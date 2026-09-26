@@ -267,7 +267,7 @@ export function buildSwitchboardIndex(switchboard) {
     }
   }
 
-  prefixes.sort((a, b) => b.prefix.length - a.prefix.length);
+  prefixes.sort((a, b) => b.prefix.length - a.prefix.length || a.prefix.localeCompare(b.prefix));
   return { exact, prefixes, routeConflicts };
 }
 
@@ -275,10 +275,15 @@ export function lookupSwitchboard(index, relPath) {
   const norm = normalizePosix(relPath);
   if (index.routeConflicts?.has(norm)) return { ...index.exact.get(norm), routeConflict: index.routeConflicts.get(norm) };
   if (index.exact.has(norm)) return index.exact.get(norm);
+  const matches = [];
   for (const { prefix, entry } of index.prefixes) {
-    if (norm === prefix || norm.startsWith(prefix + '/')) return entry;
+    if (norm === prefix || norm.startsWith(prefix + '/')) matches.push({ prefix, entry });
   }
-  return null;
+  if (matches.length === 0) return null;
+  const maxLen = matches[0].prefix.length;
+  const tied = matches.filter((m) => m.prefix.length === maxLen);
+  if (tied.length > 1) return { ...tied[0].entry, routeConflict: tied.map((m) => m.entry) };
+  return tied[0].entry;
 }
 
 export const DIRECTORY_HEURISTICS = [
@@ -441,7 +446,8 @@ export function proposeDisposition({ corpus, authorityStatus, fileClass, gap, is
   if (corpus === 'user-knowledge' || corpus === 'consumer-project') return 'reclassify-out-of-platform-scope';
   if (corpus === 'history-evidence') return 'retain-as-evidence';
   if (isPromotedCanonical) return 'promote';
-  if (fileClass === 'maintained-authority') return authorityStatus === 'candidate' ? 'promote' : 'merge';
+  if (authorityStatus === 'candidate') return 'unknown-blocking';
+  if (fileClass === 'maintained-authority') return 'merge';
   if (fileClass === 'retained-source') return 'defer-with-owner';
   return 'unknown-blocking';
 }
@@ -751,56 +757,105 @@ export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex 
 
   function parseCallArguments(src) {
     const args = [];
-    let idx = 0;
-    while (idx < src.length) {
-      while (idx < src.length && /[\s,]/.test(src[idx])) idx += 1;
-      const quote = src[idx];
-      if (quote === '"' || quote === "'" || quote === '`') {
-        let end = idx + 1;
-        let dynamicTemplate = false;
-        while (end < src.length) {
-          if (src[end] === '\\') { end += 2; continue; }
-          if (quote === '`' && src[end] === '$' && src[end + 1] === '{') dynamicTemplate = true;
-          if (src[end] === quote) break;
-          end += 1;
-        }
-        args.push({ literal: !dynamicTemplate, value: src.slice(idx + 1, end) });
-        idx = end + 1;
-      } else {
-        let end = idx;
-        while (end < src.length && src[end] !== ',') end += 1;
-        const value = src.slice(idx, end).trim();
-        if (value) args.push({ literal: false, value });
-        idx = end + 1;
+    let start = 0;
+    let depth = 0;
+    let quote = null;
+    let dynamicTemplate = false;
+    function pushArg(end) {
+      const raw = src.slice(start, end).trim();
+      if (!raw) return;
+      const q = raw[0];
+      const literal = (q === '"' || q === "'" || q === '`') && raw[raw.length - 1] === q && !(q === '`' && /\$\{/.test(raw));
+      args.push({ literal, value: literal ? raw.slice(1, -1) : raw });
+    }
+    for (let idx = 0; idx < src.length; idx += 1) {
+      const ch = src[idx];
+      if (quote) {
+        if (ch === '\\') { idx += 1; continue; }
+        if (quote === '`' && ch === '$' && src[idx + 1] === '{') dynamicTemplate = true;
+        if (ch === quote) quote = null;
+        continue;
+      }
+      if (ch === '"' || ch === "'" || ch === '`') { quote = ch; dynamicTemplate = false; continue; }
+      if (ch === '(' || ch === '[' || ch === '{') { depth += 1; continue; }
+      if (ch === ')' || ch === ']' || ch === '}') { depth = Math.max(0, depth - 1); continue; }
+      if (ch === ',' && depth === 0) {
+        pushArg(idx);
+        start = idx + 1;
       }
     }
+    pushArg(src.length);
     return args;
   }
 
+  function findDynamicCalls(content) {
+    const calls = [];
+    const callees = ['path.join', 'path.resolve', 'new URL'];
+    let quote = null;
+    for (let idx = 0; idx < content.length; idx += 1) {
+      const ch = content[idx];
+      if (quote) {
+        if (ch === '\\') { idx += 1; continue; }
+        if (ch === quote) quote = null;
+        continue;
+      }
+      if (ch === '"' || ch === "'" || ch === '`') { quote = ch; continue; }
+      const callee = callees.find((c) => content.startsWith(c, idx));
+      if (!callee) continue;
+      let open = idx + callee.length;
+      while (/\s/.test(content[open] || '')) open += 1;
+      if (content[open] !== '(') continue;
+      let depth = 1;
+      let end = open + 1;
+      let innerQuote = null;
+      for (; end < content.length; end += 1) {
+        const c = content[end];
+        if (innerQuote) {
+          if (c === '\\') { end += 1; continue; }
+          if (c === innerQuote) innerQuote = null;
+          continue;
+        }
+        if (c === '"' || c === "'" || c === '`') { innerQuote = c; continue; }
+        if (c === '(') depth += 1;
+        else if (c === ')') {
+          depth -= 1;
+          if (depth === 0) break;
+        }
+      }
+      if (depth === 0) calls.push({ callee, start: idx, end: end + 1, argsSource: content.slice(open + 1, end), raw: content.slice(idx, end + 1) });
+      idx = Math.max(idx, end);
+    }
+    return calls;
+  }
+
   function dynamicPatternFromArgs(args, sourceFile, newUrl = false) {
-    const segs = args.map((arg, idx) => {
+    const rawSegs = args.map((arg, idx) => {
       if (newUrl && idx === 1 && /^import\.meta\.url$/.test(arg.value)) return '';
       if (!arg.literal) return '**';
       return arg.value;
     }).filter((v) => v !== '');
-    if (segs.length === 0) return null;
-    const raw = normalizePosix(path.posix.join(...segs));
-    const pattern = raw.includes('**') ? raw : raw;
-    return normalizeDocTarget(pattern, sourceFile) || pattern;
+    if (rawSegs.length === 0) return null;
+    const roots = new Set(['docs', 'plans', 'scripts', 'src', 'test', 'core', 'domains', 'plugins', '.agents', '.fgos']);
+    let segs = rawSegs;
+    const rootIdx = rawSegs.findIndex((s) => roots.has(s));
+    if (rootIdx > 0) segs = rawSegs.slice(rootIdx);
+    let raw = normalizePosix(path.posix.join(...segs));
+    if (raw.includes('/**')) raw = raw.replace(/\/\*\*(?=\/\*\*|$)/g, '/**');
+    const pattern = normalizeDocTarget(raw, sourceFile) || raw;
+    if (pattern.includes('**')) return pattern.replace(/\/\*\*(?=\/\*\*|$)/g, '/**');
+    return pattern;
   }
 
   function scanDynamicCalls(content, file) {
-    const callRe = /(?:path\.(?:join|resolve)|new\s+URL)\s*\(([\s\S]*?)\)/g;
-    let m;
-    while ((m = callRe.exec(content)) !== null) {
-      const args = parseCallArguments(m[1]);
+    for (const call of findDynamicCalls(content)) {
+      const args = parseCallArguments(call.argsSource);
       if (args.length === 0) continue;
-      const isNewUrl = m[0].startsWith('new');
+      const isNewUrl = call.callee === 'new URL';
       const pattern = dynamicPatternFromArgs(args, file, isNewUrl);
       if (!pattern || !/^(docs|plans|scripts|src|test|core|domains|plugins|\.agents|\.fgos|AGENTS\.md|CLAUDE\.md)(\/|$)/.test(pattern)) continue;
-      const lineNo = lineNumberAt(content, m.index);
+      const lineNo = lineNumberAt(content, call.start);
       if (pattern.includes('**')) {
-        addUnresolved(file, lineNo, 'dynamic', pattern, { rawTarget: m[0].replace(/\s+/g, ' ').slice(0, 240) });
+        addUnresolved(file, lineNo, 'dynamic', pattern, { rawTarget: call.raw.replace(/\s+/g, ' ').slice(0, 240) });
         continue;
       }
       if (targetSet.has(pattern)) add(pattern, file, lineNo, 'dynamic', { resolvedTarget: pattern });
@@ -1099,27 +1154,52 @@ export function carryForwardIdentityRegistry(repoRoot = process.cwd(), options =
   const classification = classifyDocPath(toSourcePath, switchboardIndex);
   const units = toSourcePath.toLowerCase().endsWith('.md') ? extractMarkdownConservationUnits(content) : extractMixedFileConservationUnit(toSourcePath, content);
   const oldUnits = (registry.units || []).filter((u) => normalizePosix(u.sourcePath || '') === sourcePath);
-  const oldByFingerprint = new Map(oldUnits.filter((u) => u.identityFingerprint).map((u) => [u.identityFingerprint, u]));
-  const oldByDigest = new Map(oldUnits.map((u) => [u.unitDigest, u]));
-  const remaining = [...oldUnits];
-  const newUnitRows = units.map((u, idx) => {
+  function multimap(rows, keyFn) {
+    const map = new Map();
+    for (const row of rows) {
+      const key = keyFn(row);
+      if (!key) continue;
+      map.set(key, (map.get(key) || []).concat(row));
+    }
+    return map;
+  }
+  const oldByFingerprint = multimap(oldUnits, (u) => u.identityFingerprint);
+  const oldByDigest = multimap(oldUnits, (u) => u.unitDigest);
+  const consumed = new Set();
+  function pickUniquePrevious(u, unitDigest) {
+    const attempts = [];
+    if (u.identityFingerprint) attempts.push(['fingerprint', u.identityFingerprint, oldByFingerprint.get(u.identityFingerprint) || []]);
+    attempts.push(['digest', unitDigest, oldByDigest.get(unitDigest) || []]);
+    let sawAmbiguous = null;
+    for (const [kind, key, rows] of attempts) {
+      const available = rows.filter((row) => !consumed.has(row));
+      if (available.length === 1) {
+        consumed.add(available[0]);
+        return available[0];
+      }
+      if (available.length > 1) sawAmbiguous = `${kind} ${key} has ${available.length} possible old units`;
+    }
+    throw new Error(`${toSourcePath}: identity carry-forward refused for unit ${u.anchor || unitDigest}: ${sawAmbiguous || 'no uniquely matchable old unit (edited/new unit)'}`);
+  }
+  const newUnitRows = units.map((u) => {
     const claimKind = inferClaimKindFromPathAndText(toSourcePath, u.sample || u.title, documentType);
     const unitDigest = buildUnitIdentityDigest(u);
-    let previous = oldByFingerprint.get(u.identityFingerprint) || oldByDigest.get(unitDigest) || remaining[idx] || null;
-    if (previous) remaining.splice(remaining.indexOf(previous), 1);
+    const previous = pickUniquePrevious(u, unitDigest);
     return {
-      ...(previous || {}),
+      ...previous,
       sourcePath: toSourcePath,
       unitDigest,
       identityFingerprint: u.identityFingerprint || unitDigest,
-      claimId: previous?.claimId || randomOpaqueId('claim'),
+      claimId: previous.claimId,
       sourceAnchor: u.anchor,
       unitKind: u.unitKind,
       sourceUnitDigest: u.textDigest,
       claimKind,
-      status: previous?.status || deriveClaimStatus(classification),
+      status: previous.status || deriveClaimStatus(classification),
     };
   });
+  const unconsumed = oldUnits.filter((u) => !consumed.has(u));
+  if (unconsumed.length > 0) throw new Error(`${toSourcePath}: identity carry-forward refused because ${unconsumed.length} old unit(s) from ${sourcePath} were not uniquely preserved`);
   const documents = (registry.documents || []).filter((d) => normalizePosix(d.path || '') !== sourcePath && normalizePosix(d.path || '') !== toSourcePath);
   const oldDoc = (registry.documents || []).find((d) => normalizePosix(d.path || '') === sourcePath || normalizePosix(d.path || '') === toSourcePath);
   documents.push({ ...(oldDoc || {}), path: toSourcePath, sourceId: oldDoc?.sourceId || randomOpaqueId('src'), sourceDigest: sha256Bytes(blob), blobSha: entry.blobSha });
@@ -1295,16 +1375,19 @@ export function generateInventory(repoRoot = process.cwd(), options = {}) {
     delete item._claimsById;
   }
   const semanticConflictGroups = buildSemanticConflictGroups(items);
+  const claimIdentityGapRows = claimLedger.filter((claim) => claim.identityStatus && claim.identityStatus !== 'carried-forward');
 
   const summary = {
     scannedFilesCount: items.length,
     claimCount: claimLedger.length,
+    claimIdentityGapCount: claimIdentityGapRows.length,
     byCorpus: {},
     byAuthorityStatus: {},
     byFileClass: {},
     byProposedDisposition: {},
     byConsumerKind: {},
-    gapCount: items.filter((i) => i.gap).length,
+    gapCount: items.filter((i) => i.gap).length + claimIdentityGapRows.length,
+    fileGapCount: items.filter((i) => i.gap).length,
     duplicateContentGroupCount: duplicateContentGroups.length,
     semanticConflictGroupCount: semanticConflictGroups.length,
     scanGapCount: scanGaps.length,
@@ -1340,6 +1423,7 @@ export function generateInventory(repoRoot = process.cwd(), options = {}) {
     summary,
     duplicateContentGroups,
     semanticConflictGroups,
+    claimIdentityGapRows: claimIdentityGapRows.map((claim) => ({ claimId: claim.claimId, sourcePath: claim.sourcePath, sourceAnchor: claim.sourceAnchor, identityStatus: claim.identityStatus, disposition: claim.disposition })),
     scanGaps,
     immutableRefEdges,
     claimLedger,
@@ -1370,7 +1454,7 @@ export function generateMarkdownReport(inventory) {
   lines.push(`- **Files scanned:** ${inventory.summary.scannedFilesCount}`);
   lines.push(`- **Claim rows:** ${inventory.summary.claimCount}`);
   lines.push(`- **Headings / unheaded blocks / mixed-file blocks:** ${inventory.summary.headingTotalCount} / ${inventory.summary.unheadedBlockTotalCount} / ${inventory.summary.mixedFileBlockTotalCount}`);
-  lines.push(`- **Gaps:** ${inventory.summary.gapCount}`);
+  lines.push(`- **Gaps:** ${inventory.summary.gapCount} (${inventory.summary.fileGapCount || 0} file/routing gap(s), ${inventory.summary.claimIdentityGapCount || 0} claim identity-gap blocker(s))`);
   lines.push(`- **Exact duplicate-content groups:** ${inventory.summary.duplicateContentGroupCount}`);
   lines.push(`- **Semantic conflict groups:** ${inventory.summary.semanticConflictGroupCount}`);
   lines.push('');
@@ -1395,6 +1479,12 @@ export function generateMarkdownReport(inventory) {
   lines.push('| Path | Area | Authority Status | File Class | Proposed owner |');
   lines.push('|---|---|---|---|---|');
   for (const item of inventory.items.filter((i) => i.gap)) lines.push(`| \`${item.path}\` | ${item.area} | \`${item.authorityStatus}\` | \`${item.fileClass}\` | ${item.proposedTargetOwner ? `\`${item.proposedTargetOwner}\`` : ''} |`);
+  lines.push('');
+  lines.push('## Claim Identity-Gap Blockers');
+  lines.push('');
+  lines.push('| Claim | Source | Anchor | Identity status | Disposition |');
+  lines.push('|---|---|---|---|---|');
+  for (const c of inventory.claimIdentityGapRows || []) lines.push(`| \`${c.claimId}\` | \`${c.sourcePath}\` | \`${c.sourceAnchor}\` | \`${c.identityStatus}\` | \`${c.disposition}\` |`);
   lines.push('');
   lines.push('## Claim Ledger Sample (first 500 rows)');
   lines.push('');

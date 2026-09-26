@@ -437,6 +437,7 @@ export function checkInventory({ repoRoot, inventory, vocabulary, identityRegist
   const unknownBlockingItems = (inventory.items || []).filter((i) => i.proposedDisposition === 'unknown-blocking');
   const routingGapItems = unknownBlockingItems.filter((i) => i.gap || i.gapType === 'route-conflict');
   const ownerBlockingItems = unknownBlockingItems.filter((i) => !routingGapItems.includes(i));
+  const claimIdentityGapRows = (inventory.claimLedger || []).filter((claim) => claim.identityStatus && claim.identityStatus !== 'carried-forward');
   const duplicateGroups = inventory.duplicateContentGroups || [];
   const semanticConflictGroups = inventory.semanticConflictGroups || [];
 
@@ -446,10 +447,16 @@ export function checkInventory({ repoRoot, inventory, vocabulary, identityRegist
     clean: allFatal.length === 0,
     fatalFindings: allFatal,
     explicitOpenFindings: {
-      gapCount: gapItems.length,
+      gapCount: gapItems.length + claimIdentityGapRows.length,
+      fileGapCount: gapItems.length,
+      claimIdentityGapCount: claimIdentityGapRows.length,
       gapPaths: gapItems.map((i) => i.path),
-      unknownBlockingCount: unknownBlockingItems.length,
-      unknownBlockingRows: unknownBlockingItems.map((i) => ({ path: i.path, blockerKind: i.gapType === 'route-conflict' ? 'route-conflict' : (i.gap ? 'routing-gap' : 'missing-owner'), proposedTargetOwner: i.proposedTargetOwner || null })),
+      claimIdentityGapRows: claimIdentityGapRows.map((claim) => ({ claimId: claim.claimId, sourcePath: claim.sourcePath, sourceAnchor: claim.sourceAnchor, identityStatus: claim.identityStatus })),
+      unknownBlockingCount: unknownBlockingItems.length + claimIdentityGapRows.length,
+      unknownBlockingRows: [
+        ...unknownBlockingItems.map((i) => ({ path: i.path, blockerKind: i.gapType === 'route-conflict' ? 'route-conflict' : (i.gap ? 'routing-gap' : 'missing-owner'), proposedTargetOwner: i.proposedTargetOwner || null })),
+        ...claimIdentityGapRows.map((claim) => ({ path: claim.sourcePath, claimId: claim.claimId, blockerKind: 'claim-identity-gap', proposedTargetOwner: null })),
+      ],
       routingGapPaths: routingGapItems.map((i) => i.path),
       missingOwnerPaths: ownerBlockingItems.map((i) => i.path),
       duplicateContentGroupCount: duplicateGroups.length,
@@ -522,7 +529,7 @@ export function runCli(argv, cwd = process.cwd()) {
   console.log(
     `check-doc-inventory-gates: structural and vocabulary gates pass. ` +
     `Explicit open findings (not blocking Phase 02, must be resolved before Phase 05): ` +
-    `${result.explicitOpenFindings.gapCount} gap(s), ${result.explicitOpenFindings.duplicateContentGroupCount} duplicate-content group(s), ` +
+    `${result.explicitOpenFindings.gapCount} gap/blocker(s) (${result.explicitOpenFindings.fileGapCount} file/routing, ${result.explicitOpenFindings.claimIdentityGapCount} claim-identity), ${result.explicitOpenFindings.duplicateContentGroupCount} duplicate-content group(s), ` +
     `${result.explicitOpenFindings.semanticConflictGroupCount} semantic-conflict group(s).`
   );
   return 0;

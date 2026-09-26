@@ -15,7 +15,7 @@ Related:
 - **Files scanned:** 4305
 - **Claim rows:** 85772
 - **Headings / unheaded blocks / mixed-file blocks:** 26105 / 58490 / 1177
-- **Gaps:** 1054
+- **Gaps:** 1360 (1054 file/routing gap(s), 306 claim identity-gap blocker(s))
 - **Exact duplicate-content groups:** 818
 - **Semantic conflict groups:** 151
 
@@ -55,12 +55,12 @@ Related:
 | Value | Count |
 |---|---:|
 | `retain-as-evidence` | 1703 |
-| `unknown-blocking` | 1089 |
+| `unknown-blocking` | 1092 |
 | `merge` | 665 |
 | `reclassify-out-of-platform-scope` | 548 |
-| `split` | 292 |
-| `promote` | 4 |
+| `split` | 290 |
 | `regenerate-from-source` | 4 |
+| `promote` | 3 |
 
 ### Consumer Kind
 
@@ -2103,6 +2103,317 @@ Related:
 | `docs/templates/vision.md` | Unclassified | `unclassified` | `unclassified` |  |
 | `docs/user/README.md` | Unclassified | `unclassified` | `unclassified` |  |
 | `docs/work-item-lifecycle-vision.md` | root:docs/work-item-lifecycle-vision.md | `non-authority` | `retained-source` |  |
+
+## Claim Identity-Gap Blockers
+
+| Claim | Source | Anchor | Identity status | Disposition |
+|---|---|---|---|---|
+| `claim_identity_gap_8dd07456abcee9f7bcf9618e` | `docs/architect/agent-coordination/contracts/coordination-session.md` | `unheaded-block-37` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_e2236f3d450e7f551748bd23` | `docs/architect/agent-coordination/contracts/coordination-session.md` | `unheaded-block-45` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_8950e2e5472b13b8beed62eb` | `docs/architect/agent-coordination/contracts/coordination-session.md` | `unheaded-block-54` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_452d8b1a14c729874a439216` | `docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md` | `unheaded-block-15` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_6b98f8c75206f59987d22a32` | `docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md` | `unheaded-block-130` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_472d8d044ed923676abcd9c3` | `docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md` | `unheaded-block-131` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_1114ab1bef7ee05dabb69790` | `docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md` | `unheaded-block-133` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_1473ab35882c0015a237b6bf` | `docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md` | `unheaded-block-135` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_910df97873fb074a65c19fe0` | `docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md` | `unheaded-block-136` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_2fca28f77877df9403766f1f` | `docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md` | `unheaded-block-139` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_df63d2eee956b0b3c617200f` | `docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md` | `unheaded-block-140` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_01921fa3b8d04c1a64f40eb8` | `docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md` | `unheaded-block-57` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_1c676736caae08ec8ad27557` | `docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md` | `unheaded-block-218` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_41e67fb834627535e9f705b5` | `docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md` | `unheaded-block-22` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_4fbb8a1c77bef5ff6c317381` | `docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md` | `unheaded-block-25` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_0762e52140c101b7c603552a` | `docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md` | `unheaded-block-31` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_b1b28705924ed5bf4a0b437e` | `docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md` | `unheaded-block-36` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_3cdf835e8291b3269d7b0d1f` | `docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md` | `unheaded-block-49` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_e0f9dc375023d8206558dabc` | `docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md` | `unheaded-block-55` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_01e39d2e58fff068e9bb47b1` | `docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md` | `unheaded-block-60` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_82db662d3b329c4e5599721a` | `docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md` | `unheaded-block-71` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_f576e0bd148154cc3fec00ba` | `docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md` | `unheaded-block-80` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_1f85156e0d0d3ac3fd999b8d` | `docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md` | `unheaded-block-86` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_67cb394974b02c77ea497516` | `docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md` | `unheaded-block-90` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_9c535e050ce942f5d4e0ec8a` | `docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md` | `unheaded-block-96` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_69146bdbc623f0d10f94b858` | `docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md` | `unheaded-block-100` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_4cc6e35aeb0dcc1ef7b2c98f` | `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | `unheaded-block-13` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_b6d055a5accfd254452bc663` | `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | `unheaded-block-16` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_97616e3a4a97af4a61d9e82b` | `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | `unheaded-block-20` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_e7c85149b95af5c490ead6fb` | `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | `unheaded-block-24` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_fad73b364d29ccbb74ecd66e` | `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | `unheaded-block-28` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_6e662fc0c99b482e3d930b73` | `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | `unheaded-block-46` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_da7c1a0d9862ff8eb238eaa9` | `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | `unheaded-block-57` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_6faf303d6405fe7109c3af0a` | `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | `unheaded-block-66` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_6feb6cf9e3ff4fa5723ff930` | `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | `unheaded-block-67` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_64a71c40714f091aa4c5ac74` | `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | `unheaded-block-77` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_b8169cd046bb67d4f76cc35c` | `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | `unheaded-block-79` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_df28ae5b11f1a28c59a09646` | `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | `unheaded-block-80` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_487ef2bd018142f6fd79af3a` | `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | `unheaded-block-98` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_ab7f7313935fa2922f38e657` | `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | `unheaded-block-107` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_bd37f3db370a17d67d46bb18` | `docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | `unheaded-block-118` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_8365356624225a0a8342b867` | `docs/architect/agent-coordination/verification/step-07-mvp/P01.2.md` | `unheaded-block-94` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_07e22c08e036c4f30f18a9a9` | `docs/architect/agent-coordination/verification/step-07-mvp/P01.2.md` | `unheaded-block-108` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_2ca37d75bf63400da8356828` | `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.2.md` | `unheaded-block-63` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_dd447c1e83596a3dbdb53799` | `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.2.md` | `unheaded-block-72` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_4ba90266bc16a4bce8c1e832` | `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.3.md` | `unheaded-block-42` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_6492e7e0e7b45fb02a2d6231` | `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.3.md` | `unheaded-block-43` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_ab7bb0fcb9523f5b4b943926` | `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.3.md` | `unheaded-block-52` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_8b0b637811b437ac3881326c` | `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.3.md` | `unheaded-block-53` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_30002ba0577b9c4d2f8d5e4a` | `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.2.md` | `unheaded-block-33` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_b291fb452039f45d9ae5df2d` | `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.2.md` | `unheaded-block-55` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_4a23263e540612ded91337e1` | `docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.2.md` | `unheaded-block-91` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_902188fcdf84a149bb96630e` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | `unheaded-block-6` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_2e688819be601c7311b98a5f` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | `unheaded-block-9` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_fe8972db3db2e647b2c413ef` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | `unheaded-block-29` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_d8c23eec7b040db831d49b73` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | `unheaded-block-34` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_a8924ae077b75da3c1363844` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | `unheaded-block-35` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_49c42b1953834a04e7598501` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | `unheaded-block-67` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_1189dc420a1b45120dab66b9` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | `unheaded-block-69` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_42ff80329d1155e9597f8c38` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | `unheaded-block-84` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_7246b7f87ade6b8587d697e3` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | `unheaded-block-86` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_9a5e9f613186c591fb4a4231` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-red-team.md` | `unheaded-block-58` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_79b3842bd14923560f2b09fd` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-red-team.md` | `unheaded-block-88` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_87f7e3f764c747b5107814fd` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-review.md` | `findings` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_1c80d0d63208656ea73d9f35` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-review.md` | `unheaded-block-27` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_0e784a72120b59de5f7a353e` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-review.md` | `unheaded-block-58` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_3f067934f7f74f4bc4af1cce` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-review.md` | `findings-1` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_ea5546d84da12633a67a9ba8` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md` | `unheaded-block-22` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_48222f1c971b1a70c0c6681d` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md` | `unheaded-block-42` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_fdeb45178b8910aca76dc03a` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md` | `unheaded-block-49` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_0765e27623152fcd0eee469b` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md` | `unheaded-block-66` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_ad10598a37d5a52282e0d476` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md` | `unheaded-block-73` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_ed2be0b2fb009f593ca1de19` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md` | `unheaded-block-91` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_f6389a22e91cd79a53a731ab` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md` | `unheaded-block-94` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_23b21b6a219e286591d14b47` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md` | `unheaded-block-99` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_4ed18ce099f29fb3abe4c38e` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md` | `unheaded-block-115` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_f39bb995c8f3c8869aa3c638` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md` | `unheaded-block-118` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_3d0df3446ef2668e53bbcff0` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.3-review.md` | `unheaded-block-3` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_da87d63e6a15ec2997aaef4c` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.3-review.md` | `unheaded-block-48` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_978d5186eca7bb999c339607` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.1.md` | `unheaded-block-16` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_9ffedf59c639a4a6b05287f0` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.1.md` | `unheaded-block-23` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_d6b3f5eb8c5e63973ca3a95b` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.1.md` | `unheaded-block-26` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_4db00b937125d6ae529b70fe` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.1.md` | `unheaded-block-30` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_31e720cc4c40ad3225a27c36` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3-P08.1-review.md` | `unheaded-block-57` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_6c86cfcccebb3154794573bc` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3-P08.1-review.md` | `unheaded-block-91` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_9670a429e99feb439a441acf` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P09.2.md` | `unheaded-block-14` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_793294564cee365e8c31f03d` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P09.2.md` | `unheaded-block-31` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_a2cf71678b74ab13da78705c` | `docs/architect/agent-coordination/vocabulary/canonical-concepts.md` | `unheaded-block-31` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_e8fe828ee6275250d2cbfccd` | `docs/architect/agent-coordination/vocabulary/canonical-concepts.md` | `unheaded-block-33` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_749c9f5d04256cec15545d13` | `docs/architect/agent-coordination/vocabulary/canonical-concepts.md` | `unheaded-block-38` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_bf4c5be6d8b8d4434f387bde` | `docs/architect/agent-coordination/vocabulary/canonical-concepts.md` | `unheaded-block-41` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_634636e88ce47b60039bee79` | `docs/architect/agent-coordination/vocabulary/canonical-concepts.md` | `unheaded-block-47` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_0127bd981305841df05ed1ae` | `docs/architect/component-boundary/README.md` | `unheaded-block-20` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_72f6847a2dabe1b546c44425` | `docs/architect/component-boundary/README.md` | `unheaded-block-25` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_4b95ef679c4f3cfc1a92bfa5` | `docs/architect/component-boundary/README.md` | `unheaded-block-28` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_5227514b9c31dfd55e285a6a` | `docs/architect/component-boundary/README.md` | `unheaded-block-31` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_dcc78f971849ebc977a03e46` | `docs/architect/documentation-system-discussion.md` | `unheaded-block-34` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_4ec254cf7f9a3242665832f2` | `docs/architect/documentation-system-discussion.md` | `unheaded-block-62` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_f94919ae7e2bd21afda20251` | `docs/architect/documentation-system-discussion.md` | `unheaded-block-102` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_5c02b7c7db8a9c1f48d074e8` | `docs/architect/documentation-system-discussion.md` | `unheaded-block-176` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_7d6f6adabdd174f6a0bb808f` | `docs/architect/knowledge-registry-redesign.md` | `unheaded-block-22` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_3c0602b191c954271b50cd2e` | `docs/architect/knowledge-registry-redesign.md` | `unheaded-block-41` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_d0a5e670ca371abde82e0600` | `docs/architect/packaging-distribution/runtime-identity-and-activation.md` | `unheaded-block-23` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_7a64449df144e7c3b8ea8e36` | `docs/architect/packaging-distribution/runtime-identity-and-activation.md` | `unheaded-block-81` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_9909bd94769ba7d98618f6a8` | `docs/architect/proposals/step-10-a0-coding-domain-boundary-facade-plan.md` | `unheaded-block-33` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_2749d0406f04b1762fa6b114` | `docs/architect/proposals/step-10-a0-coding-domain-boundary-facade-plan.md` | `unheaded-block-65` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_cad9c07ae6adaa5a551109ee` | `docs/architect/proposals/step-10-a0-coding-domain-boundary-facade-plan.md` | `unheaded-block-72` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_e57acfc83ec2f2049d69f7cb` | `docs/architect/proposals/step-10-a0-coding-domain-boundary-facade-plan.md` | `unheaded-block-75` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_5617cdea72a9377a7abd1242` | `docs/architect/proposals/step-10-a0-coding-domain-boundary-facade-plan.md` | `unheaded-block-87` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_e078dd2c6ad254963f09681c` | `docs/architect/proposals/step-10-a0-coding-domain-boundary-facade-plan.md` | `unheaded-block-92` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_e4c1f59a4af8576ea1d92fae` | `docs/architect/workspace-topology-audit.md` | `unheaded-block-9` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_22b3e62f4854f39179af9f10` | `docs/architect/workspace-topology-audit.md` | `unheaded-block-13` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_1d0063f866c11f137855fab9` | `docs/architect/workspace-topology-audit.md` | `unheaded-block-16` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_d9f8ae539062e721710da940` | `docs/architect/workspace-topology-audit.md` | `unheaded-block-19` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_8f4830dc54ceb1a8f5b8619b` | `docs/architect/workspace-topology-audit.md` | `unheaded-block-23` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_78994966b4e1b06b8f3e56a4` | `docs/architect/workspace-topology-audit.md` | `unheaded-block-26` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_8ffe32e4198becc10a80d657` | `docs/architect/workspace-topology-audit.md` | `unheaded-block-29` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_62b1ec722bc2d111454549a8` | `docs/architect/workspace-topology-audit.md` | `unheaded-block-36` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_d14ad8ce810dbbd282f1795d` | `docs/architect/workspace-topology-audit.md` | `unheaded-block-40` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_638c2f90f056acdd964cd669` | `docs/architecture-map.md` | `unheaded-block-77` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_b4cd35e6dab7fcb03ed1b418` | `docs/architecture-map.md` | `unheaded-block-83` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_ab1e6954350098da6bc7fbc5` | `docs/history/compound-learn-artifact-registry/RESEARCH.md` | `unheaded-block-2` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_f5980c9b4f48eed8190e0b71` | `docs/history/compound-learn-artifact-registry/RESEARCH.md` | `unheaded-block-10` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_c3fe8bb3449f19dd3c9ca48d` | `docs/history/compound-learn-artifact-registry/RESEARCH.md` | `unheaded-block-12` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_922750c2ed5ed4eabad1316b` | `docs/history/compound-learn-artifact-registry/RESEARCH.md` | `unheaded-block-16` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_e7db85d3d11f5b1777b1d32d` | `docs/history/compound-learn-artifact-registry/RESEARCH.md` | `unheaded-block-18` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_c1d92f63f44314e15cbaaef9` | `docs/history/compound-learn-artifact-registry/RESEARCH.md` | `unheaded-block-21` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_4f6de3ae5986583bef94a0ec` | `docs/history/compound-learn-artifact-registry/RESEARCH.md` | `unheaded-block-23` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_501b28f15b7d2e473ab08e88` | `docs/history/discover-stage-graph-and-skill-layering/CONTEXT.md` | `outstanding-questions` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_26054fc859ed7d470ee2b964` | `docs/history/discover-stage-graph-and-skill-layering/CONTEXT.md` | `outstanding-questions-1` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_b0501a3633aae6bc888df134` | `docs/history/discover-stage-graph-and-skill-layering/CONTEXT.md` | `outstanding-questions-2` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_d242c4b3880a7eab202744e8` | `docs/history/discover-stage-graph-and-skill-layering/plan.md` | `outstanding-questions` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_7fcb188cf647ecdc77647cfd` | `docs/history/discover-stage-graph-and-skill-layering/plan.md` | `outstanding-questions-1` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_2a0ada8243a02e3fa68d650a` | `docs/history/discover-stage-graph-and-skill-layering/plan.md` | `outstanding-questions-2` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_0a1ca8cf1bbc63696320a654` | `docs/history/discover-stage-graph-and-skill-layering/RESEARCH.md` | `unheaded-block-10` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_59f907a4d357765519dbf09c` | `docs/history/discover-stage-graph-and-skill-layering/RESEARCH.md` | `unheaded-block-17` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_1a1d2c66b2fec96798644bdc` | `docs/history/discover-stage-graph-and-skill-layering/RESEARCH.md` | `unheaded-block-19` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_37bdb1e829d3ebac9768fd5d` | `docs/history/discover-stage-graph-and-skill-layering/RESEARCH.md` | `unheaded-block-23` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_7ea6a97546b827acc889ee71` | `docs/history/discover-stage-graph-and-skill-layering/RESEARCH.md` | `unheaded-block-26` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_d31ac91183fd1926efe4f241` | `docs/history/events-jsonl-git-tracked-truncation/RESEARCH.md` | `unheaded-block-2` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_5074625208f7bdeedca8b12a` | `docs/history/events-jsonl-git-tracked-truncation/RESEARCH.md` | `unheaded-block-8` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_586845eae20b1d671793e258` | `docs/history/gate-approve-vs-movenext-semantics/iron-law-evidence.md` | `unheaded-block-2` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_aff6e4ad3a470cd059c7f7dd` | `docs/history/gate-approve-vs-movenext-semantics/iron-law-evidence.md` | `unheaded-block-11` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_52e70b4a6a7c95d7206e847e` | `docs/history/herdr-plugin-parkreason-pane-filter/plan.md` | `unheaded-block-1` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_da9a91b0897f6ecd3e356aca` | `docs/history/herdr-plugin-parkreason-pane-filter/plan.md` | `unheaded-block-17` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_e4216cbd47e6202fbc954501` | `docs/history/herdr-spawn-remove-noninteractive-paths/iron-law-evidence.md` | `unheaded-block-2` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_525cd8f2d300c0862109ff10` | `docs/history/herdr-spawn-remove-noninteractive-paths/iron-law-evidence.md` | `unheaded-block-4` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_013a7f87b7859e0aa5216304` | `docs/history/herdr-web-dashboard/plan.md` | `unheaded-block-58` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_bd9096665d8e1bf17e8f37e7` | `docs/history/herdr-web-dashboard/plan.md` | `unheaded-block-67` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_712f4854106fc7b2e5d085e0` | `docs/history/herdr-web-dashboard/plan.md` | `approach-3` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_f6823b3ef327b1bcce43e1ee` | `docs/history/herdr-web-dashboard/plan.md` | `approach-4` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_5f4d78183e812eb4a50284aa` | `docs/history/main-checkout-lock-wait-decouple-ttl-snapshot/iron-law-evidence.md` | `unheaded-block-7` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_00d9cfbc5e77a42c46ad9921` | `docs/history/main-checkout-lock-wait-decouple-ttl-snapshot/iron-law-evidence.md` | `unheaded-block-12` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_b501b845a5c33d383abcd2c5` | `docs/history/merge-conductor-throughput-and-human-release/DISCUSSION.md` | `unheaded-block-41` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_14ea201240dbceb103f88ba0` | `docs/history/merge-conductor-throughput-and-human-release/DISCUSSION.md` | `unheaded-block-50` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_81cc390a2443d19cf4061d3a` | `docs/history/merge-conductor-throughput-and-human-release/DISCUSSION.md` | `unheaded-block-59` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_26a3c2bc344916b69c1a95c1` | `docs/history/merge-conductor-throughput-and-human-release/DISCUSSION.md` | `unheaded-block-68` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_0080c0df36fdd1c8dceeb50b` | `docs/history/merge-conductor-throughput-and-human-release/DISCUSSION.md` | `unheaded-block-77` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_0bd9a6a3a55f5038fcf617c2` | `docs/history/pi-executor-runtime-capacity/RESEARCH.md` | `unheaded-block-15` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_1d4d2b2ebd9c146457b57dfa` | `docs/history/pi-executor-runtime-capacity/RESEARCH.md` | `unheaded-block-24` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_3579ea0547f78c12230ab772` | `docs/history/setup-doctor-config-registry/plan.md` | `unheaded-block-9` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_2eaeaab9e7b2fdcf185edbce` | `docs/history/setup-doctor-config-registry/plan.md` | `unheaded-block-16` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_3c8321782f3796b9f1782681` | `docs/history/stage-status-driving-coordination/plan.md` | `unheaded-block-1` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_432b5378ca7a2d25bc3449a5` | `docs/history/stage-status-driving-coordination/plan.md` | `unheaded-block-13` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_db0f17aaed4806a49fb60055` | `docs/history/stage-status-driving-coordination/plan.md` | `outstanding-questions` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_c065a1aa3540e3bde9ca4eee` | `docs/history/stage-status-driving-coordination/plan.md` | `unheaded-block-29` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_1da814c99d955ef472e24a35` | `docs/history/stage-status-driving-coordination/plan.md` | `outstanding-questions-1` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_dab75cb6db60f9587c63356c` | `docs/history/state-runner-merge-boundary/DISCUSSION.md` | `unheaded-block-23` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_063c16408cae7274021f10a2` | `docs/history/state-runner-merge-boundary/DISCUSSION.md` | `unheaded-block-74` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_43527eb473750fc05aee25da` | `docs/history/state-runner-merge-boundary/iron-law-evidence.md` | `unheaded-block-17` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_0efeb7656bae7167e3b13ccb` | `docs/history/state-runner-merge-boundary/iron-law-evidence.md` | `unheaded-block-28` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_cefb8a5436c63958fe895a8b` | `docs/history/state-runner-merge-boundary/iron-law-evidence.md` | `unheaded-block-30` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_bf539cbd9daf13e4f021a535` | `docs/history/state-runner-merge-boundary/iron-law-evidence.md` | `unheaded-block-40` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_3bbae02beae1b51b0343224d` | `docs/history/state-runner-merge-boundary/iron-law-evidence.md` | `unheaded-block-42` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_6d1f7eab6a67c6bcdec8c07d` | `docs/history/state-runner-merge-boundary/iron-law-evidence.md` | `unheaded-block-54` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_3be279dbad32573f64243360` | `docs/history/tsk-3rn/iron-law-evidence.md` | `unheaded-block-3` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_fb08ff7bcfc9aff8dfd4be8a` | `docs/history/tsk-3rn/iron-law-evidence.md` | `unheaded-block-6` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_54a31332de43f894a3f73ef9` | `docs/history/tsk-480-approve-movework-friction-guard/iron-law-evidence.md` | `unheaded-block-8` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_c97d16207c1cea5c9aeef764` | `docs/history/tsk-480-approve-movework-friction-guard/iron-law-evidence.md` | `unheaded-block-11` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_811d8023e0228130c57cf7e8` | `docs/history/tsk-5e97-decompose-footprint-overlap-gate/scout-notes.md` | `unheaded-block-2` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_773b56a2b093f375303f01ab` | `docs/history/tsk-5e97-decompose-footprint-overlap-gate/scout-notes.md` | `unheaded-block-6` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_4ea610f90b968c594d7c9d8b` | `docs/history/tsk-5x7-2/iron-law-evidence.md` | `unheaded-block-2` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_8f8e594b8daf9a7fa9d33d05` | `docs/history/tsk-5x7-2/iron-law-evidence.md` | `unheaded-block-4` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_434f7a5c6e4d18c374d00d91` | `docs/history/tsk-64h/iron-law-evidence.md` | `unheaded-block-4` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_c72f7d85624b1e69090585b2` | `docs/history/tsk-64h/iron-law-evidence.md` | `unheaded-block-8` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_6850199113cf0a0ad4b78be3` | `docs/history/tsk-64h/iron-law-evidence.md` | `unheaded-block-14` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_98753c0351ee216c6e5c73f7` | `docs/history/tsk-64h/iron-law-evidence.md` | `unheaded-block-16` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_ad46cbd5978e1bc4881cbba5` | `docs/history/tsk-f38/iron-law-evidence.md` | `unheaded-block-5` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_29199d751c669560fb61a334` | `docs/history/tsk-f38/iron-law-evidence.md` | `unheaded-block-8` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_29b5de04db0b698bb3415df3` | `docs/how-to/use-fgos-group-thinking.md` | `unheaded-block-12` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_2f07e237845c2f5a48d222e9` | `docs/how-to/use-fgos-group-thinking.md` | `unheaded-block-17` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_a27241360652da9ea8b6efe2` | `docs/platform/agent-coordination/contracts/coordination-session.md` | `unheaded-block-36` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_47e8cd7d94b55342ec76152e` | `docs/platform/agent-coordination/contracts/coordination-session.md` | `unheaded-block-44` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_4365f0638191dbefd8f64d01` | `docs/platform/agent-coordination/contracts/coordination-session.md` | `unheaded-block-53` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_919924a68b7286e0fbe2b31f` | `docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md` | `unheaded-block-14` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_604703169e7fbf68d86f9fcc` | `docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md` | `unheaded-block-129` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_75c29061f99422c44bf13d9e` | `docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md` | `unheaded-block-130` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_857da560d1394d5fab7ed611` | `docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md` | `unheaded-block-132` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_dc266f76eb086f4b22921ffb` | `docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md` | `unheaded-block-134` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_9b242a4635b270b5b9bc31c6` | `docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md` | `unheaded-block-135` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_55b11b9095258a1d13dd80c0` | `docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md` | `unheaded-block-138` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_87a1b99043f81bca1c7beedf` | `docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md` | `unheaded-block-139` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_7b0662feee2e5ad0787c3f05` | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md` | `unheaded-block-56` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_4e17abdad18f6f1c818e31ff` | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md` | `unheaded-block-217` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_aa746623c509c62c3b4d049f` | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md` | `unheaded-block-21` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_0568585674f51ba67516eabd` | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md` | `unheaded-block-24` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_02f537fa7c7c0c0ed2241cf5` | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md` | `unheaded-block-30` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_493340f7fd3542efa487dea3` | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md` | `unheaded-block-35` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_f99fe5e6b2d3cc09838d947e` | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md` | `unheaded-block-48` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_a7271b91a7405e49901be277` | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md` | `unheaded-block-54` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_afe3adeb2ecb1b99b5a5f464` | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md` | `unheaded-block-59` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_eb9e6cd0aecb9b9501255cf5` | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md` | `unheaded-block-70` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_1c8f900233486d9e811af398` | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md` | `unheaded-block-79` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_0c5fc0d8d6eb766effa29f4c` | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md` | `unheaded-block-85` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_322f883acb0e881e662a30ce` | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md` | `unheaded-block-89` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_a30c6f071656242b5dbd1cf2` | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md` | `unheaded-block-95` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_461e8730abf28c66d07217b5` | `docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md` | `unheaded-block-99` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_6698b4e26a576b4ddfa533e0` | `docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | `unheaded-block-13` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_806d7ca9f2a75ebd63124d36` | `docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | `unheaded-block-16` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_0a50c7163df3a8f833e73b75` | `docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | `unheaded-block-20` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_93532a5253a3b61d12bb5624` | `docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | `unheaded-block-24` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_2dc32b37942abfd33a441a18` | `docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | `unheaded-block-28` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_89c8a705ff888d97156eb4ca` | `docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | `unheaded-block-46` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_cf2a5a484534dd3b48bffa0f` | `docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | `unheaded-block-57` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_2c245148ea6b8970a398d577` | `docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | `unheaded-block-66` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_95c24108148f2b7a086bacad` | `docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | `unheaded-block-67` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_c149923688f6047416dd84e9` | `docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | `unheaded-block-77` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_f344cef7ee5e3ba6e54a4c13` | `docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | `unheaded-block-79` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_265e14a3903492134bfcfcb7` | `docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | `unheaded-block-80` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_02433c8dc327e63684b7ae79` | `docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | `unheaded-block-98` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_049c9bb892d82b875a4b0f04` | `docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | `unheaded-block-107` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_b0b8b76122944ab693779411` | `docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md` | `unheaded-block-118` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_1107fdefd86f5bad6af3fda8` | `docs/platform/agent-coordination/verification/step-07-mvp/P01.2.md` | `unheaded-block-94` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_3f7ece4df7fa4df0c256e7b0` | `docs/platform/agent-coordination/verification/step-07-mvp/P01.2.md` | `unheaded-block-108` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_2faec2fe2b7ab793124cd7ad` | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.2.md` | `unheaded-block-63` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_3681a4532385734ef2e7c7d0` | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.2.md` | `unheaded-block-72` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_c8d08956edbe858053db1457` | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.3.md` | `unheaded-block-42` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_8403f6bdad2be146a5d6c55c` | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.3.md` | `unheaded-block-43` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_9da9146a531ac0211a61a01b` | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.3.md` | `unheaded-block-52` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_37c4429d333858c4cccf7b8f` | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.3.md` | `unheaded-block-53` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_46f225f73f93be14f5412dde` | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.2.md` | `unheaded-block-33` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_d827fd27df92dccd6502e4f5` | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.2.md` | `unheaded-block-55` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_ef96ccbc55e94a0f609add8b` | `docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.2.md` | `unheaded-block-91` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_52cafe1662702962c56e0940` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | `unheaded-block-6` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_84df84912334c70094489988` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | `unheaded-block-9` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_4000c5c2d0f6b828a16a9ca0` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | `unheaded-block-29` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_e4f68d09bfdd1d8fb2d8997b` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | `unheaded-block-34` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_a6ceade6ef607311a9378368` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | `unheaded-block-35` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_367519ac8250b7f2617f857f` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | `unheaded-block-67` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_a57a082fac08280cb8e67827` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | `unheaded-block-69` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_0fb5e10ec851f960ebf28014` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | `unheaded-block-84` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_75743cb09939c2141a7140cc` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | `unheaded-block-86` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_d85549122ea77cfcfcb8dcbf` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-red-team.md` | `unheaded-block-58` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_7fcb6361ae9612689aca736a` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-red-team.md` | `unheaded-block-88` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_8c0f8f91cb5a888e26a0d941` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-review.md` | `findings` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_7c585fbddeeb340130839653` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-review.md` | `unheaded-block-27` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_1d7214fb83b8cc55d6f86cfc` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-review.md` | `unheaded-block-58` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_96c414af91710c0709203063` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-review.md` | `findings-1` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_9358c4246aa621d066e64167` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md` | `unheaded-block-22` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_324e00749d4c972a4555af51` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md` | `unheaded-block-42` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_8662c2d0940bf8541ab03c9c` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md` | `unheaded-block-49` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_0e86b4263a2a5d68f528c636` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md` | `unheaded-block-66` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_8cf11e6e01dadb68508f1b41` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md` | `unheaded-block-73` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_000e10121da9f182356022a8` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md` | `unheaded-block-91` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_c5534d8bb30e3118f5bf8c8c` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md` | `unheaded-block-94` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_0bab9490562f6b5a5ba3c31e` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md` | `unheaded-block-99` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_35bd001ffa74cebe75966323` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md` | `unheaded-block-115` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_bec6a5690913ee9ebb096bcb` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md` | `unheaded-block-118` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_bdb5089fb2a3da3c4d78c8e6` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.3-review.md` | `unheaded-block-3` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_3082f53d12c318113c46b97d` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.3-review.md` | `unheaded-block-48` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_e18cedd6d233b04489c411c2` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.1.md` | `unheaded-block-16` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_dbabb23fce24e3760c9a0abf` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.1.md` | `unheaded-block-23` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_a2f55487c8776df367f2663b` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.1.md` | `unheaded-block-26` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_c099a57fedb46c8be2980b09` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.1.md` | `unheaded-block-30` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_cacecabe35d12284bf5d9f70` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3-P08.1-review.md` | `unheaded-block-57` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_256ec1b43419bb1476d812d2` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3-P08.1-review.md` | `unheaded-block-91` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_38ea824cbfce794b46a15a4a` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P09.2.md` | `unheaded-block-14` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_832f7cb15dbe3b942eb93ea3` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P09.2.md` | `unheaded-block-31` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_4a03a1907b4d25f06824314f` | `docs/platform/agent-coordination/vocabulary/canonical-concepts.md` | `unheaded-block-30` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_28c85678c9b65c05c9057ebe` | `docs/platform/agent-coordination/vocabulary/canonical-concepts.md` | `unheaded-block-32` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_ed2ec229b436e732fd7e8f27` | `docs/platform/agent-coordination/vocabulary/canonical-concepts.md` | `unheaded-block-37` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_7ee3ee4c77755e22775b08e0` | `docs/platform/agent-coordination/vocabulary/canonical-concepts.md` | `unheaded-block-40` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_5a4b54955989ab0d3cb508fd` | `docs/platform/agent-coordination/vocabulary/canonical-concepts.md` | `unheaded-block-46` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_85573f46f028dcaf43981fc6` | `docs/platform/host-invocation-routing/roadmap.md` | `unheaded-block-11` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_60c04d23005bf80f62c31a99` | `docs/platform/host-invocation-routing/roadmap.md` | `unheaded-block-23` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_5df91514da32302ab1ad6440` | `docs/platform/host-invocation-routing/roadmap.md` | `unheaded-block-29` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_bd80df7b9165b3edba5cdaa4` | `docs/platform/host-invocation-routing/roadmap.md` | `unheaded-block-34` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_3e87f9486f031d9b99ea5261` | `docs/platform/host-invocation-routing/roadmap.md` | `unheaded-block-42` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_15a8361a61a41e92250cb9c4` | `docs/platform/host-invocation-routing/roadmap.md` | `unheaded-block-47` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_ca9e6d292f6798319a2aa478` | `docs/specs/runner.md` | `unheaded-block-124` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_28b5cced8a1c716a5fdae667` | `docs/specs/runner.md` | `unheaded-block-129` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_b3041824ac2a22ce4270f949` | `docs/specs/runner.md` | `unheaded-block-141` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_2a1625ef25dfff80bc59bb6b` | `docs/specs/runner.md` | `unheaded-block-150` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_cf069ef0fdebb593def4ef48` | `docs/specs/runner.md` | `unheaded-block-215` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_ef7adf4fabc82a3ef1ddd94c` | `docs/specs/runner.md` | `unheaded-block-224` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_073c961584cefd091a5042ab` | `docs/specs/runner.md` | `unheaded-block-248` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_1fd76372fb6055936b871b8e` | `docs/specs/runner.md` | `unheaded-block-260` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_d6cfcf6bc516e201051e7927` | `docs/specs/system-overview.md` | `unheaded-block-25` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_a0421d60ef2a4ee298b10361` | `docs/specs/system-overview.md` | `unheaded-block-34` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_0bb127e013cfbbe017c753be` | `docs/specs/work-state.md` | `unheaded-block-111` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_a71f63a24e496ecff199564f` | `docs/specs/work-state.md` | `unheaded-block-115` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_f0a1d9d3867e85100ac5973a` | `docs/specs/work-state.md` | `unheaded-block-120` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_09dac3d1d73f38925df927a3` | `docs/specs/work-state.md` | `unheaded-block-132` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_6424dabf5edd9d5c913dee86` | `docs/specs/work-state.md` | `unheaded-block-138` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_2693549cf6851b6b8a79c187` | `docs/specs/work-state.md` | `unheaded-block-144` | `ambiguous-registry-gap` | `unknown-blocking` |
+| `claim_identity_gap_afe33474af27fd1c74eb5293` | `docs/specs/work-state.md` | `unheaded-block-168` | `ambiguous-registry-gap` | `unknown-blocking` |
 
 ## Claim Ledger Sample (first 500 rows)
 

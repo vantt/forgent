@@ -1,7 +1,7 @@
 # Documentation Authority Unification — active migration plan
 
 ```txt
-Plan status: In-progress (Phase 00 complete; Phase 01 complete -- independent re-review verdict APPROVE, tagged documentation-authority-phase-01-20260926 at f0c76c5e590339d9c815038539ff1f4a072c64e4; Phase 02 implemented and locally verified on 2026-09-26, pending independent review; Phases 03-09 unauthorized and deferred)
+Plan status: In-progress (Phase 00 complete; Phase 01 complete -- independent re-review verdict APPROVE, tagged documentation-authority-phase-01-20260926 at f0c76c5e590339d9c815038539ff1f4a072c64e4; Phase 02 final remediation cell F implemented locally on 2026-09-26, committed-SHA skip verifier pending, final full verifier pending, independent review pending; Phases 03-09 unauthorized and deferred)
 Primary objective: Collapse the competing platform-documentation authorities into one canonical system under docs/platform/**
 Long-horizon source: docs/platform/proposals/documentation-system-unification.md
 Historical foundation: plans/260825-1841-knowledge-registry/

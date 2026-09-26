@@ -22,6 +22,7 @@
   "summary": {
     "scannedFilesCount": 4305,
     "claimCount": 85772,
+    "claimIdentityGapCount": 306,
     "byCorpus": {
       "platform-authority": 2051,
       "history-evidence": 1704,
@@ -43,13 +44,13 @@
       "history-evidence": 1704
     },
     "byProposedDisposition": {
-      "unknown-blocking": 1089,
-      "split": 292,
+      "unknown-blocking": 1092,
+      "split": 290,
       "merge": 665,
       "regenerate-from-source": 4,
       "reclassify-out-of-platform-scope": 548,
       "retain-as-evidence": 1703,
-      "promote": 4
+      "promote": 3
     },
     "byConsumerKind": {
       "dynamic": 4305,
@@ -59,7 +60,8 @@
       "literal": 2348,
       "shipped-contract": 43
     },
-    "gapCount": 1054,
+    "gapCount": 1360,
+    "fileGapCount": 1054,
     "duplicateContentGroupCount": 818,
     "semanticConflictGroupCount": 151,
     "scanGapCount": 0,
@@ -7472,6 +7474,2150 @@
         "docs/platform/agent-coordination/verification/architecture-advisory-panel/proofs/P01.3/explanation.md"
       ],
       "rationale": "Same normalized area/title; requires semantic duplicate/conflict review before promotion."
+    }
+  ],
+  "claimIdentityGapRows": [
+    {
+      "claimId": "claim_identity_gap_8dd07456abcee9f7bcf9618e",
+      "sourcePath": "docs/architect/agent-coordination/contracts/coordination-session.md",
+      "sourceAnchor": "unheaded-block-37",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_e2236f3d450e7f551748bd23",
+      "sourcePath": "docs/architect/agent-coordination/contracts/coordination-session.md",
+      "sourceAnchor": "unheaded-block-45",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_8950e2e5472b13b8beed62eb",
+      "sourcePath": "docs/architect/agent-coordination/contracts/coordination-session.md",
+      "sourceAnchor": "unheaded-block-54",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_452d8b1a14c729874a439216",
+      "sourcePath": "docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "sourceAnchor": "unheaded-block-15",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_6b98f8c75206f59987d22a32",
+      "sourcePath": "docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "sourceAnchor": "unheaded-block-130",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_472d8d044ed923676abcd9c3",
+      "sourcePath": "docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "sourceAnchor": "unheaded-block-131",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_1114ab1bef7ee05dabb69790",
+      "sourcePath": "docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "sourceAnchor": "unheaded-block-133",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_1473ab35882c0015a237b6bf",
+      "sourcePath": "docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "sourceAnchor": "unheaded-block-135",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_910df97873fb074a65c19fe0",
+      "sourcePath": "docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "sourceAnchor": "unheaded-block-136",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_2fca28f77877df9403766f1f",
+      "sourcePath": "docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "sourceAnchor": "unheaded-block-139",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_df63d2eee956b0b3c617200f",
+      "sourcePath": "docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "sourceAnchor": "unheaded-block-140",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_01921fa3b8d04c1a64f40eb8",
+      "sourcePath": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md",
+      "sourceAnchor": "unheaded-block-57",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_1c676736caae08ec8ad27557",
+      "sourcePath": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md",
+      "sourceAnchor": "unheaded-block-218",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_41e67fb834627535e9f705b5",
+      "sourcePath": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "sourceAnchor": "unheaded-block-22",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_4fbb8a1c77bef5ff6c317381",
+      "sourcePath": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "sourceAnchor": "unheaded-block-25",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_0762e52140c101b7c603552a",
+      "sourcePath": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "sourceAnchor": "unheaded-block-31",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_b1b28705924ed5bf4a0b437e",
+      "sourcePath": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "sourceAnchor": "unheaded-block-36",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_3cdf835e8291b3269d7b0d1f",
+      "sourcePath": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "sourceAnchor": "unheaded-block-49",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_e0f9dc375023d8206558dabc",
+      "sourcePath": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "sourceAnchor": "unheaded-block-55",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_01e39d2e58fff068e9bb47b1",
+      "sourcePath": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "sourceAnchor": "unheaded-block-60",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_82db662d3b329c4e5599721a",
+      "sourcePath": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "sourceAnchor": "unheaded-block-71",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_f576e0bd148154cc3fec00ba",
+      "sourcePath": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "sourceAnchor": "unheaded-block-80",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_1f85156e0d0d3ac3fd999b8d",
+      "sourcePath": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "sourceAnchor": "unheaded-block-86",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_67cb394974b02c77ea497516",
+      "sourcePath": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "sourceAnchor": "unheaded-block-90",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_9c535e050ce942f5d4e0ec8a",
+      "sourcePath": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "sourceAnchor": "unheaded-block-96",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_69146bdbc623f0d10f94b858",
+      "sourcePath": "docs/architect/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "sourceAnchor": "unheaded-block-100",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_4cc6e35aeb0dcc1ef7b2c98f",
+      "sourcePath": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sourceAnchor": "unheaded-block-13",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_b6d055a5accfd254452bc663",
+      "sourcePath": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sourceAnchor": "unheaded-block-16",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_97616e3a4a97af4a61d9e82b",
+      "sourcePath": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sourceAnchor": "unheaded-block-20",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_e7c85149b95af5c490ead6fb",
+      "sourcePath": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sourceAnchor": "unheaded-block-24",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_fad73b364d29ccbb74ecd66e",
+      "sourcePath": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sourceAnchor": "unheaded-block-28",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_6e662fc0c99b482e3d930b73",
+      "sourcePath": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sourceAnchor": "unheaded-block-46",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_da7c1a0d9862ff8eb238eaa9",
+      "sourcePath": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sourceAnchor": "unheaded-block-57",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_6faf303d6405fe7109c3af0a",
+      "sourcePath": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sourceAnchor": "unheaded-block-66",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_6feb6cf9e3ff4fa5723ff930",
+      "sourcePath": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sourceAnchor": "unheaded-block-67",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_64a71c40714f091aa4c5ac74",
+      "sourcePath": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sourceAnchor": "unheaded-block-77",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_b8169cd046bb67d4f76cc35c",
+      "sourcePath": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sourceAnchor": "unheaded-block-79",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_df28ae5b11f1a28c59a09646",
+      "sourcePath": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sourceAnchor": "unheaded-block-80",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_487ef2bd018142f6fd79af3a",
+      "sourcePath": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sourceAnchor": "unheaded-block-98",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_ab7f7313935fa2922f38e657",
+      "sourcePath": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sourceAnchor": "unheaded-block-107",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_bd37f3db370a17d67d46bb18",
+      "sourcePath": "docs/architect/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sourceAnchor": "unheaded-block-118",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_8365356624225a0a8342b867",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P01.2.md",
+      "sourceAnchor": "unheaded-block-94",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_07e22c08e036c4f30f18a9a9",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P01.2.md",
+      "sourceAnchor": "unheaded-block-108",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_2ca37d75bf63400da8356828",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.2.md",
+      "sourceAnchor": "unheaded-block-63",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_dd447c1e83596a3dbdb53799",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.2.md",
+      "sourceAnchor": "unheaded-block-72",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_4ba90266bc16a4bce8c1e832",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.3.md",
+      "sourceAnchor": "unheaded-block-42",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_6492e7e0e7b45fb02a2d6231",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.3.md",
+      "sourceAnchor": "unheaded-block-43",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_ab7bb0fcb9523f5b4b943926",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.3.md",
+      "sourceAnchor": "unheaded-block-52",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_8b0b637811b437ac3881326c",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P00.3.md",
+      "sourceAnchor": "unheaded-block-53",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_30002ba0577b9c4d2f8d5e4a",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.2.md",
+      "sourceAnchor": "unheaded-block-33",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_b291fb452039f45d9ae5df2d",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.2.md",
+      "sourceAnchor": "unheaded-block-55",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_4a23263e540612ded91337e1",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.2.md",
+      "sourceAnchor": "unheaded-block-91",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_902188fcdf84a149bb96630e",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md",
+      "sourceAnchor": "unheaded-block-6",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_2e688819be601c7311b98a5f",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md",
+      "sourceAnchor": "unheaded-block-9",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_fe8972db3db2e647b2c413ef",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md",
+      "sourceAnchor": "unheaded-block-29",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_d8c23eec7b040db831d49b73",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md",
+      "sourceAnchor": "unheaded-block-34",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_a8924ae077b75da3c1363844",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md",
+      "sourceAnchor": "unheaded-block-35",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_49c42b1953834a04e7598501",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md",
+      "sourceAnchor": "unheaded-block-67",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_1189dc420a1b45120dab66b9",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md",
+      "sourceAnchor": "unheaded-block-69",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_42ff80329d1155e9597f8c38",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md",
+      "sourceAnchor": "unheaded-block-84",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_7246b7f87ade6b8587d697e3",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md",
+      "sourceAnchor": "unheaded-block-86",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_9a5e9f613186c591fb4a4231",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-red-team.md",
+      "sourceAnchor": "unheaded-block-58",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_79b3842bd14923560f2b09fd",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-red-team.md",
+      "sourceAnchor": "unheaded-block-88",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_87f7e3f764c747b5107814fd",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-review.md",
+      "sourceAnchor": "findings",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_1c80d0d63208656ea73d9f35",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-review.md",
+      "sourceAnchor": "unheaded-block-27",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_0e784a72120b59de5f7a353e",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-review.md",
+      "sourceAnchor": "unheaded-block-58",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_3f067934f7f74f4bc4af1cce",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-review.md",
+      "sourceAnchor": "findings-1",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_ea5546d84da12633a67a9ba8",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md",
+      "sourceAnchor": "unheaded-block-22",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_48222f1c971b1a70c0c6681d",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md",
+      "sourceAnchor": "unheaded-block-42",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_fdeb45178b8910aca76dc03a",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md",
+      "sourceAnchor": "unheaded-block-49",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_0765e27623152fcd0eee469b",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md",
+      "sourceAnchor": "unheaded-block-66",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_ad10598a37d5a52282e0d476",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md",
+      "sourceAnchor": "unheaded-block-73",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_ed2be0b2fb009f593ca1de19",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md",
+      "sourceAnchor": "unheaded-block-91",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_f6389a22e91cd79a53a731ab",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md",
+      "sourceAnchor": "unheaded-block-94",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_23b21b6a219e286591d14b47",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md",
+      "sourceAnchor": "unheaded-block-99",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_4ed18ce099f29fb3abe4c38e",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md",
+      "sourceAnchor": "unheaded-block-115",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_f39bb995c8f3c8869aa3c638",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md",
+      "sourceAnchor": "unheaded-block-118",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_3d0df3446ef2668e53bbcff0",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.3-review.md",
+      "sourceAnchor": "unheaded-block-3",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_da87d63e6a15ec2997aaef4c",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.3-review.md",
+      "sourceAnchor": "unheaded-block-48",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_978d5186eca7bb999c339607",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.1.md",
+      "sourceAnchor": "unheaded-block-16",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_9ffedf59c639a4a6b05287f0",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.1.md",
+      "sourceAnchor": "unheaded-block-23",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_d6b3f5eb8c5e63973ca3a95b",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.1.md",
+      "sourceAnchor": "unheaded-block-26",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_4db00b937125d6ae529b70fe",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.1.md",
+      "sourceAnchor": "unheaded-block-30",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_31e720cc4c40ad3225a27c36",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3-P08.1-review.md",
+      "sourceAnchor": "unheaded-block-57",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_6c86cfcccebb3154794573bc",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3-P08.1-review.md",
+      "sourceAnchor": "unheaded-block-91",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_9670a429e99feb439a441acf",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P09.2.md",
+      "sourceAnchor": "unheaded-block-14",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_793294564cee365e8c31f03d",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P09.2.md",
+      "sourceAnchor": "unheaded-block-31",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_a2cf71678b74ab13da78705c",
+      "sourcePath": "docs/architect/agent-coordination/vocabulary/canonical-concepts.md",
+      "sourceAnchor": "unheaded-block-31",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_e8fe828ee6275250d2cbfccd",
+      "sourcePath": "docs/architect/agent-coordination/vocabulary/canonical-concepts.md",
+      "sourceAnchor": "unheaded-block-33",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_749c9f5d04256cec15545d13",
+      "sourcePath": "docs/architect/agent-coordination/vocabulary/canonical-concepts.md",
+      "sourceAnchor": "unheaded-block-38",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_bf4c5be6d8b8d4434f387bde",
+      "sourcePath": "docs/architect/agent-coordination/vocabulary/canonical-concepts.md",
+      "sourceAnchor": "unheaded-block-41",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_634636e88ce47b60039bee79",
+      "sourcePath": "docs/architect/agent-coordination/vocabulary/canonical-concepts.md",
+      "sourceAnchor": "unheaded-block-47",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_0127bd981305841df05ed1ae",
+      "sourcePath": "docs/architect/component-boundary/README.md",
+      "sourceAnchor": "unheaded-block-20",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_72f6847a2dabe1b546c44425",
+      "sourcePath": "docs/architect/component-boundary/README.md",
+      "sourceAnchor": "unheaded-block-25",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_4b95ef679c4f3cfc1a92bfa5",
+      "sourcePath": "docs/architect/component-boundary/README.md",
+      "sourceAnchor": "unheaded-block-28",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_5227514b9c31dfd55e285a6a",
+      "sourcePath": "docs/architect/component-boundary/README.md",
+      "sourceAnchor": "unheaded-block-31",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_dcc78f971849ebc977a03e46",
+      "sourcePath": "docs/architect/documentation-system-discussion.md",
+      "sourceAnchor": "unheaded-block-34",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_4ec254cf7f9a3242665832f2",
+      "sourcePath": "docs/architect/documentation-system-discussion.md",
+      "sourceAnchor": "unheaded-block-62",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_f94919ae7e2bd21afda20251",
+      "sourcePath": "docs/architect/documentation-system-discussion.md",
+      "sourceAnchor": "unheaded-block-102",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_5c02b7c7db8a9c1f48d074e8",
+      "sourcePath": "docs/architect/documentation-system-discussion.md",
+      "sourceAnchor": "unheaded-block-176",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_7d6f6adabdd174f6a0bb808f",
+      "sourcePath": "docs/architect/knowledge-registry-redesign.md",
+      "sourceAnchor": "unheaded-block-22",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_3c0602b191c954271b50cd2e",
+      "sourcePath": "docs/architect/knowledge-registry-redesign.md",
+      "sourceAnchor": "unheaded-block-41",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_d0a5e670ca371abde82e0600",
+      "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "sourceAnchor": "unheaded-block-23",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_7a64449df144e7c3b8ea8e36",
+      "sourcePath": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
+      "sourceAnchor": "unheaded-block-81",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_9909bd94769ba7d98618f6a8",
+      "sourcePath": "docs/architect/proposals/step-10-a0-coding-domain-boundary-facade-plan.md",
+      "sourceAnchor": "unheaded-block-33",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_2749d0406f04b1762fa6b114",
+      "sourcePath": "docs/architect/proposals/step-10-a0-coding-domain-boundary-facade-plan.md",
+      "sourceAnchor": "unheaded-block-65",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_cad9c07ae6adaa5a551109ee",
+      "sourcePath": "docs/architect/proposals/step-10-a0-coding-domain-boundary-facade-plan.md",
+      "sourceAnchor": "unheaded-block-72",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_e57acfc83ec2f2049d69f7cb",
+      "sourcePath": "docs/architect/proposals/step-10-a0-coding-domain-boundary-facade-plan.md",
+      "sourceAnchor": "unheaded-block-75",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_5617cdea72a9377a7abd1242",
+      "sourcePath": "docs/architect/proposals/step-10-a0-coding-domain-boundary-facade-plan.md",
+      "sourceAnchor": "unheaded-block-87",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_e078dd2c6ad254963f09681c",
+      "sourcePath": "docs/architect/proposals/step-10-a0-coding-domain-boundary-facade-plan.md",
+      "sourceAnchor": "unheaded-block-92",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_e4c1f59a4af8576ea1d92fae",
+      "sourcePath": "docs/architect/workspace-topology-audit.md",
+      "sourceAnchor": "unheaded-block-9",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_22b3e62f4854f39179af9f10",
+      "sourcePath": "docs/architect/workspace-topology-audit.md",
+      "sourceAnchor": "unheaded-block-13",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_1d0063f866c11f137855fab9",
+      "sourcePath": "docs/architect/workspace-topology-audit.md",
+      "sourceAnchor": "unheaded-block-16",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_d9f8ae539062e721710da940",
+      "sourcePath": "docs/architect/workspace-topology-audit.md",
+      "sourceAnchor": "unheaded-block-19",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_8f4830dc54ceb1a8f5b8619b",
+      "sourcePath": "docs/architect/workspace-topology-audit.md",
+      "sourceAnchor": "unheaded-block-23",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_78994966b4e1b06b8f3e56a4",
+      "sourcePath": "docs/architect/workspace-topology-audit.md",
+      "sourceAnchor": "unheaded-block-26",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_8ffe32e4198becc10a80d657",
+      "sourcePath": "docs/architect/workspace-topology-audit.md",
+      "sourceAnchor": "unheaded-block-29",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_62b1ec722bc2d111454549a8",
+      "sourcePath": "docs/architect/workspace-topology-audit.md",
+      "sourceAnchor": "unheaded-block-36",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_d14ad8ce810dbbd282f1795d",
+      "sourcePath": "docs/architect/workspace-topology-audit.md",
+      "sourceAnchor": "unheaded-block-40",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_638c2f90f056acdd964cd669",
+      "sourcePath": "docs/architecture-map.md",
+      "sourceAnchor": "unheaded-block-77",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_b4cd35e6dab7fcb03ed1b418",
+      "sourcePath": "docs/architecture-map.md",
+      "sourceAnchor": "unheaded-block-83",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_ab1e6954350098da6bc7fbc5",
+      "sourcePath": "docs/history/compound-learn-artifact-registry/RESEARCH.md",
+      "sourceAnchor": "unheaded-block-2",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_f5980c9b4f48eed8190e0b71",
+      "sourcePath": "docs/history/compound-learn-artifact-registry/RESEARCH.md",
+      "sourceAnchor": "unheaded-block-10",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_c3fe8bb3449f19dd3c9ca48d",
+      "sourcePath": "docs/history/compound-learn-artifact-registry/RESEARCH.md",
+      "sourceAnchor": "unheaded-block-12",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_922750c2ed5ed4eabad1316b",
+      "sourcePath": "docs/history/compound-learn-artifact-registry/RESEARCH.md",
+      "sourceAnchor": "unheaded-block-16",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_e7db85d3d11f5b1777b1d32d",
+      "sourcePath": "docs/history/compound-learn-artifact-registry/RESEARCH.md",
+      "sourceAnchor": "unheaded-block-18",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_c1d92f63f44314e15cbaaef9",
+      "sourcePath": "docs/history/compound-learn-artifact-registry/RESEARCH.md",
+      "sourceAnchor": "unheaded-block-21",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_4f6de3ae5986583bef94a0ec",
+      "sourcePath": "docs/history/compound-learn-artifact-registry/RESEARCH.md",
+      "sourceAnchor": "unheaded-block-23",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_501b28f15b7d2e473ab08e88",
+      "sourcePath": "docs/history/discover-stage-graph-and-skill-layering/CONTEXT.md",
+      "sourceAnchor": "outstanding-questions",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_26054fc859ed7d470ee2b964",
+      "sourcePath": "docs/history/discover-stage-graph-and-skill-layering/CONTEXT.md",
+      "sourceAnchor": "outstanding-questions-1",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_b0501a3633aae6bc888df134",
+      "sourcePath": "docs/history/discover-stage-graph-and-skill-layering/CONTEXT.md",
+      "sourceAnchor": "outstanding-questions-2",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_d242c4b3880a7eab202744e8",
+      "sourcePath": "docs/history/discover-stage-graph-and-skill-layering/plan.md",
+      "sourceAnchor": "outstanding-questions",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_7fcb188cf647ecdc77647cfd",
+      "sourcePath": "docs/history/discover-stage-graph-and-skill-layering/plan.md",
+      "sourceAnchor": "outstanding-questions-1",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_2a0ada8243a02e3fa68d650a",
+      "sourcePath": "docs/history/discover-stage-graph-and-skill-layering/plan.md",
+      "sourceAnchor": "outstanding-questions-2",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_0a1ca8cf1bbc63696320a654",
+      "sourcePath": "docs/history/discover-stage-graph-and-skill-layering/RESEARCH.md",
+      "sourceAnchor": "unheaded-block-10",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_59f907a4d357765519dbf09c",
+      "sourcePath": "docs/history/discover-stage-graph-and-skill-layering/RESEARCH.md",
+      "sourceAnchor": "unheaded-block-17",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_1a1d2c66b2fec96798644bdc",
+      "sourcePath": "docs/history/discover-stage-graph-and-skill-layering/RESEARCH.md",
+      "sourceAnchor": "unheaded-block-19",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_37bdb1e829d3ebac9768fd5d",
+      "sourcePath": "docs/history/discover-stage-graph-and-skill-layering/RESEARCH.md",
+      "sourceAnchor": "unheaded-block-23",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_7ea6a97546b827acc889ee71",
+      "sourcePath": "docs/history/discover-stage-graph-and-skill-layering/RESEARCH.md",
+      "sourceAnchor": "unheaded-block-26",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_d31ac91183fd1926efe4f241",
+      "sourcePath": "docs/history/events-jsonl-git-tracked-truncation/RESEARCH.md",
+      "sourceAnchor": "unheaded-block-2",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_5074625208f7bdeedca8b12a",
+      "sourcePath": "docs/history/events-jsonl-git-tracked-truncation/RESEARCH.md",
+      "sourceAnchor": "unheaded-block-8",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_586845eae20b1d671793e258",
+      "sourcePath": "docs/history/gate-approve-vs-movenext-semantics/iron-law-evidence.md",
+      "sourceAnchor": "unheaded-block-2",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_aff6e4ad3a470cd059c7f7dd",
+      "sourcePath": "docs/history/gate-approve-vs-movenext-semantics/iron-law-evidence.md",
+      "sourceAnchor": "unheaded-block-11",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_52e70b4a6a7c95d7206e847e",
+      "sourcePath": "docs/history/herdr-plugin-parkreason-pane-filter/plan.md",
+      "sourceAnchor": "unheaded-block-1",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_da9a91b0897f6ecd3e356aca",
+      "sourcePath": "docs/history/herdr-plugin-parkreason-pane-filter/plan.md",
+      "sourceAnchor": "unheaded-block-17",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_e4216cbd47e6202fbc954501",
+      "sourcePath": "docs/history/herdr-spawn-remove-noninteractive-paths/iron-law-evidence.md",
+      "sourceAnchor": "unheaded-block-2",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_525cd8f2d300c0862109ff10",
+      "sourcePath": "docs/history/herdr-spawn-remove-noninteractive-paths/iron-law-evidence.md",
+      "sourceAnchor": "unheaded-block-4",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_013a7f87b7859e0aa5216304",
+      "sourcePath": "docs/history/herdr-web-dashboard/plan.md",
+      "sourceAnchor": "unheaded-block-58",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_bd9096665d8e1bf17e8f37e7",
+      "sourcePath": "docs/history/herdr-web-dashboard/plan.md",
+      "sourceAnchor": "unheaded-block-67",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_712f4854106fc7b2e5d085e0",
+      "sourcePath": "docs/history/herdr-web-dashboard/plan.md",
+      "sourceAnchor": "approach-3",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_f6823b3ef327b1bcce43e1ee",
+      "sourcePath": "docs/history/herdr-web-dashboard/plan.md",
+      "sourceAnchor": "approach-4",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_5f4d78183e812eb4a50284aa",
+      "sourcePath": "docs/history/main-checkout-lock-wait-decouple-ttl-snapshot/iron-law-evidence.md",
+      "sourceAnchor": "unheaded-block-7",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_00d9cfbc5e77a42c46ad9921",
+      "sourcePath": "docs/history/main-checkout-lock-wait-decouple-ttl-snapshot/iron-law-evidence.md",
+      "sourceAnchor": "unheaded-block-12",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_b501b845a5c33d383abcd2c5",
+      "sourcePath": "docs/history/merge-conductor-throughput-and-human-release/DISCUSSION.md",
+      "sourceAnchor": "unheaded-block-41",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_14ea201240dbceb103f88ba0",
+      "sourcePath": "docs/history/merge-conductor-throughput-and-human-release/DISCUSSION.md",
+      "sourceAnchor": "unheaded-block-50",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_81cc390a2443d19cf4061d3a",
+      "sourcePath": "docs/history/merge-conductor-throughput-and-human-release/DISCUSSION.md",
+      "sourceAnchor": "unheaded-block-59",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_26a3c2bc344916b69c1a95c1",
+      "sourcePath": "docs/history/merge-conductor-throughput-and-human-release/DISCUSSION.md",
+      "sourceAnchor": "unheaded-block-68",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_0080c0df36fdd1c8dceeb50b",
+      "sourcePath": "docs/history/merge-conductor-throughput-and-human-release/DISCUSSION.md",
+      "sourceAnchor": "unheaded-block-77",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_0bd9a6a3a55f5038fcf617c2",
+      "sourcePath": "docs/history/pi-executor-runtime-capacity/RESEARCH.md",
+      "sourceAnchor": "unheaded-block-15",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_1d4d2b2ebd9c146457b57dfa",
+      "sourcePath": "docs/history/pi-executor-runtime-capacity/RESEARCH.md",
+      "sourceAnchor": "unheaded-block-24",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_3579ea0547f78c12230ab772",
+      "sourcePath": "docs/history/setup-doctor-config-registry/plan.md",
+      "sourceAnchor": "unheaded-block-9",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_2eaeaab9e7b2fdcf185edbce",
+      "sourcePath": "docs/history/setup-doctor-config-registry/plan.md",
+      "sourceAnchor": "unheaded-block-16",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_3c8321782f3796b9f1782681",
+      "sourcePath": "docs/history/stage-status-driving-coordination/plan.md",
+      "sourceAnchor": "unheaded-block-1",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_432b5378ca7a2d25bc3449a5",
+      "sourcePath": "docs/history/stage-status-driving-coordination/plan.md",
+      "sourceAnchor": "unheaded-block-13",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_db0f17aaed4806a49fb60055",
+      "sourcePath": "docs/history/stage-status-driving-coordination/plan.md",
+      "sourceAnchor": "outstanding-questions",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_c065a1aa3540e3bde9ca4eee",
+      "sourcePath": "docs/history/stage-status-driving-coordination/plan.md",
+      "sourceAnchor": "unheaded-block-29",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_1da814c99d955ef472e24a35",
+      "sourcePath": "docs/history/stage-status-driving-coordination/plan.md",
+      "sourceAnchor": "outstanding-questions-1",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_dab75cb6db60f9587c63356c",
+      "sourcePath": "docs/history/state-runner-merge-boundary/DISCUSSION.md",
+      "sourceAnchor": "unheaded-block-23",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_063c16408cae7274021f10a2",
+      "sourcePath": "docs/history/state-runner-merge-boundary/DISCUSSION.md",
+      "sourceAnchor": "unheaded-block-74",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_43527eb473750fc05aee25da",
+      "sourcePath": "docs/history/state-runner-merge-boundary/iron-law-evidence.md",
+      "sourceAnchor": "unheaded-block-17",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_0efeb7656bae7167e3b13ccb",
+      "sourcePath": "docs/history/state-runner-merge-boundary/iron-law-evidence.md",
+      "sourceAnchor": "unheaded-block-28",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_cefb8a5436c63958fe895a8b",
+      "sourcePath": "docs/history/state-runner-merge-boundary/iron-law-evidence.md",
+      "sourceAnchor": "unheaded-block-30",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_bf539cbd9daf13e4f021a535",
+      "sourcePath": "docs/history/state-runner-merge-boundary/iron-law-evidence.md",
+      "sourceAnchor": "unheaded-block-40",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_3bbae02beae1b51b0343224d",
+      "sourcePath": "docs/history/state-runner-merge-boundary/iron-law-evidence.md",
+      "sourceAnchor": "unheaded-block-42",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_6d1f7eab6a67c6bcdec8c07d",
+      "sourcePath": "docs/history/state-runner-merge-boundary/iron-law-evidence.md",
+      "sourceAnchor": "unheaded-block-54",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_3be279dbad32573f64243360",
+      "sourcePath": "docs/history/tsk-3rn/iron-law-evidence.md",
+      "sourceAnchor": "unheaded-block-3",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_fb08ff7bcfc9aff8dfd4be8a",
+      "sourcePath": "docs/history/tsk-3rn/iron-law-evidence.md",
+      "sourceAnchor": "unheaded-block-6",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_54a31332de43f894a3f73ef9",
+      "sourcePath": "docs/history/tsk-480-approve-movework-friction-guard/iron-law-evidence.md",
+      "sourceAnchor": "unheaded-block-8",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_c97d16207c1cea5c9aeef764",
+      "sourcePath": "docs/history/tsk-480-approve-movework-friction-guard/iron-law-evidence.md",
+      "sourceAnchor": "unheaded-block-11",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_811d8023e0228130c57cf7e8",
+      "sourcePath": "docs/history/tsk-5e97-decompose-footprint-overlap-gate/scout-notes.md",
+      "sourceAnchor": "unheaded-block-2",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_773b56a2b093f375303f01ab",
+      "sourcePath": "docs/history/tsk-5e97-decompose-footprint-overlap-gate/scout-notes.md",
+      "sourceAnchor": "unheaded-block-6",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_4ea610f90b968c594d7c9d8b",
+      "sourcePath": "docs/history/tsk-5x7-2/iron-law-evidence.md",
+      "sourceAnchor": "unheaded-block-2",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_8f8e594b8daf9a7fa9d33d05",
+      "sourcePath": "docs/history/tsk-5x7-2/iron-law-evidence.md",
+      "sourceAnchor": "unheaded-block-4",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_434f7a5c6e4d18c374d00d91",
+      "sourcePath": "docs/history/tsk-64h/iron-law-evidence.md",
+      "sourceAnchor": "unheaded-block-4",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_c72f7d85624b1e69090585b2",
+      "sourcePath": "docs/history/tsk-64h/iron-law-evidence.md",
+      "sourceAnchor": "unheaded-block-8",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_6850199113cf0a0ad4b78be3",
+      "sourcePath": "docs/history/tsk-64h/iron-law-evidence.md",
+      "sourceAnchor": "unheaded-block-14",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_98753c0351ee216c6e5c73f7",
+      "sourcePath": "docs/history/tsk-64h/iron-law-evidence.md",
+      "sourceAnchor": "unheaded-block-16",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_ad46cbd5978e1bc4881cbba5",
+      "sourcePath": "docs/history/tsk-f38/iron-law-evidence.md",
+      "sourceAnchor": "unheaded-block-5",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_29199d751c669560fb61a334",
+      "sourcePath": "docs/history/tsk-f38/iron-law-evidence.md",
+      "sourceAnchor": "unheaded-block-8",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_29b5de04db0b698bb3415df3",
+      "sourcePath": "docs/how-to/use-fgos-group-thinking.md",
+      "sourceAnchor": "unheaded-block-12",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_2f07e237845c2f5a48d222e9",
+      "sourcePath": "docs/how-to/use-fgos-group-thinking.md",
+      "sourceAnchor": "unheaded-block-17",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_a27241360652da9ea8b6efe2",
+      "sourcePath": "docs/platform/agent-coordination/contracts/coordination-session.md",
+      "sourceAnchor": "unheaded-block-36",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_47e8cd7d94b55342ec76152e",
+      "sourcePath": "docs/platform/agent-coordination/contracts/coordination-session.md",
+      "sourceAnchor": "unheaded-block-44",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_4365f0638191dbefd8f64d01",
+      "sourcePath": "docs/platform/agent-coordination/contracts/coordination-session.md",
+      "sourceAnchor": "unheaded-block-53",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_919924a68b7286e0fbe2b31f",
+      "sourcePath": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "sourceAnchor": "unheaded-block-14",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_604703169e7fbf68d86f9fcc",
+      "sourcePath": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "sourceAnchor": "unheaded-block-129",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_75c29061f99422c44bf13d9e",
+      "sourcePath": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "sourceAnchor": "unheaded-block-130",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_857da560d1394d5fab7ed611",
+      "sourcePath": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "sourceAnchor": "unheaded-block-132",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_dc266f76eb086f4b22921ffb",
+      "sourcePath": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "sourceAnchor": "unheaded-block-134",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_9b242a4635b270b5b9bc31c6",
+      "sourcePath": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "sourceAnchor": "unheaded-block-135",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_55b11b9095258a1d13dd80c0",
+      "sourcePath": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "sourceAnchor": "unheaded-block-138",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_87a1b99043f81bca1c7beedf",
+      "sourcePath": "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "sourceAnchor": "unheaded-block-139",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_7b0662feee2e5ad0787c3f05",
+      "sourcePath": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md",
+      "sourceAnchor": "unheaded-block-56",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_4e17abdad18f6f1c818e31ff",
+      "sourcePath": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-00-overview.md",
+      "sourceAnchor": "unheaded-block-217",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_aa746623c509c62c3b4d049f",
+      "sourcePath": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "sourceAnchor": "unheaded-block-21",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_0568585674f51ba67516eabd",
+      "sourcePath": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "sourceAnchor": "unheaded-block-24",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_02f537fa7c7c0c0ed2241cf5",
+      "sourcePath": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "sourceAnchor": "unheaded-block-30",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_493340f7fd3542efa487dea3",
+      "sourcePath": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "sourceAnchor": "unheaded-block-35",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_f99fe5e6b2d3cc09838d947e",
+      "sourcePath": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "sourceAnchor": "unheaded-block-48",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_a7271b91a7405e49901be277",
+      "sourcePath": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "sourceAnchor": "unheaded-block-54",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_afe3adeb2ecb1b99b5a5f464",
+      "sourcePath": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "sourceAnchor": "unheaded-block-59",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_eb9e6cd0aecb9b9501255cf5",
+      "sourcePath": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "sourceAnchor": "unheaded-block-70",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_1c8f900233486d9e811af398",
+      "sourcePath": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "sourceAnchor": "unheaded-block-79",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_0c5fc0d8d6eb766effa29f4c",
+      "sourcePath": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "sourceAnchor": "unheaded-block-85",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_322f883acb0e881e662a30ce",
+      "sourcePath": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "sourceAnchor": "unheaded-block-89",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_a30c6f071656242b5dbd1cf2",
+      "sourcePath": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "sourceAnchor": "unheaded-block-95",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_461e8730abf28c66d07217b5",
+      "sourcePath": "docs/platform/agent-coordination/roadmap/team-dispatch-v1/step-01-rollout.md",
+      "sourceAnchor": "unheaded-block-99",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_6698b4e26a576b4ddfa533e0",
+      "sourcePath": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sourceAnchor": "unheaded-block-13",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_806d7ca9f2a75ebd63124d36",
+      "sourcePath": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sourceAnchor": "unheaded-block-16",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_0a50c7163df3a8f833e73b75",
+      "sourcePath": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sourceAnchor": "unheaded-block-20",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_93532a5253a3b61d12bb5624",
+      "sourcePath": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sourceAnchor": "unheaded-block-24",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_2dc32b37942abfd33a441a18",
+      "sourcePath": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sourceAnchor": "unheaded-block-28",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_89c8a705ff888d97156eb4ca",
+      "sourcePath": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sourceAnchor": "unheaded-block-46",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_cf2a5a484534dd3b48bffa0f",
+      "sourcePath": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sourceAnchor": "unheaded-block-57",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_2c245148ea6b8970a398d577",
+      "sourcePath": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sourceAnchor": "unheaded-block-66",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_95c24108148f2b7a086bacad",
+      "sourcePath": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sourceAnchor": "unheaded-block-67",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_c149923688f6047416dd84e9",
+      "sourcePath": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sourceAnchor": "unheaded-block-77",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_f344cef7ee5e3ba6e54a4c13",
+      "sourcePath": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sourceAnchor": "unheaded-block-79",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_265e14a3903492134bfcfcb7",
+      "sourcePath": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sourceAnchor": "unheaded-block-80",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_02433c8dc327e63684b7ae79",
+      "sourcePath": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sourceAnchor": "unheaded-block-98",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_049c9bb892d82b875a4b0f04",
+      "sourcePath": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sourceAnchor": "unheaded-block-107",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_b0b8b76122944ab693779411",
+      "sourcePath": "docs/platform/agent-coordination/verification/group-thinking-plan-loop/P01.1.md",
+      "sourceAnchor": "unheaded-block-118",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_1107fdefd86f5bad6af3fda8",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-07-mvp/P01.2.md",
+      "sourceAnchor": "unheaded-block-94",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_3f7ece4df7fa4df0c256e7b0",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-07-mvp/P01.2.md",
+      "sourceAnchor": "unheaded-block-108",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_2faec2fe2b7ab793124cd7ad",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.2.md",
+      "sourceAnchor": "unheaded-block-63",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_3681a4532385734ef2e7c7d0",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.2.md",
+      "sourceAnchor": "unheaded-block-72",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_c8d08956edbe858053db1457",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.3.md",
+      "sourceAnchor": "unheaded-block-42",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_8403f6bdad2be146a5d6c55c",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.3.md",
+      "sourceAnchor": "unheaded-block-43",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_9da9146a531ac0211a61a01b",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.3.md",
+      "sourceAnchor": "unheaded-block-52",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_37c4429d333858c4cccf7b8f",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P00.3.md",
+      "sourceAnchor": "unheaded-block-53",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_46f225f73f93be14f5412dde",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.2.md",
+      "sourceAnchor": "unheaded-block-33",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_d827fd27df92dccd6502e4f5",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.2.md",
+      "sourceAnchor": "unheaded-block-55",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_ef96ccbc55e94a0f609add8b",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.2.md",
+      "sourceAnchor": "unheaded-block-91",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_52cafe1662702962c56e0940",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md",
+      "sourceAnchor": "unheaded-block-6",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_84df84912334c70094489988",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md",
+      "sourceAnchor": "unheaded-block-9",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_4000c5c2d0f6b828a16a9ca0",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md",
+      "sourceAnchor": "unheaded-block-29",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_e4f68d09bfdd1d8fb2d8997b",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md",
+      "sourceAnchor": "unheaded-block-34",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_a6ceade6ef607311a9378368",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md",
+      "sourceAnchor": "unheaded-block-35",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_367519ac8250b7f2617f857f",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md",
+      "sourceAnchor": "unheaded-block-67",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_a57a082fac08280cb8e67827",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md",
+      "sourceAnchor": "unheaded-block-69",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_0fb5e10ec851f960ebf28014",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md",
+      "sourceAnchor": "unheaded-block-84",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_75743cb09939c2141a7140cc",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md",
+      "sourceAnchor": "unheaded-block-86",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_d85549122ea77cfcfcb8dcbf",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-red-team.md",
+      "sourceAnchor": "unheaded-block-58",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_7fcb6361ae9612689aca736a",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-red-team.md",
+      "sourceAnchor": "unheaded-block-88",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_8c0f8f91cb5a888e26a0d941",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-review.md",
+      "sourceAnchor": "findings",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_7c585fbddeeb340130839653",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-review.md",
+      "sourceAnchor": "unheaded-block-27",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_1d7214fb83b8cc55d6f86cfc",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-review.md",
+      "sourceAnchor": "unheaded-block-58",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_96c414af91710c0709203063",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2-P07.2-review.md",
+      "sourceAnchor": "findings-1",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_9358c4246aa621d066e64167",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md",
+      "sourceAnchor": "unheaded-block-22",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_324e00749d4c972a4555af51",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md",
+      "sourceAnchor": "unheaded-block-42",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_8662c2d0940bf8541ab03c9c",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md",
+      "sourceAnchor": "unheaded-block-49",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_0e86b4263a2a5d68f528c636",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md",
+      "sourceAnchor": "unheaded-block-66",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_8cf11e6e01dadb68508f1b41",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md",
+      "sourceAnchor": "unheaded-block-73",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_000e10121da9f182356022a8",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md",
+      "sourceAnchor": "unheaded-block-91",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_c5534d8bb30e3118f5bf8c8c",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md",
+      "sourceAnchor": "unheaded-block-94",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_0bab9490562f6b5a5ba3c31e",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md",
+      "sourceAnchor": "unheaded-block-99",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_35bd001ffa74cebe75966323",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md",
+      "sourceAnchor": "unheaded-block-115",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_bec6a5690913ee9ebb096bcb",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.2.md",
+      "sourceAnchor": "unheaded-block-118",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_bdb5089fb2a3da3c4d78c8e6",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.3-review.md",
+      "sourceAnchor": "unheaded-block-3",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_3082f53d12c318113c46b97d",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.3-review.md",
+      "sourceAnchor": "unheaded-block-48",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_e18cedd6d233b04489c411c2",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.1.md",
+      "sourceAnchor": "unheaded-block-16",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_dbabb23fce24e3760c9a0abf",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.1.md",
+      "sourceAnchor": "unheaded-block-23",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_a2f55487c8776df367f2663b",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.1.md",
+      "sourceAnchor": "unheaded-block-26",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_c099a57fedb46c8be2980b09",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.1.md",
+      "sourceAnchor": "unheaded-block-30",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_cacecabe35d12284bf5d9f70",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3-P08.1-review.md",
+      "sourceAnchor": "unheaded-block-57",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_256ec1b43419bb1476d812d2",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P07.3-P08.1-review.md",
+      "sourceAnchor": "unheaded-block-91",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_38ea824cbfce794b46a15a4a",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P09.2.md",
+      "sourceAnchor": "unheaded-block-14",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_832f7cb15dbe3b942eb93ea3",
+      "sourcePath": "docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P09.2.md",
+      "sourceAnchor": "unheaded-block-31",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_4a03a1907b4d25f06824314f",
+      "sourcePath": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
+      "sourceAnchor": "unheaded-block-30",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_28c85678c9b65c05c9057ebe",
+      "sourcePath": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
+      "sourceAnchor": "unheaded-block-32",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_ed2ec229b436e732fd7e8f27",
+      "sourcePath": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
+      "sourceAnchor": "unheaded-block-37",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_7ee3ee4c77755e22775b08e0",
+      "sourcePath": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
+      "sourceAnchor": "unheaded-block-40",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_5a4b54955989ab0d3cb508fd",
+      "sourcePath": "docs/platform/agent-coordination/vocabulary/canonical-concepts.md",
+      "sourceAnchor": "unheaded-block-46",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_85573f46f028dcaf43981fc6",
+      "sourcePath": "docs/platform/host-invocation-routing/roadmap.md",
+      "sourceAnchor": "unheaded-block-11",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_60c04d23005bf80f62c31a99",
+      "sourcePath": "docs/platform/host-invocation-routing/roadmap.md",
+      "sourceAnchor": "unheaded-block-23",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_5df91514da32302ab1ad6440",
+      "sourcePath": "docs/platform/host-invocation-routing/roadmap.md",
+      "sourceAnchor": "unheaded-block-29",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_bd80df7b9165b3edba5cdaa4",
+      "sourcePath": "docs/platform/host-invocation-routing/roadmap.md",
+      "sourceAnchor": "unheaded-block-34",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_3e87f9486f031d9b99ea5261",
+      "sourcePath": "docs/platform/host-invocation-routing/roadmap.md",
+      "sourceAnchor": "unheaded-block-42",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_15a8361a61a41e92250cb9c4",
+      "sourcePath": "docs/platform/host-invocation-routing/roadmap.md",
+      "sourceAnchor": "unheaded-block-47",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_ca9e6d292f6798319a2aa478",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-124",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_28b5cced8a1c716a5fdae667",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-129",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_b3041824ac2a22ce4270f949",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-141",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_2a1625ef25dfff80bc59bb6b",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-150",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_cf069ef0fdebb593def4ef48",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-215",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_ef7adf4fabc82a3ef1ddd94c",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-224",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_073c961584cefd091a5042ab",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-248",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_1fd76372fb6055936b871b8e",
+      "sourcePath": "docs/specs/runner.md",
+      "sourceAnchor": "unheaded-block-260",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_d6cfcf6bc516e201051e7927",
+      "sourcePath": "docs/specs/system-overview.md",
+      "sourceAnchor": "unheaded-block-25",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_a0421d60ef2a4ee298b10361",
+      "sourcePath": "docs/specs/system-overview.md",
+      "sourceAnchor": "unheaded-block-34",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_0bb127e013cfbbe017c753be",
+      "sourcePath": "docs/specs/work-state.md",
+      "sourceAnchor": "unheaded-block-111",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_a71f63a24e496ecff199564f",
+      "sourcePath": "docs/specs/work-state.md",
+      "sourceAnchor": "unheaded-block-115",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_f0a1d9d3867e85100ac5973a",
+      "sourcePath": "docs/specs/work-state.md",
+      "sourceAnchor": "unheaded-block-120",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_09dac3d1d73f38925df927a3",
+      "sourcePath": "docs/specs/work-state.md",
+      "sourceAnchor": "unheaded-block-132",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_6424dabf5edd9d5c913dee86",
+      "sourcePath": "docs/specs/work-state.md",
+      "sourceAnchor": "unheaded-block-138",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_2693549cf6851b6b8a79c187",
+      "sourcePath": "docs/specs/work-state.md",
+      "sourceAnchor": "unheaded-block-144",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
+    },
+    {
+      "claimId": "claim_identity_gap_afe33474af27fd1c74eb5293",
+      "sourcePath": "docs/specs/work-state.md",
+      "sourceAnchor": "unheaded-block-168",
+      "identityStatus": "ambiguous-registry-gap",
+      "disposition": "unknown-blocking"
     }
   ],
   "scanGaps": [],
@@ -441535,2236 +443681,3 @@
         {
           "type": "duplicate-content-member",
           "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [
-        "ADR-006"
-      ],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_985484f28638c531d4d3f076cd481606",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "proof-matrix",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "b9c8d712ac10e8ab397ae21e58a0cd470633f10150da48a759a21ca1e1e5ecd7",
-      "identityUnitDigest": "f802a5fb9478ab9f63797a2d4c930692311256723d2c5cccb5bf895345ee62da",
-      "identityFingerprint": "4a3c90dc94d86e2a7ecc4d763f877e59282c201c543f55afc948837997b92e6a",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 69,
-        "end": 69
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_66cbaa7e7b34b0807525bed60b279859",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "unheaded-block-4",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "c948d0f71b6afd46828566f70966e0c4c377f18a8a2d78ec6b0a8ebe931fb683",
-      "identityUnitDigest": "11f818c755ba45b10e3fa0d8f24f446bea92e24f88726c9306292ea4b37fdf5f",
-      "identityFingerprint": "11f818c755ba45b10e3fa0d8f24f446bea92e24f88726c9306292ea4b37fdf5f",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 71,
-        "end": 80
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "contract",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_552b5031eaed408cbe9a3ffcdebafc0c",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "commands",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "35944bec822776d77bc57cf903f54d00afad1afedede99864e3af67a0b6de5e2",
-      "identityUnitDigest": "512312efbe4dc1c0b9d6ade63bd2d5f4bbc3e1abbd812b60bd2b75a35c8159b1",
-      "identityFingerprint": "1e827d2c92ccaa5e38110f17e8458cf9cc90c45878319e69883b9bd69f4ae1ae",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 82,
-        "end": 82
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_a66c23862890ced0f5dd6f0102a6e02a",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "unheaded-block-5",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "195dee3059461d7886d4bd2d70769ada131bbbd035961dfd60108ebb18b5a1c1",
-      "identityUnitDigest": "aaa1c8e69af972fc2cb9c598f5650b2be8a88aaf8405a6252a9fa9e8052be74b",
-      "identityFingerprint": "aaa1c8e69af972fc2cb9c598f5650b2be8a88aaf8405a6252a9fa9e8052be74b",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 84,
-        "end": 94
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "contract",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [
-        "test/runner/assignment-dispatch.test.mjs"
-      ],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_318dcccadbeb03baf754ba6e57b39378",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "unheaded-block-6",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "9a1a59ffaf52155cdc07e7c9f59c4ef7cbf8376cab1890e97be9f70cc412c142",
-      "identityUnitDigest": "b3ba438705d7c6b5151d6bb791b66eaa6eb350388c3781d4dc511eb50d00f567",
-      "identityFingerprint": "b3ba438705d7c6b5151d6bb791b66eaa6eb350388c3781d4dc511eb50d00f567",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 96,
-        "end": 102
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [
-        "test/**/*.test.mjs"
-      ],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_20116af0509092a1ec8bb6195c009d5b",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "review",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "ae82b95ee71c7d3071e25be51b7acbcbb4da14dc816039ff1ecb0ea5922d5d90",
-      "identityUnitDigest": "fadeb8e60c5bed5f3355f2f81c3f04544eb1314bf888d809301ed967a078b669",
-      "identityFingerprint": "1d7548f6422a33e8df54e990d3fa21c57d465f2bb983b78cf20c41cbb2782c19",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 104,
-        "end": 104
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_86aceda76237c2e0fdab0cf0dd985c41",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "unheaded-block-7",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "9c00e5674e6414e4e5c882216a10f90cbc52b77344d90cf464e8feb3b6ee2884",
-      "identityUnitDigest": "2c4c1e85f5250da0c80660a2efdf2aa0a2045d2cd14ab0b112aa900a6dd5775b",
-      "identityFingerprint": "2c4c1e85f5250da0c80660a2efdf2aa0a2045d2cd14ab0b112aa900a6dd5775b",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 106,
-        "end": 106
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_14f84c93b9cc084e0dbdd3263156c8a8",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "unheaded-block-8",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "929c8c02d5cc85284a29840c97c8d2bf6cbbb09b7496c0ae3909b933dbbefa68",
-      "identityUnitDigest": "e9a3b29a6bcaf194c99c432091e5f1ea10ea9436b8c5c27a279af1b009398c99",
-      "identityFingerprint": "e9a3b29a6bcaf194c99c432091e5f1ea10ea9436b8c5c27a279af1b009398c99",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 108,
-        "end": 116
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [
-        "test/runner/assignment-dispatch.test.mjs"
-      ],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_6a6f9a0b48ed39df7fe6a8cbab15d561",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "high-a-second---contract-invocation-against-the-same-workwriter-silently-discards-the-callers-new-contract-and-re-executes-the-stale-first-one",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "80b921927b50440484bf1cc880d198ae0c0beddb68fdb35a5bb8e8ef53a9d79b",
-      "identityUnitDigest": "f7264a32e14518b47957644619f8a486c3808bfbc5079f0e359d57163905f63f",
-      "identityFingerprint": "5e0868fac110012de14e696e64863c205408665012908dd1b05a1602d748221e",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 118,
-        "end": 118
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "contract",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_577f7f0b52c5169462bce2b6e1ddcb58",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "unheaded-block-9",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "280240fd2dc103214c45d99f22395c982b25c4afd11a67cd60a35878833f5bf8",
-      "identityUnitDigest": "cd116c7b2818359585daee2ee125b2be26313702b7f4236739b5acb879d37d53",
-      "identityFingerprint": "cd116c7b2818359585daee2ee125b2be26313702b7f4236739b5acb879d37d53",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 120,
-        "end": 188
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "contract",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_f4b23049921dcd99bb1abf7356ae8f73",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "fix-round-1",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "03ed663cbcf4f8dd15a8b135477308e68a653a0b72c091ecaf239722e73410de",
-      "identityUnitDigest": "80506600ce84e4c8f57532391e5fa530ca347db8640611fc54c799e438c4e6e2",
-      "identityFingerprint": "f9699bfb83b5b508001cfe61cbeb7737a3117dd284e9587e397bf2ddce7e27bb",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 190,
-        "end": 190
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_cd41259e12df0118fd2af52b55cd5f48",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "unheaded-block-10",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "57b20671c97fe9c325ced2594141af5ee4f511bbf2ce89ebad23646ffa2b4633",
-      "identityUnitDigest": "f3be7decfb5b8f6ef2e0b34cc92ba0384c5a8e984b68c7a28da5a1c6e011f4bf",
-      "identityFingerprint": "f3be7decfb5b8f6ef2e0b34cc92ba0384c5a8e984b68c7a28da5a1c6e011f4bf",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 192,
-        "end": 200
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_83faadb3f67436826ce4471cccce7e5b",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "unheaded-block-11",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "9a727194289710c533575d60052b8fc730a8962b8ec62cc97414bbf2c00997e3",
-      "identityUnitDigest": "d3b19c8c2aba456230145f2c39ace22b9af34271b9deebc61784b0d48ce4ffff",
-      "identityFingerprint": "d3b19c8c2aba456230145f2c39ace22b9af34271b9deebc61784b0d48ce4ffff",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 202,
-        "end": 213
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "contract",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [
-        "test/runner/assignment-dispatch.test.mjs"
-      ],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_c57be022264952f2acf691f5d68d0990",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "unheaded-block-12",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "791c266f8c70390c96cfdf0640ba636a0c373479eef898a068436fecb669cea3",
-      "identityUnitDigest": "46feb4b265a9012dfdb38259c6ec5388886a6df1b142f354290fa7e5143c260a",
-      "identityFingerprint": "46feb4b265a9012dfdb38259c6ec5388886a6df1b142f354290fa7e5143c260a",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 215,
-        "end": 217
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [
-        "test/runner/assignment-dispatch.test.mjs"
-      ],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_1e2ab1ba9c83bdc4f44e7a9ac175a365",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "reviewer-recheck-material-fix-recheck-master-coordinatormd-step-f5",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "0f42d42f89dcc7ce9439a4f0e2afe7669f5280e63a7e2f43b21192d110d48122",
-      "identityUnitDigest": "dec58ae7e2df851097c63f621bc62d0b95a953718d33e90cef8dcf1c782dd41f",
-      "identityFingerprint": "82c520cc8ebe6fb89d28c70d845147de57369287dfcd617a964f568d3fcbd620",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 219,
-        "end": 219
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_e0cb7defa25255234af0398bce8119f1",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "unheaded-block-13",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "55b271a67a17495c6385814e72ae523b4214b03325a919f00f41f2b651040193",
-      "identityUnitDigest": "be813abfdeaef9f402c225072a61da608878af04f326e976eb7484a2cb1f20ea",
-      "identityFingerprint": "be813abfdeaef9f402c225072a61da608878af04f326e976eb7484a2cb1f20ea",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 221,
-        "end": 221
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_b1ecea0d901d1ef14eca684ddca1b8be",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "unheaded-block-14",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "b185084be67dce4382b5368a62d031a22270b4f2902c11cfe19427fa8aae1ec1",
-      "identityUnitDigest": "0e7c1c014eaa8a1d2ed43d324c8a8f41fed4f319996fea10a712b0c6eee969d8",
-      "identityFingerprint": "0e7c1c014eaa8a1d2ed43d324c8a8f41fed4f319996fea10a712b0c6eee969d8",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 223,
-        "end": 272
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_daba31a8fac58c666ff603f714ca73b1",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "medium-no-exclusive-create-claim-for-the-built-assignment-concurrent-race-variant-of-the-high-above",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "db5765bd3b70a49da786c02fb11727a387c36e70f585914898f6e8c739a498f7",
-      "identityUnitDigest": "64cff3da1c1ea59e802948d8782ca9891a0374b0506760931bc8e0e5f1926762",
-      "identityFingerprint": "0fb1d6390743d25bc66296eeff484d9c6032439bd5dfaa60614957b2bfb5594c",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 276,
-        "end": 276
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_8a73e827bf173d6ee343819c7b05cf60",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "unheaded-block-15",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "5a28c4c7618221eed29ac02f7ff30ffd33835676ec99bbb64f6f62554b615d64",
-      "identityUnitDigest": "48364f657085dfcab313ca89f3ecea3dadc111f58da2585ddb978e4f10d57db1",
-      "identityFingerprint": "48364f657085dfcab313ca89f3ecea3dadc111f58da2585ddb978e4f10d57db1",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 278,
-        "end": 296
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_e3092aba27c4cdb6d7d8722c7dbfe822",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "low-gaps-item-resolved-not-a-bug-callerwriterid-only-when-absent-is-safe",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "b59c60f3177fb6b26efa42636c99bd09de098ba21fa537afde80d7b9dec73c43",
-      "identityUnitDigest": "48cdffac8f41ebb13c210ca467682a751ed1580df1c411156397c810007cefb0",
-      "identityFingerprint": "a5dc6006f7baf96b24281496a6c01721e4b05b3c4e0c2550a8095fb1ff4f174f",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 298,
-        "end": 298
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_57285126c2f8425352f4c954a82e5b12",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "unheaded-block-16",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "b2d87a1b536fad0c3e3d4f70a6ede6817b2d47e538d45a332cfa70b53a36f8e8",
-      "identityUnitDigest": "1b9c8a66573acce64f6dbbc9cc2017f3446963d41b7f01c9c12f97b053650259",
-      "identityFingerprint": "1b9c8a66573acce64f6dbbc9cc2017f3446963d41b7f01c9c12f97b053650259",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 300,
-        "end": 309
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "contract",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_86e4c15f52b6ffd2d9816c43f9ef466d",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "low-informational-unreadable-but-existing---contract-file-the-doers-second-gaps-question",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "04227f5a5c3ea0897163d1790475ac74a821a388bff40ca311464c2878827890",
-      "identityUnitDigest": "6cadb3d723642b4d15a188945a246f6ab64ad3ed15b75e0042aaab7981843786",
-      "identityFingerprint": "c8404aa4f6bebf09ebd10df96e8281c873775c8ceccfcf260a7045fcc983cfb0",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 311,
-        "end": 311
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "contract",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_ddb3ef3fa845948c2b47d1e5fffe18e2",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "unheaded-block-17",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "ccfd9a66e19674f1ab2f2129341e745c928b98f17092fd2d188ed913136e4fc6",
-      "identityUnitDigest": "912b6493667be912897543a407d8920951652623880595c9248e131ca0d59992",
-      "identityFingerprint": "912b6493667be912897543a407d8920951652623880595c9248e131ca0d59992",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 313,
-        "end": 317
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "contract",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_f3356b93753d2d4cd0b464ac217cf18e",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "confirmed-correct-verified-not-assumed",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "1965a93bfdb8b51237be0c34f5a13feb547da40928655a5fe75d66685d276e61",
-      "identityUnitDigest": "e817f9c9fc927726f993b13a48409a375737378b2517e2db56a1a1a36a588bed",
-      "identityFingerprint": "fd47fab8470276611d6f824f93b6dd7a1b64fef939c46e8a237f213c5ec914e2",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 319,
-        "end": 319
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_eeb4589887aab606743672e307ea6993",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "unheaded-block-18",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "cc02ce03ee6fef8c6a874e0d94c80d8eb4cb50a9047b22452ffa06a1aeb4fe85",
-      "identityUnitDigest": "222a80a52f1d9b8b575c98393e454a8ad5cca57b578f624d48ea022e71948409",
-      "identityFingerprint": "222a80a52f1d9b8b575c98393e454a8ad5cca57b578f624d48ea022e71948409",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 321,
-        "end": 345
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "contract",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_c2c006f9af9adba26c79b051d63d8f41",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "coordinator-disposition",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "18d0f1610491c55bbe341c9e4ed36abc8292a1fbef4e135709bf7e31965a80d3",
-      "identityUnitDigest": "eff019256a829402863d130c16796fca7e9b3f9045a9c6c9ef64510b15f65e1c",
-      "identityFingerprint": "279bf376897397df0287c5c8a00da77063e5fdc10e40277ae048af7017b2d341",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 347,
-        "end": 347
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_2b055059971384d8be2f2a7211afc31e",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "unheaded-block-19",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "ebd45cc244eda30d490ffebc4b267ab5ac57eeebf2aec28c95c460c772fac586",
-      "identityUnitDigest": "c6a9a6c8884703d89657dda7bb8f8de47d0786713eefcdd9d3aa9d8e63197787",
-      "identityFingerprint": "c6a9a6c8884703d89657dda7bb8f8de47d0786713eefcdd9d3aa9d8e63197787",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 349,
-        "end": 352
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "contract",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_0f207d2dc22e9d7ffb1a0bbf486a84f3",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "unheaded-block-20",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "526e671fdd98956d83659d0c1136127aa42c55d5b6b8d2531b10acde170edc49",
-      "identityUnitDigest": "6c116c92f8eaaff948bc483866e3ec3072d179c8323bb4a15873e7f9c48a2bb0",
-      "identityFingerprint": "6c116c92f8eaaff948bc483866e3ec3072d179c8323bb4a15873e7f9c48a2bb0",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 354,
-        "end": 375
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_86117625da16f3d134f6a2495216a9e3",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "unheaded-block-21",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "d5eee4526904ac898ec4a6912bf11bb8d646248ec5cb2e82f8e2509bba292786",
-      "identityUnitDigest": "e4a375a0e90bfc677c4e6ff8e1acc2399fb6fbee06c0d0e18c7b5cc1647b20eb",
-      "identityFingerprint": "e4a375a0e90bfc677c4e6ff8e1acc2399fb6fbee06c0d0e18c7b5cc1647b20eb",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 377,
-        "end": 379
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_a451898be2386297928c77baa2e00d72",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "red-team",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "9590ebdbcf1953c43766bbf64c44b723d05e0779ec064ba6c069afd67dbb0ad8",
-      "identityUnitDigest": "c4da41ee159eb0d97fc3c86da57f3946e83cf0a08d17de954b8564f0511b0aa8",
-      "identityFingerprint": "7597cd95450907a58b16beb62abf7c1386e2468b7d7f5df42cc2cf60d917f4b5",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 381,
-        "end": 381
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_d9d9aef53e46a2af4c10da81e345e37a",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "unheaded-block-22",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "6ee1acbb1cb85d21ce573f16118ff911f3f68501696c5fbffda7c01fd4ba6918",
-      "identityUnitDigest": "9f4c0b66fa058b3a15788027387c365bb1971601ed3ea378703407edfa42b14d",
-      "identityFingerprint": "9f4c0b66fa058b3a15788027387c365bb1971601ed3ea378703407edfa42b14d",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 383,
-        "end": 392
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [
-        "test/runner/assignment-dispatch.test.mjs"
-      ],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_bc44e58318999737013f2c64b2023a0b",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "high-the-deferred-medium-is-not-a-theoretical-concurrency-edge-case-two-genuinely-simultaneous---contract-invocations-under-the-same-writer-identity-collide-and-silently-discard-one-callers-real-request-exactly-reproducing-the-just-fixed-highs-false-success-shape",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "961469fce8174fe08ce16ca4d45717c91b7356b02b4a517e33758dd7a7422b3d",
-      "identityUnitDigest": "994edc68e24b7699dcb37e7a7d3451ecfff37334801e60af3cc3588c3f7cbf2b",
-      "identityFingerprint": "501b147a2746341e9e1930b4cbcaaa19f5ea4bfb646eb517db46a7f39a988154",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 394,
-        "end": 394
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "contract",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_d6999d890de62d2626b5f0ea7e406b90",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "unheaded-block-23",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "ab80cc227b45dd2d238c44848f7d87dfbd66b456b99324493b75b9e09ea4eec3",
-      "identityUnitDigest": "6a2313b942225cab96695da9b6ade4b0588db8bac72f4e3a0157fbda3799f150",
-      "identityFingerprint": "6a2313b942225cab96695da9b6ade4b0588db8bac72f4e3a0157fbda3799f150",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 396,
-        "end": 482
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "contract",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_fab2a6a7e3bde60c734a592396f516bb",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "red-team-fix-round",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "d996e60732746a1fa4ec132b5c80b8f6e37b85e6933cf5ef9c603d987924cfef",
-      "identityUnitDigest": "ca03347eebed886f4e5524ec2bb32f77e3cdb8d9b1afdbcc39acbce0a052b125",
-      "identityFingerprint": "ffade4412be97f06984ea4ff1a12391b9686ab6a3c3fc0fee7fc153af5931a81",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 484,
-        "end": 484
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_380307a67598b0d4f0539c660ad3633a",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "unheaded-block-24",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "1c0c62e2414b8f12929a7f8bc776f4db0a132b59742eb1eea06251cc711d4097",
-      "identityUnitDigest": "71d472ef450ab281a2d96134412a8976ef2d6aab8a688899ef5d2b7cad4d2523",
-      "identityFingerprint": "71d472ef450ab281a2d96134412a8976ef2d6aab8a688899ef5d2b7cad4d2523",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 486,
-        "end": 490
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_0ee264272192211b806a60ff24c8568c",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "unheaded-block-25",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "f955bb46454cabda38d9ea8c00f1d5e0fe3077f2b02d311fa9c399aafeb671b8",
-      "identityUnitDigest": "707ba01b341b4986fc37ae13c182fdc4087600c637a4657169e1b5a945748571",
-      "identityFingerprint": "707ba01b341b4986fc37ae13c182fdc4087600c637a4657169e1b5a945748571",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 492,
-        "end": 599
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_8d032933ec73bd486d834e5c08b6a31e",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "unheaded-block-26",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "e7b055a311f0aefb5cbb8f1337f59272deca9853f7d4b2ca4e9dc964bcaedf87",
-      "identityUnitDigest": "0a1ab4b509169aad8337e3422597af98f9123753627f75155b206b3850e87855",
-      "identityFingerprint": "0a1ab4b509169aad8337e3422597af98f9123753627f75155b206b3850e87855",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 601,
-        "end": 604
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [
-        "test/runner/assignment-dispatch.test.mjs"
-      ],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_1cfa1a96ae43939d55ac4f218199e1e0",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "red-team-recheck-material-fix-recheck-master-coordinatormd-step-g4",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "5180a418f50dc9d0c511baf6d962168ce860026441a3a710259d9a961237c076",
-      "identityUnitDigest": "ae3a58a86fb310f1e71bfa626d7f86ae79086e58be54e6387770d5509414d552",
-      "identityFingerprint": "42dd8268749df95f2164ee657a043c51c9aa8353f2c4ee5496b76dd4405bed9b",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 606,
-        "end": 606
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_750b323e10378f789bd5a3a550fd5985",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "unheaded-block-27",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "a68520d3122d028ed4c2c707ad38cb7260dddd3fa6f29514a148dc08d91fd1cd",
-      "identityUnitDigest": "9857b6ccfc5ee0e42e4a00ea4f31e9a0dfd5c057fb48b11ea33cbe579be1a631",
-      "identityFingerprint": "9857b6ccfc5ee0e42e4a00ea4f31e9a0dfd5c057fb48b11ea33cbe579be1a631",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 608,
-        "end": 608
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_74c02cf8d6be2c0329a667df359fcd70",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "unheaded-block-28",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "5a8b18dbd0aea873b312ef6a48682f3fe854e9b8159eec160b277ade0e830f53",
-      "identityUnitDigest": "2ff65135e35c1543d887d0c9c2e3dafbe2414b45e225e4b103e7cae62fcd1ec1",
-      "identityFingerprint": "2ff65135e35c1543d887d0c9c2e3dafbe2414b45e225e4b103e7cae62fcd1ec1",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 610,
-        "end": 698
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_393225781409f50c9f83b484aed452c5",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "low---work-lookup-accepts-js-built-in-prototype-property-names-as-a-found-work-instead-of-erroring-silently-downgrading-to-a-no-op-rather-than-surfacing-the-callers-mistake-pre-existing-pattern-not-unique-to-this-cell",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "1ec3e64f318b7952a791e492b48fab930df9615797ec7ff435b005826d775a62",
-      "identityUnitDigest": "5fea59cb38c347cfd49e5f93c9a6e270d7fa2b0f92e8869876d1b8128cacc02a",
-      "identityFingerprint": "9ea9115ea47763b7fe759b24647667ade1b20dac9761a79fe88776e1de9fcf67",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 702,
-        "end": 702
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_d611273bb67f4386a5585a22541fb8e3",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "unheaded-block-29",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "90c1bb97d06ece72624a34f337d43a85b1c2ff21a0057312ac04622a405ecd74",
-      "identityUnitDigest": "dd05f389ec24f0f1b2c88e4bdb6037aa6b65454f7f1e2e43a9529b3383f21488",
-      "identityFingerprint": "dd05f389ec24f0f1b2c88e4bdb6037aa6b65454f7f1e2e43a9529b3383f21488",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 704,
-        "end": 755
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "contract",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_fbe5ff4a54319093632ec762e726cd30",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "low-informational-a-positional-executorid-combined-with---contract-is-silently-ignored-not-rejected",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "38730d9a154967b1774bae0656c37fc79a02d56b17090debe497d40d2e1ce8c5",
-      "identityUnitDigest": "9c8fad0d85189ea1601c8d165a7300db3d218b687eeb392a09508c03599f9688",
-      "identityFingerprint": "4e855fc215f820c1342d6ef706d5cae41332b668b058147d3237f7e5581983dd",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 757,
-        "end": 757
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "contract",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_296286506e27e3bd5ccf0db438f1fd14",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "unheaded-block-30",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "8f92d2ee5ef208b0fed66c00fd75b214c3825d5548b87f7c4e94186cfee11e11",
-      "identityUnitDigest": "9bf1a8f89f6c83e0c0f5e92a64ce23b0d0d84ca6fbdd7a1a43a59ef2ece33c04",
-      "identityFingerprint": "9bf1a8f89f6c83e0c0f5e92a64ce23b0d0d84ca6fbdd7a1a43a59ef2ece33c04",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 759,
-        "end": 773
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "contract",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_55f4d26713fff18f519947230282756b",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "confirmed-correct-under-attack-verified-not-assumed",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "acde557826e378fe8b6af8f68c79973a8b3eea8c8c3534fad200451ec473be0e",
-      "identityUnitDigest": "c53ccd6e55ecfaf023b2a42ad48215b6eca3901cc4966461ac3a10cd023b21e0",
-      "identityFingerprint": "5ad202124e2e5ffb54e7dc9f1086d6aeb32381168a7ac0827943b7534eca77db",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 775,
-        "end": 775
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_ce1a9eb6dc30b3ee6ecf2cb2046db68d",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "unheaded-block-31",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "484a9fad57f6d7114b863ce0882127e6e5b78d53bf7dc1512d8b79d553ac07e3",
-      "identityUnitDigest": "1827ccd919d7371806a8821f612b4e60696a2ab39bb10bca36338f5a77aa00cd",
-      "identityFingerprint": "1827ccd919d7371806a8821f612b4e60696a2ab39bb10bca36338f5a77aa00cd",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 777,
-        "end": 818
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "contract",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_add176266f5f1ba77e0c430d2c3c3e00",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "coordinator-disposition-red-team-pass",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "9ce4a7b1a6b06b08f31da47896292a140ea410555c59d5c97462711d25a2e85e",
-      "identityUnitDigest": "dc178a8b97ce90517fc592292ffb61e6e6ba14efece0b24a1eb21ff804fcae25",
-      "identityFingerprint": "abc1946d3760df67aeb6067bfbbab5a59662fbb2705c321dbc31ac30ba2f0fa1",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 820,
-        "end": 820
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_145ff5faa06a94ece7a1ebdbc0cf834b",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "unheaded-block-32",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "45f387b9d9ad28f8d7be4880af13acf581392a86e63577c3b33ac6c4254b052d",
-      "identityUnitDigest": "bef9adad247d0ed1ec1e68bb64971da5866acbbb04d42f4d1e0cd76f1b2c8332",
-      "identityFingerprint": "bef9adad247d0ed1ec1e68bb64971da5866acbbb04d42f4d1e0cd76f1b2c8332",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 822,
-        "end": 832
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "decision",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_f98b200857807acc6b15106891cb0fbc",
-      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
-      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-      "sourceAnchor": "unheaded-block-33",
-      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
-      "sourceUnitDigest": "0d342ba45af3548a58497841bc7539c6c5cd7efe9f826f1d3a0ddbabe7942fb3",
-      "identityUnitDigest": "09e4159564d5fcad58da29fa177f9c0f649b1d9c6f08bb1687e482a43bdba63f",
-      "identityFingerprint": "09e4159564d5fcad58da29fa177f9c0f649b1d9c6f08bb1687e482a43bdba63f",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 834,
-        "end": 852
-      },
-      "targetOwner": "docs/platform/agent-coordination/README.md",
-      "targetAnchor": null,
-      "claimKind": "architecture",
-      "authorityKind": "legacy-current",
-      "status": "current",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
-          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "split",
-      "reviewStatus": "pending",
-      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,

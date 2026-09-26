@@ -3,7 +3,7 @@
 ```txt
 Phase: 02 — Build repository-wide inventory and conservation ledger
 Verification date: 2026-09-26
-Status: LOCAL PASS; pending independent review
+Status: final remediation local focused/gate PASS; authoritative skip-full-suite pending at committed SHA; final full pending
 Authoritative runner: scripts/verify-phase-02.mjs
 Result: Phase 02 artifacts are verified only by the immutable detached-worktree runner, not by commands run in a moving local checkout.
 ```
@@ -44,7 +44,7 @@ they are not authoritative Phase 02 verification evidence.
 - `git diff --check` across `BASE..FIXED_END` and exact allowed-footprint checks;
 - full `npm test` unless `--skip-full-suite` is passed.
 
-## Review Remediation Local Evidence (Cell A)
+## Review Remediation Local Evidence (Cells A-F)
 
 Focused remediation checks in the moving worktree (not full-suite, not authoritative runner evidence):
 
@@ -59,15 +59,15 @@ node scripts/check-doc-inventory-gates.mjs \
   --identity-registry plans/260925-documentation-authority-unification/phase-02-identity-registry.json
 ```
 
-Results after remediation E: focused tests passed (64/64), deterministic regeneration passed, gate checker passed with explicit open findings only: 1054 gaps, 818 duplicate-content groups, 151 semantic-conflict groups. The canonical JSON manifest is 2,455 bytes with SHA-256 `6176a166b81f674be70900b9a0bfc7c7f858bb21c6ea9e149a7bbc5c621e3118`; all 11 shards are under 25 MB; reassembled payload SHA-256 is `73be6fb69ccaabff09a93a6e4090756cad7f22e01df554876c1d42ee71b0361e`; Markdown SHA-256 is `65433755d45107d19ee12646f1b0436163e1d35df990dc61d712d4668c211ba7`; compact identity registry is 44,988,772 bytes with SHA-256 `7e08a97664314189d1bdfc494924e5b2a14b0c1f221df90258855944b8b34730` and covers 4,305 documents / 85,772 units.
+Results after final remediation cell F: focused tests passed (61/61) for `test/scripts/generate-doc-inventory.test.mjs` and `test/scripts/check-doc-inventory-gates.test.mjs`; deterministic immutable-base regeneration completed; gate checker passed with explicit open findings only: 1054 file/routing gaps, 306 claim identity-gap blockers, 1360 total gap/blockers, 818 duplicate-content groups, 151 semantic-conflict groups. The canonical JSON manifest is 2,455 bytes with SHA-256 `e8b683c4e91dcb790031a4f143fc258e99901e6f4877dd1de81ec9290596b34b`; all 11 shards are under 25 MB (max 20,971,518 bytes); reassembled payload SHA-256 is `45e083fe0b2f6f0e62152bf25075de53bc7b8a7c41e930491eeb4c7fedfdc404`; Markdown SHA-256 is `d18603aacc1d3f0ae391df0454b765e93373d520ae5f5a6390bdf2607746829f`; compact identity registry is unchanged at 44,988,772 bytes with SHA-256 `7e08a97664314189d1bdfc494924e5b2a14b0c1f221df90258855944b8b34730` and covers 4,305 documents / 85,772 units.
 
-Remediation E specifically verified: claim lookup keys exclude `claimKind`/`status`/classification, reclassification with unchanged text preserves IDs, duplicate-titled sections carry semantic fingerprints rather than ordinal anchors, indistinguishable duplicates surface explicit ambiguity blockers, path-join/new-URL dynamic consumers emit standalone unresolved patterns, normal generation fails closed without a pinned registry, and stale registry units are detected.
+Remediation F specifically verified: carry-forward removes positional matching and refuses ambiguous duplicate/edited units; pure moves preserve source and claim IDs; balanced nested/multiline `path.join`/`path.resolve`/`new URL` consumer parsing emits standalone docs-rooted unresolved patterns such as `docs/specs/**` and `docs/**`; candidate single-owner proposals are demoted to `unknown-blocking` with null target owner; claim identity-gap blockers are included in summary/open findings/report; tied equal-prefix routes block like exact route conflicts.
 
-Authoritative skip-full-suite verification passed for the remediation commit before final record-only amend: 64 focused tests, immutable-base manifest/all-11-shards/Markdown byte identity, inventory gate, legacy ratchet, 46 docs/citation/ownership tests, changed-Markdown links, historical-plan preservation, exact diff allowlist, and clean-after-checks passed. Full suite was intentionally skipped per remediation instruction.
+Authoritative skip-full-suite verification has not yet run for this cell because it needs the committed `FIXED_END` SHA. Final full verification is intentionally pending per remediation instruction.
 
 A later timeout review found the initial identity registry was empty and the generator still had fallback ID derivation; this pass bootstrapped persisted opaque IDs from `BASE=f0c76c5e590339d9c815038539ff1f4a072c64e4`, removed silent fallback derivation from normal row generation, and batched blob access in generator/gate coverage.
 
-Authoritative full verification passed with `FIXED_END=020829d63601a7da9f0be51c4686ca06db32e973` (tree `9c067da640935cabcafe6c2a8a9ffb89dcdee630`): `npm ci`, 58 focused tests, immutable-base manifest/all-11-shards/Markdown byte identity, identity-registry validation, inventory gate, legacy ratchet, 46 docs/citation/ownership tests, changed-Markdown links, historical-plan preservation, exact diff allowlist, clean detached Rust release build, and clean-after-checks all passed. The full suite passed with 7,819 total / 7,743 passed / 0 failed / 8 skipped / 68 todo; full-suite log SHA-256 `4bea1d4bea6e4858678640fc88a91b2222dcc82a278f5198e77e639f32763d5c`; verifier receipt log SHA-256 `d2597b9fa1fc710e43e77ef788671f2cf0540db9ab8ca1cfb831492d7b3db2a7`. Two immediately preceding full-suite attempts encountered unrelated live-gateway/concurrency timing flakes and were not accepted; the successful receipt is the authoritative evidence.
+Earlier authoritative full verification passed with `FIXED_END=020829d63601a7da9f0be51c4686ca06db32e973` (tree `9c067da640935cabcafe6c2a8a9ffb89dcdee630`) before final remediation cell F. That receipt remains historical evidence for the prior state only; the current cell still requires a new committed-SHA skip verifier run, and the final full verifier remains pending.
 
 ## Last Local Evidence Before Runner Canonicalization
 

@@ -707,7 +707,7 @@ test('indistinguishable repeated carried-forward units become explicit identity 
   assert.equal(row.claims.some((c) => c.claimId.includes('_dup_')), false);
 });
 
-test('collectConsumers: dynamic segments anywhere and multiline new URL become unresolved patterns', () => {
+test('collectConsumers: balanced dynamic parser keeps nested and multiline calls as docs-rooted unresolved patterns', () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-inventory-dynamic-new-url-'));
   try {
     execFileSync('git', ['init'], { cwd: tmp, stdio: 'ignore' });
@@ -716,17 +716,44 @@ test('collectConsumers: dynamic segments anywhere and multiline new URL become u
     fs.mkdirSync(path.join(tmp, 'docs/a'), { recursive: true });
     fs.mkdirSync(path.join(tmp, 'src'), { recursive: true });
     fs.writeFileSync(path.join(tmp, 'docs/a/README.md'), '# A\n');
-    fs.writeFileSync(path.join(tmp, 'src/c.mjs'), ['path.join("docs", area, "README.md")', 'new URL(', '  "../docs/a/README.md",', '  import.meta.url', ')'].join('\n'));
+    fs.writeFileSync(path.join(tmp, 'src/c.mjs'), [
+      'path.join("docs", area, "README.md")',
+      'path.join(repoRoot, "docs", "specs", name)',
+      'path.join(root(), "docs", x)',
+      'path.join("docs", pick("a", nested("b", c)), "README.md")',
+      'new URL(',
+      '  "../docs/a/README.md",',
+      '  import.meta.url',
+      ')',
+      'new URL(`../docs/${section}.md`, import.meta.url)',
+    ].join('\n'));
     execFileSync('git', ['add', '.'], { cwd: tmp });
     execFileSync('git', ['commit', '-m', 'fixture'], { cwd: tmp, stdio: 'ignore' });
     const commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tmp, encoding: 'utf8' }).trim();
     const consumers = collectConsumers(tmp, commit, ['docs/a/README.md']);
+    const patterns = new Set(consumers.unresolvedConsumerEdges.map((e) => e.unresolvedDynamicPattern));
     assert.equal(consumers.get('docs/a/README.md').some((e) => e.path === 'src/c.mjs' && e.kind === 'dynamic' && e.resolvedTarget === 'docs/a/README.md'), true);
-    assert.equal(consumers.unresolvedConsumerEdges.some((e) => e.unresolvedDynamicPattern === 'docs/**/README.md'), true);
+    assert.equal(patterns.has('docs/**/README.md'), true);
+    assert.equal(patterns.has('docs/specs/**'), true);
+    assert.equal(patterns.has('docs/**'), true);
   } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
 });
 
-test('carryForwardIdentityRegistry moves one source without reminting unrelated opaque ids', () => {
+test('buildSwitchboardIndex marks tied equal-prefix routes as blocking conflicts', () => {
+  const index = buildSwitchboardIndex({
+    rootDocuments: [],
+    areas: [
+      { area: 'A', authorityStatus: 'legacy-current', entryPoint: 'docs/platform/a/README.md', currentRoutes: [{ route: 'docs/tie/**', authorityStatus: 'legacy-current', role: 'one' }] },
+      { area: 'B', authorityStatus: 'legacy-current', entryPoint: 'docs/platform/b/README.md', currentRoutes: [{ route: 'docs/tie/**', authorityStatus: 'legacy-current', role: 'two' }] },
+    ],
+  });
+  const row = buildInventoryRow('docs/tie/x.md', { content: '# X\n\nPayload with enough detail.\n', blobSha: '1'.repeat(40), blobSize: 32, switchboardIndex: index });
+  assert.equal(row.gap, true);
+  assert.equal(row.proposedDisposition, 'unknown-blocking');
+  assert.equal(row.proposedTargetOwner, null);
+});
+
+test('carryForwardIdentityRegistry moves one source without reminting claim ids or unrelated opaque ids', () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-inventory-carry-'));
   try {
     execFileSync('git', ['init'], { cwd: tmp, stdio: 'ignore' });
@@ -750,9 +777,61 @@ test('carryForwardIdentityRegistry moves one source without reminting unrelated 
     execFileSync('git', ['commit', '-m', 'move'], { cwd: tmp, stdio: 'ignore' });
     const newCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tmp, encoding: 'utf8' }).trim();
     const evolved = carryForwardIdentityRegistry(tmp, { commit: newCommit, identityRegistryPath: registryPath, sourcePath: 'docs/old/a.md', toSourcePath: 'docs/new/a.md' });
+    const oldMovedIds = registry.units.filter((u) => u.sourcePath === 'docs/old/a.md').map((u) => u.claimId).sort();
+    const newMovedIds = evolved.units.filter((u) => u.sourcePath === 'docs/new/a.md').map((u) => u.claimId).sort();
+    assert.deepEqual(newMovedIds, oldMovedIds);
     assert.equal(evolved.documents.find((d) => d.path === 'docs/new/a.md').sourceId, registry.documents.find((d) => d.path === 'docs/old/a.md').sourceId);
     assert.equal(evolved.documents.find((d) => d.path === 'docs/other/b.md').sourceId, registry.documents.find((d) => d.path === 'docs/other/b.md').sourceId);
   } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
+});
+
+test('carryForwardIdentityRegistry refuses ambiguous duplicate and edited units without guessing positional ids', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-inventory-carry-refuse-'));
+  try {
+    execFileSync('git', ['init'], { cwd: tmp, stdio: 'ignore' });
+    execFileSync('git', ['config', 'user.email', 't@example.test'], { cwd: tmp });
+    execFileSync('git', ['config', 'user.name', 'Test'], { cwd: tmp });
+    fs.mkdirSync(path.join(tmp, 'plans/260925-documentation-authority-unification'), { recursive: true });
+    fs.writeFileSync(path.join(tmp, 'plans/260925-documentation-authority-unification/transitional-switchboard.json'), JSON.stringify(FIXTURE_SWITCHBOARD));
+    fs.mkdirSync(path.join(tmp, 'docs/old'), { recursive: true });
+    fs.writeFileSync(path.join(tmp, 'docs/old/a.md'), ['# Same', '', 'Identical payload with enough detail.', '', '# Same', '', 'Identical payload with enough detail.'].join('\n'));
+    execFileSync('git', ['add', '.'], { cwd: tmp });
+    execFileSync('git', ['commit', '-m', 'old'], { cwd: tmp, stdio: 'ignore' });
+    const oldCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tmp, encoding: 'utf8' }).trim();
+    const registry = bootstrapIdentityRegistry(tmp, { commit: oldCommit });
+    const registryPath = path.join(tmp, 'plans/260925-documentation-authority-unification/phase-02-identity-registry.json');
+    fs.writeFileSync(registryPath, JSON.stringify(registry));
+    fs.mkdirSync(path.join(tmp, 'docs/new'), { recursive: true });
+    fs.renameSync(path.join(tmp, 'docs/old/a.md'), path.join(tmp, 'docs/new/a.md'));
+    execFileSync('git', ['add', '.'], { cwd: tmp });
+    execFileSync('git', ['commit', '-m', 'move'], { cwd: tmp, stdio: 'ignore' });
+    const moveCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tmp, encoding: 'utf8' }).trim();
+    assert.throws(() => carryForwardIdentityRegistry(tmp, { commit: moveCommit, identityRegistryPath: registryPath, sourcePath: 'docs/old/a.md', toSourcePath: 'docs/new/a.md' }), /refused.*possible old units/);
+  } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
+
+  const editTmp = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-inventory-carry-edited-'));
+  try {
+    execFileSync('git', ['init'], { cwd: editTmp, stdio: 'ignore' });
+    execFileSync('git', ['config', 'user.email', 't@example.test'], { cwd: editTmp });
+    execFileSync('git', ['config', 'user.name', 'Test'], { cwd: editTmp });
+    fs.mkdirSync(path.join(editTmp, 'plans/260925-documentation-authority-unification'), { recursive: true });
+    fs.writeFileSync(path.join(editTmp, 'plans/260925-documentation-authority-unification/transitional-switchboard.json'), JSON.stringify(FIXTURE_SWITCHBOARD));
+    fs.mkdirSync(path.join(editTmp, 'docs/old'), { recursive: true });
+    fs.writeFileSync(path.join(editTmp, 'docs/old/a.md'), '# A\n\nPayload with enough detail.\n');
+    execFileSync('git', ['add', '.'], { cwd: editTmp });
+    execFileSync('git', ['commit', '-m', 'old'], { cwd: editTmp, stdio: 'ignore' });
+    const oldCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: editTmp, encoding: 'utf8' }).trim();
+    const registry = bootstrapIdentityRegistry(editTmp, { commit: oldCommit });
+    const registryPath = path.join(editTmp, 'plans/260925-documentation-authority-unification/phase-02-identity-registry.json');
+    fs.writeFileSync(registryPath, JSON.stringify(registry));
+    fs.mkdirSync(path.join(editTmp, 'docs/new'), { recursive: true });
+    fs.writeFileSync(path.join(editTmp, 'docs/new/a.md'), '# A\n\nEdited payload with enough different detail.\n');
+    fs.rmSync(path.join(editTmp, 'docs/old/a.md'));
+    execFileSync('git', ['add', '.'], { cwd: editTmp });
+    execFileSync('git', ['commit', '-m', 'edited move'], { cwd: editTmp, stdio: 'ignore' });
+    const editCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: editTmp, encoding: 'utf8' }).trim();
+    assert.throws(() => carryForwardIdentityRegistry(editTmp, { commit: editCommit, identityRegistryPath: registryPath, sourcePath: 'docs/old/a.md', toSourcePath: 'docs/new/a.md' }), /edited\/new unit|not uniquely preserved/);
+  } finally { fs.rmSync(editTmp, { recursive: true, force: true }); }
 });
 
 test('validateIdentityRegistry detects exact equality and stale units', () => {

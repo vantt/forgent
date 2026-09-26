@@ -1,3 +1,2018 @@
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_c0d01e07a8c6841bc81dd7ab17c1b6fa",
+      "sourceId": "src_a704d4c4989ad33eb4e52f7b446068a4",
+      "sourcePath": "docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md",
+      "sourceAnchor": "unheaded-block-9",
+      "sourceDigest": "ca2d769b1876c60403bd3b430f72ca7f4728ea2707317a2dd7273fb3d6c5c60b",
+      "sourceUnitDigest": "87151ae3a835b154e24bbe227bdbe51e718bee861e13cf992f61bd585f3e6a32",
+      "identityUnitDigest": "672633df0778cf9ce9c66e59e2451b50dd0731b8a58e90507f649d9de2996d54",
+      "identityFingerprint": "672633df0778cf9ce9c66e59e2451b50dd0731b8a58e90507f649d9de2996d54",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 55,
+        "end": 59
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_c6a01f056f5a4438afe1966be2535581",
+      "sourceId": "src_a704d4c4989ad33eb4e52f7b446068a4",
+      "sourcePath": "docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md",
+      "sourceAnchor": "where-the-other-two-sources-diverge",
+      "sourceDigest": "ca2d769b1876c60403bd3b430f72ca7f4728ea2707317a2dd7273fb3d6c5c60b",
+      "sourceUnitDigest": "34d4d37176ec52a1c1100c4964e643bfb8badeb6535fe27d1cf1c4ad010544f4",
+      "identityUnitDigest": "2889907d8a7d3ba2162d91edbb6c9acd1d1fff507707dcd8c386fee129337593",
+      "identityFingerprint": "494c3dc39ae6a696e23ae62a13a8bd58230297180d5472517ed279797466aebb",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 61,
+        "end": 61
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_10b5a7a750ea734dd4320377d481d828",
+      "sourceId": "src_a704d4c4989ad33eb4e52f7b446068a4",
+      "sourcePath": "docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md",
+      "sourceAnchor": "unheaded-block-10",
+      "sourceDigest": "ca2d769b1876c60403bd3b430f72ca7f4728ea2707317a2dd7273fb3d6c5c60b",
+      "sourceUnitDigest": "b7dc4bbf60b173c746e819677bcf070c81b66f094d86ece221d9677346f3eb84",
+      "identityUnitDigest": "c93e3cb1117ff8e29babbac5b412f7c6793ea85263bdb2f333b8508b618833aa",
+      "identityFingerprint": "c93e3cb1117ff8e29babbac5b412f7c6793ea85263bdb2f333b8508b618833aa",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 63,
+        "end": 65
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_ea6756a85f84131f2211a4b83d2aa176",
+      "sourceId": "src_a704d4c4989ad33eb4e52f7b446068a4",
+      "sourcePath": "docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md",
+      "sourceAnchor": "unheaded-block-11",
+      "sourceDigest": "ca2d769b1876c60403bd3b430f72ca7f4728ea2707317a2dd7273fb3d6c5c60b",
+      "sourceUnitDigest": "748b8d25da930f48bdb500de90a6ae6071b2db0eb9b30a41efde8769bfe651da",
+      "identityUnitDigest": "f28b73ff6d68d511d1f0437774ac8fee76eeb83c92a5767d74d557a1f6f721d2",
+      "identityFingerprint": "f28b73ff6d68d511d1f0437774ac8fee76eeb83c92a5767d74d557a1f6f721d2",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 67,
+        "end": 71
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_06a3ee048e0b3e6a1705b7336b9eb542",
+      "sourceId": "src_a704d4c4989ad33eb4e52f7b446068a4",
+      "sourcePath": "docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md",
+      "sourceAnchor": "unheaded-block-12",
+      "sourceDigest": "ca2d769b1876c60403bd3b430f72ca7f4728ea2707317a2dd7273fb3d6c5c60b",
+      "sourceUnitDigest": "7e667ce1500c1044743f7b811abb65a922e1f42e12124e225cc97e077b9c32e2",
+      "identityUnitDigest": "21aab5abc9314c54e7eb0a95478fc4381706b30ac91c3b48884a4ba9514d7407",
+      "identityFingerprint": "21aab5abc9314c54e7eb0a95478fc4381706b30ac91c3b48884a4ba9514d7407",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 73,
+        "end": 76
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_bbf5da9857663de223135ec306df9e6e",
+      "sourceId": "src_a704d4c4989ad33eb4e52f7b446068a4",
+      "sourcePath": "docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md",
+      "sourceAnchor": "unheaded-block-13",
+      "sourceDigest": "ca2d769b1876c60403bd3b430f72ca7f4728ea2707317a2dd7273fb3d6c5c60b",
+      "sourceUnitDigest": "a136fcf0767a94287f92ed300380737f5c387ff893b627d7ddf2846035504da5",
+      "identityUnitDigest": "f3c252245b4a819929079a909d5eafb1ab496a96e272688255f21d2abfaa7eb1",
+      "identityFingerprint": "f3c252245b4a819929079a909d5eafb1ab496a96e272688255f21d2abfaa7eb1",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 78,
+        "end": 78
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_60671cfb4d1314d8040c1a363f3d7f1c",
+      "sourceId": "src_a704d4c4989ad33eb4e52f7b446068a4",
+      "sourcePath": "docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md",
+      "sourceAnchor": "unheaded-block-14",
+      "sourceDigest": "ca2d769b1876c60403bd3b430f72ca7f4728ea2707317a2dd7273fb3d6c5c60b",
+      "sourceUnitDigest": "e3b97033dd5a41f627302d1bad0c99a8d14496236f8d419e9b1befcafcf4fcae",
+      "identityUnitDigest": "14a5d36668ee73a664393d85ba95a73ebeeba46f4b4df76862b261c82d325bce",
+      "identityFingerprint": "14a5d36668ee73a664393d85ba95a73ebeeba46f4b4df76862b261c82d325bce",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 80,
+        "end": 81
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_4465c90d2f86a9e32e91ced616942cd2",
+      "sourceId": "src_a704d4c4989ad33eb4e52f7b446068a4",
+      "sourcePath": "docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md",
+      "sourceAnchor": "why-this-matters-for-fgos-specifically-tsk-1e4",
+      "sourceDigest": "ca2d769b1876c60403bd3b430f72ca7f4728ea2707317a2dd7273fb3d6c5c60b",
+      "sourceUnitDigest": "154ea292c0155fc15d172579a77b84c107e992a658b45f45839c26657d3e8929",
+      "identityUnitDigest": "267c6b1f0175c17c249346b0166ff8be3abce6fb911b4650ceac7f06e0c30942",
+      "identityFingerprint": "462e3a850b8bf06441f18bef288b1ad756010ab746d152bbe0d9ee90bdf0cffd",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 83,
+        "end": 83
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_addd984d2cbe3a1fa6f8133222d7958e",
+      "sourceId": "src_a704d4c4989ad33eb4e52f7b446068a4",
+      "sourcePath": "docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md",
+      "sourceAnchor": "unheaded-block-15",
+      "sourceDigest": "ca2d769b1876c60403bd3b430f72ca7f4728ea2707317a2dd7273fb3d6c5c60b",
+      "sourceUnitDigest": "a68e7c9710d92a863b626446b2a8865acba1d18ade365c9af78f7ea851dc27db",
+      "identityUnitDigest": "eacd25e6d7927c4b2fe0f3bf56a240f0d6cde782576c4eba2f8f1dcfad2e4fe5",
+      "identityFingerprint": "eacd25e6d7927c4b2fe0f3bf56a240f0d6cde782576c4eba2f8f1dcfad2e4fe5",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 85,
+        "end": 93
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_e5250b890d4c7c9996ea41934c7212a9",
+      "sourceId": "src_a704d4c4989ad33eb4e52f7b446068a4",
+      "sourcePath": "docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md",
+      "sourceAnchor": "unheaded-block-16",
+      "sourceDigest": "ca2d769b1876c60403bd3b430f72ca7f4728ea2707317a2dd7273fb3d6c5c60b",
+      "sourceUnitDigest": "ea6ab64511ecbe7607f35ace2e3f440eee60f4f2c12da51893214eb8b4810fa2",
+      "identityUnitDigest": "d074a76f750b6fcda66e3b63acdf7dcebdda119a5d8f420f1e9c07359d52c39f",
+      "identityFingerprint": "d074a76f750b6fcda66e3b63acdf7dcebdda119a5d8f420f1e9c07359d52c39f",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 95,
+        "end": 97
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_bfb90872209324075cac6dbaac0ce51d",
+      "sourceId": "src_a704d4c4989ad33eb4e52f7b446068a4",
+      "sourcePath": "docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md",
+      "sourceAnchor": "unheaded-block-17",
+      "sourceDigest": "ca2d769b1876c60403bd3b430f72ca7f4728ea2707317a2dd7273fb3d6c5c60b",
+      "sourceUnitDigest": "afa02cf824d8eb17842a7fc38ae5bdde4819fc1e3bc1c9413fcd57825dbdd00b",
+      "identityUnitDigest": "cd4d815c78f5a42f2f9ea5fc4905327f495c4b2cc37fd88b0bbbf72ef632a9f1",
+      "identityFingerprint": "cd4d815c78f5a42f2f9ea5fc4905327f495c4b2cc37fd88b0bbbf72ef632a9f1",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 99,
+        "end": 102
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_0ecba4fa33a14a5a05ee618e438d1912",
+      "sourceId": "src_a704d4c4989ad33eb4e52f7b446068a4",
+      "sourcePath": "docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md",
+      "sourceAnchor": "a-second-real-fgos-capability-beyond-impact-analysis-tsk-3ac",
+      "sourceDigest": "ca2d769b1876c60403bd3b430f72ca7f4728ea2707317a2dd7273fb3d6c5c60b",
+      "sourceUnitDigest": "bcbab848cdc0cfcc4c6c4255011c1c42a13ff4359a30fdd2e6d73926340441a8",
+      "identityUnitDigest": "0d19c6c4f1020a19f2dcdbac61e3e08d1aff43a69d690e86827d652639cc9f35",
+      "identityFingerprint": "b3f417f0af7928876c65acaae3d661961d85d42555b454763eb0980bf718434f",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 104,
+        "end": 104
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_4697cdb920ba6f0f98a752d5d76ea6ca",
+      "sourceId": "src_a704d4c4989ad33eb4e52f7b446068a4",
+      "sourcePath": "docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md",
+      "sourceAnchor": "unheaded-block-18",
+      "sourceDigest": "ca2d769b1876c60403bd3b430f72ca7f4728ea2707317a2dd7273fb3d6c5c60b",
+      "sourceUnitDigest": "ee77c530463c527a930e2c35f1b1d9b21760764f3fea59f388921c048cc58a93",
+      "identityUnitDigest": "056408baf8394177a65be314b77cd077cba0fdd6af501f7fc39445db86531c23",
+      "identityFingerprint": "056408baf8394177a65be314b77cd077cba0fdd6af501f7fc39445db86531c23",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 106,
+        "end": 115
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_92bfecec79b1c23b64d410c69ba6f422",
+      "sourceId": "src_a704d4c4989ad33eb4e52f7b446068a4",
+      "sourcePath": "docs/knowledge/tool-registry-capability-lookup-is-a-prose-contract-not-comp/tool-registry-capability-is-a-prose-contract-not-compiled-logic.md",
+      "sourceAnchor": "unheaded-block-19",
+      "sourceDigest": "ca2d769b1876c60403bd3b430f72ca7f4728ea2707317a2dd7273fb3d6c5c60b",
+      "sourceUnitDigest": "07d2b774756c7a4fa21d8be3882a1e6f8d4f812dc38b842bee630ddd733335a9",
+      "identityUnitDigest": "134c2e3bf34268eff9d7dbd50457710d94d341af38de463581b38fead9af45ba",
+      "identityFingerprint": "134c2e3bf34268eff9d7dbd50457710d94d341af38de463581b38fead9af45ba",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 117,
+        "end": 127
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_e92dbaf104ab41ab3cd73bd8c67bc4b9",
+      "sourceId": "src_008428c6a0627a6a78302bc049dd3717",
+      "sourcePath": "docs/knowledge/tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve/merge-loop-self-resolve-feature-summary.md",
+      "sourceAnchor": "unheaded-block-1",
+      "sourceDigest": "312fc4a924b31c9baa4dd5edb6099c3ba56932e6066b2cf886886f8a25136d02",
+      "sourceUnitDigest": "333bf5b874df903fb870785df45c9eb2e35624648a35a3e5f417e1d9d98a6097",
+      "identityUnitDigest": "8a303c2069596e6aac5141f6d8c2d7d7c43b9a34ef10363d81547f530a6d8772",
+      "identityFingerprint": "8a303c2069596e6aac5141f6d8c2d7d7c43b9a34ef10363d81547f530a6d8772",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 1,
+        "end": 9
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_c184b467cb5d84dbeec8775206bdc546",
+      "sourceId": "src_008428c6a0627a6a78302bc049dd3717",
+      "sourcePath": "docs/knowledge/tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve/merge-loop-self-resolve-feature-summary.md",
+      "sourceAnchor": "tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve-the-two-block-reasons-that-already-had-a-proven-playbook",
+      "sourceDigest": "312fc4a924b31c9baa4dd5edb6099c3ba56932e6066b2cf886886f8a25136d02",
+      "sourceUnitDigest": "e7dbe36c0298b6d9a60b359e7bc2c20eeca8e6bcac68e223604ecbd025888288",
+      "identityUnitDigest": "8a6c3622634e086ac3597fc1ea459dc1bd61b9d398bab05ab1e857b2b953ef0b",
+      "identityFingerprint": "c27aeb68ad203a1a5add79b6685a3fc0bcdac03cba469b6ac70fc2259219763e",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 10,
+        "end": 10
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_99acfae465fbad9d0e86167efa5aef3b",
+      "sourceId": "src_008428c6a0627a6a78302bc049dd3717",
+      "sourcePath": "docs/knowledge/tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve/merge-loop-self-resolve-feature-summary.md",
+      "sourceAnchor": "unheaded-block-2",
+      "sourceDigest": "312fc4a924b31c9baa4dd5edb6099c3ba56932e6066b2cf886886f8a25136d02",
+      "sourceUnitDigest": "b8b9863afe1203cb8ecba667bf5dee2d01a39cd83e1b40eb5e762a199fa5ac44",
+      "identityUnitDigest": "9ea65aa854cbca767fb5783642660d8a341172ea42ca0866942aa17752fa9f6f",
+      "identityFingerprint": "9ea65aa854cbca767fb5783642660d8a341172ea42ca0866942aa17752fa9f6f",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 12,
+        "end": 18
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_0afaa27a2bb425180c3c2ad303ffbcba",
+      "sourceId": "src_008428c6a0627a6a78302bc049dd3717",
+      "sourcePath": "docs/knowledge/tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve/merge-loop-self-resolve-feature-summary.md",
+      "sourceAnchor": "what-shipped",
+      "sourceDigest": "312fc4a924b31c9baa4dd5edb6099c3ba56932e6066b2cf886886f8a25136d02",
+      "sourceUnitDigest": "4b20dac36278d1c916283c5ebbb4e5e24498810ffc1e02f7c14fb72c77478f55",
+      "identityUnitDigest": "a4657c723b7c0e1dda26ae0c64468d1c9a4563ec6f35e04e8244209cae514a23",
+      "identityFingerprint": "3a570098586c4f7e66b2003f03fdd236b9febaf3edce72293e1af49b1de94cc1",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 20,
+        "end": 20
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_78fe325497232942b01822285be0a802",
+      "sourceId": "src_008428c6a0627a6a78302bc049dd3717",
+      "sourcePath": "docs/knowledge/tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve/merge-loop-self-resolve-feature-summary.md",
+      "sourceAnchor": "unheaded-block-3",
+      "sourceDigest": "312fc4a924b31c9baa4dd5edb6099c3ba56932e6066b2cf886886f8a25136d02",
+      "sourceUnitDigest": "2ebcf7ea149020378464f3095455eaf89aae1151590a8b495e12c24d4acf11f4",
+      "identityUnitDigest": "530f13a1c611006b5007aa5e8b53b7c3bc0ba399c9937d1afbba0b3e8f2a96a4",
+      "identityFingerprint": "530f13a1c611006b5007aa5e8b53b7c3bc0ba399c9937d1afbba0b3e8f2a96a4",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 22,
+        "end": 32
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "decision",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_545b279dfaa1d5246ffe549189c24a4c",
+      "sourceId": "src_008428c6a0627a6a78302bc049dd3717",
+      "sourcePath": "docs/knowledge/tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve/merge-loop-self-resolve-feature-summary.md",
+      "sourceAnchor": "unheaded-block-4",
+      "sourceDigest": "312fc4a924b31c9baa4dd5edb6099c3ba56932e6066b2cf886886f8a25136d02",
+      "sourceUnitDigest": "2645186c50aea8d2d03f138c890c8d8a25f7a6bf6b54cf75e0f63cd43649c1f1",
+      "identityUnitDigest": "2116284b755631db6af2baeeff39a4404c4b91bcbe3b4bc3e8dc391241d95867",
+      "identityFingerprint": "2116284b755631db6af2baeeff39a4404c4b91bcbe3b4bc3e8dc391241d95867",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 34,
+        "end": 39
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "historical-context",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [
+        "docs/history/tsk-3mv-merge-loop-self-resolve/CONTEXT.md"
+      ],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_5ca1691070e093f61bdd75eea9c1118f",
+      "sourceId": "src_008428c6a0627a6a78302bc049dd3717",
+      "sourcePath": "docs/knowledge/tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve/merge-loop-self-resolve-feature-summary.md",
+      "sourceAnchor": "a-real-friction-this-item-surfaced-worth-naming-honestly",
+      "sourceDigest": "312fc4a924b31c9baa4dd5edb6099c3ba56932e6066b2cf886886f8a25136d02",
+      "sourceUnitDigest": "96bbf39aae19a136a827bf017c04c687eb885819a3c720690e56ec025aa6ba48",
+      "identityUnitDigest": "11ab2c78ff44bd02d0d460d0c9c8244b264932e7670ff7a10550a98a537eb188",
+      "identityFingerprint": "f554093e192851ceee6fb0e62d571efa8346768683f7854ba585cdaaed78ee81",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 41,
+        "end": 41
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_d50b29e4cf3cfce8a93bb4b6b9128a3e",
+      "sourceId": "src_008428c6a0627a6a78302bc049dd3717",
+      "sourcePath": "docs/knowledge/tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve/merge-loop-self-resolve-feature-summary.md",
+      "sourceAnchor": "unheaded-block-5",
+      "sourceDigest": "312fc4a924b31c9baa4dd5edb6099c3ba56932e6066b2cf886886f8a25136d02",
+      "sourceUnitDigest": "71ec538326f7f6d440f0ab1d5af55e14a548b249cc37a638d73add73d14a650b",
+      "identityUnitDigest": "07b515e9440f739d7d6b13fb66a9402366850d2c99be1d5d5b738521445723f6",
+      "identityFingerprint": "07b515e9440f739d7d6b13fb66a9402366850d2c99be1d5d5b738521445723f6",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 43,
+        "end": 60
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_b4f1528f6057cd7b99f514db72dc57ac",
+      "sourceId": "src_008428c6a0627a6a78302bc049dd3717",
+      "sourcePath": "docs/knowledge/tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve/merge-loop-self-resolve-feature-summary.md",
+      "sourceAnchor": "unheaded-block-6",
+      "sourceDigest": "312fc4a924b31c9baa4dd5edb6099c3ba56932e6066b2cf886886f8a25136d02",
+      "sourceUnitDigest": "c9d19c064a7a120607948237af51cf6c1204db3b576c46cac50ae1cdaf14ab7f",
+      "identityUnitDigest": "4bc12344f084f1fe473b709959bf0ec3902c32256238be6e042cdee8434a6818",
+      "identityFingerprint": "4bc12344f084f1fe473b709959bf0ec3902c32256238be6e042cdee8434a6818",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 62,
+        "end": 73
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_1be26cc83c7d6d0b5b3ebe95dd76d29e",
+      "sourceId": "src_008428c6a0627a6a78302bc049dd3717",
+      "sourcePath": "docs/knowledge/tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve/merge-loop-self-resolve-feature-summary.md",
+      "sourceAnchor": "the-real-outcomes-this-synthesis-traces-to",
+      "sourceDigest": "312fc4a924b31c9baa4dd5edb6099c3ba56932e6066b2cf886886f8a25136d02",
+      "sourceUnitDigest": "86cd7bdf423565916d4eae6fa5f3fe1c9b2607e9c54f5a9cc1927d50d49a3a81",
+      "identityUnitDigest": "31cbb5329e08b84231fd72f1f33c2d11cee787df0c44a9f72702009f508a326e",
+      "identityFingerprint": "94a76d4d82f317da320ffca23ce4933235771098b62bbf7ab874b23b28d7e503",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 75,
+        "end": 75
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_c86abdf4a8a73078807c786ee8062b8a",
+      "sourceId": "src_008428c6a0627a6a78302bc049dd3717",
+      "sourcePath": "docs/knowledge/tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve/merge-loop-self-resolve-feature-summary.md",
+      "sourceAnchor": "unheaded-block-7",
+      "sourceDigest": "312fc4a924b31c9baa4dd5edb6099c3ba56932e6066b2cf886886f8a25136d02",
+      "sourceUnitDigest": "25525f212eeb81d79e3b65a889cbf0f9407bcab8e5760c01801221dae6076137",
+      "identityUnitDigest": "f359f98fdabdff5c683626ac0a5fb2ff5bb9706047c3c745e09089a32b5212a6",
+      "identityFingerprint": "f359f98fdabdff5c683626ac0a5fb2ff5bb9706047c3c745e09089a32b5212a6",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 77,
+        "end": 78
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_092a20efa4df147a1f69746a7412c83f",
+      "sourceId": "src_008428c6a0627a6a78302bc049dd3717",
+      "sourcePath": "docs/knowledge/tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve/merge-loop-self-resolve-feature-summary.md",
+      "sourceAnchor": "unheaded-block-8",
+      "sourceDigest": "312fc4a924b31c9baa4dd5edb6099c3ba56932e6066b2cf886886f8a25136d02",
+      "sourceUnitDigest": "579e261735d727a7b63dc434e0fcfbde63517c969b4e92932a2c3fda29713cfc",
+      "identityUnitDigest": "ec0945c8d8dd1136bdff51a87b592005d1ce492f90147643416c2435184931bb",
+      "identityFingerprint": "ec0945c8d8dd1136bdff51a87b592005d1ce492f90147643416c2435184931bb",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 80,
+        "end": 81
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_2e3e29ae777fe7e68f2713e5072dc10f",
+      "sourceId": "src_008428c6a0627a6a78302bc049dd3717",
+      "sourcePath": "docs/knowledge/tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve/merge-loop-self-resolve-feature-summary.md",
+      "sourceAnchor": "unheaded-block-9",
+      "sourceDigest": "312fc4a924b31c9baa4dd5edb6099c3ba56932e6066b2cf886886f8a25136d02",
+      "sourceUnitDigest": "88da4f8162750defe085039c444bd249c5c544ad6199611de346b1bcfd062c5d",
+      "identityUnitDigest": "e68a9dd4e3248177c7c8dd4375c98e29ef822987153900ec74c7e5ee8c54150b",
+      "identityFingerprint": "e68a9dd4e3248177c7c8dd4375c98e29ef822987153900ec74c7e5ee8c54150b",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 83,
+        "end": 86
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_9990b676c6b625618e05ed47b51b129f",
+      "sourceId": "src_008428c6a0627a6a78302bc049dd3717",
+      "sourcePath": "docs/knowledge/tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve/merge-loop-self-resolve-feature-summary.md",
+      "sourceAnchor": "related",
+      "sourceDigest": "312fc4a924b31c9baa4dd5edb6099c3ba56932e6066b2cf886886f8a25136d02",
+      "sourceUnitDigest": "d6d2ff42cef1a0aa3976efef94835e2ee6e98e4f60b2291fd4d0c53f53fed882",
+      "identityUnitDigest": "4863719bd3daea823f36ea6452e44ebb1c1c18fb6ddae900219fb9aedce5316d",
+      "identityFingerprint": "4caad620e5c851a6a0fd52f7f81a28e93d6dc01dcff7fa31b7d22a97d98e73b9",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 88,
+        "end": 88
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_e39534ff9b2bff38d4143438af8bd50c",
+      "sourceId": "src_008428c6a0627a6a78302bc049dd3717",
+      "sourcePath": "docs/knowledge/tsk-3mv-feature-summary-teaching-merge-loop-to-self-resolve/merge-loop-self-resolve-feature-summary.md",
+      "sourceAnchor": "unheaded-block-10",
+      "sourceDigest": "312fc4a924b31c9baa4dd5edb6099c3ba56932e6066b2cf886886f8a25136d02",
+      "sourceUnitDigest": "1643103a17bd10c9f461344c70e5a90abed285686d62e467782a510e9ed588b4",
+      "identityUnitDigest": "db1ffba40e072433253fe2ca80cb24a211f8268dbea7d369869d864ce92c77ef",
+      "identityFingerprint": "db1ffba40e072433253fe2ca80cb24a211f8268dbea7d369869d864ce92c77ef",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 90,
+        "end": 98
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "decision",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [
+        "docs/explanation/merge-loop-self-diagnoses-verify-fail-post-merge.md"
+      ],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_b70fe4cf62c58b11406b92872502661e",
+      "sourceId": "src_3348c11d8bd82449a1bbcf52a79c1909",
+      "sourcePath": "docs/knowledge/use-force-to-clear-a-red-first-verify-disagreement-at-clarif/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md",
+      "sourceAnchor": "unheaded-block-1",
+      "sourceDigest": "55ff0aa4a89e8616085677fb7128aaa769c87a28804af32e3a7f6520b73c502c",
+      "sourceUnitDigest": "18e8b69652b754daa693177a5984a88dcf5872124a025cd5589cd2a279c71f7d",
+      "identityUnitDigest": "ccd7b7253fcc24b3acea9816ff5af95cd739f0b6ca687fd2c9fa154ac8a070b3",
+      "identityFingerprint": "ccd7b7253fcc24b3acea9816ff5af95cd739f0b6ca687fd2c9fa154ac8a070b3",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 1,
+        "end": 9
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_3c3849c138ec40f3a8913262a7513a2c",
+      "sourceId": "src_3348c11d8bd82449a1bbcf52a79c1909",
+      "sourcePath": "docs/knowledge/use-force-to-clear-a-red-first-verify-disagreement-at-clarif/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md",
+      "sourceAnchor": "use---force-to-clear-a-red-first-verify-disagreement-at-clarify",
+      "sourceDigest": "55ff0aa4a89e8616085677fb7128aaa769c87a28804af32e3a7f6520b73c502c",
+      "sourceUnitDigest": "9d8e790af3e672d0f249cd124e04fb3db0b9226da17a5a90541705830adfef32",
+      "identityUnitDigest": "3548d1484bc26f7affbe76728368445a6ff6e72f574b5f41dec5bb98c45079fa",
+      "identityFingerprint": "d39d6bbd77320f5bdc9196c42653960f35d66eae802f5967e251f1c131bf884b",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 11,
+        "end": 11
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_858465135f2452355d48f46335d0580f",
+      "sourceId": "src_3348c11d8bd82449a1bbcf52a79c1909",
+      "sourcePath": "docs/knowledge/use-force-to-clear-a-red-first-verify-disagreement-at-clarif/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md",
+      "sourceAnchor": "unheaded-block-2",
+      "sourceDigest": "55ff0aa4a89e8616085677fb7128aaa769c87a28804af32e3a7f6520b73c502c",
+      "sourceUnitDigest": "b812accf7e3da72e83e1ea287ae6cadc56d6fbc1461b5f8a4ef2b5cc9211ad88",
+      "identityUnitDigest": "56e086badce69bcd725be6fab7e54b4c2fab854e6e77e20e138766814ab458d1",
+      "identityFingerprint": "56e086badce69bcd725be6fab7e54b4c2fab854e6e77e20e138766814ab458d1",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 13,
+        "end": 19
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_d6c00a5bea61920df346d906854e45e3",
+      "sourceId": "src_3348c11d8bd82449a1bbcf52a79c1909",
+      "sourcePath": "docs/knowledge/use-force-to-clear-a-red-first-verify-disagreement-at-clarif/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md",
+      "sourceAnchor": "the-trap-this-catches",
+      "sourceDigest": "55ff0aa4a89e8616085677fb7128aaa769c87a28804af32e3a7f6520b73c502c",
+      "sourceUnitDigest": "8af21b93f0a84b2149ac24d6c6aa5652fc18c28e9f124e0b6d8b85c0f31bc9c3",
+      "identityUnitDigest": "bd5bf251a196de3db61722d571bc1c392b48cef21be1f870f675401e0cc737ad",
+      "identityFingerprint": "c49b026ae2cf1216fbd46105a4bbfe59ede0fcfcac18112f3e49799a6f18e756",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 21,
+        "end": 21
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_edcf07caf0d393d2c835347bac058ad2",
+      "sourceId": "src_3348c11d8bd82449a1bbcf52a79c1909",
+      "sourcePath": "docs/knowledge/use-force-to-clear-a-red-first-verify-disagreement-at-clarif/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md",
+      "sourceAnchor": "unheaded-block-3",
+      "sourceDigest": "55ff0aa4a89e8616085677fb7128aaa769c87a28804af32e3a7f6520b73c502c",
+      "sourceUnitDigest": "d04520505a6b1ff67b8e75c4a8f71ed9101ca52cdafad70f6d15e8742ef47a29",
+      "identityUnitDigest": "95cc16fc166b81bbb6d7712ce59ecf8c47556daa19acd4f88b46a32b846a1e3d",
+      "identityFingerprint": "95cc16fc166b81bbb6d7712ce59ecf8c47556daa19acd4f88b46a32b846a1e3d",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 23,
+        "end": 24
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_1cd11dd6563c54d18026df4516ffb99a",
+      "sourceId": "src_3348c11d8bd82449a1bbcf52a79c1909",
+      "sourcePath": "docs/knowledge/use-force-to-clear-a-red-first-verify-disagreement-at-clarif/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md",
+      "sourceAnchor": "unheaded-block-4",
+      "sourceDigest": "55ff0aa4a89e8616085677fb7128aaa769c87a28804af32e3a7f6520b73c502c",
+      "sourceUnitDigest": "fd9d003e6df0aa99f0a30ea04e31a3aacbcf79305ffff9029099b24b6aaebf0d",
+      "identityUnitDigest": "60c59ffe62cccd087945e7d69de9d5a85e0a8a1d212af1792e6f645c175e0233",
+      "identityFingerprint": "60c59ffe62cccd087945e7d69de9d5a85e0a8a1d212af1792e6f645c175e0233",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 26,
+        "end": 29
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_9acdfdf46d959017730c4b767b8794b5",
+      "sourceId": "src_3348c11d8bd82449a1bbcf52a79c1909",
+      "sourcePath": "docs/knowledge/use-force-to-clear-a-red-first-verify-disagreement-at-clarif/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md",
+      "sourceAnchor": "unheaded-block-5",
+      "sourceDigest": "55ff0aa4a89e8616085677fb7128aaa769c87a28804af32e3a7f6520b73c502c",
+      "sourceUnitDigest": "493616ec3b5c730882ab3369db492ef486a17f8567daf16c40a429de7442a3d8",
+      "identityUnitDigest": "5e27ff6dadf132e1dd99f77ce345807052c6e54ca0039321c944cd9e7275b8af",
+      "identityFingerprint": "5e27ff6dadf132e1dd99f77ce345807052c6e54ca0039321c944cd9e7275b8af",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 31,
+        "end": 38
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_8b4b8e53701582622935dd1311dd881e",
+      "sourceId": "src_3348c11d8bd82449a1bbcf52a79c1909",
+      "sourcePath": "docs/knowledge/use-force-to-clear-a-red-first-verify-disagreement-at-clarif/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md",
+      "sourceAnchor": "what-still-has-to-be-true-of-the-verify-string",
+      "sourceDigest": "55ff0aa4a89e8616085677fb7128aaa769c87a28804af32e3a7f6520b73c502c",
+      "sourceUnitDigest": "523b2a263b36546f201e80b80ea13f548be5a9cfda52bfb30c18a6ac19cc86b4",
+      "identityUnitDigest": "db36c7bb9742a6dd930afcefcb18ad2410d29f8535ff7c610c893b778815e7a9",
+      "identityFingerprint": "d37718a5cffcab56b65fba600e88f5c5c1e8b9a1438b19dc60d55974ce55c6be",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 40,
+        "end": 40
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_96e0f32b3b231bbf0d57bf6ea75ad4be",
+      "sourceId": "src_3348c11d8bd82449a1bbcf52a79c1909",
+      "sourcePath": "docs/knowledge/use-force-to-clear-a-red-first-verify-disagreement-at-clarif/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md",
+      "sourceAnchor": "unheaded-block-6",
+      "sourceDigest": "55ff0aa4a89e8616085677fb7128aaa769c87a28804af32e3a7f6520b73c502c",
+      "sourceUnitDigest": "26ad5dca5f179305dfd831755f40ba03b9cfc79092752ef05d3cb9d9919348ac",
+      "identityUnitDigest": "1b8fdd8f6753ab57d26154681ad1d741a447f83630db42c502b22e056ae89e71",
+      "identityFingerprint": "1b8fdd8f6753ab57d26154681ad1d741a447f83630db42c502b22e056ae89e71",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 42,
+        "end": 43
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_d8ac2fa0f20eb22aa008e147622e0640",
+      "sourceId": "src_3348c11d8bd82449a1bbcf52a79c1909",
+      "sourcePath": "docs/knowledge/use-force-to-clear-a-red-first-verify-disagreement-at-clarif/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md",
+      "sourceAnchor": "unheaded-block-7",
+      "sourceDigest": "55ff0aa4a89e8616085677fb7128aaa769c87a28804af32e3a7f6520b73c502c",
+      "sourceUnitDigest": "a6ed36c4b0875388ef343dcbefa3e2a1bc24e187b82555afed58132dc29eee74",
+      "identityUnitDigest": "32ac435c9cd9e45894c76d135e771586b05f5f971397543486a70bc759fc0291",
+      "identityFingerprint": "32ac435c9cd9e45894c76d135e771586b05f5f971397543486a70bc759fc0291",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 45,
+        "end": 57
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_5025482d0de24c999a3cb992ba6f7d40",
+      "sourceId": "src_3348c11d8bd82449a1bbcf52a79c1909",
+      "sourcePath": "docs/knowledge/use-force-to-clear-a-red-first-verify-disagreement-at-clarif/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md",
+      "sourceAnchor": "then-use---force",
+      "sourceDigest": "55ff0aa4a89e8616085677fb7128aaa769c87a28804af32e3a7f6520b73c502c",
+      "sourceUnitDigest": "b7682ec167f5ed39fe9b9a132189e95b34f99a92ef18ba1e50e614d8c857a7a5",
+      "identityUnitDigest": "bdbdaf7a338d4101fd1af26229c80fed336d69b73790aa796486eb32a1dc10a0",
+      "identityFingerprint": "ebc096a15c5c3fe031d683f4c86bc1d5f3491174fb92e7ce52a3184b1955b09f",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 59,
+        "end": 59
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_3dd892b00e50573ecefc70e5952f20af",
+      "sourceId": "src_3348c11d8bd82449a1bbcf52a79c1909",
+      "sourcePath": "docs/knowledge/use-force-to-clear-a-red-first-verify-disagreement-at-clarif/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md",
+      "sourceAnchor": "unheaded-block-8",
+      "sourceDigest": "55ff0aa4a89e8616085677fb7128aaa769c87a28804af32e3a7f6520b73c502c",
+      "sourceUnitDigest": "655d553a8d8c8c8066485f70dc9620b72752c43ab2af5f4feae2d9827d73eec7",
+      "identityUnitDigest": "192d302238987782d9b41dc751bada1933e8ff3d840fb02cb4c738568a9ef94c",
+      "identityFingerprint": "192d302238987782d9b41dc751bada1933e8ff3d840fb02cb4c738568a9ef94c",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 61,
+        "end": 63
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_25b54a3191c58a467141b87f1037c830",
+      "sourceId": "src_3348c11d8bd82449a1bbcf52a79c1909",
+      "sourcePath": "docs/knowledge/use-force-to-clear-a-red-first-verify-disagreement-at-clarif/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md",
+      "sourceAnchor": "unheaded-block-9",
+      "sourceDigest": "55ff0aa4a89e8616085677fb7128aaa769c87a28804af32e3a7f6520b73c502c",
+      "sourceUnitDigest": "a217afe07203782a39452306f3b200b2127d33c0647770f87714e8fb37910ad1",
+      "identityUnitDigest": "fdff8615f05b4ea7539a74d0f92f0c5501cdf421b49e9d2a2860eb695ae0ad3c",
+      "identityFingerprint": "fdff8615f05b4ea7539a74d0f92f0c5501cdf421b49e9d2a2860eb695ae0ad3c",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 65,
+        "end": 69
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_eba5bbbb73c7a7bc985e534f432fc085",
+      "sourceId": "src_3348c11d8bd82449a1bbcf52a79c1909",
+      "sourcePath": "docs/knowledge/use-force-to-clear-a-red-first-verify-disagreement-at-clarif/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md",
+      "sourceAnchor": "unheaded-block-10",
+      "sourceDigest": "55ff0aa4a89e8616085677fb7128aaa769c87a28804af32e3a7f6520b73c502c",
+      "sourceUnitDigest": "ed07e2b4aa2672104bff3ebaebaa4e71c3f5dd2bc7dd1f7b3842a35f396aa109",
+      "identityUnitDigest": "458c18305816da39a6a8fd9e4aa454854e512398956a695964cc34d6a33a3b02",
+      "identityFingerprint": "458c18305816da39a6a8fd9e4aa454854e512398956a695964cc34d6a33a3b02",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 71,
+        "end": 79
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_99a009c2f7e3b2bcef57d95786bd6cab",
+      "sourceId": "src_3348c11d8bd82449a1bbcf52a79c1909",
+      "sourcePath": "docs/knowledge/use-force-to-clear-a-red-first-verify-disagreement-at-clarif/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md",
+      "sourceAnchor": "a-second-real-reason-to-force-the-judge-is-asking-for-plannings-job-not-explorings",
+      "sourceDigest": "55ff0aa4a89e8616085677fb7128aaa769c87a28804af32e3a7f6520b73c502c",
+      "sourceUnitDigest": "acb60da76d19c3b0486083107ec3204f779b2ef6f6c9a70280e5a4835133f931",
+      "identityUnitDigest": "350a43018c8c3b8887df67a6aeaad3af4395fc617fa7dc9f6a416101d12eaa65",
+      "identityFingerprint": "5ef6fa9cc047c1f94b30116e52a4816983cdab8a266f08622e8736da49079d23",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 81,
+        "end": 81
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_264ac2c093a4ff61321b559391c8e453",
+      "sourceId": "src_3348c11d8bd82449a1bbcf52a79c1909",
+      "sourcePath": "docs/knowledge/use-force-to-clear-a-red-first-verify-disagreement-at-clarif/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md",
+      "sourceAnchor": "unheaded-block-11",
+      "sourceDigest": "55ff0aa4a89e8616085677fb7128aaa769c87a28804af32e3a7f6520b73c502c",
+      "sourceUnitDigest": "fd06197e4a8117e16d8a685c0a38275b5637dd3092fc5d55f729532567791c16",
+      "identityUnitDigest": "2e4e9faf8a434c54f53b7db0a9c82fbf99c98625d9eb4a322dbde29b96c4b32f",
+      "identityFingerprint": "2e4e9faf8a434c54f53b7db0a9c82fbf99c98625d9eb4a322dbde29b96c4b32f",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 83,
+        "end": 87
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_4544e9086fca81a4eab665080eff5ea4",
+      "sourceId": "src_3348c11d8bd82449a1bbcf52a79c1909",
+      "sourcePath": "docs/knowledge/use-force-to-clear-a-red-first-verify-disagreement-at-clarif/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md",
+      "sourceAnchor": "unheaded-block-12",
+      "sourceDigest": "55ff0aa4a89e8616085677fb7128aaa769c87a28804af32e3a7f6520b73c502c",
+      "sourceUnitDigest": "c2a43834f4c0ca362eed6258cedfb9436c144df3973c201c389e2a10c96d8403",
+      "identityUnitDigest": "70d309ad1c737633bc593aab978241ac6ef5c607f364773a63c8d2e379f43cdc",
+      "identityFingerprint": "70d309ad1c737633bc593aab978241ac6ef5c607f364773a63c8d2e379f43cdc",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 89,
+        "end": 92
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_2bcd601110d16f9edd4ce4bcc2067cca",
+      "sourceId": "src_3348c11d8bd82449a1bbcf52a79c1909",
+      "sourcePath": "docs/knowledge/use-force-to-clear-a-red-first-verify-disagreement-at-clarif/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md",
+      "sourceAnchor": "unheaded-block-13",
+      "sourceDigest": "55ff0aa4a89e8616085677fb7128aaa769c87a28804af32e3a7f6520b73c502c",
+      "sourceUnitDigest": "ef2901890684b4cdd0c025d26b9f1be0c08233c2e252ac8f361f609636e963dc",
+      "identityUnitDigest": "1e2fefd0c908e238834dca4031be25c94552156f2b9f24980b3a003c69ee3503",
+      "identityFingerprint": "1e2fefd0c908e238834dca4031be25c94552156f2b9f24980b3a003c69ee3503",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 94,
+        "end": 100
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_2428dfd2f028bd6a25d386402cfd91a9",
+      "sourceId": "src_3348c11d8bd82449a1bbcf52a79c1909",
+      "sourcePath": "docs/knowledge/use-force-to-clear-a-red-first-verify-disagreement-at-clarif/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md",
+      "sourceAnchor": "related",
+      "sourceDigest": "55ff0aa4a89e8616085677fb7128aaa769c87a28804af32e3a7f6520b73c502c",
+      "sourceUnitDigest": "38534e2dffad7461c663ad29e980fc4eb1d3ddb8d51868fc73b9f9a5c23647b9",
+      "identityUnitDigest": "6f06885dcd92fbbd0b562fe8bd9dffbc815dee8b4e892e2eb3673382036167d7",
+      "identityFingerprint": "553ac476a116ceda418d7f1abadae11734255a2253ac78258afb6016142caf35",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 102,
+        "end": 102
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_567e9e62f2cd231d9c2fc7ca3c3fbe87",
+      "sourceId": "src_3348c11d8bd82449a1bbcf52a79c1909",
+      "sourcePath": "docs/knowledge/use-force-to-clear-a-red-first-verify-disagreement-at-clarif/use-force-to-clear-a-red-first-verify-disagreement-at-clarify.md",
+      "sourceAnchor": "unheaded-block-14",
+      "sourceDigest": "55ff0aa4a89e8616085677fb7128aaa769c87a28804af32e3a7f6520b73c502c",
+      "sourceUnitDigest": "b037812e667c1fcf9cbe9e864bdb974ec3e2e811394e63ceff3ba9e0ec555dbf",
+      "identityUnitDigest": "12ad6d05da613a0701959db9d73dcf18fa26ff6ea21e2e101f633f58e6924eef",
+      "identityFingerprint": "12ad6d05da613a0701959db9d73dcf18fa26ff6ea21e2e101f633f58e6924eef",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 104,
+        "end": 107
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "historical-context",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [
+        "docs/history/parallel-decomposition-footprint-avoidance/CONTEXT.md",
+        "docs/history/tsk-5ld-discovery-force-override-tes"
+      ],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_b0c971e36cd43de3f4f9af8f59435b14",
+      "sourceId": "src_0f344d85cd2472b176d96b4f2fcc5476",
+      "sourcePath": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "sourceAnchor": "unheaded-block-1",
+      "sourceDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "sourceUnitDigest": "1888b83371807a6a69f604ab8351990e4ed508da3e07573ed43b643948300cb5",
+      "identityUnitDigest": "3efdfc0ecb4095708a47eebd828c9323e70e3edd6d6648cb4be8a13f3e6486cc",
+      "identityFingerprint": "3efdfc0ecb4095708a47eebd828c9323e70e3edd6d6648cb4be8a13f3e6486cc",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 1,
+        "end": 4
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_a43141a064237f1c6071459f2b5836b4",
+      "sourceId": "src_0f344d85cd2472b176d96b4f2fcc5476",
+      "sourcePath": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "sourceAnchor": "verify-cost-audit-real-pickreturnapprove-cycle-counts",
+      "sourceDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "sourceUnitDigest": "df2b892e3bbf630a2bf9cc68c236df5a044865b937d38a7b30918150ca9732f8",
+      "identityUnitDigest": "231eb6c99cab2e25123dc0ae38e045fc565f78af14279349bc0d465f4363ee70",
+      "identityFingerprint": "4fbcaf663a9aa929ee646780b19205fed2cc620be29f106e2525faa5016176b1",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 5,
+        "end": 5
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_8aa003919f1994f93b14b326939d40e4",
+      "sourceId": "src_0f344d85cd2472b176d96b4f2fcc5476",
+      "sourcePath": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "sourceAnchor": "unheaded-block-2",
+      "sourceDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "sourceUnitDigest": "85e2b91321aacbf9d28c67d7946771caeb0a7e28c367d4e4d2cadf8a6b9706f1",
+      "identityUnitDigest": "de2dc0fcba6af851c911c053b409d3d03c42978774d476a4642e161edda538fe",
+      "identityFingerprint": "de2dc0fcba6af851c911c053b409d3d03c42978774d476a4642e161edda538fe",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 7,
+        "end": 13
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_ca23c2f927d4e7f6139f9fbc401fa4a4",
+      "sourceId": "src_0f344d85cd2472b176d96b4f2fcc5476",
+      "sourcePath": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "sourceAnchor": "unheaded-block-3",
+      "sourceDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "sourceUnitDigest": "02296195b0265b91856b566867bec32d0cbc700f4af1cdf6276dabd5c20a894d",
+      "identityUnitDigest": "7f21865178c45e64270117b3e74f476ce4cd27535abbf58fb8f52de05c7851d5",
+      "identityFingerprint": "7f21865178c45e64270117b3e74f476ce4cd27535abbf58fb8f52de05c7851d5",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 15,
+        "end": 17
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "historical-context",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [
+        "docs/history/tsk-vms-verify-cost-audit/",
+        "plans/reports/verify-cost-empirical-2608"
+      ],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_57afa20fb87caadb6a9b63ba91d3eda6",
+      "sourceId": "src_0f344d85cd2472b176d96b4f2fcc5476",
+      "sourcePath": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "sourceAnchor": "1-pick-rounds-per-item-through-delivered",
+      "sourceDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "sourceUnitDigest": "5bb77272015fdbf9b3a51b71b12329650bec57981baa03f6ca2003047caf712c",
+      "identityUnitDigest": "442d6b39eb519fcdd37741b3bcda157a78bc1e09969f11e9a5db0b35dc9bd371",
+      "identityFingerprint": "5633692570e2422d7c673a7bfb9bbc11878fa8e79ca289eb22a73b10eb4021b4",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 19,
+        "end": 19
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_6aad3648fa8c53e425c6ec38387ed9f3",
+      "sourceId": "src_0f344d85cd2472b176d96b4f2fcc5476",
+      "sourcePath": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "sourceAnchor": "unheaded-block-4",
+      "sourceDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "sourceUnitDigest": "c8ecfad8ac430c59ca434bac0885fda803a4821744f41045450bda49e57e0861",
+      "identityUnitDigest": "c1346914be0517fb157372aeaf700670009eee3d772786628ad6e88a309dc081",
+      "identityFingerprint": "c1346914be0517fb157372aeaf700670009eee3d772786628ad6e88a309dc081",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 21,
+        "end": 28
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_dd7fa0e4c882e2c21e84e2c785c146aa",
+      "sourceId": "src_0f344d85cd2472b176d96b4f2fcc5476",
+      "sourcePath": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "sourceAnchor": "unheaded-block-5",
+      "sourceDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "sourceUnitDigest": "bf51b217a6067be9d5de7ea777cbb0a871a6d767ea19ec946362bde7dddc2baa",
+      "identityUnitDigest": "b90dc344426190ae3b07692f40e6125bd3f96c70211e0a53d71f2a10e0654f31",
+      "identityFingerprint": "b90dc344426190ae3b07692f40e6125bd3f96c70211e0a53d71f2a10e0654f31",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 30,
+        "end": 30
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_af8bbb5f6e84d5ffc178c08c2be31635",
+      "sourceId": "src_0f344d85cd2472b176d96b4f2fcc5476",
+      "sourcePath": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "sourceAnchor": "unheaded-block-6",
+      "sourceDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "sourceUnitDigest": "2f712d39a8d0d2ed5e130905a3b0a1885ba60a9a85fdd2af6c02a6236e31b859",
+      "identityUnitDigest": "e5084a146997c0709aee72713378b468a49187eece261b39ff06103b4f53b350",
+      "identityFingerprint": "e5084a146997c0709aee72713378b468a49187eece261b39ff06103b4f53b350",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 32,
+        "end": 33
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_c5ad517a8c109253c8979302ceb8c616",
+      "sourceId": "src_0f344d85cd2472b176d96b4f2fcc5476",
+      "sourcePath": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "sourceAnchor": "unheaded-block-7",
+      "sourceDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "sourceUnitDigest": "8242f93920fdf9178a2da3a8b95a7869c8f8e3d56d0095c9cffbc0f11478d3b8",
+      "identityUnitDigest": "96a0159aa2d47b367bc187ea16ee316a10b63e48bc51e9677de0fe4e4b8d7a79",
+      "identityFingerprint": "96a0159aa2d47b367bc187ea16ee316a10b63e48bc51e9677de0fe4e4b8d7a79",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 35,
+        "end": 37
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_cb70ef413203e3a988686fe755d43563",
+      "sourceId": "src_0f344d85cd2472b176d96b4f2fcc5476",
+      "sourcePath": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "sourceAnchor": "2-return-rounds-and-how-many-resolve-to-blocked",
+      "sourceDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "sourceUnitDigest": "a7bb90ef1e7139f5af0cc58f2d6add667426d12ea78d25f7ae3b28931d407fba",
+      "identityUnitDigest": "dcb73c7e5f969e7fe78edccd77e804c78b11ff355eb51556772ebdd871ddca70",
+      "identityFingerprint": "51bc978b5dfb807ce4971e51feb4d3b36de0857d9a470ccb4787ea2f7edef247",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 39,
+        "end": 39
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_a688619509eab9c5a8059d7416688b23",
+      "sourceId": "src_0f344d85cd2472b176d96b4f2fcc5476",
+      "sourcePath": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "sourceAnchor": "unheaded-block-8",
+      "sourceDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "sourceUnitDigest": "9b6e978eda058b6a92679e790f37534cf6c7dcccdd42e0cddcac057a7f01ab0d",
+      "identityUnitDigest": "08a7474a46e76bb740419a788ed134aef7bdb5a7af946d0cd7b4cf50b566a71f",
+      "identityFingerprint": "08a7474a46e76bb740419a788ed134aef7bdb5a7af946d0cd7b4cf50b566a71f",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 41,
+        "end": 47
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_cd1f605e117a296cf752fad4b05d07dc",
+      "sourceId": "src_0f344d85cd2472b176d96b4f2fcc5476",
+      "sourcePath": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "sourceAnchor": "approve-rounds-a-separate-lifecycle-step-same-audit",
+      "sourceDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "sourceUnitDigest": "a5327d047cc5738046a2dac9a80e0b6dee065da3cd031d24fb93b4a84062a9ec",
+      "identityUnitDigest": "a7695b78532965acbde187fb1a295084cbadb4a9546e18f7fad71d404e1f410b",
+      "identityFingerprint": "c72758e84eb6608b16e39dc534baebebee567cec36c0ad18839c8aa45b19559a",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 49,
+        "end": 49
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "specification",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_3e242b4aa1b582101344ebf25900d115",
+      "sourceId": "src_0f344d85cd2472b176d96b4f2fcc5476",
+      "sourcePath": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "sourceAnchor": "unheaded-block-9",
+      "sourceDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "sourceUnitDigest": "77c2708f83a5ade02838650e9a923e20593dc88d8011548e4141ac28f000cce3",
+      "identityUnitDigest": "249450b78aa9e516134a1b6e64f9acc159fb8adc512e302f646174f4f44a08b2",
+      "identityFingerprint": "249450b78aa9e516134a1b6e64f9acc159fb8adc512e302f646174f4f44a08b2",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 51,
+        "end": 55
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_7b457bd1025a414c3203399cfe10aa20",
+      "sourceId": "src_0f344d85cd2472b176d96b4f2fcc5476",
+      "sourcePath": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "sourceAnchor": "unheaded-block-10",
+      "sourceDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "sourceUnitDigest": "72897b8ee930fe9cf4dfeed5c2e6be80717f5014d4d28b8dfccf9c3b93bccbc2",
+      "identityUnitDigest": "c191052bbfe8ff09859ca34090f4db07bea6dd9f3f79101093326eaa6fec6189",
+      "identityFingerprint": "c191052bbfe8ff09859ca34090f4db07bea6dd9f3f79101093326eaa6fec6189",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 57,
+        "end": 59
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_9fa466d829ad2b01d1fed0e706353701",
+      "sourceId": "src_0f344d85cd2472b176d96b4f2fcc5476",
+      "sourcePath": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "sourceAnchor": "3-real-failure-cause-distribution-workfrictionerrorclass",
+      "sourceDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "sourceUnitDigest": "f0e01088f57a34791304d8b46048dcd00b37149609dd6e473416630e13877759",
+      "identityUnitDigest": "56657d1f37c4d9383f5e3cc6f5c3292b52c60166d930b55bc4fef0fb43b81c08",
+      "identityFingerprint": "442c3abffb2f2daeea5f32dcc60d92f78da44f676e0ffa95a82a3d355066d444",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 61,
+        "end": 61
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_48978b90955e80b66d8e24c5e90b2af3",
+      "sourceId": "src_0f344d85cd2472b176d96b4f2fcc5476",
+      "sourcePath": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "sourceAnchor": "unheaded-block-11",
+      "sourceDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "sourceUnitDigest": "edf896ece81c6522250442e9417fbfe6ce76431adea88f27cfad3bf3fe206d3f",
+      "identityUnitDigest": "58113aea66a22a132e80b7056160cc67a96ff77df188b421df156a94b9a24685",
+      "identityFingerprint": "58113aea66a22a132e80b7056160cc67a96ff77df188b421df156a94b9a24685",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 63,
+        "end": 63
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_8c62287fabe0ef3b6da52b86725e17e9",
+      "sourceId": "src_0f344d85cd2472b176d96b4f2fcc5476",
+      "sourcePath": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "sourceAnchor": "unheaded-block-12",
+      "sourceDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "sourceUnitDigest": "2bc85bb2b2248b7feaf8e548a3829ec9f404e8db81c990e4d977c73190835083",
+      "identityUnitDigest": "bd7b6210fad42123ca62b3683dd19b240f47db84777b2f1951fb200a1edc79d5",
+      "identityFingerprint": "bd7b6210fad42123ca62b3683dd19b240f47db84777b2f1951fb200a1edc79d5",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 65,
+        "end": 71
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_73e4fc648747f229d849cd1bd0b413f5",
+      "sourceId": "src_0f344d85cd2472b176d96b4f2fcc5476",
+      "sourcePath": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "sourceAnchor": "unheaded-block-13",
+      "sourceDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "sourceUnitDigest": "1c8a1d5ebbe84542a728fda7886170080ca2bc20727cb7a38def9e43aea335ca",
+      "identityUnitDigest": "ad8e97f9fae9b3f2417af483bb3c9d47ec378afc7c506e9236299bc0da0b0397",
+      "identityFingerprint": "ad8e97f9fae9b3f2417af483bb3c9d47ec378afc7c506e9236299bc0da0b0397",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 73,
+        "end": 73
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_5520c9efb8253c260275f47ff70473b4",
+      "sourceId": "src_0f344d85cd2472b176d96b4f2fcc5476",
+      "sourcePath": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "sourceAnchor": "unheaded-block-14",
+      "sourceDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "sourceUnitDigest": "a84bf602ad42c84ee237b0e6a06a3f83f60a04aa38c425bb5c94aa6116ad8ea8",
+      "identityUnitDigest": "a5ce050c4797865f48d127226f44e022503f44fc0cd6531ede3491b779f5248b",
+      "identityFingerprint": "a5ce050c4797865f48d127226f44e022503f44fc0cd6531ede3491b779f5248b",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 75,
+        "end": 81
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_08df3d4cce1baeb0031f0ab2d87244eb",
+      "sourceId": "src_0f344d85cd2472b176d96b4f2fcc5476",
+      "sourcePath": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "sourceAnchor": "unheaded-block-15",
+      "sourceDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "sourceUnitDigest": "fc02998829dc60b34dd84b6cdca1a4df6e8637b2915836ba09dbfda02036a69b",
+      "identityUnitDigest": "69ea397bcb19db18e8c2cd8a54af04bc0ee9e875ace90adbb569fbb26bf8b799",
+      "identityFingerprint": "69ea397bcb19db18e8c2cd8a54af04bc0ee9e875ace90adbb569fbb26bf8b799",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 83,
+        "end": 85
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_940f6c4a48e8fff1fd31bdf9a90a7bcb",
+      "sourceId": "src_0f344d85cd2472b176d96b4f2fcc5476",
+      "sourcePath": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "sourceAnchor": "unheaded-block-16",
+      "sourceDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "sourceUnitDigest": "c2fbc94be22c539ad0bbb8e6453f23be96062d77fc71b29e93dbb7afac441ea5",
+      "identityUnitDigest": "62e83f704aa1326235fcb6a0e272d3a73791b5641e900633273b006db2b9fab8",
+      "identityFingerprint": "62e83f704aa1326235fcb6a0e272d3a73791b5641e900633273b006db2b9fab8",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 87,
+        "end": 89
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_f44cda8811bdbeed7f20400d72dd298a",
+      "sourceId": "src_0f344d85cd2472b176d96b4f2fcc5476",
+      "sourcePath": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "sourceAnchor": "4-full-verify-npm-test-run-count-total-and-estimate",
+      "sourceDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "sourceUnitDigest": "54b6302b937ddf4e83dadbc04cf9bc1a5b2f33d674e023f1d42786132d631c66",
+      "identityUnitDigest": "3f94cc3e04e8698bce4e11b4377bdbc836700db0d6e34b878ad165679f8712b2",
+      "identityFingerprint": "23be231a058a32fa17880d8b4ed557fd0423982e7348178c8d8d27e632a7563c",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 91,
+        "end": 91
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "verification",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_9e8147d71e0ce69faab32c3251f7e800",
+      "sourceId": "src_0f344d85cd2472b176d96b4f2fcc5476",
+      "sourcePath": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "sourceAnchor": "unheaded-block-17",
+      "sourceDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "sourceUnitDigest": "c13e0e085d72eacc893e56f40d30cda0f4e3ab6abd5aad8bb658292cdde8595b",
+      "identityUnitDigest": "afcbe595d886750d905af25cbbab1608342092ed46af6dece3eb54cc4374da20",
+      "identityFingerprint": "afcbe595d886750d905af25cbbab1608342092ed46af6dece3eb54cc4374da20",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 93,
+        "end": 104
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_3cb87f55c7e6f82455d8ef939894a129",
+      "sourceId": "src_0f344d85cd2472b176d96b4f2fcc5476",
+      "sourcePath": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "sourceAnchor": "data-limitations-stated-plainly",
+      "sourceDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "sourceUnitDigest": "63fabe51892fa6682e11ff1975fbe8b736cf095cfc16a0efe6d29f59ee29f46f",
+      "identityUnitDigest": "57acd93859b979f19bd5128dfd99e32c25b25291749eecbf35cc8ab9f6c506e6",
+      "identityFingerprint": "59b017475cd6cca306fe1a27e6ee3854d3a25abee82e4e823f12227b46dabd6d",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 106,
+        "end": 106
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_4d65cffbf562bc8c192671d31f35386e",
+      "sourceId": "src_0f344d85cd2472b176d96b4f2fcc5476",
+      "sourcePath": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "sourceAnchor": "unheaded-block-18",
+      "sourceDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "sourceUnitDigest": "4e1f78c89a05b1997159466d7518b33d16e701e6dff1a6cd3d21e65d9c91ccb8",
+      "identityUnitDigest": "ef194928f07138b46b5db525ec40f5cf2683e8af01a622b8f796b27d11627d87",
+      "identityFingerprint": "ef194928f07138b46b5db525ec40f5cf2683e8af01a622b8f796b27d11627d87",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 108,
+        "end": 115
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_424d2daae8fe498c2db4fe1b3f195e2d",
+      "sourceId": "src_0f344d85cd2472b176d96b4f2fcc5476",
+      "sourcePath": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "sourceAnchor": "what-this-report-deliberately-does-not-conclude",
+      "sourceDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "sourceUnitDigest": "b04303c60844176bed108e187abc6da404a5d0f8d2f0c4a4c4a5b3b4a99866a4",
+      "identityUnitDigest": "b9a6b6f1fa8c5aab2b8df23d260ee282da21335e5a6f005b654728e8601ed72a",
+      "identityFingerprint": "54b4942401d434c22d0f507fcef079c967c61592e069e52f6008d0fbec189735",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 117,
+        "end": 117
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_9f1edef7390008bb0fd3805ee93f210f",
+      "sourceId": "src_0f344d85cd2472b176d96b4f2fcc5476",
+      "sourcePath": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "sourceAnchor": "unheaded-block-19",
+      "sourceDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "sourceUnitDigest": "aea4c459ac8bccf75782e06c147acd3a0b78192aada1a9d946f6c96a15cb6dc9",
+      "identityUnitDigest": "12c82c96dd08a8c16f6e2da2f4189022468ec3b90033724de48946355d77b764",
+      "identityFingerprint": "12c82c96dd08a8c16f6e2da2f4189022468ec3b90033724de48946355d77b764",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 119,
+        "end": 120
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_9ccda9780a5846e7d4926535e530cf23",
+      "sourceId": "src_0f344d85cd2472b176d96b4f2fcc5476",
+      "sourcePath": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "sourceAnchor": "unheaded-block-20",
+      "sourceDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "sourceUnitDigest": "b105e9ad24aa6368392faa165ad8081584ea041f07cf30f5c49c3c87c4edbf3b",
+      "identityUnitDigest": "d66d0a612c088198757e7da2435de459ac2ab8251ba6d35a0b8181690ac8c563",
+      "identityFingerprint": "d66d0a612c088198757e7da2435de459ac2ab8251ba6d35a0b8181690ac8c563",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 122,
+        "end": 129
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_23ccd57095badce035c3e4e320cf684c",
+      "sourceId": "src_0f344d85cd2472b176d96b4f2fcc5476",
+      "sourcePath": "docs/knowledge/verify-cost-audit-real-pick-return-approve-cycle-counts/verify-cost-audit-pick-return-approve-cycle-counts.md",
+      "sourceAnchor": "unheaded-block-21",
+      "sourceDigest": "e6c35f9d207b7dc788f6419081f3ae27728cc50823b7d1c0f501ada9220bc9b0",
+      "sourceUnitDigest": "cd85349445871a29496777b6ec6a3c4ab6610d72f39a3830c0e8315571dd25a5",
+      "identityUnitDigest": "d7e1ebd4803c3deaf7ac84209ca5006f4bbba87c5bfdf29548809603aa3015f9",
+      "identityFingerprint": "d7e1ebd4803c3deaf7ac84209ca5006f4bbba87c5bfdf29548809603aa3015f9",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 131,
+        "end": 132
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "decision",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_05f530319e4e474c2b3de15cb185c4b4",
+      "sourceId": "src_0d60b2e136715b9c8f067fa28dfc9824",
+      "sourcePath": "docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md",
+      "sourceAnchor": "unheaded-block-1",
+      "sourceDigest": "b9a68bd927266d032b15f8acd64c64ddb3939065fceb98831ad91e6da720dc97",
+      "sourceUnitDigest": "63bc8c4f679f0e1eaeb440c3336bc9b9b274f1e9f29a94d16fcc6dfd7a433289",
+      "identityUnitDigest": "a5797222605b07cfae5e90993aded6dd36c874610362395a2b5e5e574b5f7955",
+      "identityFingerprint": "a5797222605b07cfae5e90993aded6dd36c874610362395a2b5e5e574b5f7955",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 1,
+        "end": 9
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "reclassify-out-of-platform-scope",
+      "reviewStatus": "pending"
+    },
+    {
+      "claimId": "claim_bc802d98bb8c3645b58c86774bf51dbf",
+      "sourceId": "src_0d60b2e136715b9c8f067fa28dfc9824",
+      "sourcePath": "docs/knowledge/vi-t-verify-cho-m-t-item-thay-i-skill-prose/write-verify-for-a-skill-prose-change.md",
+      "sourceAnchor": "viết-verify-cho-một-item-thay-đổi-skill-prose",
+      "sourceDigest": "b9a68bd927266d032b15f8acd64c64ddb3939065fceb98831ad91e6da720dc97",
+      "sourceUnitDigest": "83e5270a60e911a5bf45a725ca7a80f381e6bf48c2ede2c5b17644729e68155d",
+      "identityUnitDigest": "ae81321f7c683ed92a928283650f701fd34df3cf2bd0d4145ae563b1689b5360",
+      "identityFingerprint": "c7495e59357891d85e357c289be3c17187325e2ae03ab329089af72a9a178d33",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 11,
+        "end": 11
+      },
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "unclassified",
+      "authorityKind": "non-authority",
+      "status": "future",
+      "relations": [],
+      "decisionRefs": [],
+      "evidenceLinks": [],
       "disposition": "reclassify-out-of-platform-scope",
       "reviewStatus": "pending"
     },
@@ -477170,2202 +479185,3 @@
       "sourceAnchor": "verification-commands-run-independently-1",
       "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
       "sourceUnitDigest": "a219073b2fd86dcb7f2309789a9847bb0d0ad43dab15b0a4df1178f71d22603a",
-      "identityUnitDigest": "7d29c5c96d2700751ceb3cfc66b32db204e9a80fda4f8cbb68645fd3924ef2bf",
-      "identityFingerprint": "f204f0a95f0ef544ce44caf4a3fc7fa95ec1fa3d705122f9f21c934baff120a3",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 330,
-        "end": 330
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_9d7100cd11b288fc47b007a84ee602db",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-41",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "8cb2258b7fe3f457f2aad60142dd40e92d57ddf08d69925708c38ad68fdc8241",
-      "identityUnitDigest": "a8b9afbb5dd6d2d45b270e316e2b2350ddeae93a28a88b5b37294a79228d9baa",
-      "identityFingerprint": "a8b9afbb5dd6d2d45b270e316e2b2350ddeae93a28a88b5b37294a79228d9baa",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 332,
-        "end": 340
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [
-        "test/runner/assignment-provenance.test.mjs",
-        "test/runner/assignment-runresult.test.mjs",
-        "test/runner/coordination-*.test.mjs"
-      ],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_c1d9df721fae6bece74fff8e56e5db98",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-42",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "83c9b96ead85045dbbf01043bb8c2e2b99bf7182164fff691a173461ab73be71",
-      "identityUnitDigest": "3bac8eafcb5d4e40492aa9e1caf630d0382464d092f4e818c828a7ffa5b0d132",
-      "identityFingerprint": "3bac8eafcb5d4e40492aa9e1caf630d0382464d092f4e818c828a7ffa5b0d132",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 342,
-        "end": 345
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_205ad09fea8b440b26146c51fced8997",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-43",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "8646a2bc9d0227f7f7e6184866e639cc41714dce69c0b3f6e917113a45548b82",
-      "identityUnitDigest": "71a6e4bdaf09c2d9374cfdea9baaad831a96e98eb5b584c10c51a77acc7deb27",
-      "identityFingerprint": "71a6e4bdaf09c2d9374cfdea9baaad831a96e98eb5b584c10c51a77acc7deb27",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 347,
-        "end": 350
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [
-        "test/**/*.test.mjs"
-      ],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_3b69c7fba0af3959a7bd422d4ef7e639",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-44",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "cdc2259e973ab8678530e9b0a1a5a45ed26655916fd0a00707718956c6e75ef5",
-      "identityUnitDigest": "c6a00d041590af55ed3060a853bbfc791f0b98c8d691468253641a310c29e996",
-      "identityFingerprint": "c6a00d041590af55ed3060a853bbfc791f0b98c8d691468253641a310c29e996",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 354,
-        "end": 393
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_bf6db5d399f750cc05cb6d1a1909d97e",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "gaps",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "c56a429f009264e5c011275196411819148a76dc5b1aa0ae03f90dd08ad1e606",
-      "identityUnitDigest": "94a7100c5f0e70913ebc13dfb254a15e5716811a4e75850cf8234c16f0cca975",
-      "identityFingerprint": "47a100a368493561e2873f72adabd9996891f9940101cfe8eef866ec54b5e3f3",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 395,
-        "end": 395
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_96ab5dd8630234a010bb7faa51825cc8",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-45",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "b9d72d0133980bba1c263b65f46e6eed6d7807220e50f27bc062cdf6106a93b4",
-      "identityUnitDigest": "f10fb63a44b61d4b1ac81709513f03d3cf3e88d9cb8d0722e2493e0f1f6219c5",
-      "identityFingerprint": "f10fb63a44b61d4b1ac81709513f03d3cf3e88d9cb8d0722e2493e0f1f6219c5",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 397,
-        "end": 403
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_283b7a8c739ca62f5de0944e32a53716",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "fix-evidence",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "ecae50f7530f52e377ff744fbb667b371ae65a5ec90fc70c1f79d35407b0bb65",
-      "identityUnitDigest": "36127492217fc997383004322e16ec24f95a54dc32812ecc78f0e1ba995bbe7e",
-      "identityFingerprint": "c23b3ca2027306a2a03a0764690b602624b96301b77ce087b523cfa3f4cea83c",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 405,
-        "end": 405
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_0269f16b88e56942673c74912ff5c218",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-46",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "1524a883bf9d85d65b08dfad130f6475f29ed54900b5af2b9471a586e41be468",
-      "identityUnitDigest": "4ce41831572cf2d748817d19111a8a7f120f5b47cbd1181e54bf586956c6d0de",
-      "identityFingerprint": "4ce41831572cf2d748817d19111a8a7f120f5b47cbd1181e54bf586956c6d0de",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 407,
-        "end": 411
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "contract",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_c4052059be6ec6d5eb4161337893a79e",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "high-fix-createsessionassignment-write-order-storemjs",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "a8b3ed685e3af7177dec8a07d83dc2ec739c75b7c77dc40f23213d99556da726",
-      "identityUnitDigest": "fa812e766abf2471e9f8740c118a552a8cb30c7a484be9cb4fd3e60d4a8fccc0",
-      "identityFingerprint": "33d5c5bb33a104e0682fc0e67eb6bab7afc04ddd7798cb9d05c7fe9f7b2eca9d",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 413,
-        "end": 413
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_9281731129930534122b3f0cb1bc7508",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-47",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "73003fa71ffe37a25b9ecc3e791722437967f7d1cb9d3ce3856f6ee48347c390",
-      "identityUnitDigest": "4a8c64ae031cae513bcd12c7d0f2956d75bd97a2714daa80631008699975b190",
-      "identityFingerprint": "4a8c64ae031cae513bcd12c7d0f2956d75bd97a2714daa80631008699975b190",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 415,
-        "end": 419
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_8b3501e75691de6e519ca82ae4aa0e27",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-48",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "b4ae163f7284ad6a4bcc4d953b2c54eee04538318b3fc464cd840c4cd2675cb0",
-      "identityUnitDigest": "39949f15ed94ec881ef16aeaa9697fcf2bcb1e714181c18b845d36e76365b9b0",
-      "identityFingerprint": "39949f15ed94ec881ef16aeaa9697fcf2bcb1e714181c18b845d36e76365b9b0",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 421,
-        "end": 463
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_e48fd34aec2a667415fad6228d8aa7c9",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-49",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "d4fe9f9215069c940cfe31209e0a8375ad3d61caf5fd93668360be33aa5c5a49",
-      "identityUnitDigest": "18cc03d2fa94853065174fe6441c7615c210e52501e181821600b0b805a7889a",
-      "identityFingerprint": "18cc03d2fa94853065174fe6441c7615c210e52501e181821600b0b805a7889a",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 465,
-        "end": 468
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_0a264ded134c54f6a683e3b5d288b84f",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-50",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "62ecca8181ceed24ed01115085bf99bbdd35ef5a86e1cda4ea1d58be89a12c71",
-      "identityUnitDigest": "22eb6a72466a92e687ad4f1f183d11d5281bd1da09268bdd39ed5b520903ac8b",
-      "identityFingerprint": "22eb6a72466a92e687ad4f1f183d11d5281bd1da09268bdd39ed5b520903ac8b",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 470,
-        "end": 472
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "specification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [
-        "test/runner/coordination-store.test.mjs"
-      ],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_899811bc24649c34a6d5c673ca6d74ac",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-51",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "67f9b43ede6abc9a7bfe5c1f2c0d1de792f606fc18accc790a31d6a29f17c54c",
-      "identityUnitDigest": "8ae5f91724fafefedcf54bec963a343dfe0eddc573f1fdbc981d5ab89883e7dc",
-      "identityFingerprint": "8ae5f91724fafefedcf54bec963a343dfe0eddc573f1fdbc981d5ab89883e7dc",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 474,
-        "end": 484
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_ca2874166a5b3adaf7090557bba8a7a1",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "medium-fix-shared-schemaversion-check-schemamjs-storemjs-replaymjs",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "a6c4dd194b703762f8ec22c92a0837bc31b63fe7bd6107adf7b84a6c0e7e6cb1",
-      "identityUnitDigest": "8f037575308b151cdfa9b7ebc7391a7b60ec201eb4a8f5c366c700c15aa7e678",
-      "identityFingerprint": "26735953e8f7cf883df8396c50e572542bedce54e9808b8d784529e354c8cb79",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 486,
-        "end": 486
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "contract",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_0ded8f6e8624df9cb4deff85ef74a7ed",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-52",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "124090d1de0e585a017ce6e6253a9357a9fd202ddb82a28b32efd181d876d71c",
-      "identityUnitDigest": "aa83be70214df4bea1effa4be17fec369e920f31ba408698017f8cd8b2ac8f5b",
-      "identityFingerprint": "aa83be70214df4bea1effa4be17fec369e920f31ba408698017f8cd8b2ac8f5b",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 488,
-        "end": 490
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "contract",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_f32c34397476b8b0462a3782f2f162f2",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-53",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "23abaec00ac68919f7b2c31028825464cb761bef71cdd8d232da25c27cecd949",
-      "identityUnitDigest": "bb5f887057e22ead2cf83e44cec55e65b029638fb8aa8b697ec7d96112ca3680",
-      "identityFingerprint": "bb5f887057e22ead2cf83e44cec55e65b029638fb8aa8b697ec7d96112ca3680",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 492,
-        "end": 501
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "contract",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_b5a336adaef33cf0fcb5254225549737",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-54",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "7df8a84ec24b00d8f5ef7500a15f85b9de8dc48ec4661af1e299407ca021c6e5",
-      "identityUnitDigest": "f583c0902549d416a4459ec9b194d106879301cd147fcb9ad4a08c455db07cf2",
-      "identityFingerprint": "f583c0902549d416a4459ec9b194d106879301cd147fcb9ad4a08c455db07cf2",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 503,
-        "end": 504
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_0b13d1eb1b16d7d9d6f147478b133de1",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-55",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "a777ede2e2df80e893d7a6502321297ed28e4f4bd579fb33e1beea641ca8167a",
-      "identityUnitDigest": "94c96ca17886c3fac0fbc718af0da0954c6318c340739a5768c5d48e396631ef",
-      "identityFingerprint": "94c96ca17886c3fac0fbc718af0da0954c6318c340739a5768c5d48e396631ef",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 506,
-        "end": 521
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "contract",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_d0a5c9dbe33e0a27c0b28a9b7602333e",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-56",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "a6a3e40e297deaf8380e2513b20004427d559b1d027e6e8ee75657ea3528c0eb",
-      "identityUnitDigest": "694bf822906fab8bd4aafe0fd74b09c5c213b48792dcfbac93c7c4356a1e3dc8",
-      "identityFingerprint": "694bf822906fab8bd4aafe0fd74b09c5c213b48792dcfbac93c7c4356a1e3dc8",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 523,
-        "end": 527
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_b46e70d044522aef1498cf24f1b47f24",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-57",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "b1b8ced3d901c1604339f41e54ec16b8cae47f41b04a92e21cbde01c312e0499",
-      "identityUnitDigest": "7a68a840f01ea563ecd0c9bf57e75410ecf2e17ad42dd6e23875b0051f535350",
-      "identityFingerprint": "7a68a840f01ea563ecd0c9bf57e75410ecf2e17ad42dd6e23875b0051f535350",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 529,
-        "end": 534
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_c93bbf5f41738cab7db7e6767dec9b7a",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-58",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "5da05a762988b666fc06684f47a4284d9da5e2efcceb07cdbdb3fec4007a55f0",
-      "identityUnitDigest": "df82f30a02b8209de0fc88f5fadb81770c9407bfc0e4bef87b053f8ee81eeb7d",
-      "identityFingerprint": "df82f30a02b8209de0fc88f5fadb81770c9407bfc0e4bef87b053f8ee81eeb7d",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 536,
-        "end": 538
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_e817bee43f79e6a6ffd6bac52606a0bb",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-59",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "3cdb103a34dbddd6a77e4e00f2133d22f68134b5498a65c4481105019ee2c8fe",
-      "identityUnitDigest": "8fb3d102a8d587b9011e3e1cc273b8a7491b611c36ebabc968fe156b8f4b0461",
-      "identityFingerprint": "8fb3d102a8d587b9011e3e1cc273b8a7491b611c36ebabc968fe156b8f4b0461",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 540,
-        "end": 543
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_a2ecac7b77b87451d747181e2ef909e7",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "verification-run",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "9fdde6e43b09e36af1013bc4fd5b42943b98a64ac0e0a11c35acac93d5bb414c",
-      "identityUnitDigest": "a91d7a645b0d7af83f2a7c84896bab795aca9cd50f343ba0bf7ffbe14e45c478",
-      "identityFingerprint": "e7d513f3395b0ab0b4d6a7085cb949745aa7cc8dd0cf4556f39513ba34a302bd",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 545,
-        "end": 545
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_0d98032a9d11f8bb7b370ee2b0d7af7f",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-60",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "82051e6e573d6b4ecd2ef662d829da12a652e434cfa7a3a45ec06b6b1c375480",
-      "identityUnitDigest": "96d450fecc25d03e1b3d72526b23b4a3c46a616a891c34be65cfde6e9a9d1dfe",
-      "identityFingerprint": "96d450fecc25d03e1b3d72526b23b4a3c46a616a891c34be65cfde6e9a9d1dfe",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 547,
-        "end": 550
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [
-        "test/runner/coordination-store.test.mjs"
-      ],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_28db4103151eb78c3018446dc0bfdc02",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-61",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "313ac02b43f11c7e0cde61282c4f15c13a824e53ac279b241b8f297f7bcbdf80",
-      "identityUnitDigest": "331ca04d9033e1814a3d63d3134bf31d17c9196f1878ce16e6f0fc8b1fee4688",
-      "identityFingerprint": "331ca04d9033e1814a3d63d3134bf31d17c9196f1878ce16e6f0fc8b1fee4688",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 552,
-        "end": 563
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [
-        "test/runner/assignment-provenance.test.mjs",
-        "test/runner/assignment-runresult.te",
-        "test/runner/coordination-*.test.mjs"
-      ],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_62169cfc12c0a94435698c81cb78aad9",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-62",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "c3c7d66d0c6133ac1b38cdf36244fa5106cbe00947cc0bb49448730be4e592e5",
-      "identityUnitDigest": "e7bd7eb6ea401d8ea88f1558dc77934e7f819d35b9127e25f3088fc9b6d04bed",
-      "identityFingerprint": "e7bd7eb6ea401d8ea88f1558dc77934e7f819d35b9127e25f3088fc9b6d04bed",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 565,
-        "end": 571
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_264ced8e0b7662edb27a41a70762aad0",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-63",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "e0467744dd61e6299718c0ad5a9114255ba929bd419b6ee4718fde3432d838ec",
-      "identityUnitDigest": "ccd529dd7416952c2c12b1dac0f15873b0cc4e3a2ca0d81a3e21650c0d416662",
-      "identityFingerprint": "ccd529dd7416952c2c12b1dac0f15873b0cc4e3a2ca0d81a3e21650c0d416662",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 573,
-        "end": 577
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "contract",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [
-        "test/runner/coordination-store.test.mjs"
-      ],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_deb3b1126b506850826e683354de6a53",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "fix-round-2-2026-09-01-red-teams-second-pass-highmediumlow-all-accepted",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "09bfe8d1fa3cf15e1f4374286a3fa715a3ebfd0e0fc86ba523299f68f66746fd",
-      "identityUnitDigest": "4a3d597dab7f2ef980cebac205bb62f14c49427cf5e7838967d7f05aa7ca9bc8",
-      "identityFingerprint": "9eb6490902919465db977d820bff69666d6a42aca29e51d1d27d31839674ec91",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 579,
-        "end": 579
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_5e940396cef04d959a3cff881798d50c",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-64",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "def102ba45f95ab49f5873084a56efe0931139348c21cb31cb8df0319718720b",
-      "identityUnitDigest": "5a5efae869efe9222be33f28b352f917a9c25131a894d79b341abb41fc83e774",
-      "identityFingerprint": "5a5efae869efe9222be33f28b352f917a9c25131a894d79b341abb41fc83e774",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 581,
-        "end": 585
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_e6fe013a94a25a8ac16e1a6038cf2c0f",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-65",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "11f2670291a9fb23cbf2b3fd2bc35f5e4d47982809a7ce867a97f166426776ea",
-      "identityUnitDigest": "679b599e0439cf4b9a15ba56397ab003d8961f43cc1277357433c43a8336a090",
-      "identityFingerprint": "679b599e0439cf4b9a15ba56397ab003d8961f43cc1277357433c43a8336a090",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 587,
-        "end": 596
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_c0faf151ca0e8901e6c78e3d86d5cf57",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-66",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "ef85c82cc6f99c4dc926eae60304f09846c868eaba5643eedfe792d39257676e",
-      "identityUnitDigest": "0034fdca273a63884027862eec36414ca565ff1d8e78f6250c37cf7d1048d7c4",
-      "identityFingerprint": "0034fdca273a63884027862eec36414ca565ff1d8e78f6250c37cf7d1048d7c4",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 598,
-        "end": 611
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_979f8aae4badabf5e0e3a4161a974d22",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-67",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "ff4e2c9265e64c79d91f5c2ff24a479dd6fd849a312fcfa27b682c2aeb007e9c",
-      "identityUnitDigest": "f0d7eac35bd67a0f053784c7c054258bec7648cd31b68e53612facf768a326cf",
-      "identityFingerprint": "f0d7eac35bd67a0f053784c7c054258bec7648cd31b68e53612facf768a326cf",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 613,
-        "end": 630
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_1a2661fce9ecbd09ad171202376d58af",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-68",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "836034f2530acd806c92303ec185974ef2cf67786a63cb869eed02734dfc152d",
-      "identityUnitDigest": "afe205f1cb16842b11d391269efb51f960879c4b3900f063949d9b8d86dd27d0",
-      "identityFingerprint": "afe205f1cb16842b11d391269efb51f960879c4b3900f063949d9b8d86dd27d0",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 632,
-        "end": 650
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_369a6e65ac15f2d1a72081c6bfb00d10",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-69",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "f9d1c32b218da73b2217025f87c051e2981d7b003776f54b588d0309463251ad",
-      "identityUnitDigest": "b10e69b49e8711e37f143983d2ecbb0a39b535ef320a88bb9df34dc01bf26abd",
-      "identityFingerprint": "b10e69b49e8711e37f143983d2ecbb0a39b535ef320a88bb9df34dc01bf26abd",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 652,
-        "end": 658
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [
-        "test/runner/coordination-store.test.mjs"
-      ],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_3a0abd085dd7bc97e78716d0c8d01afb",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-70",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "cd0bc68b72cdd50bc67446dc5b3728152fbbbf277fbbc69e068ad96ee33d00e4",
-      "identityUnitDigest": "d31adf16ee70dba2e4ccf0121c0b7b37e00b56fb57f9436b3ab6b5bec094cac5",
-      "identityFingerprint": "d31adf16ee70dba2e4ccf0121c0b7b37e00b56fb57f9436b3ab6b5bec094cac5",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 660,
-        "end": 663
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_5a7d34e5b901ca6e672d6d0bc8edd580",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-71",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "319ec2c4b309b28558577042d600c00be3b8e7f7459d217c052fdf18e3be2290",
-      "identityUnitDigest": "ad53f3a967e574686419c9d5cf2746907e6322952da0248fdad15fa01ba11256",
-      "identityFingerprint": "ad53f3a967e574686419c9d5cf2746907e6322952da0248fdad15fa01ba11256",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 665,
-        "end": 673
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [
-        "test/runner/coordination-store.test.mjs"
-      ],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_1082c6b10b5827fcdc7b37fdbada5bd7",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-72",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "204cac9847f32c51ae8b364e707af287d8612c6b98ad2f2a57bed60a8738211c",
-      "identityUnitDigest": "5304267952f779d0fa7a3e1ddb0b8dfb66ccf5ba09dbf18571f4646b12d72532",
-      "identityFingerprint": "5304267952f779d0fa7a3e1ddb0b8dfb66ccf5ba09dbf18571f4646b12d72532",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 675,
-        "end": 690
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_4e75be9f62794038fff1ae29052fcaf5",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-73",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "d6a112d2495676ad342a76c8a7d5d9402e095f0a8fa603520883945498a3abcd",
-      "identityUnitDigest": "de83f0b0875c3f4a1aec5ae8fe7e9df6a114afb390f1a6bade8c21d00476b767",
-      "identityFingerprint": "de83f0b0875c3f4a1aec5ae8fe7e9df6a114afb390f1a6bade8c21d00476b767",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 692,
-        "end": 695
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_62448c5a3b67d6a051e0430be6c11dce",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-74",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "3c9e75644007e124cebebbe1d70773432eadee3743e2376c938834a170d9091a",
-      "identityUnitDigest": "715b78b0eb0972787bb5af2c0013125b49b4db783b5cca1385ed28e66e95233b",
-      "identityFingerprint": "715b78b0eb0972787bb5af2c0013125b49b4db783b5cca1385ed28e66e95233b",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 697,
-        "end": 703
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_42a1def40349f195b882fc79205bef4e",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-75",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "62f52df06900690d2f264c6de5352d2f0a42c105c5d1033958c1f07952c4cbc4",
-      "identityUnitDigest": "49584a7dabfebc337a5841a6a8dfe02493394e8e93418ff7e5ebc89887921cab",
-      "identityFingerprint": "49584a7dabfebc337a5841a6a8dfe02493394e8e93418ff7e5ebc89887921cab",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 707,
-        "end": 714
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [
-        "test/runner/coordination-store.test.mjs"
-      ],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_3e417a4ebcd62adc8d64bcde8bd66077",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-76",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "3a1dfd4b962c072e039e90d04fb202ed5e5dff9c080d53af6fd088acef783418",
-      "identityUnitDigest": "d538e52ce3c0be0877b07387e0af61ba813fafe4d8d91fd855799fe03b2a4f29",
-      "identityFingerprint": "d538e52ce3c0be0877b07387e0af61ba813fafe4d8d91fd855799fe03b2a4f29",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 716,
-        "end": 728
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [
-        "test/runner/assignment-provenance.test.mjs",
-        "test/runner/assignment-runresult.te",
-        "test/runner/coordination-*.test.mjs"
-      ],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_d734e4f79fc3af2ff79781f784715389",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-77",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "b08397f2cc55ba5857a009ee06c8382d9e1aa3ecce81cef4400ca37b3db3237b",
-      "identityUnitDigest": "0be2f7b8a8abc58003e4d4bb7e765039e5b6eb4459b5f258b3e4d32644000a90",
-      "identityFingerprint": "0be2f7b8a8abc58003e4d4bb7e765039e5b6eb4459b5f258b3e4d32644000a90",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 730,
-        "end": 736
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_7997d6d190734c93d3447877a566d86e",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-78",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "2848da43554ddf760cafc6fa68b6777edb47add38cff80ef6f6bb101065cb11b",
-      "identityUnitDigest": "7e88edb1fdab0baf6d100e34635b4022b44f29b0958afd661c825eca92e163a8",
-      "identityFingerprint": "7e88edb1fdab0baf6d100e34635b4022b44f29b0958afd661c825eca92e163a8",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 738,
-        "end": 744
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [
-        "test/runner/coordination-store.test.mjs"
-      ],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_1f7511058a6976a0ffce19eb1242c520",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "red-team-re-check-round-2-fixes-crash-safety-focus",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "2fbb3b005fe45315472a75fb772e426874991d085d7a04939021a250ba7e0a0a",
-      "identityUnitDigest": "94a7d3da221ca88f45bf55bb3038a8e8051cac4d83b34842b574f5ce0c7b3253",
-      "identityFingerprint": "3bbb2699e4f05115f80e10c00561c7d2f992abfe1e6cd759cbfe282895a9780b",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 746,
-        "end": 746
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_7c7a00b2054839a949fc26dc4613aee7",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-79",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "6d5675e233c64b51b43a908fb44319fdba71a45a32f71e5229e40bccb74b338b",
-      "identityUnitDigest": "3e10af0e521ca2baa37b0ed3b367b9fa474ec0e7f13acbeba72fe02a3903f86c",
-      "identityFingerprint": "3e10af0e521ca2baa37b0ed3b367b9fa474ec0e7f13acbeba72fe02a3903f86c",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 748,
-        "end": 754
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_65c85538a9c088a297bfd0cfb152887d",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-80",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "9c39590d018b4fffaaf417541c65b02b59f7febd227816deead43109a73eba70",
-      "identityUnitDigest": "602ab0b3b696599e6aa53ad308c1aa8c02ef265e4c6f2e448b5c9ccc21db7d0a",
-      "identityFingerprint": "602ab0b3b696599e6aa53ad308c1aa8c02ef265e4c6f2e448b5c9ccc21db7d0a",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 756,
-        "end": 758
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",
-      "status": "future",
-      "relations": [
-        {
-          "type": "duplicate-content-member",
-          "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-          "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "blobSha": "13e3a926a4826bdbcec9525cd378a35dd72ee9b4"
-        }
-      ],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "unknown-blocking",
-      "reviewStatus": "blocking",
-      "semanticClaimId": "semantic_bb0085660e079d63abbf320d",
-      "sourceOccurrences": [
-        {
-          "sourceOccurrenceOrdinal": 0,
-          "path": "docs/architect/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "canonical"
-        },
-        {
-          "sourceOccurrenceOrdinal": 1,
-          "path": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-          "role": "duplicate"
-        }
-      ]
-    },
-    {
-      "claimId": "claim_ff70108275904e0fb33e7245af16722d",
-      "sourceId": "src_f3e3cf551ee03ecba71e4f01c4b4ceed",
-      "sourcePath": "docs/platform/agent-coordination/verification/step-08-standalone-coordination/P01.1.md",
-      "sourceAnchor": "unheaded-block-81",
-      "sourceDigest": "6bbae5c768af457dee3abdd7dc0a099fdbcda4658379f830b897dd0fdbf67930",
-      "sourceUnitDigest": "2d73c260ebfb6456634ee685282aa991a0d8c879263566dead1f3a74d3ff0c4b",
-      "identityUnitDigest": "4ded04c05732a2e40b5ad729a71c0b837d2dfc63565b5e91c99abd0e52f0042d",
-      "identityFingerprint": "4ded04c05732a2e40b5ad729a71c0b837d2dfc63565b5e91c99abd0e52f0042d",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 760,
-        "end": 768
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "candidate",

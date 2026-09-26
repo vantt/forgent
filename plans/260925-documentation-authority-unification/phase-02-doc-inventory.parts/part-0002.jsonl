@@ -1,3 +1,2236 @@
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [
+        "ADR-006"
+      ],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_985484f28638c531d4d3f076cd481606",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "proof-matrix",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "b9c8d712ac10e8ab397ae21e58a0cd470633f10150da48a759a21ca1e1e5ecd7",
+      "identityUnitDigest": "f802a5fb9478ab9f63797a2d4c930692311256723d2c5cccb5bf895345ee62da",
+      "identityFingerprint": "4a3c90dc94d86e2a7ecc4d763f877e59282c201c543f55afc948837997b92e6a",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 69,
+        "end": 69
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_66cbaa7e7b34b0807525bed60b279859",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "unheaded-block-4",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "c948d0f71b6afd46828566f70966e0c4c377f18a8a2d78ec6b0a8ebe931fb683",
+      "identityUnitDigest": "11f818c755ba45b10e3fa0d8f24f446bea92e24f88726c9306292ea4b37fdf5f",
+      "identityFingerprint": "11f818c755ba45b10e3fa0d8f24f446bea92e24f88726c9306292ea4b37fdf5f",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 71,
+        "end": 80
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_552b5031eaed408cbe9a3ffcdebafc0c",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "commands",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "35944bec822776d77bc57cf903f54d00afad1afedede99864e3af67a0b6de5e2",
+      "identityUnitDigest": "512312efbe4dc1c0b9d6ade63bd2d5f4bbc3e1abbd812b60bd2b75a35c8159b1",
+      "identityFingerprint": "1e827d2c92ccaa5e38110f17e8458cf9cc90c45878319e69883b9bd69f4ae1ae",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 82,
+        "end": 82
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_a66c23862890ced0f5dd6f0102a6e02a",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "unheaded-block-5",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "195dee3059461d7886d4bd2d70769ada131bbbd035961dfd60108ebb18b5a1c1",
+      "identityUnitDigest": "aaa1c8e69af972fc2cb9c598f5650b2be8a88aaf8405a6252a9fa9e8052be74b",
+      "identityFingerprint": "aaa1c8e69af972fc2cb9c598f5650b2be8a88aaf8405a6252a9fa9e8052be74b",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 84,
+        "end": 94
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [
+        "test/runner/assignment-dispatch.test.mjs"
+      ],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_318dcccadbeb03baf754ba6e57b39378",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "unheaded-block-6",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "9a1a59ffaf52155cdc07e7c9f59c4ef7cbf8376cab1890e97be9f70cc412c142",
+      "identityUnitDigest": "b3ba438705d7c6b5151d6bb791b66eaa6eb350388c3781d4dc511eb50d00f567",
+      "identityFingerprint": "b3ba438705d7c6b5151d6bb791b66eaa6eb350388c3781d4dc511eb50d00f567",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 96,
+        "end": 102
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [
+        "test/**/*.test.mjs"
+      ],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_20116af0509092a1ec8bb6195c009d5b",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "review",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "ae82b95ee71c7d3071e25be51b7acbcbb4da14dc816039ff1ecb0ea5922d5d90",
+      "identityUnitDigest": "fadeb8e60c5bed5f3355f2f81c3f04544eb1314bf888d809301ed967a078b669",
+      "identityFingerprint": "1d7548f6422a33e8df54e990d3fa21c57d465f2bb983b78cf20c41cbb2782c19",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 104,
+        "end": 104
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_86aceda76237c2e0fdab0cf0dd985c41",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "unheaded-block-7",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "9c00e5674e6414e4e5c882216a10f90cbc52b77344d90cf464e8feb3b6ee2884",
+      "identityUnitDigest": "2c4c1e85f5250da0c80660a2efdf2aa0a2045d2cd14ab0b112aa900a6dd5775b",
+      "identityFingerprint": "2c4c1e85f5250da0c80660a2efdf2aa0a2045d2cd14ab0b112aa900a6dd5775b",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 106,
+        "end": 106
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_14f84c93b9cc084e0dbdd3263156c8a8",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "unheaded-block-8",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "929c8c02d5cc85284a29840c97c8d2bf6cbbb09b7496c0ae3909b933dbbefa68",
+      "identityUnitDigest": "e9a3b29a6bcaf194c99c432091e5f1ea10ea9436b8c5c27a279af1b009398c99",
+      "identityFingerprint": "e9a3b29a6bcaf194c99c432091e5f1ea10ea9436b8c5c27a279af1b009398c99",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 108,
+        "end": 116
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [
+        "test/runner/assignment-dispatch.test.mjs"
+      ],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_6a6f9a0b48ed39df7fe6a8cbab15d561",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "high-a-second---contract-invocation-against-the-same-workwriter-silently-discards-the-callers-new-contract-and-re-executes-the-stale-first-one",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "80b921927b50440484bf1cc880d198ae0c0beddb68fdb35a5bb8e8ef53a9d79b",
+      "identityUnitDigest": "f7264a32e14518b47957644619f8a486c3808bfbc5079f0e359d57163905f63f",
+      "identityFingerprint": "5e0868fac110012de14e696e64863c205408665012908dd1b05a1602d748221e",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 118,
+        "end": 118
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_577f7f0b52c5169462bce2b6e1ddcb58",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "unheaded-block-9",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "280240fd2dc103214c45d99f22395c982b25c4afd11a67cd60a35878833f5bf8",
+      "identityUnitDigest": "cd116c7b2818359585daee2ee125b2be26313702b7f4236739b5acb879d37d53",
+      "identityFingerprint": "cd116c7b2818359585daee2ee125b2be26313702b7f4236739b5acb879d37d53",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 120,
+        "end": 188
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_f4b23049921dcd99bb1abf7356ae8f73",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "fix-round-1",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "03ed663cbcf4f8dd15a8b135477308e68a653a0b72c091ecaf239722e73410de",
+      "identityUnitDigest": "80506600ce84e4c8f57532391e5fa530ca347db8640611fc54c799e438c4e6e2",
+      "identityFingerprint": "f9699bfb83b5b508001cfe61cbeb7737a3117dd284e9587e397bf2ddce7e27bb",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 190,
+        "end": 190
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_cd41259e12df0118fd2af52b55cd5f48",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "unheaded-block-10",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "57b20671c97fe9c325ced2594141af5ee4f511bbf2ce89ebad23646ffa2b4633",
+      "identityUnitDigest": "f3be7decfb5b8f6ef2e0b34cc92ba0384c5a8e984b68c7a28da5a1c6e011f4bf",
+      "identityFingerprint": "f3be7decfb5b8f6ef2e0b34cc92ba0384c5a8e984b68c7a28da5a1c6e011f4bf",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 192,
+        "end": 200
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_83faadb3f67436826ce4471cccce7e5b",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "unheaded-block-11",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "9a727194289710c533575d60052b8fc730a8962b8ec62cc97414bbf2c00997e3",
+      "identityUnitDigest": "d3b19c8c2aba456230145f2c39ace22b9af34271b9deebc61784b0d48ce4ffff",
+      "identityFingerprint": "d3b19c8c2aba456230145f2c39ace22b9af34271b9deebc61784b0d48ce4ffff",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 202,
+        "end": 213
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [
+        "test/runner/assignment-dispatch.test.mjs"
+      ],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_c57be022264952f2acf691f5d68d0990",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "unheaded-block-12",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "791c266f8c70390c96cfdf0640ba636a0c373479eef898a068436fecb669cea3",
+      "identityUnitDigest": "46feb4b265a9012dfdb38259c6ec5388886a6df1b142f354290fa7e5143c260a",
+      "identityFingerprint": "46feb4b265a9012dfdb38259c6ec5388886a6df1b142f354290fa7e5143c260a",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 215,
+        "end": 217
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [
+        "test/runner/assignment-dispatch.test.mjs"
+      ],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_1e2ab1ba9c83bdc4f44e7a9ac175a365",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "reviewer-recheck-material-fix-recheck-master-coordinatormd-step-f5",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "0f42d42f89dcc7ce9439a4f0e2afe7669f5280e63a7e2f43b21192d110d48122",
+      "identityUnitDigest": "dec58ae7e2df851097c63f621bc62d0b95a953718d33e90cef8dcf1c782dd41f",
+      "identityFingerprint": "82c520cc8ebe6fb89d28c70d845147de57369287dfcd617a964f568d3fcbd620",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 219,
+        "end": 219
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_e0cb7defa25255234af0398bce8119f1",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "unheaded-block-13",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "55b271a67a17495c6385814e72ae523b4214b03325a919f00f41f2b651040193",
+      "identityUnitDigest": "be813abfdeaef9f402c225072a61da608878af04f326e976eb7484a2cb1f20ea",
+      "identityFingerprint": "be813abfdeaef9f402c225072a61da608878af04f326e976eb7484a2cb1f20ea",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 221,
+        "end": 221
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_b1ecea0d901d1ef14eca684ddca1b8be",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "unheaded-block-14",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "b185084be67dce4382b5368a62d031a22270b4f2902c11cfe19427fa8aae1ec1",
+      "identityUnitDigest": "0e7c1c014eaa8a1d2ed43d324c8a8f41fed4f319996fea10a712b0c6eee969d8",
+      "identityFingerprint": "0e7c1c014eaa8a1d2ed43d324c8a8f41fed4f319996fea10a712b0c6eee969d8",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 223,
+        "end": 272
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_daba31a8fac58c666ff603f714ca73b1",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "medium-no-exclusive-create-claim-for-the-built-assignment-concurrent-race-variant-of-the-high-above",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "db5765bd3b70a49da786c02fb11727a387c36e70f585914898f6e8c739a498f7",
+      "identityUnitDigest": "64cff3da1c1ea59e802948d8782ca9891a0374b0506760931bc8e0e5f1926762",
+      "identityFingerprint": "0fb1d6390743d25bc66296eeff484d9c6032439bd5dfaa60614957b2bfb5594c",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 276,
+        "end": 276
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_8a73e827bf173d6ee343819c7b05cf60",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "unheaded-block-15",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "5a28c4c7618221eed29ac02f7ff30ffd33835676ec99bbb64f6f62554b615d64",
+      "identityUnitDigest": "48364f657085dfcab313ca89f3ecea3dadc111f58da2585ddb978e4f10d57db1",
+      "identityFingerprint": "48364f657085dfcab313ca89f3ecea3dadc111f58da2585ddb978e4f10d57db1",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 278,
+        "end": 296
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_e3092aba27c4cdb6d7d8722c7dbfe822",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "low-gaps-item-resolved-not-a-bug-callerwriterid-only-when-absent-is-safe",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "b59c60f3177fb6b26efa42636c99bd09de098ba21fa537afde80d7b9dec73c43",
+      "identityUnitDigest": "48cdffac8f41ebb13c210ca467682a751ed1580df1c411156397c810007cefb0",
+      "identityFingerprint": "a5dc6006f7baf96b24281496a6c01721e4b05b3c4e0c2550a8095fb1ff4f174f",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 298,
+        "end": 298
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_57285126c2f8425352f4c954a82e5b12",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "unheaded-block-16",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "b2d87a1b536fad0c3e3d4f70a6ede6817b2d47e538d45a332cfa70b53a36f8e8",
+      "identityUnitDigest": "1b9c8a66573acce64f6dbbc9cc2017f3446963d41b7f01c9c12f97b053650259",
+      "identityFingerprint": "1b9c8a66573acce64f6dbbc9cc2017f3446963d41b7f01c9c12f97b053650259",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 300,
+        "end": 309
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_86e4c15f52b6ffd2d9816c43f9ef466d",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "low-informational-unreadable-but-existing---contract-file-the-doers-second-gaps-question",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "04227f5a5c3ea0897163d1790475ac74a821a388bff40ca311464c2878827890",
+      "identityUnitDigest": "6cadb3d723642b4d15a188945a246f6ab64ad3ed15b75e0042aaab7981843786",
+      "identityFingerprint": "c8404aa4f6bebf09ebd10df96e8281c873775c8ceccfcf260a7045fcc983cfb0",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 311,
+        "end": 311
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_ddb3ef3fa845948c2b47d1e5fffe18e2",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "unheaded-block-17",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "ccfd9a66e19674f1ab2f2129341e745c928b98f17092fd2d188ed913136e4fc6",
+      "identityUnitDigest": "912b6493667be912897543a407d8920951652623880595c9248e131ca0d59992",
+      "identityFingerprint": "912b6493667be912897543a407d8920951652623880595c9248e131ca0d59992",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 313,
+        "end": 317
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_f3356b93753d2d4cd0b464ac217cf18e",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "confirmed-correct-verified-not-assumed",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "1965a93bfdb8b51237be0c34f5a13feb547da40928655a5fe75d66685d276e61",
+      "identityUnitDigest": "e817f9c9fc927726f993b13a48409a375737378b2517e2db56a1a1a36a588bed",
+      "identityFingerprint": "fd47fab8470276611d6f824f93b6dd7a1b64fef939c46e8a237f213c5ec914e2",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 319,
+        "end": 319
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_eeb4589887aab606743672e307ea6993",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "unheaded-block-18",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "cc02ce03ee6fef8c6a874e0d94c80d8eb4cb50a9047b22452ffa06a1aeb4fe85",
+      "identityUnitDigest": "222a80a52f1d9b8b575c98393e454a8ad5cca57b578f624d48ea022e71948409",
+      "identityFingerprint": "222a80a52f1d9b8b575c98393e454a8ad5cca57b578f624d48ea022e71948409",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 321,
+        "end": 345
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_c2c006f9af9adba26c79b051d63d8f41",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "coordinator-disposition",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "18d0f1610491c55bbe341c9e4ed36abc8292a1fbef4e135709bf7e31965a80d3",
+      "identityUnitDigest": "eff019256a829402863d130c16796fca7e9b3f9045a9c6c9ef64510b15f65e1c",
+      "identityFingerprint": "279bf376897397df0287c5c8a00da77063e5fdc10e40277ae048af7017b2d341",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 347,
+        "end": 347
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_2b055059971384d8be2f2a7211afc31e",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "unheaded-block-19",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "ebd45cc244eda30d490ffebc4b267ab5ac57eeebf2aec28c95c460c772fac586",
+      "identityUnitDigest": "c6a9a6c8884703d89657dda7bb8f8de47d0786713eefcdd9d3aa9d8e63197787",
+      "identityFingerprint": "c6a9a6c8884703d89657dda7bb8f8de47d0786713eefcdd9d3aa9d8e63197787",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 349,
+        "end": 352
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_0f207d2dc22e9d7ffb1a0bbf486a84f3",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "unheaded-block-20",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "526e671fdd98956d83659d0c1136127aa42c55d5b6b8d2531b10acde170edc49",
+      "identityUnitDigest": "6c116c92f8eaaff948bc483866e3ec3072d179c8323bb4a15873e7f9c48a2bb0",
+      "identityFingerprint": "6c116c92f8eaaff948bc483866e3ec3072d179c8323bb4a15873e7f9c48a2bb0",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 354,
+        "end": 375
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_86117625da16f3d134f6a2495216a9e3",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "unheaded-block-21",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "d5eee4526904ac898ec4a6912bf11bb8d646248ec5cb2e82f8e2509bba292786",
+      "identityUnitDigest": "e4a375a0e90bfc677c4e6ff8e1acc2399fb6fbee06c0d0e18c7b5cc1647b20eb",
+      "identityFingerprint": "e4a375a0e90bfc677c4e6ff8e1acc2399fb6fbee06c0d0e18c7b5cc1647b20eb",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 377,
+        "end": 379
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_a451898be2386297928c77baa2e00d72",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "red-team",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "9590ebdbcf1953c43766bbf64c44b723d05e0779ec064ba6c069afd67dbb0ad8",
+      "identityUnitDigest": "c4da41ee159eb0d97fc3c86da57f3946e83cf0a08d17de954b8564f0511b0aa8",
+      "identityFingerprint": "7597cd95450907a58b16beb62abf7c1386e2468b7d7f5df42cc2cf60d917f4b5",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 381,
+        "end": 381
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_d9d9aef53e46a2af4c10da81e345e37a",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "unheaded-block-22",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "6ee1acbb1cb85d21ce573f16118ff911f3f68501696c5fbffda7c01fd4ba6918",
+      "identityUnitDigest": "9f4c0b66fa058b3a15788027387c365bb1971601ed3ea378703407edfa42b14d",
+      "identityFingerprint": "9f4c0b66fa058b3a15788027387c365bb1971601ed3ea378703407edfa42b14d",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 383,
+        "end": 392
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [
+        "test/runner/assignment-dispatch.test.mjs"
+      ],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_bc44e58318999737013f2c64b2023a0b",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "high-the-deferred-medium-is-not-a-theoretical-concurrency-edge-case-two-genuinely-simultaneous---contract-invocations-under-the-same-writer-identity-collide-and-silently-discard-one-callers-real-request-exactly-reproducing-the-just-fixed-highs-false-success-shape",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "961469fce8174fe08ce16ca4d45717c91b7356b02b4a517e33758dd7a7422b3d",
+      "identityUnitDigest": "994edc68e24b7699dcb37e7a7d3451ecfff37334801e60af3cc3588c3f7cbf2b",
+      "identityFingerprint": "501b147a2746341e9e1930b4cbcaaa19f5ea4bfb646eb517db46a7f39a988154",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 394,
+        "end": 394
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_d6999d890de62d2626b5f0ea7e406b90",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "unheaded-block-23",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "ab80cc227b45dd2d238c44848f7d87dfbd66b456b99324493b75b9e09ea4eec3",
+      "identityUnitDigest": "6a2313b942225cab96695da9b6ade4b0588db8bac72f4e3a0157fbda3799f150",
+      "identityFingerprint": "6a2313b942225cab96695da9b6ade4b0588db8bac72f4e3a0157fbda3799f150",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 396,
+        "end": 482
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_fab2a6a7e3bde60c734a592396f516bb",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "red-team-fix-round",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "d996e60732746a1fa4ec132b5c80b8f6e37b85e6933cf5ef9c603d987924cfef",
+      "identityUnitDigest": "ca03347eebed886f4e5524ec2bb32f77e3cdb8d9b1afdbcc39acbce0a052b125",
+      "identityFingerprint": "ffade4412be97f06984ea4ff1a12391b9686ab6a3c3fc0fee7fc153af5931a81",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 484,
+        "end": 484
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_380307a67598b0d4f0539c660ad3633a",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "unheaded-block-24",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "1c0c62e2414b8f12929a7f8bc776f4db0a132b59742eb1eea06251cc711d4097",
+      "identityUnitDigest": "71d472ef450ab281a2d96134412a8976ef2d6aab8a688899ef5d2b7cad4d2523",
+      "identityFingerprint": "71d472ef450ab281a2d96134412a8976ef2d6aab8a688899ef5d2b7cad4d2523",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 486,
+        "end": 490
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_0ee264272192211b806a60ff24c8568c",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "unheaded-block-25",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "f955bb46454cabda38d9ea8c00f1d5e0fe3077f2b02d311fa9c399aafeb671b8",
+      "identityUnitDigest": "707ba01b341b4986fc37ae13c182fdc4087600c637a4657169e1b5a945748571",
+      "identityFingerprint": "707ba01b341b4986fc37ae13c182fdc4087600c637a4657169e1b5a945748571",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 492,
+        "end": 599
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_8d032933ec73bd486d834e5c08b6a31e",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "unheaded-block-26",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "e7b055a311f0aefb5cbb8f1337f59272deca9853f7d4b2ca4e9dc964bcaedf87",
+      "identityUnitDigest": "0a1ab4b509169aad8337e3422597af98f9123753627f75155b206b3850e87855",
+      "identityFingerprint": "0a1ab4b509169aad8337e3422597af98f9123753627f75155b206b3850e87855",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 601,
+        "end": 604
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [
+        "test/runner/assignment-dispatch.test.mjs"
+      ],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_1cfa1a96ae43939d55ac4f218199e1e0",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "red-team-recheck-material-fix-recheck-master-coordinatormd-step-g4",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "5180a418f50dc9d0c511baf6d962168ce860026441a3a710259d9a961237c076",
+      "identityUnitDigest": "ae3a58a86fb310f1e71bfa626d7f86ae79086e58be54e6387770d5509414d552",
+      "identityFingerprint": "42dd8268749df95f2164ee657a043c51c9aa8353f2c4ee5496b76dd4405bed9b",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 606,
+        "end": 606
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_750b323e10378f789bd5a3a550fd5985",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "unheaded-block-27",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "a68520d3122d028ed4c2c707ad38cb7260dddd3fa6f29514a148dc08d91fd1cd",
+      "identityUnitDigest": "9857b6ccfc5ee0e42e4a00ea4f31e9a0dfd5c057fb48b11ea33cbe579be1a631",
+      "identityFingerprint": "9857b6ccfc5ee0e42e4a00ea4f31e9a0dfd5c057fb48b11ea33cbe579be1a631",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 608,
+        "end": 608
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_74c02cf8d6be2c0329a667df359fcd70",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "unheaded-block-28",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "5a8b18dbd0aea873b312ef6a48682f3fe854e9b8159eec160b277ade0e830f53",
+      "identityUnitDigest": "2ff65135e35c1543d887d0c9c2e3dafbe2414b45e225e4b103e7cae62fcd1ec1",
+      "identityFingerprint": "2ff65135e35c1543d887d0c9c2e3dafbe2414b45e225e4b103e7cae62fcd1ec1",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 610,
+        "end": 698
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_393225781409f50c9f83b484aed452c5",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "low---work-lookup-accepts-js-built-in-prototype-property-names-as-a-found-work-instead-of-erroring-silently-downgrading-to-a-no-op-rather-than-surfacing-the-callers-mistake-pre-existing-pattern-not-unique-to-this-cell",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "1ec3e64f318b7952a791e492b48fab930df9615797ec7ff435b005826d775a62",
+      "identityUnitDigest": "5fea59cb38c347cfd49e5f93c9a6e270d7fa2b0f92e8869876d1b8128cacc02a",
+      "identityFingerprint": "9ea9115ea47763b7fe759b24647667ade1b20dac9761a79fe88776e1de9fcf67",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 702,
+        "end": 702
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_d611273bb67f4386a5585a22541fb8e3",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "unheaded-block-29",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "90c1bb97d06ece72624a34f337d43a85b1c2ff21a0057312ac04622a405ecd74",
+      "identityUnitDigest": "dd05f389ec24f0f1b2c88e4bdb6037aa6b65454f7f1e2e43a9529b3383f21488",
+      "identityFingerprint": "dd05f389ec24f0f1b2c88e4bdb6037aa6b65454f7f1e2e43a9529b3383f21488",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 704,
+        "end": 755
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_fbe5ff4a54319093632ec762e726cd30",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "low-informational-a-positional-executorid-combined-with---contract-is-silently-ignored-not-rejected",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "38730d9a154967b1774bae0656c37fc79a02d56b17090debe497d40d2e1ce8c5",
+      "identityUnitDigest": "9c8fad0d85189ea1601c8d165a7300db3d218b687eeb392a09508c03599f9688",
+      "identityFingerprint": "4e855fc215f820c1342d6ef706d5cae41332b668b058147d3237f7e5581983dd",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 757,
+        "end": 757
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_296286506e27e3bd5ccf0db438f1fd14",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "unheaded-block-30",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "8f92d2ee5ef208b0fed66c00fd75b214c3825d5548b87f7c4e94186cfee11e11",
+      "identityUnitDigest": "9bf1a8f89f6c83e0c0f5e92a64ce23b0d0d84ca6fbdd7a1a43a59ef2ece33c04",
+      "identityFingerprint": "9bf1a8f89f6c83e0c0f5e92a64ce23b0d0d84ca6fbdd7a1a43a59ef2ece33c04",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 759,
+        "end": 773
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_55f4d26713fff18f519947230282756b",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "confirmed-correct-under-attack-verified-not-assumed",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "acde557826e378fe8b6af8f68c79973a8b3eea8c8c3534fad200451ec473be0e",
+      "identityUnitDigest": "c53ccd6e55ecfaf023b2a42ad48215b6eca3901cc4966461ac3a10cd023b21e0",
+      "identityFingerprint": "5ad202124e2e5ffb54e7dc9f1086d6aeb32381168a7ac0827943b7534eca77db",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 775,
+        "end": 775
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_ce1a9eb6dc30b3ee6ecf2cb2046db68d",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "unheaded-block-31",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "484a9fad57f6d7114b863ce0882127e6e5b78d53bf7dc1512d8b79d553ac07e3",
+      "identityUnitDigest": "1827ccd919d7371806a8821f612b4e60696a2ab39bb10bca36338f5a77aa00cd",
+      "identityFingerprint": "1827ccd919d7371806a8821f612b4e60696a2ab39bb10bca36338f5a77aa00cd",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 777,
+        "end": 818
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_add176266f5f1ba77e0c430d2c3c3e00",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "coordinator-disposition-red-team-pass",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "9ce4a7b1a6b06b08f31da47896292a140ea410555c59d5c97462711d25a2e85e",
+      "identityUnitDigest": "dc178a8b97ce90517fc592292ffb61e6e6ba14efece0b24a1eb21ff804fcae25",
+      "identityFingerprint": "abc1946d3760df67aeb6067bfbbab5a59662fbb2705c321dbc31ac30ba2f0fa1",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 820,
+        "end": 820
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_145ff5faa06a94ece7a1ebdbc0cf834b",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "unheaded-block-32",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "45f387b9d9ad28f8d7be4880af13acf581392a86e63577c3b33ac6c4254b052d",
+      "identityUnitDigest": "bef9adad247d0ed1ec1e68bb64971da5866acbbb04d42f4d1e0cd76f1b2c8332",
+      "identityFingerprint": "bef9adad247d0ed1ec1e68bb64971da5866acbbb04d42f4d1e0cd76f1b2c8332",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 822,
+        "end": 832
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "decision",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
+          "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "canonical"
+        },
+        {
+          "sourceOccurrenceOrdinal": 1,
+          "path": "docs/platform/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "role": "duplicate"
+        }
+      ]
+    },
+    {
+      "claimId": "claim_f98b200857807acc6b15106891cb0fbc",
+      "sourceId": "src_70c2dd22ee020b34900610b26ead8984",
+      "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+      "sourceAnchor": "unheaded-block-33",
+      "sourceDigest": "1e9b0f6eb89ca2f9b2c87d86ccd9e0377a559608d751628f81d0744ab58910b8",
+      "sourceUnitDigest": "0d342ba45af3548a58497841bc7539c6c5cd7efe9f826f1d3a0ddbabe7942fb3",
+      "identityUnitDigest": "09e4159564d5fcad58da29fa177f9c0f649b1d9c6f08bb1687e482a43bdba63f",
+      "identityFingerprint": "09e4159564d5fcad58da29fa177f9c0f649b1d9c6f08bb1687e482a43bdba63f",
+      "identityStatus": "carried-forward",
+      "sourceLocation": {
+        "start": 834,
+        "end": 852
+      },
+      "targetOwner": "docs/platform/agent-coordination/README.md",
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "authorityKind": "legacy-current",
+      "status": "current",
+      "relations": [
+        {
+          "type": "duplicate-content-member",
+          "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+          "sourcePath": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
+          "blobSha": "58194b141714f4827be2bed14b767ddd8112d096"
+        }
+      ],
+      "decisionRefs": [],
+      "evidenceLinks": [],
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "semanticClaimId": "semantic_061899287cf4e52810e76d50",
+      "sourceOccurrences": [
+        {
+          "sourceOccurrenceOrdinal": 0,
           "path": "docs/architect/agent-coordination/verification/step-07-mvp/P03.2.md",
           "role": "canonical"
         },
@@ -481518,2193 +483751,3 @@
       "authorityKind": "non-authority",
       "status": "future",
       "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_69ecc28603051d6267e2541b6d4ab769",
-      "sourceId": "src_870fa74b78854e20265b14d726445855",
-      "sourcePath": "docs/distillery/sources/compound-engineering-plugin.md",
-      "sourceAnchor": "cross-model-peer-pass",
-      "sourceDigest": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
-      "sourceUnitDigest": "5c91137430fd1cb65f706472b75bc79e24a02199808c030dc22eb8b4b6833c2e",
-      "identityUnitDigest": "9a78c17cb6f01b8799cb002569fe4fa44df53a9a67d4fb572ceabd5b40987c77",
-      "identityFingerprint": "5c91137430fd1cb65f706472b75bc79e24a02199808c030dc22eb8b4b6833c2e",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 192,
-        "end": 192
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_060edd8c9b98f7bc545881c224ea6dfc",
-      "sourceId": "src_870fa74b78854e20265b14d726445855",
-      "sourcePath": "docs/distillery/sources/compound-engineering-plugin.md",
-      "sourceAnchor": "unheaded-block-26",
-      "sourceDigest": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
-      "sourceUnitDigest": "fb43510d4df14e5a00cac482b7ea222564ad99104a161f478842394b3bb38f05",
-      "identityUnitDigest": "364d628184591d92332490f6216f61ceebbbf182fc925b35b3f7d4e79b556432",
-      "identityFingerprint": "364d628184591d92332490f6216f61ceebbbf182fc925b35b3f7d4e79b556432",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 193,
-        "end": 197
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_ff89e164cd442d2ab53c2a2f957dd7d7",
-      "sourceId": "src_870fa74b78854e20265b14d726445855",
-      "sourcePath": "docs/distillery/sources/compound-engineering-plugin.md",
-      "sourceAnchor": "testing-evals",
-      "sourceDigest": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
-      "sourceUnitDigest": "5af36543b0f6fba61ab4310d87385fdc59865d329c37e090c22dbd6f8665fb2c",
-      "identityUnitDigest": "fa1a3745972b3f16d1c96dd1a343a155848cc8e799f5688423b267f89ff38de2",
-      "identityFingerprint": "5af36543b0f6fba61ab4310d87385fdc59865d329c37e090c22dbd6f8665fb2c",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 199,
-        "end": 199
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_51d048e582af51c0a7ea12a1c31c8b2f",
-      "sourceId": "src_870fa74b78854e20265b14d726445855",
-      "sourcePath": "docs/distillery/sources/compound-engineering-plugin.md",
-      "sourceAnchor": "metric-driven-optimize-loop",
-      "sourceDigest": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
-      "sourceUnitDigest": "afeb47d46a094e77ef0f7cc45dfbbf2e1a1d34dd7d97a4febc59593cd59a4112",
-      "identityUnitDigest": "5ea40189cf3e040c537580468100e533a48d798b32ee85181b025d43e91d461e",
-      "identityFingerprint": "afeb47d46a094e77ef0f7cc45dfbbf2e1a1d34dd7d97a4febc59593cd59a4112",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 201,
-        "end": 201
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_cf97db89257e1b5ac6c1a5abb0c3146c",
-      "sourceId": "src_870fa74b78854e20265b14d726445855",
-      "sourcePath": "docs/distillery/sources/compound-engineering-plugin.md",
-      "sourceAnchor": "unheaded-block-27",
-      "sourceDigest": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
-      "sourceUnitDigest": "e0263c2da9a59a4b1f3d8cbdaf82cddf08933707a8ad05176d2d63315a914ed4",
-      "identityUnitDigest": "edd303a455a15084588e67563e053fbc6caa11b1cda209069b16089592ca30d0",
-      "identityFingerprint": "edd303a455a15084588e67563e053fbc6caa11b1cda209069b16089592ca30d0",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 202,
-        "end": 206
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_f05ef537f94d9498f1ba8487ef891eda",
-      "sourceId": "src_870fa74b78854e20265b14d726445855",
-      "sourcePath": "docs/distillery/sources/compound-engineering-plugin.md",
-      "sourceAnchor": "diff-scoped-browser-test",
-      "sourceDigest": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
-      "sourceUnitDigest": "47c0575ec2a05ee0a32c2973e81e1932b3a0ef10b7c511aa6ffd091006f91e20",
-      "identityUnitDigest": "6af2e4b23dc30f9aafb7ddfa9ebe06c4464c890f9f45f2782ae77f87a804c1e5",
-      "identityFingerprint": "47c0575ec2a05ee0a32c2973e81e1932b3a0ef10b7c511aa6ffd091006f91e20",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 208,
-        "end": 208
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_916893a109d938683b7b4034c4492309",
-      "sourceId": "src_870fa74b78854e20265b14d726445855",
-      "sourcePath": "docs/distillery/sources/compound-engineering-plugin.md",
-      "sourceAnchor": "unheaded-block-28",
-      "sourceDigest": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
-      "sourceUnitDigest": "c58391199cf019282e8e9d7377d34ff2d375f2eed4cb4bce6b32d1c062320efa",
-      "identityUnitDigest": "bd8d84688dda5afc20f22b66219315e3c20ff9c4f78704e67b1669e56e6d5b93",
-      "identityFingerprint": "bd8d84688dda5afc20f22b66219315e3c20ff9c4f78704e67b1669e56e6d5b93",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 209,
-        "end": 213
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "verification",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_e416497a48eb54331d05bb14a3578658",
-      "sourceId": "src_870fa74b78854e20265b14d726445855",
-      "sourcePath": "docs/distillery/sources/compound-engineering-plugin.md",
-      "sourceAnchor": "hooks",
-      "sourceDigest": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
-      "sourceUnitDigest": "caa690b6f6085e086bb4284cb025989966188fa638ed2810d6a5cdb39e4fc2de",
-      "identityUnitDigest": "0e48f1b17091977c6abc9468b267bfc18a592c56125ddbdb85b65ec6554e9901",
-      "identityFingerprint": "caa690b6f6085e086bb4284cb025989966188fa638ed2810d6a5cdb39e4fc2de",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 215,
-        "end": 215
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_ab609432cb9c5c9b26eb87251092fa96",
-      "sourceId": "src_870fa74b78854e20265b14d726445855",
-      "sourcePath": "docs/distillery/sources/compound-engineering-plugin.md",
-      "sourceAnchor": "hook-lifecycle-14-events",
-      "sourceDigest": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
-      "sourceUnitDigest": "302d811cd9fdb6c6a36c78c744d8401ff6b2bce2e67176fecf7eb03a340342d2",
-      "identityUnitDigest": "0ce0d90099c7d70d740a5ca9e3d31292c55d3fcd14207918a230f7b94968a3ba",
-      "identityFingerprint": "302d811cd9fdb6c6a36c78c744d8401ff6b2bce2e67176fecf7eb03a340342d2",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 217,
-        "end": 217
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "specification",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_816c7bfe42a98e53bcb2e60c81eb6273",
-      "sourceId": "src_870fa74b78854e20265b14d726445855",
-      "sourcePath": "docs/distillery/sources/compound-engineering-plugin.md",
-      "sourceAnchor": "unheaded-block-29",
-      "sourceDigest": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
-      "sourceUnitDigest": "098bac55bc645e9c8c454dd21c76601d1990796a399e344680b3239f521fb1b6",
-      "identityUnitDigest": "a7526b05fe1c07cd51d8822970783fdb9c1d87d4f0487268879663c1caad74d0",
-      "identityFingerprint": "a7526b05fe1c07cd51d8822970783fdb9c1d87d4f0487268879663c1caad74d0",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 218,
-        "end": 222
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "contract",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_5164a6c3bd1a5994b2897aa408316684",
-      "sourceId": "src_870fa74b78854e20265b14d726445855",
-      "sourcePath": "docs/distillery/sources/compound-engineering-plugin.md",
-      "sourceAnchor": "safety",
-      "sourceDigest": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
-      "sourceUnitDigest": "a8b2c6cbbb7da774db8425aeac42414de7ba5b8db8bf7407792f4c0b3821888b",
-      "identityUnitDigest": "8ae701aa8933f37cbc4f671e122ba68bbf8cad07549615001083eaba5ea99646",
-      "identityFingerprint": "a8b2c6cbbb7da774db8425aeac42414de7ba5b8db8bf7407792f4c0b3821888b",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 224,
-        "end": 224
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_434c93a795a6036b1573bf4bd4fb33c5",
-      "sourceId": "src_870fa74b78854e20265b14d726445855",
-      "sourcePath": "docs/distillery/sources/compound-engineering-plugin.md",
-      "sourceAnchor": "untrusted-input-discipline",
-      "sourceDigest": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
-      "sourceUnitDigest": "58454e48d21195a39edb4459b2d001408b25c2f999ddc1a7cde31afe8d61042d",
-      "identityUnitDigest": "a227068dba06dd979afa6cfbe19357b012d7c5253d36a6c66d0f16d203404ac8",
-      "identityFingerprint": "58454e48d21195a39edb4459b2d001408b25c2f999ddc1a7cde31afe8d61042d",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 226,
-        "end": 226
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_a8b921c3e1483a08b03058175e6521b0",
-      "sourceId": "src_870fa74b78854e20265b14d726445855",
-      "sourcePath": "docs/distillery/sources/compound-engineering-plugin.md",
-      "sourceAnchor": "unheaded-block-30",
-      "sourceDigest": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
-      "sourceUnitDigest": "4e48c8815575b080e0d746dae68d0e7c3162910f248bbaed43206fd59c584330",
-      "identityUnitDigest": "3fa7c20f0e8fc60c6cf41194f2612be39f1a5c0924fe6c10a83d31e166c6ede7",
-      "identityFingerprint": "3fa7c20f0e8fc60c6cf41194f2612be39f1a5c0924fe6c10a83d31e166c6ede7",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 227,
-        "end": 231
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_ed310d08d23132384638cb98a7116acf",
-      "sourceId": "src_870fa74b78854e20265b14d726445855",
-      "sourcePath": "docs/distillery/sources/compound-engineering-plugin.md",
-      "sourceAnchor": "managed-root-escape-guard",
-      "sourceDigest": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
-      "sourceUnitDigest": "4b0dc31279797f93db087577a945a74cfe207c740f355eaf49afc688ff305257",
-      "identityUnitDigest": "f1447a6a3ba38934878d77b80a1f4a915417424d0087fa18fa7c1cfad3434979",
-      "identityFingerprint": "4b0dc31279797f93db087577a945a74cfe207c740f355eaf49afc688ff305257",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 233,
-        "end": 233
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_f3c688b7bb00ed66177f7b964dbd125f",
-      "sourceId": "src_870fa74b78854e20265b14d726445855",
-      "sourcePath": "docs/distillery/sources/compound-engineering-plugin.md",
-      "sourceAnchor": "unheaded-block-31",
-      "sourceDigest": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
-      "sourceUnitDigest": "2d005dd78e8afbaee6d7dbf2f3c0088a817646ed8c4df7708e2aa6522c1fef78",
-      "identityUnitDigest": "c6ea06e727c3f3edc827d32f184bd27820f188b7f5b49e176a2573779e025af5",
-      "identityFingerprint": "c6ea06e727c3f3edc827d32f184bd27820f188b7f5b49e176a2573779e025af5",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 234,
-        "end": 238
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_06dc88daf00b3dff0bb01b6138b57b0b",
-      "sourceId": "src_870fa74b78854e20265b14d726445855",
-      "sourcePath": "docs/distillery/sources/compound-engineering-plugin.md",
-      "sourceAnchor": "ux",
-      "sourceDigest": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
-      "sourceUnitDigest": "e6b81e24628918d5df34101dc6638cd3f54e4e6ff4c1cb23a244e634c303c294",
-      "identityUnitDigest": "16b04c844cdcb16a460505df69241d083dc9ea7f3df0ca27461d863d7840818b",
-      "identityFingerprint": "e6b81e24628918d5df34101dc6638cd3f54e4e6ff4c1cb23a244e634c303c294",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 240,
-        "end": 240
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_9b0ffff6e0f0c746b58c0811f9d250e9",
-      "sourceId": "src_870fa74b78854e20265b14d726445855",
-      "sourcePath": "docs/distillery/sources/compound-engineering-plugin.md",
-      "sourceAnchor": "never-block-babysit-handoff",
-      "sourceDigest": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
-      "sourceUnitDigest": "48755bda978e8dd28d1d0850f80befc59210f843d9e7ffdabe9ce6b2f0afb282",
-      "identityUnitDigest": "34db21b4edcf75161bf42b7afe82f6165d56e50da696303c6ad83e694c06f004",
-      "identityFingerprint": "48755bda978e8dd28d1d0850f80befc59210f843d9e7ffdabe9ce6b2f0afb282",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 242,
-        "end": 242
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_fb975487995ba38659f696c223988b30",
-      "sourceId": "src_870fa74b78854e20265b14d726445855",
-      "sourcePath": "docs/distillery/sources/compound-engineering-plugin.md",
-      "sourceAnchor": "unheaded-block-32",
-      "sourceDigest": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
-      "sourceUnitDigest": "672d2ee7e965add45e9c21ad9395bf4441d43a0aa4fb377b0bca07956b7b6649",
-      "identityUnitDigest": "254f35d61c8dce852cc965c71046e04abe4f0904a69a6df0fd4370d1da99985a",
-      "identityFingerprint": "254f35d61c8dce852cc965c71046e04abe4f0904a69a6df0fd4370d1da99985a",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 243,
-        "end": 247
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_f23dcaedc110e360049da7948a2f2ba8",
-      "sourceId": "src_870fa74b78854e20265b14d726445855",
-      "sourcePath": "docs/distillery/sources/compound-engineering-plugin.md",
-      "sourceAnchor": "concept-teaching-artifact",
-      "sourceDigest": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
-      "sourceUnitDigest": "750a11fea733c610af36f1a7ba31f20c61a2aae8c3306d4462b9f73cbe9a90ab",
-      "identityUnitDigest": "a69eb10c0badb851017f7014047eb400bd126bf4ff4fe9adcd778cf021ae75c9",
-      "identityFingerprint": "750a11fea733c610af36f1a7ba31f20c61a2aae8c3306d4462b9f73cbe9a90ab",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 249,
-        "end": 249
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_20d127ce2514c8e700ccb22381a73f30",
-      "sourceId": "src_870fa74b78854e20265b14d726445855",
-      "sourcePath": "docs/distillery/sources/compound-engineering-plugin.md",
-      "sourceAnchor": "unheaded-block-33",
-      "sourceDigest": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
-      "sourceUnitDigest": "a391ce91e7eba905c9f3636d57b2b5789e77163b04ed7d9df7589008452f7d73",
-      "identityUnitDigest": "396da35bb5d6a876db42e0abced1774aa6a53abed5fbb78023429e5534f9b5e6",
-      "identityFingerprint": "396da35bb5d6a876db42e0abced1774aa6a53abed5fbb78023429e5534f9b5e6",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 250,
-        "end": 254
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_df727e94ebd183c52f10c93403a5ebe3",
-      "sourceId": "src_870fa74b78854e20265b14d726445855",
-      "sourcePath": "docs/distillery/sources/compound-engineering-plugin.md",
-      "sourceAnchor": "context-memory",
-      "sourceDigest": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
-      "sourceUnitDigest": "dfa576901b60e3a35d8b079d8fcb55588ca8106bfb35717e21e5d54d5a73a299",
-      "identityUnitDigest": "14abc3cbcf5f11360f7356092678b001264d83b9bddbe42d3223190fac6274d9",
-      "identityFingerprint": "dfa576901b60e3a35d8b079d8fcb55588ca8106bfb35717e21e5d54d5a73a299",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 256,
-        "end": 256
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_8aa78b16a646bc3ad06d65b63f29597f",
-      "sourceId": "src_870fa74b78854e20265b14d726445855",
-      "sourcePath": "docs/distillery/sources/compound-engineering-plugin.md",
-      "sourceAnchor": "disk-as-source-of-truth",
-      "sourceDigest": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
-      "sourceUnitDigest": "edadd65b647d32ddd6c36f79af7f050005cd1250e4972fc83bc9aadb53e033fe",
-      "identityUnitDigest": "462dcdd63e302d4d9a96c654744c9aed693d1eb41d9f06d3b4f2b05de1c04d3b",
-      "identityFingerprint": "edadd65b647d32ddd6c36f79af7f050005cd1250e4972fc83bc9aadb53e033fe",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 258,
-        "end": 258
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_d0aa0a10b34429e4d0e0ac5ef3d8140d",
-      "sourceId": "src_870fa74b78854e20265b14d726445855",
-      "sourcePath": "docs/distillery/sources/compound-engineering-plugin.md",
-      "sourceAnchor": "unheaded-block-34",
-      "sourceDigest": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
-      "sourceUnitDigest": "ee90cd282f8bb82fdf1a927e1ae98e9f429c6d866db09c1b6c060c50e9a1a72c",
-      "identityUnitDigest": "6eae976131aa8f8d55361005641df2d51acc2b7717c07b3204c8d980b88c8b81",
-      "identityFingerprint": "6eae976131aa8f8d55361005641df2d51acc2b7717c07b3204c8d980b88c8b81",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 259,
-        "end": 263
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "specification",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_7ebc232509b93c38759594bd2f77ff3e",
-      "sourceId": "src_870fa74b78854e20265b14d726445855",
-      "sourcePath": "docs/distillery/sources/compound-engineering-plugin.md",
-      "sourceAnchor": "repo-profile-cache",
-      "sourceDigest": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
-      "sourceUnitDigest": "403b6b9c28eb0faae05d5cb0c0ed63c3fcb1f833f4d31285ce4f8c414735d126",
-      "identityUnitDigest": "5c99e8a14c7baad82bed10d29ef1017fc8fd42219f16ef44d171fdf5b00724ac",
-      "identityFingerprint": "403b6b9c28eb0faae05d5cb0c0ed63c3fcb1f833f4d31285ce4f8c414735d126",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 265,
-        "end": 265
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_31c1ec447dcd13155e0a8d6064fb8113",
-      "sourceId": "src_870fa74b78854e20265b14d726445855",
-      "sourcePath": "docs/distillery/sources/compound-engineering-plugin.md",
-      "sourceAnchor": "unheaded-block-35",
-      "sourceDigest": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
-      "sourceUnitDigest": "01301e0aa6761386c1368125ac4b67b4f68521bc1a75d4430f30856c38d4562e",
-      "identityUnitDigest": "3f9fa1f674a7ed992bf025f3e0d803ae5e52682a4860f33b75d8b8146dbf8106",
-      "identityFingerprint": "3f9fa1f674a7ed992bf025f3e0d803ae5e52682a4860f33b75d8b8146dbf8106",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 266,
-        "end": 270
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_5b7a8a3d18a71e8e2e61f951f3623f2b",
-      "sourceId": "src_870fa74b78854e20265b14d726445855",
-      "sourcePath": "docs/distillery/sources/compound-engineering-plugin.md",
-      "sourceAnchor": "tooling",
-      "sourceDigest": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
-      "sourceUnitDigest": "a8258a772aeb222fea54679bbb24cc8ebf02ad0ca164e34e97096b5df54244cd",
-      "identityUnitDigest": "f9f935d1c059d389a755a535997c711eccef54b76e14cf20a650cff26cb0e0db",
-      "identityFingerprint": "a8258a772aeb222fea54679bbb24cc8ebf02ad0ca164e34e97096b5df54244cd",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 272,
-        "end": 272
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_bbffbcaa6e45b0b9adc4973e69e95ada",
-      "sourceId": "src_870fa74b78854e20265b14d726445855",
-      "sourcePath": "docs/distillery/sources/compound-engineering-plugin.md",
-      "sourceAnchor": "bundled-skill-scripts",
-      "sourceDigest": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
-      "sourceUnitDigest": "c2d3124fa1d74cc960f5b21b2366cb5101e8f716c0cd7232a5947baac475751a",
-      "identityUnitDigest": "20f1b698c500e366b96b196ebce038aff708a5970c55930fdbe79de80dbb6943",
-      "identityFingerprint": "c2d3124fa1d74cc960f5b21b2366cb5101e8f716c0cd7232a5947baac475751a",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 274,
-        "end": 274
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_35ef4e4e8abaeeb568f99f5b1702cf08",
-      "sourceId": "src_870fa74b78854e20265b14d726445855",
-      "sourcePath": "docs/distillery/sources/compound-engineering-plugin.md",
-      "sourceAnchor": "unheaded-block-36",
-      "sourceDigest": "6b8c0309b88d25cfbae2cf5d2dd46a0369e48c6b848595da044f44db7c2994e9",
-      "sourceUnitDigest": "74b2d09c2d942a800c7e42ecfeb0ff11d9d67bf51516d9d733bfa93b2b99176e",
-      "identityUnitDigest": "60e70774c562383c0de9bf289e132023f51376f16480489706c2b0bde8ef75b1",
-      "identityFingerprint": "60e70774c562383c0de9bf289e132023f51376f16480489706c2b0bde8ef75b1",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 275,
-        "end": 279
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_62acdbb6916f4746bc5b4226ed3fc01d",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "unheaded-block-1",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "3b3fd16537305d072c661d7d5edb6d4e58edc3ae2c943465e0f64fa389b0c980",
-      "identityUnitDigest": "a4ebfe7009e81ab769db024c057f128ab5df050c38ec8ae1a342a015fc346094",
-      "identityFingerprint": "a4ebfe7009e81ab769db024c057f128ab5df050c38ec8ae1a342a015fc346094",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 1,
-        "end": 9
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_d2e0c3d7ce52f92e1b2b8d13eb279b6c",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "herdr-feature-index",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "ad667f0a2d86d74c3d7eed841d18aad2ff63ae975f2e27f6ccb07afbb67802f0",
-      "identityUnitDigest": "0a1ed2f928a8359c06d66b13970ed1853da3bc31ee96b884f7bbe52f55ae26c8",
-      "identityFingerprint": "f72be9307ba499603a37f63996c0b59f2f1c3618942201608399dd5ad4212d0a",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 11,
-        "end": 11
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_ac22efaec652a14d111d32a1f78feb72",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "unheaded-block-2",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "d5c5e70512728beab62c0f0308514fe19dbfc15866cae1e5c3961bd1bda731c4",
-      "identityUnitDigest": "0f4f59216ea369d11b982c40daa2ef6ebe52429a3e2e10781a33483bcc0f0ee5",
-      "identityFingerprint": "0f4f59216ea369d11b982c40daa2ef6ebe52429a3e2e10781a33483bcc0f0ee5",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 13,
-        "end": 13
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [
-        "docs/distillery/reports/distill-herdr-inventory-2026-07-15.md"
-      ],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_7b444dd058fb25281290bb3734e01b7d",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "harness",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "04dcac8d0012b3bee69ab8448f1b29fc6f55dd9462a40680f9304fb2d60c491c",
-      "identityUnitDigest": "13f104617c890682fb0a229c4b7533caa1f7f98b92baccd6b89816ef48610d5a",
-      "identityFingerprint": "04dcac8d0012b3bee69ab8448f1b29fc6f55dd9462a40680f9304fb2d60c491c",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 15,
-        "end": 15
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_71b0a05cb06848d7f2d0947f8635b6d1",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "agent-detection-manifests",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "d0b02596884d2b67535ad67282c3c23756da22017b59c132fd7f5d7068ca3aec",
-      "identityUnitDigest": "b6ef8232c0a5253dc9cc9676ac53e626e39008eba5ced99dee598da7e4575f8a",
-      "identityFingerprint": "d0b02596884d2b67535ad67282c3c23756da22017b59c132fd7f5d7068ca3aec",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 17,
-        "end": 17
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_a2557ba124cb6ddfefd6139440dcecc2",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "unheaded-block-3",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "7de6f53055f61b83da2633d5de40d1aa734383e2c6540b24da7d1403c47be22a",
-      "identityUnitDigest": "fd67cc90a97c2694335559cd2dd019bc63e35926fd07c9a5a93c9bba70a3f749",
-      "identityFingerprint": "fd67cc90a97c2694335559cd2dd019bc63e35926fd07c9a5a93c9bba70a3f749",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 18,
-        "end": 22
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_9ae50a87331e14083c0a1eb01518ea7c",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "status-authority-arbitration",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "d63534a0cd4d7ad0910f1f310b661ae6159d0d7bc41423f6e21c115e5521f075",
-      "identityUnitDigest": "13e6c2afe3477418303a18b6fbb17c5b65e1f4351126cd6cb6a7ebdabcc1c305",
-      "identityFingerprint": "d63534a0cd4d7ad0910f1f310b661ae6159d0d7bc41423f6e21c115e5521f075",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 24,
-        "end": 24
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_facef5d89579570a25e86c429f940cd9",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "unheaded-block-4",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "5e52039ba0011a655dcd6d044ef1c904f9f1b3321e41a893bc4924ae3a7b4287",
-      "identityUnitDigest": "22d2fa4648b946b9b4e26d9f685979dd4c6ee1ed1e66eb224e9b0001f891f881",
-      "identityFingerprint": "22d2fa4648b946b9b4e26d9f685979dd4c6ee1ed1e66eb224e9b0001f891f881",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 25,
-        "end": 29
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "specification",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_d4f9b8d43155340dbbdfc237b48f217e",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "agent-state-machine",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "c5012293d87c932efd2f1827f26c5ac9e8bf6324cabf066a0325ab866f5186ea",
-      "identityUnitDigest": "859a9ba181a43c4c0c8a653155410eb64561439b1eacdec914bf8c801a95a011",
-      "identityFingerprint": "c5012293d87c932efd2f1827f26c5ac9e8bf6324cabf066a0325ab866f5186ea",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 31,
-        "end": 31
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "specification",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_06f08134f72959f12185268ad5a9742a",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "unheaded-block-5",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "41bb945aef7c5ce79c9a18d1a9f1db97021fdaae6b53da9c13199d2c12809188",
-      "identityUnitDigest": "0c66b7e190c28f5bc97a424e174d586fb6ff868cb6d0c3cbd607391479068f34",
-      "identityFingerprint": "0c66b7e190c28f5bc97a424e174d586fb6ff868cb6d0c3cbd607391479068f34",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 32,
-        "end": 36
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "specification",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_2bc8f30896f5e242c77688b66f24e373",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "sandbox-agent-hint",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "7e64e73aa3ee37b94aa68146741571db21fc076a8fe5f64e3da27b9101d50fe6",
-      "identityUnitDigest": "a258671dc7ebb625f1604cc9f237ff04ebef7bb33b1681ce47f9ba762fc15b77",
-      "identityFingerprint": "7e64e73aa3ee37b94aa68146741571db21fc076a8fe5f64e3da27b9101d50fe6",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 38,
-        "end": 38
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_568bc5a75160a054a4e755911ee47cfa",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "unheaded-block-6",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "bd2c1c8e077410b89fbe914e7341def3a5ccd81eb40dae233aec3cc0ab1a6851",
-      "identityUnitDigest": "a165341da77e73ae1d95ef97c1aa8cbe4edc67cdded9e647e5c16a6e21676779",
-      "identityFingerprint": "a165341da77e73ae1d95ef97c1aa8cbe4edc67cdded9e647e5c16a6e21676779",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 39,
-        "end": 43
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_b47ec014e5c0b7779e3ec5c6e5738829",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "remote-manifest-hot-reload",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "8c2a2ddd5cd10b0e34577aab23de0801eccd68609489956cbf7024f3fa495e42",
-      "identityUnitDigest": "71358840f495818707271e0d4741a64623c9cc0be16d1867748010fc1317a3bd",
-      "identityFingerprint": "8c2a2ddd5cd10b0e34577aab23de0801eccd68609489956cbf7024f3fa495e42",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 45,
-        "end": 45
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_7c13001b315287f59f54cc1481eed97e",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "unheaded-block-7",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "00e81ad4ead095d3356bc0823ac53a51b9bc900df0d76d9ca841f0b7412ca308",
-      "identityUnitDigest": "e862f1e7750130ce139dd7e4e6ca08906cacbaa94d7e87ec61f54f06039d1b3d",
-      "identityFingerprint": "e862f1e7750130ce139dd7e4e6ca08906cacbaa94d7e87ec61f54f06039d1b3d",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 46,
-        "end": 50
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "specification",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_407e35bbfc7790d2fb8613bdd67ef1c1",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "orchestration",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "54aaff45feb076741e01ebc5b6770e6dc52b75c88ad0631243ad7de6467e6935",
-      "identityUnitDigest": "8ad7b6498597bfa4f4dc4cbe6718a262f18ddf6344075bea7c0e3fab7314786f",
-      "identityFingerprint": "54aaff45feb076741e01ebc5b6770e6dc52b75c88ad0631243ad7de6467e6935",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 52,
-        "end": 52
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_8ca0ca2db89e2b70505857f12dc8753b",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "workspace-tab-pane-model",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "324a55e86cc713a09ad92fb30d5881a8d114f10ab25a4c16fe97203d2278340a",
-      "identityUnitDigest": "69e63feccbab840be88bc4a792cc70529a4bef2f6eebfb6d6dc0c4a34d228236",
-      "identityFingerprint": "324a55e86cc713a09ad92fb30d5881a8d114f10ab25a4c16fe97203d2278340a",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 54,
-        "end": 54
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_ba68009a4944f6887599606ebeb0ee3a",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "unheaded-block-8",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "6bca91fe9ecf4e1db9e7d69fa374685cc5be99fb096b846f4c95e2659a6d0637",
-      "identityUnitDigest": "f9216693c8c157496d1a310dbcc3131e6fd5dceade815b81e41eb95de638d3cd",
-      "identityFingerprint": "f9216693c8c157496d1a310dbcc3131e6fd5dceade815b81e41eb95de638d3cd",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 55,
-        "end": 59
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_eb5a96b32ed47a2dfec4b8ae1c04b59e",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "socket-api-control-surface",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "98515df602e5c4e5a93e8cb8a1d18f4ba97b7df14824c9ba0232f5ada4c3554b",
-      "identityUnitDigest": "4e6bcf09f646c6738dc812e28cacafe4701083c0bccf3b4b15d5810afb660ad1",
-      "identityFingerprint": "98515df602e5c4e5a93e8cb8a1d18f4ba97b7df14824c9ba0232f5ada4c3554b",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 61,
-        "end": 61
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_61875ff1ea058d4f251bedb4eb023458",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "unheaded-block-9",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "a09c4f587aa7c5d534e5f0e8668ef1f5af72451a90dd51fae7fec1f80f280c86",
-      "identityUnitDigest": "36b310b32e665a4b5a13d01ebd94c2a8c85fa7ebeaf55e5ada60cafb84bc1a08",
-      "identityFingerprint": "36b310b32e665a4b5a13d01ebd94c2a8c85fa7ebeaf55e5ada60cafb84bc1a08",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 62,
-        "end": 66
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_bcd10d252176fd2cb7c44b60132d6df6",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "worktree-as-workspace",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "971cbbc4d9d6874357af9a16b0767c6bab542f7181ed4fdba17ad1a29b3da843",
-      "identityUnitDigest": "995696cbd586910301fce69352a46b24fdc1b63662e653990fdd59c0beb4223f",
-      "identityFingerprint": "971cbbc4d9d6874357af9a16b0767c6bab542f7181ed4fdba17ad1a29b3da843",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 68,
-        "end": 68
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_e0bf324a57eadf88d0f3d5b4a04cdfaf",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "unheaded-block-10",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "813d9a5371f1e2f0691eafdbb24f7e7d0f8155118505a8783560466edece4f4e",
-      "identityUnitDigest": "28d52a58012a62a0e1b4cad12c36de074e61f1e8d757e41e6453742274863d62",
-      "identityFingerprint": "28d52a58012a62a0e1b4cad12c36de074e61f1e8d757e41e6453742274863d62",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 69,
-        "end": 73
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_23d47a189586e5dafa8d476a2a62122b",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "wait-primitives",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "3d2327c52aea7cbe63b20b08e6578e6684a6e1783cabd5e561ed930222933ae8",
-      "identityUnitDigest": "23d7c74a1be5c299ac6d814c56ef585c6e37a4ad7024cd1418bebd6f290f328c",
-      "identityFingerprint": "3d2327c52aea7cbe63b20b08e6578e6684a6e1783cabd5e561ed930222933ae8",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 75,
-        "end": 75
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_07466ede83c5562441ccbfe5e2d7b6b3",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "unheaded-block-11",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "1cac8461cb8ea59ad757913b77bd7f11714decfdd8761ae4ce3d016dbcbe92b4",
-      "identityUnitDigest": "f17e012fe7a7390285a03775720e6aecf080d558c35cb988b40d878c36cc75a6",
-      "identityFingerprint": "f17e012fe7a7390285a03775720e6aecf080d558c35cb988b40d878c36cc75a6",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 76,
-        "end": 80
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "specification",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_6aa85f919fc8c6a32509fa084e8a6c78",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "layout-export-apply",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "d4b12ef7904b7e2029ad2b544d2c79a7ab9564c8ac8a3ab11ecbfbe977c8c221",
-      "identityUnitDigest": "194464b18048787d54c912d356145570ada059c980f00fea4c4f5089ce9d27a3",
-      "identityFingerprint": "d4b12ef7904b7e2029ad2b544d2c79a7ab9564c8ac8a3ab11ecbfbe977c8c221",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 82,
-        "end": 82
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_52d5b9ec51cea22672cb5dd3f2f7f2da",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "unheaded-block-12",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "9321cd391e8d6de8e034c6b1d398b46ef1758418bd276646463c5311a70ddb3d",
-      "identityUnitDigest": "5deef2d6013589618156845b8787d685abf4ce599fd5e77272ad7f0e61c90a89",
-      "identityFingerprint": "5deef2d6013589618156845b8787d685abf4ce599fd5e77272ad7f0e61c90a89",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 83,
-        "end": 87
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_e1ae3c45d96cc935208f0221e6e7e678",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "pane-swap-move-zoom-semantics",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "89e9183429a35dec026d6d31ee5aaa5850cc8994aee2768998ccaf6832be9680",
-      "identityUnitDigest": "0d8657fd8f99fcbd53eb92be552704764129c00bf398933edafd001508ca10f0",
-      "identityFingerprint": "89e9183429a35dec026d6d31ee5aaa5850cc8994aee2768998ccaf6832be9680",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 89,
-        "end": 89
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_9563b02eadeaef15a95e0dd995f9ded3",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "unheaded-block-13",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "8212602b52c7de7452243c55c2544ff3f5e7eb9b1e5cb964971faafbe1e20c17",
-      "identityUnitDigest": "95625e138e25e99f0e25472ae968f122b4cc7f587c499a01577e599ab90e56a0",
-      "identityFingerprint": "95625e138e25e99f0e25472ae968f122b4cc7f587c499a01577e599ab90e56a0",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 90,
-        "end": 94
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_8741ef4adbbc74cf15ec3ed6dfc09f5d",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "agent-vs-pane-cli-distinction",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "09444626b568c972168930ab816963a8438a4c0575416bcf1ca8301fb83b8b4e",
-      "identityUnitDigest": "b764daac01d925b4d474c2431a758569f831c38d68322995385468f785870410",
-      "identityFingerprint": "09444626b568c972168930ab816963a8438a4c0575416bcf1ca8301fb83b8b4e",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 96,
-        "end": 96
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_0e8a7b686dd35fe5c6cd9cded4e8d530",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "unheaded-block-14",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "d3fc498c4214a9c238e6cd014b180957feb7270d766c21f2f556c189e316c918",
-      "identityUnitDigest": "7daf7353f672ec402084e583500fac541f6d37c556c5debf61e80a407e18a0ea",
-      "identityFingerprint": "7daf7353f672ec402084e583500fac541f6d37c556c5debf61e80a407e18a0ea",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 97,
-        "end": 101
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "specification",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_19089bbf53e630459ca36465754d3594",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "context-memory",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "dfa576901b60e3a35d8b079d8fcb55588ca8106bfb35717e21e5d54d5a73a299",
-      "identityUnitDigest": "14abc3cbcf5f11360f7356092678b001264d83b9bddbe42d3223190fac6274d9",
-      "identityFingerprint": "dfa576901b60e3a35d8b079d8fcb55588ca8106bfb35717e21e5d54d5a73a299",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 103,
-        "end": 103
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_1c4ed8b34e7dd9db5cbe161779c8ee51",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "session-snapshot-restore",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "d05fff1f3380c9bec93acf531c7b6436a553ca4d2ca734df9dae3a714e1d772b",
-      "identityUnitDigest": "a90213dd5a10de640e263379efbccc175dc2e287246c9071b6a52906dac7a41c",
-      "identityFingerprint": "d05fff1f3380c9bec93acf531c7b6436a553ca4d2ca734df9dae3a714e1d772b",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 105,
-        "end": 105
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_abc38faec7b399efb16e7ee457acb486",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "unheaded-block-15",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "4bc834f985198c4b8b6f85e6c4477f1c2dc6350a9e5834fc26b6f574e1cdd583",
-      "identityUnitDigest": "b91d93517bfc4ad5a1fcc3472ffde3b3b82f14d275a8169782b7992f9ef2898d",
-      "identityFingerprint": "b91d93517bfc4ad5a1fcc3472ffde3b3b82f14d275a8169782b7992f9ef2898d",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 106,
-        "end": 110
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_a572ec6c030abfa08fe8c4f9e2b415c6",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "pane-screen-history-replay",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "734c2fba953cf59c93fc7c34c858c8a9a20a67bad45201c3db45aa0bc44f3330",
-      "identityUnitDigest": "92b8bef0be6127d75620dd0485e93d5523aa0c2f2ec82504ef15526665b0c201",
-      "identityFingerprint": "734c2fba953cf59c93fc7c34c858c8a9a20a67bad45201c3db45aa0bc44f3330",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 112,
-        "end": 112
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "historical-context",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_7f2ba815fa0ef6017fc000b91a21411c",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "unheaded-block-16",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "549f015cee7fd38fc5d6796cb0f97a9eeeea230520475f04a900a1e5464e2ba8",
-      "identityUnitDigest": "0ffd96347acb5c86131a052fd012ecfc522a75728106af7598fb4926fbdcf3ce",
-      "identityFingerprint": "0ffd96347acb5c86131a052fd012ecfc522a75728106af7598fb4926fbdcf3ce",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 113,
-        "end": 117
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "historical-context",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_2c6d35b87385c387c2a61822cda70859",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "native-agent-session-restore",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "cdd48a995e6936fca335d3d406eb41c9c4b494b5a319106fefc8ad4490bfaa98",
-      "identityUnitDigest": "85a93cd29a953026931a1fa1baf9332e1b2b85007923882d29f9ca244ea12eb5",
-      "identityFingerprint": "cdd48a995e6936fca335d3d406eb41c9c4b494b5a319106fefc8ad4490bfaa98",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 119,
-        "end": 119
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_e072834ba88b828579fe98277022e22d",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "unheaded-block-17",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "0ab38499373197d147c2afdca0d1bd80d9a66cad27f7b4dacfda4b01643599b0",
-      "identityUnitDigest": "7fe9454df262be9bb50c247e9e824161ef40061dc1868734afd240988773b9c4",
-      "identityFingerprint": "7fe9454df262be9bb50c247e9e824161ef40061dc1868734afd240988773b9c4",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 120,
-        "end": 124
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_5d100dc2a58382109eb6c4b16e457df5",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "live-handoff",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "7ff1a5f3ad2751def4f83b0357b6e5ff869d4eb7eef9c5e0e376d9b3d5fd3988",
-      "identityUnitDigest": "a771d152298da80bbdc34b1c66f3384d5c39ec37ce6e1aa1ba28e05ad512ffb2",
-      "identityFingerprint": "7ff1a5f3ad2751def4f83b0357b6e5ff869d4eb7eef9c5e0e376d9b3d5fd3988",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 126,
-        "end": 126
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_f10fd9f09182b4a2bc99aa012664b9d5",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "unheaded-block-18",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "c0bdbc6e273b44b0065f22ab9157850ddb6619443351ad464b4df3d84e44a291",
-      "identityUnitDigest": "342e9161147e77e4e95312efa7b78103f11a7b374a8d9e89046f1c4ede1ac903",
-      "identityFingerprint": "342e9161147e77e4e95312efa7b78103f11a7b374a8d9e89046f1c4ede1ac903",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 127,
-        "end": 131
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_2178bfb1331be03178c00ba6cf19d638",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "session-snapshot-bootstrap-rpc",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "5396638e1e5cc9ab5da00ff66e3581d6933bb2d586eac2c03a07cb0ec1cc7226",
-      "identityUnitDigest": "27837a452dd5e54d1e88f4a2dc911665415326682ea636a064a96dffc4186063",
-      "identityFingerprint": "5396638e1e5cc9ab5da00ff66e3581d6933bb2d586eac2c03a07cb0ec1cc7226",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 133,
-        "end": 133
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_9320afdbd45f6093450559a39ebd4900",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "unheaded-block-19",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "9be18a843d5131133b60185600e5d7c7eed39e7c8bc23f0439a6e27f06c5c56a",
-      "identityUnitDigest": "07fbc7b5a5bc23f659dfb961e0ef71f104baeec4ca980086e7197e206352c5ac",
-      "identityFingerprint": "07fbc7b5a5bc23f659dfb961e0ef71f104baeec4ca980086e7197e206352c5ac",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 134,
-        "end": 138
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "contract",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_89d92ab809943eeff07cbda46c48fe21",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "tooling",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "a8258a772aeb222fea54679bbb24cc8ebf02ad0ca164e34e97096b5df54244cd",
-      "identityUnitDigest": "f9f935d1c059d389a755a535997c711eccef54b76e14cf20a650cff26cb0e0db",
-      "identityFingerprint": "a8258a772aeb222fea54679bbb24cc8ebf02ad0ca164e34e97096b5df54244cd",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 140,
-        "end": 140
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_5e2d6f608f1a53f643ce4a464cfcf598",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "cli-as-plugin-api",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "d6ab0f6f6b00cfa983c15ae04358148c6bf1ca49e61fe451f42733c60a5b296d",
-      "identityUnitDigest": "af51242fa857bc8161dc1d72942beaa7c9772c8ab614f446835988330e92689c",
-      "identityFingerprint": "d6ab0f6f6b00cfa983c15ae04358148c6bf1ca49e61fe451f42733c60a5b296d",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 142,
-        "end": 142
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_08fbad1c08465687f14e0ef83e9643c9",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "unheaded-block-20",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "aaeab4d24f4c8a0ba8ad362a94b6029b2b2866a4ee8455a8dfaf3bb141719017",
-      "identityUnitDigest": "a5d80cd6064bbfac0e1b9c9c789c06904b64f00f070f76ca2fe193112f5a1ba1",
-      "identityFingerprint": "a5d80cd6064bbfac0e1b9c9c789c06904b64f00f070f76ca2fe193112f5a1ba1",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 143,
-        "end": 147
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_d4ba6f0d459e12124a447336e082634a",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "self-describing-protocol-schema",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "3b41f9f4a60e3f6230c1e9194dd368e0896a896d56a9d3c159cd68dab0e0e416",
-      "identityUnitDigest": "11e78c3cc080c894d35eee6b2943e5ebac29f390598e8531fb9fbbfd8c36c51b",
-      "identityFingerprint": "3b41f9f4a60e3f6230c1e9194dd368e0896a896d56a9d3c159cd68dab0e0e416",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 149,
-        "end": 149
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "contract",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_009aab819065c1ec1713488f8c9a325b",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "unheaded-block-21",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "1acc3a54de37e547be00d2fe9fe85f522c160c32f8e94b4ef01f843ef77814d5",
-      "identityUnitDigest": "51e069e2d6697126086a1856aea918c690571cf872c3e86e71da8c27e1e24eb0",
-      "identityFingerprint": "51e069e2d6697126086a1856aea918c690571cf872c3e86e71da8c27e1e24eb0",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 150,
-        "end": 154
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "contract",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_a30d78aa046a84bbeee32e707b940c68",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "protocol-version-discipline",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "496f60ca1f0527eef3230991a5fc9b07e6b43d075da4a008b7eb56152dd88f17",
-      "identityUnitDigest": "14c23c45d4624b5cd57aa376b76e58c783907ad603937e7ca50199d7ea4a56bf",
-      "identityFingerprint": "496f60ca1f0527eef3230991a5fc9b07e6b43d075da4a008b7eb56152dd88f17",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 156,
-        "end": 156
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "contract",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_d1b1fd19c0c2fd84bc3c9d283cd0c6c4",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "unheaded-block-22",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "8804e012616ef500fcb82d96b9e9dee402658b9f4b45497ce42c1759ff179337",
-      "identityUnitDigest": "2371cc09201a3a25e9ab9ceb395449d5daa00ddfcfb888cb38d105dd256938a0",
-      "identityFingerprint": "2371cc09201a3a25e9ab9ceb395449d5daa00ddfcfb888cb38d105dd256938a0",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 157,
-        "end": 161
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_9d0de2b778edb181370f4748f62971aa",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "direct-terminal-bridging",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "527dd69a24deecace28a2773b47b4b1e1968dfb2e945557900c54965281c99c9",
-      "identityUnitDigest": "993f8c933042e7c3be6b8163a7b7b7f30de4d839d32ce0501d110073ec40bb4f",
-      "identityFingerprint": "527dd69a24deecace28a2773b47b4b1e1968dfb2e945557900c54965281c99c9",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 163,
-        "end": 163
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_4ee4fd6795213aa16bded36f4ebc65b3",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "unheaded-block-23",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "efcb165d38d3f8a986f50a2e222925070dae22ad7ff262d4f925e02ee41aa39c",
-      "identityUnitDigest": "8f66eafae67de3aa0483947eefc1b9c8c8f0eedc2ad908490bebafc4f945f18d",
-      "identityFingerprint": "8f66eafae67de3aa0483947eefc1b9c8c8f0eedc2ad908490bebafc4f945f18d",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 164,
-        "end": 168
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_8b5a65dc940034ed8ab86e6412fe99a8",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "shell-completions",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "2768bf30a9bf6165e8ef2919d96c8b14fec0f697f5c7311f9434621e7f568925",
-      "identityUnitDigest": "dba288aa9c6cadf2afafe6f7d103aa0e077f1931e22eff58b8a6c0a892db8688",
-      "identityFingerprint": "2768bf30a9bf6165e8ef2919d96c8b14fec0f697f5c7311f9434621e7f568925",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 170,
-        "end": 170
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_979b5ab9ecee385701c46956d5f74451",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "unheaded-block-24",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "5b9ac23b6c09b398eb22d3f1cd822c5311b714c1a38b96b23748c2387b783b9d",
-      "identityUnitDigest": "e53e2f2447b15f4d2e29b0d997ca46461bd66426c568473bcd0dc710c671dd05",
-      "identityFingerprint": "e53e2f2447b15f4d2e29b0d997ca46461bd66426c568473bcd0dc710c671dd05",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 171,
-        "end": 174
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_9da12997c48f5f871140480826e8efed",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "config-packaging",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "8d5a8ac21578d37b697b00eda093bd5a72910316685bd7f0dd409f47e0e88138",
-      "identityUnitDigest": "9bc182be33f145d9cb143db83d3f041265b035157c6fbcd45aca74b4da32e9a8",
-      "identityFingerprint": "8d5a8ac21578d37b697b00eda093bd5a72910316685bd7f0dd409f47e0e88138",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 176,
-        "end": 176
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_f4077688e8d0cfb26822d0d9244588b0",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "layered-config-with-safe-fallback",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "61b11629b0b5b67baeb6105b27dbe1ddd87ff59b1b5a1807aca9f82fb91c730f",
-      "identityUnitDigest": "f8b27b8a7404abdf64b8ab4eb43d4af8abce892e0d1743a25aabdab0efaf9c0e",
-      "identityFingerprint": "61b11629b0b5b67baeb6105b27dbe1ddd87ff59b1b5a1807aca9f82fb91c730f",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 178,
-        "end": 178
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_68d581b240cc8833a02a9120893bd05c",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "unheaded-block-25",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "348108eb7e639d4ad9060337f6f78122afacf92b736bc63cddd9a9978fc2bc73",
-      "identityUnitDigest": "21b773a42aa81f1b7e69def4a8cab00ee2fff2c7bfa1ebca828c377f26bbf203",
-      "identityFingerprint": "21b773a42aa81f1b7e69def4a8cab00ee2fff2c7bfa1ebca828c377f26bbf203",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 179,
-        "end": 183
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_b24cdb215e6c6c4afe9b454f7b89e29e",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "update-channels",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "ec209b08abbc1f2da49d66476f9070b2ee368d8476d5015e2ac8c0a4e2f5caf0",
-      "identityUnitDigest": "bb2e394429d8b313763efbe388b3b9f30bff931540599664b7d03bb0a779b441",
-      "identityFingerprint": "ec209b08abbc1f2da49d66476f9070b2ee368d8476d5015e2ac8c0a4e2f5caf0",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 185,
-        "end": 185
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_9d20654f09e21efa151d3572ab78ce53",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "unheaded-block-26",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "96a400452b8c3df55ed87cbf7a80e2fe2518ab27e448c32dd4afd82b107876ed",
-      "identityUnitDigest": "c7413291213b0aa84954bf6e46f7ce7db20d986fbf53b54610e8857787117f7e",
-      "identityFingerprint": "c7413291213b0aa84954bf6e46f7ce7db20d986fbf53b54610e8857787117f7e",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 186,
-        "end": 190
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_d5d8e4c364bbeb05dbf1f214c0a6da56",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "vendored-native-dependency-with-tracked-patches",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "10c9e9cae9a85dd942a9a9908875c2c5999565c160f8bf7bb8bf1e7451fc06c9",
-      "identityUnitDigest": "91eff9991a7dcfc655338333fd26d1a927bd350fd27e67964b1ccc4e05104c65",
-      "identityFingerprint": "10c9e9cae9a85dd942a9a9908875c2c5999565c160f8bf7bb8bf1e7451fc06c9",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 192,
-        "end": 192
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_576e7dca27fd74de556528d3fa0fb184",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "unheaded-block-27",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "e764578926457269bb3afb9022232280873b671b72cd57ec10dc43018f9309be",
-      "identityUnitDigest": "557df269ac3b4fc3392a3751aca3b63c2409329547c6d7403249bd7b36a278e1",
-      "identityFingerprint": "557df269ac3b4fc3392a3751aca3b63c2409329547c6d7403249bd7b36a278e1",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 193,
-        "end": 197
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_3134be0cbb461aac49e44b0cd8695a47",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "nix-flake-packaging",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "e34de765080eaa6621fdfa21c9c7b0bfc15972745cfdf826affafe40638fcc6b",
-      "identityUnitDigest": "1013dc577f15ca804652da4335148be345956a5a0c80c71bc8b65faf2955aeb0",
-      "identityFingerprint": "e34de765080eaa6621fdfa21c9c7b0bfc15972745cfdf826affafe40638fcc6b",
-      "identityStatus": "carried-forward",
-      "sourceLocation": {
-        "start": 199,
-        "end": 199
-      },
-      "targetOwner": null,
-      "targetAnchor": null,
-      "claimKind": "unclassified",
-      "authorityKind": "non-authority",
-      "status": "future",
-      "relations": [],
-      "decisionRefs": [],
-      "evidenceLinks": [],
-      "disposition": "reclassify-out-of-platform-scope",
-      "reviewStatus": "pending"
-    },
-    {
-      "claimId": "claim_8fcbfc4d4cac20c644a9a1538b6162f3",
-      "sourceId": "src_810a803068dbd1f64b2e1aafb3ef2d3d",
-      "sourcePath": "docs/distillery/sources/herdr.md",
-      "sourceAnchor": "unheaded-block-28",
-      "sourceDigest": "1f45b47c40321aaebe23389d3e5af623abe19d51813005b701046a56a67586ed",
-      "sourceUnitDigest": "3540ecd377428d2efc67efa0069828a9ff4e63f3735f84cfd51337e0deb94dc7",
-      "identityUnitDigest": "82286926bf4e994602b30b0c97943d19441c1d119f3d415ec8fbcfcca6289d09",

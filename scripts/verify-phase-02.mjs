@@ -249,13 +249,15 @@ export function runPhase02Verification(options, repoRoot = REPO_ROOT) {
       '--vocabulary', PHASE02_VOCAB,
       '--identity-registry', PHASE02_IDENTITY_REGISTRY,
       '--json',
-    ], { cwd: tempWorktreeDir, encoding: 'utf8' });
+    ], { cwd: tempWorktreeDir, encoding: 'utf8', maxBuffer: 80 * 1024 * 1024 });
     const gateJson = JSON.parse(gate.stdout);
     const open = gateJson.explicitOpenFindings || {};
     receipt.checks.inventoryGate = {
       passed: gateJson.clean === true,
       explicitOpenFindingCounts: {
         gaps: open.gapCount ?? null,
+        fileGaps: open.fileGapCount ?? null,
+        claimIdentityGaps: open.claimIdentityGapCount ?? null,
         duplicateContentGroups: open.duplicateContentGroupCount ?? null,
         semanticConflictGroups: open.semanticConflictGroupCount ?? null,
       },
