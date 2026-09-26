@@ -29,21 +29,21 @@ function markdownSection(text, heading) {
 
 test('canonical fgos-code-panel and fgos-plan-loop close sections both carry sharedCwdCaveat caveat-blocks-close', () => {
   const codePanelClose = markdownSection(readSkill(CODE_PANEL_SKILL), '## 4. Close, then merge, then verify');
-  const planLoopClose = markdownSection(readSkill(PLAN_LOOP_SKILL), '## 4. Close a cell (`close.json`)');
+  assert.match(codePanelClose, /sharedCwdCaveat/, 'fgos-code-panel close section must name sharedCwdCaveat');
+  assert.match(codePanelClose, /status: 'recheck-required'/, 'fgos-code-panel close section must name recheck-required status');
+  assert.match(
+    codePanelClose,
+    /Never issue `cell-closed` while any node carries a `sharedCwdCaveat` with `status: 'recheck-required'`/,
+    'fgos-code-panel close section must state the caveat-blocks-close rule in plain words',
+  );
+  assert.match(codePanelClose, /"disposition": "cell-closed"/, 'fgos-code-panel close section must still show the cell-closed template');
 
-  for (const [name, section] of [
-    ['fgos-code-panel', codePanelClose],
-    ['fgos-plan-loop', planLoopClose],
-  ]) {
-    assert.match(section, /sharedCwdCaveat/, `${name} close section must name sharedCwdCaveat`);
-    assert.match(section, /status: 'recheck-required'/, `${name} close section must name recheck-required status`);
-    assert.match(
-      section,
-      /Never issue `cell-closed` while any node carries a `sharedCwdCaveat` with `status: 'recheck-required'`/,
-      `${name} close section must state the caveat-blocks-close rule in plain words`,
-    );
-    assert.match(section, /"disposition": "cell-closed"/, `${name} close section must still show the cell-closed template`);
-  }
+  const planLoopText = readSkill(PLAN_LOOP_SKILL);
+  const planLoopClose = markdownSection(planLoopText, '### 4. Close a Cell');
+  assert.match(planLoopClose, /sharedCwdCaveat/, 'fgos-plan-loop close section must name sharedCwdCaveat');
+  assert.match(planLoopClose, /status: 'recheck-required'/, 'fgos-plan-loop close section must name recheck-required status');
+  assert.match(planLoopClose, /fgos coordination close/, 'fgos-plan-loop close section must use semantic close command');
+  assert.doesNotMatch(planLoopClose, /close\.json/, 'fgos-plan-loop close section must not use raw close.json');
 });
 
 test('canonical fgos-code-panel documents the two-request DAG pattern with dag: true', () => {

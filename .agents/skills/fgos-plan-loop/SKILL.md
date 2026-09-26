@@ -2,729 +2,163 @@
 name: fgos-plan-loop
 user-invocable: false
 description: >-
-  Drive a Work-independent, plan-driven implementation track (one that
-  matches docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md's
-  audit -> cell -> review -> red-team -> fix -> close loop) entirely
-  through the real `fgos coordination` CLI doors (`chain`/`run`/`show`)
-  and the `standalone-master-coordination-loop` FlowDefinition -- never
-  fgOS Work items, claims, `fgos pick/cook/submit`, or a fgos-runner loop.
-  Use when a Lead session needs to resume/open/authorize/close a cell on
-  a track that a plan.md/phase-NN-*.md pair drives, and independence
-  (separate Doer/Reviewer/Red-Team/Fixer dispatches, resumable by a fresh
-  process with zero hand-fed chat history) matters. Examples: "resume
-  <track> and tell me what's next", "open the next cell for <track>",
-  "authorize a fix round for cell <id>", "close cell <id> and report the
-  commit", "run this code implementation plan", "execute this code
-  implementation track".
+  Drive a Work-independent, plan-driven implementation track (audit -> cell -> review -> red-team -> fix -> close loop)
+  entirely through the real `fgos coordination` CLI doors (`chain`/`status`/`start`/`operation`/`authorize-and-dispatch`/`disposition`/`close`)
+  and the `standalone-master-coordination-loop` FlowDefinition -- never fgOS Work items, claims, `fgos pick/cook/submit`, or a fgos-runner loop.
+  Use when a Lead session needs to resume/open/authorize/close a cell on a track that a plan.md/phase-NN-*.md pair drives, with independent
+  review and adversarial testing. Examples: "resume <track> and tell me what's next", "open the next cell for <track>",
+  "authorize a fix round for cell <id>", "close cell <id> and report the commit", "run this code implementation plan",
+  "execute this code implementation track".
 ---
 
 # fgos-plan-loop
 
-The group-thinking-native successor to
-[`master-coordinator.md`](../../../docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md)
-for **Work-independent** tracks: instead of a hand-pasted prompt block a
-Lead session interprets from scratch each time, this skill distills the
-same audit -> cell -> review -> red-team -> fix -> close loop into calls
-onto the CoordinationSession runtime's own public doors --
-`fgos coordination chain` (resume/status), `fgos coordination run
---file <request>` (open/authorize/dispatch/close), and
-`fgos coordination show` (read-only detail) -- and the
-[`standalone-master-coordination-loop`](../../../core/coordination-protocols/standalone-master-coordination-loop.yaml)
-FlowDefinition, which declares exactly this loop's own worker graph:
-`doer` -> `reviewer`/`red-team` (first pass, required) -> `fixer` ->
-`reviewer`/`red-team` recheck (driver-authorized, optional).
+`fgos-plan-loop` is the implementation-track facade for coordinating plan-driven coding work. While track sequencing across sequential cells is domain-neutral, cell execution and verification are governed by coding-domain policy.
 
-For a single, standalone code change that does not need a
-`plan.md`/`phase-NN-*.md` track of its own, see
-`fgos-code-panel` instead -- same
-mechanism, one cell, no track bookkeeping.
+This facade builds directly on two shared doctrine layers:
+- **Generic Driver Discipline:** [`../_shared/coordination-driver.md`](../_shared/coordination-driver.md) defines the domain-neutral cycle (`observe -> choose legal action -> dispatch -> verify evidence -> disposition -> adapt -> explicit close -> continuity artifact`).
+- **Coding-Cell Policy:** [`../_shared/coding-cell-policy.md`](../_shared/coding-cell-policy.md) defines isolated worktree execution, proof tiers, independent commit/test verification, tested/integrated identity, and merge-after-close rules.
 
-Every request this skill composes is re-validated end to end by
-`validateCoordinationRequest`
-([`src/verbs/coordination/schema.mjs`](../../../src/verbs/coordination/schema.mjs))
-exactly like any hand-authored request file -- this skill narrows what a
-Lead needs to write by hand, it never bypasses that boundary or opens a
-second dispatch path. Protocol semantics (which operation is
-driver-authorized, which declares `result.kind: work-product`) live in
-the FlowDefinition itself, never restated as skill prose that could drift
-from it -- read the YAML linked above, not this file, for the graph's own
-ground truth.
+All protocol execution lower into the CoordinationSession control plane (`actions.mjs`, `composers.mjs`) and the registered [`standalone-master-coordination-loop`](../../../core/coordination-protocols/standalone-master-coordination-loop.yaml) FlowDefinition (`doer -> reviewer/red-team -> fixer -> rechecks`).
+
+For a standalone single-cell change without a plan or track, use `fgos-code-panel` (or `fgos-code-change`) instead.
+
+---
 
 ## Non-Goals
 
-- **No Work involvement, ever.** Never `fgos pick/cook/submit`, claims,
-  or Work items to coordinate a track this skill drives. The
-  request-schema boundary enforces this independently of this skill's own
-  discipline: any field anywhere in a request carrying Work lifecycle
-  authority (`approve`, `merge`, `claim`, `workStatus`, `missionId`, and
-  siblings) is rejected before it ever reaches the session engine
-  (`schema.mjs:46-50` `WORK_LIFECYCLE_KEYS`, enforced recursively at
-  `schema.mjs:98-114` `assertNoWorkLifecycleKeys`, per ADR-001). A
-  session's own `workRef` (if set at all) is read-only context, never a
-  lifecycle channel.
-- **No git authority inside the session.** No step type in the five-kind
-  request vocabulary (`operation` / `authorize` / `disposition` /
-  `fan-out` / `contribution`, `schema.mjs:491-507`) can invoke `git
-  merge`, `git push`, or otherwise touch the track/main branch -- merging
-  is a Lead action taken **outside** any coordination request, never
-  something a template below expresses. The Lead performs every merge
-  into the track/main branch itself, by hand, after a cell closes.
-- **Commit policy (Phase 01 of this same track).** A Doer/Fixer dispatched
-  through a mutating `operation` step MAY commit its own work on the
-  cell's own linked-worktree branch -- the default executor already
-  permits `git add`/`git commit` there. Only the **Lead** merges that
-  branch into the track/main branch; the coordination session itself
-  never merges, and this skill never automates that merge step.
+- **No Work Lifecycle Involvement:** Never use `fgos pick/cook/submit`, claims, or Work items for tracks this skill drives. The session engine strictly rejects fields carrying Work lifecycle authority (`approve`, `merge`, `claim`, `workStatus`, `missionId`).
+- **No Git Merge Authority Inside Sessions:** A coordination session possesses zero git merge authority. Doer and Fixer operations commit inside the cell worktree branch, but merging into the target branch is strictly a driver action performed outside the session after explicit close.
+- **No Secondary Track Ledger:** Track status is derived on demand from session event logs via `fgos coordination chain` and `plan.md`. No secondary ledger or database is created.
 
-## Capability awareness (planning input)
+---
 
-This is a Work-independent, domain-agnostic planning surface — the same
-shared planning-awareness cluster the coding domain planner specializes
-applies here too:
-[`../_shared/planning-capability-awareness.md`](../_shared/planning-capability-awareness.md)
-(rule) and
-[`../_shared/capability-catalog.md`](../_shared/capability-catalog.md)
-(vocabulary). When authoring the `plan.md`/`phase-NN-*.md` files this
-skill resumes from, tag each independently executable requirement with
-its canonical capability (e.g. `code:implement`, `code:review`) — a
-planning-time signal for the Lead's own decomposition, distinct from and
-never a replacement for the per-actor `executor`/`model`/`tier` overrides
-`open.json`/`fix-N.json` declare below for team-cognition provider
-diversity. Capability annotation never pins the actor's executor; it only
-records what kind of work a requirement is, for whoever authors the next
-cell's request.
+## Capability Awareness (Planning Input)
 
-## 0. Resume: `fgos coordination chain <track>`
+When authoring the `plan.md`/`phase-NN-*.md` files this skill drives, tag each requirement with its canonical capability:
+[`../_shared/planning-capability-awareness.md`](../_shared/planning-capability-awareness.md) and [`../_shared/capability-catalog.md`](../_shared/capability-catalog.md).
+Capability tags (e.g. `code:implement`, `code:review`, `code:test`) signal decomposition boundaries without pinning executors, models, or tiers.
 
-Read-only, reconstructed entirely from each matching session's own
-persisted event log (never a cached plan/status file --
-[`chain.mjs`](../../../src/verbs/coordination/chain.mjs) header comment,
-lines 1-18). Always run this FIRST, including in a genuinely fresh
-process with zero prior chat context -- it is the one command this whole
-skill assumes a Lead can resume from cold:
+---
 
+## Facade Hook Values for Plan-Loop
+
+| Hook Slot | Plan-Loop Value |
+|---|---|
+| `unit of iteration` | One cell of the track (`<track>--<cell-id>`), corresponding to the next unmerged phase in `plan.md`. |
+| `open inputs` | Extracted from `plans/<track>/phase-NN-<name>.md` (objective, verification commands, actor requirements). |
+| `evidence verification` | Coding-cell policy: driver independently verifies git commit in worktree and executes the phase's focused tests. |
+| `disposition criteria` | Proof-gap findings (judging verification insufficient) cannot be deferred; must be `accepted` (escalating proof tier to full) or evidence-backed `rejected`. |
+| `adaptation bounds` | Maximum 3 fix rounds per cell. Unresolved proof gaps force full proof gate before close. |
+| `human-escalation triggers` | Unresolvable spec ambiguity with divergent readings, identical failure across two distinct approaches, or unresolvable merge conflict. Batch questions, non-blocking. |
+| `close criteria` | All required operations settled, all rechecks clean, caveat-free, checkpoint identity tuple recorded. |
+| `after-close action` | Coding-cell policy: merge `--no-ff` into track branch, clean worktree, append row to `plan.md` cell-status table. |
+| `continuity artifact` | `plan.md` cell-status table and cell trace (`docs/architect/agent-coordination/verification/<track>/<cell>.md` or `plans/<track>/reports/`). |
+
+---
+
+## Step-by-Step Cell Operations
+
+### 0. Track Resume: `fgos coordination chain <track>`
+
+Query track progress cold with zero prior chat context:
 ```sh
 fgos coordination chain <track> --json
 ```
+Returns `{track, cells, activeCell, nextAction}`. If `activeCell` is active, resume it through steps 2–4. Otherwise, proceed to the lowest phase lacking a `merged` entry in `plan.md`.
+Session IDs use safe characters: letters, digits, hyphen, underscore (e.g. `cell-01`, never periods).
 
-Returns `{track, cells, activeCell, nextAction}` (`chain.mjs:116-157`):
-every session id starting with the exact `<track>--` prefix (and no
-further `--` in its own remainder, so a differently-prefixed track's
-session can never be misfiled under this one, `chain.mjs:41-53`) is
-rendered as one cell record (`cellId`, `status`, `phase`,
-`lastDisposition`, `pendingDriverAuthorizations`, `assignmentRefs`,
-`quorum`); `activeCell` names the most-recently-created still-`active`
-cell (or `null` if none has opened yet -- a legitimate state, not an
-error); `nextAction` is a plain-text hint built only from fields `show`
-already derives (never a new replay of its own, `chain.mjs:59-70`). A
-cell whose own session read failed renders with a `renderError` instead
-of aborting every other cell's render (`chain.mjs:78-114`).
+### 1. Open a Cell
 
-**Session-id charset gotcha** (a real gap this skill's own authoring
-surfaced, not theoretical): `coordinationId` must satisfy the safe
-filesystem charset -- letters, digits, underscore, hyphen only
-(`schema.mjs:29`, `schema.mjs:64-69`). This repo's own cell-trace-file
-naming (`P01.1.md`, `P03.1.md`) uses a **period**, which is *not* in that
-charset. Never reuse a period-containing trace-file name as the raw
-`<cellId>` suffix of a `coordinationId` you compose below -- pick a
-charset-safe cellId instead (e.g. `p01-1` or `cell-01`) even when the
-verification doc that tracks the same cell keeps its period-containing
-filename.
-
-## 1. Open a cell (`open.json`)
-
-1. **Create the worktree first, as a plain git operation, outside any
-   coordination request** -- no request field expresses worktree
-   creation; `--cwd` (below) just names a path that must already resolve
-   to a linked git worktree before you dispatch into it (Mutation Rule,
-   condition 3, below):
-
+1. **Setup Worktree:** Create an isolated worktree per [`../_shared/coding-cell-policy.md`](../_shared/coding-cell-policy.md):
    ```sh
    git worktree add ../<track>-<cell-id> -b <track>--<cell-id> <base-branch>
    ```
-
-   The full open / verify-before-every-dispatch / close procedure (branch
-   reuse without `-b`, `npm ci` in the worktree, the not-main-checkout and
-   right-branch checks, the doer-side branch guard) is the shared
-   [`../_shared/private-cell-worktree.md`](../_shared/private-cell-worktree.md)
-   with `<prefix>` = `<track>`; this skill does not restate it.
-
-2. **Compose `open.json`** dispatching the fixture's required first pass
-   -- `produce-candidate` (Doer, real mutating work) then
-   `review-candidate` + `red-team-candidate` (Reviewer/Red-Team, always
-   advisory-only for this fixture). Every field below is cited against
-   the real, current schema -- nothing here is copied from an earlier
-   design sketch without re-verification.
-
-   ```json
-   {
-     "kind": "declared-protocol",
-     "objective": "Implement cell-01's scoped requirement set and get independent review + red-team on the result.",
-     "writerId": "<lead-identity>",
-     "coordinationId": "<track>--cell-01",
-     "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
-     "actors": [
-       { "id": "doer", "executor": "gemini", "invocation": "agy-cli-mucdong", "tier": "standard", "persona": "meticulous-implementer", "fallbackExecutors": ["glm"] },
-       { "id": "reviewer", "executor": "gemini", "invocation": "agy-cli-mucdong", "tier": "flagship", "persona": "skeptical-reviewer", "fallbackExecutors": ["claude"] },
-       { "id": "red-team", "executor": "xai", "invocation": "pi-cli-vantt", "tier": "flagship", "persona": "adversarial-tester", "fallbackExecutors": ["openai"] }
-     ],
-     "steps": [
-       {
-         "type": "operation",
-         "as": "produce",
-         "operationId": "produce-candidate",
-         "targetActorId": "doer",
-         "taskKey": "produce-candidate-doer",
-         "objective": "Implement the current-cell contract. Source plan/artifact: plans/<track>/phase-01-<name>.md. Run exactly the Verification commands the phase file declares for this cell and report each command's real outcome. Do not run the track's full proof command unless plan.md marks this phase a full-suite gate or this objective says so explicitly.",
-         "expectedOutputs": ["agent-result.json (status, summary)"],
-         "mutation": "mutating"
-       },
-       {
-         "type": "operation",
-         "as": "review",
-         "operationId": "review-candidate",
-         "targetActorId": "reviewer",
-         "taskKey": "review-candidate-reviewer",
-         "objective": "Independently review the candidate produced from the current-cell contract. Judge proof sufficiency, not only correctness: if the declared verification does not exercise a contract this diff changes, report it as a finding (HIGH on a public or shared contract) naming the missing test or why a full-suite gate is needed. You cannot run or request the full suite; the Lead decides on your finding (accepting upgrades this cell only, or providing an evidence-backed rejection).",
-         "expectedOutputs": ["agent-result.json (status, summary)"],
-         "contextRefs": ["$ref:produce"]
-       },
-       {
-         "type": "operation",
-         "as": "redTeam",
-         "operationId": "red-team-candidate",
-         "targetActorId": "red-team",
-         "taskKey": "red-team-candidate-red-team",
-         "objective": "Attempt to falsify the candidate's success claims through named bug/invariant attacks. Judge proof sufficiency, not only correctness: if the declared verification does not exercise a contract this diff changes, report it as a finding (HIGH on a public or shared contract) naming the missing test or why a full-suite gate is needed. You cannot run or request the full suite; the Lead decides on your finding (accepting upgrades this cell only, or providing an evidence-backed rejection).",
-         "expectedOutputs": ["agent-result.json (status, summary)"],
-         "contextRefs": ["$ref:produce"]
-       }
-     ]
-   }
-   ```
-
-   Field-by-field grounding:
-   - `kind`/`objective`/`writerId`/`coordinationId`/`protocolRef`/`steps`/`actors`
-     — top-level allowlist, `schema.mjs:509-512` `TOP_LEVEL_ALLOWED_KEYS`;
-     `objective` non-empty <= 20000 chars (`schema.mjs:514,551-553`);
-     `writerId` required non-empty string, the trusted driver identity
-     every follow-up request on this `coordinationId` must match exactly
-     to resume rather than be refused (`schema.mjs:554-555`,
-     `docs/how-to/run-a-coordination-session.md:18-24`); `coordinationId`
-     safe-charset (`schema.mjs:557`, see the gotcha above);
-     `protocolRef` carries only `{id}` — no inline topology
-     (`schema.mjs:235-251`).
-   - `actors[]` — `{id, persona?, executor?, model?, tier?}` only, never
-     `role` (`schema.mjs:133,143-165` `ACTOR_ALLOWED_KEYS`/
-     `validateActorsShape`); every `id` must already be declared by the
-     protocol being used (`run.mjs:391-396`) — this fixture declares
-     exactly `doer`/`reviewer`/`red-team`/`fixer`
-     (`standalone-master-coordination-loop.yaml:49-57`).
-     **Per-actor executor/tier/persona diversity only takes effect when a
-     step names its actor explicitly via `targetActorId`** — `run.mjs`'s
-     own per-actor policy lookup (`actorPolicyFields`) only fires when a
-     step declares `targetActorId` (`run.mjs:432`); an `actors[]` entry
-     with no step naming it is accepted but silently inert. Every step in
-     this template sets `targetActorId` for exactly this reason.
-   - `operation` step — `{type, as, operationId, targetActorId?,
-     objective, expectedOutputs[], contextRefs?[], constraints?[],
-     capabilities?[], fromAssignmentId?, intent?, round?, taskKey?,
-     mutation?}` (`schema.mjs:253-295` `OPERATION_STEP_ALLOWED_KEYS`/
-     `validateOperationStep`); `expectedOutputs` required non-empty
-     (`schema.mjs:264-265`); `contextRefs[]` entries are either a
-     `$ref:<label>` placeholder resolving to an assignment dispatched
-     **earlier in this same call** (`schema.mjs:71-88`
-     `assertSafeRefOrId`) or a plain safe id — never a raw filesystem
-     path (`launch-master-loop.mjs:102,106,116` states the same
-     constraint for its own `produceObjective` text, which is why a real
-     plan-file pointer belongs in `objective`'s free text, not
-     `contextRefs`, exactly as this template does).
-   - `mutation: "mutating"` on `produce` — legal here specifically because
-     `produce-candidate` is the one first-pass operation this fixture
-     declares `result.kind: work-product` for
-     (`standalone-master-coordination-loop.yaml:85-91`); see the Mutation
-     Rule section below for all four conditions, including the `--cwd`
-     flag this JSON cannot express on its own.
-
-3. **Dispatch, pointed at the worktree you just created:**
-
+2. **Start Session:** Initialize the session via semantic command:
    ```sh
-   fgos coordination run --cwd ../<track>-<cell-id> --file open.json
+   fgos coordination start \
+     --kind declared-protocol \
+     --protocol core.coordination-protocol.standalone-master-coordination-loop \
+     --coordination-id "<track>--<cell-id>" \
+     --writer-id "<driver-id>" \
+     --objective "<cell objective from phase file>"
+   ```
+3. **Dispatch Initial Pass:**
+   Query `fgos coordination status <coordination-id>`. Dispatch initial operations:
+   - `produce-candidate`: mutating, passing `--cwd ../<track>-<cell-id>`
+   - `review-candidate` and `red-team-candidate`: read-only advisory operations
+   Execute each via `fgos coordination operation --id "<coordination-id>" --action-key "<actionKey>" ...`.
+
+### 2. Read Results and Disposition Findings
+
+Inspect session status:
+```sh
+fgos coordination status <coordination-id> --detail
+```
+Independently inspect worker commits and test outputs in the worktree.
+Record driver dispositions for each reported finding:
+```sh
+fgos coordination disposition \
+  --id "<coordination-id>" \
+  --action-key "<actionKey>" \
+  --writer-id "<driver-id>" \
+  --disposition "accepted" \
+  --rationale "Reviewer HIGH-1 accepted; scheduled for fix-1."
+```
+**Caveat Rule:** A finding with `sharedCwdCaveat` (`status: 'recheck-required'`, `verdict: 'non-attributable'`) is never valid sign-off evidence and blocks close. An uncaveated recheck is mandatory.
+
+### 3. Authorize and Dispatch Fix Rounds
+
+When findings are accepted, execute a fix round (capped at 3 per cell):
+```sh
+# Authorize and dispatch Fixer revision (mutating)
+fgos coordination authorize-and-dispatch \
+  --id "<coordination-id>" \
+  --action-key "<actionKey>" \
+  --writer-id "<driver-id>" \
+  --cwd "../<track>-<cell-id>" \
+  --reason "Apply accepted Reviewer HIGH-1 finding."
+
+# Authorize and dispatch Reviewer and Red-Team rechecks
+fgos coordination authorize-and-dispatch \
+  --id "<coordination-id>" \
+  --action-key "<actionKey>" \
+  --writer-id "<driver-id>" \
+  --reason "Recheck revised candidate."
+```
+
+### 4. Close a Cell
+
+1. **Verify Quorum and Prerequisites:** Confirm all required operations and rechecks are satisfied, no open proof gaps remain, and no node carries an active `sharedCwdCaveat` with `status: 'recheck-required'`.
+2. **Record Checkpoint Identity:** In the cell trace, record: `phase/cell id`, `command`, `baseline`, `testedSha`, `integratedSha`, `treeIdentical`, and `outcome`.
+3. **Execute Explicit Close:**
+   ```sh
+   fgos coordination close \
+     --id "<coordination-id>" \
+     --action-key "<actionKey>" \
+     --writer-id "<driver-id>" \
+     --reason "All review and red-team checks clean; tests match baseline."
+   ```
+4. **Post-Close Integration:** Outside the session, merge into the target branch and remove the worktree:
+   ```sh
+   git merge --no-ff <track>--<cell-id>
+   git worktree remove ../<track>-<cell-id>
    ```
 
-   `--cwd` is required for the mutating `produce` step to satisfy
-   Mutation Rule condition 3 (below) — it is a CLI flag, never a JSON
-   field (`schema.mjs`'s `TOP_LEVEL_ALLOWED_KEYS` has no `cwd`/`dir`
-   entry; `--cwd` is parsed by the CLI layer,
-   `command-registry.mjs:760`). Omitting `--cwd` here does not make the
-   request invalid — it makes the mutating dispatch **refused** by the
-   session engine's own Mutation Rule check, because the default `cwd`
-   resolves to the repo root, which for the Lead's own process is the
-   main checkout.
-
-## 2. Read results, disposition findings
-
-```sh
-fgos coordination show <coordinationId> --json
-```
-
-**WARNING (Architecture Invariant 7):** A caveated reviewer/red-team result (identified by a per-node `sharedCwdCaveat` field carrying `status: 'recheck-required'`, `verdict: 'non-attributable'`) must **NEVER** be treated as valid accept/reject/close evidence. `fgos coordination show` currently folds `recheck-required` nodes into its `dag.counts.settled` total, meaning the aggregate count alone is **NOT** a safe closure signal. The driver must inspect each node's own `sharedCwdCaveat` field in the JSON output, not just the counts, and force an explicit uncaveated recheck before making any disposition based on a caveated finding.
-
-Read-only, no mutation, no external effect
-(`docs/how-to/run-a-coordination-session.md:50-79`). Reports:
-`authorizations` issued and whether each is already consumed;
-`ignoredAuthorizations` (written after close, never authoritative);
-`dispositions` recorded so far, each marked `postTerminal`/
-`...OwnedBySession`; and — the field this skill's own loop depends on —
-`pendingDriverAuthorizations`, every declared `activation.mode:
-driver-authorized` operation with no matching authorization yet (`null`
-for an agent-led session).
-
-Map Reviewer/Red-Team findings from `review`/`redTeam`'s own
-`agent-result.json` content onto master-coordinator.md's own severity
-state machine (HIGH blocks close; MEDIUM needs a fix or an explicit,
-recorded deferral; LOW may become a follow-up, section E of the Master
-Prompt). Record the Lead's own accept/reject/defer decision per finding
-as a `disposition` step — same step type `close.json` uses to close the
-whole cell, differentiated only by `targetRef`/`disposition`/`rationale`:
-
-```json
-{
-  "type": "disposition",
-  "as": "dispositionReviewHigh1",
-  "targetRef": "<real assignment id from the show/run result above, e.g. asgn_...>",
-  "disposition": "accepted",
-  "rationale": "Reviewer HIGH-1 (missing negative test for X) accepted; routed to fix-1.json.",
-  "evidenceRefs": []
-}
-```
-
-`disposition` step fields — `{type, as, targetRef, disposition,
-rationale, evidenceRefs?[]}` (`schema.mjs:353-383`
-`DISPOSITION_STEP_ALLOWED_KEYS`/`validateDispositionStep`); `disposition`
-is a free-form string up to 200 chars, deliberately not a closed
-vocabulary (`schema.mjs:364-369`) — `"accepted"` / `"rejected"` /
-`"deferred"` per finding, `"cell-closed"` to close the whole cell
-(section 4). **`targetRef` here cannot be a `$ref:` placeholder** if the
-finding came from an earlier, separate `fgos coordination run` call (as
-it will for any disposition step in `fix-N.json`/`close.json`, both
-separate calls from `open.json`) — `$ref:<label>` only resolves within
-the SAME call that declared the labelled step
-(`schema.mjs:71-76,79-86`). Use the real `asgn_...`-shaped assignment id
-captured from `open.json`'s own printed result or from `show`'s own
-output instead; that id already satisfies the same safe-charset check
-(`schema.mjs:64-69`) a plain id needs. A `disposition`/`authorize` step
-can never carry a second `authorizedBy`/`linkedBy` identity — driver
-provenance is pinned to the session's own top-level `writerId`
-(`schema.mjs:313-317,452-456`).
-
-## 3. Authorize + dispatch a fix round (`fix-N.json`)
-
-Every position past the required first pass —
-`revise-candidate` (Fixer), `reviewer-recheck`, `red-team-recheck` — is
-`activation.mode: driver-authorized`
-(`standalone-master-coordination-loop.yaml:106-159`): none of them can
-materialize an Assignment without a matching `authorize` step issued by
-this same request's own driver identity first. One fix round therefore
-pairs an `authorize` + `operation` step per position it needs, all
-resuming the SAME `coordinationId`:
-
-```json
-{
-  "kind": "declared-protocol",
-  "objective": "Fix round 1: apply the accepted Reviewer/Red-Team findings and get an independent recheck.",
-  "writerId": "<lead-identity>",
-  "coordinationId": "<track>--cell-01",
-  "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
-  "actors": [
-    { "id": "fixer", "executor": "gemini", "invocation": "agy-cli-mucdong", "tier": "standard", "persona": "pragmatic-fixer", "fallbackExecutors": ["glm"] },
-    { "id": "reviewer", "executor": "gemini", "invocation": "agy-cli-mucdong", "tier": "flagship", "persona": "detail-oriented-rechecker", "fallbackExecutors": ["claude"] },
-    { "id": "red-team", "executor": "xai", "invocation": "pi-cli-vantt", "tier": "flagship", "persona": "relentless-attacker", "fallbackExecutors": ["openai"] }
-  ],
-  "steps": [
-    {
-      "type": "authorize",
-      "as": "authRevise",
-      "operationId": "revise-candidate",
-      "targetActorId": "fixer",
-      "authorizationId": "auth_cell01_fix1_revise",
-      "invocationKey": "cell01:fix1:revise:1",
-      "reason": "Reviewer HIGH-1 accepted (dispositioned above); apply the fix."
-    },
-    {
-      "type": "operation",
-      "as": "revise",
-      "operationId": "revise-candidate",
-      "targetActorId": "fixer",
-      "taskKey": "revise-candidate-fixer",
-      "objective": "Apply the accepted findings from Reviewer HIGH-1 and Red-Team (if any accepted). Run exactly the Verification commands the phase file declares for this cell and report each command's real outcome. Do not run the track's full proof command unless plan.md marks this phase a full-suite gate or this objective says so explicitly.",
-      "expectedOutputs": ["agent-result.json (status, summary)"],
-      "mutation": "mutating"
-    },
-    {
-      "type": "authorize",
-      "as": "authReviewRecheck",
-      "operationId": "reviewer-recheck",
-      "targetActorId": "reviewer",
-      "authorizationId": "auth_cell01_fix1_reviewer_recheck",
-      "invocationKey": "cell01:fix1:reviewer-recheck:1",
-      "reason": "Revision landed; recheck against the original HIGH-1 finding.",
-      "grantedContextRefs": ["$ref:revise"]
-    },
-    {
-      "type": "operation",
-      "as": "reviewRecheck",
-      "operationId": "reviewer-recheck",
-      "targetActorId": "reviewer",
-      "taskKey": "reviewer-recheck-reviewer",
-      "objective": "Recheck the revised candidate against the accepted findings. Judge proof sufficiency, not only correctness: if the declared verification does not exercise a contract this diff changes, report it as a finding (HIGH on a public or shared contract) naming the missing test or why a full-suite gate is needed. You cannot run or request the full suite; the Lead decides on your finding (accepting upgrades this cell only, or providing an evidence-backed rejection).",
-      "expectedOutputs": ["agent-result.json (status, summary)"],
-      "contextRefs": ["$ref:revise"]
-    },
-    {
-      "type": "authorize",
-      "as": "authRedTeamRecheck",
-      "operationId": "red-team-recheck",
-      "targetActorId": "red-team",
-      "authorizationId": "auth_cell01_fix1_red_team_recheck",
-      "invocationKey": "cell01:fix1:red-team-recheck:1",
-      "reason": "Revision landed; recheck for the same class of attack that found HIGH-1.",
-      "grantedContextRefs": ["$ref:revise"]
-    },
-    {
-      "type": "operation",
-      "as": "redTeamRecheck",
-      "operationId": "red-team-recheck",
-      "targetActorId": "red-team",
-      "taskKey": "red-team-recheck-red-team",
-      "objective": "Recheck the revised candidate; re-attempt any attack that previously succeeded. Judge proof sufficiency, not only correctness: if the declared verification does not exercise a contract this diff changes, report it as a finding (HIGH on a public or shared contract) naming the missing test or why a full-suite gate is needed. You cannot run or request the full suite; the Lead decides on your finding (accepting upgrades this cell only, or providing an evidence-backed rejection).",
-      "expectedOutputs": ["agent-result.json (status, summary)"],
-      "contextRefs": ["$ref:revise"]
-    }
-  ]
-}
-```
-
-Field-by-field grounding for `authorize` — `{type, as, operationId,
-targetActorId?, nodeId?, authorizationId, invocationKey, reason,
-grantedContextRefs?[], targetArtifactRef?, mutation?}`
-(`schema.mjs:297-351` `AUTHORIZE_STEP_ALLOWED_KEYS`/
-`validateAuthorizeStep`); `authorizationId` safe-charset, concatenated
-verbatim into the driver-authorized dispatch's own default `taskKey`
-(`schema.mjs:326-329`); `invocationKey` required, <= 512 chars
-(`schema.mjs:302,330-332`); `reason` required, <= 20000 chars
-(`schema.mjs:303,333-335`). **`grantedContextRefs` must list every ref the
-paired `operation` step's own `contextRefs` names** (both examples above
-grant `["$ref:revise"]` because `reviewRecheck`/`redTeamRecheck` each read
-`contextRefs: ["$ref:revise"]`) -- a driver-authorized worker may read
-only the refs its own authorization explicitly grants, plus its always-legal
-base context (`dispatchDeclaredOperation`'s own `contextRefs`-vs-
-`grantedContextRefs` check, session-engine.mjs); an authorize step that
-omits it (`grantedContextRefs: []` by default) makes the very next
-`operation` step's `contextRefs` refusal-guaranteed, not merely optional.
-**An `authorize` step's own `mutation` field
-stays hard-refused for anything but `"read-only"`** — only a declared
-`operation` step may set `"mutating"`
-(`schema.mjs:122-131,319-322` `assertMutationAllowed` called without
-`allowMutating: true` for the `authorize` path) — omit `mutation`
-entirely on every `authorize` step above, as this template does.
-
-Dispatch the same way as `open.json`, still pointed at the SAME cell
-worktree (`revise-candidate` is the one recheck-round operation declaring
-`result.kind: work-product`,
-`standalone-master-coordination-loop.yaml:106-112`, so it is the one that
-needs `--cwd`):
-
-```sh
-fgos coordination run --cwd ../<track>-<cell-id> --file fix-1.json
-```
-
-A follow-up `fix-2.json`, `fix-3.json`, ... repeats this same shape with
-new `authorizationId`/`invocationKey` values (each `invocationKey` must
-be unique per authorization to avoid a duplicate-authorization refusal)
-if a recheck itself surfaces a new accepted finding.
-
-## 4. Close a cell (`close.json`)
-
-**WARNING (Architecture Invariant 7):** A caveated reviewer/red-team result (identified by a per-node `sharedCwdCaveat` field carrying `status: 'recheck-required'`, `verdict: 'non-attributable'`) must **NEVER** be treated as valid accept/reject/close evidence. `fgos coordination show` currently folds `recheck-required` nodes into its `dag.counts.settled` total, meaning the aggregate count alone is **NOT** a safe closure signal. The driver must inspect each node's own `sharedCwdCaveat` field in the JSON output, not just the counts, and force an explicit uncaveated recheck before making any disposition based on a caveated finding. **Never issue `cell-closed` while any node carries a `sharedCwdCaveat` with `status: 'recheck-required'`.** A driver reading only this close template, without having read section 2 first, is still bound by that caveat-blocks-close rule.
-
-A `disposition` step with `disposition: "cell-closed"` is the whole
-mechanism — there is no separate "close" step or door.
-`runCoordinationUseCase` always attempts `closeSessionByQuorum` as its
-own last, automatic step after every declared step in a request finishes
-dispatching (documented behavior this skill relies on, never
-reimplements — see the `fgos-group-thinking` skill's own "The gate, and
-why it holds" section for the same claim proven against a sibling
-protocol pack).
-
-**A first-pass finding is discharged only by disposition + a satisfied
-recheck, never by disposition alone.** `review-candidate`/
-`red-team-candidate` reporting `findings` fails that gating slot in
-`closeSessionByQuorum`'s quorum check; `reviewer-recheck`/
-`red-team-recheck` each declare `rechecks: review-candidate` /
-`rechecks: red-team-candidate` (`standalone-master-coordination-loop.yaml`)
-so a LATER, satisfied recheck of the same actor can discharge that slot —
-but only once the Lead has recorded a `driver-disposition-recorded` event
-against the specific failed assignment (any `disposition` step targeting
-it, any value — the disposition's own text is never parsed). A `rejected`
-finding still needs its own recheck: the independent confirmation, not the
-disposition, is what actually closes the gap. Do not hand-close a cell by
-skipping the recheck round once a finding is accepted — `close.json` will
-refuse with `missing required actor(s)` until a real, satisfied recheck
-Assignment exists for the failed slot.
-
-**Precedence & compatibility.** A phase file's own `## Verification` and
-plan.md's Product Gates govern over this skill's generic defaults; a
-mechanical isolation-breaking diff and a Lead-accepted escalation finding
-both override targeted mode for the current cell regardless of what the
-Product Gates marker says. A track that predates this rule, with no
-baseline or checkpoint block, stays fully compatible — nothing here
-forces a retroactive schema migration.
-
-**Durable evidence schema.** A cell's proof passes through three
-distinct, non-collapsible states:
-
-1. `coordination-accepted` — this cell's coordination loop reached
-   quorum and the cell-declared verification passed on the cell worktree
-   at `testedSha`.
-2. `merged-to-track` — the cell branch was integrated into the track
-   branch, producing `integratedSha`.
-3. `checkpoint-verified` — the gate's full proof command executed
-   against `integratedSha`, was compared against the recorded baseline,
-   every new failure was triaged, and it passed.
-
-**Non-inference rule.** If `testedSha != integratedSha`,
-`checkpoint-verified` can never be inferred from the pre-merge proof
-recorded at `coordination-accepted` — gate proof must execute against
-`integratedSha` itself before the checkpoint is certified. **The one
-documented exception: tree identity, AND ONLY WITH a matching environment
-fingerprint.** `git diff <testedSha> <integratedSha> -- .` empty (the
-normal case for a `--no-ff` merge with no conflicts — its SHA always
-differs from the cell tip even when nothing else changed) proves the two
-commits share a *tracked-content* tree; it proves nothing about the
-runtime/toolchain, lockfile, or a built prerequisite the proof command
-itself depends on, none of which git tracks. Both must hold: an empty
-tree diff **and** an unchanged environment fingerprint (minimum: runtime/
-toolchain version(s) + lockfile hash + any built prerequisite the command
-depends on — the same fingerprint code-panel's own tree-identity rule
-requires). Record BOTH shas, the empty-diff confirmation, and the
-fingerprint match as `treeIdentical: true`; a non-empty diff OR a changed
-fingerprint always forces the real re-run — there is no shortcut for
-either kind of drift.
-
-**Known limit (not enforced by the engine).** This rule, `Escalation
-authority & scope` below, and `Close rule` below are Lead discipline in
-prose — the coordination-session schema/engine has no field for
-`treeIdentical`, a proof tier, or a fix-round cap, and accepts any
-non-empty disposition rationale regardless of what it claims. A Lead who
-does not actually follow this section can record `checkpoint-verified`
-without having checked either condition, and nothing here catches that.
-Building a validator/schema for it is deliberately deferred (ADR-007 §4:
-a second real consumer needed first) — this note exists so that limit is
-stated, not silently assumed away.
-
-**Escalation authority & scope.** The Lead evaluates every
-Reviewer/Red-Team proof-gap finding. The Lead may `accepted` it —
-upgrading the current cell's proof requirement to
-`Proof: escalated-to-full` — or provide an evidence-backed `rejected`.
-An accepted escalation upgrades the proof requirement for **the current
-cell only**; it does not by itself create a permanent Product Gate in
-plan.md for future cells.
-
-**Checkpoint identity.** Before `close.json`, record in the cell trace:
-`phase/cell id`, `command`, `baseline`, `testedSha`, `integratedSha`,
-`treeIdentical` (true only when the non-inference rule's tree-identity
-exception applied instead of a real re-run at `integratedSha`), and
-`outcome`.
-
-**Close rule.** Close with `Proof: targeted` only when no accepted
-coverage-gap finding is open and the diff touches none of the
-isolation-breaking paths. Otherwise the cell is a full-suite gate: run
-the track's full proof command, compare against the recorded baseline,
-triage every new failure as patch-related / environmental-transient /
-environmental-precondition / pre-existing (the how-to's Execution Inputs
-section defines each bucket), verify `integratedSha` itself when it
-differs from `testedSha` unless the tree-identity exception above applies
-(non-inference rule above), and record
-`Proof: full-suite-gate | escalated-to-full` with the complete checkpoint
-identity tuple in the trace — all before `close.json`.
-
-Close only once every required first-pass step **and** every fix round
-this cell needed have already dispatched cleanly and the checkpoint
-identity above is recorded (master-coordinator.md section H, `CLOSE
-CELL`):
-
-```json
-{
-  "kind": "declared-protocol",
-  "objective": "Close cell-01: independent review + red-team both clean after fix-1, tests pass against baseline.",
-  "writerId": "<lead-identity>",
-  "coordinationId": "<track>--cell-01",
-  "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
-  "actors": [
-    { "id": "doer", "executor": "gemini", "invocation": "agy-cli-mucdong", "tier": "standard", "persona": "delivery-focused-closer", "fallbackExecutors": ["glm"] },
-    { "id": "reviewer", "executor": "gemini", "invocation": "agy-cli-mucdong", "tier": "flagship", "persona": "final-sign-off-reviewer", "fallbackExecutors": ["claude"] },
-    { "id": "red-team", "executor": "xai", "invocation": "pi-cli-vantt", "tier": "flagship", "persona": "closing-adversary", "fallbackExecutors": ["openai"] }
-  ],
-  "steps": [
-    {
-      "type": "disposition",
-      "as": "closeCell",
-      "targetRef": "<real assignment id of the final, accepted revise/recheck dispatch>",
-      "disposition": "cell-closed",
-      "rationale": "Reviewer + Red-Team recheck both clean post-fix-1; tests match the recorded baseline; commit <hash> lands on <track>--cell-01.",
-      "evidenceRefs": ["<real assignment id of reviewRecheck>", "<real assignment id of redTeamRecheck>"]
-    }
-  ]
-}
-```
-
-`actors[]` is declared here too even though this cell's own single
-`disposition` step targets no actor directly (a `disposition` step never
-carries `targetActorId` — `schema.mjs:353-355`) — kept visible so the
-full per-actor roster this cell dispatched across stays legible in the
-request that closes it out, matching R3's own always-shown, never-buried
-requirement; it is inert for this particular call (no step looks it up)
-but not rejected (`schema.mjs:143-165` places no requirement that every
-declared actor be referenced by a step in the SAME call).
-
-```sh
-fgos coordination run --cwd ../<track>-<cell-id> --file close.json
-```
-
-Then, **outside this skill and outside the coordination session
-entirely** — the Lead's own git operation, never a coordination request:
-
-```sh
-git -C <main checkout> merge --no-ff <track>--<cell-id>   # or the Lead's own equivalent merge policy
-git worktree remove ../<track>-<cell-id>
-```
-
-## The four-condition Mutation Rule, stated plainly
-
-Full, final, post-4-fix-round description:
-[`coordination-session.md`'s own "Mutation Rule" section](../../../docs/architect/agent-coordination/contracts/coordination-session.md)
-(lines 872-938) — read that section for the authoritative text; this is
-a plain restatement so a Lead knows exactly what a declared `operation`
-step must satisfy before `mutation: "mutating"` is legal, never a
-paraphrase that could drift from it:
-
-Every dispatch door defaults to read-only. A declared `operation` step
-(never `authorize`/`disposition`/`fan-out`/`contribution`, which stay
-hard-refused for anything but `"read-only"` at the schema boundary) may
-set `mutation: "mutating"` only when **all four** hold, checked before
-any Assignment is materialized, refused by name otherwise:
-
-1. **Declared on an `operation` step.** Schema-level: `schema.mjs:253-295`.
-2. **The bound operation declares `result.kind: "work-product"`**, read
-   from the FlowDefinition at dispatch time, never trusted from the
-   request. `produce-candidate` and `revise-candidate` both declare this
-   in `standalone-master-coordination-loop.yaml`; `review-candidate`,
-   `red-team-candidate`, `reviewer-recheck`, `red-team-recheck` all
-   declare `result.kind: "advisory"` and can never be dispatched
-   mutating regardless of what the request asks for.
-3. **`cwd` resolves to a linked git worktree, never the main checkout**
-   — exact comparison `resolveMainCheckoutRoot(cwd) ===
-   resolveRepoRoot(cwd)` refuses; a `cwd` outside any git checkout also
-   refuses (fail closed). This is why every mutating dispatch above
-   passes `--cwd ../<track>-<cell-id>` explicitly — the request JSON has
-   no field for this at all.
-4. **The inline execution contract carries the engine's own reserved
-   `protocol-operation:` provenance stamp**, minted only by
-   `dispatchDeclaredOperation` itself — a hand-crafted inline contract
-   claiming `mutation: "mutating"` without it is refused independently by
-   `execution-contract.mjs`/`assignment-normalizer.mjs`, so the
-   schema/normalizer layer alone is not sufficient on its own.
-
-And the layer that actually enforces this at execution time, one level
-below the four conditions above: **the caller must explicitly assert
-`isReadOnlyMode: false`** — an omitted or truthy flag is refused, never
-treated as permission
-(`assignment-runner.mjs:516-521,542-549`
-`assertInlineMutatingAssignmentAuthorized`). `runExecutorAttempt`
-(`session-engine.mjs`) is the only code path allowed to pass
-`isReadOnlyMode: false` into `executeAssignment`, and it derives that
-flag from the Assignment's own already-stamped `mutation` field, never a
-second, independently-decided boolean
-(`coordination-session.md:917-924`). A step that omits `mutation`
-entirely behaves byte-identically to every request that predates this
-rule — read-only, `isReadOnlyMode: true` — and a reviewer/red-team/recheck
-dispatch that mutates a file regardless still fails closed at the
-pre-existing read-only-violation gate, unaffected by any of the above.
+---
 
 ## 5. Unattended track mode: run every cell to the end
 
-Sections 0-4 drive ONE cell. When a person hands a whole track over and
-walks away ("run the track to the end"), the Lead loops them under the
-policy below, reading state only from `chain` and the track's own
-`plan.md` — never from chat history — so re-running the same instruction
-resumes wherever the previous session stopped.
+When executing a full multi-cell track unattended:
 
-0. **Baseline, once, before the loop below ever runs.** Run the track's
-   full proof command once and record the outcome in `plan.md`'s
-   Execution Inputs: command, date, commit, and the exact names of
-   already-failing tests as known baseline failures (see
-   [`docs/how-to/author-a-plan-loop-track.md`](../../../docs/how-to/author-a-plan-loop-track.md)
-   Execution Inputs section for the exact block shape). Every later gate's
-   full-proof run, at any phase, is compared against this recorded
-   baseline; the list of known failures may only shrink, never grow.
-
-Loop, until the last phase in `plan.md`'s Product Gates carries a
-`merged` row in its cell-status table:
-
-1. `fgos coordination chain <track> --json`. An `activeCell` that is not
-   closed is resumed through sections 2-4, never bypassed by opening a new
-   one. Otherwise the next cell is the lowest phase with no `merged` row.
-2. Commit anything pending on the track branch, create the cell worktree,
-   compose `open.json` from the phase file (section 1). A phase whose
-   capability is review-only (`code:review`) has no `produce-candidate`:
-   the Lead writes the artifact into the plan's `reports/` directory and
-   dispatches review + red-team against it.
-3. After every produce/revise step, verify the commit and run the phase's
-   focused test in the worktree yourself before reading `show`.
-4. Disposition every finding: `accepted` when its evidence holds, `rejected`
-   when the Lead can prove it wrong, `deferred` only when it is outside the
-   cell's scope and the rationale says so. **A proof-gap finding (Reviewer/
-   Red-Team judging the declared verification insufficient) never gets
-   `deferred` — section 4's Escalation authority admits only `accepted`
-   (upgrading to `Proof: escalated-to-full`) or an evidence-backed
-   `rejected`.** Any `accepted` finding opens a fix round (section 3). Cap:
-   three fix rounds per cell; past that, close remaining non-proof-gap
-   findings as `deferred` and named in the trace. If a proof-gap finding
-   was `accepted` and the fix rounds did not resolve it before the cap,
-   the cell still closes, but only after running the full proof command
-   and recording `Proof: escalated-to-full` (never `targeted`, and never
-   left as a silent `deferred` in the trace).
-5. Close (section 4): confirm the checkpoint identity (`phase/cell id`,
-   `command`, `baseline`, `testedSha`, `integratedSha`, `treeIdentical`,
-   `outcome`) is recorded in the cell trace under
-   `docs/architect/agent-coordination/verification/<track>/<cell>.md`,
-   merge `git merge --no-ff <track>--<cell-id>` into the track branch
-   (producing `integratedSha`), drop the worktree, and append one row to
-   `plan.md`'s cell-status table: cell, merge commit, review/red-team
-   verdicts, deferred findings. Phases the plan marks as full-suite gates
-   (or a mechanical isolation-breaking trigger, or a Lead-accepted
-   escalation finding (section 4)) run the full proof command
-   in the cell worktree before the merge, compared against the recorded
-   baseline; when `testedSha != integratedSha`, re-run the gate's full
-   proof command against `integratedSha` itself before recording
-   `checkpoint-verified` — unless `git diff testedSha integratedSha -- .`
-   is empty AND the environment fingerprint is unchanged, in which case
-   record `treeIdentical: true` and certify from the pre-merge run (the
-   non-inference rule's one documented exception, section 4) — never
-   inferred when either the diff is non-empty or the fingerprint moved.
-6. Back to step 1. When the loop ends, write
-   `<plan dir>/reports/track-closeout.md`: every cell's merge commit, every
-   deferred finding, and the exact commands that reproduce the evidence.
-
-Stop and ask a person only for: a product decision the spec leaves open
-where two readings produce different code; the same failure twice after
-the approach was changed; a merge conflict the Lead cannot resolve. Batch
-every open question into one message and keep working on whatever does
-not depend on the answer (product priority #2, `AGENTS.md`).
-
-The roster (`actors[]`) is track state, not skill prose: `plan.md`'s
-Execution Inputs names the executors and tiers, and every request in the
-track repeats it verbatim. Model resolution stays tier x executor
-`rigorOverrides` — `actors[].model` has no channel for declared-protocol
-requests.
+0. **Baseline:** Run the track full proof command once before cell work begins. Record baseline failures in `plan.md` Execution Inputs. Known failures may shrink, never grow.
+1. **Track Iteration:** Loop until every phase in `plan.md` is marked `merged`:
+   - Query `fgos coordination chain <track> --json`. If `activeCell` is open, resume it. Else select the lowest unmerged phase.
+   - Set up cell worktree per coding-cell policy.
+   - Start session and dispatch initial operations (`produce`, `review`, `red-team`).
+   - Independently verify doer commit and execute phase focused test in the worktree.
+   - Read status and disposition findings. Authorize fix rounds as needed (cap: 3).
+   - Once rechecks pass cleanly, execute explicit close via `fgos coordination close`.
+   - Merge cell branch into track branch (`git merge --no-ff`), drop worktree, and record row in `plan.md` cell-status table.
+   - If `testedSha !== integratedSha`, verify gate proof on `integratedSha` unless `treeIdentical: true` applies.
+2. **Track Completion:** Write `<plan dir>/reports/track-closeout.md` summarizing all merged cells, commits, and verified evidence.

@@ -1,6 +1,6 @@
 # Coordination Skill and Harness Simplification
 
-Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 verified at `main@1ca4023c` (REV-15 fix `60132825`; post-merge baseline verified at `main@f63f7e7d`); Unit I07 integrated at `main@261ed7ea`; Unit I08b integrated at `main@ba8f6a9d`; Unit I10 integrated and verified at `main@605d26fe` (carried through `main@26a1038e` and `main@ac19f6d1`); Unit I08 VERIFIED at `main@ac19f6d1` (RV-01/RV-02 remediation candidate `132d3777` + `ac19f6d1` integrated; acceptance gate verified: full suite 7647 pass exit 0, 10/10 isolated coord, 10/10 isolated dispatch, 60/60 parallel load pass; timing instability recorded as LOW debt); Unit I11 VERIFIED at `main@7d7dc2750f9fb80716a7cffae03d67605629cf9a` (candidate code `9cf843b6`, approved tip `3a67a1b9`, synchronized merge `3d706b89`; post-merge verification satisfied: 155/155 focused rerun pass, full suite 7652 pass exit 0; candidate regressions = 0); Unit I12 VERIFIED/integrated at `main@c782a08dfcae89279dcb1ca9fb59aa73fb58c515`; Unit I13 VERIFIED/integrated at `main@dc05f7586b78483d569bc25b929b988dc56a374c`; Unit I14 VERIFIED/integrated at `main@3cb80c91c` (candidate `f857eaeab`; review APPROVE at `7d01a12e2`; remediation `c03a959c7`; focused matrix 210 pass / 0 fail, full suite 7684 pass / 0 fail; Phase 4 entry gate satisfied)
+Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 verified at `main@1ca4023c` (REV-15 fix `60132825`; post-merge baseline verified at `main@f63f7e7d`); Unit I07 integrated at `main@261ed7ea`; Unit I08b integrated at `main@ba8f6a9d`; Unit I10 integrated and verified at `main@605d26fe` (carried through `main@26a1038e` and `main@ac19f6d1`); Unit I08 VERIFIED at `main@ac19f6d1` (RV-01/RV-02 remediation candidate `132d3777` + `ac19f6d1` integrated; acceptance gate verified: full suite 7647 pass exit 0, 10/10 isolated coord, 10/10 isolated dispatch, 60/60 parallel load pass; timing instability recorded as LOW debt); Unit I11 VERIFIED at `main@7d7dc2750f9fb80716a7cffae03d67605629cf9a` (candidate code `9cf843b6`, approved tip `3a67a1b9`, synchronized merge `3d706b89`; post-merge verification satisfied: 155/155 focused rerun pass, full suite 7652 pass exit 0; candidate regressions = 0); Unit I12 VERIFIED/integrated at `main@c782a08dfcae89279dcb1ca9fb59aa73fb58c515`; Unit I13 VERIFIED/integrated at `main@dc05f7586b78483d569bc25b929b988dc56a374c`; Unit I14 VERIFIED/integrated at `main@3cb80c91c` (candidate `f857eaeab`; review APPROVE at `7d01a12e2`; remediation `c03a959c7`; focused matrix 210 pass / 0 fail, full suite 7684 pass / 0 fail; Phase 4 entry gate satisfied); Unit I15 (Phase 4) implemented and verified on branch `coordination-skill-harness-phase4-driver-discipline` (dedicated suite 8 pass / 0 fail, focused matrix 166 pass / 0 fail, full suite 7691 pass / 0 fail; Phase 5 ready)
 Created: 2026-09-19
 Last Updated: 2026-09-26
 Mode: high-risk
@@ -750,6 +750,12 @@ unless the request carries an explicit close. The driver discipline states
 "explicit close is the sole close action" with no exception (owner decision
 2026-09-26).
 
+### Gates
+
+- **Satisfied (Entry):** Unit I14 integrated at `main@3cb80c91c` (plan/status commit `6bad420a0`).
+- **Satisfied (Unit I15):** Implemented canonical driver discipline fragment `core/skills/_shared/coordination-driver.md` with zero coding/track vocabulary; implemented coding-cell policy fragment `domains/coding/skills/_shared/coding-cell-policy.md` reusable for a single cell without plan/track; rewrote `fgos-plan-loop` to 1,171 words (within 1,500-word ceiling, ~68% instruction size reduction); synced mirrors byte-identically via `npm run build:skills`; verified 8/8 dedicated Phase 4 tests and 166/166 focused matrix tests pass.
+
+
 ### Work
 
 1. Author one driver-discipline fragment, canonical under
@@ -1116,12 +1122,35 @@ Executor/provider/model/tier selection remains an execution-time decision.
     implicit close.
   stop: legacy session replay changes, or any consumer depends on implicit DAG
     close without an explicit-close replacement
+- unit: I15 — extract shared driver discipline and prove on plan-loop
+  capability: code:implement
+  depends-on: I14
+  status: implemented / verified
+  branch: `coordination-skill-harness-phase4-driver-discipline`
+  worktree: `/home/vantt/projects/forgentX/.claude/worktrees/coordination-skill-harness-phase4-driver-discipline`
+  base-sha: `2085d88fea9b6aae2b629b3cd4fcd4eec397fcbb`
+  scope: Create canonical domain-neutral driver discipline fragment `core/skills/_shared/coordination-driver.md`
+    (0 coding/track vocabulary: `git`, `worktree`, `merge`, `npm test`, `phase`, `plan.md` absent);
+    create coding-domain cell policy fragment `domains/coding/skills/_shared/coding-cell-policy.md`
+    (worktree isolation, proof tiers, independent verification, post-close merge/cleanup, tested/integrated identity,
+    reusable for single cell with no plan); rewrite `core/skills/fgos-plan-loop/SKILL.md` into track sequencing
+    over semantic coordination commands (`start`, `status`, `operation`, `authorize-and-dispatch`, `disposition`, `close`, `chain`),
+    removing raw request JSON, manual ID generation, and copied kernel rules; synchronize generated projections byte-identically;
+    maintain explicit-close invariants; verify zero regressions.
+  verification: 8/8 dedicated regression/contract tests pass (`test/skills/coordination-phase4-driver-discipline.test.mjs`);
+    166 pass across 8 focused suites (3 DAG driver skill contract, 51 schema, 35 replay, 47 store, 16 chain, 6 legacy schema, 8 phase 4 driver discipline);
+    full repository suite (`npm test`): 7691 pass, 0 fail, 8 skip, 65 todo; git diff --check clean (0 errors/warnings).
+  word-budget: `fgos-plan-loop` at 1,171 words (down ~68% from ~3,700 words; strictly within 1,500-word ceiling and 800–1,200 target).
+  report: plans/260919-coordination-skill-harness-simplification/reports/phase-04-driver-discipline-implementation-report.md
+  stop: Phase 4 requires changing CoordinationSession legality/kernel authority, any close behavior regresses from explicit-close,
+    plan-loop needs a new persisted ledger, driver discipline needs coding/track vocabulary, skill projections cannot be rebuilt cleanly,
+    or full suite regresses.
 
 Parallelism is limited deliberately:
 
 ```text
 I00 -> I01 -> I02 -> I03 -------------------------------+
-          +-> I04 -> I05 -------------------------------+--> I11 -> I12 -> I13 -> I14 -> Phase 4
+          +-> I04 -> I05 -------------------------------+--> I11 -> I12 -> I13 -> I14 -> I15 (Phase 4) -> Phase 5
           +-> I06 -----+                                |
           +-> I07 -----+-> I08 -------------------------+
                        I02 + I04 + I06 -> I09 -> I10 ----+

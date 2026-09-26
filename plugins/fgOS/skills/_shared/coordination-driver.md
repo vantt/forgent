@@ -1,0 +1,111 @@
+# Shared Fragment: Coordination Driver Discipline
+
+This shared doctrine defines the domain-neutral operational loop for coordinating multi-agent sessions across the fgOS runtime. It establishes the driver discipline for observing session state, selecting legal control plane actions, verifying evidence, and performing explicit session termination without embedding domain-specific mechanics.
+
+Every coordination facade loads this fragment and supplies concrete values for the hook slots defined below.
+
+---
+
+## 1. The Generic Driver Cycle
+
+A driver executes a deterministic, evidence-grounded control loop over one or more iterations:
+
+```text
+observe(status)
+  -> choose one legal action
+  -> dispatch
+  -> verify evidence
+  -> disposition
+  -> adapt (revise / recheck / retry / ask human)
+  -> explicit close or continue
+  -> continuity artifact
+```
+
+### Step 1: Observe (`status`)
+
+Derive active session state strictly from the runtime's authoritative inspection doors:
+- Query status: `fgos coordination status <coordinationId> [--detail]`
+- Reconstruct context from the persistent session record and the designated continuity artifact.
+- Never guess state from unrecorded conversational narration, private agent memory, or expired assumptions. A fresh driver process must be able to resume cold with zero prior chat context using only the session status and continuity artifact.
+
+### Step 2: Choose One Legal Action
+
+The control plane derives legal options directly from the immutable protocol definition and the append-only event log, surfaced via `coordination-actions.v1`:
+- Inspect projected legal actions in `status.actions[]`. Each action provides an `actionKey`, action `kind`, `target`, and `requiredInputs`.
+- The driver selects exactly **one** legal action to perform next based on facade objectives.
+- Never dispatch an action that is not currently projected as legal or whose preconditions are unsatisfied.
+
+### Step 3: Dispatch
+
+Execute the chosen action using the corresponding semantic CLI command:
+- `fgos coordination operation` — for initial or required operation execution.
+- `fgos coordination authorize-and-dispatch` — for optional, driver-authorized operations.
+- `fgos coordination fan-out` — for concurrent read-only branch execution.
+- `fgos coordination contribution` — for multi-party deliberation contributions.
+- `fgos coordination human-turn` — for attributing external input to a person.
+- `fgos coordination disposition` — for recording an explicit evaluation of an outcome.
+- `fgos coordination close` — for explicit termination.
+
+Every mutating or state-advancing command requires the active `actionKey` and the trusted driver identity (`writerId`).
+
+### Step 4: Verify Evidence
+
+Before accepting any worker contribution or finding, independently inspect the declared output artifact(s):
+- The driver must directly verify the existence, format, and substantive correctness of the produced artifact.
+- Never rely on worker self-narration, conversational claims, or ungrounded status summaries.
+- **Caveat Rule:** A result carrying a caveat (such as non-attributable execution or a recheck-required flag) must **never** be treated as valid acceptance or sign-off evidence. Caveats block session completion and require an uncaveated re-execution.
+
+### Step 5: Disposition
+
+When an inspection or advisory operation reports findings, the driver must record an explicit disposition for each finding:
+- `accepted`: The finding is valid and requires corrective action or revision.
+- `rejected`: The finding is demonstrated to be invalid or inapplicable, backed by recorded rationale.
+- `deferred`: The finding is valid but explicitly deferred out of current scope, permitted only when allowed by facade disposition criteria.
+Dispositions are recorded via `fgos coordination disposition --id <coordinationId> --action-key <actionKey> --writer-id <writerId> --disposition <value> --rationale <text>`.
+
+### Step 6: Adapt (Revise, Recheck, Retry, Ask Human)
+
+Based on dispositions and evidence outcomes:
+- **Revise:** Authorize and dispatch revision operations within the declared adaptation bounds.
+- **Recheck:** Every accepted finding requires an independent recheck operation to confirm remediation. A finding is never discharged by driver disposition alone.
+- **Retry / Reopen:** When transient failures occur or bounded dialogue reopening is permitted, dispatch retry or follow-up turns within protocol limits.
+- **Ask Human:** When an unresolvable requirement ambiguity, conflicting policy constraint, or repeated failure across distinct approaches occurs, batch all blocking questions for the human operator. Never stall unrelated or non-dependent work while awaiting human response.
+
+### Step 7: Explicit Close or Continue
+
+- **Continue:** If further declared operations or authorized rechecks remain, cycle back to Step 1 (Observe).
+- **Explicit Close:** When all declared steps have settled, all findings are dispositioned, all required rechecks confirm resolution, and close prerequisites are satisfied, invoke:
+  `fgos coordination close --id <coordinationId> --action-key <actionKey> --writer-id <writerId> --reason <summary>`
+- **Explicit Close Law:** Explicit close is the sole normal close action. A session never terminates automatically merely because operations finished. Automated or implicit completion is strictly prohibited. Quorum and prerequisite checks fail closed.
+
+### Step 8: Continuity Artifact
+
+Record the iteration summary, session identifier, verified commit/evidence identifiers, dispositions, and deferred items into the facade's designated continuity artifact before completing the turn.
+
+---
+
+## 2. Facade Hook Slots
+
+Every consuming facade must explicitly define the following hook values:
+
+| Hook Slot | Definition | Responsibility |
+|---|---|---|
+| `unit of iteration` | The discrete quantum of work executed in one cycle. | Facade defines what opens, runs, and completes as one coordinated unit. |
+| `open inputs` | The source specifications and parameters used to initialize the session. | Facade maps task definitions, objectives, and actor configurations into session start parameters. |
+| `evidence verification` | The domain-specific verification rules applied to outputs. | Domain policy defines how artifacts and execution evidence are confirmed before acceptance. |
+| `disposition criteria` | Rules governing finding acceptance, rejection, and deferral. | Facade specifies which findings can be deferred versus which strictly require remediation. |
+| `adaptation bounds` | Finite limits on revision rounds, rechecks, and retries. | Facade caps maximum remediation attempts before escalation or abort. |
+| `human-escalation triggers` | Specific conditions requiring human intervention. | Facade defines thresholds for pausing autonomy and batching operator questions. |
+| `close criteria` | Conditions that must be certified before issuing explicit close. | Facade specifies required proof levels, quorum confirmation, and sign-offs. |
+| `after-close action` | Downstream actions executed following verified session completion. | Domain policy defines post-close integration, asset delivery, or cleanup. |
+| `continuity artifact` | The durable file or document tracking progress across iterations. | Facade names the persistent record used for cold resumption. |
+
+---
+
+## 3. Core Operating Invariants
+
+1. **Replay and Status Authority:** Session status is derived strictly from the append-only event log and definition snapshot. The driver never maintains private, uncommitted state.
+2. **Deterministic Preconditions:** Every state-advancing semantic command consumes an `actionKey` that binds the call to the session event sequence. Stale actions refuse with an explicit mismatch error.
+3. **Driver Identity Continuity:** The session driver identity (`writerId`) established at session creation is mandatory on all follow-up actions and cannot be reassigned or spoofed.
+4. **Independent Proof:** Dispatched workers perform task execution. The driver independently verifies evidence before certifying any result.
+5. **Sole Close Action:** Sessions remain active until an explicit driver `close` command is validated and accepted by quorum rules.
