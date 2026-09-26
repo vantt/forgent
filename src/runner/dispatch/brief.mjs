@@ -52,22 +52,43 @@ export function briefPaths(runDir, round) {
  */
 export function renderBrief({ prompt, round, runDir, agentName, effectiveContract }) {
   const p = briefPaths(runDir, round);
+  const targetResultPath = effectiveContract?.resultClaim?.path || p.resultPath;
   const contractSection = effectiveContract
     ? `\n## Execution contract\n\n` +
       `- Mutation: ${effectiveContract.mutation}\n` +
-      `- Result claim path: ${p.resultPath}\n` +
+      `- Result claim path: ${targetResultPath}\n` +
       `- Timeout: ${effectiveContract.limits?.executorTimeoutMs ?? effectiveContract.limits?.timeoutMs}ms\n` +
       `- Persisted contract: ${p.effectiveExecutionContractPath}\n`
     : '';
 
-  // Phase 09 R6: Unify result path and claim schema.
-  // If the inner prompt already contains a conflicting "Result artifact:" section
-  // naming <runDir>/agent-result.json, strip it so the brief maintains exactly
-  // ONE result path (p.resultPath) and ONE claim schema section in ## When you finish.
+  // Phase 09 R6: Unify result path and claim schema while preserving guardrails and report requirements.
+  // 1. Unify any conflicting claim path in Effective execution contract to targetResultPath.
+  // 2. Remove redundant "Write structured JSON to <path>" line and its indented schema details from "Result artifact:".
+  // 3. Align human-readable report path to p.reportPath while keeping any -- REQUIRED warning.
+  // 4. Preserve worker guardrail: "- Do not call Work lifecycle verbs..."
   let cleanPrompt = prompt ?? '';
   if (typeof cleanPrompt === 'string') {
+    // Unify any claim path under Effective execution contract to targetResultPath
     cleanPrompt = cleanPrompt.replace(
-      /\n*Result artifact:\n(?:[ \t]*-[^\n]*\n?|[ \t]+[^\n]*\n?)+/g,
+      /([ \t]*-[ \t]*Claim path:[ \t]*)[^\n]+/g,
+      `$1${targetResultPath}`,
+    );
+
+    // Remove redundant Write structured JSON line and its indented lines
+    cleanPrompt = cleanPrompt.replace(
+      /[ \t]*- Write structured JSON to [^\n]+(?:\n[ \t]+[^\n]+)*/g,
+      '',
+    );
+
+    // Align report path to p.reportPath, preserving any following text like -- REQUIRED
+    cleanPrompt = cleanPrompt.replace(
+      /([ \t]*- (?:Also write a human-readable report to|Optional human-readable report:)[ \t]*)[^\n]+?(?=(?: -- REQUIRED|\n|$))/g,
+      `$1${p.reportPath}`,
+    );
+
+    // If Result artifact: section became empty (no bullets left), remove the header
+    cleanPrompt = cleanPrompt.replace(
+      /\n*Result artifact:\s*(?=\n\s*(?:Effective execution contract:|$))/g,
       '\n',
     ).trim();
   }

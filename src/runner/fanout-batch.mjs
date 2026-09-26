@@ -11,12 +11,12 @@ import { buildPrompt } from './dispatch/prepare.mjs';
 import fs from 'node:fs';
 import { resolveFgosBin } from '../setup/bin-discovery.mjs';
 
+const REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const LOCAL_FGOS_MJS = fileURLToPath(new URL('../../bin/fgos.mjs', import.meta.url));
 
-function resolveBinFgos(root) {
+function resolveBinFgos() {
   if (process.env.FGOS_BIN) return process.env.FGOS_BIN;
-  if (fs.existsSync(LOCAL_FGOS_MJS)) return LOCAL_FGOS_MJS;
-  return resolveFgosBin(root)?.path ?? LOCAL_FGOS_MJS;
+  return resolveFgosBin(REPO_ROOT)?.path ?? LOCAL_FGOS_MJS;
 }
 
 /**

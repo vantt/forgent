@@ -167,9 +167,187 @@ test('boundary test: src/runner/dispatch/** does not reference pick/return verbs
   assert.deepEqual(violations, [], `src/runner/dispatch/** must not reference 'pick', 'return', or appendEvent:\n${violations.join('\n')}`);
 });
 
-test('boundary test: dispatch core (resolve.mjs, prepare.mjs) does not import workflow-stage-graphs directly (R2)', () => {
-  const resolveSource = fs.readFileSync(path.join(root, 'src/runner/dispatch/resolve.mjs'), 'utf8');
-  const prepareSource = fs.readFileSync(path.join(root, 'src/runner/dispatch/prepare.mjs'), 'utf8');
-  assert.doesNotMatch(resolveSource, /workflow-stage-graphs\.mjs/);
-  assert.doesNotMatch(prepareSource, /workflow-stage-graphs\.mjs/);
+test('boundary test: dispatch core does not import operation-choice, fanout-batch, or dispatch-log (F4 / R1 / R2)', () => {
+  const dispatchCoreFiles = [
+    'src/runner/dispatch/config.mjs',
+    'src/runner/dispatch/resolve.mjs',
+    'src/runner/dispatch/mechanism.mjs',
+    'src/runner/dispatch/transport.mjs',
+    'src/runner/dispatch/prepare.mjs',
+    'src/runner/dispatch/cli.mjs',
+    'src/runner/dispatch/plan.mjs',
+  ];
+
+  const bannedUpward = ['operation-choice', 'fanout-batch', 'dispatch-log'];
+  for (const rel of dispatchCoreFiles) {
+    const filePath = path.join(root, rel);
+    const content = fs.readFileSync(filePath, 'utf8');
+    for (const banned of bannedUpward) {
+      assert.equal(
+        content.includes(banned),
+        false,
+        `${rel} must not import or reference upward module ${banned}`,
+      );
+    }
+  }
+});
+
+test('boundary test: src/runner/dispatch/** contains no lifecycle verb imports or dynamic return/pick spawns (M1b, M1c)', () => {
+  const dispatchDir = path.join(root, 'src/runner/dispatch');
+  const forbiddenImports = ['settleClaim', 'claimWork', 'appendEvent', 'pickWork', 'returnWork'];
+  const forbiddenModulePatterns = [/\/state\/claim\.mjs$/, /\/state\/settle\.mjs$/, /\/verbs\/work\//];
+
+  function getFiles(dir) {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    const files = [];
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        files.push(...getFiles(fullPath));
+      } else if (entry.isFile() && (entry.name.endsWith('.mjs') || entry.name.endsWith('.js'))) {
+        files.push(fullPath);
+      }
+    }
+    return files;
+  }
+
+  const files = getFiles(dispatchDir);
+  for (const file of files) {
+    const content = fs.readFileSync(file, 'utf8');
+    const rel = path.relative(root, file);
+
+    // M1b: Check AST / static import clauses
+    const importRegex = /import\s+(?:\{([^}]+)\}|(\w+))\s+from\s+['"]([^'"]+)['"]/g;
+    let m;
+    while ((m = importRegex.exec(content)) !== null) {
+      const named = m[1] ? m[1].split(',').map((s) => s.trim().split(/\s+as\s+/)[0]) : [];
+      const defaultImport = m[2];
+      const source = m[3];
+
+      for (const sym of forbiddenImports) {
+        assert.equal(named.includes(sym), false, `${rel} statically imports lifecycle symbol '${sym}' (M1b violation)`);
+        assert.notEqual(defaultImport, sym, `${rel} default-imports lifecycle symbol '${sym}' (M1b violation)`);
+      }
+      for (const pat of forbiddenModulePatterns) {
+        assert.equal(pat.test(source), false, `${rel} imports forbidden lifecycle module '${source}' (M1b violation)`);
+      }
+    }
+
+    // Direct named symbol checks in source
+    for (const sym of forbiddenImports) {
+      assert.equal(
+        new RegExp(`\\b${sym}\\b`).test(content),
+        false,
+        `${rel} references lifecycle function '${sym}' (M1b violation)`,
+      );
+    }
+
+    // M1c: Check dynamic concatenation / spawning of 'return' or 'pick'
+    const dynamicReturnPick = /['"]\s*\+\s*['"]turn['"]|['"]\s*\+\s*['"]ick['"]|['"]re['"]\s*\+|['"]pi['"]\s*\+/;
+    assert.equal(
+      dynamicReturnPick.test(content),
+      false,
+      `${rel} dynamically constructs 'return' or 'pick' verb string (M1c violation)`,
+    );
+  }
+});
+
+test('boundary test: dispatch core has no cyclic dependencies > 2 (SCC analysis, F4)', () => {
+  const IMPORT_RE = /(?:import|export)\s+(?:[\s\S]*?from\s+)?['"](\.{1,2}\/[^'"]+)['"]/g;
+  function getImports(filePath) {
+    const content = fs.readFileSync(filePath, 'utf8');
+    const imports = [];
+    let m;
+    while ((m = IMPORT_RE.exec(content)) !== null) {
+      let resolved = path.resolve(path.dirname(filePath), m[1]);
+      if (!path.extname(resolved)) {
+        if (fs.existsSync(resolved + '.mjs')) resolved += '.mjs';
+        else if (fs.existsSync(resolved + '.js')) resolved += '.js';
+      }
+      imports.push(resolved);
+    }
+    return imports;
+  }
+
+  const graph = new Map();
+  function scan(file) {
+    if (graph.has(file)) return;
+    graph.set(file, []);
+    if (!fs.existsSync(file)) return;
+    try {
+      const imps = getImports(file);
+      graph.set(file, imps);
+      for (const imp of imps) {
+        if (imp.startsWith(root) && !imp.includes('node_modules')) {
+          scan(imp);
+        }
+      }
+    } catch {}
+  }
+
+  const dispatchDir = path.join(root, 'src/runner/dispatch');
+  for (const f of fs.readdirSync(dispatchDir)) {
+    if (f.endsWith('.mjs')) scan(path.join(dispatchDir, f));
+  }
+
+  let index = 0;
+  const indices = new Map();
+  const lowlinks = new Map();
+  const onStack = new Map();
+  const stack = [];
+  const sccs = [];
+
+  function strongConnect(v) {
+    indices.set(v, index);
+    lowlinks.set(v, index);
+    index++;
+    stack.push(v);
+    onStack.set(v, true);
+
+    for (const w of graph.get(v) || []) {
+      if (!indices.has(w)) {
+        strongConnect(w);
+        lowlinks.set(v, Math.min(lowlinks.get(v), lowlinks.get(w)));
+      } else if (onStack.get(w)) {
+        lowlinks.set(v, Math.min(lowlinks.get(v), indices.get(w)));
+      }
+    }
+
+    if (lowlinks.get(v) === indices.get(v)) {
+      const scc = [];
+      let w;
+      do {
+        w = stack.pop();
+        onStack.set(w, false);
+        scc.push(w);
+      } while (w !== v);
+      if (scc.length > 2 && scc.some((p) => p.includes('src/runner/dispatch/'))) {
+        sccs.push(scc.map((p) => path.relative(root, p)));
+      }
+      if (scc.length > 1) {
+        const rels = scc.map((p) => path.relative(root, p));
+        const bannedInCycle = [
+          'src/runner/dispatch/resolve.mjs',
+          'src/runner/dispatch/prepare.mjs',
+          'src/runner/dispatch/operation-choice.mjs',
+          'src/runner/fanout-batch.mjs',
+        ];
+        for (const b of bannedInCycle) {
+          assert.equal(
+            rels.includes(b),
+            false,
+            `${b} must not participate in any import cycle (found in SCC: ${JSON.stringify(rels)})`,
+          );
+        }
+      }
+    }
+  }
+
+  for (const node of graph.keys()) {
+    if (!indices.has(node)) {
+      strongConnect(node);
+    }
+  }
+
+  assert.deepEqual(sccs, [], `dispatch modules must have no SCC cycle > 2 (found: ${JSON.stringify(sccs)})`);
 });

@@ -1588,13 +1588,11 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
         }
       } catch {}
 
-      const gwSessionId = ctx.gatewaySessionId || client.gatewaySessionId || process.env.HERDR_GATEWAY_SESSION_ID || null;
       resourceIncarnation = computeHerdrResourceIncarnation({
         paneId: round.paneId,
         shellPid: pInfo?.shellPid || null,
         workerPid: verifiedProc.pid,
         foregroundPgid: pInfo?.foregroundPgid || null,
-        gatewaySessionId: gwSessionId,
         processStartTime: getProcessStartTime(verifiedProc.pid),
       });
     } else {
@@ -1618,7 +1616,6 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
     if (existingCmd?.resourceIncarnation) {
       resourceIncarnation = existingCmd.resourceIncarnation;
     } else {
-      const gwSessionId = ctx.gatewaySessionId || client.gatewaySessionId || process.env.HERDR_GATEWAY_SESSION_ID || null;
       try {
         const pInfo = client.paneProcessInfo(round.paneId);
         const workerProc = pInfo?.foregroundProcesses?.find((p) => p.pid && p.pid !== pInfo.shellPid);
@@ -1627,11 +1624,10 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
           shellPid: pInfo?.shellPid || null,
           workerPid: workerProc?.pid || null,
           foregroundPgid: pInfo?.foregroundPgid || null,
-          gatewaySessionId: gwSessionId,
           processStartTime: workerProc?.pid ? getProcessStartTime(workerProc.pid) : null,
         });
       } catch {
-        resourceIncarnation = computeHerdrResourceIncarnation({ paneId: round.paneId, gatewaySessionId: gwSessionId });
+        resourceIncarnation = computeHerdrResourceIncarnation({ paneId: round.paneId });
       }
     }
   }
@@ -1748,35 +1744,29 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
       );
     }
 
-    try {
-      publishHerdrCompletionReceipt({
-        runDir,
-        launchCommandId: ctx.launchCommandId,
-        runId: ctx.runId,
-        preparedInvocationDigest: ctx.preparedInvocationDigest,
-        herdrName: round.agentName,
-        paneId: round.paneId || null,
-        agentSession: round.agentSession?.value || null,
-        resourceIncarnation,
-        startArgvDigest: computeSha256Digest(herdrStartArgv),
-        workerCommandDigest,
-        completion: {
-          kind: 'settled',
-          reason: 'worker-outbox-settled',
-        },
-        result: {
-          outboxPath: outboxRelPath || 'outbox/result-1.json',
-          outboxDigest: resultDigest,
-        },
-        controlEpoch: ctx.controlEpoch,
-        controlToken: ctx.controlToken,
-        verifyDigests: true,
-      });
-    } catch (err) {
-      if (err instanceof DispatchError && err.errorClass === 'confinement-mismatch') {
-        throw err;
-      }
-    }
+    publishHerdrCompletionReceipt({
+      runDir,
+      launchCommandId: ctx.launchCommandId,
+      runId: ctx.runId,
+      preparedInvocationDigest: ctx.preparedInvocationDigest,
+      herdrName: round.agentName,
+      paneId: round.paneId || null,
+      agentSession: round.agentSession?.value || null,
+      resourceIncarnation,
+      startArgvDigest: computeSha256Digest(herdrStartArgv),
+      workerCommandDigest,
+      completion: {
+        kind: 'settled',
+        reason: 'worker-outbox-settled',
+      },
+      result: {
+        outboxPath: outboxRelPath || 'outbox/result-1.json',
+        outboxDigest: resultDigest,
+      },
+      controlEpoch: ctx.controlEpoch,
+      controlToken: ctx.controlToken,
+      verifyDigests: true,
+    });
   }
 
   return {

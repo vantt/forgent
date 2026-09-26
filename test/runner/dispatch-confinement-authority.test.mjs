@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
+import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { executeThroughConfinement, buildConfinementAttestation, prepareConfinementForLaunch } from "../../src/runner/dispatch/confinement/authority.mjs";
 import { normalizeAgentName } from "../../src/runner/dispatch/herdr-agent.mjs";
@@ -1253,4 +1254,31 @@ test("MED-A: production bwrap executor argvs yield process: unverified while hos
   assert.equal(pidOnlyAtt.coverage["control:process"], "satisfied");
   assert.notEqual(pidOnlyAtt.effectiveControls.hostWrite, "deny");
   assert.equal(pidOnlyAtt.coverage["control:hostWrite"], "unverified");
+});
+
+test("M4 lock: authority.mjs contains 0 adapter layer imports", () => {
+  const authorityPath = fileURLToPath(new URL("../../src/runner/dispatch/confinement/authority.mjs", import.meta.url));
+  const content = fs.readFileSync(authorityPath, "utf8");
+  const forbiddenAdapters = [
+    "herdr-round",
+    "herdr-agent",
+    "cli-spawn-supervisor",
+    "transport.mjs",
+    "assignment-runner",
+  ];
+  const importRegex = /(?:import|export)\s+(?:[\s\S]*?from\s+)?['"]([^'"]+)['"]/g;
+  let m;
+  const importedModules = [];
+  while ((m = importRegex.exec(content)) !== null) {
+    importedModules.push(m[1]);
+  }
+  for (const imp of importedModules) {
+    for (const forbidden of forbiddenAdapters) {
+      assert.equal(
+        imp.includes(forbidden),
+        false,
+        `authority.mjs must not import adapter module '${forbidden}' (found '${imp}', M4 violation)`,
+      );
+    }
+  }
 });

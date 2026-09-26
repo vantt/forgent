@@ -338,15 +338,15 @@ export function collectEvidence(snapshot, opts = {}) {
   evidence.push({ id: 'liveness', type: 'liveness', fresh });
 
   // R7: replacement-authority evidence comes strictly from controller-owned state (snapshot.controller),
-  // never from the worker-writable outbox.
+  // never from the worker-writable outbox. Controller bookkeeping files (evaluator-baseline.json,
+  // commands, generations) are supervisor-internal and not external evidence, so non-authority files
+  // in controller/ are ignored, never pushed as unknown evidence.
   for (const entry of snapshot.controller ?? []) {
     const name = entry.name;
     const authorityMatch = /^replacement-authority--(.+)\.json$/.exec(name);
     if (authorityMatch) {
       evidence.push({ id: name, type: 'replacement-authority', driverId: authorityMatch[1] });
-      continue;
     }
-    evidence.push({ id: name, type: 'unknown' });
   }
 
   for (const entry of snapshot.outbox ?? []) {

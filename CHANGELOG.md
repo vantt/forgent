@@ -7,13 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 - **Changed**: Dispatch boundary simplification & architectural hardening (Phase 09 / Unit I12):
-  - Moved `fanoutBatchExecutorCli` from dispatch CLI to Work Driver layer (`src/runner/fanout-batch.mjs`), ensuring dispatch core (`src/runner/dispatch/**`) contains zero references to Work lifecycle mutation (`pick`, `return`, `claim`) or event log appending (`appendEvent`).
-  - Extracted Work/stage/skill lookups (`executorIdForWork`, `resolveCapabilityIdentityDetails`, `buildPrompt`) from dispatch core into `src/runner/dispatch/operation-choice.mjs` with backward-compatible re-exports.
+  - Moved `fanoutBatchExecutorCli` from dispatch CLI to Work Driver layer (`src/runner/fanout-batch.mjs`), ensuring dispatch core (`src/runner/dispatch/**`) contains zero references to Work lifecycle mutation (`pick`, `return`, `claim`) or event log appending (`appendEvent`), with public entry points in `src/runner/dispatch.mjs`.
+  - Relocated Work/stage/skill lookups (`executorIdForWork`, `resolveCapabilityIdentityDetails`, `buildPrompt`) into `src/runner/dispatch/operation-choice.mjs`, establishing a clean Work Driver compatibility bridge.
   - Split `assignment-runner.mjs` into dedicated `src/runner/dispatch/settlement.mjs` (unified single settlement pipeline replacing duplicated branches) and `src/runner/dispatch/reconcile-cli-spawn.mjs`.
-  - Consolidated Confinement Authority preparation into `assessAndPrepare` in `src/runner/dispatch/confinement/authority.mjs`, replacing heuristic argv parsing with driver claims and isolating proof utilities in leaf module `src/runner/dispatch/proof-helpers.mjs`.
+  - Consolidated Confinement Authority preparation into `assessAndPrepare` in `src/runner/dispatch/confinement/authority.mjs`, making driver claims authoritative while retaining heuristic argv parsing as fallback, and isolating proof utilities in leaf module `src/runner/dispatch/proof-helpers.mjs`.
   - Extracted Herdr S2 proof layer into `src/runner/dispatch/herdr-reconcile.mjs` and unified terminal outcome receipt publication into `publishHerdrCompletionReceipt`.
-  - Unified claim schema and result path in `src/runner/dispatch/brief.mjs`, passed `effectiveContract`, added Linux kernel `MAX_ARG_STRLEN` size hint guard for CLI-spawn arguments, and removed unused `prepareDispatch`.
-  - Strictly enforced controller directory ownership for `replacement-authority` in `src/runner/dispatch/recovery-planner.mjs`, populated `gatewaySessionId` on Herdr rounds, and clarified in-process handback return semantics.
+  - Unified claim schema and result path in `src/runner/dispatch/brief.mjs`, wired `effectiveContract` through `transport.mjs` into production briefs, added Linux kernel `MAX_ARG_STRLEN` size hint guard for CLI-spawn arguments, and removed unused `prepareDispatch`.
+  - Strictly enforced controller directory ownership for `replacement-authority` in `src/runner/dispatch/recovery-planner.mjs`, and clarified in-process handback return semantics.
   - Stamped `contract: 'dispatch-run.legacy'` on legacy dispatch run openings and clarified launcher ownership.
   - Cached falsification probe attestations by fingerprint with 1-hour TTL in `src/runner/dispatch/confinement/attestation-store.mjs` and memoized `allRuns` per verb call via `withRunsCache` in `src/runner/dispatch/runtime-inspection.mjs`.
 - **Added**: `fgos return --to blocked` (with optional `--reason "<text>"`) and `--blocked` flag: allows settling an active claim directly into `blocked` with friction and outcome recorded, used by Work Driver fanout batch recovery (`src/runner/fanout-batch.mjs`) when executor execution throws or fails.

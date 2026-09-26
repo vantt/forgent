@@ -22,8 +22,6 @@ import { DOMAINS, DEFAULT_DOMAIN, resolveDomainName, bundleForStage, resolveTask
 import { loadAgentDefs, readTaskSpecHeader } from '../agent-roster.mjs';
 import { selectTemplate, hashTemplate } from '../prompt-templates.mjs';
 import { listWork, StoreError } from '../../state/store.mjs';
-import { logExecutorDispatch } from '../dispatch-log.mjs';
-import { fanoutBatchExecutorCli } from '../fanout-batch.mjs';
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
 import { RunnerConfigError, ensureRunnerConfigForDir, DEFAULT_TIER_TO_POLICY } from './config.mjs';
 import { resolveExecutorAndOverrides, resolveExecutorIdForPurpose, modelForTier, executorIdForWork, resolveCapabilityIdentityDetails } from './resolve.mjs';
@@ -494,9 +492,6 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
     },
   );
 }
-
-// Re-exported from ../dispatch-log.mjs (R1 / M10 boundary simplification)
-export { logExecutorDispatch };
 
 function captureHeadSha(cwd) {
   try {
@@ -1220,9 +1215,6 @@ export async function decideExecutorCli(
   return resolvedIndirectly && plan.executorId ? { ...base, executorId: plan.executorId } : base;
 }
 
-// Re-exported from ../fanout-batch.mjs (R1 / M10 boundary simplification)
-export { fanoutBatchExecutorCli };
-
 /**
  * Guard against --repo-root being passed without --cwd when process.cwd() resolves
  * to a different main-checkout root (or is not a main checkout at all, e.g. a worktree).
@@ -1685,51 +1677,6 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
       }
       break;
     }
-    case 'log': {
-      // executorId here is the SAME shared positional above — the log
-      // line's own executorId, e.g. whichever id `decide`'s own result
-      // named, never a second parsing scheme.
-      const id = flagValue('--id');
-      const provider = flagValue('--provider');
-      const command = flagValue('--command');
-      const model = flagValue('--model');
-      const capability = flagValue('--capability');
-      const mechanism = flagValue('--mechanism');
-      const tier = flagValue('--tier');
-      const fallbackReason = flagValue('--fallback-reason');
-      const outcome = flagValue('--outcome');
-      if (!id || !executorId || !provider || !command) {
-        const usageMsg =
-          'usage: node src/runner/dispatch.mjs log <executorId> --id <workItemId> --provider <p> --command <c> [--model <m>] [--capability <name>] [--mechanism <m>] [--tier <t>] [--fallback-reason <text>] [--outcome <status>]\n';
-        if (returnResult) throw new StoreError('validation', usageMsg.trim());
-        process.stderr.write(usageMsg);
-        process.exitCode = 1;
-      } else {
-        const root = resolveMainCheckoutRoot(process.cwd()) ?? resolveRepoRoot(process.cwd());
-        const fgosDir = fgosDirFromRoot(root);
-        const event = logExecutorDispatch(fgosDir, { id, executorId, provider, command, model, capability, mechanism, tier, fallbackReason, outcome });
-        if (returnResult) return event;
-        process.stdout.write(`${JSON.stringify(event)}\n`);
-      }
-      break;
-    }
-    case 'fanout-batch': {
-      const candidateArg = executorId ?? flagValue('--candidates');
-      const candidateIds = candidateArg ? String(candidateArg).split(',').map((s) => s.trim()).filter(Boolean) : [];
-      try {
-        const result = await fanoutBatchExecutorCli(candidateIds, {
-          cwd: flagValue('--cwd') ?? flagValue('--dir'),
-          hasLiveTaskAccess: rest.includes('--has-live-task-access'),
-        });
-        if (returnResult) return result;
-        process.stdout.write(`${JSON.stringify(result)}\n`);
-      } catch (err) {
-        if (returnResult) throw err;
-        process.stderr.write(`${err.message}\n`);
-        process.exitCode = 1;
-      }
-      break;
-    }
     case 'reconcile': {
       const runDir = executorId ?? flagValue('--run-dir') ?? (typeof positional !== 'undefined' ? positional[1] : undefined);
       if (!runDir) {
@@ -1754,7 +1701,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
       break;
     }
     default: {
-      const msg = `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs execute <executorId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] [--has-live-task-access] | decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | log <executorId> --id <id> --provider <p> --command <c> [--model <m>] | fanout-batch <candidates> [--cwd <dir>] [--has-live-task-access] | reconcile <runDir> [--control-epoch <n>] [--control-token <t>]\n`;
+      const msg = `unknown subcommand ${JSON.stringify(subcommand)}. Usage: node src/runner/dispatch.mjs execute <executorId> [--prompt <text>] [--model <name>] [--tier <name>] [--carries <class>] [--has-live-task-access] | decide <executorId> [--has-live-task-access] | decide --for <purpose> [--needs-soul] [--has-live-task-access] | decide --work <workId> [--stage <stage>] [--has-live-task-access] | decide --needs-soul [--has-live-task-access] | reconcile <runDir> [--control-epoch <n>] [--control-token <t>]\n`;
       if (returnResult) throw new StoreError('validation', msg.trim());
       process.stderr.write(msg);
       process.exitCode = 1;

@@ -855,6 +855,7 @@ function herdrSpawnInteractiveAdapter(invocation, opts) {
     controlEpoch: opts.controlEpoch ?? invocation.controlEpoch,
     controlToken: opts.controlToken ?? invocation.controlToken,
     preparedInvocationDigest: opts.preparedInvocationDigest ?? invocation.preparedInvocationDigest,
+    effectiveContract: opts.effectiveContract ?? invocation.effectiveContract ?? null,
     agentKind,
     agentArgs: agentArgsWithoutPrompt({ argsTemplate, args, prompt, model }),
     prompt: prompt ?? '',

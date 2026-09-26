@@ -12,6 +12,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { spawnWorker, executeExecutorCli } from '../../src/runner/dispatch/cli.mjs';
 import { fanoutBatchExecutorCli } from '../../src/runner/fanout-batch.mjs';
@@ -731,6 +732,49 @@ test('R8: legacy openDispatchRun stamps contract: dispatch-run.legacy in run.jso
     const runRecord = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
     assert.equal(runRecord.contract, 'dispatch-run.legacy');
     assert.equal(runRecord.executorId, 'mock-non-assignment');
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('fgos return --blocked sets item status to blocked with outcome and reason (R1 / F15)', () => {
+  const root = fixtureRepo();
+  const fgosDir = path.join(root, '.fgos');
+  const binFgos = fileURLToPath(new URL('../../bin/fgos.mjs', import.meta.url));
+
+  addWork(fgosDir, {
+    id: 'item-to-block',
+    title: 'Item to block',
+    kind: 'task',
+    status: 'todo',
+    domain: 'coding',
+    stage: 'executing',
+    deps: [],
+    refs: [],
+    risk: 'light',
+    verify: process.platform === 'win32' ? 'node -e "process.exit(0)"' : 'true',
+  });
+
+  try {
+    execFileSync(
+      process.execPath,
+      [binFgos, 'pick', 'item-to-block', '--dir', root],
+      { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] },
+    );
+    const stdout = execFileSync(
+      process.execPath,
+      [binFgos, 'return', 'item-to-block', '--blocked', '--reason', 'executor crashed during dispatch', '--dir', root],
+      { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] },
+    );
+    const parsed = JSON.parse(stdout);
+    assert.equal(parsed.contract, 'fgos.v1');
+    assert.equal(parsed.data.id, 'item-to-block');
+    assert.equal(parsed.data.to, 'blocked');
+    assert.equal(parsed.data.reason, 'executor crashed during dispatch');
+
+    const view = listWork(fgosDir);
+    assert.equal(view.work['item-to-block'].status, 'blocked');
+    assert.equal(view.outcomes['item-to-block']?.actual?.outcome, 'blocked');
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }

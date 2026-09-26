@@ -2530,9 +2530,9 @@ export async function executeAssignment(assignment, opts = {}) {
       effectiveCwd,
       gitBefore,
       gitBeforeSource,
-      gitAfter: rawResult?.headAfter ?? safeGitHead(effectiveCwd),
+      gitAfter: rawResult?.headAfter ?? safeGitHead(cwd),
       dirtyBefore,
-      dirtyAfter: safeGitStatusFiles(effectiveCwd),
+      dirtyAfter: safeGitStatusFiles(cwd),
       dirtyBeforeSnapshots,
       planContentHash,
       resolvedExecutorId,
@@ -2545,7 +2545,7 @@ export async function executeAssignment(assignment, opts = {}) {
       launchCommandId: useSupervisorRecovery ? launchCommandId : null,
       receipt: supervisorReceipt,
       adapterOutcome: rawResult?.adapterOutcome || rawResult?.outcome || rawResult?.status,
-      opts: { ...opts, repoRoot: root },
+      opts: { ...opts, repoRoot: root, cwd },
     });
 
     return outcome.runResult;

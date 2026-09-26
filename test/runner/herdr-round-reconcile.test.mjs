@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
-import { reconcileHerdrSpawnRun, publishHerdrAdapterReceipt } from "../../src/runner/dispatch/herdr-round.mjs";
+import { reconcileHerdrSpawnRun, publishHerdrAdapterReceipt, publishHerdrCompletionReceipt } from "../../src/runner/dispatch/herdr-round.mjs";
 import { computeSha256Digest } from "../../src/runner/dispatch/cli-spawn-supervisor.mjs";
 import { normalizeRunResultV2 } from '../../src/runner/dispatch/run-result.mjs';
 
@@ -87,6 +87,48 @@ test("reconcileHerdrSpawnRun rejects a fabricated workerCommandDigest checked ag
     const result = await reconcileHerdrSpawnRun(runDir, {});
     assert.equal(result.status, "refused", "a fabricated workerCommandDigest must be rejected, not silently accepted");
     assert.equal(result.reason, "confinement-mismatch");
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test("F3 / M11 lock: publishHerdrCompletionReceipt on settled path fails closed on error and throws", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-herdr-f3-test-"));
+  try {
+    const runDir = path.join(tmp, "run");
+    const launchCommandId = "lc-settled-fail";
+    const commandsDir = path.join(runDir, "controller", "commands");
+    fs.mkdirSync(commandsDir, { recursive: true });
+
+    const command = {
+      contract: "herdr-launch-command.v1",
+      runId: "run1",
+      launchCommandId,
+      controlEpoch: 1,
+      controlTokenDigest: `sha256:${"c".repeat(64)}`,
+      state: "pending",
+      preparedInvocationDigest: "sha256:correct-prep-digest",
+      herdrName: "fgos-run1-lc-settled",
+    };
+    fs.writeFileSync(path.join(commandsDir, `${launchCommandId}.json`), JSON.stringify(command));
+
+    // When verifyDigests is true and preparedInvocationDigest mismatches, it must throw confinement-mismatch
+    assert.throws(
+      () => {
+        publishHerdrCompletionReceipt({
+          runDir,
+          launchCommandId,
+          runId: "run1",
+          preparedInvocationDigest: "sha256:mismatched-digest",
+          herdrName: "fgos-run1-lc-settled",
+          completion: { kind: "settled", reason: "worker-outbox-settled" },
+          controlEpoch: 1,
+          controlToken: "token",
+          verifyDigests: true,
+        });
+      },
+      (err) => err.code === "confinement-mismatch" || err.errorClass === "confinement-mismatch",
+    );
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }

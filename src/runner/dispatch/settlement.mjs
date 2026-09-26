@@ -58,7 +58,19 @@ import {
 /**
  * Safely resolve root path without failing if not in a git repository.
  */
-export function resolveSafeRoot(runDir, preferredRoot = null) {
+export function resolveSafeRoot(runDir, preferredRoot = null, preferMainCheckout = false) {
+  if (preferMainCheckout) {
+    try {
+      const main = resolveMainCheckoutRoot(runDir);
+      if (main) return main;
+    } catch {}
+    try {
+      const repo = resolveRepoRoot(runDir);
+      if (repo) return repo;
+    } catch {}
+    if (preferredRoot) return preferredRoot;
+    return runDir || process.cwd();
+  }
   if (preferredRoot) return preferredRoot;
   try {
     const main = resolveMainCheckoutRoot(runDir);
@@ -435,11 +447,12 @@ export async function settleRunOutcome({
   const workerArtifactPaths = workerArtifacts.filter((a) => a.valid).map((a) => a.path);
   const isReadOnly = isReadOnlyAssignment(assignment);
 
-  const resolvedGitAfter = gitAfter ?? safeGitHead(effectiveCwd);
-  const resolvedDirtyAfter = dirtyAfter ?? safeGitStatusFiles(effectiveCwd);
+  const settlementCwd = opts?.cwd || effectiveCwd;
+  const resolvedGitAfter = gitAfter ?? safeGitHead(settlementCwd);
+  const resolvedDirtyAfter = dirtyAfter ?? safeGitStatusFiles(settlementCwd);
 
   const { changedFiles, changedFileReasons } = computeChangedFiles(
-    effectiveCwd,
+    settlementCwd,
     gitBefore,
     resolvedGitAfter,
     dirtyBefore,
@@ -452,7 +465,7 @@ export async function settleRunOutcome({
       ? dirtyBeforeSnapshots.entries()
       : Object.entries(dirtyBeforeSnapshots);
     for (const [relPath, snap] of entries) {
-      const fullPath = path.join(effectiveCwd, relPath);
+      const fullPath = path.join(settlementCwd, relPath);
       let currentExists = false;
       let currentHash = null;
       try {
@@ -480,7 +493,7 @@ export async function settleRunOutcome({
     changedFiles,
     hasDirtyBeforeMutation: mutatedDirtyBeforeFiles.length > 0,
     isReadOnlyOperation: isReadOnly,
-    cwd: effectiveCwd,
+    cwd: settlementCwd,
     repoRoot: root,
     assignment,
     work: assignment?.work || opts.work,
@@ -574,7 +587,7 @@ export async function settleRunOutcome({
     runtime: {
       exitCode,
       isTimeout: Boolean(isTimeout),
-      executionError: executionError ? { message: executionError.message, code: executionError.code } : null,
+      ...(executionError ? { executionError: { message: executionError.message, code: executionError.code } } : {}),
       stdoutLog: path.relative(root, path.join(runDir, 'stdout.log')),
       stderrLog: path.relative(root, path.join(runDir, 'stderr.log')),
     },
@@ -601,17 +614,13 @@ export async function settleRunOutcome({
     _beforeAuthoritativePublish: opts?._beforeAuthoritativePublish,
   });
 
-  const runJsonPath = path.join(runDir, 'run.json');
-  let runJsonMeta = runMeta || {};
-  if (fs.existsSync(runJsonPath)) {
-    try { runJsonMeta = JSON.parse(fs.readFileSync(runJsonPath, 'utf8')); } catch {}
-  }
-  publishMutableProjection(runJsonPath, { ...runJsonMeta, status: 'settled', settledAt });
-
-  if (launchCommandId) {
-    try {
-      await finalizeConfinementResources({ runDir, launchCommandId, receipt });
-    } catch {}
+  if (opts?.updateRunJson) {
+    const runJsonPath = path.join(runDir, 'run.json');
+    let runJsonMeta = runMeta || {};
+    if (fs.existsSync(runJsonPath)) {
+      try { runJsonMeta = JSON.parse(fs.readFileSync(runJsonPath, 'utf8')); } catch {}
+    }
+    publishMutableProjection(runJsonPath, { ...runJsonMeta, status: opts.updateRunJson, settledAt });
   }
 
   return { status: 'settled', settled: true, runResult: Object.freeze(settled) };
@@ -634,7 +643,7 @@ export async function settleFailedRunFromOutcome(runDir, runMeta, command, contr
   }
 
   const settledAt = new Date().toISOString();
-  const root = resolveSafeRoot(runDir, opts?.repoRoot);
+  const root = resolveSafeRoot(runDir, opts?.repoRoot, true);
 
   const stdoutText = '';
   const stderrText = command.outcome?.failureDetail?.message || 'submission-refused';
@@ -743,7 +752,7 @@ export async function settleReceiptRunFromOutcome(
 
   const launchCommandId = command.launchCommandId;
   const receipt = receiptOpt || readAdapterReceipt(runDir, launchCommandId);
-  const root = resolveSafeRoot(runDir, opts?.repoRoot);
+  const root = resolveSafeRoot(runDir, opts?.repoRoot, true);
 
   const captureStdoutPath = path.join(runDir, 'protected', 'capture', launchCommandId, 'stdout.log');
   const captureStderrPath = path.join(runDir, 'protected', 'capture', launchCommandId, 'stderr.log');
@@ -770,8 +779,7 @@ export async function settleReceiptRunFromOutcome(
   }
 
   // Settle outcome using unified pipeline
-
-  return await settleRunOutcome({
+  const outcome = await settleRunOutcome({
     runDir,
     runMeta,
     assignment: asgn,
@@ -792,6 +800,12 @@ export async function settleReceiptRunFromOutcome(
     launchCommandId,
     receipt,
     classifyRunEvidenceFn: classifyRunEvidence,
-    opts,
+    opts: { ...opts, updateRunJson: 'settled' },
   });
+
+  if (launchCommandId) {
+    await finalizeConfinementResources({ runDir, launchCommandId, receipt });
+  }
+
+  return outcome;
 }

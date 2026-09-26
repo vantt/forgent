@@ -556,3 +556,54 @@ test('M1: a .recovery.lock held by a live process is still refused, never reclai
     }
   } finally { cleanup(root); }
 });
+
+test('F1 / regression: controller/evaluator-baseline.json does not park recovery on resume or reassign', () => {
+  const { root } = makeRepo({
+    controller: ['evaluator-baseline.json', 'replacement-authority--agent-9.json'],
+  });
+  try {
+    const recResume = recoverObserveUseCase({ repoRoot: root }, { runId: 'run_1', intent: 'resume' });
+    assert.equal(recResume.kind, 'recommendation', 'evaluator-baseline.json must not cause resume to park');
+    assert.deepEqual(recResume.action, { type: 'resume-driver' });
+
+    const recReassign = recoverObserveUseCase({ repoRoot: root }, { runId: 'run_1', intent: 'reassign' });
+    assert.equal(recReassign.kind, 'recommendation', 'evaluator-baseline.json must not cause reassign to park');
+    assert.deepEqual(recReassign.action, { type: 'reassign-driver', toDriverId: 'agent-9' });
+  } finally { cleanup(root); }
+});
+
+test('M8 lock: collectEvidence never produces replacement-authority from outbox and ignores controller bookkeeping', () => {
+  const snapshot = {
+    visibility: null,
+    controller: [
+      { name: 'evaluator-baseline.json' },
+      { name: 'commands.json' },
+      { name: 'replacement-authority--agent-correct.json' },
+    ],
+    outbox: [
+      { name: 'replacement-authority--attacker.json' },
+      { name: 'ack-1.json' },
+      { name: 'report-1.md' },
+      { name: 'result.json' },
+    ],
+  };
+  const evidence = collectEvidence(snapshot, { now: '2026-01-01T00:00:00.000Z' });
+
+  // Controller bookkeeping ignored
+  assert.equal(evidence.some((e) => e.id === 'evaluator-baseline.json'), false);
+  assert.equal(evidence.some((e) => e.id === 'commands.json'), false);
+
+  // Controller replacement-authority recognized
+  const ctrlAuth = evidence.find((e) => e.id === 'replacement-authority--agent-correct.json');
+  assert.ok(ctrlAuth);
+  assert.equal(ctrlAuth.type, 'replacement-authority');
+  assert.equal(ctrlAuth.driverId, 'agent-correct');
+
+  // Outbox replacement-authority MUST NOT be recognized as replacement-authority; it must be unknown
+  const outboxAuth = evidence.find((e) => e.id === 'replacement-authority--attacker.json');
+  assert.ok(outboxAuth);
+  assert.equal(outboxAuth.type, 'unknown');
+
+  // Exactly one replacement-authority in evidence
+  assert.equal(evidence.filter((e) => e.type === 'replacement-authority').length, 1);
+});

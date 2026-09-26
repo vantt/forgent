@@ -7,7 +7,7 @@ import crypto from 'node:crypto';
 import { execSync, execFileSync, execFile } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
-import { executeAssignment, commitRunSettlement, resolveWorkerArtifactPath, reconcileCliSpawnRun } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { executeAssignment, commitRunSettlement, settleRunOutcome, resolveWorkerArtifactPath, reconcileCliSpawnRun } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 import { compileDispatchPlan } from '../../src/runner/dispatch/plan.mjs';
 import { decideExecutorCli } from '../../src/runner/dispatch/cli.mjs';
@@ -3702,4 +3702,44 @@ test('committed config pins code-review Claude profiles to high effort only on r
   assert.equal(hasHighEffort(argsForInvocation('claude', 'claude-herdr-readonly')), true);
   assert.equal(argsForInvocation('claude', 'claude-cli').includes('--effort'), false);
   assert.equal(cfg.executors['glm'].invocations[0].args.includes('--effort'), false);
+});
+
+test('M12 lock: settlement evaluates changedFiles and classification in opts.cwd when opts.cwd !== effectiveCwd', async () => {
+  const tempDir = mkTempDir();
+  const cwdDir = path.join(tempDir, 'opts-cwd');
+  const effectiveCwdDir = path.join(tempDir, 'effective-cwd');
+  fs.mkdirSync(cwdDir, { recursive: true });
+  fs.mkdirSync(effectiveCwdDir, { recursive: true });
+
+  execFileSync('git', ['init'], { cwd: cwdDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: cwdDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.name', 'Tester'], { cwd: cwdDir, stdio: 'ignore' });
+  fs.writeFileSync(path.join(cwdDir, 'initial.txt'), 'init\n');
+  execFileSync('git', ['add', '.'], { cwd: cwdDir, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'initial'], { cwd: cwdDir, stdio: 'ignore' });
+
+  // Add dirty file in cwdDir
+  fs.writeFileSync(path.join(cwdDir, 'mutated-in-cwd.txt'), 'content\n');
+
+  const runDir = path.join(tempDir, 'run');
+  fs.mkdirSync(runDir, { recursive: true });
+  const { controlToken } = acquireRunControl(runDir, { controllerId: 'test-ctrl' });
+
+  const outcome = await settleRunOutcome({
+    runDir,
+    runMeta: { runId: 'run_m12_01', assignmentId: 'asgn_m12' },
+    controlEpoch: 1,
+    controlToken,
+    exitCode: 0,
+    settledAt: new Date().toISOString(),
+    effectiveCwd: effectiveCwdDir,
+    gitBefore: null,
+    dirtyBefore: [],
+    opts: { cwd: cwdDir, repoRoot: cwdDir },
+  });
+
+  assert.ok(
+    outcome.runResult.evidence.changedFiles.includes('mutated-in-cwd.txt'),
+    'changedFiles must be evaluated in opts.cwd when opts.cwd !== effectiveCwd (M12 lock)',
+  );
 });

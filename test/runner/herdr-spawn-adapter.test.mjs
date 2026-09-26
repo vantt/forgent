@@ -179,7 +179,7 @@ ok({});
   };
 }
 
-function dispatchThroughMock(tmpDir, mock, { prompt, interactiveMode, promptDelivery, timeoutMs = 5000, idleTimeoutMs, argsTemplate, transportDeadlines, anchorPaneId, dispatchBatchKey } = {}) {
+function dispatchThroughMock(tmpDir, mock, { prompt, interactiveMode, promptDelivery, timeoutMs = 5000, idleTimeoutMs, argsTemplate, transportDeadlines, anchorPaneId, dispatchBatchKey, effectiveContract } = {}) {
   const runDir = path.join(tmpDir, 'run');
   fs.mkdirSync(runDir, { recursive: true });
   return EXECUTOR_ADAPTERS['herdr-spawn'](
@@ -190,12 +190,13 @@ function dispatchThroughMock(tmpDir, mock, { prompt, interactiveMode, promptDeli
       prompt,
       env: {},
       promptDelivery,
+      effectiveContract,
       interactiveMode: { exitCommand: '/exit', ...interactiveMode },
     },
     // Transport deadlines are not executor config any more; this is the seam
     // that keeps a mock round short, and production never sets it.
     { cwd: tmpDir, timeoutMs, idleTimeoutMs, workId: 'w1', tier: 'standard', model: 'sonnet', herdrBin: mock.herdrBin, runDir,
-      transportDeadlines: { resendAfterMs: 200, ...transportDeadlines }, anchorPaneId, dispatchBatchKey },
+      transportDeadlines: { resendAfterMs: 200, ...transportDeadlines }, anchorPaneId, dispatchBatchKey, effectiveContract },
   );
 }
 
@@ -260,6 +261,28 @@ test('the prompt travels as a file and only a one-line pointer is ever typed', {
   assert.ok(!typed.includes('\n'), 'what gets typed at a TUI is a single line');
   assert.match(typed, /^Read .*brief-1\.md and do what it says\.$/);
   assert.ok(!typed.includes('read the spec'), 'the work itself never goes through the terminal');
+  assert.equal(res.status, 0);
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('R6 / M6 lock: herdrSpawnAdapter passes effectiveContract through to renderBrief and renders execution contract in brief', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-brief-contract-'));
+  const mock = createMockHerdr(tmpDir);
+  const effectiveContract = {
+    mutation: 'read-only',
+    limits: { executorTimeoutMs: 45000 },
+  };
+  const res = await dispatchThroughMock(tmpDir, mock, {
+    prompt: 'Implement read-only analysis',
+    effectiveContract,
+  });
+
+  const brief = fs.readFileSync(path.join(tmpDir, 'run', 'brief-1.md'), 'utf8');
+  assert.match(brief, /## Execution contract/, 'execution contract must be rendered in brief when effectiveContract is provided');
+  assert.match(brief, /Mutation: read-only/);
+  assert.match(brief, /Timeout: 45000ms/);
+  assert.match(brief, /Result claim path: .*outbox[/\\]result-1\.json/);
   assert.equal(res.status, 0);
 
   fs.rmSync(tmpDir, { recursive: true, force: true });

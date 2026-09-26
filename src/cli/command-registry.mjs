@@ -1053,6 +1053,7 @@ export const COMMAND_REGISTRY = [
         id: { type: 'string', description: 'Work item id (positional or --id).' },
         timeout: { type: 'number', description: 'Optional verify timeout in milliseconds.' },
         to: { type: 'string', description: 'Target status (e.g. "blocked"). When set to "blocked", settles the claim into blocked without requiring branch progress or running verify.' },
+        blocked: { type: 'boolean', description: 'Mark work item as blocked on handback without requiring branch progress or running verify (alias for --to blocked).' },
         reason: { type: 'string', description: 'Optional reason when returning as blocked.' },
       },
       positional: ['id'],

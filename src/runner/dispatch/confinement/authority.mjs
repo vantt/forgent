@@ -386,7 +386,7 @@ export function buildConfinementAttestation({
           name: "filesystem",
           coverage: hasHostWriteDeny ? "covered" : (hasBwrapCmd || isHeuristicBwrap) ? "unverified" : "unknown",
           detail: hasHostWriteDeny
-            ? "observed hand-written bwrap sandbox"
+            ? (driverClaims ? "driver-verified confinement control" : "observed hand-written bwrap sandbox")
             : (hasBwrapCmd || isHeuristicBwrap)
               ? "observe-mode: heuristic bwrap name detected but sandbox unverified"
               : (request.requirement?.policyId
@@ -397,7 +397,7 @@ export function buildConfinementAttestation({
           name: "inherited-fd",
           coverage: isVerifiedBwrap ? "covered" : (hasBwrapCmd || isHeuristicBwrap) ? "unverified" : "unknown",
           detail: isVerifiedBwrap
-            ? "observed hand-written bwrap sandbox"
+            ? (driverClaims ? "driver-verified confinement control" : "observed hand-written bwrap sandbox")
             : (hasBwrapCmd || isHeuristicBwrap)
               ? "observe-mode: heuristic bwrap name detected but sandbox unverified"
               : (request.requirement?.policyId
