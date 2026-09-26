@@ -3,12 +3,13 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { spawnSync, execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import {
   classifyContractScope,
   scanSurfaceFiles,
   extractPathReferences,
+  loadCommitTree,
   generateInventory,
   generateMarkdownReport,
   normalizeContent,
@@ -477,21 +478,58 @@ test('repository inventory: detects nonexistent examples and never labels them s
 });
 
 test('environmental contamination: untracked files on disk do NOT contaminate inventory derived from git commit', () => {
-  const untrackedSurfaceFile = path.join(REPO_ROOT, 'core', 'untracked-contaminant-surface-file.md');
-  const untrackedGitnexusDir = path.join(REPO_ROOT, '.claude', 'skills', 'gitnexus', 'gitnexus-cli');
-  const untrackedGitnexusFile = path.join(untrackedGitnexusDir, 'SKILL.md');
-
+  const fixtureDir = mkTmpDir('shipped-env-contam-');
   try {
+    execFileSync('git', ['init'], { cwd: fixtureDir, stdio: 'ignore' });
+    execFileSync('git', ['config', 'user.name', 'Test'], { cwd: fixtureDir, stdio: 'ignore' });
+    execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: fixtureDir, stdio: 'ignore' });
+
+    // Commit relevant scan sources first without the six GitNexus paths
+    fs.mkdirSync(path.join(fixtureDir, 'domains', 'coding'), { recursive: true });
+    fs.copyFileSync(
+      path.join(REPO_ROOT, 'domains', 'coding', 'AGENTS.md'),
+      path.join(fixtureDir, 'domains', 'coding', 'AGENTS.md')
+    );
+    execFileSync('git', ['add', '.'], { cwd: fixtureDir, stdio: 'ignore' });
+    execFileSync('git', ['commit', '-m', 'fixture: commit scan sources'], { cwd: fixtureDir, stdio: 'ignore' });
+
+    // 1. Untracked surface contaminant file
+    const untrackedSurfaceFile = path.join(fixtureDir, 'core', 'untracked-contaminant-surface-file.md');
+    fs.mkdirSync(path.join(fixtureDir, 'core'), { recursive: true });
     fs.writeFileSync(untrackedSurfaceFile, '# Untracked surface contaminant\n`docs/specs/fake-path-never-committed.md`\n');
-    fs.mkdirSync(untrackedGitnexusDir, { recursive: true });
-    fs.writeFileSync(untrackedGitnexusFile, '# Untracked gitnexus skill\n');
-
     assert.ok(fs.existsSync(untrackedSurfaceFile), 'Untracked surface file exists on disk');
-    assert.ok(fs.existsSync(untrackedGitnexusFile), 'Untracked gitnexus file exists on disk');
 
-    const inv = generateInventory(REPO_ROOT, SHIPPED_SURFACE_DIRS, { commit: 'HEAD' });
+    // 2. Physically create all six GitNexus paths as untracked checkout-local files
+    const gitnexusPaths = [
+      '.claude/skills/gitnexus/gitnexus-cli/SKILL.md',
+      '.claude/skills/gitnexus/gitnexus-debugging/SKILL.md',
+      '.claude/skills/gitnexus/gitnexus-exploring/SKILL.md',
+      '.claude/skills/gitnexus/gitnexus-guide/SKILL.md',
+      '.claude/skills/gitnexus/gitnexus-impact-analysis/SKILL.md',
+      '.claude/skills/gitnexus/gitnexus-refactoring/SKILL.md',
+    ];
 
-    // 1. Untracked surface file is NOT scanned because it is absent from the commit tree
+    for (const p of gitnexusPaths) {
+      const fullPath = path.join(fixtureDir, p);
+      fs.mkdirSync(path.dirname(fullPath), { recursive: true });
+      fs.writeFileSync(fullPath, `# Untracked ${p}\n`);
+    }
+
+    // Assert all six physically exist
+    for (const p of gitnexusPaths) {
+      assert.ok(fs.existsSync(path.join(fixtureDir, p)), `Physical untracked file must exist on disk: ${p}`);
+    }
+
+    // Assert the committed tree lacks all six
+    const { treeFiles } = loadCommitTree('HEAD', fixtureDir);
+    for (const p of gitnexusPaths) {
+      assert.ok(!treeFiles.has(p), `Committed tree must lack ${p}`);
+    }
+
+    // Generate inventory from explicit committed tree
+    const inv = generateInventory(fixtureDir, SHIPPED_SURFACE_DIRS, { commit: 'HEAD' });
+
+    // Assert untracked surface file is not scanned
     assert.ok(
       !inv.items.some((i) => i.referencedIn.includes('core/untracked-contaminant-surface-file.md')),
       'Untracked surface file must NOT be scanned'
@@ -501,20 +539,17 @@ test('environmental contamination: untracked files on disk do NOT contaminate in
       'Paths inside untracked files must not enter inventory'
     );
 
-    // 2. Untracked gitnexus file remains nonexistent / example-not-target despite physical presence on disk
-    const gnItem = inv.items.find((i) => i.path === '.claude/skills/gitnexus/gitnexus-cli/SKILL.md');
-    assert.ok(gnItem, 'Must track gitnexus path');
-    assert.equal(gnItem.existenceStatus, 'nonexistent', 'Must remain nonexistent despite local untracked file');
-    assert.equal(gnItem.resolutionStatus, 'example-not-target', 'Must remain example-not-target');
-    assert.equal(gnItem.isSafeRewriteTarget, false, 'Must not be safe rewrite target');
-  } finally {
-    if (fs.existsSync(untrackedSurfaceFile)) fs.unlinkSync(untrackedSurfaceFile);
-    if (fs.existsSync(untrackedGitnexusFile)) fs.unlinkSync(untrackedGitnexusFile);
-    if (fs.existsSync(untrackedGitnexusDir)) {
-      try {
-        fs.rmSync(path.join(REPO_ROOT, '.claude', 'skills', 'gitnexus'), { recursive: true, force: true });
-      } catch {}
+    // Assert every corresponding inventory row is nonexistent, example-or-placeholder/example-not-target, and not safe to rewrite
+    for (const p of gitnexusPaths) {
+      const item = inv.items.find((i) => i.path === p);
+      assert.ok(item, `Inventory must track "${p}"`);
+      assert.equal(item.existenceStatus, 'nonexistent', `"${p}" must have existenceStatus nonexistent`);
+      assert.equal(item.referenceKind, 'example-or-placeholder', `"${p}" must have referenceKind example-or-placeholder`);
+      assert.equal(item.resolutionStatus, 'example-not-target', `"${p}" must have resolutionStatus example-not-target`);
+      assert.equal(item.isSafeRewriteTarget, false, `"${p}" must not be safe rewrite target`);
     }
+  } finally {
+    fs.rmSync(fixtureDir, { recursive: true, force: true });
   }
 });
 
