@@ -350,14 +350,8 @@ export function compileDispatchPlan(
     };
   }
 
-  const invocationCwd = resolvedForDispatch?.cwd ?? executor?.cwd ?? null;
   const invocation = resolvedForDispatch
-    ? {
-        via: 'cli',
-        adapter: resolvedForDispatch.adapter ?? executor?.adapter ?? 'cli-spawn',
-        protocol: 'prompt-stdout-v1',
-        ...(invocationCwd ? { cwd: invocationCwd } : {}),
-      }
+    ? { via: 'cli', adapter: resolvedForDispatch.adapter ?? executor?.adapter ?? 'cli-spawn', protocol: 'prompt-stdout-v1' }
     : null;
 
   const governance = resolvedForDispatch?.governance ?? { providerFamily: null, egress: null };

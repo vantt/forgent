@@ -3807,12 +3807,65 @@ fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nWorker done\\
     operation: 'implement-item',
   });
 
+  const asgnDir = path.join(cwdDir, '.fgos', 'assignments', assignment.assignmentId);
+  const runDir = path.join(asgnDir, 'runs', '01');
+  const genDir = path.join(asgnDir, 'admission', 'generations');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.mkdirSync(genDir, { recursive: true });
+
+  const persistedPlan = {
+    executorId: 'test-fallback',
+    policy: { executorPreference: ['test-fallback'] },
+    mechanism: 'out-of-process',
+    invocation: {
+      via: 'cli',
+      adapter: 'cli-spawn',
+      protocol: 'prompt-stdout-v1',
+      cwd: effectiveCwdDir,
+    },
+  };
+
+  const runJson = {
+    contract: 'assignment-run.v2',
+    runId: `run_${assignment.assignmentId}_01`,
+    assignmentId: assignment.assignmentId,
+    attempt: 1,
+    phase: 'admitted',
+    status: 'running',
+    executorId: 'test-fallback',
+    fallback: { resolved: 'test-fallback' },
+    dispatchPlanDigest: `sha256:${crypto.createHash('sha256').update(JSON.stringify(persistedPlan)).digest('hex')}`,
+    cwd: cwdDir,
+  };
+
+  fs.writeFileSync(path.join(runDir, 'run.json'), JSON.stringify(runJson, null, 2));
+  fs.writeFileSync(path.join(runDir, 'dispatch-plan.json'), JSON.stringify(persistedPlan, null, 2));
+
+  const admissionRecord = {
+    attempt: 1,
+    attemptStr: '01',
+    runId: `run_${assignment.assignmentId}_01`,
+    retryId: 'retry-n1-test',
+    predecessorRunId: null,
+    destination: 'dest-n1',
+    admissionPayloadDigest: 'digest-n1',
+    admittedAt: new Date().toISOString(),
+  };
+  fs.writeFileSync(path.join(genDir, '0000000001.json'), JSON.stringify(admissionRecord, null, 2));
+
   const result = await executeAssignment(assignment, {
     cwd: cwdDir,
     repoRoot: cwdDir,
     runnerConfig: {
+      executors: {
+        'test-fallback': {
+          adapter: 'cli-spawn',
+          allowCrossProvider: true,
+          command: process.execPath,
+          args: [executorScript, '{prompt}'],
+        },
+      },
       executor: {
-        cwd: effectiveCwdDir,
         allowCrossProvider: true,
         command: process.execPath,
         args: [executorScript, '{prompt}'],
@@ -3820,6 +3873,9 @@ fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nWorker done\\
       models: { standard: 'test-model' },
       timeoutMs: 10000,
     },
+    retryId: 'retry-n1-test',
+    destination: 'dest-n1',
+    payloadDigest: 'digest-n1',
   });
 
   assert.equal(result.status, 'done');
@@ -3833,7 +3889,6 @@ fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nWorker done\\
     'changedFiles must capture files from effectiveCwd',
   );
 
-  const runDir = path.join(cwdDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
   const evidenceJson = JSON.parse(fs.readFileSync(path.join(runDir, 'evidence.json'), 'utf8'));
   assert.ok(
     evidenceJson.dirtyAfter.includes('worker-created.txt'),

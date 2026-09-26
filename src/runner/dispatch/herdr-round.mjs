@@ -49,6 +49,7 @@ import { getProcessStartTime } from './process-identity.mjs';
 import {
   computeSha256Digest,
   patchCommandRecord,
+  publishMutableProjection,
 } from './proof-helpers.mjs';
 import {
   HerdrLaunchCollisionError,
@@ -1176,7 +1177,7 @@ export async function runHerdrRound(ctx) {
   fs.writeFileSync(paths.briefPath, briefText);
   if (effectiveContract && fs.existsSync(paths.effectiveExecutionContractPath)) {
     try {
-      fs.writeFileSync(paths.effectiveExecutionContractPath, `${JSON.stringify(effectiveContract, null, 2)}\n`);
+      publishMutableProjection(paths.effectiveExecutionContractPath, effectiveContract);
     } catch {}
   }
   round.note({ status: 'requested', agentName, round: roundNumber });
