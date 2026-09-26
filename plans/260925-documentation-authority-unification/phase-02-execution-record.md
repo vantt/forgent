@@ -9,6 +9,7 @@ Branch: plan/260925-documentation-authority-unification
 Immutable base: tag documentation-authority-phase-01-20260926 (target commit f0c76c5e590339d9c815038539ff1f4a072c64e4)
 Implementation HEAD before this completion pass: 738a3fcd967268d546fe6c0db5d84b32f0157833
 Status: implemented locally; pending independent review; no migration/cutover/merge/push/tag
+Authoritative verification: `scripts/verify-phase-02.mjs` only; moving-worktree local commands are historical diagnostics, not authoritative evidence.
 Checkout scope: this record only claims mutations in the assigned Phase 02 worktree; it does not assert the main checkout was untouched by unrelated dispatch infrastructure.
 ```
 
@@ -54,10 +55,9 @@ These findings are not resolved in Phase 02. They block promotion and feed later
 
 Verification summary:
 
-- focused inventory tests: 32 passed, 0 failed;
-- generated JSON and Markdown matched a fresh immutable-tree regeneration byte-for-byte;
-- inventory gate checker, legacy-doc ratchet, documentation/citation checks, ownership lint, and `git diff --check` passed;
-- full suite exited 0: 7,793 tests, 7,717 passed, 0 failed, 8 skipped, 68 todo; log SHA-256 `312e02d4b7ec727238d100efee5a9f752464eb27860a594867ff81d690017492`;
+- authoritative runner added at `scripts/verify-phase-02.mjs` and made the only Phase 02 verification door;
+- the runner requires explicit `BASE` and `FIXED_END`, creates a detached clean worktree exactly at `FIXED_END`, asserts HEAD/cleanliness before setup, regenerates inventory from immutable `BASE`, byte-compares committed artifacts, runs the Phase 02 gate/check suite, and emits a machine-readable receipt with hashes/sizes/counts/test totals;
+- pre-runner historical diagnostics: focused inventory tests passed; generated JSON and Markdown matched a fresh immutable-tree regeneration byte-for-byte; inventory gate checker, legacy-doc ratchet, documentation/citation checks, ownership lint, and `git diff --check` passed; full suite exited 0: 7,793 tests, 7,717 passed, 0 failed, 8 skipped, 68 todo; log SHA-256 `312e02d4b7ec727238d100efee5a9f752464eb27860a594867ff81d690017492`;
 - GitNexus aggregate change analysis reported HIGH risk (61 symbols, 6 flows); direct upstream impact for the two public generator/checker entry points was LOW with no affected process. Independent review must assess the aggregate HIGH result rather than treating the direct-symbol result as a waiver.
 
 ## Mutation Footprint
@@ -70,7 +70,9 @@ Verification summary:
 - `plans/260925-documentation-authority-unification/phase-02-doc-inventory.md`
 - `scripts/generate-doc-inventory.mjs`
 - `scripts/check-doc-inventory-gates.mjs`
+- `scripts/verify-phase-02.mjs`
 - `test/scripts/generate-doc-inventory.test.mjs`
+- `test/scripts/verify-phase-02.test.mjs`
 
 ## Out Of Scope / Forbidden Actions Confirmed
 
