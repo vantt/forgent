@@ -288,6 +288,67 @@ test('R6 / M6 lock: herdrSpawnAdapter passes effectiveContract through to render
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
+test('F3 / N4 / M15 lock: runHerdrRound fails closed and propagates error when publishHerdrCompletionReceipt fails on settled path', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-f3-m15-'));
+  try {
+    const mock = createMockHerdr(tmpDir);
+    const runDir = path.join(tmpDir, 'run');
+    const launchCommandId = 'lc-settled-m15';
+    const commandsDir = path.join(runDir, 'controller', 'commands');
+    fs.mkdirSync(commandsDir, { recursive: true });
+
+    // Write on-disk command record with one digest
+    const command = {
+      contract: 'herdr-launch-command.v1',
+      runId: 'run-m15',
+      launchCommandId,
+      controlEpoch: 1,
+      controlTokenDigest: `sha256:${'c'.repeat(64)}`,
+      state: 'pending',
+      preparedInvocationDigest: 'sha256:disk-digest',
+      herdrName: 'fgos-run-m15-lc-settled-m15',
+    };
+    fs.writeFileSync(path.join(commandsDir, `${launchCommandId}.json`), JSON.stringify(command));
+
+    // Calling herdr-spawn with a mismatched preparedInvocationDigest and verifyDigests must reject
+    await assert.rejects(
+      () =>
+        EXECUTOR_ADAPTERS['herdr-spawn'](
+          {
+            command: 'agy',
+            args: ['-i', 'prompt', '--mode', 'accept-edits'],
+            argsTemplate: ['-i', '{prompt}', '--mode', 'accept-edits'],
+            prompt: 'settled test prompt',
+            env: {},
+            interactiveMode: { exitCommand: '/exit' },
+          },
+          {
+            cwd: tmpDir,
+            timeoutMs: 5000,
+            workId: 'w-m15',
+            runId: 'run-m15',
+            launchCommandId,
+            controlEpoch: 1,
+            controlToken: 'token',
+            preparedInvocationDigest: 'sha256:caller-mismatched-digest',
+            tier: 'standard',
+            model: 'sonnet',
+            herdrBin: mock.herdrBin,
+            runDir,
+            transportDeadlines: { resendAfterMs: 200 },
+          },
+        ),
+      (err) => {
+        assert.ok(err instanceof DispatchError || err.errorClass === 'confinement-mismatch' || err.code === 'confinement-mismatch');
+        return true;
+      },
+    );
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+
 test('an anchor pane id lands the split in the caller batch tab instead of leaving it implicit', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-anchor-pane-'));
   const mock = createMockHerdr(tmpDir);

@@ -1256,7 +1256,7 @@ test("MED-A: production bwrap executor argvs yield process: unverified while hos
   assert.equal(pidOnlyAtt.coverage["control:hostWrite"], "unverified");
 });
 
-test("M4 lock: authority.mjs contains 0 adapter layer imports", () => {
+test("M4 / M4b lock: authority.mjs contains 0 adapter layer imports (static or dynamic)", () => {
   const authorityPath = fileURLToPath(new URL("../../src/runner/dispatch/confinement/authority.mjs", import.meta.url));
   const content = fs.readFileSync(authorityPath, "utf8");
   const forbiddenAdapters = [
@@ -1266,18 +1266,18 @@ test("M4 lock: authority.mjs contains 0 adapter layer imports", () => {
     "transport.mjs",
     "assignment-runner",
   ];
-  const importRegex = /(?:import|export)\s+(?:[\s\S]*?from\s+)?['"]([^'"]+)['"]/g;
+  const importRegex = /(?:import|export)\s+(?:[\s\S]*?from\s+)?['"]([^'"]+)['"]|\bimport\s*\(\s*['"]([^'"]+)['"]\)/g;
   let m;
   const importedModules = [];
   while ((m = importRegex.exec(content)) !== null) {
-    importedModules.push(m[1]);
+    importedModules.push(m[1] || m[2]);
   }
   for (const imp of importedModules) {
     for (const forbidden of forbiddenAdapters) {
       assert.equal(
         imp.includes(forbidden),
         false,
-        `authority.mjs must not import adapter module '${forbidden}' (found '${imp}', M4 violation)`,
+        `authority.mjs must not import adapter module '${forbidden}' (found '${imp}', M4/M4b violation)`,
       );
     }
   }

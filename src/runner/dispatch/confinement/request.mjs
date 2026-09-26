@@ -404,6 +404,7 @@ export function buildConfinementRequest({
       transportDeadlines: context.transportDeadlines,
       closeAlways: context.closeAlways,
       dispatchBatchKey: context.dispatchBatchKey,
+      effectiveContract: context.effectiveContract,
     },
     requirement: resolvedRequirement,
     override: override ?? invocation?.confinement?.override ?? cfg?.executors?.[execId]?.confinement?.override ?? undefined,

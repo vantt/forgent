@@ -1103,6 +1103,7 @@ export async function executeThroughConfinement(request, adapterPort = null) {
     // already reads from, so this is not a new concept, only a missing wire.
     requirement: request.requirement,
     backendId: effectiveBackendId,
+    effectiveContract: request.context?.effectiveContract ?? request.invocation?.effectiveContract ?? null,
   };
 
   if (preparedLaunch) {

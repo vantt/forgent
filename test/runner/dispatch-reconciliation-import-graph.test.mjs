@@ -243,14 +243,57 @@ test('boundary test: src/runner/dispatch/** contains no lifecycle verb imports o
     }
 
     // M1c: Check dynamic concatenation / spawning of 'return' or 'pick'
-    const dynamicReturnPick = /['"]\s*\+\s*['"]turn['"]|['"]\s*\+\s*['"]ick['"]|['"]re['"]\s*\+|['"]pi['"]\s*\+/;
+    const dynamicReturnPick = /['"]\s*\+\s*['"]turn['"]|['"]\s*\+\s*['"]ick['"]|['"]re['"]\s*\+|['"]pi['"]\s*\+|\[\s*['"]re['"]\s*,\s*['"]turn['"]\s*\]|\[\s*['"]pi['"]\s*,\s*['"]ck['"]\s*\]/;
     assert.equal(
       dynamicReturnPick.test(content),
       false,
       `${rel} dynamically constructs 'return' or 'pick' verb string (M1c violation)`,
     );
+
+    // M1d: Check dynamic property construction for lifecycle operations (e.g. ['settle' + 'Claim'])
+    const dynamicLifecycleProps = /['"]\s*\+\s*['"](?:Claim|Work|Event)['"]|['"](?:settle|claim|pick|append)['"]\s*\+/;
+    assert.equal(
+      dynamicLifecycleProps.test(content),
+      false,
+      `${rel} dynamically accesses lifecycle properties (M1d violation)`,
+    );
   }
 });
+
+test('boundary test: dispatch core modules without documented lookup exceptions do not import workflow-stage-graphs (R2 / N2)', () => {
+  const strictDispatchCoreFiles = [
+    'src/runner/dispatch/config.mjs',
+    'src/runner/dispatch/mechanism.mjs',
+    'src/runner/dispatch/transport.mjs',
+    'src/runner/dispatch/plan.mjs',
+    'src/runner/dispatch/settlement.mjs',
+    'src/runner/dispatch/run-result.mjs',
+    'src/runner/dispatch/runtime-inspection.mjs',
+    'src/runner/dispatch/brief.mjs',
+    'src/runner/dispatch/proof-helpers.mjs',
+    'src/runner/dispatch/herdr-reconcile.mjs',
+    'src/runner/dispatch/recovery-planner.mjs',
+  ];
+
+  for (const rel of strictDispatchCoreFiles) {
+    const filePath = path.join(root, rel);
+    const content = fs.readFileSync(filePath, 'utf8');
+    assert.equal(
+      content.includes('workflow-stage-graphs'),
+      false,
+      `${rel} must not import or reference workflow-stage-graphs`,
+    );
+  }
+
+  // Documented exception verification: resolve.mjs and prepare.mjs house
+  // Work Driver compatibility lookups (executorIdForWork, resolveCapabilityIdentityDetails, buildPrompt)
+  // to avoid upward cyclic dependencies to operation-choice.mjs, and MUST NOT import operation-choice.
+  const resolveSource = fs.readFileSync(path.join(root, 'src/runner/dispatch/resolve.mjs'), 'utf8');
+  const prepareSource = fs.readFileSync(path.join(root, 'src/runner/dispatch/prepare.mjs'), 'utf8');
+  assert.equal(resolveSource.includes('operation-choice'), false, 'resolve.mjs must not import operation-choice');
+  assert.equal(prepareSource.includes('operation-choice'), false, 'prepare.mjs must not import operation-choice');
+});
+
 
 test('boundary test: dispatch core has no cyclic dependencies > 2 (SCC analysis, F4)', () => {
   const IMPORT_RE = /(?:import|export)\s+(?:[\s\S]*?from\s+)?['"](\.{1,2}\/[^'"]+)['"]/g;

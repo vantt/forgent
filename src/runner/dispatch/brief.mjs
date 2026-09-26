@@ -47,8 +47,9 @@ export function briefPaths(runDir, round) {
 }
 
 /**
- * Render the brief the worker reads. `prompt` is the real work, verbatim --
- * this function wraps it, it never rewrites it.
+ * Render the brief the worker reads. Wraps the prompt, renders the execution
+ * contract, harmonizes the claim path to the brief's result path, and aligns
+ * report requirements.
  */
 export function renderBrief({ prompt, round, runDir, agentName, effectiveContract }) {
   const p = briefPaths(runDir, round);
@@ -119,7 +120,7 @@ Write these two files, in this order, each one \`.tmp\`-then-rename:
 
 1. \`${p.reportPath}\` -- what you did, in prose. Anything a reader needs to
    understand or check your work belongs here.
-2. \`${p.resultPath}\` -- a JSON object:
+2. \`${targetResultPath}\` -- a JSON object:
 
        {"contract":{"id":"agent-result-claim","version":2},
         "status": "done" | "blocked" | "failed" | "no-evidence",

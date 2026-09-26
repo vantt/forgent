@@ -1462,7 +1462,7 @@ export async function executeAssignment(assignment, opts = {}) {
   // `let`: see the Phase B note on `compiledPlan` above.
   let resolvedAdapter = compiledPlan?.invocation?.adapter || cfg.executors?.[resolvedExecutorId]?.adapter || cfg.executor?.adapter || 'cli-spawn';
 
-  let effectiveCwd = compiledPlan?.invocation?.cwd ?? compiledPlan?.cwd ?? cwd;
+  let effectiveCwd = opts.effectiveCwd ?? compiledPlan?.invocation?.cwd ?? compiledPlan?.cwd ?? cwd;
   const timeoutMs = opts.timeoutMs ?? cfg.timeoutMs ?? 900000;
   const startedAt = new Date().toISOString();
 
@@ -2470,6 +2470,7 @@ export async function executeAssignment(assignment, opts = {}) {
           stage: effectiveAssignment.stage,
           runDir: path.resolve(runDir),
           dispatchBatchKey: opts.dispatchBatchKey,
+          effectiveContract,
           // needsAssignmentLaunchContext (herdr-spawn, and any other
           // out-of-process adapter besides cli-spawn) reuses the SAME
           // assignmentLaunchContext identity built above -- executeExecutorCli
@@ -2530,9 +2531,9 @@ export async function executeAssignment(assignment, opts = {}) {
       effectiveCwd,
       gitBefore,
       gitBeforeSource,
-      gitAfter: rawResult?.headAfter ?? safeGitHead(cwd),
+      gitAfter: rawResult?.headAfter ?? safeGitHead(effectiveCwd),
       dirtyBefore,
-      dirtyAfter: safeGitStatusFiles(cwd),
+      dirtyAfter: safeGitStatusFiles(effectiveCwd),
       dirtyBeforeSnapshots,
       planContentHash,
       resolvedExecutorId,

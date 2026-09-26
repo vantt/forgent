@@ -162,7 +162,7 @@ Following the independent review (`REQUEST CHANGES`), all reported findings and 
 
 | Finding | Severity | Root Cause & Remediation | Verification Evidence |
 |---|---|---|---|
-| **F1** | **BLOCKER** | `collectEvidence` in `recovery-planner.mjs` treated non-authority files in `controller/` as `unknown` evidence, causing runs with `evaluator-baseline.json` to park. Remediated: only `replacement-authority--*.json` is treated as external evidence; supervisor bookkeeping (`evaluator-baseline.json`, commands, generations) is ignored. | `test/verbs/dispatch-recovery.test.mjs` (40/40 pass, including test with `evaluator-baseline.json` present). |
+| **F1** | **BLOCKER** | `collectEvidence` in `recovery-planner.mjs` treated non-authority files in `controller/` as `unknown` evidence, causing runs with `evaluator-baseline.json` to park. Remediated: only `replacement-authority--*.json` is treated as external evidence; supervisor bookkeeping (`evaluator-baseline.json`, commands, generations) is ignored. | `test/verbs/dispatch-recovery.test.mjs` (30/30 pass, including test with `evaluator-baseline.json` present). |
 | **F2** | **HIGH** | `renderBrief` regex stripped worker guardrail "Do not call Work lifecycle verbs..." and read-only `report-REQUIRED` instruction; conflicting claim path survived; `effectiveContract` was not passed to herdr round in production. Remediated: preserved guardrails in `brief.mjs`, rewritten claim path to `p.resultPath`, and wired `effectiveContract` through `transport.mjs` into `runHerdrRound`. | `test/runner/dispatch-brief.test.mjs` & `test/runner/herdr-spawn-adapter.test.mjs` (passes, execution contract verified). |
 | **F3** | **HIGH** | In `herdr-round.mjs`, error during `publishHerdrCompletionReceipt` on settled path was swallowed. Remediated: removed try/catch around settled receipt publication so I/O failures throw and fail-closed. | `test/runner/herdr-round-reconcile.test.mjs` (3/3 pass). |
 | **F4** | **HIGH** | `resolve.mjs` and `prepare.mjs` re-exported from `operation-choice.mjs`, creating a 14–15-module SCC cycle. `dispatch/cli.mjs` imported `fanout-batch.mjs`. Remediated: `resolve.mjs` and `prepare.mjs` define their symbols directly; `operation-choice.mjs` re-exports downward; `fanout-batch` and `log` subcommands are dispatched at `src/runner/dispatch.mjs` entry point. Cycle broken down to baseline 2-module SCC (`assignment-runner.mjs ↔ cli.mjs`). | `test/runner/dispatch-reconciliation-import-graph.test.mjs` (22/22 pass, Tarjan SCC verified). |
@@ -188,6 +188,33 @@ Following the independent review (`REQUEST CHANGES`), all reported findings and 
 | **M8** | Read `replacement-authority` from `outbox/` | Asserted in `test/verbs/dispatch-recovery.test.mjs` (outbox authority must be classified as `unknown` and park). **KILLED** |
 | **M12** | Classify cwd back to `opts.cwd` | Asserted in `test/runner/assignment-dispatch.test.mjs` (verifies `opts.cwd !== effectiveCwd` behavior). **KILLED** |
 
+### 5.3 Independent Re-Review Remediation Matrix (N1–N6, M13–M18)
+
+Following the second independent re-review (`REQUEST CHANGES` at `205d112e4`), all findings (N1–N6) and survived mutations (M13–M18) have been remediated, verified, and locked:
+
+#### Re-Review Findings (N1–N6)
+
+| Finding | Severity | Root Cause & Remediation | Verification Evidence |
+|---|---|---|---|
+| **N1** | **HIGH** | `executeAssignment` in `assignment-runner.mjs` captured before-state at `effectiveCwd` but captured after-state at `cwd`. When `cwd !== effectiveCwd`, `changedFiles` compared across two distinct directories, risking incorrect classification. Remediated: restored baseline semantics capturing both `gitBefore`/`dirtyBefore` and `gitAfter`/`dirtyAfter` at `effectiveCwd`. In `settlement.mjs`, preserved `settlementCwd = opts?.cwd || effectiveCwd` and resolved git status against `settlementCwd`. | `test/runner/assignment-dispatch.test.mjs` (`N1 / M13 / M13b lock: executeAssignment captures both gitBefore/dirtyBefore and gitAfter/dirtyAfter in effectiveCwd when cwd !== effectiveCwd` passes). **Killed M13 & M13b**. |
+| **N2** | **HIGH** | Work-lookup helper functions (`executorIdForWork`, `resolveCapabilityIdentityDetails`, `buildPrompt`) remained in dispatch core (`resolve.mjs`, `prepare.mjs`) to avoid cyclic dependency from `operation-choice.mjs` to `assignment-runner.mjs`, but docs and CHANGELOG claimed zero imports. Remediated: accurately documented the R2 design exception in `CHANGELOG.md` and `dispatch-control-plane.md`. Strict dispatch core modules contain zero `workflow-stage-graphs` imports, and `resolve.mjs`/`prepare.mjs` contain zero upward `operation-choice` imports. | `test/runner/dispatch-reconciliation-import-graph.test.mjs` (boundary lock and Tarjan cycle check pass). **Killed M1c & M1d**. |
+| **N3** | **HIGH** | `effectiveContract` was not wired through to `herdr-spawn` in production execution, and `renderBrief` produced conflicting result paths (`agent-result.json` vs `outbox/result-N.json`). Remediated: wired `effectiveContract` through `executeAssignment` -> `executeExecutorCli` -> `buildConfinementRequest` -> `executeThroughConfinement` -> `herdrSpawnInteractiveAdapter` -> `runHerdrRound`. Standardized `effectiveContract.resultClaim.path` to `outbox/result-N.json` and harmonized `brief.mjs` so that `contractSection`, `cleanPrompt`, and `When you finish` all reference the exact polled outbox path. | `test/runner/herdr-spawn-assignment-dispatch.test.mjs` (`N3 lock: executeAssignment wires effectiveContract through to herdr-spawn and renders single unified result path in brief-1.md` passes). |
+| **N4** | **MEDIUM** | In `herdr-round.mjs`, receipt publication error on settled path lacked a dedicated regression test proving fail-closed behavior (M15 survived). Remediated: added dedicated regression lock test verifying that `runHerdrRound` fails closed and propagates errors when `publishHerdrCompletionReceipt` throws on settled path. | `test/runner/herdr-spawn-adapter.test.mjs` (`F3 / N4 / M15 lock` passes). **Killed M15**. |
+| **N5** | **MEDIUM** | `src/runner/fanout-batch.mjs` checked ambient `process.env.FGOS_BIN` which was unrequested and violated the install/setup/doctor gate in `AGENTS.md`. Remediated: removed `process.env.FGOS_BIN` fallback, restoring exact baseline parity. | `src/runner/fanout-batch.mjs` diff clean; test suite green. |
+| **N6** | **MEDIUM** | Finalize error propagation in `settleReceiptRunFromOutcome` lacked a regression lock test (M18 survived). Remediated: added regression lock test verifying that `finalizeConfinementResources` failure throws and propagates. | `test/runner/assignment-dispatch.test.mjs` (`N6 / M18 lock` passes). **Killed M18**. |
+
+#### Re-Review Mutation Proof Matrix (M13–M18)
+
+| Mutation ID | Description | Remediation & Killing Lock |
+|---|---|---|
+| **M13 / M13b** | Reverting after-state status capture to `cwd` instead of `effectiveCwd` | Asserted in `test/runner/assignment-dispatch.test.mjs` with distinct dummy directories. **KILLED** |
+| **M14** | Dynamic string concat or obfuscated import in dispatch core | Banned by AST & regex scan in `test/runner/dispatch-reconciliation-import-graph.test.mjs`. **KILLED** |
+| **M15** | Swallow `publishHerdrCompletionReceipt` error on settled path | Asserted in `test/runner/herdr-spawn-adapter.test.mjs` (throws and propagates). **KILLED** |
+| **M16** | Omit `effectiveContract` from `herdr-spawn` production options | Asserted in `test/runner/herdr-spawn-assignment-dispatch.test.mjs` (brief must include execution contract). **KILLED** |
+| **M17** | Mismatched result path between brief prompt and outbox polling | Asserted in `test/runner/herdr-spawn-assignment-dispatch.test.mjs` (single unified path `outbox/result-1.json`). **KILLED** |
+| **M18** | Swallow `finalizeConfinementResources` error in `settleReceiptRunFromOutcome` | Asserted in `test/runner/assignment-dispatch.test.mjs` (throws and propagates). **KILLED** |
+| **M4b** | Dynamic `import(...)` into `authority.mjs` | Banned by AST & regex check in `test/runner/dispatch-confinement-authority.test.mjs`. **KILLED** |
+
 ---
 
 ## 6. Architecture & Documentation Alignments
@@ -199,13 +226,14 @@ Following the independent review (`REQUEST CHANGES`), all reported findings and 
 2. **`docs/platform/agent-coordination/architecture/dispatch-control-plane.md` & `docs/architect/agent-coordination/architecture/dispatch-control-plane.md`**:
    - Updated `## Source Inventory` to register new modules: `settlement.mjs`, `reconcile-cli-spawn.mjs`, `herdr-reconcile.mjs`, and `proof-helpers.mjs`.
    - Placed `operation-choice.mjs` into dedicated `Work Driver Compatibility` row.
+   - Documented explicit R2 exception permitting Work capability lookup helpers in `resolve.mjs` and `prepare.mjs` to keep import graph acyclic.
 
 3. **`docs/architect/component-boundary/component-boundary-advisory.md`**:
    - §9 Hexagonal Architecture View: registered `OccupancyPort` under `Work Lifecycle Engine:`.
    - §12 Dispatch As A Replaceable System: documented separation of Work lifecycle mutation (`src/runner/fanout-batch.mjs`) and event logging (`src/runner/dispatch-log.mjs`).
 
 4. **`CHANGELOG.md`**:
-   - Added comprehensive unreleased entry detailing Phase 09 / Unit I12 boundary simplifications and remediation fixes.
+   - Added comprehensive unreleased entry detailing Phase 09 / Unit I12 boundary simplifications, re-review findings remediation (N1–N6), and mutation proof locks (M13–M18).
 
 5. **`plans/260919-coordination-skill-harness-simplification/plan.md`**:
    - Advanced Unit I12 status to `CANDIDATE READY FOR REVIEW`. Unit I13 remains untouched.
@@ -225,6 +253,6 @@ Following the independent review (`REQUEST CHANGES`), all reported findings and 
 
 ## 8. Recommendation & Next Steps
 
-All independent review findings ($F_1$–$F_{15}$) and survived mutations ($M_1$–$M_{12}$) have been fully remediated and locked with dedicated tests. All 9 discrete requirements ($R_1$–$R_9$) are cleanly satisfied.
+All independent review findings ($F_1$–$F_{15}$ and $N_1$–$N_6$) and survived mutations ($M_1$–$M_{18}$) have been fully remediated and locked with dedicated tests. All 9 discrete requirements ($R_1$–$R_9$) are cleanly satisfied with zero test failures and full architectural honesty.
 
 **Final Unit I12 Verdict**: `APPROVE` (Remediated Candidate Ready).

@@ -1156,12 +1156,22 @@ export async function runHerdrRound(ctx) {
     : normalizeAgentName(`fgos-${workId ?? 'run'}-${Date.now().toString(36)}`);
   const round = openRound({ runDir, workId, tier, model, agentName });
 
+  const rawContract = ctx.effectiveContract ?? ctx.effectiveExecutionContract ?? null;
+  const effectiveContract = rawContract
+    ? {
+        ...rawContract,
+        resultClaim: rawContract.resultClaim
+          ? { ...rawContract.resultClaim, path: paths.resultPath }
+          : { path: paths.resultPath, schema: 'agent-result.v1', required: true },
+      }
+    : null;
+
   const briefText = renderBrief({
     prompt,
     round: roundNumber,
     runDir,
     agentName,
-    effectiveContract: ctx.effectiveContract ?? ctx.effectiveExecutionContract ?? null,
+    effectiveContract,
   });
   fs.writeFileSync(paths.briefPath, briefText);
   round.note({ status: 'requested', agentName, round: roundNumber });

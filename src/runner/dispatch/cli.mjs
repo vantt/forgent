@@ -588,6 +588,7 @@ export async function executeExecutorCli(
     launchCommandId,
     controlEpoch,
     controlToken,
+    effectiveContract,
   } = {},
 ) {
   const purpose = purposeArg;
@@ -973,6 +974,7 @@ export async function executeExecutorCli(
           launchCommandId,
           controlEpoch,
           controlToken,
+          effectiveContract,
         },
       });
     } catch (err) {

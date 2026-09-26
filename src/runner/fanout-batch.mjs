@@ -15,7 +15,6 @@ const REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const LOCAL_FGOS_MJS = fileURLToPath(new URL('../../bin/fgos.mjs', import.meta.url));
 
 function resolveBinFgos() {
-  if (process.env.FGOS_BIN) return process.env.FGOS_BIN;
   return resolveFgosBin(REPO_ROOT)?.path ?? LOCAL_FGOS_MJS;
 }
 
