@@ -1,5 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 
 import {
   buildSwitchboardIndex,
@@ -17,6 +21,10 @@ import {
   extractMarkdownConservationUnits,
   extractMixedFileConservationUnit,
   classifyConsumerKind,
+  normalizeDocTarget,
+  extractLinks,
+  extractRefs,
+  collectConsumers,
   parseLsTreeLong,
 } from '../../scripts/generate-doc-inventory.mjs';
 import {
@@ -156,8 +164,25 @@ test('classifyByDirectoryHeuristic: distillery is a consumer-project corpus, not
   assert.equal(row.gap, false);
 });
 
-test('slugifyHeading: lowercases, strips punctuation, collapses whitespace to hyphens', () => {
+test('slugifyHeading: lowercases, strips punctuation, collapses whitespace to GitHub-compatible hyphens', () => {
   assert.equal(slugifyHeading('Hello, World! #Test'), 'hello-world-test');
+  assert.equal(slugifyHeading('Use <code>fgOS</code> & Runner'), 'use-fgos-runner');
+});
+
+
+test('normalizeDocTarget + extractLinks: resolves Markdown relative links against the source path', () => {
+  assert.equal(normalizeDocTarget('../reference/thing.md#anchor', 'docs/how-to/run.md'), 'docs/reference/thing.md');
+  const links = extractLinks('[Read](../reference/thing.md#anchor)', 'docs/how-to/run.md');
+  assert.deepEqual(links.map((l) => l.targetPath), ['docs/reference/thing.md']);
+});
+
+
+test('extractRefs: preserves full tsk ids, avoids ADR inside D-ADR duplicates, and ignores pure date-like hex', () => {
+  const refs = extractRefs('D-ADR0030 tsk-1lv-4 20260717 ecfd0d1a ADR-001');
+  assert.equal(refs.includes('tsk-1lv-4'), true);
+  assert.equal(refs.filter((r) => r === 'ADR0030').length, 0);
+  assert.equal(refs.includes('20260717'), false);
+  assert.equal(refs.includes('ecfd0d1a'), true);
 });
 
 test('extractHeadings: ignores headings inside fenced code blocks and dedupes repeated anchors', () => {
@@ -178,6 +203,14 @@ test('extractHeadings: ignores headings inside fenced code blocks and dedupes re
     { level: 2, text: 'Section One', anchor: 'section-one' },
     { level: 2, text: 'Section One', anchor: 'section-one-1' },
   ]);
+});
+
+
+test('extractMarkdownConservationUnits: only closes fences with matching marker and sufficient length', () => {
+  const md = ['````txt', '# not heading', '```', '# still not heading', '````', '# Real'].join('\n');
+  const units = extractMarkdownConservationUnits(md);
+  assert.equal(units.some((u) => u.title === 'still not heading'), false);
+  assert.equal(units.some((u) => u.title === 'Real'), true);
 });
 
 test('extractHeadings: strips a trailing ATX closing sequence', () => {
@@ -289,6 +322,13 @@ test('extractMarkdownConservationUnits: emits headings and unheaded blocks for c
   assert.equal(units[0].anchor, 'unheaded-block-1');
 });
 
+
+test('extractMarkdownConservationUnits: preserves short nonblank normative unheaded lines', () => {
+  const units = extractMarkdownConservationUnits('MUST pass.\n\n# Title');
+  assert.equal(units[0].unitKind, 'unheaded-preamble');
+  assert.equal(units[0].sample, 'MUST pass.');
+});
+
 test('extractMarkdownConservationUnits: conserves fenced payloads without treating headings inside them as headings', () => {
   const md = ['# Contract', '', '```yaml', '# schema comment', 'authority: legacy-current', '```'].join('\n');
   const units = extractMarkdownConservationUnits(md);
@@ -304,12 +344,46 @@ test('extractMixedFileConservationUnit: non-Markdown payloads get a file-block c
   assert.equal(units[0].anchor, 'file-block');
 });
 
-test('classifyConsumerKind: covers dynamic, glob, fixture, executable proof, and literal consumers', () => {
+test('classifyConsumerKind: covers dynamic, glob, fixture, executable proof, and literal consumers without treating Markdown bold as glob', () => {
   assert.equal(classifyConsumerKind('src/x.mjs', 'const p = `${root}/docs/specs/runner.md`;'), 'dynamic');
   assert.equal(classifyConsumerKind('scripts/x.mjs', 'docs/architect/**'), 'glob');
+  assert.equal(classifyConsumerKind('docs/x.md', '**bold docs/specs/runner.md**'), 'literal');
   assert.equal(classifyConsumerKind('test/fixtures/readme.md', 'docs/specs/runner.md'), 'fixture');
   assert.equal(classifyConsumerKind('test/foo.test.mjs', 'assert.match(out, /docs/);'), 'executable-proof');
   assert.equal(classifyConsumerKind('README.md', 'docs/specs/runner.md'), 'literal');
+});
+
+
+test('collectConsumers: scans source extensions, resolves relative links, globs, exact AGENTS segments, and immutable refs', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-inventory-consumers-'));
+  try {
+    execFileSync('git', ['init'], { cwd: tmp, stdio: 'ignore' });
+    execFileSync('git', ['config', 'user.email', 't@example.test'], { cwd: tmp });
+    execFileSync('git', ['config', 'user.name', 'Test'], { cwd: tmp });
+    fs.mkdirSync(path.join(tmp, 'docs/specs'), { recursive: true });
+    fs.mkdirSync(path.join(tmp, 'docs/how-to'), { recursive: true });
+    fs.mkdirSync(path.join(tmp, 'src'), { recursive: true });
+    fs.writeFileSync(path.join(tmp, 'AGENTS.md'), '# Agents\n');
+    fs.writeFileSync(path.join(tmp, 'docs/specs/runner.md'), '# Runner\n\nD-ADR0030 tsk-1lv-4 ecfd0d1a\n');
+    fs.writeFileSync(path.join(tmp, 'docs/how-to/read.md'), '[Runner](../specs/runner.md)\n');
+    fs.writeFileSync(path.join(tmp, 'src/consumer.ts'), [
+      'const x = "docs/specs/*.md";',
+      'const y = path.join("docs", "specs", name);',
+      'const z = "AGENTS.md";',
+      'const not = "NOTAGENTS.md";',
+      '// tsk-1lv-4',
+    ].join('\n'));
+    execFileSync('git', ['add', '.'], { cwd: tmp });
+    execFileSync('git', ['commit', '-m', 'fixture'], { cwd: tmp, stdio: 'ignore' });
+    const commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tmp, encoding: 'utf8' }).trim();
+    const consumers = collectConsumers(tmp, commit, ['AGENTS.md', 'docs/specs/runner.md'], new Map(), { targetRefs: new Map([['docs/specs/runner.md', ['tsk-1lv-4']]]) });
+    assert.equal(consumers.get('docs/specs/runner.md').some((e) => e.path === 'docs/how-to/read.md' && e.resolvedTarget === 'docs/specs/runner.md'), true);
+    assert.equal(consumers.get('docs/specs/runner.md').some((e) => e.kind === 'glob'), true);
+    assert.equal(consumers.immutableRefEdges.some((e) => e.ref === 'tsk-1lv-4' && e.sourcePaths.includes('src/consumer.ts') && e.targetPaths.includes('docs/specs/runner.md')), true);
+    assert.equal(consumers.get('AGENTS.md').some((e) => e.path === 'src/consumer.ts'), true);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
 });
 
 test('buildInventoryRow: current source route is not automatically its own target owner', () => {

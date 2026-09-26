@@ -40,8 +40,19 @@ function slugText(text) {
     .replace(/\s+/g, '-');
 }
 
+export function githubSlugText(text) {
+  return String(text || '')
+    .trim()
+    .toLowerCase()
+    .replace(/<[^>]*>/g, '')
+    .replace(/[`*_~]/g, '')
+    .replace(/[^\p{L}\p{N}\s -]/gu, '')
+    .trim()
+    .replace(/\s+/g, '-');
+}
+
 export function slugifyHeading(text) {
-  return slugText(text);
+  return githubSlugText(text);
 }
 
 function areaSlug(area) {
@@ -347,6 +358,10 @@ function targetOwnerForDisposition(disposition, classification) {
   return classification.proposedTargetOwner ? normalizePosix(classification.proposedTargetOwner) : null;
 }
 
+function isNormativeUnheaded(raw) {
+  return /\b(MUST|MUST NOT|SHOULD|SHALL|NEVER|ALWAYS|REQUIRED|FORBIDDEN|Không được|không được|phải|Luật|Rule|Invariant|Blocked when|Runs when|What changes)\b/.test(raw);
+}
+
 export function extractMarkdownConservationUnits(content) {
   const lines = content.split(/\r?\n/);
   const units = [];
@@ -361,12 +376,15 @@ export function extractMarkdownConservationUnits(content) {
   function flushUnheaded(endLine) {
     const raw = unheaded.join('\n').trim();
     unheaded = [];
-    if (raw.replace(/\s+/g, '').length < 20) return;
+    if (!raw) return;
+    if (raw.replace(/\s+/g, '').length < 20 && !isNormativeUnheaded(raw)) return;
     unheadedCount += 1;
     const anchor = `unheaded-block-${unheadedCount}`;
     units.push({
       unitKind: beforeFirstHeading ? 'unheaded-preamble' : 'unheaded-block',
       anchor,
+      githubAnchor: anchor,
+      stableAnchor: anchor,
       title: beforeFirstHeading ? 'Unheaded preamble' : `Unheaded block ${unheadedCount}`,
       startLine: unheadedStart,
       endLine,
@@ -384,9 +402,10 @@ export function extractMarkdownConservationUnits(content) {
       unheaded.push(line);
       if (!inFence) {
         inFence = true;
-        fenceMarker = fenceMatch[1][0];
-      } else if (line.trim().startsWith(fenceMarker.repeat(3))) {
+        fenceMarker = fenceMatch[1];
+      } else if (fenceMatch[1][0] === fenceMarker[0] && fenceMatch[1].length >= fenceMarker.length) {
         inFence = false;
+        fenceMarker = null;
       }
       continue;
     }
@@ -400,11 +419,12 @@ export function extractMarkdownConservationUnits(content) {
       flushUnheaded(lineNo - 1);
       const level = h[1].length;
       const title = h[2].trim();
-      const base = slugifyHeading(title) || 'section';
-      const count = seenAnchors.get(base) || 0;
-      seenAnchors.set(base, count + 1);
-      const anchor = count > 0 ? `${base}-${count}` : base;
-      units.push({ unitKind: 'heading', level, title, anchor, startLine: lineNo, endLine: lineNo, textDigest: sha256(title), sample: title });
+      const githubBase = githubSlugText(title) || 'section';
+      const count = seenAnchors.get(githubBase) || 0;
+      seenAnchors.set(githubBase, count + 1);
+      const githubAnchor = count > 0 ? `${githubBase}-${count}` : githubBase;
+      const stableAnchor = `h-${stableHash(`${title}\n${lineNo}`, 12)}`;
+      units.push({ unitKind: 'heading', level, title, anchor: githubAnchor, githubAnchor, stableAnchor, startLine: lineNo, endLine: lineNo, textDigest: sha256(title), sample: title });
       beforeFirstHeading = false;
       unheadedStart = lineNo + 1;
       continue;
@@ -426,6 +446,8 @@ export function extractMixedFileConservationUnit(relPath, content) {
   return [{
     unitKind: 'file-block',
     anchor: 'file-block',
+    githubAnchor: 'file-block',
+    stableAnchor: 'file-block',
     title: path.posix.basename(normalizePosix(relPath)),
     startLine: 1,
     endLine: content.split(/\r?\n/).length,
@@ -434,26 +456,49 @@ export function extractMixedFileConservationUnit(relPath, content) {
   }];
 }
 
-export function extractLinks(content) {
+export function normalizeDocTarget(rawTarget, sourcePath = '') {
+  if (!rawTarget || typeof rawTarget !== 'string') return null;
+  let raw = rawTarget.trim().replace(/^<|>$/g, '');
+  if (!raw || /^(https?:|mailto:|#)/i.test(raw)) return null;
+  raw = raw.split(/[?#]/)[0];
+  if (!raw) return null;
+  const baseDir = path.posix.dirname(normalizePosix(sourcePath || ''));
+  const resolved = raw.startsWith('/')
+    ? normalizePosix(raw.slice(1))
+    : (raw.startsWith('./') || raw.startsWith('../'))
+      ? normalizePosix(path.posix.normalize(path.posix.join(baseDir, raw)))
+      : normalizePosix(raw);
+  return resolved.replace(/\/$/, '');
+}
+
+export function extractLinks(content, sourcePath = '') {
   const links = [];
-  const markdown = /\[[^\]]*\]\(([^)]+)\)/g;
+  const markdown = /(?<!!)\[[^\]]*\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g;
   let m;
-  while ((m = markdown.exec(content)) !== null) links.push(m[1].trim());
-  const bare = /(?:^|\s)((?:docs|plans|scripts|src|test|core|domains|plugins|\.agents|\.fgos)\/[A-Za-z0-9_.\/-]+(?:#[A-Za-z0-9_.\/-]+)?)/g;
-  while ((m = bare.exec(content)) !== null) links.push(m[1].trim());
-  return [...new Set(links)].sort();
+  while ((m = markdown.exec(content)) !== null) {
+    const raw = m[1].trim();
+    links.push({ raw, targetPath: normalizeDocTarget(raw, sourcePath), kind: raw.startsWith('.') ? 'markdown-relative' : 'markdown' });
+  }
+  const bare = /(?:^|[\s"'`(<\[])(((?:docs|plans|scripts|src|test|core|domains|plugins|\.agents|\.fgos)\/[A-Za-z0-9_.\/*-]+)(?:#[A-Za-z0-9_.\/-]+)?)/g;
+  while ((m = bare.exec(content)) !== null) {
+    const raw = m[1].trim().replace(/[),.;:]+$/, '');
+    links.push({ raw, targetPath: normalizeDocTarget(raw, sourcePath), kind: raw.includes('*') ? 'glob' : 'bare' });
+  }
+  const byKey = new Map();
+  for (const link of links) byKey.set(`${link.raw}\n${link.targetPath || ''}\n${link.kind}`, link);
+  return [...byKey.values()].sort((a, b) => (a.targetPath || a.raw).localeCompare(b.targetPath || b.raw) || a.raw.localeCompare(b.raw));
 }
 
 export function extractRefs(content) {
   const refs = new Set();
   const patterns = [
     /\bD-ADR\d{4}\b/g,
-    /\bADR-?\d{3,4}\b/g,
+    /(?<!D-)\bADR-?\d{3,4}\b/g,
     /\bSTR\d+[A-Za-z0-9-]*\b/g,
-    /\btsk-[a-z0-9]+\b/g,
+    /\btsk-[a-z0-9]+(?:-[a-z0-9]+)*\b/g,
     /\bRUL\d+\b/g,
     /\bCTR\d+\b/g,
-    /\b[a-f0-9]{7,40}\b/g,
+    /\b(?=[a-f0-9]{7,40}\b)(?=[a-f0-9]*[a-f])[a-f0-9]{7,40}\b/g,
   ];
   for (const re of patterns) {
     let m;
@@ -462,18 +507,23 @@ export function extractRefs(content) {
   return [...refs].sort();
 }
 
+function hasMeaningfulGlobSyntax(line) {
+  const stripped = String(line).replace(/\*\*[^*]+\*\*/g, '');
+  return /(^|[\s"'`=:([])[A-Za-z0-9_./-]*\*{1,2}[A-Za-z0-9_./*-]*/.test(stripped) || /\b(glob|pathspec|minimatch)\b/i.test(stripped);
+}
+
 export function classifyConsumerKind(refFile, line = '') {
   const f = normalizePosix(refFile).toLowerCase();
   const l = String(line).toLowerCase();
   if (f.includes('/fixtures/') || f.includes('fixture') || l.includes('fixture')) return 'fixture';
   if (f.startsWith('test/') || /\b(proof|verify|receipt|assert|node --test|npm test)\b/.test(l)) return 'executable-proof';
-  if (line.includes('**') || /glob|pathspec|minimatch/.test(l)) return 'glob';
-  if (/\$\{|<[^>]+>|\*|\bdynamic\b|join\(|resolve\(/.test(line)) return 'dynamic';
+  if (hasMeaningfulGlobSyntax(line)) return 'glob';
+  if (/\$\{|<[^>]+>|\bdynamic\b|join\(|resolve\(|path\.join|path\.resolve/.test(line)) return 'dynamic';
   return 'literal';
 }
 
 function isTextPath(p) {
-  return /\.(md|txt|json|jsonl|mjs|js|cjs|yaml|yml|toml|sh|rs|html|css)$/i.test(p) || !path.posix.extname(p);
+  return /\.(md|ts|tsx|js|mjs|cjs|py|rs|sh|json|yaml|yml|toml)$/i.test(p);
 }
 
 function listCommitPaths(repoRoot, commitSha) {
@@ -501,10 +551,32 @@ export function buildShippedContractIndex(shippedInventory) {
   return byPath;
 }
 
-export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex = new Map()) {
+function pathSegmentTokenRegex(fileName) {
+  const escaped = fileName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp('(^|[^A-Za-z0-9_./-])' + escaped + '($|[^A-Za-z0-9_./-])');
+}
+
+function globToRegExp(glob) {
+  const escaped = normalizePosix(glob).replace(/[.+^${}()|[\]\\]/g, '\\$&');
+  const pattern = escaped.replace(/\*\*/g, '.*').replace(/\*/g, '[^/]*');
+  return new RegExp(`^${pattern}$`);
+}
+
+function addUnique(map, target, edge) {
+  if (!map.has(target)) return;
+  map.get(target).push(edge);
+}
+
+export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex = new Map(), options = {}) {
   const normalizedTargets = targetPaths.map(normalizePosix).sort();
   const targetSet = new Set(normalizedTargets);
   const stemToTargets = new Map();
+  const targetRefs = options.targetRefs || new Map();
+  const immutableSourcesByRef = new Map();
+  const refToTargets = new Map();
+  for (const [target, refs] of targetRefs.entries()) {
+    for (const ref of refs || []) refToTargets.set(ref, (refToTargets.get(ref) || []).concat(target));
+  }
   for (const target of normalizedTargets) {
     if (target.endsWith('.md')) {
       const stem = target.replace(/\.md$/, '');
@@ -512,36 +584,71 @@ export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex 
     }
   }
   const consumersByPath = new Map(normalizedTargets.map((p) => [p, []]));
-  const allPaths = listCommitPaths(repoRoot, commitSha).filter(isTextPath);
-  const pathToken = /(?:^|[\s"'`(<\[])(((?:docs|plans|scripts|src|test|core|domains|plugins|\.agents|\.fgos)\/[A-Za-z0-9_.\/-]+(?:\*\*)?(?:\.[A-Za-z0-9]+)?))/g;
+  const scanGaps = [];
+  const allEntries = parseLsTreeLong(execFileSync('git', ['ls-tree', '-r', '-l', commitSha], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    maxBuffer: 60 * 1024 * 1024,
+    stdio: ['pipe', 'pipe', 'pipe'],
+  }));
+  const allPaths = allEntries.map((e) => normalizePosix(e.path)).filter(isTextPath).sort();
+  const sizeByPath = new Map(allEntries.map((e) => [normalizePosix(e.path), e.size]));
+  const pathToken = /(?:^|[\s"'`(<\[])(((?:docs|plans|scripts|src|test|core|domains|plugins|\.agents|\.fgos)\/[A-Za-z0-9_.\/*-]+)(?:#[A-Za-z0-9_.\/-]+)?)/g;
 
   function add(target, file, lineNo, kind, extra = {}) {
-    if (!consumersByPath.has(target)) return;
-    consumersByPath.get(target).push({ path: file, line: lineNo, kind, ...extra });
+    addUnique(consumersByPath, target, { path: file, line: lineNo, kind, ...extra });
   }
 
   for (const file of allPaths) {
+    const blobSize = sizeByPath.get(file) || 0;
+    if (blobSize > 20 * 1024 * 1024) {
+      scanGaps.push({ type: 'consumer-scan-too-large', path: file, blobSize, message: `${file}: ${blobSize} bytes exceeds 20MB consumer scan limit` });
+      continue;
+    }
     let content;
-    try { content = readBlobAtCommit(commitSha, file, repoRoot); } catch { continue; }
+    try { content = readBlobAtCommit(commitSha, file, repoRoot); } catch (err) {
+      scanGaps.push({ type: 'consumer-scan-unreadable', path: file, message: `${file}: unable to read blob: ${err.message}` });
+      continue;
+    }
     const lines = content.split(/\r?\n/);
     for (let i = 0; i < lines.length; i += 1) {
       const line = lines[i];
-      if (!line.includes('docs/') && !line.includes('AGENTS.md') && !line.includes('CLAUDE.md')) continue;
       const lineNo = i + 1;
-      if (line.includes('AGENTS.md')) add('AGENTS.md', file, lineNo, classifyConsumerKind(file, line));
-      if (line.includes('CLAUDE.md')) add('CLAUDE.md', file, lineNo, classifyConsumerKind(file, line));
+      const kind = classifyConsumerKind(file, line);
+      if (pathSegmentTokenRegex('AGENTS.md').test(line)) add('AGENTS.md', file, lineNo, kind);
+      if (pathSegmentTokenRegex('CLAUDE.md').test(line)) add('CLAUDE.md', file, lineNo, kind);
+
+      for (const link of extractLinks(line, file)) {
+        const token = link.targetPath;
+        if (!token) continue;
+        const edgeKind = link.kind === 'glob' ? 'glob' : kind;
+        if (targetSet.has(token)) add(token, file, lineNo, edgeKind, { rawTarget: link.raw, resolvedTarget: token });
+        for (const target of stemToTargets.get(token) || []) add(target, file, lineNo, edgeKind, { rawTarget: link.raw, resolvedTarget: token });
+        if (token.includes('*')) {
+          const re = globToRegExp(token);
+          for (const target of normalizedTargets) if (re.test(target)) add(target, file, lineNo, 'glob', { rawTarget: link.raw, resolvedTarget: token });
+        }
+      }
+
       let m;
       pathToken.lastIndex = 0;
       while ((m = pathToken.exec(line)) !== null) {
-        const token = normalizePosix(m[1]).replace(/[),.;:]+$/, '');
-        const kind = classifyConsumerKind(file, line);
-        if (targetSet.has(token)) add(token, file, lineNo, kind);
-        for (const target of stemToTargets.get(token) || []) add(target, file, lineNo, kind);
+        const token = normalizeDocTarget(m[1].trim().replace(/[),.;:]+$/, ''), file);
+        if (!token) continue;
+        if (targetSet.has(token)) add(token, file, lineNo, kind, { resolvedTarget: token });
+        for (const target of stemToTargets.get(token) || []) add(target, file, lineNo, kind, { resolvedTarget: token });
         if (token.includes('*')) {
-          const prefix = token.split('*')[0].replace(/\/$/, '');
-          for (const target of normalizedTargets) {
-            if (target === prefix || target.startsWith(prefix + '/')) add(target, file, lineNo, 'glob');
-          }
+          const re = globToRegExp(token);
+          for (const target of normalizedTargets) if (re.test(target)) add(target, file, lineNo, 'glob', { resolvedTarget: token });
+        }
+      }
+
+      for (const ref of extractRefs(line)) {
+        if (refToTargets.has(ref)) {
+          const key = `${file}:${lineNo}`;
+          const byLocation = immutableSourcesByRef.get(ref) || new Map();
+          byLocation.set(key, { path: file, line: lineNo });
+          immutableSourcesByRef.set(ref, byLocation);
         }
       }
     }
@@ -552,9 +659,17 @@ export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex 
   }
   for (const [target, arr] of consumersByPath.entries()) {
     const uniq = new Map();
-    for (const c of arr) uniq.set(`${c.path}:${c.line || ''}:${c.kind}:${c.contractScope || ''}`, c);
+    for (const c of arr) uniq.set(`${c.path}:${c.line || ''}:${c.kind}:${c.contractScope || ''}:${c.resolvedTarget || ''}:${c.ref || ''}`, c);
     consumersByPath.set(target, [...uniq.values()].sort((a, b) => a.path.localeCompare(b.path) || String(a.line || '').localeCompare(String(b.line || ''))));
   }
+  const immutableRefEdges = [...immutableSourcesByRef.entries()].map(([ref, byLocation]) => ({
+    edgeId: `immutable_ref_${stableHash(ref, 24)}`,
+    ref,
+    sourcePaths: [...new Set([...byLocation.values()].map((loc) => loc.path))].sort(),
+    targetPaths: [...new Set(refToTargets.get(ref) || [])].sort(),
+  })).sort((a, b) => a.ref.localeCompare(b.ref));
+  Object.defineProperty(consumersByPath, 'scanGaps', { value: scanGaps, enumerable: false });
+  Object.defineProperty(consumersByPath, 'immutableRefEdges', { value: immutableRefEdges, enumerable: false });
   return consumersByPath;
 }
 
@@ -565,7 +680,7 @@ export function buildInventoryRow(relPath, { content, blobSha, blobSize, switchb
   const documentType = isMarkdown ? extractDocumentType(content) : null;
   const claimKind = deriveClaimKind(documentType);
   const units = isMarkdown ? extractMarkdownConservationUnits(content) : extractMixedFileConservationUnit(sourcePath, content);
-  const headings = units.filter((u) => u.unitKind === 'heading').map((u) => ({ level: u.level, text: u.title, anchor: u.anchor }));
+  const headings = units.filter((u) => u.unitKind === 'heading').map((u) => ({ level: u.level, text: u.title, anchor: u.anchor, githubAnchor: u.githubAnchor, stableAnchor: u.stableAnchor }));
   const isPromotedCanonical = classification.authorityStatus === 'promoted' && sourcePath.startsWith('docs/platform/');
   const initialDisposition = proposeDisposition({ ...classification, isPromotedCanonical });
   const initialTargetOwner = targetOwnerForDisposition(initialDisposition, classification);
@@ -577,14 +692,14 @@ export function buildInventoryRow(relPath, { content, blobSha, blobSize, switchb
   const disposition = DISPOSITIONS_REQUIRING_TARGET_OWNER.has(proposedDisposition) && !hasCredibleOwner ? 'unknown-blocking' : proposedDisposition;
   const targetOwner = disposition === proposedDisposition ? proposedTargetOwner : null;
   const rationale = disposition === proposedDisposition ? proposeRationale(disposition, classification) : proposeRationale('unknown-blocking', classification);
-  const links = extractLinks(content);
+  const linkRecords = extractLinks(content, sourcePath);
+  const links = linkRecords.map((l) => l.raw);
+  const resolvedLinks = [...new Set(linkRecords.map((l) => l.targetPath).filter(Boolean))].sort();
   const refs = extractRefs(content);
   const sourceDigest = sha256(content);
   const sourceId = makeSourceId(sourceDigest);
   const claimStatus = deriveClaimStatus(classification);
   const proposedClaimOwner = RETAINED_CLAIM_DISPOSITIONS.has(disposition) ? targetOwner : null;
-  const claimDecisionRefs = refs.filter((r) => /^(D-ADR|ADR|STR|RUL|CTR)/.test(r));
-  const claimEvidenceLinks = links.filter((l) => /proof|verify|evidence|receipt|test|history|reports/.test(l.toLowerCase()));
   const baseIdCounts = new Map();
 
   const claims = units.map((u) => {
@@ -594,20 +709,23 @@ export function buildInventoryRow(relPath, { content, blobSha, blobSize, switchb
     baseIdCounts.set(baseClaimId, duplicateOrdinal + 1);
     const claimId = duplicateOrdinal === 0 ? baseClaimId : `${baseClaimId}_dup_${stableHash(`${u.anchor}\n${duplicateOrdinal}`, 8)}`;
     const relations = duplicateOrdinal === 0 ? [] : [{ type: 'same-source-identical-content-duplicate', claimId: baseClaimId, duplicateOrdinal }];
+    const unitRefs = extractRefs(`${u.title || ''}\n${u.sample || ''}`);
+    const unitLinks = extractLinks(u.sample || '', sourcePath).map((l) => l.raw);
     return {
       claimId,
       sourceId,
       sourcePath,
       sourceAnchor: u.anchor,
       sourceDigest,
+      sourceLocation: { start: u.startLine, end: u.endLine },
       targetOwner: proposedClaimOwner,
       targetAnchor: proposedClaimOwner ? u.anchor : null,
       claimKind: kind,
       authorityKind: classification.authorityStatus,
       status: claimStatus,
       relations,
-      decisionRefs: claimDecisionRefs,
-      evidenceLinks: claimEvidenceLinks,
+      decisionRefs: unitRefs.filter((r) => /^(D-ADR|ADR|STR|RUL|CTR)/.test(r)),
+      evidenceLinks: unitLinks.filter((l) => /proof|verify|evidence|receipt|test|history|reports/.test(l.toLowerCase())),
       disposition: needsClaimLevelSplit && disposition === proposedDisposition ? 'split' : disposition,
       reviewStatus: disposition === 'unknown-blocking' ? 'blocking' : 'pending',
     };
@@ -634,6 +752,8 @@ export function buildInventoryRow(relPath, { content, blobSha, blobSize, switchb
     mixedFileBlockCount: units.filter((u) => u.unitKind === 'file-block').length,
     headings,
     links,
+    resolvedLinks,
+    linkRecords,
     decisionRefs: refs.filter((r) => /^(D-ADR|ADR|STR|RUL|CTR)/.test(r)),
     immutableRefs: refs.filter((r) => /^[a-f0-9]{7,40}$/.test(r) || /^tsk-/.test(r)),
     evidenceLinks: links.filter((l) => /proof|verify|evidence|receipt|test|history|reports/.test(l.toLowerCase())),
@@ -714,13 +834,43 @@ export function generateInventory(repoRoot = process.cwd(), options = {}) {
   const shippedIndex = buildShippedContractIndex(loadShippedPathInventory(commitSha, repoRoot));
   const files = scanInScopeFiles(repoRoot, commitSha).sort((a, b) => normalizePosix(a.path).localeCompare(normalizePosix(b.path)));
   const paths = files.map((f) => normalizePosix(f.path));
-  const consumersByPath = collectConsumers(repoRoot, commitSha, paths, shippedIndex);
+  const targetRefs = new Map();
+  for (const f of files) {
+    const norm = normalizePosix(f.path);
+    if (f.size > 20 * 1024 * 1024) {
+      targetRefs.set(norm, []);
+      continue;
+    }
+    try { targetRefs.set(norm, extractRefs(readBlobAtCommit(commitSha, f.path, repoRoot))); }
+    catch { targetRefs.set(norm, []); }
+  }
+  const consumersByPath = collectConsumers(repoRoot, commitSha, paths, shippedIndex, { targetRefs });
+  const scanGaps = consumersByPath.scanGaps || [];
+  const immutableRefEdges = consumersByPath.immutableRefEdges || [];
   const blobShaCounts = new Map();
   const items = [];
 
   for (const f of files) {
     const norm = normalizePosix(f.path);
-    const content = readBlobAtCommit(commitSha, f.path, repoRoot);
+    if (f.size > 20 * 1024 * 1024) {
+      items.push(buildInventoryRow(norm, {
+        content: `UNREAD INVENTORY GAP: ${norm} exceeds 20MB blob limit (${f.size} bytes).`,
+        blobSha: f.blobSha,
+        blobSize: f.size,
+        switchboardIndex,
+        shippedContract: shippedIndex.get(norm) || null,
+        consumers: consumersByPath.get(norm) || [],
+      }));
+      scanGaps.push({ type: 'inventory-blob-too-large', path: norm, blobSize: f.size, message: `${norm}: explicit inventory gap because blob exceeds 20MB` });
+      blobShaCounts.set(f.blobSha, (blobShaCounts.get(f.blobSha) || []).concat(norm));
+      continue;
+    }
+    let content;
+    try { content = readBlobAtCommit(commitSha, f.path, repoRoot); }
+    catch (err) {
+      content = `UNREAD INVENTORY GAP: ${norm} could not be read: ${err.message}`;
+      scanGaps.push({ type: 'inventory-blob-unreadable', path: norm, message: `${norm}: explicit inventory gap because blob could not be read: ${err.message}` });
+    }
     const row = buildInventoryRow(norm, {
       content,
       blobSha: f.blobSha,
@@ -742,23 +892,24 @@ export function generateInventory(repoRoot = process.cwd(), options = {}) {
     const canonicalPath = group.paths[0];
     const canonical = itemByPath.get(canonicalPath);
     const canonicalClaimIds = canonical?.claimIds || [];
-    for (const duplicatePath of group.paths) {
+    for (const [sourceOccurrenceOrdinal, duplicatePath] of group.paths.entries()) {
       const item = itemByPath.get(duplicatePath);
       if (!item) continue;
       const oldClaimIds = [...item.claimIds];
       const oldClaimsById = item._claimsById;
       const rewrittenIds = [];
+      item.sourceOccurrences = group.paths.map((p, idx) => ({ sourceOccurrenceOrdinal: idx, path: p, role: p === canonicalPath ? 'canonical' : 'duplicate' }));
       item._claimsById = new Map();
       for (const [idx, oldClaimId] of oldClaimIds.entries()) {
         const claim = oldClaimsById?.get(oldClaimId) || item.claims?.[idx];
         if (!claim) continue;
         const canonicalClaimId = canonicalClaimIds[idx] || oldClaimId;
-        if (duplicatePath !== canonicalPath) claim.claimId = `${oldClaimId}_srcdup_${stableHash(duplicatePath, 8)}`;
+        if (duplicatePath !== canonicalPath) claim.claimId = `${oldClaimId}_srcdup_${stableHash(`${group.blobSha}\n${sourceOccurrenceOrdinal}\n${idx}`, 8)}`;
+        claim.sourceOccurrenceOrdinal = sourceOccurrenceOrdinal;
         claim.relations.push({
           type: duplicatePath === canonicalPath ? 'duplicate-content-canonical' : 'duplicate-content-of',
           claimId: canonicalClaimId,
-          sourceId: canonical?.sourceId || null,
-          sourcePath: canonicalPath,
+          sourceOccurrenceOrdinal,
           blobSha: group.blobSha,
         });
         rewrittenIds.push(claim.claimId);
@@ -770,13 +921,16 @@ export function generateInventory(repoRoot = process.cwd(), options = {}) {
   }
   const claimLedger = [];
   const consumerEdges = [];
+  const inboundLinkEdges = [];
   for (const item of items) {
     const consumers = consumersByPath.get(item.path) || [];
-    item.consumerEdgeIds = consumers.map((consumer) => `consumer_${stableHash(`${item.path}\n${consumer.path}\n${consumer.line || ''}\n${consumer.kind}\n${consumer.contractScope || ''}`, 24)}`);
+    item.consumerEdgeIds = consumers.map((consumer) => `consumer_${stableHash(`${item.path}\n${consumer.path}\n${consumer.line || ''}\n${consumer.kind}\n${consumer.contractScope || ''}\n${consumer.resolvedTarget || ''}\n${consumer.ref || ''}`, 24)}`);
     for (const consumer of consumers) {
-      const edgeId = `consumer_${stableHash(`${item.path}\n${consumer.path}\n${consumer.line || ''}\n${consumer.kind}\n${consumer.contractScope || ''}`, 24)}`;
+      const edgeId = `consumer_${stableHash(`${item.path}\n${consumer.path}\n${consumer.line || ''}\n${consumer.kind}\n${consumer.contractScope || ''}\n${consumer.resolvedTarget || ''}\n${consumer.ref || ''}`, 24)}`;
       const { line, ...consumerWithoutLine } = consumer;
-      consumerEdges.push({ edgeId, ...consumerWithoutLine });
+      const edge = { edgeId, line, targetPath: item.path, ...consumerWithoutLine };
+      consumerEdges.push(edge);
+      if (consumer.resolvedTarget || consumer.rawTarget) inboundLinkEdges.push({ edgeId, targetPath: item.path });
     }
     for (const claimId of item.claimIds) {
       const claim = item._claimsById?.get(claimId);
@@ -797,6 +951,7 @@ export function generateInventory(repoRoot = process.cwd(), options = {}) {
     gapCount: items.filter((i) => i.gap).length,
     duplicateContentGroupCount: duplicateContentGroups.length,
     semanticConflictGroupCount: semanticConflictGroups.length,
+    scanGapCount: scanGaps.length,
     headingTotalCount: items.reduce((n, i) => n + i.headingCount, 0),
     unheadedBlockTotalCount: items.reduce((n, i) => n + i.unheadedBlockCount, 0),
     mixedFileBlockTotalCount: items.reduce((n, i) => n + i.mixedFileBlockCount, 0),
@@ -808,6 +963,7 @@ export function generateInventory(repoRoot = process.cwd(), options = {}) {
     summary.byProposedDisposition[i.proposedDisposition] = (summary.byProposedDisposition[i.proposedDisposition] || 0) + 1;
     for (const k of i.consumerKinds) summary.byConsumerKind[k] = (summary.byConsumerKind[k] || 0) + 1;
   }
+  summary.immutableRefEdgeCount = immutableRefEdges.length;
 
   return {
     $schema: 'https://forgent.dev/schemas/doc-inventory.v3.json',
@@ -821,8 +977,13 @@ export function generateInventory(repoRoot = process.cwd(), options = {}) {
     summary,
     duplicateContentGroups,
     semanticConflictGroups,
+    scanGaps,
+    immutableRefEdges,
     claimLedger,
     consumerEdges,
+    inboundLinkEdges: [...inboundLinkEdges.reduce((m, e) => m.set(e.targetPath, (m.get(e.targetPath) || []).concat(e.edgeId)), new Map()).entries()]
+      .map(([targetPath, edgeIds]) => ({ targetPath, edgeIds }))
+      .sort((a, b) => a.targetPath.localeCompare(b.targetPath)),
     items,
   };
 }

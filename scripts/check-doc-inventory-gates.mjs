@@ -81,6 +81,17 @@ export function validateStructure(inventory) {
     if (!Array.isArray(item.consumerEdgeIds) || typeof item.consumerEdgeCount !== 'number' || item.consumerEdgeCount !== item.consumerEdgeIds.length || !Array.isArray(item.consumerKinds)) {
       findings.push({ type: 'missing-consumer-accounting', path: item.path, message: `${item.path}: consumer inventory must use consumerEdgeIds plus matching consumerEdgeCount and consumerKinds` });
     }
+    if (!Array.isArray(item.resolvedLinks) || !Array.isArray(item.linkRecords)) {
+      findings.push({ type: 'missing-resolved-link-inventory', path: item.path, message: `${item.path}: link inventory must carry raw linkRecords and normalized resolvedLinks` });
+    }
+  }
+
+  if (Array.isArray(inventory.scanGaps)) {
+    for (const gap of inventory.scanGaps) {
+      if (!gap?.type || !gap?.path || !gap?.message) findings.push({ type: 'malformed-scan-gap', message: 'scanGaps entries must carry type, path, and message' });
+    }
+  } else {
+    findings.push({ type: 'missing-scan-gaps', message: 'Inventory must include top-level scanGaps array, even when empty' });
   }
 
   if (typeof inventory.summary?.scannedFilesCount === 'number' && inventory.summary.scannedFilesCount !== inventory.items.length) {
@@ -95,7 +106,7 @@ export function validateStructure(inventory) {
     findings.push({ type: 'missing-claim-ledger', message: 'Inventory must include top-level claimLedger array' });
   } else {
     const claimsById = new Map();
-    const requiredClaimFields = ['claimId', 'sourceId', 'sourcePath', 'sourceAnchor', 'sourceDigest', 'targetOwner', 'targetAnchor', 'claimKind', 'authorityKind', 'status', 'relations', 'decisionRefs', 'evidenceLinks', 'disposition', 'reviewStatus'];
+    const requiredClaimFields = ['claimId', 'sourceId', 'sourcePath', 'sourceAnchor', 'sourceDigest', 'sourceLocation', 'targetOwner', 'targetAnchor', 'claimKind', 'authorityKind', 'status', 'relations', 'decisionRefs', 'evidenceLinks', 'disposition', 'reviewStatus'];
     const statusEnum = new Set(['current', 'future', 'historical']);
     for (const claim of inventory.claimLedger) {
       if (!claim?.claimId || claimsById.has(claim.claimId)) findings.push({ type: 'claim-ledger-duplicate', message: `claimLedger contains missing or duplicate claimId ${claim?.claimId || '<missing>'}` });
@@ -106,6 +117,14 @@ export function validateStructure(inventory) {
       if (claim?.status && !statusEnum.has(claim.status)) findings.push({ type: 'invalid-claim-status', message: `claim ${claim.claimId}: status ${claim.status} is not one of current, future, historical` });
       for (const arrayField of ['relations', 'decisionRefs', 'evidenceLinks']) {
         if (claim && arrayField in claim && !Array.isArray(claim[arrayField])) findings.push({ type: 'malformed-claim', message: `claim ${claim.claimId || '<missing>'}: ${arrayField} must be an array` });
+      }
+      if (claim?.sourceLocation && (typeof claim.sourceLocation.start !== 'number' || typeof claim.sourceLocation.end !== 'number')) {
+        findings.push({ type: 'malformed-claim-source-location', message: `claim ${claim.claimId || '<missing>'}: sourceLocation must identify the source line span; sourcePath remains the path field` });
+      }
+    }
+    for (const claim of inventory.claimLedger) {
+      if (/_srcdup_[0-9a-f]+$/.test(claim.claimId) && !claim.relations?.some((r) => Number.isInteger(r.sourceOccurrenceOrdinal))) {
+        findings.push({ type: 'path-dependent-duplicate-claim-id-risk', message: `claim ${claim.claimId}: duplicate occurrence ids must be backed by a path-independent sourceOccurrenceOrdinal relation` });
       }
     }
     if (inventory.claimLedger.length !== itemClaimIds.length) findings.push({ type: 'claim-ledger-mismatch', message: `claimLedger length (${inventory.claimLedger.length}) does not match total item claimIds (${itemClaimIds.length})` });
@@ -122,6 +141,17 @@ export function validateStructure(inventory) {
   }
 
   const itemConsumerIds = (inventory.items || []).flatMap((item) => Array.isArray(item.consumerEdgeIds) ? item.consumerEdgeIds.map((edgeId) => ({ edgeId, path: item.path })) : []);
+  if (!Array.isArray(inventory.inboundLinkEdges)) {
+    findings.push({ type: 'missing-inbound-link-edges', message: 'Inventory must include top-level inboundLinkEdges array' });
+  }
+  if (!Array.isArray(inventory.immutableRefEdges)) {
+    findings.push({ type: 'missing-immutable-ref-edges', message: 'Inventory must include top-level immutableRefEdges array grouping inbound event/decision references by source paths' });
+  } else {
+    for (const edge of inventory.immutableRefEdges) {
+      if (!edge?.ref || !Array.isArray(edge.sourcePaths) || !Array.isArray(edge.targetPaths)) findings.push({ type: 'malformed-immutable-ref-edge', message: 'immutableRefEdges entries must carry ref, sourcePaths, and targetPaths' });
+    }
+  }
+
   if (!Array.isArray(inventory.consumerEdges)) {
     findings.push({ type: 'missing-consumer-edges', message: 'Inventory must include top-level consumerEdges array' });
   } else {
@@ -135,6 +165,9 @@ export function validateStructure(inventory) {
       const edge = edgesById.get(edgeId);
       if (!edge) findings.push({ type: 'consumer-edge-missing-id', path: itemPath, message: `${itemPath}: consumerEdgeId ${edgeId} not found exactly once in top-level consumerEdges` });
       else if (edge.targetPath && edge.targetPath !== itemPath) findings.push({ type: 'consumer-edge-target-mismatch', path: itemPath, message: `${itemPath}: consumerEdgeId ${edgeId} targets ${edge.targetPath}` });
+    }
+    for (const edge of inventory.consumerEdges) {
+      if ((edge.rawTarget || edge.resolvedTarget) && !edge.targetPath) findings.push({ type: 'consumer-link-edge-missing-target', message: `consumer edge ${edge.edgeId || '<missing>'}: resolved link edge must carry targetPath` });
     }
   }
 

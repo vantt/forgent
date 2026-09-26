@@ -11,10 +11,10 @@ Related:
 - `plans/260925-documentation-authority-unification/plan.md` §7 Phase 02
 ```
 
-- **Commit:** `f0c76c5e590339d9c815038539ff1f4a072c64e4`
+- **Commit:** `b3b63c68c6a4742e4e12eb8173f49693d8d29132`
 - **Files scanned:** 4305
-- **Claim rows:** 85770
-- **Headings / unheaded blocks / mixed-file blocks:** 26105 / 58488 / 1177
+- **Claim rows:** 85772
+- **Headings / unheaded blocks / mixed-file blocks:** 26105 / 58490 / 1177
 - **Gaps:** 1042
 - **Exact duplicate-content groups:** 818
 - **Semantic conflict groups:** 151
@@ -67,11 +67,11 @@ Related:
 
 | Value | Count |
 |---|---:|
-| `glob` | 4297 |
-| `literal` | 2313 |
-| `executable-proof` | 1050 |
-| `dynamic` | 203 |
-| `fixture` | 74 |
+| `literal` | 3132 |
+| `glob` | 2376 |
+| `executable-proof` | 1198 |
+| `dynamic` | 113 |
+| `fixture` | 61 |
 | `shipped-contract` | 43 |
 
 ## Duplicate And Conflict Findings
