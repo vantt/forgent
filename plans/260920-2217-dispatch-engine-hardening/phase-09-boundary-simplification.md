@@ -2,6 +2,8 @@
 
 Wave 4 · Gate: Phase 01–08 xong (hành vi đã khoá bằng test trước khi dời code) · Findings: M10, L5, L8, L12, L13 + Simplicity Audit. Context: review §Simplicity Audit, §Architecture Quality Audit, Phụ lục 8.
 
+Status: VERIFIED/integrated via Unit I12 at `main@c782a08dfcae89279dcb1ca9fb59aa73fb58c515`; approved candidate `1089eb347455c10164ec03ffbcbf54ae35cd2097`; reviewer Round 5 APPROVE; post-merge full suite 7677 pass / 0 fail with dev-checkout `fgos` bin. Residual LOW debt: F-R5-1 static R2 lock evasions, F13 rollback-order debt, F14 probe-cache trust.
+
 **Có component-boundary change** — cập nhật `docs/platform/component-boundary.md` + `dispatch-control-plane.md` §Component-Internal Ownership khi thi công.
 
 ## Requirements
@@ -30,8 +32,31 @@ Wave 4 · Gate: Phase 01–08 xong (hành vi đã khoá bằng test trước khi
 
 ## Validation
 
-`npm test` xanh sau mỗi R; import-graph tests mở rộng pass; `git diff --stat` mỗi cell chỉ chạm module nêu tên.
+Track-local proof policy (approved 2026-09-26):
+
+- Mỗi R chạy focused behavior tests liên quan, import/boundary/compatibility
+  tests, `git diff --check`, và kiểm `git diff --stat` chỉ chạm file set đã
+  khai. Không mặc định chạy `npm test` sau từng structural cell.
+- R1–R2: boundary/import/call-site proof.
+- R3–R4: settlement/result-truth và confinement fail-closed matrix.
+- Sau R5: broader settlement/confinement/Herdr checkpoint; chạy `npm test`.
+- R6–R8: brief/claim/handback/legacy compatibility focused proof.
+- Sau R9: cache fingerprint/TTL/per-verb invalidation proof, aggregate focused
+  matrix, rồi `npm test` trên final candidate.
+- Independent Reviewer chạy một full suite trên exact reviewed candidate;
+  mutation proof bắt buộc cho R3/R4/R5/R9, còn structural boundary có thể dùng
+  mutation-sensitive static/focused test nếu nó khóa trực tiếp regression.
+- Track Manager không chạy lại toàn reviewer matrix nếu SHA/log/environment
+  còn hợp lệ; chỉ spot-check finding/high-risk evidence và chạy một post-merge
+  full suite.
+
+I12 implementation/review đã hoạt động theo prompt cũ trước khi policy này
+được duyệt nên được grandfather: không interrupt/restart/invalidate live
+sessions và không bỏ evidence mạnh hơn đã sinh. Policy áp dụng cho prompt
+fix/re-review/integration kế tiếp và các unit sau.
 
 ## Risk / rollback
 
-Refactor không đổi hành vi — mỗi R chỉ merge khi test suite trước/sau giống nhau; R4/R5 chạm test p03/p04/p05 lớn, làm sau cùng. Rollback theo cell.
+Refactor không đổi hành vi — mỗi R chỉ commit khi focused proof tương ứng xanh;
+checkpoint/full-suite proof khóa aggregate behavior theo policy trên. Rollback
+theo cell.

@@ -1,6 +1,6 @@
 # Coordination Skill and Harness Simplification
 
-Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 verified at `main@1ca4023c` (REV-15 fix `60132825`; post-merge baseline verified at `main@f63f7e7d`); Unit I07 integrated at `main@261ed7ea`; Unit I08b integrated at `main@ba8f6a9d`; Unit I10 integrated and verified at `main@605d26fe` (carried through `main@26a1038e` and `main@ac19f6d1`); Unit I08 VERIFIED at `main@ac19f6d1` (RV-01/RV-02 remediation candidate `132d3777` + `ac19f6d1` integrated; acceptance gate verified: full suite 7647 pass exit 0, 10/10 isolated coord, 10/10 isolated dispatch, 60/60 parallel load pass; timing instability recorded as LOW debt); Unit I11 VERIFIED at `main@7d7dc2750f9fb80716a7cffae03d67605629cf9a` (candidate code `9cf843b6`, approved tip `3a67a1b9`, synchronized merge `3d706b89`; post-merge verification satisfied: 155/155 focused rerun pass, full suite 7652 pass exit 0; candidate regressions = 0); Unit I12 CANDIDATE READY FOR REVIEW
+Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 verified at `main@1ca4023c` (REV-15 fix `60132825`; post-merge baseline verified at `main@f63f7e7d`); Unit I07 integrated at `main@261ed7ea`; Unit I08b integrated at `main@ba8f6a9d`; Unit I10 integrated and verified at `main@605d26fe` (carried through `main@26a1038e` and `main@ac19f6d1`); Unit I08 VERIFIED at `main@ac19f6d1` (RV-01/RV-02 remediation candidate `132d3777` + `ac19f6d1` integrated; acceptance gate verified: full suite 7647 pass exit 0, 10/10 isolated coord, 10/10 isolated dispatch, 60/60 parallel load pass; timing instability recorded as LOW debt); Unit I11 VERIFIED at `main@7d7dc2750f9fb80716a7cffae03d67605629cf9a` (candidate code `9cf843b6`, approved tip `3a67a1b9`, synchronized merge `3d706b89`; post-merge verification satisfied: 155/155 focused rerun pass, full suite 7652 pass exit 0; candidate regressions = 0); Unit I12 VERIFIED/integrated at `main@c782a08dfcae89279dcb1ca9fb59aa73fb58c515` (approved candidate `1089eb347455c10164ec03ffbcbf54ae35cd2097`; reviewer Round 5 APPROVE; post-merge full suite 7677 pass / 0 fail with dev-checkout bin; candidate regressions = 0; environment note: active workspace installation release makes one R1 call-site test use stale `fgos`, classified as local activation/precondition, not source regression); Unit I13 READY
 Created: 2026-09-19
 Last Updated: 2026-09-26
 Mode: high-risk
@@ -47,6 +47,53 @@ panel, coordination cell, `fgos-plan-loop`, or external executor is used to
 author this plan. The capability annotations below still govern later
 independently executable implementation/review/test units; each executing
 session runs `dispatch decide` immediately before its own unit.
+
+## Track-local lean verification policy
+
+Approved 2026-09-26. This is an execution-policy correction for this track,
+not a change to CoordinationSession, FlowDefinition, Work lifecycle, or the
+fgOS runtime being built.
+
+The active I12 implementation/review chain was already running under the older
+prompts when this policy was approved. It is grandfathered: do not interrupt,
+restart, invalidate, or ask those live sessions to discard evidence merely
+because this policy changed. Apply this policy to the next newly issued
+fix/re-review/integration prompt and to later units. Evidence already produced
+under the stronger old policy remains valid.
+
+### Evidence ownership
+
+- **Doer:** implementation correctness, reversible cell commits, cell-local
+  focused proof, and one durable candidate evidence manifest/report.
+- **Independent Reviewer:** aggregate semantic/adversarial review, risk-based
+  mutation probes, and one full-suite run on the exact reviewed candidate.
+- **Track Manager:** SHA/ancestry/dependency truth, evidence completeness,
+  relevant-drift assessment, integration authorization, and post-merge truth.
+
+A later role does not rerun a prior role's valid evidence by default. Rerun
+only when the candidate SHA changed, relevant main/environment drift exists,
+the evidence/log is missing or non-reproducible, or a new finding puts the
+covered invariant in doubt.
+
+### Proof tiers
+
+- Every reversible cell runs its focused behavior, boundary/import, and
+  compatibility tests plus `git diff --check`; it does **not** automatically
+  run `npm test`.
+- Authority/result-truth checkpoint cells run the broader affected matrix.
+- A long multi-cell unit runs `npm test` at named checkpoints and at final
+  candidate, not after every structural commit.
+- Independent review runs one full suite on the exact candidate. Mutation
+  proof is mandatory for high-risk authority/result-truth/cache boundaries;
+  structural cells may rely on a mutation-sensitive static/focused test when
+  that test directly locks the boundary.
+- Track Manager spot-checks only unresolved/high-risk evidence before review
+  or integration, then runs one post-merge full suite. It does not repeat the
+  reviewer's whole matrix without a named reason.
+
+For I12 specifically: targeted proof for every R; broader settlement/
+confinement/Herdr checkpoint after R5; final focused matrix plus full suite
+after R9; reviewer full suite once; Track Manager post-merge full suite once.
 
 ## Integration ownership and baseline rule
 
@@ -111,6 +158,11 @@ Rules:
   or branch age is not a disposition.
 - A merged commit without synchronized plan status is integration-incomplete
   and does not unlock its dependent unit.
+- Within a multi-cell unit, do not copy the same SHA/count/status into every
+  affected plan after every cell. Synchronize cross-plan accounting at three
+  milestones only: candidate ready, independent-review verdict, and
+  integrated/post-merge verified. A blocker that stops the unit is recorded
+  immediately as an exception.
 - Reviewers must compare plan statuses with Git ancestry, current source, and
   independently run tests; implementer narration alone is not proof.
 - Status remains documentation projected from Git/source/test truth. Do not add
@@ -928,14 +980,20 @@ Executor/provider/model/tier selection remains an execution-time decision.
 - unit: I12 — refactor dispatch boundaries in small reversible Phase 09 cells
   capability: code:refactor
   depends-on: I11 approved
-  status: CANDIDATE READY FOR REVIEW (R1-R9 implemented in 9 atomic cells; candidates pass all focused & full suites)
+  status: VERIFIED/integrated at `main@c782a08dfcae89279dcb1ca9fb59aa73fb58c515`
+  approved-candidate-sha: `1089eb347455c10164ec03ffbcbf54ae35cd2097`
+  integrated-sha: `c782a08dfcae89279dcb1ca9fb59aa73fb58c515` (merge commit `merge: integrate Unit I12 boundary simplification`; approved candidate is ancestor; `src/` tree hash matches approved candidate `29d4ef7f88f136d97ca69cb75c012a09594d7a5f`)
+  review-report: `plans/reports/independent-re-review-260926-1300-unit-i12-remediation-round5-report.md` (APPROVE for exact `1089eb347`)
+  post-merge-verification: `env -u CLAUDE_CODE_SESSION_ID npm test` with workspace activation temporarily disabled so `resolveFgosBin()` selects the integrated dev-checkout `bin/fgos.mjs`: 7750 tests, 7677 pass / 0 fail / 8 skipped / 65 todo, exit 0; `git diff --check` clean. A control run with the active workspace installation release restored failed one R1 call-site test because `fanoutBatchExecutorCli` resolved the older installed `fgos`; isolated rerun with dev-checkout bin passed 20/20, classifying this as a local activation/precondition mismatch rather than an I12 source regression.
+  residual-low-debt: F-R5-1 static R2 lock evasions, F13 rollback-only reverse order, F14 probe-cache trust.
   track-manager-decisions:
     r2-work-lookups: "OPTION A RATIFIED & IMPLEMENTED — Relocated Work capability lookup implementations (executorIdForWork, resolveCapabilityIdentityDetails, resolveCapabilityIdentity, buildPrompt) out of dispatch core into dedicated leaf compatibility module src/runner/work-compat.mjs (registered as infra in architecture manifest) with zero imports into dispatch core. Dispatch core contains no Work lookup implementation; resolve.mjs and prepare.mjs re-export these helpers for backward compatibility, consumed by pre-existing callers (plan.mjs for compileDispatchPlan({work}) and cli.mjs for spawnWorker). Enforced by boundary test test/runner/dispatch-reconciliation-import-graph.test.mjs forbidding strict core modules from importing Work lookup symbols or work-compat.mjs (killing mutation ME)."
     r4-argv-parser: "ACCEPTED AS DEFENSIVE FALLBACK — Confinement authority's argv/bwrap parser is preserved as a defensive fallback behind driver claims when driver claims are absent (as documented in CHANGELOG.md and docs)."
-  stop: behavior or test projection differs from the I11 baseline
+  stop: CLEARED — behavior/test projection matches I11 baseline plus accepted LOW debt; I13 may proceed.
 - unit: I13 — verify import graph, compatibility, performance, and full suite
   capability: code:test
   depends-on: I12
+  status: READY (Unit I12 VERIFIED/integrated at `main@c782a08dfcae89279dcb1ca9fb59aa73fb58c515`)
   stop: consumer behavior or full-suite baseline regresses
 
 Parallelism is limited deliberately:
