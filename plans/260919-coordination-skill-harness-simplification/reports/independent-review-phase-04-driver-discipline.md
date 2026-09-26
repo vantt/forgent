@@ -105,3 +105,72 @@ F9–F13 can ride with the same fix commit.
 
 - F4: does the plan's "Lead instruction-token reduction" count loaded shared fragments? Reviewer reading: yes, because the Lead must load them to operate. This is an owner call if disputed.
 - F6: should `coding-cell-policy.md` absorb `private-cell-worktree.md` now (code-panel repointed), or reference it until Phase 6?
+
+---
+
+## Re-review round 2 — remediation `7a66d481f`
+
+**Verdict: REQUEST CHANGES (minor), with one owner decision pending.** All three HIGH defects (F1–F3) are fixed and verified against the real CLI and use-cases. What remains is two small doc/test gaps, plus F4, which is an owner call rather than a defect.
+
+### Identity
+
+| Field | Value |
+|---|---|
+| Candidate HEAD | `7a66d481fed3a17b732ddec14bf511abc0728770` (on top of review commit `ff5f9f9e1`) |
+| Base | `2085d88fe` = `main` HEAD; unchanged |
+| Dirty before/after | clean / clean apart from this report; probes restored via `git checkout --` |
+| Scope `ff5f9f9e1..HEAD` | 14 files: canonical skill and 2 fragments + mirrors, Phase 4 test, how-to, plan.md, doer report, CHANGELOG. No `src/`/`bin/` changes, so no symbol impact |
+
+### Round-1 findings
+
+| # | Status | Evidence |
+|---|---|---|
+| F1 | ✅ fixed | Close examples no longer pass `--reason`. The contract test fails if it is re-added (probe Q1). |
+| F2 | ✅ fixed | Examples carry `--objective`, `--reason`, `--granted-context-refs` and `--expected-outputs`. String values normalize through `normalizeStringArray`, and `contextRefs` defaults to `grantedContextRefs` (`composers.mjs:385-386`). |
+| F3 | ✅ fixed | `start` passes `--cwd ../<track>-<cell-id>` and states that the entry `produce-candidate` runs inside `start`. Evaluation proceeds through `operation`. |
+| F4 | ⚖️ **owner decision** | The doer chose the facade-only reading: 1,240 words vs 5,160, a 76% cut. Combined Lead load is 1,240 + 1,141 + 733 = **3,114, a 39.7% cut**. The test adds an ad-hoc `combined <= 3300` cap. The reviewer does not accept or reject this interpretation (it is the user's decision; see below). Dispatch-count parity (3 and 5) is now asserted. |
+| F5 | ⚠️ partial → R2 | A new contract test catches unknown flags and `close --reason`. See R2. |
+| F6 | ✅ fixed | The policy points to `private-cell-worktree.md`; bash duplication and the source citation are removed. The link breaks in `.agents` (R4). |
+| F7 | ✅ fixed | The caveat rule is referenced once; the Work-field list and source-file citations are gone. |
+| F8 | ✅ fixed | plan.md says "candidate under review" and "Phase 5 (blocked)". |
+| F9–F12 | ✅ fixed | Driver Step 8 wording; the `fgos-code-change` mention is marked "future, Phase 6"; the how-to now points to the policy's identity section; numbers corrected. Minor drift: plan says 1,233 words, actual is 1,240. |
+| F13 | ⚠️ **regressed → R1** | See R1. |
+
+### New findings
+
+| # | Sev | Verdict | Where | Finding | Fix |
+|---|---|---|---|---|---|
+| R1 | MEDIUM | CONFIRMED | `SKILL.md` hook `adaptation bounds` | The F13 restore now says "proof-gap findings escalate to **human**" after the 3-round cap. The previous skill and `docs/how-to/author-a-plan-loop-track.md:221-237` say the disposition is **forced to `accepted -> Proof: escalated-to-full`** and the cell closes after the full proof run, with no human needed. This is an unrequested behavior change that contradicts a live doc and lowers autonomy (priority #2, "Release con người"). | Restore "proof-gap past cap → forced `accepted`, `Proof: escalated-to-full`, full proof before close". |
+| R2 | MEDIUM | CONFIRMED | `coordination-phase4-driver-discipline.test.mjs:342-455` | (a) The allowlist is a hand copy of `bin/fgos.mjs` `ALLOWED_COORDINATION_FLAGS`, so a future CLI change will not be detected. (b) Required flags are checked only for `close`/`authorize-and-dispatch`. Probe Q3 removed the CLI-required `--objective` from the plan-loop `operation` example: the contract test **still passed** and only the projection check tripped. | Spawn the real `bin/fgos.mjs coordination <sub> …` for each documented example against a nonexistent id, and assert the error is neither "unknown or unsupported option" nor "requires --…". This covers both gaps with no `src/` change. |
+| R3 | LOW | CONFIRMED | test 8 | Wave parity is claimed in comments only; just the dispatch count is asserted. "Cold resume" is a same-process re-query, not a new process. | Assert waves from event ordering, or reword the claim. |
+| R4 | LOW | CONFIRMED | `coding-cell-policy.md` §1 | The link `../../../../core/skills/_shared/private-cell-worktree.md` resolves in canonical and `plugins/`, but **not** in `.agents/skills/_shared/`, which is the copy the Claude wrapper loads. The prose names the sibling, so the damage is small. | Link the sibling `private-cell-worktree.md` (it resolves in both projections), matching plan-loop's convention. |
+
+### Probes (restored after each)
+
+| Probe | Mutation | Result |
+|---|---|---|
+| Q1 | Add `--reason "x"` to the plan-loop close example | contract test **fails** ✅ (+ projection) |
+| Q2 | Add `--bogus-flag` to the `operation` example | contract test **fails** ✅ |
+| Q3 | Remove the required `--objective` from the `operation` example | contract test **passes** ❌ (only the projection test fails) → R2 |
+| Q4 | Add "worktree" to the driver fragment | drift test **fails** ✅ |
+
+### Commands
+
+| Command | Exit | Result |
+|---|---|---|
+| `npm run build:skills` | 0 | no working-tree diff |
+| `git diff --check 2085d88fe..HEAD` | 0 | clean |
+| focused: 8 round-1 suites + `test/setup/skill-wrappers.test.mjs` | 0 | 287 tests, 287 pass, 0 fail |
+| `env -u CLAUDE_CODE_SESSION_ID npm test` | 0 | 7766 tests, 7693 pass, 0 fail, 8 skipped, 65 todo, 27 suites |
+
+### Phase 5 gate
+
+**Not yet.** It needs R1 and R2 fixed (R3/R4 can ride along), an owner ruling on F4, then a short re-review and merge to `main`.
+
+### Owner decision needed (F4)
+
+- **Option A — facade-only (doer's reading):** 76% cut, which passes. Justification: the driver fragment is shared platform doctrine, amortized across plan-loop, architecture-panel, panel and code-change. Risk: the literal Exit wording, "Lead instruction-token reduction", is not met for plan-loop on its own until other facades adopt the fragment.
+- **Option B — full Lead load:** 39.7%, which fails. The facade or fragments would need about 1,050 more words cut, likely stripping operational detail.
+- **Option C — accept A and amend the plan's Exit wording**, e.g. "facade ≥60%, combined load bounded at ≤3,300 and re-measured after Phase 5 amortization". This makes the rule explicit rather than an ad-hoc test constant.
+
+Reviewer recommendation: **C**. The split is architecturally right, and B would trade clarity for a number. The plan text, however, must say what is being counted.
