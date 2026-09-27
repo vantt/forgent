@@ -828,8 +828,8 @@ work for a structurally unlike, read-only, human-dialogue consumer.
    only the entry node (I16 finding: `start --actors` binds the entry node
    only; later `authorize-and-dispatch` carries no actors, so provider
    diversity across roles is not reachable from the facade today); a
-   hand-written roster stays a trusted override with provenance. Design not
-   yet settled — owner session before this item starts.
+   hand-written roster stays a trusted override with provenance. Design
+   settled 2026-09-27 (design record §12); executed as Unit I21.
 3. Replace internal `node -e` pack invocation with a public semantic CLI
    surface.
 4. Add a real public specialist-authorization composer if the kernel action is
@@ -1256,12 +1256,27 @@ Executor/provider/model/tier selection remains an execution-time decision.
     name without `--needs-soul`; manifest + test-ownership entries.
   verification: node --test test/runner/capability-match.test.mjs test/cli/capability-match.test.mjs test/runner/dispatch.test.mjs test/runner/dispatch-reconciliation-import-graph.test.mjs test/architecture.test.mjs; env -u CLAUDE_CODE_SESSION_ID npm test
   stop: matching calls decide or reads prefer; mechanism of decide changes.
+- unit: I21 — per-node binding in the request composers (Phase 5 work item 2)
+  capability: code:implement
+  depends-on: I19, I17
+  status: not-started
+  scope: see `phase-05-unit-i21-per-node-binding.md`. Composer computes one
+    `cliPolicy` per declared node (override > operation `policy.capability` ->
+    `capabilities.<cap>.prefer` > `policy.minTier` raise-only with `rigor`;
+    `readOnlyRedirects` stays as read-only safety net), delivered through the
+    existing trusted channel with `bindingSource` provenance; optional
+    `policy.capability` and `policy.distinctProviderFrom {strength}` on
+    FlowDefinition operations (additive, portable-scope requirements, not pins);
+    persona via operation template; roster becomes optional override.
+  design-record: plans/reports/architecture-investigation-260927-1154-capability-aware-dispatch-gate-phase4-decisions.md §12
+  verification: node --test test/verbs/coordination-binding.test.mjs test/runner/coordination-request-composers.test.mjs test/runner/flow-definition-schema.test.mjs test/runner/cohort-planner.test.mjs; live plan-loop cell with no hand roster shows capability.prefer provenance; env -u CLAUDE_CODE_SESSION_ID npm test
+  stop: binding decided inside session-engine/kernel; a portable definition can carry an executor pin through the new fields; replay of an existing session changes.
 
 Parallelism is limited deliberately:
 
 ```text
 I00 -> I01 -> I02 -> I03 -------------------------------+
-          +-> I04 -> I05 -------------------------------+--> I11 -> I12 -> I13 -> I14 -> I15 -> I16 -> I17 -> I19 -> I20 -> Phase 5 (item 2 waits I19; items 7/8 wait I20)
+          +-> I04 -> I05 -------------------------------+--> I11 -> I12 -> I13 -> I14 -> I15 -> I16 -> I17 -> I19 -> I21 (Phase 5 item 2) ; I19 -> I20 -> Phase 5 items 7/8
                                                              I16 -> I18 (parallel with I17)
           +-> I06 -----+                                |
           +-> I07 -----+-> I08 -------------------------+

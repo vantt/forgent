@@ -413,3 +413,29 @@ không đạt được từ facade.** Đây là đầu vào cứng cho S5: compo
 từng node (từ `serves`/`prefer` của catalog, roster tay là override), không
 chỉ node đầu. Plan liền kề đã gộp vào track làm Unit I17–I20 (owner, 2026-09-27 14:34);
 I19 (config thuần) chặn Phase 5 việc 2.
+
+## 12. Quyết định S5: binding từng node (owner, 2026-09-27 14:56) → Unit I21
+
+1. **Thứ tự bind mỗi node**, composer tính một lần, đi qua kênh `cliPolicy`
+   có sẵn, provenance `bindingSource`: override tường minh của Lead (roster
+   hoặc `--executor/--tier` trên step) > `policy.capability` của operation →
+   `capabilities.<cap>.prefer` + `overrides` > `policy.minTier` raise-only
+   với `rigor` > `readOnlyRedirects` giữ ở tầng dưới làm lưới an toàn
+   read-only.
+2. **`policy.capability`** (số ít, dưới `policy`, cạnh `minTier`) trên
+   operation của FlowDefinition; tùy chọn; hợp scope portable vì là
+   requirement. Fallback khi vắng: `work-product` → capability chính của
+   facade; `advisory` → `<domain>:review` nếu có, không thì `review`. Không
+   có bảng config ánh xạ operationId.
+3. **`policy.distinctProviderFrom: [role...]`** với `strength: required |
+   preferred`. `preferred` bind kèm cảnh báo provenance khi vô nghiệm;
+   `required` từ chối có tên `binding.diversity-unsatisfiable`, Lead vượt
+   bằng flag tường minh có provenance. `produce-review-revise` khai
+   `preferred`; panel có thể khai `required` cho red-team. Doctor báo số
+   họ provider cấu hình.
+4. **Persona** vào operation template (Phase 5 việc 1); `actors[].persona`
+   là override request-scope có provenance; agent yaml chưa nối.
+5. Chồng lấn `readOnlyRedirects` / `code:review.prefer` ghi nhận, Phase 7
+   quyết giữ một.
+6. Không quyết binding trong session-engine/kernel; engine chỉ nhận
+   `cliPolicy` đã tính cho mọi declared step (đường fan-out đã làm vậy).
