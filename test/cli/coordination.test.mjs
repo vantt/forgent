@@ -858,13 +858,13 @@ test('R5: every place that enumerates the coordination sub-verb list (help text,
   const source = fs.readFileSync(FGOS, 'utf8');
   assert.match(
     source,
-    /coordination requires a sub-verb: fgos coordination <start\|status\|operation\|authorize-and-dispatch\|fan-out\|contribution\|human-turn\|disposition\|close\|run\|show\|actions\|launch-master-loop\|chain\|recover>/,
-    'requireField usage message must enumerate all subverbs including "close", "actions", and "chain"',
+    /coordination requires a sub-verb: fgos coordination <start\|status\|operation\|authorize-and-dispatch\|fan-out\|contribution\|human-turn\|disposition\|close\|run\|show\|actions\|launch-master-loop\|chain\|recover\|pack>/,
+    'requireField usage message must enumerate all subverbs including "close", "actions", "chain", and "pack"',
   );
   assert.match(
     source,
-    /coordination: unknown sub-verb "\$\{sub\}" \(known: start, status, operation, authorize-and-dispatch, fan-out, contribution, human-turn, disposition, close, run, show, actions, launch-master-loop, chain, recover\)/,
-    'unknown-sub-verb error message must enumerate all subverbs including "close", "actions", and "chain"',
+    /coordination: unknown sub-verb "\$\{sub\}" \(known: start, status, operation, authorize-and-dispatch, fan-out, contribution, human-turn, disposition, close, run, show, actions, launch-master-loop, chain, recover, pack\)/,
+    'unknown-sub-verb error message must enumerate all subverbs including "close", "actions", "chain", and "pack"',
   );
 
   const entry = COMMAND_REGISTRY.find((e) => e.name === 'coordination');
@@ -872,20 +872,24 @@ test('R5: every place that enumerates the coordination sub-verb list (help text,
   assert.match(entry.invoke, /close/, 'registry invoke string must enumerate "close"');
   assert.match(entry.invoke, /chain/, 'registry invoke string must enumerate "chain"');
   assert.match(entry.invoke, /actions/, 'registry invoke string must enumerate "actions"');
+  assert.match(entry.invoke, /pack/, 'registry invoke string must enumerate "pack"');
   assert.ok(entry.parameters.properties.sub.enum.includes('close'), 'registry sub enum must include "close"');
   assert.ok(entry.parameters.properties.sub.enum.includes('actions'), 'registry sub enum must include "actions"');
   assert.ok(entry.parameters.properties.sub.enum.includes('chain'), 'registry sub enum must include "chain"');
+  assert.ok(entry.parameters.properties.sub.enum.includes('pack'), 'registry sub enum must include "pack"');
   assert.ok(!entry.parameters.properties.sub.enum.includes('clean'), 'registry sub enum must not include "clean"');
   assert.ok(!entry.parameters.properties.sub.enum.includes('inspect'), 'registry sub enum must not include "inspect"');
   assert.match(entry.description, /"close"/, 'registry description must document "close"');
   assert.match(entry.description, /"actions"/, 'registry description must document "actions"');
   assert.match(entry.description, /"chain"/, 'registry description must document "chain"');
+  assert.match(entry.description, /"pack/, 'registry description must document "pack"');
   assert.ok(entry.examples.some((e) => e.includes('chain')), 'registry examples must include a "chain" example');
   assert.ok(entry.examples.some((e) => e.includes('actions')), 'registry examples must include an "actions" example');
+  assert.ok(entry.examples.some((e) => e.includes('pack')), 'registry examples must include a "pack" example');
 
   const unknownSubResult = run(tmpCwdFromTemplate(), ['coordination', 'bogus-sub-verb']);
   assert.notEqual(unknownSubResult.status, 0);
-  assert.match(unknownSubResult.stderr, /known: start, status, operation, authorize-and-dispatch, fan-out, contribution, human-turn, disposition, close, run, show, actions, launch-master-loop, chain, recover/);
+  assert.match(unknownSubResult.stderr, /known: start, status, operation, authorize-and-dispatch, fan-out, contribution, human-turn, disposition, close, run, show, actions, launch-master-loop, chain, recover, pack/);
 });
 
 test('coordination CLI option validation: rejects unknown, mis-scoped, and forbidden options per subverb', () => {
@@ -922,7 +926,7 @@ test('coordination CLI option validation: rejects unknown, mis-scoped, and forbi
   // 6. Missing sub-verb usage error enumerates public subverbs
   const resNoSub = run(cwd, ['coordination']);
   assert.notEqual(resNoSub.status, 0);
-  assert.match(resNoSub.stderr, /coordination requires a sub-verb: fgos coordination <start\|status\|operation\|authorize-and-dispatch\|fan-out\|contribution\|human-turn\|disposition\|close\|run\|show\|actions\|launch-master-loop\|chain\|recover>/);
+  assert.match(resNoSub.stderr, /coordination requires a sub-verb: fgos coordination <start\|status\|operation\|authorize-and-dispatch\|fan-out\|contribution\|human-turn\|disposition\|close\|run\|show\|actions\|launch-master-loop\|chain\|recover\|pack>/);
 });
 
 // ─── Semantic coordination CLI subcommands ─────────────────────────────────
