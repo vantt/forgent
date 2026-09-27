@@ -53,6 +53,24 @@ function assignmentServedOperation(cwd, assignmentId, operationId) {
   return constraints.includes(stamp);
 }
 
+// Same shape as test/cli/coordination.test.mjs's own agentLedRequest --
+// duplicated (not imported) since this file's own fixtures are otherwise
+// entirely self-contained; only used by the "opened with no bound protocol"
+// resume-refusal test below.
+function agentLedRequest(overrides = {}) {
+  return {
+    kind: 'agent-led',
+    objective: 'Investigate package.json.',
+    writerId: 'pack-cli-test',
+    primaryRole: 'researcher',
+    task: {
+      expectedOutputs: ['agent-result.json (status, summary)'],
+      evidenceRequired: 'reported',
+    },
+    ...overrides,
+  };
+}
+
 function conveneOnlyRequest(coordinationId) {
   return {
     kind: 'declared-protocol',
@@ -448,6 +466,41 @@ test('fgos coordination pack run: resuming an existing coordinationId under a DI
   ]);
   assert.notEqual(second.status, 0);
   assert.match(second.stderr, /already bound to protocol/);
+});
+
+// Pre-existing gate refusal (group-thinking-pack.mjs's resume cross-check)
+// that predates Unit I23's CLI door but had no test anywhere in the suite:
+// a session opened as kind:"agent-led" (plain "coordination run", no bound
+// FlowDefinition at all -- manifest.definitionRef stays unset) must refuse a
+// LATER kind:"declared-protocol" pack request against that SAME
+// coordinationId, not silently treat it as freshly bound to whatever
+// protocolId this second call names.
+test('fgos coordination pack run: resuming an existing coordinationId that was really opened as kind:"agent-led" (no bound protocol) is refused', () => {
+  const cwd = tmpCwdFromTemplate();
+  writeFakeExecutorConfig(cwd);
+  const coordinationId = 'coord_pack_resume_agent_led';
+
+  const agentLedPath = writeRequest(cwd, 'agent-led.json', agentLedRequest({ coordinationId }));
+  const opened = run(cwd, ['coordination', 'run', '--file', agentLedPath]);
+  assert.equal(opened.status, 0, opened.stderr);
+  assert.equal(envelopeData(opened.stdout).kind, 'agent-led');
+
+  const packRequest = {
+    kind: 'declared-protocol',
+    objective: 'x',
+    writerId: 'pack-cli-test',
+    coordinationId,
+    protocolRef: { id: RFC_REVIEW_LITE_ID },
+    steps: [],
+  };
+  const packPath = writeRequest(cwd, 'pack-request.json', packRequest);
+  const resumed = run(cwd, [
+    'coordination', 'pack', 'run',
+    '--protocol', RFC_REVIEW_LITE_ID,
+    '--file', packPath,
+  ]);
+  assert.notEqual(resumed.status, 0);
+  assert.match(resumed.stderr, /already exists but was opened with no bound protocol \(kind:"agent-led"\)/);
 });
 
 // ---------------------------------------------------------------------

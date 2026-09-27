@@ -154,8 +154,13 @@ session-ownership marks).
 
 ## The gate, and why it holds
 
-`runGroupThinkingRequest` is the **only** function this skill ever calls
-to dispatch or resume anything, and it does nothing but: (1) refuse when
+The only doors this skill ever invokes are the three `fgos coordination
+pack <list|show-protocol|run>` CLI sub-verbs above (Unit I23) — never a
+hand-authored `node -e` script, and never `runGroupThinkingRequest`
+directly. `pack run` forwards straight into `runGroupThinkingRequest`
+([`group-thinking-pack.mjs`](../../../src/verbs/coordination/group-thinking-pack.mjs)),
+the **only** function in this whole chain that dispatches or resumes
+anything, and it does nothing but: (1) refuse when
 no `protocolId` is given; (2) refuse when `protocolId` is not a member of
 the pack registry, or the registered definition's version has drifted
 from what the pack pinned; (3) refuse when the request's own
@@ -180,19 +185,24 @@ never exposed them as caller-invocable actions in the first place:
   request already uses, with the same context-grant enforcement. This
   skill adds no second grant path — it only forwards the request object.
 - **Validate its own aggregate.** `run.mjs`'s public request vocabulary
-  has exactly five step kinds: `operation`, `authorize`, `disposition`,
-  `fan-out`, `contribution`. None of them calls
-  `validateSessionAggregation` or any other aggregation-validation door —
-  that capability simply is not reachable through this surface (the
+  has seven step kinds: `operation`, `authorize`, `disposition`,
+  `fan-out`, `contribution`, `human-turn`, `close`. None of the first six
+  calls `validateSessionAggregation` or any other aggregation-validation
+  door — that capability simply is not reachable through this surface (the
   `contribution` step forwards only into `linkSessionContribution`, a
   separate, already-independently-mediated door — see
   `docs/architect/agent-coordination/contracts/coordination-session.md`'s
-  "Group-Thinking Protocol Pack" section for the full proof).
+  "Group-Thinking Protocol Pack" section for the full proof). The seventh,
+  `close`, is covered by the bullet immediately below.
 - **Authorize a specialist.** For the same reason: no step kind reaches
   `authorizeSpecialistSlot` / `recordSpecialistAuthorization`. Specialist
   authorization is not in `run.mjs`'s public request vocabulary at all.
-- **Close a session directly.** `runCoordinationUseCase` always attempts
-  `closeSessionByQuorum` as its own last, automatic step, gated by the
-  engine's own quorum/aggregation rules. There is no separate "close" step
-  or door this skill (or any request through this door) can invoke to
-  force a close outside that gate.
+- **Close a session outside the quorum gate.** `runCoordinationUseCase`
+  never closes implicitly — reaching full quorum with no explicit close
+  request leaves the session open (`test/cli/coordination.test.mjs`'s own
+  "without close: true and without close step leaves the session active").
+  A request MAY ask to close, either via a top-level `close: true` or a
+  `{type: "close"}` step — but both routes still call the exact same
+  quorum/aggregation-gated `closeSessionByQuorum` an implicit close would
+  have used; asking for it never bypasses or reorders that gate, it only
+  decides whether the attempt happens at all.
