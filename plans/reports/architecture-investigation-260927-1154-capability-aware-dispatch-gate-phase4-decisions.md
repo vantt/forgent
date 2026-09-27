@@ -316,3 +316,100 @@ Word budget: combined Lead load hiện 3.121 / 3.300 từ (driver 1.141, plan-lo
 Ghi chú cho người thực thi: `decide --for execute` hôm nay trả claude
 out-of-process; claude headless không tự chạy test, Lead chạy verification
 ở trên và đối chiếu diff trước khi approve. Không dùng `code:implement`.
+
+## 11. Quyết định phiên steering (owner, 2026-09-27 14:16)
+
+Đầu ra của phiên: bước Q1 có hình dạng, tên, ranh giới; đã gộp vào track làm Unit I17–I20
+(`plans/260919-coordination-skill-harness-simplification/phase-05-unit-i17…i20-*.md`).
+
+### 11.1 Phía cầu khai `DemandFacts` (thuộc tính, không phải nhãn)
+
+| Thuộc tính | Kiểu | Ghi chú |
+|---|---|---|
+| `outputKind` | chuỗi mở | giá trị hợp lệ = những gì catalog đang khai; hôm nay `change`, `verification`, `finding`, `decision` |
+| `domain` | chuỗi mở | `code`, `docs`, `config`, … hoặc rỗng |
+| `mutates` | bool | |
+| `behaviorPreserving` | bool, tùy chọn | refactor vs implement |
+| `needsIndependentReview` | bool | quyết hình thức protocol |
+| `hasPlanOrTrack` | bool | quyết plan mode |
+| `size` | `TIERS` light/standard/heavy | **chỉ** quyết hình thức; không liên quan model |
+| `rigor` | `MIN_RIGOR_VALUES` low/standard/high/critical | chuyển tiếp cho Q2; steering không dùng |
+
+Agent đọc prose để khai facts; máy không đọc prose. Agent được override kết
+quả khớp, kèm lý do, được log. Enum hoạt động bị bỏ (đóng kín, tái tạo bài
+toán catalog đóng).
+
+### 11.2 Catalog tự là bảng: `serves`
+
+Mỗi capability khai `serves` (tập thuộc tính nó phục vụ). Khớp: mọi thuộc
+tính capability khai đều thỏa; không khai = bất kỳ; nhiều-thuộc-tính-hơn
+thắng; hòa hoặc không khớp → `form: inline`, `capability: null`, log miss
+kèm ứng viên. Không có bảng tra riêng; thêm capability là thêm dòng.
+
+| Capability | `serves` |
+|---|---|
+| `code:implement` | change, code, mutates |
+| `code:refactor` | change, code, mutates, behaviorPreserving |
+| `code:test` | verification, code |
+| `code:debug` | finding, code |
+| `code:review` | finding, code, không mutate |
+| `execute` | change, mutates |
+| `advise` | decision, không mutate |
+| `review` (mới) | finding, không mutate |
+
+Hình thức từ `needsIndependentReview` (protocol), `hasPlanOrTrack` (plan
+mode), `size`. `serves` là schema addition trên `runner.capabilities`,
+đăng ký setup/doctor; entry không có `serves` vẫn hợp lệ, không bao giờ
+được match tự động.
+
+### 11.3 Ba từ vựng tier, không gộp
+
+`TIERS` (work-size, `src/state/work.mjs:161`) ≠ `MIN_RIGOR_VALUES`
+(`assignment-policy.mjs:48`) ≠ `MODEL_POLICY_TIERS` (`config.mjs:520`).
+`docs/history/two-layer-dispatch/DISCUSSION.md` #30/#30b: model tier phán
+lúc dispatch, planning tier cùng lắm là gợi ý. Lý do dispatch thứ năm
+"model mạnh hơn" = `rigor` khai cao hơn mức session đang chạy; không gắn
+với `size`.
+
+### 11.4 Năm lý do dispatch; mặc định inline
+
+Model rẻ hơn, model mạnh hơn, provider khác, cách ly, chạy song song. Không
+có lý do → inline. Đảo ngược trigger hiện tại của
+`fgos-capability-dispatching`.
+
+### 11.5 Tên và ranh giới component
+
+| Thứ | Tên |
+|---|---|
+| fact phía cầu | `DemandFacts` (từ vựng cầu/cung, `dispatch-concept-boundary/DISCUSSION.md` §6.4) |
+| hàm thuần | `matchCapability(demandFacts, catalog)` |
+| kết quả | `CapabilityMatch { facts, capability \| null, form, candidates, source, reason }` |
+| module | `src/runner/capability-match.mjs` (ngoài `dispatch/`, boundary test cấm import decide) |
+| CLI | `fgos capability match --demand <json>` |
+| fragment | `_shared/capability-matching.md` (cụm bốn với catalog, planning-awareness, dispatch-fallback) |
+| log | `appendWorkerLog`, `source: match \| override \| miss` |
+
+Chuỗi: `capability match` (Q1) → `dispatch decide` (Q2) → `dispatch execute`.
+Ranh giới: matching không gọi `decide`, không đọc `prefer`, không resolve
+executor. Tên bị loại: steer (chung chung), classify (đã có
+`src/intake/classify.mjs`), route/triage/shape (skill/verb đã chiếm).
+
+### 11.6 `execute` gánh prose; `docs:*` chỉ khi có trigger
+
+Domain-scoped chỉ khi lời hứa khác; viết tài liệu theo spec là đúng lời
+hứa của `execute`. Chi phí/model do `rigor` và binding lo. Promotion trigger
+ghi trong fragment: override khỏi `execute` lặp lại trong log, hoặc project
+đăng ký executor chỉ phục vụ docs. `review` generic cần ngay.
+
+### 11.7 Đối chiếu I16 đã land (`main@a48ce987c`, 2026-09-27)
+
+Fragment và plan-loop có đúng hai dòng open inputs như §6.2; how-to sửa;
+tổng ba file 3.240 từ (trần 3.300). Executor phát hiện thêm, ghi ở
+plan-loop dòng 89: `--actors` trên `fgos coordination start` **chỉ bind node
+đầu** (entry node `produce-candidate`); các `authorize-and-dispatch` sau
+không mang actors, nên reviewer/red-team bind về executor mặc định cộng
+`placementPolicy.readOnlyRedirects`. **Đa dạng provider giữa các role hiện
+không đạt được từ facade.** Đây là đầu vào cứng cho S5: composer phải bind
+từng node (từ `serves`/`prefer` của catalog, roster tay là override), không
+chỉ node đầu. Plan liền kề đã gộp vào track làm Unit I17–I20 (owner, 2026-09-27 14:34);
+I19 (config thuần) chặn Phase 5 việc 2.

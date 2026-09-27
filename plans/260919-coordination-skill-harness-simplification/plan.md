@@ -804,6 +804,15 @@ sessions plus the plan artifact.
 
 ## Phase 5 — Rewrite architecture-panel and generic panel surfaces
 
+### Entry gate
+
+Unit I16 integrated (`main@a48ce987c`). Work item 2 additionally waits for
+Unit I19 (catalog `serves` schema); work items 7 and 8 consume the I17
+fragment and the I20 `capability match` door instead of keyword-matched
+skill descriptions. I17 and I18 may run in parallel with work items 1, 3, 4,
+5 and 6. Design record:
+`plans/reports/architecture-investigation-260927-1154-capability-aware-dispatch-gate-phase4-decisions.md`.
+
 ### Objective
 
 Prove the same control/template layer **and the Phase 4 driver discipline**
@@ -813,7 +822,14 @@ work for a structurally unlike, read-only, human-dialogue consumer.
 
 1. Move per-role packets out of the runtime skill into operation templates.
 2. Move executor/confinement registration facts into dispatch config,
-   setup/doctor checks, and a focused operator runbook.
+   setup/doctor checks, and a focused operator runbook. Concretely: a
+   per-node binding step in the request composers that reads each
+   operation's capability `serves`/`prefer` (I19) and binds every node, not
+   only the entry node (I16 finding: `start --actors` binds the entry node
+   only; later `authorize-and-dispatch` carries no actors, so provider
+   diversity across roles is not reachable from the facade today); a
+   hand-written roster stays a trusted override with provenance. Design not
+   yet settled — owner session before this item starts.
 3. Replace internal `node -e` pack invocation with a public semantic CLI
    surface.
 4. Add a real public specialist-authorization composer if the kernel action is
@@ -1190,12 +1206,63 @@ Executor/provider/model/tier selection remains an execution-time decision.
   verification: 12/12 pass across focused suites (test/skills/coordination-phase4-driver-discipline.test.mjs 9/9, test/skills/coordination-dag-driver-skill-contract.test.mjs 3/3); 29/29 pass across test/skills/**/*.test.mjs; word count 3,240 <= 3,300 ceiling (driver 1,192, plan-loop 1,319, policy 729); git diff --check clean.
   evidence: plans/reports/architecture-investigation-260927-1154-capability-aware-dispatch-gate-phase4-decisions.md §6.2, §6.4, §10
   stop: CLEARED — integrated at `main@a48ce987c`; Phase 5 unblocked.
+- unit: I17 — demand doctrine: `capability-matching.md` fragment, spec fact, trigger reversal
+  capability: execute
+  depends-on: I16
+  status: not-started
+  scope: see `phase-05-unit-i17-demand-doctrine.md`. Prose only: new shared fragment
+    (DemandFacts, serves-based matching, default inline, five dispatch reasons, promotion
+    trigger for domain capabilities), `serves` column + `review` row in
+    `capability-catalog.md`, fifth dispatch reason in `executor-dispatch-fallback.md`,
+    trigger of `fgos-capability-dispatching` and `fgos-code-panel` description switched
+    from keyword matching to declared facts, one spec line in `docs/specs/runner.md`.
+  design-record: plans/reports/architecture-investigation-260927-1154-capability-aware-dispatch-gate-phase4-decisions.md §11
+  verification: node --test test/setup/capability-catalog-doctrine.test.mjs test/skills/; npm run build:skills mirrors byte-identical; git diff --check
+  stop: fragment needs kernel/engine change; any existing skill-contract test regresses.
+- unit: I18 — plan lint hardening and `fgos plan-lint` verb
+  capability: code:implement
+  depends-on: I16
+  status: not-started
+  scope: see `phase-05-unit-i18-plan-lint-door.md`. Fix confirmed lint gaps (hedged
+    parenthetical, duplicate `capability:`, pin keys `prefer|invocation|actors`, Product
+    Gates table rows, `--cell` filter, severity hard|warn); read-only verb
+    `fgos plan-lint <path> [--cell] [--json]` (exit 0/1/2); move
+    `report-capability-plan-lint` off `shadow` in `test/test-ownership.mjs`.
+  verification: node --test test/report/capability-plan-lint.test.mjs test/cli/; node bin/fgos.mjs plan-lint plans/260919-coordination-skill-harness-simplification/plan.md --json; git diff --check
+  stop: lint reads config or calls decide; verb touches state.
+- unit: I19 — catalog `serves` schema, `review` slot, orphan executor `for`, doctor check
+  capability: code:implement
+  depends-on: I17
+  status: not-started
+  scope: see `phase-05-unit-i19-catalog-serves.md`. Config-only: `serves` key in
+    `ALLOWED_CAPABILITY_ENTRY_KEYS` + `validateCapabilitiesShape`; `serves` on every
+    `DEFAULT_CAPABILITY_SLOTS` entry; new slot `review` (no prefer/overrides); doctor
+    check that every `serves` is valid and no two entries declare the same set; live
+    `.fgos/config.json` (separate commit, additive only: `serves`, `review`, `for` on
+    glm/xai/deepseek — never change existing `prefer`).
+  gate: **Phase 5 work item 2 (binding resolver) may not start before I19 is integrated.**
+  verification: node --test test/setup/capability-catalog-doctrine.test.mjs test/setup/checks.test.mjs test/runner/dispatch.test.mjs; node bin/fgos.mjs doctor; env -u CLAUDE_CODE_SESSION_ID npm test
+  stop: a config without `serves` fails to load; any existing `decide --for` answer for a registered name changes.
+- unit: I20 — `capability-match.mjs`, `fgos capability match` verb, match log, `capability.unknown` reason code
+  capability: code:implement
+  depends-on: I19
+  status: not-started
+  scope: see `phase-05-unit-i20-capability-match-module.md`. Pure
+    `matchCapability(demandFacts, catalog)` in `src/runner/capability-match.mjs`
+    (outside `dispatch/`, boundary test forbids importing decide/transport);
+    verb `fgos capability match --demand <json> [--override --reason] [--json]`;
+    one `appendWorkerLog` line per call (`source: match|override|miss`);
+    `compileDispatchPlan` adds `capability.unknown` for an unregistered `--for`
+    name without `--needs-soul`; manifest + test-ownership entries.
+  verification: node --test test/runner/capability-match.test.mjs test/cli/capability-match.test.mjs test/runner/dispatch.test.mjs test/runner/dispatch-reconciliation-import-graph.test.mjs test/architecture.test.mjs; env -u CLAUDE_CODE_SESSION_ID npm test
+  stop: matching calls decide or reads prefer; mechanism of decide changes.
 
 Parallelism is limited deliberately:
 
 ```text
 I00 -> I01 -> I02 -> I03 -------------------------------+
-          +-> I04 -> I05 -------------------------------+--> I11 -> I12 -> I13 -> I14 -> I15 -> I16 -> Phase 5
+          +-> I04 -> I05 -------------------------------+--> I11 -> I12 -> I13 -> I14 -> I15 -> I16 -> I17 -> I19 -> I20 -> Phase 5 (item 2 waits I19; items 7/8 wait I20)
+                                                             I16 -> I18 (parallel with I17)
           +-> I06 -----+                                |
           +-> I07 -----+-> I08 -------------------------+
                        I02 + I04 + I06 -> I09 -> I10 ----+
