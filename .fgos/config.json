@@ -58,6 +58,10 @@
       },
       "review": {
         "description": "Independent read-only review of a non-code artifact (docs, design, spec, config) before merge/decision -- distinct from code:review (I19, core/skills/_shared/capability-catalog.md).",
+        "confinement": {
+          "mode": "required",
+          "policy": "host-write-denied"
+        },
         "serves": {
           "outputKind": "finding",
           "mutates": false
