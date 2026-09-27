@@ -1608,6 +1608,254 @@ Executor/provider/model/tier selection remains an execution-time decision.
     naming a literal executor id; replay of an existing session's derived
     state is unaffected (only the request-compose-time `actors[]` shape
     changed, not anything schema/store persists).
+- unit: I22 — migrate architecture-panel per-role packets into prompt templates (Phase 5 work item 1)
+  capability: code:implement
+  depends-on: none (Phase 3/I04 template wiring already satisfied)
+  status: not-started
+  design-record: plans/reports/fork-260927-2024-phase5-items-1-3-4-5-6-decomposition-research-report.md §Item 1
+  scope: `core/coordination-protocols/architecture-advisory-panel-v1.yaml`
+    already declares `task.contractTemplate` across its 14 operations (14
+    `contractTemplate` references resolving to 12 unique template ids —
+    independent decomposition review corrected the earlier "13 operations"
+    count); only `architecture-advisory-panel-v1-scout-report.md` exists.
+    Author the 11 missing `core/prompt-templates/
+    architecture-advisory-panel-v1-*.md` files (interpretation,
+    system-proposal, alternative-proposal, constraint-proposal, critique,
+    constraint-findings, specialist-answer, synthesis, redteam, explanation,
+    close-dialogue), each following the existing `scout-report` template's
+    exact placeholder convention (`{role}`, `{objective}`, `{contextRefs}`,
+    `{expectedOutputs}`, `{constraints}`, `{evidenceContract}`), absorbing
+    the matching role's packet content from `core/skills/fgos-architecture-panel/
+    SKILL.md`'s "Per-Role Task Packets" section (lines 324-594; the design
+    record cites the exact operation-id -> role mapping) — preserve the
+    existing `Task-spec:` line the current assignment path renders
+    (`assignment.mjs` ~L738-755) rather than silently dropping it, and never
+    cite a role-doctrine file path inside a template (bounded variables
+    only reach the rendered prompt; a path reference would break across the
+    dispatch boundary — this is an already-known gap, not new to this
+    unit). Once every operation resolves a real template, trim SKILL.md's
+    packet prose to a short pointer (same pattern Phase 3/I04 used
+    elsewhere), and resync `.claude/skills`/`.agents/skills`/
+    `plugins/fgOS/skills` mirrors via `npm run build:skills`. Do NOT touch
+    the FlowDefinition YAML — its `contractTemplate` refs are already
+    correct; do not widen a template's authority beyond cognitive
+    instructions/artifact shape (Phase 3's own guardrail: a template can
+    refine judgment prose, never graph legality). This unit does NOT claim
+    Phase 5's Exit-level "fixed-case quality eval" / "≥60% Lead-token
+    reduction without quality regression" measurement — that is a
+    track-wide Phase 5 exit gate evaluated once every applicable work item
+    (1, 7, 8) has landed, not a per-unit deliverable; this unit only
+    confirms its own word-count delta (I15/I16 pattern) and that nothing
+    regresses conformance. Note for whoever measures the Exit gate later:
+    this migration changes who reads the content (Lead-read packets become
+    actor-read rendered templates) — factor that into the quality eval, not
+    just the word count.
+  verification: node --test test/runner/operation-prompt-templates.test.mjs
+    (extend with one case per new template resolving/rendering with bounded
+    variables only); node --test test/verbs/coordination-architecture-advisory-panel-conformance.test.mjs
+    (must stay green — confirms no legality change); word-count check on the
+    trimmed SKILL.md (same pattern as I15/I16); npm run build:skills mirrors
+    byte-identical; env -u CLAUDE_CODE_SESSION_ID npm test.
+  stop: a template widens authority beyond cognitive instructions/artifact
+    shape; graph legality changes; a mirror fails to stay byte-identical.
+- unit: I23 — public CLI surface for group-thinking pack dispatch (Phase 5 work item 3)
+  capability: code:implement
+  depends-on: none
+  status: not-started
+  design-record: plans/reports/fork-260927-2024-phase5-items-1-3-4-5-6-decomposition-research-report.md §Item 3; independent decomposition review (Track Manager) folded into this revision.
+  decision (Lead, locked, do not reopen — REVISED after independent review's
+    M4/M5 findings): drop the earlier "new top-level `fgos group-thinking`
+    verb" call. Reasons: (1) the pack code already lives in
+    `src/verbs/coordination/`, and `coordination` already has an extensible
+    per-kind subverb mechanism (`bin/fgos.mjs`'s `KNOWN_COORDINATION_SUBVERBS`,
+    `command-registry.mjs`'s subverb enum) that does NOT touch
+    `COMMAND_REGISTRY.length`/`command-routes.json` — a top-level verb would
+    have required the full I18/I20-style rust-host regeneration for no
+    reason; (2) naming a durable public CLI door after a skill
+    (`fgos-group-thinking`) that Phase 5 work item 8 turns into a deprecated
+    stub is an avoidable inconsistency. New shape: `fgos coordination pack
+    list` (wraps `loadProtocolPack`, replaces step 1's `node -e` block);
+    `fgos coordination pack show-protocol <id>` (wraps
+    `loadCoordinationProtocol` — confirmed no existing verb exposes raw
+    protocol-shape inspection by id: `coordination show` is session-replay
+    only, `workflow operations` is stage ops; this is a genuinely new
+    sub-door, replaces step 2's block); `fgos coordination pack run
+    --protocol <id> --file <path>` (wraps `runGroupThinkingRequest`'s
+    pack-membership gate, replaces step 4's block; size with the same care
+    as I20's `capability match` verb, not a thin pass-through; forward
+    `--executor`/`--tier`/`--model` the same way plain `coordination run`
+    already does via `cliOverride`). Do NOT add a `--resume <coordinationId>`
+    flag — `runGroupThinkingRequest` has no resume parameter; "resume" is
+    just resubmitting a request file whose `coordinationId` already exists
+    (`group-thinking-pack.mjs` L234-238, L328), and the skill text already
+    says this mechanism needs no separate flag. Steps 3 (compose) and 5
+    (replay) already use real public doors and are NOT part of this unit.
+  scope: `bin/fgos.mjs`, `src/cli/command-registry.mjs` (new `pack` subverb
+    entries under the existing `coordination` verb — no top-level registry
+    growth, no rust-host regeneration needed); `src/verbs/coordination/
+    group-thinking-pack.mjs` (read-only — the new subverb(s) call its
+    existing exports, never reimplement them); `core/skills/
+    fgos-group-thinking/SKILL.md` (+ mirrors) to replace all three `node -e`
+    blocks with the new CLI invocations; `docs/how-to/
+    use-fgos-group-thinking.md` (also has a `node -e` block, L25 — same
+    replacement); `docs/architecture-manifest.json`; `test/test-ownership.mjs`;
+    `CHANGELOG.md` (user-visible new CLI surface, own sub-heading).
+  verification: existing `test/verbs/coordination-group-thinking-pack.test.mjs`,
+    `test/runner/coordination-group-thinking-rfc-review-lite.test.mjs`,
+    `test/verbs/coordination-group-thinking-pack-registration.test.mjs`
+    (bypass-invariant coverage — must stay green, confirms this unit doesn't
+    accidentally touch pack-gate behavior) all stay green; new
+    `test/cli/coordination-pack.test.mjs` covering list/show-protocol/run
+    against real fixtures, including the `--executor`/`--tier`/`--model`
+    forwarding; env -u CLAUDE_CODE_SESSION_ID npm test.
+  stop: the new subverb(s) reimplement pack-membership/dispatch logic instead
+    of calling `group-thinking-pack.mjs`'s existing exports; a duplicate
+    protocol-shape-inspection door is created where one already existed; any
+    change to `COMMAND_REGISTRY.length` sneaks in (this unit should not need
+    rust-host regeneration at all — if it turns out to, stop and report why).
+- unit: I24a — specialist-authorize request-step door, unlocked path only (Phase 5 work item 4, part 1)
+  capability: code:implement
+  depends-on: none
+  status: not-started
+  design-record: plans/reports/fork-260927-2024-phase5-items-1-3-4-5-6-decomposition-research-report.md §Item 4; independent decomposition review (Track Manager) found the original single I24 unimplementable as scoped (H1-H3) — split into I24a/I24b per that review's M3, this is I24a.
+  decision (Lead, locked, do not reopen — H3 from the decomposition review):
+    "authorize a specialist" is registered as group-thinking pack-gate
+    bypass #4 (`docs/architect/agent-coordination/contracts/
+    coordination-session.md`'s "Group-Thinking Protocol Pack" § "Five
+    bypasses, verified structurally impossible"; pinned by
+    `test/verbs/coordination-group-thinking-pack-registration.test.mjs`'s
+    header/assert ~L399). This unit does NOT reopen that invariant. The new
+    `specialist-authorize` request-step type is added to `run.mjs`'s public
+    request vocabulary for the raw `coordination run --file` power-user
+    door ONLY; the group-thinking pack gate must continue to REFUSE this
+    step type exactly as it refuses every other bypass today (option (b)
+    from the review, not (a) — do not amend the bypass list or the pack
+    gate's own refusal behavior; a pack-registered protocol still cannot
+    reach specialist authorization through `runGroupThinkingRequest`). The
+    driver-authenticated typed-action path (a real, tested door once I24b
+    lands) is the intended route for group-thinking-adjacent flows; this
+    unit only closes the RAW direct-engine-call escape hatch, nothing more.
+  scope: `authorizeSpecialistSlot` (`src/runner/coordination/
+    session-engine.mjs:1586`) has no composer/request-step wrapper today
+    (confirmed: the only non-test caller is a historical one-off script, not
+    live code) — the direct-call escape hatch `fgos-architecture-panel/
+    SKILL.md`'s "Never Reimplements The Kernel" section names as `tsk-3xk`.
+    Add a `specialist-authorize` request-step type
+    (`src/verbs/coordination/schema.mjs`, following the exact validation
+    shape of the existing step types) and a composer in
+    `src/verbs/coordination/composers.mjs` that calls
+    `authorizeSpecialistSlot` the same way every other composer calls its
+    own session-engine function, wired into `run.mjs`'s request-kind
+    dispatch switch for the UNLOCKED (`coordination run --file`) path only
+    — I24b covers the locked/typed-action path, which needs a `Locked`
+    engine twin this unit does not build. Update SKILL.md's "Never
+    Reimplements The Kernel" section to name the new door and retire
+    `tsk-3xk` from Known Gaps (but do NOT claim the typed-action/subverb
+    path exists yet — that's I24b). Update the YAML header comment
+    (`architecture-advisory-panel-v1.yaml` ~L70-82, comment only, never the
+    graph) and `fgos-architecture-panel/SKILL.md`'s Executor Roster section
+    (~L285) to stop pointing at the retired direct-call path. Explicitly
+    confirm (add a test) the group-thinking pack gate still refuses this new
+    step type — the H3 decision above is not self-enforcing without one.
+  files: src/verbs/coordination/schema.mjs, src/verbs/coordination/composers.mjs,
+    src/verbs/coordination/run.mjs, core/skills/fgos-architecture-panel/SKILL.md
+    (+ mirrors), core/coordination-protocols/architecture-advisory-panel-v1.yaml
+    (header comment only), docs/architect/agent-coordination/contracts/
+    coordination-session.md (confirm bypass-#4 wording still accurate — do
+    not weaken it), CHANGELOG.md. Do NOT touch `session-engine.mjs`'s
+    `authorizeSpecialistSlot` itself, `store.mjs`, `bin/fgos.mjs`,
+    `command-registry.mjs`, or `actions.mjs` — those belong to I24b.
+  verification: node --test test/runner/coordination-specialist-binding.test.mjs
+    (existing — extend to exercise the new request-step path via
+    `coordination run --file` alongside/instead of the direct call);
+    node --test test/verbs/coordination-group-thinking-pack-registration.test.mjs
+    (must still assert bypass #4 refused — this unit adds a NEW refused-step
+    case, doesn't remove the old one); node --test test/verbs/
+    coordination-architecture-advisory-panel-conformance.test.mjs;
+    env -u CLAUDE_CODE_SESSION_ID npm test.
+  stop: the group-thinking pack gate stops refusing `specialist-authorize`
+    (that would silently flip the H3 decision); `specialist-authorize`
+    becomes reachable any live runtime/skill path other than
+    `coordination run --file` before I24b lands.
+- unit: I24b — typed `specialist` action-view case and locked/typed-action door (Phase 5 work items 4 part 2, 5, 6)
+  capability: code:implement
+  depends-on: I24a
+  status: not-started
+  design-record: plans/reports/fork-260927-2024-phase5-items-1-3-4-5-6-decomposition-research-report.md §Items 4, 5, 6; independent decomposition review (Track Manager) H1, H2, M1, M2.
+  scope: (H1) the typed-action execution path
+    (`actions.mjs`'s `executeCoordinationActionUseCase` -> `run.mjs`
+    ~L520-553) runs every step while HOLDING the events lock
+    (`events.mjs:325`, a non-reentrant pid lock) — every existing door has a
+    `*Locked` twin (`authorizeDeclaredOperationLocked`,
+    `recordHumanTurnLocked`, `recordDriverDispositionLocked`, etc.).
+    `authorizeSpecialistSlot` -> `store.mjs`'s `recordSpecialistAuthorization`
+    (~L1289) calls `withEventsLock` itself and has NO `Locked` twin — calling
+    it from the already-locked typed-action path would self-deadlock (wait
+    until the lock's own timeout). Add `recordSpecialistAuthorizationLocked`
+    (`store.mjs`) and `authorizeSpecialistSlotLocked`
+    (`session-engine.mjs`) as siblings of the existing function (never
+    modify the existing unlocked ones I24a already wired). (H2) typed
+    actions can only be executed through per-kind `fgos coordination
+    <subverb>` verbs (`bin/fgos.mjs`'s `KNOWN_COORDINATION_SUBVERBS`,
+    `command-registry.mjs`'s subverb enum, `actions.mjs`'s own use case) —
+    add the `specialist-authorize` subverb the same way, wired to call the
+    new Locked composer/action path; this does NOT touch
+    `command-routes.json`/rust-host regeneration (subverbs are
+    `coordination`-internal, confirmed by I24a/I23's own research). Add a
+    `specialist`-kind action to `src/runner/coordination/
+    actions-projector.mjs`'s `projectCoordinationActions` (Phase 1's own
+    Cases list requires the typed action view to distinguish "specialist
+    slot available/unauthorized/exhausted") built on the EXISTING
+    `specialistSlots` fact `evaluateSpecialistSlots` already computes
+    (`legality-facts.mjs:550`/`1091` — the projector already imports
+    `legality-facts.mjs` at line 11 but never uses this fact; reuse it,
+    don't build a parallel computation) — mechanical legality data only (is
+    a slot authorizable, is it authorized, is it exhausted), never a
+    judgment field. (M2) `evaluateSpecialistSlots` only returns `bound`
+    today, not enough to derive "exhausted" — extend `legality-facts.mjs`
+    to also account for the slot's `maxBindings`, a binding's
+    `maxAssignments`, and `expiresAfterRound`/round liveness
+    (`resolveLiveSpecialistBindings`, `session-engine.mjs:~1128`) rather
+    than inventing separate logic in the projector. (M1) before treating
+    bounded-reopen visibility (item 5's other half) as already-solved,
+    directly confirm via a real/test probe against a `phase-dialogue-reopen`
+    session covering BOTH invocations of a `maxInvocations: 2` reopen
+    operation (`revise-synthesis`/`revise-explanation`,
+    `architecture-advisory-panel-v1.yaml` L531-540) — `evaluateDriverAuthorizedBindings`
+    (`legality-facts.mjs:533-545`) keys pending state by
+    `nodeId::operationId` and ignores `maxInvocations`, so the SECOND
+    invocation likely never appears as legal in the action view today; if
+    confirmed, fix `legality-facts.mjs` so both invocations are visible
+    within their declared bound, and add a test covering invocation #2
+    specifically (a test that only exercises invocation #1 would pass
+    against the bug). Work item 6: add a regression test asserting the new
+    `specialist`-kind action (and, for good measure, the existing kinds)
+    carry only mechanical legality fields, consistent with Phase 1's locked
+    contract ("describes legal choices but never chooses one").
+  files: src/runner/coordination/session-engine.mjs (new `Locked` sibling
+    export only — do not modify `authorizeSpecialistSlot` itself),
+    src/runner/coordination/store.mjs (new `Locked` sibling export only),
+    src/runner/coordination/legality-facts.mjs, src/runner/coordination/
+    actions-projector.mjs, src/verbs/coordination/actions.mjs, bin/fgos.mjs,
+    src/cli/command-registry.mjs (new `coordination specialist-authorize`
+    subverb — coordinate with I23 if still in flight on this same file;
+    sequential is safer than parallel here), CHANGELOG.md.
+  verification: node --test test/runner/coordination-specialist-binding.test.mjs
+    (extend for the Locked path); node --test test/runner/
+    coordination-legality-facts.test.mjs (existing — extend for the
+    exhausted-derivation and maxInvocations fixes); node --test test/verbs/
+    coordination-architecture-advisory-panel-conformance.test.mjs; new test
+    proving BOTH invocations of a maxInvocations:2 reopen operation appear
+    as legal actions within bound (not just the first); new regression test
+    for work item 6's mechanical-only-fields invariant; new CLI test for the
+    `specialist-authorize` subverb; env -u CLAUDE_CODE_SESSION_ID npm test.
+  stop: the typed-action path deadlocks under the events lock (a `Locked`
+    twin was skipped or miswired); the projector's `specialist` action (or
+    any other action kind) carries a judgment field instead of mechanical
+    legality data; the second invocation of a bounded-reopen operation is
+    still invisible to the action view after this unit claims it's fixed;
+    the H3 decision (pack gate still refuses `specialist-authorize`) is
+    weakened by anything in this unit.
 
 Parallelism is limited deliberately:
 
@@ -1618,7 +1866,18 @@ I00 -> I01 -> I02 -> I03 -------------------------------+
           +-> I06 -----+                                |
           +-> I07 -----+-> I08 -------------------------+
                        I02 + I04 + I06 -> I09 -> I10 ----+
+
+I16 -> I22 (Phase 5 item 1) ‖ I23 (Phase 5 item 3, files disjoint from I22)
+I22, I23 -> I24a (Phase 5 item 4 pt.1) -> I24b (Phase 5 items 4 pt.2/5/6)
 ```
+
+I22/I23 run in parallel (Files disjoint). I24a runs after I22/I23 close out —
+sequential, not parallel, despite low measured textual-overlap risk on
+`fgos-architecture-panel/SKILL.md` with I22, because this track's own history
+(I18, I21) shows overlapping-worktree/overlapping-file races cost more than
+the serialization they'd save. I24b depends on I24a's request-step door and
+also touches `bin/fgos.mjs`/`command-registry.mjs`, the same files I23
+touches — never run I24b concurrently with I23 either.
 
 I04, I06, and I07 may proceed in parallel only from the identical I01
 baseline. I09 waits for result truth, template resolution, and dispatch policy
