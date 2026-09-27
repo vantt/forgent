@@ -460,6 +460,93 @@ test('domain-neutral proof: 1 plan-loop + 2 advisory operations resolve via iden
   assert.ok(res3.templateProvenance.contentDigest.startsWith('sha256:'));
 });
 
+test('Unit I22: every architecture-advisory-panel-v1 operation resolves and renders its own real template with bounded variables only', () => {
+  const archPanelDef = loadCoordinationProtocol('core.coordination-protocol.architecture-advisory-panel-v1');
+  assert.equal(archPanelDef.spec.operations.length, 14, 'protocol must still declare exactly 14 operations');
+
+  const sampleVariables = {
+    role: 'sample-role',
+    objective: 'Sample objective for bounded-variable rendering coverage',
+    contextRefs: ['ctx/one.md', 'ctx/two.md'],
+    expectedOutputs: ['artifact-one.md'],
+    constraints: ['no-git-mutation'],
+    evidenceContract: 'reported',
+  };
+
+  for (const op of archPanelDef.spec.operations) {
+    const templateId = op.task?.contractTemplate;
+    assert.ok(templateId, `operation "${op.id}" must declare a task.contractTemplate`);
+
+    const loaded = loadOperationPromptTemplate(templateId);
+    assert.equal(loaded.id, templateId);
+    assert.equal(loaded.tier, 'core', `"${templateId}" must resolve from the core tier`);
+
+    // Every placeholder present in the raw template content must be one of
+    // the bounded variables -- validateOperationPromptTemplate already
+    // enforces this at load time (scanTier calls it), but assert it again
+    // here so this test fails loudly if that invariant is ever bypassed.
+    const detected = validateOperationPromptTemplate(loaded.content, templateId);
+    for (const varName of detected) {
+      assert.ok(
+        BOUNDED_TEMPLATE_VARIABLES.has(varName),
+        `"${templateId}" references non-bounded variable "{${varName}}"`,
+      );
+    }
+
+    const rendered = resolveAndRenderOperationPrompt(
+      { contractTemplate: templateId, ...sampleVariables },
+      { variables: sampleVariables },
+    );
+    assert.ok(rendered.renderedBody.length > 0, `"${templateId}" must render a non-empty body`);
+    assert.ok(!rendered.renderedBody.includes('{role}'), `"${templateId}" must not leave {role} unrendered`);
+    assert.ok(!rendered.renderedBody.includes('{objective}'), `"${templateId}" must not leave {objective} unrendered`);
+    assert.ok(rendered.templateProvenance.contentDigest.startsWith('sha256:'));
+  }
+});
+
+test('Unit I22 fix round 1: a real inline coordination Assignment (architecture-advisory-panel-v1) renders its actual constraints, never a false "(none)"', () => {
+  // buildInlineAssignment() (assignment.mjs) never promotes contract.constraints
+  // to a top-level Assignment field -- every architecture-advisory-panel-v1
+  // operation dispatches through this exact inline shape (session-engine.mjs
+  // -> createSessionAssignment() -> buildAssignment()), so a synthetic flat
+  // { constraints: [...] } object (as other tests in this file use) cannot
+  // catch this: it must be a REAL inline Assignment.
+  const assignment = buildAssignment({
+    provenance: {
+      kind: 'inline',
+      contract: {
+        objective: 'Shape a system proposal for the intake seam',
+        contextRefs: ['intake.md', 'scout-report.md'],
+        constraints: ['read-only', 'no-sibling-visibility'],
+        expectedOutputs: ['proposal.md'],
+        mutation: 'read-only',
+        evidence: { required: 'reported' },
+        role: 'system-shaper',
+        budget: { timeoutMs: 60000, maxRuns: 1 },
+        contractTemplate: 'architecture-advisory-panel-v1-system-proposal',
+      },
+      caller: { writerId: 'writer-arch-panel-constraints-test' },
+    },
+  });
+
+  assert.equal(assignment.provenance.kind, 'inline');
+  assert.equal(assignment.constraints, undefined, 'sanity check: real inline Assignments never carry a top-level "constraints" field');
+  assert.deepEqual(assignment.provenance.inline.contract.constraints, ['read-only', 'no-sibling-visibility']);
+
+  const { renderedBody } = resolveAndRenderOperationPrompt(assignment);
+  const constraintsSection = renderedBody.split('## Constraints')[1].split('## Evidence Contract')[0];
+  assert.ok(constraintsSection.includes('- read-only'), 'real constraint "read-only" must render');
+  assert.ok(constraintsSection.includes('- no-sibling-visibility'), 'real constraint "no-sibling-visibility" must render');
+  assert.ok(!constraintsSection.includes('(none)'), 'must never render "(none)" when real constraints exist');
+
+  // Also prove it through the actual dispatch path a real worker prompt
+  // takes: renderAssignmentPrompt() -> resolveAndRenderOperationPrompt(),
+  // not just a direct call to the lower-level function.
+  const fullPrompt = renderAssignmentPrompt(assignment);
+  assert.ok(fullPrompt.includes('- read-only'), 'renderAssignmentPrompt must surface the real constraint');
+  assert.ok(fullPrompt.includes('- no-sibling-visibility'), 'renderAssignmentPrompt must surface the real constraint');
+});
+
 test('retry/replay attribution stability: snapshot and digests remain deterministic when disk template changes', () => {
   const tmpDir = createTempDir('fgos-replay-test-');
   try {

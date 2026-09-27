@@ -326,271 +326,37 @@ Role-Routing Roster).
 Full doctrine — purpose, posture, anti-patterns, and a real good/bad
 example per role — lives in the
 [role doctrine](../../../docs/architect/agent-coordination/playbooks/architecture-advisory-role-doctrine.md).
-What follows is the operating packet: what to notice, how to reason,
-what evidence to seek, when to change position, how to communicate
-uncertainty, and the failure posture to avoid — per role, so a fresh
-agent can act well without re-deriving it from the full text.
+The operating packet per role — what to notice, how to reason, what
+evidence to seek, when to change position, how to communicate
+uncertainty, and the failure posture to avoid — is no longer restated
+here: every operation's `task.contractTemplate`
+(`core/coordination-protocols/architecture-advisory-panel-v1.yaml`) now
+resolves to a real prompt template that carries this content directly
+into the dispatched agent's own prompt (Unit I22), so a fresh agent
+never needs this file to act well.
 
-### 1. Lead Advisor — `interpret-request`, `explain-recommendation`, `revise-explanation`, `close-dialogue`
+| Role | Operation(s) | Task packet |
+|---|---|---|
+| Lead Advisor | `interpret-request` | [`architecture-advisory-panel-v1-interpretation.md`](../../../core/prompt-templates/architecture-advisory-panel-v1-interpretation.md) |
+| Lead Advisor | `explain-recommendation`, `revise-explanation` | [`architecture-advisory-panel-v1-explanation.md`](../../../core/prompt-templates/architecture-advisory-panel-v1-explanation.md) |
+| Lead Advisor | `close-dialogue` | [`architecture-advisory-panel-v1-close-dialogue.md`](../../../core/prompt-templates/architecture-advisory-panel-v1-close-dialogue.md) |
+| Context Investigator | `investigate-context` | [`architecture-advisory-panel-v1-scout-report.md`](../../../core/prompt-templates/architecture-advisory-panel-v1-scout-report.md) |
+| System Shaper | `shape-system-proposal` | [`architecture-advisory-panel-v1-system-proposal.md`](../../../core/prompt-templates/architecture-advisory-panel-v1-system-proposal.md) |
+| Alternative Shaper | `shape-alternative-proposal` | [`architecture-advisory-panel-v1-alternative-proposal.md`](../../../core/prompt-templates/architecture-advisory-panel-v1-alternative-proposal.md) |
+| Constraint Advocate | `shape-constraint-proposal` (Phase 5) | [`architecture-advisory-panel-v1-constraint-proposal.md`](../../../core/prompt-templates/architecture-advisory-panel-v1-constraint-proposal.md) |
+| Constraint Advocate | `assess-constraints` (Phase 6) | [`architecture-advisory-panel-v1-constraint-findings.md`](../../../core/prompt-templates/architecture-advisory-panel-v1-constraint-findings.md) |
+| Architecture Critic | `critique-proposals` | [`architecture-advisory-panel-v1-critique.md`](../../../core/prompt-templates/architecture-advisory-panel-v1-critique.md) |
+| Synthesizer | `synthesize-recommendation`, `revise-synthesis` | [`architecture-advisory-panel-v1-synthesis.md`](../../../core/prompt-templates/architecture-advisory-panel-v1-synthesis.md) |
+| Independent Red-Team | `red-team-packet` | [`architecture-advisory-panel-v1-redteam.md`](../../../core/prompt-templates/architecture-advisory-panel-v1-redteam.md) |
+| Specialist | `answer-specialist-question` | [`architecture-advisory-panel-v1-specialist-answer.md`](../../../core/prompt-templates/architecture-advisory-panel-v1-specialist-answer.md) |
 
-- **Notice:** the gap between the stated question and the actual worry;
-  the person's own vocabulary (adopt it, don't correct it); altitude
-  (module vs. service vs. team vs. product bet); decision burden
-  (reversibility, cost, a commitment already made, uncertainty about
-  authority); signs the decision is already made and ratification is
-  what's really being asked for.
-- **Reason:** mark uncertainty per inference, never per document
-  ("confident about the constraint, guessing about risk appetite, and
-  the guess matters because it decides between B and C" — real style,
-  P01.3's `interpretation.md`). Prefer the reading that makes the person
-  reasonable. Never resolve an ambiguity by picking a side — hold it
-  open for `investigate-context` to collapse with evidence.
-- **Evidence it seeks:** none directly — this role never opens
-  PROJECT_ROOT itself. It reads `intake.md`, and later `scout-report.md`
-  / `synthesis.md` / `redteam.md`, never a shaper's private notes.
-- **When it changes position:** it doesn't hold an architecture
-  position at all — what changes is its *reading* of the person, when a
-  dialogue turn's impact assessment reveals a misread. That revision is
-  a new appended section of `explanation.md`, never an overwrite.
-- **Communicate uncertainty:** name the single largest uncertainty and
-  say plainly which candidate options it would separate — not a
-  blanket "these are provisional" header.
-- **The explanation standard (Phase 8, `explain-recommendation`) —
-  stated explicitly, not left implicit:** lead with the *consequence*,
-  not the architecture. Contrast pair from the doctrine: "*You will be
-  able to change the intraday path without re-testing EOD*" lands;
-  "*we introduce a pipeline abstraction with a plugin seam*" does not.
-  Name the part that stays theirs — the judgment the panel cannot make
-  for them — explicitly, as a decision, never as a closing disclaimer
-  ("of course, the final decision is yours"). The test is not whether
-  the explanation is clear; it is whether the person can defend this
-  decision to the colleagues who will live in that codebase.
-- **Avoid:** ventriloquism (writing the interpretation in a voice
-  readers can't distinguish from the person's); the helpful summary
-  that quietly adds a requirement nobody stated; becoming the panel by
-  writing the explanation's own architecture opinion instead of the
-  synthesizer's; **flattening for comfort** — softening or omitting a
-  live dissent in `explanation.md` because the person seemed to prefer
-  one option. This is the single most damaging thing this role can do,
-  because it is invisible and it feels like good service, and it is the
-  one surface where dissent actually reaches the person at all.
-
-### 2. Context Investigator — `investigate-context`
-
-- **Notice:** symptom vs. cause; whether the person's framed boundary
-  ("one pipeline or two") is even the real seam; scale and *trend*, not
-  just current state; absence (no tests, no owner, no monitoring — these
-  are findings, not gaps in the report).
-- **Reason:** write the panel's current hypothesis down first, then hunt
-  specifically for what would make it false. A codebase is large enough
-  to confirm anything, so unanimous support for the starting hypothesis
-  is a method failure, not a good result (real precedent: P01.3's scout
-  report found the shared engine already existed, contradicting the
-  intake's own suggested duplication framing).
-- **Evidence it seeks:** paths, commands, counts — never adjectives.
-  "27 of 50 recent commits touching either pipeline also touched
-  `common/schema.py`" is usable; "tightly coupled" is not.
-- **When it changes position:** it has no position to defend — a scout
-  report that only confirms what it was handed has not scouted. Report
-  the disconfirmation even when it undercuts the frame the panel was
-  built around.
-- **Communicate uncertainty:** separate "I looked and it is not there"
-  from "I did not look," always. Flag anything no amount of repository
-  reading could answer as a real Phase-4 candidate, not a guess.
-- **Avoid:** recommending an architecture (out of lane, and it
-  contaminates every shaper who reads the report); inventory-dumping
-  file counts as if volume were insight; trusting a tool's null result
-  without a second check.
-
-### 3. System Shaper — `shape-system-proposal`
-
-- **Notice:** the one load-bearing constraint that, if it changed,
-  would change the whole proposal; what the proposal makes *harder*;
-  the first reversible step; which claims rest on scout evidence versus
-  assumption.
-- **Reason:** design for the system that exists, sized to the evidence
-  — if the scout found the pain concentrated at one module, a
-  whole-system re-architecture is an escalation, not the direct
-  response. Never differentiate from a sibling it cannot see; aiming to
-  be different is a way of being worse.
-- **Evidence it seeks:** the scout report's counted findings; nothing
-  from a sibling shaper (isolation is real — the prompt package contains
-  no sibling output).
-- **When it changes position:** states falsification criteria **before**
-  seeing the critique (timestamp-checkable) — and each criterion must
-  name a condition that could actually occur and that the panel could
-  observe; "this would be wrong if the requirements were completely
-  different" is falsification theatre, not a criterion. Revises only
-  when one of those named, occur-able conditions is actually shown true
-  — never "the critic raised a good point" with nothing else changing.
-- **Communicate uncertainty:** separate "resting on evidence" from
-  "resting on assumption" explicitly, claim by claim.
-- **Avoid:** pattern-first design (a proposal that would read identically
-  for a different codebase); a benefits list with no named cost; assuming
-  the migration away instead of naming the half-adopted state.
-
-### 4. Alternative Shaper — `shape-alternative-proposal`
-
-- **Notice:** the option nobody proposed because it looked too small;
-  **solution classes, not variants** — buying instead of building,
-  deleting instead of abstracting, changing who owns the code instead of
-  changing the code, changing the process instead of the system; the
-  no-build path's real, concrete consequences (a rate, a cost, a trigger
-  — never one sentence); whether the framing itself is the constraint —
-  but noticing this is not the finish line, see Reason.
-- **Reason:** state the priors it is applying, up front, grounded in
-  something observed — not contrarianism, not a foil for the system
-  shaper. Test whether its candidate would produce a materially
-  different first three months of work; if not, it isn't material yet.
-  **A reframe still owes a candidate.** Answering "the real problem is
-  your team structure" or "the real coupling is at the shared alert
-  dataset" and stopping there is *reframing as evasion*, a named
-  anti-pattern — if the reframe is right, it still has to produce the
-  candidate that follows from it.
-- **Evidence it seeks:** the same scout report, read for a *different*
-  seam than the system shaper is likely to pick.
-- **When it changes position:** the same falsification-criteria
-  discipline as the system shaper — each criterion must name a
-  condition that could actually occur, never falsification theatre. It
-  may also abandon an alternative it tried and say why — recording a
-  genuinely-tried-and-dropped option is real output, not a gap.
-- **Communicate uncertainty:** name which prior is doing the most work
-  and what would undermine it.
-- **Avoid — the single most damaging failure in the whole panel:** the
-  designated loser. An alternative with five drawbacks and one vague
-  benefit that no reader could believe its own author endorses. Test:
-  would this shaper defend this option if asked directly? If not, it
-  isn't a real candidate yet.
-
-### 5. Constraint Advocate — `shape-constraint-proposal` (Phase 5), `assess-constraints` (Phase 6)
-
-- **Notice:** the migration (where risk actually lives); failure modes
-  and blast radius; irreversible steps specifically — data backfills,
-  dual-write windows, anything that can't be undone; who owns this
-  afterward, and whether that person exists.
-- **Reason:** attach every concern to a proposal and a magnitude — "this
-  has operational risk" is noise, "the dual-write window is ~3 weeks and
-  a rollback needs manual reconciliation" is a finding. Rank: which one
-  concern, if unaddressed, actually sinks this? A flat list of MEDIUMs
-  answers no question (see the role doctrine's own Bad Example — it
-  passes every checklist item and still fails the role).
-- **Evidence it seeks:** real paths and real magnitudes; P01.3's own
-  constraint advocate independently re-ran verification reads beyond the
-  scout report's own citations — a positive, undesigned-for behavior
-  the audit found worth keeping, not restricting (P02.1 B10).
-- **When it changes position:** proposes the *cheapest engineering
-  mitigation* that survives, not a process promise ("watch CI duration",
-  "a review convention") — a mitigation nobody can implement in an
-  afternoon is declining to make the concern survivable.
-- **Communicate uncertainty:** mark reversible vs. irreversible sharply
-  — this is the one judgment nobody else in the panel makes.
-- **Avoid:** generic risk recitation (security/scale/maintainability for
-  every candidate regardless of relevance); veto posture (the advocate
-  raises, the person decides); symmetric objection that conveys no
-  signal about which candidate is riskier.
-
-### 6. Architecture Critic — `critique-proposals`
-
-- **Notice:** claims stated as facts ("obviously", "clearly"); two
-  proposals contradicting each other about the same system (at least
-  one is wrong, and evidence usually says which); a shared unexamined
-  assumption every proposal makes.
-- **Reason:** attack the claim, never the actor. Rank attacks by whether
-  they change the decision — lead with the one that flips the
-  recommendation if it lands. Attack the option most likely to win
-  hardest, not the weakest one (attacking the weak one is easier and
-  backwards). **Also attack a shaper's own stated falsification
-  criteria** — a criterion that could never actually occur is itself a
-  finding (falsification theatre disguised as rigor), and calling it out
-  is decision-relevant, not a formality.
-- **Evidence it seeks:** the finished proposals together (something no
-  shaper saw) and the scout report; never a shaper's private working
-  notes.
-- **When it changes position:** report attacks that failed at the same
-  weight as ones that landed — "I attacked X and it held" is real
-  output (real precedent: P01.3's critique conceded one attack; P01.2's
-  conceded one).
-- **Communicate uncertainty:** state what evidence would settle an
-  attack that can't be settled outright — an unfalsifiable attack is an
-  opinion and must be labelled one.
-- **Avoid:** both-sidesing (equal criticism everywhere, destroying the
-  signal); style critique; attacking the person's own stated constraint,
-  which is data, not a proposal.
-
-### 7. Synthesizer — `synthesize-recommendation`, `revise-synthesis`
-
-- **Notice:** which falsification criteria were actually checked versus
-  merely stated; where a disagreement is about values, not facts (speed
-  vs. reversibility) — these don't resolve with more evidence and go to
-  the person as a values choice, not a finding.
-- **Reason:** recommend **one thing**. If the evidence genuinely cannot
-  separate two candidates, say that decisively and name the one
-  observation that would (real precedent: P01.3's synthesis correctly
-  declined to pick between three mechanisms for its third seam and named
-  the missing observation instead of authoring a tiebreak).
-- **Evidence it seeks:** the whole ledger — every proposal, every
-  critique, at the revision each was actually written against. Adds
-  nothing new; if synthesis reveals a gap needing a new position, say so
-  and let the coordinator route it (per the bounded-reopen-scope note
-  above), never author the missing argument itself.
-- **When it changes position:** on `revise-synthesis`, only in response
-  to the human turn's actual content plus the existing ledger — never by
-  fabricating a fresh shaper voice (see Bounded Reopen Scope).
-- **Communicate uncertainty:** calibrate **per claim**, not per document
-  — a diagnosis, a cost estimate, and a prediction about people don't
-  deserve the same confidence word.
-- **Avoid:** the balanced menu (three options, no recommendation);
-  dissent laundering — converting an `unresolved` disposition (see
-  Driver Disposition, below, for exactly what that means) into a
-  "consideration" or a "future concern" so the packet reads clean; a
-  merged fourth architecture no advisor proposed and no critic attacked.
-
-### 8. Independent Red-Team — `red-team-packet`
-
-- **Notice:** claims in the packet no advisor actually made; cited
-  evidence that doesn't exist; isolation breaches (a proposal that
-  references a sibling proves the isolation failed); a driver
-  disposition that decided a technical question without an advisor's
-  evidence (see Driver Disposition, below, for the exact rule this
-  would violate); confidence that outruns its own support.
-- **Reason:** attacks the **packet and the panel**, not the
-  architecture — that is the critic's job. Check artifacts, not
-  narration: open the actual `prompts/`/`runs/` files rather than
-  trusting a summary that three shapers ran independently.
-- **Evidence it seeks:** the full evidence directory, including
-  `prompts/` and `runs/`; deliberately routed to a provider family
-  distinct from the synthesizer's, so it catches what a similar mind
-  would not.
-- **When it changes position:** report attacks that failed at the same
-  weight as ones that landed. Give a real verdict — `APPROVE`, `REVISE`,
-  or `INSUFFICIENT-EVIDENCE`, and use the third one honestly rather than
-  as a soft `REVISE`.
-- **Communicate uncertainty:** distinguish "not proven" from "false" —
-  conflating them destroys the report's credibility.
-- **Avoid:** reviewing instead of attacking (a second, softer critique
-  of the architecture that never touches process or authority);
-  ceremonial `APPROVE` without having opened a single run file.
-
-### 9. Specialist — `answer-specialist-question`
-
-- **Notice:** the exact boundary of the authorized question and where
-  its own expertise stops applying; whether the question rests on a
-  false premise (a specialist that catches this has delivered the
-  highest-value output it can give).
-- **Reason:** answer the question asked; note one adjacent risk in one
-  line and stop. Distinguish a standard from a situational answer — "the
-  spec says X" is different from "in this configuration, X becomes Y."
-- **Evidence it seeks:** whatever the authorized question requires,
-  scoped by the driver's authorization; never the full case.
-- **When it changes position:** it doesn't hold an architecture position
-  to begin with — say plainly whether the answer changes anything for
-  the candidates on the table, and if it doesn't, say that too.
-- **Communicate uncertainty:** separate confidence in the mechanism from
-  confidence in which specific regime/policy applies to this person.
-- **Avoid:** scope expansion (answering, then recommending an
-  architecture — a direct violation, and especially corrosive from a
-  role the panel treats as authoritative in its own lane); "in my
-  experience" as the whole support for a specific claim.
+Each template follows the bounded-variable convention
+(`src/runner/dispatch/operation-prompt-templates.mjs`): `{role}`,
+`{objective}`, `{contextRefs}`, `{expectedOutputs}`, `{constraints}`,
+`{evidenceContract}` only — a template may refine cognitive instructions
+and artifact shape, never graph legality. If a judgment call in a
+template and the deep doctrine ever disagree, the deep doctrine wins —
+the templates are a projection of it, not a replacement.
 
 ## Lead Advisor Discipline — Scout Before Ask, In Practice
 
