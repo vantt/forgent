@@ -90,6 +90,9 @@ export const ACTION_INPUT_RESERVED_FIELDS = Object.freeze(new Set([
   'targetRef',
   'authorizationId',
   'invocationKey',
+  'slotId',
+  'role',
+  'specialistAuthorizationId',
 ]));
 
 function sha256(content) {
@@ -136,6 +139,16 @@ export function deriveDeterministicTaskKey(coordinationId, actionKey, actorId = 
  */
 export function deriveContributionId(coordinationId, actionKey) {
   return 'contrib_' + sha256(`contrib:${coordinationId}:${actionKey}`).slice(0, 16);
+}
+
+/**
+ * Deterministically derive a specialistAuthorizationId from session identity and actionKey.
+ * @param {string} coordinationId
+ * @param {string} actionKey
+ * @returns {string}
+ */
+export function deriveSpecialistAuthorizationId(coordinationId, actionKey) {
+  return 'sauth_' + sha256(`sauth:${coordinationId}:${actionKey}`).slice(0, 16);
 }
 
 /**
@@ -558,6 +571,25 @@ export function composeCoordinationActionRequest({ manifest, action, preconditio
         operationId: target.operationId,
         branches: normalizeFanOutPayload({ branches: input.branches, fromAssignmentId: input.fromAssignmentId }),
         fromAssignmentId: input.fromAssignmentId,
+      }];
+      break;
+    }
+
+    case 'specialist': {
+      const specialistAuthorizationId = deriveSpecialistAuthorizationId(coordinationId, actionKey);
+      steps = [{
+        ...common,
+        type: 'specialist-authorize',
+        slotId: target.slotId,
+        specialistActorId: input.specialistActorId,
+        role: target.role,
+        capabilities: normalizeStringArray(input.capabilities) ?? [],
+        reason: input.reason,
+        triggerEvidenceRefs: normalizeStringArray(input.triggerEvidenceRefs) ?? [],
+        allowedContextRefs: normalizeStringArray(input.allowedContextRefs) ?? [],
+        maxAssignments: typeof input.maxAssignments === 'string' ? Number(input.maxAssignments) : input.maxAssignments,
+        expiresAfterRound: typeof input.expiresAfterRound === 'string' ? Number(input.expiresAfterRound) : input.expiresAfterRound,
+        specialistAuthorizationId,
       }];
       break;
     }

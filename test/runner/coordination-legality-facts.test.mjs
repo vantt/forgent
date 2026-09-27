@@ -94,16 +94,129 @@ test('evaluateDriverAuthorizedBindings classifies pending vs authorized without 
   assert.equal(oneAuth.authorized.length, 1);
 });
 
+// M1 fix (I24b, Phase 5 item 5 other half): a binding with
+// `activation.maxInvocations: 2` must still be `pending` after its first
+// authorization (room for a second), and only leave `pending` once both are
+// spent -- pre-fix, ANY single authorization removed a binding from
+// `pending` for good, regardless of its own declared cap.
+test('evaluateDriverAuthorizedBindings (M1): a maxInvocations:2 binding stays pending after 1 authorization, and leaves pending only after 2', () => {
+  const reopenDefinition = {
+    ...sampleDefinition,
+    spec: {
+      ...sampleDefinition.spec,
+      graph: {
+        nodes: [
+          {
+            id: 'node-reopen',
+            operations: [{ ref: 'op-reopen', actor: 'worker-1', activation: { mode: 'driver-authorized', maxInvocations: 2 } }],
+          },
+        ],
+      },
+    },
+  };
+
+  const zeroAuth = evaluateDriverAuthorizedBindings(reopenDefinition, []);
+  assert.equal(zeroAuth.pending.length, 1);
+  assert.equal(zeroAuth.authorized.length, 0);
+
+  const oneAuth = evaluateDriverAuthorizedBindings(reopenDefinition, [{ nodeId: 'node-reopen', operationId: 'op-reopen' }]);
+  assert.equal(oneAuth.pending.length, 1, 'still room for the 2nd invocation -- the M1 bug this fixes');
+  assert.equal(oneAuth.authorized.length, 1, 'at least one authorization already exists');
+
+  const twoAuth = evaluateDriverAuthorizedBindings(reopenDefinition, [
+    { nodeId: 'node-reopen', operationId: 'op-reopen' },
+    { nodeId: 'node-reopen', operationId: 'op-reopen' },
+  ]);
+  assert.equal(twoAuth.pending.length, 0, 'cap of 2 fully spent -- no longer pending');
+  assert.equal(twoAuth.authorized.length, 1);
+});
+
 test('evaluateSpecialistSlots reports bound vs available slots', () => {
   const slots1 = evaluateSpecialistSlots(sampleDefinition, []);
   assert.equal(slots1.length, 2);
   assert.equal(slots1[0].bound, false);
   assert.equal(slots1[1].bound, false);
+  assert.equal(slots1[0].authorizable, true);
+  assert.equal(slots1[0].exhausted, false);
 
   const slots2 = evaluateSpecialistSlots(sampleDefinition, [{ slotId: 'slot-sec', specialistActorId: 'actor-sec-1' }]);
   assert.equal(slots2[0].bound, true);
   assert.equal(slots2[0].specialistActorId, 'actor-sec-1');
   assert.equal(slots2[1].bound, false);
+});
+
+// M2 fix (I24b, Phase 5 item 4 pt.2): exhausted/authorizable derivation.
+test('evaluateSpecialistSlots (M2): exhausted accounts for maxBindings, a live binding\'s own maxAssignments, and expiresAfterRound/round liveness', () => {
+  const definitionWithCaps = {
+    ...sampleDefinition,
+    spec: {
+      ...sampleDefinition.spec,
+      profile: {
+        ...sampleDefinition.spec.profile,
+        topology: {
+          ...sampleDefinition.spec.profile.topology,
+          specialistSlots: [
+            { id: 'slot-sec', role: 'security-specialist', maxBindings: 1 },
+            { id: 'slot-perf', role: 'performance-specialist', maxBindings: 2 },
+          ],
+        },
+      },
+    },
+  };
+
+  // maxBindings not yet reached: authorizable, not exhausted.
+  const roomy = evaluateSpecialistSlots(
+    definitionWithCaps,
+    [{ slotId: 'slot-perf', specialistActorId: 'actor-perf-1', expiresAfterRound: 10 }],
+    [],
+  );
+  const perfRoomy = roomy.find((s) => s.slotId === 'slot-perf');
+  assert.equal(perfRoomy.bound, true);
+  assert.equal(perfRoomy.authorizable, true);
+  assert.equal(perfRoomy.exhausted, false);
+
+  // maxBindings reached (1 distinct actor, cap 1) AND the live occupant has
+  // expired (round has advanced past expiresAfterRound, no assignment-created
+  // events needed for this probe: round is derived from events alone) --
+  // genuinely no path forward for this slot.
+  const exhaustedByExpiryAndCap = evaluateSpecialistSlots(
+    definitionWithCaps,
+    [{ slotId: 'slot-sec', specialistActorId: 'actor-sec-1', expiresAfterRound: 1 }],
+    [{ type: 'assignment-created' }, { type: 'assignment-created' }],
+  );
+  const secExpired = exhaustedByExpiryAndCap.find((s) => s.slotId === 'slot-sec');
+  assert.equal(secExpired.bound, false, 'round 3 > expiresAfterRound 1 -- no longer live');
+  assert.equal(secExpired.exhausted, true, 'maxBindings (1) reached and the only-ever occupant has expired');
+  assert.equal(secExpired.authorizable, false);
+
+  // maxBindings reached (1 distinct actor, cap 1) but the live occupant is
+  // still within its own expiresAfterRound AND has assignment room left --
+  // not exhausted (the existing occupant can still be dispatched/extended).
+  const bindingsCappedButLive = evaluateSpecialistSlots(
+    definitionWithCaps,
+    [{ slotId: 'slot-sec', specialistActorId: 'actor-sec-1', expiresAfterRound: 10, maxAssignments: 3 }],
+    [],
+  );
+  const secLive = bindingsCappedButLive.find((s) => s.slotId === 'slot-sec');
+  assert.equal(secLive.bound, true);
+  assert.equal(secLive.exhausted, false, 'maxBindings reached but the live occupant still has assignment room and has not expired');
+  assert.equal(secLive.authorizable, true);
+
+  // maxBindings reached AND the live occupant's own maxAssignments cap is
+  // fully consumed (2 operation-authorized events already reference it) --
+  // exhausted even though the authorization itself has not expired.
+  const assignmentsExhausted = evaluateSpecialistSlots(
+    definitionWithCaps,
+    [{ slotId: 'slot-sec', specialistActorId: 'actor-sec-1', expiresAfterRound: 10, maxAssignments: 2 }],
+    [
+      { type: 'operation-authorized', payload: { targetActorId: 'actor-sec-1' } },
+      { type: 'operation-authorized', payload: { targetActorId: 'actor-sec-1' } },
+    ],
+  );
+  const secAssignmentsSpent = assignmentsExhausted.find((s) => s.slotId === 'slot-sec');
+  assert.equal(secAssignmentsSpent.bound, true, 'still live -- expiresAfterRound not yet passed');
+  assert.equal(secAssignmentsSpent.exhausted, true, 'maxBindings reached and the live occupant has no dispatch room left');
+  assert.equal(secAssignmentsSpent.authorizable, false);
 });
 
 test('evaluateVisibilityWindows computes open vs closed status from settled operation events', () => {

@@ -101,6 +101,7 @@ import {
   executeContributionUseCase,
   executeHumanTurnUseCase,
   executeDispositionUseCase,
+  executeSpecialistAuthorizeUseCase,
   executeCloseUseCase,
 } from '../src/verbs/coordination/actions.mjs';
 import { startCoordinationUseCase } from '../src/verbs/coordination/start.mjs';
@@ -2800,6 +2801,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         'contribution',
         'human-turn',
         'disposition',
+        'specialist-authorize',
         'close',
         'run',
         'show',
@@ -2810,9 +2812,9 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         'pack',
       ];
 
-      const sub = requireField(positional[0], 'coordination requires a sub-verb: fgos coordination <start|status|operation|authorize-and-dispatch|fan-out|contribution|human-turn|disposition|close|run|show|actions|launch-master-loop|chain|recover|pack> ...');
+      const sub = requireField(positional[0], 'coordination requires a sub-verb: fgos coordination <start|status|operation|authorize-and-dispatch|fan-out|contribution|human-turn|disposition|specialist-authorize|close|run|show|actions|launch-master-loop|chain|recover|pack> ...');
       if (!KNOWN_COORDINATION_SUBVERBS.includes(sub)) {
-        throw new StoreError('validation', `coordination: unknown sub-verb "${sub}" (known: start, status, operation, authorize-and-dispatch, fan-out, contribution, human-turn, disposition, close, run, show, actions, launch-master-loop, chain, recover, pack).`);
+        throw new StoreError('validation', `coordination: unknown sub-verb "${sub}" (known: start, status, operation, authorize-and-dispatch, fan-out, contribution, human-turn, disposition, specialist-authorize, close, run, show, actions, launch-master-loop, chain, recover, pack).`);
       }
 
       const COMMON_FLAGS = new Set(['dir', 'cwd', 'json']);
@@ -2866,6 +2868,12 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           ...COMMON_FLAGS,
           'id', 'action-key', 'writer-id', 'disposition', 'rationale',
           'evidence-refs',
+        ]),
+        'specialist-authorize': new Set([
+          ...COMMON_FLAGS,
+          'id', 'action-key', 'writer-id', 'specialist-actor-id', 'reason',
+          'capabilities', 'max-assignments', 'expires-after-round',
+          'trigger-evidence-refs', 'allowed-context-refs',
         ]),
         'close': new Set([
           ...COMMON_FLAGS,
@@ -3147,6 +3155,32 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
             disposition,
             rationale,
             evidenceRefs: flags['evidence-refs'],
+          },
+        );
+      }
+
+      if (sub === 'specialist-authorize') {
+        const id = requireField(positional[1] ?? flags.id, 'coordination specialist-authorize requires an id: fgos coordination specialist-authorize <id> --action-key <key> --writer-id <id> --specialist-actor-id <id> --reason <text> --max-assignments <n> --expires-after-round <n>');
+        const actionKey = requireField(flags['action-key'], 'coordination specialist-authorize requires --action-key <sha256:key>');
+        const writerId = requireField(flags['writer-id'], 'coordination specialist-authorize requires --writer-id <id>');
+        const specialistActorId = requireField(flags['specialist-actor-id'], 'coordination specialist-authorize requires --specialist-actor-id <id>');
+        const reason = requireField(flags.reason, 'coordination specialist-authorize requires --reason <text>');
+        const maxAssignments = requireField(flags['max-assignments'], 'coordination specialist-authorize requires --max-assignments <n>');
+        const expiresAfterRound = requireField(flags['expires-after-round'], 'coordination specialist-authorize requires --expires-after-round <n>');
+
+        return await executeSpecialistAuthorizeUseCase(
+          { cwd: cwdForCoordination, repoRoot: repoRootForCoordination },
+          {
+            id,
+            actionKey,
+            writerId,
+            specialistActorId,
+            reason,
+            capabilities: flags.capabilities,
+            maxAssignments,
+            expiresAfterRound,
+            triggerEvidenceRefs: flags['trigger-evidence-refs'],
+            allowedContextRefs: flags['allowed-context-refs'],
           },
         );
       }
@@ -5187,7 +5221,7 @@ const MUTATING_SUBCOMMAND_PREDICATES = {
   knowledge: (positional) => positional[0] === 'attest',
   coordination: (positional, flags) => [
     'run', 'close', 'launch-master-loop', 'start', 'operation', 'authorize-and-dispatch',
-    'fan-out', 'contribution', 'human-turn', 'disposition',
+    'fan-out', 'contribution', 'human-turn', 'disposition', 'specialist-authorize',
   ].includes(positional[0]) || (positional[0] === 'recover' && flags.action !== undefined),
   merge: (positional) => positional[0] === 'next',
   evolve: (positional, flags) => flags.submit !== undefined,

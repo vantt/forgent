@@ -25,6 +25,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { runGroupThinkingRequest } from '../../src/verbs/coordination/group-thinking-pack.mjs';
 import { runCoordinationUseCase } from '../../src/verbs/coordination/run.mjs';
+import { showCoordinationActionsUseCase } from '../../src/verbs/coordination/actions.mjs';
 import {
   openDeclaredProtocolSession,
   authorizeSpecialistSlot,
@@ -703,6 +704,95 @@ test('over-cap reopen: revise-synthesis admits exactly 2 invocations (activation
   const replayed = replaySession(coordinationId, { cwd: tempDir, repoRoot: tempDir });
   const synthesizerAssignmentIds = new Set(replayed.assignments.filter((a) => a.actorId === 'synthesizer-actor').map((a) => a.assignmentId));
   assert.deepEqual(synthesizerAssignmentIds, new Set([synthId, revise1Id, revise2Id]), 'wrong recheck revision: exactly three distinct Assignments, original preserved alongside both reopens');
+});
+
+// ── M1 (I24b, Phase 5 item 5 other half): the projector's own visibility of
+// a bounded reopen, distinct from the test above (which only proves the
+// ENGINE admits/refuses invocations through the raw `authorize` request-step
+// door). Pre-fix, `evaluateDriverAuthorizedBindings` keyed `pending` by mere
+// set membership on (nodeId, operationId) -- the FIRST authorization removed
+// the binding from `pending` for good, so the SECOND of a
+// `maxInvocations: 2` binding never appeared as a legal `authorize-and-dispatch`
+// action again, even though the engine itself would still admit it. ────────
+test('bounded-reopen visibility (M1): revise-synthesis stays a legal authorize-and-dispatch action after its FIRST invocation, and stops being one after its SECOND (maxInvocations: 2)', async () => {
+  const tempDir = mkTempDir();
+  const runnerConfig = fakeRunnerConfig(tempDir);
+  const ctx = { cwd: tempDir, repoRoot: tempDir, runnerConfig };
+  const engineOpts = { cwd: tempDir, repoRoot: tempDir };
+  const coordinationId = 'aap_reopen_visibility';
+  const writerId = 'aap-driver';
+
+  const call1 = await run(ctx, coordinationId, writerId, [
+    opStep('shapeSystem', 'shape-system-proposal', 'system-shaper-actor'),
+    opStep('shapeAlt', 'shape-alternative-proposal', 'alternative-shaper-actor'),
+    opStep('shapeConstraint', 'shape-constraint-proposal', 'constraint-advocate-actor'),
+  ]);
+  const call2 = await run(ctx, coordinationId, writerId, [
+    authorizeStep('authCritique', 'critique-proposals', 'architecture-critic-actor', {
+      authorizationId: 'auth_critique',
+      invocationKey: 'ik_critique',
+      reason: 'post-shaping-open is open.',
+      grantedContextRefs: [assignmentIdFor(call1, 'shapeSystem')],
+    }),
+    opStep('critique', 'critique-proposals', 'architecture-critic-actor'),
+    authorizeStep('authAssess', 'assess-constraints', 'constraint-advocate-actor', {
+      authorizationId: 'auth_assess',
+      invocationKey: 'ik_assess',
+      reason: 'post-shaping-open is open.',
+      grantedContextRefs: [assignmentIdFor(call1, 'shapeConstraint')],
+    }),
+    opStep('assess', 'assess-constraints', 'constraint-advocate-actor'),
+  ]);
+  const call3 = await run(ctx, coordinationId, writerId, [
+    authorizeStep('authSynth', 'synthesize-recommendation', 'synthesizer-actor', {
+      authorizationId: 'auth_synth',
+      invocationKey: 'ik_synth',
+      reason: 'post-critique-open is open.',
+      grantedContextRefs: [assignmentIdFor(call2, 'critique'), assignmentIdFor(call2, 'assess')],
+    }),
+    opStep('synth', 'synthesize-recommendation', 'synthesizer-actor'),
+  ]);
+  const synthId = assignmentIdFor(call3, 'synth');
+
+  const findRevise = (rendered) =>
+    rendered.actions.find((a) => a.kind === 'authorize-and-dispatch' && a.target?.operationId === 'revise-synthesis');
+
+  assert.ok(
+    findRevise(showCoordinationActionsUseCase(engineOpts, { id: coordinationId })),
+    'revise-synthesis must be a legal action before any reopen',
+  );
+
+  const call4 = await run(ctx, coordinationId, writerId, [
+    authorizeStep('authRevise1', 'revise-synthesis', 'synthesizer-actor', {
+      authorizationId: 'auth_revise_1',
+      invocationKey: 'ik_revise_1',
+      reason: 'First bounded reopen.',
+      grantedContextRefs: [synthId],
+    }),
+    opStep('revise1', 'revise-synthesis', 'synthesizer-actor'),
+  ]);
+  const revise1Id = assignmentIdFor(call4, 'revise1');
+
+  assert.ok(
+    findRevise(showCoordinationActionsUseCase(engineOpts, { id: coordinationId })),
+    'revise-synthesis must STILL be a legal action after only 1 of its 2 permitted invocations -- this is the M1 bug this unit fixes',
+  );
+
+  await run(ctx, coordinationId, writerId, [
+    authorizeStep('authRevise2', 'revise-synthesis', 'synthesizer-actor', {
+      authorizationId: 'auth_revise_2',
+      invocationKey: 'ik_revise_2',
+      reason: 'Second bounded reopen.',
+      grantedContextRefs: [revise1Id],
+    }),
+    opStep('revise2', 'revise-synthesis', 'synthesizer-actor'),
+  ]);
+
+  assert.equal(
+    findRevise(showCoordinationActionsUseCase(engineOpts, { id: coordinationId })),
+    undefined,
+    'revise-synthesis must no longer be a legal action once both of its 2 permitted invocations are spent',
+  );
 });
 
 // ── revise-explanation: the OTHER half of bounded dialogue reopen ──────────

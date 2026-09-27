@@ -70,6 +70,7 @@ import {
   recordAggregationValidation,
   recordContributionLink,
   recordSpecialistAuthorization,
+  recordSpecialistAuthorizationLocked,
   knownContributionsFromEvents,
   asCoordinationError,
   getPendingRetryDeclaration,
@@ -1679,6 +1680,121 @@ export function authorizeSpecialistSlot(
       maxAssignments,
       expiresAfterRound,
     },
+    { ...opts, maxBindingsForSlot: { slotId, cap: slot.maxBindings } },
+  );
+}
+
+/**
+ * `authorizeSpecialistSlot`'s `Locked` twin (I24b, Phase 5 item 4 pt.2) --
+ * for use ONLY by a caller that already holds `coordinationId`'s
+ * `events.lock` (the typed-action execution path). Delegates to
+ * `recordSpecialistAuthorizationLocked` (store.mjs) instead of
+ * `recordSpecialistAuthorization`, so this door never re-acquires the lock
+ * the caller is already holding -- the SAME reason `authorizeDeclaredOperationLocked`
+ * delegates to `authorizeOperationLocked` rather than `authorizeOperation`.
+ *
+ * A byte-for-byte MIRROR of `authorizeSpecialistSlot`'s own validation body
+ * (shape/session/slot/role/capability/actor-collision/refs-ownership),
+ * against a caller-supplied `paths` rather than one resolved internally --
+ * this unit's own scope requires never modifying the existing unlocked
+ * door, so there is no shared body a single edit could update for both at
+ * once; a future change to one door's validation must be applied to both.
+ *
+ * @param {string} coordinationId Must already have a non-null `definitionRef`.
+ * @param {object} params Same shape as `authorizeSpecialistSlot`'s own `params`.
+ * @param {object} paths Already-resolved session paths (the caller's own lock-held `paths`).
+ * @param {object} [opts] Workspace options ({ cwd, repoRoot, packageRoot })
+ */
+export function authorizeSpecialistSlotLocked(
+  coordinationId,
+  {
+    slotId,
+    specialistActorId,
+    role,
+    capabilities = [],
+    authorizedBy,
+    reason,
+    triggerEvidenceRefs = [],
+    allowedContextRefs = [],
+    maxAssignments,
+    expiresAfterRound,
+    specialistAuthorizationId,
+  },
+  paths,
+  opts = {},
+) {
+  const manifest = readManifestRaw(paths.manifestPath);
+  if (!manifest.definitionRef) {
+    throw new CoordinationError(
+      'validation',
+      `authorizeSpecialistSlot: session "${coordinationId}" has no declared protocol bound (definitionRef is null) -- there is no slot for an authorization to name`,
+    );
+  }
+  const definition = loadDefinitionForSession(manifest, opts);
+  if (definition.metadata.version !== manifest.definitionRef.version) {
+    throw new CoordinationError(
+      'validation',
+      `authorizeSpecialistSlot: session "${coordinationId}" was opened against definition "${manifest.definitionRef.id}@${manifest.definitionRef.version}", but the resolved definition is now version "${definition.metadata.version}" -- refusing to authorize against a drifted definition`,
+    );
+  }
+
+  const slot = (definition.spec.profile.topology?.specialistSlots ?? []).find((s) => s.id === slotId);
+  if (!slot) {
+    throw new CoordinationError(
+      'validation',
+      `authorizeSpecialistSlot: slot "${slotId}" is not declared in this protocol's spec.profile.topology.specialistSlots`,
+    );
+  }
+  if (role !== slot.role) {
+    throw new CoordinationError(
+      'validation',
+      `authorizeSpecialistSlot: role "${role}" does not match specialist slot "${slotId}"'s own declared role "${slot.role}" -- a specialist of this role could never be dispatched for any of the slot's operations`,
+    );
+  }
+  if ((definition.spec.actors ?? []).some((actorEntry) => actorEntry.id === specialistActorId)) {
+    throw new CoordinationError(
+      'validation',
+      `authorizeSpecialistSlot: specialistActorId "${specialistActorId}" collides with a statically-declared spec.actors[] id -- a specialist must be a previously-unknown identity`,
+    );
+  }
+  const missingCapabilities = slot.requiredCapabilities.filter((cap) => !capabilities.includes(cap));
+  if (missingCapabilities.length > 0) {
+    throw new CoordinationError(
+      'validation',
+      `authorizeSpecialistSlot: capabilities [${capabilities.join(', ')}] do not satisfy specialist slot "${slotId}"'s own declared requiredCapabilities -- missing [${missingCapabilities.join(', ')}]`,
+    );
+  }
+
+  const { fgosDir } = paths;
+  assertRefsOwnedBySession(triggerEvidenceRefs, {
+    coordinationId,
+    assignmentRefs: manifest.assignmentRefs,
+    fgosDir,
+    label: `authorizeSpecialistSlot: triggerEvidenceRefs`,
+  });
+  assertRefsOwnedBySession(allowedContextRefs, {
+    coordinationId,
+    assignmentRefs: manifest.assignmentRefs,
+    fgosDir,
+    label: `authorizeSpecialistSlot: allowedContextRefs`,
+  });
+
+  return recordSpecialistAuthorizationLocked(
+    coordinationId,
+    {
+      specialistAuthorizationId,
+      slotId,
+      specialistActorId,
+      role,
+      capabilities,
+      authorizedBy,
+      reason,
+      triggerEvidenceRefs,
+      allowedContextRefs,
+      maxAssignments,
+      expiresAfterRound,
+    },
+    paths,
     { ...opts, maxBindingsForSlot: { slotId, cap: slot.maxBindings } },
   );
 }

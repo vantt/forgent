@@ -504,6 +504,11 @@ export function collectDriverAuthorizedBindings(definition) {
           operationId: op.ref || op.id,
           actorId: op.actor,
           ...(op.contextAccess?.visibilityWindowRef ? { visibilityWindowRef: op.contextAccess.visibilityWindowRef } : {}),
+          // M1 fix (I24b, Phase 5 item 5 other half): carried through so
+          // `evaluateDriverAuthorizedBindings` can count invocations against
+          // this binding's own declared cap, rather than treating any single
+          // authorization as fully consuming a `maxInvocations: 2` binding.
+          ...(op.activation?.maxInvocations !== undefined ? { maxInvocations: op.activation.maxInvocations } : {}),
         });
       }
     }
@@ -529,41 +534,112 @@ export function collectRequiredBindings(definition) {
 
 /**
  * Pure evaluation of driver-authorized bindings against issued authorizations.
+ *
+ * M1 fix (I24b, Phase 5 item 5 other half): keyed by COUNT, not mere set
+ * membership -- a binding's own `activation.maxInvocations` (default 1, the
+ * SAME default `authorizeOperationLocked`'s `opts.maxInvocationsForBinding`
+ * assumes when absent) bounds how many `operation-authorized` records the
+ * SAME (nodeId, operationId) pair may legally carry. Pre-fix, ANY single
+ * authorization removed the binding from `pending` for good, so a second
+ * invocation of a `maxInvocations: 2` binding (e.g. `phase-dialogue-reopen`'s
+ * `revise-synthesis`/`revise-explanation`, `architecture-advisory-panel-v1.yaml`)
+ * never appeared as a legal action again -- confirmed by direct probe, not
+ * merely suspected. `authorized` still means "at least one authorization
+ * exists" (unchanged meaning); `pending` now means "still has room under its
+ * own cap", which is the correct legal-action signal for a repeatable
+ * binding.
  */
 export function evaluateDriverAuthorizedBindings(definition, authorizations = []) {
   if (!definition) {
     return { declared: [], authorized: [], pending: [] };
   }
   const declared = collectDriverAuthorizedBindings(definition);
-  const authorizedKeys = new Set(
-    (authorizations || []).map((a) => `${a.nodeId}::${a.operationId}`),
-  );
-  const pending = declared.filter((b) => !authorizedKeys.has(`${b.nodeId}::${b.operationId}`));
-  const authorized = declared.filter((b) => authorizedKeys.has(`${b.nodeId}::${b.operationId}`));
+  const countByKey = new Map();
+  for (const a of authorizations || []) {
+    const key = `${a.nodeId}::${a.operationId}`;
+    countByKey.set(key, (countByKey.get(key) ?? 0) + 1);
+  }
+  const pending = declared.filter((b) => {
+    const count = countByKey.get(`${b.nodeId}::${b.operationId}`) ?? 0;
+    return count < (b.maxInvocations ?? 1);
+  });
+  const authorized = declared.filter((b) => (countByKey.get(`${b.nodeId}::${b.operationId}`) ?? 0) > 0);
 
   return { declared, authorized, pending };
 }
 
 /**
- * Pure evaluation of specialist slot availability from protocol topology and replayed authorizations.
+ * Pure evaluation of specialist slot availability from protocol topology and
+ * replayed authorizations.
+ *
+ * M2 fix (I24b, Phase 5 item 4 pt.2): `bound` used to mean "any
+ * `specialist-authorized` record ever exists for this slot", regardless of
+ * whether the last one has since expired -- not enough for the projector's
+ * `specialist` action-view case to distinguish available/unauthorized/
+ * exhausted (Phase 1's own Cases list). Now accounts for all three factors
+ * the plan names: the slot's own `maxBindings` (a hard ceiling on distinct
+ * specialist actors ever recruited, mirroring `recordSpecialistAuthorization`'s
+ * own `maxBindingsForSlot` check), the live binding's own `maxAssignments`
+ * (its dispatch cap, mirroring `authorizeOperationLocked`'s
+ * `maxAssignmentsForSpecialist` opt), and `expiresAfterRound`/round liveness
+ * (the SAME "last write wins, expired if the derived current round has
+ * passed it" rule `resolveLiveSpecialistBindings`, session-engine.mjs,
+ * already applies for dispatch). Round is re-derived here rather than
+ * imported from session-engine.mjs: this module sits BELOW session-engine.mjs
+ * in the import graph (see the module's own header doc), so it cannot import
+ * that function back -- `events` is threaded in as a caller-supplied
+ * parameter instead (the caller already has it), never re-read from disk.
+ *
+ * `exhausted` means no further specialist activity is possible for this slot
+ * AT ALL: no fresh recruit is possible (`maxBindings` reached) AND the
+ * current live occupant (if any) can no longer be dispatched either (it has
+ * expired, or its own `maxAssignments` is fully consumed). `authorizable` is
+ * simply `!exhausted` -- mechanical legality data only, never a judgment
+ * about whether the driver SHOULD authorize this slot.
+ *
+ * @param {object} definition Immutable FlowDefinition
+ * @param {Array<object>} [specialistAuthorizations] Replayed `specialist-authorized` payloads, in log order
+ * @param {Array<object>} [events] Full raw event list, for round derivation and per-actor `operation-authorized` counts
  */
-export function evaluateSpecialistSlots(definition, specialistAuthorizations = []) {
+export function evaluateSpecialistSlots(definition, specialistAuthorizations = [], events = []) {
   const slots = definition?.spec?.profile?.topology?.specialistSlots ?? [];
   if (slots.length === 0) return [];
 
-  const boundMap = new Map();
+  const round = (events || []).filter((e) => e.type === 'assignment-created').length + 1;
+
+  const lastBySlot = new Map();
+  const distinctActorsBySlot = new Map();
   for (const auth of specialistAuthorizations || []) {
-    if (auth.slotId && auth.specialistActorId) {
-      boundMap.set(auth.slotId, auth.specialistActorId);
+    if (!auth.slotId) continue;
+    lastBySlot.set(auth.slotId, auth); // log order: last write wins (supersession)
+    if (auth.specialistActorId) {
+      if (!distinctActorsBySlot.has(auth.slotId)) distinctActorsBySlot.set(auth.slotId, new Set());
+      distinctActorsBySlot.get(auth.slotId).add(auth.specialistActorId);
     }
   }
 
-  return slots.map((slot) => ({
-    slotId: slot.id,
-    role: slot.role,
-    bound: boundMap.has(slot.id),
-    specialistActorId: boundMap.get(slot.id) ?? null,
-  }));
+  return slots.map((slot) => {
+    const last = lastBySlot.get(slot.id);
+    const live = last !== undefined && (last.expiresAfterRound === undefined || round <= last.expiresAfterRound);
+    const distinctCount = distinctActorsBySlot.get(slot.id)?.size ?? 0;
+    const recruitExhausted = slot.maxBindings !== undefined && distinctCount >= slot.maxBindings;
+    let liveAssignmentsExhausted = false;
+    if (live && last.maxAssignments !== undefined) {
+      const usedByLiveActor = (events || []).filter(
+        (e) => e.type === 'operation-authorized' && e.payload?.targetActorId === last.specialistActorId,
+      ).length;
+      liveAssignmentsExhausted = usedByLiveActor >= last.maxAssignments;
+    }
+    const exhausted = recruitExhausted && (!live || liveAssignmentsExhausted);
+    return {
+      slotId: slot.id,
+      role: slot.role,
+      bound: live,
+      specialistActorId: live ? last.specialistActorId : null,
+      authorizable: !exhausted,
+      exhausted,
+    };
+  });
 }
 
 /**
@@ -1013,9 +1089,8 @@ export function evaluateLegalityFacts({
     evaluateDriverAuthorizedBindings(definition, authorizations);
 
   const requiredBindings = collectRequiredBindings(definition);
-  const specialistSlots = evaluateSpecialistSlots(definition, specialistAuthorizations);
-
   const eventList = explicitEvents ?? replayed?.events ?? (Array.isArray(manifest?.events) ? manifest.events : []);
+  const specialistSlots = evaluateSpecialistSlots(definition, specialistAuthorizations, eventList);
 
   const failedAssignmentIds = new Set();
   if (quorum?.failed) {
