@@ -172,6 +172,15 @@
 # proven protocol-agnostic by P10.1/P10.3 and re-exercised by this cell's
 # own heterogeneous-actor-bindings conformance case.
 #
+# Unit I21 (Phase 5 item 2): `red-team-packet` alone declares
+# `policy.distinctProviderFrom` (a portable REQUIREMENT, not a pin --
+# resolved against `runnerConfig.capabilities.<name>.prefer` by
+# `src/verbs/coordination/binding.mjs`, same trusted delivery as `actors[]`
+# above). No operation here declares `policy.capability` -- every result
+# here is `advisory`, so the composer's own fallback derivation
+# ("<domain>:review" if registered, else the generic "review" slot)
+# already applies with nothing to declare.
+#
 # ── Artifact envelope (phase-03 item 2) ─────────────────────────────────────
 # No new registry, no new schema field: `task.contractTemplate`
 # (`src/runner/definitions/schema.mjs`'s existing `OPERATION_TASK_FIELDS`,
@@ -392,6 +401,14 @@ spec:
       role: red-team
       policy:
         minTier: flagship
+        # Unit I21 (Phase 5 item 2, design record §12 item 3): `preferred`,
+        # not `required` -- a single-provider runner config must still be
+        # able to run this panel; Phase 7 4c decides whether this stays
+        # `preferred` or is raised once provider diversity is a hard
+        # platform expectation.
+        distinctProviderFrom:
+          roles: [synthesizer]
+          strength: preferred
       task:
         contractTemplate: architecture-advisory-panel-v1-redteam
       result:

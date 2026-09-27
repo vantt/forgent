@@ -92,11 +92,21 @@ spec:
   # invokes this fixture -- see P03.1.md's Final Intended Mapping for the
   # concrete recommendation left for that caller (Phase 04's own scope, not
   # this cell's).
+  # Unit I21 (Phase 5 item 2): `policy.capability`/`policy.distinctProviderFrom`
+  # are portable REQUIREMENTS, never a literal executor/model pin -- resolved
+  # against `runnerConfig.capabilities.<name>.prefer` by the composer
+  # (`src/verbs/coordination/binding.mjs`), same trusted-scope delivery as
+  # `actors[].executor` above, never a decision made inside session-engine.mjs.
+  # `distinctProviderFrom` on `review-candidate`/`red-team-candidate` declares
+  # `preferred` (not `required`) vs `doer` -- a single-provider runner config
+  # (this repo's own default before I19) must still be able to dispatch this
+  # loop without refusing outright.
   operations:
     - id: produce-candidate
       role: doer
       policy:
         minTier: standard
+        capability: code:implement
       result:
         kind: work-product
         evidenceRequired: reported
@@ -112,6 +122,10 @@ spec:
       policy:
         minTier: flagship
         repeatMode: pre-delivery
+        capability: code:review
+        distinctProviderFrom:
+          roles: [doer]
+          strength: preferred
       result:
         kind: advisory
         evidenceRequired: reported
@@ -120,6 +134,10 @@ spec:
       policy:
         minTier: flagship
         repeatMode: pre-delivery
+        capability: code:review
+        distinctProviderFrom:
+          roles: [doer]
+          strength: preferred
       result:
         kind: advisory
         evidenceRequired: reported
@@ -127,6 +145,7 @@ spec:
       role: fixer
       policy:
         minTier: standard
+        capability: code:implement
       result:
         kind: work-product
         evidenceRequired: reported
@@ -134,6 +153,7 @@ spec:
       role: reviewer
       policy:
         minTier: flagship
+        capability: code:review
       result:
         kind: advisory
         evidenceRequired: reported
@@ -141,6 +161,7 @@ spec:
       role: red-team
       policy:
         minTier: flagship
+        capability: code:review
       result:
         kind: advisory
         evidenceRequired: reported

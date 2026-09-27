@@ -47,7 +47,8 @@ import { runAllConfinementProbes } from '../runner/dispatch/confinement/probes/h
 import { reapOrphanedConfinementResources, OWNERSHIP_MARKER_FILE } from '../runner/dispatch/confinement/cleanup.mjs';
 
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
-import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, validateCapabilityServesShape } from '../runner/dispatch/config.mjs';
+import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, validateCapabilityServesShape, RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { resolveExecutorAndOverrides, deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../state/fgos-file-registry.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
@@ -2002,6 +2003,86 @@ registerCheck({
   id: 'capability-serves-valid',
   description: 'runner.capabilities\' "serves" attribute sets are well-formed, mutually distinct, and include the "review" slot (I19)',
   check: (cwd) => checkCapabilityServesValid(cwd),
+});
+
+// Unit I21 (Phase 5 item 2): every discoverable CoordinationProtocol
+// operation's declared `policy.capability` resolves against the LIVE runner
+// config -- the SAME `resolveExecutorAndOverrides` (dispatch/resolve.mjs) a
+// real dispatch re-resolves at execution time, never a second, drifting
+// lookup. An operation naming a capability with nothing registered for it
+// does not fail at dispatch time (it quietly falls back to the runner's
+// global default executor, per `resolveAssignmentDispatchPolicy`'s own
+// precedence) -- this check is the only place that quiet degradation is
+// surfaced before it happens for real. Also reports the count of distinct
+// provider families reachable across every resolved capability (design
+// record §12 item 3: "Doctor báo số họ provider cấu hình").
+function checkOperationCapabilitiesResolve(cwd) {
+  const runnerConfig = readSharedConfig(cwd)?.runner;
+  if (!runnerConfig) {
+    return { passed: false, message: 'runner config section missing -- run fgos setup' };
+  }
+  let entries;
+  try {
+    entries = discoverCoordinationProtocols({ cwd });
+  } catch (err) {
+    if (err instanceof FlowDefinitionError) {
+      return { passed: false, message: `malformed CoordinationProtocol definition -- ${err.message}` };
+    }
+    throw err;
+  }
+
+  const unresolved = [];
+  const providerFamilies = new Set();
+  let declaredCount = 0;
+  for (const entry of entries) {
+    const definitionId = entry.definition.metadata.id;
+    for (const op of entry.definition.spec.operations ?? []) {
+      const capability = op.policy?.capability;
+      if (!capability) continue;
+      declaredCount += 1;
+      let resolved;
+      try {
+        resolved = resolveExecutorAndOverrides(runnerConfig, capability);
+      } catch (err) {
+        if (err instanceof RunnerConfigError) {
+          unresolved.push(`${definitionId}.${op.id} -> "${capability}": ${err.message}`);
+          continue;
+        }
+        throw err;
+      }
+      // Fix (round 3, MEDIUM): `binding.mjs`'s `bindOperations` (the actual
+      // runtime consumer this check exists to verify) only ever treats
+      // `bindingSource === 'capability.prefer'` as a genuine capability
+      // resolution (H1/H4, red-team rounds 1/2) -- a bare `executor-id`
+      // match or a `capability.for` orphan-executor fallback is refused
+      // there and leaves the actor unbound at real dispatch time. Checking
+      // only `resolved.configured` here would report a capability as
+      // "resolving" (and count its provider family) even when
+      // `bindOperations` would never actually bind it -- a false-positive
+      // on the exact contract this check exists to verify.
+      if (!resolved.configured || resolved.bindingSource !== 'capability.prefer') {
+        unresolved.push(`${definitionId}.${op.id} -> "${capability}": nothing registered through capabilities.${capability}.prefer (a bare executor-id match or a "for"-array fallback does not count -- bindOperations refuses both and leaves the actor unbound)`);
+        continue;
+      }
+      providerFamilies.add(deriveProviderFamily(resolved.executor));
+    }
+  }
+
+  if (unresolved.length > 0) {
+    return { passed: false, message: `${unresolved.length} declared operation.policy.capability value(s) do not resolve: ${unresolved.join('; ')}` };
+  }
+  return {
+    passed: true,
+    message: declaredCount === 0
+      ? 'no CoordinationProtocol operation declares policy.capability yet (nothing to check)'
+      : `${declaredCount} declared operation.policy.capability value(s) resolve; ${providerFamilies.size} distinct provider famil${providerFamilies.size === 1 ? 'y' : 'ies'} reachable ([${[...providerFamilies].sort().join(', ')}])`,
+  };
+}
+
+registerCheck({
+  id: 'operation-capability-resolves',
+  description: 'every discoverable CoordinationProtocol operation\'s declared policy.capability resolves against the live runner config, and reports reachable provider-family diversity (Unit I21)',
+  check: (cwd) => checkOperationCapabilitiesResolve(cwd),
 });
 
 // tsk-slq D6 (AGENTS.md's install/setup/doctor gate — a new infra

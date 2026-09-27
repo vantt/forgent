@@ -243,6 +243,7 @@
     "src/runner/dispatch/recovery.mjs": "infra",
     "src/runner/dispatch/run-lock.mjs": "infra",
     "src/setup/instruction-composition.mjs": "infra",
-    "src/setup/instruction-projections.mjs": "infra"
+    "src/setup/instruction-projections.mjs": "infra",
+    "src/verbs/coordination/binding.mjs": "use-case"
   }
 }

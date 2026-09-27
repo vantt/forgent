@@ -130,7 +130,25 @@ const ACTOR_FIELDS = new Set(['id', 'role', 'persona', 'policy']);
 // missing `preferInvocation` and `repeatMode`, silently flagging both as
 // "disallowed" in a domain workflow's declared policy even though this
 // schema accepts them).
-export const POLICY_PATCH_FIELDS = new Set(['minTier', 'preferPersona', 'preferExecutor', 'preferInvocation', 'fallbackExecutors', 'visibility', 'repeatMode']);
+//
+// `capability` and `distinctProviderFrom` (Unit I21): a portable operation's
+// own dispatch REQUIREMENTS, never a literal executor/model pin --
+// `assertNoPortableExecutorPin` (session-engine.mjs) only ever inspects
+// `preferExecutor`, so both stay legal at every portable scope
+// (definition/operation/role/actor), matching flow-definition.md's
+// PolicyPatch section ("a portable protocol expresses requirements, never a
+// literal pin"). `capability` names the operation's canonical dispatch
+// capability (resolved against `runnerConfig.capabilities.<name>.prefer` by
+// `src/verbs/coordination/binding.mjs`); `distinctProviderFrom` declares
+// which OTHER role(s) this operation's bound executor should differ in
+// provider family from (same resolver).
+export const POLICY_PATCH_FIELDS = new Set([
+  'minTier', 'preferPersona', 'preferExecutor', 'preferInvocation', 'fallbackExecutors', 'visibility', 'repeatMode',
+  'capability', 'distinctProviderFrom',
+]);
+
+export const DISTINCT_PROVIDER_STRENGTH_VALUES = Object.freeze(['required', 'preferred']);
+const DISTINCT_PROVIDER_FROM_FIELDS = new Set(['roles', 'strength']);
 
 const WORKFLOW_PROFILE_FIELDS = new Set(['kind', 'work']);
 const WORKFLOW_WORK_FIELDS = new Set(['baseStepMap']);
@@ -298,6 +316,23 @@ function validatePolicyPatch(policy, label) {
     if (!REPEAT_MODE_VALUES.includes(policy.repeatMode)) fail(`${label}.repeatMode must be one of ${REPEAT_MODE_VALUES.join(' | ')}`);
     result.repeatMode = policy.repeatMode;
   }
+  if (policy.capability !== undefined) {
+    if (!isNonEmptyString(policy.capability)) fail(`${label}.capability must be a non-empty string when provided`);
+    result.capability = policy.capability;
+  }
+  if (policy.distinctProviderFrom !== undefined) {
+    const dpf = policy.distinctProviderFrom;
+    if (!isPlainObject(dpf)) fail(`${label}.distinctProviderFrom must be an object ({roles, strength?}) when provided`);
+    assertOnlyAcceptedFields(dpf, DISTINCT_PROVIDER_FROM_FIELDS, `${label}.distinctProviderFrom`);
+    assertStringArray(dpf.roles, `${label}.distinctProviderFrom.roles`);
+    if (dpf.strength !== undefined && !DISTINCT_PROVIDER_STRENGTH_VALUES.includes(dpf.strength)) {
+      fail(`${label}.distinctProviderFrom.strength must be one of ${DISTINCT_PROVIDER_STRENGTH_VALUES.join(' | ')}`);
+    }
+    result.distinctProviderFrom = Object.freeze({
+      roles: Object.freeze([...dpf.roles]),
+      strength: dpf.strength ?? 'preferred',
+    });
+  }
 
   return Object.freeze(result);
 }
@@ -348,7 +383,7 @@ export function mergePolicyStack(scopedPatches) {
       resolved.repeatMode = validated.repeatMode;
       resolvedRepeatModeLabel = label;
     }
-    for (const key of ['preferPersona', 'preferExecutor', 'preferInvocation', 'visibility']) {
+    for (const key of ['preferPersona', 'preferExecutor', 'preferInvocation', 'visibility', 'capability', 'distinctProviderFrom']) {
       if (validated[key] !== undefined) resolved[key] = validated[key];
     }
     if (validated.fallbackExecutors !== undefined) resolved.fallbackExecutors = validated.fallbackExecutors;
