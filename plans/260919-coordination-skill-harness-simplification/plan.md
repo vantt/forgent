@@ -1,6 +1,6 @@
 # Coordination Skill and Harness Simplification
 
-Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 verified at `main@1ca4023c` (REV-15 fix `60132825`; post-merge baseline verified at `main@f63f7e7d`); Unit I07 integrated at `main@261ed7ea`; Unit I08b integrated at `main@ba8f6a9d`; Unit I10 integrated and verified at `main@605d26fe` (carried through `main@26a1038e` and `main@ac19f6d1`); Unit I08 VERIFIED at `main@ac19f6d1` (RV-01/RV-02 remediation candidate `132d3777` + `ac19f6d1` integrated; acceptance gate verified: full suite 7647 pass exit 0, 10/10 isolated coord, 10/10 isolated dispatch, 60/60 parallel load pass; timing instability recorded as LOW debt); Unit I11 VERIFIED at `main@7d7dc2750f9fb80716a7cffae03d67605629cf9a` (candidate code `9cf843b6`, approved tip `3a67a1b9`, synchronized merge `3d706b89`; post-merge verification satisfied: 155/155 focused rerun pass, full suite 7652 pass exit 0; candidate regressions = 0); Unit I12 VERIFIED/integrated at `main@c782a08dfcae89279dcb1ca9fb59aa73fb58c515`; Unit I13 VERIFIED/integrated at `main@dc05f7586b78483d569bc25b929b988dc56a374c`; Unit I14 VERIFIED/integrated at `main@3cb80c91c` (candidate `f857eaeab`; review APPROVE at `7d01a12e2`; remediation `c03a959c7`; focused matrix 210 pass / 0 fail, full suite 7684 pass / 0 fail; Phase 4 entry gate satisfied); Unit I15 (Phase 4) VERIFIED/integrated at `main@8e8a3f1aa` (candidate `38e552bb9`; approved tip `c343304b3`; focused matrix 192 pass / 0 fail, full suite 7693 pass / 0 fail; Phase 5 open / ready); Unit I16 VERIFIED/integrated at `main@a48ce987c` (candidate `6d75b54e1`; focused matrix 12 pass / 0 fail, skills matrix 29 pass / 0 fail; Phase 5 open / ready); Unit I17 VERIFIED/integrated at `main@d6c0d9033` (candidate `37833e331`; review APPROVE at `8864ea596`/`37833e331`; 40/40 doctrine pass, 124/124 matrix pass; Unit I19 unblocked); Unit I19 VERIFIED/integrated at `main@525a641a` (candidate `352200cde`; full suite 7781 pass / 0 fail; Phase 5 work item 2 / Unit I21 unblocked); Unit I18 VERIFIED/integrated at `main@8ece3bbdc` (candidate `8306c36d1`; 3 fix rounds; full suite 7813 pass / 0 fail via fresh worktree); Unit I20 VERIFIED/integrated at `main@09db1fad4` (candidate `027636e4e`; 1 fix round)
+Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 verified at `main@1ca4023c` (REV-15 fix `60132825`; post-merge baseline verified at `main@f63f7e7d`); Unit I07 integrated at `main@261ed7ea`; Unit I08b integrated at `main@ba8f6a9d`; Unit I10 integrated and verified at `main@605d26fe` (carried through `main@26a1038e` and `main@ac19f6d1`); Unit I08 VERIFIED at `main@ac19f6d1` (RV-01/RV-02 remediation candidate `132d3777` + `ac19f6d1` integrated; acceptance gate verified: full suite 7647 pass exit 0, 10/10 isolated coord, 10/10 isolated dispatch, 60/60 parallel load pass; timing instability recorded as LOW debt); Unit I11 VERIFIED at `main@7d7dc2750f9fb80716a7cffae03d67605629cf9a` (candidate code `9cf843b6`, approved tip `3a67a1b9`, synchronized merge `3d706b89`; post-merge verification satisfied: 155/155 focused rerun pass, full suite 7652 pass exit 0; candidate regressions = 0); Unit I12 VERIFIED/integrated at `main@c782a08dfcae89279dcb1ca9fb59aa73fb58c515`; Unit I13 VERIFIED/integrated at `main@dc05f7586b78483d569bc25b929b988dc56a374c`; Unit I14 VERIFIED/integrated at `main@3cb80c91c` (candidate `f857eaeab`; review APPROVE at `7d01a12e2`; remediation `c03a959c7`; focused matrix 210 pass / 0 fail, full suite 7684 pass / 0 fail; Phase 4 entry gate satisfied); Unit I15 (Phase 4) VERIFIED/integrated at `main@8e8a3f1aa` (candidate `38e552bb9`; approved tip `c343304b3`; focused matrix 192 pass / 0 fail, full suite 7693 pass / 0 fail; Phase 5 open / ready); Unit I16 VERIFIED/integrated at `main@a48ce987c` (candidate `6d75b54e1`; focused matrix 12 pass / 0 fail, skills matrix 29 pass / 0 fail; Phase 5 open / ready); Unit I17 VERIFIED/integrated at `main@d6c0d9033` (candidate `37833e331`; review APPROVE at `8864ea596`/`37833e331`; 40/40 doctrine pass, 124/124 matrix pass; Unit I19 unblocked); Unit I19 VERIFIED/integrated at `main@525a641a` (candidate `352200cde`; full suite 7781 pass / 0 fail; Phase 5 work item 2 / Unit I21 unblocked); Unit I18 VERIFIED/integrated at `main@8ece3bbdc` (candidate `8306c36d1`; 3 fix rounds; full suite 7813 pass / 0 fail via fresh worktree); Unit I20 VERIFIED/integrated at `main@09db1fad4` (candidate `027636e4e`; 1 fix round); Unit I21 VERIFIED/integrated at `main@9d1fbc99d` (candidate `ed4de649c`; 3 fix rounds — closed a real executor-pin bypass, a CLI-override regression, a live confinement regression on architecture-advisory-panel, and an idempotent-start regression; full suite 7803 pass / 0 fail; Phase 5 work item 2 satisfied)
 Created: 2026-09-19
 Last Updated: 2026-09-27
 Mode: high-risk
@@ -1453,19 +1453,161 @@ Executor/provider/model/tier selection remains an execution-time decision.
     unchanged, only `reasonCodes` gains the additive `capability.unknown`.
 - unit: I21 — per-node binding in the request composers (Phase 5 work item 2)
   capability: code:implement
-  depends-on: I19, I17
-  status: not-started
-  scope: see `phase-05-unit-i21-per-node-binding.md`. Composer computes one
-    `cliPolicy` per declared node (override > operation `policy.capability` ->
-    `capabilities.<cap>.prefer` > `policy.minTier` raise-only with `rigor`;
-    `readOnlyRedirects` stays as read-only safety net), delivered through the
-    existing trusted channel with `bindingSource` provenance; optional
-    `policy.capability` and `policy.distinctProviderFrom {strength}` on
-    FlowDefinition operations (additive, portable-scope requirements, not pins);
-    persona via operation template; roster becomes optional override.
-  design-record: plans/reports/architecture-investigation-260927-1154-capability-aware-dispatch-gate-phase4-decisions.md §12
-  verification: node --test test/verbs/coordination-binding.test.mjs test/runner/coordination-request-composers.test.mjs test/runner/flow-definition-schema.test.mjs test/runner/cohort-planner.test.mjs; live plan-loop cell with no hand roster shows capability.prefer provenance; env -u CLAUDE_CODE_SESSION_ID npm test
-  stop: binding decided inside session-engine/kernel; a portable definition can carry an executor pin through the new fields; replay of an existing session changes.
+  depends-on: I19 (satisfied, integrated at `main@525a641a`), I17 (satisfied)
+  status: integrated at `main@9d1fbc99d`
+  branch: `unit/I21` (Claude-only parallel execution runbook)
+  candidate-sha: `ed4de649ca0159747959d500e7e06ec8c48a7450`
+  integrated-sha: `9d1fbc99d59b4e993173e26ccb66af9f42711371` (merge --no-ff from
+    main checkout onto post-I20 `main@67bd9fb63`; ort strategy; CHANGELOG.md and
+    docs/architecture-manifest.json auto-merged, no manual conflict resolution)
+  scope: see `phase-05-unit-i21-per-node-binding.md`. New pure `bindOperations`
+    (`src/verbs/coordination/binding.mjs`) computing one binding per actor
+    (override > `policy.capability` -> `capabilities.<cap>.prefer` > `minTier`
+    raise-only > `readOnlyRedirects` safety net), wired into `composeStartRequest`/
+    `composeCoordinationActionRequest` and the necessary thin pass-throughs in
+    `start.mjs`/`actions.mjs` (Lead-approved file-list extensions — without
+    these the binding logic would be correct but never actually invoked); two
+    new optional, portable-scope FlowDefinition `policy` fields
+    (`capability`, `distinctProviderFrom`); new `operation-capability-resolves`
+    doctor check.
+  design-forks (Lead-adjudicated, phase file's Decisions section left open):
+    provenance-in-`fgos coordination status` surfacing stays deferred to a
+    dedicated Phase 6/7 design pass (folding dispatch-history data into the
+    Phase 1 action-view read model is itself a scoped design question, not a
+    thin addition); the round-3 idempotent-start fix required a design
+    decision on what "did the caller ask for something different" should
+    durably compare against (resolved via an advisory consultation with full
+    evidence — compare only caller-declared roster identity/persona, never
+    per-request dispatch policy, since the manifest never durably stores the
+    latter for any session, before or after this unit).
+  independent-review-history: this is the most heavily red-teamed unit in the
+    track to date — an initial review found 4 HIGH + 3 MEDIUM findings before
+    any fix; two subsequent recheck passes each found one MORE genuine HIGH
+    that the prior round's own fix-and-test cycle had missed. Three fix
+    rounds (the full cap) were used; every round's fix was independently
+    re-verified by Lead directly reading/running the code, not only trusting
+    agent reports.
+  fix-round-1 (86b3cd546): H1 — a portable FlowDefinition's `policy.capability`
+    could name a literal registered executor id (e.g. `"claude"`) and
+    `resolveExecutorAndOverrides` would treat that as a valid resolution
+    (`bindingSource: 'executor-id'`), bypassing `assertNoPortableExecutorPin`
+    entirely (the exact "smuggle preferExecutor under policy.capability"
+    attack the phase file's own red-team item names, via a different literal
+    string) — fixed by refusing that branch. H2 — a Lead-supplied CLI
+    `--executor`/`--tier` flag was silently outranked by the newly-computed
+    per-actor binding (`actorPolicyFields`'s `actorEntry?.executor ??
+    globalExecutor` in run.mjs now had a real value to prefer, inverting
+    Decision 1 step 1's precedence) — fixed by threading `cliExecutor` through
+    to suppress computed additions when present. M3 (opPolicy.preferExecutor
+    outranked) was attempted, reverted after breaking an already-passing
+    red-team test, and root-caused to session-engine.mjs's pre-existing
+    `cli`-scope-outranks-`assignment`-scope precedence — confirmed
+    out-of-boundary and pre-existing (session-engine.mjs untouched by this
+    unit's diff); deferred, not blocking.
+  fix-round-2 (a138e4353, 6d55adb94): H4 — a live confinement/security
+    regression, independently reproduced by Lead: the generic `review`
+    capability (deliberately declared with no `.prefer` by I19) fell through
+    to the executor-reverse-mapping `capability.for` branch, silently pinning
+    all 8 `architecture-advisory-panel-v1` actors onto an unconfined
+    `xai`/`pi-cli-vantt` executor (write/edit/bash, no sandbox) instead of the
+    pre-I21 `readOnlyRedirects` safety net (a confined, read-only path) —
+    fixed by restricting accepted resolutions to exactly
+    `bindingSource === 'capability.prefer'`. Plus: a tier-only roster entry
+    was silently suppressing its actor's capability-computed executor
+    entirely (fixed, the two now layer correctly); a CHANGELOG regression
+    from round 1 (accidentally replaced the I17 entry instead of adding
+    alongside it, fixed); SKILL.md's `--actors` override claim corrected to
+    state the entry-node-only limitation honestly (H3/item-2, the start-time
+    roster override never reaching later `authorize-and-dispatch` nodes, was
+    investigated in full and confirmed a genuine PRE-EXISTING gap — the
+    persisted manifest/session actor shape, `ACTOR_FIELDS` in
+    `runner/coordination/schema.mjs` plus `store.mjs`'s object literals, never
+    had an executor/tier field at all, predating this unit entirely, per
+    run.mjs's own "the roster is per-request, not per-session" comment;
+    deferred, needs a real schema/store change outside this unit's boundary).
+  fix-round-3 (1edef28f4, ed4de649c, FINAL — 3-round cap reached): a second
+    independent recheck found ANOTHER HIGH neither prior round caught: retrying
+    `coordination start` on an existing session failed with `payload-conflict`
+    whenever any actor received a capability-computed binding, because the
+    idempotency check (`start.mjs` step 8) compared the fully-merged
+    `requestObject.actors` (which now always carries synthetic `{id, executor}`
+    additions with no `role`) against `existingManifest.actors` (which always
+    has a real `role`) — a real reliability regression hitting the live
+    `standalone-master-coordination-loop` config on every retried/resumed
+    `start`. Root-caused (with a correction to Lead's own initial diagnosis:
+    `role` is schema-forbidden on every request actor entry, not merely absent
+    on computed ones) and fixed by comparing only the caller's raw
+    `options.actors` against what the manifest durably owns (actor identity +
+    `persona` — the only two properties a declared-protocol actor's manifest
+    entry ever carries, copied verbatim from the protocol's own `spec.actors[]`
+    and never touched by any request). This defect is confirmed pre-existing
+    since the commit that introduced the check (`232ef31e1`, well before I21)
+    — it simply never fired before because non-empty `actors[]` on a `start`
+    retry was rare until this unit made computed bindings the default. Also
+    fixed: the new doctor check accepted the same loose resolution branches
+    `binding.mjs` itself refuses (same root cause as H1/H4, in a file the
+    first two rounds never touched — now requires `bindingSource ===
+    'capability.prefer'` too); SKILL.md and `author-a-plan-loop-track.md` both
+    corrected to name `--executor <id>`/`--tier` as the actual per-step lever
+    instead of vaguely "repeat the override" (`--actors` does not exist on
+    `authorize-and-dispatch`/`operation` at all).
+  deferred (named, confirmed pre-existing/structural, not proof-gaps against
+    this unit's own Requirements):
+    - a start-time roster override does not durably persist and therefore
+      cannot be forwarded to a later `authorize-and-dispatch` node for the
+      same actor (needs an `ACTOR_FIELDS`/store.mjs schema change, outside
+      this unit's file boundary; the I16 finding this unit exists to close
+      was specifically about capability-computed bindings reaching later
+      nodes, which now works — explicit roster overrides reaching later
+      nodes was never separately promised and remains the pre-existing gap);
+    - `bindingSource` never survives to the persisted `dispatch-plan.json` as
+      the literal string `"capability.prefer"` — binding.mjs resolves a
+      capability to a literal executor id once, and the second, real-dispatch
+      resolution legitimately re-hits the `executor-id` branch for that
+      now-literal id (same family as the already-deferred status-surfacing
+      gap, confirmed via a real live-proof run, not inferred);
+    - `facts` (the DemandFacts advisory-fallback context) is never supplied
+      by any production caller (`start.mjs`/`actions.mjs`), so
+      `deriveOperationCapability`'s `facade-primary`/`<domain>:review`
+      fallback branches are unreachable in production and a future
+      `strength: 'required'` diversity refusal would have no CLI-reachable
+      `allowDiversityUnsatisfiable` escape — latent, no shipped protocol uses
+      `required` yet;
+    - a roster entry supplying `invocation` without `executor` now has that
+      invocation silently overwritten by the capability-computed executor's
+      own invocation choice — narrow, no shipped protocol does this today.
+  verification: node --test test/verbs/coordination-binding.test.mjs
+    test/runner/coordination-request-composers.test.mjs (25/25 pass);
+    test/runner/flow-definition-schema.test.mjs test/runner/
+    flow-definition-standalone-master-coordination-loop.test.mjs test/verbs/
+    coordination-architecture-advisory-panel-conformance.test.mjs (100/100
+    pass); test/runner/cohort-planner.test.mjs test/runner/
+    cohort-planner-purity.test.mjs (28/28 pass); test/skills/
+    coordination-phase4-driver-discipline.test.mjs (9/9 pass); test/setup/
+    checks.test.mjs (120/120 pass); `node bin/fgos.mjs doctor`:
+    `operation-capability-resolves` passes ("6 declared operation.policy.capability
+    value(s) resolve; 2 distinct provider families reachable ([gemini, openai])");
+    live proof (real `bindOperations` call against the committed config and the
+    real `standalone-master-coordination-loop`/`architecture-advisory-panel-v1`
+    protocols, independently reproduced by Lead): doer/fixer bind
+    `code:implement.prefer`, reviewer/red-team bind `code:review.prefer`, all 8
+    advisory-panel `review`-capability actors correctly `unbound` (falling
+    through to `readOnlyRedirects`, confined); Lead-run full
+    `env -u CLAUDE_CODE_SESSION_ID npm test` at candidate `ed4de649c`: 7803
+    tests, 7730 pass, 0 fail, 8 skip, 65 todo, exit 0; `git diff --check` clean.
+    Post-merge full suite on the main checkout showed the same 3
+    `fanoutBatchExecutorCli` failures already documented in Unit I18's
+    report as a main-checkout-specific test-environment anomaly (not
+    reproducible in a fresh worktree at the same integrated SHA, confirmed
+    again here: 20/20 pass); not a regression from this unit.
+  report: plans/260919-coordination-skill-harness-simplification/reports/unit-I21-claude-only-execution-report.md
+  stop: CLEARED — `session-engine.mjs` untouched by this unit's diff (no
+    binding decision moved into the kernel); `assertNoPortableExecutorPin`
+    confirmed still refuses `preferExecutor` at every portable scope, and the
+    round-1 H1 fix closes the equivalent bypass through `policy.capability`
+    naming a literal executor id; replay of an existing session's derived
+    state is unaffected (only the request-compose-time `actors[]` shape
+    changed, not anything schema/store persists).
 
 Parallelism is limited deliberately:
 
