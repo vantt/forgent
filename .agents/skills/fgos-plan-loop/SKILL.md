@@ -86,7 +86,7 @@ Session IDs use safe characters: letters, digits, hyphen, underscore (e.g. `cell
      --cwd "../<track>-<cell-id>" \
      --objective "<cell objective from phase file>"
    ```
-   Until binding resolves from config (Phase 5), pass `--actors '<json>'` on `start` when the track's Execution Inputs roster requires provider diversity; omitting it binds every node to the default executor plus placementPolicy read-only redirects.
+   Until binding resolves from config (Phase 5), `--actors '<json>'` on `start` binds only the entry node; later `authorize-and-dispatch` requests carry no actors, so reviewer and red-team bind to the default executor plus placementPolicy read-only redirects. Provider diversity across roles is not yet achievable from the facade.
 3. **Dispatch Evaluation Pass:**
    Query `fgos coordination status <track>--<cell-id>`.
    `produce-candidate` has already executed. The next projected legal actions are the parallel primary evaluations:

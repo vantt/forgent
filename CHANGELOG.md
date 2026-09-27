@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- **Changed**: `fgos-plan-loop` and the shared coordination driver discipline now spell out the `open inputs` hook (result kind, one primary capability, pass-through binding inputs), and document that `fgos coordination start --actors` binds only the entry node — reviewer and red-team use the default executor plus read-only redirects until config-based binding lands.
 - **Changed**: Extracted shared domain-neutral coordination driver discipline and coding-domain cell policy fragments; rewrote `fgos-plan-loop` skill facade into track sequencing over semantic coordination commands (Phase 4 / Unit I15):
   - Created canonical domain-neutral driver discipline fragment `core/skills/_shared/coordination-driver.md` defining the 8-step driver cycle and 9 hook slots with zero coding/track vocabulary (enforced by drift test).
   - Created canonical coding-domain cell policy fragment `domains/coding/skills/_shared/coding-cell-policy.md` defining worktree isolation, proof tiers, independent verification, post-close merge/cleanup, and tested/integrated identity, reusable for a single cell without plan or track requirements.
