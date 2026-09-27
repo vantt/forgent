@@ -1,6 +1,6 @@
 # Coordination Skill and Harness Simplification
 
-Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 verified at `main@1ca4023c` (REV-15 fix `60132825`; post-merge baseline verified at `main@f63f7e7d`); Unit I07 integrated at `main@261ed7ea`; Unit I08b integrated at `main@ba8f6a9d`; Unit I10 integrated and verified at `main@605d26fe` (carried through `main@26a1038e` and `main@ac19f6d1`); Unit I08 VERIFIED at `main@ac19f6d1` (RV-01/RV-02 remediation candidate `132d3777` + `ac19f6d1` integrated; acceptance gate verified: full suite 7647 pass exit 0, 10/10 isolated coord, 10/10 isolated dispatch, 60/60 parallel load pass; timing instability recorded as LOW debt); Unit I11 VERIFIED at `main@7d7dc2750f9fb80716a7cffae03d67605629cf9a` (candidate code `9cf843b6`, approved tip `3a67a1b9`, synchronized merge `3d706b89`; post-merge verification satisfied: 155/155 focused rerun pass, full suite 7652 pass exit 0; candidate regressions = 0); Unit I12 VERIFIED/integrated at `main@c782a08dfcae89279dcb1ca9fb59aa73fb58c515`; Unit I13 VERIFIED/integrated at `main@dc05f7586b78483d569bc25b929b988dc56a374c`; Unit I14 VERIFIED/integrated at `main@3cb80c91c` (candidate `f857eaeab`; review APPROVE at `7d01a12e2`; remediation `c03a959c7`; focused matrix 210 pass / 0 fail, full suite 7684 pass / 0 fail; Phase 4 entry gate satisfied); Unit I15 (Phase 4) VERIFIED/integrated at `main@8e8a3f1aa` (candidate `38e552bb9`; approved tip `c343304b3`; focused matrix 192 pass / 0 fail, full suite 7693 pass / 0 fail; Phase 5 open / ready); Unit I16 VERIFIED/integrated at `main@a48ce987c` (candidate `6d75b54e1`; focused matrix 12 pass / 0 fail, skills matrix 29 pass / 0 fail; Phase 5 open / ready); Unit I17 VERIFIED/integrated at `main@d6c0d9033` (candidate `37833e331`; review APPROVE at `8864ea596`/`37833e331`; 40/40 doctrine pass, 124/124 matrix pass; Unit I19 unblocked); Unit I19 VERIFIED/integrated at `main@525a641a` (candidate `352200cde`; full suite 7781 pass / 0 fail; Phase 5 work item 2 / Unit I21 unblocked); Unit I18 VERIFIED/integrated at `main@8ece3bbdc` (candidate `8306c36d1`; 3 fix rounds; full suite 7813 pass / 0 fail via fresh worktree); Unit I20 VERIFIED/integrated at `main@09db1fad4` (candidate `027636e4e`; 1 fix round); Unit I21 VERIFIED/integrated at `main@9d1fbc99d` (candidate `ed4de649c`; 3 fix rounds — closed a real executor-pin bypass, a CLI-override regression, a live confinement regression on architecture-advisory-panel, and an idempotent-start regression; full suite 7803 pass / 0 fail; Phase 5 work item 2 satisfied); Unit I22 VERIFIED/integrated at `main@387570ed3` (candidate `0076ba66f`; 3 fix rounds — closed a HIGH content-loss finding, a repo-wide constraints-rendering bug, 2 MEDIUM content-loss findings, and a scope-wording issue; full suite 7906 pass / 1 fail confirmed pre-existing flake; Phase 5 work item 1 satisfied); Unit I23 VERIFIED/integrated at `main@94c2aaf49` (candidate `0e936aa89`; 1 fix round — closed 2 real test-coverage gaps plus stale skill prose and a pre-existing untested gate-refusal path; full suite 7923 pass / 0 fail; Phase 5 work item 3 satisfied)
+Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 verified at `main@1ca4023c` (REV-15 fix `60132825`; post-merge baseline verified at `main@f63f7e7d`); Unit I07 integrated at `main@261ed7ea`; Unit I08b integrated at `main@ba8f6a9d`; Unit I10 integrated and verified at `main@605d26fe` (carried through `main@26a1038e` and `main@ac19f6d1`); Unit I08 VERIFIED at `main@ac19f6d1` (RV-01/RV-02 remediation candidate `132d3777` + `ac19f6d1` integrated; acceptance gate verified: full suite 7647 pass exit 0, 10/10 isolated coord, 10/10 isolated dispatch, 60/60 parallel load pass; timing instability recorded as LOW debt); Unit I11 VERIFIED at `main@7d7dc2750f9fb80716a7cffae03d67605629cf9a` (candidate code `9cf843b6`, approved tip `3a67a1b9`, synchronized merge `3d706b89`; post-merge verification satisfied: 155/155 focused rerun pass, full suite 7652 pass exit 0; candidate regressions = 0); Unit I12 VERIFIED/integrated at `main@c782a08dfcae89279dcb1ca9fb59aa73fb58c515`; Unit I13 VERIFIED/integrated at `main@dc05f7586b78483d569bc25b929b988dc56a374c`; Unit I14 VERIFIED/integrated at `main@3cb80c91c` (candidate `f857eaeab`; review APPROVE at `7d01a12e2`; remediation `c03a959c7`; focused matrix 210 pass / 0 fail, full suite 7684 pass / 0 fail; Phase 4 entry gate satisfied); Unit I15 (Phase 4) VERIFIED/integrated at `main@8e8a3f1aa` (candidate `38e552bb9`; approved tip `c343304b3`; focused matrix 192 pass / 0 fail, full suite 7693 pass / 0 fail; Phase 5 open / ready); Unit I16 VERIFIED/integrated at `main@a48ce987c` (candidate `6d75b54e1`; focused matrix 12 pass / 0 fail, skills matrix 29 pass / 0 fail; Phase 5 open / ready); Unit I17 VERIFIED/integrated at `main@d6c0d9033` (candidate `37833e331`; review APPROVE at `8864ea596`/`37833e331`; 40/40 doctrine pass, 124/124 matrix pass; Unit I19 unblocked); Unit I19 VERIFIED/integrated at `main@525a641a` (candidate `352200cde`; full suite 7781 pass / 0 fail; Phase 5 work item 2 / Unit I21 unblocked); Unit I18 VERIFIED/integrated at `main@8ece3bbdc` (candidate `8306c36d1`; 3 fix rounds; full suite 7813 pass / 0 fail via fresh worktree); Unit I20 VERIFIED/integrated at `main@09db1fad4` (candidate `027636e4e`; 1 fix round); Unit I21 VERIFIED/integrated at `main@9d1fbc99d` (candidate `ed4de649c`; 3 fix rounds — closed a real executor-pin bypass, a CLI-override regression, a live confinement regression on architecture-advisory-panel, and an idempotent-start regression; full suite 7803 pass / 0 fail; Phase 5 work item 2 satisfied); Unit I22 VERIFIED/integrated at `main@387570ed3` (candidate `0076ba66f`; 3 fix rounds — closed a HIGH content-loss finding, a repo-wide constraints-rendering bug, 2 MEDIUM content-loss findings, and a scope-wording issue; full suite 7906 pass / 1 fail confirmed pre-existing flake; Phase 5 work item 1 satisfied); Unit I23 VERIFIED/integrated at `main@94c2aaf49` (candidate `0e936aa89`; 1 fix round — closed 2 real test-coverage gaps plus stale skill prose and a pre-existing untested gate-refusal path; full suite 7923 pass / 0 fail; Phase 5 work item 3 satisfied); Unit I24a VERIFIED/integrated at `main@35be2c10d` (candidate `6b0420295`; 1 fix round — closed a real idempotency gap, a DAG-mode ref-edge gap, and corrected H3's "ONLY run --file" wording to cover all raw request doors; full suite 7929 pass / 0 fail; Phase 5 work item 4 part 1 satisfied, I24b unblocked)
 Created: 2026-09-19
 Last Updated: 2026-09-27
 Mode: high-risk
@@ -1740,9 +1740,37 @@ Executor/provider/model/tier selection remains an execution-time decision.
 - unit: I24a — specialist-authorize request-step door, unlocked path only (Phase 5 work item 4, part 1)
   capability: code:implement
   depends-on: none
-  status: not-started
+  status: VERIFIED/integrated at `main@35be2c10d` (candidate `6b0420295`; 1
+    fix round closed: a real idempotency gap (a retry reusing the same
+    `specialistAuthorizationId` with different content was silently echoed
+    as authorizing whatever the caller claimed — `store.mjs`'s
+    `recordSpecialistAuthorization` now matches every sibling
+    driver-authored door's canonical-payload-compare-and-refuse pattern); a
+    DAG-mode gap (`triggerEvidenceRefs`/`allowedContextRefs` on this step
+    type created no dependency edge — `dag-request-compiler.mjs` fixed);
+    and doc wording across 5 files/mirrors that inaccurately claimed only
+    `run --file` could reach this step type, when `coordination
+    start --steps` and the headless adapter already could too by design
+    (not a privilege escalation — both already passed every OTHER step
+    type unfiltered before this unit; H3's real invariant, the pack gate's
+    own refusal, was confirmed solid and is unchanged). H3 decision text
+    below revised in place to match the corrected scope; the original
+    literal "ONLY `run --file`" wording is superseded by this same status
+    line, not silently edited. Full suite 7929 pass / 0 fail. Composers.mjs
+    correctly NOT touched (deliberate, independently reviewer-verified: no
+    other non-locked step type has one either); I24b inherits the FULL
+    composer-case build (a new action kind, the `Locked` engine twin, the
+    subverb) as its own scope, corrected from an earlier misreading that
+    assumed I24a would partially cover it. Filed for separate attention,
+    not fixed here (pre-existing, out of this unit's diff): `store.mjs`'s
+    `authorizeOperationLocked` has the same weak-idempotency pattern this
+    unit's fix closed for `recordSpecialistAuthorization` — worth its own
+    work item.
   design-record: plans/reports/fork-260927-2024-phase5-items-1-3-4-5-6-decomposition-research-report.md §Item 4; independent decomposition review (Track Manager) found the original single I24 unimplementable as scoped (H1-H3) — split into I24a/I24b per that review's M3, this is I24a.
-  decision (Lead, locked, do not reopen — H3 from the decomposition review):
+  decision (Lead, locked, do not reopen — H3 from the decomposition review;
+    REVISED post-merge after independent test+review found the original
+    "ONLY `run --file`" wording factually incomplete — see fix-round
+    finding below):
     "authorize a specialist" is registered as group-thinking pack-gate
     bypass #4 (`docs/architect/agent-coordination/contracts/
     coordination-session.md`'s "Group-Thinking Protocol Pack" § "Five
@@ -1750,15 +1778,22 @@ Executor/provider/model/tier selection remains an execution-time decision.
     `test/verbs/coordination-group-thinking-pack-registration.test.mjs`'s
     header/assert ~L399). This unit does NOT reopen that invariant. The new
     `specialist-authorize` request-step type is added to `run.mjs`'s public
-    request vocabulary for the raw `coordination run --file` power-user
-    door ONLY; the group-thinking pack gate must continue to REFUSE this
-    step type exactly as it refuses every other bypass today (option (b)
-    from the review, not (a) — do not amend the bypass list or the pack
-    gate's own refusal behavior; a pack-registered protocol still cannot
-    reach specialist authorization through `runGroupThinkingRequest`). The
-    driver-authenticated typed-action path (a real, tested door once I24b
-    lands) is the intended route for group-thinking-adjacent flows; this
-    unit only closes the RAW direct-engine-call escape hatch, nothing more.
+    request vocabulary, reachable through any raw coordination request door
+    (`coordination run --file`, `coordination start --steps`, the headless
+    adapter — confirmed live: `start --steps` and the headless adapter
+    already passed every OTHER step type through unfiltered before this
+    unit, so this is not a new escalation, just corrected documentation);
+    the group-thinking pack gate must continue to REFUSE this step type
+    exactly as it refuses every other bypass today (option (b) from the
+    review, not (a) — do not amend the bypass list or the pack gate's own
+    refusal behavior; a pack-registered protocol still cannot reach
+    specialist authorization through `runGroupThinkingRequest`, confirmed
+    by an explicit new gate-level check added in the fix round since the
+    gate previously relied only on `run.mjs`'s vocabulary lacking the step,
+    not a check of its own). The driver-authenticated typed-action path (a
+    real, tested door once I24b lands) is the intended route for
+    group-thinking-adjacent flows; this unit only closes the RAW
+    direct-engine-call escape hatch, nothing more.
   scope: `authorizeSpecialistSlot` (`src/runner/coordination/
     session-engine.mjs:1586`) has no composer/request-step wrapper today
     (confirmed: the only non-test caller is a historical one-off script, not
@@ -1799,8 +1834,9 @@ Executor/provider/model/tier selection remains an execution-time decision.
     env -u CLAUDE_CODE_SESSION_ID npm test.
   stop: the group-thinking pack gate stops refusing `specialist-authorize`
     (that would silently flip the H3 decision); `specialist-authorize`
-    becomes reachable any live runtime/skill path other than
-    `coordination run --file` before I24b lands.
+    becomes reachable through a pack-gated protocol (via `runGroupThinkingRequest`)
+    before I24b lands — reachability through any OTHER raw request door is
+    within the corrected H3 scope above, not a stop condition.
 - unit: I24b — typed `specialist` action-view case and locked/typed-action door (Phase 5 work items 4 part 2, 5, 6)
   capability: code:implement
   depends-on: I24a
@@ -1825,7 +1861,15 @@ Executor/provider/model/tier selection remains an execution-time decision.
     add the `specialist-authorize` subverb the same way, wired to call the
     new Locked composer/action path; this does NOT touch
     `command-routes.json`/rust-host regeneration (subverbs are
-    `coordination`-internal, confirmed by I24a/I23's own research). Add a
+    `coordination`-internal, confirmed by I24a/I23's own research). This
+    unit owns the FULL new `composers.mjs` case for this kind (a per-kind
+    `compose*Request` entry, matching `authorize-and-dispatch`/
+    `record-disposition`/`record-human-turn`/`link-contribution`'s existing
+    shape) — I24a's independent review confirmed those 4 kinds already have
+    composer entries (an earlier "no step type has a composer" reading was
+    wrong; I24a correctly built the unlocked path inline in `run.mjs`
+    instead, matching every OTHER non-locked step type, and correctly left
+    the composer to this unit since it only feeds the locked path). Add a
     `specialist`-kind action to `src/runner/coordination/
     actions-projector.mjs`'s `projectCoordinationActions` (Phase 1's own
     Cases list requires the typed action view to distinguish "specialist
