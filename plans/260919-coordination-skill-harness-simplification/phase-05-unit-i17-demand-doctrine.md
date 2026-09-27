@@ -2,7 +2,7 @@
 
 Capability: `execute` (prose/spec, mutate file, verify bằng test có sẵn).
 Depends on: none. Land trước mọi link từ this track.
-Status: implemented
+Status: integrated at `main@d6c0d9033` (candidate `37833e331`)
 Branch: `coordination-skill-harness-i17-demand-doctrine`
 
 ## Context

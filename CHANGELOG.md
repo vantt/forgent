@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- **Added**: Demand doctrine and capability matching (`core/skills/_shared/capability-matching.md`, Unit I17): defines the 8-property `DemandFacts` schema, serves-based matching against the catalog, platform default inline execution via `unavailable`, five dispatch reasons justifying executor configuration, the generic `review` capability slot, and reverses skill triggers in `fgos-capability-dispatching` and `fgos-code-panel` from keyword spotting to declared demand facts.
 - **Changed**: `fgos-plan-loop` and the shared coordination driver discipline now spell out the `open inputs` hook (result kind, one primary capability, pass-through binding inputs), and document that `fgos coordination start --actors` binds only the entry node — reviewer and red-team use the default executor plus read-only redirects until config-based binding lands.
 - **Changed**: Extracted shared domain-neutral coordination driver discipline and coding-domain cell policy fragments; rewrote `fgos-plan-loop` skill facade into track sequencing over semantic coordination commands (Phase 4 / Unit I15):
   - Created canonical domain-neutral driver discipline fragment `core/skills/_shared/coordination-driver.md` defining the 8-step driver cycle and 9 hook slots with zero coding/track vocabulary (enforced by drift test).

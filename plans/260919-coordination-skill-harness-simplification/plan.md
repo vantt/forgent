@@ -1,6 +1,6 @@
 # Coordination Skill and Harness Simplification
 
-Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 verified at `main@1ca4023c` (REV-15 fix `60132825`; post-merge baseline verified at `main@f63f7e7d`); Unit I07 integrated at `main@261ed7ea`; Unit I08b integrated at `main@ba8f6a9d`; Unit I10 integrated and verified at `main@605d26fe` (carried through `main@26a1038e` and `main@ac19f6d1`); Unit I08 VERIFIED at `main@ac19f6d1` (RV-01/RV-02 remediation candidate `132d3777` + `ac19f6d1` integrated; acceptance gate verified: full suite 7647 pass exit 0, 10/10 isolated coord, 10/10 isolated dispatch, 60/60 parallel load pass; timing instability recorded as LOW debt); Unit I11 VERIFIED at `main@7d7dc2750f9fb80716a7cffae03d67605629cf9a` (candidate code `9cf843b6`, approved tip `3a67a1b9`, synchronized merge `3d706b89`; post-merge verification satisfied: 155/155 focused rerun pass, full suite 7652 pass exit 0; candidate regressions = 0); Unit I12 VERIFIED/integrated at `main@c782a08dfcae89279dcb1ca9fb59aa73fb58c515`; Unit I13 VERIFIED/integrated at `main@dc05f7586b78483d569bc25b929b988dc56a374c`; Unit I14 VERIFIED/integrated at `main@3cb80c91c` (candidate `f857eaeab`; review APPROVE at `7d01a12e2`; remediation `c03a959c7`; focused matrix 210 pass / 0 fail, full suite 7684 pass / 0 fail; Phase 4 entry gate satisfied); Unit I15 (Phase 4) VERIFIED/integrated at `main@8e8a3f1aa` (candidate `38e552bb9`; approved tip `c343304b3`; focused matrix 192 pass / 0 fail, full suite 7693 pass / 0 fail; Phase 5 open / ready); Unit I16 VERIFIED/integrated at `main@a48ce987c` (candidate `6d75b54e1`; focused matrix 12 pass / 0 fail, skills matrix 29 pass / 0 fail; Phase 5 open / ready)
+Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 verified at `main@1ca4023c` (REV-15 fix `60132825`; post-merge baseline verified at `main@f63f7e7d`); Unit I07 integrated at `main@261ed7ea`; Unit I08b integrated at `main@ba8f6a9d`; Unit I10 integrated and verified at `main@605d26fe` (carried through `main@26a1038e` and `main@ac19f6d1`); Unit I08 VERIFIED at `main@ac19f6d1` (RV-01/RV-02 remediation candidate `132d3777` + `ac19f6d1` integrated; acceptance gate verified: full suite 7647 pass exit 0, 10/10 isolated coord, 10/10 isolated dispatch, 60/60 parallel load pass; timing instability recorded as LOW debt); Unit I11 VERIFIED at `main@7d7dc2750f9fb80716a7cffae03d67605629cf9a` (candidate code `9cf843b6`, approved tip `3a67a1b9`, synchronized merge `3d706b89`; post-merge verification satisfied: 155/155 focused rerun pass, full suite 7652 pass exit 0; candidate regressions = 0); Unit I12 VERIFIED/integrated at `main@c782a08dfcae89279dcb1ca9fb59aa73fb58c515`; Unit I13 VERIFIED/integrated at `main@dc05f7586b78483d569bc25b929b988dc56a374c`; Unit I14 VERIFIED/integrated at `main@3cb80c91c` (candidate `f857eaeab`; review APPROVE at `7d01a12e2`; remediation `c03a959c7`; focused matrix 210 pass / 0 fail, full suite 7684 pass / 0 fail; Phase 4 entry gate satisfied); Unit I15 (Phase 4) VERIFIED/integrated at `main@8e8a3f1aa` (candidate `38e552bb9`; approved tip `c343304b3`; focused matrix 192 pass / 0 fail, full suite 7693 pass / 0 fail; Phase 5 open / ready); Unit I16 VERIFIED/integrated at `main@a48ce987c` (candidate `6d75b54e1`; focused matrix 12 pass / 0 fail, skills matrix 29 pass / 0 fail; Phase 5 open / ready); Unit I17 VERIFIED/integrated at `main@d6c0d9033` (candidate `37833e331`; review APPROVE at `8864ea596`/`37833e331`; 40/40 doctrine pass, 124/124 matrix pass; Unit I19 unblocked)
 Created: 2026-09-19
 Last Updated: 2026-09-27
 Mode: high-risk
@@ -1209,7 +1209,7 @@ Executor/provider/model/tier selection remains an execution-time decision.
 - unit: I16 — amend driver-discipline open-inputs slot and plan-loop hook value before Phase 5 consumes the fragment
   capability: execute
   depends-on: I15
-  status: VERIFIED/integrated at `main@a48ce987c` (candidate `6d75b54e1`; focused suites 12/12 pass; skills matrix 29/29 pass; Phase 5 unblocked); Phase 5 units I17–I21 planned 2026-09-27 (design record `plans/reports/architecture-investigation-260927-1154-capability-aware-dispatch-gate-phase4-decisions.md`), none started
+  status: VERIFIED/integrated at `main@a48ce987c` (candidate `6d75b54e1`; focused suites 12/12 pass; skills matrix 29/29 pass; Phase 5 unblocked); Phase 5 units I17–I21 planned 2026-09-27 (design record `plans/reports/architecture-investigation-260927-1154-capability-aware-dispatch-gate-phase4-decisions.md`); Unit I17 integrated at `main@d6c0d9033`
   candidate-sha: `6d75b54e1`
   integrated-sha: `a48ce987c`
   branch: `coordination-skill-harness-i16-open-inputs`
@@ -1251,8 +1251,12 @@ Executor/provider/model/tier selection remains an execution-time decision.
 - unit: I17 — demand doctrine: `capability-matching.md` fragment, spec fact, trigger reversal
   capability: execute
   depends-on: I16
-  status: implemented
+  status: VERIFIED/integrated at `main@d6c0d9033` (candidate `37833e331`; review APPROVE at `8864ea596`/`37833e331`; focused suites 40/40 pass, secondary matrix 124/124 pass; Phase 5 Unit I19 unblocked)
+  candidate-sha: `37833e331`
+  integrated-sha: `d6c0d9033`
   branch: `coordination-skill-harness-i17-demand-doctrine`
+  base-sha: `6e2bc83095aa6391d37e0cce28929e74246fe43a`
+  review-status: APPROVE at `8864ea596` (re-verified at clean candidate `37833e331`; F1 inline default ratified via Option A, F2 impact-analysis serves set to explicit-only)
   scope: see `phase-05-unit-i17-demand-doctrine.md`. Prose only: new shared fragment
     (DemandFacts, serves-based matching, default inline, five dispatch reasons, promotion
     trigger for domain capabilities), `serves` column + `review` row in
@@ -1260,8 +1264,8 @@ Executor/provider/model/tier selection remains an execution-time decision.
     trigger of `fgos-capability-dispatching` and `fgos-code-panel` description switched
     from keyword matching to declared facts, one spec line in `docs/specs/runner.md`.
   design-record: plans/reports/architecture-investigation-260927-1154-capability-aware-dispatch-gate-phase4-decisions.md §11
-  verification: node --test test/setup/capability-catalog-doctrine.test.mjs test/skills/*.test.mjs (40/40 pass); npm run build:skills mirrors byte-identical; git diff --check clean
-  stop: fragment needs kernel/engine change; any existing skill-contract test regresses.
+  verification: node --test test/setup/capability-catalog-doctrine.test.mjs test/skills/*.test.mjs (40/40 pass); node --test test/report/capability-plan-lint.test.mjs test/runner/dispatch-coordination-role-tiers.test.mjs test/setup/skill-wrappers.test.mjs (124/124 pass); npm run build:skills mirrors byte-identical; git diff --check clean
+  stop: CLEARED — integrated at `main@d6c0d9033`; Unit I19 unblocked.
 - unit: I18 — plan lint hardening and `fgos plan-lint` verb
   capability: code:implement
   depends-on: I16
