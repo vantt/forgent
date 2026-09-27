@@ -159,6 +159,200 @@ test('work item 6: the "specialist" action-view case (and every other kind) carr
   }
 });
 
+// Phase 5 work item 6 (I25): the "specialist" allowlist above is strict, but
+// every OTHER kind was only checked against an 8-name judgment-field
+// denylist -- a legitimate mechanical field with an unlisted name (e.g.
+// `rank`) would silently pass for any non-specialist kind. Hardened here to
+// an EXACT top-level allowlist for every kind `actions-projector.mjs`
+// actually emits, plus the same treatment for `target`'s own sub-keys
+// (`dispatch-operation`'s optional `target.authorizationId` included, for
+// the identical reason). Never recurse into field VALUES: `rationale` is a
+// legitimate `requiredInputs` array VALUE for `record-disposition`, and a
+// value-level scan would false-fail on it.
+const PER_KIND_ALLOWED_FIELDS = {
+  'dispatch-operation': new Set(['kind', 'required', 'target', 'requiredInputs', 'optionalInputs', 'actionKey']),
+  'fan-out': new Set(['kind', 'required', 'target', 'allowedActorIds', 'requiredInputs', 'optionalInputs', 'allowedValues', 'actionKey']),
+  'authorize-and-dispatch': new Set(['kind', 'required', 'target', 'requiredInputs', 'optionalInputs', 'actionKey']),
+  'record-disposition': new Set(['kind', 'required', 'target', 'requiredInputs', 'optionalInputs', 'allowedValues', 'actionKey']),
+  'link-contribution': new Set(['kind', 'required', 'target', 'requiredInputs', 'optionalInputs', 'allowedValues', 'actionKey']),
+  'record-human-turn': new Set(['kind', 'required', 'target', 'requiredInputs', 'optionalInputs', 'actionKey']),
+  close: new Set(['kind', 'required', 'target', 'requiredInputs', 'optionalInputs', 'actionKey']),
+  specialist: new Set(['kind', 'required', 'target', 'authorizable', 'authorized', 'exhausted', 'requiredInputs', 'optionalInputs', 'actionKey']),
+};
+const PER_KIND_TARGET_ALLOWED_FIELDS = {
+  'dispatch-operation': new Set(['nodeId', 'operationId', 'actorId', 'authorizationId']),
+  'fan-out': new Set(['nodeId', 'operationId', 'allowedActorIds']),
+  'authorize-and-dispatch': new Set(['nodeId', 'operationId', 'actorId']),
+  'record-disposition': new Set(['targetRef', 'actorId']),
+  'link-contribution': new Set(['assignmentId', 'operationId', 'nodeId', 'actorId']),
+  'record-human-turn': new Set(['coordinationId']),
+  close: new Set(['coordinationId']),
+  specialist: new Set(['slotId', 'role']),
+};
+
+function assertPerKindAllowlist(actions) {
+  for (const action of actions) {
+    const allowedFields = PER_KIND_ALLOWED_FIELDS[action.kind];
+    assert.ok(allowedFields, `action kind "${action.kind}" has no registered allowlist -- add one to PER_KIND_ALLOWED_FIELDS`);
+    for (const key of Object.keys(action)) {
+      assert.ok(allowedFields.has(key), `"${action.kind}" action carries unexpected top-level field "${key}" -- update the allowlist if this is intentional mechanical data, never a judgment field`);
+    }
+    const allowedTargetFields = PER_KIND_TARGET_ALLOWED_FIELDS[action.kind];
+    for (const key of Object.keys(action.target ?? {})) {
+      assert.ok(allowedTargetFields.has(key), `"${action.kind}" action's target carries unexpected field "${key}" -- update the allowlist if this is intentional mechanical data, never a judgment field`);
+    }
+  }
+}
+
+test('work item 6 (I25): every action kind the projector emits carries an exact per-kind allowlist of top-level and target fields', () => {
+  // dispatch-operation (required, no authorizationId), authorize-and-dispatch,
+  // record-human-turn, specialist -- the same fixture as the test above.
+  assertPerKindAllowlist(
+    projectCoordinationActions({
+      manifest: {
+        coordinationId: 'coord_mechanical_1',
+        schemaVersion: '3',
+        status: 'active',
+        objective: 'Do work',
+        definitionRef: { id: 'generic.coordination-protocol.sample', version: '1.0.0' },
+        snapshotRef: { digest: '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef' },
+        assignmentRefs: [],
+      },
+      events: [],
+      definition: sampleProtocolDefWithSpecialistSlot,
+      quorum: { missing: ['worker'], failed: [] },
+    }).actions,
+  );
+
+  // dispatch-operation's OTHER variant: already driver-authorized, not yet
+  // consumed by an assignment -- the only shape that carries the optional
+  // `target.authorizationId`.
+  const authorizedNotConsumed = projectCoordinationActions({
+    manifest: {
+      coordinationId: 'coord_authorized_not_consumed',
+      schemaVersion: '3',
+      status: 'active',
+      objective: 'Do work',
+      definitionRef: { id: 'generic.coordination-protocol.sample', version: '1.0.0' },
+      snapshotRef: { digest: '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef' },
+      assignmentRefs: [],
+    },
+    events: [],
+    definition: sampleProtocolDef,
+    quorum: { missing: ['worker'], failed: [] },
+    replayed: {
+      authorizations: [
+        { authorizationId: 'auth_1', operationId: 'op-optional', nodeId: 'step-1', targetActorId: 'reviewer', consumedByAssignmentId: null },
+      ],
+    },
+  });
+  const authorizedDispatchAction = authorizedNotConsumed.actions.find((a) => a.kind === 'dispatch-operation' && a.target.authorizationId === 'auth_1');
+  assert.ok(authorizedDispatchAction, 'expected a dispatch-operation action for the already-authorized, not-yet-consumed binding');
+  assertPerKindAllowlist(authorizedNotConsumed.actions);
+
+  // fan-out, link-contribution -- same fixture the dedicated projection test
+  // below (`fan-out and link-contribution projection...`) already proves is
+  // real projector output, reused here only for its per-kind field set.
+  const fanOutDef = {
+    apiVersion: 'fgos.dev/v1alpha1',
+    kind: 'FlowDefinition',
+    metadata: { id: 'test-flow-full', version: '1.0.0' },
+    spec: {
+      profile: { kind: 'CoordinationProtocol', cohort: { independence: 'isolated-until-fan-in' } },
+      roles: ['researcher', 'critic'],
+      actors: [
+        { id: 'worker-fan-1', role: 'researcher' },
+        { id: 'worker-fan-2', role: 'researcher' },
+        { id: 'worker-contrib', role: 'critic' },
+      ],
+      operations: [
+        { id: 'op-fan', role: 'researcher' },
+        { id: 'op-contrib', role: 'critic' },
+      ],
+      graph: {
+        nodes: [
+          {
+            id: 'node-fan',
+            operations: [
+              { ref: 'op-fan', actor: 'worker-fan-1' },
+              { ref: 'op-fan', actor: 'worker-fan-2' },
+              { ref: 'op-contrib', actor: 'worker-contrib', contributions: { allowedTypes: ['proposal', 'critique'] } },
+            ],
+          },
+        ],
+      },
+    },
+  };
+  const fanOutManifest = {
+    schemaVersion: '3',
+    coordinationId: 'coord_schema_trans_test',
+    status: 'active',
+    objective: 'Full schema test',
+    provenanceRoot: { writerId: 'driver-1' },
+    assignmentRefs: ['asgn-1'],
+    definitionRef: { id: 'test-flow-full', version: '1.0.0' },
+  };
+  const projFanOut = projectCoordinationActions({ manifest: fanOutManifest, events: [], definition: fanOutDef });
+  assert.ok(projFanOut.actions.some((a) => a.kind === 'fan-out'), 'expected a fan-out action from the fan-out fixture');
+  assertPerKindAllowlist(projFanOut.actions);
+
+  const projLinkContribution = projectCoordinationActions({
+    manifest: { ...fanOutManifest, assignmentRefs: ['asgn-contrib'] },
+    events: [
+      { type: 'assignment-created', payload: { assignmentId: 'asgn-contrib', actorId: 'worker-contrib', operationId: 'op-contrib' } },
+      { type: 'result-linked', payload: { assignmentId: 'asgn-contrib' } },
+    ],
+    definition: fanOutDef,
+  });
+  assert.ok(projLinkContribution.actions.some((a) => a.kind === 'link-contribution'), 'expected a link-contribution action from the settled-contribution fixture');
+  assertPerKindAllowlist(projLinkContribution.actions);
+
+  // record-disposition -- same fixture as the "failed finding awaiting
+  // disposition" test below, reused only for its per-kind field set.
+  const projDisposition = projectCoordinationActions({
+    manifest: {
+      coordinationId: 'coord_failed_finding',
+      schemaVersion: '3',
+      status: 'active',
+      objective: 'Review work',
+      definitionRef: { id: 'generic.coordination-protocol.sample', version: '1.0.0' },
+      snapshotRef: { digest: '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef' },
+      assignmentRefs: ['asgn_fail_1'],
+    },
+    events: [
+      { type: 'operation-authorized', payload: { authorizationId: 'auth_1', nodeId: 'step-1', operationId: 'op-produce', targetActorId: 'worker' } },
+      { type: 'assignment-created', payload: { assignmentId: 'asgn_fail_1', actorId: 'worker' } },
+      { type: 'result-linked', payload: { assignmentId: 'asgn_fail_1', actorId: 'worker' } },
+    ],
+    definition: sampleProtocolDef,
+    quorum: { missing: [], failed: [{ assignmentId: 'asgn_fail_1', actorId: 'worker' }] },
+  });
+  assert.ok(projDisposition.actions.some((a) => a.kind === 'record-disposition'), 'expected a record-disposition action from the failed-finding fixture');
+  assertPerKindAllowlist(projDisposition.actions);
+
+  // close -- same fixture as the "required operation settled" test below.
+  const projClose = projectCoordinationActions({
+    manifest: {
+      coordinationId: 'coord_settled_1',
+      schemaVersion: '3',
+      status: 'active',
+      objective: 'Do work',
+      definitionRef: { id: 'generic.coordination-protocol.sample', version: '1.0.0' },
+      snapshotRef: { digest: '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef' },
+      assignmentRefs: ['asgn_1'],
+    },
+    events: [
+      { type: 'operation-authorized', payload: { authorizationId: 'auth_1', nodeId: 'step-1', operationId: 'op-produce', targetActorId: 'worker' } },
+      { type: 'assignment-created', payload: { assignmentId: 'asgn_1', actorId: 'worker' } },
+      { type: 'result-linked', payload: { assignmentId: 'asgn_1' } },
+    ],
+    definition: sampleProtocolDef,
+    quorum: { missing: [], failed: [] },
+  });
+  assert.ok(projClose.actions.some((a) => a.kind === 'close'), 'expected a close action from the settled fixture');
+  assertPerKindAllowlist(projClose.actions);
+});
+
 test('required operation settled and session ready to close exposes close action', () => {
   const manifest = {
     coordinationId: 'coord_settled_1',

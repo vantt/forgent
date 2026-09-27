@@ -323,6 +323,15 @@ test('Architecture Advisory Panel V1: full chain across seven separate calls -- 
   const explainId = assignmentIdFor(call5, 'explain');
   assert.equal(replaySession(coordinationId, { cwd: tempDir, repoRoot: tempDir }).manifest.status, 'active');
 
+  // Item 5 (I25): record-human-turn must appear in the REAL
+  // architecture-advisory-panel-v1 typed action view specifically, not just
+  // the generic unit-level coverage that already tests it independent of
+  // any protocol graph declaration.
+  assert.ok(
+    showCoordinationActionsUseCase(ctx, { id: coordinationId }).actions.some((a) => a.kind === 'record-human-turn'),
+    'record-human-turn must be a legal action in the real architecture-advisory-panel-v1 typed action view while the session is active',
+  );
+
   // Call 6: a genuinely separate, later call -- the real human turn (the
   // person's own words, verbatim, via the P03.1 trusted-input door) and one
   // bounded reopen of the synthesis, authorized citing that turn. Nothing
@@ -913,6 +922,113 @@ test('over-cap reopen (explanation): revise-explanation admits exactly 2 invocat
     replayed.assignments.filter((a) => a.actorId === 'lead-advisor-actor' && [explainId, reviseExplain1Id, reviseExplain2Id].includes(a.assignmentId)).map((a) => a.assignmentId),
   );
   assert.deepEqual(leadAdvisorReopenAssignmentIds, new Set([explainId, reviseExplain1Id, reviseExplain2Id]), 'exactly three distinct Assignments for the lead advisor\'s explanation lineage: original preserved alongside both reopens');
+});
+
+// ── Item 5 (I25): revise-explanation's own visibility across invocations,
+// the same M1 mechanism proven above for revise-synthesis (bounded-reopen
+// visibility), applied to the lead advisor's explanation reopen instead --
+// today only revise-explanation's door-level over-cap REFUSAL is tested
+// (the test above); this proves the projector's own typed action view
+// keeps it a legal `authorize-and-dispatch` action before any reopen and
+// after its FIRST invocation, and stops offering it after its SECOND
+// (`activation.maxInvocations: 2`). ─────────────────────────────────────────
+test('bounded-reopen visibility (revise-explanation): revise-explanation stays a legal authorize-and-dispatch action after its FIRST invocation, and stops being one after its SECOND (maxInvocations: 2)', async () => {
+  const tempDir = mkTempDir();
+  const runnerConfig = fakeRunnerConfig(tempDir);
+  const ctx = { cwd: tempDir, repoRoot: tempDir, runnerConfig };
+  const engineOpts = { cwd: tempDir, repoRoot: tempDir };
+  const coordinationId = 'aap_reopen_visibility_explanation';
+  const writerId = 'aap-driver';
+
+  const call1 = await run(ctx, coordinationId, writerId, [
+    opStep('shapeSystem', 'shape-system-proposal', 'system-shaper-actor'),
+    opStep('shapeAlt', 'shape-alternative-proposal', 'alternative-shaper-actor'),
+    opStep('shapeConstraint', 'shape-constraint-proposal', 'constraint-advocate-actor'),
+  ]);
+  const call2 = await run(ctx, coordinationId, writerId, [
+    authorizeStep('authCritique', 'critique-proposals', 'architecture-critic-actor', {
+      authorizationId: 'auth_critique',
+      invocationKey: 'ik_critique',
+      reason: 'post-shaping-open is open.',
+      grantedContextRefs: [assignmentIdFor(call1, 'shapeSystem')],
+    }),
+    opStep('critique', 'critique-proposals', 'architecture-critic-actor'),
+    authorizeStep('authAssess', 'assess-constraints', 'constraint-advocate-actor', {
+      authorizationId: 'auth_assess',
+      invocationKey: 'ik_assess',
+      reason: 'post-shaping-open is open.',
+      grantedContextRefs: [assignmentIdFor(call1, 'shapeConstraint')],
+    }),
+    opStep('assess', 'assess-constraints', 'constraint-advocate-actor'),
+  ]);
+  const call3 = await run(ctx, coordinationId, writerId, [
+    authorizeStep('authSynth', 'synthesize-recommendation', 'synthesizer-actor', {
+      authorizationId: 'auth_synth',
+      invocationKey: 'ik_synth',
+      reason: 'post-critique-open is open.',
+      grantedContextRefs: [assignmentIdFor(call2, 'critique'), assignmentIdFor(call2, 'assess')],
+    }),
+    opStep('synth', 'synthesize-recommendation', 'synthesizer-actor'),
+  ]);
+  const call4 = await run(ctx, coordinationId, writerId, [
+    authorizeStep('authRedteam', 'red-team-packet', 'red-team-actor', {
+      authorizationId: 'auth_redteam',
+      invocationKey: 'ik_redteam',
+      reason: 'post-synthesis-open is open.',
+      grantedContextRefs: [assignmentIdFor(call3, 'synth')],
+    }),
+    opStep('redteam', 'red-team-packet', 'red-team-actor'),
+  ]);
+  const call5 = await run(ctx, coordinationId, writerId, [
+    authorizeStep('authExplain', 'explain-recommendation', 'lead-advisor-actor', {
+      authorizationId: 'auth_explain',
+      invocationKey: 'ik_explain',
+      reason: 'post-redteam-open is open.',
+      grantedContextRefs: [assignmentIdFor(call3, 'synth'), assignmentIdFor(call4, 'redteam')],
+    }),
+    opStep('explain', 'explain-recommendation', 'lead-advisor-actor'),
+  ]);
+  const explainId = assignmentIdFor(call5, 'explain');
+
+  const findReviseExplanation = (rendered) =>
+    rendered.actions.find((a) => a.kind === 'authorize-and-dispatch' && a.target?.operationId === 'revise-explanation');
+
+  assert.ok(
+    findReviseExplanation(showCoordinationActionsUseCase(engineOpts, { id: coordinationId })),
+    'revise-explanation must be a legal action before any reopen',
+  );
+
+  const call6 = await run(ctx, coordinationId, writerId, [
+    authorizeStep('authReviseExplain1', 'revise-explanation', 'lead-advisor-actor', {
+      authorizationId: 'auth_revise_explain_1',
+      invocationKey: 'ik_revise_explain_1',
+      reason: 'First bounded reopen.',
+      grantedContextRefs: [explainId],
+    }),
+    opStep('reviseExplain1', 'revise-explanation', 'lead-advisor-actor'),
+  ]);
+  const reviseExplain1Id = assignmentIdFor(call6, 'reviseExplain1');
+
+  assert.ok(
+    findReviseExplanation(showCoordinationActionsUseCase(engineOpts, { id: coordinationId })),
+    'revise-explanation must STILL be a legal action after only 1 of its 2 permitted invocations',
+  );
+
+  await run(ctx, coordinationId, writerId, [
+    authorizeStep('authReviseExplain2', 'revise-explanation', 'lead-advisor-actor', {
+      authorizationId: 'auth_revise_explain_2',
+      invocationKey: 'ik_revise_explain_2',
+      reason: 'Second bounded reopen.',
+      grantedContextRefs: [reviseExplain1Id],
+    }),
+    opStep('reviseExplain2', 'revise-explanation', 'lead-advisor-actor'),
+  ]);
+
+  assert.equal(
+    findReviseExplanation(showCoordinationActionsUseCase(engineOpts, { id: coordinationId })),
+    undefined,
+    'revise-explanation must no longer be a legal action once both of its 2 permitted invocations are spent',
+  );
 });
 
 // ── Terminal mutation is refused ────────────────────────────────────────────
