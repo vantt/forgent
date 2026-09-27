@@ -2008,72 +2008,143 @@ Executor/provider/model/tier selection remains an execution-time decision.
     made to pass without a code change beyond this unit's stated scope
     (that would mean I24b's M1 fix was incomplete — escalate, don't
     silently patch around it here).
-- unit: I26 — architecture-panel/fgos-panel consume the driver-discipline fragment; fold fgos-group-thinking into fgos-panel (Phase 5 work items 7, 8)
+- unit: I26 — architecture-panel/fgos-panel consume the driver-discipline fragment (Phase 5 work items 7, 8)
   capability: code:implement
   depends-on: none (I17 fragment and I20 capability-match door already integrated per Phase 5's own entry gate)
   status: not-started
-  design-record: plans/reports/fork-260928-0024-phase5-items-5-6-7-8-decomposition-research-report.md §Items 7, 8
-  decision (Lead, locked, do not reopen): work item 7's "the generic
-    presets driven by `fgos-panel`" wording is ambiguous — `fgos-panel`
-    exists today only as a 67-line pure NL-router that selects a preset and
-    delegates, never driving a dialogue loop itself, and no separate
-    "generic presets" file exists to own driver-discipline consumption
-    instead. Rather than inventing a new shared consumer file, `fgos-panel`
-    itself loads `core/skills/_shared/coordination-driver.md` (the Phase
-    4/I15 fragment, already consumed by `fgos-plan-loop`) and fills its
-    hooks, matching the exact two-unlike-consumer pattern Phase 5's own
-    Exit criterion requires ("architecture-panel and `fgos-panel` consume
-    the driver-discipline fragment unchanged"). `fgos-architecture-panel`
-    also loads it directly (it is a role-doctrine skill in its own right,
-    not routed through `fgos-panel`'s delegation) — confirmed via grep
-    that neither skill currently references the fragment at all.
-  scope: (Item 7) add the fragment-load + hook-fill to both
-    `core/skills/fgos-panel/SKILL.md` and
-    `core/skills/fgos-architecture-panel/SKILL.md`, following the identical
-    pattern `fgos-plan-loop` already uses (read that skill's own reference
-    to the fragment as the template — do not restate the fragment's rules
-    inline, per Phase 4's own "facades restate no rule owned by the
-    driver-discipline fragment" drift-test requirement, already enforced by
-    an existing Phase 7 drift test this unit must not break). (Item 8) most
-    of the literal wording is already satisfied: the pack-membership gate
-    already lives in code behind the public CLI (I23's `fgos coordination
-    pack list/show-protocol/run`), and the stale "always auto-closes / no
-    close step" claim is already gone (confirmed via grep — a side effect
-    of I23's own fix round). The real remaining work: (a) `fgos-panel/
-    SKILL.md`'s own step 5 currently routes through `fgos-group-thinking`
-    as an intermediary rather than calling the CLI door directly — update
-    it to call `fgos coordination pack run` directly, landing AFTER this
-    unit's own item-7 fragment-wiring in the same file to avoid touching it
-    twice across two units; (b) convert `fgos-group-thinking/SKILL.md`
-    (currently 225 lines of full content) into a genuine thin deprecated
-    stub pointing at `fgos-panel`, kept loadable only for the Phase 7
-    compatibility window (do NOT delete it yet — Phase 7 owns closing the
-    compatibility window). Resync `.agents/skills`/`.claude/skills`/
-    `plugins/fgOS/skills` mirrors via `npm run build:skills` for every
-    touched skill file.
+  design-record: plans/reports/fork-260928-0024-phase5-items-5-6-7-8-decomposition-research-report.md §Items 7, 8; independent decomposition review (`review-decompose-i25-i26`) H1/H2/M4/M5/M6/L1 — H1 resolved by a Lead decision REVERSING item 8's literal wording (below), H2 resolved by a concrete reconciliation pattern (below), M4/M5/M6/L1 folded directly into this revision.
+  decision (Lead, locked, do not reopen — item 8's literal "fold into a
+    stub" wording is superseded by direct evidence, not silently dropped):
+    read in full, `core/skills/fgos-group-thinking/SKILL.md` (225 lines) is
+    NOT stale dead weight duplicating `fgos-panel` — it is already exactly
+    the "core-facing selection gate" the plan's own prose describes
+    elsewhere ("the pack-membership gate stays in code behind the public
+    CLI"): `user-invocable: false`, holds the ONLY documented proof of all
+    5 group-thinking-pack bypasses (including bypass #4's current, accurate
+    status post-I24a/I24b), and is the ONLY place documenting the exact
+    request-composition mechanics (`actors[]` shape, `$ref` per-call
+    scoping, resume-by-coordinationId) that BOTH `fgos-panel` (step 5) and
+    `fgos-architecture-panel` (its own dispatch section) correctly point TO
+    rather than duplicate. Item 8's "fold into fgos-panel... deprecated
+    stub" wording was written before I23 built the real `pack
+    list/show-protocol/run` CLI door and before this file reached its
+    current, accurate, single-source-of-truth shape — converting it into a
+    stub now would relocate real, correct documentation into `fgos-panel`,
+    whose own Boundaries section explicitly forbids holding this level of
+    detail ("this is selection and request filling, not... an execution
+    engine"; "never invent protocol semantics... in task prose"). This
+    unit does NOT stub `fgos-group-thinking`. The two literal sub-claims in
+    item 8 that DO need action are already independently confirmed
+    complete by two separate reviews: the pack-membership gate already
+    lives in code behind the public CLI (I23), and the stale "always
+    auto-closes / no close step" claim is already gone (confirmed via grep
+    — a side effect of I23's own fix round, re-confirmed again here). Item
+    8 requires no further code or doc work; this decision note is the
+    record of that closure.
+  decision (Lead, locked, do not reopen — H2, the fragment/architecture-
+    panel reconciliation): read `core/skills/_shared/coordination-driver.md`
+    in full and `fgos-plan-loop/SKILL.md`'s own "Facade Hook Values" table
+    (~L45-58) as the working precedent. Confirmed: a hook value is NOT a
+    thin pass-through placeholder — `fgos-plan-loop`'s own `disposition
+    criteria` hook already carries a full, real, domain-specific policy
+    sentence ("Proof-gap findings... cannot be deferred; must be `accepted`
+    ... or evidence-backed `rejected`"), not a restatement of the fragment's
+    generic 3-state model. This is exactly how `fgos-architecture-panel`
+    must consume the fragment too: its existing six-value, driver-authored
+    disposition vocabulary and its existing "Fresh-Session Resume" section
+    are NOT deleted or reconciled away — they BECOME the fragment's
+    `disposition criteria`/`human-escalation triggers`/`continuity
+    artifact` hook values verbatim (each of the six values still resolves
+    to exactly one of the fragment's generic accepted/rejected/deferred
+    states for driver-discipline purposes; the fragment's Step 6 recheck
+    rule applies to architecture-panel's own advisory result kind the same
+    way it applies to plan-loop's work-product kind — an accepted advisory
+    finding still needs an independent recheck operation before being
+    discharged, which `architecture-advisory-panel-v1.yaml`'s own
+    `phase-dialogue-reopen` node already provides via `revise-synthesis`/
+    `revise-explanation`, whether or not the FlowDefinition also declares
+    separate `rechecks` metadata). No fragment edit is needed and none is
+    authorized by this unit — the "consume unchanged" Exit criterion holds
+    exactly as the plan-loop precedent already proves it can.
+  scope: add the fragment-load + hook-fill to both `core/skills/fgos-panel/
+    SKILL.md` and `core/skills/fgos-architecture-panel/SKILL.md`, following
+    the identical pattern `fgos-plan-loop` already uses (link the fragment,
+    add a "Facade Hook Values" table with all 9 slots filled from each
+    skill's OWN existing content per the reconciliation decision above —
+    never restate the fragment's rules inline, per Phase 4's own "facades
+    restate no rule owned by the driver-discipline fragment" requirement).
+    `fgos-panel`'s own hook table governs ONLY its step-5 generic-preset
+    path (the one case where `fgos-panel` itself observes/dispatches/
+    dispositions across turns) — NOT the delegated `architecture-panel`
+    (step 3) or `code-change-panel` (step 4) routes, which keep their own
+    hook tables entirely; state this scope boundary explicitly in
+    `fgos-panel/SKILL.md` itself so a future reader does not assume one
+    hook table governs all five routes. Per Phase 5's own entry gate
+    ("consume the I17 fragment and the I20 `capability match` door instead
+    of keyword-matched skill descriptions"), `fgos-panel`'s `open inputs`
+    hook must resolve its own "exactly one primary canonical capability"
+    via `fgos capability match --demand` (`core/skills/_shared/
+    capability-matching.md`) — follow `fgos-plan-loop`'s/Phase 6's own
+    cited pattern for invoking this door, not a keyword-matched guess.
+    Add the drift check M4 flagged as missing: extend
+    `test/skills/coordination-phase4-driver-discipline.test.mjs` (whose
+    own L156 comment already anticipates a Phase 5 re-measurement) with
+    assertions that `fgos-panel` and `fgos-architecture-panel` both link
+    `../_shared/coordination-driver.md`, each has a 9-slot hook table, the
+    fragment itself is byte-unchanged (digest-pinned), and its mirrors stay
+    byte-identical (alongside the existing L293 check) — do not invent a
+    general Phase 7 drift-test suite; this is a narrow, in-unit check
+    scoped exactly to this unit's own Exit-criterion claim. Preserve
+    `test/setup/skill-wrappers.test.mjs`'s existing constraint that
+    `fgos-panel` never path-links `fgos-code-panel` (backtick-mention only)
+    — do not violate it while adding the fragment link. Resync
+    `.agents/skills`/`.claude/skills`/`plugins/fgOS/skills` mirrors via
+    `npm run build:skills` for every touched skill file.
   files: core/skills/fgos-panel/SKILL.md (+ mirrors),
     core/skills/fgos-architecture-panel/SKILL.md (+ mirrors),
-    core/skills/fgos-group-thinking/SKILL.md (+ mirrors),
     core/skills/_shared/coordination-driver.md (read-only reference, do not
     modify — Phase 4's own fragment, shared with `fgos-plan-loop`),
-    docs/how-to/use-fgos-group-thinking.md (update for the stub redirect),
-    CHANGELOG.md.
+    core/skills/_shared/capability-matching.md (read-only reference for the
+    capability-match wiring pattern),
+    test/skills/coordination-phase4-driver-discipline.test.mjs, CHANGELOG.md.
+    Do NOT touch `core/skills/fgos-group-thinking/SKILL.md` or its
+    mirrors, `docs/how-to/use-fgos-group-thinking.md`, or any of the
+    "inbound references still describing group-thinking as the live gate"
+    (`docs/architect/agent-coordination/architecture/
+    group-thinking-trigger-surface.md`, `docs/specs/runner.md`,
+    `core/skills/_shared/capability-catalog.md`, the YAML header comment)
+    — under the reversed item-8 decision above, all of these are ACCURATE
+    descriptions of the current, correct architecture, not stale claims;
+    touching any of them would be executing the superseded plan, not this
+    unit's actual scope.
   verification: node --test test/setup/skill-wrappers.test.mjs (mirrors
-    byte-identical); whatever Phase 7 drift test already checks "facades
-    restate no rule owned by the driver-discipline fragment" (grep for it —
-    cited in Phase 7's own work item 5 as already planned; if it does not
-    exist yet, this unit must not be the one to invent it, note the gap
-    instead of silently building Phase 7 scope early); a live CLI probe
-    that `fgos-panel`'s step 5 now calls `fgos coordination pack run`
-    directly (grep the skill file, don't just trust prose); env -u
-    CLAUDE_CODE_SESSION_ID npm test.
+    byte-identical, `fgos-panel`/`fgos-code-panel` path-link constraint
+    still holds); node --test test/skills/
+    coordination-phase4-driver-discipline.test.mjs (extended per scope
+    above); a live CLI probe that `fgos-panel`'s `open inputs` hook
+    genuinely resolves via `fgos capability match --demand`, not a
+    hardcoded string (grep the skill file for the literal command, don't
+    just trust prose); env -u CLAUDE_CODE_SESSION_ID npm test.
   stop: `fgos-panel` or `fgos-architecture-panel` restate driver-discipline
     rules inline instead of loading the fragment (the two-unlike-consumer
-    proof requires the fragment stay unchanged and un-duplicated); the
-    `fgos-group-thinking` stub is deleted outright instead of kept loadable
-    (breaks the Phase 7 compatibility window); the pack-membership gate's
-    actual refusal behavior is touched by anything in this unit (it is
-    settled, I23/I24a/I24b territory, not this unit's job).
+    proof requires the fragment stay unchanged and un-duplicated);
+    `fgos-panel`'s hook table is written as if it governs the delegated
+    `architecture-panel`/`code-change-panel` routes too; `fgos-group-thinking/
+    SKILL.md` or any of the listed "do not touch" doc references are
+    modified by this unit (that would silently re-execute the superseded
+    item-8 wording); the pack-membership gate's actual refusal behavior is
+    touched by anything in this unit (it is settled, I23/I24a/I24b
+    territory, not this unit's job).
+
+Note (decomposition review L4, not yet actioned): three Phase 5 Exit
+criteria remain unowned by any unit — the panel-depth experiment (deep vs.
+standard protocol comparison), "architecture-panel skill within budget",
+and "≥60% Lead instruction-token reduction without quality regression". I22
+explicitly deferred all three to whoever measures the Exit gate later
+(plan.md's own I22 status line). Phase 5 cannot be marked fully closed
+after I25/I26 land without either a dedicated measurement unit or an
+explicit Lead waiver — flagged here so it is not silently dropped once
+I25/I26 close.
 
 Parallelism is limited deliberately:
 
