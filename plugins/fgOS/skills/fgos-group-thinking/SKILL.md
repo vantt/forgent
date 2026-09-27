@@ -81,6 +81,14 @@ this output — never from this skill's own text, which deliberately does
 not enumerate them (Phase 10's own constraint: "do not hide protocol
 semantics in skill prose").
 
+`show-protocol` accepts any registered `CoordinationProtocol`
+FlowDefinition id, not only a member of the group-thinking pack listed in
+step 1 — unlike `list`, it is a thin, unscoped wrapper over
+`loadCoordinationProtocol` (`src/runner/definitions/protocol-loader.mjs`).
+Reading a non-pack-member protocol's shape this way is fine; running one
+through step 4 below still refuses (pack membership is enforced at `run`
+time, not at `show-protocol` time).
+
 ## 3. Compose a request
 
 Build a request object/file in the exact shape `fgos coordination run

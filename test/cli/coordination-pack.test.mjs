@@ -17,6 +17,8 @@ import {
   run,
   tmpCwdFromTemplate,
 } from './helpers/fgos-cli-harness.mjs';
+import { replaySession } from '../../src/runner/coordination/replay.mjs';
+import { protocolOperationStamp } from '../../src/runner/coordination/legality-facts.mjs';
 
 const RFC_REVIEW_LITE_ID = 'core.coordination-protocol.group-thinking-rfc-review-lite';
 const REAL_PACK_MEMBER_IDS = [
@@ -31,6 +33,24 @@ function writeRequest(cwd, name, obj) {
   const requestPath = path.join(cwd, name);
   fs.writeFileSync(requestPath, JSON.stringify(obj, null, 2));
   return requestPath;
+}
+
+// MEDIUM-1's resume test: `replaySession`'s own `assignments[].operationId`
+// is undefined for a real declared-protocol dispatch (only stamped through a
+// different, driver-authorized branch dispatchDeclaredOperation does not take
+// for an auto-legal operation like convene/propose) -- the actually-durable,
+// on-disk proof of "which operation this assignment served" is the reserved
+// `protocol-operation:<id>@<version>#<operationId>` constraint
+// `dispatchDeclaredOperation` stamps into the real Assignment's own
+// contract (session-engine.mjs's `buildSessionContract`, mirrored read-side
+// by `pureAssignmentServesOperation`, legality-facts.mjs). Reads it straight
+// off disk, the same file the real engine itself trusts.
+function assignmentServedOperation(cwd, assignmentId, operationId) {
+  const assignmentPath = path.join(cwd, '.fgos', 'assignments', assignmentId, 'assignment.json');
+  const assignment = JSON.parse(fs.readFileSync(assignmentPath, 'utf8'));
+  const constraints = assignment.provenance?.inline?.contract?.constraints ?? [];
+  const stamp = protocolOperationStamp({ metadata: { id: RFC_REVIEW_LITE_ID, version: '1.0.0' } }, operationId);
+  return constraints.includes(stamp);
 }
 
 function conveneOnlyRequest(coordinationId) {
@@ -63,6 +83,10 @@ function conveneOnlyRequest(coordinationId) {
 // through `runGroupThinkingRequest`'s cliExecutor channel into the real
 // per-actor policy resolution (composers.mjs's `withComputedActorBindings`),
 // not just "some executor happened to run".
+// The resolved `--model`/`--tier` model string is appended as this script's
+// SECOND argv (args: [..., '{prompt}', '{model}']) -- MEDIUM-2's own --tier
+// forwarding test reads it back from `<marker>-model.txt` the same way the
+// pre-existing marker files below prove --executor forwarding.
 function writeFakeExecutorConfig(cwd) {
   const defaultScript = path.join(cwd, 'fake-executor-default.mjs');
   fs.writeFileSync(
@@ -72,6 +96,7 @@ function writeFakeExecutorConfig(cwd) {
     import path from 'node:path';
     const cwd = process.cwd();
     fs.writeFileSync(path.join(cwd, 'default-executor-ran.txt'), 'default\\n');
+    fs.writeFileSync(path.join(cwd, 'default-executor-model.txt'), process.argv[3] ?? '');
     const assignmentsRoot = path.join(cwd, '.fgos', 'assignments');
     if (fs.existsSync(assignmentsRoot)) {
       for (const asgn of fs.readdirSync(assignmentsRoot)) {
@@ -94,6 +119,7 @@ function writeFakeExecutorConfig(cwd) {
     import path from 'node:path';
     const cwd = process.cwd();
     fs.writeFileSync(path.join(cwd, 'alt-executor-ran.txt'), 'alt\\n');
+    fs.writeFileSync(path.join(cwd, 'alt-executor-model.txt'), process.argv[3] ?? '');
     const assignmentsRoot = path.join(cwd, '.fgos', 'assignments');
     if (fs.existsSync(assignmentsRoot)) {
       for (const asgn of fs.readdirSync(assignmentsRoot)) {
@@ -114,11 +140,16 @@ function writeFakeExecutorConfig(cwd) {
     ...existing,
     runner: {
       ...(existing.runner ?? {}),
-      executor: { allowCrossProvider: true, command: process.execPath, args: [defaultScript, '{prompt}'] },
+      executor: { allowCrossProvider: true, command: process.execPath, args: [defaultScript, '{prompt}', '{model}'] },
       executors: {
-        'alt-executor': { kind: 'agent', allowCrossProvider: true, command: process.execPath, args: [altScript, '{prompt}'] },
+        'alt-executor': { kind: 'agent', allowCrossProvider: true, command: process.execPath, args: [altScript, '{prompt}', '{model}'] },
       },
-      models: { standard: 'test-model', nano: 'test-model' },
+      // "flagship" is deliberately absent from every OTHER test's implicit
+      // expectation: convene/propose (coordinator-actor/proposer-actor) never
+      // declare policy.minTier in group-thinking-rfc-review-lite.yaml, so
+      // every test that omits --tier keeps resolving "standard" -- only the
+      // --tier forwarding test below ever asks for "flagship".
+      models: { standard: 'test-model', nano: 'test-model', flagship: 'flagship-test-model' },
       timeoutMs: 20000,
     },
   };
@@ -171,6 +202,25 @@ test('fgos coordination pack show-protocol: an id with no registered FlowDefinit
   const result = run(cwd, ['coordination', 'pack', 'show-protocol', 'core.coordination-protocol.does-not-exist']);
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /no CoordinationProtocol definition found/);
+});
+
+// LOW-1: `show-protocol` is a thin, unscoped wrapper over
+// `loadCoordinationProtocol` (unlike `list`, which is genuinely narrowed to
+// pack members via `loadProtocolPack`) -- this is the documented, intended
+// shape (core/skills/fgos-group-thinking/SKILL.md's own step 2 note), not an
+// accidental gap. "declared-consult" is a real, registered
+// CoordinationProtocol FlowDefinition (core/coordination-protocols/
+// declared-consult.yaml) that is deliberately NOT a group-thinking pack
+// member (see the "not a pack member" `pack run` refusal test below) --
+// proving `show-protocol` still succeeds on it confirms the wider scope is
+// stable, not a bug waiting to be "fixed" into matching `list`'s narrower one.
+test('fgos coordination pack show-protocol: succeeds on a real, registered protocol that is NOT a group-thinking pack member', () => {
+  const cwd = tmpCwdFromTemplate();
+  const result = run(cwd, ['coordination', 'pack', 'show-protocol', 'core.coordination-protocol.declared-consult']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.metadata.id, 'core.coordination-protocol.declared-consult');
+  assert.ok(!REAL_PACK_MEMBER_IDS.includes('core.coordination-protocol.declared-consult'), 'fixture assumption: this id must stay a non-pack-member for this test to prove anything');
 });
 
 // ---------------------------------------------------------------------
@@ -269,6 +319,44 @@ test('fgos coordination pack run: a pack-registered request dispatches end-to-en
   assert.equal(fs.existsSync(path.join(cwd, 'default-executor-ran.txt')), false);
 });
 
+// MEDIUM-2: bin/fgos.mjs wires `cliTier: flags.tier` into
+// `runGroupThinkingRequest` exactly like `cliExecutor: flags.executor` above,
+// but no test exercised it. Proven the SAME way: the real per-actor policy
+// resolution (`resolveAssignmentDispatchPolicy`, assignment-policy.mjs) picks
+// the model for the request's effective tier out of `runner.models[tier]`
+// and threads it into the executor's own argv via `{model}` substitution
+// (transport.mjs's `resolveExecutorCommand`) -- coordinator-actor/
+// proposer-actor declare no `policy.minTier` in group-thinking-rfc-review-
+// lite.yaml, so every OTHER test in this file (never passing --tier) leaves
+// the effective tier at the runtime default "standard" -> "test-model";
+// --tier "flagship" here raises it (flagship > standard) to
+// "flagship-test-model" -- a value no other test's config path produces --
+// proving the flag reached the real dispatch, not just parsed and dropped.
+test('fgos coordination pack run: --tier forwards to the real per-actor policy resolution, raising the resolved model', () => {
+  const cwd = tmpCwdFromTemplate();
+  writeFakeExecutorConfig(cwd);
+  const reqPath = writeRequest(cwd, 'request.json', conveneOnlyRequest('coord_pack_tier'));
+
+  const result = run(cwd, [
+    'coordination', 'pack', 'run',
+    '--protocol', RFC_REVIEW_LITE_ID,
+    '--file', reqPath,
+    '--tier', 'flagship',
+  ]);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.coordinationId, 'coord_pack_tier');
+  assert.equal(data.steps.length, 1);
+  assert.equal(data.steps[0].status, 'done');
+
+  // The default (never-named-executor) script ran -- --tier alone must not
+  // also redirect the executor -- and it received "flagship-test-model" as
+  // its own model argv, not "test-model" (the standard-tier default every
+  // other test in this file implicitly proves via the SAME script/config).
+  assert.equal(fs.existsSync(path.join(cwd, 'default-executor-ran.txt')), true);
+  assert.equal(fs.readFileSync(path.join(cwd, 'default-executor-model.txt'), 'utf8'), 'flagship-test-model');
+});
+
 test('fgos coordination pack run: resuming the SAME coordinationId through the pack gate reaches the session "pack run" itself opened', () => {
   const cwd = tmpCwdFromTemplate();
   writeFakeExecutorConfig(cwd);
@@ -304,10 +392,31 @@ test('fgos coordination pack run: resuming the SAME coordinationId through the p
   assert.equal(second.status, 0, second.stderr);
   const data = envelopeData(second.stdout);
   assert.equal(data.coordinationId, coordinationId);
-  // Resumed the SAME session: two real operations now settled against it
-  // (convene from call 1, propose from call 2), never a second session.
+  // Call 2's OWN response only ever reports its own single step -- proves
+  // nothing about call 1 by itself (a brand-new session opened for call 2
+  // would report this identically). The assertions below replay the
+  // session's real on-disk ledger instead, the same technique
+  // test/verbs/coordination-group-thinking-rfc-review-lite-pack-conformance.
+  // test.mjs uses to prove resume across independent process-level calls.
   assert.equal(data.steps.length, 1);
   assert.equal(data.steps[0].status, 'done');
+
+  // MEDIUM-1: reconstruct the WHOLE 2-call chain from replaySession's own
+  // projection alone -- proving BOTH operations (call 1's convene, call 2's
+  // propose) really settled against ONE session, not two disjoint ones a
+  // resume bug could silently produce (e.g. call 2 opening a second, brand-
+  // new session under the same coordinationId).
+  const replayed = replaySession(coordinationId, { cwd, repoRoot: cwd });
+  assert.equal(replayed.assignments.length, 2, 'both call 1\'s convene and call 2\'s propose assignments must be replayable from the SAME session, not just call 2\'s own response');
+  assert.deepEqual(
+    new Set(replayed.assignments.map((a) => a.actorId)),
+    new Set(['coordinator-actor', 'proposer-actor']),
+    'call 1\'s coordinator-actor dispatch and call 2\'s proposer-actor dispatch must both be visible in one replay',
+  );
+  const conveneAssignment = replayed.assignments.find((a) => a.actorId === 'coordinator-actor');
+  const proposeAssignment = replayed.assignments.find((a) => a.actorId === 'proposer-actor');
+  assert.ok(assignmentServedOperation(cwd, conveneAssignment.assignmentId, 'convene'), 'call 1\'s assignment must be stamped as having served "convene", not merely exist');
+  assert.ok(assignmentServedOperation(cwd, proposeAssignment.assignmentId, 'propose'), 'call 2\'s assignment must be stamped as having served "propose", not merely exist');
 });
 
 test('fgos coordination pack run: resuming an existing coordinationId under a DIFFERENT protocolId than it was really opened with is refused', () => {
