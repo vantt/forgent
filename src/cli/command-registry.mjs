@@ -714,6 +714,27 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'plan-lint',
+    invoke: 'fgos plan-lint <path>',
+    description: 'Read-only static check of a plan.md\'s own `- unit: ... / capability: <name>` and `## Product Gates` table annotations against the planning-capability-awareness doctrine (src/report/capability-plan-lint.mjs): a hedged parenthetical outside "unresolved (...)", a duplicate `capability:` line, a plan-time pin of executor/provider/model/tier/prefer/invocation/actors, an invalid or unregistered capability shape. `registered` is always `Object.keys(runner.capabilities)` from this repo\'s own live config. Exit 0 clean, 1 when a hard finding is present, 2 on a usage error (missing/nonexistent path). Default output is human-readable (each unit alongside its capability\'s catalog description); `--json` returns the raw findings/units. Never calls `decide`, never writes state.',
+    parameters: {
+      type: 'object',
+      properties: {
+        path: { type: 'string', description: 'Path to the plan.md file to lint.' },
+        cell: { type: 'string', description: 'Scope the result to only the unit block or Product Gates row matching this cell/unit id; no match yields a single capability.undeclared (severity warn) finding.' },
+        json: { type: 'boolean', description: 'Return the raw {path, ok, units, findings} envelope instead of the default human-readable report.' },
+      },
+      positional: ['path'],
+      required: ['path'],
+    },
+    examples: ['fgos plan-lint plans/my-track/plan.md', 'fgos plan-lint plans/my-track/plan.md --cell I18 --json'],
+    touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
     name: 'merge',
     invoke: 'fgos merge',
     description: '"list" (read-only) returns which awaiting-approval items are ready to merge now (every dep already done, no footprint conflict) ordered by rankImpact, which are still waiting on an unmerged dep, and which are footprint-conflicted pairs (same shape as fgos conflicts). "next" merges the single top-ranked ready item by recursing into the same approve logic (never a parallel merge path) -- if that item trips the Iron Law gate it reports which item and why and merges nothing, it never auto-acknowledges or falls through to the next-ranked item.',

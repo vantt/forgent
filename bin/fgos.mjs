@@ -48,6 +48,7 @@ import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
 import { checkDispatchAttestation } from '../src/runner/attestation-guard.mjs';
 import { classifyDispatchConfidence } from '../src/report/dispatch-confidence.mjs';
 import { formatDeprecation } from '../src/cli/deprecation.mjs';
+import { lintPlanCapabilityAnnotations } from '../src/report/capability-plan-lint.mjs';
 
 // tsk-1qi: this running copy's own package root -- the source
 // `materializeSkillsIntoProject` copies `.agents/skills/*` FROM, when
@@ -2488,6 +2489,35 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       return computedSchedule(dir, candidateIds);
     }
 
+    // Read-only door onto lintPlanCapabilityAnnotations (src/report/
+    // capability-plan-lint.mjs): a plan author's own static check, never
+    // wired into `doctor` or any automatic gate. `registered` is always
+    // `Object.keys(runner.capabilities)` from THIS repo's own live config
+    // (ensureRunnerConfigForDir) -- the module itself never reads config or
+    // infers from prose, per its own pure-function contract.
+    case 'plan-lint': {
+      const rawPath = optionalField(positional[0], 'plan-lint requires a <path> to a plan.md file, e.g. `fgos plan-lint plans/<track>/plan.md`.');
+      if (rawPath === undefined) {
+        throw new StoreError('precondition', 'plan-lint requires a <path> to a plan.md file, e.g. `fgos plan-lint plans/<track>/plan.md`.');
+      }
+      const absPath = path.resolve(process.cwd(), rawPath);
+      if (!fs.existsSync(absPath) || !fs.statSync(absPath).isFile()) {
+        throw new StoreError('precondition', `plan-lint: "${rawPath}" is not an existing file.`);
+      }
+      const cellId = optionalField(flags.cell, 'plan-lint --cell requires a non-empty value.');
+      const text = fs.readFileSync(absPath, 'utf8');
+      const repoRoot = path.dirname(dir);
+      const cfg = ensureRunnerConfigForDir(repoRoot);
+      const catalog = cfg.capabilities ?? {};
+      const registered = Object.keys(catalog);
+      const result = lintPlanCapabilityAnnotations(text, registered, cellId !== undefined ? { cellId } : {});
+      const units = result.units.map((unit) => ({
+        ...unit,
+        description: unit.capability != null ? (catalog[unit.capability]?.description ?? null) : null,
+      }));
+      return { path: absPath, ok: result.ok, units, findings: result.findings };
+    }
+
     // Request-class per D1 (same contract as `ready`/`triage`/`conflicts`): a
     // pure read. Merge-readiness ranking (docs/history/merge-standardization/
     // CONTEXT.md/plan.md): "list" surfaces which `proposed` items are
@@ -4789,6 +4819,32 @@ function handleVerbHelp(verb) {
 // byte-identical to the wrapEnvelope + JSON path. `--pretty` itself IS
 // CTR001's documented exception here: an explicit human-readable rendering
 // opt-out via an explicit flag, not a verb's default payload.
+// Default (non-`--json`) rendering for `fgos plan-lint`: prints each unit
+// alongside the catalog's own `description` text, so a reader can see a
+// registered capability's real meaning next to a unit whose own title text
+// reads nothing like it (e.g. a unit titled "extract shared driver
+// discipline" declaring `code:implement` -- the description makes clear
+// that is the canonical coding-implementation capability, not a mismatch).
+function renderPlanLintReport(data) {
+  const lines = [];
+  lines.push(`fgos plan-lint: ${data.path}`);
+  lines.push(data.ok ? 'OK -- no hard findings' : 'FAILED -- hard findings present');
+  lines.push('');
+  for (const unit of data.units) {
+    const capText = unit.capability ?? '(none)';
+    const descText = unit.description ? ` -- ${unit.description}` : '';
+    lines.push(`[${unit.source}] ${unit.unit} :: ${capText}${descText}`);
+  }
+  if (data.findings.length > 0) {
+    lines.push('');
+    lines.push('Findings:');
+    for (const f of data.findings) {
+      lines.push(`  ${f.severity.toUpperCase()} ${f.code} (line ${f.line ?? '-'}): ${f.message}`);
+    }
+  }
+  return `${lines.join('\n')}\n`;
+}
+
 function renderPretty(verb, data) {
   const lines = [];
   if (verb === 'doctor') {
@@ -5132,10 +5188,16 @@ async function main() {
     const data = await runVerb(verb, flags, positional, dir, rest);
     if (flags.pretty && (verb === 'setup' || verb === 'doctor')) {
       process.stdout.write(renderPretty(verb, data));
+    } else if (verb === 'plan-lint' && !flags.json) {
+      process.stdout.write(renderPlanLintReport(data));
     } else {
       process.stdout.write(`${JSON.stringify(wrapEnvelope(data), null, 2)}\n`);
     }
-    process.exitCode = 0;
+    // `plan-lint` is the one verb whose exit code is data-dependent (0 clean,
+    // 1 a hard finding present) rather than always-0-unless-thrown -- its own
+    // contract, distinct from the StoreError/EXIT_CODES category map every
+    // other verb uses for a THROWN refusal.
+    process.exitCode = verb === 'plan-lint' ? (data.ok ? 0 : 1) : 0;
   } catch (err) {
     // tsk-5z0: record before reporting, and only say the record exists when
     // one actually landed — `recordInvocationFault` returns null when the

@@ -42,7 +42,7 @@ export const MANIFEST = [
 
   // -- src/report/** (plan candidate area 2) --
   { id: 'report-authoritative-match', status: 'shadow', pattern: 'src/report/authoritative-match.mjs', directTests: ['test/report/authoritative-match.test.mjs'], boundaryTests: [] },
-  { id: 'report-capability-plan-lint', status: 'shadow', pattern: 'src/report/capability-plan-lint.mjs', directTests: ['test/report/capability-plan-lint.test.mjs'], boundaryTests: [] },
+  { id: 'report-capability-plan-lint', status: 'live', pattern: 'src/report/capability-plan-lint.mjs', directTests: ['test/report/capability-plan-lint.test.mjs'], boundaryTests: ['test/cli/plan-lint.test.mjs'] },
   { id: 'report-context-render', status: 'shadow', pattern: 'src/report/context-render.mjs', directTests: ['test/report/context-render.test.mjs'], boundaryTests: [] },
   { id: 'report-decision-index', status: 'shadow', pattern: 'src/report/decision-index.mjs', directTests: ['test/report/decision-index.test.mjs'], boundaryTests: [] },
   { id: 'report-enduser-index', status: 'shadow', pattern: 'src/report/enduser-index.mjs', directTests: ['test/report/enduser-index.test.mjs'], boundaryTests: [] },
