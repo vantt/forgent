@@ -239,3 +239,53 @@ The single full-suite failure is `R5 concurrency … maxConcurrency: 2 …` in `
 ### Phase 5 gate
 
 **Not yet.** Fix R5 (and R6 in the same commit), then a quick round-4 check: the R5 probe proves no dispatch occurs, and the full suite is green. Everything else is done, and no further semantic re-review is needed.
+
+---
+
+## Re-review round 4 — `38e552bb9`
+
+**Verdict: APPROVE.** R5 and R6 are closed. No open finding is HIGH or MEDIUM.
+
+### Identity
+
+| Field | Value |
+|---|---|
+| Candidate HEAD | `38e552bb90c693a51783ae19a7cbec6fe32ad064` (on top of `8cc7a59ab`) |
+| Base | `2085d88fe` = `main`; unchanged |
+| Scope `8cc7a59ab..HEAD` | `plan.md` (+1 line), `coordination-phase4-driver-discipline.test.mjs` (+88/-4). No `src/`/`bin/` changes |
+| Dirty before/after | clean / clean apart from this report; scratch probe dirs removed |
+
+### Items
+
+| # | Status | Evidence |
+|---|---|---|
+| R5 | ✅ | Substitution order is fixed: `../<track>-<cell-id>` → `dummyWt` comes first. Before any command runs, the probe writes `<tmp>/.fgos/config.json` with an executor that cannot run. `start` must fail with a pre-dispatch block. After the loop the test asserts: no `assignments/*/runs/*` entries, and no `run.json`/`agent-result.json` anywhere under `<tmp>`. |
+| R6 | ✅ | `plan.md:796` restores "no weaker evidence or extra dispatch wave". |
+
+### Independent layer proof (manual CLI replay, not a test mutation)
+
+| Layer isolated | Result |
+|---|---|
+| A: bogus runner config, full `PATH` | exit 4 in 0 s: `dispatch decide blocked operation … cross-provider egress target`; no `runs/` ✅ **sufficient alone** |
+| B: `PATH=$(dirname node)` only, no config | **spawned a real agent (80 s, `runs/01/agent-result.json`)**. On this machine `claude` and `codex` live in node's global bin dir ❌ |
+
+The test combines A and B, so it is safe. B alone gives no protection on npm/nvm-global installs.
+
+### Residual (non-blocking)
+
+| # | Sev | Finding | Suggested follow-up |
+|---|---|---|---|
+| R7 | LOW | The `PATH`-isolation comment/claim is misleading: layer A is the real guard. A future edit that drops the config write would bring back a live-agent spawn in `npm test`, and the `start` assertion would only notice after the fact. | Keep A and label it the load-bearing guard in a comment, or add a test-only env knob that refuses dispatch outright. Can ride with a Phase 5 commit. |
+
+### Commands
+
+| Command | Exit | Result |
+|---|---|---|
+| `npm run build:skills` | 0 | no working-tree diff |
+| `git diff --check 2085d88fe..HEAD` | 0 | clean |
+| focused: 8 suites + `test/setup/skill-wrappers.test.mjs` | 0 | 287 / 287 pass, 7 s, no probe dirs left in `/tmp` |
+| `env -u CLAUDE_CODE_SESSION_ID npm test` | 0 | 7766 tests, 7693 pass, 0 fail, 8 skipped, 65 todo, 27 suites |
+
+### Phase 5 gate
+
+**Phase 5 may open once this branch is merged to `main`** and the plan status records the integration SHA. The Phase 4 Exit criteria, as amended by the owner's ruling (option C), are all satisfied.
