@@ -47,7 +47,7 @@ Capability tags (e.g. `code:implement`, `code:review`, `code:test`) signal decom
 | Hook Slot | Plan-Loop Value |
 |---|---|
 | `unit of iteration` | One cell of the track (`<track>--<cell-id>`), corresponding to the next unmerged phase in `plan.md`. |
-| `open inputs` | Extracted from `plans/<track>/phase-NN-<name>.md` (objective, verification commands, actor requirements). |
+| `open inputs` | Extracted from plans/<track>/phase-NN-<name>.md: objective, verification commands, result kind (work-product for a produce cell), the phase's primary capability from the plan.md Product Gates table, and any actor binding the Lead supplies. |
 | `evidence verification` | Coding-cell policy: driver independently verifies git commit in worktree and executes the phase's focused tests. |
 | `disposition criteria` | Proof-gap findings (judging verification insufficient) cannot be deferred; must be `accepted` (escalating proof tier to full) or evidence-backed `rejected`. |
 | `adaptation bounds` | Maximum 3 fix rounds per cell. Past the 3-round cap, remaining non-proof-gap findings are `deferred` and named in the trace; proof-gap findings force `accepted -> Proof: escalated-to-full` (full proof must pass before close, no human escalation). |
@@ -86,6 +86,7 @@ Session IDs use safe characters: letters, digits, hyphen, underscore (e.g. `cell
      --cwd "../<track>-<cell-id>" \
      --objective "<cell objective from phase file>"
    ```
+   Until binding resolves from config (Phase 5), pass `--actors '<json>'` on `start` when the track's Execution Inputs roster requires provider diversity; omitting it binds every node to the default executor plus placementPolicy read-only redirects.
 3. **Dispatch Evaluation Pass:**
    Query `fgos coordination status <track>--<cell-id>`.
    `produce-candidate` has already executed. The next projected legal actions are the parallel primary evaluations:

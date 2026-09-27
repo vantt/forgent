@@ -94,7 +94,7 @@ Every consuming facade must explicitly define the following hook values:
 | Hook Slot | Definition | Responsibility |
 |---|---|---|
 | `unit of iteration` | The discrete quantum of work executed in one cycle. | Facade defines what opens, runs, and completes as one coordinated unit. |
-| `open inputs` | The source specifications and parameters used to initialize the session. | Facade maps task definitions, objectives, and actor configurations into session start parameters. |
+| `open inputs` | The source specifications and parameters used to initialize the session: (a) the iteration's declared result kind, work-product or advisory; (b) exactly one primary canonical capability; (c) any binding inputs the control layer requires, when the facade has them. | Facade supplies (a)–(c). The discipline reads (a) to select evidence and close rules, treats (b) and (c) as pass-through data, never derives or chooses them itself, and never names an executor, model, tier, or persona. |
 | `evidence verification` | The domain-specific verification rules applied to outputs. | Domain policy defines how artifacts and execution evidence are confirmed before acceptance. |
 | `disposition criteria` | Rules governing finding acceptance, rejection, and deferral. | Facade specifies which findings can be deferred versus which strictly require remediation. |
 | `adaptation bounds` | Finite limits on revision rounds, rechecks, and retries. | Facade caps maximum remediation attempts before escalation or abort. |
