@@ -61,6 +61,7 @@ import {
   authorizeDeclaredOperation,
   authorizeDeclaredOperationLocked,
   authorizeSpecialistSlot,
+  authorizeSpecialistSlotLocked,
   linkSessionContribution,
   linkSessionContributionLocked,
   evaluateSessionQuorum,
@@ -508,28 +509,23 @@ export async function executeValidatedCoordinationStep({ ctx, request, step, man
     return { as: step.as, type: 'fan-out', status: 'dispatched', branches: branchSummaries };
   }
   if (step.type === 'specialist-authorize') {
-    // I24a (Phase 5 item 4): unlocked path only -- `authorizeSpecialistSlot`
-    // has no `Locked` twin yet (session-engine.mjs), and its own
-    // `recordSpecialistAuthorization` door acquires the events lock itself
-    // (`withEventsLock`, store.mjs). Calling it while the typed-action path
-    // above already holds that lock would self-deadlock, not merely fail
-    // loudly -- refuse explicitly instead of ever reaching that call.
-    if (locked) {
-      throw new CoordinationError(
-        'validation',
-        `steps[${step.as}] (type "specialist-authorize"): no Locked engine twin exists for authorizeSpecialistSlot yet -- ` +
-          `this step type is wired for the unlocked "coordination run --file" path only; the driver-authenticated ` +
-          `typed-action door needs authorizeSpecialistSlotLocked, which a later unit adds`,
-      );
-    }
+    // I24b (Phase 5 item 4 pt.2): the locked branch now reaches
+    // authorizeSpecialistSlotLocked (session-engine.mjs), which delegates to
+    // recordSpecialistAuthorizationLocked (store.mjs) -- neither acquires
+    // the events lock itself, so this is safe to call while the typed-action
+    // path above already holds it. The unlocked branch is unchanged from
+    // I24a: it still calls the SAME authorizeSpecialistSlot door.
     const triggerEvidenceRefs = resolveRefArray(step.triggerEvidenceRefs, labels, `steps[${step.as}].triggerEvidenceRefs`);
     const allowedContextRefs = resolveRefArray(step.allowedContextRefs, labels, `steps[${step.as}].allowedContextRefs`);
-    const authorization = authorizeSpecialistSlot(manifest.coordinationId, {
+    const params = {
       slotId: step.slotId, specialistActorId: step.specialistActorId, role: step.role, capabilities: step.capabilities,
       authorizedBy: driverIdentity, reason: step.reason, triggerEvidenceRefs, allowedContextRefs,
       maxAssignments: step.maxAssignments, expiresAfterRound: step.expiresAfterRound,
       specialistAuthorizationId: step.specialistAuthorizationId,
-    }, engineOpts);
+    };
+    const authorization = locked
+      ? authorizeSpecialistSlotLocked(manifest.coordinationId, params, paths, engineOpts)
+      : authorizeSpecialistSlot(manifest.coordinationId, params, engineOpts);
     return {
       as: step.as, type: 'specialist-authorize', door: 'authorizeSpecialistSlot',
       slotId: authorization.slotId, specialistActorId: authorization.specialistActorId, role: authorization.role,
@@ -597,6 +593,11 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
             contributionId: last.contributionId, contributionType: last.contributionType, assignmentId: last.assignmentId,
             roundKey: last.roundKey, anchors: last.anchors, respondsTo: last.respondsTo, appended: last.appended,
           } : {}),
+          ...(last.type === 'specialist-authorize' ? {
+            slotId: last.slotId, specialistActorId: last.specialistActorId, role: last.role, capabilities: last.capabilities,
+            specialistAuthorizationId: last.specialistAuthorizationId, maxAssignments: last.maxAssignments,
+            expiresAfterRound: last.expiresAfterRound, appended: last.appended,
+          } : {}),
           status: actionPrecondition.kind === 'dispatch-operation' || actionPrecondition.kind === 'authorize-and-dispatch' || actionPrecondition.kind === 'fan-out'
             ? 'dispatched'
             : actionPrecondition.kind === 'link-contribution' ? 'linked' : 'recorded',
@@ -607,6 +608,7 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
           ...(last.disposition ? { disposition: last.disposition } : {}),
           ...(last.contributionId ? { contributionId: last.contributionId } : {}),
           ...(last.branches ? { branches: last.branches } : {}),
+          ...(last.specialistAuthorizationId ? { specialistAuthorizationId: last.specialistAuthorizationId } : {}),
           ...(actionPrecondition.kind === 'authorize-and-dispatch' ? { authorizationId: composed.steps[0].authorizationId } : {}),
         };
         return actionResult;

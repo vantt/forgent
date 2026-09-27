@@ -460,6 +460,31 @@ export function projectCoordinationActions({
         optionalInputs: ['dissentingActorIds', 'aggregationId'],
       });
     }
+
+    // 7. specialist: One entry per declared topology.specialistSlots[] slot
+    // (Phase 1's own Cases list: "specialist slot available/unauthorized/
+    // exhausted"), built on evaluateSpecialistSlots's own mechanical
+    // authorizable/authorized/exhausted derivation (legality-facts.mjs) --
+    // never a second, parallel computation here. Always present for a
+    // declared slot regardless of state, so an exhausted or already-bound
+    // slot stays visible/distinguishable, not silently dropped from the view;
+    // the engine's own doors still enforce legality independently at
+    // execution time.
+    for (const slot of facts.specialistSlots) {
+      rawActions.push({
+        kind: 'specialist',
+        required: false,
+        target: {
+          slotId: slot.slotId,
+          role: slot.role,
+        },
+        authorizable: slot.authorizable,
+        authorized: slot.bound,
+        exhausted: slot.exhausted,
+        requiredInputs: ['specialistActorId', 'reason', 'maxAssignments', 'expiresAfterRound'],
+        optionalInputs: ['capabilities', 'triggerEvidenceRefs', 'allowedContextRefs'],
+      });
+    }
   }
 
   // Compute actionSetDigest before actionKeys are attached

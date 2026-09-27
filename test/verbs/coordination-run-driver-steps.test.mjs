@@ -1205,14 +1205,16 @@ test('show renders authorizations issued (consumed), dispositions recorded, and 
   const manifest = readManifest(data.coordinationId, opts);
   assert.ok(manifest.assignmentRefs.includes(disposition.targetRef), 'targetRef should have resolved to a real session Assignment id');
 
-  // Declared driver-authorized operations still awaiting authorization:
-  // revise-candidate and red-team-recheck (reviewer-recheck was just
-  // authorized above, so it must NOT appear here).
+  // Declared driver-authorized operations: none of the three declares
+  // `activation.maxInvocations`, so all three are genuinely uncapped
+  // (kernel-accurate: `authorizeOperationLocked` enforces no cap at all when
+  // `opts.maxInvocationsForBinding` is absent) -- `reviewer-recheck` stays
+  // pending even though it was just authorized above, since re-authorizing
+  // it again remains legal.
   assert.deepEqual(
     shown.pendingDriverAuthorizations.map((b) => b.operationId).sort(),
-    ['red-team-recheck', 'revise-candidate'],
+    ['red-team-recheck', 'reviewer-recheck', 'revise-candidate'],
   );
-  assert.ok(!shown.pendingDriverAuthorizations.some((b) => b.operationId === 'reviewer-recheck'));
 });
 
 test('show marks a disposition recorded after a terminal event as postTerminal, without hiding it (a hand-crafted/racing write recordDriverDisposition itself would refuse today)', async () => {

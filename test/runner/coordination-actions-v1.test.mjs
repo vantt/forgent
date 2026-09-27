@@ -98,6 +98,67 @@ test('fresh session projects required operation pending and driver authorization
   assert.equal(authAction.target.operationId, 'op-optional');
 });
 
+// I24b work item 6: the new "specialist" action-view case (and every other
+// kind, for good measure) carries only mechanical legality fields -- never a
+// judgment field -- consistent with Phase 1's own locked contract ("describes
+// legal choices but never chooses one").
+const sampleProtocolDefWithSpecialistSlot = {
+  ...sampleProtocolDef,
+  spec: {
+    ...sampleProtocolDef.spec,
+    profile: {
+      ...sampleProtocolDef.spec.profile,
+      topology: {
+        ...sampleProtocolDef.spec.profile.topology,
+        specialistSlots: [{ id: 'spec-slot', role: 'worker' }],
+      },
+    },
+  },
+};
+
+test('work item 6: the "specialist" action-view case (and every other kind) carries only mechanical legality fields, never a judgment field', () => {
+  const manifest = {
+    coordinationId: 'coord_mechanical_1',
+    schemaVersion: '3',
+    status: 'active',
+    objective: 'Do work',
+    definitionRef: { id: 'generic.coordination-protocol.sample', version: '1.0.0' },
+    snapshotRef: { digest: '1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef' },
+    assignmentRefs: [],
+  };
+  const projection = projectCoordinationActions({
+    manifest,
+    events: [],
+    definition: sampleProtocolDefWithSpecialistSlot,
+    quorum: { missing: ['worker'], failed: [] },
+  });
+
+  const specialistAction = projection.actions.find((a) => a.kind === 'specialist');
+  assert.ok(specialistAction, 'expected a "specialist" action for the declared spec-slot');
+  assert.equal(specialistAction.target.slotId, 'spec-slot');
+  assert.equal(typeof specialistAction.authorizable, 'boolean');
+  assert.equal(typeof specialistAction.authorized, 'boolean');
+  assert.equal(typeof specialistAction.exhausted, 'boolean');
+
+  const JUDGMENT_FIELD_NAMES = ['recommended', 'preferred', 'best', 'shouldDo', 'priority', 'suggested', 'score', 'confidence'];
+  for (const action of projection.actions) {
+    for (const judgmentField of JUDGMENT_FIELD_NAMES) {
+      assert.ok(!(judgmentField in action), `action kind "${action.kind}" must never carry a judgment field "${judgmentField}"`);
+    }
+  }
+
+  // The "specialist" kind's own field set is an EXACT allowlist -- adding a
+  // field here without updating this test is itself the regression this
+  // guards against.
+  const SPECIALIST_ALLOWED_FIELDS = new Set([
+    'kind', 'required', 'target', 'authorizable', 'authorized', 'exhausted',
+    'requiredInputs', 'optionalInputs', 'actionKey',
+  ]);
+  for (const key of Object.keys(specialistAction)) {
+    assert.ok(SPECIALIST_ALLOWED_FIELDS.has(key), `"specialist" action carries unexpected field "${key}" -- update the allowlist if this is intentional mechanical data, never a judgment field`);
+  }
+});
+
 test('required operation settled and session ready to close exposes close action', () => {
   const manifest = {
     coordinationId: 'coord_settled_1',

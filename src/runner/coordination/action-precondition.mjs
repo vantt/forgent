@@ -25,6 +25,7 @@ import {
   normalizeFanOutPayload,
   normalizePersistedFanOutPayloadEntry,
 } from './fan-out-payload.mjs';
+import { deriveSpecialistAuthorizationId } from '../../verbs/coordination/composers.mjs';
 
 function resolveDriverIdentity(currentPayload = {}, precondition = {}, expectedKind = null) {
   if (expectedKind && expectedKind !== 'close') {
@@ -960,6 +961,39 @@ export function executeUnderActionPrecondition(
             break;
           }
         }
+      }
+    } else if (precondition.kind === 'specialist') {
+      // `specialistAuthorizationId` is derived deterministically from
+      // coordinationId + the retry's own actionKey (composers.mjs's
+      // `deriveSpecialistAuthorizationId`) -- the exact same derivation the
+      // original execution used to mint it, so a genuine retry of the same
+      // actionKey always resolves to the same `specialist-authorized` event
+      // without needing to recompute a candidate actionKey per eventSeq like
+      // the other kinds above.
+      const specialistAuthorizationId = deriveSpecialistAuthorizationId(coordinationId, precondition.actionKey);
+      const priorEvent = events.find(
+        (ev) => ev.type === 'specialist-authorized' && ev.payload?.specialistAuthorizationId === specialistAuthorizationId,
+      );
+      if (priorEvent) {
+        const target = precondition.target ?? { slotId: priorEvent.payload.slotId, role: priorEvent.payload.role };
+        if (!precondition.target) precondition.target = target;
+        priorExecution = {
+          eventSeq: events.indexOf(priorEvent),
+          recordedPayload: {
+            specialistActorId: priorEvent.payload.specialistActorId,
+            reason: priorEvent.payload.reason,
+            maxAssignments: priorEvent.payload.maxAssignments,
+            expiresAfterRound: priorEvent.payload.expiresAfterRound,
+            capabilities: priorEvent.payload.capabilities,
+            triggerEvidenceRefs: priorEvent.payload.triggerEvidenceRefs,
+            allowedContextRefs: priorEvent.payload.allowedContextRefs,
+          },
+          result: {
+            ...priorEvent.payload,
+            actionKey: precondition.actionKey,
+            appended: false,
+          },
+        };
       }
     }
 

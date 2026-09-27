@@ -241,11 +241,16 @@ function peekRequest(requestPath) {
  * bypass #4 refused for every request this pack gate ever forwards. Any raw
  * coordination request door -- `coordination run --file`, `coordination
  * start --steps`, the headless adapter -- remains a legal way to reach
- * specialist authorization until a driver-authenticated typed-action door
- * exists (a later unit): `start`/its `composers.mjs` composer forward
+ * specialist authorization: `start`/its `composers.mjs` composer forward
  * `steps` unfiltered by type, exactly as they already do for every other
  * step type, so this pack's own explicit refusal below is the actual
- * boundary, never the raw doors' own step-type vocabulary.
+ * boundary, never the raw doors' own step-type vocabulary. I24b landed the
+ * separate driver-authenticated typed-action door for this same capability
+ * (the `coordination specialist-authorize` subverb) -- it never goes
+ * through this gate at all, so a session opened via `pack run` against a
+ * protocol with `specialistSlots` can still have a specialist authorized
+ * through that subverb; this is the intended driver-authenticated route,
+ * not a gate bypass.
  *
  * Resume is `run.mjs`'s own existing behavior, inherited for free: a
  * request naming an EXISTING `coordinationId` resumes that session through

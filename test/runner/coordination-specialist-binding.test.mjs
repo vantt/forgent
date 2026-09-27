@@ -26,6 +26,7 @@ import { replaySession } from '../../src/runner/coordination/replay.mjs';
 import { CoordinationError } from '../../src/runner/coordination/schema.mjs';
 import { showCoordinationUseCase } from '../../src/verbs/coordination/show.mjs';
 import { runCoordinationUseCase } from '../../src/verbs/coordination/run.mjs';
+import { showCoordinationActionsUseCase, executeSpecialistAuthorizeUseCase } from '../../src/verbs/coordination/actions.mjs';
 
 const DEFINITION_ID = 'test.coordination-protocol.specialist-binding';
 const DRIVER_ID = 'coordinator-1';
@@ -325,6 +326,116 @@ test('the "specialist-authorize" request-step type reaches authorizeSpecialistSl
     readSessionEvents(coordinationId, ctx.opts).filter((e) => e.type === 'specialist-authorized').length,
     1,
     'exactly one specialist-authorized event after the retry',
+  );
+});
+
+// I24b (Phase 5 items 4 pt.2/5/6): the SAME authorization, reached through the
+// driver-authenticated, LOCKED typed-action door (`actions.mjs`'s
+// `executeSpecialistAuthorizeUseCase` -> `executeCoordinationActionUseCase`
+// -> `run.mjs`'s typed-action execution path, which holds the events lock
+// for its entire critical section) -- proving `authorizeSpecialistSlotLocked`/
+// `recordSpecialistAuthorizationLocked` genuinely execute under that held
+// lock without self-deadlocking, and that the new "specialist" action-view
+// case correctly reflects the slot's state before/after authorization.
+test('the locked typed-action door ("specialist-authorize" subverb) reaches authorizeSpecialistSlotLocked without self-deadlocking, and resumes idempotently on an identical retry of the same actionKey', async () => {
+  const coordinationId = 'coord_spec_locked_typed_action';
+  const ctx = setup(coordinationId);
+
+  const before = showCoordinationActionsUseCase(ctx.opts, { id: coordinationId });
+  const specialistAction = before.actions.find((a) => a.kind === 'specialist' && a.target?.slotId === 'review-slot');
+  assert.ok(specialistAction, 'expected a "specialist" action for the declared review-slot');
+  assert.equal(specialistAction.authorizable, true);
+  assert.equal(specialistAction.authorized, false);
+  assert.equal(specialistAction.exhausted, false);
+
+  const result = await executeSpecialistAuthorizeUseCase(ctx.opts, {
+    id: coordinationId,
+    actionKey: specialistAction.actionKey,
+    writerId: DRIVER_ID,
+    specialistActorId: 'specialist-alpha',
+    reason: 'Primary review needs a domain specialist.',
+    capabilities: ['deep-review'],
+    maxAssignments: 3,
+    expiresAfterRound: 10,
+  });
+  assert.equal(result.slotId, 'review-slot');
+  assert.equal(result.specialistActorId, 'specialist-alpha');
+  assert.equal(result.appended, true);
+
+  const events = readSessionEvents(coordinationId, ctx.opts).filter((e) => e.type === 'specialist-authorized');
+  assert.equal(events.length, 1, 'exactly one specialist-authorized event, written through the locked door');
+  assert.equal(events[0].payload.specialistActorId, 'specialist-alpha');
+
+  const after = showCoordinationActionsUseCase(ctx.opts, { id: coordinationId });
+  const specialistActionAfter = after.actions.find((a) => a.kind === 'specialist' && a.target?.slotId === 'review-slot');
+  assert.equal(specialistActionAfter.authorized, true);
+  assert.equal(specialistActionAfter.exhausted, false, 'maxBindings is 2 (setup default) and only 1 distinct specialist has been recruited so far');
+
+  // An IDENTICAL retry of the same actionKey (now behind the new event, and
+  // no longer in the current legal action set) must resume idempotently --
+  // the general actionKey-reconstruction contract every typed action already
+  // honors (action-precondition.mjs's own doc comment): same actionKey + same
+  // payload -> idempotent return, never a silent second event, never a
+  // refusal either.
+  const retried = await executeSpecialistAuthorizeUseCase(ctx.opts, {
+    id: coordinationId,
+    actionKey: specialistAction.actionKey,
+    writerId: DRIVER_ID,
+    specialistActorId: 'specialist-alpha',
+    reason: 'Primary review needs a domain specialist.',
+    capabilities: ['deep-review'],
+    maxAssignments: 3,
+    expiresAfterRound: 10,
+  });
+  assert.equal(retried.slotId, 'review-slot');
+  assert.equal(retried.specialistActorId, 'specialist-alpha');
+  assert.equal(retried.appended, false, 'an identical retry must resume, never duplicate');
+  assert.equal(
+    readSessionEvents(coordinationId, ctx.opts).filter((e) => e.type === 'specialist-authorized').length,
+    1,
+    'an identical retry must never append a second specialist-authorized event',
+  );
+});
+
+// The SAME actionKey retried with a genuinely DIFFERENT payload (a different
+// reason) must still be refused -- an actionKey is not a blank check for any
+// later payload, only for an exact repeat of what was already recorded.
+test('the locked typed-action door ("specialist-authorize" subverb) refuses a retry of the same actionKey carrying a different payload', async () => {
+  const coordinationId = 'coord_spec_locked_typed_action_conflict';
+  const ctx = setup(coordinationId);
+
+  const before = showCoordinationActionsUseCase(ctx.opts, { id: coordinationId });
+  const specialistAction = before.actions.find((a) => a.kind === 'specialist' && a.target?.slotId === 'review-slot');
+
+  await executeSpecialistAuthorizeUseCase(ctx.opts, {
+    id: coordinationId,
+    actionKey: specialistAction.actionKey,
+    writerId: DRIVER_ID,
+    specialistActorId: 'specialist-alpha',
+    reason: 'Primary review needs a domain specialist.',
+    capabilities: ['deep-review'],
+    maxAssignments: 3,
+    expiresAfterRound: 10,
+  });
+
+  await assert.rejects(
+    () =>
+      executeSpecialistAuthorizeUseCase(ctx.opts, {
+        id: coordinationId,
+        actionKey: specialistAction.actionKey,
+        writerId: DRIVER_ID,
+        specialistActorId: 'specialist-alpha',
+        reason: 'A completely different reason for this authorization.',
+        capabilities: ['deep-review'],
+        maxAssignments: 3,
+        expiresAfterRound: 10,
+      }),
+    (err) => err instanceof CoordinationError && err.category === 'payload-conflict',
+  );
+  assert.equal(
+    readSessionEvents(coordinationId, ctx.opts).filter((e) => e.type === 'specialist-authorized').length,
+    1,
+    'a payload-conflict retry must never append a second specialist-authorized event',
   );
 });
 

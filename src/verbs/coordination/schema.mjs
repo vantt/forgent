@@ -662,12 +662,13 @@ export function computeHumanTurnArtifactRevision(cwd, artifactRef, stepAs = 'hum
 // that recruits a previously-unknown specialist identity into a declared
 // `topology.specialistSlots[]` slot (the SAME mechanism `authorize`/
 // `disposition` already reach for their own doors, never a second copy of
-// it). Deliberately wired for the UNLOCKED `coordination run --file` path
-// only: `authorizeSpecialistSlot` has no `Locked` twin yet (a later unit
-// adds one, alongside the typed-action/subverb door that would need it),
-// so run.mjs's own step-dispatch site refuses this step type outright when
-// the already-events-locked typed-action path calls it, rather than
-// self-deadlocking against a lock it cannot re-acquire.
+// it). Wired for the UNLOCKED `coordination run --file`/`start --steps`
+// request-vocabulary path. I24b added the separate driver-authenticated
+// typed-action door (`coordination specialist-authorize` subverb -> the
+// locked `authorizeSpecialistSlotLocked`/`recordSpecialistAuthorizationLocked`
+// twins), which never reaches this step type at all -- see
+// `coordination-session.md`'s bypass-#4 wording for how the two paths
+// relate.
 const SPECIALIST_AUTHORIZE_STEP_ALLOWED_KEYS = new Set([
   'type', 'as', 'slotId', 'specialistActorId', 'role', 'capabilities', 'reason',
   'triggerEvidenceRefs', 'allowedContextRefs', 'maxAssignments', 'expiresAfterRound',

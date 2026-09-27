@@ -1382,6 +1382,110 @@ export function recordSpecialistAuthorization(
   });
 }
 
+/**
+ * `recordSpecialistAuthorization`'s `Locked` twin (I24b, Phase 5 item 4 pt.2)
+ * -- for use ONLY by a caller that already holds `coordinationId`'s
+ * `events.lock` (the typed-action execution path, `actions.mjs`'s
+ * `executeCoordinationActionUseCase` -> `run.mjs`, which holds that lock via
+ * `withEventsLock` for its entire critical section). Calling the unlocked
+ * `recordSpecialistAuthorization` from inside that section would self-
+ * deadlock against the SAME non-reentrant lock -- this door exists so the
+ * locked path never has to.
+ *
+ * Deliberately a byte-for-byte MIRROR of `recordSpecialistAuthorization`'s
+ * own critical-section body, not a shared extraction: this unit's own scope
+ * requires never modifying that already-merged, already-red-teamed door (its
+ * idempotency/duplicate-ref fix landed in I24a's own fix round) -- so this
+ * twin re-states the identical shape/canonicalization/duplicate-ref/
+ * maxBindingsForSlot logic against a caller-supplied `paths`, rather than
+ * resolving its own and acquiring the lock itself. Any future change to one
+ * door's idempotency behavior must be applied to both -- there is no shared
+ * body a single edit could update for both at once.
+ */
+export function recordSpecialistAuthorizationLocked(
+  coordinationId,
+  {
+    specialistAuthorizationId,
+    slotId,
+    specialistActorId,
+    role,
+    capabilities,
+    authorizedBy,
+    reason,
+    triggerEvidenceRefs,
+    allowedContextRefs,
+    maxAssignments,
+    expiresAfterRound,
+  },
+  paths,
+  opts = {},
+) {
+  const { sessionDir, eventsPath, manifestPath } = paths;
+  const payload = {
+    specialistAuthorizationId,
+    slotId,
+    specialistActorId,
+    role,
+    capabilities,
+    authorizedBy,
+    reason,
+    triggerEvidenceRefs,
+    allowedContextRefs,
+    maxAssignments,
+    expiresAfterRound,
+  };
+  validateEventPayload('specialist-authorized', payload);
+
+  const manifest = readManifestRaw(manifestPath);
+  assertSchemaVersionCurrent(manifest, manifestPath);
+  if (manifest.status !== 'active') {
+    throw new CoordinationError(
+      'validation',
+      `recordSpecialistAuthorization: session "${coordinationId}" is not active (status: "${manifest.status}") -- cannot authorize a specialist once new materialization has stopped`,
+    );
+  }
+
+  assertDriverIdentity(manifest, authorizedBy, {
+    coordinationId,
+    label: 'recordSpecialistAuthorization',
+    subject: 'a specialist authorization',
+  });
+
+  const events = readEvents(eventsPath);
+  const canonicalize = (value) =>
+    JSON.stringify({ ...value, authorizedBy: { type: value.authorizedBy?.type, id: value.authorizedBy?.id } });
+  const priorForId = events.find(
+    (event) => event.type === 'specialist-authorized' && event.payload?.specialistAuthorizationId === specialistAuthorizationId,
+  );
+  if (priorForId) {
+    if (canonicalize(priorForId.payload) === canonicalize(payload)) {
+      return Object.freeze({ ...priorForId.payload, appended: false });
+    }
+    throw new CoordinationError(
+      'duplicate-ref',
+      `recordSpecialistAuthorization: specialistAuthorizationId "${specialistAuthorizationId}" in session "${coordinationId}" was already recorded with different content -- a specialist authorization is immutable; record a new specialistAuthorizationId instead`,
+    );
+  }
+
+  if (opts.maxBindingsForSlot !== undefined) {
+    const { slotId: capSlotId, cap } = opts.maxBindingsForSlot;
+    const distinctActorsForSlot = new Set(
+      events
+        .filter((event) => event.type === 'specialist-authorized' && event.payload?.slotId === capSlotId)
+        .map((event) => event.payload.specialistActorId),
+    );
+    if (!distinctActorsForSlot.has(specialistActorId) && distinctActorsForSlot.size >= cap) {
+      throw new CoordinationError(
+        'validation',
+        `recordSpecialistAuthorization: specialist slot "${capSlotId}" in session "${coordinationId}" already has ${distinctActorsForSlot.size} distinct specialist actor(s) authorized, at or above its declared maxBindings cap of ${cap} -- refusing to authorize a new specialist actor "${specialistActorId}" for this slot`,
+      );
+    }
+  }
+
+  appendSessionEventLocked(eventsPath, { type: 'specialist-authorized', payload }, sessionDir, manifest);
+  return Object.freeze({ ...payload, appended: true });
+}
+
 // A disposition's `targetRef`/`evidenceRefs` may not name a different
 // CoordinationSession or an Assignment that is not this session's own
 // member -- the SAME rule `session-engine.mjs`'s `assertRefsOwnedBySession`
