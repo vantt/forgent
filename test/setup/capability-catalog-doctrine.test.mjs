@@ -12,7 +12,7 @@ import { test } from 'node:test';
 
 import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
 import { DEFAULT_CAPABILITY_SLOTS } from '../../src/setup/registrations.mjs';
-import { EXECUTOR_KINDS, compileDispatchPlan } from '../../src/runner/dispatch.mjs';
+import { EXECUTOR_KINDS, compileDispatchPlan, loadRunnerConfig, RunnerConfigError } from '../../src/runner/dispatch.mjs';
 
 const repoRoot = path.resolve(import.meta.dirname, '../..');
 const SHARED_DIR = path.join(repoRoot, 'core', 'skills', '_shared');
@@ -40,6 +40,96 @@ test('P2-runtime capability slots are registered with no provider/model/executor
     assert.equal(typeof entry.description, 'string');
     assert.ok(entry.description.trim().length > 0);
   }
+});
+
+// ─── I19: `serves` on the curated catalog, and the new "review" slot ───
+
+test('every DEFAULT_CAPABILITY_SLOTS entry declares a "serves" attribute set matching capability-matching.md\'s doctrine table', () => {
+  const expected = {
+    advise: { outputKind: 'decision', mutates: false },
+    execute: { outputKind: 'change', mutates: true },
+    review: { outputKind: 'finding', mutates: false },
+    'code:implement': { outputKind: 'change', domain: 'code', mutates: true },
+    'code:review': { outputKind: 'finding', domain: 'code', mutates: false },
+    'code:test': { outputKind: 'verification', domain: 'code' },
+    'code:debug': { outputKind: 'finding', domain: 'code' },
+    'code:refactor': { outputKind: 'change', domain: 'code', mutates: true, behaviorPreserving: true },
+  };
+  for (const [name, serves] of Object.entries(expected)) {
+    const entry = DEFAULT_CAPABILITY_SLOTS[name];
+    assert.ok(entry, `DEFAULT_CAPABILITY_SLOTS is missing "${name}"`);
+    assert.deepEqual(entry.serves, serves, `"${name}".serves`);
+  }
+});
+
+test('"review" is a new curated slot with no prefer/overrides pin, same discipline as every other curated default', () => {
+  const entry = DEFAULT_CAPABILITY_SLOTS.review;
+  assert.ok(entry, 'DEFAULT_CAPABILITY_SLOTS is missing "review"');
+  assert.ok(!entry.prefer && !entry.overrides, '"review" must never carry prefer/overrides');
+  assert.equal(typeof entry.description, 'string');
+  assert.ok(entry.description.trim().length > 0);
+});
+
+test('no two DEFAULT_CAPABILITY_SLOTS entries declare the identical "serves" attribute set', () => {
+  const signatures = new Map();
+  for (const [name, entry] of Object.entries(DEFAULT_CAPABILITY_SLOTS)) {
+    if (!entry.serves) continue;
+    const signature = JSON.stringify(Object.fromEntries(Object.entries(entry.serves).sort(([a], [b]) => a.localeCompare(b))));
+    const prior = signatures.get(signature);
+    assert.ok(!prior, `"${prior}" and "${name}" declare the identical serves attribute set`);
+    signatures.set(signature, name);
+  }
+});
+
+function tempConfigPath(capabilities) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'capability-serves-'));
+  const configPath = path.join(dir, 'runner-config.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      capabilities,
+      models: { standard: 'sonnet' },
+      timeoutMs: 1000,
+    }),
+  );
+  return configPath;
+}
+
+test('loadRunnerConfig accepts a "capabilities.<name>.serves" entry with scalar and array attribute values', () => {
+  const cfg = loadRunnerConfig(
+    tempConfigPath({
+      'code:implement': { serves: { outputKind: 'change', domain: 'code', mutates: true } },
+      review: { serves: { outputKind: ['finding', 'verification'], mutates: false } },
+    }),
+  );
+  assert.deepEqual(cfg.capabilities['code:implement'].serves, { outputKind: 'change', domain: 'code', mutates: true });
+  assert.deepEqual(cfg.capabilities.review.serves, { outputKind: ['finding', 'verification'], mutates: false });
+});
+
+test('loadRunnerConfig accepts a "capabilities.<name>" entry with no "serves" at all (an old config predating I19 keeps loading)', () => {
+  const cfg = loadRunnerConfig(tempConfigPath({ 'impact-analysis': { description: 'Code-graph blast radius' } }));
+  assert.equal(cfg.capabilities['impact-analysis'].serves, undefined);
+});
+
+test('loadRunnerConfig rejects a "serves" value that is not an object', () => {
+  for (const badServes of ['change', 42, ['change'], null]) {
+    assert.throws(() => loadRunnerConfig(tempConfigPath({ execute: { serves: badServes } })), RunnerConfigError, `serves: ${JSON.stringify(badServes)}`);
+  }
+});
+
+test('loadRunnerConfig rejects a "serves" key not in the DemandFacts vocabulary, including "size"/"rigor" (Q1 never uses those two)', () => {
+  for (const key of ['size', 'rigor', 'notARealAttribute']) {
+    assert.throws(() => loadRunnerConfig(tempConfigPath({ execute: { serves: { [key]: 'heavy' } } })), RunnerConfigError, `key: ${key}`);
+  }
+});
+
+test('loadRunnerConfig rejects a "serves" boolean attribute given a non-boolean value', () => {
+  assert.throws(() => loadRunnerConfig(tempConfigPath({ execute: { serves: { mutates: 'true' } } })), RunnerConfigError);
+});
+
+test('loadRunnerConfig rejects a "serves" string attribute given an empty string', () => {
+  assert.throws(() => loadRunnerConfig(tempConfigPath({ execute: { serves: { outputKind: '' } } })), RunnerConfigError);
 });
 
 test('advise-execute-capabilities-configured covers every curated slot, including the new P2-runtime ones', () => {
@@ -114,7 +204,7 @@ test('decide --for resolves a capability to a tool/MCP provider, never assuming 
 
 test('shared capability catalog exists, lists the registered vocabulary, and never registers a "research" capability', () => {
   const content = fs.readFileSync(CATALOG_PATH, 'utf8');
-  for (const name of ['advise', 'execute', 'code:implement', 'code:review', 'code:test', 'code:debug', 'code:refactor', 'impact-analysis']) {
+  for (const name of ['advise', 'execute', 'review', 'code:implement', 'code:review', 'code:test', 'code:debug', 'code:refactor', 'impact-analysis']) {
     assert.ok(content.includes(`\`${name}\``), `catalog should document "${name}"`);
   }
   assert.ok(!/\|\s*`research`\s*\|/.test(content), 'catalog must never register a "research" capability');
