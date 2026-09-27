@@ -12,11 +12,24 @@
 
 const UNIT_LINE = /^-\s*unit:\s*(.+)$/;
 const CAPABILITY_LINE = /^\s+capability:\s*(.+)$/;
-const PIN_LINE = /^\s+(executor|provider|model|tier|prefer|invocation|actors):\s*\S/;
+// Case-insensitive; tolerates whitespace on either side of the colon and an
+// optional leading list-bullet ("- "/"* ") -- "Model: x", "provider : x",
+// and "  - model: x" all count as a pin, the same as "  model: x" always
+// did. Still requires the literal key immediately before the colon (no
+// trailing letters), so a near-miss like "executors:"/"actor:" is still
+// never mistaken for a real pin key.
+const PIN_LINE = /^\s+(?:[-*]\s+)?(executor|provider|model|tier|prefer|invocation|actors)\s*:\s*\S/i;
 // Exact literal token "unresolved" only -- a negative lookahead blocks any
 // word char or hyphen immediately after it, so "unresolved-foo" is never
 // mistaken for the hedge marker the way a bare `\b` boundary would allow.
 const UNRESOLVED_MARK = /^unresolved(?![\w-])/i;
+// ATX heading ("#" through "######"), and a fenced code block delimiter
+// (three-or-more backticks or tildes) -- both are parsing-context
+// boundaries: a heading ends whatever unit block/table is currently open,
+// and anything strictly between a fence's open/close line is prose/example
+// text, never real plan content.
+const HEADING_LINE = /^#{1,6}(\s|$)/;
+const FENCE_LINE = /^\s*(`{3,}|~{3,})/;
 
 const GENERIC_SHAPE = /^[a-z][a-z0-9-]*$/;
 const DOMAIN_SCOPED_SHAPE = /^[a-z][a-z0-9-]*:[a-z][a-z0-9-]*$/;
@@ -155,6 +168,7 @@ export function lintPlanCapabilityAnnotations(text, registeredCapabilities, opti
 
   let current = null; // { unit, unitLine, capability, capabilityLine, pins: [] }
   let tableState = 'none'; // 'none' | 'awaiting-separator' | 'active'
+  let fenceState = null; // null | { char: '`'|'~', len: number }
 
   const closeCurrentUnitBlock = () => {
     if (!current) return;
@@ -186,6 +200,26 @@ export function lintPlanCapabilityAnnotations(text, registeredCapabilities, opti
 
   lines.forEach((rawLine, idx) => {
     const lineNo = idx + 1;
+
+    const fenceMatch = FENCE_LINE.exec(rawLine);
+    if (fenceMatch) {
+      const marker = fenceMatch[1];
+      if (!fenceState) {
+        fenceState = { char: marker[0], len: marker.length };
+      } else if (marker[0] === fenceState.char && marker.length >= fenceState.len) {
+        fenceState = null;
+      }
+      // A fence delimiter line is never itself a heading/unit/capability/
+      // pin/table-row line, whichever side of the fence it is on.
+      return;
+    }
+    if (fenceState) return; // strictly inside a fence: prose/example, inert
+
+    if (HEADING_LINE.test(rawLine)) {
+      closeCurrentUnitBlock();
+      tableState = 'none';
+      return;
+    }
 
     const cells = splitTableRow(rawLine);
     if (cells) {

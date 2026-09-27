@@ -2,10 +2,14 @@
 // writes nothing, and never touches Work/.fgos state.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import { lintPlanCapabilityAnnotations } from '../../src/report/capability-plan-lint.mjs';
 import { DEFAULT_CAPABILITY_SLOTS } from '../../src/setup/registrations.mjs';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REGISTERED = [...Object.keys(DEFAULT_CAPABILITY_SLOTS), 'impact-analysis', 'pane-labeling'];
 
 test('a plan with valid, registered, unpinned units passes clean', () => {
@@ -305,4 +309,63 @@ test('"unresolved-foo" is never treated as the exact "unresolved" hedge token', 
   assert.equal(result.findings.length, 1);
   assert.equal(result.findings[0].code, 'capability.unregistered');
   assert.notEqual(result.findings[0].code, 'capability.unresolved');
+});
+
+test('a later markdown heading ends the unit block, so an indented key under it is never read as a pin on the stale unit', () => {
+  const text = `- unit: apply the fix
+  capability: code:implement
+
+## Runtime notes
+
+Example executor config:
+
+  model: sonnet
+`;
+  const result = lintPlanCapabilityAnnotations(text, REGISTERED);
+  assert.deepEqual(result.findings, [], JSON.stringify(result.findings));
+  assert.equal(result.ok, true);
+  assert.equal(result.units.length, 1);
+  assert.equal(result.units[0].unit, 'apply the fix');
+});
+
+test('a Product-Gates-shaped table inside a fenced code block is never parsed as a real table (docs/how-to/author-a-plan-loop-track.md convention example)', () => {
+  const text = `## Product Gates table
+
+Mark each phase's proof obligation explicitly; do not leave it implicit.
+
+\`\`\`text
+## Product Gates
+
+| Phase | Cell | Capability | Exit |
+|---|---|---|---|
+| 00 | <cell name> | code:implement | <exit condition> |
+| 01 | <cell name> | code:implement | <exit condition>. **Full-suite gate.** |
+\`\`\`
+
+Real content after the fence.
+`;
+  const result = lintPlanCapabilityAnnotations(text, REGISTERED);
+  assert.deepEqual(result.units, []);
+  assert.deepEqual(result.findings, []);
+});
+
+test('the real docs/how-to/author-a-plan-loop-track.md fenced Product Gates example produces zero phantom units', () => {
+  const docPath = path.resolve(__dirname, '../../docs/how-to/author-a-plan-loop-track.md');
+  const text = fs.readFileSync(docPath, 'utf8');
+  const result = lintPlanCapabilityAnnotations(text, REGISTERED);
+  assert.deepEqual(result.units, []);
+  assert.deepEqual(result.findings, []);
+});
+
+test('a pin key is caught case-insensitively, tolerating whitespace around the colon and an optional leading bullet', () => {
+  const text = `- unit: apply the fix
+  capability: code:implement
+  Model: sonnet
+  provider : openai
+  - tier: heavy
+`;
+  const result = lintPlanCapabilityAnnotations(text, REGISTERED);
+  const pinned = result.findings.filter((f) => f.code === 'capability.pinned');
+  assert.equal(pinned.length, 3, JSON.stringify(result.findings));
+  assert.ok(pinned.every((f) => f.severity === 'hard'));
 });
