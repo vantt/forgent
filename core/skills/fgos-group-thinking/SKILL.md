@@ -58,11 +58,7 @@ cross-provider review.
 ## 1. See which protocols are registered
 
 ```bash
-node -e "
-import('./src/verbs/coordination/group-thinking-pack.mjs').then(({ loadProtocolPack }) => {
-  console.log(JSON.stringify(loadProtocolPack(), null, 2));
-});
-"
+fgos coordination pack list --json
 ```
 
 An empty `members: []` means no protocol is registered yet — there is
@@ -77,11 +73,7 @@ pair here names an already-registered FlowDefinition `metadata.id@version`
 ## 2. Read the protocol's own declared shape
 
 ```bash
-node -e "
-import('./src/runner/definitions/protocol-loader.mjs').then(({ loadCoordinationProtocol }) => {
-  console.log(JSON.stringify(loadCoordinationProtocol(process.argv[1]), null, 2));
-});
-" -- "<protocol id from step 1>"
+fgos coordination pack show-protocol "<protocol id from step 1>" --json
 ```
 
 Learn its declared actors, operations, activation modes, and graph from
@@ -126,23 +118,19 @@ request already could.
 ## 4. Launch or resume
 
 ```bash
-node -e "
-import('./src/verbs/coordination/group-thinking-pack.mjs').then(async ({ runGroupThinkingRequest }) => {
-  const result = await runGroupThinkingRequest(
-    { cwd: process.cwd(), repoRoot: process.cwd() },
-    { protocolId: '<protocol id from step 1>', requestPath: '<path to your request.json>' },
-  );
-  console.log(JSON.stringify(result, null, 2));
-});
-"
+fgos coordination pack run --protocol "<protocol id from step 1>" --file "<path to your request.json>"
 ```
 
-`protocolId` is required, and must equal the request's own
+`--protocol` is required, and must equal the request's own
 `protocolRef.id` — an unset, unregistered, or mismatched id is refused
 before anything dispatches (see the Gate section below). A request naming
 an **existing** `coordinationId` resumes that session through the exact
 same door (`run.mjs`'s own resume behavior, `findExistingManifest`) — this
-skill adds no separate resume mechanism of its own.
+skill adds no separate resume mechanism of its own, and `pack run` adds no
+separate `--resume` flag: resuming is just re-submitting a request file
+whose `coordinationId` already exists. `--executor`/`--tier`/`--model`
+forward exactly the way plain `fgos coordination run` already forwards
+them (global trusted policy, never a portable request-file field).
 
 ## 5. Render replay
 

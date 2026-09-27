@@ -113,6 +113,8 @@ import { watchRunUseCase } from '../src/verbs/dispatch/watch.mjs';
 import { recoverObserveUseCase, recoverApplyUseCase } from '../src/verbs/dispatch/recover.mjs';
 import { chainCoordinationUseCase } from '../src/verbs/coordination/chain.mjs';
 import { recoverSessionObserveUseCase, recoverSessionApplyUseCase } from '../src/verbs/coordination/recover.mjs';
+import { loadProtocolPack, runGroupThinkingRequest } from '../src/verbs/coordination/group-thinking-pack.mjs';
+import { loadCoordinationProtocol } from '../src/runner/definitions/protocol-loader.mjs';
 import { unreleasedHasEntries } from '../src/setup/registrations.mjs';
 import { branchNameFor, branchExists, provisionDependencies, resyncWorktree, detectTrunk, isMainWorktree, currentHead, realpathOrSelf as realpathOr } from '../src/runner/worktree.mjs';
 import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
@@ -2805,11 +2807,12 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         'launch-master-loop',
         'chain',
         'recover',
+        'pack',
       ];
 
-      const sub = requireField(positional[0], 'coordination requires a sub-verb: fgos coordination <start|status|operation|authorize-and-dispatch|fan-out|contribution|human-turn|disposition|close|run|show|actions|launch-master-loop|chain|recover> ...');
+      const sub = requireField(positional[0], 'coordination requires a sub-verb: fgos coordination <start|status|operation|authorize-and-dispatch|fan-out|contribution|human-turn|disposition|close|run|show|actions|launch-master-loop|chain|recover|pack> ...');
       if (!KNOWN_COORDINATION_SUBVERBS.includes(sub)) {
-        throw new StoreError('validation', `coordination: unknown sub-verb "${sub}" (known: start, status, operation, authorize-and-dispatch, fan-out, contribution, human-turn, disposition, close, run, show, actions, launch-master-loop, chain, recover).`);
+        throw new StoreError('validation', `coordination: unknown sub-verb "${sub}" (known: start, status, operation, authorize-and-dispatch, fan-out, contribution, human-turn, disposition, close, run, show, actions, launch-master-loop, chain, recover, pack).`);
       }
 
       const COMMON_FLAGS = new Set(['dir', 'cwd', 'json']);
@@ -2894,6 +2897,10 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           ...COMMON_FLAGS,
           'id', 'action', 'expected-snapshot', 'expected-event-seq',
           'expected-run-control-epoch', 'expected-expires-at', 'action-key',
+        ]),
+        'pack': new Set([
+          ...COMMON_FLAGS,
+          'protocol', 'protocol-id', 'file', 'executor', 'model', 'tier',
         ]),
       };
 
@@ -3260,6 +3267,51 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           expectedExpiresAt: requireField(flags['expected-expires-at'], 'coordination recover --action requires --expected-expires-at'),
           actionKey: requireField(flags['action-key'], 'coordination recover --action requires --action-key'),
         });
+      }
+      if (sub === 'pack') {
+        // Public CLI door onto the group-thinking Protocol Pack gate
+        // (src/verbs/coordination/group-thinking-pack.mjs) -- replaces the
+        // inline `node -e` scripts the fgos-group-thinking skill used to
+        // instruct a dispatching agent to author by hand. A subverb under
+        // the already-registered `coordination` verb, not a new top-level
+        // verb: no COMMAND_REGISTRY.length growth, no rust-host
+        // regeneration. Every function below is called unmodified -- this
+        // block never reimplements pack-membership or dispatch logic.
+        const KNOWN_PACK_SUBVERBS = ['list', 'show-protocol', 'run'];
+        const packSub = requireField(positional[1], 'coordination pack requires a sub-verb: fgos coordination pack <list|show-protocol|run> ...');
+        if (!KNOWN_PACK_SUBVERBS.includes(packSub)) {
+          throw new StoreError('validation', `coordination pack: unknown sub-verb "${packSub}" (known: list, show-protocol, run).`);
+        }
+
+        if (packSub === 'list') {
+          return loadProtocolPack();
+        }
+
+        if (packSub === 'show-protocol') {
+          const protocolId = requireField(
+            positional[2] ?? flags.protocol ?? flags['protocol-id'],
+            'coordination pack show-protocol requires a protocol id: fgos coordination pack show-protocol <id>',
+          );
+          return loadCoordinationProtocol(protocolId, { cwd: cwdForCoordination });
+        }
+
+        // packSub === 'run'
+        const protocolId = requireField(flags.protocol ?? flags['protocol-id'], 'coordination pack run requires --protocol <id>');
+        const filePath = requireField(flags.file, 'coordination pack run requires --file <request-path>');
+        return await runGroupThinkingRequest(
+          {
+            cwd: cwdForCoordination,
+            repoRoot: repoRootForCoordination,
+            runnerConfig: ensureRunnerConfigForDir(repoRootForCoordination),
+          },
+          {
+            protocolId,
+            requestPath: path.resolve(process.cwd(), filePath),
+            cliExecutor: flags.executor,
+            cliModel: flags.model,
+            cliTier: flags.tier,
+          },
+        );
       }
       throw new StoreError('validation', `coordination: unknown sub-verb "${sub}" (known: ${KNOWN_COORDINATION_SUBVERBS.join(', ')}).`);
     }
