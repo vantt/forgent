@@ -10,9 +10,10 @@ Attach every concern to a proposal and a magnitude: "this has operational
 risk" is noise; "the dual-write window is ~3 weeks and a rollback needs
 manual reconciliation" is a finding. Rank: which one concern, if
 unaddressed, actually sinks this? A flat list of mediums answers no
-question. Seek real paths and real magnitudes; re-running a verification
-read beyond the scout report's own citations, when it changes your
-confidence, is expected, not overreach.
+question. Seek real paths and real magnitudes within what {contextRefs}
+grants; re-reading a citation already inside that grant, when it changes
+your confidence, is expected, not overreach -- but never open a path
+{contextRefs} does not name.
 
 Propose the *cheapest engineering mitigation* that survives, never a
 process promise ("watch CI duration", "a review convention") -- a

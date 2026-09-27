@@ -504,6 +504,49 @@ test('Unit I22: every architecture-advisory-panel-v1 operation resolves and rend
   }
 });
 
+test('Unit I22 fix round 1: a real inline coordination Assignment (architecture-advisory-panel-v1) renders its actual constraints, never a false "(none)"', () => {
+  // buildInlineAssignment() (assignment.mjs) never promotes contract.constraints
+  // to a top-level Assignment field -- every architecture-advisory-panel-v1
+  // operation dispatches through this exact inline shape (session-engine.mjs
+  // -> createSessionAssignment() -> buildAssignment()), so a synthetic flat
+  // { constraints: [...] } object (as other tests in this file use) cannot
+  // catch this: it must be a REAL inline Assignment.
+  const assignment = buildAssignment({
+    provenance: {
+      kind: 'inline',
+      contract: {
+        objective: 'Shape a system proposal for the intake seam',
+        contextRefs: ['intake.md', 'scout-report.md'],
+        constraints: ['read-only', 'no-sibling-visibility'],
+        expectedOutputs: ['proposal.md'],
+        mutation: 'read-only',
+        evidence: { required: 'reported' },
+        role: 'system-shaper',
+        budget: { timeoutMs: 60000, maxRuns: 1 },
+        contractTemplate: 'architecture-advisory-panel-v1-system-proposal',
+      },
+      caller: { writerId: 'writer-arch-panel-constraints-test' },
+    },
+  });
+
+  assert.equal(assignment.provenance.kind, 'inline');
+  assert.equal(assignment.constraints, undefined, 'sanity check: real inline Assignments never carry a top-level "constraints" field');
+  assert.deepEqual(assignment.provenance.inline.contract.constraints, ['read-only', 'no-sibling-visibility']);
+
+  const { renderedBody } = resolveAndRenderOperationPrompt(assignment);
+  const constraintsSection = renderedBody.split('## Constraints')[1].split('## Evidence Contract')[0];
+  assert.ok(constraintsSection.includes('- read-only'), 'real constraint "read-only" must render');
+  assert.ok(constraintsSection.includes('- no-sibling-visibility'), 'real constraint "no-sibling-visibility" must render');
+  assert.ok(!constraintsSection.includes('(none)'), 'must never render "(none)" when real constraints exist');
+
+  // Also prove it through the actual dispatch path a real worker prompt
+  // takes: renderAssignmentPrompt() -> resolveAndRenderOperationPrompt(),
+  // not just a direct call to the lower-level function.
+  const fullPrompt = renderAssignmentPrompt(assignment);
+  assert.ok(fullPrompt.includes('- read-only'), 'renderAssignmentPrompt must surface the real constraint');
+  assert.ok(fullPrompt.includes('- no-sibling-visibility'), 'renderAssignmentPrompt must surface the real constraint');
+});
+
 test('retry/replay attribution stability: snapshot and digests remain deterministic when disk template changes', () => {
   const tmpDir = createTempDir('fgos-replay-test-');
   try {

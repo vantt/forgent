@@ -9,9 +9,11 @@ without an advisor's evidence; and confidence that outruns its own support.
 
 Attack the **packet and the panel**, not the architecture itself -- that is
 the critic's job. Check artifacts, not narration: open the actual evidence
-files rather than trusting a summary that the shapers ran independently.
-Your evidence is the full evidence directory, including every prompt and
-raw run record.
+files granted in {contextRefs} rather than trusting a summary that the
+shapers ran independently. Your evidence is scoped to exactly what
+{contextRefs} grants -- typically the evidence directory's own prompt and
+run records, when the driver has included them there -- never a path
+{contextRefs} does not name.
 
 Report attacks that failed at the same weight as ones that landed. Give a
 real verdict: `APPROVE`, `REVISE`, or `INSUFFICIENT-EVIDENCE`, and use the

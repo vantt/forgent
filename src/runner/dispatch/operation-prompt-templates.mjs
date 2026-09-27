@@ -541,7 +541,20 @@ export function resolveAndRenderOperationPrompt(assignmentOrTemplateId, options 
     contextRefs: target.contextRefs ?? target.artifactRefs ?? [],
     artifactRefs: target.artifactRefs ?? target.contextRefs ?? [],
     expectedOutputs: target.expectedOutputs ?? [],
-    constraints: target.constraints ?? [],
+    // Neither buildInlineAssignment() nor buildDeclaredAssignment()
+    // (assignment.mjs) promotes constraints to a top-level Assignment
+    // field -- the real values only ever live nested in provenance. Without
+    // this fallback chain, every inline Assignment (every coordination-
+    // session step, including all architecture-advisory-panel-v1
+    // operations) renders "- (none)" regardless of its actual constraints.
+    // Same fallback chain assignmentServesOperation() already uses for the
+    // identical problem (legality-facts.mjs).
+    constraints:
+      target.provenance?.inline?.contract?.constraints ??
+      target.provenance?.contract?.constraints ??
+      target.contract?.constraints ??
+      target.constraints ??
+      [],
     evidenceContract: target.evidenceContract ?? target.evidence?.required ?? 'reported',
   };
 

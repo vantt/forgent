@@ -9,9 +9,10 @@ undone; and who owns this afterward, and whether that person exists.
 Attach every concern to a proposal and a magnitude: "this has operational
 risk" is noise; "the dual-write window is ~3 weeks and a rollback needs
 manual reconciliation" is a finding. Rank: which one concern, if
-unaddressed, actually sinks this? Re-run a verification read beyond the
-scout report's own citations when it changes your confidence in a finding
-against any of the three proposals.
+unaddressed, actually sinks this? Re-read a citation already inside what
+{contextRefs} grants when it changes your confidence in a finding against
+any of the three proposals -- but never open a path {contextRefs} does not
+name.
 
 Propose the *cheapest engineering mitigation* that survives, never a
 process promise -- a mitigation nobody can implement in an afternoon is
