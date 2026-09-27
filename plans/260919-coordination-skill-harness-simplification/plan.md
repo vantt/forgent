@@ -1168,11 +1168,16 @@ Executor/provider/model/tier selection remains an execution-time decision.
          the plan.md Product Gates table, and any actor binding the Lead supplies."
     (3) `core/skills/fgos-plan-loop/SKILL.md`, section "1. Open a Cell", one transitional
         sentence after the `start` command block:
-        "Until binding resolves from config (Phase 5), pass `--actors '<json>'` on `start`
-         when the track's Execution Inputs roster requires provider diversity; omitting it
-         binds every node to the default executor plus placementPolicy read-only redirects."
+        "Until binding resolves from config (Phase 5), `--actors '<json>'` on `start` binds
+         only the entry node; later `authorize-and-dispatch` requests carry no actors, so
+         reviewer and red-team bind to the default executor plus placementPolicy read-only
+         redirects. Provider diversity across roles is not yet achievable from the facade."
+        (Amended after review: `composeCoordinationActionRequest` hard-codes `actors: []`
+         and `--actors` is a `start`-only flag, so the original "pass it for provider
+         diversity" wording overstated what `start` binds.)
     (4) `docs/how-to/author-a-plan-loop-track.md`, Execution Inputs "Roster" bullet: add
-        "(passed via `fgos coordination start --actors`; transitional until Phase 5)".
+        "(only the entry node is bound, via `fgos coordination start --actors`; full roster
+         binding lands in Phase 5)".
     (5) `npm run build:skills`; confirm `.agents/` and `plugins/fgOS/` mirrors byte-identical.
     Nothing else changes: no decide call added to the fragment, no plan-lint reference,
     no roster rule declared permanent, no Phase 4 exit criterion reopened.
