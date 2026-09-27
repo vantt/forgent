@@ -250,15 +250,15 @@ test("R4: Wall-clock timing report written to scratch JSON path (never committed
   fs.unlinkSync(scratchReportPath);
 });
 
-test("R5: Coverage floor enumerates all 73 selectors from command-routes.json", () => {
+test("R5: Coverage floor enumerates all 74 selectors from command-routes.json", () => {
   const cases = generateCoverageFloorCases();
   const routes = JSON.parse(fs.readFileSync(ROUTES_PATH, "utf8"));
   const selectors = Object.keys(routes).sort();
 
-  assert.equal(selectors.length, 73, "command-routes.json must contain exactly 73 selectors");
+  assert.equal(selectors.length, 74, "command-routes.json must contain exactly 74 selectors");
 
   const helpCases = cases.filter((c) => c.id.startsWith("coverage-help-"));
-  assert.equal(helpCases.length, 73, "Must generate exactly 73 help cases");
+  assert.equal(helpCases.length, 74, "Must generate exactly 74 help cases");
 
   for (const sel of selectors) {
     const matching = helpCases.find((c) => c.id === `coverage-help-${sel}`);
