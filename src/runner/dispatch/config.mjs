@@ -1288,9 +1288,47 @@ function validateRigorOverridesShape(rigorOverrides, label) {
 // executor alone, never override-able from a capability.
 const CAPABILITY_OVERRIDE_FIELDS = Object.freeze(['rigorOverrides', 'providerModel', 'tier', 'model']);
 
+// `serves` (I19, core/skills/_shared/capability-matching.md's Q1 steering
+// step): a capability entry's own machine-readable demand promise, checked
+// against an agent's declared `DemandFacts` at match time (a later unit's
+// scope, not this one's). Mirrors `DemandFacts` minus `size`/`rigor` --
+// those two only ever shape execution form/Q2 binding, never Q1 capability
+// selection (capability-matching.md §"DemandFacts: declaring demand").
+// Entry with no `serves` stays valid (never auto-matched, still selectable
+// by explicit name) -- an old config predating this key must keep loading.
+const CAPABILITY_SERVES_BOOLEAN_KEYS = Object.freeze([
+  'mutates',
+  'behaviorPreserving',
+  'needsIndependentReview',
+  'hasPlanOrTrack',
+]);
+const CAPABILITY_SERVES_KEYS = Object.freeze(['outputKind', 'domain', ...CAPABILITY_SERVES_BOOLEAN_KEYS]);
+
+export function validateCapabilityServesShape(serves, label) {
+  if (!serves || typeof serves !== 'object' || Array.isArray(serves)) {
+    throw new RunnerConfigError(`runner config (${label}) must be an object mapping a DemandFacts attribute -> a scalar or array value when present.`);
+  }
+  for (const [key, rawValue] of Object.entries(serves)) {
+    if (!CAPABILITY_SERVES_KEYS.includes(key)) {
+      throw new RunnerConfigError(`runner config (${label}) key "${key}" is not one of ${CAPABILITY_SERVES_KEYS.join('/')} (DemandFacts minus size/rigor).`);
+    }
+    const values = Array.isArray(rawValue) ? rawValue : [rawValue];
+    if (values.length === 0) {
+      throw new RunnerConfigError(`runner config (${label}."${key}") must be a non-empty scalar or array value.`);
+    }
+    if (CAPABILITY_SERVES_BOOLEAN_KEYS.includes(key)) {
+      if (!values.every((value) => typeof value === 'boolean')) {
+        throw new RunnerConfigError(`runner config (${label}."${key}") must be a boolean, or an array of booleans, when present.`);
+      }
+    } else if (!values.every((value) => typeof value === 'string' && value.trim())) {
+      throw new RunnerConfigError(`runner config (${label}."${key}") must be a non-empty string, or an array of non-empty strings, when present.`);
+    }
+  }
+}
+
 function validateCapabilitiesShape(capabilities, label) {
   if (!capabilities || typeof capabilities !== 'object' || Array.isArray(capabilities)) {
-    throw new RunnerConfigError(`runner config (${label}) must be an object mapping a capability name -> {description?, aliases?, prefer?, overrides?} when present.`);
+    throw new RunnerConfigError(`runner config (${label}) must be an object mapping a capability name -> {description?, aliases?, prefer?, overrides?, confinement?, serves?} when present.`);
   }
   for (const [name, entry] of Object.entries(capabilities)) {
     const entryLabel = `${label}.${name}`;
@@ -1330,7 +1368,10 @@ function validateCapabilitiesShape(capabilities, label) {
         validateRigorOverridesShape(entry.overrides.rigorOverrides, `${entryLabel}.overrides.rigorOverrides`);
       }
     }
-    const ALLOWED_CAPABILITY_ENTRY_KEYS = ['description', 'aliases', 'prefer', 'overrides', 'confinement'];
+    if (entry.serves !== undefined) {
+      validateCapabilityServesShape(entry.serves, `${entryLabel}.serves`);
+    }
+    const ALLOWED_CAPABILITY_ENTRY_KEYS = ['description', 'aliases', 'prefer', 'overrides', 'confinement', 'serves'];
     for (const key of Object.keys(entry)) {
       if (!ALLOWED_CAPABILITY_ENTRY_KEYS.includes(key)) {
         if (key === 'unconfined') {

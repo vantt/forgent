@@ -201,6 +201,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   in a 0600 side file the supervisor process reads once, uses to spawn the
   worker, and deletes immediately after.
 
+### Capability catalog `serves` (Unit I19)
+
+- Added machine-readable `serves` attributes to `runner.capabilities` catalog
+  entries (`ALLOWED_CAPABILITY_ENTRY_KEYS`/`validateCapabilitiesShape` in
+  `src/runner/dispatch/config.mjs`, `DEFAULT_CAPABILITY_SLOTS` in
+  `src/setup/registrations.mjs`): an object mirroring `DemandFacts` minus
+  `size`/`rigor` (`outputKind`, `domain`, `mutates`, `behaviorPreserving`,
+  `needsIndependentReview`, `hasPlanOrTrack`), scalar or array values, used by
+  `core/skills/_shared/capability-matching.md`'s Q1 steering. An entry
+  without `serves` stays valid; an old config predating this key keeps
+  loading unchanged.
+- Added a new generic, domain-neutral `review` capability slot to
+  `DEFAULT_CAPABILITY_SLOTS` (independent read-only review of non-code
+  artifacts, distinct from `code:review`) -- curated default, no
+  `prefer`/`overrides` pin.
+- Added doctor check `capability-serves-valid`: every declared `serves` is
+  well-formed, no two capability entries declare the identical `serves`
+  attribute set, and the `review` slot is present.
+- Live `.fgos/config.json`: added `serves` to every existing capability
+  entry, the new `review` slot, and `for` on the previously orphaned `glm`,
+  `xai`, and `deepseek` executors (`xai` -> `["review", "code:review"]`,
+  `deepseek`/`glm` -> `["execute"]`) -- additive only, no existing `prefer`
+  changed.
+
 ## [v0.1.0] - 2026-09-18
 
 ### Changed

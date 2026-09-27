@@ -93,6 +93,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'agent-claims-resolve',
       'agent-type-names-unique',
       'advise-execute-capabilities-configured',
+      'capability-serves-valid',
       'decision-index-stale',
       'instruction-projections-stale',
       'doc-registry-enforce',
@@ -1238,6 +1239,77 @@ test('advise-execute-capabilities-configured passes when both slots are declared
   const { passed, message } = checkById('advise-execute-capabilities-configured').check(cwd);
   assert.equal(passed, true);
   assert.match(message, /declares "advise", "execute", and "code:implement"/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+// ─── capability-serves-valid (I19, core/skills/_shared/capability-matching.md) ───
+
+test('capability-serves-valid fails when runner.capabilities is missing entirely', () => {
+  const cwd = mkTemp('doctor-serves-absent-');
+  const { passed, message } = checkById('capability-serves-valid').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /runner\.capabilities section missing/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('capability-serves-valid passes on the curated defaults (serves on every slot, none identical, "review" present)', () => {
+  const cwd = mkTemp('doctor-serves-ok-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities: DEFAULT_CAPABILITY_SLOTS } }));
+  const { passed, message } = checkById('capability-serves-valid').check(cwd);
+  assert.equal(passed, true, message);
+  assert.match(message, /valid "serves" attribute set, none identical, and "review" is present/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('capability-serves-valid is a no-op pass on a config with no "serves" anywhere (an entry without one stays valid)', () => {
+  const cwd = mkTemp('doctor-serves-none-declared-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities: { advise: {}, execute: {}, review: {} } } }));
+  const { passed, message } = checkById('capability-serves-valid').check(cwd);
+  assert.equal(passed, true, message);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('capability-serves-valid fails when a "serves" value has an unknown key or wrong type', () => {
+  for (const badServes of [{ notARealKey: 'change' }, { mutates: 'yes' }, { outputKind: 42 }, { size: 'heavy' }, { rigor: 'high' }]) {
+    const cwd = mkTemp('doctor-serves-malformed-');
+    fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+    fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities: { review: {}, execute: { serves: badServes } } } }));
+    const { passed, message } = checkById('capability-serves-valid').check(cwd);
+    assert.equal(passed, false, `serves: ${JSON.stringify(badServes)}`);
+    assert.match(message, /invalid "serves"/);
+    fs.rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+test('capability-serves-valid fails when two entries declare the identical "serves" attribute set', () => {
+  const cwd = mkTemp('doctor-serves-duplicate-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(
+    path.join(cwd, '.fgos', 'config.json'),
+    JSON.stringify({
+      runner: {
+        capabilities: {
+          review: { serves: { outputKind: 'finding', mutates: false } },
+          'docs:review': { serves: { outputKind: 'finding', mutates: false } },
+        },
+      },
+    }),
+  );
+  const { passed, message } = checkById('capability-serves-valid').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /declare the identical "serves" attribute set/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('capability-serves-valid fails when the "review" slot is missing', () => {
+  const cwd = mkTemp('doctor-serves-no-review-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities: { execute: { serves: { outputKind: 'change', mutates: true } } } } }));
+  const { passed, message } = checkById('capability-serves-valid').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /missing the "review" slot/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 

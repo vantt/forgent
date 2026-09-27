@@ -47,7 +47,7 @@ import { runAllConfinementProbes } from '../runner/dispatch/confinement/probes/h
 import { reapOrphanedConfinementResources, OWNERSHIP_MARKER_FILE } from '../runner/dispatch/confinement/cleanup.mjs';
 
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
-import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON } from '../runner/dispatch/config.mjs';
+import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, validateCapabilityServesShape } from '../runner/dispatch/config.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../state/fgos-file-registry.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
@@ -1777,14 +1777,27 @@ export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
     // Interim posture: P06 must first wire a production backend binding.
     // Required here would otherwise universally refuse group-thinking.
     confinement: { mode: 'unconfined' },
+    serves: { outputKind: 'decision', mutates: false },
   },
   execute: {
     description:
       'Compliance-driven work -- value comes from following the plan, changes files, must pass verify (D2, docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md)',
+    serves: { outputKind: 'change', mutates: true },
+  },
+  // I19 (core/skills/_shared/capability-matching.md, capability-catalog.md):
+  // generic, domain-neutral independent review -- docs/design/spec/config,
+  // never code (that stays `code:review`). No `prefer`/`overrides` either,
+  // same curated-default-never-pins reasoning as every other slot here.
+  review: {
+    description:
+      'Independent read-only review of a non-code artifact (docs, design, spec, config) before merge/decision -- distinct from code:review (I19, core/skills/_shared/capability-catalog.md).',
+    confinement: { mode: 'unconfined' },
+    serves: { outputKind: 'finding', mutates: false },
   },
   'code:implement': {
     description:
       'Canonical coding implementation capability -- compliance-driven coding execution before implementation (D1/D2, docs/history/capability-aware-dispatch-activation/CONTEXT.md)',
+    serves: { outputKind: 'change', domain: 'code', mutates: true },
   },
   // P2-runtime (docs/history/agent-coordination-foundation/plan.md):
   // extended by observed frequency, in this priority order. Deliberately
@@ -1794,19 +1807,23 @@ export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
     description:
       'Canonical coding review capability -- independent review of a coding implementation unit before merge (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',
     confinement: { mode: 'unconfined' },
+    serves: { outputKind: 'finding', domain: 'code', mutates: false },
   },
   'code:test': {
     description:
       'Canonical coding test capability -- author or run tests for a coding implementation unit (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',
+    serves: { outputKind: 'verification', domain: 'code' },
   },
   'code:debug': {
     description:
       'Canonical coding debug capability -- root-cause investigation of a coding defect (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',
     confinement: { mode: 'unconfined' },
+    serves: { outputKind: 'finding', domain: 'code' },
   },
   'code:refactor': {
     description:
       'Canonical coding refactor capability -- behavior-preserving structural change to existing code (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',
+    serves: { outputKind: 'change', domain: 'code', mutates: true, behaviorPreserving: true },
   },
 });
 
@@ -1922,6 +1939,69 @@ registerCheck({
   id: 'advise-execute-capabilities-configured',
   description: 'runner.capabilities declares the "advise" and "execute" purpose slots decide --for resolves against (tsk-2uf-3)',
   check: (cwd) => checkAdviseExecuteCapabilitiesConfigured(cwd),
+});
+
+// I19 (core/skills/_shared/capability-matching.md): `serves` is optional at
+// load time (`validateCapabilitiesShape`'s hot path never rejects an old
+// entry with none), but a live config's DECLARED `serves` values still need
+// a doctor signal -- a malformed one, or two capabilities that declare the
+// identical attribute set (permanently tied, capability-matching.md's
+// "Ties and misses" rule), silently degrades Q1 steering with no error
+// anywhere else. `review`'s presence is already covered generically by
+// `advise-execute-capabilities-configured` above (CURATED_CAPABILITY_NAMES
+// derives from DEFAULT_CAPABILITY_SLOTS, which now includes it) -- checked
+// again here too since it is this doctrine's own explicit requirement.
+function normalizeServesForComparison(serves) {
+  return JSON.stringify(Object.fromEntries(Object.entries(serves).sort(([a], [b]) => a.localeCompare(b))));
+}
+
+function checkCapabilityServesValid(cwd) {
+  const capabilities = readSharedConfig(cwd)?.runner?.capabilities;
+  if (!capabilities || typeof capabilities !== 'object' || Array.isArray(capabilities)) {
+    return {
+      passed: false,
+      message: 'runner.capabilities section missing -- run fgos setup ("serves" cannot be validated until it exists)',
+    };
+  }
+  const invalid = [];
+  const servesByName = new Map();
+  for (const [name, entry] of Object.entries(capabilities)) {
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry) || entry.serves === undefined) continue;
+    try {
+      validateCapabilityServesShape(entry.serves, `runner.capabilities.${name}.serves`);
+      servesByName.set(name, entry.serves);
+    } catch (error) {
+      invalid.push(`${name}: ${error.message}`);
+    }
+  }
+  if (invalid.length > 0) {
+    return { passed: false, message: `invalid "serves": ${invalid.join('; ')}` };
+  }
+  const seenBySignature = new Map();
+  for (const [name, serves] of servesByName) {
+    const signature = normalizeServesForComparison(serves);
+    const priorName = seenBySignature.get(signature);
+    if (priorName) {
+      return {
+        passed: false,
+        message: `"${priorName}" and "${name}" declare the identical "serves" attribute set -- capability matching can never distinguish them`,
+      };
+    }
+    seenBySignature.set(signature, name);
+  }
+  if (!capabilities.review || typeof capabilities.review !== 'object' || Array.isArray(capabilities.review)) {
+    return { passed: false, message: 'runner.capabilities is missing the "review" slot -- run fgos setup' };
+  }
+  return {
+    passed: true,
+    message: `${servesByName.size} capability entr${servesByName.size === 1 ? 'y declares' : 'ies declare'} a valid "serves" attribute set, none identical, and "review" is present`,
+  };
+}
+
+registerCheck({
+  id: 'capability-serves-valid',
+  description: 'runner.capabilities\' "serves" attribute sets are well-formed, mutually distinct, and include the "review" slot (I19)',
+  check: (cwd) => checkCapabilityServesValid(cwd),
 });
 
 // tsk-slq D6 (AGENTS.md's install/setup/doctor gate — a new infra
