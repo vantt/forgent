@@ -1945,12 +1945,117 @@ Executor/provider/model/tier selection remains an execution-time decision.
     still invisible to the action view after this unit claims it's fixed;
     the H3 decision (pack gate still refuses `specialist-authorize`) is
     weakened by anything in this unit.
+- unit: I25 — real-protocol conformance for human-turn/bounded-reopen visibility, allowlist hardening (Phase 5 work items 5, 6, narrow remainder)
+  capability: code:implement
+  depends-on: none (I24a/I24b already closed)
+  status: not-started
+  design-record: plans/reports/fork-260928-0024-phase5-items-5-6-7-8-decomposition-research-report.md §Items 5, 6
+  scope: work items 5 and 6 were substantially closed as a side effect of
+    I24b's own M1 fix (`evaluateDriverAuthorizedBindings` now correctly
+    keeps a `maxInvocations:2` bounded-reopen operation like
+    `revise-synthesis`/`revise-explanation` pending across both
+    invocations) and its work-item-6 mechanical-fields test
+    (`test/runner/coordination-actions-v1.test.mjs`). This unit closes the
+    two narrow remainders review-i24b/test-i24b both flagged but correctly
+    deferred: (1) `record-human-turn` and both bounded-reopen invocations
+    already surface generically, but no test proves BOTH appear correctly
+    together in the REAL `architecture-advisory-panel-v1` typed action view
+    specifically (as opposed to synthetic unit fixtures) — add one; (2) the
+    work-item-6 test (`coordination-actions-v1.test.mjs:119`) checks every
+    kind OTHER than `specialist` against only an 8-name denylist, while
+    `specialist` alone gets a strict allowlist — a judgment field with an
+    unlisted name (e.g. `rationale`, `rank`) would pass for any non-specialist
+    kind. Harden it to an allowlist for every action kind the projector
+    emits, matching Phase 1's locked contract ("describes legal choices but
+    never chooses one") for all of them, not just the newest one. Also sweep
+    `fgos-architecture-panel/SKILL.md` and any how-to docs for a stale
+    "human-turn/bounded-reopen not yet in the typed view" claim, if one
+    exists (grep first — may already be clean).
+  files: test/runner/coordination-actions-v1.test.mjs,
+    test/verbs/coordination-architecture-advisory-panel-conformance.test.mjs,
+    core/skills/fgos-architecture-panel/SKILL.md (doc sweep only, if a stale
+    claim is found), CHANGELOG.md.
+  verification: node --test test/runner/coordination-actions-v1.test.mjs;
+    node --test test/verbs/coordination-architecture-advisory-panel-conformance.test.mjs;
+    env -u CLAUDE_CODE_SESSION_ID npm test.
+  stop: the allowlist hardening narrows legitimate mechanical fields any
+    existing action kind actually needs (would break real callers, not just
+    tighten the test); the real-protocol conformance test can't be made to
+    pass without a code change beyond this unit's stated scope (that would
+    mean I24b's M1 fix was incomplete — escalate, don't silently patch
+    around it here).
+- unit: I26 — architecture-panel/fgos-panel consume the driver-discipline fragment; fold fgos-group-thinking into fgos-panel (Phase 5 work items 7, 8)
+  capability: code:implement
+  depends-on: none (I17 fragment and I20 capability-match door already integrated per Phase 5's own entry gate)
+  status: not-started
+  design-record: plans/reports/fork-260928-0024-phase5-items-5-6-7-8-decomposition-research-report.md §Items 7, 8
+  decision (Lead, locked, do not reopen): work item 7's "the generic
+    presets driven by `fgos-panel`" wording is ambiguous — `fgos-panel`
+    exists today only as a 67-line pure NL-router that selects a preset and
+    delegates, never driving a dialogue loop itself, and no separate
+    "generic presets" file exists to own driver-discipline consumption
+    instead. Rather than inventing a new shared consumer file, `fgos-panel`
+    itself loads `core/skills/_shared/coordination-driver.md` (the Phase
+    4/I15 fragment, already consumed by `fgos-plan-loop`) and fills its
+    hooks, matching the exact two-unlike-consumer pattern Phase 5's own
+    Exit criterion requires ("architecture-panel and `fgos-panel` consume
+    the driver-discipline fragment unchanged"). `fgos-architecture-panel`
+    also loads it directly (it is a role-doctrine skill in its own right,
+    not routed through `fgos-panel`'s delegation) — confirmed via grep
+    that neither skill currently references the fragment at all.
+  scope: (Item 7) add the fragment-load + hook-fill to both
+    `core/skills/fgos-panel/SKILL.md` and
+    `core/skills/fgos-architecture-panel/SKILL.md`, following the identical
+    pattern `fgos-plan-loop` already uses (read that skill's own reference
+    to the fragment as the template — do not restate the fragment's rules
+    inline, per Phase 4's own "facades restate no rule owned by the
+    driver-discipline fragment" drift-test requirement, already enforced by
+    an existing Phase 7 drift test this unit must not break). (Item 8) most
+    of the literal wording is already satisfied: the pack-membership gate
+    already lives in code behind the public CLI (I23's `fgos coordination
+    pack list/show-protocol/run`), and the stale "always auto-closes / no
+    close step" claim is already gone (confirmed via grep — a side effect
+    of I23's own fix round). The real remaining work: (a) `fgos-panel/
+    SKILL.md`'s own step 5 currently routes through `fgos-group-thinking`
+    as an intermediary rather than calling the CLI door directly — update
+    it to call `fgos coordination pack run` directly, landing AFTER this
+    unit's own item-7 fragment-wiring in the same file to avoid touching it
+    twice across two units; (b) convert `fgos-group-thinking/SKILL.md`
+    (currently 225 lines of full content) into a genuine thin deprecated
+    stub pointing at `fgos-panel`, kept loadable only for the Phase 7
+    compatibility window (do NOT delete it yet — Phase 7 owns closing the
+    compatibility window). Resync `.agents/skills`/`.claude/skills`/
+    `plugins/fgOS/skills` mirrors via `npm run build:skills` for every
+    touched skill file.
+  files: core/skills/fgos-panel/SKILL.md (+ mirrors),
+    core/skills/fgos-architecture-panel/SKILL.md (+ mirrors),
+    core/skills/fgos-group-thinking/SKILL.md (+ mirrors),
+    core/skills/_shared/coordination-driver.md (read-only reference, do not
+    modify — Phase 4's own fragment, shared with `fgos-plan-loop`),
+    docs/how-to/use-fgos-group-thinking.md (update for the stub redirect),
+    CHANGELOG.md.
+  verification: node --test test/setup/skill-wrappers.test.mjs (mirrors
+    byte-identical); whatever Phase 7 drift test already checks "facades
+    restate no rule owned by the driver-discipline fragment" (grep for it —
+    cited in Phase 7's own work item 5 as already planned; if it does not
+    exist yet, this unit must not be the one to invent it, note the gap
+    instead of silently building Phase 7 scope early); a live CLI probe
+    that `fgos-panel`'s step 5 now calls `fgos coordination pack run`
+    directly (grep the skill file, don't just trust prose); env -u
+    CLAUDE_CODE_SESSION_ID npm test.
+  stop: `fgos-panel` or `fgos-architecture-panel` restate driver-discipline
+    rules inline instead of loading the fragment (the two-unlike-consumer
+    proof requires the fragment stay unchanged and un-duplicated); the
+    `fgos-group-thinking` stub is deleted outright instead of kept loadable
+    (breaks the Phase 7 compatibility window); the pack-membership gate's
+    actual refusal behavior is touched by anything in this unit (it is
+    settled, I23/I24a/I24b territory, not this unit's job).
 
 Parallelism is limited deliberately:
 
 ```text
 I00 -> I01 -> I02 -> I03 -------------------------------+
-          +-> I04 -> I05 -------------------------------+--> I11 -> I12 -> I13 -> I14 -> I15 -> I16 -> I17 -> I19 -> I21 (Phase 5 item 2) ; I19 -> I20 -> Phase 5 items 7/8
+          +-> I04 -> I05 -------------------------------+--> I11 -> I12 -> I13 -> I14 -> I15 -> I16 -> I17 -> I19 -> I21 (Phase 5 item 2) ; I19 -> I20 -> I26 (Phase 5 items 7/8)
                                                              I16 -> I18 (parallel with I17)
           +-> I06 -----+                                |
           +-> I07 -----+-> I08 -------------------------+
@@ -1958,7 +2063,14 @@ I00 -> I01 -> I02 -> I03 -------------------------------+
 
 I16 -> I22 (Phase 5 item 1) ‖ I23 (Phase 5 item 3, files disjoint from I22)
 I22, I23 -> I24a (Phase 5 item 4 pt.1) -> I24b (Phase 5 items 4 pt.2/5/6)
+I24b -> I25 (Phase 5 items 5/6 narrow remainder) ‖ I26 (Phase 5 items 7/8, files disjoint from I25)
 ```
+
+I25 and I26 are independent of each other (disjoint files: I25 touches
+`actions-projector.mjs`/test files only, I26 touches `fgos-panel`/
+`fgos-architecture-panel`/`fgos-group-thinking` skill files only) and may
+run in parallel. Phase 6's own entry gate requires I26 (Phase 5 work items
+7/8) integrated before it opens.
 
 I22/I23 run in parallel (Files disjoint). I24a runs after I22/I23 close out —
 sequential, not parallel, despite low measured textual-overlap risk on
