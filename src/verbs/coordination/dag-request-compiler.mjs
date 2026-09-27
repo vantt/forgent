@@ -69,6 +69,7 @@ export function compileDagRequest(request, { durableLedgerIds = [] } = {}) {
     if (step.type === 'authorize') refs.push(...(step.grantedContextRefs ?? []), step.targetArtifactRef);
     if (step.type === 'disposition') refs.push(step.targetRef, ...(step.evidenceRefs ?? []));
     if (step.type === 'contribution') refs.push(step.assignmentId);
+    if (step.type === 'specialist-authorize') refs.push(...(step.triggerEvidenceRefs ?? []), ...(step.allowedContextRefs ?? []));
     for (const value of refs) {
       if (value === undefined) continue;
       const source = addReferenceEdge(dependencies, value);

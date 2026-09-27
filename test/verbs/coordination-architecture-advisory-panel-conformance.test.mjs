@@ -7,12 +7,16 @@
 // reaches the capability under test -- the same "prove it through the real
 // dispatch path, not just at the kernel level in isolation" posture
 // `coordination-group-thinking-rfc-review-lite-pack-conformance.test.mjs`
-// already established for its own protocol. Two capabilities have no pack
-// step-vocabulary channel at all (named explicitly in the FlowDefinition's
-// own header comment, not discovered here): specialist-slot authorization
-// (`authorizeSpecialistSlot`) and `mutation:"mutating"` forwarding -- neither
-// is exercised by this protocol, so only the former needs a direct-engine
-// fallback below.
+// already established for its own protocol. Two capabilities have no PACK
+// GATE channel (named explicitly in the FlowDefinition's own header
+// comment, not discovered here): specialist-slot authorization
+// (`authorizeSpecialistSlot`) -- `run.mjs`'s own vocabulary grew a
+// `specialist-authorize` step type reaching it (I24a), but
+// `runGroupThinkingRequest` explicitly refuses that step type (Group-Thinking
+// Protocol Pack bypass #4 stays refused) -- and `mutation:"mutating"`
+// forwarding, which the pack gate never touches at all. Neither is
+// exercised by this protocol through the pack, so only the former needs a
+// direct-engine fallback below.
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
@@ -526,9 +530,10 @@ test('missing actors: the session reports the real, named missing actor and neve
   assert.ok(!missingIds.has('system-shaper-actor'), 'system-shaper-actor has no further gating binding and is genuinely complete');
 });
 
-// ── Unauthorized specialist is refused (direct engine call -- run.mjs has no
-//    specialist-authorize step type; see the FlowDefinition's own header
-//    comment for this named, pre-existing gap). ────────────────────────────
+// ── Unauthorized specialist is refused (direct engine call -- reachable
+//    through `run.mjs`'s own `specialist-authorize` step type since I24a,
+//    but never through the pack gate, which explicitly refuses that step
+//    type; see the FlowDefinition's own header comment). ───────────────────
 test('unauthorized specialist: answer-specialist-question cannot dispatch without a prior authorizeSpecialistSlot, and succeeds once authorized', async () => {
   const tempDir = mkTempDir();
   const runnerConfig = fakeRunnerConfig(tempDir);

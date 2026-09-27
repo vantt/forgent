@@ -469,12 +469,12 @@ test('validateCoordinationRequest: a "disposition" step missing targetRef/dispos
   }
 });
 
-test('validateCoordinationRequest: the unknown-step-type message names all seven supported types', () => {
+test('validateCoordinationRequest: the unknown-step-type message names all eight supported types', () => {
   assert.throws(
     () => validateCoordinationRequest(request({ steps: [{ type: 'authorise', as: 'typo' }] })),
     (err) =>
       err instanceof StoreError &&
-      /steps\[0\]\.type must be "operation", "fan-out", "authorize", "disposition", "contribution", "human-turn", or "close"/.test(err.message),
+      /steps\[0\]\.type must be "operation", "fan-out", "authorize", "disposition", "contribution", "human-turn", "specialist-authorize", or "close"/.test(err.message),
   );
 });
 

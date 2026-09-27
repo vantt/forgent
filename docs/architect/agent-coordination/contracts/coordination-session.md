@@ -759,28 +759,44 @@ re-verified against two real registered protocols by `P10.5.md` §4-5):
 plus, on resume, a cross-check against the session's REAL bound protocol
 (`manifest.definitionRef.id`, via `resumeSession`) fixed by P10.1's own Fix
 Round 1 after Red-Team proved a resume-path gap in the original design;
-(3) validate its own aggregate, (4) authorize a specialist, (5) close a
-session directly — `run.mjs`'s public request vocabulary never exposes any
-of these three as caller-invokable actions at all (`closeSessionByQuorum`
-in particular is called unconditionally, and only, inside `run.mjs` itself
-at the end of its own steps loop, never as a request-selectable action);
-(2) bypass grants — `run.mjs`'s public vocabulary DOES expose an
-`authorize` step, but it dispatches through `authorizeDeclaredOperation`,
-the exact same mediated door with the exact same context-grant enforcement
-every hand-authored request already uses — this gate's own explicit-
-selection checks run before, and add nothing to, `run.mjs`'s existing
-enforcement, so the bypass is refused by mediation, not by absence from the
-vocabulary (`P10.1.md`'s own accurate framing, quoted rather than
-paraphrased: three bypasses — validate-aggregate, authorize-specialist,
-close-directly — are refused because `run.mjs`'s vocabulary never exposes
-them at all; two — switch-protocols, bypass-grants — are refused because
-the pack gate's own explicit-selection checks run before, and add nothing
-to, `run.mjs`'s existing enforcement. This is NOT "upstream mediation" in
-`run.mjs` itself: the base `runCoordinationUseCase` door has no
-resumed-session protocol cross-check of its own — see this document's
-"Group-Thinking Protocol Pack" section, residual #22 — so switch-protocols
-is refused by the PACK gate's own explicit check, not by anything
-`run.mjs` enforces upstream).
+(3) validate its own aggregate, (5) close a session directly — `run.mjs`'s
+public request vocabulary never exposes either as a caller-invokable action
+at all (`closeSessionByQuorum` in particular is called unconditionally, and
+only, inside `run.mjs` itself at the end of its own steps loop, never as a
+request-selectable action); (2) bypass grants — `run.mjs`'s public
+vocabulary DOES expose an `authorize` step, but it dispatches through
+`authorizeDeclaredOperation`, the exact same mediated door with the exact
+same context-grant enforcement every hand-authored request already uses —
+this gate's own explicit-selection checks run before, and add nothing to,
+`run.mjs`'s existing enforcement, so the bypass is refused by mediation,
+not by absence from the vocabulary.
+**(4) authorize a specialist — reasoning updated, I24a (Phase 5 item 4).**
+`run.mjs`'s public request vocabulary grew a real `specialist-authorize`
+step type (`src/verbs/coordination/schema.mjs`), reaching
+`authorizeSpecialistSlot`, for any raw coordination request door
+(`coordination run --file`, `coordination start --steps`, the headless
+adapter — none of them filter by step type) — so this bypass is no longer
+refused by absence from the vocabulary (P10.1's original framing, now
+outdated for this one bypass only). It stays refused for every request the
+group-thinking pack gate forwards through an EXPLICIT step-type refusal
+that `runGroupThinkingRequest`
+(`src/verbs/coordination/group-thinking-pack.mjs`) now applies before
+forwarding anything —
+`test/verbs/coordination-group-thinking-pack-registration.test.mjs` proves
+it. A driver-authenticated typed-action/subverb door for this same
+capability is a later unit's own work, not yet built.
+(`P10.1.md`'s own framing for the remaining four, paraphrased and adjusted
+for the changed bypass count above — no longer a literal quote once this
+paragraph split the original grouping to carve out bypass #4 separately:
+two bypasses — validate-aggregate, close-directly — are refused because
+`run.mjs`'s vocabulary never exposes them at all; two —
+switch-protocols, bypass-grants — are refused because the pack gate's own
+explicit-selection checks run before, and add nothing to, `run.mjs`'s
+existing enforcement. This is NOT "upstream mediation" in `run.mjs` itself:
+the base `runCoordinationUseCase` door has no resumed-session protocol
+cross-check of its own — see this document's "Group-Thinking Protocol
+Pack" section, residual #22 — so switch-protocols is refused by the PACK
+gate's own explicit check, not by anything `run.mjs` enforces upstream).
 
 **Per-actor provider/tier customization, proven live, never collapsed onto
 one hardcoded provider** (the user's own mid-flight requirement,

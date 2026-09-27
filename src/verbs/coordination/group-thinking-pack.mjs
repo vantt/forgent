@@ -221,15 +221,31 @@ function peekRequest(requestPath) {
 
 /**
  * Launch or resume ONE group-thinking coordination request, gated on
- * explicit pack membership, then forwarded UNCHANGED into
- * `runCoordinationUseCase` (`run.mjs`) -- the exact door `fgos coordination
- * run --file`/the headless adapter already use. This is a thin pass-through,
- * never a second execution path: nothing in this function opens a session,
- * dispatches, authorizes, dispositions, validates an aggregation, authorizes
- * a specialist, or closes a session -- `run.mjs`'s own request vocabulary
- * (`operation` | `authorize` | `disposition` | `fan-out` steps, plus its
- * own automatic close-on-quorum at the end of every request) is the ONLY
- * thing that ever executes, unmodified by anything here.
+ * explicit pack membership, then forwarded (with exactly one step-type
+ * refusal, see below) into `runCoordinationUseCase` (`run.mjs`) -- the exact
+ * door `fgos coordination run --file`/the headless adapter already use.
+ * This is a thin pass-through, never a second execution path: nothing in
+ * this function opens a session, dispatches, authorizes, dispositions,
+ * validates an aggregation, or closes a session on its own -- `run.mjs`'s
+ * own request vocabulary is the ONLY thing that ever executes, unmodified
+ * by anything here.
+ *
+ * ONE explicit exception (I24a, Phase 5 item 4): `run.mjs`'s request
+ * vocabulary now includes a `specialist-authorize` step type
+ * (`src/verbs/coordination/schema.mjs`), reaching `authorizeSpecialistSlot`
+ * -- Group-Thinking Protocol Pack bypass #4 ("authorize a specialist") can
+ * no longer be refused merely because the vocabulary lacks the step (the
+ * reasoning `docs/architect/agent-coordination/contracts/coordination-session.md`'s
+ * "Five bypasses" section gave before I24a). This function refuses that one
+ * step type explicitly, below, before anything is forwarded -- keeping
+ * bypass #4 refused for every request this pack gate ever forwards. Any raw
+ * coordination request door -- `coordination run --file`, `coordination
+ * start --steps`, the headless adapter -- remains a legal way to reach
+ * specialist authorization until a driver-authenticated typed-action door
+ * exists (a later unit): `start`/its `composers.mjs` composer forward
+ * `steps` unfiltered by type, exactly as they already do for every other
+ * step type, so this pack's own explicit refusal below is the actual
+ * boundary, never the raw doors' own step-type vocabulary.
  *
  * Resume is `run.mjs`'s own existing behavior, inherited for free: a
  * request naming an EXISTING `coordinationId` resumes that session through
@@ -284,6 +300,17 @@ export async function runGroupThinkingRequest(ctx, options = {}) {
   if (peeked.protocolRef?.id !== protocolId) {
     fail(
       `the request's own protocolRef.id ("${peeked.protocolRef?.id}") does not match the explicitly selected protocolId ("${protocolId}") -- refusing a request whose body disagrees with the caller's own explicit selection`,
+    );
+  }
+
+  // Bypass #4 ("authorize a specialist"), explicit refusal (I24a) -- see
+  // this function's own doc comment above for why this check exists now
+  // that `run.mjs`'s vocabulary has grown a `specialist-authorize` step.
+  if (Array.isArray(peeked.steps) && peeked.steps.some((step) => step && step.type === 'specialist-authorize')) {
+    fail(
+      'a "specialist-authorize" step is refused by this pack gate -- Group-Thinking Protocol Pack bypass #4 ' +
+        '("authorize a specialist") stays refused for every request forwarded through runGroupThinkingRequest; ' +
+        'use a raw coordination request door directly instead (`coordination run --file`, `coordination start --steps`, the headless adapter)',
     );
   }
 

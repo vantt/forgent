@@ -1271,7 +1271,14 @@ export function authorizeOperation(
  * a caller holding the FlowDefinition can answer -- `session-engine.mjs`'s
  * `authorizeSpecialistSlot` is that caller.
  *
- * Idempotent on `specialistAuthorizationId`, mirroring `authorizeOperation`.
+ * `specialistAuthorizationId` is claimed once, mirroring
+ * `recordContributionLink`'s own `contributionId` discipline: a
+ * byte-identical repeat (canonical payload, `authorizedBy` normalized to
+ * `{type, id}`) is an idempotent no-op that echoes back the ORIGINALLY
+ * recorded payload, never the caller's new one; the same id carrying
+ * anything different is a hard `duplicate-ref` -- a specialist
+ * authorization is immutable once written, the same crash-resume self-heal
+ * shape every other driver-authored door in this module already takes.
  *
  * `opts.maxBindingsForSlot: { slotId, cap }` is opt-in, forwarded by the
  * definition-aware caller that can read `specialistSlots[].maxBindings`.
@@ -1336,10 +1343,24 @@ export function recordSpecialistAuthorization(
     });
 
     const events = readEvents(eventsPath);
-    const alreadyAuthorized = events.some(
+    // Idempotency compares a CANONICAL shape, not the raw payload -- the SAME
+    // `authorizedBy` key-insertion-order hazard `recordDriverDisposition`/
+    // `recordContributionLink` already normalize for, applied here rather
+    // than re-derived.
+    const canonicalize = (value) =>
+      JSON.stringify({ ...value, authorizedBy: { type: value.authorizedBy?.type, id: value.authorizedBy?.id } });
+    const priorForId = events.find(
       (event) => event.type === 'specialist-authorized' && event.payload?.specialistAuthorizationId === specialistAuthorizationId,
     );
-    if (alreadyAuthorized) return Object.freeze({ ...payload, appended: false });
+    if (priorForId) {
+      if (canonicalize(priorForId.payload) === canonicalize(payload)) {
+        return Object.freeze({ ...priorForId.payload, appended: false });
+      }
+      throw new CoordinationError(
+        'duplicate-ref',
+        `recordSpecialistAuthorization: specialistAuthorizationId "${specialistAuthorizationId}" in session "${coordinationId}" was already recorded with different content -- a specialist authorization is immutable; record a new specialistAuthorizationId instead`,
+      );
+    }
 
     if (opts.maxBindingsForSlot !== undefined) {
       const { slotId: capSlotId, cap } = opts.maxBindingsForSlot;
