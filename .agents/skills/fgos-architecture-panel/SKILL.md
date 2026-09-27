@@ -63,6 +63,30 @@ the twelve-dimension rubric. If a judgment call here and the deep
 doctrine ever disagree, the deep doctrine wins — this file is a
 projection of it, not a replacement.
 
+This facade also builds on the shared **Generic Driver Discipline**:
+[`../_shared/coordination-driver.md`](../_shared/coordination-driver.md) defines
+the domain-neutral cycle (`observe -> choose legal action -> dispatch -> verify
+evidence -> disposition -> adapt -> explicit close -> continuity artifact`). The
+Facade Hook Values table below fills that cycle's 9 hook slots from this file's
+own existing sections, verbatim rather than restated — this file's six-value
+disposition vocabulary and Fresh-Session Resume packet are not reconciled away
+into something new; they *are* the fragment's `disposition criteria` and
+`continuity artifact` hook values.
+
+## Facade Hook Values
+
+| Hook Slot | Value |
+|---|---|
+| `unit of iteration` | One `architecture-advisory-panel-v1` coordination session (one `coordinationId`), from `phase-framing` entry through explicit `close-dialogue` -- the Entry Flow table's own row-by-row graph traversal, below, is the concrete shape of this hook. |
+| `open inputs` | (a) result kind: advisory, never work-product -- this skill never implements the chosen architecture (frontmatter; Bounds #1, #5). (b) primary canonical capability: `advise` (`../_shared/capability-catalog.md`'s `serves: decision, mutates: false` matches this skill's own demand directly) -- resolved once by whichever caller selected this skill (`fgos-panel`'s own `open inputs` hook, or a direct invocation), never re-derived here. (c) the raw case intake (frozen `intake.md`) and the resolved roster (Executor Roster table) -- Phase 1's own coordinator-only framing step, below. |
+| `evidence verification` | Never describe a coordination outcome to the person until it has actually come back through one of the real doors -- `fgos coordination show <coordinationId> --json`, an `operation` result, or the `human-turn`/`specialist-authorize` request steps. No "the panel would probably say" fallback (Never Reimplements The Kernel; Bounds #7). |
+| `disposition criteria` | The six dispositions in Driver Disposition (below) -- `accepted`, `answered`, `mitigated`, `deferred`, `unresolved`, `invalidated-by-evidence` -- are this skill's own disposition criteria, each resolving to exactly one of the fragment's generic accepted/rejected/deferred states for driver-discipline purposes: `accepted`, `mitigated`, and `unresolved` each change the packet (a revision, a mitigation, or recorded visible dissent) -> fragment `accepted`; `answered` and `invalidated-by-evidence` require no packet change and are backed by cited evidence -> fragment `rejected`; `deferred` -> fragment `deferred` (the one disposition made entirely on the driver's own authority). A finding about the driver's own conduct is never self-dispositioned (Driver Disposition, below). |
+| `adaptation bounds` | `revise-synthesis` and `revise-explanation` each hard-capped at `activation.maxInvocations: 2` (Decision Dialogue's reopen-budget note). Once both are spent, or a reopen would need re-dispatching a shaper or the critic -- a backward edge this graph does not have -- the driver opens a new cell inheriting `intake.md`/`scout-report.md` as context rather than continuing this session (Bounded Reopen Scope). |
+| `human-escalation triggers` | A gap earns a Decision Request only if it fails Scout Before Ask's third test -- material *now*, not material in the abstract (Lead Advisor Discipline). The one standing exception: a fact about the person's own obligations (a compliance boundary, a contractual commitment) that cannot be defaulted safely is asked immediately. A gap that fails the test is never deleted -- it is carried forward as a named default. Questions are batched, non-blocking. |
+| `close criteria` | `close-dialogue` gated by `post-explanation-open`, itself unreachable until every earlier phase's window has opened and settled (Entry Flow table) -- plus every finding in `dispositions.md` carrying one of the six dispositions above, and no fabricated human input anywhere in the packet (Bounds #6). |
+| `after-close action` | No git mutation inside PROJECT_ROOT, ever -- the session's own evidence commits are a separate repository and must never resolve to a path inside PROJECT_ROOT (Bounds #2). No implementation-plan generation -- naming the first reversible step is advisory; a phased build plan is a different product (Bounds #5). |
+| `continuity artifact` | Fresh-Session Resume's own orientation packet, in its stated reading order, below: `fgos coordination show`'s own output first (hard, replay-derived truth), then `session.md`, `intake.md`, the newest `human/<n>-person.md`, `interpretation.md`, and `dispositions.md`. |
+
 ## What This Skill Does Not Require Of The Person
 
 - No problem brief. Raw words, however vague ("EOD and intraday

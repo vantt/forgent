@@ -9,12 +9,15 @@
 // 7. CLI flag contract: documented coordination commands in skills execute against real bin/fgos.mjs CLI with no unknown option or missing required flag errors.
 // 8. Clean pass lifecycle with real entry-node start, simulated crash/resume, dispatch count parity, explicit close.
 // 9. Fix round and recheck discharge lifecycle with full quorum explicit close and dispatch count parity.
+// 10. Phase 5 (Unit I26): fgos-panel and fgos-architecture-panel consume the driver-discipline
+//     fragment unchanged (digest-pinned), each link it, and each declare a 9-slot hook table.
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 
@@ -43,6 +46,19 @@ const PLAN_LOOP_CLAUDE = path.join(REPO_ROOT, '.claude/skills/fgos-plan-loop/SKI
 
 const DRIVER_FRAGMENT = path.join(REPO_ROOT, 'core/skills/_shared/coordination-driver.md');
 const CODING_POLICY_FRAGMENT = path.join(REPO_ROOT, 'domains/coding/skills/_shared/coding-cell-policy.md');
+
+// Phase 5 (Unit I26) consumers of the driver-discipline fragment
+const FGOS_PANEL_CANONICAL = path.join(REPO_ROOT, 'core/skills/fgos-panel/SKILL.md');
+const FGOS_PANEL_AGENTS = path.join(REPO_ROOT, '.agents/skills/fgos-panel/SKILL.md');
+const FGOS_PANEL_PLUGIN = path.join(REPO_ROOT, 'plugins/fgOS/skills/fgos-panel/SKILL.md');
+
+const FGOS_ARCH_PANEL_CANONICAL = path.join(REPO_ROOT, 'core/skills/fgos-architecture-panel/SKILL.md');
+const FGOS_ARCH_PANEL_AGENTS = path.join(REPO_ROOT, '.agents/skills/fgos-architecture-panel/SKILL.md');
+const FGOS_ARCH_PANEL_PLUGIN = path.join(REPO_ROOT, 'plugins/fgOS/skills/fgos-architecture-panel/SKILL.md');
+
+// Pinned at Unit I26 integration: the fragment is read-only reference for this unit
+// (shared with fgos-plan-loop, Phase 4) and must never be edited by a consuming facade.
+const DRIVER_FRAGMENT_DIGEST = 'bad06e2d4af364298c0c31beaf44fc93d7e52195d79d4049d611558c434fc16a';
 
 const PROTOCOL_ID = 'core.coordination-protocol.standalone-master-coordination-loop';
 
@@ -316,6 +332,68 @@ test('Phase 4: generated skill projections are byte-identical to canonical sourc
   const claudeContent = fs.readFileSync(PLAN_LOOP_CLAUDE, 'utf8');
   assert.match(claudeContent, /This is a generated thin wrapper/);
   assert.match(claudeContent, /\.agents\/skills\/fgos-plan-loop\/SKILL\.md/);
+
+  // Phase 5 (Unit I26): fgos-panel and fgos-architecture-panel mirrors
+  const fgosPanelCanonical = fs.readFileSync(FGOS_PANEL_CANONICAL);
+  const fgosPanelAgents = fs.readFileSync(FGOS_PANEL_AGENTS);
+  const fgosPanelPlugin = fs.readFileSync(FGOS_PANEL_PLUGIN);
+  assert.ok(fgosPanelCanonical.equals(fgosPanelAgents), '.agents/skills/fgos-panel/SKILL.md must match canonical');
+  assert.ok(fgosPanelCanonical.equals(fgosPanelPlugin), 'plugins/fgOS/skills/fgos-panel/SKILL.md must match canonical');
+
+  const fgosArchPanelCanonical = fs.readFileSync(FGOS_ARCH_PANEL_CANONICAL);
+  const fgosArchPanelAgents = fs.readFileSync(FGOS_ARCH_PANEL_AGENTS);
+  const fgosArchPanelPlugin = fs.readFileSync(FGOS_ARCH_PANEL_PLUGIN);
+  assert.ok(fgosArchPanelCanonical.equals(fgosArchPanelAgents), '.agents/skills/fgos-architecture-panel/SKILL.md must match canonical');
+  assert.ok(fgosArchPanelCanonical.equals(fgosArchPanelPlugin), 'plugins/fgOS/skills/fgos-architecture-panel/SKILL.md must match canonical');
+});
+
+// -----------------------------------------------------------------------------
+// 10. Phase 5 (Unit I26): fgos-panel and fgos-architecture-panel consume the
+//     driver-discipline fragment unchanged instead of restating its rules.
+// -----------------------------------------------------------------------------
+
+test('Phase 5 (I26): fgos-panel and fgos-architecture-panel link the driver-discipline fragment unchanged and each declare a 9-slot hook table', () => {
+  const requiredHooks = [
+    'unit of iteration',
+    'open inputs',
+    'evidence verification',
+    'disposition criteria',
+    'adaptation bounds',
+    'human-escalation triggers',
+    'close criteria',
+    'after-close action',
+    'continuity artifact',
+  ];
+
+  // The fragment itself must remain byte-unchanged (digest-pinned): this unit
+  // is a consumer, never an editor, of core/skills/_shared/coordination-driver.md.
+  const fragmentDigest = crypto.createHash('sha256').update(fs.readFileSync(DRIVER_FRAGMENT)).digest('hex');
+  assert.equal(
+    fragmentDigest,
+    DRIVER_FRAGMENT_DIGEST,
+    'core/skills/_shared/coordination-driver.md must remain byte-unchanged (digest-pinned) -- it is shared, read-only reference for this unit',
+  );
+
+  for (const skillPath of [FGOS_PANEL_CANONICAL, FGOS_ARCH_PANEL_CANONICAL]) {
+    const content = fs.readFileSync(skillPath, 'utf8');
+    const name = path.basename(path.dirname(skillPath));
+
+    assert.ok(
+      content.includes('](../_shared/coordination-driver.md)'),
+      `${name}/SKILL.md must link ../_shared/coordination-driver.md`,
+    );
+
+    const tableMatch = content.match(/## Facade Hook Values[^\n]*\n\n\|[^\n]*\n\|[-|\s]+\n((?:\|.*\n?)+)/);
+    assert.ok(tableMatch, `${name}/SKILL.md must declare a "Facade Hook Values" table`);
+    const tableBody = tableMatch[1];
+
+    for (const hook of requiredHooks) {
+      assert.ok(
+        tableBody.includes(`\`${hook}\``),
+        `${name}/SKILL.md's Facade Hook Values table must fill hook slot "${hook}"`,
+      );
+    }
+  }
 });
 
 // -----------------------------------------------------------------------------
