@@ -184,3 +184,58 @@ The owner chose **Option C**. The doer must change the Phase 4 `### Exit` bullet
 - the combined load is re-measured after Phase 5, once architecture-panel and panel also use the driver fragment.
 
 The test's `combined <= 3300` bound then enforces a plan rule and is no longer an ad-hoc constant. With this ruling F4 is closed as a finding. It still has to land together with R1/R2 before re-review.
+
+---
+
+## Re-review round 3 — `0983c28b4`
+
+**Verdict: REQUEST CHANGES (one targeted test fix).** R1, R3, R4 and the F4 ruling have all landed correctly. R2's goal is met: the contract test now runs the real CLI and catches probe Q3. However, the new test executes the documented `start`, which is a **real mutating dispatch that spawns a live agent**. It is currently harmless only because of a placeholder-substitution bug.
+
+### Identity
+
+| Field | Value |
+|---|---|
+| Candidate HEAD | `0983c28b4f7dde1d8e39484df81aad9178451095` (on top of `e2c6f5784`) |
+| Base | `2085d88fe` = `main`; unchanged |
+| Scope `e2c6f5784..HEAD` | 8 files: plan.md Exit, SKILL.md hook row, cell-policy link (+ mirrors), Phase 4 test. No `src/`/`bin/` changes |
+| Dirty before/after | clean / clean apart from this report; probes restored; scratch probe dirs removed |
+
+### Round-2 items
+
+| # | Status | Evidence |
+|---|---|---|
+| F4 (owner C) | ✅ | Phase 4 `### Exit` now states facade ≥60% vs 5,160, combined ≤3,300, re-measure after Phase 5. The test comment points to it. |
+| R1 | ✅ | `SKILL.md:53`: past the cap, a proof-gap is forced to `accepted -> Proof: escalated-to-full`, "no human escalation". Matches the how-to at lines 221-237. |
+| R2 | ✅ goal met, ❌ see R5 | Hand-copied allowlist removed. Every documented `fgos coordination …` runs through `bin/fgos.mjs`. **Probe Q3** (remove `--objective` from `operation`) now **fails** the contract test. Negative guards for `close --reason` and `authorize-and-dispatch` without `--objective` are present. |
+| R3 | ✅ | "wave parity" wording removed; dispatch counts (3/5) asserted. |
+| R4 | ✅ | Sibling link `private-cell-worktree.md` resolves in `.agents` and `plugins`. The canonical `domains/…/_shared/` copy does not resolve, matching plan-loop's stated projection convention. |
+
+### New findings
+
+| # | Sev | Verdict | Where | Finding | Fix |
+|---|---|---|---|---|---|
+| R5 | HIGH | CONFIRMED | `coordination-phase4-driver-discipline.test.mjs` test 7, `substitutePlaceholders` | (1) **The probe executes real, state-advancing commands.** When `start` passes flag validation it opens a session and dispatches the mutating entry `produce-candidate` on an auto-detected executor. Replaying the test's exact `start` invocation (`--dir <tmp>`, `--cwd <tmp>/dummy-worktree`, `env -u CLAUDE_CODE_SESSION_ID`) wrote a default runner config (`executor: claude`) and **spawned a real Claude doer: 146 s, exit 0, `agent-result.json status: done`**. (2) The test avoids this only by accident: `replaceAll('<track>')` / `('<cell-id>')` run **before** `replaceAll('../<track>-<cell-id>', dummyWt)`, so that rule never matches. `--cwd` becomes `../test-track-cell-01` relative to the repo checkout, which does not exist, so `start` fails fast. Proven: node replay of the substitution chain prints `--cwd "../test-track-cell-01"`. If that sibling path ever exists (plan-loop's own naming creates `../<track>-<cell-id>` worktrees), or once someone "fixes" the ordering, `npm test` would spawn a paid headless agent with write access in that directory. (3) Any non-validation error counts as a pass, so the probe proves only "not rejected by the flag parser". That is fine for its purpose, but it must never reach dispatch. | Make the probe **incapable of dispatching**: pre-write `<tmp>/.fgos/config.json` with a runner whose executor cannot spawn (or run the probe with a `PATH` holding only `node`, and assert "no executor"). Add an assertion that no `assignments/*/runs/` directory appears under `<tmp>/.fgos`. Fix the substitution order (most-specific pattern first). Assert the probe's failure reason is the expected pre-dispatch one. |
+| R6 | LOW | CONFIRMED | `plan.md` Phase 4 `### Exit` | The rewrite dropped the original "…with no weaker evidence or extra dispatch wave" clause. The owner ruling concerned only the word-count basis. Dispatch-count parity is tested, so the loss is textual only. | Restore the clause as its own bullet. |
+
+### Probes
+
+| Probe | Result |
+|---|---|
+| Q3 (remove required `--objective` from `operation`) | contract test **fails** ✅ (+ projection) |
+| Replay the test's `start` probe with correct `--cwd` substitution | **real agent spawned, 146 s** ❌ → R5 |
+
+### Commands
+
+| Command | Exit | Result |
+|---|---|---|
+| `npm run build:skills` | 0 | no working-tree diff |
+| `git diff --check 2085d88fe..HEAD` | 0 | clean |
+| focused: 8 suites + `test/setup/skill-wrappers.test.mjs` | 0 | 287 / 287 pass |
+| `env -u CLAUDE_CODE_SESSION_ID npm test` | 1 | 7766 tests, 7692 pass, **1 fail**, 8 skipped, 65 todo |
+| `node --test test/runner/coordination-research-fan-out.test.mjs` ×3 | 0 | 14/14 pass each run |
+
+The single full-suite failure is `R5 concurrency … maxConcurrency: 2 …` in `test/runner/coordination-research-fan-out.test.mjs`. That file is **not touched** by the candidate, passes 3/3 in isolation, and passed in both earlier full-suite runs (rounds 1 and 2). This matches the timing instability already recorded as LOW debt in the plan status, so it is classified as a pre-existing load-sensitive flake, not a regression.
+
+### Phase 5 gate
+
+**Not yet.** Fix R5 (and R6 in the same commit), then a quick round-4 check: the R5 probe proves no dispatch occurs, and the full suite is green. Everything else is done, and no further semantic re-review is needed.
