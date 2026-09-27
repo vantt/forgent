@@ -439,3 +439,24 @@ I19 (config thuần) chặn Phase 5 việc 2.
    quyết giữ một.
 6. Không quyết binding trong session-engine/kernel; engine chỉ nhận
    `cliPolicy` đã tính cho mọi declared step (đường fan-out đã làm vậy).
+
+## 13. Phase 6/7 của track đã nhận phần còn lại (2026-09-27)
+
+Phase 6: entry gate (I21, I18, I20); hook open inputs điền từ `plan-lint --cell`
+(plan mode) và `capability match --demand` (single-change); match `inline` thì
+không mở cell; facade không cấp roster mặc định. Exit thêm: cell chỉ mở khi
+match không phải inline và không có finding cứng; ca dogfood I15 không được
+tái diễn.
+
+Phase 7: 4 (setup/doctor cho `serves`, `review`, hai policy field), 4b
+(version contract FlowDefinition + spec), 4c (chọn một trong
+`readOnlyRedirects` / `code:review.prefer`), 4d (đóng cửa sổ tương thích:
+plan chưa khai capability → refuse; bỏ `Execution Inputs: Roster` khỏi
+how-to), drift test bốn dòng mới (serves hợp lệ/không trùng; `policy.capability`
+resolve; không pin executor qua policy field; skill dispatch link fragment và
+không trigger theo từ khoá).
+
+Mọi câu hỏi mở còn lại (§9) đều có chủ: 1 → I19; 2 → I21/Phase 7 4d; 3 →
+log của I20 quyết; 4 → §11.1 (`size` chỉ hình thức); 5 → §12 mục 3; 6 →
+Phase 7 4d; 7 → I18 (warn) rồi Phase 7 4d (hard); 8 → §12 mục 4; 9 → I21
+ghi nhận, Phase 7 4c; 10 → I21 làm cả hai protocol.

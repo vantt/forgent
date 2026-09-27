@@ -874,6 +874,12 @@ the full protocol through skill prose.
 
 ## Phase 6 — Merge plan-loop and code-panel into `fgos-code-change`
 
+### Entry gate
+
+Phase 5 work items 2 (I21) and 7/8 integrated; I18 (`fgos plan-lint`) and
+I20 (`fgos capability match`) integrated so the single coding facade can
+fill its open-inputs hook from real doors instead of prose.
+
 ### Objective
 
 Replace the two overlapping coding facades with one coding-domain facade,
@@ -895,11 +901,22 @@ execution target is a plan/phase path or a named track.
 - keep explicit implementation authority distinct from advisory
   `coding-design-panel` routing;
 - turn `fgos-plan-loop` and `fgos-code-panel` into deprecated stubs pointing
-  at `fgos-code-change` until the Phase 7 compatibility window closes.
+  at `fgos-code-change` until the Phase 7 compatibility window closes;
+- fill the driver-discipline `open inputs` hook from doors, not prose: in
+  plan mode run `fgos plan-lint <phase file> --cell <id>` (I18) and refuse
+  to open on a hard finding; in single-change mode declare `DemandFacts`
+  and run `fgos capability match --demand` (I20); an `inline` match means
+  no cell is opened at all (the facade must not capture work that the
+  match sends back to the live session);
+- the facade supplies no roster by default: per-node binding comes from
+  I21; a hand roster is an explicit override with provenance.
 
 ### Exit
 
 - one coding facade, within budget; no second copy of loop orchestration;
+- the facade opens a cell only after `plan-lint`/`capability match` return
+  a non-inline, non-hard result; a docs-only or advisory request is sent
+  back inline (dogfood case from I15 must not reproduce);
 - single-change and multi-cell plan scenarios both pass through the same
   skill, including crash/resume and explicit close;
 - advisory-only coding requests are not captured.
@@ -915,7 +932,24 @@ execution target is a plan/phase path or a named track.
    sources, generated projections, and `CHANGELOG.md` for user-visible CLI /
    skill behavior.
 4. Register new installed assets/config with setup merge and doctor if Phase 3
-   introduces them.
+   introduces them; confirm the Phase 5 additions (`serves`, `review` slot,
+   `policy.capability`, `policy.distinctProviderFrom`, doctor checks from
+   I19/I21) are covered by `config-not-stale` and the doctor registry.
+4b. Version the FlowDefinition contract for the optional operation fields
+   `policy.capability` and `policy.distinctProviderFrom` (added in I21 as
+   additive, portable-scope requirements); update
+   `docs/architect/agent-coordination/contracts/flow-definition.md` PolicyPatch
+   section and the runner spec vocabulary table.
+4c. Decide which of `placementPolicy.readOnlyRedirects` (keyed by operation id)
+   and `capabilities.code:review.prefer` (keyed by capability) remains the
+   read-only binding source; keep exactly one, migrate the live config, and
+   keep the other loadable for the compatibility window.
+4d. Close the capability-declaration compatibility window: a plan or phase
+   file with no declared unit capability (neither `- unit:` blocks nor a
+   Product Gates `Capability` column) moves from `plan-lint` warning to hard
+   refusal at cell open; `Execution Inputs: Roster` is removed from
+   `docs/how-to/author-a-plan-loop-track.md` (binding from config since I21,
+   roster only as override).
 4a. Rename `core.coordination-protocol.standalone-master-coordination-loop`
    to `core.coordination-protocol.produce-review-revise`; the old id stays
    loadable so every existing session replays identically. Reclassify the
@@ -931,7 +965,15 @@ execution target is a plan/phase path or a named track.
    - generated skill projections are byte-identical to canonical sources;
    - stale auto-close language is absent from current sources;
    - facades restate no rule owned by the driver-discipline fragment, and
-     the fragment carries no domain vocabulary.
+     the fragment carries no domain vocabulary;
+   - every registered capability declares a valid `serves` set and no two
+     declare the same set; every protocol operation's `policy.capability`
+     resolves against the catalog;
+   - no portable FlowDefinition carries an executor pin through
+     `policy.capability`/`policy.distinctProviderFrom` (red-team case from
+     I21);
+   - runtime skills that dispatch link `capability-matching.md` and none
+     triggers on keyword matching of "implement"/"code" (I17 trigger reversal).
 6. Run focused coordination suites, protocol conformance suites, projection /
    packaging tests, replay corpus, and full `npm test`.
 7. Publish before/after performance and quality results.
@@ -1167,7 +1209,7 @@ Executor/provider/model/tier selection remains an execution-time decision.
 - unit: I16 — amend driver-discipline open-inputs slot and plan-loop hook value before Phase 5 consumes the fragment
   capability: execute
   depends-on: I15
-  status: VERIFIED/integrated at `main@a48ce987c` (candidate `6d75b54e1`; focused suites 12/12 pass; skills matrix 29/29 pass; Phase 5 unblocked)
+  status: VERIFIED/integrated at `main@a48ce987c` (candidate `6d75b54e1`; focused suites 12/12 pass; skills matrix 29/29 pass; Phase 5 unblocked); Phase 5 units I17–I21 planned 2026-09-27 (design record `plans/reports/architecture-investigation-260927-1154-capability-aware-dispatch-gate-phase4-decisions.md`), none started
   candidate-sha: `6d75b54e1`
   integrated-sha: `a48ce987c`
   branch: `coordination-skill-harness-i16-open-inputs`
