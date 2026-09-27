@@ -193,7 +193,23 @@ export async function executeCoordinationActionUseCase(ctx, options = {}) {
         optionalInputs,
         allowedValues,
       },
-      composeActionRequest: composeCoordinationActionRequest,
+      // Unit I21 (Phase 5 item 2): a thin wrapper, not new logic --
+      // `executeCoordinationRunKernel` (run.mjs) already passes `manifest`
+      // to this callback unchanged; this only adds `definition` (resolved
+      // the SAME way `showCoordinationActionsUseCase` above already does)
+      // and `runnerConfig` (already in `ctx`) so `composeCoordinationActionRequest`
+      // can bind every node's default executor from its own operation's
+      // policy.capability, not just the entry node. Optional/backward-
+      // compatible: composeCoordinationActionRequest's own rollback contract
+      // keeps `actors: []` when either is absent (e.g. an agent-led session,
+      // manifest.definitionRef === null).
+      composeActionRequest: (params) => composeCoordinationActionRequest({
+        ...params,
+        definition: params.manifest?.definitionRef
+          ? loadDefinitionForSession(params.manifest, { cwd: ctx.cwd, packageRoot: ctx.packageRoot })
+          : undefined,
+        runnerConfig: ctx.runnerConfig,
+      }),
     },
   );
 }

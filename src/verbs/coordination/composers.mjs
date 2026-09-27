@@ -9,6 +9,29 @@ import {
   validateCoordinationRequest,
   validateCoordinationCloseRequest,
 } from './schema.mjs';
+import { bindOperations } from './binding.mjs';
+
+/**
+ * Merge `bindOperations`'s own computed `actors[]` additions into the
+ * caller-supplied `actors` array (Unit I21, Decision 1 step 1: an existing
+ * per-actor entry is the Lead override and is never touched). No-op --
+ * returns `actors` unchanged -- when `definition`/`runnerConfig` are absent
+ * (Risk/rollback: a caller that supplies neither keeps today's behavior
+ * byte-for-byte).
+ */
+function withComputedActorBindings(actors, definition, runnerConfig, facts) {
+  if (!definition || !runnerConfig) return actors;
+  const { bindings } = bindOperations(definition, { actors }, runnerConfig, facts);
+  const existingIds = new Set(actors.map((a) => a.id));
+  const additions = bindings
+    .filter((b) => !existingIds.has(b.actorId) && b.cliPolicy.preferExecutor !== undefined)
+    .map((b) => ({
+      id: b.actorId,
+      executor: b.cliPolicy.preferExecutor,
+      ...(b.cliPolicy.preferInvocation ? { invocation: b.cliPolicy.preferInvocation } : {}),
+    }));
+  return additions.length > 0 ? [...actors, ...additions] : actors;
+}
 
 export const ACTION_INPUT_RESERVED_FIELDS = Object.freeze(new Set([
   'coordinationId',
@@ -173,6 +196,11 @@ export function composeStartRequest(options = {}) {
     partialPolicy,
     workRef,
     close,
+    // Unit I21 (Phase 5 item 2): optional -- absent for every pre-existing
+    // caller, which keeps today's behavior (empty/roster-only actors[])
+    // byte-for-byte. See `withComputedActorBindings`'s own doc comment.
+    runnerConfig,
+    facts,
   } = options;
 
   if (!writerId || typeof writerId !== 'string') {
@@ -243,7 +271,7 @@ export function composeStartRequest(options = {}) {
       writerId,
       objective,
       protocolRef: { id: pId },
-      actors: Array.isArray(actors) ? actors : [],
+      actors: withComputedActorBindings(Array.isArray(actors) ? actors : [], definition, runnerConfig, facts),
       steps: resolvedSteps,
       close: false,
       ...(aggregateBounds ? { aggregateBounds } : {}),
@@ -323,9 +351,12 @@ export function composeCloseRequest(options = {}) {
  * @param {object} params.manifest Session manifest
  * @param {object} params.action Authoritative action descriptor from projector
  * @param {object} params.precondition ActionPrecondition containing caller inputs
+ * @param {object} [params.definition] The session's resolved FlowDefinition (Unit I21). Optional -- absent for every pre-existing caller, which keeps `actors: []` byte-for-byte (Risk/rollback).
+ * @param {object} [params.runnerConfig] The validated runner config's own `runner` section (Unit I21). Optional, same rollback contract as `definition`.
+ * @param {object} [params.facts] Caller-declared binding context (Unit I21) -- see `bindOperations`'s own doc comment.
  * @returns {object} Validated production request object
  */
-export function composeCoordinationActionRequest({ manifest, action, precondition }) {
+export function composeCoordinationActionRequest({ manifest, action, precondition, definition, runnerConfig, facts }) {
   const input = precondition.inputPayload ?? {};
   assertNoForbiddenOverrides(input);
 
@@ -339,7 +370,7 @@ export function composeCoordinationActionRequest({ manifest, action, preconditio
     writerId: precondition.writerId,
     objective: manifest.objective,
     protocolRef: { id: manifest.definitionRef?.id },
-    actors: [],
+    actors: withComputedActorBindings([], definition, runnerConfig, facts),
     close: false,
   };
 

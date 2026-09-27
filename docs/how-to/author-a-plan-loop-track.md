@@ -41,8 +41,11 @@ Record these once in `plan.md`, verbatim across every request in the track:
 - **Track branch** — the branch every cell integrates into.
 - **Cell branch / coordination-id convention** — how a cell's worktree
   branch and coordination id are named.
-- **Roster** — the exact doer/reviewer/red-team roster string, unchanged
-  across cells unless the plan is revised (only the entry node is bound, via `fgos coordination start --actors`; full roster binding lands in Phase 5).
+- **Roster** — OPTIONAL: each declared step now binds a default executor from
+  its own operation's `policy.capability`; record a roster string here only
+  when the plan needs an explicit override (`fgos coordination start
+  --actors`), and note it stays unchanged across cells unless the plan is
+  revised.
 - **Full proof command** — the repository's real full-suite command (e.g.
   `npm test`).
 - **Recorded baseline** — full proof command, run once before the first

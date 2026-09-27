@@ -60,6 +60,11 @@ export async function startCoordinationUseCase(ctx, options = {}) {
     objective,
     protocolId,
     definition,
+    // Unit I21 (Phase 5 item 2): lets composeStartRequest bind every node's
+    // default executor from its own operation's policy.capability, never
+    // just the entry node -- optional, absent ctx.runnerConfig keeps this a
+    // byte-for-byte no-op (composeStartRequest's own rollback contract).
+    runnerConfig: ctx.runnerConfig,
   });
 
   const coordinationId = requestObject.coordinationId;
