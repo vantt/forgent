@@ -143,7 +143,7 @@ necessary, not sufficient, when any of those moved since `testedSha`).
 
 Every checkpoint is a durable record tuple. Record it in the cell trace —
 `docs/architect/agent-coordination/verification/<track>/<cell>.md`
-(fgos-plan-loop `SKILL.md` §5 step 5):
+(`coding-cell-policy.md` § Tested and integrated identity):
 
 ```text
 phase/cell id: <phase>/<cell>

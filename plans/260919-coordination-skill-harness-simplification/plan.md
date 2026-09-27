@@ -1,6 +1,6 @@
 # Coordination Skill and Harness Simplification
 
-Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 verified at `main@1ca4023c` (REV-15 fix `60132825`; post-merge baseline verified at `main@f63f7e7d`); Unit I07 integrated at `main@261ed7ea`; Unit I08b integrated at `main@ba8f6a9d`; Unit I10 integrated and verified at `main@605d26fe` (carried through `main@26a1038e` and `main@ac19f6d1`); Unit I08 VERIFIED at `main@ac19f6d1` (RV-01/RV-02 remediation candidate `132d3777` + `ac19f6d1` integrated; acceptance gate verified: full suite 7647 pass exit 0, 10/10 isolated coord, 10/10 isolated dispatch, 60/60 parallel load pass; timing instability recorded as LOW debt); Unit I11 VERIFIED at `main@7d7dc2750f9fb80716a7cffae03d67605629cf9a` (candidate code `9cf843b6`, approved tip `3a67a1b9`, synchronized merge `3d706b89`; post-merge verification satisfied: 155/155 focused rerun pass, full suite 7652 pass exit 0; candidate regressions = 0); Unit I12 VERIFIED/integrated at `main@c782a08dfcae89279dcb1ca9fb59aa73fb58c515`; Unit I13 VERIFIED/integrated at `main@dc05f7586b78483d569bc25b929b988dc56a374c`; Unit I14 VERIFIED/integrated at `main@3cb80c91c` (candidate `f857eaeab`; review APPROVE at `7d01a12e2`; remediation `c03a959c7`; focused matrix 210 pass / 0 fail, full suite 7684 pass / 0 fail; Phase 4 entry gate satisfied)
+Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 verified at `main@1ca4023c` (REV-15 fix `60132825`; post-merge baseline verified at `main@f63f7e7d`); Unit I07 integrated at `main@261ed7ea`; Unit I08b integrated at `main@ba8f6a9d`; Unit I10 integrated and verified at `main@605d26fe` (carried through `main@26a1038e` and `main@ac19f6d1`); Unit I08 VERIFIED at `main@ac19f6d1` (RV-01/RV-02 remediation candidate `132d3777` + `ac19f6d1` integrated; acceptance gate verified: full suite 7647 pass exit 0, 10/10 isolated coord, 10/10 isolated dispatch, 60/60 parallel load pass; timing instability recorded as LOW debt); Unit I11 VERIFIED at `main@7d7dc2750f9fb80716a7cffae03d67605629cf9a` (candidate code `9cf843b6`, approved tip `3a67a1b9`, synchronized merge `3d706b89`; post-merge verification satisfied: 155/155 focused rerun pass, full suite 7652 pass exit 0; candidate regressions = 0); Unit I12 VERIFIED/integrated at `main@c782a08dfcae89279dcb1ca9fb59aa73fb58c515`; Unit I13 VERIFIED/integrated at `main@dc05f7586b78483d569bc25b929b988dc56a374c`; Unit I14 VERIFIED/integrated at `main@3cb80c91c` (candidate `f857eaeab`; review APPROVE at `7d01a12e2`; remediation `c03a959c7`; focused matrix 210 pass / 0 fail, full suite 7684 pass / 0 fail; Phase 4 entry gate satisfied); Unit I15 (Phase 4) candidate under review (independent review REQUEST CHANGES received at `ff5f9f9e1`; remediation in progress; Phase 5 blocked pending re-review)
 Created: 2026-09-19
 Last Updated: 2026-09-26
 Mode: high-risk
@@ -750,6 +750,12 @@ unless the request carries an explicit close. The driver discipline states
 "explicit close is the sole close action" with no exception (owner decision
 2026-09-26).
 
+### Gates
+
+- **Satisfied (Entry):** Unit I14 integrated at `main@3cb80c91c` (plan/status commit `6bad420a0`).
+- **In Progress (Unit I15 candidate under review):** Implemented canonical driver discipline fragment `core/skills/_shared/coordination-driver.md` with zero coding/track vocabulary; implemented coding-cell policy fragment `domains/coding/skills/_shared/coding-cell-policy.md` referencing `private-cell-worktree.md` without plan/track assumptions; rewrote `fgos-plan-loop` to 1,233 words (within 1,500-word ceiling); synced mirrors byte-identically via `npm run build:skills`. Independent review at `ff5f9f9e1` evaluated candidate (`plans/reports/independent-review-phase-04-driver-discipline.md`, REQUEST CHANGES); remediation addressed findings F1–F13; Phase 5 blocked pending re-review and integration.
+
+
 ### Work
 
 1. Author one driver-discipline fragment, canonical under
@@ -783,10 +789,11 @@ sessions plus the plan artifact.
 
 ### Exit
 
-- skill within budget;
+- facade `fgos-plan-loop/SKILL.md` is at least 60% smaller than the Phase 0 baseline of 5,160 words;
+- combined Lead load (`facade + coordination-driver.md + coding-cell-policy.md`) is at most 3,300 words;
+- combined load is re-measured after Phase 5, once `architecture-panel` and `panel` also consume the driver fragment;
 - clean, fix/recheck, crash/resume, stale-action, and explicit-close cases pass;
-- Phase 0 plan-loop scenarios show at least 60% Lead instruction-token
-  reduction with no weaker evidence or extra dispatch wave;
+- no weaker evidence or extra dispatch wave;
 - the driver-discipline fragment contains no coding/track vocabulary (drift
   test: `git`, `worktree`, `merge`, `npm test`, `phase`, `plan.md` absent);
 - the coding-cell fragment is usable for one cell with no plan or track
@@ -1116,12 +1123,36 @@ Executor/provider/model/tier selection remains an execution-time decision.
     implicit close.
   stop: legacy session replay changes, or any consumer depends on implicit DAG
     close without an explicit-close replacement
+- unit: I15 — extract shared driver discipline and prove on plan-loop
+  capability: code:implement
+  depends-on: I14
+  status: candidate under review (remediation in progress)
+  branch: `coordination-skill-harness-phase4-driver-discipline`
+  worktree: `/home/vantt/projects/forgentX/.claude/worktrees/coordination-skill-harness-phase4-driver-discipline`
+  base-sha: `2085d88fea9b6aae2b629b3cd4fcd4eec397fcbb`
+  scope: Create canonical domain-neutral driver discipline fragment `core/skills/_shared/coordination-driver.md`
+    (0 coding/track vocabulary: `git`, `worktree`, `merge`, `npm test`, `phase`, `plan.md` absent);
+    create coding-domain cell policy fragment `domains/coding/skills/_shared/coding-cell-policy.md`
+    (referencing `private-cell-worktree.md`, proof tiers, independent verification, post-close merge/cleanup, tested/integrated identity,
+    reusable for single cell with no plan); rewrite `core/skills/fgos-plan-loop/SKILL.md` into track sequencing
+    over semantic coordination commands (`start`, `status`, `operation`, `authorize-and-dispatch`, `disposition`, `close`, `chain`),
+    removing raw request JSON, manual ID generation, and copied kernel rules; synchronize generated projections byte-identically;
+    maintain explicit-close invariants; verify zero regressions.
+  verification: 9/9 dedicated regression/contract tests pass (`test/skills/coordination-phase4-driver-discipline.test.mjs`,
+    including CLI flag contract guard against real allowlists); 177 pass across 8 focused suites;
+    full repository suite (`npm test`): 7692 pass, 0 fail, 8 skip, 65 todo; git diff --check clean (0 errors/warnings).
+  word-budget: `fgos-plan-loop` at 1,233 words (within 1,500-word ceiling and 800–1,200 target; 76.1% facade reduction vs 5,160 Phase 0 baseline).
+  review-status: REQUEST CHANGES at `ff5f9f9e1`; remediation addressing F1–F13; Phase 5 blocked until re-review APPROVE and merge.
+  report: plans/260919-coordination-skill-harness-simplification/reports/phase-04-driver-discipline-implementation-report.md
+  stop: Phase 4 requires changing CoordinationSession legality/kernel authority, any close behavior regresses from explicit-close,
+    plan-loop needs a new persisted ledger, driver discipline needs coding/track vocabulary, skill projections cannot be rebuilt cleanly,
+    or full suite regresses.
 
 Parallelism is limited deliberately:
 
 ```text
 I00 -> I01 -> I02 -> I03 -------------------------------+
-          +-> I04 -> I05 -------------------------------+--> I11 -> I12 -> I13 -> I14 -> Phase 4
+          +-> I04 -> I05 -------------------------------+--> I11 -> I12 -> I13 -> I14 -> I15 (Phase 4 candidate) -> Phase 5 (blocked)
           +-> I06 -----+                                |
           +-> I07 -----+-> I08 -------------------------+
                        I02 + I04 + I06 -> I09 -> I10 ----+
