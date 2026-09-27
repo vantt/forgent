@@ -1,6 +1,6 @@
 # Coordination Skill and Harness Simplification
 
-Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 verified at `main@1ca4023c` (REV-15 fix `60132825`; post-merge baseline verified at `main@f63f7e7d`); Unit I07 integrated at `main@261ed7ea`; Unit I08b integrated at `main@ba8f6a9d`; Unit I10 integrated and verified at `main@605d26fe` (carried through `main@26a1038e` and `main@ac19f6d1`); Unit I08 VERIFIED at `main@ac19f6d1` (RV-01/RV-02 remediation candidate `132d3777` + `ac19f6d1` integrated; acceptance gate verified: full suite 7647 pass exit 0, 10/10 isolated coord, 10/10 isolated dispatch, 60/60 parallel load pass; timing instability recorded as LOW debt); Unit I11 VERIFIED at `main@7d7dc2750f9fb80716a7cffae03d67605629cf9a` (candidate code `9cf843b6`, approved tip `3a67a1b9`, synchronized merge `3d706b89`; post-merge verification satisfied: 155/155 focused rerun pass, full suite 7652 pass exit 0; candidate regressions = 0); Unit I12 VERIFIED/integrated at `main@c782a08dfcae89279dcb1ca9fb59aa73fb58c515`; Unit I13 VERIFIED/integrated at `main@dc05f7586b78483d569bc25b929b988dc56a374c`; Unit I14 VERIFIED/integrated at `main@3cb80c91c` (candidate `f857eaeab`; review APPROVE at `7d01a12e2`; remediation `c03a959c7`; focused matrix 210 pass / 0 fail, full suite 7684 pass / 0 fail; Phase 4 entry gate satisfied); Unit I15 (Phase 4) VERIFIED/integrated at `main@8e8a3f1aa` (candidate `38e552bb9`; approved tip `c343304b3`; focused matrix 192 pass / 0 fail, full suite 7693 pass / 0 fail; Phase 5 open / ready); Unit I16 VERIFIED/integrated at `main@a48ce987c` (candidate `6d75b54e1`; focused matrix 12 pass / 0 fail, skills matrix 29 pass / 0 fail; Phase 5 open / ready); Unit I17 VERIFIED/integrated at `main@d6c0d9033` (candidate `37833e331`; review APPROVE at `8864ea596`/`37833e331`; 40/40 doctrine pass, 124/124 matrix pass; Unit I19 unblocked); Unit I19 VERIFIED/integrated at `main@525a641a` (candidate `352200cde`; full suite 7781 pass / 0 fail; Phase 5 work item 2 / Unit I21 unblocked)
+Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 verified at `main@1ca4023c` (REV-15 fix `60132825`; post-merge baseline verified at `main@f63f7e7d`); Unit I07 integrated at `main@261ed7ea`; Unit I08b integrated at `main@ba8f6a9d`; Unit I10 integrated and verified at `main@605d26fe` (carried through `main@26a1038e` and `main@ac19f6d1`); Unit I08 VERIFIED at `main@ac19f6d1` (RV-01/RV-02 remediation candidate `132d3777` + `ac19f6d1` integrated; acceptance gate verified: full suite 7647 pass exit 0, 10/10 isolated coord, 10/10 isolated dispatch, 60/60 parallel load pass; timing instability recorded as LOW debt); Unit I11 VERIFIED at `main@7d7dc2750f9fb80716a7cffae03d67605629cf9a` (candidate code `9cf843b6`, approved tip `3a67a1b9`, synchronized merge `3d706b89`; post-merge verification satisfied: 155/155 focused rerun pass, full suite 7652 pass exit 0; candidate regressions = 0); Unit I12 VERIFIED/integrated at `main@c782a08dfcae89279dcb1ca9fb59aa73fb58c515`; Unit I13 VERIFIED/integrated at `main@dc05f7586b78483d569bc25b929b988dc56a374c`; Unit I14 VERIFIED/integrated at `main@3cb80c91c` (candidate `f857eaeab`; review APPROVE at `7d01a12e2`; remediation `c03a959c7`; focused matrix 210 pass / 0 fail, full suite 7684 pass / 0 fail; Phase 4 entry gate satisfied); Unit I15 (Phase 4) VERIFIED/integrated at `main@8e8a3f1aa` (candidate `38e552bb9`; approved tip `c343304b3`; focused matrix 192 pass / 0 fail, full suite 7693 pass / 0 fail; Phase 5 open / ready); Unit I16 VERIFIED/integrated at `main@a48ce987c` (candidate `6d75b54e1`; focused matrix 12 pass / 0 fail, skills matrix 29 pass / 0 fail; Phase 5 open / ready); Unit I17 VERIFIED/integrated at `main@d6c0d9033` (candidate `37833e331`; review APPROVE at `8864ea596`/`37833e331`; 40/40 doctrine pass, 124/124 matrix pass; Unit I19 unblocked); Unit I19 VERIFIED/integrated at `main@525a641a` (candidate `352200cde`; full suite 7781 pass / 0 fail; Phase 5 work item 2 / Unit I21 unblocked); Unit I18 VERIFIED/integrated at `main@8ece3bbdc` (candidate `8306c36d1`; 3 fix rounds; full suite 7813 pass / 0 fail via fresh worktree); Unit I20 VERIFIED/integrated at `main@09db1fad4` (candidate `027636e4e`; 1 fix round)
 Created: 2026-09-19
 Last Updated: 2026-09-27
 Mode: high-risk
@@ -1389,17 +1389,68 @@ Executor/provider/model/tier selection remains an execution-time decision.
   stop: CLEARED — a config without `serves` still loads (regression test passes); `decide --for review` now resolves via `for`, no unregistered-selector change for existing registered names.
 - unit: I20 — `capability-match.mjs`, `fgos capability match` verb, match log, `capability.unknown` reason code
   capability: code:implement
-  depends-on: I19
-  status: not-started
+  depends-on: I19 (satisfied, integrated at `main@525a641a`)
+  status: integrated at `main@09db1fad4`
+  branch: `unit/I20` (Claude-only parallel execution runbook)
+  candidate-sha: `027636e4ee91fc868deac223fef8fa12af7a58b1`
+  integrated-sha: `09db1fad444a15a49efb4ee68537e3ac35a89b45` (merge --no-ff from
+    main checkout onto post-I18 `main@03cc7245e`; ort strategy, no conflicts)
   scope: see `phase-05-unit-i20-capability-match-module.md`. Pure
     `matchCapability(demandFacts, catalog)` in `src/runner/capability-match.mjs`
-    (outside `dispatch/`, boundary test forbids importing decide/transport);
+    (imports nothing from `dispatch/` at all — stricter than the required
+    bar; `RIGOR_VALUES` is a drift-tested local copy of `MIN_RIGOR_VALUES`);
     verb `fgos capability match --demand <json> [--override --reason] [--json]`;
     one `appendWorkerLog` line per call (`source: match|override|miss`);
     `compileDispatchPlan` adds `capability.unknown` for an unregistered `--for`
-    name without `--needs-soul`; manifest + test-ownership entries.
-  verification: node --test test/runner/capability-match.test.mjs test/cli/capability-match.test.mjs test/runner/dispatch.test.mjs test/runner/dispatch-reconciliation-import-graph.test.mjs test/architecture.test.mjs; env -u CLAUDE_CODE_SESSION_ID npm test
-  stop: matching calls decide or reads prefer; mechanism of decide changes.
+    name without `--needs-soul`; manifest + test-ownership entries; rust-host
+    artifact regeneration for the 74->75 verb count (registry drift lesson
+    carried over from I18: `command-routes.json`/envelope vectors regenerated,
+    hardcoded counts converted to derive-from-routes so the next verb added
+    doesn't repeat this class of break).
+  design-fork: the phase text ("`form` từ `needsIndependentReview`,
+    `hasPlanOrTrack`, `size`") never pins an exact `facade`/`protocol`/`inline`
+    formula. Implementer consulted an advisory session and initially shipped
+    `facade` gated on `hasPlanOrTrack && size==='heavy'`; independent review
+    and test both found this contradicts the design record's own text
+    ("hasPlanOrTrack quyết plan mode" — decides plan mode on its own). Lead
+    verified the source text directly and ruled: `facade` triggers on
+    `hasPlanOrTrack` alone, `size` gate removed (fix-round-1).
+  fix-round-1: two MEDIUM findings from independent review — `--override`
+    on a natural miss kept the forced `inline` form even for a real
+    overridden capability (form now recomputed from the override); the
+    `facade` threshold correction above. Plus three LOW: `--reason` without
+    `--override` is now a usage error; an alias override resolves to its
+    canonical capability key; a newline in `--reason` is stripped before
+    logging. The fixer additionally adopted the tester's own untracked
+    adversarial test files into the tracked suite (real regression coverage
+    for the exact behaviors just fixed) — Lead reviewed and kept them.
+  deferred (named, not proof-gaps): an extra/misspelled optional demand-fact
+    key is silently ignored rather than rejected; `serves: {}` (empty but
+    present) is a zero-specificity catch-all that matches any demand,
+    against the spirit of "no serves = never auto-match"; the override log
+    line doesn't record what the natural match would have been; a miss log
+    line doesn't include the candidates array despite the doctrine text
+    saying it should.
+  verification: node --test test/runner/capability-match.test.mjs
+    test/cli/capability-match.test.mjs (43/43 pass); test/runner/
+    capability-match-adversarial.test.mjs test/cli/capability-match-
+    adversarial.test.mjs (24/24 pass); test/runner/dispatch.test.mjs
+    test/runner/dispatch-reconciliation-import-graph.test.mjs (413/413
+    pass); test/architecture.test.mjs (13/13 pass); `capability match`
+    demo confirms `form: "facade"` for a light-size plan/track unit;
+    `decide --for code:implment` confirms `capability.unknown` fires
+    without changing `mechanism`/`configured`; rust-host command-routes/
+    envelope-contract/harness (50/50 pass); Lead-run full
+    `env -u CLAUDE_CODE_SESSION_ID npm test` at candidate `027636e4e`:
+    7883 tests, 1 fail — the expected pre-merge stale-shared-binary
+    `release-tree.test.mjs` R3 case (same class as I18's, resolved by a
+    `cargo build --release --workspace` after merge; confirmed 3/3 pass
+    post-merge), 0 other failures. `git diff --check` clean.
+  report: plans/260919-coordination-skill-harness-simplification/reports/unit-I20-claude-only-execution-report.md
+  stop: CLEARED — module never calls `decide` or reads `.prefer` directly
+    (only through `resolveExecutorAndOverrides` at a strictly later, separate
+    step outside this module's own scope); `decide`'s `mechanism` field is
+    unchanged, only `reasonCodes` gains the additive `capability.unknown`.
 - unit: I21 — per-node binding in the request composers (Phase 5 work item 2)
   capability: code:implement
   depends-on: I19, I17
