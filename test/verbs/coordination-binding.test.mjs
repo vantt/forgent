@@ -7,9 +7,13 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
+import fs from 'node:fs';
+import os from 'node:os';
 
 import { bindOperations, deriveOperationCapability, BindingError } from '../../src/verbs/coordination/binding.mjs';
 import { composeStartRequest, composeCoordinationActionRequest } from '../../src/verbs/coordination/composers.mjs';
+import { startCoordinationUseCase } from '../../src/verbs/coordination/start.mjs';
+import { CoordinationError } from '../../src/runner/coordination/schema.mjs';
 import { validateFlowDefinition } from '../../src/runner/definitions/schema.mjs';
 import { loadCoordinationProtocol } from '../../src/runner/definitions/protocol-loader.mjs';
 
@@ -327,6 +331,136 @@ test('Unit I21: composeCoordinationActionRequest fills actors[] for the whole gr
     },
   });
   assert.deepEqual(legacyReq.actors, []);
+});
+
+// ---------------------------------------------------------------------
+// Fix (round 3, HIGH): startCoordinationUseCase's own "Validate actors"
+// idempotent-resume check (start.mjs step 8) against a REAL end-to-end
+// session on a protocol with a genuine `policy.capability` resolution, so
+// `withComputedActorBindings` actually synthesizes a capability-computed
+// `actors[]` entry the way production traffic does (`standalone-master-
+// coordination-loop.yaml`'s own `produce-candidate` operation, capability
+// "code:implement") -- never a synthetic fixture with no capability
+// declared at all, which would leave the actor unbound and never exercise
+// the regression.
+// ---------------------------------------------------------------------
+
+function makeCapabilityStartCtx() {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-i21-start-idempotent-'));
+  const fgosDir = path.join(tmpDir, '.fgos');
+  fs.mkdirSync(fgosDir, { recursive: true });
+
+  const fakeExec = path.join(tmpDir, 'fake-exec.mjs');
+  fs.writeFileSync(fakeExec, `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const assignmentsRoot = path.join(process.cwd(), '.fgos', 'assignments');
+    if (fs.existsSync(assignmentsRoot)) {
+      for (const asgn of fs.readdirSync(assignmentsRoot)) {
+        const runDir = path.join(assignmentsRoot, asgn, 'runs', '01');
+        if (fs.existsSync(runDir) && !fs.existsSync(path.join(runDir, 'agent-result.json'))) {
+          fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done.' }));
+        }
+      }
+    }
+    process.exit(0);
+  `);
+
+  const runnerConfig = {
+    executor: { allowCrossProvider: true, command: process.execPath, args: [fakeExec, '{prompt}'] },
+    executors: {
+      'test-agy': {
+        kind: 'agent',
+        allowCrossProvider: true,
+        invocations: [{ via: 'cli', adapter: 'cli-spawn', command: process.execPath, args: [fakeExec, '{prompt}'] }],
+      },
+      'test-agy-alt': {
+        kind: 'agent',
+        allowCrossProvider: true,
+        invocations: [{ via: 'cli', adapter: 'cli-spawn', command: process.execPath, args: [fakeExec, '{prompt}'] }],
+      },
+    },
+    capabilities: {
+      'code:implement': { prefer: 'test-agy' },
+    },
+    models: { standard: 'test-model', nano: 'test-model' },
+    timeoutMs: 20000,
+  };
+  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ runner: runnerConfig }, null, 2));
+
+  return {
+    cwd: tmpDir,
+    repoRoot: tmpDir,
+    packageRoot: process.cwd(),
+    runnerConfig,
+    cleanup: () => { try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch {} },
+  };
+}
+
+test('Unit I21 fix (round 3, HIGH): startCoordinationUseCase is idempotent when a retry recomputes the SAME capability-computed actor binding', async () => {
+  const ctx = makeCapabilityStartCtx();
+  try {
+    const startParams = {
+      kind: 'declared-protocol',
+      coordinationId: 'coord_i21_idemp_retry',
+      writerId: 'driver-i21',
+      objective: 'Ship the candidate',
+      protocolId: 'core.coordination-protocol.standalone-master-coordination-loop',
+    };
+
+    const first = await startCoordinationUseCase(ctx, startParams);
+    assert.equal(first.coordinationId, 'coord_i21_idemp_retry');
+    assert.equal(first.steps.length, 1);
+    assert.equal(first.steps[0].executor, 'test-agy', 'the entry-node actor must actually have been dispatched via the capability-computed binding');
+
+    // Retry with byte-identical arguments must succeed idempotently -- this
+    // is the regression: before this fix, step 8 always threw payload-conflict
+    // here because requestObject.actors always carries the SAME
+    // capability-computed "doer" -> "test-agy" entry both times, and the old
+    // comparison could never match it against existingManifest.actors[i].role.
+    const retried = await startCoordinationUseCase(ctx, startParams);
+    assert.equal(retried.coordinationId, 'coord_i21_idemp_retry');
+    assert.equal(retried.idempotent, true);
+  } finally {
+    ctx.cleanup();
+  }
+});
+
+test('Unit I21 fix (round 3, HIGH): a resumed start still refuses a genuinely different actors[] roster (unknown id, differing persona), while a differing executor override is honored as per-request policy', async () => {
+  const ctx = makeCapabilityStartCtx();
+  try {
+    const startParams = {
+      kind: 'declared-protocol',
+      coordinationId: 'coord_i21_conflict_retry',
+      writerId: 'driver-i21',
+      objective: 'Ship the candidate',
+      protocolId: 'core.coordination-protocol.standalone-master-coordination-loop',
+    };
+    await startCoordinationUseCase(ctx, startParams);
+
+    // An actors[] entry naming an id the protocol never declared is a real conflict.
+    await assert.rejects(
+      () => startCoordinationUseCase(ctx, { ...startParams, actors: [{ id: 'not-a-real-actor' }] }),
+      (err) => err instanceof CoordinationError && err.category === 'payload-conflict' && err.message.includes('actors'),
+    );
+
+    // An actors[] entry naming a real bound actor but a DIFFERENT persona than
+    // the session's own protocol-declared SessionActor is a real conflict.
+    await assert.rejects(
+      () => startCoordinationUseCase(ctx, { ...startParams, actors: [{ id: 'doer', persona: 'a-different-persona' }] }),
+      (err) => err instanceof CoordinationError && err.category === 'payload-conflict' && err.message.includes('actors'),
+    );
+
+    // An actors[] entry naming a real bound actor with a DIFFERENT executor
+    // override than what was previously dispatched is NOT a conflict -- the
+    // roster is per-request, not per-session (run.mjs's own documented
+    // contract), so retrying with a different --executor pin must still
+    // resume idempotently rather than being refused.
+    const withDifferentExecutor = await startCoordinationUseCase(ctx, { ...startParams, actors: [{ id: 'doer', executor: 'test-agy-alt' }] });
+    assert.equal(withDifferentExecutor.idempotent, true);
+  } finally {
+    ctx.cleanup();
+  }
 });
 
 test('Red-team: a portable operation cannot smuggle preferExecutor under policy.capability through bindOperations', () => {

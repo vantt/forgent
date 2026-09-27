@@ -147,25 +147,64 @@ export async function startCoordinationUseCase(ctx, options = {}) {
       );
     }
 
-    // 8. Validate actors
-    if (existingKind === 'declared-protocol' && requestObject.actors && requestObject.actors.length > 0) {
-      const existingActors = (existingManifest.actors ?? []).map((a) => ({
-        id: a.id,
-        role: a.role,
-        ...(a.persona !== undefined ? { persona: a.persona } : {}),
-        ...(a.policy !== undefined ? { policy: a.policy } : {}),
-      }));
-      const newActors = requestObject.actors.map((a) => ({
-        id: a.id,
-        role: a.role,
-        ...(a.persona !== undefined ? { persona: a.persona } : {}),
-        ...(a.policy !== undefined ? { policy: a.policy } : {}),
-      }));
-      if (canonicalJson(existingActors) !== canonicalJson(newActors)) {
-        throw new CoordinationError(
-          'payload-conflict',
-          `coordination start: session "${coordinationId}" already exists with different actors configuration`,
-        );
+    // 8. Validate actors -- compare only the CALLER-DECLARED roster
+    // (`options.actors`, the raw pre-merge array, never `requestObject.actors`)
+    // against what the session durably owns.
+    //
+    // Fix (round 3): `requestObject.actors` is `composeStartRequest`'s fully
+    // MERGED roster -- for a declared-protocol session it always includes
+    // `withComputedActorBindings`'s own capability-computed additions/fields
+    // (Unit I21) on top of anything the caller declared. Comparing THAT
+    // against `existingManifest.actors` broke idempotent retry for every
+    // session with even one capability-resolvable actor, because the two
+    // sides can never carry comparable data in the first place:
+    //   - `role` is schema-forbidden on EVERY entry a request's `actors[]`
+    //     can ever carry (schema.mjs's `ACTOR_ALLOWED_KEYS`/"actor-role
+    //     rewrite rejected", R2) -- it is not merely absent on computed
+    //     additions, it can never be present on a caller-declared entry
+    //     either. `existingManifest.actors[i].role`, by contrast, always
+    //     carries a real, non-empty string (`openDeclaredProtocolSession`
+    //     copies it straight from the protocol's own `spec.actors[]`). This
+    //     pair can never match, so the OLD comparison threw on ANY populated
+    //     `actors[]` regardless of whether the request had changed at all --
+    //     a pre-existing defect (present since the commit that introduced
+    //     this block, 232ef31e1, well before I21) that simply never fired
+    //     before because callers rarely passed non-empty `actors[]` on a
+    //     `start` retry until I21 made that the default.
+    //   - `executor`/`model`/`tier`/`invocation`/`fallbackExecutors` are
+    //     per-request dispatch policy applied only at `dispatchDeclaredOperation`
+    //     time (`actorPolicyFields`, run.mjs) -- they are NEVER written into
+    //     `manifest.actors` for a declared-protocol session (confirmed by
+    //     tracing every write site: `openDeclaredProtocolSession`,
+    //     `openStandaloneSession`, `bindActor`). run.mjs's own dispatch
+    //     warning says this outright: "The roster is per-request, not
+    //     per-session: a resumed session must repeat actors[] to keep its
+    //     bindings." Comparing them against the manifest can therefore never
+    //     validly detect "did the caller ask for something different than
+    //     last time" -- there is nothing durable to diff against, and a
+    //     caller is free to change these per retry by design.
+    // The only two properties the manifest genuinely, durably owns for a
+    // declared-protocol actor are its IDENTITY (is this id even bound to
+    // this session) and its `persona` (copied verbatim from the protocol's
+    // own `spec.actors[]`, never overwritten by a request) -- those are the
+    // only two a conflict can honestly be judged against.
+    if (existingKind === 'declared-protocol') {
+      const callerActors = Array.isArray(options.actors) ? options.actors : [];
+      const boundActorById = new Map((existingManifest.actors ?? []).map((a) => [a.id, a]));
+      for (const actor of callerActors) {
+        const bound = boundActorById.get(actor.id);
+        if (!bound) {
+          throw new CoordinationError(
+            'payload-conflict',
+            `coordination start: session "${coordinationId}" already exists with different actors configuration -- "${actor.id}" is not one of its bound actors (${[...boundActorById.keys()].join(', ')})`,
+          );
+        }
+        if (actor.persona !== undefined && actor.persona !== bound.persona) {
+          throw new CoordinationError(
+            'payload-conflict',
+            `coordination start: session "${coordinationId}" already exists with different actors configuration -- "${actor.id}" is bound with persona "${bound.persona ?? '(none)'}", cannot start with "${actor.persona}"`,
+          );
+        }
       }
     }
 

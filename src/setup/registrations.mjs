@@ -2050,8 +2050,18 @@ function checkOperationCapabilitiesResolve(cwd) {
         }
         throw err;
       }
-      if (!resolved.configured) {
-        unresolved.push(`${definitionId}.${op.id} -> "${capability}": nothing registered (no matching executor id, no capabilities.${capability}.prefer/for)`);
+      // Fix (round 3, MEDIUM): `binding.mjs`'s `bindOperations` (the actual
+      // runtime consumer this check exists to verify) only ever treats
+      // `bindingSource === 'capability.prefer'` as a genuine capability
+      // resolution (H1/H4, red-team rounds 1/2) -- a bare `executor-id`
+      // match or a `capability.for` orphan-executor fallback is refused
+      // there and leaves the actor unbound at real dispatch time. Checking
+      // only `resolved.configured` here would report a capability as
+      // "resolving" (and count its provider family) even when
+      // `bindOperations` would never actually bind it -- a false-positive
+      // on the exact contract this check exists to verify.
+      if (!resolved.configured || resolved.bindingSource !== 'capability.prefer') {
+        unresolved.push(`${definitionId}.${op.id} -> "${capability}": nothing registered through capabilities.${capability}.prefer (a bare executor-id match or a "for"-array fallback does not count -- bindOperations refuses both and leaves the actor unbound)`);
         continue;
       }
       providerFamilies.add(deriveProviderFamily(resolved.executor));

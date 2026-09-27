@@ -86,7 +86,7 @@ Session IDs use safe characters: letters, digits, hyphen, underscore (e.g. `cell
      --cwd "../<track>-<cell-id>" \
      --objective "<cell objective from phase file>"
    ```
-   Every declared step now resolves its own default binding from the operation's `policy.capability` (`runnerConfig.capabilities.<name>.prefer`) -- `--actors '<json>'` on `start` is an optional per-actor OVERRIDE, not the only way to bind a role. Known limitation: `--actors` on `start` binds the entry node only -- a later `authorize-and-dispatch`/`operation` step does not yet inherit an earlier node's override for the same actor id, so repeat the override at that step if you need it there too.
+   Every declared step now resolves its own default binding from the operation's `policy.capability` (`runnerConfig.capabilities.<name>.prefer`) -- `--actors '<json>'` on `start` is an optional per-actor OVERRIDE, not the only way to bind a role. Known limitation: `authorize-and-dispatch`/`operation` accept no `--actors` flag at all (only `start` does) -- their only per-step override is `--executor <id>` (and `--tier <tier>` if relevant), so pass those flags again at that step if you need to override past the entry node.
 3. **Dispatch Evaluation Pass:**
    Query `fgos coordination status <track>--<cell-id>`.
    `produce-candidate` has already executed. The next projected legal actions are the parallel primary evaluations:
