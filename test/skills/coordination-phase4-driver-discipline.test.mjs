@@ -353,8 +353,28 @@ test('Phase 4: documented coordination commands in skills and fragments match re
   const dummyWt = path.join(tmpDir, 'dummy-worktree');
   fs.mkdirSync(dummyWt, { recursive: true });
 
+  // Pre-write a non-spawning runner configuration so commands cannot spawn real agents (R5)
+  const fgosDir = path.join(tmpDir, '.fgos');
+  fs.mkdirSync(fgosDir, { recursive: true });
+  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({
+    runner: {
+      executor: {
+        command: 'NO_ASSISTANT_CLI_FOUND__edit_.fgos/config.json',
+        args: ['{prompt}'],
+        allowCrossProvider: false,
+      },
+      models: {
+        standard: 'mock-model',
+        nano: 'mock-model',
+        flagship: 'mock-model',
+      },
+      timeoutMs: 10000,
+    },
+  }, null, 2));
+
   function substitutePlaceholders(arg) {
     return arg
+      .replaceAll('../<track>-<cell-id>', dummyWt)
       .replaceAll('<track>--<cell-id>', 'nonexistent-probe-cell-01')
       .replaceAll('<coordinationId>', 'nonexistent-probe-cell-01')
       .replaceAll('<track>', 'test-track')
@@ -367,7 +387,6 @@ test('Phase 4: documented coordination commands in skills and fragments match re
       .replaceAll('<value>', 'accepted')
       .replaceAll('<text>', 'Probe rationale text')
       .replaceAll('<cell objective from phase file>', 'Probe cell objective')
-      .replaceAll('../<track>-<cell-id>', dummyWt)
       .replaceAll('[--detail]', '--detail');
   }
 
@@ -432,7 +451,15 @@ test('Phase 4: documented coordination commands in skills and fragments match re
           let out = '';
           let errStr = '';
           try {
-            out = execFileSync(process.execPath, fullArgs, { encoding: 'utf8', stdio: 'pipe' });
+            out = execFileSync(process.execPath, fullArgs, {
+              encoding: 'utf8',
+              stdio: 'pipe',
+              env: {
+                ...process.env,
+                PATH: path.dirname(process.execPath),
+                CLAUDE_CODE_SESSION_ID: undefined,
+              },
+            });
           } catch (e) {
             errStr = (e.stderr || '') + (e.stdout || '');
           }
@@ -446,12 +473,52 @@ test('Phase 4: documented coordination commands in skills and fragments match re
             !combined.includes('requires --'),
             `Command "fgos coordination ${sub}" in ${path.basename(filePath)}:${i + 1} missing required option: ${combined}`,
           );
+
+          if (sub === 'start') {
+            assert.ok(
+              combined.includes('dispatch decide blocked operation') ||
+              combined.includes('no known assistant CLI found on PATH') ||
+              combined.includes('cross-provider egress target'),
+              `start command must fail with pre-dispatch block, got: ${combined}`,
+            );
+          }
+
           totalChecked++;
         }
       }
     }
 
     assert.ok(totalChecked >= 8, `Must have verified at least 8 command invocations, found ${totalChecked}`);
+
+    // Verify that no run attempts were dispatched or executed under .fgos (R5)
+    const assignDir = path.join(fgosDir, 'assignments');
+    if (fs.existsSync(assignDir)) {
+      for (const asgn of fs.readdirSync(assignDir)) {
+        const runsPath = path.join(assignDir, asgn, 'runs');
+        if (fs.existsSync(runsPath)) {
+          const runs = fs.readdirSync(runsPath);
+          assert.strictEqual(
+            runs.length,
+            0,
+            `No run attempt must be dispatched under ${runsPath}, found: ${runs.join(', ')}`,
+          );
+        }
+      }
+    }
+
+    function assertNoRunArtifacts(dir) {
+      if (!fs.existsSync(dir)) return;
+      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          assertNoRunArtifacts(full);
+        } else {
+          assert.notStrictEqual(entry.name, 'run.json', `Must not create run.json at ${full}`);
+          assert.notStrictEqual(entry.name, 'agent-result.json', `Must not create agent-result.json at ${full}`);
+        }
+      }
+    }
+    assertNoRunArtifacts(tmpDir);
 
     // Negative guard verification: prove that the real CLI actually catches invalid flags and missing required flags
     // 1. Invalid option rejection (e.g. --reason on close)
@@ -466,7 +533,15 @@ test('Phase 4: documented coordination commands in skills and fragments match re
         '--writer-id', 'driver-probe',
         '--reason', 'invalid-flag',
         '--dir', tmpDir,
-      ], { encoding: 'utf8', stdio: 'pipe' });
+      ], {
+        encoding: 'utf8',
+        stdio: 'pipe',
+        env: {
+          ...process.env,
+          PATH: path.dirname(process.execPath),
+          CLAUDE_CODE_SESSION_ID: undefined,
+        },
+      });
     } catch (e) {
       closeErr = (e.stderr || '') + (e.stdout || '');
     }
@@ -487,7 +562,15 @@ test('Phase 4: documented coordination commands in skills and fragments match re
         '--writer-id', 'driver-probe',
         '--reason', 'Valid reason',
         '--dir', tmpDir,
-      ], { encoding: 'utf8', stdio: 'pipe' });
+      ], {
+        encoding: 'utf8',
+        stdio: 'pipe',
+        env: {
+          ...process.env,
+          PATH: path.dirname(process.execPath),
+          CLAUDE_CODE_SESSION_ID: undefined,
+        },
+      });
     } catch (e) {
       authErr = (e.stderr || '') + (e.stdout || '');
     }

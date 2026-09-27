@@ -793,6 +793,7 @@ sessions plus the plan artifact.
 - combined Lead load (`facade + coordination-driver.md + coding-cell-policy.md`) is at most 3,300 words;
 - combined load is re-measured after Phase 5, once `architecture-panel` and `panel` also consume the driver fragment;
 - clean, fix/recheck, crash/resume, stale-action, and explicit-close cases pass;
+- no weaker evidence or extra dispatch wave;
 - the driver-discipline fragment contains no coding/track vocabulary (drift
   test: `git`, `worktree`, `merge`, `npm test`, `phase`, `plan.md` absent);
 - the coding-cell fragment is usable for one cell with no plan or track
