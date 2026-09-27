@@ -2,25 +2,26 @@
 name: fgos-code-panel
 user-invocable: false
 description: >-
-  Get a single code change implemented or drive a plan-driven coding track with
-  independent review + red-team through the real `fgos coordination` CLI doors.
+  Drive a mutating code change or plan-driven coding track with independent review
+  + red-team through the real `fgos coordination` CLI doors when declared DemandFacts
+  indicate outputKind: change, domain: code, mutates: true, and needsIndependentReview: true.
   Self-contained: dispatches through the same hardened CoordinationSession engine
   and `standalone-master-coordination-loop` protocol `fgos-plan-loop` uses (real
   mutation-gating, real quorum close), with its own coding-flavored doer/reviewer/
   red-team persona roster. Two modes: direct-single-cell (default, concrete code
-  changes without a plan target) and planned-multi-cell (when a plan/phase file or
-  track is the execution target, delegating multi-cell orchestration to
-  `fgos-plan-loop` by reference). Examples: "implement this fix and get it
-  reviewed+red-teamed", "run a code panel on this change", "run plans/260915-foo/plan.md",
-  "resume track plans/260915-foo/plan.md". Do not use for advisory coding decisions;
-  those route through fgos-panel without mutation.
+  changes without a plan target) and planned-multi-cell (when hasPlanOrTrack: true
+  with a plan/phase target such as plans/260915-foo/plan.md, delegating multi-cell
+  orchestration to `fgos-plan-loop` by reference). Not triggered by keyword spotting
+  on "implement"; do not use for advisory coding decisions, which route through
+  fgos-panel without mutation.
 ---
 
 # fgos-code-panel
 
-Despite the short name, this is a mutating implementation workflow. A request
-for a "coding panel" does not select it unless the person explicitly asks to
-implement/change/fix code. Advisory coding design and architecture choices
+Despite the short name, this is a mutating implementation workflow. Triggered
+only when declared `DemandFacts` indicate `outputKind: change`, `domain: code`,
+`mutates: true`, and `needsIndependentReview: true` — never by keyword spotting
+on words like "implement", "fix", or "panel". Advisory coding design and architecture choices
 start at `core/skills/fgos-panel/SKILL.md`, which routes without granting
 mutation authority.
 
