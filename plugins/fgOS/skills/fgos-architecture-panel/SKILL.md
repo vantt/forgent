@@ -111,8 +111,9 @@ existing doors only:
   infrastructure, not a graph node in this protocol's own FlowDefinition.
 - **Specialist authorization:** the `specialist-authorize` request-step
   type (`src/verbs/coordination/schema.mjs`, I24a) reaches
-  `authorizeSpecialistSlot` through the raw `coordination run --file`
-  power-user door — never through `fgos-group-thinking`'s own gate, which
+  `authorizeSpecialistSlot` through any raw coordination request door
+  (`coordination run --file`, `coordination start --steps`, the headless
+  adapter) — never through `fgos-group-thinking`'s own gate, which
   explicitly refuses this step type (see Known Gaps, `tsk-3xk`, retired). A
   driver-authenticated typed-action door for this same capability is not
   built yet — until it lands, build the `specialist-authorize` step
@@ -289,9 +290,9 @@ protocol's own `actors[]`), each bindable up front in the request's own
 `actors[]` override. The specialist has **no such actor id to bind at
 all** — it is authorized on demand through the specialist-slot mechanism
 (`specialistSlotRef: specialist-answer-slot`, `authorizeSpecialistSlot`,
-reached via a `specialist-authorize` step in a raw `coordination run
---file` request — see "Never Reimplements The Kernel" above for the
-exact door), naming the executor/tier/persona for that one question at
+reached via a `specialist-authorize` step in a raw coordination request —
+see "Never Reimplements The Kernel" above for the exact doors), naming the
+executor/tier/persona for that one question at
 authorization time, not in the session's opening roster. Never
 pre-declare a specialist actor id the way you would for the other 8.
 
@@ -692,9 +693,11 @@ never invent a new filename mid-session.
   turn licenses a dialogue reopen — never a real ref in those fields
   until this lands.
 - **`tsk-3xk`** — **closed (I24a).** A `specialist-authorize` request-step
-  type now exists for `fgos coordination run --file`
-  (`src/verbs/coordination/schema.mjs`), reaching `authorizeSpecialistSlot`
-  — build it directly into a raw request, then dispatch
+  type now exists for every raw coordination request door (`fgos
+  coordination run --file`, `fgos coordination start --steps`, the
+  headless adapter; `src/verbs/coordination/schema.mjs`), reaching
+  `authorizeSpecialistSlot` — build it directly into a raw request, then
+  dispatch
   `answer-specialist-question` through the normal `operation` step once
   authorized. This door is NOT reachable through
   `fgos-group-thinking`'s own gate — `runGroupThinkingRequest` explicitly

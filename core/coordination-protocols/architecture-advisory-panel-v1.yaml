@@ -77,10 +77,12 @@
 # `fgos coordination run --file` -- the SAME class of pre-existing wiring
 # gap P10.10 named and later closed for the `contribution` step type.
 # Closed by I24a (Phase 5 item 4): a `specialist-authorize` step type now
-# exists in that vocabulary, reachable through `fgos coordination run
-# --file` directly. It remains unreachable through `fgos-group-thinking`'s
-# own pack gate -- `runGroupThinkingRequest` explicitly refuses this step
-# type (Group-Thinking Protocol Pack bypass #4 stays refused,
+# exists in that vocabulary, reachable directly through any raw coordination
+# request door -- `fgos coordination run --file`, `fgos coordination start
+# --steps`, the headless adapter. It remains unreachable through
+# `fgos-group-thinking`'s own pack gate -- `runGroupThinkingRequest`
+# explicitly refuses this step type (Group-Thinking Protocol Pack bypass #4
+# stays refused,
 # `docs/architect/agent-coordination/contracts/coordination-session.md`'s
 # "Five bypasses" section). A driver-authenticated typed-action door for
 # this same capability is a later unit's own work, still pending.

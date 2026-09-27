@@ -417,6 +417,23 @@ test('re-authorizing the SAME specialist actor for the same slot does not consum
   assert.equal(result.appended, true);
 });
 
+test('reusing a specialistAuthorizationId with a DIFFERENT specialistActorId is refused, never silently echoed as authorizing the new actor', () => {
+  const ctx = setup('coord_spec_id_reuse_mismatch');
+  authorizeSpecialistSlot('coord_spec_id_reuse_mismatch', specialistAuthorization(), ctx.opts);
+  assert.throws(
+    () =>
+      authorizeSpecialistSlot(
+        'coord_spec_id_reuse_mismatch',
+        specialistAuthorization({ specialistActorId: 'specialist-zeta' }),
+        ctx.opts,
+      ),
+    (err) => err instanceof CoordinationError && err.category === 'duplicate-ref' && /already recorded with different content/.test(err.message),
+  );
+  const events = readSessionEvents('coord_spec_id_reuse_mismatch', ctx.opts).filter((e) => e.type === 'specialist-authorized');
+  assert.equal(events.length, 1, 'the mismatched retry must never append a second event');
+  assert.equal(events[0].payload.specialistActorId, 'specialist-alpha', 'the original binding must be untouched');
+});
+
 // ─── Bug Taxonomy: over-cap assignment refused (maxAssignments) ───────────
 
 test('a bound specialist cannot be authorized for dispatch beyond its own maxAssignments cap', () => {

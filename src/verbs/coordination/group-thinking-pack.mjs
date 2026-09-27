@@ -238,10 +238,14 @@ function peekRequest(requestPath) {
  * reasoning `docs/architect/agent-coordination/contracts/coordination-session.md`'s
  * "Five bypasses" section gave before I24a). This function refuses that one
  * step type explicitly, below, before anything is forwarded -- keeping
- * bypass #4 refused for every request this pack gate ever forwards. The raw
- * `coordination run --file` door remains the only legal way to reach
+ * bypass #4 refused for every request this pack gate ever forwards. Any raw
+ * coordination request door -- `coordination run --file`, `coordination
+ * start --steps`, the headless adapter -- remains a legal way to reach
  * specialist authorization until a driver-authenticated typed-action door
- * exists (a later unit).
+ * exists (a later unit): `start`/its `composers.mjs` composer forward
+ * `steps` unfiltered by type, exactly as they already do for every other
+ * step type, so this pack's own explicit refusal below is the actual
+ * boundary, never the raw doors' own step-type vocabulary.
  *
  * Resume is `run.mjs`'s own existing behavior, inherited for free: a
  * request naming an EXISTING `coordinationId` resumes that session through
@@ -306,7 +310,7 @@ export async function runGroupThinkingRequest(ctx, options = {}) {
     fail(
       'a "specialist-authorize" step is refused by this pack gate -- Group-Thinking Protocol Pack bypass #4 ' +
         '("authorize a specialist") stays refused for every request forwarded through runGroupThinkingRequest; ' +
-        'use the raw `coordination run --file` power-user door directly instead',
+        'use a raw coordination request door directly instead (`coordination run --file`, `coordination start --steps`, the headless adapter)',
     );
   }
 

@@ -773,19 +773,23 @@ not by absence from the vocabulary.
 **(4) authorize a specialist — reasoning updated, I24a (Phase 5 item 4).**
 `run.mjs`'s public request vocabulary grew a real `specialist-authorize`
 step type (`src/verbs/coordination/schema.mjs`), reaching
-`authorizeSpecialistSlot`, for the raw `coordination run --file`
-power-user door — so this bypass is no longer refused by absence from the
-vocabulary (P10.1's original framing, now outdated for this one bypass
-only). It stays refused for every request the group-thinking pack gate
-forwards through an EXPLICIT step-type refusal
-`runGroupThinkingRequest` (`src/verbs/coordination/group-thinking-pack.mjs`)
-now applies before forwarding anything —
+`authorizeSpecialistSlot`, for any raw coordination request door
+(`coordination run --file`, `coordination start --steps`, the headless
+adapter — none of them filter by step type) — so this bypass is no longer
+refused by absence from the vocabulary (P10.1's original framing, now
+outdated for this one bypass only). It stays refused for every request the
+group-thinking pack gate forwards through an EXPLICIT step-type refusal
+that `runGroupThinkingRequest`
+(`src/verbs/coordination/group-thinking-pack.mjs`) now applies before
+forwarding anything —
 `test/verbs/coordination-group-thinking-pack-registration.test.mjs` proves
 it. A driver-authenticated typed-action/subverb door for this same
 capability is a later unit's own work, not yet built.
-(`P10.1.md`'s own accurate framing for the remaining four, quoted rather
-than paraphrased: two bypasses — validate-aggregate, close-directly — are
-refused because `run.mjs`'s vocabulary never exposes them at all; two —
+(`P10.1.md`'s own framing for the remaining four, paraphrased and adjusted
+for the changed bypass count above — no longer a literal quote once this
+paragraph split the original grouping to carve out bypass #4 separately:
+two bypasses — validate-aggregate, close-directly — are refused because
+`run.mjs`'s vocabulary never exposes them at all; two —
 switch-protocols, bypass-grants — are refused because the pack gate's own
 explicit-selection checks run before, and add nothing to, `run.mjs`'s
 existing enforcement. This is NOT "upstream mediation" in `run.mjs` itself:

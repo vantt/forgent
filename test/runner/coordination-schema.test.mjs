@@ -90,6 +90,31 @@ test('DAG alias identity permits byte-identical repeats, rejects conflicts, and 
   assert.equal(explicit.requestFingerprint, inferred.requestFingerprint);
 });
 
+test('DAG compiler creates dependency edges for specialist-authorize triggerEvidenceRefs and allowedContextRefs', () => {
+  const specialistAuthorize = (as, { trigger = [], allowed = [] } = {}) => ({
+    type: 'specialist-authorize',
+    as,
+    slotId: 'slot-1',
+    specialistActorId: 'spec-1',
+    role: 'specialist',
+    capabilities: ['deep-review'],
+    reason: 'x',
+    triggerEvidenceRefs: trigger,
+    allowedContextRefs: allowed,
+    maxAssignments: 1,
+    expiresAfterRound: 1,
+    specialistAuthorizationId: 'sauth_dag_1',
+  });
+  const request = compiledRequest([
+    { type: 'operation', as: 'produce', operationId: 'produce', objective: 'x', expectedOutputs: ['x'] },
+    { type: 'operation', as: 'review', operationId: 'review', objective: 'x', expectedOutputs: ['x'] },
+    specialistAuthorize('authSpecialist', { trigger: ['$ref:produce'], allowed: ['review'] }),
+  ]);
+  const declaration = compileDagRequest(request);
+  const node = declaration.nodes.find((n) => n.displayLabel === 'authSpecialist');
+  assert.deepEqual([...node.dependsOn].sort(), ['node-produce', 'node-review']);
+});
+
 test('DAG authorization pairing treats an omitted targetActorId as the same binding as its explicit operation actor', () => {
   const request = compiledRequest([
     { type: 'authorize', as: 'grant', operationId: 'revise', authorizationId: 'a1', invocationKey: 'i1', reason: 'x', grantedContextRefs: [] },
