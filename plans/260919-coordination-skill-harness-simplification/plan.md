@@ -1209,7 +1209,8 @@ Executor/provider/model/tier selection remains an execution-time decision.
 - unit: I17 — demand doctrine: `capability-matching.md` fragment, spec fact, trigger reversal
   capability: execute
   depends-on: I16
-  status: not-started
+  status: implemented
+  branch: `coordination-skill-harness-i17-demand-doctrine`
   scope: see `phase-05-unit-i17-demand-doctrine.md`. Prose only: new shared fragment
     (DemandFacts, serves-based matching, default inline, five dispatch reasons, promotion
     trigger for domain capabilities), `serves` column + `review` row in
@@ -1217,7 +1218,7 @@ Executor/provider/model/tier selection remains an execution-time decision.
     trigger of `fgos-capability-dispatching` and `fgos-code-panel` description switched
     from keyword matching to declared facts, one spec line in `docs/specs/runner.md`.
   design-record: plans/reports/architecture-investigation-260927-1154-capability-aware-dispatch-gate-phase4-decisions.md §11
-  verification: node --test test/setup/capability-catalog-doctrine.test.mjs test/skills/; npm run build:skills mirrors byte-identical; git diff --check
+  verification: node --test test/setup/capability-catalog-doctrine.test.mjs test/skills/*.test.mjs (40/40 pass); npm run build:skills mirrors byte-identical; git diff --check clean
   stop: fragment needs kernel/engine change; any existing skill-contract test regresses.
 - unit: I18 — plan lint hardening and `fgos plan-lint` verb
   capability: code:implement

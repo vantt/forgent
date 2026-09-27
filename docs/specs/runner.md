@@ -1204,6 +1204,7 @@ Lớp từ vựng dispatch hiện hành của fgOS phản ánh mô hình control
 | `orchestrator` | (tái gán nghĩa `0029`) | Tầng hợp thành T0 quản lý N đơn vị work (ở lại) | `runner.md:1995` (ADR 0029), `runner.md:2172` (ADR 0031) |
 | `DispatchPlan` | (mới) | Kế hoạch dispatch được resolved gồm mechanism, target agent/tool, và metadata | `src/runner/dispatch/plan.mjs`, `dispatch-control-plane-redesign.md:175` |
 | `DispatchAssignment` | (mới) | Đơn vị phân công dispatch cụ thể gán executor cho work item | `src/runner/dispatch/plan.mjs`, `dispatch-control-plane-redesign.md:210` |
+| `DemandFacts` / `CapabilityMatch` | (mới) | DemandFacts khai báo thuộc tính phía cầu; CapabilityMatch là kết quả khớp qua serves — lời hứa hành vi đọc được bằng máy của capability | `core/skills/_shared/capability-matching.md` |
 
 *Ghi chú:*
 - Về vai trò bên gọi `launcher` / `driver` / `orchestrator`: xem lưới 2×2 tại `runner.md:2172-2180` (kỷ yếu `0031`) tóm tắt trục T1/T0.
@@ -1212,6 +1213,7 @@ Lớp từ vựng dispatch hiện hành của fgOS phản ánh mô hình control
 - `purpose` (tham số nội bộ `resolve.mjs`/`plan.mjs`) và flag CLI `--for <purpose>` KHÔNG phải một ontology thứ ba — cả hai đặt tên cho một giá trị `capability`, chỉ là cú pháp tương thích lịch sử (compatibility syntax), không phải một identity định tuyến riêng.
 - `job` KHÔNG phải một routing identity — ADR-004 dành riêng tên này cho một scheduler tương lai (chưa dùng); nếu xuất hiện trong log, nó chỉ là nhãn ngữ cảnh của một request, không phải mục tiêu dispatch resolve tới. Một `Run` là một lần thực thi cụ thể cho một Assignment, không phải job/operation identity.
 - Dispatch core chỉ nhận đúng hai target identity — `capability` và `executor-id` — cùng hợp đồng `DispatchRequest`/`PolicyPatch`/`DispatchPlan` chính tắc và danh sách sở hữu component-internal (8 thẩm quyền + forbidden dependencies): xem [Dispatch Control Plane](../architect/agent-coordination/architecture/dispatch-control-plane.md).
+- `DemandFacts` và `CapabilityMatch` (Phase 5, Unit I17): `DemandFacts` khai báo các thuộc tính nhu cầu của đơn vị việc; thuộc tính `serves` là phần danh tính của catalog capability theo nghĩa "lời hứa hành vi đọc được bằng máy", phục vụ matching thuần ngữ nghĩa thay vì quét từ khóa (xem `core/skills/_shared/capability-matching.md`).
 
 ## ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)
 

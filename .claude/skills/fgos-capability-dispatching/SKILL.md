@@ -2,7 +2,7 @@
 name: fgos-capability-dispatching
 user-invocable: false
 description: >-
-  Awareness guidance for selecting canonical dispatch capabilities (e.g. code:implement) and asking decide-before-execute control plane decisions before implementing, changing, or building code, before code edits begin, whether or not an fgOS work item exists. Not for review-only, explanation-only, or read-only diagnosis requests.
+  Awareness guidance for selecting canonical dispatch capabilities (e.g. code:implement) after declared DemandFacts indicate mutates: true in domain: code, and calling decide-before-execute once per unit to let the control plane resolve whether to delegate or execute inline (default unavailable). Not for read-only diagnosis, explanation, or keyword-based triggering.
 ---
 
 This is a generated thin wrapper (tsk-1qi) -- do not edit directly, edit the source instead.

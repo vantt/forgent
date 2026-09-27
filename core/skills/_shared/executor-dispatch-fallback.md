@@ -29,24 +29,26 @@ parameters where the consuming skill's own reasoning step lives:
 
 ## Shared awareness cluster
 
-This is the dispatch half of a two-fragment shared cluster
-(`docs/history/agent-coordination-foundation/plan.md`). The planning half
-lives beside it at
-[`planning-capability-awareness.md`](./planning-capability-awareness.md)
-(assign one canonical capability per execution unit while planning); the
-capability vocabulary both fragments share lives at
-[`capability-catalog.md`](./capability-catalog.md). Neither sibling
-fragment is coding-specific.
+This is the dispatch component of a four-fragment shared awareness cluster
+(`docs/history/agent-coordination-foundation/plan.md`):
+[`capability-catalog.md`](./capability-catalog.md) defines the canonical vocabulary and promises;
+[`capability-matching.md`](./capability-matching.md) governs demand-fact derivation and serves-matching (Q1);
+[`planning-capability-awareness.md`](./planning-capability-awareness.md) guides plan decomposition and capability assignment;
+and this fragment governs execution-time decision and dispatch (Q2).
+None of these shared fragments is coding-specific.
 
 ## Activation doctrine: Decide before execute
 
 Before executing any independently executable unit (e.g. `code:implement` for coding implementation), select the canonical capability for the job — see `capability-catalog.md` for the registered vocabulary — and call `decide` (`node src/runner/dispatch.mjs decide --for <PURPOSE> [--has-live-task-access]`) before proceeding. The returned `mechanism` controls execution: `unavailable` means execute inline directly in this session; `in-process` or `out-of-process` delegates according to the control plane. The resolved provider is not necessarily agent-shaped — a capability may resolve to an MCP/tool provider or another registered adapter instead of an agent executor (`capability-catalog.md`'s "Capability execution guidance"); read the resolved `mechanism`/executor `kind` rather than assuming an Agent/Task hand-off.
 
-Four valid reasons justify configuring an executor for a capability:
-a cheaper model, a different provider (e.g. Codex/agy), resource
-isolation, or running the step in parallel with other work to shorten
-wall-clock time (chạy song song cho nhanh — Ship Faster is priority #1,
-`AGENTS.md`). When no executor is configured for that capability, `decide` answers `unavailable` and the unit executes inline in the live session.
+Five valid reasons justify configuring an executor for a capability:
+a cheaper model, a stronger model (when the unit's required `rigor` exceeds
+the current session's model capability — tied to `rigor`, never to `size`),
+a different provider (e.g. Codex/agy), resource isolation (confinement / sandboxing),
+or running the step in parallel with other work to shorten wall-clock time
+(chạy song song cho nhanh — Ship Faster is priority #1, `AGENTS.md`).
+When no executor is configured for that capability, `decide` answers `unavailable`
+and the unit executes inline in the live session.
 
 A single tool call the live session makes directly inside its own
 reasoning — `WebSearch`, `Read`, `Grep`, `Bash`, or any other primitive
