@@ -13,7 +13,10 @@
 const UNIT_LINE = /^-\s*unit:\s*(.+)$/;
 const CAPABILITY_LINE = /^\s+capability:\s*(.+)$/;
 const PIN_LINE = /^\s+(executor|provider|model|tier|prefer|invocation|actors):\s*\S/;
-const UNRESOLVED_MARK = /^unresolved\b/i;
+// Exact literal token "unresolved" only -- a negative lookahead blocks any
+// word char or hyphen immediately after it, so "unresolved-foo" is never
+// mistaken for the hedge marker the way a bare `\b` boundary would allow.
+const UNRESOLVED_MARK = /^unresolved(?![\w-])/i;
 
 const GENERIC_SHAPE = /^[a-z][a-z0-9-]*$/;
 const DOMAIN_SCOPED_SHAPE = /^[a-z][a-z0-9-]*:[a-z][a-z0-9-]*$/;
@@ -25,6 +28,31 @@ function splitTableRow(line) {
     .slice(1, -1)
     .split('|')
     .map((cell) => cell.trim());
+}
+
+// Product Gates DATA rows only: the Exit cell is free-form prose that can
+// legitimately contain a literal "|" (e.g. `<dir|tar.gz>`). Splitting on
+// every "|" like a header/separator row would silently truncate the whole
+// table at that row. Split on only the first 3 delimiters after
+// Phase/Cell/Capability; everything left, pipes included, is the Exit cell.
+function splitProductGatesDataRow(line) {
+  const trimmed = line.trim();
+  if (!trimmed.startsWith('|') || !trimmed.endsWith('|') || trimmed.length < 2) return null;
+  const parts = trimmed.slice(1, -1).split('|');
+  if (parts.length < 4) return null;
+  const [phase, cellName, capability, ...rest] = parts;
+  return [phase.trim(), cellName.trim(), capability.trim(), rest.join('|').trim()];
+}
+
+// A Capability/Cell cell written as `` `code:implement` `` is markdown
+// styling, not part of the value -- strip one surrounding pair before
+// validating or matching it.
+function stripSurroundingBackticks(text) {
+  const trimmed = String(text ?? '').trim();
+  if (trimmed.length >= 2 && trimmed.startsWith('`') && trimmed.endsWith('`')) {
+    return trimmed.slice(1, -1).trim();
+  }
+  return trimmed;
 }
 
 function isProductGatesHeader(cells) {
@@ -81,7 +109,7 @@ export function lintPlanCapabilityAnnotations(text, registeredCapabilities, opti
   // Shared by a "- unit:" block's capability and a Product Gates row's
   // Capability cell -- one evaluation path, two callers.
   const evaluateCapabilityText = (rawText, ctx) => {
-    const text = String(rawText).trim();
+    const text = stripSurroundingBackticks(rawText);
     if (UNRESOLVED_MARK.test(text)) {
       pushFinding({
         line: ctx.line,
@@ -169,11 +197,15 @@ export function lintPlanCapabilityAnnotations(text, registeredCapabilities, opti
         tableState = isSeparatorRow(cells) ? 'active' : 'none';
         return;
       }
-      if (tableState === 'active' && cells.length === 4) {
-        const [phase, cellName, capability] = cells;
-        const unitLabel = cellName.trim();
-        const capabilityText = capability.trim();
-        units.push({ unit: unitLabel, capability: capabilityText || null, line: lineNo, source: 'product-gates', phase: phase.trim() });
+      if (tableState === 'active') {
+        const dataCells = splitProductGatesDataRow(rawLine);
+        if (!dataCells) {
+          tableState = 'none';
+          return;
+        }
+        const [phase, cellName, capabilityText] = dataCells;
+        const unitLabel = stripSurroundingBackticks(cellName);
+        units.push({ unit: unitLabel, capability: capabilityText || null, line: lineNo, source: 'product-gates', phase });
         if (!capabilityText) {
           pushFinding({
             line: lineNo,

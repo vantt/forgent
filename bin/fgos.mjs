@@ -43,7 +43,7 @@ import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs'
 import { rebuildViewFromDir } from '../src/state/replay.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
-import { loadRunnerConfig, ensureRunnerConfigForDir, runDispatchCli, DispatchError } from '../src/runner/dispatch.mjs';
+import { loadRunnerConfig, ensureRunnerConfigForDir, loadRunnerConfigFromDir, RunnerConfigError, runDispatchCli, DispatchError } from '../src/runner/dispatch.mjs';
 import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
 import { checkDispatchAttestation } from '../src/runner/attestation-guard.mjs';
 import { classifyDispatchConfidence } from '../src/report/dispatch-confidence.mjs';
@@ -2492,9 +2492,10 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // Read-only door onto lintPlanCapabilityAnnotations (src/report/
     // capability-plan-lint.mjs): a plan author's own static check, never
     // wired into `doctor` or any automatic gate. `registered` is always
-    // `Object.keys(runner.capabilities)` from THIS repo's own live config
-    // (ensureRunnerConfigForDir) -- the module itself never reads config or
-    // infers from prose, per its own pure-function contract.
+    // `Object.keys(runner.capabilities)` from THIS repo's own live config,
+    // read via `loadRunnerConfigFromDir` -- unlike `ensureRunnerConfigForDir`,
+    // that never bootstraps or rewrites `.fgos/config.json`, so a read-only
+    // lint never mutates state as a side effect of being run.
     case 'plan-lint': {
       const rawPath = optionalField(positional[0], 'plan-lint requires a <path> to a plan.md file, e.g. `fgos plan-lint plans/<track>/plan.md`.');
       if (rawPath === undefined) {
@@ -2504,10 +2505,21 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       if (!fs.existsSync(absPath) || !fs.statSync(absPath).isFile()) {
         throw new StoreError('precondition', `plan-lint: "${rawPath}" is not an existing file.`);
       }
-      const cellId = optionalField(flags.cell, 'plan-lint --cell requires a non-empty value.');
+      if (flags.cell === true || flags.cell === null || flags.cell === '') {
+        throw new StoreError('precondition', 'plan-lint --cell requires a non-empty value.');
+      }
+      const cellId = flags.cell === undefined ? undefined : flags.cell;
       const text = fs.readFileSync(absPath, 'utf8');
       const repoRoot = path.dirname(dir);
-      const cfg = ensureRunnerConfigForDir(repoRoot);
+      let cfg;
+      try {
+        cfg = loadRunnerConfigFromDir(repoRoot);
+      } catch (err) {
+        if (err instanceof RunnerConfigError) {
+          throw new StoreError('precondition', `plan-lint: ${err.message}`);
+        }
+        throw err;
+      }
       const catalog = cfg.capabilities ?? {};
       const registered = Object.keys(catalog);
       const result = lintPlanCapabilityAnnotations(text, registered, cellId !== undefined ? { cellId } : {});

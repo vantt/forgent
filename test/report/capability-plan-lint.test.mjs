@@ -69,7 +69,7 @@ test('a capability explicitly marked "unresolved" is warn-severity, never blocks
   assert.equal(result.findings[0].severity, 'warn');
 });
 
-test('gap 1: a hedged parenthetical on a NON-unresolved capability is flagged capability.hedged, hard severity', () => {
+test('a hedged parenthetical on a NON-unresolved capability is flagged capability.hedged, hard severity', () => {
   const text = `- unit: apply the fix
   capability: code:implement (pretty sure this is right)
 `;
@@ -83,7 +83,7 @@ test('gap 1: a hedged parenthetical on a NON-unresolved capability is flagged ca
   assert.equal(result.findings.length, 1);
 });
 
-test('gap 2: two "capability:" lines in one unit are flagged capability.duplicate, first value wins', () => {
+test('two "capability:" lines in one unit are flagged capability.duplicate, first value wins', () => {
   const text = `- unit: apply the fix
   capability: code:implement
   capability: code:review
@@ -97,7 +97,7 @@ test('gap 2: two "capability:" lines in one unit are flagged capability.duplicat
   assert.equal(dup.line, 3);
 });
 
-test('gap 3: pin keys cover executor/provider/model/tier/prefer/invocation/actors, one finding per pinned field', () => {
+test('pin keys cover executor/provider/model/tier/prefer/invocation/actors, one finding per pinned field', () => {
   const text = `- unit: apply the fix
   capability: code:implement
   executor: agy
@@ -158,7 +158,7 @@ test('multiple units are each linted independently -- one bad unit does not swal
   assert.equal(result.findings[0].unit, 'second');
 });
 
-test('gap 4: a Product Gates table row parses into a unit with source "product-gates"', () => {
+test('a Product Gates table row parses into a unit with source "product-gates"', () => {
   const text = `## Product Gates
 
 | Phase | Cell | Capability | Exit |
@@ -176,7 +176,7 @@ test('gap 4: a Product Gates table row parses into a unit with source "product-g
   assert.deepEqual(result.findings, []);
 });
 
-test('gap 4: a Product Gates row with an unregistered capability is flagged the same as a unit block', () => {
+test('a Product Gates row with an unregistered capability is flagged the same as a unit block', () => {
   const text = `| Phase | Cell | Capability | Exit |
 |---|---|---|---|
 | 00 | cell-a | code:teleport | tests green |
@@ -188,7 +188,7 @@ test('gap 4: a Product Gates row with an unregistered capability is flagged the 
   assert.equal(result.findings[0].unit, 'cell-a');
 });
 
-test('gap 4: a Product Gates row with an empty Capability cell is flagged capability.missing', () => {
+test('a Product Gates row with an empty Capability cell is flagged capability.missing', () => {
   const text = `| Phase | Cell | Capability | Exit |
 |---|---|---|---|
 | 00 | cell-a |  | tests green |
@@ -199,7 +199,7 @@ test('gap 4: a Product Gates row with an empty Capability cell is flagged capabi
   assert.match(result.findings[0].message, /Product Gates row/);
 });
 
-test('gap 4: a table that never matches the exact Phase|Cell|Capability|Exit header is never treated as Product Gates', () => {
+test('a table that never matches the exact Phase|Cell|Capability|Exit header is never treated as Product Gates', () => {
   const text = `| A | B | C |
 |---|---|---|
 | 1 | 2 | 3 |
@@ -209,7 +209,7 @@ test('gap 4: a table that never matches the exact Phase|Cell|Capability|Exit hea
   assert.deepEqual(result.findings, []);
 });
 
-test('gap 5: --cell scopes to the matching unit block only, by its leading id token', () => {
+test('--cell scopes to the matching unit block only, by its leading id token', () => {
   const text = `- unit: I18 — plan lint hardening
   capability: code:implement
 - unit: I19 — catalog serves schema
@@ -222,7 +222,7 @@ test('gap 5: --cell scopes to the matching unit block only, by its leading id to
   assert.deepEqual(result.findings, []);
 });
 
-test('gap 5: --cell scopes to a matching Product Gates row by its exact Cell column value', () => {
+test('--cell scopes to a matching Product Gates row by its exact Cell column value', () => {
   const text = `| Phase | Cell | Capability | Exit |
 |---|---|---|---|
 | 00 | cell-a | code:implement | ok |
@@ -234,7 +234,7 @@ test('gap 5: --cell scopes to a matching Product Gates row by its exact Cell col
   assert.equal(result.units[0].unit, 'cell-a');
 });
 
-test('gap 5: --cell with no match anywhere returns capability.undeclared, severity warn, ok stays true', () => {
+test('--cell with no match anywhere returns capability.undeclared, severity warn, ok stays true', () => {
   const text = `- unit: I18 — plan lint hardening
   capability: code:implement
 `;
@@ -246,7 +246,7 @@ test('gap 5: --cell with no match anywhere returns capability.undeclared, severi
   assert.equal(result.findings[0].severity, 'warn');
 });
 
-test('gap 5: --cell still surfaces hard findings scoped to the matched unit', () => {
+test('--cell still surfaces hard findings scoped to the matched unit', () => {
   const text = `- unit: I18 — plan lint hardening
   capability: code:teleport
 - unit: I19 — catalog serves schema
@@ -257,4 +257,52 @@ test('gap 5: --cell still surfaces hard findings scoped to the matched unit', ()
   assert.equal(result.units.length, 1);
   assert.equal(result.findings.length, 1);
   assert.equal(result.findings[0].code, 'capability.unregistered');
+});
+
+test('a Product Gates Exit cell containing a literal "|" does not truncate the table -- every row after it still parses', () => {
+  const text = `| Phase | Cell | Capability | Exit |
+|---|---|---|---|
+| 00 | cell-a | code:implement | stages a release from <dir|tar.gz> |
+| 01 | cell-b | code:review | reviewed |
+`;
+  const result = lintPlanCapabilityAnnotations(text, REGISTERED);
+  assert.equal(result.units.length, 2);
+  assert.equal(result.units[0].unit, 'cell-a');
+  assert.equal(result.units[0].capability, 'code:implement');
+  assert.equal(result.units[1].unit, 'cell-b');
+  assert.equal(result.units[1].capability, 'code:review');
+  assert.deepEqual(result.findings, []);
+});
+
+test('a backticked Capability cell that IS registered is not flagged (backticks stripped before matching)', () => {
+  const text = `| Phase | Cell | Capability | Exit |
+|---|---|---|---|
+| 00 | cell-a | \`code:implement\` | ok |
+`;
+  const result = lintPlanCapabilityAnnotations(text, REGISTERED);
+  assert.equal(result.ok, true);
+  assert.deepEqual(result.findings, []);
+  assert.equal(result.units[0].capability, '`code:implement`');
+});
+
+test('a backticked Capability cell that is NOT registered is still flagged, with backticks stripped from the reported name', () => {
+  const text = `| Phase | Cell | Capability | Exit |
+|---|---|---|---|
+| 00 | cell-a | \`code:teleport\` | ok |
+`;
+  const result = lintPlanCapabilityAnnotations(text, REGISTERED);
+  assert.equal(result.ok, false);
+  assert.equal(result.findings[0].code, 'capability.unregistered');
+  assert.match(result.findings[0].message, /capability "code:teleport" is not registered/);
+});
+
+test('"unresolved-foo" is never treated as the exact "unresolved" hedge token', () => {
+  const text = `- unit: apply the fix
+  capability: unresolved-foo
+`;
+  const result = lintPlanCapabilityAnnotations(text, REGISTERED);
+  assert.equal(result.ok, false);
+  assert.equal(result.findings.length, 1);
+  assert.equal(result.findings[0].code, 'capability.unregistered');
+  assert.notEqual(result.findings[0].code, 'capability.unresolved');
 });

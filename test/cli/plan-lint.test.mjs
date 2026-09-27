@@ -56,6 +56,12 @@ function writePlan(cwd, name, text) {
   return name;
 }
 
+// Deliberately no `.fgos/` at all -- unlike tmpCwd() above, which always
+// pre-seeds a config so most tests can lint against a known catalog.
+function bareTmpDir() {
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-plan-lint-bare-'));
+}
+
 function envelopeData(stdout) {
   const envelope = JSON.parse(stdout);
   assert.deepEqual(Object.keys(envelope).sort(), ['contract', 'data', 'data_hash', 'generated_at']);
@@ -75,6 +81,21 @@ test('a nonexistent path is a usage error: exit 2', () => {
   const result = run(cwd, ['plan-lint', 'no-such-plan.md']);
   assert.equal(result.status, 2);
   assert.match(result.stderr, /is not an existing file/);
+});
+
+test('a project with no .fgos/config.json at all is a usage error: exit 2, and no config gets created', () => {
+  const cwd = bareTmpDir();
+  const rel = writePlan(cwd, 'plan.md', `- unit: apply the fix\n  capability: code:implement\n`);
+  const result = run(cwd, ['plan-lint', rel]);
+  assert.equal(result.status, 2, result.stderr);
+  assert.equal(fs.existsSync(path.join(cwd, '.fgos', 'config.json')), false, 'plan-lint must never bootstrap a runner config as a side effect of a read-only lint');
+});
+
+test('a bare --cell with no value is a usage error: exit 2', () => {
+  const cwd = tmpCwd();
+  const rel = writePlan(cwd, 'plan.md', `- unit: apply the fix\n  capability: code:implement\n`);
+  const result = run(cwd, ['plan-lint', rel, '--cell']);
+  assert.equal(result.status, 2, result.stderr);
 });
 
 test('a clean plan exits 0, --json reports ok:true with no findings', () => {
