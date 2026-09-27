@@ -65,6 +65,10 @@ export async function startCoordinationUseCase(ctx, options = {}) {
     // just the entry node -- optional, absent ctx.runnerConfig keeps this a
     // byte-for-byte no-op (composeStartRequest's own rollback contract).
     runnerConfig: ctx.runnerConfig,
+    // Fix H2 (red-team round 1): a top-priority `--executor` flag must
+    // suppress computed capability bindings, not be silently outranked by
+    // them -- see composers.mjs's `withComputedActorBindings` doc comment.
+    cliExecutor: options.cliExecutor ?? options.executor,
   });
 
   const coordinationId = requestObject.coordinationId;

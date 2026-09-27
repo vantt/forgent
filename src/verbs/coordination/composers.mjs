@@ -18,9 +18,24 @@ import { bindOperations } from './binding.mjs';
  * returns `actors` unchanged -- when `definition`/`runnerConfig` are absent
  * (Risk/rollback: a caller that supplies neither keeps today's behavior
  * byte-for-byte).
+ *
+ * Fix H2 (red-team round 1): a top-priority `--executor` CLI flag
+ * (`cliExecutor`) is the SAME priority tier as an `actors[]` roster entry
+ * per Decision 1 step 1's own wording ("actors[] roster OR per-step
+ * --executor/--tier"), but `run.mjs`'s `actorPolicyFields` only ever reads
+ * `actorEntry?.executor ?? globalExecutor` -- it has no way to know a
+ * computed-and-injected `.executor` should rank BELOW a CLI flag it never
+ * sees at this layer. When `cliExecutor` is present, this function skips
+ * every computed addition entirely (a real no-op, not just for the actors
+ * that already have one): `run.mjs`'s own `globalExecutor` fallback then
+ * applies uniformly to every actor lacking its own roster entry, on every
+ * declared step, exactly as it did before this module existed. `cliTier`
+ * needs no equivalent guard: this module never computes or injects a
+ * `tier`/`minTier` field at all (see the module's own header doc, steps
+ * 3/4), so there is nothing here for a `--tier` flag to be outranked by.
  */
-function withComputedActorBindings(actors, definition, runnerConfig, facts) {
-  if (!definition || !runnerConfig) return actors;
+function withComputedActorBindings(actors, definition, runnerConfig, facts, cliExecutor) {
+  if (!definition || !runnerConfig || cliExecutor) return actors;
   const { bindings } = bindOperations(definition, { actors }, runnerConfig, facts);
   const existingIds = new Set(actors.map((a) => a.id));
   const additions = bindings
@@ -201,6 +216,11 @@ export function composeStartRequest(options = {}) {
     // byte-for-byte. See `withComputedActorBindings`'s own doc comment.
     runnerConfig,
     facts,
+    // Fix H2 (red-team round 1): the same `--executor` flag `start.mjs`
+    // threads to `runCoordinationUseCase` as `cliExecutor` -- see
+    // `withComputedActorBindings`'s own doc comment for why this must
+    // suppress computed additions rather than merely inform them.
+    cliExecutor,
   } = options;
 
   if (!writerId || typeof writerId !== 'string') {
@@ -271,7 +291,7 @@ export function composeStartRequest(options = {}) {
       writerId,
       objective,
       protocolRef: { id: pId },
-      actors: withComputedActorBindings(Array.isArray(actors) ? actors : [], definition, runnerConfig, facts),
+      actors: withComputedActorBindings(Array.isArray(actors) ? actors : [], definition, runnerConfig, facts, cliExecutor),
       steps: resolvedSteps,
       close: false,
       ...(aggregateBounds ? { aggregateBounds } : {}),
@@ -354,9 +374,10 @@ export function composeCloseRequest(options = {}) {
  * @param {object} [params.definition] The session's resolved FlowDefinition (Unit I21). Optional -- absent for every pre-existing caller, which keeps `actors: []` byte-for-byte (Risk/rollback).
  * @param {object} [params.runnerConfig] The validated runner config's own `runner` section (Unit I21). Optional, same rollback contract as `definition`.
  * @param {object} [params.facts] Caller-declared binding context (Unit I21) -- see `bindOperations`'s own doc comment.
+ * @param {string} [params.cliExecutor] Top-priority `--executor` CLI override (fix H2, red-team round 1) -- when present, suppresses every computed actor binding; see `withComputedActorBindings`'s own doc comment.
  * @returns {object} Validated production request object
  */
-export function composeCoordinationActionRequest({ manifest, action, precondition, definition, runnerConfig, facts }) {
+export function composeCoordinationActionRequest({ manifest, action, precondition, definition, runnerConfig, facts, cliExecutor }) {
   const input = precondition.inputPayload ?? {};
   assertNoForbiddenOverrides(input);
 
@@ -370,7 +391,7 @@ export function composeCoordinationActionRequest({ manifest, action, preconditio
     writerId: precondition.writerId,
     objective: manifest.objective,
     protocolRef: { id: manifest.definitionRef?.id },
-    actors: withComputedActorBindings([], definition, runnerConfig, facts),
+    actors: withComputedActorBindings([], definition, runnerConfig, facts, cliExecutor),
     close: false,
   };
 

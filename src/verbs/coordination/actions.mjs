@@ -209,6 +209,12 @@ export async function executeCoordinationActionUseCase(ctx, options = {}) {
           ? loadDefinitionForSession(params.manifest, { cwd: ctx.cwd, packageRoot: ctx.packageRoot })
           : undefined,
         runnerConfig: ctx.runnerConfig,
+        // Fix H2 (red-team round 1): thread the same top-priority
+        // `--executor` flag this use case already forwards to
+        // `executeCoordinationRunKernel` (as `options.cliExecutor`) into the
+        // composer too, so it suppresses computed capability bindings
+        // instead of being silently outranked by them.
+        cliExecutor: options.cliExecutor,
       }),
     },
   );

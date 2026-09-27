@@ -309,6 +309,75 @@ test('Red-team: a portable operation cannot smuggle preferExecutor under policy.
   assert.notEqual(doer.cliPolicy.preferExecutor, 'attacker-controlled-executor');
 });
 
+test('Red-team round 1, H1: policy.capability naming a literal registered executor id (not a real capability) must NOT bind to that executor', () => {
+  // "agy" is a registered executor id (baseRunnerConfig) but is never a
+  // capability key -- resolveExecutorAndOverrides's own first-checked
+  // branch (cfg.executors[name]) matches it directly, returning
+  // `configured: true, bindingSource: 'executor-id'` even though no
+  // `capabilities.agy.prefer` exists. bindOperations must refuse to treat
+  // that as a real capability resolution (the same class of attack as
+  // smuggling a literal `preferExecutor`, just via `policy.capability`'s own
+  // string instead).
+  const definition = produceReviewRedTeamDefinition({ produceCapability: 'agy' });
+  const runnerConfig = baseRunnerConfig();
+  const { bindings } = bindOperations(definition, {}, runnerConfig);
+  const doer = bindings.find((b) => b.actorId === 'doer');
+  assert.equal(doer.bindingSource, 'unbound', 'a literal executor-id match under policy.capability must never resolve as a valid capability binding');
+  assert.deepEqual(doer.cliPolicy, {});
+  assert.notEqual(doer.bindingSource, 'executor-id');
+
+  // M2 confirmed as a side effect of the H1 fix: since bindOperations never
+  // accepts the "executor-id" branch as a real resolution at all, it can
+  // never present a binding that skipped capabilityEntry.overrides while
+  // claiming a genuine capability match -- there is no longer any code path
+  // where that mismatch could occur.
+});
+
+test('Red-team round 1, H2: a top-priority --executor CLI override is never outranked by a computed capability binding (composeStartRequest)', () => {
+  const definition = produceReviewRedTeamDefinition();
+  const runnerConfig = baseRunnerConfig();
+
+  const withoutCliExecutor = composeStartRequest({
+    writerId: 'driver-1', objective: 'obj', protocolId: definition.metadata.id, definition, runnerConfig,
+    steps: [{ as: 's1', type: 'operation', operationId: 'produce-candidate', targetActorId: 'doer', objective: 'obj', expectedOutputs: ['x'] }],
+  });
+  // Baseline (no CLI override): capability computation still injects "agy".
+  assert.equal(withoutCliExecutor.actors.find((a) => a.id === 'doer').executor, 'agy');
+
+  const withCliExecutor = composeStartRequest({
+    writerId: 'driver-1', objective: 'obj', protocolId: definition.metadata.id, definition, runnerConfig,
+    cliExecutor: 'claude-default',
+    steps: [{ as: 's1', type: 'operation', operationId: 'produce-candidate', targetActorId: 'doer', objective: 'obj', expectedOutputs: ['x'] }],
+  });
+  // With a CLI-level --executor override in effect, no computed actors[]
+  // entry may be injected for ANY actor -- run.mjs's own globalExecutor
+  // fallback (actorEntry?.executor ?? globalExecutor) is what must apply
+  // "claude-default" uniformly, never a capability-computed "agy" masking it.
+  assert.equal(withCliExecutor.actors.find((a) => a.id === 'doer'), undefined);
+  assert.equal(withCliExecutor.actors.find((a) => a.id === 'reviewer'), undefined);
+});
+
+test('Red-team round 1, H2: a top-priority --executor CLI override is never outranked by a computed capability binding (composeCoordinationActionRequest)', () => {
+  const definition = produceReviewRedTeamDefinition();
+  const runnerConfig = baseRunnerConfig();
+  const manifest = { coordinationId: 'coord_i21_h2_test', objective: 'obj', definitionRef: { id: definition.metadata.id, version: '1.0.0' } };
+
+  const req = composeCoordinationActionRequest({
+    manifest,
+    definition,
+    runnerConfig,
+    cliExecutor: 'claude-default',
+    action: { kind: 'dispatch-operation', target: { nodeId: 'phase-review', operationId: 'review-candidate', actorId: 'reviewer' } },
+    precondition: {
+      actionKey: 'sha256:abc',
+      kind: 'dispatch-operation',
+      writerId: 'driver-1',
+      inputPayload: { objective: 'Execute review', expectedOutputs: ['review.md'] },
+    },
+  });
+  assert.equal(req.actors.find((a) => a.id === 'reviewer'), undefined);
+});
+
 test('Red-team: distinctProviderFrom "required" refuses a single-provider-family config and names the roles', () => {
   const definition = produceReviewRedTeamDefinition({
     reviewDistinctProviderFrom: { roles: ['doer'], strength: 'required' },
