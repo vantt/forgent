@@ -1273,15 +1273,86 @@ Executor/provider/model/tier selection remains an execution-time decision.
   stop: CLEARED — integrated at `main@d6c0d9033`; Unit I19 unblocked.
 - unit: I18 — plan lint hardening and `fgos plan-lint` verb
   capability: code:implement
-  depends-on: I16
-  status: not-started
-  scope: see `phase-05-unit-i18-plan-lint-door.md`. Fix confirmed lint gaps (hedged
-    parenthetical, duplicate `capability:`, pin keys `prefer|invocation|actors`, Product
-    Gates table rows, `--cell` filter, severity hard|warn); read-only verb
-    `fgos plan-lint <path> [--cell] [--json]` (exit 0/1/2); move
-    `report-capability-plan-lint` off `shadow` in `test/test-ownership.mjs`.
-  verification: node --test test/report/capability-plan-lint.test.mjs test/cli/; node bin/fgos.mjs plan-lint plans/260919-coordination-skill-harness-simplification/plan.md --json; git diff --check
-  stop: lint reads config or calls decide; verb touches state.
+  depends-on: I16 (satisfied)
+  status: integrated at `main@8ece3bbdc`
+  branch: `unit/I18` (Claude-only parallel execution runbook)
+  candidate-sha: `8306c36d1204c6460ba9cbff204f711cab22a1f0`
+  integrated-sha: `8ece3bbdcc3d30b6488e5cc4473628261e70f268` (merge --no-ff from main
+    checkout onto post-I19 `main@e1dab2dfa`; ort strategy; only CHANGELOG.md
+    auto-merged, no other conflicts)
+  scope: see `phase-05-unit-i18-plan-lint-door.md`. Fixed confirmed lint gaps (hedged
+    parenthetical, duplicate `capability:`, pin keys `executor|provider|model|tier|
+    prefer|invocation|actors`, Product Gates table rows, `--cell` filter, severity
+    hard|warn); read-only verb `fgos plan-lint <path> [--cell] [--json]` (exit 0/1/2);
+    moved `report-capability-plan-lint`'s boundary test coverage in
+    `test/test-ownership.mjs` (status correctly left `shadow` — see fix-round-1 below).
+  fix-round-1: Lead-rejected the phase text's literal "move off shadow" as an
+    unearned `status: 'live'` promotion — `scripts/test-select-promote.mjs` gates
+    that state behind mutation-testing evidence never produced here, and it was the
+    only `'live'` entry among 36 manifest rows. Reverted to `'shadow'`, kept the new
+    real `directTests`/`boundaryTests` coverage (which is what "has a real caller"
+    actually required).
+  fix-round-2: independent review + tester found the verb violated its own
+    `touchesState: false` claim (`ensureRunnerConfigForDir` creates/rewrites
+    `.fgos/config.json`) — switched to read-only `loadRunnerConfigFromDir`, exit 2
+    on missing config; Product Gates row parser silently truncated on a literal `|`
+    inside a cell (confirmed on `plans/260910-1700-rust-host-r1-kernel/plan.md`,
+    6/17 rows dropped) — fixed to tolerate embedded pipes; backtick-wrapped
+    Capability/Cell cells were false hard findings on 2 of 4 real Product-Gates
+    plans — fixed by stripping surrounding backticks before validation/matching;
+    plus an addendum bundled into the same round: adding the verb raised
+    `COMMAND_REGISTRY` from 73 to 74 entries, requiring regeneration of
+    `packages/host-runtime/contracts/command-routes.json` and
+    `test/rust-host/vectors/envelope/version.json` (via their own generator
+    scripts) and updating the two JS test files' hardcoded counts; the unit-block/
+    table parser didn't end at a markdown heading or skip fenced code, producing
+    false pins/phantom Product-Gates units (confirmed on
+    `docs/how-to/author-a-plan-loop-track.md`'s fenced example); `--cell`'s exit
+    code and the pin-key regex's case/whitespace/bullet tolerance were also fixed;
+    test names and one CHANGELOG bullet had "gap N"/"(Unit I18)" labels removed per
+    the Stable Code Artifacts rule.
+  fix-round-3 (final, 3-round cap reached): a second independent recheck found the
+    73->74 registry bump also broke 3 Rust-side tests embedding the same count
+    (`packages/distribution/rust/src/lib.rs` x2, `apps/fgos/tests/cli_tests.rs`) —
+    fixed by deriving the expected count from `command-routes.json` at test time
+    instead of a literal, so the next verb added doesn't repeat this; the new fence
+    logic itself had two CommonMark-incorrect escape hatches (a fence-closing line
+    that also carries an info string didn't count as closing; a backtick opener
+    whose info string itself contains a backtick was wrongly treated as an open
+    fence, swallowing the rest of the file) — both fixed and covered by tests.
+  deferred (named, not proof-gaps, out of this unit's Requirements): fence
+    indentation not capped at 0-3 spaces and no `warn` finding for an unclosed
+    fence; stale "73 selectors" prose in `test/rust-host/harness.mjs`'s comment and
+    `docs/platform/host-invocation-routing/*` (outside this unit's Files); cross-repo
+    capability resolution (`registered` resolves from the linting session's own
+    repo, not the target plan file's repo) — no cross-repo linting requirement in
+    the phase file.
+  verification: node --test test/report/capability-plan-lint.test.mjs
+    test/cli/plan-lint.test.mjs (41/41 pass); node --test test/rust-host/
+    command-routes.test.mjs test/rust-host/envelope-contract.test.mjs
+    test/rust-host/harness.test.mjs (50/50 pass); CARGO_TARGET_DIR=<isolated>
+    cargo test -p fgos-distribution --lib (43/43 pass) and -p fgos --test
+    cli_tests native_version (2/2 pass); node bin/fgos.mjs plan-lint
+    plans/260919-coordination-skill-harness-simplification/plan.md --json
+    (ok:true, 23 units, 0 findings — real HOME, no isolation needed once merged
+    onto post-I19 main); git diff --check clean. Full
+    `env -u CLAUDE_CODE_SESSION_ID npm test` at integrated SHA `8ece3bbdc`, run in
+    a fresh disposable worktree: 7813 tests, 7813 pass, 0 fail, 8 skip, 65 todo,
+    exit 0 (run twice, isolated `test/runner/dispatch-production-call-sites.test.mjs`
+    also run twice standalone at the same SHA: 20/20 both times). See the unit
+    report for a false-positive the Lead independently chased and ruled out: the
+    identical SHA run directly IN the main checkout (not a worktree) showed one
+    deterministic failure in that same fanout test across 6 separate runs over
+    two sessions, conclusively isolated to a main-checkout-specific environmental
+    factor (not code — a stale `.fgos/main-checkout.lock` was one ruled-out
+    theory; root mechanism undetermined) since the exact same tree content passes
+    cleanly in every disposable worktree tested, including a fresh one cut from
+    the exact integrated SHA. Not a regression; no fix applied; no plan/code
+    changed as a result.
+  report: plans/260919-coordination-skill-harness-simplification/reports/unit-I18-claude-only-execution-report.md
+  stop: CLEARED — verb never reads config or calls `decide` on its state-changing
+    door; confirmed read-only via `loadRunnerConfigFromDir` and a probe against an
+    empty directory (exit 2, no file created).
 - unit: I19 — catalog `serves` schema, `review` slot, orphan executor `for`, doctor check
   capability: code:implement
   depends-on: I17 (satisfied, integrated at `main@d6c0d9033`)
