@@ -402,7 +402,16 @@ test('R4: a real SECOND `fgos coordination run` invocation against the SAME coor
   assert.equal(shownData.assignmentRefs.length, 6);
   assert.deepEqual(shownData.dispositions.map((d) => d.disposition), ['rejected', 'accepted']);
   assert.equal(shownData.authorizations.length, 3);
-  assert.deepEqual(shownData.pendingDriverAuthorizations, []);
+  // None of `revise-candidate`/`reviewer-recheck`/`red-team-recheck`
+  // declares `activation.maxInvocations` in the shipped protocol -- all
+  // three stay genuinely uncapped (kernel-accurate: `authorizeOperationLocked`
+  // enforces no cap at all when absent), so this purely mechanical field
+  // still lists all three as re-authorizable, regardless of the session's
+  // own terminal status.
+  assert.deepEqual(
+    shownData.pendingDriverAuthorizations.map((b) => b.operationId).sort(),
+    ['red-team-recheck', 'reviewer-recheck', 'revise-candidate'],
+  );
 
   // No Work, no git, no repo mutation -- across BOTH calls together.
   assert.deepEqual(eventLines(cwd), workEventsBefore);

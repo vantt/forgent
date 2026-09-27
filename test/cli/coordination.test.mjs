@@ -1011,7 +1011,7 @@ function writeSpecialistSlotProtocol(cwd) {
   fs.writeFileSync(path.join(dir, 'cli-specialist-authorize.json'), `${JSON.stringify(definition, null, 2)}\n`);
 }
 
-test('fgos coordination specialist-authorize: the locked/typed-action door recruits a specialist into a declared slot, and stays idempotent on retry', () => {
+test('fgos coordination specialist-authorize: the locked/typed-action door recruits a specialist into a declared slot, and resumes idempotently on an identical retry', () => {
   const cwd = tmpCwdFromTemplate();
   writeFakeExecutorConfig(cwd);
   writeSpecialistSlotProtocol(cwd);
@@ -1063,9 +1063,11 @@ test('fgos coordination specialist-authorize: the locked/typed-action door recru
   assert.equal(specialistAction2.authorized, true);
   assert.equal(specialistAction2.exhausted, false, 'maxBindings is 2 and only 1 distinct specialist has been recruited so far');
 
-  // Retrying the SAME actionKey is refused as stale (the actionKey pins a
-  // specific eventSeq/session state, the same discipline every other
-  // semantic action door already enforces) -- never a silent second event.
+  // Retrying the SAME actionKey with an IDENTICAL payload resumes
+  // idempotently -- the general actionKey-reconstruction contract every
+  // typed action already honors (action-precondition.mjs's own doc comment):
+  // same actionKey + same payload -> idempotent return, never a silent
+  // second event, never a refusal either.
   const retryRes = run(cwd, [
     'coordination', 'specialist-authorize', coordinationId,
     '--action-key', specialistAction.actionKey,
@@ -1076,12 +1078,36 @@ test('fgos coordination specialist-authorize: the locked/typed-action door recru
     '--max-assignments', '3',
     '--expires-after-round', '10',
   ]);
-  assert.notEqual(retryRes.status, 0);
-  assert.match(retryRes.stderr, /stale|precondition|not found|does not match/i);
+  assert.equal(retryRes.status, 0, retryRes.stderr);
+  const retryData = envelopeData(retryRes.stdout);
+  assert.equal(retryData.slotId, 'review-slot');
+  assert.equal(retryData.specialistActorId, 'specialist-alpha');
+  assert.equal(retryData.appended, false, 'an identical retry must resume, never duplicate');
   assert.equal(
     envelopeData(run(cwd, ['coordination', 'show', coordinationId]).stdout).specialistAuthorizations.length,
     1,
-    'a stale-actionKey retry must never append a second specialist-authorized event',
+    'an identical retry must never append a second specialist-authorized event',
+  );
+
+  // The SAME actionKey retried with a genuinely DIFFERENT payload (a
+  // different reason) must still be refused -- an actionKey is not a blank
+  // check for any later payload, only for an exact repeat.
+  const conflictRes = run(cwd, [
+    'coordination', 'specialist-authorize', coordinationId,
+    '--action-key', specialistAction.actionKey,
+    '--writer-id', 'driver-main',
+    '--specialist-actor-id', 'specialist-alpha',
+    '--reason', 'A completely different reason for this authorization.',
+    '--capabilities', 'deep-review',
+    '--max-assignments', '3',
+    '--expires-after-round', '10',
+  ]);
+  assert.notEqual(conflictRes.status, 0);
+  assert.match(conflictRes.stderr, /payload-conflict|different payload/i);
+  assert.equal(
+    envelopeData(run(cwd, ['coordination', 'show', coordinationId]).stdout).specialistAuthorizations.length,
+    1,
+    'a payload-conflict retry must never append a second specialist-authorized event',
   );
 });
 

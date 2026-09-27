@@ -783,8 +783,15 @@ that `runGroupThinkingRequest`
 (`src/verbs/coordination/group-thinking-pack.mjs`) now applies before
 forwarding anything —
 `test/verbs/coordination-group-thinking-pack-registration.test.mjs` proves
-it. A driver-authenticated typed-action/subverb door for this same
-capability is a later unit's own work, not yet built.
+it. I24b landed the driver-authenticated typed-action/subverb door for
+this same capability: the `fgos coordination specialist-authorize`
+subverb, reaching the locked `authorizeSpecialistSlotLocked`/
+`recordSpecialistAuthorizationLocked` twins. This is the intended
+driver-authenticated route (H3's own design), not a gate bypass -- a
+session opened through `pack run` against a protocol with
+`specialistSlots` CAN still have a specialist authorized through this
+separate subverb; only the raw `specialist-authorize` request-step path
+into the pack gate itself stays refused.
 (`P10.1.md`'s own framing for the remaining four, paraphrased and adjusted
 for the changed bypass count above — no longer a literal quote once this
 paragraph split the original grouping to carve out bypass #4 separately:

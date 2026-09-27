@@ -114,11 +114,14 @@ existing doors only:
   `authorizeSpecialistSlot` through any raw coordination request door
   (`coordination run --file`, `coordination start --steps`, the headless
   adapter) — never through `fgos-group-thinking`'s own gate, which
-  explicitly refuses this step type (see Known Gaps, `tsk-3xk`, retired). A
-  driver-authenticated typed-action door for this same capability is not
-  built yet — until it lands, build the `specialist-authorize` step
-  directly into a `coordination run --file` request, outside the pack
-  gate.
+  explicitly refuses this step type (see Known Gaps, `tsk-3xk`, retired).
+  I24b landed the driver-authenticated typed-action door for this same
+  capability: the `fgos coordination specialist-authorize` subverb, reaching
+  the locked `authorizeSpecialistSlotLocked`/
+  `recordSpecialistAuthorizationLocked` twins. A session opened through
+  `fgos-group-thinking`'s own pack gate can still have a specialist
+  authorized through this separate subverb — the gate refusal above blocks
+  only the raw request-step path, never this driver-authenticated route.
 
 No authority, visibility, aggregation, bounds-checking, or replay logic
 is described or implied here beyond what those doors already enforce.
@@ -702,8 +705,13 @@ never invent a new filename mid-session.
   authorized. This door is NOT reachable through
   `fgos-group-thinking`'s own gate — `runGroupThinkingRequest` explicitly
   refuses a `specialist-authorize` step (Group-Thinking Protocol Pack
-  bypass #4 stays refused). A driver-authenticated typed-action/subverb
-  door for this same capability is a later unit's own work, still pending.
+  bypass #4 stays refused). I24b landed the driver-authenticated
+  typed-action/subverb door for this same capability (`fgos coordination
+  specialist-authorize`, reaching the locked
+  `authorizeSpecialistSlotLocked`/`recordSpecialistAuthorizationLocked`
+  twins) — a session opened via the pack gate can still have a specialist
+  authorized through that separate subverb; the gate refusal above only
+  ever blocked the raw request-step path.
 - **Doctrine-by-path fails across a dispatch boundary — a hard
   requirement, confirmed failing identically twice (P01.2, P01.3).** A
   dispatched executor's cwd is pinned to PROJECT_ROOT, a different

@@ -536,18 +536,23 @@ export function collectRequiredBindings(definition) {
  * Pure evaluation of driver-authorized bindings against issued authorizations.
  *
  * M1 fix (I24b, Phase 5 item 5 other half): keyed by COUNT, not mere set
- * membership -- a binding's own `activation.maxInvocations` (default 1, the
- * SAME default `authorizeOperationLocked`'s `opts.maxInvocationsForBinding`
- * assumes when absent) bounds how many `operation-authorized` records the
- * SAME (nodeId, operationId) pair may legally carry. Pre-fix, ANY single
- * authorization removed the binding from `pending` for good, so a second
- * invocation of a `maxInvocations: 2` binding (e.g. `phase-dialogue-reopen`'s
- * `revise-synthesis`/`revise-explanation`, `architecture-advisory-panel-v1.yaml`)
- * never appeared as a legal action again -- confirmed by direct probe, not
- * merely suspected. `authorized` still means "at least one authorization
- * exists" (unchanged meaning); `pending` now means "still has room under its
- * own cap", which is the correct legal-action signal for a repeatable
- * binding.
+ * membership -- a binding's own `activation.maxInvocations` bounds how many
+ * `operation-authorized` records the SAME (nodeId, operationId, actorId)
+ * triple may legally carry, mirroring `authorizeOperationLocked`'s own
+ * `opts.maxInvocationsForBinding` cap check exactly: keyed by that same
+ * triple (never just nodeId::operationId -- two different actors bound to
+ * the same operation each get their own independent cap), and genuinely
+ * UNBOUNDED when `activation.maxInvocations` is absent (the kernel only
+ * enforces a cap when `opts.maxInvocationsForBinding !== undefined`; when
+ * absent, its own `if` check never fires at all -- there is no implicit
+ * default of 1). Pre-fix, ANY single authorization removed the binding from
+ * `pending` for good, so a second invocation of a `maxInvocations: 2`
+ * binding (e.g. `phase-dialogue-reopen`'s `revise-synthesis`/
+ * `revise-explanation`, `architecture-advisory-panel-v1.yaml`) never
+ * appeared as a legal action again -- confirmed by direct probe, not merely
+ * suspected. `authorized` still means "at least one authorization exists"
+ * (unchanged meaning); `pending` now means "still has room under its own
+ * cap", which is the correct legal-action signal for a repeatable binding.
  */
 export function evaluateDriverAuthorizedBindings(definition, authorizations = []) {
   if (!definition) {
@@ -556,14 +561,15 @@ export function evaluateDriverAuthorizedBindings(definition, authorizations = []
   const declared = collectDriverAuthorizedBindings(definition);
   const countByKey = new Map();
   for (const a of authorizations || []) {
-    const key = `${a.nodeId}::${a.operationId}`;
+    const key = `${a.nodeId}::${a.operationId}::${a.targetActorId}`;
     countByKey.set(key, (countByKey.get(key) ?? 0) + 1);
   }
+  const keyFor = (b) => `${b.nodeId}::${b.operationId}::${b.actorId}`;
   const pending = declared.filter((b) => {
-    const count = countByKey.get(`${b.nodeId}::${b.operationId}`) ?? 0;
-    return count < (b.maxInvocations ?? 1);
+    const count = countByKey.get(keyFor(b)) ?? 0;
+    return count < (b.maxInvocations ?? Infinity);
   });
-  const authorized = declared.filter((b) => (countByKey.get(`${b.nodeId}::${b.operationId}`) ?? 0) > 0);
+  const authorized = declared.filter((b) => (countByKey.get(keyFor(b)) ?? 0) > 0);
 
   return { declared, authorized, pending };
 }
@@ -590,12 +596,22 @@ export function evaluateDriverAuthorizedBindings(definition, authorizations = []
  * that function back -- `events` is threaded in as a caller-supplied
  * parameter instead (the caller already has it), never re-read from disk.
  *
- * `exhausted` means no further specialist activity is possible for this slot
- * AT ALL: no fresh recruit is possible (`maxBindings` reached) AND the
- * current live occupant (if any) can no longer be dispatched either (it has
- * expired, or its own `maxAssignments` is fully consumed). `authorizable` is
- * simply `!exhausted` -- mechanical legality data only, never a judgment
- * about whether the driver SHOULD authorize this slot.
+ * `exhausted` mirrors the kernel's own authorization gate exactly
+ * (`recordSpecialistAuthorization`/`recordSpecialistAuthorizationLocked`,
+ * store.mjs, `opts.maxBindingsForSlot`): that gate refuses authorizing a slot
+ * only when the candidate `specialistActorId` is NOT already one of the
+ * slot's distinct recruited actors AND `maxBindings` has been reached --
+ * re-authorizing an ALREADY-recruited actor is unconditionally legal
+ * regardless of that actor's own expiry or `maxAssignments` spend (those
+ * factors gate DISPATCH via `authorizeOperationLocked`'s
+ * `maxAssignmentsForSpecialist`, a separate door, never authorization
+ * itself). So a slot is `exhausted` only when `maxBindings` is reached AND
+ * there is no already-recruited actor left to fall back on
+ * (`distinctCount === 0`, only reachable when `maxBindings <= 0`) -- once at
+ * least one specialist has ever been recruited into a slot, that slot is
+ * never exhausted again, since that occupant can always be re-authorized.
+ * `authorizable` is simply `!exhausted` -- mechanical legality data only,
+ * never a judgment about whether the driver SHOULD authorize this slot.
  *
  * @param {object} definition Immutable FlowDefinition
  * @param {Array<object>} [specialistAuthorizations] Replayed `specialist-authorized` payloads, in log order
@@ -623,14 +639,10 @@ export function evaluateSpecialistSlots(definition, specialistAuthorizations = [
     const live = last !== undefined && (last.expiresAfterRound === undefined || round <= last.expiresAfterRound);
     const distinctCount = distinctActorsBySlot.get(slot.id)?.size ?? 0;
     const recruitExhausted = slot.maxBindings !== undefined && distinctCount >= slot.maxBindings;
-    let liveAssignmentsExhausted = false;
-    if (live && last.maxAssignments !== undefined) {
-      const usedByLiveActor = (events || []).filter(
-        (e) => e.type === 'operation-authorized' && e.payload?.targetActorId === last.specialistActorId,
-      ).length;
-      liveAssignmentsExhausted = usedByLiveActor >= last.maxAssignments;
-    }
-    const exhausted = recruitExhausted && (!live || liveAssignmentsExhausted);
+    // Kernel-accurate: an already-recruited actor is always a legal
+    // re-authorization target, so a slot with any recruited actor at all is
+    // never exhausted -- see this function's own doc comment above.
+    const exhausted = recruitExhausted && distinctCount === 0;
     return {
       slotId: slot.id,
       role: slot.role,

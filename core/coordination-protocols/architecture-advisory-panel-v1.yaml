@@ -84,8 +84,13 @@
 # explicitly refuses this step type (Group-Thinking Protocol Pack bypass #4
 # stays refused,
 # `docs/architect/agent-coordination/contracts/coordination-session.md`'s
-# "Five bypasses" section). A driver-authenticated typed-action door for
-# this same capability is a later unit's own work, still pending.
+# "Five bypasses" section). I24b landed the driver-authenticated
+# typed-action door for this same capability -- the `fgos coordination
+# specialist-authorize` subverb, reaching the locked
+# `authorizeSpecialistSlotLocked`/`recordSpecialistAuthorizationLocked`
+# twins -- which never goes through the pack gate at all, so a session
+# opened via `pack run` against this protocol can still have a specialist
+# authorized through that separate subverb.
 # See this cell's own doer-report.md for the conformance test's resulting
 # split between pack-gate-level and direct-engine-level assertions.
 #

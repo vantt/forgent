@@ -88,9 +88,15 @@ test('evaluateDriverAuthorizedBindings classifies pending vs authorized without 
   assert.equal(noneAuth.pending.length, 1);
   assert.equal(noneAuth.authorized.length, 0);
 
-  const oneAuth = evaluateDriverAuthorizedBindings(sampleDefinition, [{ nodeId: 'node-1', operationId: 'op-authorized' }]);
+  // `op-authorized` declares no `activation.maxInvocations` -- genuinely
+  // uncapped, matching the kernel's own `opts.maxInvocationsForBinding`
+  // gate (no implicit default of 1), so it stays pending after 1
+  // authorization.
+  const oneAuth = evaluateDriverAuthorizedBindings(sampleDefinition, [
+    { nodeId: 'node-1', operationId: 'op-authorized', targetActorId: 'worker-1' },
+  ]);
   assert.equal(oneAuth.declared.length, 1);
-  assert.equal(oneAuth.pending.length, 0);
+  assert.equal(oneAuth.pending.length, 1, 'no declared cap -- stays pending no matter how many authorizations exist');
   assert.equal(oneAuth.authorized.length, 1);
 });
 
@@ -119,16 +125,75 @@ test('evaluateDriverAuthorizedBindings (M1): a maxInvocations:2 binding stays pe
   assert.equal(zeroAuth.pending.length, 1);
   assert.equal(zeroAuth.authorized.length, 0);
 
-  const oneAuth = evaluateDriverAuthorizedBindings(reopenDefinition, [{ nodeId: 'node-reopen', operationId: 'op-reopen' }]);
+  const oneAuth = evaluateDriverAuthorizedBindings(reopenDefinition, [
+    { nodeId: 'node-reopen', operationId: 'op-reopen', targetActorId: 'worker-1' },
+  ]);
   assert.equal(oneAuth.pending.length, 1, 'still room for the 2nd invocation -- the M1 bug this fixes');
   assert.equal(oneAuth.authorized.length, 1, 'at least one authorization already exists');
 
   const twoAuth = evaluateDriverAuthorizedBindings(reopenDefinition, [
-    { nodeId: 'node-reopen', operationId: 'op-reopen' },
-    { nodeId: 'node-reopen', operationId: 'op-reopen' },
+    { nodeId: 'node-reopen', operationId: 'op-reopen', targetActorId: 'worker-1' },
+    { nodeId: 'node-reopen', operationId: 'op-reopen', targetActorId: 'worker-1' },
   ]);
   assert.equal(twoAuth.pending.length, 0, 'cap of 2 fully spent -- no longer pending');
   assert.equal(twoAuth.authorized.length, 1);
+});
+
+// Fix (I24b fix round): the kernel (`authorizeOperationLocked`, store.mjs)
+// caps `activation.maxInvocations` per (nodeId, operationId, targetActorId)
+// -- a finer grain than nodeId::operationId alone. Two declared bindings
+// that share the same nodeId/operationId but name DIFFERENT static actors
+// (a real, schema-legal shape: a node's `operations[]` may repeat a ref for
+// distinct actors) must be counted independently -- spending one actor's cap
+// must never remove the OTHER actor's still-untouched binding from
+// `pending`.
+test('evaluateDriverAuthorizedBindings: two different actors bound to the same nodeId/operationId are capped independently', () => {
+  const sharedRefDefinition = {
+    ...sampleDefinition,
+    spec: {
+      ...sampleDefinition.spec,
+      graph: {
+        nodes: [
+          {
+            id: 'node-shared',
+            operations: [
+              { ref: 'op-shared', actor: 'actor-a', activation: { mode: 'driver-authorized', maxInvocations: 1 } },
+              { ref: 'op-shared', actor: 'actor-b', activation: { mode: 'driver-authorized', maxInvocations: 1 } },
+            ],
+          },
+        ],
+      },
+    },
+  };
+
+  const afterActorAOnly = evaluateDriverAuthorizedBindings(sharedRefDefinition, [
+    { nodeId: 'node-shared', operationId: 'op-shared', targetActorId: 'actor-a' },
+  ]);
+  assert.equal(afterActorAOnly.authorized.length, 1, 'only actor-a\'s binding is authorized');
+  assert.equal(afterActorAOnly.pending.length, 1, 'actor-b\'s own binding is untouched and still pending');
+  assert.equal(afterActorAOnly.pending[0].actorId, 'actor-b');
+
+  // Absent activation.maxInvocations means genuinely uncapped, matching the
+  // kernel's own `opts.maxInvocationsForBinding !== undefined` gate (no
+  // implicit default of 1).
+  const uncappedDefinition = {
+    ...sampleDefinition,
+    spec: {
+      ...sampleDefinition.spec,
+      graph: {
+        nodes: [
+          { id: 'node-uncapped', operations: [{ ref: 'op-uncapped', actor: 'worker-1', activation: { mode: 'driver-authorized' } }] },
+        ],
+      },
+    },
+  };
+  const afterManyAuths = evaluateDriverAuthorizedBindings(uncappedDefinition, [
+    { nodeId: 'node-uncapped', operationId: 'op-uncapped', targetActorId: 'worker-1' },
+    { nodeId: 'node-uncapped', operationId: 'op-uncapped', targetActorId: 'worker-1' },
+    { nodeId: 'node-uncapped', operationId: 'op-uncapped', targetActorId: 'worker-1' },
+  ]);
+  assert.equal(afterManyAuths.pending.length, 1, 'no declared cap -- stays pending no matter how many authorizations exist');
+  assert.equal(afterManyAuths.authorized.length, 1);
 });
 
 test('evaluateSpecialistSlots reports bound vs available slots', () => {
@@ -145,8 +210,17 @@ test('evaluateSpecialistSlots reports bound vs available slots', () => {
   assert.equal(slots2[1].bound, false);
 });
 
-// M2 fix (I24b, Phase 5 item 4 pt.2): exhausted/authorizable derivation.
-test('evaluateSpecialistSlots (M2): exhausted accounts for maxBindings, a live binding\'s own maxAssignments, and expiresAfterRound/round liveness', () => {
+// M2 fix (I24b, Phase 5 item 4 pt.2, corrected in the I24b fix round):
+// exhausted/authorizable derivation now mirrors the kernel's own
+// `recordSpecialistAuthorization`/`recordSpecialistAuthorizationLocked`
+// authorization gate exactly -- that gate unconditionally allows
+// re-authorizing an ALREADY-recruited `specialistActorId` regardless of its
+// own expiry or `maxAssignments` spend, and refuses only a NEW distinct actor
+// once `maxBindings` is reached. So a slot with at least one ever-recruited
+// actor is never `exhausted`; only a slot whose `maxBindings` is reached with
+// ZERO distinct actors ever recruited (only reachable via `maxBindings <= 0`)
+// is genuinely exhausted.
+test('evaluateSpecialistSlots (M2, corrected): exhausted mirrors the kernel\'s own re-authorization-is-always-legal rule', () => {
   const definitionWithCaps = {
     ...sampleDefinition,
     spec: {
@@ -158,6 +232,7 @@ test('evaluateSpecialistSlots (M2): exhausted accounts for maxBindings, a live b
           specialistSlots: [
             { id: 'slot-sec', role: 'security-specialist', maxBindings: 1 },
             { id: 'slot-perf', role: 'performance-specialist', maxBindings: 2 },
+            { id: 'slot-none', role: 'zero-specialist', maxBindings: 0 },
           ],
         },
       },
@@ -176,18 +251,18 @@ test('evaluateSpecialistSlots (M2): exhausted accounts for maxBindings, a live b
   assert.equal(perfRoomy.exhausted, false);
 
   // maxBindings reached (1 distinct actor, cap 1) AND the live occupant has
-  // expired (round has advanced past expiresAfterRound, no assignment-created
-  // events needed for this probe: round is derived from events alone) --
-  // genuinely no path forward for this slot.
-  const exhaustedByExpiryAndCap = evaluateSpecialistSlots(
+  // expired (round has advanced past expiresAfterRound) -- the kernel still
+  // unconditionally allows re-authorizing that SAME already-recruited actor,
+  // so the slot is not exhausted despite the expiry.
+  const expiredButRecruited = evaluateSpecialistSlots(
     definitionWithCaps,
     [{ slotId: 'slot-sec', specialistActorId: 'actor-sec-1', expiresAfterRound: 1 }],
     [{ type: 'assignment-created' }, { type: 'assignment-created' }],
   );
-  const secExpired = exhaustedByExpiryAndCap.find((s) => s.slotId === 'slot-sec');
+  const secExpired = expiredButRecruited.find((s) => s.slotId === 'slot-sec');
   assert.equal(secExpired.bound, false, 'round 3 > expiresAfterRound 1 -- no longer live');
-  assert.equal(secExpired.exhausted, true, 'maxBindings (1) reached and the only-ever occupant has expired');
-  assert.equal(secExpired.authorizable, false);
+  assert.equal(secExpired.exhausted, false, 'the only-ever occupant can always be re-authorized regardless of its own expiry');
+  assert.equal(secExpired.authorizable, true);
 
   // maxBindings reached (1 distinct actor, cap 1) but the live occupant is
   // still within its own expiresAfterRound AND has assignment room left --
@@ -204,8 +279,11 @@ test('evaluateSpecialistSlots (M2): exhausted accounts for maxBindings, a live b
 
   // maxBindings reached AND the live occupant's own maxAssignments cap is
   // fully consumed (2 operation-authorized events already reference it) --
-  // exhausted even though the authorization itself has not expired.
-  const assignmentsExhausted = evaluateSpecialistSlots(
+  // the kernel's authorization gate does not look at dispatch spend at all,
+  // so the slot is still not exhausted (dispatch itself would separately be
+  // refused by authorizeOperationLocked's own maxAssignmentsForSpecialist,
+  // a different door from authorization).
+  const assignmentsSpent = evaluateSpecialistSlots(
     definitionWithCaps,
     [{ slotId: 'slot-sec', specialistActorId: 'actor-sec-1', expiresAfterRound: 10, maxAssignments: 2 }],
     [
@@ -213,10 +291,19 @@ test('evaluateSpecialistSlots (M2): exhausted accounts for maxBindings, a live b
       { type: 'operation-authorized', payload: { targetActorId: 'actor-sec-1' } },
     ],
   );
-  const secAssignmentsSpent = assignmentsExhausted.find((s) => s.slotId === 'slot-sec');
+  const secAssignmentsSpent = assignmentsSpent.find((s) => s.slotId === 'slot-sec');
   assert.equal(secAssignmentsSpent.bound, true, 'still live -- expiresAfterRound not yet passed');
-  assert.equal(secAssignmentsSpent.exhausted, true, 'maxBindings reached and the live occupant has no dispatch room left');
-  assert.equal(secAssignmentsSpent.authorizable, false);
+  assert.equal(secAssignmentsSpent.exhausted, false, 'the recruited occupant can always be re-authorized -- dispatch spend does not gate authorization');
+  assert.equal(secAssignmentsSpent.authorizable, true);
+
+  // Genuinely exhausted: maxBindings is 0, so no specialist has ever been
+  // recruited (distinctCount 0) and none ever can be -- the only case where
+  // the kernel's "no new distinct actor, and none to fall back on" refusal
+  // covers every possible specialistActorId.
+  const neverAuthorizable = evaluateSpecialistSlots(definitionWithCaps, [], []);
+  const zeroSlot = neverAuthorizable.find((s) => s.slotId === 'slot-none');
+  assert.equal(zeroSlot.exhausted, true, 'maxBindings 0 with zero recruited actors -- no path to a legal authorization at all');
+  assert.equal(zeroSlot.authorizable, false);
 });
 
 test('evaluateVisibilityWindows computes open vs closed status from settled operation events', () => {
@@ -291,12 +378,15 @@ test('evaluateLegalityFacts master pure evaluation is robust across session kind
       { type: 'assignment-created', payload: { assignmentId: 'asg-1', actorId: 'worker-1', operationId: 'op-first' } },
       { type: 'result-linked', payload: { assignmentId: 'asg-1' } },
     ],
-    replayed: { authorizations: [{ authorizationId: 'a1', nodeId: 'node-1', operationId: 'op-authorized', consumedByAssignmentId: 'asg-2' }], aggregations: [{ aggregationId: 'agg-1' }] },
+    replayed: { authorizations: [{ authorizationId: 'a1', nodeId: 'node-1', operationId: 'op-authorized', targetActorId: 'worker-1', consumedByAssignmentId: 'asg-2' }], aggregations: [{ aggregationId: 'agg-1' }] },
   });
   assert.equal(declaredFacts.coordinationId, 'decl-1');
   assert.equal(declaredFacts.phase, 'running');
   assert.equal(declaredFacts.requiredBindings.length, 1);
-  assert.equal(declaredFacts.driverAuthorizedBindings.pending.length, 0);
+  // `op-authorized` declares no `activation.maxInvocations` -- genuinely
+  // uncapped (kernel-accurate default), so it stays pending after 1
+  // authorization.
+  assert.equal(declaredFacts.driverAuthorizedBindings.pending.length, 1);
   assert.equal(declaredFacts.visibilityWindows[0].open, true);
   assert.equal(declaredFacts.readyToClose, true);
 });
