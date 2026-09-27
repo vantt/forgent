@@ -29,7 +29,12 @@ const UNRESOLVED_MARK = /^unresolved(?![\w-])/i;
 // and anything strictly between a fence's open/close line is prose/example
 // text, never real plan content.
 const HEADING_LINE = /^#{1,6}(\s|$)/;
-const FENCE_LINE = /^\s*(`{3,}|~{3,})/;
+// Captures the marker run plus everything after it on the same line, so
+// callers can enforce CommonMark's fence-close rule (nothing but trailing
+// whitespace after the marker) and the backtick-opener rule (an info string
+// on a backtick-fence opener can never itself contain a backtick) -- see
+// call site below.
+const FENCE_LINE = /^\s*(`{3,}|~{3,})(.*)$/;
 
 const GENERIC_SHAPE = /^[a-z][a-z0-9-]*$/;
 const DOMAIN_SCOPED_SHAPE = /^[a-z][a-z0-9-]*:[a-z][a-z0-9-]*$/;
@@ -204,14 +209,27 @@ export function lintPlanCapabilityAnnotations(text, registeredCapabilities, opti
     const fenceMatch = FENCE_LINE.exec(rawLine);
     if (fenceMatch) {
       const marker = fenceMatch[1];
-      if (!fenceState) {
-        fenceState = { char: marker[0], len: marker.length };
-      } else if (marker[0] === fenceState.char && marker.length >= fenceState.len) {
-        fenceState = null;
+      const rest = fenceMatch[2];
+      if (fenceState) {
+        // Per CommonMark, a line only closes an open fence when it is the
+        // same (or a longer) run of the same fence character with nothing
+        // else on the line but trailing whitespace -- a same-line info
+        // string or trailing content never closes a fence.
+        if (marker[0] === fenceState.char && marker.length >= fenceState.len && /^\s*$/.test(rest)) {
+          fenceState = null;
+        }
+        // A fence delimiter line is never itself a heading/unit/capability/
+        // pin/table-row line, whether it closed the fence or not.
+        return;
       }
-      // A fence delimiter line is never itself a heading/unit/capability/
-      // pin/table-row line, whichever side of the fence it is on.
-      return;
+      // A backtick fence's info string can never itself contain a backtick
+      // (CommonMark) -- e.g. "``` not a fence ```" never opens a fence, so
+      // fall through and let this line be evaluated as ordinary text below.
+      const isInvalidBacktickOpener = marker[0] === '`' && rest.includes('`');
+      if (!isInvalidBacktickOpener) {
+        fenceState = { char: marker[0], len: marker.length };
+        return;
+      }
     }
     if (fenceState) return; // strictly inside a fence: prose/example, inert
 

@@ -357,6 +357,34 @@ test('the real docs/how-to/author-a-plan-loop-track.md fenced Product Gates exam
   assert.deepEqual(result.findings, []);
 });
 
+test('an inner fence-looking line with an info string (e.g. "```js") never closes an outer fence early -- a real unit after the true close still parses', () => {
+  const text = `\`\`\`
+outer fence content
+\`\`\`js
+inner odd line that looks like a nested fence open
+\`\`\`
+
+- unit: real unit after
+  capability: code:implement
+`;
+  const result = lintPlanCapabilityAnnotations(text, REGISTERED);
+  assert.deepEqual(result.findings, [], JSON.stringify(result.findings));
+  assert.equal(result.units.length, 1);
+  assert.equal(result.units[0].unit, 'real unit after');
+});
+
+test('a same-line backtick fence whose info string itself contains a backtick never opens a fence -- it never swallows the rest of the file', () => {
+  const text = `\`\`\` not a fence \`\`\`
+
+- unit: real unit after
+  capability: code:implement
+`;
+  const result = lintPlanCapabilityAnnotations(text, REGISTERED);
+  assert.deepEqual(result.findings, [], JSON.stringify(result.findings));
+  assert.equal(result.units.length, 1);
+  assert.equal(result.units[0].unit, 'real unit after');
+});
+
 test('a pin key is caught case-insensitively, tolerating whitespace around the colon and an optional leading bullet', () => {
   const text = `- unit: apply the fix
   capability: code:implement
