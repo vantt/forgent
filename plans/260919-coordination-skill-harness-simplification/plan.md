@@ -1147,12 +1147,50 @@ Executor/provider/model/tier selection remains an execution-time decision.
   stop: Phase 4 requires changing CoordinationSession legality/kernel authority, any close behavior regresses from explicit-close,
     plan-loop needs a new persisted ledger, driver discipline needs coding/track vocabulary, skill projections cannot be rebuilt cleanly,
     or full suite regresses.
+- unit: I16 — amend driver-discipline open-inputs slot and plan-loop hook value before Phase 5 consumes the fragment
+  capability: execute
+  depends-on: I15
+  status: not-started
+  scope: Prose-only amendment; no code, schema, persisted entity, or runtime change.
+    (1) `core/skills/_shared/coordination-driver.md`, hook-slot table row `open inputs`:
+        Definition: "The source specifications and parameters used to initialize the session:
+          (a) the iteration's declared result kind, work-product or advisory;
+          (b) exactly one primary canonical capability;
+          (c) any binding inputs the control layer requires, when the facade has them."
+        Responsibility: "Facade supplies (a)–(c). The discipline reads (a) to select
+          evidence and close rules, treats (b) and (c) as pass-through data, never derives
+          or chooses them itself, and never names an executor, model, tier, or persona."
+        Vocabulary constraint: no `git`, `worktree`, `merge`, `npm test`, `phase`, `plan.md`
+        (drift test); "capability", "executor", "binding" are platform vocabulary and allowed.
+    (2) `core/skills/fgos-plan-loop/SKILL.md`, hook-value table row `open inputs`:
+        "Extracted from plans/<track>/phase-NN-<name>.md: objective, verification commands,
+         result kind (work-product for a produce cell), the phase's primary capability from
+         the plan.md Product Gates table, and any actor binding the Lead supplies."
+    (3) `core/skills/fgos-plan-loop/SKILL.md`, section "1. Open a Cell", one transitional
+        sentence after the `start` command block:
+        "Until binding resolves from config (Phase 5), pass `--actors '<json>'` on `start`
+         when the track's Execution Inputs roster requires provider diversity; omitting it
+         binds every node to the default executor plus placementPolicy read-only redirects."
+    (4) `docs/how-to/author-a-plan-loop-track.md`, Execution Inputs "Roster" bullet: add
+        "(passed via `fgos coordination start --actors`; transitional until Phase 5)".
+    (5) `npm run build:skills`; confirm `.agents/` and `plugins/fgOS/` mirrors byte-identical.
+    Nothing else changes: no decide call added to the fragment, no plan-lint reference,
+    no roster rule declared permanent, no Phase 4 exit criterion reopened.
+  verification:
+    node --test test/skills/coordination-phase4-driver-discipline.test.mjs (9/9: drift, word budget, projection, CLI contract, clean pass, fix round)
+    node --test test/skills/coordination-dag-driver-skill-contract.test.mjs
+    wc -w core/skills/_shared/coordination-driver.md core/skills/fgos-plan-loop/SKILL.md domains/coding/skills/_shared/coding-cell-policy.md (combined <= 3300; 3,121 before amendment)
+    git diff --check
+  evidence: plans/reports/architecture-investigation-260927-1154-capability-aware-dispatch-gate-phase4-decisions.md §6.2, §6.4, §10
+  stop: any test above fails; combined word load exceeds 3300; the amendment needs a word on the
+    drift-test forbidden list; Phase 5 has already consumed the fragment (then the change moves
+    into Phase 5's own re-verification instead).
 
 Parallelism is limited deliberately:
 
 ```text
 I00 -> I01 -> I02 -> I03 -------------------------------+
-          +-> I04 -> I05 -------------------------------+--> I11 -> I12 -> I13 -> I14 -> I15 -> Phase 5
+          +-> I04 -> I05 -------------------------------+--> I11 -> I12 -> I13 -> I14 -> I15 -> I16 -> Phase 5
           +-> I06 -----+                                |
           +-> I07 -----+-> I08 -------------------------+
                        I02 + I04 + I06 -> I09 -> I10 ----+
