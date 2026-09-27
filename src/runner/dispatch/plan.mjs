@@ -11,6 +11,18 @@ import { resolveExecutorAndOverrides, resolveExecutorConfig, executorIdForWork }
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
 import { resolveAssignmentDispatchPolicy } from './assignment-policy.mjs';
 
+// Additive check for the `capability.unknown` reason code (never changes
+// `mechanism`): is `name` a real entry key, or a declared `aliases[]` member,
+// of `cfg.capabilities`? Mirrors the same "key or alias" membership
+// `resolveExecutorAndOverrides` (resolve.mjs) already checks for `prefer`
+// resolution, kept local here since that function resolves a single name to
+// its serving executor rather than answering a plain existence question.
+function isKnownCapabilityName(cfg, name) {
+  const capabilities = cfg && cfg.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities : {};
+  if (Object.prototype.hasOwnProperty.call(capabilities, name)) return true;
+  return Object.values(capabilities).some((entry) => Array.isArray(entry?.aliases) && entry.aliases.includes(name));
+}
+
 function policyTierForDispatchTier(dispatchTier, rigorOverrides) {
   const tier = dispatchTier ?? 'standard';
   return rigorOverrides?.[tier] ?? DEFAULT_TIER_TO_POLICY[tier] ?? (MODEL_POLICY_TIERS.includes(tier) ? tier : undefined);
@@ -216,6 +228,17 @@ export function compileDispatchPlan(
       };
     }
     reasonCodes.push('selector.unregistered');
+    // H7 (capability-aware dispatch gate, 2026-09-27): a `--for` purpose
+    // that resolved to nothing is ALREADY refused above via
+    // `selector.unregistered` -- this reason code only adds a more specific
+    // diagnosis for the one case a caller can actually act on differently:
+    // the name itself was never registered in `cfg.capabilities` (as a key
+    // or a declared alias), as opposed to being registered but pointing at
+    // an executor that failed to resolve for some other reason. Additive
+    // only: `mechanism`/`configured` are unchanged either way.
+    if (selector.type === 'purpose' && !isKnownCapabilityName(cfg, purpose)) {
+      reasonCodes.push('capability.unknown');
+    }
     return {
       selector,
       caller: callerObj,

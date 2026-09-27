@@ -5200,7 +5200,42 @@ test('decideExecutorCli resolves "unavailable" when nothing is registered for th
     timeoutMs: 5000,
   });
   const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'judge', hasLiveTaskAccess: true });
+  assert.deepEqual(decided, { mechanism: 'unavailable', configured: false, reasonCodes: ['selector.unregistered', 'capability.unknown'] });
+});
+
+test('a registered-but-unresolvable capability name keeps reasonCodes to selector.unregistered only, never capability.unknown', async () => {
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capabilities: { judge: {} },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'judge', hasLiveTaskAccess: true });
   assert.deepEqual(decided, { mechanism: 'unavailable', configured: false, reasonCodes: ['selector.unregistered'] });
+});
+
+test('a purpose name registered only as a declared alias also avoids capability.unknown', async () => {
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    capabilities: { judge: { aliases: ['adjudicate'] } },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'adjudicate', hasLiveTaskAccess: true });
+  assert.deepEqual(decided, { mechanism: 'unavailable', configured: false, reasonCodes: ['selector.unregistered'] });
+});
+
+test('--needs-soul with an unregistered purpose never gets capability.unknown -- that branch never reaches selector.unregistered', async () => {
+  const root = mkTempDir();
+  writeRunnerConfigFixture(root, {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    models: { standard: 'sonnet' },
+    timeoutMs: 5000,
+  });
+  const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'no-such-purpose-configured', needsSoul: true, hasLiveTaskAccess: true });
+  assert.deepEqual(decided, { mechanism: 'in-process', configured: false, reasonCodes: ['native-first.rule-2.live-task-access'] });
 });
 
 test('decideExecutorCli resolves purpose-based (--for) to the same result a positional executorId would, plus the resolved executorId', async () => {
@@ -5544,7 +5579,7 @@ test('the "decide" CLI entry point resolves --for <purpose> the same way as a po
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
   const result = spawnSync(process.execPath, [dispatchPath, 'decide', '--for', 'no-such-purpose-configured'], { encoding: 'utf8', cwd: repoRoot });
   assert.equal(result.status, 0, result.stderr);
-  assert.deepEqual(JSON.parse(result.stdout), { mechanism: 'unavailable', configured: false, reasonCodes: ['selector.unregistered'] });
+  assert.deepEqual(JSON.parse(result.stdout), { mechanism: 'unavailable', configured: false, reasonCodes: ['selector.unregistered', 'capability.unknown'] });
 });
 
 test('the "execute" CLI entry point honors --carries, threading it through end to end', () => {

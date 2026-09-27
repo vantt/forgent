@@ -735,6 +735,32 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'capability',
+    invoke: 'fgos capability match --demand <json>',
+    description: 'Q1 steering (core/skills/_shared/capability-matching.md): "match" derives the canonical capability -- and its execution `form` (`inline`/`protocol`/`facade`) -- from a declared DemandFacts JSON object, by checking it against the live config\'s `runner.capabilities` `serves` promises (src/runner/capability-match.mjs\'s matchCapability, a pure function; this verb is its only CLI door). Read-only with respect to state: the sole side effect is one appended `.fgos/logs/capability-match.log` line per call (`source: match|override|miss`). `--override <capability>` replaces the natural match with an explicit capability name, requires `--reason <text>` alongside it, and logs `source: override`; the override name must itself be a registered `runner.capabilities` key or alias. Never calls `decide`, never reads `capabilities.<name>.prefer`, never resolves an executor -- Q2 binding (`fgos dispatch decide --for <capability>`) is a separate, later step.',
+    parameters: {
+      type: 'object',
+      properties: {
+        sub: { type: 'string', description: 'Sub-verb (positional).', enum: ['match'] },
+        demand: { type: 'string', description: 'DemandFacts as a JSON object: {outputKind, domain, mutates, behaviorPreserving?, needsIndependentReview, hasPlanOrTrack, size, rigor}.' },
+        override: { type: 'string', description: 'Explicit capability name overriding the natural match; requires --reason.' },
+        reason: { type: 'string', description: 'Required alongside --override: why the natural match was overridden.' },
+        json: { type: 'boolean', description: 'Accepted as a no-op -- the envelope is always JSON.' },
+      },
+      positional: ['sub'],
+      required: ['sub', 'demand'],
+    },
+    examples: [
+      'fgos capability match --demand \'{"outputKind":"change","domain":"code","mutates":true,"needsIndependentReview":false,"hasPlanOrTrack":false,"size":"light","rigor":"standard"}\'',
+      'fgos capability match --demand \'{...}\' --override code:review --reason "domain context warrants independent review"',
+    ],
+    touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+  },
+  {
     name: 'merge',
     invoke: 'fgos merge',
     description: '"list" (read-only) returns which awaiting-approval items are ready to merge now (every dep already done, no footprint conflict) ordered by rankImpact, which are still waiting on an unmerged dep, and which are footprint-conflicted pairs (same shape as fgos conflicts). "next" merges the single top-ranked ready item by recursing into the same approve logic (never a parallel merge path) -- if that item trips the Iron Law gate it reports which item and why and merges nothing, it never auto-acknowledges or falls through to the next-ranked item.',

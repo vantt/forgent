@@ -55,6 +55,10 @@ export const MANIFEST = [
   // src/report/item-trace.mjs intentionally NOT listed: no direct or
   // boundary test located. Falls through to unknown -> full.
 
+  // -- src/runner/capability-match.mjs (Q1 steering, capability-aware
+  // dispatch gate) --
+  { id: 'runner-capability-match', status: 'shadow', pattern: 'src/runner/capability-match.mjs', directTests: ['test/runner/capability-match.test.mjs', 'test/cli/capability-match.test.mjs'], boundaryTests: [] },
+
   // -- src/state/** leaf modules only (plan candidate area 3) --
   { id: 'state-awaiting-context', status: 'shadow', pattern: 'src/state/awaiting-context.mjs', directTests: ['test/state/awaiting-context.test.mjs'], boundaryTests: [] },
   { id: 'state-cleanup-harness', status: 'shadow', pattern: 'src/state/cleanup-harness.mjs', directTests: ['test/state/cleanup-harness.test.mjs'], boundaryTests: [] },
