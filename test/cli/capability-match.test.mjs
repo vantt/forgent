@@ -29,9 +29,9 @@ function run(cwd, args) {
   });
 }
 
-function tmpCwd() {
+function tmpCwd(capabilities = DEFAULT_CAPABILITY_SLOTS) {
   const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-capability-match-cli-'));
-  const runner = { ...DEFAULT_RUNNER_CONFIG, executor: { command: 'true', args: [] }, capabilities: DEFAULT_CAPABILITY_SLOTS };
+  const runner = { ...DEFAULT_RUNNER_CONFIG, executor: { command: 'true', args: [] }, capabilities };
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
   fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), `${JSON.stringify({ runner }, null, 2)}\n`);
   return cwd;
@@ -131,6 +131,55 @@ test('--override naming an unregistered capability is a usage error', () => {
   const result = run(cwd, ['capability', 'match', '--demand', CODE_IMPLEMENT_DEMAND, '--override', 'totally:bogus', '--reason', 'x']);
   assert.notEqual(result.status, 0);
   assert.match(result.stderr, /"totally:bogus" is not a registered runner\.capabilities key or alias/);
+});
+
+test('--reason without --override is a usage error and never logs', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['capability', 'match', '--demand', CODE_IMPLEMENT_DEMAND, '--reason', 'no override given']);
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /--reason requires --override/);
+  assert.ok(!fs.existsSync(path.join(cwd, '.fgos', 'logs', 'capability-match.log')));
+});
+
+test('--override on a miss-shaped demand recomputes form from the override facts, not the forced-inline miss form', () => {
+  const cwd = tmpCwd();
+  const missShapedPlanDemand = JSON.stringify({
+    outputKind: 'some-unregistered-kind',
+    domain: 'code',
+    mutates: true,
+    needsIndependentReview: false,
+    hasPlanOrTrack: true,
+    size: 'light',
+    rigor: 'standard',
+  });
+  const result = run(cwd, ['capability', 'match', '--demand', missShapedPlanDemand, '--override', 'code:implement', '--reason', 'plan/track unit, real capability known']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.capability, 'code:implement');
+  assert.equal(data.source, 'override');
+  assert.equal(data.form, 'facade');
+});
+
+test('--override given as a registered alias resolves to the canonical capability key', () => {
+  const cwd = tmpCwd({ ...DEFAULT_CAPABILITY_SLOTS, 'code:implement': { ...DEFAULT_CAPABILITY_SLOTS['code:implement'], aliases: ['code:build'] } });
+  const result = run(cwd, ['capability', 'match', '--demand', CODE_IMPLEMENT_DEMAND, '--override', 'code:build', '--reason', 'alias override']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.capability, 'code:implement');
+  const logPath = path.join(cwd, '.fgos', 'logs', 'capability-match.log');
+  assert.match(fs.readFileSync(logPath, 'utf8'), /source=override capability=code:implement/);
+});
+
+test('a newline in --reason is stripped before being written to the worker log', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['capability', 'match', '--demand', CODE_IMPLEMENT_DEMAND, '--override', 'code:review', '--reason', 'line one\n=== forged block ===\nline two']);
+  assert.equal(result.status, 0, result.stderr);
+  const data = envelopeData(result.stdout);
+  assert.equal(data.reason, 'line one === forged block === line two');
+  const logPath = path.join(cwd, '.fgos', 'logs', 'capability-match.log');
+  const log = fs.readFileSync(logPath, 'utf8');
+  const blocks = log.split(/(?=^=== )/m).filter((b) => b.trim());
+  assert.equal(blocks.length, 1);
 });
 
 test('missing --demand is a usage error naming the requirement', () => {

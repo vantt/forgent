@@ -49,7 +49,7 @@ import { checkDispatchAttestation } from '../src/runner/attestation-guard.mjs';
 import { classifyDispatchConfidence } from '../src/report/dispatch-confidence.mjs';
 import { formatDeprecation } from '../src/cli/deprecation.mjs';
 import { lintPlanCapabilityAnnotations } from '../src/report/capability-plan-lint.mjs';
-import { matchCapability, CapabilityMatchError } from '../src/runner/capability-match.mjs';
+import { matchCapability, deriveForm, CapabilityMatchError } from '../src/runner/capability-match.mjs';
 import { appendWorkerLog } from '../src/runner/worker-log.mjs';
 
 // tsk-1qi: this running copy's own package root -- the source
@@ -2554,8 +2554,11 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         throw new StoreError('validation', `capability match --demand must be valid JSON: ${err.message}`);
       }
       const overrideValue = optionalField(flags.override, 'capability match --override must be a non-empty string when present');
+      const reasonValue = optionalField(flags.reason, 'capability match --reason must be a non-empty string when present');
       if (overrideValue !== undefined) {
-        requireField(flags.reason, 'capability match --override requires --reason <text>');
+        requireField(reasonValue, 'capability match --override requires --reason <text>');
+      } else if (reasonValue !== undefined) {
+        throw new StoreError('validation', 'capability match --reason requires --override <capability>.');
       }
       const repoRootForCapability = path.dirname(dir);
       let cfg;
@@ -2578,12 +2581,19 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         throw err;
       }
       if (overrideValue !== undefined) {
-        const isKnown = Object.prototype.hasOwnProperty.call(catalog, overrideValue)
-          || Object.values(catalog).some((entry) => Array.isArray(entry?.aliases) && entry.aliases.includes(overrideValue));
-        if (!isKnown) {
+        const canonicalOverride = Object.prototype.hasOwnProperty.call(catalog, overrideValue)
+          ? overrideValue
+          : Object.entries(catalog).find(([, entry]) => Array.isArray(entry?.aliases) && entry.aliases.includes(overrideValue))?.[0];
+        if (canonicalOverride === undefined) {
           throw new StoreError('validation', `capability match --override "${overrideValue}" is not a registered runner.capabilities key or alias.`);
         }
-        result = { ...result, capability: overrideValue, source: 'override', reason: flags.reason };
+        result = {
+          ...result,
+          capability: canonicalOverride,
+          source: 'override',
+          reason: reasonValue.replace(/[\r\n]+/g, ' '),
+          form: deriveForm(result.facts, canonicalOverride),
+        };
       }
       appendWorkerLog(dir, 'capability-match', {
         message: `source=${result.source} capability=${result.capability ?? 'null'} form=${result.form}: ${result.reason}`,

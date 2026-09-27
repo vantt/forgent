@@ -112,16 +112,15 @@ function evaluateCandidate(name, entry, facts) {
 }
 
 /**
- * `form` derives from `needsIndependentReview`, `hasPlanOrTrack`, and `size`
- * (never `rigor`, which is Q2-only pass-through): a plan/track-scoped unit
- * whose declared `size` is `heavy` decomposes into a `facade`; short of that,
- * a unit requiring independent review runs under a `protocol`; everything
- * else -- including a plan/track unit that is not heavy -- stays `inline`.
- * Forced to `inline` unconditionally on a miss/tie, per doctrine.
+ * `form` derives from `needsIndependentReview` and `hasPlanOrTrack` (never
+ * `rigor`, which is Q2-only pass-through): a plan/track-scoped unit decomposes
+ * into a `facade`; short of that, a unit requiring independent review runs
+ * under a `protocol`; everything else stays `inline`. Forced to `inline`
+ * unconditionally on a miss/tie, per doctrine.
  */
-function deriveForm(facts, capability) {
+export function deriveForm(facts, capability) {
   if (capability === null) return 'inline';
-  if (facts.hasPlanOrTrack && facts.size === 'heavy') return 'facade';
+  if (facts.hasPlanOrTrack) return 'facade';
   if (facts.needsIndependentReview) return 'protocol';
   return 'inline';
 }

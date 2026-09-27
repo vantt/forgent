@@ -113,7 +113,7 @@ test('an empty/undefined catalog is a legitimate miss, never thrown', () => {
 
 // ─── form derivation ────────────────────────────────────────────────────
 
-test('form is inline when neither review nor a heavy plan/track applies', () => {
+test('form is inline when neither review nor a plan/track applies', () => {
   const result = matchCapability(demandFacts(), CATALOG);
   assert.equal(result.form, 'inline');
 });
@@ -124,14 +124,14 @@ test('form is protocol when needsIndependentReview is true', () => {
   assert.equal(result.form, 'protocol');
 });
 
-test('form is facade when hasPlanOrTrack and size is heavy', () => {
+test('form is facade when hasPlanOrTrack is true, regardless of size', () => {
   const result = matchCapability(demandFacts({ hasPlanOrTrack: true, size: 'heavy' }), CATALOG);
   assert.equal(result.form, 'facade');
 });
 
-test('a plan/track unit that is not heavy stays inline, not facade', () => {
-  const result = matchCapability(demandFacts({ hasPlanOrTrack: true, size: 'standard' }), CATALOG);
-  assert.equal(result.form, 'inline');
+test('a light-size unit with hasPlanOrTrack still gets facade, not inline/protocol', () => {
+  const result = matchCapability(demandFacts({ hasPlanOrTrack: true, size: 'light' }), CATALOG);
+  assert.equal(result.form, 'facade');
 });
 
 test('facade takes precedence over protocol when both conditions hold', () => {
@@ -142,7 +142,7 @@ test('facade takes precedence over protocol when both conditions hold', () => {
   assert.equal(result.form, 'facade');
 });
 
-test('a tie forces form to inline even if needsIndependentReview/hasPlanOrTrack+heavy would otherwise apply', () => {
+test('a tie forces form to inline even if needsIndependentReview/hasPlanOrTrack would otherwise apply', () => {
   const result = matchCapability(demandFacts({ domain: 'tie-domain', needsIndependentReview: true, hasPlanOrTrack: true, size: 'heavy' }), TIE_CATALOG);
   assert.equal(result.capability, null);
   assert.equal(result.form, 'inline');
