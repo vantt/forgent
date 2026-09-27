@@ -225,6 +225,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `xai`, and `deepseek` executors (`xai` -> `["review", "code:review"]`,
   `deepseek`/`glm` -> `["execute"]`) -- additive only, no existing `prefer`
   changed.
+- **Added**: `fgos capability match --demand <json> [--override <capability> --reason <text>] [--json]` (Unit I20): Q1 steering CLI door onto a new pure `matchCapability(demandFacts, catalog)` function (`src/runner/capability-match.mjs`, no import of `dispatch/plan.mjs`/`cli.mjs`/`transport.mjs`) that derives the canonical capability -- and its execution `form` (`inline`/`protocol`/`facade`) -- from declared `DemandFacts` against the live `runner.capabilities` `serves` promises. Read-only with respect to state; appends exactly one `.fgos/logs/capability-match.log` line per call (`source: match|override|miss`). Additive reason code `capability.unknown` now accompanies `selector.unregistered` on `decide --for <purpose>` when the purpose is not a registered `runner.capabilities` key or alias (and `--needs-soul` was not passed); `mechanism` is unchanged.
 
 ## [v0.1.0] - 2026-09-18
 

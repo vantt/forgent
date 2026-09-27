@@ -49,6 +49,8 @@ import { checkDispatchAttestation } from '../src/runner/attestation-guard.mjs';
 import { classifyDispatchConfidence } from '../src/report/dispatch-confidence.mjs';
 import { formatDeprecation } from '../src/cli/deprecation.mjs';
 import { lintPlanCapabilityAnnotations } from '../src/report/capability-plan-lint.mjs';
+import { matchCapability, CapabilityMatchError } from '../src/runner/capability-match.mjs';
+import { appendWorkerLog } from '../src/runner/worker-log.mjs';
 
 // tsk-1qi: this running copy's own package root -- the source
 // `materializeSkillsIntoProject` copies `.agents/skills/*` FROM, when
@@ -2528,6 +2530,65 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         description: unit.capability != null ? (catalog[unit.capability]?.description ?? null) : null,
       }));
       return { path: absPath, ok: result.ok, units, findings: result.findings };
+    }
+
+    // Q1 steering CLI door onto matchCapability (src/runner/
+    // capability-match.mjs, a pure function this case never re-implements):
+    // reads the live runner config's `capabilities` catalog via
+    // `ensureRunnerConfigForDir`, matches declared DemandFacts against it,
+    // and appends exactly one `.fgos/logs/capability-match.log` line per
+    // call. Read-only with respect to state -- the log append (git-ignored
+    // operational text, per worker-log.mjs) is the only side effect. Never
+    // calls `decide`, never touches `capabilities.<name>.prefer` -- Q2
+    // binding is a separate, later step.
+    case 'capability': {
+      const sub = requireField(positional[0], 'capability requires a sub-verb: fgos capability match --demand <json>');
+      if (sub !== 'match') {
+        throw new StoreError('validation', `capability: unknown sub-verb "${sub}" (known: match).`);
+      }
+      const demandRaw = requireField(flags.demand, 'capability match requires --demand <json>');
+      let facts;
+      try {
+        facts = JSON.parse(demandRaw);
+      } catch (err) {
+        throw new StoreError('validation', `capability match --demand must be valid JSON: ${err.message}`);
+      }
+      const overrideValue = optionalField(flags.override, 'capability match --override must be a non-empty string when present');
+      if (overrideValue !== undefined) {
+        requireField(flags.reason, 'capability match --override requires --reason <text>');
+      }
+      const repoRootForCapability = path.dirname(dir);
+      let cfg;
+      try {
+        cfg = ensureRunnerConfigForDir(repoRootForCapability);
+      } catch (err) {
+        if (err instanceof RunnerConfigError) {
+          throw new StoreError('precondition', `capability match: ${err.message}`);
+        }
+        throw err;
+      }
+      const catalog = cfg.capabilities ?? {};
+      let result;
+      try {
+        result = matchCapability(facts, catalog);
+      } catch (err) {
+        if (err instanceof CapabilityMatchError) {
+          throw new StoreError('validation', `capability match: ${err.message}`);
+        }
+        throw err;
+      }
+      if (overrideValue !== undefined) {
+        const isKnown = Object.prototype.hasOwnProperty.call(catalog, overrideValue)
+          || Object.values(catalog).some((entry) => Array.isArray(entry?.aliases) && entry.aliases.includes(overrideValue));
+        if (!isKnown) {
+          throw new StoreError('validation', `capability match --override "${overrideValue}" is not a registered runner.capabilities key or alias.`);
+        }
+        result = { ...result, capability: overrideValue, source: 'override', reason: flags.reason };
+      }
+      appendWorkerLog(dir, 'capability-match', {
+        message: `source=${result.source} capability=${result.capability ?? 'null'} form=${result.form}: ${result.reason}`,
+      });
+      return result;
     }
 
     // Request-class per D1 (same contract as `ready`/`triage`/`conflicts`): a

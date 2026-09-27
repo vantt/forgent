@@ -25,6 +25,7 @@
     "src/runner/loop.mjs": "use-case",
     "src/runner/paths.mjs": "infra",
     "src/runner/dispatch.mjs": "infra",
+    "src/runner/capability-match.mjs": "infra",
     "src/runner/dispatch-log.mjs": "infra",
     "src/runner/fanout-batch.mjs": "infra",
     "src/runner/work-compat.mjs": "infra",
