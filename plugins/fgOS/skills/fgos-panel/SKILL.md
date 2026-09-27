@@ -23,11 +23,14 @@ the domain-neutral cycle (`observe -> choose legal action -> dispatch -> verify
 evidence -> disposition -> adapt -> explicit close -> continuity artifact`). The
 Facade Hook Values table below fills that cycle's 9 hook slots, but governs
 **only** Route step 5's own generic-preset path (the one case where this skill
-itself observes, dispatches, and dispositions a session across turns) — it does
-**not** govern the delegated `architecture-panel` (step 3) or `code-change-panel`
-(step 4) routes, each of which keeps its own hook table
-([`fgos-architecture-panel`](../fgos-architecture-panel/SKILL.md)'s own;
-`fgos-code-panel`'s own). Never assume this one table governs all five routes.
+itself observes and dispatches a session across turns — disposition and
+adaptation bounds are never this route's own, per the `disposition criteria`/
+`adaptation bounds` rows below) — it does **not** govern the delegated
+`architecture-panel` (step 3) route, which keeps its own hook table
+([`fgos-architecture-panel`](../fgos-architecture-panel/SKILL.md)'s own). The
+delegated `code-change-panel` (step 4) route is a known Phase 5 gap:
+`fgos-code-panel` does not yet link this fragment or declare a hook table of
+its own. Never assume this one table governs all five routes.
 
 Read the canonical
 [`Group Thinking Trigger Surface`](../../../docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md)
@@ -51,7 +54,13 @@ extend that map in this skill.
    real actors, operations, gates, and bounds. Fill the person's content into
    the standard declared-protocol request shape, then invoke the unchanged
    `fgos-group-thinking` pack gate with the preset's explicit id.
-6. Return the advisory artifact and coordination id. Replay/status remains
+6. When the selected FlowDefinition's own close rules (`close criteria`,
+   below) are satisfied, submit a request carrying `close: true` or an
+   explicit `{type: "close"}` step through that same `fgos coordination pack
+   run --file` door — close is never implicit (`runCoordinationUseCase` never
+   closes on quorum alone; `fgos-group-thinking`'s own gate, "Close a session
+   outside the quorum gate"). Then return the advisory artifact and
+   coordination id. Replay/status remains
    `fgos coordination show <coordinationId> --json`.
 
 ## Facade Hook Values (Route Step 5's Generic-Preset Path Only)
@@ -59,12 +68,12 @@ extend that map in this skill.
 | Hook Slot | Value |
 |---|---|
 | `unit of iteration` | One dispatched session for the single non-architecture, non-code-change preset selected in Route step 2 -- one full pass through the unmodified `fgos-group-thinking` pack gate to a returned advisory artifact and coordination id. |
-| `open inputs` | (a) result kind: advisory, never work-product -- this route never implements code (Boundaries). (b) exactly one primary canonical capability, resolved by declaring `DemandFacts` from the extracted request (`outputKind: "decision"`, `domain` from the subject when known or empty, `mutates: false`, `needsIndependentReview` per the selected preset's own collaboration shape, `hasPlanOrTrack: false`, `size`, `rigor`) and calling `fgos capability match --demand '<json>'` (`../_shared/capability-matching.md`) -- following `fgos-plan-loop`'s/Phase 6's own cited pattern of declaring `DemandFacts` and calling the real match door, never a keyword-matched guess. (c) the person's subject, proposal/artifact, supplied options, and material scope/risk constraint (Route step 1), filled into the selected FlowDefinition's declared request shape (Route step 5). |
+| `open inputs` | (a) result kind: advisory, never work-product -- this route never implements code (Boundaries). (b) exactly one primary canonical capability, resolved by declaring `DemandFacts` from the extracted request (`outputKind: "decision"`, `domain` from the subject when known or empty, `mutates: false`, `needsIndependentReview` per the selected preset's own collaboration shape, `hasPlanOrTrack: false`, `size`, `rigor`) and calling `fgos capability match --demand '<json>'` (`../_shared/capability-matching.md`) -- per Phase 5's own entry gate (consume the I17 demand doctrine and the I20 `fgos capability match` door instead of keyword-matched skill descriptions), never a keyword-matched guess. `fgos-plan-loop` is not a precedent for this call: it resolves its own capability from `plan.md`'s Product Gates table and never calls `fgos capability match` directly. (c) the person's subject, proposal/artifact, supplied options, and material scope/risk constraint (Route step 1), filled into the selected FlowDefinition's declared request shape (Route step 5). |
 | `evidence verification` | Read the advisory artifact and coordination id back through `fgos coordination show <coordinationId> --json` (Route step 6); never claim a ranking protocol selected a winner, or that mediated feedback guarantees anonymity or consensus -- report only artifacts the real session produced (Boundaries). |
 | `disposition criteria` | None owned by this route. The selected FlowDefinition's own actors, aggregation, and quorum rules govern every finding; this skill never invents protocol semantics, transitions, visibility, grants, reopen, aggregation, or close rules in task prose (Boundaries). |
 | `adaptation bounds` | None owned by this route. Bounded entirely by the selected FlowDefinition's own declared `activation`/`maxInvocations` -- this skill asserts no revision or retry limit of its own. |
 | `human-escalation triggers` | One concise question only when the subject is absent, a requested review has no accessible proposal/artifact, an explicit comparison has no supplied or discoverable options, a material scope/risk constraint cannot be obtained from evidence, or the only ambiguity is implementation authority (advice only or an actual code change) (Clarify Only Real Missing Input). Never ask for a protocol id, method name, role roster, provider, model, executor, or tier. |
-| `close criteria` | The selected FlowDefinition's own close rules, unmodified -- pack membership and FlowDefinition validation remain authoritative (Boundaries). This route asserts no close condition of its own beyond what the door itself reports. |
+| `close criteria` | The selected FlowDefinition's own close rules, unmodified -- pack membership and FlowDefinition validation remain authoritative (Boundaries). This route asserts no close condition of its own beyond what the door itself reports. Once those rules are satisfied, close is still never implicit -- the request submitted to `fgos coordination pack run --file` must carry `close: true` or an explicit `{type: "close"}` step (`fgos-group-thinking`'s own gate, "Close a session outside the quorum gate") before Route step 6 returns. |
 | `after-close action` | Return the advisory artifact and coordination id to the person (Route step 6). Never turn a coding advisory panel into a parallel implementation executor; never pin a provider, model, executor, or tier (Boundaries). |
 | `continuity artifact` | `fgos coordination show <coordinationId> --json`, unmodified -- replay/status remains this one door (Route step 6). |
 

@@ -387,12 +387,25 @@ test('Phase 5 (I26): fgos-panel and fgos-architecture-panel link the driver-disc
     assert.ok(tableMatch, `${name}/SKILL.md must declare a "Facade Hook Values" table`);
     const tableBody = tableMatch[1];
 
-    for (const hook of requiredHooks) {
-      assert.ok(
-        tableBody.includes(`\`${hook}\``),
-        `${name}/SKILL.md's Facade Hook Values table must fill hook slot "${hook}"`,
-      );
-    }
+    // Parse only the FIRST CELL of each row as the hook-slot name, so a
+    // renamed slot cannot pass merely because the old name still appears
+    // somewhere in another row's prose.
+    const rowNames = tableBody
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line.startsWith('|') && line.length > 1)
+      .map((row) => row.split('|')[1].trim().replace(/^`|`$/g, ''));
+
+    assert.equal(
+      new Set(rowNames).size,
+      rowNames.length,
+      `${name}/SKILL.md's Facade Hook Values table must not declare a duplicate hook-slot row`,
+    );
+    assert.deepEqual(
+      [...rowNames].sort(),
+      [...requiredHooks].sort(),
+      `${name}/SKILL.md's Facade Hook Values table rows must equal exactly the 9 required hook slots (no missing, no duplicate, no extra)`,
+    );
   }
 });
 
