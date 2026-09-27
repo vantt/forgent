@@ -109,9 +109,15 @@ existing doors only:
 - **Human-turn recording:** the `human-turn` request-step type
   (`recordHumanTurn`, Phase 03.1) — session-level, protocol-agnostic
   infrastructure, not a graph node in this protocol's own FlowDefinition.
-- **Specialist authorization:** `authorizeSpecialistSlot` called
-  directly (see Known Gaps — no `specialist-authorize` request-step type
-  exists yet, `tsk-3xk`).
+- **Specialist authorization:** the `specialist-authorize` request-step
+  type (`src/verbs/coordination/schema.mjs`, I24a) reaches
+  `authorizeSpecialistSlot` through the raw `coordination run --file`
+  power-user door — never through `fgos-group-thinking`'s own gate, which
+  explicitly refuses this step type (see Known Gaps, `tsk-3xk`, retired). A
+  driver-authenticated typed-action door for this same capability is not
+  built yet — until it lands, build the `specialist-authorize` step
+  directly into a `coordination run --file` request, outside the pack
+  gate.
 
 No authority, visibility, aggregation, bounds-checking, or replay logic
 is described or implied here beyond what those doors already enforce.
@@ -283,10 +289,11 @@ protocol's own `actors[]`), each bindable up front in the request's own
 `actors[]` override. The specialist has **no such actor id to bind at
 all** — it is authorized on demand through the specialist-slot mechanism
 (`specialistSlotRef: specialist-answer-slot`, `authorizeSpecialistSlot`,
-see Known Gaps' `tsk-3xk` for the exact call path), naming the
-executor/tier/persona for that one question at authorization time, not
-in the session's opening roster. Never pre-declare a specialist actor id
-the way you would for the other 8.
+reached via a `specialist-authorize` step in a raw `coordination run
+--file` request — see "Never Reimplements The Kernel" above for the
+exact door), naming the executor/tier/persona for that one question at
+authorization time, not in the session's opening roster. Never
+pre-declare a specialist actor id the way you would for the other 8.
 
 `persona` is free-form prose framing the executor receives, not a closed
 vocabulary (matching `fgos-code-panel`'s own convention) — sharpen any
@@ -684,12 +691,16 @@ never invent a new filename mid-session.
   free-text `reason` field is the only channel today to name which human
   turn licenses a dialogue reopen — never a real ref in those fields
   until this lands.
-- **`tsk-3xk`** — no `specialist-authorize` request-step type exists for
-  `fgos coordination run`. Workaround: call `authorizeSpecialistSlot`
-  directly against the session (same mechanism `dispatchDeclaredOperation`
-  already uses), then dispatch `answer-specialist-question` through the
-  normal `operation` step once authorized — everything except the
-  authorization call itself goes through the door.
+- **`tsk-3xk`** — **closed (I24a).** A `specialist-authorize` request-step
+  type now exists for `fgos coordination run --file`
+  (`src/verbs/coordination/schema.mjs`), reaching `authorizeSpecialistSlot`
+  — build it directly into a raw request, then dispatch
+  `answer-specialist-question` through the normal `operation` step once
+  authorized. This door is NOT reachable through
+  `fgos-group-thinking`'s own gate — `runGroupThinkingRequest` explicitly
+  refuses a `specialist-authorize` step (Group-Thinking Protocol Pack
+  bypass #4 stays refused). A driver-authenticated typed-action/subverb
+  door for this same capability is a later unit's own work, still pending.
 - **Doctrine-by-path fails across a dispatch boundary — a hard
   requirement, confirmed failing identically twice (P01.2, P01.3).** A
   dispatched executor's cwd is pinned to PROJECT_ROOT, a different

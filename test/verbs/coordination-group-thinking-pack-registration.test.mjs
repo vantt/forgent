@@ -399,6 +399,52 @@ test('a full RFC-Review-Lite chain (including an authorize step) dispatched enti
   assert.equal(eventTypes.includes('specialist-authorized'), false, 'bypass #4 (authorize a specialist) -- no such event exists in this session\'s real log');
 });
 
+// I24a (Phase 5 item 4, H3 decision): `run.mjs`'s request vocabulary grew a
+// real `specialist-authorize` step type reaching `authorizeSpecialistSlot`
+// -- bypass #4 can no longer be refused merely because the vocabulary lacks
+// the step (the reasoning the test above's own comment, and the design
+// doc's "Five bypasses" section, gave before this unit). This pack gate
+// must keep refusing it explicitly instead -- proving that here, not just
+// re-asserting the (now outdated) absence-based reasoning above.
+test('runGroupThinkingRequest explicitly refuses a "specialist-authorize" step -- bypass #4 (authorize a specialist) stays refused now that run.mjs\'s vocabulary has grown this step type (I24a)', async () => {
+  const tempDir = mkTempDir();
+  const coordinationId = 'coord_p10_5_specialist_authorize_bypass_refused';
+  const writerId = 'i24a-bypass4-test';
+
+  await assert.rejects(
+    () =>
+      runGroupThinkingRequest(
+        { cwd: tempDir, repoRoot: tempDir },
+        {
+          protocolId: RFC_REVIEW_LITE_ID,
+          requestObject: {
+            kind: 'declared-protocol',
+            objective: 'Attempt to authorize a specialist through the pack gate -- must be refused (H3).',
+            writerId,
+            coordinationId,
+            protocolRef: { id: RFC_REVIEW_LITE_ID },
+            steps: [
+              {
+                type: 'specialist-authorize',
+                as: 'authSpecialist',
+                slotId: 'some-slot',
+                specialistActorId: 'specialist-x',
+                role: 'specialist',
+                reason: 'Attempt a bypass of the group-thinking pack gate.',
+                maxAssignments: 1,
+                expiresAfterRound: 10,
+                specialistAuthorizationId: 'sauth_i24a_bypass_attempt',
+              },
+            ],
+          },
+        },
+      ),
+    (err) => err instanceof StoreError && err.category === 'validation' && /"specialist-authorize" step is refused by this pack gate/.test(err.message),
+  );
+
+  assert.equal(countEventLines(tempDir, coordinationId), 0, 'refused before any mutation -- the session is never even opened');
+});
+
 // ---------------------------------------------------------------------
 // Step 09 Phase 02 R1/Tests First #5-#6: `standalone-master-coordination-loop`
 // registered as the pack's fourth member, dispatchable through the SAME

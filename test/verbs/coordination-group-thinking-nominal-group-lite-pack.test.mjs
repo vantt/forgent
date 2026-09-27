@@ -423,7 +423,8 @@ test('P10.10: Nominal-Group-Lite\'s private-rank contribution lineage is now rea
 //    protocol's own request used it as a strawman for "no such door"), so
 //    it still proves the closed-vocabulary refusal genuinely fires for a
 //    misspelled/unknown step type -- only the expected message text
-//    changed, to name all five real step types including "contribution".
+//    changed, to name all real step types (including "contribution" and,
+//    since I24a, "specialist-authorize").
 
 test('runGroupThinkingRequest refuses a "link" step (an unknown step-type spelling, never a real one) with the real schema\'s own closed-vocabulary message', async () => {
   const tempDir = mkTempDir();
@@ -449,7 +450,7 @@ test('runGroupThinkingRequest refuses a "link" step (an unknown step-type spelli
     (err) =>
       err instanceof StoreError &&
       err.category === 'validation' &&
-      /steps\[1\]\.type must be "operation", "fan-out", "authorize", "disposition", "contribution", "human-turn", or "close"/.test(err.message),
+      /steps\[1\]\.type must be "operation", "fan-out", "authorize", "disposition", "contribution", "human-turn", "specialist-authorize", or "close"/.test(err.message),
   );
 });
 

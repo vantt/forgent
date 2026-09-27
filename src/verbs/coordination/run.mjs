@@ -60,6 +60,7 @@ import {
   dispatchResearchFanOutLocked,
   authorizeDeclaredOperation,
   authorizeDeclaredOperationLocked,
+  authorizeSpecialistSlot,
   linkSessionContribution,
   linkSessionContributionLocked,
   evaluateSessionQuorum,
@@ -505,6 +506,37 @@ export async function executeValidatedCoordinationStep({ ctx, request, step, man
     });
     labels[step.as] = branchAssignmentIds;
     return { as: step.as, type: 'fan-out', status: 'dispatched', branches: branchSummaries };
+  }
+  if (step.type === 'specialist-authorize') {
+    // I24a (Phase 5 item 4): unlocked path only -- `authorizeSpecialistSlot`
+    // has no `Locked` twin yet (session-engine.mjs), and its own
+    // `recordSpecialistAuthorization` door acquires the events lock itself
+    // (`withEventsLock`, store.mjs). Calling it while the typed-action path
+    // above already holds that lock would self-deadlock, not merely fail
+    // loudly -- refuse explicitly instead of ever reaching that call.
+    if (locked) {
+      throw new CoordinationError(
+        'validation',
+        `steps[${step.as}] (type "specialist-authorize"): no Locked engine twin exists for authorizeSpecialistSlot yet -- ` +
+          `this step type is wired for the unlocked "coordination run --file" path only; the driver-authenticated ` +
+          `typed-action door needs authorizeSpecialistSlotLocked, which a later unit adds`,
+      );
+    }
+    const triggerEvidenceRefs = resolveRefArray(step.triggerEvidenceRefs, labels, `steps[${step.as}].triggerEvidenceRefs`);
+    const allowedContextRefs = resolveRefArray(step.allowedContextRefs, labels, `steps[${step.as}].allowedContextRefs`);
+    const authorization = authorizeSpecialistSlot(manifest.coordinationId, {
+      slotId: step.slotId, specialistActorId: step.specialistActorId, role: step.role, capabilities: step.capabilities,
+      authorizedBy: driverIdentity, reason: step.reason, triggerEvidenceRefs, allowedContextRefs,
+      maxAssignments: step.maxAssignments, expiresAfterRound: step.expiresAfterRound,
+      specialistAuthorizationId: step.specialistAuthorizationId,
+    }, engineOpts);
+    return {
+      as: step.as, type: 'specialist-authorize', door: 'authorizeSpecialistSlot',
+      slotId: authorization.slotId, specialistActorId: authorization.specialistActorId, role: authorization.role,
+      capabilities: authorization.capabilities, specialistAuthorizationId: authorization.specialistAuthorizationId,
+      maxAssignments: authorization.maxAssignments, expiresAfterRound: authorization.expiresAfterRound,
+      appended: authorization.appended,
+    };
   }
   if (step.type === 'close') return { as: step.as, type: 'close', status: 'fulfilled' };
   throw new CoordinationError('validation', `unsupported step type "${step.type}"`);

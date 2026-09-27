@@ -25,6 +25,7 @@ import { readSessionEvents, readManifest, transitionSessionStatus } from '../../
 import { replaySession } from '../../src/runner/coordination/replay.mjs';
 import { CoordinationError } from '../../src/runner/coordination/schema.mjs';
 import { showCoordinationUseCase } from '../../src/verbs/coordination/show.mjs';
+import { runCoordinationUseCase } from '../../src/verbs/coordination/run.mjs';
 
 const DEFINITION_ID = 'test.coordination-protocol.specialist-binding';
 const DRIVER_ID = 'coordinator-1';
@@ -220,6 +221,111 @@ test('a previously-unknown specialistActorId becomes a legitimate dispatch targe
   const replayed = replaySession('coord_spec_happy', ctx.opts);
   assert.equal(replayed.specialistAuthorizations.length, 1);
   assert.equal(replayed.specialistAuthorizations[0].specialistActorId, 'specialist-alpha');
+});
+
+// I24a (Phase 5 item 4): the same authorization, reached through the new
+// "specialist-authorize" request-step type (`src/verbs/coordination/schema.mjs`),
+// dispatched through the ONE real public request door
+// (`runCoordinationUseCase`, `coordination run --file`'s own use case),
+// never a second, parallel authorization path -- proving the request
+// boundary really reaches `authorizeSpecialistSlot`, not merely that the
+// engine-level door still works (every other test in this file already
+// proves that, and keeps doing so unmodified).
+test('the "specialist-authorize" request-step type reaches authorizeSpecialistSlot through coordination run --file, end to end', async () => {
+  const coordinationId = 'coord_spec_request_step';
+  const ctx = setup(coordinationId);
+
+  const result = await runCoordinationUseCase(
+    { ...ctx.opts, runnerConfig: ctx.runnerConfig },
+    {
+      requestObject: {
+        kind: 'declared-protocol',
+        objective: 'Recruit a bounded specialist into a declared slot via the request-step door.',
+        writerId: DRIVER_ID,
+        coordinationId,
+        protocolRef: { id: DEFINITION_ID },
+        steps: [
+          {
+            type: 'specialist-authorize',
+            as: 'authSpecialist',
+            slotId: 'review-slot',
+            specialistActorId: 'specialist-alpha',
+            role: 'specialist',
+            capabilities: ['deep-review'],
+            reason: 'Primary review needs a domain specialist.',
+            maxAssignments: 3,
+            expiresAfterRound: 10,
+            specialistAuthorizationId: 'sauth_request_step_1',
+          },
+          {
+            type: 'authorize',
+            as: 'authOperation',
+            operationId: 'specialist-review',
+            targetActorId: 'specialist-alpha',
+            authorizationId: 'auth_specialist_request_step',
+            invocationKey: 'specialist-review:request-step-1',
+            reason: 'Dispatch the specialist review.',
+            grantedContextRefs: [],
+          },
+          {
+            type: 'operation',
+            as: 'dispatchReview',
+            operationId: 'specialist-review',
+            targetActorId: 'specialist-alpha',
+            objective: 'Perform the specialist review.',
+            expectedOutputs: ['agent-result.json (status, summary)'],
+          },
+        ],
+      },
+    },
+  );
+
+  assert.equal(result.steps[0].type, 'specialist-authorize');
+  assert.equal(result.steps[0].door, 'authorizeSpecialistSlot');
+  assert.equal(result.steps[0].slotId, 'review-slot');
+  assert.equal(result.steps[0].specialistActorId, 'specialist-alpha');
+  assert.equal(result.steps[0].appended, true);
+  assert.equal(result.steps[2].status, 'done');
+
+  const events = readSessionEvents(coordinationId, ctx.opts);
+  const specialistEvent = events.find((e) => e.type === 'specialist-authorized');
+  assert.ok(specialistEvent, 'specialist-authorized event must exist, written through the request-step door');
+  assert.equal(specialistEvent.payload.specialistActorId, 'specialist-alpha');
+
+  // Idempotent replay through the SAME request door: a retry (e.g. a
+  // resumed/crashed caller) must resume, never mint a second authorization.
+  const retried = await runCoordinationUseCase(
+    { ...ctx.opts, runnerConfig: ctx.runnerConfig },
+    {
+      requestObject: {
+        kind: 'declared-protocol',
+        objective: 'Retry the same specialist-authorize step.',
+        writerId: DRIVER_ID,
+        coordinationId,
+        protocolRef: { id: DEFINITION_ID },
+        steps: [
+          {
+            type: 'specialist-authorize',
+            as: 'authSpecialistRetry',
+            slotId: 'review-slot',
+            specialistActorId: 'specialist-alpha',
+            role: 'specialist',
+            capabilities: ['deep-review'],
+            reason: 'Primary review needs a domain specialist.',
+            maxAssignments: 3,
+            expiresAfterRound: 10,
+            specialistAuthorizationId: 'sauth_request_step_1',
+          },
+        ],
+      },
+    },
+  );
+  assert.equal(retried.steps[0].appended, false, 'retrying the same specialistAuthorizationId through the request door must resume, not duplicate');
+  assert.equal(
+    readSessionEvents(coordinationId, ctx.opts).filter((e) => e.type === 'specialist-authorized').length,
+    1,
+    'exactly one specialist-authorized event after the retry',
+  );
 });
 
 test('dispatching without an explicit targetActorId resolves the live specialist automatically', async () => {

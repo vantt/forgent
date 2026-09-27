@@ -657,6 +657,72 @@ export function computeHumanTurnArtifactRevision(cwd, artifactRef, stepAs = 'hum
   return { revision, realArtifactPath, artifactBytes };
 }
 
+// I24a (Phase 5 item 4): a "specialist-authorize" step reaches
+// `authorizeSpecialistSlot` (session-engine.mjs) -- the driver-only door
+// that recruits a previously-unknown specialist identity into a declared
+// `topology.specialistSlots[]` slot (the SAME mechanism `authorize`/
+// `disposition` already reach for their own doors, never a second copy of
+// it). Deliberately wired for the UNLOCKED `coordination run --file` path
+// only: `authorizeSpecialistSlot` has no `Locked` twin yet (a later unit
+// adds one, alongside the typed-action/subverb door that would need it),
+// so run.mjs's own step-dispatch site refuses this step type outright when
+// the already-events-locked typed-action path calls it, rather than
+// self-deadlocking against a lock it cannot re-acquire.
+const SPECIALIST_AUTHORIZE_STEP_ALLOWED_KEYS = new Set([
+  'type', 'as', 'slotId', 'specialistActorId', 'role', 'capabilities', 'reason',
+  'triggerEvidenceRefs', 'allowedContextRefs', 'maxAssignments', 'expiresAfterRound',
+  'specialistAuthorizationId', 'mutation', 'dependsOn',
+]);
+
+export function validateSpecialistAuthorizeStep(step, i = 0) {
+  assertNoAuthorizedBy(step, `steps[${i}] (type "specialist-authorize")`);
+  assertAllowedKeys(step, SPECIALIST_AUTHORIZE_STEP_ALLOWED_KEYS, `steps[${i}] (type "specialist-authorize")`);
+  assertMutationAllowed(step.mutation, `steps[${i}].mutation`);
+  assertSafeId(step.slotId, `steps[${i}].slotId`);
+  assertSafeId(step.specialistActorId, `steps[${i}].specialistActorId`);
+  if (!isNonEmptyString(step.role)) {
+    fail(`steps[${i}].role is required and must be a non-empty string matching the specialist slot's own declared role`);
+  }
+  const capabilities = validateStringArray(step.capabilities, `steps[${i}].capabilities`);
+  if (!isNonEmptyString(step.reason) || step.reason.length > REASON_MAX_LENGTH) {
+    fail(`steps[${i}].reason is required and must be a non-empty string of at most ${REASON_MAX_LENGTH} characters`);
+  }
+  const triggerEvidenceRefs = validateStringArray(step.triggerEvidenceRefs, `steps[${i}].triggerEvidenceRefs`);
+  triggerEvidenceRefs.forEach((ref, j) => assertSafeRefOrId(ref, `steps[${i}].triggerEvidenceRefs[${j}]`));
+  const allowedContextRefs = validateStringArray(step.allowedContextRefs, `steps[${i}].allowedContextRefs`);
+  allowedContextRefs.forEach((ref, j) => assertSafeRefOrId(ref, `steps[${i}].allowedContextRefs[${j}]`));
+  if (!Number.isInteger(step.maxAssignments) || step.maxAssignments < 1) {
+    fail(`steps[${i}].maxAssignments is required and must be a positive integer`);
+  }
+  if (!Number.isInteger(step.expiresAfterRound) || step.expiresAfterRound < 1) {
+    fail(`steps[${i}].expiresAfterRound is required and must be a positive integer`);
+  }
+  if (step.specialistAuthorizationId === undefined) {
+    fail(
+      `steps[${i}].specialistAuthorizationId is required for a "specialist-authorize" step. It names this authorization ` +
+        `instance, so RETRYING resumes idempotently against the same id instead of minting a duplicate authorization.`,
+    );
+  }
+  assertSafeId(step.specialistAuthorizationId, `steps[${i}].specialistAuthorizationId`);
+  const dependsOn = validateStringArray(step.dependsOn, `steps[${i}].dependsOn`);
+  dependsOn.forEach((ref, j) => assertSafeId(ref, `steps[${i}].dependsOn[${j}]`));
+  return {
+    type: 'specialist-authorize',
+    as: step.as,
+    slotId: step.slotId,
+    specialistActorId: step.specialistActorId,
+    role: step.role,
+    capabilities,
+    reason: step.reason,
+    triggerEvidenceRefs,
+    allowedContextRefs,
+    maxAssignments: step.maxAssignments,
+    expiresAfterRound: step.expiresAfterRound,
+    specialistAuthorizationId: step.specialistAuthorizationId,
+    ...(step.dependsOn !== undefined ? { dependsOn } : {}),
+  };
+}
+
 function validateSteps(steps) {
   if (!Array.isArray(steps) || steps.length === 0) fail('"steps" is required and must be a non-empty array when kind is "declared-protocol"');
   const seenLabels = new Set();
@@ -671,8 +737,9 @@ function validateSteps(steps) {
     if (step.type === 'disposition') return validateDispositionStep(step, i);
     if (step.type === 'contribution') return validateContributionStep(step, i);
     if (step.type === 'human-turn') return validateHumanTurnStep(step, i);
+    if (step.type === 'specialist-authorize') return validateSpecialistAuthorizeStep(step, i);
     if (step.type === 'close') return { type: 'close', as: step.as };
-    fail(`steps[${i}].type must be "operation", "fan-out", "authorize", "disposition", "contribution", "human-turn", or "close"`);
+    fail(`steps[${i}].type must be "operation", "fan-out", "authorize", "disposition", "contribution", "human-turn", "specialist-authorize", or "close"`);
     return undefined; // unreachable, keeps linters happy
   });
 }
