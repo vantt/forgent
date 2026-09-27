@@ -1949,41 +1949,65 @@ Executor/provider/model/tier selection remains an execution-time decision.
   capability: code:implement
   depends-on: none (I24a/I24b already closed)
   status: not-started
-  design-record: plans/reports/fork-260928-0024-phase5-items-5-6-7-8-decomposition-research-report.md §Items 5, 6
+  design-record: plans/reports/fork-260928-0024-phase5-items-5-6-7-8-decomposition-research-report.md §Items 5, 6; independent decomposition review (`review-decompose-i25-i26`) M1-M3 folded into this revision.
   scope: work items 5 and 6 were substantially closed as a side effect of
     I24b's own M1 fix (`evaluateDriverAuthorizedBindings` now correctly
     keeps a `maxInvocations:2` bounded-reopen operation like
     `revise-synthesis`/`revise-explanation` pending across both
     invocations) and its work-item-6 mechanical-fields test
-    (`test/runner/coordination-actions-v1.test.mjs`). This unit closes the
-    two narrow remainders review-i24b/test-i24b both flagged but correctly
-    deferred: (1) `record-human-turn` and both bounded-reopen invocations
-    already surface generically, but no test proves BOTH appear correctly
-    together in the REAL `architecture-advisory-panel-v1` typed action view
-    specifically (as opposed to synthetic unit fixtures) — add one; (2) the
-    work-item-6 test (`coordination-actions-v1.test.mjs:119`) checks every
-    kind OTHER than `specialist` against only an 8-name denylist, while
-    `specialist` alone gets a strict allowlist — a judgment field with an
-    unlisted name (e.g. `rationale`, `rank`) would pass for any non-specialist
-    kind. Harden it to an allowlist for every action kind the projector
-    emits, matching Phase 1's locked contract ("describes legal choices but
-    never chooses one") for all of them, not just the newest one. Also sweep
-    `fgos-architecture-panel/SKILL.md` and any how-to docs for a stale
-    "human-turn/bounded-reopen not yet in the typed view" claim, if one
-    exists (grep first — may already be clean).
+    (`test/runner/coordination-actions-v1.test.mjs`). The decomposition
+    review confirmed `coordination-architecture-advisory-panel-conformance.test.mjs:717`
+    ("bounded-reopen visibility (M1)") ALREADY asserts, against the real
+    `architecture-advisory-panel-v1` protocol, that `revise-synthesis` is
+    visible before any reopen, after invocation #1, and gone after
+    invocation #2 — do not duplicate this. The genuine remaining gaps: (a)
+    `revise-explanation`'s own action-view visibility across invocations #1
+    and #2 (today only its door-level over-cap REFUSAL is tested, ~L806 —
+    add the same before/#1/#2 visibility assertions L717 already uses for
+    `revise-synthesis`, applied to `revise-explanation`); (b)
+    `record-human-turn`'s presence in the real protocol's typed action view
+    (not just the generic unit-level tests already covering it). Work item
+    6: the mechanical-fields test (`coordination-actions-v1.test.mjs:119`)
+    checks every kind OTHER than `specialist` against only an 8-name
+    denylist, while `specialist` alone gets a strict allowlist — harden to
+    an allowlist for every action kind the projector actually emits. The
+    review found the real fixture only emits `dispatch-operation`,
+    `authorize-and-dispatch`, `record-human-turn`, and `specialist` — the
+    other kinds (`fan-out`, `record-disposition`, `link-contribution`,
+    `close`) never appear in it, so achieving true per-kind allowlist
+    coverage needs either new per-kind fixtures or a sweep over whichever
+    OTHER test files already exercise those kinds' own real projections
+    (grep `actions-projector.mjs`'s kind-specific field additions — e.g.
+    `fan-out` adds `allowedActorIds`/`allowedValues`; `record-disposition`/
+    `link-contribution` add a conditional `allowedValues`) — allowlist ONLY
+    the top-level keys the projector emits per kind, never recurse into
+    field VALUES (`rationale` is itself a legitimate `requiredInputs` value
+    name for `record-disposition` and would false-fail a value-level scan).
+    State explicitly whether `target`'s own sub-keys (e.g.
+    `dispatch-operation`'s optional `target.authorizationId`) are in scope
+    for the same allowlist treatment — they are, for the same reason.
   files: test/runner/coordination-actions-v1.test.mjs,
     test/verbs/coordination-architecture-advisory-panel-conformance.test.mjs,
-    core/skills/fgos-architecture-panel/SKILL.md (doc sweep only, if a stale
-    claim is found), CHANGELOG.md.
+    src/runner/coordination/actions-projector.mjs (read-only reference for
+    the per-kind field allowlist — do not modify the projector itself, this
+    unit only hardens tests against its existing, correct output). Grepped
+    and confirmed clean: no stale "human-turn/bounded-reopen not yet in the
+    typed view" claim exists anywhere today, so no doc sweep is needed —
+    `fgos-architecture-panel/SKILL.md` is NOT touched by this unit (I26
+    edits that file; keeping this unit's files list disjoint from I26's is
+    what makes the two safely parallel). No CHANGELOG.md entry — this is a
+    test-only change with no user-visible behavior.
   verification: node --test test/runner/coordination-actions-v1.test.mjs;
     node --test test/verbs/coordination-architecture-advisory-panel-conformance.test.mjs;
     env -u CLAUDE_CODE_SESSION_ID npm test.
-  stop: the allowlist hardening narrows legitimate mechanical fields any
-    existing action kind actually needs (would break real callers, not just
-    tighten the test); the real-protocol conformance test can't be made to
-    pass without a code change beyond this unit's stated scope (that would
-    mean I24b's M1 fix was incomplete — escalate, don't silently patch
-    around it here).
+  stop: this is test-only — the allowlist hardening cannot break a real
+    caller (nothing calls a test file), so the real risk is only an
+    overly-narrow allowlist making CI fail on the projector's genuine,
+    existing output; if that happens, widen the allowlist to match reality,
+    never narrow the projector; the real-protocol conformance test can't be
+    made to pass without a code change beyond this unit's stated scope
+    (that would mean I24b's M1 fix was incomplete — escalate, don't
+    silently patch around it here).
 - unit: I26 — architecture-panel/fgos-panel consume the driver-discipline fragment; fold fgos-group-thinking into fgos-panel (Phase 5 work items 7, 8)
   capability: code:implement
   depends-on: none (I17 fragment and I20 capability-match door already integrated per Phase 5's own entry gate)
