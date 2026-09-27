@@ -1,6 +1,6 @@
 # Coordination Skill and Harness Simplification
 
-Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 verified at `main@1ca4023c` (REV-15 fix `60132825`; post-merge baseline verified at `main@f63f7e7d`); Unit I07 integrated at `main@261ed7ea`; Unit I08b integrated at `main@ba8f6a9d`; Unit I10 integrated and verified at `main@605d26fe` (carried through `main@26a1038e` and `main@ac19f6d1`); Unit I08 VERIFIED at `main@ac19f6d1` (RV-01/RV-02 remediation candidate `132d3777` + `ac19f6d1` integrated; acceptance gate verified: full suite 7647 pass exit 0, 10/10 isolated coord, 10/10 isolated dispatch, 60/60 parallel load pass; timing instability recorded as LOW debt); Unit I11 VERIFIED at `main@7d7dc2750f9fb80716a7cffae03d67605629cf9a` (candidate code `9cf843b6`, approved tip `3a67a1b9`, synchronized merge `3d706b89`; post-merge verification satisfied: 155/155 focused rerun pass, full suite 7652 pass exit 0; candidate regressions = 0); Unit I12 VERIFIED/integrated at `main@c782a08dfcae89279dcb1ca9fb59aa73fb58c515`; Unit I13 VERIFIED/integrated at `main@dc05f7586b78483d569bc25b929b988dc56a374c`; Unit I14 VERIFIED/integrated at `main@3cb80c91c` (candidate `f857eaeab`; review APPROVE at `7d01a12e2`; remediation `c03a959c7`; focused matrix 210 pass / 0 fail, full suite 7684 pass / 0 fail; Phase 4 entry gate satisfied); Unit I15 (Phase 4) VERIFIED/integrated at `main@8e8a3f1aa` (candidate `38e552bb9`; approved tip `c343304b3`; focused matrix 192 pass / 0 fail, full suite 7693 pass / 0 fail; Phase 5 open / ready)
+Status: in progress — Phase 2 integrated at `main@5a02e81a`; Units I02/I03 integrated at `main@4362bfec`; Unit I04 integrated at `main@7472bd74`; Unit I06 integrated at `main@3bab9b99` (evaluated candidate `d75d311d`); Unit I09 verified at `main@1ca4023c` (REV-15 fix `60132825`; post-merge baseline verified at `main@f63f7e7d`); Unit I07 integrated at `main@261ed7ea`; Unit I08b integrated at `main@ba8f6a9d`; Unit I10 integrated and verified at `main@605d26fe` (carried through `main@26a1038e` and `main@ac19f6d1`); Unit I08 VERIFIED at `main@ac19f6d1` (RV-01/RV-02 remediation candidate `132d3777` + `ac19f6d1` integrated; acceptance gate verified: full suite 7647 pass exit 0, 10/10 isolated coord, 10/10 isolated dispatch, 60/60 parallel load pass; timing instability recorded as LOW debt); Unit I11 VERIFIED at `main@7d7dc2750f9fb80716a7cffae03d67605629cf9a` (candidate code `9cf843b6`, approved tip `3a67a1b9`, synchronized merge `3d706b89`; post-merge verification satisfied: 155/155 focused rerun pass, full suite 7652 pass exit 0; candidate regressions = 0); Unit I12 VERIFIED/integrated at `main@c782a08dfcae89279dcb1ca9fb59aa73fb58c515`; Unit I13 VERIFIED/integrated at `main@dc05f7586b78483d569bc25b929b988dc56a374c`; Unit I14 VERIFIED/integrated at `main@3cb80c91c` (candidate `f857eaeab`; review APPROVE at `7d01a12e2`; remediation `c03a959c7`; focused matrix 210 pass / 0 fail, full suite 7684 pass / 0 fail; Phase 4 entry gate satisfied); Unit I15 (Phase 4) VERIFIED/integrated at `main@8e8a3f1aa` (candidate `38e552bb9`; approved tip `c343304b3`; focused matrix 192 pass / 0 fail, full suite 7693 pass / 0 fail; Phase 5 open / ready); Unit I16 VERIFIED/integrated at `main@a48ce987c` (candidate `6d75b54e1`; focused matrix 12 pass / 0 fail, skills matrix 29 pass / 0 fail; Phase 5 open / ready)
 Created: 2026-09-19
 Last Updated: 2026-09-27
 Mode: high-risk
@@ -754,6 +754,7 @@ unless the request carries an explicit close. The driver discipline states
 
 - **Satisfied (Entry):** Unit I14 integrated at `main@3cb80c91c` (plan/status commit `6bad420a0`).
 - **Satisfied (Phase 4 / Unit I15):** Unit I15 integrated at `main@8e8a3f1aa` (candidate `38e552bb9`, approved tip `c343304b3`). Implemented canonical driver discipline fragment `core/skills/_shared/coordination-driver.md` with zero coding/track vocabulary; implemented coding-cell policy fragment `domains/coding/skills/_shared/coding-cell-policy.md` referencing `private-cell-worktree.md` without plan/track assumptions; rewrote `fgos-plan-loop` to 1,233 words (within 1,500-word ceiling); synced mirrors byte-identically via `npm run build:skills`. Independent review APPROVED at `c343304b3` (`plans/reports/independent-review-phase-04-driver-discipline.md`); full suite 7693 pass / 0 fail; Phase 5 open.
+- **Satisfied (Unit I16):** Unit I16 integrated at `main@a48ce987c` (candidate `6d75b54e1`). Amended open-inputs definition and responsibility in driver discipline fragment; updated plan-loop hook value and transitional entry-node binding note in fgos-plan-loop and author-a-plan-loop-track; projections byte-identical; Lead word load 3,240 words (<= 3,300 ceiling); focused suites 12/12 pass, full skills matrix 29/29 pass; Phase 5 open / ready.
 
 
 ### Work
@@ -1150,7 +1151,12 @@ Executor/provider/model/tier selection remains an execution-time decision.
 - unit: I16 — amend driver-discipline open-inputs slot and plan-loop hook value before Phase 5 consumes the fragment
   capability: execute
   depends-on: I15
-  status: not-started
+  status: VERIFIED/integrated at `main@a48ce987c` (candidate `6d75b54e1`; focused suites 12/12 pass; skills matrix 29/29 pass; Phase 5 unblocked)
+  candidate-sha: `6d75b54e1`
+  integrated-sha: `a48ce987c`
+  branch: `coordination-skill-harness-i16-open-inputs`
+  base-sha: `13f95df4d6416a0ff55f309af2a5f8b6392b7cd1`
+  review-status: APPROVE at `6d75b54e1` (track manager and independent review spot-check ratified; entry-node binding scope corrected)
   scope: Prose-only amendment; no code, schema, persisted entity, or runtime change.
     (1) `core/skills/_shared/coordination-driver.md`, hook-slot table row `open inputs`:
         Definition: "The source specifications and parameters used to initialize the session:
@@ -1181,15 +1187,9 @@ Executor/provider/model/tier selection remains an execution-time decision.
     (5) `npm run build:skills`; confirm `.agents/` and `plugins/fgOS/` mirrors byte-identical.
     Nothing else changes: no decide call added to the fragment, no plan-lint reference,
     no roster rule declared permanent, no Phase 4 exit criterion reopened.
-  verification:
-    node --test test/skills/coordination-phase4-driver-discipline.test.mjs (9/9: drift, word budget, projection, CLI contract, clean pass, fix round)
-    node --test test/skills/coordination-dag-driver-skill-contract.test.mjs
-    wc -w core/skills/_shared/coordination-driver.md core/skills/fgos-plan-loop/SKILL.md domains/coding/skills/_shared/coding-cell-policy.md (combined <= 3300; 3,121 before amendment)
-    git diff --check
+  verification: 12/12 pass across focused suites (test/skills/coordination-phase4-driver-discipline.test.mjs 9/9, test/skills/coordination-dag-driver-skill-contract.test.mjs 3/3); 29/29 pass across test/skills/**/*.test.mjs; word count 3,240 <= 3,300 ceiling (driver 1,192, plan-loop 1,319, policy 729); git diff --check clean.
   evidence: plans/reports/architecture-investigation-260927-1154-capability-aware-dispatch-gate-phase4-decisions.md §6.2, §6.4, §10
-  stop: any test above fails; combined word load exceeds 3300; the amendment needs a word on the
-    drift-test forbidden list; Phase 5 has already consumed the fragment (then the change moves
-    into Phase 5's own re-verification instead).
+  stop: CLEARED — integrated at `main@a48ce987c`; Phase 5 unblocked.
 
 Parallelism is limited deliberately:
 
