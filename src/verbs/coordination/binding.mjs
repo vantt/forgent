@@ -235,25 +235,37 @@ export function bindOperations(definition, request = {}, runnerConfig, facts = {
       }
       throw err;
     }
-    // Fix H1 (red-team round 1): `resolveExecutorAndOverrides` checks a
-    // LITERAL `cfg.executors[capabilityName]` entry FIRST, before ever
-    // consulting `cfg.capabilities` -- so a portable operation declaring
-    // `policy.capability: "<some registered executor id>"` (e.g. "claude")
-    // resolves as `configured: true, bindingSource: 'executor-id'` even
-    // though nothing in `capabilities.<name>.prefer` ever named it. Treating
-    // that branch as a valid capability resolution here would be the exact
-    // "smuggle preferExecutor under policy.capability" attack the module's
-    // own red-team coverage already guards against for the literal
-    // `preferExecutor` field, just reachable through a different literal
-    // string. Only `capability.prefer` (declared `capabilities.<name>.prefer`)
-    // and `capability.for` (an executor's own declared `for` purpose array --
-    // a legitimate, config-mediated match, not an identity coincidence, and
-    // the ONLY resolution path the generic "review" capability fallback has
-    // ever had, see the "fallback capability derivation" test below) count as
-    // a genuine capability resolution; `executor-id` is refused the same way
-    // `!resolved.configured` already is -- fall through to "unbound" so
-    // minTier/readOnlyRedirects remain the safety net, never thrown.
-    if (!resolved.configured || resolved.bindingSource === 'executor-id') {
+    // Fix H1 (red-team round 1, corrected in round 2): `resolveExecutorAndOverrides`
+    // has THREE resolution branches, only the middle one of which Decision
+    // 1.2 ever names as valid ("the operation's own policy.capability
+    // resolved against capabilities.<name>.prefer"):
+    //   1. a LITERAL `cfg.executors[capabilityName]` entry, checked FIRST,
+    //      before `cfg.capabilities` is ever consulted (`bindingSource:
+    //      'executor-id'`) -- lets a portable operation's policy.capability
+    //      smuggle a pin to any literally registered executor id, the same
+    //      class of attack the module's own red-team coverage already
+    //      guards against for the literal `preferExecutor` field, just
+    //      reachable through a different string.
+    //   2. `cfg.capabilities[capabilityName].prefer` (`bindingSource:
+    //      'capability.prefer'`) -- the ONLY branch Decision 1.2 names.
+    //   3. an executor's own `for` array happening to include
+    //      `capabilityName` (`bindingSource: 'capability.for'`), reached
+    //      only when neither of the above matches -- this is `decide --for`'s
+    //      own orphan-executor reverse-mapping, a purpose-routing fallback
+    //      for callers with no capability catalog entry to resolve against,
+    //      never a declared capability-catalog resolution. On the real
+    //      committed .fgos/config.json this silently rebound EVERY actor of
+    //      architecture-advisory-panel-v1's generic "review" capability
+    //      (which has no .prefer) onto whichever executor happens to
+    //      declare `for: [..., "review"]` (xai's unconfined default
+    //      invocation) -- a live confinement regression versus pre-I21
+    //      behavior, where these actors were unbound and fell through to
+    //      the `readOnlyRedirects` safety net instead (H4, red-team round 2).
+    // Only branch 2 counts as a genuine capability resolution; branches 1
+    // and 3 are refused the same way `!resolved.configured` already is --
+    // fall through to "unbound" so minTier/readOnlyRedirects remain the
+    // safety net, never thrown.
+    if (!resolved.configured || resolved.bindingSource !== 'capability.prefer') {
       bindings.push(Object.freeze({
         actorId, nodeId, operationId, role,
         capability: capabilityName,
@@ -262,8 +274,10 @@ export function bindOperations(definition, request = {}, runnerConfig, facts = {
         providerFamily: null,
         diversity: null,
         explanation: resolved.bindingSource === 'executor-id'
-          ? `actor "${actorId}" (operation "${operationId}"): capability "${capabilityName}" (${capabilitySource}) names a literal registered executor id directly (cfg.executors["${capabilityName}"]) rather than resolving through capabilities.${capabilityName}.prefer or an executor's own declared "for" -- refusing to treat a bare executor-id match as a valid capability resolution (H1) -- leaving this actor unbound`
-          : `actor "${actorId}" (operation "${operationId}"): capability "${capabilityName}" (${capabilitySource}) resolves to nothing registered (no matching executor, no capabilities.${capabilityName}.prefer) -- leaving this actor unbound`,
+          ? `actor "${actorId}" (operation "${operationId}"): capability "${capabilityName}" (${capabilitySource}) names a literal registered executor id directly (cfg.executors["${capabilityName}"]) rather than resolving through capabilities.${capabilityName}.prefer -- refusing to treat a bare executor-id match as a valid capability resolution (H1) -- leaving this actor unbound`
+          : resolved.bindingSource === 'capability.for'
+            ? `actor "${actorId}" (operation "${operationId}"): capability "${capabilityName}" (${capabilitySource}) resolves only through an executor's own declared "for" purpose array, never a declared capabilities.${capabilityName}.prefer -- refusing to treat decide --for's orphan-executor fallback as a valid capability resolution (H4) -- leaving this actor unbound`
+            : `actor "${actorId}" (operation "${operationId}"): capability "${capabilityName}" (${capabilitySource}) resolves to nothing registered (no matching executor, no capabilities.${capabilityName}.prefer) -- leaving this actor unbound`,
       }));
       continue;
     }

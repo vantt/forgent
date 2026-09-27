@@ -33,19 +33,46 @@ import { bindOperations } from './binding.mjs';
  * needs no equivalent guard: this module never computes or injects a
  * `tier`/`minTier` field at all (see the module's own header doc, steps
  * 3/4), so there is nothing here for a `--tier` flag to be outranked by.
+ *
+ * Fix M (red-team round 2): a roster entry that sets ONLY `tier`/`persona`
+ * (no `executor`) is NOT a Lead executor override -- `bindOperations` itself
+ * already knows this (its own `existing?.executor !== undefined` check only
+ * takes the "override" branch when `.executor` is actually set, computing a
+ * real capability binding for a tier-only/persona-only entry exactly like an
+ * absent one). But this function used to filter its own additions by
+ * `actors.map((a) => a.id)` alone -- ANY existing entry for that actor id,
+ * regardless of which fields it set, suppressed the computed executor
+ * entirely, silently downgrading that actor to the pre-I21 default
+ * (`opPolicy.preferExecutor ?? runnerConfig.executor.command ?? 'claude'`)
+ * instead of layering the roster's own `tier`/`persona` on top of the
+ * capability-computed `executor`. Only an entry that ALREADY sets `.executor`
+ * is a genuine override to leave untouched; every other existing entry gets
+ * its computed `.executor`/`.invocation` merged in, in place.
  */
 function withComputedActorBindings(actors, definition, runnerConfig, facts, cliExecutor) {
   if (!definition || !runnerConfig || cliExecutor) return actors;
   const { bindings } = bindOperations(definition, { actors }, runnerConfig, facts);
-  const existingIds = new Set(actors.map((a) => a.id));
+  const bindingByActorId = new Map(bindings.map((b) => [b.actorId, b]));
+  const seenIds = new Set();
+  const merged = actors.map((a) => {
+    seenIds.add(a.id);
+    if (a.executor !== undefined) return a;
+    const binding = bindingByActorId.get(a.id);
+    if (!binding || binding.cliPolicy.preferExecutor === undefined) return a;
+    return {
+      ...a,
+      executor: binding.cliPolicy.preferExecutor,
+      ...(binding.cliPolicy.preferInvocation ? { invocation: binding.cliPolicy.preferInvocation } : {}),
+    };
+  });
   const additions = bindings
-    .filter((b) => !existingIds.has(b.actorId) && b.cliPolicy.preferExecutor !== undefined)
+    .filter((b) => !seenIds.has(b.actorId) && b.cliPolicy.preferExecutor !== undefined)
     .map((b) => ({
       id: b.actorId,
       executor: b.cliPolicy.preferExecutor,
       ...(b.cliPolicy.preferInvocation ? { invocation: b.cliPolicy.preferInvocation } : {}),
     }));
-  return additions.length > 0 ? [...actors, ...additions] : actors;
+  return [...merged, ...additions];
 }
 
 export const ACTION_INPUT_RESERVED_FIELDS = Object.freeze(new Set([

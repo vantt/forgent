@@ -5,10 +5,24 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+import path from 'node:path';
 
 import { bindOperations, deriveOperationCapability, BindingError } from '../../src/verbs/coordination/binding.mjs';
 import { composeStartRequest, composeCoordinationActionRequest } from '../../src/verbs/coordination/composers.mjs';
 import { validateFlowDefinition } from '../../src/runner/definitions/schema.mjs';
+import { loadCoordinationProtocol } from '../../src/runner/definitions/protocol-loader.mjs';
+
+/** Read the committed `.fgos/config.json`'s `runner` section directly via
+ * `git show HEAD:...` -- never `fs.readFileSync` off the working tree --
+ * matching `test/runner/cohort-planner.test.mjs`'s own `committedRunnerConfig()`
+ * helper exactly (same rationale: proves the repo's committed content, not
+ * whatever happens to be sitting on this machine's disk). */
+function committedRunnerConfig() {
+  const worktreeRoot = path.resolve(import.meta.dirname, '..', '..');
+  const raw = execFileSync('git', ['show', 'HEAD:.fgos/config.json'], { cwd: worktreeRoot, encoding: 'utf8' });
+  return JSON.parse(raw).runner;
+}
 
 function baseRunnerConfig(overrides = {}) {
   return {
@@ -139,7 +153,7 @@ test('Unit I21: step 1 (Lead override) wins over step 2 (capability.prefer) and 
   assert.equal(reviewer.bindingSource, 'capability.prefer');
 });
 
-test('Unit I21: fallback capability derivation -- work-product uses facts.primaryCapability, advisory falls back to domain:review then review', () => {
+test('Unit I21: fallback capability derivation -- work-product uses facts.primaryCapability, advisory falls back to domain:review then review (round 2 correction: "review" has no .prefer, so it is unbound, never a capability.for match)', () => {
   const definition = produceReviewRedTeamDefinition({ produceCapability: null, reviewCapability: null });
   const runnerConfig = baseRunnerConfig();
 
@@ -157,10 +171,18 @@ test('Unit I21: fallback capability derivation -- work-product uses facts.primar
   assert.equal(reviewerWithFacts.capability, 'code:review');
   assert.equal(reviewerWithFacts.cliPolicy.preferExecutor, 'claude-readonly');
 
+  // Round 2 correction (Decision 1.2 only ever names capabilities.<cap>.prefer
+  // as valid): the generic "review" capability has no .prefer in
+  // baseRunnerConfig -- it only reaches "claude-default" (which declares
+  // `for: ['review']`) through decide --for's own orphan-executor
+  // reverse-mapping, refused per H4 below. This actor must be unbound, NOT
+  // silently pinned to whichever executor happens to declare a matching
+  // "for" entry.
   const withUnregisteredDomain = bindOperations(definition, {}, runnerConfig, { primaryCapability: 'code:implement', domain: 'docs' });
   const reviewerUnregisteredDomain = withUnregisteredDomain.bindings.find((b) => b.actorId === 'reviewer');
   assert.equal(reviewerUnregisteredDomain.capability, 'review');
-  assert.equal(reviewerUnregisteredDomain.bindingSource, 'capability.for');
+  assert.equal(reviewerUnregisteredDomain.bindingSource, 'unbound');
+  assert.deepEqual(reviewerUnregisteredDomain.cliPolicy, {});
 });
 
 test('Unit I21: distinctProviderFrom "preferred" binds a diverse candidate when available and warns (not refuses) when not', () => {
@@ -249,6 +271,30 @@ test('Unit I21: composeStartRequest fills every node\'s actors[] entry from bind
   assert.equal(withOverride.actors.find((a) => a.id === 'doer').executor, 'claude-default');
 });
 
+test('Red-team round 2, M (tier-only partial roster entry): a roster entry naming ONLY tier/persona (no executor) still gets its capability-computed executor layered on top, never suppressed', () => {
+  const definition = produceReviewRedTeamDefinition();
+  const runnerConfig = baseRunnerConfig();
+
+  const withPartialOverride = composeStartRequest({
+    writerId: 'driver-1', objective: 'obj', protocolId: definition.metadata.id, definition, runnerConfig,
+    actors: [{ id: 'doer', tier: 'flagship' }],
+    steps: [{ as: 's1', type: 'operation', operationId: 'produce-candidate', targetActorId: 'doer', objective: 'obj', expectedOutputs: ['x'] }],
+  });
+  const doerEntry = withPartialOverride.actors.find((a) => a.id === 'doer');
+  assert.equal(doerEntry.tier, 'flagship', 'the roster\'s own tier must survive');
+  assert.equal(doerEntry.executor, 'agy', 'the capability-computed executor must still apply -- a tier-only entry is not an executor override');
+
+  // A real executor override on the SAME actor is still left completely untouched (Decision 1 step 1, unaffected by this fix).
+  const withRealOverride = composeStartRequest({
+    writerId: 'driver-1', objective: 'obj', protocolId: definition.metadata.id, definition, runnerConfig,
+    actors: [{ id: 'doer', executor: 'claude-default', tier: 'flagship' }],
+    steps: [{ as: 's1', type: 'operation', operationId: 'produce-candidate', targetActorId: 'doer', objective: 'obj', expectedOutputs: ['x'] }],
+  });
+  const doerRealOverride = withRealOverride.actors.find((a) => a.id === 'doer');
+  assert.equal(doerRealOverride.executor, 'claude-default');
+  assert.equal(doerRealOverride.tier, 'flagship');
+});
+
 test('Unit I21: composeCoordinationActionRequest fills actors[] for the whole graph when definition/runnerConfig are supplied', () => {
   const definition = produceReviewRedTeamDefinition();
   const runnerConfig = baseRunnerConfig();
@@ -331,6 +377,48 @@ test('Red-team round 1, H1: policy.capability naming a literal registered execut
   // never present a binding that skipped capabilityEntry.overrides while
   // claiming a genuine capability match -- there is no longer any code path
   // where that mismatch could occur.
+});
+
+test('Red-team round 2, H4: a generic capability with no .prefer must NOT silently bind through an executor\'s own declared "for" array', () => {
+  // "review" (baseRunnerConfig) has no .prefer at all; "claude-default"
+  // declares `for: ['review']`. Decision 1.2 only ever names
+  // capabilities.<cap>.prefer as a valid operation-capability resolution --
+  // decide --for's own orphan-executor reverse-mapping is a purpose-routing
+  // fallback for a DIFFERENT caller shape, never a declared capability-catalog
+  // resolution this module should trust. On the real committed
+  // .fgos/config.json this exact shape (a "review"-less-.prefer capability
+  // plus an executor declaring `for: [..., "review"]`) silently rebound every
+  // architecture-advisory-panel-v1 actor onto an unconfined executor (H4) --
+  // this is the minimal reproduction of that same shape.
+  const definition = produceReviewRedTeamDefinition({ produceCapability: 'review' });
+  const runnerConfig = baseRunnerConfig();
+  const { bindings } = bindOperations(definition, {}, runnerConfig);
+  const doer = bindings.find((b) => b.actorId === 'doer');
+  assert.equal(doer.bindingSource, 'unbound', 'a capability.for match must never resolve as a valid capability binding');
+  assert.deepEqual(doer.cliPolicy, {});
+  assert.notEqual(doer.cliPolicy.preferExecutor, 'claude-default');
+});
+
+test('Red-team round 2, H4 (real config proof): architecture-advisory-panel-v1\'s generic "review" capability actors are unbound against the real committed .fgos/config.json, never pinned to an unconfined executor via "for"', () => {
+  const runnerConfig = committedRunnerConfig();
+  const repoRoot = path.resolve(import.meta.dirname, '..', '..');
+
+  // Confirm the real config still has the exact shape H4 depends on: "review"
+  // has no .prefer, and some executor declares "review" in its own "for".
+  assert.equal(runnerConfig.capabilities.review?.prefer, undefined, 'this proof assumes "review" has no .prefer in the real config -- re-check H4 if this ever changes');
+  const forExecutorId = Object.entries(runnerConfig.executors).find(([, e]) => Array.isArray(e.for) && e.for.includes('review'))?.[0];
+  assert.ok(forExecutorId, 'this proof assumes some executor declares for: [..., "review"] in the real config -- re-check H4 if this ever changes');
+
+  const definition = loadCoordinationProtocol('core.coordination-protocol.architecture-advisory-panel-v1', { cwd: repoRoot, packageRoot: repoRoot });
+  const { bindings } = bindOperations(definition, {}, runnerConfig);
+
+  const genericReviewBindings = bindings.filter((b) => b.capability === 'review');
+  assert.ok(genericReviewBindings.length > 0, 'expected at least one actor to derive the generic "review" capability');
+  for (const binding of genericReviewBindings) {
+    assert.equal(binding.bindingSource, 'unbound', `actor "${binding.actorId}" must be unbound (falling through to readOnlyRedirects), never silently pinned to "${forExecutorId}" via capability.for`);
+    assert.deepEqual(binding.cliPolicy, {});
+    assert.notEqual(binding.cliPolicy.preferExecutor, forExecutorId);
+  }
 });
 
 test('Red-team round 1, H2: a top-priority --executor CLI override is never outranked by a computed capability binding (composeStartRequest)', () => {
