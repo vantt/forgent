@@ -460,6 +460,50 @@ test('domain-neutral proof: 1 plan-loop + 2 advisory operations resolve via iden
   assert.ok(res3.templateProvenance.contentDigest.startsWith('sha256:'));
 });
 
+test('Unit I22: every architecture-advisory-panel-v1 operation resolves and renders its own real template with bounded variables only', () => {
+  const archPanelDef = loadCoordinationProtocol('core.coordination-protocol.architecture-advisory-panel-v1');
+  assert.equal(archPanelDef.spec.operations.length, 14, 'protocol must still declare exactly 14 operations');
+
+  const sampleVariables = {
+    role: 'sample-role',
+    objective: 'Sample objective for bounded-variable rendering coverage',
+    contextRefs: ['ctx/one.md', 'ctx/two.md'],
+    expectedOutputs: ['artifact-one.md'],
+    constraints: ['no-git-mutation'],
+    evidenceContract: 'reported',
+  };
+
+  for (const op of archPanelDef.spec.operations) {
+    const templateId = op.task?.contractTemplate;
+    assert.ok(templateId, `operation "${op.id}" must declare a task.contractTemplate`);
+
+    const loaded = loadOperationPromptTemplate(templateId);
+    assert.equal(loaded.id, templateId);
+    assert.equal(loaded.tier, 'core', `"${templateId}" must resolve from the core tier`);
+
+    // Every placeholder present in the raw template content must be one of
+    // the bounded variables -- validateOperationPromptTemplate already
+    // enforces this at load time (scanTier calls it), but assert it again
+    // here so this test fails loudly if that invariant is ever bypassed.
+    const detected = validateOperationPromptTemplate(loaded.content, templateId);
+    for (const varName of detected) {
+      assert.ok(
+        BOUNDED_TEMPLATE_VARIABLES.has(varName),
+        `"${templateId}" references non-bounded variable "{${varName}}"`,
+      );
+    }
+
+    const rendered = resolveAndRenderOperationPrompt(
+      { contractTemplate: templateId, ...sampleVariables },
+      { variables: sampleVariables },
+    );
+    assert.ok(rendered.renderedBody.length > 0, `"${templateId}" must render a non-empty body`);
+    assert.ok(!rendered.renderedBody.includes('{role}'), `"${templateId}" must not leave {role} unrendered`);
+    assert.ok(!rendered.renderedBody.includes('{objective}'), `"${templateId}" must not leave {objective} unrendered`);
+    assert.ok(rendered.templateProvenance.contentDigest.startsWith('sha256:'));
+  }
+});
+
 test('retry/replay attribution stability: snapshot and digests remain deterministic when disk template changes', () => {
   const tmpDir = createTempDir('fgos-replay-test-');
   try {
