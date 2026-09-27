@@ -1,7 +1,7 @@
 # Unit I19 (Phase 5) — `serves` trên catalog, `review` slot, `for` cho executor mồ côi, doctor
 
-Capability: `code:implement`. Depends on: I17 (từ vựng đã chốt trong
-fragment và spec). Config thuần, không module mới, không CLI mới; phải land
+Capability: `code:implement`. Depends on: I17 (integrated at `main@d6c0d9033`,
+candidate `37833e331`). Config thuần, không module mới, không CLI mới; phải land
 trước Phase 5 việc 2. Phần module/verb/log/reasonCode tách sang
 [I20](phase-05-unit-i20-capability-match-module.md).
 

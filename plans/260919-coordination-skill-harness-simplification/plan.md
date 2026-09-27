@@ -813,6 +813,11 @@ skill descriptions. I17 and I18 may run in parallel with work items 1, 3, 4,
 5 and 6. Design record:
 `plans/reports/architecture-investigation-260927-1154-capability-aware-dispatch-gate-phase4-decisions.md`.
 
+### Gates
+
+- **Satisfied (Entry):** Unit I16 integrated at `main@a48ce987c`.
+- **Satisfied (Unit I17):** Unit I17 integrated at `main@d6c0d9033` (candidate `37833e331`). Demand doctrine fragment `core/skills/_shared/capability-matching.md` (862 words), serves column in `capability-catalog.md`, generic `review` capability slot, and reversed skill triggers in `fgos-capability-dispatching` and `fgos-code-panel` integrated; mirrors byte-identical; 40/40 doctrine tests pass, 124/124 matrix tests pass; Unit I19 unblocked.
+
 ### Objective
 
 Prove the same control/template layer **and the Phase 4 driver discipline**
