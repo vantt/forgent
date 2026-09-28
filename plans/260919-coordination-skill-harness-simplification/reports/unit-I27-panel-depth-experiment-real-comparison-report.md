@@ -206,24 +206,32 @@ measurement in §6 does not depend on this session finishing. **Stated
 plainly: this proof is partial, not complete, and should not be read as
 "the standard variant's standalone deployment was fully verified."**
 
-## 8. Open items — both now resolved
+## 8. Open items — both resolved 2026-09-28, by explicit Lead/user decision
 
 1. **Human spot-check** (rubric §8, spec `b`) — requires an actual person,
-   explicitly not the Lead and not an agent. **The user was asked
-   directly and declined it**, choosing to record it as a known
-   limitation rather than have it done. This does **not** invalidate the
+   explicitly not the Lead and not an agent. **Decision (2026-09-28,
+   user, relayed by Lead): declined.** This is a permanent known gap, not
+   a pending item — the user was asked directly whether they could
+   spot-check the case-1 blinded packet and chose not to. Recorded here
+   as such, not silently dropped. This does **not** invalidate the
    scorer's own marks in §6 — only the independent second-rater
    cross-check that would have validated the scorer's PRESENT/ABSENT/
    CONSISTENT/CONTRADICTS judgment against a human's own reading is
-   missing. `unblinding-key.md` was committed only after this was
-   resolved (every scorer mark was already in; the human-spot-check
-   requirement was explicitly waived, not silently skipped) — see
-   commit citing this report.
-2. **Standalone session completion** — accepted as partial (see §7
-   disposition above), not pursued further.
+   missing. `unblinding-key.md` was committed only after this decision
+   was made (every scorer mark was already in; the human-spot-check
+   requirement was explicitly waived, not silently skipped).
+2. **Standalone session completion** — **Decision (2026-09-28, Lead):
+   accept as partial.** Do not wait for the `claude` quota reset, do not
+   switch the remaining actors to a different provider mid-run. The 7
+   real ops already dispatched (framing, shaping ×3, critique, assess)
+   across 5 phases/actors discharge this session's own proof purpose —
+   that the new FlowDefinition dispatches correctly through the real
+   production door — without needing synthesis/explanation/close to also
+   complete. See §7 for the full disposition.
 
-Neither item invalidates or blocks the core paired-comparison finding in
-§6, which is complete, scored, and now fully unblinded.
+Both are now closed, permanent dispositions, not open questions. Neither
+one invalidates or blocks the core paired-comparison finding in §6, which
+is complete, scored, and fully unblinded.
 
 ## 9. Gaps filed, not fixed (out of this unit's scope)
 
@@ -237,11 +245,14 @@ Neither item invalidates or blocks the core paired-comparison finding in
 
 ## 10. Verification
 
-- `env -u CLAUDE_CODE_SESSION_ID npm test`: 7945 tests, 0 fail (run
-  earlier in this worktree after the structural changes, before the
-  real-cost batch — see §1; rerun recommended before this unit closes,
-  not yet repeated after the real-run commits since they touch no
-  production code path).
+- `env -u CLAUDE_CODE_SESSION_ID npm test`: **7945 tests, 0 fail, 8 skip,
+  65 todo** — reran fresh in this worktree at commit `1a02b8cbd` (after
+  unblinding, the last commit before this report update), confirming no
+  regression from any of the real-run/scoring-only commits (they touch no
+  production code path). Also run earlier, identically clean, after the
+  structural changes (before the real-cost batch, see §1) and again after
+  the scoring commit (`9c411dc16`) — three clean runs total across this
+  unit's lifecycle, all 7945/0 fail.
 - Real dispatch count this worktree: 29 real LLM-backed operations across
   canary + 2×(full-reuse + withheld) + 1 new full session (with 1 real
   infra retry) + 1 new-case withheld probe + partial standalone session +
