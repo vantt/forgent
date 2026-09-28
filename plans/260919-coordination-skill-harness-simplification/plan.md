@@ -2771,6 +2771,11 @@ decomposition review's L4 finding flagged as unowned are now resolved:
     pending I29) are named here as known, non-blocking, and left for I29 or
     a later pass -- not re-litigated every round.
 - unit: I29 — convert `fgos-plan-loop`/`fgos-code-panel` into deprecated stubs (Phase 6 stub half)
+  status: MERGED (2026-09-28). integratedSha 4fc1756e88d56c8a6b87d41b6c96d273d69306c0,
+    testedSha 8eff54d0f (unit/I29 tip), clean --no-ff auto-merge (ort), no
+    conflicts. Key suites rerun on merged tree: 156/156 pass. Phase 6 is now
+    fully closed (I28 + I29 both merged). See
+    plans/260919-coordination-skill-harness-simplification/reports/unit-I29-claude-only-execution-report.md.
   capability: code:implement
   depends-on: I28 (HARD technical dependency, not just safety ordering —
     see the H3 fix below: I29's own tests cannot pass unless I28 carried
