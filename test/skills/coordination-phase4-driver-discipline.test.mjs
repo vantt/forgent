@@ -56,6 +56,11 @@ const FGOS_ARCH_PANEL_CANONICAL = path.join(REPO_ROOT, 'core/skills/fgos-archite
 const FGOS_ARCH_PANEL_AGENTS = path.join(REPO_ROOT, '.agents/skills/fgos-architecture-panel/SKILL.md');
 const FGOS_ARCH_PANEL_PLUGIN = path.join(REPO_ROOT, 'plugins/fgOS/skills/fgos-architecture-panel/SKILL.md');
 
+// Phase 6 (Unit I28) consumer of the driver-discipline fragment
+const CODE_CHANGE_CANONICAL = path.join(REPO_ROOT, 'domains/coding/skills/fgos-code-change/SKILL.md');
+const CODE_CHANGE_AGENTS = path.join(REPO_ROOT, '.agents/skills/fgos-code-change/SKILL.md');
+const CODE_CHANGE_PLUGIN = path.join(REPO_ROOT, 'plugins/fgOS/skills/fgos-code-change/SKILL.md');
+
 // Pinned at Unit I26 integration: the fragment is read-only reference for this unit
 // (shared with fgos-plan-loop, Phase 4) and must never be edited by a consuming facade.
 const DRIVER_FRAGMENT_DIGEST = 'bad06e2d4af364298c0c31beaf44fc93d7e52195d79d4049d611558c434fc16a';
@@ -168,8 +173,16 @@ test('Phase 4: plan-loop skill is within word budget (target 800-1200 words, <= 
   );
 
   // Combined Lead load (SKILL.md + coordination-driver.md + coding-cell-policy.md) per plan.md Phase 4 Exit (Option C):
-  // 2. Combined load must be <= 3,300 words.
-  // 3. Combined load will be re-measured after Phase 5 once architecture-panel and panel also consume the driver fragment.
+  // 2. Combined load must be bounded (see Phase 6 (Unit I28) note below for the current accepted ceiling).
+  // 3. Combined load was re-measured after Phase 5 (architecture-panel/panel joined) and again after
+  //    Phase 6 (Unit I28): coding-cell-policy.md gained a real delta (Test-Selection Block/FULL_TRIGGERS,
+  //    full-suite reuse-by-proof-key, reviewer/red-team inspect-by-default, post-merge verification) that
+  //    fgos-code-change's own merged single-cell/plan-mode lifecycle now depends on -- this is a facade
+  //    covering two merged lifecycles' worth of real safety policy, not the same shape plan-loop alone was
+  //    when 3,300 was first set. Lead measured the real new combined count (3,597 words) before deciding,
+  //    per plan.md's own Unit I28 word-budget decision, and accepts 3,597 as the new ceiling rather than
+  //    silently blowing through 3,300 or guessing a number in advance.
+  const COMBINED_LEAD_LOAD_CEILING = 3597;
   const driverContent = fs.readFileSync(DRIVER_FRAGMENT, 'utf8');
   const policyContent = fs.readFileSync(CODING_POLICY_FRAGMENT, 'utf8');
   const driverWords = countWords(driverContent);
@@ -177,8 +190,8 @@ test('Phase 4: plan-loop skill is within word budget (target 800-1200 words, <= 
   const combinedWords = planLoopWords + driverWords + policyWords;
 
   assert.ok(
-    combinedWords <= 3300,
-    `combined Lead load must be bounded (<= 3300 words per plan.md Phase 4 Exit Option C), got ${combinedWords} words (${planLoopWords} facade + ${driverWords} driver + ${policyWords} policy)`,
+    combinedWords <= COMBINED_LEAD_LOAD_CEILING,
+    `combined Lead load must be bounded (<= ${COMBINED_LEAD_LOAD_CEILING} words per plan.md Unit I28 word-budget decision), got ${combinedWords} words (${planLoopWords} facade + ${driverWords} driver + ${policyWords} policy)`,
   );
 });
 
@@ -345,6 +358,13 @@ test('Phase 4: generated skill projections are byte-identical to canonical sourc
   const fgosArchPanelPlugin = fs.readFileSync(FGOS_ARCH_PANEL_PLUGIN);
   assert.ok(fgosArchPanelCanonical.equals(fgosArchPanelAgents), '.agents/skills/fgos-architecture-panel/SKILL.md must match canonical');
   assert.ok(fgosArchPanelCanonical.equals(fgosArchPanelPlugin), 'plugins/fgOS/skills/fgos-architecture-panel/SKILL.md must match canonical');
+
+  // Phase 6 (Unit I28): fgos-code-change mirrors
+  const codeChangeCanonical = fs.readFileSync(CODE_CHANGE_CANONICAL);
+  const codeChangeAgents = fs.readFileSync(CODE_CHANGE_AGENTS);
+  const codeChangePlugin = fs.readFileSync(CODE_CHANGE_PLUGIN);
+  assert.ok(codeChangeCanonical.equals(codeChangeAgents), '.agents/skills/fgos-code-change/SKILL.md must match canonical');
+  assert.ok(codeChangeCanonical.equals(codeChangePlugin), 'plugins/fgOS/skills/fgos-code-change/SKILL.md must match canonical');
 });
 
 // -----------------------------------------------------------------------------
@@ -407,6 +427,66 @@ test('Phase 5 (I26): fgos-panel and fgos-architecture-panel link the driver-disc
       `${name}/SKILL.md's Facade Hook Values table rows must equal exactly the 9 required hook slots (no missing, no duplicate, no extra)`,
     );
   }
+});
+
+// -----------------------------------------------------------------------------
+// 11. Phase 6 (Unit I28): fgos-code-change consumes the driver-discipline
+//     fragment unchanged instead of restating its rules.
+// -----------------------------------------------------------------------------
+
+test('Phase 6 (I28): fgos-code-change links the driver-discipline fragment unchanged and declares a 9-slot hook table', () => {
+  const requiredHooks = [
+    'unit of iteration',
+    'open inputs',
+    'evidence verification',
+    'disposition criteria',
+    'adaptation bounds',
+    'human-escalation triggers',
+    'close criteria',
+    'after-close action',
+    'continuity artifact',
+  ];
+
+  // The fragment itself must remain byte-unchanged (digest-pinned): this unit
+  // is a consumer, never an editor, of core/skills/_shared/coordination-driver.md.
+  const fragmentDigest = crypto.createHash('sha256').update(fs.readFileSync(DRIVER_FRAGMENT)).digest('hex');
+  assert.equal(
+    fragmentDigest,
+    DRIVER_FRAGMENT_DIGEST,
+    'core/skills/_shared/coordination-driver.md must remain byte-unchanged (digest-pinned) -- it is shared, read-only reference for this unit',
+  );
+
+  const content = fs.readFileSync(CODE_CHANGE_CANONICAL, 'utf8');
+
+  assert.ok(
+    content.includes('](../_shared/coordination-driver.md)'),
+    'fgos-code-change/SKILL.md must link ../_shared/coordination-driver.md',
+  );
+  assert.ok(
+    content.includes('](../_shared/coding-cell-policy.md)'),
+    'fgos-code-change/SKILL.md must link ../_shared/coding-cell-policy.md',
+  );
+
+  const tableMatch = content.match(/## Facade Hook Values[^\n]*\n\n\|[^\n]*\n\|[-|\s]+\n((?:\|.*\n?)+)/);
+  assert.ok(tableMatch, 'fgos-code-change/SKILL.md must declare a "Facade Hook Values" table');
+  const tableBody = tableMatch[1];
+
+  const rowNames = tableBody
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line.startsWith('|') && line.length > 1)
+    .map((row) => row.split('|')[1].trim().replace(/^`|`$/g, ''));
+
+  assert.equal(
+    new Set(rowNames).size,
+    rowNames.length,
+    'fgos-code-change/SKILL.md\'s Facade Hook Values table must not declare a duplicate hook-slot row',
+  );
+  assert.deepEqual(
+    [...rowNames].sort(),
+    [...requiredHooks].sort(),
+    'fgos-code-change/SKILL.md\'s Facade Hook Values table rows must equal exactly the 9 required hook slots (no missing, no duplicate, no extra)',
+  );
 });
 
 // -----------------------------------------------------------------------------

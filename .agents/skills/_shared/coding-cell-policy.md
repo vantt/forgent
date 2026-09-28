@@ -35,6 +35,31 @@ Every coding cell must declare and satisfy a definite proof tier:
 | **Tier 2: Affected** | Subsystem and integration tests covering the blast radius of callers, dependents, and contracts. | Required when changing shared utilities, exported APIs, or core dispatch/coordination interfaces. |
 | **Tier 3: Full-Suite Gate** | The full repository test suite (`npm test`). | Required when touching platform foundation invariants, isolation-breaking paths, or when independent review escalates a proof gap to full. |
 
+### Test-Selection Block
+
+Declare once per cell and inline the real command into every produce/revise/recheck objective (a dispatched worker sees only its own objective, never a driver's private notes):
+
+```text
+FOCUSED_TESTS: <command(s) for the changed module/symbol/behavior>
+AFFECTED_TESTS: <command(s) covering the blast radius, or "same-as-focused">
+FULL_TEST: <the project's whole test command>
+DECISION: focused: <cmd>; affected: <cmd|same-as-focused>; full: <deferred-to-final-gate|triggered (<category>)|required (<reason>)>
+```
+
+**`FULL_TRIGGERS` (mechanical, fire regardless of the declared tier):** dispatch/self-host hooks; session/replay/schema core; shared invariants; migrations; test-harness foundations; package manifest/install/release-boundary scripts.
+
+**Full suite runs once per `(tree, environment)` state, never mechanically per round.** Reuse a proof result under this key instead of re-running:
+
+```text
+proof key = (command, git rev-parse <ref>^{tree}, environment fingerprint)
+```
+
+Record the fingerprint (toolchain/lockfile/prerequisite versions) alongside the key -- two runs on an identical tree with no recorded fingerprint for either cannot be compared, so reuse is never claimed without one.
+
+### Reviewer/Red-Team Inspect Proof by Default
+
+Reviewer and red-team default to inspecting the recorded proof (command, tree hash, fingerprint), never re-running it, unless: the proof is stale (tree hash or fingerprint changed since it was recorded), the proof is insufficient (the declared tier does not exercise the changed contract), or a specific counterexample needs fresh output to demonstrate. An insufficient tier is a finding naming the gap -- reviewer/red-team judge sufficiency, they never self-escalate to a wider tier themselves.
+
 ---
 
 ## 3. Independent Verification of Doer Commit and Tests
@@ -75,6 +100,8 @@ Every merged coding cell produces two distinct commit identities:
 
 ### Non-Inference Rule
 
-If `testedSha !== integratedSha`, proof passed on the worktree cannot be inferred to hold on the target branch:
-- The gate proof must be re-executed against `integratedSha` before certifying completion.
-- **Tree-Identity Exception:** If and only if `git diff <testedSha> <integratedSha> -- .` is completely empty (no tracked content changes) **and** the environment fingerprint (toolchain, lockfile, built prerequisites) is identical, the driver may record `treeIdentical: true` and certify completion from the pre-merge run. Otherwise, a real re-run on `integratedSha` is mandatory.
+If `testedSha !== integratedSha`, proof passed on the worktree cannot be inferred to hold on the target branch. **Tree-Identity Exception:** If and only if `git diff <testedSha> <integratedSha> -- .` is completely empty (no tracked content changes) **and** the environment fingerprint (toolchain, lockfile, built prerequisites) is identical, the driver may record `treeIdentical: true` and certify completion from the pre-merge run. Otherwise: re-run `AFFECTED_TESTS` against `integratedSha` at minimum, escalating to `FULL_TEST` when a `FULL_TRIGGERS` category fired against the merged diff (`git diff <preMergeBase> <integratedSha>`, not just the cell's own diff -- a moved target branch can trigger it too).
+
+### Post-Merge Verification (required before cleanup)
+
+Record the outcome of the check above as an ordinary, tracked `--allow-empty` commit naming `testedSha`, `integratedSha`, and the result -- never a `git note` (`refs/notes/*` is outside the default commit graph and does not push/fetch by default, so it is not durable at the project level). Immediately before removing the worktree or branch, re-assert `HEAD` still equals that commit: another writer could have advanced the target branch in the meantime.
