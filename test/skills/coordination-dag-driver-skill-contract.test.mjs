@@ -1,8 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { chainCoordinationUseCase } from '../../src/verbs/coordination/chain.mjs';
 
 // Phase 06 driver-contract: the mechanical coordination suite never reads
 // SKILL.md, so it cannot prove this phase's actual diff. This file is the
@@ -123,4 +125,51 @@ test('canonical fgos-code-change plan-mode reference names track-level cell sele
   assert.match(planMode, /merged cell with stale session evidence/);
   assert.match(planMode, /completed track/);
   assert.match(planMode, /track-closeout\.md/);
+});
+
+test('canonical fgos-code-change two-request DAG mode names the inspect--<coordinationId> auxiliary pattern, never a <coordinationId>-suffix', () => {
+  const text = readSkill(CODE_CHANGE_SKILL);
+  const dagSection = markdownSection(text, '### Optional: Concurrent Read-Only Fan-Out (Two-Request DAG Mode)');
+  assert.match(dagSection, /"coordinationId":\s*"inspect--<coordinationId>"/, 'the JSON template\'s own coordinationId value must use the non-prefix-colliding auxiliary id shape');
+  assert.doesNotMatch(dagSection, /"coordinationId":\s*"<coordinationId>-inspections"/, 'the JSON template must not use the old suffix shape, which collides with chain.mjs\'s <track>-- prefix match');
+});
+
+// Regression (tsk item from fix-round-1): a plan-mode coordinationId is
+// `<track>--<cell-id>`. An auxiliary two-request-DAG session id that merely
+// appended a suffix (`<coordinationId>-inspections`) still started with the
+// literal `<track>--` prefix `src/verbs/coordination/chain.mjs` uses for
+// track-membership matching, so it was silently grouped as a fake extra cell
+// of the track. Prove the renamed `inspect--<coordinationId>` shape is never
+// grouped, against the REAL chain.mjs (not a re-derived predicate).
+test('an inspect--<coordinationId> auxiliary session id is never grouped by fgos coordination chain <track>', () => {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-code-change-chain-prefix-test-'));
+  const sessionsDir = path.join(tempDir, '.fgos', 'coordination', 'sessions');
+  fs.mkdirSync(sessionsDir, { recursive: true });
+
+  const track = 'code-change-facade-track';
+  const realCellSessionId = `${track}--cell-01`;
+  const auxiliarySessionId = `inspect--${realCellSessionId}`;
+  // The old, rejected shape -- kept here only to prove the bug this rename
+  // fixes actually reproduces without it, not as a recommended pattern.
+  const oldBuggySessionId = `${realCellSessionId}-inspections`;
+
+  for (const id of [realCellSessionId, auxiliarySessionId, oldBuggySessionId]) {
+    fs.mkdirSync(path.join(sessionsDir, id), { recursive: true });
+  }
+
+  const ctx = { cwd: tempDir, repoRoot: tempDir };
+  const result = chainCoordinationUseCase(ctx, { track });
+  const sessionIds = result.cells.map((cell) => cell.sessionId);
+
+  assert.ok(sessionIds.includes(realCellSessionId), 'the real cell must still be grouped');
+  assert.ok(
+    !sessionIds.includes(auxiliarySessionId),
+    'the renamed inspect--<coordinationId> auxiliary id must never be grouped as a track member',
+  );
+  assert.ok(
+    sessionIds.includes(oldBuggySessionId),
+    'sanity check: the old <coordinationId>-inspections shape DOES reproduce the bug (confirms the rename is load-bearing, not cosmetic)',
+  );
+
+  fs.rmSync(tempDir, { recursive: true, force: true });
 });

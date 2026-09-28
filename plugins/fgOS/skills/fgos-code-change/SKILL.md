@@ -27,7 +27,7 @@ This facade builds directly on two shared doctrine layers:
 - **Coding-Cell Policy:** [`../_shared/coding-cell-policy.md`](../_shared/coding-cell-policy.md) defines isolated worktree execution, proof tiers, the Test-Selection Block, independent verification, post-merge verification, and tested/integrated identity.
 *(Link convention: fragment paths resolve to canonical source trees in core/domains and project to sibling `_shared/` in `.agents/` and `plugins/fgOS/`.)*
 
-All protocol execution lowers into the registered [`standalone-master-coordination-loop`](../../../../core/coordination-protocols/standalone-master-coordination-loop.yaml) FlowDefinition (`doer -> reviewer/red-team -> fixer -> rechecks`). Every operation there already declares its own `policy.capability` (`code:implement` for doer/fixer, `code:review` for reviewer/red-team) -- per-node executor binding resolves from that automatically (Unit I21); this facade supplies no default roster. A hand roster (`--executor <id>`/`--tier <tier>` on a later step; only `start` accepts `--actors`) is an explicit override, and its rationale is recorded in the dispatch objective.
+All protocol execution lowers into the registered `core/coordination-protocols/standalone-master-coordination-loop.yaml` FlowDefinition (`doer -> reviewer/red-team -> fixer -> rechecks`; cited as a repo-root-anchored path, not a relative markdown link -- a domain skill's mirrors sit at a different depth from its canonical `domains/<domain>/skills/` source, the same convention `fgos-code-panel` already uses for this identical reference). Every operation there already declares its own `policy.capability` (`code:implement` for doer/fixer, `code:review` for reviewer/red-team) -- per-node executor binding resolves from that automatically (Unit I21); this facade supplies no default roster. A hand roster (`--executor <id>`/`--tier <tier>` on a later step; only `start` accepts `--actors`) is an explicit override, and its rationale is recorded in the dispatch objective.
 
 ---
 
@@ -41,7 +41,7 @@ All protocol execution lowers into the registered [`standalone-master-coordinati
 
 ## Mode Selection
 
-One rule, replacing every former named sub-rule (`fgos-code-panel`'s M1/A1/A2/CE1-5): **plan mode only when an imperative run/resume/execute/implement verb targets a plan/phase path (`plans/**/plan.md`, `plans/**/phase-NN-*.md`) or a uniquely resolvable track name; otherwise single-cell mode.** A question, conditional, past-tense description, or an unresolved negation directed at a plan/track is never guessed -- ask one clarifying question. A plan/phase path cited only as an edit target, context, or in passing (never as the verb's own object) stays single-cell mode.
+One rule, replacing every former named sub-rule (`fgos-code-panel`'s M1/A1/A2/CE1-5): **plan mode only when an imperative run/resume/execute/implement verb targets a plan/phase path (`plans/**/plan.md`, `plans/**/phase-NN-*.md`) or a uniquely resolvable track name, or the entire request is nothing but a bare plan/phase path with no other text (M1's carried-forward exception -- a bare path alone is an implicit "execute this," no verb required); otherwise single-cell mode.** A question, conditional, or past-tense description directed at a plan/track is never guessed -- ask one clarifying question. A negation directed at a plan/track is only resolved when it names an explicit, itself-non-negated alternate target; a negated alternate too (e.g. "don't run plan.md, and don't fix src/bar.mjs either") is a second unresolved negation, never silently resolved -- ask one clarifying question there as well. A plan/phase path cited only as an edit target, context, or in passing (never as the verb's own object) stays single-cell mode.
 
 **Recursive-dispatch guard (R2, survives unchanged):** when invoked from inside an already-active cell dispatch (`options.inPlanLoop`, a `coordinationId`/`workRef` matching the `<track>--<cell-id>` shape, or an active worktree branch matching that shape), never re-enter plan mode or open a nested track -- route to single-cell mode for cell-internal work, or refuse recursion outright if asked to open an inner track.
 
@@ -73,12 +73,12 @@ The heuristic above is a first guess only. Step 0 below confirms it against the 
 
 **Known projection gaps (accepted, not silently hidden):** `dag.counts.deferred` never assigns `schedulerOutcome: 'deferred'` in a cold reconstruction (only `settled`/`recheck-required`/`refused`/`blocked`/`pending`/`materialized`) -- a live DAG run can defer a node; a cold `show` still reports `0`. `chain`'s `nextAction` can say "all N node(s) settled" while a node with `schedulerOutcome: 'materialized'` (no pending/blocked/caveated status) means work is still running -- inspect per-node `schedulerOutcome` before treating either as a close signal.
 
-**Plan mode gate:** resolve the target phase file, then run `fgos plan-lint <phase file> --cell <id> --json`. Refuse to open on `ok: false` -- report every `severity: "hard"` finding and stop (a `severity: "warn"` finding alone does not block). Then load [`references/plan-mode.md`](references/plan-mode.md) for track-level cell selection, cold-resume classification across a track's cells, the cell-status table, and closeout.
+**Plan mode gate:** resolve the track's `plan.md` (never the phase file -- `fgos plan-lint` only understands `plan.md`'s own `- unit: ... / capability:` blocks and `## Product Gates` table, per `src/report/capability-plan-lint.mjs`), then run `fgos plan-lint plans/<track>/plan.md --cell <id> --json`. Refuse to open on `ok: false` -- report every `severity: "hard"` finding and stop. Also refuse when any finding carries `code: "capability.undeclared"`, even though it is `severity: "warn"` and `ok` alone can still read `true`: that code means `--cell <id>` matched no unit block or Product Gates row at all, never a genuine clean pass. Any other `severity: "warn"` finding alone does not block. Then load [`references/plan-mode.md`](references/plan-mode.md) for track-level cell selection, cold-resume classification across a track's cells, the cell-status table, and closeout.
 
 **Single-cell mode gate:** declare `DemandFacts` (`../_shared/capability-matching.md`) and run `fgos capability match --demand '<json>'`.
 - `form: "inline"` -- no cell opens; the request returns to the live session. This facade must never capture work the match sends back inline.
-- `form: "facade"` -- the request was actually plan/track-scoped and got misclassified as single-change; re-route to the plan-mode gate above, never force-open a single cell.
-- `form: "protocol"` -- proceed to Step 1.
+- `form: "facade"` -- the request was actually plan/track-scoped and got misclassified as single-change. Check the R2 recursive-dispatch guard above FIRST: if this gate is itself running inside an already-active cell dispatch, refuse the recursion outright -- never re-route to plan mode from inside R2. Outside R2, re-route to the plan-mode gate above; never force-open a single cell.
+- `form: "protocol"` -- proceed only when the resolved `capability` is `code:implement` or `code:refactor` (this facade's own mutating-coding capabilities). Any other resolved capability (e.g. `code:review`/`code:debug`/`code:test`) is advisory or non-mutating and must never be captured into a cell -- return the result to the live session unopened. When the capability check passes, proceed to Step 1.
 
 ---
 
@@ -118,11 +118,11 @@ The heuristic above is a first guess only. Step 0 below confirms it against the 
 The legacy template above stays the default path, since DAG mode admits read-only steps only and cannot contain the mutating `produce` step. When a concurrent read-only fan-out is wanted (e.g. two independent inspections) *after* the mutating work has already landed, use a **second, separate request**:
 
 1. **Request 1:** The exact template above, containing the mutating step. Let it settle.
-2. **Request 2:** A separate `dag: true` request with a **NEW** `coordinationId` (e.g. `<coordinationId>-inspections`), read-only steps only. `contextRefs` cannot cross sessions, so each step's objective names the exact commit SHA and worktree path directly (never a moving branch name):
+2. **Request 2:** A separate `dag: true` request with a **NEW** `coordinationId` that must NOT start with the literal `<track>--` prefix (e.g. `inspect--<coordinationId>`, never `<coordinationId>-inspections`) -- `fgos coordination chain <track>` (`src/verbs/coordination/chain.mjs`) groups any session id starting with that exact prefix as a member of `<track>`, so a plan-mode `coordinationId` of `<track>--<cell-id>` would get its own auxiliary inspection session silently misfiled as a fake extra cell of the track if the auxiliary id merely appended a suffix. `contextRefs` cannot cross sessions, so each step's objective names the exact commit SHA and worktree path directly (never a moving branch name):
    ```json
    {
      "kind": "declared-protocol", "dag": true,
-     "coordinationId": "<coordinationId>-inspections",
+     "coordinationId": "inspect--<coordinationId>",
      "protocolRef": { "id": "core.coordination-protocol.standalone-master-coordination-loop" },
      "steps": [
        { "type": "operation", "as": "review", "operationId": "review-candidate", "targetActorId": "reviewer",
@@ -178,12 +178,7 @@ fgos coordination authorize-and-dispatch \
    ```sh
    fgos coordination close --id "<coordinationId>" --action-key "<actionKey>" --writer-id "<driver-id>"
    ```
-4. **Post-Close Integration:** outside the session, merge into the target branch, run post-merge verification, and clean up -- the full sequence, including the `--allow-empty` record commit and pre-cleanup `HEAD` re-assertion, is coding-cell policy §5:
-   ```sh
-   git merge --no-ff <coordinationId>
-   git worktree remove "$wt"
-   ```
-   Plan mode additionally appends a row to `plan.md`'s cell-status table (`references/plan-mode.md`).
+4. **Post-Close Integration:** outside the session, the full sequence -- merge `--no-ff` into the target branch, the mandatory `--allow-empty` record commit naming `testedSha`/`integratedSha`, the pre-cleanup `HEAD` re-assertion, then worktree removal -- is owned entirely by coding-cell policy §4/§5; this facade does not restate or abbreviate it. Plan mode additionally appends a row to `plan.md`'s cell-status table (`references/plan-mode.md`).
 
 ---
 

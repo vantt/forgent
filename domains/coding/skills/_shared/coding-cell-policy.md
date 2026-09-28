@@ -100,9 +100,7 @@ Every merged coding cell produces two distinct commit identities:
 
 ### Non-Inference Rule
 
-If `testedSha !== integratedSha`, proof passed on the worktree cannot be inferred to hold on the target branch:
-- The gate proof must be re-executed against `integratedSha` before certifying completion.
-- **Tree-Identity Exception:** If and only if `git diff <testedSha> <integratedSha> -- .` is completely empty (no tracked content changes) **and** the environment fingerprint (toolchain, lockfile, built prerequisites) is identical, the driver may record `treeIdentical: true` and certify completion from the pre-merge run. Otherwise: re-run `AFFECTED_TESTS` against `integratedSha` at minimum, escalating to `FULL_TEST` when a `FULL_TRIGGERS` category fired against the merged diff (`git diff <preMergeBase> <integratedSha>`, not just the cell's own diff -- a moved target branch can trigger it too).
+If `testedSha !== integratedSha`, proof passed on the worktree cannot be inferred to hold on the target branch. **Tree-Identity Exception:** If and only if `git diff <testedSha> <integratedSha> -- .` is completely empty (no tracked content changes) **and** the environment fingerprint (toolchain, lockfile, built prerequisites) is identical, the driver may record `treeIdentical: true` and certify completion from the pre-merge run. Otherwise: re-run `AFFECTED_TESTS` against `integratedSha` at minimum, escalating to `FULL_TEST` when a `FULL_TRIGGERS` category fired against the merged diff (`git diff <preMergeBase> <integratedSha>`, not just the cell's own diff -- a moved target branch can trigger it too).
 
 ### Post-Merge Verification (required before cleanup)
 
