@@ -3111,9 +3111,19 @@ finds real flaws" pattern this track has now hit on every multi-unit
 decomposition (I22-I26, I27, I28-I29, and now I30-I35).
 
 - unit: I30 — data-level contract version on `show`/`chain`; port BOTH missing PolicyPatch fields into the canonical FlowDefinition contract doc (Phase 7 items 1, 4b)
+  status: MERGED (2026-09-28). integratedSha 638cf13320d26883ea053b4cbdb0e19d1b06ecf3,
+    testedSha 51ce544f2 (unit/I30 tip, amended once to add I32's ported
+    clarification sentence), clean --no-ff auto-merge (ort), no conflicts.
+    Key suites rerun on merged tree: 68/68 pass. Minted new sibling contract
+    versions (`coordination-show.v1`, `coordination-chain.v1`) rather than
+    reusing `coordination-actions.v1` -- `status`'s own field untouched.
+    Incidental finding, deliberately out of scope, not silently dropped:
+    `preferInvocation`/`repeatMode` PolicyPatch fields are undocumented in
+    BOTH the canonical and legacy contract docs -- flagged as a follow-up
+    candidate. See
+    plans/260919-coordination-skill-harness-simplification/reports/unit-I30-claude-only-execution-report.md.
   capability: code:implement
   depends-on: none (Phase 7 entry: Phase 5/6 both merged, I27 merged)
-  status: not-started
   decision (Lead, 2026-09-28, corrects review H2/M1): item 1 is ALREADY
     mostly done, confirmed live: every CLI `--json` output is wrapped in
     `{"contract":"fgos.v1",...}` (`src/state/envelope.mjs:6`), and `fgos
