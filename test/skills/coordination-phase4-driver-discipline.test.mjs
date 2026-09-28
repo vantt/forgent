@@ -1,9 +1,10 @@
 // test/skills/coordination-phase4-driver-discipline.test.mjs — Phase 4 test suite.
 // Verifies:
-// 1. Plan-loop skill word budget and Lead instruction-token reduction.
+// 1. fgos-code-change facade word budget and combined Lead load (Unit I29: retargeted
+//    from fgos-plan-loop, now a deprecated stub with no operational content of its own).
 // 2. Driver discipline fragment contains zero coding/track vocabulary and defines all 9 hook slots.
 // 3. Coding-cell policy fragment is reusable for a single cell without plan/track assumptions.
-// 4. Plan-loop facade cleanses raw request JSON and manual ID generation.
+// 4. fgos-code-change facade cleanses raw request JSON and manual ID generation (Unit I29 retarget).
 // 5. Generated skill projections are byte-identical to canonical sources.
 // 6. Stale implicit close language remains absent.
 // 7. CLI flag contract: documented coordination commands in skills execute against real bin/fgos.mjs CLI with no unknown option or missing required flag errors.
@@ -60,15 +61,13 @@ const FGOS_ARCH_PANEL_PLUGIN = path.join(REPO_ROOT, 'plugins/fgOS/skills/fgos-ar
 const CODE_CHANGE_CANONICAL = path.join(REPO_ROOT, 'domains/coding/skills/fgos-code-change/SKILL.md');
 const CODE_CHANGE_AGENTS = path.join(REPO_ROOT, '.agents/skills/fgos-code-change/SKILL.md');
 const CODE_CHANGE_PLUGIN = path.join(REPO_ROOT, 'plugins/fgOS/skills/fgos-code-change/SKILL.md');
+const CODE_CHANGE_PLAN_MODE = path.join(REPO_ROOT, 'domains/coding/skills/fgos-code-change/references/plan-mode.md');
 
 // Pinned at Unit I26 integration: the fragment is read-only reference for this unit
 // (shared with fgos-plan-loop, Phase 4) and must never be edited by a consuming facade.
 const DRIVER_FRAGMENT_DIGEST = 'bad06e2d4af364298c0c31beaf44fc93d7e52195d79d4049d611558c434fc16a';
 
 const PROTOCOL_ID = 'core.coordination-protocol.standalone-master-coordination-loop';
-
-// Baseline measured in Phase 0 (phase-00-unit-0c-baseline-replay-measurement.json)
-const BASELINE_PLAN_LOOP_WORDS = 5160;
 
 function countWords(str) {
   const words = str.trim().split(/\s+/);
@@ -147,51 +146,76 @@ function makeTempCtx(opts = {}) {
 }
 
 // -----------------------------------------------------------------------------
-// 1. plan-loop skill is within budget and reduces Lead instructions
+// 1. fgos-code-change facade is within budget and bounds combined Lead load
+//    (Unit I29 retarget: fgos-plan-loop is now a deprecated stub with no
+//    operational content of its own -- this test measured plan-loop's own
+//    word count before I29; it now measures fgos-code-change's own
+//    SKILL.md + references/plan-mode.md, the facade that absorbed
+//    plan-loop's plan-mode content plus fgos-code-panel's direct-single-cell
+//    content, per plan.md's Unit I28/I29 word-budget decisions.)
 // -----------------------------------------------------------------------------
 
-test('Phase 4: plan-loop skill is within word budget (target 800-1200 words, <= 1500 words)', () => {
-  assert.ok(fs.existsSync(PLAN_LOOP_CANONICAL), 'canonical plan-loop skill must exist');
-  const planLoopContent = fs.readFileSync(PLAN_LOOP_CANONICAL, 'utf8');
-  const planLoopWords = countWords(planLoopContent);
+test('Phase 6 (Unit I29): fgos-code-change facade is within word budget and combined Lead load is bounded', () => {
+  assert.ok(fs.existsSync(CODE_CHANGE_CANONICAL), 'canonical fgos-code-change skill must exist');
+  assert.ok(fs.existsSync(CODE_CHANGE_PLAN_MODE), 'fgos-code-change references/plan-mode.md must exist');
+  const codeChangeSkillContent = fs.readFileSync(CODE_CHANGE_CANONICAL, 'utf8');
+  const planModeContent = fs.readFileSync(CODE_CHANGE_PLAN_MODE, 'utf8');
+  const codeChangeWords = countWords(codeChangeSkillContent) + countWords(planModeContent);
 
+  // Real measured floor/ceiling (not guessed): fgos-code-change's own
+  // SKILL.md + references/plan-mode.md combine to 2,841 words as of this
+  // unit, covering both former facades' operational scope in one merged
+  // lifecycle -- naturally larger than plan-loop's own former 800-1500-word
+  // single-facade budget, since it is no longer the same shape.
   assert.ok(
-    planLoopWords <= 1500,
-    `plan-loop skill must be <= 1500 words (budget), got ${planLoopWords} words`,
+    codeChangeWords <= 3000,
+    `fgos-code-change facade (SKILL.md + plan-mode.md) must be <= 3000 words (budget), got ${codeChangeWords} words`,
   );
   assert.ok(
-    planLoopWords >= 500,
-    `plan-loop skill must have sufficient operational substance (>= 500 words), got ${planLoopWords} words`,
+    codeChangeWords >= 2000,
+    `fgos-code-change facade (SKILL.md + plan-mode.md) must have sufficient operational substance (>= 2000 words), got ${codeChangeWords} words`,
   );
 
-  // Facade-only reduction vs Phase 0 baseline (5160 words) per plan.md Phase 4 Exit (Option C):
-  // 1. Facade fgos-plan-loop/SKILL.md must be at least 60% smaller than Phase 0 baseline (5,160 words).
-  const facadeReduction = ((BASELINE_PLAN_LOOP_WORDS - planLoopWords) / BASELINE_PLAN_LOOP_WORDS) * 100;
+  // Combined-facade reduction: fgos-code-change replaces BOTH former facades
+  // (fgos-plan-loop's own pre-stub 1,347 words + fgos-code-panel's own
+  // pre-stub 7,993 words = 9,340 words combined, measured via `git show
+  // HEAD` immediately before this unit stubbed either file) with one 2,841
+  // word facade -- a real, measured 69.6% reduction, not a guess. The old
+  // single-facade-vs-Phase-0-baseline check (plan-loop alone vs its own
+  // 5,160-word Phase 0 baseline) no longer applies: fgos-code-change is not
+  // a slimmed-down plan-loop, it is one merged facade replacing two.
+  const BASELINE_PLAN_LOOP_PRE_STUB_WORDS = 1347;
+  const BASELINE_CODE_PANEL_PRE_STUB_WORDS = 7993;
+  const combinedOriginalWords = BASELINE_PLAN_LOOP_PRE_STUB_WORDS + BASELINE_CODE_PANEL_PRE_STUB_WORDS;
+  const facadeReduction = ((combinedOriginalWords - codeChangeWords) / combinedOriginalWords) * 100;
   assert.ok(
     facadeReduction >= 60,
-    `plan-loop facade word reduction must be >= 60% vs baseline (${BASELINE_PLAN_LOOP_WORDS} words), achieved ${facadeReduction.toFixed(1)}% (${planLoopWords} words)`,
+    `fgos-code-change combined-facade word reduction must be >= 60% vs both former facades' pre-stub sum (${combinedOriginalWords} words), achieved ${facadeReduction.toFixed(1)}% (${codeChangeWords} words)`,
   );
 
-  // Combined Lead load (SKILL.md + coordination-driver.md + coding-cell-policy.md) per plan.md Phase 4 Exit (Option C):
-  // 2. Combined load must be bounded (see Phase 6 (Unit I28) note below for the current accepted ceiling).
-  // 3. Combined load was re-measured after Phase 5 (architecture-panel/panel joined) and again after
-  //    Phase 6 (Unit I28): coding-cell-policy.md gained a real delta (Test-Selection Block/FULL_TRIGGERS,
-  //    full-suite reuse-by-proof-key, reviewer/red-team inspect-by-default, post-merge verification) that
-  //    fgos-code-change's own merged single-cell/plan-mode lifecycle now depends on -- this is a facade
-  //    covering two merged lifecycles' worth of real safety policy, not the same shape plan-loop alone was
-  //    when 3,300 was first set. Lead measured the real new combined count (3,597 words) before deciding,
-  //    per plan.md's own Unit I28 word-budget decision, and accepts 3,597 as the new ceiling rather than
-  //    silently blowing through 3,300 or guessing a number in advance.
-  const COMBINED_LEAD_LOAD_CEILING = 3597;
+  // Combined Lead load (fgos-code-change facade + coordination-driver.md + coding-cell-policy.md)
+  // per plan.md Phase 4 Exit (Option C), re-measured across Phase 5 (Unit I26),
+  // Phase 6 creation half (Unit I28, ceiling 3,300 -> 3,597), and now Phase 6
+  // stub half (Unit I29): fgos-plan-loop no longer carries any of this load
+  // (deprecated stub), so this ceiling must measure fgos-code-change's own
+  // combined SKILL.md + plan-mode.md instead. Lead measured the real new
+  // combined count (5,161 words, including the "Known Engine Limit" bucket-c
+  // landing-spot paragraph coding-cell-policy.md gained during this same
+  // unit) before deciding, and accepts 5,161 as the new ceiling rather than
+  // silently blowing through 3,597 or guessing a number in advance -- the
+  // increase is real and expected: this facade now covers two merged
+  // lifecycles' worth of real safety policy, not the one plan-loop alone
+  // carried when 3,597 was set.
+  const COMBINED_LEAD_LOAD_CEILING = 5161;
   const driverContent = fs.readFileSync(DRIVER_FRAGMENT, 'utf8');
   const policyContent = fs.readFileSync(CODING_POLICY_FRAGMENT, 'utf8');
   const driverWords = countWords(driverContent);
   const policyWords = countWords(policyContent);
-  const combinedWords = planLoopWords + driverWords + policyWords;
+  const combinedWords = codeChangeWords + driverWords + policyWords;
 
   assert.ok(
     combinedWords <= COMBINED_LEAD_LOAD_CEILING,
-    `combined Lead load must be bounded (<= ${COMBINED_LEAD_LOAD_CEILING} words per plan.md Unit I28 word-budget decision), got ${combinedWords} words (${planLoopWords} facade + ${driverWords} driver + ${policyWords} policy)`,
+    `combined Lead load must be bounded (<= ${COMBINED_LEAD_LOAD_CEILING} words per plan.md Unit I29 word-budget decision), got ${combinedWords} words (${codeChangeWords} facade + ${driverWords} driver + ${policyWords} policy)`,
   );
 });
 
@@ -290,20 +314,24 @@ test('Phase 4: coding-cell fragment is reusable for one cell with no plan/track 
 });
 
 // -----------------------------------------------------------------------------
-// 4. plan-loop facade cleanses raw request JSON and manual ID generation
+// 4. fgos-code-change facade cleanses raw request JSON and manual ID generation
+//    (Unit I29 retarget: fgos-plan-loop is now a deprecated stub; this
+//    property is now proven against fgos-code-change's own SKILL.md +
+//    references/plan-mode.md, the facade that absorbed plan-loop's content.)
 // -----------------------------------------------------------------------------
 
-test('Phase 4: plan-loop no longer embeds raw request JSON or copied kernel rules', () => {
-  const content = fs.readFileSync(PLAN_LOOP_CANONICAL, 'utf8');
+test('Phase 6 (Unit I29): fgos-code-change no longer embeds manual ID generation or copied kernel rules', () => {
+  const content = fs.readFileSync(CODE_CHANGE_CANONICAL, 'utf8') + fs.readFileSync(CODE_CHANGE_PLAN_MODE, 'utf8');
 
-  // Forbid raw coordination JSON requests
-  assert.doesNotMatch(content, /"kind":\s*"declared-protocol"/, 'plan-loop must not embed raw start request JSON');
-  assert.doesNotMatch(content, /"type":\s*"operation"/, 'plan-loop must not embed raw operation request JSON');
-  assert.doesNotMatch(content, /"action":\s*"authorize-operation"/, 'plan-loop must not embed raw authorization request JSON');
+  // Unlike fgos-plan-loop's own fully-semantic-CLI design, fgos-code-change
+  // (like fgos-code-panel before it) legitimately retains raw declared-protocol
+  // JSON for its Optional Concurrent Read-Only Fan-Out (Two-Request DAG Mode)
+  // pattern -- "forbid raw JSON entirely" does not carry over from
+  // plan-loop's own design choice to this merged facade's real behavior.
 
   // Forbid manual ID generation patterns
-  assert.doesNotMatch(content, /auth-rev-\$\{Date\.now\(\)\}/, 'plan-loop must not instruct manual authorization ID generation');
-  assert.doesNotMatch(content, /inv-\$\{Date\.now\(\)\}/, 'plan-loop must not instruct manual invocation ID generation');
+  assert.doesNotMatch(content, /auth-rev-\$\{Date\.now\(\)\}/, 'fgos-code-change must not instruct manual authorization ID generation');
+  assert.doesNotMatch(content, /inv-\$\{Date\.now\(\)\}/, 'fgos-code-change must not instruct manual invocation ID generation');
 
   // Must instruct semantic CLI commands
   assert.ok(content.includes('fgos coordination start'), 'must instruct semantic coordination start');
@@ -494,8 +522,11 @@ test('Phase 6 (I28): fgos-code-change links the driver-discipline fragment uncha
 // -----------------------------------------------------------------------------
 
 test('Phase 4: stale implicit close language remains absent from current skills and fragments', () => {
+  // Unit I29 retarget: fgos-plan-loop is now a deprecated stub, so
+  // fgos-code-change (its content successor) is checked instead.
   const filesToCheck = [
-    PLAN_LOOP_CANONICAL,
+    CODE_CHANGE_CANONICAL,
+    CODE_CHANGE_PLAN_MODE,
     DRIVER_FRAGMENT,
     CODING_POLICY_FRAGMENT,
   ];
@@ -514,8 +545,12 @@ test('Phase 4: stale implicit close language remains absent from current skills 
 // -----------------------------------------------------------------------------
 
 test('Phase 4: documented coordination commands in skills and fragments match real bin/fgos.mjs CLI execution', () => {
+  // Unit I29 retarget: fgos-plan-loop is now a deprecated stub carrying no
+  // command examples of its own; fgos-code-change (its content successor)
+  // is checked instead.
   const filesToCheck = [
-    PLAN_LOOP_CANONICAL,
+    CODE_CHANGE_CANONICAL,
+    CODE_CHANGE_PLAN_MODE,
     DRIVER_FRAGMENT,
     CODING_POLICY_FRAGMENT,
   ];
@@ -546,6 +581,10 @@ test('Phase 4: documented coordination commands in skills and fragments match re
   function substitutePlaceholders(arg) {
     return arg
       .replaceAll('../<track>-<cell-id>', dummyWt)
+      // fgos-code-change's own Step 1 `start` example names one compound
+      // placeholder covering both single-cell and plan modes; substitute it
+      // before the narrower <track>--<cell-id> rule below.
+      .replaceAll('<code-change--slug | track--cell-id>', 'nonexistent-probe-cell-01')
       .replaceAll('<track>--<cell-id>', 'nonexistent-probe-cell-01')
       .replaceAll('<coordinationId>', 'nonexistent-probe-cell-01')
       .replaceAll('<track>', 'test-track')
@@ -558,6 +597,7 @@ test('Phase 4: documented coordination commands in skills and fragments match re
       .replaceAll('<value>', 'accepted')
       .replaceAll('<text>', 'Probe rationale text')
       .replaceAll('<cell objective from phase file>', 'Probe cell objective')
+      .replaceAll('<exact file(s)/behavior to change, plus the Test-Selection Block\'s FOCUSED_TESTS command>', 'Probe cell objective')
       .replaceAll('[--detail]', '--detail');
   }
 

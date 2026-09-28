@@ -397,18 +397,22 @@ test('fgos-code-panel is canonically located in domains/coding/skills and absent
   });
 });
 
-test('fgos-code-panel canonical source has non-vacuous repo-root path references after domain move', () => {
+test('fgos-code-change canonical source has non-vacuous repo-root path references (Unit I29 retarget from stubbed fgos-code-panel)', () => {
   const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
-  const skillPath = path.join(repoRoot, 'domains', 'coding', 'skills', 'fgos-code-panel', 'SKILL.md');
+  const skillPath = path.join(repoRoot, 'domains', 'coding', 'skills', 'fgos-code-change', 'SKILL.md');
   const skillContent = fs.readFileSync(skillPath, 'utf8');
   const repoRootPathPattern = /`((?:core|src|docs)\/[^`]+)`/g;
+  // fgos-code-panel's own justification prose ("why we reuse this engine",
+  // citing session-engine.mjs/schema.mjs/coordination-session.md by
+  // repo-root path) was deliberately dropped in fgos-code-change -- the new
+  // facade delegates worktree/merge mechanics to the coding-cell-policy
+  // fragment by relative link instead of re-citing those paths inline.
+  // This expected set reflects the repo-root paths fgos-code-change's own
+  // body actually cites today (measured, not assumed).
   const expected = new Set([
-    'core/skills/fgos-panel/SKILL.md',
-    'src/runner/coordination/session-engine.mjs',
-    'src/verbs/coordination/schema.mjs',
     'core/coordination-protocols/standalone-master-coordination-loop.yaml',
-    'core/skills/_shared/private-cell-worktree.md',
-    'docs/architect/agent-coordination/contracts/coordination-session.md',
+    'src/report/capability-plan-lint.mjs',
+    'src/verbs/coordination/chain.mjs',
   ]);
   const seen = new Set();
   const missing = [];
@@ -423,10 +427,6 @@ test('fgos-code-panel canonical source has non-vacuous repo-root path references
 
   assert.deepEqual(seen, expected);
   assert.deepEqual(missing, []);
-  assert.ok(skillContent.includes('`core/skills/_shared/private-cell-worktree.md`'));
-  assert.ok(skillContent.includes('`_shared/private-cell-worktree.md`'));
-  assert.ok(fs.existsSync(path.join(repoRoot, '.agents', 'skills', '_shared', 'private-cell-worktree.md')));
-  assert.ok(fs.existsSync(path.join(repoRoot, 'plugins', 'fgOS', 'skills', '_shared', 'private-cell-worktree.md')));
 });
 
 test('active source and projected skill files do not path-link fgos-code-panel after domain move', () => {
@@ -515,6 +515,41 @@ test('fgos-code-change is canonically located in domains/coding/skills and absen
   assert.doesNotThrow(() => {
     assembleSkills(repoRoot, mkTempDir('skill-wrappers-verify-code-change-unique-'));
   });
+});
+
+// ─── Unit I29: fgos-plan-loop / fgos-code-panel deprecated stubs ───
+
+test('fgos-plan-loop and fgos-code-panel are genuinely thin deprecated stubs naming fgos-code-change, with no leftover DemandFacts/trigger phrasing', () => {
+  const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
+  const stubs = [
+    path.join(repoRoot, 'core', 'skills', 'fgos-plan-loop', 'SKILL.md'),
+    path.join(repoRoot, 'domains', 'coding', 'skills', 'fgos-code-panel', 'SKILL.md'),
+  ];
+  // Pre-stub sizes were 1347 (fgos-plan-loop) and 7993 (fgos-code-panel)
+  // words; 200 is a ceiling well under either, not a tight-fit number.
+  const WORD_CEILING = 200;
+  const forbiddenPhrasing = [/DemandFacts/, /outputKind:/, /needsIndependentReview/, /hasPlanOrTrack/];
+
+  for (const stubPath of stubs) {
+    const content = fs.readFileSync(stubPath, 'utf8');
+    const words = content.trim().split(/\s+/).filter(Boolean).length;
+    assert.ok(
+      words < WORD_CEILING,
+      `${path.relative(repoRoot, stubPath)} must be a thin stub (${words} words, ceiling ${WORD_CEILING})`,
+    );
+    assert.match(
+      content,
+      /Deprecated: use fgos-code-change/,
+      `${path.relative(repoRoot, stubPath)} must explicitly name fgos-code-change as the replacement`,
+    );
+    for (const pattern of forbiddenPhrasing) {
+      assert.doesNotMatch(
+        content,
+        pattern,
+        `${path.relative(repoRoot, stubPath)} must not carry leftover trigger-matching phrasing (${pattern})`,
+      );
+    }
+  }
 });
 
 test('discoverCanonicalSkills throws when duplicate canonical skill id exists across core and domains (negative duplicate canonical skill id test)', () => {
@@ -1884,27 +1919,32 @@ export function validateCodePanelNoPlanLoopDuplication(skillContent) {
     }
   }
 
-  // 4. Verbatim-overlap check against fgos-plan-loop's real Section 5 body
+  // 4. Verbatim-overlap check against the real orchestration loop body
   // (red-team V-1/V-3, op_032): a byte-identical or near-verbatim copy of
   // the real orchestration loop text evades checks 1-3 whenever it sits
   // under a heading outside the section-3 allowlist, or under no heading
   // at all. This is NOT a rewrite (zero synonyms, zero restructuring) --
   // squarely inside what this discriminator's own limitations note (p01.md
   // section 3) promises to catch ("verbatim or near-verbatim copies using
-  // fgos-plan-loop's own anchor phrasing"), so it must be caught regardless
-  // of heading/section placement, not just within the structural check's
-  // own heading-gated scope. Deterministic line-overlap, not a heading or
-  // keyword match: >=3 identical substantive lines (>=30 chars each) is
-  // the threshold verified by red-team (canonical domains/coding/skills/
-  // fgos-code-panel/SKILL.md shares 0/69 substantive lines with the real
-  // Section 5 body; a verbatim copy shares 68/69).
+  // the real orchestration loop's own anchor phrasing"), so it must be
+  // caught regardless of heading/section placement, not just within the
+  // structural check's own heading-gated scope. Deterministic line-overlap,
+  // not a heading or keyword match: >=3 identical substantive lines (>=30
+  // chars each) is the threshold verified by red-team (canonical
+  // domains/coding/skills/fgos-code-panel/SKILL.md shares 0/69 substantive
+  // lines with the real orchestration loop body; a verbatim copy shares
+  // 68/69). Unit I29: fgos-plan-loop is now a deprecated stub with no
+  // Section 5 of its own -- the real orchestration loop text this check
+  // must guard against duplicating now lives in fgos-code-change's own
+  // references/plan-mode.md ("## Unattended track mode"), the content
+  // successor per the I28/I29 3-bucket disposition.
   try {
     const repoRootForOverlap = path.resolve(fileURLToPath(import.meta.url), '../../..');
-    const planLoopSkill = fs.readFileSync(
-      path.join(repoRootForOverlap, 'core', 'skills', 'fgos-plan-loop', 'SKILL.md'),
+    const planModeContent = fs.readFileSync(
+      path.join(repoRootForOverlap, 'domains', 'coding', 'skills', 'fgos-code-change', 'references', 'plan-mode.md'),
       'utf8'
     );
-    const section5Match = planLoopSkill.match(/\n##\s+5\.[^\n]*\n([\s\S]*?)(?=\n##\s+\d|\n#\s+|$)/);
+    const section5Match = planModeContent.match(/\n##\s+Unattended track mode[^\n]*\n([\s\S]*?)(?=\n##\s+|\n#\s+|$)/);
     if (section5Match) {
       const section5Lines = new Set(
         section5Match[1]
@@ -1920,14 +1960,15 @@ export function validateCodePanelNoPlanLoopDuplication(skillContent) {
       if (overlapCount >= 3) {
         return {
           pass: false,
-          reason: `Detected ${overlapCount} substantive lines verbatim-identical to fgos-plan-loop's real Section 5 orchestration loop body -- a byte-identical or near-verbatim copy, regardless of heading or section placement`,
+          reason: `Detected ${overlapCount} substantive lines verbatim-identical to the real orchestration loop body (fgos-code-change/references/plan-mode.md's Unattended track mode section) -- a byte-identical or near-verbatim copy, regardless of heading or section placement`,
         };
       }
     }
   } catch {
-    // core/skills/fgos-plan-loop/SKILL.md unreadable in this environment:
-    // fail open on THIS check only (checks 1-3 above still ran) rather than
-    // throwing out of a pure validator on an environment/path issue.
+    // fgos-code-change/references/plan-mode.md unreadable in this
+    // environment: fail open on THIS check only (checks 1-3 above still
+    // ran) rather than throwing out of a pure validator on an
+    // environment/path issue.
   }
 
   return { pass: true };
@@ -1945,13 +1986,18 @@ test('Assertion 3 Discriminator: canonical domains/coding/skills/fgos-code-panel
 });
 
 test('Assertion 3 Discriminator: verbatim fgos-plan-loop Section 5 body is caught regardless of heading (V-1/V-3, red-team op_032)', () => {
+  // Unit I29: fgos-plan-loop is now a deprecated stub carrying no Section 5
+  // content of its own. Its "Unattended track mode" content carried forward
+  // verbatim (per the I28/I29 3-bucket disposition) into fgos-code-change's
+  // references/plan-mode.md -- use that as the real, live "known-duplicated"
+  // fixture instead of a synthetic strawman.
   const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
-  const planLoopSkill = fs.readFileSync(
-    path.join(repoRoot, 'core', 'skills', 'fgos-plan-loop', 'SKILL.md'),
+  const planModeContent = fs.readFileSync(
+    path.join(repoRoot, 'domains', 'coding', 'skills', 'fgos-code-change', 'references', 'plan-mode.md'),
     'utf8'
   );
-  const section5Match = planLoopSkill.match(/\n##\s+5\.[^\n]*\n([\s\S]*?)(?=\n##\s+\d|\n#\s+|$)/);
-  assert.ok(section5Match, 'Section 5 must be found in fgos-plan-loop SKILL.md');
+  const section5Match = planModeContent.match(/\n##\s+Unattended track mode[^\n]*\n([\s\S]*?)(?=\n##\s+|\n#\s+|$)/);
+  assert.ok(section5Match, 'Unattended track mode section must be found in fgos-code-change/references/plan-mode.md');
   const body = section5Match[1];
 
   // V-1: verbatim body under a heading outside the structural check's own allowlist
@@ -2038,12 +2084,14 @@ Loop over the plan's Cell-status table rows, executing each unmerged phase until
 });
 
 test('Assertion 3 Discriminator: detects and rejects copying fgos-plan-loop Section 5 loop verbatim', () => {
+  // Unit I29 retarget: see the previous test's note -- this content now
+  // lives in fgos-code-change/references/plan-mode.md.
   const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
-  const planLoopContent = fs.readFileSync(
-    path.join(repoRoot, 'core', 'skills', 'fgos-plan-loop', 'SKILL.md'),
+  const planModeContent = fs.readFileSync(
+    path.join(repoRoot, 'domains', 'coding', 'skills', 'fgos-code-change', 'references', 'plan-mode.md'),
     'utf8'
   );
-  const section5Match = planLoopContent.match(/## 5\. Unattended track mode[\s\S]*?(?=\n## |\n---|$)/);
+  const section5Match = planModeContent.match(/## Unattended track mode[\s\S]*?(?=\n## |\n---|$)/);
   assert.ok(section5Match);
   const pastedSkill = `---
 name: fgos-code-panel
@@ -2056,12 +2104,14 @@ ${section5Match[0]}
 });
 
 test('Assertion 3 Discriminator (Red-Team Probes): catches evasions under altered headings and paraphrases', () => {
+  // Unit I29 retarget: see the above tests' note -- this content now lives
+  // in fgos-code-change/references/plan-mode.md.
   const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
-  const planLoopContent = fs.readFileSync(
-    path.join(repoRoot, 'core', 'skills', 'fgos-plan-loop', 'SKILL.md'),
+  const planModeContent = fs.readFileSync(
+    path.join(repoRoot, 'domains', 'coding', 'skills', 'fgos-code-change', 'references', 'plan-mode.md'),
     'utf8'
   );
-  const section5Body = planLoopContent.match(/## 5\. Unattended track mode[^\n]*\n([\s\S]*?)(?=\n## |\n---|$)/)[1];
+  const section5Body = planModeContent.match(/## Unattended track mode[^\n]*\n([\s\S]*?)(?=\n## |\n---|$)/)[1];
 
   // EV-A: verbatim Section 5 body with heading removed under ## Track mode
   const evA = `---
@@ -2191,49 +2241,23 @@ ${Array(45).fill('A detailed step instruction that inflates the section beyond t
 // not a JS runtime function (zero runtime callers in src/core/domains/bin). There is no runtime
 // execution spy surface to intercept invocations; tests 1-3 enforce these invariants structurally
 // on the canonical SKILL.md prose and coordination schema.
+//
+// Unit I29 retirement note: these three tests asserted the two-skill
+// delegation boundary (fgos-code-panel's planned-multi-cell mode delegating
+// track execution to a SEPARATE skill, fgos-plan-loop, "by reference", with
+// a hard STOP against self-orchestration). Phase 6 (Unit I28) replaced that
+// architecture with fgos-code-change's own unified Mode Selection: a single
+// skill now handles both single-cell and plan-mode work internally (plan
+// mode loads references/plan-mode.md, its own reference file, not a
+// separate skill by delegation reference). There is no longer a
+// cross-skill delegation boundary to assert -- retired below, not
+// weakened: the underlying invariant these tests protected (the coding
+// test-policy overlay materializes before track execution; track-level
+// orchestration logic lives in exactly one place) is now proven by
+// coordination-phase4-driver-discipline.test.mjs's own fgos-code-change
+// assertions and references/plan-mode.md's own content.
 
-test('Assertion 2 Delegation Test 1: planned-multi-cell mode delegates track execution to fgos-plan-loop exactly once by reference with policy overlay', () => {
-  const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
-  const skillContent = fs.readFileSync(
-    path.join(repoRoot, 'domains', 'coding', 'skills', 'fgos-code-panel', 'SKILL.md'),
-    'utf8'
-  );
-  const plannedSectionMatch = skillContent.match(/## Planned[- ]multi[- ]cell mode[^\n]*\n([\s\S]*?)(?=\n## |\n---|$)/i);
-  assert.ok(plannedSectionMatch, 'Planned-multi-cell mode section must exist');
-  const sectionBody = plannedSectionMatch[1];
-
-  // Asserts explicit materialization of the 3-tier coding test-policy overlay
-  assert.match(sectionBody, /Materialize the 3-tier coding test-policy overlay/i);
-  assert.match(sectionBody, /FOCUSED_TESTS/);
-  assert.match(sectionBody, /AFFECTED_TESTS/);
-  assert.match(sectionBody, /FULL_TEST/);
-
-  // Asserts single delegation to fgos-plan-loop by reference
-  assert.match(sectionBody, /Delegate track execution to `?fgos-plan-loop`? by reference/i);
-
-  // Asserts hard STOP with zero self-orchestration
-  assert.match(sectionBody, /\bSTOP\b/);
-  assert.match(sectionBody, /does NOT execute multi-cell loop orchestration/i);
-});
-
-test('Assertion 2 Delegation Test 2: zero multi-cell orchestration requests originate from fgos-code-panel', () => {
-  const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
-  const skillContent = fs.readFileSync(
-    path.join(repoRoot, 'domains', 'coding', 'skills', 'fgos-code-panel', 'SKILL.md'),
-    'utf8'
-  );
-  const plannedSectionMatch = skillContent.match(/## Planned[- ]multi[- ]cell mode[^\n]*\n([\s\S]*?)(?=\n## |\n---|$)/i);
-  assert.ok(plannedSectionMatch);
-  const sectionBody = plannedSectionMatch[1];
-
-  // No chain command or iteration loop
-  assert.doesNotMatch(sectionBody, /fgos coordination chain/i);
-  assert.doesNotMatch(sectionBody, /fgos coordination run/i);
-  assert.doesNotMatch(sectionBody, /chain\.mjs/i);
-  assert.match(sectionBody, /All multi-cell\s+progression belongs exclusively to `?fgos-plan-loop`?/i);
-});
-
-test('Assertion 2 Delegation Test 3: fgos-plan-loop accepts coding policy overlay without requiring changes to generic plan schemas', () => {
+test('Assertion 2 Delegation Test 3 (retargeted): fgos-code-change accepts coding policy overlay without requiring changes to generic plan schemas', () => {
   const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
   const schemaSource = fs.readFileSync(
     path.join(repoRoot, 'src', 'verbs', 'coordination', 'schema.mjs'),
@@ -2244,12 +2268,14 @@ test('Assertion 2 Delegation Test 3: fgos-plan-loop accepts coding policy overla
   assert.doesNotMatch(schemaSource, /trackKind:\s*['"]code['"]/i);
   assert.doesNotMatch(schemaSource, /domains\/coding/i);
 
-  // Assert plan-loop skill accepts policy overlay per its own contract
-  const planLoopContent = fs.readFileSync(
-    path.join(repoRoot, 'core', 'skills', 'fgos-plan-loop', 'SKILL.md'),
+  // Assert fgos-code-change accepts policy overlay per its own contract
+  // (Unit I29: fgos-plan-loop is now a deprecated stub carrying no policy
+  // overlay content of its own)
+  const codeChangeContent = fs.readFileSync(
+    path.join(repoRoot, 'domains', 'coding', 'skills', 'fgos-code-change', 'SKILL.md'),
     'utf8'
   );
-  assert.ok(planLoopContent.includes('FOCUSED_TESTS') || planLoopContent.includes('policy'));
+  assert.ok(codeChangeContent.includes('FOCUSED_TESTS') || codeChangeContent.includes('policy'));
 });
 
 // ─── Tests for Assertion 1: Mode-Selection Rule (R1/R2, CE1-CE5, M1) ───

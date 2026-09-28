@@ -60,6 +60,10 @@ Record the fingerprint (toolchain/lockfile/prerequisite versions) alongside the 
 
 Reviewer and red-team default to inspecting the recorded proof (command, tree hash, fingerprint), never re-running it, unless: the proof is stale (tree hash or fingerprint changed since it was recorded), the proof is insufficient (the declared tier does not exercise the changed contract), or a specific counterexample needs fresh output to demonstrate. An insufficient tier is a finding naming the gap -- reviewer/red-team judge sufficiency, they never self-escalate to a wider tier themselves.
 
+### Known Engine Limit: Proof Tiers Are Lead Discipline, Not Schema-Enforced
+
+The coordination session's request schema has no field for a proof tier, `FULL_TRIGGERS`, or an environment fingerprint, and `disposition`/`rationale` accepts any non-empty string regardless of what it claims (`schema.mjs`'s `REASON_MAX_LENGTH` bound is the only check). A driver who does not actually run `FULL_TEST`, or who mislabels a real regression as `environmental-precondition`, is not caught by anything the engine checks -- this section is entirely Lead discipline in prose, not an enforced gate.
+
 ---
 
 ## 3. Independent Verification of Doer Commit and Tests

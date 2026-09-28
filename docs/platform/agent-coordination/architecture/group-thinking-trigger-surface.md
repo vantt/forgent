@@ -72,10 +72,10 @@ authorization, bounds, completion, and contribution types.
 | Business or product options comparison / strategy brainstorm | `strategy-options` | `core.coordination-protocol.group-thinking-nominal-group-lite` | Same protocol-declared roster; domain-neutral execution policy | `advise` | Options, clarification, ranks, replay id |
 | Incident or postmortem reflection needing independent first takes and a second round | `reflection-review` | `core.coordination-protocol.group-thinking-delphi-feedback-lite` | Same protocol-declared roster; evidence references supplied in the request | `advise` | Independent analyses, mediated aggregate, revised conclusions, replay id |
 | Advisory coding design decision | `coding-design-panel` | `core.coordination-protocol.architecture-advisory-panel-v1` when architectural; otherwise the relevant review/compare preset above | Advisory only; no doer/fixer and no mutating Assignment | `advise` | Design recommendation or comparison, dissent, replay id |
-| Implement one code change and independently review/red-team it | `code-change-panel` | `core.coordination-protocol.standalone-master-coordination-loop` | `fgos-code-panel` roster and mutation gates | `code:implement`, then `code:review` at the workflow boundary | Committed candidate, findings/dispositions, test evidence, replay id |
+| Implement one code change and independently review/red-team it | `code-change-panel` | `core.coordination-protocol.standalone-master-coordination-loop` | `fgos-code-change` roster and mutation gates | `code:implement`, then `code:review` at the workflow boundary | Committed candidate, findings/dispositions, test evidence, replay id |
 | General group-thinking request without a discernible review/compare/feedback shape | unresolved | none until clarified | none | none | One concise clarification question |
 
-The `code-change-panel` row is a compatibility route to `fgos-code-panel`, not
+The `code-change-panel` row is a compatibility route to `fgos-code-change`, not
 a generic `fgos-panel` advisory preset. A phrase containing "coding panel" does
 not authorize implementation. Mutation requires an explicit implement/change/
 fix request and still follows decide-before-execute.

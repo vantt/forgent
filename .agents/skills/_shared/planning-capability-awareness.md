@@ -120,6 +120,7 @@ The coding planner (`fgos-coding-planning`) is one specialization of this
 shared cluster: it maps coding implementation units to `code:implement`
 (and, where a unit is independently reviewable/testable, to `code:review`/
 `code:test`). Any other domain's planning surface — including a
-Work-independent, plan-driven track resumed through `fgos-plan-loop`, or
+Work-independent, plan-driven track resumed through `fgos-code-change`'s
+plan mode (formerly `fgos-plan-loop`), or
 a future non-coding domain planner — reads this same fragment and the
 same catalog; neither this fragment nor the catalog is coding-specific.

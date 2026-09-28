@@ -358,12 +358,13 @@ must-not-preclude checks.
   [V-011](vision.md#v-011-the-foundation-core-stays-small), and
   [V-012](vision.md#v-012-generalization-requires-two-unlike-consumers).
 - **Status:** `deferred-preserved` -- decided, not yet built.
-- **Current slice:** the discipline lives only as prose inside
-  `fgos-plan-loop`, `fgos-code-panel`, and `fgos-architecture-panel`, fused
-  with track sequencing and coding-cell policy. Phase 4 of that plan extracts
-  it as a shared doctrine fragment (no code, no state) with plan-loop as the
-  first consumer; Phase 5 proves it with architecture-panel as the second,
-  unlike consumer; Phase 6 merges the coding facades into `fgos-code-change`.
+- **Current slice:** Phase 4 extracted the discipline as a shared doctrine
+  fragment (`_shared/coordination-driver.md`, no code, no state) with
+  plan-loop as the first consumer; Phase 5 proved it with
+  `fgos-architecture-panel` as the second, unlike consumer. Phase 6 has now
+  merged the coding facades: `fgos-plan-loop` and `fgos-code-panel` are
+  deprecated stubs (Phase 7 compatibility window), and `fgos-code-change`
+  is the live consumer of the shared fragment plus coding-cell policy.
 - **Deferred:** moving any deterministic part of the discipline into the
   control layer (for example, as action-view blockers) until at least two
   unlike consumers need the identical mechanic.

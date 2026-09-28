@@ -1,8 +1,9 @@
 # How To: Author A Plan-Loop Track
 
 Audience: a Lead writing `plan.md` + phase files for a Work-independent,
-plan-driven implementation track that `fgos-plan-loop` will drive (audit →
-cell → review → red-team → fix → close). This how-to is the authoring-side
+plan-driven implementation track that `fgos-code-change` (plan mode,
+formerly `fgos-plan-loop`) will drive (audit → cell → review → red-team →
+fix → close). This how-to is the authoring-side
 half of that contract; the coding-worker discipline half lives in the
 instruction fragment linked in [Coding verification discipline](#coding-verification-discipline)
 below — this document does not restate that fragment's rule, only points to it.
