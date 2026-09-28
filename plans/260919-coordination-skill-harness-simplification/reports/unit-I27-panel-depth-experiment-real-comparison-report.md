@@ -1,10 +1,11 @@
 # Unit I27 — panel-depth experiment: real comparison report
 
-Status: **core experiment complete and scored**; two rubric/proof items remain open
-(see "Open items" at the end) and this report is written with them explicitly
-flagged rather than silently closed.
+Status: **complete.** Core experiment scored and fully unblinded; the two
+open items (human spot-check, standalone-session completion) are both
+resolved per explicit Lead/user decisions — see §8.
 
-Rubric SHA: `7421a5e61` (`plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring-rubric.md`).
+Rubric SHA: `7421a5e612984082713defd3e3fe43946f42c39e` (`plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring-rubric.md`), approved by Lead after independent review.
+Scoring commit: `9c411dc16` (real blind-scored marks, all 3 cases).
 Rubric provenance: written **after** real dispatch had already begun (a disclosed
 process deviation from the rubric's own "before the first real call" requirement,
 caught and reported mid-experiment), by a fresh agent with **no exposure** to any
@@ -135,30 +136,42 @@ synthesizer/lead-advisor provider (`claude`, every case — see
 asserted — `scoring/case-*/scorer-run.log`).
 
 Per-case raw counts (full = the ORIGINAL explain-recommendation dispatch;
-withheld = the redteam-withheld probe — **the X/Y-to-condition mapping is
-not yet revealed**, per the rubric's own ordering rule; see §8 "Open
-items"):
+withheld = the redteam-withheld probe). **Unblinded** (per
+`scoring/unblinding-key.md`, committed only after every scorer mark was
+in and the human spot-check question was resolved by explicit user
+decision — see §8): in all 3 cases, X = full and Y = withheld (a
+coincidence of the independent per-case coin flip, not a fixed
+assignment — confirmed in the unblinding key, word counts included there
+to show no length manipulation).
 
-| Case | RT found | RT PRESENT (profile A / profile B) | CX/CY found | CX/CY PRESENT (A / B) | GT mark (A / B) |
+| Case | RT found | RT PRESENT (full / withheld) | CX/CY found | CX/CY PRESENT (full / withheld) | GT mark (full / withheld) |
 |---|---|---|---|---|---|
-| case-1 (P05.2 clear) | 3 | 1/3 (A) · 0/3 (B) | 16 each | 3/16 (A) · 3/16 (B) | GT-1: CONSISTENT (A) · CONTRADICTS (B) |
-| case-2 (P05.2 unclear) | 4 | 4/4 (A) · 3/4 (B) | 12 each | 8/12 (A) · 8/12 (B) | GT-2: CONTRADICTS (A) · CONSISTENT (B) |
-| case-3 (I21-H4, no ground truth) | 0 (red-team was a process critique, not architecture dissent — real, not smoothed) | n/a | 19 each | 12/19 (A) · 3/19 (B) | not scored (no ground truth, per rubric §6) |
+| case-1 (P05.2 clear) | 3 | 1/3 (full) · 0/3 (withheld) | 16 each | 3/16 (full) · 3/16 (withheld) | GT-1: CONSISTENT (full) · CONTRADICTS (withheld) |
+| case-2 (P05.2 unclear) | 4 | 4/4 (full) · 3/4 (withheld) | 12 each | 8/12 (full) · 8/12 (withheld) | GT-2: CONTRADICTS (full) · CONSISTENT (withheld) |
+| case-3 (I21-H4, no ground truth) | 0 (red-team was a process critique, not architecture dissent — real, not smoothed) | n/a | 19 each | 12/19 (full) · 3/19 (withheld) | not scored (no ground truth, per rubric §6) |
 
 Every PRESENT mark across all 3 cases was disposed (adopted, conditioned
 on, or rebutted with a stated reason), never merely mentioned — see each
 case's `scoring/case-*/scorer-marks.md` for the full enumerated findings,
 verbatim quotes, and per-mark dispositions.
 
-**Reading these results honestly, before unblinding:** the direction is
-NOT consistent across cases. Case-1 shows one profile losing a real
-finding and a real fact; case-2 shows the OTHER profile losing a finding
-and a fact; case-3 shows a sharp, one-sided drop in retained
-critique/constraint substance (unrelated to red-team specifically) for
-one profile. This is reported as a genuine, mixed empirical result, not
-smoothed into a single "X wins" headline — consistent with the honest
-prior stated in the plan's own decision text ("a quality regression from
-dropping red-team is plausible, not unlikely").
+**Reading these results honestly, now unblinded:** dissent retention
+favors **full** in every case that shows any difference at all (case-1:
+full keeps 1/3 RT findings, withheld keeps 0/3; case-2: full keeps all 4
+RT findings, withheld drops 1; case-3: full retains far more of the
+control critique/constraint substance, 12/19 vs. 3/19 — a large,
+one-sided drop for withheld on content that exists in BOTH conditions,
+unrelated to red-team specifically). The two ground-truth cases split in
+DIRECTION but not in stakes: case-1's withheld run got the fact wrong
+while full got it right; case-2's **full** run got the fact wrong while
+withheld got it right — so factual accuracy against verified ground truth
+did not track the red-team/no-red-team split consistently, but dissent
+retention and general content retention (the CX/CY control) did, both
+favoring full. This is reported as the genuine, real result — not
+smoothed into a stronger or weaker claim than the data supports, and
+consistent with the honest prior the plan's own decision text stated
+going in ("a quality regression from dropping red-team is plausible, not
+unlikely").
 
 ## 7. Standalone real standard-protocol session — partial
 
@@ -180,21 +193,37 @@ actually works end-to-end, separate from the paired-explanation proxy:
 **Not completed**: synthesis, explanation, close-dialogue, and therefore
 this session never reached `closed: true`. 7 real ops across 2 phases and
 4 distinct actor roles did succeed, which is real (if partial) evidence
-the variant dispatches correctly through the production door. This is
-disclosed as incomplete, not represented as a finished proof.
+the variant dispatches correctly through the production door.
 
-## 8. Open items (not silently closed)
+**Disposition (Lead-decided):** accepted as partial. The quota reset was
+not waited for, and the remaining ops were not switched to a different
+provider mid-run (which would have made this a mixed-provider proof
+rather than the intended pure-`claude` "as actually deployed" reading).
+This session's own purpose — proving the FlowDefinition dispatches
+correctly through the real production door — is satisfied by the 7 real
+ops that did succeed; the separate, already-complete paired-comparison
+measurement in §6 does not depend on this session finishing. **Stated
+plainly: this proof is partial, not complete, and should not be read as
+"the standard variant's standalone deployment was fully verified."**
+
+## 8. Open items — both now resolved
 
 1. **Human spot-check** (rubric §8, spec `b`) — requires an actual person,
-   explicitly not the Lead and not an agent. Not done. `unblinding-key.md`
-   is deliberately left uncommitted per the rubric's own ordering rule
-   until this is done, so the X/Y-to-condition mapping in §6 above is
-   genuinely not yet revealed anywhere in this report or the repo.
-2. **Standalone session completion** — blocked on the `claude` account's
-   quota reset (see §7). 7/10ish real ops done; synthesis/explain/close
-   outstanding.
-3. Neither item blocks the core paired-comparison finding in §6, which is
-   complete and scored.
+   explicitly not the Lead and not an agent. **The user was asked
+   directly and declined it**, choosing to record it as a known
+   limitation rather than have it done. This does **not** invalidate the
+   scorer's own marks in §6 — only the independent second-rater
+   cross-check that would have validated the scorer's PRESENT/ABSENT/
+   CONSISTENT/CONTRADICTS judgment against a human's own reading is
+   missing. `unblinding-key.md` was committed only after this was
+   resolved (every scorer mark was already in; the human-spot-check
+   requirement was explicitly waived, not silently skipped) — see
+   commit citing this report.
+2. **Standalone session completion** — accepted as partial (see §7
+   disposition above), not pursued further.
+
+Neither item invalidates or blocks the core paired-comparison finding in
+§6, which is complete, scored, and now fully unblinded.
 
 ## 9. Gaps filed, not fixed (out of this unit's scope)
 
