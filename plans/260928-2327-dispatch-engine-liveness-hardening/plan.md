@@ -251,33 +251,40 @@ holder blocking unnecessarily) are fixed and covered by a real test.
 
 ## Phase 4 — S3: provider-capacity lock stale-reclaim no longer loses writes
 
-STATUS: FIX ROUND 1 IN PROGRESS (2026-09-28/29). unit/P4 branch
-`b9b366047` (worktree
-`.claude/worktrees/dispatch-engine-liveness-p4-provider-capacity-stale-reclaim`)
-NOT merged. Implementer's own report claimed the race test passed 0/15;
-Lead independently reran the same unmodified test 4x in the implementer's
-own worktree and got a genuine ~50% failure rate (1 pass, 3 fail across
-two batches), not a one-off flake. Went further than trusting the
-assertion failure: instrumented `withFileLock` in an isolated scratch
-copy with an `fs.openSync(markerPath, 'wx')` liveness marker on
-ENTER/EXIT (same atomic O_EXCL primitive the lock itself relies on, so
-this is a direct concurrency check, not a timing-measurement artifact)
-and captured real `MARKER-VIOLATION` events — two distinct pids both had
-the critical section marked active on the same lockPath at once,
-confirmed independent of the state.json-loss inference. Root cause: the
-"re-read right before unlink" pattern (borrowed from
-`main-checkout-lock.mjs`) narrows but does not eliminate the race under
-this lock's real contention shape (10 concurrent contenders per trial,
-flat 20ms retry backoff with no jitter) — the implementer's own code
-comment already admitted this ("narrows, does not theoretically
-eliminate"), citing main-checkout-lock's own 0/30 probe as precedent, but
-that precedent's contention level was never verified to match this
-lock's. Sent back to impl-p4 as fix round 1 (of the 3-round cap) with the
-full evidence trail and two concrete directions: switch to
-`run-lock.mjs`'s stronger link-publish+generation pattern, or find an
-equivalent provably-atomic CAS-style reclaim and validate it with a
-marker-file-style direct concurrency check made a permanent part of the
-test, not just the downstream state.json-loss assertion alone.
+STATUS: MERGED (2026-09-29), after 1 rejected round. unit/P4
+`58613b1c4`, integratedSha `3c8d518cb`.
+
+Round 1 (`b9b366047`, re-read-before-unlink, matching
+`main-checkout-lock.mjs`'s pattern) was NOT merged: implementer's own
+report claimed the race test passed 0/15, but Lead independently reran
+the same unmodified test 4x and got a genuine ~50% failure rate, then
+went further than trusting the assertion failure and instrumented
+`withFileLock` with an `fs.openSync(markerPath, 'wx')` exclusivity marker
+(same atomic O_EXCL primitive the lock itself relies on) and captured
+real `MARKER-VIOLATION` events — two distinct pids both held the critical
+section on the same lockPath at once. Root cause: `unlinkSync` has no
+compare-and-swap semantics, so no amount of re-reading before it closes
+the window; narrows but does not eliminate, exactly as the implementer's
+own round-1 code comment had already (correctly) admitted.
+
+Round 2 (`58613b1c4`, MERGED): replaced the single lock file with an
+append-only generation ledger (each acquisition publishes a new,
+higher-numbered record via exclusive `fs.linkSync`, so the mutating step
+itself is the sole arbiter of who wins, matching `run-lock.mjs`'s own
+proven pattern — reimplemented locally rather than imported, since
+`provider-capacity.mjs` is a declared proven-leaf in this repo's own
+import-graph test). Found and fixed two further real bugs during the same
+round via trace-and-reproduce-under-artificial-CPU-stress: a
+`currentGeneration` TOCTOU on `readdir`-then-read, and a pruning step that
+reopened epoch-number reuse (both root-caused with direct marker-file
+traces, not assumed). Final design never prunes or reuses a published
+generation number — an explicitly named, deferred disk-hygiene trade-off,
+not a silently accepted one. The marker-file exclusivity check is now a
+permanent test (`withFileLock` exported for it), not just a one-off Lead
+debug script. Lead independently reran both race tests 6x under 20
+artificial CPU-stress processes (0 failures) and the full suite twice
+(8002 tests, 0 fail) before merging. See
+plans/260928-2327-dispatch-engine-liveness-hardening/reports/unit-P4-claude-only-execution-report.md.
 
 ### Work
 
