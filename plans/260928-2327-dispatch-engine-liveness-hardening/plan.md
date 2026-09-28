@@ -341,6 +341,34 @@ recovery is actually possible afterward.
 
 ## Phase 6 — S6 + S8: atomic writes and settlement ordering
 
+STATUS: MERGED (2026-09-29). unit/P6 `91cc7679e` merged onto main,
+integratedSha `9b4a03819`. Both `assignment.json` writers
+(`assignment-runner.mjs`, `coordination/store.mjs`) switched to the
+existing `publishImmutableProof` atomic primitive (fsynced temp +
+exclusive hard link) instead of a bare `writeFileSync` guarded only by
+`!existsSync` — a crash mid-write now leaves the file cleanly absent
+instead of permanently bricking the Assignment as unreadable garbage.
+Did not physically merge the two writer call sites (they live in
+different layers with different surrounding logic — read-back/freeze in
+one, a documented crash-recovery re-entry guard in the other); closed the
+actual "two broken primitives" duplication by having both call the same
+existing atomic one instead. `commitRunSettlement` now recognizes when
+the current control generation was already settled by this exact
+caller's own token+epoch and completes/rehydrates the retry instead of
+refusing it as superseded forever — reordering the two writes was
+evaluated and rejected with real evidence (would let a superseded
+controller win the publish race before its own settlement CAS could
+refuse it; the existing TOCTOU test exists to catch exactly that
+regression class). 3 new tests, each fault-injecting the real crash
+window against the real production module. Lead independently read all 4
+touched files against the report's claims (confirmed
+`publishImmutableProof`'s hard-link semantics and `settleRunControl`'s
+real record shape match exactly) and reran the full suite after
+supplying the worktree's missing Rust build-output symlink: 8002 tests,
+0 fail — the implementer's own reported 51 rust-host failures were a
+pre-existing environment gap in that worktree, not a regression. See
+plans/260928-2327-dispatch-engine-liveness-hardening/reports/unit-P6-claude-only-execution-report.md.
+
 ### Work
 
 1. `assignment.json` is written non-atomically in two separate places
