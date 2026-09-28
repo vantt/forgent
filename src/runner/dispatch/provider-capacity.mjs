@@ -7,6 +7,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { normalizeProviderFamily } from './provider-adapter.mjs';
+import { getProcessStartTime, resolveHolderLiveness } from './process-identity.mjs';
 
 export const PROVIDER_CAPACITY_STATE_CONTRACT = 'provider-capacity-state.v1';
 export const PROVIDER_CAPACITY_SELECTION_CONTRACT = 'provider-capacity-selection.v1';
@@ -254,11 +255,43 @@ export class ProviderCapacityLockError extends Error {
 // died before unlinkSync) held EVERY future lease/release/quarantine call
 // hostage for the full waitMs, then threw the raw, uncaught EEXIST error.
 // Now: on contention, read the holder's pid and reclaim (unlink) the lock
-// immediately once `!isPidAlive(pid)` proves it dead, rather than waiting
-// out the deadline for a holder that can never release it. A lock file
-// that can't be read/parsed (mid-write, or from a version that wrote a
-// different shape) is treated as unknown, not dead -- retried like a live
-// holder, never force-reclaimed on a guess.
+// immediately once liveness proves it dead, rather than waiting out the
+// deadline for a holder that can never release it. A lock file that can't
+// be read/parsed (mid-write, or from a version that wrote a different
+// shape) is treated as unknown, not dead -- retried like a live holder,
+// never force-reclaimed on a guess.
+//
+// S3 (dispatch-engine-liveness-hardening Phase 4): the dead-holder judgment
+// above used to unlink unconditionally on the read taken at judgment time,
+// with no re-check right before the unlink -- the audit reproduced this
+// racing 17/25 trials: contender B reads the stale lock and decides to
+// reclaim it, but before B's unlinkSync runs, contender C (working from the
+// SAME stale read) already reclaimed it and re-acquired a FRESH lock; B's
+// unlink then deletes C's live lock, letting B and C both enter fn()
+// concurrently and clobber each other's state.json write. Fixed with the
+// same re-read-immediately-before-unlink pattern main-checkout-lock.mjs's
+// own `tryAcquireOnce` already uses (`:308-319`): re-read right before
+// unlinking, and only unlink if the content is byte-identical to what was
+// judged dead -- changed content means a fresh holder already claimed the
+// path, so leave it alone and let this contender retry `openSync` instead.
+// This narrows (does not theoretically eliminate) the race to the gap
+// between the two back-to-back reads, matching main-checkout-lock.mjs's own
+// accepted trade-off there (its own probe: 0/30 trials with real
+// concurrent contenders). The stronger link-publish+generation pattern in
+// run-lock.mjs is architecturally heavier (an append-only, never-unlinked
+// generation ledger built for a different problem: tracking a history of
+// holders, not guarding one mutex-style critical section) and would be a
+// much larger diff for this single lock/critical-section use -- not
+// justified here per KISS, since the audit itself names the re-read
+// pattern as "adequate".
+//
+// Also closes the audit's own C2 gap for this specific lock ("pid-only, no
+// start time"): the lock record now carries `startTime` (Phase 1's
+// `getProcessStartTime`), and dead-holder judgment routes through Phase 1's
+// consolidated judge (`resolveHolderLiveness`) instead of a bare
+// `isPidAlive` check, so a pid reused by an unrelated process after the
+// real holder died is correctly judged dead rather than mistaken for a
+// live holder.
 function withFileLock(lockPath, fn, { waitMs = 5000 } = {}) {
   fs.mkdirSync(path.dirname(lockPath), { recursive: true });
   const deadline = Date.now() + waitMs;
@@ -266,7 +299,11 @@ function withFileLock(lockPath, fn, { waitMs = 5000 } = {}) {
     let fd;
     try {
       fd = fs.openSync(lockPath, 'wx');
-      fs.writeFileSync(fd, JSON.stringify({ pid: process.pid, acquiredAt: new Date().toISOString() }));
+      fs.writeFileSync(fd, JSON.stringify({
+        pid: process.pid,
+        startTime: getProcessStartTime(process.pid),
+        acquiredAt: new Date().toISOString(),
+      }));
       try {
         return fn();
       } finally {
@@ -278,16 +315,35 @@ function withFileLock(lockPath, fn, { waitMs = 5000 } = {}) {
         try { fs.closeSync(fd); } catch {}
       }
       if (err.code !== 'EEXIST') throw err;
-      let holderPid = null;
+      let raw = null;
+      let holder = null;
       try {
-        holderPid = JSON.parse(fs.readFileSync(lockPath, 'utf8'))?.pid ?? null;
+        raw = fs.readFileSync(lockPath, 'utf8');
+        holder = JSON.parse(raw);
       } catch {
         // Unreadable/mid-write: unknown, not dead -- fall through to the
         // normal wait/retry path below, same as a genuinely live holder.
       }
-      if (Number.isInteger(holderPid) && holderPid > 0 && !isPidAlive(holderPid)) {
-        try { fs.unlinkSync(lockPath); } catch {}
-        continue; // Immediately retry openSync -- no need to wait out the deadline for a proven-dead holder.
+      const holderPid = Number.isInteger(holder?.pid) && holder.pid > 0 ? holder.pid : null;
+      const knownDead = holderPid !== null
+        && resolveHolderLiveness({ pid: holderPid, processStartTime: holder.startTime }, isPidAlive(holderPid)) === 'dead';
+      if (knownDead) {
+        // Re-read right before unlinking: the liveness probe above is the
+        // slow window -- a competitor may have already reclaimed and
+        // re-acquired this lock since `raw` was read. Changed content is a
+        // live lock we must not touch.
+        let current = null;
+        try {
+          current = fs.readFileSync(lockPath, 'utf8');
+        } catch (err2) {
+          if (err2.code !== 'ENOENT') throw err2;
+        }
+        if (current === raw) {
+          try { fs.unlinkSync(lockPath); } catch (err2) {
+            if (err2.code !== 'ENOENT') throw err2;
+          }
+        }
+        continue; // Either we reclaimed it, or a fresh holder already owns it -- retry openSync either way.
       }
       if (Date.now() > deadline) {
         throw new ProviderCapacityLockError(
@@ -351,10 +407,21 @@ export function isPidAlive(pid) {
 // pid that was actually reused by an unrelated process) -- both default to
 // values that reproduce the exact pre-fix behavior when a caller supplies
 // neither.
+//
+// S3/C2 (dispatch-engine-liveness-hardening Phase 4): `pidDead` now routes
+// through Phase 1's consolidated judge instead of a bare `isPidAlive` call,
+// so a lease's recorded pid being reused by an unrelated process (the
+// "pid-only, no start time" gap the audit's own C2 table names for this
+// lock) is correctly judged dead rather than mistaken for the original
+// holder. `lease.processStartTime` is optional and missing on any lease
+// written before this fix -- resolveHolderLiveness's own documented
+// fallback (alive pid, no recorded start time -> 'held') reproduces the
+// exact pre-fix behavior for those legacy records.
 function reclaimDeadLeases(providerState, { runIsDead = () => false, isRunWorkerAlive = () => false, nowIso = new Date().toISOString() } = {}) {
   for (const [accountId, acct] of Object.entries(providerState.accounts ?? {})) {
     for (const [runId, lease] of Object.entries(acct.leases ?? {})) {
-      const pidDead = lease.pid !== undefined && !isPidAlive(lease.pid);
+      const pidDead = lease.pid !== undefined
+        && resolveHolderLiveness({ pid: lease.pid, processStartTime: lease.processStartTime }, isPidAlive(lease.pid)) === 'dead';
       const provenDead = (pidDead && !isRunWorkerAlive(runId, lease)) || runIsDead(runId, lease);
       if (provenDead) {
         delete acct.leases[runId];
@@ -411,7 +478,13 @@ export function acquireProviderAccountLease({
     const acct = accountState(providerState, accountId);
     const selectedAt = now.toISOString();
     acct.lastSelectedAt = selectedAt;
-    acct.leases[runId] = { runId, assignmentId: assignmentId ?? null, pid: process.pid, acquiredAt: selectedAt };
+    acct.leases[runId] = {
+      runId,
+      assignmentId: assignmentId ?? null,
+      pid: process.pid,
+      processStartTime: getProcessStartTime(process.pid),
+      acquiredAt: selectedAt,
+    };
     if (assignmentId) state.assignments[`${provider}:${assignmentId}`] = { accountId, selectedAt };
     writeState(statePath, state);
     return {
