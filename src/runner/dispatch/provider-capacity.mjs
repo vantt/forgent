@@ -7,6 +7,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { normalizeProviderFamily } from './provider-adapter.mjs';
+import { getProcessStartTime, resolveHolderLiveness } from './process-identity.mjs';
 
 export const PROVIDER_CAPACITY_STATE_CONTRACT = 'provider-capacity-state.v1';
 export const PROVIDER_CAPACITY_SELECTION_CONTRACT = 'provider-capacity-selection.v1';
@@ -39,7 +40,10 @@ export function providerCapacityStatePaths(runtimeDir = defaultProviderCapacityR
   return {
     runtimeDir,
     statePath: path.join(runtimeDir, 'state.json'),
-    lockPath: path.join(runtimeDir, 'state.lock'),
+    // A directory of append-only generation records (dispatch-engine-
+    // liveness-hardening Phase 4 round 2), not a single lock file -- see
+    // withFileLock's own header comment for why.
+    lockDir: path.join(runtimeDir, 'state-lock'),
   };
 }
 
@@ -253,50 +257,273 @@ export class ProviderCapacityLockError extends Error {
 // alive -- a crashed process's lock file (openSync succeeded, the process
 // died before unlinkSync) held EVERY future lease/release/quarantine call
 // hostage for the full waitMs, then threw the raw, uncaught EEXIST error.
-// Now: on contention, read the holder's pid and reclaim (unlink) the lock
-// immediately once `!isPidAlive(pid)` proves it dead, rather than waiting
-// out the deadline for a holder that can never release it. A lock file
-// that can't be read/parsed (mid-write, or from a version that wrote a
-// different shape) is treated as unknown, not dead -- retried like a live
-// holder, never force-reclaimed on a guess.
-function withFileLock(lockPath, fn, { waitMs = 5000 } = {}) {
-  fs.mkdirSync(path.dirname(lockPath), { recursive: true });
-  const deadline = Date.now() + waitMs;
-  while (true) {
-    let fd;
+// Now: on contention, read the holder's identity and reclaim the lock
+// immediately once liveness proves it dead, rather than waiting out the
+// deadline for a holder that can never release it.
+//
+// S3 (dispatch-engine-liveness-hardening Phase 4, round 2): round 1 fixed
+// the single-lock-file design with a re-read-immediately-before-unlink
+// guard (matching main-checkout-lock.mjs's own `tryAcquireOnce` pattern,
+// `:308-319`). That guard closed the gap between JUDGING a holder dead and
+// RE-READING to confirm nothing changed -- but `fs.unlinkSync` itself has
+// no compare-and-swap semantics: it deletes whatever is CURRENTLY at the
+// path, regardless of what the caller most recently read. A real
+// marker-file exclusivity probe (this phase's own test, `markerPath` in
+// the S3 race test below) proved a genuine window remained: contender A
+// re-reads, sees the still-stale content, and is about to call
+// `unlinkSync`; in the few microseconds before that call actually runs,
+// contender B (which ALSO re-read the same still-stale content, since
+// neither had unlinked yet) unlinks first and re-acquires a FRESH live
+// lock; A's own unlink then fires a moment later and deletes B's live lock
+// out from under it, letting a THIRD contender in concurrently. Measured:
+// 2/20 trials with a genuine double-critical-section-entry via the marker
+// probe, and separately confirmed independently by this track's own Lead
+// under real load. No amount of re-reading closes this: as long as the
+// reclaim path is "read, decide, THEN unlink" as two separate steps, a
+// third party can always interleave between the last read and the mutating
+// unlink, because plain `unlink(2)` has no way to say "only if it still
+// looks like X".
+//
+// Fixed by switching the RECLAIM decision itself onto a genuinely atomic
+// primitive: an append-only generation ledger (`acquireGenerationLock`/
+// `releaseGenerationLock` below), the same pattern `run-lock.mjs` already
+// proves correct for Run control-epoch fencing -- reimplemented locally
+// here (not imported) because `run-lock.mjs` is on this repo's own banned
+// list for `provider-capacity.mjs`'s import graph
+// (`test/runner/dispatch-reconciliation-import-graph.test.mjs`'s
+// `BANNED_FILES`, which documents `provider-capacity.mjs` as a PROVEN LEAF
+// with "no further relative imports to walk" -- reachable from
+// `reconcile.mjs`'s own quarantine-clear action, which must never pull in
+// `run-lock.mjs`'s own ledger-writer machinery). Nothing here ever unlinks
+// or overwrites a published generation record while it could still be the
+// current one: each acquisition attempt publishes a NEW, higher-numbered
+// record via an EXCLUSIVE hard link (`fs.linkSync`, atomic, EEXIST if a
+// concurrent contender already published that exact number) -- the
+// mutating step IS the arbiter of who wins, not a separate belief formed
+// from an earlier read, so there is no window for a third party to
+// interleave. A dead holder is reclaimed by simply publishing the NEXT
+// generation (never deleting the dead one); every contender who loses that
+// race rereads the ledger fresh and re-decides against the real winner.
+// Published records are NEVER deleted or reused, deliberately -- an earlier
+// version of this fix pruned superseded generations to bound this
+// high-frequency lock's own directory growth, but that reopened a
+// different real race (see `acquireGenerationLock`'s own header comment):
+// freeing an epoch NUMBER for reuse lets a contender that computed it long
+// ago, then got preempted, reclaim it long after it's obsolete. The
+// resulting unbounded directory growth is a named, deferred trade-off, not
+// a silently accepted one -- see that same comment.
+const GENERATION_FILE_RE = /^(\d{10})\.json$/;
+
+function generationFileName(epoch) {
+  return `${String(epoch).padStart(10, '0')}.json`;
+}
+
+function writeFsyncedTemp(dir, content) {
+  const tmpPath = path.join(dir, `.tmp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+  const fd = fs.openSync(tmpPath, 'w');
+  try {
+    fs.writeSync(fd, content);
+    fs.fsyncSync(fd);
+  } finally {
+    fs.closeSync(fd);
+  }
+  return tmpPath;
+}
+
+function removeBestEffort(filePath) {
+  try {
+    fs.unlinkSync(filePath);
+  } catch (err) {
+    if (err.code !== 'ENOENT') throw err;
+  }
+}
+
+// Distinguishes "this exact file never existed / was removed" (ENOENT) from
+// "the file exists but its content is unparseable" -- currentGeneration
+// below needs that distinction to tell a genuine race apart from genuinely
+// corrupt content (see its own header comment).
+function readGenerationFile(filePath) {
+  let raw;
+  try {
+    raw = fs.readFileSync(filePath, 'utf8');
+  } catch (err) {
+    if (err.code === 'ENOENT') return { present: false };
+    throw err;
+  }
+  try {
+    return { present: true, record: JSON.parse(raw) };
+  } catch {
+    // A record this primitive published is always complete (fsynced temp +
+    // atomic link); unparseable content here can only mean something else
+    // wrote into this directory. Treated as absent, never authoritative.
+    return { present: true, record: null };
+  }
+}
+
+function parseGenerationFile(filePath) {
+  const result = readGenerationFile(filePath);
+  return result.present ? result.record : null;
+}
+
+// S3 round 2 follow-up (found by Lead's own real-load reproduction after
+// round 2's first pass): `readdirSync` (the LIST) and the per-file
+// `readFileSync` (the READ) below are two separate steps with real
+// wall-clock time between them -- if THIS process gets preempted (CPU
+// starvation under real contention) in that gap, a DIFFERENT contender's
+// `pruneOldGenerations` can delete every generation this listing named
+// (pruning only ever deletes generations strictly below whichever NEW one
+// its own caller just won, so if everything in OUR stale listing vanished,
+// a newer generation is GUARANTEED to now exist). The original version
+// read that as "the ledger is empty" and returned null, letting the caller
+// fall back to `nextEpoch = 1` -- re-winning an already-pruned, long-
+// forgotten epoch number that nobody else is watching anymore, running
+// concurrently with the REAL current holder (confirmed via a direct
+// marker-file trace: two live holders, epoch 1 and epoch 5, active at the
+// same instant). Fixed by re-listing whenever every named candidate turns
+// out to have vanished, instead of concluding "empty": that can only
+// happen via exactly this race (a genuinely un-contended, truly-empty
+// ledger has nothing in the listing to begin with, so `epochs.length === 0`
+// already returns null without ever reaching this branch). Guaranteed to
+// terminate: each retry either finds a real winner or advances past
+// whichever concurrent prune caused this iteration's miss.
+function currentGeneration(lockDir) {
+  for (;;) {
+    let names;
     try {
-      fd = fs.openSync(lockPath, 'wx');
-      fs.writeFileSync(fd, JSON.stringify({ pid: process.pid, acquiredAt: new Date().toISOString() }));
-      try {
-        return fn();
-      } finally {
-        try { fs.closeSync(fd); } catch {}
-        try { fs.unlinkSync(lockPath); } catch {}
-      }
+      names = fs.readdirSync(lockDir);
     } catch (err) {
-      if (fd !== undefined) {
-        try { fs.closeSync(fd); } catch {}
+      if (err.code === 'ENOENT') return null;
+      throw err;
+    }
+    const epochs = [];
+    for (const name of names) {
+      const match = GENERATION_FILE_RE.exec(name);
+      if (match) epochs.push(Number(match[1]));
+    }
+    if (epochs.length === 0) return null;
+    let best = null;
+    let anyVanished = false;
+    for (const epoch of epochs) {
+      const result = readGenerationFile(path.join(lockDir, generationFileName(epoch)));
+      if (!result.present) {
+        anyVanished = true;
+        continue;
       }
-      if (err.code !== 'EEXIST') throw err;
-      let holderPid = null;
-      try {
-        holderPid = JSON.parse(fs.readFileSync(lockPath, 'utf8'))?.pid ?? null;
-      } catch {
-        // Unreadable/mid-write: unknown, not dead -- fall through to the
-        // normal wait/retry path below, same as a genuinely live holder.
-      }
-      if (Number.isInteger(holderPid) && holderPid > 0 && !isPidAlive(holderPid)) {
-        try { fs.unlinkSync(lockPath); } catch {}
-        continue; // Immediately retry openSync -- no need to wait out the deadline for a proven-dead holder.
-      }
+      if (result.record === null) continue; // genuinely corrupt, not a race -- never authoritative.
+      if (best === null || epoch > best.epoch) best = { epoch, record: result.record };
+    }
+    if (best !== null) return best;
+    // Defensive, not currently load-bearing: nothing in this file's own
+    // acquire/release path deletes a published generation record anymore
+    // (see acquireGenerationLock's own header comment for why pruning was
+    // removed) -- but this loop stays correct even if some future change,
+    // or something external, ever does remove one mid-read, rather than
+    // silently trusting readdir+read to be atomic together.
+    if (anyVanished) continue; // Every listed candidate vanished since we listed -- a newer generation may now exist; re-list.
+    return null; // Listing had generation-pattern names, but every one genuinely failed to parse (corrupt) -- treat as empty.
+  }
+}
+
+function isGenerationHeld(current) {
+  if (!current || current.record.releasedAt) return false;
+  const holderPid = Number.isInteger(current.record.holder?.pid) && current.record.holder.pid > 0
+    ? current.record.holder.pid
+    : null;
+  if (holderPid === null) return false;
+  return resolveHolderLiveness(
+    { pid: holderPid, processStartTime: current.record.holder.processStartTime },
+    isPidAlive(holderPid),
+  ) === 'held';
+}
+
+// S3 round 2 follow-up #2 (found by Lead's own real-load reproduction,
+// after follow-up #1 above): the first version of this function pruned
+// (deleted) every generation strictly below the one it just won, right
+// after winning, to bound this high-frequency lock's own directory growth.
+// That reintroduced exactly the class of bug this whole redesign exists to
+// remove: `fs.linkSync`'s exclusivity only guarantees ONE winner for a
+// given epoch NUMBER -- it says nothing about a number that was already
+// used, released, and superseded, then FREED UP AGAIN by a delete. A
+// contender that read `current` and computed `nextEpoch = N` long ago, then
+// got CPU-preempted before actually calling `fs.linkSync`, can wake up
+// after epoch N has since been won, released, superseded by epoch N+1 (or
+// higher), AND pruned -- and its now-stale `fs.linkSync` for epoch N
+// SUCCEEDS again (the path is free once more), granting it the lock
+// concurrently with the real current holder. Confirmed via the direct
+// marker-file trace: epoch 2 (a re-win of an already-superseded number) and
+// epoch 3 (the real current holder) both live at the same instant. This is
+// NOT a narrower version of the original TOCTOU -- it is a structurally
+// different bug pruning itself introduces, and it is why run-lock.mjs's own
+// generation ledger documents "nothing here ever unlinks or overwrites a
+// published record" as a hard invariant, not a style choice. Fixed by
+// removing pruning entirely, matching that invariant exactly: an epoch
+// number, once published, is NEVER freed for reuse, so a stale contender's
+// belated `fs.linkSync` for an old number always correctly fails EEXIST
+// (the record is still there) rather than spuriously succeeding.
+//
+// Trade-off, named rather than silently accepted: this lock's own directory
+// now grows by one small JSON record per acquisition, unbounded, for as
+// long as a host runs (unlike run-lock.mjs's own per-Run scope, which is
+// naturally bounded by Run lifetime). At realistic dispatch volumes this is
+// a slow, low-priority disk-hygiene concern, not a correctness one -- a
+// SEPARATE, out-of-band maintenance sweep (e.g. a future `fgos doctor` fix
+// action, deleting only generations both non-current AND older than a
+// conservative age floor far beyond any realistic scheduling delay) would
+// be safe to add later without reopening this exact race, but is out of
+// this phase's own scope and not implemented here.
+function acquireGenerationLock(lockDir, holder, deadline) {
+  fs.mkdirSync(lockDir, { recursive: true });
+  for (;;) {
+    const current = currentGeneration(lockDir);
+    if (isGenerationHeld(current)) {
       if (Date.now() > deadline) {
         throw new ProviderCapacityLockError(
-          `provider-capacity lock at "${lockPath}" is still held by a live process (pid ${holderPid ?? 'unknown'}) after ${waitMs}ms.`,
-          { lockPath, holderPid },
+          `provider-capacity lock at "${lockDir}" is still held by a live process (pid ${current.record.holder.pid}) after waiting.`,
+          { lockPath: lockDir, holderPid: current.record.holder.pid },
         );
       }
       Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 20);
+      continue;
     }
+    const nextEpoch = (current?.epoch ?? 0) + 1;
+    const targetPath = path.join(lockDir, generationFileName(nextEpoch));
+    const tmpPath = writeFsyncedTemp(lockDir, JSON.stringify({ holder, acquiredAt: new Date().toISOString() }));
+    try {
+      fs.linkSync(tmpPath, targetPath);
+    } catch (err) {
+      removeBestEffort(tmpPath);
+      if (err.code !== 'EEXIST') throw err;
+      continue; // Lost the race for this epoch -- reread and re-decide against the real winner.
+    }
+    removeBestEffort(tmpPath);
+    return nextEpoch;
+  }
+}
+
+function releaseGenerationLock(lockDir, epoch) {
+  const filePath = path.join(lockDir, generationFileName(epoch));
+  const record = parseGenerationFile(filePath);
+  if (record === null) return;
+  // Atomic replace (write-temp + rename, same discipline as writeState
+  // below), never an in-place mutation -- a concurrent reader must always
+  // see either the pre-release or fully-released content, never torn JSON.
+  const tmpPath = writeFsyncedTemp(lockDir, JSON.stringify({ ...record, releasedAt: new Date().toISOString() }));
+  fs.renameSync(tmpPath, filePath);
+}
+
+// Exported for direct exclusivity testing (a marker-file-style probe run
+// INSIDE `fn`, independent of any downstream symptom like a lost
+// state.json write) -- every other caller in this file reaches it only
+// through acquireProviderAccountLease/releaseProviderAccountLease/
+// quarantineProviderAccount/clearProviderAccountQuarantine.
+export function withFileLock(lockDir, fn, { waitMs = 5000 } = {}) {
+  const deadline = Date.now() + waitMs;
+  const holder = { pid: process.pid, processStartTime: getProcessStartTime(process.pid) };
+  const epoch = acquireGenerationLock(lockDir, holder, deadline);
+  try {
+    return fn();
+  } finally {
+    releaseGenerationLock(lockDir, epoch);
   }
 }
 
@@ -351,10 +578,21 @@ export function isPidAlive(pid) {
 // pid that was actually reused by an unrelated process) -- both default to
 // values that reproduce the exact pre-fix behavior when a caller supplies
 // neither.
+//
+// S3/C2 (dispatch-engine-liveness-hardening Phase 4): `pidDead` now routes
+// through Phase 1's consolidated judge instead of a bare `isPidAlive` call,
+// so a lease's recorded pid being reused by an unrelated process (the
+// "pid-only, no start time" gap the audit's own C2 table names for this
+// lock) is correctly judged dead rather than mistaken for the original
+// holder. `lease.processStartTime` is optional and missing on any lease
+// written before this fix -- resolveHolderLiveness's own documented
+// fallback (alive pid, no recorded start time -> 'held') reproduces the
+// exact pre-fix behavior for those legacy records.
 function reclaimDeadLeases(providerState, { runIsDead = () => false, isRunWorkerAlive = () => false, nowIso = new Date().toISOString() } = {}) {
   for (const [accountId, acct] of Object.entries(providerState.accounts ?? {})) {
     for (const [runId, lease] of Object.entries(acct.leases ?? {})) {
-      const pidDead = lease.pid !== undefined && !isPidAlive(lease.pid);
+      const pidDead = lease.pid !== undefined
+        && resolveHolderLiveness({ pid: lease.pid, processStartTime: lease.processStartTime }, isPidAlive(lease.pid)) === 'dead';
       const provenDead = (pidDead && !isRunWorkerAlive(runId, lease)) || runIsDead(runId, lease);
       if (provenDead) {
         delete acct.leases[runId];
@@ -394,8 +632,8 @@ export function acquireProviderAccountLease({
   if (!provider || !runId) return null;
   const inventory = providerAccountInventory(runnerConfig);
   if (!inventory[provider] || Object.keys(inventory[provider].accounts).length === 0) return null;
-  const { statePath, lockPath } = providerCapacityStatePaths(runtimeDir);
-  return withFileLock(lockPath, () => {
+  const { statePath, lockDir } = providerCapacityStatePaths(runtimeDir);
+  return withFileLock(lockDir, () => {
     const state = readState(statePath);
     state.providers[provider] ??= { accounts: {} };
     const providerState = state.providers[provider];
@@ -411,7 +649,13 @@ export function acquireProviderAccountLease({
     const acct = accountState(providerState, accountId);
     const selectedAt = now.toISOString();
     acct.lastSelectedAt = selectedAt;
-    acct.leases[runId] = { runId, assignmentId: assignmentId ?? null, pid: process.pid, acquiredAt: selectedAt };
+    acct.leases[runId] = {
+      runId,
+      assignmentId: assignmentId ?? null,
+      pid: process.pid,
+      processStartTime: getProcessStartTime(process.pid),
+      acquiredAt: selectedAt,
+    };
     if (assignmentId) state.assignments[`${provider}:${assignmentId}`] = { accountId, selectedAt };
     writeState(statePath, state);
     return {
@@ -429,8 +673,8 @@ export function acquireProviderAccountLease({
 
 export function releaseProviderAccountLease({ provider, accountId, runId, runtimeDir } = {}) {
   if (!provider || !accountId || !runId) return false;
-  const { statePath, lockPath } = providerCapacityStatePaths(runtimeDir);
-  return withFileLock(lockPath, () => {
+  const { statePath, lockDir } = providerCapacityStatePaths(runtimeDir);
+  return withFileLock(lockDir, () => {
     const state = readState(statePath);
     const leases = state.providers?.[provider]?.accounts?.[accountId]?.leases;
     if (!leases?.[runId]) return false;
@@ -441,8 +685,8 @@ export function releaseProviderAccountLease({ provider, accountId, runId, runtim
 }
 
 export function quarantineProviderAccount({ provider, accountId, reasonCode, quarantineKind = 'temporary', until, runtimeDir, detail } = {}) {
-  const { statePath, lockPath } = providerCapacityStatePaths(runtimeDir);
-  return withFileLock(lockPath, () => {
+  const { statePath, lockDir } = providerCapacityStatePaths(runtimeDir);
+  return withFileLock(lockDir, () => {
     const state = readState(statePath);
     state.providers[provider] ??= { accounts: {} };
     const acct = accountState(state.providers[provider], accountId);
@@ -464,8 +708,8 @@ export function clearProviderAccountQuarantine({ runnerConfig, provider, account
   if (!inventory[provider]?.accounts?.[accountId]) {
     throw new ProviderCapacityConfigError(`provider-capacity clear-quarantine refused: unknown provider/account ${provider}/${accountId}`);
   }
-  const { statePath, lockPath } = providerCapacityStatePaths(runtimeDir);
-  return withFileLock(lockPath, () => {
+  const { statePath, lockDir } = providerCapacityStatePaths(runtimeDir);
+  return withFileLock(lockDir, () => {
     const state = readState(statePath);
     const acct = state.providers?.[provider]?.accounts?.[accountId];
     const previous = acct?.quarantine ?? null;
@@ -523,24 +767,32 @@ export function inspectProviderCapacity({ runnerConfig, provider, accountId, run
   return { contract: 'provider-capacity-inspect.v1', providers };
 }
 
-// C2c doctor support: a pure read (never opens/writes/unlinks the lock
-// itself -- that mutation stays inside withFileLock's own reclaim path)
-// so `fgos doctor`'s provider-capacity-lock-stale check can report a lock
-// file whose recorded holder pid is provably dead without racing a real
-// lease/release/quarantine call for the same lock.
+// C2c doctor support: a pure read (never publishes/prunes a generation
+// itself -- that mutation stays inside withFileLock's own acquire/release
+// path) so `fgos doctor`'s provider-capacity-lock-stale check can report a
+// lock whose recorded holder pid is provably dead without racing a real
+// lease/release/quarantine call for the same lock. Phase 4 round 2: the
+// lock is now a generation-ledger directory, not a single file -- "present"
+// means the CURRENT (highest-epoch) generation exists and is not yet
+// released; a released or absent ledger reads as `present: false`, matching
+// this check's original "no lock file" meaning.
 export function inspectProviderCapacityLock(runtimeDir) {
-  const { lockPath } = providerCapacityStatePaths(runtimeDir);
-  if (!fs.existsSync(lockPath)) {
-    return { present: false, lockPath, holderPid: null, holderAlive: null };
+  const { lockDir } = providerCapacityStatePaths(runtimeDir);
+  const current = currentGeneration(lockDir);
+  if (!current || current.record.releasedAt) {
+    return { present: false, lockPath: lockDir, holderPid: null, holderAlive: null };
   }
-  let holderPid = null;
-  try {
-    holderPid = JSON.parse(fs.readFileSync(lockPath, 'utf8'))?.pid ?? null;
-  } catch {
-    return { present: true, lockPath, holderPid: null, holderAlive: null };
+  const holderPid = Number.isInteger(current.record.holder?.pid) && current.record.holder.pid > 0
+    ? current.record.holder.pid
+    : null;
+  if (holderPid === null) {
+    return { present: true, lockPath: lockDir, holderPid: null, holderAlive: null };
   }
-  const holderAlive = Number.isInteger(holderPid) && holderPid > 0 ? isPidAlive(holderPid) : null;
-  return { present: true, lockPath, holderPid, holderAlive };
+  const holderAlive = resolveHolderLiveness(
+    { pid: holderPid, processStartTime: current.record.holder.processStartTime },
+    isPidAlive(holderPid),
+  ) === 'held';
+  return { present: true, lockPath: lockDir, holderPid, holderAlive };
 }
 
 // Pre-Phase-05 gate H1 / post-review-recut.md "Fault classifier correction":

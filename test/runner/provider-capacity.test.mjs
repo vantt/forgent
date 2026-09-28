@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { fork, spawnSync } from 'node:child_process';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import {
   acquireProviderAccountLease,
@@ -17,6 +18,15 @@ import {
   stableHash,
   validateProviderAccountInventory,
 } from '../../src/runner/dispatch/provider-capacity.mjs';
+import { getProcessStartTime } from '../../src/runner/dispatch/process-identity.mjs';
+
+const PROVIDER_CAPACITY_MJS = path.resolve(fileURLToPath(import.meta.url), '../../../src/runner/dispatch/provider-capacity.mjs');
+
+// Process identity is read from /proc, so pid-reuse detection only works on
+// Linux -- elsewhere resolveHolderLiveness has nothing to cross-check
+// against and fails closed to 'held' by contract (process-identity.mjs's
+// own documented decision table).
+const HAS_PROC_START_TIME = getProcessStartTime(process.pid) !== null;
 
 function mkTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-provider-capacity-test-'));
@@ -224,6 +234,241 @@ test('lease reclaim: a dead RUNNER pid with no isRunWorkerAlive evidence still r
     runtimeDir,
   });
   assert.equal(selected.accountId, 'a', 'no isRunWorkerAlive supplied -- a dead pid alone still reclaims, unchanged from before this fix');
+});
+
+test('lease reclaim (dispatch-engine-liveness-hardening Phase 4, C2): a live pid whose recorded processStartTime no longer matches (pid reused by an unrelated process) is reclaimed, not mistaken for the original holder', () => {
+  const runtimeDir = mkTempDir();
+  const { statePath } = providerCapacityStatePaths(runtimeDir);
+  fs.mkdirSync(path.dirname(statePath), { recursive: true });
+  fs.writeFileSync(statePath, JSON.stringify({
+    contract: 'provider-capacity-state.v1',
+    providers: {
+      'openai-codex': {
+        accounts: {
+          // A live pid (this test process itself) but a processStartTime
+          // that can never match the real one -- simulating the exact C2
+          // gap the audit names for this lock ("pid-only, no start time"):
+          // a pid that is technically alive right now but is NOT the same
+          // process that originally acquired this lease.
+          a: { leases: { reused_run: { runId: 'reused_run', pid: process.pid, processStartTime: 'not-a-real-start-time' } } },
+          b: { leases: {} },
+          c: { leases: {} },
+        },
+      },
+    },
+    assignments: {},
+    audit: [],
+  }));
+
+  const selected = acquireProviderAccountLease({
+    runnerConfig: runnerConfig(),
+    provider: 'openai-codex',
+    assignmentId: 'asgn',
+    runId: 'run_asgn_01',
+    seed: 's',
+    runtimeDir,
+  });
+  const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+  if (HAS_PROC_START_TIME) {
+    assert.equal(selected.accountId, 'a', "account a's stale lease (pid reused) must be reclaimed, not treated as still held by the live process wearing that pid");
+    assert.equal(state.providers['openai-codex'].accounts.a.leases.reused_run, undefined);
+  } else {
+    // No /proc start-time available on this host -- resolveHolderLiveness
+    // has nothing to cross-check and fails closed to 'held', same as before
+    // this fix. Not a regression: documented fallback, not a bug.
+    assert.ok(state.providers['openai-codex'].accounts.a.leases.reused_run, 'without /proc, an alive pid with no cross-checkable start time must stay held (fail-closed), unchanged from before this fix');
+  }
+});
+
+// S3 (dispatch-engine-liveness-hardening Phase 4): the audit's own live
+// probe against the real module -- concurrent contenders racing a
+// pre-seeded stale lock (dead pid), no re-check before unlink -- lost a
+// lease 17/25 trials (`selected=12 leasesPersisted=10` example). Real
+// concurrency requires real OS processes (one event loop can never expose
+// a TOCTOU race against itself), so each contender is a genuine forked
+// child process calling the real `acquireProviderAccountLease`, matching
+// claim-port.test.mjs's own established real-cross-process-race pattern.
+//
+// Two adjustments beyond a plain "fork N children, race them" were needed
+// to actually reproduce the audit's own repro rate (verified empirically:
+// see this phase's own report) rather than passing vacuously:
+//  1. Each contender waits for an explicit 'go' IPC message before calling
+//     acquireProviderAccountLease, sent to every child only once ALL of
+//     them have finished importing/starting up. Fork/import startup jitter
+//     otherwise spreads contenders far enough apart in wall-clock time that
+//     they rarely actually contend for the same stale lock at once -- an
+//     unsynchronized version of this test measured only ~13% reproduction
+//     against the pre-fix code, vs. the audit's own 68% (17/25) and this
+//     synchronized version's measured 67% (10/15), a near-exact match.
+//  2. Each contender stays alive (an unref'd-equivalent keep-alive timer)
+//     after acquiring, until the parent explicitly kills it once the trial
+//     is scored. `acquireProviderAccountLease`'s own reclaim step
+//     (`reclaimDeadLeases`, Phase 2) correctly evicts a lease whose pid has
+//     ALREADY exited by the time a later contender checks -- a short-lived
+//     one-shot child that exits immediately after acquiring would trigger
+//     that (unrelated, correct) reclaim path and produce a false failure
+//     that has nothing to do with this phase's stale-lock TOCTOU fix.
+test('S3 (dispatch-engine-liveness-hardening Phase 4): concurrent contenders racing a pre-seeded stale lock (dead pid) never lose a lease', { timeout: 60_000 }, async () => {
+  const TRIALS = 10;
+  const CONTENDERS = 10;
+  const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-provider-capacity-race-'));
+  const allChildren = [];
+
+  try {
+    for (let trial = 0; trial < TRIALS; trial += 1) {
+      const runtimeDir = mkTempDir();
+      const { statePath, lockDir } = providerCapacityStatePaths(runtimeDir);
+      fs.mkdirSync(lockDir, { recursive: true });
+      // Pre-seed a stale generation-1 lock record left behind by a crashed
+      // holder: a dead pid, no re-checkable content -- exactly the audit's
+      // own probe shape, expressed in the generation-ledger's own on-disk
+      // format (dispatch-engine-liveness-hardening Phase 4 round 2).
+      fs.writeFileSync(
+        path.join(lockDir, '0000000001.json'),
+        JSON.stringify({ holder: { pid: deadPid(), processStartTime: null }, acquiredAt: new Date(0).toISOString() }),
+      );
+
+      const children = Array.from({ length: CONTENDERS }, (_, i) => {
+        const runId = `run_t${trial}_${i}`;
+        const childScript = `
+import { acquireProviderAccountLease } from ${JSON.stringify(pathToFileURL(PROVIDER_CAPACITY_MJS).href)};
+process.send({ ready: true });
+process.once('message', () => {
+  const result = acquireProviderAccountLease({
+    runnerConfig: ${JSON.stringify(runnerConfig())},
+    provider: 'openai-codex',
+    assignmentId: ${JSON.stringify(`asgn-${i}`)},
+    runId: ${JSON.stringify(runId)},
+    seed: ${JSON.stringify(runId)},
+    runtimeDir: ${JSON.stringify(runtimeDir)},
+  });
+  process.send({ runId: ${JSON.stringify(runId)}, status: result?.status ?? null });
+  setInterval(() => {}, 1000);
+});
+`;
+        const childPath = path.join(workDir, `race-child-t${trial}-${i}.mjs`);
+        fs.writeFileSync(childPath, childScript);
+        const child = fork(childPath, { stdio: 'inherit' });
+        allChildren.push(child);
+        return child;
+      });
+
+      // Wait for every contender to finish importing and report 'ready'
+      // before sending 'go' to any of them -- this is what closes the
+      // startup-jitter gap described above.
+      await Promise.all(children.map((child) => new Promise((resolve, reject) => {
+        child.once('message', resolve);
+        child.once('error', reject);
+      })));
+      const finalResultsPromise = Promise.all(children.map((child) => new Promise((resolve, reject) => {
+        child.once('message', resolve);
+        child.once('error', reject);
+      })));
+      children.forEach((child) => child.send('go'));
+      const results = await finalResultsPromise;
+
+      const selectedRunIds = results.filter((r) => r.status === 'selected').map((r) => r.runId).sort();
+      const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+      const persistedRunIds = [];
+      for (const acct of Object.values(state.providers?.['openai-codex']?.accounts ?? {})) {
+        persistedRunIds.push(...Object.keys(acct.leases ?? {}));
+      }
+      persistedRunIds.sort();
+
+      assert.deepEqual(
+        persistedRunIds,
+        selectedRunIds,
+        `trial ${trial}: every runId reported "selected" must persist its lease in state.json -- a mismatch means a concurrent contender's write clobbered this one (the exact race the audit reproduced 17/25 trials before this fix)`,
+      );
+    }
+  } finally {
+    for (const child of allChildren) child.kill();
+  }
+});
+
+// S3 round 2: the state.json-loss assertion above only INFERS a double
+// critical-section entry from its downstream symptom (a clobbered write).
+// This is Lead's own direct-proof technique, made a permanent part of the
+// suite rather than a one-off debug script: each contender's `fn` (passed
+// to the real, exported `withFileLock`) first attempts an EXCLUSIVE marker
+// file create (`fs.openSync(markerPath, 'wx')`, the SAME atomic primitive
+// the lock itself relies on) before doing any work, and records a
+// violation if that create fails with EEXIST while it should be the sole
+// holder. This catches a double-entry directly, independent of whether
+// `state.json` happens to reveal it -- a future regression that somehow
+// stops corrupting `state.json` (e.g. a change to what `fn` does) would
+// still be caught here. The critical section briefly busy-waits (a few ms)
+// to widen the window enough for a genuine violation to matter, matching
+// what actually reproduced the round-1 regression during investigation.
+test('S3 round 2 (dispatch-engine-liveness-hardening Phase 4): direct marker-file proof that withFileLock never grants two holders the same lock concurrently', { timeout: 60_000 }, async () => {
+  const TRIALS = 15;
+  const CONTENDERS = 10;
+  const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-provider-capacity-marker-race-'));
+  const allChildren = [];
+
+  try {
+    for (let trial = 0; trial < TRIALS; trial += 1) {
+      const runtimeDir = mkTempDir();
+      const { lockDir } = providerCapacityStatePaths(runtimeDir);
+      fs.mkdirSync(lockDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(lockDir, '0000000001.json'),
+        JSON.stringify({ holder: { pid: deadPid(), processStartTime: null }, acquiredAt: new Date(0).toISOString() }),
+      );
+      const markerPath = path.join(runtimeDir, 'marker');
+      const violationsPath = `${markerPath}.violations`;
+
+      const children = Array.from({ length: CONTENDERS }, (_, i) => {
+        const childScript = `
+import { withFileLock } from ${JSON.stringify(pathToFileURL(PROVIDER_CAPACITY_MJS).href)};
+import fs from 'node:fs';
+process.send({ ready: true });
+process.once('message', () => {
+  withFileLock(${JSON.stringify(lockDir)}, () => {
+    let mfd;
+    try {
+      mfd = fs.openSync(${JSON.stringify(markerPath)}, 'wx');
+    } catch (err) {
+      fs.appendFileSync(${JSON.stringify(violationsPath)}, \`MARKER-VIOLATION pid=\${process.pid} err=\${err.code}\\n\`);
+    }
+    const start = Date.now();
+    while (Date.now() - start < 5) {} // widen the critical-section window
+    if (mfd !== undefined) { fs.closeSync(mfd); fs.unlinkSync(${JSON.stringify(markerPath)}); }
+  });
+  process.send({ done: true });
+  setInterval(() => {}, 1000);
+});
+`;
+        const childPath = path.join(workDir, `marker-race-child-t${trial}-${i}.mjs`);
+        fs.writeFileSync(childPath, childScript);
+        const child = fork(childPath, { stdio: 'inherit' });
+        allChildren.push(child);
+        return child;
+      });
+
+      await Promise.all(children.map((child) => new Promise((resolve, reject) => {
+        child.once('message', resolve);
+        child.once('error', reject);
+      })));
+      const donePromise = Promise.all(children.map((child) => new Promise((resolve, reject) => {
+        child.once('message', resolve);
+        child.once('error', reject);
+      })));
+      children.forEach((child) => child.send('go'));
+      await donePromise;
+
+      const hasViolation = fs.existsSync(violationsPath);
+      assert.equal(
+        hasViolation,
+        false,
+        hasViolation
+          ? `trial ${trial}: direct marker-exclusivity violation:\n${fs.readFileSync(violationsPath, 'utf8')}`
+          : undefined,
+      );
+    }
+  } finally {
+    for (const child of allChildren) child.kill();
+  }
 });
 
 test('classifier quarantines only high-confidence stderr/provider outcomes', () => {
