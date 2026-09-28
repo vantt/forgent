@@ -25,7 +25,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { getBootId, getProcessStartTime } from './process-identity.mjs';
+import { getBootId, getProcessStartTime, resolveHolderLiveness as resolveHolderLivenessByIdentity } from './process-identity.mjs';
 
 // --- PID liveness --------------------------------------------------------
 
@@ -59,29 +59,15 @@ export function buildRunControlHolder(id) {
 }
 
 /** Whether a recorded control holder is still the live process that
- * acquired the lock, fails closed toward 'held' whenever that cannot be
- * disproven:
- *  - bootId recorded and differs from the current boot -> 'dead' (the host
- *    rebooted since acquisition; that pid cannot still be this holder).
- *  - pid not alive (ESRCH) -> 'dead'.
- *  - pid alive but no recorded processStartTime (pre-H1 holder record) ->
- *    'held' (nothing to cross-check against; stay conservative).
- *  - pid alive but /proc/<pid>/stat unreadable -> 'held' (unknown is not
- *    dead).
- *  - pid alive and processStartTime matches -> 'held' (same process).
- *  - pid alive but processStartTime differs -> 'dead' (pid was reused by a
- *    different process). */
+ * acquired the lock. Thin backward-compatible wrapper (dispatch-engine-
+ * liveness-hardening Phase 1): the actual bootId/processStartTime judge now
+ * lives in process-identity.mjs as a pure function taking an injected
+ * liveness fact, so it can be reused without pulling `process.kill` (this
+ * file's own control-plane probe, `isProcessAlive`) into that fs-only leaf.
+ * Full decision-table doc lives on process-identity.mjs's own
+ * resolveHolderLiveness. */
 export function resolveHolderLiveness(holder) {
-  if (!holder || !Number.isInteger(holder.pid)) return 'dead';
-  const currentBootId = getBootId();
-  if (holder.bootId && currentBootId && currentBootId !== 'unknown-boot' && holder.bootId !== currentBootId) {
-    return 'dead';
-  }
-  if (!isProcessAlive(holder.pid)) return 'dead';
-  if (!holder.processStartTime) return 'held';
-  const liveStartTime = getProcessStartTime(holder.pid);
-  if (liveStartTime === null) return 'held';
-  return liveStartTime === holder.processStartTime ? 'held' : 'dead';
+  return resolveHolderLivenessByIdentity(holder, isProcessAlive(holder?.pid));
 }
 
 // --- Fsynced atomic publication -------------------------------------------
