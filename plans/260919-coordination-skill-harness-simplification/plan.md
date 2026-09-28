@@ -2498,6 +2498,11 @@ decomposition review's L4 finding flagged as unowned are now resolved:
 ## Phase 6 units
 
 - unit: I28 — build `fgos-code-change`, the merged coding-domain facade (Phase 6 creation half)
+  status: MERGED (2026-09-28). integratedSha 5eea48c3bc83c8a6af46c29bd07b7763a7e74d12,
+    testedSha 4006782dd (unit/I28 fix-round-1 tip), treeIdentical: clean
+    --no-ff auto-merge (ort), no conflicts. Key suites rerun on merged tree:
+    150/150 pass. See
+    plans/260919-coordination-skill-harness-simplification/reports/unit-I28-claude-only-execution-report.md.
   capability: code:implement
   depends-on: none (Phase 6 entry gate satisfied: I21/I26 integrated for
     Phase 5 items 2/7/8; I18 `fgos plan-lint` and I20 `fgos capability
