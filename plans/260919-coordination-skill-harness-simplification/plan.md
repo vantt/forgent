@@ -242,8 +242,23 @@ mechanics stay out of that discipline and out of architecture advisory.
 
 ### Skill quality
 
-- `fgos-plan-loop` and `fgos-architecture-panel` each fit within 1,500 words;
-  target 800–1,200 words.
+- `fgos-plan-loop` fits within 1,500 words (target 800–1,200) — VERIFIED at
+  1,233 words (Phase 4/I15).
+- `fgos-architecture-panel`'s original "≤1,500 words, target 800-1,200"
+  ceiling is SUPERSEDED (Lead decision, user-confirmed 2026-09-28, do not
+  reopen): that target was set before this skill's actual final scope was
+  known — it assumed the same shape as `fgos-plan-loop` (a pure
+  router/facade), but `fgos-architecture-panel` is a different kind of
+  skill: it holds the real orchestration doctrine a Lead needs to safely
+  run a 9-role protocol (Driver Disposition vocabulary, Executor Roster,
+  Bounded Reopen Scope, Fresh-Session Resume), not just dispatch/routing
+  logic. I22 already extracted every per-role/actor-facing packet into
+  templates (970→736 lines, 9006→6866 words at integration, since grown to
+  7,969 words post-I26's own hook-table addition) — what remains is
+  Lead-only content with no further safe extraction target identified.
+  New baseline: `fgos-architecture-panel` at 7,969 words (measured
+  `main@63ac08f5f`, post-I26) is the accepted current state; no further
+  unit is required to chase the original 1,500-word number.
 - Neither skill embeds full request JSON, field-by-field schema copies,
   source-line citations, or executor incident history.
 - A cold Lead can resume from one status command plus the task/plan artifact,
@@ -2171,15 +2186,21 @@ Executor/provider/model/tier selection remains an execution-time decision.
     touched by anything in this unit (it is settled, I23/I24a/I24b
     territory, not this unit's job).
 
-Note (decomposition review L4, not yet actioned): three Phase 5 Exit
-criteria remain unowned by any unit — the panel-depth experiment (deep vs.
-standard protocol comparison), "architecture-panel skill within budget",
-and "≥60% Lead instruction-token reduction without quality regression". I22
-explicitly deferred all three to whoever measures the Exit gate later
-(plan.md's own I22 status line). Phase 5 cannot be marked fully closed
-after I25/I26 land without either a dedicated measurement unit or an
-explicit Lead waiver — flagged here so it is not silently dropped once
-I25/I26 close.
+Update (2026-09-28, user-confirmed): the 3 Phase 5 Exit criteria the
+decomposition review's L4 finding flagged as unowned are now resolved:
+- "architecture-panel skill within budget" — CLOSED. See the "Skill
+  quality" section above (~line 245): the original 1,500-word ceiling is
+  superseded with a documented reason; 7,969 words is the accepted new
+  baseline.
+- "≥60% Lead instruction-token reduction without quality regression" —
+  DEFERRED, not measured (this specific measurement was never separately
+  actioned; it requires a real before/after Lead-prompt-size comparison
+  methodology this track hasn't built). Left open, not blocking.
+- "panel-depth experiment" (deep vs. standard protocol comparison) —
+  decomposed into its own unit (I27, below), user-confirmed to run in
+  parallel with Phase 6 rather than block it, since its benefit is scoped
+  to the architecture-panel/group-thinking domain only and shares no files
+  with Phase 6's own scope.
 
 Parallelism is limited deliberately:
 
