@@ -2419,6 +2419,65 @@ Executor/provider/model/tier selection remains an execution-time decision.
     incurred, and get explicit confirmation before continuing rather than
     silently re-spending; the report omits raw per-run evidence or the
     rubric's own git SHA in favor of only summary claims.
+  decision (Lead, 2026-09-28, real-spend incident during the batch):
+    implementer correctly paused per the stop condition above rather than
+    silently re-spending, after the first real paired-design dispatch
+    (P05.2 clear case, withheld-redteam) surfaced two problems. Lead
+    independently confirmed both directly (`git show --stat` on commits
+    `cee081d6f`/`2e1251c87`): (1) a likely false "failed" status from the
+    implementer's own concurrent file writes into the same worktree cwd
+    during an in-flight dispatch (same class as `tsk-3yo`) -- accepted;
+    (2) a real, structural contamination pathway: `red-team-packet.md` for
+    both P05.2 cases was committed into this worktree's checked-out tree
+    in `cee081d6f`, BEFORE the withheld-redteam dispatch ran in
+    `2e1251c87` -- bwrap confinement mounts the whole checkout read-only,
+    so that file was physically present and readable by the dispatched
+    agent regardless of any "don't read X" instruction. An
+    instruction-only mitigation is rejected as insufficient: the file
+    stays present for every future dispatch on this worktree, and the
+    experiment is specifically measuring behavior under withheld
+    information, so relying on the dispatched agent's own restraint
+    defeats the point. Ruling: (a) the tainted P05.2-clear withheld-explain
+    result is INVALIDATED -- do not score it, mark it
+    `invalidated-methodology` in the manifest, and redo it cleanly once (b)
+    below is in place; (b) structural fix, not instructional: for every
+    remaining case, commit only pre-reveal corpus content (framing through
+    synthesis) durably up front; commit each case's reveal-only content
+    (`red-team-packet.md`, `explain-recommendation.md` -- ground truth
+    needed for scoring, never as dispatch input) ONLY AFTER that case's
+    full-protocol AND withheld-redteam dispatches have both already run.
+    SUPERSEDED same-day: the "separate disposable worktree" idea above is
+    WRONG and was never executed for real isolation -- implementer
+    independently verified the actual confinement driver
+    (`src/runner/dispatch/confinement/drivers/bwrap.mjs:356`, confirmed by
+    Lead reading the same line directly) mounts `--ro-bind '/' '/'`: the
+    ENTIRE host filesystem root, read-only, for every dispatch, with
+    `plan.resources` layering only WRITABLE exceptions on top. This
+    confinement model bounds writes, never reads -- any absolute host path
+    (including the primary worktree's already-committed corpus) stays
+    fully readable by a confined dispatch regardless of which worktree its
+    own `--dir`/repoRoot points to. No worktree-boundary trick provides
+    real read isolation here; true blinding would require a genuinely
+    separate host/filesystem, disproportionate new infrastructure for this
+    unit's scope. Revised ruling: (a) for the 2 already-contaminated P05.2
+    cases, redo the withheld probe directly in the primary `unit/I27`
+    worktree (no disposable worktree) with a maximally self-sufficient
+    inline objective (embed everything needed, give no reason to explore
+    beyond the prompt) -- score it, but state plainly in the report that
+    this is risk-reduced, not hard-isolated, given the real confinement
+    read boundary; (b) for the new track-decision case, use the same
+    tight-prompt approach AND keep the reveal-content-commit-after-dispatch
+    ordering from the original fix (still a real, if partial, mitigation --
+    no memorable breadcrumb file exists yet at dispatch time) for the best
+    practical blinding available in this environment; (c) report language
+    must state the confinement-model finding plainly, never imply a
+    stronger isolation guarantee than what's real. Discipline going forward
+    (implementer's own fix, confirmed correct): never touch the dispatch
+    worktree's files while a real dispatch is in flight. Explicitly
+    confirmed: proceed with the remaining real batch under this corrected
+    methodology -- previously-granted real-cost authorization stands; this
+    is an implementation-level integrity fix within that authorization, not
+    a new cost decision requiring a fresh user round-trip.
 
 Update (2026-09-28, user-confirmed): the 3 Phase 5 Exit criteria the
 decomposition review's L4 finding flagged as unowned are now resolved:
@@ -2644,6 +2703,68 @@ decomposition review's L4 finding flagged as unowned are now resolved:
     without a documented reason; any of the caveat-blocks-close/
     resume-state/two-request-DAG content has no equivalent landing spot
     and isn't explicitly documented as a deliberate drop.
+  fix-round-1 (2026-09-28, independent test + review, both confirmed by
+    Lead reading the real code directly, not taken on report alone):
+    MUST FIX -- 1. Step 0's single-cell gate branches on `form` alone and
+    never checks the resolved `capability`; a live probe confirmed an
+    advisory demand (`outputKind: decision, mutates: false`) returns
+    `capability: "advise"`, `form: "protocol"` -- the same form value the
+    gate treats as "proceed to Step 1", so an advisory-only request can
+    open a mutating cell, contradicting Non-Goal 3 and swallowing
+    `coding-design-panel` via the back door. Add a capability allowlist
+    (`code:implement`/`code:refactor` only; anything else refuses and
+    returns to the live session) plus the missing negative fixture this
+    unit's own verification list already required. 2. The plan-mode
+    plan-lint gate is vacuous as documented: `fgos plan-lint <phase file>
+    --cell <id>` on a phase file with no matching unit block returns only
+    a `severity: warn` `capability.undeclared` finding, so `ok: true`
+    always -- confirmed live and via `src/report/capability-plan-lint.mjs`
+    (`ok = !findings.some(hard)`). Lint `plan.md` (not the phase file) with
+    `--cell <id>`, and in plan mode treat `capability.undeclared` as
+    blocking. 3. `coding-cell-policy.md` L104 ("The gate proof must be
+    re-executed against `integratedSha`", unconditional) still contradicts
+    L105's conditional AFFECTED_TESTS/FULL_TEST escalation rule -- the
+    CHANGELOG's claim that this was resolved is inaccurate; delete/rewrite
+    L104. 4. Step 4's snippet jumps from `git merge --no-ff` straight to
+    `git worktree remove`, omitting the mandatory post-merge record commit
+    and pre-cleanup `HEAD` re-assert coding-cell-policy §5 requires --
+    show them inline or drop the truncated snippet in favor of the prose
+    pointer alone. 5. The R2 recursive-dispatch guard has no precedence
+    over the `form: "facade"` re-route: an active R2 context told to
+    "re-route to plan mode" would open exactly the nested track R2 exists
+    to forbid -- add one line: under R2, `facade` means refuse, never
+    re-route. 6. SKILL.md's Mode Selection prose disagrees with the actual
+    tested classifier (verb set omits "implement"; a bare plan/phase path
+    with no verb resolves plan mode though prose requires a verb; a
+    partial negation resolves plan mode though prose says ask) -- reconcile
+    prose and code to one behavior, and read the SKILL.md's own Mode
+    Selection text into at least one test so a future prose change can
+    fail it (today's classifier tests are self-contained JS and read no
+    skill text). 7. The two-request DAG's auxiliary session ID
+    (`<coordinationId>-inspections`) still starts with the literal
+    `<track>--` prefix `chain.mjs`'s track-membership match uses
+    (confirmed: any entry starting with `<track>--` is grouped) -- in plan
+    mode this risks the read-only auxiliary session being miscounted as an
+    extra cell of the real track during cold-resume cell selection. Rename
+    the pattern so it does not start with `<track>--`, and add a
+    regression test. Also fix the broken `.agents/skills/fgos-code-change/
+    SKILL.md` relative link (4 levels up from `.agents/skills/x` exits the
+    repo; canonical and plugins copies resolve correctly).
+    ACCEPTED AS-IS, NOT FIX-ROUND SCOPE: the 13-fixture parity subset
+    (vs. retargeting all ~78 `classifyCodePanelRequest` fixtures) is kept
+    -- two independent agents confirmed live that both wrappers now call
+    one shared classifier, so coverage is equivalent and duplicating all
+    78 would test the identical branch twice; full retarget stays I29's
+    job. The word-budget ceiling (`COMBINED_LEAD_LOAD_CEILING = 3597`)
+    keeps measuring `fgos-plan-loop` for now -- correct today, since
+    plan-loop is still real, live Lead load until I29 stubs it; I29 must
+    update this same test to measure `fgos-code-change`'s own real word
+    count once plan-loop is stubbed (added to I29's scope below). Cosmetic
+    LOW items (worktree-dir single-dash vs. branch double-dash, R2 guard's
+    slug-charset looseness, trailing-punctuation/imperative-phrase
+    classifier edge cases, premature "deprecated stubs" frontmatter wording
+    pending I29) are named here as known, non-blocking, and left for I29 or
+    a later pass -- not re-litigated every round.
 - unit: I29 — convert `fgos-plan-loop`/`fgos-code-panel` into deprecated stubs (Phase 6 stub half)
   capability: code:implement
   depends-on: I28 (HARD technical dependency, not just safety ordering —
@@ -2747,6 +2868,14 @@ decomposition review's L4 finding flagged as unowned are now resolved:
     under their pre-stub size) and that both explicitly name
     `fgos-code-change` as the replacement, with no leftover
     `DemandFacts`/trigger phrasing; env -u CLAUDE_CODE_SESSION_ID npm test.
+    Also retarget `coordination-phase4-driver-discipline.test.mjs`'s
+    `COMBINED_LEAD_LOAD_CEILING` word-budget assertion itself (I28 fix
+    round 1 decision, 2026-09-28): it still measures `fgos-plan-loop`'s
+    word count, which is correct only until this unit stubs plan-loop —
+    once stubbed, measure `fgos-code-change`'s own SKILL.md +
+    `references/plan-mode.md` (plus the same driver/policy fragments) and
+    set the ceiling to that real measured sum, with the same
+    measure-first-then-decide rationale already used for I28's own number.
   stop: any bucket-(c) unclassified content has no landing spot in
     `fgos-code-change` (escalate, don't silently drop — but bucket (b)
     content is NOT a stop condition, it's an expected, reported deletion);
