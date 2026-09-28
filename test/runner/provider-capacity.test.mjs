@@ -317,11 +317,16 @@ test('S3 (dispatch-engine-liveness-hardening Phase 4): concurrent contenders rac
   try {
     for (let trial = 0; trial < TRIALS; trial += 1) {
       const runtimeDir = mkTempDir();
-      const { statePath, lockPath } = providerCapacityStatePaths(runtimeDir);
-      fs.mkdirSync(path.dirname(lockPath), { recursive: true });
-      // Pre-seed a stale lock left behind by a crashed holder: a dead pid,
-      // no re-checkable content -- exactly the audit's own probe shape.
-      fs.writeFileSync(lockPath, JSON.stringify({ pid: deadPid(), acquiredAt: new Date(0).toISOString() }));
+      const { statePath, lockDir } = providerCapacityStatePaths(runtimeDir);
+      fs.mkdirSync(lockDir, { recursive: true });
+      // Pre-seed a stale generation-1 lock record left behind by a crashed
+      // holder: a dead pid, no re-checkable content -- exactly the audit's
+      // own probe shape, expressed in the generation-ledger's own on-disk
+      // format (dispatch-engine-liveness-hardening Phase 4 round 2).
+      fs.writeFileSync(
+        path.join(lockDir, '0000000001.json'),
+        JSON.stringify({ holder: { pid: deadPid(), processStartTime: null }, acquiredAt: new Date(0).toISOString() }),
+      );
 
       const children = Array.from({ length: CONTENDERS }, (_, i) => {
         const runId = `run_t${trial}_${i}`;
@@ -374,6 +379,91 @@ process.once('message', () => {
         persistedRunIds,
         selectedRunIds,
         `trial ${trial}: every runId reported "selected" must persist its lease in state.json -- a mismatch means a concurrent contender's write clobbered this one (the exact race the audit reproduced 17/25 trials before this fix)`,
+      );
+    }
+  } finally {
+    for (const child of allChildren) child.kill();
+  }
+});
+
+// S3 round 2: the state.json-loss assertion above only INFERS a double
+// critical-section entry from its downstream symptom (a clobbered write).
+// This is Lead's own direct-proof technique, made a permanent part of the
+// suite rather than a one-off debug script: each contender's `fn` (passed
+// to the real, exported `withFileLock`) first attempts an EXCLUSIVE marker
+// file create (`fs.openSync(markerPath, 'wx')`, the SAME atomic primitive
+// the lock itself relies on) before doing any work, and records a
+// violation if that create fails with EEXIST while it should be the sole
+// holder. This catches a double-entry directly, independent of whether
+// `state.json` happens to reveal it -- a future regression that somehow
+// stops corrupting `state.json` (e.g. a change to what `fn` does) would
+// still be caught here. The critical section briefly busy-waits (a few ms)
+// to widen the window enough for a genuine violation to matter, matching
+// what actually reproduced the round-1 regression during investigation.
+test('S3 round 2 (dispatch-engine-liveness-hardening Phase 4): direct marker-file proof that withFileLock never grants two holders the same lock concurrently', { timeout: 60_000 }, async () => {
+  const TRIALS = 15;
+  const CONTENDERS = 10;
+  const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-provider-capacity-marker-race-'));
+  const allChildren = [];
+
+  try {
+    for (let trial = 0; trial < TRIALS; trial += 1) {
+      const runtimeDir = mkTempDir();
+      const { lockDir } = providerCapacityStatePaths(runtimeDir);
+      fs.mkdirSync(lockDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(lockDir, '0000000001.json'),
+        JSON.stringify({ holder: { pid: deadPid(), processStartTime: null }, acquiredAt: new Date(0).toISOString() }),
+      );
+      const markerPath = path.join(runtimeDir, 'marker');
+      const violationsPath = `${markerPath}.violations`;
+
+      const children = Array.from({ length: CONTENDERS }, (_, i) => {
+        const childScript = `
+import { withFileLock } from ${JSON.stringify(pathToFileURL(PROVIDER_CAPACITY_MJS).href)};
+import fs from 'node:fs';
+process.send({ ready: true });
+process.once('message', () => {
+  withFileLock(${JSON.stringify(lockDir)}, () => {
+    let mfd;
+    try {
+      mfd = fs.openSync(${JSON.stringify(markerPath)}, 'wx');
+    } catch (err) {
+      fs.appendFileSync(${JSON.stringify(violationsPath)}, \`MARKER-VIOLATION pid=\${process.pid} err=\${err.code}\\n\`);
+    }
+    const start = Date.now();
+    while (Date.now() - start < 5) {} // widen the critical-section window
+    if (mfd !== undefined) { fs.closeSync(mfd); fs.unlinkSync(${JSON.stringify(markerPath)}); }
+  });
+  process.send({ done: true });
+  setInterval(() => {}, 1000);
+});
+`;
+        const childPath = path.join(workDir, `marker-race-child-t${trial}-${i}.mjs`);
+        fs.writeFileSync(childPath, childScript);
+        const child = fork(childPath, { stdio: 'inherit' });
+        allChildren.push(child);
+        return child;
+      });
+
+      await Promise.all(children.map((child) => new Promise((resolve, reject) => {
+        child.once('message', resolve);
+        child.once('error', reject);
+      })));
+      const donePromise = Promise.all(children.map((child) => new Promise((resolve, reject) => {
+        child.once('message', resolve);
+        child.once('error', reject);
+      })));
+      children.forEach((child) => child.send('go'));
+      await donePromise;
+
+      const hasViolation = fs.existsSync(violationsPath);
+      assert.equal(
+        hasViolation,
+        false,
+        hasViolation
+          ? `trial ${trial}: direct marker-exclusivity violation:\n${fs.readFileSync(violationsPath, 'utf8')}`
+          : undefined,
       );
     }
   } finally {
