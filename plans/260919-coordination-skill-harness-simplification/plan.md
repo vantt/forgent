@@ -3286,6 +3286,16 @@ decomposition (I22-I26, I27, I28-I29, and now I30-I35).
     unit:` blocks AND Product Gates `Capability` column) now fails.
 
 - unit: I33 — reclassify the `group-thinking` protocol pack; defer the protocol-id rename and stub removal as documented, out-of-scope future work (Phase 7 item 4a, narrowed)
+  status: MERGED (2026-09-28). integratedSha 5f4ed37b82445f3e50debe3e2a1d6ec7fc27432b,
+    testedSha 045ec8150 (unit/I33 tip), clean --no-ff auto-merge (ort), no
+    conflicts. Chose a per-member `kind` field on the SAME pack file over a
+    physical split, evidenced against real consumer code
+    (`group-thinking-pack.mjs`'s hardcoded single-pack-path, and
+    `fgos-architecture-panel`'s genuine live dispatch through this exact
+    gate) -- Lead independently reproduced all 6 members' CLI resolution
+    (genuine full FlowDefinition data, not stub output) before merging.
+    `fgos-group-thinking` confirmed untouched (empty diff). See
+    plans/260919-coordination-skill-harness-simplification/reports/unit-I33-claude-only-execution-report.md.
   capability: code:implement
   depends-on: I32 (sequenced after the binding-source question settles;
     otherwise file-disjoint)
