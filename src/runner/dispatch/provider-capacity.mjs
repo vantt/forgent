@@ -339,11 +339,23 @@ export function isPidAlive(pid) {
   }
 }
 
-function reclaimDeadLeases(providerState, { runIsDead = () => false, nowIso = new Date().toISOString() } = {}) {
+// S1 (dispatch-engine-liveness-hardening Phase 2): `lease.pid` is the
+// RUNNER's own pid (the process that called acquireProviderAccountLease),
+// never the detached supervisor/worker that actually holds and uses the
+// credential -- the runner can die while its detached child keeps working,
+// same root cause as admitRunAttempt's own in-flight gap. A dead runner
+// pid alone must NOT prove the lease reclaimable when the caller can show
+// (`isRunWorkerAlive`) that Run's real worker is still alive; `runIsDead`
+// keeps its existing, opposite-polarity job of proving death through OTHER
+// evidence even when the pid check alone is inconclusive (e.g. an alive
+// pid that was actually reused by an unrelated process) -- both default to
+// values that reproduce the exact pre-fix behavior when a caller supplies
+// neither.
+function reclaimDeadLeases(providerState, { runIsDead = () => false, isRunWorkerAlive = () => false, nowIso = new Date().toISOString() } = {}) {
   for (const [accountId, acct] of Object.entries(providerState.accounts ?? {})) {
     for (const [runId, lease] of Object.entries(acct.leases ?? {})) {
       const pidDead = lease.pid !== undefined && !isPidAlive(lease.pid);
-      const provenDead = pidDead || runIsDead(runId, lease);
+      const provenDead = (pidDead && !isRunWorkerAlive(runId, lease)) || runIsDead(runId, lease);
       if (provenDead) {
         delete acct.leases[runId];
         acct.lastReclaimedAt = nowIso;
@@ -352,10 +364,10 @@ function reclaimDeadLeases(providerState, { runIsDead = () => false, nowIso = ne
   }
 }
 
-export function rankProviderAccounts({ provider, inventory, state, assignmentId, seed, runIsDead, now = Date.now() }) {
+export function rankProviderAccounts({ provider, inventory, state, assignmentId, seed, runIsDead, isRunWorkerAlive, now = Date.now() }) {
   const accounts = inventory?.[provider]?.accounts ?? {};
   const providerState = state.providers?.[provider] ?? { accounts: {} };
-  reclaimDeadLeases(providerState, { runIsDead });
+  reclaimDeadLeases(providerState, { runIsDead, isRunWorkerAlive });
   const stickyAccountId = assignmentId ? state.assignments?.[`${provider}:${assignmentId}`]?.accountId : null;
   const sticky = stickyAccountId && accounts[stickyAccountId] ? accountState(providerState, stickyAccountId) : null;
   if (stickyAccountId && accounts[stickyAccountId] && sticky && !isQuarantined(sticky, now)) {
@@ -376,7 +388,7 @@ export function rankProviderAccounts({ provider, inventory, state, assignmentId,
 }
 
 export function acquireProviderAccountLease({
-  runnerConfig, provider, assignmentId, runId, seed, runtimeDir, runIsDead,
+  runnerConfig, provider, assignmentId, runId, seed, runtimeDir, runIsDead, isRunWorkerAlive,
   now = new Date(),
 } = {}) {
   if (!provider || !runId) return null;
@@ -387,9 +399,9 @@ export function acquireProviderAccountLease({
     const state = readState(statePath);
     state.providers[provider] ??= { accounts: {} };
     const providerState = state.providers[provider];
-    reclaimDeadLeases(providerState, { runIsDead, nowIso: now.toISOString() });
+    reclaimDeadLeases(providerState, { runIsDead, isRunWorkerAlive, nowIso: now.toISOString() });
     const ranked = rankProviderAccounts({
-      provider, inventory, state, assignmentId, seed: seed ?? runId, runIsDead, now: now.getTime(),
+      provider, inventory, state, assignmentId, seed: seed ?? runId, runIsDead, isRunWorkerAlive, now: now.getTime(),
     });
     if (ranked.length === 0) {
       return { status: 'refused', provider, reason: 'provider-capacity.exhausted-or-quarantined' };

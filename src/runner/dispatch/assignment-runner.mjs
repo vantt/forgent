@@ -108,6 +108,7 @@ import {
   publishMutableProjection,
   computeSha256Digest,
   canonicalJson,
+  isBoundProcessAlive,
 } from './cli-spawn-supervisor.mjs';
 import {
   buildEffectiveExecutionContract,
@@ -718,6 +719,44 @@ function validateAssignmentLegality(asgn, opts = {}) {
 }
 
 /**
+ * Whether a cli-spawn Run's DETACHED supervisor or worker -- published
+ * under `runDir/protected/(supervisor-binding|bindings)/*` by
+ * cli-spawn-supervisor.mjs -- is still doing real work, independent of
+ * whether the RUNNER process that spawned it (the control holder
+ * `inspectRunControl` tracks) is alive. The supervisor is spawned
+ * `detached: true` and deliberately outlives its parent; a runner-only
+ * liveness check (`inspectRunControl`) reads `held: false` the instant the
+ * runner dies even while its supervisor/worker keeps mutating the cwd (S1).
+ * Both `admitRunAttempt`'s in-flight check and provider-capacity's lease
+ * reclaim need this SAME real-worker signal, not just the runner's.
+ *
+ * Mirrors reconcile-cli-spawn.mjs's own "latest command file" discovery
+ * (sorted `controller/commands/*.json`, last wins) so this reads the same
+ * launchCommandId that reconciliation would use. A herdr-spawn Run (no
+ * supervisor/worker bindings ever published for it) or a Run with no
+ * commands at all correctly reads back `false` here -- falls through to
+ * the existing holder-only check, unchanged from before this fix.
+ */
+function isCliSpawnRunStillWorking(runDir) {
+  const commandsDir = path.join(runDir, 'controller', 'commands');
+  if (!fs.existsSync(commandsDir)) return false;
+  let commandFiles;
+  try {
+    commandFiles = fs.readdirSync(commandsDir).filter((f) => f.endsWith('.json')).sort();
+  } catch {
+    return false;
+  }
+  const latestCommandFile = commandFiles[commandFiles.length - 1];
+  if (!latestCommandFile) return false;
+  const launchCommandId = path.basename(latestCommandFile, '.json');
+  const supervisorBinding = readSupervisorBinding(runDir, launchCommandId);
+  if (supervisorBinding?.supervisor && isBoundProcessAlive(supervisorBinding.supervisor)) return true;
+  const workerBinding = readWorkerBinding(runDir, launchCommandId);
+  if (workerBinding?.worker && isBoundProcessAlive(workerBinding.worker)) return true;
+  return false;
+}
+
+/**
  * Atomically admit one Run attempt for `assignmentId` under `runsDir`,
  * replacing the prior readdirSync + max-attempt scan. Fences three
  * outcomes, per the admission door's own commit algorithm:
@@ -867,21 +906,26 @@ function admitRunAttempt(
     // exists to close, one level up from R1's own resume-time check (this
     // fires on a FRESH dispatch that never resumes anything, so R1's guard
     // never runs). Only a dead holder (inspectRunControl, Phase 02
-    // identity) authorizes silently proceeding; alive or undisprovable
-    // liveness refuses unless the operator explicitly overrides via
-    // `forceNewAttempt` (--force-new-attempt).
+    // identity) AND no live detached supervisor/worker (S1, Phase 2 --
+    // `inspectRunControl` alone only proves the RUNNER is dead; its
+    // detached supervisor/worker is spawned to deliberately outlive it and
+    // keeps mutating the cwd, so a runner-only check would admit a second,
+    // racing worker onto the same Run) authorizes silently proceeding;
+    // alive or undisprovable liveness on either signal refuses unless the
+    // operator explicitly overrides via `forceNewAttempt`
+    // (--force-new-attempt).
     if (current && !forceNewAttempt) {
       const priorAttemptStr = current.record.attemptStr || String(current.record.attempt).padStart(2, '0');
       const priorRunDir = path.join(runsDir, priorAttemptStr);
       if (!fs.existsSync(path.join(priorRunDir, 'result.json'))) {
         const priorControl = inspectRunControl(priorRunDir);
-        if (priorControl.held) {
+        if (priorControl.held || isCliSpawnRunStillWorking(priorRunDir)) {
           return {
             stop: true,
             status: 'run-in-flight',
             priorRunId: current.record.runId,
             priorAttempt: current.record.attempt,
-            holder: priorControl.holder,
+            holder: priorControl.holder ?? null,
           };
         }
       }
@@ -1065,6 +1109,7 @@ function attemptProviderCapacityFallback({
   hasLiveTaskAccess,
   providerCapacityRuntimeDir,
   providerCapacityRunIsDead,
+  providerCapacityIsRunWorkerAlive,
 }) {
   const declaredCandidates = Array.isArray(compiledPlan.policy?.executorPreference)
     ? compiledPlan.policy.executorPreference.slice(1)
@@ -1168,6 +1213,7 @@ function attemptProviderCapacityFallback({
         seed: `${effectiveAssignment.assignmentId}:${runId}:fallback:${candidateId}`,
         runtimeDir: providerCapacityRuntimeDir,
         runIsDead: providerCapacityRunIsDead,
+        isRunWorkerAlive: providerCapacityIsRunWorkerAlive,
       });
     } catch (err) {
       lease = { status: 'refused', reason: err.code === 'provider-capacity-lock-stale' ? 'provider-capacity.lock-stale' : 'provider-capacity.acquire-failed' };
@@ -1235,6 +1281,23 @@ export async function executeAssignment(assignment, opts = {}) {
   const assignmentsDir = path.join(fgosDir, 'assignments');
   const assignmentDir = path.join(assignmentsDir, assignment.assignmentId);
   const runsDir = path.join(assignmentDir, 'runs');
+
+  // S1 (Phase 2): reclaimDeadLeases (provider-capacity.mjs) only ever saw
+  // the lease-acquiring RUNNER pid go dead, never whether the Run's
+  // detached supervisor/worker is still using the credential -- the exact
+  // same runner-vs-detached-child gap admitRunAttempt's in-flight check
+  // closes above. `lease.assignmentId` + the `run_<assignmentId>_<NN>`
+  // runId shape (this function's own admission naming, above) are enough
+  // to rebuild that Run's directory without provider-capacity.mjs itself
+  // needing to know this layout -- it stays a generic module, this closure
+  // is the only place that maps a lease back to a real runDir.
+  const providerCapacityIsRunWorkerAlive = opts.providerCapacityIsRunWorkerAlive ?? ((runId, lease) => {
+    if (!lease?.assignmentId || typeof runId !== 'string') return false;
+    const prefix = `run_${lease.assignmentId}_`;
+    if (!runId.startsWith(prefix)) return false;
+    const attemptStr = runId.slice(prefix.length);
+    return isCliSpawnRunStillWorking(path.join(assignmentsDir, lease.assignmentId, 'runs', attemptStr));
+  });
 
   fs.mkdirSync(runsDir, { recursive: true });
 
@@ -1610,6 +1673,7 @@ export async function executeAssignment(assignment, opts = {}) {
         seed: `${effectiveAssignment.assignmentId}:${runId}`,
         runtimeDir: opts.providerCapacityRuntimeDir,
         runIsDead: opts.providerCapacityRunIsDead,
+        isRunWorkerAlive: providerCapacityIsRunWorkerAlive,
       });
     } catch (err) {
       providerCapacitySelection = {
@@ -1695,6 +1759,7 @@ export async function executeAssignment(assignment, opts = {}) {
         hasLiveTaskAccess: opts.hasLiveTaskAccess,
         providerCapacityRuntimeDir: opts.providerCapacityRuntimeDir,
         providerCapacityRunIsDead: opts.providerCapacityRunIsDead,
+        providerCapacityIsRunWorkerAlive,
       });
 
       let fallbackAdopted = false;
