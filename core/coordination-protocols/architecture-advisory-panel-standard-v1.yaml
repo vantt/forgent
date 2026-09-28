@@ -1,0 +1,340 @@
+# core/coordination-protocols/architecture-advisory-panel-standard-v1.yaml --
+# Unit I27 (panel-depth experiment, Phase 5 Exit criterion): a "standard"
+# variant of `architecture-advisory-panel-v1.yaml`, reachable only as a
+# separate, explicitly-selected protocol/preset -- never the default or a
+# silent fallback (Phase 5's own wording: "a standard profile may ship only
+# if it remains a separate registered protocol/preset with clear selection
+# triggers").
+#
+# The ENTIRE delta from the full protocol is: `phase-redteam`'s graph node,
+# the `red-team-actor` actor, the `red-team` role, the `red-team-packet`
+# operation, and the `post-redteam-open` visibility window are all removed;
+# `phase-synthesis.transitions` now points straight at `phase-explanation`;
+# `phase-explanation` is re-gated on `post-synthesis-open` (the window that
+# already opens once synthesis settles) instead of `post-redteam-open`;
+# `metadata.id` is this file's own new id. Every other node, operation,
+# actor, and role byte-identical to `architecture-advisory-panel-v1.yaml` --
+# no new judgment content invented here.
+#
+# `red-team-actor` is dropped from BOTH `spec.actors` and `spec.roles` (not
+# just the actor): the standard variant runs no red-team dispatch at all, so
+# an actor bound to a role with no operation to perform is a dead
+# declaration, not a real capability this variant offers. This was a real,
+# documented choice (Unit I27's own decision record allows either), not
+# an oversight.
+#
+# This is an EXPERIMENTAL comparison artifact (Unit I27): the full protocol
+# with mandatory red-team falsification
+# (docs/architect/agent-coordination/playbooks/architecture-advisory-role-doctrine.md
+# ~L1151-1170) remains this domain's real default. A quality regression from
+# dropping red-team is plausible, not unlikely -- prior real evidence (P05.2)
+# shows red-team dissent materially shaped the final explanation in both its
+# "clear" and "unclear" cases. See
+# plans/260919-coordination-skill-harness-simplification/reports/ for the
+# real comparison this variant was built to measure.
+
+apiVersion: fgos.dev/v1alpha1
+kind: FlowDefinition
+metadata:
+  id: core.coordination-protocol.architecture-advisory-panel-standard-v1
+  version: 1.0.0
+
+spec:
+  profile:
+    kind: CoordinationProtocol
+    completion:
+      mode: synthesize
+    topology:
+      contextVisibility: isolated-until-fan-in
+      visibilityWindows:
+        - id: framing-shaping-open
+          opensAfter:
+            milestone: listed-results-linked
+            operationRefs: []
+          permits:
+            sourceOperationRefs: [shape-system-proposal, shape-alternative-proposal, shape-constraint-proposal]
+            delivery: artifact-refs
+        - id: post-shaping-open
+          opensAfter:
+            milestone: listed-results-linked
+            operationRefs: [shape-system-proposal, shape-alternative-proposal, shape-constraint-proposal]
+          permits:
+            sourceOperationRefs: [shape-system-proposal, shape-alternative-proposal, shape-constraint-proposal]
+            delivery: artifact-refs
+        - id: post-critique-open
+          opensAfter:
+            milestone: listed-results-linked
+            operationRefs: [critique-proposals, assess-constraints]
+          permits:
+            sourceOperationRefs:
+              [
+                shape-system-proposal,
+                shape-alternative-proposal,
+                shape-constraint-proposal,
+                critique-proposals,
+                assess-constraints,
+              ]
+            delivery: artifact-refs
+        - id: post-synthesis-open
+          opensAfter:
+            milestone: listed-results-linked
+            operationRefs: [synthesize-recommendation]
+          permits:
+            sourceOperationRefs: [synthesize-recommendation]
+            delivery: artifact-refs
+        - id: post-explanation-open
+          opensAfter:
+            milestone: listed-results-linked
+            operationRefs: [explain-recommendation]
+          permits:
+            sourceOperationRefs: [explain-recommendation]
+            delivery: artifact-refs
+      specialistSlots:
+        - id: specialist-answer-slot
+          role: specialist
+          operationRefs: [answer-specialist-question]
+          requiredCapabilities: []
+          allowedVisibilityWindows: [post-shaping-open]
+          maxBindings: 3
+          maxAssignments: 3
+
+  roles:
+    - lead-advisor
+    - context-investigator
+    - system-shaper
+    - alternative-shaper
+    - constraint-advocate
+    - architecture-critic
+    - synthesizer
+    - specialist
+
+  actors:
+    - id: lead-advisor-actor
+      role: lead-advisor
+    - id: context-investigator-actor
+      role: context-investigator
+    - id: system-shaper-actor
+      role: system-shaper
+    - id: alternative-shaper-actor
+      role: alternative-shaper
+    - id: constraint-advocate-actor
+      role: constraint-advocate
+    - id: architecture-critic-actor
+      role: architecture-critic
+    - id: synthesizer-actor
+      role: synthesizer
+
+  operations:
+    - id: interpret-request
+      role: lead-advisor
+      policy:
+        minTier: frontier
+      task:
+        contractTemplate: architecture-advisory-panel-v1-interpretation
+      result:
+        kind: advisory
+        evidenceRequired: reported
+    - id: investigate-context
+      role: context-investigator
+      policy:
+        minTier: standard
+      task:
+        contractTemplate: architecture-advisory-panel-v1-scout-report
+      result:
+        kind: advisory
+        evidenceRequired: reported
+    - id: shape-system-proposal
+      role: system-shaper
+      policy:
+        minTier: flagship
+      task:
+        contractTemplate: architecture-advisory-panel-v1-system-proposal
+      result:
+        kind: advisory
+        evidenceRequired: reported
+      contributions:
+        allowedTypes: [proposal]
+    - id: shape-alternative-proposal
+      role: alternative-shaper
+      policy:
+        minTier: flagship
+      task:
+        contractTemplate: architecture-advisory-panel-v1-alternative-proposal
+      result:
+        kind: advisory
+        evidenceRequired: reported
+      contributions:
+        allowedTypes: [proposal]
+    - id: shape-constraint-proposal
+      role: constraint-advocate
+      policy:
+        minTier: flagship
+      task:
+        contractTemplate: architecture-advisory-panel-v1-constraint-proposal
+      result:
+        kind: advisory
+        evidenceRequired: reported
+      contributions:
+        allowedTypes: [proposal]
+    - id: critique-proposals
+      role: architecture-critic
+      policy:
+        minTier: flagship
+      task:
+        contractTemplate: architecture-advisory-panel-v1-critique
+      result:
+        kind: advisory
+        evidenceRequired: reported
+      contributions:
+        allowedTypes: [objection]
+    - id: assess-constraints
+      role: constraint-advocate
+      policy:
+        minTier: flagship
+      task:
+        contractTemplate: architecture-advisory-panel-v1-constraint-findings
+      result:
+        kind: advisory
+        evidenceRequired: reported
+      contributions:
+        allowedTypes: [objection]
+    - id: answer-specialist-question
+      role: specialist
+      task:
+        contractTemplate: architecture-advisory-panel-v1-specialist-answer
+      result:
+        kind: advisory
+        evidenceRequired: reported
+    - id: synthesize-recommendation
+      role: synthesizer
+      policy:
+        minTier: frontier
+      task:
+        contractTemplate: architecture-advisory-panel-v1-synthesis
+      result:
+        kind: advisory
+        evidenceRequired: reported
+      contributions:
+        allowedTypes: [response]
+    - id: explain-recommendation
+      role: lead-advisor
+      policy:
+        minTier: frontier
+      task:
+        contractTemplate: architecture-advisory-panel-v1-explanation
+      result:
+        kind: advisory
+        evidenceRequired: reported
+    - id: revise-synthesis
+      role: synthesizer
+      policy:
+        minTier: frontier
+      task:
+        contractTemplate: architecture-advisory-panel-v1-synthesis
+      result:
+        kind: advisory
+        evidenceRequired: reported
+      contributions:
+        allowedTypes: [response]
+    - id: revise-explanation
+      role: lead-advisor
+      policy:
+        minTier: frontier
+      task:
+        contractTemplate: architecture-advisory-panel-v1-explanation
+      result:
+        kind: advisory
+        evidenceRequired: reported
+    - id: close-dialogue
+      role: lead-advisor
+      policy:
+        minTier: standard
+      task:
+        contractTemplate: architecture-advisory-panel-v1-close-dialogue
+      result:
+        kind: advisory
+        evidenceRequired: reported
+
+  graph:
+    entry: phase-framing
+    nodes:
+      - id: phase-framing
+        operations:
+          - ref: interpret-request
+            actor: lead-advisor-actor
+          - ref: investigate-context
+            actor: context-investigator-actor
+        transitions: [phase-shaping]
+      - id: phase-shaping
+        operations:
+          - ref: shape-system-proposal
+            actor: system-shaper-actor
+            contextAccess:
+              visibilityWindowRef: framing-shaping-open
+          - ref: shape-alternative-proposal
+            actor: alternative-shaper-actor
+            contextAccess:
+              visibilityWindowRef: framing-shaping-open
+          - ref: shape-constraint-proposal
+            actor: constraint-advocate-actor
+            contextAccess:
+              visibilityWindowRef: framing-shaping-open
+        transitions: [phase-critique]
+      - id: phase-critique
+        operations:
+          - ref: critique-proposals
+            actor: architecture-critic-actor
+            activation:
+              mode: driver-authorized
+            contextAccess:
+              visibilityWindowRef: post-shaping-open
+          - ref: assess-constraints
+            actor: constraint-advocate-actor
+            activation:
+              mode: driver-authorized
+            contextAccess:
+              visibilityWindowRef: post-shaping-open
+          - ref: answer-specialist-question
+            specialistSlotRef: specialist-answer-slot
+            activation:
+              mode: driver-authorized
+            contextAccess:
+              visibilityWindowRef: post-shaping-open
+        transitions: [phase-synthesis]
+      - id: phase-synthesis
+        operations:
+          - ref: synthesize-recommendation
+            actor: synthesizer-actor
+            activation:
+              mode: driver-authorized
+            contextAccess:
+              visibilityWindowRef: post-critique-open
+        transitions: [phase-explanation]
+      - id: phase-explanation
+        operations:
+          - ref: explain-recommendation
+            actor: lead-advisor-actor
+            activation:
+              mode: driver-authorized
+            contextAccess:
+              visibilityWindowRef: post-synthesis-open
+        transitions: [phase-dialogue-reopen]
+      - id: phase-dialogue-reopen
+        operations:
+          - ref: revise-synthesis
+            actor: synthesizer-actor
+            activation:
+              mode: driver-authorized
+              maxInvocations: 2
+          - ref: revise-explanation
+            actor: lead-advisor-actor
+            activation:
+              mode: driver-authorized
+              maxInvocations: 2
+          - ref: close-dialogue
+            actor: lead-advisor-actor
+            activation:
+              mode: driver-authorized
+            contextAccess:
+              visibilityWindowRef: post-explanation-open
+        transitions: []

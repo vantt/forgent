@@ -1,0 +1,697 @@
+
+$ fgos coordination pack run --protocol core.coordination-protocol.architecture-advisory-panel-standard-v1 --file req1-framing-shaping.json
+exit: 0
+stdout:
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-28T04:15:04.806Z",
+  "data_hash": "28d1e03f804584c38f1dee4f3f1163b6968baee48a9ff40e2d28d0d8084dbbc4",
+  "data": {
+    "coordinationId": "smoke_standard_variant_v1",
+    "kind": "declared-protocol",
+    "definitionRef": {
+      "id": "core.coordination-protocol.architecture-advisory-panel-standard-v1",
+      "version": "1.0.0"
+    },
+    "objective": "Smoke test: framing + shaping.",
+    "status": "running",
+    "closed": false,
+    "closeAttempted": true,
+    "closeRefusalReason": "closeSessionByQuorum: session \"smoke_standard_variant_v1\" is missing required actor(s) [lead-advisor-actor, constraint-advocate-actor, architecture-critic-actor, synthesizer-actor] and declares no partialPolicy -- default completion requires every required SessionActor (R1)",
+    "quorum": {
+      "requiredActorIds": [
+        "lead-advisor-actor",
+        "context-investigator-actor",
+        "system-shaper-actor",
+        "alternative-shaper-actor",
+        "constraint-advocate-actor",
+        "architecture-critic-actor",
+        "synthesizer-actor"
+      ],
+      "completed": [
+        {
+          "actorId": "context-investigator-actor",
+          "assignmentId": "asgn_smoke_driver_op_002",
+          "runId": "run_asgn_smoke_driver_op_002_01"
+        },
+        {
+          "actorId": "system-shaper-actor",
+          "assignmentId": "asgn_smoke_driver_op_003",
+          "runId": "run_asgn_smoke_driver_op_003_01"
+        },
+        {
+          "actorId": "alternative-shaper-actor",
+          "assignmentId": "asgn_smoke_driver_op_004",
+          "runId": "run_asgn_smoke_driver_op_004_01"
+        }
+      ],
+      "failed": [],
+      "late": [],
+      "missing": [
+        {
+          "actorId": "lead-advisor-actor"
+        },
+        {
+          "actorId": "constraint-advocate-actor"
+        },
+        {
+          "actorId": "architecture-critic-actor"
+        },
+        {
+          "actorId": "synthesizer-actor"
+        }
+      ],
+      "replaced": []
+    },
+    "steps": [
+      {
+        "as": "interpret",
+        "type": "operation",
+        "actorId": "lead-advisor-actor",
+        "door": "dispatchDeclaredOperation",
+        "assignmentId": "asgn_smoke_driver_op_001",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "/home/vantt/.nvm/versions/node/v24.18.0/bin/node",
+        "provider": "claude",
+        "tier": "frontier",
+        "resumed": false
+      },
+      {
+        "as": "investigate",
+        "type": "operation",
+        "actorId": "context-investigator-actor",
+        "door": "dispatchDeclaredOperation",
+        "assignmentId": "asgn_smoke_driver_op_002",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "/home/vantt/.nvm/versions/node/v24.18.0/bin/node",
+        "provider": "claude",
+        "tier": "standard",
+        "resumed": false
+      },
+      {
+        "as": "shapeSystem",
+        "type": "operation",
+        "actorId": "system-shaper-actor",
+        "door": "dispatchDeclaredOperation",
+        "assignmentId": "asgn_smoke_driver_op_003",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "/home/vantt/.nvm/versions/node/v24.18.0/bin/node",
+        "provider": "claude",
+        "tier": "flagship",
+        "resumed": false
+      },
+      {
+        "as": "linkSystem",
+        "type": "contribution",
+        "door": "linkSessionContribution",
+        "contributionId": "p_system",
+        "contributionType": "proposal",
+        "assignmentId": "asgn_smoke_driver_op_003",
+        "roundKey": "round-1",
+        "anchors": [],
+        "respondsTo": null,
+        "appended": true
+      },
+      {
+        "as": "shapeAlt",
+        "type": "operation",
+        "actorId": "alternative-shaper-actor",
+        "door": "dispatchDeclaredOperation",
+        "assignmentId": "asgn_smoke_driver_op_004",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "/home/vantt/.nvm/versions/node/v24.18.0/bin/node",
+        "provider": "claude",
+        "tier": "flagship",
+        "resumed": false
+      },
+      {
+        "as": "linkAlt",
+        "type": "contribution",
+        "door": "linkSessionContribution",
+        "contributionId": "p_alt",
+        "contributionType": "proposal",
+        "assignmentId": "asgn_smoke_driver_op_004",
+        "roundKey": "round-1",
+        "anchors": [],
+        "respondsTo": null,
+        "appended": true
+      },
+      {
+        "as": "shapeConstraint",
+        "type": "operation",
+        "actorId": "constraint-advocate-actor",
+        "door": "dispatchDeclaredOperation",
+        "assignmentId": "asgn_smoke_driver_op_005",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "/home/vantt/.nvm/versions/node/v24.18.0/bin/node",
+        "provider": "claude",
+        "tier": "flagship",
+        "resumed": false
+      },
+      {
+        "as": "linkConstraint",
+        "type": "contribution",
+        "door": "linkSessionContribution",
+        "contributionId": "p_constraint",
+        "contributionType": "proposal",
+        "assignmentId": "asgn_smoke_driver_op_005",
+        "roundKey": "round-1",
+        "anchors": [],
+        "respondsTo": null,
+        "appended": true
+      }
+    ]
+  }
+}
+
+stderr:
+fgos: added missing default config keys to /tmp/fgos-cli-f1sjXX/.fgos/config.json#runner: coordination, modelPolicies, confinement, parallel
+fgos: coordination step "interpret" targets actor "lead-advisor-actor" but this request declares no actors[] entry for it — no per-actor executor/tier/persona was applied, so it dispatched on "/home/vantt/.nvm/versions/node/v24.18.0/bin/node". The roster is per-request, not per-session: a resumed session must repeat actors[] to keep its bindings.
+fgos: coordination step "investigate" targets actor "context-investigator-actor" but this request declares no actors[] entry for it — no per-actor executor/tier/persona was applied, so it dispatched on "/home/vantt/.nvm/versions/node/v24.18.0/bin/node". The roster is per-request, not per-session: a resumed session must repeat actors[] to keep its bindings.
+fgos: coordination step "shapeSystem" targets actor "system-shaper-actor" but this request declares no actors[] entry for it — no per-actor executor/tier/persona was applied, so it dispatched on "/home/vantt/.nvm/versions/node/v24.18.0/bin/node". The roster is per-request, not per-session: a resumed session must repeat actors[] to keep its bindings.
+fgos: coordination step "shapeAlt" targets actor "alternative-shaper-actor" but this request declares no actors[] entry for it — no per-actor executor/tier/persona was applied, so it dispatched on "/home/vantt/.nvm/versions/node/v24.18.0/bin/node". The roster is per-request, not per-session: a resumed session must repeat actors[] to keep its bindings.
+fgos: coordination step "shapeConstraint" targets actor "constraint-advocate-actor" but this request declares no actors[] entry for it — no per-actor executor/tier/persona was applied, so it dispatched on "/home/vantt/.nvm/versions/node/v24.18.0/bin/node". The roster is per-request, not per-session: a resumed session must repeat actors[] to keep its bindings.
+
+
+
+$ fgos coordination pack run --protocol core.coordination-protocol.architecture-advisory-panel-standard-v1 --file req2-critique.json
+exit: 0
+stdout:
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-28T04:15:05.340Z",
+  "data_hash": "f2e9f3bb91b2fea8ecd49de7f5f4ae27c00b2afcd80ab1a33905a368afb7667e",
+  "data": {
+    "coordinationId": "smoke_standard_variant_v1",
+    "kind": "declared-protocol",
+    "definitionRef": {
+      "id": "core.coordination-protocol.architecture-advisory-panel-standard-v1",
+      "version": "1.0.0"
+    },
+    "objective": "Smoke test: framing + shaping.",
+    "status": "running",
+    "closed": false,
+    "closeAttempted": true,
+    "closeRefusalReason": "closeSessionByQuorum: session \"smoke_standard_variant_v1\" is missing required actor(s) [lead-advisor-actor, synthesizer-actor] and declares no partialPolicy -- default completion requires every required SessionActor (R1)",
+    "quorum": {
+      "requiredActorIds": [
+        "lead-advisor-actor",
+        "context-investigator-actor",
+        "system-shaper-actor",
+        "alternative-shaper-actor",
+        "constraint-advocate-actor",
+        "architecture-critic-actor",
+        "synthesizer-actor"
+      ],
+      "completed": [
+        {
+          "actorId": "context-investigator-actor",
+          "assignmentId": "asgn_smoke_driver_op_002",
+          "runId": "run_asgn_smoke_driver_op_002_01"
+        },
+        {
+          "actorId": "system-shaper-actor",
+          "assignmentId": "asgn_smoke_driver_op_003",
+          "runId": "run_asgn_smoke_driver_op_003_01"
+        },
+        {
+          "actorId": "alternative-shaper-actor",
+          "assignmentId": "asgn_smoke_driver_op_004",
+          "runId": "run_asgn_smoke_driver_op_004_01"
+        },
+        {
+          "actorId": "constraint-advocate-actor",
+          "assignmentId": "asgn_smoke_driver_op_007",
+          "runId": "run_asgn_smoke_driver_op_007_01"
+        },
+        {
+          "actorId": "architecture-critic-actor",
+          "assignmentId": "asgn_smoke_driver_op_006",
+          "runId": "run_asgn_smoke_driver_op_006_01"
+        }
+      ],
+      "failed": [],
+      "late": [],
+      "missing": [
+        {
+          "actorId": "lead-advisor-actor"
+        },
+        {
+          "actorId": "synthesizer-actor"
+        }
+      ],
+      "replaced": []
+    },
+    "steps": [
+      {
+        "as": "authCritique",
+        "type": "authorize",
+        "door": "authorizeDeclaredOperation",
+        "operationId": "critique-proposals",
+        "nodeId": "phase-critique",
+        "actorId": "architecture-critic-actor",
+        "authorizationId": "auth_critique",
+        "invocationKey": "ik_critique_1",
+        "grantedContextRefs": [
+          "asgn_smoke_driver_op_001",
+          "asgn_smoke_driver_op_002",
+          "asgn_smoke_driver_op_003",
+          "asgn_smoke_driver_op_004",
+          "asgn_smoke_driver_op_005"
+        ],
+        "targetArtifactRef": null,
+        "appended": true
+      },
+      {
+        "as": "critique",
+        "type": "operation",
+        "actorId": "architecture-critic-actor",
+        "door": "dispatchDeclaredOperation",
+        "assignmentId": "asgn_smoke_driver_op_006",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "/home/vantt/.nvm/versions/node/v24.18.0/bin/node",
+        "provider": "claude",
+        "tier": "flagship",
+        "resumed": false
+      },
+      {
+        "as": "linkCritique",
+        "type": "contribution",
+        "door": "linkSessionContribution",
+        "contributionId": "o_critique",
+        "contributionType": "objection",
+        "assignmentId": "asgn_smoke_driver_op_006",
+        "roundKey": "round-1",
+        "anchors": [
+          "p_system",
+          "p_alt",
+          "p_constraint"
+        ],
+        "respondsTo": null,
+        "appended": true
+      },
+      {
+        "as": "authAssess",
+        "type": "authorize",
+        "door": "authorizeDeclaredOperation",
+        "operationId": "assess-constraints",
+        "nodeId": "phase-critique",
+        "actorId": "constraint-advocate-actor",
+        "authorizationId": "auth_assess",
+        "invocationKey": "ik_assess_1",
+        "grantedContextRefs": [
+          "asgn_smoke_driver_op_003",
+          "asgn_smoke_driver_op_004",
+          "asgn_smoke_driver_op_005"
+        ],
+        "targetArtifactRef": null,
+        "appended": true
+      },
+      {
+        "as": "assess",
+        "type": "operation",
+        "actorId": "constraint-advocate-actor",
+        "door": "dispatchDeclaredOperation",
+        "assignmentId": "asgn_smoke_driver_op_007",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "/home/vantt/.nvm/versions/node/v24.18.0/bin/node",
+        "provider": "claude",
+        "tier": "flagship",
+        "resumed": false
+      },
+      {
+        "as": "linkAssess",
+        "type": "contribution",
+        "door": "linkSessionContribution",
+        "contributionId": "o_assess",
+        "contributionType": "objection",
+        "assignmentId": "asgn_smoke_driver_op_007",
+        "roundKey": "round-1",
+        "anchors": [
+          "p_system",
+          "p_alt",
+          "p_constraint"
+        ],
+        "respondsTo": null,
+        "appended": true
+      }
+    ]
+  }
+}
+
+stderr:
+fgos: coordination step "critique" targets actor "architecture-critic-actor" but this request declares no actors[] entry for it — no per-actor executor/tier/persona was applied, so it dispatched on "/home/vantt/.nvm/versions/node/v24.18.0/bin/node". The roster is per-request, not per-session: a resumed session must repeat actors[] to keep its bindings.
+fgos: coordination step "assess" targets actor "constraint-advocate-actor" but this request declares no actors[] entry for it — no per-actor executor/tier/persona was applied, so it dispatched on "/home/vantt/.nvm/versions/node/v24.18.0/bin/node". The roster is per-request, not per-session: a resumed session must repeat actors[] to keep its bindings.
+
+
+
+$ fgos coordination pack run --protocol core.coordination-protocol.architecture-advisory-panel-standard-v1 --file req3-synthesis.json
+exit: 0
+stdout:
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-28T04:15:05.730Z",
+  "data_hash": "d70ee9b2c61939f6e6238495781d1ccc5f880fced8a00d8472e7c2399935c504",
+  "data": {
+    "coordinationId": "smoke_standard_variant_v1",
+    "kind": "declared-protocol",
+    "definitionRef": {
+      "id": "core.coordination-protocol.architecture-advisory-panel-standard-v1",
+      "version": "1.0.0"
+    },
+    "objective": "Smoke test: framing + shaping.",
+    "status": "running",
+    "closed": false,
+    "closeAttempted": true,
+    "closeRefusalReason": "closeSessionByQuorum: session \"smoke_standard_variant_v1\" is missing required actor(s) [lead-advisor-actor] and declares no partialPolicy -- default completion requires every required SessionActor (R1)",
+    "quorum": {
+      "requiredActorIds": [
+        "lead-advisor-actor",
+        "context-investigator-actor",
+        "system-shaper-actor",
+        "alternative-shaper-actor",
+        "constraint-advocate-actor",
+        "architecture-critic-actor",
+        "synthesizer-actor"
+      ],
+      "completed": [
+        {
+          "actorId": "context-investigator-actor",
+          "assignmentId": "asgn_smoke_driver_op_002",
+          "runId": "run_asgn_smoke_driver_op_002_01"
+        },
+        {
+          "actorId": "system-shaper-actor",
+          "assignmentId": "asgn_smoke_driver_op_003",
+          "runId": "run_asgn_smoke_driver_op_003_01"
+        },
+        {
+          "actorId": "alternative-shaper-actor",
+          "assignmentId": "asgn_smoke_driver_op_004",
+          "runId": "run_asgn_smoke_driver_op_004_01"
+        },
+        {
+          "actorId": "constraint-advocate-actor",
+          "assignmentId": "asgn_smoke_driver_op_007",
+          "runId": "run_asgn_smoke_driver_op_007_01"
+        },
+        {
+          "actorId": "architecture-critic-actor",
+          "assignmentId": "asgn_smoke_driver_op_006",
+          "runId": "run_asgn_smoke_driver_op_006_01"
+        },
+        {
+          "actorId": "synthesizer-actor",
+          "assignmentId": "asgn_smoke_driver_op_008",
+          "runId": "run_asgn_smoke_driver_op_008_01"
+        }
+      ],
+      "failed": [],
+      "late": [],
+      "missing": [
+        {
+          "actorId": "lead-advisor-actor"
+        }
+      ],
+      "replaced": []
+    },
+    "steps": [
+      {
+        "as": "authSynth",
+        "type": "authorize",
+        "door": "authorizeDeclaredOperation",
+        "operationId": "synthesize-recommendation",
+        "nodeId": "phase-synthesis",
+        "actorId": "synthesizer-actor",
+        "authorizationId": "auth_synth",
+        "invocationKey": "ik_synth_1",
+        "grantedContextRefs": [
+          "asgn_smoke_driver_op_001",
+          "asgn_smoke_driver_op_002",
+          "asgn_smoke_driver_op_003",
+          "asgn_smoke_driver_op_004",
+          "asgn_smoke_driver_op_005",
+          "asgn_smoke_driver_op_006",
+          "asgn_smoke_driver_op_007"
+        ],
+        "targetArtifactRef": null,
+        "appended": true
+      },
+      {
+        "as": "synth",
+        "type": "operation",
+        "actorId": "synthesizer-actor",
+        "door": "dispatchDeclaredOperation",
+        "assignmentId": "asgn_smoke_driver_op_008",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "/home/vantt/.nvm/versions/node/v24.18.0/bin/node",
+        "provider": "claude",
+        "tier": "frontier",
+        "resumed": false
+      },
+      {
+        "as": "linkSynth",
+        "type": "contribution",
+        "door": "linkSessionContribution",
+        "contributionId": "r_synth",
+        "contributionType": "response",
+        "assignmentId": "asgn_smoke_driver_op_008",
+        "roundKey": "round-1",
+        "anchors": [
+          "o_critique",
+          "o_assess"
+        ],
+        "respondsTo": "o_critique",
+        "appended": true
+      }
+    ]
+  }
+}
+
+stderr:
+fgos: coordination step "synth" targets actor "synthesizer-actor" but this request declares no actors[] entry for it — no per-actor executor/tier/persona was applied, so it dispatched on "/home/vantt/.nvm/versions/node/v24.18.0/bin/node". The roster is per-request, not per-session: a resumed session must repeat actors[] to keep its bindings.
+
+
+
+$ fgos coordination pack run --protocol core.coordination-protocol.architecture-advisory-panel-standard-v1 --file req4-explanation.json
+exit: 0
+stdout:
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-28T04:15:06.124Z",
+  "data_hash": "89f29da966992591bb42e107b58bee2dc346e745fe1004d856d51cd4f35562e2",
+  "data": {
+    "coordinationId": "smoke_standard_variant_v1",
+    "kind": "declared-protocol",
+    "definitionRef": {
+      "id": "core.coordination-protocol.architecture-advisory-panel-standard-v1",
+      "version": "1.0.0"
+    },
+    "objective": "Smoke test: framing + shaping.",
+    "status": "running",
+    "closed": false,
+    "closeAttempted": true,
+    "closeRefusalReason": "closeSessionByQuorum: session \"smoke_standard_variant_v1\" is missing required actor(s) [lead-advisor-actor] and declares no partialPolicy -- default completion requires every required SessionActor (R1)",
+    "quorum": {
+      "requiredActorIds": [
+        "lead-advisor-actor",
+        "context-investigator-actor",
+        "system-shaper-actor",
+        "alternative-shaper-actor",
+        "constraint-advocate-actor",
+        "architecture-critic-actor",
+        "synthesizer-actor"
+      ],
+      "completed": [
+        {
+          "actorId": "context-investigator-actor",
+          "assignmentId": "asgn_smoke_driver_op_002",
+          "runId": "run_asgn_smoke_driver_op_002_01"
+        },
+        {
+          "actorId": "system-shaper-actor",
+          "assignmentId": "asgn_smoke_driver_op_003",
+          "runId": "run_asgn_smoke_driver_op_003_01"
+        },
+        {
+          "actorId": "alternative-shaper-actor",
+          "assignmentId": "asgn_smoke_driver_op_004",
+          "runId": "run_asgn_smoke_driver_op_004_01"
+        },
+        {
+          "actorId": "constraint-advocate-actor",
+          "assignmentId": "asgn_smoke_driver_op_007",
+          "runId": "run_asgn_smoke_driver_op_007_01"
+        },
+        {
+          "actorId": "architecture-critic-actor",
+          "assignmentId": "asgn_smoke_driver_op_006",
+          "runId": "run_asgn_smoke_driver_op_006_01"
+        },
+        {
+          "actorId": "synthesizer-actor",
+          "assignmentId": "asgn_smoke_driver_op_008",
+          "runId": "run_asgn_smoke_driver_op_008_01"
+        }
+      ],
+      "failed": [],
+      "late": [],
+      "missing": [
+        {
+          "actorId": "lead-advisor-actor"
+        }
+      ],
+      "replaced": []
+    },
+    "steps": [
+      {
+        "as": "authExplain",
+        "type": "authorize",
+        "door": "authorizeDeclaredOperation",
+        "operationId": "explain-recommendation",
+        "nodeId": "phase-explanation",
+        "actorId": "lead-advisor-actor",
+        "authorizationId": "auth_explain",
+        "invocationKey": "ik_explain_1",
+        "grantedContextRefs": [
+          "asgn_smoke_driver_op_008"
+        ],
+        "targetArtifactRef": null,
+        "appended": true
+      },
+      {
+        "as": "explain",
+        "type": "operation",
+        "actorId": "lead-advisor-actor",
+        "door": "dispatchDeclaredOperation",
+        "assignmentId": "asgn_smoke_driver_op_009",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "/home/vantt/.nvm/versions/node/v24.18.0/bin/node",
+        "provider": "claude",
+        "tier": "frontier",
+        "resumed": false
+      }
+    ]
+  }
+}
+
+stderr:
+fgos: coordination step "explain" targets actor "lead-advisor-actor" but this request declares no actors[] entry for it — no per-actor executor/tier/persona was applied, so it dispatched on "/home/vantt/.nvm/versions/node/v24.18.0/bin/node". The roster is per-request, not per-session: a resumed session must repeat actors[] to keep its bindings.
+
+
+
+$ fgos coordination pack run --protocol core.coordination-protocol.architecture-advisory-panel-standard-v1 --file req5-close.json
+exit: 0
+stdout:
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-28T04:15:06.507Z",
+  "data_hash": "ba985c488d91128f8c7945a270cae145bd1473172378d84d676a38417f9da1f3",
+  "data": {
+    "coordinationId": "smoke_standard_variant_v1",
+    "kind": "declared-protocol",
+    "definitionRef": {
+      "id": "core.coordination-protocol.architecture-advisory-panel-standard-v1",
+      "version": "1.0.0"
+    },
+    "objective": "Smoke test: framing + shaping.",
+    "status": "completed",
+    "closed": true,
+    "closeAttempted": true,
+    "quorum": {
+      "requiredActorIds": [
+        "lead-advisor-actor",
+        "context-investigator-actor",
+        "system-shaper-actor",
+        "alternative-shaper-actor",
+        "constraint-advocate-actor",
+        "architecture-critic-actor",
+        "synthesizer-actor"
+      ],
+      "completed": [
+        {
+          "actorId": "lead-advisor-actor",
+          "assignmentId": "asgn_smoke_driver_op_010",
+          "runId": "run_asgn_smoke_driver_op_010_01"
+        },
+        {
+          "actorId": "context-investigator-actor",
+          "assignmentId": "asgn_smoke_driver_op_002",
+          "runId": "run_asgn_smoke_driver_op_002_01"
+        },
+        {
+          "actorId": "system-shaper-actor",
+          "assignmentId": "asgn_smoke_driver_op_003",
+          "runId": "run_asgn_smoke_driver_op_003_01"
+        },
+        {
+          "actorId": "alternative-shaper-actor",
+          "assignmentId": "asgn_smoke_driver_op_004",
+          "runId": "run_asgn_smoke_driver_op_004_01"
+        },
+        {
+          "actorId": "constraint-advocate-actor",
+          "assignmentId": "asgn_smoke_driver_op_007",
+          "runId": "run_asgn_smoke_driver_op_007_01"
+        },
+        {
+          "actorId": "architecture-critic-actor",
+          "assignmentId": "asgn_smoke_driver_op_006",
+          "runId": "run_asgn_smoke_driver_op_006_01"
+        },
+        {
+          "actorId": "synthesizer-actor",
+          "assignmentId": "asgn_smoke_driver_op_008",
+          "runId": "run_asgn_smoke_driver_op_008_01"
+        }
+      ],
+      "failed": [],
+      "late": [],
+      "missing": [],
+      "replaced": []
+    },
+    "steps": [
+      {
+        "as": "authClose",
+        "type": "authorize",
+        "door": "authorizeDeclaredOperation",
+        "operationId": "close-dialogue",
+        "nodeId": "phase-dialogue-reopen",
+        "actorId": "lead-advisor-actor",
+        "authorizationId": "auth_close",
+        "invocationKey": "ik_close_1",
+        "grantedContextRefs": [
+          "asgn_smoke_driver_op_009"
+        ],
+        "targetArtifactRef": null,
+        "appended": true
+      },
+      {
+        "as": "closeDialogue",
+        "type": "operation",
+        "actorId": "lead-advisor-actor",
+        "door": "dispatchDeclaredOperation",
+        "assignmentId": "asgn_smoke_driver_op_010",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "/home/vantt/.nvm/versions/node/v24.18.0/bin/node",
+        "provider": "claude",
+        "tier": "standard",
+        "resumed": false
+      }
+    ]
+  }
+}
+
+stderr:
+fgos: coordination step "closeDialogue" targets actor "lead-advisor-actor" but this request declares no actors[] entry for it — no per-actor executor/tier/persona was applied, so it dispatched on "/home/vantt/.nvm/versions/node/v24.18.0/bin/node". The roster is per-request, not per-session: a resumed session must repeat actors[] to keep its bindings.
+
