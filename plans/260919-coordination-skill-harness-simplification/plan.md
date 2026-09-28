@@ -2186,6 +2186,15 @@ Executor/provider/model/tier selection remains an execution-time decision.
     touched by anything in this unit (it is settled, I23/I24a/I24b
     territory, not this unit's job).
 - unit: I27 — panel-depth experiment: standard protocol variant, evaluation corpus, real comparison (Phase 5 Exit criterion, runs in parallel with Phase 6)
+  status: MERGED (2026-09-28). integratedSha 1abad5857511cec1302b092208202ead8a303acb,
+    testedSha e5684cba3df9838dfc24856a2e19f9c26521f96f (unit/I27 tip), clean
+    --no-ff auto-merge (ort; auto-merged both trigger-surface doc copies, no
+    conflicts). Key suites rerun on merged tree: 46/46 pass. Real result:
+    genuine, mixed (not smoothed) -- dissent/content retention favors the
+    full protocol in every case showing a difference; ground-truth factual
+    accuracy split direction across the two core cases. Phase 5's
+    panel-depth Exit criterion is now closed. See
+    plans/260919-coordination-skill-harness-simplification/reports/unit-I27-panel-depth-experiment-real-comparison-report.md.
   capability: code:implement
   depends-on: none (runs in parallel with Phase 6; user-confirmed 2026-09-28
     this unit's benefit is scoped to the architecture-panel/group-thinking
@@ -2598,10 +2607,14 @@ decomposition review's L4 finding flagged as unowned are now resolved:
   actioned; it requires a real before/after Lead-prompt-size comparison
   methodology this track hasn't built). Left open, not blocking.
 - "panel-depth experiment" (deep vs. standard protocol comparison) —
-  decomposed into its own unit (I27, above), user-confirmed to run in
-  parallel with Phase 6 rather than block it, since its benefit is scoped
-  to the architecture-panel/group-thinking domain only and shares no files
-  with Phase 6's own scope.
+  CLOSED 2026-09-28. Unit I27 merged (integratedSha `1abad5857511`): the
+  standard variant built, registered, and structurally tested; a real,
+  blind-scored 3-case comparison run (2 reused P05.2 cases + 1 new I21-H4
+  case, 29 real LLM-backed dispatches). Genuine, mixed result reported
+  without smoothing — see the unit's own report for the full finding; not
+  a clean "drop red-team" mandate either way. Two open items (human
+  spot-check, standalone-session completion) resolved as documented,
+  non-blocking gaps, not silently dropped.
 
 ## Phase 6 units
 
