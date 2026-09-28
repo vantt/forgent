@@ -4344,6 +4344,74 @@ test('executeExecutorCli refuses with DispatchError(dispatch-in-flight) when loc
   assert.ok(caughtError.message.includes('ambiguous'));
 });
 
+/** Write a fake executor that sleeps (real wall-clock, via setTimeout, not a
+ * busy-wait) for `ms` before exiting 0 -- for proving a real out-of-process
+ * dispatch stays genuinely in flight across multiple heartbeat ticks. */
+function writeSleepExecutor(dir, ms) {
+  const scriptPath = path.join(dir, 'sleep-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+    await new Promise((resolve) => setTimeout(resolve, ${ms}));
+    process.stdout.write('done');
+    process.exit(0);
+    `,
+  );
+  return scriptPath;
+}
+
+test('executeExecutorCli\'s per-cwd lock heartbeat keeps a genuinely live, still-running dispatch from losing its lock to a contender once its own ttlMs elapses (S2 fix, real process)', async () => {
+  const { repoRoot, fgosDir } = mkTempGitRepo();
+  const dir = mkTempDir();
+  const holdMs = 1500;
+  const timeoutMs = 1800; // the lock's own ttlMs -- must comfortably exceed holdMs so the real subprocess is never killed early
+  const scriptPath = writeSleepExecutor(dir, holdMs);
+  writeRunnerConfigFixture(repoRoot, {
+    executor: { command: '/global/executor', args: ['{prompt}'] },
+    executors: { 'cli-executor': { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
+    models: { standard: 'sonnet' },
+    timeoutMs,
+  });
+
+  const testCwd = repoRoot;
+  const { acquireMainCheckoutLock, dispatchLockFile, HELD } = await import('../../src/runner/main-checkout-lock.mjs');
+  const lockFile = dispatchLockFile(testCwd);
+  const lockPath = path.join(fgosDir, lockFile);
+
+  const t0 = Date.now();
+  const runPromise = executeExecutorCli('cli-executor', { repoRoot, cwd: testCwd, prompt: 'x' });
+
+  while (!fs.existsSync(lockPath)) await new Promise((r) => setTimeout(r, 15));
+  const initial = JSON.parse(fs.readFileSync(lockPath, 'utf8'));
+
+  // Wait for the heartbeat's own interval (Math.floor(timeoutMs / 3) here)
+  // to actually fire and renew the SAME lock's timestamp -- proof the
+  // wiring runs for real, not just that time passed.
+  let renewedTs;
+  while (true) {
+    await new Promise((r) => setTimeout(r, 15));
+    const current = JSON.parse(fs.readFileSync(lockPath, 'utf8'));
+    if (current.ts > initial.ts) { renewedTs = current.ts; break; }
+  }
+
+  // A contender's own ttlMs, shorter than the total elapsed time since the
+  // ORIGINAL acquisition (so a TTL-only, non-heartbeating judgment would
+  // wrongly see this as stale/free) but far longer than the time since the
+  // just-observed renewal (so the heartbeat protects it) -- proves the
+  // renewal itself, not test timing luck, is what keeps this holder HELD.
+  const elapsedSinceAcquire = Date.now() - t0;
+  const contenderTtlMs = Math.max(100, elapsedSinceAcquire - 100);
+  const contender = acquireMainCheckoutLock(fgosDir, { identity: 'contender-b', ttlMs: contenderTtlMs, lockFile });
+
+  assert.equal(contender.status, HELD, 'a genuinely live, still-running dispatch must not lose its lock to a contender once its own ttlMs elapses -- the heartbeat must have renewed it');
+  assert.ok(contender.lockAgeMs < elapsedSinceAcquire, 'the contender must see the RENEWED age, not the age since the original acquisition');
+
+  const result = await runPromise;
+  assert.equal(result.status, 0);
+  assert.equal(fs.existsSync(lockPath), false, 'the lock is released once the dispatch completes');
+  assert.ok(renewedTs >= initial.ts);
+});
+
 
 test('the "execute" CLI entry point prints a structured {error,errorClass} JSON line on stdout when dispatch fails, alongside the human-readable message on stderr (dispatch-execute optimization pass)', async () => {
   const { repoRoot, fgosDir } = mkTempGitRepo();

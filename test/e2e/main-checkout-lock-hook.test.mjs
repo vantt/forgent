@@ -12,19 +12,24 @@ import { fileURLToPath } from 'node:url';
 // `.fgos/` -- every test builds its own mkdtemp git repo, its own hooks
 // copy, and its own `.fgos/main-checkout.lock`.
 //
-// The hook (repo/.githooks/pre-commit) imports its two dependencies with
-// paths relative to its OWN file location (`../src/runner/main-checkout-lock.mjs`
-// and `../src/util/session-identity.mjs`), mirroring its production install
-// layout. To keep this a faithful copy rather than a reimplementation, each
-// test's temp repo gets a COPY of the real hook file plus COPIES of the same
-// two real dependency files, nested the same way (`<repo>/.githooks/pre-commit`
-// + `<repo>/src/runner/main-checkout-lock.mjs` +
+// The hook (repo/.githooks/pre-commit) imports its dependencies with paths
+// relative to its OWN file location (`../src/runner/main-checkout-lock.mjs`,
+// `../src/util/session-identity.mjs`, and -- since
+// dispatch-engine-liveness-hardening Phase 3 routed a dispatch-lock composite
+// identity through Phase 1's judge -- main-checkout-lock.mjs's own transitive
+// `../src/runner/dispatch/process-identity.mjs`), mirroring its production
+// install layout. To keep this a faithful copy rather than a
+// reimplementation, each test's temp repo gets a COPY of the real hook file
+// plus COPIES of the same real dependency files, nested the same way
+// (`<repo>/.githooks/pre-commit` + `<repo>/src/runner/main-checkout-lock.mjs`
+// + `<repo>/src/runner/dispatch/process-identity.mjs` +
 // `<repo>/src/util/session-identity.mjs`) -- so the relative imports resolve
 // exactly as they do in the real install.
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REAL_HOOK = path.resolve(__dirname, '../../.githooks/pre-commit');
 const REAL_LOCK_MODULE = path.resolve(__dirname, '../../src/runner/main-checkout-lock.mjs');
+const REAL_PROCESS_IDENTITY_MODULE = path.resolve(__dirname, '../../src/runner/dispatch/process-identity.mjs');
 const REAL_IDENTITY_MODULE = path.resolve(__dirname, '../../src/util/session-identity.mjs');
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
 
@@ -43,12 +48,14 @@ function initTempRepoWithHook() {
 
   const hooksDir = path.join(repoRoot, '.githooks');
   const runnerDir = path.join(repoRoot, 'src', 'runner');
+  const dispatchDir = path.join(runnerDir, 'dispatch');
   const utilDir = path.join(repoRoot, 'src', 'util');
   fs.mkdirSync(hooksDir, { recursive: true });
-  fs.mkdirSync(runnerDir, { recursive: true });
+  fs.mkdirSync(dispatchDir, { recursive: true });
   fs.mkdirSync(utilDir, { recursive: true });
   fs.copyFileSync(REAL_HOOK, path.join(hooksDir, 'pre-commit'));
   fs.copyFileSync(REAL_LOCK_MODULE, path.join(runnerDir, 'main-checkout-lock.mjs'));
+  fs.copyFileSync(REAL_PROCESS_IDENTITY_MODULE, path.join(dispatchDir, 'process-identity.mjs'));
   fs.copyFileSync(REAL_IDENTITY_MODULE, path.join(utilDir, 'session-identity.mjs'));
   fs.chmodSync(path.join(hooksDir, 'pre-commit'), 0o755);
   execFileSync('git', ['config', 'core.hooksPath', '.githooks'], { cwd: repoRoot });
@@ -78,12 +85,14 @@ function initTempRepoWithDetachedWorktree() {
 
   const hooksDir = path.join(worktreeRoot, '.githooks');
   const runnerDir = path.join(worktreeRoot, 'src', 'runner');
+  const dispatchDir = path.join(runnerDir, 'dispatch');
   const utilDir = path.join(worktreeRoot, 'src', 'util');
   fs.mkdirSync(hooksDir, { recursive: true });
-  fs.mkdirSync(runnerDir, { recursive: true });
+  fs.mkdirSync(dispatchDir, { recursive: true });
   fs.mkdirSync(utilDir, { recursive: true });
   fs.copyFileSync(REAL_HOOK, path.join(hooksDir, 'pre-commit'));
   fs.copyFileSync(REAL_LOCK_MODULE, path.join(runnerDir, 'main-checkout-lock.mjs'));
+  fs.copyFileSync(REAL_PROCESS_IDENTITY_MODULE, path.join(dispatchDir, 'process-identity.mjs'));
   fs.copyFileSync(REAL_IDENTITY_MODULE, path.join(utilDir, 'session-identity.mjs'));
   fs.chmodSync(path.join(hooksDir, 'pre-commit'), 0o755);
   execFileSync('git', ['config', 'core.hooksPath', '.githooks'], { cwd: worktreeRoot });
@@ -120,12 +129,14 @@ function initTempRepoWithFgwWorktree(branchName) {
 
   const hooksDir = path.join(worktreeRoot, '.githooks');
   const runnerDir = path.join(worktreeRoot, 'src', 'runner');
+  const dispatchDir = path.join(runnerDir, 'dispatch');
   const utilDir = path.join(worktreeRoot, 'src', 'util');
   fs.mkdirSync(hooksDir, { recursive: true });
-  fs.mkdirSync(runnerDir, { recursive: true });
+  fs.mkdirSync(dispatchDir, { recursive: true });
   fs.mkdirSync(utilDir, { recursive: true });
   fs.copyFileSync(REAL_HOOK, path.join(hooksDir, 'pre-commit'));
   fs.copyFileSync(REAL_LOCK_MODULE, path.join(runnerDir, 'main-checkout-lock.mjs'));
+  fs.copyFileSync(REAL_PROCESS_IDENTITY_MODULE, path.join(dispatchDir, 'process-identity.mjs'));
   fs.copyFileSync(REAL_IDENTITY_MODULE, path.join(utilDir, 'session-identity.mjs'));
   fs.chmodSync(path.join(hooksDir, 'pre-commit'), 0o755);
   execFileSync('git', ['config', 'core.hooksPath', '.githooks'], { cwd: worktreeRoot });
