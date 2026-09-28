@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 
 import {
   acquireProviderAccountLease,
@@ -148,6 +149,81 @@ test('lease reclaim requires dead-run proof', () => {
   assert.equal(selected.accountId, 'a');
   const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
   assert.equal(state.providers['openai-codex'].accounts.a.leases.deadRun, undefined);
+});
+
+// A real, guaranteed-dead pid: spawn a real child and let it exit, mirroring
+// process-identity.test.mjs's own `deadPid()` helper.
+function deadPid() {
+  const result = spawnSync(process.execPath, ['-e', 'process.exit(0)']);
+  return result.pid;
+}
+
+test('lease reclaim (S1, dispatch-engine-liveness-hardening Phase 2): a dead RUNNER pid alone does not reclaim a lease whose real worker is still alive', () => {
+  const runtimeDir = mkTempDir();
+  const { statePath } = providerCapacityStatePaths(runtimeDir);
+  const runnerPid = deadPid();
+  fs.mkdirSync(path.dirname(statePath), { recursive: true });
+  fs.writeFileSync(statePath, JSON.stringify({
+    contract: 'provider-capacity-state.v1',
+    providers: {
+      'openai-codex': {
+        accounts: {
+          a: { leases: { run_asgn_01: { runId: 'run_asgn_01', assignmentId: 'asgn', pid: runnerPid } } },
+          b: { leases: {} },
+          c: { leases: {} },
+        },
+      },
+    },
+    assignments: {},
+    audit: [],
+  }));
+
+  const selected = acquireProviderAccountLease({
+    runnerConfig: runnerConfig(),
+    provider: 'openai-codex',
+    assignmentId: 'other-asgn',
+    runId: 'run_other-asgn_01',
+    seed: 's',
+    runtimeDir,
+    isRunWorkerAlive: (runId) => runId === 'run_asgn_01',
+  });
+  assert.notEqual(selected.accountId, 'a', 'account a still holds an open lease, so ranking must prefer an idle account');
+  const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+  assert.ok(
+    state.providers['openai-codex'].accounts.a.leases.run_asgn_01,
+    'the lease must survive reclaim: the runner pid is dead but the detached worker using the credential is proven still alive',
+  );
+});
+
+test('lease reclaim: a dead RUNNER pid with no isRunWorkerAlive evidence still reclaims exactly as before this fix (backward compatible)', () => {
+  const runtimeDir = mkTempDir();
+  const { statePath } = providerCapacityStatePaths(runtimeDir);
+  const runnerPid = deadPid();
+  fs.mkdirSync(path.dirname(statePath), { recursive: true });
+  fs.writeFileSync(statePath, JSON.stringify({
+    contract: 'provider-capacity-state.v1',
+    providers: {
+      'openai-codex': {
+        accounts: {
+          a: { leases: { run_asgn_01: { runId: 'run_asgn_01', assignmentId: 'asgn', pid: runnerPid } } },
+          b: { leases: {} },
+          c: { leases: {} },
+        },
+      },
+    },
+    assignments: {},
+    audit: [],
+  }));
+
+  const selected = acquireProviderAccountLease({
+    runnerConfig: runnerConfig(),
+    provider: 'openai-codex',
+    assignmentId: 'other-asgn',
+    runId: 'run_other-asgn_01',
+    seed: 's',
+    runtimeDir,
+  });
+  assert.equal(selected.accountId, 'a', 'no isRunWorkerAlive supplied -- a dead pid alone still reclaims, unchanged from before this fix');
 });
 
 test('classifier quarantines only high-confidence stderr/provider outcomes', () => {

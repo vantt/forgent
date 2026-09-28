@@ -48,7 +48,7 @@ export {
 // test/runner/dispatch-reconciliation-import-graph.test.mjs) can use the
 // same identity check without importing this file's child_process/spawn
 // surface. Re-exported here unchanged for this file's own existing callers.
-import { getBootId, getProcessStartTime } from './process-identity.mjs';
+import { getBootId, getProcessStartTime, resolveHolderLiveness } from './process-identity.mjs';
 export { getBootId, getProcessStartTime };
 
 export function getProcessPgid(pid) {
@@ -77,15 +77,23 @@ export function isProcessAlive(pid) {
 
 /** `isProcessAlive` by itself only confirms a pid is occupied -- after that
  * pid's real owner exits, the OS can recycle it for an unrelated process,
- * which would read as "still alive" here. A `processStartTime` on the
- * binding lets this tell the two cases apart, the same identity guard
- * already applied to the incarnation checks in `reconcileCliSpawnRun`:
- * alive AND (no recorded start time to compare, or the live one matches). */
-function isBoundProcessAlive(bound) {
-  if (!bound?.pid || !isProcessAlive(bound.pid)) return false;
-  if (!bound.processStartTime) return true;
-  const liveStartTime = getProcessStartTime(bound.pid);
-  return !liveStartTime || liveStartTime === bound.processStartTime;
+ * which would read as "still alive" here. A `processStartTime` (and, for a
+ * supervisor binding, a `bootId`) on the binding lets this tell the two
+ * cases apart, the same identity guard already applied to the incarnation
+ * checks in `reconcileCliSpawnRun`. Built on process-identity.mjs's
+ * promoted `resolveHolderLiveness` judge (dispatch-engine-liveness-
+ * hardening Phase 1/2) rather than re-implementing the comparison here, so
+ * a supervisor/worker binding is judged by the SAME correctly-built
+ * bootId+processStartTime cross-check every other holder in the dispatch
+ * engine now uses -- this also closes a real gap the prior local
+ * implementation had: it never cross-checked `bound.bootId` at all, so a
+ * pid recycled by an unrelated process after a host reboot could read as
+ * "still alive" here. `admitRunAttempt` (assignment-runner.mjs) and
+ * provider-capacity's lease reclaim both call this exported function
+ * directly rather than re-deriving supervisor/worker liveness themselves. */
+export function isBoundProcessAlive(bound) {
+  if (!bound?.pid) return false;
+  return resolveHolderLiveness(bound, isProcessAlive(bound.pid)) === 'held';
 }
 
 // --- Immutable Proof Publication and Collision Errors ---------------------

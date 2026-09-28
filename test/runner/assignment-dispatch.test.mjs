@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { execSync, execFileSync, execFile } from 'node:child_process';
+import { execSync, execFileSync, execFile, spawn } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
 import { executeAssignment, commitRunSettlement, settleRunOutcome, settleReceiptRunFromOutcome, resolveWorkerArtifactPath, reconcileCliSpawnRun } from '../../src/runner/dispatch/assignment-runner.mjs';
@@ -2728,6 +2728,157 @@ test('executeAssignment: the same (retryId, destination, payloadDigest) tuple re
 
   assert.equal(second.runId, first.runId, 'the same idempotency tuple must resolve to the SAME committed Run');
   assert.equal(fs.readFileSync(counterPath, 'utf8'), '1', 'the executor must only ever be dispatched once for a duplicate admission tuple');
+});
+
+// dispatch-engine-liveness-hardening Phase 2 (S1): the RUNNER process
+// SIGKILLed while its detached cli-spawn supervisor/worker (real subprocess
+// tree, spawned `detached: true` per cli-spawn-supervisor.mjs) is still
+// alive must not let a fresh dispatch admit a second, racing attempt.
+// Mirrors the audit's own live probe (a child acquiring real run-lock
+// control, spawning a detached long-lived grandchild, then SIGKILLed) but
+// against the REAL cli-spawn adapter path (`useSupervisorRecovery`, the
+// default adapter for out-of-process Assignment execution) so the worker
+// and supervisor bindings this fix actually reads
+// (`protected/supervisor-binding/*.json`/`*.worker.json`) are the real
+// production artifacts, not hand-constructed fixtures.
+function waitFor(predicate, { timeoutMs = 10000, intervalMs = 50 } = {}) {
+  return new Promise((resolve, reject) => {
+    const deadline = Date.now() + timeoutMs;
+    const tick = () => {
+      let value;
+      try {
+        value = predicate();
+      } catch (err) {
+        reject(err);
+        return;
+      }
+      if (value) {
+        resolve(value);
+        return;
+      }
+      if (Date.now() > deadline) {
+        reject(new Error(`waitFor: timed out after ${timeoutMs}ms`));
+        return;
+      }
+      setTimeout(tick, intervalMs);
+    };
+    tick();
+  });
+}
+
+function isPidAliveForTest(pid) {
+  if (!Number.isInteger(pid) || pid <= 0) return false;
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (err) {
+    return err.code === 'EPERM';
+  }
+}
+
+test('executeAssignment: admission refuses a second attempt while a SIGKILLed runner\'s detached cli-spawn worker is still alive (S1 live probe)', { timeout: 30000 }, async () => {
+  const tempDir = mkTempDir();
+  const stallingExecutorScript = path.join(tempDir, 'stalling-executor.mjs');
+  fs.writeFileSync(
+    stallingExecutorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const prompt = process.argv.slice(2).join(' ');
+    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    if (match) {
+      const runDir = path.dirname(match[1]);
+      fs.mkdirSync(runDir, { recursive: true });
+      // Prove liveness to the test, then hang forever -- never produce
+      // agent-result.json, so the Run never settles and stays "in flight"
+      // exactly like the audit's own live-probed scenario.
+      fs.writeFileSync(path.join(runDir, 'worker-alive.pid'), String(process.pid));
+    }
+    setInterval(() => {}, 60000);
+    `,
+  );
+  const runnerConfig = admissionRunnerConfig(stallingExecutorScript);
+  const assignment = buildAssignment({
+    work: { id: 'tsk-admit-s1-sigkill', status: 'doing', stage: 'planning', domain: 'coding' },
+    stage: 'planning', operation: 'validate-plan',
+  });
+  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+  const workerPidPath = path.join(runDir, 'worker-alive.pid');
+  const bindingDir = path.join(runDir, 'protected', 'supervisor-binding');
+
+  const moduleUrl = pathToFileURL(path.resolve('src/runner/dispatch/assignment-runner.mjs')).href;
+  const runnerScript = [
+    `import('${moduleUrl}').then(async ({ executeAssignment }) => {`,
+    `  try {`,
+    `    await executeAssignment(${JSON.stringify(assignment)}, {`,
+    `      cwd: ${JSON.stringify(tempDir)}, repoRoot: ${JSON.stringify(tempDir)}, runnerConfig: ${JSON.stringify(runnerConfig)},`,
+    `    });`,
+    `  } catch (err) { process.stderr.write('runner-error: ' + err.message + '\\n'); }`,
+    `});`,
+  ].join('\n');
+  const runnerProc = spawn(process.execPath, ['-e', runnerScript], { cwd: tempDir, stdio: ['ignore', 'ignore', 'pipe'] });
+  let runnerStderr = '';
+  runnerProc.stderr.on('data', (chunk) => { runnerStderr += chunk.toString(); });
+  const runnerExited = new Promise((resolve) => runnerProc.on('exit', (code, signal) => resolve({ code, signal })));
+
+  let workerPid;
+  let supervisorPid;
+  try {
+    // 1. Wait for the REAL cli-spawn worker (this test's stalling executor,
+    // launched by the real detached supervisor) to actually start and
+    // publish its liveness marker.
+    await waitFor(() => fs.existsSync(workerPidPath) && fs.readFileSync(workerPidPath, 'utf8'));
+    workerPid = Number(fs.readFileSync(workerPidPath, 'utf8'));
+    assert.ok(isPidAliveForTest(workerPid), 'precondition: worker pid must be alive before the SIGKILL probe');
+
+    // 2. Confirm the REAL production supervisor binding was published (not
+    // a hand-built fixture) -- this is the exact artifact
+    // isCliSpawnRunStillWorking/readSupervisorBinding read.
+    const supervisorBindingFiles = await waitFor(() => {
+      if (!fs.existsSync(bindingDir)) return null;
+      const files = fs.readdirSync(bindingDir).filter((f) => f.endsWith('.json') && !f.endsWith('.worker.json'));
+      return files.length > 0 ? files : null;
+    });
+    const supervisorBinding = JSON.parse(fs.readFileSync(path.join(bindingDir, supervisorBindingFiles[0]), 'utf8'));
+    supervisorPid = supervisorBinding.supervisor?.pid;
+    assert.ok(isPidAliveForTest(supervisorPid), 'precondition: real supervisor pid must be alive before the SIGKILL probe');
+
+    // 3. SIGKILL the RUNNER (never the worker/supervisor) -- the exact
+    // probe shape S1 names: the control holder dies, its detached child
+    // does not.
+    runnerProc.kill('SIGKILL');
+    const { signal } = await runnerExited;
+    assert.equal(signal, 'SIGKILL', 'runner must have actually been killed, not exited on its own');
+
+    // 4. Real proof, not an assumption: the detached worker (and its
+    // supervisor) must genuinely have survived the runner's death.
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    assert.ok(isPidAliveForTest(workerPid), 'detached worker must survive its runner being SIGKILLed');
+    assert.ok(isPidAliveForTest(supervisorPid), 'detached supervisor must survive its runner being SIGKILLed');
+
+    // 5. A fresh dispatch for the SAME assignment must now be refused --
+    // this is the real fix under test (admitRunAttempt's in-flight check
+    // now also consults the live supervisor/worker bindings, not just the
+    // dead runner's control-holder record).
+    await assert.rejects(
+      () => executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig }),
+      (err) => {
+        assert.equal(err.code, 'admission-run-in-flight', `expected admission-run-in-flight, got ${err.code}: ${err.message}`);
+        return true;
+      },
+    );
+  } finally {
+    // Process hygiene: never leak the orphaned detached probe processes
+    // this test deliberately created.
+    for (const pid of [workerPid, supervisorPid]) {
+      if (isPidAliveForTest(pid)) {
+        try { process.kill(pid, 'SIGKILL'); } catch {}
+      }
+    }
+    if (!runnerProc.killed) {
+      try { runnerProc.kill('SIGKILL'); } catch {}
+    }
+  }
 });
 
 test('executeAssignment: resuming a Run whose result.json exists but fails to parse REFUSES (result-corrupt), never silently relaunches a worker over it (H3)', async () => {
