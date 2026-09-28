@@ -171,16 +171,16 @@ test('--cell scopes the result to only the matching unit', () => {
   assert.equal(data.units[0].unit, 'I18 — plan lint hardening');
 });
 
-test('--cell with no match reports capability.undeclared (warn) and still exits 0', () => {
+test('--cell with no match reports capability.undeclared (hard) and exits 1', () => {
   const cwd = tmpCwd();
   const rel = writePlan(cwd, 'plan.md', `- unit: apply the fix\n  capability: code:implement\n`);
   const result = run(cwd, ['plan-lint', rel, '--cell', 'no-such-cell', '--json']);
-  assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.status, 1, result.stderr);
   const data = envelopeData(result.stdout);
-  assert.equal(data.ok, true);
+  assert.equal(data.ok, false);
   assert.deepEqual(data.units, []);
   assert.equal(data.findings[0].code, 'capability.undeclared');
-  assert.equal(data.findings[0].severity, 'warn');
+  assert.equal(data.findings[0].severity, 'hard');
 });
 
 test('running plan-lint on the track\'s own plan.md lints clean and shows I15\'s code:implement description', () => {

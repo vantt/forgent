@@ -108,7 +108,7 @@ function matchesCellId(entry, cellId) {
  * @param {{ cellId?: string }} [options] - `cellId` scopes the result to
  *   only the unit block or Product Gates row whose id matches; when given
  *   and nothing matches, the result carries a single `capability.undeclared`
- *   (severity `warn`) finding instead.
+ *   (severity `hard`) finding instead.
  * @returns {{
  *   ok: boolean,
  *   units: Array<{unit: string, capability: string|null, line: number, source: 'unit-block'|'product-gates'}>,
@@ -321,7 +321,7 @@ export function lintPlanCapabilityAnnotations(text, registeredCapabilities, opti
       line: null,
       unit: null,
       source: null,
-      severity: 'warn',
+      severity: 'hard',
       code: 'capability.undeclared',
       message: `--cell "${cellId}" matches no unit block or Product Gates row`,
     });
