@@ -1,0 +1,114 @@
+{
+  "contract": { "id": "agent-result-claim", "version": 2 },
+  "status": "done",
+  "summary": "Blind-scored case-2 explanations X and Y against frozen RT (4), CX (12), and CY (12) atoms. X: RT 4/4 PRESENT, CX 8/12 PRESENT (absent CX-7/9/10/11), all PRESENT marks DISPOSED; GT-2 CONTRADICTS (calls glyph mismatch hypothetical and not the identical UI concept). Y: RT 3/4 PRESENT (RT-1 ABSENT), CY 8/12 PRESENT (absent CY-8/9/10/11), all PRESENT marks DISPOSED; GT-2 CONSISTENT (Claude U+276F vs Codex U+203A for the identical selection-cursor concept).",
+  "assessment": { "verdict": "pass" },
+  "evidenceRefs": [
+    "plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-2/question.md",
+    "plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-2/redteam-findings-source.md",
+    "plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-2/control-objections-source-X.md",
+    "plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-2/control-objections-source-Y.md",
+    "plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-2/explanation-X.md",
+    "plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-2/explanation-Y.md",
+    "plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-2/ground-truth.md",
+    ".fgos/assignments/asgn_i27_scorer_driver_op_002/runs/01/agent-report.md"
+  ],
+  "marks": {
+    "RT": [
+      {
+        "id": "RT-1",
+        "statement": "Decision trapped in a paralyzing dichotomy: over-engineer full HarnessAdapter (B) for a cosmetic issue, or accept architectural degradation from reactive patching (C)."
+      },
+      {
+        "id": "RT-2",
+        "statement": "block-classify.ts already hardcodes Claude grammar (MENU_CURSOR_ITEM, SUMMARY_QUESTION/SUMMARY_ANSWER) inside a nominally universal classifier."
+      },
+      {
+        "id": "RT-3",
+        "statement": "Middle path not evaluated: formalize existing per-agent special cases into an explicit tested lightweight extension point/registry short of full HarnessAdapter."
+      },
+      {
+        "id": "RT-4",
+        "statement": "Nominally universal Claude-tuned classifier risks false positives on Codex/Agy; PBI-061 undocumented blast radius was not treated as a central constraint."
+      }
+    ],
+    "CX": [
+      { "id": "CX-1", "statement": "looksStructured already hardcodes Claude-specific regexes (MENU_CURSOR_ITEM/MENU_ITEM, SUMMARY_QUESTION/SUMMARY_ANSWER, BOX_CHARS); ~3 of 5 heuristics are single-agent-shaped." },
+      { "id": "CX-2", "statement": "B mismatches domain severity: collie FP is destructive (keystroke/wrong-dialog); herdr wrap/pan is R22/R25 cosmetic." },
+      { "id": "CX-3", "statement": "Importing collie HarnessAdapter machinery for CSS wrap/pan is overkill; pan fallback acceptable; mis-wrap blast microscopic vs registry maintenance. Reject B." },
+      { "id": "CX-4", "statement": "C is already incident-driven drift: three successive Claude-named reactive patches narrowing the shared function." },
+      { "id": "CX-5", "statement": "No regression/fixture corpus (Open Gaps unmeasured miss rates); patches validated only against the last incident." },
+      { "id": "CX-6", "statement": "PBI-061 undocumented blast radius of Claude-tuned shared regexes on Codex/Agy and plain-shell panes; untested." },
+      { "id": "CX-7", "statement": "B prior-art is E1: only one source (collie), not independently converged." },
+      { "id": "CX-8", "statement": "B is F3: an entire subsystem (tier ladder + capability fence + conformance suite)." },
+      { "id": "CX-9", "statement": "B is green-field: web/src/lib/harness/ does not exist." },
+      { "id": "CX-10", "statement": "Per-agent split has cutover regression risk: 20+ locked R21-R30 IDs, tests assume one shared classifier, no corpus." },
+      { "id": "CX-11", "statement": "B's upside: forces fixture corpus + conformance as a hard gate; stronger if interactive send/detect later." },
+      { "id": "CX-12", "statement": "A is lower-risk than C only with an explicit checked multi-agent corpus gate; without it A is indistinguishable from C." }
+    ],
+    "CY": [
+      { "id": "CY-1", "statement": "looksStructured already hardcodes Claude-specific regexes (MENU_CURSOR_ITEM/MENU_ITEM, SUMMARY_QUESTION/SUMMARY_ANSWER, BOX_CHARS); ~3 of 5 heuristics are single-agent-shaped." },
+      { "id": "CY-2", "statement": "B mismatches domain severity: collie FP is destructive (keystroke/wrong-dialog); herdr wrap/pan is R22/R25 cosmetic." },
+      { "id": "CY-3", "statement": "Importing collie HarnessAdapter machinery for CSS wrap/pan is overkill; pan fallback acceptable; mis-wrap blast microscopic vs registry maintenance. Reject B." },
+      { "id": "CY-4", "statement": "C is already incident-driven drift: three successive Claude-named reactive patches narrowing the shared function." },
+      { "id": "CY-5", "statement": "No regression/fixture corpus (Open Gaps unmeasured miss rates); patches validated only against the last incident." },
+      { "id": "CY-6", "statement": "PBI-061 undocumented blast radius of Claude-tuned shared regexes on Codex/Agy and plain-shell panes; untested." },
+      { "id": "CY-7", "statement": "B prior-art is E1: only one source (collie), not independently converged." },
+      { "id": "CY-8", "statement": "B is F3: an entire subsystem (tier ladder + capability fence + conformance suite)." },
+      { "id": "CY-9", "statement": "B is green-field: web/src/lib/harness/ does not exist." },
+      { "id": "CY-10", "statement": "Per-agent split has cutover regression risk: 20+ locked R21-R30 IDs, tests assume one shared classifier, no corpus." },
+      { "id": "CY-11", "statement": "B's upside: forces fixture corpus + conformance as a hard gate; stronger if interactive send/detect later." },
+      { "id": "CY-12", "statement": "A is lower-risk than C only with an explicit checked multi-agent corpus gate; without it A is indistinguishable from C." }
+    ],
+    "RT_in_X": {
+      "RT-1": { "mark": "PRESENT", "disposition": "DISPOSED", "quote": "The correction: this was posed as a false dichotomy, and the [REDACTED] is right" },
+      "RT-2": { "mark": "PRESENT", "disposition": "DISPOSED", "quote": "`block-classify.ts` is not a universal heuristic today. It already contains hardcoded, undeclared per-agent rules:" },
+      "RT-3": { "mark": "PRESENT", "disposition": "DISPOSED", "quote": "make the existing per-agent rules explicit and tested, and stop there. A named, separated set of agent-specific predicates in the same module — not a `harness/` directory, not an adapter interface, not a registry, not a conformance framework." },
+      "RT-4": { "mark": "PRESENT", "disposition": "DISPOSED", "quote": "none of the three proposals measured the real blast radius on Codex/Agy panes." }
+    },
+    "RT_in_Y": {
+      "RT-1": { "mark": "ABSENT" },
+      "RT-2": { "mark": "PRESENT", "disposition": "DISPOSED", "quote": "You keep one module that already contains Claude-specific rules, and you make those rules visible by name instead of pretending the heuristic is universal." },
+      "RT-3": { "mark": "PRESENT", "disposition": "DISPOSED", "quote": "Condition 2: name the Claude-specific rules that already live in the module. Do not move them into a `harness/` directory. Do not build an adapter interface for them." },
+      "RT-4": { "mark": "PRESENT", "disposition": "DISPOSED", "quote": "Nobody's proposal measured the real blast radius on Codex or Agy panes. That is the PBI-061 gap and it stays open." }
+    },
+    "CX_in_X": {
+      "CX-1": { "mark": "PRESENT", "disposition": "DISPOSED", "quote": "`block-classify.ts` is not a universal heuristic today. It already contains hardcoded, undeclared per-agent rules:" },
+      "CX-2": { "mark": "PRESENT", "disposition": "DISPOSED", "quote": "Importing B is importing Tier-2 apparatus to protect a Tier-1 capability." },
+      "CX-3": { "mark": "PRESENT", "disposition": "DISPOSED", "quote": "Do not build a per-agent adapter subsystem." },
+      "CX-4": { "mark": "PRESENT", "disposition": "DISPOSED", "quote": "Three consecutive releases, each named after Claude Code." },
+      "CX-5": { "mark": "PRESENT", "disposition": "DISPOSED", "quote": "no patch in it has ever been checked against a non-Claude pane, because there is nothing to check against." },
+      "CX-6": { "mark": "PRESENT", "disposition": "DISPOSED", "quote": "none of the three proposals measured the real blast radius on Codex/Agy panes." },
+      "CX-7": { "mark": "ABSENT" },
+      "CX-8": { "mark": "PRESENT", "disposition": "DISPOSED", "quote": "cả hệ thống tier+fence+conformance là 1 subsystem." },
+      "CX-9": { "mark": "ABSENT" },
+      "CX-10": { "mark": "ABSENT" },
+      "CX-11": { "mark": "ABSENT" },
+      "CX-12": { "mark": "PRESENT", "disposition": "DISPOSED", "quote": "The conditions below are not caveats on the recommendation — they are the recommendation. A without them is C." }
+    },
+    "CY_in_Y": {
+      "CY-1": { "mark": "PRESENT", "disposition": "DISPOSED", "quote": "You keep one module that already contains Claude-specific rules, and you make those rules visible by name instead of pretending the heuristic is universal." },
+      "CY-2": { "mark": "PRESENT", "disposition": "DISPOSED", "quote": "A wrong classification wraps or pans a block incorrectly. It does not inject keystrokes, swallow dialogs, or lose data." },
+      "CY-3": { "mark": "PRESENT", "disposition": "DISPOSED", "quote": "Importing collie's full apparatus for block classification is importing Tier-2 machinery for a Tier-1 capability." },
+      "CY-4": { "mark": "PRESENT", "disposition": "DISPOSED", "quote": "three releases in a row (0.1.18, 0.1.19, 0.1.20) each shipped one more Claude-specific patch" },
+      "CY-5": { "mark": "PRESENT", "disposition": "DISPOSED", "quote": "The last three real releases are each a Claude patch with no corpus and no cross-agent regression run." },
+      "CY-6": { "mark": "PRESENT", "disposition": "DISPOSED", "quote": "Nobody's proposal measured the real blast radius on Codex or Agy panes. That is the PBI-061 gap and it stays open." },
+      "CY-7": { "mark": "PRESENT", "disposition": "DISPOSED", "quote": "Collie's conformance suite scored R3 E1 F3, single-source, high assembly cost." },
+      "CY-8": { "mark": "ABSENT" },
+      "CY-9": { "mark": "ABSENT" },
+      "CY-10": { "mark": "ABSENT" },
+      "CY-11": { "mark": "ABSENT" },
+      "CY-12": { "mark": "PRESENT", "disposition": "DISPOSED", "quote": "That is Proposal A, with two conditions attached below." }
+    },
+    "GT2": {
+      "X": {
+        "mark": "CONTRADICTS",
+        "quote": "It is not the identical UI concept. The documented › is Codex's composer prompt ... Whether Codex draws numbered selection menus, and with which glyph, is unverified. / The › glyph risk is documentary, not demonstrated ... it is a hypothesis with documentary support, not a demonstrated bug."
+      },
+      "Y": {
+        "mark": "CONSISTENT",
+        "quote": "Codex's real captured fixture data, already in the repo per the composer-testdata source, uses a different glyph for the identical concept: U+203A"
+      }
+    }
+  }
+}

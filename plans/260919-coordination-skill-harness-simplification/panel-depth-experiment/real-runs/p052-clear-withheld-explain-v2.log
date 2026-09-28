@@ -1,0 +1,71 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-28T04:42:23.215Z",
+  "data_hash": "7343d80a3fe15bdc05b7756d29b3c1614b65564632cc6d2a0d6d9a4004ea0f84",
+  "data": {
+    "coordinationId": "i27-p052-clear-withheld-v2",
+    "kind": "declared-protocol",
+    "definitionRef": {
+      "id": "core.coordination-protocol.architecture-advisory-panel-standard-v1",
+      "version": "1.0.0"
+    },
+    "objective": "I27 paired-design probe (P05.2 clear case): withheld-redteam explanation, same synthesis input as the real explain-recommendation dispatch, minus the red-team dissent paragraph.",
+    "status": "running",
+    "closed": false,
+    "closeAttempted": true,
+    "closeRefusalReason": "coordination run: session \"i27-p052-clear-withheld-v2\" was opened against definition \"core.coordination-protocol.architecture-advisory-panel-standard-v1@1.0.0\", but the definition could not be resolved -- refusing to close against an unresolvable definition: session \"i27-p052-clear-withheld-v2\" is missing its snapshot file at /home/vantt/projects/forgentX/.fgos/coordination/sessions/i27-p052-clear-withheld-v2/snapshot.json",
+    "quorum": {
+      "requiredActorIds": [
+        "lead-advisor-actor",
+        "context-investigator-actor",
+        "system-shaper-actor",
+        "alternative-shaper-actor",
+        "constraint-advocate-actor",
+        "architecture-critic-actor",
+        "synthesizer-actor"
+      ],
+      "completed": [],
+      "failed": [],
+      "late": [],
+      "missing": [
+        {
+          "actorId": "lead-advisor-actor"
+        },
+        {
+          "actorId": "context-investigator-actor"
+        },
+        {
+          "actorId": "system-shaper-actor"
+        },
+        {
+          "actorId": "alternative-shaper-actor"
+        },
+        {
+          "actorId": "constraint-advocate-actor"
+        },
+        {
+          "actorId": "architecture-critic-actor"
+        },
+        {
+          "actorId": "synthesizer-actor"
+        }
+      ],
+      "replaced": []
+    },
+    "steps": [
+      {
+        "as": "explainWithheld",
+        "type": "operation",
+        "actorId": "lead-advisor-actor",
+        "door": "dispatchDeclaredOperation",
+        "assignmentId": "asgn_i27_driver_op_003",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "claude",
+        "provider": "claude",
+        "tier": "frontier",
+        "resumed": false
+      }
+    ]
+  }
+}

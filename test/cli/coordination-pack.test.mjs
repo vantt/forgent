@@ -27,6 +27,7 @@ const REAL_PACK_MEMBER_IDS = [
   'core.coordination-protocol.group-thinking-delphi-feedback-lite',
   'core.coordination-protocol.standalone-master-coordination-loop',
   'core.coordination-protocol.architecture-advisory-panel-v1',
+  'core.coordination-protocol.architecture-advisory-panel-standard-v1',
 ];
 
 function writeRequest(cwd, name, obj) {

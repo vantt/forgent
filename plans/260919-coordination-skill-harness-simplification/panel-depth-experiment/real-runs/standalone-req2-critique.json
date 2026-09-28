@@ -1,0 +1,41 @@
+{
+  "kind": "declared-protocol",
+  "objective": "I27 standalone real standard-protocol session: critique.",
+  "writerId": "i27-driver",
+  "coordinationId": "i27-standalone-standard-v1",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-standard-v1" },
+  "close": true,
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "frontier" },
+    { "id": "context-investigator-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "standard" },
+    { "id": "system-shaper-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "flagship" },
+    { "id": "alternative-shaper-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "flagship" },
+    { "id": "constraint-advocate-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "flagship" },
+    { "id": "architecture-critic-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "flagship" },
+    { "id": "synthesizer-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "frontier" }
+  ],
+  "steps": [
+    {
+      "type": "authorize", "as": "authCritique", "operationId": "critique-proposals", "targetActorId": "architecture-critic-actor",
+      "authorizationId": "auth_critique_standalone", "invocationKey": "ik_critique_standalone",
+      "reason": "post-shaping-open is open: all three Phase-5 shapers have a linked result.",
+      "grantedContextRefs": ["asgn_i27_driver_op_018", "asgn_i27_driver_op_019", "asgn_i27_driver_op_020", "asgn_i27_driver_op_021", "asgn_i27_driver_op_022"]
+    },
+    {
+      "type": "operation", "as": "critique", "operationId": "critique-proposals", "targetActorId": "architecture-critic-actor",
+      "objective": "Attack the strongest proposal on the table (a mechanical materiality/risk field gating standard-variant selection, per shape-system-proposal). Read /home/vantt/projects/forgentX/core/coordination-protocols/architecture-advisory-panel-standard-v1.yaml first (absolute path). Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    },
+    {
+      "type": "authorize", "as": "authAssess", "operationId": "assess-constraints", "targetActorId": "constraint-advocate-actor",
+      "authorizationId": "auth_assess_standalone", "invocationKey": "ik_assess_standalone",
+      "reason": "post-shaping-open is open: all three Phase-5 shapers have a linked result.",
+      "grantedContextRefs": ["asgn_i27_driver_op_020", "asgn_i27_driver_op_021", "asgn_i27_driver_op_022"]
+    },
+    {
+      "type": "operation", "as": "assess", "operationId": "assess-constraints", "targetActorId": "constraint-advocate-actor",
+      "objective": "Finalize the risk ranking across all three proposals (mechanical materiality field; pure human judgment; don't ship yet), incorporating the critic's own attack. State which option you'd actually ship first, and why. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}

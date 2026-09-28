@@ -1,0 +1,24 @@
+{
+  "kind": "declared-protocol",
+  "objective": "I27 standalone real standard-protocol session: critique retry (the first attempt, asgn_i27_driver_op_023, landed real content but was marked failed by mutation-detection due to an unrelated concurrent commit landing in this same worktree during the dispatch window).",
+  "writerId": "i27-driver",
+  "coordinationId": "i27-standalone-standard-v1",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-standard-v1" },
+  "close": true,
+  "actors": [
+    { "id": "architecture-critic-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "flagship" }
+  ],
+  "steps": [
+    {
+      "type": "authorize", "as": "authCritiqueRetry", "operationId": "critique-proposals", "targetActorId": "architecture-critic-actor",
+      "authorizationId": "auth_critique_standalone_retry", "invocationKey": "ik_critique_standalone_retry",
+      "reason": "post-shaping-open is open: all three Phase-5 shapers have a linked result. Retry after op_023 was marked failed by an unrelated concurrent git-tree mutation, not a content defect.",
+      "grantedContextRefs": ["asgn_i27_driver_op_018", "asgn_i27_driver_op_019", "asgn_i27_driver_op_020", "asgn_i27_driver_op_021", "asgn_i27_driver_op_022"]
+    },
+    {
+      "type": "operation", "as": "critiqueRetry", "operationId": "critique-proposals", "targetActorId": "architecture-critic-actor",
+      "objective": "Attack the strongest proposal on the table (a mechanical materiality/risk field gating standard-variant selection, per shape-system-proposal). Read /home/vantt/projects/forgentX/core/coordination-protocols/architecture-advisory-panel-standard-v1.yaml first (absolute path). Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}

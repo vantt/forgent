@@ -1,0 +1,74 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-28T04:19:53.402Z",
+  "data_hash": "32c9fcfe63223f481c33c8067947f54cc2abcdc3c3f44fc610075ef6e2684bef",
+  "data": {
+    "coordinationId": "i27-canary-v1",
+    "kind": "declared-protocol",
+    "definitionRef": {
+      "id": "core.coordination-protocol.architecture-advisory-panel-standard-v1",
+      "version": "1.0.0"
+    },
+    "objective": "I27 real cheap-tier canary: confirm the real executor path works before the batch.",
+    "status": "running",
+    "closed": false,
+    "closeAttempted": true,
+    "closeRefusalReason": "coordination run: session \"i27-canary-v1\" was opened against definition \"core.coordination-protocol.architecture-advisory-panel-standard-v1@1.0.0\", but the definition could not be resolved -- refusing to close against an unresolvable definition: session \"i27-canary-v1\" is missing its snapshot file at /home/vantt/projects/forgentX/.fgos/coordination/sessions/i27-canary-v1/snapshot.json",
+    "quorum": {
+      "requiredActorIds": [
+        "lead-advisor-actor",
+        "context-investigator-actor",
+        "system-shaper-actor",
+        "alternative-shaper-actor",
+        "constraint-advocate-actor",
+        "architecture-critic-actor",
+        "synthesizer-actor"
+      ],
+      "completed": [
+        {
+          "actorId": "context-investigator-actor",
+          "assignmentId": "asgn_i27_driver_op_001",
+          "runId": "run_asgn_i27_driver_op_001_01"
+        }
+      ],
+      "failed": [],
+      "late": [],
+      "missing": [
+        {
+          "actorId": "lead-advisor-actor"
+        },
+        {
+          "actorId": "system-shaper-actor"
+        },
+        {
+          "actorId": "alternative-shaper-actor"
+        },
+        {
+          "actorId": "constraint-advocate-actor"
+        },
+        {
+          "actorId": "architecture-critic-actor"
+        },
+        {
+          "actorId": "synthesizer-actor"
+        }
+      ],
+      "replaced": []
+    },
+    "steps": [
+      {
+        "as": "investigate",
+        "type": "operation",
+        "actorId": "context-investigator-actor",
+        "door": "dispatchDeclaredOperation",
+        "assignmentId": "asgn_i27_driver_op_001",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "claude",
+        "provider": "claude",
+        "tier": "standard",
+        "resumed": false
+      }
+    ]
+  }
+}

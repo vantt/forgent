@@ -1,0 +1,21 @@
+{
+  "kind": "declared-protocol",
+  "objective": "I27 paired-design probe (I21 H4 case): withheld-redteam explanation, same synthesis input as the real explain-recommendation dispatch, minus the red-team verdict.",
+  "writerId": "i27-driver",
+  "coordinationId": "i27-i21h4-withheld-v1",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-standard-v1" },
+  "close": true,
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "frontier" }
+  ],
+  "steps": [
+    {
+      "type": "operation",
+      "as": "explainWithheld",
+      "operationId": "interpret-request",
+      "targetActorId": "lead-advisor-actor",
+      "objective": "Write the one document meant for the person deciding whether to invest further in closing Unit I21's H4 exposure class (the generic `review` capability, declared with no `.prefer`, having silently pinned all 8 architecture-advisory-panel-v1 actors onto an unconfined executor before the round-2 fix restricted accepted resolutions to exactly bindingSource === 'capability.prefer' at src/verbs/coordination/binding.mjs:268). The real synthesis recommendation: confirm the round-2 fix already closes the H4 exposure class as defined -- any future capability with no `.prefer` falls to unbound (fail-closed, sensitivity-blind) with no author action required -- and open no separate kernel-hardening unit for H4, conditioned on one unchecked observation (F1: whether any dispatch-time path re-resolves an operation by capability NAME rather than by the bound preferExecutor; if yes, the recommendation inverts and the guard must move into resolve.mjs). A `confinementSensitive` flag would not have prevented H4 in any case, since H4 was a consumer-side failure (a confinement.mode: required declaration existed and no code read it), not an author-judgment failure. Live disagreement to keep visible, not smoothed: the system-shaper and architecture-critic want a separate, zero-observed-instance residual (a bare-string `.prefer` silently falling through to an unconfined first invocation) closed structurally now; the alternative-shaper wants doctor-check visibility first before touching the dispatch path; this is a values trade-off (defense-in-depth vs. move-only-on-evidence), not something more evidence resolves, and it goes to the person. No code change is required for the H4 question itself. Everything you need to write this document is already given above -- do not read, list, enumerate, or search any other file, directory, or path for any reason (including src/verbs/coordination/binding.mjs itself, any sibling coordination artifact, or any directory under /home/vantt/projects/forgentX/plans/); do not use a subagent or tool to explore beyond this prompt's own text. This run is deliberately blind to material outside this prompt -- that is the entire point of this specific probe, and browsing further would defeat it. If you believe you need more information than what is given above, say so plainly in your report instead of going to find it. This session's own coordination bookkeeping lives at /home/vantt/projects/forgentX/.fgos/ -- you are authorized to write your result artifacts at the exact runDir path this dispatch gives you under that tree (this single write is the only filesystem access this task calls for). Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}. You may add any other fields you find useful alongside these two required ones.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}
