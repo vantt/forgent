@@ -2549,11 +2549,37 @@ Executor/provider/model/tier selection remains an execution-time decision.
   open dependency (Lead, 2026-09-28, human spot-check): the rubric's spec
     (b) requires a human spot-check on at least one case, and explicitly
     forbids the Lead from being that human. Implementer correctly flagged
-    this as a real dependency it cannot close itself. Not yet blocking --
-    the blinded packet doesn't exist yet. Once it does, Lead will ask the
-    user directly whether they can spot-check one case (prefer a core
-    case); if unavailable, decide a fallback then rather than guess one
-    now.
+    this as a real dependency it cannot close itself. RESOLVED same day:
+    all 3 cases are now real blind-scored (commit `9c411dc16`), packets
+    exist -- Lead independently verified the packet structure matches the
+    rubric exactly, the redaction self-check genuinely caught and fixed 3
+    real leaks before a clean second pass (not a rubber-stamped claim),
+    and the provider check correctly reasons `xai` is a legal blind-scorer
+    choice (rubric excludes only synthesizer/lead-advisor providers, and
+    `xai`'s separate use as case-3's red-team fallback doesn't disqualify
+    it). `unblinding-key.md` confirmed still uncommitted on disk, per the
+    rubric's own ordering. Lead is now asking the user directly whether
+    they can spot-check case-1 (a core case, so it also gets factual-error
+    marks) -- pending user response.
+  decision (Lead, 2026-09-28, standalone standard-protocol session --
+    accept partial): implementer hit a real `claude` CLI session-quota
+    exhaustion (reset ~3pm local, unknown distance) on the standalone
+    session's synthesis dispatch, 7/9-ish real ops already done
+    (interpret, investigate, 3 shapers, critique, assess) across multiple
+    phases/actors -- confirmed via `evidence.json` (gitBefore==gitAfter,
+    changedFiles: []) that this is a clean quota gate, not a content or
+    process failure. Ruling: accept as PARTIAL, do not wait for the reset
+    or switch provider mid-session. Reasoning: this session's sole purpose
+    is proving the new FlowDefinition dispatches end-to-end through the
+    real `fgos coordination` door "as actually deployed" -- a structural
+    plumbing proof, not part of the actual paired-comparison measurement,
+    which is already fully collected and scored across all 3 cases.
+    7 real ops spanning 5 distinct phases/actors already discharges that
+    proof; waiting an unknown amount of time or switching provider
+    mid-run (contaminating the "as actually deployed" reading with a
+    mixed-provider session) both cost more than the marginal proof value
+    justifies. Report must state this plainly as a documented partial,
+    never imply the standalone session completed.
 
 Update (2026-09-28, user-confirmed): the 3 Phase 5 Exit criteria the
 decomposition review's L4 finding flagged as unowned are now resolved:
