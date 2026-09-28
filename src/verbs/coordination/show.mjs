@@ -51,6 +51,12 @@ import { resolveNodeCwd } from './dag-scheduler.mjs';
 import { interpretRunResult } from '../../runner/dispatch/run-result.mjs';
 import { evaluateDriverAuthorizedBindings } from '../../runner/coordination/legality-facts.mjs';
 
+// Unit I30 (Phase 7 item 1): `show`'s own data shape (session status/dag/
+// dispositions/authorizations projection) is not the `coordination-actions.v1`
+// shape `showCoordinationActionsUseCase` returns (`actions.mjs`), so this is a
+// genuinely distinct sibling version, not a reuse of that constant.
+export const SHOW_CONTRACT_VERSION = 'coordination-show.v1';
+
 // Same four terminal event kinds `replay.mjs`'s own (unexported)
 // `TERMINAL_EVENT_TYPES` uses (`transitionSessionStatus`'s TERMINAL_EVENT_TYPE
 // table, store.mjs) -- mirrored here, not imported, for the same
@@ -537,6 +543,7 @@ export function showCoordinationUseCase(ctx, { id }) {
   }
 
   return {
+    contractVersion: SHOW_CONTRACT_VERSION,
     coordinationId: manifest.coordinationId,
     status: manifest.status,
     sessionStatus: manifest.status,

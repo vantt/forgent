@@ -22,6 +22,7 @@ import {
   tmpCwdFromTemplate,
 } from './helpers/fgos-cli-harness.mjs';
 import { validateCoordinationRequest } from '../../src/verbs/coordination/schema.mjs';
+import { CHAIN_CONTRACT_VERSION } from '../../src/verbs/coordination/chain.mjs';
 import { StoreError } from '../../src/state/store.mjs';
 import { COMMAND_REGISTRY } from '../../src/cli/command-registry.mjs';
 
@@ -842,7 +843,13 @@ test('fgos coordination chain <track> on a track with zero matching sessions is 
   const chainResult = run(cwd, ['coordination', 'chain', 'never-opened-track']);
   assert.equal(chainResult.status, 0, chainResult.stderr);
   const chainData = envelopeData(chainResult.stdout);
-  assert.deepEqual(chainData, { track: 'never-opened-track', cells: [], activeCell: null, nextAction: null });
+  assert.deepEqual(chainData, {
+    contractVersion: CHAIN_CONTRACT_VERSION,
+    track: 'never-opened-track',
+    cells: [],
+    activeCell: null,
+    nextAction: null,
+  });
 });
 
 test('fgos coordination chain requires a track argument', () => {
