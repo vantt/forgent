@@ -5,7 +5,6 @@ import {
   PLACEMENT_POLICY_SHADOW_CONTRACT,
   buildPlacementPolicyCandidate,
   evaluatePlacementPolicyShadow,
-  resolveVerifiedAssignmentModel,
 } from '../../src/runner/dispatch/placement-policy.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 
@@ -220,31 +219,13 @@ test('Phase 05: a fallback candidate identical to the primary candidate is never
   assert.deepEqual(result.placementPolicy.fallbackSkipped, []);
 });
 
-// ─── Follow-up (post-Phase-08): resolveAssignmentDispatchPolicy unification ─
-
-test('Follow-up: resolveVerifiedAssignmentModel is PlacementPolicy-sourced whenever it agrees with the legacy resolvePolicyTierModel value (the common case, since both call the identical primitive)', () => {
-  const cfg = { modelPolicies: { gemini: { advanced: 'gemini-3.8-flash-high' } } };
-  const legacyModel = 'gemini-3.8-flash-high'; // what resolvePolicyTierModel(cfg, 'advanced', 'gemini') itself produces
-  const result = resolveVerifiedAssignmentModel({ cfg, lookupPolicyTier: 'advanced', provider: 'gemini', legacyModel });
-  assert.equal(result.model, 'gemini-3.8-flash-high');
-  assert.equal(result.source, 'placement-policy');
-  assert.equal(result.divergence, null);
-});
-
-test('Follow-up: resolveVerifiedAssignmentModel falls back to the legacy value and reports a divergence for an unsupported provider/tier pair, never throwing', () => {
-  const cfg = { modelPolicies: { gemini: { advanced: 'gemini-3.8-flash-high' } } };
-  const legacyModel = 'some-legacy-literal';
-  const result = resolveVerifiedAssignmentModel({ cfg, lookupPolicyTier: 'frontier', provider: 'gemini', legacyModel });
-  assert.equal(result.model, legacyModel, 'an unsupported policy tier must fall back to the caller-supplied legacy value, never throw');
-  assert.equal(result.source, 'legacy');
-  assert.equal(result.divergence, null, 'a thrown-internally case is a clean fallback, not a divergence -- there is no PlacementPolicy value to disagree with');
-});
-
-test('Follow-up: resolveVerifiedAssignmentModel falls back and reports a genuine divergence when the legacy value disagrees with PlacementPolicy', () => {
-  const cfg = { modelPolicies: { gemini: { advanced: 'gemini-3.8-flash-high' } } };
-  const staleLegacyModel = 'a-stale-value-that-does-not-match';
-  const result = resolveVerifiedAssignmentModel({ cfg, lookupPolicyTier: 'advanced', provider: 'gemini', legacyModel: staleLegacyModel });
-  assert.equal(result.model, staleLegacyModel, 'a real divergence must fall back to the caller-supplied legacy value, never the unverified PlacementPolicy one');
-  assert.equal(result.source, 'legacy');
-  assert.deepEqual(result.divergence, { lookupPolicyTier: 'advanced', provider: 'gemini', legacyModel: staleLegacyModel, placementModel: 'gemini-3.8-flash-high' });
-});
+// dispatch-engine-liveness-hardening Phase 7 (C1): `resolveVerifiedAssignmentModel`
+// itself retired -- its own doc comment already admitted both sides called
+// the identical `resolvePolicyTierModel(cfg, lookupPolicyTier, provider)`
+// with identical inputs, so a real divergence was never structurally
+// possible (confirmed: zero real occurrences across ~800 grepped historical
+// production dispatch stderr.log files). `assignment-policy.mjs` and
+// `assignment-runner.mjs` now call `resolvePolicyTierModel` directly;
+// coverage for that primitive lives in `assignment-policy.test.mjs`
+// (`resolveAssignmentDispatchPolicy`'s own model-resolution tests), its
+// real production caller.

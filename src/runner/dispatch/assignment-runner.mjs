@@ -67,12 +67,10 @@ import { resolveFallback } from './recovery.mjs';
 import { deriveProviderFamily, resolvePolicyTierModel, resolveExecutorConfig, selectConfinedInvocationId } from './resolve.mjs';
 import { normalizeProviderFamily, checkProviderDisallowed } from './provider-adapter.mjs';
 import {
-  resolveVerifiedRedirectExecutor,
-  resolveVerifiedAssignmentModel,
+  selectPlacementPolicyRedirectExecutor,
   readOnlyRedirectPool,
   readOnlyRedirectInvocationFor,
   readOnlyRedirectEntryFor,
-  stablePoolIndex,
 } from './placement-policy.mjs';
 import { markRunSettled } from './visibility-session.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
@@ -294,43 +292,27 @@ function selectReadOnlyRedirectExecutor(cfg, sourceExecutorId, assignment) {
   const sourceProvider = resolveProviderFamilyForExecutor(sourceExecutorEntry, sourceExecutorId);
 
   const seed = `${assignment?.operation ?? ''}:${assignment?.assignmentId ?? ''}`;
-  const candidates = rawPool.filter((candidate) => candidate !== sourceExecutorId && executors[candidate]);
-  const legacyExecutorId = candidates.length === 0
-    ? sourceExecutorId
-    : candidates[stablePoolIndex(seed, candidates.length)];
+  // Phase 08 (executor-policy-dispatch-seams) / dispatch-engine-liveness-
+  // hardening Phase 7: PlacementPolicy owns redirect EXECUTOR selection
+  // directly -- the shadow-verified `resolveVerifiedRedirectExecutor` this
+  // used to compare against called the exact same primitive
+  // (`stablePoolIndex`) over the exact same filtered pool and seed this
+  // function already computes, so the two were never two algorithms, only
+  // one under two names. Confirmed via ~800 real production dispatch runs'
+  // captured stderr (`.fgos/assignments/*/runs/*/stderr.log`, Aug-Sept
+  // 2026): zero real divergence ever recorded.
+  const executorId = selectPlacementPolicyRedirectExecutor({ cfg, sourceExecutorId, candidatePool: rawPool, seed });
 
-  // Phase 08 (executor-policy-dispatch-seams): PlacementPolicy production
-  // binder for redirect EXECUTOR selection, self-verifying -- same safety
-  // posture as Phase 07's model-resolution binder. `legacyExecutorId` above
-  // is UNCHANGED, always computed first; PlacementPolicy's own selection
-  // (placement-policy.mjs's resolveVerifiedRedirectExecutor) is used only
-  // when it agrees, so a real dispatch can never regress. `rawPool` (before
-  // the admissibility filter above) is passed through -- the verified
-  // resolver does its own identical filtering internally, mirroring exactly
-  // what this function's own `candidates` line already does.
-  const { executorId: verifiedExecutorId, divergence: placementDivergence } = resolveVerifiedRedirectExecutor({
-    cfg,
-    sourceExecutorId,
-    candidatePool: rawPool,
-    seed,
-    legacyExecutorId,
-  });
-  if (placementDivergence) {
-    process.stderr.write(
-      `fgos: PlacementPolicy redirect divergence (falling back to legacy) source=${placementDivergence.sourceExecutorId} pool=${placementDivergence.candidatePool.join(',')} legacyExecutor=${placementDivergence.legacyExecutorId} placementExecutor=${placementDivergence.placementExecutorId}\n`,
-    );
-  }
+  const targetExecutorEntry = cfg?.executors?.[executorId];
+  const selectedProvider = resolveProviderFamilyForExecutor(targetExecutorEntry, executorId);
 
-  const targetExecutorEntry = cfg?.executors?.[verifiedExecutorId];
-  const selectedProvider = resolveProviderFamilyForExecutor(targetExecutorEntry, verifiedExecutorId);
-
-  const entryDesc = readOnlyRedirectEntryFor(cfg, sourceExecutorId, assignment?.operation, verifiedExecutorId);
-  const isCrossProvider = verifiedExecutorId !== sourceExecutorId && selectedProvider !== sourceProvider;
+  const entryDesc = readOnlyRedirectEntryFor(cfg, sourceExecutorId, assignment?.operation, executorId);
+  const isCrossProvider = executorId !== sourceExecutorId && selectedProvider !== sourceProvider;
 
   // Phase 05 R6: cross-provider redirect requires explicit opt-in via crossProvider: true.
   if (isCrossProvider && entryDesc?.crossProvider !== true) {
     throw new RunnerConfigError(
-      `read-only redirect from "${sourceExecutorId}" (${sourceProvider}) to "${verifiedExecutorId}" (${selectedProvider}) crosses provider family without explicit opt-in (entry must declare crossProvider: true).`,
+      `read-only redirect from "${sourceExecutorId}" (${sourceProvider}) to "${executorId}" (${selectedProvider}) crosses provider family without explicit opt-in (entry must declare crossProvider: true).`,
       { code: 'redirect.cross-provider-not-permitted' },
     );
   }
@@ -338,7 +320,7 @@ function selectReadOnlyRedirectExecutor(cfg, sourceExecutorId, assignment) {
   // M7 & I06: return full decision (pool, seed, sourceProvider, selectedProvider, crossProvider)
   // for provenance recording in dispatch-plan.json.
   return {
-    executorId: verifiedExecutorId,
+    executorId,
     pool: rawPool,
     seed,
     sourceProvider,
@@ -351,16 +333,14 @@ function policyForActualExecutor(cfg, policy, executorId, sourceExecutorId) {
   if (executorId === sourceExecutorId) return policy;
   const executorEntry = cfg?.executors?.[executorId];
   const providerModel = resolveProviderFamilyForExecutor(executorEntry, executorId);
-  const legacyModel = providerModel === policy.providerModel
+  // dispatch-engine-liveness-hardening Phase 7: `resolveVerifiedAssignmentModel`
+  // retired -- its own doc comment already admitted the two sides call the
+  // identical `resolvePolicyTierModel(cfg, lookupPolicyTier, provider)` with
+  // identical inputs, so a real algorithmic divergence was never possible
+  // (a provenance/ownership label, not a second competing computation).
+  const model = providerModel === policy.providerModel
     ? policy.model
     : resolvePolicyTierModel(cfg, policy.tier, providerModel);
-  const { model: verifiedModel } = resolveVerifiedAssignmentModel({
-    cfg,
-    lookupPolicyTier: policy.tier,
-    provider: providerModel,
-    legacyModel,
-  });
-  const model = verifiedModel;
   return {
     ...policy,
     executorId,

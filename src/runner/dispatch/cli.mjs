@@ -25,8 +25,8 @@ import { listWork, StoreError } from '../../state/store.mjs';
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
 import { RunnerConfigError, ensureRunnerConfigForDir, DEFAULT_TIER_TO_POLICY } from './config.mjs';
 import { resolveExecutorAndOverrides, resolveExecutorIdForPurpose, modelForTier, executorIdForWork, resolveCapabilityIdentityDetails } from './resolve.mjs';
-import { resolveVerifiedPlacementModel } from './placement-policy.mjs';
-import { resolveAssignmentDispatchPolicy } from './assignment-policy.mjs';
+import { resolveVerifiedPlacementModel, recordShadowBinderDivergence } from './placement-policy.mjs';
+import { resolveExecutorProvider, resolveExecutorGovernance } from './assignment-policy.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
 import { resolveExecutorCommand, DispatchError } from './transport.mjs';
 import { executeThroughConfinement, buildConfinementAttestation } from './confinement/authority.mjs';
@@ -315,6 +315,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
     process.stderr.write(
       `fgos: PlacementPolicy divergence (falling back to legacy) executor=${placementDivergence.executorId} tier=${placementDivergence.workTier} legacyModel=${placementDivergence.legacyModel} placementModel=${placementDivergence.placementModel}\n`,
     );
+    recordShadowBinderDivergence(opts.fgosDir, 'placement-model', placementDivergence);
   }
   const prompt = buildPrompt(work, opts.feedback, opts.stage);
   // D20/D22 (review finding H1, tsk-397): only has an observable effect on
@@ -791,14 +792,18 @@ export async function executeExecutorCli(
   }
 
   const executor = resolvedExecutor;
-  // Dispatch Core Contract Normalization follow-up: governance/provenance
-  // now resolve through the SAME resolveAssignmentDispatchPolicy() every
-  // other dispatch path uses (Assignment dispatch, coordination dispatch,
-  // operation dispatch) -- this used to be a fully separate, inline
-  // computation that never consulted `options.disallowedProviders`/
-  // `.disallowedExecutors` at all, a real governance gap on the direct
-  // spawn path production dispatch actually runs (`execute --for`/`execute
-  // <executorId>`, not just Assignment-backed dispatch).
+  // Dispatch Core Contract Normalization follow-up, consolidated further
+  // (dispatch-engine-liveness-hardening Phase 7, C3): governance now runs
+  // through the SAME `resolveExecutorProvider`/`resolveExecutorGovernance`
+  // helpers `resolveAssignmentDispatchPolicy` itself uses internally
+  // (assignment-policy.mjs) -- this used to call that entire resolver just
+  // to reach its two governance throws, discarding its whole computed
+  // policy object (tier/quality/persona/reasoningEffort/constraints/
+  // provenance) afterward, a real "three resolvers, one feeding the output"
+  // waste the audit named (C3). Calling the two small shared helpers
+  // directly closes the SAME governance gap (`options.disallowedProviders`/
+  // `.disallowedExecutors` are still consulted, unchanged) without paying
+  // for the unused computation.
   //
   // The literal MODEL is still computed by the exact same formula as before
   // (D2's precedence, untouched) and handed to the resolver as an
@@ -830,36 +835,25 @@ export async function executeExecutorCli(
     process.stderr.write(
       `fgos: PlacementPolicy divergence (falling back to legacy) executor=${placementDivergence.executorId} tier=${placementDivergence.workTier} legacyModel=${placementDivergence.legacyModel} placementModel=${placementDivergence.placementModel}\n`,
     );
+    recordShadowBinderDivergence(fgosDir, 'placement-model', placementDivergence);
   }
   const model = modelOverride ?? capabilityOverrides?.model ?? executor?.model ?? fallbackModel;
-  // `minTier` is informational/provenance only here (nothing else raises
-  // it in this ad-hoc dispatch path -- no Work/Assignment risk
-  // classification is in play) -- translated via the SAME
-  // DEFAULT_TIER_TO_POLICY/rigorOverrides formula `modelForTier` just
-  // applied internally, so it reports the same rigor `model` was actually
-  // resolved against. A value that fails to translate (an invalid --tier)
-  // already failed inside `modelForTier` above before reaching here.
-  const policyTier = (rigorOverrides && rigorOverrides[tier]) || DEFAULT_TIER_TO_POLICY[tier];
-  resolveAssignmentDispatchPolicy({
-    assignment: {
-      operation: purpose ?? executorId,
-      role: undefined,
-      policy: {
-        minTier: policyTier,
-        providerModel: capabilityOverrides?.providerModel,
-        // Only when a real registered executor resolved -- an unconfigured
-        // executorId must fall through to resolveAssignmentDispatchPolicy's
-        // own global-executor default, exactly like resolveExecutorCommand
-        // does downstream, never throw "not a registered executor" for a
-        // case this function's own contract has never thrown for.
-        ...(executorConfigured ? { preferExecutor: realExecutorId } : {}),
-      },
-      skills: [],
-    },
+  // `primaryExecutor`/`explicitProviderModel` mirror exactly what the
+  // former `resolveAssignmentDispatchPolicy({assignment: {policy: {...}}})`
+  // call built for this door: only when a real registered executor
+  // resolved -- an unconfigured executorId must fall through to
+  // `resolveExecutorProvider`'s own global-executor default, exactly like
+  // `resolveExecutorCommand` does downstream, never throw "not a
+  // registered executor" for a case this function's own contract has never
+  // thrown for.
+  const primaryExecutor = executorConfigured ? realExecutorId : (cfg?.executor?.command ?? 'claude');
+  const { resolvedProvider } = resolveExecutorProvider({
     runnerConfig: cfg,
-    cliOverride: { model },
+    primaryExecutor,
+    explicitProviderModel: capabilityOverrides?.providerModel,
     options,
   });
+  resolveExecutorGovernance({ primaryExecutor, providerModel: resolvedProvider, options });
   const resolvedAgentType = work ? resolveAgentTypeForWork(work, cwd, stage) : null;
   // Same reason as `spawnWorker`: a confinement the profile declares has to
   // reach the adapter, or the invariant that accepted the profile is fiction.
