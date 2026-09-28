@@ -133,6 +133,19 @@ any of S1/S2/S3 itself.
 
 ## Phase 2 — S1: admission sees the real worker, not just the runner
 
+STATUS: MERGED (2026-09-28). integratedSha (P2 alone, pre-P3)
+`a92bb68a3`, final combined integratedSha (post-P3 merge)
+`58be9e527...` -- see "Phase 2/3 interaction finding" note after Phase 3
+below, investigated and resolved before this status was recorded.
+testedSha `9eb58a8d4` (unit/P2 tip). `isBoundProcessAlive` migrated onto
+Phase 1's judge (closes a real bootId/reboot-detection gap the old local
+impl lacked); new `isCliSpawnRunStillWorking` helper wired into both
+admission's in-flight check and provider-capacity's lease reclaim. Proven
+with a real SIGKILL probe -- Lead independently reverted the fix and
+reran the same test, confirmed it genuinely fails without the fix before
+restoring it. Full suite (P2 alone): 7994/0 fail. See
+plans/260928-2327-dispatch-engine-liveness-hardening/reports/unit-P2-claude-only-execution-report.md.
+
 ### Work
 
 1. `admitRunAttempt`'s in-flight check (`assignment-runner.mjs:873-887`,
@@ -161,6 +174,55 @@ survives) no longer results in a second admitted attempt. Real test added
 and green, not just a manual probe.
 
 ## Phase 3 — S2: per-cwd dispatch lock gets a heartbeat and real liveness
+
+STATUS: MERGED (2026-09-28). integratedSha (P3 alone, on top of P2)
+`58be9e5277a239b48d2e8bb514c9f3cb368a7e68` (this is also the final
+combined P2+P3 tip on main), testedSha `d6b48eb90` (unit/P3 tip). Added
+a heartbeat (`setInterval` calling the existing `renewMainCheckoutLockIfOwn`,
+`unref()`'d, cleared in the existing `finally`) to the per-cwd lock in
+`cli.mjs`, and routed the embedded pid+timestamp identity through Phase
+1's judge (`main-checkout-lock.mjs`'s `tryAcquireOnce` string-identity
+branch now calls `resolveHolderLivenessByIdentity` instead of TTL-only
+freshness), fixing the misleading `held-by-live-other-pid` label for a
+provably dead pid. Both audit-reproduced scenarios covered by real
+process-based tests. See
+plans/260928-2327-dispatch-engine-liveness-hardening/reports/unit-P3-claude-only-execution-report.md.
+
+### Interaction finding: P2+P3 combined, not a regression in either
+
+After merging P2 then P3 (`git merge --no-ff unit/P2`, then `git merge
+--no-ff unit/P3`, final tree `58be9e527`), the combined suite surfaced
+`fanoutBatchExecutorCli fires candidates in batch concurrently with
+overlapping execution windows` (`test/runner/dispatch.test.mjs:6065`)
+failing consistently (3/3 reruns, `1 !== 0`). P3's own implementer report
+had already seen a similarly-named failure once and self-dismissed it as
+flaky; Lead did not accept that dismissal without independent proof.
+
+Investigation (git-worktree bisection under matched current system load,
+one throwaway worktree per commit: `26d912092` pre-P1-close, `a92bb68a3`
+P2-only, `d6b48eb90` P3-only) showed all three PASS in isolation — the
+failure requires P2 **and** P3 together. Reading `fanout-batch.mjs`
+confirmed a `fired[].status !== 0` reflects the real subprocess's real
+exit code, not a thrown lock error (a lock refusal instead produces a
+`'blocked'` result kind via `cli.mjs`'s own `DispatchError('dispatch-in-
+flight', ...)` on `HELD`/`AMBIGUOUS` — confirmed by direct read, so
+neither Phase 2's admission check nor Phase 3's per-cwd lock is the
+direct cause). Root cause, confirmed by an isolated reproduction in
+`/tmp` (two concurrent `git commit --allow-empty` calls against one
+shared temp repo): the test fixture's own design has two subprocesses
+racing on the SAME repo's `.git/index.lock` — one commit succeeds, the
+other fails with `fatal: Unable to create '.../.git/index.lock': File
+exists` (exit 128), which is exactly the failure signature reproduced.
+
+Disposition: **not a regression** in either phase's production dispatch-
+lock/liveness logic — a pre-existing test-fixture flaw (two concurrent
+candidates sharing one git repo in this specific test's own setup) that
+P2+P3's combined legitimate added latency (binding-check I/O, heartbeat
+scheduling) shifted just enough, under current heavy system load, to
+land inside the pre-existing race window. Filed as a named follow-up
+(fix the fixture to give each concurrent candidate its own temp repo)
+rather than blocking this track — tracked as a deferred item, not
+re-opened as a Phase 2/3 defect.
 
 ### Work
 
