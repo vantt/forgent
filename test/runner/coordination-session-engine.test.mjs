@@ -309,6 +309,14 @@ test('duplicate-dispatch race: two concurrent dispatchPrimaryTask calls for the 
   const rejected = results.filter((r) => r.status === 'rejected');
   assert.equal(fulfilled.length, 1, 'exactly one of the two racing dispatches must succeed');
   assert.equal(rejected.length, 1, 'the losing concurrent dispatch must be rejected, not silently duplicated');
+  // S5: the exclusive-create `dispatch.claim` marker that used to produce
+  // this refusal was removed once `executeAssignment()`'s own
+  // `admitRunAttempt` in-flight check (assignment-runner.mjs) was confirmed
+  // to fully subsume it -- the losing caller is now refused by THAT guard
+  // instead, one layer deeper (a `RunnerConfigError`,
+  // `code: 'admission-run-in-flight'`), translated back to the SAME
+  // `CoordinationError` shape/message dispatch.claim used to throw here, so
+  // every existing caller of this function keeps working unchanged.
   assert.ok(rejected[0].reason instanceof CoordinationError);
   assert.equal(rejected[0].reason.category, 'validation');
   assert.match(rejected[0].reason.message, /dispatch is already in progress/);
@@ -325,7 +333,7 @@ test('duplicate-dispatch race: two concurrent dispatchPrimaryTask calls for the 
   );
 });
 
-test('a pre-spawn RunnerConfigError (governance-blocked config) removes the dispatch.claim it just wrote, so an identical retry with a fixed config is not blocked by a stale claim', async () => {
+test('a pre-spawn RunnerConfigError (governance-blocked config) never admits a Run, so an identical retry with a fixed config is not blocked by the failed attempt', async () => {
   const tempDir = mkTempDir();
   openStandaloneSession(
     { coordinationId: 'coord_engine_prespawn_error', objective: 'Investigate package.json.', writerId: 'coordinator-1', primaryRole: 'researcher' },
@@ -357,16 +365,16 @@ test('a pre-spawn RunnerConfigError (governance-blocked config) removes the disp
   assert.equal(assignmentIds.length, 1, 'the pre-spawn failure must still have created exactly one Assignment (createSessionAssignment ran before the failing executeAssignment call)');
   const [assignmentId] = assignmentIds;
 
-  // No run was ever dispatched for this failed attempt.
+  // No run was ever dispatched for this failed attempt -- the governance
+  // gate fires before `admitRunAttempt` ever commits a generation for this
+  // Assignment, so no "current" attempt exists to block a retry against.
   const runsDir = path.join(assignmentsDir, assignmentId, 'runs');
   assert.ok(!fs.existsSync(runsDir) || fs.readdirSync(runsDir).length === 0, 'a pre-spawn RunnerConfigError must never create a run directory');
 
-  const dispatchClaimPath = path.join(assignmentsDir, assignmentId, 'dispatch.claim');
-  assert.ok(!fs.existsSync(dispatchClaimPath), 'dispatch.claim must be removed after a pre-spawn RunnerConfigError, not left permanently');
-
   // Identical retry -- same coordinationId, same default taskKey ('primary'),
   // same params -- but with the governance block removed (the "operator
-  // fixed the config" step). Must succeed, not be refused by a stale claim.
+  // fixed the config" step). Must succeed, not be refused by the failed
+  // attempt.
   const resumed = await dispatchPrimaryTask('coord_engine_prespawn_error', primaryTaskParams(), {
     cwd: tempDir,
     repoRoot: tempDir,
@@ -376,8 +384,6 @@ test('a pre-spawn RunnerConfigError (governance-blocked config) removes the disp
   assert.equal(resumed.assignment.assignmentId, assignmentId, 'the retry must reuse the SAME Assignment the failed attempt already registered for this taskKey');
   assert.equal(resumed.resumed, false, 'this is the assignment\'s first-ever successful execution, not a resume of a prior settled run');
   assert.equal(resumed.runResult.status, 'done');
-
-  assert.ok(fs.existsSync(dispatchClaimPath), 'a successful dispatch still writes/keeps dispatch.claim (round-3 behavior, unchanged on the success path)');
 
   const manifest = readManifest('coord_engine_prespawn_error', { cwd: tempDir });
   assert.deepEqual(manifest.assignmentRefs, [assignmentId], 'no duplicate Assignment must have been created across the failed attempt and the retry');

@@ -91,6 +91,7 @@ import {
   fsyncDirBestEffort,
   buildRunControlHolder,
   inspectRunControl,
+  resolveHolderLiveness,
 } from './run-lock.mjs';
 import { resolveExecutorCommand, currentDispatchDepth, MAX_DISPATCH_DEPTH, DispatchError } from './transport.mjs';
 import { reconcileHerdrSpawnRun } from './herdr-reconcile.mjs';
@@ -791,7 +792,7 @@ function admitRunAttempt(
   assignmentDir,
   runsDir,
   assignmentId,
-  { retryId, predecessorRunId = null, destination, payloadDigest, expectedRunId, buildRunMeta, buildDispatchPlan, buildEffectiveExecutionContract: buildEffectiveContractOpt, forceNewAttempt = false },
+  { retryId, predecessorRunId = null, destination, payloadDigest, expectedRunId, buildRunMeta, buildDispatchPlan, buildEffectiveExecutionContract: buildEffectiveContractOpt, forceNewAttempt = false, refuseIfSettled = false },
 ) {
   const admissionGenerationsDir = path.join(assignmentDir, 'admission', 'generations');
   const admissionMarkersDir = path.join(assignmentDir, 'admission', 'markers');
@@ -919,15 +920,51 @@ function admitRunAttempt(
       const priorRunDir = path.join(runsDir, priorAttemptStr);
       if (!fs.existsSync(path.join(priorRunDir, 'result.json'))) {
         const priorControl = inspectRunControl(priorRunDir);
-        if (priorControl.held || isCliSpawnRunStillWorking(priorRunDir)) {
+        // S5: a genuinely concurrent sibling caller can reach ITS OWN
+        // admission check for this exact Assignment before it (or a racing
+        // twin) has ever acquired real run control (`acquireRunControl`,
+        // `purpose: 'worker-spawn'`) -- a separate, later step inside
+        // `executeAssignment`, not part of this same CAS commit. In that
+        // narrow window `priorControl.held` is false (no control record
+        // exists at all, `priorControl.controlEpoch` is undefined) and
+        // `isCliSpawnRunStillWorking` is also false (no supervisor/worker
+        // spawned yet either), so neither signal below would ever catch a
+        // second admission racing INSIDE that window -- confirmed via a
+        // real two-process race (test/runner/coordination-dag-concurrency
+        // .test.mjs's cross-process "identical concurrent writers" case).
+        // The one signal that DOES exist for the whole window, with zero
+        // extra writes: the admitting process's own pid, stamped into this
+        // SAME atomic CAS record as `admittedBy` below. Consulted ONLY when
+        // no real control record exists yet (`!priorControl.controlEpoch`)
+        // -- once one does, `priorControl.held` alone is authoritative and
+        // this fallback is never consulted, so it can never override or go
+        // stale against the real control ledger.
+        const admitterAlive =
+          !priorControl.controlEpoch && current.record.admittedBy && resolveHolderLiveness(current.record.admittedBy) === 'held';
+        if (priorControl.held || isCliSpawnRunStillWorking(priorRunDir) || admitterAlive) {
           return {
             stop: true,
             status: 'run-in-flight',
             priorRunId: current.record.runId,
             priorAttempt: current.record.attempt,
-            holder: priorControl.holder ?? null,
+            holder: priorControl.holder ?? current.record.admittedBy ?? null,
           };
         }
+      } else if (refuseIfSettled) {
+        // S5 (dispatch-engine-liveness-hardening Phase 5): opt-in only, never
+        // the default -- a settled current attempt is exactly what a
+        // legitimate retry (schema-1 or schema-2, `retrySessionTask`) is
+        // SUPPOSED to admit a fresh attempt over, so M1 above never refuses
+        // on settlement alone. But a caller that never intends a retry (a
+        // FIRST, non-retry dispatch of an Assignment/taskKey) has no other
+        // atomic way to tell "a concurrent sibling already finished this
+        // exact dispatch" apart from "nothing has happened yet" -- a plain
+        // re-read from that caller's own process can always be outrun by a
+        // genuinely concurrent cross-process sibling (real wall-clock I/O,
+        // not a same-process race admitRunAttempt's own atomicity already
+        // closes). Refusing here, INSIDE the same CAS critical section that
+        // decides admission, is the only place this can be closed for real.
+        return { stop: true, status: 'run-already-settled', priorRunId: current.record.runId, priorAttempt: current.record.attempt };
       }
     }
     return {
@@ -940,6 +977,10 @@ function admitRunAttempt(
         destination,
         admissionPayloadDigest: payloadDigest,
         admittedAt: new Date().toISOString(),
+        // S5: the admitting process's own identity, stamped into this same
+        // atomic CAS commit -- see the `admitterAlive` check above for why
+        // this exists and when it is (and is not) consulted.
+        admittedBy: buildRunControlHolder(`${runId}:admission:${process.pid}`),
       },
     };
   });
@@ -957,14 +998,20 @@ function admitRunAttempt(
     );
   }
   if (admission.status === 'run-in-flight') {
-    // M1: nothing for THIS new attempt was ever created (no run directory,
-    // no dispatch.claim scope beyond the caller's own pre-existing one) --
+    // M1: nothing for THIS new attempt was ever created (no run directory) --
     // 'pre-admission' is correct, matching every other admission refusal
-    // above, so H2's session-engine claim cleanup still removes the
-    // caller's own claim on this throw.
+    // above.
     throw new RunnerConfigError(
       `executeAssignment: assignment "${assignmentId}"'s prior attempt "${admission.priorRunId}" (attempt ${admission.priorAttempt}) has not settled and its control holder is alive or its liveness could not be disproven -- refusing a new attempt that would race it (pass --force-new-attempt to override)`,
       { code: 'admission-run-in-flight', phase: 'pre-admission', priorRunId: admission.priorRunId, priorAttempt: admission.priorAttempt, holder: admission.holder },
+    );
+  }
+  if (admission.status === 'run-already-settled') {
+    // S5: opt-in (`refuseIfSettled`) refusal -- see its own comment above
+    // for why this exists. Nothing for THIS new attempt was ever created.
+    throw new RunnerConfigError(
+      `executeAssignment: assignment "${assignmentId}"'s prior attempt "${admission.priorRunId}" (attempt ${admission.priorAttempt}) already settled -- the caller opted into refuseIfSettled and must resume/link that result instead of dispatching a fresh attempt over it`,
+      { code: 'admission-run-already-settled', phase: 'pre-admission', priorRunId: admission.priorRunId, priorAttempt: admission.priorAttempt },
     );
   }
 
@@ -1579,6 +1626,9 @@ export async function executeAssignment(assignment, opts = {}) {
     // unreachable filesystem) -- never the default, always an explicit opt
     // sourced from the caller (CLI: --force-new-attempt).
     forceNewAttempt: opts.forceNewAttempt === true,
+    // S5: opt-in only (session-engine.mjs's own FRESH, non-retry dispatch
+    // path) -- see admitRunAttempt's own comment for why this exists.
+    refuseIfSettled: opts.refuseIfSettled === true,
     buildRunMeta: (record) => ({
       contract: 'assignment-run.v2',
       runId: record.runId,

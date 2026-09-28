@@ -20,6 +20,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
+import { pathToFileURL } from 'node:url';
 import {
   openStandaloneSession,
   openDeclaredProtocolSession,
@@ -116,6 +117,46 @@ function writeAttemptResult(tempDir, assignmentId, attemptStr, { status = 'done'
   const runId = `run_${assignmentId}_${attemptStr}`;
   fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({ runId, assignmentId, status, confidence }, null, 2));
   return runId;
+}
+
+// S5 SIGKILL-recovery probe below: same real-process wait/liveness helpers
+// as assignment-dispatch.test.mjs's own S1 live probe (test/runner/
+// assignment-dispatch.test.mjs, search "S1 live probe"), reused here rather
+// than imported since that file's copies are local, non-exported test
+// utilities.
+function waitFor(predicate, { timeoutMs = 10000, intervalMs = 50 } = {}) {
+  return new Promise((resolve, reject) => {
+    const deadline = Date.now() + timeoutMs;
+    const tick = () => {
+      let value;
+      try {
+        value = predicate();
+      } catch (err) {
+        reject(err);
+        return;
+      }
+      if (value) {
+        resolve(value);
+        return;
+      }
+      if (Date.now() > deadline) {
+        reject(new Error(`waitFor: timed out after ${timeoutMs}ms`));
+        return;
+      }
+      setTimeout(tick, intervalMs);
+    };
+    tick();
+  });
+}
+
+function isPidAliveForTest(pid) {
+  if (!Number.isInteger(pid) || pid <= 0) return false;
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (err) {
+    return err.code === 'EPERM';
+  }
 }
 
 // ─── R1: required actors/quorum ────────────────────────────────────────────
@@ -729,25 +770,153 @@ test('crash point "retry attempt settled on disk, never linked": retrySessionTas
   assert.ok(!fs.existsSync(path.join(tempDir, '.fgos', 'assignments', asgn.assignmentId, 'runs', '03')), 'never dispatched a redundant third attempt');
 });
 
-test('crash point "retry claim in progress, no settled attempt": retrySessionTask fails closed with named repair guidance instead of guessing past the ambiguity', async () => {
-  const tempDir = mkTempDir();
-  openStandaloneSession({ coordinationId: 'coord_retry_crash_ambiguous', objective: 'x', writerId: 'writer-1', primaryRole: 'researcher' }, { cwd: tempDir });
-  const asgn = createSessionAssignment(
-    { coordinationId: 'coord_retry_crash_ambiguous', taskKey: 'primary', actorId: PRIMARY_ACTOR_ID, contract: inlineContract(), caller: { writerId: 'writer-1' } },
-    { cwd: tempDir },
-  );
-  const runId01 = writeAttemptResult(tempDir, asgn.assignmentId, '01');
-  linkResult('coord_retry_crash_ambiguous', { assignmentId: asgn.assignmentId, runId: runId01 }, { cwd: tempDir });
-  recordRunRetry('coord_retry_crash_ambiguous', { assignmentId: asgn.assignmentId, reason: 'simulated mid-dispatch crash', previousRunId: runId01, maxRetries: 3 }, { cwd: tempDir });
-  // Simulate: the retry's claim was written (dispatch genuinely started) but
-  // the subprocess never settled attempt 02 before the crash.
-  fs.closeSync(fs.openSync(path.join(tempDir, '.fgos', 'assignments', asgn.assignmentId, 'retry-1.claim'), 'w'));
+// S5: replaces the retired "retry claim in progress" crash-point test above
+// (`retry-${attempt}.claim`, a hand-fixture-only marker file with no real
+// production writer of its own content, removed once `admitRunAttempt`'s
+// in-flight check was confirmed to fully subsume it) with a real end-to-end
+// proof of the SAME crash window, using the exact real-process SIGKILL shape
+// assignment-dispatch.test.mjs's own S1 live probe already established for
+// the underlying admission guard.
+test(
+  'S5 real recovery proof: SIGKILLing a session retry before result.json exists is refused while its detached worker survives, and a further retry recovers once the worker is confirmed dead -- no dispatch.claim, no special reconcile door needed',
+  { timeout: 30000 },
+  async () => {
+    const tempDir = mkTempDir();
+    openStandaloneSession({ coordinationId: 'coord_retry_sigkill_recovery', objective: 'x', writerId: 'writer-1', primaryRole: 'researcher' }, { cwd: tempDir });
+    const asgn = createSessionAssignment(
+      { coordinationId: 'coord_retry_sigkill_recovery', taskKey: 'primary', actorId: PRIMARY_ACTOR_ID, contract: inlineContract(), caller: { writerId: 'writer-1' } },
+      { cwd: tempDir },
+    );
+    const runId01 = writeAttemptResult(tempDir, asgn.assignmentId, '01');
+    linkResult('coord_retry_sigkill_recovery', { assignmentId: asgn.assignmentId, runId: runId01 }, { cwd: tempDir });
 
-  await assert.rejects(
-    retrySessionTask('coord_retry_crash_ambiguous', { assignmentId: asgn.assignmentId, reason: 'ignored' }, { cwd: tempDir }),
-    (err) => err instanceof CoordinationError && /repair guidance|already has a claim in progress/.test(err.message),
-  );
-});
+    const stallingExecutorScript = path.join(tempDir, 'stalling-retry-executor.mjs');
+    fs.writeFileSync(
+      stallingExecutorScript,
+      `
+      import fs from 'node:fs';
+      import path from 'node:path';
+      const prompt = process.argv.slice(2).join(' ');
+      const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+      if (match) {
+        const runDir = path.dirname(match[1]);
+        fs.mkdirSync(runDir, { recursive: true });
+        // Prove liveness to the test, then hang forever -- attempt 02 never
+        // settles, staying genuinely "in flight" the same way the audit's
+        // own S1 probe simulates it.
+        fs.writeFileSync(path.join(runDir, 'worker-alive.pid'), String(process.pid));
+      }
+      setInterval(() => {}, 60000);
+      `,
+    );
+    const stallingRunnerConfig = {
+      executor: { allowCrossProvider: true, command: process.execPath, args: [stallingExecutorScript, '{prompt}'] },
+      models: { standard: 'test-model' },
+      timeoutMs: 5000,
+    };
+
+    const runDir02 = path.join(assignmentRunsDir(tempDir, asgn.assignmentId), '02');
+    const workerPidPath = path.join(runDir02, 'worker-alive.pid');
+    const bindingDir = path.join(runDir02, 'protected', 'supervisor-binding');
+
+    const moduleUrl = pathToFileURL(path.resolve('src/runner/coordination/session-engine.mjs')).href;
+    const runnerScript = [
+      `import('${moduleUrl}').then(async ({ retrySessionTask }) => {`,
+      `  try {`,
+      `    await retrySessionTask(${JSON.stringify('coord_retry_sigkill_recovery')}, { assignmentId: ${JSON.stringify(asgn.assignmentId)}, reason: 'racer to be killed', maxRetries: 1 }, {`,
+      `      cwd: ${JSON.stringify(tempDir)}, repoRoot: ${JSON.stringify(tempDir)}, runnerConfig: ${JSON.stringify(stallingRunnerConfig)},`,
+      `    });`,
+      `  } catch (err) { process.stderr.write('runner-error: ' + err.message + '\\n'); }`,
+      `});`,
+    ].join('\n');
+    const runnerProc = spawn(process.execPath, ['-e', runnerScript], { cwd: tempDir, stdio: ['ignore', 'ignore', 'pipe'] });
+    const runnerExited = new Promise((resolve) => runnerProc.on('exit', (code, signal) => resolve({ code, signal })));
+
+    let workerPid;
+    let supervisorPid;
+    try {
+      // 1. Wait for the REAL detached cli-spawn worker (spawned by the
+      // session's own retry dispatch) to actually start.
+      await waitFor(() => fs.existsSync(workerPidPath) && fs.readFileSync(workerPidPath, 'utf8'));
+      workerPid = Number(fs.readFileSync(workerPidPath, 'utf8'));
+      assert.ok(isPidAliveForTest(workerPid), 'precondition: retry worker pid must be alive before the SIGKILL probe');
+
+      const supervisorBindingFiles = await waitFor(() => {
+        if (!fs.existsSync(bindingDir)) return null;
+        const files = fs.readdirSync(bindingDir).filter((f) => f.endsWith('.json') && !f.endsWith('.worker.json'));
+        return files.length > 0 ? files : null;
+      });
+      const supervisorBinding = JSON.parse(fs.readFileSync(path.join(bindingDir, supervisorBindingFiles[0]), 'utf8'));
+      supervisorPid = supervisorBinding.supervisor?.pid;
+      assert.ok(isPidAliveForTest(supervisorPid), 'precondition: real supervisor pid must be alive before the SIGKILL probe');
+
+      // 2. SIGKILL the session's own retry-dispatching process before
+      // result.json for attempt 02 ever exists.
+      runnerProc.kill('SIGKILL');
+      const { signal } = await runnerExited;
+      assert.equal(signal, 'SIGKILL', 'the session retry process must have actually been killed, not exited on its own');
+      assert.ok(!fs.existsSync(path.join(runDir02, 'result.json')), 'precondition: attempt 02 must never have settled before the kill');
+
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      assert.ok(isPidAliveForTest(workerPid), 'detached retry worker must survive its runner being SIGKILLed');
+      assert.ok(isPidAliveForTest(supervisorPid), 'detached retry supervisor must survive its runner being SIGKILLed');
+
+      // 3. A second retry attempt for the SAME Assignment, in THIS process,
+      // must be refused while the real detached worker is still alive --
+      // `executeAssignment()`'s own `admitRunAttempt` in-flight check
+      // (assignment-runner.mjs) alone, no dispatch.claim/retry-N.claim
+      // involved at all. Surfaces to this caller as a `CoordinationError`
+      // (retrySessionTask translates the underlying RunnerConfigError
+      // `admission-run-in-flight` back to that same shape).
+      await assert.rejects(
+        retrySessionTask(
+          'coord_retry_sigkill_recovery',
+          { assignmentId: asgn.assignmentId, reason: 'second attempt while worker alive', maxRetries: 1 },
+          { cwd: tempDir, repoRoot: tempDir, runnerConfig: stallingRunnerConfig },
+        ),
+        (err) => err instanceof CoordinationError && err.category === 'validation' && /already in progress/.test(err.message),
+      );
+
+      // 4. Confirm the worker is genuinely dead (the operator's own
+      // confirmation step) -- SIGKILL it and its supervisor too.
+      process.kill(workerPid, 'SIGKILL');
+      process.kill(supervisorPid, 'SIGKILL');
+      await waitFor(() => !isPidAliveForTest(workerPid) && !isPidAliveForTest(supervisorPid));
+
+      // 5. Recovery: a further retry now succeeds through the SAME ordinary
+      // retrySessionTask call -- no dispatch.claim to clear, no `dispatch
+      // reconcile` action, no operator door at all. This is the real
+      // end-to-end proof S5's Phase 5 Exit asked for: once the prior holder
+      // is provably dead, the system self-heals through the normal path.
+      const recoveredRunnerConfig = fakeExecutor(tempDir, { summary: 'recovered retry' });
+      const recovered = await retrySessionTask(
+        'coord_retry_sigkill_recovery',
+        { assignmentId: asgn.assignmentId, reason: 'recovery attempt after confirmed death', maxRetries: 1 },
+        { cwd: tempDir, repoRoot: tempDir, runnerConfig: recoveredRunnerConfig },
+      );
+
+      assert.equal(recovered.retried, true, 'recovery must dispatch a genuinely new attempt, not silently resume the killed one');
+      assert.equal(recovered.runResult.status, 'done');
+
+      const events = readSessionEvents('coord_retry_sigkill_recovery', { cwd: tempDir });
+      const linkedEvents = events.filter((e) => e.type === 'result-linked' && e.payload.assignmentId === asgn.assignmentId);
+      assert.equal(
+        linkedEvents[linkedEvents.length - 1].payload.runId,
+        recovered.runResult.runId,
+        "the recovered attempt is the session's current linked result",
+      );
+    } finally {
+      for (const pid of [workerPid, supervisorPid]) {
+        if (isPidAliveForTest(pid)) {
+          try { process.kill(pid, 'SIGKILL'); } catch {}
+        }
+      }
+      if (!runnerProc.killed) {
+        try { runnerProc.kill('SIGKILL'); } catch {}
+      }
+    }
+  },
+);
 
 test('replay.mjs rejects a hand-crafted second result-linked event with no intervening run-retried authorization -- evidence-laundering/duplicate-ref negative test', () => {
   const tempDir = mkTempDir();
@@ -800,7 +969,12 @@ test('concurrent retry race: two concurrent retrySessionTask calls for the SAME 
   const rejected = settled.filter((s) => s.status === 'rejected');
   assert.equal(fulfilled.length, 1, 'exactly one racer actually retried');
   assert.equal(rejected.length, 1, 'the other racer was rejected, never silently duplicated');
+  // S5: refused by `executeAssignment()`'s own `admitRunAttempt` in-flight
+  // check now, not the retired `retry-${attempt}.claim` marker --
+  // retrySessionTask translates the underlying RunnerConfigError back to
+  // the same CoordinationError shape the retired marker used to throw.
   assert.ok(rejected[0].reason instanceof CoordinationError);
+  assert.equal(rejected[0].reason.category, 'validation');
 
   const attemptDirs = fs.readdirSync(assignmentRunsDir(tempDir, asgn.assignmentId)).filter((d) => /^\d+$/.test(d));
   assert.deepEqual(attemptDirs.sort(), ['01', '02'], 'exactly one new attempt was dispatched, never two');
