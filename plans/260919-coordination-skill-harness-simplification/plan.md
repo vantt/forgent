@@ -2530,6 +2530,30 @@ Executor/provider/model/tier selection remains an execution-time decision.
     back to the already-frozen finding lists rather than inventing new
     scorer judgment calls. This SHA is what the final report must cite per
     the rubric-ordering-violation decision above.
+  process incident (Lead, 2026-09-28, worktree write collision): the
+    rubric commit above landed in the shared `unit/I27` worktree while
+    implementer's own `op_023` standalone-session `critique` dispatch was
+    still in flight there -- same class as this track's own established
+    "never git-write in a shared cell worktree while in-flight" lesson,
+    this time from the Lead/dispatcher side rather than a peer session.
+    Lead did not check implementer's live-dispatch status before
+    dispatching the rubric-writer. Consequence: mutation-detection marked
+    `op_023` `failed` despite genuinely substantive, valid content
+    (`"status": "done"` inside the real result). Disposition: kept as
+    documented evidence with the caveat noted, not re-spent -- consistent
+    with this unit's own established precedent (the `req3b` retry, the
+    earlier false-fail) of preserving honest real evidence over re-spending
+    for a cleaner-looking result. Going forward: Lead will check
+    implementer's dispatch status before any further write into this
+    worktree, and implementer will do the same in reverse.
+  open dependency (Lead, 2026-09-28, human spot-check): the rubric's spec
+    (b) requires a human spot-check on at least one case, and explicitly
+    forbids the Lead from being that human. Implementer correctly flagged
+    this as a real dependency it cannot close itself. Not yet blocking --
+    the blinded packet doesn't exist yet. Once it does, Lead will ask the
+    user directly whether they can spot-check one case (prefer a core
+    case); if unavailable, decide a fallback then rather than guess one
+    now.
 
 Update (2026-09-28, user-confirmed): the 3 Phase 5 Exit criteria the
 decomposition review's L4 finding flagged as unowned are now resolved:
