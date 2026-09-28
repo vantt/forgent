@@ -2191,105 +2191,234 @@ Executor/provider/model/tier selection remains an execution-time decision.
     this unit's benefit is scoped to the architecture-panel/group-thinking
     domain only and shares no files with Phase 6)
   status: not-started
-  design-record: plans/reports/fork-260928-1017-panel-depth-experiment-design-research-report.md
-  decision (Lead, locked, do not reopen — cost, user-confirmed 2026-09-28):
-    this experiment requires REAL LLM-backed executors for both profiles
-    (fake/test executors cannot produce a real decision-quality/dissent-
-    retention/factual-error signal) — minimum defensible corpus is 3-5 real
-    cases × 2 profiles = 6-10 real coordination sessions, each 8-11 real
-    model calls across mixed tiers including `flagship`, realistically
-    1-5+ hours of wall time and real API spend. User explicitly confirmed
-    proceeding at this cost after being shown the estimate; do not silently
-    shrink scope to cut cost without asking again.
-  decision (Lead, locked, do not reopen — reduction candidate): of 3
-    evidence-based reduction candidates investigated (dropping
-    `phase-redteam` entirely; merging `critique-proposals`+
-    `assess-constraints`; capping `phase-dialogue-reopen` at
-    `maxInvocations: 1`), dropping `phase-redteam` is the standard variant's
-    shape — it is the cleanest, most structurally separable cut (1 full
-    graph node, 1 actor, the `flagship`-tier dispatch, and the
-    `distinctProviderFrom` requirement all removed together), and red-team
-    is explicitly framed as an optional adversarial-depth phase in the
-    doctrine, not correctness-required for a low-materiality case. Do NOT
-    silently skip red-team via skill prose or a conditional — per Phase 5's
-    own wording, "a standard profile may ship only if it remains a
-    separate registered protocol/preset with clear selection triggers".
+  design-record: plans/reports/fork-260928-1017-panel-depth-experiment-design-research-report.md;
+    independent decomposition review (`review-decompose-i27`) found the
+    original methodology would have wasted the real API spend on an
+    unattributable result (3 HIGH findings) — all folded into this revision.
+    The review's own memory note on real-executor cost discipline is a
+    second source an implementer should read before starting.
+  decision (Lead, locked, do not reopen — cost, REVISED 2026-09-28 after
+    review): the paired design below is CHEAPER than the original unpaired
+    plan, not more expensive — per case: 1 full-protocol session (as
+    before) + 1 extra cheap explanation-only dispatch (withholding
+    red-team) instead of a whole second independent session. Plus ONE real
+    standalone standard-protocol session (any one case) to prove the
+    variant runs end-to-end and to get a real wall-time/dispatch-count
+    reading. For a 4-case corpus: 4 full sessions + 4 extra explanation
+    dispatches + 1 standalone standard session = 5 real sessions total,
+    not 8-10. Still real LLM-backed executors, still real cost — the user's
+    2026-09-28 confirmation to proceed at real cost still holds — but the
+    revised design is both cheaper AND the only one that isolates the
+    variable (see the paired-design decision below). Do not silently
+    shrink further without asking again.
+  decision (Lead, locked, do not reopen — reduction candidate, wording
+    CORRECTED 2026-09-28 after review): of 3 evidence-based reduction
+    candidates investigated (dropping `phase-redteam` entirely; merging
+    `critique-proposals`+`assess-constraints`; capping
+    `phase-dialogue-reopen` at `maxInvocations: 1`), dropping
+    `phase-redteam` is the standard variant's shape — it is the cleanest,
+    most structurally separable cut (1 full graph node, 1 actor, the
+    `flagship`-tier dispatch, and the `distinctProviderFrom` requirement
+    all removed together; confirmed nothing else reads `red-team-packet`
+    except `phase-explanation`'s own gate). CORRECTION: the original
+    rationale's claim that red-team is "framed as optional" in the doctrine
+    is FALSE and is retracted — `docs/architect/agent-coordination/
+    playbooks/architecture-advisory-role-doctrine.md` (~L1151-1170) frames
+    it as MANDATORY falsification of the packet and the panel, deliberately
+    on a distinct provider, with no materiality exemption anywhere in that
+    file; prior real evidence (P05.2, both the "clear" and "unclear" case)
+    shows red-team dissent materially shaped the final explanation in BOTH
+    cases. The honest prior is: a quality regression from dropping
+    red-team is PLAUSIBLE, not unlikely. This unit still tests the
+    candidate — a documented regression is a valid, complete outcome, not
+    a failure of the unit — but must not misstate the doctrine to justify
+    the choice. Do NOT silently skip red-team via skill prose or a
+    conditional — per Phase 5's own wording, "a standard profile may ship
+    only if it remains a separate registered protocol/preset with clear
+    selection triggers".
+  decision (Lead, locked, do not reopen — paired measurement design, NEW
+    2026-09-28 per review HIGH-1): an unpaired design (one independent
+    session per profile per case) cannot isolate the variable — 9 of the
+    10 upstream dispatches are identical in both profiles, so two
+    independent LLM-sampled runs differ mostly in upstream sampling noise,
+    swamping the only real signal (whether `explain-recommendation` saw
+    `redteam.md`). Fix: for each case, run the FULL protocol once, then
+    produce a SECOND explanation from the SAME synthesis/redteam context
+    with red-team's finding withheld (one extra `architecture-advisory-panel-v1-explanation`-template
+    dispatch, same synthesis input, minus the redteam.md evidence ref).
+    Compare the two explanations from the SAME upstream chain. Separately,
+    run ONE real standalone standard-protocol session (any single case)
+    end-to-end to prove the new FlowDefinition actually dispatches/closes
+    correctly and to get one real wall-time/dispatch-count data point for
+    the variant as actually deployed (not just the paired-explanation
+    proxy).
+  decision (Lead, locked, do not reopen — scoring methodology, NEW
+    2026-09-28 per review HIGH-2): (a) the scoring rubric must be
+    committed to the experiment's own directory BEFORE the first real
+    call, with its git SHA cited in the final report — never written or
+    adjusted after seeing results. (b) explanations are stripped of any
+    profile-identifying text and scored BLIND, by an executor on a
+    DIFFERENT provider than the panel's own synthesizer/lead-advisor
+    executors, plus a human spot-check of at least one case — the Lead
+    (who knows which explanation is which) must never self-score. (c)
+    "dissent retention" is mechanical, not impressionistic: enumerate
+    every distinct material finding in the full run's own `redteam.md`,
+    then mark present/absent BY SUBSTANCE in each of the two explanations;
+    also track whether critique/constraint objections (which exist in
+    both profiles) survive, as a control. (d) factual error is scored ONLY
+    against independently VERIFIED ground truth (see corpus decision
+    below) — never scorer opinion where no ground truth exists.
+  decision (Lead, locked, do not reopen — corpus, CHANGED 2026-09-28 per
+    review MEDIUM-4): use `docs/platform/agent-coordination/verification/architecture-advisory-panel/P05.2.md`'s
+    two real herdr-gateway cases (one "clear", one "unclear" — their
+    frozen `intake.md`/`synthesis.md`/`redteam.md` are already on disk) as
+    the CORE corpus, not invented cases — they are the only cases in this
+    repo with INDEPENDENTLY VERIFIED ground truth from real subsequent
+    implementation (the 30.8% false-wrap rate reproduced by a real test
+    run; the Codex cursor-glyph finding confirmed live — see P05.2.md
+    ~L170-200), making them the only cases where factual-error rate can be
+    scored objectively rather than by scorer opinion. Add 1-2 more cases
+    from this track's own real decisions (e.g. I18's rust-host-regen
+    question, I21's executor-pin bypass, I24a's H3 wording, I26's H1/H2
+    reconciliation) for extra materiality spread — these lack independent
+    ground truth, so score decision-quality/dissent-retention on them but
+    do NOT claim a factual-error rate without ground truth to check
+    against.
+  decision (Lead, locked, do not reopen — real-executor cost/safety
+    discipline, NEW 2026-09-28 per review HIGH-3): before any real-cost
+    session: (1) a fake-executor smoke run of the standard variant through
+    the SAME public door the experiment will use (`fgos coordination pack
+    run` or `coordination run`), proving the explanation re-gate and
+    quorum/close actually work end-to-end — the structural YAML-diff test
+    alone does NOT prove dispatch; (2) ONE real cheap-tier canary
+    operation (e.g. `investigate-context` alone) to confirm the real
+    executor path itself works before committing to the batch. Only after
+    both pass does the real batch run. Driver rules for every real
+    session: use a FIXED, deterministic `coordinationId` per (case,
+    profile), recorded in a run manifest before dispatch — a retry MUST
+    resume the same id (the kernel's idempotent resume,
+    `src/runner/coordination/session-engine.mjs` ~L416, reads the linked
+    RunResult instead of re-executing; a freshly-minted id on retry
+    silently re-spends real cost); run `fgos coordination show` before
+    each call to confirm current state; run sessions strictly SERIALLY,
+    never concurrently (this track has a confirmed assignment-id allocator
+    race across concurrent `coordination run` processes); dispatch from a
+    QUIESCENT checkout/worktree that no other session (including Phase 6's
+    own parallel work) is editing — a concurrent git-tree change gets
+    misattributed to the dispatched executor as a false failure, which
+    would re-spend cost on a retry; be aware `aggregateBounds.wallTimeMs`
+    (default 3h, `session-engine.mjs` ~L1996) is a PERMANENT refusal once
+    elapsed — a session that isn't finished within 3 real hours cannot be
+    resumed the next day, so size the corpus/schedule accordingly. Pin
+    identical driver policy across both profiles for every shared step
+    (same objective/contextRefs text, no human turn, no specialist
+    authorization, no reopen, immediate `close-dialogue`) so driver
+    variance is never a second confound alongside the profile itself.
   scope: (1) Author a new FlowDefinition YAML,
     `core/coordination-protocols/architecture-advisory-panel-standard-v1.yaml`
     — the full `architecture-advisory-panel-v1.yaml` (556 lines) with
-    `phase-redteam`'s node, its `red-team-actor`, its `red-team-packet`
-    operation, and `phase-explanation`'s `post-redteam-open` gate condition
-    removed and `phase-explanation` re-gated on `post-synthesis-open`
-    directly — every other node/operation/actor byte-identical to the full
-    protocol (never invent new judgment content; this is a structural
-    subtraction only). (2) Register it as
-    `core.coordination-protocol.architecture-advisory-panel-standard-v1` in
-    `core/protocol-packs/group-thinking.json`'s `members` array (currently
-    5 flat `{id, version}` entries — add a 6th). (3) Add a new row (or
-    extend the existing `architecture-panel` row) in
-    `docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md`'s
-    Surface Taxonomy table with a concrete, evidence-checkable selection
-    trigger (e.g. keyed on a materiality/risk signal already available at
-    request-framing time — do not invent a vague "use judgment" trigger;
-    Phase 5's own wording requires "clear selection triggers"). (4) Build
-    a evaluation-corpus driver from scratch (no reusable multi-case runner
-    exists in this repo today — confirmed via the design-record's own
-    search of `docs/architect/agent-coordination/verification/`; existing
-    proofs there are bespoke single-mechanism scripts, not a reusable
-    corpus harness) — borrow the PATTERN those proofs use (a driver
-    `.mjs` script + a logged `.md`/`.log` proof artifact), not any code
-    directly. The corpus itself: author 3-5 fixed, realistic
-    architecture-decision cases (frozen `intake.md`-shaped inputs) covering
-    a spread of materiality (at least one case clearly low-risk enough to
-    plausibly route to the standard profile, at least one clearly needing
-    the full protocol's adversarial check). (5) Run each case through BOTH
-    profiles with real LLM-backed executors (never fake/test executors for
-    this measurement — see the cost decision above) and record, per run:
-    decision quality (a fixed rubric, not vibes — define one before running
-    any case), dissent retention (does a real disagreement in the full
-    protocol's red-team phase survive into the final explanation, and is
-    anything materially lost in the standard profile that skipped it),
-    factual error rate, dispatch/wave count, wall time, and prompt tokens.
-    (6) Write up the comparison as a report under
-    `plans/260919-coordination-skill-harness-simplification/reports/`,
+    EXACTLY this allowlisted delta, nothing else (this exact list is the
+    stop-condition allowlist below, not a starting suggestion): remove
+    `phase-redteam`'s node, `red-team-actor` (decide whether to also drop
+    it from `spec.roles` — legal either way, pick one and state it in the
+    report), the `red-team-packet` operation, and the `post-redteam-open`
+    window definition (it references `red-team-packet` and schema
+    validation rejects an orphaned reference); change
+    `phase-synthesis.transitions` from `[phase-redteam]` to
+    `[phase-explanation]`; re-gate `phase-explanation` on
+    `post-synthesis-open` directly; update `metadata.id` to
+    `core.coordination-protocol.architecture-advisory-panel-standard-v1`;
+    rewrite the header comment to describe the standard variant honestly
+    (do not leave stale prose narrating red-team/I21 `distinctProviderFrom`
+    for a variant that no longer has it). Every other node/operation/actor
+    byte-identical to the full protocol — never invent new judgment
+    content. (2) Register it in `core/protocol-packs/group-thinking.json`'s
+    `members` array (currently 5 flat `{id, version}` entries — add a
+    6th). (3) Add a new row (or extend the existing `architecture-panel`
+    row) in `docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md`
+    (the CANONICAL copy — NOT `docs/architect/...`, which is a legacy
+    source per that file's own header; edit the legacy copy too only if
+    needed to avoid divergence) with a concrete, evidence-checkable
+    selection trigger. (4) Build an evaluation-corpus driver from scratch
+    (no reusable multi-case runner exists in this repo — confirmed via
+    the design record) — borrow the PATTERN existing single-mechanism
+    proofs use (a driver `.mjs` script + a logged `.md`/`.log` artifact),
+    not any code directly. Corpus: the P05.2 clear + unclear cases (frozen
+    verbatim) plus 1-2 track-decision cases, per the corpus decision above.
+    (5) Follow the pre-flight/safety discipline decision above exactly
+    (smoke → canary → batch; fixed coordinationIds; serial; quiescent
+    checkout; wall-time awareness) before any real-cost batch session. (6)
+    Run the paired design decision above (full session + withheld-redteam
+    explanation per case, plus one standalone standard-protocol session)
+    — never the original unpaired independent-session design. (7) Score
+    per the scoring-methodology decision above (committed rubric, blind
+    cross-provider scoring + human spot-check, mechanical dissent-retention
+    checklist, factual error only against verified ground truth — prompt
+    BYTES and wall time in place of "prompt tokens", which no field in
+    this codebase records: grep confirms nothing under `src/` tracks
+    input/prompt token counts). (8) Write up the comparison as a report
+    under `plans/260919-coordination-skill-harness-simplification/reports/`,
     citing every run's raw evidence (coordination ids, `fgos coordination
-    show` output, timing), not just summary conclusions. Do NOT ship the
-    standard variant as the DEFAULT preset regardless of results — per
-    Phase 5's own wording, it ships only as a separate, explicitly-selected
-    preset; if the comparison shows a real quality regression, the finding
-    itself (documented) is a valid, complete outcome — this unit is not
-    required to make the standard variant look good.
+    show` output, timing, the rubric's own git SHA) — never only summary
+    conclusions. Do NOT ship the standard variant as the DEFAULT preset
+    regardless of results — it ships only as a separate, explicitly-
+    selected preset (confirmed: no skill currently routes to it, since
+    I26's own scope forbids editing `fgos-architecture-panel`/`fgos-panel`
+    to add that routing — acceptable for this unit, the driver dispatches
+    both profiles directly via the CLI door, not through a skill); if the
+    comparison shows a real quality regression (plausible per the
+    corrected doctrine reading above), the finding itself, documented, is
+    a valid, complete outcome — this unit is not required to make the
+    standard variant look good.
   files: core/coordination-protocols/architecture-advisory-panel-standard-v1.yaml
     (new), core/protocol-packs/group-thinking.json,
-    docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md,
-    a new corpus/driver script under this plan's own `reports/` or a
-    dedicated `plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/`
-    subdirectory (Lead's call at execution time — keep experiment
-    artifacts out of `core/`/`test/` since they are not permanent product
-    code), the comparison report, CHANGELOG.md. Do NOT touch
-    `architecture-advisory-panel-v1.yaml` itself (the full protocol stays
-    byte-identical — this unit only ADDS a variant, never modifies the
-    existing one), and do NOT touch anything in I26's already-closed scope
-    (`fgos-panel`/`fgos-architecture-panel`/the driver-discipline fragment).
-  verification: `node --test test/verbs/coordination-group-thinking-pack-registration.test.mjs`
-    (must still pass with the new member added — confirms registration
-    doesn't break existing pack-membership invariants); a new structural
-    test confirming the standard variant really is `architecture-advisory-panel-v1.yaml`
-    minus exactly the red-team node/actor/operation/gate-rewire, nothing
-    else changed (a diff-based test, not just "it parses"); the real
-    experiment runs themselves (not a `npm test` assertion — this is
-    empirical measurement, its own report is the deliverable); `env -u
-    CLAUDE_CODE_SESSION_ID npm test` for the full suite (confirms no
-    regression to the existing full protocol or its own tests).
-  stop: the standard variant silently diverges from the full protocol
-    anywhere other than the documented red-team removal (would invalidate
-    the whole comparison's validity); the standard profile becomes
-    reachable as a default or fallback without an explicit, clear selection
-    trigger (re-opens the "conditionally skip required bindings through
-    skill prose" anti-pattern Phase 5's own wording explicitly forbids);
-    the comparison is run with fake/test executors instead of real
-    LLM-backed ones (would produce a meaningless quality signal); the
-    report omits raw per-run evidence in favor of only summary claims.
+    docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md
+    (canonical; + `docs/architect/...` legacy copy only if needed),
+    test/verbs/coordination-group-thinking-pack-registration.test.mjs
+    (asserts an exact 5-member set/length today — MUST be updated to 6, it
+    will fail otherwise, not just "still pass"),
+    test/cli/coordination-pack.test.mjs (its `REAL_PACK_MEMBER_IDS` +
+    `deepEqual` assertion needs the same update),
+    test/runner/flow-definition-protocol-loader.test.mjs (its exact
+    discovered-id list needs the same update), a new corpus/driver script
+    under a dedicated
+    `plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/`
+    subdirectory (keep experiment artifacts out of `core/`/`test/` since
+    they are not permanent product code), the comparison report,
+    CHANGELOG.md. Do NOT touch `architecture-advisory-panel-v1.yaml`
+    itself (the full protocol stays byte-identical), and do NOT touch
+    anything in I26's already-closed scope
+    (`fgos-panel`/`fgos-architecture-panel`/the driver-discipline
+    fragment) or anything in I28/I29's Phase 6 scope.
+  verification: `node --test test/verbs/coordination-group-thinking-pack-registration.test.mjs
+    test/cli/coordination-pack.test.mjs test/runner/flow-definition-protocol-loader.test.mjs`
+    (all 3 updated for the 6th member, then passing); a new structural
+    diff-based test confirming the standard variant equals the full
+    protocol minus EXACTLY the allowlisted delta above, nothing else
+    (parse both YAMLs, diff the parsed structures, assert the delta set);
+    the fake-executor smoke run (before any real spend); the one real
+    cheap-tier canary call (before the batch); the real paired-design
+    experiment runs themselves (not a `npm test` assertion — empirical
+    measurement, the report is the deliverable); `env -u
+    CLAUDE_CODE_SESSION_ID npm test` for the full suite.
+  stop: the standard variant's YAML diverges from the full protocol
+    anywhere OTHER than the exact allowlisted delta above (would
+    invalidate the whole comparison's validity — this is now a precise
+    allowlist, not a vague "just red-team" statement); the standard
+    profile becomes reachable as a default or fallback without an
+    explicit, clear selection trigger; the comparison is run with
+    fake/test executors instead of real LLM-backed ones for the actual
+    measurement; an UNPAIRED independent-session design is used instead of
+    the paired design (would waste real spend on an unattributable
+    result); scoring is done by the Lead itself or without blinding;
+    factual-error is claimed for a case with no independently verified
+    ground truth; the fake-executor smoke test or the real cheap-tier
+    canary fails — stop and fix before spending on the batch, do not
+    proceed hoping the batch works anyway; any real session needs a freshly-
+    minted `coordinationId` on retry — stop, report the spend already
+    incurred, and get explicit confirmation before continuing rather than
+    silently re-spending; the report omits raw per-run evidence or the
+    rubric's own git SHA in favor of only summary claims.
 
 Update (2026-09-28, user-confirmed): the 3 Phase 5 Exit criteria the
 decomposition review's L4 finding flagged as unowned are now resolved:
