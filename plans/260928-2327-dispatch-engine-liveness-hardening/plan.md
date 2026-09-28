@@ -58,21 +58,47 @@ the same audit found along the way.
    `test/runner/dispatch-reconciliation-import-graph.test.mjs`) never
    drags process-control code into its import graph. The actual JUDGE
    function the audit confirms is well-built
-   (`resolveHolderLiveness`, `{pid, bootId, startTime} -> live | dead |
-   ambiguous`) currently lives in `run-lock.mjs:74-85`, built ON TOP OF
-   `process-identity.mjs`'s primitives, not inside it. This phase's real
-   work is EXTRACTING/PROMOTING that judge out of `run-lock.mjs` into
-   `process-identity.mjs` itself (or a clearly-named sibling module
-   re-exported the same way `cli-spawn-supervisor.mjs`'s own two names
-   were hoisted out per that file's header comment, `process-identity.mjs:6-8`)
-   so it becomes genuinely reusable — respecting the SAME import-graph
-   constraint (the judge itself has no child_process/spawn/kill
-   dependency, so it can safely live in the leaf module without violating
-   the ban). `run-lock.mjs` re-exports the name unchanged so its own
-   existing importers are unaffected — exactly the precedent
-   `cli-spawn-supervisor.mjs`'s own header already establishes for this
-   exact situation. This is a smaller, safer, more precisely-scoped
-   change than the original "build a new module" framing implied.
+   (`resolveHolderLiveness`) currently lives in `run-lock.mjs:74-85`,
+   built ON TOP OF `process-identity.mjs`'s primitives, not inside it.
+   **Second correction (Lead, 2026-09-28, per implementer's own blocked
+   report — verified directly before deciding):** the above framing was
+   itself wrong on two counts, both confirmed against real source: (a)
+   `resolveHolderLiveness` returns only `'held' | 'dead'`, never
+   `'ambiguous'` — drop that third value from every description in this
+   plan; (b) it is NOT pure — it calls `isProcessAlive(holder.pid)`
+   (`run-lock.mjs:34-42`), which calls `process.kill(pid, 0)`, a real
+   syscall the import-graph test's `BANNED_CALL_PATTERN`
+   (`test/runner/dispatch-reconciliation-import-graph.test.mjs:89`)
+   explicitly forbids inside the leaf's own invariant
+   ("fs-only leaf: no child_process, no spawn/kill",
+   `process-identity.mjs:1-8`). Moving `resolveHolderLiveness` in
+   unchanged would violate that standing invariant, not just today's
+   specific import-graph walk.
+   **Decision: split the pure comparison judge from the impure liveness
+   probe.** Promote into `process-identity.mjs` a function with an
+   INJECTED liveness signal — e.g.
+   `resolveHolderLiveness(holder, isAlive)` where `isAlive` is the
+   caller-supplied boolean/result of ITS OWN local liveness probe (each
+   call site keeps whatever `process.kill`-based or other probe it
+   already has; `provider-capacity.mjs` already has its own local
+   `isPidAlive`/`process.kill`, confirmed by the implementer against the
+   import-graph test's own comment) — containing ONLY the bootId/
+   startTime cross-check comparison logic, which has zero process-control
+   dependency. `run-lock.mjs` keeps its own `isProcessAlive` exactly where
+   it is, and its own `resolveHolderLiveness(holder)` becomes a thin
+   backward-compatible wrapper: compute `isProcessAlive(holder.pid)`
+   locally, then call the promoted general function with that result.
+   Every existing importer of `run-lock.mjs`'s `resolveHolderLiveness`
+   keeps working completely unchanged. This is a BETTER design than the
+   original framing, not just a workaround: it correctly separates the
+   data-plane concern (record comparison: pid-reuse detection via
+   bootId+startTime, the actual inconsistency the audit's C2 finding
+   names across "four holder judges with different semantics") from the
+   control-plane concern (how do I know this specific pid is alive right
+   now — legitimately caller-specific), and lets Phase 2-4 call sites
+   that already have their OWN local liveness probe adopt the SAME
+   correct comparison semantics without needing to also adopt a specific
+   probe implementation.
 2. Do NOT migrate every one of the 9+ call sites in one unit — that is
    disproportionate blast radius for one phase. Migrate only the ones
    Phases 2-4 below actually need (the per-cwd lock's string identity, the
