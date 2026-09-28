@@ -3157,6 +3157,26 @@ decomposition (I22-I26, I27, I28-I29, and now I30-I35).
     doc without checking it against current `schema.mjs` first.
 
 - unit: I32 — read-only binding source: investigate before deciding (Phase 7 item 4c)
+  status: CLOSED (2026-09-28), outcome (a) — genuinely orthogonal, NO config
+    migration. Real evidence chain (Lead independently re-verified the two
+    most load-bearing citations directly against source before accepting):
+    `capability.prefer` resolves at bind time in `binding.mjs:bindOperations`
+    and only counts through the `bindingSource === 'capability.prefer'`
+    branch (H1 red-team fix, `binding.mjs:240-263`, confirmed direct read);
+    `readOnlyRedirects` fires at real dispatch time in
+    `assignment-runner.mjs:1388`'s `redirectAttempted` guard, which only
+    engages when the resolved executor is STILL the literal default
+    `'claude'` (confirmed direct read, exact line match) — the two are
+    structurally mutually exclusive per dispatch, layered primary +
+    dispatch-time safety net, not competing. Live config's identical target
+    for both is intentional defense-in-depth, not a race. Zero commits on
+    `unit/I32` (pure investigation, no code changed). Report:
+    plans/reports/impl-i32-260928-1556-readonly-redirect-vs-capability-prefer-orthogonality.md.
+    Deliverable applied by Lead: the proposed one-sentence clarification
+    added to the LEGACY `flow-definition.md`'s `capability` bullet
+    (~L598-606) directly on main. I30 must port this SAME sentence into the
+    canonical copy alongside its own PolicyPatch port, to avoid introducing
+    fresh canonical/legacy drift on day one of fixing the existing drift.
   capability: code:review
   depends-on: none (file-disjoint from I30 — may run in parallel; read-only,
     no conflict risk)

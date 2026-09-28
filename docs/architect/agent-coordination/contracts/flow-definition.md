@@ -603,7 +603,17 @@ policy:
   scope. Optional; when absent the composer derives a fallback from
   `result.kind` (`work-product` → the calling facade's own primary
   capability; `advisory`/`gate-verdict`/undeclared → `<domain>:review` when
-  registered, else the generic `review` slot).
+  registered, else the generic `review` slot). `capability`'s resolution and
+  `placementPolicy.readOnlyRedirects` (`src/runner/dispatch/
+  placement-policy.mjs`) are layered, not competing: a genuine
+  `capability.prefer` resolution (`bindingSource: 'capability.prefer'`)
+  always wins and structurally bypasses the redirect (its guard only fires
+  when the resolved executor is still the literal default `claude`, see
+  `src/runner/dispatch/assignment-runner.mjs`'s `redirectAttempted`);
+  `readOnlyRedirects` is the dispatch-time safety net for every read-only
+  assignment that reaches execution without an upstream capability/executor
+  preference already redirecting it away from `claude` — including
+  assignments that never pass through `bindOperations` at all (Unit I32).
 - `distinctProviderFrom` (Unit I21) declares that this operation's bound
   executor should resolve to a provider family distinct from the role(s)
   named in `roles`. `strength: preferred` binds the best available candidate
