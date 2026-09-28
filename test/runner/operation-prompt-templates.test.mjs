@@ -30,7 +30,7 @@ import {
 } from '../../src/runner/dispatch/effective-execution-contract.mjs';
 
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
-import { loadCoordinationProtocol } from '../../src/runner/definitions/protocol-loader.mjs';
+import { loadCoordinationProtocol, discoverCoordinationProtocols } from '../../src/runner/definitions/protocol-loader.mjs';
 import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
 
 function createTempDir(prefix = 'fgos-template-test-') {
@@ -545,6 +545,95 @@ test('Unit I22 fix round 1: a real inline coordination Assignment (architecture-
   const fullPrompt = renderAssignmentPrompt(assignment);
   assert.ok(fullPrompt.includes('- read-only'), 'renderAssignmentPrompt must surface the real constraint');
   assert.ok(fullPrompt.includes('- no-sibling-visibility'), 'renderAssignmentPrompt must surface the real constraint');
+});
+
+// Unit I34 (Phase 7 item 5, drift check 4: "every referenced contract
+// template resolves"). The tests above spot-check 3 protocols (1 op each)
+// plus an exhaustive pass over architecture-advisory-panel-v1's own 14
+// operations -- none of them walk every OTHER registered protocol. Schema
+// validation (schema.mjs) only requires task.contractTemplate to be a
+// non-empty string, never that it resolves; a broken reference silently
+// falls back to the legacy objective/expectedOutputs path at dispatch time
+// (session-engine.mjs) instead of failing loudly.
+//
+// Running this check unconditionally against every registered protocol
+// (verified directly by iterating discoverCoordinationProtocols() and
+// calling loadOperationPromptTemplate on every declared task.contractTemplate)
+// found that 9 of the repo's 13 registered CoordinationProtocols --
+// declared-consult, deliberation-delphi-chain, deliberation-nominal-group-
+// chain, deliberation-rfc-chain, group-cognition-framework, group-thinking-
+// delphi-feedback-lite, group-thinking-nominal-group-lite, independent-
+// research-fan-out-fan-in, and independent-research-fan-out-fan-in-gated --
+// declare contractTemplate ids with ZERO matching files anywhere under
+// core/prompt-templates/ (every single operation in each, not a partial
+// gap). This is a real, pre-existing content-authoring gap, not something
+// introduced by or in scope for this drift-test unit to silently fix by
+// inventing prompt content for protocols this unit has no domain authority
+// over -- reported to Lead as a follow-up item. Allowlisted out here (same
+// pattern as this unit's raw-JSON carve-out) so this check still catches a
+// NEW regression in the 4 protocols that currently DO resolve cleanly,
+// without either lying green over the other 9 or leaving this test red.
+const PROTOCOLS_WITH_NO_AUTHORED_TEMPLATES_YET = new Set([
+  'core.coordination-protocol.declared-consult',
+  'core.coordination-protocol.deliberation-delphi-chain',
+  'core.coordination-protocol.deliberation-nominal-group-chain',
+  'core.coordination-protocol.deliberation-rfc-chain',
+  'core.coordination-protocol.group-cognition-framework',
+  'core.coordination-protocol.group-thinking-delphi-feedback-lite',
+  'core.coordination-protocol.group-thinking-nominal-group-lite',
+  'core.coordination-protocol.independent-research-fan-out-fan-in',
+  'core.coordination-protocol.independent-research-fan-out-fan-in-gated',
+]);
+
+test('Unit I34: every declared task.contractTemplate resolves, for every registered CoordinationProtocol that currently has authored templates', () => {
+  const protocols = discoverCoordinationProtocols();
+  assert.ok(protocols.length > 0, 'expected at least one registered CoordinationProtocol');
+
+  let checked = 0;
+  for (const { definition } of protocols) {
+    if (PROTOCOLS_WITH_NO_AUTHORED_TEMPLATES_YET.has(definition.metadata.id)) continue;
+    for (const op of definition.spec.operations ?? []) {
+      const templateId = op.task?.contractTemplate;
+      if (!templateId) continue;
+      checked += 1;
+      assert.doesNotThrow(
+        () => loadOperationPromptTemplate(templateId),
+        `protocol "${definition.metadata.id}" operation "${op.id}" declares task.contractTemplate "${templateId}" that does not resolve`,
+      );
+    }
+  }
+  assert.ok(checked > 0, 'expected at least one operation with a declared task.contractTemplate to check');
+});
+
+// Companion guard: the allowlist above must never silently swallow a
+// protocol that regains real templates (or shrink coverage further) without
+// this test file being updated to notice -- proves each excluded protocol
+// still has zero resolving contractTemplate references today, so the
+// allowlist stays an honest snapshot, not a permanent blind spot.
+test('Unit I34: every allowlisted no-templates-yet protocol still has zero resolving contractTemplate references (allowlist honesty check)', () => {
+  const protocols = discoverCoordinationProtocols();
+  const byId = new Map(protocols.map((entry) => [entry.definition.metadata.id, entry.definition]));
+
+  for (const protocolId of PROTOCOLS_WITH_NO_AUTHORED_TEMPLATES_YET) {
+    const definition = byId.get(protocolId);
+    assert.ok(definition, `allowlisted protocol "${protocolId}" is no longer registered -- remove it from the allowlist`);
+    let anyResolves = false;
+    for (const op of definition.spec.operations ?? []) {
+      const templateId = op.task?.contractTemplate;
+      if (!templateId) continue;
+      try {
+        loadOperationPromptTemplate(templateId);
+        anyResolves = true;
+      } catch {
+        // expected: this protocol has no authored templates yet
+      }
+    }
+    assert.equal(
+      anyResolves,
+      false,
+      `protocol "${protocolId}" now has at least one resolving contractTemplate -- remove it from PROTOCOLS_WITH_NO_AUTHORED_TEMPLATES_YET and let the main drift check verify it fully`,
+    );
+  }
 });
 
 test('retry/replay attribution stability: snapshot and digests remain deterministic when disk template changes', () => {
