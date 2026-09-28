@@ -2891,6 +2891,23 @@ decomposition review's L4 finding flagged as unowned are now resolved:
     and this unit's job to leave alone; any test this unit retargets is
     weakened (a passing assertion made to pass by asserting less) rather
     than genuinely pointed at equivalent new-facade content.
+  bucket-c resolution (Lead, 2026-09-28): implementer correctly escalated
+    one genuine bucket-(c) orphan instead of silently dropping it --
+    `fgos-code-panel/SKILL.md`'s "Known limits (not enforced by the
+    engine)" section, first bullet (the coordination schema has no field
+    for proof tier/`FULL_TRIGGERS`/environment fingerprint, and
+    `disposition`/`rationale` accepts any non-empty string). Lead confirmed
+    directly this has no landing spot anywhere in I28's carried-forward
+    content (grepped `coding-cell-policy.md` and `fgos-code-change/
+    SKILL.md`, both come back empty). Approved: add a short paragraph
+    stating this specific engine gap to `coding-cell-policy.md` §2 (Proof
+    Tiers), mirrored the normal way -- narrow, non-invasive, and the
+    correct shared landing spot since both the old (stubbed) and new
+    facade already point there for proof-tier doctrine. The second item
+    the implementer flagged (`fgos-plan-loop`'s "Session IDs use safe
+    characters" note) is correctly treated as safe-to-drop, not orphaned
+    -- confirmed redundant with `assertSafeId`'s real engine enforcement,
+    doc or no doc.
 
 Parallelism is limited deliberately:
 
