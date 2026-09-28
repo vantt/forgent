@@ -304,6 +304,34 @@ the same test shape.
 
 ## Phase 5 — S5: `dispatch.claim` gets a real identity or gets removed
 
+STATUS: IN PROGRESS (2026-09-29), unit/P5, not yet merged. Decision:
+DELETE (confirmed via fresh code reading -- `dispatch.claim`'s in-flight
+role is genuinely subsumed by Phase 2's `admitRunAttempt`/
+`isCliSpawnRunStillWorking`, and the underlying claim file is always
+0 bytes in production, matching the audit's S5 finding exactly). Deleted
+`session-engine.mjs`'s two claim writers and reconciliation-planner.mjs's
+`clear-assignment-claim`/`planClearAssignmentClaim`/
+`applyClearAssignmentClaim`/`assignmentClaimFile`.
+
+Deleting it surfaced a real, empirically-proven (not assumed) second
+invariant `dispatch.claim` was also silently enforcing: "first settlement
+is final" for a coordination-engine Assignment's FRESH (non-retry)
+dispatch, which two real concurrent OS processes can otherwise both pass
+admission for once the first settles fast enough. A plain re-check right
+before dispatch does not close this window (proven with a real repro, not
+theoretical) -- the fix has to live in the same CAS critical section
+`admitRunAttempt` already uses, which lives in `assignment-runner.mjs`
+(out of Phase 5's originally-declared file ownership). Implementer
+escalated to kongming for the design fork rather than guessing; Lead
+authorized a narrow, additive, opt-in-only change to `admitRunAttempt`
+(a new `refuseIfSettled` option, zero effect on any existing caller that
+doesn't pass it) since assignment-runner.mjs's actual owners (Phase 2,
+Phase 6) are both already merged onto the base this unit branched from,
+and the only other phase in flight (Phase 4) doesn't touch that file --
+the original file-ownership constraint no longer reflected the real
+conflict surface by the time this came up. Implementation and
+verification of that addition are in progress; not yet merged.
+
 ### Work
 
 This phase requires a decision, not just a fix — the audit found the
