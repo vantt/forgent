@@ -2444,130 +2444,319 @@ decomposition review's L4 finding flagged as unowned are now resolved:
     Phase 5 items 2/7/8; I18 `fgos plan-lint` and I20 `fgos capability
     match` already integrated)
   status: not-started
-  design-record: plans/reports/fork-260928-1022-phase6-code-change-merge-design-research-report.md
+  design-record: plans/reports/fork-260928-1022-phase6-code-change-merge-design-research-report.md;
+    independent decomposition review (`review-decompose-i28-i29`) found 3
+    HIGH findings (a false premise about an existing fragment's content, a
+    locked word-budget test collision, and an unscoped hard test-migration
+    dependency) plus 7 MEDIUM/LOW — all folded into this revision. Lead
+    independently re-verified H1 and H2 by reading the actual fragment and
+    test files directly before accepting the review.
   decision (Lead, locked, do not reopen — unit split): mirrors the
     I24a/I24b and I25/I26 precedent. This unit (I28) only CREATES the new
     facade — it does not touch or delete `fgos-plan-loop`/`fgos-code-panel`.
-    `fgos-code-panel` alone is 977 lines of real operational doctrine
-    (3-tier proof policy, actor/model-tier rosters, post-merge-verification
-    protocol) that must be proven to land safely in the new facade BEFORE
-    the old files can become stubs — building and stubbing in one unit
-    risks the exact "deleted real content with nowhere to land" trap I26's
-    own decomposition review caught for `fgos-group-thinking`. I29
-    (dependent, stub conversion) only starts after I28 is merged and
-    verified.
-  decision (Lead, locked, do not reopen — policy-fragment promotion):
-    `fgos-plan-loop` already links `../_shared/coding-cell-policy.md` for
-    its own policy layer, but `fgos-code-panel`'s 3-tier proof policy
-    (focused/affected/full) is richer and currently facade-local prose,
-    never promoted to that shared fragment. This unit PROMOTES code-panel's
-    richer proof-tier policy into `coding-cell-policy.md` as its new
-    canonical content (supersedes whatever thinner version is there today),
-    so the merged facade consumes ONE shared policy source rather than
-    reinventing facade-local prose — matching the same "facade restates no
-    rule owned by the fragment" discipline I26 just applied to the
-    driver-discipline fragment. Verify this doesn't silently weaken
-    anything `fgos-plan-loop` itself currently relies on from that
-    fragment — read it in full before editing, diff before/after.
-  scope: create `core/skills/fgos-code-change/SKILL.md` (new, coding
-    domain) from `fgos-plan-loop`'s own cell-operation structure
-    (~L61-181) plus `fgos-code-panel`'s single-change path — ONE merged
-    open/fix/close/worktree lifecycle covering both single-cell and
-    plan-mode execution, not two independent copies. Mode-selection rule:
-    replace code-panel's own M1/A1/A2/CE1-5 rule set and R2 recursive-
-    dispatch guard with the single rule Phase 6's own Work section states
-    — plan mode only when a run/implement/resume verb targets a plan/phase
-    path or a uniquely resolvable track; otherwise one cell; ask one
-    question when ambiguous (reuse code-panel's own detection logic where
-    it already does this correctly, don't reinvent it). Link the Phase
-    4/I15 driver-discipline fragment (`../_shared/coordination-driver.md`)
-    + a 9-slot Facade Hook Values table, following the exact
-    `fgos-plan-loop`/`fgos-panel`/`fgos-architecture-panel` precedent
-    pattern (link, never restate inline). Fill the `open inputs` hook from
-    real doors, not prose: in plan mode, run `fgos plan-lint <phase file>
-    --cell <id>` and refuse to open on `ok: false`; in single-change mode,
-    declare `DemandFacts` and run `fgos capability match --demand` — a
-    `form: "inline"` result means no cell opens at all (the facade must
-    not capture work the match sends back to the live session; this is
-    the "dogfood case from I15" Phase 6's own Exit criterion names). No
-    default roster: per-node binding comes from I21; a hand roster is an
-    explicit override with provenance, matching I21's own established
-    contract. Keep the existing `coding-design-panel` advisory route
-    (inside `fgos-panel/SKILL.md`, not a separate file) fully untouched
-    and structurally distinct — the merged facade's own routing must never
-    swallow it.
-  files: core/skills/fgos-code-change/SKILL.md (new, + `.agents`/`.claude`/
-    `plugins/fgOS` mirrors via `npm run build:skills`),
-    core/skills/_shared/coding-cell-policy.md (promote code-panel's 3-tier
-    proof policy into this shared fragment), test/setup/skill-wrappers.test.mjs
-    (extend for the new skill's mirror-identity + any existing routing
-    constraints it must keep, e.g. the same style of check I26 preserved
-    for `fgos-panel`/`fgos-code-panel`), a new drift/conformance test
-    proving the fragment link + 9-slot hook table (mirroring I26's own
-    `coordination-phase4-driver-discipline.test.mjs` pattern — extend that
-    file or add a sibling, Lead's/implementer's call), CHANGELOG.md. Do
-    NOT touch `fgos-plan-loop/SKILL.md` or `fgos-code-panel/SKILL.md`
-    themselves (I29's job, dependent on this unit closing first) — read
-    them for reference only.
-  verification: node --test test/setup/skill-wrappers.test.mjs; the new
-    drift/conformance test (fragment link, 9-slot table, `coding-cell-policy.md`
-    promotion diff reviewed for no silent weakening of what `fgos-plan-loop`
-    relies on); a live CLI probe that the `open inputs` hook genuinely calls
-    `fgos plan-lint`/`fgos capability match` (grep the skill file for the
-    literal commands, don't just trust prose — same discipline I26's own
-    tester applied); env -u CLAUDE_CODE_SESSION_ID npm test.
+    `fgos-code-panel` alone is 977 lines of real operational doctrine that
+    must be proven to land safely in the new facade BEFORE the old files
+    can become stubs. I29 (dependent) only starts after I28 is merged and
+    verified — and per the H3 fix below, this is now a HARD technical
+    dependency, not just safety ordering: I29's own verification cannot
+    pass unless I28 carries forward specific content this unit names
+    explicitly.
+  decision (Lead, locked, do not reopen — policy-fragment path and content,
+    CORRECTED 2026-09-28 after review H1): the original premise was
+    factually wrong on two counts, both independently re-verified by Lead:
+    (a) the real, existing fragment is at
+    `domains/coding/skills/_shared/coding-cell-policy.md` (a domain-owned
+    path — NOT `core/skills/_shared/...`, which does not exist); (b) its
+    §2 ALREADY has the exact 3-tier proof table (Focused/Affected/
+    Full-Suite Gate) — it was never "thinner" or unpromoted, and there is
+    nothing to "supersede." What `fgos-code-panel` actually adds beyond
+    the existing fragment is a named DELTA, confirmed by direct review:
+    the Test-selection/DECISION block + `FULL_TRIGGERS` list; the "full
+    never twice per (tree, env)" rule; the proof key with environment
+    fingerprint; reviewer inspect-by-default + judge-sufficiency (R3); the
+    post-merge-verification commit + HEAD re-assert. EXTEND §2/§5 with
+    this delta, written as tersely as the existing fragment's own style —
+    do not verbatim-copy code-panel's ~1,892 words of prose. Also
+    reconcile a real, pre-existing contradiction while extending: the
+    fragment's own §5 says gate proof "must be re-executed against
+    integratedSha" while code-panel's own text (its "run AFFECTED_TESTS...
+    escalate to FULL_TEST if a FULL_TRIGGERS category fired" rule) is a
+    DIFFERENT policy — state explicitly which one is authoritative for
+    the merged facade (the escalation-trigger rule is more precise;
+    prefer it, and correct §5's wording to match, rather than silently
+    keeping both). §1/§3/§4 and every heading `coordination-phase4-driver-discipline.test.mjs`
+    pins verbatim (confirmed at test ~L252-276, which also forbids `plan.md`
+    and "track status" appearing in the fragment) MUST survive unchanged.
+  decision (Lead, locked, do not reopen — word budget, NEW 2026-09-28 per
+    review H2): Lead independently confirmed
+    `test/skills/coordination-phase4-driver-discipline.test.mjs` (~L171-181)
+    hard-asserts `planLoopWords + driverWords + policyWords <= 3300`,
+    currently measured at 1,347+1,192+729=3,268 words — only 32 words of
+    headroom, nowhere near enough for the delta above even written
+    tersely. Do NOT silently blow through 3,300 and let the test fail, and
+    do NOT silently edit the assertion's number without a documented
+    reason. Sequence: write the delta as tersely as possible first,
+    measure the REAL new combined count, THEN decide — if it fits within
+    3,300, no further decision needed; if it doesn't, this is a Phase 4
+    Exit-criterion-superseding decision (the same class of decision this
+    plan already made once for `fgos-architecture-panel`'s own word
+    budget) — record the real new number as the accepted ceiling with the
+    same evidence-based reasoning (a facade covering two merged lifecycles'
+    worth of real safety policy is not the same shape as plan-loop alone
+    was when 3,300 was set), update the test's own assertion, and name
+    this decision in the unit's own report. Do not guess the number now;
+    measure first.
+  decision (Lead, locked, do not reopen — placement path, CORRECTED per
+    review M1): Phase 6's own Work section says "coding domain"; repo
+    precedent (`skill-wrappers.test.mjs` ~L385-397) already asserts
+    `fgos-code-panel` lives under `domains/coding/skills/`, not `core/`.
+    Place the new skill at
+    `domains/coding/skills/fgos-code-change/SKILL.md` — NOT
+    `core/skills/...`.
+  decision (Lead, locked, do not reopen — 5 concrete design choices, NEW
+    2026-09-28 per review M2, replacing the vague "one merged lifecycle"
+    instruction): (1) **Doors**: semantic doors throughout
+    (`fgos coordination start/operation/authorize-and-dispatch/disposition/close`),
+    matching `fgos-plan-loop`'s own pattern — never code-panel's raw
+    `open.json`/`fix-N.json`/`close.json` request-file pattern (the Phase
+    4 test already bans raw request JSON for the semantic-door facade
+    shape). (2) **Cell identity/worktree**: single-change cells use a
+    NEW, distinct branch/worktree prefix, `code-change--<slug>` (never
+    reuse `code-panel--<slug>` or a bare `<track>--<cell-id>` scheme) —
+    `chain.mjs` (~L27,49-51) groups every `<prefix>--<x>` session as cells
+    of one track, so a deliberately distinct prefix is required to avoid
+    every single-change cell showing up conflated as one fake "track" in
+    `chain`/resume. (3) **Fix-round cap**: adopt `fgos-plan-loop`'s own
+    3-round cap with proof-gap escalation uniformly for BOTH single-cell
+    and plan-mode paths (matches this track's own runbook discipline of a
+    3-round cap everywhere else in this session) — never code-panel's
+    unbounded "repeat with fix-N.json" pattern. (4) **Post-merge
+    verification**: the post-merge-verification-commit + HEAD-re-assert
+    step becomes POLICY content (part of the `coding-cell-policy.md` §5
+    extension above), not facade-local prose, so both single-cell and
+    plan-mode paths get it from the one shared source. (5) **Plan-mode
+    reference file**: add `domains/coding/skills/fgos-code-change/references/plan-mode.md`,
+    loaded only when the execution target is a plan/phase path or a named
+    track, per Phase 6's own Objective wording ("plan mode... is a
+    reference file loaded only when...") — do not inline plan-mode's own
+    cell-selection/status-table/closeout content directly in SKILL.md.
+  decision (Lead, locked, do not reopen — capability-match contract,
+    CORRECTED per review M3): Lead independently read
+    `src/runner/capability-match.mjs` (~L35,121-126) and live-probed it —
+    the design record's own summary was wrong. The real 3-way contract:
+    `form: "inline"` (null capability) → no cell opens, work returns to
+    the live session; `form: "facade"` (triggers on `hasPlanOrTrack`
+    alone) → plan mode; `form: "protocol"` (triggers on
+    `needsIndependentReview`) → the single-cell path opens. In
+    single-change mode, a `facade` result means the request was actually
+    a plan/track request misclassified as single-change — re-route to
+    plan mode, do not force-open a single cell. Only `inline` means "no
+    cell at all."
+  decision (Lead, locked, do not reopen — mode-selection rule survival,
+    NEW 2026-09-28 per review M4): Phase 6's own single rule (plan mode
+    only when a run/implement/resume verb targets a plan/phase path or a
+    uniquely resolvable track; otherwise one cell; ask one question when
+    ambiguous) is authoritative and SUBSUMES code-panel's own
+    M1/A1/A2/CE1-5 named sub-rules — CE2 (negation)/CE3 (phase-path vs.
+    chain mismatch)/CE5 (plans outside `plans/`) are not kept as
+    separately-named rules; their real effect folds into "ask one question
+    when ambiguous" under the single rule. The R2 recursive-dispatch guard
+    DOES survive, explicitly: an in-cell worker that is already executing
+    inside an active cell dispatch and encounters what looks like a
+    plan/phase path must still refuse/ask rather than recursively opening
+    a nested track — Phase 6's own single rule does not waive this, and
+    dropping it would be a real regression. The ~78 fixtures in
+    `test/setup/skill-wrappers.test.mjs`'s `classifyCodePanelRequest`
+    (~L1512, R2 at ~L1515-1530) must be retargeted at the new facade's own
+    mode-detection function, not left as phantom tests of a stub skill
+    nobody calls anymore.
+  scope: create `domains/coding/skills/fgos-code-change/SKILL.md` (see
+    placement decision above) from `fgos-plan-loop`'s own cell-operation
+    structure (~L61-181) plus `fgos-code-panel`'s single-change path — ONE
+    merged open/fix/close/worktree lifecycle per the 5 concrete design
+    choices above, covering both single-cell and plan-mode execution, not
+    two independent copies. Link the Phase 4/I15 driver-discipline
+    fragment (`../_shared/coordination-driver.md`) + a 9-slot Facade Hook
+    Values table, following the exact `fgos-plan-loop`/`fgos-panel`/
+    `fgos-architecture-panel` precedent pattern (link, never restate
+    inline). Fill the `open inputs` hook from real doors, not prose: in
+    plan mode, run `fgos plan-lint <phase file> --cell <id>` and refuse to
+    open on `ok: false`; in single-change mode, declare `DemandFacts` and
+    run `fgos capability match --demand` per the corrected 3-way contract
+    above. No default roster: per-node binding comes from I21; a hand
+    roster is an explicit override with provenance. Keep the existing
+    `coding-design-panel` advisory route (inside `fgos-panel/SKILL.md`
+    Route step 3 / Surface Taxonomy row 74 — NOT a separate file) fully
+    untouched and structurally distinct from this facade's own Route step
+    4 / row 75 (which DOES need retargeting — see I29's files list below;
+    I28 itself does not edit `fgos-panel`, only avoids swallowing its
+    step-3 route). For the H3 test-migration dependency: this unit's own
+    new facade must carry forward, with equivalent real content (not just
+    "we thought about it" prose) — the "caveat blocks close" invariant
+    (Architecture Invariant 7 in code-panel, ~L754,812: a shared-cwd
+    caveat must block a close disposition), the resume-state
+    classification with its refused-vs-pending safety rule (code-panel
+    ~L191-214), the projection-gaps note, and the two-request DAG pattern
+    (code-panel ~L700-746) — OR explicitly document, as a named Lead
+    decision in this unit's own report, that one of these is deliberately
+    dropped and why. Do not silently omit any of them.
+  files: domains/coding/skills/fgos-code-change/SKILL.md (new, + `.agents`/
+    `.claude`/`plugins/fgOS` mirrors via `npm run build:skills`),
+    domains/coding/skills/fgos-code-change/references/plan-mode.md (new),
+    domains/coding/skills/_shared/coding-cell-policy.md (extend §2/§5 per
+    the decision above — this is an EXTENSION, not a replacement),
+    test/setup/skill-wrappers.test.mjs (retarget the ~78
+    `classifyCodePanelRequest` fixtures at the new facade's own
+    mode-detection function; confirm new-skill placement/mirror-identity
+    assertions), test/skills/coordination-phase4-driver-discipline.test.mjs
+    (update the 3,300-word assertion per the word-budget decision above —
+    measure first, then decide whether the number itself needs to change;
+    add assertions for the fragment link + 9-slot hook table, mirroring
+    I26's own pattern in this same file), a new or retargeted test proving
+    the caveat-blocks-close/resume-state/two-request-DAG content survives
+    with equivalent assertions (test/verbs/coordination-dag-driver-skill-contract.test.mjs
+    is the existing home for these assertions against `fgos-code-panel` —
+    coordinate directly with I29, which retargets this same file, so the
+    two units don't clobber each other's edits; land this piece in
+    whichever unit executes first and have the other build on it),
+    CHANGELOG.md. Do NOT touch `fgos-plan-loop/SKILL.md` or
+    `fgos-code-panel/SKILL.md` themselves (I29's job) — read them for
+    reference only. Do NOT touch `fgos-panel/SKILL.md` (I29's job, since
+    its Route-step-4/row-75 retarget only makes sense once code-panel is
+    actually stubbed).
+  verification: node --test test/setup/skill-wrappers.test.mjs
+    test/skills/coordination-phase4-driver-discipline.test.mjs
+    test/verbs/coordination-dag-driver-skill-contract.test.mjs; real CLI
+    probes (not just grepping the skill file) for all 3 `fgos capability
+    match` forms (`inline`/`facade`/`protocol`) proving each routes
+    correctly; a real `fgos plan-lint` run against a fixture with a hard
+    finding, proving the facade actually refuses to open on `ok: false`;
+    at least one negative fixture proving an advisory-only coding request
+    is never captured into a cell (Phase 6's own Exit criterion); env -u
+    CLAUDE_CODE_SESSION_ID npm test.
   stop: the new facade restates driver-discipline-fragment or
     coding-cell-policy-fragment rules inline instead of loading them; the
-    merged lifecycle is two parallel copies (single-cell path and plan-mode
-    path each reimplementing open/fix/close separately) instead of one
-    shared implementation; the `coding-design-panel` advisory route is
-    swallowed or blurred by the new facade's own routing; the promoted
-    `coding-cell-policy.md` content silently weakens or contradicts what
-    `fgos-plan-loop` itself already correctly relies on from that fragment.
+    merged lifecycle is two parallel copies instead of one shared
+    implementation; raw request-file JSON is used instead of semantic
+    doors; the `coding-design-panel` route (step 3 / row 74) is touched or
+    swallowed; the R2 recursive-dispatch guard is silently dropped; the
+    combined word-budget test is left failing OR its number is changed
+    without a documented reason; any of the caveat-blocks-close/
+    resume-state/two-request-DAG content has no equivalent landing spot
+    and isn't explicitly documented as a deliberate drop.
 - unit: I29 — convert `fgos-plan-loop`/`fgos-code-panel` into deprecated stubs (Phase 6 stub half)
   capability: code:implement
-  depends-on: I28 (must not start until the new facade is merged and
-    verified to actually carry forward everything being deleted here)
+  depends-on: I28 (HARD technical dependency, not just safety ordering —
+    see the H3 fix below: I29's own tests cannot pass unless I28 carried
+    forward specific pinned content first)
   status: not-started
-  design-record: plans/reports/fork-260928-1022-phase6-code-change-merge-design-research-report.md
+  design-record: plans/reports/fork-260928-1022-phase6-code-change-merge-design-research-report.md;
+    independent decomposition review (`review-decompose-i28-i29`) found
+    I29 as originally scoped could not pass its own verification — folded
+    into this revision.
   decision (Lead, locked, do not reopen — no repo precedent exists): I26's
     own investigation and this unit's own design-record both independently
     confirmed NO existing "deprecated stub" skill file exists anywhere in
     this repo today — this unit is the FIRST to establish the pattern, not
-    copy one. Minimum shape for a stub, absent any better precedent: retain
-    the skill's frontmatter (name/description, rewritten to say
-    "Deprecated: use fgos-code-change"), a short redirect paragraph naming
-    the replacement skill and the exact door(s) a caller should use instead,
+    copy one. Minimum shape for a stub: retain the skill's frontmatter
+    (name/description, REWRITTEN to say "Deprecated: use fgos-code-change"
+    and to DROP any `DemandFacts`/trigger-matching phrasing the old
+    description used — per review LOW-2, a host's own routing must stop
+    auto-selecting the stub once it's just a redirect, not treat its old
+    trigger text as still live), a short redirect paragraph naming the
+    replacement skill and the exact door(s) a caller should use instead,
     and nothing else — no operational content, no duplicated lifecycle
     prose. Kept loadable (not deleted) only for the Phase 7 compatibility
-    window per Phase 6's own Work section; Phase 7 owns actually removing
-    the stubs when that window closes (do not delete them in this unit).
-  scope: convert `core/skills/fgos-plan-loop/SKILL.md` and
-    `domains/coding/skills/fgos-code-panel/SKILL.md` into thin deprecated
-    stubs per the decision above. Before converting, diff each file's full
-    content against what I28's new `fgos-code-change/SKILL.md` actually
-    carries forward — if ANY real operational content in either old file
-    has no landing spot in the new facade, STOP and escalate (this is
-    exactly the class of mistake I26's own decomposition review caught
-    for `fgos-group-thinking` before any code was written; do not repeat
-    it after the fact by silently deleting orphaned content). Update every
-    known inbound reference to the old skills (grep the whole repo, not
-    just an assumed list) to point at `fgos-code-change` instead, or
-    explicitly note why a reference should keep pointing at the deprecated
-    name for the compatibility window.
+    window; Phase 7 owns actually removing the stubs when that window
+    closes.
+  decision (Lead, locked, do not reopen — 3-bucket content disposition,
+    REPLACES the original blanket stop condition, NEW 2026-09-28 per
+    review H3/M7): the original "ANY orphaned content stops the unit"
+    instruction was miscalibrated in both directions — it would fire on
+    content Phase 6's own Work section explicitly says to DELETE (the
+    duplicated roster/recovery prose, the raw JSON templates, the herdr
+    variant — none of these need a landing spot, they're intentionally
+    retired), while giving no explicit list for content that genuinely
+    needs one. Classify every real section of both old files into exactly
+    one bucket before converting either to a stub: (a) **Carried forward**
+    — must already exist with equivalent content in I28's new facade
+    (caveat-blocks-close, resume-state classification + refused-vs-pending
+    rule, projection gaps, two-request DAG pattern, the 3-tier proof
+    policy content now in `coding-cell-policy.md`, the semantic-door
+    lifecycle itself) — verify each is actually present, don't assume;
+    (b) **Deliberately deleted per Phase 6's own Work section** — the
+    duplicated open/fix/close JSON templates, the private-worktree recipe
+    prose (now superseded by the shared policy fragment's own §1), the
+    actor/model-tier roster (I21's own per-node binding replaces a
+    hand-written default roster), historical incident/recovery narration
+    — delete these with a one-line note in the unit's own report, no
+    escalation needed. (c) **Unclassified/genuinely orphaned** — only
+    THIS bucket triggers the stop condition below.
+  scope: classify every section of `core/skills/fgos-plan-loop/SKILL.md`
+    and `domains/coding/skills/fgos-code-panel/SKILL.md` per the 3-bucket
+    decision above, then convert both into thin deprecated stubs. Update
+    every real inbound reference: `fgos-panel/SKILL.md`'s own description
+    line, its "known Phase 5 gap" paragraph, and Route step 4 (all three
+    currently name `fgos-code-panel` — retarget to `fgos-code-change`;
+    leave Route step 3 / the `coding-design-panel` route and Surface
+    Taxonomy row 74 UNTOUCHED, since that's a different, still-live
+    route — this distinction is itself a stop condition below); both
+    copies of `group-thinking-trigger-surface.md`
+    (`docs/platform/agent-coordination/architecture/...` canonical, and
+    `docs/architect/agent-coordination/architecture/...` legacy) rows
+    75/78. For the wider repo sweep: grep the WHOLE repo for both skill
+    names, but EXEMPT `**/verification/**` paths and any `.log` file —
+    these are historical proof/evidence records, not live references, and
+    rewriting them would falsify the historical record (confirmed via a
+    sample grep: ~69 of ~123 total hits are exactly this class of file).
+    Of the remainder (~29 live references per the design record's own
+    sweep): update `docs/specs/reading-map.md`, `docs/specs/runner.md`,
+    relevant how-to docs, both trigger-surface copies, both
+    master-coordinator/runtime-recovery-design docs, proposal docs, the
+    intent-preservation ledger, the packaging-distribution rollout plan,
+    and `scripts/measure-coordination-baseline.mjs` (note explicitly in
+    the report that this script will measure the STUBS after conversion,
+    not the real skill — either retarget it to `fgos-code-change` in this
+    same unit if cheap, or file it as a named, accepted follow-up gap;
+    don't leave it silently measuring the wrong thing without comment).
   files: core/skills/fgos-plan-loop/SKILL.md (+ mirrors),
-    domains/coding/skills/fgos-code-panel/SKILL.md (+ mirrors), every
-    file grep turns up referencing either skill by name, CHANGELOG.md.
-  verification: node --test test/setup/skill-wrappers.test.mjs (mirrors
-    byte-identical for both stubs); a new test confirming both stubs are
-    genuinely thin (e.g. a word-count ceiling well under their pre-stub
-    size) and that both explicitly name `fgos-code-change` as the
-    replacement; env -u CLAUDE_CODE_SESSION_ID npm test.
-  stop: any real operational content from either old skill has no landing
-    spot in `fgos-code-change` (escalate, don't silently drop); either
-    stub is deleted outright instead of kept loadable (breaks the Phase 7
-    compatibility window); a real inbound reference to the old skill names
-    is left stale, pointing at content that no longer exists there.
+    domains/coding/skills/fgos-code-panel/SKILL.md (+ mirrors),
+    core/skills/fgos-panel/SKILL.md (description line, "known Phase 5 gap"
+    paragraph, Route step 4 ONLY — step 3 untouched, + mirrors),
+    docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md
+    (canonical, row 75/78), docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md
+    (legacy copy, same rows, only if needed to avoid divergence),
+    test/verbs/coordination-dag-driver-skill-contract.test.mjs (retarget
+    the pinned caveat-blocks-close/resume-contract/two-request-DAG
+    assertions at `fgos-code-change` — coordinate with I28 per its own
+    files-list note on this same file, so whichever unit lands second
+    builds on the first's edit rather than reverting it),
+    test/setup/skill-wrappers.test.mjs (the 6 pinned repo-root paths
+    ~L399-428 that must appear inside code-panel's body — retarget or
+    remove per what the stub actually keeps), the other live docs named in
+    scope above, CHANGELOG.md. Do NOT touch anything under
+    `**/verification/**` or any `.log` file (historical record, exempted
+    per the decision above).
+  verification: node --test test/setup/skill-wrappers.test.mjs
+    test/skills/coordination-phase4-driver-discipline.test.mjs
+    test/verbs/coordination-dag-driver-skill-contract.test.mjs (all
+    retargeted at `fgos-code-change` where the content moved, and
+    confirmed passing — not just "mirrors byte-identical for both stubs",
+    the ORIGINAL verification claim, which was insufficient); a new test
+    confirming both stubs are genuinely thin (a word-count ceiling well
+    under their pre-stub size) and that both explicitly name
+    `fgos-code-change` as the replacement, with no leftover
+    `DemandFacts`/trigger phrasing; env -u CLAUDE_CODE_SESSION_ID npm test.
+  stop: any bucket-(c) unclassified content has no landing spot in
+    `fgos-code-change` (escalate, don't silently drop — but bucket (b)
+    content is NOT a stop condition, it's an expected, reported deletion);
+    either stub is deleted outright instead of kept loadable; a real
+    inbound reference (outside the exempted `**/verification/**`/`.log`
+    class) is left stale; the `coding-design-panel` route (step 3 / row
+    74) is touched by this unit — that boundary is I28's job to preserve
+    and this unit's job to leave alone; any test this unit retargets is
+    weakened (a passing assertion made to pass by asserting less) rather
+    than genuinely pointed at equivalent new-facade content.
 
 Parallelism is limited deliberately:
 
