@@ -7,7 +7,7 @@ description: >-
   to an existing registered group-thinking protocol without asking the person
   for a protocol id. Covers architecture, coding-design, product, business,
   strategy, policy/process, and incident-reflection advisory cases. Does not
-  implement code; use fgos-code-panel only when the person explicitly requests
+  implement code; use fgos-code-change only when the person explicitly requests
   a code change plus review/red-team.
 ---
 

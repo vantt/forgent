@@ -1,7 +1,7 @@
 # Private cell worktree
 
-Every mutating coordination cell (`fgos-code-panel` change, `fgos-plan-loop`
-cell) runs on its own branch in its own linked git worktree. This is not a
+Every mutating coordination cell (`fgos-code-change` single-cell change or
+plan-mode cell) runs on its own branch in its own linked git worktree. This is not a
 preference: the session engine refuses `mutation: "mutating"` whenever
 `--cwd` resolves to the main checkout (`session-engine.mjs`
 `assertMutatingDispatchAllowed`, Mutation Rule condition 3), and a worker that
@@ -9,8 +9,8 @@ lands in the wrong directory writes into someone else's tree. The Lead opens
 the worktree as a plain git operation before any request, verifies it, and
 removes it after the merge. No request field expresses any of this.
 
-Substitute `<prefix>` with the calling skill's own prefix (`code-panel` for a
-code-panel change, `<track>` for a plan-loop cell) and `<slug>` with the
+Substitute `<prefix>` with the calling skill's own prefix (`code-change` for
+a single-cell change, `<track>` for a plan-mode cell) and `<slug>` with the
 change/cell id (safe charset: letters, digits, `-`, `_` — no periods).
 
 ## Open

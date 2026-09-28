@@ -15,9 +15,8 @@ const __dirname = path.dirname(__filename);
 const defaultRepoRoot = path.resolve(__dirname, '..');
 
 export const CANONICAL_SKILL_PATHS = [
-  'core/skills/fgos-plan-loop/SKILL.md',
   'core/skills/fgos-architecture-panel/SKILL.md',
-  'domains/coding/skills/fgos-code-panel/SKILL.md',
+  'domains/coding/skills/fgos-code-change/SKILL.md',
 ];
 
 export const CONTRACT_VERSION = 'coordination-baseline.v1';

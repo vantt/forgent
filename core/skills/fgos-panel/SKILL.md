@@ -7,7 +7,7 @@ description: >-
   to an existing registered group-thinking protocol without asking the person
   for a protocol id. Covers architecture, coding-design, product, business,
   strategy, policy/process, and incident-reflection advisory cases. Does not
-  implement code; use fgos-code-panel only when the person explicitly requests
+  implement code; use fgos-code-change only when the person explicitly requests
   a code change plus review/red-team.
 ---
 
@@ -29,7 +29,7 @@ adaptation bounds are never this route's own, per the `disposition criteria`/
 `architecture-panel` (step 3) route, which keeps its own hook table
 ([`fgos-architecture-panel`](../fgos-architecture-panel/SKILL.md)'s own). The
 delegated `code-change-panel` (step 4) route is a known Phase 5 gap:
-`fgos-code-panel` does not yet link this fragment or declare a hook table of
+`fgos-code-change` does not yet link this fragment or declare a hook table of
 its own. Never assume this one table governs all five routes.
 
 Read the canonical
@@ -47,7 +47,7 @@ extend that map in this skill.
    still never supplies its protocol id.
 4. For `code-change-panel`, continue only when the person explicitly asked to
    implement/change/fix code, then follow
-   `fgos-code-panel`. A coding decision, design
+   `fgos-code-change`. A coding decision, design
    review, or "plugin versus core" question is advisory and must not take this
    route.
 5. For other presets, read the selected registered FlowDefinition to learn its
