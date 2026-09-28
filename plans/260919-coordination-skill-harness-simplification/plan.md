@@ -2512,6 +2512,24 @@ Executor/provider/model/tier selection remains an execution-time decision.
     even with `--dir` set) is correctly filed as a known gap, not fixed --
     out of I27's file-ownership scope, and the underlying on-disk session
     state is independently confirmed correct regardless.
+  rubric approved (Lead, 2026-09-28): `rubric-writer-i27` committed
+    `panel-depth-experiment/scoring-rubric.md` at SHA
+    `7421a5e612984082713defd3e3fe43946f42c39e` on `unit/I27`, alone in that
+    commit -- confirmed directly (`git show --stat`). Lead read the full
+    rubric before approving. It operationalizes spec (a)-(d) mechanically
+    (role table with a provider-mismatch check for the blind scorer;
+    itemized redaction list plus a zero-hit grep self-check; a frozen,
+    quote-cited RT/CX/CY finding-enumeration procedure with no partial
+    credit; a GT-1/GT-2-only factual-error procedure explicitly forbidding
+    any factual-error claim on the non-core cases; unblinding-key commit
+    ordered strictly after every mark) and adds no dimension beyond
+    (a)-(d). Its one open question -- narrowing the corpus note's undefined
+    "decision-quality" to PRESENT-finding disposition (DISPOSED vs.
+    MENTIONED-ONLY) rather than a new impressionistic scale -- is approved
+    as the correct, conservative reading: it stays mechanical and ties
+    back to the already-frozen finding lists rather than inventing new
+    scorer judgment calls. This SHA is what the final report must cite per
+    the rubric-ordering-violation decision above.
 
 Update (2026-09-28, user-confirmed): the 3 Phase 5 Exit criteria the
 decomposition review's L4 finding flagged as unowned are now resolved:
