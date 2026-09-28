@@ -2560,7 +2560,13 @@ Executor/provider/model/tier selection remains an execution-time decision.
     it). `unblinding-key.md` confirmed still uncommitted on disk, per the
     rubric's own ordering. Lead is now asking the user directly whether
     they can spot-check case-1 (a core case, so it also gets factual-error
-    marks) -- pending user response.
+    marks) -- USER DECLINED (2026-09-28): "Bỏ qua, ghi nhận là gap" --
+    skip the spot-check, record it as a known limitation. Report must
+    state this plainly: the rubric's spec (b) human-spot-check requirement
+    was not satisfied, by explicit user choice, not silently dropped. This
+    does not block closing I27 -- the scorer-mark data and its blinding
+    remain valid on their own; only the second-rater cross-check is
+    missing.
   decision (Lead, 2026-09-28, standalone standard-protocol session --
     accept partial): implementer hit a real `claude` CLI session-quota
     exhaustion (reset ~3pm local, unknown distance) on the standalone
