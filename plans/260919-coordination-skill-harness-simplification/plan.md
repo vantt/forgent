@@ -3229,6 +3229,16 @@ decomposition (I22-I26, I27, I28-I29, and now I30-I35).
     first ruling out outcome (a).
 
 - unit: I31 — promote `capability.undeclared` to a hard `plan-lint` refusal, scoped to the `--cell` branch (Phase 7 item 4d)
+  status: MERGED (2026-09-28). integratedSha 2dbc7c8de6b8b87ccb4011f8f1d44e123515f10b,
+    testedSha 378d1df (unit/I31 tip, includes Lead's own trivial fix for a
+    stale command-registry.mjs doc-string), clean --no-ff auto-merge (ort),
+    no conflicts. Key suites rerun on merged tree: 41/41 pass. `--cell` miss
+    now exit 1/ok:false (live-probed by Lead independently); `capability.
+    unresolved` and the no-`--cell` path both confirmed untouched.
+    fgos-code-change's Step 0 workaround correctly simplified (not just
+    left redundant -- the old carve-out sentence became factually wrong
+    once the engine itself enforces this). See
+    plans/260919-coordination-skill-harness-simplification/reports/unit-I31-claude-only-execution-report.md.
   capability: code:implement
   depends-on: none (file-disjoint from I30/I32; may run after either closes
     to avoid a CHANGELOG merge conflict, not a hard technical dependency)
