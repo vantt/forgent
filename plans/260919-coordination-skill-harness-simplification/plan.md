@@ -2478,6 +2478,40 @@ Executor/provider/model/tier selection remains an execution-time decision.
     methodology -- previously-granted real-cost authorization stands; this
     is an implementation-level integrity fix within that authorization, not
     a new cost decision requiring a fresh user round-trip.
+  decision (Lead, 2026-09-28, rubric-ordering violation, real but disclosed):
+    implementer self-reported going straight into the canary/batch
+    dispatches without first committing the scoring rubric, violating
+    decision (a) of the locked scoring-methodology block above
+    ("committed BEFORE the first real call ... never written or adjusted
+    after seeing results"). Not silently buried -- flagged proactively
+    before any scoring happened. Ruling: irreversible (the real outputs
+    are already read), but NOT fatal -- the actual protection that matters
+    is that whoever operationalizes the rubric's concrete checklist has
+    not been exposed to the real run content, since the implementer
+    dispatching/monitoring the real sessions has necessarily already seen
+    raw output (needed to catch the real codex-OAuth failure, the earlier
+    contamination self-disclosure, etc.). Mitigation, not a paperwork fix:
+    a FRESH agent with zero exposure to any of I27's real run output
+    writes the operational rubric, using ONLY the scoring-methodology
+    decision text above (already locked before any real call existed) as
+    source -- never shown any real corpus/run file. That rubric then
+    still goes to the separately blinded, different-provider scorer per
+    decision (b), unchanged. Re-running the whole real batch to restore a
+    clean before/after ordering was considered and rejected as
+    disproportionate real spend for a rigor nicety, not a correctness bug
+    -- the paired-design/blinding/ground-truth safeguards that actually
+    protect the comparison's validity are untouched by this. Report must
+    state this violation and mitigation plainly, never omit it.
+    Also confirmed correct, no objection: (1) the `req3b` redteam retry
+    (`codex` OAuth dead -- genuine infra failure, not a false-fail; retried
+    under the SAME coordinationId per the driver-safety decision, switched
+    to a distinct-provider fallback executor; kept the resulting real
+    INSUFFICIENT-EVIDENCE verdict as honest evidence rather than re-spending
+    for a cleaner-looking result); (2) the `coordination show`/close
+    snapshot-path cosmetic resolution bug (main-checkout `.fgos/` resolved
+    even with `--dir` set) is correctly filed as a known gap, not fixed --
+    out of I27's file-ownership scope, and the underlying on-disk session
+    state is independently confirmed correct regardless.
 
 Update (2026-09-28, user-confirmed): the 3 Phase 5 Exit criteria the
 decomposition review's L4 finding flagged as unowned are now resolved:
