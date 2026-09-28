@@ -3081,6 +3081,327 @@ because it consumes all three. Documentation-only preparation may proceed
 earlier, but no unit may claim implementation completion before its dependency
 gate.
 
+I30 ‖ I31 (files disjoint: I30 touches the CLI status envelope and the
+canonical `flow-definition.md`; I31 touches `capability-plan-lint.mjs` and
+the how-to doc). I32 runs after both close (investigation-only, low risk,
+but its conclusion — real migration vs. "no action, document why" — should
+land before I33's rename touches adjacent config surface). I33 (protocol
+rename) is highest blast radius in this phase and gets its own dedicated
+decomposition review before any implementer touches it, same discipline as
+I27 and I28/I29. I34 (drift-test completion) runs only after I30-I33 close,
+since it audits the phase's own finished state. I35 (doc sweep + before/after
+report) is last, depends on all of I30-I34.
+
+## Phase 7 units
+
+Design record for all 6 units below:
+`plans/reports/fork-260928-1540-phase7-decomposition-research-report.md`
+(read-only research fork, confirms real current-source state before any
+unit's scope was drafted — this track's own established discipline after
+Phase 5/6's decomposition reviews repeatedly caught stale-premise drafts).
+
+- unit: I30 — extend contract versioning to the CLI status envelope; fix the canonical FlowDefinition contract doc's missing PolicyPatch section (Phase 7 items 1, 4b)
+  capability: code:implement
+  depends-on: none (Phase 7 entry: Phase 5/6 both merged, I27 merged)
+  status: not-started
+  context: item 1 is NOT a greenfield gap — `ACTIONS_CONTRACT_VERSION =
+    'coordination-actions.v1'` already exists (`src/runner/coordination/
+    actions-projector.mjs:20`, stamped into every action-view output
+    ~L497,521), and `scripts/measure-coordination-baseline.mjs` already
+    invented its own sibling `CONTRACT_VERSION` for its own surface — an
+    established, repeatable pattern to extend, not a new scheme to invent.
+    What's missing: the broader CLI `status`/`show` JSON envelope itself
+    has no top-level version marker separate from the actions array.
+    Item 4b is a real, confirmed doc-drift bug of the exact "canonical vs.
+    legacy copy diverged" shape this track has hit before (I27's original
+    draft targeted the wrong trigger-surface file): the LEGACY copy of
+    `flow-definition.md` documents `distinctProviderFrom` in its
+    PolicyPatch section (`docs/architect/agent-coordination/contracts/
+    flow-definition.md` ~L580,607, citing Unit I21 by name); the CANONICAL
+    copy (`docs/platform/agent-coordination/contracts/flow-definition.md`)
+    has zero mentions of it anywhere. The field itself is real and shipped
+    (schema-validated `src/runner/definitions/schema.mjs:134-147,323-331`,
+    consumed at binding time `src/verbs/coordination/binding.mjs:54-124`,
+    conformance-tested `test/verbs/coordination-binding.test.mjs:192,209`)
+    — only the canonical doc is missing it.
+  scope: add a top-level version field to the CLI status/show JSON envelope
+    following the existing `ACTIONS_CONTRACT_VERSION`/baseline-script
+    pattern (exact field name/shape is this unit's own implementation
+    decision — mirror the established naming convention, don't invent a
+    new one); port the legacy `flow-definition.md`'s PolicyPatch section
+    content for `distinctProviderFrom` into the canonical copy, verified
+    against the real schema/binding-code fields it documents (don't just
+    copy legacy prose verbatim — confirm it still matches current
+    `binding.mjs` behavior first).
+  files: wherever the status/show CLI envelope is assembled (likely
+    `bin/fgos.mjs` and/or `src/verbs/coordination/show.mjs` — confirm exact
+    location before editing), `docs/platform/agent-coordination/contracts/
+    flow-definition.md`, CHANGELOG.md.
+  verification: a new test asserting the status/show envelope carries the
+    new version marker; a drift test (or extension of an existing one)
+    asserting the canonical and legacy `flow-definition.md` PolicyPatch
+    sections agree on `distinctProviderFrom`; env -u CLAUDE_CODE_SESSION_ID
+    npm test.
+  stop: the new version field duplicates or conflicts with
+    `ACTIONS_CONTRACT_VERSION`'s own meaning instead of covering the
+    envelope layer above it; the ported doc content describes behavior the
+    real schema/binding code no longer matches (verify against source,
+    don't trust the legacy copy blindly).
+
+- unit: I31 — promote `capability.undeclared` to a hard `plan-lint` refusal at the engine level (Phase 7 item 4d)
+  capability: code:implement
+  depends-on: none (Phase 7 entry gate; file-disjoint from I30)
+  status: not-started
+  context: real, confirmed, substantial gap. At the ENGINE level,
+    `src/report/capability-plan-lint.mjs` still hardcodes
+    `capability.undeclared` at `severity: 'warn'` in both emission sites
+    (~L136, 324-325), and `ok` is computed as `!findings.some(f =>
+    f.severity === 'hard')` (~L314, 329) — so a missing capability
+    declaration can never fail `plan-lint` at the engine level today. This
+    is the EXACT defect Unit I28's own independent review found and had to
+    work around at the SKILL-prose level (`fgos-code-change`'s Step 0 now
+    special-cases this warn code itself, per its fix-round-1 note in this
+    plan). Fixing it at the engine level makes every consumer's prose-level
+    workaround unnecessary — this unit should coordinate with (not
+    contradict) that existing prose workaround, not duplicate the same
+    fix twice.
+    The phase text's own "remove `docs/how-to/author-a-plan-loop-track.md`'s
+    Execution Inputs: Roster section" instruction is STALE — that exact
+    heading no longer exists in the current file (already updated by an
+    earlier unit to a "Roster" bullet, ~L45-51, with wording already
+    reflecting I21's config-binding-by-default behavior). Read the doc
+    fresh before touching it; don't execute a stale literal instruction.
+  scope: change `capability.undeclared`'s severity from `warn` to `hard`
+    in `capability-plan-lint.mjs` (both emission sites); confirm
+    `fgos-code-change`'s own Step 0 prose workaround (added in I28's
+    fix-round-1) becomes redundant once this lands and either simplify it
+    or explicitly document why it stays as defense-in-depth; re-verify
+    (don't blindly edit) `author-a-plan-loop-track.md`'s current Roster
+    wording against this change before touching it.
+  files: `src/report/capability-plan-lint.mjs`, `docs/how-to/
+    author-a-plan-loop-track.md` (only if genuinely stale after fresh
+    read), `domains/coding/skills/fgos-code-change/SKILL.md` (only if the
+    Step 0 prose workaround needs updating, coordinate carefully — this is
+    a live, merged, tested facade), test files covering `plan-lint`
+    (`test/report/capability-plan-lint.test.mjs` and any plan-mode gate
+    tests in `fgos-code-change`'s own test coverage).
+  verification: a real `plan-lint` run against a fixture with an
+    undeclared capability now returns `ok: false`/exit 1 (not just a
+    grep — a live CLI probe); every existing plan/track fixture in the
+    real test suite that previously relied on the warn-only behavior is
+    checked and updated if it now fails for the right reason; env -u
+    CLAUDE_CODE_SESSION_ID npm test.
+  stop: this change makes plan-lint refuse a plan/track that legitimately
+    has a capability declared through a path this unit didn't check (verify
+    the full declaration surface — `- unit:` blocks AND Product Gates
+    `Capability` column — before hardening); any currently-passing
+    production plan/phase file in this repo now fails plan-lint as a
+    result (that would mean an undeclared-capability plan actually shipped
+    — investigate before hardening, don't just silence the new refusal).
+
+- unit: I32 — read-only binding source: investigate before deciding (Phase 7 item 4c)
+  capability: code:review
+  depends-on: I30, I31 (sequenced after both close, not file-blocked by
+    either — low risk, but its conclusion should land before I33's rename
+    touches adjacent config/binding surface)
+  status: not-started
+  context: the phase text's own "these two compete, pick one" framing may
+    be WRONG — re-verify before drafting a migration. Research found both
+    `placementPolicy.readOnlyRedirects` and `capabilities.code:review.prefer`
+    live in current config and code, but they read as ORTHOGONAL mechanisms,
+    not duplicates: `readOnlyRedirects` is `binding.mjs`'s own explicitly-
+    named "safety net" for UNBOUND actors (three separate comments in
+    `binding.mjs` ~L20,224,263,266 call it exactly that), consumed across 4
+    real source files (`placement-policy.mjs`, `config.mjs`,
+    `assignment-runner.mjs`, `binding.mjs` itself); `code:review.prefer` is
+    an ordinary named-capability config entry resolved through the normal
+    capability-prefer path used everywhere else — a capability-keyed
+    preference, not an operation-id-keyed redirect.
+  scope: re-read both mechanisms' actual call sites fresh (not from this
+    research report alone — confirm directly). Produce one of two outcomes,
+    both valid: (a) they are genuinely orthogonal — document this plainly
+    in `flow-definition.md` or wherever the two are otherwise ambiguous,
+    close with NO config migration; (b) real overlap/competition is found —
+    then and only then draft the actual consolidation (keep one, migrate
+    live config, keep the other loadable for the compat window, per the
+    phase text's original intent). Do not force a migration onto two
+    mechanisms that don't actually compete.
+  files: read-only investigation; writes only if outcome (b) — in that
+    case scope expands and this unit's own report must state the concrete
+    file list before editing, not guessed here.
+  verification: a written decision record (in this unit's own report,
+    or a plan.md decision note if outcome affects other units) citing the
+    real call sites read, not just this research report's summary; if
+    outcome (b), the normal test-suite verification for whatever config
+    migration results.
+  stop: uncertain which mechanism actually governs a real production
+    binding path (escalate rather than guess); outcome (b) is chosen
+    without first confirming outcome (a) doesn't already explain the
+    observed behavior.
+
+- unit: I33 — rename `standalone-master-coordination-loop` to `produce-review-revise` (Phase 7 item 4a)
+  capability: code:implement
+  depends-on: I32 (sequenced after the binding-source question settles;
+    file-disjoint otherwise)
+  status: not-started
+  decision (Lead, locked, do not reopen — corrects a confirmed factual
+    error in the phase text, 2026-09-28): the phase text's own item 4a
+    lists `fgos-group-thinking` among "the deprecated ... stubs" to remove
+    when the compat window closes. This is WRONG and must not be executed
+    literally. `core/skills/fgos-group-thinking/SKILL.md` is 1,609 words
+    of live, full operational content (the core-facing protocol-pack
+    selection gate) — Unit I26's own investigation already settled this
+    exact question and LOCKED the reversal: "do not stub" (see I26's own
+    unit report). The phase text predates that reversal and was never
+    updated. Only `fgos-plan-loop` and `fgos-code-panel` (both genuinely
+    stubbed by I29) belong in any removal list this unit or a future one
+    executes. `fgos-group-thinking` is explicitly OUT of this unit's scope
+    entirely, forward and backward.
+  context: this rename has real, large blast radius — 29 confirmed
+    references across `core/coordination-protocols/`, `core/protocol-packs/
+    group-thinking.json`, `src/verbs/coordination/show.mjs` and
+    `launch-master-loop.mjs`, 22 test files (including one literally named
+    `test/runner/flow-definition-standalone-master-coordination-loop.test.mjs`),
+    and — critically — the BRAND NEW `domains/coding/skills/fgos-code-change/
+    SKILL.md` (built in I28, merged this same track), which names the OLD
+    id as the FlowDefinition its own lifecycle lowers into. This is exactly
+    the kind of high-blast-radius rename this track has repeatedly found
+    hides real complexity (I18, I21's own worktree/file-overlap lessons) —
+    do not treat this as a quick find-and-replace.
+  scope: register `core.coordination-protocol.produce-review-revise` as a
+    NEW id ADDITIVE alongside the old `standalone-master-coordination-loop`
+    id (both loadable, both resolvable) rather than a hard rename/removal —
+    this is the safer path given the blast radius above, per this
+    research's own recommendation; a hard rename remains an option ONLY if
+    this unit's own decomposition review finds the additive-alias approach
+    creates worse long-term confusion than a coordinated rename would.
+    Update `fgos-code-change/SKILL.md` (Step 1's own protocol reference) to
+    target the NEW id going forward. Leave every existing session, test,
+    and reference to the OLD id fully functional — do not force-migrate 29
+    real references in one unit. Separately: reclassify the `group-thinking`
+    protocol pack per the phase text's "gated registered protocols" wording
+    (decide its concrete new id/classification as part of this unit's own
+    scope, evidenced against the real pack registration code, not guessed
+    here).
+  files: `core/coordination-protocols/standalone-master-coordination-loop.yaml`
+    (or wherever the new id's registration lands — additive, so likely a
+    new registration entry pointing at the same or a lightly-adjusted
+    FlowDefinition body), `core/protocol-packs/group-thinking.json`,
+    `domains/coding/skills/fgos-code-change/SKILL.md` (Step 1 protocol
+    reference only), `src/verbs/coordination/show.mjs`,
+    `launch-master-loop.mjs` (only if they need to recognize the new id,
+    not necessarily rewrite existing old-id logic), relevant tests (do NOT
+    touch the 22 existing old-id tests unless they need a NEW assertion for
+    the new id — don't retarget passing old-id coverage away from what it
+    correctly proves).
+  verification: real CLI probe confirming both ids resolve to a working
+    FlowDefinition; `fgos-code-change`'s own existing test coverage
+    (`test/skills/coordination-dag-driver-skill-contract.test.mjs` etc.)
+    still passes with the new id reference; a new test confirming the old
+    id remains fully functional (not just "not deleted" — actually
+    dispatch through it); env -u CLAUDE_CODE_SESSION_ID npm test.
+  stop: `fgos-group-thinking` is touched, stubbed, or removed by this unit
+    (locked decision above — this is an automatic, non-negotiable stop);
+    any of the 22 existing old-id tests is weakened or retargeted rather
+    than left passing on its own terms; the old id stops resolving for any
+    existing/replayable session.
+
+- unit: I34 — complete the drift-test suite (Phase 7 item 5)
+  capability: code:test
+  depends-on: I30, I31, I32, I33 (audits the phase's own finished state;
+    sequenced last among the code units on purpose)
+  status: not-started
+  context: several of the phase text's 9 named drift checks are already
+    covered by earlier units — confirm, don't rebuild: "generated skill
+    projections are byte-identical to canonical sources"
+    (`test/install-packaging.test.mjs`, `coordination-schema.test.mjs`,
+    directly confirmed in I26/I28/I29's own reports); "facades restate no
+    rule owned by the driver-discipline fragment"
+    (`test/skills/coordination-phase4-driver-discipline.test.mjs`,
+    confirmed directly during I28's review); "none triggers on keyword
+    matching of implement/code" (`test/runner/capability-match.test.mjs`,
+    `test/setup/checks.test.mjs`, `test/setup/capability-catalog-doctrine.test.mjs`);
+    "every registered capability declares a valid `serves` set ... every
+    protocol operation's `policy.capability` resolves" (the `registrations.mjs`
+    doctor checks from I19/I21, already confirmed live in I30's own
+    context above). Genuinely unconfirmed or likely-missing (verify with a
+    fresh, more thorough search before writing — don't duplicate a test
+    that exists under different vocabulary): "documented commands equal
+    command registry"; "runtime skills contain no raw request JSON"
+    (I28's own SKILL.md touts this as a design property but no dedicated
+    repo-wide drift test enforcing it was found); "stale auto-close
+    language is absent from current sources" (I26's own report mentions
+    "stale implicit close language remains absent" — check if this is the
+    same test under different wording before assuming a gap); "every
+    referenced contract template resolves"; "no portable FlowDefinition
+    carries an executor pin through policy.capability/distinctProviderFrom"
+    (likely covered by `assertNoPortableExecutorPin` in `session-engine.mjs`
+    plus binding conformance tests — not independently re-verified by the
+    research pass, confirm directly).
+  scope: for each of the phase text's 9 named drift checks, first search
+    thoroughly for existing coverage under plausible alternate vocabulary;
+    only write a new test for a confirmed genuine gap. Report which of the
+    9 were found already covered (cite the real test file) vs. genuinely
+    new.
+  files: whichever `test/` files result from the gap analysis above (not
+    guessed here — this unit's own first deliverable is the gap list).
+  verification: env -u CLAUDE_CODE_SESSION_ID npm test with all new/
+    confirmed drift tests passing.
+  stop: a "new" test duplicates existing coverage under different
+    vocabulary (search harder before writing); a written test is weaker
+    than the phase text's own stated check (e.g. checks a subset instead
+    of the real repo-wide property named).
+
+- unit: I35 — doc/CHANGELOG sweep, command-registry gap, and before/after report (Phase 7 items 3, 6, 7)
+  capability: execute
+  depends-on: I30, I31, I32, I33, I34 (last unit in the track — its own
+    "after" measurement must reflect the finished phase)
+  status: not-started
+  context: item 3's remaining scope is narrower than the phase text implies
+    at first read — Unit I29 already swept the wide majority of live
+    inbound references (fgos-panel routing, both trigger-surface copies,
+    master-coordinator and runtime-recovery-design docs, reading-map, the
+    how-to doc, CHANGELOG). I29's own report names ONE explicit remaining
+    gap: `docs/platform/packaging-distribution/contracts/
+    skill-package-distribution.md`'s intent-mapping table has no
+    `/fgos:code-change` row (a command-registry-level change I29
+    deliberately left out of its own scope). For items 6/7: the replay
+    mechanism (`src/runner/coordination/replay.mjs`) and the closest
+    existing "before/after" tool (`scripts/measure-coordination-baseline.mjs`,
+    already versioned, already retargeted by I29 to measure the two current
+    canonical skills) both exist and work. NO stored historical "before"
+    baseline result was found anywhere in `plans/` or `docs/` — it must be
+    reconstructed, not assumed to exist.
+  decision (Lead, 2026-09-28 — before/after baseline scope): the "before"
+    measurement spans the WHOLE track (pre-Phase-4, before the
+    driver-discipline extraction and the whole simplification effort
+    began), not just a Phase 6/7-local delta. Reasoning: this track's own
+    stated thesis and Phase 7 Exit criterion is "a cold agent can operate
+    fgos-code-change and architecture-panel from thin skills ... no
+    required operational truth depends on copying a large JSON payload or
+    remembering chat history" — that claim is only demonstrated against a
+    pre-simplification baseline, not a narrower recent delta. Reconstruct
+    the "before" number by running `measure-coordination-baseline.mjs`
+    against a pre-Phase-4 git ref in a scratch worktree (never the main
+    checkout), citing the exact ref used.
+  scope: add the `/fgos:code-change` row to `skill-package-distribution.md`'s
+    intent-mapping table; run `measure-coordination-baseline.mjs` fresh
+    against current main for the "after" number; reconstruct a "before"
+    number per the decision above; publish the before/after comparison
+    report (a new file under `plans/260919-coordination-skill-harness-simplification/reports/`);
+    final CHANGELOG.md entry closing out the track.
+  files: `docs/platform/packaging-distribution/contracts/
+    skill-package-distribution.md`, a new before/after report file,
+    CHANGELOG.md.
+  verification: the before/after report cites the exact git refs used for
+    both measurements, the exact command run, and the raw numbers (not
+    just a summary claim — mirroring this track's own established
+    real-evidence discipline); env -u CLAUDE_CODE_SESSION_ID npm test one
+    final time on the fully-integrated tree.
+  stop: the "before" number is guessed or estimated rather than actually
+    measured against a real git ref; the report claims a qualitative
+    improvement without the raw before/after numbers to support it.
+
 ## Risk map
 
 | Risk | Level | Proof point |
