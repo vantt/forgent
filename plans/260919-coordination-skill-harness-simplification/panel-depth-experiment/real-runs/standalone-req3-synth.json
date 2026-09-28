@@ -1,0 +1,24 @@
+{
+  "kind": "declared-protocol",
+  "objective": "I27 standalone real standard-protocol session: synthesis.",
+  "writerId": "i27-driver",
+  "coordinationId": "i27-standalone-standard-v1",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-standard-v1" },
+  "close": true,
+  "actors": [
+    { "id": "synthesizer-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "frontier" }
+  ],
+  "steps": [
+    {
+      "type": "authorize", "as": "authSynth", "operationId": "synthesize-recommendation", "targetActorId": "synthesizer-actor",
+      "authorizationId": "auth_synth_standalone", "invocationKey": "ik_synth_standalone",
+      "reason": "post-critique-open is open: both critique-proposals and assess-constraints have settled.",
+      "grantedContextRefs": ["asgn_i27_driver_op_018", "asgn_i27_driver_op_019", "asgn_i27_driver_op_020", "asgn_i27_driver_op_021", "asgn_i27_driver_op_022", "asgn_i27_driver_op_023", "asgn_i27_driver_op_024"]
+    },
+    {
+      "type": "operation", "as": "synth", "operationId": "synthesize-recommendation", "targetActorId": "synthesizer-actor",
+      "objective": "Recommend ONE path for whether the standard (no-red-team) variant should be selectable via a mechanical materiality field, pure human judgment, or not shipped as a separate preset yet -- keeping live disagreement visible rather than smoothing it into a footnote. Read /home/vantt/projects/forgentX/core/coordination-protocols/architecture-advisory-panel-standard-v1.yaml first (absolute path). Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}

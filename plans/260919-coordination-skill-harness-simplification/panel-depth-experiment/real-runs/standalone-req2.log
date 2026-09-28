@@ -1,0 +1,132 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-28T07:25:19.465Z",
+  "data_hash": "35a8100339d6426f65d7a25ef648e3dd569869f0d733cbbd758913019217babc",
+  "data": {
+    "coordinationId": "i27-standalone-standard-v1",
+    "kind": "declared-protocol",
+    "definitionRef": {
+      "id": "core.coordination-protocol.architecture-advisory-panel-standard-v1",
+      "version": "1.0.0"
+    },
+    "objective": "I27 standalone real standard-protocol session: framing + shaping.",
+    "status": "running",
+    "closed": false,
+    "closeAttempted": true,
+    "closeRefusalReason": "coordination run: session \"i27-standalone-standard-v1\" was opened against definition \"core.coordination-protocol.architecture-advisory-panel-standard-v1@1.0.0\", but the definition could not be resolved -- refusing to close against an unresolvable definition: session \"i27-standalone-standard-v1\" is missing its snapshot file at /home/vantt/projects/forgentX/.fgos/coordination/sessions/i27-standalone-standard-v1/snapshot.json",
+    "quorum": {
+      "requiredActorIds": [
+        "lead-advisor-actor",
+        "context-investigator-actor",
+        "system-shaper-actor",
+        "alternative-shaper-actor",
+        "constraint-advocate-actor",
+        "architecture-critic-actor",
+        "synthesizer-actor"
+      ],
+      "completed": [
+        {
+          "actorId": "context-investigator-actor",
+          "assignmentId": "asgn_i27_driver_op_019",
+          "runId": "run_asgn_i27_driver_op_019_01"
+        },
+        {
+          "actorId": "system-shaper-actor",
+          "assignmentId": "asgn_i27_driver_op_020",
+          "runId": "run_asgn_i27_driver_op_020_01"
+        },
+        {
+          "actorId": "alternative-shaper-actor",
+          "assignmentId": "asgn_i27_driver_op_021",
+          "runId": "run_asgn_i27_driver_op_021_01"
+        },
+        {
+          "actorId": "constraint-advocate-actor",
+          "assignmentId": "asgn_i27_driver_op_024",
+          "runId": "run_asgn_i27_driver_op_024_01"
+        }
+      ],
+      "failed": [
+        {
+          "actorId": "architecture-critic-actor",
+          "assignmentId": "asgn_i27_driver_op_023",
+          "runId": "run_asgn_i27_driver_op_023_01"
+        }
+      ],
+      "late": [],
+      "missing": [
+        {
+          "actorId": "lead-advisor-actor"
+        },
+        {
+          "actorId": "synthesizer-actor"
+        }
+      ],
+      "replaced": []
+    },
+    "steps": [
+      {
+        "as": "authCritique",
+        "type": "authorize",
+        "door": "authorizeDeclaredOperation",
+        "operationId": "critique-proposals",
+        "nodeId": "phase-critique",
+        "actorId": "architecture-critic-actor",
+        "authorizationId": "auth_critique_standalone",
+        "invocationKey": "ik_critique_standalone",
+        "grantedContextRefs": [
+          "asgn_i27_driver_op_018",
+          "asgn_i27_driver_op_019",
+          "asgn_i27_driver_op_020",
+          "asgn_i27_driver_op_021",
+          "asgn_i27_driver_op_022"
+        ],
+        "targetArtifactRef": null,
+        "appended": true
+      },
+      {
+        "as": "critique",
+        "type": "operation",
+        "actorId": "architecture-critic-actor",
+        "door": "dispatchDeclaredOperation",
+        "assignmentId": "asgn_i27_driver_op_023",
+        "status": "failed",
+        "confidence": "failed",
+        "executor": "claude",
+        "provider": "claude",
+        "tier": "flagship",
+        "resumed": false
+      },
+      {
+        "as": "authAssess",
+        "type": "authorize",
+        "door": "authorizeDeclaredOperation",
+        "operationId": "assess-constraints",
+        "nodeId": "phase-critique",
+        "actorId": "constraint-advocate-actor",
+        "authorizationId": "auth_assess_standalone",
+        "invocationKey": "ik_assess_standalone",
+        "grantedContextRefs": [
+          "asgn_i27_driver_op_020",
+          "asgn_i27_driver_op_021",
+          "asgn_i27_driver_op_022"
+        ],
+        "targetArtifactRef": null,
+        "appended": true
+      },
+      {
+        "as": "assess",
+        "type": "operation",
+        "actorId": "constraint-advocate-actor",
+        "door": "dispatchDeclaredOperation",
+        "assignmentId": "asgn_i27_driver_op_024",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "claude",
+        "provider": "claude",
+        "tier": "flagship",
+        "resumed": false
+      }
+    ]
+  }
+}

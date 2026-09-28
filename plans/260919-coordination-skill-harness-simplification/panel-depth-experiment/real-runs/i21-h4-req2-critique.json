@@ -5,12 +5,22 @@
   "coordinationId": "i27-i21h4-full-v1",
   "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
   "close": true,
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "frontier" },
+    { "id": "context-investigator-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "standard" },
+    { "id": "system-shaper-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "flagship" },
+    { "id": "alternative-shaper-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "flagship" },
+    { "id": "constraint-advocate-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "flagship" },
+    { "id": "architecture-critic-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "flagship" },
+    { "id": "synthesizer-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "frontier" },
+    { "id": "red-team-actor", "executor": "codex", "invocation": "codex-cli-bwrap", "tier": "flagship" }
+  ],
   "steps": [
     {
       "type": "authorize", "as": "authCritique", "operationId": "critique-proposals", "targetActorId": "architecture-critic-actor",
       "authorizationId": "auth_critique_i21h4", "invocationKey": "ik_critique_i21h4",
       "reason": "post-shaping-open is open: all three Phase-5 shapers have a linked result.",
-      "grantedContextRefs": ["$ref:interpret", "$ref:investigate", "$ref:shapeSystem", "$ref:shapeAlt", "$ref:shapeConstraint"]
+      "grantedContextRefs": ["asgn_i27_driver_op_005", "asgn_i27_driver_op_006", "asgn_i27_driver_op_007", "asgn_i27_driver_op_008", "asgn_i27_driver_op_009"]
     },
     {
       "type": "operation", "as": "critique", "operationId": "critique-proposals", "targetActorId": "architecture-critic-actor",
@@ -21,7 +31,7 @@
       "type": "authorize", "as": "authAssess", "operationId": "assess-constraints", "targetActorId": "constraint-advocate-actor",
       "authorizationId": "auth_assess_i21h4", "invocationKey": "ik_assess_i21h4",
       "reason": "post-shaping-open is open: all three Phase-5 shapers have a linked result.",
-      "grantedContextRefs": ["$ref:shapeSystem", "$ref:shapeAlt", "$ref:shapeConstraint"]
+      "grantedContextRefs": ["asgn_i27_driver_op_007", "asgn_i27_driver_op_008", "asgn_i27_driver_op_009"]
     },
     {
       "type": "operation", "as": "assess", "operationId": "assess-constraints", "targetActorId": "constraint-advocate-actor",

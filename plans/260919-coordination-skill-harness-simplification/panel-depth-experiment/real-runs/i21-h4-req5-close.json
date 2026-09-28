@@ -1,0 +1,24 @@
+{
+  "kind": "declared-protocol",
+  "objective": "I27 new track-decision case (I21 H4): close-dialogue.",
+  "writerId": "i27-driver",
+  "coordinationId": "i27-i21h4-full-v1",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "close": true,
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "standard" }
+  ],
+  "steps": [
+    {
+      "type": "authorize", "as": "authClose", "operationId": "close-dialogue", "targetActorId": "lead-advisor-actor",
+      "authorizationId": "auth_close_i21h4", "invocationKey": "ik_close_i21h4",
+      "reason": "post-explanation-open is open and no further reopen is needed.",
+      "grantedContextRefs": ["asgn_i27_driver_op_015"]
+    },
+    {
+      "type": "operation", "as": "closeDialogue", "operationId": "close-dialogue", "targetActorId": "lead-advisor-actor",
+      "objective": "Confirm no further reopen is needed and close the dialogue for coordinationId i27-i21h4-full-v1.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}

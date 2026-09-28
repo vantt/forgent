@@ -1,0 +1,140 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-28T05:05:09.301Z",
+  "data_hash": "3727f9534aa57942296ee36ab77b08a05d64b5854aa00b43ee3c911f3d6bb4c7",
+  "data": {
+    "coordinationId": "i27-i21h4-full-v1",
+    "kind": "declared-protocol",
+    "definitionRef": {
+      "id": "core.coordination-protocol.architecture-advisory-panel-v1",
+      "version": "1.0.0"
+    },
+    "objective": "I27 new track-decision case (I21 H4 executor-pin fallback): framing + shaping.",
+    "status": "running",
+    "closed": false,
+    "closeAttempted": true,
+    "closeRefusalReason": "coordination run: session \"i27-i21h4-full-v1\" was opened against definition \"core.coordination-protocol.architecture-advisory-panel-v1@1.0.0\", but the definition could not be resolved -- refusing to close against an unresolvable definition: session \"i27-i21h4-full-v1\" is missing its snapshot file at /home/vantt/projects/forgentX/.fgos/coordination/sessions/i27-i21h4-full-v1/snapshot.json",
+    "quorum": {
+      "requiredActorIds": [
+        "lead-advisor-actor",
+        "context-investigator-actor",
+        "system-shaper-actor",
+        "alternative-shaper-actor",
+        "constraint-advocate-actor",
+        "architecture-critic-actor",
+        "synthesizer-actor",
+        "red-team-actor"
+      ],
+      "completed": [
+        {
+          "actorId": "context-investigator-actor",
+          "assignmentId": "asgn_i27_driver_op_006",
+          "runId": "run_asgn_i27_driver_op_006_01"
+        },
+        {
+          "actorId": "system-shaper-actor",
+          "assignmentId": "asgn_i27_driver_op_007",
+          "runId": "run_asgn_i27_driver_op_007_01"
+        },
+        {
+          "actorId": "alternative-shaper-actor",
+          "assignmentId": "asgn_i27_driver_op_008",
+          "runId": "run_asgn_i27_driver_op_008_01"
+        },
+        {
+          "actorId": "constraint-advocate-actor",
+          "assignmentId": "asgn_i27_driver_op_011",
+          "runId": "run_asgn_i27_driver_op_011_01"
+        },
+        {
+          "actorId": "architecture-critic-actor",
+          "assignmentId": "asgn_i27_driver_op_010",
+          "runId": "run_asgn_i27_driver_op_010_01"
+        },
+        {
+          "actorId": "synthesizer-actor",
+          "assignmentId": "asgn_i27_driver_op_012",
+          "runId": "run_asgn_i27_driver_op_012_01"
+        }
+      ],
+      "failed": [
+        {
+          "actorId": "red-team-actor",
+          "assignmentId": "asgn_i27_driver_op_013",
+          "runId": "run_asgn_i27_driver_op_013_01"
+        }
+      ],
+      "late": [],
+      "missing": [
+        {
+          "actorId": "lead-advisor-actor"
+        }
+      ],
+      "replaced": []
+    },
+    "steps": [
+      {
+        "as": "authSynth",
+        "type": "authorize",
+        "door": "authorizeDeclaredOperation",
+        "operationId": "synthesize-recommendation",
+        "nodeId": "phase-synthesis",
+        "actorId": "synthesizer-actor",
+        "authorizationId": "auth_synth_i21h4",
+        "invocationKey": "ik_synth_i21h4",
+        "grantedContextRefs": [
+          "asgn_i27_driver_op_005",
+          "asgn_i27_driver_op_006",
+          "asgn_i27_driver_op_007",
+          "asgn_i27_driver_op_008",
+          "asgn_i27_driver_op_009",
+          "asgn_i27_driver_op_010",
+          "asgn_i27_driver_op_011"
+        ],
+        "targetArtifactRef": null,
+        "appended": false
+      },
+      {
+        "as": "synth",
+        "type": "operation",
+        "actorId": "synthesizer-actor",
+        "door": "dispatchDeclaredOperation",
+        "assignmentId": "asgn_i27_driver_op_012",
+        "status": "done",
+        "confidence": "reported",
+        "executor": "claude",
+        "provider": "claude",
+        "tier": "frontier",
+        "resumed": true
+      },
+      {
+        "as": "authRedteam",
+        "type": "authorize",
+        "door": "authorizeDeclaredOperation",
+        "operationId": "red-team-packet",
+        "nodeId": "phase-redteam",
+        "actorId": "red-team-actor",
+        "authorizationId": "auth_redteam_i21h4",
+        "invocationKey": "ik_redteam_i21h4",
+        "grantedContextRefs": [
+          "asgn_i27_driver_op_012"
+        ],
+        "targetArtifactRef": null,
+        "appended": false
+      },
+      {
+        "as": "redteam",
+        "type": "operation",
+        "actorId": "red-team-actor",
+        "door": "dispatchDeclaredOperation",
+        "assignmentId": "asgn_i27_driver_op_013",
+        "status": "failed",
+        "confidence": "failed",
+        "executor": "openai",
+        "provider": "openai",
+        "tier": "flagship",
+        "resumed": false
+      }
+    ]
+  }
+}

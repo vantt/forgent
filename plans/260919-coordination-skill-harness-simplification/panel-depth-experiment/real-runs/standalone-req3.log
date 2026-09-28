@@ -1,0 +1,1 @@
+fgos: authorizeDeclaredOperation: operation "synthesize-recommendation" at node "phase-synthesis" for actor "synthesizer-actor" requires visibility window "post-critique-open" to be open before any context may be granted, and it is not open yet -- refusing to authorize
