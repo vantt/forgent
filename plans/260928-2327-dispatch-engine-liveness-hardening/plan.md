@@ -45,6 +45,17 @@ the same audit found along the way.
 
 ## Phase 1 — Consolidate process liveness onto one judge (root cause, C2)
 
+STATUS: MERGED (2026-09-28). integratedSha 647e23a5c068e1a0e8c16182d6606b6324596457,
+testedSha 5b3d205c8 (unit/P1 tip), clean --no-ff auto-merge (ort), no
+conflicts. Split design (pure judge with injected `isAlive` vs. the
+control-plane probe staying in `run-lock.mjs`) per the Lead decision above
+-- confirmed by implementer's own correct stop-before-guessing discipline,
+independently re-verified by Lead against real source before deciding. 9
+new tests (`test/runner/process-identity.test.mjs`), 42/42 targeted pass,
+full suite 7991/0 fail on merged tree. None of the other 9+ liveness call
+sites touched (explicitly out of scope). See
+plans/260928-2327-dispatch-engine-liveness-hardening/reports/unit-P1-claude-only-execution-report.md.
+
 ### Work
 
 1. **Corrected scope (Lead, 2026-09-28, verified directly against real
