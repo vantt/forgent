@@ -38,6 +38,7 @@ import {
 } from './schema.mjs';
 import { normalizeDagDeclaration, computeDagSharedCwdCaveats, resolveNodeCwd } from './dag-declaration.mjs';
 import { publishNextGeneration, publishMarkerOnce, readMarker, currentGeneration, listGenerations, fsyncDirBestEffort } from '../dispatch/run-lock.mjs';
+import { publishImmutableProof } from '../dispatch/proof-helpers.mjs';
 import { DeliberationError, validateAnchors, validateResponseLineage } from '../deliberation/schema.mjs';
 import { computeActionKey } from './recovery-planner.mjs';
 import { authorize } from './read-evaluators.mjs';
@@ -1049,7 +1050,15 @@ export function createSessionAssignmentLocked(
 
     const assignmentJsonPath = path.join(assignmentsDir, assignment.assignmentId, 'assignment.json');
     if (!fs.existsSync(assignmentJsonPath)) {
-      fs.writeFileSync(assignmentJsonPath, `${JSON.stringify(assignment, null, 2)}\n`);
+      // Atomic publish (fsynced temp + exclusive hard link, same primitive
+      // as assignment-runner.mjs's own assignment.json writer): a crash
+      // mid-write must never leave partial bytes here -- readAssignmentJson
+      // above would otherwise JSON.parse that garbage and throw 'corrupt-log'
+      // forever, permanently bricking this taskKey's claimed assignmentId
+      // (S6). A crash before this call lands still reads as "no such
+      // Assignment exists" (see the doc comment above), the already-designed
+      // safe-failure shape this function's own crash-window analysis names.
+      publishImmutableProof(assignmentJsonPath, assignment);
     }
 
     completeAssignmentRegistration({

@@ -1307,6 +1307,7 @@ export async function executeAssignment(assignment, opts = {}) {
   // a different assignment from memory (which would violate the immutability guarantee).
   const assignmentJsonPath = path.join(assignmentDir, 'assignment.json');
   let effectiveAssignment = assignment;
+  let assignmentJsonPublished = false;
   if (!fs.existsSync(assignmentJsonPath)) {
     // I04-REV-01: Ensure template resolution happens before assignment.json is persisted,
     // so the immutable assignment.json on disk carries complete template provenance (including templateSnapshot).
@@ -1324,8 +1325,18 @@ export async function executeAssignment(assignment, opts = {}) {
       });
     }
     effectiveAssignment = assignment;
-    fs.writeFileSync(assignmentJsonPath, `${JSON.stringify(assignment, null, 2)}\n`);
-  } else {
+    // Atomic publish (fsynced temp + exclusive hard link, same primitive as
+    // result.json/run.json): a crash mid-write must never leave a partial
+    // assignment.json on disk -- that used to make the read-back branch
+    // below throw "corrupt (invalid JSON)" forever, permanently bricking
+    // this Assignment id (S6). `publishImmutableProof` either lands the
+    // complete file or leaves it cleanly absent; `false` here means a
+    // concurrent writer won the race in the TOCTOU window above, so fall
+    // through to the read-back branch exactly as if it had existed from
+    // the start.
+    assignmentJsonPublished = publishImmutableProof(assignmentJsonPath, assignment);
+  }
+  if (!assignmentJsonPublished) {
     let raw;
     try {
       raw = fs.readFileSync(assignmentJsonPath, 'utf8');

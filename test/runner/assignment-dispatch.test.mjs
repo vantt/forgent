@@ -17,6 +17,7 @@ import { canonicalJson, computeSha256Digest } from '../../src/runner/dispatch/cl
 import { initStore, addWork, listWork, settleClaim } from '../../src/state/store.mjs';
 import { acquireClaim, readClaim } from '../../src/state/runtime-coordination.mjs';
 import { inspectProviderCapacity, providerCapacityStatePaths, PROVIDER_CAPACITY_STATE_CONTRACT } from '../../src/runner/dispatch/provider-capacity.mjs';
+import { normalizeRunResultV2 } from '../../src/runner/dispatch/run-result.mjs';
 
 function mkTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-asgn-dispatch-test-'));
@@ -128,6 +129,44 @@ function writeHangingExecutor(dir) {
     `,
   );
   return scriptPath;
+}
+
+// Simulates a process crash mid-publish (S6): throws on the FIRST
+// `fs.writeSync` call whose fd was opened for a `.tmp-*` file under
+// `targetDir` -- the exact write `publishImmutableProof`'s fsynced
+// temp-file step performs -- so the target file (e.g. assignment.json)
+// never gets linked into place. By default `targetDir` must be the file's
+// immediate parent directory; pass `{ matchSubdir: true }` when the write
+// lands in an unpredictable child directory (e.g. a freshly-claimed
+// assignmentId directory under a shared assignments root). Self-restoring:
+// patches are undone as soon as the injected write fires, and the returned
+// `restore()` is a safety net for a test that throws before that happens.
+function injectSingleWriteFailureForDir(targetDir, errorMessage, { matchSubdir = false } = {}) {
+  const originalOpenSync = fs.openSync;
+  const originalWriteSync = fs.writeSync;
+  let capturedFd = null;
+  let triggered = false;
+  const restore = () => {
+    fs.openSync = originalOpenSync;
+    fs.writeSync = originalWriteSync;
+  };
+  const dirMatches = (dir) => (matchSubdir ? (dir === targetDir || dir.startsWith(`${targetDir}${path.sep}`)) : dir === targetDir);
+  fs.openSync = function patchedOpenSync(filePath, ...rest) {
+    const fd = originalOpenSync.call(fs, filePath, ...rest);
+    if (!triggered && typeof filePath === 'string' && dirMatches(path.dirname(filePath)) && path.basename(filePath).startsWith('.tmp-')) {
+      capturedFd = fd;
+    }
+    return fd;
+  };
+  fs.writeSync = function patchedWriteSync(fd, ...rest) {
+    if (!triggered && fd === capturedFd) {
+      triggered = true;
+      restore();
+      throw new Error(errorMessage);
+    }
+    return originalWriteSync.call(fs, fd, ...rest);
+  };
+  return restore;
 }
 
 test('executeAssignment executes non-mutating validate-plan assignment through fake executor', async () => {
@@ -3824,6 +3863,178 @@ test('reconcileCliSpawnRun: two-OS-process TOCTOU barrier race proves stale reco
 
   // 7. Old Reconciler's payload was safely preserved at result.superseded.json
   assert.equal(fs.existsSync(path.join(runDir, 'result.superseded.json')), true);
+});
+
+test('executeAssignment: an interrupted assignment.json publish leaves it cleanly absent, and a retry recovers instead of permanently bricking the Assignment (S6)', async () => {
+  const tempDir = mkTempDir();
+  const executorScript = writeEchoExecutor(tempDir);
+  const runnerConfig = {
+    executor: {
+      allowCrossProvider: true,
+      command: process.execPath,
+      args: [executorScript, '{prompt}'],
+    },
+    models: { standard: 'test-model' },
+    timeoutMs: 5000,
+  };
+
+  const work = { id: 'tsk-s6-assignment-json', status: 'doing', stage: 'planning', domain: 'coding' };
+  const assignment = buildAssignment({ work, stage: 'planning', operation: 'validate-plan' });
+  const assignmentDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId);
+  const assignmentJsonPath = path.join(assignmentDir, 'assignment.json');
+
+  // 1. Simulate a crash exactly mid-`assignment.json` publish (the S6 crash
+  // window: `assignment-runner.mjs`'s own write, previously a bare
+  // `fs.writeFileSync` guarded only by `!existsSync`).
+  const restore = injectSingleWriteFailureForDir(assignmentDir, 'Injected crash mid assignment.json publish');
+  let crashed = false;
+  try {
+    await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
+  } catch (err) {
+    crashed = true;
+    assert.match(err.message, /Injected crash mid assignment\.json publish/);
+  } finally {
+    restore();
+  }
+  assert.equal(crashed, true, 'expected the injected fault to interrupt the first attempt');
+
+  // Torn-write proof: the interrupted publish must never leave partial bytes
+  // at the target path -- it is cleanly absent, not corrupt.
+  assert.equal(fs.existsSync(assignmentJsonPath), false);
+
+  // 2. Recovery proof: retrying (the crashed process restarts and calls
+  // executeAssignment again with the same Assignment) succeeds and produces
+  // a complete, valid assignment.json -- it must NOT hit "is corrupt
+  // (invalid JSON)", the failure mode a torn `fs.writeFileSync` used to
+  // cause forever.
+  const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
+  assert.equal(result.assignmentId, assignment.assignmentId);
+  assert.equal(fs.existsSync(assignmentJsonPath), true);
+  const onDisk = JSON.parse(fs.readFileSync(assignmentJsonPath, 'utf8'));
+  assert.equal(onDisk.assignmentId, assignment.assignmentId);
+});
+
+test('createSessionAssignment: an interrupted assignment.json publish leaves it cleanly absent rather than corrupt-but-unreadable (S6, coordination/store.mjs writer)', async () => {
+  const tempDir = mkTempDir();
+  const coordinationId = 's6-store-write';
+  openSession(
+    { coordinationId, objective: 'test', provenanceRoot: { writerId: 'test-writer' } },
+    { repoRoot: tempDir },
+  );
+
+  const assignmentsDir = path.join(tempDir, '.fgos', 'assignments');
+  const restore = injectSingleWriteFailureForDir(assignmentsDir, 'Injected crash mid assignment.json publish (store.mjs)', { matchSubdir: true });
+  let crashed = false;
+  try {
+    createSessionAssignment(
+      {
+        coordinationId,
+        taskKey: 's6-task',
+        contract: {
+          objective: 'Validate the plan for S6 recovery coverage.',
+          contextRefs: [],
+          constraints: [],
+          expectedOutputs: ['agent-result.json (status, summary)'],
+          mutation: 'read-only',
+          evidence: { required: 'reported' },
+          role: 'researcher',
+          budget: { timeoutMs: 60000, maxRuns: 1 },
+        },
+        caller: { writerId: 'test-writer' },
+      },
+      { repoRoot: tempDir },
+    );
+  } catch (err) {
+    crashed = true;
+    assert.match(err.message, /Injected crash mid assignment\.json publish \(store\.mjs\)/);
+  } finally {
+    restore();
+  }
+  assert.equal(crashed, true, 'expected the injected fault to interrupt the write');
+
+  // Find the assignmentId the claim reserved before the interrupted write,
+  // and prove no torn/partial assignment.json ever landed under it.
+  const assignmentIds = fs.readdirSync(assignmentsDir);
+  assert.equal(assignmentIds.length, 1);
+  const assignmentJsonPath = path.join(assignmentsDir, assignmentIds[0], 'assignment.json');
+  assert.equal(fs.existsSync(assignmentJsonPath), false);
+});
+
+test('commitRunSettlement: a crash between control-settlement and result-publication is recoverable, not permanently stuck (S8)', () => {
+  const tempDir = mkTempDir();
+  const assignment = buildAssignment({ work: { id: 'tsk-s8-recovery', status: 'doing', stage: 'planning', domain: 'coding' }, stage: 'planning', operation: 'validate-plan' });
+  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+  const runId = `run_${assignment.assignmentId}_01`;
+  fs.mkdirSync(runDir, { recursive: true });
+
+  const control = acquireRunControl(runDir, { holder: { id: 's8-controller', pid: process.pid }, purpose: 'worker-spawn' });
+  assert.equal(control.status, 'acquired');
+
+  const runResult = normalizeRunResultV2({
+    runId,
+    assignmentId: assignment.assignmentId,
+    controlEpoch: control.controlEpoch,
+    controlToken: control.controlToken,
+    settledAt: new Date().toISOString(),
+    runtime: { exitCode: 0 },
+    isReadOnlyOperation: true,
+  });
+
+  // 1. Simulate a crash in the exact window the audit (S8) names:
+  // settleRunControl publishes the 'settled' generation, then the process
+  // dies before publishImmutableProof(result.json) ever runs.
+  assert.throws(
+    () => {
+      commitRunSettlement({
+        runDir,
+        runId,
+        controlEpoch: control.controlEpoch,
+        controlToken: control.controlToken,
+        runResult,
+        _afterControlSettlement: () => {
+          throw new Error('Injected crash: control settled, result.json not yet published');
+        },
+      });
+    },
+    /Injected crash: control settled, result\.json not yet published/,
+  );
+
+  // Prove the stuck state the audit describes: result.json never landed...
+  assert.equal(fs.existsSync(path.join(runDir, 'result.json')), false);
+  // ...and a fresh acquire attempt is refused forever (control already
+  // 'settled'), matching the audit's "acquireRunControl also gets stuck"
+  // finding -- this is what made the Run permanently unresumable before
+  // this fix.
+  const stuckReacquire = acquireRunControl(runDir, { holder: { id: 's8-controller-2', pid: process.pid }, purpose: 'worker-spawn' });
+  assert.equal(stuckReacquire.status, 'settled');
+
+  // 2. Recovery: the SAME token retries commitRunSettlement (the process
+  // that crashed restarts and resumes with the token/epoch it already
+  // held) -- this must now finish the commit instead of being refused as
+  // superseded.
+  const recovered = commitRunSettlement({
+    runDir,
+    runId,
+    controlEpoch: control.controlEpoch,
+    controlToken: control.controlToken,
+    runResult,
+  });
+  assert.equal(recovered.runId, runId);
+  assert.equal(fs.existsSync(path.join(runDir, 'result.json')), true);
+  const onDisk = JSON.parse(fs.readFileSync(path.join(runDir, 'result.json'), 'utf8'));
+  assert.equal(onDisk.runId, runId);
+
+  // 3. A further idempotent retry (e.g. a duplicate resumed process)
+  // rehydrates the already-settled result rather than throwing
+  // 'authoritative result.json already exists'.
+  const idempotentRetry = commitRunSettlement({
+    runDir,
+    runId,
+    controlEpoch: control.controlEpoch,
+    controlToken: control.controlToken,
+    runResult,
+  });
+  assert.equal(idempotentRetry.runId, runId);
 });
 
 test('executeAssignment: an unfenced caller (no retryId, every pre-existing call site) keeps getting "next available attempt", byte-compatible with the replaced readdirSync scan', async () => {

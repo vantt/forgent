@@ -14,6 +14,8 @@ import {
   isRunControlCurrent,
   settleRunControl,
   fsyncFileBestEffort,
+  controlDirs,
+  currentGeneration,
 } from './run-lock.mjs';
 import { markRunSettled } from './visibility-session.mjs';
 import { normalizeRunResultV2, interpretRunResult } from './run-result.mjs';
@@ -294,6 +296,21 @@ export function classifyRunEvidence({
 
 /**
  * Atomically commit a RunResult settlement to disk via CAS and immutable hard link.
+ *
+ * S8 recovery: `settleRunControl` publishes the 'settled' generation BEFORE
+ * `publishImmutableProof(result.json)` runs below -- a crash in that exact
+ * window leaves control settled with no result.json. `settleRunControl`
+ * always publishes 'settled' as the NEXT generation (current.epoch + 1), so
+ * a bare retry with the original `{controlEpoch, controlToken}` would read
+ * as "not current" via `isRunControlCurrent` and be refused as superseded
+ * forever, even though no other controller ever took over -- exactly the
+ * "can neither resume nor repair" state the audit names. `alreadySettledByUs`
+ * below recognizes that specific shape (current generation is 'settled',
+ * same controlToken, settledEpoch equal to our controlEpoch) and lets this
+ * exact retry finish the commit instead of re-running settleRunControl or
+ * being refused. A genuinely superseded caller (a different token, from a
+ * newer controller that really did take over) is unaffected: its token
+ * never matches, so it still falls through to the normal refusal below.
  */
 export function commitRunSettlement({
   runDir,
@@ -302,11 +319,21 @@ export function commitRunSettlement({
   controlToken,
   runResult,
   _beforeAuthoritativePublish = null,
+  _afterControlSettlement = null,
 }) {
   const resultJsonPath = path.join(runDir, 'result.json');
   const supersededJsonPath = path.join(runDir, 'result.superseded.json');
 
-  if (!isRunControlCurrent(runDir, { controlEpoch, controlToken })) {
+  const { generationsDir } = controlDirs(runDir);
+  const current = currentGeneration(generationsDir);
+  const alreadySettledByUs = Boolean(
+    current
+    && current.record?.purpose === 'settled'
+    && current.record?.controlToken === controlToken
+    && current.record?.settledEpoch === controlEpoch,
+  );
+
+  if (!alreadySettledByUs && !isRunControlCurrent(runDir, { controlEpoch, controlToken })) {
     publishMutableProjection(supersededJsonPath, runResult);
     throw new RunnerConfigError(
       `executeAssignment: control token for Run "${runId}" (epoch ${controlEpoch}) is no longer current -- a newer controller has taken over; refusing to append a settlement from a superseded controller`,
@@ -318,17 +345,35 @@ export function commitRunSettlement({
     _beforeAuthoritativePublish({ runDir, runId, controlEpoch, controlToken });
   }
 
-  const settlement = settleRunControl(runDir, { controlEpoch, controlToken });
-  if (settlement.status !== 'settled') {
-    publishMutableProjection(supersededJsonPath, runResult);
-    throw new RunnerConfigError(
-      `executeAssignment: control token for Run "${runId}" (epoch ${controlEpoch}) is no longer current (settlement status: "${settlement.status}") -- a newer controller has taken over; refusing to append a settlement from a superseded controller`,
-      { code: 'run-control-superseded', phase: 'post-admission' },
-    );
+  if (!alreadySettledByUs) {
+    const settlement = settleRunControl(runDir, { controlEpoch, controlToken });
+    if (settlement.status !== 'settled') {
+      publishMutableProjection(supersededJsonPath, runResult);
+      throw new RunnerConfigError(
+        `executeAssignment: control token for Run "${runId}" (epoch ${controlEpoch}) is no longer current (settlement status: "${settlement.status}") -- a newer controller has taken over; refusing to append a settlement from a superseded controller`,
+        { code: 'run-control-superseded', phase: 'post-admission' },
+      );
+    }
+    if (typeof _afterControlSettlement === 'function') {
+      _afterControlSettlement({ runDir, runId, controlEpoch, controlToken });
+    }
   }
 
   const published = publishImmutableProof(resultJsonPath, runResult);
   if (!published) {
+    if (alreadySettledByUs) {
+      // Our own prior attempt already reached the authoritative publish
+      // (possibly a concurrent duplicate call, or a retry that raced its own
+      // still-running earlier attempt) -- rehydrate rather than treat as
+      // superseded.
+      try {
+        const existing = interpretRunResult(resultJsonPath, { expectedRunId: runId });
+        if (existing && !existing.corrupt && !existing.contractCorrupt && !existing.resultCorrupt
+          && existing.classification?.provenance !== 'contract-corrupt') {
+          return Object.freeze(existing);
+        }
+      } catch {}
+    }
     publishMutableProjection(supersededJsonPath, runResult);
     throw new RunnerConfigError(
       `executeAssignment: authoritative result.json for Run "${runId}" already exists -- refusing to overwrite authoritative result`,
