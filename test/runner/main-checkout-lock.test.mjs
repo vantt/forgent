@@ -505,6 +505,58 @@ test('abandoned-lock self-healing is unchanged: a dead holder whose last heartbe
   assert.equal(contender.status, ACQUIRED, 'a crashed holder stops heartbeating, so self-healing still reclaims the lock after ttlMs from its LAST real write, unchanged from before this fix');
 });
 
+// --- S2 fix (dispatch-engine-liveness-hardening Phase 3): the per-cwd
+// dispatch lock's own composite pid identity (dispatchLockFile,
+// `${pid}:${acquiredAtMs}:${rand}`) is now liveness-checked at acquire time
+// instead of judged by ttlMs freshness alone, matching audit repro C
+// ("dead-pid holder blocks for the full ttlMs, mislabeled live"). ------------
+
+test('HELD no longer overclaims verified liveness -- was "held-by-live-other-pid", a status also returned for a holder whose liveness (a string identity, or now-reclaimed dead pid) was never actually confirmed live', () => {
+  assert.equal(HELD, 'held');
+});
+
+test('acquireMainCheckoutLock recognizes a dead-pid dispatch-lock composite identity as dead immediately, reclaiming it well before a long ttlMs elapses (S2 fix, real dead process)', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  const dead = deadPid();
+  const lockFile = dispatchLockFile('/some/worktree');
+  const composite = `${dead}:${Date.now()}:abc123`;
+  fs.writeFileSync(path.join(dir, lockFile), JSON.stringify({ pid: composite, ts: Date.now() }));
+
+  // A long ttlMs (1 hour) -- before this fix, a string identity's held-ness
+  // was judged purely by ttlMs freshness, so this dead-pid holder would
+  // read as HELD ("held-by-live-other-pid") for the entire hour, exactly
+  // the audit's own reproduced probe (a 999999 dead pid blocking for the
+  // full 35-minute dispatch timeout).
+  const contender = acquireMainCheckoutLock(dir, { identity: process.pid, ttlMs: 60 * 60 * 1000, lockFile });
+
+  assert.equal(contender.status, ACQUIRED, 'a dead-pid composite holder must be reclaimed immediately, never blocked for the full ttlMs');
+});
+
+test('acquireMainCheckoutLock still honors ttlMs for a LIVE dispatch-lock composite identity -- only a confirmed-dead pid short-circuits, a live one is unaffected', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  const lockFile = dispatchLockFile('/some/worktree');
+  const ts = Date.now() - 100;
+  const composite = `${process.pid}:${ts}:abc123`;
+  fs.writeFileSync(path.join(dir, lockFile), JSON.stringify({ pid: composite, ts }));
+
+  const contender = acquireMainCheckoutLock(dir, { identity: process.pid + 100_000, ttlMs: 60_000, lockFile });
+
+  assert.equal(contender.status, HELD, 'a live composite holder within ttlMs is still HELD, unchanged from before this fix');
+  assert.equal(contender.holderPid, composite);
+});
+
+test('acquireMainCheckoutLock still fails closed (AMBIGUOUS) for a non-composite string identity with no ttlMs supplied -- the S2 fix only special-cases the dispatch lock\'s own pid-embedded shape', () => {
+  const { dir } = setup();
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(lockPathFor(dir), JSON.stringify({ pid: 'session-holder-opaque-id', ts: Date.now() }));
+
+  const contender = acquireMainCheckoutLock(dir, { identity: 'contender-session' });
+
+  assert.equal(contender.status, AMBIGUOUS, 'an opaque (non-composite) string identity with no ttlMs is still undecidable, D5 fail-closed, unchanged from before this fix');
+});
+
 // --- crash-safety: exit/SIGINT/SIGTERM release the lock automatically ------
 
 test('acquire does NOT register exit/SIGINT/SIGTERM listeners by default (releaseOnExit omitted) — required for .githooks/pre-commit\'s intentional lingering-lock design', () => {

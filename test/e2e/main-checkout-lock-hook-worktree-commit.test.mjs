@@ -32,6 +32,7 @@ import { acquireMainCheckoutLock, releaseMainCheckoutLock } from '../../src/runn
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REAL_HOOK = path.resolve(__dirname, '../../.githooks/pre-commit');
 const REAL_LOCK_MODULE = path.resolve(__dirname, '../../src/runner/main-checkout-lock.mjs');
+const REAL_PROCESS_IDENTITY_MODULE = path.resolve(__dirname, '../../src/runner/dispatch/process-identity.mjs');
 const REAL_IDENTITY_MODULE = path.resolve(__dirname, '../../src/util/session-identity.mjs');
 
 function mkTempDir(prefix) {
@@ -64,12 +65,14 @@ function initSharedAbsoluteHooksPathFixture() {
 
   const hooksDir = path.join(mainRoot, '.githooks');
   const runnerDir = path.join(mainRoot, 'src', 'runner');
+  const dispatchDir = path.join(runnerDir, 'dispatch');
   const utilDir = path.join(mainRoot, 'src', 'util');
   fs.mkdirSync(hooksDir, { recursive: true });
-  fs.mkdirSync(runnerDir, { recursive: true });
+  fs.mkdirSync(dispatchDir, { recursive: true });
   fs.mkdirSync(utilDir, { recursive: true });
   fs.copyFileSync(REAL_HOOK, path.join(hooksDir, 'pre-commit'));
   fs.copyFileSync(REAL_LOCK_MODULE, path.join(runnerDir, 'main-checkout-lock.mjs'));
+  fs.copyFileSync(REAL_PROCESS_IDENTITY_MODULE, path.join(dispatchDir, 'process-identity.mjs'));
   fs.copyFileSync(REAL_IDENTITY_MODULE, path.join(utilDir, 'session-identity.mjs'));
   fs.chmodSync(path.join(hooksDir, 'pre-commit'), 0o755);
   // Absolute, not relative -- this is the load-bearing difference from

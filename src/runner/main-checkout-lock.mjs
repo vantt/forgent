@@ -45,6 +45,7 @@
 //
 import fs from 'node:fs';
 import path from 'node:path';
+import { resolveHolderLiveness as resolveHolderLivenessByIdentity } from './dispatch/process-identity.mjs';
 
 export const LOCK_FILE = 'main-checkout.lock';
 
@@ -147,8 +148,35 @@ export const HOOK_TTL_MS = 20 * 1000;
 export const HOLDER_PID_ENV_VAR = 'FGOS_MAIN_LOCK_HOLDER_PID';
 
 export const ACQUIRED = 'acquired';
-export const HELD = 'held-by-live-other-pid';
+// tsk-64hk S2 fix (dispatch-engine-liveness-hardening Phase 3): was
+// 'held-by-live-other-pid', which overclaimed a verified-live pid for EVERY
+// holder shape this status covers -- including a string identity, which has
+// no pid to be "live" at all, and (before this fix) even a dispatch-lock
+// composite identity whose embedded pid was confirmed dead but still blocked
+// on ttlMs alone. Neutral name: HELD only ever means "not yet reclaimable by
+// this acquire attempt", never a claim about verified liveness.
+export const HELD = 'held';
 export const AMBIGUOUS = 'ambiguous';
+
+// COMPOSITE_PID_IDENTITY_RE / parseCompositePidIdentity (S2 fix): the per-cwd
+// dispatch lock's own identity shape (`dispatchLockFile`, cli.mjs's
+// `executeExecutorCli`) is `${pid}:${acquiredAtMs}:${rand}` -- a STRING
+// identity carrying a real pid, unlike every other string-identity caller of
+// this module (the pre-commit hook's opaque session id, claim-port.mjs's
+// session id), which have no process to probe at all. Byte-identical regex
+// to reconciliation-planner.mjs's own `CWD_LOCK_IDENTITY_RE` (that module is
+// banned from importing this file -- it calls `process.kill`, which the
+// reconcile door's own import-graph test forbids -- so the shape is
+// necessarily duplicated there, not imported from here; both are pinned to
+// the same real production format by test/runner/dispatch-reconciliation.
+// test.mjs and test/runner/main-checkout-lock.test.mjs).
+const COMPOSITE_PID_IDENTITY_RE = /^(\d+):(\d+):[a-z0-9]+$/;
+export function parseCompositePidIdentity(identity) {
+  if (typeof identity !== 'string') return null;
+  const match = COMPOSITE_PID_IDENTITY_RE.exec(identity);
+  if (!match) return null;
+  return { pid: Number(match[1]), acquiredAtMs: Number(match[2]) };
+}
 
 /** Signal-0 liveness probe (mirrors loop.mjs/session.mjs/events.mjs's
  * isPidAlive). EPERM means the pid exists under another user — still alive,
@@ -279,16 +307,35 @@ function tryAcquireOnce(lockPath, identity, now, ttlMs, allowSelfRecognition = t
     const withinTtl = typeof ttlMs !== 'number' || now - record.ts <= ttlMs;
     held = pidLive && withinTtl;
   } else {
-    // Different string identity: no process to probe, so held-ness is
-    // judged purely by ttlMs freshness. Undecidable without a window —
-    // fail closed (D5) rather than guess free or held.
-    if (typeof ttlMs !== 'number') {
+    // Different string identity: no process to probe generically, so
+    // held-ness defaults to pure ttlMs freshness. EXCEPTION (S2 fix,
+    // dispatch-engine-liveness-hardening Phase 3): when the string parses as
+    // the per-cwd dispatch lock's own composite pid identity
+    // (parseCompositePidIdentity), route its embedded pid through Phase 1's
+    // judge (resolveHolderLiveness) instead -- a confirmed-dead pid is
+    // reclaimed immediately, never blocked for the remainder of ttlMs. No
+    // processStartTime is recorded alongside this identity, so a live pid
+    // cannot yet be distinguished from a DIFFERENT process that reused the
+    // same pid after the original holder exited (resolveHolderLiveness's own
+    // documented "legacy holder record" fallback: alive + no processStartTime
+    // -> 'held') -- an existing gap, not a regression, left exactly as wide
+    // as it already was before this fix. Any OTHER string identity (the
+    // pre-commit hook's/claim-port.mjs's opaque session id) never matches
+    // this shape and keeps the original ttlMs-only, fail-closed (D5)
+    // behavior below unchanged.
+    const composite = parseCompositePidIdentity(record.pid);
+    const knownDead = composite !== null
+      && resolveHolderLivenessByIdentity({ pid: composite.pid }, isPidAlive(composite.pid)) === 'dead';
+    if (knownDead) {
+      held = false;
+    } else if (typeof ttlMs !== 'number') {
       // Record parsed fine, so age is real even though held-ness itself is
       // undecidable (D5 fail-closed) — surface what's actually known,
       // never a fabricated remaining-TTL with no ttlMs to compute it from.
       return { status: AMBIGUOUS, lockAgeMs: now - record.ts };
+    } else {
+      held = now - record.ts <= ttlMs;
     }
-    held = now - record.ts <= ttlMs;
   }
 
   if (held) {

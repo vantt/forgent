@@ -57,6 +57,7 @@ const REPO_ROOT = fileURLToPath(new URL('../../..', import.meta.url));
 const BIN_FGOS_PATH = resolveFgosBin(REPO_ROOT)?.path ?? fileURLToPath(new URL('../../../bin/fgos.mjs', import.meta.url));
 import {
   acquireMainCheckoutLock,
+  renewMainCheckoutLockIfOwn,
   dispatchLockFile,
   ACQUIRED,
   HELD,
@@ -909,6 +910,22 @@ export async function executeExecutorCli(
     );
   }
 
+  // S2 fix (dispatch-engine-liveness-hardening Phase 3): a run's total hold
+  // time is pre-spawn prep + up to timeoutMs + settlement, so any run that
+  // uses close to its full timeout used to lose exclusivity to a contender
+  // before finishing (the lock's own `ttlMs: timeoutMs` window expiring
+  // mid-run). Heartbeat renews this SAME lock's timestamp on a fraction of
+  // its own ttlMs, mirroring merge.mjs's own withMergeTargetSlot/
+  // mergeRunnerItem heartbeat (tsk-4l8) against the identical primitive.
+  // renewMainCheckoutLockIfOwn is a no-op (not an error) once this identity
+  // no longer owns the lock, so it is safe to call on every tick regardless
+  // of how the run ends.
+  const heartbeatIntervalMs = Math.max(250, Math.floor(timeoutMs / 3));
+  const heartbeat = setInterval(() => {
+    renewMainCheckoutLockIfOwn(fgosDir, identity, { lockFile });
+  }, heartbeatIntervalMs);
+  heartbeat.unref();
+
   try {
     process.stderr.write(
       `fgos: dispatch capability=${capabilityLabel} executor=${executorId} via=${adapter} provider=${provider} model=${model} tier=${tier}\n`,
@@ -1046,6 +1063,7 @@ export async function executeExecutorCli(
     const base = buildDispatchResult({ mechanism, result: resultToBuild, headBefore, headAfter, lostUncommittedPaths, provider, command });
     return resolvedByPurpose ? { ...base, executorId } : base;
   } finally {
+    clearInterval(heartbeat);
     lockRes.release();
   }
 
