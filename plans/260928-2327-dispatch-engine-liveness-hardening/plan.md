@@ -311,7 +311,8 @@ the same test shape.
 
 ## Phase 5 — S5: `dispatch.claim` gets a real identity or gets removed
 
-STATUS: IN PROGRESS (2026-09-29), unit/P5, not yet merged. Decision:
+STATUS: MERGED (2026-09-29). unit/P5 `3ee9b52ea`, integratedSha
+`2b3752628`. Decision:
 DELETE (confirmed via fresh code reading -- `dispatch.claim`'s in-flight
 role is genuinely subsumed by Phase 2's `admitRunAttempt`/
 `isCliSpawnRunStillWorking`, and the underlying claim file is always
@@ -336,8 +337,55 @@ doesn't pass it) since assignment-runner.mjs's actual owners (Phase 2,
 Phase 6) are both already merged onto the base this unit branched from,
 and the only other phase in flight (Phase 4) doesn't touch that file --
 the original file-ownership constraint no longer reflected the real
-conflict surface by the time this came up. Implementation and
-verification of that addition are in progress; not yet merged.
+conflict surface by the time this came up.
+
+Fork 2 (found only after implementing Fork 1, via the same DAG-
+concurrency cross-process test still failing differently): `refuseIfSettled`
+alone wasn't enough -- two real processes can both reach admission before
+EITHER has acquired real run control (a separate, later step inside
+`executeAssignment`), so neither's admission sees the other as in-flight.
+Escalated to kongming again; its answer avoided two worse options (a new
+marker file needing its own clearing door; a session-lock pre-check that
+is just a disguised race) in favor of stamping the admitting process's
+own identity (`admittedBy`, reusing the already-existing
+`buildRunControlHolder`) into the SAME atomic CAS record `admitRunAttempt`
+already commits, and treating "admitter still alive, no real control
+record yet" as a live signal -- gated to fire only when
+`!priorControl.controlEpoch`, so it can never conflict with or go stale
+against the real control ledger once one exists. Both refusal codes
+translate back to the exact `CoordinationError` shape/message the retired
+claim files used to throw, so every existing consumer (`dag-scheduler.mjs`'s
+`outcomeFor`, any `instanceof CoordinationError` check) needed zero changes.
+
+Lead independently read the CAS/liveness logic and the error-translation
+boundary against real source (confirmed `buildRunControlHolder`'s shape
+matches what `resolveHolderLiveness` expects, confirmed the M1 in-flight
+check's widening only ever ADDS refusal coverage for a window that was
+previously an open gap, never narrows an existing safe path). Reran the
+cross-process race test ~120 times under heavy artificial CPU stress
+(20-25 concurrent `yes` processes); it failed twice
+(`test/runner/coordination-dag-concurrency.test.mjs:662`, "identical
+concurrent writers"). Did not accept this as a P5 regression without
+proof: traced the failure to `replay.mjs`'s own "assignment-created event
+has no corresponding assignmentRefs entry" self-heal ordering check -- a
+file Phase 5 never touches -- and reproduced the IDENTICAL failure
+signature, at a comparable rate (2/80), against pre-Phase-5 main under
+the same stress. Confirmed pre-existing, unrelated to this phase; filed
+as a named follow-up (event-log/assignmentRefs write-ordering race in
+`session-engine.mjs`'s session-creation self-heal path, surfaced by this
+track's own stress-testing discipline, not introduced by it), not
+reopened against P5. Full suite green (7995 tests, 0 fail). See
+plans/260928-2327-dispatch-engine-liveness-hardening/reports/unit-P5-claude-only-execution-report.md.
+
+Residual, out of this phase's file-ownership scope, noted by the
+implementer and not yet fixed: `src/verbs/dispatch/recover.mjs`,
+`src/cli/command-registry.mjs`'s CLI help text,
+`src/verbs/dispatch/reconcile.mjs`'s own refusal-message example list,
+and two docs
+(`docs/how-to/operate-dispatch-runtime-inspection-and-reconciliation.md`,
+`docs/specs/runner.md`) still name the retired `clear-assignment-claim`
+action. Harmless (a plain "unsupported action" refusal now, not a
+half-working door) but worth a follow-up doc/CLI-help pass.
 
 ### Work
 
