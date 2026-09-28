@@ -3386,6 +3386,19 @@ decomposition (I22-I26, I27, I28-I29, and now I30-I35).
     member's resolution.
 
 - unit: I34 — complete the drift-test suite, allowlisting the accepted raw-JSON carve-out (Phase 7 item 5)
+  status: MERGED (2026-09-28). integratedSha baed9b22e7295e87b7b7823b1427fc0abfd0646d,
+    testedSha dc7d2bc9a (unit/I34 tip), clean --no-ff auto-merge (ort), no
+    conflicts. Key suites rerun on merged tree: 45/45 pass. 6 of the 9 (+1)
+    named drift checks confirmed already covered (verified directly, not
+    inherited); 3 genuine gaps got new tests (raw-JSON allowlist,
+    keyword-trigger reversal, contract-template resolution). Real,
+    significant NEW finding: 9 of 13 registered CoordinationProtocols have
+    zero authored prompt templates for any operation, silently falling
+    back to a legacy prompt path -- allowlisted with an honesty companion
+    test (catches regression on the 4 working protocols without masking
+    the other 9), filed as a real follow-up candidate below, not silently
+    dropped. See
+    plans/260919-coordination-skill-harness-simplification/reports/unit-I34-claude-only-execution-report.md.
   capability: code:test
   depends-on: I30, I31, I32, I33 (audits the phase's own finished state;
     sequenced last among the code units on purpose)
