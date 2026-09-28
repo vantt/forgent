@@ -18,7 +18,6 @@ import crypto from 'node:crypto';
 import {
   stablePoolIndex,
   selectPlacementPolicyRedirectExecutor,
-  resolveVerifiedRedirectExecutor,
 } from '../../src/runner/dispatch/placement-policy.mjs';
 
 // Independent reproduction of assignment-runner.mjs's stableIndex -- if the
@@ -100,45 +99,14 @@ test('Phase 08: selectPlacementPolicyRedirectExecutor returns sourceExecutorId u
   assert.equal(selectPlacementPolicyRedirectExecutor({ cfg, sourceExecutorId: 'claude', candidatePool: ['not-registered'], seed: 'x' }), 'claude');
 });
 
-test('Phase 08 PRODUCTION BINDER proof: resolveVerifiedRedirectExecutor is PlacementPolicy-sourced (not falling back) whenever it genuinely agrees with the legacy value, for the real config shape and a synthetic multi-candidate pool', () => {
-  const cfg = runnerConfig();
-
-  const realShape = resolveVerifiedRedirectExecutor({
-    cfg,
-    sourceExecutorId: 'claude',
-    candidatePool: ['codex-bwrap'],
-    seed: 'review-candidate:asgn_real_002',
-    legacyExecutorId: 'codex-bwrap', // what selectReadOnlyRedirectExecutor would have computed
-  });
-  assert.equal(realShape.executorId, 'codex-bwrap');
-  assert.equal(realShape.source, 'placement-policy');
-  assert.equal(realShape.divergence, null);
-
-  const pool = ['codex-bwrap', 'claude-reviewer', 'pi-herdr'];
-  for (let i = 0; i < 50; i++) {
-    const seed = `multi-op-${i}:asgn_${i}`;
-    const legacyExecutorId = pool[referenceStableIndex(seed, pool.length)];
-    const result = resolveVerifiedRedirectExecutor({ cfg, sourceExecutorId: 'claude', candidatePool: pool, seed, legacyExecutorId });
-    assert.equal(result.executorId, legacyExecutorId);
-    assert.equal(result.source, 'placement-policy', `expected PlacementPolicy to be trusted (not fall back) at seed ${seed}`);
-    assert.equal(result.divergence, null);
-  }
-});
-
-test('Phase 08 PRODUCTION BINDER proof: a genuine divergence falls back to the legacy value and is reported, never silently applied', () => {
-  const cfg = runnerConfig();
-  // A legacyExecutorId that could not possibly be what the real formula
-  // produces for this seed/pool -- simulates a real algorithm drift.
-  const result = resolveVerifiedRedirectExecutor({
-    cfg,
-    sourceExecutorId: 'claude',
-    candidatePool: ['codex-bwrap'],
-    seed: 'x',
-    legacyExecutorId: 'claude-reviewer', // deliberately wrong for this pool
-  });
-  assert.equal(result.executorId, 'claude-reviewer', 'must fall back to the caller-supplied legacy value, never the unverified PlacementPolicy one');
-  assert.equal(result.source, 'legacy');
-  assert.ok(result.divergence);
-  assert.equal(result.divergence.legacyExecutorId, 'claude-reviewer');
-  assert.equal(result.divergence.placementExecutorId, 'codex-bwrap');
-});
+// dispatch-engine-liveness-hardening Phase 7 (C1): `resolveVerifiedRedirectExecutor`
+// itself retired -- real investigation (grepped ~800 historical production
+// dispatch stderr.log files, zero real divergence ever recorded) confirmed
+// its own doc comment's admission that both sides of the comparison reduced
+// to the SAME `stablePoolIndex` call over the SAME filtered pool, so a real
+// divergence was never structurally possible. `selectPlacementPolicyRedirectExecutor`
+// is now called directly by every production caller; the tests above
+// already prove it agrees with the legacy formula byte-for-byte across 200+
+// seeds and every admissibility edge case, so no separate "production
+// binder" proof is needed once there is no second code path left to verify
+// against.

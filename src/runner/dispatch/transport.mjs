@@ -48,6 +48,7 @@ import { spawn, execFileSync } from 'node:child_process';
 import { RunnerConfigError } from './config.mjs';
 import { resolveExecutorConfig } from './resolve.mjs';
 import { resolveVerifiedProviderArgs } from './provider-adapter.mjs';
+import { recordShadowBinderDivergence } from './placement-policy.mjs';
 import { runHerdrRound } from './herdr-round.mjs';
 import { DispatchError } from './dispatch-error.mjs';
 import { startSupervisorProcess } from './cli-spawn-supervisor.mjs';
@@ -195,6 +196,7 @@ export function resolveExecutorCommand(cfg, { prompt, model, tier, executorId, f
       process.stderr.write(
         `fgos: ProviderAdapter argv divergence (falling back to legacy) executor=${executorId ?? ''} legacyArgs=${JSON.stringify(divergence.legacyArgs)} renderedArgs=${JSON.stringify(divergence.renderedArgs)}\n`,
       );
+      recordShadowBinderDivergence(fgosDir, 'provider-args', { executorId: executorId ?? null, ...divergence });
     }
   }
   const MAX_ARG_STRLEN = 131072;
