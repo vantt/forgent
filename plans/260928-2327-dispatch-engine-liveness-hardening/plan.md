@@ -484,6 +484,55 @@ names.
 
 ## Phase 7 — C1 + C3: retire or authorize the shadow binders
 
+STATUS: MERGED (2026-09-29). unit/P7 `df527cb5d`, integratedSha
+`0c324681b`. Real investigation (grepped ~800 historical production
+dispatch stderr logs under `.fgos/assignments/*/runs/*/stderr.log`, plus
+a live empirical re-check against the current config) found the 4 shadow
+binders split cleanly, not a uniform answer:
+
+- `resolveVerifiedRedirectExecutor` and `resolveVerifiedAssignmentModel`:
+  structurally guaranteed to never diverge (both sides call the identical
+  underlying primitive — `stablePoolIndex`/`resolvePolicyTierModel` — over
+  identical inputs). Retired outright; callers now use the direct
+  primitive. Lead independently confirmed the new caller-side formula is
+  byte-identical to the old shadow-verified one by reading both against
+  real source.
+- `resolveVerifiedPlacementModel` and `resolveVerifiedProviderArgs`: real
+  historical divergence (126 confirmed hits, dated 2026-09-18, root-caused
+  to a since-fixed config gap; empirically zero against every
+  currently-registered executor today). Kept in shadow mode per the
+  audit's own high-risk flag on retiring before divergence is proven
+  zero. Durable local telemetry added
+  (`recordShadowBinderDivergence` → `.fgos/dispatch/shadow-binder-divergence.jsonl`,
+  surfaced by a new `shadow-binder-divergence` doctor check, correctly
+  registered per this repo's own install/setup/doctor gate) replacing the
+  previous ephemeral-stderr-only visibility, plus a dated `docs/backlog.md`
+  row (`tsk-p7-shadow-binders`, target 2026-10-31) enumerating 5 concrete
+  divergence classes each needing a decided winner + a matrix test before
+  retiring.
+
+C3: `executeExecutorCli` called the full `resolveAssignmentDispatchPolicy`
+only to reach its two governance throws, discarding the rest. Extracted
+`resolveExecutorProvider`/`resolveExecutorGovernance` as shared exports
+that `resolveAssignmentDispatchPolicy` now also calls internally —
+confirmed as real dedup, not duplicate logic under new names, by reading
+its updated call sites directly — preserving the exact original
+governance-throw ordering relative to other validation errors (verified
+in source, explicitly called out in the implementer's own comment on why
+this matters). `cfg.models` dual-keying (item 3) folded into the same
+backlog row as enumerated class (d): confirmed dormant for this repo's
+own config, live for external consumers.
+
+Consulted kongming before implementing, which caught a real mistake in
+the initial plan (a same-provider-redirect ternary in
+`assignment-runner.mjs`'s `policyForActualExecutor` that would have been
+wrongly flattened) before it landed — Lead independently verified the
+final code preserves that exact ternary rather than collapsing it. Full
+suite green (7993 tests, 0 fail); Lead reran the directly-touched test
+files (280 tests) plus dispatch/assignment-dispatch (472 tests) and the
+full suite independently before merging. See
+plans/260928-2327-dispatch-engine-liveness-hardening/reports/unit-P7-claude-only-execution-report.md.
+
 ### Work
 
 This phase requires a decision the audit explicitly flags as unmade: five
