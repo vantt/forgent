@@ -238,16 +238,16 @@ test('--cell scopes to a matching Product Gates row by its exact Cell column val
   assert.equal(result.units[0].unit, 'cell-a');
 });
 
-test('--cell with no match anywhere returns capability.undeclared, severity warn, ok stays true', () => {
+test('--cell with no match anywhere returns capability.undeclared, severity hard, ok turns false', () => {
   const text = `- unit: I18 — plan lint hardening
   capability: code:implement
 `;
   const result = lintPlanCapabilityAnnotations(text, REGISTERED, { cellId: 'I99' });
-  assert.equal(result.ok, true);
+  assert.equal(result.ok, false);
   assert.deepEqual(result.units, []);
   assert.equal(result.findings.length, 1);
   assert.equal(result.findings[0].code, 'capability.undeclared');
-  assert.equal(result.findings[0].severity, 'warn');
+  assert.equal(result.findings[0].severity, 'hard');
 });
 
 test('--cell still surfaces hard findings scoped to the matched unit', () => {
