@@ -13,7 +13,7 @@
       "type": "authorize", "as": "authSynth", "operationId": "synthesize-recommendation", "targetActorId": "synthesizer-actor",
       "authorizationId": "auth_synth_standalone", "invocationKey": "ik_synth_standalone",
       "reason": "post-critique-open is open: both critique-proposals and assess-constraints have settled.",
-      "grantedContextRefs": ["asgn_i27_driver_op_018", "asgn_i27_driver_op_019", "asgn_i27_driver_op_020", "asgn_i27_driver_op_021", "asgn_i27_driver_op_022", "asgn_i27_driver_op_023", "asgn_i27_driver_op_024"]
+      "grantedContextRefs": ["asgn_i27_driver_op_018", "asgn_i27_driver_op_019", "asgn_i27_driver_op_020", "asgn_i27_driver_op_021", "asgn_i27_driver_op_022", "asgn_i27_driver_op_025", "asgn_i27_driver_op_024"]
     },
     {
       "type": "operation", "as": "synth", "operationId": "synthesize-recommendation", "targetActorId": "synthesizer-actor",

@@ -1,0 +1,295 @@
+{
+  "id": "agent-result-claim",
+  "version": 2,
+  "status": "done",
+  "summary": "Blind-scored case-3 explanations against frozen RT/CX/CY substance lists. RT frozen list is empty (red-team asserted process/packet attacks only; F1–F6 not asserted; F7 not upgraded to an H4 claim). CX/CY each have 19 atomic decision-substance findings. CX-in-X: 12 PRESENT (1,4,5,7,8,9,10,11,13,17,18,19) and 7 ABSENT. CY-in-Y: 3 PRESENT (1,5,10) and 16 ABSENT. Dispositions recorded only for PRESENT marks. No ground-truth / factual-error scoring for this case.",
+  "assessment": {
+    "verdict": "pass"
+  },
+  "evidenceRefs": [
+    "plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-3/question.md",
+    "plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-3/redteam-findings-source.md",
+    "plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-3/control-objections-source-X.md",
+    "plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-3/control-objections-source-Y.md",
+    "plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-3/explanation-X.md",
+    "plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-3/explanation-Y.md"
+  ],
+  "marks": {
+    "rt": [],
+    "cx": [
+      {
+        "id": "CX-1",
+        "statement": "confinementSensitive would not have prevented H4: consumer-side unread declaration, not author mis-marking; a second synonymous unread marker changes nothing"
+      },
+      {
+        "id": "CX-2",
+        "statement": "gating refuse-orphan-fallback on confinementSensitive:true makes omitted flags fail open, worse than unconditional line-268 fail-closed"
+      },
+      {
+        "id": "CX-3",
+        "statement": "if the flag keeps line 268 unconditional, it adds no branch-3 coverage (redundant)"
+      },
+      {
+        "id": "CX-4",
+        "statement": "shaper confinement-aware prefer filter is author-opt-in and silent with no confinement block"
+      },
+      {
+        "id": "CX-5",
+        "statement": "declared-prefer-lands-unconfined residual: bare-string prefer accepted by line 268, preferInvocation omitted, first CLI unconfined (code:test / claude-cli acceptEdits)"
+      },
+      {
+        "id": "CX-6",
+        "statement": "confinement need lives on the operation side (advisory / Mutation read-only), not the capability-author side"
+      },
+      {
+        "id": "CX-7",
+        "statement": "key confined-or-unbound on operation effective mutation class (read-only), with confinement.mode as additional trigger not the only one"
+      },
+      {
+        "id": "CX-8",
+        "statement": "if mutation class is derived after binding or invisible to the binder, thread it into bindOperations facts (contract change)"
+      },
+      {
+        "id": "CX-9",
+        "statement": "system-shaper F3 (one pure unit test of the residual) is real/cheap and should be run before anything else"
+      },
+      {
+        "id": "CX-10",
+        "statement": "F1 dispatch-time re-resolution by capability name is load-bearing for every option; if it lands, guard must move into resolve.mjs"
+      },
+      {
+        "id": "CX-11",
+        "statement": "required-diversity fail-open is a real separate finding, not H4, must not be merged or lost"
+      },
+      {
+        "id": "CX-12",
+        "statement": "work order: resolve F1; locate mutation-class derivation; land predicate plus tests including code:test omission; doctor as visibility"
+      },
+      {
+        "id": "CX-13",
+        "statement": "kernel hardening has widest blast radius and a path to irreversible persisted JSONL writes if written shape changes"
+      },
+      {
+        "id": "CX-14",
+        "statement": "stricter doctor check can false-positive and block setup/CI on healthy machines including global-install projects"
+      },
+      {
+        "id": "CX-15",
+        "statement": "do-nothing risks silent unowned recurrence whose cost accumulates; C has no owner"
+      },
+      {
+        "id": "CX-16",
+        "statement": "before merging A, accept both old and new record shapes (or test no shape change); process promise is not an engineering control"
+      },
+      {
+        "id": "CX-17",
+        "statement": "register any new doctor check at warn not fail; promote later after zero false positives; test against known-healthy fixture"
+      },
+      {
+        "id": "CX-18",
+        "statement": "ship B first at warn, A second only with dual-shape reader; C is not a ship"
+      },
+      {
+        "id": "CX-19",
+        "statement": "main binding.mjs may differ from unit/I27; drift unverified"
+      }
+    ],
+    "cy": [
+      {
+        "id": "CY-1",
+        "statement": "confinementSensitive would not have prevented H4: consumer-side unread declaration, not author mis-marking; a second synonymous unread marker changes nothing"
+      },
+      {
+        "id": "CY-2",
+        "statement": "gating refuse-orphan-fallback on confinementSensitive:true makes omitted flags fail open, worse than unconditional line-268 fail-closed"
+      },
+      {
+        "id": "CY-3",
+        "statement": "if the flag keeps line 268 unconditional, it adds no branch-3 coverage (redundant)"
+      },
+      {
+        "id": "CY-4",
+        "statement": "shaper confinement-aware prefer filter is author-opt-in and silent with no confinement block"
+      },
+      {
+        "id": "CY-5",
+        "statement": "declared-prefer-lands-unconfined residual: bare-string prefer accepted by line 268, preferInvocation omitted, first CLI unconfined (code:test / claude-cli acceptEdits)"
+      },
+      {
+        "id": "CY-6",
+        "statement": "confinement need lives on the operation side (advisory / Mutation read-only), not the capability-author side"
+      },
+      {
+        "id": "CY-7",
+        "statement": "key confined-or-unbound on operation effective mutation class (read-only), with confinement.mode as additional trigger not the only one"
+      },
+      {
+        "id": "CY-8",
+        "statement": "if mutation class is derived after binding or invisible to the binder, thread it into bindOperations facts (contract change)"
+      },
+      {
+        "id": "CY-9",
+        "statement": "system-shaper F3 (one pure unit test of the residual) is real/cheap and should be run before anything else"
+      },
+      {
+        "id": "CY-10",
+        "statement": "F1 dispatch-time re-resolution by capability name is load-bearing for every option; if it lands, guard must move into resolve.mjs"
+      },
+      {
+        "id": "CY-11",
+        "statement": "required-diversity fail-open is a real separate finding, not H4, must not be merged or lost"
+      },
+      {
+        "id": "CY-12",
+        "statement": "work order: resolve F1; locate mutation-class derivation; land predicate plus tests including code:test omission; doctor as visibility"
+      },
+      {
+        "id": "CY-13",
+        "statement": "kernel hardening has widest blast radius and a path to irreversible persisted JSONL writes if written shape changes"
+      },
+      {
+        "id": "CY-14",
+        "statement": "stricter doctor check can false-positive and block setup/CI on healthy machines including global-install projects"
+      },
+      {
+        "id": "CY-15",
+        "statement": "do-nothing risks silent unowned recurrence whose cost accumulates; C has no owner"
+      },
+      {
+        "id": "CY-16",
+        "statement": "before merging A, accept both old and new record shapes (or test no shape change); process promise is not an engineering control"
+      },
+      {
+        "id": "CY-17",
+        "statement": "register any new doctor check at warn not fail; promote later after zero false positives; test against known-healthy fixture"
+      },
+      {
+        "id": "CY-18",
+        "statement": "ship B first at warn, A second only with dual-shape reader; C is not a ship"
+      },
+      {
+        "id": "CY-19",
+        "statement": "main binding.mjs may differ from unit/I27; drift unverified"
+      }
+    ],
+    "rtInX": [],
+    "rtInY": [],
+    "cxInX": [
+      {
+        "id": "CX-1",
+        "mark": "PRESENT",
+        "disposition": "DISPOSED",
+        "quote": "H4 itself was a consumer-side failure: a confinement declaration existed in config and no code read it. So a `confinementSensitive` flag … would not have prevented H4."
+      },
+      { "id": "CX-2", "mark": "ABSENT" },
+      { "id": "CX-3", "mark": "ABSENT" },
+      {
+        "id": "CX-4",
+        "mark": "PRESENT",
+        "disposition": "MENTIONED-ONLY",
+        "quote": "The shaper's trigger keys on the capability's own `confinement.mode`. The critic proposed keying on the operation's effective mutation class instead, which would also cover capabilities like `code:test` that have no confinement block."
+      },
+      {
+        "id": "CX-5",
+        "mark": "PRESENT",
+        "disposition": "MENTIONED-ONLY",
+        "quote": "A capability that declares a bare-string `.prefer` emits no invocation preference, so dispatch takes the executor's first CLI invocation, which for `[REDACTED]` and `claude` is unconfined."
+      },
+      { "id": "CX-6", "mark": "ABSENT" },
+      {
+        "id": "CX-7",
+        "mark": "PRESENT",
+        "disposition": "DISPOSED",
+        "quote": "The critic proposed keying on the operation's effective mutation class instead … The synthesizer refused to recommend it for exactly that reason. Adopting it now would be adopting an architecture nobody tested."
+      },
+      {
+        "id": "CX-8",
+        "mark": "PRESENT",
+        "disposition": "DISPOSED",
+        "quote": "The critic's variant rests on an unverified fact about where the mutation class is derived and whether the binder can see it."
+      },
+      {
+        "id": "CX-9",
+        "mark": "PRESENT",
+        "disposition": "MENTIONED-ONLY",
+        "quote": "The one unit test that would prove or kill this residual was stated by the shaper, endorsed by the critic as \"run it before anything else,\" and run by nobody."
+      },
+      {
+        "id": "CX-10",
+        "mark": "PRESENT",
+        "disposition": "DISPOSED",
+        "quote": "If any dispatch-time code … passes an operation's capability name, rather than the already-bound executor, back into executor resolution, then line 268 is not the gate and the whole recommendation inverts toward moving the guard into `resolve.mjs`."
+      },
+      {
+        "id": "CX-11",
+        "mark": "PRESENT",
+        "disposition": "DISPOSED",
+        "quote": "Required provider diversity fails open. An unknown family or forward reference counts as diverse, and the frozen record then claims the requirement was satisfied."
+      },
+      { "id": "CX-12", "mark": "ABSENT" },
+      {
+        "id": "CX-13",
+        "mark": "PRESENT",
+        "disposition": "DISPOSED",
+        "quote": "The second pass read nothing and ranked kernel hardening riskiest on a persisted-record worry the module header refutes. The synthesizer gave the second pass's ranking no weight, and I agree with that call."
+      },
+      { "id": "CX-14", "mark": "ABSENT" },
+      { "id": "CX-15", "mark": "ABSENT" },
+      { "id": "CX-16", "mark": "ABSENT" },
+      {
+        "id": "CX-17",
+        "mark": "PRESENT",
+        "disposition": "DISPOSED",
+        "quote": "Nobody opposed adding this check. Ship at warn severity first."
+      },
+      {
+        "id": "CX-18",
+        "mark": "PRESENT",
+        "disposition": "DISPOSED",
+        "quote": "confirm the round-2 fix is sufficient, lock it with a test, and do no further H4 work. Not kernel hardening. Not a doctor check as the closure."
+      },
+      {
+        "id": "CX-19",
+        "mark": "PRESENT",
+        "disposition": "MENTIONED-ONLY",
+        "quote": "Every panelist read `binding.mjs` from the `unit/I27` worktree. Nobody could read main. Drift between the two remains unverified."
+      }
+    ],
+    "cyInY": [
+      {
+        "id": "CY-1",
+        "mark": "PRESENT",
+        "disposition": "DISPOSED",
+        "quote": "H4 was not an author-judgment failure. The declaration already existed (`confinement.mode: required`); the failure was that no consumer read it. Adding a second declaration nobody reads would not have prevented H4."
+      },
+      { "id": "CY-2", "mark": "ABSENT" },
+      { "id": "CY-3", "mark": "ABSENT" },
+      { "id": "CY-4", "mark": "ABSENT" },
+      {
+        "id": "CY-5",
+        "mark": "PRESENT",
+        "disposition": "MENTIONED-ONLY",
+        "quote": "a bare-string `.prefer` silently falling through to an unconfined first invocation. Zero observed instances."
+      },
+      { "id": "CY-6", "mark": "ABSENT" },
+      { "id": "CY-7", "mark": "ABSENT" },
+      { "id": "CY-8", "mark": "ABSENT" },
+      { "id": "CY-9", "mark": "ABSENT" },
+      {
+        "id": "CY-10",
+        "mark": "PRESENT",
+        "disposition": "DISPOSED",
+        "quote": "Conditioned on F1: whether any dispatch-time path re-resolves an operation by capability NAME rather than by the bound preferExecutor. … If the answer is yes, the recommendation inverts: the guard must move into resolve.mjs"
+      },
+      { "id": "CY-11", "mark": "ABSENT" },
+      { "id": "CY-12", "mark": "ABSENT" },
+      { "id": "CY-13", "mark": "ABSENT" },
+      { "id": "CY-14", "mark": "ABSENT" },
+      { "id": "CY-15", "mark": "ABSENT" },
+      { "id": "CY-16", "mark": "ABSENT" },
+      { "id": "CY-17", "mark": "ABSENT" },
+      { "id": "CY-18", "mark": "ABSENT" },
+      { "id": "CY-19", "mark": "ABSENT" }
+    ]
+  }
+}

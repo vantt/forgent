@@ -1,7 +1,7 @@
 {
   "contract": "fgos.v1",
-  "generated_at": "2026-09-28T07:29:28.850Z",
-  "data_hash": "3e66eeee5089446e221eb8b785fc1aaa4ebc5a3fc28e4701f57b6282e964e685",
+  "generated_at": "2026-09-28T07:29:08.064Z",
+  "data_hash": "c767a8adb67df29c465b43533875df48a0d2ebb80a69dc60f9ae5d3fa9451d94",
   "data": {
     "coordinationId": "i27-standalone-standard-v1",
     "kind": "declared-protocol",
@@ -51,54 +51,49 @@
           "runId": "run_asgn_i27_driver_op_025_01"
         }
       ],
-      "failed": [
-        {
-          "actorId": "synthesizer-actor",
-          "assignmentId": "asgn_i27_driver_op_026",
-          "runId": "run_asgn_i27_driver_op_026_01"
-        }
-      ],
+      "failed": [],
       "late": [],
       "missing": [
         {
           "actorId": "lead-advisor-actor"
+        },
+        {
+          "actorId": "synthesizer-actor"
         }
       ],
       "replaced": []
     },
     "steps": [
       {
-        "as": "authSynth",
+        "as": "authCritiqueRetry",
         "type": "authorize",
         "door": "authorizeDeclaredOperation",
-        "operationId": "synthesize-recommendation",
-        "nodeId": "phase-synthesis",
-        "actorId": "synthesizer-actor",
-        "authorizationId": "auth_synth_standalone",
-        "invocationKey": "ik_synth_standalone",
+        "operationId": "critique-proposals",
+        "nodeId": "phase-critique",
+        "actorId": "architecture-critic-actor",
+        "authorizationId": "auth_critique_standalone_retry",
+        "invocationKey": "ik_critique_standalone_retry",
         "grantedContextRefs": [
           "asgn_i27_driver_op_018",
           "asgn_i27_driver_op_019",
           "asgn_i27_driver_op_020",
           "asgn_i27_driver_op_021",
-          "asgn_i27_driver_op_022",
-          "asgn_i27_driver_op_025",
-          "asgn_i27_driver_op_024"
+          "asgn_i27_driver_op_022"
         ],
         "targetArtifactRef": null,
         "appended": true
       },
       {
-        "as": "synth",
+        "as": "critiqueRetry",
         "type": "operation",
-        "actorId": "synthesizer-actor",
+        "actorId": "architecture-critic-actor",
         "door": "dispatchDeclaredOperation",
-        "assignmentId": "asgn_i27_driver_op_026",
-        "status": "failed",
-        "confidence": "failed",
+        "assignmentId": "asgn_i27_driver_op_025",
+        "status": "done",
+        "confidence": "reported",
         "executor": "claude",
         "provider": "claude",
-        "tier": "frontier",
+        "tier": "flagship",
         "resumed": false
       }
     ]
