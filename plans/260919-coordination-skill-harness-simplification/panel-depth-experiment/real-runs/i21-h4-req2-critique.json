@@ -1,0 +1,32 @@
+{
+  "kind": "declared-protocol",
+  "objective": "I27 new track-decision case (I21 H4): critique.",
+  "writerId": "i27-driver",
+  "coordinationId": "i27-i21h4-full-v1",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "close": true,
+  "steps": [
+    {
+      "type": "authorize", "as": "authCritique", "operationId": "critique-proposals", "targetActorId": "architecture-critic-actor",
+      "authorizationId": "auth_critique_i21h4", "invocationKey": "ik_critique_i21h4",
+      "reason": "post-shaping-open is open: all three Phase-5 shapers have a linked result.",
+      "grantedContextRefs": ["$ref:interpret", "$ref:investigate", "$ref:shapeSystem", "$ref:shapeAlt", "$ref:shapeConstraint"]
+    },
+    {
+      "type": "operation", "as": "critique", "operationId": "critique-proposals", "targetActorId": "architecture-critic-actor",
+      "objective": "Attack the strongest proposal on the table (kernel structural hardening in binding.mjs, per shape-system-proposal). Read /home/vantt/projects/forgentX/src/verbs/coordination/binding.mjs first (absolute path). Specifically stress-test: would a `confinementSensitive` flag actually have prevented H4, or would `review`'s author (Unit I19) simply have marked it `false` by mistake or omission -- meaning the new flag just relocates the same human-judgment failure one field over rather than closing it? Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    },
+    {
+      "type": "authorize", "as": "authAssess", "operationId": "assess-constraints", "targetActorId": "constraint-advocate-actor",
+      "authorizationId": "auth_assess_i21h4", "invocationKey": "ik_assess_i21h4",
+      "reason": "post-shaping-open is open: all three Phase-5 shapers have a linked result.",
+      "grantedContextRefs": ["$ref:shapeSystem", "$ref:shapeAlt", "$ref:shapeConstraint"]
+    },
+    {
+      "type": "operation", "as": "assess", "operationId": "assess-constraints", "targetActorId": "constraint-advocate-actor",
+      "objective": "Finalize the risk ranking across all three proposals (kernel hardening; stricter doctor check; do-nothing-further), incorporating the critic's own attack on the kernel-hardening option. State which option you'd actually ship first, and why. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}

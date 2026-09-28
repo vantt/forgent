@@ -1,0 +1,8 @@
+{
+  "note": "Fixed, deterministic coordinationId per (case, profile), recorded BEFORE dispatch per Unit I27's driver-safety decision. A retry MUST resume the same id, never mint a fresh one.",
+  "entries": [
+    { "coordinationId": "i27-canary-v1", "case": "canary", "profile": "standard", "purpose": "real cheap-tier canary (investigate-context alone) confirming the real executor path works before the batch" },
+    { "coordinationId": "i27-p052-clear-withheld-v1", "case": "p052-clear", "profile": "withheld-redteam-explanation", "purpose": "paired-design probe: same synthesis input as the real op_029 explain-recommendation dispatch, minus the red-team dissent paragraph" },
+    { "coordinationId": "i27-p052-unclear-withheld-v1", "case": "p052-unclear", "profile": "withheld-redteam-explanation", "purpose": "paired-design probe: same synthesis input as the real op_039 explain-recommendation dispatch, minus the red-team dissent paragraph" }
+  ]
+}

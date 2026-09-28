@@ -1,0 +1,32 @@
+{
+  "kind": "declared-protocol",
+  "objective": "I27 new track-decision case (I21 H4): synthesis + red-team.",
+  "writerId": "i27-driver",
+  "coordinationId": "i27-i21h4-full-v1",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "close": true,
+  "steps": [
+    {
+      "type": "authorize", "as": "authSynth", "operationId": "synthesize-recommendation", "targetActorId": "synthesizer-actor",
+      "authorizationId": "auth_synth_i21h4", "invocationKey": "ik_synth_i21h4",
+      "reason": "post-critique-open is open: both critique-proposals and assess-constraints have settled.",
+      "grantedContextRefs": ["__INTERPRET_ID__", "__INVESTIGATE_ID__", "__SHAPE_SYSTEM_ID__", "__SHAPE_ALT_ID__", "__SHAPE_CONSTRAINT_ID__", "__CRITIQUE_ID__", "__ASSESS_ID__"]
+    },
+    {
+      "type": "operation", "as": "synth", "operationId": "synthesize-recommendation", "targetActorId": "synthesizer-actor",
+      "objective": "Recommend ONE path for closing the H4 exposure class durably, keeping live disagreement visible rather than smoothing it into a footnote: kernel structural hardening in binding.mjs (system-shaper), a stricter operation-capability-resolves doctor check (alternative-shaper), or confirming the existing round-2 fix is already sufficient and no further work is needed (constraint-advocate's own risk ranking). Read /home/vantt/projects/forgentX/src/verbs/coordination/binding.mjs first (absolute path). Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    },
+    {
+      "type": "authorize", "as": "authRedteam", "operationId": "red-team-packet", "targetActorId": "red-team-actor",
+      "authorizationId": "auth_redteam_i21h4", "invocationKey": "ik_redteam_i21h4",
+      "reason": "post-synthesis-open is open: synthesize-recommendation has settled.",
+      "grantedContextRefs": ["__SYNTH_ID__"]
+    },
+    {
+      "type": "operation", "as": "redteam", "operationId": "red-team-packet", "targetActorId": "red-team-actor",
+      "objective": "Independently attack the panel's own conduct on the I21 H4 exposure-closure question -- not just the recommendation, but whether the panel stayed honest. Read /home/vantt/projects/forgentX/src/verbs/coordination/binding.mjs first (absolute path). Check specifically: did the synthesis seriously weigh the critic's own attack (that a confinementSensitive flag just relocates the same human-judgment failure), or dismiss it because the constraint-advocate's ranking already agreed with a chosen option? Is there a real, cheaper option nobody proposed (e.g. defaulting new capabilities to unbound/readOnlyRedirects unless a `.prefer` OR an explicit `confinementSensitive: false` is present, so silence is safe by construction rather than requiring a new flag most authors will forget)? Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}
