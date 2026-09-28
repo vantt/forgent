@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { chainCoordinationUseCase } from '../../src/verbs/coordination/chain.mjs';
+import { chainCoordinationUseCase, CHAIN_CONTRACT_VERSION } from '../../src/verbs/coordination/chain.mjs';
 import { runCoordinationUseCase } from '../../src/verbs/coordination/run.mjs';
 import { launchMasterLoopUseCase, MASTER_LOOP_PROTOCOL_ID } from '../../src/verbs/coordination/launch-master-loop.mjs';
 import { showCoordinationUseCase } from '../../src/verbs/coordination/show.mjs';
@@ -240,7 +240,13 @@ test('chain reports activeCell null and every cell\'s own final disposition/stat
 test('chain on a track prefix with zero matching sessions returns an empty, well-formed result -- a plan that has not started its first cell is legitimate, never an error', () => {
   const tempDir = mkTempDir();
   const result = chainCoordinationUseCase({ cwd: tempDir, repoRoot: tempDir }, { track: 'never-opened-track' });
-  assert.deepEqual(result, { track: 'never-opened-track', cells: [], activeCell: null, nextAction: null });
+  assert.deepEqual(result, {
+    contractVersion: CHAIN_CONTRACT_VERSION,
+    track: 'never-opened-track',
+    cells: [],
+    activeCell: null,
+    nextAction: null,
+  });
 });
 
 test('chain on a track with zero matching sessions in a workspace with NO .fgos/coordination/sessions/ directory at all is still empty, not a crash', () => {
