@@ -721,7 +721,7 @@ export const COMMAND_REGISTRY = [
       type: 'object',
       properties: {
         path: { type: 'string', description: 'Path to the plan.md file to lint.' },
-        cell: { type: 'string', description: 'Scope the result to only the unit block or Product Gates row matching this cell/unit id; no match yields a single capability.undeclared (severity warn) finding.' },
+        cell: { type: 'string', description: 'Scope the result to only the unit block or Product Gates row matching this cell/unit id; no match yields a single capability.undeclared (severity hard) finding -- refuses.' },
         json: { type: 'boolean', description: 'Return the raw {path, ok, units, findings} envelope instead of the default human-readable report.' },
       },
       positional: ['path'],
