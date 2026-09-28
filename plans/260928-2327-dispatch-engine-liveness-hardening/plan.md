@@ -251,6 +251,34 @@ holder blocking unnecessarily) are fixed and covered by a real test.
 
 ## Phase 4 — S3: provider-capacity lock stale-reclaim no longer loses writes
 
+STATUS: FIX ROUND 1 IN PROGRESS (2026-09-28/29). unit/P4 branch
+`b9b366047` (worktree
+`.claude/worktrees/dispatch-engine-liveness-p4-provider-capacity-stale-reclaim`)
+NOT merged. Implementer's own report claimed the race test passed 0/15;
+Lead independently reran the same unmodified test 4x in the implementer's
+own worktree and got a genuine ~50% failure rate (1 pass, 3 fail across
+two batches), not a one-off flake. Went further than trusting the
+assertion failure: instrumented `withFileLock` in an isolated scratch
+copy with an `fs.openSync(markerPath, 'wx')` liveness marker on
+ENTER/EXIT (same atomic O_EXCL primitive the lock itself relies on, so
+this is a direct concurrency check, not a timing-measurement artifact)
+and captured real `MARKER-VIOLATION` events — two distinct pids both had
+the critical section marked active on the same lockPath at once,
+confirmed independent of the state.json-loss inference. Root cause: the
+"re-read right before unlink" pattern (borrowed from
+`main-checkout-lock.mjs`) narrows but does not eliminate the race under
+this lock's real contention shape (10 concurrent contenders per trial,
+flat 20ms retry backoff with no jitter) — the implementer's own code
+comment already admitted this ("narrows, does not theoretically
+eliminate"), citing main-checkout-lock's own 0/30 probe as precedent, but
+that precedent's contention level was never verified to match this
+lock's. Sent back to impl-p4 as fix round 1 (of the 3-round cap) with the
+full evidence trail and two concrete directions: switch to
+`run-lock.mjs`'s stronger link-publish+generation pattern, or find an
+equivalent provably-atomic CAS-style reclaim and validate it with a
+marker-file-style direct concurrency check made a permanent part of the
+test, not just the downstream state.json-loss assertion alone.
+
 ### Work
 
 1. `withFileLock` (`provider-capacity.mjs:262-301`) reads a holder pid,
