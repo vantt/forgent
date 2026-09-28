@@ -41,20 +41,38 @@ the same audit found along the way.
   fix (S5) requires coordinating with a door that already lives there
   (`coordination/recover.mjs`).
 - Not deciding S4 (whether concurrent mutating Assignments may share a
-  cwd) by writing code first. That is a product decision — see Phase 6.
+  cwd) by writing code first. That is a product decision — see Phase 8.
 
 ## Phase 1 — Consolidate process liveness onto one judge (root cause, C2)
 
 ### Work
 
-1. Build (or promote, if `process-identity.mjs` already has the right
-   shape per the audit's own recommendation) a single module exporting
-   one record shape `{pid, bootId, startTime}` and one judge function
-   returning `live | dead | ambiguous` — using the SAME semantics as the
-   audit's own comparison table (unreadable-start-time handling, pid-reuse
-   detection via bootId+startTime, matching `resolveHolderLiveness`'s
-   already-correct behavior at `run-lock.mjs:74-85`, since the audit
-   confirms that one is well-built).
+1. **Corrected scope (Lead, 2026-09-28, verified directly against real
+   source before dispatch):** `src/runner/dispatch/process-identity.mjs`
+   already exists, but it is NOT the judge — it is a deliberately thin,
+   pure `fs`-only leaf exporting only the two raw primitives
+   (`getBootId()`, `getProcessStartTime(pid)`), with an explicit,
+   test-enforced import-graph constraint documented in its own header:
+   any module importing it (including `run-lock.mjs`, itself banned from
+   pulling in a process-control adapter per
+   `test/runner/dispatch-reconciliation-import-graph.test.mjs`) never
+   drags process-control code into its import graph. The actual JUDGE
+   function the audit confirms is well-built
+   (`resolveHolderLiveness`, `{pid, bootId, startTime} -> live | dead |
+   ambiguous`) currently lives in `run-lock.mjs:74-85`, built ON TOP OF
+   `process-identity.mjs`'s primitives, not inside it. This phase's real
+   work is EXTRACTING/PROMOTING that judge out of `run-lock.mjs` into
+   `process-identity.mjs` itself (or a clearly-named sibling module
+   re-exported the same way `cli-spawn-supervisor.mjs`'s own two names
+   were hoisted out per that file's header comment, `process-identity.mjs:6-8`)
+   so it becomes genuinely reusable — respecting the SAME import-graph
+   constraint (the judge itself has no child_process/spawn/kill
+   dependency, so it can safely live in the leaf module without violating
+   the ban). `run-lock.mjs` re-exports the name unchanged so its own
+   existing importers are unaffected — exactly the precedent
+   `cli-spawn-supervisor.mjs`'s own header already establishes for this
+   exact situation. This is a smaller, safer, more precisely-scoped
+   change than the original "build a new module" framing implied.
 2. Do NOT migrate every one of the 9+ call sites in one unit — that is
    disproportionate blast radius for one phase. Migrate only the ones
    Phases 2-4 below actually need (the per-cwd lock's string identity, the
