@@ -35,7 +35,6 @@ function publishControlGeneration(runDir, epoch) {
   fs.mkdirSync(d, { recursive: true });
   fs.writeFileSync(path.join(d, `${String(epoch).padStart(10, '0')}.json`), JSON.stringify({ epoch }));
 }
-function deadClaim(dir, assignmentId, extra = {}) { const d = path.join(dir, '.fgos', 'assignments', assignmentId); fs.mkdirSync(d, { recursive: true }); fs.writeFileSync(path.join(d, 'dispatch.claim'), JSON.stringify({ pid: 99999999, startTime: '1', ...extra })); }
 
 test('reconcile clears only a dead-proven cwd lock and replay is idempotent', () => {
   const dir = root(); deadLock(dir); const plan = planReconciliation(dir, { cwd: dir, now: '2026-09-15T00:00:00.000Z' });
@@ -293,121 +292,21 @@ test('reconcile collect-result is blocked (not refused/applied) when no result e
   assert.equal(noRunId.outcome, 'refused');
 });
 
-test('reconcile clear-assignment-claim clears a dead-holder claim when nothing is pending, and replay is idempotent', () => {
+// S5: `clear-assignment-claim` (and the `dispatch.claim` file it existed to
+// clear) was removed once `executeAssignment()`'s own `admitRunAttempt`
+// in-flight check (assignment-runner.mjs) was confirmed to fully subsume the
+// race it guarded against -- the real production `dispatch.claim` file was
+// also always 0 bytes with no holder identity, so this action could never
+// actually resolve a refusal in production (audit S5's own "two
+// half-mechanisms dead end" finding). `planReconciliation` now treats it
+// like any other unrecognized action name -- refused, plainly, never a
+// half-working door.
+test('reconcile refuses the retired clear-assignment-claim action as unsupported, never as a half-working door', () => {
   const dir = root();
   assignmentDir(dir, 'a');
-  deadClaim(dir, 'a');
-  const plan = planReconciliation(dir, { action: 'clear-assignment-claim', assignmentId: 'a', now: '2026-09-15T00:00:00.000Z' });
-  assert.equal(plan.outcome, 'planned');
-  assert.equal(plan.proposedAction.kind, 'clear-assignment-claim');
-  const applied = applyReconciliation(dir, plan, { now: '2026-09-15T00:00:01.000Z' });
-  assert.equal(applied.outcome, 'applied');
-  assert.equal(fs.existsSync(path.join(dir, '.fgos', 'assignments', 'a', 'dispatch.claim')), false);
-  const replay = applyReconciliation(dir, plan, { now: '2026-09-15T00:00:02.000Z' });
-  assert.equal(replay.outcome, 'already-applied');
-  assert.equal(replay.priorOutcome, 'applied');
-});
-
-test('reconcile clear-assignment-claim blocks when a pending (unmaterialized) launch is admitted for the assignment', () => {
-  const dir = root();
-  assignmentDir(dir, 'a');
-  deadClaim(dir, 'a');
-  admitGen(dir, 'a', 1, { runId: 'run-pending-launch', attempt: 1 });
-  // No runDirFor call: the admitted runId never materialized a run.json.
-  const plan = planReconciliation(dir, { action: 'clear-assignment-claim', assignmentId: 'a', now: '2026-09-15T00:00:00.000Z' });
-  assert.equal(plan.outcome, 'blocked');
-  assert.match(plan.reason, /pending launch/);
-  assert.equal(fs.existsSync(path.join(dir, '.fgos', 'assignments', 'a', 'dispatch.claim')), true);
-});
-
-test('reconcile clear-assignment-claim blocks when an admitted current Run has not settled', () => {
-  const dir = root();
-  assignmentDir(dir, 'a');
-  deadClaim(dir, 'a');
-  runDirFor(dir, 'a', '01', { runId: 'run-unsettled' });
-  admitGen(dir, 'a', 1, { runId: 'run-unsettled', attempt: 1 });
-  const plan = planReconciliation(dir, { action: 'clear-assignment-claim', assignmentId: 'a', now: '2026-09-15T00:00:00.000Z' });
-  assert.equal(plan.outcome, 'blocked');
-  assert.match(plan.reason, /unsettled Run/);
-});
-
-test('reconcile clear-assignment-claim blocks when the current Run settled but its result is still pending collect-result', () => {
-  const dir = root();
-  assignmentDir(dir, 'a');
-  deadClaim(dir, 'a');
-  runDirFor(dir, 'a', '01', { runId: 'run-uncollected' }, legacyResult('run-uncollected', 'a'));
-  admitGen(dir, 'a', 1, { runId: 'run-uncollected', attempt: 1 });
-  const plan = planReconciliation(dir, { action: 'clear-assignment-claim', assignmentId: 'a', now: '2026-09-15T00:00:00.000Z' });
-  assert.equal(plan.outcome, 'blocked');
-  assert.match(plan.reason, /pending collection/);
-  // Collecting the result first must unblock the claim clear.
-  const collectPlan = planReconciliation(dir, { action: 'collect-result', runId: 'run-uncollected', now: '2026-09-15T00:00:01.000Z' });
-  assert.equal(applyReconciliation(dir, collectPlan, { now: '2026-09-15T00:00:02.000Z' }).outcome, 'applied');
-  const claimPlan = planReconciliation(dir, { action: 'clear-assignment-claim', assignmentId: 'a', now: '2026-09-15T00:00:03.000Z' });
-  assert.equal(claimPlan.outcome, 'planned');
-});
-
-test('reconcile clear-assignment-claim refuses a CoordinationSession-owned claim: clearing it belongs to its own recovery door, not this one', () => {
-  const dir = root();
-  assignmentDir(dir, 'a');
-  // A real session-engine.mjs claim is 0 bytes -- no holder identity at all,
-  // which on its own would only ever reach the generic corrupt/unparseable
-  // needs-input branch. The CoordinationSession-ownership check must refuse
-  // BEFORE that parse is attempted, naming the real owning door.
-  const claimDir = path.join(dir, '.fgos', 'assignments', 'a');
-  fs.mkdirSync(claimDir, { recursive: true });
-  fs.writeFileSync(path.join(claimDir, 'dispatch.claim'), '');
-  const sessionDir = path.join(dir, '.fgos', 'coordination', 'sessions', 'sess-1');
-  fs.mkdirSync(sessionDir, { recursive: true });
-  fs.writeFileSync(path.join(sessionDir, 'session.json'), JSON.stringify({ assignmentRefs: ['a'] }));
   const plan = planReconciliation(dir, { action: 'clear-assignment-claim', assignmentId: 'a', now: '2026-09-15T00:00:00.000Z' });
   assert.equal(plan.outcome, 'refused');
-  assert.match(plan.reason, /CoordinationSession/);
-  assert.equal(fs.existsSync(path.join(claimDir, 'dispatch.claim')), true);
-});
-
-test('reconcile clear-assignment-claim needs-input on a corrupt/unparseable claim, and on conflicting admission facts', () => {
-  const dir = root();
-  assignmentDir(dir, 'a');
-  const claimDir = path.join(dir, '.fgos', 'assignments', 'a');
-  fs.mkdirSync(claimDir, { recursive: true });
-  fs.writeFileSync(path.join(claimDir, 'dispatch.claim'), '{ not json');
-  const corrupt = planReconciliation(dir, { action: 'clear-assignment-claim', assignmentId: 'a', now: '2026-09-15T00:00:00.000Z' });
-  assert.equal(corrupt.outcome, 'needs-input');
-  assert.match(corrupt.reason, /corrupt/);
-
-  const dir2 = root();
-  assignmentDir(dir2, 'b');
-  deadClaim(dir2, 'b');
-  runDirFor(dir2, 'b', '01', { runId: 'run-a' }, legacyResult('run-a', 'b'));
-  runDirFor(dir2, 'b', '02', { runId: 'run-b' }, legacyResult('run-b', 'b'));
-  admitGen(dir2, 'b', 1, { runId: 'run-a', attempt: 1 });
-  fs.writeFileSync(path.join(dir2, '.fgos', 'assignments', 'b', 'admission', 'generations', '0000000002.json'), JSON.stringify({ runId: 'run-b', attempt: 1 }));
-  const conflicting = planReconciliation(dir2, { action: 'clear-assignment-claim', assignmentId: 'b', now: '2026-09-15T00:00:00.000Z' });
-  assert.equal(conflicting.outcome, 'needs-input');
-});
-
-test('reconcile clear-assignment-claim refuses a path-escaping assignmentId and never reads/writes outside .fgos/assignments/', () => {
-  const dir = root();
-  // A file placed exactly where `../../outside-target` would resolve to
-  // (one level above `.fgos/assignments`) proves the guard refuses BEFORE
-  // ever joining the raw id into a path, not merely that the join happens
-  // to miss by chance.
-  const outsideFile = path.join(dir, '.fgos', 'outside-target', 'dispatch.claim');
-  fs.mkdirSync(path.dirname(outsideFile), { recursive: true });
-  fs.writeFileSync(outsideFile, JSON.stringify({ pid: 99999999, startTime: '1' }));
-  const plan = planReconciliation(dir, { action: 'clear-assignment-claim', assignmentId: '../outside-target', now: '2026-09-15T00:00:00.000Z' });
-  assert.notEqual(plan.outcome, 'planned');
-  assert.notEqual(plan.outcome, 'applied');
-  assert.equal(fs.existsSync(outsideFile), true, 'a path-escaping assignmentId must never reach a file outside .fgos/assignments/');
-});
-
-test('reconcile clear-assignment-claim refuses without an assignmentId, and is blocked for an unknown assignment', () => {
-  const dir = root();
-  const noId = planReconciliation(dir, { action: 'clear-assignment-claim', now: '2026-09-15T00:00:00.000Z' });
-  assert.equal(noId.outcome, 'refused');
-  const unknown = planReconciliation(dir, { action: 'clear-assignment-claim', assignmentId: 'does-not-exist', now: '2026-09-15T00:00:00.000Z' });
-  assert.equal(unknown.outcome, 'blocked');
+  assert.match(plan.reason, /unsupported reconciliation action/);
 });
 
 test('reconcile repair-projection rewrites a stale "running" status to settled once a valid terminal RunResult exists, and replay is idempotent', () => {
