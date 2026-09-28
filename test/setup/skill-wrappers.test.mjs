@@ -484,6 +484,38 @@ test('discoverCanonicalSkills discovers canonical skills across core/skills and 
   assert.equal(domainSkill.triggers.gemini, '/fgos:code-panel');
 });
 
+test('discoverCanonicalSkills discovers fgos-code-change (Phase 06/Unit I28) in domains/coding/skills', () => {
+  const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
+  const skills = discoverCanonicalSkills(repoRoot);
+
+  const codeChangeSkill = skills.find((s) => s.name === 'fgos-code-change');
+  assert.ok(codeChangeSkill, 'fgos-code-change must be discovered');
+  assert.equal(codeChangeSkill.authority, 'domain');
+  assert.equal(codeChangeSkill.domain, 'coding');
+  assert.equal(codeChangeSkill.canonicalDir, 'domains/coding/skills/fgos-code-change');
+  assert.equal(codeChangeSkill.intentId, 'fgos:code-change');
+  assert.equal(codeChangeSkill.triggers.codex, '$fgos-code-change');
+  assert.equal(codeChangeSkill.triggers.claude, '/fgos:code-change');
+  // A brand-new skill (never published under an old `/fgOS:` casing) gets no
+  // compat alias -- `knownCompat` (skill-wrappers.mjs) is a curated legacy
+  // whitelist, never a generic rule, and fgos-code-change is not on it.
+  assert.equal(codeChangeSkill.triggers.claudeCompat, null);
+  assert.equal(codeChangeSkill.triggers.gemini, '/fgos:code-change');
+});
+
+test('fgos-code-change is canonically located in domains/coding/skills and absent from core/skills', () => {
+  const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
+  const domainSource = path.join(repoRoot, 'domains', 'coding', 'skills', 'fgos-code-change', 'SKILL.md');
+  const coreSource = path.join(repoRoot, 'core', 'skills', 'fgos-code-change');
+
+  assert.ok(fs.existsSync(domainSource), 'domains/coding/skills/fgos-code-change/SKILL.md must exist as canonical source');
+  assert.equal(fs.existsSync(coreSource), false, 'core/skills/fgos-code-change must not exist to prevent duplicate canonical skill ids');
+
+  assert.doesNotThrow(() => {
+    assembleSkills(repoRoot, mkTempDir('skill-wrappers-verify-code-change-unique-'));
+  });
+});
+
 test('discoverCanonicalSkills throws when duplicate canonical skill id exists across core and domains (negative duplicate canonical skill id test)', () => {
   const root = mkTempDir('skill-discovery-dup-core-domain-');
   writeSkill(path.join(root, 'core', 'skills'), 'duplicate-skill', SAMPLE_FRONTMATTER, '# Core\n');
@@ -1509,7 +1541,14 @@ function phasesMatch(p1, p2) {
   return norm1.startsWith(norm2 + '-') || norm2.startsWith(norm1 + '-');
 }
 
-export function classifyCodePanelRequest(request, options = {}) {
+// Phase 06 (Unit I28): the mode-selection LOGIC below is shared verbatim
+// between `fgos-code-panel` (legacy) and `fgos-code-change` (the new merged
+// facade) -- Phase 6's own single mode-selection rule mechanically subsumes
+// code-panel's former M1/A1/A2/CE1-5 named sub-rules (their real effect
+// folds into "ask one question when ambiguous"), so the underlying
+// classifier does not change, only which facade name appears in its own
+// refusal text. `facadeName` parameterizes that text only.
+function classifyModeRequest(request, options, facadeName) {
   const repoRoot = options.repoRoot || path.resolve(fileURLToPath(import.meta.url), '../../..');
   const trimmed = request.trim();
 
@@ -1610,7 +1649,7 @@ export function classifyCodePanelRequest(request, options = {}) {
   if (phaseTargetMatch) {
     if (inPlanLoop) {
       throw new RecursiveDispatchError(
-        'Recursive dispatch refused: fgos-code-panel cannot open a nested planned-multi-cell track from within an active plan-loop cell'
+        `Recursive dispatch refused: ${facadeName} cannot open a nested planned-multi-cell track from within an active plan-loop cell`
       );
     }
     const namedPhase = phaseTargetMatch[1];
@@ -1647,7 +1686,7 @@ export function classifyCodePanelRequest(request, options = {}) {
   if (explicitRunPlanMatch) {
     if (inPlanLoop) {
       throw new RecursiveDispatchError(
-        'Recursive dispatch refused: fgos-code-panel cannot open a nested planned-multi-cell track from within an active plan-loop cell'
+        `Recursive dispatch refused: ${facadeName} cannot open a nested planned-multi-cell track from within an active plan-loop cell`
       );
     }
     const cleanPath = explicitRunPlanMatch[1].replace(/^\.\//, '');
@@ -1665,7 +1704,7 @@ export function classifyCodePanelRequest(request, options = {}) {
   if (/^plans\/[^\s,;]+\/(?:plan\.md|phase-[^\s,;]+\.md)$/i.test(normalizedBare)) {
     if (inPlanLoop) {
       throw new RecursiveDispatchError(
-        'Recursive dispatch refused: fgos-code-panel cannot open a nested planned-multi-cell track from within an active plan-loop cell'
+        `Recursive dispatch refused: ${facadeName} cannot open a nested planned-multi-cell track from within an active plan-loop cell`
       );
     }
     return { mode: 'planned-multi-cell', planPath: normalizedBare };
@@ -1687,7 +1726,7 @@ export function classifyCodePanelRequest(request, options = {}) {
 
     if (inPlanLoop) {
       throw new RecursiveDispatchError(
-        'Recursive dispatch refused: fgos-code-panel cannot open a nested planned-multi-cell track from within an active plan-loop cell'
+        `Recursive dispatch refused: ${facadeName} cannot open a nested planned-multi-cell track from within an active plan-loop cell`
       );
     }
 
@@ -1715,6 +1754,17 @@ export function classifyCodePanelRequest(request, options = {}) {
     ...(target ? { target } : {}),
     ...(inPlanLoop ? { guarded: true } : {})
   };
+}
+
+export function classifyCodePanelRequest(request, options = {}) {
+  return classifyModeRequest(request, options, 'fgos-code-panel');
+}
+
+// Phase 06 (Unit I28): fgos-code-change's own mode-detection function. Same
+// underlying classifier as classifyCodePanelRequest (see the comment above
+// classifyModeRequest) -- only the refusal text names the new facade.
+export function classifyCodeChangeRequest(request, options = {}) {
+  return classifyModeRequest(request, options, 'fgos-code-change');
 }
 
 export function validateCodePanelNoPlanLoopDuplication(skillContent) {
@@ -2617,6 +2667,110 @@ test('Recursive Dispatch Guard (R2 / H1): prevents nested multi-cell dispatch fr
   assert.equal(cellInternal.mode, 'direct-single-cell');
   assert.equal(cellInternal.guarded, true);
   assert.equal(cellInternal.target, 'src/auth.mjs');
+});
+
+// ─── Phase 06 (Unit I28): fgos-code-change mode-detection parity ───
+//
+// classifyCodeChangeRequest shares its underlying classifier verbatim with
+// classifyCodePanelRequest (see the comment above classifyModeRequest) --
+// Phase 6's own single mode-selection rule mechanically subsumes
+// fgos-code-panel's former M1/A1/A2/CE1-5 named sub-rules, folding their
+// real effect into "ask one question when ambiguous." Since the code path
+// is identical, this is a representative parity subset covering every
+// category the 78 fgos-code-panel fixtures above exercise (bare plan path,
+// explicit run verb, track-by-name, negation with/without an alternate
+// target, edit-target, inspection verb, phase-mismatch refusal, R2 guard,
+// direct default) -- not a full duplicate of all 78, which would exercise
+// the exact same code path for zero additional coverage (DRY). The
+// fgos-code-panel fixtures above are left untouched; Unit I29 retargets
+// them once fgos-code-panel itself becomes a deprecated stub.
+
+test('Phase 06 (I28) Mode-Selection: bare plan path opens plan mode', () => {
+  const res = classifyCodeChangeRequest('plans/260915-foo/plan.md');
+  assert.equal(res.mode, 'planned-multi-cell');
+  assert.equal(res.planPath, 'plans/260915-foo/plan.md');
+});
+
+test('Phase 06 (I28) Mode-Selection: explicit run verb directed at a plan opens plan mode', () => {
+  const res = classifyCodeChangeRequest('run plans/260915-foo/plan.md');
+  assert.equal(res.mode, 'planned-multi-cell');
+  assert.equal(res.planPath, 'plans/260915-foo/plan.md');
+});
+
+test('Phase 06 (I28) Mode-Selection: track referenced by name resolves to plan mode (CE1 folded into the single rule)', () => {
+  const res = classifyCodeChangeRequest('resume the code-panel-multicell-facade track');
+  assert.equal(res.mode, 'planned-multi-cell');
+  assert.equal(res.track, 'code-panel-multicell-facade');
+});
+
+test('Phase 06 (I28) Mode-Selection: unresolvable bare track name is refused, never guessed', () => {
+  assert.throws(
+    () => classifyCodeChangeRequest('run the completely-fictitious-track track'),
+    AmbiguousIntentError,
+  );
+});
+
+test('Phase 06 (I28) Mode-Selection: negation with an alternate target stays single-cell mode', () => {
+  const res = classifyCodeChangeRequest("don't run plans/260915-foo/plan.md yet, just fix src/foo.mjs");
+  assert.equal(res.mode, 'direct-single-cell');
+  assert.equal(res.target, 'src/foo.mjs');
+});
+
+test('Phase 06 (I28) Mode-Selection: negation with no alternate target is refused, never fabricated', () => {
+  assert.throws(
+    () => classifyCodeChangeRequest("don't run plans/260915-foo/plan.md yet"),
+    AmbiguousIntentError,
+  );
+});
+
+test('Phase 06 (I28) Mode-Selection: plan file as edit target stays single-cell mode', () => {
+  const res = classifyCodeChangeRequest('fix the typo in plans/260915-foo/plan.md');
+  assert.equal(res.mode, 'direct-single-cell');
+  assert.equal(res.target, 'plans/260915-foo/plan.md');
+});
+
+test('Phase 06 (I28) Mode-Selection: inspection verb on a plan stays single-cell mode', () => {
+  const res = classifyCodeChangeRequest('review plans/260915-foo/plan.md');
+  assert.equal(res.mode, 'direct-single-cell');
+  assert.equal(res.role, 'inspection');
+});
+
+test('Phase 06 (I28) Mode-Selection: phase selection mismatch against chain throws PhaseSelectionMismatchError', () => {
+  assert.throws(
+    () => classifyCodeChangeRequest('run phase-03 of plans/260915-foo/plan.md', { nextUnmergedPhase: 'phase-02-foo' }),
+    PhaseSelectionMismatchError,
+  );
+});
+
+test('Phase 06 (I28) Mode-Selection: imperative mood ambiguity (question) is refused, never guessed', () => {
+  assert.throws(
+    () => classifyCodeChangeRequest('should I run plans/260915-foo/plan.md now?'),
+    AmbiguousIntentError,
+  );
+});
+
+test('Phase 06 (I28) Recursive Dispatch Guard (R2): prevents nested plan-mode dispatch from within an active cell', () => {
+  assert.throws(
+    () => classifyCodeChangeRequest('run this implementation plan: plans/260915-foo/plan.md', { inPlanLoop: true }),
+    RecursiveDispatchError,
+  );
+  assert.throws(
+    () => classifyCodeChangeRequest('run plans/260915-foo/plan.md', { coordinationId: 'track--cell-01' }),
+    RecursiveDispatchError,
+  );
+
+  const cellInternal = classifyCodeChangeRequest('implement fix for auth bug in src/auth.mjs', {
+    coordinationId: 'code-change--slug-01',
+  });
+  assert.equal(cellInternal.mode, 'direct-single-cell');
+  assert.equal(cellInternal.guarded, true);
+  assert.equal(cellInternal.target, 'src/auth.mjs');
+});
+
+test('Phase 06 (I28) Mode-Selection: direct code change request defaults to single-cell mode', () => {
+  const res = classifyCodeChangeRequest('implement fix for auth bug in src/auth.mjs');
+  assert.equal(res.mode, 'direct-single-cell');
+  assert.equal(res.target, 'src/auth.mjs');
 });
 
 export function resolveCodePanelPlannedResumeState(input = {}) {
