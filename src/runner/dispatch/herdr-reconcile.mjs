@@ -159,23 +159,34 @@ export function readHerdrLaunchCommand(runDir, launchCommandId) {
  *   controller/commands record, or one with no `paneId` yet) -- mirrors
  *   `isCliSpawnRunStillWorking`'s own "nothing to check" `false` for the
  *   equivalent case.
- * - `true`/`false` when herdr answered: a foreground process in the pane
- *   other than its own shell means the agent is still doing real work
- *   (same "liveness rung of the signal ladder" `paneProcessInfo` itself
- *   documents, and the same interpretation this file's own reconcile probe
- *   already uses).
- * - `'unknown'` (never a plain boolean) when the herdr call itself failed or
- *   timed out -- genuinely undecidable, not "confirmed dead". Deliberately
- *   FAIL CLOSED: `admitRunAttempt`'s M1 check must treat `'unknown'` the
- *   same as "still working" (both are truthy, so a plain `||` already does
- *   this) and refuse the new attempt, matching this track's own repeated
- *   "fail closed on undecidable liveness, never fail open" rule elsewhere
- *   (`resolveMutatingCwdPosture`, the composite-pid AMBIGUOUS lock status).
- *   An operator who has independently confirmed the prior attempt is
- *   genuinely gone already has an escape valve for exactly this shape --
- *   `--force-new-attempt` (M1's own existing "a prior attempt this host can
- *   no longer observe correctly" case) -- so failing closed here costs
- *   nothing new, it only reuses that existing door.
+ * - `true`/`false` when herdr answered with a real classification. Prefers
+ *   `client.agentGet(paneId)`'s own semantic `agent_status` (herdr >=0.9.1:
+ *   `idle|working|blocked|done|unknown`) over inferring liveness from raw
+ *   foreground-process presence -- a process can be present while the agent
+ *   itself is idle/done (between turns, cleaning up), and `agent_status`
+ *   answers "is this agent still doing real work" directly instead of by
+ *   inference. `working` and `blocked` both count as still working: a
+ *   `blocked` agent (paused on its own question, e.g. a permission prompt)
+ *   is a live, unsettled attempt, not a finished one -- admitting a second
+ *   attempt over it would still be the exact double-materialization this
+ *   check exists to prevent. Falls back to the OLDER `paneProcessInfo`
+ *   foreground-process check (this file's own original implementation, kept
+ *   verbatim below) only when `agentGet` itself fails outright (herdr
+ *   <0.9.1, a socket hiccup) -- mirrors this same file's own reconcile probe
+ *   above, which already tries `agentGet` first and falls back the same way.
+ * - `'unknown'` (never a plain boolean) when herdr's own classification is
+ *   itself `'unknown'`, or when BOTH the `agentGet` and `paneProcessInfo`
+ *   calls failed/timed out -- genuinely undecidable, not "confirmed dead".
+ *   Deliberately FAIL CLOSED: `admitRunAttempt`'s M1 check must treat
+ *   `'unknown'` the same as "still working" (both are truthy, so a plain
+ *   `||` already does this) and refuse the new attempt, matching this
+ *   track's own repeated "fail closed on undecidable liveness, never fail
+ *   open" rule elsewhere (`resolveMutatingCwdPosture`, the composite-pid
+ *   AMBIGUOUS lock status). An operator who has independently confirmed the
+ *   prior attempt is genuinely gone already has an escape valve for exactly
+ *   this shape -- `--force-new-attempt` (M1's own existing "a prior attempt
+ *   this host can no longer observe correctly" case) -- so failing closed
+ *   here costs nothing new, it only reuses that existing door.
  */
 export async function isHerdrSpawnRunStillWorking(runDir, { herdrClient, herdrBin, cwd, env, timeoutMs = 5000 } = {}) {
   const commandsDir = path.join(runDir, 'controller', 'commands');
@@ -200,6 +211,18 @@ export async function isHerdrSpawnRunStillWorking(runDir, { herdrClient, herdrBi
   // herdr-reconcile.mjs). The expression itself is the same one-liner.
   const resolvedHerdrBin = (herdrBin && herdrBin.trim()) || (env ?? process.env).FGOS_HERDR_BIN?.trim() || 'herdr';
   const client = herdrClient ?? createHerdrClient({ herdrBin: resolvedHerdrBin, cwd, env });
+
+  try {
+    const { agentStatus } = client.agentGet(paneId);
+    if (agentStatus === 'working' || agentStatus === 'blocked') return true;
+    if (agentStatus === 'idle' || agentStatus === 'done') return false;
+    if (agentStatus === 'unknown') return 'unknown';
+    // Any other/unrecognized status string (a future herdr version adding a
+    // new state this code doesn't know yet): fall through to the
+    // process-presence check below rather than guessing either way.
+  } catch {
+    // agentGet failed outright -- fall through to the process check below.
+  }
 
   let pInfo;
   try {
