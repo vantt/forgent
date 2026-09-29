@@ -613,6 +613,144 @@ answer proceeds. Phase 5's own decision (delete vs. give `dispatch.claim`
 a real identity) does NOT depend on these two; phases can otherwise
 proceed independently of this phase's own timing except where noted.
 
+STATUS: DECIDED (2026-09-29), unit/P8, implementation in progress. Both
+gates discussed at length with the user (not guessed) before recording.
+
+**S4 decision: extend `acquireMainCheckoutLock` to the shared Assignment
+admission path, as a mutex with a visible-holder refusal and an explicit
+override -- NOT an absolute ban on mutating the main checkout.** An
+earlier draft of this decision (rejected by the user) proposed adopting
+`resolveMutatingCwdPosture`'s existing HARD rule (`execution-contract.mjs`
+-- "mutating dispatch must never target the main checkout", already
+enforced for the narrower inline/declared-operation dispatch path) for
+the general path too. Correctly rejected: sometimes a real Assignment
+must mutate the main checkout, and an unconditional ban would block that.
+The right precedent instead is `acquireMainCheckoutLock` itself (already
+used by `claimWork`/`executeExecutorCli`/`withMergeTargetSlot`) -- verified
+via source (`main-checkout-lock.mjs:422`) to already be per-`dir`, not a
+single global lock, so it generalizes to any cwd without new design. It
+does not forbid anything; it serializes concurrent mutating access to the
+SAME cwd and makes the conflict visible (refusal names the holder pid/age/
+remaining TTL) exactly the way this track's own `--force-new-attempt`
+precedent already works for the analogous same-Assignment-retry case. A
+speculative "passive fgos doctor visibility check" idea was raised and then
+explicitly withdrawn -- not evidence-based, nothing observed calls for it;
+the lock's own refusal message already provides the needed visibility as
+a side effect, unlike S1-S3 this gap has no real production reproduction,
+only a code-audit-found theoretical one.
+
+Investigation while discussing S4 surfaced that `admitRunAttempt` is
+called from a SHARED admission path used by BOTH the `cli-spawn` and
+`herdr-spawn` adapters (`assignment-runner.mjs:2173`'s own
+`needsAssignmentLaunchContext` check) -- so placing the lock at the
+admission layer (not adapter-specific code) naturally covers both
+without separate wiring.
+
+**New finding, folded into this phase (user's own call, not deferred to a
+separate backlog row): herdr-spawn has no equivalent to Phase 2's own S1
+fix.** `isCliSpawnRunStillWorking` (Phase 2) reads local supervisor/worker
+binding files + `process.kill(pid,0)` -- fast, local, deterministic,
+never fails for a reason other than "process is/isn't there".
+herdr-spawn's own liveness signal, `paneProcessInfo` (`herdr-agent.mjs:246`),
+SPAWNS A REAL `herdr` CLI SUBPROCESS with its own `timeoutMs` and can fail
+with `herdr_unavailable`/`herdr_call_timeout` -- a structurally different,
+non-deterministic-availability probe that cannot be safely called inline
+inside `admitRunAttempt`'s own synchronous CAS critical section (this
+track's own Phase 4/5 hardened that section specifically to never block on
+anything external). This means a SIGKILLed herdr-spawn runner whose pane/
+agent is still alive (herdr's whole design point: the pane deliberately
+outlives the runner, same as cli-spawn's detached worker) is invisible to
+admission today -- the same CLASS of bug S1 fixed for cli-spawn, unaddressed
+for herdr-spawn because this track never touched it.
+
+**Both cli-spawn's and herdr-spawn's own liveness checks are two
+implementations of the same underlying role, not two unrelated
+mechanisms**: "is the detached run this admission decision cares about
+still doing real work, independent of whether the process that dispatched
+it is still alive?" Naming this role `detached-run-supervisor` (see C4
+below) frames S1's own fix and this new herdr-spawn gap as the SAME
+interface with two adapter-specific implementations:
+- `isCliSpawnRunStillWorking` (existing, unchanged) -- local fs-binding
+  implementation for the `cli-spawn` adapter.
+- `isHerdrSpawnRunStillWorking` (new, this phase's own scope) -- herdr
+  pane-query implementation for the `herdr-spawn` adapter, calling
+  `paneProcessInfo` OUTSIDE `admitRunAttempt`'s own CAS critical section
+  (a bounded, best-effort pre-check whose RESULT is carried into the
+  section, the same shape `isCliSpawnRunStillWorking` already uses --
+  never the live herdr call itself inside the lock).
+
+**C4 decision: record the real architectural split as vocabulary, not "one
+engine vs a duplicate."** Investigation (reading `invocation_service.rs`,
+`operation_provider_router.rs`, `providers/external_process/{supervisor,
+adapter,registry}.rs`, `apps/fgos/src/legacy_exec.rs`, and this repo's own
+`docs/platform/host-invocation-routing/architecture/invocation-kernel.md`)
+found THREE mechanisms, not two, and no live conflict today:
+1. `apps/fgos/src/legacy_exec.rs` -- the real, current Node-compat bridge
+   for the 73 `legacy-cli` routes. Already documented as a deliberate,
+   temporary bypass ("Legacy CLI routes bypass the kernel... keep bypass
+   behavior until each selector migrates", invocation-kernel.md) -- not an
+   open question.
+2. `packages/host-runtime/rust/src/providers/external_process/*`
+   (~1700 lines: supervisor.rs, adapter.rs, registry.rs) -- a real,
+   already-implemented, already-tested generic `OperationProvider` for
+   "verb backed by an external CLI process", going through the kernel's
+   real `InvocationService` pipeline (admit/route/grant/invoke/record).
+   Zero current consumers (only 2 `native` routes exist -- `gate-bypass`,
+   `version` -- and neither uses it). This IS the sanctioned mechanism for
+   the user's own stated future direction (components may ship their own
+   CLI, Rust preferred but not required) -- not dead code to delete.
+   Confirmed via its own header ("Spawns and supervises the provider
+   process ONLY at invocation time") and short default deadlines
+   (`startup_timeout: 2000ms`, `request_timeout: 5000ms`) that this is
+   scoped to a SHORT, request/response-style, invocation-bound external
+   call (an RPC-shaped call over a framed `fgos.component.v1` protocol,
+   `frame_codec`) -- confirmed via source it has NO detach/process-group/
+   session logic at all (`grep` for `detach|setsid|process_group` in
+   `supervisor.rs`: no matches).
+3. `src/runner/dispatch/cli-spawn-supervisor.mjs` (Node, 1208 lines) -- a
+   different concern entirely: supervises a long-running (potentially
+   many minutes) AGENT/EXECUTOR run for an Assignment, deliberately
+   DETACHED so the run survives the crash of whatever dispatched it
+   (confirmed via source: `startSupervisorProcess`'s own detached spawn,
+   PGID-based kill, immutable receipt publication, supervisor/worker
+   binding files Phase 2 later reads back).
+
+(2) and (3) are not competing implementations of the same role -- they
+answer different questions ("run a short RPC-shaped call tied to this
+invocation's own lifetime" vs. "run a long agent job that must outlive its
+own caller"). The audit's "will become a real duplicate" framing was
+about (1) being gradually SUPERSEDED by (2) as routes migrate to `native`
+(sequential replacement, per the kernel doc's own stated plan), not (2)
+and (3) colliding.
+
+**Vocabulary decided** (to be recorded in `docs/decisions/` and used going
+forward, named after the load-bearing axis -- lifecycle/detachment -- not
+current content, so the names stay correct if either mechanism's real use
+case shifts later):
+- **`detached-run-supervisor`** -- the role `cli-spawn-supervisor.mjs`
+  fills: a supervised run that is deliberately detached and must survive
+  the crash of whatever dispatched it. Two known implementations today:
+  `isCliSpawnRunStillWorking` (cli-spawn adapter) and the new
+  `isHerdrSpawnRunStillWorking` (herdr-spawn adapter, this phase).
+- **`bound-invocation-supervisor`** -- the role `supervisor.rs`
+  (`providers/external_process/*`) fills: a supervised external-process
+  call bound to one invocation's own lifetime, never detached, never
+  expected to outlive its caller.
+- The decision note itself must anchor on this lifecycle test (detached
+  + crash-surviving vs. bound + caller-lifetime), not on "agent" vs.
+  "RPC" content labels, so a future reuse of either mechanism for
+  different content is judged by the right property.
+
+**Rename, in scope for this phase (user's own call, done now rather than
+deferred):** `cli-spawn-supervisor.mjs` and its adapter-specific exported
+symbols renamed to reflect `detached-run-supervisor`; `supervisor.rs`
+(and its module path under `providers/external_process/`) renamed to
+reflect `bound-invocation-supervisor`. Use this repo's own `rename` tool
+(GitNexus) per this project's own instruction ("NEVER rename symbols with
+find-and-replace"), not a manual find-and-replace. 16 real JS import
+sites + 7 real Rust reference sites confirmed via source before starting
+(not a guess at blast radius).
+
 ## Verification strategy
 
 Every phase above requires a REAL test reproducing the audit's own
