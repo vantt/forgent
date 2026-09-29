@@ -616,6 +616,25 @@ proceed independently of this phase's own timing except where noted.
 STATUS: DECIDED (2026-09-29), unit/P8, implementation in progress. Both
 gates discussed at length with the user (not guessed) before recording.
 
+SUB-UNIT STATUS:
+- **unit/P8b-rust MERGED** (2026-09-29). `e589577c1`, integratedSha
+  `a8fb5fc7b`. Rust `providers/external_process` supervisor renamed to
+  `BoundInvocationSupervisor`/`bound_invocation_supervisor.rs`; both
+  re-export layers updated consistently; zero remaining old-name
+  references confirmed via full-repo grep. `docs/decisions/` D-ADR0043
+  recorded via this repo's own `fgos decision write`/`decision-index`
+  (hand-authored `docs/decisions/*.md` corpus is retired, tsk-1lv-4) --
+  first write landed without its D-ADR id number (a formatting miss,
+  caught and superseded with a corrected entry after confirming 0043 was
+  free of collision against the real highest existing id, 0042). Lead
+  independently reran `cargo build --workspace` and `cargo test
+  --workspace`: clean, 177/177 pass. See
+  plans/260928-2327-dispatch-engine-liveness-hardening/reports/unit-P8b-rust-claude-only-execution-report.md.
+- **unit/P8a IN PROGRESS** (S4 cwd mutex + herdr-spawn liveness gap,
+  JS-side). Runs after P8b-rust merged; the remaining JS-side rename of
+  `cli-spawn-supervisor.mjs` to reflect `detached-run-supervisor` waits
+  for P8a to merge first (both touch `assignment-runner.mjs`).
+
 **S4 decision: extend `acquireMainCheckoutLock` to the shared Assignment
 admission path, as a mutex with a visible-holder refusal and an explicit
 override -- NOT an absolute ban on mutating the main checkout.** An
