@@ -9,7 +9,7 @@
 
 import fs from 'node:fs';
 import { isAssessmentRequired } from './agent-result-claim-contract.mjs';
-
+import { classifyRunEvidence } from './settlement.mjs';
 export const RUN_RESULT_CONTRACT = Object.freeze({ id: 'assignment-run-result', version: 2 });
 
 export const EXECUTION_STATUSES = Object.freeze(['completed', 'failed', 'cancelled', 'completion-unknown']);
@@ -20,6 +20,16 @@ export const POLICY_DISPOSITIONS = Object.freeze(['allow', 'refuse', 'needs-inpu
 export const DELIVERY_MODES = Object.freeze(['fresh', 'resumed', 'replayed', 'recovered', 'legacy-derived']);
 export const PROVENANCE_VALUES = Object.freeze(['native-v2', 'legacy-derived', 'contract-corrupt']);
 export const RECOGNIZED_LEGACY_STATUSES = Object.freeze(['done', 'failed', 'blocked', 'no-evidence']);
+
+export const CORRUPT_CLASSIFICATION = Object.freeze({
+  execution: Object.freeze({ status: 'completion-unknown', exitCode: null }),
+  assessment: Object.freeze({ verdict: 'inconclusive' }),
+  confidence: Object.freeze({ level: 'failed', basis: Object.freeze(['contract-corrupt']) }),
+  failure: Object.freeze({ family: 'contract', code: 'contract-corrupt' }),
+  policy: Object.freeze({ disposition: 'refuse', code: 'corrupt-result' }),
+  delivery: Object.freeze({ mode: 'legacy-derived' }),
+  provenance: 'contract-corrupt',
+});
 
 /**
  * Project canonical classification to legacy status string.
@@ -660,10 +670,7 @@ export function interpretRunResult(input, options = {}) {
       return {
         ...rawObj,
         contract: { ...RUN_RESULT_CONTRACT },
-        classification: {
-          ...(rawObj.classification || {}),
-          provenance: 'contract-corrupt',
-        },
+        classification: { ...CORRUPT_CLASSIFICATION },
         status: 'no-evidence',
         confidence: 'failed',
         contractCorrupt: true,
@@ -679,10 +686,7 @@ export function interpretRunResult(input, options = {}) {
     return {
       ...rawObj,
       contract: { ...RUN_RESULT_CONTRACT },
-      classification: {
-        ...(rawObj.classification || {}),
-        provenance: 'contract-corrupt',
-      },
+        classification: { ...CORRUPT_CLASSIFICATION },
       status: 'no-evidence',
       confidence: 'failed',
       contractCorrupt: true,
@@ -781,7 +785,7 @@ export function interpretRunResult(input, options = {}) {
   } else if (legacyStatus === 'done') {
     execStatus = 'completed';
     exitCode = exitCode ?? 0;
-    assessVerdict = legacyConfidence === 'verified' ? 'pass' : 'inconclusive';
+    assessVerdict = 'pass';
     failure = null;
   } else {
     execStatus = 'completed';
@@ -842,4 +846,212 @@ export function interpretRunResult(input, options = {}) {
   };
 
   return derivedView;
+}
+
+/**
+ * Outcome categories ordered from highest to lowest confidence/precedence.
+ */
+export const OUTCOME_CATEGORIES = Object.freeze(['ok', 'verdict', 'blocked', 'policy', 'infra', 'corrupt']);
+
+/**
+ * Derive high-level outcome from RunResult classification.
+ * Rules evaluated in strict order (Red Team finding #1):
+ * 1. execution.status in {failed, cancelled, completion-unknown} and failure.family in {provider, resource, unknown} (or no failure) -> infra
+ * 2. policy.disposition === 'refuse' OR failure.family in {contract, policy} -> policy
+ * 3. policy.disposition === 'needs-input' -> infra
+ * 4. verdict === 'findings' -> verdict
+ * 5. verdict === 'blocked' -> blocked
+ * 6. execution.status === 'completed' and verdict in {pass, not-applicable} -> ok
+ * 7. remaining (e.g. inconclusive) -> verdict
+ *
+ * @param {object} classification
+ * @returns {Readonly<{category: 'ok'|'infra'|'verdict'|'policy'|'blocked'|'corrupt', reason: string}>}
+ */
+export function deriveOutcome(classification) {
+  if (!classification || typeof classification !== 'object') {
+    return Object.freeze({
+      category: 'corrupt',
+      reason: 'classification must be a non-null object',
+    });
+  }
+
+  if (classification.provenance === 'contract-corrupt') {
+    return Object.freeze({
+      category: 'corrupt',
+      reason: 'classification provenance is contract-corrupt',
+    });
+  }
+
+  const execStatus = classification.execution?.status;
+  const failureFamily = classification.failure?.family;
+  const policyDisp = classification.policy?.disposition;
+  const verdict = classification.assessment?.verdict;
+
+  // Rule 1: execution failed/cancelled/unknown with provider/resource/unknown failure (or no failure)
+  const isFailedExec = execStatus === 'failed' || execStatus === 'cancelled' || execStatus === 'completion-unknown';
+  const isInfraFailure = failureFamily === 'provider' || failureFamily === 'resource' || failureFamily === 'unknown' || !failureFamily;
+  if (isFailedExec && isInfraFailure) {
+    return Object.freeze({
+      category: 'infra',
+      reason: classification.failure?.code ?? (execStatus || 'execution-failed'),
+    });
+  }
+
+  // Rule 2: policy refusal or contract/policy failure family
+  if (policyDisp === 'refuse' || failureFamily === 'contract' || failureFamily === 'policy') {
+    return Object.freeze({
+      category: 'policy',
+      reason: classification.policy?.code ?? classification.failure?.code ?? 'policy-refused',
+    });
+  }
+
+  // Rule 3: policy disposition needs-input -> infra (provider/resource requires human)
+  if (policyDisp === 'needs-input') {
+    return Object.freeze({
+      category: 'infra',
+      reason: classification.policy?.code ?? 'needs-input',
+    });
+  }
+
+  // Rule 4: reviewer findings
+  if (verdict === 'findings') {
+    return Object.freeze({
+      category: 'verdict',
+      reason: 'reviewer-findings',
+    });
+  }
+
+  // Rule 5: blocked verdict
+  if (verdict === 'blocked') {
+    return Object.freeze({
+      category: 'blocked',
+      reason: 'verdict-blocked',
+    });
+  }
+
+  // Rule 6: completed execution with pass or not-applicable verdict
+  if (execStatus === 'completed' && (verdict === 'pass' || verdict === 'not-applicable')) {
+    return Object.freeze({
+      category: 'ok',
+      reason: 'completed-pass',
+    });
+  }
+
+  // Rule 7: remaining (e.g. inconclusive) -> verdict
+  return Object.freeze({
+    category: 'verdict',
+    reason: `verdict-${verdict ?? 'inconclusive'}`,
+  });
+}
+
+/**
+ * Derive outcome for legacy v1 RunResult.
+ *
+ * @param {object} recordV1
+ * @returns {Readonly<{category: 'ok'|'infra'|'verdict'|'policy'|'blocked'|'corrupt', reason: string}>}
+ */
+export function deriveLegacyOutcome(recordV1) {
+  const interpreted = interpretRunResult(recordV1);
+  return deriveOutcome(interpreted.classification);
+}
+
+/**
+ * Unified helper for reading RunResult outcome.
+ * Single path for all dispatch, coordination, loop, show, and legality decisions.
+ *
+ * @param {object|string} resultOrPath
+ * @param {object} [options]
+ * @param {object} [options.evidenceFloor]
+ * @returns {Readonly<{
+ *   category: 'ok'|'infra'|'verdict'|'policy'|'blocked'|'corrupt',
+ *   executed: 'completed'|'failed'|'cancelled'|'unknown',
+ *   verdict: 'pass'|'findings'|'blocked'|'inconclusive'|'not-applicable',
+ *   refused: boolean,
+ *   evidence: 'verified'|'reported'|'inferred'|'none'|'failed',
+ *   satisfied: boolean,
+ *   infraFailure: boolean,
+ *   failure: object|null
+ * }>}
+ */
+export function runOutcome(resultOrPath, { evidenceFloor } = {}) {
+  const result = typeof resultOrPath === 'string'
+    ? interpretRunResult(resultOrPath)
+    : (resultOrPath?.classification !== undefined || resultOrPath?.contract !== undefined
+      ? interpretRunResult(resultOrPath)
+      : interpretRunResult(resultOrPath));
+
+  // Fail-closed with corrupt records
+  if (
+    !result ||
+    result.corrupt ||
+    result.contractCorrupt ||
+    result.resultCorrupt ||
+    result.classification?.provenance === 'contract-corrupt'
+  ) {
+    return Object.freeze({
+      category: 'corrupt',
+      executed: 'unknown',
+      verdict: 'inconclusive',
+      refused: true,
+      evidence: 'failed',
+      satisfied: false,
+      infraFailure: true,
+      failure: result?.classification?.failure ?? { family: 'contract', code: 'corrupt-record' },
+    });
+  }
+
+  // Extract / derive outcome
+  let outcome = result.classification?.outcome?.category
+    ? result.classification.outcome
+    : deriveOutcome(result.classification);
+
+  let category = outcome.category;
+  let evidence = result.classification?.confidence?.level ?? 'none';
+
+  // Apply evidenceFloor downgrade if provided
+  if (evidenceFloor && typeof evidenceFloor === 'object') {
+    const derived = classifyRunEvidence({
+      exitCode: typeof evidenceFloor.exitCode === 'number' ? evidenceFloor.exitCode : null,
+      signal: typeof evidenceFloor.signal === 'string' ? evidenceFloor.signal : null,
+      isTimeout: evidenceFloor.isTimeout === true,
+      agentClaim: evidenceFloor.agentClaim ?? null,
+      claimInvalid: evidenceFloor.claimInvalid === true,
+      workerArtifacts: Array.isArray(evidenceFloor.workerArtifacts) ? evidenceFloor.workerArtifacts : [],
+      changedFiles: Array.isArray(evidenceFloor.changedFiles) ? evidenceFloor.changedFiles : [],
+      hasDirtyBeforeMutation: evidenceFloor.hasDirtyBeforeMutation === true,
+      isReadOnlyOperation: evidenceFloor.isReadOnlyOperation === true,
+      repoRoot: evidenceFloor.repoRoot ?? process.cwd(),
+    });
+
+    const settlesAdvance = category === 'ok' && (evidence === 'reported' || evidence === 'verified');
+    const derivedAdvances = derived.status === 'done' && (derived.confidence === 'reported' || derived.confidence === 'verified');
+
+    if (!derivedAdvances || settlesAdvance) {
+      if (derived.status === 'failed') {
+        category = 'infra';
+        evidence = derived.confidence ?? 'failed';
+      } else if (derived.status === 'no-evidence') {
+        category = 'infra';
+        evidence = 'none';
+      }
+    }
+  }
+
+  const executed = result.classification?.execution?.status ?? 'unknown';
+  const verdict = result.classification?.assessment?.verdict ?? 'inconclusive';
+  const refused = category === 'policy' || result.classification?.policy?.disposition === 'refuse';
+  const satisfied = category === 'ok';
+  const infraFailure = category === 'infra' || category === 'corrupt';
+  const failure = result.classification?.failure ?? null;
+
+  return Object.freeze({
+    category,
+    executed,
+    verdict,
+    refused,
+    evidence,
+    satisfied,
+    infraFailure,
+    failure,
+  });
 }
