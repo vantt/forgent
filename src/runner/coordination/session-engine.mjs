@@ -92,7 +92,7 @@ import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 // status:'no-evidence'/confidence:'failed' deterministically; this engine's
 // quorum/fan-in gates already read those two compat fields, so nothing
 // downstream needs to change to fail closed on it.
-import { interpretRunResult } from '../dispatch/run-result.mjs';
+import { interpretRunResult, runOutcome } from '../dispatch/run-result.mjs';
 // M14: the herdr-spawn worker report lives at outbox/report-N.md, not the
 // flat agent-report.md a cli-spawn worker uses -- worker-artifacts.mjs is
 // the one function that already knows to check both (assignment-runner.mjs's
@@ -3326,15 +3326,16 @@ export function synthesizeResearchFanIn(coordinationId, { branchActorIds, contra
       continue;
     }
     const runResult = readLinkedRunResultFromDisk(fgosDir, assignmentId, linkedEvent.payload.runId);
+    const outcome = runOutcome(runResult);
 
-    if (runResult.status === 'failed' || runResult.confidence === 'failed' || runResult.confidence === 'no-evidence') {
-      failed.push({ actorId, assignmentId, runId: runResult.runId, status: runResult.status, confidence: runResult.confidence });
-    } else if (runResult.confidence === 'verified') {
-      accepted.push({ actorId, assignmentId, runId: runResult.runId, confidence: runResult.confidence });
+    if (outcome.infraFailure) {
+      failed.push({ actorId, assignmentId, runId: runResult.runId, status: outcome.category, confidence: outcome.evidence });
+    } else if (outcome.satisfied && outcome.evidence === 'verified') {
+      accepted.push({ actorId, assignmentId, runId: runResult.runId, confidence: outcome.evidence });
     } else {
-      // 'reported' / 'inferred': recorded explicitly, NEVER promoted into
-      // `accepted` -- the evidence-laundering guard R7 requires.
-      unverified.push({ actorId, assignmentId, runId: runResult.runId, confidence: runResult.confidence });
+      // 'reported' / 'inferred' or non-ok verdict/policy/blocked: recorded explicitly,
+      // NEVER promoted into `accepted` -- the evidence-laundering guard R7 requires.
+      unverified.push({ actorId, assignmentId, runId: runResult.runId, confidence: outcome.evidence });
     }
   }
 
@@ -3687,18 +3688,12 @@ const AGGREGATION_METHOD = 'evidence-preserving-synthesis';
 // coverage failure from the evaluator -- fail-closed, never a silently
 // skipped requirement.
 export function deriveDisclosures(runResult) {
+  const outcome = runOutcome(runResult);
   return {
-    status: runResult.status,
-    confidence: runResult.confidence,
-    // A contribution that came back `blocked` is a settled result that
-    // nonetheless carries an objection. Surfacing it as a `dissent` disclosure
-    // is what lets the evaluator's hidden-dissent check do real work here: if
-    // the driver's own `dissentRefs` never names that source operation, the
-    // aggregation quietly counted an objecting contribution as agreement.
-    // A fixed marker, never the worker's own summary text -- no prose is
-    // parsed for meaning anywhere in this path (plan.md Non-Negotiable
-    // Deferrals).
-    dissent: runResult.status === 'blocked' ? 'blocked' : 'none',
+    status: outcome.category,
+    outcome: outcome.category,
+    confidence: outcome.evidence,
+    dissent: outcome.category === 'blocked' ? 'blocked' : 'none',
   };
 }
 
@@ -4002,7 +3997,8 @@ function branchSatisfiedAtSeq(events, fgosDir, assignmentId) {
   for (const event of events) {
     if (event.type !== 'result-linked' || event.payload.assignmentId !== assignmentId) continue;
     const runResult = readLinkedRunResultFromDisk(fgosDir, assignmentId, event.payload.runId);
-    if (runResult.status === 'failed' || runResult.confidence === 'failed' || runResult.confidence === 'no-evidence') continue;
+    const outcome = runOutcome(runResult);
+    if (!outcome.satisfied) continue;
     return event.seq;
   }
   return 0;

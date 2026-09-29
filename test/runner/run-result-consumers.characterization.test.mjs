@@ -153,9 +153,9 @@ test('characterization: session-engine synthesizeResearchFanIn partitions fan-in
   const failedActors = fanIn.failed.map((x) => x.actorId);
 
   assert.deepEqual(acceptedActors.sort(), ['worker-v1-verified', 'worker-v2-verified']);
-  assert.deepEqual(unverifiedActors.sort(), ['worker-v1-reported', 'worker-v2-blocked']);
-  // Note: worker-v2-findings is in failedActors in current code
-  assert.deepEqual(failedActors.sort(), ['worker-v1-failed', 'worker-v2-findings', 'worker-v2-needs-input']);
+  // worker-v2-findings is now correctly bucketed into unverified (verdict finding, not infra failure)
+  assert.deepEqual(unverifiedActors.sort(), ['worker-v1-reported', 'worker-v2-blocked', 'worker-v2-findings']);
+  assert.deepEqual(failedActors.sort(), ['worker-v1-failed', 'worker-v2-needs-input']);
 });
 
 // ---------------------------------------------------------------------------
@@ -164,15 +164,17 @@ test('characterization: session-engine synthesizeResearchFanIn partitions fan-in
 test('characterization: session-engine deriveDisclosures maps status, confidence, and dissent', () => {
   const f06 = loadFixture('06-v2-completed-pass-verified.json');
   assert.deepEqual(deriveDisclosures(f06), {
-    status: 'done',
+    status: 'ok',
+    outcome: 'ok',
     confidence: 'verified',
     dissent: 'none',
   });
 
   const f08 = loadFixture('08-v2-completed-findings-reported.json');
-  // todo: expected-change: currently disclosures status is 'failed'; in Phase 2 disclosure id status is replaced by outcome (category)
+  // Disclosure status/outcome is now 'verdict' rather than legacy 'failed'
   assert.deepEqual(deriveDisclosures(f08), {
-    status: 'failed',
+    status: 'verdict',
+    outcome: 'verdict',
     confidence: 'reported',
     dissent: 'none',
   });
@@ -180,6 +182,7 @@ test('characterization: session-engine deriveDisclosures maps status, confidence
   const f14 = loadFixture('14-v2-completed-blocked-reported.json');
   assert.deepEqual(deriveDisclosures(f14), {
     status: 'blocked',
+    outcome: 'blocked',
     confidence: 'reported',
     dissent: 'blocked',
   });
