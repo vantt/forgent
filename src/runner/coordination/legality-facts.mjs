@@ -9,7 +9,7 @@ import {
   HUMAN_TURN_REF_PREFIX,
   CoordinationError,
 } from './schema.mjs';
-import { activationModeOf } from '../definitions/schema.mjs';
+import { activationModeOf, isRunResultSatisfied } from '../definitions/schema.mjs';
 
 export const PROTOCOL_OPERATION_STAMP_PREFIX = 'protocol-operation:';
 
@@ -218,12 +218,12 @@ export function lastEventFor(events = [], type, assignmentId) {
 export function classifyOperationAssignment(events = [], effectiveActorId, assignmentId, { getRunResult = () => null, failedAssignmentIds = new Set() } = {}) {
   const linkedEvent = lastEventFor(events, 'result-linked', assignmentId);
   if (!linkedEvent) return { satisfied: false, reason: 'late', actorId: effectiveActorId, assignmentId };
-  if (linkedEvent.payload?.status === 'failed' || (failedAssignmentIds && failedAssignmentIds.has(assignmentId))) {
+  if (failedAssignmentIds && failedAssignmentIds.has(assignmentId)) {
     return { satisfied: false, reason: 'failed', actorId: effectiveActorId, assignmentId, runId: linkedEvent.payload?.runId };
   }
   const runResult = getRunResult(assignmentId, linkedEvent.payload?.runId);
   if (runResult) {
-    if (runResult.status === 'failed' || runResult.confidence === 'failed' || runResult.confidence === 'no-evidence') {
+    if (!isRunResultSatisfied(runResult)) {
       return { satisfied: false, reason: 'failed', actorId: effectiveActorId, assignmentId, runId: runResult.runId ?? linkedEvent.payload?.runId };
     }
     return { satisfied: true, reason: null, actorId: effectiveActorId, assignmentId, runId: runResult.runId };
@@ -283,7 +283,7 @@ export function hasAcceptedDispositionRemediation(
     if (!linkedEvent) return false;
     const runResult = getRunResult(remediationAssignmentId, linkedEvent.payload?.runId);
     if (!runResult) return false;
-    return runResult.status !== 'failed' && runResult.confidence !== 'failed' && runResult.confidence !== 'no-evidence';
+    return isRunResultSatisfied(runResult);
   });
 }
 

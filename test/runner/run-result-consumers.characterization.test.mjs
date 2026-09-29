@@ -287,11 +287,10 @@ test('characterization: legality-facts classifyOperationAssignment', () => {
     { satisfied: false, reason: 'failed', actorId: 'actor1', assignmentId: 'a9', runId: 'r9' },
   );
 
-  // Blocked v2: currently in legality-facts: status !== 'failed', so satisfied is true in current code!
-  // todo: expected-change: blocked category must NOT be satisfied (table says satisfied === (category === 'ok'))
+  // Blocked v2: now correctly classified as NOT satisfied (satisfied === (category === 'ok'))
   assert.deepEqual(
     classifyOperationAssignment(events('a14', 'r14'), 'actor1', 'a14', makeCtx(f14)),
-    { satisfied: true, reason: null, actorId: 'actor1', assignmentId: 'a14', runId: 'r14' },
+    { satisfied: false, reason: 'failed', actorId: 'actor1', assignmentId: 'a14', runId: 'r14' },
   );
 
   // Spoofed pass (raw without downgrade would look satisfied)

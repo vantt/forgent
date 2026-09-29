@@ -1416,3 +1416,115 @@ export function validateFlowDefinition(input) {
     spec,
   });
 }
+
+/**
+ * Derive high-level outcome from RunResult classification.
+ * Single path for classification outcome categorization across Node and Rust.
+ * Rules evaluated in strict order (Red Team finding #1):
+ * 1. execution.status in {failed, cancelled, completion-unknown} and failure.family in {provider, resource, unknown} (or no failure) -> infra
+ * 2. policy.disposition === 'refuse' OR failure.family in {contract, policy} -> policy
+ * 3. policy.disposition === 'needs-input' -> infra
+ * 4. verdict === 'findings' -> verdict
+ * 5. verdict === 'blocked' -> blocked
+ * 6. execution.status === 'completed' and verdict in {pass, not-applicable} -> ok
+ * 7. remaining (e.g. inconclusive) -> verdict
+ *
+ * @param {object} classification
+ * @returns {Readonly<{category: 'ok'|'infra'|'verdict'|'policy'|'blocked'|'corrupt', reason: string}>}
+ */
+export function deriveOutcome(classification) {
+  if (!classification || typeof classification !== 'object') {
+    return Object.freeze({
+      category: 'corrupt',
+      reason: 'classification must be a non-null object',
+    });
+  }
+
+  if (classification.provenance === 'contract-corrupt') {
+    return Object.freeze({
+      category: 'corrupt',
+      reason: 'classification provenance is contract-corrupt',
+    });
+  }
+
+  const execStatus = classification.execution?.status;
+  const failureFamily = classification.failure?.family;
+  const policyDisp = classification.policy?.disposition;
+  const verdict = classification.assessment?.verdict;
+
+  // Rule 1: execution failed/cancelled/unknown with provider/resource/unknown failure (or no failure)
+  const isFailedExec = execStatus === 'failed' || execStatus === 'cancelled' || execStatus === 'completion-unknown';
+  const isInfraFailure = failureFamily === 'provider' || failureFamily === 'resource' || failureFamily === 'unknown' || !failureFamily;
+  if (isFailedExec && isInfraFailure) {
+    return Object.freeze({
+      category: 'infra',
+      reason: classification.failure?.code ?? (execStatus || 'execution-failed'),
+    });
+  }
+
+  // Rule 2: policy refusal or contract/policy failure family
+  if (policyDisp === 'refuse' || failureFamily === 'contract' || failureFamily === 'policy') {
+    return Object.freeze({
+      category: 'policy',
+      reason: classification.policy?.code ?? classification.failure?.code ?? 'policy-refused',
+    });
+  }
+
+  // Rule 3: policy disposition needs-input -> infra (provider/resource requires human)
+  if (policyDisp === 'needs-input') {
+    return Object.freeze({
+      category: 'infra',
+      reason: classification.policy?.code ?? 'needs-input',
+    });
+  }
+
+  // Rule 4: reviewer findings
+  if (verdict === 'findings') {
+    return Object.freeze({
+      category: 'verdict',
+      reason: 'reviewer-findings',
+    });
+  }
+
+  // Rule 5: blocked verdict
+  if (verdict === 'blocked') {
+    return Object.freeze({
+      category: 'blocked',
+      reason: 'verdict-blocked',
+    });
+  }
+
+  // Rule 6: completed execution with pass or not-applicable verdict
+  if (execStatus === 'completed' && (verdict === 'pass' || verdict === 'not-applicable')) {
+    return Object.freeze({
+      category: 'ok',
+      reason: 'completed-pass',
+    });
+  }
+
+  // Rule 7: remaining (e.g. inconclusive) -> verdict
+  return Object.freeze({
+    category: 'verdict',
+    reason: `verdict-${verdict ?? 'inconclusive'}`,
+  });
+}
+
+/**
+ * Pure check whether a RunResult or classification represents a satisfied run.
+ * Satisfied means category === 'ok'.
+ *
+ * @param {object} runResult
+ * @returns {boolean}
+ */
+export function isRunResultSatisfied(runResult) {
+  if (!runResult || typeof runResult !== 'object') return false;
+  if (typeof runResult.satisfied === 'boolean') return runResult.satisfied;
+  if (runResult.corrupt || runResult.contractCorrupt || runResult.resultCorrupt) return false;
+  if (runResult.classification?.outcome?.category) {
+    return runResult.classification.outcome.category === 'ok';
+  }
+  if (runResult.classification) {
+    return deriveOutcome(runResult.classification).category === 'ok';
+  }
+  return runResult.status !== 'failed' && runResult.confidence !== 'failed' && runResult.confidence !== 'no-evidence';
+}
