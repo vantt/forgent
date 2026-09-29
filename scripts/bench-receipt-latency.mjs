@@ -3,7 +3,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { execSync } from 'node:child_process';
 import { cliSpawnAdapter } from '../src/runner/dispatch/transport.mjs';
-import { publishImmutableProof } from '../src/runner/dispatch/cli-spawn-supervisor.mjs';
+import { publishImmutableProof } from '../src/runner/dispatch/detached-run-supervisor.mjs';
 
 /**
  * Receipt latency benchmark harness for Phase 08 / R7 verification.
