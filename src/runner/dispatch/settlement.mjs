@@ -50,8 +50,8 @@ import { finalizeConfinementResources } from './confinement/authority.mjs';
 import {
   publishMutableProjection,
   publishImmutableProof,
-  readAdapterReceipt,
-} from './cli-spawn-supervisor.mjs';
+  readDetachedRunAdapterReceipt,
+} from './detached-run-supervisor.mjs';
 import {
   classifyProviderCapacityFault,
   quarantineProviderAccount,
@@ -796,7 +796,7 @@ export async function settleReceiptRunFromOutcome(
   }
 
   const launchCommandId = command.launchCommandId;
-  const receipt = receiptOpt || readAdapterReceipt(runDir, launchCommandId);
+  const receipt = receiptOpt || readDetachedRunAdapterReceipt(runDir, launchCommandId);
   const root = resolveSafeRoot(runDir, opts?.repoRoot, true);
 
   const captureStdoutPath = path.join(runDir, 'protected', 'capture', launchCommandId, 'stdout.log');

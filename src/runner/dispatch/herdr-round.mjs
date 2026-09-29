@@ -132,7 +132,7 @@ export function verifyForegroundProcessArgv({ foregroundProcesses, shellPid, arg
  * actually executing. `/proc/<pid>/exe` is the kernel's own answer, the
  * same identity signal P02L's cli-spawn confinement path already resolves
  * for its own binary-identity proof (`getProcessStartTime`,
- * cli-spawn-supervisor.mjs, reads `/proc/<pid>/stat` the same way).
+ * detached-run-supervisor.mjs, reads `/proc/<pid>/stat` the same way).
  *
  * Returns `true`/`false` when both sides resolve (Linux, process still
  * alive, `expectedCommand` resolvable on disk), or `null` when the signal

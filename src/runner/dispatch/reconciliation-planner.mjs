@@ -21,7 +21,7 @@ const stable = (v) => v && typeof v === 'object' ? (Array.isArray(v) ? `[${v.map
 const digest = (v) => `sha256:${createHash('sha256').update(stable(v)).digest('hex')}`;
 const json = (file) => { try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return undefined; } };
 // Paren-aware /proc/<pid>/stat parser, deliberately kept as its own copy
-// rather than importing cli-spawn-supervisor.mjs's getProcessStartTime: that
+// rather than importing detached-run-supervisor.mjs's getProcessStartTime: that
 // module is the cli-spawn ADAPTER (it also owns child_process.spawn, worker
 // PGID signalling, receipt publication) and importing any one export from it
 // would put the whole adapter/process-control module on this file's import

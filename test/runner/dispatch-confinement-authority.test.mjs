@@ -1262,7 +1262,7 @@ test("M4 / M4b lock: authority.mjs contains 0 adapter layer imports (static or d
   const forbiddenAdapters = [
     "herdr-round",
     "herdr-agent",
-    "cli-spawn-supervisor",
+    "detached-run-supervisor",
     "transport.mjs",
     "assignment-runner",
   ];

@@ -13,7 +13,7 @@ import { compileDispatchPlan } from '../../src/runner/dispatch/plan.mjs';
 import { decideExecutorCli } from '../../src/runner/dispatch/cli.mjs';
 import { openSession, createSessionAssignment } from '../../src/runner/coordination/store.mjs';
 import { acquireRunControl, releaseRunControl } from '../../src/runner/dispatch/run-lock.mjs';
-import { canonicalJson, computeSha256Digest } from '../../src/runner/dispatch/cli-spawn-supervisor.mjs';
+import { canonicalJson, computeSha256Digest } from '../../src/runner/dispatch/detached-run-supervisor.mjs';
 import { initStore, addWork, listWork, settleClaim } from '../../src/state/store.mjs';
 import { acquireClaim, readClaim } from '../../src/state/runtime-coordination.mjs';
 import { inspectProviderCapacity, providerCapacityStatePaths, PROVIDER_CAPACITY_STATE_CONTRACT } from '../../src/runner/dispatch/provider-capacity.mjs';
@@ -2771,7 +2771,7 @@ test('executeAssignment: the same (retryId, destination, payloadDigest) tuple re
 
 // dispatch-engine-liveness-hardening Phase 2 (S1): the RUNNER process
 // SIGKILLed while its detached cli-spawn supervisor/worker (real subprocess
-// tree, spawned `detached: true` per cli-spawn-supervisor.mjs) is still
+// tree, spawned `detached: true` per detached-run-supervisor.mjs) is still
 // alive must not let a fresh dispatch admit a second, racing attempt.
 // Mirrors the audit's own live probe (a child acquiring real run-lock
 // control, spawning a detached long-lived grandchild, then SIGKILLed) but
@@ -2872,7 +2872,7 @@ test('executeAssignment: admission refuses a second attempt while a SIGKILLed ru
 
     // 2. Confirm the REAL production supervisor binding was published (not
     // a hand-built fixture) -- this is the exact artifact
-    // isCliSpawnRunStillWorking/readSupervisorBinding read.
+    // isCliSpawnRunStillWorking/readDetachedRunSupervisorBinding read.
     const supervisorBindingFiles = await waitFor(() => {
       if (!fs.existsSync(bindingDir)) return null;
       const files = fs.readdirSync(bindingDir).filter((f) => f.endsWith('.json') && !f.endsWith('.worker.json'));

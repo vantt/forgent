@@ -54,7 +54,7 @@ const isProvenLeaf = (file) => {
 // own exact-set assertion further down is the load-bearing proof, this is
 // the human-readable cross-check for it.
 const BANNED_FILES = [
-  'src/runner/dispatch/cli-spawn-supervisor.mjs', // process-control adapter: child_process.spawn, worker PGID signalling, receipt publication
+  'src/runner/dispatch/detached-run-supervisor.mjs', // process-control adapter: child_process.spawn, worker PGID signalling, receipt publication
   'src/runner/dispatch/herdr-round.mjs', // process-control: prepares/briefs/signals one interactive herdr round
   'src/runner/dispatch/herdr-agent.mjs', // herdr client: spawns/queries live herdr panes
   'src/runner/dispatch/worker-home.mjs', // creates/removes a spawned worker's confined home directory

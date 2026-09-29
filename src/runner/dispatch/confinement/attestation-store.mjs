@@ -9,7 +9,7 @@
 //     records -- their `env` field is an allow-list, never the real spawn
 //     env; the real env lives only in a 0600 side file the supervisor
 //     reads once and deletes, see authority.mjs's `redactEnvForPersistence`
-//     and cli-spawn-supervisor.mjs's `publishSecretSideFile`.)
+//     and detached-run-supervisor.mjs's `publishSecretSideFile`.)
 //   - Attestation schema covers all four phases: prepared, completed, failed, refused.
 //   - Channels completeness: filesystem, inherited-fd, stdio, host-ipc, network.
 

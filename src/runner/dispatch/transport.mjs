@@ -51,7 +51,7 @@ import { resolveVerifiedProviderArgs } from './provider-adapter.mjs';
 import { recordShadowBinderDivergence } from './placement-policy.mjs';
 import { runHerdrRound } from './herdr-round.mjs';
 import { DispatchError } from './dispatch-error.mjs';
-import { startSupervisorProcess } from './cli-spawn-supervisor.mjs';
+import { startDetachedRunSupervisorProcess } from './detached-run-supervisor.mjs';
 import { resolveWriterIdentity } from '../../util/session-identity.mjs';
 
 import {
@@ -351,7 +351,7 @@ export function cliSpawnAdapter(invocation, opts) {
     return new Promise((resolve, reject) => {
       let supervisorProc = null;
       try {
-        supervisorProc = startSupervisorProcess({
+        supervisorProc = startDetachedRunSupervisorProcess({
           envelopePath: opts.envelopePath,
           detached: true,
           onChunk: opts.onChunk,

@@ -274,7 +274,7 @@ export function findRunningRuns(fgosDir, { driverFreshMs = DRIVER_FRESH_MS, now 
 // reconcileRun below only ever needs it through its own dynamic import()
 // three lines down). A static named re-export of a herdr-round.mjs binding
 // at this file's top level would load and evaluate herdr-round.mjs's whole
-// module graph -- including the cli-spawn-supervisor.mjs process-control
+// module graph -- including the detached-run-supervisor.mjs process-control
 // adapter it imports -- the moment ANYTHING imports this file for ANY
 // reason, including reconciliation-planner.mjs's own read of RUN_STATUSES
 // below. That silently broke this file's documented "fs/path +
