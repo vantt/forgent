@@ -30,6 +30,7 @@ import {
 
 import {
   interpretRunResult,
+  runOutcome,
 } from '../../src/runner/dispatch/run-result.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -525,12 +526,19 @@ test('characterization: loop stopping predicate', () => {
 test('characterization: run.mjs summarizeDispatch copies status & settledFailed counts failed', () => {
   const f06 = loadFixture('06-v2-completed-pass-verified.json');
   const f08 = loadFixture('08-v2-completed-findings-reported.json');
+  const f01 = loadFixture('01-v1-failed-failed.json');
 
-  const summarizeDispatch = ({ assignment, runResult }) => ({
-    assignmentId: assignment.assignmentId,
-    status: runResult.status,
-    confidence: runResult.confidence,
-  });
+  const summarizeDispatch = ({ assignment, runResult }) => {
+    const outcome = runResult ? runOutcome(runResult) : null;
+    return {
+      assignmentId: assignment.assignmentId,
+      status: outcome?.category ?? runResult.status,
+      confidence: outcome?.evidence ?? runResult.confidence,
+      outcome: outcome?.category ?? null,
+      verdict: outcome?.verdict ?? null,
+      infraFailure: outcome?.infraFailure ?? (runResult.status === 'failed'),
+    };
+  };
 
   const stepPass = {
     schedulerOutcome: 'settled',
@@ -540,12 +548,16 @@ test('characterization: run.mjs summarizeDispatch copies status & settledFailed 
     schedulerOutcome: 'settled',
     ...summarizeDispatch({ assignment: { assignmentId: 'a2' }, runResult: f08 }),
   };
+  const stepInfra = {
+    schedulerOutcome: 'settled',
+    ...summarizeDispatch({ assignment: { assignmentId: 'a3' }, runResult: f01 }),
+  };
 
-  const steps = [stepPass, stepFindings];
-  const settledFailed = steps.filter((s) => s.schedulerOutcome === 'settled' && s.status === 'failed').length;
+  const steps = [stepPass, stepFindings, stepInfra];
+  const settledFailed = steps.filter((s) => s.schedulerOutcome === 'settled' && s.infraFailure).length;
 
-  // In current code: stepFindings has status: 'failed', so settledFailed count is 1!
-  // todo: expected-change: reviewer findings will not count in settledFailed (infra/corrupt only)
+  // Reviewer findings (stepFindings) has infraFailure: false, so it is NOT counted in settledFailed!
+  // Only true infra/corrupt failures (stepInfra) count towards settledFailed:
   assert.equal(settledFailed, 1);
 });
 

@@ -69,6 +69,7 @@ import {
   closeSessionByQuorum,
   readLinkedRunResultFromDisk,
 } from '../../runner/coordination/session-engine.mjs';
+import { runOutcome } from '../../runner/dispatch/run-result.mjs';
 import {
   recordDriverDisposition,
   recordDriverDispositionLocked,
@@ -354,10 +355,14 @@ function aggregationCloseParams(coordinationId, engineOpts) {
 }
 
 function summarizeDispatch({ assignment, runResult }) {
+  const outcome = runResult ? runOutcome(runResult) : null;
   return {
     assignmentId: assignment.assignmentId,
-    status: runResult.status,
-    confidence: runResult.confidence,
+    status: outcome?.category ?? runResult.status,
+    confidence: outcome?.evidence ?? runResult.confidence,
+    outcome: outcome?.category ?? null,
+    verdict: outcome?.verdict ?? null,
+    infraFailure: outcome?.infraFailure ?? (runResult.status === 'failed'),
     executor: runResult.policy?.provenance?.executor?.value ?? null,
     provider: runResult.policy?.provenance?.provider?.value ?? null,
     tier: runResult.policy?.provenance?.tier?.value ?? null,
@@ -1017,7 +1022,7 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
           dag: {
             counts: {
               settled: stepResults.filter((step) => step.schedulerOutcome === 'settled').length,
-              settledFailed: stepResults.filter((step) => step.schedulerOutcome === 'settled' && step.status === 'failed').length,
+              settledFailed: stepResults.filter((step) => step.schedulerOutcome === 'settled' && (step.infraFailure ?? (step.status === 'failed'))).length,
               refused: stepResults.filter((step) => step.schedulerOutcome === 'refused').length,
               blocked: stepResults.filter((step) => step.schedulerOutcome === 'blocked').length,
               deferred: stepResults.filter((step) => step.schedulerOutcome === 'deferred').length,
