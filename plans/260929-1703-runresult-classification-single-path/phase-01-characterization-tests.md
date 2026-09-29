@@ -39,11 +39,20 @@ Viết test mô tả chính xác mỗi consumer (bảng trong `plan.md`) quyết
 - Read: các file trong bảng consumer của `plan.md`
 
 ## Implementation Steps
+0. **Chuẩn bị worktree** (idempotent; chạy từ main checkout `/home/vantt/projects/forgentX`):
+   1. Nếu `git worktree list` đã có `~/projects/forgentX-runresult-classification` thì chỉ kiểm tra: branch đúng là `plan/260929-runresult-classification`, symlink `node_modules`/`target` còn, rồi sang bước 3.
+   2. Nếu chưa có:
+      - commit thư mục plan này lên `main` nếu còn thay đổi chưa commit. Chỉ `git add -- plans/260929-1703-runresult-classification-single-path`, không kéo theo file khác đang sửa dở;
+      - `git worktree add -b plan/260929-runresult-classification ~/projects/forgentX-runresult-classification main`. Không checkout branch trong main checkout;
+      - `ln -s /home/vantt/projects/forgentX/node_modules` và `ln -s /home/vantt/projects/forgentX/target` vào worktree.
+   3. `cd` vào worktree, kiểm `pwd` và `git branch --show-current`. Chạy nhanh một test (`CLAUDE_CODE_SESSION_ID= node --test test/runner/<một file nhỏ>`) để chắc môi trường chạy được.
+   4. Từ đây, mọi thao tác của plan (sửa code, test, commit) đều làm **trong worktree**, không làm ở main checkout.
 1. Chạy gitnexus `impact` cho `projectLegacyStatus`, `classifyRunEvidence`, `interpretRunResult`, `classificationForSettlement`; ghi lại blast radius.
-2. Chạy script quét tuple trên `.fgos/assignments` và dán bảng đếm vào `plan.md`. Dựng fixture từ các dạng này. Fixture v2 dựng bằng `normalizeRunResultV2` nếu tái tạo được; nếu không thì copy record thật đã lọc bớt.
+2. Chạy script quét tuple trên `/home/vantt/projects/forgentX/.fgos/assignments` (dữ liệu thật nằm ở main checkout, worktree không có bản riêng) và dán bảng đếm vào `plan.md`. Dựng fixture từ các dạng này. Fixture v2 dựng bằng `normalizeRunResultV2` nếu tái tạo được; nếu không thì copy record thật đã lọc bớt.
 3. Viết assert cho từng consumer và test cấp session.
 
 ## Success Criteria
+- [ ] Worktree `~/projects/forgentX-runresult-classification` tồn tại, trên branch `plan/260929-runresult-classification`, có symlink `node_modules`/`target`.
 - [ ] Test xanh trên code hiện tại.
 - [ ] Mọi dạng tuple có thật trên đĩa đều có fixture.
 - [ ] Danh sách ô `expected-change` được viết ra và dán vào `plan.md`, khớp với bảng ngữ nghĩa consumer.

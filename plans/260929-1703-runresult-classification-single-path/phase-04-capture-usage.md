@@ -12,7 +12,7 @@ dependencies: []
 ## Overview
 Ghi token vào RunResult cho những adapter có sẵn dữ liệu này, để Observe đo được chi phí của executor không phải Claude.
 
-Parser chạy song song được với phase 1–3. **Phần nối vào producer** thì phải làm sau merge A của phase 3, vì hai bên sửa cùng hàm: `normalizeRunResultV2` ở `run-result.mjs:269` và `settlement.mjs:613-640`. <!-- Red Team #15 -->
+Parser làm ngay sau phase 1, trong cùng worktree (xem thứ tự ở `plan.md`). **Phần nối vào producer** làm sau commit C1 của phase 3, vì hai bên sửa cùng hàm (`normalizeRunResultV2` ở `run-result.mjs:269`, `settlement.mjs:613-640`). C1 đã chừa sẵn input `usage`, nên bước nối chỉ là truyền giá trị vào. <!-- Red Team #15 -->
 
 ## Requirements
 - Shape:
@@ -31,12 +31,12 @@ Parser chạy song song được với phase 1–3. **Phần nối vào producer
 
 ## Related Code Files
 - Create: `src/runner/dispatch/usage-parsers.mjs` kèm test (fixture lấy từ `stdout.log`/`stderr.log` thật, đã lọc bớt; có một fixture codex mà giữa file có tool output chứa chuỗi "tokens used")
-- Modify: producer duy nhất (sau merge A của phase 3), `docs/specs/runner.md`
+- Modify: producer duy nhất (sau commit C1 của phase 3), `docs/specs/runner.md`
 
 ## Implementation Steps
 1. Đếm theo executor số run có usage, lấy 3 mẫu thật cho mỗi adapter có dữ liệu, và dán bảng đếm vào phase này.
 2. Viết parser kèm test (có case pi nhiều turn, và case codex bị chèn chuỗi giả).
-3. Sau merge A của phase 3: nối vào producer như một input tuỳ chọn.
+3. Sau commit C1 của phase 3: nối parser vào input `usage` của producer.
 
 ## Success Criteria
 - [ ] Một run `pi` thật (xai) có `usage` khác null, và `inputTokens` bằng tổng qua các turn.

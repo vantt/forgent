@@ -53,7 +53,6 @@ Validation Session 1 của plan Observe chốt: "`status` execution-only: review
 | `src/runner/loop.mjs` (tìm `outcome.runResult?.status`; log ~1572) | `outcome.runResult?.status` | Dừng vòng lặp driver |
 | `src/verbs/coordination/run.mjs:359-360` → `:1020` | `runResult.status/confidence` được chép vào `step.status` (`summarizeDispatch`), rồi đếm `settledFailed` | Báo cáo DAG của `coordination run` |
 | `src/verbs/coordination/show.mjs:416-417` | `runResult.status ?? (settled ? 'done' : null)` | Hiển thị node (v3 không có `status` thì mọi node thành `done`) |
-| `src/report/dispatch-confidence.mjs` | `confidence` | Báo cáo |
 | `src/runner/dispatch/{assignment-runner,settlement}.mjs` | `classifyRunEvidence`, `classificationForSettlement` (chết) | Producer thứ hai và thứ ba |
 
 ## Bảng ngữ nghĩa consumer (chốt sau red-team, không để người implement tự chọn)
@@ -75,44 +74,61 @@ Validation Session 1 của plan Observe chốt: "`status` execution-only: review
 |---|---|---|---|
 | 1 | [Characterization tests cho từng consumer](phase-01-characterization-tests.md) | 1.5d | — |
 | 2 | [Chuyển consumer sang `classification`](phase-02-migrate-consumers-to-classification.md) | 2d | 1 |
-| 3 | [Một producer: bỏ phép chiếu legacy, gộp `classifyRunEvidence`](phase-03-single-producer-drop-legacy-projection.md) (merge A: reader, merge B: writer v3) | 1.5d | 2 |
-| 4 | [Ghi `usage` từ output của adapter](phase-04-capture-usage.md) | 1d | parser: —; nối producer: sau merge A của phase 3 |
-| 5 | [Đo tác động bằng Observe](phase-05-measure-impact-with-observe.md) | 0.5d | 3, 4 |
+| 3 | [Một producer: bỏ phép chiếu legacy, gộp `classifyRunEvidence` (Node)](phase-03-single-producer-drop-legacy-projection.md): commit C1 là reader + producer, commit C2 là writer v3 riêng | 1.5d | 2 |
+| 4 | [Ghi `usage` từ output của adapter](phase-04-capture-usage.md) | 1d | parser: —; nối producer: sau C1 của phase 3 |
+| 5 | [Source Observe (Rust) đọc v3 + usage](phase-05-observe-source-reads-v3.md): **cổng chờ Observe**, rồi merge branch | 1d | 3, 4 + Observe F2 (5a), F4 (5b) đã commit lên `main` |
+| 6 | [Đo tác động bằng Observe](phase-06-measure-impact-with-observe.md): **sau merge** | 0.5d | 5, cộng ≥1 tuần hoặc 50 run |
 
-Làn song song:
-- làn 1 → 2 → 3 chạy tuần tự;
-- parser của phase 4 chạy độc lập, còn phần nối producer thì chờ merge A của phase 3 (cùng hàm);
-- phase 5 chờ cả hai làn.
+<!-- Validation Session 5: tách phần Rust ra phase 5 để phase 1–4 chạy song song với plan Observe; gộp hai lần merge thành một. Validation Session 6: một worktree, làm tuần tự -->
+
+**Thứ tự làm** (một worktree, một agent, tuần tự):
+1. Phase 1.
+2. Phase 4, phần parser (file mới, không đụng file nào khác).
+3. Phase 2.
+4. Phase 3 C1.
+5. Nối parser usage vào producer (bước 3 của phase 4).
+6. Phase 3 C2.
+7. Phase 5 (chờ cổng Observe).
+8. Merge.
+9. Phase 6.
+
+**Song song với plan Observe:** plan này chạy trên worktree riêng, còn plan Observe (F4, F6–F8) chạy trên `main`. Hai bên chỉ cùng sửa `loop.mjs` (conflict nhỏ, xử lý khi sync `main`) và code Rust của phase 5 (phase 5 chờ Observe commit trước).
 
 ## Phụ thuộc chéo plan
 
-- **blockedBy plan Observe:**
-  - *Merge* phase 2–3 chỉ được làm **sau M4** của Observe (baseline JSON ở F6). Plan Observe tự ghi "cần baseline M4 có trước" (dòng 109, 198). Code thì chuẩn bị song song được. <!-- Red Team #11 -->
-  - **Merge B của phase 3** sửa source `packages/run-result/rust` và phần `runs` trong scorecard của Observe (F2, F4), nên phải đợi F2 và F4 merge. Lúc red-team, `lib.rs` còn là stub và `scorecard.rs` chưa có.
+- **blockedBy plan Observe, chỉ ở phase 5.** Phase 1–4 **không chờ** Observe.
+  - **5a** (port luật `deriveOutcome` sang Rust): chờ crate `packages/run-result/rust` (F2) được commit lên `main`. F2 đã `done` nhưng code còn nằm chưa commit trong main checkout.
+  - **5b** (nối scorecard): chờ F4 được commit lên `main`.
+  - **Không chờ M4.** Baseline "trước" ở phase 6 được tính lại từ các `result.json` cũ trên đĩa bằng cùng `deriveOutcome`, nên không cần baseline JSON của Observe. <!-- Red Team #11; Validation Session 5 -->
+  - `src/report/dispatch-confidence.mjs` bị plan Observe xoá, nên không nằm trong phạm vi plan này.
 - **blocks plan Producer:** producer `run:` cần classification sạch để biết run nào fail do hạ tầng.
 
 ## Môi trường làm việc
 
 Toàn bộ plan được làm trong **worktree riêng**, không làm trong main checkout dùng chung. Lý do:
 - plan Observe đang cook trên `main` và cũng sửa `loop.mjs` và `packages/*/rust`;
-- merge phase 2–3 phải chờ M4, nên cần một branch giữ code sẵn sàng mà chưa vào `main`.
+- phase 5 phải chờ Observe, nên cần một branch giữ code sẵn sàng mà chưa vào `main`.
 
 - **Branch:** `plan/260929-runresult-classification`
-- **Worktree:** `~/projects/forgentX-runresult-classification`
-- **Dựng worktree:**
+- **Worktree:** `~/projects/forgentX-runresult-classification` (một worktree duy nhất cho cả plan)
+- **Dựng worktree:** tự động, là bước 0 của phase 1 (`/ak:cook` tự làm; idempotent). Các bước:
   1. Commit thư mục plan này lên `main` trước, vì `git worktree add` chỉ mang theo trạng thái đã commit. Chỉ stage đúng thư mục plan, không kéo theo các file đang sửa dở khác.
   2. `git worktree add -b plan/260929-runresult-classification ~/projects/forgentX-runresult-classification main`. Không bao giờ checkout branch ngay trong main checkout.
   3. Symlink `node_modules` và `target/` từ main checkout sang worktree ngay sau khi tạo; thiếu thì test fail hàng loạt.
 - **Khi làm việc:**
+  - Một agent làm tuần tự trong worktree này. Không chạy hai agent cùng lúc trong một worktree, vì chúng dùng chung git index.
   - Kiểm `pwd` trước mỗi thao tác git, vì cwd hay lệch về main checkout.
   - Commit ngay khi verify xanh.
   - Chạy `npm test` với `CLAUDE_CODE_SESSION_ID` đã unset.
   - Test CLI bằng `node bin/fgos.mjs` của worktree, không dùng hàm `fgos` trong shell (có thể trỏ tới bản đã stage cũ).
-- **Merge:**
-  - Rebase lên `main` trước mỗi lần merge.
-  - Merge A và merge B (phase 3) là hai lần merge riêng, và chỉ merge sau M4 của Observe.
-  - Sau mỗi lần merge: restage và kiểm digest.
-- **Dọn dẹp:** giữ worktree đến khi xong phase 5, rồi dọn một lần ở cuối.
+- **Sync `main` vào branch** (anh chốt: `git merge main` vào branch, không rebase):
+  - làm định kỳ, ít nhất mỗi khi `main` có commit của plan Observe, và luôn làm trước phase 5a, 5b và trước khi merge ra;
+  - sau mỗi lần sync, chạy lại `npm test`.
+- **Merge ra `main`: một lần duy nhất, khi phase 1–5 đều xong** (anh chốt).
+  - Sync `main` lần cuối, chạy toàn bộ test, rồi merge.
+  - Commit C2 (writer v3) phải còn là một commit riêng trong lịch sử, để `git revert <C2>` là đường lùi.
+  - Sau merge: restage và kiểm digest (`fgctl status` / `fgos doctor`). Phase 6 chạy sau đó.
+- **Dọn dẹp:** dọn worktree sau khi merge ra `main`.
 
 ## Acceptance
 
@@ -122,12 +138,12 @@ Toàn bộ plan được làm trong **worktree riêng**, không làm trong main 
 - RunResult mới không có trường `status`/`confidence`; contract `assignment-run-result` lên v3. Validator v3 bác record có `outcome.category` lệch với `deriveOutcome(classification)`.
 - `interpretRunResult` rẽ nhánh v1 / v2 (validator đóng băng) / v3; record v1 và v2 đọc đúng như trước.
 - `classifyRunEvidence` và `classificationForSettlement` bị xoá. `projectLegacyStatus*` không còn writer hay consumer nào; chỉ còn bản đóng băng private trong validator v2.
-- Ship hai lần merge (reader trước, writer sau). Reader của merge A đọc được v3. Restage và kiểm digest sau mỗi merge.
+- Merge ra `main` một lần, khi phase 1–5 đều xong; branch được sync `main` định kỳ. Writer v3 (C2) là commit riêng, và code chỉ có C1 đọc được v3, nên `git revert <C2>` an toàn. Restage và kiểm digest sau merge.
 - Characterization test của phase 1 (fixture từ dạng record có thật) đều xanh. Riêng các case có chủ đích đổi hành vi được liệt kê kèm lý do, khớp với bảng ngữ nghĩa consumer.
 - `pi` (cộng qua các turn) và `codex-cli` (`totalTokens`) có `usage` trong RunResult. `claude` ghi `usage: null, source: "transcript"` (token lấy qua transcript của Observe). herdr ghi `usage: null` kèm lý do.
 - Observe:
   - `metrics harness` tính #4 từ `classification.outcome.category` (D2-A; không còn nhóm `unclassified` cho run mới);
-  - #3 dùng công thức "vòng đầu" đã định nghĩa ở phase 5, hoặc giữ `estimate` kèm lý do;
+  - #3 dùng công thức "vòng đầu" đã định nghĩa ở phase 6, hoặc giữ `estimate` kèm lý do;
   - có báo cáo trước/sau dùng **cùng** một luật phân nhóm.
 - Logic phân nhóm sống **chỉ ở `deriveOutcome`** (Node và bản Rust của nó). Producer dùng nó để ghi, validator v3 và `evidenceFloor` dùng nó để kiểm. Khoá bằng fixture chung.
 - Chạy `npm test`, `cargo test --workspace`, gitnexus `impact` trước khi sửa, và `detect_changes()` trước commit.
@@ -152,9 +168,9 @@ Nếu để hai bản logic sống song song thì trái với single path, và h
 
 ## Rủi ro
 
-- **Đổi hành vi quorum/recheck/revise của session đang chạy.** Characterization test khoá hành vi cũ, và bảng ngữ nghĩa chốt chỗ nào đổi. Số session `active` cần đếm lại trước merge B: plan cũ ghi 216, red-team thấy 512. Ghi rõ trong CHANGELOG.
-- **Binary cũ đọc v3 thì coi là corrupt, và resume ném `result-corrupt`.** Xử lý bằng cách ship reader trước writer, restage và kiểm digest; rollback chỉ revert merge B (phase 3).
-- **Chạy song song với plan Observe (đang cook trên `main`).** `loop.mjs` bị cả hai plan sửa: làn B sửa chỗ gọi friction, plan này sửa chỗ dừng vòng lặp (dòng ~945, **số dòng sẽ lệch**, nên tìm theo `outcome.runResult?.status`). Rebase trước khi merge.
+- **Đổi hành vi quorum/recheck/revise của session đang chạy.** Characterization test khoá hành vi cũ, và bảng ngữ nghĩa chốt chỗ nào đổi. Số session `active` cần đếm lại trước khi merge: plan cũ ghi 216, red-team thấy 512. Ghi rõ trong CHANGELOG.
+- **Binary cũ đọc v3 thì coi là corrupt, và resume ném `result-corrupt`.** Xử lý: reader (C1) đứng trước writer (C2) trong lịch sử; restage ngay sau merge; rollback bằng `git revert <C2>`.
+- **Chạy song song với plan Observe (đang cook trên `main`).** `loop.mjs` bị cả hai plan sửa: plan Observe sửa chỗ gọi friction, plan này sửa chỗ dừng vòng lặp (dòng ~945, **số dòng sẽ lệch**, nên tìm theo `outcome.runResult?.status`). Xử lý conflict khi sync `main` vào branch.
 - ~~`result-linked` event mang `payload.status`~~: **sai**. Schema chỉ nhận `{assignmentId, runId}`, và 0/936 event có `status`. Nhánh ở `legality-facts.mjs:221` là code chết và bị xoá ở phase 2 (Red Team #9).
 
 ## Câu hỏi mở
@@ -231,3 +247,23 @@ Ghi chú: phần đếm dữ liệu thật (1028 `result.json`, 925 v1, 101–10
   - dòng D2 nhắc `infraFailure` vẫn đúng: field này vẫn còn và được suy từ `category`.
 - Unresolved contradictions: 0.
 - Việc cần làm ở plan Observe (tiếp nối Session 4): thêm `blocks: [260929-1703-runresult-classification-single-path]`; dòng "RunResult status/usage" đổi sang D1-A + D2-A (luật mới); ghi rằng source `run-result` dùng `deriveOutcome` chung fixture.
+
+### Validation Session 5 — 2026-09-29 (điều chỉnh để làm song song)
+- Anh chốt:
+  - làm trên worktree riêng;
+  - sync `main` vào branch (merge, không rebase);
+  - chỉ merge ra `main` một lần, khi đã làm xong hết.
+- Thay đổi:
+  1. Tách phần Rust (source Observe đọc v3) ra **phase 5 mới**, có cổng chờ Observe F2 (5a) và F4 (5b). Phase 1–4 không chờ Observe.
+  2. Bỏ cổng M4: baseline "trước" tính lại từ record cũ trên đĩa (phase 6).
+  3. Gộp hai lần merge A/B thành một lần merge; giữ writer v3 là commit riêng (C2) để làm đường lùi.
+  4. Đổi tên phase đo lường thành phase 6, chạy sau merge.
+  6. Bỏ `dispatch-confidence.mjs` (plan Observe xoá file này).
+- Rà lại toàn plan: các chỗ "merge A/B", "M4", "rebase" và "phase 5 = đo" chỉ còn trong log lịch sử (Validation Session 1–4, Red Team Review). Unresolved contradictions: 0.
+- Việc cần làm ở plan Observe (bổ sung): nên gom phần phân nhóm #4 của F4 vào một hàm duy nhất, để phase 5b chỉ phải thay hàm đó.
+
+### Validation Session 6 — 2026-09-29
+- Anh chốt: **một worktree**, làm tuần tự. Bỏ làn B và worktree phụ, vì chỉ lợi được khoảng 1 ngày mà phải thêm branch, lần merge và agent cần phối hợp.
+- Phase 4 (parser) được xếp ngay sau phase 1; bước nối vào producer nằm giữa C1 và C2 của phase 3.
+- Song song vẫn giữ ở cấp plan: plan này chạy trên worktree riêng, plan Observe chạy trên `main`.
+- Dựng worktree đưa vào bước 0 của phase 1 (anh hỏi), để `/ak:cook` tự chuẩn bị khi bắt đầu.

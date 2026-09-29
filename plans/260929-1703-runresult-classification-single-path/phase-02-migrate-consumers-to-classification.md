@@ -56,7 +56,6 @@ Mọi quyết định đọc kết quả run qua đúng một helper thuần do 
   - `src/runner/loop.mjs` (tìm `outcome.runResult?.status`, cả log ở ~1572)
   - `src/verbs/coordination/run.mjs` (359-360, 1020)
   - `src/verbs/coordination/show.mjs` (416-417)
-  - `src/report/dispatch-confidence.mjs`
   - `src/runner/team-cognition/aggregation-evaluator.mjs`
   - `src/runner/definitions/schema.mjs` (disclosure vocab)
 - Create: test source-scan dạng **cấu trúc** (xem Implementation Steps bước 4)
@@ -77,5 +76,5 @@ Mọi quyết định đọc kết quả run qua đúng một helper thuần do 
 - [ ] `npm test` xanh (chạy với `CLAUDE_CODE_SESSION_ID` bị unset, theo memory).
 
 ## Risk Assessment
-- **Chọn sai ngữ nghĩa `findings` ở một consumer.** Đã giảm bằng bảng ngữ nghĩa chốt sẵn; gate luôn dùng `satisfied`. Dấu hiệu còn sót: session không revise sau khi reviewer bác, hoặc retry vô ích. Phase 5 đo lại.
+- **Chọn sai ngữ nghĩa `findings` ở một consumer.** Đã giảm bằng bảng ngữ nghĩa chốt sẵn; gate luôn dùng `satisfied`. Dấu hiệu còn sót: session không revise sau khi reviewer bác, hoặc retry vô ích. Phase 6 đo lại.
 - **Đổi disclosure id `status` → `outcome`** làm protocol cũ yêu cầu `status` bị no-consensus. Cách xử lý: cập nhật mọi protocol trong `core/` cùng commit, và grep `requiredDisclosures`.
