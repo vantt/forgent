@@ -94,3 +94,28 @@ When running side-by-side or comparative bake-offs between harnesses (e.g., `fgo
 | `work.doing_to_awaiting_approval_hours` | Median and p90 active development hours from `doing` to `awaiting-approval`. |
 | `work.interventions_per_item.mean` / `p90` | Mean and p90 manual/automated interventions (`asked` + `answered` + `gate-approved`) per item. |
 | `faults.total` / `by_class` | Count of system or CLI host-level invocation faults encountered during the case. |
+
+---
+
+## 5. Staging & Verifying the Host Runtime
+
+Before measuring a real case, ensure the workspace is running the current release binary:
+1. Build release binaries:
+   ```bash
+   cargo build --release -p fgos -p fgctl
+   ```
+2. Build the distribution tree to a temporary directory:
+   ```bash
+   node scripts/build-rust-distribution.mjs --out /tmp/fgos-release-candidate
+   ```
+3. Stage and upgrade via `fgctl`:
+   ```bash
+   ./target/release/fgctl stage --from /tmp/fgos-release-candidate
+   ./target/release/fgctl upgrade --from /tmp/fgos-release-candidate
+   ```
+4. Verify the active release:
+   ```bash
+   ./target/release/fgctl status
+   ./target/release/fgctl verify
+   .fgos/installation/bin/fgos metrics ping
+   ```

@@ -50,7 +50,7 @@ Mọi component Node hoặc ngôn ngữ ngoài gọi qua helper `src/util/host-b
 
 ### § Metrics (Làn A)
 Dành cho Phase F3 (`case`), F4 (`harness`, `faults`), F6 (`work` source), F7 (`runs`, `outcomes`, `entropy`, `snapshot`).
-
+- **Claude Transcripts Source**: Thu thập token usage từ `~/.claude/projects/` (`CLAUDE_CONFIG_DIR`). Nhận tất cả thư mục có tên khớp với encoding của bất kỳ path nào trong `git worktree list` (project root cộng từng worktree ngoài) hoặc bắt đầu bằng `enc + "--claude-worktrees-"`. Giữ bộ lọc `cwd` cho từng record để ngăn match nhầm repo khác, và dedupe theo `message.id`.
 ### § Friction (Làn B)
 Dành cho Phase F5: writer Rust duy nhất, migration lười từ `work.friction`, các lệnh `friction record/resolve/list/show/rank`.
 

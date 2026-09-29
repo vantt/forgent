@@ -151,6 +151,10 @@ impl ObservationSource for ClaudeTranscriptsSource {
         let worktree_prefix = format!("{enc}--claude-worktrees-");
 
         let valid_cwds = get_valid_cwds(&root_canon);
+        let mut valid_enc_names: HashSet<String> = HashSet::new();
+        for cwd in &valid_cwds {
+            valid_enc_names.insert(encode_project_dir(cwd));
+        }
 
         let entries = match std::fs::read_dir(&projects_dir) {
             Ok(e) => e,
@@ -168,7 +172,7 @@ impl ObservationSource for ClaudeTranscriptsSource {
                 continue;
             }
             let name = entry.file_name().to_string_lossy().to_string();
-            if name == enc || name.starts_with(&worktree_prefix) {
+            if valid_enc_names.contains(&name) || name.starts_with(&worktree_prefix) {
                 matching_dirs.push(p);
             }
         }
@@ -380,4 +384,81 @@ mod tests {
         assert_eq!(obs[1].attrs.get("input_tokens").unwrap(), 200);
         assert_eq!(obs[1].attrs.get("output_tokens").unwrap(), 80);
     }
+
+    #[test]
+    fn test_claude_transcripts_external_worktree_included_and_unrelated_prefix_rejected() {
+        let temp_dir = std::env::temp_dir().join(format!("test_claude_wt_{}", std::process::id()));
+        let _ = fs::remove_dir_all(&temp_dir);
+        fs::create_dir_all(&temp_dir).unwrap();
+
+        let home_dir = temp_dir.join("home");
+        let project_root = temp_dir.join("project");
+        fs::create_dir_all(&project_root).unwrap();
+
+        // Init real git repo in project_root and add a real external worktree
+        let _ = Command::new("git").arg("init").arg(&project_root).output();
+        let _ = Command::new("git").arg("-C").arg(&project_root).args(["config", "user.email", "test@test.com"]).output();
+        let _ = Command::new("git").arg("-C").arg(&project_root).args(["config", "user.name", "Test"]).output();
+        fs::write(project_root.join("README.md"), "# Project").unwrap();
+        let _ = Command::new("git").arg("-C").arg(&project_root).args(["add", "."]).output();
+        let _ = Command::new("git").arg("-C").arg(&project_root).args(["commit", "-m", "init"]).output();
+
+        let external_wt = temp_dir.join("project-phase00-docs");
+        let wt_output = Command::new("git")
+            .arg("-C")
+            .arg(&project_root)
+            .args(["worktree", "add", external_wt.to_str().unwrap(), "-b", "docs-branch"])
+            .output()
+            .expect("git worktree add");
+        assert!(wt_output.status.success(), "worktree add must succeed");
+
+        let enc_root = encode_project_dir(&project_root.canonicalize().unwrap());
+        let enc_external_wt = encode_project_dir(&external_wt.canonicalize().unwrap());
+        let enc_fake_unrelated = format!("{}-worker-isolation", enc_root);
+
+        let projects_base = home_dir.join("projects");
+        let root_dir = projects_base.join(&enc_root);
+        let wt_dir = projects_base.join(&enc_external_wt);
+        let fake_dir = projects_base.join(&enc_fake_unrelated);
+
+        fs::create_dir_all(&root_dir).unwrap();
+        fs::create_dir_all(&wt_dir).unwrap();
+        fs::create_dir_all(&fake_dir).unwrap();
+
+        std::env::set_var("CLAUDE_CONFIG_DIR", home_dir.to_str().unwrap());
+
+        // 1. Root transcript with msg_1
+        let root_content = format!(
+            r#"{{"sessionId":"s1","cwd":"{cwd}","timestamp":"2026-09-29T10:00:00Z","message":{{"id":"msg_1","model":"claude-3-5-sonnet","usage":{{"input_tokens":100,"output_tokens":50,"cache_read_input_tokens":10,"cache_creation_input_tokens":5}}}}}}"#,
+            cwd = project_root.canonicalize().unwrap().to_str().unwrap()
+        );
+        fs::write(root_dir.join("root-session.jsonl"), root_content).unwrap();
+
+        // 2. External worktree transcript with msg_2 and duplicate msg_1
+        let wt_content = format!(
+            r#"{{"sessionId":"s2","cwd":"{cwd}","timestamp":"2026-09-29T10:05:00Z","message":{{"id":"msg_1","model":"claude-3-5-sonnet","usage":{{"input_tokens":100,"output_tokens":50,"cache_read_input_tokens":10,"cache_creation_input_tokens":5}}}}}}
+{{"sessionId":"s2","cwd":"{cwd}","timestamp":"2026-09-29T10:06:00Z","message":{{"id":"msg_2","model":"claude-3-5-sonnet","usage":{{"input_tokens":150,"output_tokens":75,"cache_read_input_tokens":15,"cache_creation_input_tokens":0}}}}}}"#,
+            cwd = external_wt.canonicalize().unwrap().to_str().unwrap()
+        );
+        fs::write(wt_dir.join("wt-session.jsonl"), wt_content).unwrap();
+
+        // 3. Fake unrelated directory transcript with msg_3 (should be ignored by directory selection and cwd filter)
+        let fake_content = format!(
+            r#"{{"sessionId":"s3","cwd":"/unrelated","timestamp":"2026-09-29T10:10:00Z","message":{{"id":"msg_3","model":"claude-3-5-sonnet","usage":{{"input_tokens":500,"output_tokens":500,"cache_read_input_tokens":0,"cache_creation_input_tokens":0}}}}}}"#
+        );
+        fs::write(fake_dir.join("fake-session.jsonl"), fake_content).unwrap();
+
+        let source = ClaudeTranscriptsSource::new();
+        let obs = source.observations(&project_root, &Window::default()).unwrap();
+
+        let _ = fs::remove_dir_all(&temp_dir);
+
+        // Verified:
+        // 1. External worktree msg_2 is included.
+        // 2. Duplicate msg_1 across root and worktree is deduplicated (only 1 occurrence).
+        // 3. Unrelated prefix fake_dir msg_3 is excluded.
+        assert_eq!(obs.len(), 2, "Expected exactly 2 observations (msg_1 and msg_2)");
+        assert_eq!(obs[0].attrs.get("input_tokens").unwrap(), 100);
+        assert_eq!(obs[1].attrs.get("input_tokens").unwrap(), 150);
 }
+    }

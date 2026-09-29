@@ -190,16 +190,6 @@ test(
     // HEAVY_KEYWORDS entry ("schema migration") — the deterministic route to
     // a real Iron-Law-tripping candidate (per this cell's action), never a
     // fabricated module-path-touching commit.
-    seedFriction(repoRoot, {
-      id: 'self-fix-source',
-      disposition: 'blocked',
-      errorClass: 'verify-miss',
-      layer: 'verification',
-      attempts: 2,
-      detail: 'Needs a schema migration in the candidate store before this keeps tripping goal-check.',
-    });
-    commitPending(repoRoot, 'seed friction for self-fix-source');
-
     // (2) `fgos friction rank` — candidate appears with every field a human
     // needs to judge it.
     // Record friction via Observe CLI

@@ -1,7 +1,7 @@
 ---
 phase: F8
 title: "Contract, golden fixture, decision record, doctor check"
-status: done
+status: completed
 priority: P1
 effort: "1d"
 dependencies: [F4, F5]

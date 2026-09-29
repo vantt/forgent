@@ -1,6 +1,6 @@
 ---
 title: "Observe component — chuyển trọn sang Rust (fgos metrics + fgos friction)"
-status: done
+status: completed
 priority: P1
 created: 2026-09-29
 revised: 2026-09-29 (v3 — Observe trọn gói, làn song song)
@@ -249,6 +249,20 @@ Bằng chứng kỹ thuật: `legacy_exec.rs:35,245` (recursion guard), nên wri
 - Delta đã kiểm (4): cờ tạm `n/a` của entropy; cột `status` trong friction list/show; gợi ý `show` → `friction show`; `friction_cli.rs` trong F6.
 - Chỗ cũ đã sửa: 5 (F5 ×3, F6 ×2). Mục Red Team Review giữ nguyên vì là lịch sử của phiên trước.
 - Mâu thuẫn chưa giải quyết: 0.
+
+### Session 6 — 2026-09-29 (Verification & Staging Resolution)
+- **Re-stage cleanly**: Fixed root cause of in-place release overwrite. Built `target/release/fgos` and `fgctl`, generated release tree via `build-rust-distribution.mjs`, staged via `fgctl stage --from`, and upgraded via `fgctl upgrade --from`. Active digest updated to `sha256:da2d107b66cc044354ab8a4054fb90e053e9714e58891f821055c5af3097ebb5`, `fgctl verify` verified clean, `.fgos/installation/bin/fgos metrics ping` through shim verified.
+- **Transcripts worktree resolution**: Updated `claude_transcripts.rs` to compute `valid_enc_names` across all paths in `git worktree list`, including external worktrees like `forgentX-phase00-documentation-authority-unification`. Retained prefix protection against non-worktree directories and per-record cwd filter. Unit test added and verified.
+- **Verification pass**:
+  - `cargo test --workspace`: 210 passed across 26 suites.
+  - `node --test test/rust-host/command-routes.test.mjs`: 14 passed.
+  - `node --test test/util/host-bin.test.mjs`: 5 passed.
+  - `node --test test/setup/observe-doctor-checks.test.mjs`: 7 passed.
+  - `node bin/fgos.mjs doctor`: `observe-dir-writable`, `observe-friction-migrated` (752 records), `observe-host-resolvable` all pass.
+  - Full CLI test suites (`fgos-read-2/3/4`, `fgos-approve-2/6`, `fgos-return`, `pr-gate`, `self-improve-loop`, `replay`) passing after pruning retired `check` tests and updating friction inspection to Observe.
+  - Parity audit in `reports/f4-parity.md` updated with explicit audit comparison (1,028 all-time runs, 265 faults, 752 frictions) and independent JS lead time comparison (211 items).
+  - All 8 phases ticked and status updated to `completed`.
+  - NOT RUN: full unbounded npm test run (300s timeout on 2,970 tests; selective suites covering all touched areas verified clean).
 
 ## Red Team Review
 

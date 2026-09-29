@@ -1,7 +1,7 @@
 ---
 phase: F3
 title: "metrics case open/close/list + stage lên shim"
-status: done
+status: completed
 priority: P1
 effort: "1d"
 dependencies: [F1]
@@ -50,18 +50,19 @@ Ghi hai thứ không tính lùi được: **danh tính và khung thời gian c�
 3. Viết test trên thư mục tmp: open → open trùng thì bị từ chối → close → close lại thì bị từ chối → list; dòng cuối bị cắt dở thì bỏ qua và báo `skipped`.
 4. **Stage (quy trình cài duy nhất, F6 dùng lại):**
    - Ghi lại `fgctl status`.
-   - `cargo build --release -p fgos` từ `main` sạch.
-   - Đọc `fgctl stage --help` và `fgctl upgrade --help` (không đoán cờ), rồi stage release và upgrade workspace forgentX.
-   - Kiểm digest mới bằng `fgctl status` cộng `fgos metrics ping`.
-   - Nếu hỏng: `fgctl repair` rollback về `previousArtifactDigest`.
-   - Ghi quy trình này vào `docs/specs/observe.md` § Cài đặt.
+   - `cargo build --release -p fgos -p fgctl` từ `main` sạch.
+   - Tạo release tree: `node scripts/build-rust-distribution.mjs --out /tmp/fgos-release-candidate-<ts>`.
+   - `./target/release/fgctl stage --from /tmp/fgos-release-candidate-<ts>`.
+   - `./target/release/fgctl upgrade --from /tmp/fgos-release-candidate-<ts>`.
+   - Kiểm digest mới bằng `./target/release/fgctl status`, xác thực `./target/release/fgctl verify`, cộng `.fgos/installation/bin/fgos metrics ping`.
+   - Ghi quy trình này vào `docs/specs/observe.md` § Cài đặt và runbook.
 5. Mở case thật đầu tiên **qua shim** cho chính việc làm F2 (mốc M1).
 
 ## Success Criteria
-- [ ] Vòng đời open/close/list đúng.
-- [ ] Mở case thứ hai khi đã có case mở thì bị từ chối, và báo tên case đang mở.
-- [ ] `fgctl status` cho thấy digest mới; `fgos metrics ping` chạy qua shim.
-- [ ] Case thật đầu tiên được mở qua shim trước khi bắt đầu F2.
+- [x] Vòng đời open/close/list đúng.
+- [x] Mở case thứ hai khi đã có case mở thì bị từ chối, và báo tên case đang mở.
+- [x] `fgctl status` cho thấy digest mới; `fgos metrics ping` chạy qua shim.
+- [x] Case thật đầu tiên được mở qua shim trước khi bắt đầu F2.
 
 ## Risk Assessment
 - **Stage sớm làm hỏng activation của workspace.** Có đường rollback bằng `fgctl repair`; build từ `main` sạch.

@@ -1,7 +1,7 @@
 ---
 phase: F4
 title: "metrics harness + metrics faults; xoá faults, dispatch-report"
-status: done
+status: completed
 priority: P1
 effort: "1d"
 dependencies: [F2, F3]
@@ -52,11 +52,11 @@ Scorecard theo case hoặc theo khung thời gian, tính trên **thực thể t�
 5. Đo thời gian chạy; vượt 5 giây thì tối ưu transcript trước.
 
 ## Success Criteria
-- [ ] Unit test `compute_*` xanh.
-- [ ] Parity phân bố run khớp chính xác trên cùng mốc dữ liệu.
-- [ ] `--case` của case M1 trả đủ field (hoặc `n/a` kèm lý do).
-- [ ] Chạy dưới 5 giây.
-- [ ] `fgos faults` và `fgos dispatch-report` báo unknown verb; `fgos metrics faults` trả cùng số record như `faults` cũ trên cùng store.
+- [x] Unit test `compute_*` xanh.
+- [x] Parity phân bố run khớp chính xác trên cùng mốc dữ liệu.
+- [x] `--case` của case M1 trả đủ field (hoặc `n/a` kèm lý do).
+- [x] Chạy dưới 5 giây.
+- [x] `fgos faults` và `fgos dispatch-report` báo unknown verb; `fgos metrics faults` trả cùng số record như `faults` cũ trên cùng store.
 
 ## Risk Assessment
 - **#3 ước lượng sai bản chất.** Luôn gắn `estimate: true`; định nghĩa thật chờ plan tiếp theo "RunResult status/usage".

@@ -1,7 +1,7 @@
 ---
 phase: F7
 title: "metrics runs/outcomes/entropy/snapshot; xoá check và entropy Node"
-status: done
+status: completed
 priority: P1
 effort: "1.5d"
 dependencies: [F6]
@@ -44,9 +44,9 @@ Thêm các lệnh `metrics` còn lại để thay hẳn `check`. Theo single pat
 4. Chạy gitnexus `impact` cho các symbol bị xoá; chạy `npm test` và `cargo test --workspace`.
 
 ## Success Criteria
-- [ ] Parity outcomes khớp; entropy chỉ lệch đúng phần đã giải thích.
-- [ ] `fgos check` báo unknown verb; `grep -rn "fgos check\b" core plugins docs/how-to docs/explanation` không còn tham chiếu sống.
-- [ ] `metrics snapshot` ghi đúng một dòng; `metrics entropy` tính delta so với snapshot đó.
+- [x] Parity outcomes khớp; entropy chỉ lệch đúng phần đã giải thích.
+- [x] `fgos check` báo unknown verb; `grep -rn "fgos check\b" core plugins docs/how-to docs/explanation` không còn tham chiếu sống.
+- [x] `metrics snapshot` ghi đúng một dòng; `metrics entropy` tính delta so với snapshot đó.
 
 ## Risk Assessment
 - **Skill hay hook bên ngoài repo vẫn gọi `fgos check`.** Dấu hiệu: `invocation-faults` có `unknown-verb check` sau khi release. Cách xử lý: `metrics faults --class unknown-verb` được theo dõi trong tuần đầu, gặp thì sửa chỗ gọi (không thêm alias).

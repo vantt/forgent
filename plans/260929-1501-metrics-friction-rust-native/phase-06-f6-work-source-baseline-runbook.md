@@ -1,7 +1,7 @@
 ---
 phase: F6
 title: "Work source, baseline, runbook"
-status: done
+status: completed
 priority: P1
 effort: "1d"
 dependencies: [F4, F5]

@@ -1,7 +1,7 @@
 ---
 phase: F5
 title: "Friction trong Observe: writer Rust duy nhất, mọi component ghi qua CLI hoặc lib"
-status: done
+status: completed
 priority: P1
 effort: "2d"
 dependencies: [F1]
@@ -85,16 +85,16 @@ Work là người dùng đầu tiên.
 5. Merge F5, rồi re-stage (quy trình F3). Backup `.fgos/events*`, `.fgos/cache/state.json`, `.fgos/observe/`. Chạy `fgos friction record` đầu tiên trên store thật (writer migrate), `fgos friction rank` so với mốc, rồi `npm test` và `cargo test --workspace`. <!-- Red Team 2026-09-29 -->
 
 ## Success Criteria
-- [ ] Parity rank chỉ chênh đúng các id `wontfix`, và danh sách chênh lệch được ghi ra.
-- [ ] `grep -rn "addFriction" src bin test` không còn gì. `work.friction` chỉ còn ở `legacy_friction.rs`, `SIDE_LOG_ONLY_EVENT_TYPES` và `scripts/measure-verify-cost.mjs:74`. <!-- Red Team 2026-09-29 -->
-- [ ] <!-- Red Team 2026-09-29 --> `approve` gặp merge conflict khi không có host: kết quả vẫn là `blocked` kèm `reason`/`conflictedFiles`, và có một dòng `friction-write-failed` trong `invocation-faults`.
-- [ ] <!-- Red Team 2026-09-29 --> `work.friction` do bản cũ ghi sau lần migrate đầu được import ở lần mở kế tiếp; crash giữa lô import không tạo bản trùng.
-- [ ] <!-- Red Team 2026-09-29 --> Ghi friction từ một worktree đi vào store của main checkout.
-- [ ] Không file Node nào ghi vào `.fgos/observe/` (test quét source).
-- [ ] <!-- Updated: Validation Session 5 - Work ngừng đọc friction --> Không file Node nào của Work đọc friction: `grep -rn "frictions" src/state src/verbs src/report` không còn chỗ đọc.
-- [ ] Mở store lần hai không import lại những `(src, seq)` đã có.
-- [ ] Friction tạo trong test được resolve khi item sang `wontfix`.
-- [ ] Một test gọi `fgos friction record` từ shell (giả lập component ngôn ngữ khác) ghi được, và `friction show` đọc lại được.
+- [x] Parity rank chỉ chênh đúng các id `wontfix`, và danh sách chênh lệch được ghi ra.
+- [x] `grep -rn "addFriction" src bin test` không còn gì. `work.friction` chỉ còn ở `legacy_friction.rs`, `SIDE_LOG_ONLY_EVENT_TYPES` và `scripts/measure-verify-cost.mjs:74`. <!-- Red Team 2026-09-29 -->
+- [x] <!-- Red Team 2026-09-29 --> `approve` gặp merge conflict khi không có host: kết quả vẫn là `blocked` kèm `reason`/`conflictedFiles`, và có một dòng `friction-write-failed` trong `invocation-faults`.
+- [x] <!-- Red Team 2026-09-29 --> `work.friction` do bản cũ ghi sau lần migrate đầu được import ở lần mở kế tiếp; crash giữa lô import không tạo bản trùng.
+- [x] <!-- Red Team 2026-09-29 --> Ghi friction từ một worktree đi vào store của main checkout.
+- [x] Không file Node nào ghi vào `.fgos/observe/` (test quét source).
+- [x] <!-- Updated: Validation Session 5 - Work ngừng đọc friction --> Không file Node nào của Work đọc friction: `grep -rn "frictions" src/state src/verbs src/report` không còn chỗ đọc.
+- [x] Mở store lần hai không import lại những `(src, seq)` đã có.
+- [x] Friction tạo trong test được resolve khi item sang `wontfix`.
+- [x] Một test gọi `fgos friction record` từ shell (giả lập component ngôn ngữ khác) ghi được, và `friction show` đọc lại được.
 
 ## Risk Assessment
 - **Blast radius ở Work core** (`store.mjs`, `replay.mjs`). `backward-compat.test` đang khoá fold lịch sử; cập nhật fixture có chủ đích và ghi lý do.

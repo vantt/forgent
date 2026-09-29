@@ -23,6 +23,7 @@ import { createSession, endSession } from '../../../src/runner/session.mjs';
 import { DEFAULT_TTL_MS } from '../../../src/runner/main-checkout-lock.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../../../src/state/fgos-file-registry.mjs';
 import { writeCoexistenceManifest } from '../../../src/install/coexist.mjs';
+import { invokeHost } from '../../../src/util/host-bin.mjs';
 
 // The CLI under test, resolved by absolute path so it works regardless of
 // the spawned process's cwd (which every test below points at a fresh
@@ -176,7 +177,24 @@ function eventLines(cwd) {
 // D4) -- the vast majority of callers want this: it reflects a claimed
 // item as 'doing' whether or not claim-time wrote that durably.
 function stateView(cwd) {
-  return listWork(path.join(cwd, '.fgos'));
+  const view = listWork(path.join(cwd, '.fgos'));
+  if (view && !view.frictions) {
+    view.frictions = new Proxy({}, {
+      get(target, prop) {
+        if (typeof prop === 'string') {
+          try {
+            const data = invokeHost(['friction', 'show', `work:${prop}`], { dir: cwd });
+            const list = data?.records || [];
+            return list.length > 0 ? list : undefined;
+          } catch {
+            return undefined;
+          }
+        }
+        return undefined;
+      }
+    });
+  }
+  return view;
 }
 
 // tsk-40m (docs/architect/doing-coordination-redesign.md): `todo -> doing`

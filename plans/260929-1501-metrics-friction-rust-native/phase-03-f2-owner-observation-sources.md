@@ -1,7 +1,7 @@
 ---
 phase: F2
 title: "Contract observation + source tầng nền"
-status: done
+status: completed
 priority: P1
 effort: "1d"
 dependencies: [F1]
@@ -17,7 +17,7 @@ Mỗi owner ở tầng nền implement `ObservationSource` **trong crate của c
 |---|---|---|---|
 | `packages/run-result/rust` (**mới**, Run Result Evaluator) | `run-result` | `.fgos/assignments/*/runs/*/result.json` | `run.settled` với subject `run:<runId>`; attrs: `executor`, `status`, `classification` (nguyên văn; **chỉ ~103/1.028 run có**), `assignmentId`, `role` và `adapter` **đọc từ `assignment.json`** của cùng assignment (result.json không có hai field này; không có thì `null`, không đoán từ executorId). `durationMs` chỉ ~109/1.028 run có: bỏ khỏi source; F4 tính duration từ timestamp coordination. <!-- Red Team 2026-09-29 --> |
 | `packages/coordination-state/rust` (**mới**, Agent Coordination) | `coordination` | `.fgos/coordination/sessions/*/{session.json,events.jsonl}` | `session.opened` / `session.assignment` (attrs `actorId`, `assignmentId`) / `session.disposition` / `session.closed` (attrs `terminal`), với subject `session:<id>` |
-| `packages/observe/rust` (source ngoài fgOS) | `claude-transcripts` | `~/.claude/projects/<dir>/*.jsonl` (`CLAUDE_CONFIG_DIR` nếu có); `enc` = path project thay `/` và `.` bằng `-`. <!-- Red Team 2026-09-29 --> Chỉ nhận `<dir> == enc` hoặc bắt đầu bằng `enc + "--claude-worktrees-"` (không match prefix trần: `-forgentX*` kéo nhầm `-forgentX-worker-isolation`; `-forgent*` kéo cả forgentX). Lọc thêm theo field `cwd` của từng record: phải nằm dưới project root hoặc một path trong `git worktree list` | `llm.usage` với subject `case:` (gán ở F4 theo khung thời gian); attrs: 4 loại token, `sessionId`, `model`; **dedupe theo `message.id`** |
+| `packages/observe/rust` (source ngoài fgOS) | `claude-transcripts` | `~/.claude/projects/<dir>/*.jsonl` (`CLAUDE_CONFIG_DIR` nếu có); nhận `<dir>` khớp encoding của bất kỳ path nào trong `git worktree list` (project root cộng từng worktree ngoài) hoặc bắt đầu bằng `enc + "--claude-worktrees-"` (không match prefix trần: `-forgentX*` không kéo nhầm `-forgentX-worker-isolation` nếu không phải worktree). Lọc thêm theo field `cwd` của từng record: phải nằm dưới project root hoặc một path trong `git worktree list` | `llm.usage` với subject `case:` (gán ở F4 theo khung thời gian); attrs: 4 loại token, `sessionId`, `model`; **dedupe theo `message.id`** |
 | `packages/observe/rust` | `repo` | `git ls-files`, `git rev-list` | dùng trực tiếp cho độ phức tạp và số commit (không cần observation) |
 
 - Non-functional:
@@ -45,9 +45,9 @@ Mỗi owner ở tầng nền implement `ObservationSource` **trong crate của c
 5. Smoke trên store thật của forgentX: 1.028 run (± run mới) và 602 session (±).
 
 ## Success Criteria
-- [ ] Unit test của từng source xanh.
-- [ ] Smoke thật khớp số lượng với audit.
-- [ ] Test chiều phụ thuộc xanh.
+- [x] Unit test của từng source xanh.
+- [x] Smoke thật khớp số lượng với audit.
+- [x] Test chiều phụ thuộc xanh.
 
 ## Risk Assessment
 - **Định dạng transcript Claude Code đổi.** Dấu hiệu: có file mà tokens = 0. Cách xử lý: source trả `status: unrecognized`, scorecard hiện `unknown`.

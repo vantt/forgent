@@ -1,7 +1,7 @@
 ---
 phase: F1
 title: "Crate Observe + route native có subcommand"
-status: done
+status: completed
 priority: P1
 effort: "1d"
 dependencies: []
@@ -92,15 +92,15 @@ main.rs ─ routes["metrics"] {native, operation_id:"observe.metrics", subcomman
 7. Viết spec tối thiểu và thêm dòng component-boundary.
 
 ## Success Criteria
-- [ ] `cargo run -p fgos -- metrics ping --dir .` in envelope có `root`.
-- [ ] `cargo run -p fgos -- metrics` exit 4 kèm danh sách sub.
-- [ ] `gate-bypass` byte-identical như trước. <!-- Red Team 2026-09-29 --> `version` **đổi** vì danh sách verb lấy từ key của `command-routes.json` (`packages/distribution/rust/src/lib.rs:452-473`): regenerate `test/rust-host/vectors/envelope/version.json` bằng `test/rust-host/generate-vectors.mjs`; mỗi làn xoá verb thì regenerate khi rebase.
-- [ ] <!-- Red Team 2026-09-29 --> Friction detail có newline, dấu ngoặc và dài 64 KB đi qua stdin round-trip nguyên vẹn.
-- [ ] <!-- Red Team 2026-09-29 --> `invokeHost` chạy được với env trống (resolve qua manifest), và báo `host-unavailable` khi không có host; `fgos-runner` với env trống không crash.
-- [ ] <!-- Red Team 2026-09-29 --> Store lock: holder bị SIGKILL thì lần gọi sau giành lại được lock.
-- [ ] `node bin/fgos.mjs metrics` exit 4 với thông báo native-only.
-- [ ] `cargo test --workspace` và `node --test test/rust-host/command-routes.test.mjs` xanh.
-- [ ] `npm test` tự build host và mọi test Node thấy `FGOS_HOST_BIN`; lời gọi `legacy-cli` lồng nhau vẫn bị chặn.
+- [x] `cargo run -p fgos -- metrics ping --dir .` in envelope có `root`.
+- [x] `cargo run -p fgos -- metrics` exit 4 kèm danh sách sub.
+- [x] `gate-bypass` byte-identical như trước. <!-- Red Team 2026-09-29 --> `version` **đổi** vì danh sách verb lấy từ key của `command-routes.json` (`packages/distribution/rust/src/lib.rs:452-473`): regenerate `test/rust-host/vectors/envelope/version.json` bằng `test/rust-host/generate-vectors.mjs`; mỗi làn xoá verb thì regenerate khi rebase.
+- [x] <!-- Red Team 2026-09-29 --> Friction detail có newline, dấu ngoặc và dài 64 KB đi qua stdin round-trip nguyên vẹn.
+- [x] <!-- Red Team 2026-09-29 --> `invokeHost` chạy được với env trống (resolve qua manifest), và báo `host-unavailable` khi không có host; `fgos-runner` với env trống không crash.
+- [x] <!-- Red Team 2026-09-29 --> Store lock: holder bị SIGKILL thì lần gọi sau giành lại được lock.
+- [x] `node bin/fgos.mjs metrics` exit 4 với thông báo native-only.
+- [x] `cargo test --workspace` và `node --test test/rust-host/command-routes.test.mjs` xanh.
+- [x] `npm test` tự build host và mọi test Node thấy `FGOS_HOST_BIN`; lời gọi `legacy-cli` lồng nhau vẫn bị chặn.
 
 ## Risk Assessment
 - **Node test giờ phụ thuộc Rust build** (đã chấp nhận). Dấu hiệu: `npm test` chậm ở lần đầu, hoặc fail khi máy không có cargo. Cách xử lý: build debug incremental; báo lỗi rõ ràng khi thiếu cargo. Chạy `node bin/fgos.mjs` trực tiếp (không qua host) thì các lệnh ghi friction báo lỗi có mã. Đây là chủ đích của single path.
