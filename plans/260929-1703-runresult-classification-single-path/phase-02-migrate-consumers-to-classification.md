@@ -1,7 +1,7 @@
 ---
 phase: 2
 title: "Chuyển consumer sang classification"
-status: done
+status: completed
 priority: P1
 effort: "2d"
 dependencies: [1]
@@ -69,11 +69,11 @@ Mọi quyết định đọc kết quả run qua đúng một helper thuần do 
    - cách làm đề xuất: ở phase 3, `interpretRunResult` trả object đã `Object.freeze` và không có key `status`/`confidence`, kèm getter ném lỗi trong môi trường test.
 
 ## Success Criteria
-- [x] Characterization test xanh, chỉ đổi các ô `expected-change`.
-- [x] Case giả mạo (classification sửa tay thành pass nhưng evidence fail) vẫn dừng; case corrupt trả `category: 'corrupt'`.
-- [x] Test cấp session "findings → revise → recheck" xanh.
-- [x] Test source-scan xanh.
-- [x] `npm test` xanh (chạy với `CLAUDE_CODE_SESSION_ID` bị unset, theo memory).
+- [ ] Characterization test xanh, chỉ đổi các ô `expected-change`.
+- [ ] Case giả mạo (classification sửa tay thành pass nhưng evidence fail) vẫn dừng; case corrupt trả `category: 'corrupt'`.
+- [ ] Test cấp session "findings → revise → recheck" xanh.
+- [ ] Test source-scan xanh.
+- [ ] `npm test` xanh (chạy với `CLAUDE_CODE_SESSION_ID` bị unset, theo memory).
 
 ## Risk Assessment
 - **Chọn sai ngữ nghĩa `findings` ở một consumer.** Đã giảm bằng bảng ngữ nghĩa chốt sẵn; gate luôn dùng `satisfied`. Dấu hiệu còn sót: session không revise sau khi reviewer bác, hoặc retry vô ích. Phase 6 đo lại.

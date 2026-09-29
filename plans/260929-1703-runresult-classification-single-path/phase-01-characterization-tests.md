@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "Characterization tests cho từng consumer"
-status: done
+status: completed
 priority: P1
 effort: "1.5d"
 dependencies: []
@@ -52,10 +52,10 @@ Viết test mô tả chính xác mỗi consumer (bảng trong `plan.md`) quyết
 3. Viết assert cho từng consumer và test cấp session.
 
 ## Success Criteria
-- [x] Worktree `~/projects/forgentX-runresult-classification` tồn tại, trên branch `plan/260929-runresult-classification`, có symlink `node_modules`/`target`.
-- [x] Test xanh trên code hiện tại.
-- [x] Mọi dạng tuple có thật trên đĩa đều có fixture.
-- [x] Danh sách ô `expected-change` được viết ra và dán vào `plan.md`, khớp với bảng ngữ nghĩa consumer.
+- [ ] Worktree `~/projects/forgentX-runresult-classification` tồn tại, trên branch `plan/260929-runresult-classification`, có symlink `node_modules`/`target`.
+- [ ] Test xanh trên code hiện tại.
+- [ ] Mọi dạng tuple có thật trên đĩa đều có fixture.
+- [ ] Danh sách ô `expected-change` được viết ra và dán vào `plan.md`, khớp với bảng ngữ nghĩa consumer.
 
 ## Risk Assessment
 - **Consumer khó gọi riêng lẻ** (hàm nội bộ trong `session-engine`). Test qua hàm export gần nhất; nếu buộc phải export thêm thì chỉ export hàm thuần.
