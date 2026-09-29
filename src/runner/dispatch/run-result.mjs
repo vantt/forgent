@@ -271,6 +271,75 @@ export function validateRunResultV2(result, { expectedRunId } = {}) {
 }
 
 /**
+ * Validate a RunResult v3 object against v3 schema and invariants.
+ *
+ * @param {object} result
+ * @param {object} [options]
+ * @param {string} [options.expectedRunId]
+ * @returns {{ valid: boolean, corrupt: boolean, reasons: string[] }}
+ */
+export function validateRunResultV3(result, { expectedRunId } = {}) {
+  const reasons = [];
+  if (!result || typeof result !== 'object' || Array.isArray(result)) {
+    return { valid: false, corrupt: true, reasons: ['RunResult must be an object'] };
+  }
+
+  if (!result.contract || typeof result.contract !== 'object') {
+    reasons.push('contract field is required');
+  } else if (result.contract.id !== RUN_RESULT_CONTRACT.id || result.contract.version !== 3) {
+    reasons.push(`contract must be {id: "${RUN_RESULT_CONTRACT.id}", version: 3}`);
+  }
+
+  if (typeof result.runId !== 'string' || !result.runId.trim()) {
+    reasons.push('runId must be a non-empty string');
+  } else if (expectedRunId && result.runId !== expectedRunId) {
+    reasons.push(`runId "${result.runId}" does not match expectedRunId "${expectedRunId}"`);
+  }
+
+  const c = result.classification;
+  if (!c || typeof c !== 'object' || Array.isArray(c)) {
+    return { valid: false, corrupt: true, reasons: ['classification is required and must be an object'] };
+  }
+
+  // execution
+  if (!c.execution || typeof c.execution !== 'object') {
+    reasons.push('classification.execution must be an object');
+  } else if (!EXECUTION_STATUSES.includes(c.execution.status)) {
+    reasons.push(`classification.execution.status must be one of [${EXECUTION_STATUSES.join(', ')}]`);
+  }
+
+  // assessment
+  if (!c.assessment || typeof c.assessment !== 'object') {
+    reasons.push('classification.assessment must be an object');
+  } else if (!ASSESSMENT_VERDICTS.includes(c.assessment.verdict)) {
+    reasons.push(`classification.assessment.verdict must be one of [${ASSESSMENT_VERDICTS.join(', ')}]`);
+  }
+
+  // confidence
+  if (!c.confidence || typeof c.confidence !== 'object') {
+    reasons.push('classification.confidence must be an object');
+  } else if (!CONFIDENCE_LEVELS.includes(c.confidence.level)) {
+    reasons.push(`classification.confidence.level must be one of [${CONFIDENCE_LEVELS.join(', ')}]`);
+  }
+
+  // Invariant (Red Team #2): category is a checked cache:
+  // validateRunResultV3 rejects record where classification.outcome.category !== deriveOutcome(classification).category
+  const derivedOutcome = deriveOutcome(c);
+  if (!c.outcome || typeof c.outcome !== 'object') {
+    reasons.push('classification.outcome must be an object in contract v3');
+  } else if (c.outcome.category !== derivedOutcome.category) {
+    reasons.push(`classification.outcome.category "${c.outcome.category}" does not match deriveOutcome "${derivedOutcome.category}"`);
+  }
+
+  const isValid = reasons.length === 0;
+  return {
+    valid: isValid,
+    corrupt: !isValid,
+    reasons,
+  };
+}
+
+/**
  * Construct and normalize a RunResult v2 object.
  *
  * @param {object} params
@@ -303,6 +372,8 @@ export function normalizeRunResultV2({
   failureOverride = null,
   confidenceLevel = null,
   assessmentOverride = null,
+  runnerNote = null,
+  usage = null,
 } = {}) {
   const exitCode = typeof runtime.exitCode === 'number' ? runtime.exitCode : null;
   const isTimeout = runtime.isTimeout === true;
@@ -537,12 +608,15 @@ export function normalizeRunResultV2({
     // the real input `agentClaim` parameter, not this projection) already
     // omits `'valid-agent-result-claim'` whenever there was none.
     ...(agentClaim ? { agentClaim } : {}),
-    runnerNote: {
-      status: projectedStatus,
-      summary: claimInvalid
-        ? 'agent-result.json was present but failed schema validation'
-        : (executionError ? executionError.message : (isTimeout ? 'Execution timed out' : 'Settled')),
-    },
+    runnerNote: runnerNote
+      ? (typeof runnerNote === 'string' ? { status: projectedStatus, summary: runnerNote } : runnerNote)
+      : {
+          status: projectedStatus,
+          summary: claimInvalid
+            ? 'agent-result.json was present but failed schema validation'
+            : (executionError ? executionError.message : (isTimeout ? 'Execution timed out' : 'Settled')),
+        },
+    ...(usage !== undefined ? { usage } : {}),
     evidence: {
       ...evidence,
       gitBefore: evidence?.gitBefore ?? null,
@@ -664,6 +738,24 @@ export function interpretRunResult(input, options = {}) {
   // complete absence of that field is historical v1; a partial, unknown, or
   // mismatched contract must never demote itself into attacker-controlled v1
   // projections.
+  if (rawObj.contract?.version === 3 && rawObj.contract?.id === RUN_RESULT_CONTRACT.id) {
+    const validation = validateRunResultV3(rawObj, { expectedRunId });
+    if (!validation.valid) {
+      return {
+        ...rawObj,
+        contract: { id: RUN_RESULT_CONTRACT.id, version: 3 },
+        classification: { ...CORRUPT_CLASSIFICATION },
+        status: 'no-evidence',
+        confidence: 'failed',
+        contractCorrupt: true,
+        resultCorrupt: true,
+        corrupt: true,
+        corruptionReasons: validation.reasons,
+      };
+    }
+    return { ...rawObj };
+  }
+
   if (rawObj.contract?.version === 2 && rawObj.contract?.id === RUN_RESULT_CONTRACT.id) {
     const validation = validateRunResultV2(rawObj, { expectedRunId });
     if (!validation.valid) {

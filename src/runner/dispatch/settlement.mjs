@@ -726,7 +726,6 @@ export async function settleFailedRunFromOutcome(runDir, runMeta, command, contr
     assignmentId: runMeta.assignmentId,
     controlEpoch,
     controlToken,
-    status: 'failed',
     confidence: 'failed',
     confidenceLevel: 'failed',
     runtime: {
@@ -734,10 +733,7 @@ export async function settleFailedRunFromOutcome(runDir, runMeta, command, contr
       stdoutLog: path.relative(root, path.join(runDir, 'stdout.log')),
       stderrLog: path.relative(root, path.join(runDir, 'stderr.log')),
     },
-    agentClaim: {
-      status: 'failed',
-      summary: stderrText,
-    },
+    runnerNote: stderrText,
     evidence: {
       gitBefore: null,
       gitAfter: null,
