@@ -26,7 +26,6 @@ const NEW_13 = [
 const MODULE_TRIP_CASES = [
   'src/runner/loop.mjs',       // prefix src/runner/
   'src/runner/merge.mjs',      // prefix src/runner/
-  'src/report/entropy.mjs',    // equals
   'src/evolve/candidates.mjs', // prefix src/evolve/
   'src/evolve/iron-law.mjs',   // prefix src/evolve/
   'bin/fgos.mjs',              // equals (whole entry file stands in for the evolve verb)

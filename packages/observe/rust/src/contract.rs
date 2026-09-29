@@ -109,6 +109,69 @@ pub trait LegacyFrictionSource: Send + Sync {
     ) -> Result<Vec<LegacyFrictionRecord>, SourceError>;
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OutcomeEntryRecord {
+    pub id: String,
+    pub predicted: Option<serde_json::Value>,
+    pub actual: Option<serde_json::Value>,
+    #[serde(rename = "docType")]
+    pub doc_type: Option<serde_json::Value>,
+    #[serde(rename = "docPath")]
+    pub doc_path: Option<serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SettlementChannelRecord {
+    pub count: usize,
+    #[serde(rename = "byKindRole")]
+    pub by_kind_role: std::collections::HashMap<String, usize>,
+    pub recent: Vec<serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct LearningChannelRecord {
+    pub count: usize,
+    pub recent: Vec<serde_json::Value>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MissingOutcomeNagRecord {
+    pub count: usize,
+    pub ids: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct WorkOutcomesRecord {
+    pub outcomes: Vec<OutcomeEntryRecord>,
+    pub settlement: Option<SettlementChannelRecord>,
+    pub learning: Option<LearningChannelRecord>,
+    #[serde(rename = "missingOutcomeNag")]
+    pub missing_outcome_nag: Option<MissingOutcomeNagRecord>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct WorkEntropySignalsRecord {
+    pub missing_actual: u64,
+    pub stale_doing: u64,
+    pub stage_entry: u64,
+    pub awaiting_human: u64,
+    pub total_outcomes_with_actual: u64,
+    pub total_settlements: u64,
+}
+
+pub trait WorkObservationSource: Send + Sync {
+    fn read_outcomes_report(
+        &self,
+        root: &Path,
+        filter_id: Option<&str>,
+    ) -> Result<WorkOutcomesRecord, SourceError>;
+
+    fn read_entropy_signals(
+        &self,
+        root: &Path,
+    ) -> Result<WorkEntropySignalsRecord, SourceError>;
+}
+
 #[derive(Debug, Clone)]
 pub struct ObserveRequest {
     pub operation: String,

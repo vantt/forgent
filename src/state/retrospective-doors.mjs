@@ -12,7 +12,7 @@
 // Advisory, not blocking (mirrors D10's "raw capture ghi ngay, narrative
 // synthesis trễ có giới hạn + có phát hiện được" posture): a finding is
 // recorded via `recordFriction` by the caller so it is queryable
-// (`fgos check <id>`), never a reason to hold the item out of
+// (`fgos metrics outcomes <id>` / `fgos friction show work:<id>`), never a reason to hold the item out of
 // `retrospective` -- Ưu tiên #2 ("Release con người") already establishes
 // that one hung question must never block other independent progress, and
 // `cleanup`'s own existing gate (`assessCleanupReadiness`) is the real

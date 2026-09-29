@@ -267,26 +267,6 @@ test('two submits of the same text get different ids, both persist, no duplicate
 });
 
 
-test('entropy-history.jsonl is written in the SAME data dir as events.jsonl, not a hardcoded path, one line per check run', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'history-path-item');
-  run(cwd, ['move', 'history-path-item', '--to', 'doing']);
-
-  run(cwd, ['check']);
-  run(cwd, ['check']);
-
-  const historyPath = path.join(cwd, '.fgos', 'logs', 'entropy-history.jsonl');
-  assert.ok(fs.existsSync(historyPath));
-  const lines = fs.readFileSync(historyPath, 'utf8').split('\n').filter(Boolean);
-  assert.equal(lines.length, 2);
-  for (const line of lines) {
-    const entry = JSON.parse(line);
-    assert.equal(typeof entry.score, 'number');
-    assert.equal(typeof entry.counts.outcomes, 'number');
-    assert.equal(typeof entry.counts.frictions, 'number');
-    assert.equal(typeof entry.counts.settlements, 'number');
-  }
-});
 
 
 

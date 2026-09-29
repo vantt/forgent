@@ -1,7 +1,7 @@
 ---
 phase: F7
 title: "metrics runs/outcomes/entropy/snapshot; xoá check và entropy Node"
-status: pending
+status: done
 priority: P1
 effort: "1.5d"
 dependencies: [F6]

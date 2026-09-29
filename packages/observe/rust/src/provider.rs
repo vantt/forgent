@@ -48,6 +48,7 @@ pub const OBSERVE_FRICTION_DESCRIPTOR: ProviderDescriptor = ProviderDescriptor {
 pub struct ObserveMetricsProvider {
     descriptor: ProviderDescriptor,
     sources: Arc<Vec<Box<dyn crate::ObservationSource>>>,
+    work_source: Arc<Option<Box<dyn crate::WorkObservationSource>>>,
 }
 
 impl ObserveMetricsProvider {
@@ -55,13 +56,17 @@ impl ObserveMetricsProvider {
         Self {
             descriptor: OBSERVE_METRICS_DESCRIPTOR,
             sources: Arc::new(Vec::new()),
+            work_source: Arc::new(None),
         }
     }
-
-    pub fn with_sources(sources: Vec<Box<dyn crate::ObservationSource>>) -> Self {
+    pub fn with_sources(
+        sources: Vec<Box<dyn crate::ObservationSource>>,
+        work_source: Option<Box<dyn crate::WorkObservationSource>>,
+    ) -> Self {
         Self {
             descriptor: OBSERVE_METRICS_DESCRIPTOR,
             sources: Arc::new(sources),
+            work_source: Arc::new(work_source),
         }
     }
 }
@@ -91,7 +96,8 @@ impl OperationProvider for ObserveMetricsProvider {
                 .downcast_ref::<ObserveRequest>()
                 .ok_or_else(|| ProviderError::SemanticValidation("input is not ObserveRequest".into()))?;
 
-            let res_json = metrics_cli::dispatch(req, &self.sources)
+            let work_src_ref: Option<&dyn crate::WorkObservationSource> = self.work_source.as_ref().as_ref().map(|b| b.as_ref());
+            let res_json = metrics_cli::dispatch(req, &self.sources, work_src_ref)
                 .map_err(ProviderError::ProviderFailed)?;
             Ok(ProviderOutcome::completed(
                 self.descriptor().outcome_contract.clone(),

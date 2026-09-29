@@ -12,7 +12,6 @@
       "authoritative-match",
       "capability",
       "catchup",
-      "check",
       "cleanup",
       "compound",
       "conflicts",
@@ -81,12 +80,12 @@
       "workflow"
     ]
   },
-  "compact_hash_input": "{\"packageVersion\":\"0.1.0\",\"gitCommit\":\"0123456\",\"verbs\":[\"add\",\"answer\",\"approve\",\"ask\",\"authoritative-match\",\"capability\",\"catchup\",\"check\",\"cleanup\",\"compound\",\"conflicts\",\"context-render\",\"coordination\",\"decision\",\"decision-index\",\"discover\",\"dispatch\",\"doc\",\"doc-registry\",\"doc-sources\",\"docs-index\",\"doctor\",\"edit\",\"friction\",\"gate-approve\",\"gate-bypass\",\"gate-check\",\"gateway\",\"goal\",\"graph\",\"handoff\",\"handoff-return\",\"init\",\"knowledge\",\"list\",\"lock-status\",\"main-checkout-reset\",\"merge\",\"metrics\",\"move\",\"pick\",\"plan\",\"plan-lint\",\"preflight\",\"promote-to-component\",\"ready\",\"rebuild\",\"recheck-blocked\",\"reject\",\"repair\",\"report\",\"resolve-park-reason\",\"resync-worktree\",\"retrospective\",\"return\",\"review\",\"rollup\",\"schedule\",\"session\",\"setup\",\"show\",\"slots\",\"stale\",\"submit\",\"sync-root\",\"take\",\"tool\",\"topic\",\"triage\",\"unclaim\",\"uninstall\",\"unlock\",\"version\",\"workflow\"]}",
-  "data_hash": "2c985f0a0cb27e832ed241cd239b63324697baeb84062ae19a42fdbdd91681ef",
+  "compact_hash_input": "{\"packageVersion\":\"0.1.0\",\"gitCommit\":\"0123456\",\"verbs\":[\"add\",\"answer\",\"approve\",\"ask\",\"authoritative-match\",\"capability\",\"catchup\",\"cleanup\",\"compound\",\"conflicts\",\"context-render\",\"coordination\",\"decision\",\"decision-index\",\"discover\",\"dispatch\",\"doc\",\"doc-registry\",\"doc-sources\",\"docs-index\",\"doctor\",\"edit\",\"friction\",\"gate-approve\",\"gate-bypass\",\"gate-check\",\"gateway\",\"goal\",\"graph\",\"handoff\",\"handoff-return\",\"init\",\"knowledge\",\"list\",\"lock-status\",\"main-checkout-reset\",\"merge\",\"metrics\",\"move\",\"pick\",\"plan\",\"plan-lint\",\"preflight\",\"promote-to-component\",\"ready\",\"rebuild\",\"recheck-blocked\",\"reject\",\"repair\",\"report\",\"resolve-park-reason\",\"resync-worktree\",\"retrospective\",\"return\",\"review\",\"rollup\",\"schedule\",\"session\",\"setup\",\"show\",\"slots\",\"stale\",\"submit\",\"sync-root\",\"take\",\"tool\",\"topic\",\"triage\",\"unclaim\",\"uninstall\",\"unlock\",\"version\",\"workflow\"]}",
+  "data_hash": "ec18da9070740b62e473b466e590058a8924c306dc75ec1443eb245bcd588525",
   "envelope": {
     "contract": "fgos.v1",
     "generated_at": "2026-09-10T17:00:00.000Z",
-    "data_hash": "2c985f0a0cb27e832ed241cd239b63324697baeb84062ae19a42fdbdd91681ef",
+    "data_hash": "ec18da9070740b62e473b466e590058a8924c306dc75ec1443eb245bcd588525",
     "data": {
       "packageVersion": "0.1.0",
       "gitCommit": "0123456",
@@ -98,7 +97,6 @@
         "authoritative-match",
         "capability",
         "catchup",
-        "check",
         "cleanup",
         "compound",
         "conflicts",
@@ -168,7 +166,7 @@
       ]
     }
   },
-  "envelope_bytes": "{\n  \"contract\": \"fgos.v1\",\n  \"generated_at\": \"2026-09-10T17:00:00.000Z\",\n  \"data_hash\": \"2c985f0a0cb27e832ed241cd239b63324697baeb84062ae19a42fdbdd91681ef\",\n  \"data\": {\n    \"packageVersion\": \"0.1.0\",\n    \"gitCommit\": \"0123456\",\n    \"verbs\": [\n      \"add\",\n      \"answer\",\n      \"approve\",\n      \"ask\",\n      \"authoritative-match\",\n      \"capability\",\n      \"catchup\",\n      \"check\",\n      \"cleanup\",\n      \"compound\",\n      \"conflicts\",\n      \"context-render\",\n      \"coordination\",\n      \"decision\",\n      \"decision-index\",\n      \"discover\",\n      \"dispatch\",\n      \"doc\",\n      \"doc-registry\",\n      \"doc-sources\",\n      \"docs-index\",\n      \"doctor\",\n      \"edit\",\n      \"friction\",\n      \"gate-approve\",\n      \"gate-bypass\",\n      \"gate-check\",\n      \"gateway\",\n      \"goal\",\n      \"graph\",\n      \"handoff\",\n      \"handoff-return\",\n      \"init\",\n      \"knowledge\",\n      \"list\",\n      \"lock-status\",\n      \"main-checkout-reset\",\n      \"merge\",\n      \"metrics\",\n      \"move\",\n      \"pick\",\n      \"plan\",\n      \"plan-lint\",\n      \"preflight\",\n      \"promote-to-component\",\n      \"ready\",\n      \"rebuild\",\n      \"recheck-blocked\",\n      \"reject\",\n      \"repair\",\n      \"report\",\n      \"resolve-park-reason\",\n      \"resync-worktree\",\n      \"retrospective\",\n      \"return\",\n      \"review\",\n      \"rollup\",\n      \"schedule\",\n      \"session\",\n      \"setup\",\n      \"show\",\n      \"slots\",\n      \"stale\",\n      \"submit\",\n      \"sync-root\",\n      \"take\",\n      \"tool\",\n      \"topic\",\n      \"triage\",\n      \"unclaim\",\n      \"uninstall\",\n      \"unlock\",\n      \"version\",\n      \"workflow\"\n    ]\n  }\n}\n",
+  "envelope_bytes": "{\n  \"contract\": \"fgos.v1\",\n  \"generated_at\": \"2026-09-10T17:00:00.000Z\",\n  \"data_hash\": \"ec18da9070740b62e473b466e590058a8924c306dc75ec1443eb245bcd588525\",\n  \"data\": {\n    \"packageVersion\": \"0.1.0\",\n    \"gitCommit\": \"0123456\",\n    \"verbs\": [\n      \"add\",\n      \"answer\",\n      \"approve\",\n      \"ask\",\n      \"authoritative-match\",\n      \"capability\",\n      \"catchup\",\n      \"cleanup\",\n      \"compound\",\n      \"conflicts\",\n      \"context-render\",\n      \"coordination\",\n      \"decision\",\n      \"decision-index\",\n      \"discover\",\n      \"dispatch\",\n      \"doc\",\n      \"doc-registry\",\n      \"doc-sources\",\n      \"docs-index\",\n      \"doctor\",\n      \"edit\",\n      \"friction\",\n      \"gate-approve\",\n      \"gate-bypass\",\n      \"gate-check\",\n      \"gateway\",\n      \"goal\",\n      \"graph\",\n      \"handoff\",\n      \"handoff-return\",\n      \"init\",\n      \"knowledge\",\n      \"list\",\n      \"lock-status\",\n      \"main-checkout-reset\",\n      \"merge\",\n      \"metrics\",\n      \"move\",\n      \"pick\",\n      \"plan\",\n      \"plan-lint\",\n      \"preflight\",\n      \"promote-to-component\",\n      \"ready\",\n      \"rebuild\",\n      \"recheck-blocked\",\n      \"reject\",\n      \"repair\",\n      \"report\",\n      \"resolve-park-reason\",\n      \"resync-worktree\",\n      \"retrospective\",\n      \"return\",\n      \"review\",\n      \"rollup\",\n      \"schedule\",\n      \"session\",\n      \"setup\",\n      \"show\",\n      \"slots\",\n      \"stale\",\n      \"submit\",\n      \"sync-root\",\n      \"take\",\n      \"tool\",\n      \"topic\",\n      \"triage\",\n      \"unclaim\",\n      \"uninstall\",\n      \"unlock\",\n      \"version\",\n      \"workflow\"\n    ]\n  }\n}\n",
   "timestamp_predicate": {
     "format": "iso-8601",
     "regex": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$",

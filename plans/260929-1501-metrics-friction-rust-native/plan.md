@@ -1,6 +1,6 @@
 ---
 title: "Observe component — chuyển trọn sang Rust (fgos metrics + fgos friction)"
-status: pending
+status: done
 priority: P1
 created: 2026-09-29
 revised: 2026-09-29 (v3 — Observe trọn gói, làn song song)

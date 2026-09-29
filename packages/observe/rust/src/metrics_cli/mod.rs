@@ -1,17 +1,24 @@
 //! CLI dispatch for `fgos metrics <sub>` (Lane A).
 
 pub mod case;
+pub mod entropy;
 pub mod faults;
 pub mod harness;
+pub mod outcomes;
+pub mod runs;
+pub mod snapshot;
 
-use crate::contract::{ObservationSource, ObserveRequest};
+use crate::contract::{ObservationSource, ObserveRequest, WorkObservationSource};
 use serde_json::json;
 
-pub const AVAILABLE_SUBCOMMANDS: &[&str] = &["ping", "case", "harness", "faults"];
+pub const AVAILABLE_SUBCOMMANDS: &[&str] = &[
+    "ping", "case", "harness", "faults", "runs", "outcomes", "entropy", "snapshot",
+];
 
 pub fn dispatch(
     req: &ObserveRequest,
     sources: &[Box<dyn ObservationSource>],
+    work_source: Option<&dyn WorkObservationSource>,
 ) -> Result<serde_json::Value, String> {
     match req.sub.as_str() {
         "ping" => {
@@ -27,6 +34,10 @@ pub fn dispatch(
         "case" => case::dispatch_case(req),
         "harness" => harness::dispatch_harness(req, sources),
         "faults" => faults::dispatch_faults(req),
+        "runs" => runs::dispatch_runs(req, sources),
+        "outcomes" => outcomes::dispatch_outcomes(req, work_source),
+        "entropy" => entropy::dispatch_entropy(req, work_source),
+        "snapshot" => snapshot::dispatch_snapshot(req, work_source),
         other => Err(format!(
             "unknown metrics subcommand \"{}\". Available: {}",
             other,

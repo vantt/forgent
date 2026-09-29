@@ -23,8 +23,8 @@ never the actual git stderr/exit status underneath it.
 
 ## Confirmed live, not theoretical
 
-Driving `tsk-1vc` on 2026-08-21: `fgos sync-root`'s CLI output, `fgos check
-<id>`'s friction summary, and every other read-only verb gave no more than
+Driving `tsk-1vc` on 2026-08-21: `fgos sync-root`'s CLI output, `fgos friction
+show work:<id>`'s friction summary, and every other read-only verb gave no more than
 the bare label `"merge-failed-unclassified"` — no actionable detail. Only
 calling `mergeRunnerItem(repoRoot, item, opts)` directly, bypassing the CLI
 entirely, revealed the real cause: `"Command failed: git merge --no-commit

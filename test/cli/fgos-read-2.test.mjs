@@ -340,22 +340,3 @@ test('ready --cursor rejects a stale cursor (id no longer in the current frontie
 test.todo('list --limit paginates only the work map: view.work becomes {items, nextCursor} while other view keys are untouched - migrated to test/direct/fgos-read.test.mjs');
 
 
-
-// --- `fgos check` (phase-3-compound-learning-3): predicted-vs-actual report ---
-//
-// `check` is a pure read (per D1 request-class, same as `ready`/`list`) over
-// `listWork(dir).outcomes` — until compound-learn-enduser-docs slice 3, the
-// CLI had no verb that WRITES a work.outcome event (only the runner did, per
-// plan Approach S1; `compound --doc-type` is now the one CLI producer, see
-// its own tests above), so these tests seed outcome data directly through
-// store.mjs's addOutcome, the same single write door the runner uses, then
-// exercise the real `check` binary.
-
-test('check on an item with no recorded outcome returns a null predicted/actual entry for that id, exit 0, no throw', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'unchecked-item');
-  const result = run(cwd, ['check', 'unchecked-item']);
-  assert.equal(result.status, 0);
-  const data = envelopeData(result.stdout);
-  assert.deepEqual(data.outcomes, [{ id: 'unchecked-item', predicted: null, actual: null, docType: null, docPath: null }]);
-});

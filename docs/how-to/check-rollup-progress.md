@@ -200,7 +200,7 @@ runner, then a human `close`:
 
 ## Related
 
-- `fgos check <id>` — full outcome/friction/settlement history for an item,
+- `fgos metrics outcomes <id>` — full outcome/settlement history for an item,
   including the entries quoted above.
 - `fgos list` — the full work list, if you need more than one root item's
   direct children.

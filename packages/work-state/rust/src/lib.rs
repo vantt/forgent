@@ -4,7 +4,10 @@
 
 pub mod legacy_friction;
 pub mod work_source;
-pub use work_source::WorkSource;
+pub use work_source::{
+    LearningChannelData, MissingOutcomeNagData, OutcomeEntry, SettlementChannelData, WorkEntropySignals,
+    WorkOutcomesReport, WorkSource, DOMAIN_ENTRY_STAGES_JSON, FINAL_STATUSES,
+};
 
 use fgos_host_runtime::contracts::{
     ContractRef, HostInvocation, OperationId, OperationRequest, ProviderDescriptor, ProviderError,

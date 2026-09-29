@@ -1008,25 +1008,6 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
-    name: 'check',
-    invoke: 'fgos check',
-    description: 'Read-only predicted-vs-actual report: outcomes, friction, settlement, learning, missing-outcome nag, and entropy trend.',
-    parameters: {
-      type: 'object',
-      properties: {
-        id: { type: 'string', description: 'Optional work item id (positional or --id); omit to check every item.' },
-      },
-      positional: ['id'],
-      required: [],
-    },
-    examples: ['fgos check', 'fgos check build-cli'],
-    touchesState: false,
-    requiresExistingStore: false,
-    externalEffect: false,
-    paginated: false,
-    deprecated: null,
-  },
-  {
     name: 'rollup',
     invoke: 'fgos rollup',
     description: "Rollup view of a root item's direct children and a goalTier item's targets: a done/total count and each member's status, counted separately per relationship.",

@@ -127,6 +127,7 @@ fn main() {
     service.register_provider(Arc::new(
         fgos_observe::ObserveMetricsProvider::with_sources(
             wiring::metrics_sources::build_metrics_sources(),
+            wiring::metrics_sources::build_work_observation_source(),
         ),
     ));
     service.register_provider(Arc::new(

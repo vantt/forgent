@@ -46,7 +46,6 @@ export const MANIFEST = [
   { id: 'report-context-render', status: 'shadow', pattern: 'src/report/context-render.mjs', directTests: ['test/report/context-render.test.mjs'], boundaryTests: [] },
   { id: 'report-decision-index', status: 'shadow', pattern: 'src/report/decision-index.mjs', directTests: ['test/report/decision-index.test.mjs'], boundaryTests: [] },
   { id: 'report-enduser-index', status: 'shadow', pattern: 'src/report/enduser-index.mjs', directTests: ['test/report/enduser-index.test.mjs'], boundaryTests: [] },
-  { id: 'report-entropy', status: 'shadow', pattern: 'src/report/entropy.mjs', directTests: ['test/report/entropy.test.mjs'], boundaryTests: [] },
   { id: 'report-frontmatter', status: 'shadow', pattern: 'src/report/frontmatter.mjs', directTests: ['test/report/frontmatter.test.mjs'], boundaryTests: [] },
   { id: 'report-knowledge-resolver', status: 'shadow', pattern: 'src/report/knowledge-resolver.mjs', directTests: ['test/report/knowledge-resolver.test.mjs'], boundaryTests: [] },
   { id: 'report-enduser-index-generate', status: 'shadow', pattern: 'src/report/enduser-index-generate.mjs', directTests: [], boundaryTests: ['test/report/enduser-index.test.mjs'] },
