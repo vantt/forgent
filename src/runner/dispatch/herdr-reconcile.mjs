@@ -8,6 +8,7 @@ import path from 'node:path';
 import { DispatchError } from './dispatch-error.mjs';
 import { interpretRunResult } from './run-result.mjs';
 import { getProcessStartTime } from './process-identity.mjs';
+import { createHerdrClient } from './herdr-agent.mjs';
 import {
   publishImmutableProof,
   publishMutableProjection,
@@ -131,6 +132,83 @@ export function readHerdrLaunchCommand(runDir, launchCommandId) {
   } catch {
     return null;
   }
+}
+
+/**
+ * The `herdr-spawn` adapter's own implementation of the same
+ * `detached-run-supervisor` role `isCliSpawnRunStillWorking`
+ * (assignment-runner.mjs) fills for `cli-spawn`: "is the detached run this
+ * admission decision cares about still doing real work, independent of
+ * whether the process that dispatched it is still alive?" herdr's pane
+ * deliberately outlives the runner that dispatched it (same design point as
+ * cli-spawn's detached supervisor/worker), so a runner-only liveness check
+ * is blind to a SIGKILLed runner whose pane/agent is still alive.
+ *
+ * Unlike `isCliSpawnRunStillWorking` (local fs-binding reads, always
+ * synchronous and instant), this calls `paneProcessInfo` -- a REAL `herdr`
+ * CLI subprocess with its own non-deterministic availability
+ * (`herdr_unavailable`/`herdr_call_timeout`) -- so it is async and MUST be
+ * called as a bounded, best-effort PRE-CHECK outside `admitRunAttempt`'s own
+ * synchronous CAS critical section (Phase 4/5 of this track hardened that
+ * section specifically to never block on anything external); only the
+ * RESULT is carried into the section, mirroring the shape
+ * `isCliSpawnRunStillWorking` already uses there.
+ *
+ * Returns:
+ * - `false` when nothing herdr-side was ever bound to check (no
+ *   controller/commands record, or one with no `paneId` yet) -- mirrors
+ *   `isCliSpawnRunStillWorking`'s own "nothing to check" `false` for the
+ *   equivalent case.
+ * - `true`/`false` when herdr answered: a foreground process in the pane
+ *   other than its own shell means the agent is still doing real work
+ *   (same "liveness rung of the signal ladder" `paneProcessInfo` itself
+ *   documents, and the same interpretation this file's own reconcile probe
+ *   already uses).
+ * - `'unknown'` (never a plain boolean) when the herdr call itself failed or
+ *   timed out -- genuinely undecidable, not "confirmed dead". Deliberately
+ *   FAIL CLOSED: `admitRunAttempt`'s M1 check must treat `'unknown'` the
+ *   same as "still working" (both are truthy, so a plain `||` already does
+ *   this) and refuse the new attempt, matching this track's own repeated
+ *   "fail closed on undecidable liveness, never fail open" rule elsewhere
+ *   (`resolveMutatingCwdPosture`, the composite-pid AMBIGUOUS lock status).
+ *   An operator who has independently confirmed the prior attempt is
+ *   genuinely gone already has an escape valve for exactly this shape --
+ *   `--force-new-attempt` (M1's own existing "a prior attempt this host can
+ *   no longer observe correctly" case) -- so failing closed here costs
+ *   nothing new, it only reuses that existing door.
+ */
+export async function isHerdrSpawnRunStillWorking(runDir, { herdrClient, herdrBin, cwd, env, timeoutMs = 5000 } = {}) {
+  const commandsDir = path.join(runDir, 'controller', 'commands');
+  if (!fs.existsSync(commandsDir)) return false;
+  let commandFiles;
+  try {
+    commandFiles = fs.readdirSync(commandsDir).filter((f) => f.endsWith('.json')).sort();
+  } catch {
+    return false;
+  }
+  const latestCommandFile = commandFiles[commandFiles.length - 1];
+  if (!latestCommandFile) return false;
+  const launchCommandId = path.basename(latestCommandFile, '.json');
+  const command = readHerdrLaunchCommand(runDir, launchCommandId);
+  const paneId = command?.paneId;
+  if (!paneId) return false;
+
+  // Inlined rather than imported from transport.mjs's own
+  // `resolveHerdrBin` -- transport.mjs imports herdr-round.mjs, which
+  // imports THIS file, so importing transport.mjs here would close a real
+  // cycle (herdr-reconcile.mjs -> transport.mjs -> herdr-round.mjs ->
+  // herdr-reconcile.mjs). The expression itself is the same one-liner.
+  const resolvedHerdrBin = (herdrBin && herdrBin.trim()) || (env ?? process.env).FGOS_HERDR_BIN?.trim() || 'herdr';
+  const client = herdrClient ?? createHerdrClient({ herdrBin: resolvedHerdrBin, cwd, env });
+
+  let pInfo;
+  try {
+    pInfo = client.paneProcessInfo(paneId, { timeoutMs });
+  } catch {
+    return 'unknown';
+  }
+  const workerProc = pInfo?.foregroundProcesses?.find((p) => p.pid && p.pid !== pInfo?.shellPid);
+  return Boolean(workerProc);
 }
 
 export function publishHerdrAdapterReceipt(runDir, launchCommandId, receiptData) {

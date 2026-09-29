@@ -1416,6 +1416,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
             cliOverride,
             hasLiveTaskAccess,
             isReadOnlyMode: asgnObj.provenance?.kind === 'inline',
+            forceSharedCwd: rest.includes('--force-shared-cwd'),
             onChunk: (stream, chunk) => process.stderr.write(chunk),
           });
           if (returnResult) return result;
@@ -1590,6 +1591,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
             cliOverride,
             hasLiveTaskAccess,
             isReadOnlyMode: true,
+            forceSharedCwd: rest.includes('--force-shared-cwd'),
             onChunk: (stream, chunk) => process.stderr.write(chunk),
           });
           if (returnResult) return result;

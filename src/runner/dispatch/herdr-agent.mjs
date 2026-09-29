@@ -242,9 +242,13 @@ export function createHerdrClient({ herdrBin = 'herdr', cwd, env, run = defaultR
     },
 
     /** The liveness rung of the signal ladder: a pane whose only foreground
-     * process is its own shell no longer has an agent in it. */
-    paneProcessInfo(paneId) {
-      const info = invoke(['pane', 'process-info', '--pane', paneId])?.process_info ?? {};
+     * process is its own shell no longer has an agent in it. `timeoutMs` is
+     * optional (omitted keeps every pre-existing caller's exact untimed
+     * behavior) -- a bounded, best-effort caller (e.g. an admission-time
+     * liveness pre-check) passes one so a hung/unavailable herdr binary
+     * cannot block it indefinitely. */
+    paneProcessInfo(paneId, { timeoutMs } = {}) {
+      const info = invoke(['pane', 'process-info', '--pane', paneId], { timeoutMs })?.process_info ?? {};
       return {
         paneId: info.pane_id ?? paneId,
         shellPid: info.shell_pid ?? null,

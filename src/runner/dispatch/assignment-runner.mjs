@@ -78,6 +78,7 @@ import { extractProtocolOperationStamp, resolveMutatingCwdPosture } from './exec
 import { loadCoordinationProtocol } from '../definitions/protocol-loader.mjs';
 import {
   publishNextGeneration,
+  currentGeneration,
   acquireRunControl,
   releaseRunControl,
   settleRunControl,
@@ -92,7 +93,16 @@ import {
   resolveHolderLiveness,
 } from './run-lock.mjs';
 import { resolveExecutorCommand, currentDispatchDepth, MAX_DISPATCH_DEPTH, DispatchError } from './transport.mjs';
-import { reconcileHerdrSpawnRun } from './herdr-reconcile.mjs';
+import {
+  acquireMainCheckoutLock,
+  renewMainCheckoutLockIfOwn,
+  dispatchLockFile,
+  ACQUIRED,
+  HELD,
+  AMBIGUOUS,
+  formatLockDurationMs,
+} from '../main-checkout-lock.mjs';
+import { reconcileHerdrSpawnRun, isHerdrSpawnRunStillWorking } from './herdr-reconcile.mjs';
 import { prepareConfinementForLaunch, finalizeConfinementResources } from './confinement/authority.mjs';
 import { buildConfinementRequest } from './confinement/request.mjs';
 import {
@@ -772,7 +782,7 @@ function admitRunAttempt(
   assignmentDir,
   runsDir,
   assignmentId,
-  { retryId, predecessorRunId = null, destination, payloadDigest, expectedRunId, buildRunMeta, buildDispatchPlan, buildEffectiveExecutionContract: buildEffectiveContractOpt, forceNewAttempt = false, refuseIfSettled = false },
+  { retryId, predecessorRunId = null, destination, payloadDigest, expectedRunId, buildRunMeta, buildDispatchPlan, buildEffectiveExecutionContract: buildEffectiveContractOpt, forceNewAttempt = false, refuseIfSettled = false, herdrLivenessPreCheck = null },
 ) {
   const admissionGenerationsDir = path.join(assignmentDir, 'admission', 'generations');
   const admissionMarkersDir = path.join(assignmentDir, 'admission', 'markers');
@@ -921,7 +931,27 @@ function admitRunAttempt(
         // stale against the real control ledger.
         const admitterAlive =
           !priorControl.controlEpoch && current.record.admittedBy && resolveHolderLiveness(current.record.admittedBy) === 'held';
-        if (priorControl.held || isCliSpawnRunStillWorking(priorRunDir) || admitterAlive) {
+        // Part 2 (herdr-spawn liveness): the prior attempt's own adapter
+        // (buildRunMeta's `adapter` field, run.json) decides which
+        // detached-run-supervisor implementation to consult.
+        // isCliSpawnRunStillWorking is local/instant, so it stays exactly as
+        // before, called inline here. herdr-spawn's own signal was already
+        // computed OUTSIDE this synchronous CAS section (see the caller's
+        // own herdrLivenessPreCheck comment) -- consult it ONLY when it was
+        // computed for this EXACT current generation (`runId` match); a
+        // mismatch means a concurrent commit changed `current` between that
+        // pre-check and this CAS running (a real but narrow race), and per
+        // this track's own repeated "fail closed on undecidable liveness"
+        // rule, an unmatched/never-computed pre-check is treated the SAME as
+        // "still working", never silently ignored.
+        let priorRunAdapter = null;
+        try {
+          priorRunAdapter = JSON.parse(fs.readFileSync(path.join(priorRunDir, 'run.json'), 'utf8'))?.adapter;
+        } catch {}
+        const priorDetachedRunStillWorking = priorRunAdapter === 'herdr-spawn'
+          ? (herdrLivenessPreCheck?.runId === current.record.runId ? herdrLivenessPreCheck.result !== false : true)
+          : isCliSpawnRunStillWorking(priorRunDir);
+        if (priorControl.held || priorDetachedRunStillWorking || admitterAlive) {
           return {
             stop: true,
             status: 'run-in-flight',
@@ -1595,12 +1625,47 @@ export async function executeAssignment(assignment, opts = {}) {
     .createHash('sha256')
     .update(JSON.stringify({ assignment: effectiveAssignment, compiledPlan }))
     .digest('hex');
+
+  // Part 2 (herdr-spawn liveness): admitRunAttempt's own M1 in-flight check
+  // (below) is a synchronous CAS critical section that must never block on
+  // anything external -- but herdr-spawn's own liveness signal
+  // (isHerdrSpawnRunStillWorking) is a real, non-deterministic-availability
+  // herdr CLI subprocess call. Pre-compute it here, OUTSIDE the CAS section,
+  // as a best-effort peek at whatever generation is current RIGHT NOW; if a
+  // concurrent commit changes the current generation between this peek and
+  // the real CAS below (a narrow, expected race -- currentGeneration is a
+  // plain read, not part of the same atomic transaction), M1's own check
+  // notices the runId mismatch and fails closed (treats it as still
+  // working) rather than trusting a pre-check computed for the wrong
+  // attempt. Skipped entirely when there is no live candidate to check
+  // (no generation yet, an already-settled attempt, or a non-herdr-spawn
+  // adapter -- isCliSpawnRunStillWorking's own synchronous, local check
+  // already covers that case unchanged, inside the CAS section itself).
+  let herdrLivenessPreCheck = null;
+  const admissionGenerationsDirPeek = path.join(assignmentDir, 'admission', 'generations');
+  const currentGenPeek = currentGeneration(admissionGenerationsDirPeek);
+  if (currentGenPeek?.record) {
+    const peekAttemptStr = currentGenPeek.record.attemptStr || String(currentGenPeek.record.attempt).padStart(2, '0');
+    const peekRunDir = path.join(runsDir, peekAttemptStr);
+    if (!fs.existsSync(path.join(peekRunDir, 'result.json'))) {
+      let peekAdapter = null;
+      try {
+        peekAdapter = JSON.parse(fs.readFileSync(path.join(peekRunDir, 'run.json'), 'utf8'))?.adapter;
+      } catch {}
+      if (peekAdapter === 'herdr-spawn') {
+        const result = await isHerdrSpawnRunStillWorking(peekRunDir, { cwd: effectiveCwd });
+        herdrLivenessPreCheck = { runId: currentGenPeek.record.runId, result };
+      }
+    }
+  }
+
   const admitted = admitRunAttempt(assignmentDir, runsDir, effectiveAssignment.assignmentId, {
     retryId: opts.retryId,
     predecessorRunId: opts.predecessorRunId ?? null,
     destination: opts.destination ?? effectiveCwd,
     payloadDigest: opts.payloadDigest ?? defaultAdmissionPayloadDigest,
     expectedRunId: opts.expectedRunId,
+    herdrLivenessPreCheck,
     // M1: operator escape valve for a prior attempt this host can no
     // longer observe correctly (e.g. its control ledger identity is on an
     // unreachable filesystem) -- never the default, always an explicit opt
@@ -2178,7 +2243,78 @@ export async function executeAssignment(assignment, opts = {}) {
   let supervisorReceipt = null;
   let assignmentLaunchContext = null;
 
+  // S4 (dispatch-engine-liveness-hardening): cli-spawn is the one Assignment
+  // launch shape with no acquireMainCheckoutLock coverage at all -- herdr-spawn
+  // already inherits it below via its own executeExecutorCli() call, which
+  // internally acquires acquireMainCheckoutLock(fgosDir, {lockFile:
+  // dispatchLockFile(cwd)}) for the full duration of that call. Acquiring a
+  // SECOND lock here for herdr-spawn too would self-conflict against that
+  // inner acquisition (two distinct string identities from the same process
+  // racing the same lock file -- the second would see the first as HELD by
+  // "a different holder" and refuse), so this is scoped to cli-spawn only.
+  // Keyed on the SAME dispatchLockFile(cwd) name executeExecutorCli already
+  // uses, so a cli-spawn Assignment, a herdr-spawn Assignment, and an ad-hoc
+  // `dispatch execute` all contend on ONE lock file per cwd. A per-call
+  // string identity (matching executeExecutorCli's own scheme, not a bare
+  // process.pid) is required because one long-lived process can dispatch
+  // several different Assignments in a row (or concurrently) against the
+  // same cwd -- a bare pid would self-recognize a second, unrelated dispatch
+  // as a refresh of the first instead of a genuine contender.
+  // `opts.forceSharedCwd` (CLI: --force-shared-cwd) is a distinct axis from
+  // `forceNewAttempt` above (that overrides the M1 same-assignment-retry
+  // check; this overrides a DIFFERENT assignment/process sharing this cwd)
+  // -- an operator who already knows concurrent mutation here is safe skips
+  // the acquisition entirely, same as never having contended for the lock.
+  // Gated on `effectiveMutation === 'mutating'`: S4's own problem statement
+  // is concurrent MUTATING Assignments racing a cwd, and this repo's own
+  // test suite (assignment-dispatch.test.mjs's "genuinely concurrent
+  // invocations under the same --work id" Red-Team fix tests) already
+  // proves concurrent READ-ONLY dispatch to the SAME cwd through this exact
+  // cli-spawn/`--contract` door is intentional, existing, relied-upon
+  // behavior -- an unconditional lock here regressed both tests outright
+  // (verified by running them). Read-only Assignments never acquire and are
+  // therefore never blocked by, nor able to block, this lock.
+  let cwdLockRes = null;
+  let cwdLockHeartbeat = null;
+
   try {
+    if (useSupervisorRecovery && effectiveMutation === 'mutating' && opts.forceSharedCwd !== true) {
+      const cwdLockIdentity = `${process.pid}:${Date.now()}:${Math.random().toString(36).slice(2)}`;
+      const cwdLockFile = dispatchLockFile(cwd);
+      const cwdLockAcquired = acquireMainCheckoutLock(fgosDir, {
+        identity: cwdLockIdentity,
+        ttlMs: timeoutMs,
+        releaseOnExit: true,
+        lockFile: cwdLockFile,
+      });
+      if (cwdLockAcquired.status === HELD) {
+        throw new DispatchError(
+          'dispatch-in-flight',
+          `dispatch for cwd "${cwd}" is already in flight (held for ${formatLockDurationMs(cwdLockAcquired.lockAgeMs)}).`,
+          { cwd, lockAgeMs: cwdLockAcquired.lockAgeMs, remainingTtlMs: cwdLockAcquired.remainingTtlMs, holderPid: cwdLockAcquired.holderPid },
+        );
+      }
+      if (cwdLockAcquired.status === AMBIGUOUS) {
+        throw new DispatchError(
+          'dispatch-in-flight',
+          `dispatch lock for cwd "${cwd}" is ambiguous (corrupt or unparseable lock file).`,
+          { cwd, lockAgeMs: cwdLockAcquired.lockAgeMs },
+        );
+      }
+      if (cwdLockAcquired.status !== ACQUIRED) {
+        throw new DispatchError(
+          'dispatch-in-flight',
+          `dispatch lock for cwd "${cwd}" could not be acquired (status: ${cwdLockAcquired.status}).`,
+          { cwd },
+        );
+      }
+      cwdLockRes = cwdLockAcquired;
+      const cwdLockHeartbeatMs = Math.max(250, Math.floor(timeoutMs / 3));
+      cwdLockHeartbeat = setInterval(() => {
+        renewMainCheckoutLockIfOwn(fgosDir, cwdLockIdentity, { lockFile: cwdLockFile });
+      }, cwdLockHeartbeatMs);
+      cwdLockHeartbeat.unref();
+    }
     if (needsAssignmentLaunchContext) {
       const depth = currentDispatchDepth();
       if (depth >= MAX_DISPATCH_DEPTH) {
@@ -2657,6 +2793,8 @@ export async function executeAssignment(assignment, opts = {}) {
 
     return outcome.runResult;
   } finally {
+    if (cwdLockHeartbeat) clearInterval(cwdLockHeartbeat);
+    if (cwdLockRes) cwdLockRes.release();
     if (useSupervisorRecovery && launchCommandId) {
       try {
         await finalizeConfinementResources({ runDir, launchCommandId, receipt: supervisorReceipt });
