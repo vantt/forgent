@@ -1,7 +1,7 @@
 ---
 phase: 5
 title: "Source Observe (Rust) đọc v3 + usage"
-status: pending
+status: completed
 priority: P1
 effort: "1d"
 dependencies: [3, 4]
