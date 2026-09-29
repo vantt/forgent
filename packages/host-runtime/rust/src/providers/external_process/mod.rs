@@ -7,8 +7,8 @@ pub mod manifest;
 pub mod registry;
 
 pub mod adapter;
+pub mod bound_invocation_supervisor;
 pub mod frame_codec;
-pub mod supervisor;
 
 pub use manifest::{
     parse_contract_ref, ExternalManifest, ExternalOperationDeclaration,
@@ -21,13 +21,13 @@ pub use registry::{
 };
 
 pub use adapter::{ExternalProcessProviderAdapter, FIXTURE_PROCESS_DESCRIPTOR};
+pub use bound_invocation_supervisor::{
+    BoundInvocationSupervisor, ExternalProcessConfig, ExternalProcessOutcome,
+    ExternalProcessRequest,
+};
 pub use frame_codec::{
     CodecError, FrameCodec, FrameMessage, JsonRpcError, JsonRpcNotification, JsonRpcRequest,
     JsonRpcResponse, RequestId, DEFAULT_MAX_FRAME_SIZE,
-};
-pub use supervisor::{
-    ExternalProcessConfig, ExternalProcessOutcome, ExternalProcessRequest,
-    ExternalProcessSupervisor,
 };
 
 /// Frozen fixture contract constants (R2-P0 / docs/platform/host-invocation-routing/verification/r2-external-process-proof.md#2)

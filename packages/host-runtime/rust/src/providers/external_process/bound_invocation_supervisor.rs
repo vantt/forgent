@@ -1,6 +1,12 @@
 //! Process supervisor for external process providers.
 //!
-//! Spawns and supervises the provider process ONLY at invocation time, never during discovery.
+//! Fills the `bound-invocation-supervisor` role (docs/decisions/):
+//! a supervised external-process call bound to ONE invocation's own lifetime,
+//! never detached, never expected to outlive its caller -- the counterpart to
+//! Node's `detached-run-supervisor` role (`cli-spawn-supervisor.mjs`), which
+//! deliberately outlives its own dispatcher. Do not conflate the two: this
+//! supervisor spawns the provider process ONLY at invocation time, never
+//! during discovery, and always tears it down before returning.
 //! Enforces:
 //! - bounded startup/handshake deadline
 //! - bounded request deadline
@@ -160,12 +166,12 @@ impl ExternalProcessOutcome {
 
 /// Supervisor that manages an external process provider lifecycle.
 #[derive(Debug, Clone)]
-pub struct ExternalProcessSupervisor {
+pub struct BoundInvocationSupervisor {
     config: ExternalProcessConfig,
     codec: FrameCodec,
 }
 
-impl ExternalProcessSupervisor {
+impl BoundInvocationSupervisor {
     pub fn new(config: ExternalProcessConfig) -> Self {
         let codec = FrameCodec::new().with_max_frame_size(config.max_frame_size);
         Self { config, codec }
