@@ -99,6 +99,7 @@ import { planVerdictFromPlanMd } from '../intake/plan-verdict-from-plan-md.mjs';
 import { classify, generateId } from '../intake/classify.mjs';
 import { checkDispatchAttestation } from './attestation-guard.mjs';
 import { chooseStageOperation, executeDriverOperationChoice } from './dispatch/operation-choice.mjs';
+import { runOutcome } from './dispatch/run-result.mjs';
 import { reapOrphanedConfinementResources } from './dispatch/confinement/cleanup.mjs';
 import { setTimeout as delay } from 'node:timers/promises';
 
@@ -940,9 +941,10 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
           runnerConfig: config,
           work: item,
         });
-        log(`fgos-runner: operation "${opChoice.operation}" for "${item.id}" finished (confidence: ${outcome.runResult?.confidence}, status: ${outcome.runResult?.status})`);
+        const runOutcomeResult = outcome.runResult ? runOutcome(outcome.runResult) : null;
+        log(`fgos-runner: operation "${opChoice.operation}" for "${item.id}" finished (confidence: ${runOutcomeResult?.evidence ?? outcome.runResult?.confidence}, status: ${runOutcomeResult?.category ?? outcome.runResult?.status})`);
 
-        if (outcome.stop || outcome.runResult?.status === 'no-evidence' || outcome.runResult?.status === 'failed') {
+        if (outcome.stop || (runOutcomeResult ? !runOutcomeResult.satisfied : (outcome.runResult?.status === 'no-evidence' || outcome.runResult?.status === 'failed'))) {
           log(`fgos-runner: operation "${opChoice.operation}" for "${item.id}" stopped safely (${outcome.reason}) — Work lifecycle untouched`);
           const isSecondary = opChoice.operation === 'scout-blast-radius' || opChoice.operation === 'review-item' || opChoice.operation === 'resolve-question';
           const finalStatus = isSecondary ? 'blocked' : 'todo';
@@ -1569,7 +1571,8 @@ export async function runOnce(options = {}) {
               runnerConfig: config,
               work: item,
             });
-            log(`fgos-runner: reviewer validation assignment for "${item.id}" executed (confidence: ${outcome.runResult?.confidence}, status: ${outcome.runResult?.status})`);
+            const validateOutcome = outcome.runResult ? runOutcome(outcome.runResult) : null;
+            log(`fgos-runner: reviewer validation assignment for "${item.id}" executed (confidence: ${validateOutcome?.evidence ?? outcome.runResult?.confidence}, status: ${validateOutcome?.category ?? outcome.runResult?.status})`);
             if (outcome.canAdvanceEdge) {
               // Cell P01.2 (R4/G5): `item.verdictPayload`/`item.callerVerdict`
               // are dead reads (grep-confirmed: no writer for either exists
