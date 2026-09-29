@@ -99,3 +99,22 @@ No migration, promotion, relocation, deletion, cutover, Phase 03+ work, main mer
 ## Component Boundary Statement
 
 No runtime component boundary changed. Changes are documentation-migration tooling, generated inventory/ledger evidence, tests, changelog, and phase records.
+
+## Post-closure sync of main (2026-09-29)
+
+Merged `main` into this branch (merge commit `32747d500`). Phase 02 scope and its
+approved closure boundary are unchanged.
+
+- Ratchet went red: 10 maintained legacy-root docs had been edited on `main` by
+  unrelated coordination and dispatch work. Human approval on 2026-09-29 accepted
+  them as reviewed `allowed-edit` exceptions in
+  `scripts/check-legacy-docs-ratchet.exceptions.json` (9 new; `docs/specs/reading-map.md`
+  re-digested). All carry `revisitTrigger: Phase 08 cutover`.
+- Ratchet clean; `check-legacy-docs-ratchet` and `generate-doc-inventory` tests pass (94/94).
+- The committed Phase 02 inventory and identity registry were NOT regenerated; they
+  still describe the pre-sync tree.
+
+Open questions:
+- Every future `main` edit to a legacy root doc will need another exception until
+  Phase 08. Decide whether Phase 03 should define a standing sync policy instead.
+- Whether Phase 03 must re-run the inventory against the post-sync tree.

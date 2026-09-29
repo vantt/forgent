@@ -6,12 +6,102 @@
     {
       "path": "docs/specs/reading-map.md",
       "kind": "allowed-edit",
-      "rationale": "Phase 01 verified stale standing route correction: update transitional rule banner to cite docs/transitional-switchboard.md, record Phase 00 and Phase 01 completion, and replace defunct fgos-coding-compounding skill references with fgos-coding-knowledge.",
-      "approvedBy": "Phase 01 unification authorization (asgn_pi_lead_phase01_op_001)",
+      "rationale": "Phase 01 verified stale standing route correction: update transitional rule banner to cite docs/transitional-switchboard.md, record Phase 00 and Phase 01 completion, and replace defunct fgos-coding-compounding skill references with fgos-coding-knowledge. Re-reviewed 2026-09-29 after main sync: feat(coding): convert fgos-plan-loop/fgos-code-panel to deprecated stubs (Unit I29)",
+      "approvedBy": "Phase 01 unification authorization (asgn_pi_lead_phase01_op_001); human approval 2026-09-29 (user, forgentX session)",
       "owner": "documentation-authority-unification-lead",
-      "expectedDigest": "04e7c7b51842d440da94a818e7120c34e8ef833c629021c53ec141757384067f",
-      "reviewedAt": "2026-09-25",
+      "expectedDigest": "910cd3edbc121b135e204609fa449c22a413423859ab95d3a0b9ba1a52b2aeb7",
+      "reviewedAt": "2026-09-29",
       "revisitTrigger": "Phase 08 cutover (retirement of legacy reading-map in favor of docs/reading-map.md)"
+    },
+    {
+      "path": "docs/architect/agent-coordination/architecture/dispatch-control-plane.md",
+      "kind": "allowed-edit",
+      "rationale": "Main-side docs edit accompanying landed code, carried in by sync of main: fix(dispatch): remediate round 4 review findings (F-R4-1 boundary lock, kill ME, restore R2/R4 text) | fix(dispatch): decouple Work lookups to work-compat.mjs (Option A) and lock clean dispatch core boundary | fix(dispatch): remediate re-review round 2 findings R2-1, R2-2, kill M4b, record R2/R4 decisions (+5 more)",
+      "approvedBy": "human approval 2026-09-29 (user, forgentX session)",
+      "owner": "documentation-authority-unification-lead",
+      "expectedDigest": "7e2db5337c75f662dd1e4897535d359bf7dd044bc7b413ba48d2905a4d6bc0e3",
+      "reviewedAt": "2026-09-29",
+      "revisitTrigger": "Phase 08 cutover"
+    },
+    {
+      "path": "docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md",
+      "kind": "allowed-edit",
+      "rationale": "Main-side docs edit accompanying landed code, carried in by sync of main: feat(coordination): add architecture-advisory-panel-standard-v1 + real panel-depth comparison (Unit I27) | feat(coding): convert fgos-plan-loop/fgos-code-panel to deprecated stubs (Unit I29) | feat(coordination): add architecture-advisory-panel-standard-v1 protocol variant",
+      "approvedBy": "human approval 2026-09-29 (user, forgentX session)",
+      "owner": "documentation-authority-unification-lead",
+      "expectedDigest": "8d97291232018d2892d6201e002e3a704962b571dc0a8fa85f21d3b90eb42414",
+      "reviewedAt": "2026-09-29",
+      "revisitTrigger": "Phase 08 cutover"
+    },
+    {
+      "path": "docs/architect/agent-coordination/architecture/runtime-recovery-design.md",
+      "kind": "allowed-edit",
+      "rationale": "Main-side docs edit accompanying landed code, carried in by sync of main: feat(coding): convert fgos-plan-loop/fgos-code-panel to deprecated stubs (Unit I29)",
+      "approvedBy": "human approval 2026-09-29 (user, forgentX session)",
+      "owner": "documentation-authority-unification-lead",
+      "expectedDigest": "d707faa742077635663d62a800aad7a0df5b5ceae6cd1e57eb1be14462fd342d",
+      "reviewedAt": "2026-09-29",
+      "revisitTrigger": "Phase 08 cutover"
+    },
+    {
+      "path": "docs/architect/agent-coordination/contracts/coordination-session.md",
+      "kind": "allowed-edit",
+      "rationale": "Main-side docs edit accompanying landed code, carried in by sync of main: fix(coordination): idempotent specialist retries, kernel-accurate exhausted/pending | fix(coordination): close idempotency gap and DAG edges for specialist-authorize | feat(coordination): add specialist-authorize request-step type (I24a)",
+      "approvedBy": "human approval 2026-09-29 (user, forgentX session)",
+      "owner": "documentation-authority-unification-lead",
+      "expectedDigest": "5fb487cca0a93df82f800fc3d18ed3d8d3a59ed81aa8c178559aa240cd72d668",
+      "reviewedAt": "2026-09-29",
+      "revisitTrigger": "Phase 08 cutover"
+    },
+    {
+      "path": "docs/architect/agent-coordination/contracts/flow-definition.md",
+      "kind": "allowed-edit",
+      "rationale": "Main-side docs edit accompanying landed code, carried in by sync of main: docs: close Unit I32 (outcome (a), no migration) and clarify readOnlyRedirects vs capability.prefer | feat(coordination): per-node dispatch binding for declared protocols (Unit I21)",
+      "approvedBy": "human approval 2026-09-29 (user, forgentX session)",
+      "owner": "documentation-authority-unification-lead",
+      "expectedDigest": "2802e3128f9cae0eb43d236d7c4d946f7df9e772008335f233e306ce44d882b8",
+      "reviewedAt": "2026-09-29",
+      "revisitTrigger": "Phase 08 cutover"
+    },
+    {
+      "path": "docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md",
+      "kind": "allowed-edit",
+      "rationale": "Main-side docs edit accompanying landed code, carried in by sync of main: feat(coding): convert fgos-plan-loop/fgos-code-panel to deprecated stubs (Unit I29)",
+      "approvedBy": "human approval 2026-09-29 (user, forgentX session)",
+      "owner": "documentation-authority-unification-lead",
+      "expectedDigest": "3579e73abc00e36aedb1d1d68daf65297cda2e10a9b34c66ed0e24245aa32f6f",
+      "reviewedAt": "2026-09-29",
+      "revisitTrigger": "Phase 08 cutover"
+    },
+    {
+      "path": "docs/architect/component-boundary/component-boundary-advisory.md",
+      "kind": "allowed-edit",
+      "rationale": "Main-side docs edit accompanying landed code, carried in by sync of main: docs(dispatch): document component boundaries, ports, and unreleased changes for I12",
+      "approvedBy": "human approval 2026-09-29 (user, forgentX session)",
+      "owner": "documentation-authority-unification-lead",
+      "expectedDigest": "41c4adfa8bef1106cad02ac2c61995e030a66840846584d1cc9874422672af09",
+      "reviewedAt": "2026-09-29",
+      "revisitTrigger": "Phase 08 cutover"
+    },
+    {
+      "path": "docs/specs/distribution.md",
+      "kind": "allowed-edit",
+      "rationale": "Main-side docs edit accompanying landed code, carried in by sync of main: feat(doctor): add coordination-sessions-closed check for sessions never reaching terminal status | fix(dispatch): retire 2 of 4 shadow binders, consolidate C3's 3-resolver door (S7, dispatch-engine-liveness-hardening Phase 7) | feat(coordination): per-node dispatch binding for declared protocols (Unit I21) (+1 more)",
+      "approvedBy": "human approval 2026-09-29 (user, forgentX session)",
+      "owner": "documentation-authority-unification-lead",
+      "expectedDigest": "c5a177a18e808f0ef51e70bc346e45438b4d3f83e493286b5325a0af02540e4a",
+      "reviewedAt": "2026-09-29",
+      "revisitTrigger": "Phase 08 cutover"
+    },
+    {
+      "path": "docs/specs/runner.md",
+      "kind": "allowed-edit",
+      "rationale": "Main-side docs edit accompanying landed code, carried in by sync of main: docs(runner): add D-ADR0043 narrative (bound-invocation-supervisor vs detached-run-supervisor) | docs(dispatch): add capability demand-matching doctrine",
+      "approvedBy": "human approval 2026-09-29 (user, forgentX session)",
+      "owner": "documentation-authority-unification-lead",
+      "expectedDigest": "0513598f48c65f34c47bbb550f7c866e415130c98e9bf44c8a03b0176d45ffb4",
+      "reviewedAt": "2026-09-29",
+      "revisitTrigger": "Phase 08 cutover"
     }
   ]
 }
