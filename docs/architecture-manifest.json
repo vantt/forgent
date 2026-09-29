@@ -55,6 +55,7 @@
     "src/runner/dispatch/agent-result-claim-contract.mjs": "infra",
     "src/runner/dispatch/evidence-attribution.mjs": "infra",
     "src/runner/dispatch/run-result.mjs": "infra",
+    "src/runner/dispatch/usage-parsers.mjs": "infra",
     "src/runner/dispatch/runtime-inspection.mjs": "infra",
     "src/runner/dispatch/reconciliation-planner.mjs": "infra",
     "src/runner/dispatch/assignment-policy.mjs": "infra",

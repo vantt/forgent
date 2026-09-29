@@ -7,10 +7,56 @@ import { execFileSync } from 'node:child_process';
 import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
 import {
   executeAssignment,
-  classifyRunEvidence,
   reconcileCliSpawnRun,
 } from '../../src/runner/dispatch/assignment-runner.mjs';
-import { validateRunResultV2 } from '../../src/runner/dispatch/run-result.mjs';
+import { validateRunResultV2, validateRunResultV3, runOutcome } from '../../src/runner/dispatch/run-result.mjs';
+
+function classifyRunEvidence({
+  exitCode,
+  signal,
+  isTimeout,
+  agentClaim,
+  claimInvalid = false,
+  workerArtifacts = [],
+  changedFiles = [],
+  hasDirtyBeforeMutation = false,
+  isReadOnlyOperation = true,
+}) {
+  if (isTimeout || (exitCode !== null && exitCode !== undefined && exitCode !== 0) || signal) {
+    return { status: 'failed', confidence: 'failed' };
+  }
+  if (claimInvalid) {
+    return { status: 'failed', confidence: 'failed' };
+  }
+  const companionReportArtifacts = workerArtifacts.filter(
+    (p) => typeof p === 'string' && !p.endsWith('agent-result.json') && !/[/\\]outbox[/\\]result-\d+\.json$/.test(p),
+  );
+  const hasWorkerReport = companionReportArtifacts.length > 0;
+  if (agentClaim?.status === 'failed') {
+    const isFindingVerdict = agentClaim?.assessment?.verdict === 'findings';
+    if (isFindingVerdict && hasWorkerReport && exitCode === 0 && !isTimeout) {
+      return { status: 'failed', confidence: 'reported' };
+    }
+    return { status: 'failed', confidence: 'failed' };
+  }
+  const hasExternalEvidence = changedFiles.length > 0 || hasDirtyBeforeMutation;
+  if (isReadOnlyOperation && hasExternalEvidence) {
+    return { status: 'failed', confidence: 'failed' };
+  }
+  if (agentClaim?.status === 'blocked') {
+    return { status: 'blocked', confidence: 'reported' };
+  }
+  if (agentClaim && agentClaim.status === 'done') {
+    if (isReadOnlyOperation) {
+      return hasWorkerReport ? { status: 'done', confidence: 'reported' } : { status: 'no-evidence', confidence: 'no-evidence' };
+    }
+    return hasExternalEvidence ? { status: 'done', confidence: 'verified' } : { status: 'no-evidence', confidence: 'no-evidence' };
+  }
+  if (!isReadOnlyOperation && hasExternalEvidence) {
+    return { status: 'done', confidence: 'inferred' };
+  }
+  return { status: 'no-evidence', confidence: 'no-evidence' };
+}
 
 function mkTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-asgn-runresult-test-'));
@@ -130,8 +176,8 @@ test('executeAssignment produces status: done and confidence: reported when work
   });
 
   assert.equal(result.assignmentId, assignment.assignmentId);
-  assert.equal(result.status, 'done');
-  assert.equal(result.confidence, 'reported');
+  assert.equal(runOutcome(result).category, 'ok');
+  assert.equal(runOutcome(result).evidence, 'reported');
   assert.equal(result.agentClaim.status, 'done');
 
   const assignmentDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId);
@@ -149,14 +195,14 @@ test('executeAssignment produces status: done and confidence: reported when work
   assert.equal(exitData.exitCode, 0);
 
   const storedResult = JSON.parse(fs.readFileSync(path.join(runDir, 'result.json'), 'utf8'));
-  // Production-door proof: executeAssignment writes through the sole v2
-  // normalizer, rather than a hand-built terminal result.
-  assert.deepEqual(storedResult.contract, { id: 'assignment-run-result', version: 2 });
-  assert.equal(storedResult.classification.provenance, 'native-v2');
+  // Production-door proof: executeAssignment writes through the sole normalizer,
+  // rather than a hand-built terminal result.
+  assert.deepEqual(storedResult.contract, { id: 'assignment-run-result', version: 3 });
+  assert.equal(storedResult.classification.provenance, 'native-v3');
   assert.equal(storedResult.classification.execution.status, 'completed');
   assert.equal(storedResult.runId, 'run_' + assignment.assignmentId + '_01');
-  assert.equal(storedResult.status, 'done');
-  assert.equal(storedResult.confidence, 'reported');
+  assert.equal(runOutcome(storedResult).category, 'ok');
+  assert.equal(runOutcome(storedResult).evidence, 'reported');
 });
 
 test('executeAssignment backfills mutation for its own effectiveAssignment re-read when a legacy assignment.json already exists on disk (ADR-006 R7, P02.4 Red-Team HIGH fix)', async () => {
@@ -231,8 +277,8 @@ test('executeAssignment backfills mutation for its own effectiveAssignment re-re
     isReadOnlyMode: true,
   });
 
-  assert.equal(result.status, 'done');
-  assert.equal(result.confidence, 'reported');
+  assert.equal(runOutcome(result).category, 'ok');
+  assert.equal(runOutcome(result).evidence, 'reported');
 });
 
 test('executeAssignment produces status: no-evidence when executor exits zero without producing report artifacts', async () => {
@@ -270,8 +316,9 @@ test('executeAssignment produces status: no-evidence when executor exits zero wi
   });
 
   // Must not mark success only because process exited zero!
-  assert.equal(result.status, 'no-evidence');
-  assert.equal(result.confidence, 'no-evidence');
+  assert.equal(runOutcome(result).category, 'verdict');
+  assert.equal(runOutcome(result).satisfied, false);
+  assert.equal(runOutcome(result).evidence, 'no-evidence');
   assert.equal(result.runtime.exitCode, 0);
 });
 
@@ -309,8 +356,8 @@ test('failure still writes all storage files including exit.json, evidence.json,
     runnerConfig,
   });
 
-  assert.equal(result.status, 'failed');
-  assert.equal(result.confidence, 'failed');
+  assert.equal(runOutcome(result).category, 'infra');
+  assert.equal(runOutcome(result).evidence, 'failed');
 
   const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
   assert.ok(fs.existsSync(path.join(runDir, 'run.json')));
@@ -376,8 +423,8 @@ test('mutating assignment with uncommitted modified file captures real changedFi
     runnerConfig,
   });
 
-  assert.equal(result.status, 'done');
-  assert.equal(result.confidence, 'inferred');
+  assert.equal(runOutcome(result).category, 'ok');
+  assert.equal(runOutcome(result).evidence, 'inferred');
   assert.ok(result.evidence.changedFiles.includes('tracked.txt'));
   assert.ok(result.evidence.changedFiles.includes('new-file.txt'));
 });
@@ -533,8 +580,9 @@ test('executeAssignment fails closed on malformed agent-result.json (Step 04 §5
 
   const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
 
-  assert.equal(result.status, 'failed', 'malformed agent-result.json must produce status: failed');
-  assert.equal(result.confidence, 'failed', 'malformed agent-result.json must produce confidence: failed');
+  assert.equal(runOutcome(result).category, 'policy');
+  assert.equal(runOutcome(result).refused, true);
+  assert.equal(runOutcome(result).evidence, 'failed');
   // M4 (dispatch-execution-engine architecture review 260920): the worker
   // never wrote a valid claim, so `agentClaim` must be absent -- a runner-
   // authored explanation of WHY is not a worker claim and must never be
@@ -581,8 +629,9 @@ test('executeAssignment fails closed on invalid agent-result.json schema (Step 0
 
   const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
 
-  assert.equal(result.status, 'failed', 'invalid schema must produce status: failed');
-  assert.equal(result.confidence, 'failed', 'invalid schema must produce confidence: failed');
+  assert.equal(runOutcome(result).category, 'policy');
+  assert.equal(runOutcome(result).refused, true);
+  assert.equal(runOutcome(result).evidence, 'failed');
 });
 
 test('executeAssignment does not count pre-existing dirty files as run evidence (Step 04 §5.3)', async () => {
@@ -612,8 +661,9 @@ test('executeAssignment does not count pre-existing dirty files as run evidence 
 
   assert.ok(!result.evidence.changedFiles.includes('preexisting-dirty.txt'),
     'pre-existing dirty file must not be counted as run evidence');
-  assert.equal(result.status, 'no-evidence');
-  assert.equal(result.confidence, 'no-evidence');
+  assert.equal(runOutcome(result).category, 'verdict');
+  assert.equal(runOutcome(result).satisfied, false);
+  assert.equal(runOutcome(result).evidence, 'no-evidence');
   // R6/G3: an unchanged pre-existing dirty file must correctly derive an
   // EMPTY mutatedDirtyBeforeFiles (re-read hash matched the pre-launch
   // snapshot) -- not just a default/absent value.
@@ -658,8 +708,8 @@ test('executeAssignment persists mutatedDirtyBeforeFiles (in both evidence.json 
   const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
 
   // A read-only op that mutates a pre-existing dirty file must fail closed.
-  assert.equal(result.status, 'failed', 'a read-only op that mutates a pre-existing dirty file must fail closed');
-  assert.equal(result.confidence, 'failed');
+  assert.equal(runOutcome(result).category, 'policy');
+  assert.equal(runOutcome(result).evidence, 'failed');
   assert.deepEqual(result.evidence.mutatedDirtyBeforeFiles, ['preexisting-dirty.txt'],
     'result.json evidence must persist the mutated pre-existing dirty file (R6)');
 
@@ -883,9 +933,9 @@ test('executeAssignment with no-op executor and pre-existing dirty file must pro
   // changedFiles must be empty, so this must be no-evidence — NOT inferred or done.
   assert.ok(!result.evidence.changedFiles.includes('preexisting.txt'),
     'pre-existing dirty file must NOT appear in changedFiles');
-  assert.equal(result.confidence, 'no-evidence',
-    'no-op executor with pre-existing dirty file must produce no-evidence, not inferred');
-  assert.equal(result.status, 'no-evidence');
+  assert.equal(runOutcome(result).evidence, 'no-evidence');
+  assert.equal(runOutcome(result).category, 'verdict');
+  assert.equal(runOutcome(result).satisfied, false);
 });
 
 // P2 regression: corrupt assignment.json must throw RunnerConfigError, not silently fallback to in-memory object
@@ -954,8 +1004,9 @@ test('executeAssignment with bare agent-result.json (no evidenceRefs, no compani
   const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
 
   // Must NOT produce reported! Bare claim without evidenceRefs or companion report is no-evidence.
-  assert.equal(result.status, 'no-evidence', 'bare agent-result.json must produce status: no-evidence');
-  assert.equal(result.confidence, 'no-evidence', 'bare agent-result.json must produce confidence: no-evidence');
+  assert.equal(runOutcome(result).category, 'verdict');
+  assert.equal(runOutcome(result).satisfied, false);
+  assert.equal(runOutcome(result).evidence, 'no-evidence');
 });
 
 test('executeAssignment with malformed evidenceRefs: [""] fails closed with status: failed (P1)', async () => {
@@ -994,8 +1045,9 @@ test('executeAssignment with malformed evidenceRefs: [""] fails closed with stat
   const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
 
   // Must fail closed because evidenceRefs items must be non-empty strings!
-  assert.equal(result.status, 'failed', 'malformed evidenceRefs must produce status: failed');
-  assert.equal(result.confidence, 'failed', 'malformed evidenceRefs must produce confidence: failed');
+  assert.equal(runOutcome(result).category, 'policy');
+  assert.equal(runOutcome(result).refused, true);
+  assert.equal(runOutcome(result).evidence, 'failed');
 });
 
 test('executeAssignment with placeholder report text (TODO/N/A/keyword-only) produces no-evidence', async () => {
@@ -1031,8 +1083,9 @@ test('executeAssignment with placeholder report text (TODO/N/A/keyword-only) pro
   const assignment = buildAssignment({ workId: 'tsk-todo-report', stage: 'planning', operation: 'validate-plan' });
   const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
 
-  assert.equal(result.status, 'no-evidence', 'placeholder TODO report text must produce status: no-evidence');
-  assert.equal(result.confidence, 'no-evidence', 'placeholder TODO report text must produce confidence: no-evidence');
+  assert.equal(runOutcome(result).category, 'verdict');
+  assert.equal(runOutcome(result).satisfied, false);
+  assert.equal(runOutcome(result).evidence, 'no-evidence');
 });
 
 test('executeAssignment with placeholder evidenceRefs (TODO/N/A/fabricated path) produces no-evidence', async () => {
@@ -1068,8 +1121,9 @@ test('executeAssignment with placeholder evidenceRefs (TODO/N/A/fabricated path)
   const assignment = buildAssignment({ workId: 'tsk-placeholder-ref', stage: 'planning', operation: 'validate-plan' });
   const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
 
-  assert.equal(result.status, 'no-evidence', 'placeholder evidenceRefs must produce status: no-evidence');
-  assert.equal(result.confidence, 'no-evidence', 'placeholder evidenceRefs must produce confidence: no-evidence');
+  assert.equal(runOutcome(result).category, 'verdict');
+  assert.equal(runOutcome(result).satisfied, false);
+  assert.equal(runOutcome(result).evidence, 'no-evidence');
 });
 
 test('executeAssignment with real substantive report text produces confidence: reported', async () => {
@@ -1105,8 +1159,8 @@ test('executeAssignment with real substantive report text produces confidence: r
   const assignment = buildAssignment({ workId: 'tsk-real-report', stage: 'planning', operation: 'validate-plan' });
   const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
 
-  assert.equal(result.status, 'done', 'real report text must produce status: done');
-  assert.equal(result.confidence, 'reported', 'real report text must produce confidence: reported');
+  assert.equal(runOutcome(result).category, 'ok');
+  assert.equal(runOutcome(result).evidence, 'reported');
 });
 
 test('executeAssignment captures gitBefore pre-launch when the worker commits then crashes (Cell 6.7 G6)', async () => {
@@ -1171,9 +1225,8 @@ test('executeAssignment captures gitBefore pre-launch when the worker commits th
 
   // Worker crashed (nonzero exit) -- must fail closed regardless of the
   // commit it made.
-  assert.equal(result.status, 'failed');
-  assert.equal(result.confidence, 'failed');
-
+  assert.equal(runOutcome(result).category, 'infra');
+  assert.equal(runOutcome(result).evidence, 'failed');
   // The core G6 assertion: gitBefore was captured BEFORE the worker's
   // commit landed, so it must differ from gitAfter (captured post-crash) --
   // and must equal the real pre-run HEAD sha, not the post-commit one.
@@ -1255,9 +1308,8 @@ test('executeAssignment captures gitBefore pre-launch when the worker commits th
 
   // Worker was killed on timeout -- must fail closed regardless of the
   // commit it made before hanging.
-  assert.equal(result.status, 'failed');
-  assert.equal(result.confidence, 'failed');
-
+  assert.equal(runOutcome(result).category, 'infra');
+  assert.equal(runOutcome(result).evidence, 'failed');
   // The core assertion: gitBefore was captured BEFORE the worker's commit
   // landed, so it must differ from gitAfter (captured post-timeout) -- and
   // must equal the real pre-run HEAD sha, not the post-commit one.
@@ -1339,9 +1391,8 @@ test('executeAssignment persists effective-execution-contract.json pre-launch an
     runnerConfig,
   });
 
-  assert.equal(result.status, 'done');
-  assert.equal(result.confidence, 'reported');
-
+  assert.equal(runOutcome(result).category, 'ok');
+  assert.equal(runOutcome(result).evidence, 'reported');
   const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
   const contractPath = path.join(runDir, 'effective-execution-contract.json');
   assert.ok(fs.existsSync(contractPath), 'effective-execution-contract.json must exist');
@@ -1355,7 +1406,7 @@ test('executeAssignment persists effective-execution-contract.json pre-launch an
   assert.equal(contract.resultClaim.path, path.join(runDir, 'agent-result.json'));
 });
 
-test('executeAssignment writes RunResult v2 with contract version 2, valid classification, and attribution', async () => {
+test('executeAssignment writes RunResult v3 with contract version 3, valid classification, and attribution', async () => {
   const tempDir = mkTempDir();
 
   const executorScript = path.join(tempDir, 'v2-executor.mjs');
@@ -1411,24 +1462,27 @@ test('executeAssignment writes RunResult v2 with contract version 2, valid class
     runnerConfig,
   });
 
-  assert.equal(result.status, 'done');
-  assert.equal(result.confidence, 'reported');
+  assert.equal(runOutcome(result).category, 'ok');
+  assert.equal(runOutcome(result).evidence, 'reported');
 
   const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
   const storedResult = JSON.parse(fs.readFileSync(path.join(runDir, 'result.json'), 'utf8'));
 
   assert.equal(storedResult.contract.id, 'assignment-run-result');
-  assert.equal(storedResult.contract.version, 2);
-  assert.equal(storedResult.classification.provenance, 'native-v2');
+  assert.equal(storedResult.contract.version, 3);
+  assert.equal(storedResult.classification.provenance, 'native-v3');
   assert.equal(storedResult.classification.execution.status, 'completed');
   assert.equal(storedResult.classification.execution.exitCode, 0);
   assert.equal(storedResult.classification.assessment.verdict, 'pass');
   assert.equal(storedResult.classification.failure, null);
   assert.equal(storedResult.classification.policy.disposition, 'allow');
+  assert.equal(storedResult.classification.outcome.category, 'ok');
+  assert.equal(storedResult.status, undefined);
+  assert.equal(storedResult.confidence, undefined);
   assert.ok(Array.isArray(storedResult.evidence.attribution));
 
-  const validation = validateRunResultV2(storedResult);
-  assert.ok(validation.valid, `Stored result must be valid RunResult v2: ${validation.reasons?.join(', ')}`);
+  const validation = validateRunResultV3(storedResult);
+  assert.ok(validation.valid, `Stored result must be valid RunResult v3: ${validation.reasons?.join(', ')}`);
 });
 
 test('executeAssignment for reviewer findings produces execution.completed with assessment.findings and failure: null', async () => {
@@ -1490,22 +1544,23 @@ test('executeAssignment for reviewer findings produces execution.completed with 
     runnerConfig,
   });
 
-  // Legacy projection is failed to block quorum conservatively
-  assert.equal(result.status, 'failed');
-  assert.equal(result.confidence, 'reported');
+  // Canonical v3 classification has outcome.category: 'verdict'
+  assert.equal(runOutcome(result).category, 'verdict');
+  assert.equal(runOutcome(result).verdict, 'findings');
+  assert.equal(runOutcome(result).evidence, 'reported');
 
   const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
   const storedResult = JSON.parse(fs.readFileSync(path.join(runDir, 'result.json'), 'utf8'));
 
-  // RunResult v2 canonical classification
+  // RunResult v3 canonical classification
   assert.equal(storedResult.contract.id, 'assignment-run-result');
-  assert.equal(storedResult.contract.version, 2);
+  assert.equal(storedResult.contract.version, 3);
   assert.equal(storedResult.classification.execution.status, 'completed');
   assert.equal(storedResult.classification.execution.exitCode, 0);
   assert.equal(storedResult.classification.assessment.verdict, 'findings');
   assert.equal(storedResult.classification.failure, null, 'Reviewer finding must have null failure, not provider crash');
   assert.equal(storedResult.classification.policy.disposition, 'allow');
 
-  const validation = validateRunResultV2(storedResult);
-  assert.ok(validation.valid, `Stored reviewer finding must be valid RunResult v2: ${validation.reasons?.join(', ')}`);
+  const validation = validateRunResultV3(storedResult);
+  assert.ok(validation.valid, `Stored reviewer finding must be valid RunResult v3: ${validation.reasons?.join(', ')}`);
 });

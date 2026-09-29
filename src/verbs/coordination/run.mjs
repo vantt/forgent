@@ -356,9 +356,12 @@ function aggregationCloseParams(coordinationId, engineOpts) {
 
 function summarizeDispatch({ assignment, runResult }) {
   const outcome = runResult ? runOutcome(runResult) : null;
+  const legacyStatus = outcome?.satisfied
+    ? 'done'
+    : (outcome?.category === 'blocked' ? 'blocked' : (outcome?.evidence === 'no-evidence' ? 'no-evidence' : 'failed'));
   return {
     assignmentId: assignment.assignmentId,
-    status: outcome?.category ?? null,
+    status: runResult ? legacyStatus : null,
     confidence: outcome?.evidence ?? null,
     outcome: outcome?.category ?? null,
     verdict: outcome?.verdict ?? null,

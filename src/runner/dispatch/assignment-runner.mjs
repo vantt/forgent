@@ -16,14 +16,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { resolveWorkerArtifactPath } from './worker-artifacts.mjs';
-import { normalizeRunResultV2, interpretRunResult, ASSESSMENT_VERDICTS } from './run-result.mjs';
+import { normalizeRunResultV2, interpretRunResult, ASSESSMENT_VERDICTS, runOutcome } from './run-result.mjs';
 import { attributeWorkspaceChanges } from './evidence-attribution.mjs';
 import {
   commitRunSettlement,
   settleRunOutcome,
   settleFailedRunFromOutcome,
   settleReceiptRunFromOutcome,
-  classifyRunEvidence,
   isSubstantiveReportText,
   safeGitHead,
   safeGitStatusFiles,
@@ -43,7 +42,6 @@ export {
   settleRunOutcome,
   settleFailedRunFromOutcome,
   settleReceiptRunFromOutcome,
-  classifyRunEvidence,
   isSubstantiveReportText,
   safeGitHead,
   safeGitStatusFiles,
@@ -2705,7 +2703,6 @@ export async function executeAssignment(assignment, opts = {}) {
       adapterOutcome: rawResult?.adapterOutcome || rawResult?.outcome || rawResult?.status,
       opts: { ...opts, repoRoot: root, cwd },
     });
-
     return outcome.runResult;
   } finally {
     if (cwdLockHeartbeat) clearInterval(cwdLockHeartbeat);

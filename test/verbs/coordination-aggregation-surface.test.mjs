@@ -46,7 +46,7 @@ import { validateSessionAggregation } from '../../src/runner/coordination/sessio
 import { readManifest, resolveSessionPaths } from '../../src/runner/coordination/store.mjs';
 import { replaySession } from '../../src/runner/coordination/replay.mjs';
 import { StoreError } from '../../src/state/store.mjs';
-
+import { interpretRunResult } from '../../src/runner/dispatch/run-result.mjs';
 const FGOS_CLI = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../bin/fgos.mjs');
 const PROTOCOL_ID = 'test.coordination-protocol.aggregation-surface';
 const AGGREGATION_METHOD = 'evidence-preserving-synthesis';
@@ -326,7 +326,7 @@ function runResultsOnDisk(coordinationId, opts) {
     for (const attempt of fs.readdirSync(runsDir).sort()) {
       const resultPath = path.join(runsDir, attempt, 'result.json');
       if (!fs.existsSync(resultPath)) continue;
-      const result = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+      const result = interpretRunResult(JSON.parse(fs.readFileSync(resultPath, 'utf8')));
       snapshot[`${assignmentId}/${attempt}`] = { status: result.status, confidence: result.confidence };
     }
   }

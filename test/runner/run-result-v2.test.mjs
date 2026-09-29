@@ -12,9 +12,6 @@ import {
   POLICY_DISPOSITIONS,
   DELIVERY_MODES,
   PROVENANCE_VALUES,
-  projectLegacyStatus,
-  projectLegacyConfidence,
-  projectLegacyStatusAndConfidence,
   validateRunResultV2,
   normalizeRunResultV2,
   interpretRunResult,
@@ -25,7 +22,7 @@ function mkTempDir() {
 }
 
 test('closed vocabularies are defined and frozen', () => {
-  assert.deepEqual(RUN_RESULT_CONTRACT, { id: 'assignment-run-result', version: 2 });
+  assert.deepEqual(RUN_RESULT_CONTRACT, { id: 'assignment-run-result', version: 3 });
   assert.deepEqual(EXECUTION_STATUSES, ['completed', 'failed', 'cancelled', 'completion-unknown']);
   assert.deepEqual(ASSESSMENT_VERDICTS, ['pass', 'findings', 'blocked', 'inconclusive', 'not-applicable']);
   assert.deepEqual(CONFIDENCE_LEVELS, ['verified', 'reported', 'inferred', 'no-evidence', 'failed']);

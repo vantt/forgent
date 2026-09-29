@@ -22,7 +22,7 @@ import { resolveContentRoot } from '../../intake/plan.mjs';
 import { planVerdictFromPlanMd } from '../../intake/plan-verdict-from-plan-md.mjs';
 import { executorIdForWork, resolveCapabilityIdentityDetails, resolveCapabilityIdentity, buildPrompt } from '../work-compat.mjs';
 import { buildAssignment, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
-import { executeAssignment, classifyRunEvidence, isSubstantiveReportText } from './assignment-runner.mjs';
+import { executeAssignment, isSubstantiveReportText } from './assignment-runner.mjs';
 import { interpretRunResult, runOutcome } from './run-result.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
 import { detectTrunk } from '../worktree.mjs';
@@ -117,13 +117,11 @@ function findLatestAssignmentRunResult({ work, repoRoot, stage, resultKind = 'ga
       const asgnDir = path.join(assignmentsDir, dirName);
       const asgnJsonPath = path.join(asgnDir, 'assignment.json');
       if (!fs.existsSync(asgnJsonPath)) continue;
-
       try {
         const asgn = JSON.parse(fs.readFileSync(asgnJsonPath, 'utf8'));
         if (asgn.workId !== work.id && asgn.work?.id !== work.id) continue;
         if (targetStage && asgn.stage && asgn.stage !== targetStage) continue;
         if (resultKind && asgn.resultKind && asgn.resultKind !== resultKind) continue;
-        // ADR-007 §3: an inline Assignment's RunResult is non-driving
         // evidence -- driver operation choice must never interpret it as a
         // Stage verdict or lifecycle signal. Skip it here, in the same
         // filter chain as the declared-shape checks above (not a
@@ -395,7 +393,7 @@ function findLatestAssignmentRunResult({ work, repoRoot, stage, resultKind = 'ga
           // derivations still apply — that is what makes a stored flip
           // inert.
           const runtimeInfo = runResult.runtime && typeof runResult.runtime === 'object' ? runResult.runtime : {};
-          const derived = classifyRunEvidence({
+          const evidenceFloor = {
             exitCode: typeof runtimeInfo.exitCode === 'number' ? runtimeInfo.exitCode : null,
             signal: typeof runtimeInfo.signal === 'string' ? runtimeInfo.signal : null,
             isTimeout: runtimeInfo.isTimeout === true,
@@ -419,17 +417,19 @@ function findLatestAssignmentRunResult({ work, repoRoot, stage, resultKind = 'ga
                   : fallbackMutationForAssignment(asgn),
             }),
             repoRoot,
-          });
-          const settlesOutcome = runOutcome(runResult);
-          const settlesAdvance =
-            settlesOutcome.satisfied && (settlesOutcome.evidence === 'reported' || settlesOutcome.evidence === 'verified');
-          const derivedAdvances =
-            derived.status === 'done' && (derived.confidence === 'reported' || derived.confidence === 'verified');
-          if (!derivedAdvances || settlesAdvance) {
-            runResult.status = derived.status;
-            runResult.confidence = derived.confidence;
+          };
+          const outcome = runOutcome(runResult, { evidenceFloor });
+          runResult.outcome = outcome;
+          if (outcome.category === 'ok') {
+            runResult.status = 'done';
+          } else if (outcome.category === 'blocked') {
+            runResult.status = 'blocked';
+          } else if (outcome.evidence === 'no-evidence') {
+            runResult.status = 'no-evidence';
+          } else {
+            runResult.status = 'failed';
           }
-          runResult.outcome = runOutcome(runResult, { evidenceFloor: derived });
+          runResult.confidence = outcome.evidence;
           if (stat.mtimeMs > latestMtime) {
             latestMtime = stat.mtimeMs;
             latestRunResult = runResult;

@@ -1341,9 +1341,11 @@ accepted dispatch-operability design from
 `plans/260914-dispatch-operability-evidence-attribution/` for the local
 Assignment/Run runtime. The shipped slice is intentionally narrow:
 
-- Typed Run Result and Observation: `RunResult` v2 remains the sole immutable
-  terminal Run truth; `RunObservation` is a mutable read projection; historical
-  v1 results read as `legacy-derived` without byte rewrite.
+- Typed Run Result and Observation: `RunResult` v3 (`assignment-run-result` v3)
+  remains the sole immutable terminal Run truth, read across all consumers via
+  `runOutcome()` built on `classification.outcome`; `RunObservation` is a mutable read
+  projection; historical v1/v2 results read deterministically via `interpretRunResult`
+  without byte rewrite.
 - Dispatch inspection and guard reconciliation: one read operation,
   `dispatch.runtime.inspect`, accepts exactly one selector (`run`,
   `assignment`, or `cwd`); a separate write operation,

@@ -3242,7 +3242,7 @@ export async function dispatchResearchFanOut(coordinationId, params, opts = {}) 
  *   fact); `'reported'`/`'inferred'` branches are recorded in `unverified`,
  *   NEVER promoted into `accepted`. (Read-only Assignments in this whole
  *   standalone-session slice can never actually classify as `'verified'`
- *   -- `classifyRunEvidence`'s read-only branch has no path to it,
+ *   -- the normalizer's read-only branch has no path to it,
  *   confirmed directly in `assignment-runner.mjs` and already documented
  *   by this track's own `coordination-declared-consult.test.mjs` R4 tests
  *   -- so a real dispatch's `accepted` bucket is legitimately expected to
@@ -3682,7 +3682,7 @@ const AGGREGATION_METHOD = 'evidence-preserving-synthesis';
 
 // The disclosure ids this engine can derive from session evidence. Every one
 // is ENGINE-classified, never worker-asserted: `status`/`confidence` come from
-// `classifyRunEvidence`'s verdict on the filesystem (assignment-runner.mjs),
+// RunResult classification on the filesystem (assignment-runner.mjs),
 // not from the worker's own `agentClaim`. A definition whose
 // `requiredDisclosures[]` names anything outside this set gets a disclosure
 // coverage failure from the evaluator -- fail-closed, never a silently

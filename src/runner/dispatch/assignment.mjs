@@ -793,7 +793,7 @@ export function renderAssignmentPrompt(assignment, options = {}) {
   // status:"DONE"/"objection" and failed schema validation
   // (validateAgentResultClaim's own ALLOWED_AGENT_CLAIM_STATUSES, above),
   // then a second real attempt still landed `no-evidence` because
-  // classifyRunEvidence (assignment-runner.mjs) requires this same report
+  // the runner (assignment-runner.mjs) requires this same report
   // artifact for a read-only operation's "done" status to count as
   // evidenced -- a requirement this prompt never disclosed. Both facts are
   // now stated explicitly instead of discovered by two failed attempts.

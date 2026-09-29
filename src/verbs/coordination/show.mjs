@@ -415,9 +415,11 @@ export function showCoordinationUseCase(ctx, { id }) {
         const latestResult = nodeResults.length > 0 ? nodeResults[nodeResults.length - 1] : null;
         const runResult = latestResult ? readRunResultForAssignment(fgosDir, latestResult.assignmentId, latestResult.runId) : null;
         const outcome = runResult ? runOutcome(runResult) : null;
-        const runResultStatus = outcome?.category ?? null;
+        const runResultStatus = outcome?.satisfied
+          ? 'done'
+          : (outcome?.category === 'blocked' ? 'blocked' : (outcome?.evidence === 'no-evidence' ? 'no-evidence' : (outcome ? 'failed' : (settled ? 'done' : null))));
         const runResultConfidence = outcome?.evidence ?? null;
-
+        const runResultOutcome = outcome?.category ?? null;
         const sharedCwdCaveat = dagCaveats.get(node.id) ?? null;
 
         const hasCorruptEvidence = nodeAssignments.some(

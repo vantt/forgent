@@ -24,9 +24,6 @@ import {
   interpretAssignmentRunResult,
 } from '../../src/runner/dispatch/operation-choice.mjs';
 
-import {
-  classifyRunEvidence,
-} from '../../src/runner/dispatch/settlement.mjs';
 
 import {
   interpretRunResult,
@@ -465,36 +462,22 @@ test('characterization: operation-choice interpretAssignmentRunResult', () => {
 // ---------------------------------------------------------------------------
 // 7. Operation Choice: classifyRunEvidence downgrade behavior (lines 398-430)
 // ---------------------------------------------------------------------------
-test('characterization: classifyRunEvidence downgrades spoofed pass to failed/failed', () => {
+test('characterization: runOutcome downgrades spoofed pass with evidenceFloor', () => {
   const f18 = loadFixture('18-spoofed-pass.json');
-  // Stored classification in f18 says status: done, confidence: verified, completed/pass
-  // But runtime/evidence says exitCode: 1 and hasDirtyBeforeMutation: true
-  const derived = classifyRunEvidence({
-    exitCode: f18.evidence.exitCode,
-    signal: null,
-    isTimeout: false,
-    agentClaim: null,
-    claimInvalid: false,
-    workerArtifacts: [],
-    changedFiles: [],
-    hasDirtyBeforeMutation: true,
-    isReadOnlyOperation: true,
-    repoRoot: '/tmp',
+  const rawOutcome = runOutcome(f18);
+  assert.equal(rawOutcome.category, 'ok');
+
+  const downgraded = runOutcome(f18, {
+    evidenceFloor: {
+      exitCode: f18.evidence.exitCode,
+      hasDirtyBeforeMutation: true,
+      isReadOnlyOperation: true,
+    },
   });
 
-  assert.equal(derived.status, 'failed');
-  assert.equal(derived.confidence, 'failed');
-
-  // When downgraded per findLatestAssignmentRunResult lines 427-430:
-  const settlesAdvance = f18.status === 'done' && (f18.confidence === 'reported' || f18.confidence === 'verified');
-  const derivedAdvances = derived.status === 'done' && (derived.confidence === 'reported' || derived.confidence === 'verified');
-  assert.equal(derivedAdvances, false);
-  assert.equal(settlesAdvance, true);
-  // Therefore downgrade applies!
-  const effectiveStatus = derived.status;
-  const effectiveConfidence = derived.confidence;
-  assert.equal(effectiveStatus, 'failed');
-  assert.equal(effectiveConfidence, 'failed');
+  assert.equal(downgraded.category, 'infra');
+  assert.equal(downgraded.evidence, 'failed');
+  assert.equal(downgraded.satisfied, false);
 });
 
 // ---------------------------------------------------------------------------

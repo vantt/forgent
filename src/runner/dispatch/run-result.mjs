@@ -9,9 +9,10 @@
 
 import fs from 'node:fs';
 import { isAssessmentRequired } from './agent-result-claim-contract.mjs';
-import { classifyRunEvidence } from './settlement.mjs';
-export const RUN_RESULT_CONTRACT = Object.freeze({ id: 'assignment-run-result', version: 2 });
 
+export const RUN_RESULT_CONTRACT = Object.freeze({ id: 'assignment-run-result', version: 3 });
+export const RUN_RESULT_CONTRACT_V2 = Object.freeze({ id: 'assignment-run-result', version: 2 });
+export const RUN_RESULT_CONTRACT_V3 = Object.freeze({ id: 'assignment-run-result', version: 3 });
 export const EXECUTION_STATUSES = Object.freeze(['completed', 'failed', 'cancelled', 'completion-unknown']);
 export const ASSESSMENT_VERDICTS = Object.freeze(['pass', 'findings', 'blocked', 'inconclusive', 'not-applicable']);
 export const CONFIDENCE_LEVELS = Object.freeze(['verified', 'reported', 'inferred', 'no-evidence', 'failed']);
@@ -46,7 +47,7 @@ export const CORRUPT_CLASSIFICATION = Object.freeze({
  * @param {object} classification
  * @returns {string}
  */
-export function projectLegacyStatus(classification) {
+function projectLegacyStatus(classification) {
   if (!classification || typeof classification !== 'object') return 'no-evidence';
   const execStatus = classification.execution?.status;
   const assessVerdict = classification.assessment?.verdict;
@@ -97,7 +98,7 @@ export function projectLegacyStatus(classification) {
  * @param {object} classification
  * @returns {string}
  */
-export function projectLegacyConfidence(classification) {
+function projectLegacyConfidence(classification) {
   if (!classification || typeof classification !== 'object') return 'no-evidence';
   const execStatus = classification.execution?.status;
   const confLevel = classification.confidence?.level;
@@ -123,7 +124,7 @@ export function projectLegacyConfidence(classification) {
  * @param {object} classification
  * @returns {{ status: string, confidence: string }}
  */
-export function projectLegacyStatusAndConfidence(classification) {
+function projectLegacyStatusAndConfidence(classification) {
   return {
     status: projectLegacyStatus(classification),
     confidence: projectLegacyConfidence(classification),
@@ -144,8 +145,8 @@ export function validateRunResultV2(result, { expectedRunId } = {}) {
 
   if (!result.contract || typeof result.contract !== 'object') {
     reasons.push('contract field is required');
-  } else if (result.contract.id !== RUN_RESULT_CONTRACT.id || result.contract.version !== RUN_RESULT_CONTRACT.version) {
-    reasons.push(`contract must be {id: "${RUN_RESULT_CONTRACT.id}", version: ${RUN_RESULT_CONTRACT.version}}`);
+  } else if (result.contract.id !== RUN_RESULT_CONTRACT_V2.id || result.contract.version !== 2) {
+    reasons.push(`contract must be {id: "${RUN_RESULT_CONTRACT_V2.id}", version: 2}`);
   }
 
   if (typeof result.runId !== 'string' || !result.runId.trim()) {
@@ -345,17 +346,21 @@ export function validateRunResultV3(result, { expectedRunId } = {}) {
  * @param {object} params
  * @returns {object} Canonical RunResult v2
  */
-export function normalizeRunResultV2({
+export function normalizeRunResult({
+  contractVersion = 3,
   runId,
   assignmentId = null,
   workId,
   controlEpoch,
   controlToken,
-  executorId = 'cli-spawn',
+  executorId = null,
+  adapter = 'cli-spawn',
+  confinement = null,
+  role = null,
   executorRedirected,
   policy: dispatchPolicy,
   settledAt,
-  durationMs,
+  durationMs = null,
   planContentHash,
   claimSha256,
   settleReports = [],
@@ -363,7 +368,6 @@ export function normalizeRunResultV2({
   agentClaim = null,
   claimInvalid = false,
   evidence = {},
-  role,
   operation,
   isReadOnlyOperation = false,
   deliveryMode = 'fresh',
@@ -372,32 +376,35 @@ export function normalizeRunResultV2({
   failureOverride = null,
   confidenceLevel = null,
   assessmentOverride = null,
+  execStatusOverride = null,
   runnerNote = null,
   usage = null,
 } = {}) {
+  const isV2 = contractVersion === 2;
   const exitCode = typeof runtime.exitCode === 'number' ? runtime.exitCode : null;
   const isTimeout = runtime.isTimeout === true;
   const isCancelled = runtime.isCancelled === true;
   const executionError = runtime.executionError || null;
 
   // 1. Execution status
-  let execStatus = 'completed';
-  if (isCancelled) {
-    execStatus = 'cancelled';
-  } else if (isTimeout) {
-    execStatus = 'failed';
-  } else if (executionError) {
-    execStatus = 'failed';
-  } else if (exitCode !== null && exitCode !== 0) {
-    execStatus = 'failed';
-  } else if (exitCode === null && !runtime.stdoutLog && !runtime.stderrLog && !runtime.settledAt) {
-    execStatus = 'completion-unknown';
-  } else if (exitCode === 0) {
-    execStatus = 'completed';
-  } else if (exitCode === null) {
-    execStatus = 'completion-unknown';
+  let execStatus = execStatusOverride || 'completed';
+  if (!execStatusOverride) {
+    if (isCancelled) {
+      execStatus = 'cancelled';
+    } else if (isTimeout) {
+      execStatus = 'failed';
+    } else if (executionError) {
+      execStatus = 'failed';
+    } else if (exitCode !== null && exitCode !== 0) {
+      execStatus = 'failed';
+    } else if (exitCode === null && !runtime.stdoutLog && !runtime.stderrLog && !runtime.settledAt) {
+      execStatus = 'completion-unknown';
+    } else if (exitCode === 0) {
+      execStatus = 'completed';
+    } else if (exitCode === null) {
+      execStatus = 'completion-unknown';
+    }
   }
-
   // 2. Failure classification
   let failure = null;
   if (failureOverride) {
@@ -546,30 +553,29 @@ export function normalizeRunResultV2({
     failure,
     policy,
     delivery,
-    provenance: 'native-v2',
+    provenance: isV2 ? 'native-v2' : 'native-v3',
   };
+  const contract = isV2 ? { ...RUN_RESULT_CONTRACT_V2 } : { ...RUN_RESULT_CONTRACT_V3 };
 
-  const projectedStatus = projectLegacyStatus(classification);
-  const projectedConfidence = projectLegacyConfidence(classification);
+  if (!isV2) {
+    classification.outcome = deriveOutcome(classification);
+  }
 
   const finalRunResult = {
-    contract: { ...RUN_RESULT_CONTRACT },
+    contract,
     runId,
     assignmentId: assignmentId ?? null,
     ...(workId !== undefined ? { workId } : {}),
     ...(controlEpoch !== undefined ? { controlEpoch } : {}),
     ...(controlToken !== undefined ? { controlToken } : {}),
-    ...(executorId !== undefined ? { executorId } : {}),
+    ...(executorId !== undefined && executorId !== null ? { executorId } : {}),
+    ...(isV2 ? {} : {
+      adapter: adapter ?? 'cli-spawn',
+      confinement: confinement ?? null,
+      role: role ?? null,
+    }),
     ...(executorRedirected !== undefined ? { executorRedirected } : {}),
     ...(dispatchPolicy !== undefined ? { policy: dispatchPolicy } : {}),
-    // Phase 02 (executor-policy-dispatch-seams, design.md §3.4): derived
-    // entirely from `dispatchPolicy` (no new caller-supplied param) --
-    // `renderAssignmentPrompt` renders persona as a `# Persona` section
-    // whenever `dispatchPolicy.persona` resolved non-null (assignment-runner.mjs's
-    // call site threads that exact same value through), so delivery here is
-    // deterministically `section`/`applied: true` for this phase. `null`
-    // when no persona resolved, additive/absent for any caller that never
-    // passes a `policy` object at all.
     ...(dispatchPolicy?.persona
       ? {
           promptEnvelope: {
@@ -582,41 +588,31 @@ export function normalizeRunResultV2({
           },
         }
       : {}),
-    ...(settledAt !== undefined ? { settledAt } : {}),
-    ...(durationMs !== undefined ? { durationMs } : {}),
+    settledAt: settledAt || new Date().toISOString(),
+    durationMs: typeof durationMs === 'number' ? durationMs : null,
     ...(planContentHash ? { planContentHash } : {}),
     ...(claimSha256 ? { claimSha256 } : {}),
     settleReports: settleReports ?? [],
     classification,
-    status: projectedStatus,
-    confidence: projectedConfidence,
+    ...(isV2 ? {
+      status: projectLegacyStatus(classification),
+      confidence: projectLegacyConfidence(classification),
+    } : {}),
     runtime: {
       exitCode,
       ...(runtime.stdoutLog ? { stdoutLog: runtime.stdoutLog } : {}),
       ...(runtime.stderrLog ? { stderrLog: runtime.stderrLog } : {}),
       ...(runtime.settledAt ? { settledAt: runtime.settledAt } : {}),
     },
-    // M4 (dispatch-execution-engine architecture review 260920): a
-    // synthesized {status,summary} object here used to be indistinguishable
-    // from a real worker-written claim to every downstream reader -- the
-    // Addendum's own rule is "agent-result.json ... never independent
-    // proof", and a normalizer that manufactures one violates that on the
-    // worker's behalf. `agentClaim` is emitted only when a real claim was
-    // parsed; `runnerNote` (below) carries the same human-readable text
-    // under a name that cannot be mistaken for worker attestation, so no
-    // information is lost, and the confidence `basis` (computed above from
-    // the real input `agentClaim` parameter, not this projection) already
-    // omits `'valid-agent-result-claim'` whenever there was none.
     ...(agentClaim ? { agentClaim } : {}),
     runnerNote: runnerNote
-      ? (typeof runnerNote === 'string' ? { status: projectedStatus, summary: runnerNote } : runnerNote)
+      ? (typeof runnerNote === 'string' ? { summary: runnerNote } : runnerNote)
       : {
-          status: projectedStatus,
           summary: claimInvalid
             ? 'agent-result.json was present but failed schema validation'
             : (executionError ? executionError.message : (isTimeout ? 'Execution timed out' : 'Settled')),
         },
-    ...(usage !== undefined ? { usage } : {}),
+    usage: usage ?? null,
     evidence: {
       ...evidence,
       gitBefore: evidence?.gitBefore ?? null,
@@ -631,9 +627,41 @@ export function normalizeRunResultV2({
     },
   };
 
+  if (!isV2) {
+    Object.defineProperty(finalRunResult, 'status', {
+      get() {
+        if (this.classification?.outcome?.category === 'ok') return 'done';
+        if (this.classification?.outcome?.category === 'blocked') return 'blocked';
+        if (this.classification?.confidence?.level === 'no-evidence') return 'no-evidence';
+        return 'failed';
+      },
+      set(v) {
+        Object.defineProperty(this, 'status', { value: v, writable: true, configurable: true, enumerable: true });
+      },
+      enumerable: false,
+      configurable: true,
+    });
+    Object.defineProperty(finalRunResult, 'confidence', {
+      get() {
+        return this.classification?.confidence?.level ?? null;
+      },
+      set(v) {
+        Object.defineProperty(this, 'confidence', { value: v, writable: true, configurable: true, enumerable: true });
+      },
+      enumerable: false,
+      configurable: true,
+    });
+  }
   return finalRunResult;
 }
 
+export function normalizeRunResultV2(params) {
+  return normalizeRunResult({ ...params, contractVersion: 2 });
+}
+
+export function normalizeRunResultV3(params) {
+  return normalizeRunResult({ ...params, contractVersion: 3 });
+}
 /**
  * Pure interpreter: reads and interprets RunResult deterministically.
  *
@@ -753,7 +781,31 @@ export function interpretRunResult(input, options = {}) {
         corruptionReasons: validation.reasons,
       };
     }
-    return { ...rawObj };
+    const resultObj = { ...rawObj };
+    Object.defineProperty(resultObj, 'status', {
+      get() {
+        if (this.classification?.outcome?.category === 'ok') return 'done';
+        if (this.classification?.outcome?.category === 'blocked') return 'blocked';
+        if (this.classification?.confidence?.level === 'no-evidence') return 'no-evidence';
+        return 'failed';
+      },
+      set(v) {
+        Object.defineProperty(this, 'status', { value: v, writable: true, configurable: true, enumerable: true });
+      },
+      enumerable: false,
+      configurable: true,
+    });
+    Object.defineProperty(resultObj, 'confidence', {
+      get() {
+        return this.classification?.confidence?.level ?? null;
+      },
+      set(v) {
+        Object.defineProperty(this, 'confidence', { value: v, writable: true, configurable: true, enumerable: true });
+      },
+      enumerable: false,
+      configurable: true,
+    });
+    return resultObj;
   }
 
   if (rawObj.contract?.version === 2 && rawObj.contract?.id === RUN_RESULT_CONTRACT.id) {
@@ -761,7 +813,7 @@ export function interpretRunResult(input, options = {}) {
     if (!validation.valid) {
       return {
         ...rawObj,
-        contract: { ...RUN_RESULT_CONTRACT },
+        contract: { ...RUN_RESULT_CONTRACT_V2 },
         classification: { ...CORRUPT_CLASSIFICATION },
         status: 'no-evidence',
         confidence: 'failed',
@@ -785,7 +837,7 @@ export function interpretRunResult(input, options = {}) {
       resultCorrupt: true,
       corrupt: true,
       corruptionReasons: [
-        `contract must be {id: "${RUN_RESULT_CONTRACT.id}", version: ${RUN_RESULT_CONTRACT.version}}`,
+        `contract must be {id: "${RUN_RESULT_CONTRACT.id}", version: 2|3}`,
       ],
     };
   }
@@ -911,7 +963,7 @@ export function interpretRunResult(input, options = {}) {
   };
 
   const derivedView = {
-    contract: { ...RUN_RESULT_CONTRACT },
+    contract: { ...RUN_RESULT_CONTRACT_V2 },
     runId: rawObj.runId ?? null,
     assignmentId: rawObj.assignmentId ?? null,
     ...(rawObj.workId !== undefined ? { workId: rawObj.workId } : {}),
@@ -1047,6 +1099,58 @@ export function deriveLegacyOutcome(recordV1) {
   return deriveOutcome(interpreted.classification);
 }
 
+function deriveEvidenceFloor(evidenceFloor) {
+  if (!evidenceFloor || typeof evidenceFloor !== 'object') return null;
+  if (evidenceFloor.status !== undefined && evidenceFloor.confidence !== undefined) {
+    return evidenceFloor;
+  }
+  const exitCode = typeof evidenceFloor.exitCode === 'number' ? evidenceFloor.exitCode : null;
+  const signal = typeof evidenceFloor.signal === 'string' ? evidenceFloor.signal : null;
+  const isTimeout = evidenceFloor.isTimeout === true;
+  const agentClaim = evidenceFloor.agentClaim ?? null;
+  const claimInvalid = evidenceFloor.claimInvalid === true;
+  const workerArtifacts = Array.isArray(evidenceFloor.workerArtifacts) ? evidenceFloor.workerArtifacts : [];
+  const changedFiles = Array.isArray(evidenceFloor.changedFiles) ? evidenceFloor.changedFiles : [];
+  const hasDirtyBeforeMutation = evidenceFloor.hasDirtyBeforeMutation === true;
+  const isReadOnlyOperation = evidenceFloor.isReadOnlyOperation === true;
+
+  if (isTimeout || (exitCode !== null && exitCode !== undefined && exitCode !== 0) || signal) {
+    return { status: 'failed', confidence: 'failed' };
+  }
+  if (claimInvalid) {
+    return { status: 'failed', confidence: 'failed' };
+  }
+  const companionReportArtifacts = workerArtifacts.filter(
+    (p) => typeof p === 'string' && !p.endsWith('agent-result.json') && !/[/\\]outbox[/\\]result-\d+\.json$/.test(p),
+  );
+  const hasWorkerReport = companionReportArtifacts.length > 0;
+
+  if (agentClaim?.status === 'failed') {
+    const isFindingVerdict = agentClaim?.assessment?.verdict === 'findings';
+    if (isFindingVerdict && hasWorkerReport && exitCode === 0 && !isTimeout) {
+      return { status: 'failed', confidence: 'reported' };
+    }
+    return { status: 'failed', confidence: 'failed' };
+  }
+
+  const hasExternalEvidence = changedFiles.length > 0 || hasDirtyBeforeMutation;
+  if (isReadOnlyOperation && hasExternalEvidence) {
+    return { status: 'failed', confidence: 'failed' };
+  }
+  if (agentClaim?.status === 'blocked') {
+    return { status: 'blocked', confidence: 'reported' };
+  }
+  if (agentClaim && agentClaim.status === 'done') {
+    if (isReadOnlyOperation) {
+      return hasWorkerReport ? { status: 'done', confidence: 'reported' } : { status: 'no-evidence', confidence: 'no-evidence' };
+    }
+    return hasExternalEvidence ? { status: 'done', confidence: 'verified' } : { status: 'no-evidence', confidence: 'no-evidence' };
+  }
+  if (!isReadOnlyOperation && hasExternalEvidence) {
+    return { status: 'done', confidence: 'inferred' };
+  }
+  return { status: 'no-evidence', confidence: 'no-evidence' };
+}
 /**
  * Unified helper for reading RunResult outcome.
  * Single path for all dispatch, coordination, loop, show, and legality decisions.
@@ -1066,6 +1170,7 @@ export function deriveLegacyOutcome(recordV1) {
  * }>}
  */
 export function runOutcome(resultOrPath, { evidenceFloor } = {}) {
+  const derivedFloor = evidenceFloor && typeof evidenceFloor === 'object' ? deriveEvidenceFloor(evidenceFloor) : null;
   const result = typeof resultOrPath === 'string'
     ? interpretRunResult(resultOrPath)
     : (resultOrPath?.classification !== undefined || resultOrPath?.contract !== undefined
@@ -1080,7 +1185,7 @@ export function runOutcome(resultOrPath, { evidenceFloor } = {}) {
     result.resultCorrupt ||
     result.classification?.provenance === 'contract-corrupt'
   ) {
-    const evidenceLevel = (evidenceFloor?.confidence === 'no-evidence' || evidenceFloor?.status === 'no-evidence')
+    const evidenceLevel = (derivedFloor?.confidence === 'no-evidence' || derivedFloor?.status === 'no-evidence')
       ? 'no-evidence'
       : 'failed';
     return Object.freeze({
@@ -1104,32 +1209,17 @@ export function runOutcome(resultOrPath, { evidenceFloor } = {}) {
   let evidence = result.classification?.confidence?.level ?? 'none';
 
   // Apply evidenceFloor downgrade if provided
-  if (evidenceFloor && typeof evidenceFloor === 'object') {
-    const derived = (evidenceFloor.status !== undefined && evidenceFloor.confidence !== undefined)
-      ? evidenceFloor
-      : classifyRunEvidence({
-          exitCode: typeof evidenceFloor.exitCode === 'number' ? evidenceFloor.exitCode : null,
-          signal: typeof evidenceFloor.signal === 'string' ? evidenceFloor.signal : null,
-          isTimeout: evidenceFloor.isTimeout === true,
-          agentClaim: evidenceFloor.agentClaim ?? null,
-          claimInvalid: evidenceFloor.claimInvalid === true,
-          workerArtifacts: Array.isArray(evidenceFloor.workerArtifacts) ? evidenceFloor.workerArtifacts : [],
-          changedFiles: Array.isArray(evidenceFloor.changedFiles) ? evidenceFloor.changedFiles : [],
-          hasDirtyBeforeMutation: evidenceFloor.hasDirtyBeforeMutation === true,
-          isReadOnlyOperation: evidenceFloor.isReadOnlyOperation === true,
-          repoRoot: evidenceFloor.repoRoot ?? process.cwd(),
-        });
-
+  if (derivedFloor) {
     const settlesAdvance = category === 'ok' && (evidence === 'reported' || evidence === 'verified');
-    const derivedAdvances = derived.status === 'done' && (derived.confidence === 'reported' || derived.confidence === 'verified');
+    const derivedAdvances = derivedFloor.status === 'done' && (derivedFloor.confidence === 'reported' || derivedFloor.confidence === 'verified');
 
     if (!derivedAdvances || settlesAdvance) {
-      if (derived.status === 'failed') {
+      if (derivedFloor.status === 'failed') {
         category = 'infra';
-        evidence = derived.confidence ?? 'failed';
-      } else if (derived.status === 'no-evidence') {
+        evidence = derivedFloor.confidence ?? 'failed';
+      } else if (derivedFloor.status === 'no-evidence') {
         category = 'infra';
-        evidence = derived.confidence ?? 'no-evidence';
+        evidence = derivedFloor.confidence ?? 'no-evidence';
       }
     }
   }

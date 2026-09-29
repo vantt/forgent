@@ -86,7 +86,6 @@ export {
 
 export {
   executeAssignment,
-  classifyRunEvidence,
 } from './dispatch/assignment-runner.mjs';
 
 import { runDispatchCli as runCoreDispatchCli } from './dispatch/cli.mjs';
