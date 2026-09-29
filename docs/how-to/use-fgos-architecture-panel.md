@@ -241,11 +241,13 @@ new resume mechanism — every one of those capabilities was already proven
 generically by the sibling group-thinking protocols and re-exercised here
 end to end (`test/verbs/coordination-architecture-advisory-panel-conformance.test.mjs`,
 13 conformance cases) and, for the entry/resume claim specifically, by the
-live throwaway proof cited above. The only two real gaps this track has
-found (`tsk-44p`, `tsk-3xk`) are pre-existing request-schema gaps general to
+live throwaway proof cited above. The two real gaps this track found
+(`tsk-44p`, `tsk-3xk`) were pre-existing request-schema gaps general to
 every protocol using a `human-turn:` ref or a specialist slot — not specific
-to this protocol, not an entry/resume ergonomics problem, and already named
-with their workarounds in `SKILL.md`'s own Known Gaps section.
+to this protocol, not an entry/resume ergonomics problem. `tsk-3xk` is now
+**closed** (Unit I24a added the `specialist-authorize` request-step type);
+`tsk-44p` remains open. Both are named, with `tsk-44p`'s own workaround, in
+`SKILL.md`'s own Known Gaps section.
 
 ## Executor roster — never one collapsed provider
 

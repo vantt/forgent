@@ -1204,6 +1204,7 @@ Lớp từ vựng dispatch hiện hành của fgOS phản ánh mô hình control
 | `orchestrator` | (tái gán nghĩa `0029`) | Tầng hợp thành T0 quản lý N đơn vị work (ở lại) | `runner.md:1995` (ADR 0029), `runner.md:2172` (ADR 0031) |
 | `DispatchPlan` | (mới) | Kế hoạch dispatch được resolved gồm mechanism, target agent/tool, và metadata | `src/runner/dispatch/plan.mjs`, `dispatch-control-plane-redesign.md:175` |
 | `DispatchAssignment` | (mới) | Đơn vị phân công dispatch cụ thể gán executor cho work item | `src/runner/dispatch/plan.mjs`, `dispatch-control-plane-redesign.md:210` |
+| `DemandFacts` / `CapabilityMatch` | (mới) | DemandFacts khai báo thuộc tính phía cầu; CapabilityMatch là kết quả khớp qua serves — lời hứa hành vi đọc được bằng máy của capability | `core/skills/_shared/capability-matching.md` |
 
 *Ghi chú:*
 - Về vai trò bên gọi `launcher` / `driver` / `orchestrator`: xem lưới 2×2 tại `runner.md:2172-2180` (kỷ yếu `0031`) tóm tắt trục T1/T0.
@@ -1212,6 +1213,7 @@ Lớp từ vựng dispatch hiện hành của fgOS phản ánh mô hình control
 - `purpose` (tham số nội bộ `resolve.mjs`/`plan.mjs`) và flag CLI `--for <purpose>` KHÔNG phải một ontology thứ ba — cả hai đặt tên cho một giá trị `capability`, chỉ là cú pháp tương thích lịch sử (compatibility syntax), không phải một identity định tuyến riêng.
 - `job` KHÔNG phải một routing identity — ADR-004 dành riêng tên này cho một scheduler tương lai (chưa dùng); nếu xuất hiện trong log, nó chỉ là nhãn ngữ cảnh của một request, không phải mục tiêu dispatch resolve tới. Một `Run` là một lần thực thi cụ thể cho một Assignment, không phải job/operation identity.
 - Dispatch core chỉ nhận đúng hai target identity — `capability` và `executor-id` — cùng hợp đồng `DispatchRequest`/`PolicyPatch`/`DispatchPlan` chính tắc và danh sách sở hữu component-internal (8 thẩm quyền + forbidden dependencies): xem [Dispatch Control Plane](../architect/agent-coordination/architecture/dispatch-control-plane.md).
+- `DemandFacts` và `CapabilityMatch` (Phase 5, Unit I17): `DemandFacts` khai báo các thuộc tính nhu cầu của đơn vị việc; thuộc tính `serves` là phần danh tính của catalog capability theo nghĩa "lời hứa hành vi đọc được bằng máy", phục vụ matching thuần ngữ nghĩa thay vì quét từ khóa (xem `core/skills/_shared/capability-matching.md`).
 
 ## ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)
 
@@ -2927,3 +2929,59 @@ Mọi lần dispatch đưa agent ra ngoài process (bao gồm `spawnWorker`, `ex
   - Merge + verify không chạm main checkout. Nhưng khi main checkout đang checkout chính trunk, `update-ref` dời nhánh đó rồi `read-tree -m -u HEAD` đồng bộ working tree — nên cổng clean-tree theo own-file-set (tsk-598: committed diff + `footprint`, bỏ qua `.fgos/` và path không liên quan) vẫn chạy trước merge; path trong own-file-set đang dirty → từ chối (exit 4, `not clean`), không dời ref. Lần kiểm đó chạy TRƯỚC worktree CAS mở ra (merge+verify có thể mất vài phút), nên kiểm lại lần hai dưới `main-checkout.lock`, ngay trước `update-ref` (`landCasMergeUnderLock`, cùng `ownFileSet`) — dính bẩn ở lần hai → `blocked` với lý do `main-checkout-dirty-mid-merge` (nằm trong tập lý do `catchup` chấp nhận thử lại, cùng hình dạng `lock-lost-mid-merge`), không `update-ref`.
   - Khóa (lock) thời gian dài không còn cần thiết cho việc thao tác file, chỉ cần cho việc update-ref (nhưng update-ref đã có cơ chế CAS an toàn).
   - Lỗi test hoặc timeout tự động dọn dẹp worktree mà không rò rỉ state vào nhánh chính.
+
+### 0043 — Vocabulary: bound-invocation-supervisor vs detached-run-supervisor
+
+#### Bối cảnh
+
+Phase 8's C4 investigation (reading `invocation_service.rs`,
+`operation_provider_router.rs`, `providers/external_process/{supervisor,
+adapter,registry}.rs`, `apps/fgos/src/legacy_exec.rs`, and
+`docs/platform/host-invocation-routing/architecture/invocation-kernel.md`)
+found `supervisor.rs` (Rust, ~855 lines) and `cli-spawn-supervisor.mjs`
+(Node, ~1208 lines) look like duplicate "supervisor" implementations —
+both do bounded capture, deadlines, crash mapping, cancellation grace — but
+they answer different questions. `supervisor.rs` has zero detach/setsid/
+process-group logic anywhere (confirmed via source) and short default
+deadlines (2-5s): a short RPC-shaped call bound to ONE invocation's own
+lifetime, never expected to outlive its caller. `cli-spawn-supervisor.mjs`
+deliberately detaches (`startSupervisorProcess`'s own detached spawn,
+PGID-based kill, immutable receipt publication) so a long agent/executor
+run survives the crash of whatever dispatched it. Zero live conflict
+today: the Rust mechanism has zero current consumers (`command-routes.json`
+confirms `dispatch` is 100% `legacy-cli`; only 2 `native` routes exist,
+neither uses it).
+
+#### Quyết định
+
+Name the two roles by the load-bearing axis — lifecycle/detachment — not
+current content label ("agent" vs "RPC"), so the names stay correct if
+either mechanism's real use case shifts later:
+
+- **`detached-run-supervisor`** — `cli-spawn-supervisor.mjs`'s role: a
+  supervised run deliberately detached, must survive the crash of whatever
+  dispatched it.
+- **`bound-invocation-supervisor`** — `supervisor.rs`'s role (renamed
+  `BoundInvocationSupervisor`, module `providers::external_process::
+  bound_invocation_supervisor`): a supervised external-process call bound
+  to one invocation's own lifetime, never detached.
+
+Renamed both implementations to match: `cli-spawn-supervisor.mjs`'s
+adapter-specific exports (Node side, unit P8a) and `supervisor.rs`/
+`ExternalProcessSupervisor` → `bound_invocation_supervisor.rs`/
+`BoundInvocationSupervisor` (Rust side, unit P8b, this record).
+
+#### Hệ quả
+
+- A future reader comparing the two "supervisor" files judges them by
+  lifecycle ownership, not by guessing from a shared generic name.
+- `ExternalProcessConfig`/`Request`/`Outcome` and
+  `ExternalProcessProviderAdapter` keep their current names — they name the
+  wire protocol and the `OperationProvider` adapter, not the supervisor
+  role, so this rename doesn't touch them.
+- The day any operation (including `dispatch`) is routed `native` instead
+  of `legacy-cli`, `bound-invocation-supervisor` becomes a real second
+  invocation mechanism alongside `detached-run-supervisor` — this record is
+  the ownership boundary written down before that happens, not after.
+
+Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.

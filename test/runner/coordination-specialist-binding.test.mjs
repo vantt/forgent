@@ -25,6 +25,8 @@ import { readSessionEvents, readManifest, transitionSessionStatus } from '../../
 import { replaySession } from '../../src/runner/coordination/replay.mjs';
 import { CoordinationError } from '../../src/runner/coordination/schema.mjs';
 import { showCoordinationUseCase } from '../../src/verbs/coordination/show.mjs';
+import { runCoordinationUseCase } from '../../src/verbs/coordination/run.mjs';
+import { showCoordinationActionsUseCase, executeSpecialistAuthorizeUseCase } from '../../src/verbs/coordination/actions.mjs';
 
 const DEFINITION_ID = 'test.coordination-protocol.specialist-binding';
 const DRIVER_ID = 'coordinator-1';
@@ -222,6 +224,221 @@ test('a previously-unknown specialistActorId becomes a legitimate dispatch targe
   assert.equal(replayed.specialistAuthorizations[0].specialistActorId, 'specialist-alpha');
 });
 
+// I24a (Phase 5 item 4): the same authorization, reached through the new
+// "specialist-authorize" request-step type (`src/verbs/coordination/schema.mjs`),
+// dispatched through the ONE real public request door
+// (`runCoordinationUseCase`, `coordination run --file`'s own use case),
+// never a second, parallel authorization path -- proving the request
+// boundary really reaches `authorizeSpecialistSlot`, not merely that the
+// engine-level door still works (every other test in this file already
+// proves that, and keeps doing so unmodified).
+test('the "specialist-authorize" request-step type reaches authorizeSpecialistSlot through coordination run --file, end to end', async () => {
+  const coordinationId = 'coord_spec_request_step';
+  const ctx = setup(coordinationId);
+
+  const result = await runCoordinationUseCase(
+    { ...ctx.opts, runnerConfig: ctx.runnerConfig },
+    {
+      requestObject: {
+        kind: 'declared-protocol',
+        objective: 'Recruit a bounded specialist into a declared slot via the request-step door.',
+        writerId: DRIVER_ID,
+        coordinationId,
+        protocolRef: { id: DEFINITION_ID },
+        steps: [
+          {
+            type: 'specialist-authorize',
+            as: 'authSpecialist',
+            slotId: 'review-slot',
+            specialistActorId: 'specialist-alpha',
+            role: 'specialist',
+            capabilities: ['deep-review'],
+            reason: 'Primary review needs a domain specialist.',
+            maxAssignments: 3,
+            expiresAfterRound: 10,
+            specialistAuthorizationId: 'sauth_request_step_1',
+          },
+          {
+            type: 'authorize',
+            as: 'authOperation',
+            operationId: 'specialist-review',
+            targetActorId: 'specialist-alpha',
+            authorizationId: 'auth_specialist_request_step',
+            invocationKey: 'specialist-review:request-step-1',
+            reason: 'Dispatch the specialist review.',
+            grantedContextRefs: [],
+          },
+          {
+            type: 'operation',
+            as: 'dispatchReview',
+            operationId: 'specialist-review',
+            targetActorId: 'specialist-alpha',
+            objective: 'Perform the specialist review.',
+            expectedOutputs: ['agent-result.json (status, summary)'],
+          },
+        ],
+      },
+    },
+  );
+
+  assert.equal(result.steps[0].type, 'specialist-authorize');
+  assert.equal(result.steps[0].door, 'authorizeSpecialistSlot');
+  assert.equal(result.steps[0].slotId, 'review-slot');
+  assert.equal(result.steps[0].specialistActorId, 'specialist-alpha');
+  assert.equal(result.steps[0].appended, true);
+  assert.equal(result.steps[2].status, 'done');
+
+  const events = readSessionEvents(coordinationId, ctx.opts);
+  const specialistEvent = events.find((e) => e.type === 'specialist-authorized');
+  assert.ok(specialistEvent, 'specialist-authorized event must exist, written through the request-step door');
+  assert.equal(specialistEvent.payload.specialistActorId, 'specialist-alpha');
+
+  // Idempotent replay through the SAME request door: a retry (e.g. a
+  // resumed/crashed caller) must resume, never mint a second authorization.
+  const retried = await runCoordinationUseCase(
+    { ...ctx.opts, runnerConfig: ctx.runnerConfig },
+    {
+      requestObject: {
+        kind: 'declared-protocol',
+        objective: 'Retry the same specialist-authorize step.',
+        writerId: DRIVER_ID,
+        coordinationId,
+        protocolRef: { id: DEFINITION_ID },
+        steps: [
+          {
+            type: 'specialist-authorize',
+            as: 'authSpecialistRetry',
+            slotId: 'review-slot',
+            specialistActorId: 'specialist-alpha',
+            role: 'specialist',
+            capabilities: ['deep-review'],
+            reason: 'Primary review needs a domain specialist.',
+            maxAssignments: 3,
+            expiresAfterRound: 10,
+            specialistAuthorizationId: 'sauth_request_step_1',
+          },
+        ],
+      },
+    },
+  );
+  assert.equal(retried.steps[0].appended, false, 'retrying the same specialistAuthorizationId through the request door must resume, not duplicate');
+  assert.equal(
+    readSessionEvents(coordinationId, ctx.opts).filter((e) => e.type === 'specialist-authorized').length,
+    1,
+    'exactly one specialist-authorized event after the retry',
+  );
+});
+
+// I24b (Phase 5 items 4 pt.2/5/6): the SAME authorization, reached through the
+// driver-authenticated, LOCKED typed-action door (`actions.mjs`'s
+// `executeSpecialistAuthorizeUseCase` -> `executeCoordinationActionUseCase`
+// -> `run.mjs`'s typed-action execution path, which holds the events lock
+// for its entire critical section) -- proving `authorizeSpecialistSlotLocked`/
+// `recordSpecialistAuthorizationLocked` genuinely execute under that held
+// lock without self-deadlocking, and that the new "specialist" action-view
+// case correctly reflects the slot's state before/after authorization.
+test('the locked typed-action door ("specialist-authorize" subverb) reaches authorizeSpecialistSlotLocked without self-deadlocking, and resumes idempotently on an identical retry of the same actionKey', async () => {
+  const coordinationId = 'coord_spec_locked_typed_action';
+  const ctx = setup(coordinationId);
+
+  const before = showCoordinationActionsUseCase(ctx.opts, { id: coordinationId });
+  const specialistAction = before.actions.find((a) => a.kind === 'specialist' && a.target?.slotId === 'review-slot');
+  assert.ok(specialistAction, 'expected a "specialist" action for the declared review-slot');
+  assert.equal(specialistAction.authorizable, true);
+  assert.equal(specialistAction.authorized, false);
+  assert.equal(specialistAction.exhausted, false);
+
+  const result = await executeSpecialistAuthorizeUseCase(ctx.opts, {
+    id: coordinationId,
+    actionKey: specialistAction.actionKey,
+    writerId: DRIVER_ID,
+    specialistActorId: 'specialist-alpha',
+    reason: 'Primary review needs a domain specialist.',
+    capabilities: ['deep-review'],
+    maxAssignments: 3,
+    expiresAfterRound: 10,
+  });
+  assert.equal(result.slotId, 'review-slot');
+  assert.equal(result.specialistActorId, 'specialist-alpha');
+  assert.equal(result.appended, true);
+
+  const events = readSessionEvents(coordinationId, ctx.opts).filter((e) => e.type === 'specialist-authorized');
+  assert.equal(events.length, 1, 'exactly one specialist-authorized event, written through the locked door');
+  assert.equal(events[0].payload.specialistActorId, 'specialist-alpha');
+
+  const after = showCoordinationActionsUseCase(ctx.opts, { id: coordinationId });
+  const specialistActionAfter = after.actions.find((a) => a.kind === 'specialist' && a.target?.slotId === 'review-slot');
+  assert.equal(specialistActionAfter.authorized, true);
+  assert.equal(specialistActionAfter.exhausted, false, 'maxBindings is 2 (setup default) and only 1 distinct specialist has been recruited so far');
+
+  // An IDENTICAL retry of the same actionKey (now behind the new event, and
+  // no longer in the current legal action set) must resume idempotently --
+  // the general actionKey-reconstruction contract every typed action already
+  // honors (action-precondition.mjs's own doc comment): same actionKey + same
+  // payload -> idempotent return, never a silent second event, never a
+  // refusal either.
+  const retried = await executeSpecialistAuthorizeUseCase(ctx.opts, {
+    id: coordinationId,
+    actionKey: specialistAction.actionKey,
+    writerId: DRIVER_ID,
+    specialistActorId: 'specialist-alpha',
+    reason: 'Primary review needs a domain specialist.',
+    capabilities: ['deep-review'],
+    maxAssignments: 3,
+    expiresAfterRound: 10,
+  });
+  assert.equal(retried.slotId, 'review-slot');
+  assert.equal(retried.specialistActorId, 'specialist-alpha');
+  assert.equal(retried.appended, false, 'an identical retry must resume, never duplicate');
+  assert.equal(
+    readSessionEvents(coordinationId, ctx.opts).filter((e) => e.type === 'specialist-authorized').length,
+    1,
+    'an identical retry must never append a second specialist-authorized event',
+  );
+});
+
+// The SAME actionKey retried with a genuinely DIFFERENT payload (a different
+// reason) must still be refused -- an actionKey is not a blank check for any
+// later payload, only for an exact repeat of what was already recorded.
+test('the locked typed-action door ("specialist-authorize" subverb) refuses a retry of the same actionKey carrying a different payload', async () => {
+  const coordinationId = 'coord_spec_locked_typed_action_conflict';
+  const ctx = setup(coordinationId);
+
+  const before = showCoordinationActionsUseCase(ctx.opts, { id: coordinationId });
+  const specialistAction = before.actions.find((a) => a.kind === 'specialist' && a.target?.slotId === 'review-slot');
+
+  await executeSpecialistAuthorizeUseCase(ctx.opts, {
+    id: coordinationId,
+    actionKey: specialistAction.actionKey,
+    writerId: DRIVER_ID,
+    specialistActorId: 'specialist-alpha',
+    reason: 'Primary review needs a domain specialist.',
+    capabilities: ['deep-review'],
+    maxAssignments: 3,
+    expiresAfterRound: 10,
+  });
+
+  await assert.rejects(
+    () =>
+      executeSpecialistAuthorizeUseCase(ctx.opts, {
+        id: coordinationId,
+        actionKey: specialistAction.actionKey,
+        writerId: DRIVER_ID,
+        specialistActorId: 'specialist-alpha',
+        reason: 'A completely different reason for this authorization.',
+        capabilities: ['deep-review'],
+        maxAssignments: 3,
+        expiresAfterRound: 10,
+      }),
+    (err) => err instanceof CoordinationError && err.category === 'payload-conflict',
+  );
+  assert.equal(
+    readSessionEvents(coordinationId, ctx.opts).filter((e) => e.type === 'specialist-authorized').length,
+    1,
+    'a payload-conflict retry must never append a second specialist-authorized event',
+  );
+});
+
 test('dispatching without an explicit targetActorId resolves the live specialist automatically', async () => {
   const ctx = setup('coord_spec_implicit');
   authorizeSpecialistSlot('coord_spec_implicit', specialistAuthorization(), ctx.opts);
@@ -309,6 +526,23 @@ test('re-authorizing the SAME specialist actor for the same slot does not consum
     ctx.opts,
   );
   assert.equal(result.appended, true);
+});
+
+test('reusing a specialistAuthorizationId with a DIFFERENT specialistActorId is refused, never silently echoed as authorizing the new actor', () => {
+  const ctx = setup('coord_spec_id_reuse_mismatch');
+  authorizeSpecialistSlot('coord_spec_id_reuse_mismatch', specialistAuthorization(), ctx.opts);
+  assert.throws(
+    () =>
+      authorizeSpecialistSlot(
+        'coord_spec_id_reuse_mismatch',
+        specialistAuthorization({ specialistActorId: 'specialist-zeta' }),
+        ctx.opts,
+      ),
+    (err) => err instanceof CoordinationError && err.category === 'duplicate-ref' && /already recorded with different content/.test(err.message),
+  );
+  const events = readSessionEvents('coord_spec_id_reuse_mismatch', ctx.opts).filter((e) => e.type === 'specialist-authorized');
+  assert.equal(events.length, 1, 'the mismatched retry must never append a second event');
+  assert.equal(events[0].payload.specialistActorId, 'specialist-alpha', 'the original binding must be untouched');
 });
 
 // ─── Bug Taxonomy: over-cap assignment refused (maxAssignments) ───────────

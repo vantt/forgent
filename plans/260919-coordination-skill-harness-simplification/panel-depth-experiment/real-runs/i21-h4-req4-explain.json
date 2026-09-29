@@ -1,0 +1,24 @@
+{
+  "kind": "declared-protocol",
+  "objective": "I27 new track-decision case (I21 H4): explanation.",
+  "writerId": "i27-driver",
+  "coordinationId": "i27-i21h4-full-v1",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "close": true,
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "frontier" }
+  ],
+  "steps": [
+    {
+      "type": "authorize", "as": "authExplain", "operationId": "explain-recommendation", "targetActorId": "lead-advisor-actor",
+      "authorizationId": "auth_explain_i21h4", "invocationKey": "ik_explain_i21h4",
+      "reason": "post-redteam-open is open: red-team-packet has settled.",
+      "grantedContextRefs": ["asgn_i27_driver_op_012", "asgn_i27_driver_op_014"]
+    },
+    {
+      "type": "operation", "as": "explain", "operationId": "explain-recommendation", "targetActorId": "lead-advisor-actor",
+      "objective": "Write the one document meant for the person deciding whether to invest further in closing Unit I21's H4 exposure class (the generic `review` capability, declared with no `.prefer`, having silently pinned all 8 architecture-advisory-panel-v1 actors onto an unconfined executor before the round-2 fix restricted accepted resolutions to exactly bindingSource === 'capability.prefer'). Real synthesis recommendation: read /home/vantt/projects/forgentX/plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/real-runs/i21-h4-req3-synth-redteam.json's own 'synth' step objective text for the full framing (this is the exact prompt the synthesizer received) and read the real result at /home/vantt/projects/forgentX/.fgos/assignments/asgn_i27_driver_op_012/runs/01/agent-report.md (absolute paths; both read-only). State the recommendation plainly, keep any live disagreement visible rather than smoothing it over, and relay the red-team's own verdict honestly -- including if the red-team found the dispatch's own evidence chain insufficient to fully evaluate the question, say so plainly rather than presenting a false sense of resolution. Read /home/vantt/projects/forgentX/.fgos/assignments/asgn_i27_driver_op_014/runs/01/agent-report.md for the real red-team output (absolute path, read-only). Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}

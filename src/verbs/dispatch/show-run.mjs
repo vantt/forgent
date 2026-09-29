@@ -103,6 +103,34 @@ export function listOutbox(runDir) {
 }
 
 /**
+ * Controller-owned state directory listing (grants, replacement-authority, etc.).
+ * Unlike worker-writable outbox, controller/ contains authoritative state written
+ * exclusively by a supervisor/controller.
+ */
+export function listController(runDir) {
+  const controller = path.join(runDir, 'controller');
+  let entries = [];
+  try {
+    entries = fs.readdirSync(controller, { withFileTypes: true });
+  } catch {
+    return [];
+  }
+  return entries
+    .filter((e) => e.isFile())
+    .map((e) => {
+      const full = path.join(controller, e.name);
+      let stat = null;
+      try { stat = fs.statSync(full); } catch { stat = null; }
+      return {
+        name: e.name,
+        bytes: stat ? stat.size : null,
+        modifiedAt: stat ? new Date(stat.mtimeMs).toISOString() : null,
+      };
+    })
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/**
  * One reading of a run: whether it is still going, where its worker is, and
  * what it has written.
  *
@@ -156,6 +184,7 @@ export function readRunSnapshot(runDir) {
     visibility,
     ...(visibilityError ? { visibilityError } : {}),
     outbox: listOutbox(dir),
+    controller: listController(dir),
   };
 }
 

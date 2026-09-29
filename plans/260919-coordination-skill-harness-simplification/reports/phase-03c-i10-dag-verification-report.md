@@ -12,12 +12,12 @@
 - **Pre-I08b Synchronized SHA**: `d1b52e44f65e013fda61c4a0376d7bd2b6a6ed72` (reviewed and approved at `ef2f35b5` on baseline `4ad0b8ca`)
 - **I08b Integration Candidate Baseline SHA**: `c6262fb1d86c78af141032dace09011c847715be` (branch `coordination-skill-harness-i08b-integration`, contains candidate merge `98f501be41756dc80d691cbf63ffeb4cd617fb30`; pending formal landing onto main)
 - **Post-I08b Synchronized Candidate SHA**: `949887407919ca8581cb7e800ef9142eba91c90b` (`merge: synchronize post-I08b integration into coordination-skill-harness-i10-dag-verification`, exact evaluated tip: `e516e9750b81eb12b2db7fdff9280b8ee00d3abc`)
-- **Integration SHA**: (pending merge into main)
+- **Integration SHA**: `605d26fea5a67f61c7d40214f17b16eb09264b3f` (carried forward through `main@26a1038e` and `main@ac19f6d1`)
 - **I09 Integrated Commit SHA**: `1ca4023c98c2f449cb58cba481e82cab49ba51ba`
 - **I09-REV-15 Fix SHA**: `601328256e4e8f26fbf4b44aaaefab23e6821162`
-- **Status**: `ready for conditional independent re-review (synchronized with I08b integration candidate c6262fb1; conditional on c6262fb1 landing on main unchanged)`
+- **Status**: `integrated and verified at main@605d26fe, carried forward`
 - **Capability**: `code:test`
-- **Next Dependency Gate**: `I11` remains BLOCKED pending I08 and I10 integration approval
+- **Next Dependency Gate**: `I11` is **READY, not yet opened** (Unit I08 VERIFIED at `main@ac19f6d1`, Unit I10 integrated and verified at `main@605d26fe`; pending official Track Manager checkpoint signoff)
 
 ---
 
@@ -241,7 +241,7 @@ Following synchronization with the I08b integration candidate baseline (branch `
 - **Pre-I08b Synchronized SHA**: `d1b52e44f65e013fda61c4a0376d7bd2b6a6ed72` (reviewed and approved at `ef2f35b5` on baseline `4ad0b8ca`)
 - **I08b Landed Baseline SHA**: `ba8f6a9dca8c84ba1561ab5802e2c89a2010446c` (on `main`, contains candidate merge `98f501be41756dc80d691cbf63ffeb4cd617fb30` and candidate `c6262fb1d86c78af141032dace09011c847715be`)
 - **Post-I08b-Landing Synchronized SHA**: `2613471e80446d5b005c5362c99817293f77b447` (`merge: synchronize main@ba8f6a9d into coordination-skill-harness-i10-dag-verification`)
-- **Integration SHA**: (pending merge into main)
+- **Integration SHA**: `605d26fea5a67f61c7d40214f17b16eb09264b3f` (carried forward through `main@26a1038e` and `main@ac19f6d1`)
 
 ### Callers Analysis
 - `readLinkedRunResultFromDisk` callers in source tree:
@@ -259,4 +259,4 @@ Following synchronization with the I08b integration candidate baseline (branch `
 
 Unit I10 verification, production fix, and synchronization with `main@ba8f6a9d` (incorporating Unit I08b landed baseline) are complete and exhaustively verified. Production defect F1 is resolved via fail-closed evidence validation, clearing the Unit I10 stop condition. Test 8 in `test/runner/coordination-dag-corrupt-evidence.test.mjs` passes live. Both production file overlaps (`session-engine.mjs` and `show.mjs`) have been verified for semantic coherence and zero regression against I08b. All 41 DAG tests (38 passed, 3 todo, 0 failed), the 16-suite baseline matrix (538/538 pass), coordination-wide suites (1040 pass, 3 todo, 0 failed), dependency matrix (37/37 pass, root 387/387 pass), and full test suite (7775 passed, 3 todo, 0 failed, exit code 0) are completely verified.
 
-With Unit I08b landed at `main@ba8f6a9d` (satisfying the ancestor condition), Unit I10 status is **ready for final independent review for integration (APPROVE FOR INTEGRATION)**. Unit **I11** remains blocked pending I08 re-verification and I10 integration approval.
+Unit I10 has been integrated and verified at `main@605d26fe` (carried forward through `main@26a1038e` and `main@ac19f6d1`). With Unit I08 also VERIFIED at `main@ac19f6d1`, Unit **I11** is **READY, not yet opened** (pending official Track Manager checkpoint signoff).

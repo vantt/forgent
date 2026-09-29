@@ -513,9 +513,12 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
 // Phase E step 1 (executor-profile-schema-migration): resolveVerifiedProviderArgs
 // is the production binder transport.mjs's resolveExecutorCommand now calls
 // for the "claude" provider family -- same self-verifying safety posture as
-// Phase 07's resolveVerifiedPlacementModel / Phase 08's
-// resolveVerifiedRedirectExecutor. No runtimeOptions are threaded through at
-// this call site (no policy-computed toolIntent/effort exists yet) -- this
+// Phase 07's resolveVerifiedPlacementModel (dispatch-engine-liveness-
+// hardening Phase 7 kept both of these two -- real, if now near-zero,
+// production divergence; retired the OTHER two shadow binders,
+// resolveVerifiedRedirectExecutor/resolveVerifiedAssignmentModel, whose own
+// two sides had proven to be the identical primitive called twice). No
+// runtimeOptions are threaded through at
 // phase proves the RENDERING MECHANISM (ProviderAdapter, shadow-only since
 // Phase 01) is production-trustworthy for every executor already
 // configured today, before any later phase builds policy-driven runtime

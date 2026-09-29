@@ -2,13 +2,15 @@
   "apiVersion": "fgos.dev/v1alpha1",
   "kind": "ProtocolPack",
   "metadata": {
-    "id": "group-thinking"
+    "id": "group-thinking",
+    "description": "This is the ONE gated registered-protocol pack file `src/verbs/coordination/group-thinking-pack.mjs` reads (hardcoded path, no pack-selection mechanism) -- it holds every explicit-selection-gated protocol, not only genuine group-thinking discussion protocols. Each member's `kind` below classifies which shape it is; `loadProtocolPack()` currently strips unrecognized member fields before returning (`id`/`version` only), so `kind` is a source-of-truth/documentation field for readers of this file, not yet surfaced by `fgos coordination pack list`."
   },
   "members": [
-    { "id": "core.coordination-protocol.group-thinking-rfc-review-lite", "version": "1.0.0" },
-    { "id": "core.coordination-protocol.group-thinking-nominal-group-lite", "version": "1.0.0" },
-    { "id": "core.coordination-protocol.group-thinking-delphi-feedback-lite", "version": "1.0.0" },
-    { "id": "core.coordination-protocol.standalone-master-coordination-loop", "version": "1.0.0" },
-    { "id": "core.coordination-protocol.architecture-advisory-panel-v1", "version": "1.0.0" }
+    { "id": "core.coordination-protocol.group-thinking-rfc-review-lite", "version": "1.0.0", "kind": "discussion" },
+    { "id": "core.coordination-protocol.group-thinking-nominal-group-lite", "version": "1.0.0", "kind": "discussion" },
+    { "id": "core.coordination-protocol.group-thinking-delphi-feedback-lite", "version": "1.0.0", "kind": "discussion" },
+    { "id": "core.coordination-protocol.standalone-master-coordination-loop", "version": "1.0.0", "kind": "coordination-loop" },
+    { "id": "core.coordination-protocol.architecture-advisory-panel-v1", "version": "1.0.0", "kind": "advisory-panel" },
+    { "id": "core.coordination-protocol.architecture-advisory-panel-standard-v1", "version": "1.0.0", "kind": "advisory-panel" }
   ]
 }

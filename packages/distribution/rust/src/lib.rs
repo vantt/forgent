@@ -404,9 +404,12 @@ mod tests {
     }
 
     #[test]
-    fn test_verbs_sorted_and_match_73() {
+    fn test_verbs_sorted_and_match_routes_json() {
+        let routes: std::collections::HashMap<String, serde_json::Value> =
+            serde_json::from_str(COMMAND_ROUTES_JSON)
+                .expect("embedded command-routes.json must be valid JSON");
         let verbs = resolve_verbs();
-        assert_eq!(verbs.len(), 73);
+        assert_eq!(verbs.len(), routes.len());
         let mut sorted = verbs.clone();
         sorted.sort();
         assert_eq!(verbs, sorted);
@@ -443,7 +446,10 @@ mod tests {
                     .downcast_ref::<BuildShowOutcome>()
                     .expect("output must be BuildShowOutcome");
                 assert_eq!(info.package_version, "0.1.0");
-                assert_eq!(info.verbs.len(), 73);
+                let routes: std::collections::HashMap<String, serde_json::Value> =
+                    serde_json::from_str(COMMAND_ROUTES_JSON)
+                        .expect("embedded command-routes.json must be valid JSON");
+                assert_eq!(info.verbs.len(), routes.len());
             }
             _ => panic!("expected completed outcome"),
         }

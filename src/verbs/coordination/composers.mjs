@@ -9,6 +9,71 @@ import {
   validateCoordinationRequest,
   validateCoordinationCloseRequest,
 } from './schema.mjs';
+import { bindOperations } from './binding.mjs';
+
+/**
+ * Merge `bindOperations`'s own computed `actors[]` additions into the
+ * caller-supplied `actors` array (Unit I21, Decision 1 step 1: an existing
+ * per-actor entry is the Lead override and is never touched). No-op --
+ * returns `actors` unchanged -- when `definition`/`runnerConfig` are absent
+ * (Risk/rollback: a caller that supplies neither keeps today's behavior
+ * byte-for-byte).
+ *
+ * Fix H2 (red-team round 1): a top-priority `--executor` CLI flag
+ * (`cliExecutor`) is the SAME priority tier as an `actors[]` roster entry
+ * per Decision 1 step 1's own wording ("actors[] roster OR per-step
+ * --executor/--tier"), but `run.mjs`'s `actorPolicyFields` only ever reads
+ * `actorEntry?.executor ?? globalExecutor` -- it has no way to know a
+ * computed-and-injected `.executor` should rank BELOW a CLI flag it never
+ * sees at this layer. When `cliExecutor` is present, this function skips
+ * every computed addition entirely (a real no-op, not just for the actors
+ * that already have one): `run.mjs`'s own `globalExecutor` fallback then
+ * applies uniformly to every actor lacking its own roster entry, on every
+ * declared step, exactly as it did before this module existed. `cliTier`
+ * needs no equivalent guard: this module never computes or injects a
+ * `tier`/`minTier` field at all (see the module's own header doc, steps
+ * 3/4), so there is nothing here for a `--tier` flag to be outranked by.
+ *
+ * Fix M (red-team round 2): a roster entry that sets ONLY `tier`/`persona`
+ * (no `executor`) is NOT a Lead executor override -- `bindOperations` itself
+ * already knows this (its own `existing?.executor !== undefined` check only
+ * takes the "override" branch when `.executor` is actually set, computing a
+ * real capability binding for a tier-only/persona-only entry exactly like an
+ * absent one). But this function used to filter its own additions by
+ * `actors.map((a) => a.id)` alone -- ANY existing entry for that actor id,
+ * regardless of which fields it set, suppressed the computed executor
+ * entirely, silently downgrading that actor to the pre-I21 default
+ * (`opPolicy.preferExecutor ?? runnerConfig.executor.command ?? 'claude'`)
+ * instead of layering the roster's own `tier`/`persona` on top of the
+ * capability-computed `executor`. Only an entry that ALREADY sets `.executor`
+ * is a genuine override to leave untouched; every other existing entry gets
+ * its computed `.executor`/`.invocation` merged in, in place.
+ */
+function withComputedActorBindings(actors, definition, runnerConfig, facts, cliExecutor) {
+  if (!definition || !runnerConfig || cliExecutor) return actors;
+  const { bindings } = bindOperations(definition, { actors }, runnerConfig, facts);
+  const bindingByActorId = new Map(bindings.map((b) => [b.actorId, b]));
+  const seenIds = new Set();
+  const merged = actors.map((a) => {
+    seenIds.add(a.id);
+    if (a.executor !== undefined) return a;
+    const binding = bindingByActorId.get(a.id);
+    if (!binding || binding.cliPolicy.preferExecutor === undefined) return a;
+    return {
+      ...a,
+      executor: binding.cliPolicy.preferExecutor,
+      ...(binding.cliPolicy.preferInvocation ? { invocation: binding.cliPolicy.preferInvocation } : {}),
+    };
+  });
+  const additions = bindings
+    .filter((b) => !seenIds.has(b.actorId) && b.cliPolicy.preferExecutor !== undefined)
+    .map((b) => ({
+      id: b.actorId,
+      executor: b.cliPolicy.preferExecutor,
+      ...(b.cliPolicy.preferInvocation ? { invocation: b.cliPolicy.preferInvocation } : {}),
+    }));
+  return [...merged, ...additions];
+}
 
 export const ACTION_INPUT_RESERVED_FIELDS = Object.freeze(new Set([
   'coordinationId',
@@ -25,6 +90,9 @@ export const ACTION_INPUT_RESERVED_FIELDS = Object.freeze(new Set([
   'targetRef',
   'authorizationId',
   'invocationKey',
+  'slotId',
+  'role',
+  'specialistAuthorizationId',
 ]));
 
 function sha256(content) {
@@ -71,6 +139,16 @@ export function deriveDeterministicTaskKey(coordinationId, actionKey, actorId = 
  */
 export function deriveContributionId(coordinationId, actionKey) {
   return 'contrib_' + sha256(`contrib:${coordinationId}:${actionKey}`).slice(0, 16);
+}
+
+/**
+ * Deterministically derive a specialistAuthorizationId from session identity and actionKey.
+ * @param {string} coordinationId
+ * @param {string} actionKey
+ * @returns {string}
+ */
+export function deriveSpecialistAuthorizationId(coordinationId, actionKey) {
+  return 'sauth_' + sha256(`sauth:${coordinationId}:${actionKey}`).slice(0, 16);
 }
 
 /**
@@ -173,6 +251,16 @@ export function composeStartRequest(options = {}) {
     partialPolicy,
     workRef,
     close,
+    // Unit I21 (Phase 5 item 2): optional -- absent for every pre-existing
+    // caller, which keeps today's behavior (empty/roster-only actors[])
+    // byte-for-byte. See `withComputedActorBindings`'s own doc comment.
+    runnerConfig,
+    facts,
+    // Fix H2 (red-team round 1): the same `--executor` flag `start.mjs`
+    // threads to `runCoordinationUseCase` as `cliExecutor` -- see
+    // `withComputedActorBindings`'s own doc comment for why this must
+    // suppress computed additions rather than merely inform them.
+    cliExecutor,
   } = options;
 
   if (!writerId || typeof writerId !== 'string') {
@@ -243,7 +331,7 @@ export function composeStartRequest(options = {}) {
       writerId,
       objective,
       protocolRef: { id: pId },
-      actors: Array.isArray(actors) ? actors : [],
+      actors: withComputedActorBindings(Array.isArray(actors) ? actors : [], definition, runnerConfig, facts, cliExecutor),
       steps: resolvedSteps,
       close: false,
       ...(aggregateBounds ? { aggregateBounds } : {}),
@@ -323,9 +411,13 @@ export function composeCloseRequest(options = {}) {
  * @param {object} params.manifest Session manifest
  * @param {object} params.action Authoritative action descriptor from projector
  * @param {object} params.precondition ActionPrecondition containing caller inputs
+ * @param {object} [params.definition] The session's resolved FlowDefinition (Unit I21). Optional -- absent for every pre-existing caller, which keeps `actors: []` byte-for-byte (Risk/rollback).
+ * @param {object} [params.runnerConfig] The validated runner config's own `runner` section (Unit I21). Optional, same rollback contract as `definition`.
+ * @param {object} [params.facts] Caller-declared binding context (Unit I21) -- see `bindOperations`'s own doc comment.
+ * @param {string} [params.cliExecutor] Top-priority `--executor` CLI override (fix H2, red-team round 1) -- when present, suppresses every computed actor binding; see `withComputedActorBindings`'s own doc comment.
  * @returns {object} Validated production request object
  */
-export function composeCoordinationActionRequest({ manifest, action, precondition }) {
+export function composeCoordinationActionRequest({ manifest, action, precondition, definition, runnerConfig, facts, cliExecutor }) {
   const input = precondition.inputPayload ?? {};
   assertNoForbiddenOverrides(input);
 
@@ -339,7 +431,7 @@ export function composeCoordinationActionRequest({ manifest, action, preconditio
     writerId: precondition.writerId,
     objective: manifest.objective,
     protocolRef: { id: manifest.definitionRef?.id },
-    actors: [],
+    actors: withComputedActorBindings([], definition, runnerConfig, facts, cliExecutor),
     close: false,
   };
 
@@ -479,6 +571,25 @@ export function composeCoordinationActionRequest({ manifest, action, preconditio
         operationId: target.operationId,
         branches: normalizeFanOutPayload({ branches: input.branches, fromAssignmentId: input.fromAssignmentId }),
         fromAssignmentId: input.fromAssignmentId,
+      }];
+      break;
+    }
+
+    case 'specialist': {
+      const specialistAuthorizationId = deriveSpecialistAuthorizationId(coordinationId, actionKey);
+      steps = [{
+        ...common,
+        type: 'specialist-authorize',
+        slotId: target.slotId,
+        specialistActorId: input.specialistActorId,
+        role: target.role,
+        capabilities: normalizeStringArray(input.capabilities) ?? [],
+        reason: input.reason,
+        triggerEvidenceRefs: normalizeStringArray(input.triggerEvidenceRefs) ?? [],
+        allowedContextRefs: normalizeStringArray(input.allowedContextRefs) ?? [],
+        maxAssignments: typeof input.maxAssignments === 'string' ? Number(input.maxAssignments) : input.maxAssignments,
+        expiresAfterRound: typeof input.expiresAfterRound === 'string' ? Number(input.expiresAfterRound) : input.expiresAfterRound,
+        specialistAuthorizationId,
       }];
       break;
     }

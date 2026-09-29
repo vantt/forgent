@@ -26,6 +26,7 @@ import {
   mapSkillIntentToHostTriggers,
 } from '../../src/setup/skill-wrappers.mjs';
 import { resolveMainCheckoutRoot, fgosDirFromRoot } from '../../src/runner/paths.mjs';
+import { matchCapability } from '../../src/runner/capability-match.mjs';
 
 function mkTempDir(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
@@ -396,18 +397,22 @@ test('fgos-code-panel is canonically located in domains/coding/skills and absent
   });
 });
 
-test('fgos-code-panel canonical source has non-vacuous repo-root path references after domain move', () => {
+test('fgos-code-change canonical source has non-vacuous repo-root path references (Unit I29 retarget from stubbed fgos-code-panel)', () => {
   const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
-  const skillPath = path.join(repoRoot, 'domains', 'coding', 'skills', 'fgos-code-panel', 'SKILL.md');
+  const skillPath = path.join(repoRoot, 'domains', 'coding', 'skills', 'fgos-code-change', 'SKILL.md');
   const skillContent = fs.readFileSync(skillPath, 'utf8');
   const repoRootPathPattern = /`((?:core|src|docs)\/[^`]+)`/g;
+  // fgos-code-panel's own justification prose ("why we reuse this engine",
+  // citing session-engine.mjs/schema.mjs/coordination-session.md by
+  // repo-root path) was deliberately dropped in fgos-code-change -- the new
+  // facade delegates worktree/merge mechanics to the coding-cell-policy
+  // fragment by relative link instead of re-citing those paths inline.
+  // This expected set reflects the repo-root paths fgos-code-change's own
+  // body actually cites today (measured, not assumed).
   const expected = new Set([
-    'core/skills/fgos-panel/SKILL.md',
-    'src/runner/coordination/session-engine.mjs',
-    'src/verbs/coordination/schema.mjs',
     'core/coordination-protocols/standalone-master-coordination-loop.yaml',
-    'core/skills/_shared/private-cell-worktree.md',
-    'docs/architect/agent-coordination/contracts/coordination-session.md',
+    'src/report/capability-plan-lint.mjs',
+    'src/verbs/coordination/chain.mjs',
   ]);
   const seen = new Set();
   const missing = [];
@@ -422,10 +427,6 @@ test('fgos-code-panel canonical source has non-vacuous repo-root path references
 
   assert.deepEqual(seen, expected);
   assert.deepEqual(missing, []);
-  assert.ok(skillContent.includes('`core/skills/_shared/private-cell-worktree.md`'));
-  assert.ok(skillContent.includes('`_shared/private-cell-worktree.md`'));
-  assert.ok(fs.existsSync(path.join(repoRoot, '.agents', 'skills', '_shared', 'private-cell-worktree.md')));
-  assert.ok(fs.existsSync(path.join(repoRoot, 'plugins', 'fgOS', 'skills', '_shared', 'private-cell-worktree.md')));
 });
 
 test('active source and projected skill files do not path-link fgos-code-panel after domain move', () => {
@@ -482,6 +483,73 @@ test('discoverCanonicalSkills discovers canonical skills across core/skills and 
   assert.equal(domainSkill.triggers.claude, '/fgos:code-panel');
   assert.equal(domainSkill.triggers.claudeCompat, '/fgOS:code-panel');
   assert.equal(domainSkill.triggers.gemini, '/fgos:code-panel');
+});
+
+test('discoverCanonicalSkills discovers fgos-code-change (Phase 06/Unit I28) in domains/coding/skills', () => {
+  const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
+  const skills = discoverCanonicalSkills(repoRoot);
+
+  const codeChangeSkill = skills.find((s) => s.name === 'fgos-code-change');
+  assert.ok(codeChangeSkill, 'fgos-code-change must be discovered');
+  assert.equal(codeChangeSkill.authority, 'domain');
+  assert.equal(codeChangeSkill.domain, 'coding');
+  assert.equal(codeChangeSkill.canonicalDir, 'domains/coding/skills/fgos-code-change');
+  assert.equal(codeChangeSkill.intentId, 'fgos:code-change');
+  assert.equal(codeChangeSkill.triggers.codex, '$fgos-code-change');
+  assert.equal(codeChangeSkill.triggers.claude, '/fgos:code-change');
+  // A brand-new skill (never published under an old `/fgOS:` casing) gets no
+  // compat alias -- `knownCompat` (skill-wrappers.mjs) is a curated legacy
+  // whitelist, never a generic rule, and fgos-code-change is not on it.
+  assert.equal(codeChangeSkill.triggers.claudeCompat, null);
+  assert.equal(codeChangeSkill.triggers.gemini, '/fgos:code-change');
+});
+
+test('fgos-code-change is canonically located in domains/coding/skills and absent from core/skills', () => {
+  const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
+  const domainSource = path.join(repoRoot, 'domains', 'coding', 'skills', 'fgos-code-change', 'SKILL.md');
+  const coreSource = path.join(repoRoot, 'core', 'skills', 'fgos-code-change');
+
+  assert.ok(fs.existsSync(domainSource), 'domains/coding/skills/fgos-code-change/SKILL.md must exist as canonical source');
+  assert.equal(fs.existsSync(coreSource), false, 'core/skills/fgos-code-change must not exist to prevent duplicate canonical skill ids');
+
+  assert.doesNotThrow(() => {
+    assembleSkills(repoRoot, mkTempDir('skill-wrappers-verify-code-change-unique-'));
+  });
+});
+
+// ─── Unit I29: fgos-plan-loop / fgos-code-panel deprecated stubs ───
+
+test('fgos-plan-loop and fgos-code-panel are genuinely thin deprecated stubs naming fgos-code-change, with no leftover DemandFacts/trigger phrasing', () => {
+  const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
+  const stubs = [
+    path.join(repoRoot, 'core', 'skills', 'fgos-plan-loop', 'SKILL.md'),
+    path.join(repoRoot, 'domains', 'coding', 'skills', 'fgos-code-panel', 'SKILL.md'),
+  ];
+  // Pre-stub sizes were 1347 (fgos-plan-loop) and 7993 (fgos-code-panel)
+  // words; 200 is a ceiling well under either, not a tight-fit number.
+  const WORD_CEILING = 200;
+  const forbiddenPhrasing = [/DemandFacts/, /outputKind:/, /needsIndependentReview/, /hasPlanOrTrack/];
+
+  for (const stubPath of stubs) {
+    const content = fs.readFileSync(stubPath, 'utf8');
+    const words = content.trim().split(/\s+/).filter(Boolean).length;
+    assert.ok(
+      words < WORD_CEILING,
+      `${path.relative(repoRoot, stubPath)} must be a thin stub (${words} words, ceiling ${WORD_CEILING})`,
+    );
+    assert.match(
+      content,
+      /Deprecated: use fgos-code-change/,
+      `${path.relative(repoRoot, stubPath)} must explicitly name fgos-code-change as the replacement`,
+    );
+    for (const pattern of forbiddenPhrasing) {
+      assert.doesNotMatch(
+        content,
+        pattern,
+        `${path.relative(repoRoot, stubPath)} must not carry leftover trigger-matching phrasing (${pattern})`,
+      );
+    }
+  }
 });
 
 test('discoverCanonicalSkills throws when duplicate canonical skill id exists across core and domains (negative duplicate canonical skill id test)', () => {
@@ -1509,7 +1577,14 @@ function phasesMatch(p1, p2) {
   return norm1.startsWith(norm2 + '-') || norm2.startsWith(norm1 + '-');
 }
 
-export function classifyCodePanelRequest(request, options = {}) {
+// Phase 06 (Unit I28): the mode-selection LOGIC below is shared verbatim
+// between `fgos-code-panel` (legacy) and `fgos-code-change` (the new merged
+// facade) -- Phase 6's own single mode-selection rule mechanically subsumes
+// code-panel's former M1/A1/A2/CE1-5 named sub-rules (their real effect
+// folds into "ask one question when ambiguous"), so the underlying
+// classifier does not change, only which facade name appears in its own
+// refusal text. `facadeName` parameterizes that text only.
+function classifyModeRequest(request, options, facadeName) {
   const repoRoot = options.repoRoot || path.resolve(fileURLToPath(import.meta.url), '../../..');
   const trimmed = request.trim();
 
@@ -1536,11 +1611,11 @@ export function classifyCodePanelRequest(request, options = {}) {
   const clauses = trimmed.split(/(?<=[.!?;])\s+|\n+/);
   for (const clause of clauses) {
     const c = clause.trim();
-    const hasPlanOrTrack = /(?:plans\/|[^\s,;]*(?:plan|phase-\d+[^\s,;]*)\.md|(?:run|resume|execute|ran|resumed|executed)\s+(?:the\s+)?[\w-]+\s+track\b|(?:run|resume|execute|ran|resumed|executed)\s+track\s+|open\s+(?:the\s+next\s+cell\s+for\s+)[\w-]+|(?:run|resume|execute|ran|resumed|executed)\s+phase-\d+\S*\s+of\s+)/i.test(c);
+    const hasPlanOrTrack = /(?:plans\/|[^\s,;]*(?:plan|phase-\d+[^\s,;]*)\.md|(?:run|resume|execute|implement|ran|resumed|executed|implemented)\s+(?:the\s+)?[\w-]+\s+track\b|(?:run|resume|execute|implement|ran|resumed|executed|implemented)\s+track\s+|open\s+(?:the\s+next\s+cell\s+for\s+)[\w-]+|(?:run|resume|execute|implement|ran|resumed|executed|implemented)\s+phase-\d+\S*\s+of\s+)/i.test(c);
     if (!hasPlanOrTrack) continue;
 
-    const hasRunVerb = /\b(?:run|resume|execute|open)\b/i.test(c);
-    const hasPastTense = /\b(?:I|we)\s+(?:ran|executed|resumed)\b/i.test(c);
+    const hasRunVerb = /\b(?:run|resume|execute|open|implement)\b/i.test(c);
+    const hasPastTense = /\b(?:I|we)\s+(?:ran|executed|resumed|implemented)\b/i.test(c);
     const hasSpeculative = /\b(?:maybe|perhaps)\b/i.test(c);
 
     if (!hasRunVerb && !hasPastTense && !hasSpeculative) continue;
@@ -1560,24 +1635,31 @@ export function classifyCodePanelRequest(request, options = {}) {
   // Negation directed at running a plan or track must be handled before verb matching.
   // Covers path negation, track-by-name negation, and phase-of-track / phase-of-path negation (F-1).
   const negationOnPlanMatch =
-    trimmed.match(/\b(?:don't|do not|never)\s+(?:run|resume|execute)\s+(?:phase-\d+\S*\s+of\s+(?:the\s+)?(?:track\s+)?)?(?:the\s+)?([a-zA-Z0-9_-]+)\s+track\b/i) ||
-    trimmed.match(/\b(?:don't|do not|never)\s+(?:run|resume|execute)\s+(?:phase-\d+\S*\s+of\s+(?:the\s+)?(?:track\s+)?)?track\s+([a-zA-Z0-9_-]+)/i) ||
+    trimmed.match(/\b(?:don't|do not|never)\s+(?:run|resume|execute|implement)\s+(?:phase-\d+\S*\s+of\s+(?:the\s+)?(?:track\s+)?)?(?:the\s+)?([a-zA-Z0-9_-]+)\s+track\b/i) ||
+    trimmed.match(/\b(?:don't|do not|never)\s+(?:run|resume|execute|implement)\s+(?:phase-\d+\S*\s+of\s+(?:the\s+)?(?:track\s+)?)?track\s+([a-zA-Z0-9_-]+)/i) ||
     trimmed.match(/\b(?:don't|do not|never)\s+open\s+(?:the\s+next\s+cell\s+for\s+)([a-zA-Z0-9_-]+)/i) ||
-    trimmed.match(/\b(?:don't|do not|never)\s+(?:run|resume|execute)\s+(?:phase-\d+\S*\s+of\s+(?:the\s+)?(?:track\s+)?)?(?:(?:this\s+)?(?:implementation\s+)?(?:plan|track)?(?::\s*|\s+))?((?:\.\/)?[^\s,;]+\.md)/i) ||
-    trimmed.match(/\b(?:don't|do not|never)\s+(?:run|resume|execute)\s+(?:phase-\d+\S*\s+of\s+(?:the\s+)?(?:track\s+)?)?(?:the\s+)?([^\s,;]+(?:\.md|\btrack\b|[a-zA-Z0-9_-]+[-/]plan\.md))/i) ||
-    trimmed.match(/\b(?:don't|do not|never)\s+(?:run|resume|execute)\s+(?:phase-\d+\S*)\s+of\s+/i);
+    trimmed.match(/\b(?:don't|do not|never)\s+(?:run|resume|execute|implement)\s+(?:phase-\d+\S*\s+of\s+(?:the\s+)?(?:track\s+)?)?(?:(?:this\s+)?(?:implementation\s+)?(?:plan|track)?(?::\s*|\s+))?((?:\.\/)?[^\s,;]+\.md)/i) ||
+    trimmed.match(/\b(?:don't|do not|never)\s+(?:run|resume|execute|implement)\s+(?:phase-\d+\S*\s+of\s+(?:the\s+)?(?:track\s+)?)?(?:the\s+)?([^\s,;]+(?:\.md|\btrack\b|[a-zA-Z0-9_-]+[-/]plan\.md))/i) ||
+    trimmed.match(/\b(?:don't|do not|never)\s+(?:run|resume|execute|implement)\s+(?:phase-\d+\S*)\s+of\s+/i);
   if (negationOnPlanMatch) {
     // Look for affirmative alternative target
     const altTargetMatch = trimmed.match(
       /\b(?:just\s+|instead\s+)?(?:fix|edit|modify|update|refactor|work\s+on)\s+(?:the\s+bug\s+in\s+)?([^\s,;]+)/i
     );
-    if (altTargetMatch) {
+    // Partial-negation guard: an alt-target phrase that is ITSELF negated
+    // (e.g. "don't run plan.md, and don't fix src/bar.mjs either") is not a
+    // resolved alternative -- it is a second unresolved negation and must
+    // ask for clarification, never silently resolve to that target.
+    const altTargetNegated = altTargetMatch
+      ? /\b(?:don't|do not|never)\s+(?:just\s+|instead\s+)?$/i.test(trimmed.slice(0, altTargetMatch.index))
+      : false;
+    if (altTargetMatch && !altTargetNegated) {
       let target = altTargetMatch[1].replace(/[.,;]+$/, '');
       return { mode: 'direct-single-cell', target, ...(inPlanLoop ? { guarded: true } : {}) };
     }
-    // No explicit alternate target: never fabricate 'src/auth.mjs'
+    // No explicit (non-negated) alternate target: never fabricate one
     throw new AmbiguousIntentError(
-      'Negation detected on plan/track with no explicit alternate target; clarification required'
+      'Negation detected on plan/track with no explicit non-negated alternate target; clarification required'
     );
   }
 
@@ -1605,12 +1687,12 @@ export function classifyCodePanelRequest(request, options = {}) {
 
   // 7. Phase path target interaction with chain (CE3 & NEW-10):
   const phaseTargetMatch = trimmed.match(
-    /(?:run|resume|execute)\s+(phase-\d+[^,\s]*)\s+of\s+(?:the\s+)?(?:track\s+)?([^\s,;]+(?:\s+track)?)/i
+    /(?:run|resume|execute|implement)\s+(phase-\d+[^,\s]*)\s+of\s+(?:the\s+)?(?:track\s+)?([^\s,;]+(?:\s+track)?)/i
   );
   if (phaseTargetMatch) {
     if (inPlanLoop) {
       throw new RecursiveDispatchError(
-        'Recursive dispatch refused: fgos-code-panel cannot open a nested planned-multi-cell track from within an active plan-loop cell'
+        `Recursive dispatch refused: ${facadeName} cannot open a nested planned-multi-cell track from within an active plan-loop cell`
       );
     }
     const namedPhase = phaseTargetMatch[1];
@@ -1642,12 +1724,12 @@ export function classifyCodePanelRequest(request, options = {}) {
   // Handles single or multiple spaces, colons, and takes precedence over secondary inspection phrases.
   // CE5: Restricts to plans/ directory or plan.md/phase-NN-*.md shaped files.
   const explicitRunPlanMatch = trimmed.match(
-    /\b(?:run|resume|execute)\s+(?:(?:this\s+)?(?:implementation\s+)?(?:plan|track)?(?::\s*|\s+))?((?:\.\/)?(?:plans\/[^\s,;]+|[^\s,;]*(?:plan|phase-\d+[^\s,;]*)\.md))[.,]?/i
+    /\b(?:run|resume|execute|implement)\s+(?:(?:this\s+)?(?:implementation\s+)?(?:plan|track)?(?::\s*|\s+))?((?:\.\/)?(?:plans\/[^\s,;]+|[^\s,;]*(?:plan|phase-\d+[^\s,;]*)\.md))[.,]?/i
   );
   if (explicitRunPlanMatch) {
     if (inPlanLoop) {
       throw new RecursiveDispatchError(
-        'Recursive dispatch refused: fgos-code-panel cannot open a nested planned-multi-cell track from within an active plan-loop cell'
+        `Recursive dispatch refused: ${facadeName} cannot open a nested planned-multi-cell track from within an active plan-loop cell`
       );
     }
     const cleanPath = explicitRunPlanMatch[1].replace(/^\.\//, '');
@@ -1665,7 +1747,7 @@ export function classifyCodePanelRequest(request, options = {}) {
   if (/^plans\/[^\s,;]+\/(?:plan\.md|phase-[^\s,;]+\.md)$/i.test(normalizedBare)) {
     if (inPlanLoop) {
       throw new RecursiveDispatchError(
-        'Recursive dispatch refused: fgos-code-panel cannot open a nested planned-multi-cell track from within an active plan-loop cell'
+        `Recursive dispatch refused: ${facadeName} cannot open a nested planned-multi-cell track from within an active plan-loop cell`
       );
     }
     return { mode: 'planned-multi-cell', planPath: normalizedBare };
@@ -1674,9 +1756,9 @@ export function classifyCodePanelRequest(request, options = {}) {
   // 11. Track referenced by name without path (CE1 + C2 + H1 + M3):
   // Check for explicit track syntax: e.g. "resume the foo track", "open the next cell for bar", "resume track baz"
   const explicitTrackMatch =
-    trimmed.match(/(?:run|resume|execute)\s+(?:the\s+)?([a-zA-Z0-9_-]+)\s+track\b/i) ||
+    trimmed.match(/(?:run|resume|execute|implement)\s+(?:the\s+)?([a-zA-Z0-9_-]+)\s+track\b/i) ||
     trimmed.match(/open\s+(?:the\s+next\s+cell\s+for\s+)([a-zA-Z0-9_-]+)/i) ||
-    trimmed.match(/(?:run|resume|execute)\s+track\s+([a-zA-Z0-9_-]+)/i);
+    trimmed.match(/(?:run|resume|execute|implement)\s+track\s+([a-zA-Z0-9_-]+)/i);
 
   if (explicitTrackMatch) {
     const candidate = explicitTrackMatch[1];
@@ -1687,7 +1769,7 @@ export function classifyCodePanelRequest(request, options = {}) {
 
     if (inPlanLoop) {
       throw new RecursiveDispatchError(
-        'Recursive dispatch refused: fgos-code-panel cannot open a nested planned-multi-cell track from within an active plan-loop cell'
+        `Recursive dispatch refused: ${facadeName} cannot open a nested planned-multi-cell track from within an active plan-loop cell`
       );
     }
 
@@ -1715,6 +1797,17 @@ export function classifyCodePanelRequest(request, options = {}) {
     ...(target ? { target } : {}),
     ...(inPlanLoop ? { guarded: true } : {})
   };
+}
+
+export function classifyCodePanelRequest(request, options = {}) {
+  return classifyModeRequest(request, options, 'fgos-code-panel');
+}
+
+// Phase 06 (Unit I28): fgos-code-change's own mode-detection function. Same
+// underlying classifier as classifyCodePanelRequest (see the comment above
+// classifyModeRequest) -- only the refusal text names the new facade.
+export function classifyCodeChangeRequest(request, options = {}) {
+  return classifyModeRequest(request, options, 'fgos-code-change');
 }
 
 export function validateCodePanelNoPlanLoopDuplication(skillContent) {
@@ -1826,27 +1919,32 @@ export function validateCodePanelNoPlanLoopDuplication(skillContent) {
     }
   }
 
-  // 4. Verbatim-overlap check against fgos-plan-loop's real Section 5 body
+  // 4. Verbatim-overlap check against the real orchestration loop body
   // (red-team V-1/V-3, op_032): a byte-identical or near-verbatim copy of
   // the real orchestration loop text evades checks 1-3 whenever it sits
   // under a heading outside the section-3 allowlist, or under no heading
   // at all. This is NOT a rewrite (zero synonyms, zero restructuring) --
   // squarely inside what this discriminator's own limitations note (p01.md
   // section 3) promises to catch ("verbatim or near-verbatim copies using
-  // fgos-plan-loop's own anchor phrasing"), so it must be caught regardless
-  // of heading/section placement, not just within the structural check's
-  // own heading-gated scope. Deterministic line-overlap, not a heading or
-  // keyword match: >=3 identical substantive lines (>=30 chars each) is
-  // the threshold verified by red-team (canonical domains/coding/skills/
-  // fgos-code-panel/SKILL.md shares 0/69 substantive lines with the real
-  // Section 5 body; a verbatim copy shares 68/69).
+  // the real orchestration loop's own anchor phrasing"), so it must be
+  // caught regardless of heading/section placement, not just within the
+  // structural check's own heading-gated scope. Deterministic line-overlap,
+  // not a heading or keyword match: >=3 identical substantive lines (>=30
+  // chars each) is the threshold verified by red-team (canonical
+  // domains/coding/skills/fgos-code-panel/SKILL.md shares 0/69 substantive
+  // lines with the real orchestration loop body; a verbatim copy shares
+  // 68/69). Unit I29: fgos-plan-loop is now a deprecated stub with no
+  // Section 5 of its own -- the real orchestration loop text this check
+  // must guard against duplicating now lives in fgos-code-change's own
+  // references/plan-mode.md ("## Unattended track mode"), the content
+  // successor per the I28/I29 3-bucket disposition.
   try {
     const repoRootForOverlap = path.resolve(fileURLToPath(import.meta.url), '../../..');
-    const planLoopSkill = fs.readFileSync(
-      path.join(repoRootForOverlap, 'core', 'skills', 'fgos-plan-loop', 'SKILL.md'),
+    const planModeContent = fs.readFileSync(
+      path.join(repoRootForOverlap, 'domains', 'coding', 'skills', 'fgos-code-change', 'references', 'plan-mode.md'),
       'utf8'
     );
-    const section5Match = planLoopSkill.match(/\n##\s+5\.[^\n]*\n([\s\S]*?)(?=\n##\s+\d|\n#\s+|$)/);
+    const section5Match = planModeContent.match(/\n##\s+Unattended track mode[^\n]*\n([\s\S]*?)(?=\n##\s+|\n#\s+|$)/);
     if (section5Match) {
       const section5Lines = new Set(
         section5Match[1]
@@ -1862,14 +1960,15 @@ export function validateCodePanelNoPlanLoopDuplication(skillContent) {
       if (overlapCount >= 3) {
         return {
           pass: false,
-          reason: `Detected ${overlapCount} substantive lines verbatim-identical to fgos-plan-loop's real Section 5 orchestration loop body -- a byte-identical or near-verbatim copy, regardless of heading or section placement`,
+          reason: `Detected ${overlapCount} substantive lines verbatim-identical to the real orchestration loop body (fgos-code-change/references/plan-mode.md's Unattended track mode section) -- a byte-identical or near-verbatim copy, regardless of heading or section placement`,
         };
       }
     }
   } catch {
-    // core/skills/fgos-plan-loop/SKILL.md unreadable in this environment:
-    // fail open on THIS check only (checks 1-3 above still ran) rather than
-    // throwing out of a pure validator on an environment/path issue.
+    // fgos-code-change/references/plan-mode.md unreadable in this
+    // environment: fail open on THIS check only (checks 1-3 above still
+    // ran) rather than throwing out of a pure validator on an
+    // environment/path issue.
   }
 
   return { pass: true };
@@ -1887,13 +1986,18 @@ test('Assertion 3 Discriminator: canonical domains/coding/skills/fgos-code-panel
 });
 
 test('Assertion 3 Discriminator: verbatim fgos-plan-loop Section 5 body is caught regardless of heading (V-1/V-3, red-team op_032)', () => {
+  // Unit I29: fgos-plan-loop is now a deprecated stub carrying no Section 5
+  // content of its own. Its "Unattended track mode" content carried forward
+  // verbatim (per the I28/I29 3-bucket disposition) into fgos-code-change's
+  // references/plan-mode.md -- use that as the real, live "known-duplicated"
+  // fixture instead of a synthetic strawman.
   const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
-  const planLoopSkill = fs.readFileSync(
-    path.join(repoRoot, 'core', 'skills', 'fgos-plan-loop', 'SKILL.md'),
+  const planModeContent = fs.readFileSync(
+    path.join(repoRoot, 'domains', 'coding', 'skills', 'fgos-code-change', 'references', 'plan-mode.md'),
     'utf8'
   );
-  const section5Match = planLoopSkill.match(/\n##\s+5\.[^\n]*\n([\s\S]*?)(?=\n##\s+\d|\n#\s+|$)/);
-  assert.ok(section5Match, 'Section 5 must be found in fgos-plan-loop SKILL.md');
+  const section5Match = planModeContent.match(/\n##\s+Unattended track mode[^\n]*\n([\s\S]*?)(?=\n##\s+|\n#\s+|$)/);
+  assert.ok(section5Match, 'Unattended track mode section must be found in fgos-code-change/references/plan-mode.md');
   const body = section5Match[1];
 
   // V-1: verbatim body under a heading outside the structural check's own allowlist
@@ -1980,12 +2084,14 @@ Loop over the plan's Cell-status table rows, executing each unmerged phase until
 });
 
 test('Assertion 3 Discriminator: detects and rejects copying fgos-plan-loop Section 5 loop verbatim', () => {
+  // Unit I29 retarget: see the previous test's note -- this content now
+  // lives in fgos-code-change/references/plan-mode.md.
   const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
-  const planLoopContent = fs.readFileSync(
-    path.join(repoRoot, 'core', 'skills', 'fgos-plan-loop', 'SKILL.md'),
+  const planModeContent = fs.readFileSync(
+    path.join(repoRoot, 'domains', 'coding', 'skills', 'fgos-code-change', 'references', 'plan-mode.md'),
     'utf8'
   );
-  const section5Match = planLoopContent.match(/## 5\. Unattended track mode[\s\S]*?(?=\n## |\n---|$)/);
+  const section5Match = planModeContent.match(/## Unattended track mode[\s\S]*?(?=\n## |\n---|$)/);
   assert.ok(section5Match);
   const pastedSkill = `---
 name: fgos-code-panel
@@ -1998,12 +2104,14 @@ ${section5Match[0]}
 });
 
 test('Assertion 3 Discriminator (Red-Team Probes): catches evasions under altered headings and paraphrases', () => {
+  // Unit I29 retarget: see the above tests' note -- this content now lives
+  // in fgos-code-change/references/plan-mode.md.
   const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
-  const planLoopContent = fs.readFileSync(
-    path.join(repoRoot, 'core', 'skills', 'fgos-plan-loop', 'SKILL.md'),
+  const planModeContent = fs.readFileSync(
+    path.join(repoRoot, 'domains', 'coding', 'skills', 'fgos-code-change', 'references', 'plan-mode.md'),
     'utf8'
   );
-  const section5Body = planLoopContent.match(/## 5\. Unattended track mode[^\n]*\n([\s\S]*?)(?=\n## |\n---|$)/)[1];
+  const section5Body = planModeContent.match(/## Unattended track mode[^\n]*\n([\s\S]*?)(?=\n## |\n---|$)/)[1];
 
   // EV-A: verbatim Section 5 body with heading removed under ## Track mode
   const evA = `---
@@ -2133,49 +2241,23 @@ ${Array(45).fill('A detailed step instruction that inflates the section beyond t
 // not a JS runtime function (zero runtime callers in src/core/domains/bin). There is no runtime
 // execution spy surface to intercept invocations; tests 1-3 enforce these invariants structurally
 // on the canonical SKILL.md prose and coordination schema.
+//
+// Unit I29 retirement note: these three tests asserted the two-skill
+// delegation boundary (fgos-code-panel's planned-multi-cell mode delegating
+// track execution to a SEPARATE skill, fgos-plan-loop, "by reference", with
+// a hard STOP against self-orchestration). Phase 6 (Unit I28) replaced that
+// architecture with fgos-code-change's own unified Mode Selection: a single
+// skill now handles both single-cell and plan-mode work internally (plan
+// mode loads references/plan-mode.md, its own reference file, not a
+// separate skill by delegation reference). There is no longer a
+// cross-skill delegation boundary to assert -- retired below, not
+// weakened: the underlying invariant these tests protected (the coding
+// test-policy overlay materializes before track execution; track-level
+// orchestration logic lives in exactly one place) is now proven by
+// coordination-phase4-driver-discipline.test.mjs's own fgos-code-change
+// assertions and references/plan-mode.md's own content.
 
-test('Assertion 2 Delegation Test 1: planned-multi-cell mode delegates track execution to fgos-plan-loop exactly once by reference with policy overlay', () => {
-  const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
-  const skillContent = fs.readFileSync(
-    path.join(repoRoot, 'domains', 'coding', 'skills', 'fgos-code-panel', 'SKILL.md'),
-    'utf8'
-  );
-  const plannedSectionMatch = skillContent.match(/## Planned[- ]multi[- ]cell mode[^\n]*\n([\s\S]*?)(?=\n## |\n---|$)/i);
-  assert.ok(plannedSectionMatch, 'Planned-multi-cell mode section must exist');
-  const sectionBody = plannedSectionMatch[1];
-
-  // Asserts explicit materialization of the 3-tier coding test-policy overlay
-  assert.match(sectionBody, /Materialize the 3-tier coding test-policy overlay/i);
-  assert.match(sectionBody, /FOCUSED_TESTS/);
-  assert.match(sectionBody, /AFFECTED_TESTS/);
-  assert.match(sectionBody, /FULL_TEST/);
-
-  // Asserts single delegation to fgos-plan-loop by reference
-  assert.match(sectionBody, /Delegate track execution to `?fgos-plan-loop`? by reference/i);
-
-  // Asserts hard STOP with zero self-orchestration
-  assert.match(sectionBody, /\bSTOP\b/);
-  assert.match(sectionBody, /does NOT execute multi-cell loop orchestration/i);
-});
-
-test('Assertion 2 Delegation Test 2: zero multi-cell orchestration requests originate from fgos-code-panel', () => {
-  const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
-  const skillContent = fs.readFileSync(
-    path.join(repoRoot, 'domains', 'coding', 'skills', 'fgos-code-panel', 'SKILL.md'),
-    'utf8'
-  );
-  const plannedSectionMatch = skillContent.match(/## Planned[- ]multi[- ]cell mode[^\n]*\n([\s\S]*?)(?=\n## |\n---|$)/i);
-  assert.ok(plannedSectionMatch);
-  const sectionBody = plannedSectionMatch[1];
-
-  // No chain command or iteration loop
-  assert.doesNotMatch(sectionBody, /fgos coordination chain/i);
-  assert.doesNotMatch(sectionBody, /fgos coordination run/i);
-  assert.doesNotMatch(sectionBody, /chain\.mjs/i);
-  assert.match(sectionBody, /All multi-cell\s+progression belongs exclusively to `?fgos-plan-loop`?/i);
-});
-
-test('Assertion 2 Delegation Test 3: fgos-plan-loop accepts coding policy overlay without requiring changes to generic plan schemas', () => {
+test('Assertion 2 Delegation Test 3 (retargeted): fgos-code-change accepts coding policy overlay without requiring changes to generic plan schemas', () => {
   const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
   const schemaSource = fs.readFileSync(
     path.join(repoRoot, 'src', 'verbs', 'coordination', 'schema.mjs'),
@@ -2186,12 +2268,14 @@ test('Assertion 2 Delegation Test 3: fgos-plan-loop accepts coding policy overla
   assert.doesNotMatch(schemaSource, /trackKind:\s*['"]code['"]/i);
   assert.doesNotMatch(schemaSource, /domains\/coding/i);
 
-  // Assert plan-loop skill accepts policy overlay per its own contract
-  const planLoopContent = fs.readFileSync(
-    path.join(repoRoot, 'core', 'skills', 'fgos-plan-loop', 'SKILL.md'),
+  // Assert fgos-code-change accepts policy overlay per its own contract
+  // (Unit I29: fgos-plan-loop is now a deprecated stub carrying no policy
+  // overlay content of its own)
+  const codeChangeContent = fs.readFileSync(
+    path.join(repoRoot, 'domains', 'coding', 'skills', 'fgos-code-change', 'SKILL.md'),
     'utf8'
   );
-  assert.ok(planLoopContent.includes('FOCUSED_TESTS') || planLoopContent.includes('policy'));
+  assert.ok(codeChangeContent.includes('FOCUSED_TESTS') || codeChangeContent.includes('policy'));
 });
 
 // ─── Tests for Assertion 1: Mode-Selection Rule (R1/R2, CE1-CE5, M1) ───
@@ -2617,6 +2701,199 @@ test('Recursive Dispatch Guard (R2 / H1): prevents nested multi-cell dispatch fr
   assert.equal(cellInternal.mode, 'direct-single-cell');
   assert.equal(cellInternal.guarded, true);
   assert.equal(cellInternal.target, 'src/auth.mjs');
+});
+
+// ─── Phase 06 (Unit I28): fgos-code-change mode-detection parity ───
+//
+// classifyCodeChangeRequest shares its underlying classifier verbatim with
+// classifyCodePanelRequest (see the comment above classifyModeRequest) --
+// Phase 6's own single mode-selection rule mechanically subsumes
+// fgos-code-panel's former M1/A1/A2/CE1-5 named sub-rules, folding their
+// real effect into "ask one question when ambiguous." Since the code path
+// is identical, this is a representative parity subset covering every
+// category the 78 fgos-code-panel fixtures above exercise (bare plan path,
+// explicit run verb, track-by-name, negation with/without an alternate
+// target, edit-target, inspection verb, phase-mismatch refusal, R2 guard,
+// direct default) -- not a full duplicate of all 78, which would exercise
+// the exact same code path for zero additional coverage (DRY). The
+// fgos-code-panel fixtures above are left untouched; Unit I29 retargets
+// them once fgos-code-panel itself becomes a deprecated stub.
+
+test('Phase 06 (I28) Mode-Selection: bare plan path opens plan mode', () => {
+  const res = classifyCodeChangeRequest('plans/260915-foo/plan.md');
+  assert.equal(res.mode, 'planned-multi-cell');
+  assert.equal(res.planPath, 'plans/260915-foo/plan.md');
+});
+
+test('Phase 06 (I28) Mode-Selection: explicit run verb directed at a plan opens plan mode', () => {
+  const res = classifyCodeChangeRequest('run plans/260915-foo/plan.md');
+  assert.equal(res.mode, 'planned-multi-cell');
+  assert.equal(res.planPath, 'plans/260915-foo/plan.md');
+});
+
+test('Phase 06 (I28) Mode-Selection: track referenced by name resolves to plan mode (CE1 folded into the single rule)', () => {
+  const res = classifyCodeChangeRequest('resume the code-panel-multicell-facade track');
+  assert.equal(res.mode, 'planned-multi-cell');
+  assert.equal(res.track, 'code-panel-multicell-facade');
+});
+
+test('Phase 06 (I28) Mode-Selection: unresolvable bare track name is refused, never guessed', () => {
+  assert.throws(
+    () => classifyCodeChangeRequest('run the completely-fictitious-track track'),
+    AmbiguousIntentError,
+  );
+});
+
+test('Phase 06 (I28) Mode-Selection: negation with an alternate target stays single-cell mode', () => {
+  const res = classifyCodeChangeRequest("don't run plans/260915-foo/plan.md yet, just fix src/foo.mjs");
+  assert.equal(res.mode, 'direct-single-cell');
+  assert.equal(res.target, 'src/foo.mjs');
+});
+
+test('Phase 06 (I28) Mode-Selection: negation with no alternate target is refused, never fabricated', () => {
+  assert.throws(
+    () => classifyCodeChangeRequest("don't run plans/260915-foo/plan.md yet"),
+    AmbiguousIntentError,
+  );
+});
+
+test('Phase 06 (I28) Mode-Selection: plan file as edit target stays single-cell mode', () => {
+  const res = classifyCodeChangeRequest('fix the typo in plans/260915-foo/plan.md');
+  assert.equal(res.mode, 'direct-single-cell');
+  assert.equal(res.target, 'plans/260915-foo/plan.md');
+});
+
+test('Phase 06 (I28) Mode-Selection: inspection verb on a plan stays single-cell mode', () => {
+  const res = classifyCodeChangeRequest('review plans/260915-foo/plan.md');
+  assert.equal(res.mode, 'direct-single-cell');
+  assert.equal(res.role, 'inspection');
+});
+
+test('Phase 06 (I28) Mode-Selection: phase selection mismatch against chain throws PhaseSelectionMismatchError', () => {
+  assert.throws(
+    () => classifyCodeChangeRequest('run phase-03 of plans/260915-foo/plan.md', { nextUnmergedPhase: 'phase-02-foo' }),
+    PhaseSelectionMismatchError,
+  );
+});
+
+test('Phase 06 (I28) Mode-Selection: imperative mood ambiguity (question) is refused, never guessed', () => {
+  assert.throws(
+    () => classifyCodeChangeRequest('should I run plans/260915-foo/plan.md now?'),
+    AmbiguousIntentError,
+  );
+});
+
+test('Phase 06 (I28) Recursive Dispatch Guard (R2): prevents nested plan-mode dispatch from within an active cell', () => {
+  assert.throws(
+    () => classifyCodeChangeRequest('run this implementation plan: plans/260915-foo/plan.md', { inPlanLoop: true }),
+    RecursiveDispatchError,
+  );
+  assert.throws(
+    () => classifyCodeChangeRequest('run plans/260915-foo/plan.md', { coordinationId: 'track--cell-01' }),
+    RecursiveDispatchError,
+  );
+
+  const cellInternal = classifyCodeChangeRequest('implement fix for auth bug in src/auth.mjs', {
+    coordinationId: 'code-change--slug-01',
+  });
+  assert.equal(cellInternal.mode, 'direct-single-cell');
+  assert.equal(cellInternal.guarded, true);
+  assert.equal(cellInternal.target, 'src/auth.mjs');
+});
+
+test('Phase 06 (I28) Mode-Selection: direct code change request defaults to single-cell mode', () => {
+  const res = classifyCodeChangeRequest('implement fix for auth bug in src/auth.mjs');
+  assert.equal(res.mode, 'direct-single-cell');
+  assert.equal(res.target, 'src/auth.mjs');
+});
+
+// ─── Phase 06 (I28) fix-round-1: prose/code parity + capability gate ───
+
+test('Phase 06 (I28) Mode-Selection: "implement" verb directed at a plan opens plan mode (prose claims implement as a trigger verb; code must honor it)', () => {
+  const res = classifyCodeChangeRequest('implement plans/260915-foo/plan.md');
+  assert.equal(res.mode, 'planned-multi-cell');
+  assert.equal(res.planPath, 'plans/260915-foo/plan.md');
+});
+
+test('Phase 06 (I28) Mode-Selection: "implement" verb directed at a phase-of-track opens plan mode', () => {
+  const res = classifyCodeChangeRequest('implement phase-03 of plans/260915-foo/plan.md');
+  assert.equal(res.mode, 'planned-multi-cell');
+  assert.equal(res.phase, 'phase-03');
+});
+
+test('Phase 06 (I28) Mode-Selection: negated "implement" of a plan is honored as negation, not a stray plan-mode trigger', () => {
+  const res = classifyCodeChangeRequest("don't implement plans/260915-foo/plan.md yet, just fix src/auth.mjs");
+  assert.equal(res.mode, 'direct-single-cell');
+  assert.equal(res.target, 'src/auth.mjs');
+});
+
+test('Phase 06 (I28) Mode-Selection: partial negation (alt target itself negated) is refused, never silently resolved', () => {
+  assert.throws(
+    () => classifyCodeChangeRequest("don't run plans/260915-foo/plan.md, and don't fix src/bar.mjs either"),
+    AmbiguousIntentError,
+  );
+});
+
+test('Phase 06 (I28) Mode Selection prose (real SKILL.md text, not a JS copy) states the implement verb, the bare-path exception, and the partial-negation clarification', () => {
+  const repoRoot = path.resolve(fileURLToPath(import.meta.url), '../../..');
+  const skillPath = path.join(repoRoot, 'domains/coding/skills/fgos-code-change/SKILL.md');
+  const text = fs.readFileSync(skillPath, 'utf8');
+  const start = text.indexOf('## Mode Selection');
+  assert.ok(start >= 0, 'expected a ## Mode Selection heading');
+  const end = text.indexOf('\n## ', start + 1);
+  const section = end === -1 ? text.slice(start) : text.slice(start, end);
+
+  assert.match(section, /run\/resume\/execute\/implement/, 'verb set must name "implement" (matches the classifier\'s own trigger verbs)');
+  assert.match(section, /bare plan\/phase path with no other text/i, 'must document the bare-path (M1) exception');
+  assert.match(section, /negated alternate too/i, 'must document that a negated alt-target is never silently resolved');
+});
+
+// Phase 06 (I28) fix-round-1: Step 0's single-cell mode gate must check the
+// RESOLVED capability, not just `form` -- `deriveForm` (src/runner/
+// capability-match.mjs) derives `form` only from `needsIndependentReview`/
+// `hasPlanOrTrack`, so an advisory demand (code:review/code:debug) and a
+// mutating demand (code:implement/code:refactor) can both yield form:
+// 'protocol'. This mirrors SKILL.md's own Step 0 gate rule in code so a
+// prose regression there is provable, never just asserted.
+const CODE_CHANGE_CAPABILITY_CATALOG = Object.freeze({
+  'code:implement': { serves: { outputKind: 'change', domain: 'code', mutates: true } },
+  'code:refactor': { serves: { outputKind: 'change', domain: 'code', mutates: true, behaviorPreserving: true } },
+  'code:review': { serves: { outputKind: 'finding', domain: 'code', mutates: false } },
+  'code:debug': { serves: { outputKind: 'finding', domain: 'code' } },
+});
+const CODE_CHANGE_MUTATING_CAPABILITIES = Object.freeze(['code:implement', 'code:refactor']);
+
+function resolveCodeChangeSingleCellGate(matchResult) {
+  if (matchResult.form === 'inline') return { opensCell: false, reason: 'inline' };
+  if (matchResult.form === 'facade') return { opensCell: false, reason: 'reroute-to-plan-mode' };
+  if (matchResult.form === 'protocol') {
+    return CODE_CHANGE_MUTATING_CAPABILITIES.includes(matchResult.capability)
+      ? { opensCell: true, reason: 'protocol-mutating-capability' }
+      : { opensCell: false, reason: 'advisory-capability-not-mutating' };
+  }
+  return { opensCell: false, reason: 'unknown-form' };
+}
+
+test('Phase 06 (I28) Step 0 single-cell gate: mutating code:implement demand with form: protocol opens a cell', () => {
+  const result = matchCapability(
+    { outputKind: 'change', domain: 'code', mutates: true, needsIndependentReview: true, hasPlanOrTrack: false, size: 'light', rigor: 'standard' },
+    CODE_CHANGE_CAPABILITY_CATALOG,
+  );
+  assert.equal(result.capability, 'code:implement');
+  assert.equal(result.form, 'protocol');
+  assert.equal(resolveCodeChangeSingleCellGate(result).opensCell, true);
+});
+
+test('Phase 06 (I28) Step 0 single-cell gate: advisory code:review demand with form: protocol is NEVER captured into a cell (Phase 6 Exit criterion)', () => {
+  const result = matchCapability(
+    { outputKind: 'finding', domain: 'code', mutates: false, needsIndependentReview: true, hasPlanOrTrack: false, size: 'light', rigor: 'standard' },
+    CODE_CHANGE_CAPABILITY_CATALOG,
+  );
+  assert.equal(result.capability, 'code:review');
+  assert.equal(result.form, 'protocol', 'form alone cannot distinguish an advisory demand from a mutating one');
+  const gate = resolveCodeChangeSingleCellGate(result);
+  assert.equal(gate.opensCell, false, 'an advisory-only coding request must never open a cell despite form: protocol');
+  assert.equal(gate.reason, 'advisory-capability-not-mutating');
 });
 
 export function resolveCodePanelPlannedResumeState(input = {}) {

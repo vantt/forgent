@@ -43,7 +43,7 @@ explicitly. No Work claim, merge, approval or status authority is added here.
 | Identity | Owner | Current evidence and design consequence |
 |---|---|---|
 | Lead conversation/session | Agent harness outside Coordination | May drive many cells; not a persisted CoordinationSession identity. |
-| Track/cell | Consuming track/domain harness | `fgos-plan-loop` sections 0/1/5 use plan/phase documents and one `<track>--<cell>` session convention. `chain.mjs:24` derives membership from that name. No universal core Cell entity exists. |
+| Track/cell | Consuming track/domain harness | `fgos-code-change`'s plan mode (`references/plan-mode.md`, formerly `fgos-plan-loop` sections 0/1/5) uses plan/phase documents and one `<track>--<cell>` session convention. `chain.mjs:24` derives membership from that name. No universal core Cell entity exists. |
 | CoordinationSession | Coordination engine/store | Bounded ledger, actors, authority, graph and budget; not a cell acceptance authority. |
 | Actor | Session | `replaceSessionActor` preserves role and old Assignment provenance; replacing one executor is not actor replacement. |
 | Assignment | Assignment builder/store | Immutable semantic task, session-blind; session owns membership refs. |

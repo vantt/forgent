@@ -33,6 +33,7 @@ import {
   deriveAuthorizationId,
   deriveInvocationKey,
   deriveContributionId,
+  deriveSpecialistAuthorizationId,
 } from './composers.mjs';
 
 export {
@@ -43,6 +44,7 @@ export {
   deriveAuthorizationId,
   deriveInvocationKey,
   deriveContributionId,
+  deriveSpecialistAuthorizationId,
 } from './composers.mjs';
 
 
@@ -193,7 +195,29 @@ export async function executeCoordinationActionUseCase(ctx, options = {}) {
         optionalInputs,
         allowedValues,
       },
-      composeActionRequest: composeCoordinationActionRequest,
+      // Unit I21 (Phase 5 item 2): a thin wrapper, not new logic --
+      // `executeCoordinationRunKernel` (run.mjs) already passes `manifest`
+      // to this callback unchanged; this only adds `definition` (resolved
+      // the SAME way `showCoordinationActionsUseCase` above already does)
+      // and `runnerConfig` (already in `ctx`) so `composeCoordinationActionRequest`
+      // can bind every node's default executor from its own operation's
+      // policy.capability, not just the entry node. Optional/backward-
+      // compatible: composeCoordinationActionRequest's own rollback contract
+      // keeps `actors: []` when either is absent (e.g. an agent-led session,
+      // manifest.definitionRef === null).
+      composeActionRequest: (params) => composeCoordinationActionRequest({
+        ...params,
+        definition: params.manifest?.definitionRef
+          ? loadDefinitionForSession(params.manifest, { cwd: ctx.cwd, packageRoot: ctx.packageRoot })
+          : undefined,
+        runnerConfig: ctx.runnerConfig,
+        // Fix H2 (red-team round 1): thread the same top-priority
+        // `--executor` flag this use case already forwards to
+        // `executeCoordinationRunKernel` (as `options.cliExecutor`) into the
+        // composer too, so it suppresses computed capability bindings
+        // instead of being silently outranked by them.
+        cliExecutor: options.cliExecutor,
+      }),
     },
   );
 }
@@ -530,6 +554,71 @@ export async function executeDispositionUseCase(ctx, options = {}) {
     coordinationId,
     actionKey: options.actionKey,
     kind: 'record-disposition',
+    writerId: options.writerId,
+    inputPayload,
+  });
+}
+
+/**
+ * Use case: Driver authorizes a previously-unknown specialist actor identity
+ * into a declared `topology.specialistSlots[]` slot (I24b, Phase 5 items 5/6),
+ * through the driver-authenticated typed-action door -- never the raw,
+ * unlocked `coordination run --file`/`start --steps` doors I24a already
+ * wired (those remain a separate, still-open request-vocabulary path; see
+ * `coordination-session.md`'s bypass-#4 wording, which this unit does not
+ * touch).
+ *
+ * @param {object} ctx `{ cwd, repoRoot, packageRoot? }`
+ * @param {object} options `{ id/coordinationId, actionKey, writerId, specialistActorId, reason, maxAssignments, expiresAfterRound, ... }`
+ * @returns {Promise<object>} Action result
+ */
+export async function executeSpecialistAuthorizeUseCase(ctx, options = {}) {
+  const coordinationId = options.id ?? options.coordinationId;
+  if (!coordinationId || typeof coordinationId !== 'string') {
+    throw new CoordinationError('validation', 'coordination specialist-authorize: "id" or "coordinationId" is required');
+  }
+  if (!options.actionKey || typeof options.actionKey !== 'string') {
+    throw new CoordinationError('validation', 'coordination specialist-authorize: "actionKey" is required');
+  }
+  if (!options.writerId || typeof options.writerId !== 'string') {
+    throw new CoordinationError('validation', 'coordination specialist-authorize: "writerId" is required');
+  }
+  if (!options.specialistActorId || typeof options.specialistActorId !== 'string') {
+    throw new CoordinationError('validation', 'coordination specialist-authorize: "specialistActorId" is required');
+  }
+  if (!options.reason || typeof options.reason !== 'string') {
+    throw new CoordinationError('validation', 'coordination specialist-authorize: "reason" is required');
+  }
+  if (options.maxAssignments === undefined || options.maxAssignments === null) {
+    throw new CoordinationError('validation', 'coordination specialist-authorize: "maxAssignments" is required');
+  }
+  if (options.expiresAfterRound === undefined || options.expiresAfterRound === null) {
+    throw new CoordinationError('validation', 'coordination specialist-authorize: "expiresAfterRound" is required');
+  }
+
+  for (const field of ['slotId', 'role', 'actorId', 'targetActorId', 'operationId', 'nodeId', 'assignmentId', 'targetRef', 'target', 'authorizedBy', 'specialistAuthorizationId']) {
+    if (options[field] !== undefined) {
+      throw new CoordinationError('validation', `coordination specialist-authorize: field "${field}" is descriptor-derived/kernel-owned and cannot be provided by caller`);
+    }
+  }
+
+  const maxAssignments = typeof options.maxAssignments === 'string' ? Number(options.maxAssignments) : options.maxAssignments;
+  const expiresAfterRound = typeof options.expiresAfterRound === 'string' ? Number(options.expiresAfterRound) : options.expiresAfterRound;
+
+  const inputPayload = {
+    specialistActorId: options.specialistActorId,
+    reason: options.reason,
+    maxAssignments,
+    expiresAfterRound,
+    ...(options.capabilities !== undefined ? { capabilities: normalizeStringArray(options.capabilities) } : {}),
+    ...(options.triggerEvidenceRefs !== undefined ? { triggerEvidenceRefs: normalizeStringArray(options.triggerEvidenceRefs) } : {}),
+    ...(options.allowedContextRefs !== undefined ? { allowedContextRefs: normalizeStringArray(options.allowedContextRefs) } : {}),
+  };
+
+  return executeCoordinationActionUseCase(ctx, {
+    coordinationId,
+    actionKey: options.actionKey,
+    kind: 'specialist',
     writerId: options.writerId,
     inputPayload,
   });

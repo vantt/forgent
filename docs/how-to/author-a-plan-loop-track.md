@@ -1,8 +1,9 @@
 # How To: Author A Plan-Loop Track
 
 Audience: a Lead writing `plan.md` + phase files for a Work-independent,
-plan-driven implementation track that `fgos-plan-loop` will drive (audit →
-cell → review → red-team → fix → close). This how-to is the authoring-side
+plan-driven implementation track that `fgos-code-change` (plan mode,
+formerly `fgos-plan-loop`) will drive (audit → cell → review → red-team →
+fix → close). This how-to is the authoring-side
 half of that contract; the coding-worker discipline half lives in the
 instruction fragment linked in [Coding verification discipline](#coding-verification-discipline)
 below — this document does not restate that fragment's rule, only points to it.
@@ -41,8 +42,13 @@ Record these once in `plan.md`, verbatim across every request in the track:
 - **Track branch** — the branch every cell integrates into.
 - **Cell branch / coordination-id convention** — how a cell's worktree
   branch and coordination id are named.
-- **Roster** — the exact doer/reviewer/red-team roster string, unchanged
-  across cells unless the plan is revised.
+- **Roster** — OPTIONAL: each declared step now binds a default executor from
+  its own operation's `policy.capability`; record a roster string here only
+  when the plan needs an explicit override. `fgos coordination start
+  --actors` binds the entry node only — `authorize-and-dispatch`/`operation`
+  accept no `--actors` flag at all, so overriding a later step means passing
+  `--executor <id>` (and `--tier <tier>` if relevant) again at that step.
+  Note the roster stays unchanged across cells unless the plan is revised.
 - **Full proof command** — the repository's real full-suite command (e.g.
   `npm test`).
 - **Recorded baseline** — full proof command, run once before the first
@@ -143,7 +149,7 @@ necessary, not sufficient, when any of those moved since `testedSha`).
 
 Every checkpoint is a durable record tuple. Record it in the cell trace —
 `docs/architect/agent-coordination/verification/<track>/<cell>.md`
-(fgos-plan-loop `SKILL.md` §5 step 5):
+(`coding-cell-policy.md` § Tested and integrated identity):
 
 ```text
 phase/cell id: <phase>/<cell>

@@ -13,7 +13,7 @@
 - **Porting Evidence Tip**: `fc25949821fcc8f2894f8b05d0e25d87afbd6949`
 - **Status**: `verified at main@f63f7e7d (integrated at 1ca4023c, REV-15 fix at 60132825, post-merge verification satisfied)`
 - **Capability**: `code:implement`
-- **Next Dependency Gate**: `I10` dependency gate SATISFIED (Unit I10 candidate ready for independent review, not integrated; production fix at `3c49cf4205060fea998abfb2e9ef5df7b816a252` resolves defect; test candidate at `97420638c7c0360823b64a4a4b74d05eeee8723d` with 38 pass, 3 todo, 0 fail; ready for review).
+- **Next Dependency Gate**: `I10` dependency gate SATISFIED (Unit I10 integrated and verified at `main@605d26fe`, carried forward through `main@26a1038e` and `main@ac19f6d1`; production fix at `3c49cf4205060fea998abfb2e9ef5df7b816a252` resolves defect; test candidate at `97420638c7c0360823b64a4a4b74d05eeee8723d` with 38 pass, 3 todo, 0 fail; Unit I10 VERIFIED).
 
 ---
 
@@ -226,7 +226,7 @@ All review findings from the independent review rounds (evaluated commits `d5209
 - **Status-Recording Commits**: `524579b41d51b617fcc8e1fbf35bdd9c1efb77e7` and `dd4fb2e54f95afe5a68b6bcc092bd3d929de96d8`.
 - **Integrated Commit SHA**: `1ca4023c98c2f449cb58cba481e82cab49ba51ba` (Merges `cc687d92` + `dd4fb2e5`; verified topology and preserved local state).
 - **Integration Status**: **Verified at main@f63f7e7d** (integrated at `1ca4023c`, post-merge verification satisfied following REV-15 timing fix at `60132825`: 538/538 pass across 16-suite matrix; 3 consecutive timing reruns 129/129 pass; candidate regressions = 0; D2/D3 in `fgos-approve.test.mjs` confirmed pre-existing baseline defect).
-- **Next Gate**: **Unit I10 dependency gate is SATISFIED**; Unit I10 candidate ready for independent review, not integrated (production fix at `3c49cf4205060fea998abfb2e9ef5df7b816a252` resolves defect; test candidate at `97420638c7c0360823b64a4a4b74d05eeee8723d` with 38 pass, 3 todo, 0 fail; ready for review).
+- **Next Gate**: **Unit I10 dependency gate is SATISFIED**; Unit I10 integrated and verified at `main@605d26fe`, carried forward through `main@26a1038e` and `main@ac19f6d1` (production fix at `3c49cf4205060fea998abfb2e9ef5df7b816a252` resolves defect; test candidate at `97420638c7c0360823b64a4a4b74d05eeee8723d` with 38 pass, 3 todo, 0 fail; Unit I10 VERIFIED).
 
 ### 5.2 Verification Summary
 - `git diff --check`: clean (exit 0).

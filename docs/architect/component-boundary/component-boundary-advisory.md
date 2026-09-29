@@ -399,6 +399,7 @@ Port candidates, grouped by owning component:
 ```txt
 Work Lifecycle Engine:
   WorkLifecyclePort
+  OccupancyPort
 
 Agent Coordination Engine:
   SessionStorePort
@@ -643,7 +644,8 @@ Dispatch should not:
 - decide which semantic operation should happen;
 - inspect sibling Assignments to implement cohort diversity;
 - infer task success from output text;
-- move Work lifecycle;
+- move Work lifecycle (driving fanout batches and mutating Work state via `pick`/`return` belongs strictly to Work Driver `src/runner/fanout-batch.mjs`);
+- append audit event logs directly (delegated to `src/runner/dispatch-log.mjs`);
 - implement team cognition or protocol graph rules.
 
 Cohort diversity is a good example boundary. A coordinator or session allocator

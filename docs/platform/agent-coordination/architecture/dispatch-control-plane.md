@@ -276,8 +276,9 @@ Component-Outer Boundary Note's responsibilities.
 
 Forbidden dependencies for all eight:
 
-- no `Work` lifecycle mutation;
-- no workflow/stage/task/skill lookup;
+- no `Work` lifecycle mutation (`pick`, `return`, `claim`, `take`): enforced by boundary grep tests (`test/runner/dispatch-reconciliation-import-graph.test.mjs`). Work driving orchestration lives exclusively in Work Driver (`src/runner/loop.mjs`, `src/runner/fanout-batch.mjs`);
+- no event store append (`appendEvent`): audit dispatch logging is isolated to `src/runner/dispatch-log.mjs` outside dispatch core;
+- no workflow/stage/task/skill lookup: dispatch core contains no Work lookup implementations. Work capability lookups (`executorIdForWork`, `resolveCapabilityIdentityDetails`, `resolveCapabilityIdentity`, `buildPrompt`) are housed in dedicated leaf compatibility module `src/runner/work-compat.mjs` (registered as `infra` in architecture manifest) with zero imports into dispatch core; `src/runner/dispatch/resolve.mjs` and `prepare.mjs` provide backward-compatible re-exports without importing `workflow-stage-graphs` or `operation-choice.mjs`, consumed by pre-existing callers (`plan.mjs` for `compileDispatchPlan({work})` and `cli.mjs` for `spawnWorker`). All 13 strictly decoupled dispatch core modules contain zero `workflow-stage-graphs` imports, and boundary tests enforce that strict core modules cannot import Work lookup symbols or `work-compat.mjs` (verified by `test/runner/dispatch-reconciliation-import-graph.test.mjs`);
 - no semantic operation choice;
 - no direct protocol/skill/domain executor launch;
 - no RunResult confidence decision (owned by the Run Result Evaluator);
@@ -341,3 +342,13 @@ sibling Assignment state.
 The detailed redesign source remains a
 [proposal](../proposals/dispatch-control-plane-redesign.md) until its unresolved
 target-state sections are reconciled with implementation.
+
+## Source Inventory
+
+| Layer | Modules | Responsibilities & Boundaries |
+| --- | --- | --- |
+| Dispatch Core | `src/runner/dispatch/**` (`cli.mjs`, `plan.mjs`, `resolve.mjs`, `prepare.mjs`, `settlement.mjs`, `reconcile-cli-spawn.mjs`, `herdr-reconcile.mjs`, `proof-helpers.mjs`, `assignment-runner.mjs`, `confinement/**`, `transport.mjs`, `herdr-round.mjs`, `brief.mjs`, `assignment.mjs`, `runtime-inspection.mjs`) | Execution allocation, plan compilation, executor commands, confinement, and adapter execution. Strictly zero references to `pick`, `return`, `claim`, or `appendEvent`. |
+| Work Driver Compatibility | `src/runner/work-compat.mjs` | Leaf compatibility module (registered as "infra" in architecture manifest) housing Work Driver compatibility lookup implementations (`executorIdForWork`, `resolveCapabilityIdentityDetails`, `resolveCapabilityIdentity`, `buildPrompt`) with zero imports into dispatch core; consumed by `plan.mjs`/`cli.mjs` via compatibility re-export. |
+| Stage Operation Selection | `src/runner/dispatch/operation-choice.mjs` | Bridge for stage operation selection (`chooseStageOperation`, `executeDriverOperationChoice`) consuming hardened RunResult. |
+| Work Driver | `src/runner/loop.mjs`, `src/runner/fanout-batch.mjs` | Work item lifecycle orchestration, batch fan-out driving (`pick -> executeExecutorCli -> return`), fail-safe settlement (`fgos return --to blocked`), and worker slots occupancy (`OccupancyPort`). |
+| Audit Seam | `src/runner/dispatch-log.mjs` | Audit event logging (`logExecutorDispatch`) isolated from dispatch core. |

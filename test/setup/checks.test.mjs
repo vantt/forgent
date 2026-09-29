@@ -93,6 +93,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'agent-claims-resolve',
       'agent-type-names-unique',
       'advise-execute-capabilities-configured',
+      'capability-serves-valid',
       'decision-index-stale',
       'instruction-projections-stale',
       'doc-registry-enforce',
@@ -139,8 +140,11 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'confinement-probe-freshness',
       'confinement-strict-readiness',
       'coordination-abandoned-claims',
+      'coordination-sessions-closed',
       'operation-prompt-templates-valid',
+      'operation-capability-resolves',
       'runner-coordination-orgPolicy-shape',
+      'shadow-binder-divergence',
     ].sort(),
   );
 });
@@ -1241,6 +1245,77 @@ test('advise-execute-capabilities-configured passes when both slots are declared
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
+// ─── capability-serves-valid (I19, core/skills/_shared/capability-matching.md) ───
+
+test('capability-serves-valid fails when runner.capabilities is missing entirely', () => {
+  const cwd = mkTemp('doctor-serves-absent-');
+  const { passed, message } = checkById('capability-serves-valid').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /runner\.capabilities section missing/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('capability-serves-valid passes on the curated defaults (serves on every slot, none identical, "review" present)', () => {
+  const cwd = mkTemp('doctor-serves-ok-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities: DEFAULT_CAPABILITY_SLOTS } }));
+  const { passed, message } = checkById('capability-serves-valid').check(cwd);
+  assert.equal(passed, true, message);
+  assert.match(message, /valid "serves" attribute set, none identical, and "review" is present/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('capability-serves-valid is a no-op pass on a config with no "serves" anywhere (an entry without one stays valid)', () => {
+  const cwd = mkTemp('doctor-serves-none-declared-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities: { advise: {}, execute: {}, review: {} } } }));
+  const { passed, message } = checkById('capability-serves-valid').check(cwd);
+  assert.equal(passed, true, message);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('capability-serves-valid fails when a "serves" value has an unknown key or wrong type', () => {
+  for (const badServes of [{ notARealKey: 'change' }, { mutates: 'yes' }, { outputKind: 42 }, { size: 'heavy' }, { rigor: 'high' }]) {
+    const cwd = mkTemp('doctor-serves-malformed-');
+    fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+    fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities: { review: {}, execute: { serves: badServes } } } }));
+    const { passed, message } = checkById('capability-serves-valid').check(cwd);
+    assert.equal(passed, false, `serves: ${JSON.stringify(badServes)}`);
+    assert.match(message, /invalid "serves"/);
+    fs.rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+test('capability-serves-valid fails when two entries declare the identical "serves" attribute set', () => {
+  const cwd = mkTemp('doctor-serves-duplicate-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(
+    path.join(cwd, '.fgos', 'config.json'),
+    JSON.stringify({
+      runner: {
+        capabilities: {
+          review: { serves: { outputKind: 'finding', mutates: false } },
+          'docs:review': { serves: { outputKind: 'finding', mutates: false } },
+        },
+      },
+    }),
+  );
+  const { passed, message } = checkById('capability-serves-valid').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /declare the identical "serves" attribute set/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('capability-serves-valid fails when the "review" slot is missing', () => {
+  const cwd = mkTemp('doctor-serves-no-review-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities: { execute: { serves: { outputKind: 'change', mutates: true } } } } }));
+  const { passed, message } = checkById('capability-serves-valid').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /missing the "review" slot/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
 test('gate-bypass-configured check fails when the shared file has no gateBypass key at all', () => {
   const cwd = mkTemp('doctor-gatebypass-absent-');
   const { passed, message } = checkById('gate-bypass-configured').check(cwd);
@@ -1800,6 +1875,198 @@ test('no-stuck-merge-abort check fails and fix reports manual command when MERGE
     assert.equal(changed, false);
     assert.match(fixMessage, /merge in progress or stuck/);
     assert.match(fixMessage, new RegExp(`fgos main-checkout-reset --sha ${headSha} --confirm`));
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+// ─── operation-capability-resolves (Unit I21 fix, round 3, MEDIUM) ────────
+// The check's own purpose is verifying what `bindOperations` (binding.mjs)
+// would ACTUALLY bind at real dispatch time -- and `bindOperations` only
+// ever treats `bindingSource === 'capability.prefer'` as a genuine
+// resolution (H1/H4, red-team rounds 1/2): a bare literal `executor-id`
+// match or a `capability.for` orphan-executor fallback is refused there,
+// leaving the actor unbound. Before this fix, the check accepted
+// `resolved.configured` alone, so it would have reported a capability as
+// "resolving" (and counted its provider family) even in exactly that
+// refused case -- a false positive on its own stated contract.
+
+function writeProjectCoordinationProtocol(dir, yamlBody) {
+  const protocolsDir = path.join(dir, '.fgos', 'coordination-protocols');
+  fs.mkdirSync(protocolsDir, { recursive: true });
+  fs.writeFileSync(path.join(protocolsDir, 'doctor-check-fixture.yaml'), yamlBody);
+}
+
+function writeRunnerConfig(dir, runner) {
+  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({ runner }, null, 2));
+}
+
+test('operation-capability-resolves fails a capability that only resolves through a literal executor-id match (H1), never treating it as a genuine capability.prefer resolution', () => {
+  const dir = mkTemp('checks-operation-capability-executor-id-');
+  try {
+    writeProjectCoordinationProtocol(
+      dir,
+      `apiVersion: fgos.dev/v1alpha1
+kind: FlowDefinition
+metadata:
+  id: project.coordination-protocol.doctor-check-executor-id-fixture
+  version: 1.0.0
+spec:
+  profile:
+    kind: CoordinationProtocol
+  roles: [doer]
+  actors:
+    - id: doer
+      role: doer
+  operations:
+    - id: produce
+      role: doer
+      policy:
+        capability: fake-cap
+      result:
+        kind: work-product
+        evidenceRequired: reported
+  graph:
+    entry: phase-produce
+    nodes:
+      - id: phase-produce
+        operations:
+          - ref: produce
+            actor: doer
+        transitions: []
+`,
+    );
+    writeRunnerConfig(dir, {
+      executor: { command: 'claude', args: ['{prompt}'] },
+      executors: {
+        'fake-cap': { kind: 'agent', invocations: [{ via: 'cli', adapter: 'cli-spawn', command: 'claude', args: ['{prompt}'] }] },
+      },
+    });
+
+    const { passed, message } = checkById('operation-capability-resolves').check(dir);
+    assert.equal(passed, false, message);
+    assert.match(message, /fake-cap/);
+    assert.match(message, /nothing registered through capabilities\.fake-cap\.prefer/);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('operation-capability-resolves passes a capability that genuinely resolves through capabilities.<name>.prefer', () => {
+  const dir = mkTemp('checks-operation-capability-prefer-');
+  try {
+    writeProjectCoordinationProtocol(
+      dir,
+      `apiVersion: fgos.dev/v1alpha1
+kind: FlowDefinition
+metadata:
+  id: project.coordination-protocol.doctor-check-prefer-fixture
+  version: 1.0.0
+spec:
+  profile:
+    kind: CoordinationProtocol
+  roles: [doer]
+  actors:
+    - id: doer
+      role: doer
+  operations:
+    - id: produce
+      role: doer
+      policy:
+        capability: real-cap
+      result:
+        kind: work-product
+        evidenceRequired: reported
+  graph:
+    entry: phase-produce
+    nodes:
+      - id: phase-produce
+        operations:
+          - ref: produce
+            actor: doer
+        transitions: []
+`,
+    );
+    // Start from the REAL committed runner config (never a hand-trimmed
+    // subset): `discoverCoordinationProtocols` always scans the real core
+    // tier alongside this test's own project-tier fixture, so every real
+    // core CoordinationProtocol's own declared capability must ALSO
+    // resolve, or this "passes" case would spuriously fail on unrelated
+    // repo content instead of proving anything about the fixture below.
+    const repoRoot = path.resolve(import.meta.dirname, '..', '..');
+    const committedRunner = JSON.parse(execFileSync('git', ['show', 'HEAD:.fgos/config.json'], { cwd: repoRoot, encoding: 'utf8' })).runner;
+    writeRunnerConfig(dir, {
+      ...committedRunner,
+      executors: {
+        ...committedRunner.executors,
+        'some-executor': { kind: 'agent', invocations: [{ via: 'cli', adapter: 'cli-spawn', command: 'claude', args: ['{prompt}'] }] },
+      },
+      capabilities: {
+        ...committedRunner.capabilities,
+        'real-cap': { prefer: 'some-executor' },
+      },
+    });
+
+    const { passed, message } = checkById('operation-capability-resolves').check(dir);
+    assert.equal(passed, true, message);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+function writeCoordinationSession(dir, coordinationId, { status, createdAt }) {
+  const sessionDir = path.join(dir, '.fgos', 'coordination', 'sessions', coordinationId);
+  fs.mkdirSync(sessionDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(sessionDir, 'session.json'),
+    JSON.stringify({ schemaVersion: '1', coordinationId, status, createdAt }, null, 2),
+  );
+}
+
+test('coordination-sessions-closed passes when there is no coordination sessions directory at all', () => {
+  const dir = initRepo('checks-coordination-sessions-closed-absent-');
+  try {
+    const { passed, message } = checkById('coordination-sessions-closed').check(dir);
+    assert.equal(passed, true, message);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('coordination-sessions-closed passes for a fresh active session (well under the 7-day threshold) and for an old session that already reached a terminal status', () => {
+  const dir = initRepo('checks-coordination-sessions-closed-fresh-');
+  try {
+    writeCoordinationSession(dir, 'fresh-active', { status: 'active', createdAt: new Date().toISOString() });
+    writeCoordinationSession(dir, 'old-but-completed', {
+      status: 'completed',
+      createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+    });
+
+    const { passed, message } = checkById('coordination-sessions-closed').check(dir);
+    assert.equal(passed, true, message);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('coordination-sessions-closed fails and names the oldest offender when a session has been "active" past 7 days', () => {
+  const dir = initRepo('checks-coordination-sessions-closed-stale-');
+  try {
+    writeCoordinationSession(dir, 'stale-active-younger', {
+      status: 'active',
+      createdAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
+    });
+    writeCoordinationSession(dir, 'stale-active-oldest', {
+      status: 'active',
+      createdAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
+    });
+    writeCoordinationSession(dir, 'fresh-active-unrelated', { status: 'active', createdAt: new Date().toISOString() });
+
+    const { passed, message } = checkById('coordination-sessions-closed').check(dir);
+    assert.equal(passed, false, 'two sessions are past the 7-day active threshold; the fresh one must not count');
+    assert.match(message, /\b2\b/, `message must report the count of 2 stale sessions, got: ${message}`);
+    assert.match(message, /stale-active-oldest/, `message must name the OLDEST offender specifically, got: ${message}`);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }

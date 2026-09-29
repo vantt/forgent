@@ -4,19 +4,25 @@
 import crypto from "node:crypto";
 import path from "node:path";
 import fs from "node:fs";
-import { EXECUTOR_ADAPTERS, DEFAULT_ADAPTER, DispatchError, getAdapterMetadata, resolveExecutorEnv, currentDispatchDepth, DISPATCH_DEPTH_ENV } from "../transport.mjs";
+import { EXECUTOR_ADAPTERS, DEFAULT_ADAPTER, getAdapterMetadata, resolveExecutorEnv, currentDispatchDepth, DISPATCH_DEPTH_ENV } from "../adapters.mjs";
+import { DispatchError } from "../dispatch-error.mjs";
 import { RunnerConfigError } from "../config.mjs";
 import { resolveWriterIdentity } from '../../../util/session-identity.mjs';
 import { validateConfinementRequest, validateAssignmentLaunchContext } from "./request.mjs";
-import { saveAttestationRecord, savePlanRecord, assertAttestationStoreIsolated, verifyAttestationStoreIsolation } from "./attestation-store.mjs";
+import {
+  saveAttestationRecord,
+  savePlanRecord,
+  assertAttestationStoreIsolated,
+  verifyAttestationStoreIsolation,
+  loadProbeCacheRecord,
+  saveProbeCacheRecord,
+} from "./attestation-store.mjs";
 import {
   loadMachineBackendRegistry,
   createBackendRegistrySnapshot,
   getBackendDriver,
 } from "./backend-registry.mjs";
 import { computeProbeFingerprint, runAllConfinementProbes } from "./probes/harness.mjs";
-import { normalizeAgentName } from "../herdr-agent.mjs";
-
 import { normalizeLegacyConfinement } from "./policies.mjs";
 import { evaluateBypassPairing } from "./bypass-pairing.mjs";
 import { OWNERSHIP_MARKER_FILE } from "./cleanup.mjs";
@@ -28,7 +34,8 @@ import {
   publishSecretSideFile,
   updateCommandEnvelope,
   commitCommandOutcome,
-} from "../cli-spawn-supervisor.mjs";
+  normalizeAgentName,
+} from "../proof-helpers.mjs";
 
 export {
   DispatchError,
@@ -136,15 +143,33 @@ function verifyRequiredProbe(request, backendInstance, driver) {
     return { passed: false, message: `no falsification probe profile for backend type "${backendInstance.type}"` };
   }
   const executable = backendInstance.config?.executable || "bwrap";
+  const fingerprint = computeProbeFingerprint({
+    policy: request.requirement.policy,
+    driverVersion: driver.version,
+    backendConfig: backendInstance.config || {},
+    bwrapExecutable: executable,
+  });
+
+  const cached = loadProbeCacheRecord(fingerprint, request?.context);
+  if (cached) {
+    return {
+      ...cached,
+      fingerprint,
+    };
+  }
+
   const result = runAllConfinementProbes({ bwrapBin: executable });
+  if (result.passed) {
+    try {
+      saveProbeCacheRecord(fingerprint, result, request?.context);
+    } catch {
+      // Best-effort cache save
+    }
+  }
+
   return {
     ...result,
-    fingerprint: computeProbeFingerprint({
-      policy: request.requirement.policy,
-      driverVersion: driver.version,
-      backendConfig: backendInstance.config || {},
-      bwrapExecutable: executable,
-    }),
+    fingerprint,
   };
 }
 
@@ -156,6 +181,7 @@ export function buildConfinementAttestation({
   phase = "completed",
   outcome = null,
   error = null,
+  driverClaims = null,
 } = {}) {
   const reqMode = request.requirement?.mode ?? "unconfined";
   const isExplicitUnconfined = reqMode === "unconfined" && !request.requirement?.omitted;
@@ -187,7 +213,13 @@ export function buildConfinementAttestation({
   let declaredHomeTarget = null;
   const writableBinds = [];
 
-  if (hasBwrapCmd && Array.isArray(request.invocation?.args)) {
+  if (driverClaims && typeof driverClaims === "object") {
+    if (driverClaims["control:hostWrite"] === "satisfied") hasHostWriteDeny = true;
+    if (driverClaims["control:process"] === "satisfied") hasProcessIsolation = true;
+    if (driverClaims["control:session"] === "satisfied") hasSessionIsolation = true;
+    if (driverClaims["control:workspace"] === "satisfied") hasOwnWorkspace = true;
+    if (driverClaims["control:home"] === "satisfied") hasPrivateHome = true;
+  } else if (hasBwrapCmd && Array.isArray(request.invocation?.args)) {
     const rawArgs = request.invocation.args;
     const dashDashIdx = rawArgs.indexOf("--");
     const bwrapOptions = dashDashIdx >= 0 ? rawArgs.slice(0, dashDashIdx) : rawArgs;
@@ -278,26 +310,32 @@ export function buildConfinementAttestation({
   };
 
   const coverage = {};
-  if (hasHostWriteDeny) {
-    coverage["control:hostWrite"] = "satisfied";
-  } else if (hasBwrapCmd || isHeuristicBwrap) {
-    coverage["control:hostWrite"] = "unverified";
-  }
+  if (driverClaims && typeof driverClaims === "object") {
+    for (const [k, v] of Object.entries(driverClaims)) {
+      coverage[k] = v;
+    }
+  } else {
+    if (hasHostWriteDeny) {
+      coverage["control:hostWrite"] = "satisfied";
+    } else if (hasBwrapCmd || isHeuristicBwrap) {
+      coverage["control:hostWrite"] = "unverified";
+    }
 
-  if (hasProcessIsolation) {
-    coverage["control:process"] = "satisfied";
-  } else if (hasBwrapCmd || isHeuristicBwrap) {
-    coverage["control:process"] = "unverified";
-  }
+    if (hasProcessIsolation) {
+      coverage["control:process"] = "satisfied";
+    } else if (hasBwrapCmd || isHeuristicBwrap) {
+      coverage["control:process"] = "unverified";
+    }
 
-  if (legacy?.controls?.session === "isolated") {
-    coverage["control:session"] = hasSessionIsolation ? "satisfied" : "unverified";
-  }
-  if (legacy?.controls?.workspace === "own") {
-    coverage["control:workspace"] = hasOwnWorkspace ? "satisfied" : "unverified";
-  }
-  if (legacy?.controls?.home === "private") {
-    coverage["control:home"] = hasPrivateHome ? "satisfied" : "unverified";
+    if (legacy?.controls?.session === "isolated") {
+      coverage["control:session"] = hasSessionIsolation ? "satisfied" : "unverified";
+    }
+    if (legacy?.controls?.workspace === "own") {
+      coverage["control:workspace"] = hasOwnWorkspace ? "satisfied" : "unverified";
+    }
+    if (legacy?.controls?.home === "private") {
+      coverage["control:home"] = hasPrivateHome ? "satisfied" : "unverified";
+    }
   }
 
   // LOW-2: Legacy grants name an abstract resource (e.g. 'private-home') whose concrete filesystem
@@ -348,7 +386,7 @@ export function buildConfinementAttestation({
           name: "filesystem",
           coverage: hasHostWriteDeny ? "covered" : (hasBwrapCmd || isHeuristicBwrap) ? "unverified" : "unknown",
           detail: hasHostWriteDeny
-            ? "observed hand-written bwrap sandbox"
+            ? (driverClaims ? "driver-verified confinement control" : "observed hand-written bwrap sandbox")
             : (hasBwrapCmd || isHeuristicBwrap)
               ? "observe-mode: heuristic bwrap name detected but sandbox unverified"
               : (request.requirement?.policyId
@@ -359,7 +397,7 @@ export function buildConfinementAttestation({
           name: "inherited-fd",
           coverage: isVerifiedBwrap ? "covered" : (hasBwrapCmd || isHeuristicBwrap) ? "unverified" : "unknown",
           detail: isVerifiedBwrap
-            ? "observed hand-written bwrap sandbox"
+            ? (driverClaims ? "driver-verified confinement control" : "observed hand-written bwrap sandbox")
             : (hasBwrapCmd || isHeuristicBwrap)
               ? "observe-mode: heuristic bwrap name detected but sandbox unverified"
               : (request.requirement?.policyId
@@ -481,47 +519,16 @@ export function buildConfinementAttestation({
 }
 
 /**
- * The single runtime door to external executor adapters.
- *
- * executeThroughConfinement(request, adapterPort) -> result + attestation
+ * Consolidated confinement assessment and preparation door (Phase 09 R4).
+ * Single unified preparation pipeline used by both executeThroughConfinement (direct)
+ * and prepareConfinementForLaunch (assignment).
  */
-export async function executeThroughConfinement(request, adapterPort = null) {
-  validateConfinementRequest(request);
+export async function assessAndPrepare(request, opts = {}) {
+  const reqMode = request.requirement?.mode ?? "unconfined";
+  const isRequired = reqMode === "required";
+  const adapterPort = opts.adapterPort ?? null;
+  const adapterName = request.invocation?.adapter ?? DEFAULT_ADAPTER;
 
-  // R6: In-process Agent/Task dispatch gets authorityScope: "external-harness" with null attestation
-  if (request.authorityScope === "external-harness") {
-    if (request.requirement?.mode === "required") {
-      const refusedAttestation = buildConfinementAttestation({
-        request,
-        phase: "refused",
-        outcome: "refused",
-      });
-      throw new DispatchError(
-        "confinement-unsupported",
-        `required confinement refused: in-process dispatch has no trusted harness attestation contract (authorityScope "external-harness").`,
-        {
-          contract: "confinement-execution.v1",
-          status: "refused",
-          dispatchId: request.dispatchId,
-          capability: request.capability,
-          requirement: request.requirement,
-          attestation: refusedAttestation,
-          authorityScope: "external-harness",
-        },
-      );
-    }
-    return {
-      ...request.invocation,
-      contract: "confinement-execution.v1",
-      status: "completed",
-      result: request.invocation,
-      attestation: null,
-      authorityScope: "external-harness",
-    };
-  }
-
-  // R2: Preferred mode stays disabled / explicitly bounded; never silently runs unconfined;
-  // cleanly refuses before spawn with named reason (confinement-mode-unsupported).
   if (request.requirement?.mode === "preferred") {
     const refusedAttestation = buildConfinementAttestation({
       request,
@@ -543,7 +550,7 @@ export async function executeThroughConfinement(request, adapterPort = null) {
     );
   }
 
-  // Safe pre-adapter preparation checks (R3, R5: ownWorktree & bypass pairing)
+  // Pre-adapter bypass pairing checks
   const invocationConfinement = request.invocation?.confinement;
   const legacyNormalized = invocationConfinement
     ? normalizeLegacyConfinement(invocationConfinement)
@@ -624,31 +631,14 @@ export async function executeThroughConfinement(request, adapterPort = null) {
     );
   }
 
-  // Phase 04 Required Enforcement & Backend Resolution:
   let backendInstance = null;
   let driver = null;
   let backendPlan = null;
   let preparedConfinement = null;
-  const adapterName = request.invocation?.adapter ?? DEFAULT_ADAPTER;
 
-  // H10/D2: one shared defaulting rule for both doors -- the assignment/
-  // Run-owned launch path (prepareConfinementForLaunch) already defaults a
-  // missing backendId to 'bwrap'; this direct door used to require the
-  // caller to supply one explicitly and simply had none of the backend
-  // instance resolved at all otherwise, which meant every direct
-  // `required`-mode dispatch with no backendId (the production case for
-  // capabilities like advise/code:review/code:debug, whose executor
-  // config never sets confinement.backend) refused outright below instead
-  // of resolving the same default the assignment door already gets.
-  // The 'bwrap' default is for `required` mode only: a dispatch that does not
-  // require confinement never uses the resolved backend, so it must not refuse
-  // on a machine whose registry has no bwrap entry (macOS, or any machine that
-  // never ran `fgos setup`). An explicitly named backendId is still resolved
-  // (and still refused when missing/disabled) in every mode.
-  const isRequired = request.requirement?.mode === "required";
   const effectiveBackendId = request.backendId ?? (isRequired ? 'bwrap' : null);
 
-  if (!request.assignmentLaunchContext && effectiveBackendId) {
+  if (reqMode !== 'unconfined' && effectiveBackendId) {
     const registryDoc = loadMachineBackendRegistry();
     const rawInstance = registryDoc?.confinementBackends?.[effectiveBackendId];
     if (rawInstance && rawInstance.enabled === false) {
@@ -656,6 +646,10 @@ export async function executeThroughConfinement(request, adapterPort = null) {
         request,
         phase: "refused",
         outcome: "refused",
+      });
+      refusedAttestation.mismatches.push({
+        code: "confinement-backend-missing",
+        detail: `confinement backend "${effectiveBackendId}" is not configured or disabled.`,
       });
       saveAttestationRecord(refusedAttestation, request.context);
       throw new DispatchError(
@@ -679,6 +673,10 @@ export async function executeThroughConfinement(request, adapterPort = null) {
         phase: "refused",
         outcome: "refused",
       });
+      refusedAttestation.mismatches.push({
+        code: "confinement-backend-missing",
+        detail: `confinement backend "${effectiveBackendId}" could not be resolved from snapshot.`,
+      });
       saveAttestationRecord(refusedAttestation, request.context);
       throw new DispatchError(
         "confinement-backend-missing",
@@ -693,12 +691,7 @@ export async function executeThroughConfinement(request, adapterPort = null) {
         },
       );
     }
-    // L9: getBackendDriver throws an untyped ConfinementBackendRegistryError
-    // (a data-integrity edge case: the registry names a type not in
-    // ALLOWED_DRIVER_TYPES) -- wrap it the same way prepareConfinementForLaunch's
-    // own identical call already does, so this door's contract ("every
-    // refusal is a DispatchError with an attached attestation") holds here
-    // too, instead of leaking a raw untyped error past this door.
+
     try {
       driver = getBackendDriver(backendInstance.type);
     } catch (err) {
@@ -710,12 +703,7 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       }));
     }
 
-    if (request.requirement?.mode === "required") {
-    // H10/D2: no separate "no backendId at all" refusal -- effectiveBackendId
-    // above always has a value (explicit, or the shared 'bwrap' default).
-    // The genuine refuse case, the resolved backend not actually being
-    // available in the machine registry, is still caught here.
-    if (!backendInstance || !driver) {
+    if (isRequired && (!backendInstance || !driver)) {
       const refusedAttestation = buildConfinementAttestation({
         request,
         phase: "refused",
@@ -744,13 +732,31 @@ export async function executeThroughConfinement(request, adapterPort = null) {
         if (assessment.coverage[key] === 'satisfied') assessment.coverage[key] = 'unverified';
       }
     }
-    const coverageFailures = requiredCoverageFailures(request.requirement.policy, assessment.coverage);
+
+    try {
+      assertAttestationStoreIsolated(request.context, assessment.resources || []);
+      if (request.assignmentLaunchContext && request.context?.runDir) {
+        const protectedDir = path.join(request.context.runDir, 'protected');
+        const controllerDir = path.join(request.context.runDir, 'controller');
+        verifyAttestationStoreIsolation(protectedDir, assessment.resources || []);
+        verifyAttestationStoreIsolation(controllerDir, assessment.resources || []);
+      }
+    } catch (err) {
+      assessment.mismatches.push({
+        code: 'confinement-grant-invalid',
+        detail: err.message,
+      });
+      assessment.coverage['control:hostWrite'] = 'unsatisfied';
+    }
+
+    const coverageFailures = requiredCoverageFailures(request.requirement?.policy, assessment.coverage);
     for (const failure of coverageFailures) {
       assessment.mismatches.push({
         code: "confinement-coverage-unverified",
         detail: `${failure.key} has ${failure.coverage} coverage; required confinement needs satisfied coverage.`,
       });
     }
+
     backendPlan = {
       contract: "confinement-plan.v1",
       dispatchId: request.dispatchId,
@@ -804,9 +810,6 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       );
     }
 
-    // The same real falsification harness used by doctor is Authority's
-    // pre-spawn proof gate. Structural inspection of argv cannot establish
-    // outcome: enforced (spec §6.6).
     const probe = verifyRequiredProbe(request, backendInstance, driver);
     if (!probe.passed) {
       const refusedAttestation = buildConfinementAttestation({ request, phase: "refused", outcome: "refused" });
@@ -822,7 +825,6 @@ export async function executeThroughConfinement(request, adapterPort = null) {
 
     preparedConfinement = await driver.prepare(backendPlan, request, backendInstance);
 
-    // Verify prepared claims match plan coverage (R1: prepared claims mismatch the plan)
     let claimsMismatch = false;
     if (!preparedConfinement?.claims) {
       claimsMismatch = true;
@@ -872,10 +874,107 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       request,
       phase: "prepared",
       outcome: "unknown",
+      driverClaims: preparedConfinement.claims,
     });
     applyBackendPlanToAttestation(prepAttestation, backendPlan);
     saveAttestationRecord(prepAttestation, request.context);
+  } else if (request.assignmentLaunchContext) {
+    // Unconfined assignment launch needs a plan record and prepared attestation
+    backendPlan = {
+      contract: "confinement-plan.v1",
+      dispatchId: request.dispatchId,
+      decision: "execute",
+      requested: request.requirement,
+      coverage: {
+        "control:hostWrite": "unverified",
+        "control:hostRead": "satisfied",
+        "control:networkEgress": "satisfied",
+      },
+      resources: [],
+      readiness: {},
+      grants: [],
+      backend: {
+        id: "none",
+        type: "none",
+        version: "none",
+        configDigest: null,
+      },
+      mismatches: [],
+    };
+    savePlanRecord(backendPlan, request.context);
+
+    const prepAttestation = buildConfinementAttestation({
+      request,
+      phase: "prepared",
+      outcome: "unconfined",
+    });
+    applyBackendPlanToAttestation(prepAttestation, backendPlan);
+    saveAttestationRecord(prepAttestation, request.context);
+  }
+
+  return {
+    backendInstance,
+    driver,
+    backendPlan,
+    preparedConfinement,
+  };
+}
+
+/**
+ * The single runtime door to external executor adapters.
+ *
+ * executeThroughConfinement(request, adapterPort) -> result + attestation
+ */
+export async function executeThroughConfinement(request, adapterPort = null) {
+  validateConfinementRequest(request);
+
+  // R6: In-process Agent/Task dispatch gets authorityScope: "external-harness" with null attestation
+  if (request.authorityScope === "external-harness") {
+    if (request.requirement?.mode === "required") {
+      const refusedAttestation = buildConfinementAttestation({
+        request,
+        phase: "refused",
+        outcome: "refused",
+      });
+      throw new DispatchError(
+        "confinement-unsupported",
+        `required confinement refused: in-process dispatch has no trusted harness attestation contract (authorityScope "external-harness").`,
+        {
+          contract: "confinement-execution.v1",
+          status: "refused",
+          dispatchId: request.dispatchId,
+          capability: request.capability,
+          requirement: request.requirement,
+          attestation: refusedAttestation,
+          authorityScope: "external-harness",
+        },
+      );
     }
+    return {
+      ...request.invocation,
+      contract: "confinement-execution.v1",
+      status: "completed",
+      result: request.invocation,
+      attestation: null,
+      authorityScope: "external-harness",
+    };
+  }
+
+  // Phase 04 Required Enforcement & Backend Resolution:
+  let backendInstance = null;
+  let driver = null;
+  let backendPlan = null;
+  let preparedConfinement = null;
+  const adapterName = request.invocation?.adapter ?? DEFAULT_ADAPTER;
+  const isRequired = request.requirement?.mode === "required";
+  const effectiveBackendId = request.backendId ?? (isRequired ? 'bwrap' : null);
+
+  if (!request.assignmentLaunchContext) {
+    const prep = await assessAndPrepare(request, { adapterPort });
+    backendInstance = prep.backendInstance;
+    driver = prep.driver;
+    backendPlan = prep.backendPlan;
+    preparedConfinement = prep.preparedConfinement;
   }
 
   // R3: Resolve adapter function through Authority
@@ -1004,6 +1103,7 @@ export async function executeThroughConfinement(request, adapterPort = null) {
     // already reads from, so this is not a new concept, only a missing wire.
     requirement: request.requirement,
     backendId: effectiveBackendId,
+    effectiveContract: request.context?.effectiveContract ?? request.invocation?.effectiveContract ?? null,
   };
 
   if (preparedLaunch) {
@@ -1233,192 +1333,11 @@ export async function prepareConfinementForLaunch(request, opts = {}) {
   }
 
   const adapterName = request.invocation?.adapter || DEFAULT_ADAPTER;
-  const reqMode = request.requirement?.mode ?? 'unconfined';
-
-  let backendPlan = null;
-  let preparedConfinement = null;
-  let backendInstance = null;
-  let driver = null;
-
-  if (reqMode !== 'unconfined') {
-    const backendRegistry = loadMachineBackendRegistry();
-    // H10/D2: same shared default as executeThroughConfinement's direct
-    // door. `backendRegistry.defaultBackend` was dead code -- the registry
-    // schema (backend-registry.mjs ALLOWED_DOC_KEYS) forbids that key at
-    // the document level, so it could never be truthy.
-    const backendId = request.backendId || 'bwrap';
-    const rawInstance = backendRegistry.confinementBackends?.[backendId];
-
-    if (!rawInstance || rawInstance.enabled === false) {
-      const refusedAttestation = buildConfinementAttestation({ request, phase: 'refused', outcome: 'refused' });
-      refusedAttestation.mismatches.push({
-        code: 'confinement-backend-missing',
-        detail: `confinement backend "${backendId}" is not configured or disabled.`,
-      });
-      saveAttestationRecord(refusedAttestation, request.context);
-      throw new DispatchError('confinement-backend-missing', `confinement backend "${backendId}" is not available.`, {
-        contract: 'confinement-execution.v1', status: 'refused', dispatchId: request.dispatchId,
-        capability: request.capability, requirement: request.requirement, attestation: refusedAttestation,
-      });
-    }
-
-    const snapshot = createBackendRegistrySnapshot(backendRegistry);
-    backendInstance = snapshot.resolve(backendId);
-    if (!backendInstance) {
-      const refusedAttestation = buildConfinementAttestation({ request, phase: 'refused', outcome: 'refused' });
-      refusedAttestation.mismatches.push({
-        code: 'confinement-backend-missing',
-        detail: `confinement backend "${backendId}" could not be resolved from snapshot.`,
-      });
-      saveAttestationRecord(refusedAttestation, request.context);
-      throw new DispatchError('confinement-backend-missing', `confinement backend "${backendId}" is not available.`, {
-        contract: 'confinement-execution.v1', status: 'refused', dispatchId: request.dispatchId,
-        capability: request.capability, requirement: request.requirement, attestation: refusedAttestation,
-      });
-    }
-
-    try {
-      driver = getBackendDriver(backendInstance.type);
-    } catch (err) {
-      const refusedAttestation = buildConfinementAttestation({ request, phase: 'refused', outcome: 'refused' });
-      refusedAttestation.mismatches.push({ code: 'confinement-backend-missing', detail: err.message });
-      saveAttestationRecordThenThrow(refusedAttestation, request.context, new DispatchError('confinement-backend-missing', err.message, {
-        contract: 'confinement-execution.v1', status: 'refused', dispatchId: request.dispatchId,
-        capability: request.capability, requirement: request.requirement, attestation: refusedAttestation,
-      }));
-    }
-
-    const assessment = driver.assess(request, backendInstance);
-    if (!adapterConsumesPreparedSandbox(adapterName, opts.adapterPort, request)) {
-      const detail = `adapter ${adapterName} does not apply the prepared sandbox.`;
-      assessment.mismatches.push({ code: 'confinement-adapter-unsupported', detail });
-      for (const key of Object.keys(assessment.coverage)) {
-        if (assessment.coverage[key] === 'satisfied') assessment.coverage[key] = 'unverified';
-      }
-    }
-
-    // Fail closed if protected or attestation store overlaps writable worker grant
-    try {
-      assertAttestationStoreIsolated(request.context, assessment.resources || []);
-      if (request.context?.runDir) {
-        const protectedDir = path.join(request.context.runDir, 'protected');
-        const controllerDir = path.join(request.context.runDir, 'controller');
-        verifyAttestationStoreIsolation(protectedDir, assessment.resources || []);
-        verifyAttestationStoreIsolation(controllerDir, assessment.resources || []);
-      }
-    } catch (err) {
-      assessment.mismatches.push({
-        code: 'confinement-grant-invalid',
-        detail: err.message,
-      });
-      assessment.coverage['control:hostWrite'] = 'unsatisfied';
-    }
-
-    const coverageFailures = requiredCoverageFailures(request.requirement.policy, assessment.coverage);
-    for (const failure of coverageFailures) {
-      assessment.mismatches.push({
-        code: 'confinement-coverage-unverified',
-        detail: `${failure.key} has ${failure.coverage} coverage; required confinement needs satisfied coverage.`,
-      });
-    }
-
-    backendPlan = {
-      contract: 'confinement-plan.v1',
-      dispatchId: request.dispatchId,
-      decision: assessment.mismatches.length > 0 ? 'refuse' : 'execute',
-      requested: request.requirement,
-      coverage: assessment.coverage,
-      resources: assessment.resources,
-      readiness: assessment.readiness,
-      grants: (request.requirement?.policy?.grants || []).map((g) => {
-        const match = assessment.resources.find((r) => r.resource === g.resource);
-        return {
-          resource: g.resource,
-          access: g.access,
-          resolvedTarget: match?.executionTarget?.path || g.resource,
-        };
-      }),
-      backend: {
-        id: backendInstance.id,
-        type: backendInstance.type,
-        version: driver.version,
-        configDigest: crypto.createHash('sha256').update(JSON.stringify(backendInstance.config || {})).digest('hex'),
-      },
-      mismatches: assessment.mismatches,
-    };
-    savePlanRecord(backendPlan, request.context);
-
-    if (backendPlan.decision === 'refuse') {
-      const refusedAttestation = buildConfinementAttestation({ request, phase: 'refused', outcome: 'refused' });
-      applyBackendPlanToAttestation(refusedAttestation, backendPlan);
-      saveAttestationRecord(refusedAttestation, request.context);
-      const primaryMismatch = assessment.mismatches[0] || {};
-      const errorCode = primaryMismatch.code || 'confinement-unsupported';
-      throw new DispatchError(
-        errorCode,
-        `required confinement refused for capability "${request.capability}": ${assessment.mismatches.map((m) => m.detail).join('; ')}`,
-        {
-          contract: 'confinement-execution.v1', status: 'refused', dispatchId: request.dispatchId,
-          capability: request.capability, requirement: request.requirement, attestation: refusedAttestation,
-        },
-      );
-    }
-
-    const probe = verifyRequiredProbe(request, backendInstance, driver);
-    if (!probe.passed) {
-      const refusedAttestation = buildConfinementAttestation({ request, phase: 'refused', outcome: 'refused' });
-      applyBackendPlanToAttestation(refusedAttestation, backendPlan);
-      refusedAttestation.evidence.push({ kind: 'falsification-probe', ref: probe.message, freshness: 'stale', fingerprint: probe.fingerprint });
-      saveAttestationRecord(refusedAttestation, request.context);
-      throw new DispatchError('confinement-probe-failed', `required confinement refused: ${probe.message}`, {
-        contract: 'confinement-execution.v1', status: 'refused', dispatchId: request.dispatchId,
-        capability: request.capability, requirement: request.requirement, attestation: refusedAttestation,
-      });
-    }
-    backendPlan.probe = probe;
-
-    preparedConfinement = await driver.prepare(backendPlan, request, backendInstance);
-
-    const prepAttestation = buildConfinementAttestation({
-      request,
-      phase: 'prepared',
-      outcome: 'unknown',
-    });
-    applyBackendPlanToAttestation(prepAttestation, backendPlan);
-    saveAttestationRecord(prepAttestation, request.context);
-  } else {
-    // Unconfined
-    backendPlan = {
-      contract: 'confinement-plan.v1',
-      dispatchId: request.dispatchId,
-      decision: 'execute',
-      requested: request.requirement,
-      coverage: {
-        'control:hostWrite': 'unverified',
-        'control:hostRead': 'satisfied',
-        'control:networkEgress': 'satisfied',
-      },
-      resources: [],
-      readiness: {},
-      grants: [],
-      backend: {
-        id: 'none',
-        type: 'none',
-        version: 'none',
-        configDigest: null,
-      },
-      mismatches: [],
-    };
-    savePlanRecord(backendPlan, request.context);
-
-    const prepAttestation = buildConfinementAttestation({
-      request,
-      phase: 'prepared',
-      outcome: 'unconfined',
-    });
-    applyBackendPlanToAttestation(prepAttestation, backendPlan);
-    saveAttestationRecord(prepAttestation, request.context);
-  }
+  const prep = await assessAndPrepare(request, { adapterPort: opts.adapterPort });
+  const backendPlan = prep.backendPlan;
+  const preparedConfinement = prep.preparedConfinement;
+  const backendInstance = prep.backendInstance;
+  const driver = prep.driver;
 
   // Prepared Worker Invocation
   const sourceInvocation = preparedConfinement?.invocation || request.invocation;

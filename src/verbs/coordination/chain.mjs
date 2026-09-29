@@ -21,6 +21,13 @@ import { resolveCoordinationPaths, readManifest } from '../../runner/coordinatio
 import { CoordinationError } from '../../runner/coordination/schema.mjs';
 import { showCoordinationUseCase } from './show.mjs';
 
+// Unit I30 (Phase 7 item 1): `chain`'s own data shape (`{track, cells,
+// activeCell, nextAction}`) is a distinct sibling version from both
+// `coordination-actions.v1` and `coordination-show.v1` -- reconstructed
+// entirely from `show`'s own per-cell projections, but never itself that
+// shape.
+export const CHAIN_CONTRACT_VERSION = 'coordination-chain.v1';
+
 const ACTIVE_STATUS = 'active';
 
 function trackPrefix(track) {
@@ -184,6 +191,7 @@ export function chainCoordinationUseCase(ctx, { track }) {
   }
 
   return {
+    contractVersion: CHAIN_CONTRACT_VERSION,
     track,
     cells,
     activeCell: activeCellRecord !== null ? activeCellRecord.cellId : null,

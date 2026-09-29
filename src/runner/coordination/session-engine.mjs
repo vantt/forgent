@@ -70,6 +70,7 @@ import {
   recordAggregationValidation,
   recordContributionLink,
   recordSpecialistAuthorization,
+  recordSpecialistAuthorizationLocked,
   knownContributionsFromEvents,
   asCoordinationError,
   getPendingRetryDeclaration,
@@ -120,7 +121,7 @@ import {
   evaluateVisibilityWindowState,
   classifySessionQuorum as pureClassifySessionQuorum,
 } from './legality-facts.mjs';
-import { computeDagSharedCwdCaveats } from './dag-declaration.mjs';
+import { computeDagSharedCwdCaveats, resolveNodeCwd } from './dag-declaration.mjs';
 
 export function loadDefinitionForSession(manifest, opts) {
   if (manifest.schemaVersion === '3') {
@@ -423,50 +424,35 @@ async function runExecutorAttempt(assignment, opts) {
  * `executeAssignment()` is ever called (`priorLink` from `replaySession()`
  * at the top of this function; `unlinked` only detects a SETTLED run,
  * `result.json` on disk). Neither one detects a run another concurrent
- * caller has already STARTED but not yet settled, so a plain, unconditional
- * `await executeAssignment(...)` here would let two callers racing within
- * the SAME process (this function genuinely awaits, unlike the fully
- * synchronous `validateConsultProposal`/`bindActor` pair fixed earlier in
- * this file) both spawn a real executor for the identical Assignment. The
- * exclusive `dispatch.claim` file below closes that window the same way
- * `createSessionAssignment`'s own `taskClaimPath` closes the analogous
- * window for Assignment CREATION: written synchronously, right before the
- * step it guards, with no gap where a second caller could observe "no claim
- * yet" and proceed anyway. Unlike `taskClaimPath`, this claim is never
- * consulted to resolve/return anything -- its sole job is to make a second
- * concurrent dispatch attempt fail loudly (`EEXIST`) instead of silently
- * duplicating; it is intentionally never removed on success (the `priorLink`
- * check above already makes a later legitimate resume short-circuit before
- * reaching this code at all).
+ * caller has already STARTED (this function's own snapshot is a plain
+ * read, outrunnable by a genuinely concurrent cross-process sibling doing
+ * real file I/O) -- two distinct races, both closed by
+ * `executeAssignment()`'s own `admitRunAttempt` (assignment-runner.mjs),
+ * the ONLY place this can be closed atomically (inside its own CAS-based
+ * generation-ledger critical section, `publishNextGeneration`):
+ * - A sibling still UNSETTLED: refused (`run-in-flight`) whenever the
+ *   current attempt has neither settled nor a provably dead control holder
+ *   AND detached supervisor/worker (S1, Phase 2's
+ *   `isCliSpawnRunStillWorking`). Always on, for every caller.
+ * - A sibling that already SETTLED (finished, possibly even linked) before
+ *   this caller's own stale `priorLink`/`unlinked` snapshot could see it:
+ *   refused (`run-already-settled`) ONLY when this caller opts in via
+ *   `refuseIfSettled: true`, which this function always passes -- a
+ *   settled current attempt is exactly what a RETRY is supposed to admit a
+ *   fresh one over, so this must never be the default (`retrySessionTask`
+ *   never passes it). On that refusal, this function re-reads and links
+ *   the sibling's already-settled result instead of wastefully dispatching
+ *   a real executor run for work that is already done.
  *
- * On failure, the claim is removed ONLY when `executeAssignment` threw a
- * `RunnerConfigError` whose `phase` is NOT `'post-admission'` -- every such
- * throw site in assignment-runner.mjs (asserted assignment shape, unknown/
- * human-only operation, read-only-mode violation, corrupt assignment.json,
- * governance/decide-blocked mechanism, decide/policy executor mismatch)
- * fires strictly before that function's own `fs.mkdirSync(runDir, ...)`,
- * i.e. before any per-attempt run directory or subprocess for THIS
- * Assignment has ever been created. Removing the claim there is provably
- * safe: nothing was spawned, so there is no ambiguous in-flight state and
- * no concurrency window left open -- the SAME `taskKey`/assignmentId can be
- * retried (e.g. after an operator fixes a governance-blocked executor
- * config) without leaving a stale claim wedged forever.
- *
- * `phase: 'post-admission'` (Phase 03 C1a: the resume-reconcile refusal,
- * `run-in-flight`/`run-unreconciled`) is the opposite case on purpose -- it
- * fires only once a resumed Run's OWN prior dispatch attempt is already on
- * record, possibly still live. Unlinking the claim there would let a second
- * concurrent caller see "no claim" and dispatch a second worker over an
- * unsettled Run, exactly the double-materialization this file exists to
- * prevent -- so it is grouped with every other error type below instead.
- * Any OTHER thrown error type -- most notably anything thrown once
- * `executeAssignment` is past the pre-mkdirSync window, `post-admission`
- * included -- leaves the claim in place exactly as before: a crashed or
- * still-live in-flight dispatch still needs manual reconciliation, not
- * silent auto-retry -- fail closed, matching this module's own
- * dangling-ref/duplicate-ref posture elsewhere. The original error is
- * always rethrown unchanged either way; this only ever affects
- * whether the claim file survives the throw.
+ * Both refusals throw `RunnerConfigError`; the in-flight one is translated
+ * back to the same `CoordinationError` shape/message the retired exclusive-
+ * create `dispatch.claim` marker file used to throw here (removed, S5, once
+ * `admitRunAttempt` was confirmed to subsume its in-flight guard -- the
+ * marker was also always an empty, unparseable file with no writer-
+ * populated holder identity, so the `dispatch reconcile` door that existed
+ * to clear it could never actually resolve a refusal against the real
+ * production shape), so every existing caller matching `instanceof
+ * CoordinationError` keeps working unchanged.
  */
 async function createAndExecuteSessionTask({ coordinationId, taskKey, actorId, contract, caller, authorizationProvenance, dagNodeId }, opts = {}, paths = null) {
   const reconciled = replaySession(coordinationId, opts);
@@ -493,29 +479,6 @@ async function createAndExecuteSessionTask({ coordinationId, taskKey, actorId, c
     return { assignment, runResult: unlinked, resumed: true };
   }
 
-  // L2 (Phase 03 R9, deprecation notice, not yet removed): the in-process
-  // race this exclusive-create file closes is now ALSO closed, more
-  // robustly, by admitRunAttempt's own admission-time in-flight check
-  // (assignment-runner.mjs, Phase 03 R6/M1) -- it reads the Run's real
-  // control-epoch ledger (PID + processStartTime dead-holder proof) rather
-  // than a same-process-only marker file, so it also catches a second
-  // caller in a DIFFERENT process, which this file never could. Kept for
-  // one release rather than removed outright, so a caller still mid-flight
-  // on the old assumption is not broken by a single release cut. Slated
-  // for removal once that window has passed.
-  const dispatchClaimPath = path.join(fgosDir, 'assignments', assignment.assignmentId, 'dispatch.claim');
-  try {
-    fs.closeSync(fs.openSync(dispatchClaimPath, 'wx'));
-  } catch (err) {
-    if (err.code === 'EEXIST') {
-      throw new CoordinationError(
-        'validation',
-        `createAndExecuteSessionTask: a dispatch is already in progress for assignment "${assignment.assignmentId}" in session "${coordinationId}" -- refusing to spawn a second concurrent executor run for the same Assignment`,
-      );
-    }
-    throw err;
-  }
-
   let lockReleased = Boolean(opts.lockReleased || opts.lockState?.released);
   if (typeof opts.releaseLock === 'function') {
     lockReleased = true;
@@ -523,25 +486,46 @@ async function createAndExecuteSessionTask({ coordinationId, taskKey, actorId, c
     opts.releaseLock();
   }
 
+  // This is a FRESH (non-retry) dispatch, so `refuseIfSettled: true` opts
+  // into admitRunAttempt's own atomic, CAS-level check for a sibling that
+  // already settled this exact Assignment -- see its own comment
+  // (assignment-runner.mjs) for why only that check, INSIDE the same
+  // critical section as the admission decision itself, can catch a
+  // genuinely concurrent cross-process sibling that this function's own
+  // `priorLink`/`unlinked` reads above (a plain, outrunnable snapshot) can
+  // miss. `retrySessionTask` never passes this: a settled current attempt
+  // is exactly what a retry is supposed to admit a fresh one over.
   let runResult;
   try {
-    runResult = await runExecutorAttempt(assignment, opts);
+    runResult = await runExecutorAttempt(assignment, { ...opts, refuseIfSettled: true });
   } catch (err) {
-    // H2: `phase: 'post-admission'` (executeAssignment's own resume-reconcile
-    // refusal, run-in-flight/run-unreconciled -- see assignment-runner.mjs)
-    // means a real dispatch attempt for this Assignment is already on
-    // record, possibly still live. Unlinking the claim there would let a
-    // second concurrent caller observe "no claim" and dispatch again over
-    // it -- exactly the double-materialization this claim file exists to
-    // prevent. Every OTHER RunnerConfigError this doc comment already
-    // enumerates fires strictly before any run directory or subprocess for
-    // this Assignment exists, so removing the claim for those is still safe.
-    if (err instanceof RunnerConfigError && err.phase !== 'post-admission') {
-      try {
-        fs.unlinkSync(dispatchClaimPath);
-      } catch (unlinkErr) {
-        if (unlinkErr.code !== 'ENOENT') throw unlinkErr;
+    if (err instanceof RunnerConfigError && err.code === 'admission-run-already-settled') {
+      // The sibling that settled it may not have linked it yet (a crash
+      // window of its own) -- self-heal exactly like the `unlinked` check
+      // above, never treat this as a hard failure.
+      const settled = findLatestRunResult(fgosDir, assignment.assignmentId);
+      if (settled) {
+        if (paths) {
+          linkResultLocked(coordinationId, { assignmentId: assignment.assignmentId, runId: settled.runId }, paths, opts);
+        } else {
+          linkResult(coordinationId, { assignmentId: assignment.assignmentId, runId: settled.runId }, opts);
+        }
+        return { assignment, runResult: settled, resumed: true };
       }
+    }
+    // S5: a second concurrent caller for this exact Assignment still
+    // genuinely in flight (same process or a different one) is refused by
+    // `admitRunAttempt`'s own in-flight check -- translated back to the
+    // SAME `CoordinationError` shape/message the retired exclusive-create
+    // `dispatch.claim` marker used to throw here, so every existing
+    // consumer of this function's error contract (dag-scheduler.mjs's
+    // `outcomeFor`, callers matching `instanceof CoordinationError`) keeps
+    // working unchanged.
+    if (err instanceof RunnerConfigError && err.code === 'admission-run-in-flight') {
+      throw new CoordinationError(
+        'validation',
+        `createAndExecuteSessionTask: a dispatch is already in progress for assignment "${assignment.assignmentId}" in session "${coordinationId}" -- refusing to spawn a second concurrent executor run for the same Assignment`,
+      );
     }
     throw err;
   }
@@ -1679,6 +1663,121 @@ export function authorizeSpecialistSlot(
       maxAssignments,
       expiresAfterRound,
     },
+    { ...opts, maxBindingsForSlot: { slotId, cap: slot.maxBindings } },
+  );
+}
+
+/**
+ * `authorizeSpecialistSlot`'s `Locked` twin (I24b, Phase 5 item 4 pt.2) --
+ * for use ONLY by a caller that already holds `coordinationId`'s
+ * `events.lock` (the typed-action execution path). Delegates to
+ * `recordSpecialistAuthorizationLocked` (store.mjs) instead of
+ * `recordSpecialistAuthorization`, so this door never re-acquires the lock
+ * the caller is already holding -- the SAME reason `authorizeDeclaredOperationLocked`
+ * delegates to `authorizeOperationLocked` rather than `authorizeOperation`.
+ *
+ * A byte-for-byte MIRROR of `authorizeSpecialistSlot`'s own validation body
+ * (shape/session/slot/role/capability/actor-collision/refs-ownership),
+ * against a caller-supplied `paths` rather than one resolved internally --
+ * this unit's own scope requires never modifying the existing unlocked
+ * door, so there is no shared body a single edit could update for both at
+ * once; a future change to one door's validation must be applied to both.
+ *
+ * @param {string} coordinationId Must already have a non-null `definitionRef`.
+ * @param {object} params Same shape as `authorizeSpecialistSlot`'s own `params`.
+ * @param {object} paths Already-resolved session paths (the caller's own lock-held `paths`).
+ * @param {object} [opts] Workspace options ({ cwd, repoRoot, packageRoot })
+ */
+export function authorizeSpecialistSlotLocked(
+  coordinationId,
+  {
+    slotId,
+    specialistActorId,
+    role,
+    capabilities = [],
+    authorizedBy,
+    reason,
+    triggerEvidenceRefs = [],
+    allowedContextRefs = [],
+    maxAssignments,
+    expiresAfterRound,
+    specialistAuthorizationId,
+  },
+  paths,
+  opts = {},
+) {
+  const manifest = readManifestRaw(paths.manifestPath);
+  if (!manifest.definitionRef) {
+    throw new CoordinationError(
+      'validation',
+      `authorizeSpecialistSlot: session "${coordinationId}" has no declared protocol bound (definitionRef is null) -- there is no slot for an authorization to name`,
+    );
+  }
+  const definition = loadDefinitionForSession(manifest, opts);
+  if (definition.metadata.version !== manifest.definitionRef.version) {
+    throw new CoordinationError(
+      'validation',
+      `authorizeSpecialistSlot: session "${coordinationId}" was opened against definition "${manifest.definitionRef.id}@${manifest.definitionRef.version}", but the resolved definition is now version "${definition.metadata.version}" -- refusing to authorize against a drifted definition`,
+    );
+  }
+
+  const slot = (definition.spec.profile.topology?.specialistSlots ?? []).find((s) => s.id === slotId);
+  if (!slot) {
+    throw new CoordinationError(
+      'validation',
+      `authorizeSpecialistSlot: slot "${slotId}" is not declared in this protocol's spec.profile.topology.specialistSlots`,
+    );
+  }
+  if (role !== slot.role) {
+    throw new CoordinationError(
+      'validation',
+      `authorizeSpecialistSlot: role "${role}" does not match specialist slot "${slotId}"'s own declared role "${slot.role}" -- a specialist of this role could never be dispatched for any of the slot's operations`,
+    );
+  }
+  if ((definition.spec.actors ?? []).some((actorEntry) => actorEntry.id === specialistActorId)) {
+    throw new CoordinationError(
+      'validation',
+      `authorizeSpecialistSlot: specialistActorId "${specialistActorId}" collides with a statically-declared spec.actors[] id -- a specialist must be a previously-unknown identity`,
+    );
+  }
+  const missingCapabilities = slot.requiredCapabilities.filter((cap) => !capabilities.includes(cap));
+  if (missingCapabilities.length > 0) {
+    throw new CoordinationError(
+      'validation',
+      `authorizeSpecialistSlot: capabilities [${capabilities.join(', ')}] do not satisfy specialist slot "${slotId}"'s own declared requiredCapabilities -- missing [${missingCapabilities.join(', ')}]`,
+    );
+  }
+
+  const { fgosDir } = paths;
+  assertRefsOwnedBySession(triggerEvidenceRefs, {
+    coordinationId,
+    assignmentRefs: manifest.assignmentRefs,
+    fgosDir,
+    label: `authorizeSpecialistSlot: triggerEvidenceRefs`,
+  });
+  assertRefsOwnedBySession(allowedContextRefs, {
+    coordinationId,
+    assignmentRefs: manifest.assignmentRefs,
+    fgosDir,
+    label: `authorizeSpecialistSlot: allowedContextRefs`,
+  });
+
+  return recordSpecialistAuthorizationLocked(
+    coordinationId,
+    {
+      specialistAuthorizationId,
+      slotId,
+      specialistActorId,
+      role,
+      capabilities,
+      authorizedBy,
+      reason,
+      triggerEvidenceRefs,
+      allowedContextRefs,
+      maxAssignments,
+      expiresAfterRound,
+    },
+    paths,
     { ...opts, maxBindingsForSlot: { slotId, cap: slot.maxBindings } },
   );
 }
@@ -3452,26 +3551,13 @@ export function closeSessionByQuorumLocked(coordinationId, { dissentingActorIds 
     const nodeCwds = new Map();
     for (const node of replayed.dag.declaration.nodes) {
       const nodeAssignments = (replayed.assignments ?? []).filter((entry) => entry.dagNodeId === node.id);
-      let cwd = node.semantics?.canonicalCwd || node.semantics?.cwd;
-      if (!cwd && fgosDir) {
-        for (const asgn of nodeAssignments) {
-          const runsDir = path.join(fgosDir, 'assignments', asgn.assignmentId, 'runs');
-          if (fs.existsSync(runsDir)) {
-            try {
-              const attempts = fs.readdirSync(runsDir);
-              for (const attempt of attempts) {
-                const runJsonPath = path.join(runsDir, attempt, 'run.json');
-                if (fs.existsSync(runJsonPath)) {
-                  const run = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
-                  if (run.cwd) { cwd = run.cwd; break; }
-                }
-              }
-            } catch {}
-          }
-          if (cwd) break;
-        }
-      }
-      nodeCwds.set(node.id, path.resolve(cwd ?? opts.cwd ?? process.cwd()));
+      nodeCwds.set(
+        node.id,
+        resolveNodeCwd(node, nodeAssignments, fgosDir, opts.cwd ?? process.cwd(), {
+          events: replayed.events,
+          results: replayed.results,
+        }),
+      );
     }
     const dagCaveats = computeDagSharedCwdCaveats({
       declaredNodes: replayed.dag.declaration.nodes,
@@ -4277,7 +4363,7 @@ const DEFAULT_MAX_RETRIES = 1;
  * the prior RunResult (it stays on disk, immutable, and stays in the event
  * log as the earlier `result-linked` entry).
  *
- * Resume-safe (R3): always reconciles via `replaySession()` first. Three
+ * Resume-safe (R3): always reconciles via `replaySession()` first. Two
  * crash windows, each closed the same way `createAndExecuteSessionTask`'s
  * own precedent closes the analogous windows for a first dispatch:
  * - A settled attempt already sits on disk with no matching `result-linked`
@@ -4288,12 +4374,12 @@ const DEFAULT_MAX_RETRIES = 1;
  *   itself detects this (`pendingRetries > 0`) and resumes the SAME
  *   declaration rather than appending a second one or re-checking
  *   `maxRetries` again.
- * - A per-attempt claim file already exists with no settled result (crash
- *   mid-dispatch, subprocess killed): fails closed with a named
- *   `CoordinationError` describing exactly how to repair it (R3: "Ambiguous
- *   state fails with repair guidance") -- the SAME posture
- *   `createAndExecuteSessionTask`'s own `dispatch.claim` precedent already
- *   established for a first dispatch, reused unchanged for a retry.
+ * A concurrent second caller for the SAME retry (same process or a
+ * different one) is refused by `executeAssignment()`'s own `admitRunAttempt`
+ * in-flight check, the same guard `createAndExecuteSessionTask` relies on
+ * for a first dispatch -- see that function's doc comment for why it fully
+ * subsumes the per-attempt `retry-${attempt}.claim` marker this module used
+ * to write here (removed, S5).
  *
  * @param {string} coordinationId
  * @param {object} params
@@ -4366,7 +4452,7 @@ export async function retrySessionTask(coordinationId, { assignmentId, reason, m
 
   // recordRunRetry itself resumes a pending-but-undispatched declaration
   // (never double-declares) and enforces maxRetries atomically, lock-held.
-  const { attempt, nextRunId, retryId: declaredRetryId, admissionPayloadDigest: declaredPayloadDigest } = recordRunRetry(
+  const { nextRunId, retryId: declaredRetryId, admissionPayloadDigest: declaredPayloadDigest } = recordRunRetry(
     coordinationId,
     {
       assignmentId,
@@ -4378,29 +4464,6 @@ export async function retrySessionTask(coordinationId, { assignmentId, reason, m
     opts,
   );
 
-  // Per-attempt exclusive claim -- same crash-safety shape as
-  // createAndExecuteSessionTask's own `dispatch.claim`, numbered per retry
-  // attempt so a resumed declaration (same `attempt` number) collides
-  // correctly with a genuinely still-in-flight sibling instead of a
-  // permanent one-shot flag from the FIRST dispatch.
-  //
-  // L2 (Phase 03 R9, deprecation notice): same redundancy as
-  // `dispatch.claim` above, for the same reason -- `admitRunAttempt`'s own
-  // admission-time in-flight check now covers this race more robustly
-  // (cross-process, not just same-process). Kept for one release.
-  const retryClaimPath = path.join(fgosDir, 'assignments', assignmentId, `retry-${attempt}.claim`);
-  try {
-    fs.closeSync(fs.openSync(retryClaimPath, 'wx'));
-  } catch (err) {
-    if (err.code === 'EEXIST') {
-      throw new CoordinationError(
-        'validation',
-        `retrySessionTask: retry attempt ${attempt} for assignment "${assignmentId}" in session "${coordinationId}" already has a claim in progress -- either a concurrent retry is genuinely in flight, or a prior attempt crashed mid-dispatch (ambiguous state, repair guidance: confirm no live process is still running this retry, then remove ${retryClaimPath} before retrying again)`,
-      );
-    }
-    throw err;
-  }
-
   // Schema-2: fence the actual Run admission to the EXACT declared identity
   // -- assignment-runner.mjs's own admission ledger refuses anything that
   // does not supersede `previousRunId` under this `retryId`/payload tuple,
@@ -4409,20 +4472,26 @@ export async function retrySessionTask(coordinationId, { assignmentId, reason, m
     ? { ...opts, retryId: declaredRetryId, predecessorRunId: previousRunId ?? null, payloadDigest: declaredPayloadDigest ?? admissionPayloadDigest, expectedRunId: nextRunId }
     : opts;
 
+  // A concurrent second retry attempt for this Assignment is refused by
+  // `executeAssignment()`'s own `admitRunAttempt` in-flight check -- see
+  // this function's doc comment above for why it fully subsumes the
+  // per-attempt `retry-${attempt}.claim` marker this module used to write
+  // here. Never passes `refuseIfSettled` (unlike `createAndExecuteSessionTask`):
+  // a settled current attempt is exactly what THIS retry is admitted fresh
+  // over.
   let runResult;
   try {
     runResult = await runExecutorAttempt(assignment, executionOpts);
   } catch (err) {
-    // H2: same reasoning as `createAndExecuteSessionTask`'s `dispatch.claim`
-    // above -- `phase: 'post-admission'` means a real dispatch attempt for
-    // this retry is already on record, possibly still live; removing the
-    // claim would let a second concurrent caller dispatch over it.
-    if (err instanceof RunnerConfigError && err.phase !== 'post-admission') {
-      try {
-        fs.unlinkSync(retryClaimPath);
-      } catch (unlinkErr) {
-        if (unlinkErr.code !== 'ENOENT') throw unlinkErr;
-      }
+    if (err instanceof RunnerConfigError && err.code === 'admission-run-in-flight') {
+      // S5: translated back to the same `CoordinationError` shape/message
+      // the retired `retry-${attempt}.claim` marker used to throw here, so
+      // every existing caller matching `instanceof CoordinationError` keeps
+      // working unchanged.
+      throw new CoordinationError(
+        'validation',
+        `retrySessionTask: a retry dispatch is already in progress for assignment "${assignmentId}" in session "${coordinationId}" -- refusing to spawn a second concurrent executor run for the same retry`,
+      );
     }
     throw err;
   }
@@ -4482,9 +4551,7 @@ export async function retrySessionTask(coordinationId, { assignmentId, reason, m
  * (this function's earlier posture) let `newActorId` silently absorb an
  * unrelated, still-required actor's own slot.
  *
- * A crash-file marker closes this gap the SAME way `retrySessionTask`'s own
- * per-attempt `retry-${attempt}.claim` closes the analogous ambiguity for a
- * retry dispatch: a `replaceClaimPath` file, keyed on the exact
+ * A crash-file marker closes this gap: a `replaceClaimPath` file, keyed on the exact
  * `(oldActorId, newActorId)` pair, is written to disk strictly BEFORE the
  * `bindActor` call below. Its presence on a later call is the only thing
  * that can durably prove "this is MY earlier, crashed `bindActor` step" --
@@ -4548,9 +4615,7 @@ export function replaceSessionActor(coordinationId, { oldActorId, newActorId, pe
     );
   }
 
-  // Crash-file marker for THIS EXACT (oldActorId, newActorId) pair -- same
-  // shape/location convention as retrySessionTask's own per-attempt
-  // `retry-${attempt}.claim` (session-engine.mjs, search that name),
+  // Crash-file marker for THIS EXACT (oldActorId, newActorId) pair,
   // written strictly BEFORE bindActor below so its on-disk presence can
   // later prove "this exact call reached this point before", completely
   // separate from (and never inferable from) the event log. See the doc

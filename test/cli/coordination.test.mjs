@@ -22,6 +22,7 @@ import {
   tmpCwdFromTemplate,
 } from './helpers/fgos-cli-harness.mjs';
 import { validateCoordinationRequest } from '../../src/verbs/coordination/schema.mjs';
+import { CHAIN_CONTRACT_VERSION } from '../../src/verbs/coordination/chain.mjs';
 import { StoreError } from '../../src/state/store.mjs';
 import { COMMAND_REGISTRY } from '../../src/cli/command-registry.mjs';
 
@@ -842,7 +843,13 @@ test('fgos coordination chain <track> on a track with zero matching sessions is 
   const chainResult = run(cwd, ['coordination', 'chain', 'never-opened-track']);
   assert.equal(chainResult.status, 0, chainResult.stderr);
   const chainData = envelopeData(chainResult.stdout);
-  assert.deepEqual(chainData, { track: 'never-opened-track', cells: [], activeCell: null, nextAction: null });
+  assert.deepEqual(chainData, {
+    contractVersion: CHAIN_CONTRACT_VERSION,
+    track: 'never-opened-track',
+    cells: [],
+    activeCell: null,
+    nextAction: null,
+  });
 });
 
 test('fgos coordination chain requires a track argument', () => {
@@ -858,13 +865,13 @@ test('R5: every place that enumerates the coordination sub-verb list (help text,
   const source = fs.readFileSync(FGOS, 'utf8');
   assert.match(
     source,
-    /coordination requires a sub-verb: fgos coordination <start\|status\|operation\|authorize-and-dispatch\|fan-out\|contribution\|human-turn\|disposition\|close\|run\|show\|actions\|launch-master-loop\|chain\|recover>/,
-    'requireField usage message must enumerate all subverbs including "close", "actions", and "chain"',
+    /coordination requires a sub-verb: fgos coordination <start\|status\|operation\|authorize-and-dispatch\|fan-out\|contribution\|human-turn\|disposition\|specialist-authorize\|close\|run\|show\|actions\|launch-master-loop\|chain\|recover\|pack>/,
+    'requireField usage message must enumerate all subverbs including "close", "actions", "chain", "pack", and "specialist-authorize"',
   );
   assert.match(
     source,
-    /coordination: unknown sub-verb "\$\{sub\}" \(known: start, status, operation, authorize-and-dispatch, fan-out, contribution, human-turn, disposition, close, run, show, actions, launch-master-loop, chain, recover\)/,
-    'unknown-sub-verb error message must enumerate all subverbs including "close", "actions", and "chain"',
+    /coordination: unknown sub-verb "\$\{sub\}" \(known: start, status, operation, authorize-and-dispatch, fan-out, contribution, human-turn, disposition, specialist-authorize, close, run, show, actions, launch-master-loop, chain, recover, pack\)/,
+    'unknown-sub-verb error message must enumerate all subverbs including "close", "actions", "chain", "pack", and "specialist-authorize"',
   );
 
   const entry = COMMAND_REGISTRY.find((e) => e.name === 'coordination');
@@ -872,20 +879,28 @@ test('R5: every place that enumerates the coordination sub-verb list (help text,
   assert.match(entry.invoke, /close/, 'registry invoke string must enumerate "close"');
   assert.match(entry.invoke, /chain/, 'registry invoke string must enumerate "chain"');
   assert.match(entry.invoke, /actions/, 'registry invoke string must enumerate "actions"');
+  assert.match(entry.invoke, /pack/, 'registry invoke string must enumerate "pack"');
+  assert.match(entry.invoke, /specialist-authorize/, 'registry invoke string must enumerate "specialist-authorize"');
   assert.ok(entry.parameters.properties.sub.enum.includes('close'), 'registry sub enum must include "close"');
   assert.ok(entry.parameters.properties.sub.enum.includes('actions'), 'registry sub enum must include "actions"');
   assert.ok(entry.parameters.properties.sub.enum.includes('chain'), 'registry sub enum must include "chain"');
+  assert.ok(entry.parameters.properties.sub.enum.includes('pack'), 'registry sub enum must include "pack"');
+  assert.ok(entry.parameters.properties.sub.enum.includes('specialist-authorize'), 'registry sub enum must include "specialist-authorize"');
   assert.ok(!entry.parameters.properties.sub.enum.includes('clean'), 'registry sub enum must not include "clean"');
   assert.ok(!entry.parameters.properties.sub.enum.includes('inspect'), 'registry sub enum must not include "inspect"');
   assert.match(entry.description, /"close"/, 'registry description must document "close"');
   assert.match(entry.description, /"actions"/, 'registry description must document "actions"');
   assert.match(entry.description, /"chain"/, 'registry description must document "chain"');
+  assert.match(entry.description, /"pack/, 'registry description must document "pack"');
+  assert.match(entry.description, /"specialist-authorize"/, 'registry description must document "specialist-authorize"');
   assert.ok(entry.examples.some((e) => e.includes('chain')), 'registry examples must include a "chain" example');
   assert.ok(entry.examples.some((e) => e.includes('actions')), 'registry examples must include an "actions" example');
+  assert.ok(entry.examples.some((e) => e.includes('pack')), 'registry examples must include a "pack" example');
+  assert.ok(entry.examples.some((e) => e.includes('specialist-authorize')), 'registry examples must include a "specialist-authorize" example');
 
   const unknownSubResult = run(tmpCwdFromTemplate(), ['coordination', 'bogus-sub-verb']);
   assert.notEqual(unknownSubResult.status, 0);
-  assert.match(unknownSubResult.stderr, /known: start, status, operation, authorize-and-dispatch, fan-out, contribution, human-turn, disposition, close, run, show, actions, launch-master-loop, chain, recover/);
+  assert.match(unknownSubResult.stderr, /known: start, status, operation, authorize-and-dispatch, fan-out, contribution, human-turn, disposition, specialist-authorize, close, run, show, actions, launch-master-loop, chain, recover, pack/);
 });
 
 test('coordination CLI option validation: rejects unknown, mis-scoped, and forbidden options per subverb', () => {
@@ -922,7 +937,7 @@ test('coordination CLI option validation: rejects unknown, mis-scoped, and forbi
   // 6. Missing sub-verb usage error enumerates public subverbs
   const resNoSub = run(cwd, ['coordination']);
   assert.notEqual(resNoSub.status, 0);
-  assert.match(resNoSub.stderr, /coordination requires a sub-verb: fgos coordination <start\|status\|operation\|authorize-and-dispatch\|fan-out\|contribution\|human-turn\|disposition\|close\|run\|show\|actions\|launch-master-loop\|chain\|recover>/);
+  assert.match(resNoSub.stderr, /coordination requires a sub-verb: fgos coordination <start\|status\|operation\|authorize-and-dispatch\|fan-out\|contribution\|human-turn\|disposition\|specialist-authorize\|close\|run\|show\|actions\|launch-master-loop\|chain\|recover\|pack>/);
 });
 
 // ─── Semantic coordination CLI subcommands ─────────────────────────────────
@@ -951,6 +966,156 @@ test('fgos coordination start creates session and fgos coordination status proje
   assert.equal(statusData.session.status, 'active');
   assert.ok(Array.isArray(statusData.actions));
   assert.ok(statusData.actions.length > 0);
+});
+
+// ─── I24b (Phase 5 items 4 pt.2/5/6): the "specialist-authorize" subverb --
+// the locked/typed-action door, distinct from the raw "specialist-authorize"
+// request-step type reachable through "run"/"start --steps" (I24a). ───────
+
+function writeSpecialistSlotProtocol(cwd) {
+  const dir = path.join(cwd, '.fgos', 'coordination-protocols');
+  fs.mkdirSync(dir, { recursive: true });
+  const definition = {
+    apiVersion: 'fgos.dev/v1alpha1',
+    kind: 'FlowDefinition',
+    metadata: { id: 'test.coordination-protocol.cli-specialist-authorize', version: '1.0.0' },
+    spec: {
+      profile: {
+        kind: 'CoordinationProtocol',
+        topology: {
+          specialistSlots: [
+            {
+              id: 'review-slot',
+              role: 'specialist',
+              operationRefs: ['specialist-review'],
+              requiredCapabilities: ['deep-review'],
+              allowedVisibilityWindows: [],
+              maxBindings: 2,
+              maxAssignments: 3,
+            },
+          ],
+        },
+      },
+      roles: ['doer', 'specialist'],
+      actors: [{ id: 'doer', role: 'doer' }],
+      operations: [
+        { id: 'produce-candidate', role: 'doer', result: { kind: 'work-product', evidenceRequired: 'reported' } },
+        { id: 'specialist-review', role: 'specialist', capabilities: ['deep-review'], result: { kind: 'advisory', evidenceRequired: 'reported' } },
+      ],
+      graph: {
+        entry: 'phase-produce',
+        nodes: [
+          { id: 'phase-produce', operations: [{ ref: 'produce-candidate', actor: 'doer' }], transitions: ['phase-specialist'] },
+          {
+            id: 'phase-specialist',
+            operations: [{ ref: 'specialist-review', specialistSlotRef: 'review-slot', activation: { mode: 'driver-authorized' } }],
+            transitions: [],
+          },
+        ],
+      },
+    },
+  };
+  fs.writeFileSync(path.join(dir, 'cli-specialist-authorize.json'), `${JSON.stringify(definition, null, 2)}\n`);
+}
+
+test('fgos coordination specialist-authorize: the locked/typed-action door recruits a specialist into a declared slot, and resumes idempotently on an identical retry', () => {
+  const cwd = tmpCwdFromTemplate();
+  writeFakeExecutorConfig(cwd);
+  writeSpecialistSlotProtocol(cwd);
+
+  const startRes = run(cwd, [
+    'coordination', 'start', 'coord-cli-specialist-1',
+    '--kind', 'declared-protocol',
+    '--protocol', 'test.coordination-protocol.cli-specialist-authorize',
+    '--objective', 'Recruit a specialist through the CLI subverb.',
+    '--writer-id', 'driver-main',
+  ]);
+  assert.equal(startRes.status, 0, startRes.stderr);
+  const coordinationId = envelopeData(startRes.stdout).coordinationId;
+
+  const actionsRes = run(cwd, ['coordination', 'actions', coordinationId]);
+  assert.equal(actionsRes.status, 0, actionsRes.stderr);
+  const actionsData = envelopeData(actionsRes.stdout);
+  const specialistAction = actionsData.actions.find((a) => a.kind === 'specialist' && a.target?.slotId === 'review-slot');
+  assert.ok(specialistAction, 'expected a "specialist" action for the declared review-slot');
+  assert.equal(specialistAction.authorizable, true);
+  assert.equal(specialistAction.authorized, false);
+  assert.equal(specialistAction.exhausted, false);
+
+  const authRes = run(cwd, [
+    'coordination', 'specialist-authorize', coordinationId,
+    '--action-key', specialistAction.actionKey,
+    '--writer-id', 'driver-main',
+    '--specialist-actor-id', 'specialist-alpha',
+    '--reason', 'Primary review needs a domain specialist.',
+    '--capabilities', 'deep-review',
+    '--max-assignments', '3',
+    '--expires-after-round', '10',
+  ]);
+  assert.equal(authRes.status, 0, authRes.stderr);
+  const authData = envelopeData(authRes.stdout);
+  assert.equal(authData.slotId, 'review-slot');
+  assert.equal(authData.specialistActorId, 'specialist-alpha');
+  assert.equal(authData.appended, true);
+
+  const showRes = run(cwd, ['coordination', 'show', coordinationId]);
+  const showData = envelopeData(showRes.stdout);
+  assert.equal(showData.specialistAuthorizations.length, 1);
+  assert.equal(showData.specialistAuthorizations[0].specialistActorId, 'specialist-alpha');
+  assert.equal(showData.specialistAuthorizations[0].slotId, 'review-slot');
+
+  // The projected "specialist" action must now reflect the live binding.
+  const actionsRes2 = run(cwd, ['coordination', 'actions', coordinationId]);
+  const specialistAction2 = envelopeData(actionsRes2.stdout).actions.find((a) => a.kind === 'specialist' && a.target?.slotId === 'review-slot');
+  assert.equal(specialistAction2.authorized, true);
+  assert.equal(specialistAction2.exhausted, false, 'maxBindings is 2 and only 1 distinct specialist has been recruited so far');
+
+  // Retrying the SAME actionKey with an IDENTICAL payload resumes
+  // idempotently -- the general actionKey-reconstruction contract every
+  // typed action already honors (action-precondition.mjs's own doc comment):
+  // same actionKey + same payload -> idempotent return, never a silent
+  // second event, never a refusal either.
+  const retryRes = run(cwd, [
+    'coordination', 'specialist-authorize', coordinationId,
+    '--action-key', specialistAction.actionKey,
+    '--writer-id', 'driver-main',
+    '--specialist-actor-id', 'specialist-alpha',
+    '--reason', 'Primary review needs a domain specialist.',
+    '--capabilities', 'deep-review',
+    '--max-assignments', '3',
+    '--expires-after-round', '10',
+  ]);
+  assert.equal(retryRes.status, 0, retryRes.stderr);
+  const retryData = envelopeData(retryRes.stdout);
+  assert.equal(retryData.slotId, 'review-slot');
+  assert.equal(retryData.specialistActorId, 'specialist-alpha');
+  assert.equal(retryData.appended, false, 'an identical retry must resume, never duplicate');
+  assert.equal(
+    envelopeData(run(cwd, ['coordination', 'show', coordinationId]).stdout).specialistAuthorizations.length,
+    1,
+    'an identical retry must never append a second specialist-authorized event',
+  );
+
+  // The SAME actionKey retried with a genuinely DIFFERENT payload (a
+  // different reason) must still be refused -- an actionKey is not a blank
+  // check for any later payload, only for an exact repeat.
+  const conflictRes = run(cwd, [
+    'coordination', 'specialist-authorize', coordinationId,
+    '--action-key', specialistAction.actionKey,
+    '--writer-id', 'driver-main',
+    '--specialist-actor-id', 'specialist-alpha',
+    '--reason', 'A completely different reason for this authorization.',
+    '--capabilities', 'deep-review',
+    '--max-assignments', '3',
+    '--expires-after-round', '10',
+  ]);
+  assert.notEqual(conflictRes.status, 0);
+  assert.match(conflictRes.stderr, /payload-conflict|different payload/i);
+  assert.equal(
+    envelopeData(run(cwd, ['coordination', 'show', coordinationId]).stdout).specialistAuthorizations.length,
+    1,
+    'a payload-conflict retry must never append a second specialist-authorized event',
+  );
 });
 
 test('fgos coordination semantic workflow: start -> operation -> close', () => {

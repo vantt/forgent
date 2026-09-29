@@ -43,11 +43,14 @@ import { repairTruncatedLastLine, EventLogError } from '../src/state/events.mjs'
 import { rebuildViewFromDir } from '../src/state/replay.mjs';
 import { deriveTitle, classify, generateId } from '../src/intake/classify.mjs';
 import { wrapEnvelope } from '../src/state/envelope.mjs';
-import { loadRunnerConfig, ensureRunnerConfigForDir, runDispatchCli, DispatchError } from '../src/runner/dispatch.mjs';
+import { loadRunnerConfig, ensureRunnerConfigForDir, loadRunnerConfigFromDir, RunnerConfigError, runDispatchCli, DispatchError } from '../src/runner/dispatch.mjs';
 import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
 import { checkDispatchAttestation } from '../src/runner/attestation-guard.mjs';
 import { classifyDispatchConfidence } from '../src/report/dispatch-confidence.mjs';
 import { formatDeprecation } from '../src/cli/deprecation.mjs';
+import { lintPlanCapabilityAnnotations } from '../src/report/capability-plan-lint.mjs';
+import { matchCapability, deriveForm, CapabilityMatchError } from '../src/runner/capability-match.mjs';
+import { appendWorkerLog } from '../src/runner/worker-log.mjs';
 
 // tsk-1qi: this running copy's own package root -- the source
 // `materializeSkillsIntoProject` copies `.agents/skills/*` FROM, when
@@ -98,6 +101,7 @@ import {
   executeContributionUseCase,
   executeHumanTurnUseCase,
   executeDispositionUseCase,
+  executeSpecialistAuthorizeUseCase,
   executeCloseUseCase,
 } from '../src/verbs/coordination/actions.mjs';
 import { startCoordinationUseCase } from '../src/verbs/coordination/start.mjs';
@@ -110,6 +114,8 @@ import { watchRunUseCase } from '../src/verbs/dispatch/watch.mjs';
 import { recoverObserveUseCase, recoverApplyUseCase } from '../src/verbs/dispatch/recover.mjs';
 import { chainCoordinationUseCase } from '../src/verbs/coordination/chain.mjs';
 import { recoverSessionObserveUseCase, recoverSessionApplyUseCase } from '../src/verbs/coordination/recover.mjs';
+import { loadProtocolPack, runGroupThinkingRequest } from '../src/verbs/coordination/group-thinking-pack.mjs';
+import { loadCoordinationProtocol } from '../src/runner/definitions/protocol-loader.mjs';
 import { unreleasedHasEntries } from '../src/setup/registrations.mjs';
 import { branchNameFor, branchExists, provisionDependencies, resyncWorktree, detectTrunk, isMainWorktree, currentHead, realpathOrSelf as realpathOr } from '../src/runner/worktree.mjs';
 import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
@@ -2488,6 +2494,116 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       return computedSchedule(dir, candidateIds);
     }
 
+    // Read-only door onto lintPlanCapabilityAnnotations (src/report/
+    // capability-plan-lint.mjs): a plan author's own static check, never
+    // wired into `doctor` or any automatic gate. `registered` is always
+    // `Object.keys(runner.capabilities)` from THIS repo's own live config,
+    // read via `loadRunnerConfigFromDir` -- unlike `ensureRunnerConfigForDir`,
+    // that never bootstraps or rewrites `.fgos/config.json`, so a read-only
+    // lint never mutates state as a side effect of being run.
+    case 'plan-lint': {
+      const rawPath = optionalField(positional[0], 'plan-lint requires a <path> to a plan.md file, e.g. `fgos plan-lint plans/<track>/plan.md`.');
+      if (rawPath === undefined) {
+        throw new StoreError('precondition', 'plan-lint requires a <path> to a plan.md file, e.g. `fgos plan-lint plans/<track>/plan.md`.');
+      }
+      const absPath = path.resolve(process.cwd(), rawPath);
+      if (!fs.existsSync(absPath) || !fs.statSync(absPath).isFile()) {
+        throw new StoreError('precondition', `plan-lint: "${rawPath}" is not an existing file.`);
+      }
+      if (flags.cell === true || flags.cell === null || flags.cell === '') {
+        throw new StoreError('precondition', 'plan-lint --cell requires a non-empty value.');
+      }
+      const cellId = flags.cell === undefined ? undefined : flags.cell;
+      const text = fs.readFileSync(absPath, 'utf8');
+      const repoRoot = path.dirname(dir);
+      let cfg;
+      try {
+        cfg = loadRunnerConfigFromDir(repoRoot);
+      } catch (err) {
+        if (err instanceof RunnerConfigError) {
+          throw new StoreError('precondition', `plan-lint: ${err.message}`);
+        }
+        throw err;
+      }
+      const catalog = cfg.capabilities ?? {};
+      const registered = Object.keys(catalog);
+      const result = lintPlanCapabilityAnnotations(text, registered, cellId !== undefined ? { cellId } : {});
+      const units = result.units.map((unit) => ({
+        ...unit,
+        description: unit.capability != null ? (catalog[unit.capability]?.description ?? null) : null,
+      }));
+      return { path: absPath, ok: result.ok, units, findings: result.findings };
+    }
+
+    // Q1 steering CLI door onto matchCapability (src/runner/
+    // capability-match.mjs, a pure function this case never re-implements):
+    // reads the live runner config's `capabilities` catalog via
+    // `ensureRunnerConfigForDir`, matches declared DemandFacts against it,
+    // and appends exactly one `.fgos/logs/capability-match.log` line per
+    // call. Read-only with respect to state -- the log append (git-ignored
+    // operational text, per worker-log.mjs) is the only side effect. Never
+    // calls `decide`, never touches `capabilities.<name>.prefer` -- Q2
+    // binding is a separate, later step.
+    case 'capability': {
+      const sub = requireField(positional[0], 'capability requires a sub-verb: fgos capability match --demand <json>');
+      if (sub !== 'match') {
+        throw new StoreError('validation', `capability: unknown sub-verb "${sub}" (known: match).`);
+      }
+      const demandRaw = requireField(flags.demand, 'capability match requires --demand <json>');
+      let facts;
+      try {
+        facts = JSON.parse(demandRaw);
+      } catch (err) {
+        throw new StoreError('validation', `capability match --demand must be valid JSON: ${err.message}`);
+      }
+      const overrideValue = optionalField(flags.override, 'capability match --override must be a non-empty string when present');
+      const reasonValue = optionalField(flags.reason, 'capability match --reason must be a non-empty string when present');
+      if (overrideValue !== undefined) {
+        requireField(reasonValue, 'capability match --override requires --reason <text>');
+      } else if (reasonValue !== undefined) {
+        throw new StoreError('validation', 'capability match --reason requires --override <capability>.');
+      }
+      const repoRootForCapability = path.dirname(dir);
+      let cfg;
+      try {
+        cfg = ensureRunnerConfigForDir(repoRootForCapability);
+      } catch (err) {
+        if (err instanceof RunnerConfigError) {
+          throw new StoreError('precondition', `capability match: ${err.message}`);
+        }
+        throw err;
+      }
+      const catalog = cfg.capabilities ?? {};
+      let result;
+      try {
+        result = matchCapability(facts, catalog);
+      } catch (err) {
+        if (err instanceof CapabilityMatchError) {
+          throw new StoreError('validation', `capability match: ${err.message}`);
+        }
+        throw err;
+      }
+      if (overrideValue !== undefined) {
+        const canonicalOverride = Object.prototype.hasOwnProperty.call(catalog, overrideValue)
+          ? overrideValue
+          : Object.entries(catalog).find(([, entry]) => Array.isArray(entry?.aliases) && entry.aliases.includes(overrideValue))?.[0];
+        if (canonicalOverride === undefined) {
+          throw new StoreError('validation', `capability match --override "${overrideValue}" is not a registered runner.capabilities key or alias.`);
+        }
+        result = {
+          ...result,
+          capability: canonicalOverride,
+          source: 'override',
+          reason: reasonValue.replace(/[\r\n]+/g, ' '),
+          form: deriveForm(result.facts, canonicalOverride),
+        };
+      }
+      appendWorkerLog(dir, 'capability-match', {
+        message: `source=${result.source} capability=${result.capability ?? 'null'} form=${result.form}: ${result.reason}`,
+      });
+      return result;
+    }
+
     // Request-class per D1 (same contract as `ready`/`triage`/`conflicts`): a
     // pure read. Merge-readiness ranking (docs/history/merge-standardization/
     // CONTEXT.md/plan.md): "list" surfaces which `proposed` items are
@@ -2685,6 +2801,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         'contribution',
         'human-turn',
         'disposition',
+        'specialist-authorize',
         'close',
         'run',
         'show',
@@ -2692,11 +2809,12 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         'launch-master-loop',
         'chain',
         'recover',
+        'pack',
       ];
 
-      const sub = requireField(positional[0], 'coordination requires a sub-verb: fgos coordination <start|status|operation|authorize-and-dispatch|fan-out|contribution|human-turn|disposition|close|run|show|actions|launch-master-loop|chain|recover> ...');
+      const sub = requireField(positional[0], 'coordination requires a sub-verb: fgos coordination <start|status|operation|authorize-and-dispatch|fan-out|contribution|human-turn|disposition|specialist-authorize|close|run|show|actions|launch-master-loop|chain|recover|pack> ...');
       if (!KNOWN_COORDINATION_SUBVERBS.includes(sub)) {
-        throw new StoreError('validation', `coordination: unknown sub-verb "${sub}" (known: start, status, operation, authorize-and-dispatch, fan-out, contribution, human-turn, disposition, close, run, show, actions, launch-master-loop, chain, recover).`);
+        throw new StoreError('validation', `coordination: unknown sub-verb "${sub}" (known: start, status, operation, authorize-and-dispatch, fan-out, contribution, human-turn, disposition, specialist-authorize, close, run, show, actions, launch-master-loop, chain, recover, pack).`);
       }
 
       const COMMON_FLAGS = new Set(['dir', 'cwd', 'json']);
@@ -2751,6 +2869,12 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           'id', 'action-key', 'writer-id', 'disposition', 'rationale',
           'evidence-refs',
         ]),
+        'specialist-authorize': new Set([
+          ...COMMON_FLAGS,
+          'id', 'action-key', 'writer-id', 'specialist-actor-id', 'reason',
+          'capabilities', 'max-assignments', 'expires-after-round',
+          'trigger-evidence-refs', 'allowed-context-refs',
+        ]),
         'close': new Set([
           ...COMMON_FLAGS,
           'file', 'id', 'action-key', 'writer-id', 'authorized-by',
@@ -2781,6 +2905,10 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           ...COMMON_FLAGS,
           'id', 'action', 'expected-snapshot', 'expected-event-seq',
           'expected-run-control-epoch', 'expected-expires-at', 'action-key',
+        ]),
+        'pack': new Set([
+          ...COMMON_FLAGS,
+          'protocol', 'protocol-id', 'file', 'executor', 'model', 'tier',
         ]),
       };
 
@@ -3031,6 +3159,32 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         );
       }
 
+      if (sub === 'specialist-authorize') {
+        const id = requireField(positional[1] ?? flags.id, 'coordination specialist-authorize requires an id: fgos coordination specialist-authorize <id> --action-key <key> --writer-id <id> --specialist-actor-id <id> --reason <text> --max-assignments <n> --expires-after-round <n>');
+        const actionKey = requireField(flags['action-key'], 'coordination specialist-authorize requires --action-key <sha256:key>');
+        const writerId = requireField(flags['writer-id'], 'coordination specialist-authorize requires --writer-id <id>');
+        const specialistActorId = requireField(flags['specialist-actor-id'], 'coordination specialist-authorize requires --specialist-actor-id <id>');
+        const reason = requireField(flags.reason, 'coordination specialist-authorize requires --reason <text>');
+        const maxAssignments = requireField(flags['max-assignments'], 'coordination specialist-authorize requires --max-assignments <n>');
+        const expiresAfterRound = requireField(flags['expires-after-round'], 'coordination specialist-authorize requires --expires-after-round <n>');
+
+        return await executeSpecialistAuthorizeUseCase(
+          { cwd: cwdForCoordination, repoRoot: repoRootForCoordination },
+          {
+            id,
+            actionKey,
+            writerId,
+            specialistActorId,
+            reason,
+            capabilities: flags.capabilities,
+            maxAssignments,
+            expiresAfterRound,
+            triggerEvidenceRefs: flags['trigger-evidence-refs'],
+            allowedContextRefs: flags['allowed-context-refs'],
+          },
+        );
+      }
+
       if (sub === 'run') {
         const filePath = requireField(flags.file, 'coordination run requires --file <request-path>: fgos coordination run --file <request.json>');
         return await runCoordinationUseCase(
@@ -3147,6 +3301,51 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           expectedExpiresAt: requireField(flags['expected-expires-at'], 'coordination recover --action requires --expected-expires-at'),
           actionKey: requireField(flags['action-key'], 'coordination recover --action requires --action-key'),
         });
+      }
+      if (sub === 'pack') {
+        // Public CLI door onto the group-thinking Protocol Pack gate
+        // (src/verbs/coordination/group-thinking-pack.mjs) -- replaces the
+        // inline `node -e` scripts the fgos-group-thinking skill used to
+        // instruct a dispatching agent to author by hand. A subverb under
+        // the already-registered `coordination` verb, not a new top-level
+        // verb: no COMMAND_REGISTRY.length growth, no rust-host
+        // regeneration. Every function below is called unmodified -- this
+        // block never reimplements pack-membership or dispatch logic.
+        const KNOWN_PACK_SUBVERBS = ['list', 'show-protocol', 'run'];
+        const packSub = requireField(positional[1], 'coordination pack requires a sub-verb: fgos coordination pack <list|show-protocol|run> ...');
+        if (!KNOWN_PACK_SUBVERBS.includes(packSub)) {
+          throw new StoreError('validation', `coordination pack: unknown sub-verb "${packSub}" (known: list, show-protocol, run).`);
+        }
+
+        if (packSub === 'list') {
+          return loadProtocolPack();
+        }
+
+        if (packSub === 'show-protocol') {
+          const protocolId = requireField(
+            positional[2] ?? flags.protocol ?? flags['protocol-id'],
+            'coordination pack show-protocol requires a protocol id: fgos coordination pack show-protocol <id>',
+          );
+          return loadCoordinationProtocol(protocolId, { cwd: cwdForCoordination });
+        }
+
+        // packSub === 'run'
+        const protocolId = requireField(flags.protocol ?? flags['protocol-id'], 'coordination pack run requires --protocol <id>');
+        const filePath = requireField(flags.file, 'coordination pack run requires --file <request-path>');
+        return await runGroupThinkingRequest(
+          {
+            cwd: cwdForCoordination,
+            repoRoot: repoRootForCoordination,
+            runnerConfig: ensureRunnerConfigForDir(repoRootForCoordination),
+          },
+          {
+            protocolId,
+            requestPath: path.resolve(process.cwd(), filePath),
+            cliExecutor: flags.executor,
+            cliModel: flags.model,
+            cliTier: flags.tier,
+          },
+        );
       }
       throw new StoreError('validation', `coordination: unknown sub-verb "${sub}" (known: ${KNOWN_COORDINATION_SUBVERBS.join(', ')}).`);
     }
@@ -3549,6 +3748,26 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // claim) reads null here — settleClaim's own legacy fallback handles
       // that case without a claimId.
       const activeClaim = readClaim(dir, id);
+      if (flags.to === 'blocked' || flags.blocked === true) {
+        const reason = flags.reason || 'executor-failed';
+        const { event } = settleClaim(dir, {
+          id,
+          claimId: activeClaim?.claimId,
+          finalStatus: 'blocked',
+          reason,
+          role: item.claimRole ?? 'session',
+        });
+        addOutcome(dir, { id, actual: { outcome: 'blocked', passed: false, attempts: 1, errorClass: reason } });
+        addFriction(dir, {
+          id,
+          disposition: 'blocked',
+          errorClass: reason,
+          layer: 'executor',
+          attempts: 1,
+          detail: reason,
+        });
+        return { id, from: 'doing', to: 'blocked', source: 'return', reason, seq: event?.seq };
+      }
       // tsk-1zo: a verify never upgraded from its discovery/submit-stage
       // placeholder sentinel shells out as literal text (runGoalCheck ->
       // runCommand) and fails with a cryptic raw shell error ("<first
@@ -4769,6 +4988,32 @@ function handleVerbHelp(verb) {
 // byte-identical to the wrapEnvelope + JSON path. `--pretty` itself IS
 // CTR001's documented exception here: an explicit human-readable rendering
 // opt-out via an explicit flag, not a verb's default payload.
+// Default (non-`--json`) rendering for `fgos plan-lint`: prints each unit
+// alongside the catalog's own `description` text, so a reader can see a
+// registered capability's real meaning next to a unit whose own title text
+// reads nothing like it (e.g. a unit titled "extract shared driver
+// discipline" declaring `code:implement` -- the description makes clear
+// that is the canonical coding-implementation capability, not a mismatch).
+function renderPlanLintReport(data) {
+  const lines = [];
+  lines.push(`fgos plan-lint: ${data.path}`);
+  lines.push(data.ok ? 'OK -- no hard findings' : 'FAILED -- hard findings present');
+  lines.push('');
+  for (const unit of data.units) {
+    const capText = unit.capability ?? '(none)';
+    const descText = unit.description ? ` -- ${unit.description}` : '';
+    lines.push(`[${unit.source}] ${unit.unit} :: ${capText}${descText}`);
+  }
+  if (data.findings.length > 0) {
+    lines.push('');
+    lines.push('Findings:');
+    for (const f of data.findings) {
+      lines.push(`  ${f.severity.toUpperCase()} ${f.code} (line ${f.line ?? '-'}): ${f.message}`);
+    }
+  }
+  return `${lines.join('\n')}\n`;
+}
+
 function renderPretty(verb, data) {
   const lines = [];
   if (verb === 'doctor') {
@@ -4976,7 +5221,7 @@ const MUTATING_SUBCOMMAND_PREDICATES = {
   knowledge: (positional) => positional[0] === 'attest',
   coordination: (positional, flags) => [
     'run', 'close', 'launch-master-loop', 'start', 'operation', 'authorize-and-dispatch',
-    'fan-out', 'contribution', 'human-turn', 'disposition',
+    'fan-out', 'contribution', 'human-turn', 'disposition', 'specialist-authorize',
   ].includes(positional[0]) || (positional[0] === 'recover' && flags.action !== undefined),
   merge: (positional) => positional[0] === 'next',
   evolve: (positional, flags) => flags.submit !== undefined,
@@ -5112,10 +5357,16 @@ async function main() {
     const data = await runVerb(verb, flags, positional, dir, rest);
     if (flags.pretty && (verb === 'setup' || verb === 'doctor')) {
       process.stdout.write(renderPretty(verb, data));
+    } else if (verb === 'plan-lint' && !flags.json) {
+      process.stdout.write(renderPlanLintReport(data));
     } else {
       process.stdout.write(`${JSON.stringify(wrapEnvelope(data), null, 2)}\n`);
     }
-    process.exitCode = 0;
+    // `plan-lint` is the one verb whose exit code is data-dependent (0 clean,
+    // 1 a hard finding present) rather than always-0-unless-thrown -- its own
+    // contract, distinct from the StoreError/EXIT_CODES category map every
+    // other verb uses for a THROWN refusal.
+    process.exitCode = verb === 'plan-lint' ? (data.ok ? 0 : 1) : 0;
   } catch (err) {
     // tsk-5z0: record before reporting, and only say the record exists when
     // one actually landed — `recordInvocationFault` returns null when the

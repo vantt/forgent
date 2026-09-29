@@ -69,19 +69,28 @@
 # "Specialists": `answer-specialist-question` binds via
 # `specialistSlotRef: specialist-answer-slot`, reusing
 # `recordSpecialistAuthorization`/`dispatchDeclaredOperation`'s existing
-# specialist-slot mechanism unchanged (Phase 09, Step 09 MVP9) -- no new
-# step type, no new store/session-engine function. Named gap, not invented
-# here: `src/verbs/coordination/run.mjs`'s own request-step vocabulary
-# (`operation | authorize | disposition | contribution | human-turn |
-# fan-out`) has no `specialist-authorize` step, so a specialist slot can
-# only be authorized via a direct `authorizeSpecialistSlot` engine call
-# today, not through `fgos coordination run --file`/the pack gate -- the
-# SAME class of pre-existing wiring gap P10.10 named and later closed for
-# the `contribution` step type. Filed as `tsk-3xk` (general to every
-# protocol's own use of a specialist slot, not unique to this one), left
-# unfixed here per phase-03's own "no speculative kernel work" instruction
-# for this cell (this cell's
-# May-Touch list is the protocol/pack/test files below, not `run.mjs`).
+# specialist-slot mechanism unchanged (Phase 09, Step 09 MVP9). Formerly a
+# named gap (`tsk-3xk`, general to every protocol's own use of a specialist
+# slot): `src/verbs/coordination/run.mjs`'s own request-step vocabulary had
+# no `specialist-authorize` step, so a specialist slot could only be
+# authorized via a direct `authorizeSpecialistSlot` engine call, not through
+# `fgos coordination run --file` -- the SAME class of pre-existing wiring
+# gap P10.10 named and later closed for the `contribution` step type.
+# Closed by I24a (Phase 5 item 4): a `specialist-authorize` step type now
+# exists in that vocabulary, reachable directly through any raw coordination
+# request door -- `fgos coordination run --file`, `fgos coordination start
+# --steps`, the headless adapter. It remains unreachable through
+# `fgos-group-thinking`'s own pack gate -- `runGroupThinkingRequest`
+# explicitly refuses this step type (Group-Thinking Protocol Pack bypass #4
+# stays refused,
+# `docs/architect/agent-coordination/contracts/coordination-session.md`'s
+# "Five bypasses" section). I24b landed the driver-authenticated
+# typed-action door for this same capability -- the `fgos coordination
+# specialist-authorize` subverb, reaching the locked
+# `authorizeSpecialistSlotLocked`/`recordSpecialistAuthorizationLocked`
+# twins -- which never goes through the pack gate at all, so a session
+# opened via `pack run` against this protocol can still have a specialist
+# authorized through that separate subverb.
 # See this cell's own doer-report.md for the conformance test's resulting
 # split between pack-gate-level and direct-engine-level assertions.
 #
@@ -171,6 +180,15 @@
 # executor/tier/persona selection is the request's own `actors[]` field,
 # proven protocol-agnostic by P10.1/P10.3 and re-exercised by this cell's
 # own heterogeneous-actor-bindings conformance case.
+#
+# Unit I21 (Phase 5 item 2): `red-team-packet` alone declares
+# `policy.distinctProviderFrom` (a portable REQUIREMENT, not a pin --
+# resolved against `runnerConfig.capabilities.<name>.prefer` by
+# `src/verbs/coordination/binding.mjs`, same trusted delivery as `actors[]`
+# above). No operation here declares `policy.capability` -- every result
+# here is `advisory`, so the composer's own fallback derivation
+# ("<domain>:review" if registered, else the generic "review" slot)
+# already applies with nothing to declare.
 #
 # ── Artifact envelope (phase-03 item 2) ─────────────────────────────────────
 # No new registry, no new schema field: `task.contractTemplate`
@@ -392,6 +410,14 @@ spec:
       role: red-team
       policy:
         minTier: flagship
+        # Unit I21 (Phase 5 item 2, design record §12 item 3): `preferred`,
+        # not `required` -- a single-provider runner config must still be
+        # able to run this panel; Phase 7 4c decides whether this stays
+        # `preferred` or is raised once provider diversity is a hard
+        # platform expectation.
+        distinctProviderFrom:
+          roles: [synthesizer]
+          strength: preferred
       task:
         contractTemplate: architecture-advisory-panel-v1-redteam
       result:

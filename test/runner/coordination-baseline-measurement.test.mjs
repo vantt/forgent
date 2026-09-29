@@ -19,7 +19,10 @@ test('baseline harness contract and output shape', () => {
   assert.ok(result.source.commit);
   assert.ok(result.source.dirtyFingerprint.startsWith('sha256:'));
   assert.ok(result.source.lockfileDigest.startsWith('sha256:'));
-  assert.equal(result.skills.length, 3);
+  // Unit I29: CANONICAL_SKILL_PATHS dropped fgos-plan-loop (now a
+  // deprecated stub, replaced by fgos-code-change) instead of measuring
+  // the same merged facade twice under two paths.
+  assert.equal(result.skills.length, 2);
   for (const skill of result.skills) {
     assert.ok(skill.bytes > 0);
     assert.ok(skill.words > 0);

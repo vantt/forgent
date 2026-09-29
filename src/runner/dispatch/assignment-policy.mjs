@@ -25,7 +25,6 @@
 
 import { MODEL_POLICY_TIERS, RunnerConfigError, REASONING_EFFORT_VALUES } from './config.mjs';
 import { resolvePolicyTierModel, deriveProviderFamily } from './resolve.mjs';
-import { resolveVerifiedAssignmentModel } from './placement-policy.mjs';
 import { REPEAT_MODE_VALUES } from '../definitions/schema.mjs';
 import { checkProviderDisallowed } from './provider-adapter.mjs';
 
@@ -119,6 +118,82 @@ export function resolveStrongerTier(tierA, tierB) {
 
   if (strengthA === 0 && strengthB === 0) return tierA;
   return strengthB > strengthA ? tierB : tierA;
+}
+
+/**
+ * Resolve `primaryExecutor` to its REGISTERED config entry (Phase 00 R6,
+ * fixes H2a/H2b) and derive its provider family (Phase 00 R6 fix F1) --
+ * extracted verbatim from `resolveAssignmentDispatchPolicy`'s own former
+ * inline steps 3b/4 (dispatch-engine-liveness-hardening Phase 7, C3
+ * finding) so `cli.mjs`'s `executeExecutorCli` can derive the SAME
+ * `resolvedProvider` it needs for governance without running this
+ * resolver's entire tier/quality/persona/model computation. Same checks,
+ * same order, same throws as before this extraction -- a pure move.
+ *
+ * @param {object} params
+ * @param {object} [params.runnerConfig]
+ * @param {string} params.primaryExecutor
+ * @param {string} [params.explicitProviderModel] an already-resolved
+ *   providerModel override (cliOverride/opPolicy), when the caller has one
+ * @param {{disallowedProviders?: string[], disallowedExecutors?: string[]}} [params.options]
+ * @returns {{resolvedProvider: string, registeredExecutorEntry: object|undefined}}
+ */
+export function resolveExecutorProvider({ runnerConfig, primaryExecutor, explicitProviderModel, options = {} }) {
+  const hasExecutorRegistry = Boolean(runnerConfig && runnerConfig.executors && typeof runnerConfig.executors === 'object');
+  const hasGovernanceOptions =
+    (Array.isArray(options.disallowedProviders) && options.disallowedProviders.length > 0) ||
+    (Array.isArray(options.disallowedExecutors) && options.disallowedExecutors.length > 0);
+  if (hasGovernanceOptions && !hasExecutorRegistry) {
+    throw new RunnerConfigError(
+      `governance requires "disallowedProviders"/"disallowedExecutors" but runnerConfig.executors is absent -- provider family cannot be verified for executor "${primaryExecutor}"`,
+    );
+  }
+  const registeredExecutorEntry = hasExecutorRegistry ? runnerConfig.executors[primaryExecutor] : undefined;
+  const isImplicitDefaultExecutor = primaryExecutor === 'claude' || primaryExecutor === runnerConfig?.executor?.command;
+  if (hasExecutorRegistry && !registeredExecutorEntry && !isImplicitDefaultExecutor) {
+    throw new RunnerConfigError(`preferExecutor "${primaryExecutor}" is not a registered executor (runnerConfig.executors has no such entry).`);
+  }
+  const registeredExecutorCommand = registeredExecutorEntry?.invocations?.find((inv) => inv.via === 'cli')?.command;
+  const resolvedProvider = explicitProviderModel
+    ? explicitProviderModel
+    : registeredExecutorEntry
+      ? deriveProviderFamily(registeredExecutorEntry, registeredExecutorCommand)
+      : isImplicitDefaultExecutor
+        ? deriveProviderFamily({ command: runnerConfig?.executor?.command }, primaryExecutor)
+        : primaryExecutor;
+  return { resolvedProvider, registeredExecutorEntry };
+}
+
+/**
+ * Governance gate (Phase 00 R6/F2): reject an already-resolved provider
+ * family / executor id pair against `options.disallowedProviders`/
+ * `.disallowedExecutors`. Extracted from `resolveAssignmentDispatchPolicy`
+ * (dispatch-engine-liveness-hardening Phase 7, C3 finding) so a caller that
+ * has already resolved its own provider/executor (e.g. `cli.mjs`'s
+ * `executeExecutorCli`/`spawnWorker`, which used to run this resolver's
+ * entire tier/quality/persona/model computation only to reach this same
+ * check) can run the SAME governance check directly, without a second,
+ * redundant resolver call whose rich result it then discarded.
+ *
+ * @param {object} params
+ * @param {string} params.primaryExecutor the resolved executor id
+ * @param {string} params.providerModel the resolved provider family
+ * @param {{disallowedProviders?: string[], disallowedExecutors?: string[]}} [params.options]
+ * @returns {{canonicalProvider: string}}
+ */
+export function resolveExecutorGovernance({ primaryExecutor, providerModel, options = {} }) {
+  const providerGov = checkProviderDisallowed(options.disallowedProviders, providerModel);
+  if (providerGov.disallowed) {
+    throw new RunnerConfigError(`governance gate rejected provider "${providerGov.canonicalProvider}": disallowed egress`, {
+      code: 'governance.disallowed-provider',
+    });
+  }
+  if (options.disallowedExecutors && options.disallowedExecutors.includes(primaryExecutor)) {
+    throw new RunnerConfigError(`governance gate rejected executor "${primaryExecutor}": disallowed`, {
+      code: 'governance.disallowed-executor',
+    });
+  }
+  return { canonicalProvider: providerGov.canonicalProvider };
 }
 
 /**
@@ -336,108 +411,25 @@ export function resolveAssignmentDispatchPolicy({
     ...declaredFallbacks.filter((e) => e !== primaryExecutor),
   ];
 
-  // 3b. Resolve `primaryExecutor` to its REGISTERED config entry (Phase 00
-  // R6, fixes H2a/H2b) before deriving provider/model — a registered
-  // executor's own `providerModel` field is the truth for provider family,
-  // never the executor id string. The registered-executor check only
-  // applies when `runnerConfig.executors` is itself present (a real
-  // registry to check against) -- a caller that passes no `executors` map
-  // at all (only a bare global `executor` block, or no runnerConfig)
-  // legitimately has nothing to validate `primaryExecutor` against, same as
-  // every other place in this file that treats `runnerConfig` as optional.
-  const hasExecutorRegistry = Boolean(runnerConfig && runnerConfig.executors && typeof runnerConfig.executors === 'object');
-  // Phase 00 RT1 fix: governance (`disallowedProviders`/`disallowedExecutors`)
-  // is only trustworthy when there is a real `executors` registry to verify
-  // `resolvedProvider`/`primaryExecutor` against -- without one, `resolvedProvider`
-  // below either falls back to the raw executor id or a best-effort synthetic
-  // derivation, neither of which is a verified provider family. Fail closed
-  // here, before any resolution or governance check, rather than silently
-  // under-enforcing governance against an unverifiable value. Gated strictly
-  // on governance options being present so the F1 no-registry exemption path
-  // stays untouched when governance isn't in play.
-  const hasGovernanceOptions =
-    (Array.isArray(options.disallowedProviders) && options.disallowedProviders.length > 0) ||
-    (Array.isArray(options.disallowedExecutors) && options.disallowedExecutors.length > 0);
-  if (hasGovernanceOptions && !hasExecutorRegistry) {
-    throw new RunnerConfigError(
-      `governance requires "disallowedProviders"/"disallowedExecutors" but runnerConfig.executors is absent -- provider family cannot be verified for executor "${primaryExecutor}"`,
-    );
-  }
-  const registeredExecutorEntry = hasExecutorRegistry ? runnerConfig.executors[primaryExecutor] : undefined;
-  // The literal "claude" identity (CLAUDE_CLI_COMMANDS' own default) and
-  // whatever the base `runnerConfig.executor.command` already is are the
-  // implicit global default -- always structurally valid (validated at
-  // config-load time via `validateExecutorShape`) regardless of whether an
-  // `executors{}` map also happens to list a matching entry. No silent
-  // substitution occurs by resolving either of these without a registry
-  // hit, so only a genuinely DIFFERENT, unregistered id fails closed here.
-  const isImplicitDefaultExecutor = primaryExecutor === 'claude' || primaryExecutor === runnerConfig?.executor?.command;
-  if (hasExecutorRegistry && !registeredExecutorEntry && !isImplicitDefaultExecutor) {
-    throw new RunnerConfigError(`preferExecutor "${primaryExecutor}" is not a registered executor (runnerConfig.executors has no such entry).`);
-  }
-
-  // 4. Provider Model & Literal Model Resolution
-  // `isImplicitDefaultExecutor` (above) exempts ONLY the "unregistered
-  // executor" throw -- it must not also fall back to the raw executor-id
-  // string here (that reproduces H2a's exact defect for this one carve-out;
-  // Phase 00 R6 fix F1). Derive the provider family the same way a real
-  // registered entry would, against a synthetic entry carrying the resolved
-  // global command, with `primaryExecutor` itself as the command literal --
-  // `isImplicitDefaultExecutor` guarantees `primaryExecutor` IS either the
-  // literal `'claude'` or `runnerConfig?.executor?.command`, so passing
-  // `runnerConfig?.executor?.command` instead here would derive the wrong
-  // family whenever those two differ (e.g. an explicit `preferExecutor:
-  // 'claude'` override while the global `executor.command` is `'pi'`).
-  // A registered entry's real command lives under `invocations[].command`
-  // (the `via: "cli"` entry — same selection resolve.mjs's
-  // resolveExecutorConfig uses) for every currently-registered production
-  // executor shape (.fgos/config.json's `runner.executors` — every entry
-  // invocations[]-shaped). Without this, `deriveProviderFamily` below
-  // would silently default its `resolvedCommand` parameter to `'claude'`,
-  // disagreeing with resolve.mjs:429's own two-argument call for any
-  // registered executor whose real command isn't a Claude CLI command
-  // (e.g. `codex-cli`). A bare (non-invocations) entry shape has no such
-  // structured signal to extract from — `registeredExecutorCommand` stays
-  // `undefined` there, so `deriveProviderFamily`'s own default parameter
-  // (`'claude'`) applies exactly as it did before this fix, unchanged for
-  // every bare-shape entry (including one whose flat `.command` is a
-  // locally-swapped-in test executable that carries no real provider
-  // signal of its own).
-  // Attempted follow-up, reverted (Dispatch Core Contract Normalization):
-  // falling back to a bare entry's own flat `.command` here (mirroring
-  // resolve.mjs's real-spawn derivation) is architecturally correct, but
-  // measured against the real test suite it broke 125 tests across
-  // coordination/group-thinking -- most fixtures use a bare-shape non-Claude
-  // test executor (a real script path, `process.execPath`, ...) with no
-  // declared `providerModel`, relying on this exact silent-default-to-
-  // 'claude' behavior, unrelated to what any of those tests actually probe.
-  // Checked against the real `.fgos/config.json`: every currently-registered
-  // production executor is either invocations[]-shaped (already correctly
-  // derived above) or declares `providerModel` explicitly (`claude-bwrap`,
-  // `codex-readonly`, ...) -- so live production dispatch was never exposed
-  // to the gap this would have closed, and the cross-provider
-  // `allowCrossProvider` gate in resolve.mjs's `resolveExecutorConfig`
-  // still catches a real bare-shape cross-provider executor at actual
-  // dispatch time regardless. Left as `warnIfProviderFamilyUnreliable`
-  // already recommends: declare `providerModel` explicitly on a bare-shape
-  // non-Claude executor, rather than widen this resolver's own derivation.
-  const registeredExecutorCommand = registeredExecutorEntry?.invocations?.find((inv) => inv.via === 'cli')?.command;
-  // Explicit providerModel override channel (additive -- undefined for
-  // every pre-existing caller): lets a capability's own
-  // `overrides.providerModel` (config.mjs's `CAPABILITY_OVERRIDE_FIELDS`)
-  // retune which `modelPolicies` table this dispatch's tier resolves
-  // against, independent of the executor's own declared `providerModel`.
-  // Previously only `executeExecutorCli` (cli.mjs) read this field, via its
-  // own separate inline tier/model computation that never reached this
-  // resolver or its governance checks at all.
+  // 3b/4 (registry validation, provider derivation): extracted to
+  // `resolveExecutorProvider` (dispatch-engine-liveness-hardening Phase 7,
+  // C3) -- see that function's own doc comment for why, and
+  // `docs/history/executor-policy-dispatch-seams/` (H2a/H2b/RT1/F1) for the
+  // edge cases its logic still encodes unchanged (pure move, same checks,
+  // same order, same throws). The governance THROWS (disallowedProviders/
+  // disallowedExecutors, step 7 below) stay in their original position,
+  // AFTER quality/persona/visibility/repeatMode/constraints resolution --
+  // moving them here would fire a governance rejection before a validation
+  // error (invalid mode/minRigor/repeatMode) that used to throw first for
+  // the same malformed input, a real ordering change this extraction must
+  // not introduce.
   const explicitProviderModel = cliOverride.providerModel ?? opPolicy.providerModel;
-  const resolvedProvider = explicitProviderModel
-    ? explicitProviderModel
-    : registeredExecutorEntry
-      ? deriveProviderFamily(registeredExecutorEntry, registeredExecutorCommand)
-      : isImplicitDefaultExecutor
-        ? deriveProviderFamily({ command: runnerConfig?.executor?.command }, primaryExecutor)
-        : primaryExecutor;
+  const { resolvedProvider, registeredExecutorEntry } = resolveExecutorProvider({
+    runnerConfig,
+    primaryExecutor,
+    explicitProviderModel,
+    options,
+  });
   const providerSource = explicitProviderModel
     ? (cliOverride.providerModel ? { scope: 'cliOverride' } : { scope: 'opPolicy', id: opId })
     : registeredExecutorEntry
@@ -462,23 +454,17 @@ export function resolveAssignmentDispatchPolicy({
     // against `lookupPolicyTier`, not `effectiveTier` directly (Phase 04):
     // value-preserving for every caller that never supplies
     // `rigorOverrides`, since `lookupPolicyTier === effectiveTier` then.
-    const legacyModel = resolvePolicyTierModel(runnerConfig, lookupPolicyTier, resolvedProvider);
-    // Follow-up (post-Phase-08): PlacementPolicy production-binder
-    // unification -- see resolveVerifiedAssignmentModel's own docstring
-    // (placement-policy.mjs) for why this closes the track's own "no
-    // fourth hidden placement source" close criterion. legacyModel above
-    // is unchanged and always computed first; PlacementPolicy's value is
-    // used only when it agrees, so this cannot regress any config.
-    const { model: verifiedModel, source: verifiedSource } = resolveVerifiedAssignmentModel({
-      cfg: runnerConfig,
-      lookupPolicyTier,
-      provider: resolvedProvider,
-      legacyModel,
-    });
-    resolvedModel = verifiedModel;
-    modelSource = verifiedSource === 'placement-policy'
-      ? { scope: 'placement-policy', id: `${resolvedProvider}.${lookupPolicyTier}` }
-      : { scope: 'runnerConfig', id: `${resolvedProvider}.${lookupPolicyTier}` };
+    // dispatch-engine-liveness-hardening Phase 7: `resolveVerifiedAssignmentModel`
+    // retired -- it called this exact same `resolvePolicyTierModel` with the
+    // exact same (lookupPolicyTier, resolvedProvider) inputs, so its own
+    // "legacy" fallback branch was unreachable (a second call with identical
+    // args either produces the same value or throws exactly as this first
+    // call already would have). Kept as one call; `source` is always
+    // PlacementPolicy-attributed since PlacementPolicy target semantics IS
+    // this resolution path per design.md's close criterion (post-Phase-08
+    // follow-up comment, now realized in full).
+    resolvedModel = resolvePolicyTierModel(runnerConfig, lookupPolicyTier, resolvedProvider);
+    modelSource = { scope: 'placement-policy', id: `${resolvedProvider}.${lookupPolicyTier}` };
   }
 
   // 5. Visibility Resolution
@@ -523,19 +509,14 @@ export function resolveAssignmentDispatchPolicy({
   // executor id, per its own option name; `disallowedExecutors` is its
   // executor-id-keyed counterpart, for governance configs that need to
   // block one specific registered executor entry even when its declared
-  // provider family is otherwise trusted)
-  const providerGov = checkProviderDisallowed(options.disallowedProviders, resolvedProvider);
-  if (providerGov.disallowed) {
-    throw new RunnerConfigError(`governance gate rejected provider "${providerGov.canonicalProvider}": disallowed egress`, {
-      code: 'governance.disallowed-provider',
-    });
-  }
-  if (options.disallowedExecutors && options.disallowedExecutors.includes(primaryExecutor)) {
-    throw new RunnerConfigError(`governance gate rejected executor "${primaryExecutor}": disallowed`, {
-      code: 'governance.disallowed-executor',
-    });
-  }
-  const governanceSource = { scope: 'governance', id: providerGov.canonicalProvider };
+  // provider family is otherwise trusted). Extracted to `resolveExecutorGovernance`
+  // (dispatch-engine-liveness-hardening Phase 7, C3) so `executeExecutorCli`/
+  // `spawnWorker` (cli.mjs) can run the SAME governance check directly
+  // against their own already-resolved provider/executor without paying for
+  // this resolver's full tier/quality/persona/model computation just to
+  // reach these two throws.
+  const { canonicalProvider } = resolveExecutorGovernance({ primaryExecutor, providerModel: resolvedProvider, options });
+  const governanceSource = { scope: 'governance', id: canonicalProvider };
 
   const effectivePolicy = {
     role: assignment.role,

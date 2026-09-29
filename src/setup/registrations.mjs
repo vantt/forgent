@@ -47,7 +47,8 @@ import { runAllConfinementProbes } from '../runner/dispatch/confinement/probes/h
 import { reapOrphanedConfinementResources, OWNERSHIP_MARKER_FILE } from '../runner/dispatch/confinement/cleanup.mjs';
 
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
-import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON } from '../runner/dispatch/config.mjs';
+import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, validateCapabilityServesShape, RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { resolveExecutorAndOverrides, deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../state/fgos-file-registry.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
@@ -1777,14 +1778,27 @@ export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
     // Interim posture: P06 must first wire a production backend binding.
     // Required here would otherwise universally refuse group-thinking.
     confinement: { mode: 'unconfined' },
+    serves: { outputKind: 'decision', mutates: false },
   },
   execute: {
     description:
       'Compliance-driven work -- value comes from following the plan, changes files, must pass verify (D2, docs/history/dispatch-activation-and-handoff-redesign/CONTEXT.md)',
+    serves: { outputKind: 'change', mutates: true },
+  },
+  // I19 (core/skills/_shared/capability-matching.md, capability-catalog.md):
+  // generic, domain-neutral independent review -- docs/design/spec/config,
+  // never code (that stays `code:review`). No `prefer`/`overrides` either,
+  // same curated-default-never-pins reasoning as every other slot here.
+  review: {
+    description:
+      'Independent read-only review of a non-code artifact (docs, design, spec, config) before merge/decision -- distinct from code:review (I19, core/skills/_shared/capability-catalog.md).',
+    confinement: { mode: 'unconfined' },
+    serves: { outputKind: 'finding', mutates: false },
   },
   'code:implement': {
     description:
       'Canonical coding implementation capability -- compliance-driven coding execution before implementation (D1/D2, docs/history/capability-aware-dispatch-activation/CONTEXT.md)',
+    serves: { outputKind: 'change', domain: 'code', mutates: true },
   },
   // P2-runtime (docs/history/agent-coordination-foundation/plan.md):
   // extended by observed frequency, in this priority order. Deliberately
@@ -1794,19 +1808,23 @@ export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
     description:
       'Canonical coding review capability -- independent review of a coding implementation unit before merge (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',
     confinement: { mode: 'unconfined' },
+    serves: { outputKind: 'finding', domain: 'code', mutates: false },
   },
   'code:test': {
     description:
       'Canonical coding test capability -- author or run tests for a coding implementation unit (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',
+    serves: { outputKind: 'verification', domain: 'code' },
   },
   'code:debug': {
     description:
       'Canonical coding debug capability -- root-cause investigation of a coding defect (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',
     confinement: { mode: 'unconfined' },
+    serves: { outputKind: 'finding', domain: 'code' },
   },
   'code:refactor': {
     description:
       'Canonical coding refactor capability -- behavior-preserving structural change to existing code (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',
+    serves: { outputKind: 'change', domain: 'code', mutates: true, behaviorPreserving: true },
   },
 });
 
@@ -1922,6 +1940,149 @@ registerCheck({
   id: 'advise-execute-capabilities-configured',
   description: 'runner.capabilities declares the "advise" and "execute" purpose slots decide --for resolves against (tsk-2uf-3)',
   check: (cwd) => checkAdviseExecuteCapabilitiesConfigured(cwd),
+});
+
+// I19 (core/skills/_shared/capability-matching.md): `serves` is optional at
+// load time (`validateCapabilitiesShape`'s hot path never rejects an old
+// entry with none), but a live config's DECLARED `serves` values still need
+// a doctor signal -- a malformed one, or two capabilities that declare the
+// identical attribute set (permanently tied, capability-matching.md's
+// "Ties and misses" rule), silently degrades Q1 steering with no error
+// anywhere else. `review`'s presence is already covered generically by
+// `advise-execute-capabilities-configured` above (CURATED_CAPABILITY_NAMES
+// derives from DEFAULT_CAPABILITY_SLOTS, which now includes it) -- checked
+// again here too since it is this doctrine's own explicit requirement.
+function normalizeServesForComparison(serves) {
+  return JSON.stringify(Object.fromEntries(Object.entries(serves).sort(([a], [b]) => a.localeCompare(b))));
+}
+
+function checkCapabilityServesValid(cwd) {
+  const capabilities = readSharedConfig(cwd)?.runner?.capabilities;
+  if (!capabilities || typeof capabilities !== 'object' || Array.isArray(capabilities)) {
+    return {
+      passed: false,
+      message: 'runner.capabilities section missing -- run fgos setup ("serves" cannot be validated until it exists)',
+    };
+  }
+  const invalid = [];
+  const servesByName = new Map();
+  for (const [name, entry] of Object.entries(capabilities)) {
+    if (!entry || typeof entry !== 'object' || Array.isArray(entry) || entry.serves === undefined) continue;
+    try {
+      validateCapabilityServesShape(entry.serves, `runner.capabilities.${name}.serves`);
+      servesByName.set(name, entry.serves);
+    } catch (error) {
+      invalid.push(`${name}: ${error.message}`);
+    }
+  }
+  if (invalid.length > 0) {
+    return { passed: false, message: `invalid "serves": ${invalid.join('; ')}` };
+  }
+  const seenBySignature = new Map();
+  for (const [name, serves] of servesByName) {
+    const signature = normalizeServesForComparison(serves);
+    const priorName = seenBySignature.get(signature);
+    if (priorName) {
+      return {
+        passed: false,
+        message: `"${priorName}" and "${name}" declare the identical "serves" attribute set -- capability matching can never distinguish them`,
+      };
+    }
+    seenBySignature.set(signature, name);
+  }
+  if (!capabilities.review || typeof capabilities.review !== 'object' || Array.isArray(capabilities.review)) {
+    return { passed: false, message: 'runner.capabilities is missing the "review" slot -- run fgos setup' };
+  }
+  return {
+    passed: true,
+    message: `${servesByName.size} capability entr${servesByName.size === 1 ? 'y declares' : 'ies declare'} a valid "serves" attribute set, none identical, and "review" is present`,
+  };
+}
+
+registerCheck({
+  id: 'capability-serves-valid',
+  description: 'runner.capabilities\' "serves" attribute sets are well-formed, mutually distinct, and include the "review" slot (I19)',
+  check: (cwd) => checkCapabilityServesValid(cwd),
+});
+
+// Unit I21 (Phase 5 item 2): every discoverable CoordinationProtocol
+// operation's declared `policy.capability` resolves against the LIVE runner
+// config -- the SAME `resolveExecutorAndOverrides` (dispatch/resolve.mjs) a
+// real dispatch re-resolves at execution time, never a second, drifting
+// lookup. An operation naming a capability with nothing registered for it
+// does not fail at dispatch time (it quietly falls back to the runner's
+// global default executor, per `resolveAssignmentDispatchPolicy`'s own
+// precedence) -- this check is the only place that quiet degradation is
+// surfaced before it happens for real. Also reports the count of distinct
+// provider families reachable across every resolved capability (design
+// record §12 item 3: "Doctor báo số họ provider cấu hình").
+function checkOperationCapabilitiesResolve(cwd) {
+  const runnerConfig = readSharedConfig(cwd)?.runner;
+  if (!runnerConfig) {
+    return { passed: false, message: 'runner config section missing -- run fgos setup' };
+  }
+  let entries;
+  try {
+    entries = discoverCoordinationProtocols({ cwd });
+  } catch (err) {
+    if (err instanceof FlowDefinitionError) {
+      return { passed: false, message: `malformed CoordinationProtocol definition -- ${err.message}` };
+    }
+    throw err;
+  }
+
+  const unresolved = [];
+  const providerFamilies = new Set();
+  let declaredCount = 0;
+  for (const entry of entries) {
+    const definitionId = entry.definition.metadata.id;
+    for (const op of entry.definition.spec.operations ?? []) {
+      const capability = op.policy?.capability;
+      if (!capability) continue;
+      declaredCount += 1;
+      let resolved;
+      try {
+        resolved = resolveExecutorAndOverrides(runnerConfig, capability);
+      } catch (err) {
+        if (err instanceof RunnerConfigError) {
+          unresolved.push(`${definitionId}.${op.id} -> "${capability}": ${err.message}`);
+          continue;
+        }
+        throw err;
+      }
+      // Fix (round 3, MEDIUM): `binding.mjs`'s `bindOperations` (the actual
+      // runtime consumer this check exists to verify) only ever treats
+      // `bindingSource === 'capability.prefer'` as a genuine capability
+      // resolution (H1/H4, red-team rounds 1/2) -- a bare `executor-id`
+      // match or a `capability.for` orphan-executor fallback is refused
+      // there and leaves the actor unbound at real dispatch time. Checking
+      // only `resolved.configured` here would report a capability as
+      // "resolving" (and count its provider family) even when
+      // `bindOperations` would never actually bind it -- a false-positive
+      // on the exact contract this check exists to verify.
+      if (!resolved.configured || resolved.bindingSource !== 'capability.prefer') {
+        unresolved.push(`${definitionId}.${op.id} -> "${capability}": nothing registered through capabilities.${capability}.prefer (a bare executor-id match or a "for"-array fallback does not count -- bindOperations refuses both and leaves the actor unbound)`);
+        continue;
+      }
+      providerFamilies.add(deriveProviderFamily(resolved.executor));
+    }
+  }
+
+  if (unresolved.length > 0) {
+    return { passed: false, message: `${unresolved.length} declared operation.policy.capability value(s) do not resolve: ${unresolved.join('; ')}` };
+  }
+  return {
+    passed: true,
+    message: declaredCount === 0
+      ? 'no CoordinationProtocol operation declares policy.capability yet (nothing to check)'
+      : `${declaredCount} declared operation.policy.capability value(s) resolve; ${providerFamilies.size} distinct provider famil${providerFamilies.size === 1 ? 'y' : 'ies'} reachable ([${[...providerFamilies].sort().join(', ')}])`,
+  };
+}
+
+registerCheck({
+  id: 'operation-capability-resolves',
+  description: 'every discoverable CoordinationProtocol operation\'s declared policy.capability resolves against the live runner config, and reports reachable provider-family diversity (Unit I21)',
+  check: (cwd) => checkOperationCapabilitiesResolve(cwd),
 });
 
 // tsk-slq D6 (AGENTS.md's install/setup/doctor gate — a new infra
@@ -4915,4 +5076,108 @@ registerFix({
     }
     return { changed: false };
   }
+});
+
+// dispatch-engine-liveness-hardening Phase 7 (C1): the two remaining shadow
+// binders (`resolveVerifiedPlacementModel`/`resolveVerifiedProviderArgs`,
+// dispatch/placement-policy.mjs's `recordShadowBinderDivergence`) now write
+// a real disagreement to a durable local JSONL instead of only an ephemeral
+// stderr line. Informational, not a gate: a fallback-to-legacy disagreement
+// is handled safely by design (the real spawn never regresses on
+// divergence), so this never fails the check -- it only makes the
+// otherwise-invisible event visible to `fgos doctor`, closing the exact gap
+// this track's own investigation had to work around by manually grepping
+// ~800 historical stderr.log files.
+function checkShadowBinderDivergence(cwd) {
+  const logPath = path.join(cwd, '.fgos', 'dispatch', 'shadow-binder-divergence.jsonl');
+  if (!fs.existsSync(logPath)) {
+    return { passed: true, message: 'no shadow-binder divergence recorded' };
+  }
+  let lines;
+  try {
+    lines = fs.readFileSync(logPath, 'utf8').split('\n').filter((line) => line.trim());
+  } catch {
+    return { passed: true, message: `${logPath} exists but could not be read` };
+  }
+  if (lines.length === 0) {
+    return { passed: true, message: 'no shadow-binder divergence recorded' };
+  }
+  let last;
+  try {
+    last = JSON.parse(lines[lines.length - 1]);
+  } catch {
+    last = null;
+  }
+  const lastDesc = last ? `${last.binder ?? '(unknown)'} at ${last.ts ?? '(unknown)'}` : '(last entry unreadable)';
+  return { passed: true, message: `${lines.length} shadow-binder divergence event(s) recorded — most recent: ${lastDesc}` };
+}
+
+registerCheck({
+  id: 'shadow-binder-divergence',
+  description: 'real PlacementPolicy/ProviderAdapter shadow-binder divergence is durably recorded, not only ephemeral stderr (dispatch-engine-liveness-hardening Phase 7, C1)',
+  check: (cwd) => checkShadowBinderDivergence(cwd),
+});
+
+// A coordination session's own manifest.status can stay 'active' forever
+// once the real work inside it is done, if nothing ever calls
+// transitionSessionStatus -- confirmed against real production session data
+// that a large share of sessions with a linked result never reached a
+// terminal status (completed/partial/failed/cancelled, the only
+// STATUS_VALUES members besides 'active'). Purely informational: naming a
+// session here never mutates or closes it -- there is no companion fix,
+// since closing a session safely requires real classification of which
+// actors/assignments are actually done, not something to guess at from
+// outside. 7-day threshold, not 24h: some real sessions (e.g. multi-day
+// architecture-advisory panels with a human in the loop) legitimately stay
+// active far longer than a day, and this check must not turn into noise for
+// those.
+const STALE_ACTIVE_SESSION_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+
+function checkCoordinationSessionsClosed(cwd) {
+  const sessionsDir = path.join(cwd, '.fgos', 'coordination', 'sessions');
+  if (!fs.existsSync(sessionsDir)) {
+    return { passed: true, message: 'no coordination sessions directory present' };
+  }
+  let entries;
+  try {
+    entries = fs.readdirSync(sessionsDir, { withFileTypes: true });
+  } catch (err) {
+    return { passed: true, message: `coordination sessions directory unreadable: ${err.message}` };
+  }
+  const now = Date.now();
+  let staleActive = 0;
+  let oldestId = null;
+  let oldestAgeMs = -1;
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    let manifest;
+    try {
+      manifest = JSON.parse(fs.readFileSync(path.join(sessionsDir, entry.name, 'session.json'), 'utf8'));
+    } catch {
+      continue; // unreadable/mid-write/not a real session dir -- not this check's job
+    }
+    if (manifest.status !== 'active') continue;
+    const createdAt = Date.parse(manifest.createdAt);
+    if (!Number.isFinite(createdAt)) continue;
+    const ageMs = now - createdAt;
+    if (ageMs < STALE_ACTIVE_SESSION_AGE_MS) continue;
+    staleActive += 1;
+    if (ageMs > oldestAgeMs) {
+      oldestAgeMs = ageMs;
+      oldestId = manifest.coordinationId ?? entry.name;
+    }
+  }
+  if (staleActive === 0) {
+    return { passed: true, message: 'no coordination session stuck "active" past 7 days' };
+  }
+  return {
+    passed: false,
+    message: `${staleActive} coordination session(s) still "active" past 7 days -- oldest: "${oldestId}" (${Math.round(oldestAgeMs / 86400000)}d). A session this old likely finished without ever reaching a terminal status (completed/partial/failed/cancelled) -- worth reviewing, no auto-fix.`,
+  };
+}
+
+registerCheck({
+  id: 'coordination-sessions-closed',
+  description: 'coordination sessions reach a terminal status (completed/partial/failed/cancelled) instead of staying "active" indefinitely',
+  check: (cwd) => checkCoordinationSessionsClosed(cwd),
 });

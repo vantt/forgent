@@ -8,7 +8,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { inspectDispatchRuntime, findCoordinationSessionOwningAssignment, isWithinDir } from './runtime-inspection.mjs';
+import { inspectDispatchRuntime, clearAllRunsCache, withRunsCache } from './runtime-inspection.mjs';
 // visibility-session.mjs's own import graph is fs/path + worker-artifacts.mjs
 // (also fs/path only) -- no adapter/process-control, so importing its
 // RUN_STATUSES vocabulary here does not widen this module's excluded-import
@@ -21,7 +21,7 @@ const stable = (v) => v && typeof v === 'object' ? (Array.isArray(v) ? `[${v.map
 const digest = (v) => `sha256:${createHash('sha256').update(stable(v)).digest('hex')}`;
 const json = (file) => { try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return undefined; } };
 // Paren-aware /proc/<pid>/stat parser, deliberately kept as its own copy
-// rather than importing cli-spawn-supervisor.mjs's getProcessStartTime: that
+// rather than importing detached-run-supervisor.mjs's getProcessStartTime: that
 // module is the cli-spawn ADAPTER (it also owns child_process.spawn, worker
 // PGID signalling, receipt publication) and importing any one export from it
 // would put the whole adapter/process-control module on this file's import
@@ -118,15 +118,10 @@ const CWD_LOCK_DEAD_MARGIN_MS = 5000;
 // (main-checkout-lock.mjs's own tryAcquireOnce, written under the filename
 // dispatchLockFile(cwd) computes): `{pid: "<pid>:<acquiredAtMs>:<rand>", ts:
 // <int>}`, where `pid` is a composite identity string, never a bare
-// integer. Distinct from holder() below, which still serves
-// clear-assignment-claim's own dispatch.claim -- a DIFFERENT file with a
-// real production writer (session-engine.mjs) that never records a holder
-// identity at all (see assignmentClaimFile's doc comment), so the old
-// `{pid: integer, startTime: string}` shape holder() still parses remains
-// that action's own accepted, deferred (D04/D05) fixture-only convention,
-// not a live production record this cwd lock ever actually writes -- never
-// reused for a lock that DOES have a real, known production shape (H1's own
-// class of defect: matching a fixture instead of the real writer).
+// integer. Distinct from holder() below, which parses withLocalLock's own
+// `{pid: integer, startTime: string}` reclaim-marker shape -- never reused
+// for a lock that DOES have a real, known production shape (H1's own class
+// of defect: matching a fixture instead of the real writer).
 const CWD_LOCK_IDENTITY_RE = /^(\d+):(\d+):[a-z0-9]+$/;
 function cwdLockHolder(lock) {
   if (!lock || typeof lock !== 'object' || typeof lock.pid !== 'string') return { state: 'unparseable' };
@@ -200,40 +195,6 @@ const actionKey = (snapshot, action, expiresAt) => `reconcile_${createHash('sha2
 // computation to agreement with the real dispatchLockFile export so the two
 // can never silently drift apart.
 function lockFile(root, cwd) { return path.join(root, '.fgos', `dispatch--${encodeURIComponent(cwd)}.lock`); }
-// Per-Assignment counterpart to lockFile's per-cwd dispatch lock: the same
-// holder-identity guard SPIRIT (a pid/timestamp identity `holder()` below
-// can prove dead), scoped to one Assignment instead of one cwd -- but its
-// OWN accepted `{pid: integer, startTime: string}` fixture shape (see
-// `holder()`), never the per-cwd lock's real composite-identity record (see
-// `cwdLockHolder()`), since the two files have different real writers. A
-// real writer DOES exist: coordination/session-engine.mjs's
-// `createAndExecuteSessionTask` creates this exact file (0 bytes,
-// `fs.openSync(dispatchClaimPath, 'wx')`,
-// src/runner/coordination/session-engine.mjs) as a CoordinationSession's own
-// in-process dispatch-exclusivity marker -- never populated with any holder
-// identity content the way the per-cwd lock is, and never removed on
-// success (see that function's own doc comment). Because it
-// carries no holder identity, `holder()` below can only ever read it as
-// corrupt/unparseable; the CoordinationSession-ownership check in
-// `planClearAssignmentClaim` (via `findCoordinationSessionOwningAssignment`)
-// refuses BEFORE that parse is even attempted, matching collect-result's own
-// CoordinationSession refusal. D04/D05 (plans/260914-dispatch-operability-
-// evidence-attribution) separately deferred a STANDALONE (non-session)
-// Assignment-level launch/drive exclusivity writer -- for that case,
-// `clear-assignment-claim` still legitimately reports `blocked: 'no
-// assignment claim exists'`, the same shape clear-cwd-lock reports before
-// any cwd lock has ever been written, and non-session test fixtures for both
-// actions write this file directly rather than relying on a real writer
-// (see dispatch-reconciliation.test.mjs).
-// `assignmentId` arrives over the public CLI boundary (--assignment) and is
-// joined into a path -- resolve the real target and refuse (return null)
-// unless it stays inside the assignments directory, closing a `../` escape
-// out of `.fgos/assignments/` a raw id string would otherwise allow.
-function assignmentClaimFile(root, assignmentId) {
-  const assignmentsDir = path.join(root, '.fgos', 'assignments');
-  const file = path.join(assignmentsDir, assignmentId, 'dispatch.claim');
-  return isWithinDir(assignmentsDir, file) ? file : null;
-}
 function actionLog(root) { return path.join(root, '.fgos', 'dispatch', 'reconciliation-actions.jsonl'); }
 function localLock(root) { return path.join(root, '.fgos', 'dispatch', 'reconcile.lock'); }
 function resultFile(runDir) { return path.join(runDir, 'result.json'); }
@@ -261,28 +222,29 @@ function holder(lock) {
   return { state: 'live', pid: lock.pid, incarnation: `pid:${lock.pid}:start:${recorded}` };
 }
 
-export function planReconciliation(root, { action = 'clear-cwd-lock', runId, assignmentId, cwd = process.cwd(), now = new Date().toISOString(), ttlMs = 300000 } = {}) {
-  if ((runId !== undefined || assignmentId !== undefined) && (!action || action === 'clear-cwd-lock')) {
-    return { outcome: 'refused', reason: 'dispatch reconcile plan with --run or --assignment requires --action (e.g. collect-result, clear-assignment-claim, or repair-projection)' };
-  }
-  if (action === 'collect-result') return planCollectResult(root, { runId, now, ttlMs });
-  if (action === 'clear-assignment-claim') return planClearAssignmentClaim(root, { assignmentId, now, ttlMs });
-  if (action === 'repair-projection') return planRepairProjection(root, { runId, now, ttlMs });
-  const proposedAction = canonicalAction(root, action, cwd);
-  if (!proposedAction) return { outcome: 'refused', reason: `unsupported reconciliation action: ${action}` };
-  const file = proposedAction.path, raw = fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null, lock = raw === null ? null : json(file);
-  if (raw === null) return { outcome: 'blocked', reason: 'no cwd lock exists' };
-  if (lock === undefined) return { outcome: 'needs-input', reason: 'cwd lock is corrupt or unparseable' };
-  const proof = cwdLockHolder(lock);
-  if (proof.state === 'live') return { outcome: 'refused', reason: 'cwd lock holder resource incarnation is live' };
-  if (proof.state !== 'dead') return { outcome: 'needs-input', reason: 'cwd lock holder lacks a verifiable resource incarnation' };
-  // No `controlEpoch` field here: the real production record
-  // ({pid, ts}, see lockFile's doc comment) never carries one, and the
-  // full-byte `digest` below already detects any successor rewrite of this
-  // exact file -- an inert, always-null field would add nothing a real
-  // writer could ever populate.
-  const snapshot = { digest: digest({ raw }), resourceIncarnation: proof.incarnation, expiresAt: expires(now, ttlMs) };
-  return { outcome: 'planned', actionKey: actionKey(snapshot, proposedAction, snapshot.expiresAt), snapshot, proposedAction, preconditions: ['holder-dead-proven', 'no-active-run-for-holder'] };
+export function planReconciliation(root, { action = 'clear-cwd-lock', runId, assignmentId, cwd = process.cwd(), now = new Date().toISOString(), ttlMs = 300000, runsCache = null } = {}) {
+  return withRunsCache(runsCache, () => {
+    if ((runId !== undefined || assignmentId !== undefined) && (!action || action === 'clear-cwd-lock')) {
+      return { outcome: 'refused', reason: 'dispatch reconcile plan with --run or --assignment requires --action (e.g. collect-result or repair-projection)' };
+    }
+    if (action === 'collect-result') return planCollectResult(root, { runId, now, ttlMs });
+    if (action === 'repair-projection') return planRepairProjection(root, { runId, now, ttlMs });
+    const proposedAction = canonicalAction(root, action, cwd);
+    if (!proposedAction) return { outcome: 'refused', reason: `unsupported reconciliation action: ${action}` };
+    const file = proposedAction.path, raw = fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null, lock = raw === null ? null : json(file);
+    if (raw === null) return { outcome: 'blocked', reason: 'no cwd lock exists' };
+    if (lock === undefined) return { outcome: 'needs-input', reason: 'cwd lock is corrupt or unparseable' };
+    const proof = cwdLockHolder(lock);
+    if (proof.state === 'live') return { outcome: 'refused', reason: 'cwd lock holder resource incarnation is live' };
+    if (proof.state !== 'dead') return { outcome: 'needs-input', reason: 'cwd lock holder lacks a verifiable resource incarnation' };
+    // No `controlEpoch` field here: the real production record
+    // ({pid, ts}, see lockFile's doc comment) never carries one, and the
+    // full-byte `digest` below already detects any successor rewrite of this
+    // exact file -- an inert, always-null field would add nothing a real
+    // writer could ever populate.
+    const snapshot = { digest: digest({ raw }), resourceIncarnation: proof.incarnation, expiresAt: expires(now, ttlMs) };
+    return { outcome: 'planned', actionKey: actionKey(snapshot, proposedAction, snapshot.expiresAt), snapshot, proposedAction, preconditions: ['holder-dead-proven', 'no-active-run-for-holder'] };
+  });
 }
 
 // collect-result links/collects an already-written, already-valid result.json
@@ -335,102 +297,6 @@ function planCollectResult(root, { runId, now, ttlMs }) {
   return { outcome: 'planned', actionKey: actionKey(snapshot, proposedAction, snapshot.expiresAt), snapshot, proposedAction, preconditions: ['result-valid', 'owner-authority-standalone', 'not-superseded'] };
 }
 
-// clear-assignment-claim removes `dispatch.claim`, the per-Assignment
-// counterpart to clear-cwd-lock's per-cwd `dispatch.lock` (assignmentClaimFile
-// above). Like collect-result, it never derives ownership/admission facts
-// itself -- it reuses inspectDispatchRuntime's --assignment and --run views
-// verbatim, so it can never disagree with dispatch.runtime.inspect about
-// which Run is current for an Assignment or whether that Run has settled.
-//
-// D04's required proof has three parts, each mapped to a concrete,
-// re-derivable fact instead of a human judgment call:
-//   1. "no admitted unsettled Run or pending launch exists" -- an admission
-//      generation committed with no materialized run.json yet IS a pending
-//      launch (inspectDispatchRuntime's own missingMaterializations), and an
-//      admitted, materialized Run with no result.json yet IS an unsettled
-//      Run (inspectDispatchRuntime's own runResult === null for the current
-//      Run). Both are reported `blocked`, not `needs-input`: the facts are
-//      complete, a named precondition is simply false.
-//   2. "no linked result is pending collection" -- once a Run settles
-//      (result.json exists) it must be linked through collect-result's own
-//      door FIRST (run.json.resultCollectedAt stamped); clearing the claim
-//      out from under an uncollected result would let that evidence become
-//      unreachable the moment the claim (and whatever cwd/session context it
-//      names) is gone. Also `blocked`.
-//   3. "claimed resource absence is proven" -- reuses the exact same
-//      PID/start-time dead-incarnation proof clear-cwd-lock already applies
-//      via `holder()`: the claim's holder field records the runner process
-//      that admitted/drove this Assignment, and only a provably dead
-//      incarnation authorizes removal (never TTL alone, per D04's Refusals).
-// Multiple current Run ids or corrupt/malformed materializations are
-// `needs-input`: unlike missing-materialization or unsettled-Run, an
-// ambiguous or corrupt admission ledger is not a single named precondition
-// failing, it is runtime-inspection itself unable to say what is true.
-function planClearAssignmentClaim(root, { assignmentId, now, ttlMs }) {
-  if (typeof assignmentId !== 'string' || !assignmentId.trim()) return { outcome: 'refused', reason: 'clear-assignment-claim requires an assignmentId' };
-  const view = inspectDispatchRuntime(root, { assignment: assignmentId });
-  if (view.inspectionStatus === 'not-found') return { outcome: 'blocked', reason: 'no matching Assignment was found for clear-assignment-claim' };
-  // A CoordinationSession-owned claim (session-engine.mjs's own exclusivity
-  // marker, see assignmentClaimFile's doc comment above) is refused before
-  // any settlement/admission facts are even consulted: clearing it belongs
-  // to that session's own recovery door, never this narrow guard repair --
-  // the same refusal shape planCollectResult already applies to a
-  // CoordinationSession-owned Run. Checked ahead of the corrupt/unparseable
-  // branch below too, since a 0-byte session claim would otherwise only ever
-  // reach that generic "needs-input" outcome, which does not name the real
-  // owning door.
-  const sessionOwner = findCoordinationSessionOwningAssignment(root, assignmentId);
-  if (sessionOwner) {
-    return { outcome: 'refused', reason: `owning authority is a CoordinationSession ("${sessionOwner.id}"); clearing its dispatch.claim belongs to its own recovery door (${sessionOwner.observeCommand}), not dispatch.runtime.reconcile` };
-  }
-  const obs = view.observations?.[0]?.value ?? {};
-  const currentRunIds = obs.currentRunIds ?? [];
-  const missingMaterializations = obs.missingMaterializations ?? [];
-  const malformedMaterializations = obs.malformedMaterializations ?? [];
-  const duplicateCurrentMaterializations = obs.duplicateCurrentMaterializations ?? [];
-  if (malformedMaterializations.length > 0 || duplicateCurrentMaterializations.length > 0) {
-    return { outcome: 'needs-input', reason: `assignment "${assignmentId}" admission/materialization facts are corrupt or conflicting; claim proof cannot be verified` };
-  }
-  if (missingMaterializations.length > 0) {
-    return { outcome: 'blocked', reason: `a pending launch is admitted for assignment "${assignmentId}" but not yet materialized` };
-  }
-  if (currentRunIds.length > 1) {
-    return { outcome: 'needs-input', reason: `more than one current Run is derived for assignment "${assignmentId}"; claim proof cannot be verified` };
-  }
-  if (currentRunIds.length === 1) {
-    const runId = currentRunIds[0];
-    const runView = inspectDispatchRuntime(root, { run: runId });
-    if (runView.inspectionStatus === 'ambiguous') return { outcome: 'needs-input', reason: `more than one Run repository owns assignment "${assignmentId}"'s current run id` };
-    const loc = runView.subject.locations[0];
-    if (!loc) return { outcome: 'blocked', reason: `admitted run "${runId}" for assignment "${assignmentId}" has not materialized` };
-    if (!runView.runResult) return { outcome: 'blocked', reason: `an admitted, unsettled Run ("${runId}") exists for assignment "${assignmentId}"` };
-    const runMeta = json(path.join(loc.path, 'run.json')) ?? {};
-    if (!runMeta.resultCollectedAt) return { outcome: 'blocked', reason: `a linked result for run "${runId}" is still pending collection for assignment "${assignmentId}"` };
-  }
-  const file = assignmentClaimFile(root, assignmentId);
-  // F4: assignmentId escaping the assignments directory (e.g. `../../..`)
-  // is refused here, before any read of the resolved (out-of-tree) path is
-  // even attempted.
-  if (file === null) return { outcome: 'refused', reason: 'assignmentId must not escape the assignments directory' };
-  const raw = fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null, claim = raw === null ? null : json(file);
-  if (raw === null) return { outcome: 'blocked', reason: 'no assignment claim exists' };
-  if (claim === undefined) return { outcome: 'needs-input', reason: 'assignment claim is corrupt or unparseable' };
-  const proof = holder(claim);
-  if (proof.state === 'live') return { outcome: 'refused', reason: 'assignment claim holder resource incarnation is live' };
-  if (proof.state !== 'dead') return { outcome: 'needs-input', reason: 'assignment claim holder lacks a verifiable resource incarnation' };
-  // controlEpoch here is `claim.controlEpoch ?? null`, not F2's
-  // control/generations read: dispatch.claim's own real production writer
-  // (session-engine.mjs) never records a controlEpoch -- or any holder
-  // identity at all -- on this file (see assignmentClaimFile's doc
-  // comment), so this field is already fully covered by the `digest` below
-  // hashing the SAME bytes, unlike run.json's shadow copy (F2's actual
-  // target), which is a DIFFERENT file than the one collect-result/
-  // repair-projection digest.
-  const snapshot = { digest: digest({ raw }), assignmentId, controlEpoch: claim.controlEpoch ?? null, resourceIncarnation: proof.incarnation, expiresAt: expires(now, ttlMs) };
-  const proposedAction = { kind: 'clear-assignment-claim', assignmentId, path: file };
-  return { outcome: 'planned', actionKey: actionKey(snapshot, proposedAction, snapshot.expiresAt), snapshot, proposedAction, preconditions: ['holder-dead-proven', 'no-pending-result-collection', 'no-admitted-unsettled-run-or-pending-launch'] };
-}
-
 // repair-projection additively patches run.json.status to 'settled' when an
 // already-validated, immutable terminal RunResult proves the Run finished
 // but the real production settlement marker (run.json.status --
@@ -442,8 +308,7 @@ function planClearAssignmentClaim(root, { assignmentId, now, ttlMs }) {
 // version of this action targeted a `run.json.phase` field that no
 // production writer ever set -- `status` is the one real marker every
 // reader above actually consults, so the target field was corrected to
-// match.) Like collect-result
-// and clear-assignment-claim, it never derives Run/result facts itself: it
+// match.) Like collect-result, it never derives Run/result facts itself: it
 // reuses inspectDispatchRuntime's --run view verbatim (the SAME RunResult
 // interpretation runtime-inspection.mjs's `one()` already performs, backed
 // by run-result.mjs's single interpretRunResult path), so this guard can
@@ -474,9 +339,9 @@ function planClearAssignmentClaim(root, { assignmentId, now, ttlMs }) {
 // Only `status === 'settled'` already matches what a terminal RunResult
 // proves, so only that value is reported `blocked` ("nothing to repair"),
 // matching every other "nothing to act on" case in this module (clear-cwd-
-// lock's "no cwd lock exists", clear-assignment-claim's "no assignment claim
-// exists", collect-result's "no result exists yet") rather than a silent
-// no-op `applied` that would falsely claim a mutation happened.
+// lock's "no cwd lock exists", collect-result's "no result exists yet")
+// rather than a silent no-op `applied` that would falsely claim a mutation
+// happened.
 function planRepairProjection(root, { runId, now, ttlMs }) {
   if (typeof runId !== 'string' || !runId.trim()) return { outcome: 'refused', reason: 'repair-projection requires a runId' };
   const view = inspectDispatchRuntime(root, { run: runId });
@@ -504,10 +369,9 @@ function planRepairProjection(root, { runId, now, ttlMs }) {
 }
 
 // M9a: this module already has everything a dead-holder reclaim needs
-// (`startTime`/`holder`, the exact {pid, startTime} proof clear-assignment-
-// claim's own dead-holder check already applies) -- withLocalLock itself
-// never used any of it. A crashed applyReconciliation/applyCollectResult/
-// applyClearAssignmentClaim/applyRepairProjection call used to leave
+// (`startTime`/`holder`, the exact {pid, startTime} proof) -- withLocalLock
+// itself never used any of it. A crashed applyReconciliation/
+// applyCollectResult/applyRepairProjection call used to leave
 // reconcile.lock wedged FOREVER (no TTL, no reclaim at all), blocking every
 // future reconcile apply on this host. Reclaim only ever fires on
 // `holder(...).state === 'dead'` -- the same PID+startTime proof, never
@@ -591,54 +455,13 @@ function applyCollectResult(root, plan, { now }) {
     fs.writeFileSync(tmp, `${JSON.stringify({ ...runMeta, resultCollectedAt: now }, null, 2)}\n`);
     fs.renameSync(tmp, plan.proposedAction.path);
     fs.appendFileSync(actionLog(root), `${JSON.stringify({ actionKey: plan.actionKey, outcome: 'applied', at: now })}\n`);
+    clearAllRunsCache(root);
     return { outcome: 'applied', actionKey: plan.actionKey };
   });
 }
 
-// Delete-semantics apply, structurally the same shape as applyReconciliation's
-// own clear-cwd-lock branch below (re-derive fresh under the local lock,
-// require byte-for-byte agreement with the plan, unlink, tolerate a
-// concurrent ENOENT as goal-already-achieved) -- kept as its own function
-// because, like collect-result, its target depends on a caller-supplied id
-// (assignmentId) that canonicalAction()'s (root, kind) shape cannot carry.
-function applyClearAssignmentClaim(root, plan, { now }) {
-  const assignmentId = plan?.proposedAction?.assignmentId;
-  if (!plan?.actionKey || !plan?.snapshot || typeof assignmentId !== 'string' || !assignmentId.trim()) return { outcome: 'refused', reason: 'apply requires a reconcile plan for a supported action' };
-  return withLocalLock(root, () => {
-    const prior = records(root).find((r) => r.actionKey === plan.actionKey);
-    if (prior) return { outcome: 'already-applied', priorOutcome: prior.outcome, actionKey: plan.actionKey };
-    if (Date.parse(now) > Date.parse(plan.snapshot.expiresAt)) return { outcome: 'plan-stale', reason: 'reconcile plan expired' };
-    // Full re-derivation from root+assignmentId alone -- the caller-supplied
-    // proposedAction.path is never trusted as the mutation target until it is
-    // proven identical to what a fresh, from-scratch plan computes right now.
-    const fresh = planClearAssignmentClaim(root, { assignmentId, now, ttlMs: Math.max(0, Date.parse(plan.snapshot.expiresAt) - Date.parse(now)) });
-    if (fresh.outcome !== 'planned' || stable(fresh.proposedAction) !== stable(plan.proposedAction) || stable(fresh.snapshot) !== stable(plan.snapshot)) {
-      return { outcome: fresh.outcome === 'blocked' ? 'blocked' : 'plan-stale', reason: fresh.reason ?? 'assignment claim facts changed since planning' };
-    }
-    const expectedActionKey = actionKey(fresh.snapshot, fresh.proposedAction, fresh.snapshot.expiresAt);
-    if (plan.actionKey !== expectedActionKey) return { outcome: 'plan-stale', reason: 'reconcile action key does not bind the canonical snapshot and target' };
-    let raw;
-    try {
-      raw = fs.readFileSync(plan.proposedAction.path, 'utf8');
-    } catch (err) {
-      if (err.code === 'ENOENT') return { outcome: 'plan-stale', reason: 'assignment claim was already removed by a concurrent cleanup' };
-      throw err;
-    }
-    if (digest({ raw }) !== plan.snapshot.digest) return { outcome: 'plan-stale', reason: 'assignment claim changed since planning' };
-    try {
-      fs.unlinkSync(plan.proposedAction.path);
-    } catch (err) {
-      if (err.code !== 'ENOENT') throw err;
-      // Goal state (claim absent) already achieved by a concurrent cleanup --
-      // same spirit as clear-cwd-lock's own unlink-ENOENT tolerance below.
-    }
-    fs.appendFileSync(actionLog(root), `${JSON.stringify({ actionKey: plan.actionKey, outcome: 'applied', at: now })}\n`);
-    return { outcome: 'applied', actionKey: plan.actionKey };
-  });
-}
-
-// Delete-semantics siblings above unlink a file; repair-projection instead
-// additively patches run.json.status the same way visibility-session.mjs's
+// clear-cwd-lock's delete-semantics apply (below) unlinks a file;
+// repair-projection instead additively patches run.json.status the same way visibility-session.mjs's
 // own markRunSettled does (status + settledAt), the same shape as
 // applyCollectResult -- kept as its own function for the same reason
 // collect-result is: its target depends on a caller-supplied runId that
@@ -698,21 +521,22 @@ function applyRepairProjection(root, plan, { now }) {
     fs.writeFileSync(tmp, `${JSON.stringify({ ...runMeta, status: SETTLED_STATUS, settledAt: now }, null, 2)}\n`);
     fs.renameSync(tmp, plan.proposedAction.path);
     fs.appendFileSync(actionLog(root), `${JSON.stringify({ actionKey: plan.actionKey, outcome: 'applied', at: now })}\n`);
+    clearAllRunsCache(root);
     return { outcome: 'applied', actionKey: plan.actionKey };
   });
 }
 
-export function applyReconciliation(root, plan, { now = new Date().toISOString() } = {}) {
-  if (plan?.proposedAction?.kind === 'collect-result') return applyCollectResult(root, plan, { now });
-  if (plan?.proposedAction?.kind === 'clear-assignment-claim') return applyClearAssignmentClaim(root, plan, { now });
-  if (plan?.proposedAction?.kind === 'repair-projection') return applyRepairProjection(root, plan, { now });
-  const canonical = canonicalAction(root, plan?.proposedAction?.kind, plan?.proposedAction?.cwd);
-  if (!plan?.actionKey || !plan?.snapshot || !canonical) return { outcome: 'refused', reason: 'apply requires a reconcile plan for a supported action' };
-  // Do this before looking up a prior record: a replay must not turn a
-  // caller-controlled path/action-key combination into an authorization.
-  if (stable(plan.proposedAction) !== stable(canonical)) return { outcome: 'plan-stale', reason: 'reconcile action target is not the canonical guard target' };
-  return withLocalLock(root, () => {
-    const prior = records(root).find((r) => r.actionKey === plan.actionKey);
+export function applyReconciliation(root, plan, { now = new Date().toISOString(), runsCache = null } = {}) {
+  return withRunsCache(runsCache, () => {
+    if (plan?.proposedAction?.kind === 'collect-result') return applyCollectResult(root, plan, { now });
+    if (plan?.proposedAction?.kind === 'repair-projection') return applyRepairProjection(root, plan, { now });
+    const canonical = canonicalAction(root, plan?.proposedAction?.kind, plan?.proposedAction?.cwd);
+    if (!plan?.actionKey || !plan?.snapshot || !canonical) return { outcome: 'refused', reason: 'apply requires a reconcile plan for a supported action' };
+    // Do this before looking up a prior record: a replay must not turn a
+    // caller-controlled path/action-key combination into an authorization.
+    if (stable(plan.proposedAction) !== stable(canonical)) return { outcome: 'plan-stale', reason: 'reconcile action target is not the canonical guard target' };
+    return withLocalLock(root, () => {
+      const prior = records(root).find((r) => r.actionKey === plan.actionKey);
     if (prior) return { outcome: 'already-applied', priorOutcome: prior.outcome, actionKey: plan.actionKey };
     if (Date.parse(now) > Date.parse(plan.snapshot.expiresAt)) return { outcome: 'plan-stale', reason: 'reconcile plan expired' };
     const fresh = planReconciliation(root, { action: canonical.kind, cwd: canonical.cwd, now, ttlMs: Math.max(0, Date.parse(plan.snapshot.expiresAt) - Date.parse(now)) });
@@ -766,6 +590,8 @@ export function applyReconciliation(root, plan, { now = new Date().toISOString()
       // same spirit as tryAcquireOnce's own unlink-ENOENT tolerance.
     }
     fs.appendFileSync(actionLog(root), `${JSON.stringify({ actionKey: plan.actionKey, outcome: 'applied', at: now })}\n`);
+    clearAllRunsCache(root);
     return { outcome: 'applied', actionKey: plan.actionKey };
+  });
   });
 }

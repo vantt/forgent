@@ -42,7 +42,7 @@ export const MANIFEST = [
 
   // -- src/report/** (plan candidate area 2) --
   { id: 'report-authoritative-match', status: 'shadow', pattern: 'src/report/authoritative-match.mjs', directTests: ['test/report/authoritative-match.test.mjs'], boundaryTests: [] },
-  { id: 'report-capability-plan-lint', status: 'shadow', pattern: 'src/report/capability-plan-lint.mjs', directTests: ['test/report/capability-plan-lint.test.mjs'], boundaryTests: [] },
+  { id: 'report-capability-plan-lint', status: 'shadow', pattern: 'src/report/capability-plan-lint.mjs', directTests: ['test/report/capability-plan-lint.test.mjs'], boundaryTests: ['test/cli/plan-lint.test.mjs'] },
   { id: 'report-context-render', status: 'shadow', pattern: 'src/report/context-render.mjs', directTests: ['test/report/context-render.test.mjs'], boundaryTests: [] },
   { id: 'report-decision-index', status: 'shadow', pattern: 'src/report/decision-index.mjs', directTests: ['test/report/decision-index.test.mjs'], boundaryTests: [] },
   { id: 'report-enduser-index', status: 'shadow', pattern: 'src/report/enduser-index.mjs', directTests: ['test/report/enduser-index.test.mjs'], boundaryTests: [] },
@@ -54,6 +54,10 @@ export const MANIFEST = [
   { id: 'report-knowledge-projection', status: 'shadow', pattern: 'src/report/knowledge-projection.mjs', directTests: [], boundaryTests: ['test/setup/knowledge-doctor.test.mjs'] },
   // src/report/item-trace.mjs intentionally NOT listed: no direct or
   // boundary test located. Falls through to unknown -> full.
+
+  // -- src/runner/capability-match.mjs (Q1 steering, capability-aware
+  // dispatch gate) --
+  { id: 'runner-capability-match', status: 'shadow', pattern: 'src/runner/capability-match.mjs', directTests: ['test/runner/capability-match.test.mjs', 'test/cli/capability-match.test.mjs'], boundaryTests: [] },
 
   // -- src/state/** leaf modules only (plan candidate area 3) --
   { id: 'state-awaiting-context', status: 'shadow', pattern: 'src/state/awaiting-context.mjs', directTests: ['test/state/awaiting-context.test.mjs'], boundaryTests: [] },

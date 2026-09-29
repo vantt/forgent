@@ -1,0 +1,61 @@
+{
+  "kind": "declared-protocol",
+  "objective": "I27 new track-decision case (I21 H4 executor-pin fallback): framing + shaping.",
+  "writerId": "i27-driver",
+  "coordinationId": "i27-i21h4-full-v1",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-v1" },
+  "close": true,
+  "aggregateBounds": { "maxRounds": 20 },
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "frontier" },
+    { "id": "context-investigator-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "standard" },
+    { "id": "system-shaper-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "flagship" },
+    { "id": "alternative-shaper-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "flagship" },
+    { "id": "constraint-advocate-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "flagship" },
+    { "id": "architecture-critic-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "flagship" },
+    { "id": "synthesizer-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "frontier" },
+    { "id": "red-team-actor", "executor": "codex", "invocation": "codex-cli-bwrap", "tier": "flagship" }
+  ],
+  "steps": [
+    {
+      "type": "operation",
+      "as": "interpret",
+      "operationId": "interpret-request",
+      "targetActorId": "lead-advisor-actor",
+      "objective": "Interpret the person's intent: Unit I21 (this repo's own coordination-skill-harness-simplification track) found a real, live confinement/security regression (H4, fix-round-2): the generic \"review\" capability (deliberately declared with no `.prefer` by Unit I19) fell through `deriveOperationCapability`'s reverse-mapping `capability.for` branch, silently pinning all 8 architecture-advisory-panel-v1 actors onto an UNCONFINED `xai`/`pi-cli-vantt` executor (write/edit/bash, no sandbox) instead of the pre-I21 `readOnlyRedirects` safety net (a confined, read-only path). The round-2 fix restricted accepted resolutions to exactly `bindingSource === 'capability.prefer'` (src/verbs/coordination/binding.mjs, around the H4 comment). Validate: is this fix a sufficient, durable structural closure, or does it leave the underlying exposure open for any FUTURE capability that also declares no `.prefer` (the same shape that caused H4 in the first place)? Use absolute paths for anything you read (e.g. /home/vantt/projects/forgentX/src/verbs/coordination/binding.mjs). This session's own coordination bookkeeping lives at /home/vantt/projects/forgentX/.fgos/ -- you are authorized to write your result artifacts at the exact runDir path this dispatch gives you under that tree. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    },
+    {
+      "type": "operation",
+      "as": "investigate",
+      "operationId": "investigate-context",
+      "targetActorId": "context-investigator-actor",
+      "objective": "Read /home/vantt/projects/forgentX/src/verbs/coordination/binding.mjs end to end (absolute path), find and report: (1) the exact H4 fix (restricting accepted resolutions to bindingSource === 'capability.prefer'), with file:line evidence; (2) every OTHER capability currently registered in /home/vantt/projects/forgentX/.fgos/config.json's runner.capabilities that also declares no `.prefer` (a `review`-shaped gap, same class as H4) -- report each by name with a one-line description of what it would fall through to if dispatched today; (3) whether deriveOperationCapability has any mechanism today distinguishing a confinement-sensitive capability from a non-sensitive one, or whether the H4 fix applies uniformly regardless of sensitivity. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    },
+    {
+      "type": "operation",
+      "as": "shapeSystem",
+      "operationId": "shape-system-proposal",
+      "targetActorId": "system-shaper-actor",
+      "objective": "Propose ONE architecture for closing the H4 exposure class durably: harden `deriveOperationCapability` itself so that ANY capability with no `.prefer` NEVER falls through to an unconfined executor, structurally, regardless of which future capability is added (e.g., require every capability declaration to mark itself `confinementSensitive: true/false`, and refuse the reverse-mapping fallback whenever that flag is true or absent). Read /home/vantt/projects/forgentX/src/verbs/coordination/binding.mjs first (absolute path). Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    },
+    {
+      "type": "operation",
+      "as": "shapeAlt",
+      "operationId": "shape-alternative-proposal",
+      "targetActorId": "alternative-shaper-actor",
+      "objective": "Propose ONE alternative architecture: leave `deriveOperationCapability` exactly as the H4 fix left it (bindingSource === 'capability.prefer' only), and instead close the gap procedurally -- extend the existing `operation-capability-resolves` doctor check (Unit I21) to FAIL whenever any registered capability declares no `.prefer`, forcing every future capability author to make an explicit confinement choice at config-authoring time rather than relying on a kernel-level structural guarantee. Read /home/vantt/projects/forgentX/src/verbs/coordination/binding.mjs first (absolute path). Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    },
+    {
+      "type": "operation",
+      "as": "shapeConstraint",
+      "operationId": "shape-constraint-proposal",
+      "targetActorId": "constraint-advocate-actor",
+      "objective": "Rank the risk of each option on the table (kernel structural hardening in binding.mjs vs. a stricter doctor check vs. doing nothing further since H4 is already fixed for the one capability that hit it) against: how much new kernel surface each touches, whether either option could break an already-passing red-team test the way I21's own M3 attempt did, and whether Unit I21's own \"no shipped protocol uses `required` yet\" note means this exposure is latent-but-real or purely theoretical today. Read /home/vantt/projects/forgentX/src/verbs/coordination/binding.mjs first (absolute path). Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}

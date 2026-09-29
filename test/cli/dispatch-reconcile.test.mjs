@@ -92,15 +92,18 @@ test('CLI apply refuses a same-byte outside-root target tampered into a plan', (
   assert.equal(fs.existsSync(guard), true, 'canonical guard must remain after refusal');
 });
 
-test('CLI refuses a path-escaping --assignment for clear-assignment-claim and never touches anything outside .fgos/assignments/', () => {
+// S5: clear-assignment-claim (and the dispatch.claim file it existed to
+// clear) was retired once executeAssignment()'s own admitRunAttempt
+// in-flight check was confirmed to fully subsume the race it guarded
+// against -- the real production dispatch.claim file was also always 0
+// bytes with no holder identity, so this action could never actually
+// resolve a refusal in production. The CLI must refuse it plainly as an
+// unsupported action, never as a half-working door.
+test('CLI refuses the retired clear-assignment-claim action as unsupported, never as a half-working door', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'dispatch-reconcile-cli-')); fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
-  const outsideFile = path.join(root, '.fgos', 'outside-target', 'dispatch.claim');
-  fs.mkdirSync(path.dirname(outsideFile), { recursive: true });
-  fs.writeFileSync(outsideFile, JSON.stringify({ pid: 99999999, startTime: '1' }));
-  const planned = run(root, ['dispatch', 'reconcile', 'plan', '--action', 'clear-assignment-claim', '--assignment', '../outside-target']);
+  const planned = run(root, ['dispatch', 'reconcile', 'plan', '--action', 'clear-assignment-claim', '--assignment', 'a']);
   assert.equal(planned.status, 0, planned.stderr);
-  const outcome = JSON.parse(planned.stdout).data.outcome;
-  assert.notEqual(outcome, 'planned');
-  assert.notEqual(outcome, 'applied');
-  assert.equal(fs.existsSync(outsideFile), true, 'a path-escaping --assignment must never reach a file outside .fgos/assignments/');
+  const outcome = JSON.parse(planned.stdout).data;
+  assert.equal(outcome.outcome, 'refused');
+  assert.match(outcome.reason, /unsupported reconciliation action/);
 });

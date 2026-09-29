@@ -2,27 +2,32 @@
 
 Wave 4 · Gate: Phase 03 (dùng chung vocab code M2) · Findings: M11, M9(b,c), M16, L3, L10. Context: review §M9/M11/M16, Phụ lục 7/8.
 
-## Status — 2026-09-24 (Unit I07 Integrated, Unit I08b Integration Candidate at c6262fb1, pending landing)
+## Status — 2026-09-25 (Unit I08 VERIFIED at main@ac19f6d1; Unit I08b Integrated; Unit I10 Integrated/Verified; Unit I11 Ready)
 
-- **Unit I07 Status**: `integrated` (fast-forwarded to `main@261ed7ea01765db6c9fa87afddfa8f3e259be1ea`; remote synchronization and post-merge verification completed with 0 candidate regressions).
-- **Unit I08 Status**: `pending post-integration re-verification`.
-- **Unit I08b Status**: `integration candidate c6262fb1, pending landing` (Integration Candidate Merge Commit: `98f501be41756dc80d691cbf63ffeb4cd617fb30`, Candidate SHA: `d4e052a6e0e80ffe2add08a0f4661433b2e80582` merged into `origin/main@4ad0b8ca`).
-- **Remediation Scope**: Base defects F4 (HIGH), F5 (HIGH), F6 (MEDIUM), F7 (MEDIUM), F10 (MEDIUM).
-- **Reports**:
+- **Unit I07 Status**: `integrated` (fast-forwarded to `main@261ed7ea01765db6c9fa87afddfa8f3e259be1ea`).
+- **Unit I08b Status**: `integrated at main@ba8f6a9d` (candidate merge `98f501be`, candidate `d4e052a6`, post-landing verified).
+- **Unit I08 Status**: `VERIFIED at main@ac19f6d1` (RV-01/RV-02 governance fix `132d3777` + docs tip `ac19f6d1`; acceptance gate re-verification complete).
+- **Unit I10 Status**: `integrated and verified at main@605d26fe` (carried through `main@26a1038e` and `main@ac19f6d1`).
+- **Unit I11 Status**: `READY (dependencies satisfied), not yet opened` (pending official Track Manager checkpoint signoff).
+- **Remediation Scope**:
+  - Base defects F4 (HIGH), F5 (HIGH), F6 (MEDIUM), F7 (MEDIUM), F10 (MEDIUM) remediated in Unit I08b (`ba8f6a9d`).
+  - Governance defects RV-01 (HIGH redirect bypass) and RV-02 (MEDIUM direct raw comparison) remediated in candidate `132d3777` with shared canonical provider vocabulary.
+- **Reports & Artifacts**:
   - Implementation (I07): `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-operability-cli-doctor-implementation.md`
   - Verification (I08): `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-i08-dispatch-verification-report.md`
   - Remediation (I08b): `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-i08b-base-remediation-report.md`
+  - Governance Remediation (RV-01/RV-02): `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-provider-denylist-remediation-report.md`
+  - Acceptance Gate Re-verification Manifest: `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-i08-acceptance-gate-reverification-manifest.json`
+  - Acceptance Gate Re-verification Summary: `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-i08-acceptance-gate-reverification-summary.md`
   - Benchmark artifact: `plans/260920-2217-dispatch-engine-hardening/reports/i08-receipt-latency-measurement.json`
-- **Verification Evidence (Integration Branch)**:
-  - `test/runner/dispatch-i08b-remediation.test.mjs`: 5 pass / 0 fail.
-  - `test/runner/dispatch-governance-operability.test.mjs`: 9 pass / 0 fail.
-  - Focused matrix (10 files): 184 pass / 0 fail (189 with regression suite).
-  - Comprehensive dispatch root suite (`test/runner/dispatch.test.mjs`): 387 pass / 0 fail.
-  - Affected dispatch/herdr matrix (53 files): 1456 pass, 0 fail, 1 skip.
-  - Full repository suite (`npm test`): 7603 pass, 0 fail, 8 skip, 65 todo (389.6s).
+- **Acceptance Gate Re-Verification Evidence (main@ac19f6d1)**:
+  - Full repository suite (`npm test`): Run 3 reached exit code 0 (`7647 pass, 0 fail, 8 skip, 68 todo`; 364s). Runs 1 and 2 had timing threshold exceedances, classified as timing instability (LOW debt).
+  - Isolated stress testing: 10/10 pass on `coordination-phase2-concurrency.test.mjs` (160/160 pass, 0 fail); 10/10 pass on `dispatch.test.mjs` (3870/3870 pass, 0 fail).
+  - Parallel load stress testing: 10/10 iterations pass with 6 suites running concurrently (60/60 suite executions exit 0, 0 fail).
+  - Baseline comparison on exact `26a1038e` worktree: confirmed clean (dispatch 387 pass exit 0; coord 16 pass exit 0).
+  - Evidence inventory: 85 logs total on disk (83 manifest-hashed verification logs on `ac19f6d1` + 2 baseline comparison logs on `26a1038e`) preserved in `scratch/i08-reverification/`.
   - Candidate Regressions: Exactly 0.
-  - R7 Latency Benchmark: 40 trials, min 31ms, median 38ms, p95 47ms, max 51ms vs baseline p95 46ms (threshold <= 146ms; PASS).
-  - Follow-up ledger: N10 (disentangle vendor boundary from adapter selection in ProviderAdapter).
+  - Follow-up ledger: Set<string> canonicalization in helper, PlacementPolicy shadow gate raw comparison, test cleanup finally blocks, N10 adapter selection concern.
   - `git diff --check origin/main...HEAD`: clean (0 errors/warnings).
 
 ## Requirements

@@ -436,9 +436,10 @@ Keep the existing RunResult `status` and `confidence` fields unchanged. Every
 response step gains a separate scheduler `outcome`:
 
 ```txt
-outcome = settled | refused | blocked | deferred
+outcome = settled | refused | blocked | deferred | materialized
 ```
 
+`materialized` represents an admitted node whose assignment exists on disk or was resumed in-flight, but has not yet authoritatively settled with run evidence (also reported in show projection).
 `settled` includes a RunResult whose own `status` is `failed`; it means the
 result was linked and readable, not that the worker succeeded. This avoids a
 real name collision because RunResult already uses values such as `blocked`.

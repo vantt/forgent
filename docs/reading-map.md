@@ -104,7 +104,7 @@ The full-horizon design is
 [documentation-system-unification.md](platform/proposals/documentation-system-unification.md).
 The proposed near-term authority migration is
 [plan.md](../plans/260925-documentation-authority-unification/plan.md). Phase
-00 and Phase 01 are completed; Phases 02–09 remain unauthorized, and this plan's existence
+00–02 are completed; Phases 03–09 remain unauthorized, and this plan's existence
 does not authorize migration or cutover.
 
 ## 4. Related Files

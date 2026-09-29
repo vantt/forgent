@@ -59,6 +59,7 @@ const NOMINAL_GROUP_LITE_ID = 'core.coordination-protocol.group-thinking-nominal
 const DELPHI_FEEDBACK_LITE_ID = 'core.coordination-protocol.group-thinking-delphi-feedback-lite';
 const MASTER_COORDINATION_LOOP_ID = 'core.coordination-protocol.standalone-master-coordination-loop';
 const ARCHITECTURE_ADVISORY_PANEL_V1_ID = 'core.coordination-protocol.architecture-advisory-panel-v1';
+const ARCHITECTURE_ADVISORY_PANEL_STANDARD_V1_ID = 'core.coordination-protocol.architecture-advisory-panel-standard-v1';
 
 const OUTPUTS = ['agent-result.json (status, summary)'];
 
@@ -129,15 +130,22 @@ function fakeRunnerConfig(tempDir) {
 // 1. Registration correctness -- the real, committed pack, not a synthetic
 //    fixture (no `packPath` override anywhere in this section).
 
-test('all three group-thinking-lite protocols are registered in the real, committed pack, alongside standalone-master-coordination-loop (Step 09 Phase 02 R1) and architecture-advisory-panel-v1 (Architecture Advisory Panel track, P03.2) and no other entry', () => {
+test('all three group-thinking-lite protocols are registered in the real, committed pack, alongside standalone-master-coordination-loop (Step 09 Phase 02 R1), architecture-advisory-panel-v1 (Architecture Advisory Panel track, P03.2), and architecture-advisory-panel-standard-v1 (Unit I27 panel-depth experiment) and no other entry', () => {
   const pack = loadProtocolPack();
   const registeredIds = new Set(pack.members.map((m) => m.id));
   assert.deepEqual(
     registeredIds,
-    new Set([RFC_REVIEW_LITE_ID, NOMINAL_GROUP_LITE_ID, DELPHI_FEEDBACK_LITE_ID, MASTER_COORDINATION_LOOP_ID, ARCHITECTURE_ADVISORY_PANEL_V1_ID]),
-    'the real pack must list exactly RFC-Review-Lite, Nominal-Group-Lite, Delphi-Feedback-Lite, standalone-master-coordination-loop, and architecture-advisory-panel-v1 -- no more, no fewer',
+    new Set([
+      RFC_REVIEW_LITE_ID,
+      NOMINAL_GROUP_LITE_ID,
+      DELPHI_FEEDBACK_LITE_ID,
+      MASTER_COORDINATION_LOOP_ID,
+      ARCHITECTURE_ADVISORY_PANEL_V1_ID,
+      ARCHITECTURE_ADVISORY_PANEL_STANDARD_V1_ID,
+    ]),
+    'the real pack must list exactly RFC-Review-Lite, Nominal-Group-Lite, Delphi-Feedback-Lite, standalone-master-coordination-loop, architecture-advisory-panel-v1, and architecture-advisory-panel-standard-v1 -- no more, no fewer',
   );
-  assert.equal(pack.members.length, 5, 'no duplicate member entries');
+  assert.equal(pack.members.length, 6, 'no duplicate member entries');
 });
 
 test('resolvePackProtocol resolves each of the three real, registered protocols against the real pack, with no version drift -- not just refusing correctly against an empty pack (P10.1\'s own proof)', () => {
@@ -399,6 +407,52 @@ test('a full RFC-Review-Lite chain (including an authorize step) dispatched enti
   assert.equal(eventTypes.includes('specialist-authorized'), false, 'bypass #4 (authorize a specialist) -- no such event exists in this session\'s real log');
 });
 
+// I24a (Phase 5 item 4, H3 decision): `run.mjs`'s request vocabulary grew a
+// real `specialist-authorize` step type reaching `authorizeSpecialistSlot`
+// -- bypass #4 can no longer be refused merely because the vocabulary lacks
+// the step (the reasoning the test above's own comment, and the design
+// doc's "Five bypasses" section, gave before this unit). This pack gate
+// must keep refusing it explicitly instead -- proving that here, not just
+// re-asserting the (now outdated) absence-based reasoning above.
+test('runGroupThinkingRequest explicitly refuses a "specialist-authorize" step -- bypass #4 (authorize a specialist) stays refused now that run.mjs\'s vocabulary has grown this step type (I24a)', async () => {
+  const tempDir = mkTempDir();
+  const coordinationId = 'coord_p10_5_specialist_authorize_bypass_refused';
+  const writerId = 'i24a-bypass4-test';
+
+  await assert.rejects(
+    () =>
+      runGroupThinkingRequest(
+        { cwd: tempDir, repoRoot: tempDir },
+        {
+          protocolId: RFC_REVIEW_LITE_ID,
+          requestObject: {
+            kind: 'declared-protocol',
+            objective: 'Attempt to authorize a specialist through the pack gate -- must be refused (H3).',
+            writerId,
+            coordinationId,
+            protocolRef: { id: RFC_REVIEW_LITE_ID },
+            steps: [
+              {
+                type: 'specialist-authorize',
+                as: 'authSpecialist',
+                slotId: 'some-slot',
+                specialistActorId: 'specialist-x',
+                role: 'specialist',
+                reason: 'Attempt a bypass of the group-thinking pack gate.',
+                maxAssignments: 1,
+                expiresAfterRound: 10,
+                specialistAuthorizationId: 'sauth_i24a_bypass_attempt',
+              },
+            ],
+          },
+        },
+      ),
+    (err) => err instanceof StoreError && err.category === 'validation' && /"specialist-authorize" step is refused by this pack gate/.test(err.message),
+  );
+
+  assert.equal(countEventLines(tempDir, coordinationId), 0, 'refused before any mutation -- the session is never even opened');
+});
+
 // ---------------------------------------------------------------------
 // Step 09 Phase 02 R1/Tests First #5-#6: `standalone-master-coordination-loop`
 // registered as the pack's fourth member, dispatchable through the SAME
@@ -408,7 +462,7 @@ test('standalone-master-coordination-loop is registered in the real, committed p
   const pack = loadProtocolPack();
   const registeredIds = new Set(pack.members.map((m) => m.id));
   assert.ok(registeredIds.has(MASTER_COORDINATION_LOOP_ID), 'the real pack must list standalone-master-coordination-loop as a member');
-  assert.equal(pack.members.length, 5, 'exactly the three group-thinking-lite protocols plus standalone-master-coordination-loop plus architecture-advisory-panel-v1 -- no forgotten sixth entry');
+  assert.equal(pack.members.length, 6, 'exactly the three group-thinking-lite protocols plus standalone-master-coordination-loop plus architecture-advisory-panel-v1 plus architecture-advisory-panel-standard-v1 -- no forgotten seventh entry');
 
   const resolved = resolvePackProtocol(MASTER_COORDINATION_LOOP_ID);
   assert.equal(resolved.id, MASTER_COORDINATION_LOOP_ID);

@@ -60,6 +60,8 @@ import {
   dispatchResearchFanOutLocked,
   authorizeDeclaredOperation,
   authorizeDeclaredOperationLocked,
+  authorizeSpecialistSlot,
+  authorizeSpecialistSlotLocked,
   linkSessionContribution,
   linkSessionContributionLocked,
   evaluateSessionQuorum,
@@ -506,6 +508,32 @@ export async function executeValidatedCoordinationStep({ ctx, request, step, man
     labels[step.as] = branchAssignmentIds;
     return { as: step.as, type: 'fan-out', status: 'dispatched', branches: branchSummaries };
   }
+  if (step.type === 'specialist-authorize') {
+    // I24b (Phase 5 item 4 pt.2): the locked branch now reaches
+    // authorizeSpecialistSlotLocked (session-engine.mjs), which delegates to
+    // recordSpecialistAuthorizationLocked (store.mjs) -- neither acquires
+    // the events lock itself, so this is safe to call while the typed-action
+    // path above already holds it. The unlocked branch is unchanged from
+    // I24a: it still calls the SAME authorizeSpecialistSlot door.
+    const triggerEvidenceRefs = resolveRefArray(step.triggerEvidenceRefs, labels, `steps[${step.as}].triggerEvidenceRefs`);
+    const allowedContextRefs = resolveRefArray(step.allowedContextRefs, labels, `steps[${step.as}].allowedContextRefs`);
+    const params = {
+      slotId: step.slotId, specialistActorId: step.specialistActorId, role: step.role, capabilities: step.capabilities,
+      authorizedBy: driverIdentity, reason: step.reason, triggerEvidenceRefs, allowedContextRefs,
+      maxAssignments: step.maxAssignments, expiresAfterRound: step.expiresAfterRound,
+      specialistAuthorizationId: step.specialistAuthorizationId,
+    };
+    const authorization = locked
+      ? authorizeSpecialistSlotLocked(manifest.coordinationId, params, paths, engineOpts)
+      : authorizeSpecialistSlot(manifest.coordinationId, params, engineOpts);
+    return {
+      as: step.as, type: 'specialist-authorize', door: 'authorizeSpecialistSlot',
+      slotId: authorization.slotId, specialistActorId: authorization.specialistActorId, role: authorization.role,
+      capabilities: authorization.capabilities, specialistAuthorizationId: authorization.specialistAuthorizationId,
+      maxAssignments: authorization.maxAssignments, expiresAfterRound: authorization.expiresAfterRound,
+      appended: authorization.appended,
+    };
+  }
   if (step.type === 'close') return { as: step.as, type: 'close', status: 'fulfilled' };
   throw new CoordinationError('validation', `unsupported step type "${step.type}"`);
 }
@@ -565,6 +593,11 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
             contributionId: last.contributionId, contributionType: last.contributionType, assignmentId: last.assignmentId,
             roundKey: last.roundKey, anchors: last.anchors, respondsTo: last.respondsTo, appended: last.appended,
           } : {}),
+          ...(last.type === 'specialist-authorize' ? {
+            slotId: last.slotId, specialistActorId: last.specialistActorId, role: last.role, capabilities: last.capabilities,
+            specialistAuthorizationId: last.specialistAuthorizationId, maxAssignments: last.maxAssignments,
+            expiresAfterRound: last.expiresAfterRound, appended: last.appended,
+          } : {}),
           status: actionPrecondition.kind === 'dispatch-operation' || actionPrecondition.kind === 'authorize-and-dispatch' || actionPrecondition.kind === 'fan-out'
             ? 'dispatched'
             : actionPrecondition.kind === 'link-contribution' ? 'linked' : 'recorded',
@@ -575,6 +608,7 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
           ...(last.disposition ? { disposition: last.disposition } : {}),
           ...(last.contributionId ? { contributionId: last.contributionId } : {}),
           ...(last.branches ? { branches: last.branches } : {}),
+          ...(last.specialistAuthorizationId ? { specialistAuthorizationId: last.specialistAuthorizationId } : {}),
           ...(actionPrecondition.kind === 'authorize-and-dispatch' ? { authorizationId: composed.steps[0].authorizationId } : {}),
         };
         return actionResult;
@@ -714,7 +748,21 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
       const nodeCwds = new Map();
       for (const node of dagDeclaration.nodes) {
         const nodeAssignments = replayed.assignments.filter((entry) => entry.dagNodeId === node.id);
-        nodeCwds.set(node.id, resolveNodeCwd(node, nodeAssignments, fgosDir, ctx.cwd ?? engineOpts.cwd));
+        try {
+          nodeCwds.set(
+            node.id,
+            resolveNodeCwd(node, nodeAssignments, fgosDir, ctx.cwd ?? engineOpts.cwd, {
+              events: replayed.events,
+              results: replayed.results,
+            }),
+          );
+        } catch (err) {
+          if (err instanceof CoordinationError && err.category === 'dangling-ref') {
+            nodeCwds.set(node.id, null);
+          } else {
+            throw err;
+          }
+        }
       }
       dagCaveats = computeDagSharedCwdCaveats({
         declaredNodes: dagDeclaration.nodes,
@@ -777,7 +825,7 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
           }
         } else {
           resumedDagStates.set(node.displayLabel, {
-            outcome: 'deferred',
+            outcome: 'materialized',
             resumed: true,
             result: {
               as: node.displayLabel,
@@ -787,7 +835,7 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
               door: 'dispatchDeclaredOperation',
               authoritativeSettled: false,
               settled: false,
-              schedulerOutcome: 'deferred',
+              schedulerOutcome: 'materialized',
             },
           });
         }
@@ -816,12 +864,38 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
           if (asgnId && !settledIdsNow.has(asgnId)) {
             stepResult.authoritativeSettled = false;
             stepResult.settled = false;
-            stepResult.schedulerOutcome = 'deferred';
+            stepResult.schedulerOutcome = 'materialized';
           }
           stepResults.push(stepResult);
           return stepResult;
         },
       });
+      const replayedAfter = resumeSession(manifest.coordinationId, engineOpts);
+      const { fgosDir: postFgosDir } = resolveSessionPaths(manifest.coordinationId, engineOpts);
+      const postNodeCwds = new Map();
+      for (const node of dagDeclaration.nodes) {
+        const nodeAssignments = replayedAfter.assignments.filter((entry) => entry.dagNodeId === node.id);
+        try {
+          postNodeCwds.set(
+            node.id,
+            resolveNodeCwd(node, nodeAssignments, postFgosDir, ctx.cwd ?? engineOpts.cwd, {
+              events: replayedAfter.events,
+              results: replayedAfter.results,
+            }),
+          );
+        } catch (err) {
+          if (err instanceof CoordinationError && err.category === 'dangling-ref') {
+            postNodeCwds.set(node.id, null);
+          } else {
+            throw err;
+          }
+        }
+      }
+      dagCaveats = computeDagSharedCwdCaveats({
+        declaredNodes: dagDeclaration.nodes,
+        getNodeCwd: (id) => postNodeCwds.get(id),
+      });
+
       const resultsByLabel = new Map(stepResults.map((result) => [result.as, result]));
       for (const state of scheduled) {
         const result = resultsByLabel.get(state.as) ?? state.result ?? { as: state.as, type: request.steps[state.index].type };
@@ -831,7 +905,10 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
         result.schedulerOutcome = state.outcome;
         result.resumed = state.resumed === true || result.resumed === true;
         if (state.error) result.error = state.error;
-        if (state.blockedBy) result.blockedBy = [state.blockedBy === 'terminal-session' ? state.blockedBy : `node-${state.blockedBy}`];
+        if (state.blockedBy) {
+          const rawBlocked = Array.isArray(state.blockedBy) ? state.blockedBy : [state.blockedBy];
+          result.blockedBy = rawBlocked.map((b) => (b === 'terminal-session' ? b : (b.startsWith('node-') ? b : `node-${b}`)));
+        }
         if (state.overlapGroup) result.overlapGroup = state.overlapGroup;
 
         const node = dagDeclaration.nodes.find((n) => n.displayLabel === state.as);
@@ -866,13 +943,14 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
   }
 
   const hasDagCaveat = Boolean(dagDeclaration && dagCaveats?.size > 0);
-  const hasPartialDagOutcome = dagDeclaration && stepResults.some((step) => ['deferred', 'refused', 'blocked'].includes(step.schedulerOutcome));
+  const hasPartialDagOutcome = dagDeclaration && stepResults.some((step) => ['deferred', 'refused', 'blocked', 'materialized'].includes(step.schedulerOutcome));
   const quorumBeforeClose = evaluateSessionQuorum(manifest.coordinationId, engineOpts);
   let closed = false;
   let closeRefusalReason = null;
+  const explicitCloseRequested = Boolean(request.close === true || (request.steps ?? []).some((s) => s.type === 'close'));
   const shouldAttemptClose = dagDeclaration
-    ? (!hasPartialDagOutcome && !hasDagCaveat)
-    : (request.close === true || (request.steps ?? []).some((s) => s.type === 'close'));
+    ? (explicitCloseRequested && !hasPartialDagOutcome && !hasDagCaveat)
+    : explicitCloseRequested;
 
   if (dagDeclaration && hasDagCaveat) {
     closeRefusalReason = 'recheck-required: concurrent read-only nodes sharing cwd carry non-attributable-verdict caveats';
@@ -929,7 +1007,7 @@ export async function executeCoordinationRunKernel(ctx, request, options = {}) {
     status,
     closed,
     ...(hasDagCaveat ? { caveated: true } : {}),
-    closeAttempted: dagDeclaration ? (!hasPartialDagOutcome && !hasDagCaveat) : Boolean(request.close),
+    closeAttempted: dagDeclaration ? (explicitCloseRequested && !hasPartialDagOutcome && !hasDagCaveat) : Boolean(request.close),
     ...(closeRefusalReason !== null ? { closeRefusalReason } : {}),
     ...(fanOutFailure !== null ? { fanOutFailure } : {}),
     quorum: finalQuorum,

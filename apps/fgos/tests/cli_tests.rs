@@ -238,9 +238,15 @@ fn test_native_version_succeeds_with_envelope() {
     assert!(gen_at.ends_with('Z'));
     assert_eq!(parsed["data_hash"].as_str().map(|h| h.len()), Some(64));
     assert_eq!(parsed["data"]["packageVersion"], "0.1.0");
+    let routes_path =
+        repo_root().join("packages/host-runtime/contracts/command-routes.json");
+    let routes_str =
+        fs::read_to_string(&routes_path).expect("command-routes.json must be readable");
+    let routes: std::collections::HashMap<String, serde_json::Value> =
+        serde_json::from_str(&routes_str).expect("command-routes.json must be valid JSON");
     assert_eq!(
         parsed["data"]["verbs"].as_array().map(|v| v.len()),
-        Some(73)
+        Some(routes.len())
     );
 }
 

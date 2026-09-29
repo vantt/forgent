@@ -469,12 +469,12 @@ test('validateCoordinationRequest: a "disposition" step missing targetRef/dispos
   }
 });
 
-test('validateCoordinationRequest: the unknown-step-type message names all seven supported types', () => {
+test('validateCoordinationRequest: the unknown-step-type message names all eight supported types', () => {
   assert.throws(
     () => validateCoordinationRequest(request({ steps: [{ type: 'authorise', as: 'typo' }] })),
     (err) =>
       err instanceof StoreError &&
-      /steps\[0\]\.type must be "operation", "fan-out", "authorize", "disposition", "contribution", "human-turn", or "close"/.test(err.message),
+      /steps\[0\]\.type must be "operation", "fan-out", "authorize", "disposition", "contribution", "human-turn", "specialist-authorize", or "close"/.test(err.message),
   );
 });
 
@@ -1205,14 +1205,16 @@ test('show renders authorizations issued (consumed), dispositions recorded, and 
   const manifest = readManifest(data.coordinationId, opts);
   assert.ok(manifest.assignmentRefs.includes(disposition.targetRef), 'targetRef should have resolved to a real session Assignment id');
 
-  // Declared driver-authorized operations still awaiting authorization:
-  // revise-candidate and red-team-recheck (reviewer-recheck was just
-  // authorized above, so it must NOT appear here).
+  // Declared driver-authorized operations: none of the three declares
+  // `activation.maxInvocations`, so all three are genuinely uncapped
+  // (kernel-accurate: `authorizeOperationLocked` enforces no cap at all when
+  // `opts.maxInvocationsForBinding` is absent) -- `reviewer-recheck` stays
+  // pending even though it was just authorized above, since re-authorizing
+  // it again remains legal.
   assert.deepEqual(
     shown.pendingDriverAuthorizations.map((b) => b.operationId).sort(),
-    ['red-team-recheck', 'revise-candidate'],
+    ['red-team-recheck', 'reviewer-recheck', 'revise-candidate'],
   );
-  assert.ok(!shown.pendingDriverAuthorizations.some((b) => b.operationId === 'reviewer-recheck'));
 });
 
 test('show marks a disposition recorded after a terminal event as postTerminal, without hiding it (a hand-crafted/racing write recordDriverDisposition itself would refuse today)', async () => {
@@ -2207,7 +2209,8 @@ test('Phase 05: external in-flight work defers a maxConcurrency:1 DAG immediatel
   assert.equal(result.closed, false);
   assert.equal(result.closeAttempted, false);
   assert.equal(result.steps.find((step) => step.as === 'produce').schedulerOutcome, 'deferred');
-  assert.equal(result.steps.find((step) => step.as === 'review').schedulerOutcome, 'deferred', 'with no invocation-owned settlement possible, the dependent is deferred rather than falsely blocked by an external Assignment');
+  assert.equal(result.steps.find((step) => step.as === 'review').schedulerOutcome, 'blocked');
+  assert.deepEqual(result.steps.find((step) => step.as === 'review').blockedBy, ['node-produce']);
   assert.deepEqual(result.dag.inFlightOutsideInvocation, [outside.assignmentId]);
 });
 

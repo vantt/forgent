@@ -1,9 +1,12 @@
 # Shared fragment: capability catalog
 
 Canonical dispatch-capability vocabulary for the whole repo, not just the
-coding domain. Read this fragment alongside its two siblings, which
+coding domain. Read this fragment alongside its siblings, which
 together form one shared awareness cluster (`docs/history/agent-coordination-foundation/plan.md`):
 
+- [`capability-matching.md`](./capability-matching.md) — how an agent
+  derives `DemandFacts` and matches them against `serves` to steer
+  capability and execution form.
 - [`planning-capability-awareness.md`](./planning-capability-awareness.md)
   — when authoring a plan, assign one canonical capability to each
   independently executable unit.
@@ -11,7 +14,7 @@ together form one shared awareness cluster (`docs/history/agent-coordination-fou
   when executing a unit, ask `decide` for its capability before acting
   (`decide-before-execute`).
 
-This file answers a narrower question both of those depend on: **what is
+This file answers a narrower question all of those depend on: **what is
 a valid canonical capability name, and what does each registered one
 mean?**
 
@@ -30,7 +33,7 @@ Two canonical shapes are valid:
 
 - **Generic capability** — no domain prefix, used when the behavior
   promise is not specific to one domain's artifacts (e.g. `advise`,
-  `execute`).
+  `execute`, `review`).
 - **Domain-scoped capability** — `domain:capability`, used when the
   behavior promise only makes sense against one domain's own artifacts
   (e.g. `code:implement` — coding execution against source files).
@@ -40,33 +43,47 @@ Two canonical shapes are valid:
 - If the unit's output is domain-specific (source diffs, marketing copy,
   a design doc), use `domain:capability`.
 - If the unit's output is domain-agnostic (a yes/no consult, a generic
-  compliance-execution pass with no domain-shaped artifact), use the
-  generic form.
+  compliance-execution pass with no domain-shaped artifact, or an
+  independent review of non-code artifacts like docs or design), use the
+  generic form. Do not make every review `code:review`.
 - Never invent a third shape (no task-name-as-capability, no
   `capability@version`, no free-text purpose string). A caller that needs
   a capability not yet in this catalog reports the gap instead of
   minting one ad hoc — see "Registering a new capability" below.
 
+## Capability serves: machine-readable behavioral promises
+
+Each capability declares a `serves` attribute set — the machine-readable promise of what demand profile it fulfills (see [`capability-matching.md`](./capability-matching.md) for matching rules against `DemandFacts`). Attributes include:
+- `outputKind`: `change`, `verification`, `finding`, or `decision`.
+- `domain`: `code`, or omitted for domain-neutral work.
+- `mutates`: boolean (`true` or `false`).
+- `behaviorPreserving`: optional boolean for structural refactoring.
+
+Catalog entries without a declared `serves` definition remain valid for explicit, manual selection (e.g. specialized tools or adapters), but they will never be matched automatically by demand steering.
+
 ## Registered catalog
 
-| Capability | Shape | Meaning | Typical provider |
-|---|---|---|---|
-| `advise` | generic | Async product-decision consult — value comes from disagreement, never changes state, one question/one answer. | agent executor |
-| `execute` | generic | Compliance-driven work — value comes from following a plan, changes files, must pass verify. | agent executor |
-| `code:implement` | domain-scoped | Coding implementation — write/change source to satisfy a spec. | agent executor |
-| `code:review` | domain-scoped | Independent review of a coding implementation unit before merge. | agent executor |
-| `code:test` | domain-scoped | Author or run tests for a coding implementation unit. | agent executor |
-| `code:debug` | domain-scoped | Root-cause investigation of a coding defect. | agent executor |
-| `code:refactor` | domain-scoped | Behavior-preserving structural change to existing code. | agent executor |
-| `impact-analysis` | generic | Code-graph blast-radius lookup (upstream/downstream callers, affected flows). | MCP/tool provider (this repo's live config maps it to `gitnexus`, `kind: "tool"`, `via: "mcp"`) |
-| `pane-labeling` | generic | Write a session/task id onto a terminal pane's label for a human watching a screen. | adapter (herdr-only today) |
+| Capability | Shape | Serves | Meaning | Typical provider |
+|---|---|---|---|---|
+| `advise` | generic | decision, mutates: false | Async product-decision consult — value comes from disagreement, never changes state, one question/one answer. | agent executor |
+| `execute` | generic | change, mutates: true | Compliance-driven work — value comes from following a plan, changes files, must pass verify. | agent executor |
+| `review` | generic | finding, mutates: false | Independent read-only review of non-code artifacts (docs, design, spec, config) before merge/decision. | agent executor |
+| `code:implement` | domain-scoped | change, domain: code, mutates: true | Coding implementation — write/change source to satisfy a spec. | agent executor |
+| `code:review` | domain-scoped | finding, domain: code, mutates: false | Independent review of a coding implementation unit before merge. | agent executor |
+| `code:test` | domain-scoped | verification, domain: code | Author or run tests for a coding implementation unit. | agent executor |
+| `code:debug` | domain-scoped | finding, domain: code | Root-cause investigation of a coding defect. | agent executor |
+| `code:refactor` | domain-scoped | change, domain: code, mutates: true, behaviorPreserving: true | Behavior-preserving structural change to existing code. | agent executor |
+| `impact-analysis` | generic | — | Code-graph blast-radius lookup (upstream/downstream callers, affected flows). | MCP/tool provider (this repo's live config maps it to `gitnexus`, `kind: "tool"`, `via: "mcp"`) |
+| `pane-labeling` | generic | — | Write a session/task id onto a terminal pane's label for a human watching a screen. | adapter (herdr-only today) |
 
 Every entry above is either already registered in
 `src/setup/registrations.mjs`'s `DEFAULT_CAPABILITY_SLOTS` or already
-live in `.fgos/config.json`'s `runner.capabilities`. Do not treat this
-table as exhaustive forever, and do not treat it as a place to pre-invent
-capabilities nobody has asked `decide` for yet (P2-runtime: extend only
-by observed frequency).
+live in `.fgos/config.json`'s `runner.capabilities` (with the generic
+`review` slot introduced in doctrine and pending config schema
+registration; `decide --for review` currently returns the default
+mechanism). Do not treat this table as exhaustive forever,
+and do not treat it as a place to pre-invent capabilities nobody has asked
+`decide` for yet (P2-runtime: extend only by observed frequency).
 
 ## Capability execution guidance: not agent-only
 

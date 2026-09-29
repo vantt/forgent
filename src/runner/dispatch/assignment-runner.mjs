@@ -18,35 +18,39 @@ import path from 'node:path';
 import { resolveWorkerArtifactPath } from './worker-artifacts.mjs';
 import { normalizeRunResultV2, interpretRunResult, ASSESSMENT_VERDICTS } from './run-result.mjs';
 import { attributeWorkspaceChanges } from './evidence-attribution.mjs';
+import {
+  commitRunSettlement,
+  settleRunOutcome,
+  settleFailedRunFromOutcome,
+  settleReceiptRunFromOutcome,
+  classifyRunEvidence,
+  isSubstantiveReportText,
+  safeGitHead,
+  safeGitStatusFiles,
+  safeGitCommittedDiffFiles,
+  computeChangedFiles,
+  resolveRunWorkerArtifactPath,
+} from './settlement.mjs';
+import { reconcileCliSpawnRun } from './reconcile-cli-spawn.mjs';
 
 // Shared with reconciliation, which must never disagree with this collector
 // about which file is the worker's claim. Re-exported because callers and
 // tests have always taken it from here.
-export { resolveWorkerArtifactPath };
-
-export function resolveRunWorkerArtifactPath(runDir, roundPattern, legacyName) {
-  const candidateDirs = [
-    path.join(runDir, 'worker-output', 'outbox'),
-    path.join(runDir, 'worker-output'),
-    path.join(runDir, 'outbox'),
-  ];
-  for (const dir of candidateDirs) {
-    if (fs.existsSync(dir)) {
-      let entries = [];
-      try { entries = fs.readdirSync(dir); } catch {}
-      const latest = entries
-        .map((name) => ({ name, round: Number((name.match(roundPattern) ?? [])[1]) }))
-        .filter((e) => Number.isFinite(e.round))
-        .sort((a, b) => a.round - b.round)
-        .pop();
-      if (latest) return path.join(dir, latest.name);
-      if (legacyName && entries.includes(legacyName)) {
-        return path.join(dir, legacyName);
-      }
-    }
-  }
-  return resolveWorkerArtifactPath(runDir, roundPattern, legacyName);
-}
+export {
+  resolveWorkerArtifactPath,
+  resolveRunWorkerArtifactPath,
+  commitRunSettlement,
+  settleRunOutcome,
+  settleFailedRunFromOutcome,
+  settleReceiptRunFromOutcome,
+  classifyRunEvidence,
+  isSubstantiveReportText,
+  safeGitHead,
+  safeGitStatusFiles,
+  safeGitCommittedDiffFiles,
+  computeChangedFiles,
+  reconcileCliSpawnRun,
+};
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import {
@@ -63,12 +67,10 @@ import { resolveFallback } from './recovery.mjs';
 import { deriveProviderFamily, resolvePolicyTierModel, resolveExecutorConfig, selectConfinedInvocationId } from './resolve.mjs';
 import { normalizeProviderFamily, checkProviderDisallowed } from './provider-adapter.mjs';
 import {
-  resolveVerifiedRedirectExecutor,
-  resolveVerifiedAssignmentModel,
+  selectPlacementPolicyRedirectExecutor,
   readOnlyRedirectPool,
   readOnlyRedirectInvocationFor,
   readOnlyRedirectEntryFor,
-  stablePoolIndex,
 } from './placement-policy.mjs';
 import { markRunSettled } from './visibility-session.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
@@ -76,6 +78,7 @@ import { extractProtocolOperationStamp, resolveMutatingCwdPosture } from './exec
 import { loadCoordinationProtocol } from '../definitions/protocol-loader.mjs';
 import {
   publishNextGeneration,
+  currentGeneration,
   acquireRunControl,
   releaseRunControl,
   settleRunControl,
@@ -87,16 +90,26 @@ import {
   fsyncDirBestEffort,
   buildRunControlHolder,
   inspectRunControl,
+  resolveHolderLiveness,
 } from './run-lock.mjs';
 import { resolveExecutorCommand, currentDispatchDepth, MAX_DISPATCH_DEPTH, DispatchError } from './transport.mjs';
-import { reconcileHerdrSpawnRun } from './herdr-round.mjs';
+import {
+  acquireMainCheckoutLock,
+  renewMainCheckoutLockIfOwn,
+  dispatchLockFile,
+  ACQUIRED,
+  HELD,
+  AMBIGUOUS,
+  formatLockDurationMs,
+} from '../main-checkout-lock.mjs';
+import { reconcileHerdrSpawnRun, isHerdrSpawnRunStillWorking } from './herdr-reconcile.mjs';
 import { prepareConfinementForLaunch, finalizeConfinementResources } from './confinement/authority.mjs';
 import { buildConfinementRequest } from './confinement/request.mjs';
 import {
-  startSupervisorProcess,
-  readSupervisorBinding,
-  readWorkerBinding,
-  readAdapterReceipt,
+  startDetachedRunSupervisorProcess,
+  readDetachedRunSupervisorBinding,
+  readDetachedRunWorkerBinding,
+  readDetachedRunAdapterReceipt,
   getBootId,
   getProcessStartTime,
   getProcessPgid,
@@ -104,7 +117,8 @@ import {
   publishMutableProjection,
   computeSha256Digest,
   canonicalJson,
-} from './cli-spawn-supervisor.mjs';
+  isDetachedRunProcessAlive,
+} from './detached-run-supervisor.mjs';
 import {
   buildEffectiveExecutionContract,
   EFFECTIVE_EXECUTION_CONTRACT_FILE,
@@ -288,43 +302,27 @@ function selectReadOnlyRedirectExecutor(cfg, sourceExecutorId, assignment) {
   const sourceProvider = resolveProviderFamilyForExecutor(sourceExecutorEntry, sourceExecutorId);
 
   const seed = `${assignment?.operation ?? ''}:${assignment?.assignmentId ?? ''}`;
-  const candidates = rawPool.filter((candidate) => candidate !== sourceExecutorId && executors[candidate]);
-  const legacyExecutorId = candidates.length === 0
-    ? sourceExecutorId
-    : candidates[stablePoolIndex(seed, candidates.length)];
+  // Phase 08 (executor-policy-dispatch-seams) / dispatch-engine-liveness-
+  // hardening Phase 7: PlacementPolicy owns redirect EXECUTOR selection
+  // directly -- the shadow-verified `resolveVerifiedRedirectExecutor` this
+  // used to compare against called the exact same primitive
+  // (`stablePoolIndex`) over the exact same filtered pool and seed this
+  // function already computes, so the two were never two algorithms, only
+  // one under two names. Confirmed via ~800 real production dispatch runs'
+  // captured stderr (`.fgos/assignments/*/runs/*/stderr.log`, Aug-Sept
+  // 2026): zero real divergence ever recorded.
+  const executorId = selectPlacementPolicyRedirectExecutor({ cfg, sourceExecutorId, candidatePool: rawPool, seed });
 
-  // Phase 08 (executor-policy-dispatch-seams): PlacementPolicy production
-  // binder for redirect EXECUTOR selection, self-verifying -- same safety
-  // posture as Phase 07's model-resolution binder. `legacyExecutorId` above
-  // is UNCHANGED, always computed first; PlacementPolicy's own selection
-  // (placement-policy.mjs's resolveVerifiedRedirectExecutor) is used only
-  // when it agrees, so a real dispatch can never regress. `rawPool` (before
-  // the admissibility filter above) is passed through -- the verified
-  // resolver does its own identical filtering internally, mirroring exactly
-  // what this function's own `candidates` line already does.
-  const { executorId: verifiedExecutorId, divergence: placementDivergence } = resolveVerifiedRedirectExecutor({
-    cfg,
-    sourceExecutorId,
-    candidatePool: rawPool,
-    seed,
-    legacyExecutorId,
-  });
-  if (placementDivergence) {
-    process.stderr.write(
-      `fgos: PlacementPolicy redirect divergence (falling back to legacy) source=${placementDivergence.sourceExecutorId} pool=${placementDivergence.candidatePool.join(',')} legacyExecutor=${placementDivergence.legacyExecutorId} placementExecutor=${placementDivergence.placementExecutorId}\n`,
-    );
-  }
+  const targetExecutorEntry = cfg?.executors?.[executorId];
+  const selectedProvider = resolveProviderFamilyForExecutor(targetExecutorEntry, executorId);
 
-  const targetExecutorEntry = cfg?.executors?.[verifiedExecutorId];
-  const selectedProvider = resolveProviderFamilyForExecutor(targetExecutorEntry, verifiedExecutorId);
-
-  const entryDesc = readOnlyRedirectEntryFor(cfg, sourceExecutorId, assignment?.operation, verifiedExecutorId);
-  const isCrossProvider = verifiedExecutorId !== sourceExecutorId && selectedProvider !== sourceProvider;
+  const entryDesc = readOnlyRedirectEntryFor(cfg, sourceExecutorId, assignment?.operation, executorId);
+  const isCrossProvider = executorId !== sourceExecutorId && selectedProvider !== sourceProvider;
 
   // Phase 05 R6: cross-provider redirect requires explicit opt-in via crossProvider: true.
   if (isCrossProvider && entryDesc?.crossProvider !== true) {
     throw new RunnerConfigError(
-      `read-only redirect from "${sourceExecutorId}" (${sourceProvider}) to "${verifiedExecutorId}" (${selectedProvider}) crosses provider family without explicit opt-in (entry must declare crossProvider: true).`,
+      `read-only redirect from "${sourceExecutorId}" (${sourceProvider}) to "${executorId}" (${selectedProvider}) crosses provider family without explicit opt-in (entry must declare crossProvider: true).`,
       { code: 'redirect.cross-provider-not-permitted' },
     );
   }
@@ -332,7 +330,7 @@ function selectReadOnlyRedirectExecutor(cfg, sourceExecutorId, assignment) {
   // M7 & I06: return full decision (pool, seed, sourceProvider, selectedProvider, crossProvider)
   // for provenance recording in dispatch-plan.json.
   return {
-    executorId: verifiedExecutorId,
+    executorId,
     pool: rawPool,
     seed,
     sourceProvider,
@@ -345,16 +343,14 @@ function policyForActualExecutor(cfg, policy, executorId, sourceExecutorId) {
   if (executorId === sourceExecutorId) return policy;
   const executorEntry = cfg?.executors?.[executorId];
   const providerModel = resolveProviderFamilyForExecutor(executorEntry, executorId);
-  const legacyModel = providerModel === policy.providerModel
+  // dispatch-engine-liveness-hardening Phase 7: `resolveVerifiedAssignmentModel`
+  // retired -- its own doc comment already admitted the two sides call the
+  // identical `resolvePolicyTierModel(cfg, lookupPolicyTier, provider)` with
+  // identical inputs, so a real algorithmic divergence was never possible
+  // (a provenance/ownership label, not a second competing computation).
+  const model = providerModel === policy.providerModel
     ? policy.model
     : resolvePolicyTierModel(cfg, policy.tier, providerModel);
-  const { model: verifiedModel } = resolveVerifiedAssignmentModel({
-    cfg,
-    lookupPolicyTier: policy.tier,
-    provider: providerModel,
-    legacyModel,
-  });
-  const model = verifiedModel;
   return {
     ...policy,
     executorId,
@@ -372,50 +368,6 @@ function policyForActualExecutor(cfg, policy, executorId, sourceExecutorId) {
       },
     },
   };
-}
-
-/**
- * Check if report text is non-empty and contains substantive content (not a placeholder).
- *
- * @param {string} text
- * @returns {boolean}
- */
-/**
- * Check if report text is non-empty and contains substantive content (not a placeholder).
- *
- * @param {string} text
- * @returns {boolean}
- */
-export function isSubstantiveReportText(text) {
-  if (typeof text !== 'string') return false;
-  const trimmed = text.trim();
-  if (!trimmed) return false;
-
-  if (/^(todo|n\/?a|none|tbd|placeholder|null|undefined)[\s.!\-:#]*$/i.test(trimmed)) {
-    return false;
-  }
-
-  const words = trimmed.toUpperCase().match(/\b[A-Z0-9_-]+\b/g) || [];
-  if (words.length === 0) return false;
-
-  const GENERIC_KEYWORDS = new Set([
-    'TODO', 'N', 'A', 'NA', 'NONE', 'TBD', 'PLACEHOLDER', 'NULL', 'UNDEFINED',
-    'DONE', 'PASSED', 'PASS', 'FAIL', 'FAILED', 'REJECTED', 'READY', 'SUMMARY',
-    'VERDICT', 'REPORT', 'OK', 'STATUS', 'YES', 'NO', 'RESULT', 'RESULTS',
-    'CHECK', 'TITLE', 'HEADER', 'NOTES', 'NOTE', 'DETAILS', 'FINDINGS',
-  ]);
-
-  const nonGenericWords = words.filter((w) => !GENERIC_KEYWORDS.has(w));
-  if (nonGenericWords.length === 0) {
-    return false;
-  }
-
-  const hasExplicitPlaceholder = /\b(todo|n\/?a|none|tbd|placeholder)\b/i.test(trimmed);
-  if (hasExplicitPlaceholder && nonGenericWords.length < 3) {
-    return false;
-  }
-
-  return true;
 }
 
 /**
@@ -458,132 +410,6 @@ export function isSubstantiveEvidenceRef(ref, opts = {}) {
   }
 
   return !/^[a-z0-9_-]+$/i.test(trimmed) || trimmed.includes('/') || trimmed.includes('.');
-}
-
-
-/**
- * Read git HEAD sha safely without emitting error noise on non-git directories.
- *
- * @param {string} dir
- * @returns {string|null}
- */
-function safeGitHead(dir) {
-  if (!dir) return null;
-  try {
-    return execFileSync('git', ['rev-parse', 'HEAD'], {
-      cwd: dir,
-      encoding: 'utf8',
-      shell: false,
-      stdio: ['ignore', 'pipe', 'ignore'],
-    }).trim();
-  } catch {
-    return null;
-  }
-}
-
-/**
- * List uncommitted changed/untracked files via git status, excluding .fgos/ internal files.
- *
- * @param {string} dir
- * @returns {string[]}
- */
-function safeGitStatusFiles(dir) {
-  if (!dir) return [];
-  try {
-    const output = execFileSync('git', ['status', '--porcelain', '-uall'], {
-      cwd: dir,
-      encoding: 'utf8',
-      shell: false,
-      stdio: ['ignore', 'pipe', 'ignore'],
-    });
-    const lines = output.split('\n');
-    const files = [];
-    for (const rawLine of lines) {
-      if (!rawLine || rawLine.length < 4) continue;
-      const match = rawLine.slice(3).trim();
-      if (match) {
-        const filePath = match.includes(' -> ') ? match.split(' -> ')[1].trim() : match;
-        if (!filePath.startsWith('.fgos/') && filePath !== '.fgos') {
-          files.push(filePath);
-        }
-      }
-    }
-    return files;
-  } catch {
-    return [];
-  }
-}
-
-/**
- * List files modified between two commit SHAs, excluding .fgos/ internal files.
- *
- * @param {string} dir
- * @param {string|null} gitBefore
- * @param {string|null} gitAfter
- * @returns {string[]}
- */
-function safeGitCommittedDiffFiles(dir, gitBefore, gitAfter) {
-  if (!dir || !gitBefore || !gitAfter || gitBefore === gitAfter) return [];
-  try {
-    const output = execFileSync('git', ['diff', '--name-only', `${gitBefore}..${gitAfter}`], {
-      cwd: dir,
-      encoding: 'utf8',
-      shell: false,
-      stdio: ['ignore', 'pipe', 'ignore'],
-    });
-    return output
-      .trim()
-      .split('\n')
-      .map((s) => s.trim())
-      .filter((s) => s && !s.startsWith('.fgos/') && s !== '.fgos');
-  } catch {
-    return [];
-  }
-}
-
-/**
- * Compute changed files produced during the run (Step 04 §5.3).
- *
- * Post-run evidence = new dirty files + committed diffs:
- * - newDirtyFiles = dirtyAfter - dirtyBefore  (only files that were clean before the run)
- * - committedFiles = diff(gitBefore..gitAfter)
- * - changedFiles = union(newDirtyFiles, committedFiles)
- *
- * Callers MUST pass dirtyAfter from a snapshot taken immediately after execution —
- * never call safeGitStatusFiles again here. Pre-existing dirty files (dirtyBefore) are
- * excluded from evidence regardless of whether they appear in dirtyAfter.
- *
- * @param {string} dir
- * @param {string|null} gitBefore
- * @param {string|null} gitAfter
- * @param {string[]} dirtyBefore Paths already dirty BEFORE the run started (required)
- * @param {string[]} dirtyAfter  Paths dirty AFTER the run completed (required)
- * @returns {{ changedFiles: string[], changedFileReasons: Record<string,string> }}
- */
-function computeChangedFiles(dir, gitBefore, gitAfter, dirtyBefore, dirtyAfter) {
-  const dirtyBeforeSet = new Set(dirtyBefore ?? []);
-  const committedFiles = safeGitCommittedDiffFiles(dir, gitBefore, gitAfter);
-
-  const changedFileReasons = {};
-
-  // New dirty files: clean before the run, dirty after.
-  // Files already dirty before are conservatively excluded (ambiguous provenance).
-  for (const f of (dirtyAfter ?? [])) {
-    if (!dirtyBeforeSet.has(f)) {
-      changedFileReasons[f] = 'new-dirty-after-run';
-    }
-  }
-
-  // Committed files between gitBefore..gitAfter are always evidence
-  for (const f of committedFiles) {
-    changedFileReasons[f] = changedFileReasons[f]
-      ? 'new-dirty-and-committed-after-run'
-      : 'committed-after-run';
-  }
-
-  const changedFiles = Array.from(new Set(Object.keys(changedFileReasons))).sort();
-
-  return { changedFiles, changedFileReasons };
 }
 
 /**
@@ -695,108 +521,6 @@ function snapshotDirtyBeforeFiles(dir, dirtyBefore) {
 }
 
 /**
- * Classify RunResult status and confidence from evidence (Step 04 §5.2).
- *
- * @param {object} params
- * @param {number|null} params.exitCode
- * @param {string|null} params.signal
- * @param {boolean} params.isTimeout
- * @param {object|null} params.agentClaim
- * @param {boolean} [params.claimInvalid]
- * @param {string[]} [params.workerArtifacts]
- * @param {string[]} [params.changedFiles]
- * @param {boolean} [params.hasDirtyBeforeMutation]
- * @param {boolean} params.isReadOnlyOperation
- * @returns {{ status: 'done'|'blocked'|'failed'|'no-evidence', confidence: 'verified'|'reported'|'inferred'|'no-evidence'|'failed' }}
- */
-export function classifyRunEvidence({
-  exitCode,
-  signal,
-  isTimeout,
-  agentClaim,
-  claimInvalid = false,
-  workerArtifacts = [],
-  changedFiles = [],
-  hasDirtyBeforeMutation = false,
-  isReadOnlyOperation = true,
-  cwd,
-  repoRoot,
-  assignment,
-  work,
-  role,
-}) {
-  if (isTimeout || (exitCode !== null && exitCode !== undefined && exitCode !== 0) || signal) {
-    return { status: 'failed', confidence: 'failed' };
-  }
-
-  // Step 04 §5.2: malformed structured claim must fail closed, not degrade to no-evidence.
-  if (claimInvalid) {
-    return { status: 'failed', confidence: 'failed' };
-  }
-
-  // Step 04 §5.2: agent-result.json is the structured claim, not evidence by itself.
-  // A read-only operation classifies as reported only with a companion report
-  // artifact (e.g. agent-report.md) the runner detected in the run dir.
-  // Self-attested evidenceRefs strings never substitute for it: the worker
-  // fully controls agent-result.json, so string refs prove nothing on disk.
-  // The claim never counts as its own companion report, under either of the
-  // two names it may have been written with.
-  const companionReportArtifacts = workerArtifacts.filter(
-    (p) => typeof p === 'string' && !p.endsWith('agent-result.json') && !/[/\\]outbox[/\\]result-\d+\.json$/.test(p),
-  );
-  const hasWorkerReport = companionReportArtifacts.length > 0;
-
-  if (agentClaim?.status === 'failed') {
-    const isReviewerRole = role === 'reviewer' || role === 'red-team' || assignment?.role === 'reviewer' || assignment?.role === 'red-team';
-    const isFindingVerdict = agentClaim?.assessment?.verdict === 'findings';
-    if ((isReviewerRole || isFindingVerdict) && hasWorkerReport && exitCode === 0 && !isTimeout) {
-      return { status: 'failed', confidence: 'reported' };
-    }
-    return { status: 'failed', confidence: 'failed' };
-  }
-
-  const hasExternalEvidence = changedFiles.length > 0 || hasDirtyBeforeMutation;
-
-  // Step 06 P1: Read-only operation MUST NOT mutate repo state.
-  // If a read-only assignment modified files in the repository (hasExternalEvidence === true),
-  // it violates the read-only contract and must fail closed with confidence: 'failed'.
-  // This check MUST run before the `blocked` short-circuit below: a worker that
-  // mutates a pre-existing dirty file and then self-reports `status: 'blocked'`
-  // must not be allowed to escape the fail-closed verdict by choosing which
-  // status string it writes to agent-result.json (Cell 6.7 Bug A).
-  if (isReadOnlyOperation && hasExternalEvidence) {
-    return { status: 'failed', confidence: 'failed' };
-  }
-
-  if (agentClaim?.status === 'blocked') {
-    return { status: 'blocked', confidence: 'reported' };
-  }
-
-  if (agentClaim && agentClaim.status === 'done') {
-    // Reported for read-only consult/review only when a runner-detected
-    // worker-produced report artifact exists.
-    if (isReadOnlyOperation) {
-      if (hasWorkerReport) {
-        return { status: 'done', confidence: 'reported' };
-      }
-      return { status: 'no-evidence', confidence: 'no-evidence' };
-    }
-    // Verified requires external evidence for mutating operations (git delta / external test proof)
-    // Step 04: changedFiles are already dirty-before-subtracted; only post-run files qualify.
-    if (hasExternalEvidence) {
-      return { status: 'done', confidence: 'verified' };
-    }
-    return { status: 'no-evidence', confidence: 'no-evidence' };
-  }
-
-  // Inferred when external evidence exists without structured claim for mutating operations
-  if (!isReadOnlyOperation && hasExternalEvidence) {
-    return { status: 'done', confidence: 'inferred' };
-  }
-
-  // A settled process with no claim/report and no external proof is always no-evidence
-  return { status: 'no-evidence', confidence: 'no-evidence' };
-}
 
 /**
  * Execute an Assignment through the dispatch control plane and record full RunResult evidence (Step 01 Slice 4/5).
@@ -986,6 +710,44 @@ function validateAssignmentLegality(asgn, opts = {}) {
 }
 
 /**
+ * Whether a cli-spawn Run's DETACHED supervisor or worker -- published
+ * under `runDir/protected/(supervisor-binding|bindings)/*` by
+ * detached-run-supervisor.mjs -- is still doing real work, independent of
+ * whether the RUNNER process that spawned it (the control holder
+ * `inspectRunControl` tracks) is alive. The supervisor is spawned
+ * `detached: true` and deliberately outlives its parent; a runner-only
+ * liveness check (`inspectRunControl`) reads `held: false` the instant the
+ * runner dies even while its supervisor/worker keeps mutating the cwd (S1).
+ * Both `admitRunAttempt`'s in-flight check and provider-capacity's lease
+ * reclaim need this SAME real-worker signal, not just the runner's.
+ *
+ * Mirrors reconcile-cli-spawn.mjs's own "latest command file" discovery
+ * (sorted `controller/commands/*.json`, last wins) so this reads the same
+ * launchCommandId that reconciliation would use. A herdr-spawn Run (no
+ * supervisor/worker bindings ever published for it) or a Run with no
+ * commands at all correctly reads back `false` here -- falls through to
+ * the existing holder-only check, unchanged from before this fix.
+ */
+function isCliSpawnRunStillWorking(runDir) {
+  const commandsDir = path.join(runDir, 'controller', 'commands');
+  if (!fs.existsSync(commandsDir)) return false;
+  let commandFiles;
+  try {
+    commandFiles = fs.readdirSync(commandsDir).filter((f) => f.endsWith('.json')).sort();
+  } catch {
+    return false;
+  }
+  const latestCommandFile = commandFiles[commandFiles.length - 1];
+  if (!latestCommandFile) return false;
+  const launchCommandId = path.basename(latestCommandFile, '.json');
+  const supervisorBinding = readDetachedRunSupervisorBinding(runDir, launchCommandId);
+  if (supervisorBinding?.supervisor && isDetachedRunProcessAlive(supervisorBinding.supervisor)) return true;
+  const workerBinding = readDetachedRunWorkerBinding(runDir, launchCommandId);
+  if (workerBinding?.worker && isDetachedRunProcessAlive(workerBinding.worker)) return true;
+  return false;
+}
+
+/**
  * Atomically admit one Run attempt for `assignmentId` under `runsDir`,
  * replacing the prior readdirSync + max-attempt scan. Fences three
  * outcomes, per the admission door's own commit algorithm:
@@ -1020,7 +782,7 @@ function admitRunAttempt(
   assignmentDir,
   runsDir,
   assignmentId,
-  { retryId, predecessorRunId = null, destination, payloadDigest, expectedRunId, buildRunMeta, buildDispatchPlan, buildEffectiveExecutionContract: buildEffectiveContractOpt, forceNewAttempt = false },
+  { retryId, predecessorRunId = null, destination, payloadDigest, expectedRunId, buildRunMeta, buildDispatchPlan, buildEffectiveExecutionContract: buildEffectiveContractOpt, forceNewAttempt = false, refuseIfSettled = false, herdrLivenessPreCheck = null },
 ) {
   const admissionGenerationsDir = path.join(assignmentDir, 'admission', 'generations');
   const admissionMarkersDir = path.join(assignmentDir, 'admission', 'markers');
@@ -1135,23 +897,84 @@ function admitRunAttempt(
     // exists to close, one level up from R1's own resume-time check (this
     // fires on a FRESH dispatch that never resumes anything, so R1's guard
     // never runs). Only a dead holder (inspectRunControl, Phase 02
-    // identity) authorizes silently proceeding; alive or undisprovable
-    // liveness refuses unless the operator explicitly overrides via
-    // `forceNewAttempt` (--force-new-attempt).
+    // identity) AND no live detached supervisor/worker (S1, Phase 2 --
+    // `inspectRunControl` alone only proves the RUNNER is dead; its
+    // detached supervisor/worker is spawned to deliberately outlive it and
+    // keeps mutating the cwd, so a runner-only check would admit a second,
+    // racing worker onto the same Run) authorizes silently proceeding;
+    // alive or undisprovable liveness on either signal refuses unless the
+    // operator explicitly overrides via `forceNewAttempt`
+    // (--force-new-attempt).
     if (current && !forceNewAttempt) {
       const priorAttemptStr = current.record.attemptStr || String(current.record.attempt).padStart(2, '0');
       const priorRunDir = path.join(runsDir, priorAttemptStr);
       if (!fs.existsSync(path.join(priorRunDir, 'result.json'))) {
         const priorControl = inspectRunControl(priorRunDir);
-        if (priorControl.held) {
+        // S5: a genuinely concurrent sibling caller can reach ITS OWN
+        // admission check for this exact Assignment before it (or a racing
+        // twin) has ever acquired real run control (`acquireRunControl`,
+        // `purpose: 'worker-spawn'`) -- a separate, later step inside
+        // `executeAssignment`, not part of this same CAS commit. In that
+        // narrow window `priorControl.held` is false (no control record
+        // exists at all, `priorControl.controlEpoch` is undefined) and
+        // `isCliSpawnRunStillWorking` is also false (no supervisor/worker
+        // spawned yet either), so neither signal below would ever catch a
+        // second admission racing INSIDE that window -- confirmed via a
+        // real two-process race (test/runner/coordination-dag-concurrency
+        // .test.mjs's cross-process "identical concurrent writers" case).
+        // The one signal that DOES exist for the whole window, with zero
+        // extra writes: the admitting process's own pid, stamped into this
+        // SAME atomic CAS record as `admittedBy` below. Consulted ONLY when
+        // no real control record exists yet (`!priorControl.controlEpoch`)
+        // -- once one does, `priorControl.held` alone is authoritative and
+        // this fallback is never consulted, so it can never override or go
+        // stale against the real control ledger.
+        const admitterAlive =
+          !priorControl.controlEpoch && current.record.admittedBy && resolveHolderLiveness(current.record.admittedBy) === 'held';
+        // Part 2 (herdr-spawn liveness): the prior attempt's own adapter
+        // (buildRunMeta's `adapter` field, run.json) decides which
+        // detached-run-supervisor implementation to consult.
+        // isCliSpawnRunStillWorking is local/instant, so it stays exactly as
+        // before, called inline here. herdr-spawn's own signal was already
+        // computed OUTSIDE this synchronous CAS section (see the caller's
+        // own herdrLivenessPreCheck comment) -- consult it ONLY when it was
+        // computed for this EXACT current generation (`runId` match); a
+        // mismatch means a concurrent commit changed `current` between that
+        // pre-check and this CAS running (a real but narrow race), and per
+        // this track's own repeated "fail closed on undecidable liveness"
+        // rule, an unmatched/never-computed pre-check is treated the SAME as
+        // "still working", never silently ignored.
+        let priorRunAdapter = null;
+        try {
+          priorRunAdapter = JSON.parse(fs.readFileSync(path.join(priorRunDir, 'run.json'), 'utf8'))?.adapter;
+        } catch {}
+        const priorDetachedRunStillWorking = priorRunAdapter === 'herdr-spawn'
+          ? (herdrLivenessPreCheck?.runId === current.record.runId ? herdrLivenessPreCheck.result !== false : true)
+          : isCliSpawnRunStillWorking(priorRunDir);
+        if (priorControl.held || priorDetachedRunStillWorking || admitterAlive) {
           return {
             stop: true,
             status: 'run-in-flight',
             priorRunId: current.record.runId,
             priorAttempt: current.record.attempt,
-            holder: priorControl.holder,
+            holder: priorControl.holder ?? current.record.admittedBy ?? null,
           };
         }
+      } else if (refuseIfSettled) {
+        // S5 (dispatch-engine-liveness-hardening Phase 5): opt-in only, never
+        // the default -- a settled current attempt is exactly what a
+        // legitimate retry (schema-1 or schema-2, `retrySessionTask`) is
+        // SUPPOSED to admit a fresh attempt over, so M1 above never refuses
+        // on settlement alone. But a caller that never intends a retry (a
+        // FIRST, non-retry dispatch of an Assignment/taskKey) has no other
+        // atomic way to tell "a concurrent sibling already finished this
+        // exact dispatch" apart from "nothing has happened yet" -- a plain
+        // re-read from that caller's own process can always be outrun by a
+        // genuinely concurrent cross-process sibling (real wall-clock I/O,
+        // not a same-process race admitRunAttempt's own atomicity already
+        // closes). Refusing here, INSIDE the same CAS critical section that
+        // decides admission, is the only place this can be closed for real.
+        return { stop: true, status: 'run-already-settled', priorRunId: current.record.runId, priorAttempt: current.record.attempt };
       }
     }
     return {
@@ -1164,6 +987,10 @@ function admitRunAttempt(
         destination,
         admissionPayloadDigest: payloadDigest,
         admittedAt: new Date().toISOString(),
+        // S5: the admitting process's own identity, stamped into this same
+        // atomic CAS commit -- see the `admitterAlive` check above for why
+        // this exists and when it is (and is not) consulted.
+        admittedBy: buildRunControlHolder(`${runId}:admission:${process.pid}`),
       },
     };
   });
@@ -1181,14 +1008,20 @@ function admitRunAttempt(
     );
   }
   if (admission.status === 'run-in-flight') {
-    // M1: nothing for THIS new attempt was ever created (no run directory,
-    // no dispatch.claim scope beyond the caller's own pre-existing one) --
+    // M1: nothing for THIS new attempt was ever created (no run directory) --
     // 'pre-admission' is correct, matching every other admission refusal
-    // above, so H2's session-engine claim cleanup still removes the
-    // caller's own claim on this throw.
+    // above.
     throw new RunnerConfigError(
       `executeAssignment: assignment "${assignmentId}"'s prior attempt "${admission.priorRunId}" (attempt ${admission.priorAttempt}) has not settled and its control holder is alive or its liveness could not be disproven -- refusing a new attempt that would race it (pass --force-new-attempt to override)`,
       { code: 'admission-run-in-flight', phase: 'pre-admission', priorRunId: admission.priorRunId, priorAttempt: admission.priorAttempt, holder: admission.holder },
+    );
+  }
+  if (admission.status === 'run-already-settled') {
+    // S5: opt-in (`refuseIfSettled`) refusal -- see its own comment above
+    // for why this exists. Nothing for THIS new attempt was ever created.
+    throw new RunnerConfigError(
+      `executeAssignment: assignment "${assignmentId}"'s prior attempt "${admission.priorRunId}" (attempt ${admission.priorAttempt}) already settled -- the caller opted into refuseIfSettled and must resume/link that result instead of dispatching a fresh attempt over it`,
+      { code: 'admission-run-already-settled', phase: 'pre-admission', priorRunId: admission.priorRunId, priorAttempt: admission.priorAttempt },
     );
   }
 
@@ -1333,6 +1166,7 @@ function attemptProviderCapacityFallback({
   hasLiveTaskAccess,
   providerCapacityRuntimeDir,
   providerCapacityRunIsDead,
+  providerCapacityIsRunWorkerAlive,
 }) {
   const declaredCandidates = Array.isArray(compiledPlan.policy?.executorPreference)
     ? compiledPlan.policy.executorPreference.slice(1)
@@ -1436,6 +1270,7 @@ function attemptProviderCapacityFallback({
         seed: `${effectiveAssignment.assignmentId}:${runId}:fallback:${candidateId}`,
         runtimeDir: providerCapacityRuntimeDir,
         runIsDead: providerCapacityRunIsDead,
+        isRunWorkerAlive: providerCapacityIsRunWorkerAlive,
       });
     } catch (err) {
       lease = { status: 'refused', reason: err.code === 'provider-capacity-lock-stale' ? 'provider-capacity.lock-stale' : 'provider-capacity.acquire-failed' };
@@ -1464,97 +1299,6 @@ function attemptProviderCapacityFallback({
     // before this phase.
     evidence: declaredCandidates.length ? { declaredPrimary: resolvedExecutorId, reasonCode: 'provider-capacity-refused', primaryRefusalReason, skippedCandidates } : null,
   };
-}
-
-/**
- * R5 (Phase 01 result truth, Decision D3): Authoritative RunResult settlement gate.
- *
- * Contract & Concurrency Invariants:
- * 1. Authority & Exclusivity:
- *    - Only the controller holding the current control epoch (`isRunControlCurrent(runDir, { controlEpoch, controlToken })`)
- *      is permitted to commit the authoritative settlement: publishing `result.json` and transitioning the run via `markRunSettled(runDir)`.
- * 2. Superseded Controller Late Settlement Preservation:
- *    - When a controller finishes late after control moved to a newer epoch (e.g. orchestrator timeout, retry takeover,
- *      or split-brain worker completion), it is refused from mutating `result.json`.
- *    - Instead, its normalized work product (`runResult`) is preserved at `result.superseded.json`.
- *    - The function throws a typed RunnerConfigError({ code: 'run-control-superseded', phase: 'post-admission' }).
- * 3. Atomic Publication Guarantees:
- *    - Writes to both `result.json` and `result.superseded.json` use `publishMutableProjection`, which writes to a
- *      process-unique temporary file (`.tmp-${process.pid}-${timestamp}-${rand}`), calls `fs.fsyncSync`, and performs
- *      POSIX `fs.renameSync`.
- *    - This guarantees that readers and concurrent writers never observe a partially written, torn, or corrupted file.
- * 4. Same-Payload Retry Determinism:
- *    - Multiple concurrent or sequential late attempts producing identical normalized work products converge
- *      deterministically to the identical byte representation in `result.superseded.json`.
- * 5. Conflicting Late Payloads (Atomic Last-Writer-Wins):
- *    - If multiple distinct late workers produce conflicting payloads, atomic rename guarantees last-writer-wins.
- *      `result.superseded.json` always contains a complete, valid JSON payload of the latest writer, never torn or mixed.
- *    - Authoritative `result.json` is NEVER overwritten, touched, or corrupted by any late writer.
- * 6. Non-Authoritative Isolation:
- *    - `result.superseded.json` is strictly a diagnostic projection. Downstream consumers (session engine,
- *      `readLinkedRunResultFromDisk`, `findLatestRunResult`, `evaluateSessionQuorum`, `closeSessionByQuorum`, `replaySession`)
- *      read only `result.json` and completely ignore `result.superseded.json`.
- *
- * @param {object} params
- * @param {string} params.runDir Path to the run directory
- * @param {string} params.runId Run identifier
- * @param {number} params.controlEpoch Control epoch held by this controller
- * @param {string} params.controlToken Control token held by this controller
- * @param {object} params.runResult Normalized RunResult v2 object
- * @returns {Readonly<object>} Frozen runResult on authoritative settlement
- */
-export function commitRunSettlement({
-  runDir,
-  runId,
-  controlEpoch,
-  controlToken,
-  runResult,
-  _beforeAuthoritativePublish = null,
-}) {
-  const resultJsonPath = path.join(runDir, 'result.json');
-  const supersededJsonPath = path.join(runDir, 'result.superseded.json');
-
-  // 1. Precondition check: controller must have current control
-  if (!isRunControlCurrent(runDir, { controlEpoch, controlToken })) {
-    publishMutableProjection(supersededJsonPath, runResult);
-    throw new RunnerConfigError(
-      `executeAssignment: control token for Run "${runId}" (epoch ${controlEpoch}) is no longer current -- a newer controller has taken over; refusing to append a settlement from a superseded controller`,
-      { code: 'run-control-superseded', phase: 'post-admission' },
-    );
-  }
-
-  // 2. Barrier hook for two-process race testing: called after passing precondition,
-  // right before entering the authoritative publication / CAS transaction.
-  if (typeof _beforeAuthoritativePublish === 'function') {
-    _beforeAuthoritativePublish({ runDir, runId, controlEpoch, controlToken });
-  }
-
-  // 3. Authoritative settlement CAS: validate control token and commit settlement in the run-lock ledger.
-  // This atomically validates that { controlEpoch, controlToken } is STILL current and publishes the
-  // 'settled' generation record, locking out any future controller.
-  const settlement = settleRunControl(runDir, { controlEpoch, controlToken });
-  if (settlement.status !== 'settled') {
-    publishMutableProjection(supersededJsonPath, runResult);
-    throw new RunnerConfigError(
-      `executeAssignment: control token for Run "${runId}" (epoch ${controlEpoch}) is no longer current (settlement status: "${settlement.status}") -- a newer controller has taken over; refusing to append a settlement from a superseded controller`,
-      { code: 'run-control-superseded', phase: 'post-admission' },
-    );
-  }
-
-  // 4. Authoritative publication via immutable hard link (atomic EEXIST protection against overwriting):
-  // Authoritative result.json is immutable and must NEVER be overwritten by any subsequent writer.
-  const published = publishImmutableProof(resultJsonPath, runResult);
-  if (!published) {
-    publishMutableProjection(supersededJsonPath, runResult);
-    throw new RunnerConfigError(
-      `executeAssignment: authoritative result.json for Run "${runId}" already exists -- refusing to overwrite authoritative result`,
-      { code: 'run-control-superseded', phase: 'post-admission' },
-    );
-  }
-
-  markRunSettled(runDir);
-  Object.defineProperty(runResult, 'runResult', { value: runResult, enumerable: false, configurable: true });
-  return Object.freeze(runResult);
 }
 
 /**
@@ -1595,6 +1339,23 @@ export async function executeAssignment(assignment, opts = {}) {
   const assignmentDir = path.join(assignmentsDir, assignment.assignmentId);
   const runsDir = path.join(assignmentDir, 'runs');
 
+  // S1 (Phase 2): reclaimDeadLeases (provider-capacity.mjs) only ever saw
+  // the lease-acquiring RUNNER pid go dead, never whether the Run's
+  // detached supervisor/worker is still using the credential -- the exact
+  // same runner-vs-detached-child gap admitRunAttempt's in-flight check
+  // closes above. `lease.assignmentId` + the `run_<assignmentId>_<NN>`
+  // runId shape (this function's own admission naming, above) are enough
+  // to rebuild that Run's directory without provider-capacity.mjs itself
+  // needing to know this layout -- it stays a generic module, this closure
+  // is the only place that maps a lease back to a real runDir.
+  const providerCapacityIsRunWorkerAlive = opts.providerCapacityIsRunWorkerAlive ?? ((runId, lease) => {
+    if (!lease?.assignmentId || typeof runId !== 'string') return false;
+    const prefix = `run_${lease.assignmentId}_`;
+    if (!runId.startsWith(prefix)) return false;
+    const attemptStr = runId.slice(prefix.length);
+    return isCliSpawnRunStillWorking(path.join(assignmentsDir, lease.assignmentId, 'runs', attemptStr));
+  });
+
   fs.mkdirSync(runsDir, { recursive: true });
 
   // Ensure persisted assignment.json is the immutable input for this Run (Step 03 §2).
@@ -1603,6 +1364,7 @@ export async function executeAssignment(assignment, opts = {}) {
   // a different assignment from memory (which would violate the immutability guarantee).
   const assignmentJsonPath = path.join(assignmentDir, 'assignment.json');
   let effectiveAssignment = assignment;
+  let assignmentJsonPublished = false;
   if (!fs.existsSync(assignmentJsonPath)) {
     // I04-REV-01: Ensure template resolution happens before assignment.json is persisted,
     // so the immutable assignment.json on disk carries complete template provenance (including templateSnapshot).
@@ -1620,8 +1382,18 @@ export async function executeAssignment(assignment, opts = {}) {
       });
     }
     effectiveAssignment = assignment;
-    fs.writeFileSync(assignmentJsonPath, `${JSON.stringify(assignment, null, 2)}\n`);
-  } else {
+    // Atomic publish (fsynced temp + exclusive hard link, same primitive as
+    // result.json/run.json): a crash mid-write must never leave a partial
+    // assignment.json on disk -- that used to make the read-back branch
+    // below throw "corrupt (invalid JSON)" forever, permanently bricking
+    // this Assignment id (S6). `publishImmutableProof` either lands the
+    // complete file or leaves it cleanly absent; `false` here means a
+    // concurrent writer won the race in the TOCTOU window above, so fall
+    // through to the read-back branch exactly as if it had existed from
+    // the start.
+    assignmentJsonPublished = publishImmutableProof(assignmentJsonPath, assignment);
+  }
+  if (!assignmentJsonPublished) {
     let raw;
     try {
       raw = fs.readFileSync(assignmentJsonPath, 'utf8');
@@ -1853,17 +1625,55 @@ export async function executeAssignment(assignment, opts = {}) {
     .createHash('sha256')
     .update(JSON.stringify({ assignment: effectiveAssignment, compiledPlan }))
     .digest('hex');
+
+  // Part 2 (herdr-spawn liveness): admitRunAttempt's own M1 in-flight check
+  // (below) is a synchronous CAS critical section that must never block on
+  // anything external -- but herdr-spawn's own liveness signal
+  // (isHerdrSpawnRunStillWorking) is a real, non-deterministic-availability
+  // herdr CLI subprocess call. Pre-compute it here, OUTSIDE the CAS section,
+  // as a best-effort peek at whatever generation is current RIGHT NOW; if a
+  // concurrent commit changes the current generation between this peek and
+  // the real CAS below (a narrow, expected race -- currentGeneration is a
+  // plain read, not part of the same atomic transaction), M1's own check
+  // notices the runId mismatch and fails closed (treats it as still
+  // working) rather than trusting a pre-check computed for the wrong
+  // attempt. Skipped entirely when there is no live candidate to check
+  // (no generation yet, an already-settled attempt, or a non-herdr-spawn
+  // adapter -- isCliSpawnRunStillWorking's own synchronous, local check
+  // already covers that case unchanged, inside the CAS section itself).
+  let herdrLivenessPreCheck = null;
+  const admissionGenerationsDirPeek = path.join(assignmentDir, 'admission', 'generations');
+  const currentGenPeek = currentGeneration(admissionGenerationsDirPeek);
+  if (currentGenPeek?.record) {
+    const peekAttemptStr = currentGenPeek.record.attemptStr || String(currentGenPeek.record.attempt).padStart(2, '0');
+    const peekRunDir = path.join(runsDir, peekAttemptStr);
+    if (!fs.existsSync(path.join(peekRunDir, 'result.json'))) {
+      let peekAdapter = null;
+      try {
+        peekAdapter = JSON.parse(fs.readFileSync(path.join(peekRunDir, 'run.json'), 'utf8'))?.adapter;
+      } catch {}
+      if (peekAdapter === 'herdr-spawn') {
+        const result = await isHerdrSpawnRunStillWorking(peekRunDir, { cwd: effectiveCwd });
+        herdrLivenessPreCheck = { runId: currentGenPeek.record.runId, result };
+      }
+    }
+  }
+
   const admitted = admitRunAttempt(assignmentDir, runsDir, effectiveAssignment.assignmentId, {
     retryId: opts.retryId,
     predecessorRunId: opts.predecessorRunId ?? null,
     destination: opts.destination ?? effectiveCwd,
     payloadDigest: opts.payloadDigest ?? defaultAdmissionPayloadDigest,
     expectedRunId: opts.expectedRunId,
+    herdrLivenessPreCheck,
     // M1: operator escape valve for a prior attempt this host can no
     // longer observe correctly (e.g. its control ledger identity is on an
     // unreachable filesystem) -- never the default, always an explicit opt
     // sourced from the caller (CLI: --force-new-attempt).
     forceNewAttempt: opts.forceNewAttempt === true,
+    // S5: opt-in only (session-engine.mjs's own FRESH, non-retry dispatch
+    // path) -- see admitRunAttempt's own comment for why this exists.
+    refuseIfSettled: opts.refuseIfSettled === true,
     buildRunMeta: (record) => ({
       contract: 'assignment-run.v2',
       runId: record.runId,
@@ -1969,6 +1779,7 @@ export async function executeAssignment(assignment, opts = {}) {
         seed: `${effectiveAssignment.assignmentId}:${runId}`,
         runtimeDir: opts.providerCapacityRuntimeDir,
         runIsDead: opts.providerCapacityRunIsDead,
+        isRunWorkerAlive: providerCapacityIsRunWorkerAlive,
       });
     } catch (err) {
       providerCapacitySelection = {
@@ -2054,6 +1865,7 @@ export async function executeAssignment(assignment, opts = {}) {
         hasLiveTaskAccess: opts.hasLiveTaskAccess,
         providerCapacityRuntimeDir: opts.providerCapacityRuntimeDir,
         providerCapacityRunIsDead: opts.providerCapacityRunIsDead,
+        providerCapacityIsRunWorkerAlive,
       });
 
       let fallbackAdopted = false;
@@ -2431,7 +2243,78 @@ export async function executeAssignment(assignment, opts = {}) {
   let supervisorReceipt = null;
   let assignmentLaunchContext = null;
 
+  // S4 (dispatch-engine-liveness-hardening): cli-spawn is the one Assignment
+  // launch shape with no acquireMainCheckoutLock coverage at all -- herdr-spawn
+  // already inherits it below via its own executeExecutorCli() call, which
+  // internally acquires acquireMainCheckoutLock(fgosDir, {lockFile:
+  // dispatchLockFile(cwd)}) for the full duration of that call. Acquiring a
+  // SECOND lock here for herdr-spawn too would self-conflict against that
+  // inner acquisition (two distinct string identities from the same process
+  // racing the same lock file -- the second would see the first as HELD by
+  // "a different holder" and refuse), so this is scoped to cli-spawn only.
+  // Keyed on the SAME dispatchLockFile(cwd) name executeExecutorCli already
+  // uses, so a cli-spawn Assignment, a herdr-spawn Assignment, and an ad-hoc
+  // `dispatch execute` all contend on ONE lock file per cwd. A per-call
+  // string identity (matching executeExecutorCli's own scheme, not a bare
+  // process.pid) is required because one long-lived process can dispatch
+  // several different Assignments in a row (or concurrently) against the
+  // same cwd -- a bare pid would self-recognize a second, unrelated dispatch
+  // as a refresh of the first instead of a genuine contender.
+  // `opts.forceSharedCwd` (CLI: --force-shared-cwd) is a distinct axis from
+  // `forceNewAttempt` above (that overrides the M1 same-assignment-retry
+  // check; this overrides a DIFFERENT assignment/process sharing this cwd)
+  // -- an operator who already knows concurrent mutation here is safe skips
+  // the acquisition entirely, same as never having contended for the lock.
+  // Gated on `effectiveMutation === 'mutating'`: S4's own problem statement
+  // is concurrent MUTATING Assignments racing a cwd, and this repo's own
+  // test suite (assignment-dispatch.test.mjs's "genuinely concurrent
+  // invocations under the same --work id" Red-Team fix tests) already
+  // proves concurrent READ-ONLY dispatch to the SAME cwd through this exact
+  // cli-spawn/`--contract` door is intentional, existing, relied-upon
+  // behavior -- an unconditional lock here regressed both tests outright
+  // (verified by running them). Read-only Assignments never acquire and are
+  // therefore never blocked by, nor able to block, this lock.
+  let cwdLockRes = null;
+  let cwdLockHeartbeat = null;
+
   try {
+    if (useSupervisorRecovery && effectiveMutation === 'mutating' && opts.forceSharedCwd !== true) {
+      const cwdLockIdentity = `${process.pid}:${Date.now()}:${Math.random().toString(36).slice(2)}`;
+      const cwdLockFile = dispatchLockFile(cwd);
+      const cwdLockAcquired = acquireMainCheckoutLock(fgosDir, {
+        identity: cwdLockIdentity,
+        ttlMs: timeoutMs,
+        releaseOnExit: true,
+        lockFile: cwdLockFile,
+      });
+      if (cwdLockAcquired.status === HELD) {
+        throw new DispatchError(
+          'dispatch-in-flight',
+          `dispatch for cwd "${cwd}" is already in flight (held for ${formatLockDurationMs(cwdLockAcquired.lockAgeMs)}).`,
+          { cwd, lockAgeMs: cwdLockAcquired.lockAgeMs, remainingTtlMs: cwdLockAcquired.remainingTtlMs, holderPid: cwdLockAcquired.holderPid },
+        );
+      }
+      if (cwdLockAcquired.status === AMBIGUOUS) {
+        throw new DispatchError(
+          'dispatch-in-flight',
+          `dispatch lock for cwd "${cwd}" is ambiguous (corrupt or unparseable lock file).`,
+          { cwd, lockAgeMs: cwdLockAcquired.lockAgeMs },
+        );
+      }
+      if (cwdLockAcquired.status !== ACQUIRED) {
+        throw new DispatchError(
+          'dispatch-in-flight',
+          `dispatch lock for cwd "${cwd}" could not be acquired (status: ${cwdLockAcquired.status}).`,
+          { cwd },
+        );
+      }
+      cwdLockRes = cwdLockAcquired;
+      const cwdLockHeartbeatMs = Math.max(250, Math.floor(timeoutMs / 3));
+      cwdLockHeartbeat = setInterval(() => {
+        renewMainCheckoutLockIfOwn(fgosDir, cwdLockIdentity, { lockFile: cwdLockFile });
+      }, cwdLockHeartbeatMs);
+      cwdLockHeartbeat.unref();
+    }
     if (needsAssignmentLaunchContext) {
       const depth = currentDispatchDepth();
       if (depth >= MAX_DISPATCH_DEPTH) {
@@ -2684,7 +2567,7 @@ export async function executeAssignment(assignment, opts = {}) {
       // 7. Submit supervisor
       let supervisorProc;
       try {
-        supervisorProc = startSupervisorProcess({
+        supervisorProc = startDetachedRunSupervisorProcess({
           envelopePath: prepResult.envelopePath,
           detached: true,
           onChunk: opts.onChunk,
@@ -2829,6 +2712,7 @@ export async function executeAssignment(assignment, opts = {}) {
           stage: effectiveAssignment.stage,
           runDir: path.resolve(runDir),
           dispatchBatchKey: opts.dispatchBatchKey,
+          effectiveContract,
           // needsAssignmentLaunchContext (herdr-spawn, and any other
           // out-of-process adapter besides cli-spawn) reuses the SAME
           // assignmentLaunchContext identity built above -- executeExecutorCli
@@ -2862,320 +2746,55 @@ export async function executeAssignment(assignment, opts = {}) {
       // run-control-superseded without touching authoritative result.json.
     }
 
-  const durationMs = Date.now() - startTime;
-  const settledAt = new Date().toISOString();
+    const runMeta = {
+      contract: 'run-meta.v1',
+      runId,
+      assignmentId: effectiveAssignment.assignmentId,
+      workId: effectiveAssignment.workId,
+      attempt: admitted.attemptNum,
+      executorId,
+    };
 
-  const gitAfter = rawResult?.headAfter ?? safeGitHead(effectiveCwd);
-  // Step 04 §5.3: snapshot dirty state AFTER the run for subtraction
-  const dirtyAfter = safeGitStatusFiles(effectiveCwd);
-
-  const stdoutText = rawResult.stdout || '';
-  const stderrText = rawResult.stderr || (executionError ? executionError.message : '');
-
-  fs.writeFileSync(path.join(runDir, 'stdout.log'), stdoutText);
-  fs.writeFileSync(path.join(runDir, 'stderr.log'), stderrText);
-
-  const isTimeout = rawResult.status === 'timeout';
-  const exitCode = typeof rawResult.status === 'number'
-    ? rawResult.status
-    : (rawResult.exitCode ?? (isTimeout ? 124 : (rawResult.status === 'failed' || executionError ? 1 : 0)));
-  const signal = rawResult.signal ?? (isTimeout ? 'SIGTERM' : null);
-
-  const exitInfoData = {
-    exitCode,
-    signal,
-    timedOut: isTimeout,
-    settledAt,
-    durationMs,
-  };
-  fs.writeFileSync(path.join(runDir, 'exit.json'), `${JSON.stringify(exitInfoData, null, 2)}\n`);
-
-  // Detect worker-produced artifacts in runDir (Step 04 §5.5)
-  const agentReportPath = resolveRunWorkerArtifactPath(runDir, /^report-(\d+)\.md$/, 'agent-report.md');
-  const agentResultPath = resolveRunWorkerArtifactPath(runDir, /^result-(\d+)\.json$/, 'agent-result.json');
-
-  // Step 04 §5.2: validate agent-result.json; invalid schema must produce failed/failed.
-  let agentClaim = null;
-  let claimInvalid = false;
-  // Claim-bytes binding: the sha256 of the EXACT agent-result.json bytes this
-  // runner classified. result.json records it alongside the claim copy, so
-  // cross-pass consumption can prove the stored claim still matches the
-  // worker's own file — a post-exit edit of either side breaks the pairing.
-  let claimSha256 = null;
-  const agentResultExists = fs.existsSync(agentResultPath);
-  if (agentResultExists) {
-    let claimBytes;
-    let parseError = false;
-    try {
-      claimBytes = fs.readFileSync(agentResultPath);
-    } catch {
-      parseError = true;
-    }
-    let parsedClaim = null;
-    if (!parseError) {
-      try {
-        parsedClaim = JSON.parse(claimBytes.toString('utf8'));
-      } catch {
-        parseError = true;
-      }
-    }
-    if (parseError) {
-      // Malformed JSON: treat as invalid claim (not absent)
-      claimInvalid = true;
-    } else {
-      const validation = validateAgentResultClaim(parsedClaim, { role: assignment.role, operation: assignment.operation });
-      if (validation.valid) {
-        agentClaim = parsedClaim;
-        try {
-          claimSha256 = crypto.createHash('sha256').update(claimBytes).digest('hex');
-        } catch {
-          claimSha256 = null;
-        }
-      } else {
-        // Present but invalid schema: fail closed
-        claimInvalid = true;
-      }
-    }
-  }
-
-  // Build worker artifact list (agent-report.md and agent-result.json are worker-produced).
-  // Control-plane files (result.json, evidence.json, etc.) are never listed here.
-  const workerArtifacts = [];
-  // Settle-report binding: hash the EXACT bytes of every companion report
-  // artifact the classifier will count. result.json records the settle set,
-  // so cross-pass consumption can prove each report is still the bytes that
-  // were classified — a report planted or edited after settle is not in the
-  // set (or no longer matches) and can never satisfy a report gate. An
-  // honest no-report run records an empty settle set.
-  const settleReports = [];
-  const agentReportExists = fs.existsSync(agentReportPath);
-  if (agentReportExists) {
-    let reportValid = false;
-    let reportSha256 = null;
-    try {
-      const reportBytes = fs.readFileSync(agentReportPath);
-      reportValid = isSubstantiveReportText(reportBytes.toString('utf8'));
-      if (reportValid) {
-        try {
-          reportSha256 = crypto.createHash('sha256').update(reportBytes).digest('hex');
-        } catch {
-          reportSha256 = null;
-        }
-      }
-    } catch {
-      reportValid = false;
-    }
-    const reportRelPath = path.relative(root, agentReportPath);
-    workerArtifacts.push({
-      path: reportRelPath,
-      kind: 'agent-report',
-      valid: reportValid,
-    });
-    if (reportValid && reportSha256) {
-      settleReports.push({ path: reportRelPath, sha256: reportSha256 });
-    }
-  }
-  if (agentResultExists) {
-    workerArtifacts.push({
-      path: path.relative(root, agentResultPath),
-      kind: 'agent-result',
-      valid: !claimInvalid,
-    });
-  }
-  // Flatten to paths for classifyRunEvidence (only valid worker artifacts count towards evidence)
-  const workerArtifactPaths = workerArtifacts.filter((a) => a.valid).map((a) => a.path);
-
-  // Step 04 §5.4: use isReadOnlyAssignment helper instead of inline role check
-  const isReadOnly = isReadOnlyAssignment(effectiveAssignment);
-
-  // Step 04 §5.3: subtract dirtyBefore from changed files computation.
-  // dirtyAfter must be passed explicitly — not re-snapshotted inside computeChangedFiles —
-  // so pre-existing dirty files are excluded from post-run evidence.
-  const { changedFiles, changedFileReasons } = computeChangedFiles(cwd, gitBefore, gitAfter, dirtyBefore, dirtyAfter);
-
-  const mutatedDirtyBeforeFiles = [];
-  if (isReadOnly) {
-    for (const [relPath, snap] of dirtyBeforeSnapshots) {
-      const fullPath = path.join(cwd, relPath);
-      let currentContent = null;
-      let currentHash = null;
-      let currentExists = false;
-      try {
-        if (fs.existsSync(fullPath)) {
-          currentContent = fs.readFileSync(fullPath);
-          currentHash = crypto.createHash('sha256').update(currentContent).digest('hex');
-          currentExists = true;
-        }
-      } catch {}
-
-      if (currentExists !== snap.exists || currentHash !== snap.hash) {
-        mutatedDirtyBeforeFiles.push(relPath);
-      }
-    }
-  }
-
-  const { status, confidence } = classifyRunEvidence({
-    exitCode,
-    signal,
-    isTimeout,
-    agentClaim,
-    claimInvalid,
-    workerArtifacts: workerArtifactPaths,
-    changedFiles,
-    hasDirtyBeforeMutation: mutatedDirtyBeforeFiles.length > 0,
-    isReadOnlyOperation: isReadOnly,
-    cwd,
-    repoRoot: root,
-    assignment: effectiveAssignment,
-    work: opts.work,
-  });
-
-  let providerCapacityFault = null;
-  if (providerCapacitySelection?.status === 'selected') {
-    const fault = classifyProviderCapacityFault({
-      provider: providerCapacitySelection.provider,
-      stderr: stderrText,
-      adapterOutcome: rawResult?.adapterOutcome || rawResult?.outcome || rawResult?.status,
-      structuredAgent: agentClaim,
-    });
-    if (fault?.action && fault.action !== 'none') {
-      providerCapacityFault = {
-        provider: providerCapacitySelection.provider,
-        accountId: providerCapacitySelection.accountId,
-        action: fault.action,
-        reasonCode: fault.reasonCode,
-        quarantineKind: fault.quarantineKind,
-      };
-      if (fault.action === 'quarantine') {
-        // C2a: quarantineProviderAccount's real signature is
-        // {provider, accountId, reasonCode, quarantineKind, until,
-        // runtimeDir, detail} -- the previous call site passed
-        // {runnerConfig, manualClear, evidence}, none of which that
-        // function reads, so `quarantineKind` silently defaulted to
-        // 'temporary' even for a manual-clear-required auth fault, and
-        // `until` was always undefined -- which isQuarantined() reads as
-        // "quarantined forever" (it fails closed on a missing `until`).
-        // The very first quota fault therefore permanently exhausted that
-        // account instead of the classifier's own computed reset window.
-        const quarantine = quarantineProviderAccount({
-          provider: providerCapacitySelection.provider,
-          accountId: providerCapacitySelection.accountId,
-          reasonCode: fault.reasonCode,
-          quarantineKind: fault.quarantineKind,
-          until: fault.until,
-          runtimeDir: opts.providerCapacityRuntimeDir,
-          detail: {
-            kind: 'provider-stderr-classifier',
-            runId,
-            assignmentId: effectiveAssignment.assignmentId,
-          },
-        });
-        providerCapacityFault.quarantine = quarantine;
-      }
-      if (providerCapacityEvidence) {
-        providerCapacityEvidence = {
-          ...providerCapacityEvidence,
-          reasonCodes: [...new Set([...(providerCapacityEvidence.reasonCodes || []), fault.reasonCode].filter(Boolean))],
-          ...(providerCapacityFault.quarantine ? { quarantine: providerCapacityFault.quarantine } : {}),
-        };
-        const selectionPath = path.join(runDir, 'provider-capacity-selection.json');
-        try {
-          fs.writeFileSync(selectionPath, `${JSON.stringify(providerCapacityEvidence, null, 2)}\n`);
-          fsyncFileBestEffort(selectionPath);
-        } catch {}
-      }
-    }
-  }
-
-  // Step 04 §5.5: richer evidence.json with provenance fields.
-  // Keep changedFiles for backward compatibility; add richer fields beside it.
-  const evidenceData = {
-    operationMutability: isReadOnly ? 'read-only' : 'mutates-repo',
-    gitBefore,
-    gitAfter,
-    gitBeforeSource,
-    dirtyBefore,
-    dirtyAfter,
-    mutatedDirtyBeforeFiles,
-    changedFiles,
-    changedFileReasons,
-    attribution: attributeWorkspaceChanges({ preLaunchDirt: dirtyBefore, postRunDirt: dirtyAfter }),
-    artifacts: workerArtifacts,
-    tests: [],
-    ...(providerCapacityFault ? { providerCapacity: providerCapacityFault } : {}),
-    ...(fallbackEvidence ? { fallback: fallbackEvidence } : {}),
-  };
-  fs.writeFileSync(path.join(runDir, 'evidence.json'), `${JSON.stringify(evidenceData, null, 2)}\n`);
-
-  const runResult = normalizeRunResultV2({
-    runId,
-    assignmentId: effectiveAssignment.assignmentId,
-    workId: effectiveAssignment.workId,
-    controlEpoch,
-    controlToken,
-    // executorId: the executor that ACTUALLY ran this attempt (post-redirect).
-    // policy.executorPreference[0]: the DECLARED preference (pre-redirect).
-    // executorRedirected: true when the two above disagree, so the redirect
-    // is explicit in the persisted record rather than left to be inferred by
-    // diffing the two fields (Cell 6.7 Bug B).
-    executorId: resolvedExecutorId,
-    policy: effectivePolicy,
-    executorRedirected,
-    settledAt,
-    durationMs,
-    ...(planContentHash ? { planContentHash } : {}),
-    ...(claimSha256 ? { claimSha256 } : {}),
-    settleReports,
-    status,
-    confidence,
-    role: effectiveAssignment.role,
-    operation: effectiveAssignment.operation,
-    isReadOnlyOperation: isReadOnly,
-    confidenceLevel: confidence,
-    runtime: {
-      exitCode,
-      isTimeout,
-      executionError: executionError ? { message: executionError.message, code: executionError.code } : null,
-      stdoutLog: path.relative(root, path.join(runDir, 'stdout.log')),
-      stderrLog: path.relative(root, path.join(runDir, 'stderr.log')),
-    },
-    // M4 (dispatch-execution-engine architecture review 260920): never
-    // fabricate a claim-shaped object when the worker wrote none. A
-    // synthesized {status,summary} here used to be indistinguishable from
-    // a real worker claim to every downstream reader (basis would even
-    // record 'valid-agent-result-claim' for a claim the worker never
-    // wrote). Pass the real value through unchanged (null when absent);
-    // normalizeRunResultV2 derives its own runner-authored `runnerNote`
-    // from the same runtime facts when there is no real claim, under a
-    // field name that cannot be mistaken for worker attestation.
-    agentClaim,
-    // Pre-existing gap this fix also closes: `claimInvalid` was computed
-    // above but never threaded into normalizeRunResultV2 at this call
-    // site, so a malformed/schema-invalid agent-result.json only produced
-    // status:'failed' through the OLD synthesized agentClaim.status --
-    // itself unrelated to this field. normalizeRunResultV2 already fails
-    // closed on claimInvalid (policy.disposition:'refuse' and
-    // confidence:'failed'); it just needs to actually receive it.
-    claimInvalid,
-    evidence: {
-      // changedFiles at top level for RunResult backward compatibility (Step 03 §5 shape)
+    const outcome = await settleRunOutcome({
+      runDir,
+      runMeta,
+      assignment: effectiveAssignment,
+      controlEpoch,
+      controlToken,
+      exitCode: typeof rawResult?.status === 'number'
+        ? rawResult.status
+        : (rawResult?.exitCode ?? (rawResult?.status === 'timeout' ? 124 : (rawResult?.status === 'failed' || executionError ? 1 : 0))),
+      signal: rawResult?.signal ?? (rawResult?.status === 'timeout' ? 'SIGTERM' : null),
+      isTimeout: rawResult?.status === 'timeout',
+      durationMs: Date.now() - startTime,
+      settledAt: new Date().toISOString(),
+      stdoutText: rawResult?.stdout || '',
+      stderrText: rawResult?.stderr || (executionError ? executionError.message : ''),
+      effectiveCwd,
       gitBefore,
-      gitAfter,
-      // Cell 6.7 G6: explicit provenance for gitBefore -- 'pre-launch' (the
-      // normal case, captured before the worker ever runs) vs
-      // 'post-crash-fallback', so a consumer never has to guess whether
-      // gitBefore/gitAfter were captured at genuinely different instants.
       gitBeforeSource,
-      changedFiles,
-      mutatedDirtyBeforeFiles,
-      attribution: evidenceData.attribution,
-      artifacts: workerArtifactPaths,
-      tests: [],
-    },
-  });
+      gitAfter: rawResult?.headAfter ?? safeGitHead(effectiveCwd),
+      dirtyBefore,
+      dirtyAfter: safeGitStatusFiles(effectiveCwd),
+      dirtyBeforeSnapshots,
+      planContentHash,
+      resolvedExecutorId,
+      effectivePolicy,
+      executorRedirected,
+      providerCapacitySelection,
+      providerCapacityEvidence,
+      fallbackEvidence,
+      executionError,
+      launchCommandId: useSupervisorRecovery ? launchCommandId : null,
+      receipt: supervisorReceipt,
+      adapterOutcome: rawResult?.adapterOutcome || rawResult?.outcome || rawResult?.status,
+      opts: { ...opts, repoRoot: root, cwd },
+    });
 
-  return commitRunSettlement({ runDir, runId, controlEpoch, controlToken, runResult });
+    return outcome.runResult;
   } finally {
+    if (cwdLockHeartbeat) clearInterval(cwdLockHeartbeat);
+    if (cwdLockRes) cwdLockRes.release();
     if (useSupervisorRecovery && launchCommandId) {
       try {
         await finalizeConfinementResources({ runDir, launchCommandId, receipt: supervisorReceipt });
@@ -3192,678 +2811,5 @@ export async function executeAssignment(assignment, opts = {}) {
       } catch {}
     }
     releaseRunControl(runDir, { controlEpoch, controlToken });
-  }
-}
-
-async function settleFailedRunFromOutcome(runDir, runMeta, command, controlEpoch, controlToken, opts = {}) {
-  const resultJsonPath = path.join(runDir, 'result.json');
-  if (fs.existsSync(resultJsonPath)) {
-    try {
-      const settledResult = interpretRunResult(resultJsonPath, { expectedRunId: runMeta?.runId });
-      if (!settledResult || settledResult.corrupt || settledResult.contractCorrupt || settledResult.resultCorrupt || settledResult.classification?.provenance === 'contract-corrupt') {
-        // Do not rehydrate a contract-corrupt result
-      } else {
-        return { status: 'settled', settled: true, runResult: Object.freeze(settledResult) };
-      }
-    } catch {}
-  }
-  // result.json early-return: if a prior settlement already exists, rehydrate it.
-  // (Control CAS check below in commitRunSettlement handles the stale-writer case.)
-  const settledAt = new Date().toISOString();
-  const root = resolveMainCheckoutRoot(runDir) || resolveRepoRoot(runDir) || process.cwd();
-
-  const stdoutText = '';
-  const stderrText = command.outcome?.failureDetail?.message || 'submission-refused';
-
-  fs.writeFileSync(path.join(runDir, 'stdout.log'), stdoutText);
-  fs.writeFileSync(path.join(runDir, 'stderr.log'), stderrText);
-
-  const exitInfoData = {
-    exitCode: 1,
-    signal: null,
-    timedOut: false,
-    settledAt,
-    durationMs: 0,
-  };
-  fs.writeFileSync(path.join(runDir, 'exit.json'), `${JSON.stringify(exitInfoData, null, 2)}\n`);
-
-  const evidenceData = {
-    operationMutability: 'mutates-repo',
-    gitBefore: null,
-    gitAfter: null,
-    gitBeforeSource: 'pre-launch',
-    dirtyBefore: [],
-    dirtyAfter: [],
-    mutatedDirtyBeforeFiles: [],
-    changedFiles: [],
-    changedFileReasons: {},
-    attribution: [],
-    artifacts: [],
-    tests: [],
-  };
-  fs.writeFileSync(path.join(runDir, 'evidence.json'), `${JSON.stringify(evidenceData, null, 2)}\n`);
-
-  const runResult = normalizeRunResultV2({
-    runId: runMeta.runId,
-    assignmentId: runMeta.assignmentId,
-    controlEpoch,
-    controlToken,
-    status: 'failed',
-    confidence: 'failed',
-    confidenceLevel: 'failed',
-    runtime: {
-      exitCode: 1,
-      stdoutLog: path.relative(root, path.join(runDir, 'stdout.log')),
-      stderrLog: path.relative(root, path.join(runDir, 'stderr.log')),
-    },
-    agentClaim: {
-      status: 'failed',
-      summary: stderrText,
-    },
-    evidence: {
-      gitBefore: null,
-      gitAfter: null,
-      gitBeforeSource: 'pre-launch',
-      changedFiles: [],
-      mutatedDirtyBeforeFiles: [],
-      attribution: [],
-      artifacts: [],
-      tests: [],
-    },
-  });
-
-  // Route result.json publication through the shared atomic settlement
-  // primitive: settleRunControl CAS + immutable hard-link publication.
-  // This closes the TOCTOU gap (F-01): stale writers are refused here the
-  // same way commitRunSettlement refuses them in the normal completion path.
-  // The old isRunControlCurrent() pre-check was a non-atomic read that left
-  // a window between check and write; commitRunSettlement collapses them.
-  const settled = commitRunSettlement({
-    runDir,
-    runId: runMeta.runId,
-    controlEpoch,
-    controlToken,
-    runResult,
-    _beforeAuthoritativePublish: opts?._beforeAuthoritativePublish,
-  });
-  const runJsonPath = path.join(runDir, 'run.json');
-  let runJsonMeta = runMeta || {};
-  if (fs.existsSync(runJsonPath)) {
-    try { runJsonMeta = JSON.parse(fs.readFileSync(runJsonPath, 'utf8')); } catch {}
-  }
-  // run.json status 'failed' is a mutable projection (not authoritative result.json).
-  // commitRunSettlement already wrote 'settled' via markRunSettled; overwrite with
-  // 'failed' to preserve the reconciliation path's explicit status convention.
-  publishMutableProjection(runJsonPath, { ...runJsonMeta, status: 'failed', settledAt });
-  await finalizeConfinementResources({ runDir, launchCommandId: command.launchCommandId });
-
-  return { status: 'settled', settled: true, runResult: Object.freeze(settled) };
-}
-
-async function settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, controlEpoch, controlToken, receiptOpt = null, opts = {}) {
-  const resultJsonPath = path.join(runDir, 'result.json');
-  if (fs.existsSync(resultJsonPath)) {
-    try {
-      const settledResult = interpretRunResult(resultJsonPath, { expectedRunId: runMeta?.runId });
-      if (!settledResult || settledResult.corrupt || settledResult.contractCorrupt || settledResult.resultCorrupt || settledResult.classification?.provenance === 'contract-corrupt') {
-        // Do not rehydrate a contract-corrupt result
-      } else {
-        return { status: 'settled', settled: true, runResult: Object.freeze(settledResult) };
-      }
-    } catch {}
-  }
-  // (Control CAS check below in commitRunSettlement handles the stale-writer case.)
-  const launchCommandId = command.launchCommandId;
-  const receipt = receiptOpt || readAdapterReceipt(runDir, launchCommandId);
-  const root = resolveMainCheckoutRoot(runDir) || resolveRepoRoot(runDir) || process.cwd();
-
-  const captureStdoutPath = path.join(runDir, 'protected', 'capture', launchCommandId, 'stdout.log');
-  const captureStderrPath = path.join(runDir, 'protected', 'capture', launchCommandId, 'stderr.log');
-  let stdoutText = '';
-  let stderrText = '';
-  try { stdoutText = fs.readFileSync(captureStdoutPath, 'utf8'); } catch {}
-  try { stderrText = fs.readFileSync(captureStderrPath, 'utf8'); } catch {}
-
-  fs.writeFileSync(path.join(runDir, 'stdout.log'), stdoutText);
-  fs.writeFileSync(path.join(runDir, 'stderr.log'), stderrText);
-
-  const isTimeout = receipt?.completion?.kind === 'timeout' || receipt?.completion?.kind === 'idle-timeout';
-  const exitCode = receipt?.completion?.exitCode ?? (isTimeout ? 124 : 0);
-  const signal = receipt?.completion?.signal ?? (isTimeout ? 'SIGTERM' : null);
-  const durationMs = receipt?.completion?.durationMs ?? 0;
-  const settledAt = receipt?.completion?.settledAt ?? new Date().toISOString();
-
-  const exitInfoData = {
-    exitCode,
-    signal,
-    timedOut: isTimeout,
-    settledAt,
-    durationMs,
-  };
-  fs.writeFileSync(path.join(runDir, 'exit.json'), `${JSON.stringify(exitInfoData, null, 2)}\n`);
-
-  // Detect worker artifacts
-  const agentReportPath = resolveRunWorkerArtifactPath(runDir, /^report-(\d+)\.md$/, 'agent-report.md');
-  const agentResultPath = resolveRunWorkerArtifactPath(runDir, /^result-(\d+)\.json$/, 'agent-result.json');
-
-  // Read assignment before validating its worker claim so role/operation
-  // requirements are enforced at this recovery settlement gate too.
-  const candidateAssignmentPaths = [
-    path.join(path.dirname(runDir), '..', 'assignment.json'),
-    path.join(runDir, 'assignment.json'),
-  ];
-  let asgn = null;
-  for (const p of candidateAssignmentPaths) {
-    if (fs.existsSync(p)) {
-      try { asgn = JSON.parse(fs.readFileSync(p, 'utf8')); break; } catch {}
-    }
-  }
-
-  let agentClaim = null;
-  let claimInvalid = false;
-  let claimSha256 = null;
-
-  if (fs.existsSync(agentResultPath)) {
-    try {
-      const claimBytes = fs.readFileSync(agentResultPath);
-      const parsed = JSON.parse(claimBytes.toString('utf8'));
-      const validation = validateAgentResultClaim(parsed, { role: asgn?.role, operation: asgn?.operation });
-      if (validation.valid) {
-        agentClaim = parsed;
-        claimSha256 = crypto.createHash('sha256').update(claimBytes).digest('hex');
-      } else {
-        claimInvalid = true;
-      }
-    } catch {
-      claimInvalid = true;
-    }
-  }
-
-  const workerArtifacts = [];
-  const settleReports = [];
-  if (fs.existsSync(agentReportPath)) {
-    let reportValid = false;
-    let reportSha256 = null;
-    try {
-      const reportBytes = fs.readFileSync(agentReportPath);
-      reportValid = isSubstantiveReportText(reportBytes.toString('utf8'));
-      if (reportValid) {
-        reportSha256 = crypto.createHash('sha256').update(reportBytes).digest('hex');
-      }
-    } catch {}
-    const reportRel = path.relative(root, agentReportPath);
-    workerArtifacts.push({ path: reportRel, kind: 'agent-report', valid: reportValid });
-    if (reportValid && reportSha256) {
-      settleReports.push({ path: reportRel, sha256: reportSha256 });
-    }
-  }
-
-  if (fs.existsSync(agentResultPath)) {
-    workerArtifacts.push({
-      path: path.relative(root, agentResultPath),
-      kind: 'agent-result',
-      valid: !claimInvalid,
-    });
-  }
-
-  const workerArtifactPaths = workerArtifacts.filter((a) => a.valid).map((a) => a.path);
-
-  // Assignment was read before claim validation so both gates share its context.
-  const isReadOnly = isReadOnlyAssignment(asgn);
-
-  const effectiveCwd = baseline?.cwd || root;
-  const gitBefore = baseline?.gitBefore ?? null;
-  const gitBeforeSource = baseline?.gitBeforeSource ?? 'pre-launch';
-  const dirtyBefore = baseline?.dirtyBefore || [];
-  const gitAfter = safeGitHead(effectiveCwd);
-  const dirtyAfter = safeGitStatusFiles(effectiveCwd);
-
-  const { changedFiles, changedFileReasons } = computeChangedFiles(effectiveCwd, gitBefore, gitAfter, dirtyBefore, dirtyAfter);
-
-  const mutatedDirtyBeforeFiles = [];
-  if (isReadOnly && baseline?.dirtyBeforeSnapshots) {
-    for (const [relPath, snap] of Object.entries(baseline.dirtyBeforeSnapshots)) {
-      const fullPath = path.join(effectiveCwd, relPath);
-      let currentExists = false;
-      let currentHash = null;
-      try {
-        if (fs.existsSync(fullPath)) {
-          const content = fs.readFileSync(fullPath);
-          currentHash = crypto.createHash('sha256').update(content).digest('hex');
-          currentExists = true;
-        }
-      } catch {}
-      if (currentExists !== snap.exists || currentHash !== snap.sha256) {
-        mutatedDirtyBeforeFiles.push(relPath);
-      }
-    }
-  }
-
-  const { status, confidence } = classifyRunEvidence({
-    exitCode,
-    signal,
-    isTimeout,
-    agentClaim,
-    claimInvalid,
-    workerArtifacts: workerArtifactPaths,
-    changedFiles,
-    hasDirtyBeforeMutation: mutatedDirtyBeforeFiles.length > 0,
-    isReadOnlyOperation: isReadOnly,
-    cwd: effectiveCwd,
-    repoRoot: root,
-    assignment: asgn,
-  });
-
-  const evidenceData = {
-    operationMutability: isReadOnly ? 'read-only' : 'mutates-repo',
-    gitBefore,
-    gitAfter,
-    gitBeforeSource,
-    dirtyBefore,
-    dirtyAfter,
-    mutatedDirtyBeforeFiles,
-    changedFiles,
-    changedFileReasons,
-    attribution: attributeWorkspaceChanges({ preLaunchDirt: dirtyBefore, postRunDirt: dirtyAfter }),
-    artifacts: workerArtifacts,
-    tests: [],
-  };
-  fs.writeFileSync(path.join(runDir, 'evidence.json'), `${JSON.stringify(evidenceData, null, 2)}\n`);
-
-  const runResult = normalizeRunResultV2({
-    runId: runMeta.runId,
-    assignmentId: runMeta.assignmentId,
-    workId: runMeta.workId || asgn?.workId,
-    controlEpoch,
-    controlToken,
-    executorId: runMeta.executorId || 'cli-spawn',
-    ...(claimSha256 ? { claimSha256 } : {}),
-    settleReports,
-    status,
-    confidence,
-    role: asgn?.role,
-    operation: asgn?.operation,
-    isReadOnlyOperation: isReadOnly,
-    confidenceLevel: confidence,
-    runtime: {
-      exitCode,
-      isTimeout,
-      stdoutLog: path.relative(root, path.join(runDir, 'stdout.log')),
-      stderrLog: path.relative(root, path.join(runDir, 'stderr.log')),
-    },
-    // M4 — see the sibling site above: pass the real claim through
-    // unchanged, never a synthesized stand-in.
-    agentClaim,
-    // Same pre-existing gap closed at the sibling site above.
-    claimInvalid,
-    evidence: {
-      gitBefore,
-      gitAfter,
-      gitBeforeSource,
-      changedFiles,
-      mutatedDirtyBeforeFiles,
-      attribution: evidenceData.attribution,
-      artifacts: workerArtifactPaths,
-      tests: [],
-    },
-  });
-
-  // Route result.json publication through the shared atomic settlement
-  // primitive: settleRunControl CAS + immutable hard-link publication.
-  // This closes the TOCTOU gap (F-01) for the receipt-backed reconciliation path.
-  const settled = commitRunSettlement({
-    runDir,
-    runId: runMeta.runId,
-    controlEpoch,
-    controlToken,
-    runResult,
-    _beforeAuthoritativePublish: opts?._beforeAuthoritativePublish,
-  });
-  const runJsonPath = path.join(runDir, 'run.json');
-  let runJsonMeta = runMeta || {};
-  if (fs.existsSync(runJsonPath)) {
-    try { runJsonMeta = JSON.parse(fs.readFileSync(runJsonPath, 'utf8')); } catch {}
-  }
-  publishMutableProjection(runJsonPath, { ...runJsonMeta, status: 'settled', settledAt });
-  await finalizeConfinementResources({ runDir, launchCommandId, receipt });
-
-  return { status: 'settled', settled: true, runResult: Object.freeze(settled) };
-}
-
-/**
- * Reconcile an Assignment-owned cli-spawn Run against durable evidence.
- *
- * @param {string} runDir Path to Run directory (assignments/<asgn>/runs/<attempt>)
- * @param {object} [opts] Options
- * @returns {Promise<object>} Outcome object
- */
-export async function reconcileCliSpawnRun(runDir, opts = {}) {
-  // Check action: unsupported operations
-  if (opts.action === 'cancel' || opts.operation === 'cancel') {
-    return { status: 'parked', reason: 'cancel-unsupported' };
-  }
-  if (opts.action === 'shared-cwd-takeover' || opts.operation === 'shared-cwd-takeover') {
-    return { status: 'parked', reason: 'shared-cwd-takeover-unsupported' };
-  }
-
-  const resultJsonPath = path.join(runDir, 'result.json');
-  if (fs.existsSync(resultJsonPath)) {
-    try {
-      let expectedRunId = opts.expectedRunId ?? opts.runId;
-      if (!expectedRunId) {
-        const runJsonPath = path.join(runDir, 'run.json');
-        if (fs.existsSync(runJsonPath)) {
-          try { expectedRunId = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'))?.runId; } catch {}
-        }
-      }
-      const settledResult = interpretRunResult(resultJsonPath, { expectedRunId });
-      if (!settledResult || settledResult.corrupt || settledResult.contractCorrupt || settledResult.resultCorrupt || settledResult.classification?.provenance === 'contract-corrupt') {
-        return { status: 'corrupt', corrupt: true, resultCorrupt: true, runResult: Object.freeze(settledResult) };
-      }
-      return { status: 'settled', settled: true, runResult: Object.freeze(settledResult) };
-    } catch {}
-  }
-
-  const commandsDir = path.join(runDir, 'controller', 'commands');
-  if (!fs.existsSync(commandsDir)) {
-    return { status: 'parked', reason: 'command-missing' };
-  }
-  const commandFiles = fs.readdirSync(commandsDir).filter((f) => f.endsWith('.json'));
-  if (commandFiles.length === 0) {
-    return { status: 'parked', reason: 'command-missing' };
-  }
-
-  commandFiles.sort();
-  const commandFile = commandFiles[commandFiles.length - 1];
-  const launchCommandId = path.basename(commandFile, '.json');
-  const commandPath = path.join(commandsDir, commandFile);
-  const command = JSON.parse(fs.readFileSync(commandPath, 'utf8'));
-
-  // Stale controller verification
-  const isStale = (opts.controlEpoch !== undefined && opts.controlEpoch < command.controlEpoch) ||
-    (opts.controlToken !== undefined && command.controlTokenDigest && computeSha256Digest(opts.controlToken) !== command.controlTokenDigest);
-  if (isStale) {
-    return { status: 'observed', outcome: command.outcome, receipt: readAdapterReceipt(runDir, launchCommandId), settled: false };
-  }
-
-  let controlEpoch = opts.controlEpoch ?? command.controlEpoch ?? 1;
-  let controlToken = opts.controlToken ?? 'tok-reconcile-default';
-
-  let acquiredControl = null;
-  if (opts.controlToken === undefined) {
-    const holder = opts.holder || buildRunControlHolder(`reconciler:${process.pid}:${crypto.randomUUID()}`);
-    try {
-      const control = acquireRunControl(runDir, { holder, purpose: 'reconciliation', ttlMs: opts.controlTtlMs });
-      if (control.status === 'held') {
-        return { status: 'held', holder: control.holder, controlEpoch: control.controlEpoch };
-      }
-      if (control.status === 'stale') {
-        return { status: 'stale', controlEpoch: control.controlEpoch };
-      }
-      acquiredControl = control;
-      if (opts.controlEpoch === undefined && control.controlEpoch !== undefined) {
-        controlEpoch = control.controlEpoch;
-      }
-      if (control.controlToken !== undefined) {
-        controlToken = control.controlToken;
-      }
-    } catch {}
-  } else {
-    // opts.controlToken was supplied (e.g., from a parent executeAssignment).
-    // The control ledger must have a registered generation for settleRunControl's
-    // CAS to work. If the generations dir is empty (direct-reconciler call site
-    // or legacy fixture without prior acquireRunControl), bootstrap it now.
-    const generationsDir = path.join(runDir, 'control', 'generations');
-    const ledgerEmpty = !fs.existsSync(generationsDir) ||
-      fs.readdirSync(generationsDir).filter((f) => f.endsWith('.json')).length === 0;
-    if (ledgerEmpty) {
-      const bootstrapHolder = opts.holder || buildRunControlHolder(`reconciler-bootstrap:${process.pid}`);
-      try {
-        const bootstrapControl = acquireRunControl(runDir, { holder: bootstrapHolder, purpose: 'reconciliation', ttlMs: opts.controlTtlMs });
-        if (bootstrapControl.status === 'acquired') {
-          // Use the freshly acquired epoch/token for settlement; the caller's
-          // opts.controlToken was only used for the stale-check above.
-          acquiredControl = bootstrapControl;
-          controlEpoch = bootstrapControl.controlEpoch;
-          controlToken = bootstrapControl.controlToken;
-        }
-      } catch {}
-    }
-  }
-
-  function checkRunControlCurrent() {
-    if (opts.tokenCurrent === false) return false;
-    const generationsDir = path.join(runDir, 'control', 'generations');
-    if (fs.existsSync(generationsDir)) {
-      try {
-        const files = fs.readdirSync(generationsDir).filter((f) => f.endsWith('.json'));
-        if (files.length > 0) {
-          return isRunControlCurrent(runDir, { controlEpoch, controlToken });
-        }
-      } catch {}
-    }
-    return true;
-  }
-
-  try {
-    let runMeta = null;
-    const runJsonPath = path.join(runDir, 'run.json');
-    if (fs.existsSync(runJsonPath)) {
-      try { runMeta = JSON.parse(fs.readFileSync(runJsonPath, 'utf8')); } catch {}
-    }
-    if (!runMeta) {
-      const asgnJsonPath = path.join(runDir, 'assignment.json');
-      if (fs.existsSync(asgnJsonPath)) {
-        try { runMeta = JSON.parse(fs.readFileSync(asgnJsonPath, 'utf8')); } catch {}
-      }
-    }
-    if (!runMeta) {
-      return { status: 'parked', reason: 'run-meta-missing' };
-    }
-
-    // Window 3a / 13: submission refusal recorded, Run unsettled
-    if (command.state === 'reconciled' && command.outcome?.kind === 'submission-refused') {
-      if (!checkRunControlCurrent()) {
-        return { status: 'observed', outcome: command.outcome, settled: false };
-      }
-      return await settleFailedRunFromOutcome(runDir, runMeta, command, controlEpoch, controlToken, opts);
-    }
-
-    // Check receipt tamper if receipt already exists
-    const receipt = readAdapterReceipt(runDir, launchCommandId);
-    if (receipt) {
-      if (receipt.digest) {
-        const { digest: rDig, ...rBody } = receipt;
-        if (rDig !== computeSha256Digest(rBody)) {
-          return { status: 'refused', reason: 'protected-artifact-corrupt' };
-        }
-      }
-      const actualRecDigest = receipt.digest || computeSha256Digest(receipt);
-      if (command.outcome?.receiptDigest && command.outcome.receiptDigest !== actualRecDigest) {
-        return { status: 'refused', reason: 'protected-artifact-corrupt' };
-      }
-      if (command.receiptDigest && command.receiptDigest !== actualRecDigest) {
-        return { status: 'refused', reason: 'protected-artifact-corrupt' };
-      }
-    }
-
-    // Window 11 / 12: command outcome recorded, Run unsettled
-    if (command.state === 'reconciled' && command.outcome?.kind === 'receipt-backed') {
-      const baselinePath = path.join(runDir, 'controller', 'evaluator-baseline.json');
-      let baseline = null;
-      if (fs.existsSync(baselinePath)) {
-        try {
-          baseline = JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
-          const { digest: baselineDigest, ...baselineWithoutDigest } = baseline;
-          if (baselineDigest && baselineDigest !== computeSha256Digest(baselineWithoutDigest)) {
-            return { status: 'refused', reason: 'evaluator-baseline-mismatch' };
-          }
-        } catch {
-          return { status: 'parked', reason: 'evaluator-baseline-missing' };
-        }
-      } else {
-        return { status: 'parked', reason: 'evaluator-baseline-missing' };
-      }
-      if (!checkRunControlCurrent()) {
-        return { status: 'observed', outcome: command.outcome, settled: false };
-      }
-      return await settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, controlEpoch, controlToken, null, opts);
-    }
-
-    // Window 2: Command pending without envelope
-    if (!command.envelopeDigest) {
-      return { status: 'parked', reason: 'launch-envelope-missing' };
-    }
-
-    let envelopePath = path.join(runDir, 'protected', 'launch-envelope', `${launchCommandId}.json`);
-    if (!fs.existsSync(envelopePath)) {
-      envelopePath = path.join(runDir, 'protected', 'launch-envelope.json');
-    }
-    if (!fs.existsSync(envelopePath)) {
-      return { status: 'parked', reason: 'launch-envelope-missing' };
-    }
-
-    let envelope;
-    try {
-      envelope = JSON.parse(fs.readFileSync(envelopePath, 'utf8'));
-      const { digest: envDigest, ...envelopeWithoutDigest } = envelope;
-      if (envDigest && (envDigest !== computeSha256Digest(envelopeWithoutDigest) || (command.envelopeDigest && envDigest !== command.envelopeDigest))) {
-        return { status: 'refused', reason: 'protected-artifact-corrupt' };
-      }
-    } catch {
-      return { status: 'refused', reason: 'protected-artifact-corrupt' };
-    }
-
-    const { digest: envDigest, ...envelopeWithoutDigest } = envelope;
-    const computedEnvDigest = computeSha256Digest(envelopeWithoutDigest);
-    const actualEnvDigest = envDigest || computedEnvDigest;
-
-    // Window 3 / 4: Envelope exists, no supervisor binding
-    const supervisorBinding = readSupervisorBinding(runDir, launchCommandId);
-    if (!supervisorBinding) {
-      return { status: 'parked', reason: 'supervisor-binding-unknown' };
-    }
-
-    if (supervisorBinding.digest) {
-      const { digest: supDig, ...supBody } = supervisorBinding;
-      if (supDig !== computeSha256Digest(supBody)) {
-        return { status: 'refused', reason: 'protected-artifact-corrupt' };
-      }
-    }
-
-    if (!supervisorBinding.envelopeDigest || (actualEnvDigest && supervisorBinding.envelopeDigest !== actualEnvDigest)) {
-      return { status: 'refused', reason: 'incarnation-mismatch' };
-    }
-
-    // Window 15: Host boot changed
-    const currentBootId = getBootId();
-    const bindingBootId = supervisorBinding.bootId || supervisorBinding.supervisor?.bootId;
-    if (bindingBootId && currentBootId && currentBootId !== 'unknown-boot' && bindingBootId !== currentBootId && !receipt) {
-      return { status: 'parked', reason: 'host-reboot-unknown' };
-    }
-
-    // Check supervisor liveness and starttime
-    const supervisorAlive = isProcessAlive(supervisorBinding.supervisor?.pid);
-    const supervisorStartTime = getProcessStartTime(supervisorBinding.supervisor?.pid);
-    if (supervisorAlive && supervisorStartTime && supervisorBinding.supervisor?.processStartTime) {
-      if (supervisorStartTime !== supervisorBinding.supervisor.processStartTime) {
-        return { status: 'refused', reason: 'incarnation-mismatch' };
-      }
-    }
-
-    // Window 5 / 6: Check worker binding
-    const workerBinding = readWorkerBinding(runDir, launchCommandId);
-    if (!workerBinding) {
-      if (supervisorAlive) {
-        return { status: 'waiting', state: 'supervisor-running' };
-      }
-      if (!receipt) {
-        return { status: 'parked', reason: 'worker-binding-unknown' };
-      }
-    } else {
-      if (!workerBinding.envelopeDigest || (actualEnvDigest && workerBinding.envelopeDigest !== actualEnvDigest)) {
-        return { status: 'refused', reason: 'incarnation-mismatch' };
-      }
-      if (workerBinding.worker?.pgid && supervisorBinding.supervisor?.pgid && workerBinding.worker.pgid === supervisorBinding.supervisor.pgid) {
-        return { status: 'refused', reason: 'incarnation-mismatch' };
-      }
-      const workerAlive = isProcessAlive(workerBinding.worker?.pid);
-      const workerStartTime = getProcessStartTime(workerBinding.worker?.pid);
-      if (workerAlive && workerStartTime && workerBinding.worker?.processStartTime) {
-        if (workerStartTime !== workerBinding.worker.processStartTime) {
-          return { status: 'refused', reason: 'incarnation-mismatch' };
-        }
-      }
-    }
-
-    // Window 7 / 9 / 14: Check receipt
-    if (!receipt) {
-      const workerAlive = workerBinding ? isProcessAlive(workerBinding.worker?.pid) : false;
-      if (supervisorAlive || workerAlive) {
-        return { status: 'waiting', state: 'running' };
-      }
-      return { status: 'parked', reason: 'worker-state-unknown' };
-    }
-
-    // Verify receipt digests
-    const { digest: recDigest, ...receiptWithoutDigest } = receipt;
-    if (recDigest && recDigest !== computeSha256Digest(receiptWithoutDigest)) {
-      return { status: 'refused', reason: 'protected-artifact-corrupt' };
-    }
-    if (receipt.envelopeDigest && actualEnvDigest && receipt.envelopeDigest !== actualEnvDigest) {
-      return { status: 'refused', reason: 'confinement-plan-mismatch' };
-    }
-
-    const supervisorBindingDigest = supervisorBinding.digest || computeSha256Digest(supervisorBinding);
-    let expectedBindingDigest = supervisorBindingDigest;
-    if (workerBinding) {
-      expectedBindingDigest = computeSha256Digest([supervisorBindingDigest, workerBinding.digest || computeSha256Digest(workerBinding)]);
-    }
-    if (receipt.bindingDigest && receipt.bindingDigest !== expectedBindingDigest && receipt.bindingDigest !== supervisorBindingDigest) {
-      return { status: 'refused', reason: 'incarnation-mismatch' };
-    }
-
-    // Stale controller check (Acceptance Test 11)
-    if (!checkRunControlCurrent()) {
-      return { status: 'observed', receipt, settled: false };
-    }
-
-    const baselinePath = path.join(runDir, 'controller', 'evaluator-baseline.json');
-    let baseline = null;
-    if (fs.existsSync(baselinePath)) {
-      try {
-        baseline = JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
-        const { digest: baselineDigest, ...baselineWithoutDigest } = baseline;
-        if (baselineDigest && baselineDigest !== computeSha256Digest(baselineWithoutDigest)) {
-          return { status: 'refused', reason: 'evaluator-baseline-mismatch' };
-        }
-      } catch {
-        return { status: 'parked', reason: 'evaluator-baseline-missing' };
-      }
-    } else {
-      return { status: 'parked', reason: 'evaluator-baseline-missing' };
-    }
-
-    // Publish receipt-backed command outcome
-    const outcome = {
-      kind: 'receipt-backed',
-      receiptDigest: receipt.digest || computeSha256Digest(receipt),
-      adapterCompletion: receipt.completion || receipt.outcome,
-    };
-    command.state = 'reconciled';
-    command.receiptDigest = outcome.receiptDigest;
-    command.outcome = outcome;
-    publishMutableProjection(commandPath, command);
-
-    return await settleReceiptRunFromOutcome(runDir, runMeta, command, baseline, controlEpoch, controlToken, receipt, opts);
-  } finally {
-    if (acquiredControl?.controlToken) {
-      try {
-        releaseRunControl(runDir, {
-          controlEpoch: acquiredControl.controlEpoch,
-          controlToken: acquiredControl.controlToken,
-        });
-      } catch {}
-    }
   }
 }

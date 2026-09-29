@@ -4,20 +4,20 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { execSync, execFileSync, execFile } from 'node:child_process';
+import { execSync, execFileSync, execFile, spawn } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
-import { executeAssignment, commitRunSettlement, resolveWorkerArtifactPath, reconcileCliSpawnRun } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { executeAssignment, commitRunSettlement, settleRunOutcome, settleReceiptRunFromOutcome, resolveWorkerArtifactPath, reconcileCliSpawnRun } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
-import { prepareDispatch } from '../../src/runner/dispatch/prepare.mjs';
 import { compileDispatchPlan } from '../../src/runner/dispatch/plan.mjs';
 import { decideExecutorCli } from '../../src/runner/dispatch/cli.mjs';
 import { openSession, createSessionAssignment } from '../../src/runner/coordination/store.mjs';
 import { acquireRunControl, releaseRunControl } from '../../src/runner/dispatch/run-lock.mjs';
-import { canonicalJson, computeSha256Digest } from '../../src/runner/dispatch/cli-spawn-supervisor.mjs';
+import { canonicalJson, computeSha256Digest } from '../../src/runner/dispatch/detached-run-supervisor.mjs';
 import { initStore, addWork, listWork, settleClaim } from '../../src/state/store.mjs';
 import { acquireClaim, readClaim } from '../../src/state/runtime-coordination.mjs';
 import { inspectProviderCapacity, providerCapacityStatePaths, PROVIDER_CAPACITY_STATE_CONTRACT } from '../../src/runner/dispatch/provider-capacity.mjs';
+import { normalizeRunResultV2 } from '../../src/runner/dispatch/run-result.mjs';
 
 function mkTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-asgn-dispatch-test-'));
@@ -129,6 +129,44 @@ function writeHangingExecutor(dir) {
     `,
   );
   return scriptPath;
+}
+
+// Simulates a process crash mid-publish (S6): throws on the FIRST
+// `fs.writeSync` call whose fd was opened for a `.tmp-*` file under
+// `targetDir` -- the exact write `publishImmutableProof`'s fsynced
+// temp-file step performs -- so the target file (e.g. assignment.json)
+// never gets linked into place. By default `targetDir` must be the file's
+// immediate parent directory; pass `{ matchSubdir: true }` when the write
+// lands in an unpredictable child directory (e.g. a freshly-claimed
+// assignmentId directory under a shared assignments root). Self-restoring:
+// patches are undone as soon as the injected write fires, and the returned
+// `restore()` is a safety net for a test that throws before that happens.
+function injectSingleWriteFailureForDir(targetDir, errorMessage, { matchSubdir = false } = {}) {
+  const originalOpenSync = fs.openSync;
+  const originalWriteSync = fs.writeSync;
+  let capturedFd = null;
+  let triggered = false;
+  const restore = () => {
+    fs.openSync = originalOpenSync;
+    fs.writeSync = originalWriteSync;
+  };
+  const dirMatches = (dir) => (matchSubdir ? (dir === targetDir || dir.startsWith(`${targetDir}${path.sep}`)) : dir === targetDir);
+  fs.openSync = function patchedOpenSync(filePath, ...rest) {
+    const fd = originalOpenSync.call(fs, filePath, ...rest);
+    if (!triggered && typeof filePath === 'string' && dirMatches(path.dirname(filePath)) && path.basename(filePath).startsWith('.tmp-')) {
+      capturedFd = fd;
+    }
+    return fd;
+  };
+  fs.writeSync = function patchedWriteSync(fd, ...rest) {
+    if (!triggered && fd === capturedFd) {
+      triggered = true;
+      restore();
+      throw new Error(errorMessage);
+    }
+    return originalWriteSync.call(fs, fd, ...rest);
+  };
+  return restore;
 }
 
 test('executeAssignment executes non-mutating validate-plan assignment through fake executor', async () => {
@@ -279,17 +317,6 @@ test('executeAssignment rejects human-only assignment before spawning', async ()
     () => executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir }),
     (err) => err instanceof RunnerConfigError && /cannot execute human-only/i.test(err.message),
   );
-});
-
-test('prepareDispatch accepts an Assignment unit with assignmentId', () => {
-  const assignment = buildAssignment({
-    workId: 'tsk-prep-test',
-    stage: 'planning',
-    operation: 'validate-plan',
-  });
-
-  const prepared = prepareDispatch(assignment);
-  assert.equal(prepared.unit.assignmentId, assignment.assignmentId);
 });
 
 test('compileDispatchPlan produces selector.type: "assignment" and resolves executor from assignment policy', () => {
@@ -2742,6 +2769,157 @@ test('executeAssignment: the same (retryId, destination, payloadDigest) tuple re
   assert.equal(fs.readFileSync(counterPath, 'utf8'), '1', 'the executor must only ever be dispatched once for a duplicate admission tuple');
 });
 
+// dispatch-engine-liveness-hardening Phase 2 (S1): the RUNNER process
+// SIGKILLed while its detached cli-spawn supervisor/worker (real subprocess
+// tree, spawned `detached: true` per detached-run-supervisor.mjs) is still
+// alive must not let a fresh dispatch admit a second, racing attempt.
+// Mirrors the audit's own live probe (a child acquiring real run-lock
+// control, spawning a detached long-lived grandchild, then SIGKILLed) but
+// against the REAL cli-spawn adapter path (`useSupervisorRecovery`, the
+// default adapter for out-of-process Assignment execution) so the worker
+// and supervisor bindings this fix actually reads
+// (`protected/supervisor-binding/*.json`/`*.worker.json`) are the real
+// production artifacts, not hand-constructed fixtures.
+function waitFor(predicate, { timeoutMs = 10000, intervalMs = 50 } = {}) {
+  return new Promise((resolve, reject) => {
+    const deadline = Date.now() + timeoutMs;
+    const tick = () => {
+      let value;
+      try {
+        value = predicate();
+      } catch (err) {
+        reject(err);
+        return;
+      }
+      if (value) {
+        resolve(value);
+        return;
+      }
+      if (Date.now() > deadline) {
+        reject(new Error(`waitFor: timed out after ${timeoutMs}ms`));
+        return;
+      }
+      setTimeout(tick, intervalMs);
+    };
+    tick();
+  });
+}
+
+function isPidAliveForTest(pid) {
+  if (!Number.isInteger(pid) || pid <= 0) return false;
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (err) {
+    return err.code === 'EPERM';
+  }
+}
+
+test('executeAssignment: admission refuses a second attempt while a SIGKILLed runner\'s detached cli-spawn worker is still alive (S1 live probe)', { timeout: 30000 }, async () => {
+  const tempDir = mkTempDir();
+  const stallingExecutorScript = path.join(tempDir, 'stalling-executor.mjs');
+  fs.writeFileSync(
+    stallingExecutorScript,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const prompt = process.argv.slice(2).join(' ');
+    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    if (match) {
+      const runDir = path.dirname(match[1]);
+      fs.mkdirSync(runDir, { recursive: true });
+      // Prove liveness to the test, then hang forever -- never produce
+      // agent-result.json, so the Run never settles and stays "in flight"
+      // exactly like the audit's own live-probed scenario.
+      fs.writeFileSync(path.join(runDir, 'worker-alive.pid'), String(process.pid));
+    }
+    setInterval(() => {}, 60000);
+    `,
+  );
+  const runnerConfig = admissionRunnerConfig(stallingExecutorScript);
+  const assignment = buildAssignment({
+    work: { id: 'tsk-admit-s1-sigkill', status: 'doing', stage: 'planning', domain: 'coding' },
+    stage: 'planning', operation: 'validate-plan',
+  });
+  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+  const workerPidPath = path.join(runDir, 'worker-alive.pid');
+  const bindingDir = path.join(runDir, 'protected', 'supervisor-binding');
+
+  const moduleUrl = pathToFileURL(path.resolve('src/runner/dispatch/assignment-runner.mjs')).href;
+  const runnerScript = [
+    `import('${moduleUrl}').then(async ({ executeAssignment }) => {`,
+    `  try {`,
+    `    await executeAssignment(${JSON.stringify(assignment)}, {`,
+    `      cwd: ${JSON.stringify(tempDir)}, repoRoot: ${JSON.stringify(tempDir)}, runnerConfig: ${JSON.stringify(runnerConfig)},`,
+    `    });`,
+    `  } catch (err) { process.stderr.write('runner-error: ' + err.message + '\\n'); }`,
+    `});`,
+  ].join('\n');
+  const runnerProc = spawn(process.execPath, ['-e', runnerScript], { cwd: tempDir, stdio: ['ignore', 'ignore', 'pipe'] });
+  let runnerStderr = '';
+  runnerProc.stderr.on('data', (chunk) => { runnerStderr += chunk.toString(); });
+  const runnerExited = new Promise((resolve) => runnerProc.on('exit', (code, signal) => resolve({ code, signal })));
+
+  let workerPid;
+  let supervisorPid;
+  try {
+    // 1. Wait for the REAL cli-spawn worker (this test's stalling executor,
+    // launched by the real detached supervisor) to actually start and
+    // publish its liveness marker.
+    await waitFor(() => fs.existsSync(workerPidPath) && fs.readFileSync(workerPidPath, 'utf8'));
+    workerPid = Number(fs.readFileSync(workerPidPath, 'utf8'));
+    assert.ok(isPidAliveForTest(workerPid), 'precondition: worker pid must be alive before the SIGKILL probe');
+
+    // 2. Confirm the REAL production supervisor binding was published (not
+    // a hand-built fixture) -- this is the exact artifact
+    // isCliSpawnRunStillWorking/readDetachedRunSupervisorBinding read.
+    const supervisorBindingFiles = await waitFor(() => {
+      if (!fs.existsSync(bindingDir)) return null;
+      const files = fs.readdirSync(bindingDir).filter((f) => f.endsWith('.json') && !f.endsWith('.worker.json'));
+      return files.length > 0 ? files : null;
+    });
+    const supervisorBinding = JSON.parse(fs.readFileSync(path.join(bindingDir, supervisorBindingFiles[0]), 'utf8'));
+    supervisorPid = supervisorBinding.supervisor?.pid;
+    assert.ok(isPidAliveForTest(supervisorPid), 'precondition: real supervisor pid must be alive before the SIGKILL probe');
+
+    // 3. SIGKILL the RUNNER (never the worker/supervisor) -- the exact
+    // probe shape S1 names: the control holder dies, its detached child
+    // does not.
+    runnerProc.kill('SIGKILL');
+    const { signal } = await runnerExited;
+    assert.equal(signal, 'SIGKILL', 'runner must have actually been killed, not exited on its own');
+
+    // 4. Real proof, not an assumption: the detached worker (and its
+    // supervisor) must genuinely have survived the runner's death.
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    assert.ok(isPidAliveForTest(workerPid), 'detached worker must survive its runner being SIGKILLed');
+    assert.ok(isPidAliveForTest(supervisorPid), 'detached supervisor must survive its runner being SIGKILLed');
+
+    // 5. A fresh dispatch for the SAME assignment must now be refused --
+    // this is the real fix under test (admitRunAttempt's in-flight check
+    // now also consults the live supervisor/worker bindings, not just the
+    // dead runner's control-holder record).
+    await assert.rejects(
+      () => executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig }),
+      (err) => {
+        assert.equal(err.code, 'admission-run-in-flight', `expected admission-run-in-flight, got ${err.code}: ${err.message}`);
+        return true;
+      },
+    );
+  } finally {
+    // Process hygiene: never leak the orphaned detached probe processes
+    // this test deliberately created.
+    for (const pid of [workerPid, supervisorPid]) {
+      if (isPidAliveForTest(pid)) {
+        try { process.kill(pid, 'SIGKILL'); } catch {}
+      }
+    }
+    if (!runnerProc.killed) {
+      try { runnerProc.kill('SIGKILL'); } catch {}
+    }
+  }
+});
+
 test('executeAssignment: resuming a Run whose result.json exists but fails to parse REFUSES (result-corrupt), never silently relaunches a worker over it (H3)', async () => {
   const tempDir = mkTempDir();
   const executorScript = writeEchoExecutor(tempDir);
@@ -3687,6 +3865,178 @@ test('reconcileCliSpawnRun: two-OS-process TOCTOU barrier race proves stale reco
   assert.equal(fs.existsSync(path.join(runDir, 'result.superseded.json')), true);
 });
 
+test('executeAssignment: an interrupted assignment.json publish leaves it cleanly absent, and a retry recovers instead of permanently bricking the Assignment (S6)', async () => {
+  const tempDir = mkTempDir();
+  const executorScript = writeEchoExecutor(tempDir);
+  const runnerConfig = {
+    executor: {
+      allowCrossProvider: true,
+      command: process.execPath,
+      args: [executorScript, '{prompt}'],
+    },
+    models: { standard: 'test-model' },
+    timeoutMs: 5000,
+  };
+
+  const work = { id: 'tsk-s6-assignment-json', status: 'doing', stage: 'planning', domain: 'coding' };
+  const assignment = buildAssignment({ work, stage: 'planning', operation: 'validate-plan' });
+  const assignmentDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId);
+  const assignmentJsonPath = path.join(assignmentDir, 'assignment.json');
+
+  // 1. Simulate a crash exactly mid-`assignment.json` publish (the S6 crash
+  // window: `assignment-runner.mjs`'s own write, previously a bare
+  // `fs.writeFileSync` guarded only by `!existsSync`).
+  const restore = injectSingleWriteFailureForDir(assignmentDir, 'Injected crash mid assignment.json publish');
+  let crashed = false;
+  try {
+    await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
+  } catch (err) {
+    crashed = true;
+    assert.match(err.message, /Injected crash mid assignment\.json publish/);
+  } finally {
+    restore();
+  }
+  assert.equal(crashed, true, 'expected the injected fault to interrupt the first attempt');
+
+  // Torn-write proof: the interrupted publish must never leave partial bytes
+  // at the target path -- it is cleanly absent, not corrupt.
+  assert.equal(fs.existsSync(assignmentJsonPath), false);
+
+  // 2. Recovery proof: retrying (the crashed process restarts and calls
+  // executeAssignment again with the same Assignment) succeeds and produces
+  // a complete, valid assignment.json -- it must NOT hit "is corrupt
+  // (invalid JSON)", the failure mode a torn `fs.writeFileSync` used to
+  // cause forever.
+  const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
+  assert.equal(result.assignmentId, assignment.assignmentId);
+  assert.equal(fs.existsSync(assignmentJsonPath), true);
+  const onDisk = JSON.parse(fs.readFileSync(assignmentJsonPath, 'utf8'));
+  assert.equal(onDisk.assignmentId, assignment.assignmentId);
+});
+
+test('createSessionAssignment: an interrupted assignment.json publish leaves it cleanly absent rather than corrupt-but-unreadable (S6, coordination/store.mjs writer)', async () => {
+  const tempDir = mkTempDir();
+  const coordinationId = 's6-store-write';
+  openSession(
+    { coordinationId, objective: 'test', provenanceRoot: { writerId: 'test-writer' } },
+    { repoRoot: tempDir },
+  );
+
+  const assignmentsDir = path.join(tempDir, '.fgos', 'assignments');
+  const restore = injectSingleWriteFailureForDir(assignmentsDir, 'Injected crash mid assignment.json publish (store.mjs)', { matchSubdir: true });
+  let crashed = false;
+  try {
+    createSessionAssignment(
+      {
+        coordinationId,
+        taskKey: 's6-task',
+        contract: {
+          objective: 'Validate the plan for S6 recovery coverage.',
+          contextRefs: [],
+          constraints: [],
+          expectedOutputs: ['agent-result.json (status, summary)'],
+          mutation: 'read-only',
+          evidence: { required: 'reported' },
+          role: 'researcher',
+          budget: { timeoutMs: 60000, maxRuns: 1 },
+        },
+        caller: { writerId: 'test-writer' },
+      },
+      { repoRoot: tempDir },
+    );
+  } catch (err) {
+    crashed = true;
+    assert.match(err.message, /Injected crash mid assignment\.json publish \(store\.mjs\)/);
+  } finally {
+    restore();
+  }
+  assert.equal(crashed, true, 'expected the injected fault to interrupt the write');
+
+  // Find the assignmentId the claim reserved before the interrupted write,
+  // and prove no torn/partial assignment.json ever landed under it.
+  const assignmentIds = fs.readdirSync(assignmentsDir);
+  assert.equal(assignmentIds.length, 1);
+  const assignmentJsonPath = path.join(assignmentsDir, assignmentIds[0], 'assignment.json');
+  assert.equal(fs.existsSync(assignmentJsonPath), false);
+});
+
+test('commitRunSettlement: a crash between control-settlement and result-publication is recoverable, not permanently stuck (S8)', () => {
+  const tempDir = mkTempDir();
+  const assignment = buildAssignment({ work: { id: 'tsk-s8-recovery', status: 'doing', stage: 'planning', domain: 'coding' }, stage: 'planning', operation: 'validate-plan' });
+  const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
+  const runId = `run_${assignment.assignmentId}_01`;
+  fs.mkdirSync(runDir, { recursive: true });
+
+  const control = acquireRunControl(runDir, { holder: { id: 's8-controller', pid: process.pid }, purpose: 'worker-spawn' });
+  assert.equal(control.status, 'acquired');
+
+  const runResult = normalizeRunResultV2({
+    runId,
+    assignmentId: assignment.assignmentId,
+    controlEpoch: control.controlEpoch,
+    controlToken: control.controlToken,
+    settledAt: new Date().toISOString(),
+    runtime: { exitCode: 0 },
+    isReadOnlyOperation: true,
+  });
+
+  // 1. Simulate a crash in the exact window the audit (S8) names:
+  // settleRunControl publishes the 'settled' generation, then the process
+  // dies before publishImmutableProof(result.json) ever runs.
+  assert.throws(
+    () => {
+      commitRunSettlement({
+        runDir,
+        runId,
+        controlEpoch: control.controlEpoch,
+        controlToken: control.controlToken,
+        runResult,
+        _afterControlSettlement: () => {
+          throw new Error('Injected crash: control settled, result.json not yet published');
+        },
+      });
+    },
+    /Injected crash: control settled, result\.json not yet published/,
+  );
+
+  // Prove the stuck state the audit describes: result.json never landed...
+  assert.equal(fs.existsSync(path.join(runDir, 'result.json')), false);
+  // ...and a fresh acquire attempt is refused forever (control already
+  // 'settled'), matching the audit's "acquireRunControl also gets stuck"
+  // finding -- this is what made the Run permanently unresumable before
+  // this fix.
+  const stuckReacquire = acquireRunControl(runDir, { holder: { id: 's8-controller-2', pid: process.pid }, purpose: 'worker-spawn' });
+  assert.equal(stuckReacquire.status, 'settled');
+
+  // 2. Recovery: the SAME token retries commitRunSettlement (the process
+  // that crashed restarts and resumes with the token/epoch it already
+  // held) -- this must now finish the commit instead of being refused as
+  // superseded.
+  const recovered = commitRunSettlement({
+    runDir,
+    runId,
+    controlEpoch: control.controlEpoch,
+    controlToken: control.controlToken,
+    runResult,
+  });
+  assert.equal(recovered.runId, runId);
+  assert.equal(fs.existsSync(path.join(runDir, 'result.json')), true);
+  const onDisk = JSON.parse(fs.readFileSync(path.join(runDir, 'result.json'), 'utf8'));
+  assert.equal(onDisk.runId, runId);
+
+  // 3. A further idempotent retry (e.g. a duplicate resumed process)
+  // rehydrates the already-settled result rather than throwing
+  // 'authoritative result.json already exists'.
+  const idempotentRetry = commitRunSettlement({
+    runDir,
+    runId,
+    controlEpoch: control.controlEpoch,
+    controlToken: control.controlToken,
+    runResult,
+  });
+  assert.equal(idempotentRetry.runId, runId);
+});
+
 test('executeAssignment: an unfenced caller (no retryId, every pre-existing call site) keeps getting "next available attempt", byte-compatible with the replaced readdirSync scan', async () => {
   const tempDir = mkTempDir();
   const executorScript = writeEchoExecutor(tempDir);
@@ -3714,4 +4064,243 @@ test('committed config pins code-review Claude profiles to high effort only on r
   assert.equal(hasHighEffort(argsForInvocation('claude', 'claude-herdr-readonly')), true);
   assert.equal(argsForInvocation('claude', 'claude-cli').includes('--effort'), false);
   assert.equal(cfg.executors['glm'].invocations[0].args.includes('--effort'), false);
+});
+
+test('M12 lock: settlement evaluates changedFiles and classification in opts.cwd when opts.cwd !== effectiveCwd', async () => {
+  const tempDir = mkTempDir();
+  const cwdDir = path.join(tempDir, 'opts-cwd');
+  const effectiveCwdDir = path.join(tempDir, 'effective-cwd');
+  fs.mkdirSync(cwdDir, { recursive: true });
+  fs.mkdirSync(effectiveCwdDir, { recursive: true });
+
+  execFileSync('git', ['init'], { cwd: cwdDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: cwdDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.name', 'Tester'], { cwd: cwdDir, stdio: 'ignore' });
+  fs.writeFileSync(path.join(cwdDir, 'initial.txt'), 'init\n');
+  execFileSync('git', ['add', '.'], { cwd: cwdDir, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'initial'], { cwd: cwdDir, stdio: 'ignore' });
+
+  // Add dirty file in cwdDir
+  fs.writeFileSync(path.join(cwdDir, 'mutated-in-cwd.txt'), 'content\n');
+
+  const runDir = path.join(tempDir, 'run');
+  fs.mkdirSync(runDir, { recursive: true });
+  const { controlToken } = acquireRunControl(runDir, { controllerId: 'test-ctrl' });
+
+  const outcome = await settleRunOutcome({
+    runDir,
+    runMeta: { runId: 'run_m12_01', assignmentId: 'asgn_m12' },
+    controlEpoch: 1,
+    controlToken,
+    exitCode: 0,
+    settledAt: new Date().toISOString(),
+    effectiveCwd: effectiveCwdDir,
+    gitBefore: null,
+    dirtyBefore: [],
+    opts: { cwd: cwdDir, repoRoot: cwdDir },
+  });
+
+  assert.ok(
+    outcome.runResult.evidence.changedFiles.includes('mutated-in-cwd.txt'),
+    'changedFiles must be evaluated in opts.cwd when opts.cwd !== effectiveCwd (M12 lock)',
+  );
+});
+
+test('N1 / M13 / M13b lock: executeAssignment captures both gitBefore/dirtyBefore and gitAfter/dirtyAfter in effectiveCwd when cwd !== effectiveCwd', async () => {
+  const tempDir = mkTempDir();
+  const cwdDir = path.join(tempDir, 'opts-cwd');
+  const effectiveCwdDir = path.join(tempDir, 'effective-cwd');
+  fs.mkdirSync(cwdDir, { recursive: true });
+  fs.mkdirSync(effectiveCwdDir, { recursive: true });
+
+  // Init git repo in cwdDir
+  execFileSync('git', ['init'], { cwd: cwdDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: cwdDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.name', 'Tester'], { cwd: cwdDir, stdio: 'ignore' });
+  fs.writeFileSync(path.join(cwdDir, 'cwd-file.txt'), 'cwd init\n');
+  execFileSync('git', ['add', '.'], { cwd: cwdDir, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'cwd commit'], { cwd: cwdDir, stdio: 'ignore' });
+  const cwdHead = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: cwdDir, encoding: 'utf8' }).trim();
+
+  // Init git repo in effectiveCwdDir
+  execFileSync('git', ['init'], { cwd: effectiveCwdDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: effectiveCwdDir, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.name', 'Tester'], { cwd: effectiveCwdDir, stdio: 'ignore' });
+  fs.writeFileSync(path.join(effectiveCwdDir, 'eff-file.txt'), 'eff init\n');
+  execFileSync('git', ['add', '.'], { cwd: effectiveCwdDir, stdio: 'ignore' });
+  execFileSync('git', ['commit', '-m', 'eff commit before'], { cwd: effectiveCwdDir, stdio: 'ignore' });
+  const effHeadBefore = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: effectiveCwdDir, encoding: 'utf8' }).trim();
+
+  // Worker script modifies effectiveCwdDir by creating a new file
+  const executorScript = path.join(tempDir, 'worker-script.mjs');
+  fs.writeFileSync(
+    executorScript,
+    `
+import fs from 'node:fs';
+import path from 'node:path';
+const prompt = process.argv.slice(2).join(' ');
+const runDirMatch = /(?:Write structured JSON to|Claim path:)[ \t]+(\S+agent-result\.json)/.exec(prompt);
+let runDir = runDirMatch ? path.dirname(runDirMatch[1]) : null;
+if (!runDir) {
+  const asgnBase = path.join(${JSON.stringify(cwdDir)}, '.fgos', 'assignments');
+  if (fs.existsSync(asgnBase)) {
+    for (const d of fs.readdirSync(asgnBase)) {
+      const candidate = path.join(asgnBase, d, 'runs', '01');
+      if (fs.existsSync(candidate)) { runDir = candidate; break; }
+    }
+  }
+}
+if (!runDir) runDir = process.cwd();
+// Write dirty file into effectiveCwdDir
+const targetDir = ${JSON.stringify(effectiveCwdDir)};
+fs.writeFileSync(path.join(targetDir, 'worker-created.txt'), 'created by worker\\n');
+// Write agent-result.json
+fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({
+  status: 'done',
+  summary: 'Created worker file in effective cwd',
+}));
+fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nWorker done\\n');
+`,
+  );
+
+  const assignment = buildAssignment({
+    work: { id: 'tsk-n1-m13-test', status: 'todo', stage: 'executing', domain: 'coding' },
+    stage: 'executing',
+    operation: 'implement-item',
+  });
+
+  const asgnDir = path.join(cwdDir, '.fgos', 'assignments', assignment.assignmentId);
+  const runDir = path.join(asgnDir, 'runs', '01');
+  const genDir = path.join(asgnDir, 'admission', 'generations');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.mkdirSync(genDir, { recursive: true });
+
+  const persistedPlan = {
+    executorId: 'test-fallback',
+    policy: { executorPreference: ['test-fallback'] },
+    mechanism: 'out-of-process',
+    invocation: {
+      via: 'cli',
+      adapter: 'cli-spawn',
+      protocol: 'prompt-stdout-v1',
+      cwd: effectiveCwdDir,
+    },
+  };
+
+  const runJson = {
+    contract: 'assignment-run.v2',
+    runId: `run_${assignment.assignmentId}_01`,
+    assignmentId: assignment.assignmentId,
+    attempt: 1,
+    phase: 'admitted',
+    status: 'running',
+    executorId: 'test-fallback',
+    fallback: { resolved: 'test-fallback' },
+    dispatchPlanDigest: `sha256:${crypto.createHash('sha256').update(JSON.stringify(persistedPlan)).digest('hex')}`,
+    cwd: cwdDir,
+  };
+
+  fs.writeFileSync(path.join(runDir, 'run.json'), JSON.stringify(runJson, null, 2));
+  fs.writeFileSync(path.join(runDir, 'dispatch-plan.json'), JSON.stringify(persistedPlan, null, 2));
+
+  const admissionRecord = {
+    attempt: 1,
+    attemptStr: '01',
+    runId: `run_${assignment.assignmentId}_01`,
+    retryId: 'retry-n1-test',
+    predecessorRunId: null,
+    destination: 'dest-n1',
+    admissionPayloadDigest: 'digest-n1',
+    admittedAt: new Date().toISOString(),
+  };
+  fs.writeFileSync(path.join(genDir, '0000000001.json'), JSON.stringify(admissionRecord, null, 2));
+
+  const result = await executeAssignment(assignment, {
+    cwd: cwdDir,
+    repoRoot: cwdDir,
+    runnerConfig: {
+      executors: {
+        'test-fallback': {
+          adapter: 'cli-spawn',
+          allowCrossProvider: true,
+          command: process.execPath,
+          args: [executorScript, '{prompt}'],
+        },
+      },
+      executor: {
+        allowCrossProvider: true,
+        command: process.execPath,
+        args: [executorScript, '{prompt}'],
+      },
+      models: { standard: 'test-model' },
+      timeoutMs: 10000,
+    },
+    retryId: 'retry-n1-test',
+    destination: 'dest-n1',
+    payloadDigest: 'digest-n1',
+  });
+
+  assert.equal(result.status, 'done');
+  // Evidence must reflect effectiveCwdDir, NOT cwdDir!
+  assert.equal(result.evidence.gitBefore, effHeadBefore, 'gitBefore must be captured from effectiveCwd');
+  assert.notEqual(result.evidence.gitBefore, cwdHead, 'gitBefore must NOT be from cwdDir');
+  assert.equal(result.evidence.gitAfter, effHeadBefore, 'gitAfter must be captured from effectiveCwd');
+  assert.notEqual(result.evidence.gitAfter, cwdHead, 'gitAfter must NOT be from cwdDir');
+  assert.ok(
+    result.evidence.changedFiles.includes('worker-created.txt'),
+    'changedFiles must capture files from effectiveCwd',
+  );
+
+  const evidenceJson = JSON.parse(fs.readFileSync(path.join(runDir, 'evidence.json'), 'utf8'));
+  assert.ok(
+    evidenceJson.dirtyAfter.includes('worker-created.txt'),
+    'dirtyAfter in evidence.json must capture files from effectiveCwd (kills M13 / M13b)',
+  );
+  assert.equal(evidenceJson.gitAfter, effHeadBefore);
+  assert.notEqual(evidenceJson.gitAfter, cwdHead);
+});
+
+test('N6 / M18 lock: settleReceiptRunFromOutcome propagates finalizeConfinementResources errors on receipt path', async () => {
+  const tempDir = mkTempDir();
+  const runDir = path.join(tempDir, 'run');
+  fs.mkdirSync(runDir, { recursive: true });
+
+  const launchCommandId = 'lc-m18';
+  const { controlToken } = acquireRunControl(runDir, { controllerId: 'test-ctrl' });
+
+  // Set up descriptor in protected/confinement-finalization
+  const finDir = path.join(runDir, 'protected', 'confinement-finalization');
+  fs.mkdirSync(finDir, { recursive: true });
+  const descPath = path.join(finDir, `${launchCommandId}.json`);
+  fs.writeFileSync(descPath, JSON.stringify({ cleanupState: 'pending', resources: [] }));
+
+  // Make the directory unwritable so publishMutableProjection throws EACCES
+  fs.chmodSync(finDir, 0o555);
+
+  const command = { launchCommandId };
+  const receipt = {
+    contract: 'cli-spawn-receipt.v1',
+    completion: { kind: 'exited', exitCode: 0, settledAt: new Date().toISOString() },
+  };
+
+  try {
+    await assert.rejects(
+      () =>
+        settleReceiptRunFromOutcome(
+          runDir,
+          { runId: 'run-m18', assignmentId: 'asgn-m18' },
+          command,
+          { cwd: tempDir },
+          1,
+          controlToken,
+          receipt,
+        ),
+      (err) => {
+        assert.ok(err, 'finalize error must be propagated, never swallowed (M18 lock)');
+        return true;
+      },
+    );
+  } finally {
+    fs.chmodSync(finDir, 0o755);
+  }
 });

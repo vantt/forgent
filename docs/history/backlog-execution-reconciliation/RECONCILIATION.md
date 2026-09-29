@@ -25,7 +25,7 @@ mode this item exists to end.
 
 ## Result
 
-30 proposed rows: **7 resolved**, **2 partial**, **2 stale**, **19 open**.
+31 proposed rows: **7 resolved**, **2 partial**, **2 stale**, **20 open**.
 
 Nine rows (7 resolved + 2 stale) describe work the execution layer has
 already finished or made moot, while the backlog still presents them as
@@ -37,6 +37,17 @@ from `docs/backlog.md` on every run, so a newly added `proposed` row starts
 failing until it is reconciled here.
 
 ---
+
+### tsk-p7-shadow-binders — verdict: open
+
+Added by dispatch-engine-liveness-hardening Phase 7 (2026-09-29), the same
+change that added this row to `docs/backlog.md` — not a pre-existing row
+being reconciled after the fact. Genuinely still proposed: the two
+remaining shadow binders (`resolveVerifiedPlacementModel`/
+`resolveVerifiedProviderArgs`) stay in shadow mode, dated for
+re-evaluation once the newly-added durable telemetry
+(`.fgos/dispatch/shadow-binder-divergence.jsonl`) accumulates enough real
+evidence to decide the enumerated divergence classes the row itself names.
 
 ### p-09351985 — verdict: partial
 

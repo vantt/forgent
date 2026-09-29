@@ -79,3 +79,23 @@ export function getAdapterMetadata(adapterName) {
   }
   return null;
 }
+
+export const DISPATCH_DEPTH_ENV = 'FGOS_DISPATCH_DEPTH';
+export const MAX_DISPATCH_DEPTH = 3;
+
+export function currentDispatchDepth() {
+  const raw = process.env[DISPATCH_DEPTH_ENV];
+  const n = raw ? Number(raw) : 0;
+  return Number.isFinite(n) && n >= 0 ? n : 0;
+}
+
+export function resolveExecutorEnv(rawEnv, baseEnv = process.env) {
+  if (!rawEnv || typeof rawEnv !== 'object') return {};
+  const resolved = {};
+  for (const [k, v] of Object.entries(rawEnv)) {
+    if (typeof v === 'string') {
+      resolved[k] = v.replace(/\$\{([^}]+)\}/g, (_, varName) => baseEnv[varName] ?? '');
+    }
+  }
+  return resolved;
+}

@@ -1,0 +1,224 @@
+{
+  "contract": { "id": "agent-result-claim", "version": 2 },
+  "status": "done",
+  "summary": "Blind-scored case-1: 3 RT findings, 16 CX and 16 CY (X/Y sources identical). PRESENT: RT-3 only in X; CX-9/11/15 in X; CY-9/11/15 in Y. All PRESENT marks DISPOSED. GT-1 CONSISTENT in X (4/13 = 30.8%) and CONTRADICTS in Y (rate believed zero).",
+  "assessment": { "verdict": "pass" },
+  "evidenceRefs": [
+    "plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-1/question.md",
+    "plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-1/redteam-findings-source.md",
+    "plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-1/control-objections-source-X.md",
+    "plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-1/control-objections-source-Y.md",
+    "plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-1/explanation-X.md",
+    "plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-1/explanation-Y.md",
+    "plans/260919-coordination-skill-harness-simplification/panel-depth-experiment/scoring/case-1/ground-truth.md"
+  ],
+  "marks": {
+    "rt": [
+      {
+        "id": "RT-1",
+        "statement": "Keeping Proposal A (the flat OR-chain) ignores internal maintainability and producer-side scaling by leaning on consumer output shape.",
+        "quote": "ignores internal maintainability/producer-side scaling by leaning on consumer output shape.",
+        "X": "ABSENT",
+        "Y": "ABSENT"
+      },
+      {
+        "id": "RT-2",
+        "statement": "looksStructured is a dumping ground of hardcoded, tool-specific heuristics; as CLI producers grow, the flat OR-chain will balloon into an unmaintainable, brittle regex nightmare / accumulating technical debt.",
+        "quote": "The `looksStructured` function is a dumping ground of hardcoded, highly specific heuristics targeting exact tools. [...] As the number of supported CLI tools (producers) grows, this flat OR-chain will inevitably balloon into an unmaintainable, brittle regex nightmare.",
+        "X": "ABSENT",
+        "Y": "ABSENT"
+      },
+      {
+        "id": "RT-3",
+        "statement": "Missing legitimate hybrid: array of modular independently-testable predicate functions (Strategy pattern; Classifier = (lines: string[]) => boolean; HEURISTICS.some), solving producer-side maintainability without a grammar registry.",
+        "quote": "A simple, legitimate hybrid would be to extract the heuristics into an array of modular predicate functions (the Strategy pattern) conforming to a simple interface, e.g., `type Classifier = (lines: string[]) => boolean`.",
+        "X": "PRESENT",
+        "X_quote": "An array of modular predicate functions — a Strategy-pattern refactor. Same behaviour, same OR-composition, same file if you like; each detector extracted into its own named unit and the chain becomes an iteration over them.",
+        "X_disposition": "DISPOSED",
+        "Y": "ABSENT"
+      }
+    ],
+    "cx": [
+      {
+        "id": "CX-1",
+        "statement": "Proposal A conflates consumer output shape with implementation architecture.",
+        "X": "ABSENT"
+      },
+      {
+        "id": "CX-2",
+        "statement": "Flat OR-chain in one file will degrade block-classify.ts into a God Function.",
+        "X": "ABSENT"
+      },
+      {
+        "id": "CX-3",
+        "statement": "OCP: every new CLI layout requires modifying core looksStructured / a sensitive path.",
+        "X": "ABSENT"
+      },
+      {
+        "id": "CX-4",
+        "statement": "Regression risk: new heuristics in a flat OR-chain can catch prose; no isolation.",
+        "X": "ABSENT"
+      },
+      {
+        "id": "CX-5",
+        "statement": "Cognitive overload from mixed domains as the heuristic list grows.",
+        "X": "ABSENT"
+      },
+      {
+        "id": "CX-6",
+        "statement": "Internal composition must be modular to absorb CLI-format churn; a flat OR-chain fails that.",
+        "X": "ABSENT"
+      },
+      {
+        "id": "CX-7",
+        "statement": "Registry adds no value to the caller because terminal-render.ts only consumes binary block.mode.",
+        "X": "ABSENT"
+      },
+      {
+        "id": "CX-8",
+        "statement": "No demonstrated Phase 5 need for runtime-pluggable detectors; registry is YAGNI.",
+        "X": "ABSENT"
+      },
+      {
+        "id": "CX-9",
+        "statement": "Six checks are empirically patched special cases; independently-registered units risk losing interaction context.",
+        "X": "PRESENT",
+        "X_quote": "One constant is narrowed so a different detector can claim what it gave up. Today those two notes sit forty lines apart and a reader hits both. Under B they live in a box-drawing grammar module and a q-and-a-summary grammar module respectively.",
+        "X_disposition": "DISPOSED"
+      },
+      {
+        "id": "CX-10",
+        "statement": "Wrongly-panned structured block is unrecoverable; wrongly-wrapped prose matches old behavior.",
+        "X": "ABSENT"
+      },
+      {
+        "id": "CX-11",
+        "statement": "Debuggability of top-to-bottom classification is a safety property; dynamic registration is harder to trace than a linear if-chain.",
+        "X": "PRESENT",
+        "X_quote": "B is behaviourally identical to A and pays for that identity with a specific, concrete loss of debuggability.",
+        "X_disposition": "DISPOSED"
+      },
+      {
+        "id": "CX-12",
+        "statement": "Configurable registration order/active detectors risks breaking the text-only verdict invariant.",
+        "X": "ABSENT"
+      },
+      {
+        "id": "CX-13",
+        "statement": "B has full rewrite/migration cost against 6 heuristics with no shown correctness or extensibility win.",
+        "X": "ABSENT"
+      },
+      {
+        "id": "CX-14",
+        "statement": "Forward risk of A: independent ORs may quietly become order-dependent as detectors accumulate.",
+        "X": "ABSENT"
+      },
+      {
+        "id": "CX-15",
+        "statement": "A and C are not independent designs; they produce the same already-shipping code; real fork is B vs not-B.",
+        "X": "PRESENT",
+        "X_quote": "Proposal C — the status quo, which is Proposal A. Same shape, different label.",
+        "X_disposition": "DISPOSED"
+      },
+      {
+        "id": "CX-16",
+        "statement": "Unresolved whether a concrete Phase 5 requirement drives B or B is speculative.",
+        "X": "ABSENT"
+      }
+    ],
+    "cy": [
+      {
+        "id": "CY-1",
+        "statement": "Proposal A conflates consumer output shape with implementation architecture.",
+        "Y": "ABSENT"
+      },
+      {
+        "id": "CY-2",
+        "statement": "Flat OR-chain in one file will degrade block-classify.ts into a God Function.",
+        "Y": "ABSENT"
+      },
+      {
+        "id": "CY-3",
+        "statement": "OCP: every new CLI layout requires modifying core looksStructured / a sensitive path.",
+        "Y": "ABSENT"
+      },
+      {
+        "id": "CY-4",
+        "statement": "Regression risk: new heuristics in a flat OR-chain can catch prose; no isolation.",
+        "Y": "ABSENT"
+      },
+      {
+        "id": "CY-5",
+        "statement": "Cognitive overload from mixed domains as the heuristic list grows.",
+        "Y": "ABSENT"
+      },
+      {
+        "id": "CY-6",
+        "statement": "Internal composition must be modular to absorb CLI-format churn; a flat OR-chain fails that.",
+        "Y": "ABSENT"
+      },
+      {
+        "id": "CY-7",
+        "statement": "Registry adds no value to the caller because terminal-render.ts only consumes binary block.mode.",
+        "Y": "ABSENT"
+      },
+      {
+        "id": "CY-8",
+        "statement": "No demonstrated Phase 5 need for runtime-pluggable detectors; registry is YAGNI.",
+        "Y": "ABSENT"
+      },
+      {
+        "id": "CY-9",
+        "statement": "Six checks are empirically patched special cases; independently-registered units risk losing interaction context.",
+        "Y": "PRESENT",
+        "Y_quote": "BOX_CHARS excluding the arrow character precisely so a later summary detector can claim it. [...] In a registry, the exclusion lives in one grammar file and the beneficiary in another [...]. A future maintainer who sees the arrow exclusion in isolation will reasonably \"fix\" it, and the summary detector will silently stop firing.",
+        "Y_disposition": "DISPOSED"
+      },
+      {
+        "id": "CY-10",
+        "statement": "Wrongly-panned structured block is unrecoverable; wrongly-wrapped prose matches old behavior.",
+        "Y": "ABSENT"
+      },
+      {
+        "id": "CY-11",
+        "statement": "Debuggability of top-to-bottom classification is a safety property; dynamic registration is harder to trace than a linear if-chain.",
+        "Y": "PRESENT",
+        "Y_quote": "When a block is mis-rendered, one person opens one function, reads the detectors top to bottom, and sees which one claimed the block and which earlier one deliberately stepped aside.",
+        "Y_disposition": "DISPOSED"
+      },
+      {
+        "id": "CY-12",
+        "statement": "Configurable registration order/active detectors risks breaking the text-only verdict invariant.",
+        "Y": "ABSENT"
+      },
+      {
+        "id": "CY-13",
+        "statement": "B has full rewrite/migration cost against 6 heuristics with no shown correctness or extensibility win.",
+        "Y": "ABSENT"
+      },
+      {
+        "id": "CY-14",
+        "statement": "Forward risk of A: independent ORs may quietly become order-dependent as detectors accumulate.",
+        "Y": "ABSENT"
+      },
+      {
+        "id": "CY-15",
+        "statement": "A and C are not independent designs; they produce the same already-shipping code; real fork is B vs not-B.",
+        "Y": "PRESENT",
+        "Y_quote": "Proposals A and C are the same shape. A restates the status quo with intent; C is the status quo.",
+        "Y_disposition": "DISPOSED"
+      },
+      {
+        "id": "CY-16",
+        "statement": "Unresolved whether a concrete Phase 5 requirement drives B or B is speculative.",
+        "Y": "ABSENT"
+      }
+    ],
+    "gt1": {
+      "X": "CONSISTENT",
+      "X_quote": "false wrap (must be zero): 4/13 = 30.8%",
+      "Y": "CONTRADICTS",
+      "Y_quote": "I could not verify that the current false-wrap rate is zero. The mandate says it \"must stay at zero\", which implies it is believed to be zero today; the corpus is what would prove it."
+    }
+  }
+}

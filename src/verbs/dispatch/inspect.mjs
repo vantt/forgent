@@ -1,4 +1,4 @@
-import { inspectDispatchRuntime, validateInspectionSelector } from '../../runner/dispatch/runtime-inspection.mjs';
+import { inspectDispatchRuntime, validateInspectionSelector, withRunsCache } from '../../runner/dispatch/runtime-inspection.mjs';
 import { loadGlobalConfig } from '../../config/global-config.mjs';
 import { inspectProviderCapacity } from '../../runner/dispatch/provider-capacity.mjs';
 
@@ -7,20 +7,22 @@ export class DispatchInspectError extends Error {
 }
 
 export function inspectDispatchUseCase(ctx, options = {}) {
-  try {
-    if (options.providerCapacity === true) {
-      return inspectProviderCapacity({
-        runnerConfig: loadGlobalConfig(options.globalConfigPath),
-        runtimeDir: options.runtimeDir,
-      });
+  return withRunsCache(() => {
+    try {
+      if (options.providerCapacity === true) {
+        return inspectProviderCapacity({
+          runnerConfig: loadGlobalConfig(options.globalConfigPath),
+          runtimeDir: options.runtimeDir,
+        });
+      }
+      validateInspectionSelector(options);
+      const repoRoot = ctx?.repoRoot ?? ctx?.cwd ?? process.cwd();
+      return inspectDispatchRuntime(repoRoot, options);
+    } catch (error) {
+      if (error instanceof DispatchInspectError) throw error;
+      throw new DispatchInspectError(error.message);
     }
-    validateInspectionSelector(options);
-    const repoRoot = ctx?.repoRoot ?? ctx?.cwd ?? process.cwd();
-    return inspectDispatchRuntime(repoRoot, options);
-  } catch (error) {
-    if (error instanceof DispatchInspectError) throw error;
-    throw new DispatchInspectError(error.message);
-  }
+  });
 }
 
 // Host routing selects a provider from operation/effect only.  Selector

@@ -8,8 +8,10 @@ use std::future::Future;
 use std::path::PathBuf;
 use std::pin::Pin;
 
+use super::bound_invocation_supervisor::{
+    BoundInvocationSupervisor, ExternalProcessConfig, ExternalProcessRequest,
+};
 use super::frame_codec::RequestId;
-use super::supervisor::{ExternalProcessConfig, ExternalProcessRequest, ExternalProcessSupervisor};
 use super::{FIXTURE_OPERATION_ID, FIXTURE_PROVIDER_ID};
 use crate::contracts::{
     ContractRef, HostInvocation, OperationId, OperationRequest, ProviderDescriptor, ProviderError,
@@ -150,7 +152,7 @@ pub const FIXTURE_PROCESS_DESCRIPTOR: ProviderDescriptor = ProviderDescriptor {
 #[derive(Debug, Clone)]
 pub struct ExternalProcessProviderAdapter {
     descriptor: ProviderDescriptor,
-    supervisor: ExternalProcessSupervisor,
+    supervisor: BoundInvocationSupervisor,
 }
 
 impl ExternalProcessProviderAdapter {
@@ -158,7 +160,7 @@ impl ExternalProcessProviderAdapter {
     pub fn new(config: ExternalProcessConfig) -> Self {
         Self {
             descriptor: FIXTURE_PROCESS_DESCRIPTOR,
-            supervisor: ExternalProcessSupervisor::new(config),
+            supervisor: BoundInvocationSupervisor::new(config),
         }
     }
 
@@ -166,7 +168,7 @@ impl ExternalProcessProviderAdapter {
     pub fn with_descriptor(descriptor: ProviderDescriptor, config: ExternalProcessConfig) -> Self {
         Self {
             descriptor,
-            supervisor: ExternalProcessSupervisor::new(config),
+            supervisor: BoundInvocationSupervisor::new(config),
         }
     }
 
@@ -209,7 +211,7 @@ impl ExternalProcessProviderAdapter {
     }
 
     /// Returns a reference to the underlying supervisor.
-    pub fn supervisor(&self) -> &ExternalProcessSupervisor {
+    pub fn supervisor(&self) -> &BoundInvocationSupervisor {
         &self.supervisor
     }
 }

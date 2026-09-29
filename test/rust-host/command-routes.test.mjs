@@ -22,14 +22,15 @@ const REPO_ROOT = path.resolve(__dirname, '../..');
 const EXPORT_SCRIPT = path.join(REPO_ROOT, 'scripts/export-command-selectors.mjs');
 const EXPLAIN_SCRIPT = path.join(REPO_ROOT, 'scripts/explain-command-route.mjs');
 
-test('all 73 COMMAND_REGISTRY selectors appear exactly once in generated output', () => {
-  assert.equal(COMMAND_REGISTRY.length, 73, 'COMMAND_REGISTRY must contain exactly 73 selectors');
-
+test('all COMMAND_REGISTRY selectors appear exactly once in generated output', () => {
   const content = fs.readFileSync(DEFAULT_ROUTES_PATH, 'utf8');
   const routes = JSON.parse(content);
   const routeKeys = Object.keys(routes);
 
-  assert.equal(routeKeys.length, 73, 'command-routes.json must contain exactly 73 selectors');
+  // Derived from COMMAND_REGISTRY.length itself, never a fresh hardcoded
+  // literal -- a verb addition or removal moves both sides together instead
+  // of needing this assertion edited every time the registry changes size.
+  assert.equal(routeKeys.length, COMMAND_REGISTRY.length, `command-routes.json must contain exactly ${COMMAND_REGISTRY.length} selectors (COMMAND_REGISTRY.length)`);
 
   // Lexicographical sort check
   const sortedKeys = [...routeKeys].sort();

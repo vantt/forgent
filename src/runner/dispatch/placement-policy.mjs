@@ -29,10 +29,44 @@
 // concern, out of scope here).
 
 import crypto from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
 import { DEFAULT_TIER_TO_POLICY, MODEL_POLICY_TIERS, RunnerConfigError } from './config.mjs';
 import { resolvePolicyTierModel, deriveProviderFamily, resolveExecutorAndOverrides } from './resolve.mjs';
 
 export const PLACEMENT_POLICY_SHADOW_CONTRACT = 'placement-policy-shadow.v1';
+
+/**
+ * dispatch-engine-liveness-hardening Phase 7 (C1): durable, local record of
+ * a real shadow-binder divergence (`resolveVerifiedPlacementModel`/
+ * `resolveVerifiedProviderArgs`, the two remaining shadow binders this
+ * track's own investigation found still carry real, if empirically
+ * near-zero today, production divergence -- see docs/backlog.md's dated
+ * retirement row). Before this, the ONLY record of a divergence was an
+ * ephemeral `process.stderr.write`, invisible unless a human happened to
+ * be watching that exact process's stderr at that exact moment -- this
+ * track's own investigation had to manually grep ~800 real historical
+ * assignment run stderr.log files (.fgos/assignments/.../runs/.../stderr.log)
+ * to find the one real divergence window it traced (2026-09-18, a
+ * since-fixed config gap).
+ * Best-effort only: a write failure here must never block or fail a real
+ * dispatch -- this is diagnostic evidence, not a precondition.
+ *
+ * @param {string|undefined} fgosDir
+ * @param {'placement-model'|'provider-args'} binder
+ * @param {object} fields extra fields to record (executorId, legacy/candidate values, ...)
+ */
+export function recordShadowBinderDivergence(fgosDir, binder, fields = {}) {
+  if (!fgosDir) return;
+  try {
+    const logPath = path.join(fgosDir, 'dispatch', 'shadow-binder-divergence.jsonl');
+    fs.mkdirSync(path.dirname(logPath), { recursive: true });
+    const entry = { ts: new Date().toISOString(), binder, ...fields };
+    fs.appendFileSync(logPath, `${JSON.stringify(entry)}\n`);
+  } catch {
+    // best-effort telemetry -- never block or fail a real dispatch over it
+  }
+}
 
 // Same formula as plan.mjs's policyTierForDispatchTier / cli.mjs's inline
 // duplicate (resolve.mjs's modelForTier already documents the pre-existing
@@ -428,90 +462,36 @@ export function selectPlacementPolicyRedirectExecutor({ cfg, sourceExecutorId, c
   return admissible[stablePoolIndex(seed, admissible.length)];
 }
 
-/**
- * Phase 08 production binder, self-verifying -- same safety posture as
- * Phase 07's `resolveVerifiedPlacementModel`. The caller's own UNCHANGED
- * legacy selection (`legacyExecutorId`, already computed by
- * `selectReadOnlyRedirectExecutor`) is never recomputed here. PlacementPolicy's
- * own selection is used ONLY when it agrees; a genuine divergence (a bug in
- * this module, or a future drift between the two stable-hash copies) falls
- * back to the legacy value and is reported, never silently applied. Because
- * both algorithms are the SAME deterministic formula over the SAME pool,
- * they are expected to agree for every real config -- this wrapper exists
- * as defense-in-depth, not because disagreement is expected.
- *
- * @param {object} params
- * @param {object} params.cfg
- * @param {string} params.sourceExecutorId
- * @param {string[]} params.candidatePool the SAME pool
- *   `readOnlyRedirectCandidates` already computed for this call
- * @param {string} params.seed the SAME seed string the legacy
- *   `stableIndex` call already used (`${operation}:${assignmentId}`)
- * @param {string} params.legacyExecutorId what `selectReadOnlyRedirectExecutor`
- *   already computed for this exact input
- */
-export function resolveVerifiedRedirectExecutor({ cfg, sourceExecutorId, candidatePool, seed, legacyExecutorId }) {
-  let placementExecutorId;
-  try {
-    placementExecutorId = selectPlacementPolicyRedirectExecutor({ cfg, sourceExecutorId, candidatePool, seed });
-  } catch {
-    return { executorId: legacyExecutorId, source: 'legacy', divergence: null };
-  }
-  if (placementExecutorId !== legacyExecutorId) {
-    return {
-      executorId: legacyExecutorId,
-      source: 'legacy',
-      divergence: Object.freeze({ sourceExecutorId, candidatePool: Object.freeze([...candidatePool]), legacyExecutorId, placementExecutorId }),
-    };
-  }
-  return { executorId: placementExecutorId, source: 'placement-policy', divergence: null };
-}
-
-// ─── Follow-up (post-Phase-08): resolveAssignmentDispatchPolicy unification ─
+// ─── dispatch-engine-liveness-hardening Phase 7 (C1): retired shadow
+// binders ────────────────────────────────────────────────────────────────
 //
-// design.md's close criteria: "no production path has a fourth hidden
-// placement source beside PlacementPolicy target semantics." Phase 07 only
-// wired cli.mjs's modelForTier-based paths (spawnWorker/executeExecutorCli).
-// resolveAssignmentDispatchPolicy (assignment-policy.mjs) -- the resolver
-// executeAssignment's real production dispatch path uses -- has its OWN
-// separate model resolution: `resolvePolicyTierModel(cfg, lookupPolicyTier,
-// provider)`, called directly, never through this module. That is the
-// remaining "fourth source" this closes.
+// `resolveVerifiedRedirectExecutor` (Phase 08) and `resolveVerifiedAssignmentModel`
+// (post-Phase-08 unification follow-up) were both retired here, not just at
+// their call sites. Real investigation (not assumed): both compared TWO
+// calls to the exact same underlying primitive over the exact same inputs
+// --  `resolveVerifiedRedirectExecutor`'s own legacy/PlacementPolicy sides
+// both reduced to `stablePoolIndex` over an identically-filtered pool;
+// `resolveVerifiedAssignmentModel`'s own doc comment already admitted its
+// two sides both called `resolvePolicyTierModel(cfg, lookupPolicyTier,
+// provider)` with identical, already-shared inputs. A real algorithmic
+// divergence was never possible for either -- confirmed against ~800 real
+// production dispatch runs' captured stderr
+// (`.fgos/assignments/*/runs/*/stderr.log`, Aug-Sept 2026): zero real
+// divergence ever recorded for `resolveVerifiedRedirectExecutor`; the
+// handful of "PlacementPolicy divergence" hits attributed to
+// `resolveVerifiedAssignmentModel`'s own module traced entirely to
+// `resolveVerifiedPlacementModel` (kept below -- a genuinely different code
+// path). Callers now use `selectPlacementPolicyRedirectExecutor`/
+// `resolvePolicyTierModel` directly (`assignment-runner.mjs`,
+// `assignment-policy.mjs`).
 //
-// Unlike Phase 07's model/redirect binders, this one's two sides were
-// ALREADY calling the identical underlying primitive
-// (resolvePolicyTierModel) with the identical inputs -- lookupPolicyTier
-// and provider are computed once, by resolveAssignmentDispatchPolicy itself
-// (Phase 04), and simply handed to this wrapper rather than recomputed. So
-// this is honestly more a PROVENANCE/OWNERSHIP move (marking `modelSource`
-// as PlacementPolicy-attributed in evidence) than a case where a genuine
-// algorithmic divergence was ever possible -- the self-verify guard is kept
-// anyway, as the same defense-in-depth posture as every other verified
-// binder in this track, in case a future change to either side drifts.
-
-/**
- * @param {object} params
- * @param {object} params.cfg
- * @param {string} params.lookupPolicyTier the SAME value
- *   resolveAssignmentDispatchPolicy already computed (Phase 04)
- * @param {string} params.provider the SAME resolvedProvider
- *   resolveAssignmentDispatchPolicy already computed
- * @param {string} params.legacyModel what resolvePolicyTierModel already
- *   produced for this exact (lookupPolicyTier, provider) pair
- */
-export function resolveVerifiedAssignmentModel({ cfg, lookupPolicyTier, provider, legacyModel }) {
-  let placementModel;
-  try {
-    placementModel = resolvePolicyTierModel(cfg, lookupPolicyTier, provider);
-  } catch {
-    return { model: legacyModel, source: 'legacy', divergence: null };
-  }
-  if (placementModel !== legacyModel) {
-    return {
-      model: legacyModel,
-      source: 'legacy',
-      divergence: Object.freeze({ lookupPolicyTier, provider, legacyModel, placementModel }),
-    };
-  }
-  return { model: placementModel, source: 'placement-policy', divergence: null };
-}
+// `resolveVerifiedPlacementModel` (below) and `resolveVerifiedProviderArgs`
+// (`provider-adapter.mjs`) are KEPT: both compare two genuinely different
+// code paths (this module's own PlacementPolicy candidate resolution vs.
+// `resolve.mjs`'s `modelForTier`; a real `ClaudeProviderAdapter` renderer
+// vs. hand-rolled `{prompt}`/`{model}` string substitution) that DID show
+// real historical production divergence (root-caused to a since-fixed
+// config gap -- see `docs/backlog.md`'s dated retirement row for the full
+// evidence and the enumerated divergence classes still open). Divergence is
+// now recorded durably (`recordShadowBinderDivergence`), not just to an
+// ephemeral stderr line.

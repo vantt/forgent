@@ -697,8 +697,8 @@ test('Phase 07: DAG resume with retried predecessor does not dispatch successor 
   const produceStep = resumeResult.steps.find((s) => s.as === 'produce');
   const reviewStep = resumeResult.steps.find((s) => s.as === 'review');
 
-  assert.equal(produceStep.schedulerOutcome, 'deferred', 'produce must be deferred when retry is pending');
-  assert.equal(reviewStep.schedulerOutcome, 'deferred', 'review must not be admitted when predecessor produce is not authoritative settled');
+  assert.equal(produceStep.schedulerOutcome, 'materialized', 'produce must be materialized when retry is pending');
+  assert.equal(reviewStep.schedulerOutcome, 'blocked', 'review must not be admitted when predecessor produce is not authoritative settled');
   assert.equal(resumeResult.closed, false);
 });
 

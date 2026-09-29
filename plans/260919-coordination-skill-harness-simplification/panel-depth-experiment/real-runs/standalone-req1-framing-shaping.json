@@ -1,0 +1,45 @@
+{
+  "kind": "declared-protocol",
+  "objective": "I27 standalone real standard-protocol session: framing + shaping.",
+  "writerId": "i27-driver",
+  "coordinationId": "i27-standalone-standard-v1",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-standard-v1" },
+  "close": true,
+  "aggregateBounds": { "maxRounds": 20 },
+  "actors": [
+    { "id": "lead-advisor-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "frontier" },
+    { "id": "context-investigator-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "standard" },
+    { "id": "system-shaper-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "flagship" },
+    { "id": "alternative-shaper-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "flagship" },
+    { "id": "constraint-advocate-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "flagship" },
+    { "id": "architecture-critic-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "flagship" },
+    { "id": "synthesizer-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "frontier" }
+  ],
+  "steps": [
+    {
+      "type": "operation", "as": "interpret", "operationId": "interpret-request", "targetActorId": "lead-advisor-actor",
+      "objective": "Interpret the person's intent: this repo's Unit I27 (coordination-skill-harness-simplification track) is deciding whether the 'standard' (no-red-team) architecture-advisory-panel protocol variant it just built (core/coordination-protocols/architecture-advisory-panel-standard-v1.yaml) is safe to ship as a separate, explicitly-selected preset. Frame the real decision: what evidence would justify recommending the standard variant for LOW-materiality architecture questions, versus always requiring the full protocol's red-team phase? Use absolute paths for anything you read (e.g. /home/vantt/projects/forgentX/core/coordination-protocols/architecture-advisory-panel-standard-v1.yaml). This session's own coordination bookkeeping lives at /home/vantt/projects/forgentX/.fgos/ -- you are authorized to write your result artifacts at the exact runDir path this dispatch gives you under that tree. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    },
+    {
+      "type": "operation", "as": "investigate", "operationId": "investigate-context", "targetActorId": "context-investigator-actor",
+      "objective": "Read /home/vantt/projects/forgentX/core/coordination-protocols/architecture-advisory-panel-standard-v1.yaml in full (absolute path) and report: exactly what this variant removes relative to the full protocol, and what safeguards (if any) exist against it becoming a silent default. Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    },
+    {
+      "type": "operation", "as": "shapeSystem", "operationId": "shape-system-proposal", "targetActorId": "system-shaper-actor",
+      "objective": "Propose ONE selection-trigger mechanism for when the standard variant is legal to use instead of the full protocol -- e.g. a caller-declared materiality/risk field in the request, checked at dispatch time. Read /home/vantt/projects/forgentX/core/coordination-protocols/architecture-advisory-panel-standard-v1.yaml first (absolute path). Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    },
+    {
+      "type": "operation", "as": "shapeAlt", "operationId": "shape-alternative-proposal", "targetActorId": "alternative-shaper-actor",
+      "objective": "Propose an ALTERNATIVE: never gate selection mechanically at all -- keep it purely a human/driver judgment call at request-authoring time, with no schema-level materiality field, on the reasoning that a mechanical materiality classifier would itself need red-team-level scrutiny to trust. Read /home/vantt/projects/forgentX/core/coordination-protocols/architecture-advisory-panel-standard-v1.yaml first (absolute path). Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    },
+    {
+      "type": "operation", "as": "shapeConstraint", "operationId": "shape-constraint-proposal", "targetActorId": "constraint-advocate-actor",
+      "objective": "Rank the risk of shipping the standard variant with (a) a mechanical materiality field vs (b) pure human judgment vs (c) not shipping it as a separate preset at all yet. Read /home/vantt/projects/forgentX/core/coordination-protocols/architecture-advisory-panel-standard-v1.yaml first (absolute path). Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}

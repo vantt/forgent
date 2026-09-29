@@ -13,11 +13,11 @@ import {
   buildAssignment,
 } from '../../src/runner/dispatch/assignment.mjs';
 import {
-  runSupervisor,
-  startSupervisorProcess,
-  readSupervisorBinding,
-  readWorkerBinding,
-  readAdapterReceipt,
+  runDetachedRunSupervisor,
+  startDetachedRunSupervisorProcess,
+  readDetachedRunSupervisorBinding,
+  readDetachedRunWorkerBinding,
+  readDetachedRunAdapterReceipt,
   getBootId,
   getProcessStartTime,
   getProcessPgid,
@@ -26,9 +26,9 @@ import {
   computeSha256Digest,
   publishImmutableProof,
   publishMutableProjection,
-  publishAdapterReceipt,
-  ReceiptPathCollisionError,
-} from '../../src/runner/dispatch/cli-spawn-supervisor.mjs';
+  publishDetachedRunAdapterReceipt,
+  DetachedRunReceiptPathCollisionError,
+} from '../../src/runner/dispatch/detached-run-supervisor.mjs';
 import { spawnWorker } from '../../src/runner/dispatch/cli.mjs';
 import { cliSpawnAdapter } from '../../src/runner/dispatch/transport.mjs';
 import {
@@ -93,7 +93,7 @@ test('1. legacy ad-hoc spawnWorker and cliSpawnAdapter parity for argv/env/cwd/s
     // Order is the one contract every onChunk caller shares (stream first);
     // the chunk's own type is adapter-specific -- this adapter sets
     // `child.stdout.setEncoding('utf8')`, so its chunks are strings, while
-    // cli-spawn-supervisor.mjs's detached path hands Buffers. Both are valid.
+    // detached-run-supervisor.mjs's detached path hands Buffers. Both are valid.
     assert.equal(typeof c.stream, 'string', 'onChunk must receive stream (stdout/stderr) as its first argument');
     assert.ok(c.stream === 'stdout' || c.stream === 'stderr', `stream must be stdout/stderr, got ${c.stream}`);
     assert.ok(typeof c.chunk === 'string' || Buffer.isBuffer(c.chunk), 'onChunk must receive the chunk as its second argument');
@@ -186,12 +186,12 @@ test('2. Assignment-owned fresh launch writes pending command, baseline, envelop
   assert.equal(fs.existsSync(path.join(runDir, envelope.invocation.secretsRef)), false, 'the secrets side file must be consumed and deleted by the supervisor, never left behind');
 
   // Verify supervisor binding
-  const supBinding = readSupervisorBinding(runDir, cmdState.launchCommandId);
+  const supBinding = readDetachedRunSupervisorBinding(runDir, cmdState.launchCommandId);
   assert.ok(supBinding);
   assert.equal(supBinding.contract, 'cli-spawn-supervisor-binding.v1');
 
   // Verify worker binding
-  const workerBinding = readWorkerBinding(runDir, cmdState.launchCommandId);
+  const workerBinding = readDetachedRunWorkerBinding(runDir, cmdState.launchCommandId);
   assert.ok(workerBinding);
   assert.equal(workerBinding.contract, 'cli-spawn-worker-binding.v1');
 
@@ -201,7 +201,7 @@ test('2. Assignment-owned fresh launch writes pending command, baseline, envelop
   assert.match(fs.readFileSync(stdoutPath, 'utf8'), /Worker finished cleanly/);
 
   // Verify receipt
-  const receipt = readAdapterReceipt(runDir, cmdState.launchCommandId);
+  const receipt = readDetachedRunAdapterReceipt(runDir, cmdState.launchCommandId);
   assert.ok(receipt);
   assert.equal(receipt.contract, 'cli-spawn-adapter-receipt.v1');
   assert.equal(receipt.exitCode, 0);
@@ -256,7 +256,7 @@ test('3. injected coordinator death after supervisor start still produces protec
   publishImmutableProof(envPath, envelope);
 
   // Start supervisor detached (simulating coordinator death by not awaiting in same process)
-  const child = startSupervisorProcess({
+  const child = startDetachedRunSupervisorProcess({
     envelopePath: envPath,
     runDir,
     launchCommandId,
@@ -265,7 +265,7 @@ test('3. injected coordinator death after supervisor start still produces protec
   // Wait for receipt to appear on disk independently
   let receipt = null;
   for (let i = 0; i < 40; i++) {
-    receipt = readAdapterReceipt(runDir, launchCommandId);
+    receipt = readDetachedRunAdapterReceipt(runDir, launchCommandId);
     if (receipt) break;
     await new Promise((r) => setTimeout(r, 100));
   }
@@ -376,7 +376,7 @@ test('5. worker PGID differs from supervisor PGID and timeout signals only worke
   const envPath = path.join(runDir, 'protected', 'launch-envelope', `${launchCommandId}.json`);
   publishImmutableProof(envPath, envelope);
 
-  const child = startSupervisorProcess({
+  const child = startDetachedRunSupervisorProcess({
     envelopePath: envPath,
     runDir,
     launchCommandId,
@@ -384,7 +384,7 @@ test('5. worker PGID differs from supervisor PGID and timeout signals only worke
 
   let receipt = null;
   for (let i = 0; i < 40; i++) {
-    receipt = readAdapterReceipt(runDir, launchCommandId);
+    receipt = readDetachedRunAdapterReceipt(runDir, launchCommandId);
     if (receipt) break;
     await new Promise((r) => setTimeout(r, 100));
   }
@@ -392,8 +392,8 @@ test('5. worker PGID differs from supervisor PGID and timeout signals only worke
   assert.ok(receipt);
   assert.equal(receipt.completion.kind, 'timeout');
 
-  const supBinding = readSupervisorBinding(runDir, launchCommandId);
-  const workerBinding = readWorkerBinding(runDir, launchCommandId);
+  const supBinding = readDetachedRunSupervisorBinding(runDir, launchCommandId);
+  const workerBinding = readDetachedRunWorkerBinding(runDir, launchCommandId);
 
   assert.ok(supBinding.supervisor.pid);
   assert.ok(workerBinding.worker.pid);
@@ -453,7 +453,7 @@ test('6. escaped descendant keeps pipe open but timeout/maxBuffer receipt publis
   publishImmutableProof(envPath, envelope);
 
   const startMs = Date.now();
-  startSupervisorProcess({
+  startDetachedRunSupervisorProcess({
     envelopePath: envPath,
     runDir,
     launchCommandId,
@@ -461,7 +461,7 @@ test('6. escaped descendant keeps pipe open but timeout/maxBuffer receipt publis
 
   let receipt = null;
   for (let i = 0; i < 40; i++) {
-    receipt = readAdapterReceipt(runDir, launchCommandId);
+    receipt = readDetachedRunAdapterReceipt(runDir, launchCommandId);
     if (receipt) break;
     await new Promise((r) => setTimeout(r, 100));
   }
@@ -658,7 +658,7 @@ test('10. live onChunk callback failure does not block capture, timers or receip
   publishImmutableProof(envPath, envelope);
 
   // Supervisor with onChunk that throws an error
-  const child = startSupervisorProcess({
+  const child = startDetachedRunSupervisorProcess({
     envelopePath: envPath,
     runDir,
     launchCommandId,
@@ -669,7 +669,7 @@ test('10. live onChunk callback failure does not block capture, timers or receip
 
   let receipt = null;
   for (let i = 0; i < 40; i++) {
-    receipt = readAdapterReceipt(runDir, launchCommandId);
+    receipt = readDetachedRunAdapterReceipt(runDir, launchCommandId);
     if (receipt) break;
     await new Promise((r) => setTimeout(r, 100));
   }
@@ -1132,17 +1132,17 @@ test('19. pre-placed receipt with different content fails supervisor publication
   // Step A: Direct invocation of the supervisor's publish step must fail loudly with typed collision error
   assert.throws(
     () => {
-      publishAdapterReceipt(receiptPath, realReceipt, { launchCommandId });
+      publishDetachedRunAdapterReceipt(receiptPath, realReceipt, { launchCommandId });
     },
     (err) => {
-      assert.ok(err instanceof ReceiptPathCollisionError);
+      assert.ok(err instanceof DetachedRunReceiptPathCollisionError);
       assert.equal(err.code, 'receipt-path-collision');
       assert.equal(err.targetPath, receiptPath);
       assert.equal(err.expectedDigest, realReceiptDigest);
       assert.match(err.message, /adapter receipt path collision/);
       return true;
     },
-    'publishAdapterReceipt must throw ReceiptPathCollisionError when receipt path is pre-occupied with different content',
+    'publishDetachedRunAdapterReceipt must throw DetachedRunReceiptPathCollisionError when receipt path is pre-occupied with different content',
   );
 
   // Confirm pre-placed content was not overwritten and did not win
@@ -1181,15 +1181,15 @@ test('19. pre-placed receipt with different content fails supervisor publication
 
   await assert.rejects(
     async () => {
-      await runSupervisor(envPath);
+      await runDetachedRunSupervisor(envPath);
     },
     (err) => {
-      assert.ok(err instanceof ReceiptPathCollisionError || err.code === 'receipt-path-collision');
+      assert.ok(err instanceof DetachedRunReceiptPathCollisionError || err.code === 'receipt-path-collision');
       assert.equal(err.code, 'receipt-path-collision');
       assert.match(err.message, /adapter receipt path collision/);
       return true;
     },
-    'runSupervisor must reject loudly instead of silently succeeding when receipt path is pre-occupied with different content',
+    'runDetachedRunSupervisor must reject loudly instead of silently succeeding when receipt path is pre-occupied with different content',
   );
 
   // Confirm pre-placed content is still intact on disk
@@ -1199,7 +1199,48 @@ test('19. pre-placed receipt with different content fails supervisor publication
 
   // Step C: Identical content publication succeeds idempotently
   const identicalPath = path.join(receiptsDir, 'identical_receipt.json');
-  publishAdapterReceipt(identicalPath, realReceipt);
-  const idempotentResult = publishAdapterReceipt(identicalPath, realReceipt);
+  publishDetachedRunAdapterReceipt(identicalPath, realReceipt);
+  const idempotentResult = publishDetachedRunAdapterReceipt(identicalPath, realReceipt);
   assert.equal(idempotentResult.digest, realReceiptDigest);
+});
+
+test('R6 / M7 lock: runDetachedRunSupervisor fails immediately with spawn-failed receipt when an argument exceeds MAX_ARG_STRLEN', async () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'sup-maxarg-'));
+  const runDir = path.join(tmp, 'run');
+  const receiptsDir = path.join(runDir, 'protected', 'adapter-receipt');
+  fs.mkdirSync(receiptsDir, { recursive: true });
+
+  const hugeArg = 'a'.repeat(131073);
+  const launchCommandId = 'cmd-oversized-1';
+  const envBody = {
+    contract: 'cli-spawn-launch-envelope.v1',
+    launchCommandId,
+    runId: 'run-oversized-1',
+    controlEpoch: 1,
+    controlToken: 'tok-oversized',
+    invocation: {
+      command: 'echo',
+      args: [hugeArg],
+      cwd: tmp,
+    },
+    limits: {
+      timeoutMs: 3000,
+    },
+  };
+  const envDigest = computeSha256Digest(envBody);
+  const envelope = { ...envBody, digest: envDigest };
+
+  const envDir = path.join(runDir, 'protected', 'launch-envelope');
+  fs.mkdirSync(envDir, { recursive: true });
+  const envPath = path.join(envDir, `${launchCommandId}.json`);
+  publishImmutableProof(envPath, envelope);
+
+  await runDetachedRunSupervisor(envPath);
+  const receipt = readDetachedRunAdapterReceipt(runDir, launchCommandId);
+  assert.ok(receipt);
+  assert.equal(receipt.outcome?.kind, 'spawn-failed');
+  assert.equal(receipt.outcome?.errorClass, 'worker-spawn-fail');
+  assert.match(receipt.outcome?.cause, /exceeds Linux MAX_ARG_STRLEN \(128 KiB/);
+
+  fs.rmSync(tmp, { recursive: true, force: true });
 });

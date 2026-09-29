@@ -63,6 +63,30 @@ the twelve-dimension rubric. If a judgment call here and the deep
 doctrine ever disagree, the deep doctrine wins — this file is a
 projection of it, not a replacement.
 
+This facade also builds on the shared **Generic Driver Discipline**:
+[`../_shared/coordination-driver.md`](../_shared/coordination-driver.md) defines
+the domain-neutral cycle (`observe -> choose legal action -> dispatch -> verify
+evidence -> disposition -> adapt -> explicit close -> continuity artifact`). The
+Facade Hook Values table below fills that cycle's 9 hook slots from this file's
+own existing sections, verbatim rather than restated — this file's six-value
+disposition vocabulary and Fresh-Session Resume packet are not reconciled away
+into something new; they *are* the fragment's `disposition criteria` and
+`continuity artifact` hook values.
+
+## Facade Hook Values
+
+| Hook Slot | Value |
+|---|---|
+| `unit of iteration` | One `architecture-advisory-panel-v1` coordination session (one `coordinationId`), from `phase-framing` entry through explicit `close-dialogue` -- the Entry Flow table's own row-by-row graph traversal, below, is the concrete shape of this hook. |
+| `open inputs` | (a) result kind: advisory, never work-product -- this skill never implements the chosen architecture (frontmatter; Bounds #1, #5). (b) exactly one primary canonical capability, resolved by this skill itself declaring `DemandFacts` from the case intake (`outputKind: "decision"`, `domain` from the subject when known or empty, `mutates: false`, `needsIndependentReview: true` -- this protocol's own 9-role quorum is the collaboration shape, `hasPlanOrTrack: false`, `size`, `rigor`) and calling `fgos capability match --demand '<json>'` (`../_shared/capability-matching.md`). This skill is `user-invocable: false` but still directly selectable by the runtime's own Skill-tool dispatch whenever a request's intent matches this file's description, not only when `fgos-panel`'s Route step 3 delegates here -- so the match is resolved here, never assumed pre-resolved by a caller. Expect `advise` (`../_shared/capability-catalog.md`'s `serves: decision, mutates: false` matches this skill's own demand directly), but the door's own answer is authoritative, never asserted as a static fact. (c) the raw case intake (frozen `intake.md`) and the resolved roster (Executor Roster table) -- Phase 1's own coordinator-only framing step, below. |
+| `evidence verification` | Never describe a coordination outcome to the person until it has actually come back through one of the real doors -- `fgos coordination show <coordinationId> --json`, an `operation` result, or the `human-turn`/`specialist-authorize` request steps. No "the panel would probably say" fallback (Never Reimplements The Kernel; Bounds #7). |
+| `disposition criteria` | The six dispositions in Driver Disposition (below) are this skill's own `dispositions.md` vocabulary; each is still recorded through the real door -- `fgos coordination disposition --id <coordinationId> --action-key <actionKey> --writer-id <writerId> --disposition <LITERAL> --rationale <text>` -- passing exactly one of three LITERAL `--disposition` values, chosen by packet-level bucket, never by echoing the six-value word itself: `accepted`/`mitigated` -> pass literal `accepted` (each changes the packet, so each requires the Step-6 independent recheck below -- `revise-synthesis`/`revise-explanation` -- before the finding is discharged; driver disposition alone never discharges it). `answered`/`invalidated-by-evidence` -> pass literal `rejected` (no packet change, backed by cited evidence, no recheck owed). `deferred`/`unresolved` -> pass literal `deferred` (`unresolved` also escalates to the person as visible dissent, per the human-escalation row below, and can never be "recheck-confirmed resolved" the way an `accepted` finding must be, so it belongs in this bucket, never under `accepted`). **This mapping is load-bearing, not decorative:** the real kernel (`recordDriverDispositionLocked`, `src/runner/coordination/store.mjs`) treats any literal disposition string outside its own five-item denylist (`rejected`/`reject`/`deferred`/`defer`/`recheck-required`) as accepting -- passing the literal words `answered` or `invalidated-by-evidence` themselves as the CLI value would silently accept the finding, the opposite of what this row intends. A finding about the driver's own conduct is never self-dispositioned (Driver Disposition, below). |
+| `adaptation bounds` | `revise-synthesis` and `revise-explanation` each hard-capped at `activation.maxInvocations: 2` (Decision Dialogue's reopen-budget note). Once both are spent, or a reopen would need re-dispatching a shaper or the critic -- a backward edge this graph does not have -- the driver opens a new cell inheriting `intake.md`/`scout-report.md` as context rather than continuing this session (Bounded Reopen Scope). |
+| `human-escalation triggers` | A gap earns a Decision Request only if it fails Scout Before Ask's third test -- material *now*, not material in the abstract (Lead Advisor Discipline). The one standing exception: a fact about the person's own obligations (a compliance boundary, a contractual commitment) that cannot be defaulted safely is asked immediately. A gap that fails the test is never deleted -- it is carried forward as a named default. Questions are batched, non-blocking. Two further triggers beyond an information gap: an `unresolved` disposition always escalates to the person as visible dissent, in the packet body, never smoothed into a footnote (Driver Disposition, below); and a finding about the driver's own conduct (an authority violation, an isolation breach, a fabricated turn) is never self-dispositioned -- it escalates to the person or an independent role (Driver Disposition, below). |
+| `close criteria` | `close-dialogue` gated by `post-explanation-open`, itself unreachable until every earlier phase's window has opened and settled (Entry Flow table) -- plus every finding in `dispositions.md` carrying one of the six dispositions above, and no fabricated human input anywhere in the packet (Bounds #6). |
+| `after-close action` | No git mutation inside PROJECT_ROOT, ever -- the session's own evidence commits are a separate repository and must never resolve to a path inside PROJECT_ROOT (Bounds #2). No implementation-plan generation -- naming the first reversible step is advisory; a phased build plan is a different product (Bounds #5). |
+| `continuity artifact` | Fresh-Session Resume's own orientation packet, in its full stated reading order (steps 1-6), below: `fgos coordination show`'s own output first (hard, replay-derived truth), then `session.md`, `intake.md`, the newest `human/<n>-person.md`, `interpretation.md`, and `dispositions.md`, reading only as far as the next action actually needs (never re-reading every artifact "to feel oriented"), and finally checking every actor with a prompt but no matching run record for a needed re-dispatch under a new ordinal. |
+
 ## What This Skill Does Not Require Of The Person
 
 - No problem brief. Raw words, however vague ("EOD and intraday
@@ -109,9 +133,19 @@ existing doors only:
 - **Human-turn recording:** the `human-turn` request-step type
   (`recordHumanTurn`, Phase 03.1) — session-level, protocol-agnostic
   infrastructure, not a graph node in this protocol's own FlowDefinition.
-- **Specialist authorization:** `authorizeSpecialistSlot` called
-  directly (see Known Gaps — no `specialist-authorize` request-step type
-  exists yet, `tsk-3xk`).
+- **Specialist authorization:** the `specialist-authorize` request-step
+  type (`src/verbs/coordination/schema.mjs`, I24a) reaches
+  `authorizeSpecialistSlot` through any raw coordination request door
+  (`coordination run --file`, `coordination start --steps`, the headless
+  adapter) — never through `fgos-group-thinking`'s own gate, which
+  explicitly refuses this step type (see Known Gaps, `tsk-3xk`, retired).
+  I24b landed the driver-authenticated typed-action door for this same
+  capability: the `fgos coordination specialist-authorize` subverb, reaching
+  the locked `authorizeSpecialistSlotLocked`/
+  `recordSpecialistAuthorizationLocked` twins. A session opened through
+  `fgos-group-thinking`'s own pack gate can still have a specialist
+  authorized through this separate subverb — the gate refusal above blocks
+  only the raw request-step path, never this driver-authenticated route.
 
 No authority, visibility, aggregation, bounds-checking, or replay logic
 is described or implied here beyond what those doors already enforce.
@@ -283,10 +317,11 @@ protocol's own `actors[]`), each bindable up front in the request's own
 `actors[]` override. The specialist has **no such actor id to bind at
 all** — it is authorized on demand through the specialist-slot mechanism
 (`specialistSlotRef: specialist-answer-slot`, `authorizeSpecialistSlot`,
-see Known Gaps' `tsk-3xk` for the exact call path), naming the
-executor/tier/persona for that one question at authorization time, not
-in the session's opening roster. Never pre-declare a specialist actor id
-the way you would for the other 8.
+reached via a `specialist-authorize` step in a raw coordination request —
+see "Never Reimplements The Kernel" above for the exact doors), naming the
+executor/tier/persona for that one question at
+authorization time, not in the session's opening roster. Never
+pre-declare a specialist actor id the way you would for the other 8.
 
 `persona` is free-form prose framing the executor receives, not a closed
 vocabulary (matching `fgos-code-panel`'s own convention) — sharpen any
@@ -326,271 +361,37 @@ Role-Routing Roster).
 Full doctrine — purpose, posture, anti-patterns, and a real good/bad
 example per role — lives in the
 [role doctrine](../../../docs/architect/agent-coordination/playbooks/architecture-advisory-role-doctrine.md).
-What follows is the operating packet: what to notice, how to reason,
-what evidence to seek, when to change position, how to communicate
-uncertainty, and the failure posture to avoid — per role, so a fresh
-agent can act well without re-deriving it from the full text.
+The operating packet per role — what to notice, how to reason, what
+evidence to seek, when to change position, how to communicate
+uncertainty, and the failure posture to avoid — is no longer restated
+here: every operation's `task.contractTemplate`
+(`core/coordination-protocols/architecture-advisory-panel-v1.yaml`) now
+resolves to a real prompt template that carries this content directly
+into the dispatched agent's own prompt (Unit I22), so a fresh agent
+never needs this file to act well.
 
-### 1. Lead Advisor — `interpret-request`, `explain-recommendation`, `revise-explanation`, `close-dialogue`
+| Role | Operation(s) | Task packet |
+|---|---|---|
+| Lead Advisor | `interpret-request` | [`architecture-advisory-panel-v1-interpretation.md`](../../../core/prompt-templates/architecture-advisory-panel-v1-interpretation.md) |
+| Lead Advisor | `explain-recommendation`, `revise-explanation` | [`architecture-advisory-panel-v1-explanation.md`](../../../core/prompt-templates/architecture-advisory-panel-v1-explanation.md) |
+| Lead Advisor | `close-dialogue` | [`architecture-advisory-panel-v1-close-dialogue.md`](../../../core/prompt-templates/architecture-advisory-panel-v1-close-dialogue.md) |
+| Context Investigator | `investigate-context` | [`architecture-advisory-panel-v1-scout-report.md`](../../../core/prompt-templates/architecture-advisory-panel-v1-scout-report.md) |
+| System Shaper | `shape-system-proposal` | [`architecture-advisory-panel-v1-system-proposal.md`](../../../core/prompt-templates/architecture-advisory-panel-v1-system-proposal.md) |
+| Alternative Shaper | `shape-alternative-proposal` | [`architecture-advisory-panel-v1-alternative-proposal.md`](../../../core/prompt-templates/architecture-advisory-panel-v1-alternative-proposal.md) |
+| Constraint Advocate | `shape-constraint-proposal` (Phase 5) | [`architecture-advisory-panel-v1-constraint-proposal.md`](../../../core/prompt-templates/architecture-advisory-panel-v1-constraint-proposal.md) |
+| Constraint Advocate | `assess-constraints` (Phase 6) | [`architecture-advisory-panel-v1-constraint-findings.md`](../../../core/prompt-templates/architecture-advisory-panel-v1-constraint-findings.md) |
+| Architecture Critic | `critique-proposals` | [`architecture-advisory-panel-v1-critique.md`](../../../core/prompt-templates/architecture-advisory-panel-v1-critique.md) |
+| Synthesizer | `synthesize-recommendation`, `revise-synthesis` | [`architecture-advisory-panel-v1-synthesis.md`](../../../core/prompt-templates/architecture-advisory-panel-v1-synthesis.md) |
+| Independent Red-Team | `red-team-packet` | [`architecture-advisory-panel-v1-redteam.md`](../../../core/prompt-templates/architecture-advisory-panel-v1-redteam.md) |
+| Specialist | `answer-specialist-question` | [`architecture-advisory-panel-v1-specialist-answer.md`](../../../core/prompt-templates/architecture-advisory-panel-v1-specialist-answer.md) |
 
-- **Notice:** the gap between the stated question and the actual worry;
-  the person's own vocabulary (adopt it, don't correct it); altitude
-  (module vs. service vs. team vs. product bet); decision burden
-  (reversibility, cost, a commitment already made, uncertainty about
-  authority); signs the decision is already made and ratification is
-  what's really being asked for.
-- **Reason:** mark uncertainty per inference, never per document
-  ("confident about the constraint, guessing about risk appetite, and
-  the guess matters because it decides between B and C" — real style,
-  P01.3's `interpretation.md`). Prefer the reading that makes the person
-  reasonable. Never resolve an ambiguity by picking a side — hold it
-  open for `investigate-context` to collapse with evidence.
-- **Evidence it seeks:** none directly — this role never opens
-  PROJECT_ROOT itself. It reads `intake.md`, and later `scout-report.md`
-  / `synthesis.md` / `redteam.md`, never a shaper's private notes.
-- **When it changes position:** it doesn't hold an architecture
-  position at all — what changes is its *reading* of the person, when a
-  dialogue turn's impact assessment reveals a misread. That revision is
-  a new appended section of `explanation.md`, never an overwrite.
-- **Communicate uncertainty:** name the single largest uncertainty and
-  say plainly which candidate options it would separate — not a
-  blanket "these are provisional" header.
-- **The explanation standard (Phase 8, `explain-recommendation`) —
-  stated explicitly, not left implicit:** lead with the *consequence*,
-  not the architecture. Contrast pair from the doctrine: "*You will be
-  able to change the intraday path without re-testing EOD*" lands;
-  "*we introduce a pipeline abstraction with a plugin seam*" does not.
-  Name the part that stays theirs — the judgment the panel cannot make
-  for them — explicitly, as a decision, never as a closing disclaimer
-  ("of course, the final decision is yours"). The test is not whether
-  the explanation is clear; it is whether the person can defend this
-  decision to the colleagues who will live in that codebase.
-- **Avoid:** ventriloquism (writing the interpretation in a voice
-  readers can't distinguish from the person's); the helpful summary
-  that quietly adds a requirement nobody stated; becoming the panel by
-  writing the explanation's own architecture opinion instead of the
-  synthesizer's; **flattening for comfort** — softening or omitting a
-  live dissent in `explanation.md` because the person seemed to prefer
-  one option. This is the single most damaging thing this role can do,
-  because it is invisible and it feels like good service, and it is the
-  one surface where dissent actually reaches the person at all.
-
-### 2. Context Investigator — `investigate-context`
-
-- **Notice:** symptom vs. cause; whether the person's framed boundary
-  ("one pipeline or two") is even the real seam; scale and *trend*, not
-  just current state; absence (no tests, no owner, no monitoring — these
-  are findings, not gaps in the report).
-- **Reason:** write the panel's current hypothesis down first, then hunt
-  specifically for what would make it false. A codebase is large enough
-  to confirm anything, so unanimous support for the starting hypothesis
-  is a method failure, not a good result (real precedent: P01.3's scout
-  report found the shared engine already existed, contradicting the
-  intake's own suggested duplication framing).
-- **Evidence it seeks:** paths, commands, counts — never adjectives.
-  "27 of 50 recent commits touching either pipeline also touched
-  `common/schema.py`" is usable; "tightly coupled" is not.
-- **When it changes position:** it has no position to defend — a scout
-  report that only confirms what it was handed has not scouted. Report
-  the disconfirmation even when it undercuts the frame the panel was
-  built around.
-- **Communicate uncertainty:** separate "I looked and it is not there"
-  from "I did not look," always. Flag anything no amount of repository
-  reading could answer as a real Phase-4 candidate, not a guess.
-- **Avoid:** recommending an architecture (out of lane, and it
-  contaminates every shaper who reads the report); inventory-dumping
-  file counts as if volume were insight; trusting a tool's null result
-  without a second check.
-
-### 3. System Shaper — `shape-system-proposal`
-
-- **Notice:** the one load-bearing constraint that, if it changed,
-  would change the whole proposal; what the proposal makes *harder*;
-  the first reversible step; which claims rest on scout evidence versus
-  assumption.
-- **Reason:** design for the system that exists, sized to the evidence
-  — if the scout found the pain concentrated at one module, a
-  whole-system re-architecture is an escalation, not the direct
-  response. Never differentiate from a sibling it cannot see; aiming to
-  be different is a way of being worse.
-- **Evidence it seeks:** the scout report's counted findings; nothing
-  from a sibling shaper (isolation is real — the prompt package contains
-  no sibling output).
-- **When it changes position:** states falsification criteria **before**
-  seeing the critique (timestamp-checkable) — and each criterion must
-  name a condition that could actually occur and that the panel could
-  observe; "this would be wrong if the requirements were completely
-  different" is falsification theatre, not a criterion. Revises only
-  when one of those named, occur-able conditions is actually shown true
-  — never "the critic raised a good point" with nothing else changing.
-- **Communicate uncertainty:** separate "resting on evidence" from
-  "resting on assumption" explicitly, claim by claim.
-- **Avoid:** pattern-first design (a proposal that would read identically
-  for a different codebase); a benefits list with no named cost; assuming
-  the migration away instead of naming the half-adopted state.
-
-### 4. Alternative Shaper — `shape-alternative-proposal`
-
-- **Notice:** the option nobody proposed because it looked too small;
-  **solution classes, not variants** — buying instead of building,
-  deleting instead of abstracting, changing who owns the code instead of
-  changing the code, changing the process instead of the system; the
-  no-build path's real, concrete consequences (a rate, a cost, a trigger
-  — never one sentence); whether the framing itself is the constraint —
-  but noticing this is not the finish line, see Reason.
-- **Reason:** state the priors it is applying, up front, grounded in
-  something observed — not contrarianism, not a foil for the system
-  shaper. Test whether its candidate would produce a materially
-  different first three months of work; if not, it isn't material yet.
-  **A reframe still owes a candidate.** Answering "the real problem is
-  your team structure" or "the real coupling is at the shared alert
-  dataset" and stopping there is *reframing as evasion*, a named
-  anti-pattern — if the reframe is right, it still has to produce the
-  candidate that follows from it.
-- **Evidence it seeks:** the same scout report, read for a *different*
-  seam than the system shaper is likely to pick.
-- **When it changes position:** the same falsification-criteria
-  discipline as the system shaper — each criterion must name a
-  condition that could actually occur, never falsification theatre. It
-  may also abandon an alternative it tried and say why — recording a
-  genuinely-tried-and-dropped option is real output, not a gap.
-- **Communicate uncertainty:** name which prior is doing the most work
-  and what would undermine it.
-- **Avoid — the single most damaging failure in the whole panel:** the
-  designated loser. An alternative with five drawbacks and one vague
-  benefit that no reader could believe its own author endorses. Test:
-  would this shaper defend this option if asked directly? If not, it
-  isn't a real candidate yet.
-
-### 5. Constraint Advocate — `shape-constraint-proposal` (Phase 5), `assess-constraints` (Phase 6)
-
-- **Notice:** the migration (where risk actually lives); failure modes
-  and blast radius; irreversible steps specifically — data backfills,
-  dual-write windows, anything that can't be undone; who owns this
-  afterward, and whether that person exists.
-- **Reason:** attach every concern to a proposal and a magnitude — "this
-  has operational risk" is noise, "the dual-write window is ~3 weeks and
-  a rollback needs manual reconciliation" is a finding. Rank: which one
-  concern, if unaddressed, actually sinks this? A flat list of MEDIUMs
-  answers no question (see the role doctrine's own Bad Example — it
-  passes every checklist item and still fails the role).
-- **Evidence it seeks:** real paths and real magnitudes; P01.3's own
-  constraint advocate independently re-ran verification reads beyond the
-  scout report's own citations — a positive, undesigned-for behavior
-  the audit found worth keeping, not restricting (P02.1 B10).
-- **When it changes position:** proposes the *cheapest engineering
-  mitigation* that survives, not a process promise ("watch CI duration",
-  "a review convention") — a mitigation nobody can implement in an
-  afternoon is declining to make the concern survivable.
-- **Communicate uncertainty:** mark reversible vs. irreversible sharply
-  — this is the one judgment nobody else in the panel makes.
-- **Avoid:** generic risk recitation (security/scale/maintainability for
-  every candidate regardless of relevance); veto posture (the advocate
-  raises, the person decides); symmetric objection that conveys no
-  signal about which candidate is riskier.
-
-### 6. Architecture Critic — `critique-proposals`
-
-- **Notice:** claims stated as facts ("obviously", "clearly"); two
-  proposals contradicting each other about the same system (at least
-  one is wrong, and evidence usually says which); a shared unexamined
-  assumption every proposal makes.
-- **Reason:** attack the claim, never the actor. Rank attacks by whether
-  they change the decision — lead with the one that flips the
-  recommendation if it lands. Attack the option most likely to win
-  hardest, not the weakest one (attacking the weak one is easier and
-  backwards). **Also attack a shaper's own stated falsification
-  criteria** — a criterion that could never actually occur is itself a
-  finding (falsification theatre disguised as rigor), and calling it out
-  is decision-relevant, not a formality.
-- **Evidence it seeks:** the finished proposals together (something no
-  shaper saw) and the scout report; never a shaper's private working
-  notes.
-- **When it changes position:** report attacks that failed at the same
-  weight as ones that landed — "I attacked X and it held" is real
-  output (real precedent: P01.3's critique conceded one attack; P01.2's
-  conceded one).
-- **Communicate uncertainty:** state what evidence would settle an
-  attack that can't be settled outright — an unfalsifiable attack is an
-  opinion and must be labelled one.
-- **Avoid:** both-sidesing (equal criticism everywhere, destroying the
-  signal); style critique; attacking the person's own stated constraint,
-  which is data, not a proposal.
-
-### 7. Synthesizer — `synthesize-recommendation`, `revise-synthesis`
-
-- **Notice:** which falsification criteria were actually checked versus
-  merely stated; where a disagreement is about values, not facts (speed
-  vs. reversibility) — these don't resolve with more evidence and go to
-  the person as a values choice, not a finding.
-- **Reason:** recommend **one thing**. If the evidence genuinely cannot
-  separate two candidates, say that decisively and name the one
-  observation that would (real precedent: P01.3's synthesis correctly
-  declined to pick between three mechanisms for its third seam and named
-  the missing observation instead of authoring a tiebreak).
-- **Evidence it seeks:** the whole ledger — every proposal, every
-  critique, at the revision each was actually written against. Adds
-  nothing new; if synthesis reveals a gap needing a new position, say so
-  and let the coordinator route it (per the bounded-reopen-scope note
-  above), never author the missing argument itself.
-- **When it changes position:** on `revise-synthesis`, only in response
-  to the human turn's actual content plus the existing ledger — never by
-  fabricating a fresh shaper voice (see Bounded Reopen Scope).
-- **Communicate uncertainty:** calibrate **per claim**, not per document
-  — a diagnosis, a cost estimate, and a prediction about people don't
-  deserve the same confidence word.
-- **Avoid:** the balanced menu (three options, no recommendation);
-  dissent laundering — converting an `unresolved` disposition (see
-  Driver Disposition, below, for exactly what that means) into a
-  "consideration" or a "future concern" so the packet reads clean; a
-  merged fourth architecture no advisor proposed and no critic attacked.
-
-### 8. Independent Red-Team — `red-team-packet`
-
-- **Notice:** claims in the packet no advisor actually made; cited
-  evidence that doesn't exist; isolation breaches (a proposal that
-  references a sibling proves the isolation failed); a driver
-  disposition that decided a technical question without an advisor's
-  evidence (see Driver Disposition, below, for the exact rule this
-  would violate); confidence that outruns its own support.
-- **Reason:** attacks the **packet and the panel**, not the
-  architecture — that is the critic's job. Check artifacts, not
-  narration: open the actual `prompts/`/`runs/` files rather than
-  trusting a summary that three shapers ran independently.
-- **Evidence it seeks:** the full evidence directory, including
-  `prompts/` and `runs/`; deliberately routed to a provider family
-  distinct from the synthesizer's, so it catches what a similar mind
-  would not.
-- **When it changes position:** report attacks that failed at the same
-  weight as ones that landed. Give a real verdict — `APPROVE`, `REVISE`,
-  or `INSUFFICIENT-EVIDENCE`, and use the third one honestly rather than
-  as a soft `REVISE`.
-- **Communicate uncertainty:** distinguish "not proven" from "false" —
-  conflating them destroys the report's credibility.
-- **Avoid:** reviewing instead of attacking (a second, softer critique
-  of the architecture that never touches process or authority);
-  ceremonial `APPROVE` without having opened a single run file.
-
-### 9. Specialist — `answer-specialist-question`
-
-- **Notice:** the exact boundary of the authorized question and where
-  its own expertise stops applying; whether the question rests on a
-  false premise (a specialist that catches this has delivered the
-  highest-value output it can give).
-- **Reason:** answer the question asked; note one adjacent risk in one
-  line and stop. Distinguish a standard from a situational answer — "the
-  spec says X" is different from "in this configuration, X becomes Y."
-- **Evidence it seeks:** whatever the authorized question requires,
-  scoped by the driver's authorization; never the full case.
-- **When it changes position:** it doesn't hold an architecture position
-  to begin with — say plainly whether the answer changes anything for
-  the candidates on the table, and if it doesn't, say that too.
-- **Communicate uncertainty:** separate confidence in the mechanism from
-  confidence in which specific regime/policy applies to this person.
-- **Avoid:** scope expansion (answering, then recommending an
-  architecture — a direct violation, and especially corrosive from a
-  role the panel treats as authoritative in its own lane); "in my
-  experience" as the whole support for a specific claim.
+Each template follows the bounded-variable convention
+(`src/runner/dispatch/operation-prompt-templates.mjs`): `{role}`,
+`{objective}`, `{contextRefs}`, `{expectedOutputs}`, `{constraints}`,
+`{evidenceContract}` only — a template may refine cognitive instructions
+and artifact shape, never graph legality. If a judgment call in a
+template and the deep doctrine ever disagree, the deep doctrine wins —
+the templates are a projection of it, not a replacement.
 
 ## Lead Advisor Discipline — Scout Before Ask, In Practice
 
@@ -918,12 +719,23 @@ never invent a new filename mid-session.
   free-text `reason` field is the only channel today to name which human
   turn licenses a dialogue reopen — never a real ref in those fields
   until this lands.
-- **`tsk-3xk`** — no `specialist-authorize` request-step type exists for
-  `fgos coordination run`. Workaround: call `authorizeSpecialistSlot`
-  directly against the session (same mechanism `dispatchDeclaredOperation`
-  already uses), then dispatch `answer-specialist-question` through the
-  normal `operation` step once authorized — everything except the
-  authorization call itself goes through the door.
+- **`tsk-3xk`** — **closed (I24a).** A `specialist-authorize` request-step
+  type now exists for every raw coordination request door (`fgos
+  coordination run --file`, `fgos coordination start --steps`, the
+  headless adapter; `src/verbs/coordination/schema.mjs`), reaching
+  `authorizeSpecialistSlot` — build it directly into a raw request, then
+  dispatch
+  `answer-specialist-question` through the normal `operation` step once
+  authorized. This door is NOT reachable through
+  `fgos-group-thinking`'s own gate — `runGroupThinkingRequest` explicitly
+  refuses a `specialist-authorize` step (Group-Thinking Protocol Pack
+  bypass #4 stays refused). I24b landed the driver-authenticated
+  typed-action/subverb door for this same capability (`fgos coordination
+  specialist-authorize`, reaching the locked
+  `authorizeSpecialistSlotLocked`/`recordSpecialistAuthorizationLocked`
+  twins) — a session opened via the pack gate can still have a specialist
+  authorized through that separate subverb; the gate refusal above only
+  ever blocked the raw request-step path.
 - **Doctrine-by-path fails across a dispatch boundary — a hard
   requirement, confirmed failing identically twice (P01.2, P01.3).** A
   dispatched executor's cwd is pinned to PROJECT_ROOT, a different

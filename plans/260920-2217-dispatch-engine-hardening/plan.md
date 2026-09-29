@@ -50,7 +50,7 @@ Hai điều rule ở trên đã sửa để việc này không lặp lại: (a) 
 | 05 | [Policy/plan governance coherence](phase-05-policy-governance-coherence.md) | 3 | H6, H12, M5, M6, M7, M12, L4 | D1 cho H6(b); phối hợp executor-policy-dispatch-seams cho M5 | executor-policy-dispatch-seams |
 | 06 | [Provider capacity rotator](phase-06-provider-capacity-rotator.md) | 3 | C2, H8, M6 (vocabulary), H3 (state.json) | **phải xong trước khi bật global account inventory** | account-rotator (plan status stale, cần cập nhật) |
 | 07 | [Herdr adapter, trust store, supervisor tee](phase-07-herdr-trust-supervisor.md) | 3 | H7, M3, M15(b,c), L11 | — | dispatch (herdr adapter) |
-| 08 | [Operability/CLI surface + doctor](phase-08-operability-cli-doctor.md) | 4 | M11, M9(b,c), M16, L3, L10 | integrated (261ed7ea); I08 base defects remediated in I08b candidate (c6262fb1, pending landing) | dispatch-operability follow-up |
+| 08 | [Operability/CLI surface + doctor](phase-08-operability-cli-doctor.md) | 4 | M11, M9(b,c), M16, L3, L10 | VERIFIED (ac19f6d1); RV-01/RV-02 remediated; acceptance gate verified (full suite exit 0, 80/80 stress pass, 85 logs) | dispatch-operability follow-up |
 | 09 | [Boundary placement + simplification](phase-09-boundary-simplification.md) | 4 | M10, L5, L8, L12, L13 + tách file | Phase 01–08 xong (hành vi đã khoá test) | this plan; **có component-boundary change** |
 
 ## Dependencies
@@ -95,7 +95,7 @@ Ghi vào `plans/260920-2217-dispatch-engine-hardening/reports/phase-NN-<slug>-re
   - Phase 01 R1/R4/R5 (Result truth & settlement CAS) integrated as Units **I02** and **I03** (`main@4362bfec`).
   - Phase 05 remainder (Cross-provider redirect governance & PlacementPolicy binding) integrated as Unit **I06** (`main@3bab9b99`).
   - Phase 08 (Operability/CLI surface & doctor) tracked under Unit **I07** (implementation) and **I08** (verification).
-  - Phase 09 (Boundary placement & simplification) tracked under Unit **I12** (blocked on I11 approval).
+  - Phase 09 (Boundary placement & simplification) tracked under Unit **I12** (READY; dependency Unit I11 VERIFIED at main@7d7dc2750f9fb80716a7cffae03d67605629cf9a).
 - **Unit I07 (Dispatch Hardening Phase 08 Operability/CLI Surface & Doctor) Accounting:**
   - Evaluated candidate `439a1fb078418edff7628555c4b6cb9f4015e4e6` approved in independent review (0 blocker, 0 high, 113 focused passing).
   - Synchronized candidate `6a638752` integrated locally; remote synchronized candidate `261ed7ea01765db6c9fa87afddfa8f3e259be1ea` approved for integration; fast-forwarded `main` to `261ed7ea`.
@@ -103,18 +103,26 @@ Ghi vào `plans/260920-2217-dispatch-engine-hardening/reports/phase-NN-<slug>-re
 - **Unit I08 (Dispatch Hardening Phase 08 Verification) Accounting:**
   - Implementation/verification base: `6f3fb9038fd66cd9943972a321eed2ba98587fab`.
   - Candidate branch: `coordination-skill-harness-i08-dispatch-verification`.
-  - Status: `blocked on base defects F4/F5 (remediation unit required)`.
-  - Stop condition: `triggered (redirect/governance bypass via base defects F4/F5 → remediation unit required)`.
-  - Verification scope: combined I06 + I07 dispatch governance, public CLI contract, observation & recovery truth, doctor/setup coherence, and R7 performance gates.
-  - Test evidence: 178/178 focused tests pass; 9/9 governance tests pass (`test/runner/dispatch-governance-operability.test.mjs`); affected matrix (55 files): 1455 pass, 0 fail, 1 skip.
-  - Base defects uncovered: F4 (HIGH, execute falls back to default claude on unregistered selector), F5 (HIGH, redirect check compares raw providerModel strings without normalizeProviderFamily, bypassing canonical family checks and corrupting provenance), F6 (MEDIUM), F7 (MEDIUM), F10 (MEDIUM).
+  - Status: `VERIFIED at main@ac19f6d1`.
+  - Stop condition: `CLEARED (base defects F4/F5 remediated in I08b; RV-01/RV-02 remediated in candidate 132d3777 + ac19f6d1)`.
+  - Remediations:
+    * I08b (`ba8f6a9dca8c84ba1561ab5802e2c89a2010446c`): F4, F5, F6, F7, F10 resolved.
+    * Governance Denylist Remediation (`132d377794ee02da702ff12d91cfa1c1545bb275` + docs tip `ac19f6d1e868c53b2bc59a2c9642ee0e37e7eb08`): RV-01 & RV-02 resolved via shared canonical provider vocabulary across direct and redirect gates.
+  - Acceptance Gate Re-verification Evidence:
+    * Full suite: Run 3 reached exit code 0 (`7647 pass, 0 fail, 8 skipped, 68 todo`; duration 364s). Runs 1 and 2 had timing threshold exceedances, classified as timing instability (LOW debt).
+    * Isolated stress testing: 10/10 pass on `coordination-phase2-concurrency.test.mjs` (160/160 pass, 0 fail); 10/10 pass on `dispatch.test.mjs` (3870/3870 pass, 0 fail).
+    * Parallel load stress testing: 10/10 iterations pass with 6 suites running concurrently (60/60 suite executions exit 0, 0 fail).
+    * Baseline comparison on exact `26a1038e` worktree: confirmed clean (dispatch 387 pass exit 0; coord 16 pass exit 0).
+    * Evidence inventory: 85 logs total on disk (83 manifest-hashed verification logs on `ac19f6d1` + 2 baseline comparison logs on `26a1038e`) in `scratch/i08-reverification/`.
+    * Durable artifacts: `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-i08-acceptance-gate-reverification-manifest.json` and `phase-08-i08-acceptance-gate-reverification-summary.md`.
+    * Known LOW follow-up debts: Set<string> canonicalization in checkProviderDisallowed helper, PlacementPolicy shadow gate raw providerModel comparison, test cleanup finally blocks, N10 adapter selection disentanglement.
   - R7 receipt latency benchmark: 40 trials, min 31ms, median 38ms, p95 47ms, max 51ms vs baseline p95 46ms (threshold <= 146ms; PASS).
   - Measurement artifact: `plans/260920-2217-dispatch-engine-hardening/reports/i08-receipt-latency-measurement.json`.
   - Report: `plans/260920-2217-dispatch-engine-hardening/reports/phase-08-i08-dispatch-verification-report.md`.
 - **Unit I08b (Remediation of I08 Base Defects F4, F5, F6, F7, F10) Accounting:**
   - Capability: `code:implement`.
-  - Depends-on: Unit I08 (pending post-integration re-verification).
-  - Status: `integration candidate c6262fb1, pending landing` (post-merge verification complete on integration branch: 189/189 focused pass, 7603/7603 full suite pass, 0 candidate regressions).
+  - Depends-on: Unit I08.
+  - Status: `integrated at main@ba8f6a9d` (post-landing verified: 486/486 pass).
   - Integration Candidate Merge Commit: `98f501be41756dc80d691cbf63ffeb4cd617fb30` (candidate `d4e052a6` merged into `origin/main@4ad0b8ca`).
   - Branch: `coordination-skill-harness-i08b-remediation`.
   - Worktree: `.claude/worktrees/coordination-skill-harness-i08b-remediation`.
@@ -133,4 +141,5 @@ Ghi vào `plans/260920-2217-dispatch-engine-hardening/reports/phase-NN-<slug>-re
   - Integration status: VERIFIED. Integrated at `1ca4023c`, post-merge verification satisfied at `main@f63f7e7d` following REV-15 timing fix at `60132825` (538/538 pass across 16-suite focused matrix; 3 consecutive timing reruns 129/129 pass; candidate regressions = 0; D2/D3 in `fgos-approve.test.mjs` confirmed pre-existing baseline defect).
   - Follow-up finding `I09-REV-15` (candidate test timing regression in `coordination-r5-hard-budgets.test.mjs`) resolved and verified on current main baseline.
   - 14 focused suites pass (538 passed / 0 failed, `git diff --check` clean).
-  - Unit **I10 status: ready for independent review, not integrated** (base `c386e9f30b1ac60d78675f688e8d10146f5e8949` is descendant containing `1ca4023c` and `60132825`; production fix commit `3c49cf4205060fea998abfb2e9ef5df7b816a252`; candidate test commit `97420638c7c0360823b64a4a4b74d05eeee8723d`; 41 tests across 5 test suites: 38 passed, 3 todo, 0 failed; 538/538 pass across 16-suite focused matrix; 3x timing reruns 129/129 pass).
+  - Unit **I10 status: INTEGRATED AND VERIFIED at main@605d26fe** (carried through `main@26a1038e` and `main@ac19f6d1`).
+  - Unit **I11 status: VERIFIED at main@7d7dc2750f9fb80716a7cffae03d67605629cf9a** (candidate code `9cf843b6fbb786923992f9deb2f70deb447620a2`, synchronized merge `3d706b8901bb8787f8c6c9b35641b9a4acaeea3b`; reviewer APPROVE ratified; post-merge verification satisfied: 155/155 focused rerun pass, full suite 7652 pass exit 0; candidate regressions = 0; Unit I12 READY).

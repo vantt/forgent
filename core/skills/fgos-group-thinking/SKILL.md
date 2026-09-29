@@ -58,11 +58,7 @@ cross-provider review.
 ## 1. See which protocols are registered
 
 ```bash
-node -e "
-import('./src/verbs/coordination/group-thinking-pack.mjs').then(({ loadProtocolPack }) => {
-  console.log(JSON.stringify(loadProtocolPack(), null, 2));
-});
-"
+fgos coordination pack list --json
 ```
 
 An empty `members: []` means no protocol is registered yet — there is
@@ -77,17 +73,21 @@ pair here names an already-registered FlowDefinition `metadata.id@version`
 ## 2. Read the protocol's own declared shape
 
 ```bash
-node -e "
-import('./src/runner/definitions/protocol-loader.mjs').then(({ loadCoordinationProtocol }) => {
-  console.log(JSON.stringify(loadCoordinationProtocol(process.argv[1]), null, 2));
-});
-" -- "<protocol id from step 1>"
+fgos coordination pack show-protocol "<protocol id from step 1>" --json
 ```
 
 Learn its declared actors, operations, activation modes, and graph from
 this output — never from this skill's own text, which deliberately does
 not enumerate them (Phase 10's own constraint: "do not hide protocol
 semantics in skill prose").
+
+`show-protocol` accepts any registered `CoordinationProtocol`
+FlowDefinition id, not only a member of the group-thinking pack listed in
+step 1 — unlike `list`, it is a thin, unscoped wrapper over
+`loadCoordinationProtocol` (`src/runner/definitions/protocol-loader.mjs`).
+Reading a non-pack-member protocol's shape this way is fine; running one
+through step 4 below still refuses (pack membership is enforced at `run`
+time, not at `show-protocol` time).
 
 ## 3. Compose a request
 
@@ -126,23 +126,19 @@ request already could.
 ## 4. Launch or resume
 
 ```bash
-node -e "
-import('./src/verbs/coordination/group-thinking-pack.mjs').then(async ({ runGroupThinkingRequest }) => {
-  const result = await runGroupThinkingRequest(
-    { cwd: process.cwd(), repoRoot: process.cwd() },
-    { protocolId: '<protocol id from step 1>', requestPath: '<path to your request.json>' },
-  );
-  console.log(JSON.stringify(result, null, 2));
-});
-"
+fgos coordination pack run --protocol "<protocol id from step 1>" --file "<path to your request.json>"
 ```
 
-`protocolId` is required, and must equal the request's own
+`--protocol` is required, and must equal the request's own
 `protocolRef.id` — an unset, unregistered, or mismatched id is refused
 before anything dispatches (see the Gate section below). A request naming
 an **existing** `coordinationId` resumes that session through the exact
 same door (`run.mjs`'s own resume behavior, `findExistingManifest`) — this
-skill adds no separate resume mechanism of its own.
+skill adds no separate resume mechanism of its own, and `pack run` adds no
+separate `--resume` flag: resuming is just re-submitting a request file
+whose `coordinationId` already exists. `--executor`/`--tier`/`--model`
+forward exactly the way plain `fgos coordination run` already forwards
+them (global trusted policy, never a portable request-file field).
 
 ## 5. Render replay
 
@@ -158,22 +154,34 @@ session-ownership marks).
 
 ## The gate, and why it holds
 
-`runGroupThinkingRequest` is the **only** function this skill ever calls
-to dispatch or resume anything, and it does nothing but: (1) refuse when
+The only doors this skill ever invokes are the three `fgos coordination
+pack <list|show-protocol|run>` CLI sub-verbs above (Unit I23) — never a
+hand-authored `node -e` script, and never `runGroupThinkingRequest`
+directly. `pack run` forwards straight into `runGroupThinkingRequest`
+([`group-thinking-pack.mjs`](../../../src/verbs/coordination/group-thinking-pack.mjs)),
+the **only** function in this whole chain that dispatches or resumes
+anything, and it does nothing but: (1) refuse when
 no `protocolId` is given; (2) refuse when `protocolId` is not a member of
 the pack registry, or the registered definition's version has drifted
 from what the pack pinned; (3) refuse when the request's own
 `protocolRef.id` disagrees with the selected `protocolId`, or the request
-is `kind: "agent-led"` (no bound protocol to gate); (4) forward the
-untouched request straight into `runCoordinationUseCase`
+is `kind: "agent-led"` (no bound protocol to gate); (4) refuse when any
+step in the request is type `specialist-authorize` (I24a, bypass #4 —
+see below); (5) forward the untouched request straight into
+`runCoordinationUseCase`
 ([`run.mjs`](../../../src/verbs/coordination/run.mjs)) — the exact door
 `fgos coordination run` and the headless adapter already use, with zero
 altered fields. Everything after that point is `run.mjs`'s own,
 already-proven behavior; nothing here reimplements or forks it.
 
-This is why the five bypasses a later cell (P10.5) must prove impossible
-do not need special defensive code in this skill — the door it calls
-never exposed them as caller-invocable actions in the first place:
+This is why four of the five bypasses a later cell (P10.5) proved
+impossible need no special defensive code in this skill — the door it
+calls never exposed them as caller-invocable actions in the first place.
+The fifth, bypass #4 ("authorize a specialist"), is the one exception
+since Unit I24a grew `run.mjs`'s vocabulary a `specialist-authorize` step
+— it now stays refused ONLY because `runGroupThinkingRequest` applies an
+EXPLICIT step-type refusal before forwarding anything, covered in its own
+bullet below:
 
 - **Switch protocols silently.** There is no default or inferred protocol
   anywhere in this chain. `protocolId` is a required, explicit parameter,
@@ -184,19 +192,34 @@ never exposed them as caller-invocable actions in the first place:
   request already uses, with the same context-grant enforcement. This
   skill adds no second grant path — it only forwards the request object.
 - **Validate its own aggregate.** `run.mjs`'s public request vocabulary
-  has exactly five step kinds: `operation`, `authorize`, `disposition`,
-  `fan-out`, `contribution`. None of them calls
-  `validateSessionAggregation` or any other aggregation-validation door —
-  that capability simply is not reachable through this surface (the
-  `contribution` step forwards only into `linkSessionContribution`, a
-  separate, already-independently-mediated door — see
+  has eight step kinds: `operation`, `authorize`, `disposition`,
+  `fan-out`, `contribution`, `human-turn`, `specialist-authorize`,
+  `close`. None of the first seven calls `validateSessionAggregation` or
+  any other aggregation-validation door — that capability simply is not
+  reachable through this surface (the `contribution` step forwards only
+  into `linkSessionContribution`, a separate, already-independently-
+  mediated door — see
   `docs/architect/agent-coordination/contracts/coordination-session.md`'s
-  "Group-Thinking Protocol Pack" section for the full proof).
-- **Authorize a specialist.** For the same reason: no step kind reaches
-  `authorizeSpecialistSlot` / `recordSpecialistAuthorization`. Specialist
-  authorization is not in `run.mjs`'s public request vocabulary at all.
-- **Close a session directly.** `runCoordinationUseCase` always attempts
-  `closeSessionByQuorum` as its own last, automatic step, gated by the
-  engine's own quorum/aggregation rules. There is no separate "close" step
-  or door this skill (or any request through this door) can invoke to
-  force a close outside that gate.
+  "Group-Thinking Protocol Pack" section for the full proof). The eighth,
+  `close`, is covered by the bullet immediately below.
+- **Authorize a specialist (I24a: reasoning updated, no longer "absence
+  from the vocabulary").** `run.mjs`'s public request vocabulary now
+  includes a `specialist-authorize` step type reaching
+  `authorizeSpecialistSlot` / `recordSpecialistAuthorization` — reachable
+  through any raw coordination request door (`coordination run --file`,
+  `coordination start --steps`, the headless adapter). This bypass now
+  holds ONLY because `runGroupThinkingRequest`
+  (`src/verbs/coordination/group-thinking-pack.mjs`) applies an EXPLICIT
+  step-type refusal on `specialist-authorize` before forwarding anything —
+  never because the vocabulary lacks the step. See
+  `docs/architect/agent-coordination/contracts/coordination-session.md`'s
+  "Five bypasses" section, bypass #4, for the full reasoning.
+- **Close a session outside the quorum gate.** `runCoordinationUseCase`
+  never closes implicitly — reaching full quorum with no explicit close
+  request leaves the session open (`test/cli/coordination.test.mjs`'s own
+  "without close: true and without close step leaves the session active").
+  A request MAY ask to close, either via a top-level `close: true` or a
+  `{type: "close"}` step — but both routes still call the exact same
+  quorum/aggregation-gated `closeSessionByQuorum` an implicit close would
+  have used; asking for it never bypasses or reorders that gate, it only
+  decides whether the attempt happens at all.

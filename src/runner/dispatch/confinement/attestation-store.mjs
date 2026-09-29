@@ -9,7 +9,7 @@
 //     records -- their `env` field is an allow-list, never the real spawn
 //     env; the real env lives only in a 0600 side file the supervisor
 //     reads once and deletes, see authority.mjs's `redactEnvForPersistence`
-//     and cli-spawn-supervisor.mjs's `publishSecretSideFile`.)
+//     and detached-run-supervisor.mjs's `publishSecretSideFile`.)
 //   - Attestation schema covers all four phases: prepared, completed, failed, refused.
 //   - Channels completeness: filesystem, inherited-fd, stdio, host-ipc, network.
 
@@ -265,4 +265,101 @@ export function createRedactedAttestationReference(attestation) {
       ? attestation.mismatches.map((m) => (typeof m === 'object' ? m.code : m))
       : [],
   };
+}
+
+// --- Falsification probe cache (R9 / Performance Audit) ---------------------
+
+export const DEFAULT_PROBE_CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
+
+const inMemoryProbeCache = new Map();
+
+function probeFingerprintDigest(fingerprint) {
+  return crypto.createHash('sha256').update(JSON.stringify(fingerprint)).digest('hex');
+}
+
+function probeCachePath(storeDir, fpDigest) {
+  return path.join(storeDir, `probe-${fpDigest}.json`);
+}
+
+export function clearProbeCache() {
+  inMemoryProbeCache.clear();
+}
+
+/**
+ * Save successful probe result into attestation store keyed by fingerprint.
+ */
+export function saveProbeCacheRecord(fingerprint, probeResult, context = {}, { now = Date.now() } = {}) {
+  if (!probeResult || !probeResult.passed) return null;
+  const fpDigest = probeFingerprintDigest(fingerprint);
+  const nowMs = typeof now === 'number' ? now : Date.parse(now);
+  const record = {
+    contract: 'confinement-probe-cache.v1',
+    fingerprint,
+    fpDigest,
+    passed: true,
+    passedAt: new Date(nowMs).toISOString(),
+    passedAtMs: nowMs,
+    message: probeResult.message,
+    results: probeResult.results,
+  };
+
+  inMemoryProbeCache.set(fpDigest, record);
+
+  try {
+    const storeDir = resolveAttestationStoreDir(context);
+    fs.mkdirSync(storeDir, { recursive: true });
+    const filePath = probeCachePath(storeDir, fpDigest);
+    const tmpPath = `${filePath}.tmp.${Date.now()}`;
+    fs.writeFileSync(tmpPath, JSON.stringify(record, null, 2), 'utf8');
+    fs.renameSync(tmpPath, filePath);
+  } catch {
+    // Best-effort disk persistence
+  }
+
+  return record;
+}
+
+/**
+ * Load probe cache from memory or attestation store if fresh within TTL.
+ */
+export function loadProbeCacheRecord(fingerprint, context = {}, { ttlMs = DEFAULT_PROBE_CACHE_TTL_MS, now = Date.now() } = {}) {
+  const fpDigest = probeFingerprintDigest(fingerprint);
+  const nowMs = typeof now === 'number' ? now : Date.parse(now);
+
+  // Check in-memory cache first
+  const mem = inMemoryProbeCache.get(fpDigest);
+  if (mem && mem.passed && nowMs - mem.passedAtMs <= ttlMs) {
+    return {
+      passed: true,
+      message: mem.message,
+      results: mem.results,
+      passedAt: mem.passedAt,
+      cached: true,
+    };
+  }
+
+  // Check persistent attestation store on disk
+  try {
+    const storeDir = resolveAttestationStoreDir(context);
+    const filePath = probeCachePath(storeDir, fpDigest);
+    if (!fs.existsSync(filePath)) return null;
+
+    const raw = fs.readFileSync(filePath, 'utf8');
+    const record = JSON.parse(raw);
+    if (!record || !record.passed) return null;
+    const passedAtMs = record.passedAtMs || (record.passedAt ? Date.parse(record.passedAt) : NaN);
+    if (!Number.isFinite(passedAtMs) || (nowMs - passedAtMs > ttlMs)) {
+      return null;
+    }
+    inMemoryProbeCache.set(fpDigest, record);
+    return {
+      passed: true,
+      message: record.message,
+      results: record.results,
+      passedAt: record.passedAt,
+      cached: true,
+    };
+  } catch {
+    return null;
+  }
 }

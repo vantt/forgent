@@ -1,0 +1,10 @@
+{
+  "note": "Fixed, deterministic coordinationId per (case, profile), recorded BEFORE dispatch per Unit I27's driver-safety decision. A retry MUST resume the same id, never mint a fresh one.",
+  "entries": [
+    { "coordinationId": "i27-canary-v1", "case": "canary", "profile": "standard", "purpose": "real cheap-tier canary (investigate-context alone) confirming the real executor path works before the batch" },
+    { "coordinationId": "i27-p052-clear-withheld-v1", "case": "p052-clear", "profile": "withheld-redteam-explanation", "status": "invalidated-methodology", "invalidReason": "session-engine marked the assignment failed (likely a false-failure from concurrent driver writes into this same worktree during the live dispatch, tsk-3yo-class); agent self-disclosed reading the real red-team-packet.md from the committed corpus before recognizing this profile withholds it. Discarded, not scored. Superseded by i27-p052-clear-withheld-v2.", "purpose": "paired-design probe: same synthesis input as the real op_029 explain-recommendation dispatch, minus the red-team dissent paragraph" },
+    { "coordinationId": "i27-p052-unclear-withheld-v1", "case": "p052-unclear", "profile": "withheld-redteam-explanation", "status": "never-dispatched", "purpose": "paired-design probe: same synthesis input as the real op_039 explain-recommendation dispatch, minus the red-team dissent paragraph. Superseded by i27-p052-unclear-withheld-v2 before this v1 id was ever used." },
+    { "coordinationId": "i27-p052-clear-withheld-v2", "case": "p052-clear", "profile": "withheld-redteam-explanation", "purpose": "redo of v1 with a maximally self-sufficient inline objective and an explicit no-exploration instruction, per the corrected methodology (bwrap confinement mounts the whole host filesystem read-only -- 'don't read X' is risk-reduction, not a hard guarantee; documented plainly in the final report)" },
+    { "coordinationId": "i27-p052-unclear-withheld-v2", "case": "p052-unclear", "profile": "withheld-redteam-explanation", "purpose": "same corrected methodology as i27-p052-clear-withheld-v2, for the unclear case" }
+  ]
+}

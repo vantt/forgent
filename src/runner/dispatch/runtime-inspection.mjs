@@ -29,7 +29,52 @@ export function isWithinDir(parentDir, candidatePath) {
   return resolvedCandidate === resolvedParent || resolvedCandidate.startsWith(resolvedParent + path.sep);
 }
 
-function allRuns(root) {
+import { AsyncLocalStorage } from 'node:async_hooks';
+
+const verbRunsCacheStorage = new AsyncLocalStorage();
+
+export function createRunsCache() {
+  return new Map();
+}
+
+export function getRunsCacheStore() {
+  return verbRunsCacheStorage.getStore() || null;
+}
+
+export function withRunsCache(cacheOrFn, maybeFn) {
+  let cache;
+  let fn;
+  if (typeof cacheOrFn === 'function') {
+    fn = cacheOrFn;
+    const existing = getRunsCacheStore();
+    if (existing) return fn();
+    cache = new Map();
+  } else {
+    cache = cacheOrFn || new Map();
+    fn = maybeFn;
+  }
+  return verbRunsCacheStorage.run(cache, fn);
+}
+
+export function clearAllRunsCache(root = null, cache = null) {
+  const store = cache || getRunsCacheStore();
+  if (!store) return;
+  if (root) {
+    store.delete(path.resolve(root));
+  } else {
+    store.clear();
+  }
+}
+
+export function allRuns(root, opts = {}) {
+  const normRoot = path.resolve(root);
+  const bypassCache = opts.bypassCache === true;
+  const store = opts.runsCache || opts.cache || getRunsCacheStore();
+
+  if (!bypassCache && store && store.has(normRoot)) {
+    return store.get(normRoot);
+  }
+
   const base = fgosDir(root), out = [];
   for (const assignmentId of dirs(path.join(base, 'assignments'))) for (const attempt of dirs(path.join(base, 'assignments', assignmentId, 'runs'))) {
     const runDir = path.join(base, 'assignments', assignmentId, 'runs', attempt), run = json(path.join(runDir, 'run.json'));
@@ -38,6 +83,9 @@ function allRuns(root) {
   for (const group of dirs(path.join(base, 'dispatch-runs'))) for (const attempt of dirs(path.join(base, 'dispatch-runs', group))) {
     const runDir = path.join(base, 'dispatch-runs', group, attempt), run = json(path.join(runDir, 'run.json'));
     out.push({ kind: 'dispatch-run', group, attempt, runDir, run, malformed: !run || typeof run !== 'object' || Array.isArray(run) });
+  }
+  if (store) {
+    store.set(normRoot, out);
   }
   return out;
 }
@@ -225,8 +273,8 @@ function workspace(input) { const absolute = path.resolve(input); let cursor = a
 const missing = (kind, id, reason) => ({ inspectionStatus: 'not-found', subject: { kind, id, locations: [] }, observations: [], runObservation: null, runResult: null, reconciliation: { state: 'not-needed', reason }, links: { assignmentIds: [], coordinationIds: [], runIds: [] } });
 
 export function validateInspectionSelector(options = {}) { const supplied = [['run', options.run], ['assignment', options.assignment], ['cwd', options.cwd]].filter(([, v]) => typeof v === 'string' && v.trim()); if (supplied.length !== 1) throw new Error('dispatch inspect requires exactly one selector: --run, --assignment, or --cwd'); return { kind: supplied[0][0], id: supplied[0][1] }; }
-export function inspectDispatchRuntime(root, options = {}, { now = () => new Date().toISOString() } = {}) {
-  const selector = validateInspectionSelector(options), all = allRuns(root), base = fgosDir(root);
+export function inspectDispatchRuntime(root, options = {}, { now = () => new Date().toISOString(), bypassRunsCache = false, runsCache = null } = {}) {
+  const selector = validateInspectionSelector(options), all = allRuns(root, { bypassCache: bypassRunsCache, runsCache }), base = fgosDir(root);
   if (selector.kind === 'run') { const found = all.filter((l) => !l.malformed && l.run.runId === selector.id); if (!found.length) return missing('run', selector.id, 'No matching Run was found in registered Assignment or ad-hoc Run repositories.'); if (found.length > 1) return { ...missing('run', selector.id, 'More than one Run repository owns this run id.'), inspectionStatus: 'ambiguous', subject: { kind: 'run', id: selector.id, locations: found.map(project) }, reconciliation: { state: 'manual-required', reason: 'More than one Run repository owns this run id.' }, links: { assignmentIds: uniq(found.map((l) => l.assignmentId)), coordinationIds: [], runIds: [selector.id] } }; return one(found[0], root, now, all); }
   if (selector.kind === 'assignment') {
     const assignmentsRoot = path.join(base, 'assignments'), dir = path.join(assignmentsRoot, selector.id);

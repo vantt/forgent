@@ -1,0 +1,21 @@
+{
+  "kind": "declared-protocol",
+  "objective": "I27 real cheap-tier canary: confirm the real executor path works before the batch.",
+  "writerId": "i27-driver",
+  "coordinationId": "i27-canary-v1",
+  "protocolRef": { "id": "core.coordination-protocol.architecture-advisory-panel-standard-v1" },
+  "close": true,
+  "actors": [
+    { "id": "context-investigator-actor", "executor": "claude", "invocation": "claude-cli-bwrap", "tier": "standard" }
+  ],
+  "steps": [
+    {
+      "type": "operation",
+      "as": "investigate",
+      "operationId": "investigate-context",
+      "targetActorId": "context-investigator-actor",
+      "objective": "Read /home/vantt/projects/forgentX/core/coordination-protocols/architecture-advisory-panel-standard-v1.yaml (use this absolute path) and report in 3-5 sentences: does its graph ever reference red-team-packet, phase-redteam, or post-redteam-open anywhere? Write your structured result as JSON with exactly this shape: {\"status\": one of \"done\"|\"blocked\"|\"failed\"|\"no-evidence\" (lowercase, no other values), \"summary\": a non-empty string}.",
+      "expectedOutputs": ["agent-result.json (status, summary)", "agent-report.md (human-readable)"]
+    }
+  ]
+}

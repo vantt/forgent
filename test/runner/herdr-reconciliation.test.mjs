@@ -32,12 +32,13 @@ import {
   computeSha256Digest,
   publishImmutableProof,
   publishMutableProjection,
-} from '../../src/runner/dispatch/cli-spawn-supervisor.mjs';
+} from '../../src/runner/dispatch/detached-run-supervisor.mjs';
 import {
   BUILTIN_POLICIES,
 } from '../../src/runner/dispatch/confinement/policies.mjs';
 import { herdrSpawnAdapter } from '../../src/runner/dispatch/transport.mjs';
 import { DispatchError } from '../../src/runner/dispatch/dispatch-error.mjs';
+import { isHerdrSpawnRunStillWorking } from '../../src/runner/dispatch/herdr-reconcile.mjs';
 
 function mkTempDir(prefix = 'fgos-herdr-recon-') {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
@@ -1271,5 +1272,102 @@ test('22. verifyProcessEnvironment catches value overrides and injected addition
     assert.equal(verifyProcessEnvironment(999999999, { FGOS_TEST_MARKER: 'expected-value' }), null);
   } finally {
     child.kill('SIGKILL');
+  }
+});
+
+// dispatch-engine-liveness-hardening Phase 8 follow-up: herdr >=0.9.1 exposes
+// a real semantic agent_status (idle|working|blocked|done|unknown) via
+// `agentGet`, a strictly better liveness signal than inferring from raw
+// foreground-process presence (a process can be present while the agent
+// itself is idle/done). This is a real unit test for
+// isHerdrSpawnRunStillWorking's own decision table -- it previously had none
+// beyond indirect integration coverage (flagged in Phase 8a's own report).
+
+function writeHerdrLaunchCommandFixture(runDir, launchCommandId, { paneId }) {
+  const commandsDir = path.join(runDir, 'controller', 'commands');
+  fs.mkdirSync(commandsDir, { recursive: true });
+  fs.writeFileSync(path.join(commandsDir, `${launchCommandId}.json`), JSON.stringify({ paneId }));
+}
+
+test('isHerdrSpawnRunStillWorking returns false when no controller/commands record exists at all', async () => {
+  const runDir = mkTempDir('fgos-herdr-still-working-absent-');
+  try {
+    assert.equal(await isHerdrSpawnRunStillWorking(runDir), false);
+  } finally {
+    fs.rmSync(runDir, { recursive: true, force: true });
+  }
+});
+
+test('isHerdrSpawnRunStillWorking returns false when the latest command record has no paneId yet', async () => {
+  const runDir = mkTempDir('fgos-herdr-still-working-no-pane-');
+  try {
+    writeHerdrLaunchCommandFixture(runDir, 'cmd-01', { paneId: undefined });
+    assert.equal(await isHerdrSpawnRunStillWorking(runDir), false);
+  } finally {
+    fs.rmSync(runDir, { recursive: true, force: true });
+  }
+});
+
+test('isHerdrSpawnRunStillWorking maps agentGet\'s real agent_status values to the right liveness decision', async () => {
+  const runDir = mkTempDir('fgos-herdr-still-working-status-');
+  try {
+    writeHerdrLaunchCommandFixture(runDir, 'cmd-01', { paneId: 'wS:pTest' });
+    const cases = [
+      ['working', true],
+      ['blocked', true, 'a blocked agent (paused on its own question) is still a live, unsettled attempt'],
+      ['idle', false],
+      ['done', false],
+      ['unknown', 'unknown'],
+    ];
+    for (const [agentStatus, expected, why] of cases) {
+      const herdrClient = { agentGet: () => ({ agentStatus }) };
+      const result = await isHerdrSpawnRunStillWorking(runDir, { herdrClient });
+      assert.equal(result, expected, why ?? `agentStatus "${agentStatus}" must map to ${expected}`);
+    }
+  } finally {
+    fs.rmSync(runDir, { recursive: true, force: true });
+  }
+});
+
+test('isHerdrSpawnRunStillWorking falls back to the process-presence check when agentGet itself fails', async () => {
+  const runDir = mkTempDir('fgos-herdr-still-working-fallback-');
+  try {
+    writeHerdrLaunchCommandFixture(runDir, 'cmd-01', { paneId: 'wS:pTest' });
+
+    const workingClient = {
+      agentGet: () => { throw new Error('herdr_unavailable'); },
+      paneProcessInfo: () => ({ shellPid: 100, foregroundProcesses: [{ pid: 200 }] }),
+    };
+    assert.equal(
+      await isHerdrSpawnRunStillWorking(runDir, { herdrClient: workingClient }),
+      true,
+      'a real foreground worker process (distinct from the shell) still counts as working via the fallback',
+    );
+
+    const idleClient = {
+      agentGet: () => { throw new Error('herdr_unavailable'); },
+      paneProcessInfo: () => ({ shellPid: 100, foregroundProcesses: [{ pid: 100 }] }),
+    };
+    assert.equal(
+      await isHerdrSpawnRunStillWorking(runDir, { herdrClient: idleClient }),
+      false,
+      'only the shell process itself in the foreground means nothing else is working, via the fallback',
+    );
+  } finally {
+    fs.rmSync(runDir, { recursive: true, force: true });
+  }
+});
+
+test('isHerdrSpawnRunStillWorking fails closed to "unknown" when both agentGet and the process-presence fallback fail', async () => {
+  const runDir = mkTempDir('fgos-herdr-still-working-double-fail-');
+  try {
+    writeHerdrLaunchCommandFixture(runDir, 'cmd-01', { paneId: 'wS:pTest' });
+    const brokenClient = {
+      agentGet: () => { throw new Error('herdr_unavailable'); },
+      paneProcessInfo: () => { throw new Error('herdr_call_timeout'); },
+    };
+    assert.equal(await isHerdrSpawnRunStillWorking(runDir, { herdrClient: brokenClient }), 'unknown');
+  } finally {
+    fs.rmSync(runDir, { recursive: true, force: true });
   }
 });

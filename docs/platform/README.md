@@ -55,7 +55,7 @@ Target area docs live at `docs/platform/<area>/`.
 |---|---|---|
 | Settled | Platform-wide docs live directly under `docs/platform/`; area docs live under `docs/platform/<area>/` | `docs/doc-governance.md` |
 | Settled | No `docs/platform/system/` and no `docs/platform/areas/` | `docs/doc-governance.md` |
-| Proposed | Exact migration order for existing areas | `plans/260925-documentation-authority-unification/plan.md`; Phase 00 and Phase 01 are completed, Phases 02–09 remain unauthorized |
+| Proposed | Exact migration order for existing areas | `plans/260925-documentation-authority-unification/plan.md`; Phases 00–02 are completed, Phases 03–09 remain unauthorized |
 | Open | Final area list and naming | Inventory and minimum constitution in the active H1 plan |
 | Preserved | Full multi-profile Knowledge and Documentation Engine and separate Agent Context Engine | [proposals/documentation-system-unification.md](proposals/documentation-system-unification.md) and [intent-preservation-ledger.md](intent-preservation-ledger.md) |
 

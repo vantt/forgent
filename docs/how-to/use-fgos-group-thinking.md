@@ -22,11 +22,7 @@ five bypasses it structurally cannot allow.
 ## Operator path: see what's registered
 
 ```bash
-node -e "
-import('./src/verbs/coordination/group-thinking-pack.mjs').then(({ loadProtocolPack }) => {
-  console.log(JSON.stringify(loadProtocolPack(), null, 2));
-});
-"
+fgos coordination pack list --json
 ```
 
 Three members today: `core.coordination-protocol.group-thinking-rfc-review-lite`,
