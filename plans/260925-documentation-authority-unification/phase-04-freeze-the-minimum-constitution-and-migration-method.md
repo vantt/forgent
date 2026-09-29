@@ -41,6 +41,17 @@ dependencies: [3]
 
 Program-level data model and execution boundary: `plan.md` §5 (Execution Boundary) and §6 (Minimum Migration Data Model).
 
+### Execution harness (proposed, pending authorization)
+
+If this phase is authorized to run through fgOS `coordination` (declared protocol `standalone-master-coordination-loop`) and measured with Observe, use the setup in [reports/harness-readiness-2026-09-29.md](reports/harness-readiness-2026-09-29.md):
+- **Actor pins:** doer `claude` (strong tier), reviewer `openai` codex read-only (a different provider from the doer), red-team `xai`, fixer `claude`.
+- **Session:** one coordination session for this phase, closed explicitly at the end.
+- **Observe case:** open the case **before** the first dispatch, bound to the session: `fgos metrics case open <name> --harness fgos --task "<phase title>"`, then close it with `--sessions <coordinationId>`.
+- **Preconditions:**
+  - explicit authorization of this phase;
+  - Observe M1 reached;
+  - the Observe transcript source fixed to include worktrees outside `.claude/worktrees`.
+
 ## Related Code Files
 
 Determined when this phase is authorized; deliverable paths are listed under Requirements.
