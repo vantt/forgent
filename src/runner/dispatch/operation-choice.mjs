@@ -23,7 +23,7 @@ import { planVerdictFromPlanMd } from '../../intake/plan-verdict-from-plan-md.mj
 import { executorIdForWork, resolveCapabilityIdentityDetails, resolveCapabilityIdentity, buildPrompt } from '../work-compat.mjs';
 import { buildAssignment, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
 import { executeAssignment, classifyRunEvidence, isSubstantiveReportText } from './assignment-runner.mjs';
-import { interpretRunResult } from './run-result.mjs';
+import { interpretRunResult, runOutcome } from './run-result.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
 import { detectTrunk } from '../worktree.mjs';
 
@@ -428,7 +428,7 @@ function findLatestAssignmentRunResult({ work, repoRoot, stage, resultKind = 'ga
             runResult.status = derived.status;
             runResult.confidence = derived.confidence;
           }
-
+          runResult.outcome = runOutcome(runResult);
           if (stat.mtimeMs > latestMtime) {
             latestMtime = stat.mtimeMs;
             latestRunResult = runResult;
@@ -1698,25 +1698,11 @@ function fallbackMutationForAssignment(asgn) {
 }
 
 export function interpretAssignmentRunResult({ choice, runResult, contextSignals = {}, work, repoRoot }) {
-  const confidence = runResult?.confidence;
-  const status = runResult?.status;
+  const outcome = runResult?.outcome ?? (runResult ? runOutcome(runResult) : null);
+  const confidence = outcome ? outcome.evidence : runResult?.confidence;
+  const status = runResult?.status ?? (outcome?.satisfied ? 'done' : outcome?.category);
   const operation = choice?.operation;
 
-  // ADR-006 R5: interpretation reads the Assignment's own stamped fields, not
-  // the operation id. `choice.assignment` is the real stamped Assignment on
-  // the production path (`executeDriverOperationChoice` always builds one via
-  // `buildAssignment`, which stamps `resultKind`/`evidence.required`, before
-  // calling this function). `chooseStageOperation`'s two cross-pass call
-  // sites never populate `choice.assignment` -- they pass only `{ operation,
-  // ... }`, so this falls through to `fallbackResultKindForOperation` below
-  // for those callers rather than reading anything persisted (P02.2 Red-Team
-  // MEDIUM-4: `findLatestAssignmentRunResult` does read the real, disk-
-  // persisted `resultKind` as its own filter, but its return value never
-  // carries that field forward to here -- deliberate for now, since no
-  // producer anywhere in `src/` ever sets a `runResult.assignment`, and
-  // fixing it means changing the return shape of the codebase's highest
-  // tamper-detection-sensitivity function; see `docs/architect/agent-
-  // coordination/verification/step-07-mvp/index.md`'s Follow-Ups).
   const stampedAssignment = choice?.assignment ?? null;
   const resultKind = stampedAssignment?.resultKind ?? fallbackResultKindForOperation(operation);
   const evidenceRequired = stampedAssignment?.evidence?.required;
@@ -1729,7 +1715,10 @@ export function interpretAssignmentRunResult({ choice, runResult, contextSignals
     });
   }
 
-  if (confidence === 'failed' || status === 'failed') {
+  const isFailed = outcome
+    ? (outcome.infraFailure || outcome.category === 'policy' || confidence === 'failed' || status === 'failed')
+    : (confidence === 'failed' || status === 'failed');
+  if (isFailed) {
     return Object.freeze({
       canAdvanceEdge: false,
       stop: true,
@@ -1737,7 +1726,7 @@ export function interpretAssignmentRunResult({ choice, runResult, contextSignals
     });
   }
 
-  if (status === 'blocked') {
+  if (outcome?.category === 'blocked' || status === 'blocked') {
     return Object.freeze({
       canAdvanceEdge: false,
       stop: true,
@@ -1745,35 +1734,26 @@ export function interpretAssignmentRunResult({ choice, runResult, contextSignals
     });
   }
 
-  // ADR-006 R5 (result-ladder confidence checks reference the stamped
-  // requirement): when the Assignment's own stamped `evidence.required` is
-  // known and is `'verified'`, that is the confidence floor here --
-  // `'reported'` alone is not sufficient. `assignment-normalizer.mjs` stamps
-  // `evidence.required: 'verified'` unconditionally for `fix-verify-red`,
-  // `scoped-subtask`, AND `implement-item`, so on the real production path
-  // (`executeDriverOperationChoice` always builds a real Assignment via
-  // `buildAssignment` before calling this function) this gate is the
-  // EFFECTIVE confidence floor for all three operations: it always
-  // evaluates first and is strictly stricter-or-equal to their deeper
-  // per-branch `confidence !== 'verified'` re-checks, so those re-checks
-  // (and their distinct `<op>-requires-verified-evidence` reason string)
-  // are unreachable for any dispatch that carries a stamped Assignment --
-  // not merely redundant defense-in-depth. They are left in place verbatim
-  // only because they remain reachable, and still needed, for direct
-  // unit-test call sites that construct a bare `choice` with no stamped
-  // Assignment at all (no `choice.assignment`/`runResult.assignment`); see
-  // `test/runner/operation-choice.test.mjs` for regression coverage of both
-  // shapes. When `evidence.required` is not available (no stamped
-  // Assignment reached this call), the floor stays the original uniform
-  // `'reported' || 'verified'` check.
   const hasReportConfidence =
     evidenceRequired === 'verified' ? confidence === 'verified' : confidence === 'reported' || confidence === 'verified';
-  if (!hasReportConfidence || status !== 'done') {
-    return Object.freeze({
-      canAdvanceEdge: false,
-      stop: true,
-      reason: `assignment-${operation}-insufficient-confidence`,
-    });
+  const isSatisfied = outcome ? outcome.satisfied : status === 'done';
+
+  if (resultKind !== 'gate-verdict' && resultKind !== 'review-verdict') {
+    if (!hasReportConfidence || !isSatisfied) {
+      return Object.freeze({
+        canAdvanceEdge: false,
+        stop: true,
+        reason: `assignment-${operation}-insufficient-confidence`,
+      });
+    }
+  } else if (!hasReportConfidence && (!outcome || outcome.category !== 'verdict')) {
+    if (status !== 'done') {
+      return Object.freeze({
+        canAdvanceEdge: false,
+        stop: true,
+        reason: `assignment-${operation}-insufficient-confidence`,
+      });
+    }
   }
 
   if (resultKind === 'gate-verdict') {
