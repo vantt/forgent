@@ -3686,7 +3686,7 @@ const AGGREGATION_METHOD = 'evidence-preserving-synthesis';
 // `requiredDisclosures[]` names anything outside this set gets a disclosure
 // coverage failure from the evaluator -- fail-closed, never a silently
 // skipped requirement.
-function deriveDisclosures(runResult) {
+export function deriveDisclosures(runResult) {
   return {
     status: runResult.status,
     confidence: runResult.confidence,
@@ -3998,7 +3998,7 @@ const CONTRIBUTION_FIELD_MAX_LENGTH = 2000;
  * another `result-linked` without re-closing anything, and reading the latest
  * would move "opened at" forward for a window that never moved.
  */
-function branchSatisfiedAtSeq(events, fgosDir, assignmentId) {
+export function branchSatisfiedAtSeq(events, fgosDir, assignmentId) {
   for (const event of events) {
     if (event.type !== 'result-linked' || event.payload.assignmentId !== assignmentId) continue;
     const runResult = readLinkedRunResultFromDisk(fgosDir, assignmentId, event.payload.runId);

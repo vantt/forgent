@@ -1,0 +1,262 @@
+{
+  "contract": {
+    "id": "assignment-run-result",
+    "version": 2
+  },
+  "runId": "run_asgn_lead_cold_resumable_dag_op_022_01",
+  "assignmentId": "asgn_lead_cold_resumable_dag_op_022",
+  "workId": null,
+  "controlEpoch": 1,
+  "controlToken": "3f96c354-986f-48e0-ae4c-21767268cc2e",
+  "executorId": "gemini",
+  "executorRedirected": false,
+  "policy": {
+    "role": "doer",
+    "persona": "meticulous-implementer",
+    "executorPreference": [
+      "gemini",
+      "glm"
+    ],
+    "executorId": "gemini",
+    "providerModel": "gemini",
+    "tier": "standard",
+    "model": "gemini-3.8-flash-medium",
+    "quality": {
+      "minRigor": {
+        "value": "standard",
+        "source": {
+          "scope": "derived",
+          "id": "standard"
+        }
+      },
+      "mode": {
+        "value": "balanced",
+        "source": {
+          "scope": "tier-bridge",
+          "id": "standard"
+        },
+        "sourceKind": "implied-by-tier-bridge"
+      }
+    },
+    "lookupPolicyTier": "standard",
+    "reasoningEffort": "medium",
+    "visibility": "headless",
+    "repeatMode": null,
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "gemini",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "provider": {
+        "value": "gemini",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "gemini"
+        }
+      },
+      "model": {
+        "value": "gemini-3.8-flash-medium",
+        "source": {
+          "scope": "placement-policy",
+          "id": "gemini.standard"
+        }
+      },
+      "tier": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "semanticTier": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "quality": {
+        "minRigor": {
+          "value": "standard",
+          "source": {
+            "scope": "derived",
+            "id": "standard"
+          }
+        },
+        "mode": {
+          "value": "balanced",
+          "source": {
+            "scope": "tier-bridge",
+            "id": "standard"
+          },
+          "sourceKind": "implied-by-tier-bridge"
+        }
+      },
+      "lookupPolicyTier": {
+        "value": "standard",
+        "source": {
+          "scope": "default",
+          "kind": "semantic"
+        }
+      },
+      "reasoningEffort": {
+        "value": "medium",
+        "source": {
+          "scope": "derived",
+          "id": "quality.minRigor.standard"
+        }
+      },
+      "persona": {
+        "value": "meticulous-implementer",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "repeatMode": {
+        "value": null,
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "asgn_lead_cold_resumable_dag_op_022"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "gemini"
+        }
+      }
+    }
+  },
+  "promptEnvelope": {
+    "persona": {
+      "ref": "meticulous-implementer",
+      "delivery": "section",
+      "applied": true,
+      "source": {
+        "scope": "cli",
+        "id": "cli"
+      }
+    }
+  },
+  "settledAt": "2026-09-18T05:34:13.636Z",
+  "durationMs": 428376,
+  "settleReports": [],
+  "classification": {
+    "execution": {
+      "status": "completed",
+      "exitCode": 0
+    },
+    "assessment": {
+      "verdict": "pass"
+    },
+    "confidence": {
+      "level": "inferred",
+      "basis": [
+        "valid-agent-result-claim",
+        "captured-stdout",
+        "workspace-git-diff"
+      ]
+    },
+    "failure": null,
+    "policy": {
+      "disposition": "allow",
+      "code": null
+    },
+    "delivery": {
+      "mode": "fresh"
+    },
+    "provenance": "native-v2"
+  },
+  "status": "done",
+  "confidence": "inferred",
+  "runtime": {
+    "exitCode": 0,
+    "stdoutLog": ".fgos/assignments/asgn_lead_cold_resumable_dag_op_022/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/asgn_lead_cold_resumable_dag_op_022/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "status": "done",
+    "summary": "Settled"
+  },
+  "evidence": {
+    "gitBefore": "0d12beb9a11042e5ac49ee8c3a18b47cb3639579",
+    "gitAfter": "0d12beb9a11042e5ac49ee8c3a18b47cb3639579",
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [
+      "src/runner/coordination/headless-adapter.mjs",
+      "src/runner/coordination/schema.mjs",
+      "src/verbs/coordination/chain.mjs",
+      "src/verbs/coordination/show.mjs"
+    ],
+    "mutatedDirtyBeforeFiles": [],
+    "attribution": [
+      {
+        "path": "open.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "src/runner/coordination/headless-adapter.mjs",
+        "firstObserved": "post-run",
+        "level": "correlated",
+        "basis": [
+          "pre-post-git-snapshot"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "src/runner/coordination/schema.mjs",
+        "firstObserved": "post-run",
+        "level": "correlated",
+        "basis": [
+          "pre-post-git-snapshot"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "src/verbs/coordination/chain.mjs",
+        "firstObserved": "post-run",
+        "level": "correlated",
+        "basis": [
+          "pre-post-git-snapshot"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "src/verbs/coordination/show.mjs",
+        "firstObserved": "post-run",
+        "level": "correlated",
+        "basis": [
+          "pre-post-git-snapshot"
+        ],
+        "coverageMatched": false
+      }
+    ],
+    "artifacts": [],
+    "tests": []
+  }
+}

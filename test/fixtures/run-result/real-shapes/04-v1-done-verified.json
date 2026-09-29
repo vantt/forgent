@@ -1,0 +1,146 @@
+{
+  "runId": "run_asgn_claude_lead_code_panel_multicell_facade_op_002_01",
+  "assignmentId": "asgn_claude_lead_code_panel_multicell_facade_op_002",
+  "workId": null,
+  "controlEpoch": 1,
+  "controlToken": "ac908984-c692-471f-b2a7-4a050069688f",
+  "executorId": "agy-cli",
+  "policy": {
+    "role": "doer",
+    "persona": "focused-code-implementer",
+    "executorPreference": [
+      "agy-cli"
+    ],
+    "executorId": "agy-cli",
+    "providerModel": "gemini",
+    "tier": "standard",
+    "model": "gemini-3.8-flash-medium",
+    "visibility": "headless",
+    "repeatMode": null,
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "agy-cli",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "provider": {
+        "value": "gemini",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "agy-cli"
+        }
+      },
+      "model": {
+        "value": "gemini-3.8-flash-medium",
+        "source": {
+          "scope": "runnerConfig",
+          "id": "gemini.standard"
+        }
+      },
+      "tier": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "persona": {
+        "value": "focused-code-implementer",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "repeatMode": {
+        "value": null,
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "asgn_claude_lead_code_panel_multicell_facade_op_002"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "gemini"
+        }
+      }
+    }
+  },
+  "executorRedirected": false,
+  "claimSha256": "1a386319f79cff85209ed21d1220d5ec66b842e481fb90a98bc51ec9fee40a13",
+  "settleReports": [
+    {
+      "path": ".fgos/assignments/asgn_claude_lead_code_panel_multicell_facade_op_002/runs/01/agent-report.md",
+      "sha256": "f28fad4981c7cea3493c48fe8697cfc7a863cb91158dac387ebc371cb53aa622"
+    }
+  ],
+  "status": "done",
+  "confidence": "verified",
+  "runtime": {
+    "exitCode": 0,
+    "stdoutLog": ".fgos/assignments/asgn_claude_lead_code_panel_multicell_facade_op_002/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/asgn_claude_lead_code_panel_multicell_facade_op_002/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "status": "done",
+    "summary": "Fixed orphaned authorization supersession in resolveBindingAuthorization, resolveTaskKeyAuthorization, and same-binding collision check in src/runner/coordination/session-engine.mjs. Landed commit b16dd524 with regression tests in test/runner/coordination-driver-authorization.test.mjs. Mutation verified: reverted fix fails with exact wrong-Assignment-minted symptom, restored fix passes all 134 focused tests with zero regressions.",
+    "commit": "b16dd524621cbf97690663e9764f9ede286583be",
+    "branch": "code-panel-multicell-facade--p04",
+    "focused_tests": {
+      "command": "node --test test/runner/coordination-session-engine.test.mjs test/runner/coordination-driver-authorization.test.mjs test/runner/coordination-recovery-and-quorum.test.mjs",
+      "total": 134,
+      "pass": 134,
+      "fail": 0,
+      "exitCode": 0
+    },
+    "mutation_verification": {
+      "command": "node --test --test-name-pattern=\"superseded\" test/runner/coordination-driver-authorization.test.mjs",
+      "reverted_code_outcome": {
+        "pass": 0,
+        "fail": 2,
+        "exitCode": 1,
+        "error_output": "✖ an older orphaned authorization is superseded by newer consumed siblings -- keyless repeat dispatch refuses rather than minting a 4th Assignment spending the orphan (1752.735078ms)\n  AssertionError [ERR_ASSERTION]: Missing expected rejection.\n✖ an older orphaned authorization is superseded by a newer consumed sibling -- repeat keyless dispatch idempotently resumes the consumed Assignment instead of spending the orphan (1481.097994ms)\n  AssertionError [ERR_ASSERTION]: repeat keyless call must idempotently resume first\n  false !== true"
+      },
+      "fixed_code_outcome": {
+        "pass": 2,
+        "fail": 0,
+        "exitCode": 0,
+        "output": "✔ an older orphaned authorization is superseded by newer consumed siblings -- keyless repeat dispatch refuses rather than minting a 4th Assignment spending the orphan (1502.62459ms)\n✔ an older orphaned authorization is superseded by a newer consumed sibling -- repeat keyless dispatch idempotently resumes the consumed Assignment instead of spending the orphan (727.485918ms)\nℹ tests 2\nℹ pass 2\nℹ fail 0"
+      }
+    }
+  },
+  "evidence": {
+    "gitBefore": "45569ac3379445e93436524c1226159b3869265c",
+    "gitAfter": "b16dd524621cbf97690663e9764f9ede286583be",
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [
+      "src/runner/coordination/session-engine.mjs",
+      "test/runner/coordination-driver-authorization.test.mjs"
+    ],
+    "mutatedDirtyBeforeFiles": [],
+    "artifacts": [
+      ".fgos/assignments/asgn_claude_lead_code_panel_multicell_facade_op_002/runs/01/agent-report.md",
+      ".fgos/assignments/asgn_claude_lead_code_panel_multicell_facade_op_002/runs/01/agent-result.json"
+    ],
+    "tests": []
+  }
+}

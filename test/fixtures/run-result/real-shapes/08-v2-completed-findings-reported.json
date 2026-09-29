@@ -1,0 +1,265 @@
+{
+  "contract": {
+    "id": "assignment-run-result",
+    "version": 2
+  },
+  "runId": "run_asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_003_01",
+  "assignmentId": "asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_003",
+  "workId": null,
+  "controlEpoch": 1,
+  "controlToken": "3d64c44a-be84-4a37-86ca-9bec0adb951f",
+  "executorId": "xai",
+  "executorRedirected": false,
+  "policy": {
+    "role": "red-team",
+    "persona": "edge-case-and-security-attacker",
+    "executorPreference": [
+      "xai",
+      "openai"
+    ],
+    "executorId": "xai",
+    "providerModel": "xai",
+    "tier": "flagship",
+    "model": "grok-4.6",
+    "quality": {
+      "minRigor": {
+        "value": "high",
+        "source": {
+          "scope": "derived",
+          "id": "flagship"
+        }
+      },
+      "mode": {
+        "value": "analytical",
+        "source": {
+          "scope": "tier-bridge",
+          "id": "flagship"
+        },
+        "sourceKind": "implied-by-tier-bridge"
+      }
+    },
+    "lookupPolicyTier": "flagship",
+    "reasoningEffort": "high",
+    "visibility": "headless",
+    "repeatMode": "pre-delivery",
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "xai",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "provider": {
+        "value": "xai",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "xai"
+        }
+      },
+      "model": {
+        "value": "grok-4.6",
+        "source": {
+          "scope": "placement-policy",
+          "id": "xai.flagship"
+        }
+      },
+      "tier": {
+        "value": "flagship",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "semanticTier": {
+        "value": "flagship",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "quality": {
+        "minRigor": {
+          "value": "high",
+          "source": {
+            "scope": "derived",
+            "id": "flagship"
+          }
+        },
+        "mode": {
+          "value": "analytical",
+          "source": {
+            "scope": "tier-bridge",
+            "id": "flagship"
+          },
+          "sourceKind": "implied-by-tier-bridge"
+        }
+      },
+      "lookupPolicyTier": {
+        "value": "flagship",
+        "source": {
+          "scope": "cli",
+          "id": "cli",
+          "kind": "semantic"
+        }
+      },
+      "reasoningEffort": {
+        "value": "high",
+        "source": {
+          "scope": "derived",
+          "id": "quality.minRigor.high"
+        }
+      },
+      "persona": {
+        "value": "edge-case-and-security-attacker",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "repeatMode": {
+        "value": "pre-delivery",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_003"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "xai"
+        }
+      }
+    }
+  },
+  "promptEnvelope": {
+    "persona": {
+      "ref": "edge-case-and-security-attacker",
+      "delivery": "section",
+      "applied": true,
+      "source": {
+        "scope": "cli",
+        "id": "cli"
+      }
+    }
+  },
+  "settledAt": "2026-09-17T16:39:44.323Z",
+  "durationMs": 353319,
+  "claimSha256": "e450e8760b4c3b91cf128adf3323f7556016abe7cf7f69a9021145f7a3c9bbb5",
+  "settleReports": [
+    {
+      "path": ".fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_003/runs/01/agent-report.md",
+      "sha256": "d96d521849a8b0971116858f38ee276f165887bd8a747f7f7013419d9d62c1d3"
+    }
+  ],
+  "classification": {
+    "execution": {
+      "status": "completed",
+      "exitCode": 0
+    },
+    "assessment": {
+      "verdict": "findings"
+    },
+    "confidence": {
+      "level": "reported",
+      "basis": [
+        "valid-agent-result-claim",
+        "captured-stdout"
+      ]
+    },
+    "failure": null,
+    "policy": {
+      "disposition": "allow",
+      "code": null
+    },
+    "delivery": {
+      "mode": "fresh"
+    },
+    "provenance": "native-v2"
+  },
+  "status": "failed",
+  "confidence": "reported",
+  "runtime": {
+    "exitCode": 0,
+    "stdoutLog": ".fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_003/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_003/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "contract": {
+      "id": "agent-result-claim",
+      "version": 2
+    },
+    "status": "done",
+    "summary": "Red-team of commit 802a0965 (R3-P1 remote projector/presenter). All four named attacks failed to break the implementation: (1) present_remote_outcome maps a failed BuildShowOutcome downcast to GatewayError::unexpected via ok_or_else — no unwrap/expect/panic on that path; (2) ProviderError maps to at least four distinct ErrorCategory values (Precondition / Conflict / Validation / Unexpected), not a silent Unexpected collapse; (3) include_runtime is a struct-literal true with no caller parameter and no other construction site; (4) cargo metadata shows herdr-fgos is not a root workspace member; cargo pkgid -p fgos and -p fgos-host-runtime still resolve to apps/fgos and packages/host-runtime/rust, and -p herdr-fgos from repo root still fails. Two LOW proof-sufficiency findings: FOCUSED_TESTS never construct a Completed payload that is not BuildShowOutcome, and they never inspect root workspace resolution.",
+    "assessment": {
+      "verdict": "findings"
+    },
+    "findings": [
+      {
+        "id": "L1",
+        "severity": "low",
+        "title": "FOCUSED_TESTS miss the downcast-failure contract present_remote_outcome claims",
+        "detail": "present_remote_outcome is specified to return a mapped GatewayError when ProviderOutcome::Completed.output is not BuildShowOutcome, and the source does that (ok_or_else -> GatewayError::unexpected(\"unsupported outcome payload type\")). Named attack (1) therefore does not break the code. FOCUSED_TESTS still never construct that case: test_present_remote_outcome_completed uses a real BuildShowOutcome, test_present_remote_outcome_parked_fallback uses Parked, and test_present_remote_outcome_error_mappings only feeds ProviderError. A future regression to .unwrap()/.expect() on downcast_ref would still go green under `cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation`.",
+        "evidence": "herdr-plugin/src/remote_invocation.rs:206-213 (mapped error), 267-316 (Completed+Parked tests), 317-382 (error tests; no wrong-type Completed)"
+      },
+      {
+        "id": "L2",
+        "severity": "low",
+        "title": "FOCUSED_TESTS miss the workspace-isolation contract the Cargo.toml path deps change",
+        "detail": "The diff adds path deps on fgos-host-runtime and fgos-distribution to an excluded crate. Named attack (4) does not land: independent `cargo metadata --no-deps` from repo root still has exactly the five original workspace members and zero herdr packages; `cargo pkgid -p fgos` / `-p fgos-host-runtime` still resolve to apps/fgos and packages/host-runtime/rust; `cargo pkgid -p herdr-fgos` from root still exits 101. FOCUSED_TESTS (`cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation`) cannot observe any of that — they only compile the excluded crate's own graph. A members-list addition in root Cargo.toml would not fail that filter.",
+        "evidence": "cargo metadata --no-deps (root workspace_members=5, no herdr); cargo pkgid -p fgos / fgos-host-runtime / herdr-fgos; git show 802a0965 --stat (root Cargo.toml untouched)"
+      }
+    ],
+    "attacks": {
+      "1_downcast_panic": "failed-to-break",
+      "2_error_category_collapse": "failed-to-break",
+      "3_include_runtime_caller_influence": "failed-to-break",
+      "4_workspace_pollution": "failed-to-break"
+    },
+    "evidenceRefs": [
+      "/home/vantt/projects/forgentX/.fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_003/runs/01/agent-report.md",
+      "git commit 802a096540f2c99eaa9bdc3fe471398b807372ba",
+      "herdr-plugin/src/remote_invocation.rs",
+      "herdr-plugin/Cargo.toml",
+      "Cargo.toml [workspace].members / exclude"
+    ]
+  },
+  "evidence": {
+    "gitBefore": "802a096540f2c99eaa9bdc3fe471398b807372ba",
+    "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [],
+    "mutatedDirtyBeforeFiles": [],
+    "attribution": [],
+    "artifacts": [
+      ".fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_003/runs/01/agent-report.md",
+      ".fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_003/runs/01/agent-result.json"
+    ],
+    "tests": [],
+    "findingRefs": [
+      "/home/vantt/projects/forgentX/.fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_003/runs/01/agent-report.md",
+      "git commit 802a096540f2c99eaa9bdc3fe471398b807372ba",
+      "herdr-plugin/src/remote_invocation.rs",
+      "herdr-plugin/Cargo.toml",
+      "Cargo.toml [workspace].members / exclude"
+    ]
+  }
+}

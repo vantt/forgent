@@ -1,0 +1,282 @@
+{
+  "contract": {
+    "id": "assignment-run-result",
+    "version": 2
+  },
+  "runId": "run_asgn_lead_cold_resumable_dag_op_042_01",
+  "assignmentId": "asgn_lead_cold_resumable_dag_op_042",
+  "workId": null,
+  "controlEpoch": 1,
+  "controlToken": "da69f4e8-787c-4512-bec5-f997e5ba1f69",
+  "executorId": "openai",
+  "executorRedirected": false,
+  "policy": {
+    "role": "doer",
+    "persona": "meticulous-implementer",
+    "executorPreference": [
+      "openai"
+    ],
+    "executorId": "openai",
+    "providerModel": "openai",
+    "tier": "flagship",
+    "model": "gpt-5.6-terra",
+    "quality": {
+      "minRigor": {
+        "value": "high",
+        "source": {
+          "scope": "derived",
+          "id": "flagship"
+        }
+      },
+      "mode": {
+        "value": "analytical",
+        "source": {
+          "scope": "tier-bridge",
+          "id": "flagship"
+        },
+        "sourceKind": "implied-by-tier-bridge"
+      }
+    },
+    "lookupPolicyTier": "flagship",
+    "reasoningEffort": "high",
+    "visibility": "headless",
+    "repeatMode": null,
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "openai",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "provider": {
+        "value": "openai",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "openai"
+        }
+      },
+      "model": {
+        "value": "gpt-5.6-terra",
+        "source": {
+          "scope": "placement-policy",
+          "id": "openai.flagship"
+        }
+      },
+      "tier": {
+        "value": "flagship",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "semanticTier": {
+        "value": "flagship",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "quality": {
+        "minRigor": {
+          "value": "high",
+          "source": {
+            "scope": "derived",
+            "id": "flagship"
+          }
+        },
+        "mode": {
+          "value": "analytical",
+          "source": {
+            "scope": "tier-bridge",
+            "id": "flagship"
+          },
+          "sourceKind": "implied-by-tier-bridge"
+        }
+      },
+      "lookupPolicyTier": {
+        "value": "flagship",
+        "source": {
+          "scope": "cli",
+          "id": "cli",
+          "kind": "semantic"
+        }
+      },
+      "reasoningEffort": {
+        "value": "high",
+        "source": {
+          "scope": "derived",
+          "id": "quality.minRigor.high"
+        }
+      },
+      "persona": {
+        "value": "meticulous-implementer",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "repeatMode": {
+        "value": null,
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "asgn_lead_cold_resumable_dag_op_042"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "openai"
+        }
+      }
+    }
+  },
+  "promptEnvelope": {
+    "persona": {
+      "ref": "meticulous-implementer",
+      "delivery": "section",
+      "applied": true,
+      "source": {
+        "scope": "cli",
+        "id": "cli"
+      }
+    }
+  },
+  "settledAt": "2026-09-18T08:35:25.911Z",
+  "durationMs": 264639,
+  "claimSha256": "afca363c5e4b7e5add56aa8145ad3e013c4af60e5f2370a74f6be5fd082e92b5",
+  "settleReports": [],
+  "classification": {
+    "execution": {
+      "status": "completed",
+      "exitCode": 0
+    },
+    "assessment": {
+      "verdict": "not-applicable"
+    },
+    "confidence": {
+      "level": "failed",
+      "basis": [
+        "valid-agent-result-claim",
+        "captured-stdout",
+        "workspace-git-diff"
+      ]
+    },
+    "failure": null,
+    "policy": {
+      "disposition": "allow",
+      "code": null
+    },
+    "delivery": {
+      "mode": "fresh"
+    },
+    "provenance": "native-v2"
+  },
+  "status": "done",
+  "confidence": "failed",
+  "runtime": {
+    "exitCode": 0,
+    "stdoutLog": ".fgos/assignments/asgn_lead_cold_resumable_dag_op_042/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/asgn_lead_cold_resumable_dag_op_042/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "contract": {
+      "id": "agent-result-claim",
+      "version": 2
+    },
+    "status": "failed",
+    "summary": "Incomplete P05 implementation; no commit was created. Real-door existing DAG tests began passing in streamed output, but the required targeted and full npm test gates, new exit-criterion tests, barrier-clock proof, and verification baseline comparison were not completed. Failure count: unverified.",
+    "error": "The assigned delivery could not be completed and verified within this execution window; reporting partial implementation honestly rather than claiming the phase complete.",
+    "evidenceRefs": [
+      "src/verbs/coordination/dag-scheduler.mjs",
+      "src/verbs/coordination/run.mjs",
+      "docs/architect/agent-coordination/verification/cold-resumable-coordination-dag/p05.md"
+    ]
+  },
+  "evidence": {
+    "gitBefore": "d1ed1247263fe99dc9e366f1cb8e9cb34baf9876",
+    "gitAfter": "d1ed1247263fe99dc9e366f1cb8e9cb34baf9876",
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [
+      "docs/architect/agent-coordination/verification/cold-resumable-coordination-dag/p05.md",
+      "docs/enduser-docs-index.json",
+      "src/verbs/coordination/dag-scheduler.mjs",
+      "src/verbs/coordination/run.mjs"
+    ],
+    "mutatedDirtyBeforeFiles": [],
+    "attribution": [
+      {
+        "path": "docs/architect/agent-coordination/verification/cold-resumable-coordination-dag/p05.md",
+        "firstObserved": "post-run",
+        "level": "correlated",
+        "basis": [
+          "pre-post-git-snapshot"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "docs/enduser-docs-index.json",
+        "firstObserved": "post-run",
+        "level": "correlated",
+        "basis": [
+          "pre-post-git-snapshot"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "open.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "src/verbs/coordination/dag-scheduler.mjs",
+        "firstObserved": "post-run",
+        "level": "correlated",
+        "basis": [
+          "pre-post-git-snapshot"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "src/verbs/coordination/run.mjs",
+        "firstObserved": "post-run",
+        "level": "correlated",
+        "basis": [
+          "pre-post-git-snapshot"
+        ],
+        "coverageMatched": false
+      }
+    ],
+    "artifacts": [
+      ".fgos/assignments/asgn_lead_cold_resumable_dag_op_042/runs/01/agent-result.json"
+    ],
+    "tests": [],
+    "findingRefs": [
+      "src/verbs/coordination/dag-scheduler.mjs",
+      "src/verbs/coordination/run.mjs",
+      "docs/architect/agent-coordination/verification/cold-resumable-coordination-dag/p05.md"
+    ]
+  }
+}

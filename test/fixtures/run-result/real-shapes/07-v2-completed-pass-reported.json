@@ -1,0 +1,233 @@
+{
+  "contract": {
+    "id": "assignment-run-result",
+    "version": 2
+  },
+  "runId": "run_asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_002_01",
+  "assignmentId": "asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_002",
+  "workId": null,
+  "controlEpoch": 1,
+  "controlToken": "c70e33c0-ccc5-4fe2-8560-519a60b77064",
+  "executorId": "gemini",
+  "executorRedirected": false,
+  "policy": {
+    "role": "reviewer",
+    "persona": "code-quality-reviewer",
+    "executorPreference": [
+      "gemini",
+      "claude"
+    ],
+    "executorId": "gemini",
+    "providerModel": "gemini",
+    "tier": "flagship",
+    "model": "gemini-3.1-pro-low",
+    "quality": {
+      "minRigor": {
+        "value": "high",
+        "source": {
+          "scope": "derived",
+          "id": "flagship"
+        }
+      },
+      "mode": {
+        "value": "analytical",
+        "source": {
+          "scope": "tier-bridge",
+          "id": "flagship"
+        },
+        "sourceKind": "implied-by-tier-bridge"
+      }
+    },
+    "lookupPolicyTier": "flagship",
+    "reasoningEffort": "high",
+    "visibility": "headless",
+    "repeatMode": "pre-delivery",
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "gemini",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "provider": {
+        "value": "gemini",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "gemini"
+        }
+      },
+      "model": {
+        "value": "gemini-3.1-pro-low",
+        "source": {
+          "scope": "placement-policy",
+          "id": "gemini.flagship"
+        }
+      },
+      "tier": {
+        "value": "flagship",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "semanticTier": {
+        "value": "flagship",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "quality": {
+        "minRigor": {
+          "value": "high",
+          "source": {
+            "scope": "derived",
+            "id": "flagship"
+          }
+        },
+        "mode": {
+          "value": "analytical",
+          "source": {
+            "scope": "tier-bridge",
+            "id": "flagship"
+          },
+          "sourceKind": "implied-by-tier-bridge"
+        }
+      },
+      "lookupPolicyTier": {
+        "value": "flagship",
+        "source": {
+          "scope": "cli",
+          "id": "cli",
+          "kind": "semantic"
+        }
+      },
+      "reasoningEffort": {
+        "value": "high",
+        "source": {
+          "scope": "derived",
+          "id": "quality.minRigor.high"
+        }
+      },
+      "persona": {
+        "value": "code-quality-reviewer",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "repeatMode": {
+        "value": "pre-delivery",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_002"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "gemini"
+        }
+      }
+    }
+  },
+  "promptEnvelope": {
+    "persona": {
+      "ref": "code-quality-reviewer",
+      "delivery": "section",
+      "applied": true,
+      "source": {
+        "scope": "cli",
+        "id": "cli"
+      }
+    }
+  },
+  "settledAt": "2026-09-17T16:33:50.909Z",
+  "durationMs": 71949,
+  "claimSha256": "65a0b7bf2875ef319a0e54b6001df3e3ddf93a5f8c696c5ef41cc19215eaedb4",
+  "settleReports": [
+    {
+      "path": ".fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_002/runs/01/agent-report.md",
+      "sha256": "ca2297ca01db5a1d58e3c7d2a3351e68acc3ce8e3d0dd0b3cd4c8752a7308983"
+    }
+  ],
+  "classification": {
+    "execution": {
+      "status": "completed",
+      "exitCode": 0
+    },
+    "assessment": {
+      "verdict": "pass"
+    },
+    "confidence": {
+      "level": "reported",
+      "basis": [
+        "valid-agent-result-claim",
+        "captured-stdout"
+      ]
+    },
+    "failure": null,
+    "policy": {
+      "disposition": "allow",
+      "code": null
+    },
+    "delivery": {
+      "mode": "fresh"
+    },
+    "provenance": "native-v2"
+  },
+  "status": "done",
+  "confidence": "reported",
+  "runtime": {
+    "exitCode": 0,
+    "stdoutLog": ".fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_002/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_002/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "id": "agent-result-claim",
+    "version": 2,
+    "status": "done",
+    "summary": "Review completed successfully. Implementation accurately reflects the constraints, utilizes appropriate error mappings, does not introduce Node.js shelling, and leaves router untouched. Test coverage is robust.",
+    "assessment": {
+      "verdict": "pass"
+    },
+    "evidenceRefs": [
+      "/home/vantt/projects/forgentX/.fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_002/runs/01/agent-report.md"
+    ]
+  },
+  "evidence": {
+    "gitBefore": "802a096540f2c99eaa9bdc3fe471398b807372ba",
+    "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [],
+    "mutatedDirtyBeforeFiles": [],
+    "attribution": [],
+    "artifacts": [
+      ".fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_002/runs/01/agent-report.md",
+      ".fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_002/runs/01/agent-result.json"
+    ],
+    "tests": [],
+    "findingRefs": [
+      "/home/vantt/projects/forgentX/.fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_002/runs/01/agent-report.md"
+    ]
+  }
+}

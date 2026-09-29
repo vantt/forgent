@@ -236,7 +236,27 @@ Nếu để hai bản logic sống song song thì trái với single path, và h
 | 14 | Ma trận P1 thiếu `needs-input`, v1, `failure`, text verdict | Medium | Accept | P1 |
 | 15 | P4 không độc lập với P3; Outcome ghi quá phạm vi (H5 `result-ladder`) | Medium | Accept | P4, Outcome, Phases |
 
-Ghi chú: phần đếm dữ liệu thật (1028 `result.json`, 925 v1, 101–106 v2, 936 `result-linked`, 512 session `active`) là do reviewer đếm. Phase 1 đếm lại và dán số vào plan.
+Ghi chú: phần đếm dữ liệu thật (1028 `result.json`, 925 v1, 103 v2, 936 `result-linked`, 512 session `active`) đã được quét và xác nhận ở Phase 1 bước 2:
+
+| # | Version | execution.status | assessment.verdict | policy.disposition | confidence.level | failure.family | status (legacy) | confidence (legacy) | Số lượng | Sample path |
+|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | v1 | none | none | none | none | none | failed | failed | 285 | asgn_5439cfc7_9ffa_45b0_8997_4d5c34fe8fbf_op_001 |
+| 2 | v1 | none | none | none | none | none | no-evidence | no-evidence | 70 | asgn_5439cfc7_9ffa_45b0_8997_4d5c34fe8fbf_op_002 |
+| 3 | v1 | none | none | none | none | none | done | inferred | 4 | asgn_claude_lead_code_panel_multicell_facade_op_001 |
+| 4 | v1 | none | none | none | none | none | done | verified | 98 | asgn_claude_lead_code_panel_multicell_facade_op_002 |
+| 5 | v1 | none | none | none | none | none | done | reported | 468 | asgn_claude_lead_code_panel_multicell_facade_op_003 |
+| 6 | v2 | completed | pass | allow | verified | none | done | verified | 21 | asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001 |
+| 7 | v2 | completed | pass | allow | reported | none | done | reported | 22 | asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_002 |
+| 8 | v2 | completed | findings | allow | reported | none | failed | reported | 31 | asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_003 |
+| 9 | v2 | failed | not-applicable | needs-input | failed | provider | failed | failed | 10 | asgn_driver_1_op_001 |
+| 10 | v2 | failed | not-applicable | refuse | failed | provider | failed | failed | 2 | asgn_driver_1_op_002 |
+| 11 | v2 | completed | pass | refuse | failed | none | failed | failed | 2 | asgn_lead_cold_resumable_dag_op_017 |
+| 12 | v2 | completed | pass | allow | inferred | none | done | inferred | 6 | asgn_lead_cold_resumable_dag_op_022 |
+| 13 | v2 | completed | inconclusive | allow | no-evidence | none | no-evidence | no-evidence | 4 | asgn_lead_cold_resumable_dag_op_025 |
+| 14 | v2 | completed | blocked | allow | reported | none | blocked | reported | 3 | asgn_lead_cold_resumable_dag_op_035 |
+| 15 | v2 | completed | not-applicable | allow | failed | none | done | failed | 2 | asgn_lead_cold_resumable_dag_op_042 |
+
+Tổng cộng: 1028 file (925 v1, 103 v2). Result-linked events: 936 (0 payload.status). Coordination sessions: 606 total, 512 active.
 
 ### Whole-Plan Consistency Sweep
 - Files reread: plan.md, phase-01 … phase-05.

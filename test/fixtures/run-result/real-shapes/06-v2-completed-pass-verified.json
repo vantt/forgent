@@ -1,0 +1,238 @@
+{
+  "contract": {
+    "id": "assignment-run-result",
+    "version": 2
+  },
+  "runId": "run_asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001_01",
+  "assignmentId": "asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001",
+  "workId": null,
+  "controlEpoch": 1,
+  "controlToken": "5127e530-01c5-4af2-92b0-000c1b63380f",
+  "executorId": "gemini",
+  "executorRedirected": false,
+  "policy": {
+    "role": "doer",
+    "persona": "focused-code-implementer",
+    "executorPreference": [
+      "gemini",
+      "openai"
+    ],
+    "executorId": "gemini",
+    "providerModel": "gemini",
+    "tier": "standard",
+    "model": "gemini-3.8-flash-medium",
+    "quality": {
+      "minRigor": {
+        "value": "standard",
+        "source": {
+          "scope": "derived",
+          "id": "standard"
+        }
+      },
+      "mode": {
+        "value": "balanced",
+        "source": {
+          "scope": "tier-bridge",
+          "id": "standard"
+        },
+        "sourceKind": "implied-by-tier-bridge"
+      }
+    },
+    "lookupPolicyTier": "standard",
+    "reasoningEffort": "medium",
+    "visibility": "headless",
+    "repeatMode": null,
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "gemini",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "provider": {
+        "value": "gemini",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "gemini"
+        }
+      },
+      "model": {
+        "value": "gemini-3.8-flash-medium",
+        "source": {
+          "scope": "placement-policy",
+          "id": "gemini.standard"
+        }
+      },
+      "tier": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "semanticTier": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "quality": {
+        "minRigor": {
+          "value": "standard",
+          "source": {
+            "scope": "derived",
+            "id": "standard"
+          }
+        },
+        "mode": {
+          "value": "balanced",
+          "source": {
+            "scope": "tier-bridge",
+            "id": "standard"
+          },
+          "sourceKind": "implied-by-tier-bridge"
+        }
+      },
+      "lookupPolicyTier": {
+        "value": "standard",
+        "source": {
+          "scope": "default",
+          "kind": "semantic"
+        }
+      },
+      "reasoningEffort": {
+        "value": "medium",
+        "source": {
+          "scope": "derived",
+          "id": "quality.minRigor.standard"
+        }
+      },
+      "persona": {
+        "value": "focused-code-implementer",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "repeatMode": {
+        "value": null,
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "gemini"
+        }
+      }
+    }
+  },
+  "promptEnvelope": {
+    "persona": {
+      "ref": "focused-code-implementer",
+      "delivery": "section",
+      "applied": true,
+      "source": {
+        "scope": "cli",
+        "id": "cli"
+      }
+    }
+  },
+  "settledAt": "2026-09-17T16:32:38.818Z",
+  "durationMs": 485772,
+  "claimSha256": "f53062478a38836f02ce026033850ae2dccc1abdaef2c7cba32aeb4c08fa06b8",
+  "settleReports": [
+    {
+      "path": ".fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001/runs/01/agent-report.md",
+      "sha256": "f376635793537dd4e6efff5737ba6624a858ba7a4a5fff92f1516f06409e20ee"
+    }
+  ],
+  "classification": {
+    "execution": {
+      "status": "completed",
+      "exitCode": 0
+    },
+    "assessment": {
+      "verdict": "pass"
+    },
+    "confidence": {
+      "level": "verified",
+      "basis": [
+        "valid-agent-result-claim",
+        "captured-stdout",
+        "workspace-git-diff"
+      ]
+    },
+    "failure": null,
+    "policy": {
+      "disposition": "allow",
+      "code": null
+    },
+    "delivery": {
+      "mode": "fresh"
+    },
+    "provenance": "native-v2"
+  },
+  "status": "done",
+  "confidence": "verified",
+  "runtime": {
+    "exitCode": 0,
+    "stdoutLog": ".fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "contract": {
+      "id": "agent-result-claim",
+      "version": 2
+    },
+    "status": "done",
+    "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+    "evidenceRefs": [
+      "git commit 802a0965",
+      "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+    ]
+  },
+  "evidence": {
+    "gitBefore": "b5d26f6c213733971f3ea17220fb8457c84dbfe5",
+    "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [
+      "herdr-plugin/Cargo.lock",
+      "herdr-plugin/Cargo.toml",
+      "herdr-plugin/src/gateway.rs",
+      "herdr-plugin/src/lib.rs",
+      "herdr-plugin/src/remote_invocation.rs"
+    ],
+    "mutatedDirtyBeforeFiles": [],
+    "attribution": [],
+    "artifacts": [
+      ".fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001/runs/01/agent-report.md",
+      ".fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001/runs/01/agent-result.json"
+    ],
+    "tests": [],
+    "findingRefs": [
+      "git commit 802a0965",
+      "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+    ]
+  }
+}
