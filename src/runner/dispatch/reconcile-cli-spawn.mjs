@@ -8,14 +8,14 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { interpretRunResult } from './run-result.mjs';
 import {
-  readAdapterReceipt,
-  readSupervisorBinding,
-  readWorkerBinding,
+  readDetachedRunAdapterReceipt,
+  readDetachedRunSupervisorBinding,
+  readDetachedRunWorkerBinding,
   getBootId,
   getProcessStartTime,
   computeSha256Digest,
   publishMutableProjection,
-} from './cli-spawn-supervisor.mjs';
+} from './detached-run-supervisor.mjs';
 import {
   acquireRunControl,
   isRunControlCurrent,
@@ -81,7 +81,7 @@ export async function reconcileCliSpawnRun(runDir, opts = {}) {
   const isStale = (opts.controlEpoch !== undefined && opts.controlEpoch < command.controlEpoch) ||
     (opts.controlToken !== undefined && command.controlTokenDigest && computeSha256Digest(opts.controlToken) !== command.controlTokenDigest);
   if (isStale) {
-    return { status: 'observed', outcome: command.outcome, receipt: readAdapterReceipt(runDir, launchCommandId), settled: false };
+    return { status: 'observed', outcome: command.outcome, receipt: readDetachedRunAdapterReceipt(runDir, launchCommandId), settled: false };
   }
 
   let controlEpoch = opts.controlEpoch ?? command.controlEpoch ?? 1;
@@ -166,7 +166,7 @@ export async function reconcileCliSpawnRun(runDir, opts = {}) {
     }
 
     // Check receipt tamper if receipt already exists
-    const receipt = readAdapterReceipt(runDir, launchCommandId);
+    const receipt = readDetachedRunAdapterReceipt(runDir, launchCommandId);
     if (receipt) {
       if (receipt.digest) {
         const { digest: rDig, ...rBody } = receipt;
@@ -235,7 +235,7 @@ export async function reconcileCliSpawnRun(runDir, opts = {}) {
     const actualEnvDigest = envDigest || computedEnvDigest;
 
     // Window 3 / 4: Envelope exists, no supervisor binding
-    const supervisorBinding = readSupervisorBinding(runDir, launchCommandId);
+    const supervisorBinding = readDetachedRunSupervisorBinding(runDir, launchCommandId);
     if (!supervisorBinding) {
       return { status: 'parked', reason: 'supervisor-binding-unknown' };
     }
@@ -268,7 +268,7 @@ export async function reconcileCliSpawnRun(runDir, opts = {}) {
     }
 
     // Window 5 / 6: Check worker binding
-    const workerBinding = readWorkerBinding(runDir, launchCommandId);
+    const workerBinding = readDetachedRunWorkerBinding(runDir, launchCommandId);
     if (!workerBinding) {
       if (supervisorAlive) {
         return { status: 'waiting', state: 'supervisor-running' };

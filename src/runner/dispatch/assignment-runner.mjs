@@ -106,10 +106,10 @@ import { reconcileHerdrSpawnRun, isHerdrSpawnRunStillWorking } from './herdr-rec
 import { prepareConfinementForLaunch, finalizeConfinementResources } from './confinement/authority.mjs';
 import { buildConfinementRequest } from './confinement/request.mjs';
 import {
-  startSupervisorProcess,
-  readSupervisorBinding,
-  readWorkerBinding,
-  readAdapterReceipt,
+  startDetachedRunSupervisorProcess,
+  readDetachedRunSupervisorBinding,
+  readDetachedRunWorkerBinding,
+  readDetachedRunAdapterReceipt,
   getBootId,
   getProcessStartTime,
   getProcessPgid,
@@ -117,8 +117,8 @@ import {
   publishMutableProjection,
   computeSha256Digest,
   canonicalJson,
-  isBoundProcessAlive,
-} from './cli-spawn-supervisor.mjs';
+  isDetachedRunProcessAlive,
+} from './detached-run-supervisor.mjs';
 import {
   buildEffectiveExecutionContract,
   EFFECTIVE_EXECUTION_CONTRACT_FILE,
@@ -712,7 +712,7 @@ function validateAssignmentLegality(asgn, opts = {}) {
 /**
  * Whether a cli-spawn Run's DETACHED supervisor or worker -- published
  * under `runDir/protected/(supervisor-binding|bindings)/*` by
- * cli-spawn-supervisor.mjs -- is still doing real work, independent of
+ * detached-run-supervisor.mjs -- is still doing real work, independent of
  * whether the RUNNER process that spawned it (the control holder
  * `inspectRunControl` tracks) is alive. The supervisor is spawned
  * `detached: true` and deliberately outlives its parent; a runner-only
@@ -740,10 +740,10 @@ function isCliSpawnRunStillWorking(runDir) {
   const latestCommandFile = commandFiles[commandFiles.length - 1];
   if (!latestCommandFile) return false;
   const launchCommandId = path.basename(latestCommandFile, '.json');
-  const supervisorBinding = readSupervisorBinding(runDir, launchCommandId);
-  if (supervisorBinding?.supervisor && isBoundProcessAlive(supervisorBinding.supervisor)) return true;
-  const workerBinding = readWorkerBinding(runDir, launchCommandId);
-  if (workerBinding?.worker && isBoundProcessAlive(workerBinding.worker)) return true;
+  const supervisorBinding = readDetachedRunSupervisorBinding(runDir, launchCommandId);
+  if (supervisorBinding?.supervisor && isDetachedRunProcessAlive(supervisorBinding.supervisor)) return true;
+  const workerBinding = readDetachedRunWorkerBinding(runDir, launchCommandId);
+  if (workerBinding?.worker && isDetachedRunProcessAlive(workerBinding.worker)) return true;
   return false;
 }
 
@@ -2567,7 +2567,7 @@ export async function executeAssignment(assignment, opts = {}) {
       // 7. Submit supervisor
       let supervisorProc;
       try {
-        supervisorProc = startSupervisorProcess({
+        supervisorProc = startDetachedRunSupervisorProcess({
           envelopePath: prepResult.envelopePath,
           detached: true,
           onChunk: opts.onChunk,

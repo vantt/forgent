@@ -1,5 +1,13 @@
-// cli-spawn-supervisor.mjs — Per-Run local supervisor process for Assignment-owned cli-spawn
+// detached-run-supervisor.mjs — Per-Run local supervisor process for Assignment-owned cli-spawn
 // (plans/260911-2305-runtime-recovery/phase-designs/cli-spawn-local-contract.md).
+//
+// Fills the `detached-run-supervisor` role (docs/decisions/): a supervised
+// run that is deliberately DETACHED so it survives the crash of whatever
+// dispatched it (a long-running agent/executor job, potentially many
+// minutes) -- the counterpart to Rust's `bound-invocation-supervisor`
+// (`packages/host-runtime/rust/src/providers/external_process/
+// bound_invocation_supervisor.rs`), which is bound to one short
+// invocation's own lifetime and never detached. Do not conflate the two.
 //
 // The supervisor owns crash-surviving timers, protected stdout/stderr capture,
 // worker PGID signalling, and immutable adapter receipt publication.
@@ -91,17 +99,17 @@ export function isProcessAlive(pid) {
  * "still alive" here. `admitRunAttempt` (assignment-runner.mjs) and
  * provider-capacity's lease reclaim both call this exported function
  * directly rather than re-deriving supervisor/worker liveness themselves. */
-export function isBoundProcessAlive(bound) {
+export function isDetachedRunProcessAlive(bound) {
   if (!bound?.pid) return false;
   return resolveHolderLiveness(bound, isProcessAlive(bound.pid)) === 'held';
 }
 
 // --- Immutable Proof Publication and Collision Errors ---------------------
 
-export class ReceiptPathCollisionError extends Error {
+export class DetachedRunReceiptPathCollisionError extends Error {
   constructor(message, options = {}) {
     super(message);
-    this.name = 'ReceiptPathCollisionError';
+    this.name = 'DetachedRunReceiptPathCollisionError';
     this.code = options.code || 'receipt-path-collision';
     this.targetPath = options.targetPath;
     this.expectedDigest = options.expectedDigest;
@@ -109,10 +117,10 @@ export class ReceiptPathCollisionError extends Error {
   }
 }
 
-export class SupervisorBindingPathCollisionError extends Error {
+export class DetachedRunSupervisorBindingPathCollisionError extends Error {
   constructor(message, options = {}) {
     super(message);
-    this.name = 'SupervisorBindingPathCollisionError';
+    this.name = 'DetachedRunSupervisorBindingPathCollisionError';
     this.code = options.code || 'binding-path-collision';
     this.targetPath = options.targetPath;
     this.expectedDigest = options.expectedDigest;
@@ -120,10 +128,10 @@ export class SupervisorBindingPathCollisionError extends Error {
   }
 }
 
-export class WorkerBindingPathCollisionError extends Error {
+export class DetachedRunWorkerBindingPathCollisionError extends Error {
   constructor(message, options = {}) {
     super(message);
-    this.name = 'WorkerBindingPathCollisionError';
+    this.name = 'DetachedRunWorkerBindingPathCollisionError';
     this.code = options.code || 'worker-binding-path-collision';
     this.targetPath = options.targetPath;
     this.expectedDigest = options.expectedDigest;
@@ -152,13 +160,13 @@ function computeFileSha256Digest(filePath) {
   }
 }
 
-export function publishAdapterReceipt(receiptPath, receipt, { launchCommandId = null, envelope = null } = {}) {
+export function publishDetachedRunAdapterReceipt(receiptPath, receipt, { launchCommandId = null, envelope = null } = {}) {
   const publishedReceipt = publishImmutableProof(receiptPath, receipt);
   if (!publishedReceipt) {
     const existingDigest = computeFileSha256Digest(receiptPath);
     const expectedDigest = receipt.digest || computeSha256Digest(receipt);
     if (existingDigest !== expectedDigest) {
-      throw new ReceiptPathCollisionError(
+      throw new DetachedRunReceiptPathCollisionError(
         `supervisor: adapter receipt path collision for ${launchCommandId || path.basename(receiptPath, '.json')} at ${receiptPath} (expected digest ${expectedDigest}, found ${existingDigest || 'unknown'})`,
         {
           code: 'receipt-path-collision',
@@ -181,13 +189,13 @@ export function publishAdapterReceipt(receiptPath, receipt, { launchCommandId = 
   return receipt;
 }
 
-export function publishSupervisorBinding(supervisorBindingPath, supervisorBinding, { launchCommandId = null, envelope = null } = {}) {
+export function publishDetachedRunSupervisorBinding(supervisorBindingPath, supervisorBinding, { launchCommandId = null, envelope = null } = {}) {
   const published = publishImmutableProof(supervisorBindingPath, supervisorBinding);
   if (!published) {
     const existingDigest = computeFileSha256Digest(supervisorBindingPath);
     const expectedDigest = supervisorBinding.digest || computeSha256Digest(supervisorBinding);
     if (existingDigest !== expectedDigest) {
-      throw new SupervisorBindingPathCollisionError(
+      throw new DetachedRunSupervisorBindingPathCollisionError(
         `supervisor: duplicate supervisor binding rejected for ${launchCommandId || path.basename(supervisorBindingPath, '.json')} at ${supervisorBindingPath}`,
         {
           code: 'binding-path-collision',
@@ -210,13 +218,13 @@ export function publishSupervisorBinding(supervisorBindingPath, supervisorBindin
   return supervisorBinding;
 }
 
-export function publishWorkerBinding(workerBindingPath, workerBinding, { launchCommandId = null, envelope = null } = {}) {
+export function publishDetachedRunWorkerBinding(workerBindingPath, workerBinding, { launchCommandId = null, envelope = null } = {}) {
   const publishedWorkerBinding = publishImmutableProof(workerBindingPath, workerBinding);
   if (!publishedWorkerBinding) {
     const existingDigest = computeFileSha256Digest(workerBindingPath);
     const expectedDigest = workerBinding.digest || computeSha256Digest(workerBinding);
     if (existingDigest !== expectedDigest) {
-      throw new WorkerBindingPathCollisionError(
+      throw new DetachedRunWorkerBindingPathCollisionError(
         `supervisor: worker binding path collision for ${launchCommandId || path.basename(workerBindingPath, '.worker.json')} at ${workerBindingPath} (expected digest ${expectedDigest}, found ${existingDigest || 'unknown'})`,
         {
           code: 'worker-binding-path-collision',
@@ -241,7 +249,7 @@ export function publishWorkerBinding(workerBindingPath, workerBinding, { launchC
 
 // --- Readers --------------------------------------------------------------
 
-export function readSupervisorBinding(runDir, launchCommandId) {
+export function readDetachedRunSupervisorBinding(runDir, launchCommandId) {
   const candidatePaths = [
     path.join(runDir, 'protected', 'supervisor-binding', `${launchCommandId}.json`),
     path.join(runDir, 'protected', 'bindings', launchCommandId, 'supervisor.json'),
@@ -256,7 +264,7 @@ export function readSupervisorBinding(runDir, launchCommandId) {
   return null;
 }
 
-export function readWorkerBinding(runDir, launchCommandId) {
+export function readDetachedRunWorkerBinding(runDir, launchCommandId) {
   const candidatePaths = [
     path.join(runDir, 'protected', 'supervisor-binding', `${launchCommandId}.worker.json`),
     path.join(runDir, 'protected', 'bindings', launchCommandId, 'worker.json'),
@@ -271,7 +279,7 @@ export function readWorkerBinding(runDir, launchCommandId) {
   return null;
 }
 
-export function readAdapterReceipt(runDir, launchCommandId) {
+export function readDetachedRunAdapterReceipt(runDir, launchCommandId) {
   const candidatePaths = [
     path.join(runDir, 'protected', 'adapter-receipts', `${launchCommandId}.json`),
     path.join(runDir, 'protected', 'receipts', launchCommandId, 'adapter-receipt.json'),
@@ -296,7 +304,7 @@ export function readAdapterReceipt(runDir, launchCommandId) {
  * @param {Function} [opts.onChunk] Live chunk observer
  * @returns {Promise<object>} The published adapter receipt
  */
-export async function runSupervisor(envelopePath, opts = {}) {
+export async function runDetachedRunSupervisor(envelopePath, opts = {}) {
   // Ignore pipe/IPC broken-pipe errors so parent exit doesn't kill supervisor
   process.on('disconnect', () => {});
   if (process.stdout && typeof process.stdout.on === 'function') {
@@ -366,7 +374,7 @@ export async function runSupervisor(envelopePath, opts = {}) {
     publishedAt: new Date().toISOString(),
   };
 
-  publishSupervisorBinding(supervisorBindingPath, supervisorBinding, { launchCommandId, envelope });
+  publishDetachedRunSupervisorBinding(supervisorBindingPath, supervisorBinding, { launchCommandId, envelope });
   const supervisorBindingDigest = computeSha256Digest(supervisorBinding);
 
   // Step 2: Open capture files
@@ -482,7 +490,7 @@ export async function runSupervisor(envelopePath, opts = {}) {
       digest: receiptDigest,
     };
 
-    return publishAdapterReceipt(receiptPath, receipt, { launchCommandId, envelope });
+    return publishDetachedRunAdapterReceipt(receiptPath, receipt, { launchCommandId, envelope });
   }
 
   return new Promise((resolve, reject) => {
@@ -692,7 +700,7 @@ export async function runSupervisor(envelopePath, opts = {}) {
     };
 
     try {
-      publishWorkerBinding(workerBindingPath, workerBinding, { launchCommandId, envelope });
+      publishDetachedRunWorkerBinding(workerBindingPath, workerBinding, { launchCommandId, envelope });
     } catch (err) {
       if (timeoutTimer) clearTimeout(timeoutTimer);
       if (idleTimer) clearTimeout(idleTimer);
@@ -841,7 +849,7 @@ export async function runSupervisor(envelopePath, opts = {}) {
 /**
  * Start a supervisor process in the background, or await it if live.
  */
-export function startSupervisorProcess({ envelopePath, detached = true, onChunk = null, env }) {
+export function startDetachedRunSupervisorProcess({ envelopePath, detached = true, onChunk = null, env }) {
   const supervisorScript = fileURLToPath(import.meta.url);
   const proc = child_process.spawn(process.execPath, [supervisorScript, envelopePath], {
     detached,
@@ -1071,7 +1079,7 @@ export async function reconcileCliSpawnRun({
     const workerBindingPath = path.join(runDir, 'protected', 'supervisor-binding', `${launchCommandId}.worker.json`);
     let workerBinding = null;
     if (!fs.existsSync(workerBindingPath)) {
-      const supAlive = isBoundProcessAlive(supBinding.supervisor);
+      const supAlive = isDetachedRunProcessAlive(supBinding.supervisor);
       if (!supAlive) {
         return { status: 'parked', reason: 'worker-binding-unknown' };
       }
@@ -1107,7 +1115,7 @@ export async function reconcileCliSpawnRun({
     // 4. Check adapter receipt
     const receiptPath = path.join(runDir, 'protected', 'adapter-receipts', `${launchCommandId}.json`);
     if (!fs.existsSync(receiptPath)) {
-      const supAlive = isBoundProcessAlive(supBinding.supervisor);
+      const supAlive = isDetachedRunProcessAlive(supBinding.supervisor);
       if (supAlive) {
         return { status: 'running', phase: 'worker-running' };
       }
@@ -1199,13 +1207,13 @@ export async function reconcileCliSpawnRun({
 }
 
 // CLI entry point
-if (process.argv[1] && (path.resolve(process.argv[1]) === fileURLToPath(import.meta.url) || path.basename(process.argv[1]) === 'cli-spawn-supervisor.mjs')) {
+if (process.argv[1] && (path.resolve(process.argv[1]) === fileURLToPath(import.meta.url) || path.basename(process.argv[1]) === 'detached-run-supervisor.mjs')) {
   const envelopeArg = process.argv[2];
   if (!envelopeArg) {
-    process.stderr.write('usage: node cli-spawn-supervisor.mjs <envelopePath>\n');
+    process.stderr.write('usage: node detached-run-supervisor.mjs <envelopePath>\n');
     process.exit(1);
   }
-  runSupervisor(path.resolve(envelopeArg))
+  runDetachedRunSupervisor(path.resolve(envelopeArg))
     .then(() => {
       process.exit(0);
     })

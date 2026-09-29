@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import { reconcileHerdrSpawnRun, publishHerdrAdapterReceipt, publishHerdrCompletionReceipt } from "../../src/runner/dispatch/herdr-round.mjs";
-import { computeSha256Digest } from "../../src/runner/dispatch/cli-spawn-supervisor.mjs";
+import { computeSha256Digest } from "../../src/runner/dispatch/detached-run-supervisor.mjs";
 import { normalizeRunResultV2 } from '../../src/runner/dispatch/run-result.mjs';
 
 test('reconcileHerdrSpawnRun preserves contract-corrupt provenance for a tampered v2 result.json', async () => {

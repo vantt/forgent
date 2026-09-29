@@ -32,7 +32,7 @@ import {
   computeSha256Digest,
   publishImmutableProof,
   publishMutableProjection,
-} from '../../src/runner/dispatch/cli-spawn-supervisor.mjs';
+} from '../../src/runner/dispatch/detached-run-supervisor.mjs';
 import {
   BUILTIN_POLICIES,
 } from '../../src/runner/dispatch/confinement/policies.mjs';

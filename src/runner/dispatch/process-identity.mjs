@@ -4,7 +4,7 @@
 // this (including run-lock.mjs, a banned-from-process-control ledger writer
 // per test/runner/dispatch-reconciliation-import-graph.test.mjs) never pulls
 // a process-control adapter into its own import graph. Hoisted out of
-// cli-spawn-supervisor.mjs (Phase 02 H1), which re-exports both names
+// detached-run-supervisor.mjs (Phase 02 H1), which re-exports both names
 // unchanged so its own existing importers are unaffected.
 //
 // `resolveHolderLiveness` below is the data-plane half of run-lock.mjs's own
