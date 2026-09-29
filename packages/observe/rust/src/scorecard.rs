@@ -238,18 +238,41 @@ pub fn compute_runs(observations: &[Observation]) -> RunsSection {
 
         let classification = obs.attrs.get("classification").and_then(|v| v.as_object());
 
-        // Helper to update bucket
+        let category = obs.attrs.get("category").and_then(|v| v.as_str()).or_else(|| {
+            classification
+                .and_then(|c| c.get("outcome"))
+                .and_then(|o| o.get("category"))
+                .and_then(|s| s.as_str())
+        });
+        let verdict = classification
+            .and_then(|c| c.get("assessment"))
+            .and_then(|a| a.get("verdict"))
+            .and_then(|v| v.as_str())
+            .unwrap_or("");
+
+        // Helper to update bucket based on category (single path)
         let classify = |b: &mut RunStatusBuckets| {
             b.total += 1;
-            if let Some(cls) = classification {
+            if let Some(cat) = category {
+                match cat {
+                    "ok" => b.ok += 1,
+                    "infra" | "corrupt" => b.exec_failed += 1,
+                    "policy" => b.policy_refused += 1,
+                    "blocked" => b.blocked += 1,
+                    "verdict" => {
+                        if verdict == "inconclusive" {
+                            b.inconclusive += 1;
+                        } else {
+                            b.verdict_fail += 1;
+                        }
+                    }
+                    _ => b.unclassified += 1,
+                }
+            } else if let Some(cls) = classification {
                 let exec_status = cls.get("execution")
                     .and_then(|e| e.get("status"))
                     .and_then(|s| s.as_str())
-                    .unwrap_or("");
-                let verdict = cls.get("assessment")
-                    .and_then(|a| a.get("verdict"))
-                    .and_then(|v| v.as_str())
-                    .unwrap_or("");
+                    .unwrap_or("unknown");
                 let policy_disp = cls.get("policy")
                     .and_then(|p| p.get("disposition"))
                     .and_then(|d| d.as_str())
@@ -257,16 +280,18 @@ pub fn compute_runs(observations: &[Observation]) -> RunsSection {
 
                 if exec_status != "completed" {
                     b.exec_failed += 1;
+                } else if policy_disp == "refuse" {
+                    b.policy_refused += 1;
+                } else if policy_disp == "needs-input" {
+                    b.exec_failed += 1;
                 } else if verdict == "findings" {
                     b.verdict_fail += 1;
-                } else if verdict == "inconclusive" {
-                    b.inconclusive += 1;
                 } else if verdict == "blocked" {
                     b.blocked += 1;
-                } else if policy_disp != "allow" {
-                    b.policy_refused += 1;
                 } else if verdict == "pass" || verdict == "not-applicable" {
                     b.ok += 1;
+                } else if verdict == "inconclusive" {
+                    b.inconclusive += 1;
                 } else {
                     b.unclassified += 1;
                 }
@@ -402,28 +427,51 @@ pub fn compute_tokens(observations: &[Observation]) -> TokensSection {
     let mut sessions = std::collections::HashSet::new();
 
     for obs in observations {
-        if obs.source != "claude-transcripts" || obs.kind != "llm.usage" {
-            continue;
-        }
-        sec.message_count += 1;
-        if let Some(s) = obs.attrs.get("sessionId").and_then(|v| v.as_str()) {
-            sessions.insert(s.to_string());
-        }
+        if obs.source == "claude-transcripts" && obs.kind == "llm.usage" {
+            sec.message_count += 1;
+            if let Some(s) = obs.attrs.get("sessionId").and_then(|v| v.as_str()) {
+                sessions.insert(s.to_string());
+            }
 
-        if let Some(inp) = obs.attrs.get("input_tokens").or_else(|| obs.attrs.get("inputTokens")).and_then(|v| v.as_u64()) {
-            sec.input_tokens += inp;
-        }
-        if let Some(out) = obs.attrs.get("output_tokens").or_else(|| obs.attrs.get("outputTokens")).and_then(|v| v.as_u64()) {
-            sec.output_tokens += out;
-        }
-        if let Some(c_create) = obs.attrs.get("cache_creation").or_else(|| obs.attrs.get("cacheCreationInputTokens")).and_then(|v| v.as_u64()) {
-            sec.cache_creation_input_tokens += c_create;
-        }
-        if let Some(c_read) = obs.attrs.get("cache_read").or_else(|| obs.attrs.get("cacheReadInputTokens")).and_then(|v| v.as_u64()) {
-            sec.cache_read_input_tokens += c_read;
+            if let Some(inp) = obs.attrs.get("input_tokens").or_else(|| obs.attrs.get("inputTokens")).and_then(|v| v.as_u64()) {
+                sec.input_tokens += inp;
+            }
+            if let Some(out) = obs.attrs.get("output_tokens").or_else(|| obs.attrs.get("outputTokens")).and_then(|v| v.as_u64()) {
+                sec.output_tokens += out;
+            }
+            if let Some(c_create) = obs.attrs.get("cache_creation").or_else(|| obs.attrs.get("cacheCreationInputTokens")).and_then(|v| v.as_u64()) {
+                sec.cache_creation_input_tokens += c_create;
+            }
+            if let Some(c_read) = obs.attrs.get("cache_read").or_else(|| obs.attrs.get("cacheReadInputTokens")).and_then(|v| v.as_u64()) {
+                sec.cache_read_input_tokens += c_read;
+            }
+        } else if obs.source == "run-result" && obs.kind == "run.settled" {
+            // Token usage from RunResult for non-Claude executors
+            if let Some(usage) = obs.attrs.get("usage").and_then(|v| v.as_object()) {
+                let usage_source = usage.get("source").and_then(|v| v.as_str());
+                if usage_source != Some("transcript") {
+                    let inp = usage.get("inputTokens").and_then(|v| v.as_u64()).unwrap_or(0);
+                    let out = usage.get("outputTokens").and_then(|v| v.as_u64()).unwrap_or(0);
+                    let c_create = usage.get("cacheCreationTokens").and_then(|v| v.as_u64()).unwrap_or(0);
+                    let c_read = usage.get("cacheReadTokens").and_then(|v| v.as_u64()).unwrap_or(0);
+                    let tot = usage.get("totalTokens").and_then(|v| v.as_u64()).unwrap_or(0);
+
+                    sec.input_tokens += inp;
+                    sec.output_tokens += out;
+                    sec.cache_creation_input_tokens += c_create;
+                    sec.cache_read_input_tokens += c_read;
+
+                    let part_sum = inp + out + c_create + c_read;
+                    if tot > part_sum {
+                        sec.input_tokens += tot - part_sum;
+                    }
+                    if inp > 0 || out > 0 || tot > 0 {
+                        sec.message_count += 1;
+                    }
+                }
+            }
         }
     }
-
     sec.session_count = sessions.len() as u64;
     sec.total_tokens = sec.input_tokens + sec.output_tokens + sec.cache_creation_input_tokens + sec.cache_read_input_tokens;
     sec
