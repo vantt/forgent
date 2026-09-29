@@ -1,6 +1,9 @@
 # Dispatch Engine Liveness Hardening
 
-Status: PROPOSED — not started.
+Status: **CLOSED** (2026-09-29) — all 8 phases merged, final integratedSha
+`d76082d19e9083643f6a183c5972ee43261f7c7b`. See "Track closure summary"
+near the end of this file for the full phase table and explicitly
+deferred follow-ups.
 Created: 2026-09-28
 Mode: high-risk (touches every real mutating dispatch path: admission,
 per-cwd exclusivity, provider-account leasing, settlement)
@@ -659,10 +662,59 @@ SUB-UNIT STATUS:
   See
   plans/260928-2327-dispatch-engine-liveness-hardening/reports/unit-P8a-claude-only-execution-report.md.
 
-**Remaining for this track's own close:** the JS-side rename of
-`cli-spawn-supervisor.mjs` to reflect `detached-run-supervisor`
-vocabulary (P8b's other half, deferred until P8a merged since both touch
-`assignment-runner.mjs` -- now unblocked).
+**unit/P8b-js MERGED** (2026-09-29), the track's final unit. `37cc4e7a7`,
+integratedSha `d76082d19`. `cli-spawn-supervisor.mjs` renamed to
+`detached-run-supervisor.mjs` via `git mv`, 12 generic exported symbols
+renamed to match (`startSupervisorProcess`, `runSupervisor`,
+`publish/readSupervisorBinding`, `publish/readWorkerBinding`,
+`publish/readAdapterReceipt`, `isBoundProcessAlive` ->
+`isDetachedRunProcessAlive`, 3 `*CollisionError` classes), across every
+real importer -- adapter-specific names (`isCliSpawnRunStillWorking`,
+`isHerdrSpawnRunStillWorking`), the `'cli-spawn'`/`'herdr-spawn'` adapter
+identifiers, and on-disk data-contract literals deliberately left
+untouched. Implementer found and fixed a pre-existing
+`docs/architecture-manifest.json` duplicate-key issue the rename's own
+test run surfaced. Lead's own independent full-repo grep caught one more
+real straggler outside the implementer's stated `src/`+`test/` scope
+(`scripts/bench-receipt-latency.mjs`, a standalone dev script never
+exercised by the test suite, so its broken import had gone silently
+undetected) -- fixed directly by Lead, full suite rerun clean after the
+fix (7994 tests, 0 fail) before merging. Two historical plan-artifact
+JSON snapshots under `plans/` still name the old filename, left as-is
+per this repo's own convention of never rewriting historical records.
+See
+plans/260928-2327-dispatch-engine-liveness-hardening/reports/unit-P8b-js-claude-only-execution-report.md.
+
+---
+
+## Track closure summary (2026-09-29)
+
+All 8 phases closed. Every code phase (1-7) and both Phase 8 gates (S4,
+C4) independently re-verified against real source and real test output
+before merging -- no phase merged on a self-report alone.
+
+| Phase | What shipped | Status |
+|---|---|---|
+| 1 | Consolidated liveness judge (`resolveHolderLiveness`) | MERGED |
+| 2 | Admission/lease-reclaim see the real detached worker (S1) | MERGED |
+| 3 | Per-cwd dispatch lock heartbeat + real liveness (S2) | MERGED |
+| 4 | Provider-capacity stale-reclaim, provably-atomic generation ledger (S3) -- 1 round rejected, round 2 verified under artificial CPU stress | MERGED |
+| 5 | `dispatch.claim` retired; two real dedup gaps it hid closed in `admitRunAttempt` | MERGED |
+| 6 | Atomic `assignment.json` writes; settlement-ordering recovery (S6/S8) | MERGED |
+| 7 | 2 of 4 shadow binders retired, 2 kept with durable telemetry (C1); C3 resolver consolidation | MERGED |
+| 8a | S4 cwd mutex (cli-spawn only, evidenced correction) + herdr-spawn liveness gap | MERGED |
+| 8b-rust | Rust supervisor renamed to `bound-invocation-supervisor`; D-ADR0043 recorded | MERGED |
+| 8b-js | Node supervisor renamed to `detached-run-supervisor`; track's final unit | MERGED |
+
+**Explicitly deferred, not silently dropped** (named follow-ups, matching this repo's own backlog convention):
+1. `docs/backlog.md`'s `tsk-p7-shadow-binders` row: 5 enumerated divergence classes for the 2 shadow binders still kept, each needing a decided winner + matrix test before retiring (target 2026-10-31).
+2. `--force-new-attempt` was never actually wired to a CLI flag (pre-existing gap, found during P8a, unrelated to this track).
+3. No dedicated SIGKILL-probe test yet for `isHerdrSpawnRunStillWorking` specifically (existing herdr suite proves no regression, doesn't reproduce that exact bug class).
+4. `providerCapacityIsRunWorkerAlive` (lease reclaim) has the same cli-spawn-only blind spot for herdr-spawn that M1 had before P8a -- same class of gap, different call site, not fixed here.
+5. A pre-existing, unrelated race in `replay.mjs`'s own "assignment-created event has no assignmentRefs entry" self-heal ordering, surfaced by this track's own stress-testing discipline during Phase 5's verification (reproduced identically on pre-Phase-5 main, confirmed not a regression from this track).
+6. Docs/CLI-help references to the retired `clear-assignment-claim` action (Phase 5) in a few peripheral files -- harmless (plain "unsupported action" refusal now), not yet swept.
+
+Worktree cleanup: batched at track end, matching this repo's own established preference -- not yet done as of this closure note.
 
 **S4 decision: extend `acquireMainCheckoutLock` to the shared Assignment
 admission path, as a mutex with a visible-holder refusal and an explicit
