@@ -21,8 +21,10 @@ use fgos_host_runtime::contracts::{
     ContractRef, OperationId, ProviderDescriptor, ProviderError, ProviderLifecycle,
 };
 use fgos_host_runtime::providers::external_process::{
+    bound_invocation_supervisor::{
+        BoundInvocationSupervisor, ExternalProcessConfig, ExternalProcessRequest,
+    },
     frame_codec::{CodecError, FrameCodec, FrameMessage, JsonRpcError, RequestId},
-    supervisor::{ExternalProcessConfig, ExternalProcessRequest, ExternalProcessSupervisor},
     COMPONENT_PROTOCOL_VERSION, FIXTURE_OPERATION_ID, FIXTURE_OUTCOME_CONTRACT,
     FIXTURE_PROVIDER_ID, FIXTURE_REQUEST_CONTRACT,
 };
@@ -277,7 +279,7 @@ fn test_frame_codec_rejects_non_jsonrpc_shapes() {
 async fn test_supervisor_happy_path_fixture_invocation() {
     let bin = fixture_bin();
     let config = ExternalProcessConfig::new(FIXTURE_PROVIDER_ID, bin);
-    let supervisor = ExternalProcessSupervisor::new(config);
+    let supervisor = BoundInvocationSupervisor::new(config);
 
     let payload = serde_json::json!({
         "message": "hello from supervisor",
@@ -317,7 +319,7 @@ async fn test_supervisor_startup_failure() {
         FIXTURE_PROVIDER_ID,
         PathBuf::from("/nonexistent/path/to/fixture_binary"),
     );
-    let supervisor = ExternalProcessSupervisor::new(config);
+    let supervisor = BoundInvocationSupervisor::new(config);
 
     let request = ExternalProcessRequest::new(
         FIXTURE_OPERATION_ID,
@@ -338,7 +340,7 @@ async fn test_supervisor_bad_handshake() {
     let bin = fixture_bin();
     let config = ExternalProcessConfig::new(FIXTURE_PROVIDER_ID, bin)
         .with_arguments(vec!["--bad-handshake".to_string()]);
-    let supervisor = ExternalProcessSupervisor::new(config);
+    let supervisor = BoundInvocationSupervisor::new(config);
 
     let request = ExternalProcessRequest::new(
         FIXTURE_OPERATION_ID,
@@ -360,7 +362,7 @@ async fn test_supervisor_timeout_handshake() {
     let config = ExternalProcessConfig::new(FIXTURE_PROVIDER_ID, bin)
         .with_arguments(vec!["--hang".to_string()])
         .with_startup_timeout(Duration::from_millis(50));
-    let supervisor = ExternalProcessSupervisor::new(config);
+    let supervisor = BoundInvocationSupervisor::new(config);
 
     let request = ExternalProcessRequest::new(
         FIXTURE_OPERATION_ID,
@@ -381,7 +383,7 @@ async fn test_supervisor_timeout_request() {
     let bin = fixture_bin();
     let config = ExternalProcessConfig::new(FIXTURE_PROVIDER_ID, bin)
         .with_request_timeout(Duration::from_millis(50));
-    let supervisor = ExternalProcessSupervisor::new(config);
+    let supervisor = BoundInvocationSupervisor::new(config);
 
     let request = ExternalProcessRequest::new(
         FIXTURE_OPERATION_ID,
@@ -405,7 +407,7 @@ async fn test_supervisor_drain_bounded_when_grandchild_holds_stdout_handshake() 
     let config = ExternalProcessConfig::new(FIXTURE_PROVIDER_ID, PathBuf::from("sh"))
         .with_arguments(vec!["-c".to_string(), "sleep 10 & exit 0".to_string()])
         .with_startup_timeout(Duration::from_millis(50));
-    let supervisor = ExternalProcessSupervisor::new(config);
+    let supervisor = BoundInvocationSupervisor::new(config);
 
     let request = ExternalProcessRequest::new(
         FIXTURE_OPERATION_ID,
@@ -483,7 +485,7 @@ if len(prefix) == 4:
     let config = ExternalProcessConfig::new(FIXTURE_PROVIDER_ID, PathBuf::from("python3"))
         .with_arguments(vec!["-c".to_string(), py_script.to_string()])
         .with_request_timeout(Duration::from_millis(50));
-    let supervisor = ExternalProcessSupervisor::new(config);
+    let supervisor = BoundInvocationSupervisor::new(config);
 
     let request = ExternalProcessRequest::new(
         FIXTURE_OPERATION_ID,
@@ -512,7 +514,7 @@ async fn test_supervisor_crash_before_dispatch() {
     let bin = fixture_bin();
     let config = ExternalProcessConfig::new(FIXTURE_PROVIDER_ID, bin)
         .with_arguments(vec!["--exit-after-handshake".to_string()]);
-    let supervisor = ExternalProcessSupervisor::new(config);
+    let supervisor = BoundInvocationSupervisor::new(config);
 
     let request = ExternalProcessRequest::new(
         FIXTURE_OPERATION_ID,
@@ -536,7 +538,7 @@ async fn test_supervisor_crash_before_dispatch() {
 async fn test_supervisor_crash_after_dispatch() {
     let bin = fixture_bin();
     let config = ExternalProcessConfig::new(FIXTURE_PROVIDER_ID, bin);
-    let supervisor = ExternalProcessSupervisor::new(config);
+    let supervisor = BoundInvocationSupervisor::new(config);
 
     let request = ExternalProcessRequest::new(
         FIXTURE_OPERATION_ID,
@@ -556,7 +558,7 @@ async fn test_supervisor_crash_after_dispatch() {
 async fn test_supervisor_malformed_frame() {
     let bin = fixture_bin();
     let config = ExternalProcessConfig::new(FIXTURE_PROVIDER_ID, bin);
-    let supervisor = ExternalProcessSupervisor::new(config);
+    let supervisor = BoundInvocationSupervisor::new(config);
 
     let request = ExternalProcessRequest::new(
         FIXTURE_OPERATION_ID,
@@ -613,7 +615,7 @@ async fn test_supervisor_cancellation_path() {
     let config = ExternalProcessConfig::new(FIXTURE_PROVIDER_ID, bin)
         .with_environment(env)
         .with_cancellation_grace_period(grace_period);
-    let supervisor = ExternalProcessSupervisor::new(config);
+    let supervisor = BoundInvocationSupervisor::new(config);
 
     let request = ExternalProcessRequest::new(
         FIXTURE_OPERATION_ID,
@@ -684,7 +686,7 @@ async fn test_supervisor_flood_bounds_memory_and_terminates() {
     let bin = fixture_bin();
     let config =
         ExternalProcessConfig::new(FIXTURE_PROVIDER_ID, bin).with_max_capture_bytes(64 * 1024); // 64 KB limit
-    let supervisor = ExternalProcessSupervisor::new(config);
+    let supervisor = BoundInvocationSupervisor::new(config);
 
     let request = ExternalProcessRequest::new(
         FIXTURE_OPERATION_ID,
@@ -711,7 +713,7 @@ async fn test_supervisor_flood_bounds_memory_and_terminates() {
 #[test]
 fn test_to_provider_outcome_rejects_missing_version_delimiter() {
     let outcome =
-        fgos_host_runtime::providers::external_process::supervisor::ExternalProcessOutcome {
+        fgos_host_runtime::providers::external_process::bound_invocation_supervisor::ExternalProcessOutcome {
             provider_id: FIXTURE_PROVIDER_ID.to_string(),
             operation_id: FIXTURE_OPERATION_ID.to_string(),
             outcome_contract: "fixture.echo.echo.outcome".to_string(), // missing '@'
@@ -752,7 +754,7 @@ async fn test_discovery_does_not_spawn_fixture_process() {
     // DISCOVERY PHASE:
     // Construct configuration, supervisor, and descriptor
     let config = ExternalProcessConfig::new(FIXTURE_PROVIDER_ID, bin).with_environment(env);
-    let supervisor = ExternalProcessSupervisor::new(config);
+    let supervisor = BoundInvocationSupervisor::new(config);
 
     // Construct in-memory descriptor
     let descriptor = ProviderDescriptor {
