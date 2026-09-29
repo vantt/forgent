@@ -1,11 +1,22 @@
+---
+title: "Documentation Authority Unification"
+description: "Collapse the competing platform-documentation authorities into one canonical system under docs/platform/**"
+status: in-progress
+priority: P1
+created: 2026-09-25
+revised: 2026-09-29 (converted to AgentKit plan format; phases renumbered from 1)
+blockedBy: []
+blocks: []
+---
+
 # Documentation Authority Unification — active migration plan
 
 ```txt
-Plan status: In-progress (Phase 00 complete; Phase 01 complete -- independent re-review verdict APPROVE, tagged documentation-authority-phase-01-20260926 at f0c76c5e590339d9c815038539ff1f4a072c64e4; Phase 02 complete -- independent closure-review verdict APPROVE for `f0c76c5e590339d9c815038539ff1f4a072c64e4..0c3e8d8b57c40214fdcdb29a69c9b3c11de552fb`, immutable full receipt pinned on the same-tree boundary, tagged `documentation-authority-phase-02-20260926`; Phases 03-09 unauthorized and deferred)
+Plan status: In-progress (Phase 1 complete; Phase 2 complete -- independent re-review verdict APPROVE, tagged documentation-authority-phase-01-20260926 at f0c76c5e590339d9c815038539ff1f4a072c64e4; Phase 3 complete -- independent closure-review verdict APPROVE for `f0c76c5e590339d9c815038539ff1f4a072c64e4..0c3e8d8b57c40214fdcdb29a69c9b3c11de552fb`, immutable full receipt pinned on the same-tree boundary, tagged `documentation-authority-phase-02-20260926`; Phases 4-10 unauthorized and deferred)
 Primary objective: Collapse the competing platform-documentation authorities into one canonical system under docs/platform/**
 Long-horizon source: docs/platform/proposals/documentation-system-unification.md
 Historical foundation: plans/260825-1841-knowledge-registry/
-Execution authority: Phase 00 and Phase 01 completed by direct human request on 2026-09-25; Phase 02 authorized by direct human request on 2026-09-26 (Phase 02 doer assignment, isolated worktree /home/vantt/projects/forgentX-phase00-documentation-authority-unification); no authority for Phases 03-09
+Execution authority: Phase 1 and Phase 2 completed by direct human request on 2026-09-25; Phase 3 authorized by direct human request on 2026-09-26 (Phase 3 doer assignment, isolated worktree /home/vantt/projects/forgentX-phase00-documentation-authority-unification); no authority for Phases 4-10
 Risk: Critical documentation migration
 ```
 
@@ -48,7 +59,7 @@ Some areas have already been promoted independently, some target portals remain
 partial, and some promoted portals still delegate contract or decision authority
 back to legacy roots. `docs/reading-map.md`, `docs/specs/reading-map.md`, accepted
 governance, and always-loaded instructions therefore express different migration
-rules. Phase 00 must map this live state rather than assume no area has flipped.
+rules. Phase 1 must map this live state rather than assume no area has flipped.
 
 ### 2.2. Existing foundation that must be reused
 
@@ -76,7 +87,7 @@ its claims and current consumers.
 
 ### 2.4. Preliminary current-authority snapshot
 
-This is a truth-reset seed, not the complete Phase 00 inventory:
+This is a truth-reset seed, not the complete Phase 1 inventory:
 
 | Surface | Observed state | Current route until superseded |
 |---|---|---|
@@ -84,10 +95,10 @@ This is a truth-reset seed, not the complete Phase 00 inventory:
 | Host invocation-routing | Promoted portal with partial route migration and retained legacy sources | `docs/platform/host-invocation-routing/README.md` plus explicit current-source links |
 | Agent coordination | Target navigation is canonical, but exact schemas/contracts/proofs remain in `docs/architect/**` unless explicitly superseded | `docs/platform/agent-coordination/README.md` then its declared legacy owners |
 | Most other platform areas | Legacy-current or conflicted; target coverage varies | `docs/specs/reading-map.md` and area-specific declarations |
-| Root authorities | Current and outside either area tree | Existing named root document until Phase 00 assigns an owner |
+| Root authorities | Current and outside either area tree | Existing named root document until Phase 1 assigns an owner |
 | User knowledge | Registry reports 479 docs/topics: 147 active and 332 provisional; `docs/knowledge/**` coexists with live legacy quadrant roots (137 explanation, 20 how-to, 6 reference Markdown files at review time) | Existing knowledge registry and user-doc routes; not platform authority |
 
-Phase 00 must verify and expand this table before any authorization beyond truth
+Phase 1 must verify and expand this table before any authorization beyond truth
 reset. No row may be inferred solely from a `Canonical:` metadata string.
 
 ## 3. Locked Program Decisions
@@ -224,418 +235,61 @@ Only the following rules are required before inventory and transformation:
 - authority conflict handling;
 - promotion and retirement gates.
 
-Phase 01 publishes the preliminary vocabulary; inventory may extend it only by
-recorded exception; Phase 03 freezes the evidence-corrected version. This avoids
+Phase 2 publishes the preliminary vocabulary; inventory may extend it only by
+recorded exception; Phase 4 freezes the evidence-corrected version. This avoids
 a constitution↔inventory dependency cycle. The complete future constitution may
 be richer. Do not delay inventory for metadata that the cutover does not
 consume.
-
 ## 7. Program Phases
+
+Each phase lives in its own `phase-NN-*.md` file (AgentKit plan format). Phases were **renumbered from 1** on 2026-09-29; the legacy number is kept only in historical identifiers (git tags such as `documentation-authority-phase-01-20260926`, branch names, assignment ids) and in the artifact file names under `reports/` (for example `reports/phase-02-doc-inventory.json` is evidence of Phase 3).
+
+| # | Phase | Legacy # | Status | File |
+|---|---|---|---|---|
+| 1 | Correct planning and routing semantics | 00 | completed | [phase-01-correct-planning-and-routing-semantics.md](phase-01-correct-planning-and-routing-semantics.md) |
+| 2 | Contain further divergence | 01 | completed | [phase-02-contain-further-divergence.md](phase-02-contain-further-divergence.md) |
+| 3 | Build repository-wide inventory and conservation ledger | 02 | completed | [phase-03-build-repository-wide-inventory-and-conservation-ledger.md](phase-03-build-repository-wide-inventory-and-conservation-ledger.md) |
+| 4 | Freeze the minimum constitution and migration method | 03 | pending (not authorized) | [phase-04-freeze-the-minimum-constitution-and-migration-method.md](phase-04-freeze-the-minimum-constitution-and-migration-method.md) |
+| 5 | Dual pilot: re-audit plus unmigrated mixed area | 04 | pending (not authorized) | [phase-05-dual-pilot-re-audit-plus-unmigrated-mixed-area.md](phase-05-dual-pilot-re-audit-plus-unmigrated-mixed-area.md) |
+| 6 | Transform all platform areas as candidate material | 05 | pending (not authorized) | [phase-06-transform-all-platform-areas-as-candidate-material.md](phase-06-transform-all-platform-areas-as-candidate-material.md) |
+| 7 | Cross-area integrity and fresh-reader review | 06 | pending (not authorized) | [phase-07-cross-area-integrity-and-fresh-reader-review.md](phase-07-cross-area-integrity-and-fresh-reader-review.md) |
+| 8 | Eliminate switchboard bypasses and prepare consumers | 07 | pending (not authorized) | [phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md](phase-08-eliminate-switchboard-bypasses-and-prepare-consumers.md) |
+| 9 | Atomic platform-authority cutover | 08 | pending (not authorized) | [phase-09-atomic-platform-authority-cutover.md](phase-09-atomic-platform-authority-cutover.md) |
+| 10 | Post-cutover maintenance MVP | 09 | pending (not authorized) | [phase-10-post-cutover-maintenance-mvp.md](phase-10-post-cutover-maintenance-mvp.md) |
+
+### 7.1. Detailed status and authorization (snapshot)
 
 Status snapshot: 2026-09-25. `not-started` means no deliverable mutation from
 that phase has begun; `not-authorized` means the dependency graph alone is not
 permission to execute it.
 
-| Phase | Detailed status | Authorization | Dependency / next gate | Evidence or blocker |
+| Phase (new #) | Detailed status | Authorization | Dependency / next gate | Evidence or blocker |
 |---|---|---|---|---|
-| 00 | `completed` | Authorized by direct human request | Gate passed; truth reset only | Review unit is `ac19f6d1e..documentation-authority-phase-00-20260925`, including `a725d4788`, `0c38df980`, and the Phase 00 review-follow-up at HEAD; execution record, authority map, correction note, two independent reviews |
-| 01 | `completed` | Authorized by direct human request (asgn_pi_lead_phase01_review_fix_op_001) | Gate passed; containment active | Review unit `38a337ecb31dc97b78aca012eba0da89c003a927..f0c76c5e590339d9c815038539ff1f4a072c64e4`; independent re-review verdict **APPROVE**; tagged `documentation-authority-phase-01-20260926` (annotated tag object `135957aec6e9939b7a1626d2942014c045620a40`, tested/final tree `7f9e3f0907b1751f73e4ca1e4cdb7a75e2135a1a`); operative switchboard (`docs/transitional-switchboard.md`, `transitional-switchboard.json`), vocabulary (`claim-and-disposition-vocabulary.{json,md}`), baseline (`scripts/check-legacy-docs-ratchet.baseline.json`), exceptions ledger, policy-aware ratchet and tests, authoring rules (`docs/platform/migration-authoring-rules.md`), shipped path conventions inventory (`shipped-path-conventions-inventory.{json,md}`), execution and verification records; tag annotation records "Phase 02 remains unauthorized" as of that tag, superseded by this plan's Phase 02 authorization below |
-| 02 | `completed` | Authorized by direct human request on 2026-09-26 (Phase 02 doer assignment, isolated worktree) | Gate passed; immutable full verification and independent closure review **APPROVE**; Phase 03 remains unauthorized | Approved range `f0c76c5e590339d9c815038539ff1f4a072c64e4..0c3e8d8b57c40214fdcdb29a69c9b3c11de552fb`; tagged `documentation-authority-phase-02-20260926`. Deterministic inventory + conservation ledger: manifest `phase-02-doc-inventory.json`, 10 shards, report, and opaque identity registry. Inventory covers 4,305 files, 85,772 claim occurrences, and 98,406 consumer edges; explicit later-phase blockers remain 1,360 total, 818 exact duplicate groups, and 151 semantic-conflict groups. Full suite: 7,832 total / 0 failed. |
-| 03 | `not-started`, `not-authorized` | None | Blocked by Phase 02 | Constitution, mechanical conservation gates, alias resolver, and cutover-lease design remain open |
-| 04 | `not-started`, `not-authorized` | None | Blocked by Phase 03 | Neither pilot has begun; no candidate transformation is authorized |
-| 05 | `not-started`, `not-authorized` | None | Blocked by Phase 04 | No area-wide candidate corpus exists |
-| 06 | `not-started`, `not-authorized` | None | Blocked by Phase 05 | Cross-area and fresh-reader review cannot begin before complete candidates |
-| 07 | `not-started`, `not-authorized` | None | Blocked by Phase 06 | Always-loaded, shipped, generated, test, and prompt bypasses remain intentionally unchanged |
-| 08 | `not-started`, `not-authorized` | None | Blocked by Phase 07 and explicit cutover approval | No promotion, migration, deletion, alias activation, or legacy retirement has occurred |
-| 09 | `not-started`, `not-authorized` | None | Follow-on only after verified Phase 08 cutover | Maintenance MVP remains a handoff, not current work |
+| 1 | `completed` | Authorized by direct human request | Gate passed; truth reset only | Review unit is `ac19f6d1e..documentation-authority-phase-00-20260925`, including `a725d4788`, `0c38df980`, and the Phase 1 review-follow-up at HEAD; execution record, authority map, correction note, two independent reviews |
+| 2 | `completed` | Authorized by direct human request (asgn_pi_lead_phase01_review_fix_op_001) | Gate passed; containment active | Review unit `38a337ecb31dc97b78aca012eba0da89c003a927..f0c76c5e590339d9c815038539ff1f4a072c64e4`; independent re-review verdict **APPROVE**; tagged `documentation-authority-phase-01-20260926` (annotated tag object `135957aec6e9939b7a1626d2942014c045620a40`, tested/final tree `7f9e3f0907b1751f73e4ca1e4cdb7a75e2135a1a`); operative switchboard (`docs/transitional-switchboard.md`, `transitional-switchboard.json`), vocabulary (`claim-and-disposition-vocabulary.{json,md}`), baseline (`scripts/check-legacy-docs-ratchet.baseline.json`), exceptions ledger, policy-aware ratchet and tests, authoring rules (`docs/platform/migration-authoring-rules.md`), shipped path conventions inventory (`shipped-path-conventions-inventory.{json,md}`), execution and verification records; tag annotation records "Phase 02 remains unauthorized" (legacy numbering: Phase 02 = Phase 3) as of that tag, superseded by this plan's Phase 3 authorization below |
+| 3 | `completed` | Authorized by direct human request on 2026-09-26 (Phase 3 doer assignment, isolated worktree) | Gate passed; immutable full verification and independent closure review **APPROVE**; Phase 4 remains unauthorized | Approved range `f0c76c5e590339d9c815038539ff1f4a072c64e4..0c3e8d8b57c40214fdcdb29a69c9b3c11de552fb`; tagged `documentation-authority-phase-02-20260926`. Deterministic inventory + conservation ledger: manifest `reports/phase-02-doc-inventory.json`, 10 shards, report, and opaque identity registry. Inventory covers 4,305 files, 85,772 claim occurrences, and 98,406 consumer edges; explicit later-phase blockers remain 1,360 total, 818 exact duplicate groups, and 151 semantic-conflict groups. Full suite: 7,832 total / 0 failed. |
+| 4 | `not-started`, `not-authorized` | None | Blocked by Phase 3 | Constitution, mechanical conservation gates, alias resolver, and cutover-lease design remain open |
+| 5 | `not-started`, `not-authorized` | None | Blocked by Phase 4 | Neither pilot has begun; no candidate transformation is authorized |
+| 6 | `not-started`, `not-authorized` | None | Blocked by Phase 5 | No area-wide candidate corpus exists |
+| 7 | `not-started`, `not-authorized` | None | Blocked by Phase 6 | Cross-area and fresh-reader review cannot begin before complete candidates |
+| 8 | `not-started`, `not-authorized` | None | Blocked by Phase 7 | Always-loaded, shipped, generated, test, and prompt bypasses remain intentionally unchanged |
+| 9 | `not-started`, `not-authorized` | None | Blocked by Phase 8 and explicit cutover approval | No promotion, migration, deletion, alias activation, or legacy retirement has occurred |
+| 10 | `not-started`, `not-authorized` | None | Follow-on only after verified Phase 9 cutover | Maintenance MVP remains a handoff, not current work |
 
-### Phase 00 — Correct planning and routing semantics
-
-**Status:** `completed` — review and merge the complete range `ac19f6d1e..documentation-authority-phase-00-20260925`,
-not `a725d4788` alone. The range includes the implementation commit
-`a725d4788`, status commit `0c38df980`, and the Phase 00 review-follow-up at
-HEAD. No later-phase authority is implied.
-**Mode:** planning/documentation only
-**Purpose:** Ensure every artifact tells the truth about what is historical,
-active, canonical, candidate, or preserved future intent.
-
-Deliverables:
-
-- preserve `plans/260825-1841-knowledge-registry/` at its historical path and
-  label the code landing separately from later migration/enforcement history;
-- keep the full proposal as long-horizon architecture;
-- establish this file as the proposed near-term plan;
-- update the platform intent ledger with future engine commitments and source/
-  evidence pointers;
-- produce a verified current-authority table per area and root document with
-  separate `authorityStatus` and `fileClass` dimensions; authority status is
-  `promoted`, `candidate`, `legacy-current`, `conflicted`, or `non-authority`;
-- resolve the contradiction between accepted `docs/doc-governance.md` §13,
-  `docs/reading-map.md`, `docs/specs/reading-map.md`, and portal declarations;
-- identify every always-loaded pointer that bypasses the transitional route;
-- preserve the verified locked-law result: L5/L8 wording does not hardcode
-  `docs/specs/**` or `docs/architect/**`, so path relocation alone does not
-  supersede those laws; moving the root law source still requires generated
-  instruction-anchor/projection rewrites and L8 anchor-suite proof;
-- record known tsk-28x implementation/migration drift in a new correction note,
-  never by rewriting historical evidence.
-
-Gate:
-
-- a stranger can distinguish proposal, proposed plan, historical plan, and
-  intent ledger without chat history;
-- every area has one explicit current route even when its physical sources are
-  still mixed;
-- no locked-law or governance change is hidden inside wording cleanup.
-
-Phase 00 evidence:
-
-- isolated-worktree execution record and input digests:
-  `phase-00-execution-record.md`;
-- reproducible commands, exit codes, and summaries:
-  `phase-00-verification.md`;
-- verified area/root routing map:
-  `current-authority-map-2026-09-25.md`;
-- historical-registry current-state correction:
-  `../260825-1841-knowledge-registry/CURRENT-STATE-CORRECTION.md`;
-- independent reviews: `independent-frontier-review-2026-09-25.md` and
-  `independent-frontier-rereview-2026-09-25.md`.
-
-Completion of this phase records truth and routing only. It does not activate a
-switchboard, ratchet, alias resolver, claim ledger, corpus transformation, or
-cutover, and it does not authorize any later phase.
-
-### Phase 01 — Contain further divergence
-
-**Status:** `completed` — review findings R1–R5 remediated on branch
-`documentation-authority-unification--phase-01-review-fix`; independent re-review range
-`38a337ecb31dc97b78aca012eba0da89c003a927..f0c76c5e590339d9c815038539ff1f4a072c64e4` returned verdict
-**APPROVE**. Tagged `documentation-authority-phase-01-20260926` (annotated tag object
-`135957aec6e9939b7a1626d2942014c045620a40`, target commit `f0c76c5e590339d9c815038539ff1f4a072c64e4`,
-tested/final tree `7f9e3f0907b1751f73e4ca1e4cdb7a75e2135a1a`). This tag is the immutable base for Phase 02.
-Phase 02 is authorized as of 2026-09-26 (see Phase 02 section below); Phases 03–09 remain unauthorized.
-**Mode:** plan branch
-**Purpose:** Stop the two systems drifting farther apart while migration runs.
-
-Deliverables:
-
-- one switchboard route, backed by the Phase 00 authority table, through which
-  repository-local readers resolve current owners without guessing (`docs/transitional-switchboard.md`, `transitional-switchboard.json`);
-- a preliminary claim-kind and source-disposition vocabulary (`claim-and-disposition-vocabulary.json`, `claim-and-disposition-vocabulary.md`);
-- a baseline list of files and source digests under legacy roots (`scripts/check-legacy-docs-ratchet.baseline.json`);
-- a ratchet refusing unreviewed new maintained files **and unaccounted edits**
-  under legacy roots (`scripts/check-legacy-docs-ratchet.mjs`, `scripts/check-legacy-docs-ratchet.exceptions.json`, `test/scripts/check-legacy-docs-ratchet.test.mjs`);
-- authoring guidance for changes during migration: update the current owner once,
-  then record candidate-target impact in the ledger; never dual-author prose (`docs/platform/migration-authoring-rules.md`);
-- immediate correction of stale standing routes that point to known-invalid
-  skill/path facts (updated `docs/specs/reading-map.md` and `docs/reading-map.md`);
-- a separate inventory of path conventions shipped through `core/skills`,
-  `domains/**`, generated instructions, and plugins so repository migration does
-  not silently redefine consumer-project contracts (`shipped-path-conventions-inventory.json`, `shipped-path-conventions-inventory.md`).
-
-This phase does not declare `docs/platform/**` fully canonical.
-
-Gate:
-
-- no writer has to guess between legacy and target;
-- no new legacy maintained file can appear without a recorded exception.
-
-Phase 01 evidence:
-
-- execution record: `phase-01-execution-record.md`;
-- reproducible verification: `phase-01-verification.md`.
-
-### Phase 02 — Build repository-wide inventory and conservation ledger
-
-**Status:** `completed` — authorized by direct human request on 2026-09-26; independent closure-review verdict **APPROVE**; tagged `documentation-authority-phase-02-20260926`.
-(Phase 02 doer assignment, isolated worktree
-`/home/vantt/projects/forgentX-phase00-documentation-authority-unification`, branch
-`plan/260925-documentation-authority-unification`, immutable base tag
-`documentation-authority-phase-01-20260926` at `f0c76c5e590339d9c815038539ff1f4a072c64e4`). Phase 01 gate
-passed (see Phase 01 section above). Phase 02 now generates the deterministic repository-wide inventory
-and claim-level conservation ledger at `phase-02-doc-inventory.{json,md}`; the generator accounts for file
-classification, headings, unheaded prose blocks, mixed/non-Markdown file blocks, inbound/outbound links,
-consumer kinds (literal/dynamic/glob/fixture/executable-proof/shipped-contract), source/evidence links,
-immutable event/decision refs, local-vs-shipped contract scope, exact duplicates, semantic conflicts, and
-exactly one proposed owner for each retained claim row. The gate checker independently recomputes the
-in-scope file set and validates structure/vocabulary/claim-owner constraints. Local Phase 02 verification
-passed; unresolved gaps/conflicts are explicit findings and still block promotion. Phase 02 remediation E pins identity-registry input explicitly (`--identity-registry`), records registry path/bytes/SHA-256/count binding in inventory metadata, treats unresolved dynamic consumer patterns such as `docs/**/README.md` as standalone unresolved consumer edges, and requires reviewed carry-forward writer use for path moves or unit-map changes. Phase 03–09 remain
-unauthorized and untouched, and no migration/promotion/deletion/cutover has occurred.
-**Mode:** read-only inventory, followed by reviewed ledger writes
-**Purpose:** Account for the real corpus before deciding migration mechanics.
-
-Inventory dimensions:
-
-- file class: maintained authority / generated projection / evidence-history;
-- area and subcomponent;
-- document type;
-- claim kinds present;
-- current authority status;
-- inbound and outbound links;
-- code/test/skill/instruction consumers;
-- duplicates and conflicts;
-- source/evidence relationships and non-Markdown payloads;
-- immutable event/decision references to source paths;
-- repository-local versus shipped consumer contract;
-- target candidate;
-- proposed disposition.
-
-Special rules:
-
-- mixed files are split at claim level;
-- generated and raw evidence payloads are not linted as canonical prose;
-- a read-only text scan found no production code opening non-Markdown
-  `docs/architect/**` proof payloads directly, but found many source/test/skill
-  path references and 566 such payloads; inventory must still detect dynamic,
-  glob-based, test-fixture, and executable-proof consumers before relocation;
-- current implementation is evidence, not automatic authority;
-- missing current behavior documentation is recorded as a gap, not invented;
-- unit coverage independently verifies source blobs/counts/digests but intentionally shares the Phase 02 frozen extraction algorithm; it must not be overclaimed as an independent semantic parser;
-- `targetOwner` on an area portal is a proposed area-level destination only; final claim anchors and complete partitioning are deferred to a later authorized phase;
-- file moves require the reviewed carry-forward writer so persisted opaque IDs are moved deliberately instead of reminted or inferred.
-
-Gate:
-
-- every in-scope source is accounted for exactly once at file level;
-- every heading/unheaded content block passes the source-coverage floor;
-- every retained claim has exactly one proposed target owner;
-- all root authorities, area directories, evidence payloads, and shipped path
-  conventions are enumerated;
-- unresolved conflicts are explicit and block promotion.
-
-### Phase 03 — Freeze the minimum constitution and migration method
-
-**Status:** `not-started`, `not-authorized`, blocked by Phase 02.
-**Mode:** plan branch
-**Purpose:** Turn inventory evidence into a small, testable migration contract.
-
-Deliverables:
-
-- minimum machine-readable constitution or equivalent validated schema;
-- claim/disposition ledger schema;
-- target path rules;
-- conflict-resolution procedure;
-- conservation checker;
-- legacy-path ratchet;
-- retirement-check dry-run;
-- a minimal platform alias table/resolver contract that covers immutable
-  historical paths and is importable into the future multi-profile registry;
-- evidence-payload relocation policy and consumer proof;
-- migration-specific documentation-cutover lease design; if it introduces a
-  persistent file/config/tool dependency, register setup/doctor discovery and a
-  changelog entry rather than leaving hidden infrastructure;
-- candidate-status metadata/check;
-- explicit list of richer fields deferred to the future engine.
-
-Gate:
-
-- the method can reject duplicate owners, missing dispositions, missing targets,
-  and unauthorized legacy growth mechanically.
-
-### Phase 04 — Dual pilot: re-audit plus unmigrated mixed area
-
-**Status:** `not-started`, `not-authorized`, blocked by Phase 03.
-**Mode:** isolated worktrees, candidate/review only
-**Purpose:** Falsify both conservation and transformation before applying them
-globally.
-
-Pilot A re-audits one already-promoted small area (initial candidate:
-host-invocation-routing) with the new section/block coverage ledger. Its job is
-to discover what the earlier migration audit missed, not to manufacture another
-target.
-
-Pilot B transforms one stable, not-yet-promoted area that combines spec decision
-history, architecture/contracts, and a root authority (initial candidate:
-work-state plus `io-contract.md`, subject to inventory evidence). Do not default
-to packaging-distribution or agent-coordination: the former is already promoted;
-the latter is large, active, and structurally exceptional.
-
-Deliverables:
-
-- discrepancy report between old and new audit methods;
-- candidate target docs for Pilot B;
-- source-to-claim and target-to-source conservation samples;
-- alias and immutable-history lookup test;
-- link rewrite preview;
-- independent fresh-reader review using the six L5 questions, with explicit pass
-  criteria and no chat-history briefing;
-- defects found in the method;
-- revised method and constitution.
-
-Gate:
-
-- the pilots demonstrate sensitivity to omissions, not merely successful output;
-- neither pilot independently flips new authority.
-
-### Phase 05 — Transform all platform areas as candidate material
-
-**Status:** `not-started`, `not-authorized`, blocked by Phase 04.
-**Mode:** isolated worktrees per non-overlapping target, merged to plan branch
-**Purpose:** Build the complete target corpus without creating a second live
-system.
-
-Rules:
-
-- schedule by target ownership and dependency, not arbitrary source files;
-- preserve all retained details before improving prose;
-- separate current state, intended direction, obligation, rationale, decision,
-  and proof into their correct owners;
-- update area portals and related links as part of each target unit;
-- keep target docs explicitly candidate until repository-wide promotion;
-- record every deletion/archive reason in the ledger;
-- run conservation after every target commit.
-
-Gate:
-
-- all platform areas have complete candidate owners;
-- no retained claim remains only in a legacy source;
-- the final ledger destination is prepared at
-  `docs/platform/history/documentation-authority-unification/`, where a sealed
-  immutable claim-conservation snapshot plus digest/proof will survive cutover
-  as D2 evidence and an H2 import source.
-
-### Phase 06 — Cross-area integrity and fresh-reader review
-
-**Status:** `not-started`, `not-authorized`, blocked by Phase 05.
-**Mode:** plan branch, review only except fixes
-**Purpose:** Catch errors that per-area migration cannot see.
-
-Review dimensions:
-
-- one owner per cross-area claim;
-- contract producer/consumer agreement;
-- platform-wide vocabulary consistency;
-- vision/spec/architecture/contract/decision separation;
-- component-boundary correctness;
-- preserved intent and deferred capabilities;
-- generated projection/source agreement;
-- newcomer navigation without legacy paths;
-- implementation alignment and evidence quality.
-
-Gate:
-
-- no unresolved authority conflict;
-- a stranger can answer the platform's read-first, owner, contract, risk,
-  verification, and learning questions without legacy authority.
-
-### Phase 07 — Eliminate switchboard bypasses and prepare consumers
-
-**Status:** `not-started`, `not-authorized`, blocked by Phase 06.
-**Mode:** plan branch
-**Purpose:** Ensure cutover changes behavior, not only files. Generic consumers
-should already use the Phase 01 switchboard; this phase rewrites remaining direct
-path dependencies and prepares the one-row/table authority flip rather than
-holding hundreds of edits on a long-lived branch.
-
-Consumers include:
-
-- AGENTS/CLAUDE and instruction sources;
-- reading maps and portals;
-- skills and prompt templates;
-- CLI help/examples;
-- setup/doctor registrations;
-- generators and projections;
-- tests and fixtures;
-- comments that name authority paths;
-- external-facing links where maintained in-repo.
-
-Gate:
-
-- repository-wide search finds no reader or writer treating a legacy path as
-  current authority;
-- aliases are lookup-only and never writing instructions.
-
-### Phase 08 — Atomic platform-authority cutover
-
-**Status:** `not-started`, `not-authorized`, blocked by Phase 07 and a separate explicit cutover approval.
-**Mode:** dedicated cutover worktree; serialized mutation
-**Purpose:** Promote one system and physically retire the competing system in one
-reviewable integration change.
-
-Cutover sequence:
-
-1. acquire a migration-specific exclusive documentation-cutover lease; while it
-   is held, registered doc writers, dispatch admission, and merge gates refuse
-   mutations to in-scope roots; enumerate worktrees and require clean/digest-
-   matched sources before the lease and immediately before ref movement;
-2. rerun inventory and detect any unregistered/raw source drift since baseline;
-   drift blocks cutover rather than being overwritten;
-3. apply final candidate updates;
-4. promote target authority metadata;
-5. switch every reader and writer;
-6. delete maintained files under `docs/specs/**` and `docs/architect/**` only
-   after non-authority evidence payloads have been relocated and verified;
-7. activate approved aliases in the minimal platform resolver, not as duplicate
-   files;
-8. regenerate projections and indexes;
-9. enable no-legacy-path enforcement;
-10. run semantic-remnant search and the full verification suite.
-
-Rollback:
-
-- one cutover commit or a tightly controlled commit train with a documented
-  revert order;
-- cutover itself appends no registry/event-log events;
-- snapshot and verify generated projections, installation ledgers, alias state,
-  and any installed-skill impact in addition to git state;
-- never leave half the readers switched after a failed cutover;
-- if gate failure occurs, restore the pre-cutover authority table, aliases,
-  projections, and installed surfaces—not only tracked files—rather than
-  declaring a partial success.
-
-Gate:
-
-- only `docs/platform/**` owns maintained platform claims;
-- no physical legacy platform authority remains;
-- all aliases resolve to committed current targets;
-- the sealed migration ledger exists at its durable target path and verifies;
-- the documentation-cutover lease prevented registered writes and drift checks
-  caught unregistered writes;
-- complete suite and documentation checks are green.
-
-### Phase 09 — Post-cutover maintenance MVP
-
-**Status:** `not-started`, `not-authorized`, blocked by a verified Phase 08 cutover and follow-on authorization.
-**Mode:** follow-on plan may begin only after cutover
-**Purpose:** Prevent recurrence with the smallest useful maintenance system.
-
-Initial surfaces:
-
-```text
-fgos doc classify
-fgos doc new
-fgos doc check
-fgos doc inventory
-fgos doc retirement-check
-```
-
-Initial checks prioritize observed failures:
-
-- duplicate owner;
-- wrong placement;
-- missing required metadata;
-- broken links and anchors;
-- references to nonexistent code/skills/commands;
-- stale generated projection;
-- reintroduced legacy roots;
-- unaccounted source/claim lineage.
-
-This phase hands off to the future Knowledge and Documentation Engine plan; it
-must not silently expand into Agent Context Engine.
 
 ## 8. Dependency Graph
 
 ```text
-00 truth reset + current-authority map
-  → 01 switchboard + containment
-  → 02 inventory/conservation
-  → 03 minimum constitution + mechanical gates
-  → 04 pilot candidate
-  → 05 all candidate transformations
-  → 06 cross-area review
-  → 07 consumer rewrite
-  → 08 atomic cutover
-  → 09 maintenance MVP handoff
+1 truth reset + current-authority map
+  → 2 switchboard + containment
+  → 3 inventory/conservation
+  → 4 minimum constitution + mechanical gates
+  → 5 pilot candidate
+  → 6 all candidate transformations
+  → 7 cross-area review
+  → 8 consumer rewrite
+  → 9 atomic cutover
+  → 10 maintenance MVP handoff
 ```
 
 Inventory may gather read-only evidence in parallel by non-overlapping area.
@@ -681,7 +335,7 @@ reconciled.
 | Risk | Countermeasure |
 |---|---|
 | Move files without migrating mixed claims | Claim-level ledger and conservation gate |
-| Pilot accidentally becomes canonical | Candidate labels; no reader switch before Phase 08 |
+| Pilot accidentally becomes canonical | Candidate labels; no reader switch before Phase 9 |
 | Migration never ends because both systems stay usable | Cutover date/gate and no-legacy ratchet |
 | Build an engine instead of migrating content | Minimum constitution only before cutover |
 | Lose long-horizon architecture while narrowing scope | Intent ledger + unchanged full proposal |
@@ -733,7 +387,7 @@ proposal, this plan, historical foundation, intent ledger, and current repositor
 state. The review must be advisory-only and must not edit files.
 
 A read-only Claude Opus review was completed on 2026-09-25. Verdict: **proceed
-with required changes for Phase 00 only; do not authorize Phases 01–08 yet**. It
+with required changes for Phase 1 only; do not authorize Phases 2–9 yet**. It
 identified two critical issues—the repository already contains per-area authority
 flips, and no platform alias resolver exists before deletion—plus required fixes
 for claim coverage, dispositions, evidence payloads, locked-law checks, shipped
@@ -761,7 +415,7 @@ The review must answer:
 6. Are Knowledge and Documentation Engine and Agent Context Engine intents
    preserved with real non-preclusion constraints?
 7. Which assumptions are contradicted by the current repository?
-8. What must change before Phase 00 can be authorized?
+8. What must change before Phase 1 can be authorized?
 
 The exact reusable prompt is stored beside this plan in
 `independent-frontier-review-prompt.md`. The first review is preserved in
@@ -776,15 +430,15 @@ in `independent-frontier-rereview-2026-09-25.md`.
 - Transitional platform portal: `docs/platform/README.md`
 - Historical registry implementation: `plans/260825-1841-knowledge-registry/`
 - Historical registry current-state correction: `plans/260825-1841-knowledge-registry/CURRENT-STATE-CORRECTION.md`
-- Phase 00 execution record: `plans/260925-documentation-authority-unification/phase-00-execution-record.md`
-- Phase 00 verification: `plans/260925-documentation-authority-unification/phase-00-verification.md`
-- Verified Phase 00 authority map: `plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md`
+- Phase 1 execution record: `plans/260925-documentation-authority-unification/reports/phase-00-execution-record.md`
+- Phase 1 verification: `plans/260925-documentation-authority-unification/reports/phase-00-verification.md`
+- Verified Phase 1 authority map: `plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md`
 - Independent review prompt: `plans/260925-documentation-authority-unification/independent-frontier-review-prompt.md`
 - First independent review: `plans/260925-documentation-authority-unification/independent-frontier-review-2026-09-25.md`
 - Frontier re-review: `plans/260925-documentation-authority-unification/independent-frontier-rereview-2026-09-25.md`
 - OKF learning source: `docs/distillery/sources/okf.md`
-- Phase 01 execution record: `plans/260925-documentation-authority-unification/phase-01-execution-record.md`
-- Phase 01 verification: `plans/260925-documentation-authority-unification/phase-01-verification.md`
+- Phase 2 execution record: `plans/260925-documentation-authority-unification/reports/phase-01-execution-record.md`
+- Phase 2 verification: `plans/260925-documentation-authority-unification/reports/phase-01-verification.md`
 - Operative transitional switchboard: `docs/transitional-switchboard.md` and `plans/260925-documentation-authority-unification/transitional-switchboard.json`
 - Claim and disposition vocabulary: `plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.json` and `plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.md`
 - Legacy root baseline: `scripts/check-legacy-docs-ratchet.baseline.json`
@@ -792,9 +446,9 @@ in `independent-frontier-rereview-2026-09-25.md`.
 - Legacy ratchet script: `scripts/check-legacy-docs-ratchet.mjs`
 - Migration authoring rules: `docs/platform/migration-authoring-rules.md`
 - Shipped path conventions inventory: `plans/260925-documentation-authority-unification/shipped-path-conventions-inventory.json` and `plans/260925-documentation-authority-unification/shipped-path-conventions-inventory.md`
-- Phase 01 tag: `documentation-authority-phase-01-20260926` (annotated tag object `135957aec6e9939b7a1626d2942014c045620a40`, target commit `f0c76c5e590339d9c815038539ff1f4a072c64e4`)
-- Phase 02 doc-inventory generator: `scripts/generate-doc-inventory.mjs`
-- Phase 02 inventory gate checker: `scripts/check-doc-inventory-gates.mjs`
-- Phase 02 generator/checker unit tests: `test/scripts/generate-doc-inventory.test.mjs`
-- Phase 02 execution record: `plans/260925-documentation-authority-unification/phase-02-execution-record.md`
-- Phase 02 immutable verification record: `plans/260925-documentation-authority-unification/phase-02-verification.md`
+- Phase 2 tag: `documentation-authority-phase-01-20260926` (annotated tag object `135957aec6e9939b7a1626d2942014c045620a40`, target commit `f0c76c5e590339d9c815038539ff1f4a072c64e4`)
+- Phase 3 doc-inventory generator: `scripts/generate-doc-inventory.mjs`
+- Phase 3 inventory gate checker: `scripts/check-doc-inventory-gates.mjs`
+- Phase 3 generator/checker unit tests: `test/scripts/generate-doc-inventory.test.mjs`
+- Phase 3 execution record: `plans/260925-documentation-authority-unification/reports/phase-02-execution-record.md`
+- Phase 3 immutable verification record: `plans/260925-documentation-authority-unification/reports/phase-02-verification.md`

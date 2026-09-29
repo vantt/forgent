@@ -478,9 +478,9 @@ function loadInventory(filePath) {
   return loadShardedJsonArtifact(filePath, { allowLegacyRawJson: false });
 }
 
-export const DEFAULT_INVENTORY_PATH = 'plans/260925-documentation-authority-unification/phase-02-doc-inventory.json';
+export const DEFAULT_INVENTORY_PATH = 'plans/260925-documentation-authority-unification/reports/phase-02-doc-inventory.json';
 export const DEFAULT_VOCABULARY_PATH = 'plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.json';
-export const DEFAULT_IDENTITY_REGISTRY_PATH = 'plans/260925-documentation-authority-unification/phase-02-identity-registry.json';
+export const DEFAULT_IDENTITY_REGISTRY_PATH = 'plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json';
 
 export function runCli(argv, cwd = process.cwd()) {
   const inventoryIdx = argv.indexOf('--inventory');
@@ -529,7 +529,7 @@ export function runCli(argv, cwd = process.cwd()) {
 
   console.log(
     `check-doc-inventory-gates: structural and vocabulary gates pass. ` +
-    `Explicit open findings (not blocking Phase 02, must be resolved before Phase 05): ` +
+    `Explicit open findings (not blocking the inventory phase, Phase 3; must be resolved before candidate transformation, Phase 6): ` +
     `${result.explicitOpenFindings.gapCount} gap/blocker(s) (${result.explicitOpenFindings.fileGapCount} file/routing, ${result.explicitOpenFindings.claimIdentityGapCount} claim-identity), ${result.explicitOpenFindings.duplicateContentGroupCount} duplicate-content group(s), ` +
     `${result.explicitOpenFindings.semanticConflictGroupCount} semantic-conflict group(s).`
   );

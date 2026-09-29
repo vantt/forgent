@@ -337,7 +337,7 @@ test('generateInventory: exact duplicate files share semantic claim ids with exp
     execFileSync('git', ['init'], { cwd: tmp, stdio: 'ignore' });
     execFileSync('git', ['config', 'user.email', 't@example.test'], { cwd: tmp });
     execFileSync('git', ['config', 'user.name', 'Test'], { cwd: tmp });
-    fs.mkdirSync(path.join(tmp, 'plans/260925-documentation-authority-unification'), { recursive: true });
+    fs.mkdirSync(path.join(tmp, 'plans/260925-documentation-authority-unification/reports'), { recursive: true });
     fs.writeFileSync(path.join(tmp, 'plans/260925-documentation-authority-unification/transitional-switchboard.json'), JSON.stringify(FIXTURE_SWITCHBOARD));
     fs.writeFileSync(path.join(tmp, 'plans/260925-documentation-authority-unification/shipped-path-conventions-inventory.json'), JSON.stringify({ entries: [] }));
     fs.mkdirSync(path.join(tmp, 'docs'), { recursive: true });
@@ -347,7 +347,7 @@ test('generateInventory: exact duplicate files share semantic claim ids with exp
     execFileSync('git', ['add', '.'], { cwd: tmp });
     execFileSync('git', ['commit', '-m', 'fixture'], { cwd: tmp, stdio: 'ignore' });
     const commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tmp, encoding: 'utf8' }).trim();
-    const registryPath = path.join(tmp, 'plans/260925-documentation-authority-unification/phase-02-identity-registry.json');
+    const registryPath = path.join(tmp, 'plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json');
     fs.writeFileSync(registryPath, JSON.stringify(bootstrapIdentityRegistry(tmp, { commit }), null, 2));
     const inventory = generateInventory(tmp, { commit, identityRegistryPath: registryPath });
     const a = inventory.items.find((i) => i.path === 'docs/a.md');
@@ -826,7 +826,7 @@ test('carryForwardIdentityRegistry moves one source without reminting claim ids 
     execFileSync('git', ['init'], { cwd: tmp, stdio: 'ignore' });
     execFileSync('git', ['config', 'user.email', 't@example.test'], { cwd: tmp });
     execFileSync('git', ['config', 'user.name', 'Test'], { cwd: tmp });
-    fs.mkdirSync(path.join(tmp, 'plans/260925-documentation-authority-unification'), { recursive: true });
+    fs.mkdirSync(path.join(tmp, 'plans/260925-documentation-authority-unification/reports'), { recursive: true });
     fs.writeFileSync(path.join(tmp, 'plans/260925-documentation-authority-unification/transitional-switchboard.json'), JSON.stringify(FIXTURE_SWITCHBOARD));
     fs.mkdirSync(path.join(tmp, 'docs/old'), { recursive: true });
     fs.mkdirSync(path.join(tmp, 'docs/other'), { recursive: true });
@@ -836,7 +836,7 @@ test('carryForwardIdentityRegistry moves one source without reminting claim ids 
     execFileSync('git', ['commit', '-m', 'old'], { cwd: tmp, stdio: 'ignore' });
     const oldCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tmp, encoding: 'utf8' }).trim();
     const registry = bootstrapIdentityRegistry(tmp, { commit: oldCommit });
-    const registryPath = path.join(tmp, 'plans/260925-documentation-authority-unification/phase-02-identity-registry.json');
+    const registryPath = path.join(tmp, 'plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json');
     fs.writeFileSync(registryPath, JSON.stringify(registry, null, 2));
     fs.mkdirSync(path.join(tmp, 'docs/new'), { recursive: true });
     fs.renameSync(path.join(tmp, 'docs/old/a.md'), path.join(tmp, 'docs/new/a.md'));
@@ -858,7 +858,7 @@ test('carryForwardIdentityRegistry refuses existing destination registry entries
     execFileSync('git', ['init'], { cwd: tmp, stdio: 'ignore' });
     execFileSync('git', ['config', 'user.email', 't@example.test'], { cwd: tmp });
     execFileSync('git', ['config', 'user.name', 'Test'], { cwd: tmp });
-    fs.mkdirSync(path.join(tmp, 'plans/260925-documentation-authority-unification'), { recursive: true });
+    fs.mkdirSync(path.join(tmp, 'plans/260925-documentation-authority-unification/reports'), { recursive: true });
     fs.writeFileSync(path.join(tmp, 'plans/260925-documentation-authority-unification/transitional-switchboard.json'), JSON.stringify(FIXTURE_SWITCHBOARD));
     fs.mkdirSync(path.join(tmp, 'docs/old'), { recursive: true });
     fs.mkdirSync(path.join(tmp, 'docs/new'), { recursive: true });
@@ -868,7 +868,7 @@ test('carryForwardIdentityRegistry refuses existing destination registry entries
     execFileSync('git', ['commit', '-m', 'old'], { cwd: tmp, stdio: 'ignore' });
     const commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tmp, encoding: 'utf8' }).trim();
     const registry = bootstrapIdentityRegistry(tmp, { commit });
-    const registryPath = path.join(tmp, 'plans/260925-documentation-authority-unification/phase-02-identity-registry.json');
+    const registryPath = path.join(tmp, 'plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json');
     fs.writeFileSync(registryPath, JSON.stringify(registry));
     assert.throws(() => carryForwardIdentityRegistry(tmp, { commit, identityRegistryPath: registryPath, sourcePath: 'docs/old/a.md', toSourcePath: 'docs/new/a.md' }), /destination already exists|destination units already exist/);
   } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
@@ -880,7 +880,7 @@ test('carryForwardIdentityRegistry updates carried unit status from new classifi
     execFileSync('git', ['init'], { cwd: tmp, stdio: 'ignore' });
     execFileSync('git', ['config', 'user.email', 't@example.test'], { cwd: tmp });
     execFileSync('git', ['config', 'user.name', 'Test'], { cwd: tmp });
-    fs.mkdirSync(path.join(tmp, 'plans/260925-documentation-authority-unification'), { recursive: true });
+    fs.mkdirSync(path.join(tmp, 'plans/260925-documentation-authority-unification/reports'), { recursive: true });
     fs.writeFileSync(path.join(tmp, 'plans/260925-documentation-authority-unification/transitional-switchboard.json'), JSON.stringify(FIXTURE_SWITCHBOARD));
     fs.mkdirSync(path.join(tmp, 'docs/old'), { recursive: true });
     fs.writeFileSync(path.join(tmp, 'docs/old/a.md'), '# A\n\nPayload with enough detail.\n');
@@ -889,7 +889,7 @@ test('carryForwardIdentityRegistry updates carried unit status from new classifi
     const oldCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tmp, encoding: 'utf8' }).trim();
     const registry = bootstrapIdentityRegistry(tmp, { commit: oldCommit });
     for (const unit of registry.units) if (unit.sourcePath === 'docs/old/a.md') unit.status = 'historical';
-    const registryPath = path.join(tmp, 'plans/260925-documentation-authority-unification/phase-02-identity-registry.json');
+    const registryPath = path.join(tmp, 'plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json');
     fs.writeFileSync(registryPath, JSON.stringify(registry));
     fs.mkdirSync(path.join(tmp, 'docs/new'), { recursive: true });
     fs.renameSync(path.join(tmp, 'docs/old/a.md'), path.join(tmp, 'docs/new/a.md'));
@@ -907,7 +907,7 @@ test('carryForwardIdentityRegistry refuses ambiguous duplicate and edited units 
     execFileSync('git', ['init'], { cwd: tmp, stdio: 'ignore' });
     execFileSync('git', ['config', 'user.email', 't@example.test'], { cwd: tmp });
     execFileSync('git', ['config', 'user.name', 'Test'], { cwd: tmp });
-    fs.mkdirSync(path.join(tmp, 'plans/260925-documentation-authority-unification'), { recursive: true });
+    fs.mkdirSync(path.join(tmp, 'plans/260925-documentation-authority-unification/reports'), { recursive: true });
     fs.writeFileSync(path.join(tmp, 'plans/260925-documentation-authority-unification/transitional-switchboard.json'), JSON.stringify(FIXTURE_SWITCHBOARD));
     fs.mkdirSync(path.join(tmp, 'docs/old'), { recursive: true });
     fs.writeFileSync(path.join(tmp, 'docs/old/a.md'), ['# Same', '', 'Identical payload with enough detail.', '', '# Same', '', 'Identical payload with enough detail.'].join('\n'));
@@ -915,7 +915,7 @@ test('carryForwardIdentityRegistry refuses ambiguous duplicate and edited units 
     execFileSync('git', ['commit', '-m', 'old'], { cwd: tmp, stdio: 'ignore' });
     const oldCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tmp, encoding: 'utf8' }).trim();
     const registry = bootstrapIdentityRegistry(tmp, { commit: oldCommit });
-    const registryPath = path.join(tmp, 'plans/260925-documentation-authority-unification/phase-02-identity-registry.json');
+    const registryPath = path.join(tmp, 'plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json');
     fs.writeFileSync(registryPath, JSON.stringify(registry));
     fs.mkdirSync(path.join(tmp, 'docs/new'), { recursive: true });
     fs.renameSync(path.join(tmp, 'docs/old/a.md'), path.join(tmp, 'docs/new/a.md'));
@@ -930,7 +930,7 @@ test('carryForwardIdentityRegistry refuses ambiguous duplicate and edited units 
     execFileSync('git', ['init'], { cwd: editTmp, stdio: 'ignore' });
     execFileSync('git', ['config', 'user.email', 't@example.test'], { cwd: editTmp });
     execFileSync('git', ['config', 'user.name', 'Test'], { cwd: editTmp });
-    fs.mkdirSync(path.join(editTmp, 'plans/260925-documentation-authority-unification'), { recursive: true });
+    fs.mkdirSync(path.join(editTmp, 'plans/260925-documentation-authority-unification/reports'), { recursive: true });
     fs.writeFileSync(path.join(editTmp, 'plans/260925-documentation-authority-unification/transitional-switchboard.json'), JSON.stringify(FIXTURE_SWITCHBOARD));
     fs.mkdirSync(path.join(editTmp, 'docs/old'), { recursive: true });
     fs.writeFileSync(path.join(editTmp, 'docs/old/a.md'), '# A\n\nPayload with enough detail.\n');
@@ -938,7 +938,7 @@ test('carryForwardIdentityRegistry refuses ambiguous duplicate and edited units 
     execFileSync('git', ['commit', '-m', 'old'], { cwd: editTmp, stdio: 'ignore' });
     const oldCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: editTmp, encoding: 'utf8' }).trim();
     const registry = bootstrapIdentityRegistry(editTmp, { commit: oldCommit });
-    const registryPath = path.join(editTmp, 'plans/260925-documentation-authority-unification/phase-02-identity-registry.json');
+    const registryPath = path.join(editTmp, 'plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json');
     fs.writeFileSync(registryPath, JSON.stringify(registry));
     fs.mkdirSync(path.join(editTmp, 'docs/new'), { recursive: true });
     fs.writeFileSync(path.join(editTmp, 'docs/new/a.md'), '# A\n\nEdited payload with enough different detail.\n');

@@ -23,7 +23,8 @@ import { classifyFile as classifyLegacyRootFile } from './check-legacy-docs-ratc
 export const SCAN_ROOTS = ['docs'];
 export const ADDITIONAL_ROOT_FILES = ['AGENTS.md', 'CLAUDE.md'];
 export const PHASE_DIR = 'plans/260925-documentation-authority-unification';
-export const IDENTITY_REGISTRY_PATH = `${PHASE_DIR}/phase-02-identity-registry.json`;
+// Historical inventory artifacts live under the plan's reports/ directory.
+export const IDENTITY_REGISTRY_PATH = `${PHASE_DIR}/reports/phase-02-identity-registry.json`;
 
 function stableHash(input, len = 16) {
   return crypto.createHash('sha256').update(String(input)).digest('hex').slice(0, len);
@@ -1517,7 +1518,7 @@ export function generateMarkdownReport(inventory) {
   lines.push('Design status: Draft (Phase 02, pending independent review)');
   lines.push('Phase: 02 Deliverable');
   lines.push('Related:');
-  lines.push('- `plans/260925-documentation-authority-unification/phase-02-doc-inventory.json`');
+  lines.push('- `plans/260925-documentation-authority-unification/reports/phase-02-doc-inventory.json`');
   lines.push('- `plans/260925-documentation-authority-unification/plan.md` §7 Phase 02');
   lines.push('```');
   lines.push('');
