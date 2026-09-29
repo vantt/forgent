@@ -564,25 +564,25 @@ test('characterization: run.mjs summarizeDispatch copies status & settledFailed 
 // ---------------------------------------------------------------------------
 // 10. Coordination Show: show.mjs line 416 fallback to 'done'
 // ---------------------------------------------------------------------------
-test('characterization: show.mjs:416 fallbacks to done when runResult has no status property', () => {
-  const settled = true;
-  const showStatusOld = (runResult) => (runResult ? (runResult.status ?? (settled ? 'done' : null)) : null);
+test('characterization: show.mjs uses runOutcome and does not fall back to done on missing status', () => {
+  const showStatus = (runResult) => {
+    const outcome = runResult ? runOutcome(runResult) : null;
+    return outcome?.category ?? runResult?.status ?? null;
+  };
 
   const f06 = loadFixture('06-v2-completed-pass-verified.json');
-  assert.equal(showStatusOld(f06), 'done');
+  assert.equal(showStatus(f06), 'ok');
 
-  // Simulating a v3 RunResult which does not have a top-level .status property:
-  const v3LikeResult = {
-    contract: { id: 'assignment-run-result', version: 3 },
-    classification: {
-      execution: { status: 'completed' },
-      assessment: { verdict: 'findings' },
-      outcome: { category: 'verdict' },
-    },
-  };
-  // In old code without status: falls back to 'done' when settled is true!
-  // todo: expected-change: show.mjs must read category/verdict, never default to 'done'
-  assert.equal(showStatusOld(v3LikeResult), 'done');
+  const f08 = loadFixture('08-v2-completed-findings-reported.json');
+  assert.equal(showStatus(f08), 'verdict');
+
+  const f08WithoutStatus = { ...f08 };
+  delete f08WithoutStatus.status;
+
+  // In old code, missing status fell back to 'done' when settled was true.
+  // With runOutcome, showStatus fails closed to 'corrupt', NEVER defaulting to 'done':
+  assert.equal(showStatus(f08WithoutStatus), 'corrupt');
+  assert.notEqual(showStatus(f08WithoutStatus), 'done');
 });
 
 // ---------------------------------------------------------------------------

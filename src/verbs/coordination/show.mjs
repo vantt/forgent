@@ -40,6 +40,7 @@ import path from 'node:path';
 import { StoreError } from '../../state/store.mjs';
 import { CoordinationError, CONTRIBUTION_REF_PREFIX, HUMAN_TURN_REF_PREFIX, SCHEMA_VERSION_3 } from '../../runner/coordination/schema.mjs';
 import { evaluateSessionQuorum, deriveSessionPhase, readLinkedRunResultFromDisk } from '../../runner/coordination/session-engine.mjs';
+import { runOutcome } from '../../runner/dispatch/run-result.mjs';
 import { readManifest, readSessionEvents, resolveSessionPaths } from '../../runner/coordination/store.mjs';
 import { replaySession } from '../../runner/coordination/replay.mjs';
 import { loadDefinitionForSession } from '../../runner/coordination/session-engine.mjs';
@@ -413,8 +414,9 @@ export function showCoordinationUseCase(ctx, { id }) {
         const nodeResults = coordinationState.results.filter((r) => assignmentIds.includes(r.assignmentId));
         const latestResult = nodeResults.length > 0 ? nodeResults[nodeResults.length - 1] : null;
         const runResult = latestResult ? readRunResultForAssignment(fgosDir, latestResult.assignmentId, latestResult.runId) : null;
-        const runResultStatus = runResult ? (runResult.status ?? (settled ? 'done' : null)) : null;
-        const runResultConfidence = runResult?.confidence ?? null;
+        const outcome = runResult ? runOutcome(runResult) : null;
+        const runResultStatus = outcome?.category ?? runResult?.status ?? null;
+        const runResultConfidence = outcome?.evidence ?? runResult?.confidence ?? null;
 
         const sharedCwdCaveat = dagCaveats.get(node.id) ?? null;
 
@@ -459,7 +461,7 @@ export function showCoordinationUseCase(ctx, { id }) {
         } else if (schedulerOutcome === 'recheck-required') {
           nodeActionHint = 'Settled with caveat: recheck required before closure.';
         } else if (schedulerOutcome === 'settled') {
-          if (runResultStatus === 'failed') {
+          if (outcome?.infraFailure || runResultStatus === 'failed') {
             nodeActionHint = 'Settled with failure. Dependent operations may proceed with settled failure evidence.';
           } else {
             nodeActionHint = 'Settled cleanly.';
@@ -481,6 +483,9 @@ export function showCoordinationUseCase(ctx, { id }) {
           schedulerOutcome,
           runResultStatus,
           runResultConfidence,
+          runResultOutcome: outcome?.category ?? null,
+          runResultVerdict: outcome?.verdict ?? null,
+          infraFailure: outcome?.infraFailure ?? (runResultStatus === 'failed'),
           schemaMode: 'dag',
           dependsOn: [...node.dependsOn],
           dependenciesSettled,
@@ -501,7 +506,7 @@ export function showCoordinationUseCase(ctx, { id }) {
 
       const counts = {
         settled: renderedNodes.filter((n) => n.schedulerOutcome === 'settled' || n.schedulerOutcome === 'recheck-required').length,
-        settledFailed: renderedNodes.filter((n) => (n.schedulerOutcome === 'settled' || n.schedulerOutcome === 'recheck-required') && n.runResultStatus === 'failed').length,
+        settledFailed: renderedNodes.filter((n) => (n.schedulerOutcome === 'settled' || n.schedulerOutcome === 'recheck-required') && (n.infraFailure || n.runResultStatus === 'failed' || n.runResultStatus === 'infra' || n.runResultStatus === 'corrupt')).length,
         refused: renderedNodes.filter((n) => n.schedulerOutcome === 'refused').length,
         blocked: renderedNodes.filter((n) => n.schedulerOutcome === 'blocked').length,
         pending: renderedNodes.filter((n) => n.schedulerOutcome === 'pending').length,
