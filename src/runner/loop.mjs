@@ -63,7 +63,7 @@ import {
   readyWork,
   readRawEvents,
   addOutcome,
-  addFriction,
+  recordFriction,
   categoryOf,
   EXIT_CODES,
   resolveWriterLogPath,
@@ -1239,7 +1239,8 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
     // outcome half: outcome carries the numbers the predicted-half is scored
     // against; friction carries the attribution compound-learning mines.
     await queue.enqueue(async () => {
-      addFriction(dir, {
+      recordFriction(dir, {
+        producer: 'runner.loop',
         id: item.id,
         disposition: tripped || decision.action === 'halt' ? 'halted' : 'parked',
         errorClass: failure.errorClass,

@@ -67,6 +67,7 @@ This table is a compact navigation surface, not a full replacement for the advis
 | Host And Surface Layer | CLI/API/plugin/dashboard/Herdr surfaces into platform engines. | Host invocation and gateway docs |
 | Packaging-Distribution | Runtime packaging, install, activation, setup/doctor readiness. | [packaging-distribution/README.md](packaging-distribution/README.md) |
 | Knowledge, Learning, And Documentation Registry | Retrospective learning, doc registry, end-user docs index, trace/evolve signals. | Knowledge and docs registry docs |
+| Observe (Metrics & Friction) | Measurement and friction tracking across substrate entities (cases, runs, sessions, friction, snapshots). Owned in Rust (`packages/observe/rust`), native routing. | [../specs/observe.md](../specs/observe.md) |
 
 ## 5. How To Change
 
@@ -84,3 +85,4 @@ This table is a compact navigation surface, not a full replacement for the advis
 | detailed component-boundary source | [../architect/component-boundary/component-boundary-advisory.md](../architect/component-boundary/component-boundary-advisory.md) |
 | draft authority map | [../architect/proposals/component-authority-boundary-map.md](../architect/proposals/component-authority-boundary-map.md) |
 | packaging-distribution area | [packaging-distribution/README.md](packaging-distribution/README.md) |
+| observe component | [../specs/observe.md](../specs/observe.md) |

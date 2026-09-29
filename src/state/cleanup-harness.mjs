@@ -562,7 +562,7 @@ export function assessCleanupReadiness({ view, rawEvents, id, repoRoot, worktree
  * first place, so reporting it as "would now unblock" would be
  * misleading; it is reported separately under `notApplicable` instead.
  *
- * Never calls `moveWork`/`addFriction`/`addDecision` -- read-only, same as
+ * Never calls `moveWork`/`recordFriction`/`addDecision` -- read-only, same as
  * `checkMergeStillResolves` itself. Never auto-transitions anything; the
  * item's own scope note (and the named risks in its description --
  * fragile trigger key, flap loop, check-then-transition TOCTOU, no

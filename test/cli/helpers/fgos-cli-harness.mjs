@@ -16,7 +16,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { addOutcome, addFriction, addDiscovery, moveWork, moveStage, addWork, editWork, listWork, StoreError, resolveWriterLogPath, rebuild, initStore } from '../../../src/state/store.mjs';
+import { addOutcome, recordFriction, addDiscovery, moveWork, moveStage, addWork, editWork, listWork, StoreError, resolveWriterLogPath, rebuild, initStore } from '../../../src/state/store.mjs';
 import { appendEvent } from '../../../src/state/events.mjs';
 import { releaseClaim } from '../../../src/state/runtime-coordination.mjs';
 import { createSession, endSession } from '../../../src/runner/session.mjs';
@@ -1174,7 +1174,7 @@ export {
   addAdHocWorktree,
   addBareOrigin,
   addDiscovery,
-  addFriction,
+  recordFriction,
   addGoalItem,
   addOk,
   addOutcome,

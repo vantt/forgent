@@ -55,7 +55,7 @@ One per block reason. Read `<id>`'s merge target from the envelope's `target` fi
 
 ### Playbook: verify-timeout-post-merge
 
-- **Signal**: `{picked: <id>, approve: {blocked, reason: "verify-timeout-post-merge"}}`. Confirm `timedOut: true` on the same envelope. `fgos check <id>`'s friction detail reads "goal-check timed out on staged merge ... after `<ms>`ms — not a verify failure; merge aborted, `<target>` unchanged, rerun catchup", and its `errorClass` is `verify-timeout`, never `verify-miss`.
+- **Signal**: `{picked: <id>, approve: {blocked, reason: "verify-timeout-post-merge"}}`. Confirm `timedOut: true` on the same envelope. `fgos friction show work:<id>`'s friction detail reads "goal-check timed out on staged merge ... after `<ms>`ms — not a verify failure; merge aborted, `<target>` unchanged, rerun catchup", and its `errorClass` is `verify-timeout`, never `verify-miss`.
 - **What the machine tries**: `fgos catchup <id> --timeout <2× the budget that timed out>`, reading the timed-out budget from friction detail. The doubled budget applies to this one call only. **Never edit `.fgos/config.json`'s `runner.timeoutMs`**.
 - **Stop condition**: The governing ceiling above, and a second timeout at the doubled budget stops immediately regardless.
 - **Reported on failure**: The id, both budgets tried, that `<target>` is unchanged, output from catchup, and that the configured default timeout was left untouched.

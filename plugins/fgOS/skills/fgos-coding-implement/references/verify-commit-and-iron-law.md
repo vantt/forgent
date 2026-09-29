@@ -8,7 +8,7 @@ The full detail behind SKILL.md's Step 3 and Step 4.
 worker already ran verify itself per the Hard rule; re-running it here
 would be redundant at best and misleading at worst if the workspace has
 since changed. Otherwise (you did the work yourself), run the item's own
-`verify` command exactly as recorded on the item (`fgos check <id>` or
+`verify` command exactly as recorded on the item (`fgos metrics outcomes <id>` or
 `fgos list --json` shows it). A prose description instead of a runnable
 command is not this skill's problem to invent a substitute for — that is
 a shaping defect from `fgos-coding-planning`; park the item and say so

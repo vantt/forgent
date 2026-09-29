@@ -1,0 +1,425 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-09-29T11:37:13.995Z",
+  "data_hash": "9d1aefefb74a58ebda3ae5de400bfc34f39af77c3043071a71790d67c2c7f128",
+  "data": {
+    "runs": {
+      "total": 1028,
+      "unclassified_rate": 0.8998054474708171,
+      "overall": {
+        "total": 1028,
+        "ok": 51,
+        "exec_failed": 12,
+        "verdict_fail": 31,
+        "inconclusive": 4,
+        "blocked": 3,
+        "policy_refused": 2,
+        "unclassified": 925
+      },
+      "by_executor": {
+        "/home/vantt/.nvm/versions/node/v24.18.0/bin/node": {
+          "total": 1,
+          "ok": 0,
+          "exec_failed": 0,
+          "verdict_fail": 0,
+          "inconclusive": 0,
+          "blocked": 0,
+          "policy_refused": 0,
+          "unclassified": 1
+        },
+        "agy-bwrap": {
+          "total": 28,
+          "ok": 0,
+          "exec_failed": 0,
+          "verdict_fail": 0,
+          "inconclusive": 0,
+          "blocked": 0,
+          "policy_refused": 0,
+          "unclassified": 28
+        },
+        "agy-cli": {
+          "total": 63,
+          "ok": 0,
+          "exec_failed": 0,
+          "verdict_fail": 0,
+          "inconclusive": 0,
+          "blocked": 0,
+          "policy_refused": 0,
+          "unclassified": 63
+        },
+        "agy-herdr": {
+          "total": 46,
+          "ok": 0,
+          "exec_failed": 0,
+          "verdict_fail": 0,
+          "inconclusive": 0,
+          "blocked": 0,
+          "policy_refused": 0,
+          "unclassified": 46
+        },
+        "claude": {
+          "total": 193,
+          "ok": 1,
+          "exec_failed": 0,
+          "verdict_fail": 0,
+          "inconclusive": 0,
+          "blocked": 2,
+          "policy_refused": 0,
+          "unclassified": 190
+        },
+        "claude-bwrap": {
+          "total": 50,
+          "ok": 0,
+          "exec_failed": 0,
+          "verdict_fail": 0,
+          "inconclusive": 0,
+          "blocked": 0,
+          "policy_refused": 0,
+          "unclassified": 50
+        },
+        "claude-reviewer": {
+          "total": 119,
+          "ok": 0,
+          "exec_failed": 0,
+          "verdict_fail": 0,
+          "inconclusive": 0,
+          "blocked": 0,
+          "policy_refused": 0,
+          "unclassified": 119
+        },
+        "claude-reviewer-herdr": {
+          "total": 158,
+          "ok": 0,
+          "exec_failed": 0,
+          "verdict_fail": 0,
+          "inconclusive": 0,
+          "blocked": 0,
+          "policy_refused": 0,
+          "unclassified": 158
+        },
+        "codex-bwrap": {
+          "total": 21,
+          "ok": 0,
+          "exec_failed": 0,
+          "verdict_fail": 0,
+          "inconclusive": 0,
+          "blocked": 0,
+          "policy_refused": 0,
+          "unclassified": 21
+        },
+        "codex-cli": {
+          "total": 157,
+          "ok": 0,
+          "exec_failed": 0,
+          "verdict_fail": 0,
+          "inconclusive": 0,
+          "blocked": 0,
+          "policy_refused": 0,
+          "unclassified": 157
+        },
+        "codex-herdr": {
+          "total": 82,
+          "ok": 0,
+          "exec_failed": 0,
+          "verdict_fail": 0,
+          "inconclusive": 0,
+          "blocked": 0,
+          "policy_refused": 0,
+          "unclassified": 82
+        },
+        "codex-pi": {
+          "total": 5,
+          "ok": 0,
+          "exec_failed": 0,
+          "verdict_fail": 0,
+          "inconclusive": 0,
+          "blocked": 0,
+          "policy_refused": 0,
+          "unclassified": 5
+        },
+        "codex-readonly": {
+          "total": 1,
+          "ok": 0,
+          "exec_failed": 0,
+          "verdict_fail": 0,
+          "inconclusive": 0,
+          "blocked": 0,
+          "policy_refused": 0,
+          "unclassified": 1
+        },
+        "gemini": {
+          "total": 41,
+          "ok": 30,
+          "exec_failed": 0,
+          "verdict_fail": 5,
+          "inconclusive": 4,
+          "blocked": 1,
+          "policy_refused": 1,
+          "unclassified": 0
+        },
+        "glm-cli": {
+          "total": 4,
+          "ok": 0,
+          "exec_failed": 0,
+          "verdict_fail": 0,
+          "inconclusive": 0,
+          "blocked": 0,
+          "policy_refused": 0,
+          "unclassified": 4
+        },
+        "openai": {
+          "total": 24,
+          "ok": 10,
+          "exec_failed": 11,
+          "verdict_fail": 3,
+          "inconclusive": 0,
+          "blocked": 0,
+          "policy_refused": 0,
+          "unclassified": 0
+        },
+        "xai": {
+          "total": 35,
+          "ok": 10,
+          "exec_failed": 1,
+          "verdict_fail": 23,
+          "inconclusive": 0,
+          "blocked": 0,
+          "policy_refused": 1,
+          "unclassified": 0
+        }
+      },
+      "by_role": {
+        "advisor": {
+          "total": 1,
+          "ok": 0,
+          "exec_failed": 0,
+          "verdict_fail": 0,
+          "inconclusive": 0,
+          "blocked": 0,
+          "policy_refused": 0,
+          "unclassified": 1
+        },
+        "alternative-shaper": {
+          "total": 9,
+          "ok": 0,
+          "exec_failed": 0,
+          "verdict_fail": 0,
+          "inconclusive": 0,
+          "blocked": 0,
+          "policy_refused": 0,
+          "unclassified": 9
+        },
+        "architecture-critic": {
+          "total": 9,
+          "ok": 0,
+          "exec_failed": 0,
+          "verdict_fail": 0,
+          "inconclusive": 0,
+          "blocked": 0,
+          "policy_refused": 0,
+          "unclassified": 9
+        },
+        "constraint-advocate": {
+          "total": 22,
+          "ok": 0,
+          "exec_failed": 0,
+          "verdict_fail": 0,
+          "inconclusive": 0,
+          "blocked": 0,
+          "policy_refused": 0,
+          "unclassified": 22
+        },
+        "consultant": {
+          "total": 3,
+          "ok": 0,
+          "exec_failed": 0,
+          "verdict_fail": 0,
+          "inconclusive": 0,
+          "blocked": 0,
+          "policy_refused": 0,
+          "unclassified": 3
+        },
+        "context-investigator": {
+          "total": 11,
+          "ok": 0,
+          "exec_failed": 0,
+          "verdict_fail": 0,
+          "inconclusive": 0,
+          "blocked": 0,
+          "policy_refused": 0,
+          "unclassified": 11
+        },
+        "coordinator": {
+          "total": 2,
+          "ok": 0,
+          "exec_failed": 0,
+          "verdict_fail": 0,
+          "inconclusive": 0,
+          "blocked": 0,
+          "policy_refused": 0,
+          "unclassified": 2
+        },
+        "doer": {
+          "total": 99,
+          "ok": 11,
+          "exec_failed": 3,
+          "verdict_fail": 0,
+          "inconclusive": 0,
+          "blocked": 1,
+          "policy_refused": 0,
+          "unclassified": 84
+        },
+        "fixer": {
+          "total": 112,
+          "ok": 18,
+          "exec_failed": 2,
+          "verdict_fail": 0,
+          "inconclusive": 1,
+          "blocked": 1,
+          "policy_refused": 0,
+          "unclassified": 90
+        },
+        "lead-advisor": {
+          "total": 18,
+          "ok": 0,
+          "exec_failed": 0,
+          "verdict_fail": 0,
+          "inconclusive": 0,
+          "blocked": 0,
+          "policy_refused": 0,
+          "unclassified": 18
+        },
+        "red-team": {
+          "total": 279,
+          "ok": 8,
+          "exec_failed": 0,
+          "verdict_fail": 23,
+          "inconclusive": 0,
+          "blocked": 0,
+          "policy_refused": 1,
+          "unclassified": 247
+        },
+        "requester": {
+          "total": 5,
+          "ok": 0,
+          "exec_failed": 0,
+          "verdict_fail": 0,
+          "inconclusive": 0,
+          "blocked": 0,
+          "policy_refused": 0,
+          "unclassified": 5
+        },
+        "researcher": {
+          "total": 13,
+          "ok": 0,
+          "exec_failed": 3,
+          "verdict_fail": 0,
+          "inconclusive": 0,
+          "blocked": 0,
+          "policy_refused": 0,
+          "unclassified": 10
+        },
+        "reviewer": {
+          "total": 426,
+          "ok": 14,
+          "exec_failed": 4,
+          "verdict_fail": 8,
+          "inconclusive": 3,
+          "blocked": 1,
+          "policy_refused": 1,
+          "unclassified": 395
+        },
+        "specialist": {
+          "total": 1,
+          "ok": 0,
+          "exec_failed": 0,
+          "verdict_fail": 0,
+          "inconclusive": 0,
+          "blocked": 0,
+          "policy_refused": 0,
+          "unclassified": 1
+        },
+        "synthesizer": {
+          "total": 9,
+          "ok": 0,
+          "exec_failed": 0,
+          "verdict_fail": 0,
+          "inconclusive": 0,
+          "blocked": 0,
+          "policy_refused": 0,
+          "unclassified": 9
+        },
+        "system-shaper": {
+          "total": 9,
+          "ok": 0,
+          "exec_failed": 0,
+          "verdict_fail": 0,
+          "inconclusive": 0,
+          "blocked": 0,
+          "policy_refused": 0,
+          "unclassified": 9
+        }
+      }
+    },
+    "sessions": {
+      "estimate": true,
+      "total_evaluated": 293,
+      "active_count": 215,
+      "assignments_p50": 2.0,
+      "assignments_p90": 8.0,
+      "duration_sec_p50": 147.0,
+      "duration_sec_p90": 3052.0,
+      "first_pass_count": 57
+    },
+    "tokens": {
+      "input_tokens": 7847854,
+      "output_tokens": 23553770,
+      "cache_creation_input_tokens": 148109255,
+      "cache_read_input_tokens": 14844555358,
+      "total_tokens": 15024066237,
+      "session_count": 418,
+      "message_count": 34231
+    },
+    "friction": "n/a (pre-F5)",
+    "complexity": {
+      "lines_of_code": {
+        "total": 344936,
+        "runner": 59540,
+        "packages": 10720,
+        "apps": 1461,
+        "herdr_plugin": 13113,
+        "tests": 196446,
+        "other": 63656
+      },
+      "protocols_used": 0,
+      "protocols_defined": 0,
+      "native_routes": 2,
+      "total_routes": 50
+    },
+    "work": {
+      "total_evaluated": 769,
+      "add_to_delivered_hours": {
+        "p50": 2.69,
+        "p90": 47.99
+      },
+      "doing_to_awaiting_approval_hours": {
+        "p50": 0.11,
+        "p90": 0.46
+      },
+      "interventions_per_item": {
+        "mean": 2.37,
+        "p90": 5.0
+      }
+    },
+    "faults": {
+      "total": 257,
+      "by_class": {
+        "dir-invalid": 7,
+        "init-in-worktree": 16,
+        "store-missing": 129,
+        "unknown-verb": 105
+      }
+    },
+    "warnings": []
+  }
+}

@@ -243,6 +243,9 @@ pub fn execute_legacy_cli(
     cmd.arg(&payload_path);
     cmd.args(forward_args);
     cmd.env(RECURSION_GUARD_VAR, "1");
+    if let Ok(exe) = std::env::current_exe() {
+        cmd.env("FGOS_HOST_BIN", exe);
+    }
     cmd.stdin(Stdio::inherit());
     cmd.stdout(Stdio::inherit());
     cmd.stderr(Stdio::inherit());

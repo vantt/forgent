@@ -108,6 +108,13 @@ export const STATUSES = Object.freeze([
 ]);
 
 /**
+ * FINAL_STATUSES: statuses at which a goal-check attempt has already run (or
+ * been bypassed by a mechanical reconcile) such that outcomes[id].actual
+ * SHOULD already be recorded.
+ */
+export const FINAL_STATUSES = new Set(['awaiting-approval', 'blocked', 'delivered', 'retrospective', 'cleanup', 'done']);
+
+/**
  * The fixed `statusCategory` domain (per decision record 0027, D2/D3 —
  * `docs/decisions/0027-domain-so-huu-status-doan-truoc-delivered-supersede-
  * base-workflow-model-d1-d3.md`; pinned terms in `docs/history/phase-2-

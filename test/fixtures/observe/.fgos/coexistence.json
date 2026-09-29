@@ -1,0 +1,12 @@
+{
+  "v": 1,
+  "territory": {
+    "data": ".fgos/",
+    "worktrees": {
+      "descriptor": "<tmpdir>/fgos-worktrees",
+      "resolved": "/tmp/fgos-worktrees"
+    },
+    "branches": "fgw/*"
+  },
+  "detected_harnesses": []
+}

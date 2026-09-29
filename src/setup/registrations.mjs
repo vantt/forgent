@@ -91,7 +91,7 @@ import { projectWorkflowToFlowDefinition } from '../runner/definitions/workflow-
 import { FlowDefinitionError, POLICY_PATCH_FIELDS } from '../runner/definitions/schema.mjs';
 import { validateCoordinationRequest } from '../verbs/coordination/schema.mjs';
 import { discoverOperationPromptTemplates, TemplateResolutionError } from '../runner/dispatch/operation-prompt-templates.mjs';
-
+import { resolveHostBin } from '../util/host-bin.mjs';
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 export { claudeCodeHookWired } from './claude-code-hooks.mjs';
 export { checkAgySubHomesConfigured } from './agy-permissions.mjs';
@@ -5180,4 +5180,180 @@ registerCheck({
   id: 'coordination-sessions-closed',
   description: 'coordination sessions reach a terminal status (completed/partial/failed/cancelled) instead of staying "active" indefinitely',
   check: (cwd) => checkCoordinationSessionsClosed(cwd),
+});
+
+// ─── Observe Component (Phase F8, plans/260929-1501-metrics-friction-rust-native) ─
+
+export function checkObserveDirWritable(cwd) {
+  const root = resolveMainCheckoutRoot(cwd) ?? cwd;
+  const observeDir = path.join(root, '.fgos', 'observe');
+  try {
+    if (!fs.existsSync(observeDir)) {
+      fs.mkdirSync(observeDir, { recursive: true });
+    }
+    const probeFile = path.join(observeDir, `.probe-${process.pid}-${Date.now()}`);
+    fs.writeFileSync(probeFile, 'ok', 'utf8');
+    fs.unlinkSync(probeFile);
+    return { passed: true, message: '.fgos/observe is writable' };
+  } catch (err) {
+    return { passed: false, message: `.fgos/observe is not writable: ${err.message}` };
+  }
+}
+
+export function checkObserveFrictionMigrated(cwd) {
+  const root = resolveMainCheckoutRoot(cwd) ?? cwd;
+  const fgosDir = path.join(root, '.fgos');
+  if (!fs.existsSync(fgosDir)) {
+    return { passed: true, message: 'no .fgos directory present' };
+  }
+
+  // 1. Scan legacy work.friction records in .fgos/events.jsonl and .fgos/events/*.jsonl
+  const legacyFrictions = [];
+  const filesToScan = [];
+  const baselineEvents = path.join(fgosDir, 'events.jsonl');
+  if (fs.existsSync(baselineEvents)) {
+    filesToScan.push({ src: 'events.jsonl', path: baselineEvents });
+  }
+  const eventsDir = path.join(fgosDir, 'events');
+  if (fs.existsSync(eventsDir) && fs.statSync(eventsDir).isDirectory()) {
+    try {
+      const entries = fs.readdirSync(eventsDir);
+      for (const entry of entries) {
+        if (entry.endsWith('.jsonl')) {
+          filesToScan.push({ src: `events/${entry}`, path: path.join(eventsDir, entry) });
+        }
+      }
+    } catch {}
+  }
+
+  for (const { src, path: filePath } of filesToScan) {
+    try {
+      const content = fs.readFileSync(filePath, 'utf8');
+      const lines = content.split('\n');
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+        try {
+          const ev = JSON.parse(trimmed);
+          if (ev.type === 'work.friction') {
+            const seq = typeof ev.seq === 'number' ? ev.seq : 0;
+            legacyFrictions.push({ src, seq });
+          }
+        } catch {}
+      }
+    } catch {}
+  }
+
+  if (legacyFrictions.length === 0) {
+    return { passed: true, message: 'no legacy work.friction records to migrate' };
+  }
+
+  // 2. Scan .fgos/observe/friction/*.jsonl for migration record and migrated (src, seq) pairs
+  const frictionDir = path.join(fgosDir, 'observe', 'friction');
+  if (!fs.existsSync(frictionDir) || !fs.statSync(frictionDir).isDirectory()) {
+    return {
+      passed: false,
+      message: 'friction migration not run: .fgos/observe/friction directory missing while legacy work.friction records exist',
+    };
+  }
+
+  let hasMigrationRecord = false;
+  const migratedPairs = new Set();
+  try {
+    const entries = fs.readdirSync(frictionDir);
+    for (const entry of entries) {
+      if (entry.endsWith('.jsonl')) {
+        const content = fs.readFileSync(path.join(frictionDir, entry), 'utf8');
+        const lines = content.split('\n');
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed) continue;
+          try {
+            const rec = JSON.parse(trimmed);
+            if (rec.type === 'migration') {
+              hasMigrationRecord = true;
+            }
+            if (rec.legacy && typeof rec.legacy.src === 'string' && typeof rec.legacy.seq === 'number') {
+              migratedPairs.add(`${rec.legacy.src}:${rec.legacy.seq}`);
+            }
+          } catch {}
+        }
+      }
+    }
+  } catch (err) {
+    return { passed: false, message: `failed reading .fgos/observe/friction: ${err.message}` };
+  }
+
+  if (!hasMigrationRecord) {
+    return {
+      passed: false,
+      message: 'friction migration not run: no migration record found in .fgos/observe/friction/*.jsonl',
+    };
+  }
+
+  const unmigrated = legacyFrictions.filter(({ src, seq }) => !migratedPairs.has(`${src}:${seq}`));
+  if (unmigrated.length > 0) {
+    return {
+      passed: false,
+      message: `${unmigrated.length} legacy work.friction record(s) newer than cursor (not migrated)`,
+    };
+  }
+
+  return {
+    passed: true,
+    message: `all ${legacyFrictions.length} legacy work.friction record(s) migrated to .fgos/observe/friction`,
+  };
+}
+
+export function checkObserveHostResolvable(cwd) {
+  const hostBin = resolveHostBin(cwd);
+  if (!hostBin) {
+    return {
+      passed: false,
+      message: 'host binary unavailable (FGOS_HOST_BIN unset and no active installation manifest)',
+    };
+  }
+
+  const root = resolveMainCheckoutRoot(cwd) ?? cwd;
+  try {
+    const stdout = execFileSync(hostBin, ['friction', 'ping', '--dir', root], {
+      stdio: ['pipe', 'pipe', 'pipe'],
+      encoding: 'utf8',
+    });
+    const parsed = JSON.parse(stdout);
+    if (parsed && (parsed.ok || parsed.data?.ok)) {
+      return {
+        passed: true,
+        message: `host binary at ${hostBin} resolved and verified (friction supported)`,
+      };
+    }
+    return {
+      passed: true,
+      message: `host binary at ${hostBin} resolved`,
+    };
+  } catch (err) {
+    const stderr = err.stderr ? err.stderr.toString('utf8').trim() : err.message;
+    return {
+      passed: false,
+      message: `host binary at ${hostBin} failed version check: ${stderr || err.message}`,
+    };
+  }
+}
+
+registerCheck({
+  id: 'observe-dir-writable',
+  description: '.fgos/observe directory is writable',
+  check: (cwd) => checkObserveDirWritable(cwd),
+});
+
+registerCheck({
+  id: 'observe-friction-migrated',
+  description: 'legacy work.friction records are fully migrated to .fgos/observe/friction with no unmigrated records past cursor',
+  check: (cwd) => checkObserveFrictionMigrated(cwd),
+});
+
+registerCheck({
+  id: 'observe-host-resolvable',
+  description: 'Rust host binary resolves and supports observe commands (friction ping)',
+  check: (cwd) => checkObserveHostResolvable(cwd),
 });

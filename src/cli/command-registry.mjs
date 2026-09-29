@@ -61,6 +61,32 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
+    name: 'metrics',
+    invoke: 'fgos metrics <subcommand>',
+    description: 'Observation metrics suite (cases, harness scorecard, runs, outcomes, entropy, snapshot). Native Rust host command.',
+    parameters: { type: 'object', properties: {}, required: [] },
+    examples: ['fgos metrics ping'],
+    touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+    nativeOnly: true,
+  },
+  {
+    name: 'friction',
+    invoke: 'fgos friction <subcommand>',
+    description: 'Observation friction recording, resolution, inspection, and ranking. Native Rust host command.',
+    parameters: { type: 'object', properties: {}, required: [] },
+    examples: ['fgos friction ping'],
+    touchesState: false,
+    requiresExistingStore: false,
+    externalEffect: false,
+    paginated: false,
+    deprecated: null,
+    nativeOnly: true,
+  },
+  {
     name: 'init',
     invoke: 'fgos init',
     description: 'Initialize the .fgos/ store in the current directory (event log, empty view, coexistence manifest).',
@@ -672,24 +698,6 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
-    name: 'faults',
-    invoke: 'fgos faults',
-    description: 'Read-only: the machine-readable surface for .fgos/logs/invocation-faults.jsonl, the side log recordInvocationFault writes when a fgos call is malformed (unknown verb, missing store, a bad --dir, an arg-parse fault) — never for a verb\'s own business refusal. Returns every record in append order (oldest first) plus the total count; --limit caps it to the N most recent (still oldest-of-those-first). Resolves the log the same worktree-safe way it is written: from a linked worktree with no --dir, this still reads the main checkout\'s real log rather than an empty view.',
-    parameters: {
-      type: 'object',
-      properties: {
-        limit: { type: 'integer', description: 'Return only the N most recently recorded faults instead of the full log.' },
-      },
-      required: [],
-    },
-    examples: ['fgos faults', 'fgos faults --limit 20'],
-    touchesState: false,
-    requiresExistingStore: false,
-    externalEffect: false,
-    paginated: false,
-    deprecated: null,
-  },
-  {
     name: 'recheck-blocked',
     invoke: 'fgos recheck-blocked',
     description: 'Read-only, report-only advisory: re-runs the merge-still-resolves ancestry check LIVE against every current status:blocked item, instead of trusting its stored reason/detail text (the same live-recheck stance fgos catchup\'s own eligibility gate already takes). Reports which blocked items would now pass that check (resolvable), which are still genuinely blocked (stillBlocked), and which the check does not apply to at all — a non-worktree-backed domain, or an item with no recorded merge commit (notApplicable). Never transitions anything; run fgos catchup <id> to actually act on a resolvable item.',
@@ -1000,25 +1008,6 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
-    name: 'check',
-    invoke: 'fgos check',
-    description: 'Read-only predicted-vs-actual report: outcomes, friction, settlement, learning, missing-outcome nag, and entropy trend.',
-    parameters: {
-      type: 'object',
-      properties: {
-        id: { type: 'string', description: 'Optional work item id (positional or --id); omit to check every item.' },
-      },
-      positional: ['id'],
-      required: [],
-    },
-    examples: ['fgos check', 'fgos check build-cli'],
-    touchesState: false,
-    requiresExistingStore: false,
-    externalEffect: false,
-    paginated: false,
-    deprecated: null,
-  },
-  {
     name: 'rollup',
     invoke: 'fgos rollup',
     description: "Rollup view of a root item's direct children and a goalTier item's targets: a done/total count and each member's status, counted separately per relationship.",
@@ -1258,38 +1247,6 @@ export const COMMAND_REGISTRY = [
     deprecated: null,
   },
   {
-    name: 'evolve',
-    invoke: 'fgos evolve',
-    description: 'Rank open self-improve candidates (no flags — --cursor/--limit paginate this list, opaque cursor per D5/D35), reprint one candidate\'s full friction record (--pick), or submit a candidate as a new work item (--submit — the only mutating path).',
-    parameters: {
-      type: 'object',
-      properties: {
-        pick: { type: 'string', description: "Reprint one ranked candidate's full friction record by id." },
-        submit: { type: 'string', description: 'Submit the named candidate as a new work item.' },
-        cursor: { type: 'string', description: 'Bare-call only: opaque pagination cursor from a prior call\'s nextCursor; omit to start from the beginning.' },
-        limit: { type: 'integer', description: 'Bare-call only: max items per page (default 50 when cursor/limit is used); omit both flags to get the unpaginated full array.' },
-      },
-      required: [],
-    },
-    examples: ['fgos evolve', 'fgos evolve --limit 20', 'fgos evolve --pick cand-1', 'fgos evolve --submit cand-1'],
-    touchesState: true,
-    // false, not true (tsk-4fu-2): unlike the other 20 requiresExistingStore
-    // verbs, evolve is dual-mode — bare/--pick is a pure read (must return an
-    // empty list on a missing store, same as ready/check/list, confirmed by
-    // this suite's own "on a directory with no log at all" tests) and only
-    // --submit actually mutates. The registry's per-verb flags describe the
-    // verb at its most-privileged effect (see file header), but this guard
-    // needs a call-time answer, not a verb-level one — gating the common read
-    // path on `.fgos/` existing would refuse a legitimate no-op read. A
-    // truly fresh `evolve --submit` retains the narrower pre-existing
-    // auto-vivify gap this item does not close (out of scope: not part of
-    // the worktree-write hazard this item targets).
-    requiresExistingStore: false,
-    externalEffect: false,
-    paginated: true,
-    deprecated: null,
-  },
-  {
     name: 'triage',
     invoke: 'fgos triage',
     description: 'Rank open work by blocking fan-out over the unified deps+parent graph (how many other open items it unblocks), one flat row per item with stage, goalTier, and its dependency/lineage component (componentId, componentSize, isIsolated) — declared goals (mvp, then milestone) sort first. Done/wontfix items are excluded by default; pass --all to append them after the ranked rows (each with blocks: 0, componentSize: 0 — a resolved item can never block anything). --cursor/--limit paginate the result (opaque cursor, per D5/D35): omit both to get the full array unchanged; pass either to get {items, nextCursor} instead.',
@@ -1318,25 +1275,6 @@ export const COMMAND_REGISTRY = [
     touchesState: false,
     requiresExistingStore: false,
     externalEffect: true,
-    paginated: false,
-    deprecated: null,
-  },
-  {
-    name: 'dispatch-report',
-    invoke: 'fgos dispatch-report [id]',
-    description: 'Read-only report on dispatch result confidence (reported | legacy-signal | inferred | missing) folded from executor.dispatch events and worker log evidence (best-effort, this-machine-only, degrades to missing when log is unavailable).',
-    parameters: {
-      type: 'object',
-      properties: {
-        id: { type: 'string', description: 'Work item id to report dispatch confidence for (positional or --id); omit to report across all dispatches.' },
-      },
-      positional: ['id'],
-      required: [],
-    },
-    examples: ['fgos dispatch-report', 'fgos dispatch-report tsk-1g6'],
-    touchesState: false,
-    requiresExistingStore: false,
-    externalEffect: false,
     paginated: false,
     deprecated: null,
   },

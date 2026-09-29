@@ -333,7 +333,7 @@ máy bắt được lỗi đếm tay này.)
 | Slice | Ghép từ | Physics | Contracts | Maturity |
 |---|---|---|---|---|
 | human-gate (`awaiting-human`) | verbs ask/answer (Entry) + FSM edge (Domain) + fold (Domain) | event | CTR004 | live (STR19) |
-| outcome hai-nửa + `fgos check` | loop ghi 2 nửa (Use-case) + fold (Domain) + check (Entry) | event→state | CTR002 | live |
+| outcome hai-nửa + `fgos metrics outcomes` | loop ghi 2 nửa (Use-case) + fold (Domain) + check (Entry) | event→state | CTR002 | live |
 | worker-run trên nhánh `fgw/` | dispatch spawn (Infra) + worktree sandbox (Infra) + loop giám sát (Use-case) | run | CTR003, CTR009 | live |
 | confinement-enforcement (Authority) | dispatch/confinement (Infra) + dispatch cli/transport (Infra) + backend registry (Infra) | run | CTR010, CTR009 | live |
 

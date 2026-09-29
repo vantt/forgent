@@ -19,7 +19,6 @@ import { HEAVY_KEYWORDS, matchesKeyword } from '../intake/risk-keywords.mjs';
 // the safe direction (D13).
 const MODULE_RULES = [
   { kind: 'prefix', value: 'src/runner/' },
-  { kind: 'equals', value: 'src/report/entropy.mjs' },
   { kind: 'prefix', value: 'src/evolve/' },
   { kind: 'equals', value: 'bin/fgos.mjs' },
   { kind: 'equals', value: 'src/state/store.mjs' },

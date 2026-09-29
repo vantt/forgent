@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "run-result.read.v1",
+  "title": "Run Result Read Contract for Observe Source v1",
+  "description": "Defines the subset of fields read by Observe's RunResultSource from .fgos/assignments/<asgnId>/runs/<runId>/result.json and assignment.json.",
+  "type": "object",
+  "properties": {
+    "result": {
+      "type": "object",
+      "description": "Fields read from result.json.",
+      "required": ["runId"],
+      "properties": {
+        "runId": {
+          "type": "string",
+          "description": "Identifier of the run, used as subject id."
+        },
+        "settledAt": {
+          "type": "string",
+          "description": "Timestamp of settlement, primary timestamp for the observation."
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Fallback timestamp if settledAt is missing."
+        },
+        "executorId": {
+          "type": "string",
+          "description": "Executor identifier attribute (checked first)."
+        },
+        "executor": {
+          "type": "string",
+          "description": "Executor identifier attribute (fallback)."
+        },
+        "status": {
+          "type": "string",
+          "description": "Settlement status of the run."
+        },
+        "classification": {
+          "type": "object",
+          "description": "Structured run-result failure classification."
+        },
+        "assignmentId": {
+          "type": "string",
+          "description": "Assignment identifier (fallback to directory name if absent)."
+        }
+      }
+    },
+    "assignment": {
+      "type": "object",
+      "description": "Fields read from assignment.json (cached per assignment).",
+      "properties": {
+        "role": {
+          "type": "string",
+          "description": "Dispatched agent role attribute."
+        },
+        "adapter": {
+          "type": "string",
+          "description": "Dispatched provider adapter attribute."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Assignment creation timestamp, used as ultimate fallback for observation timestamp."
+        }
+      }
+    }
+  }
+}

@@ -289,7 +289,7 @@ function applyEvent(view, event) {
       // decision) and 'close' (the item reaching the terminal `done`
       // status, via either entry edge). No new event type (D3/R3 — the
       // data already exists in the log); this only APPENDS a derived
-      // record, mirroring frictions/discovery below (never merge/replace —
+      // record, mirroring discovery below (never merge/replace —
       // a settlement is a one-time occurrence per transition, and reusing
       // the id for a later unrelated settlement must not erase this one).
       // GUARDED on `item` (a real work item this move actually applied to)
@@ -324,13 +324,12 @@ function applyEvent(view, event) {
       // Câu-6 tự động (per Phase 3 S3-closeout (c), six-questions L5): the
       // `done`-closing work.move carries an additive `learning` object
       // composed by store.mjs (never here — replay only folds, per D3).
-      // Mirrors frictions/discovery's fold rule: APPENDED per id, never
+      // Mirrors discovery's fold rule: APPENDED per id, never
       // merged/replaced. `done` is terminal (status-fsm.mjs — no outgoing edge) so
       // in practice at most one learning record ever accumulates per id, but
       // the append shape stays consistent with the other occurrence-style
       // channels. `learnings` is a LAZY key exactly like
-      // `outcomes`/`frictions`/`discovery`: absent until the first item
-      // closes with a `learning` payload (backward-compat.test) — a legacy
+      // `outcomes`/`discovery`: absent until the first item
       // event with no `learning` field (or, per the guard above, no `v` at
       // all) never creates it.
       if (item && to === 'done' && learning) {
@@ -369,7 +368,7 @@ function applyEvent(view, event) {
       // 1190 before the live-log seq repair), decision-schema-rationale-
       // alternatives-source): `id` is optional on a decision (per
       // addDecision) — when present, ALSO fold into a lazy `decisionsById`
-      // key, same append-per-id pattern as `discovery`/`frictions` above
+      // key, same append-per-id pattern as `discovery` above
       // (decisions accumulate over time, never merge/replace). The global
       // push above stays unconditional either way, so id-less decisions and
       // every existing reader of the flat `decisions` array are unaffected.
@@ -544,11 +543,11 @@ function applyEvent(view, event) {
       break;
     }
     case 'work.discovery': {
-      // Additive event type (per stage-clarify D3/D6) — mirrors work.friction
-      // below: each context-discovery verdict is its own occurrence (pass or
-      // not), so this APPENDS per id rather than merging/replacing. `discovery`
-      // is a LAZY key exactly like `frictions`/`outcomes`/`gates`: absent from
-      // the view until the first work.discovery event folds (backward-compat).
+      // Additive event type (per stage-clarify D3/D6): each context-discovery
+      // verdict is its own occurrence (pass or not), so this APPENDS per id
+      // rather than merging/replacing. `discovery` is a LAZY key exactly like
+      // `outcomes`/`gates`: absent from the view until the first work.discovery
+      // event folds (backward-compat).
       const { id } = event.payload ?? {};
       if (typeof id === 'string') {
         if (!view.discovery) {
@@ -592,35 +591,13 @@ function applyEvent(view, event) {
       // single persisted pointer to the currently active goal id — a
       // scalar OVERWRITE (last-write-wins), never merged like work.outcome
       // above (D4: exactly one active focus at a time). `focus` is a LAZY
-      // key exactly like `outcomes`/`frictions`/`gates`: absent from the
+      // key exactly like `outcomes`/`gates`: absent from the
       // view until the first goal.focus event folds, so replaying a
       // pre-STR67 log produces a view shaped exactly as before this event
       // type existed (backward-compat).
       const { id } = event.payload ?? {};
       if (typeof id === 'string') {
         view.focus = id;
-      }
-      break;
-    }
-    case 'work.friction': {
-      // Additive event type (per D7 schema evolution, mirroring work.outcome
-      // above) — but with the OPPOSITE fold rule: one friction record per
-      // final failure exit (park/halt), and a single id can accumulate
-      // several across re-claims, so this APPENDS per id. It never merges
-      // and never replaces — each record is its own occurrence, and a later
-      // one erasing an earlier one would silently lose history (the exact
-      // fold-replace bug class critical-patterns records). `frictions` is a
-      // LAZY key exactly like `outcomes`/`gates`: absent from the view until
-      // the first work.friction event folds (backward-compat.test).
-      const { id } = event.payload ?? {};
-      if (typeof id === 'string') {
-        if (!view.frictions) {
-          view.frictions = {};
-        }
-        view.frictions[id] = [
-          ...(view.frictions[id] ?? []),
-          { ...event.payload, ts: event.ts },
-        ];
       }
       break;
     }

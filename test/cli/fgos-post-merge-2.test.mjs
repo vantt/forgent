@@ -15,7 +15,6 @@ import {
   addAdHocWorktree,
   addBareOrigin,
   addDiscovery,
-  addFriction,
   addGoalItem,
   addOk,
   addOutcome,
@@ -268,47 +267,8 @@ test('two submits of the same text get different ids, both persist, no duplicate
 });
 
 
-test('entropy-history.jsonl is written in the SAME data dir as events.jsonl, not a hardcoded path, one line per check run', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'history-path-item');
-  run(cwd, ['move', 'history-path-item', '--to', 'doing']);
-
-  run(cwd, ['check']);
-  run(cwd, ['check']);
-
-  const historyPath = path.join(cwd, '.fgos', 'logs', 'entropy-history.jsonl');
-  assert.ok(fs.existsSync(historyPath));
-  const lines = fs.readFileSync(historyPath, 'utf8').split('\n').filter(Boolean);
-  assert.equal(lines.length, 2);
-  for (const line of lines) {
-    const entry = JSON.parse(line);
-    assert.equal(typeof entry.score, 'number');
-    assert.equal(typeof entry.counts.outcomes, 'number');
-    assert.equal(typeof entry.counts.frictions, 'number');
-    assert.equal(typeof entry.counts.settlements, 'number');
-  }
-});
 
 
-test('GOLDEN evolve is read-only: events.jsonl and state.json are byte-identical before/after both the list and --pick paths', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'ro-item');
-  const dir = path.join(cwd, '.fgos');
-  addFriction(dir, { id: 'ro-item', disposition: 'blocked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'goal-check failed' });
-
-  const logBefore = fs.readFileSync(logPath(cwd), 'utf8');
-  const viewBefore = fs.readFileSync(viewPath(cwd), 'utf8');
-
-  const list = run(cwd, ['evolve']);
-  assert.equal(list.status, 0);
-  assert.equal(fs.readFileSync(logPath(cwd), 'utf8'), logBefore, 'events.jsonl must be untouched by evolve (list)');
-  assert.equal(fs.readFileSync(viewPath(cwd), 'utf8'), viewBefore, 'state.json must be untouched by evolve (list)');
-
-  const pick = run(cwd, ['evolve', '--pick', 'ro-item']);
-  assert.equal(pick.status, 0);
-  assert.equal(fs.readFileSync(logPath(cwd), 'utf8'), logBefore, 'events.jsonl must be untouched by evolve (--pick)');
-  assert.equal(fs.readFileSync(viewPath(cwd), 'utf8'), viewBefore, 'state.json must be untouched by evolve (--pick)');
-});
 
 
 test('the CLI usage message for an unknown verb lists review/approve/sync-root/reject in the surface', () => {

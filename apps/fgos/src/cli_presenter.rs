@@ -198,6 +198,8 @@ pub fn present_outcome(outcome: &ProviderOutcome) -> i32 {
                     output.downcast_ref::<fgos_work_state::GateBypassShowOutcome>()
                 {
                     wrap_envelope(show, None)
+                } else if let Some(json) = output.downcast_ref::<fgos_host_runtime::JsonOutcome>() {
+                    wrap_envelope(&json.0, None)
                 } else if let Some(val) = output.downcast_ref::<serde_json::Value>() {
                     wrap_envelope(val, None)
                 } else if let Some(s) = output.downcast_ref::<String>() {

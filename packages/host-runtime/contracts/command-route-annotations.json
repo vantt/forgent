@@ -1,8 +1,20 @@
 {
+  "friction": {
+    "route_kind": "native",
+    "operation_id": "observe.friction",
+    "owner_path": "packages/observe/rust",
+    "subcommands": true
+  },
   "gate-bypass": {
     "route_kind": "native",
     "operation_id": "work.gate-bypass.show",
     "owner_path": "packages/work-state/rust"
+  },
+  "metrics": {
+    "route_kind": "native",
+    "operation_id": "observe.metrics",
+    "owner_path": "packages/observe/rust",
+    "subcommands": true
   },
   "version": {
     "route_kind": "native",

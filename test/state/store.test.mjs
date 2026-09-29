@@ -17,7 +17,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fork, execFileSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { initStore, addWork, editWork, moveWork, moveStage, addOutcome, addFriction, addDecision, recordGateApprove, listWork, readRawEvents, setFocus, rebuild, resolveWriterLogPath, StoreError, assertPlanEvidence } from '../../src/state/store.mjs';
+import { initStore, addWork, editWork, moveWork, moveStage, addOutcome, addDecision, recordGateApprove, listWork, readRawEvents, setFocus, rebuild, resolveWriterLogPath, StoreError, assertPlanEvidence } from '../../src/state/store.mjs';
 import { appendEvent } from '../../src/state/events.mjs';
 import { REGISTRY, ENV, PID, UNRESOLVED } from "../../src/util/session-identity.mjs";
 import { MAX_TITLE_LENGTH } from '../../src/state/work.mjs';
@@ -222,14 +222,6 @@ test('moveWork doing->done composes a learning record reflecting the item\'s act
     id: 'learn-doing',
     actual: { outcome: 'pass', passed: true, attempts: 2, errorClass: null, aheadCount: 0, visits: 1 },
   });
-  addFriction(dir, {
-    id: 'learn-doing',
-    disposition: 'parked',
-    errorClass: 'verify-miss',
-    layer: 'verification',
-    attempts: 1,
-    detail: 'first miss',
-  });
 
   // done's one remaining door in is cleanup->done (work-item-status-
   // delivered-retrospective-cleanup D1) — walk the sequential chain to it.
@@ -243,7 +235,6 @@ test('moveWork doing->done composes a learning record reflecting the item\'s act
   assert.equal(records.length, 1);
   const record = records[0];
   assert.deepEqual(record.outcome, { disposition: 'pass', attempts: 2, errorClass: null });
-  assert.deepEqual(record.frictions, { verification: 1 });
   assert.deepEqual(record.settlements, { 'close/human': 1 });
   assert.equal(typeof record.ts, 'string');
 });
@@ -282,7 +273,7 @@ test('moveWork to done for an item with no outcome and no friction still produce
 
   const record = view.learnings['learn-empty'][0];
   assert.equal(record.outcome, null, 'no outcome recorded -> null, never fabricated');
-  assert.deepEqual(record.frictions, {}, 'no friction -> empty group, not omitted');
+  assert.equal('frictions' in record, false, 'learning.frictions removed per F5');
   // The close transition itself IS a settlement (per phase-3-compound-learning-5)
   // — it is never possible for `settlements` to be empty on a learning
   // record, since reaching `done` always settles at least the close.
@@ -451,38 +442,20 @@ test('addOutcome accepts a docType tag of any of the four Diataxis quadrants', (
   }
 });
 
-test('addFriction accepts a docType tag of any of the four Diataxis quadrants', () => {
-  const dir = tmpDir();
-  for (const docType of DIATAXIS_QUADRANTS) {
-    addSampleWork(dir, `friction-doctype-${docType}`);
-    const { view } = addFriction(dir, { id: `friction-doctype-${docType}`, docType, disposition: 'parked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'x' });
-    const records = view.frictions[`friction-doctype-${docType}`];
-    assert.equal(records[records.length - 1].docType, docType);
-  }
-});
-
-test('addOutcome and addFriction stay valid when docType is absent or explicitly null (untagged)', () => {
+test('addOutcome stays valid when docType is absent or explicitly null (untagged)', () => {
   const dir = tmpDir();
   addSampleWork(dir, 'outcome-untagged');
-  addSampleWork(dir, 'friction-untagged');
 
   const { view: v1 } = addOutcome(dir, { id: 'outcome-untagged', predicted: { tier: 'standard', deps: 0, priorVisits: 0 } });
   assert.equal('docType' in v1.outcomes['outcome-untagged'], false, 'absent docType is never fabricated onto the folded record');
 
   const { view: v2 } = addOutcome(dir, { id: 'outcome-untagged', docType: null, actual: { outcome: 'pass', passed: true, attempts: 1, errorClass: null, aheadCount: 0, visits: 1 } });
   assert.equal(v2.outcomes['outcome-untagged'].docType, null, 'an explicit null is accepted and folds through as null');
-
-  const { view: v3 } = addFriction(dir, { id: 'friction-untagged', disposition: 'parked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'x' });
-  assert.equal('docType' in v3.frictions['friction-untagged'][0], false);
-
-  const { view: v4 } = addFriction(dir, { id: 'friction-untagged', docType: null, disposition: 'halted', errorClass: 'worker-timeout', layer: 'environment', attempts: 1, detail: 'y' });
-  assert.equal(v4.frictions['friction-untagged'][1].docType, null);
 });
 
-test('addOutcome and addFriction reject a docType outside the four Diataxis quadrants — non-quadrant string, empty/whitespace, and non-string', () => {
+test('addOutcome rejects a docType outside the four Diataxis quadrants — non-quadrant string, empty/whitespace, and non-string', () => {
   const dir = tmpDir();
   addSampleWork(dir, 'outcome-bad-doctype');
-  addSampleWork(dir, 'friction-bad-doctype');
 
   const badValues = ['pattern', '', '   ', 42, true, {}];
   for (const docType of badValues) {
@@ -490,28 +463,18 @@ test('addOutcome and addFriction reject a docType outside the four Diataxis quad
       () => addOutcome(dir, { id: 'outcome-bad-doctype', docType, predicted: { tier: 'standard', deps: 0, priorVisits: 0 } }),
       /docType.*must be one of/,
     );
-    assert.throws(
-      () => addFriction(dir, { id: 'friction-bad-doctype', docType, disposition: 'parked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'x' }),
-      /docType.*must be one of/,
-    );
   }
-  // Neither rejected call left a partial event behind.
   assert.equal(listWork(dir).outcomes?.['outcome-bad-doctype'], undefined);
-  assert.equal(listWork(dir).frictions?.['friction-bad-doctype'], undefined);
 });
 
-test('a docType-tagged outcome AND friction survive an independent rebuild of the view from the log (zero replay.mjs mechanism change)', () => {
+test('a docType-tagged outcome survives an independent rebuild of the view from the log', () => {
   const dir = tmpDir();
   addSampleWork(dir, 'replay-survival');
 
   addOutcome(dir, { id: 'replay-survival', docType: 'how-to', predicted: { tier: 'standard', deps: 0, priorVisits: 0 } });
-  addFriction(dir, { id: 'replay-survival', docType: 'reference', disposition: 'parked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'x' });
 
-  // A fresh, independent rebuild from the on-disk log — not the write call's
-  // own returned view — is the actual replay-survival proof.
   const rebuilt = listWork(dir);
   assert.equal(rebuilt.outcomes['replay-survival'].docType, 'how-to', 'tagged outcome retains docType after rebuild');
-  assert.equal(rebuilt.frictions['replay-survival'][0].docType, 'reference', 'tagged friction retains docType after rebuild');
 });
 
 // --- cycle guard at the write door (work-graph-intelligence S1) -----------

@@ -25,12 +25,11 @@ export const FGOS_FILE = {
   GUARD_MARK: 'guardMark',
   APPROVE_FAULT_LOG: 'approveFaultLog',
   MAIN_CHECKOUT_GUARD_WARNINGS: 'mainCheckoutGuardWarnings',
-  CHANGELOG_NAG_HISTORY: 'changelogNagHistory',
-  ENTROPY_HISTORY: 'entropyHistory',
   INVOCATION_FAULTS: 'invocationFaults',
   COORDINATION_SCHEMA_FAULTS: 'coordinationSchemaFaults',
   CLAIMS_DIR: 'claimsDir',
   CLAIMS_LOCK: 'claimsLock',
+  OBSERVE_DIR: 'observeDir',
 };
 
 const FGOS_FILE_RESOLVERS = {
@@ -39,12 +38,11 @@ const FGOS_FILE_RESOLVERS = {
   [FGOS_FILE.GUARD_MARK]: (fgosDir) => path.join(fgosDir, 'runtime', 'events-jsonl.truncation-guard.json'),
   [FGOS_FILE.APPROVE_FAULT_LOG]: (fgosDir) => path.join(fgosDir, 'logs', 'approve-post-success-faults.jsonl'),
   [FGOS_FILE.MAIN_CHECKOUT_GUARD_WARNINGS]: (fgosDir) => path.join(fgosDir, 'logs', 'main-checkout-guard-warnings.jsonl'),
-  [FGOS_FILE.CHANGELOG_NAG_HISTORY]: (fgosDir) => path.join(fgosDir, 'logs', 'changelog-nag-history.jsonl'),
-  [FGOS_FILE.ENTROPY_HISTORY]: (fgosDir) => path.join(fgosDir, 'logs', 'entropy-history.jsonl'),
   [FGOS_FILE.INVOCATION_FAULTS]: (fgosDir) => path.join(fgosDir, 'logs', 'invocation-faults.jsonl'),
   [FGOS_FILE.COORDINATION_SCHEMA_FAULTS]: (fgosDir) => path.join(fgosDir, 'logs', 'coordination-schema-faults.jsonl'),
   [FGOS_FILE.CLAIMS_DIR]: (fgosDir) => path.join(fgosDir, 'runtime', 'claims'),
   [FGOS_FILE.CLAIMS_LOCK]: (fgosDir) => path.join(fgosDir, 'runtime', 'claims.lock'),
+  [FGOS_FILE.OBSERVE_DIR]: (fgosDir) => path.join(fgosDir, 'observe'),
 };
 
 /**

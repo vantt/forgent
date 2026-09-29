@@ -27,7 +27,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, execSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf, parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, recordFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf, parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
 import { resolveDocPath } from '../src/report/knowledge-resolver.mjs';
 import { resolveDocId } from '../src/state/knowledge-registry.mjs';
 import { computeKnowledgeProjection } from '../src/report/knowledge-projection.mjs';
@@ -46,7 +46,6 @@ import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfigForDir, loadRunnerConfigFromDir, RunnerConfigError, runDispatchCli, DispatchError } from '../src/runner/dispatch.mjs';
 import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
 import { checkDispatchAttestation } from '../src/runner/attestation-guard.mjs';
-import { classifyDispatchConfidence } from '../src/report/dispatch-confidence.mjs';
 import { formatDeprecation } from '../src/cli/deprecation.mjs';
 import { lintPlanCapabilityAnnotations } from '../src/report/capability-plan-lint.mjs';
 import { matchCapability, deriveForm, CapabilityMatchError } from '../src/runner/capability-match.mjs';
@@ -65,18 +64,17 @@ import { resolveFgosFile, FGOS_FILE } from '../src/state/fgos-file-registry.mjs'
 import { resolveCliVersionInfo } from '../src/cli/version.mjs';
 import { hasRealVerify } from '../src/intake/discovery.mjs';
 import { replaceLockedDecisionsSection, resolveContentRoot } from '../src/intake/plan.mjs';
-import { computeEntropy, computeCounts, FINAL_STATUSES } from '../src/report/entropy.mjs';
 import { findSourceCaptureIds } from '../src/report/enduser-index.mjs';
 import { generateEnduserDocsIndex } from '../src/report/enduser-index-generate.mjs';
-import { rankCandidates } from '../src/evolve/candidates.mjs';
 import { rankImpact } from '../src/state/impact.mjs';
+import { FINAL_STATUSES } from '../src/state/work.mjs';
 import { isResolvedStatus } from '../src/state/frontier.mjs';
 import { readClaim, releaseClaim } from '../src/state/runtime-coordination.mjs';
 import { paginate } from '../src/state/cursor.mjs';
 import { runGoalCheck, detachedWorktreeFgosHint, runInvariantChecks, invariantFailureAsCheck } from '../src/runner/goal-check.mjs';
 import { frozenJudgeHits, footprintDiffHits } from '../src/runner/frozen-judge.mjs';
 import { normalizePath } from '../src/util/normalize-path.mjs';
-import { collectOutcomeEntry, collectFrictionData } from '../src/report/item-trace.mjs';
+import { collectOutcomeEntry } from '../src/report/item-trace.mjs';
 import { cleanupMergedBranch, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, buildOwnFileSet } from '../src/runner/merge.mjs';
 import { assertSafeMainCheckoutReset } from '../src/runner/main-checkout-reset-guard.mjs';
 import { rejectUseCase } from '../src/verbs/merge/reject.mjs';
@@ -290,7 +288,7 @@ function excludeIronLawEvidence(files, id) {
 // moved under this gitignored bucket -- kept here too since this regex is
 // evaluated against whatever path list a caller hands it, not only
 // `git diff --name-only` (which would never surface an ignored path).
-const FGOS_NOISE_ONLY_PATHS = /^\.fgos\/(events\.jsonl(\.backup-.*)?|events\/.*\.jsonl|events\/archive\/.*|logs\/.*|entropy-history\.jsonl|events-jsonl\.truncation-guard\..*|main-checkout-guard-warnings\..*)$/;
+const FGOS_NOISE_ONLY_PATHS = /^\.fgos\/(events\.jsonl(\.backup-.*)?|events\/.*\.jsonl|events\/archive\/.*|logs\/.*|observe\/.*|events-jsonl\.truncation-guard\..*|main-checkout-guard-warnings\..*)$/;
 function excludeFgosPaths(files) {
   return files.filter((f) => !FGOS_NOISE_ONLY_PATHS.test(normalizePath(f)));
 }
@@ -731,142 +729,6 @@ function collectMissingOutcomeNag(view, id) {
   return { count: missing.length, ids: missing };
 }
 
-// tsk-3ip (docs/history/automated-changelog-compound-learn/DISCUSSION.md
-// §6.1/§6.4): observe/remind only, never blocks merge (R2, tsk-28x §6.4).
-// `unreleasedHasEntries` (registrations.mjs) is the same structural read
-// the `changelog-unreleased-stale` doctor check uses, so both surfaces
-// agree on what "has an entry" means.
-function changelogNagHistoryPath(dir) {
-  return resolveFgosFile(dir, FGOS_FILE.CHANGELOG_NAG_HISTORY);
-}
-
-// Appends one snapshot per `check` run — same append-only, never-read-back
-// discipline `appendHistoryEntry` (entropy, below) already uses. This file
-// is the item's own required "bộ đếm": raw {ts, hasEntries, deliveredCount}
-// data points that, read back across N real runs spread over N real
-// merges, are what let a person later derive the three numbers the item's
-// description says are currently guesses. This function only records the
-// data point — it never computes a rate itself ("đếm, đừng mắng").
-function appendChangelogNagHistoryEntry(dir, entry) {
-  const logPath = changelogNagHistoryPath(dir);
-  fs.mkdirSync(path.dirname(logPath), { recursive: true });
-  fs.appendFileSync(logPath, `${JSON.stringify(entry)}\n`, 'utf8');
-}
-
-function collectChangelogNag(view, dir) {
-  const root = path.dirname(dir);
-  const changelogPath = path.join(root, 'CHANGELOG.md');
-  if (!fs.existsSync(changelogPath)) {
-    return { fileExists: false };
-  }
-  const content = fs.readFileSync(changelogPath, 'utf8');
-  const hasEntries = unreleasedHasEntries(content);
-  const deliveredCount = Object.values(view.work ?? {}).filter((w) => w.status === 'delivered').length;
-  appendChangelogNagHistoryEntry(dir, { ts: new Date().toISOString(), hasEntries, deliveredCount });
-  return { fileExists: true, hasEntries, deliveredCount };
-}
-
-// Entropy-trend history path (per this cell's action (2) / must_haves: MUST
-// live in the SAME data dir as the store's own events.jsonl — never
-// hardcoded to `repo/.fgos`). `dir` here is always the caller's resolved
-// data dir (dataDir() below, or a test's own tmp dir), the exact same value
-// every other verb in this file already threads through to store.mjs.
-function entropyHistoryPath(dir) {
-  return resolveFgosFile(dir, FGOS_FILE.ENTROPY_HISTORY);
-}
-
-// Reads only the LAST line of the trend history (the one prior checkpoint
-// entropy/seal-digest compare against) — never the whole file, and never
-// throws on a missing file/dir (mirrors readEvents' missing-log contract in
-// events.mjs): no history yet reads as `null`, the "baseline" case.
-function readLastHistoryEntry(dir) {
-  let raw;
-  try {
-    raw = fs.readFileSync(entropyHistoryPath(dir), 'utf8');
-  } catch (err) {
-    if (err.code === 'ENOENT') return null;
-    throw err;
-  }
-  const lines = raw.split('\n').filter(Boolean);
-  // Walk backwards to the last COMPLETE (parseable) line. A crash or a partial
-  // append can leave a torn final line; the last valid checkpoint is whatever
-  // precedes it. One truncated line must never throw the whole `check` over —
-  // the same "absent/corrupt data reads as the baseline, never a crash"
-  // tolerance the missing-file branch above already gives.
-  for (let i = lines.length - 1; i >= 0; i--) {
-    try {
-      return JSON.parse(lines[i]);
-    } catch {
-      // torn/partial line — fall back to the previous one
-    }
-  }
-  return null;
-}
-
-// Appends exactly one history line per `check` run — same
-// append-then-nothing-else discipline as events.mjs's appendEvent, but this
-// file (unlike events.jsonl/state.json) is new per this cell and never
-// read by store.mjs/replay.mjs. Only ever called when collectEntropyData
-// has already confirmed there is work-state data to report on (below) —
-// so a `check` against an uninitialized dir never creates it.
-function appendHistoryEntry(dir, entry) {
-  const logPath = entropyHistoryPath(dir);
-  fs.mkdirSync(path.dirname(logPath), { recursive: true });
-  fs.appendFileSync(logPath, `${JSON.stringify(entry)}\n`, 'utf8');
-}
-
-// Entropy-trend + seal-digest data (per this cell's action (2)/(3)):
-// reported only when at least one work item exists — an empty view (no log
-// at all) returns null, keeping `check`'s existing "no data at all" contract
-// byte-identical (the same "absent data -> null" rule the friction/
-// settlement data already follow), rather than writing a zero-score
-// checkpoint into a directory that was never initialized. `compounded` always
-// carries every channel's raw delta since the last checkpoint (never
-// suppressed for a zero value) — the caller decides what is worth surfacing.
-function collectEntropyData(view, dir) {
-  if (Object.keys(view.work ?? {}).length === 0) {
-    return null;
-  }
-  const { score, parts } = computeEntropy(view);
-  const counts = computeCounts(view);
-  const prev = readLastHistoryEntry(dir);
-  appendHistoryEntry(dir, { ts: new Date().toISOString(), score, counts });
-
-  const trend = prev ? { baseline: false, delta: score - prev.score } : { baseline: true, delta: null };
-  const prevCounts = prev?.counts ?? { outcomes: 0, frictions: 0, settlements: 0 };
-  const compounded = {
-    outcomes: counts.outcomes - prevCounts.outcomes,
-    frictions: counts.frictions - prevCounts.frictions,
-    settlements: counts.settlements - prevCounts.settlements,
-  };
-  return { score, trend, parts: parts.filter((p) => p.count > 0), counts, compounded };
-}
-
-// Read-only data collector (per D1 request-class): folds `view.outcomes`
-// (lazy key — absent on any log with no work.outcome events, per replay.mjs)
-// plus the friction/settlement/learning/nag/entropy channels above into one
-// predicted-vs-actual report. Never throws on missing data — an item with no
-// outcome yet, or a log with no `outcomes` key at all, both return an empty
-// outcomes list and the caller still exits 0 (this is a read, not a
-// validation failure).
-function collectCheckData(view, id, dir) {
-  const outcomes = view.outcomes ?? {};
-  const ids = id ? [id] : Object.keys(outcomes);
-  return {
-    outcomes: ids.map((itemId) => collectOutcomeEntry(itemId, outcomes[itemId])),
-    friction: collectFrictionData(view, id),
-    settlement: collectSettlementData(view, id),
-    learning: collectLearningData(view, id),
-    missingOutcomeNag: collectMissingOutcomeNag(view, id),
-    // Changelog observe/remind nag (tsk-3ip): a whole-work-state summary,
-    // not scoped to `id`, same as `entropy` below.
-    changelogNag: collectChangelogNag(view, dir),
-    // Entropy-trend + seal-digest: a whole-work-state summary, not scoped to
-    // `id` like the fields above — it reports on the learning area as a
-    // whole even when `check <id>` was called for one item.
-    entropy: collectEntropyData(view, dir),
-  };
-}
 
 // Rollup view (P24): direct children only (`w.parent === id`) — decompose
 // (P16) is a single-level split, a root's own children never carry further
@@ -1043,26 +905,6 @@ function submitWork(dir, text, opts = {}) {
   };
   const { event } = addWork(dir, work);
   return event.payload;
-}
-
-// Composes the human-readable description `evolve --submit` hands to
-// submitWork (self-improve-loop D15) from a ranked candidate object (the
-// exact shape `candidates.mjs`'s rankCandidates returns — id/disposition/
-// errorClass/layer/detail/attempts/score). Any field that is null/undefined
-// is omitted rather than printing the literal string "undefined".
-function describeCandidate(candidate) {
-  const meta = [];
-  if (candidate.disposition != null) meta.push(candidate.disposition);
-  const bracket = [candidate.errorClass != null ? candidate.errorClass : null, candidate.layer != null ? `layer ${candidate.layer}` : null].filter(Boolean);
-  if (bracket.length > 0) meta.push(`(${bracket.join(', ')})`);
-  if (candidate.attempts != null) meta.push(`${candidate.attempts} attempt(s)`);
-
-  let description = `Self-improve candidate ${candidate.id}`;
-  description += meta.length > 0 ? `: ${meta.join(' ')}.` : '.';
-  if (candidate.detail != null && candidate.detail !== '') {
-    description += ` ${candidate.detail}`;
-  }
-  return description;
 }
 
 async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slice(3)) {
@@ -1413,7 +1255,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         for (const [doorName, findings] of Object.entries(doors)) {
           if (findings.length === 0) continue;
           doorFindings[doorName] = findings.length;
-          addFriction(dir, {
+          recordFriction(dir, {
+            producer: 'bin.fgos.retrospective',
             id: item.id,
             disposition: 'advisory',
             errorClass: `retrospective-door-${doorName}`,
@@ -2258,7 +2101,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         decisions: rawView.decisionsById?.[id] ?? [],
         gates: rawView.gates?.[id] ?? null,
         outcome: collectOutcomeEntry(id, rawView.outcomes?.[id]),
-        friction: collectFrictionData(rawView, id),
+        friction: null,
         settlement: collectSettlementData(rawView, id),
         learning: collectLearningData(rawView, id),
       };
@@ -2411,11 +2254,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       return { id, stopReason: stopReason ?? null, seq: event.seq };
     }
 
-    case 'dispatch-report': {
-      const id = optionalField(positional[0] ?? flags.id, 'dispatch-report [id]');
-      return classifyDispatchConfidence(dir, { id });
-    }
-
     case 'conflicts': {
       // tsk-4zj D7: footprintConflicts' candidate set now spans multiple
       // stages (tsk-4so's frontierAcrossSteps), so stageEffective is real
@@ -2436,39 +2274,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       return { conflicts, stageByItem };
     }
 
-    // tsk-1wdf: the machine-readable read surface D6 (tsk-5z0) left as
-    // follow-on work -- `recordInvocationFault` writes .fgos/invocation-
-    // faults.jsonl, this reads it back. `resolveFaultLogPath` already
-    // falls back to the main checkout's own store when `dir` doesn't exist
-    // (D5 -- the exact worktree-safety fallback this verb needs too), so
-    // this is deliberately absent from STORE_MISSING_WARNING_VERBS below:
-    // unlike `list`/`stale`, a worktree session with no --dir still reads
-    // the real log correctly here, so warning about "may be empty" would
-    // be actively misleading (same reasoning as docs-index's exclusion).
-    case 'faults': {
-      // Validated before the (possibly early, no-log) return below, so a
-      // malformed --limit is refused the same way regardless of whether
-      // any fault has ever been recorded yet.
-      const rawLimit = optionalField(flags.limit, 'faults --limit requires a positive integer value');
-      let limit;
-      if (rawLimit !== undefined) {
-        limit = Number(rawLimit);
-        if (!Number.isInteger(limit) || limit <= 0) {
-          throw new StoreError('validation', 'faults --limit requires a positive integer value');
-        }
-      }
-      const logPath = resolveFaultLogPath(dir, process.cwd());
-      if (!logPath || !fs.existsSync(logPath)) {
-        return { path: logPath, count: 0, records: [] };
-      }
-      const records = fs
-        .readFileSync(logPath, 'utf8')
-        .split('\n')
-        .filter(Boolean)
-        .map((line) => JSON.parse(line));
-      const mostRecent = limit === undefined ? records : records.slice(-limit);
-      return { path: logPath, count: records.length, records: mostRecent };
-    }
 
     // Read-only, report-only (tsk-597z): re-runs checkMergeStillResolves
     // LIVE against every current status:blocked item -- the same live
@@ -3366,16 +3171,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       return { logPath, backupPath, eventCount, droppedLine };
     }
 
-    // Request-class per D1 (same contract as `ready`/`list`): a pure read,
-    // never appends an event, never mutates state.json. Reports the
-    // predicted-vs-actual compound-learning signal (per Phase 3 plan
-    // Approach S1) folded from `listWork(dir).outcomes` — no new store
-    // export needed for reading, per this cell's action.
-    case 'check': {
-      const id = optionalField(positional[0] ?? flags.id, 'check --id requires a non-empty id value (omit --id entirely to check every item)');
-      return collectCheckData(listWork(dir), id, dir);
-    }
-
     // Rollup view theo bộ (P24, request-class per D1: a pure read — never
     // appends an event, never mutates state.json, same contract as
     // `check`/`ready`/`list`). Prints one root item (title/status) plus a
@@ -3758,7 +3553,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           role: item.claimRole ?? 'session',
         });
         addOutcome(dir, { id, actual: { outcome: 'blocked', passed: false, attempts: 1, errorClass: reason } });
-        addFriction(dir, {
+        recordFriction(dir, {
+          producer: 'bin.fgos.return',
           id,
           disposition: 'blocked',
           errorClass: reason,
@@ -3806,7 +3602,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const attestation = checkDispatchAttestation(dir, repoRoot, id, branch);
         if (!attestation.ok) {
           settleClaim(dir, { id, claimId: activeClaim?.claimId, finalStatus: 'blocked', reason: attestation.reason, role: item.claimRole ?? 'session' });
-          addFriction(dir, {
+          recordFriction(dir, {
+            producer: 'bin.fgos.return',
             id,
             disposition: 'blocked',
             errorClass: attestation.reason,
@@ -3933,7 +3730,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           // of a real verify failure (per the tsk-53o comment above), so it
           // gets no hint either.
           const hint = check.timedOut ? null : detachedWorktreeFgosHint(check.output);
-          addFriction(dir, {
+          recordFriction(dir, {
+            producer: 'bin.fgos.return',
             id,
             disposition: 'blocked',
             errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss',
@@ -4072,7 +3870,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         // the branch-source path above (tsk-53o: a timeout is not proof of
         // a real verify failure).
         const hint = check.timedOut ? null : detachedWorktreeFgosHint(check.output);
-        addFriction(dir, {
+        recordFriction(dir, {
+          producer: 'bin.fgos.return',
           id,
           disposition: 'blocked',
           errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss',
@@ -4229,49 +4028,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     }
 
     // Gate A — candidate ranking (self-improve-loop P13 Slice 1, D1/D3/D6):
-    // two-shot, flag-driven, NEVER an interactive stdin loop (D11). `fgos
-    // evolve` (no --pick) ranks every id with unsettled friction and prints
-    // the full list; `fgos evolve --pick <id>` reprints that candidate's
-    // full friction record. Request-class per D1 (same contract as
-    // `ready`/`list`/`check`): reads the view via `listWork` ONLY — never
-    // `rebuild`/`rebuild`-adjacent writers — so a run never appends an
-    // event or touches state.json. Running with no `--pick` IS the "stop"
-    // outcome (D6); there is no separate cancel input and no re-prompt on a
-    // bad `--pick` id (D11) — an unmatched id is a clean validation error.
-    case 'evolve': {
-      const pickId = optionalField(flags.pick, 'evolve --pick requires a non-empty candidate id value (omit --pick entirely to list every candidate)');
-      // Per D15: `--submit <id>` is the only mutating action across the
-      // whole evolve/Gate A surface — `evolve` (no flag) and `evolve --pick`
-      // above are unchanged from Slice 1.
-      const submitId = optionalField(flags.submit, 'evolve --submit requires a non-empty candidate id value');
-      const view = listWork(dir);
-      const candidates = rankCandidates(view);
-      if (submitId !== undefined) {
-        const picked = candidates.find((c) => c.id === submitId);
-        if (!picked) {
-          throw new StoreError(
-            'validation',
-            `evolve --submit: "${submitId}" is not an open candidate — run "fgos evolve" to see the current ranked list.`,
-          );
-        }
-        return submitWork(dir, describeCandidate(picked));
-      }
-      if (pickId === undefined) {
-        return paginateVerbResult(candidates, flags, 'evolve-v1', 'evolve');
-      }
-      const picked = candidates.find((c) => c.id === pickId);
-      if (!picked) {
-        throw new StoreError(
-          'validation',
-          `evolve --pick: "${pickId}" is not an open candidate — run "fgos evolve" to see the current ranked list.`,
-        );
-      }
-      // Reuses the existing friction-record collector (collectFrictionData
-      // above) rather than a new one — the picked candidate's "full record"
-      // IS that id's friction data.
-      return collectFrictionData(view, pickId);
-    }
-
     // Backlog-triage impact ranking (P21) — separate from P14's intake-time
     // risk/lane classification: this ranks open work by blocking fan-out
     // (how many other open items it unblocks), not by how risky it is.
@@ -4893,7 +4649,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|item|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|sync-root|reject|catchup|evolve|triage|session|gateway|goal|tool|setup|doctor|unlock|lock-status|main-checkout-reset> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|item|ask|answer|decision|list|ready|rebuild|repair|rollup|take|return|review|approve|sync-root|reject|catchup|triage|session|gateway|goal|tool|setup|doctor|unlock|lock-status|main-checkout-reset> ...`);
   }
 }
 
@@ -5123,7 +4879,7 @@ function renderPretty(verb, data) {
 // own hard refusal instead of a soft warning.
 const STORE_MISSING_WARNING_VERBS = new Set([
   'list', 'ready', 'graph', 'stale', 'check', 'rollup', 'show', 'conflicts', 'triage', 'schedule',
-  'gate-bypass', 'doc-sources', 'lock-status', 'evolve', 'recheck-blocked',
+  'gate-bypass', 'doc-sources', 'lock-status', 'recheck-blocked',
 ]);
 
 // State/root-resolution investigation (docs/history/agent-coordination-state-root):
@@ -5224,7 +4980,6 @@ const MUTATING_SUBCOMMAND_PREDICATES = {
     'fan-out', 'contribution', 'human-turn', 'disposition', 'specialist-authorize',
   ].includes(positional[0]) || (positional[0] === 'recover' && flags.action !== undefined),
   merge: (positional) => positional[0] === 'next',
-  evolve: (positional, flags) => flags.submit !== undefined,
   // `dispatch show-run`/`watch` never write; `dispatch recover` writes
   // (controlEpoch bump + one recovery-commands.jsonl line) only when
   // --action is given -- the bare observe form stays read-only.
@@ -5281,6 +5036,10 @@ async function main() {
     // check: refuse when `cwd` is a linked worktree, the one remaining
     // path that could recreate a live `.fgos/` there and defeat ADR0020.
     const entry = COMMAND_REGISTRY.find((e) => e.name === verb);
+    if (entry?.nativeOnly) {
+      process.stderr.write(`fgos: "${verb}" chỉ có ở Rust host.\n`);
+      process.exit(4);
+    }
     faultClass = 'store-missing';
     if (entry?.requiresExistingStore && !fs.existsSync(dir)) {
       throw new StoreError(

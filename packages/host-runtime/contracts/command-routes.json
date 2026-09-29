@@ -62,15 +62,6 @@
       "test/rust-host/command-routes.test.mjs"
     ]
   },
-  "check": {
-    "selector": "check",
-    "route_kind": "legacy-cli",
-    "legacy_payload": "legacy-node",
-    "owner_path": "src/cli/command-registry.mjs",
-    "compatibility_tests": [
-      "test/rust-host/command-routes.test.mjs"
-    ]
-  },
   "cleanup": {
     "selector": "cleanup",
     "route_kind": "legacy-cli",
@@ -152,15 +143,6 @@
       "test/rust-host/command-routes.test.mjs"
     ]
   },
-  "dispatch-report": {
-    "selector": "dispatch-report",
-    "route_kind": "legacy-cli",
-    "legacy_payload": "legacy-node",
-    "owner_path": "src/cli/command-registry.mjs",
-    "compatibility_tests": [
-      "test/rust-host/command-routes.test.mjs"
-    ]
-  },
   "doc": {
     "selector": "doc",
     "route_kind": "legacy-cli",
@@ -215,23 +197,15 @@
       "test/rust-host/command-routes.test.mjs"
     ]
   },
-  "evolve": {
-    "selector": "evolve",
-    "route_kind": "legacy-cli",
-    "legacy_payload": "legacy-node",
-    "owner_path": "src/cli/command-registry.mjs",
+  "friction": {
+    "selector": "friction",
+    "route_kind": "native",
+    "operation_id": "observe.friction",
+    "owner_path": "packages/observe/rust",
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
-    ]
-  },
-  "faults": {
-    "selector": "faults",
-    "route_kind": "legacy-cli",
-    "legacy_payload": "legacy-node",
-    "owner_path": "src/cli/command-registry.mjs",
-    "compatibility_tests": [
-      "test/rust-host/command-routes.test.mjs"
-    ]
+    ],
+    "subcommands": true
   },
   "gate-approve": {
     "selector": "gate-approve",
@@ -358,6 +332,16 @@
     "compatibility_tests": [
       "test/rust-host/command-routes.test.mjs"
     ]
+  },
+  "metrics": {
+    "selector": "metrics",
+    "route_kind": "native",
+    "operation_id": "observe.metrics",
+    "owner_path": "packages/observe/rust",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ],
+    "subcommands": true
   },
   "move": {
     "selector": "move",

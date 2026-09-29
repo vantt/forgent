@@ -20,8 +20,6 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..
 const MOVED_BASENAMES = [
   'approve-post-success-faults.jsonl',
   'main-checkout-guard-warnings.jsonl',
-  'changelog-nag-history.jsonl',
-  'entropy-history.jsonl',
   'invocation-faults.jsonl',
 ];
 

@@ -5,6 +5,9 @@ members = [
     "packages/host-runtime/rust",
     "packages/distribution/rust",
     "packages/work-state/rust",
+    "packages/observe/rust",
+    "packages/run-result/rust",
+    "packages/coordination-state/rust",
 ]
 exclude = [
     "herdr-plugin",
