@@ -737,7 +737,7 @@ export function applyKnowledgeEvent(view, event) {
     // already seeds from bootstrap (docs/architect/...md §7.2's own
     // example schema) -- one array of every capture that has ever
     // justified this doc's content, never overwritten, mirroring
-    // `work.friction`'s own accumulate-never-replace fold rule.
+    // an accumulate-never-replace fold rule.
     case 'doc.attest': {
       const { docId, topicId, role, captureId } = payload;
       const id = resolveDocId(view, { docId, topicId, role });

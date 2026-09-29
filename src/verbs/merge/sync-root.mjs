@@ -10,7 +10,7 @@
 // Unlike `approve`'s root-into-main path, this never deletes fgw/<id>
 // afterward: the root stays open for further leaf merges.
 import { execFileSync } from 'node:child_process';
-import { listWork, addDecision, addFriction, StoreError } from '../../state/store.mjs';
+import { listWork, addDecision, recordFriction, StoreError } from '../../state/store.mjs';
 import {
   mergeRunnerItem,
   withMergeTargetSlot,
@@ -108,7 +108,7 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
     const result = await runMerge(() => mergeRunnerItem(mergeRoot, itemOverride, lockRoot ? { timeoutMs, lockRoot, targetSlot } : { timeoutMs }));
 
     if (result.outcome === 'conflict') {
-      addFriction(dir, {
+      recordFriction(dir, {
         id,
         disposition: 'blocked',
         errorClass: 'merge-conflict',
@@ -119,7 +119,7 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
       return { id, mode: 'sync-root', outcome: 'blocked', reason: 'merge-conflict', target: targetBranch, branch };
     }
     if (result.outcome === 'fgos-write-rejected') {
-      addFriction(dir, {
+      recordFriction(dir, {
         id,
         disposition: 'blocked',
         errorClass: 'fgos-write-blocked',
@@ -131,7 +131,7 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
     }
     if (result.outcome === 'verify-fail') {
       // tsk-53o: a timeout is not proof the staged merge's verify failed.
-      addFriction(dir, {
+      recordFriction(dir, {
         id,
         disposition: 'blocked',
         errorClass: result.check.timedOut ? 'verify-timeout' : 'verify-miss',
@@ -160,7 +160,7 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
       const errText = result.error
         ? ` (exit ${result.error.status}): ${result.error.stderr || result.error.message}`
         : '';
-      addFriction(dir, {
+      recordFriction(dir, {
         id,
         disposition: 'blocked',
         errorClass: 'sync-root-unhandled-outcome',
@@ -224,7 +224,7 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
       if (!alreadyAncestor) {
         const catchupResult = await performCatchUp(repoRoot, id, item, targetBranch, timeoutMs);
         if (catchupResult.outcome === 'conflict') {
-          addFriction(dir, {
+          recordFriction(dir, {
             id,
             disposition: 'blocked',
             errorClass: 'merge-conflict',
@@ -235,7 +235,7 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
           return { id, mode: 'sync-root', outcome: 'blocked', reason: 'merge-conflict', target: targetBranch, branch, conflictedFiles: catchupResult.conflictedFiles };
         }
         if (catchupResult.outcome === 'merge-refused') {
-          addFriction(dir, {
+          recordFriction(dir, {
             id,
             disposition: 'blocked',
             errorClass: 'merge-fail',
@@ -246,7 +246,7 @@ export async function syncRootUseCase({ dir, repoRoot }, { id, resolveTimeoutMs,
           return { id, mode: 'sync-root', outcome: 'blocked', reason: 'merge-failed-unclassified', target: targetBranch, branch, detail: catchupResult.reason };
         }
         if (catchupResult.outcome === 'verify-fail') {
-          addFriction(dir, {
+          recordFriction(dir, {
             id,
             disposition: 'blocked',
             errorClass: catchupResult.timedOut ? 'verify-timeout' : 'verify-miss',

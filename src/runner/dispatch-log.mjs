@@ -9,8 +9,8 @@ import { resolveWriterLogPath } from '../state/store.mjs';
  *
  * Architectural Boundary Note (F3 / M10):
  * This is an in-session audit log exception into the Work event log
- * preserved for backward compatibility and evaluator confidence reporting
- * (`src/report/dispatch-confidence.mjs`). Dispatch core (`src/runner/dispatch/**`)
+ * preserved for backward compatibility and evaluator confidence reporting.
+ * Dispatch core (`src/runner/dispatch/**`)
  * does not reference `appendEvent` or Work lifecycle mutation verbs.
  */
 export function logExecutorDispatch(fgosDir, { id, executorId, provider, command, model, governance, plan, capability, mechanism, tier, fallbackReason, outcome }) {

@@ -48,6 +48,28 @@ pub const CATALOG: &[OperationDescriptor] = &[
         allowed_host_kinds: &["cli", "remote", "test"],
         streaming_mode: StreamingMode::None,
     },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("observe.metrics"),
+        owning_component_id: Cow::Borrowed("observe"),
+        request_contract: ContractRef::from_static("observe.metrics.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("observe.metrics.outcome", "1.0.0"),
+        effect: OperationEffect::Read,
+        idempotency: OperationIdempotency::Safe,
+        authority_policy_id: Cow::Borrowed("observe.read"),
+        allowed_host_kinds: &["cli", "remote"],
+        streaming_mode: StreamingMode::None,
+    },
+    OperationDescriptor {
+        operation_id: OperationId::from_static("observe.friction"),
+        owning_component_id: Cow::Borrowed("observe"),
+        request_contract: ContractRef::from_static("observe.friction.request", "1.0.0"),
+        outcome_contract: ContractRef::from_static("observe.friction.outcome", "1.0.0"),
+        effect: OperationEffect::Write,
+        idempotency: OperationIdempotency::None,
+        authority_policy_id: Cow::Borrowed("observe.write"),
+        allowed_host_kinds: &["cli", "remote"],
+        streaming_mode: StreamingMode::None,
+    },
 ];
 
 #[cfg(test)]
@@ -56,13 +78,14 @@ mod tests {
 
     #[test]
     fn catalog_contains_required_operations() {
-        assert_eq!(CATALOG.len(), 3);
+        assert_eq!(CATALOG.len(), 5);
         let ids: Vec<&str> = CATALOG.iter().map(|op| op.operation_id.as_str()).collect();
         assert!(ids.contains(&"distribution.build.show"));
         assert!(ids.contains(&"work.gate-bypass.show"));
         assert!(ids.contains(&"test.fixture.echo"));
+        assert!(ids.contains(&"observe.metrics"));
+        assert!(ids.contains(&"observe.friction"));
     }
-
     /// `OperationId::from_static` (used by every `CATALOG` entry, for
     /// const-context construction with no runtime allocation) skips
     /// `OperationId::parse`'s validation by design -- it is a trusted

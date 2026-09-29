@@ -100,7 +100,6 @@ const scopeSideLogsTo = (view, idSet) => ({
   gates: scopedByIds(view.gates, idSet),
   settlements: scopedByIds(view.settlements, idSet),
   outcomes: scopedByIds(view.outcomes, idSet),
-  frictions: scopedByIds(view.frictions, idSet),
   learnings: scopedByIds(view.learnings, idSet),
   decisionsById: scopedByIds(view.decisionsById, idSet),
 });
@@ -135,7 +134,7 @@ export function listUseCase({ dir }, { id, fields, all = false, cursor, limit } 
       }
       const {
         decisions, discovery, gates, settlements, outcomes,
-        frictions, learnings, decisionsById, callThreads,
+        learnings, decisionsById, callThreads,
         ...restView
       } = rawView;
       const singleView = {
@@ -158,7 +157,6 @@ export function listUseCase({ dir }, { id, fields, all = false, cursor, limit } 
       gates: scopedById(rawView.gates),
       settlements: scopedById(rawView.settlements),
       outcomes: scopedById(rawView.outcomes),
-      frictions: scopedById(rawView.frictions),
       learnings: scopedById(rawView.learnings),
       decisionsById: scopedById(rawView.decisionsById),
       callThreads: scopedById(rawView.callThreads),

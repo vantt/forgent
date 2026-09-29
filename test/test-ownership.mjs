@@ -49,7 +49,6 @@ export const MANIFEST = [
   { id: 'report-entropy', status: 'shadow', pattern: 'src/report/entropy.mjs', directTests: ['test/report/entropy.test.mjs'], boundaryTests: [] },
   { id: 'report-frontmatter', status: 'shadow', pattern: 'src/report/frontmatter.mjs', directTests: ['test/report/frontmatter.test.mjs'], boundaryTests: [] },
   { id: 'report-knowledge-resolver', status: 'shadow', pattern: 'src/report/knowledge-resolver.mjs', directTests: ['test/report/knowledge-resolver.test.mjs'], boundaryTests: [] },
-  { id: 'report-dispatch-confidence', status: 'shadow', pattern: 'src/report/dispatch-confidence.mjs', directTests: [], boundaryTests: ['test/runner/dispatch.test.mjs'] },
   { id: 'report-enduser-index-generate', status: 'shadow', pattern: 'src/report/enduser-index-generate.mjs', directTests: [], boundaryTests: ['test/report/enduser-index.test.mjs'] },
   { id: 'report-knowledge-projection', status: 'shadow', pattern: 'src/report/knowledge-projection.mjs', directTests: [], boundaryTests: ['test/setup/knowledge-doctor.test.mjs'] },
   // src/report/item-trace.mjs intentionally NOT listed: no direct or

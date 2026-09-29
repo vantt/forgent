@@ -1,7 +1,7 @@
 ---
-authoritative_for: the `fgos dispatch-report [id]` read-only CLI verb and `src/report/dispatch-confidence.mjs`, which classify recorded dispatch results into a confidence ladder (`reported` | `legacy-signal` | `inferred` | `missing`) from `.fgos/events.jsonl` + `.fgos/logs/<id>.log` before any telemetry write was added
+authoritative_for: the historical `fgos dispatch-report [id]` read-only CLI verb and `src/report/dispatch-confidence.mjs` (retired and removed in Phase F4).
+status: deprecated
 ---
-
 # Reading dispatch result confidence before writing a telemetry field for it
 
 `tsk-1g6` built the production **read surface** for dispatch result

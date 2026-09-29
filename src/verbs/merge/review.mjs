@@ -34,7 +34,7 @@ export async function reviewUseCase({ dir, cwd }, { id, github, prNumber, ghComm
   // real GitHub PR for a runner-sourced item instead of printing the local
   // diff. Opt-in and additive — the flag's absence leaves the path below
   // byte-identical. Stays read-only on FSM state exactly like local review:
-  // a gh failure is reported as plain output, never a moveWork/addFriction.
+  // a gh failure is reported as plain output, never a moveWork/recordFriction.
   if (github) {
     const repoRoot = cwd;
     const source = classifySource(repoRoot, item);
@@ -47,7 +47,7 @@ export async function reviewUseCase({ dir, cwd }, { id, github, prNumber, ghComm
     // read-only. It classifies on `closed` (boolean) + `mergedAt` (null vs
     // timestamp) only — never on the `state` string, whose closed/merged
     // values S1's spike never observed. Like every review path it stays
-    // read-only: no moveWork/addFriction under any outcome, because a
+    // read-only: no moveWork/recordFriction under any outcome, because a
     // GitHub-side close is not itself an approval or reject action (D6);
     // only local `fgos reject` moves the item. pollTimeoutMs:0 is
     // load-bearing: this check reads only closed/mergedAt (unrelated to

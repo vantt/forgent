@@ -31,6 +31,7 @@ export const FGOS_FILE = {
   COORDINATION_SCHEMA_FAULTS: 'coordinationSchemaFaults',
   CLAIMS_DIR: 'claimsDir',
   CLAIMS_LOCK: 'claimsLock',
+  OBSERVE_DIR: 'observeDir',
 };
 
 const FGOS_FILE_RESOLVERS = {
@@ -45,6 +46,7 @@ const FGOS_FILE_RESOLVERS = {
   [FGOS_FILE.COORDINATION_SCHEMA_FAULTS]: (fgosDir) => path.join(fgosDir, 'logs', 'coordination-schema-faults.jsonl'),
   [FGOS_FILE.CLAIMS_DIR]: (fgosDir) => path.join(fgosDir, 'runtime', 'claims'),
   [FGOS_FILE.CLAIMS_LOCK]: (fgosDir) => path.join(fgosDir, 'runtime', 'claims.lock'),
+  [FGOS_FILE.OBSERVE_DIR]: (fgosDir) => path.join(fgosDir, 'observe'),
 };
 
 /**

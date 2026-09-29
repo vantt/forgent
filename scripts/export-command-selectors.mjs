@@ -288,8 +288,8 @@ export function generateCommandRoutes({ registry = COMMAND_REGISTRY, annotations
       ...(legacy_payload ? { legacy_payload } : {}),
       owner_path,
       compatibility_tests,
+      ...(ann?.subcommands !== undefined ? { subcommands: Boolean(ann.subcommands) } : {}),
     };
-
     routes[selector] = descriptor;
   }
 

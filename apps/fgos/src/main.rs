@@ -10,7 +10,7 @@
 mod cli_presenter;
 mod cli_projector;
 mod legacy_exec;
-
+mod wiring;
 use fgos_host_runtime::invocation_service::NoopEventSink;
 use fgos_host_runtime::{
     build_snapshot, EchoProvider, InvocationService, ProviderDescriptor, CATALOG,
@@ -35,6 +35,8 @@ pub struct CommandRouteDescriptor {
     pub operation_id: Option<String>,
     pub owner_path: String,
     pub compatibility_tests: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub subcommands: Option<bool>,
 }
 
 static ROUTES: OnceLock<HashMap<String, CommandRouteDescriptor>> = OnceLock::new();
@@ -52,14 +54,34 @@ static COMPOSITION_PROVIDERS: &[ProviderDescriptor] = &[
     ECHO_PROVIDER_DESCRIPTOR,
     fgos_distribution::DISTRIBUTION_BUILD_SHOW_DESCRIPTOR,
     fgos_work_state::WORK_GATE_BYPASS_SHOW_DESCRIPTOR,
+    fgos_observe::OBSERVE_METRICS_DESCRIPTOR,
+    fgos_observe::OBSERVE_FRICTION_DESCRIPTOR,
 ];
 
-fn main() {
-    // Check recursion guard immediately. Fails closed if already set.
-    if let Err(err) = legacy_exec::check_recursion_guard() {
-        eprintln!("fgos: error: {}", err);
-        std::process::exit(1);
+fn resolve_target_root(cli_args: &[std::ffi::OsString]) -> std::path::PathBuf {
+    for i in 0..cli_args.len() {
+        if let Some(s) = cli_args[i].to_str() {
+            if s == "--dir" && i + 1 < cli_args.len() {
+                return std::path::PathBuf::from(&cli_args[i + 1]);
+            }
+            if let Some(dir) = s.strip_prefix("--dir=") {
+                return std::path::PathBuf::from(dir);
+            }
+        }
     }
+    let cwd = std::env::current_dir().unwrap_or_else(|_| std::path::PathBuf::from("."));
+    let mut current = cwd.clone();
+    loop {
+        if current.join(".fgos").is_dir() {
+            return current;
+        }
+        if !current.pop() {
+            return cwd;
+        }
+    }
+}
+
+fn main() {
 
     let args: Vec<std::ffi::OsString> = std::env::args_os().collect();
     let cli_args = if args.len() > 1 { &args[1..] } else { &[] };
@@ -102,34 +124,112 @@ fn main() {
     service.register_provider(Arc::new(EchoProvider::new()));
     service.register_provider(Arc::new(fgos_distribution::BuildShowProvider::new()));
     service.register_provider(Arc::new(fgos_work_state::GateBypassShowProvider::new()));
+    service.register_provider(Arc::new(
+        fgos_observe::ObserveMetricsProvider::with_sources(
+            wiring::metrics_sources::build_metrics_sources(),
+        ),
+    ));
+    service.register_provider(Arc::new(
+        fgos_observe::ObserveFrictionProvider::with_legacy_sources(
+            wiring::friction_sources::build_legacy_friction_sources(),
+        ),
+    ));
     let tracker = service.tracker();
 
     match route.route_kind.as_str() {
         "legacy-cli" => {
+            // Check recursion guard immediately. Fails closed if already set.
+            if let Err(err) = legacy_exec::check_recursion_guard() {
+                eprintln!("fgos: error: {}", err);
+                std::process::exit(1);
+            }
             // Delegate to legacy-cli lane.
             legacy_exec::execute_legacy_cli(selector, &tracker, cli_args);
         }
         "native" => {
-            use std::io::IsTerminal;
-            if !std::io::stdin().is_terminal() {
-                use std::io::Read;
-                let _ = std::io::copy(
-                    &mut std::io::stdin().take(1024 * 1024),
-                    &mut std::io::sink(),
-                );
-            }
-
             let op_id_str = route
                 .operation_id
                 .as_deref()
                 .unwrap_or("distribution.build.show");
 
-            let (invocation, request) = cli_projector::project_cli_invocation(op_id_str, cli_args)
-                .unwrap_or_else(|err| {
-                    eprintln!("fgos: error: {}", err);
-                    std::process::exit(1);
-                });
+            if route.subcommands == Some(true) {
+                let (available, name) = if selector == "metrics" {
+                    (fgos_observe::metrics_cli::AVAILABLE_SUBCOMMANDS, "metrics")
+                } else {
+                    (fgos_observe::friction_cli::AVAILABLE_SUBCOMMANDS, "friction")
+                };
+                let sub_opt = if cli_args.len() > 1 {
+                    let s = cli_args[1].to_string_lossy();
+                    if !s.starts_with('-') && !s.is_empty() {
+                        Some(s.to_string())
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                };
+                match &sub_opt {
+                    Some(sub) if available.contains(&sub.as_str()) => {}
+                    Some(sub) => {
+                        eprintln!(
+                            "fgos: unknown {} subcommand \"{}\". Available: {}",
+                            name,
+                            sub,
+                            available.join(", ")
+                        );
+                        std::process::exit(4);
+                    }
+                    None => {
+                        eprintln!(
+                            "fgos: {} requires a subcommand. Available: {}",
+                            name,
+                            available.join(", ")
+                        );
+                        std::process::exit(4);
+                    }
+                }
+            }
 
+            let is_observe = op_id_str.starts_with("observe.");
+            let stdin_data = if is_observe {
+                use std::io::IsTerminal;
+                if !std::io::stdin().is_terminal() {
+                    use std::io::Read;
+                    let mut buf = Vec::new();
+                    let max_bytes = 1024 * 1024;
+                    let mut handle = std::io::stdin().take(max_bytes as u64 + 1);
+                    handle.read_to_end(&mut buf).unwrap_or_default();
+                    if buf.len() > max_bytes {
+                        eprintln!("fgos: error: stdin payload exceeds 1 MiB limit [stdin-overflow]");
+                        std::process::exit(4);
+                    }
+                    if !buf.is_empty() {
+                        Some(buf)
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                }
+            } else {
+                use std::io::IsTerminal;
+                if !std::io::stdin().is_terminal() {
+                    use std::io::Read;
+                    let _ = std::io::copy(
+                        &mut std::io::stdin().take(1024 * 1024),
+                        &mut std::io::sink(),
+                    );
+                }
+                None
+            };
+
+            let root = resolve_target_root(cli_args);
+            let (invocation, request) =
+                cli_projector::project_cli_invocation(op_id_str, cli_args, root, stdin_data)
+                    .unwrap_or_else(|err| {
+                        eprintln!("fgos: error: {}", err);
+                        std::process::exit(1);
+                    });
             let rt = tokio::runtime::Builder::new_current_thread()
                 .enable_all()
                 .build()

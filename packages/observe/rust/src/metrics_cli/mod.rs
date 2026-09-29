@@ -1,0 +1,36 @@
+//! CLI dispatch for `fgos metrics <sub>` (Lane A).
+
+pub mod case;
+pub mod faults;
+pub mod harness;
+
+use crate::contract::{ObservationSource, ObserveRequest};
+use serde_json::json;
+
+pub const AVAILABLE_SUBCOMMANDS: &[&str] = &["ping", "case", "harness", "faults"];
+
+pub fn dispatch(
+    req: &ObserveRequest,
+    sources: &[Box<dyn ObservationSource>],
+) -> Result<serde_json::Value, String> {
+    match req.sub.as_str() {
+        "ping" => {
+            let stdin_bytes = req.stdin.as_ref().map(|b| b.len());
+            let stdin_text = req.stdin.as_ref().and_then(|b| String::from_utf8(b.clone()).ok());
+            Ok(json!({
+                "ok": true,
+                "root": req.root.to_string_lossy(),
+                "stdin_len": stdin_bytes,
+                "stdin_text": stdin_text
+            }))
+        }
+        "case" => case::dispatch_case(req),
+        "harness" => harness::dispatch_harness(req, sources),
+        "faults" => faults::dispatch_faults(req),
+        other => Err(format!(
+            "unknown metrics subcommand \"{}\". Available: {}",
+            other,
+            AVAILABLE_SUBCOMMANDS.join(", ")
+        )),
+    }
+}

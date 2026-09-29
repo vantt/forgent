@@ -1,0 +1,37 @@
+//! Fast typed record for Claude transcript streaming (avoids generic serde_json::Value overhead).
+
+use serde::Deserialize;
+
+#[derive(Deserialize)]
+pub struct TranscriptLine<'a> {
+    #[serde(borrow)]
+    pub timestamp: Option<&'a str>,
+    #[serde(borrow)]
+    pub cwd: Option<&'a str>,
+    #[serde(borrow)]
+    pub session_id: Option<&'a str>,
+    #[serde(borrow, rename = "sessionId")]
+    pub session_id_camel: Option<&'a str>,
+    pub message: Option<TranscriptMessage<'a>>,
+}
+
+#[derive(Deserialize)]
+pub struct TranscriptMessage<'a> {
+    #[serde(borrow)]
+    pub id: Option<&'a str>,
+    #[serde(borrow)]
+    pub model: Option<&'a str>,
+    #[serde(borrow)]
+    pub timestamp: Option<&'a str>,
+    #[serde(borrow)]
+    pub cwd: Option<&'a str>,
+    pub usage: Option<TranscriptUsage>,
+}
+
+#[derive(Deserialize)]
+pub struct TranscriptUsage {
+    pub input_tokens: Option<u64>,
+    pub output_tokens: Option<u64>,
+    pub cache_creation_input_tokens: Option<u64>,
+    pub cache_read_input_tokens: Option<u64>,
+}

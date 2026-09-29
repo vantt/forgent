@@ -15,7 +15,6 @@ import {
   addAdHocWorktree,
   addBareOrigin,
   addDiscovery,
-  addFriction,
   addGoalItem,
   addOk,
   addOutcome,
@@ -202,46 +201,6 @@ test('triage rows carry stage, goalTier, and component membership; declared goal
 // --- friction channel in `check` (phase-3-compound-learning-4, S2) ---------
 //
 // Same write-door discipline as the outcome tests above: only the runner
-// writes work.friction in production, so these seed through store.mjs's
-// addFriction and exercise the real `check` binary read-side.
-
-test('check returns the friction data — per-layer counts + recent records — when friction data exists', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'fric-item');
-  const dir = path.join(cwd, '.fgos');
-  addFriction(dir, { id: 'fric-item', disposition: 'parked', errorClass: 'verify-miss', layer: 'verification', attempts: 2, detail: 'goal-check failed (exit 1)' });
-  addFriction(dir, { id: 'fric-item', disposition: 'halted', errorClass: 'worker-timeout', layer: 'environment', attempts: 1, detail: 'timed out' });
-
-  const result = run(cwd, ['check']);
-  assert.equal(result.status, 0);
-  const { friction } = envelopeData(result.stdout);
-  assert.equal(friction.count, 2);
-  assert.deepEqual(friction.byLayer, { verification: 1, environment: 1 });
-  const parked = friction.recent.find((r) => r.disposition === 'parked');
-  const halted = friction.recent.find((r) => r.disposition === 'halted');
-  assert.equal(parked.id, 'fric-item');
-  assert.equal(parked.errorClass, 'verify-miss');
-  assert.equal(parked.layer, 'verification');
-  assert.equal(parked.attempts, 2);
-  assert.equal(halted.id, 'fric-item');
-  assert.equal(halted.errorClass, 'worker-timeout');
-  assert.equal(halted.layer, 'environment');
-});
-
-
-test('check surfaces docType for a tagged friction via the existing recent spread — no collectFrictionData change needed', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'fric-doctype-item');
-  const dir = path.join(cwd, '.fgos');
-  addFriction(dir, { id: 'fric-doctype-item', docType: 'explanation', disposition: 'parked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'x' });
-
-  const result = run(cwd, ['check']);
-  assert.equal(result.status, 0);
-  const { friction } = envelopeData(result.stdout);
-  const record = friction.recent.find((r) => r.id === 'fric-doctype-item');
-  assert.equal(record.docType, 'explanation');
-});
-
 
 test('check nags items sitting in a final status without their actual half (porting-outcome-lifecycle: no silent record)', () => {
   const cwd = tmpCwdFromTemplate();
@@ -452,14 +411,6 @@ test('check returns the learning data — outcome/friction/settlement summary �
     id: 'learning-item',
     actual: { outcome: 'pass', passed: true, attempts: 1, errorClass: null, aheadCount: 0, visits: 1 },
   });
-  addFriction(dir, {
-    id: 'learning-item',
-    disposition: 'parked',
-    errorClass: 'verify-miss',
-    layer: 'verification',
-    attempts: 1,
-    detail: 'miss',
-  });
 
   // Walk the sequential chain to done's one remaining door in (work-item-
   // status-delivered-retrospective-cleanup D1/D2/D10).
@@ -478,7 +429,7 @@ test('check returns the learning data — outcome/friction/settlement summary �
   assert.equal(record.outcome.disposition, 'pass');
   assert.equal(record.outcome.attempts, 1);
   assert.equal(record.outcome.errorClass, null);
-  assert.deepEqual(record.frictions, { verification: 1 });
+  assert.equal('frictions' in record, false);
   assert.deepEqual(record.settlements, { 'close/human': 1 });
 });
 

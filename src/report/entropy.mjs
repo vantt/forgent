@@ -1,7 +1,7 @@
 // entropy.mjs — pure entropy score for the work-state view (per Phase 3
 // S3-closeout, plan Slice 3 (b) / CONTEXT.md D3/D6): a weighted signal over
 // the SAME work-state surface `fgos check` already reports (status,
-// outcomes, frictions, settlements, stage) — never the distillery's own
+// outcomes, settlements, stage) — never the distillery's own
 // unsealed/backfill vocabulary, which is a lab concept over a different
 // surface (this cell's prohibitions).
 //
@@ -60,7 +60,6 @@ export const WEIGHTS = Object.freeze({
   missingActual: 5,
   staleDoing: 5,
   stageEntry: 3,
-  frictionUnsettled: 2,
   awaitingHuman: 2,
 });
 
@@ -74,39 +73,6 @@ function countMissingActual(view) {
   ).length;
 }
 
-// A friction record counts as "unsettled" when no settlement recorded for
-// the SAME id has a `ts` later than the friction's own `ts` — i.e. nothing
-// on that id resolved since the friction happened. An id with no
-// settlements at all counts every one of its friction records; a
-// settlement that happened BEFORE the friction (an earlier resolution,
-// unrelated to this occurrence) does not count as having settled it.
-//
-// The single owner of that settled-after comparison: every consumer that
-// needs "which frictions are still open" (this module's own entropy count,
-// and the evolve-loop candidate ranking) reads it from here instead of
-// re-deriving it. Returns a map of only the ids that still carry at least
-// one unsettled record, each mapped to that id's unsettled records (in log
-// order); an id whose every friction has since settled is omitted entirely.
-export function listUnsettledFrictionsByWork(view) {
-  const frictions = view.frictions ?? {};
-  const settlements = view.settlements ?? {};
-  const result = {};
-  for (const [id, records] of Object.entries(frictions)) {
-    const settlementTimes = (settlements[id] ?? []).map((s) => s.ts);
-    const unsettled = records.filter(
-      (record) => !settlementTimes.some((ts) => ts > record.ts),
-    );
-    if (unsettled.length > 0) result[id] = unsettled;
-  }
-  return result;
-}
-
-function countFrictionUnsettled(view) {
-  return Object.values(listUnsettledFrictionsByWork(view)).reduce(
-    (count, records) => count + records.length,
-    0,
-  );
-}
 
 function countStaleDoing(view) {
   return Object.values(view.work ?? {}).filter((w) => w.status === 'doing').length;
@@ -166,7 +132,6 @@ export function computeEntropy(view) {
     { label: 'missing-actual', count: countMissingActual(view), weight: WEIGHTS.missingActual },
     { label: 'stale-doing', count: countStaleDoing(view), weight: WEIGHTS.staleDoing },
     { label: 'stage-entry', count: countStageEntry(view), weight: WEIGHTS.stageEntry },
-    { label: 'friction-unsettled', count: countFrictionUnsettled(view), weight: WEIGHTS.frictionUnsettled },
     { label: 'awaiting-human', count: countAwaitingHuman(view), weight: WEIGHTS.awaitingHuman },
   ];
   const parts = rows.map((r) => ({ ...r, points: r.count * r.weight }));
@@ -183,11 +148,10 @@ export function computeEntropy(view) {
  */
 export function computeCounts(view) {
   const outcomes = view.outcomes ?? {};
-  const frictions = view.frictions ?? {};
   const settlements = view.settlements ?? {};
   return {
     outcomes: Object.values(outcomes).filter((o) => o?.actual).length,
-    frictions: Object.values(frictions).reduce((sum, records) => sum + records.length, 0),
+    frictions: 0,
     settlements: Object.values(settlements).reduce((sum, records) => sum + records.length, 0),
   };
 }

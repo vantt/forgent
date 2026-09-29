@@ -10,6 +10,8 @@ use std::ffi::OsString;
 pub fn project_cli_invocation(
     operation_id_str: &str,
     args: &[OsString],
+    root: std::path::PathBuf,
+    stdin: Option<Vec<u8>>,
 ) -> Result<(HostInvocation, OperationRequest), String> {
     let operation = OperationId::parse(operation_id_str)
         .map_err(|e| format!("invalid operation id '{}': {}", operation_id_str, e))?;
@@ -26,6 +28,50 @@ pub fn project_cli_invocation(
             ContractRef::from_static("work.gate-bypass.show.request", "1.0.0"),
             Box::new(fgos_work_state::GateBypassShowRequest::default()),
         ),
+        "observe.metrics" => {
+            let sub = if args.len() > 1 {
+                args[1].to_string_lossy().to_string()
+            } else {
+                String::new()
+            };
+            let sub_args: Vec<String> = if args.len() > 2 {
+                args[2..].iter().map(|a| a.to_string_lossy().to_string()).collect()
+            } else {
+                Vec::new()
+            };
+            (
+                ContractRef::from_static("observe.metrics.request", "1.0.0"),
+                Box::new(fgos_observe::ObserveRequest {
+                    operation: operation_id_str.to_string(),
+                    sub,
+                    args: sub_args,
+                    root,
+                    stdin,
+                }),
+            )
+        }
+        "observe.friction" => {
+            let sub = if args.len() > 1 {
+                args[1].to_string_lossy().to_string()
+            } else {
+                String::new()
+            };
+            let sub_args: Vec<String> = if args.len() > 2 {
+                args[2..].iter().map(|a| a.to_string_lossy().to_string()).collect()
+            } else {
+                Vec::new()
+            };
+            (
+                ContractRef::from_static("observe.friction.request", "1.0.0"),
+                Box::new(fgos_observe::ObserveRequest {
+                    operation: operation_id_str.to_string(),
+                    sub,
+                    args: sub_args,
+                    root,
+                    stdin,
+                }),
+            )
+        }
         other => {
             return Err(format!(
                 "native CLI projector has no request mapping for '{}'",
@@ -45,7 +91,8 @@ mod tests {
 
     #[test]
     fn test_project_cli_invocation_for_version() {
-        let (invocation, request) = project_cli_invocation("distribution.build.show", &[]).unwrap();
+        let (invocation, request) =
+            project_cli_invocation("distribution.build.show", &[], std::path::PathBuf::from("."), None).unwrap();
         assert_eq!(invocation.host_kind, "cli");
         assert_eq!(request.operation.as_str(), "distribution.build.show");
         assert_eq!(request.contract.id(), "distribution.build.show.request");
@@ -58,7 +105,8 @@ mod tests {
 
     #[test]
     fn test_project_cli_invocation_for_gate_bypass() {
-        let (invocation, request) = project_cli_invocation("work.gate-bypass.show", &[]).unwrap();
+        let (invocation, request) =
+            project_cli_invocation("work.gate-bypass.show", &[], std::path::PathBuf::from("."), None).unwrap();
         assert_eq!(invocation.host_kind, "cli");
         assert_eq!(request.operation.as_str(), "work.gate-bypass.show");
         assert_eq!(request.contract.id(), "work.gate-bypass.show.request");
@@ -67,5 +115,20 @@ mod tests {
             .input
             .downcast_ref::<fgos_work_state::GateBypassShowRequest>()
             .is_some());
+    }
+
+    #[test]
+    fn test_project_cli_invocation_for_metrics() {
+        let args = vec![OsString::from("metrics"), OsString::from("ping")];
+        let (invocation, request) =
+            project_cli_invocation("observe.metrics", &args, std::path::PathBuf::from("/test"), None).unwrap();
+        assert_eq!(invocation.host_kind, "cli");
+        assert_eq!(request.operation.as_str(), "observe.metrics");
+        let req = request
+            .input
+            .downcast_ref::<fgos_observe::ObserveRequest>()
+            .unwrap();
+        assert_eq!(req.sub, "ping");
+        assert_eq!(req.root, std::path::PathBuf::from("/test"));
     }
 }

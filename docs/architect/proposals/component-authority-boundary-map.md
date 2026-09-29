@@ -198,6 +198,7 @@ Reading the tree:
 | Group-Thinking Protocol Pack | Versioned, data-first CoordinationProtocol definitions and public-contract request/renderer adapters for reusable group-thinking methods. | Session state, visibility legality, aggregation validity, terminal authority, dispatch, Work lifecycle, or hidden protocol semantics in prompts/adapters. |
 | `fgos-group-thinking` Skill | Selects an explicit registered protocol, builds a public request, launches/resumes through coordination surfaces, and renders public replay/evidence. | Group-thinking runtime logic, hidden actor/topology changes, context grants, aggregate validation, specialist authorization, or Work/git mutation. |
 | Learning, Knowledge, And Documentation Registry | Retrospective knowledge capture, doc slot/topic registry, projections, traces, end-user docs index, learning outputs. | Work lifecycle, Agent Coordination runtime, RunResult confidence. |
+| Observe (Metrics & Friction) | Measurement and scorecard calculation across substrate entities (`run`, `session`, `executor`, `case`, `work`), case lifecycle journal (`.fgos/observe/cases/`), independent friction repository (`.fgos/observe/friction/`), writer shards, store locks (`.fgos/observe/.lock`), snapshots, and declaring `ObservationSource` / `LegacyFrictionSource` traits. | Work item status/stage mutation, RunResult confidence truth, Agent Coordination session lifecycle, or direct dispatch governance. |
 
 ## 7. Contract Dependency Matrix
 
@@ -215,6 +216,8 @@ Reading the tree:
 | Group-Thinking Protocol Pack -> Agent Coordination / Team Cognition | May declare versioned protocols and invoke only public request, replay, contribution, and aggregation contracts. | Must not read private session storage, add protocol-specific branches to core, or bypass legality/validation. |
 | `fgos-group-thinking` Skill -> Group-Thinking Protocol Pack / Host Surface | May select an indexed `metadata.id@version`, assemble inputs/bounds, and call the public coordination surface. | Must not implement RFC/NGT/Delphi semantics in skill prose or switch protocols invisibly during a session. |
 | Sibling components under one parent | May collaborate through declared ports/events and shared immutable references. | Must not reach into each other's private state or rely on physical nesting as API. |
+| Observe -> Substrate Sources | May read substrate events and states through declared read contracts (`run-result.read.v1`, `session-events.read.v1`, `work-events.read.v1`) and traits. | Must not mutate substrate truth or enforce Work-lifecycle dependencies on metrics. |
+| Platform Components -> Observe | May append friction or case transitions via native CLI (`fgos friction`, `fgos metrics`). | Must not bypass writer shards or write directly into `.fgos/observe` storage without host lock. |
 
 Placement rule:
 

@@ -1,0 +1,3 @@
+{"seq":1,"ts":"2026-09-29T08:00:00.000Z","type":"work.add","payload":{"id":"tsk-golden-1","title":"Implement observe contracts","kind":"task","risk":"standard","verify":"npm test","description":"Add versioned contracts and golden fixtures for observe component."},"v":2}
+{"seq":2,"ts":"2026-09-29T08:05:00.000Z","type":"work.friction","payload":{"id":"tsk-golden-1","layer":"verification","errorClass":"verify-miss","disposition":"advisory","detail":"Contract schema validation failed for observe.observation","attempts":1,"docType":null,"producer":"runner.loop"},"v":2}
+{"seq":3,"ts":"2026-09-29T08:10:00.000Z","type":"work.move","payload":{"id":"tsk-golden-1","from":"blocked","to":"done","actor":"human"},"v":2}

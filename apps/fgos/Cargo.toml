@@ -7,6 +7,9 @@ edition.workspace = true
 fgos-host-runtime = { path = "../../packages/host-runtime/rust" }
 fgos-distribution = { path = "../../packages/distribution/rust" }
 fgos-work-state = { path = "../../packages/work-state/rust" }
+fgos-observe = { path = "../../packages/observe/rust" }
+fgos-run-result = { path = "../../packages/run-result/rust" }
+fgos-coordination-state = { path = "../../packages/coordination-state/rust" }
 tokio = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true, features = ["preserve_order", "arbitrary_precision"] }

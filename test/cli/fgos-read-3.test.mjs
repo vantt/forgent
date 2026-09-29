@@ -15,7 +15,6 @@ import {
   addAdHocWorktree,
   addBareOrigin,
   addDiscovery,
-  addFriction,
   addGoalItem,
   addOk,
   addOutcome,
@@ -410,8 +409,6 @@ test('show returns the work record plus every per-item log scoped to just that i
   run(cwd, ['ask', 'other-item', '--text', '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: unrelated ask']);
   addOutcome(dir, { id: 'show-detail-item', predicted: { tier: 'standard', deps: 0, priorVisits: 0 } });
   addOutcome(dir, { id: 'other-item', predicted: { tier: 'light', deps: 0, priorVisits: 0 } });
-  addFriction(dir, { id: 'show-detail-item', disposition: 'parked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'goal-check failed' });
-  addFriction(dir, { id: 'other-item', disposition: 'halted', errorClass: 'worker-timeout', layer: 'environment', attempts: 1, detail: 'timed out' });
 
   const result = run(cwd, ['show', 'show-detail-item']);
   assert.equal(result.status, 0);
@@ -432,9 +429,7 @@ test('show returns the work record plus every per-item log scoped to just that i
   assert.equal(data.outcome.id, 'show-detail-item');
   assert.equal(data.outcome.predicted.tier, 'standard');
 
-  assert.equal(data.friction.count, 1);
-  assert.equal(data.friction.recent[0].errorClass, 'verify-miss');
-
+  assert.equal(data.friction, null);
   // Nothing from 'other-item' leaked into 'show-detail-item's scoped view.
   assert.ok(!JSON.stringify(data).includes('unrelated'));
   assert.ok(!JSON.stringify(data).includes('worker-timeout'));

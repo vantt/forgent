@@ -20,7 +20,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { spawnSync, execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { acquireFullSuiteQueue, QUEUE_HELD_ENV } from './lib/full-suite-queue.mjs';
@@ -28,6 +28,40 @@ import { acquireFullSuiteQueue, QUEUE_HELD_ENV } from './lib/full-suite-queue.mj
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const DEFAULT_TEST_ROOT = path.join(REPO_ROOT, 'test');
 const TEST_FILE_SUFFIX = '.test.mjs';
+
+/**
+ * Ensures FGOS_HOST_BIN is available and points to a runnable host binary.
+ * If FGOS_HOST_BIN is already set and runnable, returns it without building.
+ * Otherwise, builds fgos with cargo (debug incremental) using checkout's CARGO_TARGET_DIR.
+ */
+export function ensureHostBin(env = process.env, cwd = REPO_ROOT) {
+  if (env.FGOS_HOST_BIN) {
+    try {
+      if (fs.existsSync(env.FGOS_HOST_BIN)) {
+        execFileSync(env.FGOS_HOST_BIN, ['version'], { stdio: 'ignore' });
+        return env.FGOS_HOST_BIN;
+      }
+    } catch {}
+  }
+
+  try {
+    execFileSync('cargo', ['--version'], { stdio: 'ignore' });
+  } catch {
+    throw new Error('cargo is required to build fgos host binary for testing, but was not found on PATH');
+  }
+
+  const targetDir = env.CARGO_TARGET_DIR || path.join(cwd, 'target');
+  const binName = process.platform === 'win32' ? 'fgos.exe' : 'fgos';
+  const binPath = path.join(targetDir, 'debug', binName);
+
+  execFileSync('cargo', ['build', '-p', 'fgos'], {
+    cwd,
+    env: { ...env, CARGO_TARGET_DIR: targetDir },
+    stdio: 'inherit',
+  });
+
+  return binPath;
+}
 
 /**
  * Recursively lists every file under `root` whose name ends with
@@ -96,6 +130,15 @@ export function buildTestEnv(env = process.env) {
     } catch {
       // If the runner's temp root disappears, let Node's normal temp logic fail naturally.
     }
+  }
+  try {
+    const hostBin = ensureHostBin(childEnv, REPO_ROOT);
+    if (hostBin) {
+      childEnv.FGOS_HOST_BIN = hostBin;
+    }
+  } catch (err) {
+    // If cargo is missing or build fails, let tests that require host fail with clear diagnostic
+    console.error(`run-tests: warning: failed to ensure host binary: ${err.message}`);
   }
   return childEnv;
 }

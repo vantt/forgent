@@ -15,7 +15,6 @@ import {
   addAdHocWorktree,
   addBareOrigin,
   addDiscovery,
-  addFriction,
   addGoalItem,
   addOk,
   addOutcome,
@@ -91,119 +90,6 @@ import {
 } from './helpers/fgos-cli-harness.mjs';
 
 
-// tsk-5iv D3 (round-3 review, MEDIUM): same STORE_MISSING_WARNING_VERBS gap
-// again, found in `evolve` -- `rankCandidates` over an empty-store view
-// silently returns `[]` instead of the real candidate list.
-
-test('evolve never touches git (no branch/worktree operation) — succeeds on a directory that is not even a git repo', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'no-git-item');
-  const dir = path.join(cwd, '.fgos');
-  addFriction(dir, { id: 'no-git-item', disposition: 'blocked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'x' });
-  assert.equal(fs.existsSync(path.join(cwd, '.git')), false);
-
-  const result = run(cwd, ['evolve']);
-  assert.equal(result.status, 0);
-  const pickResult = run(cwd, ['evolve', '--pick', 'no-git-item']);
-  assert.equal(pickResult.status, 0);
-});
-
-
-// --- `fgos evolve --submit <id>` (self-improve-loop P13 Slice 3, D15) ------
-//
-// The only mutating action on the whole evolve/Gate A surface: bridges a
-// ranked friction candidate into a real work item through the same
-// submitWork door `submit` uses. `evolve` (no flag) and `evolve --pick` stay
-// exactly as shipped in Slice 1 (asserted below too, not just by the golden
-// test above).
-
-test("evolve --submit <id> with a matching candidate creates exactly one new work item via submitWork, described from the candidate's fields", () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'submit-item');
-  const dir = path.join(cwd, '.fgos');
-  addFriction(dir, { id: 'submit-item', disposition: 'blocked', errorClass: 'verify-miss', layer: 'verification', attempts: 2, detail: 'goal-check failed (exit 1)' });
-
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['evolve', '--submit', 'submit-item']);
-  assert.equal(result.status, 0);
-  const envelope = JSON.parse(result.stdout);
-  assert.equal(envelope.contract, 'fgos.v1');
-  const item = envelope.data;
-  assert.equal(item.status, 'todo');
-  assert.equal(item.stage, 'discovery');
-  assert.match(item.description, /Self-improve candidate submit-item/);
-  assert.match(item.description, /blocked/);
-  assert.match(item.description, /verify-miss/);
-  assert.match(item.description, /layer verification/);
-  assert.match(item.description, /2 attempt\(s\)/);
-  assert.match(item.description, /goal-check failed \(exit 1\)/);
-
-  assert.equal(eventLines(cwd).length, before + 1, 'evolve --submit appends exactly one new event');
-  const view = envelopeData(run(cwd, ['list']).stdout);
-  assert.ok(view.work[item.id], 'the new work item persisted');
-  assert.equal(view.work['submit-item'].status, 'todo', 'the candidate\'s own item is untouched');
-});
-
-
-test('evolve --submit <id> with no matching candidate creates no work item, prints a clean error, exits non-zero', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'exists-item-2');
-  const dir = path.join(cwd, '.fgos');
-  addFriction(dir, { id: 'exists-item-2', disposition: 'blocked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'x' });
-
-  const before = eventLines(cwd).length;
-  const result = run(cwd, ['evolve', '--submit', 'nonexistent-id']);
-  assert.notEqual(result.status, 0);
-  assert.match(result.stderr, /not an open candidate/);
-  assert.equal(eventLines(cwd).length, before, 'no event appended on an invalid --submit id');
-});
-
-
-test('evolve --submit with a bare flag (no value) is refused as validation, not a re-prompt', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'bare-submit-item');
-  const result = run(cwd, ['evolve', '--submit']);
-  assert.notEqual(result.status, 0);
-  assert.match(result.stderr, /evolve --submit requires a non-empty candidate id/);
-});
-
-
-test('evolve --submit composes its description gracefully around missing candidate fields, never printing the literal "undefined"', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'sparse-item');
-  const dir = path.join(cwd, '.fgos');
-  addFriction(dir, { id: 'sparse-item', disposition: 'blocked', attempts: 1 });
-
-  const result = run(cwd, ['evolve', '--submit', 'sparse-item']);
-  assert.equal(result.status, 0);
-  const description = JSON.parse(result.stdout).data.description;
-  assert.doesNotMatch(description, /undefined/);
-  assert.match(description, /Self-improve candidate sparse-item/);
-  assert.match(description, /blocked/);
-  assert.match(description, /1 attempt\(s\)/);
-});
-
-
-test('evolve (no flag) and evolve --pick remain unaffected by the new --submit path: same output, no event appended', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'unaffected-item');
-  const dir = path.join(cwd, '.fgos');
-  addFriction(dir, { id: 'unaffected-item', disposition: 'blocked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'goal-check failed' });
-
-  const before = eventLines(cwd).length;
-  const list = run(cwd, ['evolve']);
-  assert.equal(list.status, 0);
-  const listData = envelopeData(list.stdout);
-  assert.equal(listData[0].id, 'unaffected-item');
-  assert.equal(listData[0].score, 2);
-  assert.equal(listData[0].disposition, 'blocked');
-
-  const pick = run(cwd, ['evolve', '--pick', 'unaffected-item']);
-  assert.equal(pick.status, 0);
-  assert.equal(envelopeData(pick.stdout).count, 1);
-
-  assert.equal(eventLines(cwd).length, before, 'evolve and evolve --pick still append no events');
-});
 
 
 // --- `fgos compound` (tsk-3o3, restored from fcfbae5/tsk-1zi's removal,

@@ -41,6 +41,8 @@ import { frontier, frontierAcrossSteps, isDepsAndLineageReady as depsAndLineageR
 import { assertNoCycle, assertNoUnifiedCycle } from './dep-graph.mjs';
 import { resolveWriterIdentity } from '../util/session-identity.mjs';
 import { KnowledgeValidationError, applyKnowledgeEvent } from './knowledge-registry.mjs';
+import { resolveFriction, recordFriction } from '../observe/friction-client.mjs';
+export { recordFriction, resolveFriction };
 import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
 import { readClaim, readClaims, releaseClaim, withClaimsLock, buildEffectiveView, getItemDurableRevision } from './runtime-coordination.mjs';
 
@@ -477,11 +479,7 @@ function composeLearning(view, id, closingSettlement) {
     ? { disposition: actual.outcome ?? null, attempts: actual.attempts ?? null, errorClass: actual.errorClass ?? null }
     : null;
 
-  const frictions = {};
-  for (const record of view.frictions?.[id] ?? []) {
-    const layer = record.layer ?? 'unknown';
-    frictions[layer] = (frictions[layer] ?? 0) + 1;
-  }
+  // F5: learning friction removed per Observe migration
 
   const settlementRecords = [...(view.settlements?.[id] ?? []), closingSettlement];
   const settlements = {};
@@ -490,7 +488,7 @@ function composeLearning(view, id, closingSettlement) {
     settlements[key] = (settlements[key] ?? 0) + 1;
   }
 
-  return { outcome, frictions, settlements };
+  return { outcome, settlements };
 }
 
 /**
@@ -884,6 +882,19 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   }
   return appendEventLocked(resolveWriterLogPath(dir), rawEvent, dir); // captures the real seq; rawEvent itself has none
   });
+  if (answer) {
+    try {
+      resolveFriction(dir, { id, reason: 'answer', by: 'work' });
+    } catch {}
+  } else if (result.event.payload.to === 'done') {
+    try {
+      resolveFriction(dir, { id, reason: 'done', by: 'work' });
+    } catch {}
+  } else if (result.event.payload.to === 'wontfix') {
+    try {
+      resolveFriction(dir, { id, reason: 'wontfix', by: 'work' });
+    } catch {}
+  }
   // tsk-2t9c D16: `delivered` is a terminal state for the role/holder axis
   // -- no stage skill ever re-enters an item past this point (every wired
   // reclaim lives at a stage-skill's own entry point), so an async call
@@ -955,8 +966,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
 /**
  * tsk-1ht: `getItemDurableRevision` hashes ONLY `view.work[id]` — never
  * `view.decisions`/`decisionsById`, `view.gates`, `view.discovery`,
- * `view.outcomes`, `view.frictions`, or `view.callThreads` (all separate,
- * side-log-only structures per `replay.mjs`'s fold switch). An event whose
+ * `view.outcomes`, or `view.callThreads` (all separate,
  * type folds into one of those side logs can NEVER cause a revision drift,
  * no matter who wrote it or whether it carries a writer stamp at all — a
  * confirmed live case: `fgos decision`/`fgos gate-approve` (routinely
@@ -1437,11 +1447,17 @@ export function answerAwaiting(dir, { id, answer, expectedStatus, role, rational
  */
 export function moveStage(dir, { id, to, expectedStage, verify, role } = {}) {
   const { logPath } = paths(dir);
-  return withEventsLockAndRefresh(dir, logPath, () => {
+  let shouldResolveClarify = false;
+  const result = withEventsLockAndRefresh(dir, logPath, () => {
     const before = currentView(dir);
     const work = before.work[id];
     if (!work) {
       throw new StoreError('validation', `work "${id}" not found.`);
+    }
+
+    const drivingVerdict = before.discovery?.[id]?.at(-1);
+    if (work.stage === 'discovery' && drivingVerdict?.clear !== false) {
+      shouldResolveClarify = true;
     }
 
     const rawEvent = transitionStage({ work, to, expectedStage, verify }); // FsmError: precondition | conflict
@@ -1457,6 +1473,14 @@ export function moveStage(dir, { id, to, expectedStage, verify, role } = {}) {
     rawEvent.payload.writer = resolveWriterIdentity(dir);
     return appendEventLocked(resolveWriterLogPath(dir), rawEvent, dir);
   });
+
+  if (shouldResolveClarify) {
+    try {
+      resolveFriction(dir, { id, reason: 'clarify-pass', by: 'work' });
+    } catch {}
+  }
+
+  return result;
 }
 
 /**
@@ -1592,9 +1616,9 @@ export function recordCallReturn(dir, { id, note } = {}) {
 }
 
 /**
- * Log a context-discovery verdict event (per stage-clarify D3/D6). Mirrors
- * `addFriction` exactly: no FSM/work validation beyond requiring the `id`
- * the fold appends by; each verdict is its own occurrence (pass or not) —
+ * Log a context-discovery verdict event (per stage-clarify D3/D6): no FSM/work
+ * validation beyond requiring the `id` the fold appends by; each verdict is its
+ * own occurrence (pass or not) — the fold APPENDS per id, a later record never
  * the fold APPENDS per id, a later record never erases an earlier one. Same
  * single write door + append-then-refresh tail as every mutation here.
  */
@@ -1763,7 +1787,7 @@ export function parseDecisionRelation(raw) {
 // (pattern/decision/failure). Exactly the four Diataxis quadrants — no
 // audience/type beyond these four is valid when the field is present at
 // all; absent/null stays untagged (never required). Defined once here and
-// shared by `addOutcome`/`addFriction` below.
+// shared by `addOutcome` below.
 const DIATAXIS_DOC_TYPES = new Set(['tutorial', 'how-to', 'reference', 'explanation']);
 
 // Shared optional-shape check for `payload.docType` (mirrors the `docsRef`
@@ -1773,7 +1797,7 @@ const DIATAXIS_DOC_TYPES = new Set(['tutorial', 'how-to', 'reference', 'explanat
 // P1 fix) so a caller — `bin/fgos.mjs`'s `compound --doc-type` — can
 // pre-validate a quadrant BEFORE any write, reusing this single
 // `DIATAXIS_DOC_TYPES` set rather than duplicating the enum at the CLI
-// layer. `addOutcome`/`addFriction` below still call it too, so validation
+// layer. `addOutcome` below still calls it too, so validation
 // stays identical whichever door the payload comes through.
 export function assertValidDocType(payload) {
   if (payload.docType === undefined || payload.docType === null) {
@@ -1805,25 +1829,6 @@ export function addOutcome(dir, payload) {
   }
   assertValidDocType(payload);
   return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(resolveWriterLogPath(dir), { type: 'work.outcome', payload }, dir));
-}
-
-/**
- * Log a work-friction event — the friction channel of the 2-channel capture
- * (per Phase 3 plan Slice 2 / lifecycle-vision §8): the runner writes one at
- * the park/halt choke-point, self-attributed to a failure layer. Unlike
- * `work.outcome` (two halves MERGED by id), frictions are occurrences — the
- * fold APPENDS per id, a later record never erases an earlier one. Same
- * single write door + append-then-refresh tail as every mutation here.
- * `payload.docType` is the same OPTIONAL Diataxis tag as `addOutcome` above
- * (D5/D6) — same shape check, same raw-append-for-fold-survival contract.
- */
-export function addFriction(dir, payload) {
-  const { logPath } = paths(dir);
-  if (!payload || typeof payload.id !== 'string' || !payload.id.trim()) {
-    throw new StoreError('validation', 'friction requires a non-empty "id".');
-  }
-  assertValidDocType(payload);
-  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(resolveWriterLogPath(dir), { type: 'work.friction', payload }, dir));
 }
 
 /**

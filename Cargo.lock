@@ -95,14 +95,28 @@ dependencies = [
 name = "fgos"
 version = "0.1.0"
 dependencies = [
+ "fgos-coordination-state",
  "fgos-distribution",
  "fgos-host-runtime",
+ "fgos-observe",
+ "fgos-run-result",
  "fgos-work-state",
  "serde",
  "serde_json",
  "sha2",
  "thiserror",
  "tokio",
+]
+
+[[package]]
+name = "fgos-coordination-state"
+version = "0.1.0"
+dependencies = [
+ "fgos-host-runtime",
+ "fgos-observe",
+ "serde",
+ "serde_json",
+ "thiserror",
 ]
 
 [[package]]
@@ -133,10 +147,33 @@ dependencies = [
 ]
 
 [[package]]
+name = "fgos-observe"
+version = "0.1.0"
+dependencies = [
+ "fgos-host-runtime",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "tokio",
+]
+
+[[package]]
+name = "fgos-run-result"
+version = "0.1.0"
+dependencies = [
+ "fgos-host-runtime",
+ "fgos-observe",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "fgos-work-state"
 version = "0.1.0"
 dependencies = [
  "fgos-host-runtime",
+ "fgos-observe",
  "serde",
  "serde_json",
  "tokio",

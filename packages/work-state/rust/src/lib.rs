@@ -2,6 +2,10 @@
 //!
 //! Native read providers for work/state-owned operations.
 
+pub mod legacy_friction;
+pub mod work_source;
+pub use work_source::WorkSource;
+
 use fgos_host_runtime::contracts::{
     ContractRef, HostInvocation, OperationId, OperationRequest, ProviderDescriptor, ProviderError,
     ProviderLifecycle, ProviderOutcome,
