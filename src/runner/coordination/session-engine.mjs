@@ -3998,7 +3998,7 @@ const CONTRIBUTION_FIELD_MAX_LENGTH = 2000;
  * another `result-linked` without re-closing anything, and reading the latest
  * would move "opened at" forward for a window that never moved.
  */
-export function branchSatisfiedAtSeq(events, fgosDir, assignmentId) {
+function branchSatisfiedAtSeq(events, fgosDir, assignmentId) {
   for (const event of events) {
     if (event.type !== 'result-linked' || event.payload.assignmentId !== assignmentId) continue;
     const runResult = readLinkedRunResultFromDisk(fgosDir, assignmentId, event.payload.runId);

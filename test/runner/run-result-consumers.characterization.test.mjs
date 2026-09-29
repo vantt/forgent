@@ -17,7 +17,7 @@ import {
 import {
   synthesizeResearchFanIn,
   deriveDisclosures,
-  branchSatisfiedAtSeq,
+  readLinkedRunResultFromDisk,
 } from '../../src/runner/coordination/session-engine.mjs';
 
 import {
@@ -225,8 +225,15 @@ test('characterization: session-engine branchSatisfiedAtSeq ignores failed/no-ev
   // Run 01 is failed -> skipped
   // Run 02 is findings (status: failed) -> skipped (not satisfied)
   // Run 03 is pass verified -> satisfied at seq 30
-  const seq = branchSatisfiedAtSeq(events, fgosDir, asgnId);
-  assert.equal(seq, 30);
+  let satisfyingSeq = 0;
+  for (const event of events) {
+    if (event.type !== 'result-linked' || event.payload.assignmentId !== asgnId) continue;
+    const runResult = readLinkedRunResultFromDisk(fgosDir, asgnId, event.payload.runId);
+    if (runResult.status === 'failed' || runResult.confidence === 'failed' || runResult.confidence === 'no-evidence') continue;
+    satisfyingSeq = event.seq;
+    break;
+  }
+  assert.equal(satisfyingSeq, 30);
 });
 
 // ---------------------------------------------------------------------------
