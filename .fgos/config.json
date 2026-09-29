@@ -472,7 +472,7 @@
               "{prompt}"
             ],
             "env": {
-              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/tetnu"
+              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openai-tetnu"
             }
           },
           {
@@ -494,7 +494,29 @@
               "{prompt}"
             ],
             "env": {
-              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/fgovn"
+              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openai-fgovn"
+            }
+          },
+          {
+            "id": "pi-cli-tetcu72",
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "pi",
+            "args": [
+              "--model",
+              "{model}",
+              "--thinking",
+              "medium",
+              "--tools",
+              "read,write,edit,bash,grep,find,ls",
+              "--mode",
+              "json",
+              "--approve",
+              "-p",
+              "{prompt}"
+            ],
+            "env": {
+              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openai-tetcu72"
             }
           },
           {
@@ -519,7 +541,7 @@
               "backend": "bwrap"
             },
             "env": {
-              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/tetnu"
+              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openai-tetnu"
             }
           },
           {
@@ -544,7 +566,32 @@
               "backend": "bwrap"
             },
             "env": {
-              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/fgovn"
+              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openai-fgovn"
+            }
+          },
+          {
+            "id": "pi-cli-bwrap-tetcu72",
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "pi",
+            "args": [
+              "--model",
+              "{model}",
+              "--thinking",
+              "medium",
+              "--tools",
+              "read,write,edit,bash,grep,find,ls",
+              "--mode",
+              "json",
+              "--approve",
+              "-p",
+              "{prompt}"
+            ],
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "env": {
+              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openai-tetcu72"
             }
           }
         ]
