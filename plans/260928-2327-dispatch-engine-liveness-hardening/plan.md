@@ -630,10 +630,39 @@ SUB-UNIT STATUS:
   independently reran `cargo build --workspace` and `cargo test
   --workspace`: clean, 177/177 pass. See
   plans/260928-2327-dispatch-engine-liveness-hardening/reports/unit-P8b-rust-claude-only-execution-report.md.
-- **unit/P8a IN PROGRESS** (S4 cwd mutex + herdr-spawn liveness gap,
-  JS-side). Runs after P8b-rust merged; the remaining JS-side rename of
-  `cli-spawn-supervisor.mjs` to reflect `detached-run-supervisor` waits
-  for P8a to merge first (both touch `assignment-runner.mjs`).
+- **unit/P8a MERGED** (2026-09-29). `00f632be5`, integratedSha
+  `7b6eca608`. S4 mutex scoped to the `cli-spawn` adapter only (a real,
+  evidenced correction to this plan's own assumption -- herdr-spawn
+  already gets `acquireMainCheckoutLock` coverage via its existing
+  `executeExecutorCli()` call chain, confirmed by Lead tracing that call
+  chain directly in `assignment-runner.mjs:2702`; a second lock there
+  would self-conflict). Gated on `effectiveMutation === 'mutating'`
+  (another real correction: an unconditional lock regressed two
+  pre-existing tests proving concurrent read-only dispatch to the same
+  cwd is intentional). New `--force-shared-cwd` override, distinct from
+  `--force-new-attempt` (different axis, per this plan's own note above).
+  `isHerdrSpawnRunStillWorking` added and wired into `admitRunAttempt`'s
+  M1 check via a pre-CAS peek tagged with the exact runId it was computed
+  for, failing closed (treated as still-working) on both an `'unknown'`
+  herdr-probe result and a stale/mismatched peek. Lead independently
+  traced the self-conflict claim against real source, reran the new
+  real-subprocess concurrency test directly (pass), reran
+  main-checkout-lock + assignment-dispatch (161/161) and every herdr
+  suite (101/101, 1 skipped) plus the full suite (7994 tests, 0 fail)
+  before merging. Two related gaps flagged by the implementer, not fixed
+  here (named, not silently dropped): `--force-new-attempt` itself was
+  never wired to a CLI flag (pre-existing, unrelated to this phase); no
+  dedicated SIGKILL-probe test exists yet for
+  `isHerdrSpawnRunStillWorking` specifically, and
+  `providerCapacityIsRunWorkerAlive` (lease reclaim) has the same
+  cli-spawn-only blind spot for herdr-spawn as M1 did before this phase.
+  See
+  plans/260928-2327-dispatch-engine-liveness-hardening/reports/unit-P8a-claude-only-execution-report.md.
+
+**Remaining for this track's own close:** the JS-side rename of
+`cli-spawn-supervisor.mjs` to reflect `detached-run-supervisor`
+vocabulary (P8b's other half, deferred until P8a merged since both touch
+`assignment-runner.mjs` -- now unblocked).
 
 **S4 decision: extend `acquireMainCheckoutLock` to the shared Assignment
 admission path, as a mutex with a visible-holder refusal and an explicit
