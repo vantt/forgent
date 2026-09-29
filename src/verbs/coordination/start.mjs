@@ -308,7 +308,7 @@ export async function startCoordinationUseCase(ctx, options = {}) {
     };
   }
 
-  const runResult = await runCoordinationUseCase(ctx, {
+  const coordinationRunResult = await runCoordinationUseCase(ctx, {
     requestObject,
     cliExecutor: options.cliExecutor ?? options.executor,
     cliModel: options.cliModel ?? options.model,
@@ -317,13 +317,13 @@ export async function startCoordinationUseCase(ctx, options = {}) {
 
   return {
     ok: true,
-    coordinationId: runResult.coordinationId,
-    kind: runResult.kind,
-    status: runResult.status,
-    phase: runResult.phase,
-    steps: runResult.steps ?? [],
-    protocolRef: runResult.protocolRef ?? (protocolId ? { id: protocolId } : null),
-    boundDefinition: runResult.boundDefinition ?? null,
-    statusDoor: `fgos coordination status ${runResult.coordinationId}`,
+    coordinationId: coordinationRunResult.coordinationId,
+    kind: coordinationRunResult.kind,
+    status: coordinationRunResult.status,
+    phase: coordinationRunResult.phase,
+    steps: coordinationRunResult.steps ?? [],
+    protocolRef: coordinationRunResult.protocolRef ?? (protocolId ? { id: protocolId } : null),
+    boundDefinition: coordinationRunResult.boundDefinition ?? null,
+    statusDoor: `fgos coordination status ${coordinationRunResult.coordinationId}`,
   };
 }

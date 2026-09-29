@@ -427,8 +427,7 @@ test('characterization: operation-choice interpretAssignmentRunResult', () => {
     reason: 'assignment-test-op-blocked',
   });
 
-  // Findings: currently status: 'failed'
-  // todo: expected-change: findings will route via verdict, rather than generic failure
+  // Findings: now routes via verdict checking rather than generic failure
   const r08 = interpretAssignmentRunResult({
     choice: { operation: 'review-item' },
     runResult: f08,
@@ -436,7 +435,7 @@ test('characterization: operation-choice interpretAssignmentRunResult', () => {
   assert.deepEqual(r08, {
     canAdvanceEdge: false,
     stop: true,
-    reason: 'assignment-review-item-failed',
+    reason: 'review-item-missing-evidence-refs',
   });
 
   // fix-verify-red requiring verified evidence:

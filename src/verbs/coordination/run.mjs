@@ -358,11 +358,11 @@ function summarizeDispatch({ assignment, runResult }) {
   const outcome = runResult ? runOutcome(runResult) : null;
   return {
     assignmentId: assignment.assignmentId,
-    status: outcome?.category ?? runResult.status,
-    confidence: outcome?.evidence ?? runResult.confidence,
+    status: outcome?.category ?? null,
+    confidence: outcome?.evidence ?? null,
     outcome: outcome?.category ?? null,
     verdict: outcome?.verdict ?? null,
-    infraFailure: outcome?.infraFailure ?? (runResult.status === 'failed'),
+    infraFailure: outcome?.infraFailure ?? false,
     executor: runResult.policy?.provenance?.executor?.value ?? null,
     provider: runResult.policy?.provenance?.provider?.value ?? null,
     tier: runResult.policy?.provenance?.tier?.value ?? null,

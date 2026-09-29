@@ -988,12 +988,15 @@ export function runOutcome(resultOrPath, { evidenceFloor } = {}) {
     result.resultCorrupt ||
     result.classification?.provenance === 'contract-corrupt'
   ) {
+    const evidenceLevel = (evidenceFloor?.confidence === 'no-evidence' || evidenceFloor?.status === 'no-evidence')
+      ? 'no-evidence'
+      : 'failed';
     return Object.freeze({
       category: 'corrupt',
       executed: 'unknown',
       verdict: 'inconclusive',
       refused: true,
-      evidence: 'failed',
+      evidence: evidenceLevel,
       satisfied: false,
       infraFailure: true,
       failure: result?.classification?.failure ?? { family: 'contract', code: 'corrupt-record' },
@@ -1010,18 +1013,20 @@ export function runOutcome(resultOrPath, { evidenceFloor } = {}) {
 
   // Apply evidenceFloor downgrade if provided
   if (evidenceFloor && typeof evidenceFloor === 'object') {
-    const derived = classifyRunEvidence({
-      exitCode: typeof evidenceFloor.exitCode === 'number' ? evidenceFloor.exitCode : null,
-      signal: typeof evidenceFloor.signal === 'string' ? evidenceFloor.signal : null,
-      isTimeout: evidenceFloor.isTimeout === true,
-      agentClaim: evidenceFloor.agentClaim ?? null,
-      claimInvalid: evidenceFloor.claimInvalid === true,
-      workerArtifacts: Array.isArray(evidenceFloor.workerArtifacts) ? evidenceFloor.workerArtifacts : [],
-      changedFiles: Array.isArray(evidenceFloor.changedFiles) ? evidenceFloor.changedFiles : [],
-      hasDirtyBeforeMutation: evidenceFloor.hasDirtyBeforeMutation === true,
-      isReadOnlyOperation: evidenceFloor.isReadOnlyOperation === true,
-      repoRoot: evidenceFloor.repoRoot ?? process.cwd(),
-    });
+    const derived = (evidenceFloor.status !== undefined && evidenceFloor.confidence !== undefined)
+      ? evidenceFloor
+      : classifyRunEvidence({
+          exitCode: typeof evidenceFloor.exitCode === 'number' ? evidenceFloor.exitCode : null,
+          signal: typeof evidenceFloor.signal === 'string' ? evidenceFloor.signal : null,
+          isTimeout: evidenceFloor.isTimeout === true,
+          agentClaim: evidenceFloor.agentClaim ?? null,
+          claimInvalid: evidenceFloor.claimInvalid === true,
+          workerArtifacts: Array.isArray(evidenceFloor.workerArtifacts) ? evidenceFloor.workerArtifacts : [],
+          changedFiles: Array.isArray(evidenceFloor.changedFiles) ? evidenceFloor.changedFiles : [],
+          hasDirtyBeforeMutation: evidenceFloor.hasDirtyBeforeMutation === true,
+          isReadOnlyOperation: evidenceFloor.isReadOnlyOperation === true,
+          repoRoot: evidenceFloor.repoRoot ?? process.cwd(),
+        });
 
     const settlesAdvance = category === 'ok' && (evidence === 'reported' || evidence === 'verified');
     const derivedAdvances = derived.status === 'done' && (derived.confidence === 'reported' || derived.confidence === 'verified');
@@ -1032,7 +1037,7 @@ export function runOutcome(resultOrPath, { evidenceFloor } = {}) {
         evidence = derived.confidence ?? 'failed';
       } else if (derived.status === 'no-evidence') {
         category = 'infra';
-        evidence = 'none';
+        evidence = derived.confidence ?? 'no-evidence';
       }
     }
   }

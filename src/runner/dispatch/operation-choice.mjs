@@ -420,15 +420,16 @@ function findLatestAssignmentRunResult({ work, repoRoot, stage, resultKind = 'ga
             }),
             repoRoot,
           });
+          const settlesOutcome = runOutcome(runResult);
           const settlesAdvance =
-            runResult.status === 'done' && (runResult.confidence === 'reported' || runResult.confidence === 'verified');
+            settlesOutcome.satisfied && (settlesOutcome.evidence === 'reported' || settlesOutcome.evidence === 'verified');
           const derivedAdvances =
             derived.status === 'done' && (derived.confidence === 'reported' || derived.confidence === 'verified');
           if (!derivedAdvances || settlesAdvance) {
             runResult.status = derived.status;
             runResult.confidence = derived.confidence;
           }
-          runResult.outcome = runOutcome(runResult);
+          runResult.outcome = runOutcome(runResult, { evidenceFloor: derived });
           if (stat.mtimeMs > latestMtime) {
             latestMtime = stat.mtimeMs;
             latestRunResult = runResult;
@@ -1699,8 +1700,12 @@ function fallbackMutationForAssignment(asgn) {
 
 export function interpretAssignmentRunResult({ choice, runResult, contextSignals = {}, work, repoRoot }) {
   const outcome = runResult?.outcome ?? (runResult ? runOutcome(runResult) : null);
-  const confidence = outcome ? outcome.evidence : runResult?.confidence;
-  const status = runResult?.status ?? (outcome?.satisfied ? 'done' : outcome?.category);
+  const confidence = (outcome?.evidence === 'no-evidence' || outcome?.evidence === 'none')
+    ? 'no-evidence'
+    : (outcome?.evidence ?? null);
+  const status = (confidence === 'no-evidence')
+    ? 'no-evidence'
+    : (outcome?.satisfied ? 'done' : (outcome?.category ?? null));
   const operation = choice?.operation;
 
   const stampedAssignment = choice?.assignment ?? null;
@@ -1717,7 +1722,7 @@ export function interpretAssignmentRunResult({ choice, runResult, contextSignals
 
   const isFailed = outcome
     ? (outcome.infraFailure || outcome.category === 'policy' || confidence === 'failed' || status === 'failed')
-    : (confidence === 'failed' || status === 'failed');
+    : false;
   if (isFailed) {
     return Object.freeze({
       canAdvanceEdge: false,

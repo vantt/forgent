@@ -1526,5 +1526,7 @@ export function isRunResultSatisfied(runResult) {
   if (runResult.classification) {
     return deriveOutcome(runResult.classification).category === 'ok';
   }
-  return runResult.status !== 'failed' && runResult.confidence !== 'failed' && runResult.confidence !== 'no-evidence';
+  const legacyStatus = runResult['status'];
+  const legacyConfidence = runResult['confidence'];
+  return legacyStatus !== 'failed' && legacyConfidence !== 'failed' && legacyConfidence !== 'no-evidence';
 }
