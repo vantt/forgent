@@ -5,7 +5,7 @@ status: in-progress
 priority: P1
 created: 2026-09-25
 revised: 2026-09-29 (converted to AgentKit plan format; phases renumbered from 1)
-blockedBy: []
+blockedBy: [260929-1501-metrics-friction-rust-native, 260929-1703-runresult-classification-single-path]
 blocks: []
 ---
 
@@ -276,6 +276,43 @@ permission to execute it.
 | 9 | `not-started`, `not-authorized` | None | Blocked by Phase 8 and explicit cutover approval | No promotion, migration, deletion, alias activation, or legacy retirement has occurred |
 | 10 | `not-started`, `not-authorized` | None | Follow-on only after verified Phase 9 cutover | Maintenance MVP remains a handoff, not current work |
 
+
+## 7.2. Execution harness and observation
+
+**Start condition:** Phases 4–10 start only after the Observe-related plans are finished, so every phase is measured from its first step:
+- `plans/260929-1501-metrics-friction-rust-native/` on `main`, **including** its follow-up (re-stage, transcript support for worktrees outside `.claude/worktrees`, verification pass);
+- `plans/260929-1703-runresult-classification-single-path/` on `main` (exact verdict/infra split, `usage`).
+
+The substrate friction producers (draft plan `260929-1703-baseline-friction-producers`) are **not** a precondition.
+
+**Harness (cost-aware, correct capabilities).** Full rationale and mechanism table: [reports/harness-readiness-2026-09-29.md](reports/harness-readiness-2026-09-29.md) §5.
+- Authoring stays with the Lead in this worktree. In today's fgOS no mutating, non-code, Observe-visible dispatch path exists.
+- The master loop (`code:*`, 4 runs per round) is **not** used for documentation.
+- **Doc:**
+  - 1 `agent-led` reviewer session with `task.capabilities: ["review"]`, read-only, pinned to a provider different from the Lead;
+  - at most 1 re-review after fixes.
+- **Decision:** Doc review **plus one** `group-thinking-rfc-review-lite` session (proposer + 2 objectors) on the decision record.
+- **Code slice:**
+  - Lead inline;
+  - 1 `agent-led` reviewer session with `task.capabilities: ["code:review"]`;
+  - at most 1 re-review.
+- **Fresh-reader:** `independent-research-fan-out-fan-in` (2 independent researchers, read-only).
+
+**Observation per phase:**
+- Open `fgos metrics case open doc-authority-p<N> --harness fgos --task "<phase title>"` before starting.
+- Close every coordination session explicitly.
+- Close the case with `--interventions`, `--verdict` and `--sessions <ids>`.
+- Read the result with `fgos metrics harness --case doc-authority-p<N>`.
+
+| Phase | Harness type |
+|---|---|
+| 4 | Decision + Code slice (constitution and method freeze; mechanical gates) |
+| 5 | Doc (+ Code slice if gates change) |
+| 6 | Doc, one review per non-overlapping area batch |
+| 7 | Fresh-reader + Doc |
+| 8 | Code slice + Doc (consumer and bypass rewrites) |
+| 9 | Decision (cutover approval) + Code slice |
+| 10 | Code slice + Doc |
 
 ## 8. Dependency Graph
 

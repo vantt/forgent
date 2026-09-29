@@ -20,7 +20,7 @@ What this shows:
 3. **Sessions were never closed.** None of the six reached a terminal status. Rounds continued in new sessions instead of within one, so per-phase measurement is fragmented. `fgos doctor` now has a `coordination-sessions-closed` check (commit `4358e88c0`).
 4. Legacy Phase 02 (now Phase 3) was not run through coordination.
 
-## 2. Role and executor configuration
+## 2. Role and executor configuration (**superseded by §5 Revision 2**)
 
 The protocol hard-codes `code:implement` (doer, fixer) and `code:review` (reviewer, red-team). This track is mostly documentation, with some gate scripts. The config (`.fgos/config.json` `runner.capabilities`) has better-fitting capabilities: `execute` (prefer `claude`) and `review` (non-code artifact review, read-only confinement), but the protocol does not reference them.
 
@@ -59,3 +59,43 @@ Open point: the protocol's `code:*` labels remain semantically wrong for docs wo
 3. **Observe F2 transcript fix** for worktrees outside `.claude/worktrees`.
 4. **One session per phase, closed explicitly** at the end (and after each authorized re-run), so rounds and first-pass are measurable.
 5. Open the case with `--sessions <coordinationId>` so the scorecard binds to the session rather than only the time window.
+
+## 5. Revision 2 (2026-09-29, late): cost-aware harness, correct capabilities
+
+Section 2 above (master loop with actor pins) is **withdrawn**: it runs doer + reviewer + red-team + fixer every round with `code:*` capabilities, which is both wrong for documentation and too expensive. A re-check of what the current fgOS mechanisms actually allow:
+
+| Mechanism | Writes files? | Capability | Seen by Observe? | Fit for this track |
+|---|---|---|---|---|
+| Declared protocol `standalone-master-coordination-loop` | yes (doer/fixer) | hard-coded `code:implement` / `code:review` | yes | **No** for docs: wrong capability, 4 runs per round. Only for a substantial code slice |
+| `dispatch execute --contract` | **no**: `mutation: mutating` is rejected (`src/runner/dispatch/execution-contract.mjs:12`) | from contract | yes (assignment runs) | Read-only tasks only |
+| `dispatch execute <executor>` (plain door) | yes | `--for <capability>` | **no**: writes `.fgos/dispatch-runs/`, which Observe does not read | No (breaks "Observe usable") |
+| `coordination run`, `kind: "agent-led"` | no (`primaryRole` ∈ `reviewer`, `researcher`, `advisor`) | `task.capabilities` passed through (`src/verbs/coordination/run.mjs:671`) | yes (session + assignment runs) | **Yes, for review/research** with capability `review` (non-code, read-only confinement) |
+| Declared read-only protocols: `group-thinking-rfc-review-lite` (proposer + 2 objectors), `declared-consult`, `independent-research-fan-out-fan-in` | no | none declared (actor pins) | yes | **Yes, for decision gates** (one-off multi-view objection instead of a red-team every round) |
+
+**Consequence:** in today's fgOS there is **no path that dispatches a mutating non-code worker and is also visible to Observe**. Documentation authoring therefore stays with the **Lead** (the session working in this worktree, via `ak:cook` or directly). fgOS coordination is used where it is cheap and correct: independent review and decision objection.
+
+### Proposed harness per phase type
+
+| Phase type | Authoring | Independent check | Budget |
+|---|---|---|---|
+| **Doc** (default) | Lead inline | 1 `agent-led` session, `primaryRole: reviewer`, `task.capabilities: ["review"]`, `mutation: read-only`, actor pinned to a provider **different from the Lead** (e.g. `openai`, since `review` has no `prefer` and would otherwise fall back to the default `claude`). If findings: Lead fixes, then **one** re-review | ≤ 2 review runs per phase |
+| **Decision** (method freeze, cutover approval) | Lead drafts the decision record | Doc review above **plus one** `group-thinking-rfc-review-lite` session (proposer + 2 objectors, read-only) on the decision itself | +1 session, once |
+| **Code slice** (gate scripts, resolver, checks) | Lead inline | 1 `agent-led` reviewer session with `task.capabilities: ["code:review"]` (the correct capability for code) | ≤ 2 review runs |
+| Substantial code (only if a phase turns out code-heavy) | master loop is acceptable **only** for that slice, with `code:*` | as protocol | per protocol, bounded by `aggregateBounds.maxRounds` |
+
+Compare with the previous Phase 2 run: 3 master-loop rounds ≈ 10 runs and ≈ 150 minutes of worker time in one session, plus 4 extra sessions.
+
+### Observe usage (so the run is measured from the first step)
+
+- One Observe case per phase: `fgos metrics case open doc-authority-p<N> --harness fgos --task "<phase title>"` **before** starting. Close it with `--interventions <n> --verdict <…> --sessions <ids of the review/decision sessions>`.
+- Close every coordination session explicitly (`coordination close`); a doctor check now flags sessions that are never closed.
+- What Observe will show: Lead tokens (transcripts), review runs with verdict/infra split, session duration and assignment count, manual interventions, commits in the case window.
+- Known limits:
+  1. Lead tokens need the transcript fix for worktrees outside `.claude/worktrees` (follow-up of the Observe plan).
+  2. The verdict/infra split is exact only after the RunResult plan (D2-A).
+  3. Observe #3 "first-pass" is defined for the master loop (fixer presence). For agent-led review sessions, read the verdict of the review runs instead.
+  4. Friction stays empty: this track is not a Work item, and no substrate producers exist yet.
+
+### Open fgOS gap (not in this track)
+
+A mutating, **non-code**, Observe-visible dispatch path does not exist. If dispatching documentation authoring to a worker is wanted later, it needs an fgOS change (for example, allow the `execute` capability as a declared-protocol doer in a doc-flavoured protocol). That belongs in a separate fgOS plan, not in this track.
