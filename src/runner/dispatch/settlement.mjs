@@ -22,6 +22,7 @@ import { normalizeRunResultV2, interpretRunResult } from './run-result.mjs';
 import { validateAgentResultClaim, isReadOnlyAssignment } from './assignment.mjs';
 import { resolveWorkerArtifactPath } from './worker-artifacts.mjs';
 import { attributeWorkspaceChanges } from './evidence-attribution.mjs';
+import { parseUsageForAdapter } from './usage-parsers.mjs';
 
 export function resolveRunWorkerArtifactPath(runDir, roundPattern, legacyName) {
   const candidateDirs = [
@@ -609,8 +610,20 @@ export async function settleRunOutcome({
     ...(fallbackEvidence ? { fallback: fallbackEvidence } : {}),
   };
   fs.writeFileSync(path.join(runDir, 'evidence.json'), `${JSON.stringify(evidenceData, null, 2)}\n`);
+  const stdoutPath = path.join(runDir, 'stdout.log');
+  const stderrPath = path.join(runDir, 'stderr.log');
+  let stdoutContent = null;
+  let stderrContent = null;
+  try { if (fs.existsSync(stdoutPath)) stdoutContent = fs.readFileSync(stdoutPath, 'utf8'); } catch {}
+  try { if (fs.existsSync(stderrPath)) stderrContent = fs.readFileSync(stderrPath, 'utf8'); } catch {}
+
+  const usage = parseUsageForAdapter(resolvedExecutorId || command?.adapter || 'cli-spawn', {
+    stdout: stdoutContent,
+    stderr: stderrContent,
+  });
 
   const runResult = normalizeRunResultV2({
+    usage,
     runId: runMeta.runId,
     assignmentId: runMeta.assignmentId,
     workId: runMeta.workId || assignment?.workId,
