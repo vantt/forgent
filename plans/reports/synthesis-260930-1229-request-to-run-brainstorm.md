@@ -5,7 +5,7 @@ Document type: Synthesis report (discussion lead)
 Snapshot: 2026-09-30 16:20 (Asia/Saigon), main @ 5aed82c52
 Prompt: plans/reports/brainstorm-prompt-260930-1102-request-to-run-decomposition.md
 Handoff: plans/reports/handoff-260930-1210-harness-routing-discussion-lead.md
-Status: v2.7 — §6b đối chiếu plan X (readonly redesign): không chặn bước 1, nên gom với bind(); sửa D5/bước 1/F16; thống nhất tên red-team (bỏ objector); Q6 chốt (persona khoá không bị thay, không có 'thêm' ở V1); checker theo rigor; Q1, Q2 chấp nhận; Q4 chốt red-team bắt buộc cho code (lead rút đề xuất); Q0 chốt: mô hình gọn; tách hai tầng: 3 Pattern cộng tác (+ preset) vs Workflow nhiều bước; luật phân biệt; Q8 chốt (giữ mọi dạng thảo luận; bỏ engine chỉ khi chúng chạy tốt trên mô hình gọn); Q9 chốt (supersede ADR-006 §6); (architecture advisor là ca nghiệm thu thu hồi engine); §4b chấm lại theo §0 (lead + kongming độc lập: gọn 3,9–4,0 > P-A 3,2–3,3 > P-B loại); bake-off sửa; F26–F30; §0 kết quả mong muốn + tiêu chí mới (G1–G6, 8 tiêu chí); Q0 engine vs mô hình gọn (bake-off trước); mức 4 override làm rõ; hình chạy tổng thể + plan vs Workflow + (b) quyền sở hữu plan.md đã chốt; Workflow tách khỏi Work đã chốt; bảng thuật ngữ đã chốt ở §6 D0; 3 câu trả lời (2 family: claude, openai). Chưa có gemini/xai; cập nhật tiếp nếu owner gửi thêm.
+Status: v2.8 — §6c đối chiếu plan tier T: T chạy trước, track này chờ T ở phần code; T cần thêm sàn `capabilities.<cap>.rigor`; Q2 đã được T phủ; §6b đối chiếu plan X (readonly redesign): không chặn bước 1, nên gom với bind(); sửa D5/bước 1/F16; thống nhất tên red-team (bỏ objector); Q6 chốt (persona khoá không bị thay, không có 'thêm' ở V1); checker theo rigor; Q1, Q2 chấp nhận; Q4 chốt red-team bắt buộc cho code (lead rút đề xuất); Q0 chốt: mô hình gọn; tách hai tầng: 3 Pattern cộng tác (+ preset) vs Workflow nhiều bước; luật phân biệt; Q8 chốt (giữ mọi dạng thảo luận; bỏ engine chỉ khi chúng chạy tốt trên mô hình gọn); Q9 chốt (supersede ADR-006 §6); (architecture advisor là ca nghiệm thu thu hồi engine); §4b chấm lại theo §0 (lead + kongming độc lập: gọn 3,9–4,0 > P-A 3,2–3,3 > P-B loại); bake-off sửa; F26–F30; §0 kết quả mong muốn + tiêu chí mới (G1–G6, 8 tiêu chí); Q0 engine vs mô hình gọn (bake-off trước); mức 4 override làm rõ; hình chạy tổng thể + plan vs Workflow + (b) quyền sở hữu plan.md đã chốt; Workflow tách khỏi Work đã chốt; bảng thuật ngữ đã chốt ở §6 D0; 3 câu trả lời (2 family: claude, openai). Chưa có gemini/xai; cập nhật tiếp nếu owner gửi thêm.
 Lịch sử: v0 12:29 (sonnet + openai bản 12:20) → v1 16:20 (thêm fable; openai bản sửa 12:39)
 ```
 
@@ -440,12 +440,45 @@ X nằm trên nhánh `plan/260930-tier-rigor-consolidation` (đọc bằng `git 
 - Bước 1: `docs:review.prefer=[claude/claude-cli-bwrap]` + capability `docs:review` khai `confinement: required, host-write-denied`; bỏ `claude-cli-readonly`.
 - Bảng 5 mức / F16: fallback theo quota **chưa chạy được** hôm nay; phụ thuộc X.
 
+## 6c. Đối chiếu với plan tier T — `260930-0445-tier-rigor-vocabulary-consolidation` (2026-10-01 00:20)
+
+T nằm trên nhánh `plan/260930-tier-rigor-consolidation` (worktree `~/projects/forgentX-tier-rigor-consolidation`), `status: pending`, 4 phase tuần tự (5–6 ngày), `blocks` plan X. Nhánh T có 4 commit (chỉ tài liệu plan) và đang **sau main 24 commit**; từ merge-base, main **không** đổi gì ở `src/runner/**`, `src/verbs/coordination/**`, `core/coordination-protocols/**`, `.fgos/config.json` — chỉ đổi file brainstorm prompt (`cf94a59e8`).
+
+### T làm gì mà thiết kế này dựa vào
+
+| Thứ T giao | Thiết kế này dùng ở đâu |
+|---|---|
+| `rigor` thay `minTier`; bảng `runner.rigorToTier` (khoá bắt buộc, setup/doctor) | bảng 5 mức, cột tier; mức 0 `rigor = standard`; mức 3 `rigor` của unit/step |
+| một resolver `resolveTierModel` + `deriveProviderFamily` | chuỗi tier duy nhất; `bind()` gọi nó |
+| field `tier` ở PolicyPatch scope actor/assignment/cli (override chỉ nâng) | mức 4 override tier (sau này gom vào `overrides[{scope}]`) |
+| xoá `runner.models`, `rigorOverrides`, bridge, shadow | giảm số nơi quyết model → tiền đề của G6 và tiêu chí 3 |
+| `core/agents/*.yaml`: `model_tier` → `rigor`; `scripts/project-agents.mjs` qua `resolveTierModel` (phase 1 + 3) | **Q2 đã được T phủ** (xem sửa bên dưới) |
+| Work `tier` → `size` + `rigor` | unit từ Work mang `rigor`; Workflow tách khỏi Work làm sau, không xung đột |
+
+### Có phải chờ nhau không
+
+- **T không chờ thiết kế này.** T là nền; nên chạy trước.
+- **Thiết kế này chờ T ở phần code**: `bind()` + primitive + cổng mutating (Q9) + ca nghiệm thu đều sửa `assignment-runner.mjs`, `assignment-policy.mjs`, `resolve.mjs`, `.fgos/config.json` — đúng các file T sửa ở cả 3 phase (T tự ghi "các phase chạy tuần tự vì cùng sửa các file này"). Làm song song = xung đột merge chắc chắn. F28: `rigorToTier` chưa có trên main.
+- **Làm được ngay, không đụng T:** sửa `metrics harness` đọc `definitionRef.id` (F12, Rust Observe); viết plan triển khai cho track này; thiết kế ca nghiệm thu.
+- **Thứ tự đề xuất:** T → (X gom vào) plan `bind()` + primitive + cổng mutating + ca nghiệm thu → plan tách Workflow khỏi Work → plan đổi tên thuật ngữ toàn hệ thống.
+
+### Đề xuất điều chỉnh T (owner quyết; lead không sửa nhánh T)
+
+1. **Thêm `capabilities.<cap>.rigor` (Q1, owner đã chấp nhận)** vào phase 2 của T: một scope sàn chỉ-nâng trong chuỗi merge, cùng thang `rigor`; validator + doctor. Đây là điều chỉnh **bắt buộc** duy nhất.
+2. **Bỏ mục phase 4 sửa brainstorm prompt §6.4**: main đã làm việc này ở `cf94a59e8`; giữ lại chỉ gây xung đột merge trên một bản ghi lịch sử.
+3. Không cần đổi phạm vi khác. Phần T sửa trong engine (schema FlowDefinition, `session-engine.mjs`, `composers.mjs`, 13 YAML `minTier`→`rigor`) một phần sẽ bị mô hình gọn thay sau, nhưng: engine là thứ đang chạy hôm nay; `rigor` trên step là dữ liệu sống sót khi biểu diễn lại thành preset/Workflow; phần bỏ đi nhỏ. Không nên trì hoãn T để tránh phần này.
+4. T giữ tên cũ (`FlowDefinition`, `DemandFacts`…) — đổi tên thuộc plan riêng; T chỉ nên tránh **viết tài liệu mới** quanh các tên sắp bỏ khi có thể (vd `docs/specs/runner.md` D9 nói `rigor` trên "step của Pattern cộng tác" thay vì "step FlowDefinition").
+
+### Sửa trong thiết kế này (đã áp)
+
+- **F15 / Q2**: fable và lead ghi "plan tier chưa phủ `model_tier`" — **đã lỗi thời**: bản T sau red team (`b8df6f780`) đã đưa `scripts/project-agents.mjs` và `core/agents/*.yaml` (`model_tier` → `rigor`) vào phase 1 và 3. Q2 thu hẹp lại: phần còn lại của thiết kế này chỉ là `bind()` trả `model` cho Agent tool khi chạy in-process (thuộc plan `bind()`, không thuộc T).
+
 ## 7. Bộ câu hỏi cho owner (một lượt)
 
 0. ~~Q0 engine hay mô hình gọn~~ — **owner chốt 2026-09-30 23:52: mô hình gọn.** Bake-off không còn để quyết lựa chọn; giữ lại làm **ca nghiệm thu + đo mốc** (Lead-active, can thiệp, chất lượng, resume, no-candidate) để chứng minh mô hình gọn đạt G1–G6 và không thua engine, đồng thời là số liệu nền cho Observe.
 
 1. ~~Sàn tier theo capability~~ — **owner chấp nhận 2026-09-30 23:58**: thêm `capabilities.<cap>.rigor` (sàn, cùng thang, chỉ nâng) vào chuỗi merge; đưa vào plan tier như một mục nhỏ (chạm C5 có chủ đích). Bản gốc câu hỏi: 1. **Sàn tier theo capability — chạm quyết định đã chốt C5.** Khẩu vị của anh nói theo loại việc ("review = opus", "research = standard"), nhưng `rigorToTier` là bảng toàn cục; muốn "review luôn opus" thì chỉ còn cách khai `rigor` cao trong YAML mẫu, tức khẩu vị quay lại YAML. Fable đề xuất thêm một scope `capabilities.<cap>.rigor` (sàn, cùng thang, chỉ nâng) vào chuỗi merge đã có. **Em đề xuất: nhận**, đưa vào plan tier như một mục nhỏ. Lựa chọn khác: giữ C5 nguyên, chấp nhận pattern khai rigor.
-2. ~~`model_tier`~~ — **owner chấp nhận 2026-09-30 23:58**: xoá `model_tier` trong plan tier cùng `runner.models`, kèm thay thế: `bind()` trả `model` cho Agent tool (in-process). Bản gốc câu hỏi: 2. **`model_tier` trong `core/agents/*.yaml`** là đường chọn model thứ hai (qua `scripts/project-agents.mjs`, dựa vào `runner.models` sắp bị xoá), plan tier **chưa phủ** (F15). **Em đề xuất: thêm vào plan tier** (vì plan đó xoá `runner.models`, không làm thì gãy), **kèm thay thế**: subagent in-process lấy model từ `bind()` (tham số `model` của Agent tool, tra `modelPolicies.claude[tier]`), không từ agent YAML. Chỉ xoá mà không thay thì đường in-process mất cách chọn model. Lựa chọn khác: để S5 ở đây.
+2. ~~`model_tier`~~ — **owner chấp nhận 2026-09-30 23:58**; **cập nhật 2026-10-01 00:20:** T (bản sau red team) đã phủ phần `model_tier` → `rigor` + `project-agents.mjs` qua `resolveTierModel` (phase 1, 3) — không cần sửa T; phần còn lại (`bind()` trả `model` cho Agent tool in-process) thuộc plan `bind()` (§6c). Bản gốc câu hỏi: 2. **`model_tier` trong `core/agents/*.yaml`** là đường chọn model thứ hai (qua `scripts/project-agents.mjs`, dựa vào `runner.models` sắp bị xoá), plan tier **chưa phủ** (F15). **Em đề xuất: thêm vào plan tier** (vì plan đó xoá `runner.models`, không làm thì gãy), **kèm thay thế**: subagent in-process lấy model từ `bind()` (tham số `model` của Agent tool, tra `modelPolicies.claude[tier]`), không từ agent YAML. Chỉ xoá mà không thay thì đường in-process mất cách chọn model. Lựa chọn khác: để S5 ở đây.
 3. **Bake-off engine vs Lead + subagent** trên 2 area trước khi làm S2+. Tốn thêm một lượt smoke; đổi lại biết chắc nên gom engine hay đi đường gọn kiểu herdr-cook-plan. **Em đề xuất: làm.**
 4. ~~Red-team cho code~~ — **owner chốt 2026-09-30 23:58: red-team BẮT BUỘC cho code; lead rút đề xuất "tuỳ chọn".** Lead đã đọc sai chính bằng chứng của mình: red-team `failed` 6/6 là **lỗi phân loại** (finding bị ghi thành failure — đang sửa trong plan RunResult classification), không phải red-team vô ích; ngược lại, red-team là checker duy nhất tìm ra finding thật được chấp nhận ở mọi vòng, trong khi reviewer cùng provider đóng dấu (F27). Chi phí thật nhỏ: red-team 6–9 phút/vòng so với producer 22–30 phút/vòng (`.fgos/assignments/asgn_pi_lead_phase01_op_00{1,3,4,6,7,9}`). Nguyên tắc owner: không đạt thì phát hiện càng sớm càng tốt. Hệ quả thiết kế: preset `code-change` = reviewer (khác provider) + red-team **luôn bật** + verify; reviewer và red-team đều chỉ đọc nên **chạy song song** để không cộng thời gian; finding là outcome, không phải failure. Còn mở: có áp cùng mặc định "red-team luôn bật" cho mọi output ghi file ở domain khác (docs…) không — lead nghiêng có, vì cùng nguyên tắc; chờ owner. Bản gốc câu hỏi: 4. **Red-team cho code**: giữ bắt buộc như hiện nay, hay thành red-team tuỳ chọn (tự bật ở `rigor: critical`) giống mọi domain? **Em đề xuất: tuỳ chọn**, vì §6.6 cho thấy chi phí vòng lặp; review khác provider bắt buộc đã giữ chất lượng nền. **Bổ sung 2026-10-01 00:04 (owner):** checker của `reviewed` cấu hình **theo rigor** — đây là khẩu vị (mức 1–2 config), không phải YAML pattern. Dạng đề xuất:
 
