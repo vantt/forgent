@@ -9,7 +9,7 @@ blocks: []
 
 # Plan: Đo tác động RunResult classification bằng Observe
 
-Nguồn: Tách từ Phase 6 của plan [RunResult single path](../260929-1703-runresult-classification-single-path/plan.md) sau khi Phase 1–5 đã hoàn tất và merge vào `main`.
+Nguồn: Tách từ Phase 6 của plan [RunResult single path](../../archive/plans/260929-1703-runresult-classification-single-path/plan.md) sau khi Phase 1–5 đã hoàn tất và merge vào `main`.
 
 ## Outcome
 
