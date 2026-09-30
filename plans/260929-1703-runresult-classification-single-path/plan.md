@@ -1,10 +1,10 @@
 ---
 title: "RunResult: classification là đường đọc duy nhất + ghi usage"
-status: in-progress
+status: completed
 priority: P1
 created: 2026-09-29
 blockedBy: [260929-1501-metrics-friction-rust-native]
-blocks: [260929-1703-baseline-friction-producers]
+blocks: [260930-0335-measure-runresult-classification-impact, 260929-1703-baseline-friction-producers]
 ---
 
 # Plan: RunResult — `classification` single path + `usage`
@@ -77,8 +77,7 @@ Validation Session 1 của plan Observe chốt: "`status` execution-only: review
 | 3 | [Một producer: bỏ phép chiếu legacy, gộp `classifyRunEvidence` (Node)](phase-03-single-producer-drop-legacy-projection.md) | 1.5d | 2 | completed (C1 + C2) |
 | 4 | [Ghi `usage` từ output của adapter](phase-04-capture-usage.md) | 1d | parser: —; nối producer: sau C1 | completed |
 | 5 | [Source Observe (Rust) đọc v3 + usage](phase-05-observe-source-reads-v3.md) | 1d | 3, 4 + Observe F2, F4 | completed |
-| 6 | [Đo tác động bằng Observe](phase-06-measure-impact-with-observe.md) | 0.5d | 5, cộng ≥1 tuần hoặc 50 run | pending-bake |
-<!-- Validation Session 5: tách phần Rust ra phase 5 để phase 1–4 chạy song song với plan Observe; gộp hai lần merge thành một. Validation Session 6: một worktree, làm tuần tự -->
+<!-- Phase 6 (đo lường sau merge) đã tách thành plan riêng: plans/260930-0335-measure-runresult-classification-impact -->
 
 **Thứ tự làm** (một worktree, một agent, tuần tự):
 1. Phase 1.

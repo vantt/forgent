@@ -43,10 +43,10 @@ Sửa source `run-result` và phần `runs` của scorecard Observe để đọc
 4. Sync `main` vào branch lần cuối, chạy lại toàn bộ test, rồi **merge cả branch về `main` một lần** (chỉ khi phase 1–5 đều xong). Restage và kiểm digest (`fgctl status` / `fgos doctor`). Chạy `fgos metrics harness --since <hôm qua>`.
 
 ## Success Criteria
-- [ ] Node và Rust cùng xanh trên `legacy-derivation.json`.
-- [ ] Record v3 không bị phân nhóm lại ở phía Rust.
-- [ ] `fgos metrics harness --since <hôm qua>` chạy đúng ngay sau merge, trên bản đã restage (không có khoảng hở).
-- [ ] Trước merge: đếm lại số session `active` (red-team thấy 512, plan cũ ghi 216); đóng hoặc park các session cũ không còn dùng.
+- [x] Node và Rust cùng xanh trên `legacy-derivation.json`.
+- [x] Record v3 không bị phân nhóm lại ở phía Rust.
+- [x] `fgos metrics harness --since <hôm qua>` chạy đúng ngay sau merge, trên bản đã restage (không có khoảng hở).
+- [x] Trước merge: đếm lại số session `active` (red-team thấy 512, plan cũ ghi 216); đóng hoặc park các session cũ không còn dùng.
 
 ## Risk Assessment
 - **Observe đổi shape source/scorecard khi đang cook.** Dấu hiệu: conflict lớn khi sync `main` ở `lib.rs`/`scorecard.rs`. Cách xử lý: sync `main` thường xuyên; làm 5a/5b sau khi Observe đã commit phase tương ứng, không làm trên code chưa commit.

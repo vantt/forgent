@@ -72,13 +72,13 @@ Có test: reader của C1 đọc đúng fixture v3; session có cả v2 và v3.
    Commit riêng.
 
 ## Success Criteria
-- [ ] `grep -rn "classifyRunEvidence\|classificationForSettlement" src` rỗng. `projectLegacyStatus` chỉ còn trong validator v2 đóng băng (private).
-- [ ] Record v1 và v2 đọc đúng như trước (characterization); record mới đúng v3, có `adapter`/`confinement`/`role`/`durationMs` (hoặc `null`, không bao giờ `0` giả).
-- [ ] Record v3 có category bị sửa tay thì bị validator bác và thành `corrupt`.
-- [ ] Code ở C1 (khi chưa có C2) đọc được fixture v3, tức `git revert C2` an toàn.
-- [ ] C2 là một commit riêng, chỉ chứa phần writer v3.
-- [ ] Test quét source: chỉ `deriveOutcome`/`deriveLegacyOutcome` được phép phân nhóm. `runOutcome` (qua `evidenceFloor`) và validator v3 gọi `deriveOutcome` để kiểm, là ngoại lệ tường minh.
-- [ ] `detect_changes()` chỉ báo các symbol trong phạm vi dự kiến.
+- [x] `grep -rn "classifyRunEvidence\|classificationForSettlement" src` rỗng. `projectLegacyStatus` chỉ còn trong validator v2 đóng băng (private).
+- [x] Record v1 và v2 đọc đúng như trước (characterization); record mới đúng v3, có `adapter`/`confinement`/`role`/`durationMs` (hoặc `null`, không bao giờ `0` giả).
+- [x] Record v3 có category bị sửa tay thì bị validator bác và thành `corrupt`.
+- [x] Code ở C1 (khi chưa có C2) đọc được fixture v3, tức `git revert C2` an toàn.
+- [x] C2 là một commit riêng, chỉ chứa phần writer v3.
+- [x] Test quét source: chỉ `deriveOutcome`/`deriveLegacyOutcome` được phép phân nhóm. `runOutcome` (qua `evidenceFloor`) và validator v3 gọi `deriveOutcome` để kiểm, là ngoại lệ tường minh.
+- [x] `detect_changes()` chỉ báo các symbol trong phạm vi dự kiến.
 
 ## Risk Assessment
 - **Tool bên ngoài đọc `result.json` và dựa vào `status`** (source `run-result` của Observe, herdr dashboard). Cách xử lý: phase 5 sửa source Observe **trước khi merge**; grep `herdr-plugin/src` tìm `"status"` trên result trước merge.

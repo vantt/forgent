@@ -39,9 +39,9 @@ Parser làm ngay sau phase 1, trong cùng worktree (xem thứ tự ở `plan.md`
 3. Sau commit C1 của phase 3: nối parser vào input `usage` của producer.
 
 ## Success Criteria
-- [ ] Một run `pi` thật (xai) có `usage` khác null, và `inputTokens` bằng tổng qua các turn.
-- [ ] Một run `codex-cli` thật có `totalTokens`; fixture có chuỗi "tokens used" giả ở giữa file không bị parse nhầm.
-- [ ] Run claude/herdr có `usage: null` kèm `source`.
+- [x] Một run `pi` thật (xai) có `usage` khác null, và `inputTokens` bằng tổng qua các turn.
+- [x] Một run `codex-cli` thật có `totalTokens`; fixture có chuỗi "tokens used" giả ở giữa file không bị parse nhầm.
+- [x] Run claude/herdr có `usage: null` kèm `source`.
 
 ## Risk Assessment
 - **Định dạng output đổi theo version CLI.** Parser trả `null` kèm `source: "unrecognized"`, không ném lỗi và không làm fail run.
