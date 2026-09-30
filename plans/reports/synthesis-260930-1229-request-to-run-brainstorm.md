@@ -5,7 +5,7 @@ Document type: Synthesis report (discussion lead)
 Snapshot: 2026-09-30 16:20 (Asia/Saigon), main @ 5aed82c52
 Prompt: plans/reports/brainstorm-prompt-260930-1102-request-to-run-decomposition.md
 Handoff: plans/reports/handoff-260930-1210-harness-routing-discussion-lead.md
-Status: v1.4 — Workflow tách khỏi Work đã chốt; bảng thuật ngữ đã chốt ở §6 D0; 3 câu trả lời (2 family: claude, openai). Chưa có gemini/xai; cập nhật tiếp nếu owner gửi thêm.
+Status: v1.5 — hình chạy tổng thể + plan vs Workflow + (b) quyền sở hữu plan.md đã chốt; Workflow tách khỏi Work đã chốt; bảng thuật ngữ đã chốt ở §6 D0; 3 câu trả lời (2 family: claude, openai). Chưa có gemini/xai; cập nhật tiếp nếu owner gửi thêm.
 Lịch sử: v0 12:29 (sonnet + openai bản 12:20) → v1 16:20 (thêm fable; openai bản sửa 12:39)
 ```
 
@@ -136,6 +136,48 @@ P-B **là bước 1 của P-A** (cả ba agent đồng ý). P-Y chỉ chọn n�
   - Phân tầng: `Work (tuỳ chọn) → Workflow run (tuỳ chọn) → Unit → CollaborationPattern → coordination session → assignment/RunResult`. Prompt tự do: không Work, không Workflow. Plan AgentKit: unit từ phase file, Work tuỳ chọn. Quy trình marketing tự động: Workflow, không cần Work. Item trên board: Work + Workflow `coding/feature`.
   - **Một runner duy nhất cho Workflow run**: rút phần tuần tự stage khỏi `src/runner/loop.mjs`; coordination session chỉ chạy **một** unit. Không để hai sequencer (rủi ro E1 của fable) — phải kiểm khi lập plan.
   - Chưa kiểm: engine hiện tại chạy được domain không phải coding end-to-end không (tên stage coding và verb `discover`/`plan` còn rải trong code).
+
+- **Hình chạy tổng thể (owner tạm đồng ý 2026-09-30 22:45).** Bốn đường vào, hội tụ ở Unit; Workflow là tầng tuần tự bước duy nhất:
+
+  ```text
+  Work (tuỳ chọn) ── bản ghi yêu cầu · board · status; trỏ tới cái đang chạy bên dưới
+     │
+  ┌─ prompt tự do ────► Lead hiểu + viết Unit[]            (agent phán đoán)
+  ├─ plan AgentKit ───► đọc unit khai sẵn trong phase file  (máy đọc)
+  ├─ plan dạng khác ──► Lead đọc plan, viết Unit[]          (agent phán đoán)
+  └─ Workflow ────────► Workflow run: đang ở bước nào
+                          │ mỗi bước ──► sinh Unit[]  ─────────────┐
+                          │ hoặc cổng người ──► park, chờ trả lời   │
+                          ▲                                         │
+                          └── bước xong (RunResult) → sang bước sau ┘
+                                        │
+                  máy lint: id, dependsOn, writes không giao, không ghim hạ tầng
+                                        │
+                                     Unit[]   ◄── điểm hội tụ
+                                        │
+                  CollaborationPattern (unit ghi rõ, nếu không thì rule config)
+                                        │
+                        vai ──► bind() ──► executor · tier · persona · cơ chế
+                                        │
+             chạy inline / in-process / out-of-process (ghi file: mỗi unit một worktree)
+                                        │
+                        RunResult ──► Observe (và báo ngược lên Workflow run / Work)
+  ```
+
+- **AgentKit plan và Workflow: giống ở hình dạng, khác ở nguồn (owner chốt 2026-09-30 22:52).**
+
+  | | AgentKit plan | Workflow |
+  |---|---|---|
+  | Dùng | **một lần**, cho một việc | **nhiều lần**, mọi việc cùng loại trong domain |
+  | Chứa | **nội dung cụ thể** (area, file, tiêu chí) | **hình dạng** (bước, loại việc, cổng người); nội dung điền lúc chạy |
+  | Unit | khai **sẵn, cụ thể** trong phase file (`- unit:`) | **khuôn** unit trên bước (capability, rigor, pattern); objective từ đầu vào/bước trước |
+  | Thứ tự / cổng người | bảng phase + `blockedBy` / authorize từng phase | thứ tự bước trong YAML / bước `human-only` |
+
+  Xử lý:
+  - Cả hai đi **cùng một runner tuần tự bước** (Workflow run) và cùng một đường từ Unit trở xuống; không có runner riêng cho plan.
+  - **Chạy một phase**: không mở Workflow run — đọc unit của phase rồi chạy. **Chạy nhiều phase liên tiếp**: driver dịch plan thành định nghĩa bước (phase → bước, `blockedBy` → thứ tự, authorize → cổng người) và mở một Workflow run; khác Workflow domain chỉ ở chỗ định nghĩa dùng một lần.
+  - Cả hai không khai executor/model; không cần Work.
+  - **Quyền sở hữu `plan.md` = (b):** `plan.md` vẫn do người/tool `ak` quản; fgOS **chỉ đọc** bảng phase/authorize, **không ghi** vào plan. Workflow run chỉ ghi tiến độ chạy của chính nó vào store (JSONL, L3). Lý do: plan là tài liệu của AgentKit, fgOS không chiếm quyền sở hữu; tránh hai nơi cùng giữ sự thật.
 
 - **D1 → unit khai `capability` dạng `domain:verb`**, binder tra `capabilities[domain:verb]` rồi fallback `capabilities[verb]`. Xoá DemandFacts, matcher, `form`. (sonnet `kind+domain` là cùng thông tin đổi tên.)
 - **D2 → rule mặc định trong config** (đổi so với v0): "review nhiều hay ít" là khẩu vị nên phải là dữ liệu (lập luận của fable). Mặc định: có `writes` + rigor ≥ standard → `reviewed`; `critical` → thêm objector; còn lại `solo`. Unit/user override bằng `pattern:`.
