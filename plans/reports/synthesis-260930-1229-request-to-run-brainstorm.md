@@ -5,7 +5,7 @@ Document type: Synthesis report (discussion lead)
 Snapshot: 2026-09-30 16:20 (Asia/Saigon), main @ 5aed82c52
 Prompt: plans/reports/brainstorm-prompt-260930-1102-request-to-run-decomposition.md
 Handoff: plans/reports/handoff-260930-1210-harness-routing-discussion-lead.md
-Status: v1 — 3 câu trả lời (2 family: claude, openai). Chưa có gemini/xai; cập nhật tiếp nếu owner gửi thêm.
+Status: v1.1 — thuật ngữ đã chốt ở §6 D0; 3 câu trả lời (2 family: claude, openai). Chưa có gemini/xai; cập nhật tiếp nếu owner gửi thêm.
 Lịch sử: v0 12:29 (sonnet + openai bản 12:20) → v1 16:20 (thêm fable; openai bản sửa 12:39)
 ```
 
@@ -114,7 +114,7 @@ P-B **là bước 1 của P-A** (cả ba agent đồng ý). P-Y chỉ chọn n�
 
 **Chọn P-A**, chốt bất đồng như sau (thay đổi so với v0 được ghi rõ):
 
-- **D0 → hội tụ ở Unit** (theo fable). Tên gọi: *Pattern* = 13 protocol hiện có (cách cộng tác trong một unit); *Flow* = danh sách unit khai sẵn + cổng người. Flow **chưa xây** tới khi có tenant K5 thật. Lý do: cách nhìn này giải thích được vì sao "FlowDefinition cho mỗi plan" là sai — plan đã *là* danh sách unit.
+- **D0 → hội tụ ở Unit** (theo fable). Tên gọi (**owner chốt 2026-09-30 22:20**): **Pattern cộng tác** = 13 file YAML hiện có trong `core/coordination-protocols/` (cách cộng tác để làm xong **một** unit: vai, ai thấy gì, vòng sửa); **Flow nghiệp vụ** = danh sách unit khai sẵn + phụ thuộc + cổng người. Không dùng chữ "FlowDefinition" để chỉ Pattern cộng tác nữa (cả hai đều là YAML nên dễ lẫn). Đổi tên thật trong code/tài liệu (`CoordinationProtocol`, `validateFlowDefinition`, `docs/.../flow-definition.md`) thuộc plan triển khai. Flow **chưa xây** tới khi có tenant K5 thật. Lý do: cách nhìn này giải thích được vì sao "FlowDefinition cho mỗi plan" là sai — plan đã *là* danh sách unit.
 - **D1 → unit khai `capability` dạng `domain:verb`**, binder tra `capabilities[domain:verb]` rồi fallback `capabilities[verb]`. Xoá DemandFacts, matcher, `form`. (sonnet `kind+domain` là cùng thông tin đổi tên.)
 - **D2 → rule mặc định trong config** (đổi so với v0): "review nhiều hay ít" là khẩu vị nên phải là dữ liệu (lập luận của fable). Mặc định: có `writes` + rigor ≥ standard → `reviewed`; `critical` → thêm objector; còn lại `solo`. Unit/user override bằng `pattern:`.
 - **D3 → 3 mẫu `solo`, `reviewed` (objector tuỳ chọn, `driver-authorized`), `panel`.** Delphi/nominal/rfc/group-cognition (0 lần dùng, F13) → đánh dấu experimental, không gom lúc này.
@@ -139,7 +139,7 @@ P-B **là bước 1 của P-A** (cả ba agent đồng ý). P-Y chỉ chọn n�
   | 0 | Mặc định hệ thống | inline nếu có Lead / lỗi rõ nếu headless (không mặc định `claude`) | `rigor = standard` (vẫn đi qua `rigorToTier`) | không có (prompt không có mục Persona) |
   | 1 | Khẩu vị global `~/.fgos/config.json` | `capabilities[domain:verb].prefer[]` → fallback `capabilities[verb].prefer[]` — **đã có** (`prefer`) | `rigorToTier` (khoá bắt buộc, `fgos setup` cài, `doctor` kiểm — plan tier); sàn `capabilities[cap].rigor` — **đề xuất, Q1** | `capabilities[cap].persona` — **đề xuất, chưa có** |
   | 2 | Khẩu vị project `.fgos/config.json` (đè global theo từng key) | như mức 1 | như mức 1 | như mức 1 |
-  | 3 | Yêu cầu của việc (unit / YAML mẫu / Flow) | **không bao giờ** | `rigor` (sàn) | vai do step/Flow khai |
+  | 3 | Yêu cầu của việc (Unit / Pattern cộng tác / Flow nghiệp vụ) | **không bao giờ** | `rigor` (sàn) | vai do step/Flow khai |
   | 4 | Override một lần (request / CLI) | `unit.overrides[role]`, `--executor` | `--tier` / `actors[].tier` (chỉ nâng) | override |
 
   Áp trên mọi mức, không ai vượt: bộ lọc `readOnly` + `independentOf` (override vi phạm thì từ chối trừ khi ghi rõ chấp nhận); governance phủ quyết cuối.
