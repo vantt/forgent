@@ -62,6 +62,13 @@ Tiêu chí để chấm một phương án (dùng đúng các tiêu chí này �
 - **Mặc định inline**: không có executor cấu hình cho một capability thì Lead tự làm trong session (`core/skills/_shared/capability-matching.md`, Q0).
 - **Plan không ghim hạ tầng**: plan không được khai executor/provider/model/tier (`src/report/capability-plan-lint.mjs` báo lỗi khi gặp).
 - **Khẩu vị hiện tại của owner** (dùng làm dữ liệu mẫu, không phải thiết kế): viết tài liệu = openai `flagship`; review tài liệu = claude opus readonly; phản biện quyết định = claude opus; viết code/script = gemini; review code = claude opus, khác provider với người viết; research = gemini/xai `standard`. Không áp trần ngân sách. Cho phép song song, mỗi luồng ghi file một worktree.
+- **Thang độ mạnh model đã chốt (2026-09-30), không thiết kế lại:** plan riêng `plans/260930-0445-tier-rigor-vocabulary-consolidation/` (nhánh `plan/260930-tier-rigor-consolidation`, chưa merge main; đọc bằng `git show plan/260930-tier-rigor-consolidation:plans/260930-0445-tier-rigor-vocabulary-consolidation/plan.md`). Tóm tắt:
+  - bên cầu chỉ có `rigor` (`low|standard|high|critical`), thay `minTier` trên step; bên cung là `runner.rigorToTier` → `tier` → `modelPolicies[provider][tier]`;
+  - xoá `minRigor`, `mode`, `QUALITY_TIER_BRIDGE`, `DEFAULT_TIER_TO_POLICY`, `runner.models`, `rigorOverrides`, `readOnlyRedirects`, PlacementPolicy shadow;
+  - Work `tier` tách thành `size` (không bao giờ tới model) + `rigor`;
+  - bước chỉ-đọc dùng invocation read-only (`readOnly: true` hoặc confinement) của **chính** executor đã chọn, không còn redirect.
+
+  Fact sheet §6.4 bên dưới mô tả hiện trạng **trước** plan đó, chỉ để hiểu vì sao nó rối. Thiết kế của bạn coi hình dạng đích trên là cho sẵn, và chỉ bàn phần còn lại của tầng 5 (executor, invocation, persona, thứ tự ưu tiên, override).
 
 ## 5. Khung giả thuyết (được phép phá)
 
@@ -104,7 +111,7 @@ Khoảng 59k dòng `src/runner/dispatch/**`, 21k dòng `src/runner/coordination`
 - Skill `fgos-panel` định tuyến yêu cầu "cho ý kiến/review/so sánh/red-team" sang protocol group-thinking có sẵn.
 - **Domain workflow** (thuộc lớp Work, ngoài phạm vi, chỉ để biết): `domains/coding/workflows/feature.yaml` khai stage → operations với `role`, `reason`, `dispatch: human-only`… — một cấu trúc "các bước" thứ hai, khác FlowDefinition.
 
-### 6.4 Tầng 5: binding (chọn người làm)
+### 6.4 Tầng 5: binding (chọn người làm) — hiện trạng trước plan tier/rigor (xem §4)
 - **Thứ tự hiện tại cho executor** [fact, gom từ nhiều file]:
   1. cờ CLI `--executor` (đè mọi binding tính toán — `composers.mjs` `withComputedActorBindings`);
   2. `actors[].executor` trong request của Lead;
@@ -164,7 +171,7 @@ Quên code hiện tại. Thiết kế tiến trình yêu cầu → chạy với 
 2. **Ai làm tầng nào**: agent (LLM phán đoán) hay máy (code tất định). Nêu lý do cho từng tầng.
 3. **Điểm hội tụ** giữa "có FlowDefinition" và "không có FlowDefinition".
 4. **Một bảng ưu tiên duy nhất** cho executor / invocation / tier / persona, gồm override một lần (K6) và ràng buộc độc lập (khác provider).
-5. **Một bộ từ vựng tier/rigor duy nhất** (hoặc giải thích vì sao cần nhiều hơn một).
+5. **Tier/rigor**: dùng hình dạng đã chốt ở §4 (rigor → rigorToTier → tier → modelPolicies). Chỉ nêu nếu bạn thấy nó xung đột với thiết kế của mình, kèm bằng chứng.
 6. **Ngữ nghĩa persona**: nó là gì, ai khai, ảnh hưởng tới cái gì (prompt, tier, executor?).
 7. Chạy inline vs dispatch vs song song + worktree, và cách mọi đường đều để Observe đo được.
 8. Chỗ duy nhất nối với Work (nếu cần) — chỉ giao diện.
@@ -187,7 +194,7 @@ Ba lý do mạnh nhất khiến đề xuất của bạn có thể sai hoặc th
 3. Chọn pattern cộng tác (tầng 4) là việc của máy (quy tắc từ facts), của agent, hay của config?
 4. FlowDefinition nên chứa những gì và **không** chứa gì? `minTier` và `persona` là yêu cầu của bước hay khẩu vị của owner?
 5. Có nên gộp các protocol hiện có thành một thư viện pattern nhỏ với vai là slot không? Nếu có, bao nhiêu pattern là đủ?
-6. `readOnlyRedirects` có nên tồn tại không, hay gộp vào `prefer`?
+6. (Đã chốt ở §4: `readOnlyRedirects` bị xoá.) Thay vào đó: persona có nên là khẩu vị trong config hay yêu cầu trên step, và nó ảnh hưởng tới những gì?
 7. Có cần tách capability theo domain (`docs:*`) không, hay `execute`/`review` + `domain` là đủ để binding?
 8. Làm sao để một unit ghi file đơn lẻ (không review) vẫn chạy qua cửa Observe đọc được, mà không sinh đường thứ hai?
 9. Đâu là tập khái niệm nên **xoá** trước tiên để giảm tùm lum nhiều nhất với chi phí nhỏ nhất?
