@@ -36,6 +36,11 @@ Sau phase này `placement-policy.mjs` không còn nội dung nào nên bị xoá
     - Audit mọi invocation khác có tên chứa `readonly` và xử lý giống vậy.
   - Xoá: `selectReadOnlyRedirectExecutor`, `hasExplicitInvocationPin`, `redirectAttempted`, `redirectDecision` (trong compiled plan / `dispatch-plan.json`), `policyForActualExecutor` (nếu không còn dùng), `readOnlyRedirectPool`, `readOnlyRedirectEntryFor`, `readOnlyRedirectInvocationFor`, `selectPlacementPolicyRedirectExecutor`, `stablePoolIndex` (nếu không còn caller), khoá config `runner.placementPolicy` (validator từ chối kèm hướng dẫn), và file `src/runner/dispatch/placement-policy.mjs`.
   - Governance (`disallowedProviders/Executors`) vẫn có quyền phủ quyết cuối, giữ nguyên.
+  <!-- Updated: Validation Session 2 - fallback khi hết quota thay cho redirect -->
+  - **Fallback khi claude hết quota (D16):** hiện không config nào khai `fallbackExecutors`. Phase này khai `fallbackExecutors: [openai]` cho các bước chỉ-đọc đang gắn claude (tối thiểu `review-candidate`, `red-team-candidate` trong `standalone-master-coordination-loop.yaml`; tìm các bước còn lại bằng `rg`). Khai ở `op.policy` hoặc ở actor, tuỳ chỗ mà `run.mjs:127-135` và `registrations.mjs:882` đang đọc.
+    - Fallback chỉ chạy khi dispatch fail thật (quota/capacity) và được ghi provenance. Nó khác redirect, vì redirect đổi executor trước cả khi chạy.
+    - Executor fallback cũng phải qua ràng buộc read-only ở trên. Với openai, ràng buộc chọn invocation read-only đầu tiên theo thứ tự khai (`codex-cli-bwrap`).
+    - Ứng viên fallback vi phạm `distinctProviderFrom` thì bị bỏ qua. Nếu không còn ứng viên hợp lệ, step fail kèm lý do, không chạy bằng provider trùng.
 - Non-functional:
   - Bước chỉ-đọc claude trong master loop (`review-candidate`, `red-team-candidate`) chạy trên claude, model theo tier, không bị đổi sang openai. `distinctProviderFrom` vẫn do `binding.mjs` đảm bảo **trước** dispatch.
   - Pane herdr cho reviewer claude vẫn dùng được khi roster hoặc `prefer` ghim `claude-herdr-readonly`.
@@ -54,6 +59,7 @@ read-only(inv) := inv.readOnly === true (args được validator kiểm) || conf
 
 - Modify: `src/runner/dispatch/assignment-runner.mjs`, `src/runner/dispatch/config.mjs` (field `readOnly`, hằng cờ cấm, từ chối `placementPolicy`), `src/runner/dispatch/resolve.mjs` (`isReadOnlyInvocation`), `src/verbs/coordination/binding.mjs` (bỏ tham chiếu redirect), `src/setup/registrations.mjs` và `src/setup/checks.mjs` (các check liên quan redirect)
 - Modify config: `.fgos/config.json` (xoá `placementPolicy`; sửa args và khai `readOnly` cho các invocation read-only), `~/.fgos/config.json` nếu có invocation tương tự
+- Modify (fallback, D16): `core/coordination-protocols/standalone-master-coordination-loop.yaml` và các protocol khác có bước chỉ-đọc gắn claude; `src/verbs/coordination/run.mjs` nếu đường fallback chưa lọc theo `distinctProviderFrom`
 - Delete: `src/runner/dispatch/placement-policy.mjs`, `test/runner/placement-policy.test.mjs`, `test/runner/placement-policy-redirect-selection.test.mjs`, `test/runner/dispatch-cross-provider-redirect.test.mjs` (đổi thành test cho ràng buộc mới nếu phần nào còn đúng nghĩa)
 - Tests cập nhật (tối thiểu): `test/runner/assignment-dispatch.test.mjs`, `test/runner/assignment-policy.test.mjs`, `test/runner/dispatch-executor-profile.test.mjs`, `test/runner/dispatch-governance-operability.test.mjs`, `test/runner/dispatch-governance-provider-denylist.test.mjs`, `test/runner/dispatch-coordination-role-tiers.test.mjs`, `test/runner/dispatch-policy-baseline-snapshot.test.mjs`, `test/runner/dispatch-i08b-remediation.test.mjs`, `test/runner/provider-adapter.test.mjs`, `test/verbs/coordination-binding.test.mjs`, `test/setup/checks.test.mjs`, `test/setup/checks-doctor-config.test.mjs`
 - Tìm thêm chỗ ghim: `rg -n "cli-readonly|herdr-readonly|readonly-fgovn|readOnlyRedirect" src core domains docs/specs .fgos/config.json`
@@ -66,7 +72,8 @@ read-only(inv) := inv.readOnly === true (args được validator kiểm) || conf
    - validator: `readOnly: true` + `acceptEdits` → lỗi; `readOnly: false` → lỗi;
    - dispatch: read-only + ghim invocation không read-only → lỗi; read-only + không ghim → chọn invocation read-only đầu tiên của cùng executor; read-only + executor không có invocation read-only → lỗi;
    - hồi quy: bước review claude **không** bị đổi sang openai; ghim `claude-herdr-readonly` thì chạy đúng invocation đó.
-4. Thêm field, hằng và predicate; sửa config theo kết quả smoke.
+   - fallback: claude fail vì quota → chạy openai bằng invocation read-only, provenance ghi lý do fallback; ứng viên fallback trùng provider với `distinctProviderFrom` → bị bỏ qua (có test).
+4. Thêm field, hằng và predicate; sửa config theo kết quả smoke; khai `fallbackExecutors` cho các bước chỉ-đọc gắn claude (D16).
 5. Thay khối redirect ở `assignment-runner.mjs` (~dòng 1405-1470) bằng ràng buộc mới; xoá các hàm liệt kê ở Requirements.
 6. Xoá `placement-policy.mjs`; xác nhận không còn import nào (`rg "placement-policy" src bin test`).
 7. Bổ sung vào guard test: `readOnlyRedirect`, `placementPolicy`, `redirectDecision`, `placement-policy.mjs`.
@@ -79,6 +86,7 @@ read-only(inv) := inv.readOnly === true (args được validator kiểm) || conf
 - [ ] Mỗi invocation `readOnly: true` có kết quả smoke "không ghi được file" trong báo cáo phase.
 - [ ] Validator từ chối `readOnly: true` đi kèm cờ tự duyệt ghi (có test).
 - [ ] Các ca ràng buộc read-only và hồi quy "claude review không bị đổi" có test xanh.
+- [ ] Fallback quota: các bước chỉ-đọc gắn claude có `fallbackExecutors`; test chứng minh fallback chạy read-only, ghi provenance và tôn trọng `distinctProviderFrom`.
 - [ ] Smoke end-to-end: bước chỉ-đọc claude chạy trên claude (hoặc giới hạn môi trường được ghi rõ, kèm lệnh cho owner chạy).
 - [ ] Guard test xanh; focused tests xanh; đã merge vào nhánh plan.
 
@@ -86,6 +94,6 @@ read-only(inv) := inv.readOnly === true (args được validator kiểm) || conf
 
 - **Cờ CLI không chặn ghi như tài liệu nói** (bảo đảm ở mức cờ, không phải OS). Tín hiệu: smoke ở bước 2 tạo được file. Xử lý: không khai `readOnly` cho invocation đó; nếu claude không còn cách read-only nào ngoài bwrap, báo owner. Ngoài ra danh sách cờ cấm trong validator chặn trường hợp ai đó sau này thêm lại `acceptEdits`.
 - **CLI đổi hành vi cờ ở bản mới.** Xử lý: smoke read-only đưa vào `fgos doctor` như một check có thể chạy tay (phase 5 đăng ký), không chạy mặc định vì tốn token.
-- **Quota claude:** redirect ban đầu được thêm khi claude hết quota (hotfix 2026-09-16), để dồn review sang openai. Sau phase này, hết quota claude thì bước chỉ-đọc đi theo `fallbackExecutors` / Provider Capacity Rotator (cơ chế đã có), không qua redirect. Tín hiệu: review fail vì quota mà không có fallback. Xử lý: khai `fallbackExecutors` cho vai review; không khôi phục redirect.
+- **Quota claude:** redirect ban đầu được thêm khi claude hết quota (hotfix 2026-09-16), để dồn review sang openai. Sau phase này, hết quota claude thì bước chỉ-đọc đi theo `fallbackExecutors` do chính phase này khai (D16), không qua redirect. Tín hiệu: review vẫn fail vì quota, tức là còn bước chỉ-đọc gắn claude chưa có fallback. Xử lý: khai thêm cho bước đó; không khôi phục redirect.
 - **Executor không có invocation read-only** (`glm`, `gitnexus`, `herdr` không khai `invocations`) mà được bind vào bước chỉ-đọc. Tín hiệu: `readonly.no-read-only-invocation`. Xử lý: đó là lỗi cấu hình đúng nghĩa. Doctor ([phase 5](./phase-05-guard-docs-and-main-merge.md)) kiểm trước: capability có `serves.mutates: false` phải `prefer` executor có invocation read-only.
 - **Rollback:** revert merge commit của phase trên nhánh plan.

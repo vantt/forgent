@@ -21,7 +21,7 @@ Gom mọi phép "tier → model" về **một hàm duy nhất** đọc `modelPol
   - `provider` chỉ lấy từ `executors.<id>.providerModel` (D6).
   - Đường Work/`execute --tier` vẫn nhận `light|standard|heavy` **tạm thời** qua `DEFAULT_TIER_TO_POLICY`. Bảng này được gọi đúng một lần, ở đầu `resolveTierModel`, và bị xoá ở [phase 3](./phase-03-work-size-and-rigor.md) khi Work có `size` + `rigor` (D7). Không nơi nào khác được đọc nó.
 - Non-functional:
-  - Mọi model thật đang chạy giữ nguyên, trừ các chỗ `rigorOverrides` đổi model. Những chỗ đó được dời vào `modelPolicies` sao cho kết quả không đổi (bảng đối chiếu ở bước 2).
+  - Mọi model thật đang chạy giữ nguyên, trừ các chỗ `rigorOverrides` đổi model. Những chỗ đó được dời vào `modelPolicies` sao cho kết quả không đổi (bảng đối chiếu ở bước 2). Ngoại lệ đã được owner duyệt: override của gemini bị xoá mà không dời (D15, bước 2).
   - Config chứa `runner.models`, `executors.*.rigorOverrides`, `capabilities.*.overrides.rigorOverrides` hoặc `capabilities.*.overrides.providerModel` → `RunnerConfigError`, nêu rõ khoá và cách thay.
 
 ## Architecture
@@ -50,11 +50,17 @@ Các hàm bị xoá khỏi `placement-policy.mjs`: `PLACEMENT_POLICY_SHADOW_CONT
    - Với mỗi executor có `rigorOverrides` (project: `glm` → `z-ai`, `gemini` → `gemini`; global: `pi`), tính model thật mà mỗi tổ hợp (tier đầu vào → override → `modelPolicies`) đang cho ra.
    - Ghi lại `modelPolicies.<provider>` sao cho cùng tier đầu vào cho ra cùng model, không cần override.
    - **Nếu hai executor dùng chung một provider nhưng có override khác nhau**, không thể diễn đạt bằng `modelPolicies`. Khi đó dừng lại, báo owner, không tự chọn.
+   <!-- Updated: Validation Session 2 - chốt trước cách xử lý từng override đã biết -->
+   - **Đã chốt trước (Validation Session 2, D15):** các override đã biết được xử lý như sau, không cần dừng:
+     - `executors.gemini.rigorOverrides` (light→nano, standard→standard, heavy→advanced) và `capabilities.fgos-coding-implement.overrides` (`providerModel: gemini`, `rigorOverrides` mọi mức → standard): xung đột trên cùng provider gemini. **Xoá cả hai, không sửa `modelPolicies.gemini`.** Nếu ghi `gemini.frontier = flash-high` thì step coordination ở `frontier` sẽ tụt model. Trạng thái cuối sau phase 3: Work trên gemini = `rigorToTier[rigor ?? standard]` → flash-medium, trùng với cái capability đang ép. Cập nhật luôn `description` đã cũ của capability này (nó còn nhắc `gemini-3.6-flash-medium`, `modelPolicies.gemini.lightweight`).
+     - `executors.glm.rigorOverrides` (mọi mức → nano): `modelPolicies.z-ai` vốn đã là `glm-5.2` ở mọi tier, nên chỉ cần xoá.
+     - Global `executors.pi.rigorOverrides` (mọi mức → nano): chỉ `pi` dùng `openai-codex`, và bảng đó hiện chỉ có `nano`. Điền đủ 6 tier của `modelPolicies.openai-codex` bằng `gpt-5.5`, rồi xoá override.
+   - Bảng đối chiếu vẫn phải ghi vào báo cáo phase, để chứng minh không còn tổ hợp nào khác đổi model.
 3. Viết `resolveTierModel` cùng unit test: tier hợp lệ; tier lạ → lỗi; provider thiếu bảng → lỗi; chuỗi `light|standard|heavy` đi qua bridge tạm thời.
 4. Chuyển từng caller sang `resolveTierModel`; xoá `modelForTier`, `resolvePolicyTierModel`, `policyTierForDispatchTier`, `policyTierForWorkTier`, và nhánh fallback `cfg.models`.
 5. Xoá phần shadow trong `placement-policy.mjs`; dời `recordShadowBinderDivergence` sang `provider-adapter.mjs`; sửa import ở `cli.mjs` và `transport.mjs`.
 6. Sửa validator để từ chối các khoá đã chết. Thông báo lỗi phải chỉ rõ cách thay, ví dụ: `"executors.gemini.rigorOverrides was removed; express per-tier models in runner.modelPolicies.gemini"`.
-7. Sửa `.fgos/config.json` và `~/.fgos/config.json` theo bảng ở bước 2; xoá `runner.models` ở global config.
+7. Sửa `.fgos/config.json` và `~/.fgos/config.json` theo bảng ở bước 2; xoá `runner.models` ở **cả hai** config (project cũng có khoá này). <!-- Updated: Validation Session 2 - runner.models có ở cả config project -->
 8. Tạo `test/runner/dead-vocabulary-guard.test.mjs`. Test quét `src/`, `bin/`, `core/`, `domains/`, `.fgos/config.json` và fail khi gặp `rigorOverrides`, `resolvePolicyTierModel`, `modelForTier`, `PLACEMENT_POLICY_SHADOW`, `buildPlacementPolicyCandidate`, `runner.models`. Phase 2–4 sẽ bổ sung thêm từ.
 9. Chạy focused tests (danh sách ở Related Code Files, cộng `npm run test:related`) với `env -u CLAUDE_CODE_SESSION_ID`. Xanh thì commit ngay, merge `--no-ff` vào nhánh plan, rồi chạy lại focused tests trên nhánh plan.
 
@@ -68,7 +74,8 @@ Các hàm bị xoá khỏi `placement-policy.mjs`: `PLACEMENT_POLICY_SHADOW_CONT
 
 ## Risk Assessment
 
-- **Hai executor chung provider nhưng override khác nhau.** Tín hiệu: bảng ở bước 2 có xung đột. Xử lý: dừng lại và hỏi owner; không thêm lại một lớp override.
+- **Hai executor chung provider nhưng override khác nhau.** Tín hiệu: bảng ở bước 2 có xung đột. Xử lý: dừng lại và hỏi owner; không thêm lại một lớp override. Xung đột gemini đã biết thì đã chốt (D15, bước 2); chỉ dừng khi gặp xung đột **mới**.
+- **Provider có bảng `modelPolicies` thiếu tier** (ví dụ global `openai` chỉ có `nano`). Khi bỏ nhánh fallback `cfg.models`, dispatch ở tier thiếu sẽ fail-fast thay vì âm thầm dùng model của claude. Đây là hành vi đúng; doctor ở [phase 5](./phase-05-guard-docs-and-main-merge.md) sẽ báo trước.
 - **Global config của project khác chứa khoá đã chết.** Tín hiệu: lỗi validate khi chạy fgOS ở project đó. Xử lý: thông báo lỗi có hướng dẫn; doctor liệt kê ([phase 5](./phase-05-guard-docs-and-main-merge.md)). Không viết code tự migrate (quyết định D11 trong [plan.md](./plan.md)).
 - **Test snapshot baseline (`dispatch-policy-baseline-snapshot`) mã hoá hành vi shadow.** Xử lý: cập nhật snapshot. Trước khi commit, diff `--stat` và đọc lại để chắc chỉ phần shadow/model đổi (memory `feedback_diff_before_committing_regenerated_baseline.md`).
 - **Rollback:** revert merge commit của phase trên nhánh plan; `main` không bị ảnh hưởng cho tới phase 5.

@@ -26,7 +26,8 @@ Trong cùng phase, xoá quality bridge (`minRigor`, `mode`, `QUALITY_TIER_BRIDGE
     - `tier = max(rigorToTier[rigor], explicitTier)`, trong đó `explicitTier` đến từ `--tier` hoặc `actors[].tier` và chỉ được nâng;
     - rigor mặc định khi không scope nào khai: `standard`;
     - provenance ghi `{rigor, rigorSource, tier, tierSource}`.
-  - Xoá `minRigor`, `mode`, `QUALITY_TIER_BRIDGE`, `QUALITY_MODE_VALUES`, `MIN_RIGOR_VALUES` (thay bằng `RIGOR_VALUES` duy nhất), và mọi field provenance tương ứng.
+  - Xoá `minRigor`, `mode`, `QUALITY_TIER_BRIDGE`, `QUALITY_MODE_VALUES`, `MIN_RIGOR_VALUES`, và mọi field provenance tương ứng. <!-- Updated: Validation Session 2 - RIGOR_VALUES đã tồn tại -->
+  - `RIGOR_VALUES` **đã tồn tại** ở `src/runner/capability-match.mjs:30` (bản sao của `MIN_RIGOR_VALUES`). Gộp về đúng một hằng trong một module lá, để cả `schema.mjs`, `assignment-policy.mjs`, `capability-match.mjs` và `src/state/work.mjs` ([phase 3](./phase-03-work-size-and-rigor.md)) cùng import mà không tạo vòng import. Không khai thêm bản thứ ba.
   - Đường Work (`loop.mjs`, `execute --tier light|standard|heavy`) giữ nguyên trong phase này, vẫn đi qua bridge tạm thời trong `resolveTierModel`; [phase 3](./phase-03-work-size-and-rigor.md) xử lý.
   - DemandFacts `rigor` hết là "pass-through". Doctrine (`core/skills/_shared/capability-matching.md`) ghi rằng nó là cùng một trường với `rigor` trên step/unit.
 - Non-functional:
@@ -56,7 +57,7 @@ resolveTierModel(cfg, tier, executors.<id>.providerModel)   ← phase 1
 
 1. Mở worktree phase từ đầu nhánh plan (đã chứa phase 1). `impact` upstream cho `validatePolicyPatch`/`mergePolicyStack` (`schema.mjs`), hàm resolver chính trong `assignment-policy.mjs`, `QUALITY_TIER_BRIDGE`.
 2. **Bảng đối chiếu trước khi sửa:** liệt kê mọi step có `minTier` (60 chỗ) cùng tier hiện tại, và tier mới qua `rigorToTier` mặc định. Chênh lệch nào không phải chỗ `advanced` thì dừng lại, không tiếp tục.
-3. Sửa schema: thêm `RIGOR_VALUES`, merge chỉ-nâng, từ chối `minTier`. Viết test trước cho: merge nâng, merge hạ bị từ chối, `minTier` bị từ chối kèm hướng dẫn.
+3. Sửa schema: dùng `RIGOR_VALUES` đã gộp, merge chỉ-nâng, từ chối `minTier`. Viết test trước cho: merge nâng, merge hạ bị từ chối, `minTier` bị từ chối kèm hướng dẫn.
 4. Sửa resolver: `rigorToTier` + explicit tier; xoá quality bridge; cập nhật provenance.
 5. (Không đụng đường Work: để dành cho phase 3.)
 6. Đổi toàn bộ YAML bằng script một lần (không commit script), rồi đọc lại diff từng file.

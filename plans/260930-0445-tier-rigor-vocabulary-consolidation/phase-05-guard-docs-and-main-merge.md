@@ -23,6 +23,7 @@ Khoá kết quả để các lớp đã xoá không mọc lại. Việc gồm:
   - `test/runner/dead-vocabulary-guard.test.mjs` chứa đủ danh sách từ đã chết của phase 1–4, quét `src/`, `bin/`, `core/`, `domains/`, `.fgos/config.json`. Test cho phép các từ này xuất hiện trong `docs/specs/**` **chỉ** ở mục lịch sử quyết định (nhận diện bằng heading), và không cho phép ở bất kỳ chỗ nào khác.
   - Doctor check `tier-vocabulary-dead-keys` (đăng ký trong `src/setup/checks.mjs`/`registrations.mjs`): đọc **cả** config project lẫn global, liệt kê từng khoá đã chết kèm cách thay. Đây là cách owner phát hiện project khác cần sửa (quyết định D11 trong [plan.md](./plan.md)).
   - Doctor check: mọi capability có `serves.mutates: false` phải `prefer` executor có invocation read-only (rủi ro của [phase 4](./phase-04-readonly-invocations.md)).
+  - Doctor check `model-policy-tier-coverage` (Validation Session 2): với mỗi executor có `providerModel`, `modelPolicies[provider]` phải có đủ mọi tier mà `rigorToTier` có thể sinh ra. Kiểm ở cả config project lẫn global. Ví dụ hiện có: global `openai` chỉ khai `nano`. <!-- Updated: Validation Session 2 - doctor phủ tier -->
   - Doctor check chạy tay (không mặc định, vì tốn token): smoke "không ghi được file" cho mọi invocation `readOnly: true`, dùng đúng lệnh smoke của phase 4.
   - `docs/specs/<work spec>` (spec area sở hữu Work, tìm qua `docs/specs/reading-map.md`): trường `size` và `rigor` của Work, cùng đường đọc `tier → size` cho event cũ.
 - Tài liệu:
@@ -32,7 +33,7 @@ Khoá kết quả để các lớp đã xoá không mọc lại. Việc gồm:
     - đánh dấu RUL69 đã bị thay một phần (không sửa tại chỗ phần lịch sử).
   - `docs/specs/distribution.md`: bỏ mọi mô tả `rigorOverrides`.
   - `core/skills/_shared/capability-matching.md` và `executor-dispatch-fallback.md`: `rigor` điều khiển tier qua `rigorToTier`; không còn "pass-through".
-  - `CHANGELOG.md` `[Unreleased]`: một dòng mô tả thay đổi config người dùng thấy được (khoá bị bỏ, khoá mới `rigorToTier`, YAML `minTier` → `rigor`, Work `tier` → `size` + `rigor` và cờ `--tier` → `--size`/`--rigor`, item `heavy` không khai `rigor` sẽ chạy ở `standard`, field invocation `readOnly: true`, bước chỉ-đọc không còn bị redirect sang executor khác).
+  - `CHANGELOG.md` `[Unreleased]`: một dòng mô tả thay đổi config người dùng thấy được (khoá bị bỏ, khoá mới `rigorToTier`, YAML `minTier` → `rigor`, Work `tier` → `size` + `rigor` và cờ `--tier` → `--size`/`--rigor`, item `heavy` không khai `rigor` sẽ chạy ở `standard`, field invocation `readOnly: true`, bước chỉ-đọc không còn bị redirect sang executor khác mà chỉ fallback khi hết quota qua `fallbackExecutors`, `rigorOverrides` của gemini/`fgos-coding-implement` bị bỏ).
   - `plans/reports/brainstorm-prompt-260930-1102-request-to-run-decomposition.md` §6.4: thêm ghi chú rằng phần tier/rigor đã được thay bởi plan này (trỏ link), để các agent brainstorm không thiết kế lại phần này.
 
 ## Related Code Files
