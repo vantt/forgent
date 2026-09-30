@@ -5,9 +5,55 @@ Document type: Synthesis report (discussion lead)
 Snapshot: 2026-09-30 16:20 (Asia/Saigon), main @ 5aed82c52
 Prompt: plans/reports/brainstorm-prompt-260930-1102-request-to-run-decomposition.md
 Handoff: plans/reports/handoff-260930-1210-harness-routing-discussion-lead.md
-Status: v1.7 — Q0 engine vs mô hình gọn (bake-off trước); mức 4 override làm rõ; hình chạy tổng thể + plan vs Workflow + (b) quyền sở hữu plan.md đã chốt; Workflow tách khỏi Work đã chốt; bảng thuật ngữ đã chốt ở §6 D0; 3 câu trả lời (2 family: claude, openai). Chưa có gemini/xai; cập nhật tiếp nếu owner gửi thêm.
+Status: v1.8 — §0 kết quả mong muốn + tiêu chí mới (G1–G6, 8 tiêu chí); Q0 engine vs mô hình gọn (bake-off trước); mức 4 override làm rõ; hình chạy tổng thể + plan vs Workflow + (b) quyền sở hữu plan.md đã chốt; Workflow tách khỏi Work đã chốt; bảng thuật ngữ đã chốt ở §6 D0; 3 câu trả lời (2 family: claude, openai). Chưa có gemini/xai; cập nhật tiếp nếu owner gửi thêm.
 Lịch sử: v0 12:29 (sonnet + openai bản 12:20) → v1 16:20 (thêm fable; openai bản sửa 12:39)
 ```
+
+## 0. Kết quả mong muốn và tiêu chí chấm (đề xuất lại, owner đồng ý 2026-09-30 23:15)
+
+Thay cho §3 của prompt gốc. Lý do đổi: (1) kết quả gốc chỉ nói "chọn đúng người" (tầng binding) trong khi chỗ đau thật là phần chạy quá nặng và không tới xong (§6.6 prompt; F13; Q0); (2) ưu tiên sản phẩm #1 Ship Faster và #2 Release con người không có tiêu chí nào; (3) "đơn giản" chỉ đo bề mặt, không đo máy móc bên dưới; (4) điều kiện đạt/không đạt bị trộn với tiêu chí so sánh; (5) bản gốc ngầm giả định luôn có Lead.
+
+### 0.1 Kết quả mong muốn
+
+Anh, hoặc một project/business workflow dùng fgOS, đưa vào **một yêu cầu** ở bất kỳ dạng nào (câu tự do, plan bất kỳ, hay lệnh chạy một Workflow của domain) thì:
+
+1. **Đi tới kết quả đã kiểm chứng nhanh**, chi phí điều phối nhỏ so với chính công việc, không nghi lễ.
+2. **Tự chạy tới xong**: chỉ dừng hỏi người ở cổng thật sự cần; câu hỏi gom thành bộ; phần việc không phụ thuộc vẫn chạy; chạy được cả khi không có người/Lead (headless).
+3. **Đúng người làm, review thật sự độc lập**: mỗi phần việc do đúng người theo khẩu vị cấu hình **một lần**, đổi cho một lần chạy bằng **một câu nói**; review khác provider, finding được xử lý chứ không đóng dấu.
+4. **Mỗi lần chạy kết thúc rõ ràng, có bằng chứng** (xong / chờ người / lỗi có lý do); không lần chạy nào treo hay vô hình.
+5. **Người/agent lạ đọc được**: vì sao người này làm, việc đang ở đâu, bước tiếp là gì.
+
+Người yêu cầu **không viết gì ngoài nội dung việc**: không định nghĩa quy trình riêng, không file request, không ghim hạ tầng. Đúng cho **mọi domain**, không chỉ code.
+
+Ngoài phạm vi: thiết kế lại thang tier/rigor (plan riêng); nội bộ lớp Work (chỉ giao diện); tính năng Pattern cộng tác chưa có người dùng thật (panel ẩn danh, delphi…).
+
+### 0.2 Điều kiện bắt buộc (đạt/không đạt — không đạt thì loại phương án)
+
+| # | Điều kiện | Nguồn |
+|---|---|---|
+| G1 | Mọi lần chạy (inline, subagent, process ngoài) nằm trong một Observe case và có RunResult | Observe trước (advice §2) |
+| G2 | Plan, Workflow, Pattern cộng tác không ghim executor/provider/model/tier | C4, plan-lint |
+| G3 | Một đường cho mỗi năng lực: cái mới thay cái cũ thì xoá trong cùng bước, không alias | single path |
+| G4 | Chạy được headless và cho một domain không phải code | D-ADR0035 |
+| G5 | Không làm yếu ràng buộc độc lập (khác provider) hay governance | §6.6, C4 |
+| G6 | **Không bao giờ đổi người làm lặng lẽ**: mọi lệch khỏi khẩu vị/override (hết quota, governance, không còn candidate khác provider) có lý do trong provenance; không có người thay hợp lệ thì dừng và báo, không tự hạ | owner 23:16; bài học `readOnlyRedirects` (F3) |
+
+### 0.3 Tiêu chí so sánh (theo thứ tự ưu tiên; mỗi tiêu chí có chỉ số đo trong bake-off)
+
+| # | Tiêu chí | Câu hỏi | Chỉ số | Mốc so sánh |
+|---|---|---|---|---|
+| 1 | **Nhanh, nhẹ** (Ship Faster) | Điều phối tốn bao nhiêu so với công việc? | thời gian ngoài công việc thật / unit; số lệnh Lead gọi / unit; số run phụ | phase tài liệu cũ: ~150 phút, 3 vòng, ~10 run |
+| 2 | **Ít phải canh** (Release con người) | Người phải xen vào bao nhiêu lần? | số lần can thiệp / yêu cầu; câu hỏi có gom; cổng người có chặn việc độc lập | K3 hôm nay: Lead dẫn tay từng bước |
+| 3 | **Đúng người** | Mỗi vai có do đúng executor/tier/persona anh muốn? | tỉ lệ khớp khẩu vị (assignment thực chạy đúng khẩu vị hoặc override / tổng); số lệch có lý do; số lệch không lý do (đích 0) | hôm nay: `code:review` → openai, redirect opus → openai, persona `code-reviewer` cho mọi reviewer |
+| 4 | **Chất lượng và kết thúc** (DoD) | Review có thật? Lần chạy có tới xong? | tỉ lệ finding được chấp nhận; số lần reviewer cho qua < 3 phút với 0 finding; tỉ lệ run tới trạng thái cuối; resume được sau crash | 0/6 session đóng; 512/606 kẹt `active` |
+| 5 | **Đơn giản — bề mặt và máy móc** | Phải hiểu bao nhiêu? Bên dưới bao nhiêu bộ phận chuyển động? | số khái niệm phải hiểu; số nơi chứa khẩu vị (đích 1); số state machine + dòng code trên đường chạy | herdr-cook-plan: 1 skill + 151 dòng |
+| 6 | **Linh hoạt** | Thêm domain/Workflow, đổi khẩu vị, override có phải viết code? | số việc cần sửa code (đích 0); cùng plan chạy ở project khác với khẩu vị khác | — |
+| 7 | **Minh bạch** | Trả lời được "vì sao người này", "đang ở đâu, bước tiếp là gì"? | mọi binding có chuỗi provenance; trạng thái + bước tiếp đọc bằng một lệnh | câu hỏi L5 cho người lạ |
+| 8 | **Chuyển đổi** | Làm theo bước nhỏ? Xoá được bao nhiêu? | mỗi bước tự chạy được; tỉ lệ dòng xoá / dòng thêm (xoá nhiều là điểm cộng) | — |
+
+"Đúng người" xếp trước "Chất lượng" vì nó là điều kiện để review thật (đúng opus, khác provider) và là ý định gốc của cuộc thảo luận. "Đo được" của bản gốc thành G1; "Tường minh" gộp vào "Minh bạch".
+
+Hệ quả: §4 (chấm P-A/P-Y/P-B theo 5 tiêu chí cũ) và đánh giá lại trong Q0 cần **chấm lại theo bộ này** — việc tiếp theo.
 
 ## 1. Bảng tham gia
 
