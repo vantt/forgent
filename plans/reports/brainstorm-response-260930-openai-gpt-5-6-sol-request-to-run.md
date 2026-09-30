@@ -2,13 +2,13 @@
 
 ## Tóm tắt lập trường (≤ 8 dòng)
 
-- [suy luận] Điểm hội tụ nên là **RunGraph**: DAG các Assignment slot; FlowDefinition chỉ là template tái dùng sinh RunGraph, còn yêu cầu/plan không có flow do Lead sinh cùng IR.
-- [suy luận] Chỉ giữ bốn khái niệm trên hot path: `Unit → RunGraph → Binding → Run/RunResult`; Work đứng ngoài và chỉ đưa input/nhận evidence.
+- [suy luận] Điểm hội tụ nên là một **canonical RunGraph IR trước binding**, ưu tiên mở rộng `AssignmentPlan` hiện có nếu đủ thay vì tạo type/scheduler mới. FlowDefinition và yêu cầu/plan chỉ là hai nguồn cùng sinh IR này.
+- [suy luận] Hot path logic là `Unit → canonical graph → Binding → Run/RunResult`; Work đứng ngoài. Runtime phải tái dùng assignment runner, mutation admission, worktree lifecycle và Observe hiện có.
 - [suy luận] Unit lưu **một capability đã chọn**, không lưu cả capability lẫn tám `DemandFacts`; facts chỉ là chất liệu để agent chọn và linter kiểm.
 - [suy luận] FlowDefinition khai semantics (`capability`, `rigor`, role, dependency, mutation, evidence, human gate), không khai executor/tier/provider/model hay owner preference.
 - [suy luận] Một bảng binding project-local theo `(capability, domain, role)` chọn executor/invocation/persona; rigor đi đúng chuỗi đã chốt tới tier/model.
-- [suy luận] Inline và external đều phải materialize Assignment/Run; khác nhau ở executor, không khác cửa chạy/đo.
-- [suy luận] Bước đầu tiên phải là vertical slice chạy K3, không phải thêm slot/protocol tổng quát trước rồi vẫn chưa chạy được plan.
+- [suy luận] Inline và external đều phải materialize Assignment/Run/RunResult qua cửa hiện có; khác nhau ở executor, không khác scheduler hay cửa đo.
+- [suy luận] Vertical slice đầu phải vừa chạy K3 vừa chứng minh một FlowDefinition hiện hữu đi cùng runtime; không xây đường K3 mới rồi hứa hội tụ sau.
 - [fact] Hiện các mối nối đã tồn tại từng phần, nhưng nằm ở prose, facade coding, binding composer và legacy dispatch path khác nhau.
 
 ## A. Hiện trạng (trace K1, K3, K5 + bảng đếm khái niệm)
@@ -109,7 +109,19 @@ BindingResult:
   provenance: ["project rule docs/reviewer", "rigor high → flagship"]
 ```
 
-[suy luận] `Unit` là output chung của cả plan AgentKit và yêu cầu tự do. `RunGraph` là **điểm hội tụ**: không FlowDefinition thì Lead chọn template `solo/review/fanout` và compile; có FlowDefinition thì máy expand definition thành cùng RunGraph. Từ đó chỉ còn một binder và một runtime.
+```yaml
+Run:
+  assignmentId: assignment-author
+  executor: openai
+  worktree: ../phase-06-observe
+RunResult:
+  runId: run-author
+  outcome: pass          # pass | findings | execution-failure | policy-refusal | blocked
+  evidence: [runs/run-author/result.json]
+  next: [review]         # findings có thể mở fix/re-review; human gate mở approve/reject/resume
+```
+
+[suy luận] `Unit` là output chung của cả plan AgentKit và yêu cầu tự do. Canonical graph là **điểm hội tụ trước binding**, không phải runtime mới: ưu tiên nâng `AssignmentPlan` hiện có để nhận node/dependency/gate còn thiếu. FlowDefinition và các template `solo/review/fanout` đều compile/normalize vào đó; sau đó tái dùng binder, assignment runner, admission, worktree và RunResult hiện có. Nếu implementation cần scheduler thứ hai, đề xuất này phải bị bác.
 
 ### 2. Ai quyết tầng nào
 
@@ -127,48 +139,48 @@ BindingResult:
 | Thứ tự | Nguồn | Executor/invocation | Tier/model | Persona |
 |---:|---|---|---|---|
 | 1 | Governance/hard requirements | veto nếu sai mutation/read-only/provider diversity | rigor là floor; không hạ | fixed persona chỉ khi step semantics bắt buộc |
-| 2 | One-shot request override | K6 chọn OpenAI invocation, nhưng vẫn phải thỏa #1 | tier chỉ nâng | override khi step không khóa persona |
-| 3 | Project preference `(capability, domain, role)` | owner cấu hình một lần | `rigorToTier → modelPolicies[provider][tier]` | default theo role/domain |
+| 2 | One-shot request override có selector node/role | K6 chọn OpenAI cho đúng reviewer, nhưng vẫn phải thỏa #1 | tier chỉ nâng | override khi step không khóa persona |
+| 3 | Project preference `(capability, domain, role)` | owner cấu hình một lần; specificity cao hơn thắng, hòa thì refuse ambiguous | `rigorToTier → modelPolicies[provider][tier]` | default theo role/domain |
 | 4 | Capability default | executor/invocation mặc định | cùng chuỗi rigor | persona mặc định capability |
-| 5 | Không cấu hình | Lead inline | model của Lead; vẫn ghi provenance | none |
+| 5 | Không cấu hình | Lead inline nếu governance cho phép | model của Lead; vẫn ghi provenance | none |
 
-[suy luận] Governance là veto cuối về thời điểm thực thi nhưng đứng đầu về hiệu lực. `distinctProviderFrom` lọc candidate sau khi các Assignment trước đã bind; resolver phải hỗ trợ DAG dependency, không dựa array order như giới hạn hiện tại (`binding.mjs:112-133`).
+[suy luận] Governance là veto cuối về thời điểm thực thi nhưng đứng đầu về hiệu lực. `distinctProviderFrom` là constraint trên toàn nhóm graph, kể cả sibling fan-out; resolver phải giải theo constraint/binding order xác định, không dựa array order hay chỉ các Assignment đã bind như giới hạn hiện tại (`binding.mjs:112-133`). Không đủ provider hợp lệ thì refuse/needs-input, không âm thầm bỏ constraint.
 
 ### 4. Persona, inline, worktree, Observe, Work
 
 - [suy luận] Persona là **prompt behavior profile**: tone, checklist, judgment lens, domain obligations. Nó không đổi executor/tier. Registry persona phải có nội dung versioned; không chỉ string label.
 - [suy luận] Persona trên Flow step chỉ khi là semantics nghiệp vụ, ví dụ `brand-reviewer`. Khẩu vị `docs-reviewer` mặc định nằm trong project binding config.
-- [suy luận] Mọi node, kể cả Lead-inline, tạo Assignment và Run qua một `run assignment` door. Inline nghĩa executor=`current-session`; không có legacy `.fgos/dispatch-runs`.
-- [suy luận] `mutation: mutating` bắt buộc worktree; scheduler dùng `writeScope` để phát hiện overlap, nhưng checkout riêng vẫn là isolation authority.
-- [suy luận] Work nối đúng một chỗ: input `{request, constraints, refs}` → driver; output `{RunGraph id, artifacts, RunResults, recommendation}` → Work verb quyết lifecycle. Khớp boundary hiện tại (`work-integration.md:16-44`).
+- [suy luận] Mọi node, kể cả Lead-inline, tạo Assignment, Run và `runs/<id>/result.json` qua assignment lifecycle hiện có. Inline nghĩa executor=`current-session`; không có legacy `.fgos/dispatch-runs`.
+- [suy luận] `mutation: mutating` bắt buộc worktree và phải qua cùng mutation admission. Khi bỏ protocol-operation stamp, producer và `executeAssignment` phải cut over cùng bước, không thêm bypass.
+- [suy luận] Work nối đúng một chỗ: input `{request, constraints, refs}` → driver; output `{graph id, artifacts, RunResults, recommendation}` → Work verb quyết lifecycle. Khớp boundary hiện tại (`work-integration.md:16-44`).
 
 ### 5. Trace K1–K6
 
 | Kịch bản | Trace đích |
 |---|---|
-| K1 | Lead sinh 1 Unit code/change/high/review → template review sinh author+reviewer → config Gemini author, Claude reviewer khác provider → hai Run, một worktree. |
-| K2 | 1 Unit docs/finding/standard/solo/read-only → không executor config thì current-session Run → Observe vẫn thấy. |
-| K3 | Lead đọc phase, sinh 15 area Units + 1 ledger Unit; area chạy song song worktree riêng, ledger dependsOn mọi area và chạy đơn; docs author OpenAI, reviewer Claude Opus. |
-| K4 | 1 decision Unit → `fanout(count=3)+synthesize`; binder chọn provider-diverse candidates; bốn Run. |
-| K5 | Marketing FlowDefinition compile thành brief→author→brand-review→human gate→publish RunGraph; human gate không bind executor. |
-| K6 | Như K1; override reviewer executor=OpenAI chỉ cho request này; provenance ghi override, project preference không đổi. |
+| K1 | Lead sinh 1 Unit code/change/high/review → template review sinh author+reviewer → config bind hai provider → cùng assignment runner tạo Run/RunResult; findings mở fix/re-review, pass mới đóng. |
+| K2 | 1 Unit docs/finding/standard/solo/read-only → không executor config thì current-session Run vẫn ghi `result.json` → Observe thấy cùng lifecycle. |
+| K3 | Lead sinh area Units; mỗi author/reviewer pair trả reviewed commit + source digests + ledger delta. Một integration/ledger writer áp tuần tự vào plan branch và chạy conservation sau **mỗi target commit**, không chờ mọi area xong. |
+| K4 | 1 decision Unit → `fanout(count=3)+synthesize`; binder giải provider-diversity trên ba sibling trước chạy; thiếu candidate thì refuse/needs-input. |
+| K5 | Marketing FlowDefinition normalize thành brief→author→brand-review→human gate→publish trên cùng canonical graph; approve mở publish, reject/resume có transition tường minh. |
+| K6 | Như K1; one-shot selector chỉ override reviewer sang OpenAI; governance/diversity vẫn veto và provenance ghi override. |
 
 ## C. Đối chiếu với hiện tại
 
 | Đích | Hiện có gần đúng | Hành động |
 |---|---|---|
 | Unit schema chung | DemandFacts + plan lint convention | **Gom/đổi** thành Unit; matcher là helper, không runtime IR |
-| RunGraph | FlowDefinition graph + coordination request DAG | **Giữ/gom** thành một compiled graph |
-| 3 template | master loop, research fan-out, consult/panels | **Gom** solo/review/fanout; human gate là node/gate, không nhân pattern |
+| Canonical graph | `AssignmentPlan` + FlowDefinition graph + coordination request DAG | **Mở rộng/gom** representation hiện có; không tạo scheduler/runtime tên RunGraph nếu `AssignmentPlan` đảm nhiệm được |
+| 3 template | master loop, research fan-out, consult/panels | **Gom** solo/review/fanout thành authoring templates; human gate và result transition là graph semantics |
 | FlowDefinition | loader 3 tầng + validator | **Giữ**, bỏ hạ tầng preference khỏi definition |
 | capability slot | `deriveOperationCapability` | **Giữ ý**, bỏ fallback ngầm; compiled node phải có capability |
 | binder duy nhất | `bindOperations` + assignment policy + resolve | **Gom**; binding phải nhận Assignment facts và trả một provenance chain |
 | project preference `(capability,domain,role)` | `capabilities.<name>.prefer` | **Mở rộng dữ liệu**, không tạo `docs:*` chỉ để routing |
 | rigor chain | plan tier-rigor đã chốt | **Nhận nguyên** |
 | persona registry có body | `preferPersona` + `core/agents` labels | **Thiếu, xây nhỏ**; tách persona khỏi agent type |
-| một run door | Assignment runner + coordination | **Giữ**; đưa inline/solo mutation vào đây, **xoá** legacy dispatch-run |
-| generic plan/free-request facade | coding-only `fgos-code-change` | **Tổng quát hóa rồi xoá facade cũ** |
-| Observe mọi run | RunResult/Coordination sources | **Giữ**; inline cũng phát cùng contract |
+| một run door | Assignment runner + coordination | **Giữ và tái dùng**; cut over inline/solo mutation vào cùng admission, **xoá** legacy dispatch-run sau khi mọi caller đã chuyển |
+| generic plan/free-request facade | coding-only `fgos-code-change` | **Mở rộng caller**, không dựng runtime bên dưới thứ hai |
+| Observe mọi run | RunResult/Coordination sources | **Giữ**; mọi producer phải ghi `runs/<id>/result.json`, phân biệt pass/findings/execution/policy/blocked |
 
 ## D. Chấm điểm, lộ trình, không nên làm
 
@@ -176,27 +188,27 @@ BindingResult:
 
 | Tiêu chí | Điểm /5 | Lý do |
 |---|---:|---|
-| Đơn giản | 4.5 | 4 contract, 1 convergence point, 1 runtime; chi phí là Unit + RunGraph compiler. |
+| Đơn giản | 4 | Một IR trước binding và runtime hiện có; mất điểm nếu phải thêm type/scheduler thay vì mở rộng `AssignmentPlan`. |
 | Linh hoạt | 4.5 | Domain/pref/flow đều là data; ad-hoc không cần FlowDefinition. |
-| Tường minh | 5 | Một precedence table và provenance trên từng BindingResult. |
-| Đo được | 5 | Inline/external/solo/protocol đều là Run. |
-| Chuyển đổi | 3 | Phải cắt facade, legacy run store và policy seams; làm vertical slice được. |
+| Tường minh | 4.5 | Precedence, selector, tie-break và provenance phải cùng được khóa. |
+| Đo được | 4 | Chỉ đạt 5 khi inline/current-session thật sự ghi RunResult và Observe đọc được. |
+| Chuyển đổi | 3 | Phải cut over producer và admission cùng bước; vertical slice vẫn khả thi nếu tái dùng runtime. |
 
 ### Lộ trình
 
-1. **K3 vertical slice trước.** Thêm Unit/RunGraph tối thiểu và một generic `run plan/phase` facade: Lead phân rã Phase 6 thành area Units; compiler tạo author+review nodes; scheduler mở worktree riêng, serialize ledger; mọi node materialize Assignment/Run. Thêm project rules docs-author→OpenAI, docs-reviewer→Claude read-only/flagship. Sau smoke một area + ledger, chạy Phase 6. **Xoá ngay** requirement dùng coding master loop/hand-written request JSON cho path này. Rủi ro: plan Phase 6 chưa chi tiết và chưa authorized — runner phải refuse trước authorization.
-2. Compile FlowDefinition và ad-hoc templates về RunGraph; giữ loader/validator, bỏ path materialization song song.
-3. Hợp nhất `bindOperations`, assignment policy và capability resolve thành một binder trên Assignment facts; triển khai precedence/provenance duy nhất; nhận migration tier-rigor đã chốt.
-4. Đưa Lead-inline và solo mutation qua Assignment Run door; Observe smoke cả hai; xoá `openDispatchRun`/`.fgos/dispatch-runs`.
-5. Cutover facade: generic facade thay `fgos-code-change`; xoá deprecated code-panel/plan-loop và protocol trùng; đo usage rồi giữ hoặc xoá 13 protocol theo template/FlowDefinition thật sự cần.
+1. **Khóa eligibility của K3 trước.** Tách “build/smoke harness” khỏi “chạy Phase 6 thật”; xác minh Phase 5, các prerequisite Observe/RunResult, authorization, area ownership/dependency và sửa contract authoring hiện tại ở plan §7.2. Chưa đủ gate thì runner refuse, nhưng việc build/smoke vẫn tiến được.
+2. **K3 vertical slice trên runtime hiện có.** Mở rộng `AssignmentPlan` (hoặc representation hiện có tương đương) thành canonical graph tối thiểu; không thêm scheduler. FlowDefinition hiện hữu và K3 area pair phải cùng đi qua binder, mutation admission, assignment runner, worktree và RunResult. Cut over producer lẫn `executeAssignment` trong cùng bước; không bypass protocol stamp một phía.
+3. **Smoke hai area song song, không chỉ một area.** Mỗi pair trả reviewed commit + digests + ledger delta; integration/ledger writer áp tuần tự vào plan branch và chạy conservation sau mỗi target commit. Kiểm cả findings→fix/re-review, pass, policy refusal và terminal closure. Chỉ sau smoke này và authorization mới chạy Phase 6 thật.
+4. Mở rộng cùng canonical graph cho ad-hoc templates và các FlowDefinition còn lại; hợp nhất binding precedence/provenance, selector/tie-break và provider-diversity constraint. Nhận nguyên migration tier-rigor đã chốt.
+5. Cut over Lead-inline/solo mutation vào cùng RunResult lifecycle, smoke Observe, rồi xoá `openDispatchRun`/`.fgos/dispatch-runs`, facade/protocol deprecated và các đường materialization song song.
 
-**Không nên làm:** thêm `slotBindings` song song với capability trên compiled node; tạo `docs:*` chỉ để chọn model; FlowDefinition cho từng plan; policy preference trong YAML; matcher tự đoán capability lại lúc runtime; giữ legacy dispatch-run để “tương thích”; thêm Rust subsystem mới trước khi K3 vertical slice chạy thật.
+**Không nên làm:** tạo type `RunGraph` nếu `AssignmentPlan` mở rộng được; viết compiler/scheduler/runtime K3 thứ hai; thêm `slotBindings` song song với capability; tạo `docs:*` chỉ để chọn model; FlowDefinition cho từng plan; policy preference trong YAML; matcher tự đoán capability lại lúc runtime; bỏ mutation admission thay vì cut over; giữ legacy dispatch-run để “tương thích”; thêm Rust subsystem mới trước khi K3 vertical slice chạy thật.
 
 ## E. Tự phản biện
 
-1. **RunGraph có thể chỉ đổi tên độ phức tạp hiện có.** Phát hiện sớm: implementation cần hơn một compiler + một schema, hoặc vẫn giữ hai scheduler. Gate: K3 và K5 phải dùng cùng persisted Assignment shape và scheduler.
+1. **Canonical graph có thể chỉ đổi tên độ phức tạp hiện có.** Phát hiện sớm: cần type/scheduler mới hoặc K3 và FlowDefinition đi hai entry/runtime khác nhau. Gate: ưu tiên mở rộng `AssignmentPlan`; một K3 pair và một FlowDefinition phải có cùng persisted Assignment shape, admission, runner và RunResult.
 2. **Agent phân rã K3 có thể tạo Unit không ổn định/overlap.** Phát hiện sớm: dry-run hai lần cho graph khác nhau hoặc write-scope collision. Gate: canonicalized graph diff + deterministic cycle/overlap validator trước mutation.
-3. **Một bảng preference `(capability,domain,role)` có thể chưa đủ cho brand/legal/security.** Phát hiện sớm: K5 cần executor pin trong FlowDefinition. Cách sửa: thêm semantic constraints/required persona, không thêm selector hạ tầng vào flow.
+3. **Outcome/gate có thể bị mô tả nhưng không vận hành.** Gate: permanent scenario phải chứng minh findings không bị coi là execution failure, fix/re-review tiếp tục được, human reject/resume đúng transition và session đóng terminal.
 
 ## Trả lời 9 câu hỏi cụ thể
 
@@ -207,8 +219,8 @@ BindingResult:
 5. **Có; ba template đủ:** `solo`, `review`, `fanout`; human approval là gate primitive. Red-team là reviewer role/persona, không phải pattern mới.
 6. **Persona semantic nằm trong step; persona mặc định nằm config.** Nó chỉ ảnh hưởng prompt, không executor/tier.
 7. **`execute/review + domain` đủ.** Chỉ tạo `docs:*` khi behavior contract khác, không vì routing preference.
-8. **Solo unit vẫn materialize Assignment/Run qua cùng run door.** Không coordination session bắt buộc, không legacy dispatch-run.
-9. **Xoá trước:** `form` như runtime branch, legacy dispatch-run, `purpose` alias nội bộ, capability fallback ngầm, persona-label-không-body, và protocol/facade deprecated. Tier-rigor plan xử lý cụm vocabulary chất lượng riêng.
+8. **Solo unit vẫn materialize Assignment/Run/RunResult qua assignment lifecycle hiện có.** Không coordination session bắt buộc, không scheduler mới, không legacy dispatch-run.
+9. **Xoá trước:** `form` như runtime branch, legacy dispatch-run sau cutover, `purpose` alias nội bộ, capability fallback ngầm, persona-label-không-body, và protocol/facade deprecated. Tier-rigor plan xử lý cụm vocabulary chất lượng riêng.
 
 ## Chỗ fact sheet §6 sai hoặc thiếu (nếu có)
 
@@ -216,10 +228,10 @@ BindingResult:
 - [fact] Core hiện có đúng 13 protocol.
 - [fact] Persona không chỉ “chưa xác nhận”: runtime chèn đúng tên vào prompt (`assignment.mjs:713-765`); `core/agents/*.yaml` được `agent-roster.mjs` dùng để chọn agent type, không cung cấp persona body cho đường này.
 - [fact] K3 mô tả “~15 area, mỗi area một worker” là scenario mục tiêu, chưa phải contract hiện hành của Phase 6. Phase file chưa enumerate units; plan §7.2 hiện ghi authoring bởi Lead và review theo area batch.
-- [fact] `fallbackExecutors` bị tài liệu accepted mô tả `reserved-not-executed` (`dispatch-control-plane.md:181-187`), trong khi comments mới hơn nói Provider Capacity Rotator tiêu thụ nó; đây là drift cần xác minh trước khi dựa vào fallback.
+- [fact] `fallbackExecutors` bị tài liệu accepted mô tả `reserved-not-executed` (`dispatch-control-plane.md:181-187`), nhưng runtime đã dùng `compiledPlan.policy.executorPreference.slice(1)` cho provider-capacity refusal (`assignment-runner.mjs:1070-1118,1767-1804`). Drift nằm ở tài liệu; đây không phải retry/failover chung cho mọi lỗi.
 - [fact] `deriveOperationCapability` là nửa slot thật, nhưng `facts` không được `startCoordinationUseCase` truyền rõ từ CLI và action composer gọi không có facts (`actions.mjs:198-220`); fallback domain vì vậy không bền qua session.
 
 ## Câu hỏi còn mở cho owner
 
-1. K3 hiện vẫn `not-authorized` và blocked by Phase 5. “Bước đầu đủ chạy K3” có nghĩa là chỉ build/smoke harness, hay đồng thời owner sẽ authorize và bổ sung danh sách area Units?
+1. K3 hiện `not-authorized`, blocked by Phase 5 và plan §7.2 còn khóa Lead-inline authoring. Owner cho phép đến đâu: chỉ build/smoke harness, hay sau khi đủ Observe/RunResult prerequisite sẽ authorize Phase 6 và sửa execution contract sang external author/reviewer + integration writer?
 2. Persona nghiệp vụ như `brand-reviewer` có được phép khóa ở FlowDefinition, hay mọi persona đều phải override được theo request? Đề xuất: persona semantic được khóa; persona preference thì override được.
