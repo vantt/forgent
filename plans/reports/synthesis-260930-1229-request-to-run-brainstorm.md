@@ -5,7 +5,7 @@ Document type: Synthesis report (discussion lead)
 Snapshot: 2026-09-30 16:20 (Asia/Saigon), main @ 5aed82c52
 Prompt: plans/reports/brainstorm-prompt-260930-1102-request-to-run-decomposition.md
 Handoff: plans/reports/handoff-260930-1210-harness-routing-discussion-lead.md
-Status: v1.9 — §4b chấm lại theo §0 (lead + kongming độc lập: gọn 3,9–4,0 > P-A 3,2–3,3 > P-B loại); bake-off sửa; F26–F30; §0 kết quả mong muốn + tiêu chí mới (G1–G6, 8 tiêu chí); Q0 engine vs mô hình gọn (bake-off trước); mức 4 override làm rõ; hình chạy tổng thể + plan vs Workflow + (b) quyền sở hữu plan.md đã chốt; Workflow tách khỏi Work đã chốt; bảng thuật ngữ đã chốt ở §6 D0; 3 câu trả lời (2 family: claude, openai). Chưa có gemini/xai; cập nhật tiếp nếu owner gửi thêm.
+Status: v2.0 — Q9 chốt (supersede ADR-006 §6); Q8 đổi khung (architecture advisor là ca nghiệm thu thu hồi engine); §4b chấm lại theo §0 (lead + kongming độc lập: gọn 3,9–4,0 > P-A 3,2–3,3 > P-B loại); bake-off sửa; F26–F30; §0 kết quả mong muốn + tiêu chí mới (G1–G6, 8 tiêu chí); Q0 engine vs mô hình gọn (bake-off trước); mức 4 override làm rõ; hình chạy tổng thể + plan vs Workflow + (b) quyền sở hữu plan.md đã chốt; Workflow tách khỏi Work đã chốt; bảng thuật ngữ đã chốt ở §6 D0; 3 câu trả lời (2 family: claude, openai). Chưa có gemini/xai; cập nhật tiếp nếu owner gửi thêm.
 Lịch sử: v0 12:29 (sonnet + openai bản 12:20) → v1 16:20 (thêm fable; openai bản sửa 12:39)
 ```
 
@@ -202,7 +202,7 @@ Hai bản độc lập **cùng thứ hạng**, cách nhau ≤ 0,16 điểm. Đ�
 
 **Mô hình gọn**, với ba điều kiện bắt buộc để qua gate: (a) thay cổng stamp của `executeAssignment` bằng posture + `bind()`, supersede ADR-006 §6 tường minh (F26); (b) **tiêu chí thu hồi engine đếm được + mốc ngày**, không "đóng băng chờ xem" (G3); (c) mọi RunResult ghi file có `provenance.binding` (doctor check) để cửa mutating không bị gọi vòng qua `bind()`.
 
-Biến thể kongming đề xuất (§8 báo cáo của nó): **không giữ engine đóng băng cho panel ẩn danh** mà xoá cùng track; `panel` = loop song song + tổng hợp; ẩn danh sau này là một cờ trên loop. Qua G3 sạch, tiêu chí 8 lên 5; giá là mất "panel có luật visibility" mà hiện 0 người dùng (delphi/nominal/rfc/group-cognition = 0, architecture panel 8). → §7 Q8.
+Biến thể kongming đề xuất (§8 báo cáo của nó): xoá engine cùng track, `panel` = loop song song + tổng hợp. **Đã điều chỉnh 23:40 theo owner** (xem §7 Q8): "0 người dùng" là do harness chưa ổn định, không phải không có nhu cầu — architecture advisor là use case thật đầu tiên. Vì vậy tiêu chí thu hồi engine (G3) = **architecture advisor chạy được trên mô hình gọn với cùng bảo đảm**, không phải đếm lượt dùng.
 
 ## 5. Đối chiếu với đề xuất chưa chốt (handoff §5)
 
@@ -414,8 +414,14 @@ Các bước sau (theo fable): S2 override bền + `solo` + xoá `agent-led`/`di
 
 7. ~~Quy trình nghiệp vụ nằm ở đâu~~ — **đã chốt 22:38**, xem quyết định Workflow ở §6.
 
-8. **Panel ẩn danh: giữ engine đóng băng hay xoá cùng track?** Xem §4b. **Em đề xuất: xoá cùng track** (0 người dùng; qua G3 sạch); nếu anh muốn giữ option, bắt buộc có mốc thu hồi có ngày và tiêu chí đếm được.
-9. **Supersede ADR-006 §6** (bỏ protocol stamp, cổng mutating = posture worktree + `bind()`): cần anh đồng ý vì đổi ranh giới an toàn đã chốt (F26). **Em đề xuất: đồng ý**, vì stamp tự nhận forgeable và posture mới là cổng thật.
+8. **Panel (architecture advisor, business discussion): giữ engine hay chuyển sang mô hình gọn?** — **đổi khung 23:40 theo owner.** Owner cho biết: số "0 người dùng" (F13) **không** phản ánh nhu cầu mà do harness chưa ổn định nên chưa đưa panel vào dùng; ứng viên thật đầu tiên là **software architect advisor** (`fgos-architecture-panel`, protocol `architecture-advisory-panel-v1` / `-standard-v1`), tiếp theo là **thảo luận vấn đề business**. → Rút lại lập luận "0 người dùng nên xoá" ở §4b.
+   - Cấu trúc thật của architecture panel [fact, `core/coordination-protocols/architecture-advisory-panel-standard-v1.yaml`]: chuỗi pha framing → shaping (3 đề xuất độc lập song song: system / alternative / constraint) → critique → synthesis → explanation → dialogue-reopen (người hỏi lại); `visibilityWindows` quy định pha nào được thấy kết quả pha nào; `specialistSlots` gọi chuyên gia khi cần; nhiều bước `driver-authorized`.
+   - Nhìn bằng khái niệm đã chốt: đây là **một Workflow** (pha = bước, dialogue-reopen = cổng người), mỗi pha là unit chạy bằng `panel`/`solo`, và **visibility = đầu vào khai báo của mỗi bước** (bước critique nhận 3 đề xuất; 3 bước shaping chỉ nhận kết quả framing → độc lập theo cấu tạo vì chạy song song với context sạch). Specialist = unit tuỳ chọn do driver kích hoạt.
+   - **Em đề xuất:** không xoá khả năng panel; **dùng architecture advisor làm ca nghiệm thu thứ hai** cho mô hình gọn (sau bake-off docs). Engine chỉ bị thu hồi khi architecture advisor chạy trên mô hình gọn với cùng bảo đảm: đề xuất vòng đầu độc lập, lộ kết quả theo pha, người hỏi lại được, replay được. Không đạt → giữ engine cho panel, ghi rõ lý do (tức P-A cục bộ cho panel). Business discussion là ca thứ ba và cũng là ca G4b (Workflow không phải code, có cổng người).
+   - Ràng buộc kèm: vai có ràng buộc visibility **không bao giờ chạy inline** (Lead thấy hết); phải in-process/out-of-process với context sạch.
+   - Chưa kiểm: engine hiện có ép visibility ở mức hệ thống file (confinement) hay chỉ ở mức context được đưa vào prompt — quyết định mức bảo đảm mô hình gọn cần đạt.
+
+9. ~~Supersede ADR-006 §6~~ — **owner đồng ý 2026-09-30 23:40**: bỏ protocol stamp; cổng ghi file = posture worktree (`resolveMutatingCwdPosture`) + đi qua `bind()` (có `provenance.binding`). Supersede phải ghi tường minh trong plan triển khai (decision record trong spec area tương ứng), không sửa ADR tại chỗ.
 
 Những gì em **tự quyết**, không hỏi: D0–D7 ở §6; bác `AssignmentPlan` (F25); Workflow marketing chỉ smoke trong plan tách Workflow, không xây domain marketing thật trước tenant.
 
