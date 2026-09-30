@@ -120,6 +120,18 @@ P-B **là bước 1 của P-A** (cả ba agent đồng ý). P-Y chỉ chọn n�
 - **D3 → 3 mẫu `solo`, `reviewed` (objector tuỳ chọn, `driver-authorized`), `panel`.** Delphi/nominal/rfc/group-cognition (0 lần dùng, F13) → đánh dấu experimental, không gom lúc này.
 - **D4/D8 → mọi Ask thành Assignment + RunResult qua `executeAssignment`, kể cả inline** (`mechanism: inline`) — **đổi so với v0** (2/3 agent; F11 cho thấy transcript chỉ có với claude, còn Observe cần RunResult để nhóm theo unit). Điều kiện ghi file = cwd là linked worktree (`resolveMutatingCwdPosture` đã có), bỏ phụ thuộc protocol stamp.
 - **D5 → bảng ưu tiên của fable**: override một lần (lưu theo unit, áp mọi vòng) → yêu cầu của unit/vai → khẩu vị config → không còn gì thì inline (có Lead) / lỗi rõ (headless). Không mặc định `claude`. `readOnly` và `independentOf` là **bộ lọc**; override vi phạm độc lập thì từ chối trừ khi override nói rõ chấp nhận. Governance phủ quyết cuối.
+- **Cơ chế chạy do `bind()` trả** (bổ sung 19:35 sau thảo luận với owner):
+
+  | | inline | in-process | out-of-process |
+  |---|---|---|---|
+  | Ai làm | Lead, trong lượt của nó | subagent qua Agent/Task tool của Lead (hoặc MCP tool) | process CLI riêng qua coordination/assignment |
+  | Context | chung với Lead | mới, sạch | mới, sạch |
+  | Model | cố định = model session | chọn trong cùng host (tham số `model` của Agent tool) | `modelPolicies[provider][tier]` |
+  | Provider | = Lead | = Lead | bất kỳ |
+  | Song song / chỉ-đọc ép được / độc lập khác provider | không / không / không | có / tool-scope / không | có / invocation read-only / có |
+
+  Quy tắc: (1) candidate khác provider Lead → out-of-process; (2) cùng provider nhưng vai cần context sạch (review, objector), tier khác session, hoặc song song → in-process, `bind()` trả `model`; (3) cùng provider, **tier session ≥ sàn**, vai không cần độc lập → inline. Cả ba đều ghi RunResult (D4/D8).
+- **Tier/model chỉ còn một chuỗi**: `rigor → rigorToTier → tier → modelPolicies[provider][tier]`, cho cả out-of-process lẫn in-process. Đầu vào merge chỉ-nâng: `rigor` unit/step, override `--tier`/`actors[].tier`, và (nếu Q1 được nhận) `capabilities.<cap>.rigor`. Inline không phải một đường chọn model mà là điều kiện "tier session ≥ sàn".
 - **D6 → vai khai là yêu cầu (vd `brand-guardian`), `capabilities[cap].persona` là khẩu vị**; persona có nội dung thật; bỏ default `code-reviewer`, `implied-by-persona`, `model_tier`.
 - **D7 → `independentOf` bắt buộc** với vai review output ghi file; không thoả → park. Doctor check "mỗi capability chỉ-đọc có ≥ 2 provider family có invocation read-only".
 
@@ -136,7 +148,7 @@ Các bước sau (theo fable): S2 override bền + `solo` + xoá `agent-led`/`di
 ## 7. Bộ câu hỏi cho owner (một lượt)
 
 1. **Sàn tier theo capability — chạm quyết định đã chốt C5.** Khẩu vị của anh nói theo loại việc ("review = opus", "research = standard"), nhưng `rigorToTier` là bảng toàn cục; muốn "review luôn opus" thì chỉ còn cách khai `rigor` cao trong YAML mẫu, tức khẩu vị quay lại YAML. Fable đề xuất thêm một scope `capabilities.<cap>.rigor` (sàn, cùng thang, chỉ nâng) vào chuỗi merge đã có. **Em đề xuất: nhận**, đưa vào plan tier như một mục nhỏ. Lựa chọn khác: giữ C5 nguyên, chấp nhận pattern khai rigor.
-2. **`model_tier` trong `core/agents/*.yaml`** là đường chọn model thứ hai (qua `scripts/project-agents.mjs`, dựa vào `runner.models` sắp bị xoá), plan tier **chưa phủ** (F15). **Em đề xuất: thêm vào plan tier** (vì plan đó xoá `runner.models`, không làm thì gãy). Lựa chọn khác: để S5 ở đây.
+2. **`model_tier` trong `core/agents/*.yaml`** là đường chọn model thứ hai (qua `scripts/project-agents.mjs`, dựa vào `runner.models` sắp bị xoá), plan tier **chưa phủ** (F15). **Em đề xuất: thêm vào plan tier** (vì plan đó xoá `runner.models`, không làm thì gãy), **kèm thay thế**: subagent in-process lấy model từ `bind()` (tham số `model` của Agent tool, tra `modelPolicies.claude[tier]`), không từ agent YAML. Chỉ xoá mà không thay thì đường in-process mất cách chọn model. Lựa chọn khác: để S5 ở đây.
 3. **Bake-off engine vs Lead + subagent** trên 2 area trước khi làm S2+. Tốn thêm một lượt smoke; đổi lại biết chắc nên gom engine hay đi đường gọn kiểu herdr-cook-plan. **Em đề xuất: làm.**
 4. **Red-team cho code**: giữ bắt buộc như hiện nay, hay thành objector tuỳ chọn (tự bật ở `rigor: critical`) giống mọi domain? **Em đề xuất: tuỳ chọn**, vì §6.6 cho thấy chi phí vòng lặp; review khác provider bắt buộc đã giữ chất lượng nền.
 5. **Plan tài liệu**: bước 1 chỉ build + smoke trên area mẫu. Chạy phase thật cần anh authorize P4 (P6 còn chặn bởi P4–P5). Anh định authorize P4 ngay khi S1 xong, hay chờ thêm? (Không chặn việc build.)
