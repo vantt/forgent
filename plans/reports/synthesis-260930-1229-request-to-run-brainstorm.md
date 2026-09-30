@@ -5,7 +5,7 @@ Document type: Synthesis report (discussion lead)
 Snapshot: 2026-09-30 16:20 (Asia/Saigon), main @ 5aed82c52
 Prompt: plans/reports/brainstorm-prompt-260930-1102-request-to-run-decomposition.md
 Handoff: plans/reports/handoff-260930-1210-harness-routing-discussion-lead.md
-Status: v2.8 — §6c đối chiếu plan tier T: T chạy trước, track này chờ T ở phần code; T cần thêm sàn `capabilities.<cap>.rigor`; Q2 đã được T phủ; §6b đối chiếu plan X (readonly redesign): không chặn bước 1, nên gom với bind(); sửa D5/bước 1/F16; thống nhất tên red-team (bỏ objector); Q6 chốt (persona khoá không bị thay, không có 'thêm' ở V1); checker theo rigor; Q1, Q2 chấp nhận; Q4 chốt red-team bắt buộc cho code (lead rút đề xuất); Q0 chốt: mô hình gọn; tách hai tầng: 3 Pattern cộng tác (+ preset) vs Workflow nhiều bước; luật phân biệt; Q8 chốt (giữ mọi dạng thảo luận; bỏ engine chỉ khi chúng chạy tốt trên mô hình gọn); Q9 chốt (supersede ADR-006 §6); (architecture advisor là ca nghiệm thu thu hồi engine); §4b chấm lại theo §0 (lead + kongming độc lập: gọn 3,9–4,0 > P-A 3,2–3,3 > P-B loại); bake-off sửa; F26–F30; §0 kết quả mong muốn + tiêu chí mới (G1–G6, 8 tiêu chí); Q0 engine vs mô hình gọn (bake-off trước); mức 4 override làm rõ; hình chạy tổng thể + plan vs Workflow + (b) quyền sở hữu plan.md đã chốt; Workflow tách khỏi Work đã chốt; bảng thuật ngữ đã chốt ở §6 D0; 3 câu trả lời (2 family: claude, openai). Chưa có gemini/xai; cập nhật tiếp nếu owner gửi thêm.
+Status: v2.9 — plan T đã sửa (D19, D20; commit 9a2cef1cd trên nhánh T); X gộp vào plan bind(); §6c đối chiếu plan tier T: T chạy trước, track này chờ T ở phần code; T cần thêm sàn `capabilities.<cap>.rigor`; Q2 đã được T phủ; §6b đối chiếu plan X (readonly redesign): không chặn bước 1, nên gom với bind(); sửa D5/bước 1/F16; thống nhất tên red-team (bỏ objector); Q6 chốt (persona khoá không bị thay, không có 'thêm' ở V1); checker theo rigor; Q1, Q2 chấp nhận; Q4 chốt red-team bắt buộc cho code (lead rút đề xuất); Q0 chốt: mô hình gọn; tách hai tầng: 3 Pattern cộng tác (+ preset) vs Workflow nhiều bước; luật phân biệt; Q8 chốt (giữ mọi dạng thảo luận; bỏ engine chỉ khi chúng chạy tốt trên mô hình gọn); Q9 chốt (supersede ADR-006 §6); (architecture advisor là ca nghiệm thu thu hồi engine); §4b chấm lại theo §0 (lead + kongming độc lập: gọn 3,9–4,0 > P-A 3,2–3,3 > P-B loại); bake-off sửa; F26–F30; §0 kết quả mong muốn + tiêu chí mới (G1–G6, 8 tiêu chí); Q0 engine vs mô hình gọn (bake-off trước); mức 4 override làm rõ; hình chạy tổng thể + plan vs Workflow + (b) quyền sở hữu plan.md đã chốt; Workflow tách khỏi Work đã chốt; bảng thuật ngữ đã chốt ở §6 D0; 3 câu trả lời (2 family: claude, openai). Chưa có gemini/xai; cập nhật tiếp nếu owner gửi thêm.
 Lịch sử: v0 12:29 (sonnet + openai bản 12:20) → v1 16:20 (thêm fable; openai bản sửa 12:39)
 ```
 
@@ -426,7 +426,7 @@ X nằm trên nhánh `plan/260930-tier-rigor-consolidation` (đọc bằng `git 
 - **`bind()` một chỗ + primitive (các bước sau): nên gom với X**, không làm hai lần trên cùng code (`resolve.mjs`, `assignment-runner.mjs:1431-1455, 2318-2353`, `placement-policy.mjs`). Nếu X làm riêng trên code hiện tại rồi mô hình gọn viết lại đường fallback/redirect → làm hai lần (RUL11).
 - X vẫn `blockedBy` plan tier; thiết kế này cũng xếp `bind()` sau plan tier → hai cái cùng mốc bắt đầu, thuận để gom.
 
-### Đề xuất điều chỉnh X (owner quyết; lead không sửa nhánh X)
+### Điều chỉnh X — **owner chốt 2026-10-01: gộp X vào plan `bind()`** (đã ghi vào `plans/260930-1235-readonly-invocation-redesign/plan.md` trên nhánh T, commit `9a2cef1cd`)
 
 1. **Đích của X đặt trong `bind()`**: read-only là một posture/bộ lọc do `bind()` áp, có provenance; fallback (quota) cũng chọn qua `bind()`. Không vá tiếp `placement-policy.mjs`/khối redirect rồi xoá sau.
 2. **Trả lời câu hỏi brainstorm của X theo hướng nhất quán với thiết kế này**: read-only = OS confinement resolve một chỗ lúc spawn (primary + fallback + resume); in-process = tool-scope — cùng khái niệm posture.
@@ -462,7 +462,7 @@ T nằm trên nhánh `plan/260930-tier-rigor-consolidation` (worktree `~/project
 - **Làm được ngay, không đụng T:** sửa `metrics harness` đọc `definitionRef.id` (F12, Rust Observe); viết plan triển khai cho track này; thiết kế ca nghiệm thu.
 - **Thứ tự đề xuất:** T → (X gom vào) plan `bind()` + primitive + cổng mutating + ca nghiệm thu → plan tách Workflow khỏi Work → plan đổi tên thuật ngữ toàn hệ thống.
 
-### Đề xuất điều chỉnh T (owner quyết; lead không sửa nhánh T)
+### Điều chỉnh T — **owner đồng ý 2026-10-01; lead đã sửa plan T** trên nhánh `plan/260930-tier-rigor-consolidation`, commit `9a2cef1cd` (D19: sàn `capabilities.<cap>.rigor` + **xoá cả khối `capabilities.*.overrides`** vì sau phase 1 chỉ còn `tier`/`model`, không config nào dùng, và `overrides.model` là model ghi cứng; D20: bỏ mục sửa prompt; Validation Session 3). Việc triển khai T do agent khác làm.
 
 1. **Thêm `capabilities.<cap>.rigor` (Q1, owner đã chấp nhận)** vào phase 2 của T: một scope sàn chỉ-nâng trong chuỗi merge, cùng thang `rigor`; validator + doctor. Đây là điều chỉnh **bắt buộc** duy nhất.
 2. **Bỏ mục phase 4 sửa brainstorm prompt §6.4**: main đã làm việc này ở `cf94a59e8`; giữ lại chỉ gây xung đột merge trên một bản ghi lịch sử.
