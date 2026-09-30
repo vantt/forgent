@@ -132,13 +132,31 @@ P-B **là bước 1 của P-A** (cả ba agent đồng ý). P-Y chỉ chọn n�
 
   Quy tắc: (1) candidate khác provider Lead → out-of-process; (2) cùng provider nhưng vai cần context sạch (review, objector), tier khác session, hoặc song song → in-process, `bind()` trả `model`; (3) cùng provider, **tier session ≥ sàn**, vai không cần độc lập → inline. Cả ba đều ghi RunResult (D4/D8).
 - **Tier/model chỉ còn một chuỗi**: `rigor → rigorToTier → tier → modelPolicies[provider][tier]`, cho cả out-of-process lẫn in-process. Đầu vào merge chỉ-nâng: `rigor` unit/step, override `--tier`/`actors[].tier`, và (nếu Q1 được nhận) `capabilities.<cap>.rigor`. Inline không phải một đường chọn model mà là điều kiện "tier session ≥ sàn".
+- **Năm mức tuỳ biến executor / tier / persona** (bổ sung 22:05 sau thảo luận với owner). Xếp từ thấp (fallback) lên cao (thắng); mỗi thuộc tính lấy giá trị ở mức cao nhất có khai, mức 0 chỉ dùng khi mức 1–4 đều trống:
+
+  | Mức | Tầng | Executor (+ invocation) | Tier | Persona |
+  |---|---|---|---|---|
+  | 0 | Mặc định hệ thống | inline nếu có Lead / lỗi rõ nếu headless (không mặc định `claude`) | `rigor = standard` (vẫn đi qua `rigorToTier`) | không có (prompt không có mục Persona) |
+  | 1 | Khẩu vị global `~/.fgos/config.json` | `capabilities[domain:verb].prefer[]` → fallback `capabilities[verb].prefer[]` — **đã có** (`prefer`) | `rigorToTier` (khoá bắt buộc, `fgos setup` cài, `doctor` kiểm — plan tier); sàn `capabilities[cap].rigor` — **đề xuất, Q1** | `capabilities[cap].persona` — **đề xuất, chưa có** |
+  | 2 | Khẩu vị project `.fgos/config.json` (đè global theo từng key) | như mức 1 | như mức 1 | như mức 1 |
+  | 3 | Yêu cầu của việc (unit / YAML mẫu / Flow) | **không bao giờ** | `rigor` (sàn) | vai do step/Flow khai |
+  | 4 | Override một lần (request / CLI) | `unit.overrides[role]`, `--executor` | `--tier` / `actors[].tier` (chỉ nâng) | override |
+
+  Áp trên mọi mức, không ai vượt: bộ lọc `readOnly` + `independentOf` (override vi phạm thì từ chối trừ khi ghi rõ chấp nhận); governance phủ quyết cuối.
+
+  Ba ngoại lệ về cách thắng:
+  - **Tier lấy giá trị lớn nhất, không theo "mức cao đè":** `rigor = max(rigor mức 3, sàn mức 1–2) ?? standard`; `tier = max(rigorToTier[rigor], override mức 4)`; `model = modelPolicies[provider][tier]`. Không mức nào hạ được sàn.
+  - **Executor không có mức 3:** việc chỉ nêu yêu cầu; ai làm là khẩu vị hoặc override. Trong `prefer[]`, candidate đầu qua bộ lọc thắng, các candidate sau là fallback (kể cả khi hết quota).
+  - **Persona mức 3 vs 4 còn tranh chấp:** persona nghiệp vụ Flow khoá (vd `brand-guardian`) — lead đề xuất override **không** đè được (xem §7 Q6).
+
+  Hiện trạng persona để đối chiếu: chỉ có mức 4 (`actors[].persona`), mức 3 (`preferPersona` trong YAML) và một mặc định cứng `code-reviewer` cho mọi role `reviewer` (`assignment-policy.mjs:388-391`); config chưa có field persona; persona chỉ là tên (F4, F5).
 - **D6 → vai khai là yêu cầu (vd `brand-guardian`), `capabilities[cap].persona` là khẩu vị**; persona có nội dung thật; bỏ default `code-reviewer`, `implied-by-persona`, `model_tier`.
 - **D7 → `independentOf` bắt buộc** với vai review output ghi file; không thoả → park. Doctor check "mỗi capability chỉ-đọc có ≥ 2 provider family có invocation read-only".
 
 **Bước 1 = S1 của fable (bốn việc) + hai bổ sung:**
 1. Bỏ `policy.capability` khỏi master loop; `red-team-candidate` → `driver-authorized`.
 2. `coordination start --capability`, lưu manifest; `composeActionRequest` đọc lại cho mọi node (thay `facts` chết).
-3. Config: `docs:write.prefer=[openai]`, `docs:review.prefer=[claude/claude-cli-readonly]`, và sửa `code:review.prefer` → claude (F3).
+3. Config: `docs:write.prefer=[openai]`, `docs:review.prefer=[claude/claude-cli-readonly]`, và sửa `code:review.prefer` → claude (F3). **Lưu ý:** `plan.md` của plan tier nay ghi "readOnlyRedirects dời sang plan follow-on" — **lệch với C5 của handoff** (C5 ghi "bỏ redirect"). Chừng nào redirect còn, bước read-only chọn claude vẫn bị đổi sang openai trừ khi ghim invocation tường minh; vì vậy `prefer` phải luôn kèm invocation, hoặc bước 1 tự xoá redirect.
 4. Close-check trước merge; sửa `metrics harness` đọc `definitionRef.id` (F12).
 5. *(bổ sung)* Smoke **2 area song song** (openai) trong một Observe case.
 6. *(bổ sung)* **Bake-off** cùng 2 area bằng Lead + subagent (fable E1) → quyết P-A hay P-Y trước khi đầu tư S2–S6.
@@ -152,6 +170,8 @@ Các bước sau (theo fable): S2 override bền + `solo` + xoá `agent-led`/`di
 3. **Bake-off engine vs Lead + subagent** trên 2 area trước khi làm S2+. Tốn thêm một lượt smoke; đổi lại biết chắc nên gom engine hay đi đường gọn kiểu herdr-cook-plan. **Em đề xuất: làm.**
 4. **Red-team cho code**: giữ bắt buộc như hiện nay, hay thành objector tuỳ chọn (tự bật ở `rigor: critical`) giống mọi domain? **Em đề xuất: tuỳ chọn**, vì §6.6 cho thấy chi phí vòng lặp; review khác provider bắt buộc đã giữ chất lượng nền.
 5. **Plan tài liệu**: bước 1 chỉ build + smoke trên area mẫu. Chạy phase thật cần anh authorize P4 (P6 còn chặn bởi P4–P5). Anh định authorize P4 ngay khi S1 xong, hay chờ thêm? (Không chặn việc build.)
+
+6. **Persona nghiệp vụ Flow khoá có bị override một lần đè không?** Fable: override thắng; openai: persona đã khoá không đè được. **Em đề xuất: không đè** — đó là yêu cầu nghiệp vụ (mức 3), không phải khẩu vị; muốn đổi thì sửa Flow.
 
 Những gì em **tự quyết**, không hỏi: D0–D7 ở §6; bác `AssignmentPlan` (F25); không xây Flow trước tenant.
 
