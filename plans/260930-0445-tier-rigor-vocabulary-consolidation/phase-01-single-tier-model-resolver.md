@@ -19,7 +19,7 @@ Gom mọi phép "tier → model" về **một hàm duy nhất** đọc `modelPol
   - Một hàm `resolveTierModel(cfg, tier, provider)` trong `src/runner/dispatch/resolve.mjs`. Nó là nơi duy nhất đọc `modelPolicies`, và chỉ nhận tier thuộc `nano|mini|standard|advanced|flagship|frontier`.
   - Mọi caller hiện có chuyển sang gọi hàm này: `modelForTier`, `resolvePolicyTierModel`, `policyTierForDispatchTier` (`plan.mjs:26`), `policyTierForWorkTier` (`placement-policy.mjs:80`), `resolveVerifiedPlacementModel` (`cli.mjs:313`, `cli.mjs:833`), `assignment-runner.mjs:266`, `assignment-policy.mjs:466`.
   - `provider` chỉ lấy từ `executors.<id>.providerModel` (D6).
-  - Đường Work/`execute --tier` vẫn nhận `light|standard|heavy` **tạm thời** qua `DEFAULT_TIER_TO_POLICY`. Bảng này được gọi đúng một lần, ở đầu `resolveTierModel`, và bị xoá ở phase 2 khi có `rigor` (D7). Không nơi nào khác được đọc nó.
+  - Đường Work/`execute --tier` vẫn nhận `light|standard|heavy` **tạm thời** qua `DEFAULT_TIER_TO_POLICY`. Bảng này được gọi đúng một lần, ở đầu `resolveTierModel`, và bị xoá ở [phase 3](./phase-03-work-size-and-rigor.md) khi Work có `size` + `rigor` (D7). Không nơi nào khác được đọc nó.
 - Non-functional:
   - Mọi model thật đang chạy giữ nguyên, trừ các chỗ `rigorOverrides` đổi model. Những chỗ đó được dời vào `modelPolicies` sao cho kết quả không đổi (bảng đối chiếu ở bước 2).
   - Config chứa `runner.models`, `executors.*.rigorOverrides`, `capabilities.*.overrides.rigorOverrides` hoặc `capabilities.*.overrides.providerModel` → `RunnerConfigError`, nêu rõ khoá và cách thay.
@@ -33,7 +33,7 @@ trước:  modelForTier ─┐  resolvePolicyTierModel ─┐  policyTierForDisp
 sau:    resolveTierModel(cfg, tier, provider) → modelPolicies[provider][tier]
 ```
 
-Các hàm bị xoá khỏi `placement-policy.mjs`: `PLACEMENT_POLICY_SHADOW_CONTRACT`, `buildPlacementPolicyCandidate`, `evaluatePlacementPolicyShadow`, `resolveVerifiedPlacementModel`, `policyTierForWorkTier`. Hàm `recordShadowBinderDivergence` vẫn còn một caller cho argv binder (`transport.mjs:51`, không thuộc phạm vi plan này), nên nó được **dời** sang `provider-adapter.mjs`, cạnh `resolveVerifiedProviderArgs`. Phần redirect còn lại của `placement-policy.mjs` bị xoá ở phase 3.
+Các hàm bị xoá khỏi `placement-policy.mjs`: `PLACEMENT_POLICY_SHADOW_CONTRACT`, `buildPlacementPolicyCandidate`, `evaluatePlacementPolicyShadow`, `resolveVerifiedPlacementModel`, `policyTierForWorkTier`. Hàm `recordShadowBinderDivergence` vẫn còn một caller cho argv binder (`transport.mjs:51`, không thuộc phạm vi plan này), nên nó được **dời** sang `provider-adapter.mjs`, cạnh `resolveVerifiedProviderArgs`. Phần redirect còn lại của `placement-policy.mjs` bị xoá ở [phase 4](./phase-04-readonly-invocations.md).
 
 ## Related Code Files
 
@@ -55,7 +55,7 @@ Các hàm bị xoá khỏi `placement-policy.mjs`: `PLACEMENT_POLICY_SHADOW_CONT
 5. Xoá phần shadow trong `placement-policy.mjs`; dời `recordShadowBinderDivergence` sang `provider-adapter.mjs`; sửa import ở `cli.mjs` và `transport.mjs`.
 6. Sửa validator để từ chối các khoá đã chết. Thông báo lỗi phải chỉ rõ cách thay, ví dụ: `"executors.gemini.rigorOverrides was removed; express per-tier models in runner.modelPolicies.gemini"`.
 7. Sửa `.fgos/config.json` và `~/.fgos/config.json` theo bảng ở bước 2; xoá `runner.models` ở global config.
-8. Tạo `test/runner/dead-vocabulary-guard.test.mjs`. Test quét `src/`, `bin/`, `core/`, `domains/`, `.fgos/config.json` và fail khi gặp `rigorOverrides`, `resolvePolicyTierModel`, `modelForTier`, `PLACEMENT_POLICY_SHADOW`, `buildPlacementPolicyCandidate`, `runner.models`. Phase 2 và 3 sẽ bổ sung thêm từ.
+8. Tạo `test/runner/dead-vocabulary-guard.test.mjs`. Test quét `src/`, `bin/`, `core/`, `domains/`, `.fgos/config.json` và fail khi gặp `rigorOverrides`, `resolvePolicyTierModel`, `modelForTier`, `PLACEMENT_POLICY_SHADOW`, `buildPlacementPolicyCandidate`, `runner.models`. Phase 2–4 sẽ bổ sung thêm từ.
 9. Chạy focused tests (danh sách ở Related Code Files, cộng `npm run test:related`) với `env -u CLAUDE_CODE_SESSION_ID`. Xanh thì commit ngay, merge `--no-ff` vào nhánh plan, rồi chạy lại focused tests trên nhánh plan.
 
 ## Success Criteria
@@ -69,6 +69,6 @@ Các hàm bị xoá khỏi `placement-policy.mjs`: `PLACEMENT_POLICY_SHADOW_CONT
 ## Risk Assessment
 
 - **Hai executor chung provider nhưng override khác nhau.** Tín hiệu: bảng ở bước 2 có xung đột. Xử lý: dừng lại và hỏi owner; không thêm lại một lớp override.
-- **Global config của project khác chứa khoá đã chết.** Tín hiệu: lỗi validate khi chạy fgOS ở project đó. Xử lý: thông báo lỗi có hướng dẫn; doctor liệt kê (phase 4). Không viết code tự migrate (câu hỏi mở 4 trong [plan.md](./plan.md)).
+- **Global config của project khác chứa khoá đã chết.** Tín hiệu: lỗi validate khi chạy fgOS ở project đó. Xử lý: thông báo lỗi có hướng dẫn; doctor liệt kê ([phase 5](./phase-05-guard-docs-and-main-merge.md)). Không viết code tự migrate (quyết định D11 trong [plan.md](./plan.md)).
 - **Test snapshot baseline (`dispatch-policy-baseline-snapshot`) mã hoá hành vi shadow.** Xử lý: cập nhật snapshot. Trước khi commit, diff `--stat` và đọc lại để chắc chỉ phần shadow/model đổi (memory `feedback_diff_before_committing_regenerated_baseline.md`).
-- **Rollback:** revert merge commit của phase trên nhánh plan; `main` không bị ảnh hưởng cho tới phase 4.
+- **Rollback:** revert merge commit của phase trên nhánh plan; `main` không bị ảnh hưởng cho tới phase 5.

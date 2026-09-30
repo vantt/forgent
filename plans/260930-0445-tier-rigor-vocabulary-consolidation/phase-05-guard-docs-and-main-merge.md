@@ -1,13 +1,13 @@
 ---
-phase: 4
+phase: 5
 title: "Guard từ đã chết, doctor, tài liệu, full suite, merge main"
 status: pending
 priority: P1
 effort: "0.5d"
-dependencies: [1, 2, 3]
+dependencies: [1, 2, 3, 4]
 ---
 
-# Phase 4: Guard, doctor, tài liệu, merge main
+# Phase 5: Guard, doctor, tài liệu, merge main
 
 ## Overview
 
@@ -20,9 +20,11 @@ Khoá kết quả để các lớp đã xoá không mọc lại. Việc gồm:
 ## Requirements
 
 - Functional:
-  - `test/runner/dead-vocabulary-guard.test.mjs` chứa đủ danh sách từ đã chết của phase 1–3, quét `src/`, `bin/`, `core/`, `domains/`, `.fgos/config.json`. Test cho phép các từ này xuất hiện trong `docs/specs/**` **chỉ** ở mục lịch sử quyết định (nhận diện bằng heading), và không cho phép ở bất kỳ chỗ nào khác.
-  - Doctor check `tier-vocabulary-dead-keys` (đăng ký trong `src/setup/checks.mjs`/`registrations.mjs`): đọc **cả** config project lẫn global, liệt kê từng khoá đã chết kèm cách thay. Đây là cách owner phát hiện project khác cần sửa (câu hỏi mở 4 trong [plan.md](./plan.md)).
-  - Doctor check: mọi capability có `serves.mutates: false` phải `prefer` executor có invocation confined (rủi ro của [phase 3](./phase-03-readonly-confined-invocation.md)).
+  - `test/runner/dead-vocabulary-guard.test.mjs` chứa đủ danh sách từ đã chết của phase 1–4, quét `src/`, `bin/`, `core/`, `domains/`, `.fgos/config.json`. Test cho phép các từ này xuất hiện trong `docs/specs/**` **chỉ** ở mục lịch sử quyết định (nhận diện bằng heading), và không cho phép ở bất kỳ chỗ nào khác.
+  - Doctor check `tier-vocabulary-dead-keys` (đăng ký trong `src/setup/checks.mjs`/`registrations.mjs`): đọc **cả** config project lẫn global, liệt kê từng khoá đã chết kèm cách thay. Đây là cách owner phát hiện project khác cần sửa (quyết định D11 trong [plan.md](./plan.md)).
+  - Doctor check: mọi capability có `serves.mutates: false` phải `prefer` executor có invocation read-only (rủi ro của [phase 4](./phase-04-readonly-invocations.md)).
+  - Doctor check chạy tay (không mặc định, vì tốn token): smoke "không ghi được file" cho mọi invocation `readOnly: true`, dùng đúng lệnh smoke của phase 4.
+  - `docs/specs/<work spec>` (spec area sở hữu Work, tìm qua `docs/specs/reading-map.md`): trường `size` và `rigor` của Work, cùng đường đọc `tier → size` cho event cũ.
 - Tài liệu:
   - `docs/specs/runner.md`:
     - thêm quyết định mới ở "Business Rules" và "Lịch sử quyết định" (2 thang + 1 bảng; danh sách từ bị cấm; lý do: các track trước additive/shadow);
@@ -30,7 +32,7 @@ Khoá kết quả để các lớp đã xoá không mọc lại. Việc gồm:
     - đánh dấu RUL69 đã bị thay một phần (không sửa tại chỗ phần lịch sử).
   - `docs/specs/distribution.md`: bỏ mọi mô tả `rigorOverrides`.
   - `core/skills/_shared/capability-matching.md` và `executor-dispatch-fallback.md`: `rigor` điều khiển tier qua `rigorToTier`; không còn "pass-through".
-  - `CHANGELOG.md` `[Unreleased]`: một dòng mô tả thay đổi config người dùng thấy được (khoá bị bỏ, khoá mới `rigorToTier`, YAML `minTier` → `rigor`, bước chỉ-đọc không còn bị redirect).
+  - `CHANGELOG.md` `[Unreleased]`: một dòng mô tả thay đổi config người dùng thấy được (khoá bị bỏ, khoá mới `rigorToTier`, YAML `minTier` → `rigor`, Work `tier` → `size` + `rigor` và cờ `--tier` → `--size`/`--rigor`, item `heavy` không khai `rigor` sẽ chạy ở `standard`, field invocation `readOnly: true`, bước chỉ-đọc không còn bị redirect sang executor khác).
   - `plans/reports/brainstorm-prompt-260930-1102-request-to-run-decomposition.md` §6.4: thêm ghi chú rằng phần tier/rigor đã được thay bởi plan này (trỏ link), để các agent brainstorm không thiết kế lại phần này.
 
 ## Related Code Files
@@ -40,7 +42,7 @@ Khoá kết quả để các lớp đã xoá không mọc lại. Việc gồm:
 
 ## Implementation Steps
 
-1. Mở worktree phase từ đầu nhánh plan (đã có phase 1–3). Đồng bộ `main` vào nhánh plan nếu `main` có thay đổi (§ Quy trình thực thi trong [plan.md](./plan.md)).
+1. Mở worktree phase từ đầu nhánh plan (đã có phase 1–4). Đồng bộ `main` vào nhánh plan nếu `main` có thay đổi (§ Quy trình thực thi trong [plan.md](./plan.md)).
 2. Hoàn thiện guard test và hai doctor check, viết test trước.
 3. Cập nhật tài liệu. Sau đó `rg` toàn repo (trừ `archive/`, `plans/reports/` cũ, `.fgos/`) tìm các từ đã chết, và xử lý từng chỗ còn sót.
 4. `npm run build:skills` nếu có sửa skill hoặc doctrine; kiểm tra bản render không lệch.
@@ -65,4 +67,4 @@ Khoá kết quả để các lớp đã xoá không mọc lại. Việc gồm:
 - **`main` trôi trong lúc plan chạy** (các session khác sửa dispatch). Tín hiệu: conflict khi đồng bộ, hoặc test fail mới sau khi merge `main`. Xử lý: đồng bộ trước mỗi phase; conflict ở file dispatch thì giải quyết trên worktree nhánh plan, rồi chạy lại focused tests của cả ba phase.
 - **Test không hermetic trong agent session** (`CLAUDE_CODE_SESSION_ID`). Xử lý: luôn chạy với `env -u`; fail chỉ xuất hiện trong session thì không coi là regression.
 - **`/tmp` cạn inode vì fixture test** (memory `project_tmp_inode_exhaustion_from_test_fixtures.md`). Tín hiệu: `ENOSPC` dù còn dung lượng đĩa. Xử lý: `/bin/df -i`, dọn `fgos-*` cũ hơn 2 giờ.
-- **Rollback sau merge main:** `git revert -m 1 <merge-commit>` trên `main`. Config đã sửa (project và global) phải khôi phục bằng tay theo diff đã ghi ở báo cáo phase 1 và 2.
+- **Rollback sau merge main:** `git revert -m 1 <merge-commit>` trên `main`. Config đã sửa (project và global) phải khôi phục bằng tay theo diff đã ghi ở báo cáo phase 1–4.
