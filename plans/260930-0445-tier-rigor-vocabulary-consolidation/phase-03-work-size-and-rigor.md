@@ -28,9 +28,15 @@ Verdict ở discovery (`fgos-coding-discovering`) phán **cả** `size` lẫn `r
 
 - Functional:
   - Schema (`src/state/work.mjs`): đổi `TIERS` → `SIZES`, trường `tier` → `size`; thêm `RIGOR_VALUES` (dùng chung hằng của phase 2, không khai bản sao) cho trường tuỳ chọn `rigor`.
-  - **Đường đọc duy nhất cho dữ liệu cũ:** event lịch sử có `tier` được map thành `size` lúc đọc (store/replay), đúng một chỗ. Không ghi lại lịch sử, không có alias ở bất kỳ nơi nào khác. Event mới chỉ ghi `size`/`rigor`.
+  - **Đường đọc duy nhất cho dữ liệu cũ:** event lịch sử có `tier` được map thành `size` lúc đọc (store/replay), đúng một chỗ. **Lưu ý snapshot:** `rebuildView`/`rebuildViewFromDir` đi đường tắt, trả nguyên `state.json` đã lưu hoặc chỉ fold phần bytes mới (`replay.mjs:705-738,750-754,930-934`). Snapshot không có version, nên 1042 item đã fold sẽ không bao giờ được map lại. Vì vậy phải thêm `viewSchemaVersion` vào `state.json`: lệch version thì fold lại từ đầu. Rust `work_source.rs:6,86-90` đọc cùng `state.json` và phải kiểm cùng version. Test phải bắt đầu từ một `state.json` hình dạng cũ, không chỉ từ event log. <!-- Updated: Red Team 2026-09-30 --> Không ghi lại lịch sử, không có alias ở bất kỳ nơi nào khác. Event mới chỉ ghi `size`/`rigor`.
+  - **`work.risk: heavy` (D18):** hiện nâng sàn lên `flagship` (`assignment-policy.mjs:259-262`; 199 item). Sau phase này dispatch chỉ đọc `rigor`. Item chưa có `rigor` mà có `risk: heavy` được đọc thành `rigor: high` ở cùng chỗ với đường đọc dữ liệu cũ. `risk` vẫn giữ các công dụng khác, nhưng không còn là kênh vào tier. <!-- Updated: Red Team 2026-09-30 -->
   - Intake: `classify.mjs` trả `size` (giữ luật từ khoá, vì đây vẫn là placeholder tạm tới discovery); `classify` **không** đoán `rigor`.
-  - CLI: `fgos add/submit/discover/edit` bỏ `--tier`, thêm `--size` và `--rigor`. Truyền `--tier` → lỗi kèm hướng dẫn.
+  - CLI: `fgos add/submit/discover/edit` bỏ `--tier`, thêm `--size` và `--rigor`. Truyền `--tier` → lỗi kèm hướng dẫn. Định nghĩa flag nằm ở `src/cli/command-registry.mjs:124,162,191,314` và `bin/fgos.mjs:539,817-821,972-980,1110`. **Không** đụng `--tier` của coordination/`dispatch execute` (`cli.mjs:1288,1299,1410`, `dispatch.mjs:119`, `bin/fgos.mjs:2634-2716`): đó là kênh override tier hợp lệ. <!-- Updated: Red Team 2026-09-30 -->
+  - Prompt discovery (`src/runner/prompt-templates/worker-prompt-discovery.txt:26-34`): verdict JSON đổi `"tier"` → `"size"` và thêm `"rigor"`; parser verdict nhận hai field mới. Nếu không, discovery sẽ không bao giờ ghi được `rigor`.
+  - `src/runner/capability-match.mjs:23,81` import `TIERS` để kiểm `DemandFacts.size` → đổi sang `SIZES`.
+  - `src/state/gate-bypass.mjs:32` (`LEVELS = ['off', ...TIERS]`, cùng `.fgos/gate-bypass.json` đã lưu): đổi sang `SIZES`, giữ giá trị đã lưu (`standard` vẫn hợp lệ).
+  - `capabilities.*.overrides.tier` và `executors.*.tier` (`plan.mjs:399-400`, `cli.mjs:816`, `CAPABILITY_OVERRIDE_FIELDS` ở `config.mjs:1289`): chỉ nhận `nano…frontier`; giá trị `light|heavy` → lỗi validate kèm hướng dẫn.
+  - herdr web: `herdr-plugin/web/src/api/types.ts:48`, `herdr-plugin/web/src/screens/TaskDetail.tsx:215` chuyển sang `size` (+ `rigor`). Contract JSON của gateway nhận `size`/`rigor`; key `tier` → lỗi 4xx kèm hướng dẫn.
   - Item con của decompose (`src/intake/plan.mjs:952`) kế thừa `size`; `rigor` kế thừa nếu cha có.
   - Work dispatch (`src/runner/loop.mjs:1644`, `src/runner/dispatch/cli.mjs:296`, `src/runner/dispatch/plan.mjs:400`, `assignment-policy.mjs:256`, `claim-port.mjs:326`, `work-compat.mjs:259`): lấy `rigor` của item, thiếu thì `standard`, đưa vào `rigorToTier`. `size` không được đọc ở bất kỳ đường dispatch nào.
   - Xoá `DEFAULT_TIER_TO_POLICY` và bridge tạm thời trong `resolveTierModel` (còn lại từ [phase 1](./phase-01-single-tier-model-resolver.md)). `fgos dispatch execute --tier` chỉ nhận `nano…frontier`; thêm `--rigor`.
@@ -38,7 +44,7 @@ Verdict ở discovery (`fgos-coding-discovering`) phán **cả** `size` lẫn `r
   - Rust: `packages/work-state/rust/src/work_source.rs:540` đọc `size` (và map `tier` cũ → `size` đúng như đường đọc Node); `herdr-plugin/src/gateway.rs:713` đổi cờ chuyển tiếp `--tier` → `--size` và thêm `--rigor`.
   - Các module đọc `tier` trong `src/state/**` (`impact.mjs`, `retro-pool.mjs`, `discover-pool.mjs`, `replay.mjs`, `handoff.mjs`, `retrospective-doors.mjs`, `graph-harness.mjs`, `gate-bypass.mjs`, `store.mjs`) và `src/verbs/state/edit.mjs` chuyển sang `size`, hoặc `rigor` nếu chỗ đó thật sự cần độ nghiêm (xét từng chỗ, ghi vào báo cáo phase).
 - Non-functional:
-  - Item hiện có (1042; `standard` 542, `light` 326, `heavy` 174) không có `rigor` → dispatch ở `standard`. Item `heavy` đang chạy `frontier` sẽ về `standard` cho tới khi discovery phán `rigor`. Ghi rõ trong CHANGELOG ([phase 5](./phase-05-guard-docs-and-main-merge.md)).
+  - Item hiện có (1042; `standard` 542, `light` 326, `heavy` 174) không có `rigor` → dispatch ở `standard`, trừ item `risk: heavy` → `high` (D18). Item size `heavy` đang chạy `frontier` sẽ về `standard` (hoặc `flagship` nếu `risk: heavy`) cho tới khi discovery phán `rigor`. Ghi rõ trong CHANGELOG ([phase 4](./phase-04-guard-docs-and-main-merge.md)).
   - L3 (`docs/platform-foundations.md`): JSONL là nguồn sự thật, db là view. Không sửa `events.jsonl`; `state.json`/view được build lại qua đường đọc.
 
 ## Architecture
@@ -55,7 +61,8 @@ Work dispatch ─────► rigor ?? standard → rigorToTier → tier → 
 ## Related Code Files
 
 - Modify (Node): `src/state/work.mjs`, `src/state/store.mjs`, `src/state/replay.mjs`, `src/state/impact.mjs`, `src/state/retro-pool.mjs`, `src/state/discover-pool.mjs`, `src/state/handoff.mjs`, `src/state/retrospective-doors.mjs`, `src/state/graph-harness.mjs`, `src/state/gate-bypass.mjs`, `src/verbs/state/edit.mjs`, `src/intake/classify.mjs`, `src/intake/discovery.mjs`, `src/intake/plan.mjs`, `src/runner/loop.mjs`, `src/runner/claim-port.mjs`, `src/runner/work-compat.mjs`, `src/runner/prompt-templates.mjs` (bỏ `tier` khỏi đầu vào `selectTemplate`, vì không rule nào dùng), `src/runner/dispatch/cli.mjs`, `src/runner/dispatch/plan.mjs`, `src/runner/dispatch/assignment-policy.mjs`, `bin/fgos.mjs` (cờ `--tier` ở `add`/`discover`/`edit`, khoảng dòng 539, 817-821, 972-980)
-- Modify (Rust): `packages/work-state/rust/src/work_source.rs`, `herdr-plugin/src/gateway.rs`
+- Modify (Rust/web): `packages/work-state/rust/src/work_source.rs`, `herdr-plugin/src/gateway.rs`, `herdr-plugin/web/src/api/types.ts`, `herdr-plugin/web/src/screens/TaskDetail.tsx`
+- Modify (thêm, red team): `src/cli/command-registry.mjs`, `src/runner/prompt-templates/worker-prompt-discovery.txt`, `src/runner/capability-match.mjs`, `src/state/gate-bypass.mjs`, `src/runner/dispatch/config.mjs`, `core/agents/*.yaml` (`model_tier` → `rigor`), `scripts/project-agents.mjs`
 - Modify (skill; sửa ở nguồn rồi `npm run build:skills`): `domains/coding/skills/fgos-coding-discovering/SKILL.md`, cùng mọi skill hay doctrine khác mà `rg -n "\-\-tier|work\.tier|\btier\b" core domains` tìm thấy và thật sự nói về tier của Work
 - Tests: mọi test mà `rg -l "tier" test/state test/intake test/cli test/e2e test/runner/loop.test.mjs` tìm thấy (sửa theo nghĩa, không đổi tên hàng loạt); Rust: `cargo test -p <work-state crate>` và test của herdr-plugin
 
@@ -68,19 +75,21 @@ Work dispatch ─────► rigor ?? standard → rigorToTier → tier → 
    - `--tier` bị từ chối kèm hướng dẫn;
    - Work dispatch với `rigor: high` ra tier `flagship`;
    - không có `rigor` → `standard`;
-   - `size: heavy` không ảnh hưởng model.
+   - `size: heavy` không ảnh hưởng model;
+   - `risk: heavy`, không có `rigor` → `rigor: high`;
+   - bắt đầu từ `state.json` cũ (không có version) → view có `size`.
 4. Sửa schema, store, đường đọc, CLI, intake, dispatch.
 5. Sửa Rust (`work_source.rs`, `gateway.rs`) cùng test tương ứng.
 6. Sửa skill `fgos-coding-discovering` ở nguồn; `npm run build:skills`.
-7. Bổ sung vào `dead-vocabulary-guard.test.mjs`: `DEFAULT_TIER_TO_POLICY`, `work.tier`, `TIERS` (của work.mjs), cờ `--tier` trong `bin/fgos.mjs`. Ngoại lệ duy nhất: chỗ map `tier → size` ở đường đọc, có đánh dấu tường minh.
+7. Bổ sung vào `dead-vocabulary-guard.test.mjs`: `DEFAULT_TIER_TO_POLICY`, mẫu `\b(item|work|workItem)\??\.tier\b`, `TIERS` (của work.mjs), cờ `tier` trong định nghĩa flag của các verb Work (`add/submit/discover/edit` trong `command-registry.mjs` và `bin/fgos.mjs`). Không chặn `'--tier'` toàn cục, vì override coordination/`dispatch execute` là hợp lệ. Ngoại lệ duy nhất: chỗ map `tier → size` ở đường đọc, có đánh dấu tường minh. <!-- Updated: Red Team 2026-09-30 -->
 8. Chạy focused tests Node + `cargo test` cho hai crate + `npm run test:related`, với `env -u CLAUDE_CODE_SESSION_ID`. Xanh thì commit, merge `--no-ff` vào nhánh plan, chạy lại focused tests trên nhánh plan.
 
 ## Success Criteria
 
-- [ ] `rg -n "\bwork\.tier\b|\bitem\.tier\b|'--tier'" src bin packages herdr-plugin` → rỗng; chỉ còn đúng một chỗ map `tier → size` ở đường đọc.
+- [ ] `rg -n "\b(item|work|workItem)\??\.tier\b" src bin packages herdr-plugin` → chỉ còn đúng một chỗ map `tier → size` ở đường đọc; các verb Work không còn khai cờ `tier`; `--tier` của coordination/`dispatch execute` vẫn còn. <!-- Updated: Red Team 2026-09-30 -->
 - [ ] `rg -n "DEFAULT_TIER_TO_POLICY" src bin` → rỗng; `resolveTierModel` chỉ nhận `nano…frontier`.
 - [ ] `size` không xuất hiện ở bất kỳ file nào trong `src/runner/dispatch/**` (có test/guard).
-- [ ] `fgos list` và view Rust hiển thị `size` cho item cũ (đọc từ event `tier`).
+- [ ] `fgos list`, view Rust và herdr web hiển thị `size` cho item cũ, **trên `.fgos` thật** (snapshot `state.json` cũ), không chỉ trên fixture.
 - [ ] Skill discovery phán và ghi được `size` + `rigor` (có test skill hoặc e2e tương ứng).
 - [ ] Guard test xanh; focused tests Node + Rust xanh; đã merge vào nhánh plan.
 

@@ -1,13 +1,13 @@
 ---
 title: "Gom thang tier/rigor: 2 thang + 1 bảng, xoá mọi lớp chồng"
-description: "rigor (bên cầu) → rigorToTier → tier → modelPolicies[provider][tier]; xoá minTier, minRigor, mode, QUALITY_TIER_BRIDGE, DEFAULT_TIER_TO_POLICY, runner.models, rigorOverrides, readOnlyRedirects, PlacementPolicy shadow"
+description: "rigor (bên cầu) → rigorToTier → tier → modelPolicies[provider][tier]; xoá minTier, minRigor, mode, QUALITY_TIER_BRIDGE, DEFAULT_TIER_TO_POLICY, runner.models, rigorOverrides, PlacementPolicy shadow (readOnlyRedirects dời sang plan follow-on)"
 status: pending
 priority: P1
-effort: "6-7d"
+effort: "5-6d"
 tags: [dispatch, coordination, config, simplification]
 created: 2026-09-30
 blockedBy: []
-blocks: []
+blocks: [260930-1235-readonly-invocation-redesign]
 ---
 
 # Gom thang tier/rigor: 2 thang + 1 bảng
@@ -33,8 +33,8 @@ Bên cung (khẩu vị owner): runner.rigorToTier[rigor] → tier (nano|mini|sta
                           provider = executors.<id>.providerModel (một nơi duy nhất)
 Override một lần:         --tier / actors[].tier (chỉ nâng, có provenance)
 Work:                     work.size (độ lớn, KHÔNG tới model) + work.rigor (tuỳ chọn, cùng thang, discovery phán)
-Read-only:                bước chỉ-đọc chạy bằng invocation read-only của CHÍNH executor đã chọn; không có thì lỗi
-                          read-only(inv) := inv.readOnly === true (validator kiểm args) || confinement hiệu lực
+Read-only:                NGOÀI PHẠM VI plan này (red team 2026-09-30) → plan follow-on
+                          260930-1235-readonly-invocation-redesign; readOnlyRedirects giữ nguyên tới khi plan đó xong
 ```
 
 Chuỗi provenance duy nhất: `rigor` (hoặc override tier) → `rigorToTier` → `modelPolicies[provider][tier]`.
@@ -46,7 +46,7 @@ Chuỗi provenance duy nhất: `rigor` (hoặc override tier) → `rigorToTier` 
 | D1 | Thay `minTier` trong FlowDefinition/workflow YAML bằng `rigor` (toàn bộ khẩu vị tier nằm trong config) |
 | D2 | Xoá `runner.models`, `DEFAULT_TIER_TO_POLICY`, `minRigor`, `mode`, `QUALITY_TIER_BRIDGE`, `QUALITY_MODE_VALUES` |
 | D3 | Xoá `rigorOverrides`; dời giá trị hiệu chỉnh vào `modelPolicies.<provider>` (gemini: xoá, không dời — D15) |
-| D4 | Xoá `readOnlyRedirects`; bước chỉ-đọc dùng invocation read-only của executor đã chọn, không có thì báo lỗi (không đổi executor lặng lẽ) |
+| D4 | **[Dời sang plan follow-on, red team 2026-09-30]** Xoá `readOnlyRedirects`; bước chỉ-đọc dùng invocation read-only của executor đã chọn, không có thì báo lỗi (không đổi executor lặng lẽ) |
 | D5 | Xoá PlacementPolicy shadow |
 | D6 | Giữ `providerModel` trên executor; bỏ ở capability |
 | D7 | Cắt liên kết `size` (`light/standard/heavy`) → model |
@@ -56,9 +56,11 @@ Chuỗi provenance duy nhất: `rigor` (hoặc override tier) → `rigorToTier` 
 | D11 | Project khác có khoá đã chết → fail-fast với hướng dẫn + doctor check; owner tự sửa config, không viết code migrate |
 | D12 | `work.tier` tách thành `work.size` (độ lớn, không bao giờ tới model) + `work.rigor` (tuỳ chọn); discovery phán cả hai; event cũ đọc `tier → size` ở đường đọc duy nhất |
 | D13 | Step `divergent-exploration` (`minTier: advanced`) → `rigor: standard` |
-| D14 | Invocation có field `readOnly: true`; `claude-cli-readonly`/`claude-herdr-readonly` được sửa thành read-only thật (cờ CLI, smoke chứng minh) để giữ pane herdr; validator cấm `readOnly: true` đi kèm cờ tự duyệt ghi |
+| D14 | **[Dời sang plan follow-on; tiền đề sai theo red team]** Invocation có field `readOnly: true`; `claude-cli-readonly`/`claude-herdr-readonly` được sửa thành read-only thật (cờ CLI, smoke chứng minh) để giữ pane herdr; validator cấm `readOnly: true` đi kèm cờ tự duyệt ghi |
 | D15 | Xoá `rigorOverrides` của executor `gemini` và capability `fgos-coding-implement` mà không sửa `modelPolicies.gemini`; `glm` chỉ xoá; global `pi` điền đủ 6 tier `openai-codex` = `gpt-5.5` |
-| D16 | Phase 4 khai `fallbackExecutors: [openai]` cho các bước chỉ-đọc gắn claude; fallback chạy read-only, có provenance, tôn trọng `distinctProviderFrom` |
+| D16 | **[Dời sang plan follow-on; fallback hiện không bao giờ chạy]** Phase 4 khai `fallbackExecutors: [openai]` cho các bước chỉ-đọc gắn claude; fallback chạy read-only, có provenance, tôn trọng `distinctProviderFrom` |
+| D17 | Phase 4 cũ (read-only, D4/D14/D16) tách thành plan follow-on [`260930-1235-readonly-invocation-redesign`](../260930-1235-readonly-invocation-redesign/plan.md); plan này giữ `readOnlyRedirects` và phần redirect của `placement-policy.mjs` |
+| D18 | `work.risk: heavy` của item chưa có `rigor` được đọc thành `rigor: high` ở đúng một chỗ; dispatch chỉ đọc `rigor`; discovery phán `rigor` có xét `risk` |
 
 ## Quy trình thực thi (bắt buộc)
 
@@ -66,7 +68,7 @@ Chuỗi provenance duy nhất: `rigor` (hoặc override tier) → `rigorToTier` 
 - **Mỗi phase một worktree riêng:** nhánh `plan/260930-tier-rigor-consolidation--phase-0N` tạo từ **đầu nhánh plan hiện tại**, worktree `~/projects/forgentX-tier-rigor-p0N`. Ngay sau `git worktree add`: symlink `node_modules` và `target` từ checkout chính (memory `project_worktree_missing_node_modules_symlink_mass_test_failures.md`).
 - **Xong phase:** focused tests xanh → commit ngay → `git merge --no-ff` vào nhánh plan (làm trong worktree của nhánh plan, **không** checkout nhánh trong checkout chính — memory `feedback_never_checkout_branch_in_shared_main_checkout.md`) → chạy lại focused tests trên nhánh plan.
 - **Đồng bộ main:** trước khi mở mỗi phase, `git merge main` vào nhánh plan nếu `main` có thay đổi ở `src/runner/**`, `src/verbs/coordination/**`, `core/coordination-protocols/**`, `.fgos/config.json`.
-- **Merge về main chỉ một lần**, sau khi phase 5 xong: full `npm test` xanh trên nhánh plan + `detect_changes` sạch (xem [phase 5](./phase-05-guard-docs-and-main-merge.md)).
+- **Merge về main chỉ một lần**, sau khi phase 4 (guard/merge) xong: full `npm test` xanh trên nhánh plan + `detect_changes` sạch (xem [phase 4](./phase-04-guard-docs-and-main-merge.md)).
 - **Dọn worktree gom một lần cuối plan** (memory `feedback_worktree_cleanup_batched_at_track_end.md`).
 - **Trước khi sửa bất kỳ symbol nào:** chạy GitNexus `impact` (upstream) với `repo: "/home/vantt/projects/forgentX"` và báo blast radius. Index hiện đứng ở `6bad420` (cũ hơn HEAD) → chạy `node .gitnexus/run.cjs analyze` trước phase 1; zero-result đáng ngờ phải cross-check bằng `rg`.
 - **Chạy test ngoài agent session:** `env -u CLAUDE_CODE_SESSION_ID npm test` (memory `project_npm_test_not_hermetic_inside_agent_session.md`); đọc exit code thật, không qua pipe.
@@ -89,23 +91,22 @@ Mọi đường dispatch (assignment, coordination, Work runner, `execute` CLI) 
 | 1 | [Một resolver tier→model; xoá cầu nối, rigorOverrides, shadow](./phase-01-single-tier-model-resolver.md) | 1.5d | — | pending |
 | 2 | [rigor thay minTier; bảng rigorToTier; xoá quality bridge](./phase-02-rigor-replaces-mintier.md) | 1.5d | 1 | pending |
 | 3 | [Work: tách work.tier thành work.size + work.rigor; xoá DEFAULT_TIER_TO_POLICY](./phase-03-work-size-and-rigor.md) | 1.5d | 2 | pending |
-| 4 | [Bước chỉ-đọc dùng invocation read-only của chính executor; xoá readOnlyRedirects và placement-policy.mjs](./phase-04-readonly-invocations.md) | 1.5d | 1, 2, 3 | pending |
-| 5 | [Guard từ đã chết, doctor, tài liệu, full suite, merge main](./phase-05-guard-docs-and-main-merge.md) | 0.5d | 1–4 | pending |
+| 4 | [Guard từ đã chết, doctor, tài liệu, full suite, merge main](./phase-04-guard-docs-and-main-merge.md) | 0.5d | 1–3 | pending |
+
+Phase read-only cũ đã được dời sang plan follow-on [`260930-1235-readonly-invocation-redesign`](../260930-1235-readonly-invocation-redesign/plan.md) (D17).
 
 Các phase chạy **tuần tự**, vì cùng sửa `assignment-policy.mjs`, `assignment-runner.mjs`, `resolve.mjs` và `.fgos/config.json`.
 
 ## Success Criteria
 
-- [ ] Toàn repo (`src/`, `bin/`, `core/`, `domains/`, `.fgos/config.json`, `~/.fgos/config.json`) không còn: `minTier`, `minRigor`, `QUALITY_TIER_BRIDGE`, `QUALITY_MODE_VALUES`, `DEFAULT_TIER_TO_POLICY`, `rigorOverrides`, `readOnlyRedirects`, `runner.models`, `PLACEMENT_POLICY_SHADOW`, `placement-policy.mjs`; một test tự động chặn chúng quay lại.
+- [ ] Toàn repo (`src/`, `bin/`, `core/`, `domains/`, `.fgos/config.json`, `~/.fgos/config.json`) không còn: `minTier`, `minRigor`, `QUALITY_TIER_BRIDGE`, `QUALITY_MODE_VALUES`, `DEFAULT_TIER_TO_POLICY`, `rigorOverrides`, `runner.models` (khoá `models` dưới `runner`, và `cfg.models` trong code), `PLACEMENT_POLICY_SHADOW`; một test tự động chặn chúng quay lại. `readOnlyRedirects` và phần redirect của `placement-policy.mjs` còn lại, chờ plan follow-on. <!-- Updated: Red Team 2026-09-30 -->
 - [ ] Đúng **một** hàm map tier → model, và mọi đường dispatch gọi nó.
-- [ ] Mọi assignment ghi provenance `{rigor, rigorSource, tier, tierSource, provider, model}` dẫn được về đúng một chuỗi.
-- [ ] Bước chỉ-đọc claude chạy trên claude bằng invocation read-only (smoke chứng minh không ghi được file), không bị đổi sang openai; ghim `claude-herdr-readonly` vẫn hiện pane herdr.
-- [ ] `work.size` không bao giờ dẫn tới model; Work dispatch dùng `work.rigor ?? standard`; event cũ đọc được.
+- [ ] Mọi assignment ghi provenance `{rigor, rigorSource, tier, tierSource, provider, model, reasoningEffort}` dẫn được về đúng một chuỗi; `reasoningEffort` suy từ `rigor`.
+- [ ] `work.size` không bao giờ dẫn tới model; Work dispatch dùng `work.rigor` (item cũ: `risk: heavy` → `high`, còn lại `standard`); event cũ và snapshot `state.json` cũ đọc ra `size`.
 - [ ] Config chứa khoá đã chết → lỗi validate nêu rõ khoá và cách thay; `fgos doctor` liệt kê được ở cả config project lẫn global.
-- [ ] Bước chỉ-đọc gắn claude có `fallbackExecutors`; fallback khi hết quota chạy read-only và tôn trọng `distinctProviderFrom` (D16).
 - [ ] `fgos doctor` báo provider nào có `modelPolicies` thiếu tier mà `rigorToTier` sinh ra.
 - [ ] `docs/specs/runner.md` có mục quyết định mới; `CHANGELOG.md` `[Unreleased]` có dòng thay đổi config.
-- [ ] Full `npm test` xanh trên nhánh plan; merge `--no-ff` về `main`; post-merge suite xanh.
+- [ ] Full `npm test` xanh trên nhánh plan (kể cả với HOME trỏ tới global rỗng); merge `--no-ff` về `main`; post-merge suite xanh; gateway đã restart.
 
 ## Câu hỏi mở
 
@@ -158,4 +159,38 @@ Không còn. Các câu đã được chốt ở Validation Log bên dưới.
 - Decision deltas checked: 4 (D15 gemini override, D16 quota fallback, `runner.models` ở cả hai config, gộp `RIGOR_VALUES`).
 - Reconciled stale references: 5. Gồm: phase 1 non-functional "dời sao cho kết quả không đổi"; phase 1 rủi ro xung đột provider; D3 trong plan.md; CHANGELOG ở phase 5; Success Criteria trong plan.md. Phase 4 bỏ "Provider Capacity Rotator (cơ chế đã có)" vì không có config nào dùng.
 - Phase 3 không bị ảnh hưởng: nó dùng `RIGOR_VALUES` của phase 2, khớp với việc gộp hằng.
+- Unresolved contradictions: 0.
+
+## Red Team Review
+
+### Session — 2026-09-30
+**Reviewers:** Failure Mode Analyst (Flow Tracer), Assumption Destroyer (Scope Auditor), Security Adversary (Fact Checker).
+**Findings:** 15 sau khi gộp trùng từ 27 (15 accepted, 0 rejected; mọi phát hiện đều có file:line).
+**Severity breakdown:** 5 Critical, 7 High, 3 Medium.
+
+| # | Finding | Severity | Disposition | Applied To |
+|---|---|---|---|---|
+| 1 | Read-only bằng cờ CLI chặn luôn việc ghi `agent-result.json`/`agent-report.md`/outbox của chính run | Critical | Accept → dời plan | follow-on (D17) |
+| 2 | Nhánh "confinement" của predicate chỉ là metadata, resolve thành `unconfined` | Critical | Accept → dời plan | follow-on |
+| 3 | Danh sách cờ cấm thiếu cờ đang có trong config; Bash allowlist ghi được | Critical | Accept → dời plan | follow-on |
+| 4 | D16: fallback quota không bao giờ chạy (không có `runner.providers`); chọn invocation ở chỗ khác → `codex-cli-bypass-fgovn` | Critical | Accept → dời plan | follow-on |
+| 5 | D16 gắn nhầm bước (`review-candidate` đã bind openai); xoá redirect làm hỏng project khác | Critical | Accept → dời plan | follow-on |
+| 6 | `scripts/project-agents.mjs` + `core/agents/*.yaml` dùng `modelForTier`/`model_tier` | High | Accept | Phase 1, 3 |
+| 7 | "provider chỉ từ `providerModel`" làm vỡ claude → `deriveProviderFamily` | High | Accept | Phase 1 |
+| 8 | Guard: phase 1 tự đỏ; mẫu không khớp code thật; `docs/` không được quét; `flow-definition.md` bị sót | Medium | Accept | Phase 1, 2, 3, 4 |
+| 9 | Bỏ `minTier` thì `actors[].tier` mất đường đi → field `tier` trong PolicyPatch | High | Accept | Phase 2 |
+| 10 | `policy.minTier` đã lưu (37 assignment, 8 coordination) mất mức sàn lặng lẽ | High | Accept | Phase 2 |
+| 11 | `reasoningEffort` mất nguồn; DemandFacts `rigor` không có consumer | Medium | Accept | Phase 2 |
+| 12 | Snapshot `state.json` đi đường tắt, không bao giờ map `tier → size` | High | Accept | Phase 3 |
+| 13 | Kiểm kê Work thiếu consumer; `work.risk: heavy` là kênh tier thứ hai (D18) | High | Accept | Phase 3 |
+| 14 | Gateway đang chạy + web UI vỡ khi bỏ `--tier`; tiêu chí `'--tier'` mâu thuẫn override | High | Accept | Phase 3, 4 |
+| 15 | Test đọc `~/.fgos` thật; rollback không nguyên tử; sửa global có hiệu lực ngay | Medium | Accept | Phase 1, 4 |
+
+**Owner quyết (2026-09-30):** tách phase read-only ra plan follow-on (D17); `risk: heavy` → `rigor: high` khi đọc (D18); áp dụng toàn bộ #6–#15.
+
+### Whole-Plan Consistency Sweep
+- Files reread: plan.md, phase-01, phase-02, phase-03, phase-04 (guard; đổi số từ phase 5).
+- Decision deltas checked: 6 (D17 tách phase, đổi số phase 5 → 4, D18 risk, field `tier` PolicyPatch, `deriveProviderFamily`, guard scan set).
+- Reconciled stale references: 14. Gồm: hình dạng đích (dòng Read-only); D4/D14/D16 được đánh dấu dời; bảng phase; Success Criteria (bỏ `readOnlyRedirects`/`placement-policy.mjs`, bỏ 2 tiêu chí read-only/fallback, thêm provenance `reasoningEffort`, snapshot, HOME rỗng, gateway); phase 1 (câu "phần redirect bị xoá ở phase 4", provider, rollback "main không bị ảnh hưởng"); link/nhãn "phase 5" → "phase 4" (5 chỗ); doctor read-only + smoke read-only bị bỏ khỏi phase guard; CHANGELOG; tiêu chí `'--tier'` ở phase 3.
+- Còn giữ có chủ ý: "phase 5" trong Validation Log Session 1–2 là log lịch sử, không sửa.
 - Unresolved contradictions: 0.
