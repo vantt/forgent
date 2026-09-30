@@ -5,7 +5,7 @@ Document type: Synthesis report (discussion lead)
 Snapshot: 2026-09-30 16:20 (Asia/Saigon), main @ 5aed82c52
 Prompt: plans/reports/brainstorm-prompt-260930-1102-request-to-run-decomposition.md
 Handoff: plans/reports/handoff-260930-1210-harness-routing-discussion-lead.md
-Status: v1.6 — mức 4 override làm rõ; hình chạy tổng thể + plan vs Workflow + (b) quyền sở hữu plan.md đã chốt; Workflow tách khỏi Work đã chốt; bảng thuật ngữ đã chốt ở §6 D0; 3 câu trả lời (2 family: claude, openai). Chưa có gemini/xai; cập nhật tiếp nếu owner gửi thêm.
+Status: v1.7 — Q0 engine vs mô hình gọn (bake-off trước); mức 4 override làm rõ; hình chạy tổng thể + plan vs Workflow + (b) quyền sở hữu plan.md đã chốt; Workflow tách khỏi Work đã chốt; bảng thuật ngữ đã chốt ở §6 D0; 3 câu trả lời (2 family: claude, openai). Chưa có gemini/xai; cập nhật tiếp nếu owner gửi thêm.
 Lịch sử: v0 12:29 (sonnet + openai bản 12:20) → v1 16:20 (thêm fable; openai bản sửa 12:39)
 ```
 
@@ -112,7 +112,7 @@ P-B **là bước 1 của P-A** (cả ba agent đồng ý). P-Y chỉ chọn n�
 
 ## 6. Đề xuất của lead
 
-**Chọn P-A**, chốt bất đồng như sau (thay đổi so với v0 được ghi rõ):
+**Lập trường về engine đã đổi (2026-09-30 23:05) — xem mục Q0 ngay trước "Bước 1".** Lead ban đầu chọn P-A (gom vào engine coordination) theo đa số advisor; sau thảo luận với owner, lead nghiêng về **mô hình gọn** và để bake-off quyết. Các chốt D0–D7 và mọi quyết định bên dưới (Unit, `bind()`, bảng 5 mức, thuật ngữ, Workflow tách khỏi Work, override) **không phụ thuộc** lựa chọn engine và giữ nguyên:
 
 - **D0 → hội tụ ở Unit** (theo fable). **Thuật ngữ thống nhất (owner chốt 2026-09-30 22:20–22:25): một khái niệm = một tên, dùng cho toàn hệ thống (code, YAML, docs, skill, thảo luận); không có "tên nội bộ" khác "tên thảo luận".**
 
@@ -233,7 +233,56 @@ P-B **là bước 1 của P-A** (cả ba agent đồng ý). P-Y chỉ chọn n�
 - **D6 → vai khai là yêu cầu (vd `brand-guardian`), `capabilities[cap].persona` là khẩu vị**; persona có nội dung thật; bỏ default `code-reviewer`, `implied-by-persona`, `model_tier`.
 - **D7 → `independentOf` bắt buộc** với vai review output ghi file; không thoả → park. Doctor check "mỗi capability chỉ-đọc có ≥ 2 provider family có invocation read-only".
 
-**Bước 1 = S1 của fable (bốn việc) + hai bổ sung:**
+### Q0 — chạy Pattern cộng tác bằng engine coordination hay mô hình gọn (câu hỏi trung tâm, thêm 2026-09-30 23:05)
+
+**Khởi nguồn:** owner hỏi "không sinh JSON có giúp nhẹ đi không? mô hình điều phối có vẻ quá phức tạp". Trả lời: tự sinh request JSON chỉ đỡ việc người viết; engine bên dưới vẫn nguyên, chỉ bị giấu.
+
+**Bằng chứng mô hình điều phối hiện quá nặng:**
+- Quy mô: ~21k dòng coordination (`src/runner/coordination` + `src/verbs/coordination`) + ~32k dòng dispatch; so với `thieung/herdr-cook-plan` 1 skill + 1 script 151 dòng (`plans/reports/deep-comparison-260929-1446-harness-simplicity-herdr-cook-plan-vs-fgos.md`).
+- Nghi lễ: request có 8 loại step (`operation`, `fan-out`, `authorize`, `disposition`, `contribution`, `human-turn`, `specialist-authorize`, `close` — `src/verbs/coordination/schema.mjs`), cộng actionKey, driver authorize, legality facts, actions projector; Lead gọi 5–8 lệnh cho **một** thay đổi (fable K1).
+- Kết quả thật (§6.6 prompt): 3 vòng, ~10 run, ~150 phút cho một phase tài liệu; không session nào đóng.
+- Store (F13): 512/606 session kẹt `active`.
+- Phần phức tạp nhất không ai dùng: delphi, nominal, rfc, group-cognition = 0 lần; architecture panel 8 (F13).
+- Fable E1: chi phí đến từ vòng lặp + nghi lễ driver, **không** từ binding. Tức phần đã thiết kế kỹ nhất (chọn người làm) không phải phần gây nặng; phần gây nặng là **engine chạy Pattern cộng tác**.
+- Phát hiện kèm theo: tự sinh request JSON (thiết kế P-A) vẫn giữ nguyên engine; hôm nay K3 cần ~15 file request viết tay (F8, F9) và khẩu vị bị chép vào từng file.
+
+**Phần thật sự cần vs phần là nghi lễ:**
+
+| Thật sự cần cho mục tiêu | Nghi lễ, có thể bỏ |
+|---|---|
+| `bind()` chọn executor/tier/persona theo khẩu vị | request JSON 8 loại step |
+| Một cửa chạy ghi RunResult cho Observe | actionKey, driver authorize từng bước |
+| Worktree cho việc ghi file | legality facts, actions projector |
+| Review khác provider, tối đa N vòng sửa | session state machine cho một việc đơn giản |
+| Tuần tự bước + cổng người (Workflow run) | 13 Pattern cộng tác, phần lớn không dùng |
+
+**Mô hình gọn (P-Y của fable, cụ thể hoá):**
+
+```text
+Unit ──► fgos run --unit <u> --role <vai>
+            = bind() + chạy (inline / in-process / out-of-process) + ghi RunResult
+```
+- **Một primitive**: mỗi vai của một unit = một lần gọi. Gần đủ sẵn: `executeAssignment` đã ghi assignment + RunResult mà Observe đọc (F11).
+- **Ba Pattern cộng tác = ba vòng lặp nhỏ** gọi primitive: `solo` (1 lần); `reviewed` (author → reviewer khác provider → có finding thì author sửa, ≤ 2 vòng); `panel` (N lần song song → tổng hợp). Viết bằng **code nhỏ dùng chung** cho cả khi có Lead lẫn headless (để tất định), không để Lead chạy bằng prose.
+- **Workflow run** vẫn cần state riêng (tuần tự bước, park ở cổng người) vì business workflow phải chạy không người canh.
+- **Engine coordination đóng băng**, chỉ còn cho Pattern cộng tác thật sự cần ép luật ai thấy gì (panel ẩn danh); vẫn không ai dùng thì xoá.
+- Giữ nguyên: bảng 5 mức, `bind()`, Unit, Workflow tách khỏi Work, thuật ngữ, override. Chỉ đổi "chạy Pattern cộng tác bằng gì".
+
+**Cái giá:**
+- Kém tất định hơn nếu Lead chạy vòng lặp bằng prose → chữa bằng vòng lặp code nhỏ dùng chung.
+- Mất các bảo đảm engine đang có (ẩn kết quả giữa thành viên panel, authorize từng bước) — phần lớn hiện gần như không được dùng.
+- Chi phí chuyển đổi lớn nếu đi tới cùng (đóng băng rồi xoá phần lớn coordination); theo RUL11 quy mô không là lý do giữ cái rối.
+
+**Đánh giá lại phương án (§4):** P-A giữ điểm "Đơn giản 4" chỉ ở bề mặt người dùng; tính cả engine thì thấp hơn. Mô hình gọn: đơn giản cao nhất, linh hoạt ngang, tường minh ngang (cùng `bind()`), đo được ngang (cùng `executeAssignment`), chi phí chuyển đổi cao ở phần xoá nhưng phần xây mới nhỏ.
+
+**Lập trường lead:** nghiêng về **mô hình gọn**; quyết bằng **bake-off, làm trước mọi đầu tư khác**: chạy cùng 2 area tài liệu bằng (1) engine hiện tại và (2) primitive + vòng lặp `reviewed`; so trong cùng một Observe case: wall time, số lần người can thiệp, số finding thật được chấp nhận, chất lượng đầu ra. Mô hình gọn không thua về chất lượng → đi đường gọn, viết lại S2–S6 theo hướng đó.
+
+**Bước 1 (sắp lại 23:05 theo Q0): bake-off trước, chỉ làm những sửa không phụ thuộc engine.**
+1. **Bake-off** (việc đầu tiên): 2 area tài liệu, chạy bằng engine hiện tại vs primitive + vòng lặp `reviewed`, cùng một Observe case (xem Q0). Cần một primitive tối thiểu `run --unit --role` bọc `executeAssignment` + `bind()` bản nhỏ đủ cho khẩu vị docs.
+2. Sửa không phụ thuộc engine, làm ngay: config `docs:write.prefer=[openai]`, `docs:review.prefer=[claude/claude-cli-readonly]`, sửa `code:review.prefer` → claude (F3); `prefer` luôn kèm invocation vì `readOnlyRedirects` còn sống (plan tier dời việc xoá sang follow-on — lệch C5); sửa `metrics harness` đọc `definitionRef.id` (F12) để bake-off đo đúng.
+3. **Chỉ khi engine thắng bake-off** mới làm các sửa engine của S1 fable: bỏ `policy.capability` khỏi master loop + `red-team-candidate` → `driver-authorized`; `coordination start --capability` lưu manifest, `composeActionRequest` đọc lại cho mọi node; close-check trước merge.
+
+Bản cũ của bước 1 (trước 23:05, giữ để không mất chi tiết): **Bước 1 = S1 của fable (bốn việc) + hai bổ sung:**
 1. Bỏ `policy.capability` khỏi master loop; `red-team-candidate` → `driver-authorized`.
 2. `coordination start --capability`, lưu manifest; `composeActionRequest` đọc lại cho mọi node (thay `facts` chết).
 3. Config: `docs:write.prefer=[openai]`, `docs:review.prefer=[claude/claude-cli-readonly]`, và sửa `code:review.prefer` → claude (F3). **Lưu ý:** `plan.md` của plan tier nay ghi "readOnlyRedirects dời sang plan follow-on" — **lệch với C5 của handoff** (C5 ghi "bỏ redirect"). Chừng nào redirect còn, bước read-only chọn claude vẫn bị đổi sang openai trừ khi ghim invocation tường minh; vì vậy `prefer` phải luôn kèm invocation, hoặc bước 1 tự xoá redirect.
@@ -246,6 +295,8 @@ Các bước sau (theo fable): S2 override bền + `solo` + xoá `agent-led`/`di
 **Plan riêng, xếp sau bước 1 và sau plan tier: tách Workflow khỏi Work** (xem quyết định Workflow ở trên). Phạm vi: Workflow definition + Workflow run store (JSONL, L3) + một runner tuần tự bước và cổng người; stage `discovery/exploring/planning/executing` trở thành các bước của Workflow `coding/feature`; Work chỉ giữ status board + tham chiếu Workflow run; kiểm Workflow chạy được domain không phải coding (smoke marketing). Quy mô đã đếm: 32 file import `workflow-stage-graphs.mjs`, 24 file đọc `item.stage` (gồm dispatch `assignment-runner.mjs`, `operation-choice.mjs`), Rust `work-state`.
 
 ## 7. Bộ câu hỏi cho owner (một lượt)
+
+0. **Q0 (trung tâm) — engine coordination hay mô hình gọn?** Xem mục Q0 ở §6. **Em đề xuất:** quyết bằng bake-off làm đầu tiên; nghiêng về mô hình gọn. Q1–Q6 bên dưới vẫn đúng với cả hai hướng.
 
 1. **Sàn tier theo capability — chạm quyết định đã chốt C5.** Khẩu vị của anh nói theo loại việc ("review = opus", "research = standard"), nhưng `rigorToTier` là bảng toàn cục; muốn "review luôn opus" thì chỉ còn cách khai `rigor` cao trong YAML mẫu, tức khẩu vị quay lại YAML. Fable đề xuất thêm một scope `capabilities.<cap>.rigor` (sàn, cùng thang, chỉ nâng) vào chuỗi merge đã có. **Em đề xuất: nhận**, đưa vào plan tier như một mục nhỏ. Lựa chọn khác: giữ C5 nguyên, chấp nhận pattern khai rigor.
 2. **`model_tier` trong `core/agents/*.yaml`** là đường chọn model thứ hai (qua `scripts/project-agents.mjs`, dựa vào `runner.models` sắp bị xoá), plan tier **chưa phủ** (F15). **Em đề xuất: thêm vào plan tier** (vì plan đó xoá `runner.models`, không làm thì gãy), **kèm thay thế**: subagent in-process lấy model từ `bind()` (tham số `model` của Agent tool, tra `modelPolicies.claude[tier]`), không từ agent YAML. Chỉ xoá mà không thay thì đường in-process mất cách chọn model. Lựa chọn khác: để S5 ở đây.
