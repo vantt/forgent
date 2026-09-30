@@ -33,11 +33,12 @@ Khoá kết quả để các lớp đã xoá không mọc lại. Việc gồm:
   - `docs/specs/distribution.md`: bỏ mọi mô tả `rigorOverrides`.
   - `core/skills/_shared/capability-matching.md` và `executor-dispatch-fallback.md`: `rigor` điều khiển tier qua `rigorToTier`; không còn "pass-through".
   - `CHANGELOG.md` `[Unreleased]`: một dòng mô tả thay đổi config người dùng thấy được (khoá bị bỏ, khoá mới `rigorToTier`, YAML `minTier` → `rigor`, Work `tier` → `size` + `rigor` và cờ `--tier` → `--size`/`--rigor`, item `heavy` không khai `rigor` sẽ chạy ở `standard`, `work.risk: heavy` được đọc thành `rigor: high`, PolicyPatch có field `tier` (actor/assignment/cli) thay `minTier`, `rigorOverrides` của gemini/`fgos-coding-implement` bị bỏ, cờ `tier` trong JSON của gateway đổi sang `size`/`rigor`).
-  - `plans/reports/brainstorm-prompt-260930-1102-request-to-run-decomposition.md` §6.4: thêm ghi chú rằng phần tier/rigor đã được thay bởi plan này (trỏ link), để các agent brainstorm không thiết kế lại phần này.
+  - ~~`plans/reports/brainstorm-prompt-…` §6.4~~ — **bỏ (D20)**: `main` đã làm ở `cf94a59e8`.
+  - `docs/specs/runner.md` và `CHANGELOG.md`: thêm sàn `capabilities.<cap>.rigor` và việc xoá khối `capabilities.*.overrides` (D19).
 
 ## Related Code Files
 
-- Modify: `test/runner/dead-vocabulary-guard.test.mjs`, `src/setup/checks.mjs`, `src/setup/registrations.mjs`, `docs/specs/runner.md`, `docs/specs/distribution.md`, `core/skills/_shared/capability-matching.md`, `core/skills/_shared/executor-dispatch-fallback.md`, `CHANGELOG.md`, `plans/reports/brainstorm-prompt-260930-1102-request-to-run-decomposition.md`
+- Modify: `test/runner/dead-vocabulary-guard.test.mjs`, `src/setup/checks.mjs`, `src/setup/registrations.mjs`, `docs/specs/runner.md`, `docs/specs/distribution.md`, `core/skills/_shared/capability-matching.md`, `core/skills/_shared/executor-dispatch-fallback.md`, `CHANGELOG.md`
 - Tests: `test/setup/checks.test.mjs`, `test/setup/checks-doctor-config.test.mjs`, `test/setup/capability-catalog-doctrine.test.mjs`
 
 ## Implementation Steps

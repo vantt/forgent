@@ -35,7 +35,8 @@ Verdict ở discovery (`fgos-coding-discovering`) phán **cả** `size` lẫn `r
   - Prompt discovery (`src/runner/prompt-templates/worker-prompt-discovery.txt:26-34`): verdict JSON đổi `"tier"` → `"size"` và thêm `"rigor"`; parser verdict nhận hai field mới. Nếu không, discovery sẽ không bao giờ ghi được `rigor`.
   - `src/runner/capability-match.mjs:23,81` import `TIERS` để kiểm `DemandFacts.size` → đổi sang `SIZES`.
   - `src/state/gate-bypass.mjs:32` (`LEVELS = ['off', ...TIERS]`, cùng `.fgos/gate-bypass.json` đã lưu): đổi sang `SIZES`, giữ giá trị đã lưu (`standard` vẫn hợp lệ).
-  - `capabilities.*.overrides.tier` và `executors.*.tier` (`plan.mjs:399-400`, `cli.mjs:816`, `CAPABILITY_OVERRIDE_FIELDS` ở `config.mjs:1289`): chỉ nhận `nano…frontier`; giá trị `light|heavy` → lỗi validate kèm hướng dẫn.
+  - `executors.*.tier` (`cli.mjs:816`): chỉ nhận `nano…frontier`; giá trị `light|heavy` → lỗi validate kèm hướng dẫn. (`capabilities.*.overrides.tier` đã bị xoá ở [phase 2](./phase-02-rigor-replaces-mintier.md), D19; sàn theo loại việc là `capabilities.<cap>.rigor`, gộp chỉ-nâng với `work.rigor` ở đường Work dispatch bên dưới.) <!-- Updated: Session 3 2026-10-01 -->
+  - Work dispatch gộp `rigor = max(work.rigor ?? standard, capabilities[capability].rigor)` trước `rigorToTier` (D19); có test.
   - herdr web: `herdr-plugin/web/src/api/types.ts:48`, `herdr-plugin/web/src/screens/TaskDetail.tsx:215` chuyển sang `size` (+ `rigor`). Contract JSON của gateway nhận `size`/`rigor`; key `tier` → lỗi 4xx kèm hướng dẫn.
   - Item con của decompose (`src/intake/plan.mjs:952`) kế thừa `size`; `rigor` kế thừa nếu cha có.
   - Work dispatch (`src/runner/loop.mjs:1644`, `src/runner/dispatch/cli.mjs:296`, `src/runner/dispatch/plan.mjs:400`, `assignment-policy.mjs:256`, `claim-port.mjs:326`, `work-compat.mjs:259`): lấy `rigor` của item, thiếu thì `standard`, đưa vào `rigorToTier`. `size` không được đọc ở bất kỳ đường dispatch nào.

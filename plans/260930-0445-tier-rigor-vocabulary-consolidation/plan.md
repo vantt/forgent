@@ -31,6 +31,8 @@ Bên cầu (việc cần gì):    rigor = low | standard | high | critical
 Bên cung (khẩu vị owner): runner.rigorToTier[rigor] → tier (nano|mini|standard|advanced|flagship|frontier)
                           runner.modelPolicies[provider][tier] → model
                           provider = executors.<id>.providerModel (một nơi duy nhất)
+Sàn theo loại việc:       capabilities.<cap>.rigor (khẩu vị owner, cùng thang, chỉ nâng — D19;
+                          thay cả khối capabilities.<cap>.overrides)
 Override một lần:         --tier / actors[].tier (chỉ nâng, có provenance)
 Work:                     work.size (độ lớn, KHÔNG tới model) + work.rigor (tuỳ chọn, cùng thang, discovery phán)
 Read-only:                NGOÀI PHẠM VI plan này (red team 2026-09-30) → plan follow-on
@@ -61,6 +63,8 @@ Chuỗi provenance duy nhất: `rigor` (hoặc override tier) → `rigorToTier` 
 | D16 | **[Dời sang plan follow-on; fallback hiện không bao giờ chạy]** Phase 4 khai `fallbackExecutors: [openai]` cho các bước chỉ-đọc gắn claude; fallback chạy read-only, có provenance, tôn trọng `distinctProviderFrom` |
 | D17 | Phase 4 cũ (read-only, D4/D14/D16) tách thành plan follow-on [`260930-1235-readonly-invocation-redesign`](../260930-1235-readonly-invocation-redesign/plan.md); plan này giữ `readOnlyRedirects` và phần redirect của `placement-policy.mjs` |
 | D18 | `work.risk: heavy` của item chưa có `rigor` được đọc thành `rigor: high` ở đúng một chỗ; dispatch chỉ đọc `rigor`; discovery phán `rigor` có xét `risk` |
+| D19 | **(owner 2026-10-01)** Thêm sàn theo loại việc `capabilities.<cap>.rigor` (cùng thang `low…critical`, merge chỉ-nâng như một scope của bên cầu, `rigorSource: capability`), áp cho cả đường coordination lẫn đường Work. Đồng thời **xoá cả khối `capabilities.<cap>.overrides`**: sau phase 1 nó chỉ còn `tier` và `model`, không config nào dùng (đã quét `.fgos/config.json` của forgentX, fgos-test-drive, herdr-gateway, mdview, worktree docs); `overrides.model` là model ghi cứng, trái luật "không literal model". Lý do: khẩu vị owner phát biểu theo loại việc ("review = opus", "research = standard"); không có sàn này thì rigor phải khai trong YAML pattern, tức khẩu vị lọt vào YAML. Nguồn: `plans/reports/synthesis-260930-1229-request-to-run-brainstorm.md` §7 Q1, §6c (trên `main`) → [phase 2](./phase-02-rigor-replaces-mintier.md) |
+| D20 | **(owner 2026-10-01)** Bỏ mục phase 4 sửa `plans/reports/brainstorm-prompt-260930-1102-request-to-run-decomposition.md` §6.4: `main` đã làm việc này ở `cf94a59e8`; prompt là bản ghi lịch sử, sửa lại chỉ gây xung đột merge |
 
 ## Quy trình thực thi (bắt buộc)
 
@@ -100,6 +104,7 @@ Các phase chạy **tuần tự**, vì cùng sửa `assignment-policy.mjs`, `ass
 ## Success Criteria
 
 - [ ] Toàn repo (`src/`, `bin/`, `core/`, `domains/`, `.fgos/config.json`, `~/.fgos/config.json`) không còn: `minTier`, `minRigor`, `QUALITY_TIER_BRIDGE`, `QUALITY_MODE_VALUES`, `DEFAULT_TIER_TO_POLICY`, `rigorOverrides`, `runner.models` (khoá `models` dưới `runner`, và `cfg.models` trong code), `PLACEMENT_POLICY_SHADOW`; một test tự động chặn chúng quay lại. `readOnlyRedirects` và phần redirect của `placement-policy.mjs` còn lại, chờ plan follow-on. <!-- Updated: Red Team 2026-09-30 -->
+- [ ] Config không còn `capabilities.*.overrides` (cả `tier`, `model`, `providerModel`, `rigorOverrides`); `capabilities.<cap>.rigor` là sàn duy nhất theo loại việc, có hiệu lực ở cả đường coordination lẫn Work, provenance ghi `rigorSource: capability` (D19).
 - [ ] Đúng **một** hàm map tier → model, và mọi đường dispatch gọi nó.
 - [ ] Mọi assignment ghi provenance `{rigor, rigorSource, tier, tierSource, provider, model, reasoningEffort}` dẫn được về đúng một chuỗi; `reasoningEffort` suy từ `rigor`.
 - [ ] `work.size` không bao giờ dẫn tới model; Work dispatch dùng `work.rigor` (item cũ: `risk: heavy` → `high`, còn lại `standard`); event cũ và snapshot `state.json` cũ đọc ra `size`.
@@ -160,6 +165,16 @@ Không còn. Các câu đã được chốt ở Validation Log bên dưới.
 - Reconciled stale references: 5. Gồm: phase 1 non-functional "dời sao cho kết quả không đổi"; phase 1 rủi ro xung đột provider; D3 trong plan.md; CHANGELOG ở phase 5; Success Criteria trong plan.md. Phase 4 bỏ "Provider Capacity Rotator (cơ chế đã có)" vì không có config nào dùng.
 - Phase 3 không bị ảnh hưởng: nó dùng `RIGOR_VALUES` của phase 2, khớp với việc gộp hằng.
 - Unresolved contradictions: 0.
+
+### Session 3 — 2026-10-01 (đối chiếu với track request-to-run)
+
+**Trigger:** discussion lead của track request-to-run đối chiếu plan này với thiết kế của track đó (`plans/reports/synthesis-260930-1229-request-to-run-brainstorm.md` §6b, §6c trên `main`); owner duyệt 2026-10-01.
+
+- **D19** (sàn `capabilities.<cap>.rigor`, xoá khối `capabilities.*.overrides`) → phase 2, phase 3 (bỏ mục validate `overrides.tier`), phase 4 (tài liệu, CHANGELOG).
+- **D20** (bỏ mục sửa brainstorm prompt) → phase 4.
+- Plan follow-on `260930-1235-readonly-invocation-redesign` **được gộp vào plan `bind()` của track request-to-run** (owner 2026-10-01); không lập phase riêng. Plan này vẫn giữ `readOnlyRedirects` như D17.
+- Không đổi phạm vi khác. Plan này là **nền** của track request-to-run (bảng `rigorToTier`, một resolver, field `tier` override); track đó chờ plan này merge rồi mới sửa `assignment-runner.mjs`/`assignment-policy.mjs`/`resolve.mjs`.
+- Đã kiểm: `CAPABILITY_OVERRIDE_FIELDS = ['rigorOverrides','providerModel','tier','model']` (`config.mjs:1289`); `overrides.tier`/`.model` chỉ được đọc ở đường Work (`plan.mjs:397-400`, `cli.mjs:810-820`); không config nào khai `overrides.tier`/`.model`.
 
 ## Red Team Review
 

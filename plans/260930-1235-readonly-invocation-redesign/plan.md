@@ -14,7 +14,9 @@ blocks: []
 
 ## Trạng thái
 
-**Chưa có phase.** Bước tiếp theo: `/ak:brainstorm` (liên quan bảo mật), rồi mới `/ak:plan`. Plan
+**Gộp vào plan `bind()` của track request-to-run (owner 2026-10-01).** Plan này không lập phase riêng. Mục tiêu và 9 ràng buộc bên dưới là đầu vào bắt buộc cho phase read-only của plan `bind()`. Đích đổi so với bản gốc: read-only là một **posture** do `bind()` áp (confinement resolve một chỗ lúc spawn, cho primary + fallback + resume), fallback theo quota cũng chọn qua `bind()`, mọi lệch có provenance (G6 "không đổi người lặng lẽ"). Scope thu hẹp: không vá `executeExecutorCli`/`runDispatchCli` (ràng buộc 8) vì track đó xoá đường `dispatch-runs`/`execute` thường. Nguồn: `plans/reports/synthesis-260930-1229-request-to-run-brainstorm.md` §6b (trên `main`).
+
+Ghi chú lịch sử (trước 2026-10-01): **Chưa có phase.** Bước tiếp theo: `/ak:brainstorm` (liên quan bảo mật), rồi mới `/ak:plan`. Plan
 [`260930-0445-tier-rigor-vocabulary-consolidation`](../260930-0445-tier-rigor-vocabulary-consolidation/plan.md)
 giữ nguyên `readOnlyRedirects` và phần redirect của `placement-policy.mjs` cho tới khi plan này xong (D17 bên đó).
 Bản nháp phase cũ để tham khảo: [reference-original-phase-04-draft.md](./reference-original-phase-04-draft.md). Bản nháp này **sai**, không dùng lại nguyên văn.
