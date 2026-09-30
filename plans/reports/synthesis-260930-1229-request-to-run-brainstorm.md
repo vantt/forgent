@@ -5,7 +5,7 @@ Document type: Synthesis report (discussion lead)
 Snapshot: 2026-09-30 16:20 (Asia/Saigon), main @ 5aed82c52
 Prompt: plans/reports/brainstorm-prompt-260930-1102-request-to-run-decomposition.md
 Handoff: plans/reports/handoff-260930-1210-harness-routing-discussion-lead.md
-Status: v2.6 — thống nhất tên red-team (bỏ objector); Q6 chốt (persona khoá không bị thay, không có 'thêm' ở V1); checker theo rigor; Q1, Q2 chấp nhận; Q4 chốt red-team bắt buộc cho code (lead rút đề xuất); Q0 chốt: mô hình gọn; tách hai tầng: 3 Pattern cộng tác (+ preset) vs Workflow nhiều bước; luật phân biệt; Q8 chốt (giữ mọi dạng thảo luận; bỏ engine chỉ khi chúng chạy tốt trên mô hình gọn); Q9 chốt (supersede ADR-006 §6); (architecture advisor là ca nghiệm thu thu hồi engine); §4b chấm lại theo §0 (lead + kongming độc lập: gọn 3,9–4,0 > P-A 3,2–3,3 > P-B loại); bake-off sửa; F26–F30; §0 kết quả mong muốn + tiêu chí mới (G1–G6, 8 tiêu chí); Q0 engine vs mô hình gọn (bake-off trước); mức 4 override làm rõ; hình chạy tổng thể + plan vs Workflow + (b) quyền sở hữu plan.md đã chốt; Workflow tách khỏi Work đã chốt; bảng thuật ngữ đã chốt ở §6 D0; 3 câu trả lời (2 family: claude, openai). Chưa có gemini/xai; cập nhật tiếp nếu owner gửi thêm.
+Status: v2.7 — §6b đối chiếu plan X (readonly redesign): không chặn bước 1, nên gom với bind(); sửa D5/bước 1/F16; thống nhất tên red-team (bỏ objector); Q6 chốt (persona khoá không bị thay, không có 'thêm' ở V1); checker theo rigor; Q1, Q2 chấp nhận; Q4 chốt red-team bắt buộc cho code (lead rút đề xuất); Q0 chốt: mô hình gọn; tách hai tầng: 3 Pattern cộng tác (+ preset) vs Workflow nhiều bước; luật phân biệt; Q8 chốt (giữ mọi dạng thảo luận; bỏ engine chỉ khi chúng chạy tốt trên mô hình gọn); Q9 chốt (supersede ADR-006 §6); (architecture advisor là ca nghiệm thu thu hồi engine); §4b chấm lại theo §0 (lead + kongming độc lập: gọn 3,9–4,0 > P-A 3,2–3,3 > P-B loại); bake-off sửa; F26–F30; §0 kết quả mong muốn + tiêu chí mới (G1–G6, 8 tiêu chí); Q0 engine vs mô hình gọn (bake-off trước); mức 4 override làm rõ; hình chạy tổng thể + plan vs Workflow + (b) quyền sở hữu plan.md đã chốt; Workflow tách khỏi Work đã chốt; bảng thuật ngữ đã chốt ở §6 D0; 3 câu trả lời (2 family: claude, openai). Chưa có gemini/xai; cập nhật tiếp nếu owner gửi thêm.
 Lịch sử: v0 12:29 (sonnet + openai bản 12:20) → v1 16:20 (thêm fable; openai bản sửa 12:39)
 ```
 
@@ -86,7 +86,7 @@ Lead không dispatch lượt nào (owner chọn tự chạy). Hai family claude 
 | F13 | Store session: 602 session có `session.json` (606 thư mục), **512 `active`**, 27 `completed`, 57 `partial`; ~115 là test rò (`test.*`, `some-def`); 152 agent-led; delphi/nominal/rfc/group-cognition dùng **0** lần | fable (602) | Đúng (số hôm nay 606) | đếm `session.json` trong `.fgos/coordination/sessions` |
 | F14 | `executors.xai.for` chứa `review`, `code:review` → `decide --for review` có thể ra xai, trái doc catalog | fable [suy luận] | Config đúng; hành vi `decide` chưa chạy thử | `.fgos/config.json` `runner.executors.*.for` |
 | F15 | Nơi chứa khẩu vị bị sót trong fact sheet: `model_tier` của `core/agents/*.yaml` → `scripts/project-agents.mjs` `DEFAULT_MODELS {light,standard,heavy}` (comment "matches runner.models", thứ plan tier sẽ xoá); `feature.yaml` `preferExecutor: claude` | fable | Đúng | `scripts/project-agents.mjs:47-53`; `domains/coding/workflows/feature.yaml:65` |
-| F16 | `fallbackExecutors`: doc/comment "reserved-not-executed" nhưng runtime có Provider Capacity Rotator | openai | Đúng là drift (doc cũ) | `assignment-policy.mjs:404-410` vs `assignment-runner.mjs:1069,1768` |
+| F16 | `fallbackExecutors`: doc/comment "reserved-not-executed" nhưng runtime có Provider Capacity Rotator | openai | Đúng là drift; **nhưng nhánh rotator là code chết trong config hiện tại** (chỉ chạy khi lease `refused`, cần `runner.providers.*.accounts`, không config nào khai — plan X ràng buộc 4) | `assignment-policy.mjs:404-410` vs `assignment-runner.mjs:1069,1768` |
 | F17 | K3 (phase 6) chưa authorize, bị chặn phase 4–5; phase file chưa liệt kê area | openai | Đúng | nhánh `plan/260925-documentation-authority-unification` `plan.md:254,271-273` |
 | F18 | Mặc định `code:implement` sót | fact sheet | Đúng, nhưng chỉ trong `buildConfinementRequest` (chọn confinement) | `assignment-runner.mjs:2378` |
 | F19 | `steps[].capabilities` là field contract, không phải khoá routing | openai | Đúng | `session-engine.mjs:278-290` |
@@ -291,7 +291,7 @@ Biến thể kongming đề xuất (§8 báo cáo của nó): xoá engine cùng 
 - **D2 → rule mặc định trong config** (đổi so với v0): "review nhiều hay ít" là khẩu vị nên phải là dữ liệu (lập luận của fable). Mặc định: có `writes` + rigor ≥ standard → `reviewed`; `critical` → thêm red-team; còn lại `solo`. Unit/user override bằng `pattern:`.
 - **D3 → 3 mẫu `solo`, `reviewed` (red-team: **luôn bật cho code** theo Q4; domain khác chờ owner), `panel`.** **Bổ sung 23:48 (owner đồng ý tách hai tầng):** 13 file YAML hiện có chia hai loại — (1) **preset của một pattern**: master loop → `reviewed` + red-team; declared-consult → `solo`; research fan-out → `panel` (gated = `panel` + cổng lộ trước tổng hợp); rfc chain / review-lite → `reviewed` N người phản biện 1 vòng; (2) **Workflow nhiều bước**: delphi (chain, feedback-lite), nominal group (chain, lite), group cognition, architecture panel (v1, standard). **Luật phân biệt:** mọi vai cùng làm trên **một sản phẩm**, cùng worktree, lặp tới khi đạt → Pattern; nhiều sản phẩm nối nhau, bước sau lấy kết quả bước trước làm đầu vào mới, hoặc có cổng người → Workflow. Ví dụ coding implement producer + reviewer + tester + red-team = **Pattern `reviewed`** (preset `code-change`): checker list [reviewer khác provider, tester, red-team luôn bật (Q4)]; phần chạy test suite là **lệnh verify tất định** của pattern, không cần một agent; chỉ khi tester **viết** test như một sản phẩm riêng (TDD) thì thành unit riêng `dependsOn` trong cùng bước. Lifecycle coding (discovery → planning → implement → merge approval) mới là Workflow `coding/feature`, trong đó bước implement dùng preset `code-change`. Nguyên nhân engine nặng: gộp hai tầng (làm một unit; tuần tự nhiều bước) vào một cơ chế. Delphi/nominal/rfc/group-cognition (0 lần dùng, F13) → đánh dấu experimental, không gom lúc này.
 - **D4/D8 → mọi Ask thành Assignment + RunResult qua `executeAssignment`, kể cả inline** (`mechanism: inline`) — **đổi so với v0** (2/3 agent; F11 cho thấy transcript chỉ có với claude, còn Observe cần RunResult để nhóm theo unit). Điều kiện ghi file = cwd là linked worktree (`resolveMutatingCwdPosture` đã có), bỏ phụ thuộc protocol stamp.
-- **D5 → bảng ưu tiên của fable**: override một lần (lưu trên manifest lần chạy, scope theo unit/vai, áp mọi vòng) → yêu cầu của unit/vai → khẩu vị config → không còn gì thì inline (có Lead) / lỗi rõ (headless). Không mặc định `claude`. `readOnly` và `independentOf` là **bộ lọc**; override vi phạm độc lập thì từ chối trừ khi override nói rõ chấp nhận. Governance phủ quyết cuối.
+- **D5 → bảng ưu tiên của fable**: override một lần (lưu trên manifest lần chạy, scope theo unit/vai, áp mọi vòng) → yêu cầu của unit/vai → khẩu vị config → không còn gì thì inline (có Lead) / lỗi rõ (headless). Không mặc định `claude`. `readOnly` (posture confinement — cơ chế do plan X quyết, xem §6b; không phải "invocation read-only") và `independentOf` là **bộ lọc**; override vi phạm độc lập thì từ chối trừ khi override nói rõ chấp nhận. Governance phủ quyết cuối.
 - **Cơ chế chạy do `bind()` trả** (bổ sung 19:35 sau thảo luận với owner):
 
   | | inline | in-process | out-of-process |
@@ -334,7 +334,7 @@ Biến thể kongming đề xuất (§8 báo cáo của nó): xoá engine cùng 
 
   Ba ngoại lệ về cách thắng:
   - **Tier lấy giá trị lớn nhất, không theo "mức cao đè":** `rigor = max(rigor mức 3, sàn mức 1–2) ?? standard`; `tier = max(rigorToTier[rigor], override mức 4)`; `model = modelPolicies[provider][tier]`. Không mức nào hạ được sàn.
-  - **Executor không có mức 3:** việc chỉ nêu yêu cầu; ai làm là khẩu vị hoặc override. Trong `prefer[]`, candidate đầu qua bộ lọc thắng, các candidate sau là fallback (kể cả khi hết quota).
+  - **Executor không có mức 3:** việc chỉ nêu yêu cầu; ai làm là khẩu vị hoặc override. Trong `prefer[]`, candidate đầu qua bộ lọc thắng, các candidate sau là fallback. Fallback **khi hết quota hiện chưa chạy được** (nhánh cần `runner.providers.*.accounts`, không config nào khai — plan X ràng buộc 4); trigger quota do plan X quyết.
   - **Persona mức 3 vs 4 còn tranh chấp:** persona do Workflow khoá (vd `brand-guardian`) — lead đề xuất override **không** đè được (xem §7 Q6).
 
   Hiện trạng persona để đối chiếu: chỉ có mức 4 (`actors[].persona`), mức 3 (`preferPersona` trong YAML) và một mặc định cứng `code-reviewer` cho mọi role `reviewer` (`assignment-policy.mjs:388-391`); config chưa có field persona; persona chỉ là tên (F4, F5).
@@ -387,13 +387,13 @@ Unit ──► fgos run --unit <u> --role <vai>
 
 **Bước 1 (sắp lại 23:05 theo Q0): bake-off trước, chỉ làm những sửa không phụ thuộc engine.**
 1. **Bake-off** (việc đầu tiên): 2 area tài liệu, engine hiện tại (roster ghim reviewer khác provider) vs primitive + `reviewed` chạy hai lần (có/không red-team), cùng một Observe case; đo Lead-active; thêm ca resume và ca no-candidate (xem §4b). Cần một primitive tối thiểu `run --unit --role` bọc `executeAssignment` + `bind()` bản nhỏ đủ cho khẩu vị docs.
-2. Sửa không phụ thuộc engine, làm ngay: config `docs:write.prefer=[openai]`, `docs:review.prefer=[claude/claude-cli-readonly]`, sửa `code:review.prefer` → claude (F3); `prefer` luôn kèm invocation vì `readOnlyRedirects` còn sống (plan tier dời việc xoá sang follow-on — lệch C5); sửa `metrics harness` đọc `definitionRef.id` (F12) để bake-off đo đúng.
+2. Sửa không phụ thuộc engine, làm ngay: config `docs:write.prefer=[openai]`, `docs:review.prefer=[claude/claude-cli-bwrap]` (+ `confinement: required, host-write-denied`; không dùng `claude-cli-readonly` — xem §6b), sửa `code:review.prefer` → claude (F3); `prefer` luôn kèm invocation vì `readOnlyRedirects` còn sống (plan tier dời việc xoá sang follow-on — lệch C5); sửa `metrics harness` đọc `definitionRef.id` (F12) để bake-off đo đúng.
 3. **Chỉ khi engine thắng bake-off** mới làm các sửa engine của S1 fable: bỏ `policy.capability` khỏi master loop + `red-team-candidate` → `driver-authorized`; `coordination start --capability` lưu manifest, `composeActionRequest` đọc lại cho mọi node; close-check trước merge.
 
 Bản cũ của bước 1 (trước 23:05, giữ để không mất chi tiết): **Bước 1 = S1 của fable (bốn việc) + hai bổ sung:**
 1. Bỏ `policy.capability` khỏi master loop; `red-team-candidate` → `driver-authorized`.
 2. `coordination start --capability`, lưu manifest; `composeActionRequest` đọc lại cho mọi node (thay `facts` chết).
-3. Config: `docs:write.prefer=[openai]`, `docs:review.prefer=[claude/claude-cli-readonly]`, và sửa `code:review.prefer` → claude (F3). **Lưu ý:** `plan.md` của plan tier nay ghi "readOnlyRedirects dời sang plan follow-on" — **lệch với C5 của handoff** (C5 ghi "bỏ redirect"). Chừng nào redirect còn, bước read-only chọn claude vẫn bị đổi sang openai trừ khi ghim invocation tường minh; vì vậy `prefer` phải luôn kèm invocation, hoặc bước 1 tự xoá redirect.
+3. Config: `docs:write.prefer=[openai]`, `docs:review.prefer=[claude/claude-cli-bwrap]` (+ `confinement: required, host-write-denied`; không dùng `claude-cli-readonly` — xem §6b), và sửa `code:review.prefer` → claude (F3). **Lưu ý:** `plan.md` của plan tier nay ghi "readOnlyRedirects dời sang plan follow-on" — **lệch với C5 của handoff** (C5 ghi "bỏ redirect"). Chừng nào redirect còn, bước read-only chọn claude vẫn bị đổi sang openai trừ khi ghim invocation tường minh; vì vậy `prefer` phải luôn kèm invocation, hoặc bước 1 tự xoá redirect.
 4. Close-check trước merge; sửa `metrics harness` đọc `definitionRef.id` (F12).
 5. *(bổ sung)* Smoke **2 area song song** (openai) trong một Observe case.
 6. *(bổ sung)* **Bake-off** cùng 2 area bằng Lead + subagent (fable E1) → quyết P-A hay P-Y trước khi đầu tư S2–S6.
@@ -401,6 +401,44 @@ Bản cũ của bước 1 (trước 23:05, giữ để không mất chi tiết):
 Các bước sau (theo fable): S2 override bền + `solo` + xoá `agent-led`/`dispatch-runs`; S3 một binder (sau khi plan tier merge, cùng file); S4 unit trong phase file + driver chung, xoá DemandFacts; S5 persona + RunResult inline; S6 `panel`.
 
 **Plan riêng, xếp sau bước 1 và sau plan tier: tách Workflow khỏi Work** (xem quyết định Workflow ở trên). Phạm vi: Workflow definition + Workflow run store (JSONL, L3) + một runner tuần tự bước và cổng người; stage `discovery/exploring/planning/executing` trở thành các bước của Workflow `coding/feature`; Work chỉ giữ status board + tham chiếu Workflow run; kiểm Workflow chạy được domain không phải coding (smoke marketing). Quy mô đã đếm: 32 file import `workflow-stage-graphs.mjs`, 24 file đọc `item.stage` (gồm dispatch `assignment-runner.mjs`, `operation-choice.mjs`), Rust `work-state`.
+
+## 6b. Đối chiếu với plan X — `260930-1235-readonly-invocation-redesign` (2026-10-01 00:10)
+
+X nằm trên nhánh `plan/260930-tier-rigor-consolidation` (đọc bằng `git show`, không đụng nhánh), `blockedBy` plan tier, **chưa có phase**, bước kế là brainstorm bảo mật. Mục tiêu X: xoá `readOnlyRedirects` + `placement-policy.mjs`; bước chỉ-đọc không đổi executor lặng lẽ; read-only không ghi repo/host nhưng vẫn ghi artifact của run; hết quota claude không để review nằm chờ người. X có 9 ràng buộc đã chứng minh bằng file:line.
+
+### Quan hệ
+
+| Chủ đề | X | Thiết kế này | Quan hệ |
+|---|---|---|---|
+| Không đổi người lặng lẽ | mục tiêu chính | G6 | **cùng nguyên tắc**; X là một phần việc để đạt G6 |
+| Read-only là gì | câu hỏi mở; ràng buộc 1–3: cờ CLI không đủ, `confinement` khai ở invocation chỉ là metadata, bwrap chỉ chạy khi `capabilities.<cap>.confinement` yêu cầu | D5 ghi "bộ lọc `readOnly` = chỉ nhận invocation read-only của chính executor" | **thiết kế này sai theo bằng chứng của X** → sửa D5: read-only là **posture** (confinement) resolve một chỗ lúc spawn; cơ chế do X quyết, `bind()` chỉ tiêu thụ |
+| Fallback khi hết quota | ràng buộc 4: nhánh fallback là **code chết** (cần `runner.providers.*.accounts`, không config nào khai) | bảng 5 mức: "`prefer[]` candidate sau là fallback kể cả khi hết quota"; F16 | **thiết kế này dựa trên thứ chưa chạy** → đánh dấu phụ thuộc X (trigger quota do X quyết); sửa F16 |
+| Chọn invocation cho fallback | ràng buộc 5: chọn ở `assignment-runner.mjs:2318-2353`, pin primary đi theo sang executor mới | `bind()` chọn executor + invocation + provenance cho mọi candidate | **cùng chỗ code** → nên gom: fallback cũng đi qua `bind()` |
+| Redirect tác động thật ở đâu | ràng buộc 6: actor không bind hoặc ghim claude (vd capability `review` của advisory panel) | bước 1 đổi `code:review.prefer` → claude | **đổi này làm redirect tác động mạnh hơn** → bắt buộc kèm invocation pin. Đã kiểm: invocation trong `prefer` đi tới `cliOverride.preferInvocation` (`binding.mjs:311` → `composers.mjs:65,73` → `run.mjs:126,138`) nên `hasExplicitInvocationPin` đúng → redirect không đè (đường coordination) |
+| Project khác | ràng buộc 7: redirect mặc định `claude → claude-reviewer`; nhiều project không có `executors.claude` → cần doctor quét | mission #1 | X giữ đúng; thiết kế này phải thừa kế doctor check đó |
+| Luật read-only thứ hai | ràng buộc 8: `provider-adapter.mjs:356-369`; `executeExecutorCli`/`runDispatchCli` không qua `isReadOnlyAssignment` | mô hình gọn xoá `dispatch-runs` / `execute` thường | **mô hình gọn giảm scope X**: hai đường bypass đó biến mất |
+| `distinctProviderFrom` | ràng buộc 9: chỉ kiểm lúc bind; không được biến `preferred` thành `required` (ở tầng dispatch, lặng lẽ) | D7: `required` cho review output ghi file | **không mâu thuẫn** nếu đổi tường minh ở pattern/config (thiết kế này), không lặng lẽ trong dispatch; ghi rõ khi lập plan |
+| In-process | ngoài scope X | K1: reviewer claude chạy in-process | **khoảng trống**: read-only in-process = tool-scope của agent type — luật read-only thứ ba; cần gom vào cùng khái niệm posture |
+
+### Có phải chờ nhau không
+
+- **Bước 1 (ca nghiệm thu mô hình gọn + sửa không phụ thuộc engine): không chờ X.** Chạy được hôm nay nếu: mọi bước review ghim invocation tường minh; invocation đó là **confined** (`claude-cli-bwrap`) và capability tương ứng khai `confinement: required, host-write-denied` (như `review`, `code:review` đang có) — **không dùng `claude-cli-readonly`** (vẫn chạy `acceptEdits`, ghi được file — plan tier finding #3; X ràng buộc 1–2).
+- **`bind()` một chỗ + primitive (các bước sau): nên gom với X**, không làm hai lần trên cùng code (`resolve.mjs`, `assignment-runner.mjs:1431-1455, 2318-2353`, `placement-policy.mjs`). Nếu X làm riêng trên code hiện tại rồi mô hình gọn viết lại đường fallback/redirect → làm hai lần (RUL11).
+- X vẫn `blockedBy` plan tier; thiết kế này cũng xếp `bind()` sau plan tier → hai cái cùng mốc bắt đầu, thuận để gom.
+
+### Đề xuất điều chỉnh X (owner quyết; lead không sửa nhánh X)
+
+1. **Đích của X đặt trong `bind()`**: read-only là một posture/bộ lọc do `bind()` áp, có provenance; fallback (quota) cũng chọn qua `bind()`. Không vá tiếp `placement-policy.mjs`/khối redirect rồi xoá sau.
+2. **Trả lời câu hỏi brainstorm của X theo hướng nhất quán với thiết kế này**: read-only = OS confinement resolve một chỗ lúc spawn (primary + fallback + resume); in-process = tool-scope — cùng khái niệm posture.
+3. **Thu hẹp scope X**: bỏ việc vá `executeExecutorCli`/`runDispatchCli` (ràng buộc 8) vì mô hình gọn xoá hai đường đó.
+4. **Trigger quota**: quyết trong X; thiết kế này dùng kết quả cho `prefer[]` fallback và G6.
+5. Hai cách tổ chức: (a) X thành một phase của plan `bind()` + primitive (gom hẳn); (b) X giữ plan riêng nhưng đổi đích như (1) và chạy ngay trước bước `bind()`. **Lead nghiêng (a)** — cùng code, cùng mốc, ít lần sửa nhất.
+
+### Sửa trong thiết kế này (đã áp)
+
+- D5: `readOnly` là posture confinement do X quyết, không phải "invocation read-only".
+- Bước 1: `docs:review.prefer=[claude/claude-cli-bwrap]` + capability `docs:review` khai `confinement: required, host-write-denied`; bỏ `claude-cli-readonly`.
+- Bảng 5 mức / F16: fallback theo quota **chưa chạy được** hôm nay; phụ thuộc X.
 
 ## 7. Bộ câu hỏi cho owner (một lượt)
 
