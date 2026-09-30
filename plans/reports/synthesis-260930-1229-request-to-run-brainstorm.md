@@ -5,7 +5,7 @@ Document type: Synthesis report (discussion lead)
 Snapshot: 2026-09-30 16:20 (Asia/Saigon), main @ 5aed82c52
 Prompt: plans/reports/brainstorm-prompt-260930-1102-request-to-run-decomposition.md
 Handoff: plans/reports/handoff-260930-1210-harness-routing-discussion-lead.md
-Status: v1.8 — §0 kết quả mong muốn + tiêu chí mới (G1–G6, 8 tiêu chí); Q0 engine vs mô hình gọn (bake-off trước); mức 4 override làm rõ; hình chạy tổng thể + plan vs Workflow + (b) quyền sở hữu plan.md đã chốt; Workflow tách khỏi Work đã chốt; bảng thuật ngữ đã chốt ở §6 D0; 3 câu trả lời (2 family: claude, openai). Chưa có gemini/xai; cập nhật tiếp nếu owner gửi thêm.
+Status: v1.9 — §4b chấm lại theo §0 (lead + kongming độc lập: gọn 3,9–4,0 > P-A 3,2–3,3 > P-B loại); bake-off sửa; F26–F30; §0 kết quả mong muốn + tiêu chí mới (G1–G6, 8 tiêu chí); Q0 engine vs mô hình gọn (bake-off trước); mức 4 override làm rõ; hình chạy tổng thể + plan vs Workflow + (b) quyền sở hữu plan.md đã chốt; Workflow tách khỏi Work đã chốt; bảng thuật ngữ đã chốt ở §6 D0; 3 câu trả lời (2 family: claude, openai). Chưa có gemini/xai; cập nhật tiếp nếu owner gửi thêm.
 Lịch sử: v0 12:29 (sonnet + openai bản 12:20) → v1 16:20 (thêm fable; openai bản sửa 12:39)
 ```
 
@@ -34,7 +34,8 @@ Ngoài phạm vi: thiết kế lại thang tier/rigor (plan riêng); nội bộ 
 | G1 | Mọi lần chạy (inline, subagent, process ngoài) nằm trong một Observe case và có RunResult | Observe trước (advice §2) |
 | G2 | Plan, Workflow, Pattern cộng tác không ghim executor/provider/model/tier | C4, plan-lint |
 | G3 | Một đường cho mỗi năng lực: cái mới thay cái cũ thì xoá trong cùng bước, không alias | single path |
-| G4 | Chạy được headless và cho một domain không phải code | D-ADR0035 |
+| G4a | Chạy được headless (không người, không Lead) | D-ADR0035 |
+| G4b | Chạy được một Workflow domain không phải code có cổng người (vd marketing) — kiểm trong plan tách Workflow; docs chỉ đủ cho bake-off | D-ADR0035; kongming §7.7 |
 | G5 | Không làm yếu ràng buộc độc lập (khác provider) hay governance | §6.6, C4 |
 | G6 | **Không bao giờ đổi người làm lặng lẽ**: mọi lệch khỏi khẩu vị/override (hết quota, governance, không còn candidate khác provider) có lý do trong provenance; không có người thay hợp lệ thì dừng và báo, không tự hạ | owner 23:16; bài học `readOnlyRedirects` (F3) |
 
@@ -42,7 +43,7 @@ Ngoài phạm vi: thiết kế lại thang tier/rigor (plan riêng); nội bộ 
 
 | # | Tiêu chí | Câu hỏi | Chỉ số | Mốc so sánh |
 |---|---|---|---|---|
-| 1 | **Nhanh, nhẹ** (Ship Faster) | Điều phối tốn bao nhiêu so với công việc? | thời gian ngoài công việc thật / unit; số lệnh Lead gọi / unit; số run phụ | phase tài liệu cũ: ~150 phút, 3 vòng, ~10 run |
+| 1 | **Nhanh, nhẹ** (Ship Faster) | Điều phối tốn bao nhiêu so với công việc? | **Lead-active**: số lệnh + số quyết định Lead / unit, thời gian Lead chờ giữa hai lệnh; số vòng × phút fixer; số run phụ. **Không dùng wall time** (wall ≈ worker: 140 vs 137 phút — kongming E1) | **cả phase tài liệu cũ: 6 session, 25 run, ~6 h session-time, không session nào đóng**; một session: 10 run / 3 vòng / 137 phút worker / ~12 lệnh Lead; một cell hôm nay ~8 lệnh `fgos coordination` |
 | 2 | **Ít phải canh** (Release con người) | Người phải xen vào bao nhiêu lần? | số lần can thiệp / yêu cầu; câu hỏi có gom; cổng người có chặn việc độc lập | K3 hôm nay: Lead dẫn tay từng bước |
 | 3 | **Đúng người** | Mỗi vai có do đúng executor/tier/persona anh muốn? | tỉ lệ khớp khẩu vị (assignment thực chạy đúng khẩu vị hoặc override / tổng); số lệch có lý do; số lệch không lý do (đích 0) | hôm nay: `code:review` → openai, redirect opus → openai, persona `code-reviewer` cho mọi reviewer |
 | 4 | **Chất lượng và kết thúc** (DoD) | Review có thật? Lần chạy có tới xong? | tỉ lệ finding được chấp nhận; số lần reviewer cho qua < 3 phút với 0 finding; tỉ lệ run tới trạng thái cuối; resume được sau crash | 0/6 session đóng; 512/606 kẹt `active` |
@@ -82,7 +83,7 @@ Lead không dispatch lượt nào (owner chọn tự chạy). Hai family claude 
 | F10 | `distinctProviderFrom` bỏ qua vai chưa bind (phụ thuộc thứ tự) | openai | Đúng | `binding.mjs:112-133` |
 | F11 | Observe không đọc `.fgos/dispatch-runs/`; có đọc `.fgos/assignments` và transcript claude | cả ba | Đúng | `run-result/rust/src/lib.rs:330-337`; `observe/rust/src/sources/claude_transcripts.rs` |
 | F12 | `metrics harness` đếm protocol sai: đọc `core/protocols/*.json` (không tồn tại) và `session.json.protocol.id` (field thật là `definitionRef.id`) → luôn 0 | fable | Đúng | `observe/rust/src/metrics_cli/harness.rs:226-250`; `ls core/protocols` lỗi |
-| F13 | Store session: 606 session, **512 `active`**; ~115 là test rò (`test.*`, `some-def`); 152 agent-led; delphi/nominal/rfc/group-cognition dùng **0** lần | fable (602) | Đúng (số hôm nay 606) | đếm `session.json` trong `.fgos/coordination/sessions` |
+| F13 | Store session: 602 session có `session.json` (606 thư mục), **512 `active`**, 27 `completed`, 57 `partial`; ~115 là test rò (`test.*`, `some-def`); 152 agent-led; delphi/nominal/rfc/group-cognition dùng **0** lần | fable (602) | Đúng (số hôm nay 606) | đếm `session.json` trong `.fgos/coordination/sessions` |
 | F14 | `executors.xai.for` chứa `review`, `code:review` → `decide --for review` có thể ra xai, trái doc catalog | fable [suy luận] | Config đúng; hành vi `decide` chưa chạy thử | `.fgos/config.json` `runner.executors.*.for` |
 | F15 | Nơi chứa khẩu vị bị sót trong fact sheet: `model_tier` của `core/agents/*.yaml` → `scripts/project-agents.mjs` `DEFAULT_MODELS {light,standard,heavy}` (comment "matches runner.models", thứ plan tier sẽ xoá); `feature.yaml` `preferExecutor: claude` | fable | Đúng | `scripts/project-agents.mjs:47-53`; `domains/coding/workflows/feature.yaml:65` |
 | F16 | `fallbackExecutors`: doc/comment "reserved-not-executed" nhưng runtime có Provider Capacity Rotator | openai | Đúng là drift (doc cũ) | `assignment-policy.mjs:404-410` vs `assignment-runner.mjs:1069,1768` |
@@ -91,6 +92,11 @@ Lead không dispatch lượt nào (owner chọn tự chạy). Hai family claude 
 | F19 | `steps[].capabilities` là field contract, không phải khoá routing | openai | Đúng | `session-engine.mjs:278-290` |
 | F20 | Chặn `preferExecutor` ở scope portable | fact sheet | Đúng | `session-engine.mjs:925-942` |
 | **F25** | "Mở rộng `AssignmentPlan` hiện có" làm canonical graph | openai (bản 12:39) | **Sai: không có symbol/khái niệm `AssignmentPlan`** trong `src/`, `packages/`, `docs/`. Gần nhất là `compileDispatchPlan` — plan dispatch của **một** assignment, không phải đồ thị | `rg AssignmentPlan` rỗng; `assignment-runner.mjs:1376` |
+| F26 | Mutating qua `executeAssignment` **bắt buộc** protocol-operation stamp trỏ tới operation `work-product` của một CoordinationProtocol thật, rồi mới kiểm posture worktree; stamp tự nhận forgeable nên posture mới là cổng thật. Mô hình gọn (và D4 bỏ stamp) phải thay cổng này bằng posture + `bind()` và **supersede ADR-006 §6 tường minh** | lead + kongming | Đúng | `assignment-runner.mjs:521-560`; `execution-contract.mjs:11-33,139-160,317-326` |
+| F27 | `assignment.json.provenance` **không ghi chuỗi binding** (vì sao executor này) → nguyên nhân rubber-stamp §6.6 (`strength: preferred` hay `--executor` tay) không truy được từ store; tiêu chí Minh bạch hôm nay ≈ 1. Hệ quả đo được: reviewer gemini = doer, 2,7 phút `done` / 3,0 phút `no-evidence`; red-team xai **6/6** `failed` dù finding được accept | kongming E3 | Đúng (provenance chỉ có `kind`, `contractPolicyVersion`, …) | `.fgos/assignments/asgn_pi_lead_phase01_op_002/assignment.json` |
+| F28 | `rigorToTier` **chưa tồn tại** trên main (0 lượt trong `src/`); plan tier chưa merge → bake-off dùng `minTier` hôm nay | kongming E6 | Đúng | `rg rigorToTier src` rỗng |
+| F29 | `executeAssignment` có 4 caller (`cli.mjs` execute --assignment / --contract, `operation-choice.mjs` Work loop, `session-engine.mjs:403`) → "một cửa" đã đúng ở tầng assignment; engine chỉ là một trong bốn người gọi | kongming E5 | [fact kongming, lead chưa kiểm từng dòng] | grep `executeAssignment(` |
+| F30 | Mốc §6.6 "~150 phút / 3 vòng / ~10 run" chỉ là **1/6 session** của phase; cả phase = 6 session, 25 run, ~6 h | kongming E1–E2 | Đúng (6 session, 25 assignment `phase01`) | `.fgos/coordination/sessions/documentation-authority-unification--phase-01*`; `.fgos/assignments/*phase01*` |
 
 Chưa kiểm: `strength: preferred` có đúng là nguyên nhân rubber-stamp §6.6 (cần log session).
 
@@ -143,6 +149,60 @@ Chưa kiểm: `strength: preferred` có đúng là nguyên nhân rubber-stamp §
 | Trace K3 | 15 unit `docs:write` rigor high + 1 unit ledger `dependsOn` cả 15; `reviewed`; author openai flagship, reviewer claude opus readonly khác provider; mỗi area một worktree trả ledger delta | Lead mở 15 subagent/`run --ask` theo prose | Mở tay 15 session `start --capability docs:write --cwd <wt>` |
 
 P-B **là bước 1 của P-A** (cả ba agent đồng ý). P-Y chỉ chọn nếu bake-off cho thấy nghi lễ engine vẫn quá đắt.
+
+## 4b. Chấm lại theo §0 (2026-09-30 23:30) — lead + kongming độc lập
+
+Hai bản chấm độc lập: lead (Opus 5.5) và kongming (claude-fable-5.1, chỉ đọc, không đọc bản của lead; báo cáo đầy đủ: [rescoring-260930-2320-kongming-request-to-run-options.md](rescoring-260930-2320-kongming-request-to-run-options.md)). Bảng §4 (5 tiêu chí cũ) giữ để đối chiếu, **không còn dùng để quyết**.
+
+### Gate
+
+| Gate | P-A (engine) | Mô hình gọn | P-B (vá) |
+|---|---|---|---|
+| G1 Observe + RunResult | đạt có ĐK (RunResult inline chưa có — chung mọi phương án; xoá `dispatch-runs`) | đạt có ĐK (như P-A + `unitId` trên assignment để Observe nhóm theo unit) | **không đạt** (giữ `dispatch-runs`) |
+| G2 không ghim | đạt (sau bỏ 6 dòng `policy.capability` + `feature.yaml:65`) | đạt | đạt có ĐK (`preferExecutor`, `executors.for`, redirect còn) |
+| G3 một đường | đạt có ĐK (request tự sinh là lớp **thêm**; phải cấm request tay, xoá `agent-led`, DemandFacts, `dispatch-runs`) | đạt có ĐK (**engine "đóng băng" = đường thứ hai cho panel** → cần tiêu chí thu hồi đếm được + mốc ngày; `loop.mjs` stage sequencer rút về Workflow run) | **không đạt** |
+| G4a headless | đạt có ĐK (15 unit ghi file = 15 session vì DAG read-only, F9) | đạt có ĐK (**phải thay cổng stamp, F26**) | yếu |
+| G5 độc lập | đạt (`required`) | đạt có ĐK (loop `reviewed` tự áp `independentOf`; supersede ADR-006 §6) | **không đạt** (`preferred`) |
+| G6 không đổi lặng lẽ | đạt có ĐK (gom redirect + rotator vào `bind()`) | đạt có ĐK (dễ hơn: primitive là entry duy nhất) | **không đạt** (redirect + default `claude`) |
+
+**P-B rớt G1, G3, G5, G6 → loại.**
+
+### Tám tiêu chí (1–5)
+
+| # | Tiêu chí | P-A lead / kongming | Gọn lead / kongming | P-B lead / kongming | Lý do chính (hợp nhất) |
+|---|---|---|---|---|---|
+| 1 | Nhanh, nhẹ | 2 / 3 | 4 / 4 | 1 / 2 | P-A: ~3–5 lệnh Lead/unit, disposition mỗi vòng; gọn: 1 lệnh/unit, Lead không đứng giữa các vòng. Tiết kiệm chủ yếu đến từ **pattern**, phần còn lại từ bỏ nghi lễ |
+| 2 | Ít phải canh | 3 / 3 | 4 / 4 | 1 / 1 | disposition là driver action của engine (≥1 can thiệp/vòng finding); gọn: 0 can thiệp bình thường, 1 khi hết vòng hoặc không candidate |
+| 3 | Đúng người | 5 / 4 | 5 / 4 | 2 / 2 | cùng `bind()`; kongming trừ 1 vì lối vòng `--executor` từng step/`actors[]` còn tới S3 — **lead nhận 4/4** |
+| 4 | Chất lượng & kết thúc | 3 / 3 | 3 / 4 | 2 / 2 | P-A có replay/recovery thật nhưng tới trạng thái cuối thực đo 27/602 (close-quorum ≥5 lý do từ chối); gọn: terminal = hàm return, finding là outcome không phải failure, **resume sau crash phải tự xây** |
+| 5 | Đơn giản (bề mặt + máy móc) | 2 / 2 | 4 / 4 | 1 / 1 | P-A ~12 khái niệm để hiểu một lần chạy, 20,7k dòng coordination trên đường chạy, request tự sinh **giấu** không bớt; gọn: ~5 khái niệm, code mới ~1,5–2k dòng |
+| 6 | Linh hoạt | 5 / 4 | 3 / 4 | 2 / 2 | P-A: pattern mới = YAML nhưng schema 8 step kind khó tới mức chưa ai viết business flow; gọn: pattern mới = code nhưng 3 là đủ (D3) — **lead nhận 4/4** |
+| 7 | Minh bạch | 4 / 4 | 5 / 4 | 2 / 2 | cùng `bind --explain`; P-A có sẵn `coordination status --detail`; gọn cần `fgos run status` mới — **lead nhận 4/4**. Hôm nay ≈ 1 (F27) |
+| 8 | Chuyển đổi | 3 / 3 | 3 / 4 | 3 / 3 | gọn: bước 1 tự chạy, xoá/thêm ≈ 10:1 tiềm năng, trừ vì xoá dồn về cuối và 57 test gắn session-engine |
+
+### Tổng có trọng số
+
+| Trọng số | P-A | Mô hình gọn | P-B |
+|---|---|---|---|
+| lead: 1–4 ×2, 5–8 ×1 | 40/60 = **3,33** | 47/60 = **3,92** | 20/60 = 1,67 |
+| kongming: 1–2 ×3, 3–4 ×2, 5 ×1,5, 6–8 ×1 | **3,17** | **4,00** | 1,97 |
+
+Hai bản độc lập **cùng thứ hạng**, cách nhau ≤ 0,16 điểm. Độ nhạy (kongming): P-A có auto-driver → 3,38; gọn thua chất lượng ở bake-off (tiêu chí 4 xuống 2) → 3,72. **Thứ hạng chỉ đảo nếu mô hình gọn rớt gate**: G3 (không có tiêu chí thu hồi engine) hoặc G5 (cửa mutating mở không qua `bind()`).
+
+Điểm chắc từ tĩnh (không cần bake-off): 5, 8, gate. Điểm phỏng đoán cần bake-off: 1, 2, 4.
+
+### Sửa bake-off (theo kongming §5, lead đồng ý)
+
+1. **Đo đúng biến.** Nhánh engine hôm nay = master loop có red-team bắt buộc + `preferred`; so với `reviewed` không objector + `required` thì chênh là **pattern**, không phải engine. Cách rẻ nhất: nhánh engine ghim roster `actors[]` để reviewer khác provider (giả lập `required`), và chạy nhánh gọn **hai lần** (có objector — đồng hình với red-team — và không objector).
+2. **Chỉ số**: Lead-active (lệnh, quyết định, chờ) và số vòng × phút fixer; wall chỉ để đối chiếu (§0 tiêu chí 1 đã sửa).
+3. **Thêm hai ca**: kill driver giữa vòng 2 rồi resume (tiêu chí 4); chỉ một provider có invocation read-only để ép G6 (phải dừng + báo, không tự hạ).
+4. Dùng `minTier` hôm nay (F28), ghi rõ; không chờ plan tier.
+
+### Lập trường sau chấm lại
+
+**Mô hình gọn**, với ba điều kiện bắt buộc để qua gate: (a) thay cổng stamp của `executeAssignment` bằng posture + `bind()`, supersede ADR-006 §6 tường minh (F26); (b) **tiêu chí thu hồi engine đếm được + mốc ngày**, không "đóng băng chờ xem" (G3); (c) mọi RunResult ghi file có `provenance.binding` (doctor check) để cửa mutating không bị gọi vòng qua `bind()`.
+
+Biến thể kongming đề xuất (§8 báo cáo của nó): **không giữ engine đóng băng cho panel ẩn danh** mà xoá cùng track; `panel` = loop song song + tổng hợp; ẩn danh sau này là một cờ trên loop. Qua G3 sạch, tiêu chí 8 lên 5; giá là mất "panel có luật visibility" mà hiện 0 người dùng (delphi/nominal/rfc/group-cognition = 0, architecture panel 8). → §7 Q8.
 
 ## 5. Đối chiếu với đề xuất chưa chốt (handoff §5)
 
@@ -321,10 +381,10 @@ Unit ──► fgos run --unit <u> --role <vai>
 
 **Đánh giá lại phương án (§4):** P-A giữ điểm "Đơn giản 4" chỉ ở bề mặt người dùng; tính cả engine thì thấp hơn. Mô hình gọn: đơn giản cao nhất, linh hoạt ngang, tường minh ngang (cùng `bind()`), đo được ngang (cùng `executeAssignment`), chi phí chuyển đổi cao ở phần xoá nhưng phần xây mới nhỏ.
 
-**Lập trường lead:** nghiêng về **mô hình gọn**; quyết bằng **bake-off, làm trước mọi đầu tư khác**: chạy cùng 2 area tài liệu bằng (1) engine hiện tại và (2) primitive + vòng lặp `reviewed`; so trong cùng một Observe case: wall time, số lần người can thiệp, số finding thật được chấp nhận, chất lượng đầu ra. Mô hình gọn không thua về chất lượng → đi đường gọn, viết lại S2–S6 theo hướng đó.
+**Lập trường lead** (đã chấm lại ở §4b, bake-off sửa theo §4b): nghiêng về **mô hình gọn**; quyết bằng **bake-off, làm trước mọi đầu tư khác**: chạy cùng 2 area tài liệu bằng (1) engine hiện tại và (2) primitive + vòng lặp `reviewed`; so trong cùng một Observe case: wall time, số lần người can thiệp, số finding thật được chấp nhận, chất lượng đầu ra. Mô hình gọn không thua về chất lượng → đi đường gọn, viết lại S2–S6 theo hướng đó.
 
 **Bước 1 (sắp lại 23:05 theo Q0): bake-off trước, chỉ làm những sửa không phụ thuộc engine.**
-1. **Bake-off** (việc đầu tiên): 2 area tài liệu, chạy bằng engine hiện tại vs primitive + vòng lặp `reviewed`, cùng một Observe case (xem Q0). Cần một primitive tối thiểu `run --unit --role` bọc `executeAssignment` + `bind()` bản nhỏ đủ cho khẩu vị docs.
+1. **Bake-off** (việc đầu tiên): 2 area tài liệu, engine hiện tại (roster ghim reviewer khác provider) vs primitive + `reviewed` chạy hai lần (có/không objector), cùng một Observe case; đo Lead-active; thêm ca resume và ca no-candidate (xem §4b). Cần một primitive tối thiểu `run --unit --role` bọc `executeAssignment` + `bind()` bản nhỏ đủ cho khẩu vị docs.
 2. Sửa không phụ thuộc engine, làm ngay: config `docs:write.prefer=[openai]`, `docs:review.prefer=[claude/claude-cli-readonly]`, sửa `code:review.prefer` → claude (F3); `prefer` luôn kèm invocation vì `readOnlyRedirects` còn sống (plan tier dời việc xoá sang follow-on — lệch C5); sửa `metrics harness` đọc `definitionRef.id` (F12) để bake-off đo đúng.
 3. **Chỉ khi engine thắng bake-off** mới làm các sửa engine của S1 fable: bỏ `policy.capability` khỏi master loop + `red-team-candidate` → `driver-authorized`; `coordination start --capability` lưu manifest, `composeActionRequest` đọc lại cho mọi node; close-check trước merge.
 
@@ -353,6 +413,9 @@ Các bước sau (theo fable): S2 override bền + `solo` + xoá `agent-led`/`di
 6. **Persona do Workflow khoá có bị override một lần đè không?** Fable: override thắng; openai: persona đã khoá không đè được. **Em đề xuất: không đè** — đó là yêu cầu nghiệp vụ (mức 3), không phải khẩu vị; muốn đổi thì sửa Workflow.
 
 7. ~~Quy trình nghiệp vụ nằm ở đâu~~ — **đã chốt 22:38**, xem quyết định Workflow ở §6.
+
+8. **Panel ẩn danh: giữ engine đóng băng hay xoá cùng track?** Xem §4b. **Em đề xuất: xoá cùng track** (0 người dùng; qua G3 sạch); nếu anh muốn giữ option, bắt buộc có mốc thu hồi có ngày và tiêu chí đếm được.
+9. **Supersede ADR-006 §6** (bỏ protocol stamp, cổng mutating = posture worktree + `bind()`): cần anh đồng ý vì đổi ranh giới an toàn đã chốt (F26). **Em đề xuất: đồng ý**, vì stamp tự nhận forgeable và posture mới là cổng thật.
 
 Những gì em **tự quyết**, không hỏi: D0–D7 ở §6; bác `AssignmentPlan` (F25); Workflow marketing chỉ smoke trong plan tách Workflow, không xây domain marketing thật trước tenant.
 
