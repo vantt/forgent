@@ -5,7 +5,7 @@ Document type: Synthesis report (discussion lead)
 Snapshot: 2026-09-30 16:20 (Asia/Saigon), main @ 5aed82c52
 Prompt: plans/reports/brainstorm-prompt-260930-1102-request-to-run-decomposition.md
 Handoff: plans/reports/handoff-260930-1210-harness-routing-discussion-lead.md
-Status: v1.5 — hình chạy tổng thể + plan vs Workflow + (b) quyền sở hữu plan.md đã chốt; Workflow tách khỏi Work đã chốt; bảng thuật ngữ đã chốt ở §6 D0; 3 câu trả lời (2 family: claude, openai). Chưa có gemini/xai; cập nhật tiếp nếu owner gửi thêm.
+Status: v1.6 — mức 4 override làm rõ; hình chạy tổng thể + plan vs Workflow + (b) quyền sở hữu plan.md đã chốt; Workflow tách khỏi Work đã chốt; bảng thuật ngữ đã chốt ở §6 D0; 3 câu trả lời (2 family: claude, openai). Chưa có gemini/xai; cập nhật tiếp nếu owner gửi thêm.
 Lịch sử: v0 12:29 (sonnet + openai bản 12:20) → v1 16:20 (thêm fable; openai bản sửa 12:39)
 ```
 
@@ -106,7 +106,7 @@ P-B **là bước 1 của P-A** (cả ba agent đồng ý). P-Y chỉ chọn n�
 | Q2 facade | Đưa `fgos-code-change` lên core; xoá 2 skill deprecated | **Xác nhận** | 3/3 |
 | Q3 tách plan | Plan 1 = B5+B1+B7+smoke | **Sửa**: bước 1 = S1 bốn việc (§6) + smoke 2 area + bake-off; B7 bỏ | F17: P6 chưa authorize |
 | Q4 `docs:*` | Tạo `docs:author/review` trong catalog | **Bác một nửa**: không vào catalog với `serves`; chỉ là **key config** `docs:write`/`docs:review` có fallback | 3/3 không tách catalog; fable: tách = một dòng dữ liệu |
-| Q5 unit format | Mở rộng `- unit:` của plan-lint sang phase file + `rigor/dependsOn/writes` | **Xác nhận**, field chốt: `id, objective, capability, rigor, writes, dependsOn, pattern?, overrides?` | 3/3 |
+| Q5 unit format | Mở rộng `- unit:` của plan-lint sang phase file + `rigor/dependsOn/writes` | **Xác nhận**, field chốt: `id, objective, capability, rigor, writes, dependsOn, pattern?` (không có `overrides`: plan không ghim hạ tầng; override nằm trên lần chạy — xem mức 4) | 3/3 |
 | Q6 Node/Rust | Sửa Node trong ranh giới file | **Xác nhận** | 3/3 |
 | Persona chưa rõ | — | **Đóng**: chỉ là tên (F4, F5) | |
 
@@ -183,7 +183,7 @@ P-B **là bước 1 của P-A** (cả ba agent đồng ý). P-Y chỉ chọn n�
 - **D2 → rule mặc định trong config** (đổi so với v0): "review nhiều hay ít" là khẩu vị nên phải là dữ liệu (lập luận của fable). Mặc định: có `writes` + rigor ≥ standard → `reviewed`; `critical` → thêm objector; còn lại `solo`. Unit/user override bằng `pattern:`.
 - **D3 → 3 mẫu `solo`, `reviewed` (objector tuỳ chọn, `driver-authorized`), `panel`.** Delphi/nominal/rfc/group-cognition (0 lần dùng, F13) → đánh dấu experimental, không gom lúc này.
 - **D4/D8 → mọi Ask thành Assignment + RunResult qua `executeAssignment`, kể cả inline** (`mechanism: inline`) — **đổi so với v0** (2/3 agent; F11 cho thấy transcript chỉ có với claude, còn Observe cần RunResult để nhóm theo unit). Điều kiện ghi file = cwd là linked worktree (`resolveMutatingCwdPosture` đã có), bỏ phụ thuộc protocol stamp.
-- **D5 → bảng ưu tiên của fable**: override một lần (lưu theo unit, áp mọi vòng) → yêu cầu của unit/vai → khẩu vị config → không còn gì thì inline (có Lead) / lỗi rõ (headless). Không mặc định `claude`. `readOnly` và `independentOf` là **bộ lọc**; override vi phạm độc lập thì từ chối trừ khi override nói rõ chấp nhận. Governance phủ quyết cuối.
+- **D5 → bảng ưu tiên của fable**: override một lần (lưu trên manifest lần chạy, scope theo unit/vai, áp mọi vòng) → yêu cầu của unit/vai → khẩu vị config → không còn gì thì inline (có Lead) / lỗi rõ (headless). Không mặc định `claude`. `readOnly` và `independentOf` là **bộ lọc**; override vi phạm độc lập thì từ chối trừ khi override nói rõ chấp nhận. Governance phủ quyết cuối.
 - **Cơ chế chạy do `bind()` trả** (bổ sung 19:35 sau thảo luận với owner):
 
   | | inline | in-process | out-of-process |
@@ -204,7 +204,23 @@ P-B **là bước 1 của P-A** (cả ba agent đồng ý). P-Y chỉ chọn n�
   | 1 | Khẩu vị global `~/.fgos/config.json` | `capabilities[domain:verb].prefer[]` → fallback `capabilities[verb].prefer[]` — **đã có** (`prefer`) | `rigorToTier` (khoá bắt buộc, `fgos setup` cài, `doctor` kiểm — plan tier); sàn `capabilities[cap].rigor` — **đề xuất, Q1** | `capabilities[cap].persona` — **đề xuất, chưa có** |
   | 2 | Khẩu vị project `.fgos/config.json` (đè global theo từng key) | như mức 1 | như mức 1 | như mức 1 |
   | 3 | Yêu cầu của việc (Unit / Pattern cộng tác / Workflow) | **không bao giờ** | `rigor` (sàn) | vai do step/Workflow khai |
-  | 4 | Override một lần (request / CLI) | `unit.overrides[role]`, `--executor` | `--tier` / `actors[].tier` (chỉ nâng) | override |
+  | 4 | Override một lần (request / CLI / lời user) — lưu trên **manifest lần chạy** | `overrides[{scope}].executor/invocation` | `overrides[{scope}].tier` (chỉ nâng) | `overrides[{scope}].persona` |
+
+  **Mức 4 — override một lần** (bổ sung 2026-09-30 23:00 sau thảo luận với owner): lựa chọn "ai làm / mạnh tới đâu" do **người khởi chạy** nêu cho **riêng lần chạy này**; không sửa config, lần sau quay về khẩu vị mức 1–2.
+  - Hai cửa, cùng ghi một chỗ: lời user trong prompt ("lần này review bằng gpt" — Lead dịch thành dữ liệu) hoặc CLI/request. Dạng:
+
+    ```yaml
+    overrides:                         # trên manifest LẦN CHẠY, không trong plan, không trong config
+      - scope: { unit: fix-null, role: reviewer }   # hoặc chỉ role (mọi unit), hoặc cả lần chạy
+        executor: openai
+        tier: flagship                 # chỉ nâng
+        persona: security-reviewer
+    ```
+  - Sống hết lần chạy, **kể cả các vòng sửa/recheck** (sửa bug F8: roster `--actors` hôm nay chỉ áp bước đầu).
+  - Giới hạn: tier chỉ nâng; vẫn qua bộ lọc `independentOf`/`readOnly` (vi phạm thì từ chối trừ khi ghi rõ chấp nhận); governance vẫn phủ quyết; không đè persona Workflow khoá (nếu Q6 theo đề xuất); provenance ghi `override`.
+  - **Người viết plan không bao giờ khai override** (plan-lint cấm ghim hạ tầng); chỉ người khởi chạy.
+  - Override lặp lại cùng kiểu nhiều lần = tín hiệu nên sửa khẩu vị (về sau Observe có thể đề xuất — B8).
+  - Gom từ hiện trạng: `--executor` (áp cả session, tắt computed binding của bước), `actors[]` (chỉ ở `start`, không theo sang bước sau), `--tier` (không scope theo vai) → **một** field `overrides` có scope, lưu bền trên lần chạy.
 
   Áp trên mọi mức, không ai vượt: bộ lọc `readOnly` + `independentOf` (override vi phạm thì từ chối trừ khi ghi rõ chấp nhận); governance phủ quyết cuối.
 
