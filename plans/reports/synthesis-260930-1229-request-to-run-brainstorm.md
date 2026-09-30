@@ -5,7 +5,7 @@ Document type: Synthesis report (discussion lead)
 Snapshot: 2026-09-30 16:20 (Asia/Saigon), main @ 5aed82c52
 Prompt: plans/reports/brainstorm-prompt-260930-1102-request-to-run-decomposition.md
 Handoff: plans/reports/handoff-260930-1210-harness-routing-discussion-lead.md
-Status: v1.3 — bảng thuật ngữ đã chốt ở §6 D0; 3 câu trả lời (2 family: claude, openai). Chưa có gemini/xai; cập nhật tiếp nếu owner gửi thêm.
+Status: v1.4 — Workflow tách khỏi Work đã chốt; bảng thuật ngữ đã chốt ở §6 D0; 3 câu trả lời (2 family: claude, openai). Chưa có gemini/xai; cập nhật tiếp nếu owner gửi thêm.
 Lịch sử: v0 12:29 (sonnet + openai bản 12:20) → v1 16:20 (thêm fable; openai bản sửa 12:39)
 ```
 
@@ -88,8 +88,8 @@ Chưa kiểm: `strength: preferred` có đúng là nguyên nhân rubber-stamp §
 
 | | **P-A: Unit → mẫu → một binder → một cửa (gom 3 bản)** | **P-Y: Lead điều phối bằng prose + primitive `run --ask` (fable, đường lui)** | **P-B: Vá tối thiểu** |
 |---|---|---|---|
-| Ý chính | Unit chung; 3 mẫu chạy bằng engine coordination hiện có; `bind()` một chỗ ở cửa chạy; mọi Ask = Assignment + RunResult | Mẫu chạy bằng Lead (như herdr-cook-plan); engine chỉ dùng cho quy trình nghiệp vụ | Chỉ bỏ pin master loop, persist capability, thêm khẩu vị docs |
-| Đơn giản | 4 (6 danh từ: Unit, Pattern cộng tác, quy trình nghiệp vụ, Ask, Taste, Run) | 3 (ad-hoc gọn, nhưng hai sequencer) | 2 (vẫn ~10 nơi quyết executor, F-bảng fable) |
+| Ý chính | Unit chung; 3 mẫu chạy bằng engine coordination hiện có; `bind()` một chỗ ở cửa chạy; mọi Ask = Assignment + RunResult | Mẫu chạy bằng Lead (như herdr-cook-plan); engine chỉ dùng cho Workflow | Chỉ bỏ pin master loop, persist capability, thêm khẩu vị docs |
+| Đơn giản | 4 (6 danh từ: Unit, Pattern cộng tác, Workflow, Ask, Taste, Run) | 3 (ad-hoc gọn, nhưng hai sequencer) | 2 (vẫn ~10 nơi quyết executor, F-bảng fable) |
 | Linh hoạt | 5 | 4 | 3 |
 | Tường minh | 5 (`bind --explain`) | 5 | 2 |
 | Đo được | 4–5 (cần RunResult inline) | 3 (Observe phải học cách nhóm mới) | 3 |
@@ -121,12 +121,21 @@ P-B **là bước 1 của P-A** (cả ba agent đồng ý). P-Y chỉ chọn n�
   | Một phần việc | Unit | cell, step (của plan), dòng Product Gate |
   | Cách cộng tác để làm xong **một** unit (vai, ai thấy gì, vòng sửa) — 13 file YAML hiện có | **Pattern cộng tác / `CollaborationPattern`** (không bao giờ viết tắt thành "Pattern") | `FlowDefinition`, `CoordinationProtocol`, "protocol", Protocol Pack |
   | Một lần chạy một `CollaborationPattern` cho một unit | coordination session | — |
-  | Nhiều unit theo thứ tự + cổng người | quy trình nghiệp vụ — **cố ý chưa đặt tên**, chưa xây tới khi có tenant thật; mọi ứng viên (Flow, Workflow, Playbook, Procedure, Recipe, Routine) đều đã có nghĩa khác trong repo | — |
-  | Lifecycle Work (`feature.yaml`) | giữ tên của lớp Work, ngoài phạm vi (C1) | — |
+  | Nhiều unit theo thứ tự + cổng người (vd coding `feature`, marketing brief→viết→duyệt→xuất bản) — định nghĩa theo domain | **Workflow** (`domains/<domain>/workflows/*.yaml`) | Flow, FlowDefinition profile `Workflow`, "quy trình nghiệp vụ" |
+  | Một lần chạy một Workflow (đang ở bước nào, cổng người nào đang chờ) | **Workflow run** | stage của Work item |
+  | Bản ghi yêu cầu, giao tiếp user, board, status lifecycle | **Work** — tuỳ chọn; **dùng** Workflow run qua tham chiếu, không sở hữu Workflow | stage như field của Work |
 
   **`FlowDefinition` là gì hôm nay và vì sao xoá được** [fact]: là `kind` của vỏ YAML/IR (`src/runner/definitions/schema.mjs:1-20`, `KIND = 'FlowDefinition'`) với hai profile. (1) profile `CoordinationProtocol`: cả 13 file `core/coordination-protocols/*.yaml` — đây chính là Pattern cộng tác. (2) profile `Workflow`: không có file YAML nào; chỉ có `projectWorkflowToFlowDefinition` (`src/runner/definitions/workflow-adapter.mjs`) chiếu workflow Work sang vỏ này, và **người dùng duy nhất là một doctor check** (`src/setup/registrations.mjs:3595-3700`); runtime Work đọc thẳng `src/state/workflow-stage-graphs.mjs`, không qua vỏ. Vậy nghĩa thứ hai không có consumer runtime.
 
-  Hướng đổi (thuộc plan triển khai, không làm bây giờ): YAML khai thẳng `kind: CollaborationPattern`, bỏ lớp `profile`; thư mục `core/collaboration-patterns/`; `validateFlowDefinition` → validator `CollaborationPattern`; **chưa quyết** số phận profile `Workflow` / `workflow-adapter.mjs` — phụ thuộc §7 Q7 (workflow của Work có phải là nơi chứa quy trình nghiệp vụ không); `protocolRef` → tham chiếu `CollaborationPattern`; contract `docs/architect/agent-coordination/contracts/flow-definition.md` đổi tên theo. Khoảng 20 file `src/` và ~800 lượt nhắc trong docs/core/domains/packages cần đổi — không alias, không giữ tên cũ (luật single path).
+  Hướng đổi (thuộc plan triển khai, không làm bây giờ): YAML khai thẳng `kind: CollaborationPattern`, bỏ lớp `profile`; thư mục `core/collaboration-patterns/`; `validateFlowDefinition` → validator `CollaborationPattern`; xoá profile `Workflow` của vỏ cũ và `workflow-adapter.mjs` (chỉ là bản chiếu cho doctor; định dạng Workflow thật là YAML của domain — xem quyết định Workflow bên dưới); `protocolRef` → tham chiếu `CollaborationPattern`; contract `docs/architect/agent-coordination/contracts/flow-definition.md` đổi tên theo. Khoảng 20 file `src/` và ~800 lượt nhắc trong docs/core/domains/packages cần đổi — không alias, không giữ tên cũ (luật single path).
+
+- **Workflow tách khỏi Work (owner chốt 2026-09-30 22:38).** Bằng chứng khởi điểm: fgOS đã có domain workflow (`domains/<domain>/registry.yaml` + `workflows/*.yaml`: stage có thứ tự, operation có `role`/`reason`/`dispatch: human-only`; nạp bởi `src/state/workflow-stage-graphs.mjs`; `domains/marketing/` có nhưng rỗng), nhưng nó đang nằm trong Work engine (stage là field của Work item). Quyết định:
+  - **Workflow** là lớp độc lập: định nghĩa theo domain + **Workflow run** (trạng thái một lần chạy). Hệ thống chạy được Workflow **không cần Work**.
+  - **Work** (khớp C1) chỉ còn: bản ghi yêu cầu, giao tiếp user, board, status lifecycle; **dùng** Workflow run qua tham chiếu (request coordination đã có `workRef` làm điểm nối).
+  - Mỗi bước Workflow sinh Unit (hoặc là cổng người); thực thi Unit vẫn một đường: Unit → `CollaborationPattern` → `bind()` → coordination session.
+  - Phân tầng: `Work (tuỳ chọn) → Workflow run (tuỳ chọn) → Unit → CollaborationPattern → coordination session → assignment/RunResult`. Prompt tự do: không Work, không Workflow. Plan AgentKit: unit từ phase file, Work tuỳ chọn. Quy trình marketing tự động: Workflow, không cần Work. Item trên board: Work + Workflow `coding/feature`.
+  - **Một runner duy nhất cho Workflow run**: rút phần tuần tự stage khỏi `src/runner/loop.mjs`; coordination session chỉ chạy **một** unit. Không để hai sequencer (rủi ro E1 của fable) — phải kiểm khi lập plan.
+  - Chưa kiểm: engine hiện tại chạy được domain không phải coding end-to-end không (tên stage coding và verb `discover`/`plan` còn rải trong code).
 
 - **D1 → unit khai `capability` dạng `domain:verb`**, binder tra `capabilities[domain:verb]` rồi fallback `capabilities[verb]`. Xoá DemandFacts, matcher, `form`. (sonnet `kind+domain` là cùng thông tin đổi tên.)
 - **D2 → rule mặc định trong config** (đổi so với v0): "review nhiều hay ít" là khẩu vị nên phải là dữ liệu (lập luận của fable). Mặc định: có `writes` + rigor ≥ standard → `reviewed`; `critical` → thêm objector; còn lại `solo`. Unit/user override bằng `pattern:`.
@@ -152,7 +161,7 @@ P-B **là bước 1 của P-A** (cả ba agent đồng ý). P-Y chỉ chọn n�
   | 0 | Mặc định hệ thống | inline nếu có Lead / lỗi rõ nếu headless (không mặc định `claude`) | `rigor = standard` (vẫn đi qua `rigorToTier`) | không có (prompt không có mục Persona) |
   | 1 | Khẩu vị global `~/.fgos/config.json` | `capabilities[domain:verb].prefer[]` → fallback `capabilities[verb].prefer[]` — **đã có** (`prefer`) | `rigorToTier` (khoá bắt buộc, `fgos setup` cài, `doctor` kiểm — plan tier); sàn `capabilities[cap].rigor` — **đề xuất, Q1** | `capabilities[cap].persona` — **đề xuất, chưa có** |
   | 2 | Khẩu vị project `.fgos/config.json` (đè global theo từng key) | như mức 1 | như mức 1 | như mức 1 |
-  | 3 | Yêu cầu của việc (Unit / Pattern cộng tác / quy trình nghiệp vụ) | **không bao giờ** | `rigor` (sàn) | vai do step/quy trình nghiệp vụ khai |
+  | 3 | Yêu cầu của việc (Unit / Pattern cộng tác / Workflow) | **không bao giờ** | `rigor` (sàn) | vai do step/Workflow khai |
   | 4 | Override một lần (request / CLI) | `unit.overrides[role]`, `--executor` | `--tier` / `actors[].tier` (chỉ nâng) | override |
 
   Áp trên mọi mức, không ai vượt: bộ lọc `readOnly` + `independentOf` (override vi phạm thì từ chối trừ khi ghi rõ chấp nhận); governance phủ quyết cuối.
@@ -160,7 +169,7 @@ P-B **là bước 1 của P-A** (cả ba agent đồng ý). P-Y chỉ chọn n�
   Ba ngoại lệ về cách thắng:
   - **Tier lấy giá trị lớn nhất, không theo "mức cao đè":** `rigor = max(rigor mức 3, sàn mức 1–2) ?? standard`; `tier = max(rigorToTier[rigor], override mức 4)`; `model = modelPolicies[provider][tier]`. Không mức nào hạ được sàn.
   - **Executor không có mức 3:** việc chỉ nêu yêu cầu; ai làm là khẩu vị hoặc override. Trong `prefer[]`, candidate đầu qua bộ lọc thắng, các candidate sau là fallback (kể cả khi hết quota).
-  - **Persona mức 3 vs 4 còn tranh chấp:** persona do quy trình nghiệp vụ khoá (vd `brand-guardian`) — lead đề xuất override **không** đè được (xem §7 Q6).
+  - **Persona mức 3 vs 4 còn tranh chấp:** persona do Workflow khoá (vd `brand-guardian`) — lead đề xuất override **không** đè được (xem §7 Q6).
 
   Hiện trạng persona để đối chiếu: chỉ có mức 4 (`actors[].persona`), mức 3 (`preferPersona` trong YAML) và một mặc định cứng `code-reviewer` cho mọi role `reviewer` (`assignment-policy.mjs:388-391`); config chưa có field persona; persona chỉ là tên (F4, F5).
 - **D6 → vai khai là yêu cầu (vd `brand-guardian`), `capabilities[cap].persona` là khẩu vị**; persona có nội dung thật; bỏ default `code-reviewer`, `implied-by-persona`, `model_tier`.
@@ -174,7 +183,9 @@ P-B **là bước 1 của P-A** (cả ba agent đồng ý). P-Y chỉ chọn n�
 5. *(bổ sung)* Smoke **2 area song song** (openai) trong một Observe case.
 6. *(bổ sung)* **Bake-off** cùng 2 area bằng Lead + subagent (fable E1) → quyết P-A hay P-Y trước khi đầu tư S2–S6.
 
-Các bước sau (theo fable): S2 override bền + `solo` + xoá `agent-led`/`dispatch-runs`; S3 một binder (sau khi plan tier merge, cùng file); S4 unit trong phase file + driver chung, xoá DemandFacts; S5 persona + RunResult inline; S6 `panel` + quy trình nghiệp vụ khi có tenant.
+Các bước sau (theo fable): S2 override bền + `solo` + xoá `agent-led`/`dispatch-runs`; S3 một binder (sau khi plan tier merge, cùng file); S4 unit trong phase file + driver chung, xoá DemandFacts; S5 persona + RunResult inline; S6 `panel`.
+
+**Plan riêng, xếp sau bước 1 và sau plan tier: tách Workflow khỏi Work** (xem quyết định Workflow ở trên). Phạm vi: Workflow definition + Workflow run store (JSONL, L3) + một runner tuần tự bước và cổng người; stage `discovery/exploring/planning/executing` trở thành các bước của Workflow `coding/feature`; Work chỉ giữ status board + tham chiếu Workflow run; kiểm Workflow chạy được domain không phải coding (smoke marketing). Quy mô đã đếm: 32 file import `workflow-stage-graphs.mjs`, 24 file đọc `item.stage` (gồm dispatch `assignment-runner.mjs`, `operation-choice.mjs`), Rust `work-state`.
 
 ## 7. Bộ câu hỏi cho owner (một lượt)
 
@@ -184,14 +195,11 @@ Các bước sau (theo fable): S2 override bền + `solo` + xoá `agent-led`/`di
 4. **Red-team cho code**: giữ bắt buộc như hiện nay, hay thành objector tuỳ chọn (tự bật ở `rigor: critical`) giống mọi domain? **Em đề xuất: tuỳ chọn**, vì §6.6 cho thấy chi phí vòng lặp; review khác provider bắt buộc đã giữ chất lượng nền.
 5. **Plan tài liệu**: bước 1 chỉ build + smoke trên area mẫu. Chạy phase thật cần anh authorize P4 (P6 còn chặn bởi P4–P5). Anh định authorize P4 ngay khi S1 xong, hay chờ thêm? (Không chặn việc build.)
 
-6. **Persona do quy trình nghiệp vụ khoá có bị override một lần đè không?** Fable: override thắng; openai: persona đã khoá không đè được. **Em đề xuất: không đè** — đó là yêu cầu nghiệp vụ (mức 3), không phải khẩu vị; muốn đổi thì sửa quy trình nghiệp vụ.
+6. **Persona do Workflow khoá có bị override một lần đè không?** Fable: override thắng; openai: persona đã khoá không đè được. **Em đề xuất: không đè** — đó là yêu cầu nghiệp vụ (mức 3), không phải khẩu vị; muốn đổi thì sửa Workflow.
 
-7. **Quy trình nghiệp vụ (vd marketing) nằm ở đâu?** Owner hỏi lại 22:30: vì sao xoá `Workflow`. Bằng chứng: fgOS **đã có** cơ chế domain workflow của Work — `domains/<domain>/registry.yaml` + `workflows/*.yaml` khai stage có thứ tự, operation có `role`, `reason`, `dispatch: human-only` (`domains/coding/workflows/feature.yaml`; `src/state/workflow-stage-graphs.mjs` nạp theo domain; `domains/marketing/` đã có nhưng rỗng). Profile `Workflow` của `FlowDefinition` chỉ là **bản chiếu** của nó cho doctor, không chạy gì. Chưa kiểm: engine Work có chạy được một domain không phải coding end-to-end không (nhiều file còn nhắc tên stage coding; verb `discover`/`plan` mang nghĩa coding).
-   - **Phương án A (em đề xuất):** quy trình nghiệp vụ = **domain workflow của Work** — mỗi stage chỉ ra một (hoặc vài) unit và cổng người; thực thi từng unit vẫn đi một đường Unit → `CollaborationPattern` → `bind()`. Không tạo khái niệm thứ hai; Work vẫn là bản ghi + lifecycle, không phải cơ chế thực thi (hợp C1: Work chỉ nối qua giao diện "stage này cần unit gì"). Hệ quả: không cần đặt tên mới; bản chiếu `FlowDefinition` profile `Workflow` vẫn thừa và xoá được.
-   - **Phương án B:** khái niệm quy trình nghiệp vụ riêng (như "Flow" của fable), độc lập với Work — trùng với domain workflow đã có, dễ thành tùm lum (RUL11).
-   - Cần owner quyết vì A diễn giải lại C1 (Work mang quy trình nghiệp vụ, dù không mang thực thi).
+7. ~~Quy trình nghiệp vụ nằm ở đâu~~ — **đã chốt 22:38**, xem quyết định Workflow ở §6.
 
-Những gì em **tự quyết**, không hỏi: D0–D7 ở §6; bác `AssignmentPlan` (F25); không xây quy trình nghiệp vụ trước tenant.
+Những gì em **tự quyết**, không hỏi: D0–D7 ở §6; bác `AssignmentPlan` (F25); Workflow marketing chỉ smoke trong plan tách Workflow, không xây domain marketing thật trước tenant.
 
 ## 8. Câu hỏi còn mở
 
