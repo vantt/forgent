@@ -5,7 +5,7 @@ Document type: Synthesis report (discussion lead)
 Snapshot: 2026-09-30 16:20 (Asia/Saigon), main @ 5aed82c52
 Prompt: plans/reports/brainstorm-prompt-260930-1102-request-to-run-decomposition.md
 Handoff: plans/reports/handoff-260930-1210-harness-routing-discussion-lead.md
-Status: v1.2 — bảng thuật ngữ đã chốt ở §6 D0; 3 câu trả lời (2 family: claude, openai). Chưa có gemini/xai; cập nhật tiếp nếu owner gửi thêm.
+Status: v1.3 — bảng thuật ngữ đã chốt ở §6 D0; 3 câu trả lời (2 family: claude, openai). Chưa có gemini/xai; cập nhật tiếp nếu owner gửi thêm.
 Lịch sử: v0 12:29 (sonnet + openai bản 12:20) → v1 16:20 (thêm fable; openai bản sửa 12:39)
 ```
 
@@ -114,18 +114,20 @@ P-B **là bước 1 của P-A** (cả ba agent đồng ý). P-Y chỉ chọn n�
 
 **Chọn P-A**, chốt bất đồng như sau (thay đổi so với v0 được ghi rõ):
 
-- **D0 → hội tụ ở Unit** (theo fable). **Thuật ngữ thống nhất (owner chốt 2026-09-30 22:20–22:30):**
+- **D0 → hội tụ ở Unit** (theo fable). **Thuật ngữ thống nhất (owner chốt 2026-09-30 22:20–22:25): một khái niệm = một tên, dùng cho toàn hệ thống (code, YAML, docs, skill, thảo luận); không có "tên nội bộ" khác "tên thảo luận".**
 
-  | Khái niệm | Tên dùng | Không dùng nữa cho khái niệm này |
+  | Khái niệm | Tên duy nhất (VN / EN, cả trong code) | Tên cũ phải xoá |
   |---|---|---|
-  | Một phần việc | **Unit** | cell, step (của plan), Product Gate row |
-  | Cách cộng tác để làm xong **một** unit (vai, ai thấy gì, vòng sửa) — 13 file YAML hiện có | **Pattern cộng tác** (Collaboration Pattern) | Coordination Protocol, protocol, FlowDefinition |
-  | Một lần chạy một Pattern cộng tác cho một unit (runtime) | **coordination session** (giữ) | — |
-  | Nhiều unit theo thứ tự + cổng người (vd marketing brief→viết→duyệt→xuất bản) | **quy trình nghiệp vụ** — cố ý **chưa đặt tên riêng**, chưa xây tới khi có tenant thật | Flow, Workflow, FlowDefinition |
-  | Định dạng vỏ YAML `kind: FlowDefinition` (dùng chung cho profile `CoordinationProtocol` và hình chiếu workflow của Work, `workflow-adapter.mjs`) | chỉ là **tên nội bộ trong code**, không dùng khi thảo luận thiết kế | — |
-  | Lifecycle Work (`feature.yaml`, profile `Workflow`) | giữ trong lớp Work, ngoài phạm vi (C1) | — |
+  | Một phần việc | Unit | cell, step (của plan), dòng Product Gate |
+  | Cách cộng tác để làm xong **một** unit (vai, ai thấy gì, vòng sửa) — 13 file YAML hiện có | **Pattern cộng tác / `CollaborationPattern`** (không bao giờ viết tắt thành "Pattern") | `FlowDefinition`, `CoordinationProtocol`, "protocol", Protocol Pack |
+  | Một lần chạy một `CollaborationPattern` cho một unit | coordination session | — |
+  | Nhiều unit theo thứ tự + cổng người | quy trình nghiệp vụ — **cố ý chưa đặt tên**, chưa xây tới khi có tenant thật; mọi ứng viên (Flow, Workflow, Playbook, Procedure, Recipe, Routine) đều đã có nghĩa khác trong repo | — |
+  | Lifecycle Work (`feature.yaml`) | giữ tên của lớp Work, ngoài phạm vi (C1) | — |
 
-  Chọn "Pattern" thay "Protocol": owner đã chọn "Pattern cộng tác"; và thiết kế gom về 3 mẫu `solo/reviewed/panel` — đúng nghĩa mẫu. Không đặt tên cho quy trình nghiệp vụ bây giờ vì mọi ứng viên (Flow, Workflow, Playbook, Procedure, Recipe, Routine) đều đã có nghĩa khác trong repo; đặt tên khi xây. Đổi tên thật trong code/tài liệu (`core/coordination-protocols/`, `CoordinationProtocol`, `protocolRef`, Protocol Pack, `validateFlowDefinition`, `flow-definition.md`) thuộc plan triển khai.
+  **`FlowDefinition` là gì hôm nay và vì sao xoá được** [fact]: là `kind` của vỏ YAML/IR (`src/runner/definitions/schema.mjs:1-20`, `KIND = 'FlowDefinition'`) với hai profile. (1) profile `CoordinationProtocol`: cả 13 file `core/coordination-protocols/*.yaml` — đây chính là Pattern cộng tác. (2) profile `Workflow`: không có file YAML nào; chỉ có `projectWorkflowToFlowDefinition` (`src/runner/definitions/workflow-adapter.mjs`) chiếu workflow Work sang vỏ này, và **người dùng duy nhất là một doctor check** (`src/setup/registrations.mjs:3595-3700`); runtime Work đọc thẳng `src/state/workflow-stage-graphs.mjs`, không qua vỏ. Vậy nghĩa thứ hai không có consumer runtime.
+
+  Hướng đổi (thuộc plan triển khai, không làm bây giờ): YAML khai thẳng `kind: CollaborationPattern`, bỏ lớp `profile`; thư mục `core/collaboration-patterns/`; `validateFlowDefinition` → validator `CollaborationPattern`; xoá profile `Workflow`, `workflow-adapter.mjs` và doctor check chiếu (Work tự validate workflow của nó trong lớp Work); `protocolRef` → tham chiếu `CollaborationPattern`; contract `docs/architect/agent-coordination/contracts/flow-definition.md` đổi tên theo. Khoảng 20 file `src/` và ~800 lượt nhắc trong docs/core/domains/packages cần đổi — không alias, không giữ tên cũ (luật single path).
+
 - **D1 → unit khai `capability` dạng `domain:verb`**, binder tra `capabilities[domain:verb]` rồi fallback `capabilities[verb]`. Xoá DemandFacts, matcher, `form`. (sonnet `kind+domain` là cùng thông tin đổi tên.)
 - **D2 → rule mặc định trong config** (đổi so với v0): "review nhiều hay ít" là khẩu vị nên phải là dữ liệu (lập luận của fable). Mặc định: có `writes` + rigor ≥ standard → `reviewed`; `critical` → thêm objector; còn lại `solo`. Unit/user override bằng `pattern:`.
 - **D3 → 3 mẫu `solo`, `reviewed` (objector tuỳ chọn, `driver-authorized`), `panel`.** Delphi/nominal/rfc/group-cognition (0 lần dùng, F13) → đánh dấu experimental, không gom lúc này.
