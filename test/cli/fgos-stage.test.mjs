@@ -1,4 +1,4 @@
-// fgos-stage.test.mjs -- phần "discover, decompose, evolve, compound" của bộ test CLI, tách nguyên văn
+// fgos-stage.test.mjs -- phần "discover, decompose, compound" của bộ test CLI, tách nguyên văn
 // từ test/cli/fgos.test.mjs (tsk-3um). Nội dung test không đổi, chỉ chỗ ở đổi.
 // Bộ đồ nghề dùng chung nằm ở ./helpers/fgos-cli-harness.mjs.
 import { test } from 'node:test';
@@ -90,18 +90,6 @@ import {
 } from './helpers/fgos-cli-harness.mjs';
 
 
-// tsk-5iv D3 (round-3 review, MEDIUM): same STORE_MISSING_WARNING_VERBS gap
-// again, found in `evolve` -- `rankCandidates` over an empty-store view
-// silently returns `[]` instead of the real candidate list.
-// Note: verb `evolve` was retired in commit 120af6b3d (Observe migration to Rust).
-// Skipped per baseline test rigor rules: do not delete tests, mark skip with reason in code and report.
-test.skip('evolve from a .fgos/-less linked worktree with no --dir warns on stderr instead of a silent []', () => {
-  const { wt } = tmpLinkedWorktree();
-  const result = run(wt, ['evolve']);
-  assert.equal(result.status, 0, 'evolve is requiresExistingStore:false -- it warns, never refuses');
-  assert.match(result.stderr, /\.fgos\/ not found/);
-  assert.deepEqual(envelopeData(result.stdout), [], 'the empty-store rankCandidates result, never silently trusted as "no real candidates exist"');
-});
 
 
 // RETARGET (stage-decompose D2, cell 3): `discover` on a stage-`clarify`
