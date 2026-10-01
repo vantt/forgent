@@ -16,6 +16,7 @@ import { resolveFgosFile, FGOS_FILE } from '../../state/fgos-file-registry.mjs';
  */
 export function recordCoordinationSchemaFault(cwd, error, raw) {
   try {
+    if (!cwd) return null;
     const mainRoot = resolveMainCheckoutRoot(cwd);
     const fgosDir = mainRoot ? fgosDirFromRoot(mainRoot) : null;
     if (!fgosDir || !fs.existsSync(fgosDir)) return null;
