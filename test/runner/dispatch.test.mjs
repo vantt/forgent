@@ -6398,6 +6398,7 @@ test('registered executors.glm entry resolves command "claude" and env block', (
       },
     },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: 1000,
   };
   const fgosDir = path.join(repoRoot, '.fgos');
