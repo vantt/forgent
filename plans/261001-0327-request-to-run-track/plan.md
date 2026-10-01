@@ -36,7 +36,7 @@ Unit · **Unit run** (một lần chạy một Unit bằng Pattern cộng tác �
 ## Lộ trình và phụ thuộc (Q-C, owner 2026-10-01)
 
 ```text
-[việc lẻ A ✓, B] ───────────────────────────────┐ (điều kiện cần trước nghiệm thu P1)
+[việc lẻ A ✓, B ✓] ───────────────────────────────┐ (điều kiện cần trước nghiệm thu P1)
 T Tier/rigor (agent khác) ──► P1 Lõi thực thi ──► P3a Workflow runner + tích hợp ──┬──► P2 Plan chạy được ──────────┐
                                                                                    └──► P3b Bỏ stage khỏi Work ──────┴──► P4 Dạng thảo luận + thu hồi engine ──► P5 Thuật ngữ
 ```
@@ -156,6 +156,6 @@ Không còn (đã chốt ở Validation Log). Q5 hoãn có chủ đích tới P2
 | 6 | Dữ liệu session cũ sau xoá engine | **tar backup + báo cáo số liệu nền, rồi xoá; không giữ code đọc** | P4 plan, ph6 |
 | 7 | Mức visibility dạng thảo luận | **Ngang engine** (inputs + context sạch); mạnh hơn khi có ca thật | P4 plan, ph1, risk |
 
-Ghi chú trạng thái T (2026-10-01 11:55): phase 1 xong và merge vào nhánh plan T (`0f25b973a`; worktree `~/projects/forgentX-tier-rigor-p01` sạch, chờ dọn cuối plan); phase 2 đang chạy ở `~/projects/forgentX-tier-rigor-p02`.
+Ghi chú trạng thái (2026-10-01 20:50): **T đã merge `main`** (`dc677ac16`); việc lẻ A, B xong; full `npm test` trên `main` 7858 pass / 0 fail. Cổng điều kiện (phase 1 của track) đóng → **P1 bắt đầu được**.
 
 <!-- slug: request-to-run-track -->
