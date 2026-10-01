@@ -350,7 +350,7 @@
       },
       "openai": {
         "kind": "agent",
-        "description": "OpenAI provider, 2 bins merged into one executor (2026-09-17 provider-naming pass): codex CLI (native OpenAI Codex CLI) + pi CLI (multi-provider agent, --provider omitted -- each ~/.pi/accounts/<name> dir carries exactly one provider's credentials, confirmed via real invocation test). Invocation id = <bin>-<mode>-<account>, self-descriptive regardless of which bin actually runs. Both bins now use DEFAULT_TIER_TO_POLICY like every other executor. \"codex-cli-readonly-fgovn\" stays RETIRED FOR DISPATCH -- \"-s read-only\" has no writable-exceptions syntax (all of sandbox-profiles/read-only.sb is deny-all-writes), so pi CLI writing brief-<round>.md in-process fails with EPERM under it. Phase 4 will introduce fallbackExecutors: [\"openai\"] with an account-pool-aware invocation.",
+        "description": "OpenAI provider, 2 bins merged into one executor (2026-09-17 provider-naming pass): codex CLI (native OpenAI Codex CLI) + pi CLI (multi-provider agent, --provider omitted -- each ~/.pi/accounts/<name> dir carries exactly one provider's credentials, confirmed via real invocation test). Invocation id = <bin>-<mode>-<account>, self-descriptive regardless of which bin actually runs. Both bins now use modelPolicies like every other executor. \"codex-cli-readonly-fgovn\" stays RETIRED FOR DISPATCH -- \"-s read-only\" has no writable-exceptions syntax (all of sandbox-profiles/read-only.sb is deny-all-writes), so pi CLI writing brief-<round>.md in-process fails with EPERM under it. Phase 4 will introduce fallbackExecutors: [\"openai\"] with an account-pool-aware invocation.",
         "providerModel": "openai",
         "allowCrossProvider": true,
         "for": [

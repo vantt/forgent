@@ -149,6 +149,9 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'runner-coordination-orgPolicy-shape',
       'runner-rigor-config',
       'shadow-binder-divergence',
+      'tier-vocabulary-dead-keys',
+      'model-policy-tier-coverage',
+      'coordination-protocol-dead-vocabulary',
     ].sort(),
   );
 });

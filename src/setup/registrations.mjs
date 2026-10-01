@@ -47,7 +47,7 @@ import { runAllConfinementProbes } from '../runner/dispatch/confinement/probes/h
 import { reapOrphanedConfinementResources, OWNERSHIP_MARKER_FILE } from '../runner/dispatch/confinement/cleanup.mjs';
 
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
-import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, validateCapabilityServesShape, RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, DEFAULT_RIGOR_TO_TIER, validateCapabilityServesShape, RunnerConfigError } from '../runner/dispatch/config.mjs';
 import { RIGOR_VALUES } from '../runner/rigor.mjs';
 import { resolveExecutorAndOverrides, deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
@@ -459,6 +459,141 @@ function checkRunnerRigorConfig(cwd) {
   return problems.length > 0
     ? { passed: false, message: problems.join('; ') }
     : { passed: true, message: 'runner rigor maps and capability floors are valid at every configured level' };
+}
+
+export function checkTierVocabularyDeadKeys(cwd) {
+  const levels = [
+    ['project', readSharedConfig(cwd)?.runner],
+    ['global', loadGlobalConfig()?.runner],
+  ];
+  const problems = [];
+  for (const [level, runner] of levels) {
+    if (!runner || typeof runner !== 'object') continue;
+    if ('models' in runner) {
+      problems.push(`${level} config contains dead key "runner.models"; replace with "runner.modelPolicies"`);
+    }
+    if ('DEFAULT_TIER_TO_POLICY' in runner) {
+      problems.push(`${level} config contains dead key "runner.DEFAULT_TIER_TO_POLICY"`);
+    }
+    if ('QUALITY_TIER_BRIDGE' in runner) {
+      problems.push(`${level} config contains dead key "runner.QUALITY_TIER_BRIDGE"`);
+    }
+    if ('QUALITY_MODE_VALUES' in runner) {
+      problems.push(`${level} config contains dead key "runner.QUALITY_MODE_VALUES"`);
+    }
+    if ('minTier' in runner) {
+      problems.push(`${level} config contains dead key "runner.minTier"; replace with "rigor"`);
+    }
+    if ('minRigor' in runner) {
+      problems.push(`${level} config contains dead key "runner.minRigor"; replace with "rigor"`);
+    }
+    if ('rigorOverrides' in runner) {
+      problems.push(`${level} config contains dead key "runner.rigorOverrides"; replace by adjusting "runner.modelPolicies.<provider>"`);
+    }
+    if ('PLACEMENT_POLICY_SHADOW' in runner) {
+      problems.push(`${level} config contains dead key "runner.PLACEMENT_POLICY_SHADOW"`);
+    }
+    for (const [execId, exec] of Object.entries(runner.executors ?? {})) {
+      if (exec && typeof exec === 'object') {
+        if ('rigorOverrides' in exec) {
+          problems.push(`${level} config contains dead key "runner.executors.${execId}.rigorOverrides"; replace by adjusting "runner.modelPolicies.<provider>"`);
+        }
+        if ('models' in exec) {
+          problems.push(`${level} config contains dead key "runner.executors.${execId}.models"`);
+        }
+      }
+    }
+    for (const [capName, cap] of Object.entries(runner.capabilities ?? {})) {
+      if (cap && typeof cap === 'object') {
+        if ('overrides' in cap) {
+          problems.push(`${level} config contains dead key "runner.capabilities.${capName}.overrides"; replace with "runner.capabilities.${capName}.rigor"`);
+        }
+        if ('rigorOverrides' in cap) {
+          problems.push(`${level} config contains dead key "runner.capabilities.${capName}.rigorOverrides"`);
+        }
+        if ('minTier' in cap) {
+          problems.push(`${level} config contains dead key "runner.capabilities.${capName}.minTier"; replace with "rigor"`);
+        }
+        if ('minRigor' in cap) {
+          problems.push(`${level} config contains dead key "runner.capabilities.${capName}.minRigor"; replace with "rigor"`);
+        }
+      }
+    }
+  }
+  return problems.length > 0
+    ? { passed: false, message: problems.join('; ') }
+    : { passed: true, message: 'no retired tier vocabulary keys in project or global config' };
+}
+
+export function checkModelPolicyTierCoverage(cwd) {
+  const levels = [
+    ['project', readSharedConfig(cwd)?.runner],
+    ['global', loadGlobalConfig()?.runner],
+  ];
+  const problems = [];
+  for (const [level, runner] of levels) {
+    if (!runner || typeof runner !== 'object') continue;
+    const rigorToTier = runner.rigorToTier ?? DEFAULT_RIGOR_TO_TIER;
+    const neededTiers = new Set(Object.values(rigorToTier));
+    const providersChecked = new Set();
+
+    for (const [execId, exec] of Object.entries(runner.executors ?? {})) {
+      if (!exec || typeof exec !== 'object') continue;
+      const provider = deriveProviderFamily(exec);
+      if (!provider || providersChecked.has(provider)) continue;
+      providersChecked.add(provider);
+
+      const providerPolicies = runner.modelPolicies?.[provider];
+      if (!providerPolicies || typeof providerPolicies !== 'object') {
+        problems.push(`${level} provider "${provider}" for executor "${execId}" has no modelPolicies entry`);
+        continue;
+      }
+      for (const tier of neededTiers) {
+        if (!providerPolicies[tier]) {
+          problems.push(`${level} provider "${provider}" missing model for tier "${tier}" (required by rigorToTier)`);
+        }
+      }
+    }
+  }
+  return problems.length > 0
+    ? { passed: false, message: problems.join('; ') }
+    : { passed: true, message: 'modelPolicies covers all tiers required by rigorToTier' };
+}
+
+export function checkCoordinationProtocolDeadVocabulary(cwd) {
+  const scanDirs = [
+    path.join(cwd, '.fgos', 'coordination-protocols'),
+    path.join(cwd, 'core', 'coordination-protocols'),
+    path.join(cwd, 'domains'),
+  ];
+  const yamlFiles = [];
+  function scan(dir) {
+    if (!fs.existsSync(dir)) return;
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        if (entry.name === 'node_modules' || entry.name === '.git') continue;
+        scan(full);
+      } else if (entry.isFile() && (entry.name.endsWith('.yaml') || entry.name.endsWith('.yml'))) {
+        yamlFiles.push(full);
+      }
+    }
+  }
+  for (const dir of scanDirs) scan(dir);
+
+  const deadPattern = /\b(minTier|minRigor|QUALITY_TIER_BRIDGE|QUALITY_MODE_VALUES)\b/;
+  const problems = [];
+  for (const file of yamlFiles) {
+    const content = fs.readFileSync(file, 'utf8');
+    const match = content.match(deadPattern);
+    if (match) {
+      const rel = path.relative(cwd, file);
+      problems.push(`${rel} contains retired "${match[1]}"; replace with "rigor" (low|standard|high|critical)`);
+    }
+  }
+  return problems.length > 0
+    ? { passed: false, message: problems.join('; ') }
+    : { passed: true, message: 'no retired coordination protocol vocabulary in project' };
 }
 
 // tsk-2t9c (multi-role team harness, D6/D9 task-spec A-lite convention;
@@ -1072,6 +1207,24 @@ registerCheck({
   id: 'runner-rigor-config',
   description: 'project and global runner rigorToTier maps are complete and capabilities declare only rigor floors',
   check: (cwd) => checkRunnerRigorConfig(cwd),
+});
+
+registerCheck({
+  id: 'tier-vocabulary-dead-keys',
+  description: 'project and global configs have no retired tier vocabulary keys (runner.models, minTier, rigorOverrides, etc.)',
+  check: (cwd) => checkTierVocabularyDeadKeys(cwd),
+});
+
+registerCheck({
+  id: 'model-policy-tier-coverage',
+  description: 'runner.modelPolicies covers every tier generated by rigorToTier for all registered executors',
+  check: (cwd) => checkModelPolicyTierCoverage(cwd),
+});
+
+registerCheck({
+  id: 'coordination-protocol-dead-vocabulary',
+  description: 'coordination protocols and workflows in project do not contain retired minTier or minRigor',
+  check: (cwd) => checkCoordinationProtocolDeadVocabulary(cwd),
 });
 
 registerCheck({
