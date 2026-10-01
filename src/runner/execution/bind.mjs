@@ -4,6 +4,7 @@
 import { decideExecutorDispatchMechanism } from '../dispatch/mechanism.mjs';
 import { deriveProviderFamily, resolveTierModel } from '../dispatch/resolve.mjs';
 import { checkProviderDisallowed } from '../dispatch/provider-adapter.mjs';
+import { canApplyPosture } from '../dispatch/confinement/policies.mjs';
 import { RIGOR_VALUES, RIGOR_RANK, resolveStrongerRigor } from '../rigor.mjs';
 import { MODEL_POLICY_TIERS } from '../dispatch/config.mjs';
 import { resolveStrongerTier, TIER_STRENGTH } from '../dispatch/assignment-policy.mjs';
@@ -89,9 +90,12 @@ function findMatchingOverride(overrides, unit, role) {
 function getProviderFamily(runnerConfig, executorId) {
   const executors = runnerConfig?.executors ?? runnerConfig?.runner?.executors ?? {};
   const executorEntry = executors[executorId];
-  return deriveProviderFamily(executorEntry, executorId);
+  const globalCommand = runnerConfig?.executor?.command ?? runnerConfig?.runner?.executor?.command;
+  const cliInvocation = executorEntry?.invocations?.find((inv) => inv?.via === 'cli');
+  const hasOwnCommandOrAdapter = cliInvocation?.command || cliInvocation?.adapter || executorEntry?.command || executorEntry?.adapter;
+  const resolvedCommand = cliInvocation?.command ?? executorEntry?.command ?? (!hasOwnCommandOrAdapter ? globalCommand : undefined);
+  return deriveProviderFamily(executorEntry, resolvedCommand);
 }
-
 /**
  * Pure bind function implementing the 5-level table and filter rules.
  *
@@ -196,6 +200,13 @@ export function bind(ask, ctx, { skipCandidateIndex = -1 } = {}) {
             continue;
           }
         }
+      }
+
+      // Filter: Posture capability (Phase 6)
+      if (!canApplyPosture(cand, posture, { runnerConfig, executors })) {
+        refusalReason = 'posture-unavailable';
+        refusalDetail = `Candidate "${executorId}" cannot apply posture "${posture}"`;
+        continue;
       }
 
       // Candidate passed filters
@@ -397,3 +408,4 @@ export function nextCandidate(prevBinding, ask, ctx, reason = 'provider-limit') 
 
   return nextResult;
 }
+export { canApplyPosture };

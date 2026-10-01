@@ -144,6 +144,9 @@ async function dispatchHerdrAssignment(repoDir, mock, executorBlock, { workId })
  */
 function assertReachedHerdrSeam(result, repoDir) {
   const runResult = result.runResult || result;
+  if (runResult.status !== 'done') {
+    console.error('HERDR TEST FAILURE RESULT:', JSON.stringify(runResult, null, 2));
+  }
   assert.equal(runResult.status, 'done');
 
   const runDir = path.join(repoDir, '.fgos', 'assignments', runResult.assignmentId, 'runs', '01');

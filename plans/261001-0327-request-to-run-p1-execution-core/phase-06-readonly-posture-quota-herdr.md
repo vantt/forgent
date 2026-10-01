@@ -1,7 +1,7 @@
 ---
 phase: 6
 title: "Posture trong pane herdr + cli, quota, xoá redirect (gộp plan X)"
-status: pending
+status: done
 priority: P1
 effort: "2.5d"
 dependencies: [5]
@@ -50,9 +50,9 @@ usage-limit trên màn hình ─► outcome provider-limit ─► bind().nextCan
 
 ## Success Criteria
 
-- [ ] Spike đạt (báo cáo); một hàm posture cho herdr + cli; test chứng minh primary/fallback/resume cùng posture.
-- [ ] `rg "readOnlyRedirects|placement-policy|selectReadOnlyRedirectExecutor|-readonly\"" src .fgos/config.json` rỗng.
-- [ ] 9 ràng buộc của X có test hoặc ghi "đóng bởi phase 5".
+- [x] Spike đạt (báo cáo); một hàm posture cho herdr + cli; test chứng minh primary/fallback/resume cùng posture.
+- [x] `rg "readOnlyRedirects|placement-policy|selectReadOnlyRedirectExecutor|-readonly\"" src .fgos/config.json` rỗng.
+- [x] 9 ràng buộc của X có test hoặc ghi "đóng bởi phase 5".
 
 ## Risk Assessment
 

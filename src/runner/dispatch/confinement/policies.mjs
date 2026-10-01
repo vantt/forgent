@@ -635,3 +635,59 @@ export function resolveConfinementPolicy(policyId, customPolicies = {}) {
   }
   return null;
 }
+/**
+ * Resolve posture into confinement parameters (Phase 6 / X-1).
+ *
+ * @param {object} binding { executor, invocation, posture, transport }
+ * @param {object} [ctx] { runnerConfig, session, runDir, cwd, repoRoot }
+ * @returns {object} { policyId, policy, bwrapArgs, envPatch }
+ */
+export function resolvePosture(binding, ctx = {}) {
+  const posture = binding?.posture ?? 'read-only';
+  const policyId = posture === 'workspace-write' ? 'workspace-write' : 'host-write-denied';
+  const policy = resolveConfinementPolicy(policyId, ctx.runnerConfig?.confinementPolicies);
+
+  const runDir = ctx.runDir || ctx.context?.runDir;
+  const cwd = ctx.cwd || ctx.context?.cwd || process.cwd();
+  const repoRoot = ctx.repoRoot || ctx.context?.repoRoot || cwd;
+
+  const bwrapArgs = [
+    '--ro-bind', '/', '/',
+    '--dev', '/dev',
+    '--proc', '/proc',
+    '--tmpfs', '/tmp',
+  ];
+
+  if (runDir) {
+    bwrapArgs.push('--bind', runDir, runDir);
+  }
+
+  if (posture === 'workspace-write') {
+    bwrapArgs.push('--bind', repoRoot, repoRoot);
+    if (cwd !== repoRoot && !cwd.startsWith(repoRoot)) {
+      bwrapArgs.push('--bind', cwd, cwd);
+    }
+  }
+
+  return {
+    posture,
+    policyId,
+    policy,
+    bwrapArgs,
+  };
+}
+
+/**
+ * Check whether a candidate executor/invocation can apply the given posture.
+ *
+ * @param {object} candidate { executor, invocation }
+ * @param {string} posture 'read-only' | 'workspace-write'
+ * @param {object} [ctx]
+ * @returns {boolean}
+ */
+export function canApplyPosture(candidate, posture, ctx = {}) {
+  if (!candidate || !candidate.executor) return false;
+  // In Phase 6, all registered executors on Linux can apply OS confinement posture (bwrap)
+  // or native workspace-write.
+  return true;
+}

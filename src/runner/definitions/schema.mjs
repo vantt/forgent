@@ -138,7 +138,7 @@ const ACTOR_FIELDS = new Set(['id', 'role', 'persona', 'policy']);
 // which OTHER role(s) this operation's bound executor should differ in
 // provider family from (same resolver).
 export const POLICY_PATCH_FIELDS = new Set([
-  'rigor', 'tier', 'preferPersona', 'preferExecutor', 'preferInvocation', 'fallbackExecutors', 'visibility', 'repeatMode',
+  'rigor', 'tier', 'fallbackExecutors', 'visibility', 'repeatMode',
   'capability', 'distinctProviderFrom',
 ]);
 
@@ -294,19 +294,6 @@ function validatePolicyPatch(policy, label, { scope } = {}) {
     if (!TIER_RANK.has(policy.tier)) fail(`${label}.tier must be one of ${TIER_VALUES.join(' | ')}`);
     result.tier = policy.tier;
   }
-  if (policy.preferPersona !== undefined) {
-    if (!isNonEmptyString(policy.preferPersona)) fail(`${label}.preferPersona must be a non-empty string when provided`);
-    result.preferPersona = policy.preferPersona;
-  }
-  if (policy.preferExecutor !== undefined) {
-    if (!isNonEmptyString(policy.preferExecutor)) fail(`${label}.preferExecutor must be a non-empty string when provided`);
-    result.preferExecutor = policy.preferExecutor;
-  }
-  if (policy.preferInvocation !== undefined) {
-    if (!isNonEmptyString(policy.preferInvocation)) fail(`${label}.preferInvocation must be a non-empty string when provided`);
-    if (policy.preferExecutor === undefined) fail(`${label}.preferInvocation is present but "preferExecutor" is not -- an invocation pin only means something alongside an explicit executor`);
-    result.preferInvocation = policy.preferInvocation;
-  }
   if (policy.fallbackExecutors !== undefined) {
     // `reserved-not-executed` in V1 (contract): parseable, never a flag
     // implying automatic failover. Validated as a plain string list only --
@@ -398,7 +385,7 @@ export function mergePolicyStack(scopedPatches) {
       resolved.repeatMode = validated.repeatMode;
       resolvedRepeatModeLabel = label;
     }
-    for (const key of ['preferPersona', 'preferExecutor', 'preferInvocation', 'visibility', 'capability', 'distinctProviderFrom']) {
+    for (const key of ['visibility', 'capability', 'distinctProviderFrom']) {
       if (validated[key] !== undefined) resolved[key] = validated[key];
     }
     if (validated.fallbackExecutors !== undefined) resolved.fallbackExecutors = validated.fallbackExecutors;

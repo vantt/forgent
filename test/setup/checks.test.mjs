@@ -147,6 +147,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'operation-prompt-templates-valid',
       'operation-capability-resolves',
       'runner-coordination-orgPolicy-shape',
+      'runner-patterns-config',
       'runner-rigor-config',
       'shadow-binder-divergence',
       'tier-vocabulary-dead-keys',

@@ -835,7 +835,7 @@ export function classifyProviderCapacityFault({ provider, stderr = '', adapterOu
     return { action: 'evidence-only', reasonCode: 'provider-unknown' };
   }
   const text = typeof stderr === 'string' ? stderr : '';
-  if (adapterOutcome === 'paused-limit' || structuredAgent?.stopReason === 'paused-limit') {
+  if (adapterOutcome === 'paused-limit' || adapterOutcome === 'provider-limit' || structuredAgent?.stopReason === 'paused-limit' || structuredAgent?.stopReason === 'provider-limit') {
     // No stderr text to parse a reset window from at all in this branch --
     // always the conservative default, never an expiry-less quarantine.
     return {

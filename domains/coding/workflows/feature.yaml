@@ -61,8 +61,6 @@ stages:
           - fgos-coding-validating
         policy:
           rigor: standard
-          preferPersona: code-reviewer
-          preferExecutor: claude
       - id: scout-blast-radius
         taskSpec: scout-blast-radius
         role: researcher

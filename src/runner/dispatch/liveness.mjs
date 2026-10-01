@@ -46,6 +46,7 @@ export const LADDER_OUTCOMES = Object.freeze([
   'died',
   'timed-out-ceiling',
   'paused-limit',
+  'provider-limit',
   'timed-out-idle',
 ]);
 
@@ -85,6 +86,7 @@ export const PANE_FATE = Object.freeze({
   'timed-out-ceiling': 'keep',
   'timed-out-idle': 'keep',
   'paused-limit': 'keep-always',
+  'provider-limit': 'keep-always',
 });
 
 /** Resolve the pane decision for an outcome. `closeAlways` is the automated
@@ -201,7 +203,7 @@ export function evaluateLadder({ observation = {}, limits = {}, prior = {} } = {
 
   const limitLine = matchUsageLimit(screen, usageLimitPatterns);
   if (limitLine) {
-    return settle('paused-limit', 'the screen says a provider limit was reached', limitLine);
+    return settle('provider-limit', 'the screen says a provider limit was reached', limitLine);
   }
   return settle('timed-out-idle', `no progress for ${idleFor}ms`);
 }

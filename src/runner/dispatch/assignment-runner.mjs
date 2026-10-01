@@ -65,12 +65,6 @@ import { compileDispatchPlan } from './plan.mjs';
 import { resolveFallback } from './recovery.mjs';
 import { deriveProviderFamily, resolveTierModel, resolveExecutorConfig, selectConfinedInvocationId } from './resolve.mjs';
 import { normalizeProviderFamily, checkProviderDisallowed } from './provider-adapter.mjs';
-import {
-  selectPlacementPolicyRedirectExecutor,
-  readOnlyRedirectPool,
-  readOnlyRedirectInvocationFor,
-  readOnlyRedirectEntryFor,
-} from './placement-policy.mjs';
 import { markRunSettled } from './visibility-session.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
 import { extractProtocolOperationStamp, normalizeSavedPolicyTier, resolveMutatingCwdPosture } from './execution-contract.mjs';
@@ -182,76 +176,6 @@ function resolveProviderFamilyForExecutor(entry, executorId) {
   return normalizeProviderFamily(deriveProviderFamily(entry, cmd), cmd);
 }
 
-function selectReadOnlyRedirectExecutor(cfg, sourceExecutorId, assignment) {
-  const executors = cfg?.executors && typeof cfg.executors === 'object' ? cfg.executors : {};
-  const configuredRedirects = cfg?.placementPolicy?.readOnlyRedirects;
-  const isConfiguredForSource = configuredRedirects && Object.prototype.hasOwnProperty.call(configuredRedirects, sourceExecutorId);
-
-  // Phase D correction (executor-profile-schema-migration): PlacementPolicy
-  // itself now owns reading the declared candidate pool
-  // (`readOnlyRedirectPool`, `placement-policy.mjs`) -- see that function's
-  // own doc comment for why this moved off `executors.<id>` a second time.
-  const rawPool = readOnlyRedirectPool(cfg, sourceExecutorId, assignment?.operation);
-
-  // Phase 05 R6: validate explicitly configured pool entries.
-  // Empty configured pools and unknown executors fail with typed refusal codes.
-  if (isConfiguredForSource) {
-    if (rawPool.length === 0) {
-      throw new RunnerConfigError(
-        `read-only redirect pool for "${sourceExecutorId}" is empty.`,
-        { code: 'redirect.empty-pool' },
-      );
-    }
-    for (const candidate of rawPool) {
-      if (!executors[candidate]) {
-        throw new RunnerConfigError(
-          `read-only redirect pool for "${sourceExecutorId}" references unknown executor "${candidate}".`,
-          { code: 'redirect.unknown-executor' },
-        );
-      }
-    }
-  }
-
-  const sourceExecutorEntry = cfg?.executors?.[sourceExecutorId];
-  const sourceProvider = resolveProviderFamilyForExecutor(sourceExecutorEntry, sourceExecutorId);
-
-  const seed = `${assignment?.operation ?? ''}:${assignment?.assignmentId ?? ''}`;
-  // Phase 08 (executor-policy-dispatch-seams) / dispatch-engine-liveness-
-  // hardening Phase 7: PlacementPolicy owns redirect EXECUTOR selection
-  // directly -- the shadow-verified `resolveVerifiedRedirectExecutor` this
-  // used to compare against called the exact same primitive
-  // (`stablePoolIndex`) over the exact same filtered pool and seed this
-  // function already computes, so the two were never two algorithms, only
-  // one under two names. Confirmed via ~800 real production dispatch runs'
-  // captured stderr (`.fgos/assignments/*/runs/*/stderr.log`, Aug-Sept
-  // 2026): zero real divergence ever recorded.
-  const executorId = selectPlacementPolicyRedirectExecutor({ cfg, sourceExecutorId, candidatePool: rawPool, seed });
-
-  const targetExecutorEntry = cfg?.executors?.[executorId];
-  const selectedProvider = resolveProviderFamilyForExecutor(targetExecutorEntry, executorId);
-
-  const entryDesc = readOnlyRedirectEntryFor(cfg, sourceExecutorId, assignment?.operation, executorId);
-  const isCrossProvider = executorId !== sourceExecutorId && selectedProvider !== sourceProvider;
-
-  // Phase 05 R6: cross-provider redirect requires explicit opt-in via crossProvider: true.
-  if (isCrossProvider && entryDesc?.crossProvider !== true) {
-    throw new RunnerConfigError(
-      `read-only redirect from "${sourceExecutorId}" (${sourceProvider}) to "${executorId}" (${selectedProvider}) crosses provider family without explicit opt-in (entry must declare crossProvider: true).`,
-      { code: 'redirect.cross-provider-not-permitted' },
-    );
-  }
-
-  // M7 & I06: return full decision (pool, seed, sourceProvider, selectedProvider, crossProvider)
-  // for provenance recording in dispatch-plan.json.
-  return {
-    executorId,
-    pool: rawPool,
-    seed,
-    sourceProvider,
-    selectedProvider,
-    crossProvider: entryDesc?.crossProvider === true,
-  };
-}
 
 function policyForActualExecutor(cfg, policy, executorId, sourceExecutorId) {
   if (executorId === sourceExecutorId) return policy;
@@ -1139,10 +1063,7 @@ function admitRunAttempt(
  * resolution with `cliOverride.preferExecutor` forced to the candidate,
  * verifies the scoped plan's governance verdict reads "allowed" and its
  * tier/visibility provenance agrees with the original plan, and never
- * silently downgrades a governance floor. `placement-policy.mjs`'s own
- * `fallbackCandidates`/`admitFallbackCandidate` machinery (unexported,
- * provider/model-ranking only) is NOT used here -- `resolveFallback` is a
- * strict superset: same disallowed-provider/executor checks (they run
+ * silently downgrades a governance floor.
  * inside `resolveAssignmentDispatchPolicy`), plus a full, correctly
  * recompiled invocation/confinement-policy for the candidate, "for free".
  *
@@ -1506,98 +1427,10 @@ export async function executeAssignment(assignment, opts = {}) {
   // primary).
   const declaredPrimaryExecutorId = effectivePolicy.executorPreference?.[0] ?? 'claude';
 
-  // Reviewer/researcher/advisor executor scoping. A read-only Assignment must
-  // never resolve to the same executor profile as a worker (acceptEdits +
-  // Bash(git add/commit)) when the resolved family is the default "claude".
-  // Historically this was a literal claude -> claude-reviewer redirect. That
-  // kept the write-safety fix but also concentrated every read-only Claude
-  // role onto one executor/account. The default remains byte-identical when no
-  // config is present; projects can now declare per-operation/pool redirects
-  // under runner.placementPolicy.readOnlyRedirects.<sourceExecutorId> (Phase D,
-  // executor-profile-schema-migration -- PlacementPolicy-owned, per
-  // design.md §3.6/§7 step 9, not nested on any executors.<id> entry)
-  // without changing the higher-level operation policy.
   const defaultExecutorId = effectivePolicy.executorPreference[0] ?? 'claude';
-  // `let`: see the Phase B note on `compiledPlan` above -- a fallback
-  // candidate is never read-only-redirected (only ever a DECLARED
-  // executorPreference entry), so this reassignment happens strictly
-  // after the redirect/governance logic immediately below, never inside it.
-  //
-  // executor-id-consolidation Step 2: a caller that already pinned a
-  // specific invocation (`opts.cliOverride?.preferInvocation` -- e.g. a
-  // code-panel actor explicitly declaring `{executor:"claude",
-  // invocation:"cli-readonly"}`) has already made ITS OWN deliberate
-  // read-only-safe choice; the redirect exists to supply a safe default
-  // when nobody made one, never to override one that was already made.
-  // Without this guard, an explicit pin to claude's own read-only
-  // invocation would still get silently substituted away to the
-  // redirect's target executor entirely, discarding the caller's choice.
   const hasExplicitInvocationPin = typeof opts.cliOverride?.preferInvocation === 'string' && opts.cliOverride.preferInvocation.trim();
-  const redirectAttempted = isReadOnlyAssignment(effectiveAssignment) && defaultExecutorId === 'claude' && !hasExplicitInvocationPin;
-  const redirectResult = redirectAttempted ? selectReadOnlyRedirectExecutor(cfg, defaultExecutorId, effectiveAssignment) : null;
-  let resolvedExecutorId = redirectResult ? redirectResult.executorId : defaultExecutorId;
-  // executor-id-consolidation Step 2: the pool entry that named
-  // `resolvedExecutorId` may have pinned a specific invocation (Step 2.1's
-  // `id`) -- e.g. redirecting to a specific confined variant, not
-  // whichever invocation Gate B2's own "first via:cli" default happens to
-  // pick. `undefined` (no pin, or no redirect happened at all) leaves Gate
-  // B2's default completely unchanged.
-  const readOnlyRedirectInvocationId = resolvedExecutorId !== defaultExecutorId
-    ? readOnlyRedirectInvocationFor(cfg, defaultExecutorId, effectiveAssignment?.operation, resolvedExecutorId)
-    : undefined;
-  // M7: persist the FULL redirect decision (not just the chosen id) onto
-  // the compiled plan -- before this, dispatch-plan.json carried no record
-  // of which pool was considered or what seed drove the deterministic
-  // pick, so a redirected dispatch had no audit trail for why it landed on
-  // the executor it did. Only set when a redirect was actually attempted
-  // (redirectResult non-null); an ordinary, non-read-only or already-pinned
-  // dispatch carries no redirectDecision at all, same as before this field
-  // existed.
-  if (redirectResult && compiledPlan) {
-    compiledPlan = {
-      ...compiledPlan,
-      redirectDecision: {
-        sourceExecutorId: defaultExecutorId,
-        sourceProvider: redirectResult.sourceProvider,
-        pool: redirectResult.pool,
-        seed: redirectResult.seed,
-        chosen: resolvedExecutorId,
-        selectedProvider: redirectResult.selectedProvider,
-        invocation: readOnlyRedirectInvocationId ?? null,
-        crossProvider: redirectResult.crossProvider,
-      },
-    };
-  }
+  let resolvedExecutorId = defaultExecutorId;
   effectivePolicy = policyForActualExecutor(cfg, effectivePolicy, resolvedExecutorId, defaultExecutorId);
-  // Pre-Phase-05 gate H5 (plans/260915-executor-policy-dispatch-seams/plan.md):
-  // resolveAssignmentDispatchPolicy (inside compileDispatchPlan above) already
-  // checked opts.options.disallowedProviders/disallowedExecutors against the
-  // DECLARED executor -- but a readOnlyRedirect redirect (right above) can
-  // retarget to a DIFFERENT executor/provider that was never checked at
-  // all. A project that disallows a provider while also configuring a
-  // redirect pool containing an executor of that same provider would have
-  // the redirect silently bypass governance. Re-run the exact same two
-  // checks resolveAssignmentDispatchPolicy uses, against the resolved
-  // (post-redirect) executor/provider, only when the redirect actually
-  // changed anything -- a value-preserving no-op for every unredirected
-  // dispatch.
-  if (resolvedExecutorId !== defaultExecutorId) {
-    const redirectGov = checkProviderDisallowed(opts.options?.disallowedProviders, effectivePolicy.providerModel);
-    if (redirectGov.disallowed) {
-      throw new RunnerConfigError(`governance gate rejected provider "${redirectGov.canonicalProvider}": disallowed egress (via readOnlyRedirect "${defaultExecutorId}" -> "${resolvedExecutorId}")`, {
-        code: 'governance.disallowed-provider',
-      });
-    }
-    if (opts.options?.disallowedExecutors?.includes(resolvedExecutorId)) {
-      throw new RunnerConfigError(`governance gate rejected executor "${resolvedExecutorId}": disallowed (via readOnlyRedirect "${defaultExecutorId}" -> "${resolvedExecutorId}")`, {
-        code: 'governance.disallowed-executor',
-      });
-    }
-    const targetEntry = cfg?.executors?.[resolvedExecutorId];
-    if (targetEntry && redirectResult?.crossProvider && targetEntry.allowCrossProvider !== true) {
-      throw new RunnerConfigError(`executor "${resolvedExecutorId}" resolves to cross-provider redirect target without allowCrossProvider: true.`);
-    }
-  }
   // Cell 6.7 Bug B: `resolvedExecutorId` can diverge from `defaultExecutorId`
   // for a redirected read-only op (above). `policy.executorPreference[0]`
   // (persisted below, unchanged) always records the DECLARED preference
@@ -2453,8 +2286,7 @@ export async function executeAssignment(assignment, opts = {}) {
           // unsubstituted primary the explicit pin would target); the
           // read-only-redirect's own declared pin is the last fallback
           // source; neither pins anything for the unsubstituted
-          // primary, leaving Gate B2's "first via:cli" default untouched.
-          invocationId: (hasExplicitInvocationPin ? opts.cliOverride.preferInvocation : undefined) ?? fallbackInvocationId ?? readOnlyRedirectInvocationId,
+          invocationId: (hasExplicitInvocationPin ? opts.cliOverride.preferInvocation : undefined) ?? fallbackInvocationId,
         });
       } catch (err) {
         const commandOutcome = {

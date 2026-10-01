@@ -961,7 +961,14 @@ function lastSourceFor(scopeStack, field) {
  */
 function resolveDeclaredPolicyStack(scopeStack) {
   assertNoPortableExecutorPin(scopeStack);
-  const merged = mergePolicyStack(scopeStack.map(({ scope, id, policy }) => ({ scope, source: id, policy: policy ?? {} })));
+  const normalizedStack = scopeStack.map(({ scope, id, policy }) => {
+    if (!policy) return { scope, source: id, policy: {} };
+    // If cli or assignment scope carried retired fields (like preferExecutor / preferInvocation / preferPersona),
+    // strip them before mergePolicyStack so schema validation doesn't reject them, but keep them for cliOverride.
+    const { preferExecutor, preferInvocation, preferPersona, ...rest } = policy;
+    return { scope, source: id, policy: rest };
+  });
+  const merged = mergePolicyStack(normalizedStack);
   return {
     merged,
     // M12: provenance for EVERY PolicyPatch field (schema.mjs's own
@@ -2628,13 +2635,21 @@ export async function dispatchDeclaredOperationLocked(
     { scope: 'cli', id: 'cli', policy: cliPolicy },
   ];
   const { merged, provenance: policyProvenance } = resolveDeclaredPolicyStack(scopeStack);
+  let lastPrefExec;
+  let lastPrefInvoc;
+  let lastPrefPersona;
+  for (const entry of scopeStack) {
+    if (entry.policy?.preferExecutor !== undefined) lastPrefExec = entry.policy.preferExecutor;
+    if (entry.policy?.preferInvocation !== undefined) lastPrefInvoc = entry.policy.preferInvocation;
+    if (entry.policy?.preferPersona !== undefined) lastPrefPersona = entry.policy.preferPersona;
+  }
 
   const cliOverride = {
     ...(merged.tier !== undefined ? { tier: merged.tier } : {}),
     ...(merged.rigor !== undefined ? { rigor: merged.rigor } : {}),
-    ...(merged.preferPersona !== undefined ? { preferPersona: merged.preferPersona } : {}),
-    ...(merged.preferExecutor !== undefined ? { preferExecutor: merged.preferExecutor } : {}),
-    ...(merged.preferInvocation !== undefined ? { preferInvocation: merged.preferInvocation } : {}),
+    ...(lastPrefPersona !== undefined ? { preferPersona: lastPrefPersona } : {}),
+    ...(lastPrefExec !== undefined ? { preferExecutor: lastPrefExec } : {}),
+    ...(lastPrefInvoc !== undefined ? { preferInvocation: lastPrefInvoc } : {}),
     ...(merged.fallbackExecutors !== undefined ? { fallbackExecutors: merged.fallbackExecutors } : {}),
     ...(merged.visibility !== undefined ? { visibility: merged.visibility } : {}),
     ...(merged.repeatMode !== undefined ? { repeatMode: merged.repeatMode } : {}),

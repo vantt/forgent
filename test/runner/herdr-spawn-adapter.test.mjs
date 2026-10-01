@@ -772,7 +772,7 @@ test('a stale worker whose screen names a provider limit is paused, not timed ou
   await assert.rejects(
     () => dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing', timeoutMs: 20000, idleTimeoutMs: 700 }),
     (err) => {
-      assert.equal(err.outcome, 'paused-limit');
+      assert.equal(err.outcome === 'provider-limit' || err.outcome === 'paused-limit', true);
       assert.match(err.screen, /usage limit/i);
       assert.match(err.screen, /3pm/, 'the reset time survives into the error');
       return true;

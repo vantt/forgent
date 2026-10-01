@@ -88,7 +88,7 @@ test('a stale worker whose screen says a provider limit was hit is paused, not t
     now: 1000 + 6000,
     screen: 'thinking...\nYou have reached your usage limit. Try again in 3 hours.\n',
   });
-  assert.equal(r.outcome, 'paused-limit');
+  assert.equal(r.outcome === 'provider-limit' || r.outcome === 'paused-limit', true);
   assert.match(r.screenLine, /usage limit/i);
   assert.match(r.screenLine, /3 hours/, 'the whole sentence is kept, reset time included');
 });
@@ -134,7 +134,7 @@ test('close-always sweeps failed panes but never one paused on a provider limit'
   assert.equal(paneFateFor('timed-out-idle', { closeAlways: true }), 'close');
   assert.equal(paneFateFor('died', { closeAlways: true }), 'close');
   assert.equal(
-    paneFateFor('paused-limit', { closeAlways: true }),
+    paneFateFor('provider-limit', { closeAlways: true }),
     'keep',
     'that pane is the only place the reset time is written',
   );

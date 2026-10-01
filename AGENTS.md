@@ -96,9 +96,12 @@ hình dễ, không chắp vá.
 
 khong phai no nang ma no tum lum
 
-## Dispatch — routing work to a executor
+## Dispatch — routing work to an executor
 
-**Before dispatching any task out of the current turn — a work item, a registered executor, an ad-hoc task, or your own direct Agent/Task-tool call — run `fgos dispatch decide` (or compatibility alias `node src/runner/dispatch.mjs decide`) first. Never decide the mechanism yourself.** A `PreToolUse` hook enforces this on Agent/Task-tool calls: it runs `decide` for you and refuses the call when the answer comes back as anything other than `in-process`.
+`fgos run` is the primary door for executing new work in the execution core.
+For routing checks, `fgos dispatch decide` computes the execution mechanism and executor via `bind()` (`src/runner/execution/bind.mjs`). herdr is the default transport when present in the session/environment.
+
+**Before dispatching any task out of the current turn — a work item, a registered executor, an ad-hoc task, or your own direct Agent/Task-tool call — run `fgos dispatch decide` (or compatibility alias `node src/runner/dispatch.mjs decide`) first. Never decide the mechanism yourself.** A `PreToolUse` hook enforces this on Agent/Task-tool calls: it delegates to `bind()` and refuses the call when the answer comes back as anything other than `in-process`.
 
 Four ways to call `decide`, for four different situations:
 
@@ -112,11 +115,10 @@ Add `--has-live-task-access` when you already have the Agent/Task tool in your o
 Three possible `mechanism` results, each needing a different response:
 
 - **`"unavailable"`** — nothing serves this. NOT an error: do it inline yourself, and report nothing.
-- **"in-process"** — call it yourself, with your own live capability: pass the returned agentType to your Agent/Task tool, or call the returned mcpTool directly. Dispatch cannot do this for you — it has neither an Agent/Task tool nor an MCP client of its own. When neither field is returned, use whichever agent type you would have used by default.
+- **`"in-process"`** — call it yourself, with your own live capability: pass the returned agentType to your Agent/Task tool, or call the returned mcpTool directly. Dispatch cannot do this for you — it has neither an Agent/Task tool nor an MCP client of its own. When neither field is returned, use whichever agent type you would have used by default.
 - **`"out-of-process"`** — run `fgos dispatch execute` (or compatibility alias `node src/runner/dispatch.mjs execute`). Never run the resolved command yourself through Bash: `execute` invokes the adapter and hands back the real result. (For a worktree-backed item, if passing explicit directory flags, pass `--cwd <worktree path>` and `--repo-root <main checkout path>` as two separate flags — never pass the main checkout as `--dir` alone). Log completed out-of-process runs via `fgos dispatch log` (or compatibility alias `node src/runner/dispatch.mjs log`).
 
 Every result also carries `configured: true|false`, additive `reasonCodes: [...]`, and optional `blockedReason` (e.g. when blocked by governance policy) — `false` means nothing is configured for that name or job, and the answer came from the default.
-
 A skill that dispatches should not re-derive any of this. Point its reasoning step at the shared fragment `.agents/skills/_shared/executor-dispatch-fallback.md` (mirrored byte-identical at `plugins/fgOS/skills/_shared/`). `.claude/skills` contains generated wrappers only; it has no `_shared` directory of its own.
 
 ## Starting the herdr gateway — one door, never a raw process

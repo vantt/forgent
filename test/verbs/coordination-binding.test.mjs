@@ -14,7 +14,7 @@ import { bindOperations, deriveOperationCapability, BindingError } from '../../s
 import { composeStartRequest, composeCoordinationActionRequest } from '../../src/verbs/coordination/composers.mjs';
 import { startCoordinationUseCase } from '../../src/verbs/coordination/start.mjs';
 import { CoordinationError } from '../../src/runner/coordination/schema.mjs';
-import { validateFlowDefinition } from '../../src/runner/definitions/schema.mjs';
+import { validateFlowDefinition, FlowDefinitionError } from '../../src/runner/definitions/schema.mjs';
 import { loadCoordinationProtocol } from '../../src/runner/definitions/protocol-loader.mjs';
 
 /** Read the committed `.fgos/config.json`'s `runner` section directly via
@@ -467,29 +467,15 @@ test('Unit I21 fix (round 3, HIGH): a resumed start still refuses a genuinely di
 });
 
 test('Red-team: a portable operation cannot smuggle preferExecutor under policy.capability through bindOperations', () => {
-  // `validatePolicyPatch` (schema.mjs) shape-checks each field independently
-  // of scope -- it is NOT the enforcement boundary for a literal executor
-  // pin at a portable scope (`assertNoPortableExecutorPin`,
-  // session-engine.mjs, is, unaffected by this unit -- see
-  // test/runner/coordination-nominal-group-lite.test.mjs's own R2 case,
-  // still green). So a malicious portable YAML declaring BOTH `capability`
-  // and `preferExecutor` on one operation still PARSES -- the real
-  // assertion here is that `bindOperations` (this unit's own new code path)
-  // never reads or forwards that `preferExecutor` value into its computed
-  // `cliPolicy` at all; only the resolved capability candidate ever reaches
-  // `cliPolicy.preferExecutor`.
+  // `validatePolicyPatch` (schema.mjs) now rejects preferExecutor as unknown field.
   const definition = produceReviewRedTeamDefinition();
   const smuggled = JSON.parse(JSON.stringify(definition));
   const doerOp = smuggled.spec.operations.find((op) => op.id === 'produce-candidate');
   doerOp.policy.preferExecutor = 'attacker-controlled-executor';
-  const revalidated = validateFlowDefinition(smuggled);
-  assert.equal(revalidated.spec.operations.find((op) => op.id === 'produce-candidate').policy.preferExecutor, 'attacker-controlled-executor');
-
-  const runnerConfig = baseRunnerConfig();
-  const { bindings } = bindOperations(revalidated, {}, runnerConfig);
-  const doer = bindings.find((b) => b.actorId === 'doer');
-  assert.equal(doer.cliPolicy.preferExecutor, 'agy', 'bindOperations must resolve via capability.prefer, never echo the smuggled preferExecutor value');
-  assert.notEqual(doer.cliPolicy.preferExecutor, 'attacker-controlled-executor');
+  assert.throws(
+    () => validateFlowDefinition(smuggled),
+    (err) => err instanceof FlowDefinitionError && /unknown field "preferExecutor"/.test(err.message),
+  );
 });
 
 test('Red-team round 1, H1: policy.capability naming a literal registered executor id (not a real capability) must NOT bind to that executor', () => {

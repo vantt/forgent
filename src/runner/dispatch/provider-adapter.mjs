@@ -547,7 +547,6 @@ export function resolveVerifiedProviderArgs({ providerFamily, command, baseArgs,
 
 /**
  * Durable, local record of a real shadow-binder divergence.
- * Moved here from placement-policy.mjs following PlacementPolicy shadow retirement.
  *
  * @param {string|undefined} fgosDir
  * @param {'placement-model'|'provider-args'} binder

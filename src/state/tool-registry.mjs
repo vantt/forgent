@@ -102,7 +102,7 @@ export function toolsFromExecutors(executors) {
     // "for" alone was never a safe signal on its own now that both kinds
     // legitimately declare it.
     if (executor?.kind !== 'tool') continue;
-    const rawCapability = Array.isArray(executor?.for) && executor.for.length > 0 ? executor.for[0] : undefined;
+    const rawCapability = executor?.capability;
     const capability = normalizeCapability(rawCapability);
     if (!capability) continue;
     const invocation = Array.isArray(executor.invocations) ? executor.invocations[0] : undefined;

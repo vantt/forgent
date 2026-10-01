@@ -143,10 +143,6 @@ function buildAgentTypeExecutor(baseExecutor, agentType) {
  * unchanged, never by changing how `executors` is keyed.)
  */
 export function resolveExecutorIdForPurpose(cfg, purpose) {
-  const executors = cfg && cfg.executors && typeof cfg.executors === 'object' ? cfg.executors : {};
-  for (const [id, executor] of Object.entries(executors)) {
-    if (executor && Array.isArray(executor.for) && executor.for.includes(purpose)) return id;
-  }
   return null;
 }
 
@@ -185,12 +181,13 @@ export function resolveExecutorIdForPurpose(cfg, purpose) {
 export function resolveExecutorAndOverrides(cfg, executorIdOrPurpose) {
   const executors = cfg && cfg.executors && typeof cfg.executors === 'object' ? cfg.executors : {};
   if (executors[executorIdOrPurpose]) {
-    // `bindingSource` (Dispatch Core Contract Normalization, Slice D):
-    // additive-only provenance for WHICH resolution branch bound the
-    // returned executorId, surfaced on DispatchPlan.bindingSource by
-    // plan.mjs. Pre-existing callers that destructure only
-    // {executorId, executor, overrides, configured} are unaffected.
     return { executorId: executorIdOrPurpose, executor: executors[executorIdOrPurpose], configured: true, bindingSource: 'executor-id' };
+  }
+  if (!executorIdOrPurpose && cfg?.executor) {
+    return { executorId: cfg.executor.command ?? 'executor', executor: cfg.executor, configured: true, bindingSource: 'default' };
+  }
+  if (cfg?.executor && (executorIdOrPurpose === 'executor' || executorIdOrPurpose === cfg.executor.command || executorIdOrPurpose === cfg.executor.invocations?.[0]?.command || executorIdOrPurpose === cfg.executor.invocations?.[0]?.id)) {
+    return { executorId: executorIdOrPurpose, executor: cfg.executor, configured: true, bindingSource: 'default' };
   }
   const capabilityEntry = cfg && cfg.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities[executorIdOrPurpose] : undefined;
   const preferred = capabilityEntry?.prefer;
@@ -219,10 +216,6 @@ export function resolveExecutorAndOverrides(cfg, executorIdOrPurpose) {
       invocationId: primary.invocation,
       candidates,
     };
-  }
-  const found = resolveExecutorIdForPurpose(cfg, executorIdOrPurpose);
-  if (found) {
-    return { executorId: found, executor: executors[found], configured: true, bindingSource: 'capability.for' };
   }
   return { executorId: null, executor: undefined, configured: false, bindingSource: null };
 }
@@ -333,13 +326,19 @@ export function resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCar
   // requires a command-less, invocation-less entry.
   const effectiveAgentType = executorEntry?.agentType ?? resolvedAgentType;
   const resolvedViaAgentType = !cliInvocation && !(executorEntry && (executorEntry.adapter || executorEntry.command)) && Boolean(effectiveAgentType && cfg && cfg.executor);
+  let defaultCliInvocation = null;
+  if (!executorEntry && cfg?.executor?.invocations) {
+    defaultCliInvocation = cfg.executor.invocations.find((inv) => inv.via === 'cli');
+  }
   const byExecutor = cliInvocation
-    ? { command: cliInvocation.command, args: cliInvocation.args, adapter: cliInvocation.adapter, provider: executorEntry.provider, env: cliInvocation.env ?? executorEntry.env, liveOutput: cliInvocation.liveOutput ?? executorEntry.liveOutput, interactiveMode: cliInvocation.interactiveMode ?? executorEntry.interactiveMode, promptDelivery: cliInvocation.promptDelivery ?? executorEntry.promptDelivery, permissionMode: cliInvocation.permissionMode ?? executorEntry.permissionMode, confinement: cliInvocation.confinement ?? executorEntry.confinement, resourceBindings: cliInvocation.resourceBindings ?? executorEntry.resourceBindings }
+    ? { command: cliInvocation.command, args: cliInvocation.args, adapter: cliInvocation.adapter, provider: executorEntry?.provider, env: cliInvocation.env ?? executorEntry?.env, liveOutput: cliInvocation.liveOutput ?? executorEntry?.liveOutput, interactiveMode: cliInvocation.interactiveMode ?? executorEntry?.interactiveMode, promptDelivery: cliInvocation.promptDelivery ?? executorEntry?.promptDelivery, permissionMode: cliInvocation.permissionMode ?? executorEntry?.permissionMode, confinement: cliInvocation.confinement ?? executorEntry?.confinement, resourceBindings: cliInvocation.resourceBindings ?? executorEntry?.resourceBindings }
     : executorEntry && (executorEntry.adapter || executorEntry.command)
       ? executorEntry
-      : resolvedViaAgentType
-        ? buildAgentTypeExecutor(cfg.executor, effectiveAgentType)
-        : undefined;
+      : defaultCliInvocation
+        ? { command: defaultCliInvocation.command, args: defaultCliInvocation.args, adapter: defaultCliInvocation.adapter, provider: cfg?.executor?.provider, env: defaultCliInvocation.env ?? cfg?.executor?.env, liveOutput: defaultCliInvocation.liveOutput ?? cfg?.executor?.liveOutput, interactiveMode: defaultCliInvocation.interactiveMode ?? cfg?.executor?.interactiveMode, promptDelivery: defaultCliInvocation.promptDelivery ?? cfg?.executor?.promptDelivery, permissionMode: defaultCliInvocation.permissionMode ?? cfg?.executor?.permissionMode, confinement: defaultCliInvocation.confinement ?? cfg?.executor?.confinement, resourceBindings: defaultCliInvocation.resourceBindings ?? cfg?.executor?.resourceBindings }
+        : resolvedViaAgentType
+          ? buildAgentTypeExecutor(cfg.executor, effectiveAgentType)
+          : undefined;
   const executor = byExecutor ?? (cfg && cfg.executor);
   if (!executor || typeof executor.command !== 'string' || !Array.isArray(executor.args)) {
     throw new RunnerConfigError('runner config "executor" must have a string "command" and an "args" array.');
