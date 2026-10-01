@@ -122,6 +122,9 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       // Phase 07 (herdr-trust-supervisor R3): codex-toml/agy trust stores had
       // no doctor coverage at all -- only claude-json's default path did.
       'non-claude-trust-stores-readable',
+      'observe-dir-writable',
+      'observe-friction-migrated',
+      'observe-host-resolvable',
       'executor-confinement',
       'herdr-executor-kinds',
       // Phase 06 (executor-policy-dispatch-seams): legacy policy-shaped
@@ -144,6 +147,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'operation-prompt-templates-valid',
       'operation-capability-resolves',
       'runner-coordination-orgPolicy-shape',
+      'runner-rigor-config',
       'shadow-binder-divergence',
     ].sort(),
   );
