@@ -111,7 +111,10 @@ export function generateVerifyFromTargets(dir, id, { cwd = process.cwd(), repoRo
 
 export function parseEditFlags(flags, { id, dir, cwd = process.cwd(), repoRoot } = {}) {
   const patch = {};
-  for (const field of ['title', 'description', 'kind', 'risk', 'verify', 'tier', 'urgent', 'action']) {
+  if (flags.tier !== undefined) {
+    throw new StoreError('validation', '--tier is retired; use --size (light|standard|heavy) or --rigor (low|standard|high|critical) instead.');
+  }
+  for (const field of ['title', 'description', 'kind', 'risk', 'verify', 'size', 'rigor', 'urgent', 'action']) {
     if (flags[field] !== undefined) {
       patch[field] = flags[field];
     }

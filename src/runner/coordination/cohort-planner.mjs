@@ -26,7 +26,7 @@
 //     for the resolver-handoff/mismatch check (R4) -- the SAME Assignment
 //     resolution path an actual dispatch will re-run at execution time.
 //   - `mergePolicyStack` (definitions/schema.mjs, P02.1) for PolicyPatch
-//     shape validation and monotonic minTier composition (R2/R3) -- this
+//     shape validation and monotonic tier composition (R2/R3) -- this
 //     planner never invents a second PolicyPatch vocabulary.
 //
 // Candidate order (R2): `buildCandidateInventory` explicitly sorts
@@ -215,10 +215,10 @@ export function buildCandidateInventory(runnerConfig) {
  * requirement is free to use it).
  *
  * @param {Readonly<object>} candidate One entry from `buildCandidateInventory`.
- * @param {object} requirement `{role, minTier?, requiredCapabilities?, minContext?, executorId?, providerFamily?}`
+ * @param {object} requirement `{role, tier?, requiredCapabilities?, minContext?, executorId?, providerFamily?}`
  */
 export function matchCandidateToRequirement(candidate, requirement) {
-  const { role, minTier, requiredCapabilities = [], minContext, executorId, providerFamily } = requirement;
+  const { role, tier, requiredCapabilities = [], minContext, executorId, providerFamily } = requirement;
 
   if (executorId !== undefined && candidate.executorId !== executorId) {
     return {
@@ -238,11 +238,11 @@ export function matchCandidateToRequirement(candidate, requirement) {
     };
   }
 
-  if (minTier !== undefined && !candidate.supportedTiers.includes(minTier)) {
+  if (tier !== undefined && !candidate.supportedTiers.includes(tier)) {
     return {
       ok: false,
       field: 'tier',
-      reason: `role "${role}" needs tier "${minTier}"; candidate "${candidate.executorId}" (provider "${candidate.providerFamily}") only supports [${candidate.supportedTiers.join(', ') || 'none'}]`,
+      reason: `role "${role}" needs tier "${tier}"; candidate "${candidate.executorId}" (provider "${candidate.providerFamily}") only supports [${candidate.supportedTiers.join(', ') || 'none'}]`,
       availableSupport:
         candidate.supportedTiers.length > 0
           ? `candidate "${candidate.executorId}" supports [${candidate.supportedTiers.join(', ')}]`
@@ -324,10 +324,10 @@ function resolveActorOperation(definition, actorId) {
 function summarizeAvailableSupport(field, requirement, allCandidates) {
   switch (field) {
     case 'tier': {
-      const capableFamilies = [...new Set(allCandidates.filter((c) => c.supportedTiers.includes(requirement.minTier)).map((c) => c.providerFamily))].sort();
+      const capableFamilies = [...new Set(allCandidates.filter((c) => c.supportedTiers.includes(requirement.tier)).map((c) => c.providerFamily))].sort();
       return capableFamilies.length > 0
-        ? `role "${requirement.role}" needs tier "${requirement.minTier}"; only [${capableFamilies.join(', ')}] ${capableFamilies.length === 1 ? 'is' : 'are'} configured for any candidate`
-        : `role "${requirement.role}" needs tier "${requirement.minTier}"; no candidate currently configures that tier for any provider family`;
+        ? `role "${requirement.role}" needs tier "${requirement.tier}"; only [${capableFamilies.join(', ')}] ${capableFamilies.length === 1 ? 'is' : 'are'} configured for any candidate`
+        : `role "${requirement.role}" needs tier "${requirement.tier}"; no candidate currently configures that tier for any provider family`;
     }
     case 'capability': {
       const capableIds = allCandidates.filter((c) => requirement.requiredCapabilities.every((cap) => c.capabilities.includes(cap))).map((c) => c.executorId);
@@ -369,8 +369,8 @@ function summarizeAvailableSupport(field, requirement, allCandidates) {
  * Allocation, per actor in that stable order: resolve its wired operation
  * (role/tier/capabilities), compose the DECLARED policy scope stack this
  * planner has real data for (`definition < operation < actor`, ascending
- * specificity, via `mergePolicyStack` -- never a second minTier-monotonicity
- * implementation) to get the effective `minTier`/pinned `preferExecutor`,
+ * specificity, via `mergePolicyStack` -- never a second tier-monotonicity
+ * implementation) to get the effective `tier`/pinned `preferExecutor`,
  * then pick the first candidate (stable order) satisfying every hard
  * constraint (`matchCandidateToRequirement`) that is not already allocated
  * to a prior actor in this cohort. Diversity-seeking tie-break: among
@@ -463,12 +463,14 @@ export function planCohort({ definition, runnerConfig, fallbackRules = [] }) {
       { scope: 'actor', source: actor.id, policy: actor.policy ?? {} },
     ];
     const merged = mergePolicyStack(scopeStack);
-    const minTier = merged.minTier ?? 'standard';
+    const rigor = merged.rigor ?? 'standard';
+    const rigorToTier = runnerConfig?.rigorToTier ?? runnerConfig?.runner?.rigorToTier ?? { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' };
+    const allocatedTier = merged.tier ?? (rigorToTier[rigor] ?? 'standard');
     const requiredCapabilities = operation.capabilities ?? [];
 
     const requirement = {
       role: actor.role,
-      minTier,
+      tier: allocatedTier,
       requiredCapabilities,
       // A declared actor/operation/definition-scope preferExecutor pin
       // (schema-legal, though `session-engine.mjs`'s own
@@ -514,7 +516,8 @@ export function planCohort({ definition, runnerConfig, fallbackRules = [] }) {
     usedProviderFamilies.add(chosen.providerFamily);
 
     const assignmentPolicyFragment = {
-      minTier,
+      rigor,
+      tier: allocatedTier,
       preferExecutor: chosen.executorId,
       ...(merged.preferPersona !== undefined ? { preferPersona: merged.preferPersona } : {}),
       ...(merged.visibility !== undefined ? { visibility: merged.visibility } : {}),
@@ -533,9 +536,9 @@ export function planCohort({ definition, runnerConfig, fallbackRules = [] }) {
       operationId: operation.id,
       executorId: chosen.executorId,
       providerFamily: chosen.providerFamily,
-      tier: minTier,
+      tier: allocatedTier,
       policyPatch,
-      explanation: `actor "${actor.id}" (role "${actor.role}") allocated to executor "${chosen.executorId}" (provider "${chosen.providerFamily}", tier "${minTier}") -- chosen from ${eligible.length} eligible candidate(s) in stable order; provider family "${chosen.providerFamily}" ${
+      explanation: `actor "${actor.id}" (role "${actor.role}") allocated to executor "${chosen.executorId}" (provider "${chosen.providerFamily}", tier "${allocatedTier}") -- chosen from ${eligible.length} eligible candidate(s) in stable order; provider family "${chosen.providerFamily}" ${
         unusedFamily ? 'not yet used by this cohort' : 'already used by a prior actor in this cohort (no unused-family candidate was eligible)'
       }`,
     });
@@ -619,7 +622,8 @@ export function verifyPlannedAllocationAgainstCurrentConfig(allocation, currentR
     role: allocation.role,
     operation: allocation.operationId,
     policy: {
-      minTier: allocation.tier,
+      rigor: allocation.policyPatch?.rigor ?? 'standard',
+      tier: allocation.tier,
       preferExecutor: allocation.executorId,
     },
   };

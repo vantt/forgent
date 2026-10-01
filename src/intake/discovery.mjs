@@ -191,7 +191,9 @@ function nextDiscoveryEdge(work, verdict) {
 export function classificationPatchFromVerdict(outcome, callerVerdict) {
   if (outcome !== 'clear' || !callerVerdict?.clear) return {};
   const patch = {};
-  if (callerVerdict.tier !== undefined) patch.tier = callerVerdict.tier;
+  if (callerVerdict.size !== undefined) patch.size = callerVerdict.size;
+  else if (callerVerdict.tier !== undefined) patch.size = callerVerdict.tier;
+  if (callerVerdict.rigor !== undefined) patch.rigor = callerVerdict.rigor;
   if (callerVerdict.kind !== undefined) patch.kind = callerVerdict.kind;
   if (callerVerdict.risk !== undefined) patch.risk = callerVerdict.risk;
   return patch;

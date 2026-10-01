@@ -10,6 +10,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { DOMAINS, DEFAULT_DOMAIN, getDomain, classificationVocabulary, roleGraphFor } from './workflow-stage-graphs.mjs';
+import { RIGOR_VALUES } from '../runner/rigor.mjs';
+
+export { RIGOR_VALUES };
 
 /** Error raised by this module. `category` is the CLI exit-code contract (R4). */
 export class WorkValidationError extends Error {
@@ -157,15 +160,10 @@ export const STATUS_CATEGORIES = Object.freeze([
 ]);
 
 /**
- * Tier domain for `work.tier` (per D6) — the cost/cognitive weight a work
- * item self-declares; the runner (Epic 3) maps tier -> model via a config
- * table at dispatch time. PROVISIONAL: this is the minimal placeholder set
- * for Phase 2's substrate slice. It must reconcile with the tier->model
- * config table introduced alongside the runner — that config becomes the
- * single source of truth for what a tier *means*; this list only bounds what
- * a work item is allowed to *say*. Do not let the two drift apart.
+ * Size domain for `work.size` (Phase 3) — the scale / effort of a work
+ * item ('light', 'standard', 'heavy'). Never mapped to a model.
  */
-export const TIERS = Object.freeze(['light', 'standard', 'heavy']);
+export const SIZES = Object.freeze(['light', 'standard', 'heavy']);
 
 /**
  * Urgency domain for `work.urgent` (per work-item-priority-matrix D2) —
@@ -227,7 +225,7 @@ export const SCHEMA_VERSION = 3;
  * folding a legacy event missing the field) is the caller's job, never
  * this module's.
  */
-export const DEFAULTS = Object.freeze({ tier: 'standard' });
+export const DEFAULTS = Object.freeze({ size: 'standard' });
 
 function requireNonEmptyString(work, field) {
   if (typeof work[field] !== 'string' || !work[field].trim()) {
@@ -390,9 +388,19 @@ export function validateWorkShape(work, touchedFields) {
   if (touched('learn') && work.learn !== undefined && work.learn !== null && typeof work.learn !== 'string') {
     throw new WorkValidationError('work.learn must be a string when present (it is optional).');
   }
-  if (touched('tier') && work.tier !== undefined && !TIERS.includes(work.tier)) {
+  if (touched('size') && work.size !== undefined && !SIZES.includes(work.size)) {
     throw new WorkValidationError(
-      `work.tier must be one of ${JSON.stringify(TIERS)} when present, got: ${JSON.stringify(work.tier)}`,
+      `work.size must be one of ${JSON.stringify(SIZES)} when present, got: ${JSON.stringify(work.size)}`,
+    );
+  }
+  if (touched('rigor') && work.rigor !== undefined && !RIGOR_VALUES.includes(work.rigor)) {
+    throw new WorkValidationError(
+      `work.rigor must be one of ${JSON.stringify(RIGOR_VALUES)} when present, got: ${JSON.stringify(work.rigor)}`,
+    );
+  }
+  if (touched('tier') && work.tier !== undefined) {
+    throw new WorkValidationError(
+      'work.tier is retired; use work.size (light|standard|heavy) or work.rigor (low|standard|high|critical) instead',
     );
   }
   if (touched('domain') && work.domain !== undefined && !Object.hasOwn(DOMAINS, work.domain)) {

@@ -738,7 +738,7 @@ test('findWorkflowStageOperationProblems fails when primary operation contradict
   assert.ok(problems.some((p) => p.includes('does not include stage skill')));
 });
 
-test('findWorkflowStageOperationProblems fails when policy minTier or preferPersona is invalid', () => {
+test('findWorkflowStageOperationProblems fails when policy rigor or preferPersona is invalid', () => {
   const customDomains = {
     coding: {
       workflows: {
@@ -750,7 +750,7 @@ test('findWorkflowStageOperationProblems fails when policy minTier or preferPers
                 taskSpec: 'shape-plan',
                 role: 'implementer',
                 skills: ['fgos-coding-planning'],
-                policy: { minTier: 'ultra-mega-tier', preferPersona: 'alien-persona' },
+                policy: { rigor: 'ultra-mega-rigor', preferPersona: 'alien-persona' },
               },
             ],
           },
@@ -760,7 +760,7 @@ test('findWorkflowStageOperationProblems fails when policy minTier or preferPers
   };
   const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
   assert.equal(problems.length >= 2, true);
-  assert.ok(problems.some((p) => p.includes('policy.minTier')));
+  assert.ok(problems.some((p) => p.includes('policy.rigor')));
   assert.ok(problems.some((p) => p.includes('policy.preferPersona')));
 });
 
@@ -930,7 +930,7 @@ test('findWorkflowStageOperationProblems fails when policy contains disallowed k
                 role: 'implementer',
                 skills: ['fgos-coding-planning'],
                 policy: {
-                  minTier: 'standard',
+                  rigor: 'standard',
                   model: 'gpt-5.5',
                   timeoutMs: 999999,
                   prompt: 'Do something',

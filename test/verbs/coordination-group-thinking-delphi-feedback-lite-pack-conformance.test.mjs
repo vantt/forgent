@@ -164,8 +164,7 @@ test('Delphi-Feedback-Lite: convene -> two round-1 proposals -> mediated aggrega
     assert.equal(step.type, 'operation', 'the group-thinking pack gate\'s public vocabulary offers no other step kind reachable for this fixture');
     assert.equal(step.status, 'done');
   }
-
-  // Actor-scope minTier provenance, real, through the pack -- mirrors
+  // Actor-scope rigor provenance, real, through the pack -- mirrors
   // P10.4.md's own direct-call assertion, now proved reachable via the
   // public request/response shape rather than a raw dispatch return value.
   assert.equal(result.steps[0].tier, 'frontier', 'convene, facilitator-actor');

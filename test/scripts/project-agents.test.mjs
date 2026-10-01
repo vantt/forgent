@@ -33,7 +33,7 @@ decision_boundary:
     - Pick test fixtures
   must_escalate:
     - Real work
-model_tier: light
+rigor: low
 tool-scope:
   - Read
   - Grep
@@ -46,7 +46,7 @@ test('tool-scope maps exactly into the generated tools: frontmatter -- no silent
   assert.equal(toolsLine, 'tools: Read, Grep, Bash');
 });
 
-test('model_tier resolves through the same tier->model map the shared config file/dispatch.mjs already use', () => {
+test('rigor resolves through the same tier->model map the shared config file/dispatch.mjs already use', () => {
   const markdown = projectAgentMarkdown('test-agent', VALID_YAML, DEFAULT_MODELS);
   const modelLine = markdown.split('\n').find((line) => line.startsWith('model:'));
   assert.equal(modelLine, 'model: haiku');
@@ -100,9 +100,9 @@ test('an empty tool-scope is refused -- an agent-type with no declared tools is 
   assert.throws(() => projectAgentMarkdown('test-agent', emptyToolScope, DEFAULT_MODELS), AgentDefinitionError);
 });
 
-test('an unrecognized model_tier is refused rather than silently falling through to undefined', () => {
-  const badTier = VALID_YAML.replace('model_tier: light', 'model_tier: extreme');
-  assert.throws(() => projectAgentMarkdown('test-agent', badTier, DEFAULT_MODELS), AgentDefinitionError);
+test('an unrecognized rigor is refused rather than silently falling through to undefined', () => {
+  const badRigor = VALID_YAML.replace('rigor: low', 'rigor: extreme');
+  assert.throws(() => projectAgentMarkdown('test-agent', badRigor, DEFAULT_MODELS), AgentDefinitionError);
 });
 
 // --- readRunnerModels: real integration coverage (tsk-5tm, D9) -- this
@@ -113,18 +113,14 @@ test('an unrecognized model_tier is refused rather than silently falling through
 test('readRunnerModels resolves via modelPolicies when present, not the legacy models map', () => {
   const dir = mkTempDir();
   writeSharedConfig(dir, {
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     modelPolicies: {
-      claude: { nano: 'haiku-custom', standard: 'sonnet-custom', advanced: 'sonnet-custom', flagship: 'sonnet-custom', frontier: 'opus-custom' },
+      claude: { nano: 'haiku-custom', standard: 'sonnet-custom', advanced: 'sonnet-custom', flagship: 'flagship-custom', frontier: 'opus-custom' },
     },
   });
-  assert.deepEqual(readRunnerModels(dir), { light: 'haiku-custom', standard: 'sonnet-custom', heavy: 'opus-custom' });
+  assert.deepEqual(readRunnerModels(dir), { low: 'haiku-custom', standard: 'sonnet-custom', high: 'flagship-custom', critical: 'opus-custom' });
 });
 
-test('readRunnerModels still resolves via the legacy flat models map when modelPolicies is absent (pre-D9 config, backward compatible)', () => {
-  const dir = mkTempDir();
-  writeSharedConfig(dir, { models: { light: 'haiku-legacy', standard: 'sonnet-legacy', heavy: 'opus-legacy' } });
-  assert.deepEqual(readRunnerModels(dir), { light: 'haiku-legacy', standard: 'sonnet-legacy', heavy: 'opus-legacy' });
-});
 
 test('readRunnerModels falls back to DEFAULT_MODELS per-tier when neither modelPolicies nor models configures that tier', () => {
   const dir = mkTempDir();

@@ -62,7 +62,7 @@ import { operationsForStage } from '../../state/workflow-stage-graphs.mjs';
 // silently reaching `validateFlowDefinition` in a way whose rejection
 // message would look like a schema.mjs bug rather than an adapter-input
 // problem.
-const POLICY_PATCH_KEYS = ['minTier', 'preferPersona', 'preferExecutor', 'fallbackExecutors', 'visibility'];
+const POLICY_PATCH_KEYS = ['rigor', 'preferPersona', 'preferExecutor', 'fallbackExecutors', 'visibility'];
 
 function projectPolicy(rawPolicy) {
   if (!rawPolicy || typeof rawPolicy !== 'object') return undefined;

@@ -282,7 +282,8 @@ function fakeExecutor(tempDir) {
       {
         runner: {
           executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-          models: { standard: 'test-model', nano: 'test-model', advanced: 'test-model', flagship: 'test-model', frontier: 'test-model' },
+          modelPolicies: { claude: { nano: 'test-model', standard: 'test-model', advanced: 'test-model', flagship: 'test-model', frontier: 'test-model' } },
+          rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
           timeoutMs: 20000,
         },
       },

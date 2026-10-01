@@ -47,7 +47,8 @@ import { runAllConfinementProbes } from '../runner/dispatch/confinement/probes/h
 import { reapOrphanedConfinementResources, OWNERSHIP_MARKER_FILE } from '../runner/dispatch/confinement/cleanup.mjs';
 
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
-import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, validateCapabilityServesShape, RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, DEFAULT_RIGOR_TO_TIER, validateCapabilityServesShape, RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { RIGOR_VALUES } from '../runner/rigor.mjs';
 import { resolveExecutorAndOverrides, deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../state/fgos-file-registry.mjs';
@@ -426,6 +427,173 @@ function checkConfigNotStale(cwd) {
     return { passed: false, message: `stale config — missing keys: ${addedKeys.join(', ')} — run fgos setup` };
   }
   return { passed: true, message: `config up to date at ${sharedPath}` };
+}
+
+function checkRunnerRigorConfig(cwd) {
+  const levels = [
+    ['project', readSharedConfig(cwd)?.runner],
+    ['global', loadGlobalConfig()?.runner],
+  ];
+  const problems = [];
+  for (const [level, runner] of levels) {
+    if (!runner) continue;
+    const map = runner.rigorToTier;
+    if (!map || typeof map !== 'object' || Array.isArray(map)) {
+      problems.push(`${level} runner.rigorToTier missing -- run fgos setup`);
+    } else {
+      for (const rigor of RIGOR_VALUES) {
+        if (!MODEL_POLICY_TIERS.includes(map[rigor])) {
+          problems.push(`${level} runner.rigorToTier.${rigor} must be one of ${MODEL_POLICY_TIERS.join('/')}`);
+        }
+      }
+      for (const rigor of Object.keys(map)) {
+        if (!RIGOR_VALUES.includes(rigor)) problems.push(`${level} runner.rigorToTier has unknown rigor "${rigor}"`);
+      }
+    }
+    for (const [capability, entry] of Object.entries(runner.capabilities ?? {})) {
+      if (entry?.overrides !== undefined) {
+        problems.push(`${level} runner.capabilities.${capability}.overrides was removed; use .rigor`);
+      }
+    }
+  }
+  return problems.length > 0
+    ? { passed: false, message: problems.join('; ') }
+    : { passed: true, message: 'runner rigor maps and capability floors are valid at every configured level' };
+}
+
+export function checkTierVocabularyDeadKeys(cwd) {
+  const levels = [
+    ['project', readSharedConfig(cwd)?.runner],
+    ['global', loadGlobalConfig()?.runner],
+  ];
+  const problems = [];
+  for (const [level, runner] of levels) {
+    if (!runner || typeof runner !== 'object') continue;
+    if ('models' in runner) {
+      problems.push(`${level} config contains dead key "runner.models"; replace with "runner.modelPolicies"`);
+    }
+    if ('DEFAULT_TIER_TO_POLICY' in runner) {
+      problems.push(`${level} config contains dead key "runner.DEFAULT_TIER_TO_POLICY"`);
+    }
+    if ('QUALITY_TIER_BRIDGE' in runner) {
+      problems.push(`${level} config contains dead key "runner.QUALITY_TIER_BRIDGE"`);
+    }
+    if ('QUALITY_MODE_VALUES' in runner) {
+      problems.push(`${level} config contains dead key "runner.QUALITY_MODE_VALUES"`);
+    }
+    if ('minTier' in runner) {
+      problems.push(`${level} config contains dead key "runner.minTier"; replace with "rigor"`);
+    }
+    if ('minRigor' in runner) {
+      problems.push(`${level} config contains dead key "runner.minRigor"; replace with "rigor"`);
+    }
+    if ('rigorOverrides' in runner) {
+      problems.push(`${level} config contains dead key "runner.rigorOverrides"; replace by adjusting "runner.modelPolicies.<provider>"`);
+    }
+    if ('PLACEMENT_POLICY_SHADOW' in runner) {
+      problems.push(`${level} config contains dead key "runner.PLACEMENT_POLICY_SHADOW"`);
+    }
+    for (const [execId, exec] of Object.entries(runner.executors ?? {})) {
+      if (exec && typeof exec === 'object') {
+        if ('rigorOverrides' in exec) {
+          problems.push(`${level} config contains dead key "runner.executors.${execId}.rigorOverrides"; replace by adjusting "runner.modelPolicies.<provider>"`);
+        }
+        if ('models' in exec) {
+          problems.push(`${level} config contains dead key "runner.executors.${execId}.models"`);
+        }
+      }
+    }
+    for (const [capName, cap] of Object.entries(runner.capabilities ?? {})) {
+      if (cap && typeof cap === 'object') {
+        if ('overrides' in cap) {
+          problems.push(`${level} config contains dead key "runner.capabilities.${capName}.overrides"; replace with "runner.capabilities.${capName}.rigor"`);
+        }
+        if ('rigorOverrides' in cap) {
+          problems.push(`${level} config contains dead key "runner.capabilities.${capName}.rigorOverrides"`);
+        }
+        if ('minTier' in cap) {
+          problems.push(`${level} config contains dead key "runner.capabilities.${capName}.minTier"; replace with "rigor"`);
+        }
+        if ('minRigor' in cap) {
+          problems.push(`${level} config contains dead key "runner.capabilities.${capName}.minRigor"; replace with "rigor"`);
+        }
+      }
+    }
+  }
+  return problems.length > 0
+    ? { passed: false, message: problems.join('; ') }
+    : { passed: true, message: 'no retired tier vocabulary keys in project or global config' };
+}
+
+export function checkModelPolicyTierCoverage(cwd) {
+  const levels = [
+    ['project', readSharedConfig(cwd)?.runner],
+    ['global', loadGlobalConfig()?.runner],
+  ];
+  const problems = [];
+  for (const [level, runner] of levels) {
+    if (!runner || typeof runner !== 'object') continue;
+    const rigorToTier = runner.rigorToTier ?? DEFAULT_RIGOR_TO_TIER;
+    const neededTiers = new Set(Object.values(rigorToTier));
+    const providersChecked = new Set();
+
+    for (const [execId, exec] of Object.entries(runner.executors ?? {})) {
+      if (!exec || typeof exec !== 'object') continue;
+      const provider = deriveProviderFamily(exec);
+      if (!provider || providersChecked.has(provider)) continue;
+      providersChecked.add(provider);
+
+      const providerPolicies = runner.modelPolicies?.[provider];
+      if (!providerPolicies || typeof providerPolicies !== 'object') {
+        problems.push(`${level} provider "${provider}" for executor "${execId}" has no modelPolicies entry`);
+        continue;
+      }
+      for (const tier of neededTiers) {
+        if (!providerPolicies[tier]) {
+          problems.push(`${level} provider "${provider}" missing model for tier "${tier}" (required by rigorToTier)`);
+        }
+      }
+    }
+  }
+  return problems.length > 0
+    ? { passed: false, message: problems.join('; ') }
+    : { passed: true, message: 'modelPolicies covers all tiers required by rigorToTier' };
+}
+
+export function checkCoordinationProtocolDeadVocabulary(cwd) {
+  const scanDirs = [
+    path.join(cwd, '.fgos', 'coordination-protocols'),
+    path.join(cwd, 'core', 'coordination-protocols'),
+    path.join(cwd, 'domains'),
+  ];
+  const yamlFiles = [];
+  function scan(dir) {
+    if (!fs.existsSync(dir)) return;
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        if (entry.name === 'node_modules' || entry.name === '.git') continue;
+        scan(full);
+      } else if (entry.isFile() && (entry.name.endsWith('.yaml') || entry.name.endsWith('.yml'))) {
+        yamlFiles.push(full);
+      }
+    }
+  }
+  for (const dir of scanDirs) scan(dir);
+
+  const deadPattern = /\b(minTier|minRigor|QUALITY_TIER_BRIDGE|QUALITY_MODE_VALUES)\b/;
+  const problems = [];
+  for (const file of yamlFiles) {
+    const content = fs.readFileSync(file, 'utf8');
+    const match = content.match(deadPattern);
+    if (match) {
+      const rel = path.relative(cwd, file);
+      problems.push(`${rel} contains retired "${match[1]}"; replace with "rigor" (low|standard|high|critical)`);
+    }
+  }
+  return problems.length > 0
+    ? { passed: false, message: problems.join('; ') }
+    : { passed: true, message: 'no retired coordination protocol vocabulary in project' };
 }
 
 // tsk-2t9c (multi-role team harness, D6/D9 task-spec A-lite convention;
@@ -866,8 +1034,8 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
               if (disallowedKeys.length > 0) {
                 problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy contains disallowed key(s) [${disallowedKeys.join(', ')}] (allowed: ${[...POLICY_PATCH_FIELDS].join(', ')})`);
               }
-              if (op.policy.minTier && !MODEL_POLICY_TIERS.includes(op.policy.minTier)) {
-                problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy.minTier "${op.policy.minTier}" not in recognized tiers [${MODEL_POLICY_TIERS.join(', ')}]`);
+              if (op.policy.rigor && !RIGOR_VALUES.includes(op.policy.rigor)) {
+                problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy.rigor "${op.policy.rigor}" not in recognized rigors [${RIGOR_VALUES.join(', ')}]`);
               }
               if (op.policy.preferPersona) {
                 if (typeof op.policy.preferPersona !== 'string' || (agentSkillsMap.size > 0 && !agentSkillsMap.has(op.policy.preferPersona))) {
@@ -1033,6 +1201,30 @@ registerCheck({
   id: 'config-not-stale',
   description: '.fgos/config.json exists and has every current registered default key',
   check: (cwd) => checkConfigNotStale(cwd),
+});
+
+registerCheck({
+  id: 'runner-rigor-config',
+  description: 'project and global runner rigorToTier maps are complete and capabilities declare only rigor floors',
+  check: (cwd) => checkRunnerRigorConfig(cwd),
+});
+
+registerCheck({
+  id: 'tier-vocabulary-dead-keys',
+  description: 'project and global configs have no retired tier vocabulary keys (runner.models, minTier, rigorOverrides, etc.)',
+  check: (cwd) => checkTierVocabularyDeadKeys(cwd),
+});
+
+registerCheck({
+  id: 'model-policy-tier-coverage',
+  description: 'runner.modelPolicies covers every tier generated by rigorToTier for all registered executors',
+  check: (cwd) => checkModelPolicyTierCoverage(cwd),
+});
+
+registerCheck({
+  id: 'coordination-protocol-dead-vocabulary',
+  description: 'coordination protocols and workflows in project do not contain retired minTier or minRigor',
+  check: (cwd) => checkCoordinationProtocolDeadVocabulary(cwd),
 });
 
 registerCheck({
@@ -1846,12 +2038,7 @@ export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
 // confirmed GREEN (worker contract followed: layered skill-pointer chain
 // read natively, footprint honored, correct `[BLOCKED]`/`[DONE]`
 // two-token reporting) — see
-// docs/history/pi-executor-runtime-capacity/RESEARCH.md Round 4. No
-// `rigorOverrides`: the old `{light/standard/heavy -> nano}` default was
-// never a deliberate, endorsed cost policy -- just this seed's own
-// historical proof-test default -- dropped so a fresh install's `pi`
-// behaves like every other executor (DEFAULT_TIER_TO_POLICY) unless an
-// operator deliberately opts in later.
+// docs/history/pi-executor-runtime-capacity/RESEARCH.md Round 4.
 // Exported (mirrors `DEFAULT_CAPABILITY_SLOTS` below it) so the ripple
 // tests assert this exact shape instead of duplicating the literal.
 export const PI_EXECUTOR_DEFAULT = Object.freeze({
@@ -4048,7 +4235,7 @@ registerCheck({
 
 registerCheck({
   id: 'executor-profile-warnings',
-  description: 'Phase 06 (executor-policy-dispatch-seams): legacy executor/capability entries hardcoding policy-shaped flags, rigorOverrides-as-identity, or account-pool-like env, each named with its documented migration target',
+  description: 'Phase 06 (executor-policy-dispatch-seams): legacy executor entries hardcoding policy-shaped flags or account-pool-like env, each named with its documented migration target',
   check: (cwd) => {
     try {
       return checkExecutorProfileWarnings(cwd, loadRunnerConfigFromDir(cwd));
@@ -5078,9 +5265,8 @@ registerFix({
   }
 });
 
-// dispatch-engine-liveness-hardening Phase 7 (C1): the two remaining shadow
-// binders (`resolveVerifiedPlacementModel`/`resolveVerifiedProviderArgs`,
-// dispatch/placement-policy.mjs's `recordShadowBinderDivergence`) now write
+// dispatch-engine-liveness-hardening Phase 7 (C1): shadow binder
+// (`resolveVerifiedProviderArgs`, `recordShadowBinderDivergence`) now writes
 // a real disagreement to a durable local JSONL instead of only an ephemeral
 // stderr line. Informational, not a gate: a fallback-to-legacy disagreement
 // is handled safely by design (the real spawn never regresses on

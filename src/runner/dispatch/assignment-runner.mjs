@@ -62,7 +62,7 @@ import { resolveAndRenderOperationPrompt, TemplateResolutionError } from './oper
 import { executeExecutorCli } from './cli.mjs';
 import { compileDispatchPlan } from './plan.mjs';
 import { resolveFallback } from './recovery.mjs';
-import { deriveProviderFamily, resolvePolicyTierModel, resolveExecutorConfig, selectConfinedInvocationId } from './resolve.mjs';
+import { deriveProviderFamily, resolveTierModel, resolveExecutorConfig, selectConfinedInvocationId } from './resolve.mjs';
 import { normalizeProviderFamily, checkProviderDisallowed } from './provider-adapter.mjs';
 import {
   selectPlacementPolicyRedirectExecutor,
@@ -72,7 +72,7 @@ import {
 } from './placement-policy.mjs';
 import { markRunSettled } from './visibility-session.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
-import { extractProtocolOperationStamp, resolveMutatingCwdPosture } from './execution-contract.mjs';
+import { extractProtocolOperationStamp, normalizeSavedPolicyTier, resolveMutatingCwdPosture } from './execution-contract.mjs';
 import { loadCoordinationProtocol } from '../definitions/protocol-loader.mjs';
 import {
   publishNextGeneration,
@@ -257,13 +257,12 @@ function policyForActualExecutor(cfg, policy, executorId, sourceExecutorId) {
   const executorEntry = cfg?.executors?.[executorId];
   const providerModel = resolveProviderFamilyForExecutor(executorEntry, executorId);
   // dispatch-engine-liveness-hardening Phase 7: `resolveVerifiedAssignmentModel`
-  // retired -- its own doc comment already admitted the two sides call the
-  // identical `resolvePolicyTierModel(cfg, lookupPolicyTier, provider)` with
-  // identical inputs, so a real algorithmic divergence was never possible
+  // retired -- both sides call the identical `resolveTierModel(cfg, policy.tier, provider)` with
+  // identical inputs, so divergence was never possible.
   // (a provenance/ownership label, not a second competing computation).
   const model = providerModel === policy.providerModel
     ? policy.model
-    : resolvePolicyTierModel(cfg, policy.tier, providerModel);
+    : resolveTierModel(cfg, policy.tier, providerModel);
   return {
     ...policy,
     executorId,
@@ -1315,11 +1314,24 @@ export async function executeAssignment(assignment, opts = {}) {
         `assignment.json for "${assignment.assignmentId}" exists but could not be read: ${err.message}`,
       );
     }
+    let parsedAssignment;
     try {
-      effectiveAssignment = Object.freeze(JSON.parse(raw));
+      parsedAssignment = JSON.parse(raw);
     } catch (err) {
       throw new RunnerConfigError(
         `assignment.json for "${assignment.assignmentId}" is corrupt (invalid JSON): ${err.message}`,
+      );
+    }
+    try {
+      const normalizedPolicy = normalizeSavedPolicyTier(parsedAssignment.policy, { allowAdditionalFields: true });
+      effectiveAssignment = Object.freeze(
+        normalizedPolicy === parsedAssignment.policy
+          ? parsedAssignment
+          : { ...parsedAssignment, policy: normalizedPolicy },
+      );
+    } catch (err) {
+      throw new RunnerConfigError(
+        `assignment.json for "${assignment.assignmentId}" is corrupt or invalid: ${err.message}`,
       );
     }
   }
@@ -1366,7 +1378,7 @@ export async function executeAssignment(assignment, opts = {}) {
   // agreement; both used to happen here, separately, and could only ever
   // agree or throw, never usefully disagree. `workItem: opts.work` is
   // threaded through so the merged policy resolution sees the real Work
-  // object for tier monotonicity (work.tier/work.risk), the same object
+  // object for rigor monotonicity (work.rigor/work.risk), the same object
   // the removed direct call used to pass as `work`.
   // `let`, not `const`: a provider-capacity refusal below (Phase B,
   // plans/260917-executor-profile-schema-migration/plan.md) may replace

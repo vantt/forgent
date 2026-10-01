@@ -6,7 +6,7 @@
 // selector, caller, mechanism, executorId, capability, invocation, governance,
 // and reasonCodes into a canonical DispatchPlan object.
 
-import { DEFAULT_TIER_TO_POLICY, MODEL_POLICY_TIERS, RunnerConfigError } from './config.mjs';
+import { RunnerConfigError } from './config.mjs';
 import { resolveExecutorAndOverrides, resolveExecutorConfig, executorIdForWork } from './resolve.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
 import { resolveAssignmentDispatchPolicy } from './assignment-policy.mjs';
@@ -23,10 +23,6 @@ function isKnownCapabilityName(cfg, name) {
   return Object.values(capabilities).some((entry) => Array.isArray(entry?.aliases) && entry.aliases.includes(name));
 }
 
-function policyTierForDispatchTier(dispatchTier, rigorOverrides) {
-  const tier = dispatchTier ?? 'standard';
-  return rigorOverrides?.[tier] ?? DEFAULT_TIER_TO_POLICY[tier] ?? (MODEL_POLICY_TIERS.includes(tier) ? tier : undefined);
-}
 
 /**
  * Compiles a canonical DispatchPlan object for a dispatch request.
@@ -394,13 +390,9 @@ export function compileDispatchPlan(
   // caller-supplied cliOverride.preferExecutor disagrees anyway.
   const realAssignmentForPolicy = assignmentItem ?? (typeof assignmentArg === 'object' && assignmentArg ? assignmentArg : null);
   const syntheticPolicy = { preferExecutor: executorId };
-  if (resolved.overrides?.providerModel) syntheticPolicy.providerModel = resolved.overrides.providerModel;
-  if (resolved.overrides?.model) syntheticPolicy.model = resolved.overrides.model;
-  const overrideTier = policyTierForDispatchTier(
-    resolved.overrides?.tier ?? workItem?.tier ?? 'standard',
-    resolved.overrides?.rigorOverrides,
-  );
-  if (overrideTier) syntheticPolicy.minTier = overrideTier;
+  const capRigor = capability ? cfg?.capabilities?.[capability]?.rigor : undefined;
+  if (capRigor) syntheticPolicy.rigor = capRigor;
+  if (capability) syntheticPolicy.capability = capability;
   const assignmentForPolicy = realAssignmentForPolicy ?? {
     operation: capability ?? executorId,
     role: undefined,

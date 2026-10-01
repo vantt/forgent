@@ -1095,7 +1095,7 @@ test('determinism: the zero-read fast path\'s round-tripped view is deep-equal t
   const dir = tmpFgosDir();
   addWork(dir, {
     id: 'a', title: 'A realistic item', kind: 'feature', status: 'todo', deps: [], risk: 'standard', refs: ['docs/x.md'],
-    verify: 'npm test', tier: 'standard', description: 'a full description', footprint: ['src/a.mjs'],
+    verify: 'npm test', size: 'standard', description: 'a full description', footprint: ['src/a.mjs'],
   });
   const logPath = logPathOf(dir);
   moveWork(dir, { id: 'a', to: 'blocked', expectedStatus: 'todo' });

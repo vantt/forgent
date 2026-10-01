@@ -24,7 +24,8 @@ function loadWith(executorEntry) {
   const file = path.join(dir, 'config.json');
   fs.writeFileSync(file, JSON.stringify({
     executor: { command: 'node', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
+    modelPolicies: { node: { standard: 'sonnet' }, claude: { standard: 'sonnet' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: 60000,
     executors: { sample: { kind: 'agent', ...executorEntry } },
   }, null, 2));
@@ -154,7 +155,8 @@ test('A1: the profile reaches the resolver without resolve.mjs being changed for
   const file = path.join(dir, 'config.json');
   fs.writeFileSync(file, JSON.stringify({
     executor: { command: 'node', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
+    modelPolicies: { node: { standard: 'sonnet' }, claude: { standard: 'sonnet' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: 60000,
     executors: {
       profiled: {
@@ -325,7 +327,10 @@ test('Phase C: the real repository config declares identity/supports on "claude"
 function loadRunnerConfigObject(cfgObject) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-redirect-cfg-'));
   const file = path.join(dir, 'config.json');
-  fs.writeFileSync(file, JSON.stringify(cfgObject, null, 2));
+  fs.writeFileSync(file, JSON.stringify({
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    ...cfgObject,
+  }, null, 2));
   try {
     return loadRunnerConfig(file);
   } finally {
@@ -337,7 +342,7 @@ test('Phase D: the retired top-level "readOnlyExecutorRedirects" field is refuse
   assert.throws(
     () => loadRunnerConfigObject({
       executor: { command: 'node', args: ['{prompt}'] },
-      models: { standard: 'sonnet' },
+      modelPolicies: { node: { standard: 'sonnet' }, claude: { standard: 'sonnet' } },
       timeoutMs: 60000,
       readOnlyExecutorRedirects: { claude: ['claude-reviewer'] },
     }),
@@ -360,14 +365,14 @@ test('Phase D: a config declaring no placementPolicy at all still loads unchange
 test('Phase D: placementPolicy.readOnlyRedirects.<id> accepts a bare string, an array of strings, or {default, operations}', () => {
   assert.equal(loadRunnerConfigObject({
     executor: { command: 'node', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
+    modelPolicies: { node: { standard: 'sonnet' }, claude: { standard: 'sonnet' } },
     timeoutMs: 60000,
     placementPolicy: { readOnlyRedirects: { claude: 'claude-reviewer' } },
   }).placementPolicy.readOnlyRedirects.claude, 'claude-reviewer');
 
   assert.deepEqual(loadRunnerConfigObject({
     executor: { command: 'node', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
+    modelPolicies: { node: { standard: 'sonnet' }, claude: { standard: 'sonnet' } },
     timeoutMs: 60000,
     placementPolicy: { readOnlyRedirects: { claude: ['claude-reviewer', 'codex-bwrap'] } },
   }).placementPolicy.readOnlyRedirects.claude, ['claude-reviewer', 'codex-bwrap']);
@@ -375,7 +380,7 @@ test('Phase D: placementPolicy.readOnlyRedirects.<id> accepts a bare string, an 
   const full = { default: ['codex-bwrap'], operations: { 'review-candidate': ['codex-bwrap'] } };
   assert.deepEqual(loadRunnerConfigObject({
     executor: { command: 'node', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
+    modelPolicies: { node: { standard: 'sonnet' }, claude: { standard: 'sonnet' } },
     timeoutMs: 60000,
     placementPolicy: { readOnlyRedirects: { claude: full } },
   }).placementPolicy.readOnlyRedirects.claude, full);
@@ -384,7 +389,7 @@ test('Phase D: placementPolicy.readOnlyRedirects.<id> accepts a bare string, an 
 test('Phase D: placementPolicy.readOnlyRedirects refuses a malformed pool -- empty string, non-string entries, or an unrecognized shape', () => {
   const withPool = (pool) => loadRunnerConfigObject({
     executor: { command: 'node', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
+    modelPolicies: { node: { standard: 'sonnet' }, claude: { standard: 'sonnet' } },
     timeoutMs: 60000,
     placementPolicy: { readOnlyRedirects: { claude: pool } },
   });
@@ -421,7 +426,7 @@ test('Phase D: the real repository config declares placementPolicy.readOnlyRedir
 function multiInvocationConfig(invocations) {
   return loadRunnerConfigObject({
     executor: { command: 'node', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
+    modelPolicies: { node: { standard: 'sonnet' }, claude: { standard: 'sonnet' } },
     timeoutMs: 60000,
     executors: {
       multi: { kind: 'agent', invocations },

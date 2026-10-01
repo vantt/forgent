@@ -231,15 +231,11 @@ test('validate-plan no-evidence does not move Work', async () => {
   seedTaskSpecs(tempDir, ['validate-plan']);
   const executorScript = writeNoEvidenceExecutor(tempDir);
 
-  const runnerConfig = {
-    executor: {
-      allowCrossProvider: true,
-      command: process.execPath,
-      args: [executorScript, '{prompt}'],
-    },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  const runnerConfig = { executor: {
+    allowCrossProvider: true,
+    command: process.execPath,
+    args: [executorScript, '{prompt}'],
+  }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
 
   const work = { id: 'tsk-no-ev', status: 'doing', stage: 'planning', domain: 'coding' };
   const choice = chooseStageOperation({
@@ -271,15 +267,11 @@ test('validate-plan failed does not move Work', async () => {
   seedTaskSpecs(tempDir, ['validate-plan']);
   const executorScript = writeFailingExecutor(tempDir);
 
-  const runnerConfig = {
-    executor: {
-      allowCrossProvider: true,
-      command: process.execPath,
-      args: [executorScript, '{prompt}'],
-    },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  const runnerConfig = { executor: {
+    allowCrossProvider: true,
+    command: process.execPath,
+    args: [executorScript, '{prompt}'],
+  }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
 
   const work = { id: 'tsk-fail-op', status: 'doing', stage: 'planning', domain: 'coding' };
   const choice = chooseStageOperation({
@@ -310,15 +302,11 @@ test('reported READY allows existing planning edge path', async () => {
   seedTaskSpecs(tempDir, ['validate-plan']);
   const executorScript = writeFakeExecutor(tempDir, { status: 'done', verdict: 'READY', summary: 'Feasible' });
 
-  const runnerConfig = {
-    executor: {
-      allowCrossProvider: true,
-      command: process.execPath,
-      args: [executorScript, '{prompt}'],
-    },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  const runnerConfig = { executor: {
+    allowCrossProvider: true,
+    command: process.execPath,
+    args: [executorScript, '{prompt}'],
+  }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
 
   const work = { id: 'tsk-ready-op', status: 'doing', stage: 'planning', domain: 'coding' };
   const choice = chooseStageOperation({

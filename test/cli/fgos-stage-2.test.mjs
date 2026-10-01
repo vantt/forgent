@@ -108,13 +108,23 @@ test('discover with an out-of-vocabulary --kind is rejected as validation (exit 
 });
 
 
-test('discover with an out-of-vocabulary --tier is rejected as validation (exit 4) before the item moves at all', () => {
+test('discover with retired --tier is rejected as validation (exit 4) before the item moves at all', () => {
   const cwd = tmpCwdFromTemplate();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
   const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- bad-tier', '--tier', 'enormous']);
   assert.equal(result.status, 4);
-  assert.match(result.stderr, /work\.tier must be one of/);
+  assert.match(result.stderr, /--tier is retired/);
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'discovery');
+});
+
+test('discover with an out-of-vocabulary --size is rejected as validation (exit 4) before the item moves at all', () => {
+  const cwd = tmpCwdFromTemplate();
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+
+  const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- bad-size', '--size', 'enormous']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /work\.size must be one of/);
   assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'discovery');
 });
 

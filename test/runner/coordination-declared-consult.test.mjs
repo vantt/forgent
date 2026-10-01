@@ -59,11 +59,7 @@ function fakeExecutor(tempDir, { status = 'done', summary = 'Validated.' } = {})
     process.exit(0);
     `,
   );
-  return {
-    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    models: { standard: 'test-model', nano: 'test-model', advanced: 'test-model', flagship: 'test-model', frontier: 'test-model' },
-    timeoutMs: 5000,
-  };
+  return { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model', nano: 'test-model', advanced: 'test-model', flagship: 'test-model', frontier: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
 }
 
 function openSessionWithConfig(coordinationId, tempDir, overrides = {}) {
@@ -346,14 +342,14 @@ test('R3: the full precedence chain composes, and the resolved tier/persona/exec
   openSessionWithConfig('coord_declared_r3_chain', tempDir);
   const runnerConfig = fakeExecutor(tempDir);
 
-  // provide-consult's own declared operation policy sets minTier: standard.
-  // Layer runner (nano, ignored -- lower), then cli (frontier, the
-  // most specific scope) on top of it -- final tier must be "frontier",
+  // provide-consult's own declared operation policy sets standard rigor.
+  // Layer runner (explicit low rigor, ignored -- lower), then cli (frontier,
+  // the most specific scope) on top of it -- final tier must be "frontier",
   // sourced to "cli", not silently defaulted or misattributed to "cliOverride".
   const request = await dispatchRequest('coord_declared_r3_chain', tempDir, runnerConfig);
   const provide = await dispatchProvide('coord_declared_r3_chain', tempDir, runnerConfig, request.assignment.assignmentId, {
-    runnerPolicy: { minTier: 'nano' },
-    cliPolicy: { minTier: 'frontier', preferPersona: 'trusted-reviewer' },
+    runnerPolicy: { rigor: 'low' },
+    cliPolicy: { tier: 'frontier', preferPersona: 'trusted-reviewer' },
   });
 
   const provenance = provide.runResult.policy.provenance;
@@ -366,16 +362,14 @@ test('R3: the full precedence chain composes, and the resolved tier/persona/exec
   assert.equal(provenance.governance.source.scope, 'governance');
 });
 
-test('R3: a declared-operation repeatMode is forwarded through the merged policy stack into the compiled RunResult, same channel as minTier', async () => {
+test('R3: a declared-operation repeatMode is forwarded through the merged policy stack into the compiled RunResult', async () => {
   const tempDir = mkTempDir();
   openSessionWithConfig('coord_declared_r3_repeatmode', tempDir);
   const runnerConfig = fakeExecutor(tempDir);
   const request = await dispatchRequest('coord_declared_r3_repeatmode', tempDir, runnerConfig);
 
-  // provide-consult's own declared operation policy carries no repeatMode --
-  // sourcing it here from the operation scope of the SAME merged policy
-  // stack `minTier` already proves goes through, so this is exercising the
-  // identical `cliOverride` forwarding path, not a different one.
+  // provide-consult's own declared operation policy carries no repeatMode,
+  // so this exercises the caller-policy forwarding path.
   const provide = await dispatchProvide('coord_declared_r3_repeatmode', tempDir, runnerConfig, request.assignment.assignmentId, {
     cliPolicy: { repeatMode: 'pre-delivery' },
   });
@@ -402,7 +396,7 @@ test('R3: role-scope preferPersona wins over an absent runner/definition/operati
   assert.deepEqual(personaProvenance.source, { scope: 'role', id: 'consultant' });
 });
 
-test('R3: minTier is monotonic -- an assignment-scope attempt to LOWER the operation-declared floor is rejected, not silently clamped', async () => {
+test('R3: rigor is monotonic -- an assignment-scope attempt to LOWER the operation-declared floor is rejected, not silently clamped', async () => {
   const tempDir = mkTempDir();
   openSessionWithConfig('coord_declared_r3_monotonic', tempDir);
   const runnerConfig = fakeExecutor(tempDir);
@@ -410,9 +404,9 @@ test('R3: minTier is monotonic -- an assignment-scope attempt to LOWER the opera
 
   await assert.rejects(
     dispatchProvide('coord_declared_r3_monotonic', tempDir, runnerConfig, request.assignment.assignmentId, {
-      assignmentPolicy: { minTier: 'nano' },
+      assignmentPolicy: { rigor: 'low' },
     }),
-    (err) => err instanceof FlowDefinitionError && /minTier is monotonic/.test(err.message),
+    (err) => err instanceof FlowDefinitionError && /rigor is monotonic/.test(err.message),
   );
 
   const runsDir = path.join(tempDir, '.fgos', 'assignments', request.assignment.assignmentId, '..');

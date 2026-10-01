@@ -256,7 +256,7 @@ export function buildPrompt(work, feedback, stage = 'executing') {
   const skillName = skillForStage(domainObj, stage);
   const skillPath = `.claude/skills/${skillName}/SKILL.md`;
 
-  const templateName = selectTemplate({ kind: work.kind, tier: work.tier ?? DEFAULTS.tier, domain: work.domain, stage });
+  const templateName = selectTemplate({ kind: work.kind, domain: work.domain, stage });
   return renderTemplate(templateName, {
     title: work.title,
     kind: work.kind,

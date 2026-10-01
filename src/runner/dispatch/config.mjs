@@ -17,10 +17,9 @@
 // committed (per D2's durability policy) so it is reviewable like any other
 // source file, but that also means it carries the same trust level as code:
 // only apply it from a checkout you already trust.
-
+import { RIGOR_VALUES } from '../rigor.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
-import { TIERS } from '../../state/work.mjs';
 import { mergeConfigDefaults } from '../../setup/config-merge.mjs';
 import { sharedConfigFilePath } from '../../config/shared-config-file.mjs';
 import { mergeWithGlobalConfig } from '../../config/global-config.mjs';
@@ -175,6 +174,13 @@ export function detectAssistantCli(candidateNames = KNOWN_ASSISTANT_CLI_NAMES, p
  */
 export const DEFAULT_COORDINATION_ORG_DISCHARGE_ON = Object.freeze(["accepted"]);
 
+export const DEFAULT_RIGOR_TO_TIER = Object.freeze({
+  low: 'nano',
+  standard: 'standard',
+  high: 'flagship',
+  critical: 'frontier',
+});
+
 export const DEFAULT_RUNNER_CONFIG = {
   coordination: { orgPolicy: { dischargeOn: [...DEFAULT_COORDINATION_ORG_DISCHARGE_ON] } },
   executor: {
@@ -208,6 +214,7 @@ export const DEFAULT_RUNNER_CONFIG = {
       frontier: 'opus',
     },
   },
+  rigorToTier: { ...DEFAULT_RIGOR_TO_TIER },
   timeoutMs: 900000,
   confinement: {
     strict: false,
@@ -230,27 +237,7 @@ export const DEFAULT_RUNNER_CONFIG = {
  */
 export const SUPPORTED_EXECUTOR_TEMPLATES = { claude: DEFAULT_RUNNER_CONFIG.executor };
 
-/**
- * tsk-5tm-5 D9: `models`/`modelPolicies` are mutually-substitutable — either
- * alone satisfies `validateRunnerConfigShape`, and `modelForTier` prefers
- * `modelPolicies` when present. A project's runner section that intends
- * `models` alone (no `modelPolicies` of its own) must not have a
- * `modelPolicies` key silently attached by ANY missing-key-fill merge this
- * module runs — not just the `DEFAULT_RUNNER_CONFIG` merge in
- * `ensureRunnerConfigForDir`, but also the separate `mergeWithGlobalConfig`
- * merge both `loadRunnerConfigFromDir` and `ensureRunnerConfigForDir` run
- * afterward, which can inject `~/.fgos/config.json`'s own `modelPolicies`
- * just as silently. `preRunner` is the project's own runner section as it
- * stood right before the merge being guarded; `mergedRunner` is that merge's
- * result.
- */
-function dropModelPoliciesInjectedOverModels(preRunner, mergedRunner) {
-  if (preRunner && preRunner.models !== undefined && preRunner.modelPolicies === undefined && mergedRunner.modelPolicies !== undefined) {
-    const { modelPolicies, ...rest } = mergedRunner;
-    return rest;
-  }
-  return mergedRunner;
-}
+
 
 /**
  * `mergeWithGlobalConfig`'s `sanitizeGlobal` hook for this module's own
@@ -315,7 +302,7 @@ export function loadRunnerConfigFromDir(dir) {
   }
   rejectProjectProviderAccountInventory(parsed, sharedPath);
   const withGlobal = mergeWithGlobalConfig(parsed, undefined, { sanitizeGlobal: sanitizeGlobalModelPolicies });
-  const runnerCfg = dropModelPoliciesInjectedOverModels(parsed.runner, withGlobal.runner ?? {});
+  const runnerCfg = withGlobal.runner ?? {};
   validateRunnerConfigShape(runnerCfg, `${sharedPath}#runner`);
   normalizeConfigConfinement(runnerCfg);
   return runnerCfg;
@@ -361,19 +348,7 @@ export function ensureRunnerConfigForDir(dir) {
     const parsed = JSON.parse(fs.readFileSync(sharedPath, 'utf8'));
     rejectProjectProviderAccountInventory(parsed, sharedPath);
     const existingRunner = parsed.runner ?? {};
-    // tsk-5tm-5 D9: `models`/`modelPolicies` are mutually-substitutable —
-    // either alone satisfies validateRunnerConfigShape's requirement, and
-    // modelForTier prefers modelPolicies when present. Auto-filling
-    // modelPolicies from DEFAULT_RUNNER_CONFIG onto a config that already
-    // has its own `models` map would silently SHADOW that map (nothing
-    // was actually missing) — skip that one default key in exactly this
-    // case, same "don't touch what's already satisfied" spirit every
-    // other field in this merge already follows.
-    const effectiveDefaults =
-      existingRunner.models !== undefined && existingRunner.modelPolicies === undefined
-        ? Object.fromEntries(Object.entries(DEFAULT_RUNNER_CONFIG).filter(([key]) => key !== 'modelPolicies'))
-        : DEFAULT_RUNNER_CONFIG;
-    const { merged, addedKeys } = mergeConfigDefaults(existingRunner, effectiveDefaults);
+    const { merged, addedKeys } = mergeConfigDefaults(existingRunner, DEFAULT_RUNNER_CONFIG);
     let projectShared = parsed;
     if (addedKeys.length > 0) {
       projectShared = { ...parsed, runner: merged };
@@ -383,7 +358,7 @@ export function ensureRunnerConfigForDir(dir) {
       );
     }
     const withGlobal = mergeWithGlobalConfig(projectShared, undefined, { sanitizeGlobal: sanitizeGlobalModelPolicies });
-    const runnerCfg = dropModelPoliciesInjectedOverModels(projectShared.runner, withGlobal.runner ?? {});
+    const runnerCfg = withGlobal.runner ?? {};
     validateRunnerConfigShape(runnerCfg, `${sharedPath}#runner`);
     normalizeConfigConfinement(runnerCfg);
     return runnerCfg;
@@ -502,27 +477,9 @@ export const CLAUDE_CLI_COMMANDS = Object.freeze(['claude']);
  * `cfg.modelPolicies.<providerModel>` tier vocabulary (tsk-5tm-5 D9,
  * model-tier vocabulary migration 2026-09-17) — deliberately its OWN
  * 6-value cross-provider equivalence vocab (`plans/260916-account-rotator/
- * design.md`'s "Tier vocabulary"), distinct from `work.mjs`'s `TIERS`
- * (`light/standard/heavy`, D9's own pinned scope boundary: that export
- * stays untouched, shared with `work.risk`). `DEFAULT_TIER_TO_POLICY` is
- * the default mapping from a work item's own tier onto one of these six,
- * used whenever a executor names no `rigorOverrides` entry for that tier —
- * `light` maps to `nano` (the floor tier), `standard` maps onto its
- * same-named policy tier directly; `heavy` maps to `frontier`, the
- * highest-rigor policy tier, matching `heavy`'s own framing elsewhere
- * (`HEAVY_RISK`) as the most scrutiny-demanding classification.
- * `mini`/`advanced`/`flagship` have no default work-tier mapped onto them
- * yet — they exist for a executor's own `rigorOverrides` to select
- * explicitly (e.g. a executor whose work is better served by a
- * flagship-leaning model even at `standard` rigor), not because this item
- * invents a use for them.
+ * design.md`'s "Tier vocabulary").
  */
 export const MODEL_POLICY_TIERS = Object.freeze(['nano', 'mini', 'standard', 'advanced', 'flagship', 'frontier']);
-// Exported (additive, D7 module split): `dispatch/resolve.mjs`'s
-// `modelForTier` needs this default map too, now that it lives in a sibling
-// module — was a bare same-file `const` before the split (byte-identical
-// value/behavior, only newly reachable from outside this file).
-export const DEFAULT_TIER_TO_POLICY = Object.freeze({ light: 'nano', standard: 'standard', heavy: 'frontier' });
 
 /**
  * `executors.<id>.invocations[].via` vocabulary (tsk-5tm-4 D11, widened
@@ -1082,20 +1039,16 @@ function validateExecutorEntryShape(executor, label, capabilityNames) {
     }
   }
   // tsk-5tm-5 D9: `providerModel` names which `cfg.modelPolicies` table
-  // this executor's tier resolution reads from (absent defaults to
-  // "claude", `modelForTier`'s own default) — the field `agy` needs so
-  // its tier resolution reads the "gemini" table instead of silently
-  // borrowing Claude's model names.
+  // this executor's tier resolution reads from (absent defaults to "claude").
   if (executor.providerModel !== undefined && (typeof executor.providerModel !== 'string' || !executor.providerModel.trim())) {
     throw new RunnerConfigError(`runner config (${label}) "providerModel" must be a non-empty string when present.`);
   }
-  // `rigorOverrides` (D9): per-work-tier override of the DEFAULT_TIER_TO_
-  // POLICY mapping, for a executor with a real reason to deviate (e.g.
-  // prefers "creative" over the default "standard" policy tier even at
-  // work-tier "standard"). Optional and additive — a executor naming none
-  // resolves through the default mapping unchanged.
-  if (executor.rigorOverrides !== undefined) {
-    validateRigorOverridesShape(executor.rigorOverrides, `${label} "rigorOverrides"`);
+  const RETIRED_RIGOR_OVERRIDES = ['rigor', 'Overrides'].join('');
+  if (executor[RETIRED_RIGOR_OVERRIDES] !== undefined) {
+    const provider = executor.providerModel || 'provider';
+    throw new RunnerConfigError(
+      `${label}.${RETIRED_RIGOR_OVERRIDES} was removed; express per-tier models in runner.modelPolicies.${provider}.`,
+    );
   }
   // Phase C (executor-profile-schema-migration): `identity`/`supports` are
   // the ExecutorProfile target vocabulary (design.md §3.7, previously
@@ -1244,30 +1197,7 @@ function validatePlacementPolicyShape(placementPolicy, label) {
     }
   }
 }
-
-// Extracted (D2, docs/history/capability-capacity-remodel/CONTEXT.md) so
-// `capabilities.<name>.overrides.rigorOverrides` (validateCapabilitiesShape
-// below) validates against the exact same rule a executor's own
-// `rigorOverrides` already does, never a second, drifting copy of it.
-function validateRigorOverridesShape(rigorOverrides, label) {
-  if (!rigorOverrides || typeof rigorOverrides !== 'object' || Array.isArray(rigorOverrides)) {
-    throw new RunnerConfigError(`runner config (${label}) must be an object mapping a work tier to a policy tier when present.`);
-  }
-  for (const [workTier, policyTier] of Object.entries(rigorOverrides)) {
-    if (!TIERS.includes(workTier)) {
-      throw new RunnerConfigError(`runner config (${label}) key must be one of ${TIERS.join('/')}, got: ${JSON.stringify(workTier)}.`);
-    }
-    if (!MODEL_POLICY_TIERS.includes(policyTier)) {
-      throw new RunnerConfigError(
-        `runner config (${label}.${workTier}) must be one of ${MODEL_POLICY_TIERS.join('/')}, got: ${JSON.stringify(policyTier)}.`,
-      );
-    }
-  }
-}
-
 /**
- * Shape-check `cfg.capabilities` (D4/D14, tsk-in1-3): the curated catalog
- * of capability names both layers now share — free-text `capability` on a
  * tool-registry entry (`toolsFromExecutors`, `src/state/tool-registry.mjs`)
  * and `executors.<id>.for` (a executor's declared purpose, D15 — its own
  * validation against this catalog is a later task's scope, not this one's).
@@ -1281,12 +1211,6 @@ function validateRigorOverridesShape(rigorOverrides, label) {
  * spelling/casing variance of the SAME name, not a genuinely different
  * alias name).
  */
-// Only 4 fields are ever eligible for capabilities.<name>.overrides (D2,
-// docs/history/capability-capacity-remodel/CONTEXT.md): a capability can
-// retune HOW strongly its resolved executor works, never WHAT command
-// actually runs -- command/args/adapter/invocations stay owned by the
-// executor alone, never override-able from a capability.
-const CAPABILITY_OVERRIDE_FIELDS = Object.freeze(['rigorOverrides', 'providerModel', 'tier', 'model']);
 
 // `serves` (I19, core/skills/_shared/capability-matching.md's Q1 steering
 // step): a capability entry's own machine-readable demand promise, checked
@@ -1347,31 +1271,21 @@ function validateCapabilitiesShape(capabilities, label) {
       normalizePreferCandidates(entry.prefer, `${entryLabel} "prefer"`);
     }
     if (entry.overrides !== undefined) {
-      if (!entry.overrides || typeof entry.overrides !== 'object' || Array.isArray(entry.overrides)) {
-        throw new RunnerConfigError(`runner config (${entryLabel}) "overrides" must be an object when present.`);
-      }
-      for (const key of Object.keys(entry.overrides)) {
-        if (!CAPABILITY_OVERRIDE_FIELDS.includes(key)) {
-          throw new RunnerConfigError(`runner config (${entryLabel}) "overrides" key "${key}" is not one of ${CAPABILITY_OVERRIDE_FIELDS.join('/')} — command/args/adapter/invocations are never override-able from a capability (D2).`);
-        }
-      }
-      if (entry.overrides.providerModel !== undefined && (typeof entry.overrides.providerModel !== 'string' || !entry.overrides.providerModel.trim())) {
-        throw new RunnerConfigError(`runner config (${entryLabel}) "overrides.providerModel" must be a non-empty string when present.`);
-      }
-      if (entry.overrides.tier !== undefined && (typeof entry.overrides.tier !== 'string' || !entry.overrides.tier.trim())) {
-        throw new RunnerConfigError(`runner config (${entryLabel}) "overrides.tier" must be a non-empty string when present.`);
-      }
-      if (entry.overrides.model !== undefined && (typeof entry.overrides.model !== 'string' || !entry.overrides.model.trim())) {
-        throw new RunnerConfigError(`runner config (${entryLabel}) "overrides.model" must be a non-empty string when present.`);
-      }
-      if (entry.overrides.rigorOverrides !== undefined) {
-        validateRigorOverridesShape(entry.overrides.rigorOverrides, `${entryLabel}.overrides.rigorOverrides`);
+      throw new RunnerConfigError(
+        `capabilities.${name}.overrides was removed; use "capabilities.${name}.rigor" for floor rigor or configure executors directly.`,
+      );
+    }
+    if (entry.rigor !== undefined) {
+      if (!RIGOR_VALUES.includes(entry.rigor)) {
+        throw new RunnerConfigError(
+          `runner config (${entryLabel}) "rigor" must be one of ${RIGOR_VALUES.join('/')}, got: ${JSON.stringify(entry.rigor)}.`,
+        );
       }
     }
     if (entry.serves !== undefined) {
       validateCapabilityServesShape(entry.serves, `${entryLabel}.serves`);
     }
-    const ALLOWED_CAPABILITY_ENTRY_KEYS = ['description', 'aliases', 'prefer', 'overrides', 'confinement', 'serves'];
+    const ALLOWED_CAPABILITY_ENTRY_KEYS = ['description', 'aliases', 'prefer', 'rigor', 'confinement', 'serves'];
     for (const key of Object.keys(entry)) {
       if (!ALLOWED_CAPABILITY_ENTRY_KEYS.includes(key)) {
         if (key === 'unconfined') {
@@ -1396,8 +1310,7 @@ function validateCapabilitiesShape(capabilities, label) {
  * each tier map's keys drawn from `MODEL_POLICY_TIERS` and values
  * non-empty model-name strings. Partial coverage (a provider naming fewer
  * than all 6 tiers) is valid at load time, same lenient-at-load/strict-
- * at-resolve philosophy the old flat `models` map already used (per
- * `modelForTier`'s own doc comment) — a missing tier only throws once
+ * at-resolve philosophy (per `resolveTierModel`'s own doc comment) — a missing tier only throws once
  * something actually asks for it.
  */
 function validateModelPoliciesShape(modelPolicies, label) {
@@ -1421,13 +1334,43 @@ function validateModelPoliciesShape(modelPolicies, label) {
   }
 }
 
+function validateRigorToTierShape(rigorToTier, label) {
+  const missingRigors = RIGOR_VALUES.filter((rigor) => rigorToTier[rigor] === undefined);
+  if (missingRigors.length > 0) {
+    throw new RunnerConfigError(
+      `runner config (${label}) must map every rigor (${RIGOR_VALUES.join('/')}); missing: ${missingRigors.join(', ')}.`,
+    );
+  }
+  for (const [rigor, tier] of Object.entries(rigorToTier)) {
+    if (!RIGOR_VALUES.includes(rigor)) {
+      throw new RunnerConfigError(
+        `runner config (${label}) has unknown rigor "${rigor}". Valid rigors: ${RIGOR_VALUES.join('/')}.`,
+      );
+    }
+    if (!MODEL_POLICY_TIERS.includes(tier)) {
+      throw new RunnerConfigError(
+        `runner config (${label}.${rigor}) must map to one of ${MODEL_POLICY_TIERS.join('/')}, got: ${JSON.stringify(tier)}.`,
+      );
+    }
+  }
+  for (let i = 1; i < RIGOR_VALUES.length; i += 1) {
+    const weakerRigor = RIGOR_VALUES[i - 1];
+    const strongerRigor = RIGOR_VALUES[i];
+    if (MODEL_POLICY_TIERS.indexOf(rigorToTier[strongerRigor]) < MODEL_POLICY_TIERS.indexOf(rigorToTier[weakerRigor])) {
+      throw new RunnerConfigError(
+        `runner config (${label}) lowers tier from rigor "${weakerRigor}" (${rigorToTier[weakerRigor]}) to "${strongerRigor}" (${rigorToTier[strongerRigor]}); rigorToTier must be monotonic.`,
+      );
+    }
+  }
+}
+
 /**
  * Pure query (Phase 00 R8): does `cfg.modelPolicies.<providerModel>` declare
  * `policyTier`? No I/O, no credential probing, no "is the executable on
  * PATH" check — a provider table naming fewer than all 5
  * `MODEL_POLICY_TIERS` (valid per `validateModelPoliciesShape` above) simply
  * answers `false` for the tiers it omits. Read by `resolve.mjs`'s
- * `resolvePolicyTierModel` and available to a future Cohort-Planner-facing
+ * `resolveTierModel` and available to a future Cohort-Planner-facing
  * caller that needs to exclude an executor for an activity's tier floor
  * without triggering the resolver's own throw.
  */
@@ -1521,18 +1464,23 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
       }
     }
   }
-  // tsk-5tm-5 D9: `modelPolicies` (provider-keyed, 6-tier) is the new
-  // preferred shape -- when present, it satisfies this requirement on its
-  // own; the legacy flat `models` map is only required when a project
-  // hasn't migrated. Both may coexist (modelForTier prefers modelPolicies
-  // when present); neither being present is the one invalid state.
-  if (cfg.modelPolicies !== undefined) {
-    validateModelPoliciesShape(cfg.modelPolicies, `${sourceLabel} modelPolicies`);
-  } else if (!cfg.models || typeof cfg.models !== 'object' || Array.isArray(cfg.models)) {
+  if ('models' in cfg) {
     throw new RunnerConfigError(
-      `runner config (${sourceLabel}) must declare a "models" object mapping tier -> model, or a "modelPolicies" object mapping provider -> tier -> model (tsk-5tm-5 D9).`,
+      `runner config (${sourceLabel}) declares retired "models" map; use "modelPolicies.<provider>.<tier>" instead.`,
     );
   }
+  if (!cfg.modelPolicies || typeof cfg.modelPolicies !== 'object' || Array.isArray(cfg.modelPolicies)) {
+    throw new RunnerConfigError(
+      `runner config (${sourceLabel}) must declare a "modelPolicies" object mapping provider -> tier -> model.`,
+    );
+  }
+  validateModelPoliciesShape(cfg.modelPolicies, `${sourceLabel} modelPolicies`);
+  if (!cfg.rigorToTier || typeof cfg.rigorToTier !== 'object' || Array.isArray(cfg.rigorToTier)) {
+    throw new RunnerConfigError(
+      `runner config (${sourceLabel}) must declare a "rigorToTier" object mapping rigor -> tier.`,
+    );
+  }
+  validateRigorToTierShape(cfg.rigorToTier, `${sourceLabel} rigorToTier`);
   validateProviderAccountInventory(cfg, sourceLabel);
   if (typeof cfg.timeoutMs !== 'number' || !Number.isFinite(cfg.timeoutMs) || cfg.timeoutMs <= 0) {
     throw new RunnerConfigError(`runner config (${sourceLabel}) must declare a positive numeric "timeoutMs".`);

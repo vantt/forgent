@@ -1,5 +1,5 @@
 // dispatch/resolve.mjs — unit -> executor -> model/tier/command resolution
-// (D7, tsk-2uf-1): `modelForTier`, the purpose/executorId resolution chain
+// (D7, tsk-2uf-1): `resolveTierModel`, the purpose/executorId resolution chain
 // (`resolveExecutorIdForPurpose`/`resolveExecutorAndOverrides`), and
 // `resolveExecutorConfig` (the executor-block resolve + cross-provider
 // governance gate `dispatch/transport.mjs`'s `resolveExecutorCommand`
@@ -9,7 +9,7 @@
 // barrel. See `docs/history/dispatch-activation-and-handoff-redesign/
 // CONTEXT.md` D7 for the split rationale.
 
-import { RunnerConfigError, EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, DEFAULT_TIER_TO_POLICY, MODEL_POLICY_TIERS, supportsPolicyTier, normalizePreferCandidates } from './config.mjs';
+import { RunnerConfigError, EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, MODEL_POLICY_TIERS, supportsPolicyTier, normalizePreferCandidates } from './config.mjs';
 export {
   executorIdForWork,
   resolveCapabilityIdentityDetails,
@@ -17,79 +17,26 @@ export {
 } from '../work-compat.mjs';
 
 /**
- * Resolve `tier` (per D6; falls back to `work.mjs`'s declared default when a
- * work item omits `tier`, per D7b) to a model name. An unknown tier — one
- * work.mjs's `TIERS` allows but the resolved table does not cover, or any
- * other string — is a validation error: dispatch time is where that drift
- * would first bite (per D6's own original reasoning, unchanged by D9).
- *
- * tsk-5tm-5 D9: `cfg.modelPolicies` (provider-keyed, 5-tier) is preferred
- * when present — `providerModel` (default `"claude"`, every pre-D9 call
- * site) selects which provider's table to read, and `tier` maps onto one
- * of `MODEL_POLICY_TIERS` via `DEFAULT_TIER_TO_POLICY`, unless
- * `rigorOverrides` (a executor's own override map, threaded in by the
- * caller) names a different policy tier for this specific work tier.
- * Falls back to the legacy flat `cfg.models[tier]` lookup, byte-identical
- * to every pre-D9 caller, when `cfg.modelPolicies` is absent — this
- * signature's first two positional params are UNCHANGED (D9's own
- * constraint): `loop.mjs`'s `modelForTier(config, tier)` call site keeps
- * working exactly as before, options object omitted entirely.
+ * Resolve a tier to a model name using cfg.modelPolicies[provider][tier].
+ * Valid tiers: nano | mini | standard | advanced | flagship | frontier.
  */
-export function modelForTier(cfg, tier, { providerModel = 'claude', rigorOverrides } = {}) {
+export function resolveTierModel(cfg, tier, provider = 'claude') {
+  if (!MODEL_POLICY_TIERS.includes(tier)) {
+    throw new RunnerConfigError(`unrecognized tier "${tier}". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);
+  }
   const policies = cfg && cfg.modelPolicies;
-  if (policies) {
-    const providerPolicy = policies[providerModel];
-    if (!providerPolicy || typeof providerPolicy !== 'object') {
-      throw new RunnerConfigError(`no modelPolicies configured for provider "${providerModel}".`);
-    }
-    const policyTier = (rigorOverrides && rigorOverrides[tier]) || DEFAULT_TIER_TO_POLICY[tier];
-    if (!policyTier || typeof providerPolicy[policyTier] !== 'string') {
-      throw new RunnerConfigError(`no model configured for tier "${tier}" (policy tier "${policyTier}") under provider "${providerModel}".`);
-    }
-    return providerPolicy[policyTier];
+  if (!policies || typeof policies !== 'object') {
+    throw new RunnerConfigError(`no modelPolicies configured.`);
   }
-  const models = cfg && cfg.models;
-  if (!models || typeof tier !== 'string' || !(tier in models)) {
-    throw new RunnerConfigError(`no model configured for tier "${tier}".`);
+  const providerPolicy = policies[provider];
+  if (!providerPolicy || typeof providerPolicy !== 'object') {
+    throw new RunnerConfigError(`no modelPolicies configured for provider "${provider}".`);
   }
-  return models[tier];
-}
-
-/**
- * Resolve a POLICY tier (`lightweight|standard|creative|analytical|critical`)
- * DIRECTLY against `cfg.modelPolicies.<providerModel>` — no
- * `DEFAULT_TIER_TO_POLICY` indirection (that map is `modelForTier`'s own
- * WORK-tier (`light|standard|heavy`) bridge, untouched by this function).
- * This is the resolver `resolveAssignmentDispatchPolicy` calls: its
- * `effectiveTier` is always already one of `MODEL_POLICY_TIERS` (Phase 00
- * R5, fixes B1 — `assignment-policy.mjs` used to call `modelForTier` with a
- * policy tier as its `tier` arg, which only matches `DEFAULT_TIER_TO_POLICY`
- * by coincidence at `"standard"`; every other policy tier threw, and the
- * caller silently swallowed it).
- *
- * Mirrors `modelForTier`'s own two-table fallback (`cfg.modelPolicies`
- * preferred, else the legacy flat `cfg.models` map — the two are
- * mutually-substitutable per this module's own D9 precedent) but reads
- * `policyTier` directly against whichever table is present, never through a
- * work-tier alias. Fails closed with a named `RunnerConfigError` (provider +
- * tier) when neither table declares the requested tier — never swallowed by
- * a caller.
- */
-export function resolvePolicyTierModel(cfg, policyTier, providerModel = 'claude') {
-  if (!MODEL_POLICY_TIERS.includes(policyTier)) {
-    throw new RunnerConfigError(`unrecognized policy tier "${policyTier}". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);
+  const model = providerPolicy[tier];
+  if (typeof model !== 'string' || !model.trim()) {
+    throw new RunnerConfigError(`no model configured for tier "${tier}" under provider "${provider}".`);
   }
-  if (cfg && cfg.modelPolicies) {
-    if (!supportsPolicyTier(cfg, providerModel, policyTier)) {
-      throw new RunnerConfigError(`no model configured for policy tier "${policyTier}" under provider "${providerModel}".`);
-    }
-    return cfg.modelPolicies[providerModel][policyTier];
-  }
-  const models = cfg && cfg.models;
-  if (!models || typeof models[policyTier] !== 'string') {
-    throw new RunnerConfigError(`no model configured for policy tier "${policyTier}" (no modelPolicies table and no legacy models["${policyTier}"] entry).`);
-  }
-  return models[policyTier];
+  return model;
 }
 
 /**
@@ -234,24 +181,6 @@ export function resolveExecutorIdForPurpose(cfg, purpose) {
  * found — `{executorId: null, configured: false}`, a legitimate,
  * expected state, never thrown.
  *
- * `overrides` (D2, only when resolved via step 2) is returned, never
- * applied here — each call site decides what it means for ITS OWN
- * resolution, and only 4 fields are ever eligible
- * (`rigorOverrides`/`providerModel`/`tier`/`model` — never `command`/
- * `args`/`adapter`/`invocations`, D2: a capability can retune HOW
- * strongly its executor works, never WHAT command actually runs).
- * `rigorOverrides`/`providerModel` matter to every model-computing call
- * site (`spawnWorker` and `executeExecutorCli` both). `tier`/`model`
- * (a raw, direct override — no `modelForTier` computation at all) only
- * ever mattered for `executeExecutorCli`'s own ad hoc dispatch, the
- * exact same pre-existing scope a plain `executor.tier`/`executor.model`
- * already had before this item — `spawnWorker` resolves `tier` from the
- * WORK ITEM's own classification (`work.tier`, a scope/effort judgment
- * made once at Discovery, not a per-executor opt-out) and never accepted
- * a raw literal model override at all; a capability's `overrides.tier`/
- * `.model` were never meant to reach that door, and self-review found
- * (and left) that scope boundary undisturbed rather than wiring
- * `work.tier` open to being silently overridden by dispatch config.
  */
 export function resolveExecutorAndOverrides(cfg, executorIdOrPurpose) {
   const executors = cfg && cfg.executors && typeof cfg.executors === 'object' ? cfg.executors : {};
@@ -261,7 +190,7 @@ export function resolveExecutorAndOverrides(cfg, executorIdOrPurpose) {
     // returned executorId, surfaced on DispatchPlan.bindingSource by
     // plan.mjs. Pre-existing callers that destructure only
     // {executorId, executor, overrides, configured} are unaffected.
-    return { executorId: executorIdOrPurpose, executor: executors[executorIdOrPurpose], overrides: undefined, configured: true, bindingSource: 'executor-id' };
+    return { executorId: executorIdOrPurpose, executor: executors[executorIdOrPurpose], configured: true, bindingSource: 'executor-id' };
   }
   const capabilityEntry = cfg && cfg.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities[executorIdOrPurpose] : undefined;
   const preferred = capabilityEntry?.prefer;
@@ -285,24 +214,17 @@ export function resolveExecutorAndOverrides(cfg, executorIdOrPurpose) {
     return {
       executorId: primary.executor,
       executor,
-      overrides: capabilityEntry.overrides,
       configured: true,
       bindingSource: 'capability.prefer',
-      // `invocationId`: consumed by resolveExecutorConfig's Gate B2 (Step
-      // 2.1) when set — `undefined` for every legacy bare-string
-      // candidate, so Gate B2's own "first via:cli" default is unchanged.
       invocationId: primary.invocation,
-      // `candidates`: the FULL ordered pool, for a cascade-aware caller
-      // (e.g. a future fallback consumer) — `resolveExecutorConfig` itself
-      // never reads this; it only ever acts on the primary candidate above.
       candidates,
     };
   }
   const found = resolveExecutorIdForPurpose(cfg, executorIdOrPurpose);
   if (found) {
-    return { executorId: found, executor: executors[found], overrides: undefined, configured: true, bindingSource: 'capability.for' };
+    return { executorId: found, executor: executors[found], configured: true, bindingSource: 'capability.for' };
   }
-  return { executorId: null, executor: undefined, overrides: undefined, configured: false, bindingSource: null };
+  return { executorId: null, executor: undefined, configured: false, bindingSource: null };
 }
 
 // Exported (additive, D7 module split): `dispatch/transport.mjs`'s

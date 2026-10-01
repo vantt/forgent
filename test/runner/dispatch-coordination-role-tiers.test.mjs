@@ -1,5 +1,5 @@
 // Phase 03 (Step 09 P03.1) R8: a REAL dispatch proof (not a config read)
-// that standalone-master-coordination-loop.yaml's own `policy.minTier` per
+// that standalone-master-coordination-loop.yaml's own `policy.rigor` per
 // role operation actually changes what `dispatchDeclaredOperation`
 // resolves at dispatch time -- exercised through the real, shipped fixture
 // (loaded via `loadCoordinationProtocol`, never a hand-typed copy) and the
@@ -70,6 +70,7 @@ function fakeExecutor(tempDir, { status = 'done', summary = 'Validated.' } = {})
         frontier: 'test-model-frontier',
       },
     },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: 5000,
   };
 }
@@ -166,6 +167,7 @@ function fakeCrossProviderRedirectConfig(tempDir) {
           frontier: 'gpt-test-frontier',
         },
       },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 5000,
     },
   };
@@ -214,20 +216,21 @@ async function dispatchFirstPass(coordinationId, tempDir, runnerConfig, operatio
   );
 }
 
-// ─── R2-R6: role-tier separation actually resolves through real dispatch ──
+// ─── R2-R6: role-tier separation actually resolves through real dispatch ─
 
-test('R8: produce-candidate (Doer) resolves the fixture-declared "standard" minTier through a real dispatch, not "flagship"/"frontier"', async () => {
+test('R8: produce-candidate (Doer) resolves the fixture-declared standard rigor through a real dispatch, not flagship/frontier', async () => {
   const tempDir = mkTempDir();
   openSessionWithConfig('coord_role_tiers_doer', tempDir);
   const runnerConfig = fakeExecutor(tempDir);
 
   const { runResult } = await dispatchProduce('coord_role_tiers_doer', tempDir, runnerConfig);
 
+  assert.equal(runResult.policy.rigor, 'standard');
   assert.equal(runResult.policy.tier, 'standard');
   assert.equal(runResult.policy.model, 'test-model-standard');
 });
 
-test('R8: review-candidate and red-team-candidate (Reviewer/Red-Team) resolve the fixture-declared "flagship" minTier through a real dispatch', async () => {
+test('R8: review-candidate and red-team-candidate (Reviewer/Red-Team) resolve the fixture-declared high rigor through a real dispatch', async () => {
   const tempDir = mkTempDir();
   openSessionWithConfig('coord_role_tiers_first_pass', tempDir);
   const runnerConfig = fakeExecutor(tempDir);
@@ -236,8 +239,10 @@ test('R8: review-candidate and red-team-candidate (Reviewer/Red-Team) resolve th
   const review = await dispatchFirstPass('coord_role_tiers_first_pass', tempDir, runnerConfig, 'review-candidate', produce.assignment.assignmentId);
   const redTeam = await dispatchFirstPass('coord_role_tiers_first_pass', tempDir, runnerConfig, 'red-team-candidate', produce.assignment.assignmentId);
 
+  assert.equal(review.runResult.policy.rigor, 'high');
   assert.equal(review.runResult.policy.tier, 'flagship');
   assert.equal(review.runResult.policy.model, 'test-model-flagship');
+  assert.equal(redTeam.runResult.policy.rigor, 'high');
   assert.equal(redTeam.runResult.policy.tier, 'flagship');
   assert.equal(redTeam.runResult.policy.model, 'test-model-flagship');
 
@@ -280,7 +285,7 @@ test('read-only red-team-candidate pinned to claude can redirect to codex-bwrap 
   assert.ok(!codexArgs.includes('opus'), 'Claude model literals must not leak into the redirected red-team executor');
 });
 
-test('R8: Red-Team escalation to "frontier" for a named high-risk round resolves via a caller-supplied assignment-scope PolicyPatch, raising above the fixture\'s own "flagship" floor', async () => {
+test('R8: Red-Team escalation to explicit tier frontier for a named high-risk round resolves above the fixture-derived flagship tier', async () => {
   const tempDir = mkTempDir();
   openSessionWithConfig('coord_role_tiers_escalation', tempDir);
   const runnerConfig = fakeExecutor(tempDir);
@@ -295,10 +300,11 @@ test('R8: Red-Team escalation to "frontier" for a named high-risk round resolves
     // The coordinator's own per-round judgment call (R4/R6): this round
     // touches a named high-risk category (e.g. a concurrency/dispatch-
     // resolution invariant), so it escalates THIS dispatch only -- the
-    // fixture itself stays at "flagship" for every other round.
-    { assignmentPolicy: { minTier: 'frontier' } },
+    // fixture itself stays at high rigor for every other round.
+    { assignmentPolicy: { tier: 'frontier' } },
   );
 
+  assert.equal(redTeam.runResult.policy.rigor, 'high');
   assert.equal(redTeam.runResult.policy.tier, 'frontier');
   assert.equal(redTeam.runResult.policy.model, 'test-model-frontier');
 });
@@ -317,9 +323,9 @@ test('R8: a missing frontier-tier provider fails closed (RunnerConfigError) rath
       runnerConfig,
       'red-team-candidate',
       produce.assignment.assignmentId,
-      { assignmentPolicy: { minTier: 'frontier' } },
+      { assignmentPolicy: { tier: 'frontier' } },
     ),
-    (err) => err instanceof RunnerConfigError && /no model configured for policy tier "frontier"/.test(err.message),
+    (err) => err instanceof RunnerConfigError && /no model configured for tier "frontier"/.test(err.message),
   );
 
   // Fail-closed, not silently downgraded: no result.json exists for the
@@ -373,6 +379,7 @@ test('R8/Phase 2: a request-level actors[].fallbackExecutors override reaches re
       'codex-bwrap': { command: process.execPath, args: [codex.scriptPath, '{prompt}', '--model', '{model}'], providerModel: 'openai-codex', allowCrossProvider: true },
     },
     modelPolicies: { claude: { standard: 'sonnet' }, 'openai-codex': { standard: 'gpt-test-standard' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: 5000,
   };
   const captures = { codex };

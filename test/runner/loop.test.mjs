@@ -248,10 +248,22 @@ if (priorRuns === 0) {
   return scriptPath;
 }
 
+const DUMMY_CONFIG = {
+  executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
+  modelPolicies: {
+    claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' },
+    node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' },
+  },
+  timeoutMs: 30000,
+};
+
 function configFor(scriptPath) {
   return {
     executor: { allowCrossProvider: true, command: process.execPath, args: [scriptPath, '{prompt}', '--model', '{model}'] },
-    models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+    modelPolicies: {
+      node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' },
+      claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' },
+    },
     timeoutMs: 30000,
   };
 }
@@ -353,7 +365,7 @@ test('runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> 
   );
   // predicted is written right at claim time, before dispatch ever runs
   const predictedEvent = events.find((e) => e.type === 'work.outcome' && e.payload.predicted);
-  assert.deepEqual(predictedEvent.payload.predicted, { tier: 'standard', deps: 0, priorVisits: 0 });
+  assert.deepEqual(predictedEvent.payload.predicted, { size: 'standard', deps: 0, priorVisits: 0 });
   // actual is written on the pass terminal, sourced from the runner's own
   // goal-check/branchFacts — never the worker's status/signal
   const actualEvent = events.find((e) => e.type === 'work.outcome' && e.payload.actual);
@@ -437,7 +449,7 @@ test('runOnce\'s executor.dispatch audit event records the REAL spawned command 
         provider: 'claude',
       },
     },
-    models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+    modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' }, node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
     timeoutMs: 30000,
   };
 
@@ -1061,11 +1073,7 @@ test('verify passes but the worker never committed -> classified verify-miss, pa
 test('worker-spawn-fail: nonexistent executor -> retry per matrix, then park to blocked', async () => {
   const { repoRoot, dir, worktreeDir } = setup();
   seedItem(dir, { id: 'item-nospawn' });
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1277,11 +1285,7 @@ test('startup reap: a crashed run\'s doing item with a committed, verify-passing
   execFileSync('git', ['commit', '-q', '-m', 'worker: output.txt'], { cwd: wt.path });
   removeWorktree(repoRoot, wt.path);
   // an executor that would blow up if the runner wrongly re-dispatched
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1303,11 +1307,7 @@ test('startup reap reclaims an orphaned checkout left behind by a genuine crash 
   fs.writeFileSync(path.join(wt.path, 'output.txt'), 'done before crash\n');
   execFileSync('git', ['add', 'output.txt'], { cwd: wt.path });
   execFileSync('git', ['commit', '-q', '-m', 'worker: output.txt'], { cwd: wt.path });
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1322,11 +1322,7 @@ test('startup reap: a doing item with nothing on its branch is reclaimed to bloc
   const { repoRoot, dir, worktreeDir } = setup();
   seedItem(dir, { id: 'item-vanished' });
   acquireClaim(dir, { id: 'item-vanished', actor: 'runner', preClaimStatus: 'todo' });
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1345,11 +1341,7 @@ test('startup reap SKIPS a doing item claimed by a human (claimRole) — never r
   const { repoRoot, dir, worktreeDir } = setup();
   const item = seedItem(dir, { id: 'item-human-held' });
   acquireClaim(dir, { id: item.id, actor: 'human', preClaimStatus: 'todo', claimRole: 'human', headAtTake: 'deadbeef' });
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1364,11 +1356,7 @@ test('startup reap SKIPS a doing item claimed by a session, but still reaps a pl
   acquireClaim(dir, { id: held.id, actor: 'session', preClaimStatus: 'todo', claimRole: 'session', headAtTake: 'cafebabe' });
   const vanished = seedItem(dir, { id: 'item-runner-vanished' });
   acquireClaim(dir, { id: vanished.id, actor: 'runner', preClaimStatus: 'todo', claimRole: 'runner' });
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1390,11 +1378,7 @@ test('startup reap: empty fgw/ orphan branches are pruned, branches carrying com
   execFileSync('git', ['add', 'proposal.txt'], { cwd: keeper.path });
   execFileSync('git', ['commit', '-q', '-m', 'worker: proposal.txt'], { cwd: keeper.path });
   removeWorktree(repoRoot, keeper.path);
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1417,11 +1401,7 @@ test('startup reap: a zero-ahead root branch with an open (non-done/wontfix) lea
   seedItem(dir, { id: 'root-a', status: 'cleanup' });
   seedItem(dir, { id: 'leaf-b', parent: 'root-a', status: 'cleanup' });
 
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1437,11 +1417,7 @@ test('startup reap: a zero-ahead root branch whose only descendant is already do
   seedItem(dir, { id: 'root-c', status: 'cleanup' });
   seedItem(dir, { id: 'leaf-d', parent: 'root-c', status: 'done' });
 
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1458,11 +1434,7 @@ test('startup reap: a wontfix branch with real commits ahead and no open descend
   removeWorktree(repoRoot, wt.path);
   seedItem(dir, { id: 'wontfix-a', status: 'wontfix' });
 
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1480,11 +1452,7 @@ test('startup reap: a wontfix branch with an open descendant is kept, not pruned
   seedItem(dir, { id: 'wontfix-root', status: 'wontfix' });
   seedItem(dir, { id: 'child-open', parent: 'wontfix-root', status: 'doing' });
 
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1568,7 +1536,7 @@ test('bin/fgos-runner.mjs run from a SUBDIRECTORY of another repo operates on th
     JSON.stringify({
       runner: {
         executor: { command: process.execPath, args: [scriptPath, '{prompt}', '--model', '{model}'] },
-        models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+        modelPolicies: { node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' }, claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
         timeoutMs: 30000,
       },
     }),
@@ -1886,7 +1854,7 @@ test('wgi-8: even a TIMED-OUT worker (output on the err.stdout path) has its fgo
   const scriptPath = writeHangingDiscoveringExecutor(scriptDir, body);
   const config = {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
-    models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+    modelPolicies: { node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' }, claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
     timeoutMs: 400,
   };
 
@@ -2158,8 +2126,8 @@ test('tsk-2yo: parseVerdictBlock parses optional tier/kind/risk additively, with
     verify: 'npm test',
   });
   assert.deepEqual(
-    parseVerdictBlock('```fgos-verdict\n{"clear": true, "verify": "npm test", "tier": "heavy", "kind": "bug", "risk": "heavy"}\n```'),
-    { clear: true, verify: 'npm test', tier: 'heavy', kind: 'bug', risk: 'heavy' },
+    parseVerdictBlock('```fgos-verdict\n{"clear": true, "verify": "npm test", "size": "heavy", "rigor": "high", "kind": "bug", "risk": "heavy"}\n```'),
+    { clear: true, verify: 'npm test', size: 'heavy', rigor: 'high', kind: 'bug', risk: 'heavy' },
   );
   // Partial classification (only one of the three fields) — each key is
   // independent, never all-or-nothing.
@@ -2170,29 +2138,30 @@ test('tsk-2yo: parseVerdictBlock parses optional tier/kind/risk additively, with
   });
   // A non-string classification value is dropped the same way a non-string
   // `verify` already is -- fail-safe, never a thrown error.
-  assert.deepEqual(parseVerdictBlock('```fgos-verdict\n{"clear": true, "verify": "npm test", "tier": 5}\n```'), {
+  assert.deepEqual(parseVerdictBlock('```fgos-verdict\n{"clear": true, "verify": "npm test", "size": 5}\n```'), {
     clear: true,
     verify: 'npm test',
   });
   // An `unclear` verdict never carries classification fields at all — the
   // parser only reads them from the `clear: true` branch.
   assert.deepEqual(
-    parseVerdictBlock('```fgos-verdict\n{"clear": false, "question": "which one?", "tier": "heavy"}\n```'),
+    parseVerdictBlock('```fgos-verdict\n{"clear": false, "question": "which one?", "size": "heavy"}\n```'),
     { clear: false, question: 'which one?' },
   );
 });
 
 test('tsk-2yo: classificationPatchFromVerdict only builds a patch on a clear discovery outcome with a clear caller verdict, and only for fields actually reported', async () => {
   const { classificationPatchFromVerdict } = await import('../../src/runner/loop.mjs');
-  assert.deepEqual(classificationPatchFromVerdict('clear', { clear: true, tier: 'heavy', kind: 'bug', risk: 'heavy' }), {
-    tier: 'heavy',
+  assert.deepEqual(classificationPatchFromVerdict('clear', { clear: true, size: 'heavy', rigor: 'high', kind: 'bug', risk: 'heavy' }), {
+    size: 'heavy',
+    rigor: 'high',
     kind: 'bug',
     risk: 'heavy',
   });
-  assert.deepEqual(classificationPatchFromVerdict('clear', { clear: true, tier: 'heavy' }), { tier: 'heavy' }, 'partial classification stays partial');
+  assert.deepEqual(classificationPatchFromVerdict('clear', { clear: true, size: 'heavy' }), { size: 'heavy' }, 'partial classification stays partial');
   assert.deepEqual(classificationPatchFromVerdict('clear', { clear: true }), {}, 'no classification fields reported -> empty patch, no edit call');
   assert.deepEqual(
-    classificationPatchFromVerdict('unclear', { clear: true, tier: 'heavy' }),
+    classificationPatchFromVerdict('unclear', { clear: true, size: 'heavy' }),
     {},
     'never applies when the discovery outcome itself is not clear',
   );
@@ -2215,15 +2184,16 @@ test('tsk-2yo: a headless clear verdict carrying tier/kind/risk actually applies
     risk: 'standard',
     refs: [],
     verify: 'npm test',
-    tier: 'standard',
+    size: 'standard',
     stage: 'discovery',
     domain: 'coding',
   });
-  const callerVerdict = { clear: true, verify: 'npm test', tier: 'heavy', kind: 'bug', risk: 'heavy' };
+  const callerVerdict = { clear: true, verify: 'npm test', size: 'heavy', rigor: 'high', kind: 'bug', risk: 'heavy' };
   const patch = classificationPatchFromVerdict('clear', callerVerdict);
   editWork(dir, { id: 'item-headless-classify', patch, role: 'runner' });
   const item = listWork(dir).work['item-headless-classify'];
-  assert.equal(item.tier, 'heavy');
+  assert.equal(item.size, 'heavy');
+  assert.equal(item.rigor, 'high');
   assert.equal(item.kind, 'bug');
   assert.equal(item.risk, 'heavy');
 });
@@ -2933,8 +2903,8 @@ test('Cell 6.1 happy path: runOnce dispatches planning.validate-plan to a fake e
   const { runDir } = cell61RunDir(repoRoot);
   const result = JSON.parse(fs.readFileSync(path.join(runDir, 'result.json'), 'utf8'));
   assert.equal(result.workId, id);
-  assert.equal(result.status, 'done');
-  assert.equal(result.confidence, 'reported');
+  assert.equal(result.classification.execution.status, 'completed');
+  assert.equal(result.classification.confidence.level, 'reported');
 
   // The Assignment never moves Work: plan.md here has no "## Split" section
   // at all, so planVerdictFromPlanMd (Cell P01.2, R3/G5) has no signal to
@@ -2967,7 +2937,7 @@ test('Cell 6.1 happy path: driver consumes READY+reported and feeds the existing
 
   // Ordering proves the driver, not the Assignment, moved Work: the
   // assignment-finished log precedes the verdict-consumption log.
-  const finishedIdx = capture.findIndex((l) => l.includes('executed (confidence: reported, status: done)'));
+  const finishedIdx = capture.findIndex((l) => l.includes('executed (confidence: reported, status: ok)'));
   assert.ok(finishedIdx !== -1, 'assignment finished with a reported RunResult');
   const consumedIdx = capture.findIndex((l) => l.includes('after READY validation'));
   assert.ok(consumedIdx > finishedIdx, 'Work moved only after the Assignment had settled, via resolvePlan');
@@ -3426,8 +3396,8 @@ test('Cell 6.2 staleness: plan.md edited after settle is never consumed cross-pa
   const first = cell62RunDirs(repoRoot);
   assert.deepEqual(first.runs, ['01']);
   const result1 = JSON.parse(fs.readFileSync(path.join(first.runsDir, '01', 'result.json'), 'utf8'));
-  assert.equal(result1.status, 'done');
-  assert.equal(result1.confidence, 'reported');
+  assert.equal(result1.classification.execution.status, 'completed');
+  assert.equal(result1.classification.confidence.level, 'reported');
 
   // Edit plan.md after the verdict settled (mtime of the edit is newer than
   // the recorded result.json — the plain, non-hidden case).
@@ -3485,8 +3455,8 @@ test('Cell 6.2 red-team: string-only evidenceRefs without a companion report nev
 
   const { runsDir } = cell62RunDirs(repoRoot);
   const result = JSON.parse(fs.readFileSync(path.join(runsDir, '01', 'result.json'), 'utf8'));
-  assert.notEqual(result.confidence, 'reported', 'string-only evidenceRefs must never classify reported');
-  assert.equal(result.confidence, 'no-evidence');
+  assert.notEqual(result.classification.confidence.level, 'reported', 'string-only evidenceRefs must never classify reported');
+  assert.equal(result.classification.confidence.level, 'no-evidence');
   assert.ok(!logs.some((l) => l.includes('after READY validation')), 'a forged string-only claim must never feed the planning edge');
 
   const item = listWork(dir).work[id];
@@ -3552,8 +3522,8 @@ test('Cell 6.2 no-evidence stop: an executor that writes nothing leaves Work unt
 
   const { runsDir } = cell62RunDirs(repoRoot);
   const result = JSON.parse(fs.readFileSync(path.join(runsDir, '01', 'result.json'), 'utf8'));
-  assert.equal(result.status, 'no-evidence');
-  assert.equal(result.confidence, 'no-evidence');
+  assert.equal(result.classification.execution.status, 'completed');
+  assert.equal(result.classification.confidence.level, 'no-evidence');
   assert.ok(logs.some((l) => l.includes('did not report READY')), 'a no-evidence run must log its conservative stop');
   assert.ok(!logs.some((l) => l.includes('after READY validation')));
 
@@ -3572,8 +3542,8 @@ test('Cell 6.2 failed stop: malformed agent-result.json fails closed and leaves 
 
   const { runsDir } = cell62RunDirs(repoRoot);
   const result = JSON.parse(fs.readFileSync(path.join(runsDir, '01', 'result.json'), 'utf8'));
-  assert.equal(result.status, 'failed');
-  assert.equal(result.confidence, 'failed');
+  assert.equal(result.classification.execution.status, 'failed');
+  assert.equal(result.classification.confidence.level, 'failed');
   assert.ok(!logs.some((l) => l.includes('after READY validation')));
   assert.ok(logs.some((l) => l.includes('did not report READY')));
 
@@ -3592,8 +3562,8 @@ test('Cell 6.2 NOT READY verdict routes back to the primary planning path withou
 
   const { runsDir } = cell62RunDirs(repoRoot);
   const result = JSON.parse(fs.readFileSync(path.join(runsDir, '01', 'result.json'), 'utf8'));
-  assert.equal(result.status, 'done');
-  assert.equal(result.confidence, 'reported');
+  assert.equal(result.classification.execution.status, 'completed');
+  assert.equal(result.classification.confidence.level, 'reported');
   assert.ok(logs.some((l) => l.includes('returned NOT READY — routing back to primary planning path')), 'NOT READY must route back to the primary planning path');
   assert.ok(!logs.some((l) => l.includes('after READY validation')));
 
@@ -3843,7 +3813,7 @@ test('S3a composed: a single runtime.exitCode flip cannot erase a settle-classif
   // set, plan hash, stored status/confidence all untouched), future mtime.
   const resultPath = path.join(first.runsDir, '01', 'result.json');
   const res = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
-  assert.equal(res.status, 'failed', 'pass 1 settles as failed — the exploit only works if the stored verdict is honest');
+  assert.equal(res.classification.execution.status, 'failed', 'pass 1 settles as failed — the exploit only works if the stored verdict is honest');
   fs.writeFileSync(resultPath, JSON.stringify({ ...res, runtime: { ...res.runtime, exitCode: 0 } }, null, 2));
   const future = new Date(Date.now() + 5000);
   fs.utimesSync(resultPath, future, future);

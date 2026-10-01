@@ -139,7 +139,7 @@ test('F5: declared vendor takes precedence over CLI harness; cross-vendor redire
     policy: {
       providerModel: 'deepseek',
       executorPreference: ['claude'],
-      minTier: 'standard',
+      rigor: 'standard',
     },
     mutation: 'read-only',
   });
@@ -203,7 +203,7 @@ test('F5: declared vendor takes precedence over CLI harness; cross-vendor redire
     policy: {
       providerModel: 'openai',
       executorPreference: ['claude'],
-      minTier: 'standard',
+      rigor: 'standard',
     },
     mutation: 'read-only',
   });

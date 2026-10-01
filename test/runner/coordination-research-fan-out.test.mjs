@@ -96,23 +96,9 @@ function fakeCohortRunnerConfig(tempDir, { delayMs, status = 'done', summary = '
         invocations: [{ via: 'cli', adapter: 'cli-spawn', command: process.execPath, args: [executorScript, '{prompt}'] }],
       },
     },
-    // Every family configures BOTH nano and standard (a deliberate
-    // divergence from the real .fgos/config.json, documented in this
-    // cell's own report): resolveAssignmentDispatchPolicy's tier FLOOR
-    // (assignment-policy.mjs's `opPolicy.minTier || 'standard'`) can only
-    // ever be RAISED by a cliOverride, never lowered, because inline
-    // Assignments (execution-contract.mjs's whitelist, assignment.mjs's
-    // INLINE_ASSIGNMENT_PARAM_WHITELIST) have no `policy` field at all --
-    // so EVERY real dispatch through session-engine.mjs's inline-contract
-    // path resolves to AT LEAST 'standard', regardless of what tier an
-    // operation/cliPolicy declares. These fan-out MECHANICS tests (R5-R7)
-    // are not re-testing that tier-floor behavior (already real,
-    // pre-existing, out of this cell's file ownership) -- they configure
-    // 'standard' for every synthetic family so a real dispatch can settle
-    // and the fan-out/isolation/evidence logic itself gets exercised. The
-    // SAME constraint is why R8's real .fgos/config.json live proof cannot
-    // reach a genuine second, non-claude provider family -- see this
-    // cell's report.
+    // Every family configures both nano and standard so these fan-out
+    // mechanics tests can exercise real dispatch without making a
+    // provider-specific model choice part of the scenario.
     modelPolicies: {
       claude: { nano: 'test-model', standard: 'test-model' },
       'family-a': { nano: 'test-model', standard: 'test-model' },

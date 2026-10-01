@@ -128,7 +128,7 @@ spec:
     - id: interpret-request
       role: lead-advisor
       policy:
-        minTier: frontier
+        rigor: critical
       task:
         contractTemplate: architecture-advisory-panel-v1-interpretation
       result:
@@ -137,7 +137,7 @@ spec:
     - id: investigate-context
       role: context-investigator
       policy:
-        minTier: standard
+        rigor: standard
       task:
         contractTemplate: architecture-advisory-panel-v1-scout-report
       result:
@@ -146,7 +146,7 @@ spec:
     - id: shape-system-proposal
       role: system-shaper
       policy:
-        minTier: flagship
+        rigor: high
       task:
         contractTemplate: architecture-advisory-panel-v1-system-proposal
       result:
@@ -157,7 +157,7 @@ spec:
     - id: shape-alternative-proposal
       role: alternative-shaper
       policy:
-        minTier: flagship
+        rigor: high
       task:
         contractTemplate: architecture-advisory-panel-v1-alternative-proposal
       result:
@@ -168,7 +168,7 @@ spec:
     - id: shape-constraint-proposal
       role: constraint-advocate
       policy:
-        minTier: flagship
+        rigor: high
       task:
         contractTemplate: architecture-advisory-panel-v1-constraint-proposal
       result:
@@ -179,7 +179,7 @@ spec:
     - id: critique-proposals
       role: architecture-critic
       policy:
-        minTier: flagship
+        rigor: high
       task:
         contractTemplate: architecture-advisory-panel-v1-critique
       result:
@@ -190,7 +190,7 @@ spec:
     - id: assess-constraints
       role: constraint-advocate
       policy:
-        minTier: flagship
+        rigor: high
       task:
         contractTemplate: architecture-advisory-panel-v1-constraint-findings
       result:
@@ -208,7 +208,7 @@ spec:
     - id: synthesize-recommendation
       role: synthesizer
       policy:
-        minTier: frontier
+        rigor: critical
       task:
         contractTemplate: architecture-advisory-panel-v1-synthesis
       result:
@@ -219,7 +219,7 @@ spec:
     - id: explain-recommendation
       role: lead-advisor
       policy:
-        minTier: frontier
+        rigor: critical
       task:
         contractTemplate: architecture-advisory-panel-v1-explanation
       result:
@@ -228,7 +228,7 @@ spec:
     - id: revise-synthesis
       role: synthesizer
       policy:
-        minTier: frontier
+        rigor: critical
       task:
         contractTemplate: architecture-advisory-panel-v1-synthesis
       result:
@@ -239,7 +239,7 @@ spec:
     - id: revise-explanation
       role: lead-advisor
       policy:
-        minTier: frontier
+        rigor: critical
       task:
         contractTemplate: architecture-advisory-panel-v1-explanation
       result:
@@ -248,7 +248,7 @@ spec:
     - id: close-dialogue
       role: lead-advisor
       policy:
-        minTier: standard
+        rigor: standard
       task:
         contractTemplate: architecture-advisory-panel-v1-close-dialogue
       result:

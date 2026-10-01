@@ -102,7 +102,7 @@ spec:
     - panelist
 
   actors:
-    # Real spec.actors[].policy.minTier usage on both roles (legal, portable
+    # Real spec.actors[].policy.rigor usage on both roles (legal, portable
     # -- unlike preferExecutor, checked below). Facilitator synthesizes the
     # mediated artifact from both panelists' private reasoning, a
     # higher-stakes judgment than either individual proposal, so its floor
@@ -111,7 +111,7 @@ spec:
     # (session-engine.mjs) starts its own effective-tier floor at "standard"
     # by hardcoded default, and its provenance-update comparison is a
     # STRICT `>` (a tie never updates attribution) -- an actor-scope
-    # `minTier: standard` would resolve the CORRECT value but get
+    # `rigor: standard` would resolve the CORRECT value but get
     # misattributed provenance (`{scope: 'default'}` instead of
     # `{scope: 'actor', ...}`), confirmed empirically while building this
     # definition's own proof test. "flagship"/"frontier" both sit above
@@ -133,15 +133,15 @@ spec:
     - id: facilitator-actor
       role: facilitator
       policy:
-        minTier: frontier
+        rigor: critical
     - id: panelist-a
       role: panelist
       policy:
-        minTier: flagship
+        rigor: high
     - id: panelist-b
       role: panelist
       policy:
-        minTier: flagship
+        rigor: high
 
   operations:
     - id: convene

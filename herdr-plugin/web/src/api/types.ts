@@ -45,7 +45,8 @@ export interface WorkItem {
   kind: string
   status: string
   stage?: string
-  tier?: string
+  size?: string
+  rigor?: string
   risk?: string
   domain?: string
   parent?: string | null

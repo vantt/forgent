@@ -20,14 +20,10 @@
 // (see `RIGOR_VALUES`) rather than a dispatch/ import, so this module stays
 // fully decoupled from executor/decide/CLI-spawn machinery.
 
-import { TIERS } from '../state/work.mjs';
+import { SIZES } from '../state/work.mjs';
+import { RIGOR_VALUES } from './rigor.mjs';
 
-// Mirrors `MIN_RIGOR_VALUES` (`src/runner/dispatch/assignment-policy.mjs`)
-// exactly. Duplicated rather than imported so this module has zero
-// dependency on anything under `dispatch/` -- `test/runner/
-// capability-match.test.mjs` asserts the two arrays stay identical, so this
-// copy cannot silently drift from the real one.
-export const RIGOR_VALUES = Object.freeze(['low', 'standard', 'high', 'critical']);
+export { RIGOR_VALUES };
 
 // The three possible execution forms a match can yield. `inline` is both a
 // real steady-state form (no protocol, no facade) and the forced form for
@@ -78,8 +74,8 @@ function validateDemandFacts(facts) {
       fail(`demandFacts.${key} must be a boolean when present, got: ${JSON.stringify(facts[key])}.`);
     }
   }
-  if (!TIERS.includes(facts.size)) {
-    fail(`demandFacts.size must be one of ${TIERS.join('/')}, got: ${JSON.stringify(facts.size)}.`);
+  if (!SIZES.includes(facts.size)) {
+    fail(`demandFacts.size must be one of ${SIZES.join('/')}, got: ${JSON.stringify(facts.size)}.`);
   }
   if (!RIGOR_VALUES.includes(facts.rigor)) {
     fail(`demandFacts.rigor must be one of ${RIGOR_VALUES.join('/')}, got: ${JSON.stringify(facts.rigor)}.`);

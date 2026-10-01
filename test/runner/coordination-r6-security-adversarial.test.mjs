@@ -71,11 +71,7 @@ function fakeExecutor(tempDir, summary = 'done') {
     process.exit(0);
     `,
   );
-  return {
-    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  return { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
 }
 
 // ─── Attack #1: path traversal -- a malicious coordinationId containing
@@ -343,7 +339,7 @@ test('R6 partial-consensus false success: an actor dispatched a SECOND, unrelate
     process.exit(0);
     `,
   );
-  const failRunnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [failScript, '{prompt}'] }, models: { standard: 'test-model' }, timeoutMs: 5000 };
+  const failRunnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [failScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
 
   const first = await dispatchPrimaryTask(
     'coord_r6_no_launder',

@@ -32,7 +32,9 @@ import { parse as parseYaml } from 'yaml';
 
 import { resolveMainCheckoutRoot } from '../src/runner/paths.mjs';
 import { readSharedConfig } from '../src/config/shared-config-file.mjs';
-import { modelForTier } from '../src/runner/dispatch.mjs';
+import { resolveTierModel } from '../src/runner/dispatch.mjs';
+import { RIGOR_VALUES } from '../src/runner/rigor.mjs';
+import { DEFAULT_RIGOR_TO_TIER } from '../src/runner/dispatch/config.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
 
 const REPO_ROOT = path.resolve(import.meta.dirname, '..');
@@ -46,11 +48,9 @@ const LEGACY_AGENTS_SOURCE = 'agents';
 
 const FORBIDDEN_PLATFORM_NAMES = ['claude', 'codex', 'anthropic'];
 
-const REQUIRED_FIELDS = ['name', 'version', 'description', 'role', 'persona', 'decision_boundary', 'model_tier', 'tool-scope'];
+const REQUIRED_FIELDS = ['name', 'version', 'description', 'role', 'persona', 'decision_boundary', 'rigor', 'tool-scope'];
 
-// Matches the shared config file's own `runner.models` block + dispatch.mjs's
-// modelForTier default fallback -- reused as-is, not a second mapping.
-export const DEFAULT_MODELS = { light: 'haiku', standard: 'sonnet', heavy: 'opus' };
+export const DEFAULT_MODELS = { low: 'haiku', standard: 'sonnet', high: 'opus', critical: 'opus' };
 
 export class AgentDefinitionError extends Error {}
 
@@ -65,11 +65,8 @@ export class AgentDefinitionError extends Error {}
 // returns a worktree's own root unchanged, not its main checkout) is the
 // one helper that actually resolves via `--git-common-dir` the way this
 // needs.
-// tsk-5tm D9: delegates to `modelForTier` (the one canonical tier->model
-// resolver) instead of reading `cfg.runner.models` directly -- that field
-// is the legacy flat map D9 introduced `modelPolicies` to replace, and
-// `modelForTier` already prefers `modelPolicies` when present, falling
-// back to the legacy map otherwise. Reading `cfg.runner.models` here
+// tsk-5tm D9: delegates to `resolveTierModel` (the one canonical tier->model
+// resolver) to read `modelPolicies.claude`.
 // directly (this function's pre-D9 shape) meant a `modelPolicies`-only
 // config -- the shape this repo's OWN committed `.fgos/config.json` now
 // uses -- would silently fall through to DEFAULT_MODELS below with no
@@ -84,11 +81,12 @@ export function readRunnerModels(mainCheckoutRootOverride) {
   const cfg = readSharedConfig(mainCheckoutRoot);
   const runnerCfg = cfg.runner ?? {};
   const models = {};
-  for (const tier of Object.keys(DEFAULT_MODELS)) {
+  for (const rigor of RIGOR_VALUES) {
+    const tier = runnerCfg.rigorToTier?.[rigor] ?? DEFAULT_RIGOR_TO_TIER[rigor];
     try {
-      models[tier] = modelForTier(runnerCfg, tier);
+      models[rigor] = resolveTierModel(runnerCfg, tier);
     } catch {
-      models[tier] = DEFAULT_MODELS[tier];
+      models[rigor] = DEFAULT_MODELS[rigor];
     }
   }
   return models;
@@ -114,9 +112,9 @@ function validateDefinition(name, def) {
   if (!Array.isArray(def['tool-scope']) || def['tool-scope'].length === 0 || def['tool-scope'].some((t) => typeof t !== 'string' || !t.trim())) {
     throw new AgentDefinitionError(`agents/${name}.yaml's tool-scope must be a non-empty list of tool-name strings.`);
   }
-  if (!(def.model_tier in DEFAULT_MODELS)) {
+  if (!RIGOR_VALUES.includes(def.rigor)) {
     throw new AgentDefinitionError(
-      `agents/${name}.yaml's model_tier "${def.model_tier}" is not one of ${Object.keys(DEFAULT_MODELS).join('/')}.`,
+      `agents/${name}.yaml's rigor "${def.rigor}" is not one of ${RIGOR_VALUES.join('/')}.`,
     );
   }
   // skills (tsk-397 D20): optional, but when present must be a real list
@@ -183,7 +181,7 @@ export function projectAgentMarkdown(name, sourceYamlText, models, sourcePath = 
   assertPlatformAgnostic(name, sourceYamlText);
   validateDefinition(name, def);
 
-  const model = models[def.model_tier];
+  const model = models[def.rigor];
   const tools = def['tool-scope'].join(', ');
 
   // skills (tsk-397 D20): OPTIONAL -- declared capabilities of this agent-type

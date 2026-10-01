@@ -11,7 +11,7 @@ decision_boundary:
     - Confirm its own generated adapter file exists and matches this source
   must_escalate:
     - Any real task -- this agent exists only to prove the projection mechanism works and is never meant to be invoked for actual work
-model_tier: light
+rigor: low
 tool-scope:
   - Read
 skills:

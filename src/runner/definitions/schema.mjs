@@ -15,19 +15,15 @@
 // NOT build the Workflow projection adapter, the CoordinationProtocol
 // loader, fixture files, or setup/doctor registration -- those are a later
 // cell (R5-R8) once this pure kernel is proven correct in isolation.
+import { RIGOR_VALUES, RIGOR_RANK } from '../rigor.mjs';
 
 export const API_VERSION = 'fgos.dev/v1alpha1';
 export const KIND = 'FlowDefinition';
 
 export const PROFILE_KINDS = Object.freeze(['Workflow', 'CoordinationProtocol']);
 
-// Order is significant: index is the monotonicity rank PolicyPatch's
-// `minTier` uses (contract's PolicyPatch section: "a more specific scope
-// may raise the floor, never lower it below a less specific scope's
-// requirement") -- ascending strictness, left to right, matching the
-// contract's own enum listing order verbatim.
-export const MIN_TIER_VALUES = Object.freeze(['nano', 'mini', 'standard', 'advanced', 'flagship', 'frontier']);
-const MIN_TIER_RANK = new Map(MIN_TIER_VALUES.map((tier, index) => [tier, index]));
+export const TIER_VALUES = Object.freeze(['nano', 'mini', 'standard', 'advanced', 'flagship', 'frontier']);
+const TIER_RANK = new Map(TIER_VALUES.map((tier, index) => [tier, index]));
 
 // repeatMode (Step 09/P03 fallback-and-effect-boundary contract): declared
 // explicitly per operation/protocol YAML, never inferred from a
@@ -39,11 +35,10 @@ const MIN_TIER_RANK = new Map(MIN_TIER_VALUES.map((tier, index) => [tier, index]
 // `post-delivery` names one that happens after -- the harder case
 // dispatch/recovery.mjs's own Acceptance Matrix governs.
 export const REPEAT_MODE_VALUES = Object.freeze(['pre-delivery', 'post-delivery']);
-// Rank for the SAME non-weakening discipline MIN_TIER_RANK already applies
-// to `minTier` -- `post-delivery` is the stronger, harder-to-satisfy
-// requirement (it is gated by dispatch/recovery.mjs's own Acceptance
-// Matrix), so a more specific scope may only raise it, never silently
-// downgrade it back to `pre-delivery`.
+// Rank for the non-weakening discipline -- `post-delivery` is the stronger,
+// harder-to-satisfy requirement (it is gated by dispatch/recovery.mjs's own
+// Acceptance Matrix), so a more specific scope may only raise it, never
+// silently downgrade it back to `pre-delivery`.
 const REPEAT_MODE_RANK = new Map(REPEAT_MODE_VALUES.map((mode, index) => [mode, index]));
 
 export const VISIBILITY_VALUES = Object.freeze(['headless', 'visible']);
@@ -143,7 +138,7 @@ const ACTOR_FIELDS = new Set(['id', 'role', 'persona', 'policy']);
 // which OTHER role(s) this operation's bound executor should differ in
 // provider family from (same resolver).
 export const POLICY_PATCH_FIELDS = new Set([
-  'minTier', 'preferPersona', 'preferExecutor', 'preferInvocation', 'fallbackExecutors', 'visibility', 'repeatMode',
+  'rigor', 'tier', 'preferPersona', 'preferExecutor', 'preferInvocation', 'fallbackExecutors', 'visibility', 'repeatMode',
   'capability', 'distinctProviderFrom',
 ]);
 
@@ -265,10 +260,10 @@ function assertNoForbiddenFieldsDeep(value, label, seen = new Set()) {
   }
 }
 
-function assertMinTierNotLowered(floorTier, candidateTier, label) {
-  if (floorTier === undefined || candidateTier === undefined) return;
-  if (MIN_TIER_RANK.get(candidateTier) < MIN_TIER_RANK.get(floorTier)) {
-    fail(`${label}.minTier ("${candidateTier}") would lower the floor already set by a less specific scope ("${floorTier}") -- PolicyPatch minTier is monotonic (raise only)`);
+function assertRigorNotLowered(floorRigor, candidateRigor, label) {
+  if (floorRigor === undefined || candidateRigor === undefined) return;
+  if ((RIGOR_RANK[candidateRigor] ?? 0) < (RIGOR_RANK[floorRigor] ?? 0)) {
+    fail(`${label}.rigor ("${candidateRigor}") would lower the floor already set by a less specific scope ("${floorRigor}") -- PolicyPatch rigor is monotonic (raise only)`);
   }
 }
 
@@ -277,15 +272,27 @@ function assertMinTierNotLowered(floorTier, candidateTier, label) {
  * table. Returns a frozen, normalized copy -- never the input object.
  * Throws FlowDefinitionError on an unknown field or an invalid value.
  */
-function validatePolicyPatch(policy, label) {
+function validatePolicyPatch(policy, label, { scope } = {}) {
   if (!isPlainObject(policy)) fail(`${label} must be an object`);
+  const RETIRED_MIN_TIER = ['min', 'Tier'].join('');
+  if (policy[RETIRED_MIN_TIER] !== undefined) {
+    fail(`${label}.${RETIRED_MIN_TIER} was removed; use "rigor" (low | standard | high | critical) instead`);
+  }
   assertOnlyAcceptedFields(policy, POLICY_PATCH_FIELDS, label);
 
   const result = {};
 
-  if (policy.minTier !== undefined) {
-    if (!MIN_TIER_RANK.has(policy.minTier)) fail(`${label}.minTier must be one of ${MIN_TIER_VALUES.join(' | ')}`);
-    result.minTier = policy.minTier;
+  if (policy.rigor !== undefined) {
+    if (!RIGOR_VALUES.includes(policy.rigor)) fail(`${label}.rigor must be one of ${RIGOR_VALUES.join(' | ')}`);
+    result.rigor = policy.rigor;
+  }
+  if (policy.tier !== undefined) {
+    const ALLOWED_TIER_SCOPES = ['actor', 'assignment', 'cli'];
+    if (scope && !ALLOWED_TIER_SCOPES.includes(scope)) {
+      fail(`${label}.tier is only valid at actor/assignment/cli scope; use "rigor" in definitions and operations`);
+    }
+    if (!TIER_RANK.has(policy.tier)) fail(`${label}.tier must be one of ${TIER_VALUES.join(' | ')}`);
+    result.tier = policy.tier;
   }
   if (policy.preferPersona !== undefined) {
     if (!isNonEmptyString(policy.preferPersona)) fail(`${label}.preferPersona must be a non-empty string when provided`);
@@ -342,9 +349,9 @@ function validatePolicyPatch(policy, label) {
  * first, most-specific scope last, per the contract's own provenance scope
  * order (`runner < definition < node < operation < role < actor <
  * assignment < cli < governance`) -- into one resolved PolicyPatch.
- * `minTier` is monotonic: a later (more specific) entry may only raise it,
+ * `rigor`/`tier` is monotonic: a later (more specific) entry may only raise it,
  * never lower it below what an earlier entry already established; every
- * other field is most-specific-wins. Pure; throws FlowDefinitionError on a
+ * other field is most-specific-wins.
  * lowering attempt. Exported for reuse by a later execution-time policy
  * resolver (out of this cell's scope, which only validates the PolicyPatch
  * input shape itself -- provenance recording is not implemented here).
@@ -356,23 +363,31 @@ export function mergePolicyStack(scopedPatches) {
   if (!Array.isArray(scopedPatches)) fail('mergePolicyStack expects an array of { scope, source, policy } entries');
 
   const resolved = {};
-  let resolvedMinTierLabel = null;
+  let resolvedRigorLabel = null;
+  let resolvedTierLabel = null;
   let resolvedRepeatModeLabel = null;
 
   for (const entry of scopedPatches) {
     if (!isPlainObject(entry)) fail('mergePolicyStack entries must be objects');
     if (!isNonEmptyString(entry.scope)) fail('mergePolicyStack entry.scope must be a non-empty string');
     const label = `policy stack entry (scope: "${entry.scope}"${isNonEmptyString(entry.source) ? `, source: "${entry.source}"` : ''})`;
-    const validated = validatePolicyPatch(entry.policy ?? {}, label);
+    const validated = validatePolicyPatch(entry.policy, label, { scope: entry.scope });
 
-    if (validated.minTier !== undefined) {
-      if (resolved.minTier !== undefined && MIN_TIER_RANK.get(validated.minTier) < MIN_TIER_RANK.get(resolved.minTier)) {
-        fail(`${label} sets minTier "${validated.minTier}", lower than the floor "${resolved.minTier}" already set by ${resolvedMinTierLabel} -- PolicyPatch minTier is monotonic (raise only)`);
+    if (validated.rigor !== undefined) {
+      if (resolved.rigor !== undefined && (RIGOR_RANK[validated.rigor] ?? 0) < (RIGOR_RANK[resolved.rigor] ?? 0)) {
+        fail(`${label} sets rigor "${validated.rigor}", lower than the floor "${resolved.rigor}" already set by ${resolvedRigorLabel} -- PolicyPatch rigor is monotonic (raise only)`);
       }
-      resolved.minTier = validated.minTier;
-      resolvedMinTierLabel = label;
+      resolved.rigor = validated.rigor;
+      resolvedRigorLabel = label;
     }
-    // Same non-weakening discipline as minTier above -- a weaker scope
+    if (validated.tier !== undefined) {
+      if (resolved.tier !== undefined && TIER_RANK.get(validated.tier) < TIER_RANK.get(resolved.tier)) {
+        fail(`${label} sets tier "${validated.tier}", lower than the floor "${resolved.tier}" already set by ${resolvedTierLabel} -- PolicyPatch tier is monotonic (raise only)`);
+      }
+      resolved.tier = validated.tier;
+      resolvedTierLabel = label;
+    }
+    // Same non-weakening discipline as rigor/tier above -- a weaker scope
     // (e.g. CLI/assignment) may not silently downgrade a stronger repeatMode
     // (e.g. `post-delivery`) already set by a less specific scope (e.g. the
     // operation itself).
@@ -771,7 +786,7 @@ function validateActors(actors, roleSet) {
       entry.persona = actor.persona;
     }
     if (actor.policy !== undefined) {
-      entry.policy = validatePolicyPatch(actor.policy, `${label}.policy`);
+      entry.policy = validatePolicyPatch(actor.policy, `${label}.policy`, { scope: 'actor' });
     }
     return Object.freeze(entry);
   });
@@ -826,7 +841,7 @@ function validateOperations(operations, roleSet, profileKind) {
     }
 
     if (op.policy !== undefined) {
-      result0.policy = validatePolicyPatch(op.policy, `${label}.policy`);
+      result0.policy = validatePolicyPatch(op.policy, `${label}.policy`, { scope: 'operation' });
     }
 
     if (op.result !== undefined) {
@@ -1360,24 +1375,40 @@ function validateSpec(spec) {
   const slotsById = new Map((profile.topology?.specialistSlots ?? []).map((slot) => [slot.id, slot]));
   const graph = validateGraph(spec.graph, operations, actors, profile.kind, windowIds, slotsById);
   assertSpecialistSlotIdsAreDisjoint(profile, roleSet, actors, operationIds, graph, windowIds);
-  const policy = spec.policy !== undefined ? validatePolicyPatch(spec.policy, 'spec.policy') : undefined;
+  const policy = spec.policy !== undefined ? validatePolicyPatch(spec.policy, 'spec.policy', { scope: 'definition' }) : undefined;
 
   // Definition-scope (`spec.policy`) is the least-specific declared scope
   // in a static FlowDefinition document; operation-scope and actor-scope
   // are both more specific (contract's provenance scope order). Neither
-  // may lower the floor `spec.policy.minTier` already set.
-  if (policy?.minTier !== undefined) {
+  // may lower the floor `spec.policy.rigor` already set.
+  if (policy?.rigor !== undefined) {
     operations.forEach((op, i) => {
-      if (op.policy?.minTier !== undefined) {
-        assertMinTierNotLowered(policy.minTier, op.policy.minTier, `spec.operations[${i}].policy`);
+      if (op.policy?.rigor !== undefined) {
+        assertRigorNotLowered(policy.rigor, op.policy.rigor, `spec.operations[${i}].policy`);
       }
     });
     (actors ?? []).forEach((actor, i) => {
-      if (actor.policy?.minTier !== undefined) {
-        assertMinTierNotLowered(policy.minTier, actor.policy.minTier, `spec.actors[${i}].policy`);
+      if (actor.policy?.rigor !== undefined) {
+        assertRigorNotLowered(policy.rigor, actor.policy.rigor, `spec.actors[${i}].policy`);
       }
     });
   }
+  const operationsById = new Map(operations.map((operation) => [operation.id, operation]));
+  const actorsById = new Map((actors ?? []).map((actor) => [actor.id, actor]));
+  graph.nodes.forEach((node, nodeIndex) => {
+    node.operations.forEach((binding, bindingIndex) => {
+      if (binding.actor === undefined) return;
+      const operation = operationsById.get(binding.ref);
+      const actor = actorsById.get(binding.actor);
+      if (operation?.policy?.rigor !== undefined && actor?.policy?.rigor !== undefined) {
+        assertRigorNotLowered(
+          operation.policy.rigor,
+          actor.policy.rigor,
+          `spec.graph.nodes[${nodeIndex}].operations[${bindingIndex}] actor "${binding.actor}" policy`,
+        );
+      }
+    });
+  });
 
   if (profile.kind === 'CoordinationProtocol' && profile.completion?.mode === 'synthesize') {
     assertAdvisoryReachableFromEntry(graph, operations);

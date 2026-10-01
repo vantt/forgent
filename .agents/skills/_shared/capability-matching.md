@@ -29,8 +29,8 @@ Machines do not parse ambiguous prose to guess capabilities. The agent inspects 
 4. `behaviorPreserving` (boolean, optional) — Whether code changes preserve existing behavior (distinguishes refactor from implementation).
 5. `needsIndependentReview` (boolean) — Whether independent adversarial review or multi-role quorum is required (determines protocol form).
 6. `hasPlanOrTrack` (boolean) — Whether execution targets an authored plan or named implementation track (determines plan mode).
-7. `size` (`TIERS`: `light` / `standard` / `heavy`, per `src/state/work.mjs:161`) — Work granularity. Judges execution shape and decomposition — never pins model or provider.
-8. `rigor` (`MIN_RIGOR_VALUES`: `low` / `standard` / `high` / `critical`, per `src/runner/dispatch/assignment-policy.mjs:48`) — Evaluation rigor. Pass-through metadata for Q2 binding; not used for Q1 capability steering.
+7. `size` (`SIZES`: `light` / `standard` / `heavy`, per `src/state/work.mjs`) — Work granularity. Judges execution shape and decomposition — never pins model or provider.
+8. `rigor` (`RIGOR_VALUES`: `low` / `standard` / `high` / `critical`, per `src/runner/rigor.mjs`) — Evaluation rigor. Governs tier via `runner.rigorToTier` at Q2 binding; not used for Q1 capability steering.
 
 ## Matching rules: serves-based, not keyword spotting
 

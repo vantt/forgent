@@ -367,15 +367,17 @@ function makeCapabilityStartCtx() {
   `);
 
   const runnerConfig = {
-    executor: { allowCrossProvider: true, command: process.execPath, args: [fakeExec, '{prompt}'] },
+    executor: { allowCrossProvider: true, command: process.execPath, providerModel: 'claude', args: [fakeExec, '{prompt}'] },
     executors: {
       'test-agy': {
         kind: 'agent',
+        providerModel: 'claude',
         allowCrossProvider: true,
         invocations: [{ via: 'cli', adapter: 'cli-spawn', command: process.execPath, args: [fakeExec, '{prompt}'] }],
       },
       'test-agy-alt': {
         kind: 'agent',
+        providerModel: 'claude',
         allowCrossProvider: true,
         invocations: [{ via: 'cli', adapter: 'cli-spawn', command: process.execPath, args: [fakeExec, '{prompt}'] }],
       },
@@ -383,7 +385,8 @@ function makeCapabilityStartCtx() {
     capabilities: {
       'code:implement': { prefer: 'test-agy' },
     },
-    models: { standard: 'test-model', nano: 'test-model' },
+    modelPolicies: { claude: { nano: 'test-model', standard: 'test-model' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: 20000,
   };
   fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ runner: runnerConfig }, null, 2));

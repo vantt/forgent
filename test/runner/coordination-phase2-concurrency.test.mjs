@@ -557,12 +557,12 @@ function writeFakeExecutor(tempDir) {
           invocations: [{ via: 'cli', adapter: 'cli-spawn', command: process.execPath, args: [executorScript, '{prompt}'] }],
         },
       },
-      models: { standard: 'test-model', nano: 'test-model' },
       modelPolicies: {
         claude: { nano: 'test-model', standard: 'test-model' },
         'family-a': { nano: 'test-model', standard: 'test-model' },
         'family-b': { nano: 'test-model', standard: 'test-model' },
       },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 20000,
     },
   };

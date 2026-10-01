@@ -48,7 +48,8 @@ test('parity: discover clear verdict direct in-process vs CLI', () => {
       callerVerdict: {
         clear: true,
         verify: 'npm test -- parity-clear',
-        tier: 'heavy',
+        size: 'heavy',
+        rigor: 'high',
         kind: 'bug',
         risk: 'heavy',
       },
@@ -67,8 +68,10 @@ test('parity: discover clear verdict direct in-process vs CLI', () => {
     'clear',
     '--verify',
     'npm test -- parity-clear',
-    '--tier',
+    '--size',
     'heavy',
+    '--rigor',
+    'high',
     '--kind',
     'bug',
     '--risk',
@@ -82,7 +85,8 @@ test('parity: discover clear verdict direct in-process vs CLI', () => {
   assert.equal(directRes.outcome, cliEnvelope.data.outcome);
   assert.equal(directItem.stage, cliItem.stage);
   assert.equal(directItem.verify, cliItem.verify);
-  assert.equal(directItem.tier, cliItem.tier);
+  assert.equal(directItem.size, cliItem.size);
+  assert.equal(directItem.rigor, cliItem.rigor);
   assert.equal(directItem.kind, cliItem.kind);
   assert.equal(directItem.risk, cliItem.risk);
   assert.equal(directItem.status, cliItem.status);

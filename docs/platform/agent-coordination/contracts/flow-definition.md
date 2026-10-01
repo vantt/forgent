@@ -13,7 +13,7 @@ recheck-vs-retry contract text accepted — implemented across
 `step-09-group-thinking-mvp1-mvp2` Phases 01-03 (the `activation` schema
 field, `standalone-master-coordination-loop.yaml`'s real
 `driver-authorized` bindings) and `step-09-mvp3-to-mvp5` Phase 03
-(`policy.minTier` role-tier separation for the same fixture's operations).
+(`policy.rigor` role-tier separation for the same fixture's operations; migrated from the original field name in tier/rigor consolidation Phase 2).
 Full per-phase trace:
 `docs/architect/agent-coordination/verification/step-09-mvp3-to-mvp5/index.md`.
 Phase 06 (Step 09 MVP6): `spec.profile.topology.visibilityWindows[]` and
@@ -182,7 +182,7 @@ operations:
       taskSpec: <optional-declared-taskspec-id>
       contractTemplate: <optional-inline-template-id>
     policy:
-      minTier: nano | mini | standard | advanced | flagship | frontier
+      rigor: low | standard | high | critical
     result:
       kind: advisory | gate-verdict | work-product
       evidenceRequired: reported | verified
@@ -566,7 +566,8 @@ role, actor, Assignment, human/CLI, governance):
 
 ```yaml
 policy:
-  minTier: nano | mini | standard | advanced | flagship | frontier
+  rigor: low | standard | high | critical
+  tier: nano | mini | standard | advanced | flagship | frontier  # actor/assignment/cli scope only
   preferPersona: <persona-id>
   preferExecutor: <executor-id>
   fallbackExecutors:
@@ -578,7 +579,7 @@ policy:
     strength: required | preferred
 ```
 
-- `minTier` is monotonic across scopes: a more specific scope may raise the
+- `rigor` is monotonic across scopes: a more specific scope may raise the
   floor, never lower it below a less specific scope's requirement.
 - `fallbackExecutors` is `reserved-not-executed` in V1 — parseable for
   compatibility, never automatically executed as failover (see dispatch
@@ -589,7 +590,7 @@ policy:
   preference.
 - Literal executor/model names in `policy` are trusted session/human/project
   overrides, not portable framework defaults; a *portable* `CoordinationProtocol`
-  or `Workflow` definition expresses requirements (`minTier`, `capabilities`),
+  or `Workflow` definition expresses requirements (`rigor`, `capabilities`),
   not literal executor/model pins.
 - `capability` (Unit I21, Phase 5 item 2) names the operation's canonical
   dispatch capability (e.g. `code:implement`) — a *requirement*, resolved
@@ -643,7 +644,7 @@ references.
 | Any `spec.operations[]` template | `contextAccess` | Binding-scoped only, exactly like `activation` (Phase 06, Step 09 MVP6). |
 | `CoordinationProtocol` profile | `profile.work`, `baseStepMap`, mandatory `task.taskSpec`, `result.kind: gate-verdict` | Would import Work lifecycle authority into a standalone protocol. |
 | Any `FlowDefinition` | a `missionId` field anywhere | ADR-008 Decision 5; Mission stays deferred-preserved. |
-| A literal `policy.preferExecutor` at definition/role/actor/operation scope, on any portable `CoordinationProtocol` or `Workflow` document | `preferExecutor` | A *portable* definition expresses requirements (`minTier`, `capabilities`), never a literal executor pin — that authority is trusted session/human/project-scope only (PolicyPatch, above). Runtime-enforced by `assertNoPortableExecutorPin` (`session-engine.mjs`); a request's own trusted per-actor `actors[].executor` field is the correct channel instead (proven protocol-agnostic, `P10.1.md`/`P10.3.md`, Step 09 Phase 10). Named as a contract-text gap by P10.2's own Reviewer (found investigating RFC-Review-Lite's own objector-actor `policy.minTier` elevation), closed here by P10.10. |
+| A literal `policy.preferExecutor` at definition/role/actor/operation scope, on any portable `CoordinationProtocol` or `Workflow` document | `preferExecutor` | A *portable* definition expresses requirements (`rigor`, `capabilities`), never a literal executor pin — that authority is trusted session/human/project-scope only (PolicyPatch, above). Runtime-enforced by `assertNoPortableExecutorPin` (`session-engine.mjs`); a request's own trusted per-actor `actors[].executor` field is the correct channel if a specific run needs one. |
 
 ## Proposed Continuation Profile
 
@@ -666,7 +667,7 @@ introduced explicitly before any writer consumes the field.
 - An operation's `role` not present in `spec.roles` is rejected.
 - A `graph.nodes[].operations[].actor` not present in `spec.actors` is
   rejected.
-- A `policy.minTier` at a more specific scope that is lower than a less
+- A `policy.rigor` at a more specific scope that is lower than a less
   specific scope's already-resolved floor is rejected (monotonicity).
 - Existing `domains/coding/workflows/*.yaml`, unchanged, continues to
   normalize through `normalizeWorkflow()` exactly as before; the

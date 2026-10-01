@@ -23,10 +23,10 @@ import { loadAgentDefs, readTaskSpecHeader } from '../agent-roster.mjs';
 import { selectTemplate, hashTemplate } from '../prompt-templates.mjs';
 import { listWork, StoreError } from '../../state/store.mjs';
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
-import { RunnerConfigError, ensureRunnerConfigForDir, DEFAULT_TIER_TO_POLICY } from './config.mjs';
-import { resolveExecutorAndOverrides, resolveExecutorIdForPurpose, modelForTier, executorIdForWork, resolveCapabilityIdentityDetails } from './resolve.mjs';
-import { resolveVerifiedPlacementModel, recordShadowBinderDivergence } from './placement-policy.mjs';
-import { resolveExecutorProvider, resolveExecutorGovernance } from './assignment-policy.mjs';
+import { RunnerConfigError, ensureRunnerConfigForDir, MODEL_POLICY_TIERS } from './config.mjs';
+import { RIGOR_VALUES, resolveStrongerRigor } from '../rigor.mjs';
+import { resolveExecutorAndOverrides, resolveExecutorIdForPurpose, resolveTierModel, deriveProviderFamily, executorIdForWork, resolveCapabilityIdentityDetails } from './resolve.mjs';
+import { resolveExecutorProvider, resolveExecutorGovernance, resolveStrongerTier } from './assignment-policy.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
 import { resolveExecutorCommand, DispatchError } from './transport.mjs';
 import { executeThroughConfinement, buildConfinementAttestation } from './confinement/authority.mjs';
@@ -288,35 +288,28 @@ function openDispatchRun({ fgosDir, workId, executorId, cwd }) {
 
 export function spawnWorker(work, cfg, cwd, opts = {}) {
   // Setup stays synchronous and OUTSIDE the adapter call on purpose: a
-  // malformed tier/config (RunnerConfigError, via modelForTier/
+  // malformed tier/config (RunnerConfigError, via resolveTierModel/
   // resolveExecutorCommand) must still throw synchronously, before any
   // process is spawned — exactly like the spawnSync-based version, and
   // exactly what dispatch.test.mjs's "throws a RunnerConfigError ... before
   // any spawn" test pins.
-  const tier = work.tier ?? DEFAULTS.tier;
-  // tsk-5tm-5 D9: executorId computed before modelForTier (moved ahead of
-  // its pre-D9 position, right after) so a executor's own providerModel/
-  // rigorOverrides can thread into tier resolution — never borrowing
-  // Claude's model names for a non-Claude executor's own dispatch.
+  const workRigor = work?.rigor ?? (work?.risk === 'heavy' ? 'high' : 'standard');
   const executorId = executorIdForWork(work, opts.stage);
-  const { executorId: resolvedExecutorId, executor: executorForTier, overrides: capabilityOverrides } = executorId ? resolveExecutorAndOverrides(cfg, executorId) : {};
-  const legacyModel = modelForTier(cfg, tier, {
-    providerModel: capabilityOverrides?.providerModel ?? executorForTier?.providerModel,
-    rigorOverrides: capabilityOverrides?.rigorOverrides ?? executorForTier?.rigorOverrides,
+  const { executorId: resolvedExecutorId, executor: executorForTier } = executorId ? resolveExecutorAndOverrides(cfg, executorId) : {};
+  const { capability: capabilityName } = resolveCapabilityIdentityDetails({
+    cfg,
+    work,
+    stage: opts.stage,
+    executorId,
+    resolvedExecutor: executorForTier,
   });
-  // Phase 07 (executor-policy-dispatch-seams): PlacementPolicy production
-  // binder, self-verifying -- see resolveVerifiedPlacementModel's own
-  // docstring (placement-policy.mjs) for the full safety argument. The
-  // legacy formula above is UNCHANGED and always computed; this only picks
-  // which of the two (legacy vs PlacementPolicy) the real spawn actually
-  // uses.
-  const { model, source: modelSource, divergence: placementDivergence } = resolveVerifiedPlacementModel({ cfg, executorId, workTier: tier, legacyModel });
-  if (placementDivergence) {
-    process.stderr.write(
-      `fgos: PlacementPolicy divergence (falling back to legacy) executor=${placementDivergence.executorId} tier=${placementDivergence.workTier} legacyModel=${placementDivergence.legacyModel} placementModel=${placementDivergence.placementModel}\n`,
-    );
-    recordShadowBinderDivergence(opts.fgosDir, 'placement-model', placementDivergence);
-  }
+  const capabilityRigor = capabilityName ? cfg.capabilities?.[capabilityName]?.rigor : undefined;
+  const effectiveRigor = capabilityRigor ? resolveStrongerRigor(workRigor, capabilityRigor) : workRigor;
+  const policyTier = cfg.rigorToTier?.[effectiveRigor] ?? 'standard';
+  const providerFamily = deriveProviderFamily(executorForTier);
+  const model = executorForTier?.model ?? resolveTierModel(cfg, policyTier, providerFamily);
+  const modelSource = { scope: 'placement-policy', id: `${providerFamily}.${policyTier}` };
+  const tier = policyTier;
   const prompt = buildPrompt(work, opts.feedback, opts.stage);
   // D20/D22 (review finding H1, tsk-397): only has an observable effect on
   // a command-less/adapter-less/invocation-less executor with no static
@@ -552,6 +545,7 @@ export async function executeExecutorCli(
     runnerConfig,
     model: modelOverride,
     tier: tierOverride,
+    rigor: rigorOverride,
     for: purposeArg,
     carries,
     hasLiveTaskAccess = false,
@@ -621,20 +615,9 @@ export async function executeExecutorCli(
     };
   }
   const resolvedByPurpose = !executorIdArg;
-  // D4 (docs/history/capability-capacity-remodel/CONTEXT.md): resolve
-  // through the shared resolver on WHICHEVER key this call actually gave
-  // us — `purpose` when purpose-resolved, `executorIdArg` when named
-  // directly (itself possibly a purpose-shaped id with no literal
-  // `cfg.executors` entry of its own, e.g. "fgos-coding-implement"
-  // resolved via `capabilities.<name>.prefer`). A single call per door,
-  // never a second one on the already-resolved id afterward — a prior
-  // version of this fix called `resolveExecutorAndOverrides` a second
-  // time here, on `executorId` post-resolution: for the `--for` door
-  // that id is already a literal `cfg.executors` key by then, so the
-  // second call always hit the literal-key branch and silently dropped
-  // `capabilities.<purpose>.overrides` — found by re-reading this exact
-  // code end to end.
-  //
+  // Resolve through the shared resolver on the supplied capability or
+  // executor id. A capability contributes its rigor floor through the
+  // policy resolver below; executor selection carries no policy override.
   // The two doors keep their own error contracts: `--for` alone throws when
   // nothing resolves ("no executor registered for purpose..." — guides the
   // caller to `decide --for` first); a named `executorIdArg` that resolves
@@ -643,7 +626,6 @@ export async function executeExecutorCli(
   // implicit/global resolution for work-driven execution.
   let executorId = executorIdArg;
   let resolvedExecutor;
-  let capabilityOverrides;
   // `realExecutorId`/`executorConfigured` (Dispatch Core Contract
   // Normalization follow-up): the positional-executorIdArg branch below
   // deliberately never reassigns `executorId` itself -- it stays as the
@@ -667,7 +649,6 @@ export async function executeExecutorCli(
     }
     executorId = resolved.executorId;
     resolvedExecutor = resolved.executor;
-    capabilityOverrides = resolved.overrides;
     realExecutorId = resolved.executorId;
     executorConfigured = resolved.configured;
   } else {
@@ -680,7 +661,6 @@ export async function executeExecutorCli(
       );
     }
     resolvedExecutor = resolved.executor;
-    capabilityOverrides = resolved.overrides;
     realExecutorId = resolved.executorId ?? executorId;
     executorConfigured = resolved.configured;
   }
@@ -805,39 +785,28 @@ export async function executeExecutorCli(
   // `.disallowedExecutors` are still consulted, unchanged) without paying
   // for the unused computation.
   //
-  // The literal MODEL is still computed by the exact same formula as before
-  // (D2's precedence, untouched) and handed to the resolver as an
-  // already-resolved `cliOverride.model` -- deliberately never letting the
-  // resolver's own tier-driven model-table lookup run for this caller. That
-  // lookup (`resolvePolicyTierModel`) reads a legacy flat `cfg.models`
-  // table keyed by POLICY tier ("lightweight"/"standard"/.../"critical");
-  // `modelForTier` (used here, and by every existing `--tier`/
-  // `capabilities.overrides.tier`/`executor.tier` caller of this function)
-  // reads the SAME field name keyed by WORK tier ("light"/"standard"/
-  // "heavy") -- two genuinely incompatible legacy shapes under one config
-  // key that predate this unification; reconciling them is out of scope
-  // here. Precomputing the model sidesteps the conflict entirely: real
-  // production config always declares `modelPolicies` (provider-keyed,
-  // policy-tier), where both readings agree.
-  const rigorOverrides = capabilityOverrides?.rigorOverrides ?? executor?.rigorOverrides;
-  const tier = tierOverride ?? capabilityOverrides?.tier ?? executor?.tier ?? DEFAULTS.tier;
-  const legacyModel = modelForTier(cfg, tier, {
-    providerModel: capabilityOverrides?.providerModel ?? executor?.providerModel,
-    rigorOverrides,
-  });
-  // Phase 07 (executor-policy-dispatch-seams): same self-verifying
-  // PlacementPolicy production binder as spawnWorker above -- only applies
-  // to the `modelForTier` fallback branch, never to an explicit
-  // modelOverride/capabilityOverrides.model/executor.model, which must
-  // always win outright regardless of what PlacementPolicy would choose.
-  const { model: fallbackModel, divergence: placementDivergence } = resolveVerifiedPlacementModel({ cfg, executorId, workTier: tier, legacyModel });
-  if (placementDivergence) {
-    process.stderr.write(
-      `fgos: PlacementPolicy divergence (falling back to legacy) executor=${placementDivergence.executorId} tier=${placementDivergence.workTier} legacyModel=${placementDivergence.legacyModel} placementModel=${placementDivergence.placementModel}\n`,
-    );
-    recordShadowBinderDivergence(fgosDir, 'placement-model', placementDivergence);
+  // The literal MODEL is computed via resolveTierModel and handed to the
+  // resolver as an already-resolved `cliOverride.model`.
+  const capabilityName = anchorCapability ?? capabilityIdentity ?? purpose ?? executorIdArg;
+  const capabilityRigor = capabilityName ? cfg?.capabilities?.[capabilityName]?.rigor : undefined;
+  if (tierOverride !== undefined && !MODEL_POLICY_TIERS.includes(tierOverride)) {
+    throw new RunnerConfigError(`invalid tier "${tierOverride}". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);
   }
-  const model = modelOverride ?? capabilityOverrides?.model ?? executor?.model ?? fallbackModel;
+  if (executor?.tier !== undefined && !MODEL_POLICY_TIERS.includes(executor.tier)) {
+    throw new RunnerConfigError(`invalid executor tier "${executor.tier}". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);
+  }
+  if (rigorOverride !== undefined && !RIGOR_VALUES.includes(rigorOverride)) {
+    throw new RunnerConfigError(`invalid rigor "${rigorOverride}". Valid rigors: [${RIGOR_VALUES.join(', ')}]`);
+  }
+  const effectiveRigor = (rigorOverride && capabilityRigor)
+    ? resolveStrongerRigor(rigorOverride, capabilityRigor)
+    : (rigorOverride ?? capabilityRigor);
+  const derivedTier = effectiveRigor ? cfg?.rigorToTier?.[effectiveRigor] : undefined;
+  const tier = tierOverride
+    ?? resolveStrongerTier(derivedTier ?? 'standard', executor?.tier);
+  const providerFamily = deriveProviderFamily(executor);
+  const fallbackModel = resolveTierModel(cfg, tier, providerFamily);
+  const model = modelOverride ?? executor?.model ?? fallbackModel;
   // `primaryExecutor`/`explicitProviderModel` mirror exactly what the
   // former `resolveAssignmentDispatchPolicy({assignment: {policy: {...}}})`
   // call built for this door: only when a real registered executor
@@ -850,7 +819,6 @@ export async function executeExecutorCli(
   const { resolvedProvider } = resolveExecutorProvider({
     runnerConfig: cfg,
     primaryExecutor,
-    explicitProviderModel: capabilityOverrides?.providerModel,
     options,
   });
   resolveExecutorGovernance({ primaryExecutor, providerModel: resolvedProvider, options });

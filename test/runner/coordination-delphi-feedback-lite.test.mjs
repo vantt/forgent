@@ -119,18 +119,15 @@ test('Delphi-Feedback-Lite: convene -> two round-1 private proposals -> mediated
   assert.equal(round1A.resumed, false);
   assert.equal(round1B.resumed, false);
 
-  // Actor-scope minTier proof: panelist-a's dispatch resolves tier
-  // "flagship", sourced to scope "actor" (id "panelist-a") -- the
-  // definition's own `propose-round1` operation template declares no
+  // Actor-scope rigor proof: panelist-a's dispatch resolves high rigor and
+  // its mapped flagship tier, sourced to scope "actor" (id "panelist-a").
+  // The definition's own `propose-round1` operation template declares no
   // policy of its own, so this value can only have come from
-  // spec.actors[].policy. ("flagship", not "standard": a tier exactly
-  // equal to resolveAssignmentDispatchPolicy's own hardcoded default floor
-  // ties its strict `>` provenance-update check and never attributes to
-  // "actor", even though the VALUE still resolves correctly -- see the
-  // fixture's own header comment.)
-  const round1AProvenance = round1A.runResult.policy.provenance.tier;
-  assert.equal(round1AProvenance.value, 'flagship');
-  assert.deepEqual(round1AProvenance.source, { scope: 'actor', id: 'panelist-a' });
+  // spec.actors[].policy.
+  const round1ARigorProvenance = round1A.runResult.policy.provenance.rigor;
+  assert.equal(round1ARigorProvenance.value, 'high');
+  assert.deepEqual(round1ARigorProvenance.source, { scope: 'actor', id: 'panelist-a' });
+  assert.equal(round1A.runResult.policy.tier, 'flagship');
 
   const round1LinkA = link(coordinationId, ctx, { contributionId: 'delphi_lite_r1_a', type: 'proposal', assignmentId: round1A.assignment.assignmentId, roundKey: 'round-1' });
   const round1LinkB = link(coordinationId, ctx, { contributionId: 'delphi_lite_r1_b', type: 'proposal', assignmentId: round1B.assignment.assignmentId, roundKey: 'round-1' });
@@ -138,8 +135,8 @@ test('Delphi-Feedback-Lite: convene -> two round-1 private proposals -> mediated
   assert.equal(round1LinkB.appended, true);
 
   // "aggregate" is a plain declared operation -- it produces the mediated,
-  // non-contribution artifact this protocol is named for. Its own dispatch
-  // resolves tier "frontier", sourced to actor "facilitator-actor".
+  // non-contribution artifact this protocol is named for. Its critical rigor
+  // maps to tier "frontier"; tier provenance records that canonical derivation.
   const aggregate = await dispatchDeclaredOperation(
     coordinationId,
     { operationId: 'aggregate', targetActorId: 'facilitator-actor', objective: 'Produce the mediated aggregate artifact.', expectedOutputs: ['agent-result.json (status, summary)'], writerId: 'coordinator-1' },
@@ -147,7 +144,7 @@ test('Delphi-Feedback-Lite: convene -> two round-1 private proposals -> mediated
   );
   const aggregateId = aggregate.assignment.assignmentId;
   assert.equal(aggregate.runResult.policy.provenance.tier.value, 'frontier');
-  assert.deepEqual(aggregate.runResult.policy.provenance.tier.source, { scope: 'actor', id: 'facilitator-actor' });
+  assert.deepEqual(aggregate.runResult.policy.provenance.tier.source, { scope: 'rigor', id: 'critical' });
 
   const round2A = await dispatchDeclaredOperation(
     coordinationId,

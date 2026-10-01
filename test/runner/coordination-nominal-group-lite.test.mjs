@@ -16,7 +16,7 @@
 // one scope `assertNoPortableExecutorPin` (session-engine.mjs) legally
 // allows to carry a literal `preferExecutor` pin. `spec.actors[].policy`
 // itself declares the portable, legal half of per-actor policy
-// (`minTier`, differing by role) -- see the fixture's own header comment
+// (`rigor`, differing by role) -- see the fixture's own header comment
 // for why a literal executor pin cannot legally live there.
 //
 // No formal tally/winner semantics are exercised or asserted anywhere in
@@ -283,7 +283,7 @@ test('Nominal-Group-Lite privacy shape: the facilitator cannot be authorized to 
   assert.ok(shared.assignmentId, 'share dispatches cleanly once the full cohort has proposed');
 });
 
-test('Nominal-Group-Lite per-actor provider/tier: the facilitator role and the participant role dispatch through two genuinely DIFFERENT registered executors, proven live via cliPolicy -- the definition itself declares only the legal, portable minTier half of per-actor policy', async () => {
+test('Nominal-Group-Lite per-actor provider/tier: the facilitator role and the participant role dispatch through two genuinely DIFFERENT registered executors, proven live via cliPolicy -- the definition itself declares only the legal, portable rigor half of per-actor policy', async () => {
   const coordinationId = 'ngl-per-actor-executor';
   const ctx = openSession(coordinationId);
 
@@ -315,25 +315,19 @@ test('Nominal-Group-Lite per-actor provider/tier: the facilitator role and the p
   assert.notEqual(participantProvenance.provider.value, facilitatorProvenance.provider.value);
   // The literal executor pin is sourced to the "cli" scope, never to
   // "actor" -- `spec.actors[].policy` (this fixture) legally carries only
-  // `minTier`; the executor pin lives at the one scope allowed to carry one.
+  // `rigor`; the executor pin lives at the one scope allowed to carry one.
   assert.deepEqual(participantProvenance.executor.source, { scope: 'cli', id: 'cli' });
   assert.deepEqual(facilitatorProvenance.executor.source, { scope: 'cli', id: 'cli' });
-  // The definition's OWN portable minTier declaration is genuinely read and
-  // resolved (not merely present, unread, in the YAML) -- proven by the
-  // ACTUAL resolved tier value differing by role, matching each role's own
-  // `spec.actors[].policy.minTier` declaration. The provenance SOURCE
-  // labels below are a real, pre-existing resolution-granularity limit of
-  // `resolveAssignmentDispatchPolicy` (session-engine.mjs), found empirically
-  // while building this proof, not introduced by this cell: a tier strictly
-  // BELOW the hardcoded 'standard' default floor threads through the inline
-  // Assignment contract and is labeled generically `{scope: 'opPolicy'}`
-  // (never the finer FlowDefinition scope that actually declared it), and a
-  // tier EQUAL to that same 'standard' floor is indistinguishable from never
-  // having been declared at all (`{scope: 'default'}`) -- `resolveStrongerTier`'s
-  // own `>` (never `>=`) comparison against the default floor. Only a tier
-  // STRICTLY ABOVE 'standard' would attribute to the real declaring scope.
+  // The definition's portable rigor declaration is genuinely consumed:
+  // participant low maps to nano, while facilitator standard maps to
+  // standard. Tier provenance identifies the canonical rigor derivation;
+  // the sibling rigor provenance retains the declaring actor scope.
+  assert.equal(participantProvenance.rigor.value, 'low');
+  assert.deepEqual(participantProvenance.rigor.source, { scope: 'actor', id: 'participant-a' });
   assert.equal(participantProvenance.tier.value, 'nano');
-  assert.equal(participantProvenance.tier.source.scope, 'opPolicy');
+  assert.deepEqual(participantProvenance.tier.source, { scope: 'rigor', id: 'low' });
+  assert.equal(facilitatorProvenance.rigor.value, 'standard');
+  assert.deepEqual(facilitatorProvenance.rigor.source, { scope: 'actor', id: 'facilitator-actor' });
   assert.equal(facilitatorProvenance.tier.value, 'standard');
-  assert.equal(facilitatorProvenance.tier.source.scope, 'default');
+  assert.deepEqual(facilitatorProvenance.tier.source, { scope: 'rigor', id: 'standard' });
 });

@@ -146,7 +146,8 @@ function writeRunnerConfig(repoRoot, executorScript) {
     JSON.stringify({
       runner: {
         executor: { command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'] },
-        models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+        modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
+        rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
         timeoutMs: 15000,
       },
     }),
@@ -161,7 +162,8 @@ function writeExplicitRunnerConfigFile(repoRoot, executorScript) {
     configPath,
     JSON.stringify({
       executor: { command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'] },
-      models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+      modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 15000,
     }),
   );
@@ -803,7 +805,7 @@ test('e2e full journey: item1 (no deps) -> awaiting-approval with a worker commi
   // an "outcome exists" flag.
   const outcome1 = stateView(repoRoot).outcomes?.item1;
   assert.ok(outcome1, 'outcome for item1 exists');
-  assert.equal(outcome1.predicted.tier, 'standard', 'predicted half carries the real claimed tier');
+  assert.equal(outcome1.predicted.size, 'standard', 'predicted half carries the real claimed size');
   assert.equal(outcome1.actual.outcome, 'awaiting-approval', 'actual half carries the real dispatch outcome');
   assert.equal(outcome1.actual.passed, true);
 });

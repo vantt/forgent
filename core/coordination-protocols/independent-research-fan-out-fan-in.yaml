@@ -16,7 +16,7 @@
 #   old `count: 2` made planCohort hard-fail immediately on load. `count`
 #   is optional; omitting it plans every declared actor with no count
 #   assertion, which is what this fixture actually needs.
-# - `independent-research`'s `policy.minTier` lowered from `flagship` to
+# - `independent-research`'s `policy.rigor` lowered from `flagship` to
 #   `nano`: `flagship` is only configured for the `claude`
 #   provider family in this repo's real .fgos/config.json, which would
 #   silently defeat the whole point of an independent, diverse-provider
@@ -91,7 +91,7 @@ spec:
     - id: independent-research
       role: researcher
       policy:
-        minTier: nano
+        rigor: low
       task:
         contractTemplate: independent-research-brief
       result:

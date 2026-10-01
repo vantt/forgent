@@ -41,10 +41,12 @@ function runnerConfig(executorScript, extra = {}) {
     executor: {
       allowCrossProvider: true,
       command: process.execPath,
+      providerModel: 'claude',
       args: [executorScript, '--sentinel-config-field', 'forwarded-through-adapter', '{prompt}'],
       ...(extra.executor ?? {}),
     },
-    models: { standard: 'test-model', analytical: 'test-analytical-model' },
+    modelPolicies: { claude: { standard: 'test-model', advanced: 'test-analytical-model' }, [process.execPath]: { standard: 'test-model', advanced: 'test-analytical-model' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: extra.timeoutMs ?? 5000,
     ...(extra.config ?? {}),
   };
@@ -65,7 +67,7 @@ function writeAssignmentMaterialization(root, assignmentId, runId, resultBytes) 
   fs.writeFileSync(path.join(runDir, 'result.json'), resultBytes);
 }
 
-test('production assignment door writes RunResult v2, effective contract, adapter argv, and inspect reads the same terminal result', async () => {
+test('production assignment door writes RunResult v3, effective contract, adapter argv, and inspect reads the same terminal result', async () => {
   const root = tempRoot();
   const argvPath = path.join(root, 'argv.json');
   const executor = writeExecutor(root, 'reporting-executor', `

@@ -63,7 +63,7 @@ test('projectWorkflowToFlowDefinition("coding", "feature") produces a valid Work
   });
 
   const validatePlan = fd.spec.operations.find((op) => op.id === 'planning::validate-plan');
-  assert.deepEqual(validatePlan.policy, { minTier: 'standard', preferPersona: 'code-reviewer', preferExecutor: 'claude' });
+  assert.deepEqual(validatePlan.policy, { rigor: 'standard', preferPersona: 'code-reviewer', preferExecutor: 'claude' });
 
   assert.ok(Object.isFrozen(fd));
   assert.ok(Object.isFrozen(fd.spec));
