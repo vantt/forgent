@@ -212,7 +212,8 @@ export function TaskDetail({ client, baseUrl, itemId, onBack, pollIntervalMs = 5
   // used before D17.
   const metaParts = [
     item.domain,
-    item.tier && `tier-${item.tier}`,
+    item.size && `size-${item.size}`,
+    item.rigor && `rigor-${item.rigor}`,
     item.deps && item.deps.length > 0 && `deps: ${item.deps.join(', ')}`,
     item.parent && `parent: ${item.parent}`,
   ].filter(Boolean)

@@ -68,15 +68,17 @@ export function resolveNormalizedSnapshotRow(cfg, executorId, workTier, throwawa
   // 1. Resolve executor entry and overrides
   const { executorId: resolvedExecutorId, executor, overrides, bindingSource } = resolveExecutorAndOverrides(cfg, executorId);
 
-  // 2. Resolve model for tier using exact production wiring from cli.mjs spawnWorker (~lines 294-304)
+  // 2. Resolve model for tier using production policy tier mapping
   const provider = deriveProviderFamily(executor);
-  const model = resolveTierModel(cfg, workTier, provider);
+  const tierMap = { light: 'nano', standard: 'standard', heavy: 'frontier' };
+  const policyTier = tierMap[workTier] ?? workTier;
+  const model = resolveTierModel(cfg, policyTier, provider);
 
   // 3. Resolve command/args/env via pure transport resolver
   const resolvedCmd = resolveExecutorCommand(cfg, {
     prompt: '<prompt>',
     model,
-    tier: workTier,
+    tier: policyTier,
     executorId,
     fgosDir: throwawayDir,
     contentCarries: 'repo-content',

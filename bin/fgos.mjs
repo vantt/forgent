@@ -535,11 +535,15 @@ function parseDiscoverCallerVerdict(flags) {
     // (`classificationPatchFromVerdict`) then re-checks the resolved outcome
     // before anything is written. Each key is present only when the caller
     // actually passed it, so a call that omits all three produces the exact
-    // same verdict shape as before these flags existed.
-    const tier = optionalField(flags.tier, "discover --tier requires a value ('light'/'standard'/'heavy'); omit --tier entirely to leave the item's tier unchanged.");
+    if (flags.tier !== undefined) {
+      throw new StoreError('validation', '--tier is retired; use --size (light|standard|heavy) or --rigor (low|standard|high|critical) instead.');
+    }
+    const size = optionalField(flags.size, "discover --size requires a value ('light'/'standard'/'heavy'); omit --size entirely to leave the item's size unchanged.");
+    const rigor = optionalField(flags.rigor, "discover --rigor requires a value ('low'/'standard'/'high'/'critical'); omit --rigor entirely to leave the item's rigor unchanged.");
     const kind = optionalField(flags.kind, "discover --kind requires a value from the domain's own kind vocabulary; omit --kind entirely to leave the item's kind unchanged.");
     const risk = optionalField(flags.risk, "discover --risk requires a value ('light'/'standard'/'heavy'); omit --risk entirely to leave the item's risk unchanged.");
-    if (tier !== undefined) verdict.tier = tier;
+    if (size !== undefined) verdict.size = size;
+    if (rigor !== undefined) verdict.rigor = rigor;
     if (kind !== undefined) verdict.kind = kind;
     if (risk !== undefined) verdict.risk = risk;
     return verdict;
@@ -818,7 +822,7 @@ function submitWork(dir, text, opts = {}) {
   // independently overridable per-field; an omitted flag falls through to
   // classify(text)'s own mechanical default for exactly that field, so a
   // flagless call stays byte-identical to the pre-feature behavior.
-  const tier = opts.tier ?? classified.tier;
+  const size = opts.size ?? classified.size;
   const kind = opts.kind ?? classified.kind;
   const risk = opts.risk ?? classified.risk;
   const id = generateId(title, Object.keys(listWork(dir).work));
@@ -855,7 +859,8 @@ function submitWork(dir, text, opts = {}) {
     // opts.X ?? default shape as every other field-parity flag below) --
     // omitted leaves this at the existing sentinel, unchanged.
     verify: opts.verify ?? SUBMIT_VERIFY_SENTINEL,
-    tier,
+    size,
+    ...(opts.rigor !== undefined ? { rigor: opts.rigor } : {}),
     mode: opts.async ? 'async' : 'sync',
     // Per base-workflow-model D1-D4/S2: --domain is optional, same
     // omitted-leaves-undefined shape as `add`'s --domain above; omitting
@@ -948,6 +953,9 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // long-work-item-ids-max-length-guard.md) — generateId is now the
       // path of least resistance, not a manually-typed guess.
       const idFlag = optionalField(positional[0] ?? flags.id, 'add --id requires a non-empty value; omit --id entirely to auto-generate one from --title.');
+      if (flags.tier !== undefined) {
+        throw new StoreError('validation', '--tier is retired; use --size (light|standard|heavy) or --rigor (low|standard|high|critical) instead.');
+      }
       const id = idFlag ?? generateId(
         requireField(flags.title, 'add requires --title (used to derive the id when --id is omitted, and always required as the item\'s own title regardless)'),
         Object.keys(listWork(dir).work),
@@ -961,22 +969,10 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         risk: flags.risk,
         refs: parseListFlag(flags.refs),
         verify: flags.verify,
-        // tsk-535 D1: REQUIRED at this CLI handler layer only -- never
-        // added to work.mjs's validateWorkShape, since two other
-        // legitimate addWork callers (loop.mjs's discovered-work, and
-        // this same file's promote-to-component fresh-root creation)
-        // deliberately omit description by design and would break under a
-        // schema-wide requirement (plan.md's own rejected-alternative).
         description: requireField(flags.description, 'add requires --description (the item\'s own full-text intake description)'),
         learn: typeof flags.learn === 'string' ? flags.learn : undefined,
-        // Per D6: --tier is optional; a bare/empty flag is refused the same
-        // as any other malformed value (requireField's rule), while simply
-        // omitting --tier leaves this undefined so store.mjs's addWork
-        // applies work.mjs's declared DEFAULTS.tier. An out-of-domain value
-        // (e.g. --tier extreme) passes through unrejected here — work.mjs's
-        // validateWorkShape is the single source for the TIERS domain and
-        // rejects it as validation, so that rule is never duplicated here.
-        tier: optionalField(flags.tier, 'add --tier requires a tier value (e.g. light/standard/heavy); omit --tier entirely to use the default.'),
+        size: optionalField(flags.size, 'add --size requires a size value (e.g. light/standard/heavy); omit --size entirely to use the default.'),
+        rigor: optionalField(flags.rigor, 'add --rigor requires a rigor value (e.g. low/standard/high/critical); omit --rigor entirely to leave unset.'),
         // Per base-workflow-model D1-D4/S2: --domain is optional, same
         // omitted-leaves-undefined shape as --tier just above; omitting it
         // leaves work.domain undefined so store.mjs's addWork/validateWorkShape
@@ -1083,31 +1079,18 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // on it here.
     case 'submit': {
       const text = requireField(positional[0], 'submit requires a free-text description: fgos submit "<description>" [--async|--unattended]');
+      if (flags.tier !== undefined) {
+        throw new StoreError('validation', '--tier is retired; use --size (light|standard|heavy) or --rigor (low|standard|high|critical) instead.');
+      }
       const opts = {
         async: Boolean(flags.async || flags.unattended),
-        // Per work-item-backlog-status D2: same independent boolean-flag
-        // shape as --async above -- creates the item directly at
-        // status: 'backlog' instead of the default 'todo'.
         backlog: Boolean(flags.backlog),
         domain: optionalField(flags.domain, 'submit --domain requires a domain name (e.g. coding/synthetic); omit --domain entirely to use the default.'),
-        // Per work-graph-intelligence S2b (producer A): two-hop like domain —
-        // parsed here, threaded into submitWork's work object below.
         discoveredFrom: optionalField(flags['discovered-from'], 'submit --discovered-from requires a non-empty id; omit it to leave unset.'),
-        // Per D4 (str83-fgos-slash-commands): same parseListFlag helper
-        // `add`'s --deps already uses (above) — an omitted flag parses to
-        // [], byte-identical to the prior hardcoded deps: []. Cycle/
-        // existence validation happens at the same addWork write-gate
-        // every other verb goes through; no new check here.
         deps: parseListFlag(flags.deps),
-        // Per str73-done-flip-cos-check D2: same optional JSON-encoded
-        // acceptance flag as `add`, threaded through submitWork's opts the
-        // same way domain/discoveredFrom already are, immediately above.
         acceptance: parseAcceptanceFlag(flags.acceptance, 'submit --acceptance requires a JSON-encoded array of {text, evidence} clauses.'),
-        // Per str51-llm-assist-classify D2: three new optional overrides for
-        // classify(text)'s per-field output, same optionalField shape as
-        // add's --tier above; each is independent (D5) and omitted leaves
-        // this field undefined so submitWork falls through to classify().
-        tier: optionalField(flags.tier, 'submit --tier requires a tier value (e.g. light/standard/heavy); omit --tier entirely to use classify()\'s derived value.'),
+        size: optionalField(flags.size, 'submit --size requires a size value (e.g. light/standard/heavy); omit --size entirely to use classify()\'s derived value.'),
+        rigor: optionalField(flags.rigor, 'submit --rigor requires a rigor value (e.g. low/standard/high/critical); omit --rigor entirely to leave unset.'),
         kind: optionalField(flags.kind, 'submit --kind requires a kind value; omit --kind entirely to use classify()\'s derived value.'),
         risk: optionalField(flags.risk, 'submit --risk requires a risk value; omit --risk entirely to use classify()\'s derived value.'),
         // tsk-5gu: same optionalField shape as --tier/--kind/--risk above --

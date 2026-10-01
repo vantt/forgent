@@ -323,7 +323,7 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
       addOutcome(dir, {
         id,
         predicted: {
-          tier: item.tier ?? DEFAULTS.tier,
+          size: item.size ?? DEFAULTS.size,
           deps: item.deps?.length ?? 0,
           priorVisits,
           role: actor,

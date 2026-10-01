@@ -365,7 +365,7 @@ test('runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> 
   );
   // predicted is written right at claim time, before dispatch ever runs
   const predictedEvent = events.find((e) => e.type === 'work.outcome' && e.payload.predicted);
-  assert.deepEqual(predictedEvent.payload.predicted, { tier: 'standard', deps: 0, priorVisits: 0 });
+  assert.deepEqual(predictedEvent.payload.predicted, { size: 'standard', deps: 0, priorVisits: 0 });
   // actual is written on the pass terminal, sourced from the runner's own
   // goal-check/branchFacts — never the worker's status/signal
   const actualEvent = events.find((e) => e.type === 'work.outcome' && e.payload.actual);
@@ -2126,8 +2126,8 @@ test('tsk-2yo: parseVerdictBlock parses optional tier/kind/risk additively, with
     verify: 'npm test',
   });
   assert.deepEqual(
-    parseVerdictBlock('```fgos-verdict\n{"clear": true, "verify": "npm test", "tier": "heavy", "kind": "bug", "risk": "heavy"}\n```'),
-    { clear: true, verify: 'npm test', tier: 'heavy', kind: 'bug', risk: 'heavy' },
+    parseVerdictBlock('```fgos-verdict\n{"clear": true, "verify": "npm test", "size": "heavy", "rigor": "high", "kind": "bug", "risk": "heavy"}\n```'),
+    { clear: true, verify: 'npm test', size: 'heavy', rigor: 'high', kind: 'bug', risk: 'heavy' },
   );
   // Partial classification (only one of the three fields) — each key is
   // independent, never all-or-nothing.
@@ -2138,29 +2138,30 @@ test('tsk-2yo: parseVerdictBlock parses optional tier/kind/risk additively, with
   });
   // A non-string classification value is dropped the same way a non-string
   // `verify` already is -- fail-safe, never a thrown error.
-  assert.deepEqual(parseVerdictBlock('```fgos-verdict\n{"clear": true, "verify": "npm test", "tier": 5}\n```'), {
+  assert.deepEqual(parseVerdictBlock('```fgos-verdict\n{"clear": true, "verify": "npm test", "size": 5}\n```'), {
     clear: true,
     verify: 'npm test',
   });
   // An `unclear` verdict never carries classification fields at all — the
   // parser only reads them from the `clear: true` branch.
   assert.deepEqual(
-    parseVerdictBlock('```fgos-verdict\n{"clear": false, "question": "which one?", "tier": "heavy"}\n```'),
+    parseVerdictBlock('```fgos-verdict\n{"clear": false, "question": "which one?", "size": "heavy"}\n```'),
     { clear: false, question: 'which one?' },
   );
 });
 
 test('tsk-2yo: classificationPatchFromVerdict only builds a patch on a clear discovery outcome with a clear caller verdict, and only for fields actually reported', async () => {
   const { classificationPatchFromVerdict } = await import('../../src/runner/loop.mjs');
-  assert.deepEqual(classificationPatchFromVerdict('clear', { clear: true, tier: 'heavy', kind: 'bug', risk: 'heavy' }), {
-    tier: 'heavy',
+  assert.deepEqual(classificationPatchFromVerdict('clear', { clear: true, size: 'heavy', rigor: 'high', kind: 'bug', risk: 'heavy' }), {
+    size: 'heavy',
+    rigor: 'high',
     kind: 'bug',
     risk: 'heavy',
   });
-  assert.deepEqual(classificationPatchFromVerdict('clear', { clear: true, tier: 'heavy' }), { tier: 'heavy' }, 'partial classification stays partial');
+  assert.deepEqual(classificationPatchFromVerdict('clear', { clear: true, size: 'heavy' }), { size: 'heavy' }, 'partial classification stays partial');
   assert.deepEqual(classificationPatchFromVerdict('clear', { clear: true }), {}, 'no classification fields reported -> empty patch, no edit call');
   assert.deepEqual(
-    classificationPatchFromVerdict('unclear', { clear: true, tier: 'heavy' }),
+    classificationPatchFromVerdict('unclear', { clear: true, size: 'heavy' }),
     {},
     'never applies when the discovery outcome itself is not clear',
   );
@@ -2183,15 +2184,16 @@ test('tsk-2yo: a headless clear verdict carrying tier/kind/risk actually applies
     risk: 'standard',
     refs: [],
     verify: 'npm test',
-    tier: 'standard',
+    size: 'standard',
     stage: 'discovery',
     domain: 'coding',
   });
-  const callerVerdict = { clear: true, verify: 'npm test', tier: 'heavy', kind: 'bug', risk: 'heavy' };
+  const callerVerdict = { clear: true, verify: 'npm test', size: 'heavy', rigor: 'high', kind: 'bug', risk: 'heavy' };
   const patch = classificationPatchFromVerdict('clear', callerVerdict);
   editWork(dir, { id: 'item-headless-classify', patch, role: 'runner' });
   const item = listWork(dir).work['item-headless-classify'];
-  assert.equal(item.tier, 'heavy');
+  assert.equal(item.size, 'heavy');
+  assert.equal(item.rigor, 'high');
   assert.equal(item.kind, 'bug');
   assert.equal(item.risk, 'heavy');
 });

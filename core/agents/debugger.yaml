@@ -11,7 +11,7 @@ decision_boundary:
     - Fix the root cause of a proven, reproduced failure without redesigning scope
   must_escalate:
     - A failure whose root cause implies a design or architecture change beyond the item's own locked scope
-model_tier: standard
+rigor: standard
 tool-scope:
   - Read
   - Edit

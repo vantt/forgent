@@ -83,6 +83,8 @@ impl WorkSource {
         Self
     }
 
+    pub const VIEW_SCHEMA_VERSION: u64 = 2;
+
     /// Read raw state json from `.fgos/cache/state.json` or `.fgos/state.json`
     pub fn read_state_json(root: &Path) -> Option<Value> {
         let fgos_dir = root.join(".fgos");
@@ -99,7 +101,11 @@ impl WorkSource {
 
         let path = state_path?;
         let content = fs::read_to_string(path).ok()?;
-        serde_json::from_str(&content).ok()
+        let val: Value = serde_json::from_str(&content).ok()?;
+        if val.get("viewSchemaVersion").and_then(|v| v.as_u64()) != Some(Self::VIEW_SCHEMA_VERSION) {
+            return None;
+        }
+        Some(val)
     }
 
     /// Read active runtime claims from `.fgos/runtime/claims/*.json`
@@ -537,8 +543,11 @@ impl ObservationSource for WorkSource {
                         if let Some(kind) = payload.get("kind") {
                             attrs.insert("kind".to_string(), kind.clone());
                         }
-                        if let Some(tier) = payload.get("tier") {
-                            attrs.insert("tier".to_string(), tier.clone());
+                        if let Some(size) = payload.get("size").or_else(|| payload.get("tier")) {
+                            attrs.insert("size".to_string(), size.clone());
+                        }
+                        if let Some(rigor) = payload.get("rigor") {
+                            attrs.insert("rigor".to_string(), rigor.clone());
                         }
                         observations.push(Observation {
                             ts: ts.to_string(),
@@ -699,7 +708,7 @@ mod tests {
         let fgos_dir = dir.join(".fgos");
         fs::create_dir_all(&fgos_dir).unwrap();
 
-        let event1 = r#"{"type":"work.add","seq":1,"ts":"2026-09-01T10:00:00Z","payload":{"id":"tsk-1","kind":"feature","tier":"standard"}}"#;
+        let event1 = r#"{"type":"work.add","seq":1,"ts":"2026-09-01T10:00:00Z","payload":{"id":"tsk-1","kind":"feature","size":"standard"}}"#;
         let event2 = r#"{"type":"work.move","seq":2,"ts":"2026-09-01T10:05:00Z","payload":{"id":"tsk-1","from":"todo","to":"awaiting-human","ask":"what is this?"}}"#;
         let event3 = r#"{"type":"work.move","seq":3,"ts":"2026-09-01T10:10:00Z","payload":{"id":"tsk-1","from":"awaiting-human","to":"doing","answer":"it is X"}}"#;
         let event4 = r#"{"type":"work.gate-approved","seq":4,"ts":"2026-09-01T10:15:00Z","payload":{"id":"tsk-1","gate":"plan","actor":"human"}}"#;
@@ -733,6 +742,7 @@ mod tests {
         fs::create_dir_all(&fgos_dir).unwrap();
 
         let state_json = r#"{
+            "viewSchemaVersion": 2,
             "work": {
                 "tsk-1": { "id": "tsk-1", "status": "awaiting-approval", "stage": "executing", "domain": "coding" },
                 "tsk-2": { "id": "tsk-2", "status": "doing", "stage": "executing", "domain": "coding" },

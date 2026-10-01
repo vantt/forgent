@@ -12,7 +12,7 @@ decision_boundary:
     - Which open product-decision gap is material enough to ask a person about
   must_escalate:
     - A product decision with no grounding in the item's own CONTEXT.md
-model_tier: standard
+rigor: standard
 tool-scope:
   - Read
   - Write

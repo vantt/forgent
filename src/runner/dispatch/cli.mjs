@@ -23,7 +23,8 @@ import { loadAgentDefs, readTaskSpecHeader } from '../agent-roster.mjs';
 import { selectTemplate, hashTemplate } from '../prompt-templates.mjs';
 import { listWork, StoreError } from '../../state/store.mjs';
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
-import { RunnerConfigError, ensureRunnerConfigForDir, DEFAULT_TIER_TO_POLICY } from './config.mjs';
+import { RunnerConfigError, ensureRunnerConfigForDir, MODEL_POLICY_TIERS } from './config.mjs';
+import { RIGOR_VALUES, resolveStrongerRigor } from '../rigor.mjs';
 import { resolveExecutorAndOverrides, resolveExecutorIdForPurpose, resolveTierModel, deriveProviderFamily, executorIdForWork, resolveCapabilityIdentityDetails } from './resolve.mjs';
 import { resolveExecutorProvider, resolveExecutorGovernance, resolveStrongerTier } from './assignment-policy.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
@@ -292,10 +293,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   // process is spawned — exactly like the spawnSync-based version, and
   // exactly what dispatch.test.mjs's "throws a RunnerConfigError ... before
   // any spawn" test pins.
-  const requestedTier = work.tier ?? DEFAULTS.tier;
-  // Work still speaks light|standard|heavy in Phase 2. Bridge it once here,
-  // then apply the selected capability's demand-side rigor as a raise-only
-  // floor before resolving the provider model.
+  const workRigor = work?.rigor ?? (work?.risk === 'heavy' ? 'high' : 'standard');
   const executorId = executorIdForWork(work, opts.stage);
   const { executorId: resolvedExecutorId, executor: executorForTier } = executorId ? resolveExecutorAndOverrides(cfg, executorId) : {};
   const { capability: capabilityName } = resolveCapabilityIdentityDetails({
@@ -306,12 +304,12 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
     resolvedExecutor: executorForTier,
   });
   const capabilityRigor = capabilityName ? cfg.capabilities?.[capabilityName]?.rigor : undefined;
-  const capabilityTier = capabilityRigor ? cfg.rigorToTier?.[capabilityRigor] : undefined;
-  const policyTier = resolveStrongerTier(DEFAULT_TIER_TO_POLICY[requestedTier] ?? requestedTier, capabilityTier);
+  const effectiveRigor = capabilityRigor ? resolveStrongerRigor(workRigor, capabilityRigor) : workRigor;
+  const policyTier = cfg.rigorToTier?.[effectiveRigor] ?? 'standard';
   const providerFamily = deriveProviderFamily(executorForTier);
   const model = executorForTier?.model ?? resolveTierModel(cfg, policyTier, providerFamily);
   const modelSource = { scope: 'placement-policy', id: `${providerFamily}.${policyTier}` };
-  const tier = requestedTier;
+  const tier = policyTier;
   const prompt = buildPrompt(work, opts.feedback, opts.stage);
   // D20/D22 (review finding H1, tsk-397): only has an observable effect on
   // a command-less/adapter-less/invocation-less executor with no static
@@ -324,7 +322,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   const { command, args, argsTemplate, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement, adapter, provider, baseCommit, headRef, governance, method, url, headers, body, resourceBindings } = resolveExecutorCommand(cfg, {
     prompt,
     model,
-    tier: requestedTier,
+    tier,
     executorId,
     fgosDir: opts.fgosDir,
     // tsk-4hl: attest THIS worker's own dispatch worktree, never fgosDir's
@@ -547,6 +545,7 @@ export async function executeExecutorCli(
     runnerConfig,
     model: modelOverride,
     tier: tierOverride,
+    rigor: rigorOverride,
     for: purposeArg,
     carries,
     hasLiveTaskAccess = false,
@@ -790,18 +789,21 @@ export async function executeExecutorCli(
   // resolver as an already-resolved `cliOverride.model`.
   const capabilityName = anchorCapability ?? capabilityIdentity ?? purpose ?? executorIdArg;
   const capabilityRigor = capabilityName ? cfg?.capabilities?.[capabilityName]?.rigor : undefined;
-  const capabilityTier = capabilityRigor ? cfg?.rigorToTier?.[capabilityRigor] : undefined;
-  // Preserve the Phase-2 Work compatibility bridge: legacy light/heavy are
-  // direct placement requests. Canonical six-level tiers remain raise-only
-  // against the capability/default floor.
-  const legacyTierOverride = tierOverride === 'light' || tierOverride === 'heavy'
-    ? DEFAULT_TIER_TO_POLICY[tierOverride]
-    : undefined;
-  const executorTier = executor?.tier !== undefined && Object.prototype.hasOwnProperty.call(DEFAULT_TIER_TO_POLICY, executor.tier)
-    ? DEFAULT_TIER_TO_POLICY[executor.tier]
-    : executor?.tier;
-  const tier = legacyTierOverride
-    ?? resolveStrongerTier(capabilityTier ?? DEFAULTS.tier, tierOverride ?? executorTier);
+  if (tierOverride !== undefined && !MODEL_POLICY_TIERS.includes(tierOverride)) {
+    throw new RunnerConfigError(`invalid tier "${tierOverride}". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);
+  }
+  if (executor?.tier !== undefined && !MODEL_POLICY_TIERS.includes(executor.tier)) {
+    throw new RunnerConfigError(`invalid executor tier "${executor.tier}". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);
+  }
+  if (rigorOverride !== undefined && !RIGOR_VALUES.includes(rigorOverride)) {
+    throw new RunnerConfigError(`invalid rigor "${rigorOverride}". Valid rigors: [${RIGOR_VALUES.join(', ')}]`);
+  }
+  const effectiveRigor = (rigorOverride && capabilityRigor)
+    ? resolveStrongerRigor(rigorOverride, capabilityRigor)
+    : (rigorOverride ?? capabilityRigor);
+  const derivedTier = effectiveRigor ? cfg?.rigorToTier?.[effectiveRigor] : undefined;
+  const tier = tierOverride
+    ?? resolveStrongerTier(derivedTier ?? 'standard', executor?.tier);
   const providerFamily = deriveProviderFamily(executor);
   const fallbackModel = resolveTierModel(cfg, tier, providerFamily);
   const model = modelOverride ?? executor?.model ?? fallbackModel;

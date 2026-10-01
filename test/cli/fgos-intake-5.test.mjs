@@ -200,13 +200,13 @@ test('submit --backlog creates the item at status:"backlog" with its own categor
 });
 
 
-test('submit of text matching no keyword falls back to tier:"standard" and persists, exit 0', () => {
+test('submit of text matching no keyword falls back to size:"standard" and persists, exit 0', () => {
   const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);
   assert.equal(result.status, 0);
   const item = JSON.parse(result.stdout).data;
-  assert.equal(item.tier, 'standard');
-  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[item.id].tier, 'standard');
+  assert.equal(item.size, 'standard');
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[item.id].size, 'standard');
 });
 
 

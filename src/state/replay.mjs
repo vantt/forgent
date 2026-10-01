@@ -18,6 +18,8 @@ import { applyKnowledgeEvent } from './knowledge-registry.mjs';
 import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
 
 // tsk-49e: every top-level key applyEvent ever writes to `view` is either an
+export const VIEW_SCHEMA_VERSION = 2;
+
 // array `.push`ed onto in place (only `decisions`) or reassigned via a
 // `{...oldValue, ...patch}` spread (every other container: work, gates,
 // settlements, learnings, decisionsById, outcomes, discovery, tools, and any
@@ -69,7 +71,17 @@ function applyEvent(view, event) {
     case 'work.add': {
       const item = event.payload;
       if (item && typeof item === 'object' && typeof item.id === 'string') {
-        view.work[item.id] = { ...DEFAULTS, ...item };
+        const normalized = { ...item };
+        if (normalized.tier !== undefined) {
+          if (normalized.size === undefined) {
+            normalized.size = normalized.tier;
+          }
+          delete normalized.tier;
+        }
+        if (normalized.rigor === undefined && normalized.risk === 'heavy') {
+          normalized.rigor = 'high';
+        }
+        view.work[item.id] = { ...DEFAULTS, ...normalized };
       }
       break;
     }
@@ -352,7 +364,17 @@ function applyEvent(view, event) {
       const { id, patch, writer } = event.payload ?? {};
       const item = view.work[id];
       if (item && patch && typeof patch === 'object') {
-        Object.assign(item, patch);
+        const normalizedPatch = { ...patch };
+        if (normalizedPatch.tier !== undefined) {
+          if (normalizedPatch.size === undefined) {
+            normalizedPatch.size = normalizedPatch.tier;
+          }
+          delete normalizedPatch.tier;
+        }
+        if (normalizedPatch.risk === 'heavy' && item.rigor === undefined && normalizedPatch.rigor === undefined) {
+          normalizedPatch.rigor = 'high';
+        }
+        Object.assign(item, normalizedPatch);
       }
       // Writer provenance (D8/D15, str46-io-contract): same unconditional,
       // latest-write-wins fold as work.move above -- writer is a sibling of
@@ -711,6 +733,7 @@ function tryIncrementalRebuild(logPath) {
     return null;
   }
   if (!persisted || typeof persisted !== 'object') return null;
+  if (persisted.viewSchemaVersion !== VIEW_SCHEMA_VERSION) return null;
   const snap = persisted.snapshot;
   if (!snap || typeof snap.size !== 'number' || typeof snap.mtimeMs !== 'number' || typeof snap.lastLine !== 'string') return null;
 
@@ -725,7 +748,7 @@ function tryIncrementalRebuild(logPath) {
   // snapshot) from the returned view shape -- everything else in
   // `persisted` IS the real view, per writeView's own "additive sibling
   // field, never folded back" pattern (see viewRevision's own doc comment).
-  const { revision, snapshot, ...savedView } = persisted;
+  const { revision, snapshot, viewSchemaVersion, ...savedView } = persisted;
 
   if (stat.mtimeMs === snap.mtimeMs && stat.size === snap.size) {
     return savedView; // untouched since the snapshot -- zero-read shortcut
@@ -866,10 +889,11 @@ function tryIncrementalRebuildFromDir(dir) {
     return null;
   }
   if (!persisted || typeof persisted !== 'object') return null;
+  if (persisted.viewSchemaVersion !== VIEW_SCHEMA_VERSION) return null;
   const snap = persisted.snapshot;
   if (!snap || typeof snap.files !== 'object' || snap.files === null || typeof snap.maxTs !== 'string') return null;
 
-  const { revision, snapshot, ...savedView } = persisted;
+  const { revision, snapshot, viewSchemaVersion, ...savedView } = persisted;
 
   const currentFiles = discoverEventFilePaths(dir);
   const currentFileNames = new Set(currentFiles.map((f) => f.file));

@@ -40,6 +40,7 @@ test('dead vocabulary guard: Phase 1 & 2 retired symbols do not appear in src, b
     'QUALITY_MODE_VALUES',
     'MIN_RIGOR_VALUES',
     'MIN_TIER_VALUES',
+    'DEFAULT_TIER_TO_POLICY',
   ];
 
   const searchDirs = ['src', 'bin', 'core', 'domains', 'scripts'].map((d) => path.join(REPO_ROOT, d));
@@ -192,11 +193,15 @@ test('resolveTierModel: resolves tier to model via modelPolicies[provider][tier]
   assert.equal(resolveTierModel(cfg, 'flagship', 'claude'), 'opus');
   assert.equal(resolveTierModel(cfg, 'frontier', 'claude'), 'fable');
 
-  // Temporary bridge for light|standard|heavy
-  assert.equal(resolveTierModel(cfg, 'light', 'gemini'), 'flash-low');
-  assert.equal(resolveTierModel(cfg, 'standard', 'gemini'), 'flash-medium');
-  assert.equal(resolveTierModel(cfg, 'heavy', 'gemini'), 'pro-high');
-
+  // Phase 3: light/heavy are retired from resolveTierModel
+  assert.throws(
+    () => resolveTierModel(cfg, 'light', 'gemini'),
+    (err) => err instanceof RunnerConfigError && /unrecognized tier "light"/.test(err.message),
+  );
+  assert.throws(
+    () => resolveTierModel(cfg, 'heavy', 'gemini'),
+    (err) => err instanceof RunnerConfigError && /unrecognized tier "heavy"/.test(err.message),
+  );
   // Invalid tier throws
   assert.throws(
     () => resolveTierModel(cfg, 'non-existent-tier', 'claude'),
@@ -297,4 +302,52 @@ test('dead vocabulary guard: capabilities.<cap>.rigor floor elevates tier and ca
   assert.equal(effective.model, 'opus');
   assert.equal(effective.provenance.rigor.source.scope, 'capability');
   assert.equal(effective.provenance.rigor.source.id, 'code:review');
+});
+
+import * as workModule from '../../src/state/work.mjs';
+import { COMMAND_REGISTRY } from '../../src/cli/command-registry.mjs';
+
+test('dead vocabulary guard: Phase 3 Work tier retired, size and rigor enforced', () => {
+  // 1. workModule exports SIZES, not TIERS
+  assert.equal(workModule.TIERS, undefined, 'TIERS must not be exported from work.mjs');
+  assert.ok(Array.isArray(workModule.SIZES), 'SIZES must be exported from work.mjs');
+  assert.deepEqual(workModule.SIZES, ['light', 'standard', 'heavy']);
+
+  // 2. Pattern \b(item|work|workItem)\??\.tier\b does not appear in src, bin, packages, herdr-plugin/src
+  // Exception: src/state/work.mjs where work.tier is checked and rejected
+  const pattern = /\b(item|work|workItem)\??\.tier\b/;
+  const checkDirs = ['src', 'bin', 'packages', path.join('herdr-plugin', 'src')].map((d) => path.join(REPO_ROOT, d));
+  const allFiles = checkDirs.flatMap((d) => collectFiles(d, ['.js', '.mjs', '.cjs', '.rs']));
+  const violations = [];
+  for (const file of allFiles) {
+    const rel = path.relative(REPO_ROOT, file);
+    if (rel === 'src/state/work.mjs') continue; // allowed: error rejection of work.tier
+    const content = fs.readFileSync(file, 'utf8');
+    if (pattern.test(content)) {
+      violations.push(`${rel}: found deprecated work tier read`);
+    }
+  }
+  assert.deepEqual(violations, [], `Work tier reads detected:\n${violations.join('\n')}`);
+
+  // 3. Work verbs in command registry do not declare tier flag, and declare size + rigor
+  for (const verb of ['add', 'submit', 'discover', 'edit']) {
+    const entry = COMMAND_REGISTRY.find((e) => e.invoke === `fgos ${verb}`);
+    assert.ok(entry, `command-registry must have entry for fgos ${verb}`);
+    assert.equal(entry.parameters?.properties?.tier, undefined, `fgos ${verb} must not declare tier flag`);
+    assert.ok(entry.parameters?.properties?.size, `fgos ${verb} must declare size flag`);
+    assert.ok(entry.parameters?.properties?.rigor, `fgos ${verb} must declare rigor flag`);
+  }
+
+  // 4. \b(work|item|workItem)\.size\b does not appear in src/runner/dispatch/**
+  const dispatchFiles = collectFiles(path.join(REPO_ROOT, 'src', 'runner', 'dispatch'), ['.js', '.mjs']);
+  const workSizePattern = /\b(work|item|workItem)\.size\b/;
+  const dispatchViolations = [];
+  for (const file of dispatchFiles) {
+    const rel = path.relative(REPO_ROOT, file);
+    const content = fs.readFileSync(file, 'utf8');
+    if (workSizePattern.test(content)) {
+      dispatchViolations.push(`${rel}: work.size leaked into dispatch`);
+    }
+  }
+  assert.deepEqual(dispatchViolations, [], `Dispatch size leaks detected:\n${dispatchViolations.join('\n')}`);
 });

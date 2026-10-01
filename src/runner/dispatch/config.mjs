@@ -20,7 +20,6 @@
 import { RIGOR_VALUES } from '../rigor.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
-import { TIERS } from '../../state/work.mjs';
 import { mergeConfigDefaults } from '../../setup/config-merge.mjs';
 import { sharedConfigFilePath } from '../../config/shared-config-file.mjs';
 import { mergeWithGlobalConfig } from '../../config/global-config.mjs';
@@ -478,15 +477,9 @@ export const CLAUDE_CLI_COMMANDS = Object.freeze(['claude']);
  * `cfg.modelPolicies.<providerModel>` tier vocabulary (tsk-5tm-5 D9,
  * model-tier vocabulary migration 2026-09-17) — deliberately its OWN
  * 6-value cross-provider equivalence vocab (`plans/260916-account-rotator/
- * design.md`'s "Tier vocabulary"), distinct from `work.mjs`'s `TIERS`
- * (`light/standard/heavy`, D9's own pinned scope boundary: that export
- * `DEFAULT_TIER_TO_POLICY` is the temporary mapping from a work item's own
- * tier onto one of these six (retired in Phase 3).
+ * design.md`'s "Tier vocabulary").
  */
 export const MODEL_POLICY_TIERS = Object.freeze(['nano', 'mini', 'standard', 'advanced', 'flagship', 'frontier']);
-// Exported (additive, D7 module split): `dispatch/resolve.mjs`'s
-// `resolveTierModel` needs this default map too.
-export const DEFAULT_TIER_TO_POLICY = Object.freeze({ light: 'nano', standard: 'standard', heavy: 'frontier' });
 
 /**
  * `executors.<id>.invocations[].via` vocabulary (tsk-5tm-4 D11, widened

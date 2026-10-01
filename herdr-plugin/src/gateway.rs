@@ -704,13 +704,19 @@ async fn patch_work(
     // guarded for consistency rather than carved out like `text`/`reason`
     // (tsk-1ah's own exemption is for genuinely long free text, not a
     // one-line title).
+    if body.get("tier").is_some() {
+        return Err(GatewayError::validation(
+            "\"tier\" is retired; use \"size\" (light|standard|heavy) or \"rigor\" (low|standard|high|critical) instead"
+        ));
+    }
     for (json_key, flag) in [
         ("title", "--title"),
         ("description", "--description"),
         ("kind", "--kind"),
         ("risk", "--risk"),
         ("verify", "--verify"),
-        ("tier", "--tier"),
+        ("size", "--size"),
+        ("rigor", "--rigor"),
         // `urgent` reads as boolean-shaped from its name, but the engine
         // treats it as a string enum (`work.mjs`'s own real vocabulary:
         // "low"/"medium"/"high"/"critical", confirmed by a live `fgos

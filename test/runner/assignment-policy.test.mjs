@@ -822,14 +822,15 @@ test('resolveAssignmentDispatchPolicy rejects malformed assignment policy contai
   }
 });
 
-test('resolveAssignmentDispatchPolicy limits the temporary Work tier bridge to the legacy vocabulary', () => {
+test('resolveAssignmentDispatchPolicy: Work size never enters dispatch and work.rigor determines policy tier', () => {
   const assignment = buildAssignment({ stage: 'planning', operation: 'validate-plan' });
-  for (const tier of ['frontier', ['heavy']]) {
-    assert.throws(
-      () => resolveAssignmentDispatchPolicy({ assignment, work: { id: 'tsk-work-tier', tier } }),
-      (err) => err instanceof RunnerConfigError && /work\.tier must be one of/.test(err.message),
-    );
-  }
+  const effective = resolveAssignmentDispatchPolicy({
+    assignment,
+    work: { id: 'tsk-work-1', size: 'heavy', rigor: 'high' },
+  });
+  assert.equal(effective.tier, 'flagship');
+  assert.equal(effective.provenance.rigor.value, 'high');
+  assert.equal(effective.provenance.rigor.source.scope, 'work');
 });
 
 test('resolveAssignmentDispatchPolicy: reasoningEffort derives only from rigor and an explicit tier does not raise it', () => {

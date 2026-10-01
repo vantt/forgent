@@ -328,7 +328,7 @@ test('rebuild-determinism (domain retrofit): the fixture log (zero domain events
         risk: 'low',
         refs: [],
         verify: 'npm test',
-        tier: 'standard',
+        size: 'standard',
       },
       'design-api': {
         id: 'design-api',
@@ -339,7 +339,7 @@ test('rebuild-determinism (domain retrofit): the fixture log (zero domain events
         risk: 'medium',
         refs: ['docs/spec.md'],
         verify: 'review passes',
-        tier: 'standard',
+        size: 'standard',
       },
       'build-feature': {
         id: 'build-feature',
@@ -350,7 +350,7 @@ test('rebuild-determinism (domain retrofit): the fixture log (zero domain events
         risk: 'high',
         refs: [],
         verify: 'npm test',
-        tier: 'standard',
+        size: 'standard',
       },
     },
     decisions: [{ text: 'Chose fgos naming convention', ts: '2026-07-14T06:17:16.363Z' }],

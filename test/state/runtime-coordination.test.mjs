@@ -558,7 +558,7 @@ test('settleClaim reconciles a revision drift caused entirely by the SAME writer
 
     // Several routine same-writer edits, same shape fgos-coding-planning's
     // own field-sync steps make mid-lifecycle -- all writer "session-A".
-    editWork(dir, { id: 'tsk-1', patch: { tier: 'standard' } });
+    editWork(dir, { id: 'tsk-1', patch: { size: 'standard' } });
     editWork(dir, { id: 'tsk-1', patch: { docsRef: 'docs/history/tsk-1/' } });
     editWork(dir, { id: 'tsk-1', patch: { verify: 'npm test -- test/foo.test.mjs', action: 'do the thing', footprint: ['src/foo.mjs'] } });
 
@@ -593,7 +593,7 @@ test('settleClaim reconciles a same-writer drift even when unstamped side-log ev
     const preClaimRevision = getItemDurableRevision(listWork(dir), 'tsk-1');
     const claim = acquireClaim(dir, { id: 'tsk-1', actor: 'session', preClaimStatus: 'todo', preClaimRevision });
 
-    editWork(dir, { id: 'tsk-1', patch: { tier: 'standard' } });
+    editWork(dir, { id: 'tsk-1', patch: { size: 'standard' } });
     addDecision(dir, { id: 'tsk-1', text: 'a routine mid-lifecycle decision', rationale: 'because', kind: 'engine' });
     recordGateApprove(dir, { id: 'tsk-1', gate: 'validateApprove', actor: 'bypass', verify: 'npm test' });
 
@@ -684,7 +684,7 @@ test('settleClaim treats an event with no writer stamp at all as NOT self-caused
     const preClaimRevision = getItemDurableRevision(listWork(dir), 'tsk-1');
     const claim = acquireClaim(dir, { id: 'tsk-1', actor: 'session', preClaimStatus: 'todo', preClaimRevision });
 
-    editWork(dir, { id: 'tsk-1', patch: { tier: 'standard' } });
+    editWork(dir, { id: 'tsk-1', patch: { size: 'standard' } });
 
     // Simulate an unstamped event touching this id landing in the log
     // directly (the shape recordClaimAttempt writes -- no payload.writer).

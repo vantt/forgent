@@ -203,10 +203,11 @@ test('fgos --help renders move\'s mixed positional/flag args distinctly', () => 
 // be registered in the manifest as optional properties (not in `required`)
 // so they are discoverable via `fgos --help --json`, same shape as the
 // existing domain/discovered-from/deps/acceptance optional entries.
-test('submit\'s registry entry lists tier/kind/risk as optional properties, not required', () => {
+test('submit\'s registry entry lists size/rigor/kind/risk as optional properties, not required, and no tier', () => {
   const submitEntry = COMMAND_REGISTRY.find((entry) => entry.name === 'submit');
   assert.ok(submitEntry, 'COMMAND_REGISTRY is missing a "submit" entry');
-  for (const field of ['tier', 'kind', 'risk']) {
+  assert.equal(submitEntry.parameters.properties.tier, undefined, 'submit registry entry must not have tier');
+  for (const field of ['size', 'rigor', 'kind', 'risk']) {
     assert.ok(
       submitEntry.parameters.properties[field],
       `submit's registry entry is missing a "${field}" property`,

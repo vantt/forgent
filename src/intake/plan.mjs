@@ -949,7 +949,8 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
       description: child.title,
       stage: stageForStep(domain, 'Execute'),
       parent: id,
-      tier: work.tier,
+      size: work.size ?? DEFAULTS.size,
+      ...(work.rigor !== undefined ? { rigor: work.rigor } : {}),
       domain: work.domain,
     });
   });

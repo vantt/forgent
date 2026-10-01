@@ -1378,7 +1378,7 @@ export async function executeAssignment(assignment, opts = {}) {
   // agreement; both used to happen here, separately, and could only ever
   // agree or throw, never usefully disagree. `workItem: opts.work` is
   // threaded through so the merged policy resolution sees the real Work
-  // object for tier monotonicity (work.tier/work.risk), the same object
+  // object for rigor monotonicity (work.rigor/work.risk), the same object
   // the removed direct call used to pass as `work`.
   // `let`, not `const`: a provider-capacity refusal below (Phase B,
   // plans/260917-executor-profile-schema-migration/plan.md) may replace

@@ -66,7 +66,7 @@ const EXPECTED_OLD_VIEW = {
       risk: 'low',
       refs: [],
       verify: 'npm test',
-      tier: 'standard',
+      size: 'standard',
     },
     'design-api': {
       id: 'design-api',
@@ -77,7 +77,7 @@ const EXPECTED_OLD_VIEW = {
       risk: 'medium',
       refs: ['docs/spec.md'],
       verify: 'review passes',
-      tier: 'standard',
+      size: 'standard',
     },
     'build-feature': {
       id: 'build-feature',
@@ -88,7 +88,7 @@ const EXPECTED_OLD_VIEW = {
       risk: 'high',
       refs: [],
       verify: 'npm test',
-      tier: 'standard',
+      size: 'standard',
     },
   },
   decisions: [{ text: 'Chose fgos naming convention', ts: '2026-07-14T06:17:16.363Z' }],
@@ -106,7 +106,7 @@ test('fixture carries the expected 7 events, none with tier/v (old log, pre-Phas
   }
 });
 
-test('rebuildView on the fixture alone injects DEFAULTS.tier and folds to the expected view', () => {
+test('rebuildView on the fixture alone injects DEFAULTS.size and folds to the expected view', () => {
   const view = rebuildView(FIXTURE_PATH);
   assert.deepEqual(view, EXPECTED_OLD_VIEW);
 });
@@ -177,14 +177,14 @@ test('a log mixing old (fixture) events followed by new (v-carrying) events fold
   const second = rebuildView(logPath);
   assert.deepEqual(first, second);
 
-  // Old items retain their defaulted tier alongside their updated status.
-  assert.equal(first.work['setup-repo'].tier, 'standard');
+  // Old items retain their defaulted size alongside their updated status.
+  assert.equal(first.work['setup-repo'].size, 'standard');
   assert.equal(first.work['build-feature'].status, 'awaiting-approval');
-  assert.equal(first.work['build-feature'].tier, 'standard');
+  assert.equal(first.work['build-feature'].size, 'standard');
 
-  // New items: an explicit tier survives untouched; an omitted one still defaults.
-  assert.equal(first.work['ship-feature'].tier, 'heavy');
-  assert.equal(first.work['write-docs'].tier, 'standard');
+  // New items: an explicit tier maps to size; an omitted one still defaults.
+  assert.equal(first.work['ship-feature'].size, 'heavy');
+  assert.equal(first.work['write-docs'].size, 'standard');
 
   // On disk: the original 7 lines still carry no v; every appended line does.
   const rawLines = fs
@@ -226,8 +226,8 @@ test('a pure new log (every event carries v) replays correctly, not just old-alo
 
   const view = rebuildView(logPath);
   assert.equal(view.work.a.status, 'done');
-  assert.equal(view.work.a.tier, DEFAULTS.tier);
-  assert.equal(view.work.b.tier, 'light');
+  assert.equal(view.work.a.size, DEFAULTS.size);
+  assert.equal(view.work.b.size, 'light');
   assert.equal(view.decisions.length, 1);
 
   const rawLines = fs

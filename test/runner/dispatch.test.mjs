@@ -1681,9 +1681,9 @@ test('detectAssistantCli delegates to tool-registry.mjs\'s shared findExecutable
 
 test('resolveTierModel resolves each declared tier to its configured model', () => {
   const cfg = baseConfig(['{prompt}']);
-  assert.equal(resolveTierModel(cfg, 'light'), 'haiku');
+  assert.equal(resolveTierModel(cfg, 'nano'), 'haiku');
   assert.equal(resolveTierModel(cfg, 'standard'), 'sonnet');
-  assert.equal(resolveTierModel(cfg, 'heavy'), 'opus');
+  assert.equal(resolveTierModel(cfg, 'frontier'), 'opus');
 });
 
 test('resolveTierModel throws a validation error for an unknown tier', () => {
@@ -1710,23 +1710,37 @@ function modelPoliciesConfig() {
 
 test('resolveTierModel resolves the default provider (claude) when no providerModel is given, same tier->model mapping as before', () => {
   const cfg = modelPoliciesConfig();
-  assert.equal(resolveTierModel(cfg, 'light'), 'haiku');
+  assert.equal(resolveTierModel(cfg, 'nano'), 'haiku');
   assert.equal(resolveTierModel(cfg, 'standard'), 'sonnet');
-  assert.equal(resolveTierModel(cfg, 'heavy'), 'opus');
+  assert.equal(resolveTierModel(cfg, 'frontier'), 'opus');
 });
 
 test('resolveTierModel resolves a non-Claude provider (e.g. agy/gemini) to that provider\'s own model name, not Claude\'s', () => {
   const cfg = modelPoliciesConfig();
-  assert.equal(resolveTierModel(cfg, 'light', 'gemini'), 'gemini-flash');
+  assert.equal(resolveTierModel(cfg, 'nano', 'gemini'), 'gemini-flash');
   assert.equal(resolveTierModel(cfg, 'standard', 'gemini'), 'gemini-pro');
-  assert.equal(resolveTierModel(cfg, 'heavy', 'gemini'), 'gemini-ultra');
+  assert.equal(resolveTierModel(cfg, 'frontier', 'gemini'), 'gemini-ultra');
 });
 
 test('resolveTierModel throws when providerModel names a provider with no modelPolicies entry', () => {
   const cfg = modelPoliciesConfig();
-  assert.throws(() => resolveTierModel(cfg, 'light', 'mistral'), (err) => {
+  assert.throws(() => resolveTierModel(cfg, 'standard', 'mistral'), (err) => {
     assert.ok(err instanceof RunnerConfigError);
     assert.match(err.message, /mistral/);
+    return true;
+  });
+});
+
+test('resolveTierModel throws for retired light/heavy tiers', () => {
+  const cfg = modelPoliciesConfig();
+  assert.throws(() => resolveTierModel(cfg, 'light'), (err) => {
+    assert.ok(err instanceof RunnerConfigError);
+    assert.match(err.message, /unrecognized tier "light"/);
+    return true;
+  });
+  assert.throws(() => resolveTierModel(cfg, 'heavy'), (err) => {
+    assert.ok(err instanceof RunnerConfigError);
+    assert.match(err.message, /unrecognized tier "heavy"/);
     return true;
   });
 });
@@ -2172,10 +2186,10 @@ test('resolveExecutorCommand honors a executors.<executorId> override ahead of t
     modelPolicies: { claude: { frontier: 'opus', standard: 'opus' }, node: { frontier: 'opus', standard: 'opus' } },
     timeoutMs: 5000,
   };
-  const byExecutor = resolveExecutorCommand(cfg, { prompt: 'p', model: 'opus', tier: 'heavy', executorId: 'fgos-code-implement' });
+  const byExecutor = resolveExecutorCommand(cfg, { prompt: 'p', model: 'opus', tier: 'frontier', executorId: 'fgos-code-implement' });
   assert.equal(byExecutor.command, '/executor/executor');
   // no executorId at all -> falls back to the global executor, unaffected
-  const noExecutorId = resolveExecutorCommand(cfg, { prompt: 'p', model: 'opus', tier: 'heavy' });
+  const noExecutorId = resolveExecutorCommand(cfg, { prompt: 'p', model: 'opus', tier: 'frontier' });
   assert.equal(noExecutorId.command, '/global/executor');
 });
 
@@ -2188,11 +2202,11 @@ test('resolveExecutorCommand falls back to the global executor when the executor
   // cross-provider-governance tests above for that boundary instead).
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
-    executors: { 'fgos-code-implement': { kind: 'agent', target: 'general-purpose', tier: 'heavy' } },
+    executors: { 'fgos-code-implement': { kind: 'agent', target: 'general-purpose', tier: 'frontier' } },
     modelPolicies: { claude: { frontier: 'opus', standard: 'opus' }, node: { frontier: 'opus', standard: 'opus' } },
     timeoutMs: 5000,
   };
-  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'opus', tier: 'heavy', executorId: 'fgos-code-implement' });
+  const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'opus', tier: 'frontier', executorId: 'fgos-code-implement' });
   assert.equal(resolved.command, 'claude');
 });
 
@@ -3136,13 +3150,13 @@ test('spawnWorker resolves tier -> model, runs in cwd, and passes the prompt via
   const cfg = baseConfig([scriptPath, '{prompt}', '--model', '{model}']);
   const runCwd = mkTempDir();
 
-  const result = await spawnWorker(sampleWork({ tier: 'heavy' }), cfg, runCwd);
+  const result = await spawnWorker(sampleWork({ rigor: 'critical' }), cfg, runCwd);
 
   assert.equal(result.status, 0);
-  assert.equal(result.tier, 'heavy');
+  assert.equal(result.tier, 'frontier');
   assert.equal(result.model, 'opus');
   const payload = JSON.parse(result.stdout);
-  assert.equal(payload.args[0], buildPrompt(sampleWork({ tier: 'heavy' })));
+  assert.equal(payload.args[0], buildPrompt(sampleWork({ rigor: 'critical' })));
   assert.equal(payload.args[1], '--model');
   assert.equal(payload.args[2], 'opus');
   assert.equal(fs.realpathSync(payload.cwd), fs.realpathSync(runCwd));
@@ -3784,7 +3798,7 @@ test('executeExecutorCli honors a caller-supplied model override over both the e
   const root = mkTempDir();
   writeRunnerConfigFixture(root, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
-    executors: { 'submit-assist-classify': { kind: 'agent', command: process.execPath, provider: 'agy', args: [scriptPath, '{model}:{prompt}'], tier: 'light', model: 'flash-3.5', allowCrossProvider: true } },
+    executors: { 'submit-assist-classify': { kind: 'agent', command: process.execPath, provider: 'agy', args: [scriptPath, '{model}:{prompt}'], tier: 'nano', model: 'flash-3.5', allowCrossProvider: true } },
     modelPolicies: { claude: { nano: 'flash-3.5', standard: 'sonnet' }, node: { nano: 'flash-3.5', standard: 'sonnet' }, agy: { nano: 'flash-3.5', standard: 'sonnet' } },
     timeoutMs: 5000,
   });
@@ -3808,7 +3822,7 @@ test('executeExecutorCli honors a caller-supplied tier override, feeding it into
   // at all (the pre-existing `executor?.tier ?? DEFAULTS.tier` fallback
   // already lands on 'standard' with no executor match), so it would not
   // actually prove the override path works.
-  const result = await executeExecutorCli('claude', { prompt: 'x', repoRoot: root, tier: 'light' });
+  const result = await executeExecutorCli('claude', { prompt: 'x', repoRoot: root, tier: 'nano' });
   assert.equal(result.model, 'flash-3.5');
   const payload = JSON.parse(result.stdout);
   assert.deepEqual(payload.args, ['flash-3.5:x']);
@@ -3849,7 +3863,7 @@ test('the "execute" CLI entry point honors --tier, changing which configured mod
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
   const result = spawnSync(
     process.execPath,
-    [dispatchPath, 'execute', 'claude', '--prompt', 'hello', '--tier', 'light'],
+    [dispatchPath, 'execute', 'claude', '--prompt', 'hello', '--tier', 'nano'],
     { encoding: 'utf8', cwd: repoRoot },
   );
   assert.equal(result.status, 0, result.stderr);

@@ -33,6 +33,8 @@ import { parse as parseYaml } from 'yaml';
 import { resolveMainCheckoutRoot } from '../src/runner/paths.mjs';
 import { readSharedConfig } from '../src/config/shared-config-file.mjs';
 import { resolveTierModel } from '../src/runner/dispatch.mjs';
+import { RIGOR_VALUES } from '../src/runner/rigor.mjs';
+import { DEFAULT_RIGOR_TO_TIER } from '../src/runner/dispatch/config.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
 
 const REPO_ROOT = path.resolve(import.meta.dirname, '..');
@@ -46,10 +48,9 @@ const LEGACY_AGENTS_SOURCE = 'agents';
 
 const FORBIDDEN_PLATFORM_NAMES = ['claude', 'codex', 'anthropic'];
 
-const REQUIRED_FIELDS = ['name', 'version', 'description', 'role', 'persona', 'decision_boundary', 'model_tier', 'tool-scope'];
+const REQUIRED_FIELDS = ['name', 'version', 'description', 'role', 'persona', 'decision_boundary', 'rigor', 'tool-scope'];
 
-// Matches dispatch.mjs's resolveTierModel default fallback -- reused as-is, not a second mapping.
-export const DEFAULT_MODELS = { light: 'haiku', standard: 'sonnet', heavy: 'opus' };
+export const DEFAULT_MODELS = { low: 'haiku', standard: 'sonnet', high: 'opus', critical: 'opus' };
 
 export class AgentDefinitionError extends Error {}
 
@@ -80,11 +81,12 @@ export function readRunnerModels(mainCheckoutRootOverride) {
   const cfg = readSharedConfig(mainCheckoutRoot);
   const runnerCfg = cfg.runner ?? {};
   const models = {};
-  for (const tier of Object.keys(DEFAULT_MODELS)) {
+  for (const rigor of RIGOR_VALUES) {
+    const tier = runnerCfg.rigorToTier?.[rigor] ?? DEFAULT_RIGOR_TO_TIER[rigor];
     try {
-      models[tier] = resolveTierModel(runnerCfg, tier);
+      models[rigor] = resolveTierModel(runnerCfg, tier);
     } catch {
-      models[tier] = DEFAULT_MODELS[tier];
+      models[rigor] = DEFAULT_MODELS[rigor];
     }
   }
   return models;
@@ -110,9 +112,9 @@ function validateDefinition(name, def) {
   if (!Array.isArray(def['tool-scope']) || def['tool-scope'].length === 0 || def['tool-scope'].some((t) => typeof t !== 'string' || !t.trim())) {
     throw new AgentDefinitionError(`agents/${name}.yaml's tool-scope must be a non-empty list of tool-name strings.`);
   }
-  if (!(def.model_tier in DEFAULT_MODELS)) {
+  if (!RIGOR_VALUES.includes(def.rigor)) {
     throw new AgentDefinitionError(
-      `agents/${name}.yaml's model_tier "${def.model_tier}" is not one of ${Object.keys(DEFAULT_MODELS).join('/')}.`,
+      `agents/${name}.yaml's rigor "${def.rigor}" is not one of ${RIGOR_VALUES.join('/')}.`,
     );
   }
   // skills (tsk-397 D20): optional, but when present must be a real list
@@ -179,7 +181,7 @@ export function projectAgentMarkdown(name, sourceYamlText, models, sourcePath = 
   assertPlatformAgnostic(name, sourceYamlText);
   validateDefinition(name, def);
 
-  const model = models[def.model_tier];
+  const model = models[def.rigor];
   const tools = def['tool-scope'].join(', ');
 
   // skills (tsk-397 D20): OPTIONAL -- declared capabilities of this agent-type

@@ -29,7 +29,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { withEventsLock, appendEventLocked } from './events.mjs';
-import { viewRevision, serializeView, readAllEventsFromDir, rebuildViewFromDir, buildSnapshotFromDir } from './replay.mjs';
+import { viewRevision, serializeView, readAllEventsFromDir, rebuildViewFromDir, buildSnapshotFromDir, VIEW_SCHEMA_VERSION } from './replay.mjs';
 import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, classifyStalePostDelivery, footprintOverlapAmong, goalScopedCriticalPath, goalScopedGreedyTopUnblock, computeSchedule, detectCycles } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './status-fsm.mjs';
 import { transitionStage } from './stage-fsm.mjs';
@@ -180,7 +180,7 @@ function writeView(viewPath, view, snapshot) {
   // view.
   const { viewStr, revision } = serializeView(view);
   const snapshotPart = snapshot !== undefined ? `,"snapshot":${JSON.stringify(snapshot)}` : '';
-  const persistedContent = `${viewStr.slice(0, -1)},"revision":${JSON.stringify(revision)}${snapshotPart}}\n`;
+  const persistedContent = `${viewStr.slice(0, -1)},"revision":${JSON.stringify(revision)},"viewSchemaVersion":${VIEW_SCHEMA_VERSION}${snapshotPart}}\n`;
   // tsk-4mx: write to a uniquely-named temp file, then rename(2) it onto
   // viewPath -- an atomic replace on POSIX, so a reader can never observe a
   // truncated/partial state.json, same pattern as main-checkout-lock.mjs's
@@ -274,7 +274,7 @@ export function addWork(dir, work) {
     // truncated title is what the appended event carries, and every caller
     // reaching this door (submit and add in bin/fgos.mjs, decompose's children,
     // the runner loop) obeys one rule without any of them repeating it.
-    const item = { ...work, tier: work?.tier ?? DEFAULTS.tier, title: truncateTitle(work?.title) };
+    const item = { ...work, size: work?.size ?? DEFAULTS.size, title: truncateTitle(work?.title) };
     validateWork(item, Object.keys(before.work));
     // domainFields fieldSchema (decision record 0027, D6): a separate,
     // narrower check than validateWork's own domainFields shape rule above
@@ -350,7 +350,7 @@ export function addWork(dir, work) {
 // write path (identity is immutable; `status` is `move`'s; `stage` is
 // `moveStage`'s) and mixing them into `edit` would open a second door onto
 // the same field.
-const EDITABLE_FIELDS = new Set(['title', 'description', 'kind', 'risk', 'verify', 'tier', 'refs', 'deps', 'acceptance', 'priority', 'intent', 'docsRef', 'parent', 'urgent', 'impact', 'effort', 'footprint', 'action', 'mergeAfter', 'supersededBy', 'duplicates', 'domainFields', 'goalTier', 'nextOperation', 'secondaryOperation']);
+const EDITABLE_FIELDS = new Set(['title', 'description', 'kind', 'risk', 'verify', 'size', 'rigor', 'refs', 'deps', 'acceptance', 'priority', 'intent', 'docsRef', 'parent', 'urgent', 'impact', 'effort', 'footprint', 'action', 'mergeAfter', 'supersededBy', 'duplicates', 'domainFields', 'goalTier', 'nextOperation', 'secondaryOperation']);
 
 /**
  * Patch fields on an existing work item, through the SAME single write door
