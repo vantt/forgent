@@ -322,6 +322,10 @@ export function checkExecuteAssignmentCallSitePostures(sites) {
       } else if (!hasLiteralTrue && !hasInlineTrue) {
         violations.push(`${file}: executeAssignment(...) call's isReadOnlyMode is neither literal true nor the known true-for-inline expression -- ${callText}`);
       }
+    } else if (file === 'src/runner/execution/run.mjs') {
+      if (!/isReadOnlyMode:\s*readOnly\b/.test(callText)) {
+        violations.push(`${file}: runRole's executeAssignment(...) call must pass isReadOnlyMode: readOnly -- found: ${callText}`);
+      }
     } else {
       violations.push(`${file}: unexpected NEW executeAssignment(...) call site -- add explicit posture coverage to checkExecuteAssignmentCallSitePostures before accepting it`);
     }
@@ -344,6 +348,7 @@ test('executeAssignment(...) isReadOnlyMode posture: every real call site codeba
     'src/runner/coordination/session-engine.mjs',
     'src/runner/dispatch/cli.mjs',
     'src/runner/dispatch/operation-choice.mjs',
+    'src/runner/execution/run.mjs',
   ]);
   assert.deepEqual(
     [...foundFiles].sort(),
@@ -356,6 +361,9 @@ test('executeAssignment(...) isReadOnlyMode posture: every real call site codeba
 
   const cliSites = sites.filter((s) => s.file === 'src/runner/dispatch/cli.mjs');
   assert.equal(cliSites.length, 2, `expected exactly two executeAssignment(...) call sites in cli.mjs, found ${cliSites.length}`);
+  const runSites = sites.filter((s) => s.file === 'src/runner/execution/run.mjs');
+  assert.equal(runSites.length, 1, `expected exactly one executeAssignment(...) call site in run.mjs, found ${runSites.length}`);
+
 
   assert.deepEqual(checkExecuteAssignmentCallSitePostures(sites), []);
 });

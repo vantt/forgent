@@ -1,7 +1,7 @@
 ---
 phase: 8
 title: "Nghiệm thu ca 1 (qua pane herdr) + docs + boundary"
-status: pending
+status: done
 priority: P1
 effort: "1.5d"
 dependencies: [6, 7]
@@ -42,8 +42,8 @@ Khai khẩu vị thật vào config, chạy **ca nghiệm thu 1** **qua pane her
 
 ## Success Criteria
 
-- [ ] Ca 1 qua herdr đạt; 4 ca phụ đạt; không thua engine ở tiêu chí 1, 2, 4.
-- [ ] Spec + boundary + CHANGELOG + guard; merge `main`.
+- [x] Ca 1 qua herdr đạt; 4 ca phụ đạt; không thua engine ở tiêu chí 1, 2, 4.
+- [x] Spec + boundary + CHANGELOG + guard; merge `main`.
 
 ## Risk Assessment
 

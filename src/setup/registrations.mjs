@@ -51,6 +51,7 @@ import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, DEFAULT_RIGO
 import { RIGOR_VALUES } from '../runner/rigor.mjs';
 import { resolveExecutorAndOverrides, deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
+import { bind } from '../runner/execution/bind.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../state/fgos-file-registry.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
 import { listWork, StoreError } from '../state/store.mjs';
@@ -539,6 +540,82 @@ export function checkRunnerPatternsConfig(cwd) {
     return { passed: true, message: `warning: ${warnings.join('; ')}` };
   }
   return { passed: true, message: 'runner patterns configuration is valid at every configured level' };
+}
+
+export function checkMutatingAssignmentBindingSnapshot(cwd) {
+  const root = cwd ?? process.cwd();
+  const assignmentsDir = path.join(root, '.fgos', 'assignments');
+  if (!fs.existsSync(assignmentsDir)) {
+    return { passed: true, message: 'no assignments directory present' };
+  }
+
+  const problems = [];
+  try {
+    const entries = fs.readdirSync(assignmentsDir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      const unitJsonPath = path.join(assignmentsDir, entry.name, 'unit.json');
+      if (!fs.existsSync(unitJsonPath)) continue;
+
+      let unitRecord;
+      try {
+        unitRecord = JSON.parse(fs.readFileSync(unitJsonPath, 'utf8'));
+      } catch {
+        problems.push(`corrupted unit.json in unit run "${entry.name}"`);
+        continue;
+      }
+
+      const unitDir = path.join(assignmentsDir, entry.name);
+      const roles = fs.readdirSync(unitDir, { withFileTypes: true });
+      for (const roleEntry of roles) {
+        if (!roleEntry.isDirectory()) continue;
+        const role = roleEntry.name;
+        const roleDir = path.join(unitDir, role);
+        let rounds;
+        try {
+          rounds = fs.readdirSync(roleDir, { withFileTypes: true });
+        } catch {
+          continue;
+        }
+        for (const roundEntry of rounds) {
+          if (!roundEntry.isDirectory()) continue;
+          const round = roundEntry.name;
+          const attemptDir = path.join(roleDir, round, 'runs', '01');
+          const resultFile = path.join(attemptDir, 'result.json');
+          if (!fs.existsSync(resultFile)) continue;
+
+          try {
+            const resultData = JSON.parse(fs.readFileSync(resultFile, 'utf8'));
+            if (resultData.binding && resultData.role) {
+              const recomputed = bind(
+                {
+                  unit: unitRecord.unit,
+                  role: resultData.role,
+                  readOnly: false,
+                  overrides: unitRecord.overrides || [],
+                },
+                {
+                  runnerConfig: unitRecord.configSnapshot?.runner,
+                  session: {},
+                },
+              );
+              if (recomputed.refused || recomputed.executor !== resultData.binding.executor) {
+                problems.push(`unit run "${entry.name}" role "${role}" round "${round}" binding mismatches unit.json snapshot`);
+              }
+            }
+          } catch {
+            // ignore
+          }
+        }
+      }
+    }
+  } catch (err) {
+    return { passed: false, message: `error scanning assignments: ${err.message}` };
+  }
+
+  return problems.length > 0
+    ? { passed: false, message: problems.join('; ') }
+    : { passed: true, message: 'every mutating assignment RunResult binding matches its unit.json snapshot' };
 }
 
 export function checkTierVocabularyDeadKeys(cwd) {
@@ -1293,6 +1370,12 @@ registerCheck({
   id: 'runner-patterns-config',
   description: 'project and global runner patterns configuration is present, well-formed, and cumulative',
   check: (cwd) => checkRunnerPatternsConfig(cwd),
+});
+
+registerCheck({
+  id: 'mutating-assignment-binding-snapshot',
+  description: 'every mutating assignment RunResult binding matches its unit.json snapshot',
+  check: (cwd) => checkMutatingAssignmentBindingSnapshot(cwd),
 });
 
 registerCheck({

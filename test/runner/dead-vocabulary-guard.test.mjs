@@ -406,3 +406,38 @@ test('dead vocabulary guard: Phase 3 Work tier retired, size and rigor enforced'
   }
   assert.deepEqual(dispatchViolations, [], `Dispatch size leaks detected:\n${dispatchViolations.join('\n')}`);
 });
+
+test('dead vocabulary guard: Request-to-Run P1 retired symbols do not appear in src or config', () => {
+  const p1DeadSymbols = [
+    'selectReadOnlyRedirectExecutor',
+    'claude-cli-readonly',
+    'claude-herdr-readonly',
+    'codex-cli-readonly-fgovn',
+  ];
+
+  const searchDirs = ['src', 'bin', 'core', 'domains'].map((d) => path.join(REPO_ROOT, d));
+  const codeFiles = searchDirs.flatMap((d) => collectFiles(d, ['.js', '.mjs', '.cjs', '.json', '.yaml', '.yml']));
+  const configJson = path.join(REPO_ROOT, '.fgos', 'config.json');
+  if (fs.existsSync(configJson)) {
+    codeFiles.push(configJson);
+  }
+
+  const violations = [];
+  const symbolRegexes = p1DeadSymbols.map((sym) => ({ symbol: sym, regex: new RegExp(`\\b${sym}\\b`) }));
+
+  for (const file of codeFiles) {
+    const rel = path.relative(REPO_ROOT, file);
+    const content = fs.readFileSync(file, 'utf8');
+    for (const { symbol, regex } of symbolRegexes) {
+      if (regex.test(content)) {
+        violations.push(`${rel}: contains retired P1 symbol "${symbol}"`);
+      }
+    }
+  }
+
+  // Ensure placement-policy.mjs is deleted
+  const placementPolicyPath = path.join(REPO_ROOT, 'src', 'runner', 'dispatch', 'placement-policy.mjs');
+  assert.equal(fs.existsSync(placementPolicyPath), false, 'src/runner/dispatch/placement-policy.mjs must be deleted');
+
+  assert.deepEqual(violations, [], `P1 dead symbols detected:\n${violations.join('\n')}`);
+});

@@ -33,7 +33,6 @@
     "src/runner/work-compat.mjs": "infra",
     "src/runner/dispatch/adapters.mjs": "infra",
     "src/runner/dispatch/config.mjs": "infra",
-    "src/runner/dispatch/placement-policy.mjs": "infra",
     "src/runner/dispatch/confinement/policies.mjs": "infra",
     "src/runner/dispatch/confinement/bypass-pairing.mjs": "infra",
     "src/runner/dispatch/confinement/backend-registry.mjs": "infra",
@@ -246,6 +245,14 @@
     "src/runner/dispatch/run-lock.mjs": "infra",
     "src/setup/instruction-composition.mjs": "infra",
     "src/setup/instruction-projections.mjs": "infra",
-    "src/verbs/coordination/binding.mjs": "use-case"
+    "src/verbs/coordination/binding.mjs": "use-case",
+    "src/runner/execution/unit.mjs": "infra",
+    "src/runner/execution/bind.mjs": "infra",
+    "src/runner/execution/run.mjs": "use-case",
+    "src/runner/execution/patterns/index.mjs": "domain",
+    "src/runner/execution/patterns/panel.mjs": "domain",
+    "src/runner/execution/patterns/presets.mjs": "domain",
+    "src/runner/execution/patterns/reviewed.mjs": "domain",
+    "src/runner/execution/patterns/solo.mjs": "domain"
   }
 }

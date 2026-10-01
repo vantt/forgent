@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- **Added**: Request-to-Run P1 Execution Core (`fgos run`, Unit contract, single `bind()`, and 3 collaboration patterns):
+  - **Unit data contract**: Canonical schema (`src/runner/execution/unit.mjs`) for headless execution. Non-infrastructure (G2: forbids executor, model, tier, invocation, provider pins).
+  - **Single `bind()` authority**: 5-level precedence table (`src/runner/execution/bind.mjs`) resolving executor, invocation, transport (`herdr` default, `cli` fallback), tier, model, persona, mechanism, and posture with full provenance.
+  - **Collaboration pattern loops**: Pure loops (`solo`, `reviewed`, `panel`) in `src/runner/execution/patterns/**` with named presets (`code-change`). Loops reconstruct state from `history()` without dedicated storage. Findings are treated as genuine outcomes, never execution failures.
+  - **Verifiable mutating gate**: Supersedes ADR-006 §6 by verifying that mutating assignments run in a linked git worktree matching `unit.json.worktree` and that recomputed `bind()` deep-equals the assignment binding. Retains engine protocol stamp as named exception.
+  - **CLI verb `fgos run`**: Single execution door for headless Unit runs, supporting `--unit`, `--pattern`, `--override`, `--resume`, and `fgos run record` for verified inline producer turns.
+  - **Retired concepts removed**: Invocations `*-readonly`, `readOnlyRedirects`, `placement-policy.mjs`, `executors.*.for`, PolicyPatch `prefer*`. Read-only is now an OS confinement posture applied consistently across herdr and cli.
+  - **RunResult v4**: Contract bumped to v4 with `unitRunId`, `role`, `round`, and expanded outcomes (`findings`, `provider-limit`).
 - **Changed**: Consolidated tier and rigor vocabulary across dispatch and Work (tier-rigor-vocabulary-consolidation):
   - Demand side: FlowDefinitions, coordination operations, and Work declare `rigor` (`low|standard|high|critical`); retired `minTier`, `minRigor`, `mode`, `QUALITY_TIER_BRIDGE`, and `QUALITY_MODE_VALUES`.
   - Supply side: required config `runner.rigorToTier` maps demand rigor into six-level `modelPolicies[provider][tier]`; single resolver `resolveTierModel` replaces `modelForTier` and temporary `DEFAULT_TIER_TO_POLICY` bridges.

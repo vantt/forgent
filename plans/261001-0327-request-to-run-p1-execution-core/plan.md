@@ -1,7 +1,7 @@
 ---
 title: "P1 Lõi thực thi: Unit, một bind(), một cửa chạy (herdr mặc định), 3 Pattern cộng tác"
 description: "Đóng mối authority L5: 'ai làm' một chỗ (bind), 'chạy qua cửa nào' một cửa (pane herdr mặc định, cli fallback), read-only một posture confinement OS; lõi mới không phụ thuộc L3. Gộp plan read-only X."
-status: pending
+status: done
 priority: P1
 effort: "~10–12d"
 tags: [dispatch, execution-core, bind, collaboration-pattern, read-only, herdr, observe]
@@ -107,12 +107,12 @@ Sóng B: 2 ∥ 3 ∥ 4 (file mới/khác nhau; dùng hợp đồng ở trên). S
 
 ## Success Criteria
 
-- [ ] 4 mối authority có đúng một chủ; guard kiến trúc xanh.
-- [ ] Out-of-process mặc định qua pane herdr khi herdr có mặt, cli khi không; cùng posture; provenance ghi `transport` (G7).
-- [ ] Cổng ghi file: posture worktree khớp `unit.json.worktree` **và** `bind()` tính lại từ snapshot khớp; test âm (binding tự chế, worktree khác, config sửa trong worktree).
-- [ ] `rg "readOnlyRedirects|placement-policy|selectReadOnlyRedirectExecutor|executors\.[a-z-]+\.for|preferPersona|'code-reviewer'" src .fgos/config.json` rỗng; invocation `*-readonly` đã xoá.
-- [ ] Nghiệm thu ca 1 (qua herdr) đạt G1–G7, không thua engine ở tiêu chí 1, 2, 4; lệch người không lý do = 0.
-- [ ] Spec (gồm supersede ADR-006 §6, D-ADR0033 giữ nguyên) + boundary + CHANGELOG; full `npm test`; merge `main`.
+- [x] 4 mối authority có đúng một chủ; guard kiến trúc xanh.
+- [x] Out-of-process mặc định qua pane herdr khi herdr có mặt, cli khi không; cùng posture; provenance ghi `transport` (G7).
+- [x] Cổng ghi file: posture worktree khớp `unit.json.worktree` **và** `bind()` tính lại từ snapshot khớp; test âm (binding tự chế, worktree khác, config sửa trong worktree).
+- [x] `rg "readOnlyRedirects|placement-policy|selectReadOnlyRedirectExecutor|executors\.[a-z-]+\.for|preferPersona|'code-reviewer'" src .fgos/config.json` rỗng; invocation `*-readonly` đã xoá.
+- [x] Nghiệm thu ca 1 (qua herdr) đạt G1–G7, không thua engine ở tiêu chí 1, 2, 4; lệch người không lý do = 0.
+- [x] Spec (gồm supersede ADR-006 §6, D-ADR0033 giữ nguyên) + boundary + CHANGELOG; full `npm test`; merge `main`.
 
 ## Risk Assessment
 
