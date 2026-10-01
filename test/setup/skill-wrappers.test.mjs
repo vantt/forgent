@@ -1504,34 +1504,42 @@ export function resolveTrackNameToPlanPath(trackName, repoRoot = path.resolve(fi
   const trimmed = trackName.trim();
   if (!trimmed) return null;
 
-  const plansDir = path.join(repoRoot, 'plans');
-  if (!fs.existsSync(plansDir)) return null;
+  const candidateDirs = [
+    { dir: path.join(repoRoot, 'plans'), isArchive: false },
+    { dir: path.join(repoRoot, 'archive', 'plans'), isArchive: true },
+  ];
 
   try {
-    const entries = fs.readdirSync(plansDir, { withFileTypes: true });
-    const matchingPlans = [];
+    for (const { dir, isArchive } of candidateDirs) {
+      if (!fs.existsSync(dir)) continue;
+      const entries = fs.readdirSync(dir, { withFileTypes: true });
+      const matchingPlans = [];
 
-    for (const entry of entries) {
-      if (!entry.isDirectory() || entry.name === 'reports') continue;
-      const planFile = path.join(plansDir, entry.name, 'plan.md');
-      if (!fs.existsSync(planFile)) continue;
+      for (const entry of entries) {
+        if (!entry.isDirectory() || entry.name === 'reports') continue;
+        const planFile = path.join(dir, entry.name, 'plan.md');
+        if (!fs.existsSync(planFile)) continue;
 
-      const content = fs.readFileSync(planFile, 'utf8');
-      const lines = content.split('\n').slice(0, 40);
-      for (const line of lines) {
-        const m = line.match(/^\s*(?:\*\*)?(?:Track|Execution track):(?:\*\*)?\s*`?([a-zA-Z0-9_-]+)`?/i);
-        if (m && m[1] === trimmed) {
-          matchingPlans.push(path.relative(repoRoot, planFile).split(path.sep).join('/'));
-          break;
+        const content = fs.readFileSync(planFile, 'utf8');
+        const lines = content.split('\n').slice(0, 40);
+        for (const line of lines) {
+          const m = line.match(/^\s*(?:\*\*)?(?:Track|Execution track):(?:\*\*)?\s*`?([a-zA-Z0-9_-]+)`?/i);
+          if (m && m[1] === trimmed) {
+            const rel = path.relative(repoRoot, planFile).split(path.sep).join('/');
+            matchingPlans.push(isArchive && rel.startsWith('archive/plans/') ? rel.slice('archive/'.length) : rel);
+            break;
+          }
         }
       }
-    }
 
-    // Only return when there is a genuinely UNIQUE, EXACT match against a real plan's Track header
-    if (matchingPlans.length === 1) {
-      return matchingPlans[0];
+      // Only return when there is a genuinely UNIQUE, EXACT match against a real plan's Track header
+      if (matchingPlans.length === 1) {
+        return matchingPlans[0];
+      }
+      if (matchingPlans.length > 1) {
+        return null;
+      }
     }
-    // Ambiguous (multiple matches) or no match -> return null (no suffix/substring guessing)
     return null;
   } catch {
     return null;
