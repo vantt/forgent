@@ -1,6 +1,7 @@
 {
   "executor": { "command": "claude", "args": ["-p", "{prompt}", "--model", "{model}"] },
-  "models": { "light": "haiku", "standard": "sonnet", "heavy": "opus" },
+  "modelPolicies": { "claude": { "nano": "haiku", "mini": "haiku", "standard": "sonnet", "advanced": "sonnet", "flagship": "opus", "frontier": "opus" } },
+  "rigorToTier": { "low": "nano", "standard": "standard", "high": "flagship", "critical": "frontier" },
   "timeoutMs": 120000,
   "executors": {
     "claude-bwrap": {
