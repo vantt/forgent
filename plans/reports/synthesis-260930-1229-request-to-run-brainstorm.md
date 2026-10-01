@@ -5,7 +5,7 @@ Document type: Synthesis report (discussion lead)
 Snapshot: 2026-09-30 16:20 (Asia/Saigon), main @ 5aed82c52
 Prompt: plans/reports/brainstorm-prompt-260930-1102-request-to-run-decomposition.md
 Handoff: plans/reports/handoff-260930-1210-harness-routing-discussion-lead.md
-Status: v2.9 — plan T đã sửa (D19, D20; commit 9a2cef1cd trên nhánh T); X gộp vào plan bind(); §6c đối chiếu plan tier T: T chạy trước, track này chờ T ở phần code; T cần thêm sàn `capabilities.<cap>.rigor`; Q2 đã được T phủ; §6b đối chiếu plan X (readonly redesign): không chặn bước 1, nên gom với bind(); sửa D5/bước 1/F16; thống nhất tên red-team (bỏ objector); Q6 chốt (persona khoá không bị thay, không có 'thêm' ở V1); checker theo rigor; Q1, Q2 chấp nhận; Q4 chốt red-team bắt buộc cho code (lead rút đề xuất); Q0 chốt: mô hình gọn; tách hai tầng: 3 Pattern cộng tác (+ preset) vs Workflow nhiều bước; luật phân biệt; Q8 chốt (giữ mọi dạng thảo luận; bỏ engine chỉ khi chúng chạy tốt trên mô hình gọn); Q9 chốt (supersede ADR-006 §6); (architecture advisor là ca nghiệm thu thu hồi engine); §4b chấm lại theo §0 (lead + kongming độc lập: gọn 3,9–4,0 > P-A 3,2–3,3 > P-B loại); bake-off sửa; F26–F30; §0 kết quả mong muốn + tiêu chí mới (G1–G6, 8 tiêu chí); Q0 engine vs mô hình gọn (bake-off trước); mức 4 override làm rõ; hình chạy tổng thể + plan vs Workflow + (b) quyền sở hữu plan.md đã chốt; Workflow tách khỏi Work đã chốt; bảng thuật ngữ đã chốt ở §6 D0; 3 câu trả lời (2 family: claude, openai). Chưa có gemini/xai; cập nhật tiếp nếu owner gửi thêm.
+Status: v3.0 — §7b lộ trình track (P1 Lõi thực thi … P5) + việc lẻ; §7c bài học engine; plan T đã sửa (D19, D20; commit 9a2cef1cd trên nhánh T); X gộp vào plan bind(); §6c đối chiếu plan tier T: T chạy trước, track này chờ T ở phần code; T cần thêm sàn `capabilities.<cap>.rigor`; Q2 đã được T phủ; §6b đối chiếu plan X (readonly redesign): không chặn bước 1, nên gom với bind(); sửa D5/bước 1/F16; thống nhất tên red-team (bỏ objector); Q6 chốt (persona khoá không bị thay, không có 'thêm' ở V1); checker theo rigor; Q1, Q2 chấp nhận; Q4 chốt red-team bắt buộc cho code (lead rút đề xuất); Q0 chốt: mô hình gọn; tách hai tầng: 3 Pattern cộng tác (+ preset) vs Workflow nhiều bước; luật phân biệt; Q8 chốt (giữ mọi dạng thảo luận; bỏ engine chỉ khi chúng chạy tốt trên mô hình gọn); Q9 chốt (supersede ADR-006 §6); (architecture advisor là ca nghiệm thu thu hồi engine); §4b chấm lại theo §0 (lead + kongming độc lập: gọn 3,9–4,0 > P-A 3,2–3,3 > P-B loại); bake-off sửa; F26–F30; §0 kết quả mong muốn + tiêu chí mới (G1–G6, 8 tiêu chí); Q0 engine vs mô hình gọn (bake-off trước); mức 4 override làm rõ; hình chạy tổng thể + plan vs Workflow + (b) quyền sở hữu plan.md đã chốt; Workflow tách khỏi Work đã chốt; bảng thuật ngữ đã chốt ở §6 D0; 3 câu trả lời (2 family: claude, openai). Chưa có gemini/xai; cập nhật tiếp nếu owner gửi thêm.
 Lịch sử: v0 12:29 (sonnet + openai bản 12:20) → v1 16:20 (thêm fable; openai bản sửa 12:39)
 ```
 
@@ -516,6 +516,39 @@ T nằm trên nhánh `plan/260930-tier-rigor-consolidation` (worktree `~/project
 9. ~~Supersede ADR-006 §6~~ — **owner đồng ý 2026-09-30 23:40**: bỏ protocol stamp; cổng ghi file = posture worktree (`resolveMutatingCwdPosture`) + đi qua `bind()` (có `provenance.binding`). Supersede phải ghi tường minh trong plan triển khai (decision record trong spec area tương ứng), không sửa ADR tại chỗ.
 
 Những gì em **tự quyết**, không hỏi: D0–D7 ở §6; bác `AssignmentPlan` (F25); Workflow marketing chỉ smoke trong plan tách Workflow, không xây domain marketing thật trước tenant.
+
+## 7b. Lộ trình track và việc lẻ (owner duyệt hướng 2026-10-01 00:20–10:00)
+
+"Plan `bind()`" là tên tạm trước đây; tên chính thức trong lộ trình: **P1 Lõi thực thi**.
+
+```text
+T  Tier/rigor (plan riêng, agent khác đang làm — worktree ~/projects/forgentX-tier-rigor-p01 đã mở phase 1)
+ └► P1 Lõi thực thi ──┬► P2 Plan chạy được
+                      └► P3 Workflow tách khỏi Work ──► P4 Dạng thảo luận + thu hồi engine ──► P5 Quét thuật ngữ
+```
+
+| Plan | Giao | Xoá | Quyết định dùng | Nghiệm thu |
+|---|---|---|---|---|
+| T | `rigor → rigorToTier → tier → model`; một resolver; sàn `capabilities.<cap>.rigor` (D19) | ~10 khái niệm tier; khối `capabilities.*.overrides` | C5, Q1, Q2 | của T |
+| P1 Lõi thực thi | Unit; `bind()` một chỗ (bảng 5 mức, provenance, G6); primitive `fgos run --unit --role`; cổng ghi file (Q9); read-only posture + fallback quota (gộp X); 3 Pattern cộng tác bằng code nhỏ (`reviewed` với `checkersByRigor`, red-team luôn bật cho code); override có scope; RunResult inline; khẩu vị docs | `readOnlyRedirects`, `placement-policy.mjs`, protocol stamp, `dispatch-runs`/`execute` thường, default `claude`, `preferExecutor`, `executors.for`, persona default `code-reviewer` | D1–D7, Q0, Q4, Q6, Q9, X, G1–G6 | **Ca 1**: 2 area docs song song (Lead-active, resume, no-candidate) |
+| P2 Plan chạy được | unit trong phase file; driver chung "chạy phase N" mọi domain; prompt tự do ra cùng Unit | DemandFacts, matcher, `form`, `fgos-code-panel`, `fgos-plan-loop`, gate chỉ-code của `fgos-code-change` | D0, (b) `plan.md` | chạy thật một phase plan tài liệu (khi owner authorize — Q5) |
+| P3 Workflow tách khỏi Work | Workflow + Workflow run (JSONL) + một runner; plan nhiều phase = Workflow run; `coding/feature` thành Workflow; Work chỉ tham chiếu | tuần tự stage trong `loop.mjs`; `stage` là field Work; profile `Workflow` + `workflow-adapter.mjs` | Q7, quyết định Workflow | smoke Workflow marketing có cổng người (G4b) |
+| P4 Dạng thảo luận + thu hồi engine | 12 dạng thảo luận → preset pattern / Workflow; tên `CollaborationPattern` trong code | engine coordination (~21k dòng) sau khi mọi dạng qua nghiệm thu; `FlowDefinition`, `CoordinationProtocol`, Protocol Pack, "objector" | Q8, D3 bổ sung | **Ca 2** architecture advisor → **ca 3** business discussion → các dạng còn lại |
+| P5 Quét thuật ngữ | docs/spec dùng một tên mỗi khái niệm | ~800 lượt tên cũ | bảng thuật ngữ | guard test chặn tên cũ |
+
+- P1 chờ T merge (cùng file dispatch). P2 và P3 cần P1; **P2 trước** vì mở use case đang kẹt; P3 sau hoặc gối đầu. P4 cần P1 + P3.
+- Mỗi plan: nhánh riêng, mỗi phase một worktree merge vào nhánh plan, xong hết mới merge `main`. Plan con lập chi tiết **khi tới lượt** (kết quả nghiệm thu plan trước có thể đổi plan sau). Một **plan tổng** (umbrella) sẽ giữ bảng này + trạng thái.
+
+**Việc lẻ, ngoài track, làm ngay song song (owner chọn cách b — lead soạn prompt, agent khác làm, 2026-10-01 10:00):**
+- [prompt-261001-0955-fix-observe-harness-protocol-count.md](prompt-261001-0955-fix-observe-harness-protocol-count.md) — F12.
+- [prompt-261001-0955-fix-test-fixture-store-leak.md](prompt-261001-0955-fix-test-fixture-store-leak.md) — bổ sung prompt gốc chưa ai làm (`plans/260930-0335-measure-runresult-classification-impact/fix-test-fixture-leak-prompt.md`); không đụng session thật đang treo (bằng chứng nền).
+- Là **điều kiện cần trước ca nghiệm thu 1**. Hai việc không đụng file của nhau, không phải chờ nhau (mỗi agent một worktree; prompt 1 kiểm bằng fixture tạm vì prompt 2 đổi số liệu store). Xung đột thật duy nhất: prompt 2 với T trên file test dispatch/coordination — giữ diff nhỏ, merge `main` sớm; T merge `main` trước mỗi phase.
+
+## 7c. Vì sao engine nặng, và bài học (thảo luận owner 2026-09-30 23:52)
+
+- Engine **không vô nghĩa**: phần nền (`executeAssignment`, claim id nguyên tử, `admitRunAttempt`, posture worktree, RunResult/Observe, `distinctProviderFrom`, governance) được mô hình gọn dùng lại; engine là **đặc tả chạy được** cho các dạng thảo luận (Q8); lần chạy thật của nó là bằng chứng để quyết đúng hôm nay. Thứ bỏ là lớp điều phối ở giữa.
+- Vì sao nặng: xây trước cho ca khó nhất (thảo luận nhiều pha, ép visibility, replay/resume) rồi để ca đơn giản đi chung; gộp hai tầng (làm một unit + tuần tự nhiều bước) vào một cơ chế; xây cộng dồn không xoá (mỗi vòng review thêm một lớp bảo vệ — đúng điều RUL11 cảnh báo; agent, kể cả lead, có xu hướng trả lời "làm cho đúng" bằng cách thêm); xây trước khi có người dùng thật; đo lường đến muộn.
+- Bài học áp cho track này: **làm gọn trước, đo ngay**; chỉ thêm máy móc khi một ca thật thất bại trên bản gọn, có số liệu; **mỗi lần thêm phải xoá được cái gì đó**; ca khó (architecture advisor) là bài nghiệm thu, không phải lý do để mọi ca gánh chi phí của nó.
 
 ## 8. Câu hỏi còn mở
 
