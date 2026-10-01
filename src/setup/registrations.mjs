@@ -1847,11 +1847,7 @@ export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
 // read natively, footprint honored, correct `[BLOCKED]`/`[DONE]`
 // two-token reporting) — see
 // docs/history/pi-executor-runtime-capacity/RESEARCH.md Round 4. No
-// `rigorOverrides`: the old `{light/standard/heavy -> nano}` default was
-// never a deliberate, endorsed cost policy -- just this seed's own
-// historical proof-test default -- dropped so a fresh install's `pi`
-// behaves like every other executor (DEFAULT_TIER_TO_POLICY) unless an
-// operator deliberately opts in later.
+  // A fresh install's `pi` behaves like every other executor (DEFAULT_TIER_TO_POLICY).
 // Exported (mirrors `DEFAULT_CAPABILITY_SLOTS` below it) so the ripple
 // tests assert this exact shape instead of duplicating the literal.
 export const PI_EXECUTOR_DEFAULT = Object.freeze({
@@ -4048,7 +4044,7 @@ registerCheck({
 
 registerCheck({
   id: 'executor-profile-warnings',
-  description: 'Phase 06 (executor-policy-dispatch-seams): legacy executor/capability entries hardcoding policy-shaped flags, rigorOverrides-as-identity, or account-pool-like env, each named with its documented migration target',
+  description: 'Phase 06 (executor-policy-dispatch-seams): legacy executor entries hardcoding policy-shaped flags or account-pool-like env, each named with its documented migration target',
   check: (cwd) => {
     try {
       return checkExecutorProfileWarnings(cwd, loadRunnerConfigFromDir(cwd));
@@ -5078,9 +5074,8 @@ registerFix({
   }
 });
 
-// dispatch-engine-liveness-hardening Phase 7 (C1): the two remaining shadow
-// binders (`resolveVerifiedPlacementModel`/`resolveVerifiedProviderArgs`,
-// dispatch/placement-policy.mjs's `recordShadowBinderDivergence`) now write
+// dispatch-engine-liveness-hardening Phase 7 (C1): shadow binder
+// (`resolveVerifiedProviderArgs`, `recordShadowBinderDivergence`) now writes
 // a real disagreement to a durable local JSONL instead of only an ephemeral
 // stderr line. Informational, not a gate: a fallback-to-legacy disagreement
 // is handled safely by design (the real spawn never regresses on

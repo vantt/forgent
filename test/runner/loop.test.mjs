@@ -237,10 +237,22 @@ if (priorRuns === 0) {
   return scriptPath;
 }
 
+const DUMMY_CONFIG = {
+  executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
+  modelPolicies: {
+    claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' },
+    node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' },
+  },
+  timeoutMs: 30000,
+};
+
 function configFor(scriptPath) {
   return {
     executor: { allowCrossProvider: true, command: process.execPath, args: [scriptPath, '{prompt}', '--model', '{model}'] },
-    models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+    modelPolicies: {
+      node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' },
+      claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' },
+    },
     timeoutMs: 30000,
   };
 }
@@ -426,7 +438,7 @@ test('runOnce\'s executor.dispatch audit event records the REAL spawned command 
         provider: 'claude',
       },
     },
-    models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+    modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' }, node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
     timeoutMs: 30000,
   };
 
@@ -1050,11 +1062,7 @@ test('verify passes but the worker never committed -> classified verify-miss, pa
 test('worker-spawn-fail: nonexistent executor -> retry per matrix, then park to blocked', async () => {
   const { repoRoot, dir, worktreeDir } = setup();
   seedItem(dir, { id: 'item-nospawn' });
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1266,11 +1274,7 @@ test('startup reap: a crashed run\'s doing item with a committed, verify-passing
   execFileSync('git', ['commit', '-q', '-m', 'worker: output.txt'], { cwd: wt.path });
   removeWorktree(repoRoot, wt.path);
   // an executor that would blow up if the runner wrongly re-dispatched
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1292,11 +1296,7 @@ test('startup reap reclaims an orphaned checkout left behind by a genuine crash 
   fs.writeFileSync(path.join(wt.path, 'output.txt'), 'done before crash\n');
   execFileSync('git', ['add', 'output.txt'], { cwd: wt.path });
   execFileSync('git', ['commit', '-q', '-m', 'worker: output.txt'], { cwd: wt.path });
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1311,11 +1311,7 @@ test('startup reap: a doing item with nothing on its branch is reclaimed to bloc
   const { repoRoot, dir, worktreeDir } = setup();
   seedItem(dir, { id: 'item-vanished' });
   acquireClaim(dir, { id: 'item-vanished', actor: 'runner', preClaimStatus: 'todo' });
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1334,11 +1330,7 @@ test('startup reap SKIPS a doing item claimed by a human (claimRole) — never r
   const { repoRoot, dir, worktreeDir } = setup();
   const item = seedItem(dir, { id: 'item-human-held' });
   acquireClaim(dir, { id: item.id, actor: 'human', preClaimStatus: 'todo', claimRole: 'human', headAtTake: 'deadbeef' });
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1353,11 +1345,7 @@ test('startup reap SKIPS a doing item claimed by a session, but still reaps a pl
   acquireClaim(dir, { id: held.id, actor: 'session', preClaimStatus: 'todo', claimRole: 'session', headAtTake: 'cafebabe' });
   const vanished = seedItem(dir, { id: 'item-runner-vanished' });
   acquireClaim(dir, { id: vanished.id, actor: 'runner', preClaimStatus: 'todo', claimRole: 'runner' });
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1379,11 +1367,7 @@ test('startup reap: empty fgw/ orphan branches are pruned, branches carrying com
   execFileSync('git', ['add', 'proposal.txt'], { cwd: keeper.path });
   execFileSync('git', ['commit', '-q', '-m', 'worker: proposal.txt'], { cwd: keeper.path });
   removeWorktree(repoRoot, keeper.path);
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1406,11 +1390,7 @@ test('startup reap: a zero-ahead root branch with an open (non-done/wontfix) lea
   seedItem(dir, { id: 'root-a', status: 'cleanup' });
   seedItem(dir, { id: 'leaf-b', parent: 'root-a', status: 'cleanup' });
 
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1426,11 +1406,7 @@ test('startup reap: a zero-ahead root branch whose only descendant is already do
   seedItem(dir, { id: 'root-c', status: 'cleanup' });
   seedItem(dir, { id: 'leaf-d', parent: 'root-c', status: 'done' });
 
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1447,11 +1423,7 @@ test('startup reap: a wontfix branch with real commits ahead and no open descend
   removeWorktree(repoRoot, wt.path);
   seedItem(dir, { id: 'wontfix-a', status: 'wontfix' });
 
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1469,11 +1441,7 @@ test('startup reap: a wontfix branch with an open descendant is kept, not pruned
   seedItem(dir, { id: 'wontfix-root', status: 'wontfix' });
   seedItem(dir, { id: 'child-open', parent: 'wontfix-root', status: 'doing' });
 
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1557,7 +1525,7 @@ test('bin/fgos-runner.mjs run from a SUBDIRECTORY of another repo operates on th
     JSON.stringify({
       runner: {
         executor: { command: process.execPath, args: [scriptPath, '{prompt}', '--model', '{model}'] },
-        models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+        modelPolicies: { node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' }, claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
         timeoutMs: 30000,
       },
     }),
@@ -1875,7 +1843,7 @@ test('wgi-8: even a TIMED-OUT worker (output on the err.stdout path) has its fgo
   const scriptPath = writeHangingDiscoveringExecutor(scriptDir, body);
   const config = {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
-    models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+    modelPolicies: { node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' }, claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
     timeoutMs: 400,
   };
 
@@ -2921,6 +2889,7 @@ test('Cell 6.1 happy path: runOnce dispatches planning.validate-plan to a fake e
 
   const { runDir } = cell61RunDir(repoRoot);
   const result = JSON.parse(fs.readFileSync(path.join(runDir, 'result.json'), 'utf8'));
+  console.log('RESULT KEYS:', JSON.stringify(result, null, 2));
   assert.equal(result.workId, id);
   assert.equal(result.status, 'done');
   assert.equal(result.confidence, 'reported');

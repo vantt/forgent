@@ -221,7 +221,7 @@ selection logic sits behind either yet — deciding them is a separate,
 later concern — but the slots exist now on purpose: `resolveExecutorCommand`
 already threads `model`/`tier` end-to-end (`src/runner/dispatch.mjs`), and
 leaving them out at this layer would nail every ad-hoc dispatch to
-`executor.model ?? modelForTier(cfg, work.tier)` — always the default
+`executor.model ?? resolveTierModel(cfg, work.tier)` — always the default
 backend — forcing every call site written against this shape to be
 revisited later just to add them.
 
@@ -306,7 +306,7 @@ required field means "do not dispatch, fall back to
 `<INLINE_FALLBACK_HEADING>` — Step C above): here, failing to reach a
 confident tier/provider judgment means dispatch ANYWAY, with the
 executor's own declared default (`executor.tier`/`executor.model`, or the
-computed `modelForTier` fallback) — an unresolved judgment is never a
+computed `resolveTierModel` fallback) — an unresolved judgment is never a
 reason to block a dispatch that would otherwise proceed.
 
 Record whichever tier/model actually gets used — judged or defaulted —

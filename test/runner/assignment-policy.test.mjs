@@ -7,7 +7,7 @@ import {
   TIER_STRENGTH,
 } from '../../src/runner/dispatch/assignment-policy.mjs';
 import { RunnerConfigError, supportsPolicyTier } from '../../src/runner/dispatch/config.mjs';
-import { resolvePolicyTierModel, deriveProviderFamily, resolveExecutorConfig } from '../../src/runner/dispatch/resolve.mjs';
+import { resolveTierModel, deriveProviderFamily, resolveExecutorConfig } from '../../src/runner/dispatch/resolve.mjs';
 
 test('resolveStrongerTier correctly orders tiers monotonically', () => {
   assert.equal(resolveStrongerTier('standard', 'nano'), 'standard');
@@ -180,7 +180,7 @@ test('literal model override is rejected if it originates from workflow YAML pol
 
 // --- Phase 00 R5: direct policy-tier resolver (fixes B1) ---
 
-test('resolvePolicyTierModel resolves policy tiers above "standard" directly against a provider table (no DEFAULT_TIER_TO_POLICY indirection)', () => {
+test('resolveTierModel resolves policy tiers above "standard" directly against a provider table', () => {
   const cfg = {
     modelPolicies: {
       claude: {
@@ -193,26 +193,28 @@ test('resolvePolicyTierModel resolves policy tiers above "standard" directly aga
     },
   };
 
-  assert.equal(resolvePolicyTierModel(cfg, 'flagship', 'claude'), 'claude-opus-analytical');
-  assert.equal(resolvePolicyTierModel(cfg, 'frontier', 'claude'), 'claude-opus-critical');
+  assert.equal(resolveTierModel(cfg, 'flagship', 'claude'), 'claude-opus-analytical');
+  assert.equal(resolveTierModel(cfg, 'frontier', 'claude'), 'claude-opus-critical');
 });
 
-test('resolvePolicyTierModel fails closed with a named RunnerConfigError for an unsupported provider/tier pair', () => {
+test('resolveTierModel fails closed with a named RunnerConfigError for an unsupported provider/tier pair', () => {
   const cfg = {
     modelPolicies: {
       claude: { standard: 'claude-3-7-sonnet-20250219' },
+      'z-ai': { nano: 'glm-5.2' },
     },
   };
 
   assert.throws(
-    () => resolvePolicyTierModel(cfg, 'flagship', 'claude'),
+    () => resolveTierModel(cfg, 'flagship', 'claude'),
     (err) => err instanceof RunnerConfigError && /flagship/.test(err.message) && /claude/.test(err.message),
   );
   assert.throws(
-    () => resolvePolicyTierModel(cfg, 'standard', 'z-ai'),
+    () => resolveTierModel(cfg, 'standard', 'z-ai'),
     (err) => err instanceof RunnerConfigError && /standard/.test(err.message) && /z-ai/.test(err.message),
   );
 });
+
 
 test('resolveAssignmentDispatchPolicy resolves an flagship-tier work item against a provider that declares it (B1 end-to-end)', () => {
   const assignment = buildAssignment({ stage: 'planning', operation: 'validate-plan' });
@@ -767,53 +769,7 @@ test('Phase 04: explicit minRigor stronger than the semantic-tier-derived value 
   );
 });
 
-test('Phase 04: raw agy heavy work preserves lookupPolicyTier "advanced" -> gemini-3.8-flash-high, while semanticTier stays "frontier"/quality.minRigor stays "critical"', () => {
-  // Mirrors the real agy-cli/agy-herdr executor shape (rigorOverrides keyed
-  // by this resolver's own policy-tier vocabulary): heavy work composes up
-  // to the 'frontier' semantic tier (DEFAULT_TIER_TO_POLICY.heavy ===
-  // 'frontier', dispatch/config.mjs), and agy's own rigorOverrides retarget
-  // ONLY the model-lookup key for 'frontier' to 'advanced' -- design.md
-  // §5.3's "creative-column trap" this phase must not fall into.
-  const assignment = buildAssignment({
-    stage: 'planning',
-    operation: 'validate-plan',
-    policy: { minTier: 'frontier', rigorOverrides: { frontier: 'advanced' } },
-  });
-  const runnerConfig = {
-    executor: { command: 'agy' },
-    modelPolicies: { gemini: { standard: 'gemini-3.8-flash-medium', advanced: 'gemini-3.8-flash-high', frontier: 'gemini-3.8-flash-critical-unused' } },
-  };
-
-  const effective = resolveAssignmentDispatchPolicy({ assignment, runnerConfig, cliOverride: { providerModel: 'gemini' } });
-
-  assert.equal(effective.tier, 'frontier', 'legacy flat tier field unaffected');
-  assert.equal(effective.provenance.semanticTier.value, 'frontier');
-  assert.equal(effective.quality.minRigor.value, 'critical', 'canonical minRigor must not follow the calibration lookup tier');
-  assert.equal(effective.lookupPolicyTier, 'advanced');
-  assert.deepEqual(effective.provenance.lookupPolicyTier.source, { scope: 'executor', kind: 'calibration' });
-  assert.equal(effective.model, 'gemini-3.8-flash-high');
-});
-
-test('Phase 04: fgos-coding-implement capability override retargets lookupPolicyTier to "standard" -> gemini-3.8-flash-medium, for the SAME critical semantic tier/heavy work', () => {
-  const assignment = buildAssignment({
-    stage: 'planning',
-    operation: 'validate-plan',
-    policy: { minTier: 'frontier', rigorOverrides: { frontier: 'standard' } },
-  });
-  const runnerConfig = {
-    executor: { command: 'agy' },
-    modelPolicies: { gemini: { standard: 'gemini-3.8-flash-medium', advanced: 'gemini-3.8-flash-high' } },
-  };
-
-  const effective = resolveAssignmentDispatchPolicy({ assignment, runnerConfig, cliOverride: { providerModel: 'gemini' } });
-
-  assert.equal(effective.provenance.semanticTier.value, 'frontier');
-  assert.equal(effective.quality.minRigor.value, 'critical', 'the same heavy work item keeps the same semantic rigor regardless of which provider calibration it dispatches through');
-  assert.equal(effective.lookupPolicyTier, 'standard');
-  assert.equal(effective.model, 'gemini-3.8-flash-medium');
-});
-
-test('Phase 04: without rigorOverrides, lookupPolicyTier equals semanticTier/effectiveTier (value-preserving no-op for every pre-Phase-04 caller)', () => {
+test('Phase 04: lookupPolicyTier equals semanticTier/effectiveTier (value-preserving no-op for every caller)', () => {
   const assignment = buildAssignment({ stage: 'planning', operation: 'validate-plan', policy: { minTier: 'advanced' } });
 
   const effective = resolveAssignmentDispatchPolicy({ assignment });
@@ -823,42 +779,26 @@ test('Phase 04: without rigorOverrides, lookupPolicyTier equals semanticTier/eff
   assert.deepEqual(effective.provenance.lookupPolicyTier.source, { scope: 'opPolicy', id: 'validate-plan', kind: 'semantic' });
 });
 
-test('Phase 04: rigorOverrides naming an unrecognized policy tier fails closed', () => {
-  const assignment = buildAssignment({
-    stage: 'planning',
-    operation: 'validate-plan',
-    policy: { minTier: 'frontier', rigorOverrides: { frontier: 'not-a-real-tier' } },
-  });
-
-  assert.throws(
-    () => resolveAssignmentDispatchPolicy({ assignment }),
-    (err) => err instanceof RunnerConfigError && /not a recognized policy tier/i.test(err.message),
-  );
-});
-
 test('Phase 04: evidence separately exposes semanticTier, canonical quality, lookupPolicyTier, and model source provenance', () => {
   const assignment = buildAssignment({
     stage: 'planning',
     operation: 'validate-plan',
-    policy: { minTier: 'frontier', rigorOverrides: { frontier: 'advanced' } },
+    policy: { minTier: 'advanced' },
   });
   const runnerConfig = {
     executor: { command: 'agy' },
+    executors: {
+      agy: { kind: 'agent', providerModel: 'gemini', invocations: [{ via: 'cli', command: 'agy', args: [] }] },
+    },
     modelPolicies: { gemini: { advanced: 'gemini-3.8-flash-high' } },
   };
 
-  const effective = resolveAssignmentDispatchPolicy({ assignment, runnerConfig, cliOverride: { providerModel: 'gemini' } });
+  const effective = resolveAssignmentDispatchPolicy({ assignment, runnerConfig, cliOverride: { preferExecutor: 'agy' } });
 
-  assert.notEqual(effective.provenance.semanticTier.value, effective.lookupPolicyTier, 'semanticTier and lookupPolicyTier must be independently inspectable, not the same collapsed value');
-  assert.equal(effective.provenance.semanticTier.value, 'frontier');
+  assert.equal(effective.provenance.semanticTier.value, 'advanced');
   assert.equal(effective.lookupPolicyTier, 'advanced');
-  assert.equal(effective.quality.minRigor.value, 'critical');
-  assert.equal(effective.quality.mode.value, 'analytical');
-  // Follow-up (post-Phase-08, retired dispatch-engine-liveness-hardening
-  // Phase 7): model provenance is now unconditionally PlacementPolicy-
-  // attributed, not "runnerConfig" -- closes the track's own "no fourth
-  // hidden placement source" close criterion for this resolver. The
-  // literal model VALUE is unchanged.
+  assert.equal(effective.quality.minRigor.value, 'standard');
+  assert.equal(effective.quality.mode.value, 'creative');
   assert.deepEqual(effective.provenance.model.source, { scope: 'placement-policy', id: 'gemini.advanced' });
   assert.equal(effective.model, 'gemini-3.8-flash-high');
 });

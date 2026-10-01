@@ -12,7 +12,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { loadRunnerConfigFromDir } from '../../src/runner/dispatch/config.mjs';
-import { resolveExecutorAndOverrides, modelForTier } from '../../src/runner/dispatch/resolve.mjs';
+import { resolveExecutorAndOverrides } from '../../src/runner/dispatch/resolve.mjs';
 import { resolveExecutorCommand } from '../../src/runner/dispatch/transport.mjs';
 
 import {

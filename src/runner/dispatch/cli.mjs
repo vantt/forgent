@@ -23,9 +23,8 @@ import { loadAgentDefs, readTaskSpecHeader } from '../agent-roster.mjs';
 import { selectTemplate, hashTemplate } from '../prompt-templates.mjs';
 import { listWork, StoreError } from '../../state/store.mjs';
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
-import { RunnerConfigError, ensureRunnerConfigForDir, DEFAULT_TIER_TO_POLICY } from './config.mjs';
-import { resolveExecutorAndOverrides, resolveExecutorIdForPurpose, modelForTier, executorIdForWork, resolveCapabilityIdentityDetails } from './resolve.mjs';
-import { resolveVerifiedPlacementModel, recordShadowBinderDivergence } from './placement-policy.mjs';
+import { RunnerConfigError, ensureRunnerConfigForDir } from './config.mjs';
+import { resolveExecutorAndOverrides, resolveExecutorIdForPurpose, resolveTierModel, deriveProviderFamily, executorIdForWork, resolveCapabilityIdentityDetails } from './resolve.mjs';
 import { resolveExecutorProvider, resolveExecutorGovernance } from './assignment-policy.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
 import { resolveExecutorCommand, DispatchError } from './transport.mjs';
@@ -288,35 +287,20 @@ function openDispatchRun({ fgosDir, workId, executorId, cwd }) {
 
 export function spawnWorker(work, cfg, cwd, opts = {}) {
   // Setup stays synchronous and OUTSIDE the adapter call on purpose: a
-  // malformed tier/config (RunnerConfigError, via modelForTier/
+  // malformed tier/config (RunnerConfigError, via resolveTierModel/
   // resolveExecutorCommand) must still throw synchronously, before any
   // process is spawned — exactly like the spawnSync-based version, and
   // exactly what dispatch.test.mjs's "throws a RunnerConfigError ... before
   // any spawn" test pins.
   const tier = work.tier ?? DEFAULTS.tier;
-  // tsk-5tm-5 D9: executorId computed before modelForTier (moved ahead of
-  // its pre-D9 position, right after) so a executor's own providerModel/
-  // rigorOverrides can thread into tier resolution — never borrowing
-  // Claude's model names for a non-Claude executor's own dispatch.
+  // executorId computed before resolveTierModel so an executor's own
+  // providerModel can thread into tier resolution.
   const executorId = executorIdForWork(work, opts.stage);
   const { executorId: resolvedExecutorId, executor: executorForTier, overrides: capabilityOverrides } = executorId ? resolveExecutorAndOverrides(cfg, executorId) : {};
-  const legacyModel = modelForTier(cfg, tier, {
-    providerModel: capabilityOverrides?.providerModel ?? executorForTier?.providerModel,
-    rigorOverrides: capabilityOverrides?.rigorOverrides ?? executorForTier?.rigorOverrides,
-  });
-  // Phase 07 (executor-policy-dispatch-seams): PlacementPolicy production
-  // binder, self-verifying -- see resolveVerifiedPlacementModel's own
-  // docstring (placement-policy.mjs) for the full safety argument. The
-  // legacy formula above is UNCHANGED and always computed; this only picks
-  // which of the two (legacy vs PlacementPolicy) the real spawn actually
-  // uses.
-  const { model, source: modelSource, divergence: placementDivergence } = resolveVerifiedPlacementModel({ cfg, executorId, workTier: tier, legacyModel });
-  if (placementDivergence) {
-    process.stderr.write(
-      `fgos: PlacementPolicy divergence (falling back to legacy) executor=${placementDivergence.executorId} tier=${placementDivergence.workTier} legacyModel=${placementDivergence.legacyModel} placementModel=${placementDivergence.placementModel}\n`,
-    );
-    recordShadowBinderDivergence(opts.fgosDir, 'placement-model', placementDivergence);
-  }
+  const providerFamily = deriveProviderFamily(executorForTier);
+  const effectiveTier = capabilityOverrides?.tier ?? tier;
+  const model = capabilityOverrides?.model ?? executorForTier?.model ?? resolveTierModel(cfg, effectiveTier, providerFamily);
+  const modelSource = { scope: 'placement-policy', id: `${providerFamily}.${effectiveTier}` };
   const prompt = buildPrompt(work, opts.feedback, opts.stage);
   // D20/D22 (review finding H1, tsk-397): only has an observable effect on
   // a command-less/adapter-less/invocation-less executor with no static
@@ -805,38 +789,11 @@ export async function executeExecutorCli(
   // `.disallowedExecutors` are still consulted, unchanged) without paying
   // for the unused computation.
   //
-  // The literal MODEL is still computed by the exact same formula as before
-  // (D2's precedence, untouched) and handed to the resolver as an
-  // already-resolved `cliOverride.model` -- deliberately never letting the
-  // resolver's own tier-driven model-table lookup run for this caller. That
-  // lookup (`resolvePolicyTierModel`) reads a legacy flat `cfg.models`
-  // table keyed by POLICY tier ("lightweight"/"standard"/.../"critical");
-  // `modelForTier` (used here, and by every existing `--tier`/
-  // `capabilities.overrides.tier`/`executor.tier` caller of this function)
-  // reads the SAME field name keyed by WORK tier ("light"/"standard"/
-  // "heavy") -- two genuinely incompatible legacy shapes under one config
-  // key that predate this unification; reconciling them is out of scope
-  // here. Precomputing the model sidesteps the conflict entirely: real
-  // production config always declares `modelPolicies` (provider-keyed,
-  // policy-tier), where both readings agree.
-  const rigorOverrides = capabilityOverrides?.rigorOverrides ?? executor?.rigorOverrides;
+  // The literal MODEL is computed via resolveTierModel and handed to the
+  // resolver as an already-resolved `cliOverride.model`.
   const tier = tierOverride ?? capabilityOverrides?.tier ?? executor?.tier ?? DEFAULTS.tier;
-  const legacyModel = modelForTier(cfg, tier, {
-    providerModel: capabilityOverrides?.providerModel ?? executor?.providerModel,
-    rigorOverrides,
-  });
-  // Phase 07 (executor-policy-dispatch-seams): same self-verifying
-  // PlacementPolicy production binder as spawnWorker above -- only applies
-  // to the `modelForTier` fallback branch, never to an explicit
-  // modelOverride/capabilityOverrides.model/executor.model, which must
-  // always win outright regardless of what PlacementPolicy would choose.
-  const { model: fallbackModel, divergence: placementDivergence } = resolveVerifiedPlacementModel({ cfg, executorId, workTier: tier, legacyModel });
-  if (placementDivergence) {
-    process.stderr.write(
-      `fgos: PlacementPolicy divergence (falling back to legacy) executor=${placementDivergence.executorId} tier=${placementDivergence.workTier} legacyModel=${placementDivergence.legacyModel} placementModel=${placementDivergence.placementModel}\n`,
-    );
-    recordShadowBinderDivergence(fgosDir, 'placement-model', placementDivergence);
-  }
+  const providerFamily = deriveProviderFamily(executor);
+  const fallbackModel = resolveTierModel(cfg, tier, providerFamily);
   const model = modelOverride ?? capabilityOverrides?.model ?? executor?.model ?? fallbackModel;
   // `primaryExecutor`/`explicitProviderModel` mirror exactly what the
   // former `resolveAssignmentDispatchPolicy({assignment: {policy: {...}}})`
@@ -850,7 +807,6 @@ export async function executeExecutorCli(
   const { resolvedProvider } = resolveExecutorProvider({
     runnerConfig: cfg,
     primaryExecutor,
-    explicitProviderModel: capabilityOverrides?.providerModel,
     options,
   });
   resolveExecutorGovernance({ primaryExecutor, providerModel: resolvedProvider, options });

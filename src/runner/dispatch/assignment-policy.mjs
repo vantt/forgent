@@ -24,7 +24,7 @@
 // added.
 
 import { MODEL_POLICY_TIERS, RunnerConfigError, REASONING_EFFORT_VALUES } from './config.mjs';
-import { resolvePolicyTierModel, deriveProviderFamily } from './resolve.mjs';
+import { resolveTierModel, deriveProviderFamily } from './resolve.mjs';
 import { REPEAT_MODE_VALUES } from '../definitions/schema.mjs';
 import { checkProviderDisallowed } from './provider-adapter.mjs';
 
@@ -138,7 +138,7 @@ export function resolveStrongerTier(tierA, tierB) {
  * @param {{disallowedProviders?: string[], disallowedExecutors?: string[]}} [params.options]
  * @returns {{resolvedProvider: string, registeredExecutorEntry: object|undefined}}
  */
-export function resolveExecutorProvider({ runnerConfig, primaryExecutor, explicitProviderModel, options = {} }) {
+export function resolveExecutorProvider({ runnerConfig, primaryExecutor, options = {} }) {
   const hasExecutorRegistry = Boolean(runnerConfig && runnerConfig.executors && typeof runnerConfig.executors === 'object');
   const hasGovernanceOptions =
     (Array.isArray(options.disallowedProviders) && options.disallowedProviders.length > 0) ||
@@ -154,13 +154,11 @@ export function resolveExecutorProvider({ runnerConfig, primaryExecutor, explici
     throw new RunnerConfigError(`preferExecutor "${primaryExecutor}" is not a registered executor (runnerConfig.executors has no such entry).`);
   }
   const registeredExecutorCommand = registeredExecutorEntry?.invocations?.find((inv) => inv.via === 'cli')?.command;
-  const resolvedProvider = explicitProviderModel
-    ? explicitProviderModel
-    : registeredExecutorEntry
-      ? deriveProviderFamily(registeredExecutorEntry, registeredExecutorCommand)
-      : isImplicitDefaultExecutor
-        ? deriveProviderFamily({ command: runnerConfig?.executor?.command }, primaryExecutor)
-        : primaryExecutor;
+  const resolvedProvider = registeredExecutorEntry
+    ? deriveProviderFamily(registeredExecutorEntry, registeredExecutorCommand)
+    : isImplicitDefaultExecutor
+      ? deriveProviderFamily({ command: runnerConfig?.executor?.command }, primaryExecutor)
+      : primaryExecutor;
   return { resolvedProvider, registeredExecutorEntry };
 }
 
@@ -301,27 +299,13 @@ export function resolveAssignmentDispatchPolicy({
   // 1b. Quality bridge (Phase 04, executor-policy-dispatch-seams).
   //
   // `effectiveTier` above is the semantic tier: raise-only composed, exactly
-  // as before this phase, never touched by rigorOverrides. It is the ONLY
-  // input the canonical quality bridge derives from (phase-04.md step 2:
-  // "Derive quality.minRigor from semanticTier; never derive it from
-  // executor/capability rigorOverrides").
+  // as before this phase. It is the ONLY input the canonical quality bridge
+  // derives from.
   const semanticTier = effectiveTier;
   const derivedQuality = QUALITY_TIER_BRIDGE[semanticTier];
 
-  // `rigorOverrides` (an executor/capability's own model-calibration map,
-  // keyed by this resolver's own policy-tier vocabulary) may retarget ONLY
-  // the legacy `modelPolicies` lookup key -- never semanticTier, never
-  // minRigor (phase-04.md step 3 / design.md §5.3 "creative-column trap").
-  const rigorOverrides = cliOverride.rigorOverrides ?? opPolicy.rigorOverrides;
-  const overriddenPolicyTier = rigorOverrides ? rigorOverrides[semanticTier] : undefined;
-  if (overriddenPolicyTier !== undefined && !MODEL_POLICY_TIERS.includes(overriddenPolicyTier)) {
-    throw new RunnerConfigError(`rigorOverrides["${semanticTier}"] = "${overriddenPolicyTier}" is not a recognized policy tier. Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);
-  }
-  const lookupPolicyTier = overriddenPolicyTier ?? semanticTier;
-  const lookupPolicyTierSource = overriddenPolicyTier !== undefined
-    ? { scope: 'executor', kind: 'calibration' }
-    : { ...tierSource, kind: 'semantic' };
-
+  const lookupPolicyTier = semanticTier;
+  const lookupPolicyTierSource = { ...tierSource, kind: 'semantic' };
   // Mode source precedence: explicit > implied-by-persona >
   // implied-by-tier-bridge (design.md §3.2). `implied-by-persona` has no
   // producer yet -- see the QUALITY_TIER_BRIDGE comment above.
@@ -423,18 +407,14 @@ export function resolveAssignmentDispatchPolicy({
   // error (invalid mode/minRigor/repeatMode) that used to throw first for
   // the same malformed input, a real ordering change this extraction must
   // not introduce.
-  const explicitProviderModel = cliOverride.providerModel ?? opPolicy.providerModel;
   const { resolvedProvider, registeredExecutorEntry } = resolveExecutorProvider({
     runnerConfig,
     primaryExecutor,
-    explicitProviderModel,
     options,
   });
-  const providerSource = explicitProviderModel
-    ? (cliOverride.providerModel ? { scope: 'cliOverride' } : { scope: 'opPolicy', id: opId })
-    : registeredExecutorEntry
-      ? { scope: 'registeredExecutor', id: primaryExecutor }
-      : executorSource;
+  const providerSource = registeredExecutorEntry
+    ? { scope: 'registeredExecutor', id: primaryExecutor }
+    : executorSource;
   let resolvedModel = null;
   // Phase 00 R7/F4: defaults to `{ scope: 'default' }` below when no
   // override/runnerConfig resolves a source -- provenance.model.source must
@@ -452,18 +432,15 @@ export function resolveAssignmentDispatchPolicy({
     // with a named RunnerConfigError when the provider/tier pair is
     // unsupported -- never swallowed into a silent `null` model. Resolves
     // against `lookupPolicyTier`, not `effectiveTier` directly (Phase 04):
-    // value-preserving for every caller that never supplies
-    // `rigorOverrides`, since `lookupPolicyTier === effectiveTier` then.
-    // dispatch-engine-liveness-hardening Phase 7: `resolveVerifiedAssignmentModel`
-    // retired -- it called this exact same `resolvePolicyTierModel` with the
-    // exact same (lookupPolicyTier, resolvedProvider) inputs, so its own
+    // Direct tier resolution: fails closed with a named RunnerConfigError when
+    // the provider/tier pair is unsupported.
     // "legacy" fallback branch was unreachable (a second call with identical
     // args either produces the same value or throws exactly as this first
     // call already would have). Kept as one call; `source` is always
     // PlacementPolicy-attributed since PlacementPolicy target semantics IS
     // this resolution path per design.md's close criterion (post-Phase-08
     // follow-up comment, now realized in full).
-    resolvedModel = resolvePolicyTierModel(runnerConfig, lookupPolicyTier, resolvedProvider);
+    resolvedModel = resolveTierModel(runnerConfig, lookupPolicyTier, resolvedProvider);
     modelSource = { scope: 'placement-policy', id: `${resolvedProvider}.${lookupPolicyTier}` };
   }
 

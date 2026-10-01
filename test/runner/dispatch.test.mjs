@@ -12,7 +12,7 @@ import {
   ensureRunnerConfigForDir,
   DEFAULT_RUNNER_CONFIG,
   detectAssistantCli,
-  modelForTier,
+  resolveTierModel,
   resolveExecutorCommand,
   resolveExecutorEnv,
   executeExecutorCli,
@@ -273,7 +273,7 @@ function sampleWork(overrides = {}) {
 function baseConfig(executorArgs) {
   return {
     executor: { command: process.execPath, args: executorArgs },
-    models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+    modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' }, node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
     timeoutMs: 5000,
   };
 }
@@ -436,13 +436,13 @@ test('loadRunnerConfig parses a valid committed-shaped config', () => {
     configPath,
     JSON.stringify({
       executor: { command: 'claude', args: ['-p', '{prompt}', '--model', '{model}'] },
-      models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+      modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' }, node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
       timeoutMs: 120000,
     }),
   );
   const cfg = loadRunnerConfig(configPath);
   assert.equal(cfg.executor.command, 'claude');
-  assert.equal(cfg.models.standard, 'sonnet');
+  assert.equal(cfg.modelPolicies.claude.standard, 'sonnet');
   assert.equal(cfg.timeoutMs, 120000);
 });
 
@@ -460,11 +460,11 @@ test('loadRunnerConfig rejects invalid JSON', () => {
 test('loadRunnerConfig rejects a config missing executor.args', () => {
   const dir = mkTempDir();
   const configPath = path.join(dir, 'missing-args.json');
-  fs.writeFileSync(configPath, JSON.stringify({ executor: { command: 'claude' }, models: {}, timeoutMs: 1000 }));
+  fs.writeFileSync(configPath, JSON.stringify({ executor: { command: 'claude' }, modelPolicies: { claude: { standard: 'sonnet' } }, timeoutMs: 1000 }));
   assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
 });
 
-test('loadRunnerConfig rejects a config missing models', () => {
+test('loadRunnerConfig rejects a config missing modelPolicies', () => {
   const dir = mkTempDir();
   const configPath = path.join(dir, 'missing-models.json');
   fs.writeFileSync(
@@ -481,7 +481,6 @@ test('loadRunnerConfig accepts a modelPolicies provider table declaring only som
     configPath,
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
-      models: {},
       modelPolicies: {
         claude: { standard: 'sonnet' },
         'z-ai': { standard: 'glm-4.6', frontier: 'glm-4.6-max' },
@@ -502,7 +501,6 @@ test('loadRunnerConfig rejects a modelPolicies tier key not in MODEL_POLICY_TIER
     configPath,
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
-      models: {},
       modelPolicies: { claude: { 'not-a-real-tier': 'sonnet' } },
       timeoutMs: 1000,
     }),
@@ -517,7 +515,6 @@ test('loadRunnerConfig rejects a modelPolicies entry whose model value is not a 
     configPath,
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
-      models: {},
       modelPolicies: { claude: { standard: '' } },
       timeoutMs: 1000,
     }),
@@ -612,7 +609,7 @@ test('loadRunnerConfig rejects a non-positive timeoutMs', () => {
   const configPath = path.join(dir, 'bad-timeout.json');
   fs.writeFileSync(
     configPath,
-    JSON.stringify({ executor: { command: 'claude', args: ['{prompt}'] }, models: {}, timeoutMs: 0 }),
+    JSON.stringify({ executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' } }, timeoutMs: 0 }),
   );
   assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
 });
@@ -622,7 +619,7 @@ test('loadRunnerConfig accepts a config with no "idleTimeoutMs" at all -- absent
   const configPath = path.join(dir, 'no-idle-timeout.json');
   fs.writeFileSync(
     configPath,
-    JSON.stringify({ executor: { command: 'claude', args: ['{prompt}'] }, models: { standard: 'sonnet' }, timeoutMs: 1000 }),
+    JSON.stringify({ executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, timeoutMs: 1000 }),
   );
   const cfg = loadRunnerConfig(configPath);
   assert.equal(cfg.idleTimeoutMs, undefined);
@@ -633,7 +630,7 @@ test('loadRunnerConfig accepts a well-formed positive "idleTimeoutMs"', () => {
   const configPath = path.join(dir, 'good-idle-timeout.json');
   fs.writeFileSync(
     configPath,
-    JSON.stringify({ executor: { command: 'claude', args: ['{prompt}'] }, models: { standard: 'sonnet' }, timeoutMs: 1000, idleTimeoutMs: 30000 }),
+    JSON.stringify({ executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, timeoutMs: 1000, idleTimeoutMs: 30000 }),
   );
   const cfg = loadRunnerConfig(configPath);
   assert.equal(cfg.idleTimeoutMs, 30000);
@@ -644,7 +641,7 @@ test('loadRunnerConfig rejects a non-positive "idleTimeoutMs" when present', () 
   const configPath = path.join(dir, 'bad-idle-timeout.json');
   fs.writeFileSync(
     configPath,
-    JSON.stringify({ executor: { command: 'claude', args: ['{prompt}'] }, models: { standard: 'sonnet' }, timeoutMs: 1000, idleTimeoutMs: 0 }),
+    JSON.stringify({ executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, timeoutMs: 1000, idleTimeoutMs: 0 }),
   );
   assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
 });
@@ -667,7 +664,7 @@ test('loadRunnerConfig accepts a config with no "executors" block at all', () =>
     configPath,
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -683,7 +680,7 @@ test('loadRunnerConfig rejects a non-object "executors" block (tsk-225 D1: the r
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: 'nope',
-      models: {},
+      modelPolicies: { claude: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -697,7 +694,7 @@ test('loadRunnerConfig rejects an unknown "adapter" value on the global executor
     configPath,
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'], adapter: 'rpc' },
-      models: {},
+      modelPolicies: { claude: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -717,7 +714,7 @@ test('loadRunnerConfig accepts a config with no "executors" block at all — pre
     configPath,
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -733,7 +730,7 @@ test('loadRunnerConfig accepts a well-formed "executors" entry carrying its own 
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { 'fgos-code-implement': { kind: 'agent', command: 'agy', args: ['{prompt}'] } },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -754,7 +751,7 @@ test('loadRunnerConfig accepts a config with no "capabilities" block at all', ()
     configPath,
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -770,7 +767,7 @@ test('loadRunnerConfig accepts a well-formed "capabilities" catalog entry with d
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       capabilities: { 'impact-analysis': { description: 'Code-graph blast radius', aliases: ['impact_analysis', 'Impact Analysis'] } },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -787,7 +784,7 @@ test('loadRunnerConfig accepts a "capabilities" entry naming neither description
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       capabilities: { 'pane-labeling': {} },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -803,7 +800,7 @@ test('loadRunnerConfig rejects a "capabilities" block that is not an object', ()
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       capabilities: 'nope',
-      models: {},
+      modelPolicies: { claude: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -818,7 +815,7 @@ test('loadRunnerConfig rejects a "capabilities.<name>" entry that is not an obje
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       capabilities: { 'impact-analysis': 'nope' },
-      models: {},
+      modelPolicies: { claude: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -833,7 +830,7 @@ test('loadRunnerConfig rejects a "capabilities.<name>" entry with an empty-strin
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       capabilities: { 'impact-analysis': { description: '' } },
-      models: {},
+      modelPolicies: { claude: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -848,7 +845,7 @@ test('loadRunnerConfig rejects a "capabilities.<name>" entry whose aliases is no
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       capabilities: { 'impact-analysis': { aliases: ['ok', ''] } },
-      models: {},
+      modelPolicies: { claude: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -878,7 +875,7 @@ test('loadRunnerConfig accepts a "executors.<id>" entry using the invocations[] 
           invocations: [{ via: 'cli', adapter: 'cli-spawn', command: 'agy', args: ['-p', '{prompt}', '--model', '{model}'] }],
         },
       },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -893,7 +890,7 @@ test('loadRunnerConfig rejects a "executors.<id>.invocations" that is not a non-
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { agy: { kind: 'agent', invocations: [] } },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -910,7 +907,7 @@ test('loadRunnerConfig rejects a "executors.<id>.invocations[]" entry with an un
       executors: {
         agy: { kind: 'agent', allowCrossProvider: true, invocations: [{ via: 'api', command: 'agy', args: ['{prompt}'] }] },
       },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -925,7 +922,7 @@ test('loadRunnerConfig rejects a "executors.<id>.invocations[]" entry with a mal
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { agy: { kind: 'agent', allowCrossProvider: true, invocations: [{ via: 'cli', command: 'agy' }] } },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -942,7 +939,7 @@ test('resolveExecutorCommand resolves command/args/provider from invocations[0] 
         invocations: [{ via: 'cli', adapter: 'cli-spawn', command: 'agy', args: ['-p', '{prompt}', '--model', '{model}'] }],
       },
     },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
   const resolved = resolveExecutorCommand(cfg, { prompt: 'hello', model: 'sonnet', tier: 'standard', executorId: 'agy' });
@@ -964,7 +961,7 @@ test('resolveExecutorCommand picks the invocation whose "via" is "cli" even when
         ],
       },
     },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
   const resolved = resolveExecutorCommand(cfg, { prompt: 'hello', model: 'sonnet', tier: 'standard', executorId: 'agy' });
@@ -981,7 +978,7 @@ test('resolveExecutorCommand throws when a executor declares "invocations" but n
         invocations: [{ via: 'mcp', command: 'mcp:agy' }],
       },
     },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
   assert.throws(
@@ -996,7 +993,7 @@ test('resolveExecutorCommand still enforces cross-provider governance for an inv
     executors: {
       agy: { kind: 'agent', invocations: [{ via: 'cli', adapter: 'cli-spawn', command: 'agy', args: ['{prompt}'] }] },
     },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
   assert.throws(
@@ -1041,7 +1038,7 @@ function claudeExecutorCfg() {
         invocations: [{ via: 'cli', adapter: 'cli-spawn', command: 'claude', args: ['-p', '{prompt}', '--model', '{model}', '--permission-mode', 'acceptEdits'] }],
       },
     },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
 }
@@ -1075,7 +1072,7 @@ test('loadRunnerConfig accepts a "executors" entry naming only "kind" (metadata-
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { distill: { kind: 'agent', target: 'general-purpose', tier: 'standard' } },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -1090,7 +1087,7 @@ test('loadRunnerConfig rejects a "executors" block that is not an object', () =>
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: 'nope',
-      models: {},
+      modelPolicies: { claude: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -1105,7 +1102,7 @@ test('loadRunnerConfig rejects a "executors.<id>" entry with an unknown "kind"',
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { distill: { kind: 'not-a-real-kind' } },
-      models: {},
+      modelPolicies: { claude: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -1120,7 +1117,7 @@ test('loadRunnerConfig accepts "task" as a "executors.<id>.kind" value (the one 
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { distill: { kind: 'agent', target: 'general-purpose' } },
-      models: {},
+      modelPolicies: { claude: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -1135,7 +1132,7 @@ test('loadRunnerConfig rejects a "executors.<id>" entry declaring "command" with
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { 'fgos-code-implement': { kind: 'agent', command: 'agy' } },
-      models: {},
+      modelPolicies: { claude: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -1152,7 +1149,7 @@ test('loadRunnerConfig accepts a "executors.<id>" entry with allowCrossProvider:
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { 'fgos-code-implement': { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -1167,7 +1164,7 @@ test('loadRunnerConfig rejects a "executors.<id>" entry whose allowCrossProvider
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { 'fgos-code-implement': { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: 'yes' } },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -1288,7 +1285,7 @@ test('loadRunnerConfig accepts a "executors.<id>.invocations[]" entry with "via"
       executors: {
         webhook: { kind: 'tool', invocations: [{ via: 'api', adapter: 'http', url: 'http://example.invalid/hook' }] },
       },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -1303,7 +1300,7 @@ test('loadRunnerConfig rejects a "executors.<id>.invocations[]" entry with "via"
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { webhook: { kind: 'tool', invocations: [{ via: 'api', adapter: 'http' }] } },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -1441,7 +1438,7 @@ test('loadRunnerConfigFromDir reads the runner section of the shared file', () =
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
   fs.writeFileSync(
     path.join(dir, '.fgos', 'config.json'),
-    JSON.stringify({ runner: { executor: { command: 'claude', args: ['{prompt}'] }, models: { standard: 'sonnet' }, timeoutMs: 5000 } }),
+    JSON.stringify({ runner: { executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, timeoutMs: 5000 } }),
   );
   const cfg = loadRunnerConfigFromDir(dir);
   assert.equal(cfg.executor.command, 'claude');
@@ -1460,7 +1457,7 @@ test('loadRunnerConfigFromDir merges a project runner section against ~/.fgos/co
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
   fs.writeFileSync(
     path.join(dir, '.fgos', 'config.json'),
-    JSON.stringify({ runner: { executor: { command: 'claude', args: ['{prompt}'] }, models: { standard: 'sonnet' }, timeoutMs: 5000 } }),
+    JSON.stringify({ runner: { executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, timeoutMs: 5000 } }),
   );
   const homeDir = mkTempDir();
   fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
@@ -1575,7 +1572,7 @@ test('ensureRunnerConfigForDir fills missing default keys into an existing share
   fs.writeFileSync(
     sharedPath,
     JSON.stringify({
-      runner: { executor: { command: 'claude', args: ['{prompt}'] }, models: { standard: 'sonnet' }, timeoutMs: 1000 },
+      runner: { executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, timeoutMs: 1000 },
       unrelatedSection: { keep: 'me' },
     }),
   );
@@ -1583,7 +1580,7 @@ test('ensureRunnerConfigForDir fills missing default keys into an existing share
   const cfg = ensureRunnerConfigForDir(dir);
 
   assert.deepEqual(cfg.parallel, DEFAULT_RUNNER_CONFIG.parallel);
-  assert.equal(cfg.models.standard, 'sonnet');
+  assert.equal(cfg.modelPolicies.claude.standard, 'sonnet');
   const written = JSON.parse(fs.readFileSync(sharedPath, 'utf8'));
   // A sibling section this item never touches survives untouched.
   assert.deepEqual(written.unrelatedSection, { keep: 'me' });
@@ -1645,25 +1642,25 @@ test('detectAssistantCli delegates to tool-registry.mjs\'s shared findExecutable
   assert.equal(detectAssistantCli(['claude', 'codex'], dir), findExecutableOnPath(['claude', 'codex'], dir));
 });
 
-// --- modelForTier: tier -> model, unknown tier is a validation error ----
+// --- resolveTierModel: tier -> model, unknown tier is a validation error ----
 
-test('modelForTier resolves each declared tier to its configured model', () => {
+test('resolveTierModel resolves each declared tier to its configured model', () => {
   const cfg = baseConfig(['{prompt}']);
-  assert.equal(modelForTier(cfg, 'light'), 'haiku');
-  assert.equal(modelForTier(cfg, 'standard'), 'sonnet');
-  assert.equal(modelForTier(cfg, 'heavy'), 'opus');
+  assert.equal(resolveTierModel(cfg, 'light'), 'haiku');
+  assert.equal(resolveTierModel(cfg, 'standard'), 'sonnet');
+  assert.equal(resolveTierModel(cfg, 'heavy'), 'opus');
 });
 
-test('modelForTier throws a validation error for an unknown tier', () => {
+test('resolveTierModel throws a validation error for an unknown tier', () => {
   const cfg = baseConfig(['{prompt}']);
-  assert.throws(() => modelForTier(cfg, 'ultra-mega'), (err) => {
+  assert.throws(() => resolveTierModel(cfg, 'ultra-mega'), (err) => {
     assert.ok(err instanceof RunnerConfigError);
     assert.equal(err.category, 'validation');
     return true;
   });
 });
 
-// --- modelForTier: modelPolicies (D9, tsk-5tm-5) -------------------------
+// --- resolveTierModel: modelPolicies (D9, tsk-5tm-5) -------------------------
 
 function modelPoliciesConfig() {
   return {
@@ -1676,45 +1673,44 @@ function modelPoliciesConfig() {
   };
 }
 
-test('modelForTier resolves the default provider (claude) when no providerModel is given, same tier->model mapping as before', () => {
+test('resolveTierModel resolves the default provider (claude) when no providerModel is given, same tier->model mapping as before', () => {
   const cfg = modelPoliciesConfig();
-  assert.equal(modelForTier(cfg, 'light'), 'haiku');
-  assert.equal(modelForTier(cfg, 'standard'), 'sonnet');
-  assert.equal(modelForTier(cfg, 'heavy'), 'opus');
+  assert.equal(resolveTierModel(cfg, 'light'), 'haiku');
+  assert.equal(resolveTierModel(cfg, 'standard'), 'sonnet');
+  assert.equal(resolveTierModel(cfg, 'heavy'), 'opus');
 });
 
-test('modelForTier resolves a non-Claude provider (e.g. agy/gemini) to that provider\'s own model name, not Claude\'s (D9\'s reported bug: executor non-Claude nhan sai ten)', () => {
+test('resolveTierModel resolves a non-Claude provider (e.g. agy/gemini) to that provider\'s own model name, not Claude\'s', () => {
   const cfg = modelPoliciesConfig();
-  assert.equal(modelForTier(cfg, 'light', { providerModel: 'gemini' }), 'gemini-flash');
-  assert.equal(modelForTier(cfg, 'standard', { providerModel: 'gemini' }), 'gemini-pro');
-  assert.equal(modelForTier(cfg, 'heavy', { providerModel: 'gemini' }), 'gemini-ultra');
+  assert.equal(resolveTierModel(cfg, 'light', 'gemini'), 'gemini-flash');
+  assert.equal(resolveTierModel(cfg, 'standard', 'gemini'), 'gemini-pro');
+  assert.equal(resolveTierModel(cfg, 'heavy', 'gemini'), 'gemini-ultra');
 });
 
-test('modelForTier throws when providerModel names a provider with no modelPolicies entry', () => {
+test('resolveTierModel throws when providerModel names a provider with no modelPolicies entry', () => {
   const cfg = modelPoliciesConfig();
-  assert.throws(() => modelForTier(cfg, 'light', { providerModel: 'mistral' }), (err) => {
+  assert.throws(() => resolveTierModel(cfg, 'light', 'mistral'), (err) => {
     assert.ok(err instanceof RunnerConfigError);
     assert.match(err.message, /mistral/);
     return true;
   });
 });
 
-test('modelForTier honors rigorOverrides, routing a work tier to a different model-policy tier than DEFAULT_TIER_TO_POLICY', () => {
-  const cfg = modelPoliciesConfig();
-  // Default: 'standard' work-tier -> 'standard' policy tier -> sonnet.
-  assert.equal(modelForTier(cfg, 'standard'), 'sonnet');
-  // Override routes 'standard' work-tier -> 'frontier' policy tier -> opus.
-  assert.equal(modelForTier(cfg, 'standard', { rigorOverrides: { standard: 'frontier' } }), 'opus');
-});
-
-test('modelForTier prefers modelPolicies over a legacy flat models map when both are present', () => {
-  const cfg = { ...modelPoliciesConfig(), models: { light: 'legacy-light', standard: 'legacy-standard', heavy: 'legacy-heavy' } };
-  assert.equal(modelForTier(cfg, 'standard'), 'sonnet');
-});
-
-test('modelForTier still resolves the legacy flat models map when modelPolicies is absent (backward compatible)', () => {
-  const cfg = baseConfig(['{prompt}']);
-  assert.equal(modelForTier(cfg, 'standard'), 'sonnet');
+test('loadRunnerConfig rejects a runner config declaring retired models map', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'retired-models.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['{prompt}'] },
+      models: { standard: 'sonnet' },
+      timeoutMs: 1000,
+    }),
+  );
+  assert.throws(
+    () => loadRunnerConfig(configPath),
+    (err) => err instanceof RunnerConfigError && /declares retired "models" map/.test(err.message),
+  );
 });
 
 test('loadRunnerConfig accepts a runner config declaring modelPolicies instead of models', () => {
@@ -1732,7 +1728,7 @@ test('loadRunnerConfig accepts a runner config declaring modelPolicies instead o
   assert.equal(cfg.modelPolicies.claude.standard, 'sonnet');
 });
 
-test('loadRunnerConfig rejects a config declaring neither models nor modelPolicies', () => {
+test('loadRunnerConfig rejects a config declaring no modelPolicies', () => {
   const dir = mkTempDir();
   const configPath = path.join(dir, 'no-models.json');
   fs.writeFileSync(
@@ -1741,7 +1737,6 @@ test('loadRunnerConfig rejects a config declaring neither models nor modelPolici
   );
   assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
 });
-
 test('loadRunnerConfig rejects a modelPolicies entry with an unknown policy tier key', () => {
   const dir = mkTempDir();
   const configPath = path.join(dir, 'bad-tier-key.json');
@@ -2120,7 +2115,7 @@ test('resolveExecutorCommand falls back to the global executor when no tier is g
 });
 
 test('resolveExecutorCommand throws for an unknown adapter even on a raw config object that skipped loadRunnerConfig validation', () => {
-  const cfg = { executor: { command: 'x', args: ['{prompt}'], adapter: 'not-a-real-adapter' }, models: {}, timeoutMs: 5000 };
+  const cfg = { executor: { command: 'x', args: ['{prompt}'], adapter: 'not-a-real-adapter' }, modelPolicies: { claude: { standard: 'sonnet' } }, timeoutMs: 5000 };
   assert.throws(() => resolveExecutorCommand(cfg, { prompt: 'p', model: 'm' }), RunnerConfigError);
 });
 
@@ -2131,7 +2126,7 @@ test('resolveExecutorCommand honors a executors.<executorId> override ahead of t
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { 'fgos-code-implement': { kind: 'agent', command: '/executor/executor', args: ['{prompt}'], allowCrossProvider: true } },
-    models: { heavy: 'opus' },
+    modelPolicies: { claude: { frontier: 'opus', standard: 'opus' }, node: { frontier: 'opus', standard: 'opus' } },
     timeoutMs: 5000,
   };
   const byExecutor = resolveExecutorCommand(cfg, { prompt: 'p', model: 'opus', tier: 'heavy', executorId: 'fgos-code-implement' });
@@ -2151,7 +2146,7 @@ test('resolveExecutorCommand falls back to the global executor when the executor
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
     executors: { 'fgos-code-implement': { kind: 'agent', target: 'general-purpose', tier: 'heavy' } },
-    models: { heavy: 'opus' },
+    modelPolicies: { claude: { frontier: 'opus', standard: 'opus' }, node: { frontier: 'opus', standard: 'opus' } },
     timeoutMs: 5000,
   };
   const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'opus', tier: 'heavy', executorId: 'fgos-code-implement' });
@@ -2173,7 +2168,7 @@ test('resolveExecutorCommand resolves "judge-decompose" through its own executor
         args: ['{prompt}', '--allowedTools', 'Task,WebSearch,WebFetch,Read,Bash(rg:*),Bash(git add:*),Bash(git commit:*)'],
       },
     },
-    models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+    modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' }, node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
     timeoutMs: 5000,
   };
   const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', executorId: 'judge-decompose' });
@@ -2184,7 +2179,7 @@ test('resolveExecutorCommand with a executors block present but no matching exec
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { 'some-other-executor': { kind: 'agent', command: '/other/executor', args: ['{prompt}'] } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
   const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', executorId: 'fgos-code-implement' });
@@ -2192,13 +2187,13 @@ test('resolveExecutorCommand with a executors block present but no matching exec
 });
 
 test('resolveExecutorCommand result carries "provider", defaulting to "command" when the executor block declares no explicit provider alias', () => {
-  const cfg = { executor: { command: '/global/executor', args: ['{prompt}'] }, models: {}, timeoutMs: 5000 };
+  const cfg = { executor: { command: '/global/executor', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' } }, timeoutMs: 5000 };
   const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'm' });
   assert.equal(resolved.provider, '/global/executor');
 });
 
 test('resolveExecutorCommand result carries an explicit "provider" alias when the executor block declares one', () => {
-  const cfg = { executor: { command: '/usr/local/bin/agy-cli', provider: 'agy', args: ['{prompt}'] }, models: {}, timeoutMs: 5000 };
+  const cfg = { executor: { command: '/usr/local/bin/agy-cli', provider: 'agy', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' } }, timeoutMs: 5000 };
   const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'm' });
   assert.equal(resolved.provider, 'agy');
   assert.equal(resolved.command, '/usr/local/bin/agy-cli');
@@ -2222,7 +2217,7 @@ test('resolveExecutorCommand result carries the providerModel-derived family, no
         invocations: [{ via: 'cli', adapter: 'cli-spawn', command: 'claude', args: ['{prompt}'] }],
       },
     },
-    models: {},
+    modelPolicies: { claude: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
   const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'm', executorId: 'glm-cli' });
@@ -2237,7 +2232,7 @@ test('resolveExecutorCommand throws a RunnerConfigError when a kind:"cli" execut
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { 'fgos-code-implement': { kind: 'agent', target: 'agy' } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
   assert.throws(
@@ -2252,7 +2247,7 @@ test('resolveExecutorCommand throws a RunnerConfigError when a kind:"cli" execut
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { 'fgos-code-implement': { kind: 'agent', target: 'agy-definitely-not-on-path-xyz' } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
   assert.throws(
@@ -2267,7 +2262,7 @@ test('resolveExecutorCommand resolves a metadata-only kind:"cli" executor straig
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { 'fgos-code-implement': { kind: 'agent', target: 'agy', tier: 'standard', allowCrossProvider: true } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
   const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', executorId: 'fgos-code-implement', fgosDir: dir });
@@ -2278,7 +2273,7 @@ test('resolveExecutorCommand skips the fgos-tool-query presence check entirely w
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { 'fgos-code-implement': { kind: 'agent', target: 'agy-not-registered-anywhere', allowCrossProvider: true } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
   assert.doesNotThrow(() =>
@@ -2297,7 +2292,7 @@ for (const kind of ['mcp', 'skill', 'http', 'binary']) {
     const cfg = {
       executor: { command: '/global/executor', args: ['{prompt}'] },
       executors: { 'fgos-code-implement': { kind, target: 'agy' } },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 5000,
     };
     assert.throws(
@@ -2313,7 +2308,7 @@ for (const kind of ['mcp', 'skill', 'http', 'binary']) {
     const cfg = {
       executor: { command: '/global/executor', args: ['{prompt}'] },
       executors: { 'fgos-code-implement': { kind, target: 'agy-definitely-not-on-path-xyz' } },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 5000,
     };
     assert.throws(
@@ -2326,7 +2321,7 @@ for (const kind of ['mcp', 'skill', 'http', 'binary']) {
     const cfg = {
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { 'fgos-code-implement': { kind, command: 'agy', args: ['{prompt}'] } },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 5000,
     };
     assert.throws(
@@ -2342,7 +2337,7 @@ test('resolveExecutorCommand still skips both the presence check and the cross-p
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
     executors: { 'my-agent-executor': { kind: 'agent', agentType: 'code-simplifier' } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
   assert.doesNotThrow(() =>
@@ -2369,7 +2364,7 @@ function agentTypeCfg() {
       args: ['-p', '{prompt}', '--model', '{model}', '--permission-mode', 'acceptEdits', '--allowedTools', 'Bash(git add:*),Bash(git commit:*)'],
     },
     executors: { 'my-agent-executor': { kind: 'agent', agentType: 'code-simplifier' } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
 }
@@ -2412,7 +2407,7 @@ test('resolveExecutorCommand uses a caller-supplied resolvedAgentType when the e
   const cfg = {
     executor: { command: 'claude', args: ['-p', '{prompt}', '--model', '{model}'] },
     executors: { 'my-agent-executor': { kind: 'agent' } }, // no static agentType
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
   const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', executorId: 'my-agent-executor', resolvedAgentType: 'fgos-placeholder' });
@@ -2430,7 +2425,7 @@ test('resolveExecutorCommand ignores resolvedAgentType entirely for an executor 
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
     executors: { agy: { kind: 'agent', command: 'agy', args: ['-p', '{prompt}'], allowCrossProvider: true } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
   const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', executorId: 'agy', resolvedAgentType: 'fgos-placeholder' });
@@ -2443,7 +2438,7 @@ test('resolveExecutorCommand omitting resolvedAgentType is byte-identical to eve
   const cfg = {
     executor: { command: 'claude', args: ['-p', '{prompt}', '--model', '{model}'] },
     executors: { 'my-agent-executor': { kind: 'agent' } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
   const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', executorId: 'my-agent-executor' });
@@ -2464,7 +2459,7 @@ test('resolveExecutorCommand still prefers a executor\'s own command/args over a
         args: ['-p', '{prompt}', '--model', '{model}', '--allowedTools', 'Task,Bash(rg:*)'],
       },
     },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
   const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', executorId: 'judge-discovery' });
@@ -2478,7 +2473,7 @@ test('resolveExecutorCommand falls through to the global executor for a executor
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
     executors: { 'fgos-code-implement': { kind: 'agent', tier: 'standard' } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
   const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', executorId: 'fgos-code-implement' });
@@ -2496,7 +2491,7 @@ test('loadRunnerConfig accepts a "executors.<id>" entry with a non-empty agentTy
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { 'my-agent-executor': { kind: 'agent', agentType: 'code-simplifier' } },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -2511,7 +2506,7 @@ test('loadRunnerConfig rejects a "executors.<id>" entry whose agentType is not a
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { 'my-agent-executor': { kind: 'agent', agentType: '' } },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -2529,7 +2524,7 @@ test('loadRunnerConfig accepts a "executors.<id>" entry with a boolean forceCliS
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { 'my-task-executor': { kind: 'agent', agentType: 'code-simplifier', forceCliSpawn: true } },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -2544,7 +2539,7 @@ test('loadRunnerConfig rejects a "executors.<id>" entry whose forceCliSpawn is n
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { 'my-task-executor': { kind: 'agent', forceCliSpawn: 'yes' } },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -2580,7 +2575,7 @@ test('decideExecutorDispatchMechanism resolves to in-process for a kind:"task" e
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
     executors: { 'judge-discovery': { kind: 'agent', agentType: 'judge' } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
   assert.equal(decideExecutorDispatchMechanism(cfg, 'judge-discovery', { hasLiveTaskAccess: true }), 'in-process');
@@ -2590,7 +2585,7 @@ test('decideExecutorDispatchMechanism falls back to out-of-process for a kind:"t
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
     executors: { 'judge-discovery': { kind: 'agent', agentType: 'judge' } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
   assert.equal(decideExecutorDispatchMechanism(cfg, 'judge-discovery', { hasLiveTaskAccess: false }), 'out-of-process');
@@ -2601,7 +2596,7 @@ test('decideExecutorDispatchMechanism respects a executor\'s own forceCliSpawn o
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
     executors: { 'judge-discovery': { kind: 'agent', agentType: 'judge', forceCliSpawn: true } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
   assert.equal(decideExecutorDispatchMechanism(cfg, 'judge-discovery', { hasLiveTaskAccess: true }), 'out-of-process');
@@ -2611,14 +2606,14 @@ test('decideExecutorDispatchMechanism always resolves out-of-process for a kind:
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
     executors: { 'submit-assist-classify': { kind: 'tool', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
-    models: { light: 'flash-3.5' },
+    modelPolicies: { agy: { nano: 'flash-3.5', standard: 'flash-3.5' }, node: { nano: 'flash-3.5', standard: 'flash-3.5' } },
     timeoutMs: 5000,
   };
   assert.equal(decideExecutorDispatchMechanism(cfg, 'submit-assist-classify', { hasLiveTaskAccess: true }), 'out-of-process');
 });
 
 test('decideExecutorDispatchMechanism resolves out-of-process for an unconfigured executor, regardless of live Task access', () => {
-  const cfg = { executor: { command: 'claude', args: ['{prompt}'] }, models: { standard: 'sonnet' }, timeoutMs: 5000 };
+  const cfg = { executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, timeoutMs: 5000 };
   assert.equal(decideExecutorDispatchMechanism(cfg, 'no-such-executor', { hasLiveTaskAccess: true }), 'out-of-process');
 });
 
@@ -2636,7 +2631,7 @@ test('decideExecutorCli resolves "in-process" for a kind:"task" executor when ha
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
     executors: { 'judge-discovery': { kind: 'agent', agentType: 'judge' } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const decided = await decideExecutorCli('judge-discovery', { repoRoot: root, hasLiveTaskAccess: true });
@@ -2648,7 +2643,7 @@ test('decideExecutorCli resolves "out-of-process" for the same kind:"task" execu
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
     executors: { 'judge-discovery': { kind: 'agent', agentType: 'judge' } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const decided = await decideExecutorCli('judge-discovery', { repoRoot: root });
@@ -2660,7 +2655,7 @@ test('decideExecutorCli omits agentType entirely for a kind:"tool" executor that
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
     executors: { 'submit-assist-classify': { kind: 'tool', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
-    models: { light: 'flash-3.5' },
+    modelPolicies: { agy: { nano: 'flash-3.5', standard: 'flash-3.5' }, node: { nano: 'flash-3.5', standard: 'flash-3.5' } },
     timeoutMs: 5000,
   });
   const decided = await decideExecutorCli('submit-assist-classify', { repoRoot: root, hasLiveTaskAccess: true });
@@ -2678,7 +2673,7 @@ test('decideExecutorCli defaults to native dispatch for a bare --needs-soul call
   const root = mkTempDir();
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const withAccess = await decideExecutorCli(undefined, { repoRoot: root, needsSoul: true, hasLiveTaskAccess: true });
@@ -2691,7 +2686,7 @@ test('decideExecutorCli --needs-soul defaults to native dispatch for an unregist
   const root = mkTempDir();
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'general-purpose', needsSoul: true, hasLiveTaskAccess: true });
@@ -2704,7 +2699,7 @@ test('decideExecutorCli --needs-soul never overrides a real registered purpose m
     executor: { command: 'claude', args: ['{prompt}'] },
     capabilities: { judge: {} },
     executors: { gather: { kind: 'tool', for: ['judge'], command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'judge', needsSoul: true, hasLiveTaskAccess: true });
@@ -2731,7 +2726,7 @@ test('decideExecutorCli hands back mcpTool (mechanism upgraded to in-process) fo
         invocations: [{ via: 'mcp', command: 'mcp:gitnexus', tools: { 'impact-analysis': 'mcp__gitnexus__impact' } }],
       },
     },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'impact-analysis', hasLiveTaskAccess: true });
@@ -2750,7 +2745,7 @@ test('decideExecutorCli hands back mcpTool for a direct executorId call with no 
         invocations: [{ via: 'mcp', command: 'mcp:gitnexus', tools: { 'impact-analysis': 'mcp__gitnexus__impact' } }],
       },
     },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const decided = await decideExecutorCli('gitnexus', { repoRoot: root, hasLiveTaskAccess: true });
@@ -2769,7 +2764,7 @@ test('decideExecutorCli never hands back mcpTool when the requested purpose has 
         invocations: [{ via: 'mcp', command: 'mcp:gitnexus', tools: { 'impact-analysis': 'mcp__gitnexus__impact' } }],
       },
     },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   // gitnexus declares ONLY an mcp invocation, no via:"cli" one at all --
@@ -2805,7 +2800,7 @@ test('decideExecutorCli never hands back mcpTool for a direct executorId call wh
         invocations: [{ via: 'mcp', command: 'mcp:gitnexus', tools: { 'impact-analysis': 'mcp__gitnexus__impact' } }],
       },
     },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   // Same underlying gap as the sibling test above: gitnexus has no
@@ -2831,7 +2826,7 @@ test('decideExecutorCli: governance-blocked output is clearly distinguishable fr
         invocations: [{ via: 'mcp', command: 'mcp:tool', tools: { other: 'mcp__other' } }],
       },
     },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
 
@@ -2856,7 +2851,7 @@ test('decideExecutorCli never hands back mcpTool for an agent-kind executor -- a
     executor: { command: 'claude', args: ['{prompt}'] },
     capabilities: { judge: {} },
     executors: { 'judge-discovery': { kind: 'agent', agentType: 'judge', for: ['judge'] } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'judge', hasLiveTaskAccess: true });
@@ -2876,7 +2871,7 @@ test('the "decide" CLI entry point hands back mcpTool for --for impact-analysis 
         invocations: [{ via: 'mcp', command: 'mcp:gitnexus', tools: { 'impact-analysis': 'mcp__gitnexus__impact' } }],
       },
     },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
@@ -2891,7 +2886,7 @@ test('the "decide" CLI entry point hands back mcpTool for --for impact-analysis 
 
 test('the "decide" CLI entry point parses --needs-soul', () => {
   const { repoRoot } = mkTempGitRepo();
-  writeRunnerConfigFixture(repoRoot, { executor: { command: 'claude', args: ['{prompt}'] }, models: { standard: 'sonnet' }, timeoutMs: 5000 });
+  writeRunnerConfigFixture(repoRoot, { executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, timeoutMs: 5000 });
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
   const result = spawnSync(
     process.execPath,
@@ -2918,7 +2913,7 @@ test('the "decide" CLI entry point parses --needs-soul', () => {
 // proof, zero coupling to the live main checkout either direction.
 test('the "decide" CLI entry point (node src/runner/dispatch.mjs decide <executorId>) prints {mechanism} JSON to stdout for a real spawned invocation against an isolated repo\'s own .fgos/config.json', () => {
   const { repoRoot } = mkTempGitRepo();
-  writeRunnerConfigFixture(repoRoot, { executor: { command: 'claude', args: ['{prompt}'] }, models: { standard: 'sonnet' }, timeoutMs: 5000 });
+  writeRunnerConfigFixture(repoRoot, { executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, timeoutMs: 5000 });
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
   const result = spawnSync(process.execPath, [dispatchPath, 'decide', 'no-such-executor-configured'], { encoding: 'utf8', cwd: repoRoot });
   assert.equal(result.status, 0, result.stderr);
@@ -2985,7 +2980,7 @@ test('the "execute" CLI entry point tees the spawned executor\'s own stdout/stde
   writeRunnerConfigFixture(repoRoot, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { probe: { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
@@ -3013,7 +3008,7 @@ test('dispatch CLI: --repo-root alone with process.cwd() resolving to a DIFFEREN
   writeRunnerConfigFixture(repo2.repoRoot, {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
     executors: { probe: { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
@@ -3033,7 +3028,7 @@ test('dispatch CLI: --repo-root alone with process.cwd() resolving to the SAME p
   writeRunnerConfigFixture(repoRoot, {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
     executors: { probe: { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
@@ -3054,7 +3049,7 @@ test('dispatch CLI: both --cwd and --repo-root given unchanged, no guard fires',
   writeRunnerConfigFixture(repo2.repoRoot, {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
     executors: { probe: { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
@@ -3074,7 +3069,7 @@ test('dispatch CLI: neither given unchanged, existing default-process.cwd() beha
   writeRunnerConfigFixture(repoRoot, {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
     executors: { probe: { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
@@ -3237,7 +3232,7 @@ test('spawnWorker threads opts.fgosDir into a kind:"cli" executor\'s presence ch
   const cfg = {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
     executors: { 'fgos-coding-implement': { kind: 'agent', tier: 'standard', allowCrossProvider: true } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
 
@@ -3247,7 +3242,7 @@ test('spawnWorker threads opts.fgosDir into a kind:"cli" executor\'s presence ch
   const cfgUnregistered = {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
     executors: { 'fgos-coding-implement': { kind: 'agent', target: 'not-registered' } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
   const emptyFgosDir = mkTempDir();
@@ -3306,7 +3301,7 @@ test('spawnWorker attaches stdout/stderr captured before a worker-timeout kill',
 test('spawnWorker throws worker-spawn-fail when the configured command does not exist', async () => {
   const cfg = {
     executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
   await assert.rejects(
@@ -3489,7 +3484,7 @@ test('spawnWorker refused with dispatch-depth-exceeded classifies to "park" via 
 test('spawnWorker throws a RunnerConfigError (not DispatchError) for an unconfigured tier, before any spawn', () => {
   const dir = mkTempDir();
   const scriptPath = writeEchoExecutor(dir);
-  const cfg = { executor: { command: scriptPath, args: ['{prompt}'] }, models: {}, timeoutMs: 5000 };
+  const cfg = { executor: { command: scriptPath, args: ['{prompt}'] }, modelPolicies: { claude: { nano: 'haiku' } }, timeoutMs: 5000 };
   assert.throws(() => spawnWorker(sampleWork({ tier: 'standard' }), cfg, mkTempDir()), RunnerConfigError);
 });
 
@@ -3580,7 +3575,7 @@ test('resolveExecutorCommand throws when a kind:"cli" executor resolves to a non
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
     executors: { 'fgos-code-implement': { kind: 'agent', command: 'agy', args: ['{prompt}'] } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
   assert.throws(
@@ -3593,7 +3588,7 @@ test('resolveExecutorCommand dispatches normally when the same non-Claude execut
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
     executors: { 'fgos-code-implement': { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
   const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', executorId: 'fgos-code-implement' });
@@ -3607,7 +3602,7 @@ test('resolveExecutorCommand never requires allowCrossProvider for a kind:"cli" 
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
     executors: { 'fgos-code-implement': { kind: 'agent' } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
   const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', executorId: 'fgos-code-implement' });
@@ -3618,7 +3613,7 @@ test('resolveExecutorCommand never requires allowCrossProvider for a kind:"cli" 
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
     executors: { 'fgos-code-implement': { kind: 'agent', command: 'claude', args: ['{prompt}'] } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
   const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', executorId: 'fgos-code-implement' });
@@ -3629,7 +3624,7 @@ test('resolveExecutorCommand cross-provider governance is kind-independent (D5, 
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
     executors: { distill: { kind: 'tool', command: 'agy', args: ['{prompt}'] } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
   assert.throws(
@@ -3645,7 +3640,7 @@ test('resolveExecutorCommand exempts an agentType-resolved executor from cross-p
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
     executors: { 'my-agent': { kind: 'agent', agentType: 'general-purpose' } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
   const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', executorId: 'my-agent' });
@@ -3655,7 +3650,7 @@ test('resolveExecutorCommand exempts an agentType-resolved executor from cross-p
 test('resolveExecutorCommand with no executors block at all never triggers cross-provider governance, byte-identical to pre-tsk-32n behavior', () => {
   const cfg = {
     executor: { command: 'agy', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
   const resolved = resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard' });
@@ -3668,7 +3663,7 @@ test('resolveExecutorCommand throws for a non-Claude "cli" executor even when fg
   const cfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
     executors: { 'fgos-code-implement': { kind: 'agent', command: 'agy', args: ['{prompt}'] } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
   assert.throws(
@@ -3726,7 +3721,7 @@ test('executeExecutorCli fails closed when the executorId is not in cfg.executor
   const root = mkTempDir();
   writeRunnerConfigFixture(root, {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   // Intentional contract adjustment (F4): an explicitly nominated executorId
@@ -3745,7 +3740,7 @@ test('executeExecutorCli honors a caller-supplied model override over both the e
   writeRunnerConfigFixture(root, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { 'submit-assist-classify': { kind: 'agent', command: process.execPath, provider: 'agy', args: [scriptPath, '{model}:{prompt}'], tier: 'light', model: 'flash-3.5', allowCrossProvider: true } },
-    models: { light: 'flash-3.5', standard: 'sonnet' },
+    modelPolicies: { claude: { nano: 'flash-3.5', standard: 'sonnet' }, node: { nano: 'flash-3.5', standard: 'sonnet' }, agy: { nano: 'flash-3.5', standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const result = await executeExecutorCli('submit-assist-classify', { prompt: 'classify this', repoRoot: root, model: 'opus' });
@@ -3760,7 +3755,7 @@ test('executeExecutorCli honors a caller-supplied tier override, feeding it into
   const root = mkTempDir();
   writeRunnerConfigFixture(root, {
     executor: { command: process.execPath, args: [scriptPath, '{model}:{prompt}'], allowCrossProvider: true },
-    models: { light: 'flash-3.5', standard: 'sonnet' },
+    modelPolicies: { claude: { nano: 'flash-3.5', standard: 'sonnet' }, node: { nano: 'flash-3.5', standard: 'sonnet' }, agy: { nano: 'flash-3.5', standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   // 'light', deliberately NOT `DEFAULTS.tier` ('standard', work.mjs) — a
@@ -3778,7 +3773,7 @@ test('the "execute" CLI entry point honors --model, overriding the computed defa
   const { repoRoot } = mkTempGitRepo();
   const dir = mkTempDir();
   const scriptPath = writeEchoExecutor(dir);
-  writeRunnerConfigFixture(repoRoot, { executor: { command: process.execPath, args: [scriptPath, '{model}', '{prompt}'], allowCrossProvider: true }, models: { standard: 'sonnet' }, timeoutMs: 5000 });
+  writeRunnerConfigFixture(repoRoot, { executor: { command: process.execPath, args: [scriptPath, '{model}', '{prompt}'], allowCrossProvider: true }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, timeoutMs: 5000 });
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
   const result = spawnSync(
     process.execPath,
@@ -3865,7 +3860,7 @@ test('executeExecutorCli hands back {mechanism:"in-process",agentType,prompt} fo
   writeRunnerConfigFixture(root, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { 'my-agent-executor': { kind: 'agent', agentType: 'code-simplifier' } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const result = await executeExecutorCli('my-agent-executor', { repoRoot: root, prompt: 'do the thing', hasLiveTaskAccess: true });
@@ -3879,7 +3874,7 @@ test('executeExecutorCli falls to out-of-process and self-executes (never hands 
   writeRunnerConfigFixture(root, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { 'my-agent-executor': { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const result = await executeExecutorCli('my-agent-executor', { repoRoot: root, prompt: 'hello' });
@@ -3896,7 +3891,7 @@ test('executeExecutorCli self-executes a kind:"cli" executor via EXECUTOR_ADAPTE
   writeRunnerConfigFixture(root, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { 'submit-assist-classify': { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const result = await executeExecutorCli('submit-assist-classify', { repoRoot: root, prompt: 'classify this' });
@@ -3919,7 +3914,7 @@ test('executeExecutorCli prints a "fgos: dispatch ..." chokepoint line to stderr
     executor: { command: '/global/executor', args: ['{prompt}'] },
     capabilities: { review: {} },
     executors: { 'my-agent-executor': { kind: 'agent', agentType: 'code-simplifier', for: ['review'] } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const original = process.stderr.write.bind(process.stderr);
@@ -3941,7 +3936,7 @@ test('executeExecutorCli prints a "fgos: dispatch ..." chokepoint line to stderr
     executor: { command: '/global/executor', args: ['{prompt}'] },
     capabilities: { classification: {} },
     executors: { 'submit-assist-classify': { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true, for: ['classification'] } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const original = process.stderr.write.bind(process.stderr);
@@ -3963,7 +3958,7 @@ test('executeExecutorCli resolves purpose-based (--for) the same way a positiona
     executor: { command: '/global/executor', args: ['{prompt}'] },
     capabilities: { judge: {} },
     executors: { 'judge-decompose': { kind: 'agent', for: ['judge'], command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const byPurpose = await executeExecutorCli(undefined, { repoRoot: root, for: 'judge', prompt: 'p' });
@@ -3980,7 +3975,7 @@ test('executeExecutorCli returns outcome:"unsignaled" with headBefore and headAf
   writeRunnerConfigFixture(root, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { 'test-executor': { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const result = await executeExecutorCli('test-executor', { repoRoot: root, cwd: process.cwd(), prompt: 'test' });
@@ -4004,7 +3999,7 @@ test('executeExecutorCli omits outcome and head shas when stdout contains [DONE]
       'done-executor': { kind: 'agent', command: process.execPath, args: [scriptDonePath, '{prompt}'], allowCrossProvider: true },
       'blocked-executor': { kind: 'agent', command: process.execPath, args: [scriptBlockedPath, '{prompt}'], allowCrossProvider: true },
     },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
 
@@ -4033,7 +4028,7 @@ test('executeExecutorCli includes verifiedSha on [DONE] when cwd is a git repo, 
       'done-executor': { kind: 'agent', command: process.execPath, args: [scriptDonePath, '{prompt}'], allowCrossProvider: true },
       'blocked-executor': { kind: 'agent', command: process.execPath, args: [scriptBlockedPath, '{prompt}'], allowCrossProvider: true },
     },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
 
@@ -4064,7 +4059,7 @@ test('executeExecutorCli returns outcome:"unsignaled" when [DONE] or [BLOCKED] a
       'quoted-executor': { kind: 'agent', command: process.execPath, args: [scriptQuotedPath, '{prompt}'], allowCrossProvider: true },
       'quoted-and-done-executor': { kind: 'agent', command: process.execPath, args: [scriptQuotedAndDonePath, '{prompt}'], allowCrossProvider: true },
     },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
 
@@ -4184,7 +4179,7 @@ test('executeExecutorCli throws when no executor is registered for the given pur
   const root = mkTempDir();
   writeRunnerConfigFixture(root, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   await assert.rejects(() => executeExecutorCli(undefined, { repoRoot: root, for: 'judge', prompt: 'x' }), RunnerConfigError);
@@ -4197,7 +4192,7 @@ test('executeExecutorCli propagates resolveExecutorConfig\'s own RunnerConfigErr
   writeRunnerConfigFixture(root, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { 'submit-assist-classify': { kind: 'agent', command: scriptPath, args: ['{prompt}'] } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   await assert.rejects(() => executeExecutorCli('submit-assist-classify', { repoRoot: root, prompt: 'x' }), RunnerConfigError);
@@ -4210,7 +4205,7 @@ test('executeExecutorCli refuses a concurrent dispatch for the same cwd with Dis
   writeRunnerConfigFixture(repoRoot, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { 'slow-executor': { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
 
@@ -4261,7 +4256,7 @@ test('executeExecutorCli attaches lostUncommittedPaths and prints stderr warning
     executors: {
       'wipe-executor': { kind: 'agent', command: process.execPath, args: [scriptWipePath, '{prompt}'], allowCrossProvider: true },
     },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
 
@@ -4301,7 +4296,7 @@ test('executeExecutorCli omits lostUncommittedPaths when dispatch is clean or ad
     executors: {
       'commit-executor': { kind: 'agent', command: process.execPath, args: [scriptCommitPath, '{prompt}'], allowCrossProvider: true },
     },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
 
@@ -4322,7 +4317,7 @@ test('executeExecutorCli refuses with DispatchError(dispatch-in-flight) when loc
   writeRunnerConfigFixture(repoRoot, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { 'cli-executor': { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
 
@@ -4368,7 +4363,7 @@ test('executeExecutorCli\'s per-cwd lock heartbeat keeps a genuinely live, still
   writeRunnerConfigFixture(repoRoot, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { 'cli-executor': { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs,
   });
 
@@ -4419,7 +4414,7 @@ test('the "execute" CLI entry point prints a structured {error,errorClass} JSON 
   writeRunnerConfigFixture(repoRoot, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { 'cli-executor': { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const testCwd = repoRoot;
@@ -4456,7 +4451,7 @@ test('the "execute" CLI entry point self-executes a real adapter-resolvable exec
   writeRunnerConfigFixture(repoRoot, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { 'cli-executor': { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
@@ -4479,7 +4474,7 @@ test('the "execute" CLI entry point accepts --prompt-file, overrides --prompt wh
   writeRunnerConfigFixture(repoRoot, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { 'cli-executor': { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
@@ -4529,7 +4524,7 @@ test('the "execute" CLI entry point hands back {mechanism:"in-process",...} for 
   writeRunnerConfigFixture(repoRoot, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { 'native-executor': { kind: 'agent', agentType: 'code-simplifier' } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
@@ -4566,7 +4561,7 @@ test('loadRunnerConfig accepts a "executors.<id>" entry with a valid carries val
       executor: { command: 'claude', args: ['{prompt}'] },
       capabilities: { judge: {} },
       executors: { gather: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['judge'], carries: 'repo-content', allowCrossProvider: true } },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -4584,7 +4579,7 @@ test('loadRunnerConfig ignores a "executors.<id>" entry\'s stray "capability" fi
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { gitnexus: { kind: 'tool', capability: 'not-declared-anywhere', invocations: [{ via: 'mcp', command: 'mcp:gitnexus' }] } },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -4599,7 +4594,7 @@ test('loadRunnerConfig accepts a "executors.<id>" entry naming neither "for" nor
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -4623,7 +4618,7 @@ test('loadRunnerConfig accepts an mcp invocation\'s "tools" map when every key i
           invocations: [{ via: 'mcp', command: 'mcp:gitnexus', tools: { 'impact-analysis': 'mcp__gitnexus__impact' } }],
         },
       },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -4643,7 +4638,7 @@ test('loadRunnerConfig rejects an mcp invocation\'s "tools" map whose key is not
           invocations: [{ via: 'mcp', command: 'mcp:gitnexus', tools: { 'not-declared-anywhere': 'mcp__gitnexus__impact' } }],
         },
       },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -4664,7 +4659,7 @@ test('loadRunnerConfig rejects an mcp invocation\'s "tools" map whose value is n
           invocations: [{ via: 'mcp', command: 'mcp:gitnexus', tools: { 'impact-analysis': '' } }],
         },
       },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -4679,7 +4674,7 @@ test('loadRunnerConfig accepts an mcp invocation naming no "tools" at all -- pur
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { gitnexus: { kind: 'tool', invocations: [{ via: 'mcp', command: 'mcp:gitnexus' }] } },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -4694,7 +4689,7 @@ test('loadRunnerConfig rejects a "executors.<id>" entry whose carries is not one
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { gather: { kind: 'agent', command: 'agy', args: ['{prompt}'], carries: 'secrets' } },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -4705,7 +4700,7 @@ function carriesCfg(carries) {
   return {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { gather: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['judge'], carries, allowCrossProvider: true } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
 }
@@ -4755,7 +4750,7 @@ test('resolveExecutorCommand never triggers the carries gate for a executor that
   const cfg = {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { 'submit-assist-classify': { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   };
   assert.doesNotThrow(() =>
@@ -4867,7 +4862,7 @@ test('resolveExecutorCommand\'s allowCrossProvider error names the REAL resolved
     executor: { command: 'claude', args: ['{prompt}'] },
     executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'] } }, // no allowCrossProvider
     capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
   };
   assert.throws(
     () => resolveExecutorCommand(cfg, { prompt: 'p', model: 'sonnet', tier: 'standard', executorId: 'fgos-coding-implement' }),
@@ -4937,7 +4932,7 @@ test('loadRunnerConfig accepts a well-formed capabilities.<name>.prefer/override
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'] } },
-      capabilities: { 'fgos-coding-implement': { description: 'code-implement work', prefer: 'agy', overrides: { rigorOverrides: { standard: 'advanced' } } } },
+      capabilities: { 'fgos-coding-implement': { description: 'code-implement work', prefer: 'agy', overrides: { tier: 'standard', model: 'sonnet' } } },
       modelPolicies: { claude: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
@@ -5125,7 +5120,7 @@ test('spawnWorker resolves model via capabilities.<name>.prefer + overrides -- t
     executors: {
       agy: { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}', '--model', '{model}'], for: ['fgos-coding-implement'], providerModel: 'gemini', allowCrossProvider: true },
     },
-    capabilities: { 'fgos-coding-implement': { prefer: 'agy', overrides: { rigorOverrides: { standard: 'nano' } } } },
+    capabilities: { 'fgos-coding-implement': { prefer: 'agy', overrides: { tier: 'nano', model: 'gemini-flash' } } },
     modelPolicies: { claude: { standard: 'sonnet' }, gemini: { nano: 'gemini-flash' } },
     timeoutMs: 5000,
   };
@@ -5145,7 +5140,7 @@ test('executeExecutorCli resolves a purpose-named executorId via capabilities.<n
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { agy: { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}'], for: ['fgos-coding-implement'], allowCrossProvider: true } },
     capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const result = await executeExecutorCli('fgos-coding-implement', { repoRoot: root, prompt: 'do the thing' });
@@ -5162,7 +5157,7 @@ test('executeExecutorCli applies capabilities.<name>.overrides identically wheth
   writeRunnerConfigFixture(root, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { agy: { kind: 'agent', command: process.execPath, args: [scriptPath, '{model}:{prompt}'], for: ['fgos-coding-implement'], providerModel: 'gemini', allowCrossProvider: true } },
-    capabilities: { 'fgos-coding-implement': { prefer: 'agy', overrides: { rigorOverrides: { standard: 'advanced' } } } },
+    capabilities: { 'fgos-coding-implement': { prefer: 'agy', overrides: { tier: 'advanced' } } },
     modelPolicies: { claude: { standard: 'sonnet' }, gemini: { standard: 'flash', advanced: 'flash-creative' } },
     timeoutMs: 5000,
   });
@@ -5233,7 +5228,7 @@ test('executeExecutorCli: an explicit caller-supplied --tier/--model always wins
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { agy: { kind: 'agent', command: process.execPath, args: [scriptPath, '{model}:{prompt}'], for: ['fgos-coding-implement'], allowCrossProvider: true } },
     capabilities: { 'fgos-coding-implement': { prefer: 'agy', overrides: { model: 'should-never-win' } } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const result = await executeExecutorCli('fgos-coding-implement', { repoRoot: root, prompt: 'p', model: 'caller-explicit-model' });
@@ -5248,7 +5243,7 @@ test('decideExecutorCli resolves a purpose-named executorId via capabilities.<na
     // above for why this is required now (second-round self-review finding).
     executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'], allowCrossProvider: true } },
     capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const decided = await decideExecutorCli('fgos-coding-implement', { repoRoot: root, hasLiveTaskAccess: false });
@@ -5263,7 +5258,7 @@ test('decideExecutorCli resolves "unavailable" when nothing is registered for th
   const root = mkTempDir();
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'judge', hasLiveTaskAccess: true });
@@ -5275,7 +5270,7 @@ test('a registered-but-unresolvable capability name keeps reasonCodes to selecto
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
     capabilities: { judge: {} },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'judge', hasLiveTaskAccess: true });
@@ -5287,7 +5282,7 @@ test('a purpose name registered only as a declared alias also avoids capability.
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
     capabilities: { judge: { aliases: ['adjudicate'] } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'adjudicate', hasLiveTaskAccess: true });
@@ -5298,7 +5293,7 @@ test('--needs-soul with an unregistered purpose never gets capability.unknown --
   const root = mkTempDir();
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'no-such-purpose-configured', needsSoul: true, hasLiveTaskAccess: true });
@@ -5311,7 +5306,7 @@ test('decideExecutorCli resolves purpose-based (--for) to the same result a posi
     executor: { command: 'claude', args: ['{prompt}'] },
     capabilities: { judge: {} },
     executors: { gather: { kind: 'tool', for: ['judge'], command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const byPurpose = await decideExecutorCli(undefined, { repoRoot: root, for: 'judge', hasLiveTaskAccess: true });
@@ -5425,7 +5420,7 @@ test('decideExecutorCli resolves work-item-based (--work) to the same result a p
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
     executors: { 'fgos-coding-implement': { kind: 'agent', agentType: 'general-purpose' } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const byWork = await decideExecutorCli(undefined, { repoRoot: root, work: 'tsk-fanout-candidate', hasLiveTaskAccess: true });
@@ -5453,7 +5448,7 @@ test('decideExecutorCli resolves work-item-based (--work) via capabilities.fgos-
     executor: { command: 'claude', args: ['{prompt}'] },
     executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'], allowCrossProvider: true } },
     capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   // hasLiveTaskAccess:true (a live/native session) -- must still resolve
@@ -5487,7 +5482,7 @@ test('decideExecutorCli resolves work-item-based (--work) to "in-process" by def
     // No `executors` block at all -- matches this repo's own real
     // .fgos/config.json, where none of the 14 fgos-coding-* skills are
     // registered as a executors.<id> entry.
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const byWork = await decideExecutorCli(undefined, { repoRoot: root, work: 'tsk-fanout-unregistered', hasLiveTaskAccess: true });
@@ -5519,7 +5514,7 @@ test('decideExecutorCli resolves work-item-based (--work) to "out-of-process" wh
   });
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const byWork = await decideExecutorCli(undefined, { repoRoot: root, work: 'tsk-fanout-no-live-access' });
@@ -5531,7 +5526,7 @@ test('decideExecutorCli throws a RunnerConfigError when --work names a work item
   fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
   writeRunnerConfigFixture(root, {
     executor: { command: 'claude', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   await assert.rejects(
@@ -5559,7 +5554,7 @@ test('a positional executorId still wins over --work when both are somehow passe
       'fgos-coding-implement': { kind: 'agent', agentType: 'general-purpose' },
       explicit: { kind: 'tool', command: 'agy', args: ['{prompt}'], allowCrossProvider: true },
     },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const decided = await decideExecutorCli('explicit', { repoRoot: root, work: 'tsk-fanout-candidate-2', hasLiveTaskAccess: true });
@@ -5581,7 +5576,7 @@ test('the "decide" CLI entry point resolves --work <id> the same way as a positi
   writeRunnerConfigFixture(repoRoot, {
     executor: { command: 'claude', args: ['{prompt}'] },
     executors: { 'fgos-coding-implement': { kind: 'agent', agentType: 'general-purpose' } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
@@ -5609,7 +5604,7 @@ test('executeExecutorCli resolves purpose-based (--for) to the same command a po
     executor: { command: '/global/executor', args: ['{prompt}'] },
     capabilities: { judge: {} },
     executors: { gather: { kind: 'agent', for: ['judge'], carries: 'repo-content', command: process.execPath, provider: 'agy', args: [scriptPath, '{prompt}'], allowCrossProvider: true } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' }, agy: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const byPurpose = await executeExecutorCli(undefined, { repoRoot: root, for: 'judge', carries: 'repo-content', prompt: 'p' });
@@ -5627,7 +5622,7 @@ test('executeExecutorCli propagates the carries refusal for a purpose-resolved e
     executor: { command: '/global/executor', args: ['{prompt}'] },
     capabilities: { judge: {} },
     executors: { gather: { kind: 'agent', for: ['judge'], carries: 'user-text', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   await assert.rejects(
@@ -5642,7 +5637,7 @@ test('executeExecutorCli propagates the carries refusal for a purpose-resolved e
 // rationale as the CLI-spawn tests above.
 test('the "decide" CLI entry point resolves --for <purpose> the same way as a positional executorId', () => {
   const { repoRoot } = mkTempGitRepo();
-  writeRunnerConfigFixture(repoRoot, { executor: { command: 'claude', args: ['{prompt}'] }, models: { standard: 'sonnet' }, timeoutMs: 5000 });
+  writeRunnerConfigFixture(repoRoot, { executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, timeoutMs: 5000 });
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
   const result = spawnSync(process.execPath, [dispatchPath, 'decide', '--for', 'no-such-purpose-configured'], { encoding: 'utf8', cwd: repoRoot });
   assert.equal(result.status, 0, result.stderr);
@@ -5653,7 +5648,7 @@ test('the "execute" CLI entry point honors --carries, threading it through end t
   const { repoRoot } = mkTempGitRepo();
   const dir = mkTempDir();
   const scriptPath = writeEchoExecutor(dir);
-  writeRunnerConfigFixture(repoRoot, { executor: { command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true }, models: { standard: 'sonnet' }, timeoutMs: 5000 });
+  writeRunnerConfigFixture(repoRoot, { executor: { command: process.execPath, args: [scriptPath, '{prompt}'], allowCrossProvider: true }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, timeoutMs: 5000 });
   const dispatchPath = path.resolve('src/runner/dispatch.mjs');
   const result = spawnSync(
     process.execPath,
@@ -5794,7 +5789,7 @@ test('dispatch CLI execute subcommand respects --cwd flag', () => {
   writeRunnerConfigFixture(workerRepo.repoRoot, {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
     executors: { testexec: { kind: 'agent', allowCrossProvider: true, command: process.execPath, args: [scriptPath, '{prompt}'] } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
 
@@ -5814,7 +5809,7 @@ test('dispatch CLI decide subcommand respects --cwd flag', () => {
   writeRunnerConfigFixture(repo.repoRoot, {
     executor: { command: process.execPath, args: ['{prompt}'] },
     executors: { testexec: { kind: 'agent', agentType: 'test' } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
 
@@ -5941,7 +5936,7 @@ test('fanoutBatchExecutorCli: real end-to-end out-of-process fire -- pick/execut
   writeRunnerConfigFixture(repoRoot, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { 'fgos-coding-implement': { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   addWork(fgosDir, {
@@ -5978,7 +5973,7 @@ test('fanoutBatchExecutorCli returns candidate as unavailable when executor is g
   writeRunnerConfigFixture(repoRoot, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { 'fgos-coding-implement': { kind: 'agent', command: process.execPath, args: [scriptPath] } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   addWork(fgosDir, {
@@ -6029,7 +6024,7 @@ test('fanoutBatchExecutorCli fires candidates in batch concurrently with overlap
     executor: { command: '/global/executor', args: ['{prompt}'] },
     capabilities: { 'fgos-coding-implement': { prefer: 'fgos-coding-implement' } },
     executors: { 'fgos-coding-implement': { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
 
@@ -6183,7 +6178,7 @@ test('loadRunnerConfig accepts well-formed "env" block in executors entry', () =
           },
         },
       },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -6203,7 +6198,7 @@ test('loadRunnerConfig rejects malformed "env" in executors entry', () => {
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { glm: { kind: 'agent', command: 'claude', args: ['{prompt}'], env: 'not-an-object' } },
-      models: {},
+      modelPolicies: { claude: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -6216,7 +6211,7 @@ test('loadRunnerConfig rejects malformed "env" in executors entry', () => {
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { glm: { kind: 'agent', command: 'claude', args: ['{prompt}'], env: ['KEY=VAL'] } },
-      models: {},
+      modelPolicies: { claude: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -6229,7 +6224,7 @@ test('loadRunnerConfig rejects malformed "env" in executors entry', () => {
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { glm: { kind: 'agent', command: 'claude', args: ['{prompt}'], env: { KEY: 123 } } },
-      models: {},
+      modelPolicies: { claude: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -6242,7 +6237,7 @@ test('loadRunnerConfig rejects malformed "env" in executors entry', () => {
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { glm: { kind: 'agent', command: 'claude', args: ['{prompt}'], env: { '': 'value' } } },
-      models: {},
+      modelPolicies: { claude: { standard: 'sonnet' } },
       timeoutMs: 1000,
     }),
   );
@@ -6264,7 +6259,7 @@ test('resolveExecutorCommand returns env block from resolved executor', () => {
         },
       },
     },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
   };
 
   const res = resolveExecutorCommand(cfg, { prompt: 'hi', model: 'sonnet', tier: 'standard', executorId: 'glm' });
@@ -6312,7 +6307,7 @@ test('spawnWorker / cliSpawnAdapter passes per-executor resolved env to child pr
           },
         },
       },
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
       timeoutMs: 5000,
     };
 
@@ -6352,7 +6347,7 @@ test('registered executors.glm entry resolves command "claude" and env block', (
         },
       },
     },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 1000,
   };
   const fgosDir = path.join(repoRoot, '.fgos');
@@ -6386,7 +6381,7 @@ test('decideExecutorCli resolves --for via capabilities.<name>.prefer returning 
     // THIS test is pinning (executor resolution via capabilities.prefer).
     executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'], allowCrossProvider: true } },
     capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
   const decided = await decideExecutorCli(undefined, { repoRoot: root, for: 'fgos-coding-implement', hasLiveTaskAccess: false });
@@ -6537,7 +6532,11 @@ test('compileDispatchPlan mcp-handback (in-process) never attempts cli resolutio
 // These tests pin the merged behavior: one resolution, additive fields,
 // same mismatch guarantee, now enforced inside compileDispatchPlan itself.
 
-const SLICE_D_MODELS = Object.freeze({ nano: 'haiku', standard: 'sonnet', advanced: 'sonnet', flagship: 'sonnet', frontier: 'opus' });
+const SLICE_D_MODEL_POLICIES = Object.freeze({
+  claude: { nano: 'haiku', standard: 'sonnet', advanced: 'sonnet', flagship: 'sonnet', frontier: 'opus' },
+  agy: { nano: 'haiku', standard: 'sonnet', advanced: 'sonnet', flagship: 'sonnet', frontier: 'opus' },
+  'some-other-cli': { nano: 'haiku', standard: 'sonnet', advanced: 'sonnet', flagship: 'sonnet', frontier: 'opus' },
+});
 
 test('compileDispatchPlan merges tier/model/providerModel/provenance/policy for an executor-id selector (Slice D)', () => {
   const cfg = {
@@ -6547,7 +6546,7 @@ test('compileDispatchPlan merges tier/model/providerModel/provenance/policy for 
     // resolveAssignmentDispatchPolicy's provider derivation defaults to
     // "claude" -- pre-existing, orthogonal to what this test pins.
     executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], providerModel: 'agy', allowCrossProvider: true } },
-    models: SLICE_D_MODELS,
+    modelPolicies: SLICE_D_MODEL_POLICIES,
   };
   const plan = compileDispatchPlan(cfg, { executorId: 'agy' });
   assert.equal(plan.executorId, 'agy');
@@ -6563,7 +6562,7 @@ test('compileDispatchPlan merges the same fields for a --for capability selector
   const cfg = {
     executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'], allowCrossProvider: true } },
     capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
-    models: SLICE_D_MODELS,
+    modelPolicies: SLICE_D_MODEL_POLICIES,
   };
   const plan = compileDispatchPlan(cfg, { for: 'fgos-coding-implement' });
   assert.equal(plan.executorId, 'agy');
@@ -6587,8 +6586,8 @@ test('compileDispatchPlan applies capability overrides when synthesizing policy 
       'fgos-coding-implement': {
         prefer: 'agy-herdr',
         overrides: {
-          providerModel: 'gemini',
-          rigorOverrides: { standard: 'nano' },
+          tier: 'nano',
+          model: 'gemini-flash-medium',
         },
       },
     },
@@ -6610,7 +6609,7 @@ test('compileDispatchPlan records bindingSource: capability.for when resolution 
   const cfg = {
     executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'], allowCrossProvider: true } },
     capabilities: { 'fgos-coding-implement': {} },
-    models: SLICE_D_MODELS,
+    modelPolicies: SLICE_D_MODEL_POLICIES,
   };
   const plan = compileDispatchPlan(cfg, { for: 'fgos-coding-implement' });
   assert.equal(plan.executorId, 'agy');
@@ -6620,7 +6619,7 @@ test('compileDispatchPlan records bindingSource: capability.for when resolution 
 test('compileDispatchPlan merges policy fields from a real Assignment (assignmentItem), matching resolveAssignmentDispatchPolicy\'s own output', () => {
   const cfg = {
     executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
-    models: SLICE_D_MODELS,
+    modelPolicies: SLICE_D_MODEL_POLICIES,
   };
   const assignmentItem = {
     assignmentId: 'test-assignment-1',
@@ -6644,7 +6643,7 @@ test('compileDispatchPlan throws the dispatch-decide-mismatch error when a real 
       agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true },
       claude: { kind: 'agent', command: 'claude', args: ['{prompt}'] },
     },
-    models: SLICE_D_MODELS,
+    modelPolicies: SLICE_D_MODEL_POLICIES,
   };
   const assignmentItem = {
     assignmentId: 'test-assignment-mismatch',
@@ -6673,7 +6672,7 @@ test('compileDispatchPlan never throws over a policy mismatch on a synthesized (
       agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true },
       claude: { kind: 'agent', command: 'claude', args: ['{prompt}'] },
     },
-    models: SLICE_D_MODELS,
+    modelPolicies: SLICE_D_MODEL_POLICIES,
   };
   // No assignment/assignmentItem at all -- plan.mjs synthesizes one
   // internally. A caller-supplied cliOverride.preferExecutor that disagrees
@@ -6694,7 +6693,7 @@ test('compileDispatchPlan preserves the requested capability\'s provenance when 
     executors: {
       agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], providerModel: 'agy', allowCrossProvider: true },
     },
-    models: SLICE_D_MODELS,
+    modelPolicies: SLICE_D_MODEL_POLICIES,
   };
   // Caller explicitly names BOTH an executor override AND the capability it
   // is overriding for -- selector.type must report "executor" (the winning
@@ -6712,7 +6711,7 @@ test('compileDispatchPlan governance-blocked and unavailable branches never popu
   const blockedCfg = {
     executor: { command: 'claude', args: ['{prompt}'] },
     executors: { blockedExec: { kind: 'agent', command: 'some-other-cli', args: ['{prompt}'] } },
-    models: SLICE_D_MODELS,
+    modelPolicies: SLICE_D_MODEL_POLICIES,
   };
   const blockedPlan = compileDispatchPlan(blockedCfg, { executorId: 'blockedExec' });
   assert.equal(blockedPlan.mechanism, 'unavailable');

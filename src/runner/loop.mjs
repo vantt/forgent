@@ -80,7 +80,7 @@ import {
   MAX_VISITS,
   BREAKER_MISSES,
 } from './anti-loop.mjs';
-import { spawnWorker, modelForTier } from './dispatch.mjs';
+import { spawnWorker, resolveTierModel } from './dispatch.mjs';
 import { appendEvent } from '../state/events.mjs';
 import { appendWorkerLog, appendWorkerLogChunk } from './worker-log.mjs';
 import { createDispatchWorktree, removeDispatchWorktree, listLeftovers, branchNameFor, createBranchRef } from './worktree.mjs';
@@ -1645,7 +1645,7 @@ export async function runOnce(options = {}) {
       const plan = {
         dispatch: item.id,
         tier,
-        model: modelForTier(config, tier),
+        model: resolveTierModel(config, tier),
         branch: branchNameFor(item.id),
         verify: item.verify,
         visits,

@@ -19,35 +19,6 @@ test('Phase 06: collectExecutorProfileWarnings names a policy-shaped flag with i
   assert.match(flagWarning.detail, /--permission-mode/);
 });
 
-test('Phase 06: collectExecutorProfileWarnings names executor-level rigorOverrides as a PlacementPolicy migration target, not executor identity', () => {
-  const cfg = {
-    executors: {
-      'agy-cli': {
-        invocations: [{ via: 'cli', command: 'agy', args: [] }],
-        providerModel: 'gemini',
-        rigorOverrides: { heavy: 'advanced' },
-      },
-    },
-  };
-  const warnings = collectExecutorProfileWarnings(cfg);
-  const rigorWarning = warnings.find((w) => w.id === 'executor.agy-cli.rigor-overrides');
-  assert.ok(rigorWarning);
-  assert.match(rigorWarning.migrateTo, /PlacementPolicy/);
-});
-
-test('Phase 06: collectExecutorProfileWarnings names capability-level rigorOverrides too (fgos-coding-implement shape)', () => {
-  const cfg = {
-    executors: { 'agy-herdr': { invocations: [{ via: 'cli', command: 'agy', args: [] }], providerModel: 'gemini' } },
-    capabilities: {
-      'fgos-coding-implement': {
-        prefer: 'agy-herdr',
-        overrides: { providerModel: 'gemini', rigorOverrides: { heavy: 'standard' } },
-      },
-    },
-  };
-  const warnings = collectExecutorProfileWarnings(cfg);
-  assert.ok(warnings.some((w) => w.id === 'capability.fgos-coding-implement.rigor-overrides'));
-});
 
 test('Phase 06: collectExecutorProfileWarnings names an account-pool-shaped env var, pointing at Provider Capacity Rotator, without reintroducing account pools itself', () => {
   const cfg = {
