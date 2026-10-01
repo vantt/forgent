@@ -118,7 +118,7 @@ function openGatedSession(coordinationId, tempDir) {
       objective: 'Fan research out to an independent cohort, then synthesize once the window opens.',
       writerId: 'coordinator-1',
     },
-    { cwd: tempDir },
+    { cwd: tempDir, repoRoot: tempDir },
   );
   return { tempDir, runnerConfig: fakeCohortRunnerConfig(tempDir), opts: { cwd: tempDir, repoRoot: tempDir } };
 }
@@ -674,7 +674,7 @@ test('DEGENERATE: a window whose opensAfter.operationRefs[] is EMPTY validates a
   fs.writeFileSync(path.join(dir, 'empty-opens-after.json'), `${JSON.stringify(doc, null, 2)}\n`);
   openDeclaredProtocolSession(
     { definitionId: doc.metadata.id, coordinationId: 'coord_vwf_empty_refs', objective: 'Degenerate window.', writerId: 'coordinator-1' },
-    { cwd: ctx.tempDir },
+    { cwd: ctx.tempDir, repoRoot: ctx.tempDir },
   );
 
   // ZERO cohort work has been done -- not one branch dispatched.
@@ -727,7 +727,7 @@ test('SCOPE BOUNDARY: a required binding carrying contextAccess.visibilityWindow
   fs.writeFileSync(path.join(dir, 'required-binding-window.json'), `${JSON.stringify(doc, null, 2)}\n`);
   openDeclaredProtocolSession(
     { definitionId: doc.metadata.id, coordinationId: 'coord_vwf_required_boundary_session', objective: 'Scope boundary.', writerId: 'coordinator-1' },
-    { cwd: ctx.tempDir },
+    { cwd: ctx.tempDir, repoRoot: ctx.tempDir },
   );
 
   const definition = loadCoordinationProtocol(doc.metadata.id, { cwd: ctx.tempDir });

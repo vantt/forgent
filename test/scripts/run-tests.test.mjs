@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { discoverTestFiles, buildTestArgv, buildTestEnv, runTests, runSelectedTests, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT } from '../../scripts/run-tests.mjs';
+import { discoverTestFiles, buildTestArgv, buildTestEnv, runTests, runSelectedTests, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT, snapshotFgos, diffFgosSnapshots, SENSITIVE_FGOS_FILES } from '../../scripts/run-tests.mjs';
 
 function tmpFixtureRoot() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'run-tests-fixture-'));
@@ -364,5 +364,140 @@ test('runSelectedTests removes the per-run temp dir even when spawning the suite
     spawn: (_exec, _argv, opts) => { runTemp = opts.env.TMPDIR; throw new Error('spawn blew up'); },
   }), /spawn blew up/);
   assert.equal(fs.existsSync(runTemp), false);
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+// ─── .fgos Store Leak Guardrail Tests ─────────────────────────────────────────
+
+test('snapshotFgos captures files in .fgos including observe/, excluding secrets', () => {
+  const base = tempBase();
+  const fgosDir = path.join(base, '.fgos');
+  fs.mkdirSync(path.join(fgosDir, 'observe', 'friction'), { recursive: true });
+  fs.mkdirSync(path.join(fgosDir, 'coordination'), { recursive: true });
+  fs.writeFileSync(path.join(fgosDir, 'config.json'), '{"runner":{}}');
+  fs.writeFileSync(path.join(fgosDir, 'observe', 'friction', 'data.json'), '{"friction":1}');
+  fs.writeFileSync(path.join(fgosDir, 'secrets.local.env'), 'SECRET_TOKEN=abc');
+  fs.writeFileSync(path.join(fgosDir, 'secrets.env'), 'SECRET_KEY=xyz');
+
+  const snap = snapshotFgos(base);
+  assert.equal(snap.has('config.json'), true);
+  assert.equal(snap.has(path.join('observe', 'friction', 'data.json')), true);
+  assert.equal(snap.has('secrets.local.env'), false, 'secrets.local.env must be excluded from snapshot');
+  assert.equal(snap.has('secrets.env'), false, 'secrets.env must be excluded from snapshot');
+  assert.equal(snap.get('config.json').size, 13);
+
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('diffFgosSnapshots correctly computes added, modified, deleted, and respects allowedMutations', () => {
+  const before = new Map([
+    ['config.json', { mtimeMs: 1000, size: 20 }],
+    ['state.json', { mtimeMs: 1000, size: 50 }],
+    ['to-delete.json', { mtimeMs: 1000, size: 30 }],
+  ]);
+  const after = new Map([
+    ['config.json', { mtimeMs: 1000, size: 20 }], // unchanged
+    ['state.json', { mtimeMs: 2000, size: 60 }], // modified
+    ['new-run.json', { mtimeMs: 2000, size: 100 }], // added
+    ['allowed-new.json', { mtimeMs: 2000, size: 10 }], // allowed added
+  ]);
+
+  const allowed = new Set(['allowed-new.json']);
+  const diff = diffFgosSnapshots(before, after, allowed);
+
+  assert.equal(diff.leaked, true);
+  assert.deepEqual(diff.added, ['new-run.json']);
+  assert.deepEqual(diff.modified, ['state.json']);
+  assert.deepEqual(diff.deleted, ['to-delete.json']);
+});
+
+test('runSelectedTests passes cleanly with status 0 when no .fgos store leak occurs', () => {
+  const base = tempBase();
+  const fgosDir = path.join(base, '.fgos');
+  fs.mkdirSync(fgosDir, { recursive: true });
+  fs.writeFileSync(path.join(fgosDir, 'config.json'), '{"runner":{}}');
+
+  const result = runSelectedTests(['a.test.mjs'], {
+    cwd: base,
+    spawn: () => ({ status: 0 }),
+  });
+
+  assert.equal(result.status, 0);
+  assert.equal(result.fgosDiff.leaked, false);
+  assert.deepEqual(result.fgosDiff.added, []);
+  assert.deepEqual(result.fgosDiff.modified, []);
+  assert.deepEqual(result.fgosDiff.deleted, []);
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('runSelectedTests fails with exit 1 and reports error when test suite leaks a file into .fgos', () => {
+  const base = tempBase();
+  const fgosDir = path.join(base, '.fgos');
+  fs.mkdirSync(fgosDir, { recursive: true });
+  fs.writeFileSync(path.join(fgosDir, 'config.json'), '{"runner":{}}');
+
+  const logs = [];
+  const result = runSelectedTests(['a.test.mjs'], {
+    cwd: base,
+    spawn: () => {
+      // Simulate a test leaking a file into .fgos/dispatch-runs/claude/123/run.json
+      const leakDir = path.join(fgosDir, 'dispatch-runs', 'claude', '123');
+      fs.mkdirSync(leakDir, { recursive: true });
+      fs.writeFileSync(path.join(leakDir, 'run.json'), '{"leaked":true}');
+      return { status: 0 }; // test claimed it passed
+    },
+    log: (msg) => logs.push(msg),
+  });
+
+  assert.equal(result.status, 1, 'suite MUST fail if test leaked into .fgos');
+  assert.equal(result.fgosDiff.leaked, true);
+  assert.equal(result.fgosDiff.added.includes(path.join('dispatch-runs', 'claude', '123', 'run.json')), true);
+  assert.match(logs.join('\n'), /leaked unexpected files/);
+  assert.match(logs.join('\n'), /dispatch-runs.*run\.json/);
+
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('runSelectedTests fails when a test leaks into .fgos/observe/ store', () => {
+  const base = tempBase();
+  const fgosDir = path.join(base, '.fgos');
+  fs.mkdirSync(path.join(fgosDir, 'observe', 'friction'), { recursive: true });
+
+  const logs = [];
+  const result = runSelectedTests(['observe.test.mjs'], {
+    cwd: base,
+    spawn: () => {
+      // Simulate leaking into .fgos/observe/friction/leak.json
+      fs.writeFileSync(path.join(fgosDir, 'observe', 'friction', 'leak.json'), '{"bad":true}');
+      return { status: 0 };
+    },
+    log: (msg) => logs.push(msg),
+  });
+
+  assert.equal(result.status, 1, 'suite MUST fail if test leaked into .fgos/observe/');
+  assert.equal(result.fgosDiff.leaked, true);
+  assert.equal(result.fgosDiff.added.includes(path.join('observe', 'friction', 'leak.json')), true);
+  assert.match(logs.join('\n'), /observe.*leak\.json/);
+
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('runSelectedTests permits allowed mutations without failing the suite', () => {
+  const base = tempBase();
+  const fgosDir = path.join(base, '.fgos');
+  fs.mkdirSync(fgosDir, { recursive: true });
+
+  const allowed = new Set(['allowed.log']);
+  const result = runSelectedTests(['a.test.mjs'], {
+    cwd: base,
+    allowedFgosMutations: allowed,
+    spawn: () => {
+      fs.writeFileSync(path.join(fgosDir, 'allowed.log'), 'ok');
+      return { status: 0 };
+    },
+  });
+
+  assert.equal(result.status, 0);
+  assert.equal(result.fgosDiff.leaked, false);
   fs.rmSync(base, { recursive: true, force: true });
 });
