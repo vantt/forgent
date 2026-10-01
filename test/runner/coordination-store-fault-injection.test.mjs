@@ -5,13 +5,21 @@ import fs from 'node:fs';
 import { tmpdir } from 'node:os';
 import { openSession } from '../../src/runner/coordination/store.mjs';
 
+const createdDirs = [];
 function tmpCwd() {
   const dir = path.join(tmpdir(), 'fgos-store-test-' + Math.random().toString(36).slice(2));
   fs.mkdirSync(dir, { recursive: true });
   const fgosDir = path.join(dir, '.fgos');
   fs.mkdirSync(fgosDir);
+  createdDirs.push(dir);
   return dir;
 }
+
+test.after(() => {
+  for (const dir of createdDirs) {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
 
 const DUMMY_PROVENANCE = { writerId: 'test-writer' };
 

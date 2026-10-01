@@ -119,7 +119,7 @@ function setup(coordinationId) {
       objective: 'Prove recheck creates a new Assignment and disposition is a driver event.',
       writerId: 'coordinator-1',
     },
-    { cwd: tempDir },
+    { cwd: tempDir, repoRoot: tempDir },
   );
   return { tempDir, runnerConfig: fakeExecutor(tempDir), opts: { cwd: tempDir, repoRoot: tempDir } };
 }
@@ -303,7 +303,7 @@ test('R2: a recheck materializes a new Assignment and leaves the original review
   assert.equal(events.filter((e) => e.type === 'result-linked' && e.payload.assignmentId === rechecked.assignment.assignmentId).length, 1);
 
   // Both verdicts remain readable side by side.
-  assert.equal(JSON.parse(reviewResultBefore).status, 'done');
+  assert.equal(reviewed.runResult.status, 'done');
   assert.equal(rechecked.runResult.status, 'done');
   assert.deepEqual(readManifest('coord_rd_recheck_new', ctx.opts).assignmentRefs, [
     produced.assignment.assignmentId,
@@ -709,7 +709,7 @@ test("R2 (topology-edge branch): a driver-authorized binding reached via a decla
   const coordinationId = 'coord_rd_edge_taskkey';
   openDeclaredProtocolSession(
     { definitionId: `${DEFINITION_ID}-edge`, coordinationId, objective: 'Prove the round-scoped taskKey branch also gets the authorization suffix.', writerId: 'coordinator-1' },
-    { cwd: tempDir },
+    { cwd: tempDir, repoRoot: tempDir },
   );
   const opts = { cwd: tempDir, repoRoot: tempDir };
   const runnerConfig = fakeExecutor(tempDir);

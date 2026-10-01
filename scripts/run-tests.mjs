@@ -153,6 +153,84 @@ export function buildTestEnv(env = process.env) {
  * selected. Returns `{ status, files }`, same shape as `runTests()`.
  */
 export const KEEP_TMP_ENV = 'FGOS_TEST_KEEP_TMP';
+export const SENSITIVE_FGOS_FILES = new Set(['secrets.local.env', 'secrets.env']);
+
+/**
+ * Recursively snapshots the repository's `.fgos` store before/after test runs.
+ * Excludes sensitive secret files.
+ * Captures relative paths, file sizes, and mtimeMs.
+ */
+export function snapshotFgos(repoRoot) {
+  const fgosDir = path.join(repoRoot, '.fgos');
+  const map = new Map();
+  if (!fs.existsSync(fgosDir)) return map;
+
+  function walk(currentDir) {
+    let entries;
+    try {
+      entries = fs.readdirSync(currentDir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const entry of entries) {
+      if (SENSITIVE_FGOS_FILES.has(entry.name)) continue;
+      const fullPath = path.join(currentDir, entry.name);
+      const relPath = path.relative(fgosDir, fullPath);
+      if (entry.isDirectory()) {
+        walk(fullPath);
+      } else if (entry.isFile() || entry.isSymbolicLink()) {
+        try {
+          const stat = fs.statSync(fullPath);
+          map.set(relPath, { mtimeMs: stat.mtimeMs, size: stat.size });
+        } catch {
+          // File deleted while walking; safe to ignore
+        }
+      }
+    }
+  }
+
+  walk(fgosDir);
+  return map;
+}
+
+/**
+ * Compares two `.fgos` snapshots and reports any added, modified, or deleted files.
+ */
+export function diffFgosSnapshots(before, after, allowedMutations = new Set()) {
+  const added = [];
+  const modified = [];
+  const deleted = [];
+
+  for (const [relPath, info] of after) {
+    if (allowedMutations.has(relPath)) continue;
+    if (!before.has(relPath)) {
+      added.push(relPath);
+    } else {
+      const prev = before.get(relPath);
+      if (prev.mtimeMs !== info.mtimeMs || prev.size !== info.size) {
+        modified.push(relPath);
+      }
+    }
+  }
+
+  for (const [relPath] of before) {
+    if (allowedMutations.has(relPath)) continue;
+    if (!after.has(relPath)) {
+      deleted.push(relPath);
+    }
+  }
+
+  added.sort();
+  modified.sort();
+  deleted.sort();
+
+  return {
+    added,
+    modified,
+    deleted,
+    leaked: added.length > 0 || modified.length > 0 || deleted.length > 0,
+  };
+}
 
 export function runSelectedTests(files, {
   cwd = REPO_ROOT,
@@ -162,18 +240,9 @@ export function runSelectedTests(files, {
   env = process.env,
   stdio = 'inherit',
   log = (msg) => console.error(msg),
+  allowedFgosMutations = new Set(),
 } = {}) {
   const relFiles = files.map((file) => path.relative(cwd, file));
-  // Every temp dir the suite creates lands under one per-run directory that
-  // is removed once the run ends: tests mkdtemp fixtures (git repos,
-  // worktrees, .fgos stores) and mostly never delete them, so without this
-  // each full run leaves tens of thousands of dirs in the OS temp dir --
-  // enough, across a day of concurrent runs, to exhaust the disk's inodes.
-  // buildTestEnv also strips an inherited NODE_TEST_CONTEXT (a nested
-  // `node --test` would otherwise report to a parent that isn't listening
-  // and exit without running anything) and applies darwin's own TMPDIR
-  // realpath fix to the OUTER temp root; this per-run dir is created inside
-  // that already-resolved root, so it needs no realpath of its own.
   const childEnv = buildTestEnv(env);
   let runTemp = null;
   try {
@@ -185,9 +254,13 @@ export function runSelectedTests(files, {
     // If the temp root is unusable, let Node's normal temp logic fail naturally.
     runTemp = null;
   }
+
+  const fgosBefore = snapshotFgos(cwd);
+
+  let result;
   try {
-    const result = spawn(execPath, buildTestArgv(relFiles, forwardedArgs), { cwd, env: childEnv, stdio });
-    return { status: result.status ?? 1, files: relFiles, runTemp };
+    const spawnResult = spawn(execPath, buildTestArgv(relFiles, forwardedArgs), { cwd, env: childEnv, stdio });
+    result = { status: spawnResult.status ?? 1, files: relFiles, runTemp };
   } finally {
     if (runTemp) {
       if (env[KEEP_TMP_ENV] === '1') {
@@ -201,6 +274,29 @@ export function runSelectedTests(files, {
       }
     }
   }
+
+  const fgosAfter = snapshotFgos(cwd);
+  const fgosDiff = diffFgosSnapshots(fgosBefore, fgosAfter, allowedFgosMutations);
+  result.fgosDiff = fgosDiff;
+
+  if (fgosDiff.leaked) {
+    log('run-tests: ERROR: test suite leaked unexpected files or modifications into .fgos store:');
+    if (fgosDiff.added.length) {
+      log(`  Added (${fgosDiff.added.length}):`);
+      for (const f of fgosDiff.added) log(`    + .fgos/${f}`);
+    }
+    if (fgosDiff.modified.length) {
+      log(`  Modified (${fgosDiff.modified.length}):`);
+      for (const f of fgosDiff.modified) log(`    * .fgos/${f}`);
+    }
+    if (fgosDiff.deleted.length) {
+      log(`  Deleted (${fgosDiff.deleted.length}):`);
+      for (const f of fgosDiff.deleted) log(`    - .fgos/${f}`);
+    }
+    result.status = result.status !== 0 ? result.status : 1;
+  }
+
+  return result;
 }
 
 /**
@@ -220,6 +316,7 @@ export function runTests({
   cwd = REPO_ROOT,
   stdio = 'inherit',
   queue = null,
+  allowedFgosMutations = new Set(),
 } = {}) {
   const files = discoverTestFiles(root);
   if (files.length === 0) {
@@ -233,10 +330,10 @@ export function runTests({
   // `queue` (the CLI door passes acquireFullSuiteQueue): taken only once
   // there is real work to run, and marked on the child's env so a test that
   // spawns this door itself never waits on its own parent's lock.
-  if (!queue) return runSelectedTests(files, { cwd, forwardedArgs, execPath, spawn, env, stdio });
+  if (!queue) return runSelectedTests(files, { cwd, forwardedArgs, execPath, spawn, env, stdio, allowedFgosMutations });
   const release = queue({ env });
   try {
-    return runSelectedTests(files, { cwd, forwardedArgs, execPath, spawn, env: { ...env, [QUEUE_HELD_ENV]: '1' }, stdio });
+    return runSelectedTests(files, { cwd, forwardedArgs, execPath, spawn, env: { ...env, [QUEUE_HELD_ENV]: '1' }, stdio, allowedFgosMutations });
   } finally {
     release();
   }

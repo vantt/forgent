@@ -135,7 +135,7 @@ function setup(coordinationId, fixtureOptions, sessionOptions = {}) {
       writerId: 'coordinator-1',
       ...sessionOptions,
     },
-    { cwd: tempDir },
+    { cwd: tempDir, repoRoot: tempDir },
   );
   return { tempDir, runnerConfig: fakeExecutor(tempDir), opts: { cwd: tempDir, repoRoot: tempDir } };
 }
@@ -145,7 +145,7 @@ function setup(coordinationId, fixtureOptions, sessionOptions = {}) {
 function openSecondSession(tempDir, coordinationId) {
   openDeclaredProtocolSession(
     { definitionId: DEFINITION_ID, coordinationId, objective: 'A different session entirely.', writerId: 'coordinator-1' },
-    { cwd: tempDir },
+    { cwd: tempDir, repoRoot: tempDir },
   );
 }
 
@@ -1669,7 +1669,7 @@ function setupVisibilityWindow(coordinationId, fixtureOverrides) {
       objective: 'Prove visibility-window runtime enforcement.',
       writerId: 'coordinator-1',
     },
-    { cwd: tempDir },
+    { cwd: tempDir, repoRoot: tempDir },
   );
   return { tempDir, runnerConfig: fakeExecutor(tempDir), opts: { cwd: tempDir, repoRoot: tempDir } };
 }
