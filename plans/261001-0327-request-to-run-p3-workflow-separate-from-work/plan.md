@@ -89,6 +89,6 @@ Sóng D: 4 ∥ 5 (khác file). P2 chạy song song từ sóng C (bảng sở h�
 
 ## Câu hỏi mở
 
-1. Status `awaiting-approval` của Work và cổng người cuối Workflow: gộp (Work status phản chiếu cổng cuối — đề xuất) hay Work tự quản?
+Không còn. Work `awaiting-approval` **phản chiếu cổng người cuối** của Workflow run — một chỗ giữ "chờ duyệt" (validate 2026-10-01). <!-- Updated: Validation Session 1 -->
 
 <!-- slug: request-to-run-p3-workflow-separate-from-work -->

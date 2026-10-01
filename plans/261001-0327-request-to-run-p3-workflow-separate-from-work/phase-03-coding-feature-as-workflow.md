@@ -19,6 +19,7 @@ Chuyển lifecycle coding (discovery → exploring → planning → executing �
   - `domains/coding/workflows/feature.yaml` viết lại theo schema Workflow: stage → step; operation → unit template (`taskSpec`, `capability` `coding:*`, `pattern`); `dispatch: human-only` → `gate: human`; không `policy` ghim.
   - `domains/coding/registry.yaml`: chỉ giữ phần Workflow dùng.
   - Work (`src/state/work.mjs`, `store.mjs`, `replay.mjs`): bỏ `stage`; thêm `workflowRunId?`. **Tạo mới** version cho view (`viewSchemaVersion` chưa tồn tại; hiện chỉ có `SCHEMA_VERSION` ở `replay.mjs:47`): lệch version → fold lại từ đầu. **Một đường đọc** dữ liệu cũ: event/snapshot có `stage` → map sang Workflow run (kể cả event `stage` mới do binary cũ ở project khác ghi).
+  - Status `awaiting-approval` của Work (`status-fsm.mjs`) **phản chiếu cổng người cuối** của Workflow run (validate 2026-10-01): duyệt/từ chối ở cổng → status Work đổi theo; Work không tự giữ trạng thái chờ duyệt riêng. <!-- Updated: Validation Session 1 -->
   - Pool/frontier/triage/plan-pool/discover-pool/handoff/impact/graph-* đọc bước hiện tại từ Workflow run.
   - `loop.mjs`: bỏ tuần tự stage; Work runner (nếu còn) gọi `runner.advance`.
   - Rust `packages/work-state/rust/src/work_source.rs` (đọc thẳng `state.json` ~86-89) + contract `domain-entry-stages.json`: kiểm cùng version, hiển thị bước từ Workflow run.

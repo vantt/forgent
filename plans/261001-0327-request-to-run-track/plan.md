@@ -138,8 +138,24 @@ T Tier/rigor (agent khác) ──► P1 Lõi thực thi ──► P3a Workflow r
 
 ## Câu hỏi mở
 
-1. **Q5:** owner authorize phase 4 (P4 constitution) của plan tài liệu khi nào? Chỉ chặn nghiệm thu "chạy thật một phase" ở P2.
-2. Plan `260930-0335-measure-runresult-classification-impact` phase 4 (producer coordination `maxRounds`): bỏ hay hoãn vì engine sẽ bị thu hồi ở P4?
-3. Tên skill driver chung: `fgos-run` (đề xuất).
+Không còn (đã chốt ở Validation Log). Q5 hoãn có chủ đích tới P2 phase 5.
+
+## Validation Log
+
+### Session 1 — 2026-10-01 (`/ak:plan validate`)
+
+**Verification:** bỏ qua bước verify đầy đủ (đã có Red Team Review kèm bằng chứng); kiểm lại các con trỏ red-team từng FAILED: `test/runner/dead-vocabulary-guard.test.mjs` có trên nhánh T (`plan/260930-tier-rigor-consolidation`, cả `--phase-01`, `--phase-02`) → append được sau khi T merge; `test/verbs/dispatch-decide*` không còn được nhắc; hook đúng `scripts/dispatch-decide-hook.mjs`. Claims checked: 3 · Verified: 3 · Failed: 0.
+
+| # | Câu hỏi | Quyết định (owner) | Áp vào |
+|---|---|---|---|
+| 1 | Khi nào authorize phase 4 plan tài liệu (Q5) | **Quyết khi P2 tới phase nghiệm thu**; P2 merge được, phần "chạy thật" ghi chờ Q5 | P2 plan, ph5 |
+| 2 | Plan đo RunResult phase 4 (producer coordination `maxRounds`) | **Bỏ** | `plans/260930-0335-measure-runresult-classification-impact/` (bảng producer, phase-04 `status: cancelled`) |
+| 3 | Tên skill driver chung | **`fgos-run`** | P2 |
+| 4 | Work `awaiting-approval` vs cổng người cuối Workflow | **Work phản chiếu cổng cuối** (một chỗ giữ "chờ duyệt") | P3 plan, ph3 |
+| 5 | Hai bản architecture panel | **Gộp một Workflow có tham số** (red-team packet) | P4 plan, ph3 |
+| 6 | Dữ liệu session cũ sau xoá engine | **tar backup + báo cáo số liệu nền, rồi xoá; không giữ code đọc** | P4 plan, ph6 |
+| 7 | Mức visibility dạng thảo luận | **Ngang engine** (inputs + context sạch); mạnh hơn khi có ca thật | P4 plan, ph1, risk |
+
+Ghi chú trạng thái T (2026-10-01 11:55): phase 1 xong và merge vào nhánh plan T (`0f25b973a`; worktree `~/projects/forgentX-tier-rigor-p01` sạch, chờ dọn cuối plan); phase 2 đang chạy ở `~/projects/forgentX-tier-rigor-p02`.
 
 <!-- slug: request-to-run-track -->

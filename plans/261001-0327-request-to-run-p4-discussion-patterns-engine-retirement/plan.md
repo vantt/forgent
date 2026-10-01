@@ -31,7 +31,7 @@ Owner chốt (Q8, 2026-09-30 23:45): **các dạng thảo luận là năng lực
 | `group-cognition-framework` | **Workflow** group cognition | 5 |
 | `standalone-master-coordination-loop` | đã là `reviewed` (P1) | — |
 
-"Ai thấy gì" (visibility windows) = **đầu vào khai báo** (`inputs`) của từng bước/Unit + context sạch (vai có ràng buộc visibility luôn out-of-process, qua pane herdr — G7, Q-A). **Mức bảo đảm = ngang engine hôm nay** (red-team mục 14): bwrap không hỗ trợ `hostRead: deny` (`src/runner/dispatch/confinement/drivers/bwrap.mjs:181-189`), mọi policy `hostRead: allow` (`policies.mjs:28,50`) — engine cũng chỉ ép ở mức prompt/context. Ép ở mức file chỉ làm nếu owner muốn mạnh hơn engine (câu hỏi mở 3).
+"Ai thấy gì" (visibility windows) = **đầu vào khai báo** (`inputs`) của từng bước/Unit + context sạch (vai có ràng buộc visibility luôn out-of-process, qua pane herdr — G7, Q-A). **Mức bảo đảm = ngang engine hôm nay** (red-team mục 14): bwrap không hỗ trợ `hostRead: deny` (`src/runner/dispatch/confinement/drivers/bwrap.mjs:181-189`), mọi policy `hostRead: allow` (`policies.mjs:28,50`) — engine cũng chỉ ép ở mức prompt/context. Owner chốt giữ mức này (validate 2026-10-01); làm mạnh hơn chỉ khi có ca thật cần.
 
 ## Mối authority phải đóng
 
@@ -66,14 +66,12 @@ Sóng B: 2 ∥ 3 ∥ 5 (khác file). Phase 4 sau 3 để dùng lại cách làm 
 
 | Rủi ro | Tín hiệu | Phản ứng |
 |---|---|---|
-| Owner muốn visibility mạnh hơn engine (mức file) | câu hỏi mở 3 = có | thêm phase driver `hostRead: deny` + store kết quả ngoài cây đọc được; không mang lại engine |
+| Ca thật cần visibility mạnh hơn engine (mức file) | owner nêu ca cụ thể | plan riêng: driver `hostRead: deny` + store ngoài cây đọc được; không mang lại engine |
 | Một dạng không biểu diễn được gọn | conformance đỏ, chi phí lớn | **owner quyết** (Q8): giữ engine riêng cho dạng đó hoặc bỏ dạng đó — lead không tự bỏ |
-| Dữ liệu session cũ (602 session) | Observe/replay cũ cần đọc | phase 6 quyết: lưu trữ đông lạnh (đọc qua một đường) hoặc xuất báo cáo rồi bỏ — owner duyệt |
+| Dữ liệu session cũ (602 session) | cần số liệu nền cho ca 2, 3 | đo trước khi xoá; tar backup + báo cáo, rồi xoá (owner chốt) |
 
 ## Câu hỏi mở
 
-1. Gộp `architecture-advisory-panel-v1` và `-standard-v1` thành một Workflow có tham số (red-team packet tuỳ chọn) hay giữ hai? (đề xuất: một, tham số.)
-2. Dữ liệu `.fgos/coordination/sessions` sau khi xoá engine: lưu trữ đông lạnh hay xuất rồi bỏ?
-3. Visibility: giữ mức ngang engine (prompt/context — đề xuất) hay đầu tư ép ở mức file?
+Không còn (validate 2026-10-01): (1) **gộp** hai architecture panel thành một Workflow có tham số; (2) dữ liệu session cũ: **tar backup + báo cáo số liệu nền rồi xoá**, không giữ code đọc; (3) visibility **ngang engine**. <!-- Updated: Validation Session 1 -->
 
 <!-- slug: request-to-run-p4-discussion-patterns-engine-retirement -->

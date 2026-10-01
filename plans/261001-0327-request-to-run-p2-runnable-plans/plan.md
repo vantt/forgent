@@ -73,7 +73,6 @@ Sóng B: 2 ∥ 4. **Song song với P3b**: theo bảng sở hữu trong track `p
 
 ## Câu hỏi mở
 
-1. Tên skill driver: `fgos-run` (đề xuất — tên không mang domain; `fgos-code-change` bị xoá).
-2. Q5 (owner): authorize phase 4 plan tài liệu để nghiệm thu "chạy thật"?
+Không còn. Tên skill = **`fgos-run`** (validate 2026-10-01). Q5 (authorize plan tài liệu) owner quyết khi tới phase 5. <!-- Updated: Validation Session 1 -->
 
 <!-- slug: request-to-run-p2-runnable-plans -->

@@ -35,7 +35,7 @@ Plan này ở trạng thái chờ tích luỹ dữ liệu (bake period):
 | # | Producer | Subject | Khi nào ghi | Ai resolve, khi nào | Căn cứ |
 |---|---|---|---|---|---|
 | P1 | Dispatch: run fail do hạ tầng | `run:<runId>` | `classification.outcome.category === 'infra'` (plan RunResult, D2-A) | Dispatch, khi assignment đó có run sau với `category === 'ok'` | 330/1.028 run `failed`, 74 `no-evidence` (chưa tách được hạ tầng với verdict) |
-| P3' | Coordination: session chạm `maxRounds` | `session:<id>` | Session bị chặn vì vượt `aggregateBounds.maxRounds` | Coordination, khi session về trạng thái kết thúc | Memory: `maxRounds:10` là trần cứng của cả session, và khi chạm trần phải thoát bằng tay |
+| ~~P3'~~ | **Bỏ (owner 2026-10-01):** engine coordination sẽ bị thu hồi ở track request-to-run P4; vòng lặp mới dùng `reviewed.maxRounds` + outcome `findings` — xem `plans/261001-0327-request-to-run-track/plan.md`. Coordination: session chạm `maxRounds` | `session:<id>` | Session bị chặn vì vượt `aggregateBounds.maxRounds` | Coordination, khi session về trạng thái kết thúc | Memory: `maxRounds:10` là trần cứng của cả session, và khi chạm trần phải thoát bằng tay |
 
 ### Ứng viên đã loại (chốt 2026-09-29)
 
