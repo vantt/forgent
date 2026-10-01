@@ -32,7 +32,7 @@ import { parse as parseYaml } from 'yaml';
 
 import { resolveMainCheckoutRoot } from '../src/runner/paths.mjs';
 import { readSharedConfig } from '../src/config/shared-config-file.mjs';
-import { modelForTier } from '../src/runner/dispatch.mjs';
+import { resolveTierModel } from '../src/runner/dispatch.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
 
 const REPO_ROOT = path.resolve(import.meta.dirname, '..');
@@ -48,8 +48,7 @@ const FORBIDDEN_PLATFORM_NAMES = ['claude', 'codex', 'anthropic'];
 
 const REQUIRED_FIELDS = ['name', 'version', 'description', 'role', 'persona', 'decision_boundary', 'model_tier', 'tool-scope'];
 
-// Matches the shared config file's own `runner.models` block + dispatch.mjs's
-// modelForTier default fallback -- reused as-is, not a second mapping.
+// Matches dispatch.mjs's resolveTierModel default fallback -- reused as-is, not a second mapping.
 export const DEFAULT_MODELS = { light: 'haiku', standard: 'sonnet', heavy: 'opus' };
 
 export class AgentDefinitionError extends Error {}
@@ -65,11 +64,8 @@ export class AgentDefinitionError extends Error {}
 // returns a worktree's own root unchanged, not its main checkout) is the
 // one helper that actually resolves via `--git-common-dir` the way this
 // needs.
-// tsk-5tm D9: delegates to `modelForTier` (the one canonical tier->model
-// resolver) instead of reading `cfg.runner.models` directly -- that field
-// is the legacy flat map D9 introduced `modelPolicies` to replace, and
-// `modelForTier` already prefers `modelPolicies` when present, falling
-// back to the legacy map otherwise. Reading `cfg.runner.models` here
+// tsk-5tm D9: delegates to `resolveTierModel` (the one canonical tier->model
+// resolver) to read `modelPolicies.claude`.
 // directly (this function's pre-D9 shape) meant a `modelPolicies`-only
 // config -- the shape this repo's OWN committed `.fgos/config.json` now
 // uses -- would silently fall through to DEFAULT_MODELS below with no
@@ -86,7 +82,7 @@ export function readRunnerModels(mainCheckoutRootOverride) {
   const models = {};
   for (const tier of Object.keys(DEFAULT_MODELS)) {
     try {
-      models[tier] = modelForTier(runnerCfg, tier);
+      models[tier] = resolveTierModel(runnerCfg, tier);
     } catch {
       models[tier] = DEFAULT_MODELS[tier];
     }

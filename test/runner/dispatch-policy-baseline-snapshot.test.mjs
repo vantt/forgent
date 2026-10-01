@@ -17,7 +17,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { loadRunnerConfigFromDir } from '../../src/runner/dispatch/config.mjs';
-import { resolveExecutorAndOverrides, modelForTier } from '../../src/runner/dispatch/resolve.mjs';
+import { resolveExecutorAndOverrides, resolveTierModel, deriveProviderFamily } from '../../src/runner/dispatch/resolve.mjs';
 import { resolveExecutorCommand } from '../../src/runner/dispatch/transport.mjs';
 
 /**
@@ -69,10 +69,8 @@ export function resolveNormalizedSnapshotRow(cfg, executorId, workTier, throwawa
   const { executorId: resolvedExecutorId, executor, overrides, bindingSource } = resolveExecutorAndOverrides(cfg, executorId);
 
   // 2. Resolve model for tier using exact production wiring from cli.mjs spawnWorker (~lines 294-304)
-  const model = modelForTier(cfg, workTier, {
-    providerModel: overrides?.providerModel ?? executor?.providerModel,
-    rigorOverrides: overrides?.rigorOverrides ?? executor?.rigorOverrides,
-  });
+  const provider = deriveProviderFamily(executor);
+  const model = resolveTierModel(cfg, workTier, provider);
 
   // 3. Resolve command/args/env via pure transport resolver
   const resolvedCmd = resolveExecutorCommand(cfg, {
@@ -454,7 +452,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     workTier: 'heavy',
     bindingSource: 'executor-id',
     provider: 'gemini',
-    model: 'gemini-3.8-flash-high',
+    model: 'gemini-3.1-pro-high',
     command: 'agy',
     args: [
       '-p',
@@ -465,7 +463,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '--print-timeout',
       '30m',
       '--model',
-      'gemini-3.8-flash-high'
+      'gemini-3.1-pro-high'
     ],
     envKeys: [
       'HOME'
@@ -529,7 +527,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     workTier: 'heavy',
     bindingSource: 'executor-id',
     provider: 'gemini',
-    model: 'gemini-3.8-flash-high',
+    model: 'gemini-3.1-pro-high',
     command: 'agy',
     args: [
       '<prompt>',
@@ -537,7 +535,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'accept-edits',
       '--new-project',
       '--model',
-      'gemini-3.8-flash-high'
+      'gemini-3.1-pro-high'
     ],
     envKeys: [
       'HOME'
@@ -553,7 +551,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     workTier: 'light',
     bindingSource: 'capability.prefer',
     provider: 'gemini',
-    model: 'gemini-3.8-flash-medium',
+    model: 'gemini-3.8-flash-low',
     command: 'agy',
     args: [
       '<prompt>',
@@ -561,7 +559,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'accept-edits',
       '--new-project',
       '--model',
-      'gemini-3.8-flash-medium'
+      'gemini-3.8-flash-low'
     ],
     envKeys: [
       'HOME'
@@ -601,7 +599,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     workTier: 'heavy',
     bindingSource: 'capability.prefer',
     provider: 'gemini',
-    model: 'gemini-3.8-flash-medium',
+    model: 'gemini-3.1-pro-high',
     command: 'agy',
     args: [
       '<prompt>',
@@ -609,7 +607,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       'accept-edits',
       '--new-project',
       '--model',
-      'gemini-3.8-flash-medium'
+      'gemini-3.1-pro-high'
     ],
     envKeys: [
       'HOME'
@@ -1205,28 +1203,26 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
   });
 
   describe('named explicit baseline facts', () => {
-    // (a) raw agy-cli heavy AND agy-herdr heavy both resolve model to gemini-3.8-flash-high (policy tier creative)
-    test('fact (a): raw agy-cli heavy and agy-herdr heavy resolve to gemini-3.8-flash-high (policy tier creative)', () => {
+    // (a) raw agy-cli heavy AND agy-herdr heavy both resolve model to gemini-3.1-pro-high (policy tier frontier, D15)
+    test('fact (a): raw agy-cli heavy and agy-herdr heavy resolve to gemini-3.1-pro-high (policy tier frontier, D15)', () => {
       const agyCliHeavy = resolveSnapshotRowByLabel(cfg, 'agy-cli', 'heavy', throwawayDir);
       const agyHerdrHeavy = resolveSnapshotRowByLabel(cfg, 'agy-herdr', 'heavy', throwawayDir);
 
-      assert.equal(agyCliHeavy.model, 'gemini-3.8-flash-high', 'agy-cli heavy model must be gemini-3.8-flash-high');
-      assert.equal(agyHerdrHeavy.model, 'gemini-3.8-flash-high', 'agy-herdr heavy model must be gemini-3.8-flash-high');
+      assert.equal(agyCliHeavy.model, 'gemini-3.1-pro-high', 'agy-cli heavy model must be gemini-3.1-pro-high');
+      assert.equal(agyHerdrHeavy.model, 'gemini-3.1-pro-high', 'agy-herdr heavy model must be gemini-3.1-pro-high');
       assert.equal(agyCliHeavy.provider, 'gemini');
       assert.equal(agyHerdrHeavy.provider, 'gemini');
     });
 
-    // (b) fgos-coding-implement heavy resolves model to gemini-3.8-flash-medium (policy tier standard, via its capability override)
-    // Note: fgos-coding-implement is a capability id resolved via resolveExecutorAndOverrides's capability.prefer path;
-    // its resolvedExecutorId will differ from 'fgos-coding-implement' itself. Assert on resolved model not executor identity.
-    test('fact (b): fgos-coding-implement heavy resolves model to gemini-3.8-flash-medium via capability override', () => {
+    // (b) fgos-coding-implement heavy resolves model to gemini-3.1-pro-high (policy tier frontier, D15)
+    test('fact (b): fgos-coding-implement heavy resolves model to gemini-3.1-pro-high without overrides (D15)', () => {
       const { executorId: resolvedExecutorId, invocationId: resolvedInvocationId, bindingSource } = resolveExecutorAndOverrides(cfg, 'fgos-coding-implement');
       assert.equal(bindingSource, 'capability.prefer', 'bindingSource must be capability.prefer');
       assert.equal(resolvedExecutorId, 'gemini', 'resolvedExecutorId resolves to gemini (executor-provider-naming 2026-09-17 -- was agy)');
       assert.equal(resolvedInvocationId, 'agy-herdr-mucdong', 'resolvedInvocationId pins agy\'s herdr-mucdong invocation');
 
       const fgosImplementHeavy = resolveSnapshotRowByLabel(cfg, 'fgos-coding-implement', 'heavy', throwawayDir);
-      assert.equal(fgosImplementHeavy.model, 'gemini-3.8-flash-medium', 'fgos-coding-implement heavy model must be gemini-3.8-flash-medium');
+      assert.equal(fgosImplementHeavy.model, 'gemini-3.1-pro-high', 'fgos-coding-implement heavy model must be gemini-3.1-pro-high');
       assert.equal(fgosImplementHeavy.selector, 'fgos-coding-implement');
       assert.equal(fgosImplementHeavy.bindingSource, 'capability.prefer');
     });

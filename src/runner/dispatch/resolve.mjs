@@ -1,5 +1,5 @@
 // dispatch/resolve.mjs — unit -> executor -> model/tier/command resolution
-// (D7, tsk-2uf-1): `modelForTier`, the purpose/executorId resolution chain
+// (D7, tsk-2uf-1): `resolveTierModel`, the purpose/executorId resolution chain
 // (`resolveExecutorIdForPurpose`/`resolveExecutorAndOverrides`), and
 // `resolveExecutorConfig` (the executor-block resolve + cross-provider
 // governance gate `dispatch/transport.mjs`'s `resolveExecutorCommand`
@@ -17,79 +17,28 @@ export {
 } from '../work-compat.mjs';
 
 /**
- * Resolve `tier` (per D6; falls back to `work.mjs`'s declared default when a
- * work item omits `tier`, per D7b) to a model name. An unknown tier — one
- * work.mjs's `TIERS` allows but the resolved table does not cover, or any
- * other string — is a validation error: dispatch time is where that drift
- * would first bite (per D6's own original reasoning, unchanged by D9).
- *
- * tsk-5tm-5 D9: `cfg.modelPolicies` (provider-keyed, 5-tier) is preferred
- * when present — `providerModel` (default `"claude"`, every pre-D9 call
- * site) selects which provider's table to read, and `tier` maps onto one
- * of `MODEL_POLICY_TIERS` via `DEFAULT_TIER_TO_POLICY`, unless
- * `rigorOverrides` (a executor's own override map, threaded in by the
- * caller) names a different policy tier for this specific work tier.
- * Falls back to the legacy flat `cfg.models[tier]` lookup, byte-identical
- * to every pre-D9 caller, when `cfg.modelPolicies` is absent — this
- * signature's first two positional params are UNCHANGED (D9's own
- * constraint): `loop.mjs`'s `modelForTier(config, tier)` call site keeps
- * working exactly as before, options object omitted entirely.
+ * Resolve a tier to a model name using cfg.modelPolicies[provider][tier].
+ * Valid tiers: nano | mini | standard | advanced | flagship | frontier.
+ * (Temporarily bridges light|standard|heavy via DEFAULT_TIER_TO_POLICY until Phase 3).
  */
-export function modelForTier(cfg, tier, { providerModel = 'claude', rigorOverrides } = {}) {
+export function resolveTierModel(cfg, tier, provider = 'claude') {
+  const effectiveTier = DEFAULT_TIER_TO_POLICY[tier] ?? tier;
+  if (!MODEL_POLICY_TIERS.includes(effectiveTier)) {
+    throw new RunnerConfigError(`unrecognized tier "${tier}". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);
+  }
   const policies = cfg && cfg.modelPolicies;
-  if (policies) {
-    const providerPolicy = policies[providerModel];
-    if (!providerPolicy || typeof providerPolicy !== 'object') {
-      throw new RunnerConfigError(`no modelPolicies configured for provider "${providerModel}".`);
-    }
-    const policyTier = (rigorOverrides && rigorOverrides[tier]) || DEFAULT_TIER_TO_POLICY[tier];
-    if (!policyTier || typeof providerPolicy[policyTier] !== 'string') {
-      throw new RunnerConfigError(`no model configured for tier "${tier}" (policy tier "${policyTier}") under provider "${providerModel}".`);
-    }
-    return providerPolicy[policyTier];
+  if (!policies || typeof policies !== 'object') {
+    throw new RunnerConfigError(`no modelPolicies configured.`);
   }
-  const models = cfg && cfg.models;
-  if (!models || typeof tier !== 'string' || !(tier in models)) {
-    throw new RunnerConfigError(`no model configured for tier "${tier}".`);
+  const providerPolicy = policies[provider];
+  if (!providerPolicy || typeof providerPolicy !== 'object') {
+    throw new RunnerConfigError(`no modelPolicies configured for provider "${provider}".`);
   }
-  return models[tier];
-}
-
-/**
- * Resolve a POLICY tier (`lightweight|standard|creative|analytical|critical`)
- * DIRECTLY against `cfg.modelPolicies.<providerModel>` — no
- * `DEFAULT_TIER_TO_POLICY` indirection (that map is `modelForTier`'s own
- * WORK-tier (`light|standard|heavy`) bridge, untouched by this function).
- * This is the resolver `resolveAssignmentDispatchPolicy` calls: its
- * `effectiveTier` is always already one of `MODEL_POLICY_TIERS` (Phase 00
- * R5, fixes B1 — `assignment-policy.mjs` used to call `modelForTier` with a
- * policy tier as its `tier` arg, which only matches `DEFAULT_TIER_TO_POLICY`
- * by coincidence at `"standard"`; every other policy tier threw, and the
- * caller silently swallowed it).
- *
- * Mirrors `modelForTier`'s own two-table fallback (`cfg.modelPolicies`
- * preferred, else the legacy flat `cfg.models` map — the two are
- * mutually-substitutable per this module's own D9 precedent) but reads
- * `policyTier` directly against whichever table is present, never through a
- * work-tier alias. Fails closed with a named `RunnerConfigError` (provider +
- * tier) when neither table declares the requested tier — never swallowed by
- * a caller.
- */
-export function resolvePolicyTierModel(cfg, policyTier, providerModel = 'claude') {
-  if (!MODEL_POLICY_TIERS.includes(policyTier)) {
-    throw new RunnerConfigError(`unrecognized policy tier "${policyTier}". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);
+  const model = providerPolicy[effectiveTier];
+  if (typeof model !== 'string' || !model.trim()) {
+    throw new RunnerConfigError(`no model configured for tier "${effectiveTier}" under provider "${provider}".`);
   }
-  if (cfg && cfg.modelPolicies) {
-    if (!supportsPolicyTier(cfg, providerModel, policyTier)) {
-      throw new RunnerConfigError(`no model configured for policy tier "${policyTier}" under provider "${providerModel}".`);
-    }
-    return cfg.modelPolicies[providerModel][policyTier];
-  }
-  const models = cfg && cfg.models;
-  if (!models || typeof models[policyTier] !== 'string') {
-    throw new RunnerConfigError(`no model configured for policy tier "${policyTier}" (no modelPolicies table and no legacy models["${policyTier}"] entry).`);
-  }
-  return models[policyTier];
+  return model;
 }
 
 /**
@@ -236,15 +185,7 @@ export function resolveExecutorIdForPurpose(cfg, purpose) {
  *
  * `overrides` (D2, only when resolved via step 2) is returned, never
  * applied here — each call site decides what it means for ITS OWN
- * resolution, and only 4 fields are ever eligible
- * (`rigorOverrides`/`providerModel`/`tier`/`model` — never `command`/
- * `args`/`adapter`/`invocations`, D2: a capability can retune HOW
- * strongly its executor works, never WHAT command actually runs).
- * `rigorOverrides`/`providerModel` matter to every model-computing call
- * site (`spawnWorker` and `executeExecutorCli` both). `tier`/`model`
- * (a raw, direct override — no `modelForTier` computation at all) only
- * ever mattered for `executeExecutorCli`'s own ad hoc dispatch, the
- * exact same pre-existing scope a plain `executor.tier`/`executor.model`
+ * resolution (`tier`/`model`).
  * already had before this item — `spawnWorker` resolves `tier` from the
  * WORK ITEM's own classification (`work.tier`, a scope/effort judgment
  * made once at Discovery, not a per-executor opt-out) and never accepted

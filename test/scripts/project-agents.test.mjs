@@ -120,11 +120,6 @@ test('readRunnerModels resolves via modelPolicies when present, not the legacy m
   assert.deepEqual(readRunnerModels(dir), { light: 'haiku-custom', standard: 'sonnet-custom', heavy: 'opus-custom' });
 });
 
-test('readRunnerModels still resolves via the legacy flat models map when modelPolicies is absent (pre-D9 config, backward compatible)', () => {
-  const dir = mkTempDir();
-  writeSharedConfig(dir, { models: { light: 'haiku-legacy', standard: 'sonnet-legacy', heavy: 'opus-legacy' } });
-  assert.deepEqual(readRunnerModels(dir), { light: 'haiku-legacy', standard: 'sonnet-legacy', heavy: 'opus-legacy' });
-});
 
 test('readRunnerModels falls back to DEFAULT_MODELS per-tier when neither modelPolicies nor models configures that tier', () => {
   const dir = mkTempDir();

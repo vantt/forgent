@@ -62,7 +62,7 @@ import { resolveAndRenderOperationPrompt, TemplateResolutionError } from './oper
 import { executeExecutorCli } from './cli.mjs';
 import { compileDispatchPlan } from './plan.mjs';
 import { resolveFallback } from './recovery.mjs';
-import { deriveProviderFamily, resolvePolicyTierModel, resolveExecutorConfig, selectConfinedInvocationId } from './resolve.mjs';
+import { deriveProviderFamily, resolveTierModel, resolveExecutorConfig, selectConfinedInvocationId } from './resolve.mjs';
 import { normalizeProviderFamily, checkProviderDisallowed } from './provider-adapter.mjs';
 import {
   selectPlacementPolicyRedirectExecutor,
@@ -257,13 +257,12 @@ function policyForActualExecutor(cfg, policy, executorId, sourceExecutorId) {
   const executorEntry = cfg?.executors?.[executorId];
   const providerModel = resolveProviderFamilyForExecutor(executorEntry, executorId);
   // dispatch-engine-liveness-hardening Phase 7: `resolveVerifiedAssignmentModel`
-  // retired -- its own doc comment already admitted the two sides call the
-  // identical `resolvePolicyTierModel(cfg, lookupPolicyTier, provider)` with
-  // identical inputs, so a real algorithmic divergence was never possible
+  // retired -- both sides call the identical `resolveTierModel(cfg, policy.tier, provider)` with
+  // identical inputs, so divergence was never possible.
   // (a provenance/ownership label, not a second competing computation).
   const model = providerModel === policy.providerModel
     ? policy.model
-    : resolvePolicyTierModel(cfg, policy.tier, providerModel);
+    : resolveTierModel(cfg, policy.tier, providerModel);
   return {
     ...policy,
     executorId,
