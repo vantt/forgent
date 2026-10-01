@@ -1,108 +1,100 @@
 ---
-title: "P1 Lõi thực thi: Unit, một bind(), một cửa chạy, 3 Pattern cộng tác"
-description: "Đóng mối authority L5: 'ai làm' một chỗ (bind), 'chạy qua cửa nào' một cửa, read-only một posture; lõi mới không phụ thuộc L3. Gộp plan read-only X."
+title: "P1 Lõi thực thi: Unit, một bind(), một cửa chạy (herdr mặc định), 3 Pattern cộng tác"
+description: "Đóng mối authority L5: 'ai làm' một chỗ (bind), 'chạy qua cửa nào' một cửa (pane herdr mặc định, cli fallback), read-only một posture confinement OS; lõi mới không phụ thuộc L3. Gộp plan read-only X."
 status: pending
 priority: P1
-effort: "~9–11d"
-tags: [dispatch, execution-core, bind, collaboration-pattern, read-only, observe]
+effort: "~10–12d"
+tags: [dispatch, execution-core, bind, collaboration-pattern, read-only, herdr, observe]
 created: 2026-10-01
 blockedBy: [project:plan/260930-tier-rigor-consolidation]
-blocks: [261001-0327-request-to-run-p2-runnable-plans, 261001-0327-request-to-run-p3-workflow-separate-from-work]
+blocks: [261001-0327-request-to-run-p3-workflow-separate-from-work]
 ---
 
 # P1 Lõi thực thi
 
 ## Overview
 
-Xây **mô hình gọn** ở L5: hợp đồng **Unit**; một hàm thuần **`bind()`** (bảng 5 mức, bộ lọc, provenance, chọn cơ chế); **3 Pattern cộng tác** bằng code nhỏ (`solo`, `reviewed`, `panel`); **một cửa chạy** `fgos run` bọc `executeAssignment`; read-only là **posture** confinement; fallback theo quota qua `bind()`. Xoá các đường chọn người/cửa chạy cũ. Thuộc track [request-to-run](../261001-0327-request-to-run-track/plan.md).
+Xây **mô hình gọn** ở L5: hợp đồng **Unit**; **`bind()`** (bảng 5 mức, bộ lọc, provenance, chọn cơ chế — **tái dùng** `mechanism.mjs`, giữ D-ADR0033); **3 Pattern cộng tác** bằng code nhỏ (`solo`, `reviewed`, `panel`); **một cửa chạy** `fgos run` bọc `executeAssignment`, **mặc định spawn qua pane herdr** (G7), cli fallback; read-only/ghi file là **posture confinement OS** áp cả trong pane herdr lẫn cli; fallback quota qua `bind()`; cổng ghi file mới **kiểm chứng được**. Thuộc track [request-to-run](../261001-0327-request-to-run-track/plan.md).
 
-## Mối authority phải đóng (tiêu chí xong — synthesis §7d)
+## Mối authority phải đóng (tiêu chí xong)
 
 | Mối | Chủ duy nhất sau P1 |
 |---|---|
-| "ai làm / model / persona" cho mọi lần chạy (lõi mới + đường coordination còn sống) | `src/runner/execution/bind.mjs` |
-| "chạy qua cửa nào" | `fgos run` → `executeAssignment` (xoá `dispatch-runs`/`execute` thường) |
-| "read-only là gì" | một posture confinement resolve lúc spawn (primary + fallback + resume) |
-| lõi mới không phụ thuộc Work (A4) | guard test: `src/runner/execution/**` không import `src/state/**` |
+| "ai làm / model / persona / cơ chế" cho mọi lần chạy (lõi mới + đường coordination còn sống + `dispatch decide` + hook) | `src/runner/execution/bind.mjs` (tái dùng `src/runner/dispatch/mechanism.mjs`) |
+| "chạy qua cửa nào" cho việc mới | `fgos run` → `executeAssignment` (herdr mặc định, cli fallback) |
+| "read-only / ghi file được tới đâu" | một posture confinement OS, resolve lúc spawn (primary + fallback + resume), cho cả herdr và cli |
+| lõi mới không phụ thuộc Work (A4) | guard: `src/runner/execution/**` không import `src/state/**`, `src/runner/coordination/**`, `src/runner/worktree.mjs`, `src/runner/merge.mjs` |
 
-## Quyết định nguồn (không mở lại — synthesis)
+Ngoại lệ có tên (single path tạm): đường engine còn dùng **protocol stamp** tới P4 phase 6; writer `dispatch-runs` của `spawnWorker`/fan-out còn tới P3b (P3 phase 5).
 
-D0–D7 (§6), bảng 5 mức + 3 ngoại lệ (§6), cơ chế inline/in-process/out-of-process (§6), override một lần có scope (§6 mức 4), Q0 mô hình gọn, Q4 red-team bắt buộc cho code + `checkersByRigor`, Q6 persona khoá, Q9 bỏ protocol stamp (supersede ADR-006 §6), X gộp (§6b), A4/A5/A6 (§7d), G1–G6 + 8 tiêu chí (§0), bake-off đã sửa (§4b).
+## Quyết định nguồn (không mở lại)
 
-## Hợp đồng dữ liệu (định nghĩa trước để các phase song song)
+synthesis §0 (G1–**G7**), §6 (D0–D7, bảng 5 mức, override mức 4), Q0, Q4 + `checkersByRigor`, Q6, Q9, X (§6b), §7d (A4/A5/A6), **§7e (Q-A giữ D-ADR0033, Q-B Unit run không store mới, Q-C, G7, X-1/3/4)**; [red-team-adjudication.md](../261001-0327-request-to-run-track/reports/red-team-adjudication.md) mục 1–6, 8, 9, 12, 13, 15.
+
+## Hợp đồng dữ liệu
 
 ```yaml
-# Unit (phase 2 định nghĩa schema; mọi phase dùng)
+# Unit (phase 2)
 unit:
   id: area-runner
   objective: "…"
   capability: docs:write          # domain:verb, fallback verb
-  rigor: high                     # low|standard|high|critical (T)
-  writes: [docs/platform/runner/**]   # rỗng = chỉ đọc
+  rigor: high                     # T
+  writes: [docs/platform/runner/**]   # rỗng = read-only; repo-relative, không '..', không absolute
   dependsOn: []
   pattern: reviewed               # tuỳ chọn; vắng thì rule config
-  inputs: []                      # ref tới RunResult/artefact được phép thấy (visibility)
+  inputs: []                      # repo-relative trong worktree Unit, hoặc unit-run:<id>/<role>
   expectedOutputs: ["…"]
 
-# Khẩu vị (config, mức 1–2)
-runner:
-  capabilities:
-    docs:write:  { prefer: [{executor: openai, invocation: …}], rigor: high? }
-    docs:review: { prefer: [{executor: claude, invocation: claude-cli-bwrap}], confinement: {mode: required, policy: host-write-denied}, persona: docs-reviewer }
-    code:implement: { prefer: […gemini…], minCheckers: [reviewer, red-team], verify: "npm test" }
-  patterns:
-    defaultRule: { mutatingMinRigor: standard }     # writes≠∅ & rigor≥standard → reviewed; còn lại solo
-    reviewed: { maxRounds: 2, checkersByRigor: { low: [reviewer], standard: [reviewer], high: [reviewer, red-team], critical: [reviewer, red-team] } }
+# Unit run = .fgos/assignments/<unitRunId>/unit.json + các assignment <unitRunId>/<role>/<round>
+unit.json: { unit, overrides[], configSnapshot{hash, runner.capabilities, runner.patterns, …}, worktree: <realpath>, createdBy }
+# không có store mới: trạng thái vòng lặp suy từ assignment + RunResult (role, round, outcome)
 
-# bind(): đầu vào/ra (phase 3)
-in:  { unit, role, readOnly, independentOf: [boundRef…], lockedPersona?, overrides[{scope}], session: {provider, tier, hasAgentTool} }
-out: { executor, invocation, tier, model, persona, mechanism: inline|in-process|out-of-process, provenance: {field: {value, source}} }
-     | { refused: { reason, detail } }
+# Khẩu vị (config mức 1–2) — đọc từ checkout chính/global lúc bắt đầu Unit run (snapshot), không từ worktree
+runner.capabilities.<domain:verb>: { prefer: [{executor, invocation?}], persona?, minCheckers?, verify?, rigor? (T) }
+runner.patterns: { defaultRule: { mutatingMinRigor: standard }, reviewed: { maxRounds: 2, checkersByRigor: {…} } }
+# preset: module code src/runner/execution/patterns/presets.mjs (một nơi), không ở config
 
-# RunResult outcome (phase 4, 5)
-outcome: pass | findings | execution-failure | policy-refusal | blocked   # finding KHÔNG phải failure
+# bind() (phase 3)
+in:  { unit, role, readOnly, independentOf, lockedPersona?, overrides[{scope, origin: human-cli|agent, executor?, invocation?, tier?, persona?, acceptDependence?}], session: {provider, tier, hasNativeAgent, herdrPresent, headless} }
+out: { executor, invocation, transport: herdr|cli, tier, model, persona, mechanism: inline|in-process|out-of-process, posture: read-only|workspace-write, provenance } | { refused: { reason, detail } }
+
+# RunResult contract v4: + unitRunId, role, round, outcome ∈ pass|findings|execution-failure|policy-refusal|provider-limit|blocked
 ```
-
-Store mới: `.fgos/unit-runs/<unitRunId>/events.jsonl` (JSONL — luật L3 nền tảng) giữ: unit, overrides, trạng thái vòng lặp pattern (để resume). Assignment mang `unitRunId` + `role` + `round`. Phase 1 kiểm lại xem có nên tái dùng shape của `packages/coordination-state` thay vì store mới (quyết bằng bằng chứng, ghi lại).
 
 ## Phases và song song
 
 | # | Phase | Phụ thuộc | Sóng | Sở hữu file (độc quyền trong sóng) |
 |---|---|---|---|---|
-| 1 | [Làm tươi](./phase-01-refresh.md) | T merge | A | — (chỉ đọc + sửa plan) |
+| 1 | [Làm tươi](./phase-01-refresh.md) | T merge | A | plan |
 | 2 | [Unit + khẩu vị config](./phase-02-unit-and-taste-config.md) | 1 | **B** | `src/runner/execution/unit.mjs` (mới), `src/runner/dispatch/config.mjs`, `src/setup/registrations.mjs`, `src/setup/checks.mjs` |
 | 3 | [bind() lõi](./phase-03-bind-core.md) | 1 | **B** | `src/runner/execution/bind.mjs` (mới) + test |
 | 4 | [Vòng lặp Pattern cộng tác](./phase-04-pattern-loops.md) | 1 | **B** | `src/runner/execution/patterns/**` (mới) + test |
-| 5 | [Cửa chạy `fgos run`](./phase-05-run-door.md) | 2, 3, 4 | C | `src/runner/execution/run.mjs` (mới), `src/runner/dispatch/assignment-runner.mjs` (cổng mutating, ghi `unitRunId`), `src/runner/dispatch/execution-contract.mjs`, `src/runner/dispatch/cli.mjs` (xoá `openDispatchRun`/`execute` thường), `src/runner/dispatch/assignment.mjs` (persona body), `bin/fgos.mjs` + `src/cli/command-registry.mjs` (verb `run`), `packages/run-result/rust`, `packages/observe/rust` (nhóm theo `unitRunId`) |
-| 6 | [Read-only posture, quota, herdr (gộp X)](./phase-06-readonly-posture-quota-herdr.md) | 5 | **D** | `src/runner/dispatch/assignment-runner.mjs` (khối redirect ~1428-1455, chọn invocation fallback ~2318-2353), `src/runner/dispatch/placement-policy.mjs` (xoá), `src/runner/dispatch/confinement/**`, `src/runner/dispatch/provider-capacity.mjs`, `src/runner/dispatch/provider-adapter.mjs`, `src/runner/dispatch/transport.mjs` |
-| 7 | [Đường coordination dùng bind()](./phase-07-coordination-path-on-bind.md) | 5 | **D** | `src/verbs/coordination/binding.mjs`, `src/verbs/coordination/composers.mjs`, `src/runner/dispatch/assignment-policy.mjs`, `src/runner/dispatch/resolve.mjs`, `src/runner/definitions/schema.mjs` (PolicyPatch), `core/coordination-protocols/standalone-master-coordination-loop.yaml`, `domains/coding/workflows/feature.yaml:65` |
-| 8 | [Nghiệm thu ca 1 + docs + boundary](./phase-08-acceptance-docs-boundary.md) | 6, 7; việc lẻ A, B | E | `.fgos/config.json`, `~/.fgos/config.json` (giá trị khẩu vị), `docs/specs/runner.md`, `docs/platform/component-boundary.md`, `CHANGELOG.md`, `test/architecture*.test.mjs` |
+| 5 | [Cửa chạy `fgos run` + cổng ghi file](./phase-05-run-door.md) | 2, 3, 4 | C | `src/runner/execution/run.mjs` (mới), `src/runner/dispatch/assignment-runner.mjs` (cổng mutating, ghi `unit.json`), `execution-contract.mjs`, `assignment.mjs` (persona body), `run-result.mjs`, `bin/fgos.mjs` + `src/cli/command-registry.mjs` (verb `run`), `packages/run-result/rust`, `packages/observe/rust`, `.gitignore` |
+| — | **Điểm đo sớm** (cuối phase 5) | 5 | — | chạy 1 area docs bằng `fgos run` (cli) so với mốc; thua rõ → dừng, báo owner trước khi đầu tư phase 6–7 |
+| 6 | [Posture trong herdr + cli, quota, xoá redirect (gộp X)](./phase-06-readonly-posture-quota-herdr.md) | 5 | **D** | `src/runner/dispatch/transport.mjs` + `herdr-round.mjs` (posture trong pane), `src/runner/dispatch/confinement/**`, `assignment-runner.mjs` (chỉ khối redirect + chọn invocation fallback), `placement-policy.mjs` (xoá), `provider-capacity.mjs`, `provider-adapter.mjs`, `liveness.mjs` (outcome `provider-limit`), `.fgos/config.json` (xoá `*-readonly`) |
+| 7 | [Engine + decide + hook dùng bind()](./phase-07-coordination-path-on-bind.md) | 5 | **D** | `src/verbs/coordination/binding.mjs`, `composers.mjs`, `run.mjs` (actorPolicyFields), `src/runner/dispatch/assignment-policy.mjs`, `resolve.mjs`, `src/runner/definitions/schema.mjs` (PolicyPatch), `src/verbs/dispatch/**` (decide), `scripts/dispatch-decide-hook.mjs`, `AGENTS.md` § Dispatch, `domains/coding/workflows/feature.yaml:65` |
+| 8 | [Nghiệm thu ca 1 (qua herdr) + docs + boundary](./phase-08-acceptance-docs-boundary.md) | 6, 7; việc lẻ A ✓, B | E | config khẩu vị, `docs/specs/runner.md`, `docs/platform/component-boundary.md`, `CHANGELOG.md`, `test/runner/dead-vocabulary-guard.test.mjs` (append), test kiến trúc |
 
-Sóng B: 3 phase song song (file mới hoặc khác nhau; 3 và 4 dùng hợp đồng ở trên, test bằng fixture/stub, không cần 2 xong). Sóng D: 6 ∥ 7 (khác vùng file; `assignment-runner.mjs` chỉ thuộc 6, `resolve.mjs`/`assignment-policy.mjs` chỉ thuộc 7). Mỗi phase một worktree; merge vào nhánh plan theo thứ tự xong.
+Sóng B: 2 ∥ 3 ∥ 4 (file mới/khác nhau; dùng hợp đồng ở trên). Sóng D: 6 ∥ 7 (`assignment-runner.mjs` chỉ thuộc 6; `assignment-policy.mjs`/`resolve.mjs` chỉ thuộc 7).
 
 ## Success Criteria
 
-- [ ] 4 mối authority ở bảng trên có đúng một chủ; guard test L5-execution → L3 xanh.
-- [ ] `rg -n "readOnlyRedirects|placement-policy|openDispatchRun|dispatch-runs|PROTOCOL_OPERATION_STAMP|executors\.\w+\.for\b|preferPersona|'code-reviewer'" src` → chỉ còn chỗ có lý do ghi trong báo cáo phase (mục tiêu: rỗng).
-- [ ] Mọi assignment có `provenance.binding` (chuỗi 5 mức); doctor check "RunResult ghi file phải có provenance.binding".
-- [ ] Nghiệm thu ca 1 đạt G1–G6 và không thua engine ở tiêu chí 1, 2, 4; đúng người: lệch không lý do = 0 (phase 8).
-- [ ] `docs/specs/runner.md` có quyết định mới (gồm supersede ADR-006 §6); component-boundary cập nhật authority L5; CHANGELOG.
-- [ ] Full `npm test` xanh trên nhánh plan; merge `main`.
+- [ ] 4 mối authority có đúng một chủ; guard kiến trúc xanh.
+- [ ] Out-of-process mặc định qua pane herdr khi herdr có mặt, cli khi không; cùng posture; provenance ghi `transport` (G7).
+- [ ] Cổng ghi file: posture worktree khớp `unit.json.worktree` **và** `bind()` tính lại từ snapshot khớp; test âm (binding tự chế, worktree khác, config sửa trong worktree).
+- [ ] `rg "readOnlyRedirects|placement-policy|selectReadOnlyRedirectExecutor|executors\.[a-z-]+\.for|preferPersona|'code-reviewer'" src .fgos/config.json` rỗng; invocation `*-readonly` đã xoá.
+- [ ] Nghiệm thu ca 1 (qua herdr) đạt G1–G7, không thua engine ở tiêu chí 1, 2, 4; lệch người không lý do = 0.
+- [ ] Spec (gồm supersede ADR-006 §6, D-ADR0033 giữ nguyên) + boundary + CHANGELOG; full `npm test`; merge `main`.
 
 ## Risk Assessment
 
-| Rủi ro | Tín hiệu | Phản ứng định trước |
+| Rủi ro | Tín hiệu | Phản ứng |
 |---|---|---|
-| Bỏ protocol stamp mở cửa ghi file cho caller đi vòng `bind()` | doctor check provenance fail; run ghi file ở checkout chính | cổng = posture worktree **và** `provenance.binding` hợp lệ; test âm |
-| Vòng lặp pattern thiếu luật engine đang có (recheck, disposition) → chất lượng tụt | ca 1: tỉ lệ finding chấp nhận thấp hơn nhánh engine; reviewer < 3 phút, 0 finding liên tiếp | bổ sung luật cụ thể vào `reviewed`; không mang lại engine |
-| Resume sau crash tự xây yếu | ca kill-resume fail | assignment id tất định `unitRunId/role/round` + `admitRunAttempt`; store `unit-runs` JSONL |
-| Read-only bằng confinement làm vỡ pane herdr / project khác thiếu `executors.claude` | X ràng buộc 1, 7 | doctor quét step read-only × executor; quyết herdr ở phase 6 bước 1 |
-| Đổi `code:review` → claude kích hoạt redirect | review chạy openai lặng lẽ | `prefer` luôn kèm invocation cho tới khi phase 6 xoá redirect (đã kiểm: invocation trong prefer → `hasExplicitInvocationPin`) |
-
-## Câu hỏi mở
-
-1. Phase 6: trigger fallback quota — khai `runner.providers.<p>.accounts` hay classifier lỗi usage-limit lúc runtime? (X câu hỏi brainstorm; cần owner, liên quan bảo mật/chi phí.)
-2. Phase 6: pane herdr cho vai read-only — giữ (cần confinement cho herdr-spawn) hay bỏ cho reviewer? (A5)
-3. Phase 1: store `unit-runs` mới hay tái dùng shape `coordination-state`?
+| Confinement không chạy được trong pane herdr | spike phase 6 thất bại | dừng, báo owner (G7); không bỏ herdr lặng lẽ |
+| Cổng ghi file mới có lỗ | test âm fail; run ghi file ngoài worktree Unit | rollback merge phase 5 |
+| Vòng lặp pattern thiếu luật engine | đo sớm/ca 1 thua tiêu chí 4 | bổ sung vào `reviewed`; không mang lại engine |
+| Resume bị `admitRunAttempt` chặn `run-in-flight` | ca kill-resume fail | chứng minh holder chết (recipe hiện có) → attempt mới; ghi rõ ở phase 5 |
+| Snapshot config làm khẩu vị đổi giữa chừng không có hiệu lực | owner đổi config khi Unit run đang chạy | có chủ đích (tái lập được); Unit run mới đọc config mới |
 
 <!-- slug: request-to-run-p1-execution-core -->

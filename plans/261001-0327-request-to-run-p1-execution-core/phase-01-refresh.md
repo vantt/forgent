@@ -31,14 +31,16 @@ Không có. Đầu vào: `main` sau T; synthesis §2 (F1–F30), §6b (9 ràng b
 1. Kiểm cổng: T đã merge `main` (`rg rigorToTier src` có kết quả); nếu chưa → dừng.
 2. Tạo nhánh `plan/261001-request-to-run-p1` + worktree; symlink `node_modules`, `target`; `node .gitnexus/run.cjs analyze`.
 3. Scout lại, ghi bảng "con trỏ cũ → mới": `executeAssignment` và 4 caller; cổng mutating (`assignment-runner.mjs` ~521-560); khối redirect (~1428-1455); chọn invocation fallback (~2318-2353); `openDispatchRun` (`cli.mjs` ~260); persona (`assignment.mjs` ~713-765, `assignment-policy.mjs` ~388-391); default `'claude'` (`assignment-policy.mjs` ~290); `deriveOperationCapability`/`bindOperations` (`binding.mjs`); `assertNoPortableExecutorPin` (`session-engine.mjs` ~925-942); 4 import `workflow-stage-graphs` trong dispatch; `resolveTierModel` (của T).
-4. Quyết câu hỏi mở 3 (store `unit-runs` mới hay tái dùng `coordination-state`): đọc `packages/coordination-state/rust/src/lib.rs`, `src/runner/coordination/store.mjs` (claim/append); chọn phương án ít khái niệm hơn; ghi lý do vào plan.md.
+4. (Đã chốt Q-B: không store mới; Unit run = `unit.json` + assignments.) Kiểm `run-result.mjs` / `packages/run-result/rust/src/lib.rs` (contract v2/v3 hiện có) để chuẩn bị bump v4; kiểm cây `.fgos/assignments/` cho `unit.json`.
+4b. Đếm **đủ** consumer của mọi interface P1 đổi/xoá (red-team: đếm thiếu): PolicyPatch `preferExecutor/preferInvocation/preferPersona` (~40 file gồm test), `executors.*.for` (~17 file + 8 entry config, gồm `plan.mjs`, `tool-registry.mjs`, `registrations.mjs`), `dispatch decide` + hook `scripts/dispatch-decide-hook.mjs` (`.claude/settings.json:56-64`), invocation `*-readonly` (config + test + doc).
+4c. Herdr: đọc `src/runner/dispatch/transport.mjs:749-800`, `herdr-round.mjs`, `herdr-agent.mjs`, `liveness.mjs` (usage-limit) để chuẩn bị spike phase 6.
 5. Đọc ADR-006 §6 và tài liệu `fallbackExecutors` (`docs/architect/agent-coordination/architecture/dispatch-control-plane.md`) để chuẩn bị supersede ở phase 5/6.
 6. Cập nhật phase 2–8; commit plan trên nhánh plan.
 
 ## Success Criteria
 
 - [ ] Bảng con trỏ cũ→mới trong `plan.md` (mục "Làm tươi"); 0 con trỏ chưa kiểm.
-- [ ] Câu hỏi mở 3 có quyết định + lý do.
+- [ ] Danh sách consumer đầy đủ cho mọi interface đổi/xoá (có số đếm).
 - [ ] Không quyết định đã chốt nào bị đổi mà không có bằng chứng mới ghi rõ.
 
 ## Risk Assessment

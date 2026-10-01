@@ -11,50 +11,54 @@ dependencies: [1]
 
 ## Overview
 
-Viết **`bind()`** — hàm thuần, chỗ duy nhất quyết executor / invocation / tier / model / persona / cơ chế chạy cho một vai của một Unit, theo **bảng 5 mức** (synthesis §6), kèm provenance từng field và từ chối có lý do (G6). Chưa nối vào đường chạy (phase 5, 7 nối).
+Viết **`bind()`** — chỗ duy nhất quyết executor / invocation / transport (herdr|cli) / tier / model / persona / cơ chế / posture cho một vai của một Unit, theo **bảng 5 mức**, kèm provenance từng field và từ chối có lý do (G6). **Tái dùng** `src/runner/dispatch/mechanism.mjs` (giữ D-ADR0033 — Q-A) và chuẩn hoá candidate của `resolve.mjs`; không viết lại. Chưa nối vào đường chạy (phase 5, 7 nối).
 
 ## Requirements
 
 - Functional:
-  - **Executor (+invocation)**: override mức 4 (`overrides[{scope:{unit?,role?}}]`) → `capabilities[domain:verb].prefer[]` → `capabilities[verb].prefer[]` (project đè global theo key) → không còn gì: `inline` nếu có Lead, lỗi rõ nếu headless. **Không** mặc định `claude`. Mức 3 (unit/Workflow) không bao giờ chọn executor.
-  - **Bộ lọc** áp lên mọi candidate: `readOnly` (chỉ nhận candidate có posture read-only — hàm kiểm posture do phase 6 cung cấp; phase này dùng interface `isReadOnlyCapable(candidate, config)` với cài đặt tạm theo `confinement` của capability), `independentOf` (khác provider family với vai đã bind; giải theo tập vai đã bind truyền vào, không theo thứ tự mảng). Override vi phạm `independentOf` → từ chối, trừ khi override có `acceptDependence: true`.
-  - **Governance** (`disallowedProviders/Executors`) phủ quyết cuối.
-  - **Tier**: `rigor = max(rigor unit/step, capabilities[cap].rigor) ?? standard`; `tier = max(rigorToTier[rigor], override.tier)`; `model = resolveTierModel(cfg, tier, provider)` (hàm của T). Không hạ được sàn.
-  - **Persona**: override → persona khoá bởi Workflow (`lockedPersona`; override **không** thay được — trả lỗi rõ, Q6) → vai do step khai → `capabilities[cap].persona` → không có.
-  - **Cơ chế**: candidate khác provider với session Lead → `out-of-process`; cùng provider và (vai cần context sạch: `reviewer`/`red-team`/panel member, hoặc tier khác session, hoặc song song) → `in-process` (trả `model` cho Agent tool); cùng provider, `tier session ≥ tier`, vai không cần độc lập → `inline`.
-  - **Provenance**: `{executor:{value,source}, invocation…, tier…, model…, persona…, mechanism…}`; `source` ∈ `override|lockedPersona|unit|capability:<key>|capability-fallback:<verb>|default|session`.
-  - Từ chối: `{refused:{reason: no-candidate|independence|governance|locked-persona|headless-no-executor, detail}}` — không bao giờ tự hạ (G6).
-- Non-functional: hàm thuần (không I/O ngoài đọc config đã truyền vào); không import `src/state/**`; không import `src/runner/coordination/**`.
+  - **Executor (+invocation)**: override mức 4 (`overrides[{scope:{unit?,role?}, origin}]`) → `capabilities[domain:verb].prefer[]` → `capabilities[verb].prefer[]` → hết: `inline` nếu có Lead **và** vai là producer; lỗi rõ nếu headless. Không mặc định `claude`. Mức 3 không chọn executor.
+  - **Transport (G7)**: executor đã chọn có invocation herdr và `session.herdrPresent` → `transport: herdr`; ngược lại `cli`. Không còn invocation `*-readonly` (X-4): chọn invocation chỉ là chọn đường + tài khoản (thứ tự `prefer[]`).
+  - **Cơ chế (Q-A)**: gọi `mechanism.mjs` — executor có CLI (claude, codex, agy, pi) **luôn `out-of-process`**; `in-process` chỉ cho agent native không có CLI; `inline` chỉ cho vai producer do chính Lead làm, **không bao giờ** cho `reviewer`/`red-team`/thành viên panel/vai có ràng buộc visibility.
+  - **Posture (X-1)**: vai read-only → `read-only`; vai ghi file → `workspace-write` (grant theo `writes[]`); phase này chỉ trả nhãn, phase 6 áp thật.
+  - **Bộ lọc**: `readOnly` (candidate phải có posture áp được — interface `canApplyPosture(candidate, posture, ctx)`, cài đặt thật ở phase 6), `independentOf` (khác provider family với vai đã bind; theo tập, không theo thứ tự). Override vi phạm `independentOf` → từ chối, trừ khi `acceptDependence: true` **và** `origin: human-cli`.
+  - **Governance** phủ quyết cuối (kiểm phase 1: khoá thật trong config; hiện `runner.governance` null).
+  - **Tier**: `rigor = max(rigor unit/step, capabilities[cap].rigor) ?? standard`; `tier = max(rigorToTier[rigor], override.tier)`, override tier bị chặn bởi trần toàn cục (`runner.maxTier` nếu owner khai); `model = resolveTierModel(...)` (T).
+  - **Persona**: override → persona khoá bởi Workflow (không thay được — Q6) → vai do step khai → `capabilities[cap].persona` → không có.
+  - **Quota (X-3)**: hàm `nextCandidate(prevBinding, reason='provider-limit')` trả candidate kế trong `prefer[]` (vẫn qua mọi bộ lọc), provenance ghi `fallbackFrom` + lý do.
+  - **Provenance**: mọi field `{value, source}`; `overrides[].origin` ghi lại.
+  - Từ chối: `no-candidate | independence | governance | locked-persona | headless-no-executor | posture-unavailable`.
+- Non-functional: hàm thuần (nhận config đã snapshot); không import `src/state/**`, `src/runner/coordination/**`.
 
 ## Architecture
 
 ```text
-bind(ask, ctx) ── candidates(prefer[] theo mức) ─► filter(readOnly, independentOf, governance) ─► pick first
-                └► tier = max(rigorToTier[max(rigor…)], override.tier) ─► resolveTierModel
-                └► persona chain ─► mechanism rule ─► provenance
+bind(ask, ctx) ─ candidates(mức 4→2→1) ─► filter(posture, independentOf, governance) ─► pick
+               ├► transport = herdr nếu có invocation herdr ∧ herdrPresent, else cli
+               ├► mechanism = mechanism.mjs(executor, ctx)   (D-ADR0033)
+               ├► tier/model (T) · persona chain · posture label
+               └► provenance
 ```
 
-Thiết kế theo hợp đồng operation (request/outcome contract, authority policy) như kernel Rust `packages/host-runtime/rust/src/operation_provider_router.rs` (A6, điều chỉnh 5): input/output là object thuần, có `contractVersion`.
+Hợp đồng in/out thuần, có `contractVersion` — theo kiểu operation contract của kernel Rust (`packages/host-runtime/rust/src/operation_provider_router.rs`) để sau chuyển sang Rust không thiết kế lại (A6).
 
 ## Related Code Files
 
-- Create: `src/runner/execution/bind.mjs`, `test/runner/execution/bind.test.mjs` (bảng ca K1–K6 + ca âm)
-- Read-only tham chiếu: `src/runner/dispatch/resolve.mjs` (`resolveTierModel`, `deriveProviderFamily`, `normalizePreferCandidates`), `src/verbs/coordination/binding.mjs` (logic `distinctProviderFrom` để tái dùng ý, không import)
+- Create: `src/runner/execution/bind.mjs`, `test/runner/execution/bind.test.mjs`
+- Import (không sửa): `src/runner/dispatch/mechanism.mjs`, `resolve.mjs` (`normalizePreferCandidates`, `deriveProviderFamily`, `resolveTierModel` của T)
 
 ## Implementation Steps
 
-1. Viết bảng test trước (table-driven): K1 (code, author gemini out-of-process, reviewer claude in-process khác provider), K2 (read-only inline), K3 (docs author openai flagship, reviewer claude bwrap), K4 (panel 3 provider khác nhau), K6 (override reviewer openai), persona khoá, no-candidate, governance, headless không executor, override vi phạm độc lập.
-2. Viết `bind.mjs` tới khi bảng xanh.
-3. Thêm test kiến trúc: `src/runner/execution/**` không import `src/state/**`, `src/runner/coordination/**`.
+1. Test bảng trước: K1 (author gemini out-of-process herdr; reviewer claude out-of-process herdr, read-only, khác provider), K2 (read-only producer inline), K3 (docs author openai herdr; reviewer claude herdr read-only), K4 (panel 3 provider), K6 (override reviewer openai, `origin: human-cli`), không có herdr → cli, quota → candidate kế, persona khoá, no-candidate, governance, headless không executor, override vi phạm độc lập từ `agent`.
+2. Viết `bind.mjs` tới khi xanh.
+3. Test kiến trúc (không import ngoài phạm vi).
 4. Commit → merge vào nhánh plan.
 
 ## Success Criteria
 
-- [ ] Bảng ca K1–K6 + 6 ca âm xanh; mọi kết quả có provenance đủ field.
-- [ ] Không có nhánh nào trả executor khi bị lọc hết (G6).
-- [ ] Test kiến trúc xanh.
+- [ ] Bảng ca xanh; mọi kết quả có provenance đủ field (gồm `transport`, `posture`, `origin`).
+- [ ] Không vai checker nào ra `inline`/`in-process` với executor có CLI.
+- [ ] Không có nhánh trả executor khi bị lọc hết (G6).
 
 ## Risk Assessment
 
-- `independentOf` theo tập đã bind có thể ra rỗng với panel lớn (ít provider) → từ chối có lý do; doctor (phase 8) kiểm "mỗi capability read-only có ≥ 2 provider family có posture read-only".
-- `isReadOnlyCapable` tạm có thể khác cài đặt thật của phase 6 → interface cố định ở phase này; phase 6 chỉ thay cài đặt.
+- `independentOf` theo tập có thể rỗng khi ít provider → từ chối có lý do; doctor (phase 6) kiểm "mỗi capability read-only có ≥ 2 provider family áp được posture".

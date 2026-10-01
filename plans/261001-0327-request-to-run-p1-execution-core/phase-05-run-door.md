@@ -1,62 +1,64 @@
 ---
 phase: 5
-title: "Cửa chạy fgos run"
+title: "Cửa chạy fgos run + cổng ghi file kiểm chứng được"
 status: pending
 priority: P1
-effort: "2.5d"
+effort: "3d"
 dependencies: [2, 3, 4]
 ---
 
-# Phase 5: Cửa chạy `fgos run`
+# Phase 5: Cửa chạy `fgos run` + cổng ghi file
 
 ## Overview
 
-Nối Unit + `bind()` + vòng lặp pattern thành **một cửa chạy**: verb `fgos run` → mỗi vai `bind()` → `executeAssignment` (out-of-process) hoặc trả chỉ dẫn in-process/inline cho Lead → RunResult. Đổi cổng ghi file (Q9: bỏ protocol stamp). Ghi RunResult cho cả lần chạy inline. Xoá cửa `dispatch-runs`/`execute` thường. Persona có nội dung. Observe nhóm theo `unitRunId`.
+Nối Unit + `bind()` + vòng lặp pattern thành **một cửa chạy** `fgos run` cho việc mới. Mỗi vai `bind()` → `executeAssignment` (out-of-process; herdr nếu có, cli nếu không — posture thật áp ở phase 6, phase này dùng confinement hiện có cho cli). Unit run = `unit.json` + assignments (Q-B). **Cổng ghi file mới kiểm chứng được** (Q9 + red-team mục 1, 2). Persona có nội dung. RunResult v4. Không xoá cửa cũ đang có caller (mục 8).
 
 ## Requirements
 
 - Functional:
-  - **Verb**: `fgos run --unit <file|->` (JSON/YAML Unit) `[--pattern <name|preset>] [--override <json>] [--resume <unitRunId>] [--json]`; một lệnh cho cả Unit (Lead không đứng giữa các vòng — tiêu chí 1, 2). Subverb `fgos run record --unit-run <id> --role <r> --result <file>` để Lead ghi kết quả vai **inline** / **in-process** (RunResult cùng lifecycle, `mechanism` tương ứng).
-  - Mỗi vai: `bind()` → nếu `out-of-process`: dựng assignment (`unitRunId`, `role`, `round`, `provenance.binding`, `contract`) và gọi `executeAssignment`; nếu `in-process`/`inline`: trả chỉ dẫn (agentType/model/persona) cho Lead và chờ `run record`. Headless (không Lead) mà `bind()` ra inline/in-process → `bind()` đã từ chối từ trước.
-  - Store `.fgos/unit-runs/<unitRunId>/events.jsonl` (hoặc phương án phase 1 chọn): unit, overrides, sự kiện vòng lặp; `--resume` đọc lại; assignment id tất định `unitRunId/role/round`; `admitRunAttempt` giữ "một run chưa settle".
-  - **Cổng ghi file (Q9, supersede ADR-006 §6)**: assignment `mutating` được admit khi **(a)** cwd là linked worktree (`resolveMutatingCwdPosture`) **và (b)** có `provenance.binding` hợp lệ từ `bind()`. Bỏ yêu cầu protocol-operation stamp; giữ đường engine chạy được (engine sẽ gắn `provenance.binding` ở phase 7).
-  - **Xoá**: `openDispatchRun` + `.fgos/dispatch-runs` writer; `fgos dispatch execute <executor>` dạng thường (chỉ còn `execute --assignment` cho engine tới P4) — kiểm caller trước; ngoại lệ stamp ở `execution-contract.mjs`.
-  - **Persona có nội dung**: prompt render mục Persona từ nội dung `core/agents/<persona>.yaml` (`persona`, `decision_boundary`, `voice`…), không chỉ cái tên (F4, F5).
-  - **Observe**: RunResult source mang `unitRunId`; case gom theo `unitRunId` (`packages/run-result/rust`, `packages/observe/rust/src/case_journal.rs`).
-  - Đăng ký `.fgos/unit-runs/` vào setup/doctor (install gate).
-- Non-functional: `src/runner/execution/run.mjs` không import `src/state/**`.
+  - **Verb**: `fgos run --unit <file|->` `[--pattern <name|preset>] [--override <json>] [--resume <unitRunId>] [--dir <mainRoot>] [--json]`. Một lệnh chạy trọn Unit headless. `--override` từ CLI mang `origin: human-cli`; override do Lead dịch từ lời người mang `origin: agent`.
+  - **`fgos run record`** chỉ cho **vai producer inline** của chính Lead (Q-A, mục 4): nonce một lần phát kèm chỉ dẫn; `evidenceRefs` bắt buộc và phải tồn tại; từ chối record lặp, từ chối record cho vai `reviewer`/`red-team`/panel hay vai đã bind out-of-process. `fgos dispatch log` gộp vào cửa này (một cửa ghi kết quả ngoài outbox) — đếm caller ở phase 1.
+  - **Unit run (Q-B)**: tạo `.fgos/assignments/<unitRunId>/unit.json` = { unit, overrides, configSnapshot (hash + khoá runner liên quan, đọc từ **checkout chính/global**, không từ worktree — mục 12), worktree realpath, createdBy }; mỗi vai = assignment `<unitRunId>/<role>/<round>` (id tất định). Không store mới. `history()` cho pattern đọc từ các assignment này.
+  - **Cổng ghi file (Q9, supersede ADR-006 §6)** — assignment `mutating` được admit khi **(a)** cwd là linked worktree **và** `realpath(cwd) == unit.json.worktree` của Unit run đó, **(b)** `bind()` **tính lại** từ `unit.json` (unit + overrides + configSnapshot) cho đúng vai/vòng khớp deep-equal với binding của assignment; không tin `provenance` caller gửi. Vai ghi file chạy posture `workspace-write` với grant rw theo `writes[]` (`confinement/policies.mjs` đã có `workspace-write`).
+  - **Ngoại lệ có tên**: đường engine (`session-engine.mjs` → `executeAssignment`) giữ **protocol stamp** tới P4 phase 6 (chủ xoá). Cổng chấp nhận: stamp hợp lệ **hoặc** (a)+(b). Ghi rõ trong code + spec.
+  - **Không xoá** `openDispatchRun`/`dispatch-runs`/`execute <executor>` (còn `spawnWorker` `loop.mjs:83,1035`, fan-out, 3 reader) — chỉ không dùng cho việc mới; xoá ở P3 phase 5.
+  - **Resume**: `--resume` đọc `unit.json` + assignments; vai có attempt chưa có `result.json` → kiểm holder (lock `dispatch--<cwd>.lock`, pid) theo recipe hiện có; holder chết → attempt mới (`forceNewAttempt`); holder sống → báo, không chạy đè.
+  - **`verify`** của capability chạy **confined** (posture read-only + quyền ghi thư mục output), không chạy trên host trần (mục 12).
+  - **Persona có nội dung**: prompt render từ `core/agents/<persona>.yaml` (`persona`, `decision_boundary`, `voice`…).
+  - **RunResult contract v4**: + `unitRunId`, `role`, `round`, outcome mở rộng (`findings`, `provider-limit`); Node `run-result.mjs` + Rust `packages/run-result/rust` cùng bump; Observe (`packages/observe/rust`) nhóm theo `unitRunId`.
+  - `.gitignore` không cần thêm (không store mới) — kiểm `.fgos/assignments` đã ignore.
+- Non-functional: `src/runner/execution/run.mjs` không import `src/state/**`, `worktree.mjs`, `merge.mjs` (tạo/tích hợp worktree là việc của P3a; P1 nhận worktree đã có qua tham số hoặc tạo bằng `git worktree add` thuần trong lõi — chọn ở phase 1).
 
 ## Architecture
 
 ```text
-fgos run --unit u ─► validateUnit ─► pattern(name|rule) ─► runPattern(…, runRole = role ─► bind() ─┬► out-of-process: executeAssignment ─► RunResult
-                                                                                                └► in-process/inline: chỉ dẫn → Lead → fgos run record ─► RunResult
-                                     └► log(event) ─► .fgos/unit-runs/<id>/events.jsonl
+fgos run --unit u ─► validateUnit ─► unit.json (snapshot config từ main/global) ─► runPattern(…,
+     runRole = role ─► bind() ─► assignment <unitRunId>/<role>/<round> ─► executeAssignment ─► RunResult v4,
+     history = đọc assignments của unitRunId)
+cổng mutating: posture worktree == unit.json.worktree ∧ bind(unit.json, role, round) == binding  (∨ stamp — chỉ engine, tới P4)
 ```
 
 ## Related Code Files
 
 - Create: `src/runner/execution/run.mjs`, `test/runner/execution/run.test.mjs`, `test/cli/run-verb.test.mjs`
-- Modify: `src/runner/dispatch/assignment-runner.mjs` (cổng mutating ~521-560, ghi `unitRunId`/`provenance.binding`), `src/runner/dispatch/execution-contract.mjs`, `src/runner/dispatch/cli.mjs` (xoá `openDispatchRun`), `src/runner/dispatch/assignment.mjs` (persona body), `bin/fgos.mjs`, `src/cli/command-registry.mjs`, `src/setup/registrations.mjs` (unit-runs), `packages/run-result/rust/src/lib.rs`, `packages/observe/rust/src/case_journal.rs`
-- Delete: phần writer `dispatch-runs` và test của nó
+- Modify: `src/runner/dispatch/assignment-runner.mjs` (cổng mutating ~509-560), `execution-contract.mjs`, `assignment.mjs` (persona body ~714-765), `src/runner/run-result.mjs` (hoặc vị trí contract thật), `bin/fgos.mjs`, `src/cli/command-registry.mjs`, `src/runner/dispatch-log.mjs` (gộp vào `run record`), `packages/run-result/rust/src/lib.rs`, `packages/observe/rust/src/case_journal.rs` + nguồn run
 
 ## Implementation Steps
 
-1. GitNexus `impact` cho `executeAssignment`, `openDispatchRun`, cổng mutating, `renderAssignmentPrompt`/hàm persona; báo blast radius (dự kiến CRITICAL ở `executeAssignment` → báo owner trước khi sửa).
-2. Test trước: `fgos run` read-only solo out-of-process; mutating ngoài worktree → từ chối; mutating không `provenance.binding` → từ chối; inline `run record`; resume sau kill giữa vòng 2; persona body có trong prompt; Observe đếm RunResult theo `unitRunId`.
-3. Viết `run.mjs`, verb, store, sửa cổng, persona, Observe.
-4. Xoá `dispatch-runs`/`execute` thường + caller; cập nhật doc lệnh.
-5. Full test dispatch + coordination (engine vẫn phải xanh) → commit → merge vào nhánh plan.
+1. GitNexus `impact`: `executeAssignment` (CRITICAL dự kiến → báo owner), cổng mutating, hàm persona, contract RunResult.
+2. Test trước: Unit `reviewed` read-only chạy trọn headless; mutating ngoài worktree Unit → từ chối; binding tự chế/lệch snapshot → từ chối; config sửa trong worktree không có hiệu lực; engine stamp vẫn qua; `run record` cho reviewer → từ chối; nonce dùng lại → từ chối; kill giữa vòng 2 → resume đúng; persona body có trong prompt; Observe đếm theo `unitRunId`.
+3. Viết `run.mjs`, verb, cổng, persona, contract v4.
+4. Suite dispatch + coordination (engine phải xanh) + Rust → commit → merge vào nhánh plan.
+5. **Điểm đo sớm**: chạy 1 area docs (thư mục thử) bằng `fgos run` cli; so Lead-active/vòng/thời gian với mốc; thua rõ → dừng, báo owner trước phase 6–7.
 
 ## Success Criteria
 
-- [ ] Một lệnh `fgos run` chạy trọn Unit `reviewed` không cần Lead can thiệp giữa vòng (headless).
-- [ ] Cổng mutating mới có test dương + âm; stamp đã xoá.
-- [ ] `rg "openDispatchRun|dispatch-runs" src` rỗng (ngoài migration ghi rõ).
-- [ ] RunResult inline có `mechanism: inline`; Observe thấy cả hai loại.
-- [ ] Coordination engine còn chạy (test engine xanh).
+- [ ] Một lệnh chạy trọn Unit `reviewed` headless; checker không bao giờ inline.
+- [ ] Cổng mutating có test dương/âm như bước 2; ngoại lệ stamp chỉ cho engine, có test.
+- [ ] RunResult v4 Node + Rust; Observe nhóm theo `unitRunId`.
+- [ ] Điểm đo sớm có số liệu, ghi vào `reports/early-measurement.md`.
 
 ## Risk Assessment
 
-- **Supersede ADR-006 §6** chạm ranh giới an toàn → ghi decision record ở phase 8; test âm bắt buộc. Tín hiệu hỏng: run ghi file xuất hiện ngoài worktree → rollback merge phase.
-- Xoá `execute` thường làm gãy skill/doc đang gọi nó → `rg "dispatch execute"` trong `core/`, `domains/`, `docs/` và sửa cùng phase.
+- **Supersede ADR-006 §6** chạm ranh giới an toàn → decision record ở phase 8; test âm bắt buộc. Tín hiệu hỏng: run ghi file ngoài worktree Unit → rollback merge phase.
+- Bump contract RunResult làm Observe/Rust đọc sai dữ liệu cũ → đường đọc v2/v3 giữ (dữ liệu cũ đọc được qua một đường), test cả ba.

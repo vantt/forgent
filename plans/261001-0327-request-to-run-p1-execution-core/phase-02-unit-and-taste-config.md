@@ -17,8 +17,9 @@ dependencies: [1]
 
 - Functional:
   - `src/runner/execution/unit.mjs`: `validateUnit(raw)` → Unit chuẩn hoá hoặc lỗi có hướng dẫn; field: `id, objective, capability, rigor?, writes[], dependsOn[], pattern?, inputs[], expectedOutputs[]`. Unit **không** được chứa `executor|provider|model|tier|invocation|actors|prefer|overrides` (G2) → lỗi.
+  - **Containment** (red-team mục 15): `writes[]`, `inputs[]` chỉ nhận path repo-relative trong worktree của Unit hoặc ref `unit-run:<id>/<role>`; từ chối absolute, `..`, symlink ra ngoài; cùng luật cho `taskSpec`.
   - `capability` dạng `domain:verb` hoặc `verb`; tra config `capabilities[domain:verb]` rồi fallback `capabilities[verb]` (không đăng ký trước `docs:*` vào catalog `serves` — synthesis §5 Q4).
-  - Config validator (`config.mjs`): capability entry nhận `persona`, `minCheckers`, `verify`; `runner.patterns` với `defaultRule.mutatingMinRigor`, `reviewed.maxRounds`, `reviewed.checkersByRigor` (mức cao ⊇ mức thấp — validator từ chối nếu không cộng dồn); checker hợp lệ: `reviewer`, `red-team`, `tester`.
+  - Config validator (`config.mjs`): capability entry nhận `persona`, `minCheckers`, `verify` (lệnh chạy **confined**, không chạy trên host trần); `runner.patterns` với `defaultRule.mutatingMinRigor`, `reviewed.maxRounds`, `reviewed.checkersByRigor` (mức cao ⊇ mức thấp — validator từ chối nếu không cộng dồn); checker hợp lệ: `reviewer`, `red-team`, `tester`.
   - Doctor: thiếu `runner.patterns` → dùng mặc định cài bởi setup; checker lạ; `checkersByRigor` không cộng dồn; capability `:review`/`red-team` read-only thiếu `confinement`.
 - Non-functional: không đổi hành vi dispatch hiện tại (chưa ai đọc khoá mới cho tới phase 5).
 
