@@ -51,6 +51,7 @@ export {
 };
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
+import { bind } from '../execution/bind.mjs';
 import {
   DEFAULT_DOMAIN,
   operationsForStage,
@@ -506,7 +507,8 @@ function snapshotDirtyBeforeFiles(dir, dirtyBefore) {
  * @param {object} opts
  */
 function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
-  if (asgn.mutation !== 'mutating' || asgn.provenance?.kind !== 'inline') return;
+  if (asgn.mutation !== 'mutating') return;
+  if (asgn.provenance?.kind !== 'inline' && asgn.provenance?.kind !== 'unit-run') return;
 
   if (opts.isReadOnlyMode !== false) {
     throw new RunnerConfigError(
@@ -514,48 +516,138 @@ function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
     );
   }
 
-  const stamp = extractProtocolOperationStamp(asgn.provenance?.inline?.contract?.constraints);
-  if (!stamp) {
-    throw new RunnerConfigError(
-      `executeAssignment: mutating inline assignment "${asgn.assignmentId}" carries no single, well-formed engine-reserved protocol-operation stamp -- refused`,
-    );
-  }
-
   const cwd = opts.cwd ?? process.cwd();
 
-  let definition;
-  try {
-    definition = loadCoordinationProtocol(stamp.definitionId, { cwd, packageRoot: opts.packageRoot });
-  } catch (err) {
-    throw new RunnerConfigError(
-      `executeAssignment: mutating inline assignment "${asgn.assignmentId}" claims protocol-operation stamp for definition "${stamp.definitionId}", which does not resolve to a real CoordinationProtocol -- refused (${err.message})`,
-    );
-  }
-  if (definition.metadata.version !== stamp.definitionVersion) {
-    throw new RunnerConfigError(
-      `executeAssignment: mutating inline assignment "${asgn.assignmentId}" stamp names definition version "${stamp.definitionVersion}", but the resolved definition "${stamp.definitionId}" is version "${definition.metadata.version}" -- refused (stale or forged stamp)`,
-    );
-  }
-  const operation = definition.spec.operations?.find((op) => op.id === stamp.operationId);
-  if (!operation || operation.result?.kind !== 'work-product') {
-    throw new RunnerConfigError(
-      `executeAssignment: mutating inline assignment "${asgn.assignmentId}" claims operation "${stamp.operationId}" in definition "${stamp.definitionId}" -- that operation does not declare result.kind "work-product" -- refused`,
-    );
+  // Check 1: Engine protocol-operation stamp exception (named legacy path until P4 phase 6)
+  const stamp = extractProtocolOperationStamp(asgn.provenance?.inline?.contract?.constraints);
+  if (stamp) {
+    let definition;
+    try {
+      definition = loadCoordinationProtocol(stamp.definitionId, { cwd, packageRoot: opts.packageRoot });
+    } catch (err) {
+      throw new RunnerConfigError(
+        `executeAssignment: mutating inline assignment "${asgn.assignmentId}" claims protocol-operation stamp for definition "${stamp.definitionId}", which does not resolve to a real CoordinationProtocol -- refused (${err.message})`,
+      );
+    }
+    if (definition.metadata.version !== stamp.definitionVersion) {
+      throw new RunnerConfigError(
+        `executeAssignment: mutating inline assignment "${asgn.assignmentId}" stamp names definition version "${stamp.definitionVersion}", but the resolved definition "${stamp.definitionId}" is version "${definition.metadata.version}" -- refused (stale or forged stamp)`,
+      );
+    }
+    const operation = definition.spec.operations?.find((op) => op.id === stamp.operationId);
+    if (!operation || operation.result?.kind !== 'work-product') {
+      throw new RunnerConfigError(
+        `executeAssignment: mutating inline assignment "${asgn.assignmentId}" claims operation "${stamp.operationId}" in definition "${stamp.definitionId}" -- that operation does not declare result.kind "work-product" -- refused`,
+      );
+    }
+
+    const posture = resolveMutatingCwdPosture(cwd);
+    if (!posture.ok) {
+      const reason =
+        posture.reason === 'main-checkout'
+          ? `resolves to the main checkout ("${posture.repoRoot}"); a mutating dispatch must run in a linked git worktree, never the main checkout`
+          : posture.reason === 'outside-git'
+            ? 'does not resolve inside any git checkout (fail closed on an unresolvable root, never fail open)'
+            : 'toplevel could not be resolved; fail closed, never fail open';
+      throw new RunnerConfigError(
+        `executeAssignment: mutating inline assignment "${asgn.assignmentId}" refused -- cwd "${cwd}" ${reason}`,
+      );
+    }
+    return;
   }
 
-  const posture = resolveMutatingCwdPosture(cwd);
-  if (!posture.ok) {
-    const reason =
-      posture.reason === 'main-checkout'
-        ? `resolves to the main checkout ("${posture.repoRoot}"); a mutating dispatch must run in a linked git worktree, never the main checkout`
-        : posture.reason === 'outside-git'
-          ? 'does not resolve inside any git checkout (fail closed on an unresolvable root, never fail open)'
-          : 'toplevel could not be resolved; fail closed, never fail open';
-    throw new RunnerConfigError(
-      `executeAssignment: mutating inline assignment "${asgn.assignmentId}" refused -- cwd "${cwd}" ${reason}`,
+  // Check 2: Verifiable Unit run mutating gate (Q9, supersede ADR-006 §6)
+  if (asgn.provenance?.kind === 'unit-run' || asgn.unitRunId) {
+    const unitRunId = asgn.unitRunId || asgn.provenance?.unitRunId || asgn.assignmentId?.split('/')[0];
+    if (!unitRunId) {
+      throw new RunnerConfigError(
+        `executeAssignment: mutating unit-run assignment "${asgn.assignmentId}" has unresolvable unitRunId -- refused`,
+      );
+    }
+    const root = opts.repoRoot ?? resolveRepoRoot(cwd);
+    const unitJsonPath = path.join(root, '.fgos', 'assignments', unitRunId, 'unit.json');
+    if (!fs.existsSync(unitJsonPath)) {
+      throw new RunnerConfigError(
+        `executeAssignment: mutating unit-run assignment "${asgn.assignmentId}" refers to missing unit.json at "${unitJsonPath}" -- refused`,
+      );
+    }
+    let unitRecord;
+    try {
+      unitRecord = JSON.parse(fs.readFileSync(unitJsonPath, 'utf8'));
+    } catch (err) {
+      throw new RunnerConfigError(
+        `executeAssignment: mutating unit-run assignment "${asgn.assignmentId}" has corrupt unit.json at "${unitJsonPath}" -- refused (${err.message})`,
+      );
+    }
+
+    const posture = resolveMutatingCwdPosture(cwd);
+    if (!posture.ok) {
+      const reason =
+        posture.reason === 'main-checkout'
+          ? `resolves to the main checkout ("${posture.repoRoot}"); a mutating dispatch must run in a linked git worktree, never the main checkout`
+          : posture.reason === 'outside-git'
+            ? 'does not resolve inside any git checkout (fail closed on an unresolvable root, never fail open)'
+            : 'toplevel could not be resolved; fail closed, never fail open';
+      throw new RunnerConfigError(
+        `executeAssignment: mutating unit-run assignment "${asgn.assignmentId}" refused -- cwd "${cwd}" ${reason}`,
+      );
+    }
+
+    let realCwd, realExpectedWorktree;
+    try {
+      realCwd = fs.realpathSync(cwd);
+      realExpectedWorktree = fs.realpathSync(unitRecord.worktree);
+    } catch (err) {
+      throw new RunnerConfigError(
+        `executeAssignment: mutating unit-run assignment "${asgn.assignmentId}" could not resolve realpath for worktree -- refused (${err.message})`,
+      );
+    }
+    if (realCwd !== realExpectedWorktree) {
+      throw new RunnerConfigError(
+        `executeAssignment: mutating unit-run assignment "${asgn.assignmentId}" worktree mismatch: cwd "${realCwd}" does not match unit.json worktree "${realExpectedWorktree}" -- refused`,
+      );
+    }
+
+    const recomputed = bind(
+      {
+        unit: unitRecord.unit,
+        role: asgn.role,
+        readOnly: false,
+        overrides: unitRecord.overrides || [],
+      },
+      {
+        runnerConfig: unitRecord.configSnapshot?.runner || opts.runnerConfig,
+        session: opts.session || {},
+      },
     );
+
+    if (recomputed.refused) {
+      throw new RunnerConfigError(
+        `executeAssignment: mutating unit-run assignment "${asgn.assignmentId}" recomputed binding refused: ${recomputed.refused.reason} (${recomputed.refused.detail})`,
+      );
+    }
+
+    const asgnBinding = asgn.binding || asgn.provenance?.binding;
+    if (asgnBinding) {
+      if (
+        recomputed.executor !== asgnBinding.executor ||
+        recomputed.tier !== asgnBinding.tier ||
+        recomputed.posture !== asgnBinding.posture
+      ) {
+        throw new RunnerConfigError(
+          `executeAssignment: mutating unit-run assignment "${asgn.assignmentId}" binding mismatch: recomputed { executor: "${recomputed.executor}", tier: "${recomputed.tier}", posture: "${recomputed.posture}" } does not match assignment { executor: "${asgnBinding.executor}", tier: "${asgnBinding.tier}", posture: "${asgnBinding.posture}" } -- refused`,
+        );
+      }
+    }
+
+    return;
   }
+
+  throw new RunnerConfigError(
+    `executeAssignment: mutating inline assignment "${asgn.assignmentId}" carries no single, well-formed engine-reserved protocol-operation stamp and no verified unit-run gate -- refused`,
+  );
 }
+
 
 function validateAssignmentLegality(asgn, opts = {}) {
   if (!asgn || typeof asgn !== 'object') {
@@ -575,10 +667,10 @@ function validateAssignmentLegality(asgn, opts = {}) {
   // gate immediately below, and `executeAssignment`'s own
   // `effectiveAssignment` mutation backfill) stays exactly as-is and
   // still runs unconditionally for both shapes.
-  const isInline = asgn.provenance?.kind === 'inline';
+  const isDeclared = !asgn.provenance || (asgn.provenance.kind !== 'inline' && asgn.provenance.kind !== 'unit-run');
   let matchedOp;
 
-  if (!isInline) {
+  if (isDeclared) {
     const stageOps = operationsForStage(asgn.domain, asgn.stage, { kind: asgn.workflow });
     matchedOp = stageOps.find((o) => o.id === asgn.operation);
 

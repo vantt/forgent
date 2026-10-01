@@ -13,13 +13,14 @@ import { isAssessmentRequired } from './agent-result-claim-contract.mjs';
 export const RUN_RESULT_CONTRACT = Object.freeze({ id: 'assignment-run-result', version: 3 });
 export const RUN_RESULT_CONTRACT_V2 = Object.freeze({ id: 'assignment-run-result', version: 2 });
 export const RUN_RESULT_CONTRACT_V3 = Object.freeze({ id: 'assignment-run-result', version: 3 });
+export const RUN_RESULT_CONTRACT_V4 = Object.freeze({ id: 'assignment-run-result', version: 4 });
 export const EXECUTION_STATUSES = Object.freeze(['completed', 'failed', 'cancelled', 'completion-unknown']);
 export const ASSESSMENT_VERDICTS = Object.freeze(['pass', 'findings', 'blocked', 'inconclusive', 'not-applicable']);
 export const CONFIDENCE_LEVELS = Object.freeze(['verified', 'reported', 'inferred', 'no-evidence', 'failed']);
 export const FAILURE_FAMILIES = Object.freeze(['provider', 'resource', 'contract', 'policy', 'external-interference', 'unknown']);
 export const POLICY_DISPOSITIONS = Object.freeze(['allow', 'refuse', 'needs-input', 'not-applicable']);
 export const DELIVERY_MODES = Object.freeze(['fresh', 'resumed', 'replayed', 'recovered', 'legacy-derived']);
-export const PROVENANCE_VALUES = Object.freeze(['native-v2', 'native-v3', 'legacy-derived', 'contract-corrupt']);
+export const PROVENANCE_VALUES = Object.freeze(['native-v2', 'native-v3', 'native-v4', 'legacy-derived', 'contract-corrupt']);
 export const RECOGNIZED_LEGACY_STATUSES = Object.freeze(['done', 'failed', 'blocked', 'no-evidence']);
 
 export const CORRUPT_CLASSIFICATION = Object.freeze({
@@ -350,6 +351,8 @@ export function normalizeRunResult({
   contractVersion = 3,
   runId,
   assignmentId = null,
+  unitRunId = null,
+  round = null,
   workId,
   controlEpoch,
   controlToken,
@@ -553,9 +556,11 @@ export function normalizeRunResult({
     failure,
     policy,
     delivery,
-    provenance: isV2 ? 'native-v2' : 'native-v3',
+    provenance: isV2 ? 'native-v2' : (contractVersion === 4 ? 'native-v4' : 'native-v3'),
   };
-  const contract = isV2 ? { ...RUN_RESULT_CONTRACT_V2 } : { ...RUN_RESULT_CONTRACT_V3 };
+  const contract = isV2
+    ? { ...RUN_RESULT_CONTRACT_V2 }
+    : (contractVersion === 4 ? { ...RUN_RESULT_CONTRACT_V4 } : { ...RUN_RESULT_CONTRACT_V3 });
 
   if (!isV2) {
     classification.outcome = deriveOutcome(classification);
@@ -565,6 +570,8 @@ export function normalizeRunResult({
     contract,
     runId,
     assignmentId: assignmentId ?? null,
+    ...(contractVersion === 4 || unitRunId !== null ? { unitRunId } : {}),
+    ...(contractVersion === 4 || round !== null ? { round } : {}),
     ...(workId !== undefined ? { workId } : {}),
     ...(controlEpoch !== undefined ? { controlEpoch } : {}),
     ...(controlToken !== undefined ? { controlToken } : {}),
@@ -661,6 +668,81 @@ export function normalizeRunResultV2(params) {
 
 export function normalizeRunResultV3(params) {
   return normalizeRunResult({ ...params, contractVersion: 3 });
+}
+
+export function normalizeRunResultV4(params) {
+  return normalizeRunResult({ ...params, contractVersion: 4 });
+}
+
+/**
+ * Validate a RunResult v4 object against v4 schema and invariants.
+ *
+ * @param {object} result
+ * @param {object} [options]
+ * @param {string} [options.expectedRunId]
+ * @returns {{ valid: boolean, corrupt: boolean, reasons: string[] }}
+ */
+export function validateRunResultV4(result, { expectedRunId } = {}) {
+  const reasons = [];
+  if (!result || typeof result !== 'object' || Array.isArray(result)) {
+    return { valid: false, corrupt: true, reasons: ['RunResult must be an object'] };
+  }
+
+  if (!result.contract || typeof result.contract !== 'object') {
+    reasons.push('contract field is required');
+  } else if (result.contract.id !== RUN_RESULT_CONTRACT.id || result.contract.version !== 4) {
+    reasons.push(`contract must be {id: "${RUN_RESULT_CONTRACT.id}", version: 4}`);
+  }
+
+  if (typeof result.runId !== 'string' || !result.runId.trim()) {
+    reasons.push('runId must be a non-empty string');
+  } else if (expectedRunId && result.runId !== expectedRunId) {
+    reasons.push(`runId "${result.runId}" does not match expectedRunId "${expectedRunId}"`);
+  }
+
+  const c = result.classification;
+  if (!c || typeof c !== 'object' || Array.isArray(c)) {
+    return { valid: false, corrupt: true, reasons: ['classification is required and must be an object'] };
+  }
+
+  if (!c.execution || typeof c.execution !== 'object') {
+    reasons.push('classification.execution must be an object');
+  } else if (!EXECUTION_STATUSES.includes(c.execution.status)) {
+    reasons.push(`classification.execution.status must be one of [${EXECUTION_STATUSES.join(', ')}]`);
+  }
+
+  if (!c.assessment || typeof c.assessment !== 'object') {
+    reasons.push('classification.assessment must be an object');
+  } else if (!ASSESSMENT_VERDICTS.includes(c.assessment.verdict)) {
+    reasons.push(`classification.assessment.verdict must be one of [${ASSESSMENT_VERDICTS.join(', ')}]`);
+  }
+
+  if (!c.confidence || typeof c.confidence !== 'object') {
+    reasons.push('classification.confidence must be an object');
+  } else if (!CONFIDENCE_LEVELS.includes(c.confidence.level)) {
+    reasons.push(`classification.confidence.level must be one of [${CONFIDENCE_LEVELS.join(', ')}]`);
+  }
+
+  const derivedOutcome = deriveOutcome(c);
+  if (!c.outcome || typeof c.outcome !== 'object') {
+    reasons.push('classification.outcome must be an object in contract v4');
+  } else if (c.outcome.category !== derivedOutcome.category) {
+    reasons.push(`classification.outcome.category "${c.outcome.category}" does not match deriveOutcome "${derivedOutcome.category}"`);
+  }
+
+  if (result.unitRunId !== undefined && result.unitRunId !== null && typeof result.unitRunId !== 'string') {
+    reasons.push('unitRunId must be a string when present');
+  }
+  if (result.round !== undefined && result.round !== null && typeof result.round !== 'number') {
+    reasons.push('round must be a number when present');
+  }
+
+  const isValid = reasons.length === 0;
+  return {
+    valid: isValid,
+    corrupt: !isValid,
+    reasons,
+  };
 }
 /**
  * Pure interpreter: reads and interprets RunResult deterministically.
@@ -766,6 +848,48 @@ export function interpretRunResult(input, options = {}) {
   // complete absence of that field is historical v1; a partial, unknown, or
   // mismatched contract must never demote itself into attacker-controlled v1
   // projections.
+  if (rawObj.contract?.version === 4 && rawObj.contract?.id === RUN_RESULT_CONTRACT.id) {
+    const validation = validateRunResultV4(rawObj, { expectedRunId });
+    if (!validation.valid) {
+      return {
+        ...rawObj,
+        contract: { id: RUN_RESULT_CONTRACT.id, version: 4 },
+        classification: { ...CORRUPT_CLASSIFICATION },
+        status: 'no-evidence',
+        confidence: 'failed',
+        contractCorrupt: true,
+        resultCorrupt: true,
+        corrupt: true,
+        corruptionReasons: validation.reasons,
+      };
+    }
+    const resultObj = { ...rawObj };
+    Object.defineProperty(resultObj, 'status', {
+      get() {
+        if (this.classification?.outcome?.category === 'ok') return 'done';
+        if (this.classification?.outcome?.category === 'blocked') return 'blocked';
+        if (this.classification?.confidence?.level === 'no-evidence') return 'no-evidence';
+        return 'failed';
+      },
+      set(v) {
+        Object.defineProperty(this, 'status', { value: v, writable: true, configurable: true, enumerable: true });
+      },
+      enumerable: false,
+      configurable: true,
+    });
+    Object.defineProperty(resultObj, 'confidence', {
+      get() {
+        return this.classification?.confidence?.level ?? null;
+      },
+      set(v) {
+        Object.defineProperty(this, 'confidence', { value: v, writable: true, configurable: true, enumerable: true });
+      },
+      enumerable: false,
+      configurable: true,
+    });
+    return resultObj;
+  }
+
   if (rawObj.contract?.version === 3 && rawObj.contract?.id === RUN_RESULT_CONTRACT.id) {
     const validation = validateRunResultV3(rawObj, { expectedRunId });
     if (!validation.valid) {

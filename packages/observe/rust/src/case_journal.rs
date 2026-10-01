@@ -50,6 +50,8 @@ pub struct CaseClosedRecord {
     pub items: Vec<String>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub sessions: Vec<String>,
+    #[serde(default, rename = "unitRuns", skip_serializing_if = "Vec::is_empty")]
+    pub unit_runs: Vec<String>,
     #[serde(rename = "headAtClose")]
     pub head_at_close: Option<String>,
 }
@@ -79,6 +81,8 @@ pub struct CaseWindow {
     pub items: Vec<String>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub sessions: Vec<String>,
+    #[serde(default, rename = "unitRuns", skip_serializing_if = "Vec::is_empty")]
+    pub unit_runs: Vec<String>,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -191,6 +195,7 @@ pub fn materialize_cases(records: &[CaseRecord]) -> Vec<CaseWindow> {
                     note: None,
                     items: Vec::new(),
                     sessions: Vec::new(),
+                    unit_runs: Vec::new(),
                 });
             }
             CaseRecord::Closed(c) => {
@@ -202,6 +207,7 @@ pub fn materialize_cases(records: &[CaseRecord]) -> Vec<CaseWindow> {
                     existing.note = c.note.clone();
                     existing.items = c.items.clone();
                     existing.sessions = c.sessions.clone();
+                    existing.unit_runs = c.unit_runs.clone();
                 }
             }
         }
@@ -307,6 +313,7 @@ pub fn open_case(
         note: None,
         items: Vec::new(),
         sessions: Vec::new(),
+        unit_runs: Vec::new(),
     })
 }
 
@@ -350,6 +357,7 @@ pub fn close_case(
         note: note.clone(),
         items: items.clone(),
         sessions: sessions.clone(),
+        unit_runs: Vec::new(),
         head_at_close: head_at_close.clone(),
     };
 
@@ -363,6 +371,7 @@ pub fn close_case(
     closed_window.note = note;
     closed_window.items = items;
     closed_window.sessions = sessions;
+    closed_window.unit_runs = Vec::new();
 
     Ok(closed_window)
 }

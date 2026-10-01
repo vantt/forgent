@@ -214,7 +214,7 @@ pub fn derive_legacy_outcome(record: &Value) -> Outcome {
             };
         }
 
-        if version == Some(2) || version == Some(3) {
+        if version == Some(2) || version == Some(3) || version == Some(4) {
             if let Some(c) = raw.get("classification").and_then(|v| v.as_object()) {
                 if !is_classification_valid(c) {
                     return Outcome {
