@@ -153,6 +153,7 @@ dependencies = [
  "fgos-host-runtime",
  "serde",
  "serde_json",
+ "serde_yaml",
  "thiserror",
  "tokio",
 ]
