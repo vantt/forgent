@@ -223,16 +223,85 @@ fn compute_loc_breakdown(root: &Path) -> LocBreakdown {
     loc
 }
 
-fn count_protocols_defined(root: &Path) -> u64 {
-    let protocols_dir = root.join("core").join("protocols");
-    if let Ok(entries) = std::fs::read_dir(protocols_dir) {
-        entries.filter_map(|e| e.ok()).filter(|e| e.path().extension().map_or(false, |ext| ext == "json")).count() as u64
-    } else {
-        0
+fn extract_protocol_id_from_file(path: &Path) -> Option<String> {
+    let content = std::fs::read_to_string(path).ok()?;
+    let val: serde_yaml::Value = serde_yaml::from_str(&content).ok()?;
+    let id = val.get("metadata")?
+        .get("id")?
+        .as_str()?;
+    let id = id.trim();
+    if id.is_empty() {
+        return None;
+    }
+    // If spec.profile.kind is declared, it must be CoordinationProtocol
+    if let Some(spec) = val.get("spec") {
+        if let Some(profile) = spec.get("profile") {
+            if let Some(kind) = profile.get("kind").and_then(|k| k.as_str()) {
+                if kind != "CoordinationProtocol" {
+                    return None;
+                }
+            }
+        }
+    }
+    Some(id.to_string())
+}
+
+fn scan_tier_directory(dir: &Path, seen_protocols: &mut std::collections::HashSet<String>) {
+    let Ok(entries) = std::fs::read_dir(dir) else {
+        return;
+    };
+    let mut files: Vec<std::path::PathBuf> = Vec::new();
+    for entry in entries.flatten() {
+        let path = entry.path();
+        if path.is_file() {
+            if let Some(ext) = path.extension().and_then(|e| e.to_str()) {
+                let ext_lower = ext.to_lowercase();
+                if ext_lower == "yaml" || ext_lower == "yml" || ext_lower == "json" {
+                    files.push(path);
+                }
+            }
+        }
+    }
+    files.sort();
+    for file in files {
+        if let Some(id) = extract_protocol_id_from_file(&file) {
+            seen_protocols.insert(id);
+        }
     }
 }
 
-fn count_protocols_used(root: &Path) -> u64 {
+pub fn count_protocols_defined(root: &Path) -> u64 {
+    let mut protocols = std::collections::HashSet::new();
+
+    // Tier 1: project (<root>/.fgos/coordination-protocols)
+    let project_dir = root.join(".fgos").join("coordination-protocols");
+    scan_tier_directory(&project_dir, &mut protocols);
+
+    // Tier 2: domain (<root>/domains/<domain>/coordination-protocols)
+    let domains_dir = root.join("domains");
+    if let Ok(entries) = std::fs::read_dir(&domains_dir) {
+        let mut domain_dirs: Vec<std::path::PathBuf> = Vec::new();
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.is_dir() {
+                domain_dirs.push(path);
+            }
+        }
+        domain_dirs.sort();
+        for domain_dir in domain_dirs {
+            let tier_dir = domain_dir.join("coordination-protocols");
+            scan_tier_directory(&tier_dir, &mut protocols);
+        }
+    }
+
+    // Tier 3: core (<root>/core/coordination-protocols)
+    let core_dir = root.join("core").join("coordination-protocols");
+    scan_tier_directory(&core_dir, &mut protocols);
+
+    protocols.len() as u64
+}
+
+pub fn count_protocols_used(root: &Path) -> u64 {
     let sessions_dir = root.join(".fgos").join("coordination").join("sessions");
     let mut protocols = std::collections::HashSet::new();
     if let Ok(entries) = std::fs::read_dir(sessions_dir) {
@@ -240,8 +309,13 @@ fn count_protocols_used(root: &Path) -> u64 {
             let session_json = e.path().join("session.json");
             if let Ok(f) = std::fs::File::open(session_json) {
                 if let Ok(v) = serde_json::from_reader::<_, serde_json::Value>(std::io::BufReader::new(f)) {
-                    if let Some(p) = v.get("protocol").and_then(|p| p.get("id")).and_then(|id| id.as_str()) {
-                        protocols.insert(p.to_string());
+                    if let Some(dref) = v.get("definitionRef") {
+                        if let Some(id) = dref.get("id").and_then(|id| id.as_str()) {
+                            let trimmed = id.trim();
+                            if !trimmed.is_empty() {
+                                protocols.insert(trimmed.to_string());
+                            }
+                        }
                     }
                 }
             }
