@@ -42,3 +42,9 @@ Lead đã tự kiểm lại: facts không có producer (bác một phần AD4); 
 - **Q-B** (mục 5): không tạo store `unit-runs`; "Unit run" thay "coordination session"? — đề xuất **có**.
 - **Q-C** (mục 7): thứ tự mới P1 → P3a → (P2 ∥ P3b) → P4 → P5? — đề xuất **có**.
 - **Q-X** (4 câu của plan X, đưa lên trước sóng B — mục 15): (1) read-only = chỉ OS confinement (đề xuất có); (2) pane herdr cho vai read-only: bỏ (đề xuất bỏ); (3) trigger quota: classifier lỗi usage-limit lúc runtime → `bind()` chọn candidate kế (đề xuất), hay khai `runner.providers.*.accounts`; (4) invocation read-only mặc định: khai tường minh `readOnlyDefault` trên executor (đề xuất có).
+
+## Owner trả lời (2026-10-01 11:15–11:25)
+
+- Q-A: **giữ D-ADR0033**. Q-B: **đồng ý** (Unit run, không store mới). Q-C: **đồng ý** (P1 → P3a → P2 ∥ P3b → P4 → P5).
+- Q-X: owner chỉ ra herdr-spawn qua pane là **mục tiêu hàng đầu**, hơn cả cli-spawn, và hỏi vì sao herdr bị đẩy khỏi plan → thêm **G7** (herdr mặc định, cli fallback, posture áp trong pane). Sau giải thích: chốt X-1 (confinement OS cho cả herdr và cli), X-3 (quota phản ứng khi gặp lỗi), X-4 (bỏ `readOnlyDefault`, xoá invocation `*-readonly`). Phương án "bỏ pane herdr cho vai read-only" **bị bác**.
+- 11 mục Accept: áp (owner duyệt cùng lượt).
