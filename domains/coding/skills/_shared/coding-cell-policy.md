@@ -1,6 +1,6 @@
 # Shared Fragment: Coding-Cell Policy
 
-This coding-domain fragment defines the technical policy for executing any mutating coding cell — whether a standalone single-cell change (e.g. via `fgos-code-panel` direct mode, or future `fgos-code-change` in Phase 6) or one step within an implementation track. It is completely self-contained and makes no assumptions about multi-cell tracks, plans, or multi-cell status tables.
+This coding-domain fragment defines the technical policy for executing any mutating coding cell — whether a standalone single-cell change (via `fgos-run`) or one step within an implementation track. It is completely self-contained and makes no assumptions about multi-cell tracks, plans, or multi-cell status tables.
 
 ---
 

@@ -47,8 +47,7 @@ import { loadRunnerConfig, ensureRunnerConfigForDir, loadRunnerConfigFromDir, Ru
 import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
 import { checkDispatchAttestation } from '../src/runner/attestation-guard.mjs';
 import { formatDeprecation } from '../src/cli/deprecation.mjs';
-import { lintPlanCapabilityAnnotations } from '../src/report/capability-plan-lint.mjs';
-import { matchCapability, deriveForm, CapabilityMatchError } from '../src/runner/capability-match.mjs';
+import { lintPlanCapabilityAnnotations, lintPhaseUnits } from '../src/report/capability-plan-lint.mjs';
 import { appendWorkerLog } from '../src/runner/worker-log.mjs';
 
 // tsk-1qi: this running copy's own package root -- the source
@@ -2324,19 +2323,23 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // that never bootstraps or rewrites `.fgos/config.json`, so a read-only
     // lint never mutates state as a side effect of being run.
     case 'plan-lint': {
-      const rawPath = optionalField(positional[0], 'plan-lint requires a <path> to a plan.md file, e.g. `fgos plan-lint plans/<track>/plan.md`.');
+      const rawPath = optionalField(positional[0], 'plan-lint requires a <path> to a plan directory, plan.md, or phase file, e.g. `fgos plan-lint plans/<track>`.');
       if (rawPath === undefined) {
-        throw new StoreError('precondition', 'plan-lint requires a <path> to a plan.md file, e.g. `fgos plan-lint plans/<track>/plan.md`.');
+        throw new StoreError('precondition', 'plan-lint requires a <path> to a plan directory, plan.md, or phase file, e.g. `fgos plan-lint plans/<track>`.');
       }
       const absPath = path.resolve(process.cwd(), rawPath);
-      if (!fs.existsSync(absPath) || !fs.statSync(absPath).isFile()) {
-        throw new StoreError('precondition', `plan-lint: "${rawPath}" is not an existing file.`);
+      if (!fs.existsSync(absPath)) {
+        throw new StoreError('precondition', `plan-lint: "${rawPath}" is not an existing file or directory.`);
       }
       if (flags.cell === true || flags.cell === null || flags.cell === '') {
         throw new StoreError('precondition', 'plan-lint --cell requires a non-empty value.');
       }
       const cellId = flags.cell === undefined ? undefined : flags.cell;
-      const text = fs.readFileSync(absPath, 'utf8');
+
+      if (flags.phase === true || flags.phase === null || flags.phase === '') {
+        throw new StoreError('precondition', 'plan-lint --phase requires a phase number.');
+      }
+
       const repoRoot = path.dirname(dir);
       let cfg;
       try {
@@ -2349,82 +2352,55 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       }
       const catalog = cfg.capabilities ?? {};
       const registered = Object.keys(catalog);
-      const result = lintPlanCapabilityAnnotations(text, registered, cellId !== undefined ? { cellId } : {});
-      const units = result.units.map((unit) => ({
-        ...unit,
-        description: unit.capability != null ? (catalog[unit.capability]?.description ?? null) : null,
-      }));
-      return { path: absPath, ok: result.ok, units, findings: result.findings };
+
+      let targetPath = absPath;
+      let result;
+
+      if (flags.phase !== undefined) {
+        const planDir = fs.statSync(absPath).isDirectory() ? absPath : path.dirname(absPath);
+        const phaseNum = typeof flags.phase === 'number' ? flags.phase : parseInt(String(flags.phase), 10);
+        if (Number.isNaN(phaseNum)) {
+          throw new StoreError('precondition', `plan-lint: invalid phase number "${flags.phase}".`);
+        }
+        const phasePattern = new RegExp(`^phase-0*${phaseNum}(?:-.*)?\\.md$`, 'i');
+        const files = fs.readdirSync(planDir).filter((f) => phasePattern.test(f)).sort();
+        if (files.length === 0) {
+          throw new StoreError('precondition', `plan-lint: no phase file matching phase ${flags.phase} found in "${planDir}".`);
+        }
+        targetPath = path.join(planDir, files[0]);
+        result = lintPhaseUnits(targetPath, { config: cfg, phase: phaseNum, cellId });
+      } else if (fs.statSync(absPath).isDirectory()) {
+        const planMd = path.join(absPath, 'plan.md');
+        if (!fs.existsSync(planMd)) {
+          throw new StoreError('precondition', `plan-lint: "${rawPath}" is a directory but contains no plan.md.`);
+        }
+        targetPath = planMd;
+        const text = fs.readFileSync(targetPath, 'utf8');
+        result = lintPlanCapabilityAnnotations(text, registered, cellId !== undefined ? { cellId } : {});
+      } else {
+        targetPath = absPath;
+        if (/^phase-\d+/i.test(path.basename(targetPath))) {
+          result = lintPhaseUnits(targetPath, { config: cfg, cellId });
+        } else {
+          const text = fs.readFileSync(targetPath, 'utf8');
+          result = lintPlanCapabilityAnnotations(text, registered, cellId !== undefined ? { cellId } : {});
+        }
+      }
+
+      const units = result.units.map((unit) => {
+        const cap = unit.capability;
+        let desc = null;
+        if (cap != null) {
+          desc = catalog[cap]?.description ?? (cap.includes(':') ? catalog[cap.split(':')[1]]?.description : null) ?? null;
+        }
+        return {
+          ...unit,
+          description: desc,
+        };
+      });
+      return { path: targetPath, ok: result.ok, units, findings: result.findings };
     }
 
-    // Q1 steering CLI door onto matchCapability (src/runner/
-    // capability-match.mjs, a pure function this case never re-implements):
-    // reads the live runner config's `capabilities` catalog via
-    // `ensureRunnerConfigForDir`, matches declared DemandFacts against it,
-    // and appends exactly one `.fgos/logs/capability-match.log` line per
-    // call. Read-only with respect to state -- the log append (git-ignored
-    // operational text, per worker-log.mjs) is the only side effect. Never
-    // calls `decide`, never touches `capabilities.<name>.prefer` -- Q2
-    // binding is a separate, later step.
-    case 'capability': {
-      const sub = requireField(positional[0], 'capability requires a sub-verb: fgos capability match --demand <json>');
-      if (sub !== 'match') {
-        throw new StoreError('validation', `capability: unknown sub-verb "${sub}" (known: match).`);
-      }
-      const demandRaw = requireField(flags.demand, 'capability match requires --demand <json>');
-      let facts;
-      try {
-        facts = JSON.parse(demandRaw);
-      } catch (err) {
-        throw new StoreError('validation', `capability match --demand must be valid JSON: ${err.message}`);
-      }
-      const overrideValue = optionalField(flags.override, 'capability match --override must be a non-empty string when present');
-      const reasonValue = optionalField(flags.reason, 'capability match --reason must be a non-empty string when present');
-      if (overrideValue !== undefined) {
-        requireField(reasonValue, 'capability match --override requires --reason <text>');
-      } else if (reasonValue !== undefined) {
-        throw new StoreError('validation', 'capability match --reason requires --override <capability>.');
-      }
-      const repoRootForCapability = path.dirname(dir);
-      let cfg;
-      try {
-        cfg = ensureRunnerConfigForDir(repoRootForCapability);
-      } catch (err) {
-        if (err instanceof RunnerConfigError) {
-          throw new StoreError('precondition', `capability match: ${err.message}`);
-        }
-        throw err;
-      }
-      const catalog = cfg.capabilities ?? {};
-      let result;
-      try {
-        result = matchCapability(facts, catalog);
-      } catch (err) {
-        if (err instanceof CapabilityMatchError) {
-          throw new StoreError('validation', `capability match: ${err.message}`);
-        }
-        throw err;
-      }
-      if (overrideValue !== undefined) {
-        const canonicalOverride = Object.prototype.hasOwnProperty.call(catalog, overrideValue)
-          ? overrideValue
-          : Object.entries(catalog).find(([, entry]) => Array.isArray(entry?.aliases) && entry.aliases.includes(overrideValue))?.[0];
-        if (canonicalOverride === undefined) {
-          throw new StoreError('validation', `capability match --override "${overrideValue}" is not a registered runner.capabilities key or alias.`);
-        }
-        result = {
-          ...result,
-          capability: canonicalOverride,
-          source: 'override',
-          reason: reasonValue.replace(/[\r\n]+/g, ' '),
-          form: deriveForm(result.facts, canonicalOverride),
-        };
-      }
-      appendWorkerLog(dir, 'capability-match', {
-        message: `source=${result.source} capability=${result.capability ?? 'null'} form=${result.form}: ${result.reason}`,
-      });
-      return result;
-    }
 
     // Request-class per D1 (same contract as `ready`/`triage`/`conflicts`): a
     // pure read. Merge-readiness ranking (docs/history/merge-standardization/

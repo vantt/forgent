@@ -32,7 +32,7 @@ parameters where the consuming skill's own reasoning step lives:
 This is the dispatch component of a four-fragment shared awareness cluster
 (`docs/history/agent-coordination-foundation/plan.md`):
 [`capability-catalog.md`](./capability-catalog.md) defines the canonical vocabulary and promises;
-[`capability-matching.md`](./capability-matching.md) governs demand-fact derivation and serves-matching (Q1);
+[`capability-matching.md`](./capability-matching.md) governs understanding intent, writing Units, and invoking Workflow runner (Q1);
 [`planning-capability-awareness.md`](./planning-capability-awareness.md) guides plan decomposition and capability assignment;
 and this fragment governs execution-time decision and dispatch (Q2).
 None of these shared fragments is coding-specific.

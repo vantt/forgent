@@ -4,13 +4,12 @@ user-invocable: false
 description: >-
   Drive any mutating coding change -- a single ad-hoc fix or a full plan/track --
   through the real `fgos coordination` CLI doors with independent review and
-  red-team, in one merged lifecycle. Triggered only when declared `DemandFacts`
-  indicate `outputKind: change`, `domain: code`, `mutates: true`, and
-  `needsIndependentReview: true` -- never by keyword spotting on
-  "implement"/"fix"/"change". `fgos capability match --demand`'s returned `form`
-  selects the path: `facade` (a run/resume/execute verb targets a plan/phase
-  path or a uniquely resolvable track) opens plan mode; `protocol` (everything
-  else) opens single-cell mode; `inline` means no cell opens at all. Replaces
+  red-team, in one merged lifecycle. Triggered when intent indicates
+  mutating code work requiring independent review (`code:implement` or
+  `code:refactor`), never by keyword spotting on "implement"/"fix"/"change".
+  Plan mode handles plan/phase-scoped tracks; single-cell mode handles
+  isolated mutating coding cells; inline handles read-only or non-cell work.
+  Replaces
   `fgos-plan-loop` and `fgos-code-panel` (both deprecated stubs pending the
   Phase 7 compatibility window). Advisory-only coding design or architecture
   discussion routes through `fgos-panel`'s `coding-design-panel`, never here.
@@ -45,7 +44,7 @@ One rule, replacing every former named sub-rule (`fgos-code-panel`'s M1/A1/A2/CE
 
 **Recursive-dispatch guard (R2, survives unchanged):** when invoked from inside an already-active cell dispatch (`options.inPlanLoop`, a `coordinationId`/`workRef` matching the `<track>--<cell-id>` shape, or an active worktree branch matching that shape), never re-enter plan mode or open a nested track -- route to single-cell mode for cell-internal work, or refuse recursion outright if asked to open an inner track.
 
-The heuristic above is a first guess only. Step 0 below confirms it against the real doors (`fgos plan-lint`'s `ok` in plan mode, `fgos capability match`'s `form` in single-cell mode) before any cell opens.
+The heuristic above is a first guess only. Step 0 below confirms it before any cell opens.
 
 ---
 
@@ -54,7 +53,7 @@ The heuristic above is a first guess only. Step 0 below confirms it against the 
 | Hook Slot | Value |
 |---|---|
 | `unit of iteration` | One cell: the single change (single-cell mode) or the next unmerged phase of a track (plan mode, `<track>--<cell-id>`). |
-| `open inputs` | Plan mode: `plans/<track>/phase-NN-<name>.md`'s objective, `## Verification` block, and Product Gates capability, gated by a passing `fgos plan-lint` run (Step 0). Single-cell mode: the objective's own named file(s)/behavior, gated by a `protocol`-form `fgos capability match` result (Step 0). Either way: any actor binding override the Lead supplies. |
+| `open inputs` | Plan mode: `plans/<track>/phase-NN-<name>.md`'s objective, `## Verification` block, and Product Gates capability, gated by a passing `fgos plan-lint` run (Step 0). Single-cell mode: the objective's own named file(s)/behavior, requiring mutating coding capability (`code:implement` or `code:refactor`) (Step 0). Either way: any actor binding override the Lead supplies. |
 | `evidence verification` | Coding-cell policy: independently verify the git commit in the worktree and execute the cell's own declared Test-Selection Block tier(s). |
 | `disposition criteria` | Proof-gap findings (judging the declared tier insufficient) cannot be deferred; must be `accepted` (escalating proof tier) or evidence-backed `rejected`. |
 | `adaptation bounds` | Maximum 3 fix rounds per cell (uniform across both modes). Past the cap, remaining non-proof-gap findings are `deferred` and named in the trace; proof-gap findings force `accepted -> Proof: escalated-to-full` (full proof must pass before close). |
@@ -75,10 +74,10 @@ The heuristic above is a first guess only. Step 0 below confirms it against the 
 
 **Plan mode gate:** resolve the track's `plan.md` (never the phase file -- `fgos plan-lint` only understands `plan.md`'s own `- unit: ... / capability:` blocks and `## Product Gates` table, per `src/report/capability-plan-lint.mjs`), then run `fgos plan-lint plans/<track>/plan.md --cell <id> --json`. Refuse to open on `ok: false` -- report every `severity: "hard"` finding (including `code: "capability.undeclared"`, meaning `--cell <id>` matched no unit block or Product Gates row at all) and stop. Any `severity: "warn"` finding alone does not block. Then load [`references/plan-mode.md`](references/plan-mode.md) for track-level cell selection, cold-resume classification across a track's cells, the cell-status table, and closeout.
 
-**Single-cell mode gate:** declare `DemandFacts` (`../_shared/capability-matching.md`) and run `fgos capability match --demand '<json>'`.
-- `form: "inline"` -- no cell opens; the request returns to the live session. This facade must never capture work the match sends back inline.
-- `form: "facade"` -- the request was actually plan/track-scoped and got misclassified as single-change. Check the R2 recursive-dispatch guard above FIRST: if this gate is itself running inside an already-active cell dispatch, refuse the recursion outright -- never re-route to plan mode from inside R2. Outside R2, re-route to the plan-mode gate above; never force-open a single cell.
-- `form: "protocol"` -- proceed only when the resolved `capability` is `code:implement` or `code:refactor` (this facade's own mutating-coding capabilities). Any other resolved capability (e.g. `code:review`/`code:debug`/`code:test`) is advisory or non-mutating and must never be captured into a cell -- return the result to the live session unopened. When the capability check passes, proceed to Step 1.
+**Single-cell mode gate:** inspect the task requirements directly.
+- If the work is read-only, advisory, non-mutating (e.g. `code:review`/`code:debug`/`code:test`), or does not require independent review, no cell opens; the request returns to the live session inline.
+- If the request was actually plan/track-scoped and got misclassified as single-change: check the R2 recursive-dispatch guard above FIRST (if inside R2, refuse outright; otherwise re-route to plan mode above).
+- Mutating coding work: proceed only when the required capability is `code:implement` or `code:refactor` (this facade's own mutating-coding capabilities). When the capability check passes, proceed to Step 1.
 
 ---
 

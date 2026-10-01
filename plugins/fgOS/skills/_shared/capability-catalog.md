@@ -5,8 +5,7 @@ coding domain. Read this fragment alongside its siblings, which
 together form one shared awareness cluster (`docs/history/agent-coordination-foundation/plan.md`):
 
 - [`capability-matching.md`](./capability-matching.md) — how an agent
-  derives `DemandFacts` and matches them against `serves` to steer
-  capability and execution form.
+  understands intent, writes Units, and invokes Workflow runner / fgos-run.
 - [`planning-capability-awareness.md`](./planning-capability-awareness.md)
   — when authoring a plan, assign one canonical capability to each
   independently executable unit.
@@ -53,13 +52,11 @@ Two canonical shapes are valid:
 
 ## Capability serves: machine-readable behavioral promises
 
-Each capability declares a `serves` attribute set — the machine-readable promise of what demand profile it fulfills (see [`capability-matching.md`](./capability-matching.md) for matching rules against `DemandFacts`). Attributes include:
+Each capability may declare a `serves` attribute set — the machine-readable promise of what demand profile it fulfills (see [`capability-matching.md`](./capability-matching.md)). Attributes include:
 - `outputKind`: `change`, `verification`, `finding`, or `decision`.
 - `domain`: `code`, or omitted for domain-neutral work.
 - `mutates`: boolean (`true` or `false`).
 - `behaviorPreserving`: optional boolean for structural refactoring.
-
-Catalog entries without a declared `serves` definition remain valid for explicit, manual selection (e.g. specialized tools or adapters), but they will never be matched automatically by demand steering.
 
 ## Registered catalog
 

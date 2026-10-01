@@ -10,7 +10,7 @@ defined in [`capability-catalog.md`](./capability-catalog.md).
 
 ```text
 steering awareness (capability-matching.md):
-  derive DemandFacts and match against catalog serves to identify the capability
+  understand intent, write Units, and invoke Workflow runner / fgos-run
 
 planning awareness (this fragment):
   identify the canonical capability for each independent execution unit
@@ -47,11 +47,11 @@ flow step — capability annotation is a planning-time signal, never a
 Work-schema field, and never itself a reason to create, split, or
 transition a Work item.
 
-### Execution units and declared DemandFacts
+### Execution units and canonical capabilities
 
-Each execution unit authored into a plan is a concrete declaration of `DemandFacts` (see [`capability-matching.md`](./capability-matching.md)): its objective, boundaries, expected outputs, and review requirements declare its `outputKind`, `domain`, `mutates`, and `needsIndependentReview`. The author (or planner) derives the unit's canonical capability by matching these demand facts against `capability-catalog.md`'s `serves` definitions, rather than guessing names from keywords.
+Each execution unit authored into a plan is a concrete declaration of work (see [`capability-matching.md`](./capability-matching.md)): its objective, boundaries, expected outputs, reads, and writes declare its contract. The author (or planner) derives the unit's canonical capability directly from `capability-catalog.md`'s canonical capability names, rather than guessing names from keywords.
 
-A static harness or lint reads these declared units and verifies that their assigned capabilities are valid canonical names from the catalog, ensuring no execution infrastructure has been pinned into the plan.
+A static harness or lint (`plan-lint`) reads these declared units and verifies that their assigned capabilities are valid canonical names from the catalog, ensuring no execution infrastructure has been pinned into the plan.
 
 ## What a plan writes down
 
@@ -120,7 +120,6 @@ The coding planner (`fgos-coding-planning`) is one specialization of this
 shared cluster: it maps coding implementation units to `code:implement`
 (and, where a unit is independently reviewable/testable, to `code:review`/
 `code:test`). Any other domain's planning surface — including a
-Work-independent, plan-driven track resumed through `fgos-code-change`'s
-plan mode (formerly `fgos-plan-loop`), or
+Work-independent, plan-driven track driven through `fgos-run`, or
 a future non-coding domain planner — reads this same fragment and the
 same catalog; neither this fragment nor the catalog is coding-specific.

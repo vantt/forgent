@@ -1,7 +1,7 @@
 ---
 phase: 4
 title: "Bỏ DemandFacts + facade cũ"
-status: pending
+status: done
 priority: P1
 effort: "1.5d"
 dependencies: [1]
@@ -36,7 +36,7 @@ Xoá lớp "DemandFacts (8 field) → matcher → `capability` + `form`" (D1); v
 
 ## Success Criteria
 
-- [ ] `rg "DemandFacts|matchCapability|deriveForm|fgos-plan-loop|fgos-code-panel|capability match" src bin core domains AGENTS.md` rỗng (trừ lịch sử/CHANGELOG).
+- [x] `rg "DemandFacts|matchCapability|deriveForm|fgos-plan-loop|fgos-code-panel|capability match" src bin core domains AGENTS.md` rỗng (trừ lịch sử/CHANGELOG).
 
 ## Risk Assessment
 

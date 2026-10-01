@@ -441,3 +441,39 @@ test('dead vocabulary guard: Request-to-Run P1 retired symbols do not appear in 
 
   assert.deepEqual(violations, [], `P1 dead symbols detected:\n${violations.join('\n')}`);
 });
+
+test('dead vocabulary guard: Request-to-Run P2 retired symbols (DemandFacts, matchCapability, deriveForm, retired facades) do not appear in src, bin, core, domains, or AGENTS.md', () => {
+  const p2DeadSymbols = [
+    'matchCapability',
+    'deriveForm',
+    'DemandFacts',
+    'fgos-code-panel',
+    'fgos-plan-loop',
+    'fgos-code-change',
+    'fgos-capability-dispatching',
+  ];
+
+  const searchDirs = ['src', 'bin', 'core', 'domains'].map((d) => path.join(REPO_ROOT, d));
+  const codeFiles = searchDirs.flatMap((d) => collectFiles(d, ['.js', '.mjs', '.cjs', '.json', '.yaml', '.yml', '.md']));
+  const agentsMd = path.join(REPO_ROOT, 'AGENTS.md');
+  if (fs.existsSync(agentsMd)) codeFiles.push(agentsMd);
+
+  const violations = [];
+  const symbolRegexes = p2DeadSymbols.map((sym) => ({ symbol: sym, regex: new RegExp(`\\b${sym}\\b`) }));
+
+  for (const file of codeFiles) {
+    const rel = path.relative(REPO_ROOT, file);
+    const content = fs.readFileSync(file, 'utf8');
+    for (const { symbol, regex } of symbolRegexes) {
+      if (regex.test(content)) {
+        violations.push(`${rel}: contains retired P2 symbol "${symbol}"`);
+      }
+    }
+  }
+
+  // Ensure capability-match.mjs is deleted
+  const capMatchPath = path.join(REPO_ROOT, 'src', 'runner', 'capability-match.mjs');
+  assert.equal(fs.existsSync(capMatchPath), false, 'src/runner/capability-match.mjs must be deleted');
+
+  assert.deepEqual(violations, [], `P2 dead symbols detected:\n${violations.join('\n')}`);
+});

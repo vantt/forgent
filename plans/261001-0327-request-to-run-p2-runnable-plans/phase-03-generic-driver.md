@@ -1,7 +1,7 @@
 ---
 phase: 3
 title: "Driver mỏng trên Workflow runner"
-status: pending
+status: done
 priority: P1
 effort: "1.5d"
 dependencies: [2]
@@ -44,8 +44,8 @@ câu tự do / "phase N" / "phase A..B" ─► Unit[] ─► fgos workflow start
 
 ## Success Criteria
 
-- [ ] K1, K3-thu-nhỏ, plan nhiều phase chạy trọn qua runner; ledger Unit chạy sau cùng, một writer; phase chưa duyệt dừng ở cổng người.
-- [ ] `rg fgos-code-change core domains docs AGENTS.md` chỉ còn lịch sử.
+- [x] K1, K3-thu-nhỏ, plan nhiều phase chạy trọn qua runner; ledger Unit chạy sau cùng, một writer; phase chưa duyệt dừng ở cổng người.
+- [x] `rg fgos-code-change core domains docs AGENTS.md` chỉ còn lịch sử.
 
 ## Risk Assessment
 

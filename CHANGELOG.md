@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- **Added**: Request-to-Run P2 Runnable Plans (`fgos-run`, Unit-driven plan-lint, retirement of DemandFacts & legacy facades):
+  - **Unit-driven plan-lint**: Extended `fgos plan-lint <planPath> [--phase <N>] [--json]` (`src/report/capability-plan-lint.mjs`) to parse `- unit:` blocks in phase files, validate with `validateUnit`, and enforce G2 constraints, cycle detection, and writes collision.
+  - **Single execution driver `fgos-run`**: Introduced `core/skills/fgos-run/SKILL.md` replacing domain-specific facades (`fgos-code-change`, `fgos-code-panel`, `fgos-plan-loop`).
+  - **Retired DemandFacts & matcher**: Deleted `src/runner/capability-match.mjs`, retired `fgos capability match`, rewritten doctrine to focus on understanding intent and formulating Unit data contracts.
 - **Added**: Request-to-Run P1 Execution Core (`fgos run`, Unit contract, single `bind()`, and 3 collaboration patterns):
   - **Unit data contract**: Canonical schema (`src/runner/execution/unit.mjs`) for headless execution. Non-infrastructure (G2: forbids executor, model, tier, invocation, provider pins).
   - **Single `bind()` authority**: 5-level precedence table (`src/runner/execution/bind.mjs`) resolving executor, invocation, transport (`herdr` default, `cli` fallback), tier, model, persona, mechanism, and posture with full provenance.
