@@ -21,6 +21,7 @@ Owner chốt (2026-09-30): **một khái niệm một tên trên toàn hệ th�
 | Khái niệm | Tên dùng | Tên cũ phải bỏ |
 |---|---|---|
 | một phần việc | Unit | cell, step (của plan), dòng Product Gate |
+| một lần chạy một Unit bằng Pattern cộng tác | Unit run | coordination session |
 | cách làm xong một unit | Pattern cộng tác / `CollaborationPattern` (`solo`, `reviewed`, `panel` + preset) | FlowDefinition, CoordinationProtocol, protocol, Protocol Pack |
 | chuỗi nhiều bước / dạng thảo luận nhiều pha | Workflow / Workflow run | Flow, "quy trình nghiệp vụ", profile Workflow, stage (như field Work) |
 | checker phản biện | red-team | objector |

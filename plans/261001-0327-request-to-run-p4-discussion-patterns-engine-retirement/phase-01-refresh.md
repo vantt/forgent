@@ -16,8 +16,8 @@ Khớp plan với `main` sau P1 + P3; trả lời câu hỏi đã treo từ synt
 ## Requirements
 
 - Functional:
-  - Đọc `src/runner/coordination/session-engine.mjs` (visibility windows, reveal), `legality-facts.mjs`, `actions-projector.mjs`, confinement của assignment engine → kết luận: worker có đọc được artefact pha khác trên đĩa không. Thử thực tế bằng một session architecture panel nhỏ (read-only) nếu cần.
-  - Kết luận → yêu cầu cho phase 3, 5 (chỉ `inputs` + context sạch, hay thêm confinement đọc).
+  - Xác nhận lại kết luận red-team mục 14 (visibility engine chỉ ở mức prompt/context: `drivers/bwrap.mjs:181-189`, `policies.mjs:28,50`) → mức bảo đảm = ngang engine, trừ khi owner chọn khác (câu hỏi mở 3).
+  - **Ledger bất biến an toàn** (red-team mục 15/Sec8): liệt kê mọi gate engine đang giữ (`assertMutatingDispatchAllowed` `session-engine.mjs:2135`, `assertNoPortableExecutorPin` `:933`, `READ_ONLY_ROLES`, visibility `:1477,1888-1898`, protocol stamp…) → chủ mới (P1 posture/`bind()`/cổng, Workflow runner) hoặc "retire có owner duyệt"; ghi vào `plan.md`. Phase 6 chỉ xoá khi ledger đóng.
   - Kịch bản đo ca 2, 3: cùng câu hỏi, chạy engine và mô hình gọn; chỉ số §0.
   - Liệt kê caller của engine còn lại sau P1–P3 (skill, verb, test, Observe, Rust `coordination-state`).
 - Non-functional: chỉ sửa plan.
@@ -37,7 +37,7 @@ Khớp plan với `main` sau P1 + P3; trả lời câu hỏi đã treo từ synt
 
 ## Success Criteria
 
-- [ ] Kết luận visibility có bằng chứng; yêu cầu phase 3, 5 cập nhật.
+- [ ] Kết luận visibility xác nhận; ledger bất biến an toàn đầy đủ.
 - [ ] Danh sách caller engine đầy đủ; 2 câu hỏi mở có đề xuất.
 
 ## Risk Assessment

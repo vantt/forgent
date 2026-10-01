@@ -16,8 +16,8 @@ Mở rộng guard từ vựng chết sang docs/skill (ngoài vùng lịch sử);
 ## Requirements
 
 - Functional:
-  - `test/runner/dead-vocabulary-guard.test.mjs`: thêm docs/core/domains/AGENTS.md vào phạm vi, loại vùng lịch sử; danh sách từ theo bảng thuật ngữ.
-  - `docs/platform/component-boundary.md`: bảng component sau track — Work (bản ghi/board/lifecycle), Workflow (định nghĩa + run + runner), Execution core (Unit, `bind()`, Pattern cộng tác, cửa `fgos run`), Dispatch transport/confinement, Observe, Host/Surface, Packaging; bỏ "Agent Coordination Engine". `Last reviewed` cập nhật.
+  - `test/runner/dead-vocabulary-guard.test.mjs` (file do plan T tạo; mọi plan trước đã **append**): thêm docs/core/domains/AGENTS.md vào phạm vi, loại trừ module đọc dữ liệu cũ (vd đường map `stage` cũ của P3), loại vùng lịch sử; danh sách từ theo bảng thuật ngữ.
+  - `docs/platform/component-boundary.md`: bảng component sau track — Work (bản ghi/board/lifecycle), Workflow (định nghĩa + run + runner + tích hợp), Execution core (Unit, Unit run, `bind()`, Pattern cộng tác, cửa `fgos run`, posture), herdr (transport chính + bề mặt quan sát), Dispatch transport/confinement, Observe, Host/Surface, Packaging; bỏ "Agent Coordination Engine". `Last reviewed` cập nhật.
   - `docs/specs/reading-map.md`: trỏ spec mới (Workflow, execution core) và bỏ spec đã thu hồi.
   - Cập nhật track `plan.md`: trạng thái mọi plan con, bằng chứng; đóng track.
 - Non-functional: full `npm test` xanh; merge `main`.

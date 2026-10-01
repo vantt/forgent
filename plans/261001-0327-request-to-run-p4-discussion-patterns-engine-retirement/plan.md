@@ -31,14 +31,14 @@ Owner chốt (Q8, 2026-09-30 23:45): **các dạng thảo luận là năng lực
 | `group-cognition-framework` | **Workflow** group cognition | 5 |
 | `standalone-master-coordination-loop` | đã là `reviewed` (P1) | — |
 
-"Ai thấy gì" (visibility windows) = **đầu vào khai báo** (`inputs`) của từng bước/Unit; vai có ràng buộc visibility **không bao giờ inline** (context sạch).
+"Ai thấy gì" (visibility windows) = **đầu vào khai báo** (`inputs`) của từng bước/Unit + context sạch (vai có ràng buộc visibility luôn out-of-process, qua pane herdr — G7, Q-A). **Mức bảo đảm = ngang engine hôm nay** (red-team mục 14): bwrap không hỗ trợ `hostRead: deny` (`src/runner/dispatch/confinement/drivers/bwrap.mjs:181-189`), mọi policy `hostRead: allow` (`policies.mjs:28,50`) — engine cũng chỉ ép ở mức prompt/context. Ép ở mức file chỉ làm nếu owner muốn mạnh hơn engine (câu hỏi mở 3).
 
 ## Mối authority phải đóng
 
 | Mối | Chủ duy nhất sau P4 |
 |---|---|
 | chạy một dạng thảo luận | preset Pattern cộng tác (P1) hoặc Workflow (P3) — không còn engine |
-| "ai thấy gì" | `inputs` khai báo + context sạch (+ confinement đọc nếu phase 1 chứng minh cần) |
+| "ai thấy gì" | `inputs` khai báo + context sạch (ngang engine) |
 | định tuyến yêu cầu thảo luận (`fgos-panel`) | chọn preset/Workflow theo tên; không chọn protocol id |
 | tên trong code | `CollaborationPattern`; không còn `FlowDefinition`, `CoordinationProtocol`, Protocol Pack, "objector" |
 
@@ -47,11 +47,11 @@ Owner chốt (Q8, 2026-09-30 23:45): **các dạng thảo luận là năng lực
 | # | Phase | Phụ thuộc | Sóng | Sở hữu file |
 |---|---|---|---|---|
 | 1 | [Làm tươi + mức bảo đảm visibility](./phase-01-refresh.md) | P1, P3 merge | A | plan |
-| 2 | [Preset cho dạng một-unit](./phase-02-single-unit-presets.md) | 1 | **B** | preset trong `src/runner/execution/patterns/index.mjs` + config `runner.patterns.presets`; skill tham chiếu consult/research |
+| 2 | [Preset cho dạng một-unit](./phase-02-single-unit-presets.md) | 1 | **B** | `src/runner/execution/patterns/presets.mjs` (một nơi, code); skill tham chiếu consult/research |
 | 3 | [Architecture advisor = Workflow (ca 2)](./phase-03-architecture-advisor-workflow.md) | 1 | **B** | `core/workflows/architecture-advisory*.yaml`, `core/skills/fgos-architecture-panel/` |
 | 4 | [Business discussion = Workflow (ca 3)](./phase-04-business-discussion-workflow.md) | 3 | C | `core/workflows/business-discussion.yaml`, skill tương ứng (tạo nếu cần) |
 | 5 | [Các dạng còn lại = Workflow](./phase-05-remaining-discussion-workflows.md) | 1 | **B** | `core/workflows/{delphi,nominal-group,group-cognition}.yaml`, `core/skills/fgos-group-thinking/`, `core/skills/fgos-panel/`, `core/protocol-packs/` |
-| 6 | [Thu hồi engine + đổi tên](./phase-06-engine-retirement-rename.md) | 2, 3, 4, 5 đều đạt | D | `src/runner/coordination/**`, `src/verbs/coordination/**`, `src/runner/definitions/**`, `src/runner/team-cognition/**`, `src/runner/deliberation/**`, `core/coordination-protocols/**`, `packages/coordination-state/rust`, `packages/observe/rust` (nguồn coordination), verb `coordination` |
+| 6 | [Thu hồi engine + đổi tên](./phase-06-engine-retirement-rename.md) | 2, 3, 4, 5 đều đạt | D | `src/runner/coordination/**`, `src/verbs/coordination/**`, phần còn lại `src/runner/definitions/**`, `src/runner/team-cognition/**`, `src/runner/deliberation/**`, `core/coordination-protocols/**`, `packages/coordination-state/rust` + Cargo workspace (`Cargo.toml:10`, `apps/fgos/Cargo.toml:12`, `apps/fgos/**/metrics_sources.rs`), `packages/observe/rust` (scorecard `source: "coordination"` → nguồn Unit run + Workflow run), verb `coordination`, `execute --assignment` |
 
 Sóng B: 2 ∥ 3 ∥ 5 (khác file). Phase 4 sau 3 để dùng lại cách làm đã nghiệm thu.
 
@@ -66,7 +66,7 @@ Sóng B: 2 ∥ 3 ∥ 5 (khác file). Phase 4 sau 3 để dùng lại cách làm 
 
 | Rủi ro | Tín hiệu | Phản ứng |
 |---|---|---|
-| Visibility chỉ ép ở mức prompt, agent đọc được artefact pha khác trên đĩa | phase 1 chứng minh engine ép ở mức file, hoặc ca 2 thấy rò | thêm confinement đọc (bind mount chỉ `inputs`) cho vai có ràng buộc; không mang lại engine |
+| Owner muốn visibility mạnh hơn engine (mức file) | câu hỏi mở 3 = có | thêm phase driver `hostRead: deny` + store kết quả ngoài cây đọc được; không mang lại engine |
 | Một dạng không biểu diễn được gọn | conformance đỏ, chi phí lớn | **owner quyết** (Q8): giữ engine riêng cho dạng đó hoặc bỏ dạng đó — lead không tự bỏ |
 | Dữ liệu session cũ (602 session) | Observe/replay cũ cần đọc | phase 6 quyết: lưu trữ đông lạnh (đọc qua một đường) hoặc xuất báo cáo rồi bỏ — owner duyệt |
 
@@ -74,5 +74,6 @@ Sóng B: 2 ∥ 3 ∥ 5 (khác file). Phase 4 sau 3 để dùng lại cách làm 
 
 1. Gộp `architecture-advisory-panel-v1` và `-standard-v1` thành một Workflow có tham số (red-team packet tuỳ chọn) hay giữ hai? (đề xuất: một, tham số.)
 2. Dữ liệu `.fgos/coordination/sessions` sau khi xoá engine: lưu trữ đông lạnh hay xuất rồi bỏ?
+3. Visibility: giữ mức ngang engine (prompt/context — đề xuất) hay đầu tư ép ở mức file?
 
 <!-- slug: request-to-run-p4-discussion-patterns-engine-retirement -->

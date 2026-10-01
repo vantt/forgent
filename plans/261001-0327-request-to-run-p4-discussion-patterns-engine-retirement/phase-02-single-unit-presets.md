@@ -16,7 +16,7 @@ Biểu diễn 5 file protocol "một unit" thành **preset có tên** của Patt
 ## Requirements
 
 - Functional:
-  - Preset khai ở một nơi (config `runner.patterns.presets` hoặc module preset của P1 — theo chỗ P1 đã chọn); tham số: vai, n, vòng, cổng.
+  - Preset khai ở **một nơi**: `src/runner/execution/patterns/presets.mjs` (P1); tham số: vai, n, vòng, cổng.
   - Cổng lộ (gated): kết quả thành viên panel chỉ đưa vào `inputs` của bước tổng hợp sau cổng; thành viên không thấy nhau (context sạch, `independentOf`).
   - Conformance: cùng câu hỏi qua engine và preset → cùng số vai, cùng ràng buộc độc lập, kết quả tới trạng thái cuối.
   - Skill/doc đang gọi `declared-consult`/`independent-research-*`/rfc protocol → gọi preset (chỉ các tham chiếu trong phạm vi file phase này sở hữu; `fgos-panel` thuộc phase 5).
@@ -24,7 +24,7 @@ Biểu diễn 5 file protocol "một unit" thành **preset có tên** của Patt
 
 ## Related Code Files
 
-- Modify: `src/runner/execution/patterns/index.mjs` (preset) hoặc `src/runner/dispatch/config.mjs` + `.fgos/config.json` (nếu preset ở config), test conformance `test/runner/execution/presets-conformance.test.mjs`
+- Modify: `src/runner/execution/patterns/presets.mjs`, test conformance `test/runner/execution/presets-conformance.test.mjs`
 - Modify: skill/doc tham chiếu (ngoài `fgos-panel`, `fgos-group-thinking`, `fgos-architecture-panel`)
 
 ## Implementation Steps

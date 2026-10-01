@@ -17,7 +17,7 @@ Biểu diễn lại architecture advisory panel (9 vai, 6 pha, visibility window
 
 - Functional:
   - `core/workflows/architecture-advisory.yaml` (loader 3 tầng core/domain/project — P3 phase 2): bước `framing` (interpret + investigate, solo), `shaping` (panel 3: system / alternative / constraint; mỗi thành viên chỉ thấy kết quả framing), `critique` (critique + assess-constraints, thấy 3 đề xuất), `synthesis` (synthesize; red-team packet tuỳ tham số — gộp v1/standard theo quyết định câu hỏi mở 1), `explanation`, `dialogue` (cổng người: hỏi lại → revise-synthesis/explanation → close).
-  - Visibility theo kết luận phase 1 (`inputs` + context sạch, ± confinement đọc).
+  - Visibility: `inputs` + context sạch (ngang engine); mọi vai out-of-process qua **pane herdr** (G7) — owner xem được từng vai.
   - Specialist: unit tuỳ chọn, kích hoạt khi bước critique/synthesis yêu cầu (outcome `needs-specialist`) — không cần "slot" riêng nếu biểu diễn được bằng bước điều kiện.
   - Vai/persona khoá theo vai nghiệp vụ (Q6); executor theo khẩu vị (phản biện = claude opus — C6).
   - Skill `fgos-architecture-panel`: khởi chạy Workflow thay engine; giữ trải nghiệm hỏi lại (dialogue) của người dùng.
