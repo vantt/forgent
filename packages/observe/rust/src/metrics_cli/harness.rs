@@ -223,8 +223,18 @@ fn compute_loc_breakdown(root: &Path) -> LocBreakdown {
     loc
 }
 
+const MAX_READ_BYTES: u64 = 1024 * 1024; // 1 MiB cap prevents unbounded memory / DoS
+
 fn extract_protocol_id_from_file(path: &Path) -> Option<String> {
-    let content = std::fs::read_to_string(path).ok()?;
+    let meta = path.metadata().ok()?;
+    if !meta.is_file() || meta.len() > MAX_READ_BYTES {
+        return None;
+    }
+    let f = std::fs::File::open(path).ok()?;
+    let mut limited = std::io::Read::take(f, MAX_READ_BYTES);
+    let mut content = String::new();
+    std::io::Read::read_to_string(&mut limited, &mut content).ok()?;
+
     let val: serde_yaml::Value = serde_yaml::from_str(&content).ok()?;
     let id = val.get("metadata")?
         .get("id")?
@@ -232,6 +242,12 @@ fn extract_protocol_id_from_file(path: &Path) -> Option<String> {
     let id = id.trim();
     if id.is_empty() {
         return None;
+    }
+    // If kind is declared, it should be FlowDefinition
+    if let Some(kind) = val.get("kind").and_then(|k| k.as_str()) {
+        if kind != "FlowDefinition" {
+            return None;
+        }
     }
     // If spec.profile.kind is declared, it must be CoordinationProtocol
     if let Some(spec) = val.get("spec") {
@@ -253,11 +269,13 @@ fn scan_tier_directory(dir: &Path, seen_protocols: &mut std::collections::HashSe
     let mut files: Vec<std::path::PathBuf> = Vec::new();
     for entry in entries.flatten() {
         let path = entry.path();
-        if path.is_file() {
-            if let Some(ext) = path.extension().and_then(|e| e.to_str()) {
-                let ext_lower = ext.to_lowercase();
-                if ext_lower == "yaml" || ext_lower == "yml" || ext_lower == "json" {
-                    files.push(path);
+        if let Ok(meta) = path.metadata() {
+            if meta.is_file() && meta.len() <= MAX_READ_BYTES {
+                if let Some(ext) = path.extension().and_then(|e| e.to_str()) {
+                    let ext_lower = ext.to_lowercase();
+                    if ext_lower == "yaml" || ext_lower == "yml" || ext_lower == "json" {
+                        files.push(path);
+                    }
                 }
             }
         }
@@ -307,8 +325,15 @@ pub fn count_protocols_used(root: &Path) -> u64 {
     if let Ok(entries) = std::fs::read_dir(sessions_dir) {
         for e in entries.flatten() {
             let session_json = e.path().join("session.json");
-            if let Ok(f) = std::fs::File::open(session_json) {
-                if let Ok(v) = serde_json::from_reader::<_, serde_json::Value>(std::io::BufReader::new(f)) {
+            let Ok(meta) = session_json.metadata() else {
+                continue;
+            };
+            if !meta.is_file() || meta.len() > MAX_READ_BYTES {
+                continue;
+            }
+            if let Ok(f) = std::fs::File::open(&session_json) {
+                let limited = std::io::Read::take(f, MAX_READ_BYTES);
+                if let Ok(v) = serde_json::from_reader::<_, serde_json::Value>(std::io::BufReader::new(limited)) {
                     if let Some(dref) = v.get("definitionRef") {
                         if let Some(id) = dref.get("id").and_then(|id| id.as_str()) {
                             let trimmed = id.trim();

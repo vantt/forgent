@@ -86,6 +86,16 @@ fn test_harness_protocols_defined_and_used() {
     fs::write(core_dir.join("corrupted.yaml"), "::: broken yaml :::\n").unwrap();
     // Non-protocol file
     fs::write(core_dir.join("readme.txt"), "some random text\n").unwrap();
+    // Non-FlowDefinition kind should be ignored
+    fs::write(
+        core_dir.join("k8s.yaml"),
+        "apiVersion: v1\nkind: ConfigMap\nmetadata:\n  id: k8s-map\n",
+    ).unwrap();
+
+    // Oversized protocol file (> 1 MiB) should be ignored
+    let mut big_proto = "apiVersion: fgos.dev/v1alpha1\nkind: FlowDefinition\nmetadata:\n  id: proto-oversized\nspec:\n  profile:\n    kind: CoordinationProtocol\n# ".to_string();
+    big_proto.extend(std::iter::repeat('x').take(1024 * 1024 + 100));
+    fs::write(core_dir.join("oversized.yaml"), big_proto).unwrap();
 
     // Sessions in .fgos/coordination/sessions/*/session.json
     let sessions_dir = root.join(".fgos").join("coordination").join("sessions");
@@ -142,6 +152,13 @@ fn test_harness_protocols_defined_and_used() {
     // Session 7: session dir without session.json
     let s7_dir = sessions_dir.join("sess-7");
     fs::create_dir_all(&s7_dir).unwrap();
+    // Session 8: oversized session.json (> 1 MiB) should be ignored
+    let s8_dir = sessions_dir.join("sess-8");
+    fs::create_dir_all(&s8_dir).unwrap();
+    let mut big_session = r#"{"id":"sess-8","definitionRef":{"id":"proto-oversized-session","version":"1.0.0"},"padding":""#.to_string();
+    big_session.extend(std::iter::repeat('x').take(1024 * 1024 + 100));
+    big_session.push_str("\"}");
+    fs::write(s8_dir.join("session.json"), big_session).unwrap();
 
     // Assert counts via helper functions
     let defined = count_protocols_defined(&root);
