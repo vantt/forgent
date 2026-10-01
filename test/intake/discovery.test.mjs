@@ -652,10 +652,10 @@ test('assertCallerClassification refuses an out-of-vocabulary value and passes a
     (err) => categoryOf(err) === 'validation' && /work\.kind must be one of/.test(err.message),
   );
   assert.throws(
-    () => assertCallerClassification(work, { clear: true, tier: 'enormous' }),
-    (err) => categoryOf(err) === 'validation' && /work\.tier must be one of/.test(err.message),
+    () => assertCallerClassification(work, { clear: true, size: 'enormous' }),
+    (err) => categoryOf(err) === 'validation' && /work\.size must be one of/.test(err.message),
   );
-  assert.doesNotThrow(() => assertCallerClassification(work, { clear: true, tier: 'heavy', kind: 'bug', risk: 'heavy' }));
+  assert.doesNotThrow(() => assertCallerClassification(work, { clear: true, size: 'heavy', rigor: 'high', kind: 'bug', risk: 'heavy' }));
 });
 
 test('assertCallerClassification is a no-op on an unclear verdict, even one carrying a bad classification', () => {

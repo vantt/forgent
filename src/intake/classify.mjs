@@ -66,10 +66,10 @@ function countMatches(text, keywords) {
 }
 
 /**
- * Classify a free-text submission into {tier, kind, risk} (D1, D5). Purely
+ * Classify a free-text submission into {size, kind, risk} (Phase 3). Purely
  * mechanical keyword counting, no LLM call, and never throws — an
- * unrecognized or empty/non-string input falls back to tier: 'standard',
- * kind: 'task', with risk mirroring the tier signal.
+ * unrecognized or empty/non-string input falls back to size: 'standard',
+ * kind: 'task', with risk mirroring the size signal. Does NOT guess rigor.
  *
  * D12 (tsk-2yo): this result is only ever a TEMP placeholder at item
  * creation time now -- the real judgment happens once, later, at stage
@@ -78,11 +78,11 @@ function countMatches(text, keywords) {
 export function classify(text) {
   const safeText = typeof text === 'string' ? text : '';
 
-  let tier = 'standard';
+  let size = 'standard';
   if (countMatches(safeText, HEAVY_KEYWORDS) > 0) {
-    tier = 'heavy';
+    size = 'heavy';
   } else if (countMatches(safeText, LIGHT_KEYWORDS) > 0) {
-    tier = 'light';
+    size = 'light';
   }
 
   let kind = 'task';
@@ -93,11 +93,11 @@ export function classify(text) {
     }
   }
 
-  // D5: risk is derived from the same keyword signal as tier (mirrors the
-  // tier name) — always overridable by the caller, never blocks submit.
-  const risk = tier;
+  // D5: risk is derived from the same keyword signal as size (mirrors the
+  // size name) — always overridable by the caller, never blocks submit.
+  const risk = size;
 
-  return { tier, kind, risk };
+  return { size, kind, risk };
 }
 
 // D3: SHA256 -> base36, per porting-log `hash-id-adaptive-length` (3-8 chars

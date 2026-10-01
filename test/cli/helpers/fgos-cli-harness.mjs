@@ -402,8 +402,9 @@ const EDIT_PRIORITY_MATRIX_BAD_FLAG_CASES = [
 // test-suite-dry-consolidation/CONTEXT.md); merging keeps every edge case
 // while dropping the repeated shape.
 const ADD_BAD_FLAG_CASES = [
-  ['a --tier outside the TIERS domain', ['--tier', 'extreme']],
-  ['a bare --tier (no value)', ['--tier']],
+  ['a --size outside the SIZES domain', ['--size', 'extreme']],
+  ['a bare --size (no value)', ['--size']],
+  ['a retired --tier flag', ['--tier', 'heavy']],
   ['an unrecognized --domain value', ['--domain', 'bogus']],
   ['a bare --domain (no value)', ['--domain']],
   ['a --stage outside the domain\'s own stage enum', ['--stage', 'assembling']],
@@ -529,7 +530,8 @@ const SUBMIT_BAD_FLAG_CASES = [
   ['an empty --discovered-from ""', ['--discovered-from', '']],
   ['a bare --discovered-from (no value)', ['--discovered-from']],
   ['a nonexistent --deps id', ['--deps', 'ghost-dep']],
-  ['a bare --tier (no value)', ['--tier']],
+  ['a bare --size (no value)', ['--size']],
+  ['a retired --tier flag', ['--tier', 'heavy']],
   ['an empty --docs-ref ""', ['--docs-ref', '']],
   ['an empty --kind ""', ['--kind', '']],
 ];

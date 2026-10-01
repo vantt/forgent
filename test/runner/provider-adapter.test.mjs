@@ -444,7 +444,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
           const resolvedCmd = resolveExecutorCommand(cfg, {
             prompt: '<prompt>',
             model: legacyRow.model,
-            tier,
+            tier: legacyRow.tier,
             executorId,
             fgosDir: throwawayDir,
             contentCarries: 'repo-content',

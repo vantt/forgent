@@ -11,7 +11,7 @@ decision_boundary:
     - PASS/FAIL on each row of a feasibility or review matrix, given concrete evidence
   must_escalate:
     - Any finding that implies reversing a decision already locked elsewhere
-model_tier: standard
+rigor: standard
 tool-scope:
   - Read
   - Bash

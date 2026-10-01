@@ -179,14 +179,14 @@ test('goal focus is not auto-cleared when the focused item reaches status done',
 });
 
 
-test('list shows tier and the proposed status for the real CLI view, exit 0', () => {
+test('list shows size and the proposed status for the real CLI view, exit 0', () => {
   const cwd = tmpCwdFromTemplate();
   toProposed(cwd, 'listed-proposed');
   const result = run(cwd, ['list']);
   assert.equal(result.status, 0);
   const data = envelopeData(result.stdout);
   assert.equal(data.work['listed-proposed'].status, 'awaiting-approval');
-  assert.equal(data.work['listed-proposed'].tier, 'standard');
+  assert.equal(data.work['listed-proposed'].size, 'standard');
 });
 
 

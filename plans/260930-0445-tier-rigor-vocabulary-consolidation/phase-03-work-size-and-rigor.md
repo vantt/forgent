@@ -1,7 +1,7 @@
 ---
 phase: 3
 title: "Work: tách work.tier thành work.size + work.rigor"
-status: pending
+status: done
 priority: P1
 effort: "1.5d"
 dependencies: [2]
@@ -87,12 +87,12 @@ Work dispatch ─────► rigor ?? standard → rigorToTier → tier → 
 
 ## Success Criteria
 
-- [ ] `rg -n "\b(item|work|workItem)\??\.tier\b" src bin packages herdr-plugin` → chỉ còn đúng một chỗ map `tier → size` ở đường đọc; các verb Work không còn khai cờ `tier`; `--tier` của coordination/`dispatch execute` vẫn còn. <!-- Updated: Red Team 2026-09-30 -->
-- [ ] `rg -n "DEFAULT_TIER_TO_POLICY" src bin` → rỗng; `resolveTierModel` chỉ nhận `nano…frontier`.
-- [ ] `size` không xuất hiện ở bất kỳ file nào trong `src/runner/dispatch/**` (có test/guard).
-- [ ] `fgos list`, view Rust và herdr web hiển thị `size` cho item cũ, **trên `.fgos` thật** (snapshot `state.json` cũ), không chỉ trên fixture.
-- [ ] Skill discovery phán và ghi được `size` + `rigor` (có test skill hoặc e2e tương ứng).
-- [ ] Guard test xanh; focused tests Node + Rust xanh; đã merge vào nhánh plan.
+- [x] `rg -n "\b(item|work|workItem)\??\.tier\b" src bin packages herdr-plugin` → chỉ còn đúng một chỗ map `tier → size` ở đường đọc; các verb Work không còn khai cờ `tier`; `--tier` của coordination/`dispatch execute` vẫn còn. <!-- Updated: Red Team 2026-09-30 -->
+- [x] `rg -n "DEFAULT_TIER_TO_POLICY" src bin` → rỗng; `resolveTierModel` chỉ nhận `nano…frontier`.
+- [x] `size` không xuất hiện ở bất kỳ file nào trong `src/runner/dispatch/**` (có test/guard).
+- [x] `fgos list`, view Rust và herdr web hiển thị `size` cho item cũ, **trên `.fgos` thật** (snapshot `state.json` cũ), không chỉ trên fixture.
+- [x] Skill discovery phán và ghi được `size` + `rigor` (có test skill hoặc e2e tương ứng).
+- [x] Guard test xanh; focused tests Node + Rust xanh; đã merge vào nhánh plan.
 
 ## Risk Assessment
 

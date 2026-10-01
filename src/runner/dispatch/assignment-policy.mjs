@@ -21,7 +21,7 @@
 // this resolver's own generic `{scope: 'cliOverride'}` label. Existing callers
 // omit `policyProvenance`, so the field is purely additive.
 
-import { MODEL_POLICY_TIERS, RunnerConfigError, REASONING_EFFORT_VALUES, DEFAULT_RIGOR_TO_TIER, DEFAULT_TIER_TO_POLICY } from './config.mjs';
+import { MODEL_POLICY_TIERS, RunnerConfigError, REASONING_EFFORT_VALUES, DEFAULT_RIGOR_TO_TIER } from './config.mjs';
 import { resolveTierModel, deriveProviderFamily } from './resolve.mjs';
 import { REPEAT_MODE_VALUES } from '../definitions/schema.mjs';
 import { checkProviderDisallowed } from './provider-adapter.mjs';
@@ -299,13 +299,7 @@ export function resolveAssignmentDispatchPolicy({
   // Explicit tiers are independent raise-only inputs. Validate every source
   // before composition so a stronger source cannot mask a malformed weaker
   // one.
-  let workTier;
-  if (work?.tier !== undefined) {
-    if (typeof work.tier !== 'string' || !Object.prototype.hasOwnProperty.call(DEFAULT_TIER_TO_POLICY, work.tier)) {
-      throw new RunnerConfigError('work.tier must be one of [light, standard, heavy] during the Phase 2 compatibility window');
-    }
-    workTier = DEFAULT_TIER_TO_POLICY[work.tier];
-  }
+
   const tierOverrideProvenance = cliOverride.policyProvenance?.tier;
   if (
     cliOverride.tier !== undefined &&
@@ -317,7 +311,6 @@ export function resolveAssignmentDispatchPolicy({
     );
   }
   const explicitTiers = [
-    { value: workTier, source: { scope: 'work', id: work?.id } },
     { value: opPolicy.tier, source: { scope: 'opPolicy', id: opId } },
     { value: cliOverride.tier, source: cliOverride.policyProvenance?.tier ?? { scope: 'cliOverride' } },
   ];

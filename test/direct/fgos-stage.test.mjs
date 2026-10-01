@@ -117,14 +117,14 @@ test('discover with an out-of-vocabulary kind is rejected as validation before i
   assert.equal(listWork(dir).work['disc-5'].stage, 'discovery');
 });
 
-test('discover with an out-of-vocabulary tier is rejected as validation before item moves', () => {
+test('discover with an out-of-vocabulary size is rejected as validation before item moves', () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
   addTestWork(dir, 'disc-6', { stage: 'discovery' });
 
   assert.throws(
-    () => discoverUseCase({ dir }, { id: 'disc-6', callerVerdict: { clear: true, verify: 'npm test', tier: 'enormous' } }),
-    (err) => err.category === 'validation' && /work\.tier must be one of/.test(err.message),
+    () => discoverUseCase({ dir }, { id: 'disc-6', callerVerdict: { clear: true, verify: 'npm test', size: 'enormous' } }),
+    (err) => err.category === 'validation' && /work\.size must be one of/.test(err.message),
   );
   assert.equal(listWork(dir).work['disc-6'].stage, 'discovery');
 });
@@ -141,7 +141,7 @@ test('discover with an out-of-vocabulary risk is rejected as validation before i
   assert.equal(listWork(dir).work['disc-7'].stage, 'discovery');
 });
 
-test('discover --verdict clear with tier/kind/risk applies classification to the item', () => {
+test('discover --verdict clear with size/rigor/kind/risk applies classification to the item', () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
   addTestWork(dir, 'disc-8', { stage: 'discovery' });
@@ -153,7 +153,8 @@ test('discover --verdict clear with tier/kind/risk applies classification to the
       callerVerdict: {
         clear: true,
         verify: 'npm test -- classified',
-        tier: 'heavy',
+        size: 'heavy',
+        rigor: 'high',
         kind: 'bug',
         risk: 'heavy',
       },
@@ -162,7 +163,8 @@ test('discover --verdict clear with tier/kind/risk applies classification to the
   assert.equal(res.outcome, 'clear');
 
   const item = listWork(dir).work['disc-8'];
-  assert.equal(item.tier, 'heavy');
+  assert.equal(item.size, 'heavy');
+  assert.equal(item.rigor, 'high');
   assert.equal(item.kind, 'bug');
   assert.equal(item.risk, 'heavy');
   assert.equal(item.stage, 'planning');
@@ -171,7 +173,7 @@ test('discover --verdict clear with tier/kind/risk applies classification to the
 test('discover applies only classification fields actually passed, leaving the rest untouched', () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
-  addTestWork(dir, 'disc-9', { stage: 'discovery', tier: 'standard', risk: 'standard', kind: 'task' });
+  addTestWork(dir, 'disc-9', { stage: 'discovery', size: 'standard', risk: 'standard', kind: 'task' });
 
   const res = discoverUseCase(
     { dir },
@@ -188,14 +190,14 @@ test('discover applies only classification fields actually passed, leaving the r
 
   const item = listWork(dir).work['disc-9'];
   assert.equal(item.kind, 'docs');
-  assert.equal(item.tier, 'standard', 'an unpassed field is never rewritten');
+  assert.equal(item.size, 'standard', 'an unpassed field is never rewritten');
   assert.equal(item.risk, 'standard', 'an unpassed field is never rewritten');
 });
 
 test('discover --verdict unclear never applies classification', () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
-  addTestWork(dir, 'disc-10', { stage: 'discovery', tier: 'standard', risk: 'standard', kind: 'task' });
+  addTestWork(dir, 'disc-10', { stage: 'discovery', size: 'standard', risk: 'standard', kind: 'task' });
 
   const question = '## Context\n\nBackground needed to understand question.\n\n## Why this matters\n\nDirectly affects outcome: Which provider?';
   const res = discoverUseCase(
@@ -205,7 +207,8 @@ test('discover --verdict unclear never applies classification', () => {
       callerVerdict: {
         clear: false,
         question,
-        tier: 'heavy',
+        size: 'heavy',
+        rigor: 'high',
         kind: 'bug',
         risk: 'heavy',
       },
@@ -214,7 +217,7 @@ test('discover --verdict unclear never applies classification', () => {
   assert.equal(res.outcome, 'unclear');
 
   const item = listWork(dir).work['disc-10'];
-  assert.equal(item.tier, 'standard');
+  assert.equal(item.size, 'standard');
   assert.equal(item.kind, 'task');
   assert.equal(item.risk, 'standard');
   assert.equal(item.status, 'awaiting-human');

@@ -91,9 +91,8 @@ import { effectiveStage, getDomain } from './workflow-stage-graphs.mjs';
  *     `proposed` item, derived from `item.parent` alone (an item with a
  *     parent always merges into SOME `fgw/<root>`, never straight to
  *     `main`) — matches the design report's own §G table split. Named
- *     `mergeTier`, not the canonical reports' bare `tier` (D7): `work.tier`
- *     already exists as a different, unrelated field (the item's own
- *     cost/model-weight).
+ *     `mergeTier`, not the canonical reports' bare `tier` (D7): work scale
+ *     already exists as a different, unrelated field (`work.size`).
  *   - `supersededOut` — ids of otherwise-`ready` candidates carrying a
  *     `supersededBy` target that is RESOLVED, or itself present in this
  *     same call's ready-set (tsk-2ie D2, docs/history/

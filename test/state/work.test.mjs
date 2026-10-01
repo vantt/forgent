@@ -13,7 +13,8 @@ import {
   validateDuplicates,
   WorkValidationError,
   STATUSES,
-  TIERS,
+  SIZES,
+  RIGOR_VALUES,
   STAGES,
   GOAL_TIERS,
   URGENCY_LEVELS,
@@ -383,22 +384,42 @@ test('validateWork does not add supersededBy/duplicates to SCHEMA_VERSION or DEF
   assert.equal(Object.hasOwn(DEFAULTS, 'duplicates'), false);
 });
 
-test('validateWork accepts a work item missing tier (optional, defaulted by the caller per D7b)', () => {
+test('validateWork accepts a work item missing size (optional, defaulted by caller)', () => {
   const work = baseWork();
-  assert.equal(work.tier, undefined);
+  assert.equal(work.size, undefined);
   assert.doesNotThrow(() => validateWork(work));
 });
 
-test('validateWork accepts every tier in TIERS', () => {
-  for (const tier of TIERS) {
-    assert.doesNotThrow(() => validateWork(baseWork({ tier })));
+test('validateWork accepts every size in SIZES', () => {
+  for (const size of SIZES) {
+    assert.doesNotThrow(() => validateWork(baseWork({ size })));
   }
 });
 
-test('validateWork rejects a tier outside the TIERS domain', () => {
+test('validateWork rejects a size outside the SIZES domain', () => {
   assert.throws(
-    () => validateWork(baseWork({ tier: 'ultra-heavy' })),
-    (err) => err instanceof WorkValidationError && /tier/.test(err.message),
+    () => validateWork(baseWork({ size: 'ultra-heavy' })),
+    (err) => err instanceof WorkValidationError && /size/.test(err.message),
+  );
+});
+
+test('validateWork accepts every rigor in RIGOR_VALUES', () => {
+  for (const rigor of RIGOR_VALUES) {
+    assert.doesNotThrow(() => validateWork(baseWork({ rigor })));
+  }
+});
+
+test('validateWork rejects a rigor outside the RIGOR_VALUES domain', () => {
+  assert.throws(
+    () => validateWork(baseWork({ rigor: 'ultra-critical' })),
+    (err) => err instanceof WorkValidationError && /rigor/.test(err.message),
+  );
+});
+
+test('validateWork rejects legacy tier', () => {
+  assert.throws(
+    () => validateWork(baseWork({ tier: 'standard' })),
+    (err) => err instanceof WorkValidationError && /tier is retired/.test(err.message),
   );
 });
 
@@ -458,8 +479,8 @@ test('an untouched legacy kind/risk is grandfathered on edit, but a touched one 
   );
 });
 
-test('DEFAULTS.tier is itself a member of TIERS, and SCHEMA_VERSION is a positive integer', () => {
-  assert.ok(TIERS.includes(DEFAULTS.tier));
+test('DEFAULTS.size is itself a member of SIZES, and SCHEMA_VERSION is a positive integer', () => {
+  assert.ok(SIZES.includes(DEFAULTS.size));
   assert.ok(Number.isInteger(SCHEMA_VERSION) && SCHEMA_VERSION > 0);
 });
 

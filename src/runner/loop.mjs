@@ -730,7 +730,8 @@ export function parseVerdictBlock(output) {
           // validation happens where these are actually applied (editWork),
           // not here -- this parse step stays fail-safe-only, same as its
           // sibling `parseDiscoveredBlocks`.
-          ...(typeof parsed.tier === 'string' ? { tier: parsed.tier } : {}),
+          ...(typeof parsed.size === 'string' ? { size: parsed.size } : (typeof parsed.tier === 'string' ? { size: parsed.tier } : {})),
+          ...(typeof parsed.rigor === 'string' ? { rigor: parsed.rigor } : {}),
           ...(typeof parsed.kind === 'string' ? { kind: parsed.kind } : {}),
           ...(typeof parsed.risk === 'string' ? { risk: parsed.risk } : {}),
         }
@@ -870,7 +871,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
   await queue.enqueue(async () => {
     addOutcome(dir, {
       id: item.id,
-      predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits },
+      predicted: { size: item.size ?? DEFAULTS.size, deps: item.deps.length, priorVisits },
     });
   });
 
@@ -1641,9 +1642,11 @@ export async function runOnce(options = {}) {
       if (hasExceededMaxVisits(visits, maxVisits)) {
         return { outcome: 'dry-run', plan: { park: item.id, reason: 'anti-loop-max-visits', visits }, reap, parked, exitCode: 0 };
       }
-      const tier = item.tier ?? DEFAULTS.tier;
+      const itemRigor = item.rigor ?? (item.risk === 'heavy' ? 'high' : 'standard');
+      const tier = config.rigorToTier?.[itemRigor] ?? 'standard';
       const plan = {
         dispatch: item.id,
+        rigor: itemRigor,
         tier,
         model: resolveTierModel(config, tier),
         branch: branchNameFor(item.id),

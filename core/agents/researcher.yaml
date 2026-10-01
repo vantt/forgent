@@ -11,7 +11,7 @@ decision_boundary:
     - Whether the evidence gathered resolves the question asked (clear) or leaves a real gap (unclear)
   must_escalate:
     - Any product or architecture decision -- a finding is handed back to the caller, never acted on directly
-model_tier: light
+rigor: low
 tool-scope:
   - Read
   - Bash

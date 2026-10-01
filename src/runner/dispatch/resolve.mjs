@@ -9,7 +9,7 @@
 // barrel. See `docs/history/dispatch-activation-and-handoff-redesign/
 // CONTEXT.md` D7 for the split rationale.
 
-import { RunnerConfigError, EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, DEFAULT_TIER_TO_POLICY, MODEL_POLICY_TIERS, supportsPolicyTier, normalizePreferCandidates } from './config.mjs';
+import { RunnerConfigError, EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, MODEL_POLICY_TIERS, supportsPolicyTier, normalizePreferCandidates } from './config.mjs';
 export {
   executorIdForWork,
   resolveCapabilityIdentityDetails,
@@ -19,11 +19,9 @@ export {
 /**
  * Resolve a tier to a model name using cfg.modelPolicies[provider][tier].
  * Valid tiers: nano | mini | standard | advanced | flagship | frontier.
- * (Temporarily bridges light|standard|heavy via DEFAULT_TIER_TO_POLICY until Phase 3).
  */
 export function resolveTierModel(cfg, tier, provider = 'claude') {
-  const effectiveTier = DEFAULT_TIER_TO_POLICY[tier] ?? tier;
-  if (!MODEL_POLICY_TIERS.includes(effectiveTier)) {
+  if (!MODEL_POLICY_TIERS.includes(tier)) {
     throw new RunnerConfigError(`unrecognized tier "${tier}". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);
   }
   const policies = cfg && cfg.modelPolicies;
@@ -34,9 +32,9 @@ export function resolveTierModel(cfg, tier, provider = 'claude') {
   if (!providerPolicy || typeof providerPolicy !== 'object') {
     throw new RunnerConfigError(`no modelPolicies configured for provider "${provider}".`);
   }
-  const model = providerPolicy[effectiveTier];
+  const model = providerPolicy[tier];
   if (typeof model !== 'string' || !model.trim()) {
-    throw new RunnerConfigError(`no model configured for tier "${effectiveTier}" under provider "${provider}".`);
+    throw new RunnerConfigError(`no model configured for tier "${tier}" under provider "${provider}".`);
   }
   return model;
 }

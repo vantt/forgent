@@ -94,7 +94,7 @@ Mọi đường dispatch (assignment, coordination, Work runner, `execute` CLI) 
 |---|---|---|---|---|
 | 1 | [Một resolver tier→model; xoá cầu nối, rigorOverrides, shadow](./phase-01-single-tier-model-resolver.md) | 1.5d | — | done |
 | 2 | [rigor thay minTier; bảng rigorToTier; xoá quality bridge](./phase-02-rigor-replaces-mintier.md) | 1.5d | 1 | done |
-| 3 | [Work: tách work.tier thành work.size + work.rigor; xoá DEFAULT_TIER_TO_POLICY](./phase-03-work-size-and-rigor.md) | 1.5d | 2 | pending |
+| 3 | [Work: tách work.tier thành work.size + work.rigor; xoá DEFAULT_TIER_TO_POLICY](./phase-03-work-size-and-rigor.md) | 1.5d | 2 | done |
 | 4 | [Guard từ đã chết, doctor, tài liệu, full suite, merge main](./phase-04-guard-docs-and-main-merge.md) | 0.5d | 1–3 | pending |
 
 Phase read-only cũ đã được dời sang plan follow-on [`260930-1235-readonly-invocation-redesign`](../260930-1235-readonly-invocation-redesign/plan.md) (D17).

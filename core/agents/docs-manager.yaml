@@ -11,7 +11,7 @@ decision_boundary:
     - Which Diataxis doc type a captured signal belongs to, and where it should live
   must_escalate:
     - A capture with no real evidence behind it -- never fabricate content to fill a doc
-model_tier: light
+rigor: low
 tool-scope:
   - Read
   - Write

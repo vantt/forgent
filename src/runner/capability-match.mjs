@@ -20,7 +20,7 @@
 // (see `RIGOR_VALUES`) rather than a dispatch/ import, so this module stays
 // fully decoupled from executor/decide/CLI-spawn machinery.
 
-import { TIERS } from '../state/work.mjs';
+import { SIZES } from '../state/work.mjs';
 import { RIGOR_VALUES } from './rigor.mjs';
 
 export { RIGOR_VALUES };
@@ -74,8 +74,8 @@ function validateDemandFacts(facts) {
       fail(`demandFacts.${key} must be a boolean when present, got: ${JSON.stringify(facts[key])}.`);
     }
   }
-  if (!TIERS.includes(facts.size)) {
-    fail(`demandFacts.size must be one of ${TIERS.join('/')}, got: ${JSON.stringify(facts.size)}.`);
+  if (!SIZES.includes(facts.size)) {
+    fail(`demandFacts.size must be one of ${SIZES.join('/')}, got: ${JSON.stringify(facts.size)}.`);
   }
   if (!RIGOR_VALUES.includes(facts.rigor)) {
     fail(`demandFacts.rigor must be one of ${RIGOR_VALUES.join('/')}, got: ${JSON.stringify(facts.rigor)}.`);

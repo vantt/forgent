@@ -239,29 +239,34 @@ test('add with --title but no --id is rejected the same as a fully bare call (mi
 });
 
 
-// --- D6 tier: --tier on `add` (phase-2-routing-3) ---
+// --- size: --size on `add` (Phase 3) ---
 
-test('add with --tier records the given tier explicitly in the view, exit 0', () => {
+test('add with --size records the given size explicitly in the view, exit 0', () => {
   const cwd = tmpCwd();
-  const result = run(cwd, ['add', 'heavy-item', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--tier', 'heavy', '--description', 'tsk-535 fixture description.']);
+  const result = run(cwd, ['add', 'heavy-item', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--size', 'heavy', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
-  assert.equal(stateView(cwd).work['heavy-item'].tier, 'heavy');
+  assert.equal(stateView(cwd).work['heavy-item'].size, 'heavy');
 });
 
+test('add with retired --tier is rejected as validation with guidance, exit 4', () => {
+  const cwd = tmpCwd();
+  const result = run(cwd, ['add', 'bad-tier', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--tier', 'heavy', '--description', 'desc']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /--tier is retired/);
+});
 
-test('add without --tier defaults to work.mjs DEFAULTS.tier ("standard"), exit 0', () => {
+test('add without --size defaults to work.mjs DEFAULTS.size ("standard"), exit 0', () => {
   const cwd = tmpCwd();
   const result = addOk(cwd, 'default-tier-item');
   assert.equal(result.status, 0);
-  assert.equal(stateView(cwd).work['default-tier-item'].tier, 'standard');
+  assert.equal(stateView(cwd).work['default-tier-item'].size, 'standard');
 });
 
-
-test('add explicitly writes the tier into the work.add event payload itself, not only the folded view', () => {
+test('add explicitly writes the size into the work.add event payload itself, not only the folded view', () => {
   const cwd = tmpCwd();
   addOk(cwd, 'explicit-tier-item');
   const lines = eventLines(cwd);
   const addEvent = JSON.parse(lines[lines.length - 1]);
   assert.equal(addEvent.type, 'work.add');
-  assert.equal(addEvent.payload.tier, 'standard');
+  assert.equal(addEvent.payload.size, 'standard');
 });

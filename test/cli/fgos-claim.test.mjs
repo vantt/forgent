@@ -192,7 +192,7 @@ test('take with no --id claims the frontier head, defaults role to human, record
   assert.equal(view.work['pull-a'].headAtTake, headBefore);
   assert.equal(view.outcomes['pull-a'].predicted.role, 'human');
   assert.equal(view.outcomes['pull-a'].predicted.headAtTake, headBefore);
-  assert.equal(view.outcomes['pull-a'].predicted.tier, 'standard');
+  assert.equal(view.outcomes['pull-a'].predicted.size, 'standard');
 });
 
 

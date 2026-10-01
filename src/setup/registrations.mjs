@@ -1885,8 +1885,7 @@ export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
 // confirmed GREEN (worker contract followed: layered skill-pointer chain
 // read natively, footprint honored, correct `[BLOCKED]`/`[DONE]`
 // two-token reporting) — see
-// docs/history/pi-executor-runtime-capacity/RESEARCH.md Round 4. No
-  // A fresh install's `pi` behaves like every other executor (DEFAULT_TIER_TO_POLICY).
+// docs/history/pi-executor-runtime-capacity/RESEARCH.md Round 4.
 // Exported (mirrors `DEFAULT_CAPABILITY_SLOTS` below it) so the ripple
 // tests assert this exact shape instead of duplicating the literal.
 export const PI_EXECUTOR_DEFAULT = Object.freeze({
