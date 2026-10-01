@@ -34,6 +34,29 @@ Thuộc track [request-to-run](../261001-0327-request-to-run-track/plan.md).
 
 synthesis "Workflow tách khỏi Work" (§6), "AgentKit plan và Workflow" + (b), hình chạy tổng thể, Q7, A2/A4, **§7e Q-B (Unit run), Q-C (P3a trước P2; một sequencer), G7**; red-team mục 7, 8, 10, 11, 12, 13, 15.
 
+## Làm tươi (Phase 1 scout kết quả)
+
+| Hạng mục | Số lượng / Vị trí | Ghi chú |
+|---|---|---|
+| `workflow-stage-graphs` | 32 files trong `src/` | Gồm intake (3), runner loop/claim (4), definitions (2), dispatch (4), state (5), templates (3), setup (2) |
+| `.stage` | 26 files trong `src/` | Bản ghi Work hiện mang `stage`, sẽ bỏ ở P3b; P3a tách runner độc lập không đụng |
+| Helper tích hợp | `src/runner/worktree.mjs` + `src/runner/merge.mjs` | Tách hàm thuần git sang `src/workflow/integrate.mjs`: `createWorkflowWorktree`, `mergeWorkflowBranch`, `cleanupWorkflowBranch` |
+| Loader chuyển | `src/runner/definitions/protocol-loader.mjs` | Chuyển nạp core/domain YAML sang `src/workflow/loader.mjs`, bỏ project tier |
+| Thiết kế verb `workflow` | `bin/fgos.mjs` & `command-registry.mjs` | Mở rộng `start \| status \| answer \| resume`; giữ `operations` & `stages` tương thích ngược |
+| Store Workflow run | `.fgos/workflow-runs/<id>/events.jsonl` | Append-only, không can thiệp store Work |
+
+### Ranh giới helper tích hợp (`src/workflow/integrate.mjs`):
+- Thuần git: nhận `repoRoot`, `branch`, `targetBranch`, `worktreePath`.
+- Không import `src/state/**`, không biết `item.id`, không ghi `events.jsonl`.
+- Work layer (`merge.mjs`) gọi helper này cho phần git, giữ nguyên FSM/status/event bên trên.
+
+### Thiết kế verb `fgos workflow`:
+- `fgos workflow start <id> [--units <file>] [--plan <dir>] [--phases A..B] [--dir <mainRoot>]`
+- `fgos workflow status <workflowRunId> [--dir <mainRoot>]`
+- `fgos workflow answer <workflowRunId> --step <stepId> --answer <text> [--dir <mainRoot>]`
+- `fgos workflow resume <workflowRunId> [--dir <mainRoot>]`
+- `fgos workflow operations --stage <stage>` & `fgos workflow stages` (giữ tương thích)
+
 ## Hợp đồng
 
 ```yaml

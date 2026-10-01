@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "Làm tươi"
-status: pending
+status: done
 priority: P1
 effort: "1d"
 dependencies: []
@@ -34,7 +34,7 @@ Khớp plan với `main` sau P1: API `fgos run`/Unit run thật, kết quả ca 
 
 ## Success Criteria
 
-- [ ] Danh sách consumer đầy đủ (có số); ranh giới helper tích hợp; thiết kế verb `workflow` không trùng.
+- [x] Danh sách consumer đầy đủ (có số); ranh giới helper tích hợp; thiết kế verb `workflow` không trùng.
 
 ## Risk Assessment
 
