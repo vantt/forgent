@@ -20,7 +20,7 @@ dependencies: [1]
   - **Containment** (red-team mục 15): `writes[]`, `inputs[]` chỉ nhận path repo-relative trong worktree của Unit hoặc ref `unit-run:<id>/<role>`; từ chối absolute, `..`, symlink ra ngoài; cùng luật cho `taskSpec`.
   - `capability` dạng `domain:verb` hoặc `verb`; tra config `capabilities[domain:verb]` rồi fallback `capabilities[verb]` (không đăng ký trước `docs:*` vào catalog `serves` — synthesis §5 Q4).
   - Config validator (`config.mjs`): capability entry nhận `persona`, `minCheckers`, `verify` (lệnh chạy **confined**, không chạy trên host trần); `runner.patterns` với `defaultRule.mutatingMinRigor`, `reviewed.maxRounds`, `reviewed.checkersByRigor` (mức cao ⊇ mức thấp — validator từ chối nếu không cộng dồn); checker hợp lệ: `reviewer`, `red-team`, `tester`.
-  - Doctor: thiếu `runner.patterns` → dùng mặc định cài bởi setup; checker lạ; `checkersByRigor` không cộng dồn; capability `:review`/`red-team` read-only thiếu `confinement`.
+  - Doctor: thiếu `runner.patterns` → dùng mặc định cài bởi setup; checker lạ; `checkersByRigor` không cộng dồn; (posture do fgOS áp theo vai — X-1; không còn kiểm `confinement` theo từng capability).
 - Non-functional: không đổi hành vi dispatch hiện tại (chưa ai đọc khoá mới cho tới phase 5).
 
 ## Architecture
@@ -45,7 +45,7 @@ Unit nằm ở `src/runner/execution/` (lõi mới, L5) — **không import `src
 ## Success Criteria
 
 - [ ] `validateUnit` + validator config có test (xanh), gồm ca âm G2.
-- [ ] `fgos setup` ghi default `runner.patterns`; `fgos doctor` báo 4 loại lỗi ở trên.
+- [ ] `fgos setup` ghi default `runner.patterns`; `fgos doctor` báo 3 loại lỗi ở trên.
 - [ ] `src/runner/execution/unit.mjs` không import `src/state/**`.
 
 ## Risk Assessment

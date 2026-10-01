@@ -11,7 +11,7 @@ dependencies: []
 
 ## Overview
 
-Khớp plan với `main` sau P1 + P3; trả lời câu hỏi đã treo từ synthesis: **engine ép visibility ở mức hệ thống file hay chỉ ở mức prompt?** — quyết mức bảo đảm mô hình gọn phải đạt. Lập kịch bản so sánh hai đường cho ca 2, 3.
+Khớp plan với `main` sau P1 + P3; xác nhận mức bảo đảm visibility (red-team mục 14: engine chỉ ép ở mức prompt/context) và lập ledger bất biến an toàn của engine. Lập kịch bản so sánh hai đường cho ca 2, 3.
 
 ## Requirements
 
@@ -32,14 +32,14 @@ Khớp plan với `main` sau P1 + P3; trả lời câu hỏi đã treo từ synt
 2. Nhánh `plan/261001-request-to-run-p4` + worktree; symlink; GitNexus analyze.
 3. Phân tích visibility; ghi kết luận + bằng chứng `file:line` vào `plan.md`.
 4. Đếm caller engine; lập danh sách xoá cho phase 6.
-5. Viết đề xuất cho 2 câu hỏi mở; gửi owner một lượt.
+5. Viết đề xuất cho 3 câu hỏi mở; gửi owner một lượt.
 6. Commit plan.
 
 ## Success Criteria
 
 - [ ] Kết luận visibility xác nhận; ledger bất biến an toàn đầy đủ.
-- [ ] Danh sách caller engine đầy đủ; 2 câu hỏi mở có đề xuất.
+- [ ] Danh sách caller engine đầy đủ; 3 câu hỏi mở có đề xuất.
 
 ## Risk Assessment
 
-- Kết luận "engine ép ở mức file" → phase 3/5 thêm confinement đọc; effort tăng, không đổi hướng.
+- Owner chọn visibility mức file (câu hỏi mở 3) → thêm phase driver `hostRead: deny`; effort tăng, không đổi hướng.

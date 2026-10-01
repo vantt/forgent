@@ -130,7 +130,11 @@ T Tier/rigor (agent khác) ──► P1 Lõi thực thi ──► P3a Workflow r
 | 15 | Việc vụn (Cargo, Observe, ledger, containment, resume, guard, consumer, đo sớm, preset ở module) | Med–High | Accept | nhiều phase |
 
 ### Whole-Plan Consistency Sweep
-_(ghi sau khi áp xong — xem cuối file)_
+- Files reread: track `plan.md` + phase-01; P1 plan + 8 phase; P2 plan + 5 phase; P3 plan + 6 phase (phase 4 đổi tên `phase-04-surfaces-skills-herdr.md`); P4 plan + 6 phase; P5 plan + 3 phase.
+- Decision deltas checked: Q-A (D-ADR0033, checker không inline), Q-B (không `unit-runs`, Unit run, RunResult v4), Q-C (P3a trước P2; mốc merge P3a; bỏ `plan-reader`), G7 (herdr mặc định; ca nghiệm thu qua herdr), X-1/3/4 (posture OS cho herdr + cli; quota phản ứng; xoá `*-readonly`, không `readOnlyDefault`), mục 1, 2, 4, 6, 8, 9, 10, 11, 12, 13, 14, 15.
+- Reconciled stale references: `unit-runs` (P1 hợp đồng, ph4, ph5), `plan-reader` (P2 ph3), `decide` ở P2 (chuyển P1 ph7), tầng project loader (P3 ph2, P4 ph3), `isReadOnlyCapable` → `canApplyPosture`, persona/posture doctor (P1 ph2), số câu hỏi mở P4, preset ở một nơi (P1 ph4, P4 ph2), `dead-vocabulary-guard` = append (T tạo).
+- `ak plan validate`: 6/6 valid.
+- Unresolved contradictions: 0. Báo cáo red-team giữ nguyên văn (bản ghi lịch sử).
 
 ## Câu hỏi mở
 
