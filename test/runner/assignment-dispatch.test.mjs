@@ -407,8 +407,8 @@ test('dispatch CLI execute subcommand with --assignment executes assignment and 
 
   const parsed = JSON.parse(stdout.trim());
   assert.equal(parsed.assignmentId, assignment.assignmentId);
-  assert.equal(parsed.status, 'done');
-  assert.equal(parsed.confidence, 'reported');
+  assert.equal(parsed.classification.outcome.category, 'ok');
+  assert.equal(parsed.classification.confidence.level, 'reported');
 });
 
 test('dispatch CLI execute subcommand with --assignment and --executor dispatches through the named executor', async () => {
@@ -452,7 +452,7 @@ test('dispatch CLI execute subcommand with --assignment and --executor dispatche
   );
 
   const parsed = JSON.parse(stdout.trim());
-  assert.equal(parsed.status, 'done');
+  assert.equal(parsed.classification.outcome.category, 'ok');
 
   const storedPlan = JSON.parse(
     fs.readFileSync(path.join(asgnDir, 'runs', '01', 'dispatch-plan.json'), 'utf8'),
@@ -2057,7 +2057,7 @@ test('dispatch CLI execute subcommand with --contract and --work fires the domai
   );
 
   const parsed = JSON.parse(stdout.trim());
-  assert.equal(parsed.status, 'done');
+  assert.equal(parsed.classification.outcome.category, 'ok');
   assert.equal(parsed.workId, 'tsk-contract-cli-seam');
 
   const assignmentJson = JSON.parse(
@@ -2094,7 +2094,7 @@ test('dispatch CLI execute subcommand with --contract and no --work builds a sta
   );
 
   const parsed = JSON.parse(stdout.trim());
-  assert.equal(parsed.status, 'done');
+  assert.equal(parsed.classification.outcome.category, 'ok');
   assert.equal(parsed.workId, null);
 
   const assignmentJson = JSON.parse(
@@ -2136,7 +2136,7 @@ test('dispatch CLI execute subcommand with --contract and --executor dispatches 
   );
 
   const parsed = JSON.parse(stdout.trim());
-  assert.equal(parsed.status, 'done');
+  assert.equal(parsed.classification.outcome.category, 'ok');
 
   const storedPlan = JSON.parse(
     fs.readFileSync(path.join(tempDir, '.fgos', 'assignments', parsed.assignmentId, 'runs', '01', 'dispatch-plan.json'), 'utf8'),
@@ -2238,7 +2238,7 @@ test('dispatch CLI execute subcommand with --contract honors a file-supplied cal
   );
 
   const parsed = JSON.parse(stdout.trim());
-  assert.equal(parsed.status, 'done');
+  assert.equal(parsed.classification.outcome.category, 'ok');
 
   const assignmentJson = JSON.parse(
     fs.readFileSync(path.join(tempDir, '.fgos', 'assignments', parsed.assignmentId, 'assignment.json'), 'utf8'),
@@ -2329,7 +2329,7 @@ test('dispatch CLI execute subcommand with --contract computes a distinct assign
     { encoding: 'utf8', cwd: tempDir },
   );
   const parsed1 = JSON.parse(stdout1.trim());
-  assert.equal(parsed1.status, 'done');
+  assert.equal(parsed1.classification.outcome.category, 'ok');
 
   const stdout2 = execFileSync(
     process.execPath,
@@ -2337,7 +2337,7 @@ test('dispatch CLI execute subcommand with --contract computes a distinct assign
     { encoding: 'utf8', cwd: tempDir },
   );
   const parsed2 = JSON.parse(stdout2.trim());
-  assert.equal(parsed2.status, 'done');
+  assert.equal(parsed2.classification.outcome.category, 'ok');
 
   assert.notEqual(parsed2.assignmentId, parsed1.assignmentId, 'a second --contract --work invocation under the same writer must never collide with the first assignmentId');
 
@@ -2615,14 +2615,14 @@ fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ contra
     cwd: tempDir, repoRoot: tempDir,
     runnerConfig: { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, models: { standard: 'test-model' }, timeoutMs: 5000 },
   });
-  assert.equal(result.status, 'failed');
-  assert.equal(result.confidence, 'failed');
+  assert.equal(result.classification.outcome.category, 'policy');
+  assert.equal(result.classification.confidence.level, 'failed');
   // M4 (dispatch-execution-engine architecture review 260920): the claim
   // failed schema validation, so there IS no real worker claim -- agentClaim
   // must be absent, never a runner-fabricated stand-in. The same
   // explanation now lives under runnerNote.
   assert.equal(result.agentClaim, undefined);
-  assert.deepEqual(result.runnerNote, { status: 'failed', summary: 'agent-result.json was present but failed schema validation' });
+  assert.deepEqual(result.runnerNote, { summary: 'agent-result.json was present but failed schema validation' });
 });
 
 test('executeAssignment rejects a legacy failed claim with an object error at the production classification gate', async () => {
@@ -2643,11 +2643,11 @@ fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status
     cwd: tempDir, repoRoot: tempDir,
     runnerConfig: { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, models: { standard: 'test-model' }, timeoutMs: 5000 },
   });
-  assert.equal(result.status, 'failed');
-  assert.equal(result.confidence, 'failed');
+  assert.equal(result.classification.outcome.category, 'policy');
+  assert.equal(result.classification.confidence.level, 'failed');
   // Same M4 rationale as the sibling test above.
   assert.equal(result.agentClaim, undefined);
-  assert.deepEqual(result.runnerNote, { status: 'failed', summary: 'agent-result.json was present but failed schema validation' });
+  assert.deepEqual(result.runnerNote, { summary: 'agent-result.json was present but failed schema validation' });
 });
 
 
@@ -3264,7 +3264,7 @@ test('executeAssignment: a control token that is superseded mid-flight (a freshe
   const supersededResult = JSON.parse(fs.readFileSync(path.join(runDir, 'result.superseded.json'), 'utf8'));
   assert.equal(supersededResult.runId, `run_${assignment.assignmentId}_01`);
   assert.equal(supersededResult.assignmentId, assignment.assignmentId);
-  assert.deepEqual(supersededResult.contract, { id: 'assignment-run-result', version: 2 });
+  assert.deepEqual(supersededResult.contract, { id: 'assignment-run-result', version: 3 });
 });
 
 test('executeAssignment: late superseded writer cannot overwrite authoritative result.json already settled by a newer controller (R5)', async () => {
