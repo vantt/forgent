@@ -44,7 +44,7 @@ T Tier/rigor (agent khác) ──► P1 Lõi thực thi ──► P3a Workflow r
 | Plan | Thư mục | Layer / mối authority phải đóng | Phụ thuộc | Song song với |
 |---|---|---|---|---|
 | T | nhánh `plan/260930-tier-rigor-consolidation` | L5+config: "model mạnh tới đâu" | — | việc lẻ A, B |
-| P1 Lõi thực thi | [p1-execution-core](../261001-0327-request-to-run-p1-execution-core/plan.md) | L5: "ai làm" một `bind()`; một cửa chạy (herdr mặc định); read-only một posture; lõi mới không phụ thuộc L3 | T merge; việc lẻ A+B trước phase nghiệm thu | — |
+| P1 Lõi thực thi | [p1-execution-core](../261001-0327-request-to-run-p1-execution-core/plan.md) | **xong** (2026-10-01) — L5: "ai làm" một `bind()`; một cửa chạy `fgos run` (herdr mặc định); read-only một posture; lõi mới không phụ thuộc L3 | T merge; việc lẻ A+B | — |
 | P3a | [p3 phase 1–2](../261001-0327-request-to-run-p3-workflow-separate-from-work/plan.md) | "tuần tự bước + cổng người" một Workflow runner; tích hợp/merge không phụ thuộc Work | P1 | — |
 | P2 Plan chạy được | [p2-runnable-plans](../261001-0327-request-to-run-p2-runnable-plans/plan.md) | L2→dữ liệu: Unit là hợp đồng duy nhất; driver mỏng trên runner | **P3a** | **P3b** |
 | P3b | [p3 phase 3–6](../261001-0327-request-to-run-p3-workflow-separate-from-work/plan.md) | L3: Work không còn `stage`; L5 hết import L3 | P3a | **P2** |
