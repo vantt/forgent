@@ -1,7 +1,7 @@
 ---
 phase: 4
 title: "Guard từ đã chết, doctor, tài liệu, full suite, merge main"
-status: pending
+status: done
 priority: P1
 effort: "0.5d"
 dependencies: [1, 2, 3]
@@ -57,11 +57,11 @@ Khoá kết quả để các lớp đã xoá không mọc lại. Việc gồm:
 
 ## Success Criteria
 
-- [ ] Guard test chặn đủ từ đã chết; thử thêm lại một từ thì test fail (kiểm bằng tay một lần).
-- [ ] Hai doctor check có test xanh; `fgos doctor` sạch trên project này.
-- [ ] Spec, doctrine, CHANGELOG khớp với code (claim nào cũng trỏ được về file:line thật).
-- [ ] Full suite xanh trên nhánh plan và trên `main` sau merge; `detect_changes` khớp phạm vi.
-- [ ] Worktree và nhánh phase đã dọn.
+- [x] Guard test chặn đủ từ đã chết; thử thêm lại một từ thì test fail (kiểm bằng tay một lần).
+- [x] Hai doctor check có test xanh; `fgos doctor` sạch trên project này.
+- [x] Spec, doctrine, CHANGELOG khớp với code (claim nào cũng trỏ được về file:line thật).
+- [x] Full suite xanh trên nhánh plan và trên `main` sau merge; `detect_changes` khớp phạm vi.
+- [x] Worktree và nhánh phase đã dọn.
 
 ## Risk Assessment
 

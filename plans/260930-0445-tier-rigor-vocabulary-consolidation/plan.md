@@ -1,7 +1,7 @@
 ---
 title: "Gom thang tier/rigor: 2 thang + 1 bảng, xoá mọi lớp chồng"
 description: "rigor (bên cầu) → rigorToTier → tier → modelPolicies[provider][tier]; xoá minTier, minRigor, mode, QUALITY_TIER_BRIDGE, DEFAULT_TIER_TO_POLICY, runner.models, rigorOverrides, PlacementPolicy shadow (readOnlyRedirects dời sang plan follow-on)"
-status: in-progress
+status: done
 priority: P1
 effort: "5-6d"
 tags: [dispatch, coordination, config, simplification]
@@ -95,7 +95,7 @@ Mọi đường dispatch (assignment, coordination, Work runner, `execute` CLI) 
 | 1 | [Một resolver tier→model; xoá cầu nối, rigorOverrides, shadow](./phase-01-single-tier-model-resolver.md) | 1.5d | — | done |
 | 2 | [rigor thay minTier; bảng rigorToTier; xoá quality bridge](./phase-02-rigor-replaces-mintier.md) | 1.5d | 1 | done |
 | 3 | [Work: tách work.tier thành work.size + work.rigor; xoá DEFAULT_TIER_TO_POLICY](./phase-03-work-size-and-rigor.md) | 1.5d | 2 | done |
-| 4 | [Guard từ đã chết, doctor, tài liệu, full suite, merge main](./phase-04-guard-docs-and-main-merge.md) | 0.5d | 1–3 | pending |
+| 4 | [Guard từ đã chết, doctor, tài liệu, full suite, merge main](./phase-04-guard-docs-and-main-merge.md) | 0.5d | 1–3 | done |
 
 Phase read-only cũ đã được dời sang plan follow-on [`260930-1235-readonly-invocation-redesign`](../260930-1235-readonly-invocation-redesign/plan.md) (D17).
 
@@ -103,15 +103,15 @@ Các phase chạy **tuần tự**, vì cùng sửa `assignment-policy.mjs`, `ass
 
 ## Success Criteria
 
-- [ ] Toàn repo (`src/`, `bin/`, `core/`, `domains/`, `.fgos/config.json`, `~/.fgos/config.json`) không còn: `minTier`, `minRigor`, `QUALITY_TIER_BRIDGE`, `QUALITY_MODE_VALUES`, `DEFAULT_TIER_TO_POLICY`, `rigorOverrides`, `runner.models` (khoá `models` dưới `runner`, và `cfg.models` trong code), `PLACEMENT_POLICY_SHADOW`; một test tự động chặn chúng quay lại. `readOnlyRedirects` và phần redirect của `placement-policy.mjs` còn lại, chờ plan follow-on. <!-- Updated: Red Team 2026-09-30 -->
-- [ ] Config không còn `capabilities.*.overrides` (cả `tier`, `model`, `providerModel`, `rigorOverrides`); `capabilities.<cap>.rigor` là sàn duy nhất theo loại việc, có hiệu lực ở cả đường coordination lẫn Work, provenance ghi `rigorSource: capability` (D19).
-- [ ] Đúng **một** hàm map tier → model, và mọi đường dispatch gọi nó.
-- [ ] Mọi assignment ghi provenance `{rigor, rigorSource, tier, tierSource, provider, model, reasoningEffort}` dẫn được về đúng một chuỗi; `reasoningEffort` suy từ `rigor`.
-- [ ] `work.size` không bao giờ dẫn tới model; Work dispatch dùng `work.rigor` (item cũ: `risk: heavy` → `high`, còn lại `standard`); event cũ và snapshot `state.json` cũ đọc ra `size`.
-- [ ] Config chứa khoá đã chết → lỗi validate nêu rõ khoá và cách thay; `fgos doctor` liệt kê được ở cả config project lẫn global.
-- [ ] `fgos doctor` báo provider nào có `modelPolicies` thiếu tier mà `rigorToTier` sinh ra.
-- [ ] `docs/specs/runner.md` có mục quyết định mới; `CHANGELOG.md` `[Unreleased]` có dòng thay đổi config.
-- [ ] Full `npm test` xanh trên nhánh plan (kể cả với HOME trỏ tới global rỗng); merge `--no-ff` về `main`; post-merge suite xanh; gateway đã restart.
+- [x] Toàn repo (`src/`, `bin/`, `core/`, `domains/`, `.fgos/config.json`, `~/.fgos/config.json`) không còn: `minTier`, `minRigor`, `QUALITY_TIER_BRIDGE`, `QUALITY_MODE_VALUES`, `DEFAULT_TIER_TO_POLICY`, `rigorOverrides`, `runner.models` (khoá `models` dưới `runner`, và `cfg.models` trong code), `PLACEMENT_POLICY_SHADOW`; một test tự động chặn chúng quay lại. `readOnlyRedirects` và phần redirect của `placement-policy.mjs` còn lại, chờ plan follow-on. <!-- Updated: Red Team 2026-09-30 -->
+- [x] Config không còn `capabilities.*.overrides` (cả `tier`, `model`, `providerModel`, `rigorOverrides`); `capabilities.<cap>.rigor` là sàn duy nhất theo loại việc, có hiệu lực ở cả đường coordination lẫn Work, provenance ghi `rigorSource: capability` (D19).
+- [x] Đúng **một** hàm map tier → model, và mọi đường dispatch gọi nó.
+- [x] Mọi assignment ghi provenance `{rigor, rigorSource, tier, tierSource, provider, model, reasoningEffort}` dẫn được về đúng một chuỗi; `reasoningEffort` suy từ `rigor`.
+- [x] `work.size` không bao giờ dẫn tới model; Work dispatch dùng `work.rigor` (item cũ: `risk: heavy` → `high`, còn lại `standard`); event cũ và snapshot `state.json` cũ đọc ra `size`.
+- [x] Config chứa khoá đã chết → lỗi validate nêu rõ khoá và cách thay; `fgos doctor` liệt kê được ở cả config project lẫn global.
+- [x] `fgos doctor` báo provider nào có `modelPolicies` thiếu tier mà `rigorToTier` sinh ra.
+- [x] `docs/specs/runner.md` có mục quyết định mới; `CHANGELOG.md` `[Unreleased]` có dòng thay đổi config.
+- [x] Full `npm test` xanh trên nhánh plan (kể cả với HOME trỏ tới global rỗng); merge `--no-ff` về `main`; post-merge suite xanh; gateway đã restart.
 
 ## Câu hỏi mở
 

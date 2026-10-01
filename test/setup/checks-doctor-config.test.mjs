@@ -957,3 +957,114 @@ test('no-stuck-merge-abort check fails and fix reports manual command when MERGE
     fs.rmSync(dir, { recursive: true, force: true });
   }
 });
+
+test('tier-vocabulary-dead-keys check passes on clean config', () => {
+  const dir = mkTemp('checks-tier-dead-clean-');
+  try {
+    fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
+    fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({
+      runner: {
+        rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+        modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', flagship: 'opus', frontier: 'opus' } },
+      },
+    }));
+    const { passed, message } = checkById('tier-vocabulary-dead-keys').check(dir);
+    assert.equal(passed, true);
+    assert.match(message, /no retired tier vocabulary/);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('tier-vocabulary-dead-keys check fails when retired keys are present', () => {
+  const dir = mkTemp('checks-tier-dead-dirty-');
+  try {
+    fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
+    fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({
+      runner: {
+        models: { light: 'haiku' },
+        rigorOverrides: { low: 'standard' },
+        capabilities: {
+          'code:review': { overrides: { tier: 'standard' } },
+        },
+      },
+    }));
+    const { passed, message } = checkById('tier-vocabulary-dead-keys').check(dir);
+    assert.equal(passed, false);
+    assert.match(message, /runner\.models/);
+    assert.match(message, /runner\.rigorOverrides/);
+    assert.match(message, /capabilities\.code:review\.overrides/);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('model-policy-tier-coverage check passes when all needed tiers are covered', () => {
+  const dir = mkTemp('checks-model-coverage-pass-');
+  const fakeHome = mkTemp('fake-home-');
+  try {
+    fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
+    fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({
+      runner: {
+        rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+        executors: {
+          claude: { command: 'claude', providerModel: 'claude' },
+        },
+        modelPolicies: {
+          claude: { nano: 'haiku', standard: 'sonnet', flagship: 'opus', frontier: 'opus' },
+        },
+      },
+    }));
+    withHome(fakeHome, () => {
+      const { passed, message } = checkById('model-policy-tier-coverage').check(dir);
+      assert.equal(passed, true);
+      assert.match(message, /modelPolicies covers all tiers/);
+    });
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+    fs.rmSync(fakeHome, { recursive: true, force: true });
+  }
+});
+
+test('model-policy-tier-coverage check fails when an executor provider lacks tier coverage', () => {
+  const dir = mkTemp('checks-model-coverage-fail-');
+  const fakeHome = mkTemp('fake-home-');
+  try {
+    fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
+    fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({
+      runner: {
+        rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+        executors: {
+          claude: { command: 'claude', providerModel: 'claude' },
+          openai: { command: 'codex', providerModel: 'openai' },
+        },
+        modelPolicies: {
+          claude: { nano: 'haiku', standard: 'sonnet', flagship: 'opus', frontier: 'opus' },
+          openai: { nano: 'gpt-nano' }, // missing standard, flagship, frontier
+        },
+      },
+    }));
+    withHome(fakeHome, () => {
+      const { passed, message } = checkById('model-policy-tier-coverage').check(dir);
+      assert.equal(passed, false);
+      assert.match(message, /openai.*missing model for tier "standard"/);
+    });
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+    fs.rmSync(fakeHome, { recursive: true, force: true });
+  }
+});
+
+test('coordination-protocol-dead-vocabulary check fails when minTier is in protocol YAML', () => {
+  const dir = mkTemp('checks-coord-proto-dead-');
+  try {
+    const protoDir = path.join(dir, '.fgos', 'coordination-protocols');
+    fs.mkdirSync(protoDir, { recursive: true });
+    fs.writeFileSync(path.join(protoDir, 'test-proto.yaml'), 'steps:\n  - id: step1\n    policy:\n      minTier: standard\n');
+    const { passed, message } = checkById('coordination-protocol-dead-vocabulary').check(dir);
+    assert.equal(passed, false);
+    assert.match(message, /minTier/);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});

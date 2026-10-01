@@ -23,7 +23,7 @@ function collectFiles(dir, extensions = ['.js', '.mjs', '.cjs', '.json', '.yaml'
   return results;
 }
 
-test('dead vocabulary guard: Phase 1 & 2 retired symbols do not appear in src, bin, core, domains, scripts', () => {
+test('dead vocabulary guard: Phase 1-3 retired symbols do not appear in src, bin, core, domains, scripts, config, or non-history docs', () => {
   const deadSymbols = [
     'modelForTier',
     'resolvePolicyTierModel',
@@ -44,17 +44,72 @@ test('dead vocabulary guard: Phase 1 & 2 retired symbols do not appear in src, b
   ];
 
   const searchDirs = ['src', 'bin', 'core', 'domains', 'scripts'].map((d) => path.join(REPO_ROOT, d));
-  const files = searchDirs.flatMap((d) => collectFiles(d));
+  const codeFiles = searchDirs.flatMap((d) => collectFiles(d));
+  const configJson = path.join(REPO_ROOT, '.fgos', 'config.json');
+  if (fs.existsSync(configJson)) {
+    codeFiles.push(configJson);
+  }
+
+  const docDirs = [
+    path.join(REPO_ROOT, 'docs', 'specs'),
+    path.join(REPO_ROOT, 'docs', 'platform', 'agent-coordination', 'contracts'),
+    path.join(REPO_ROOT, 'docs', 'architect', 'agent-coordination', 'contracts'),
+  ];
+  const docFiles = docDirs.flatMap((d) => collectFiles(d, ['.md']));
 
   const violations = [];
   const symbolRegexes = deadSymbols.map((sym) => ({ symbol: sym, regex: new RegExp(`\\b${sym}\\b`) }));
 
-  for (const file of files) {
-    const content = fs.readFileSync(file, 'utf8');
+  for (const file of codeFiles) {
+    let content = fs.readFileSync(file, 'utf8');
+    const rel = path.relative(REPO_ROOT, file);
+    if (rel === 'src/setup/registrations.mjs') {
+      // Exclude doctor check functions and registrations that detect dead keys
+      content = content
+        .replace(/export function checkTierVocabularyDeadKeys[\s\S]*?\n\}/, '')
+        .replace(/export function checkCoordinationProtocolDeadVocabulary[\s\S]*?\n\}/, '')
+        .replace(/registerCheck\(\{\s*id:\s*['"]tier-vocabulary-dead-keys['"][\s\S]*?\n\}\);/, '')
+        .replace(/registerCheck\(\{\s*id:\s*['"]coordination-protocol-dead-vocabulary['"][\s\S]*?\n\}\);/, '');
+    }
     for (const { symbol, regex } of symbolRegexes) {
       if (regex.test(content)) {
-        const rel = path.relative(REPO_ROOT, file);
         violations.push(`${rel}: found dead symbol "${symbol}"`);
+      }
+    }
+  }
+
+  for (const file of docFiles) {
+    const lines = fs.readFileSync(file, 'utf8').split('\n');
+    let inHistory = false;
+    let historyLevel = 0;
+    let inRuleBullet = false;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const h = line.match(/^(#{1,6})\s+(.*)$/);
+      if (h) {
+        inRuleBullet = false;
+        const lvl = h[1].length;
+        const title = h[2].toLowerCase();
+        if (inHistory && lvl <= historyLevel) {
+          inHistory = false;
+        }
+        if (!inHistory && (title.includes('lịch sử') || title.includes('decision history') || title.includes('quyết định'))) {
+          inHistory = true;
+          historyLevel = lvl;
+        }
+      }
+      if (line.match(/^\s*-\s*\*\*RUL(69|70|72)\b/)) {
+        inRuleBullet = true;
+      } else if (line.match(/^\s*-\s*\*\*RUL\d+\b/) || line.match(/^#{1,6}\s/)) {
+        inRuleBullet = false;
+      }
+      if (inHistory || inRuleBullet) continue;
+
+      for (const { symbol, regex } of symbolRegexes) {
+        if (regex.test(line)) {
+          const rel = path.relative(REPO_ROOT, file);
+          violations.push(`${rel}:${i + 1}: found dead symbol "${symbol}" outside decision history`);
+        }
       }
     }
   }
