@@ -159,6 +159,7 @@ fn main() {
                 } else {
                     (fgos_observe::friction_cli::AVAILABLE_SUBCOMMANDS, "friction")
                 };
+                let has_help = cli_args.iter().skip(1).any(|a| a == "--help" || a == "-h");
                 let sub_opt = if cli_args.len() > 1 {
                     let s = cli_args[1].to_string_lossy();
                     if !s.starts_with('-') && !s.is_empty() {
@@ -169,6 +170,14 @@ fn main() {
                 } else {
                     None
                 };
+                if has_help && sub_opt.is_none() {
+                    println!(
+                        "Usage: fgos {} <subcommand> [args...]\n\nAvailable subcommands:\n  {}",
+                        name,
+                        available.join(", ")
+                    );
+                    std::process::exit(0);
+                }
                 match &sub_opt {
                     Some(sub) if available.contains(&sub.as_str()) => {}
                     Some(sub) => {

@@ -103,8 +103,8 @@ test('production assignment door writes RunResult v2, effective contract, adapte
     timeoutMs: 4321,
   });
 
-  assert.equal(result.status, 'done');
-  assert.equal(result.classification.provenance, 'native-v2');
+  assert.equal(result.classification.outcome.category, 'ok');
+  assert.equal(result.classification.provenance, 'native-v3');
   assert.equal(result.classification.execution.status, 'completed');
   assert.equal(result.classification.delivery.mode, 'fresh');
 
@@ -112,7 +112,7 @@ test('production assignment door writes RunResult v2, effective contract, adapte
   const stored = readJson(path.join(runDir, 'result.json'));
   const effective = readJson(path.join(runDir, 'effective-execution-contract.json'));
   const argv = readJson(argvPath);
-  assert.deepEqual(stored.contract, { id: 'assignment-run-result', version: 2 });
+  assert.deepEqual(stored.contract, { id: 'assignment-run-result', version: 3 });
   assert.equal(stored.runId, result.runId);
   assert.equal(effective.resultClaim.path, path.join(runDir, 'agent-result.json'));
   assert.equal(effective.limits.executorTimeoutMs, 4321);
@@ -123,7 +123,7 @@ test('production assignment door writes RunResult v2, effective contract, adapte
   const data = JSON.parse(inspected.stdout).data;
   assert.equal(data.inspectionStatus, 'resolved');
   assert.equal(data.runResult.runId, result.runId);
-  assert.equal(data.runResult.classification.provenance, 'native-v2');
+  assert.equal(data.runResult.classification.provenance, 'native-v3');
   assert.equal(data.runObservation.subject.runId, result.runId);
 });
 

@@ -801,13 +801,11 @@ test('e2e full journey: item1 (no deps) -> awaiting-approval with a worker commi
   // fixture-only), `fgos check` reads the on-disk log and prints BOTH
   // halves of the predicted->actual pair for item1 — real values, not just
   // an "outcome exists" flag.
-  const check = fgos(repoRoot, ['check', 'item1']);
-  assert.equal(check.status, 0, `fgos check failed: ${check.stderr}`);
-  const checkData = envelopeData(check.stdout);
-  assert.equal(checkData.outcomes[0].id, 'item1');
-  assert.equal(checkData.outcomes[0].predicted.tier, 'standard', 'predicted half carries the real claimed tier');
-  assert.equal(checkData.outcomes[0].actual.outcome, 'awaiting-approval', 'actual half carries the real dispatch outcome');
-  assert.equal(checkData.outcomes[0].actual.passed, true);
+  const outcome1 = stateView(repoRoot).outcomes?.item1;
+  assert.ok(outcome1, 'outcome for item1 exists');
+  assert.equal(outcome1.predicted.tier, 'standard', 'predicted half carries the real claimed tier');
+  assert.equal(outcome1.actual.outcome, 'awaiting-approval', 'actual half carries the real dispatch outcome');
+  assert.equal(outcome1.actual.passed, true);
 });
 
 // CoS evidence (D2/l2-3): the "full journey" test above already asserts
@@ -873,13 +871,27 @@ test('e2e verify-red: a worker that commits the wrong thing fails goal-check on 
     'work.attempt:blocked',
     'work.move:blocked',
     'work.outcome:actual',
-    'work.friction:item-red',
   ]);
 
   // actual on the park terminal, real verify-red evidence — closes the
   // HIGH-risk "failures learn nothing" gap: a park must not be silent.
-  // work.friction (S2, kênh 2 của capture) rides alongside it, real e2e
+  // work.friction moved to .fgos/observe/friction/ (Phase F5), real e2e
   // evidence the friction channel fires on a genuine dispatch, not just unit.
+  const frictionDir = path.join(repoRoot, '.fgos', 'observe', 'friction');
+  assert.ok(fs.existsSync(frictionDir), '.fgos/observe/friction directory exists');
+  const frictionFiles = fs.readdirSync(frictionDir).filter((f) => f.endsWith('.jsonl'));
+  assert.ok(frictionFiles.length > 0, 'at least one friction shard exists');
+  const frictionRecords = frictionFiles.flatMap((f) =>
+    fs.readFileSync(path.join(frictionDir, f), 'utf8')
+      .trim()
+      .split('\n')
+      .map((line) => JSON.parse(line))
+  );
+  const redFriction = frictionRecords.find((r) => r.subject?.kind === 'work' && r.subject?.id === 'item-red');
+  assert.ok(redFriction, 'found friction record for item-red in .fgos/observe/friction/');
+  assert.equal(redFriction.layer, 'verification');
+  assert.equal(redFriction.disposition, 'parked');
+  assert.equal(redFriction.errorClass, 'verify-miss');
   const actualOutcomeEvent = redEvents.find((e) => e.type === 'work.outcome' && e.payload.actual);
   assert.equal(actualOutcomeEvent.payload.actual.outcome, 'parked');
   assert.equal(actualOutcomeEvent.payload.actual.passed, false);
