@@ -38,6 +38,11 @@ pub fn dispatch(
         "outcomes" => outcomes::dispatch_outcomes(req, work_source),
         "entropy" => entropy::dispatch_entropy(req, work_source),
         "snapshot" => snapshot::dispatch_snapshot(req, work_source),
+        "--help" | "-h" | "help" => Ok(json!({
+            "ok": true,
+            "command": "metrics",
+            "available_subcommands": AVAILABLE_SUBCOMMANDS,
+        })),
         other => Err(format!(
             "unknown metrics subcommand \"{}\". Available: {}",
             other,
