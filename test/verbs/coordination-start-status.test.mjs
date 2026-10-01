@@ -33,7 +33,8 @@ function makeTempCtx() {
   fs.writeFileSync(configFile, JSON.stringify({
     runner: {
       executor: { allowCrossProvider: true, command: process.execPath, args: [fakeExec, '{prompt}'] },
-      models: { standard: 'test-model', nano: 'test-model' },
+      modelPolicies: { claude: { nano: 'test-model', standard: 'test-model' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 20000,
     },
   }, null, 2));

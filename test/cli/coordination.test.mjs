@@ -62,7 +62,8 @@ function writeFakeExecutorConfig(cwd) {
     runner: {
       ...(existing.runner ?? {}),
       executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-      models: { standard: 'test-model', nano: 'test-model' },
+      modelPolicies: { claude: { nano: 'test-model', standard: 'test-model', flagship: 'test-model', frontier: 'test-model' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 20000,
     },
   };
@@ -112,7 +113,8 @@ function writeCwdMarkerExecutorConfig(repoRootDir, assignmentsRoot) {
     runner: {
       ...(existing.runner ?? {}),
       executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-      models: { standard: 'test-model', nano: 'test-model' },
+      modelPolicies: { claude: { nano: 'test-model', standard: 'test-model', flagship: 'test-model', frontier: 'test-model' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 20000,
     },
   };

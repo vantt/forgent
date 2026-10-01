@@ -139,7 +139,7 @@ test('enrichAndValidateContract preserves contract.supports on the returned (enr
 test('enrichAndValidateContract writes the matched operation\'s own declared policy hints (validate-plan: reviewer/code-reviewer/claude/standard)', () => {
   const { policy } = enrichAndValidateContract(validContract(), { domain: 'coding', work: planningWork() });
   assert.deepEqual(policy, {
-    minTier: 'standard',
+    rigor: 'standard',
     preferPersona: 'code-reviewer',
     preferExecutor: 'claude',
   });
@@ -196,8 +196,8 @@ test('mergeHarnessPolicy returns undefined when neither side has anything to con
 });
 
 test('mergeHarnessPolicy merges opPolicy and callerPolicy, caller wins on overlapping keys', () => {
-  const merged = mergeHarnessPolicy({ minTier: 'standard', preferExecutor: 'claude' }, { preferExecutor: 'pi' });
-  assert.deepEqual(merged, { minTier: 'standard', preferExecutor: 'pi' });
+  const merged = mergeHarnessPolicy({ rigor: 'standard', preferExecutor: 'claude' }, { preferExecutor: 'pi' });
+  assert.deepEqual(merged, { rigor: 'standard', preferExecutor: 'pi' });
   assert.ok(Object.isFrozen(merged));
 });
 

@@ -146,7 +146,8 @@ test('cross-provider redirect without explicit opt-in fails closed BEFORE worker
         allowCrossProvider: true,
       },
     },
-    models: { standard: 'test-model' },
+    modelPolicies: { claude: { standard: 'test-model' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
   };
 
   const work = { id: 'tsk-xprovider-probe', status: 'todo', stage: 'planning', domain: 'coding' };
@@ -216,11 +217,11 @@ test('approved redirect records full immutable provenance in dispatch-plan.json'
         allowCrossProvider: true,
       },
     },
-    models: { standard: 'test-model' },
     modelPolicies: {
       claude: { standard: 'claude-3-5-sonnet' },
       'openai-codex': { standard: 'gpt-4o' },
     },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
   };
 
   const work = { id: 'tsk-provenance-probe', status: 'todo', stage: 'planning', domain: 'coding' };
@@ -417,7 +418,8 @@ test('provider-family warning suppresses for all-non-CLI and warns for bare unve
     const cfgA = path.join(tmp, 'cfgA.json');
     fs.writeFileSync(cfgA, JSON.stringify({
       executor: baseExecutor,
-      models: { standard: 'test-model' },
+      modelPolicies: { claude: { standard: 'test-model' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 5000,
       executors: {
         'mcp-executor': {
@@ -433,7 +435,8 @@ test('provider-family warning suppresses for all-non-CLI and warns for bare unve
     const cfgB = path.join(tmp, 'cfgB.json');
     fs.writeFileSync(cfgB, JSON.stringify({
       executor: baseExecutor,
-      models: { standard: 'test-model' },
+      modelPolicies: { claude: { standard: 'test-model' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 5000,
       executors: {
         'unrecognized-cli-executor': {
@@ -453,7 +456,8 @@ test('provider-family warning suppresses for all-non-CLI and warns for bare unve
     const cfgC = path.join(tmp, 'cfgC.json');
     fs.writeFileSync(cfgC, JSON.stringify({
       executor: baseExecutor,
-      models: { standard: 'test-model' },
+      modelPolicies: { claude: { standard: 'test-model' }, 'custom-provider': { standard: 'test-model' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 5000,
       executors: {
         'explicit-executor': {

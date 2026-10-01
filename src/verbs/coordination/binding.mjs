@@ -17,9 +17,9 @@
 //      `resolveExecutorAndOverrides` (dispatch/resolve.mjs) a real dispatch
 //      re-resolves at execution time -- never a second, independently
 //      drifting capability-lookup.
-//   3/4. `policy.minTier` (raise-only) and `placementPolicy.readOnlyRedirects`
+//   3/4. `policy.rigor` (raise-only) and `placementPolicy.readOnlyRedirects`
 //      are NOT computed here -- both already apply at their own existing
-//      scopes (the operation's own portable `policy.minTier`, and the
+//      scopes (the operation's own portable `policy.rigor`, and the
 //      read-only-redirect gate inside `assignment-runner.mjs`) whenever this
 //      module leaves `cliPolicy` empty for an actor, so they remain the
 //      safety net underneath an unbound actor exactly as they do today.
@@ -33,6 +33,8 @@
 import { buildCandidateInventory } from '../../runner/coordination/cohort-planner.mjs';
 import { resolveExecutorAndOverrides } from '../../runner/dispatch/resolve.mjs';
 import { RunnerConfigError } from '../../runner/dispatch/config.mjs';
+import { deriveOperationCapability } from '../../runner/operation-capability.mjs';
+export { deriveOperationCapability } from '../../runner/operation-capability.mjs';
 
 export class BindingError extends Error {
   constructor(category, message) {
@@ -73,40 +75,6 @@ function discoverFirstActorBindings(definition) {
   return out;
 }
 
-/**
- * Derive the operation's canonical dispatch capability name (Decision 2).
- * Declared `policy.capability` always wins. Absent that: `result.kind:
- * "work-product"` falls back to the caller's own declared
- * `facts.primaryCapability` (the calling facade's own primary capability --
- * e.g. "code:implement" for the coding facade); `"advisory"`/`"gate-verdict"`/
- * undeclared falls back to `"<facts.domain>:review"` when that name is
- * actually registered in `runnerConfig.capabilities`, else the generic
- * `"review"` slot. No config mapping table (Decision 2) -- this derivation
- * is the ONLY place that fallback lives.
- *
- * @returns {{name: string, source: string}|{name: null, source: 'unbound'}}
- */
-export function deriveOperationCapability(operation, facts = {}, runnerConfig) {
-  const declared = operation.policy?.capability;
-  if (declared !== undefined) {
-    return { name: declared, source: 'declared' };
-  }
-  if (operation.result?.kind === 'work-product') {
-    if (facts.primaryCapability) {
-      return { name: facts.primaryCapability, source: 'facade-primary' };
-    }
-    return { name: null, source: 'unbound' };
-  }
-  // advisory | gate-verdict | undeclared: <domain>:review when registered,
-  // else the generic "review" slot every runner config carries
-  // (`capability-serves-valid` doctor check requires it present).
-  const capabilities = runnerConfig?.capabilities;
-  const domainCapability = facts.domain ? `${facts.domain}:review` : undefined;
-  if (domainCapability && capabilities && typeof capabilities === 'object' && capabilities[domainCapability]) {
-    return { name: domainCapability, source: 'domain-review-fallback' };
-  }
-  return { name: 'review', source: 'generic-review-fallback' };
-}
 
 /**
  * Resolve `policy.distinctProviderFrom` (Decision 3) against the provider
@@ -221,7 +189,7 @@ export function bindOperations(definition, request = {}, runnerConfig, facts = {
         cliPolicy: Object.freeze({}),
         providerFamily: null,
         diversity: null,
-        explanation: `actor "${actorId}" (operation "${operationId}", result.kind "${operation.result?.kind ?? 'undeclared'}"): no policy.capability declared and no facts.primaryCapability supplied to derive a work-product fallback -- leaving this actor unbound (minTier/readOnlyRedirects remain the safety net)`,
+        explanation: `actor "${actorId}" (operation "${operationId}", result.kind "${operation.result?.kind ?? 'undeclared'}"): no policy.capability declared and no facts.primaryCapability supplied to derive a work-product fallback -- leaving this actor unbound (rigor/readOnlyRedirects remain the safety net)`,
       }));
       continue;
     }
@@ -263,7 +231,7 @@ export function bindOperations(definition, request = {}, runnerConfig, facts = {
     //      the `readOnlyRedirects` safety net instead (H4, red-team round 2).
     // Only branch 2 counts as a genuine capability resolution; branches 1
     // and 3 are refused the same way `!resolved.configured` already is --
-    // fall through to "unbound" so minTier/readOnlyRedirects remain the
+    // fall through to "unbound" so rigor/readOnlyRedirects remain the
     // safety net, never thrown.
     if (!resolved.configured || resolved.bindingSource !== 'capability.prefer') {
       bindings.push(Object.freeze({

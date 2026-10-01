@@ -46,7 +46,7 @@
 #     each participant's private ranking is informed by what was shared and
 #     clarified, never by a raw, unmediated read of the other proposals.
 #
-# Per-actor policy: `spec.actors[].policy.minTier` differs by role
+# Per-actor policy: `spec.actors[].policy.rigor` differs by role
 # (facilitator: standard, participant: nano) -- a real per-actor
 # REQUIREMENT declared in this portable definition. A literal
 # `preferExecutor` pin is deliberately NOT declared here:
@@ -112,25 +112,25 @@ spec:
     - id: facilitator-actor
       role: facilitator
       policy:
-        minTier: standard
+        rigor: standard
     - id: participant-a
       role: participant
       policy:
-        minTier: nano
+        rigor: low
     - id: participant-b
       role: participant
       policy:
-        minTier: nano
+        rigor: low
     - id: participant-c
       role: participant
       policy:
-        minTier: nano
+        rigor: low
 
   operations:
     - id: private-propose
       role: participant
       policy:
-        minTier: nano
+        rigor: low
       task:
         contractTemplate: nominal-group-lite-private-propose
       result:
@@ -141,7 +141,7 @@ spec:
     - id: share
       role: facilitator
       policy:
-        minTier: standard
+        rigor: standard
       task:
         contractTemplate: nominal-group-lite-share
       result:
@@ -150,7 +150,7 @@ spec:
     - id: clarify
       role: facilitator
       policy:
-        minTier: standard
+        rigor: standard
       task:
         contractTemplate: nominal-group-lite-clarify
       result:
@@ -161,7 +161,7 @@ spec:
     - id: private-rank
       role: participant
       policy:
-        minTier: nano
+        rigor: low
       task:
         contractTemplate: nominal-group-lite-private-rank
       result:

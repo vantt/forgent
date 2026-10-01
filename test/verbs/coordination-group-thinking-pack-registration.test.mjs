@@ -93,8 +93,8 @@ function readEventTypes(tempDir, coordinationId) {
  *  stub, that settles every not-yet-settled Run under `.fgos/assignments/`
  *  with a fixed report and a "done" result. Passed via `ctx.runnerConfig`
  *  (not a `.fgos/config.json` file) specifically because it carries a
- *  `critical` tier entry -- RFC-Review-Lite's objector actors declare
- *  `policy.minTier: critical`, exactly as P10.2's own proof does. */
+ *  `critical` rigor entry -- RFC-Review-Lite's objector actors declare
+ *  `policy.rigor: critical`, exactly as P10.2's own proof does. */
 function fakeRunnerConfig(tempDir) {
   const executorScript = path.join(tempDir, `fake-executor-${Math.random().toString(36).slice(2)}.mjs`);
   fs.writeFileSync(

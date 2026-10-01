@@ -17,7 +17,7 @@
 // committed (per D2's durability policy) so it is reviewable like any other
 // source file, but that also means it carries the same trust level as code:
 // only apply it from a checkout you already trust.
-
+import { RIGOR_VALUES } from '../rigor.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { TIERS } from '../../state/work.mjs';
@@ -175,6 +175,13 @@ export function detectAssistantCli(candidateNames = KNOWN_ASSISTANT_CLI_NAMES, p
  */
 export const DEFAULT_COORDINATION_ORG_DISCHARGE_ON = Object.freeze(["accepted"]);
 
+export const DEFAULT_RIGOR_TO_TIER = Object.freeze({
+  low: 'nano',
+  standard: 'standard',
+  high: 'flagship',
+  critical: 'frontier',
+});
+
 export const DEFAULT_RUNNER_CONFIG = {
   coordination: { orgPolicy: { dischargeOn: [...DEFAULT_COORDINATION_ORG_DISCHARGE_ON] } },
   executor: {
@@ -208,6 +215,7 @@ export const DEFAULT_RUNNER_CONFIG = {
       frontier: 'opus',
     },
   },
+  rigorToTier: { ...DEFAULT_RIGOR_TO_TIER },
   timeoutMs: 900000,
   confinement: {
     strict: false,
@@ -1210,12 +1218,6 @@ function validatePlacementPolicyShape(placementPolicy, label) {
  * spelling/casing variance of the SAME name, not a genuinely different
  * alias name).
  */
-// Only 4 fields are ever eligible for capabilities.<name>.overrides (D2,
-// docs/history/capability-capacity-remodel/CONTEXT.md): a capability can
-// retune HOW strongly its resolved executor works, never WHAT command
-// actually runs -- command/args/adapter/invocations stay owned by the
-// executor alone, never override-able from a capability.
-const CAPABILITY_OVERRIDE_FIELDS = Object.freeze(['tier', 'model']);
 
 // `serves` (I19, core/skills/_shared/capability-matching.md's Q1 steering
 // step): a capability entry's own machine-readable demand promise, checked
@@ -1276,36 +1278,21 @@ function validateCapabilitiesShape(capabilities, label) {
       normalizePreferCandidates(entry.prefer, `${entryLabel} "prefer"`);
     }
     if (entry.overrides !== undefined) {
-      if (!entry.overrides || typeof entry.overrides !== 'object' || Array.isArray(entry.overrides)) {
-        throw new RunnerConfigError(`runner config (${entryLabel}) "overrides" must be an object when present.`);
-      }
-      for (const key of Object.keys(entry.overrides)) {
-        const RETIRED_RIGOR_OVERRIDES = ['rigor', 'Overrides'].join('');
-        if (key === RETIRED_RIGOR_OVERRIDES) {
-          throw new RunnerConfigError(
-            `${entryLabel}.overrides.${RETIRED_RIGOR_OVERRIDES} was removed; express per-tier models in runner.modelPolicies.${entry.overrides?.providerModel || 'provider'}.`,
-          );
-        }
-        if (key === 'providerModel') {
-          throw new RunnerConfigError(
-            `${entryLabel}.overrides.providerModel was removed; provider belongs on executors.<id>.providerModel.`,
-          );
-        }
-        if (!CAPABILITY_OVERRIDE_FIELDS.includes(key)) {
-          throw new RunnerConfigError(`runner config (${entryLabel}) "overrides" key "${key}" is not one of ${CAPABILITY_OVERRIDE_FIELDS.join('/')} — command/args/adapter/invocations are never override-able from a capability (D2).`);
-        }
-      }
-      if (entry.overrides.tier !== undefined && (typeof entry.overrides.tier !== 'string' || !entry.overrides.tier.trim())) {
-        throw new RunnerConfigError(`runner config (${entryLabel}) "overrides.tier" must be a non-empty string when present.`);
-      }
-      if (entry.overrides.model !== undefined && (typeof entry.overrides.model !== 'string' || !entry.overrides.model.trim())) {
-        throw new RunnerConfigError(`runner config (${entryLabel}) "overrides.model" must be a non-empty string when present.`);
+      throw new RunnerConfigError(
+        `capabilities.${name}.overrides was removed; use "capabilities.${name}.rigor" for floor rigor or configure executors directly.`,
+      );
+    }
+    if (entry.rigor !== undefined) {
+      if (!RIGOR_VALUES.includes(entry.rigor)) {
+        throw new RunnerConfigError(
+          `runner config (${entryLabel}) "rigor" must be one of ${RIGOR_VALUES.join('/')}, got: ${JSON.stringify(entry.rigor)}.`,
+        );
       }
     }
     if (entry.serves !== undefined) {
       validateCapabilityServesShape(entry.serves, `${entryLabel}.serves`);
     }
-    const ALLOWED_CAPABILITY_ENTRY_KEYS = ['description', 'aliases', 'prefer', 'overrides', 'confinement', 'serves'];
+    const ALLOWED_CAPABILITY_ENTRY_KEYS = ['description', 'aliases', 'prefer', 'rigor', 'confinement', 'serves'];
     for (const key of Object.keys(entry)) {
       if (!ALLOWED_CAPABILITY_ENTRY_KEYS.includes(key)) {
         if (key === 'unconfined') {
@@ -1350,6 +1337,36 @@ function validateModelPoliciesShape(modelPolicies, label) {
       if (typeof model !== 'string' || !model.trim()) {
         throw new RunnerConfigError(`runner config (${label}.${providerModel}.${policyTier}) must be a non-empty string.`);
       }
+    }
+  }
+}
+
+function validateRigorToTierShape(rigorToTier, label) {
+  const missingRigors = RIGOR_VALUES.filter((rigor) => rigorToTier[rigor] === undefined);
+  if (missingRigors.length > 0) {
+    throw new RunnerConfigError(
+      `runner config (${label}) must map every rigor (${RIGOR_VALUES.join('/')}); missing: ${missingRigors.join(', ')}.`,
+    );
+  }
+  for (const [rigor, tier] of Object.entries(rigorToTier)) {
+    if (!RIGOR_VALUES.includes(rigor)) {
+      throw new RunnerConfigError(
+        `runner config (${label}) has unknown rigor "${rigor}". Valid rigors: ${RIGOR_VALUES.join('/')}.`,
+      );
+    }
+    if (!MODEL_POLICY_TIERS.includes(tier)) {
+      throw new RunnerConfigError(
+        `runner config (${label}.${rigor}) must map to one of ${MODEL_POLICY_TIERS.join('/')}, got: ${JSON.stringify(tier)}.`,
+      );
+    }
+  }
+  for (let i = 1; i < RIGOR_VALUES.length; i += 1) {
+    const weakerRigor = RIGOR_VALUES[i - 1];
+    const strongerRigor = RIGOR_VALUES[i];
+    if (MODEL_POLICY_TIERS.indexOf(rigorToTier[strongerRigor]) < MODEL_POLICY_TIERS.indexOf(rigorToTier[weakerRigor])) {
+      throw new RunnerConfigError(
+        `runner config (${label}) lowers tier from rigor "${weakerRigor}" (${rigorToTier[weakerRigor]}) to "${strongerRigor}" (${rigorToTier[strongerRigor]}); rigorToTier must be monotonic.`,
+      );
     }
   }
 }
@@ -1465,6 +1482,12 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
     );
   }
   validateModelPoliciesShape(cfg.modelPolicies, `${sourceLabel} modelPolicies`);
+  if (!cfg.rigorToTier || typeof cfg.rigorToTier !== 'object' || Array.isArray(cfg.rigorToTier)) {
+    throw new RunnerConfigError(
+      `runner config (${sourceLabel}) must declare a "rigorToTier" object mapping rigor -> tier.`,
+    );
+  }
+  validateRigorToTierShape(cfg.rigorToTier, `${sourceLabel} rigorToTier`);
   validateProviderAccountInventory(cfg, sourceLabel);
   if (typeof cfg.timeoutMs !== 'number' || !Number.isFinite(cfg.timeoutMs) || cfg.timeoutMs <= 0) {
     throw new RunnerConfigError(`runner config (${sourceLabel}) must declare a positive numeric "timeoutMs".`);

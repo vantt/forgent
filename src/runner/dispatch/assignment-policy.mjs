@@ -18,16 +18,15 @@
 // composed a full scoped policy stack upstream (runner/definition/operation/
 // role/actor/assignment/cli -- coordination/session-engine.mjs's
 // `dispatchDeclaredOperation`) record which scope actually won, instead of
-// this resolver's own generic `{scope: 'cliOverride'}` label. Purely
-// additive: `policyProvenance` is undefined for every pre-existing caller,
-// so their persisted provenance is byte-identical to before this field was
-// added.
+// this resolver's own generic `{scope: 'cliOverride'}` label. Existing callers
+// omit `policyProvenance`, so the field is purely additive.
 
-import { MODEL_POLICY_TIERS, RunnerConfigError, REASONING_EFFORT_VALUES } from './config.mjs';
+import { MODEL_POLICY_TIERS, RunnerConfigError, REASONING_EFFORT_VALUES, DEFAULT_RIGOR_TO_TIER, DEFAULT_TIER_TO_POLICY } from './config.mjs';
 import { resolveTierModel, deriveProviderFamily } from './resolve.mjs';
 import { REPEAT_MODE_VALUES } from '../definitions/schema.mjs';
 import { checkProviderDisallowed } from './provider-adapter.mjs';
-
+import { RIGOR_VALUES, RIGOR_RANK, resolveStrongerRigor } from '../rigor.mjs';
+import { deriveOperationCapability } from '../operation-capability.mjs';
 export const TIER_STRENGTH = Object.freeze({
   nano: 1,
   mini: 2,
@@ -37,52 +36,18 @@ export const TIER_STRENGTH = Object.freeze({
   frontier: 6,
 });
 
-// Phase 04 (executor-policy-dispatch-seams) — canonical quality axes.
-// `minRigor` is ordinal (raise-only applies here, nowhere else); `mode` is
-// nominal (design.md §3.2/§4). These are separate from `TIER_STRENGTH`'s
-// legacy 6-tier vocabulary above, which stays the compatibility key for the
-// live `modelPolicies` catalog until PlacementPolicy/model calibration has
-// enough shadow proof to re-key safely (design.md §5.1/§8, phase-04.md
-// "Catalog decision").
-export const MIN_RIGOR_VALUES = Object.freeze(['low', 'standard', 'high', 'critical']);
-const MIN_RIGOR_RANK = new Map(MIN_RIGOR_VALUES.map((rigor, index) => [rigor, index]));
 
-export const QUALITY_MODE_VALUES = Object.freeze(['balanced', 'creative', 'analytical', 'adversarial']);
+export { RIGOR_VALUES, RIGOR_RANK };
 
-// Legacy tier -> canonical quality bridge (phase-04-quality-bridge.md
-// "Legacy bridge" table). Bridge mode sourceKind is always
-// `implied-by-tier-bridge` — the weakest of the three sourceKinds in the
-// `explicit > implied-by-persona > implied-by-tier-bridge` precedence
-// (design.md §3.2). `implied-by-persona` has no producer yet (persona ->
-// mode is a later-phase PromptEnvelope/persona-registry concern) and is
-// intentionally never selected by this resolver today. `mini` bridges to
-// the same `{minRigor: 'low', mode: 'balanced'}` as `nano` — `MIN_RIGOR_VALUES`
-// only has 4 discrete rungs (low/standard/high/critical) for 6 model tiers,
-// and `mini` sits closer to `nano` (small/cheap model class) than to
-// `standard` on every provider's own mapping (design.md's provider table).
-// Every one of the 6 `MODEL_POLICY_TIERS` MUST resolve here: `resolveAssignmentDispatchPolicy`
-// reads `derivedQuality.mode`/`derivedQuality.minRigor` unconditionally below,
-// so a missing key here would throw a raw TypeError instead of a clean
-// RunnerConfigError.
-export const QUALITY_TIER_BRIDGE = Object.freeze({
-  nano: Object.freeze({ minRigor: 'low', mode: 'balanced' }),
-  mini: Object.freeze({ minRigor: 'low', mode: 'balanced' }),
-  standard: Object.freeze({ minRigor: 'standard', mode: 'balanced' }),
-  advanced: Object.freeze({ minRigor: 'standard', mode: 'creative' }),
-  flagship: Object.freeze({ minRigor: 'high', mode: 'analytical' }),
-  frontier: Object.freeze({ minRigor: 'critical', mode: 'analytical' }),
-});
-
-// Phase 03 (executor-policy-dispatch-seams) — canonical reasoningEffort
-// (design.md §3.3). Most-specific-wins, unlike minRigor's raise-only rule
-// (design.md §4 field rules table). Definition moved to config.mjs (Phase C,
+// Phase 03 (executor-policy-dispatch-seams) — canonical reasoningEffort.
+// Most-specific-wins (design.md §4 field rules table).
 // executor-profile-schema-migration) so `validateExecutorEntryShape`'s new
 // `supports.reasoningEffort` check can reuse the exact same vocabulary
 // without a config.mjs -> assignment-policy.mjs -> config.mjs import cycle;
 // re-exported here unchanged so every existing caller of this module keeps
 // working byte-identically.
 export { REASONING_EFFORT_VALUES };
-const REASONING_EFFORT_DEFAULT_FROM_MIN_RIGOR = Object.freeze({
+export const REASONING_EFFORT_DEFAULT_FROM_RIGOR = Object.freeze({
   low: 'low',
   standard: 'medium',
   high: 'high',
@@ -109,15 +74,14 @@ const REASONING_EFFORT_DEFAULT_FROM_MIN_RIGOR = Object.freeze({
  * @returns {string}
  */
 export function resolveStrongerTier(tierA, tierB) {
-  if (!tierA && !tierB) return 'standard';
-  if (!tierA) return tierB;
-  if (!tierB) return tierA;
-
-  const strengthA = TIER_STRENGTH[tierA] ?? 0;
-  const strengthB = TIER_STRENGTH[tierB] ?? 0;
-
-  if (strengthA === 0 && strengthB === 0) return tierA;
-  return strengthB > strengthA ? tierB : tierA;
+  for (const value of [tierA, tierB]) {
+    if (value !== undefined && value !== null && !MODEL_POLICY_TIERS.includes(value)) {
+      throw new RunnerConfigError(`invalid tier "${value}". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);
+    }
+  }
+  if (tierA === undefined || tierA === null) return tierB ?? 'standard';
+  if (tierB === undefined || tierB === null) return tierA;
+  return TIER_STRENGTH[tierB] > TIER_STRENGTH[tierA] ? tierB : tierA;
 }
 
 /**
@@ -232,59 +196,147 @@ export function resolveAssignmentDispatchPolicy({
     throw new RunnerConfigError('resolveAssignmentDispatchPolicy requires an assignment object');
   }
 
-  const opPolicy = assignment.policy || {};
+  const opPolicy = assignment.policy === undefined ? {} : assignment.policy;
+  if (!opPolicy || typeof opPolicy !== 'object' || Array.isArray(opPolicy)) {
+    throw new RunnerConfigError('assignment.policy must be an object when provided');
+  }
+  const retiredMinTier = ['min', 'Tier'].join('');
+  if (Object.prototype.hasOwnProperty.call(opPolicy, retiredMinTier)) {
+    throw new RunnerConfigError(`assignment policy field "${retiredMinTier}" was removed; normalize persisted assignments at the load boundary or use "rigor"/"tier"`);
+  }
+  if (opPolicy._fromYaml && opPolicy.tier !== undefined) {
+    throw new RunnerConfigError('workflow YAML cannot set explicit tier; use rigor, or set tier at actor/assignment/CLI scope');
+  }
 
   // Reject literal model in operation policy if it was not explicitly stamped as assignment-level
   if (opPolicy.model && !assignment._allowLiteralModel && !cliOverride.model) {
     // If model comes from declared operation YAML, it is prohibited
     if (opPolicy._fromYaml) {
-      throw new RunnerConfigError('workflow YAML cannot pin literal model names; use minTier or persona');
+      throw new RunnerConfigError('workflow YAML cannot pin literal model names; use rigor or persona');
     }
   }
 
   const opId = assignment.operation;
   const strength = (t) => TIER_STRENGTH[t] ?? 0;
+  const rigorToTier = runnerConfig?.rigorToTier ?? runnerConfig?.runner?.rigorToTier ?? DEFAULT_RIGOR_TO_TIER;
+  const rigorStrength = (r) => RIGOR_RANK[r] ?? 0;
 
-  // 1. Tier Resolution (monotonicity: highest required tier wins)
-  let effectiveTier = opPolicy.minTier || 'standard';
-  let tierSource = opPolicy.minTier ? { scope: 'opPolicy', id: opId } : { scope: 'default' };
-
-  // Work item tier / risk policy
+  // 1. Rigor Resolution (demand side, monotonic: highest explicit
+  // requirement wins; the implicit standard is only a final fallback).
+  if (opPolicy.rigor !== undefined && !RIGOR_VALUES.includes(opPolicy.rigor)) {
+    throw new RunnerConfigError(`invalid operation rigor "${opPolicy.rigor}". Valid rigors: [${RIGOR_VALUES.join(', ')}]`);
+  }
+  let effectiveRigor = opPolicy.rigor ?? 'standard';
+  let rigorSource = opPolicy.rigor !== undefined ? { scope: 'opPolicy', id: opId } : { scope: 'default' };
+  // The implicit standard is a fallback, not a floor. The first explicit
+  // source may therefore select low; only later explicit sources are
+  // monotonic raise-only.
   if (work) {
-    if (work.tier && MODEL_POLICY_TIERS.includes(work.tier)) {
-      if (strength(work.tier) > strength(effectiveTier)) tierSource = { scope: 'work', id: work.id };
-      effectiveTier = resolveStrongerTier(effectiveTier, work.tier);
+    if (work.rigor !== undefined) {
+      if (!RIGOR_VALUES.includes(work.rigor)) {
+        throw new RunnerConfigError(`invalid work rigor "${work.rigor}". Valid rigors: [${RIGOR_VALUES.join(', ')}]`);
+      }
+      if (rigorSource.scope === 'default' || rigorStrength(work.rigor) > rigorStrength(effectiveRigor)) {
+        effectiveRigor = rigorSource.scope === 'default' ? work.rigor : resolveStrongerRigor(effectiveRigor, work.rigor);
+        rigorSource = { scope: 'work', id: work.id };
+      }
     } else if (work.risk === 'heavy') {
-      // High-risk work raises floor to at least standard or flagship
-      if (strength('flagship') > strength(effectiveTier)) tierSource = { scope: 'work', id: work.id };
-      effectiveTier = resolveStrongerTier(effectiveTier, 'flagship');
+      // D18: work.risk: heavy of item without rigor is read as rigor: high
+      if (rigorStrength('high') > rigorStrength(effectiveRigor)) {
+        rigorSource = { scope: 'work', id: work.id };
+        effectiveRigor = resolveStrongerRigor(effectiveRigor, 'high');
+      }
     }
   }
 
-  // CLI override tier
-  const cliTier = cliOverride.tier || cliOverride.minTier;
-  if (cliTier) {
-    if (!MODEL_POLICY_TIERS.includes(cliTier)) {
-      throw new RunnerConfigError(`invalid override tier "${cliTier}". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);
+  // Capability floor (D19). Declared capability wins. For assignments built
+  // from operations without policy.capability, reuse the canonical derivation
+  // shared with coordination binding; never import the verb layer here.
+  const derivedCapability = deriveOperationCapability(
+    { id: assignment.operation, policy: opPolicy, result: assignment.result ?? { kind: assignment.resultKind } },
+    { domain: work?.domain, primaryCapability: assignment.primaryCapability },
+    runnerConfig,
+  );
+  const targetCap = opPolicy.capability ?? assignment.capability ?? derivedCapability.name;
+  if (targetCap && runnerConfig?.capabilities?.[targetCap]?.rigor !== undefined) {
+    const capRigor = runnerConfig.capabilities[targetCap].rigor;
+    if (!RIGOR_VALUES.includes(capRigor)) {
+      throw new RunnerConfigError(`invalid capability rigor "${capRigor}" for "${targetCap}". Valid rigors: [${RIGOR_VALUES.join(', ')}]`);
     }
-    // Step 08 R3: a caller that has already composed a full scoped policy
-    // stack (runner/definition/operation/role/actor/assignment/cli, e.g. a
-    // declared CoordinationProtocol materialization) may name the ACTUAL
-    // winning scope via `cliOverride.policyProvenance.tier` instead of the
-    // generic `{scope: 'cliOverride'}` this resolver would otherwise stamp
-    // for every value it receives through this one channel -- additive only:
-    // `policyProvenance` is undefined for every pre-existing caller, so this
-    // is a value-preserving no-op unless a caller opts in.
-    if (strength(cliTier) > strength(effectiveTier)) tierSource = cliOverride.policyProvenance?.tier ?? { scope: 'cliOverride' };
-    effectiveTier = resolveStrongerTier(effectiveTier, cliTier);
+    if (rigorSource.scope === 'default' || rigorStrength(capRigor) > rigorStrength(effectiveRigor)) {
+      effectiveRigor = rigorSource.scope === 'default' ? capRigor : resolveStrongerRigor(effectiveRigor, capRigor);
+      rigorSource = { scope: 'capability', id: targetCap };
+    }
+  }
+
+  // Caller/CLI rigor.
+  const cliRigor = cliOverride.rigor;
+  if (cliRigor !== undefined) {
+    if (!RIGOR_VALUES.includes(cliRigor)) {
+      throw new RunnerConfigError(`invalid override rigor "${cliRigor}". Valid rigors: [${RIGOR_VALUES.join(', ')}]`);
+    }
+    if (rigorSource.scope === 'default' || rigorStrength(cliRigor) > rigorStrength(effectiveRigor)) {
+      effectiveRigor = rigorSource.scope === 'default' ? cliRigor : resolveStrongerRigor(effectiveRigor, cliRigor);
+      rigorSource = cliOverride.policyProvenance?.rigor ?? { scope: 'cliOverride' };
+    }
+  }
+
+  if (!RIGOR_VALUES.includes(effectiveRigor)) {
+    throw new RunnerConfigError(`unrecognized rigor "${effectiveRigor}". Valid rigors: [${RIGOR_VALUES.join(', ')}]`);
+  }
+
+  // 1b. Map rigor -> tier via rigorToTier. Validate before considering any
+  // explicit tier, otherwise a valid override could mask a malformed map.
+  const derivedTier = rigorToTier[effectiveRigor];
+  if (!MODEL_POLICY_TIERS.includes(derivedTier)) {
+    throw new RunnerConfigError(
+      `rigorToTier maps rigor "${effectiveRigor}" to invalid tier "${derivedTier}". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`,
+    );
+  }
+  let effectiveTier = derivedTier;
+  let tierSource = { scope: 'rigor', id: effectiveRigor };
+
+  // Explicit tiers are independent raise-only inputs. Validate every source
+  // before composition so a stronger source cannot mask a malformed weaker
+  // one.
+  let workTier;
+  if (work?.tier !== undefined) {
+    if (typeof work.tier !== 'string' || !Object.prototype.hasOwnProperty.call(DEFAULT_TIER_TO_POLICY, work.tier)) {
+      throw new RunnerConfigError('work.tier must be one of [light, standard, heavy] during the Phase 2 compatibility window');
+    }
+    workTier = DEFAULT_TIER_TO_POLICY[work.tier];
+  }
+  const tierOverrideProvenance = cliOverride.policyProvenance?.tier;
+  if (
+    cliOverride.tier !== undefined &&
+    tierOverrideProvenance !== undefined &&
+    !['actor', 'assignment', 'cli', 'cliOverride'].includes(tierOverrideProvenance.scope)
+  ) {
+    throw new RunnerConfigError(
+      `explicit tier provenance scope "${tierOverrideProvenance.scope}" is not allowed; tier may be explicit only at actor, assignment, or CLI scope`,
+    );
+  }
+  const explicitTiers = [
+    { value: workTier, source: { scope: 'work', id: work?.id } },
+    { value: opPolicy.tier, source: { scope: 'opPolicy', id: opId } },
+    { value: cliOverride.tier, source: cliOverride.policyProvenance?.tier ?? { scope: 'cliOverride' } },
+  ];
+  for (const { value, source } of explicitTiers) {
+    if (value === undefined) continue;
+    if (!MODEL_POLICY_TIERS.includes(value)) {
+      throw new RunnerConfigError(`invalid explicit tier "${value}". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);
+    }
+    if (strength(value) > strength(effectiveTier)) {
+      effectiveTier = resolveStrongerTier(effectiveTier, value);
+      tierSource = source;
+    }
   }
 
   if (!MODEL_POLICY_TIERS.includes(effectiveTier)) {
     throw new RunnerConfigError(`unrecognized tier "${effectiveTier}". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);
   }
 
-  // 1a. Executor preference (hoisted ahead of quality/persona resolution,
-  // Phase 03).
+  // 1c. Executor preference
   const primaryExecutor =
     cliOverride.preferExecutor ??
     opPolicy.preferExecutor ??
@@ -296,64 +348,10 @@ export function resolveAssignmentDispatchPolicy({
       ? { scope: 'opPolicy', id: opId }
       : { scope: 'default' };
 
-  // 1b. Quality bridge (Phase 04, executor-policy-dispatch-seams).
-  //
-  // `effectiveTier` above is the semantic tier: raise-only composed, exactly
-  // as before this phase. It is the ONLY input the canonical quality bridge
-  // derives from.
-  const semanticTier = effectiveTier;
-  const derivedQuality = QUALITY_TIER_BRIDGE[semanticTier];
 
-  const lookupPolicyTier = semanticTier;
-  const lookupPolicyTierSource = { ...tierSource, kind: 'semantic' };
-  // Mode source precedence: explicit > implied-by-persona >
-  // implied-by-tier-bridge (design.md §3.2). `implied-by-persona` has no
-  // producer yet -- see the QUALITY_TIER_BRIDGE comment above.
-  const explicitMode = cliOverride.mode ?? opPolicy.mode;
-  let mode;
-  let modeSourceKind;
-  let modeSource;
-  if (explicitMode !== undefined) {
-    if (!QUALITY_MODE_VALUES.includes(explicitMode)) {
-      throw new RunnerConfigError(`invalid mode "${explicitMode}". Valid modes: [${QUALITY_MODE_VALUES.join(', ')}]`);
-    }
-    mode = explicitMode;
-    modeSourceKind = 'explicit';
-    modeSource = cliOverride.mode ? { scope: 'cliOverride' } : { scope: 'opPolicy', id: opId };
-  } else {
-    mode = derivedQuality.mode;
-    modeSourceKind = 'implied-by-tier-bridge';
-    modeSource = { scope: 'tier-bridge', id: semanticTier };
-  }
-
-  // `minRigor` is derived/read-only this phase (phase-04.md "Resolver
-  // rule"): an explicit value no stronger than the derived one is accepted
-  // as a compatibility assertion, but the effective value stays the derived
-  // one -- there is no independent raise (or lower) channel for it yet. A
-  // stronger explicit value is rejected outright rather than silently
-  // ignored, so a caller asking for more rigor than the semantic tier
-  // provides finds out immediately instead of silently under-provisioning.
-  const explicitMinRigor = cliOverride.minRigor ?? opPolicy.minRigor;
-  if (explicitMinRigor !== undefined) {
-    if (!MIN_RIGOR_VALUES.includes(explicitMinRigor)) {
-      throw new RunnerConfigError(`invalid minRigor "${explicitMinRigor}". Valid values: [${MIN_RIGOR_VALUES.join(', ')}]`);
-    }
-    if (MIN_RIGOR_RANK.get(explicitMinRigor) > MIN_RIGOR_RANK.get(derivedQuality.minRigor)) {
-      throw new RunnerConfigError(`explicit minRigor "${explicitMinRigor}" is stronger than the semantic-tier-derived value "${derivedQuality.minRigor}" (tier "${semanticTier}") -- minRigor is derived/read-only in this phase, not an independent raise channel.`);
-    }
-  }
-  const minRigor = derivedQuality.minRigor;
-  const minRigorSource = { scope: 'derived', id: semanticTier };
-
-  const quality = Object.freeze({
-    minRigor: Object.freeze({ value: minRigor, source: Object.freeze(minRigorSource) }),
-    mode: Object.freeze({ value: mode, source: Object.freeze(modeSource), sourceKind: modeSourceKind }),
-  });
-
-  // Phase 03: canonical reasoningEffort, most-specific-wins (never raise-only
-  // like minRigor -- design.md §4). Precedence mirrors every other field in
-  // this resolver: explicit cliOverride/opPolicy > alias-supplied compat
-  // default > derived from canonical minRigor.
+  // Phase 03: canonical reasoningEffort, most-specific-wins.
+  // Precedence mirrors every other field in this resolver:
+  // explicit cliOverride/opPolicy > derived from canonical rigor.
   const explicitReasoningEffort = cliOverride.reasoningEffort ?? opPolicy.reasoningEffort;
   let reasoningEffort;
   let reasoningEffortSource;
@@ -364,8 +362,8 @@ export function resolveAssignmentDispatchPolicy({
     reasoningEffort = explicitReasoningEffort;
     reasoningEffortSource = cliOverride.reasoningEffort ? { scope: 'cliOverride' } : { scope: 'opPolicy', id: opId };
   } else {
-    reasoningEffort = REASONING_EFFORT_DEFAULT_FROM_MIN_RIGOR[minRigor];
-    reasoningEffortSource = { scope: 'derived', id: `quality.minRigor.${minRigor}` };
+    reasoningEffort = REASONING_EFFORT_DEFAULT_FROM_RIGOR[effectiveRigor] ?? 'medium';
+    reasoningEffortSource = { scope: 'derived', id: `rigor.${effectiveRigor}` };
   }
 
   // 2. Persona Resolution
@@ -403,8 +401,7 @@ export function resolveAssignmentDispatchPolicy({
   // same order, same throws). The governance THROWS (disallowedProviders/
   // disallowedExecutors, step 7 below) stay in their original position,
   // AFTER quality/persona/visibility/repeatMode/constraints resolution --
-  // moving them here would fire a governance rejection before a validation
-  // error (invalid mode/minRigor/repeatMode) that used to throw first for
+  // error (invalid rigor/repeatMode) that used to throw first for
   // the same malformed input, a real ordering change this extraction must
   // not introduce.
   const { resolvedProvider, registeredExecutorEntry } = resolveExecutorProvider({
@@ -428,20 +425,11 @@ export function resolveAssignmentDispatchPolicy({
     resolvedModel = opPolicy.model;
     modelSource = { scope: 'opPolicy', id: opId };
   } else if (runnerConfig) {
-    // Direct policy-tier resolution (Phase 00 R5, fixes B1): fails closed
-    // with a named RunnerConfigError when the provider/tier pair is
-    // unsupported -- never swallowed into a silent `null` model. Resolves
-    // against `lookupPolicyTier`, not `effectiveTier` directly (Phase 04):
-    // Direct tier resolution: fails closed with a named RunnerConfigError when
-    // the provider/tier pair is unsupported.
-    // "legacy" fallback branch was unreachable (a second call with identical
-    // args either produces the same value or throws exactly as this first
-    // call already would have). Kept as one call; `source` is always
-    // PlacementPolicy-attributed since PlacementPolicy target semantics IS
-    // this resolution path per design.md's close criterion (post-Phase-08
-    // follow-up comment, now realized in full).
-    resolvedModel = resolveTierModel(runnerConfig, lookupPolicyTier, resolvedProvider);
-    modelSource = { scope: 'placement-policy', id: `${resolvedProvider}.${lookupPolicyTier}` };
+    // Direct tier resolution fails closed when the provider/tier pair is
+    // unsupported. The previous fallback repeated the identical lookup and
+    // could never recover from a missing mapping.
+    resolvedModel = resolveTierModel(runnerConfig, effectiveTier, resolvedProvider);
+    modelSource = { scope: 'placement-policy', id: `${resolvedProvider}.${effectiveTier}` };
   }
 
   // 5. Visibility Resolution
@@ -501,35 +489,19 @@ export function resolveAssignmentDispatchPolicy({
     executorPreference: Object.freeze(executorList),
     executorId: primaryExecutor,
     providerModel: resolvedProvider,
+    rigor: effectiveRigor,
     tier: effectiveTier,
     model: resolvedModel,
-    // Phase 04: additive quality/lookup-tier evidence alongside the legacy
-    // `tier` field above (unchanged). `quality` and `lookupPolicyTier` are
-    // new fields -- every pre-existing reader of `effectivePolicy.tier`
-    // keeps seeing exactly what it saw before this phase.
-    quality,
-    lookupPolicyTier,
-    // Phase 03: canonical reasoningEffort, additive alongside quality/tier.
     reasoningEffort,
     visibility: resolvedVisibility,
     repeatMode: resolvedRepeatMode ?? null,
     constraints: Object.freeze(constraints),
-    // Phase 00 R7: field-level provenance, additive alongside the flat
-    // fields above (which stay unchanged in shape/values for backward
-    // compatibility this phase) -- shape matches ADR-009's FlowDefinition
-    // PolicyPatch provenance contract `{field: {value, source: {scope, id}}}`.
     provenance: Object.freeze({
       executor: Object.freeze({ value: primaryExecutor, source: Object.freeze(executorSource) }),
       provider: Object.freeze({ value: resolvedProvider, source: Object.freeze(providerSource) }),
       model: Object.freeze({ value: resolvedModel, source: modelSource ? Object.freeze(modelSource) : undefined }),
+      rigor: Object.freeze({ value: effectiveRigor, source: Object.freeze(rigorSource) }),
       tier: Object.freeze({ value: effectiveTier, source: Object.freeze(tierSource) }),
-      // Phase 04: `semanticTier` is a named alias of `tier` above (same
-      // value, same source) -- kept as its own provenance key so a stranger
-      // can name "the semantic tier canonical quality derives from"
-      // without relying on the legacy `tier` field's dual meaning.
-      semanticTier: Object.freeze({ value: semanticTier, source: Object.freeze(tierSource) }),
-      quality,
-      lookupPolicyTier: Object.freeze({ value: lookupPolicyTier, source: Object.freeze(lookupPolicyTierSource) }),
       reasoningEffort: Object.freeze({ value: reasoningEffort, source: Object.freeze(reasoningEffortSource) }),
       persona: Object.freeze({ value: resolvedPersona, source: personaSource ? Object.freeze(personaSource) : undefined }),
       visibility: Object.freeze({ value: resolvedVisibility, source: Object.freeze(visibilitySource) }),
@@ -538,6 +510,5 @@ export function resolveAssignmentDispatchPolicy({
       governance: Object.freeze({ value: 'allowed', source: Object.freeze(governanceSource) }),
     }),
   };
-
   return Object.freeze(effectivePolicy);
 }

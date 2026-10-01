@@ -2889,10 +2889,9 @@ test('Cell 6.1 happy path: runOnce dispatches planning.validate-plan to a fake e
 
   const { runDir } = cell61RunDir(repoRoot);
   const result = JSON.parse(fs.readFileSync(path.join(runDir, 'result.json'), 'utf8'));
-  console.log('RESULT KEYS:', JSON.stringify(result, null, 2));
   assert.equal(result.workId, id);
-  assert.equal(result.status, 'done');
-  assert.equal(result.confidence, 'reported');
+  assert.equal(result.classification.execution.status, 'completed');
+  assert.equal(result.classification.confidence.level, 'reported');
 
   // The Assignment never moves Work: plan.md here has no "## Split" section
   // at all, so planVerdictFromPlanMd (Cell P01.2, R3/G5) has no signal to
@@ -2925,7 +2924,7 @@ test('Cell 6.1 happy path: driver consumes READY+reported and feeds the existing
 
   // Ordering proves the driver, not the Assignment, moved Work: the
   // assignment-finished log precedes the verdict-consumption log.
-  const finishedIdx = capture.findIndex((l) => l.includes('executed (confidence: reported, status: done)'));
+  const finishedIdx = capture.findIndex((l) => l.includes('executed (confidence: reported, status: ok)'));
   assert.ok(finishedIdx !== -1, 'assignment finished with a reported RunResult');
   const consumedIdx = capture.findIndex((l) => l.includes('after READY validation'));
   assert.ok(consumedIdx > finishedIdx, 'Work moved only after the Assignment had settled, via resolvePlan');
@@ -3384,8 +3383,8 @@ test('Cell 6.2 staleness: plan.md edited after settle is never consumed cross-pa
   const first = cell62RunDirs(repoRoot);
   assert.deepEqual(first.runs, ['01']);
   const result1 = JSON.parse(fs.readFileSync(path.join(first.runsDir, '01', 'result.json'), 'utf8'));
-  assert.equal(result1.status, 'done');
-  assert.equal(result1.confidence, 'reported');
+  assert.equal(result1.classification.execution.status, 'completed');
+  assert.equal(result1.classification.confidence.level, 'reported');
 
   // Edit plan.md after the verdict settled (mtime of the edit is newer than
   // the recorded result.json — the plain, non-hidden case).
@@ -3443,8 +3442,8 @@ test('Cell 6.2 red-team: string-only evidenceRefs without a companion report nev
 
   const { runsDir } = cell62RunDirs(repoRoot);
   const result = JSON.parse(fs.readFileSync(path.join(runsDir, '01', 'result.json'), 'utf8'));
-  assert.notEqual(result.confidence, 'reported', 'string-only evidenceRefs must never classify reported');
-  assert.equal(result.confidence, 'no-evidence');
+  assert.notEqual(result.classification.confidence.level, 'reported', 'string-only evidenceRefs must never classify reported');
+  assert.equal(result.classification.confidence.level, 'no-evidence');
   assert.ok(!logs.some((l) => l.includes('after READY validation')), 'a forged string-only claim must never feed the planning edge');
 
   const item = listWork(dir).work[id];
@@ -3510,8 +3509,8 @@ test('Cell 6.2 no-evidence stop: an executor that writes nothing leaves Work unt
 
   const { runsDir } = cell62RunDirs(repoRoot);
   const result = JSON.parse(fs.readFileSync(path.join(runsDir, '01', 'result.json'), 'utf8'));
-  assert.equal(result.status, 'no-evidence');
-  assert.equal(result.confidence, 'no-evidence');
+  assert.equal(result.classification.execution.status, 'completed');
+  assert.equal(result.classification.confidence.level, 'no-evidence');
   assert.ok(logs.some((l) => l.includes('did not report READY')), 'a no-evidence run must log its conservative stop');
   assert.ok(!logs.some((l) => l.includes('after READY validation')));
 
@@ -3530,8 +3529,8 @@ test('Cell 6.2 failed stop: malformed agent-result.json fails closed and leaves 
 
   const { runsDir } = cell62RunDirs(repoRoot);
   const result = JSON.parse(fs.readFileSync(path.join(runsDir, '01', 'result.json'), 'utf8'));
-  assert.equal(result.status, 'failed');
-  assert.equal(result.confidence, 'failed');
+  assert.equal(result.classification.execution.status, 'failed');
+  assert.equal(result.classification.confidence.level, 'failed');
   assert.ok(!logs.some((l) => l.includes('after READY validation')));
   assert.ok(logs.some((l) => l.includes('did not report READY')));
 
@@ -3550,8 +3549,8 @@ test('Cell 6.2 NOT READY verdict routes back to the primary planning path withou
 
   const { runsDir } = cell62RunDirs(repoRoot);
   const result = JSON.parse(fs.readFileSync(path.join(runsDir, '01', 'result.json'), 'utf8'));
-  assert.equal(result.status, 'done');
-  assert.equal(result.confidence, 'reported');
+  assert.equal(result.classification.execution.status, 'completed');
+  assert.equal(result.classification.confidence.level, 'reported');
   assert.ok(logs.some((l) => l.includes('returned NOT READY — routing back to primary planning path')), 'NOT READY must route back to the primary planning path');
   assert.ok(!logs.some((l) => l.includes('after READY validation')));
 
@@ -3801,7 +3800,7 @@ test('S3a composed: a single runtime.exitCode flip cannot erase a settle-classif
   // set, plan hash, stored status/confidence all untouched), future mtime.
   const resultPath = path.join(first.runsDir, '01', 'result.json');
   const res = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
-  assert.equal(res.status, 'failed', 'pass 1 settles as failed — the exploit only works if the stored verdict is honest');
+  assert.equal(res.classification.execution.status, 'failed', 'pass 1 settles as failed — the exploit only works if the stored verdict is honest');
   fs.writeFileSync(resultPath, JSON.stringify({ ...res, runtime: { ...res.runtime, exitCode: 0 } }, null, 2));
   const future = new Date(Date.now() + 5000);
   fs.utimesSync(resultPath, future, future);

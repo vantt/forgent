@@ -116,6 +116,7 @@ const HERDR_EXECUTOR = {
   kind: 'agent',
   adapter: 'herdr-spawn',
   command: 'agy',
+  providerModel: 'agy',
   args: ['-i', '{prompt}', '--mode', 'accept-edits'],
   // agy is not a Claude CLI, so the cross-provider egress gate refuses it
   // unless the executor says so -- the same declaration the live config makes.
@@ -143,8 +144,9 @@ function fixtureRepo(makeExecutor = () => HERDR_EXECUTOR) {
   fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
   fs.writeFileSync(path.join(root, '.fgos', 'config.json'), JSON.stringify({
     runner: {
-      executor: { command: 'agy', args: ['-i', '{prompt}'] },
-      models: { standard: 'sonnet' },
+      executor: { command: 'agy', providerModel: 'agy', args: ['-i', '{prompt}'] },
+      modelPolicies: { agy: { standard: 'sonnet' }, claude: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 20000,
       executors: { 'herdr-worker': makeExecutor(root) },
       capabilities: { [IMPLEMENT_CAPABILITY]: { prefer: 'herdr-worker' } },
@@ -719,6 +721,7 @@ test('R8: legacy openDispatchRun stamps contract: dispatch-run.legacy in run.jso
           'mock-non-assignment': {
             adapter: 'cli-spawn',
             command: 'echo',
+            providerModel: 'claude',
             args: ['legacy-ok'],
             allowCrossProvider: true,
           },

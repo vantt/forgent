@@ -150,7 +150,7 @@ test('P09.3: no exported function/const/class name anywhere in src/runner/defini
 
   // `src/runner/definitions/**` is a schema/PolicyPatch module, not
   // `src/runner/coordination/**` -- it genuinely exports `mergePolicyStack`
-  // (PolicyPatch scope-layer resolution, `minTier`/`preferPersona`/etc.,
+  // (PolicyPatch scope-layer resolution, `rigor`/`preferPersona`/etc.,
   // predates and is unrelated to MVP9), a real false positive for the
   // substring "merge" that `src/runner/coordination/**` never produces
   // (confirmed: it exports nothing matching "merge" today). Named and

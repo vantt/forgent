@@ -791,15 +791,11 @@ test('I04-REV-01 regression: executeAssignment retry uses pinned template snapsh
       `,
     );
 
-    const runnerConfig = {
-      executor: {
-        allowCrossProvider: true,
-        command: process.execPath,
-        args: [executorScript, '{prompt}'],
-      },
-      models: { standard: 'test-model' },
-      timeoutMs: 5000,
-    };
+    const runnerConfig = { executor: {
+      allowCrossProvider: true,
+      command: process.execPath,
+      args: [executorScript, '{prompt}'],
+    }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
 
     const assignment = {
       assignmentId: 'asgn_rev01_runner',

@@ -1248,7 +1248,7 @@ test('heterogeneous actor bindings: two shaper roles resolve through genuinely d
   const shapeAlt = call1.steps.find((s) => s.as === 'shapeAlt');
   assert.equal(shapeSystem.executor, 'exec-family-a');
   assert.equal(shapeSystem.provider, 'family-a');
-  assert.equal(shapeSystem.tier, 'flagship', 'system-shaper\'s own operation-declared minTier floor');
+  assert.equal(shapeSystem.tier, 'flagship', 'system-shaper’s own operation-declared high rigor maps to flagship');
   assert.equal(shapeAlt.executor, 'exec-family-b');
   assert.equal(shapeAlt.provider, 'family-b');
   assert.notEqual(shapeSystem.executor, shapeAlt.executor, 'two genuinely different registered executors, not one global default');
@@ -1285,7 +1285,7 @@ test('heterogeneous actor bindings: two shaper roles resolve through genuinely d
   );
   const synth = call2.steps.find((s) => s.as === 'synth');
   assert.equal(synth.executor, 'exec-family-a', 'the SAME executor as system-shaper, proving the model difference below is a tier effect, not an executor effect');
-  assert.equal(synth.tier, 'frontier', 'synthesizer\'s own operation-declared minTier floor');
+  assert.equal(synth.tier, 'frontier', 'synthesizer’s own operation-declared critical rigor maps to frontier');
 
   // Read the real RunResult files to compare the actually-resolved MODEL
   // string -- summarizeDispatch's own step-result shape does not surface

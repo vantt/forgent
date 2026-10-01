@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- **Changed**: Consolidated dispatch quality vocabulary: FlowDefinitions and operations now declare `rigor` (`low|standard|high|critical`), runner config maps it through required `rigorToTier` into the six-level `modelPolicies` tier scale, and `capabilities.<name>.rigor` supplies the only capability-level raise-only floor. Explicit `tier` remains placement-only at actor/assignment/CLI scope. Retired quality bridges, flat model config, and capability overrides now fail fast; setup and doctor own the new mapping.
 - **Changed**: RunResult contract updated to v3 (`assignment-run-result` v3); removed legacy `status` and `confidence` fields from newly recorded runs in favor of unified `classification.outcome` single path (`runOutcome()`); added token usage persistence in `RunResult.usage`.
 - **Added**: Native `work` observation source in `packages/work-state/rust` and `work` scorecard section in Observe (Phase F6):
   - Implements `ObservationSource` with `source_id: "work"`, parsing timing events (`added`, `moved`, `asked`, `answered`, `gate-approved`) across `.fgos/events.jsonl` and shard files `.fgos/events/*.jsonl` with `(src, seq)` deduplication.

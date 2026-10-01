@@ -165,10 +165,11 @@ function writeFakeExecutorConfig(cwd) {
       },
       // "flagship" is deliberately absent from every OTHER test's implicit
       // expectation: convene/propose (coordinator-actor/proposer-actor) never
-      // declare policy.minTier in group-thinking-rfc-review-lite.yaml, so
+      // declare policy.rigor in group-thinking-rfc-review-lite.yaml, so
       // every test that omits --tier keeps resolving "standard" -- only the
       // --tier forwarding test below ever asks for "flagship".
-      models: { standard: 'test-model', nano: 'test-model', flagship: 'flagship-test-model' },
+      modelPolicies: { claude: { nano: 'test-model', standard: 'test-model', flagship: 'flagship-test-model' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 20000,
     },
   };
@@ -345,7 +346,7 @@ test('fgos coordination pack run: a pack-registered request dispatches end-to-en
 // the model for the request's effective tier out of `runner.models[tier]`
 // and threads it into the executor's own argv via `{model}` substitution
 // (transport.mjs's `resolveExecutorCommand`) -- coordinator-actor/
-// proposer-actor declare no `policy.minTier` in group-thinking-rfc-review-
+// proposer-actor declare no `policy.rigor` in group-thinking-rfc-review-
 // lite.yaml, so every OTHER test in this file (never passing --tier) leaves
 // the effective tier at the runtime default "standard" -> "test-model";
 // --tier "flagship" here raises it (flagship > standard) to

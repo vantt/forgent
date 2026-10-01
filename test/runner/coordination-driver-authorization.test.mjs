@@ -117,11 +117,7 @@ function fakeExecutor(tempDir, { status = 'done', summary = 'Validated.' } = {})
     process.exit(0);
     `,
   );
-  return {
-    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    models: { standard: 'test-model', nano: 'test-model', advanced: 'test-model', flagship: 'test-model', frontier: 'test-model' },
-    timeoutMs: 5000,
-  };
+  return { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model', nano: 'test-model', advanced: 'test-model', flagship: 'test-model', frontier: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
 }
 
 function setup(coordinationId, fixtureOptions, sessionOptions = {}) {

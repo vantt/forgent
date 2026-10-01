@@ -89,7 +89,8 @@ function tempConfigPath(capabilities) {
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       capabilities,
-      models: { standard: 'sonnet' },
+      modelPolicies: { claude: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );

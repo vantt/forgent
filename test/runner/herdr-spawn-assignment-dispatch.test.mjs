@@ -113,11 +113,7 @@ ok({});
 
 async function dispatchHerdrAssignment(repoDir, mock, executorBlock, { workId }) {
   initGitRepo(repoDir);
-  const runnerConfig = {
-    executor: executorBlock,
-    models: { standard: 'sonnet' },
-    timeoutMs: 15000,
-  };
+  const runnerConfig = { executor: executorBlock, modelPolicies: { claude: { standard: 'sonnet' }, agy: { standard: 'sonnet' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 15000 };
   const assignment = buildAssignment({
     workId,
     operation: 'implement-item',

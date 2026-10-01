@@ -21,13 +21,9 @@
 // fully decoupled from executor/decide/CLI-spawn machinery.
 
 import { TIERS } from '../state/work.mjs';
+import { RIGOR_VALUES } from './rigor.mjs';
 
-// Mirrors `MIN_RIGOR_VALUES` (`src/runner/dispatch/assignment-policy.mjs`)
-// exactly. Duplicated rather than imported so this module has zero
-// dependency on anything under `dispatch/` -- `test/runner/
-// capability-match.test.mjs` asserts the two arrays stay identical, so this
-// copy cannot silently drift from the real one.
-export const RIGOR_VALUES = Object.freeze(['low', 'standard', 'high', 'critical']);
+export { RIGOR_VALUES };
 
 // The three possible execution forms a match can yield. `inline` is both a
 // real steady-state form (no protocol, no facade) and the forced form for

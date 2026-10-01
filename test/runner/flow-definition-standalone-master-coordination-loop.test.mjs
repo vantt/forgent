@@ -121,25 +121,20 @@ test('standalone-master-coordination-loop rejects a mutated copy that injects ba
 
 // ─── Phase 03 (Step 09 P03.1) R2/R3/R4: role execution policy readiness ───
 
-test('standalone-master-coordination-loop declares the intended cheap-by-default / flagship-by-default policy.minTier per role operation', () => {
+test('standalone-master-coordination-loop declares the intended standard/high policy.rigor per role operation', () => {
   const def = loadCoordinationProtocol(FIXTURE_ID, { cwd: mkTempDir('flow-definition-master-loop-policy-') });
-  const minTierByOp = Object.fromEntries(def.spec.operations.map((op) => [op.id, op.policy?.minTier]));
+  const rigorByOp = Object.fromEntries(def.spec.operations.map((op) => [op.id, op.policy?.rigor]));
 
-  // Doer/Fixer: cheap-by-default (R4).
-  assert.equal(minTierByOp['produce-candidate'], 'standard');
-  assert.equal(minTierByOp['revise-candidate'], 'standard');
-  // Reviewer/Recheck: flagship read-only default (R4/R5).
-  assert.equal(minTierByOp['review-candidate'], 'flagship');
-  assert.equal(minTierByOp['reviewer-recheck'], 'flagship');
-  // Red-Team/Recheck: flagship default, escalated to frontier only via a
-  // caller-supplied assignment/cli-scope PolicyPatch at dispatch time (see
-  // test/runner/dispatch-coordination-role-tiers.test.mjs for the live
-  // escalation proof) -- a portable operation/role/actor/definition scope
-  // can never pin `frontier` unconditionally without also raising the
-  // floor for every OTHER round this operation dispatches, defeating "cheap
-  // by default" (R6).
-  assert.equal(minTierByOp['red-team-candidate'], 'flagship');
-  assert.equal(minTierByOp['red-team-recheck'], 'flagship');
+  // Doer/Fixer: standard rigor.
+  assert.equal(rigorByOp['produce-candidate'], 'standard');
+  assert.equal(rigorByOp['revise-candidate'], 'standard');
+  // Reviewer/Recheck: high rigor.
+  assert.equal(rigorByOp['review-candidate'], 'high');
+  assert.equal(rigorByOp['reviewer-recheck'], 'high');
+  // Red-Team/Recheck: high rigor, escalated to explicit frontier tier only
+  // via an assignment/cli-scope PolicyPatch at dispatch time.
+  assert.equal(rigorByOp['red-team-candidate'], 'high');
+  assert.equal(rigorByOp['red-team-recheck'], 'high');
 
   // No operation declares `capabilities[]` (R1 audit finding: inert for
   // this fixture's non-cohort dispatch path -- see P03.1.md).
@@ -148,7 +143,7 @@ test('standalone-master-coordination-loop declares the intended cheap-by-default
   }
 });
 
-test('standalone-master-coordination-loop declares no literal provider/model name anywhere (R3: capability/minTier only)', () => {
+test('standalone-master-coordination-loop declares no literal provider/model name anywhere (R3: capability/rigor only)', () => {
   // Comment lines (this fixture's own explanatory `#` prose, e.g. naming
   // `preferExecutor` as a concept it deliberately does NOT declare) are
   // stripped before scanning -- this test asserts no MACHINE-READABLE YAML

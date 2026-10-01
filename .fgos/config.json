@@ -865,6 +865,12 @@
         "frontier": "deepseek/deepseek-v4-pro"
       }
     },
+    "rigorToTier": {
+      "low": "nano",
+      "standard": "standard",
+      "high": "flagship",
+      "critical": "frontier"
+    },
     "confinement": {
       "strict": false
     },

@@ -256,9 +256,9 @@ test('RFC-Review-Lite -- vacuous-gate regression: "object" declares only "object
   assert.equal(replaySession(coordinationId, ctx.opts).contributions.length, 1, 'only the earlier, legitimate proposal link may have written anything');
 });
 
-test('RFC-Review-Lite: the objector role\'s real, worked actor-scope PolicyPatch (policy.minTier: critical) resolves and is attributed to the ACTOR scope in the persisted RunResult', async () => {
+test('RFC-Review-Lite: the objector role\'s actor-scope critical rigor resolves and is attributed to the ACTOR scope in the persisted RunResult', async () => {
   const coordinationId = 'rfc-review-lite-actor-policy';
-  const ctx = openProtocolSession(coordinationId, 'Probe the objector role\'s real per-actor minTier requirement.');
+  const ctx = openProtocolSession(coordinationId, 'Probe the objector role\'s real per-actor rigor requirement.');
 
   const dispatched = await dispatchDeclaredOperation(
     coordinationId,
@@ -274,6 +274,7 @@ test('RFC-Review-Lite: the objector role\'s real, worked actor-scope PolicyPatch
   );
 
   const provenance = dispatched.runResult.policy.provenance;
-  assert.equal(provenance.tier.value, 'frontier', 'objector-a-actor\'s own spec.actors[].policy.minTier must genuinely raise the resolved tier');
-  assert.deepEqual(provenance.tier.source, { scope: 'actor', id: 'objector-a-actor' }, 'the resolved tier must be attributed to the REAL declaring scope, not a synthetic default');
+  assert.equal(provenance.rigor.value, 'critical');
+  assert.deepEqual(provenance.rigor.source, { scope: 'actor', id: 'objector-a-actor' });
+  assert.equal(provenance.tier.value, 'frontier');
 });

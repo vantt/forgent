@@ -164,11 +164,7 @@ function fakeExecutor(tempDir) {
     process.stdout.write('Executed.\\n');
     `,
   );
-  return {
-    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    models: { standard: 'test-model', nano: 'test-model', mini: 'test-model', advanced: 'test-model', flagship: 'test-model', frontier: 'test-model' },
-    timeoutMs: 10000,
-  };
+  return { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model', nano: 'test-model', mini: 'test-model', advanced: 'test-model', flagship: 'test-model', frontier: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 10000 };
 }
 
 function barrierExecutor(tempDir, barrierDir) {
@@ -203,11 +199,7 @@ function barrierExecutor(tempDir, barrierDir) {
     process.stdout.write('Validated.\\n');
     `,
   );
-  return {
-    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    models: { standard: 'test-model', nano: 'test-model', mini: 'test-model', advanced: 'test-model', flagship: 'test-model', frontier: 'test-model' },
-    timeoutMs: 10000,
-  };
+  return { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model', nano: 'test-model', mini: 'test-model', advanced: 'test-model', flagship: 'test-model', frontier: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 10000 };
 }
 
 function produceStep(overrides = {}) {
@@ -791,11 +783,7 @@ test('DAG concurrency: conflicting writers fail before duplicate mutation or ext
     process.stdout.write('Executed.\\n');
     `,
   );
-  const activeRunnerConfig = {
-    executor: { allowCrossProvider: true, command: process.execPath, args: [activeExecutorScript, '{prompt}'] },
-    models: { standard: 'm', nano: 'm', mini: 'm', advanced: 'm', flagship: 'm', frontier: 'm' },
-    timeoutMs: 10000,
-  };
+  const activeRunnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [activeExecutorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'm', nano: 'm', mini: 'm', advanced: 'm', flagship: 'm', frontier: 'm' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 10000 };
 
   // Spawn concurrent processes: legitimate actively-dispatching writer vs conflicting writer
   const runnerScriptA = path.join(tempDir, 'concurrent-worker-a.mjs');

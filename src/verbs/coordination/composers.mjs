@@ -31,7 +31,7 @@ import { bindOperations } from './binding.mjs';
  * applies uniformly to every actor lacking its own roster entry, on every
  * declared step, exactly as it did before this module existed. `cliTier`
  * needs no equivalent guard: this module never computes or injects a
- * `tier`/`minTier` field at all (see the module's own header doc, steps
+ * `tier` field at all (see the module's own header doc, steps
  * 3/4), so there is nothing here for a `--tier` flag to be outranked by.
  *
  * Fix M (red-team round 2): a roster entry that sets ONLY `tier`/`persona`

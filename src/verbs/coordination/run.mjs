@@ -110,14 +110,14 @@ function readRequestFile(requestPath) {
 }
 
 // Resolves an "actors[]" trusted policy entry into the {preferExecutor,
-// minTier, preferPersona} shape session-engine.mjs's `cliPolicy`/
-// `cliOverride` parameters accept (assignment-policy.mjs's ALLOWED_POLICY_KEYS
+// tier, preferPersona} shape session-engine.mjs's `cliPolicy`/
+// `cliOverride` parameters accept
 // shape, mirrored). `model` is intentionally NOT included here -- see
 // buildCliOverrideForActor's own doc comment below for why the declared-
 // protocol dispatch path has no engine channel for it.
 function actorPolicyFields(actorEntry, { globalExecutor, globalTier } = {}) {
   const preferExecutor = actorEntry?.executor ?? globalExecutor;
-  const minTier = actorEntry?.tier ?? globalTier;
+  const tier = actorEntry?.tier ?? globalTier;
   const preferPersona = actorEntry?.persona;
   // `preferInvocation` (executor-id-consolidation Step 2): only ever comes
   // from the actor entry itself (schema.mjs's `invocation` field, checked
@@ -136,7 +136,7 @@ function actorPolicyFields(actorEntry, { globalExecutor, globalTier } = {}) {
   return {
     ...(preferExecutor !== undefined ? { preferExecutor } : {}),
     ...(preferInvocation !== undefined ? { preferInvocation } : {}),
-    ...(minTier !== undefined ? { minTier } : {}),
+    ...(tier !== undefined ? { tier } : {}),
     ...(preferPersona !== undefined ? { preferPersona } : {}),
     ...(fallbackExecutors !== undefined ? { fallbackExecutors } : {}),
   };
@@ -204,7 +204,7 @@ function findExistingSession(coordinationId, writerId, engineOpts) {
 
 // dispatchDeclaredOperation (session-engine.mjs) builds its OWN
 // `opts.cliOverride` internally from a resolved PolicyPatch stack that only
-// ever carries {minTier, preferPersona, preferExecutor, fallbackExecutors,
+// ever carries {tier, rigor, preferPersona, preferExecutor, fallbackExecutors,
 // visibility} -- confirmed by reading its body: nothing in that function
 // ever copies a `model` field from `cliPolicy` into the `cliOverride` it
 // forwards. dispatchPrimaryTask, by contrast, forwards `opts` (including
@@ -221,7 +221,7 @@ function assertModelSupportedForKind(kind, { globalModel, actors }) {
   if (globalModel !== undefined || anyActorModel) {
     throw new StoreError(
       'validation',
-      'coordination run: --model / actors[].model is not supported for kind:"declared-protocol" requests -- dispatchDeclaredOperation\'s PolicyPatch scope stack (session-engine.mjs) has no model-override channel today (only minTier/preferPersona/preferExecutor/fallbackExecutors/visibility flow through it); pass --executor/--tier instead, or use a kind:"agent-led" request for a single-actor session',
+      'coordination run: --model / actors[].model is not supported for kind:"declared-protocol" requests -- dispatchDeclaredOperation\'s PolicyPatch scope stack (session-engine.mjs) has no model-override channel today (only tier/rigor/preferPersona/preferExecutor/fallbackExecutors/visibility flow through it); pass --executor/--tier instead, or use a kind:"agent-led" request for a single-actor session',
     );
   }
 }

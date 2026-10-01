@@ -172,27 +172,37 @@ test('rejects a graph.nodes[].operations[].actor not present in spec.actors', ()
   );
 });
 
-test('rejects a more-specific-scope minTier that lowers a less-specific scope floor (operation-scope monotonicity)', () => {
+test('rejects a more-specific-scope rigor that lowers a less-specific scope floor (operation-scope monotonicity)', () => {
   const def = minimalWorkflowDefinition();
-  def.spec.policy = { minTier: 'frontier' };
-  def.spec.operations[0].policy = { minTier: 'standard' };
+  def.spec.policy = { rigor: 'critical' };
+  def.spec.operations[0].policy = { rigor: 'standard' };
   assert.throws(
     () => validateFlowDefinition(def),
-    throwsFlowDefinitionError(/spec\.operations\[0\]\.policy\.minTier \("standard"\) would lower the floor already set by a less specific scope \("frontier"\)/),
+    throwsFlowDefinitionError(/spec\.operations\[0\]\.policy\.rigor \("standard"\) would lower the floor already set by a less specific scope \("critical"\)/),
   );
 });
 
-test('rejects a more-specific-scope minTier that lowers a less-specific scope floor (actor-scope monotonicity)', () => {
+test('rejects a more-specific-scope rigor that lowers a less-specific scope floor (actor-scope monotonicity)', () => {
   const def = minimalProtocolDefinition();
-  def.spec.policy = { minTier: 'flagship' };
-  def.spec.actors[0].policy = { minTier: 'nano' };
+  def.spec.policy = { rigor: 'high' };
+  def.spec.actors[0].policy = { rigor: 'low' };
   assert.throws(
     () => validateFlowDefinition(def),
-    throwsFlowDefinitionError(/spec\.actors\[0\]\.policy\.minTier \("nano"\) would lower the floor already set by a less specific scope \("flagship"\)/),
+    throwsFlowDefinitionError(/spec\.actors\[0\]\.policy\.rigor \("low"\) would lower the floor already set by a less specific scope \("high"\)/),
   );
 });
 
 // ---------------------------------------------------------------------------
+
+test('rejects an actor rigor below the operation it is bound to', () => {
+  const def = minimalProtocolDefinition();
+  def.spec.operations[0].policy = { rigor: 'high' };
+  def.spec.actors[0].policy = { rigor: 'low' };
+  assert.throws(
+    () => validateFlowDefinition(def),
+    throwsFlowDefinitionError(/actor "actor-1" policy\.rigor .* would lower the floor/),
+  );
+});
 // Other contract MUST rules
 // ---------------------------------------------------------------------------
 
@@ -956,22 +966,55 @@ test('validating the same input twice produces deep-equal output and does not mu
 // mergePolicyStack (standalone helper, exported for future reuse)
 // ---------------------------------------------------------------------------
 
-test('mergePolicyStack resolves most-specific-wins for non-minTier fields and allows minTier to rise', () => {
+test('explicit tier is accepted at actor scope and rejected at portable definition/operation scopes', () => {
+  const actorScoped = minimalProtocolDefinition();
+  actorScoped.spec.actors[0].policy = { tier: 'advanced' };
+  const validated = validateFlowDefinition(actorScoped);
+  assert.equal(validated.spec.actors[0].policy.tier, 'advanced');
+
+  const definitionScoped = minimalWorkflowDefinition();
+  definitionScoped.spec.policy = { tier: 'advanced' };
+  assert.throws(
+    () => validateFlowDefinition(definitionScoped),
+    throwsFlowDefinitionError(/tier is only valid at actor\/assignment\/cli scope/),
+  );
+
+  const operationScoped = minimalWorkflowDefinition();
+  operationScoped.spec.operations[0].policy = { tier: 'advanced' };
+  assert.throws(
+    () => validateFlowDefinition(operationScoped),
+    throwsFlowDefinitionError(/tier is only valid at actor\/assignment\/cli scope/),
+  );
+});
+
+test('mergePolicyStack resolves most-specific-wins for non-rigor fields and allows rigor to rise', () => {
   const resolved = mergePolicyStack([
-    { scope: 'definition', source: 'def-1', policy: { minTier: 'standard', visibility: 'headless' } },
-    { scope: 'operation', source: 'op-1', policy: { minTier: 'frontier', preferExecutor: 'codex-cli' } },
+    { scope: 'definition', source: 'def-1', policy: { rigor: 'standard', visibility: 'headless' } },
+    { scope: 'operation', source: 'op-1', policy: { rigor: 'critical', preferExecutor: 'codex-cli' } },
   ]);
-  assert.equal(resolved.minTier, 'frontier');
+  assert.equal(resolved.rigor, 'critical');
   assert.equal(resolved.visibility, 'headless');
   assert.equal(resolved.preferExecutor, 'codex-cli');
 });
 
-test('mergePolicyStack rejects a stack entry that lowers the already-resolved minTier floor', () => {
+test('mergePolicyStack rejects a stack entry that lowers the already-resolved rigor floor', () => {
   assert.throws(
     () => mergePolicyStack([
-      { scope: 'definition', source: 'def-1', policy: { minTier: 'frontier' } },
-      { scope: 'actor', source: 'actor-1', policy: { minTier: 'standard' } },
+      { scope: 'definition', source: 'def-1', policy: { rigor: 'critical' } },
+      { scope: 'actor', source: 'actor-1', policy: { rigor: 'standard' } },
     ]),
-    throwsFlowDefinitionError(/sets minTier "standard", lower than the floor "frontier" already set by/),
+    throwsFlowDefinitionError(/sets rigor "standard", lower than the floor "critical" already set by/),
   );
+});
+
+test('mergePolicyStack rejects a missing or null policy fragment instead of treating it as empty', () => {
+  for (const entry of [
+    { scope: 'definition' },
+    { scope: 'definition', policy: null },
+  ]) {
+    assert.throws(
+      () => mergePolicyStack([entry, { scope: 'actor', policy: { rigor: 'critical' } }]),
+      throwsFlowDefinitionError(/policy stack entry .* must be an object/),
+    );
+  }
 });

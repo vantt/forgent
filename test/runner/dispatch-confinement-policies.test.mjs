@@ -35,7 +35,8 @@ function mkTempConfig(runnerObj) {
   const file = path.join(dir, 'config.json');
   fs.writeFileSync(file, JSON.stringify({
     executor: { command: 'node', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
+    modelPolicies: { node: { standard: 'sonnet' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: 60000,
     ...runnerObj,
   }, null, 2));
