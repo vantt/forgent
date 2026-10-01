@@ -1063,12 +1063,12 @@ Một báo-cáo hỏng-hình (không phân tích được, thiếu tên việc) 
   `pi`'s CLI args bỏ hẳn cờ `--provider` (test thật xác nhận: account dir `~/.pi/accounts/<name>` vốn chỉ chứa credential của ĐÚNG 1 provider, nên `pi` tự suy ra provider từ chính account dir đang dùng, không cần cờ) — đổi độc lập với việc gộp executor, không phải hệ quả của nó. `normalizeProviderFamily` (`provider-adapter.mjs`, khoá governance/egress family theo `command` — hardcode `cmd==='codex'→'openai-codex'`, `cmd==='pi'→'pi'`) hoàn toàn không đụng bởi rename này: family đó khoá theo BINARY thật đang chạy, độc lập tuyệt đối với executor id/`providerModel` trong config.
 
 - **RUL72 (Gom thang tier/rigor: 2 thang + 1 bảng, xoá mọi lớp chồng; tier-rigor-vocabulary-consolidation, 2026-09-30).**
-  Thay thế RUL69 về cơ chế map model và chuẩn hoá từ vựng toàn repo:
+  Thay thế RUL69 (vocab modelTier 6 mức thay 5 mức cũ) về cơ chế map model và chuẩn hoá từ vựng toàn repo:
   1. Bên cầu (việc cần gì): từ duy nhất là `rigor = low | standard | high | critical` (thay thế `minTier`, `minRigor`, `mode`). `rigor` gộp chỉ-nâng qua các scope (FlowDefinition → Operation → Actor → Assignment → CLI), rồi gộp sàn theo loại việc `capabilities.<cap>.rigor`.
   2. Bên cung (khẩu vị owner): ánh xạ qua đúng một bảng config bắt buộc `runner.rigorToTier[rigor] → tier` (`nano|mini|standard|advanced|flagship|frontier`), sau đó chọn model tại `runner.modelPolicies[provider][tier]`.
   3. Override tường minh: `--tier` / `actors[].tier` là kênh placement tường minh (chỉ-nâng, có provenance `tierSource`); definition/operation dùng `tier` bị từ chối.
   4. Work: tách `work.tier` thành `work.size` (độ lớn, không bao giờ tới model) và `work.rigor` (tuỳ chọn, discovery phán). Item cũ có `risk: heavy` và chưa có `rigor` được đọc thành `rigor: high` ở đường đọc duy nhất.
-  5. Sàn theo loại việc `capabilities.<cap>.rigor` là sàn duy nhất theo loại việc, có hiệu lực ở cả đường coordination lẫn Work (D19). Khối `capabilities.*.overrides` bị xoá hoàn toàn.
+  5. Sàn theo loại việc `capabilities.<cap>.rigor` là sàn duy nhất theo loại việc, có hiệu lực ở cả đường coordination lẫn Work. Khối `capabilities.*.overrides` bị xoá hoàn toàn.
   6. Xoá vĩnh viễn không lặp lại: `minTier`, `minRigor`, `QUALITY_TIER_BRIDGE`, `QUALITY_MODE_VALUES`, `DEFAULT_TIER_TO_POLICY`, `rigorOverrides`, `runner.models`, `capabilities.*.overrides`. Test guard tự động chặn chúng quay lại.
 
 ## Edge Cases Settled
@@ -1222,12 +1222,12 @@ Lớp từ vựng dispatch hiện hành của fgOS phản ánh mô hình control
 | `DispatchPlan` | (mới) | Kế hoạch dispatch được resolved gồm mechanism, target agent/tool, và metadata | `src/runner/dispatch/plan.mjs`, `dispatch-control-plane-redesign.md:175` |
 | `DispatchAssignment` | (mới) | Đơn vị phân công dispatch cụ thể gán executor cho work item | `src/runner/dispatch/plan.mjs`, `dispatch-control-plane-redesign.md:210` |
 | `DemandFacts` / `CapabilityMatch` | (mới) | DemandFacts khai báo thuộc tính phía cầu; CapabilityMatch là kết quả khớp qua serves — lời hứa hành vi đọc được bằng máy của capability | `core/skills/_shared/capability-matching.md` |
-| `rigor` | (từ vựng chất lượng cũ) | Yêu cầu chất lượng phía cầu (`low | standard | high | critical`), gộp chỉ-nâng qua các scope và sàn capability | `RUL72`, D-ADR0046 |
-| `tier` | `modelTier` | Mức model phía cung (`nano | mini | standard | advanced | flagship | frontier`), cấu hình qua `runner.rigorToTier` và chọn model tại `runner.modelPolicies` | `RUL72`, D-ADR0046 |
-| `work.size` | (hạng việc cũ) | Độ lớn việc (`light | standard | heavy`), không bao giờ dẫn tới model | `RUL72`, spec Work-State |
+| `rigor` | (từ vựng chất lượng cũ) | Yêu cầu chất lượng phía cầu (`low | standard | high | critical`), gộp chỉ-nâng qua các scope và sàn capability | RUL72 (Gom thang tier/rigor: 2 thang + 1 bảng, xoá mọi lớp chồng), 0046 |
+| `tier` | `modelTier` | Mức model phía cung (`nano | mini | standard | advanced | flagship | frontier`), cấu hình qua `runner.rigorToTier` và chọn model tại `runner.modelPolicies` | RUL72 (Gom thang tier/rigor: 2 thang + 1 bảng, xoá mọi lớp chồng), 0046 |
+| `work.size` | (hạng việc cũ) | Độ lớn việc (`light | standard | heavy`), không bao giờ dẫn tới model | RUL72 (Gom thang tier/rigor: 2 thang + 1 bảng, xoá mọi lớp chồng), spec Work-State |
 
 *Ghi chú:*
-- Gom thang tier/rigor (RUL72, D-ADR0046): phân định triệt để bên cầu (`rigor`) và bên cung (`tier` qua bảng `rigorToTier`). Xoá hoàn toàn các lớp trung gian, cầu nối và overrides cũ. Sàn duy nhất theo loại việc là `capabilities.<cap>.rigor`.
+- Gom thang tier/rigor (RUL72 (Gom thang tier/rigor: 2 thang + 1 bảng, xoá mọi lớp chồng), 0046): phân định triệt để bên cầu (`rigor`) và bên cung (`tier` qua bảng `rigorToTier`). Xoá hoàn toàn các lớp trung gian, cầu nối và overrides cũ. Sàn duy nhất theo loại việc là `capabilities.<cap>.rigor`.
 - Về vai trò bên gọi `launcher` / `driver` / `orchestrator`: xem lưới 2×2 tại `runner.md:2172-2180` (kỷ yếu `0031`) tóm tắt trục T1/T0.
 - Khái niệm `capacity` trong lịch sử từng đại diện cho cả năng lực lẫn đơn vị thực thi; từ ADR 0034 (`runner.md:2434`), các cấu hình `capacities.<id>` được chuyển thành `executors.<id>` và `capabilities.<id>`.
 - `rootTask` và `subTask` đã bị loại bỏ khỏi từ vựng dispatch per ADR 0029 (xem `docs/decisions/index.md`).
@@ -3016,7 +3016,7 @@ adapter-specific exports (Node side, unit P8a) and `supervisor.rs`/
   1. Bên cầu chỉ dùng `rigor` (`low|standard|high|critical`); bên cung chỉ dùng `tier` (`nano|mini|standard|advanced|flagship|frontier`) qua `rigorToTier`.
   2. Một resolver duy nhất: `resolveTierModel(cfg, tier, provider)`.
   3. Xoá vĩnh viễn: `minTier`, `minRigor`, `QUALITY_TIER_BRIDGE`, `QUALITY_MODE_VALUES`, `DEFAULT_TIER_TO_POLICY`, `rigorOverrides`, `runner.models`, `capabilities.*.overrides`.
-  4. Sàn theo loại việc `capabilities.<cap>.rigor` (D19), merge chỉ-nâng với provenance `rigorSource: capability`.
-  5. Tách `work.tier` thành `work.size` (độ lớn, không tới model) và `work.rigor` (tuỳ chọn, discovery phán); đường đọc duy nhất map event cũ `tier → size` và `risk: heavy` → `rigor: high` (D18). Snapshot `state.json` mang `viewSchemaVersion: 2`.
+  4. Sàn theo loại việc `capabilities.<cap>.rigor`, merge chỉ-nâng với provenance `rigorSource: capability`.
+  5. Tách `work.tier` thành `work.size` (độ lớn, không tới model) và `work.rigor` (tuỳ chọn, discovery phán); đường đọc duy nhất map event cũ `tier → size` và `risk: heavy` → `rigor: high`. Snapshot `state.json` mang `viewSchemaVersion: 2`.
   6. Doctor checks (`tier-vocabulary-dead-keys`, `model-policy-tier-coverage`, `coordination-protocol-dead-vocabulary`) và dead vocabulary guard bảo vệ cấu trúc.
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
