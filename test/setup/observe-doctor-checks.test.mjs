@@ -149,11 +149,16 @@ test('observe-friction-migrated passes when all legacy records are migrated', ()
 test('observe-host-resolvable verifies host binary status', () => {
   const originalHostBin = process.env.FGOS_HOST_BIN;
   try {
-    // 1. Invalid host binary path fails
-    process.env.FGOS_HOST_BIN = '/nonexistent/bin/fgos';
-    // If it points to nonexistent, resolveHostBin returns null in an empty dir
-    const resUnavailable = checkObserveHostResolvable('/tmp');
-    assert.equal(resUnavailable.passed, false);
+    // 1. Invalid/failing host binary fails
+    const dummyScript = path.join(tmpdir(), 'failing-host-bin-' + Math.random().toString(36).slice(2) + '.sh');
+    fs.writeFileSync(dummyScript, '#!/bin/sh\nexit 1\n', { mode: 0o755 });
+    try {
+      process.env.FGOS_HOST_BIN = dummyScript;
+      const resUnavailable = checkObserveHostResolvable('/tmp');
+      assert.equal(resUnavailable.passed, false);
+    } finally {
+      if (fs.existsSync(dummyScript)) fs.unlinkSync(dummyScript);
+    }
 
     // 2. Built host binary passes
     const builtHost = path.resolve('target', 'debug', 'fgos');
