@@ -1,7 +1,7 @@
 ---
 title: "P2 Plan chạy được: Unit cho mọi đường vào, driver mỏng trên Workflow runner, bỏ DemandFacts"
 description: "Đóng mối authority 'phân rã thành gì': Unit là hợp đồng dữ liệu duy nhất cho prompt tự do, plan AgentKit, plan dạng khác; một driver mỏng giao việc cho Workflow runner (P3a); bỏ DemandFacts/matcher/form và các facade chỉ-code."
-status: pending
+status: done
 priority: P1
 effort: "~4–5d"
 tags: [planning, unit, driver, doctrine, skills]
@@ -31,6 +31,17 @@ Sau P1 (`fgos run --unit`) và **P3a** (Workflow runner + store + helper tích h
 
 synthesis D0, D1, D2, Q2/Q5 handoff, quyết định (b) `plan.md` chỉ đọc, §7d, **§7e Q-C** (P3a trước P2; một sequencer), G7 (herdr mặc định); red-team mục 7, 13, 15.
 
+## Làm tươi (Phase 1 scout kết quả)
+
+| Hạng mục | Vị trí / Số lượng | Ghi chú |
+|---|---|---|
+| `plan-lint` | `src/report/capability-plan-lint.mjs:13-37` | Cần mở rộng đọc block `- unit:` trong phase file, dùng `validateUnit`, kiểm phụ thuộc & containment |
+| `capability-match.mjs` | `src/runner/capability-match.mjs` | File sẽ xoá hoàn toàn ở Phase 4 |
+| Verb `capability` | `bin/fgos.mjs:2370`, `command-registry.mjs:750` | Xoá subcommand `match` ở Phase 4 |
+| Caller `capability match` | 4 call sites: `fgos-architecture-panel/SKILL.md:81`, `fgos-panel/SKILL.md:71`, `fgos-code-change/SKILL.md:10,78` | Thay bằng tra trực tiếp config `domain:verb` |
+| Facades cũ cần xoá | `fgos-code-change`, `fgos-plan-loop`, `fgos-code-panel`, `fgos-capability-dispatching` | Thay bằng skill core `fgos-run` |
+| Hợp đồng Unit | Đã chốt ở P1 (`src/runner/execution/unit.mjs`) | Không đổi; phase 2 tái dùng `validateUnit` |
+
 ## Hợp đồng `- unit:` trong phase file
 
 ```markdown
@@ -59,9 +70,9 @@ Sóng B: 2 ∥ 4. **Song song với P3b**: theo bảng sở hữu trong track `p
 
 ## Success Criteria
 
-- [ ] "Chạy phase N" và "phase A..B" của plan có `- unit:` chạy trọn qua driver → Workflow runner → `fgos run` (pane herdr); câu tự do K1 chạy trọn (Lead viết Unit); phase chưa được owner duyệt dừng ở cổng người.
-- [ ] `rg -n "DemandFacts|matchCapability|deriveForm|fgos-code-panel|fgos-plan-loop|fgos-code-change|capability match" src bin core domains AGENTS.md` rỗng (trừ lịch sử/CHANGELOG).
-- [ ] Spec + boundary + CHANGELOG; guard (append); full `npm test`; merge `main`.
+- [x] "Chạy phase N" và "phase A..B" của plan có `- unit:` chạy trọn qua driver → Workflow runner → `fgos run` (pane herdr); câu tự do K1 chạy trọn (Lead viết Unit); phase chưa được owner duyệt dừng ở cổng người.
+- [x] `rg -n "DemandFacts|matchCapability|deriveForm|fgos-code-panel|fgos-plan-loop|fgos-code-change|capability match" src bin core domains AGENTS.md` rỗng (trừ lịch sử/CHANGELOG).
+- [x] Spec + boundary + CHANGELOG; guard (append); full `npm test`; merge `main`.
 
 ## Risk Assessment
 

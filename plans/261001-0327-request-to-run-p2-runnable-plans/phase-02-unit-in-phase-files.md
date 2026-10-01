@@ -1,7 +1,7 @@
 ---
 phase: 2
 title: "Unit trong phase file (plan-lint)"
-status: pending
+status: done
 priority: P1
 effort: "1d"
 dependencies: [1]
@@ -38,8 +38,8 @@ dependencies: [1]
 
 ## Success Criteria
 
-- [ ] `fgos plan-lint <plan> --phase N --json` trả Unit[] chuẩn; 5 ca test xanh.
-- [ ] Không còn đường đọc Unit thứ hai.
+- [x] `fgos plan-lint <plan> --phase N --json` trả Unit[] chuẩn; 5 ca test xanh.
+- [x] Không còn đường đọc Unit thứ hai.
 
 ## Risk Assessment
 

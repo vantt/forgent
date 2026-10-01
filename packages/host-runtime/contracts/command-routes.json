@@ -44,15 +44,6 @@
       "test/rust-host/command-routes.test.mjs"
     ]
   },
-  "capability": {
-    "selector": "capability",
-    "route_kind": "legacy-cli",
-    "legacy_payload": "legacy-node",
-    "owner_path": "src/cli/command-registry.mjs",
-    "compatibility_tests": [
-      "test/rust-host/command-routes.test.mjs"
-    ]
-  },
   "catchup": {
     "selector": "catchup",
     "route_kind": "legacy-cli",
@@ -498,6 +489,15 @@
   },
   "rollup": {
     "selector": "rollup",
+    "route_kind": "legacy-cli",
+    "legacy_payload": "legacy-node",
+    "owner_path": "src/cli/command-registry.mjs",
+    "compatibility_tests": [
+      "test/rust-host/command-routes.test.mjs"
+    ]
+  },
+  "run": {
+    "selector": "run",
     "route_kind": "legacy-cli",
     "legacy_payload": "legacy-node",
     "owner_path": "src/cli/command-registry.mjs",

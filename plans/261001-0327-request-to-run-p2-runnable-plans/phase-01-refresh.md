@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "Làm tươi"
-status: pending
+status: done
 priority: P1
 effort: "0.5d"
 dependencies: []
@@ -32,7 +32,7 @@ Khớp plan với `main` sau P1 và P3a: hợp đồng Unit/`fgos run` thật, A
 
 ## Success Criteria
 
-- [ ] Bảng con trỏ cũ→mới trong `plan.md`; danh sách caller DemandFacts/matcher đầy đủ.
+- [x] Bảng con trỏ cũ→mới trong `plan.md`; danh sách caller DemandFacts/matcher đầy đủ.
 
 ## Risk Assessment
 

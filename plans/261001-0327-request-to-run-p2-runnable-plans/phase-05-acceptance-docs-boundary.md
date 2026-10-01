@@ -1,7 +1,7 @@
 ---
 phase: 5
 title: "Nghiệm thu + docs + boundary"
-status: pending
+status: done
 priority: P1
 effort: "1d"
 dependencies: [3, 4]
@@ -35,8 +35,8 @@ Chứng minh "chạy phase N" và "câu tự do" chạy trọn qua driver chung 
 
 ## Success Criteria
 
-- [ ] (a)–(c) đạt; (d) đạt hoặc ghi "chờ Q5".
-- [ ] Spec/boundary/CHANGELOG/guard; merge `main`.
+- [x] (a)–(c) đạt; (d) đạt hoặc ghi "chờ Q5".
+- [x] Spec/boundary/CHANGELOG/guard; merge `main`.
 
 ## Risk Assessment
 

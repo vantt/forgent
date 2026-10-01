@@ -7,7 +7,7 @@ description: >-
   to an existing registered group-thinking protocol without asking the person
   for a protocol id. Covers architecture, coding-design, product, business,
   strategy, policy/process, and incident-reflection advisory cases. Does not
-  implement code; use fgos-code-change only when the person explicitly requests
+  implement code; use fgos-run only when the person explicitly requests
   a code change plus review/red-team.
 ---
 
@@ -28,9 +28,8 @@ adaptation bounds are never this route's own, per the `disposition criteria`/
 `adaptation bounds` rows below) — it does **not** govern the delegated
 `architecture-panel` (step 3) route, which keeps its own hook table
 ([`fgos-architecture-panel`](../fgos-architecture-panel/SKILL.md)'s own). The
-delegated `code-change-panel` (step 4) route is a known Phase 5 gap:
-`fgos-code-change` does not yet link this fragment or declare a hook table of
-its own. Never assume this one table governs all five routes.
+delegated `code-change-panel` (step 4) route delegates execution to
+`fgos-run`. Never assume this one table governs all five routes.
 
 Read the canonical
 [`Group Thinking Trigger Surface`](../../../docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md)
@@ -47,7 +46,7 @@ extend that map in this skill.
    still never supplies its protocol id.
 4. For `code-change-panel`, continue only when the person explicitly asked to
    implement/change/fix code, then follow
-   `fgos-code-change`. A coding decision, design
+   `fgos-run`. A coding decision, design
    review, or "plugin versus core" question is advisory and must not take this
    route.
 5. For other presets, read the selected registered FlowDefinition to learn its
@@ -68,7 +67,7 @@ extend that map in this skill.
 | Hook Slot | Value |
 |---|---|
 | `unit of iteration` | One dispatched session for the single non-architecture, non-code-change preset selected in Route step 2 -- one full pass through the unmodified `fgos-group-thinking` pack gate to a returned advisory artifact and coordination id. |
-| `open inputs` | (a) result kind: advisory, never work-product -- this route never implements code (Boundaries). (b) exactly one primary canonical capability, resolved by declaring `DemandFacts` from the extracted request (`outputKind: "decision"`, `domain` from the subject when known or empty, `mutates: false`, `needsIndependentReview` per the selected preset's own collaboration shape, `hasPlanOrTrack: false`, `size`, `rigor`) and calling `fgos capability match --demand '<json>'` (`../_shared/capability-matching.md`) -- per Phase 5's own entry gate (consume the I17 demand doctrine and the I20 `fgos capability match` door instead of keyword-matched skill descriptions), never a keyword-matched guess. `fgos-plan-loop` is not a precedent for this call: it resolves its own capability from `plan.md`'s Product Gates table and never calls `fgos capability match` directly. (c) the person's subject, proposal/artifact, supplied options, and material scope/risk constraint (Route step 1), filled into the selected FlowDefinition's declared request shape (Route step 5). |
+| `open inputs` | (a) result kind: advisory, never work-product -- this route never implements code (Boundaries). (b) exactly one primary canonical capability, resolved directly from the selected preset or task capability in `runner.capabilities` (e.g. `advise`), never a keyword-matched guess. (c) the person's subject, proposal/artifact, supplied options, and material scope/risk constraint (Route step 1), filled into the selected FlowDefinition's declared request shape (Route step 5). |
 | `evidence verification` | Read the advisory artifact and coordination id back through `fgos coordination show <coordinationId> --json` (Route step 6); never claim a ranking protocol selected a winner, or that mediated feedback guarantees anonymity or consensus -- report only artifacts the real session produced (Boundaries). |
 | `disposition criteria` | None owned by this route. The selected FlowDefinition's own actors, aggregation, and quorum rules govern every finding; this skill never invents protocol semantics, transitions, visibility, grants, reopen, aggregation, or close rules in task prose (Boundaries). |
 | `adaptation bounds` | None owned by this route. Bounded entirely by the selected FlowDefinition's own declared `activation`/`maxInvocations` -- this skill asserts no revision or retry limit of its own. |

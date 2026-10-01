@@ -3033,3 +3033,14 @@ adapter-specific exports (Node side, unit P8a) and `supervisor.rs`/
   5. **Cổng ghi file kiểm chứng được (supersede ADR-006 §6):** Assignment `mutating` được admit khi: (a) cwd là linked worktree và `realpath(cwd) == unit.json.worktree`, (b) `bind()` tính lại từ `unit.json` khớp deep-equal. Ngoại lệ có tên: engine protocol stamp giữ tới P4 phase 6. D-ADR0033 giữ nguyên.
   6. **Xoá bỏ hoàn toàn:** Invocations `*-readonly`, `readOnlyRedirects`, `placement-policy.mjs`, `executors.*.for`, PolicyPatch `prefer*`. Posture read-only/ghi file là confinement OS do fgOS áp cho cả herdr lẫn cli (X-1). Quota limit `provider-limit` kích hoạt `bind().nextCandidate` mở pane mới giữ pane cũ (X-3).
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
+
+### 0048 — P2 Plan chạy được: Unit cho mọi đường vào, driver mỏng fgos-run, bỏ DemandFacts/matcher
+
+- **Trạng thái:** Settled (Request-to-Run P2 Runnable Plans hoàn tất, 2026-10-01)
+- **Bối cảnh:** Trước P2, việc phân rã và chọn capability/cơ chế bị phân mảnh bởi lớp prose L2 DemandFacts (8 fields) -> matcher -> `form` (`inline|protocol|facade`). Các facade `fgos-code-change`, `fgos-code-panel`, `fgos-plan-loop` tự lập lịch, tự chạy vòng lặp bằng prose, tạo ra nhiều sequencer chồng chéo và gắn chặt vào domain coding.
+- **Quyết định:**
+  1. **Unit là hợp đồng dữ liệu duy nhất (`src/runner/execution/unit.mjs`):** Mọi đường vào (prompt tự do, plan AgentKit, phase file) đều quy về Unit. `fgos plan-lint` kiểm chứng Unit trong phase file (`## Units`, `- unit:`), phát hiện sớm ghim hạ tầng (G2), trùng id, vòng phụ thuộc, và giao nhau `writes` không có `dependsOn`.
+  2. **Driver mỏng (`core/skills/fgos-run`):** Thay thế toàn bộ các facade cũ (`fgos-code-change`, `fgos-code-panel`, `fgos-plan-loop`, `fgos-capability-dispatching`). Driver không tự lập lịch, không tự merge mà giao trọn cho **Workflow runner** (`src/workflow/runner.mjs`, P3a).
+  3. **Cổng người thống nhất:** Authorize không parse từ prose plan. Phase chưa được duyệt sẽ dừng ở cổng người của Workflow run (`gate: { kind: "human" }`), owner trả lời qua `fgos workflow answer`. Mọi câu hỏi treo được gom thành một bộ duy nhất.
+  4. **Xoá bỏ DemandFacts & matcher:** Xoá `src/runner/capability-match.mjs`, verb `fgos capability match`, các fragment `capability-matching.md`. L2 chỉ còn hiểu yêu cầu và viết Unit với `capability` (`domain:verb`).
+Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.

@@ -6,8 +6,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { lintPlanCapabilityAnnotations } from '../../src/report/capability-plan-lint.mjs';
+import {
+  lintPlanCapabilityAnnotations,
+  lintPhaseUnits,
+  resolvePhaseFile,
+  pathsOverlap,
+} from '../../src/report/capability-plan-lint.mjs';
 import { DEFAULT_CAPABILITY_SLOTS } from '../../src/setup/registrations.mjs';
+import { execFileSync } from 'node:child_process';
+import os from 'node:os';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REGISTERED = [...Object.keys(DEFAULT_CAPABILITY_SLOTS), 'impact-analysis', 'pane-labeling'];
@@ -396,4 +403,318 @@ test('a pin key is caught case-insensitively, tolerating whitespace around the c
   const pinned = result.findings.filter((f) => f.code === 'capability.pinned');
   assert.equal(pinned.length, 3, JSON.stringify(result.findings));
   assert.ok(pinned.every((f) => f.severity === 'hard'));
+});
+
+test('pathsOverlap helper correctly identifies overlapping and non-overlapping patterns', () => {
+  assert.equal(pathsOverlap('src/foo.mjs', 'src/foo.mjs'), true);
+  assert.equal(pathsOverlap('src/foo.mjs', 'src/bar.mjs'), false);
+  assert.equal(pathsOverlap('src', 'src/foo.mjs'), true);
+  assert.equal(pathsOverlap('src/foo.mjs', 'src'), true);
+  assert.equal(pathsOverlap('src/runner/**', 'src/runner/execution/unit.mjs'), true);
+  assert.equal(pathsOverlap('src/runner/**', 'src/**'), true);
+  assert.equal(pathsOverlap('src/runner/**', 'src/workflow/**'), false);
+  assert.equal(pathsOverlap('src/*.mjs', 'src/foo.mjs'), true);
+  assert.equal(pathsOverlap('src/*.mjs', 'src/sub/foo.mjs'), false);
+});
+
+test('resolvePhaseFile finds padded and unpadded phase files in a directory', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-phase-test-'));
+  try {
+    fs.writeFileSync(path.join(tmpDir, 'phase-01-refresh.md'), '# Phase 1');
+    fs.writeFileSync(path.join(tmpDir, 'phase-2-units.md'), '# Phase 2');
+
+    const f1 = resolvePhaseFile(tmpDir, 1);
+    assert.ok(f1.endsWith('phase-01-refresh.md'));
+
+    const f2 = resolvePhaseFile(tmpDir, 2);
+    assert.ok(f2.endsWith('phase-2-units.md'));
+
+    assert.throws(() => resolvePhaseFile(tmpDir, 3), /No phase file matching phase 3/);
+    assert.throws(() => resolvePhaseFile(tmpDir, 'invalid'), /Invalid phase number/);
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('lintPhaseUnits validates valid units in ## Units section', () => {
+  const text = `# Phase 2: Units
+
+## Overview
+Overview text
+
+## Units
+- unit: area-runner
+  capability: docs:write
+  rigor: high
+  writes: [docs/platform/runner/**]
+  dependsOn: []
+  pattern: reviewed
+  objective: "Write documentation"
+
+- unit: area-reviewer
+  capability: code:review
+  rigor: standard
+  writes: []
+  dependsOn: [area-runner]
+  pattern: reviewed
+  objective: "Review code"
+`;
+  const config = {
+    runner: {
+      capabilities: {
+        'docs:write': { description: 'Write documentation' },
+        'code:review': { description: 'Review code' },
+      },
+    },
+  };
+  const result = lintPhaseUnits(text, { config });
+  assert.equal(result.ok, true);
+  assert.equal(result.findings.length, 0);
+  assert.equal(result.units.length, 2);
+  assert.equal(result.units[0].id, 'area-runner');
+  assert.equal(result.units[0].rigor, 'high');
+  assert.deepEqual(result.units[0].writes, ['docs/platform/runner/**']);
+  assert.equal(result.units[1].id, 'area-reviewer');
+  assert.deepEqual(result.units[1].dependsOn, ['area-runner']);
+});
+
+test('lintPhaseUnits flags G2 violations as hard errors (executor, provider, model, tier, invocation, prefer, overrides)', () => {
+  const text = `## Units
+- unit: area-runner
+  capability: docs:write
+  objective: "Run docs"
+  executor: claude
+  provider: anthropic
+  model: sonnet
+  tier: high
+  invocation: direct
+  prefer: test-pref
+  overrides: test-overrides
+`;
+  const result = lintPhaseUnits(text);
+  assert.equal(result.ok, false);
+  const pinned = result.findings.filter((f) => f.code === 'capability.pinned');
+  assert.equal(pinned.length, 7);
+  assert.ok(pinned.every((f) => f.severity === 'hard'));
+});
+
+test('lintPhaseUnits flags duplicate unit IDs within the same phase as hard error', () => {
+  const text = `## Units
+- unit: step-a
+  capability: docs:write
+  objective: "First step A"
+
+- unit: step-a
+  capability: code:review
+  objective: "Duplicate step A"
+`;
+  const result = lintPhaseUnits(text);
+  assert.equal(result.ok, false);
+  const dups = result.findings.filter((f) => f.code === 'unit.duplicate-id');
+  assert.equal(dups.length, 1);
+  assert.equal(dups[0].severity, 'hard');
+  assert.match(dups[0].message, /duplicate unit id "step-a"/);
+});
+
+test('lintPhaseUnits flags direct and indirect dependency cycles as hard errors', () => {
+  const directCycle = `## Units
+- unit: u1
+  capability: docs:write
+  objective: "Unit 1"
+  dependsOn: [u2]
+
+- unit: u2
+  capability: docs:write
+  objective: "Unit 2"
+  dependsOn: [u1]
+`;
+  const r1 = lintPhaseUnits(directCycle);
+  assert.equal(r1.ok, false);
+  const c1 = r1.findings.filter((f) => f.code === 'unit.dependency-cycle');
+  assert.ok(c1.length >= 1);
+  assert.equal(c1[0].severity, 'hard');
+
+  const threeCycle = `## Units
+- unit: a
+  capability: docs:write
+  objective: "Unit A"
+  dependsOn: [c]
+
+- unit: b
+  capability: docs:write
+  objective: "Unit B"
+  dependsOn: [a]
+
+- unit: c
+  capability: docs:write
+  objective: "Unit C"
+  dependsOn: [b]
+`;
+  const r2 = lintPhaseUnits(threeCycle);
+  assert.equal(r2.ok, false);
+  const c2 = r2.findings.filter((f) => f.code === 'unit.dependency-cycle');
+  assert.ok(c2.length >= 1);
+});
+
+test('lintPhaseUnits flags writes collision when units overlap without dependency', () => {
+  const colliding = `## Units
+- unit: writer-1
+  capability: docs:write
+  objective: "Write docs 1"
+  writes: [docs/platform/runner/**]
+  dependsOn: []
+
+- unit: writer-2
+  capability: docs:write
+  objective: "Write docs 2"
+  writes: [docs/platform/runner/guide.md]
+  dependsOn: []
+`;
+  const result = lintPhaseUnits(colliding);
+  assert.equal(result.ok, false);
+  const collisions = result.findings.filter((f) => f.code === 'unit.writes-collision');
+  assert.equal(collisions.length, 1);
+  assert.equal(collisions[0].severity, 'hard');
+  assert.match(collisions[0].message, /overlapping writes/);
+});
+
+test('lintPhaseUnits allows overlapping writes when units have dependency relationship', () => {
+  const dependent = `## Units
+- unit: writer-1
+  capability: docs:write
+  objective: "Write docs 1"
+  writes: [docs/platform/runner/**]
+  dependsOn: []
+
+- unit: writer-2
+  capability: docs:write
+  objective: "Write docs 2"
+  writes: [docs/platform/runner/guide.md]
+  dependsOn: [writer-1]
+`;
+  const result = lintPhaseUnits(dependent);
+  assert.equal(result.ok, true);
+  const collisions = result.findings.filter((f) => f.code === 'unit.writes-collision');
+  assert.equal(collisions.length, 0);
+});
+
+test('lintPhaseUnits checks capability declaration with direct match and fallback verb', () => {
+  const text = `## Units
+- unit: u-exact
+  capability: docs:write
+  objective: "Direct capability match"
+
+- unit: u-fallback
+  capability: code:implement
+  objective: "Fallback verb match"
+
+- unit: u-missing
+  capability: deploy:custom-target
+  objective: "Missing capability"
+
+- unit: u-unresolved
+  capability: unresolved (needs review)
+  objective: "Unresolved capability"
+`;
+  const config = {
+    runner: {
+      capabilities: {
+        'docs:write': { description: 'Exact capability' },
+        implement: { description: 'Fallback verb' },
+      },
+    },
+  };
+  const result = lintPhaseUnits(text, { config });
+  // Missing capability is a warning, so ok is true!
+  assert.equal(result.ok, true);
+
+  const unreg = result.findings.filter((f) => f.code === 'capability.unregistered');
+  assert.equal(unreg.length, 1);
+  assert.equal(unreg[0].unit, 'u-missing');
+  assert.equal(unreg[0].severity, 'warn');
+
+  const unres = result.findings.filter((f) => f.code === 'capability.unresolved');
+  assert.equal(unres.length, 1);
+  assert.equal(unres[0].unit, 'u-unresolved');
+  assert.equal(unres[0].severity, 'warn');
+});
+
+test('lintPhaseUnits warns on unknown pattern', () => {
+  const text = `## Units
+- unit: u1
+  capability: docs:write
+  objective: "Unknown pattern"
+  pattern: unearthly-ritual
+`;
+  const result = lintPhaseUnits(text);
+  assert.equal(result.ok, true);
+  const unknownPattern = result.findings.filter((f) => f.code === 'pattern.unknown');
+  assert.equal(unknownPattern.length, 1);
+  assert.equal(unknownPattern[0].severity, 'warn');
+});
+
+test('lintPhaseUnits flags missing objective as hard error', () => {
+  const text = `## Units
+- unit: u1
+  capability: docs:write
+`;
+  const result = lintPhaseUnits(text);
+  assert.equal(result.ok, false);
+  const invalid = result.findings.filter((f) => f.code === 'unit.invalid');
+  assert.equal(invalid.length, 1);
+  assert.equal(invalid[0].severity, 'hard');
+  assert.match(invalid[0].message, /unit\.objective must be a non-empty string/);
+});
+
+test('lintPlanCapabilityAnnotations supports options.phase to target phase files', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-plan-target-'));
+  try {
+    fs.writeFileSync(path.join(tmpDir, 'plan.md'), '# Main Plan\n');
+    fs.writeFileSync(
+      path.join(tmpDir, 'phase-02-runnable.md'),
+      `# Phase 2
+## Units
+- unit: u-phase2
+  capability: docs:write
+  objective: "Run Phase 2 unit"
+`,
+    );
+
+    const result = lintPlanCapabilityAnnotations(tmpDir, { phase: 2 });
+    assert.equal(result.ok, true);
+    assert.equal(result.units.length, 1);
+    assert.equal(result.units[0].id, 'u-phase2');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+});
+
+test('CLI fgos plan-lint supports --phase and --json end-to-end', () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-lint-'));
+  try {
+    fs.writeFileSync(path.join(tmpDir, 'plan.md'), '# Plan\n');
+    fs.writeFileSync(
+      path.join(tmpDir, 'phase-01-setup.md'),
+      `# Phase 1
+## Units
+- unit: cli-unit-1
+  capability: docs:write
+  objective: "CLI unit test"
+`,
+    );
+
+    const binFgos = path.resolve(__dirname, '../../bin/fgos.mjs');
+    const proc = execFileSync(
+      'node',
+      [binFgos, 'plan-lint', tmpDir, '--phase', '1', '--json'],
+      { encoding: 'utf8' },
+    );
+    const parsed = JSON.parse(proc);
+    assert.equal(parsed.contract, 'fgos.v1');
+    assert.equal(parsed.data.ok, true);
+    assert.equal(parsed.data.units.length, 1);
+    assert.equal(parsed.data.units[0].id, 'cli-unit-1');
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
 });
