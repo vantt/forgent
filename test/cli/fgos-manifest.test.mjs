@@ -43,15 +43,17 @@ function dispatchedVerbs() {
 
 test('manifest verb-name set equals the set of verbs runVerb() actually dispatches', () => {
   const dispatched = [...new Set(dispatchedVerbs())].sort();
-  const registered = COMMAND_REGISTRY.map((entry) => entry.name).sort();
+  const registered = COMMAND_REGISTRY.filter((entry) => !entry.nativeOnly).map((entry) => entry.name).sort();
   assert.deepEqual(registered, dispatched);
 });
 
 test('every registry entry has touchesState, externalEffect, paginated, requiresExistingStore booleans and the required keys', () => {
+  const baseKeys = ['deprecated', 'description', 'examples', 'externalEffect', 'invoke', 'name', 'paginated', 'parameters', 'requiresExistingStore', 'touchesState'];
   for (const entry of COMMAND_REGISTRY) {
+    const expectedKeys = entry.nativeOnly !== undefined ? [...baseKeys, 'nativeOnly'].sort() : [...baseKeys].sort();
     assert.deepEqual(
       Object.keys(entry).sort(),
-      ['deprecated', 'description', 'examples', 'externalEffect', 'invoke', 'name', 'paginated', 'parameters', 'requiresExistingStore', 'touchesState'].sort(),
+      expectedKeys,
       `entry "${entry.name}" has an unexpected key set`,
     );
     assert.equal(typeof entry.touchesState, 'boolean', `entry "${entry.name}" has invalid touchesState "${entry.touchesState}"`);
