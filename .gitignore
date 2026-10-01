@@ -24,6 +24,7 @@
 .fgos/assignments/
 .fgos/coordination/
 .fgos/dispatch-runs/
+.fgos/workflow-runs/
 cache/
 node_modules/
 node_modules

@@ -253,6 +253,13 @@
     "src/runner/execution/patterns/panel.mjs": "domain",
     "src/runner/execution/patterns/presets.mjs": "domain",
     "src/runner/execution/patterns/reviewed.mjs": "domain",
-    "src/runner/execution/patterns/solo.mjs": "domain"
+    "src/runner/execution/patterns/solo.mjs": "domain",
+    "src/workflow/definition.mjs": "infra",
+    "src/workflow/loader.mjs": "infra",
+    "src/workflow/store.mjs": "infra",
+    "src/workflow/integrate.mjs": "infra",
+    "src/workflow/plan-source.mjs": "infra",
+    "src/workflow/runner.mjs": "use-case",
+    "src/workflow/index.mjs": "use-case"
   }
 }

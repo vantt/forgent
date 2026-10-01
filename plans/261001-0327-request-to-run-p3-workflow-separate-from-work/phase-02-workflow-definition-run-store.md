@@ -1,7 +1,7 @@
 ---
 phase: 2
 title: "P3a — Workflow runner + store + tích hợp + dịch plan"
-status: pending
+status: done
 priority: P1
 effort: "3.5d"
 dependencies: [1]
@@ -47,9 +47,9 @@ fgos workflow start <id | --units f | --plan dir --phases A..B> ─► run log �
 
 ## Success Criteria
 
-- [ ] Các ca ở bước 1 xanh; guard xanh; store có doctor + gitignore.
-- [ ] Work merge vẫn xanh sau khi tách helper.
-- [ ] P3a trên `main`.
+- [x] Các ca ở bước 1 xanh; guard xanh; store có doctor + gitignore.
+- [x] Work merge vẫn xanh sau khi tách helper.
+- [x] P3a trên `main`.
 
 ## Risk Assessment
 

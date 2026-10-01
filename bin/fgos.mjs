@@ -2144,10 +2144,44 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // different project (docs/history/tsk-65q-gate-bypass-global-install-
     // resolution/RESEARCH.md).
     case 'workflow': {
+      const sub = positional[0];
+      if (sub === 'start') {
+        const { startWorkflow } = await import('../src/workflow/index.mjs');
+        const workflowId = positional[1] ?? flags.id;
+        const planPath = flags.plan;
+        if (!workflowId && !planPath) {
+          throw new StoreError('validation', 'workflow start requires <workflowId> or --plan <path>');
+        }
+        return await startWorkflow({
+          workflowId,
+          planPath,
+          repoRoot: flags.dir,
+          worktree: flags.worktree,
+        });
+      }
+      if (sub === 'status') {
+        const { statusWorkflow } = await import('../src/workflow/index.mjs');
+        const workflowRunId = requireField(positional[1] ?? flags.id, 'workflow status requires a workflowRunId: fgos workflow status <id>');
+        return statusWorkflow(workflowRunId, { repoRoot: flags.dir });
+      }
+      if (sub === 'answer') {
+        const { answerWorkflow } = await import('../src/workflow/index.mjs');
+        const workflowRunId = requireField(positional[1] ?? flags.id, 'workflow answer requires a workflowRunId: fgos workflow answer <id> --step <stepId> --answer <text>');
+        const stepId = requireField(flags.step, 'workflow answer requires --step <stepId>');
+        const answer = requireField(flags.answer, 'workflow answer requires --answer <text>');
+        return await answerWorkflow(workflowRunId, { stepId, answer, repoRoot: flags.dir, worktree: flags.worktree });
+      }
+      if (sub === 'resume') {
+        const { resumeWorkflow } = await import('../src/workflow/index.mjs');
+        const workflowRunId = requireField(positional[1] ?? flags.id, 'workflow resume requires a workflowRunId: fgos workflow resume <id>');
+        return await resumeWorkflow(workflowRunId, { repoRoot: flags.dir, worktree: flags.worktree });
+      }
+
+      // Legacy stage operations inspection
       let stage = flags.stage;
       if (!stage) {
-        if (positional[0] === 'operations') {
-          stage = positional[1];
+        if (positional[0] === 'operations' || positional[0] === 'stages') {
+          stage = positional[1] || flags.stage;
         } else if (positional[0]) {
           stage = positional[0];
         }
