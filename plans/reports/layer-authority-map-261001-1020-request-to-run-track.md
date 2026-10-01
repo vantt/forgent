@@ -5,7 +5,7 @@ Document type: Analysis report (discussion lead)
 Snapshot: 2026-10-01 10:20 (Asia/Saigon), main @ e36f21c92
 Nguồn: duyệt code thật (đếm dòng, import, entry point) + docs/platform/component-boundary.md
 Liên quan: plans/reports/synthesis-260930-1229-request-to-run-brainstorm.md (§7b lộ trình)
-Status: phân tích; đề xuất điều chỉnh lộ trình chờ owner
+Status: phân tích; 5 điều chỉnh §4.1 owner duyệt 2026-10-01 10:20 — đã ghi vào synthesis §7d
 ```
 
 ## 1. Hình dạng hệ thống hôm nay (trên → dưới)

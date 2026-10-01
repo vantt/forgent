@@ -5,7 +5,7 @@ Document type: Synthesis report (discussion lead)
 Snapshot: 2026-09-30 16:20 (Asia/Saigon), main @ 5aed82c52
 Prompt: plans/reports/brainstorm-prompt-260930-1102-request-to-run-decomposition.md
 Handoff: plans/reports/handoff-260930-1210-harness-routing-discussion-lead.md
-Status: v3.0 — §7b lộ trình track (P1 Lõi thực thi … P5) + việc lẻ; §7c bài học engine; plan T đã sửa (D19, D20; commit 9a2cef1cd trên nhánh T); X gộp vào plan bind(); §6c đối chiếu plan tier T: T chạy trước, track này chờ T ở phần code; T cần thêm sàn `capabilities.<cap>.rigor`; Q2 đã được T phủ; §6b đối chiếu plan X (readonly redesign): không chặn bước 1, nên gom với bind(); sửa D5/bước 1/F16; thống nhất tên red-team (bỏ objector); Q6 chốt (persona khoá không bị thay, không có 'thêm' ở V1); checker theo rigor; Q1, Q2 chấp nhận; Q4 chốt red-team bắt buộc cho code (lead rút đề xuất); Q0 chốt: mô hình gọn; tách hai tầng: 3 Pattern cộng tác (+ preset) vs Workflow nhiều bước; luật phân biệt; Q8 chốt (giữ mọi dạng thảo luận; bỏ engine chỉ khi chúng chạy tốt trên mô hình gọn); Q9 chốt (supersede ADR-006 §6); (architecture advisor là ca nghiệm thu thu hồi engine); §4b chấm lại theo §0 (lead + kongming độc lập: gọn 3,9–4,0 > P-A 3,2–3,3 > P-B loại); bake-off sửa; F26–F30; §0 kết quả mong muốn + tiêu chí mới (G1–G6, 8 tiêu chí); Q0 engine vs mô hình gọn (bake-off trước); mức 4 override làm rõ; hình chạy tổng thể + plan vs Workflow + (b) quyền sở hữu plan.md đã chốt; Workflow tách khỏi Work đã chốt; bảng thuật ngữ đã chốt ở §6 D0; 3 câu trả lời (2 family: claude, openai). Chưa có gemini/xai; cập nhật tiếp nếu owner gửi thêm.
+Status: v3.1 — §7d góc nhìn layer/authority (L0–L7, A1–A7, 5 điều chỉnh owner duyệt, tiêu chí 'đóng một mối authority'); §7b lộ trình track (P1 Lõi thực thi … P5) + việc lẻ; §7c bài học engine; plan T đã sửa (D19, D20; commit 9a2cef1cd trên nhánh T); X gộp vào plan bind(); §6c đối chiếu plan tier T: T chạy trước, track này chờ T ở phần code; T cần thêm sàn `capabilities.<cap>.rigor`; Q2 đã được T phủ; §6b đối chiếu plan X (readonly redesign): không chặn bước 1, nên gom với bind(); sửa D5/bước 1/F16; thống nhất tên red-team (bỏ objector); Q6 chốt (persona khoá không bị thay, không có 'thêm' ở V1); checker theo rigor; Q1, Q2 chấp nhận; Q4 chốt red-team bắt buộc cho code (lead rút đề xuất); Q0 chốt: mô hình gọn; tách hai tầng: 3 Pattern cộng tác (+ preset) vs Workflow nhiều bước; luật phân biệt; Q8 chốt (giữ mọi dạng thảo luận; bỏ engine chỉ khi chúng chạy tốt trên mô hình gọn); Q9 chốt (supersede ADR-006 §6); (architecture advisor là ca nghiệm thu thu hồi engine); §4b chấm lại theo §0 (lead + kongming độc lập: gọn 3,9–4,0 > P-A 3,2–3,3 > P-B loại); bake-off sửa; F26–F30; §0 kết quả mong muốn + tiêu chí mới (G1–G6, 8 tiêu chí); Q0 engine vs mô hình gọn (bake-off trước); mức 4 override làm rõ; hình chạy tổng thể + plan vs Workflow + (b) quyền sở hữu plan.md đã chốt; Workflow tách khỏi Work đã chốt; bảng thuật ngữ đã chốt ở §6 D0; 3 câu trả lời (2 family: claude, openai). Chưa có gemini/xai; cập nhật tiếp nếu owner gửi thêm.
 Lịch sử: v0 12:29 (sonnet + openai bản 12:20) → v1 16:20 (thêm fable; openai bản sửa 12:39)
 ```
 
@@ -543,6 +543,55 @@ T  Tier/rigor (plan riêng, agent khác đang làm — worktree ~/projects/forge
 - [prompt-261001-0955-fix-observe-harness-protocol-count.md](prompt-261001-0955-fix-observe-harness-protocol-count.md) — F12.
 - [prompt-261001-0955-fix-test-fixture-store-leak.md](prompt-261001-0955-fix-test-fixture-store-leak.md) — bổ sung prompt gốc chưa ai làm (`plans/260930-0335-measure-runresult-classification-impact/fix-test-fixture-leak-prompt.md`); không đụng session thật đang treo (bằng chứng nền).
 - Là **điều kiện cần trước ca nghiệm thu 1**. Hai việc không đụng file của nhau, không phải chờ nhau (mỗi agent một worktree; prompt 1 kiểm bằng fixture tạm vì prompt 2 đổi số liệu store). Xung đột thật duy nhất: prompt 2 với T trên file test dispatch/coordination — giữ diff nhỏ, merge `main` sớm; T merge `main` trước mỗi phase.
+
+## 7d. Góc nhìn layer/component authority (owner duyệt 2026-10-01 10:20)
+
+Nguồn: [layer-authority-map-261001-1020-request-to-run-track.md](layer-authority-map-261001-1020-request-to-run-track.md) (dựng từ code thật, main @ `e36f21c92`). Bảy layer thuộc fgOS (L0–L5, L7) + L6 executor nằm ngoài fgOS + các thành phần ngang.
+
+### Các layer hôm nay (trên → dưới)
+
+| Layer | Thành phần (code thật) | Quy mô | Authority hôm nay | Đích sau track (plan nào đóng) |
+|---|---|---|---|---|
+| **L0 Bề mặt kích hoạt** | prompt tự do trong session Claude Code; 58 skill `/fgOS:*` (`plugins/fgOS/skills`); skill kit `ak:*`; CLI `fgos` 73 verb (`bin/fgos.mjs`); herdr gateway REST/MCP/dashboard (`herdr-plugin`); daemon `fgos-runner --watch`; hook harness (`.claude/hooks`, PreToolUse ép `dispatch decide`) | `bin/fgos.mjs` 5.155 dòng; `herdr-plugin` ~12,5k dòng Rust | ai/cái gì khởi động một việc | giữ; mọi đường vào hội tụ về Unit (P2) — prompt, plan, Workflow, board |
+| **L1 Host và định tuyến lệnh** | Rust host (`fgctl`, release manifest → `components.legacyNode.entry` = `bin/fgos.mjs`); kernel `packages/host-runtime/rust` (`operation_provider_router`, `authority_gate`, `invocation_service`, provider external-process); `src/cli/command-registry.mjs` | host-runtime ~8,3k dòng Rust; catalog native hiện 3 operation **đọc** (`distribution.build.show`, `work.gate-bypass.show`, `observe.metrics`) | operation fgOS nào do component nào (Rust native hay Node) xử lý — **không** chọn agent | không đổi trong track; primitive/`bind()` của P1 thiết kế theo hợp đồng operation của kernel này (điều chỉnh 5) để sau chuyển sang Rust không thiết kế lại |
+| **L2 Doctrine / điều phối bằng prose** | `core/skills` (12), `domains/coding/skills` (11), `core/skills/_shared/*` (capability-matching Q0–Q2, executor-dispatch-fallback, catalog), `fgos-routing`, `fgos-coding-driving`, `fgos-code-change`, `fgos-panel` | prose, Lead (LLM) thi hành | hiểu yêu cầu, phân rã, chọn capability/pattern, inline hay dispatch, **dẫn vòng lặp** — authority nằm trong prose | P2: phân rã ra **Unit** (hợp đồng dữ liệu), driver chung; doctrine chỉ còn hướng dẫn hiểu + phân rã; vòng lặp rời prose sang code pattern (P1) và Workflow run (P3) |
+| **L3 Work** | `src/state` (work, store, replay, stage-fsm, `workflow-stage-graphs`, frontier…), `src/verbs/state`, `src/intake`, merge (`src/runner/merge.mjs` + `src/verbs/merge`), worktree/claim/main-checkout-lock, Work runner `src/runner/loop.mjs`, fan-out; `domains/*/workflows/*.yaml`, `registry.yaml`; Rust `work-state` (đọc) | state 12,7k + intake 2,1k + merge 3,9k + runner lõi ~5k dòng Node; Rust 1,3k | bản ghi yêu cầu, status/board, lifecycle **và** tuần tự stage của workflow domain | P3: Work chỉ còn bản ghi/board/lifecycle; tuần tự bước + cổng người → **Workflow run** (một runner) |
+| **L4 Coordination** | `src/verbs/coordination`, `src/runner/coordination` (`session-engine.mjs` 4.778 dòng), `src/runner/definitions` (FlowDefinition), team-cognition/deliberation; 13 YAML `core/coordination-protocols`; Rust `coordination-state` (đọc) | 6,1k + 14,6k + 2k + 0,9k dòng | phiên cộng tác (vai, pha, visibility, authorize, disposition, close); tự bind executor (`binding.mjs`) | P4: không còn là runtime riêng — dạng thảo luận thành preset Pattern cộng tác (P1) hoặc Workflow (P3); engine thu hồi khi mọi dạng qua nghiệm thu |
+| **L5 Dispatch và thực thi** | `src/runner/dispatch`: decide/mechanism; plan/resolve/assignment-policy (chọn executor + tier); `executeAssignment` (cửa chạy, 4 caller); transport/adapter/provider-adapter; confinement; provider-capacity; execution-contract; `dispatch-runs` legacy; `src/verbs/dispatch` | 32k + 0,8k dòng | ai làm, model nào, chạy ở đâu, cách ly, ghi kết quả | T + P1: **một** `bind()` (bảng 5 mức, provenance, G6), **một** cửa chạy (primitive qua `executeAssignment`), read-only là posture; **không phụ thuộc L3** (điều chỉnh 1) |
+| **L6 Executor** (ngoài fgOS) | CLI claude / codex / agy / pi; pane herdr; bwrap | — | làm việc thật | chỉ được gọi qua cửa chạy của L5 |
+| **L7 Lưu trữ** | `.fgos/events.jsonl` + `state.json` (Work); `.fgos/assignments/*/runs` (RunResult); `.fgos/coordination/sessions`; `.fgos/dispatch-runs` (legacy); `.fgos/observe` | — | sự thật (luật L3 nền tảng: truth ở JSONL) | P1: RunResult một nơi, xoá `dispatch-runs`; P3: thêm store Workflow run; việc lẻ: chặn test rò |
+| **Ngang** | config runner (`.fgos/config.json`, global); setup/doctor/distribution (`src/setup` 9,3k + Rust distribution 4,9k); **Observe** (Rust 5,1k, đọc L7); knowledge/doc registry | — | khẩu vị, cài đặt, đo | khẩu vị một nơi (bảng 5 mức); mọi khoá mới qua setup/doctor |
+
+### Chồng chéo authority (đã kiểm trong code)
+
+| # | Vấn đề | Bằng chứng | Plan đóng |
+|---|---|---|---|
+| A1 | "Ai làm, model nào" rải trên L2, L4, L5 + config | §2 F3–F8; §6 bảng 5 mức | T (tier) + P1 (executor/persona) + P2 (phần prose) + P4 (phần L4) |
+| A2 | "Tuần tự bước" có 3 sequencer: L3 (stage FSM + `loop.mjs`), L4 (pha/DAG session), L2 (skill dẫn vòng lặp bằng prose) | `src/state/stage-fsm.mjs`, `loop.mjs`; `session-engine.mjs`, `dag-scheduler.mjs`; SKILL.md | P1 (vòng lặp pattern thành code) + P3 (Workflow run) + P4 |
+| A3 | Nhiều cửa chạy ở L5: `executeAssignment` (4 caller), `execute` thường → `dispatch-runs`, `execute --contract`, Agent tool in-process qua hook | F9, F29 | P1 |
+| **A4** | **Dispatch (L5) đọc thẳng workflow/stage của Work (L3)** — trái ranh giới đã ghi ("Dispatch … strictly forbids … direct workflow/stage/skill lookups in core", `docs/platform/component-boundary.md` §4) | 4 file dispatch import `src/state/workflow-stage-graphs.mjs`: `assignment-runner.mjs:57`, `operation-choice.mjs:20`, `cli.mjs:21`, `assignment.mjs:51`; `config.mjs`, `cli.mjs` import state Work | P1 (lõi mới không import + guard) + P3 (cắt phần cũ) |
+| A5 | Herdr hai vai: bề mặt (L0) và transport thực thi (L5/L6 pane) | `herdr-plugin`; invocation `*-herdr-*` | P1 phase read-only |
+| A6 | Hai bộ định tuyến ở L1 (kernel Rust và Node command-registry); writer migration `planned` | `docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md` §4 | không đóng trong track; P1 tuân hợp đồng operation |
+| A7 | Nhiều store, không rõ một writer/entity; test rò vào store thật | F13 | hai việc lẻ + P1 |
+
+### Năm điều chỉnh (owner duyệt 2026-10-01 10:20)
+
+1. **A4 vào P1**: lõi thực thi mới (`bind()`, primitive) **không import** `workflow-stage-graphs` hay state Work; guard test kiến trúc một chiều chặn L5 → L3. Phần dispatch cũ còn import do P3 cắt nốt khi stage rời Work.
+2. **Tiêu chí "xong" của mọi plan con**: plan **đóng hẳn một mối authority** — sau plan, layer chính của nó có **đúng một chủ** cho mối quan tâm đó; cập nhật `docs/platform/component-boundary.md` (hoặc nguồn chi tiết của nó); có guard test chặn rò ngược. Không "đánh bóng từng layer" trước — L4 và một phần L2 sẽ bị bỏ/chuyển.
+3. **A5 vào phase read-only của P1**: quyết pane herdr là transport có confinement hay không dùng cho vai read-only.
+4. **A7** do hai việc lẻ + P1 (RunResult một nơi, xoá `dispatch-runs`) đóng.
+5. **A6**: primitive và `bind()` thiết kế theo hợp đồng operation của kernel Rust (request/outcome contract, authority policy), để khi chuyển writer sang Rust không phải thiết kế lại.
+
+### Lộ trình nhìn theo layer
+
+| Plan | Layer chính | Mối authority phải đóng (tiêu chí xong) |
+|---|---|---|
+| T | L5 + config | "model mạnh tới đâu": một chuỗi `rigor → rigorToTier → tier → modelPolicies` |
+| P1 Lõi thực thi | L5 (+ config, L7) | "ai làm" một chỗ (`bind()`); "chạy qua cửa nào" một cửa; read-only một posture; L5 không phụ thuộc L3 (lõi mới) |
+| P2 Plan chạy được | L2 → dữ liệu | "phân rã thành gì": Unit là hợp đồng dữ liệu duy nhất cho mọi đường vào |
+| P3 Workflow tách khỏi Work | L3 | "tuần tự bước + cổng người": một Workflow run; Work chỉ bản ghi/board; L5 hết import L3 |
+| P4 Dạng thảo luận + thu hồi engine | L4 | L4 không còn là runtime riêng |
+| P5 Thuật ngữ | ngang | một tên mỗi khái niệm |
 
 ## 7c. Vì sao engine nặng, và bài học (thảo luận owner 2026-09-30 23:52)
 
