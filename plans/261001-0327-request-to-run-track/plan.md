@@ -3,8 +3,8 @@ title: "Track request-to-run: mô hình gọn từ yêu cầu tới lúc chạy 
 description: "Umbrella cho 5 plan con P1–P5 + plan nền T. Giữ mục tiêu, tiêu chí, lộ trình, phụ thuộc, trạng thái; không chứa bước triển khai."
 status: pending
 priority: P1
-effort: "~4–6 tuần (ước, theo tổng các plan con)"
-tags: [umbrella, dispatch, coordination, workflow, work, observe, simplification]
+effort: "~5–7 tuần (ước, theo tổng các plan con)"
+tags: [umbrella, dispatch, workflow, work, herdr, observe, simplification]
 created: 2026-10-01
 blockedBy: [project:plan/260930-tier-rigor-consolidation]
 blocks: []
@@ -14,7 +14,7 @@ blocks: []
 
 ## Overview
 
-Đưa vào **một yêu cầu** (câu tự do, plan bất kỳ, hay chạy một Workflow của domain) → đi tới kết quả đã kiểm chứng nhanh, ít phải canh, đúng người làm theo khẩu vị cấu hình một lần, mọi lần chạy kết thúc rõ ràng và đọc được. Làm bằng **mô hình gọn** (owner chốt Q0 2026-09-30): Unit → Pattern cộng tác (3 cái, code nhỏ) → một `bind()` → một cửa chạy → RunResult/Observe; Workflow run là tầng tuần tự bước duy nhất; engine coordination thu hồi khi mọi dạng thảo luận chạy tốt trên mô hình gọn.
+Đưa vào **một yêu cầu** (câu tự do, plan bất kỳ, hay chạy một Workflow của domain) → đi tới kết quả đã kiểm chứng nhanh, ít phải canh, đúng người làm theo khẩu vị cấu hình một lần, **nhìn thấy được trong pane herdr**, mọi lần chạy kết thúc rõ ràng và đọc được. Làm bằng **mô hình gọn** (owner chốt Q0): Unit → Pattern cộng tác (3 cái, code nhỏ) → một `bind()` → một cửa chạy (mặc định pane herdr, fallback cli) → RunResult/Observe; Workflow run là tầng tuần tự bước duy nhất; engine coordination thu hồi khi mọi dạng thảo luận chạy tốt trên mô hình gọn.
 
 Plan tổng này **không có bước triển khai**; nó giữ mục tiêu, tiêu chí, lộ trình, phụ thuộc và trạng thái của các plan con.
 
@@ -22,79 +22,82 @@ Plan tổng này **không có bước triển khai**; nó giữ mục tiêu, ti�
 
 | Tài liệu | Nội dung |
 |---|---|
-| [synthesis-260930-1229-request-to-run-brainstorm.md](../reports/synthesis-260930-1229-request-to-run-brainstorm.md) | **Nguồn chính.** §0 kết quả mong muốn, G1–G6, 8 tiêu chí; §2 fact F1–F30; §6 D0–D7, bảng 5 mức, Workflow tách Work, plan vs Workflow, override, Q0; §6b plan X; §6c plan T; §7 Q1–Q9; §7b lộ trình + việc lẻ; §7c bài học; §7d layer/authority A1–A7 + 5 điều chỉnh |
+| [synthesis-260930-1229-request-to-run-brainstorm.md](../reports/synthesis-260930-1229-request-to-run-brainstorm.md) | **Nguồn chính.** §0 kết quả mong muốn, **G1–G7**, 8 tiêu chí; §2 fact; §6 D0–D7, bảng 5 mức, Workflow tách Work, plan vs Workflow, override, Q0; §6b plan X; §6c plan T; §7 Q1–Q9; §7b lộ trình + việc lẻ; §7c bài học; §7d layer/authority; **§7e quyết định sau red-team (Q-A, Q-B, Q-C, G7, X-1/3/4)** |
+| [reports/red-team-adjudication.md](./reports/red-team-adjudication.md) | 37 finding → 15 mục, phân xử, câu trả lời owner |
 | [layer-authority-map-261001-1020-request-to-run-track.md](../reports/layer-authority-map-261001-1020-request-to-run-track.md) | bản đồ L0–L7 dựng từ code |
-| [rescoring-260930-2320-kongming-request-to-run-options.md](../reports/rescoring-260930-2320-kongming-request-to-run-options.md) | chấm độc lập, sửa bake-off |
-| [advice-260930-1002-harness-flexibility-plan-agnostic-routing.md](../reports/advice-260930-1002-harness-flexibility-plan-agnostic-routing.md) §7 | bảng quyết định đã chốt |
-| `plan/260930-tier-rigor-consolidation` (nhánh) `plans/260930-0445-tier-rigor-vocabulary-consolidation/plan.md` | plan nền T (D19 sàn `capabilities.<cap>.rigor`) |
-| cùng nhánh `plans/260930-1235-readonly-invocation-redesign/plan.md` | plan X — đã gộp vào P1 phase 6 |
+| [rescoring-260930-2320-kongming-request-to-run-options.md](../reports/rescoring-260930-2320-kongming-request-to-run-options.md) | chấm độc lập |
+| nhánh `plan/260930-tier-rigor-consolidation`: `plans/260930-0445-tier-rigor-vocabulary-consolidation/plan.md` | plan nền T (D19 sàn `capabilities.<cap>.rigor`; tạo `test/runner/dead-vocabulary-guard.test.mjs`) |
+| cùng nhánh: `plans/260930-1235-readonly-invocation-redesign/plan.md` | plan X — **gộp vào P1 phase 6** |
 
-## Thuật ngữ (một khái niệm một tên — synthesis §6 D0, D3)
+## Thuật ngữ (một khái niệm một tên)
 
-Unit · **Pattern cộng tác / `CollaborationPattern`** (đúng 3: `solo`, `reviewed`, `panel` + preset) · **Workflow** / **Workflow run** · coordination session (runtime cũ) · Work (bản ghi/board/lifecycle) · red-team (không "objector"). Không dùng `FlowDefinition`, `CoordinationProtocol` để chỉ Pattern cộng tác.
+Unit · **Unit run** (một lần chạy một Unit bằng Pattern cộng tác — thay "coordination session") · **Pattern cộng tác / `CollaborationPattern`** (đúng 3: `solo`, `reviewed`, `panel` + preset) · **Workflow** / **Workflow run** · Work (bản ghi/board/lifecycle) · red-team (không "objector"). Không dùng `FlowDefinition`, `CoordinationProtocol` để chỉ Pattern cộng tác.
 
-## Lộ trình và phụ thuộc
+## Lộ trình và phụ thuộc (Q-C, owner 2026-10-01)
 
 ```text
-[việc lẻ A, B] ─────────────────────────────┐ (điều kiện cần trước nghiệm thu P1)
-T Tier/rigor (agent khác) ──► P1 Lõi thực thi ──┬──► P2 Plan chạy được ─────────────┐
-                                               └──► P3 Workflow tách khỏi Work ──► P4 Dạng thảo luận + thu hồi engine ──► P5 Thuật ngữ
+[việc lẻ A ✓, B] ───────────────────────────────┐ (điều kiện cần trước nghiệm thu P1)
+T Tier/rigor (agent khác) ──► P1 Lõi thực thi ──► P3a Workflow runner + tích hợp ──┬──► P2 Plan chạy được ──────────┐
+                                                                                   └──► P3b Bỏ stage khỏi Work ──────┴──► P4 Dạng thảo luận + thu hồi engine ──► P5 Thuật ngữ
 ```
 
 | Plan | Thư mục | Layer / mối authority phải đóng | Phụ thuộc | Song song với |
 |---|---|---|---|---|
 | T | nhánh `plan/260930-tier-rigor-consolidation` | L5+config: "model mạnh tới đâu" | — | việc lẻ A, B |
-| P1 Lõi thực thi | [p1-execution-core](../261001-0327-request-to-run-p1-execution-core/plan.md) | L5: "ai làm" một `bind()`; một cửa chạy; read-only một posture; L5 không phụ thuộc L3 (lõi mới) | T merge; việc lẻ A+B trước phase nghiệm thu | — |
-| P2 Plan chạy được | [p2-runnable-plans](../261001-0327-request-to-run-p2-runnable-plans/plan.md) | L2→dữ liệu: Unit là hợp đồng duy nhất cho mọi đường vào | P1 | **P3** (khác file; xem bảng sở hữu) |
-| P3 Workflow tách khỏi Work | [p3-workflow-separate-from-work](../261001-0327-request-to-run-p3-workflow-separate-from-work/plan.md) | L3: "tuần tự bước + cổng người" một Workflow run; L5 hết import L3 | P1 | **P2** |
-| P4 Dạng thảo luận + thu hồi engine | [p4-discussion-patterns-engine-retirement](../261001-0327-request-to-run-p4-discussion-patterns-engine-retirement/plan.md) | L4 không còn là runtime riêng | P1 + P3 (P2 khuyến nghị) | — |
-| P5 Thuật ngữ | [p5-terminology-sweep](../261001-0327-request-to-run-p5-terminology-sweep/plan.md) | ngang: một tên mỗi khái niệm | P4 | — |
+| P1 Lõi thực thi | [p1-execution-core](../261001-0327-request-to-run-p1-execution-core/plan.md) | L5: "ai làm" một `bind()`; một cửa chạy (herdr mặc định); read-only một posture; lõi mới không phụ thuộc L3 | T merge; việc lẻ A+B trước phase nghiệm thu | — |
+| P3a | [p3 phase 1–2](../261001-0327-request-to-run-p3-workflow-separate-from-work/plan.md) | "tuần tự bước + cổng người" một Workflow runner; tích hợp/merge không phụ thuộc Work | P1 | — |
+| P2 Plan chạy được | [p2-runnable-plans](../261001-0327-request-to-run-p2-runnable-plans/plan.md) | L2→dữ liệu: Unit là hợp đồng duy nhất; driver mỏng trên runner | **P3a** | **P3b** |
+| P3b | [p3 phase 3–6](../261001-0327-request-to-run-p3-workflow-separate-from-work/plan.md) | L3: Work không còn `stage`; L5 hết import L3 | P3a | **P2** |
+| P4 | [p4-discussion-patterns-engine-retirement](../261001-0327-request-to-run-p4-discussion-patterns-engine-retirement/plan.md) | L4 không còn là runtime riêng | P1 + P3 (P2 khuyến nghị) | — |
+| P5 | [p5-terminology-sweep](../261001-0327-request-to-run-p5-terminology-sweep/plan.md) | ngang: một tên mỗi khái niệm | P4 | — |
 
-**Sở hữu file giữa P2 và P3 (để chạy song song):** P2 sở hữu `src/report/capability-plan-lint.mjs`, `src/runner/capability-match.mjs`, `core/skills/_shared/capability-*.md`, `core/skills/fgos-capability-dispatching/`, `core/skills/fgos-plan-loop/`, `domains/coding/skills/fgos-code-change/`, `domains/coding/skills/fgos-code-panel/`, verb `capability`/`plan-lint` trong `bin/fgos.mjs` + `src/cli/command-registry.mjs` (chỉ các mục đó). P3 sở hữu `src/state/**` (trừ đọc), `src/workflow/**` (mới), `src/runner/loop.mjs`, `src/runner/dispatch/operation-choice.mjs`, `domains/*/workflows/**`, `domains/*/registry.yaml`, `src/runner/definitions/workflow-adapter.mjs`, Rust `packages/work-state`, `herdr-plugin` (phần `stage`). Điểm chạm chung: **driver chung của P2 chạy nhiều phase bằng Workflow run của P3** → P2 chỉ làm "một phase"; "nhiều phase" thuộc P3 phase 4.
+**P2 ∥ P3b — sở hữu file:** P2: `src/report/capability-plan-lint.mjs`, `src/runner/capability-match.mjs` (xoá), `core/skills/_shared/capability-*.md`, `core/skills/fgos-capability-dispatching/`, `core/skills/fgos-plan-loop/`, `domains/coding/skills/fgos-code-change/`, `fgos-code-panel/`, `core/skills/fgos-run/` (mới), mục `plan-lint`/`capability` trong `bin/fgos.mjs` + `src/cli/command-registry.mjs`, 2 dòng gọi `capability match` trong `core/skills/fgos-panel/SKILL.md` và `fgos-architecture-panel/SKILL.md`. P3b: `src/state/**`, `src/verbs/state/**`, `src/intake/**`, `src/runner/loop.mjs`, `src/runner/dispatch/{operation-choice,cli,assignment,assignment-runner,config}.mjs` (chỉ phần L3 + `dispatch-runs`), skill/verb theo stage, `packages/work-state/rust`, `herdr-plugin` phần stage. File chung bắt buộc (`bin/fgos.mjs`, `src/cli/command-registry.mjs`, `src/setup/registrations.mjs`): mỗi bên chỉ sửa **mục của mình**, merge vào `main` theo thứ tự xong trước, bên sau rebase. **Cây skill sinh ra** (`.agents/skills/**`, `plugins/fgOS/skills/**`): **không commit trong nhánh phase**; tái sinh một lần (`npm run build:skills`) khi merge plan con vào `main`.
 
 ## Việc lẻ (ngoài track, làm ngay, song song)
 
-| # | Prompt | Vì sao cần cho track |
-|---|---|---|
-| A | [prompt-261001-0955-fix-observe-harness-protocol-count.md](../reports/prompt-261001-0955-fix-observe-harness-protocol-count.md) | số liệu Observe đúng cho nghiệm thu |
-| B | [prompt-261001-0955-fix-test-fixture-store-leak.md](../reports/prompt-261001-0955-fix-test-fixture-store-leak.md) | store sạch → số liệu nền tiêu chí 4 không nhiễu |
+| # | Prompt | Trạng thái | Vì sao cần cho track |
+|---|---|---|---|
+| A | [prompt-261001-0955-fix-observe-harness-protocol-count.md](../reports/prompt-261001-0955-fix-observe-harness-protocol-count.md) | **xong** (owner báo 2026-10-01 11:38; `main` @ `143b36540`, `58bb92f49`; harness đọc 3 tầng `coordination-protocols`) | số liệu Observe đúng cho nghiệm thu |
+| B | [prompt-261001-0955-fix-test-fixture-store-leak.md](../reports/prompt-261001-0955-fix-test-fixture-store-leak.md) | chờ | store sạch → số liệu nền tiêu chí 4 không nhiễu |
 
 ## Quy trình thực thi (bắt buộc cho mọi plan con)
 
 - Mỗi plan con: nhánh `plan/261001-request-to-run-pN`, worktree riêng ngoài checkout chính; **mỗi phase một worktree** từ đầu nhánh plan; xong phase → test xanh → commit → `merge --no-ff` vào nhánh plan (trong worktree của nhánh plan, **không** checkout nhánh trong checkout chính) → chạy lại test trên nhánh plan. Merge `main` **một lần** khi plan con xong. Dọn worktree gom cuối plan.
 - Ngay sau `git worktree add`: symlink `node_modules` và `target` từ checkout chính.
-- **Phase 1 của mọi plan con là "làm tươi"** (merge `main`, chạy GitNexus analyze, scout lại `file:line`, cập nhật phase lệch theo kết quả nghiệm thu plan trước). Không mở lại quyết định đã chốt trong synthesis; chỉ đổi khi có bằng chứng mới, và ghi rõ.
+- **Phase 1 của mọi plan con là "làm tươi"** (merge `main`, GitNexus analyze, scout lại `file:line` **và đếm đủ consumer** của mọi interface bị đổi/xoá — red-team cho thấy đếm thiếu ở 8/10 interface; cập nhật phase lệch theo kết quả nghiệm thu plan trước). Không mở lại quyết định đã chốt trừ khi có bằng chứng mới, và ghi rõ.
 - Trước khi sửa symbol: capability gate impact-analysis + GitNexus `impact` upstream; báo blast radius; HIGH/CRITICAL → dừng, báo owner.
 - Test: `env -u CLAUDE_CODE_SESSION_ID npm test` (hoặc focused), đọc exit code thật, không qua pipe.
-- Skill: sửa ở `core/skills/**` / `domains/**/skills/**`, rồi `npm run build:skills`; không sửa tay `.agents/`, `plugins/`.
-- Mọi khoá config / env / file hạ tầng mới → đăng ký `fgos setup` + `fgos doctor` (install gate `AGENTS.md`); thay đổi người dùng thấy → `CHANGELOG.md` `[Unreleased]`.
-- Single path, không backward compat: cái mới thay cái cũ thì xoá cái cũ trong cùng phase.
+- Skill: sửa ở `core/skills/**` / `domains/**/skills/**`; cây sinh ra theo luật ở trên.
+- Mọi khoá config / env / file hạ tầng mới → `fgos setup` + `fgos doctor` (install gate); store mới dưới `.fgos/` phải vào `.gitignore`; thay đổi người dùng thấy → `CHANGELOG.md` `[Unreleased]`.
+- Single path, không backward compat: cái mới thay cái cũ thì xoá cái cũ trong cùng phase — **trừ ngoại lệ có tên và chủ xoá ghi trong plan** (vd stamp của engine giữ tới P4 phase 6).
+- Guard từ vựng: một file `test/runner/dead-vocabulary-guard.test.mjs` (do T tạo); mỗi plan **thêm** từ của mình; loại trừ module đọc dữ liệu cũ.
 - Commit conventional, không ghi mã plan/phase/finding vào commit message hay code comment.
 
 ## Tiêu chí "xong" của mọi plan con (synthesis §7d điều chỉnh 2)
 
 1. Mối authority của plan có **đúng một chủ** trong layer chính của nó.
-2. `docs/platform/component-boundary.md` (hoặc nguồn chi tiết) cập nhật; hoặc ghi `No component-boundary change` có lý do.
-3. Guard test chặn rò ngược (vd L5 → L3; từ vựng cũ).
-4. Quyết định đã chốt được ghi vào `docs/specs/<area>.md` "Lịch sử quyết định" (L5 platform law: learning left behind).
-5. Full `npm test` xanh trên nhánh plan trước khi merge `main`.
+2. `docs/platform/component-boundary.md` (hoặc nguồn chi tiết) cập nhật; hoặc `No component-boundary change` có lý do.
+3. Guard test chặn rò ngược (L5 → L3; từ vựng cũ).
+4. Quyết định đã chốt ghi vào `docs/specs/<area>.md` "Lịch sử quyết định".
+5. Full `npm test` (Node + Rust khi đụng Rust) xanh trên nhánh plan trước khi merge `main`.
 
 ## Success Criteria (của cả track — synthesis §0)
 
-- [ ] G1–G6 đạt (G1 Observe thấy mọi lần chạy; G2 không ghim hạ tầng trong plan/Workflow/pattern; G3 một đường mỗi năng lực; G4a headless; G4b Workflow non-code có cổng người; G5 không yếu độc lập/governance; G6 không đổi người lặng lẽ).
-- [ ] Nghiệm thu ca 1 (P1: 2 area docs), ca 2 (P4: architecture advisor), ca 3 (P4: business discussion) không thua engine ở tiêu chí 1 (nhanh), 2 (ít canh), 4 (chất lượng + kết thúc); đúng người (tiêu chí 3) lệch không lý do = 0.
-- [ ] Engine coordination (~21k dòng) đã xoá; mọi dạng thảo luận vẫn chạy.
+- [ ] G1–G7 đạt (G1 Observe thấy mọi lần chạy; G2 không ghim hạ tầng; G3 một đường mỗi năng lực; G4a headless; G4b Workflow non-code có cổng người; G5 không yếu độc lập/governance; G6 không đổi người lặng lẽ; **G7 out-of-process mặc định qua pane herdr, cli fallback cùng năng lực**).
+- [ ] Nghiệm thu ca 1 (P1: 2 area docs), ca 2 (P4: architecture advisor), ca 3 (P4: business discussion) **chạy qua pane herdr**, không thua engine ở tiêu chí 1, 2, 4; đúng người lệch không lý do = 0.
+- [ ] Engine coordination (~21k dòng) xoá; mọi dạng thảo luận vẫn chạy.
 - [ ] Một tên mỗi khái niệm trên code + docs (guard).
 
 ## Rủi ro track-level
 
 | Rủi ro | Tín hiệu | Phản ứng định trước |
 |---|---|---|
-| Mô hình gọn thiếu bảo đảm engine đang có (resume, visibility ở mức file) | ca nghiệm thu P1/P4 thua tiêu chí 4, hoặc agent đọc được artifact ngoài đầu vào khai báo | xây đúng phần thiếu trong mô hình gọn; **không** mang lại engine; nếu không xây được với chi phí hợp lý → owner quyết giữ engine riêng cho dạng đó (Q8) |
-| T trễ | T chưa merge khi P1 sẵn sàng | P1 không bắt đầu (cùng file); dùng thời gian làm việc lẻ A, B và refresh |
-| Plan con lệch nhau khi chạy song song (P2 ∥ P3) | xung đột ở file chung / driver | bảng sở hữu ở trên; driver nhiều phase chỉ ở P3 |
-| Số dòng `file:line` trong plan mục | phase refresh phát hiện | phase 1 mỗi plan cập nhật, không coi là lỗi plan |
-| Plan đo RunResult `260930-0335-measure-runresult-classification-impact` phase 4 (producer coordination `maxRounds`) thành việc phí vì engine bị thu hồi | P4 tiến tới phase 6 | đề xuất owner bỏ/hoãn phase 4 của plan đó (ghi ở Câu hỏi mở) |
+| Mô hình gọn thiếu bảo đảm engine đang có (resume, visibility) | ca nghiệm thu thua tiêu chí 4 | xây đúng phần thiếu trong mô hình gọn; không mang lại engine; không xây được với chi phí hợp lý → owner quyết (Q8) |
+| Confinement không áp được trong pane herdr | spike P1 phase 6 thất bại | **dừng, báo owner**; không lặng lẽ bỏ herdr (G7) |
+| T trễ | T chưa merge khi P1 sẵn sàng | P1 không bắt đầu (cùng file); làm việc lẻ B, refresh |
+| P2 ∥ P3b lệch nhau | xung đột ở file chung | bảng sở hữu; merge theo thứ tự xong; cây skill tái sinh khi merge plan |
+| `file:line` trong plan mục | phase refresh phát hiện | phase 1 mỗi plan cập nhật |
+| Plan đo RunResult `260930-0335-measure-runresult-classification-impact` phase 4 (producer coordination `maxRounds`) thành việc phí | P4 tiến tới phase 6 | đề xuất owner bỏ/hoãn (Câu hỏi mở) |
 
 ## Phases
 
@@ -102,9 +105,37 @@ T Tier/rigor (agent khác) ──► P1 Lõi thực thi ──┬──► P2 Pl
 |---|---|---|
 | 1 | [Cổng điều kiện tiên quyết](./phase-01-prerequisites-gate.md) | Pending |
 
+## Red Team Review
+
+### Session — 2026-10-01
+**Findings:** 37 → 15 mục sau gộp (13 Accept, 1 Accept một phần, 1 phần bác: "`facts` không chết"); 3 mục cần owner quyết → đã chốt (Q-A giữ D-ADR0033, Q-B Unit run không store mới, Q-C P3a trước P2) + G7 herdr + X-1/3/4.
+**Severity:** 5 Critical, 8 High, 2 Medium (sau gộp).
+
+| # | Mục | Sev | Phán | Áp vào |
+|---|---|---|---|---|
+| 1 | Cổng ghi file Q9 kiểm chứng được (re-derive `bind()` từ snapshot) | Critical | Accept | P1 ph5 |
+| 2 | Worktree gắn Unit; ghi file chạy `workspace-write`; log do runner ghi; gitignore | Critical | Accept | P1 ph5 |
+| 3 | D-ADR0033 | Critical | Owner: giữ | P1 ph3, ph5, ph7 |
+| 4 | `fgos run record` chỉ producer inline | High | Accept | P1 ph5 |
+| 5 | Không store `unit-runs`; Unit run | Critical | Owner: đồng ý | P1, P5, track |
+| 6 | `bind()` tái dùng `mechanism.mjs`; decide/hook chuyển ở P1 | High | Accept | P1 ph3, ph7; P2 ph4 |
+| 7 | Một sequencer; tích hợp không phụ thuộc Work; P3a trước P2 | High | Owner: đồng ý | track, P2, P3 |
+| 8 | Không xoá `dispatch-runs` ở P1; xoá ở P3b cùng reader | High | Accept | P1 ph5; P3 ph5 |
+| 9 | Giữ `policy.capability` master loop; chỉ xoá `facts` | High | Accept một phần | P1 ph7 |
+| 10 | Tách P3 phase 3; versioning tạo mới; Rust/herdr/gateway | High | Accept | P3 ph3, ph4 |
+| 11 | Verb `fgos workflow` đã có → mở rộng | High | Accept | P3 ph2 |
+| 12 | Config/Workflow repo không tin cậy; snapshot; verify confined; bỏ tầng project | High | Accept | P1 ph5; P3 ph2 |
+| 13 | Override có `origin`; authorize = cổng người | High | Accept | P1 ph3; P2 ph3; P3 ph2 |
+| 14 | Visibility mức prompt = ngang engine | High | Accept | P4 |
+| 15 | Việc vụn (Cargo, Observe, ledger, containment, resume, guard, consumer, đo sớm, preset ở module) | Med–High | Accept | nhiều phase |
+
+### Whole-Plan Consistency Sweep
+_(ghi sau khi áp xong — xem cuối file)_
+
 ## Câu hỏi mở
 
-1. **Q5:** owner authorize phase 4 (P4 constitution) của plan tài liệu khi nào? Chỉ chặn nghiệm thu "chạy thật một phase" ở P2, không chặn build.
+1. **Q5:** owner authorize phase 4 (P4 constitution) của plan tài liệu khi nào? Chỉ chặn nghiệm thu "chạy thật một phase" ở P2.
 2. Plan `260930-0335-measure-runresult-classification-impact` phase 4 (producer coordination `maxRounds`): bỏ hay hoãn vì engine sẽ bị thu hồi ở P4?
+3. Tên skill driver chung: `fgos-run` (đề xuất).
 
 <!-- slug: request-to-run-track -->
