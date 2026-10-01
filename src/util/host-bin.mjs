@@ -15,7 +15,7 @@ const PACKAGE_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 
  *
  * Returns absolute path to binary or null.
  */
-export function resolveHostBin(dir = process.cwd()) {
+export function resolveHostBin(dir = process.cwd(), options = {}) {
   if (process.env.FGOS_HOST_BIN) {
     const candidate = path.resolve(process.env.FGOS_HOST_BIN);
     try {
@@ -34,9 +34,20 @@ export function resolveHostBin(dir = process.cwd()) {
     }
   } catch {}
 
+  // Hermetic resolution support: when packageRoot is specified via options
+  // or FGOS_PACKAGE_ROOT env, search only that root instead of falling back to
+  // developer workstation's process.cwd() or PACKAGE_ROOT.
+  const customPackageRoot = options?.packageRoot !== undefined
+    ? options.packageRoot
+    : (process.env.FGOS_PACKAGE_ROOT ? path.resolve(process.env.FGOS_PACKAGE_ROOT) : undefined);
+
+  const fallbackDirs = customPackageRoot !== undefined
+    ? (customPackageRoot ? [customPackageRoot] : [])
+    : [process.cwd(), PACKAGE_ROOT];
+
   // If dir was a temporary directory (e.g. in tests) with no installation,
-  // check the active workspace installation of process.cwd() or PACKAGE_ROOT
-  for (const fallbackDir of [process.cwd(), PACKAGE_ROOT]) {
+  // check the active workspace installation of fallback directories
+  for (const fallbackDir of fallbackDirs) {
     try {
       const root = resolveMainCheckoutRoot(fallbackDir);
       if (root && root !== mainRoot) {
@@ -59,8 +70,8 @@ export function resolveHostBin(dir = process.cwd()) {
  * @param {string} [options.dir] starting directory (defaults to process.cwd())
  * @returns {object} data field from the returned fgos.v1 envelope
  */
-export function invokeHost(args, { input, dir = process.cwd() } = {}) {
-  const hostBin = resolveHostBin(dir);
+export function invokeHost(args, { input, dir = process.cwd(), packageRoot } = {}) {
+  const hostBin = resolveHostBin(dir, { packageRoot });
   if (!hostBin) {
     const err = new Error('Rust host binary unavailable (FGOS_HOST_BIN unset and no active installation manifest)');
     err.code = 'host-unavailable';
