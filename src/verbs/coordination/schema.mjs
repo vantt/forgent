@@ -154,7 +154,6 @@ const ACTOR_ALLOWED_KEYS = new Set(['id', 'persona', 'executor', 'model', 'tier'
 //
 // `fallbackExecutors` (model-tier-vocabulary-and-coordination-fallback,
 // 2026-09-17): an array of executor ids, same shape and same "SHAPE only,
-// legality checked downstream" contract as `preferExecutor`/`invocation`
 // above -- nests into the per-request `cliPolicy` scope
 // (`actorPolicyFields`, run.mjs) exactly like the already-real
 // `opPolicy.fallbackExecutors` mechanism (`assignment-policy.mjs`,

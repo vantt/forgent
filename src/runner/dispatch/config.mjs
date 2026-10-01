@@ -223,6 +223,17 @@ export const DEFAULT_RUNNER_CONFIG = {
     maxRoots: 4,
     maxLeavesPerRoot: 4,
   },
+  patterns: {
+    defaultRule: { mutatingMinRigor: 'standard' },
+    reviewed: {
+      maxRounds: 2,
+      checkersByRigor: {
+        standard: ['reviewer'],
+        high: ['reviewer', 'red-team'],
+        critical: ['reviewer', 'red-team', 'tester'],
+      },
+    },
+  },
 };
 
 /**
@@ -588,9 +599,7 @@ export const INVOCATION_VIA = Object.freeze(['cli', 'task', 'mcp', 'api']);
  * `capabilities.<name>.prefer` (executor-id-consolidation Step 2.2): accepts
  * either the legacy single executor-id string, or a non-empty array naming
  * an ORDERED candidate pool (account-rotator-style cascade: try the first,
- * fall to the next only when the first is not usable — never a "spread
- * load evenly" distribution, that is placementPolicy.readOnlyRedirects's
- * own, deliberately different, semantics). Each array element is either a
+ * fall to the next only when the first is not usable). Each array element is either a
  * bare executor-id string (no invocation pin — Gate B2's legacy default
  * applies) or `{executor, invocation?}` — `invocation` names a specific
  * `invocations[].id` on that executor (Step 2.1), e.g. to require the
@@ -859,9 +868,9 @@ const PROMPT_DELIVERIES = ['file-pointer', 'inline'];
  */
 const REMOVED_EXECUTOR_FIELDS = Object.freeze({
   receipt: 'It had one legal value and no reader anywhere in the repo. The rule it stood for -- a round concludes only from a file the receiver wrote -- is not configurable and never was; it is what the herdr round does unconditionally.',
-  trustStore: 'Declare it on "interactiveMode" instead, which is where the adapter reads it. It used to be declared at the executor level and read from interactiveMode, so its one validated kind guarded a field nothing consulted.',
-  readOnlyRedirect: 'Declare it under "placementPolicy.readOnlyRedirects.<thisExecutorId>" instead (top-level, not on any executor entry). "Which executor to substitute for a read-only operation" is a PlacementPolicy ranking decision (design.md §3.6), not a fact about this executor\'s own identity -- putting it here was itself a corrected mistake (executor-profile-schema-migration Phase D).',
-});
+   trustStore: 'Declare it on "interactiveMode" instead, which is where the adapter reads it. It used to be declared at the executor level and read from interactiveMode, so its one validated kind guarded a field nothing consulted.',
+  readOnlyRedirect: 'readOnlyRedirect was retired. Read-only posture is enforced by OS confinement (Phase 6).',
+ });
 
 /** All are real: claude keeps trust in `~/.claude.json`, codex in a
  * `[projects."<abs>"]` block of its `config.toml`, and agy in `settings.json`'s
@@ -1119,39 +1128,6 @@ function validateExecutorSupportsShape(supports, label) {
   }
 }
 
-/**
- * Shape-check ONE `placementPolicy.readOnlyRedirects.<sourceExecutorId>`
- * entry: a bare candidate id, an array of candidate ids, or an object with
- * a `default` pool plus a per-operation `operations` override. Each
- * candidate may also be `{executor, invocation?}` (executor-id-
- * consolidation Step 2), reusing `normalizePreferCandidates`'s own shape
- * rule -- this validator only checks shape; `readOnlyRedirectPool` is
- * still the one place that reads it, extracting `.executor` for its
- * existing string-keyed selection algorithm.
- */
-function validateReadOnlyRedirectPoolShape(value, label) {
-  const validatePool = (pool, poolLabel) => {
-    normalizePreferCandidates(pool, poolLabel);
-  };
-  if (typeof value === 'string' || Array.isArray(value)) {
-    validatePool(value, label);
-    return;
-  }
-  if (!value || typeof value !== 'object') {
-    throw new RunnerConfigError(`runner config (${label}) must be a string, an array of strings, or an object with "default"/"operations".`);
-  }
-  if (value.default !== undefined) {
-    validatePool(value.default, `${label} "default"`);
-  }
-  if (value.operations !== undefined) {
-    if (!value.operations || typeof value.operations !== 'object' || Array.isArray(value.operations)) {
-      throw new RunnerConfigError(`runner config (${label}) "operations" must be an object mapping operation id -> candidate pool when present.`);
-    }
-    for (const [opId, pool] of Object.entries(value.operations)) {
-      validatePool(pool, `${label} "operations.${opId}"`);
-    }
-  }
-}
 
 /**
  * Shape-check `runner.placementPolicy` (Phase D correction,
@@ -1172,29 +1148,12 @@ function validateReadOnlyRedirectPoolShape(value, label) {
  * own the declaration, not merely the selection algorithm among an opaque
  * pool handed to it (which Phase 08's `resolveVerifiedRedirectExecutor`
  * already did, unchanged by this correction).
- *
- * `readOnlyRedirects.<sourceExecutorId>` keeps the identical value shape the
- * field has always had -- only WHERE it lives changes twice now (top-level
- * `readOnlyExecutorRedirects` -> `executors.<id>.readOnlyRedirect` ->
- * `placementPolicy.readOnlyRedirects.<id>`). `placement-policy.mjs` itself
- * now reads this config directly (`readOnlyRedirectPool`), rather than
- * `assignment-runner.mjs` computing the pool and handing it in as an opaque
- * parameter -- PlacementPolicy owns both the declaration read and the
- * selection, not one module doing the reading and a different one doing
- * the ranking.
+/**
+ * Shape-check `runner.placementPolicy`: retired in Phase 6.
  */
 function validatePlacementPolicyShape(placementPolicy, label) {
-  if (!placementPolicy || typeof placementPolicy !== 'object' || Array.isArray(placementPolicy)) {
-    throw new RunnerConfigError(`runner config (${label}) must be an object.`);
-  }
-  if (placementPolicy.readOnlyRedirects !== undefined) {
-    const pools = placementPolicy.readOnlyRedirects;
-    if (!pools || typeof pools !== 'object' || Array.isArray(pools)) {
-      throw new RunnerConfigError(`runner config (${label} "readOnlyRedirects") must be an object mapping source executor id -> candidate pool.`);
-    }
-    for (const [sourceExecutorId, pool] of Object.entries(pools)) {
-      validateReadOnlyRedirectPoolShape(pool, `${label} "readOnlyRedirects.${sourceExecutorId}"`);
-    }
+  if (placementPolicy !== undefined) {
+    throw new RunnerConfigError(`runner config (${label}) "placementPolicy" was retired. Posture is enforced via OS confinement.`);
   }
 }
 /**
@@ -1282,10 +1241,27 @@ function validateCapabilitiesShape(capabilities, label) {
         );
       }
     }
+    if (entry.persona !== undefined) {
+      if (typeof entry.persona !== 'string' || !entry.persona.trim()) {
+        throw new RunnerConfigError(`runner config (${entryLabel}) "persona" must be a non-empty string when present.`);
+      }
+    }
+    if (entry.minCheckers !== undefined) {
+      if (!Array.isArray(entry.minCheckers) || !entry.minCheckers.every((c) => VALID_CHECKER_ROLES.has(c))) {
+        throw new RunnerConfigError(
+          `runner config (${entryLabel}) "minCheckers" must be an array of strings in [${Array.from(VALID_CHECKER_ROLES).join(', ')}] when present.`,
+        );
+      }
+    }
+    if (entry.verify !== undefined) {
+      if (typeof entry.verify !== 'string' || !entry.verify.trim()) {
+        throw new RunnerConfigError(`runner config (${entryLabel}) "verify" must be a non-empty string command when present.`);
+      }
+    }
     if (entry.serves !== undefined) {
       validateCapabilityServesShape(entry.serves, `${entryLabel}.serves`);
     }
-    const ALLOWED_CAPABILITY_ENTRY_KEYS = ['description', 'aliases', 'prefer', 'rigor', 'confinement', 'serves'];
+    const ALLOWED_CAPABILITY_ENTRY_KEYS = ['description', 'aliases', 'prefer', 'rigor', 'confinement', 'serves', 'persona', 'minCheckers', 'verify'];
     for (const key of Object.keys(entry)) {
       if (!ALLOWED_CAPABILITY_ENTRY_KEYS.includes(key)) {
         if (key === 'unconfined') {
@@ -1300,6 +1276,87 @@ function validateCapabilitiesShape(capabilities, label) {
     }
     if (entry.confinement !== undefined) {
       validateCapabilityConfinementShape(entry.confinement, `${entryLabel}.confinement`);
+    }
+  }
+}
+
+export const VALID_CHECKER_ROLES = Object.freeze(new Set(['reviewer', 'red-team', 'tester']));
+
+export function validateRunnerPatternsShape(patterns, label) {
+  if (!patterns || typeof patterns !== 'object' || Array.isArray(patterns)) {
+    throw new RunnerConfigError(`runner config (${label}) must be an object when present.`);
+  }
+  const ALLOWED_PATTERNS_KEYS = ['defaultRule', 'reviewed'];
+  for (const key of Object.keys(patterns)) {
+    if (!ALLOWED_PATTERNS_KEYS.includes(key)) {
+      throw new RunnerConfigError(`runner config (${label}) contains unknown key "${key}". Allowed keys: ${ALLOWED_PATTERNS_KEYS.join(', ')}.`);
+    }
+  }
+  if (patterns.defaultRule !== undefined) {
+    if (!patterns.defaultRule || typeof patterns.defaultRule !== 'object' || Array.isArray(patterns.defaultRule)) {
+      throw new RunnerConfigError(`runner config (${label}.defaultRule) must be an object.`);
+    }
+    const ALLOWED_DEFAULT_RULE_KEYS = ['mutatingMinRigor'];
+    for (const key of Object.keys(patterns.defaultRule)) {
+      if (!ALLOWED_DEFAULT_RULE_KEYS.includes(key)) {
+        throw new RunnerConfigError(`runner config (${label}.defaultRule) contains unknown key "${key}". Allowed keys: ${ALLOWED_DEFAULT_RULE_KEYS.join(', ')}.`);
+      }
+    }
+    if (patterns.defaultRule.mutatingMinRigor !== undefined) {
+      if (!RIGOR_VALUES.includes(patterns.defaultRule.mutatingMinRigor)) {
+        throw new RunnerConfigError(
+          `runner config (${label}.defaultRule.mutatingMinRigor) must be one of ${RIGOR_VALUES.join('/')}, got: ${JSON.stringify(patterns.defaultRule.mutatingMinRigor)}.`,
+        );
+      }
+    }
+  }
+  if (patterns.reviewed !== undefined) {
+    if (!patterns.reviewed || typeof patterns.reviewed !== 'object' || Array.isArray(patterns.reviewed)) {
+      throw new RunnerConfigError(`runner config (${label}.reviewed) must be an object.`);
+    }
+    const ALLOWED_REVIEWED_KEYS = ['maxRounds', 'checkersByRigor'];
+    for (const key of Object.keys(patterns.reviewed)) {
+      if (!ALLOWED_REVIEWED_KEYS.includes(key)) {
+        throw new RunnerConfigError(`runner config (${label}.reviewed) contains unknown key "${key}". Allowed keys: ${ALLOWED_REVIEWED_KEYS.join(', ')}.`);
+      }
+    }
+    if (patterns.reviewed.maxRounds !== undefined) {
+      const maxRounds = patterns.reviewed.maxRounds;
+      if (!Number.isInteger(maxRounds) || maxRounds <= 0) {
+        throw new RunnerConfigError(`runner config (${label}.reviewed.maxRounds) must be a positive integer.`);
+      }
+    }
+    if (patterns.reviewed.checkersByRigor !== undefined) {
+      const cbr = patterns.reviewed.checkersByRigor;
+      if (!cbr || typeof cbr !== 'object' || Array.isArray(cbr)) {
+        throw new RunnerConfigError(`runner config (${label}.reviewed.checkersByRigor) must be an object.`);
+      }
+      for (const [rigor, checkers] of Object.entries(cbr)) {
+        if (!RIGOR_VALUES.includes(rigor)) {
+          throw new RunnerConfigError(`runner config (${label}.reviewed.checkersByRigor) contains unknown rigor "${rigor}".`);
+        }
+        if (!Array.isArray(checkers) || !checkers.every((c) => VALID_CHECKER_ROLES.has(c))) {
+          throw new RunnerConfigError(
+            `runner config (${label}.reviewed.checkersByRigor.${rigor}) must be an array of strings in [${Array.from(VALID_CHECKER_ROLES).join(', ')}].`,
+          );
+        }
+      }
+      // Monotonic/cumulative check: checkers for stronger rigor MUST be a superset of weaker rigor
+      // standard <= high <= critical (and low <= standard if both present)
+      const orderedRigors = ['low', 'standard', 'high', 'critical'].filter((r) => r in cbr);
+      for (let i = 1; i < orderedRigors.length; i += 1) {
+        const weaker = orderedRigors[i - 1];
+        const stronger = orderedRigors[i];
+        const weakerSet = new Set(cbr[weaker]);
+        const strongerSet = new Set(cbr[stronger]);
+        for (const checker of weakerSet) {
+          if (!strongerSet.has(checker)) {
+            throw new RunnerConfigError(
+              `runner config (${label}.reviewed.checkersByRigor) is not cumulative: "${stronger}" does not include checker "${checker}" from weaker rigor "${weaker}".`,
+            );
+          }
+        }
+      }
     }
   }
 }
@@ -1382,18 +1439,9 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
   if (!cfg || typeof cfg !== 'object' || Array.isArray(cfg)) {
     throw new RunnerConfigError(`runner config (${sourceLabel}) must be an object.`);
   }
-  // Phase D (executor-profile-schema-migration): removed, not deprecated --
-  // a config still carrying this top-level field is told so, rather than
-  // having it quietly do nothing (same discipline REMOVED_EXECUTOR_FIELDS
-  // already applies per-executor, below). Declare the SAME pool shape
-  // (bare id/array, or {default, operations}) under
-  // `placementPolicy.readOnlyRedirects.<sourceExecutorId>` instead -- a
-  // POLICY-owned surface, never nested on any executor's own identity
-  // (see `validatePlacementPolicyShape`'s own doc comment for why this
-  // moved twice).
-  if (cfg.readOnlyExecutorRedirects !== undefined) {
+  if (cfg.readOnlyExecutorRedirects !== undefined || cfg?.placementPolicy !== undefined) {
     throw new RunnerConfigError(
-      `runner config (${sourceLabel}) "readOnlyExecutorRedirects" was removed. Declare "readOnlyRedirects.<sourceExecutorId>" under "placementPolicy" instead (e.g. placementPolicy.readOnlyRedirects.claude), same value shape as before.`,
+      `runner config (${sourceLabel}) "readOnlyExecutorRedirects" / "placementPolicy" was removed. Read-only posture is enforced by OS confinement.`,
     );
   }
   if (cfg.placementPolicy !== undefined) {
@@ -1511,6 +1559,9 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
         throw new RunnerConfigError(`runner config (${sourceLabel}) "parallel.${key}" must be a positive integer when present.`);
       }
     }
+  }
+  if (cfg.patterns !== undefined) {
+    validateRunnerPatternsShape(cfg.patterns, `${sourceLabel} patterns`);
   }
 
   // Phase 01 R1/R5: Project config cannot define or override machine backend instances.

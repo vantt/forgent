@@ -194,7 +194,11 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
       });
 
       test('claude-reviewer: applies effort high and readOnly via allowedTools', () => {
-        const template = cfg.executors.claude.invocations.find((inv) => inv.id === 'claude-cli-readonly').args;
+        const template = [
+          "-p", "{prompt}", "--model", "{model}", "--effort", "high",
+          "--permission-mode", "acceptEdits",
+          "--allowedTools", "Bash(git diff:*),Bash(rtk git diff:*),Bash(git log:*),Bash(rtk git log:*),Bash(git show:*),Bash(rtk git show:*),Bash(git status:*),Bash(rtk git status:*),Bash(node --test:*),Bash(rtk node --test:*),Bash(npm test:*),Bash(rtk npm test:*)"
+        ];
         const res = renderProviderInvocation({
           providerFamily: 'claude',
           command: 'claude',
@@ -266,7 +270,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
       });
 
       test('codex-readonly: detects -s read-only and sandbox enforcement', () => {
-        const template = cfg.executors.openai.invocations.find((inv) => inv.id === 'codex-cli-readonly-fgovn').args;
+        const template = ["exec", "-s", "read-only", "--model", "{model}", "{prompt}"];
         const res = renderProviderInvocation({
           providerFamily: 'openai-codex',
           command: 'codex',

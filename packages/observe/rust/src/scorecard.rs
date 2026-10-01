@@ -694,6 +694,7 @@ mod tests {
             note: None,
             items: vec![],
             sessions: vec![],
+            unit_runs: vec![],
         };
 
         let (sec, warnings) = compute_case(&cw);
@@ -722,6 +723,7 @@ mod tests {
             note: None,
             items: vec![],
             sessions: vec![],
+            unit_runs: vec![],
         };
 
         let (sec, warnings) = compute_case(&cw);

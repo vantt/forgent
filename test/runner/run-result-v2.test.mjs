@@ -29,7 +29,7 @@ test('closed vocabularies are defined and frozen', () => {
   assert.deepEqual(FAILURE_FAMILIES, ['provider', 'resource', 'contract', 'policy', 'external-interference', 'unknown']);
   assert.deepEqual(POLICY_DISPOSITIONS, ['allow', 'refuse', 'needs-input', 'not-applicable']);
   assert.deepEqual(DELIVERY_MODES, ['fresh', 'resumed', 'replayed', 'recovered', 'legacy-derived']);
-  assert.deepEqual(PROVENANCE_VALUES, ['native-v2', 'native-v3', 'legacy-derived', 'contract-corrupt']);
+  assert.deepEqual(PROVENANCE_VALUES, ['native-v2', 'native-v3', 'native-v4', 'legacy-derived', 'contract-corrupt']);
 });
 
 test('normalizeRunResultV2: clean pass produces done status and native-v2 provenance', () => {

@@ -1,7 +1,7 @@
 ---
 phase: 3
 title: "bind() lõi"
-status: pending
+status: done
 priority: P1
 effort: "2d"
 dependencies: [1]
@@ -55,9 +55,9 @@ Hợp đồng in/out thuần, có `contractVersion` — theo kiểu operation co
 
 ## Success Criteria
 
-- [ ] Bảng ca xanh; mọi kết quả có provenance đủ field (gồm `transport`, `posture`, `origin`).
-- [ ] Không vai checker nào ra `inline`/`in-process` với executor có CLI.
-- [ ] Không có nhánh trả executor khi bị lọc hết (G6).
+- [x] Bảng ca xanh; mọi kết quả có provenance đủ field (gồm `transport`, `posture`, `origin`).
+- [x] Không vai checker nào ra `inline`/`in-process` với executor có CLI.
+- [x] Không có nhánh trả executor khi bị lọc hết (G6).
 
 ## Risk Assessment
 

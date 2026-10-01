@@ -479,7 +479,7 @@ export function planCohort({ definition, runnerConfig, fallbackRules = [] }) {
       // this planner does not duplicate) is honored here as a hard pin:
       // the planner never second-guesses a declared requirement, it only
       // allocates against it.
-      executorId: merged.preferExecutor,
+      executorId: undefined,
     };
 
     const eligible = candidates.filter((c) => !usedExecutorIds.has(c.executorId) && matchCandidateToRequirement(c, requirement).ok);
@@ -518,8 +518,6 @@ export function planCohort({ definition, runnerConfig, fallbackRules = [] }) {
     const assignmentPolicyFragment = {
       rigor,
       tier: allocatedTier,
-      preferExecutor: chosen.executorId,
-      ...(merged.preferPersona !== undefined ? { preferPersona: merged.preferPersona } : {}),
       ...(merged.visibility !== undefined ? { visibility: merged.visibility } : {}),
     };
     // 'assignment' scope: the ONE legal, non-portable scope a concrete
@@ -624,7 +622,6 @@ export function verifyPlannedAllocationAgainstCurrentConfig(allocation, currentR
     policy: {
       rigor: allocation.policyPatch?.rigor ?? 'standard',
       tier: allocation.tier,
-      preferExecutor: allocation.executorId,
     },
   };
 

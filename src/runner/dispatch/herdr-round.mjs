@@ -339,6 +339,7 @@ const ERROR_CLASS_FOR_OUTCOME = Object.freeze({
   'timed-out-idle': 'worker-timeout',
   'timed-out-ceiling': 'worker-timeout',
   'paused-limit': 'worker-timeout',
+  'provider-limit': 'worker-timeout',
 });
 
 /**

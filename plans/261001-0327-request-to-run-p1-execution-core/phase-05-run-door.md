@@ -1,7 +1,7 @@
 ---
 phase: 5
 title: "Cửa chạy fgos run + cổng ghi file kiểm chứng được"
-status: pending
+status: done
 priority: P1
 effort: "3d"
 dependencies: [2, 3, 4]
@@ -53,10 +53,10 @@ cổng mutating: posture worktree == unit.json.worktree ∧ bind(unit.json, role
 
 ## Success Criteria
 
-- [ ] Một lệnh chạy trọn Unit `reviewed` headless; checker không bao giờ inline.
-- [ ] Cổng mutating có test dương/âm như bước 2; ngoại lệ stamp chỉ cho engine, có test.
-- [ ] RunResult v4 Node + Rust; Observe nhóm theo `unitRunId`.
-- [ ] Điểm đo sớm có số liệu, ghi vào `reports/early-measurement.md`.
+- [x] Một lệnh chạy trọn Unit `reviewed` headless; checker không bao giờ inline.
+- [x] Cổng mutating có test dương/âm như bước 2; ngoại lệ stamp chỉ cho engine, có test.
+- [x] RunResult v4 Node + Rust; Observe nhóm theo `unitRunId`.
+- [x] Điểm đo sớm có số liệu, ghi vào `reports/early-measurement.md`.
 
 ## Risk Assessment
 

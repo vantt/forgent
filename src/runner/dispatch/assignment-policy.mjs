@@ -113,7 +113,7 @@ export function resolveExecutorProvider({ runnerConfig, primaryExecutor, options
     );
   }
   const registeredExecutorEntry = hasExecutorRegistry ? runnerConfig.executors[primaryExecutor] : undefined;
-  const isImplicitDefaultExecutor = primaryExecutor === 'claude' || primaryExecutor === runnerConfig?.executor?.command;
+  const isImplicitDefaultExecutor = primaryExecutor === 'claude' || primaryExecutor === runnerConfig?.executor?.command || primaryExecutor === runnerConfig?.executor?.invocations?.[0]?.command || primaryExecutor === runnerConfig?.executor?.invocations?.[0]?.id;
   if (hasExecutorRegistry && !registeredExecutorEntry && !isImplicitDefaultExecutor) {
     throw new RunnerConfigError(`preferExecutor "${primaryExecutor}" is not a registered executor (runnerConfig.executors has no such entry).`);
   }
@@ -334,7 +334,7 @@ export function resolveAssignmentDispatchPolicy({
     cliOverride.preferExecutor ??
     opPolicy.preferExecutor ??
     runnerConfig?.executor?.command ??
-    'claude';
+    (runnerConfig?.executor?.invocations?.[0]?.command ?? runnerConfig?.executor?.invocations?.[0]?.id);
   const executorSource = cliOverride.preferExecutor
     ? (cliOverride.policyProvenance?.executor ?? { scope: 'cliOverride' })
     : opPolicy.preferExecutor
@@ -362,8 +362,7 @@ export function resolveAssignmentDispatchPolicy({
   // 2. Persona Resolution
   const resolvedPersona =
     cliOverride.preferPersona ??
-    opPolicy.preferPersona ??
-    (assignment.role === 'reviewer' ? 'code-reviewer' : undefined);
+    opPolicy.preferPersona;
   const personaSource = cliOverride.preferPersona
     ? (cliOverride.policyProvenance?.persona ?? { scope: 'cliOverride' })
     : opPolicy.preferPersona

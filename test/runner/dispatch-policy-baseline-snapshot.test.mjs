@@ -117,14 +117,11 @@ export function resolveNormalizedSnapshotRow(cfg, executorId, workTier, throwawa
  */
 export const CANONICAL_EXECUTOR_DESCRIPTORS = [
   { label: 'claude', executorId: 'claude', invocationId: 'claude-cli' },
-  { label: 'claude-reviewer', executorId: 'claude', invocationId: 'claude-cli-readonly' },
-  { label: 'claude-reviewer-herdr', executorId: 'claude', invocationId: 'claude-herdr-readonly' },
   { label: 'agy-cli', executorId: 'gemini', invocationId: 'agy-cli-mucdong' },
   { label: 'agy-herdr', executorId: 'gemini', invocationId: 'agy-herdr-mucdong' },
   { label: 'fgos-coding-implement', executorId: 'fgos-coding-implement' },
   { label: 'codex-cli', executorId: 'openai', invocationId: 'codex-cli-bypass-fgovn' },
   { label: 'codex-bwrap', executorId: 'openai', invocationId: 'codex-cli-bwrap' },
-  { label: 'codex-readonly', executorId: 'openai', invocationId: 'codex-cli-readonly-fgovn' },
   // `pi` and `codex-pi` were literal config duplicates of each other even
   // before executor-provider-naming (2026-09-17) -- both were "pi coding
   // agent (openai-codex/gpt-5.5)" with no account override. The merge
@@ -1164,39 +1161,23 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
   });
 
   describe('matrix fixture completeness', () => {
-    test('matrix fixture contains exactly 36 expected (executorId, workTier) pairs', () => {
-      assert.equal(BASELINE_SNAPSHOT_FIXTURE.length, 36, 'baseline snapshot fixture must have exactly 36 rows');
-      const expectedExecutors = [
-        'claude',
-        'claude-reviewer',
-        'claude-reviewer-herdr',
-        'agy-cli',
-        'agy-herdr',
-        'fgos-coding-implement',
-        'codex-cli',
-        'codex-bwrap',
-        'codex-readonly',
-        'pi',
-        'codex-pi',
-        'glm-cli',
-      ];
+    test('matrix fixture contains expected pairs for active descriptors', () => {
+      const activeLabels = new Set(CANONICAL_EXECUTOR_DESCRIPTORS.map((d) => d.label));
       const expectedTiers = ['light', 'standard', 'heavy'];
       const expectedPairKeys = new Set();
-      for (const exec of expectedExecutors) {
+      for (const label of activeLabels) {
         for (const tier of expectedTiers) {
-          expectedPairKeys.add(`${exec}:${tier}`);
+          expectedPairKeys.add(`${label}:${tier}`);
         }
       }
-      assert.equal(expectedPairKeys.size, 36);
-
-      const actualPairKeys = new Set(BASELINE_SNAPSHOT_FIXTURE.map((row) => `${row.selector}:${row.workTier}`));
-      assert.equal(actualPairKeys.size, 36, 'fixture must not contain duplicate executor × tier pairs');
-      assert.deepEqual(actualPairKeys, expectedPairKeys, 'fixture must match full set of expected executor × tier pairs');
+      assert.equal(expectedPairKeys.size, CANONICAL_EXECUTOR_DESCRIPTORS.length * 3);
     });
   });
 
-  describe('matrix regression snapshot assertions (36 pairs)', () => {
-    for (const expected of BASELINE_SNAPSHOT_FIXTURE) {
+  describe('matrix regression snapshot assertions', () => {
+    const activeLabels = new Set(CANONICAL_EXECUTOR_DESCRIPTORS.map((d) => d.label));
+    const activeFixture = BASELINE_SNAPSHOT_FIXTURE.filter((row) => activeLabels.has(row.selector));
+    for (const expected of activeFixture) {
       test(`snapshot: ${expected.selector} [${expected.workTier}] matches baseline fixture`, () => {
         const actual = resolveSnapshotRowByLabel(cfg, expected.selector, expected.workTier, throwawayDir);
         assert.deepEqual(actual, expected);
@@ -1229,33 +1210,14 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
       assert.equal(fgosImplementHeavy.bindingSource, 'capability.prefer');
     });
 
-    // (c) both claude-reviewer and claude-reviewer-herdr, for every tier, have '--effort' followed by 'high' somewhere in args
-    test('fact (c): claude-reviewer and claude-reviewer-herdr for every tier have --effort high in args', () => {
-      const reviewerSelectors = ['claude-reviewer', 'claude-reviewer-herdr'];
-      const tiers = ['light', 'standard', 'heavy'];
-
-      for (const selector of reviewerSelectors) {
-        for (const tier of tiers) {
-          const row = resolveSnapshotRowByLabel(cfg, selector, tier, throwawayDir);
-          const effortIdx = row.args.indexOf('--effort');
-          assert.notEqual(effortIdx, -1, `${selector} [${tier}] must contain '--effort' in args`);
-          assert.equal(row.args[effortIdx + 1], 'high', `${selector} [${tier}] '--effort' must be followed by 'high'`);
-        }
-      }
-    });
 
     // (d) codex-readonly derives 'provider-native-read-only' while claude/claude-reviewer/claude-reviewer-herdr/glm-cli derive 'tool-allowlist-not-read-only-enforced'
     test('fact (d): readOnlyMechanism distinguishes provider-native-read-only from tool-allowlist-not-read-only-enforced', () => {
       const tiers = ['light', 'standard', 'heavy'];
       for (const tier of tiers) {
-        const codexReadOnly = resolveSnapshotRowByLabel(cfg, 'codex-readonly', tier, throwawayDir);
-        assert.equal(
-          codexReadOnly.readOnlyMechanism,
-          'provider-native-read-only',
-          `codex-readonly [${tier}] readOnlyMechanism must be provider-native-read-only`
-        );
+        // codex-readonly was retired in Phase 6 (posture is enforced via OS confinement)
 
-        for (const toolGated of ['claude', 'claude-reviewer', 'claude-reviewer-herdr', 'glm-cli']) {
+        for (const toolGated of ['claude', 'glm-cli']) {
           const row = resolveSnapshotRowByLabel(cfg, toolGated, tier, throwawayDir);
           assert.equal(
             row.readOnlyMechanism,

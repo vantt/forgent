@@ -3020,3 +3020,16 @@ adapter-specific exports (Node side, unit P8a) and `supervisor.rs`/
   5. Tách `work.tier` thành `work.size` (độ lớn, không tới model) và `work.rigor` (tuỳ chọn, discovery phán); đường đọc duy nhất map event cũ `tier → size` và `risk: heavy` → `rigor: high`. Snapshot `state.json` mang `viewSchemaVersion: 2`.
   6. Doctor checks (`tier-vocabulary-dead-keys`, `model-policy-tier-coverage`, `coordination-protocol-dead-vocabulary`) và dead vocabulary guard bảo vệ cấu trúc.
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
+
+### 0047 — P1 Lõi thực thi: Unit, một bind(), một cửa chạy fgos run, 3 Pattern cộng tác, đóng 4 mối authority L5
+
+- **Trạng thái:** Settled (Request-to-Run P1 Execution Core hoàn tất, 2026-10-01)
+- **Bối cảnh:** L5 trước P1 bị phân mảnh: "ai làm" bị quyết định ở nhiều nơi (coordination engine, `decide`, placement-policy, `assignment-policy.mjs`); "chạy qua cửa nào" có nhiều cửa ad-hoc; read-only bị chia rẽ giữa invocation `*-readonly` và tool gating; cổng ghi file phụ thuộc template stamp của engine.
+- **Quyết định:**
+  1. **Hợp đồng Unit (`src/runner/execution/unit.mjs`):** Hợp đồng dữ liệu duy nhất cho mọi đường vào. Phi hạ tầng (G2) — cấm chứa executor/provider/model/tier/invocation/actors/prefer/overrides.
+  2. **Một `bind()` duy nhất (`src/runner/execution/bind.mjs`):** Bảng 5 mức (Session -> Overrides -> Unit role/rigor -> Project taste -> Global taste), tái dùng `mechanism.mjs` (D-ADR0033).
+  3. **Một cửa chạy `fgos run` (`src/runner/execution/run.mjs`):** Bọc `executeAssignment`, mặc định spawn qua pane herdr (G7), cli fallback. Có `fgos run record` cho producer inline với nonce một lần phát kèm chỉ dẫn và kiểm chứng `evidenceRefs`.
+  4. **3 Pattern cộng tác (`solo`, `reviewed`, `panel`):** Vòng lặp code nhỏ, thuần, không store mới (Q-B: trạng thái vòng lặp suy từ `history()` của Unit run). `findings` là outcome, không đánh `failed`.
+  5. **Cổng ghi file kiểm chứng được (supersede ADR-006 §6):** Assignment `mutating` được admit khi: (a) cwd là linked worktree và `realpath(cwd) == unit.json.worktree`, (b) `bind()` tính lại từ `unit.json` khớp deep-equal. Ngoại lệ có tên: engine protocol stamp giữ tới P4 phase 6. D-ADR0033 giữ nguyên.
+  6. **Xoá bỏ hoàn toàn:** Invocations `*-readonly`, `readOnlyRedirects`, `placement-policy.mjs`, `executors.*.for`, PolicyPatch `prefer*`. Posture read-only/ghi file là confinement OS do fgOS áp cho cả herdr lẫn cli (X-1). Quota limit `provider-limit` kích hoạt `bind().nextCandidate` mở pane mới giữ pane cũ (X-3).
+Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.

@@ -58,19 +58,19 @@ function withComputedActorBindings(actors, definition, runnerConfig, facts, cliE
     seenIds.add(a.id);
     if (a.executor !== undefined) return a;
     const binding = bindingByActorId.get(a.id);
-    if (!binding || binding.cliPolicy.preferExecutor === undefined) return a;
+    if (!binding || binding.executor === undefined) return a;
     return {
       ...a,
-      executor: binding.cliPolicy.preferExecutor,
-      ...(binding.cliPolicy.preferInvocation ? { invocation: binding.cliPolicy.preferInvocation } : {}),
+      executor: binding.executor,
+      ...(binding.invocation ? { invocation: binding.invocation } : {}),
     };
   });
   const additions = bindings
-    .filter((b) => !seenIds.has(b.actorId) && b.cliPolicy.preferExecutor !== undefined)
+    .filter((b) => !seenIds.has(b.actorId) && b.executor !== undefined)
     .map((b) => ({
       id: b.actorId,
-      executor: b.cliPolicy.preferExecutor,
-      ...(b.cliPolicy.preferInvocation ? { invocation: b.cliPolicy.preferInvocation } : {}),
+      executor: b.executor,
+      ...(b.invocation ? { invocation: b.invocation } : {}),
     }));
   return [...merged, ...additions];
 }

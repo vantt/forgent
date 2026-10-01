@@ -21,4 +21,5 @@ export {
   ensureSharedConfigDefaults,
   checkConfinementHerdrMaturity,
   checkAgySubHomesConfigured,
+  checkRunnerPatternsConfig,
 } from './registrations.mjs';

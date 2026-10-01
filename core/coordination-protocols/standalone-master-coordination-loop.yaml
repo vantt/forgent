@@ -125,7 +125,7 @@ spec:
         capability: code:review
         distinctProviderFrom:
           roles: [doer]
-          strength: preferred
+          strength: required
       result:
         kind: advisory
         evidenceRequired: reported
@@ -137,7 +137,7 @@ spec:
         capability: code:review
         distinctProviderFrom:
           roles: [doer]
-          strength: preferred
+          strength: required
       result:
         kind: advisory
         evidenceRequired: reported

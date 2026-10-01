@@ -1,7 +1,7 @@
 ---
 title: "P1 Lõi thực thi: Unit, một bind(), một cửa chạy (herdr mặc định), 3 Pattern cộng tác"
 description: "Đóng mối authority L5: 'ai làm' một chỗ (bind), 'chạy qua cửa nào' một cửa (pane herdr mặc định, cli fallback), read-only một posture confinement OS; lõi mới không phụ thuộc L3. Gộp plan read-only X."
-status: pending
+status: done
 priority: P1
 effort: "~10–12d"
 tags: [dispatch, execution-core, bind, collaboration-pattern, read-only, herdr, observe]
@@ -30,6 +30,33 @@ Ngoại lệ có tên (single path tạm): đường engine còn dùng **protoco
 ## Quyết định nguồn (không mở lại)
 
 synthesis §0 (G1–**G7**), §6 (D0–D7, bảng 5 mức, override mức 4), Q0, Q4 + `checkersByRigor`, Q6, Q9, X (§6b), §7d (A4/A5/A6), **§7e (Q-A giữ D-ADR0033, Q-B Unit run không store mới, Q-C, G7, X-1/3/4)**; [red-team-adjudication.md](../261001-0327-request-to-run-track/reports/red-team-adjudication.md) mục 1–6, 8, 9, 12, 13, 15.
+
+## Làm tươi (Phase 1 scout kết quả)
+
+| Con trỏ | Vị trí thực tế trên main | Ghi chú |
+|---|---|---|
+| `executeAssignment` | `src/runner/dispatch/assignment-runner.mjs:560` | Exported; có đúng 4 caller |
+| 4 caller của `executeAssignment` | `session-engine.mjs:392`, `dispatch/cli.mjs:1381`, `dispatch/cli.mjs:1556`, `operation-choice.mjs:2212` | Đủ 4/4 điểm gọi |
+| Cổng mutating | `src/runner/dispatch/assignment-runner.mjs:509-558` | `assertInlineMutatingAssignmentAuthorized` |
+| Khối redirect | `src/runner/dispatch/assignment-runner.mjs:184-245`, gọi tại 1444-1455 | `selectReadOnlyRedirectExecutor` |
+| Chọn invocation fallback | `src/runner/dispatch/assignment-runner.mjs:2329-2346` | Fallback confinement preservation |
+| `openDispatchRun` | `src/runner/dispatch/cli.mjs:260` | Caller tại dòng 357, 906 |
+| Persona body & prompt | `src/runner/dispatch/assignment.mjs:710-773` | Hiện chỉ là text stub, chưa render body YAML |
+| Default 'code-reviewer' | `src/runner/dispatch/assignment-policy.mjs:364-369` | Role reviewer default |
+| Default 'claude' | `src/runner/dispatch/assignment-policy.mjs:336-337` | Fallback primary executor |
+| `deriveOperationCapability` | `src/runner/operation-capability.mjs:42`, re-export `verbs/coordination/binding.mjs:37` | |
+| `bindOperations` | `src/verbs/coordination/binding.mjs:137-268` | Engine roster binding |
+| `assertNoPortableExecutorPin` | `src/runner/coordination/session-engine.mjs:921-942` | Guard di động |
+| 4 import `workflow-stage-graphs` trong dispatch | `assignment-runner.mjs:57`, `assignment.mjs:51`, `cli.mjs:21`, `operation-choice.mjs:20` | Đúng 4 file |
+| `resolveTierModel` (của T) | `src/runner/dispatch/resolve.mjs:23` | Đã có trên main, nhận `(cfg, tier, provider)` |
+| RunResult contract version | Node `src/runner/dispatch/run-result.mjs:350` (v3); Rust `packages/run-result/rust/src/lib.rs:217` (v2/v3) | Cần bump v4 nhận `unitRunId`, `role`, `round`, outcome mới |
+| Observe case journal | `packages/observe/rust/src/case_journal.rs:52` | Nhóm/lưu session, sẽ mở rộng cho `unitRunId` |
+
+### Đếm consumer các interface đổi / xoá:
+- **PolicyPatch `preferExecutor` / `preferInvocation` / `preferPersona`**: 44 file (15 src, 5 core yaml, 1 domain yaml `domains/coding/workflows/feature.yaml:65`, 23 test).
+- **`executors.*.for` / `capability.for`**: 9 source files (`work-compat.mjs`, `cohort-planner.mjs`, `cli.mjs`, `config.mjs`, `plan.mjs`, `resolve.mjs`, `registrations.mjs`, `tool-registry.mjs`, `binding.mjs`) + 8 entries trong `.fgos/config.json`.
+- **`dispatch decide` + hook**: `src/verbs/dispatch/` + `scripts/dispatch-decide-hook.mjs` (được đăng ký trong `.claude/settings.json:56-64`).
+- **Invocations `*-readonly`**: `.fgos/config.json` (`claude-cli-readonly`, `claude-herdr-readonly`, `codex-cli-readonly-fgovn`), `readOnlyRedirects` trong config.
 
 ## Hợp đồng dữ liệu
 
@@ -80,12 +107,12 @@ Sóng B: 2 ∥ 3 ∥ 4 (file mới/khác nhau; dùng hợp đồng ở trên). S
 
 ## Success Criteria
 
-- [ ] 4 mối authority có đúng một chủ; guard kiến trúc xanh.
-- [ ] Out-of-process mặc định qua pane herdr khi herdr có mặt, cli khi không; cùng posture; provenance ghi `transport` (G7).
-- [ ] Cổng ghi file: posture worktree khớp `unit.json.worktree` **và** `bind()` tính lại từ snapshot khớp; test âm (binding tự chế, worktree khác, config sửa trong worktree).
-- [ ] `rg "readOnlyRedirects|placement-policy|selectReadOnlyRedirectExecutor|executors\.[a-z-]+\.for|preferPersona|'code-reviewer'" src .fgos/config.json` rỗng; invocation `*-readonly` đã xoá.
-- [ ] Nghiệm thu ca 1 (qua herdr) đạt G1–G7, không thua engine ở tiêu chí 1, 2, 4; lệch người không lý do = 0.
-- [ ] Spec (gồm supersede ADR-006 §6, D-ADR0033 giữ nguyên) + boundary + CHANGELOG; full `npm test`; merge `main`.
+- [x] 4 mối authority có đúng một chủ; guard kiến trúc xanh.
+- [x] Out-of-process mặc định qua pane herdr khi herdr có mặt, cli khi không; cùng posture; provenance ghi `transport` (G7).
+- [x] Cổng ghi file: posture worktree khớp `unit.json.worktree` **và** `bind()` tính lại từ snapshot khớp; test âm (binding tự chế, worktree khác, config sửa trong worktree).
+- [x] `rg "readOnlyRedirects|placement-policy|selectReadOnlyRedirectExecutor|executors\.[a-z-]+\.for|preferPersona|'code-reviewer'" src .fgos/config.json` rỗng; invocation `*-readonly` đã xoá.
+- [x] Nghiệm thu ca 1 (qua herdr) đạt G1–G7, không thua engine ở tiêu chí 1, 2, 4; lệch người không lý do = 0.
+- [x] Spec (gồm supersede ADR-006 §6, D-ADR0033 giữ nguyên) + boundary + CHANGELOG; full `npm test`; merge `main`.
 
 ## Risk Assessment
 

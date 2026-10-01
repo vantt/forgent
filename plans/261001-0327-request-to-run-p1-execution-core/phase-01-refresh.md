@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "Làm tươi"
-status: pending
+status: done
 priority: P1
 effort: "0.5d"
 dependencies: []
@@ -39,9 +39,9 @@ Không có. Đầu vào: `main` sau T; synthesis §2 (F1–F30), §6b (9 ràng b
 
 ## Success Criteria
 
-- [ ] Bảng con trỏ cũ→mới trong `plan.md` (mục "Làm tươi"); 0 con trỏ chưa kiểm.
-- [ ] Danh sách consumer đầy đủ cho mọi interface đổi/xoá (có số đếm).
-- [ ] Không quyết định đã chốt nào bị đổi mà không có bằng chứng mới ghi rõ.
+- [x] Bảng con trỏ cũ→mới trong `plan.md` (mục "Làm tươi"); 0 con trỏ chưa kiểm.
+- [x] Danh sách consumer đầy đủ cho mọi interface đổi/xoá (có số đếm).
+- [x] Không quyết định đã chốt nào bị đổi mà không có bằng chứng mới ghi rõ.
 
 ## Risk Assessment
 

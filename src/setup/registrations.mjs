@@ -51,6 +51,7 @@ import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, DEFAULT_RIGO
 import { RIGOR_VALUES } from '../runner/rigor.mjs';
 import { resolveExecutorAndOverrides, deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
+import { bind } from '../runner/execution/bind.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../state/fgos-file-registry.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
 import { listWork, StoreError } from '../state/store.mjs';
@@ -459,6 +460,162 @@ function checkRunnerRigorConfig(cwd) {
   return problems.length > 0
     ? { passed: false, message: problems.join('; ') }
     : { passed: true, message: 'runner rigor maps and capability floors are valid at every configured level' };
+}
+
+export function checkRunnerPatternsConfig(cwd) {
+  const projectRunner = readSharedConfig(cwd)?.runner;
+  const globalRunner = loadGlobalConfig()?.runner;
+  const levels = [];
+  if (projectRunner) {
+    levels.push(['project', projectRunner]);
+  } else if (globalRunner) {
+    levels.push(['global', globalRunner]);
+  }
+  if (levels.length === 0) {
+    return { passed: true, message: 'warning: runner.patterns missing -- falling back to setup defaults; run fgos setup' };
+  }
+  const problems = [];
+  const warnings = [];
+  for (const [level, runner] of levels) {
+    if (!runner) continue;
+    const patterns = runner.patterns;
+    if (patterns === undefined) {
+      warnings.push(`${level} runner.patterns missing -- falling back to setup defaults; run fgos setup`);
+      continue;
+    }
+    if (!patterns || typeof patterns !== 'object' || Array.isArray(patterns)) {
+      problems.push(`${level} runner.patterns must be an object`);
+      continue;
+    }
+    if (patterns.defaultRule !== undefined) {
+      if (!patterns.defaultRule || typeof patterns.defaultRule !== 'object' || Array.isArray(patterns.defaultRule)) {
+        problems.push(`${level} runner.patterns.defaultRule must be an object`);
+      } else if (patterns.defaultRule.mutatingMinRigor !== undefined && !RIGOR_VALUES.includes(patterns.defaultRule.mutatingMinRigor)) {
+        problems.push(`${level} runner.patterns.defaultRule.mutatingMinRigor must be one of ${RIGOR_VALUES.join('/')}`);
+      }
+    }
+    if (patterns.reviewed !== undefined) {
+      if (!patterns.reviewed || typeof patterns.reviewed !== 'object' || Array.isArray(patterns.reviewed)) {
+        problems.push(`${level} runner.patterns.reviewed must be an object`);
+      } else {
+        if (patterns.reviewed.maxRounds !== undefined && (!Number.isInteger(patterns.reviewed.maxRounds) || patterns.reviewed.maxRounds <= 0)) {
+          problems.push(`${level} runner.patterns.reviewed.maxRounds must be a positive integer`);
+        }
+        if (patterns.reviewed.checkersByRigor !== undefined) {
+          const cbr = patterns.reviewed.checkersByRigor;
+          if (!cbr || typeof cbr !== 'object' || Array.isArray(cbr)) {
+            problems.push(`${level} runner.patterns.reviewed.checkersByRigor must be an object`);
+          } else {
+            const VALID_CHECKERS = new Set(['reviewer', 'red-team', 'tester']);
+            for (const [rigor, checkers] of Object.entries(cbr)) {
+              if (!RIGOR_VALUES.includes(rigor)) {
+                problems.push(`${level} runner.patterns.reviewed.checkersByRigor has unknown rigor "${rigor}"`);
+              }
+              if (!Array.isArray(checkers) || !checkers.every((c) => VALID_CHECKERS.has(c))) {
+                problems.push(`${level} runner.patterns.reviewed.checkersByRigor.${rigor} must be an array of strings in [${Array.from(VALID_CHECKERS).join(', ')}]`);
+              }
+            }
+            const orderedRigors = ['low', 'standard', 'high', 'critical'].filter((r) => r in cbr);
+            for (let i = 1; i < orderedRigors.length; i += 1) {
+              const weaker = orderedRigors[i - 1];
+              const stronger = orderedRigors[i];
+              const weakerSet = new Set(cbr[weaker]);
+              const strongerSet = new Set(cbr[stronger]);
+              for (const checker of weakerSet) {
+                if (!strongerSet.has(checker)) {
+                  problems.push(`${level} runner.patterns.reviewed.checkersByRigor is not cumulative: "${stronger}" missing "${checker}" from "${weaker}"`);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  if (problems.length > 0) {
+    return { passed: false, message: problems.join('; ') };
+  }
+  if (warnings.length > 0) {
+    return { passed: true, message: `warning: ${warnings.join('; ')}` };
+  }
+  return { passed: true, message: 'runner patterns configuration is valid at every configured level' };
+}
+
+export function checkMutatingAssignmentBindingSnapshot(cwd) {
+  const root = cwd ?? process.cwd();
+  const assignmentsDir = path.join(root, '.fgos', 'assignments');
+  if (!fs.existsSync(assignmentsDir)) {
+    return { passed: true, message: 'no assignments directory present' };
+  }
+
+  const problems = [];
+  try {
+    const entries = fs.readdirSync(assignmentsDir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue;
+      const unitJsonPath = path.join(assignmentsDir, entry.name, 'unit.json');
+      if (!fs.existsSync(unitJsonPath)) continue;
+
+      let unitRecord;
+      try {
+        unitRecord = JSON.parse(fs.readFileSync(unitJsonPath, 'utf8'));
+      } catch {
+        problems.push(`corrupted unit.json in unit run "${entry.name}"`);
+        continue;
+      }
+
+      const unitDir = path.join(assignmentsDir, entry.name);
+      const roles = fs.readdirSync(unitDir, { withFileTypes: true });
+      for (const roleEntry of roles) {
+        if (!roleEntry.isDirectory()) continue;
+        const role = roleEntry.name;
+        const roleDir = path.join(unitDir, role);
+        let rounds;
+        try {
+          rounds = fs.readdirSync(roleDir, { withFileTypes: true });
+        } catch {
+          continue;
+        }
+        for (const roundEntry of rounds) {
+          if (!roundEntry.isDirectory()) continue;
+          const round = roundEntry.name;
+          const attemptDir = path.join(roleDir, round, 'runs', '01');
+          const resultFile = path.join(attemptDir, 'result.json');
+          if (!fs.existsSync(resultFile)) continue;
+
+          try {
+            const resultData = JSON.parse(fs.readFileSync(resultFile, 'utf8'));
+            if (resultData.binding && resultData.role) {
+              const recomputed = bind(
+                {
+                  unit: unitRecord.unit,
+                  role: resultData.role,
+                  readOnly: false,
+                  overrides: unitRecord.overrides || [],
+                },
+                {
+                  runnerConfig: unitRecord.configSnapshot?.runner,
+                  session: {},
+                },
+              );
+              if (recomputed.refused || recomputed.executor !== resultData.binding.executor) {
+                problems.push(`unit run "${entry.name}" role "${role}" round "${round}" binding mismatches unit.json snapshot`);
+              }
+            }
+          } catch {
+            // ignore
+          }
+        }
+      }
+    }
+  } catch (err) {
+    return { passed: false, message: `error scanning assignments: ${err.message}` };
+  }
+
+  return problems.length > 0
+    ? { passed: false, message: problems.join('; ') }
+    : { passed: true, message: 'every mutating assignment RunResult binding matches its unit.json snapshot' };
 }
 
 export function checkTierVocabularyDeadKeys(cwd) {
@@ -1207,6 +1364,18 @@ registerCheck({
   id: 'runner-rigor-config',
   description: 'project and global runner rigorToTier maps are complete and capabilities declare only rigor floors',
   check: (cwd) => checkRunnerRigorConfig(cwd),
+});
+
+registerCheck({
+  id: 'runner-patterns-config',
+  description: 'project and global runner patterns configuration is present, well-formed, and cumulative',
+  check: (cwd) => checkRunnerPatternsConfig(cwd),
+});
+
+registerCheck({
+  id: 'mutating-assignment-binding-snapshot',
+  description: 'every mutating assignment RunResult binding matches its unit.json snapshot',
+  check: (cwd) => checkMutatingAssignmentBindingSnapshot(cwd),
 });
 
 registerCheck({

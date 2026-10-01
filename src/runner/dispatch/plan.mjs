@@ -293,7 +293,7 @@ export function compileDispatchPlan(
   let finalMechanism = mechanism;
   if (mechanism === 'out-of-process') {
     const mcpInvocation = Array.isArray(executor?.invocations) ? executor.invocations.find((inv) => inv.via === 'mcp') : undefined;
-    const lookupPurpose = purpose ?? (Array.isArray(executor?.for) && executor.for.length === 1 ? executor.for[0] : undefined);
+    const lookupPurpose = purpose;
     const candidate = lookupPurpose && mcpInvocation?.tools ? mcpInvocation.tools[lookupPurpose] : undefined;
     if (typeof candidate === 'string' && candidate) {
       mcpTool = candidate;
@@ -303,7 +303,7 @@ export function compileDispatchPlan(
   }
 
   const agentType = executor?.agentType;
-  const capability = purpose ?? (Array.isArray(executor?.for) && executor.for.length > 0 ? executor.for[0] : (executorId ?? null));
+    const capability = purpose ?? (executorId ?? null);
 
   // Self-review finding (2026-08-25): the invocation/governance below used
   // to be APPROXIMATED here -- `executor.invocations[0]` instead of the

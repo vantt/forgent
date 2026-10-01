@@ -1,7 +1,7 @@
 ---
 phase: 2
 title: "Unit + khẩu vị config"
-status: pending
+status: done
 priority: P1
 effort: "1.5d"
 dependencies: [1]
@@ -44,9 +44,9 @@ Unit nằm ở `src/runner/execution/` (lõi mới, L5) — **không import `src
 
 ## Success Criteria
 
-- [ ] `validateUnit` + validator config có test (xanh), gồm ca âm G2.
-- [ ] `fgos setup` ghi default `runner.patterns`; `fgos doctor` báo 3 loại lỗi ở trên.
-- [ ] `src/runner/execution/unit.mjs` không import `src/state/**`.
+- [x] `validateUnit` + validator config có test (xanh), gồm ca âm G2.
+- [x] `fgos setup` ghi default `runner.patterns`; `fgos doctor` báo 3 loại lỗi ở trên.
+- [x] `src/runner/execution/unit.mjs` không import `src/state/**`.
 
 ## Risk Assessment
 

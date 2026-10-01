@@ -1,7 +1,7 @@
 ---
 phase: 7
 title: "Engine + dispatch decide + hook dùng bind()"
-status: pending
+status: done
 priority: P1
 effort: "2d"
 dependencies: [5]
@@ -39,9 +39,9 @@ Một nơi chọn người/cơ chế cho **mọi** đường còn sống: engine
 
 ## Success Criteria
 
-- [ ] Engine, `decide`, hook chọn qua `bind()`; một luật cơ chế (`mechanism.mjs`).
-- [ ] `rg "preferExecutor|preferInvocation|preferPersona|executors\.[a-z-]+\.for|'code-reviewer'" src core domains .fgos/config.json` rỗng (trừ thông báo lỗi hướng dẫn); `facts` không còn.
-- [ ] Master loop còn `policy.capability`; `strength: required` cho review/red-team output ghi file.
+- [x] Engine, `decide`, hook chọn qua `bind()`; một luật cơ chế (`mechanism.mjs`).
+- [x] `rg "preferExecutor|preferInvocation|preferPersona|executors\.[a-z-]+\.for|'code-reviewer'" src core domains .fgos/config.json` rỗng (trừ thông báo lỗi hướng dẫn); `facts` không còn.
+- [x] Master loop còn `policy.capability`; `strength: required` cho review/red-team output ghi file.
 
 ## Risk Assessment
 

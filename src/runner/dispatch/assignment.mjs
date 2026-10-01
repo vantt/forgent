@@ -42,6 +42,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import YAML from 'yaml';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import {
   DEFAULT_DOMAIN,
@@ -667,6 +668,56 @@ function buildInlineAssignment({ provenance, work, workId, createdBy, options = 
   return Object.freeze(assignment);
 }
 
+function renderPersonaSection(personaRef, options = {}) {
+  const root = options.repoRoot ?? options.cwd ?? process.cwd();
+  const personaFile = path.join(root, 'core', 'agents', `${personaRef}.yaml`);
+  let content = null;
+  if (fs.existsSync(personaFile)) {
+    try {
+      const raw = fs.readFileSync(personaFile, 'utf8');
+      content = YAML.parse(raw);
+    } catch {
+      content = null;
+    }
+  }
+
+  const lines = [
+    '',
+    '# Persona',
+    `You are acting under the resolved persona "${personaRef}". Let this persona`,
+    'shape tone, emphasis, and judgment calls for this assignment, without',
+    'overriding the Role, Objective, or Constraints stated elsewhere in this prompt.',
+  ];
+
+  if (content && typeof content === 'object') {
+    if (content.description) {
+      lines.push(`Description: ${content.description}`);
+    }
+    if (content.persona && typeof content.persona === 'object') {
+      if (content.persona.voice) lines.push(`Voice: ${content.persona.voice}`);
+      if (content.persona.style) lines.push(`Style: ${content.persona.style}`);
+      if (content.persona.archetype) lines.push(`Archetype: ${content.persona.archetype}`);
+    }
+    if (content.decision_boundary && typeof content.decision_boundary === 'object') {
+      lines.push('', '## Decision Boundaries');
+      if (Array.isArray(content.decision_boundary.can_decide) && content.decision_boundary.can_decide.length > 0) {
+        lines.push('Can decide:');
+        for (const item of content.decision_boundary.can_decide) {
+          lines.push(`- ${item}`);
+        }
+      }
+      if (Array.isArray(content.decision_boundary.must_escalate) && content.decision_boundary.must_escalate.length > 0) {
+        lines.push('Must escalate:');
+        for (const item of content.decision_boundary.must_escalate) {
+          lines.push(`- ${item}`);
+        }
+      }
+    }
+  }
+
+  return lines;
+}
+
 /**
  * Render standard prompt text for an Assignment (Step 03 / Step 04).
  * Keeps prompt references as refs rather than embedding large file contents.
@@ -726,13 +777,7 @@ export function renderAssignmentPrompt(assignment, options = {}) {
 
   if (renderedTemplateResult) {
     if (personaRef) {
-      lines.push(
-        '',
-        '# Persona',
-        `You are acting under the resolved persona "${personaRef}". Let this persona`,
-        'shape tone, emphasis, and judgment calls for this assignment, without',
-        'overriding the Role, Objective, or Constraints stated elsewhere in this prompt.',
-      );
+      lines.push(...renderPersonaSection(personaRef, options));
     }
     lines.push('', renderedTemplateResult.renderedBody);
   } else {
@@ -744,13 +789,7 @@ export function renderAssignmentPrompt(assignment, options = {}) {
     );
 
     if (personaRef) {
-      lines.push(
-        '',
-        '# Persona',
-        `You are acting under the resolved persona "${personaRef}". Let this persona`,
-        'shape tone, emphasis, and judgment calls for this assignment, without',
-        'overriding the Role, Objective, or Constraints stated elsewhere in this prompt.',
-      );
+      lines.push(...renderPersonaSection(personaRef, options));
     }
 
     lines.push('Context refs:');
