@@ -20,7 +20,8 @@ dependencies: [1]
   - Trả Unit[] chuẩn (dùng `validateUnit`); `--json` cho driver.
   - Lỗi cứng: ghim hạ tầng; vòng phụ thuộc; `writes` giao nhau không có `dependsOn`; id trùng. Cảnh báo: capability không có key trong config (`domain:verb` lẫn fallback `verb`); `pattern` lạ.
   - Bỏ phần `## Product Gates` nếu nó trùng nghĩa Unit (kiểm phase 1; một dạng duy nhất — RUL11).
-  - fgOS **chỉ đọc** plan (quyết định (b)); không ghi trạng thái vào `plan.md`.
+  - fgOS **chỉ đọc** plan (quyết định (b)); không ghi trạng thái vào `plan.md`; **không** đọc authorize từ prose (authorize = cổng người của Workflow run).
+  - Đầu ra `--json` là đầu vào của bộ dịch plan → Workflow (P3a) — một đường đọc Unit duy nhất.
 - Non-functional: thuần đọc; không gọi `decide`/`bind`.
 
 ## Related Code Files

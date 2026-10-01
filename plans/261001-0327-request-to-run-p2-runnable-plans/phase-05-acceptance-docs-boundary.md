@@ -16,7 +16,7 @@ Chứng minh "chạy phase N" và "câu tự do" chạy trọn qua driver chung 
 ## Requirements
 
 - Functional:
-  - Nghiệm thu: (a) K1 prompt tự do (code); (b) K2 read-only inline; (c) một phase plan có `- unit:` với ≥ 3 Unit gồm song song + ledger; (d) nếu owner đã authorize (Q5): chạy thật một phase của plan tài liệu `plans/260925-documentation-authority-unification/` (Unit do Lead viết từ prose phase, owner duyệt Unit trước); nếu chưa → ghi "chờ Q5", không chặn merge.
+  - Nghiệm thu (mọi vai out-of-process chạy qua pane herdr — G7): (a) K1 prompt tự do (code); (b) K2 read-only producer inline; (c) một phase plan có `- unit:` với ≥ 3 Unit gồm song song + ledger; (c2) "phase A..B" có một phase chưa duyệt → dừng ở cổng người; (d) nếu owner đã authorize (Q5): chạy thật một phase của plan tài liệu `plans/260925-documentation-authority-unification/` (Unit do Lead viết từ prose phase, owner duyệt Unit trước); nếu chưa → ghi "chờ Q5", không chặn merge.
   - Đo bằng Observe: Lead-active, can thiệp người, đúng người, tới trạng thái cuối; so với ca 1 P1.
   - Docs: `docs/specs/<area>.md` (area planning/doctrine và runner) "Lịch sử quyết định": Unit cho mọi đường vào, driver chung, bỏ DemandFacts, `decide` = `bind()`; `docs/platform/component-boundary.md`: L2 không còn quyết người/cơ chế; `CHANGELOG.md`.
   - Guard từ vựng: DemandFacts, matcher, `form`, skill đã xoá.
@@ -40,4 +40,4 @@ Chứng minh "chạy phase N" và "câu tự do" chạy trọn qua driver chung 
 
 ## Risk Assessment
 
-- Chạy thật plan tài liệu khi chưa authorize → cấm; driver phải từ chối (đã có test phase 3).
+- Chạy thật plan tài liệu khi chưa authorize → cấm; runner phải dừng ở cổng người (đã có test phase 3).

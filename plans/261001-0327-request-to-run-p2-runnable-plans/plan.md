@@ -1,12 +1,12 @@
 ---
-title: "P2 Plan chạy được: Unit cho mọi đường vào, driver chung, bỏ DemandFacts"
-description: "Đóng mối authority 'phân rã thành gì': Unit là hợp đồng dữ liệu duy nhất cho prompt tự do, plan AgentKit, plan dạng khác; một driver chung chạy một phase; bỏ DemandFacts/matcher/form và các facade chỉ-code."
+title: "P2 Plan chạy được: Unit cho mọi đường vào, driver mỏng trên Workflow runner, bỏ DemandFacts"
+description: "Đóng mối authority 'phân rã thành gì': Unit là hợp đồng dữ liệu duy nhất cho prompt tự do, plan AgentKit, plan dạng khác; một driver mỏng giao việc cho Workflow runner (P3a); bỏ DemandFacts/matcher/form và các facade chỉ-code."
 status: pending
 priority: P1
-effort: "~5–6d"
+effort: "~4–5d"
 tags: [planning, unit, driver, doctrine, skills]
 created: 2026-10-01
-blockedBy: [261001-0327-request-to-run-p1-execution-core]
+blockedBy: [261001-0327-request-to-run-p3-workflow-separate-from-work]
 blocks: []
 ---
 
@@ -14,22 +14,22 @@ blocks: []
 
 ## Overview
 
-Sau P1 đã có `fgos run --unit`. P2 làm cho **mọi đường vào sinh ra cùng một dạng Unit** và có **một driver chung**: anh nói "chạy phase N" (plan AgentKit hay plan có block `- unit:`), hoặc gõ một câu tự do → Lead/driver ra Unit[] → `fgos run`. Chuyển authority "phân rã, chọn capability, chọn pattern" từ **prose L2** sang **dữ liệu** (Unit + rule config). Xoá DemandFacts/matcher/`form`, `fgos-code-panel`, `fgos-plan-loop`, gate chỉ-code của `fgos-code-change`. Thuộc track [request-to-run](../261001-0327-request-to-run-track/plan.md).
+Sau P1 (`fgos run --unit`) và **P3a** (Workflow runner + store + helper tích hợp + dịch plan → Workflow — P3 phase 2), P2 làm cho **mọi đường vào sinh ra cùng một dạng Unit** và có **một driver mỏng**: anh nói "chạy phase N" (hay "phase A..B"), hoặc gõ một câu tự do → Unit[] → **Workflow runner** (một bước chứa Unit[] với `dependsOn`, hoặc nhiều bước từ plan) → `fgos run` từng Unit qua pane herdr → tích hợp kết quả. Chuyển "phân rã, chọn capability, chọn pattern" từ **prose L2** sang **dữ liệu**. Xoá DemandFacts/matcher/`form`, `fgos-code-panel`, `fgos-plan-loop`, `fgos-code-change`. Thuộc track [request-to-run](../261001-0327-request-to-run-track/plan.md).
 
-**Phạm vi chạy:** P2 chỉ chạy **một phase** (hoặc một tập Unit). Chạy **nhiều phase liên tiếp** = Workflow run → thuộc P3 phase 4.
+**Không có sequencer trong P2** (Q-C): lập lịch Unit theo `dependsOn`, cổng người, tích hợp/merge đều là việc của Workflow runner (P3a). `dispatch decide` + hook đã chuyển sang `bind()` ở P1 phase 7.
 
 ## Mối authority phải đóng
 
 | Mối | Chủ duy nhất sau P2 |
 |---|---|
-| "một phần việc có dạng gì" | Unit (`src/runner/execution/unit.mjs`, từ P1) — plan-lint, driver, prompt tự do đều ra cùng dạng |
-| "chạy một phase/tập Unit" | một driver chung (skill core + `fgos run`) — không còn facade theo domain |
+| "một phần việc có dạng gì" | Unit (`src/runner/execution/unit.mjs`, P1) — plan-lint, driver, prompt tự do đều ra cùng dạng |
+| "chạy một yêu cầu/phase" | driver mỏng (skill core `fgos-run`) → Workflow runner (P3a) — không facade theo domain |
 | "chọn capability/pattern" | dữ liệu: Unit khai `capability`, `pattern` (hoặc rule config) — không còn DemandFacts → matcher → `form` |
-| `dispatch decide` (hook, doctrine) | gọi `bind()` — không còn logic chọn cơ chế thứ hai |
+| "phase này được phép chạy chưa" | cổng người của Workflow run (owner trả lời) — không parse authorize từ prose plan (red-team mục 13) |
 
 ## Quyết định nguồn
 
-synthesis D0 (hội tụ ở Unit), D1 (capability `domain:verb`, xoá DemandFacts), D2 (pattern: unit ghi rõ, không thì rule config), Q2 handoff (driver chung = tổng quát `fgos-code-change`), Q5 handoff (`- unit:` trong phase file), (b) `plan.md` do người/`ak` quản — fgOS chỉ đọc, §7d (L2 → dữ liệu).
+synthesis D0, D1, D2, Q2/Q5 handoff, quyết định (b) `plan.md` chỉ đọc, §7d, **§7e Q-C** (P3a trước P2; một sequencer), G7 (herdr mặc định); red-team mục 7, 13, 15.
 
 ## Hợp đồng `- unit:` trong phase file
 
@@ -43,40 +43,37 @@ synthesis D0 (hội tụ ở Unit), D1 (capability `domain:verb`, xoá DemandFac
   pattern: reviewed          # tuỳ chọn
   objective: "…"
 ```
-Không được có `executor|provider|model|tier|invocation|actors|prefer|overrides` (plan-lint lỗi — G2).
+Không được có `executor|provider|model|tier|invocation|actors|prefer|overrides` (plan-lint lỗi — G2); path theo luật containment của P1 phase 2.
 
 ## Phases và song song
 
 | # | Phase | Phụ thuộc | Sóng | Sở hữu file |
 |---|---|---|---|---|
-| 1 | [Làm tươi](./phase-01-refresh.md) | P1 merge | A | plan |
-| 2 | [Unit trong phase file (plan-lint)](./phase-02-unit-in-phase-files.md) | 1 | **B** | `src/report/capability-plan-lint.mjs`, verb `plan-lint` (`bin/fgos.mjs`, `src/cli/command-registry.mjs` mục `plan-lint`), test |
-| 3 | [Driver chung](./phase-03-generic-driver.md) | 2 | C | `core/skills/fgos-run/` (mới, tổng quát `domains/coding/skills/fgos-code-change/`), `src/runner/execution/plan-reader.mjs` (mới) |
-| 4 | [Bỏ DemandFacts + facade cũ; decide qua bind()](./phase-04-retire-demandfacts-legacy-facades.md) | 1 | **B** | `src/runner/capability-match.mjs` (xoá), verb `capability`, `core/skills/_shared/capability-*.md`, `core/skills/_shared/executor-dispatch-fallback.md`, `core/skills/fgos-capability-dispatching/`, `core/skills/fgos-plan-loop/` (xoá), `domains/coding/skills/fgos-code-panel/` (xoá), `src/verbs/dispatch/**` (decide), `AGENTS.md` § Dispatch |
-| 5 | [Nghiệm thu + docs + boundary](./phase-05-acceptance-docs-boundary.md) | 3, 4 | D | `docs/specs/*`, `docs/platform/component-boundary.md`, `CHANGELOG.md` |
+| 1 | [Làm tươi](./phase-01-refresh.md) | P3a merge | A | plan |
+| 2 | [Unit trong phase file (plan-lint)](./phase-02-unit-in-phase-files.md) | 1 | **B** | `src/report/capability-plan-lint.mjs`, mục `plan-lint` trong `bin/fgos.mjs` + `src/cli/command-registry.mjs`, test |
+| 3 | [Driver mỏng](./phase-03-generic-driver.md) | 2 | C | `core/skills/fgos-run/` (mới), xoá `domains/coding/skills/fgos-code-change/` |
+| 4 | [Bỏ DemandFacts + facade cũ](./phase-04-retire-demandfacts-legacy-facades.md) | 1 | **B** | `src/runner/capability-match.mjs` (xoá), mục `capability` trong `bin/fgos.mjs` + `command-registry.mjs`, `core/skills/_shared/capability-*.md`, `executor-dispatch-fallback.md`, `core/skills/fgos-capability-dispatching/`, `core/skills/fgos-plan-loop/` (xoá), `domains/coding/skills/fgos-code-panel/` (xoá), **2 dòng** gọi `capability match` ở `core/skills/fgos-panel/SKILL.md:71` và `core/skills/fgos-architecture-panel/SKILL.md:81` |
+| 5 | [Nghiệm thu + docs + boundary](./phase-05-acceptance-docs-boundary.md) | 3, 4 | D | `docs/specs/*`, `docs/platform/component-boundary.md`, `CHANGELOG.md`, guard (append) |
 
-Sóng B: 2 ∥ 4 (khác file hoàn toàn). Phase 3 cần 2 (đọc Unit) và tham chiếu doctrine mới của 4 (chỉ link, không sửa file của 4).
-
-**Song song với P3:** xem bảng sở hữu trong track `plan.md`. P2 không đụng `src/state/**`, `loop.mjs`, `domains/*/workflows/**`.
+Sóng B: 2 ∥ 4. **Song song với P3b**: theo bảng sở hữu trong track `plan.md`; file chung (`bin/fgos.mjs`, `command-registry.mjs`) mỗi bên chỉ sửa mục của mình; cây skill sinh ra không commit trong nhánh phase.
 
 ## Success Criteria
 
-- [ ] "Chạy phase N" của một plan có `- unit:` chạy trọn qua driver chung; prompt tự do K1 chạy trọn qua driver (Lead viết Unit).
-- [ ] `rg -n "DemandFacts|matchCapability|deriveForm|fgos-code-panel|fgos-plan-loop|capability match" src bin core domains` rỗng (trừ CHANGELOG/lịch sử).
-- [ ] `dispatch decide` gọi `bind()`; hook PreToolUse vẫn chặn đúng.
-- [ ] Spec + boundary + CHANGELOG; guard từ vựng; full `npm test`; merge `main`.
+- [ ] "Chạy phase N" và "phase A..B" của plan có `- unit:` chạy trọn qua driver → Workflow runner → `fgos run` (pane herdr); câu tự do K1 chạy trọn (Lead viết Unit); phase chưa được owner duyệt dừng ở cổng người.
+- [ ] `rg -n "DemandFacts|matchCapability|deriveForm|fgos-code-panel|fgos-plan-loop|fgos-code-change|capability match" src bin core domains AGENTS.md` rỗng (trừ lịch sử/CHANGELOG).
+- [ ] Spec + boundary + CHANGELOG; guard (append); full `npm test`; merge `main`.
 
 ## Risk Assessment
 
 | Rủi ro | Tín hiệu | Phản ứng |
 |---|---|---|
-| Bỏ DemandFacts → agent chọn sai `capability` (keyword-spotting quay lại — fable E2) | tỉ lệ override capability cao trong Observe | thêm ví dụ vào doctrine; plan-lint báo capability không có trong config; không khôi phục DemandFacts |
-| Driver chung phình thành engine thứ hai | driver tự tuần tự nhiều phase | nhiều phase thuộc P3; driver chỉ một phase |
-| Plan AgentKit không có `- unit:` | driver không đọc được | Lead viết Unit từ prose phase (như prompt tự do); plan-lint gợi ý thêm block |
+| Bỏ DemandFacts → agent chọn sai `capability` | tỉ lệ override capability cao (Observe) | ví dụ trong doctrine; plan-lint cảnh báo capability không có key config; không khôi phục DemandFacts |
+| Plan AgentKit không có `- unit:` | driver không đọc được | Lead viết Unit từ prose phase (như prompt tự do), hiện Unit cho owner duyệt ở cổng người khi rigor ≥ high |
+| P3a chậm | P2 chưa bắt đầu được | làm phase 2, 4 (không cần runner) trước; phase 3 chờ |
 
 ## Câu hỏi mở
 
-1. Tên skill driver chung: `fgos-run` (đề xuất) hay giữ `fgos-code-change` đổi nội dung? (Theo luật một tên: `fgos-code-change` bị xoá, tên mới không mang domain.)
+1. Tên skill driver: `fgos-run` (đề xuất — tên không mang domain; `fgos-code-change` bị xoá).
 2. Q5 (owner): authorize phase 4 plan tài liệu để nghiệm thu "chạy thật"?
 
 <!-- slug: request-to-run-p2-runnable-plans -->

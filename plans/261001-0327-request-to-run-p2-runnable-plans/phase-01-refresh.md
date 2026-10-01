@@ -11,7 +11,7 @@ dependencies: []
 
 ## Overview
 
-Khớp plan với `main` sau P1: hợp đồng Unit/`fgos run` thật, kết quả nghiệm thu ca 1, con trỏ code của skill/doctrine/verb sẽ sửa.
+Khớp plan với `main` sau P1 và P3a: hợp đồng Unit/`fgos run` thật, API Workflow runner (start/answer, Workflow từ Unit[], dịch plan → Workflow, bước tích hợp), kết quả nghiệm thu ca 1, con trỏ code của skill/doctrine/verb sẽ sửa; đếm **đủ** consumer của `fgos capability match` (~32 file), DemandFacts, skill bị xoá.
 
 ## Requirements
 
@@ -24,9 +24,9 @@ Khớp plan với `main` sau P1: hợp đồng Unit/`fgos run` thật, kết qu�
 
 ## Implementation Steps
 
-1. Cổng: P1 đã merge `main`.
+1. Cổng: P1 và P3a (P3 phase 2) đã lên `main`.
 2. Nhánh `plan/261001-request-to-run-p2` + worktree; symlink; GitNexus analyze.
-3. Scout: `src/report/capability-plan-lint.mjs` (đọc `plan.md` chỉ; luật ghim hạ tầng ~13-22); `src/runner/capability-match.mjs` + caller (`bin/fgos.mjs` verb `capability`); `core/skills/_shared/*` nhắc DemandFacts/Q0–Q2; `domains/coding/skills/fgos-code-change/SKILL.md` (plan mode, gate `code:implement|refactor`); `fgos-code-panel`, `fgos-plan-loop` (deprecated); `src/verbs/dispatch` (`decide`); hook PreToolUse (tìm script thật: `rg -l "dispatch decide" .claude plugins core`); mọi chỗ gọi `fgos capability match`.
+3. Scout: `src/report/capability-plan-lint.mjs` (đọc `plan.md` chỉ; luật ghim hạ tầng ~13-22); `src/runner/capability-match.mjs` + caller (`bin/fgos.mjs` verb `capability`); `core/skills/_shared/*` nhắc DemandFacts/Q0–Q2; `domains/coding/skills/fgos-code-change/SKILL.md` (plan mode, gate `code:implement|refactor`); `fgos-code-panel`, `fgos-plan-loop` (deprecated); mọi chỗ gọi `fgos capability match` (gồm `core/skills/fgos-panel/SKILL.md:71`, `core/skills/fgos-architecture-panel/SKILL.md:81`); (`decide` + hook `scripts/dispatch-decide-hook.mjs` đã chuyển ở P1 phase 7 — chỉ kiểm lại).
 4. Đọc báo cáo ca 1 P1: có điều gì đổi hợp đồng Unit/`fgos run` không → cập nhật phase 2–3.
 5. Commit plan.
 
