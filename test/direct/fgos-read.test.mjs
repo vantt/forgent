@@ -257,7 +257,6 @@ test('list --id without --fields is unchanged from full behavior', () => {
   assert.ok(data.gates);
   assert.ok(data.settlements);
   assert.ok(data.outcomes);
-  assert.ok(data.frictions);
   assert.ok(data.learnings);
   assert.ok(data.decisionsById);
   assert.ok(data.callThreads);

@@ -15,6 +15,17 @@ import { runOnce, runWatch, resolveRepoRoot } from '../../src/runner/loop.mjs';
 import { resolveDiscovery } from '../../src/intake/discovery.mjs';
 import { createMissBreaker } from '../../src/runner/anti-loop.mjs';
 
+// Friction records live in the Observe store (.fgos/observe/friction/*.jsonl),
+// not in the work event log.
+function readFrictionRecords(dir) {
+  const fgosDir = path.basename(dir) === '.fgos' ? dir : path.join(dir, '.fgos');
+  const frictionDir = path.join(fgosDir, 'observe', 'friction');
+  if (!fs.existsSync(frictionDir)) return [];
+  return fs.readdirSync(frictionDir)
+    .filter((f) => f.endsWith('.jsonl'))
+    .flatMap((f) => fs.readFileSync(path.join(frictionDir, f), 'utf8').trim().split('\n').filter(Boolean).map((line) => JSON.parse(line)));
+}
+
 // Fake executors only — every "worker" spawned here is a node script this
 // file writes into a mkdtemp directory. Every test builds its own
 // disposable git repo (git init in mkdtemp) with its own `.fgos/` inside
@@ -981,13 +992,13 @@ test('verify-miss: worker commits the wrong thing -> retry once, then park to bl
 
   // friction channel (S2 — kênh 2 của capture): the runner blames itself at
   // the same park choke-point, layer attributed mechanically from the class.
-  const frictionEvent = events.find((e) => e.type === 'work.friction');
-  assert.ok(frictionEvent, 'work.friction written on the park branch');
-  assert.equal(frictionEvent.payload.disposition, 'parked');
-  assert.equal(frictionEvent.payload.errorClass, 'verify-miss');
-  assert.equal(frictionEvent.payload.layer, 'verification');
-  assert.equal(frictionEvent.payload.attempts, 2);
-  assert.ok(frictionEvent.payload.detail, 'friction carries the failure message');
+  const friction = readFrictionRecords(dir).find((r) => r.subject?.kind === 'work' && r.subject?.id === 'item-miss');
+  assert.ok(friction, 'friction written on the park branch');
+  assert.equal(friction.disposition, 'parked');
+  assert.equal(friction.errorClass, 'verify-miss');
+  assert.equal(friction.layer, 'verification');
+  assert.equal(friction.attempts, 2);
+  assert.ok(friction.detail, 'friction carries the failure message');
 });
 
 test('P1 fix: retry resets to this item\'s own dispatch baseline, not HEAD — a differently-committing retry never carries the first (failed) attempt\'s commit forward', async () => {
@@ -1238,11 +1249,11 @@ test('breaker trip: a goal-check miss at threshold parks the item and halts the 
 
   // friction channel (S2): the HALT path writes friction too — a halt must
   // not be silent any more than a park (ghi CẢ đường thất bại).
-  const frictionEvent = readRawEvents(dir).find((e) => e.type === 'work.friction');
-  assert.ok(frictionEvent, 'work.friction written on the halt branch');
-  assert.equal(frictionEvent.payload.disposition, 'halted');
-  assert.equal(frictionEvent.payload.errorClass, 'verify-miss');
-  assert.equal(frictionEvent.payload.layer, 'verification');
+  const friction = readFrictionRecords(dir).find((r) => r.subject?.kind === 'work' && r.subject?.id === 'item-breaker');
+  assert.ok(friction, 'friction written on the halt branch');
+  assert.equal(friction.disposition, 'halted');
+  assert.equal(friction.errorClass, 'verify-miss');
+  assert.equal(friction.layer, 'verification');
 });
 
 test('breaker inert under default config: same goal-check miss with no breakerThreshold override parks the item instead of tripping the breaker (phase2-p1-breaker-inert-fix)', async () => {

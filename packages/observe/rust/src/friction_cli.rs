@@ -135,6 +135,11 @@ pub fn dispatch(
 
             friction::rank(&req.root, limit)
         }
+        "--help" | "-h" | "help" => Ok(json!({
+            "ok": true,
+            "command": "friction",
+            "available_subcommands": AVAILABLE_SUBCOMMANDS,
+        })),
         other => Err(format!(
             "unknown friction subcommand \"{}\". Available: {}",
             other,

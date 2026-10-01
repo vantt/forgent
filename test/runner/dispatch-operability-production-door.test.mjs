@@ -105,7 +105,7 @@ test('production assignment door writes RunResult v3, effective contract, adapte
     timeoutMs: 4321,
   });
 
-  assert.equal(result.status, 'done');
+  assert.equal(result.classification.outcome.category, 'ok');
   assert.equal(result.classification.provenance, 'native-v3');
   assert.equal(result.classification.execution.status, 'completed');
   assert.equal(result.classification.delivery.mode, 'fresh');

@@ -2495,8 +2495,8 @@ fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ contra
     cwd: tempDir, repoRoot: tempDir,
     runnerConfig: { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 },
   });
-  assert.equal(result.status, 'failed');
-  assert.equal(result.confidence, 'failed');
+  assert.equal(result.classification.outcome.category, 'policy');
+  assert.equal(result.classification.confidence.level, 'failed');
   // M4 (dispatch-execution-engine architecture review 260920): the claim
   // failed schema validation, so there IS no real worker claim -- agentClaim
   // must be absent, never a runner-fabricated stand-in. The same
@@ -2523,8 +2523,8 @@ fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status
     cwd: tempDir, repoRoot: tempDir,
     runnerConfig: { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 },
   });
-  assert.equal(result.status, 'failed');
-  assert.equal(result.confidence, 'failed');
+  assert.equal(result.classification.outcome.category, 'policy');
+  assert.equal(result.classification.confidence.level, 'failed');
   // Same M4 rationale as the sibling test above.
   assert.equal(result.agentClaim, undefined);
   assert.deepEqual(result.runnerNote, { summary: 'agent-result.json was present but failed schema validation' });

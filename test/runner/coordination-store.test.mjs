@@ -22,9 +22,17 @@ import {
 import { CoordinationError, SCHEMA_VERSION_3 } from '../../src/runner/coordination/schema.mjs';
 import { replaySession } from '../../src/runner/coordination/replay.mjs';
 
+const tempDirs = new Set();
+
 function mkTempDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-coordination-store-test-'));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-coordination-store-test-'));
+  tempDirs.add(dir);
+  return dir;
 }
+
+process.once('exit', () => {
+  for (const dir of tempDirs) fs.rmSync(dir, { recursive: true, force: true });
+});
 
 function inlineContract(overrides = {}) {
   return {
@@ -618,6 +626,8 @@ test('public coordination CLI without --dir keeps same-id sessions and their app
   const stem = path.basename(mainCheckout);
   const worktreeA = path.join(parent, `${stem}-worktree-a`);
   const worktreeB = path.join(parent, `${stem}-worktree-b`);
+  tempDirs.add(worktreeA);
+  tempDirs.add(worktreeB);
   const runGit = (args, cwd = mainCheckout) => execFileSync('git', args, { cwd, encoding: 'utf8' });
 
   runGit(['init']);

@@ -118,7 +118,7 @@ function openFanOutSession(coordinationId, tempDir, overrides = {}) {
       writerId: 'coordinator-1',
       ...overrides,
     },
-    { cwd: tempDir },
+    { cwd: tempDir, repoRoot: tempDir },
   );
 }
 
@@ -300,7 +300,7 @@ spec:
 
   openDeclaredProtocolSession(
     { definitionId: 'test.coordination-protocol.sibling-edge-bad', coordinationId: 'coord_fanout_r5_sibling', objective: 'Prove sibling edges are rejected.', writerId: 'coordinator-1' },
-    { cwd: tempDir },
+    { cwd: tempDir, repoRoot: tempDir },
   );
   const runnerConfig = fakeCohortRunnerConfig(tempDir);
 

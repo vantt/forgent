@@ -31,10 +31,17 @@ import { replaySession } from '../../src/runner/coordination/replay.mjs';
 import { CoordinationError, validateEventPayload } from '../../src/runner/coordination/schema.mjs';
 
 const DEFINITION_ID = 'test.coordination-protocol.recheck-disposition';
+const tempDirs = new Set();
 
 function mkTempDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-recheck-disposition-test-'));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-recheck-disposition-test-'));
+  tempDirs.add(dir);
+  return dir;
 }
+
+process.once('exit', () => {
+  for (const dir of tempDirs) fs.rmSync(dir, { recursive: true, force: true });
+});
 
 // `produce-candidate` and `review-candidate` are ordinary `required`
 // bindings (the original first pass); `reviewer-recheck` is the
@@ -115,7 +122,7 @@ function setup(coordinationId) {
       objective: 'Prove recheck creates a new Assignment and disposition is a driver event.',
       writerId: 'coordinator-1',
     },
-    { cwd: tempDir },
+    { cwd: tempDir, repoRoot: tempDir },
   );
   return { tempDir, runnerConfig: fakeExecutor(tempDir), opts: { cwd: tempDir, repoRoot: tempDir } };
 }
@@ -706,7 +713,7 @@ test("R2 (topology-edge branch): a driver-authorized binding reached via a decla
   const coordinationId = 'coord_rd_edge_taskkey';
   openDeclaredProtocolSession(
     { definitionId: `${DEFINITION_ID}-edge`, coordinationId, objective: 'Prove the round-scoped taskKey branch also gets the authorization suffix.', writerId: 'coordinator-1' },
-    { cwd: tempDir },
+    { cwd: tempDir, repoRoot: tempDir },
   );
   const opts = { cwd: tempDir, repoRoot: tempDir };
   const runnerConfig = fakeExecutor(tempDir);

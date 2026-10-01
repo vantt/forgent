@@ -25,18 +25,26 @@ test('resolveHostBin prioritizes process.env.FGOS_HOST_BIN', () => {
 
 test('resolveHostBin returns null when no host is available in empty dir', () => {
   const original = process.env.FGOS_HOST_BIN;
+  const originalPkgRoot = process.env.FGOS_PACKAGE_ROOT;
   try {
     delete process.env.FGOS_HOST_BIN;
-    // An arbitrary temp directory has no .fgos/installation
-    const emptyDir = path.join(REPO_ROOT, 'scratch');
-    const resolved = resolveHostBin(emptyDir);
-    // Might resolve repo installation if scratch falls back to repo root,
-    // but in /tmp it must be null
-    const tmpResolved = resolveHostBin('/tmp');
-    assert.equal(tmpResolved, null);
+    // An arbitrary temp directory has no .fgos/installation.
+    // Hermetic: specify empty packageRoot via parameter or FGOS_PACKAGE_ROOT env
+    // to prevent falling back to developer workstation's .fgos/installation.
+    assert.equal(resolveHostBin('/tmp', { packageRoot: '/tmp' }), null);
+
+    process.env.FGOS_PACKAGE_ROOT = '/tmp';
+    assert.equal(resolveHostBin('/tmp'), null);
   } finally {
     if (original !== undefined) {
       process.env.FGOS_HOST_BIN = original;
+    } else {
+      delete process.env.FGOS_HOST_BIN;
+    }
+    if (originalPkgRoot !== undefined) {
+      process.env.FGOS_PACKAGE_ROOT = originalPkgRoot;
+    } else {
+      delete process.env.FGOS_PACKAGE_ROOT;
     }
   }
 });
@@ -59,15 +67,24 @@ test('invokeHost runs metrics ping and returns envelope data', () => {
 
 test('invokeHost throws host-unavailable when host cannot be resolved', () => {
   const original = process.env.FGOS_HOST_BIN;
+  const originalPkgRoot = process.env.FGOS_PACKAGE_ROOT;
   try {
     delete process.env.FGOS_HOST_BIN;
+    process.env.FGOS_PACKAGE_ROOT = '/tmp';
     assert.throws(
-      () => invokeHost(['metrics', 'ping'], { dir: '/tmp' }),
+      () => invokeHost(['metrics', 'ping'], { dir: '/tmp', packageRoot: '/tmp' }),
       (err) => err.code === 'host-unavailable'
     );
   } finally {
     if (original !== undefined) {
       process.env.FGOS_HOST_BIN = original;
+    } else {
+      delete process.env.FGOS_HOST_BIN;
+    }
+    if (originalPkgRoot !== undefined) {
+      process.env.FGOS_PACKAGE_ROOT = originalPkgRoot;
+    } else {
+      delete process.env.FGOS_PACKAGE_ROOT;
     }
   }
 });

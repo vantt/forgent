@@ -71,7 +71,7 @@ function openSessionWithConfig(coordinationId, tempDir, overrides = {}) {
       writerId: 'coordinator-1',
       ...overrides,
     },
-    { cwd: tempDir },
+    { cwd: tempDir, repoRoot: tempDir },
   );
 }
 
@@ -548,7 +548,7 @@ test('R5: aggregateBounds.wallTimeMs is enforced -- a session past its wall-time
   const tempDir = mkTempDir();
   openDeclaredProtocolSession(
     { definitionId: DEFINITION_ID, coordinationId: 'coord_declared_r5_walltime', objective: 'Prove the wall-time bound.', writerId: 'coordinator-1', aggregateBounds: { wallTimeMs: 1 } },
-    { cwd: tempDir },
+    { cwd: tempDir, repoRoot: tempDir },
   );
   const runnerConfig = fakeExecutor(tempDir);
   await new Promise((resolve) => setTimeout(resolve, 15));
@@ -565,7 +565,7 @@ test('R5: aggregateBounds.maxTaskDepth is enforced against the REAL parentAssign
   const tempDir = mkTempDir();
   openDeclaredProtocolSession(
     { definitionId: DEFINITION_ID, coordinationId: 'coord_declared_r5_depth', objective: 'Prove the task-depth bound.', writerId: 'coordinator-1', aggregateBounds: { maxTaskDepth: 2 } },
-    { cwd: tempDir },
+    { cwd: tempDir, repoRoot: tempDir },
   );
   const runnerConfig = fakeExecutor(tempDir);
   // request-consult (depth 1, root) -> provide-consult (depth 2, parent =
@@ -594,7 +594,7 @@ test('R5: aggregateBounds.maxAssignments is enforced session-wide for the declar
   const tempDir = mkTempDir();
   openDeclaredProtocolSession(
     { definitionId: DEFINITION_ID, coordinationId: 'coord_declared_r5_maxasgn', objective: 'Prove the maxAssignments bound.', writerId: 'coordinator-1', aggregateBounds: { maxAssignments: 1 } },
-    { cwd: tempDir },
+    { cwd: tempDir, repoRoot: tempDir },
   );
   const runnerConfig = fakeExecutor(tempDir);
   const request = await dispatchRequest('coord_declared_r5_maxasgn', tempDir, runnerConfig);
@@ -611,7 +611,7 @@ test('R5: aggregateBounds.maxRounds (session-wide) is enforced independently of 
   const tempDir = mkTempDir();
   openDeclaredProtocolSession(
     { definitionId: DEFINITION_ID, coordinationId: 'coord_declared_r5_maxrounds', objective: 'Prove the session-wide maxRounds bound.', writerId: 'coordinator-1', aggregateBounds: { maxRounds: 1 } },
-    { cwd: tempDir },
+    { cwd: tempDir, repoRoot: tempDir },
   );
   const runnerConfig = fakeExecutor(tempDir);
   // The requester's own request-consult already consumes the session's ONE
@@ -630,7 +630,7 @@ test('R5: aggregateBounds.maxConcurrency is enforced session-wide -- of two conc
   const tempDir = mkTempDir();
   openDeclaredProtocolSession(
     { definitionId: DEFINITION_ID, coordinationId: 'coord_declared_r5_concurrency', objective: 'Prove the maxConcurrency bound.', writerId: 'coordinator-1', aggregateBounds: { maxConcurrency: 1 } },
-    { cwd: tempDir },
+    { cwd: tempDir, repoRoot: tempDir },
   );
   const runnerConfig = fakeExecutor(tempDir);
 

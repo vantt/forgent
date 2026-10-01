@@ -124,7 +124,7 @@ function setup(coordinationId, fixtureOptions) {
   writeFixture(tempDir, fixtureOptions);
   openDeclaredProtocolSession(
     { definitionId: DEFINITION_ID, coordinationId, objective: 'Recruit a bounded specialist into a declared slot.', writerId: DRIVER_ID },
-    { cwd: tempDir },
+    { cwd: tempDir, repoRoot: tempDir },
   );
   return { tempDir, runnerConfig: fakeExecutor(tempDir), opts: { cwd: tempDir, repoRoot: tempDir } };
 }

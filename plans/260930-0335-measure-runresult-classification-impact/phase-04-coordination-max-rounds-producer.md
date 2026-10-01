@@ -1,11 +1,13 @@
 ---
 phase: 4
 title: "Producer P3' — coordination chạm maxRounds"
-status: blocked-by-phase-02
+status: cancelled
 priority: P1
 effort: stub
 dependencies: [2]
 ---
+
+> **Huỷ (owner 2026-10-01):** producer này phụ thuộc engine coordination, sẽ bị thu hồi ở track request-to-run P4 (`plans/261001-0327-request-to-run-track/plan.md`). Không làm.
 
 # Phase 4: Producer P3' — coordination chạm maxRounds
 

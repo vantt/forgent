@@ -4,7 +4,7 @@
 Document type: Stateful advisory report (điểm khởi đầu cho một chat thảo luận tiếp)
 Snapshot: 2026-09-30, main @ 40a61d10b
 Audience: người (owner fgOS) + agent ở chat mới, không có lịch sử hội thoại
-Status: Đề xuất; chưa có plan triển khai. Các quyết định đã chốt và câu hỏi mở nằm ở §7–§8
+Status: Đề xuất; chưa có plan triển khai. Các quyết định đã chốt và câu hỏi mở nằm ở §7–§8. **Cập nhật 2026-10-01:** thiết kế đã được chốt qua brainstorm nhiều agent và thảo luận với owner — nguồn đầy đủ: `plans/reports/synthesis-260930-1229-request-to-run-brainstorm.md`. Mô hình đích §6 của báo cáo này bị **thay** bởi thiết kế ở đó (đặc biệt: bỏ engine coordination cho ca thường, "mô hình gọn"; không tạo `docs:*` trong catalog; không `slotBindings`).
 Case ứng dụng: plan "Documentation Authority Unification" (§3)
 ```
 
@@ -153,6 +153,27 @@ FlowDefinition      ── quy trình nghiệp vụ theo domain (finance/marketi
 | RunResult | D1-A: bỏ `status` legacy, đọc `classification`; D2-A: producer ghi `classification.outcome.category` một lần | `plans/260929-1703-runresult-classification-single-path/` (đang chạy trên nhánh `plan/260929-runresult-classification`) |
 | Không dùng master loop `code:*` cho docs | chốt | §3 bằng chứng chi phí |
 
+
+**Bổ sung 2026-10-01 (nguồn: `plans/reports/synthesis-260930-1229-request-to-run-brainstorm.md`, các mục §0, §6, §7):**
+
+| Chủ đề | Quyết định | Nguồn |
+|---|---|---|
+| Kết quả mong muốn và tiêu chí | Viết lại: tới xong nhanh, ít canh, đúng người, kết thúc rõ, đọc được; G1–G6 (gồm G6 "không đổi người lặng lẽ") + 8 tiêu chí theo thứ tự ưu tiên | owner 2026-09-30 23:15–23:16; synthesis §0 |
+| Engine hay mô hình gọn (Q0) | **Mô hình gọn**: primitive `run --unit --role` + 3 Pattern cộng tác bằng code nhỏ + Workflow run; engine coordination thu hồi khi mọi dạng thảo luận chạy tốt trên mô hình gọn | owner 2026-09-30 23:52; synthesis §4b, Q0 |
+| Thuật ngữ | Unit; **Pattern cộng tác / `CollaborationPattern`** = đúng 3 (`solo`, `reviewed`, `panel`) + preset; **Workflow** = chuỗi nhiều bước (gồm dạng thảo luận nhiều pha); bỏ `FlowDefinition`, `CoordinationProtocol`, "objector" (dùng red-team) | owner 2026-09-30 22:20–23:48, 2026-10-01 00:08; synthesis §6 D0, D3 |
+| Workflow và Work | Workflow tách khỏi Work engine; hệ thống chạy Workflow không cần Work; Work chỉ là bản ghi/board/lifecycle, tham chiếu Workflow run | owner 2026-09-30 22:38 |
+| AgentKit plan | Cùng runner với Workflow; chạy nhiều phase = Workflow run dịch từ plan; `plan.md` do người/`ak` quản, fgOS chỉ đọc (b) | owner 2026-09-30 22:52 |
+| Chọn người làm | Bảng 5 mức (mặc định → khẩu vị global → project → yêu cầu của việc → override một lần); tier lấy giá trị lớn nhất; executor không bao giờ ở mức yêu cầu; override lưu trên manifest lần chạy, có scope | owner 2026-09-30 22:05–23:00 |
+| Sàn tier theo loại việc (Q1) | `capabilities.<cap>.rigor`; xoá khối `capabilities.*.overrides` — đã ghi vào plan tier (D19) | owner 2026-09-30 23:58; plan tier commit `9a2cef1cd` |
+| `model_tier` (Q2) | Plan tier đã phủ (`model_tier` → `rigor`); `bind()` trả `model` cho Agent tool in-process | owner 2026-09-30 23:58 |
+| Red-team (Q4) | **Bắt buộc cho code**; checker của `reviewed` cấu hình theo rigor (`checkersByRigor`), red-team từ `high` cho domain khác | owner 2026-09-30 23:58, 2026-10-01 00:04 |
+| Persona khoá (Q6) | Persona do Workflow khoá không bị override một lần thay; không có "thêm checker" ở V1 | owner 2026-10-01 00:04 |
+| Dạng thảo luận (Q8) | Không bỏ dạng nào; architecture advisor là ca nghiệm thu thu hồi engine, rồi business discussion | owner 2026-09-30 23:45 |
+| Cổng ghi file (Q9) | Supersede ADR-006 §6: bỏ protocol stamp; cổng = posture worktree + đi qua `bind()` | owner 2026-09-30 23:40 |
+| Plan read-only (X) | Gộp vào P1 Lõi thực thi | owner 2026-10-01 00:20 |
+| Lộ trình | T → P1 Lõi thực thi → P2 Plan chạy được / P3 Workflow tách khỏi Work → P4 dạng thảo luận + thu hồi engine → P5 thuật ngữ; hai việc lẻ (Observe harness, test rò store) làm ngay | owner 2026-10-01; synthesis §7b |
+| Khẩu vị docs / B7 | **Không** tạo `docs:author/review/object` trong catalog; chỉ là key config `docs:write`/`docs:review` có fallback | synthesis §5 Q4 |
+
 ## 8. Câu hỏi mở (cho chat tiếp theo)
 
 1. **B1:** bind slot tự động từ DemandFacts làm mặc định, cho `slotBindings` tường minh override? (đề xuất: cả hai)
@@ -161,6 +182,8 @@ FlowDefinition      ── quy trình nghiệp vụ theo domain (finance/marketi
 4. **B7:** tạo `docs:*` riêng (đề xuất), hay tái dùng `execute` / `review`?
 5. **Unit trong plan:** chọn định dạng máy đọc được nào trong file phase của AgentKit (ví dụ block YAML `units:` trong từng phase), sao cho `ak plan` và B6 cùng đọc được?
 6. **Code mới** (B1/B3/B5 nằm trong Node dispatch/coordination): chấp nhận sửa Node, hay chờ tới khi các component đó chuyển sang Rust?
+
+**Trạng thái các câu §8 (2026-10-01):** Q1 (`slotBindings`) — bỏ, thay bằng khoá `domain:verb` + Unit; Q2 (`fgos-plan-run`) — thành driver chung ở P2, `fgos-code-change` tổng quát hoá; Q3 (tách plan) — thay bằng lộ trình T → P1…P5; Q4 (`docs:*`) — không vào catalog; Q5 (unit format) — `- unit:` trong phase file, field `id, objective, capability, rigor, writes, dependsOn, pattern?`; Q6 (Node/Rust) — sửa Node trong ranh giới file. **Còn mở:** khi nào authorize P4 của plan tài liệu (Q5 của synthesis). Chi tiết: `plans/reports/synthesis-260930-1229-request-to-run-brainstorm.md` §7.
 
 ## 9. Chưa kiểm chứng (cần làm trước hoặc trong plan)
 
