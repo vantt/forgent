@@ -223,6 +223,17 @@ export const DEFAULT_RUNNER_CONFIG = {
     maxRoots: 4,
     maxLeavesPerRoot: 4,
   },
+  patterns: {
+    defaultRule: { mutatingMinRigor: 'standard' },
+    reviewed: {
+      maxRounds: 2,
+      checkersByRigor: {
+        standard: ['reviewer'],
+        high: ['reviewer', 'red-team'],
+        critical: ['reviewer', 'red-team', 'tester'],
+      },
+    },
+  },
 };
 
 /**
@@ -1282,10 +1293,27 @@ function validateCapabilitiesShape(capabilities, label) {
         );
       }
     }
+    if (entry.persona !== undefined) {
+      if (typeof entry.persona !== 'string' || !entry.persona.trim()) {
+        throw new RunnerConfigError(`runner config (${entryLabel}) "persona" must be a non-empty string when present.`);
+      }
+    }
+    if (entry.minCheckers !== undefined) {
+      if (!Array.isArray(entry.minCheckers) || !entry.minCheckers.every((c) => VALID_CHECKER_ROLES.has(c))) {
+        throw new RunnerConfigError(
+          `runner config (${entryLabel}) "minCheckers" must be an array of strings in [${Array.from(VALID_CHECKER_ROLES).join(', ')}] when present.`,
+        );
+      }
+    }
+    if (entry.verify !== undefined) {
+      if (typeof entry.verify !== 'string' || !entry.verify.trim()) {
+        throw new RunnerConfigError(`runner config (${entryLabel}) "verify" must be a non-empty string command when present.`);
+      }
+    }
     if (entry.serves !== undefined) {
       validateCapabilityServesShape(entry.serves, `${entryLabel}.serves`);
     }
-    const ALLOWED_CAPABILITY_ENTRY_KEYS = ['description', 'aliases', 'prefer', 'rigor', 'confinement', 'serves'];
+    const ALLOWED_CAPABILITY_ENTRY_KEYS = ['description', 'aliases', 'prefer', 'rigor', 'confinement', 'serves', 'persona', 'minCheckers', 'verify'];
     for (const key of Object.keys(entry)) {
       if (!ALLOWED_CAPABILITY_ENTRY_KEYS.includes(key)) {
         if (key === 'unconfined') {
@@ -1300,6 +1328,87 @@ function validateCapabilitiesShape(capabilities, label) {
     }
     if (entry.confinement !== undefined) {
       validateCapabilityConfinementShape(entry.confinement, `${entryLabel}.confinement`);
+    }
+  }
+}
+
+export const VALID_CHECKER_ROLES = Object.freeze(new Set(['reviewer', 'red-team', 'tester']));
+
+export function validateRunnerPatternsShape(patterns, label) {
+  if (!patterns || typeof patterns !== 'object' || Array.isArray(patterns)) {
+    throw new RunnerConfigError(`runner config (${label}) must be an object when present.`);
+  }
+  const ALLOWED_PATTERNS_KEYS = ['defaultRule', 'reviewed'];
+  for (const key of Object.keys(patterns)) {
+    if (!ALLOWED_PATTERNS_KEYS.includes(key)) {
+      throw new RunnerConfigError(`runner config (${label}) contains unknown key "${key}". Allowed keys: ${ALLOWED_PATTERNS_KEYS.join(', ')}.`);
+    }
+  }
+  if (patterns.defaultRule !== undefined) {
+    if (!patterns.defaultRule || typeof patterns.defaultRule !== 'object' || Array.isArray(patterns.defaultRule)) {
+      throw new RunnerConfigError(`runner config (${label}.defaultRule) must be an object.`);
+    }
+    const ALLOWED_DEFAULT_RULE_KEYS = ['mutatingMinRigor'];
+    for (const key of Object.keys(patterns.defaultRule)) {
+      if (!ALLOWED_DEFAULT_RULE_KEYS.includes(key)) {
+        throw new RunnerConfigError(`runner config (${label}.defaultRule) contains unknown key "${key}". Allowed keys: ${ALLOWED_DEFAULT_RULE_KEYS.join(', ')}.`);
+      }
+    }
+    if (patterns.defaultRule.mutatingMinRigor !== undefined) {
+      if (!RIGOR_VALUES.includes(patterns.defaultRule.mutatingMinRigor)) {
+        throw new RunnerConfigError(
+          `runner config (${label}.defaultRule.mutatingMinRigor) must be one of ${RIGOR_VALUES.join('/')}, got: ${JSON.stringify(patterns.defaultRule.mutatingMinRigor)}.`,
+        );
+      }
+    }
+  }
+  if (patterns.reviewed !== undefined) {
+    if (!patterns.reviewed || typeof patterns.reviewed !== 'object' || Array.isArray(patterns.reviewed)) {
+      throw new RunnerConfigError(`runner config (${label}.reviewed) must be an object.`);
+    }
+    const ALLOWED_REVIEWED_KEYS = ['maxRounds', 'checkersByRigor'];
+    for (const key of Object.keys(patterns.reviewed)) {
+      if (!ALLOWED_REVIEWED_KEYS.includes(key)) {
+        throw new RunnerConfigError(`runner config (${label}.reviewed) contains unknown key "${key}". Allowed keys: ${ALLOWED_REVIEWED_KEYS.join(', ')}.`);
+      }
+    }
+    if (patterns.reviewed.maxRounds !== undefined) {
+      const maxRounds = patterns.reviewed.maxRounds;
+      if (!Number.isInteger(maxRounds) || maxRounds <= 0) {
+        throw new RunnerConfigError(`runner config (${label}.reviewed.maxRounds) must be a positive integer.`);
+      }
+    }
+    if (patterns.reviewed.checkersByRigor !== undefined) {
+      const cbr = patterns.reviewed.checkersByRigor;
+      if (!cbr || typeof cbr !== 'object' || Array.isArray(cbr)) {
+        throw new RunnerConfigError(`runner config (${label}.reviewed.checkersByRigor) must be an object.`);
+      }
+      for (const [rigor, checkers] of Object.entries(cbr)) {
+        if (!RIGOR_VALUES.includes(rigor)) {
+          throw new RunnerConfigError(`runner config (${label}.reviewed.checkersByRigor) contains unknown rigor "${rigor}".`);
+        }
+        if (!Array.isArray(checkers) || !checkers.every((c) => VALID_CHECKER_ROLES.has(c))) {
+          throw new RunnerConfigError(
+            `runner config (${label}.reviewed.checkersByRigor.${rigor}) must be an array of strings in [${Array.from(VALID_CHECKER_ROLES).join(', ')}].`,
+          );
+        }
+      }
+      // Monotonic/cumulative check: checkers for stronger rigor MUST be a superset of weaker rigor
+      // standard <= high <= critical (and low <= standard if both present)
+      const orderedRigors = ['low', 'standard', 'high', 'critical'].filter((r) => r in cbr);
+      for (let i = 1; i < orderedRigors.length; i += 1) {
+        const weaker = orderedRigors[i - 1];
+        const stronger = orderedRigors[i];
+        const weakerSet = new Set(cbr[weaker]);
+        const strongerSet = new Set(cbr[stronger]);
+        for (const checker of weakerSet) {
+          if (!strongerSet.has(checker)) {
+            throw new RunnerConfigError(
+              `runner config (${label}.reviewed.checkersByRigor) is not cumulative: "${stronger}" does not include checker "${checker}" from weaker rigor "${weaker}".`,
+            );
+          }
+        }
+      }
     }
   }
 }
@@ -1511,6 +1620,9 @@ function validateRunnerConfigShape(cfg, sourceLabel) {
         throw new RunnerConfigError(`runner config (${sourceLabel}) "parallel.${key}" must be a positive integer when present.`);
       }
     }
+  }
+  if (cfg.patterns !== undefined) {
+    validateRunnerPatternsShape(cfg.patterns, `${sourceLabel} patterns`);
   }
 
   // Phase 01 R1/R5: Project config cannot define or override machine backend instances.

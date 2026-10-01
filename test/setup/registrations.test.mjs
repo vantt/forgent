@@ -1000,3 +1000,67 @@ test('domain-workflow-operations-coverage doctor check is registered and passes 
   assert.equal(result.passed, true);
   assert.match(result.message, /every stage operation across domain workflows resolves/);
 });
+
+test('doctor check runner-patterns-config passes with defaults or warns when missing', () => {
+  const tmpDir = mkTempDir();
+  const fgosDir = path.join(tmpDir, '.fgos');
+  fs.mkdirSync(fgosDir, { recursive: true });
+
+  // Missing runner.patterns entirely -> warning (passes)
+  fs.writeFileSync(
+    path.join(fgosDir, 'config.json'),
+    JSON.stringify({ runner: { capabilities: DEFAULT_CAPABILITY_SLOTS } }, null, 2),
+    'utf8',
+  );
+  const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');
+  assert.ok(check, 'runner-patterns-config doctor check must be registered');
+  const missingRes = check.check(tmpDir);
+  assert.equal(missingRes.passed, true);
+  assert.match(missingRes.message, /warning/);
+  assert.match(missingRes.message, /falling back to setup defaults/);
+
+  // Present and valid
+  fs.writeFileSync(
+    path.join(fgosDir, 'config.json'),
+    JSON.stringify({
+      runner: {
+        patterns: {
+          defaultRule: { mutatingMinRigor: 'standard' },
+          reviewed: {
+            maxRounds: 2,
+            checkersByRigor: {
+              standard: ['reviewer'],
+              high: ['reviewer', 'red-team'],
+              critical: ['reviewer', 'red-team', 'tester'],
+            },
+          },
+        },
+      },
+    }, null, 2),
+    'utf8',
+  );
+  const validRes = check.check(tmpDir);
+  assert.equal(validRes.passed, true);
+  assert.match(validRes.message, /valid/);
+
+  // Invalid (non-cumulative checkers)
+  fs.writeFileSync(
+    path.join(fgosDir, 'config.json'),
+    JSON.stringify({
+      runner: {
+        patterns: {
+          reviewed: {
+            checkersByRigor: {
+              standard: ['reviewer'],
+              high: ['red-team'],
+            },
+          },
+        },
+      },
+    }, null, 2),
+    'utf8',
+  );
+  const invalidRes = check.check(tmpDir);
+  assert.equal(invalidRes.passed, false);
+  assert.match(invalidRes.message, /not cumulative/);
+});

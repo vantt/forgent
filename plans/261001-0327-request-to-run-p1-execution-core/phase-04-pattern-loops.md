@@ -1,7 +1,7 @@
 ---
 phase: 4
 title: "Vòng lặp Pattern cộng tác"
-status: pending
+status: done
 priority: P1
 effort: "1.5d"
 dependencies: [1]
@@ -46,9 +46,9 @@ panel:    [member₁ ∥ … ∥ memberₙ] ─► synthesize
 
 ## Success Criteria
 
-- [ ] Toàn bộ ca ở bước 1 xanh.
-- [ ] Không chỗ nào ghi finding thành `failed`.
-- [ ] Module không import ngoài phạm vi.
+- [x] Toàn bộ ca ở bước 1 xanh.
+- [x] Không chỗ nào ghi finding thành `failed`.
+- [x] Module không import ngoài phạm vi.
 
 ## Risk Assessment
 
