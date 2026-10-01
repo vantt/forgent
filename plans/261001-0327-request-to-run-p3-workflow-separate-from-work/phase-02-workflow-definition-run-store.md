@@ -16,6 +16,7 @@ Xây lớp Workflow độc lập với Work: schema định nghĩa (đọc `doma
 ## Requirements
 
 - Functional:
+  - Nạp **ba tầng** như `protocol-loader.mjs` hiện có: `core/workflows/*.yaml` (dạng thảo luận dùng chung mọi domain — P4 dùng), `domains/<d>/workflows/*.yaml`, project `.fgos/workflows/*.yaml`; project đè domain đè core theo id.
   - `src/workflow/definition.mjs`: validate Workflow (steps, `dependsOn`, `units[].template` (capability, pattern, rigor, taskSpec, persona khoá nếu có — Q6), `gate`); từ chối ghim hạ tầng (G2).
   - `src/workflow/store.mjs`: `.fgos/workflow-runs/<id>/events.jsonl` (append-only, claim nguyên tử như store hiện có); đăng ký setup/doctor.
   - `src/workflow/runner.mjs`: `start(workflowId, input)`, `advance(runId)`, `answer(runId, answers)`; bước sẵn sàng → dựng Unit (objective từ input/kết quả bước trước; `taskSpec` resolve thành `inputs`) → gọi `fgos run` (qua hàm execution của P1, không qua shell) → ghi `unit-result`; outcome `findings`/`needs-human` → park + câu hỏi; gom câu hỏi của mọi bước đang park thành **một bộ**.
