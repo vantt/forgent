@@ -31,10 +31,17 @@ import { replaySession } from '../../src/runner/coordination/replay.mjs';
 import { CoordinationError, validateEventPayload } from '../../src/runner/coordination/schema.mjs';
 
 const DEFINITION_ID = 'test.coordination-protocol.recheck-disposition';
+const tempDirs = new Set();
 
 function mkTempDir() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-recheck-disposition-test-'));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-recheck-disposition-test-'));
+  tempDirs.add(dir);
+  return dir;
 }
+
+process.once('exit', () => {
+  for (const dir of tempDirs) fs.rmSync(dir, { recursive: true, force: true });
+});
 
 // `produce-candidate` and `review-candidate` are ordinary `required`
 // bindings (the original first pass); `reviewer-recheck` is the
