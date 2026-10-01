@@ -68,11 +68,11 @@ Các hàm bị xoá khỏi `placement-policy.mjs`: `PLACEMENT_POLICY_SHADOW_CONT
 
 ## Success Criteria
 
-- [ ] `rg -n "modelForTier|resolvePolicyTierModel|policyTierForDispatchTier|policyTierForWorkTier|rigorOverrides|resolveVerifiedPlacementModel|buildPlacementPolicyCandidate|evaluatePlacementPolicyShadow|PLACEMENT_POLICY_SHADOW" src bin core domains .fgos/config.json` → rỗng.
-- [ ] `DEFAULT_TIER_TO_POLICY` chỉ còn được đọc ở một chỗ, trong `resolveTierModel`.
-- [ ] Bảng đối chiếu model trước/sau (bước 2) cho thấy không có tổ hợp executor × tier nào đổi model, trừ những chỗ owner duyệt.
-- [ ] Config có khoá đã chết → lỗi có hướng dẫn (có test).
-- [ ] `dead-vocabulary-guard.test.mjs` xanh; focused tests xanh; đã merge vào nhánh plan.
+- [x] `rg -n "modelForTier|resolvePolicyTierModel|policyTierForDispatchTier|policyTierForWorkTier|rigorOverrides|resolveVerifiedPlacementModel|buildPlacementPolicyCandidate|evaluatePlacementPolicyShadow|PLACEMENT_POLICY_SHADOW" src bin core domains .fgos/config.json` → rỗng.
+- [x] `DEFAULT_TIER_TO_POLICY` chỉ còn được đọc ở một chỗ, trong `resolveTierModel`.
+- [x] Bảng đối chiếu model trước/sau (bước 2) cho thấy không có tổ hợp executor × tier nào đổi model, trừ những chỗ owner duyệt.
+- [x] Config có khoá đã chết → lỗi có hướng dẫn (có test).
+- [x] `dead-vocabulary-guard.test.mjs` xanh; focused tests xanh; đã merge vào nhánh plan.
 
 ## Risk Assessment
 

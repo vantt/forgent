@@ -1,7 +1,7 @@
 ---
 phase: 2
 title: "rigor thay minTier; bảng rigorToTier; xoá quality bridge"
-status: in-progress
+status: done
 priority: P1
 effort: "1.5d"
 dependencies: [1]
@@ -81,13 +81,13 @@ resolveTierModel(cfg, tier, executors.<id>.providerModel)   ← phase 1
 
 ## Success Criteria
 
-- [ ] `rg -n "minTier|minRigor|QUALITY_TIER_BRIDGE|QUALITY_MODE_VALUES|MIN_RIGOR_VALUES|MIN_TIER_VALUES" src bin core domains .fgos/config.json` → rỗng.
-- [ ] Bảng đối chiếu ở bước 2 cho thấy 0 thay đổi tier, ngoài step `divergent-exploration` đã được owner duyệt.
-- [ ] YAML chứa `minTier` → lỗi validate có hướng dẫn (có test).
-- [ ] Provenance của assignment có `rigor/rigorSource/tier/tierSource` (có test).
-- [ ] `capabilities.<cap>.rigor` nâng được tier ở cả operation khai và không khai `policy.capability`; `capabilities.*.overrides` bị từ chối kèm hướng dẫn; `rg -n "CAPABILITY_OVERRIDE_FIELDS|overrides\.(tier|model)" src` → rỗng (D19, có test).
-- [ ] `fgos doctor` báo được trường hợp thiếu `rigorToTier`; `fgos setup` ghi default.
-- [ ] Guard test xanh; focused tests xanh; đã merge vào nhánh plan.
+- [x] `rg -n "minTier|minRigor|QUALITY_TIER_BRIDGE|QUALITY_MODE_VALUES|MIN_RIGOR_VALUES|MIN_TIER_VALUES" src bin core domains .fgos/config.json` → rỗng.
+- [x] Bảng đối chiếu ở bước 2 cho thấy 0 thay đổi tier, ngoài step `divergent-exploration` đã được owner duyệt.
+- [x] YAML chứa `minTier` → lỗi validate có hướng dẫn (có test).
+- [x] Provenance của assignment có `rigor/rigorSource/tier/tierSource` (có test).
+- [x] `capabilities.<cap>.rigor` nâng được tier ở cả operation khai và không khai `policy.capability`; `capabilities.*.overrides` bị từ chối kèm hướng dẫn; `rg -n "CAPABILITY_OVERRIDE_FIELDS|overrides\.(tier|model)" src` → rỗng (D19, có test).
+- [x] `fgos doctor` báo được trường hợp thiếu `rigorToTier`; `fgos setup` ghi default.
+- [x] Guard test xanh; focused tests xanh; đã merge vào nhánh plan.
 
 ## Risk Assessment
 
