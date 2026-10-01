@@ -150,11 +150,7 @@ function fakeExecutor(scriptDir, assignmentsRoot, { status = 'done', summary = '
     process.exit(0);
     `,
   );
-  return {
-    executor: { allowCrossProvider: true, command: process.execPath, args: [scriptPath, '{prompt}'] },
-    models: { standard: 'test-model', nano: 'test-model', advanced: 'test-model', flagship: 'test-model', frontier: 'test-model' },
-    timeoutMs: 5000,
-  };
+  return { executor: { allowCrossProvider: true, command: process.execPath, args: [scriptPath, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model', nano: 'test-model', advanced: 'test-model', flagship: 'test-model', frontier: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
 }
 
 // ─── R1 (src/verbs/coordination/schema.mjs): assertMutationAllowed ────────

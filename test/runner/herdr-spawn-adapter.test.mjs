@@ -216,7 +216,8 @@ test('herdr-spawn adapter validates interactiveMode config shape', () => {
   fs.mkdirSync(path.dirname(cfgPath), { recursive: true });
   const withInteractiveMode = (interactiveMode) => JSON.stringify({
     executor: { command: 'node', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: 60000,
     executors: {
       agyHerdr: { kind: 'agent', command: 'agy', args: ['-i', '{prompt}'], adapter: 'herdr-spawn', interactiveMode },
@@ -484,7 +485,8 @@ test('dispatchBatchKey survives the real executeExecutorCli door, not just a dir
         interactiveMode: { exitCommand: '/exit', kind: 'agy' },
       },
     },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: 5000,
   });
 
@@ -827,7 +829,8 @@ test('herdr-spawn adapter (LIVE): dispatch a real agy-herdr interactiveMode exec
   execFileSync('git', ['commit', '--allow-empty', '-m', 'initial'], { cwd: tmpRoot });
   writeRunnerConfigFixture(tmpRoot, {
     executor: { command: 'agy', args: ['-i', '{prompt}', '--model', '{model}'] },
-    models: { light: 'gemini-3.6-flash-medium' },
+    modelPolicies: { agy: { nano: 'gemini-3.6-flash-medium' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: 60000,
     executors: {
       'test-agy-herdr-interactive': {
@@ -980,7 +983,8 @@ test('a config can no longer name the session a worker lands in', () => {
   fs.mkdirSync(path.dirname(cfgPath), { recursive: true });
   fs.writeFileSync(cfgPath, JSON.stringify({
     executor: { command: 'node', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: 60000,
     executors: {
       agyHerdr: {

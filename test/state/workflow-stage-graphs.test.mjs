@@ -498,7 +498,7 @@ test('operationsForStage resolves explicit operations for planning stage', () =>
   assert.equal(validateOp.reason, 'review');
   assert.deepEqual(validateOp.skills, ['fgos-coding-validating']);
   assert.deepEqual(validateOp.policy, {
-    minTier: 'standard',
+    rigor: 'standard',
     preferPersona: 'code-reviewer',
     preferExecutor: 'claude',
   });

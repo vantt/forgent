@@ -157,7 +157,8 @@ function writeRunnerConfig(repoRoot, executorScript) {
     JSON.stringify({
       runner: {
         executor: { command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'] },
-        models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+        modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
+        rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
         timeoutMs: 15000,
       },
     }),

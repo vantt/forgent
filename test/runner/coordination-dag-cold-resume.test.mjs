@@ -160,11 +160,7 @@ function fakeExecutor(tempDir) {
     process.stdout.write('Executed.\\n');
     `,
   );
-  return {
-    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    models: { standard: 'test-model', nano: 'test-model', mini: 'test-model', advanced: 'test-model', flagship: 'test-model', frontier: 'test-model' },
-    timeoutMs: 10000,
-  };
+  return { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model', nano: 'test-model', mini: 'test-model', advanced: 'test-model', flagship: 'test-model', frontier: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 10000 };
 }
 
 function setupHarness() {
@@ -601,11 +597,7 @@ test('DAG cold resume: clean process cold resume preserves settled node evidence
     `,
   );
 
-  const runnerConfig = {
-    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    models: { standard: 'm', nano: 'm', mini: 'm', advanced: 'm', flagship: 'm', frontier: 'm' },
-    timeoutMs: 10000,
-  };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'm', nano: 'm', mini: 'm', advanced: 'm', flagship: 'm', frontier: 'm' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 10000 };
 
   // Driver script to be spawned and terminated midway
   const driverScript = path.join(tempDir, 'driver-runner.mjs');

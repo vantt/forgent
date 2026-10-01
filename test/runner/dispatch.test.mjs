@@ -274,6 +274,7 @@ function baseConfig(executorArgs) {
   return {
     executor: { command: process.execPath, args: executorArgs },
     modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' }, node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: 5000,
   };
 }
@@ -437,6 +438,7 @@ test('loadRunnerConfig parses a valid committed-shaped config', () => {
     JSON.stringify({
       executor: { command: 'claude', args: ['-p', '{prompt}', '--model', '{model}'] },
       modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' }, node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 120000,
     }),
   );
@@ -444,6 +446,25 @@ test('loadRunnerConfig parses a valid committed-shaped config', () => {
   assert.equal(cfg.executor.command, 'claude');
   assert.equal(cfg.modelPolicies.claude.standard, 'sonnet');
   assert.equal(cfg.timeoutMs, 120000);
+});
+
+test('loadRunnerConfig rejects a rigorToTier map that lowers supply for stronger rigor', () => {
+  const dir = mkTempDir();
+  const configPath = path.join(dir, 'nonmonotonic-rigor-map.json');
+  fs.writeFileSync(
+    configPath,
+    JSON.stringify({
+      executor: { command: 'claude', args: ['-p', '{prompt}', '--model', '{model}'] },
+      modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', flagship: 'opus' } },
+      rigorToTier: { low: 'nano', standard: 'flagship', high: 'standard', critical: 'flagship' },
+      timeoutMs: 120000,
+    }),
+  );
+
+  assert.throws(
+    () => loadRunnerConfig(configPath),
+    (err) => err instanceof RunnerConfigError && /must be monotonic/.test(err.message),
+  );
 });
 
 test('loadRunnerConfig rejects a missing file', () => {
@@ -485,6 +506,7 @@ test('loadRunnerConfig accepts a modelPolicies provider table declaring only som
         claude: { standard: 'sonnet' },
         'z-ai': { standard: 'glm-4.6', frontier: 'glm-4.6-max' },
       },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -550,6 +572,7 @@ test('loadRunnerConfig rejects provider accounts declared as an array', () => {
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       modelPolicies: { claude: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
       providers: { 'openai-codex': { accounts: [] } },
     }),
@@ -565,6 +588,7 @@ test('loadRunnerConfig rejects provider account entries that declare placement p
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       modelPolicies: { claude: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
       providers: {
         'openai-codex': {
@@ -619,7 +643,7 @@ test('loadRunnerConfig accepts a config with no "idleTimeoutMs" at all -- absent
   const configPath = path.join(dir, 'no-idle-timeout.json');
   fs.writeFileSync(
     configPath,
-    JSON.stringify({ executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, timeoutMs: 1000 }),
+    JSON.stringify({ executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 1000 }),
   );
   const cfg = loadRunnerConfig(configPath);
   assert.equal(cfg.idleTimeoutMs, undefined);
@@ -630,7 +654,7 @@ test('loadRunnerConfig accepts a well-formed positive "idleTimeoutMs"', () => {
   const configPath = path.join(dir, 'good-idle-timeout.json');
   fs.writeFileSync(
     configPath,
-    JSON.stringify({ executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, timeoutMs: 1000, idleTimeoutMs: 30000 }),
+    JSON.stringify({ executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 1000, idleTimeoutMs: 30000 }),
   );
   const cfg = loadRunnerConfig(configPath);
   assert.equal(cfg.idleTimeoutMs, 30000);
@@ -665,6 +689,7 @@ test('loadRunnerConfig accepts a config with no "executors" block at all', () =>
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -715,6 +740,7 @@ test('loadRunnerConfig accepts a config with no "executors" block at all — pre
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -731,6 +757,7 @@ test('loadRunnerConfig accepts a well-formed "executors" entry carrying its own 
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { 'fgos-code-implement': { kind: 'agent', command: 'agy', args: ['{prompt}'] } },
       modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -752,6 +779,7 @@ test('loadRunnerConfig accepts a config with no "capabilities" block at all', ()
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -768,6 +796,7 @@ test('loadRunnerConfig accepts a well-formed "capabilities" catalog entry with d
       executor: { command: 'claude', args: ['{prompt}'] },
       capabilities: { 'impact-analysis': { description: 'Code-graph blast radius', aliases: ['impact_analysis', 'Impact Analysis'] } },
       modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -785,6 +814,7 @@ test('loadRunnerConfig accepts a "capabilities" entry naming neither description
       executor: { command: 'claude', args: ['{prompt}'] },
       capabilities: { 'pane-labeling': {} },
       modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -876,6 +906,7 @@ test('loadRunnerConfig accepts a "executors.<id>" entry using the invocations[] 
         },
       },
       modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -1073,6 +1104,7 @@ test('loadRunnerConfig accepts a "executors" entry naming only "kind" (metadata-
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { distill: { kind: 'agent', target: 'general-purpose', tier: 'standard' } },
       modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -1118,6 +1150,7 @@ test('loadRunnerConfig accepts "task" as a "executors.<id>.kind" value (the one 
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { distill: { kind: 'agent', target: 'general-purpose' } },
       modelPolicies: { claude: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -1150,6 +1183,7 @@ test('loadRunnerConfig accepts a "executors.<id>" entry with allowCrossProvider:
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { 'fgos-code-implement': { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
       modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -1286,6 +1320,7 @@ test('loadRunnerConfig accepts a "executors.<id>.invocations[]" entry with "via"
         webhook: { kind: 'tool', invocations: [{ via: 'api', adapter: 'http', url: 'http://example.invalid/hook' }] },
       },
       modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -1438,7 +1473,7 @@ test('loadRunnerConfigFromDir reads the runner section of the shared file', () =
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
   fs.writeFileSync(
     path.join(dir, '.fgos', 'config.json'),
-    JSON.stringify({ runner: { executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, timeoutMs: 5000 } }),
+    JSON.stringify({ runner: { executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 } }),
   );
   const cfg = loadRunnerConfigFromDir(dir);
   assert.equal(cfg.executor.command, 'claude');
@@ -1457,7 +1492,7 @@ test('loadRunnerConfigFromDir merges a project runner section against ~/.fgos/co
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
   fs.writeFileSync(
     path.join(dir, '.fgos', 'config.json'),
-    JSON.stringify({ runner: { executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, timeoutMs: 5000 } }),
+    JSON.stringify({ runner: { executor: { command: 'claude', args: ['{prompt}'] }, modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 } }),
   );
   const homeDir = mkTempDir();
   fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
@@ -1495,7 +1530,7 @@ test('loadRunnerConfigFromDir drops a stale global modelPolicies tier key instea
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
   fs.writeFileSync(
     path.join(dir, '.fgos', 'config.json'),
-    JSON.stringify({ runner: { executor: { command: 'claude', args: ['{prompt}'] }, timeoutMs: 5000, modelPolicies: { claude: { standard: 'sonnet' } } } }),
+    JSON.stringify({ runner: { executor: { command: 'claude', args: ['{prompt}'] }, timeoutMs: 5000, modelPolicies: { claude: { standard: 'sonnet' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' } } }),
   );
   const homeDir = mkTempDir();
   fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
@@ -1527,7 +1562,7 @@ test('loadRunnerConfigFromDir still lets a global modelPolicies tier key fill a 
   fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
   fs.writeFileSync(
     path.join(dir, '.fgos', 'config.json'),
-    JSON.stringify({ runner: { executor: { command: 'claude', args: ['{prompt}'] }, timeoutMs: 5000, modelPolicies: { claude: { standard: 'sonnet' } } } }),
+    JSON.stringify({ runner: { executor: { command: 'claude', args: ['{prompt}'] }, timeoutMs: 5000, modelPolicies: { claude: { standard: 'sonnet' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' } } }),
   );
   const homeDir = mkTempDir();
   fs.mkdirSync(path.join(homeDir, '.fgos'), { recursive: true });
@@ -1721,6 +1756,7 @@ test('loadRunnerConfig accepts a runner config declaring modelPolicies instead o
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       modelPolicies: { claude: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -1793,6 +1829,7 @@ test('loadRunnerConfig does not warn for a "executors.<id>" entry that declares 
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { 'glm-cli': { kind: 'agent', providerModel: 'z-ai', command: 'glm', args: [] } },
       modelPolicies: { claude: { standard: 'sonnet' }, 'z-ai': { standard: 'glm-4.6' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -1816,6 +1853,7 @@ test('loadRunnerConfig does not warn for a "executors.<id>" entry with a Claude 
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { 'custom-claude-executor': { kind: 'agent', command: 'claude', args: ['{prompt}'] } },
       modelPolicies: { claude: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -1839,6 +1877,7 @@ test('loadRunnerConfig warns (never throws) for a "executors.<id>" entry with a 
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { 'bare-nonclaude': { kind: 'agent', command: 'some-other-tool', args: [] } },
       modelPolicies: { claude: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -1869,6 +1908,7 @@ test('loadRunnerConfig does not warn for an "invocations[]"-shaped "executors.<i
         },
       },
       modelPolicies: { claude: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -1899,6 +1939,7 @@ test('loadRunnerConfig skips provider-family warning when every invocation is no
         },
       },
       modelPolicies: { claude: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -1930,6 +1971,7 @@ test('loadRunnerConfig still warns when an executor has a CLI invocation with un
         },
       },
       modelPolicies: { claude: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -2052,7 +2094,7 @@ test('codex\'s cli-bypass invocation consumes model placeholder in invocation ar
     operation: 'validate-plan',
     policy: {
       preferExecutor: 'openai',
-      minTier: 'flagship',
+      rigor: 'high',
     },
   });
 
@@ -2062,6 +2104,7 @@ test('codex\'s cli-bypass invocation consumes model placeholder in invocation ar
   });
 
   assert.equal(effectivePolicy.providerModel, 'openai');
+  assert.equal(effectivePolicy.rigor, 'high');
   assert.equal(effectivePolicy.tier, 'flagship');
   assert.equal(effectivePolicy.model, 'gpt-5.6-terra');
 
@@ -2492,6 +2535,7 @@ test('loadRunnerConfig accepts a "executors.<id>" entry with a non-empty agentTy
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { 'my-agent-executor': { kind: 'agent', agentType: 'code-simplifier' } },
       modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -2525,6 +2569,7 @@ test('loadRunnerConfig accepts a "executors.<id>" entry with a boolean forceCliS
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { 'my-task-executor': { kind: 'agent', agentType: 'code-simplifier', forceCliSpawn: true } },
       modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -4562,6 +4607,7 @@ test('loadRunnerConfig accepts a "executors.<id>" entry with a valid carries val
       capabilities: { judge: {} },
       executors: { gather: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['judge'], carries: 'repo-content', allowCrossProvider: true } },
       modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -4580,6 +4626,7 @@ test('loadRunnerConfig ignores a "executors.<id>" entry\'s stray "capability" fi
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { gitnexus: { kind: 'tool', capability: 'not-declared-anywhere', invocations: [{ via: 'mcp', command: 'mcp:gitnexus' }] } },
       modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -4595,6 +4642,7 @@ test('loadRunnerConfig accepts a "executors.<id>" entry naming neither "for" nor
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
       modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -4619,6 +4667,7 @@ test('loadRunnerConfig accepts an mcp invocation\'s "tools" map when every key i
         },
       },
       modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -4675,6 +4724,7 @@ test('loadRunnerConfig accepts an mcp invocation naming no "tools" at all -- pur
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { gitnexus: { kind: 'tool', invocations: [{ via: 'mcp', command: 'mcp:gitnexus' }] } },
       modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -4804,7 +4854,7 @@ test('resolveExecutorAndOverrides resolves a literal executorId directly, unchan
   const result = resolveExecutorAndOverrides(cfg, 'agy');
   assert.equal(result.executorId, 'agy');
   assert.equal(result.executor, cfg.executors.agy);
-  assert.equal(result.overrides, undefined);
+  assert.ok(!Object.hasOwn(result, 'overrides'));
   assert.equal(result.configured, true);
 });
 
@@ -4819,13 +4869,14 @@ test('resolveExecutorAndOverrides resolves via capabilities.<name>.prefer when t
   assert.equal(result.configured, true);
 });
 
-test('resolveExecutorAndOverrides carries capabilities.<name>.overrides through, unapplied, for the caller to merge itself', () => {
+test('resolveExecutorAndOverrides selects a capability with a rigor floor without returning retired override payload', () => {
   const cfg = {
     executors: { agy: { kind: 'agent', command: 'agy', for: ['fgos-coding-implement'] } },
-    capabilities: { 'fgos-coding-implement': { prefer: 'agy', overrides: { rigorOverrides: { standard: 'advanced' } } } },
+    capabilities: { 'fgos-coding-implement': { prefer: 'agy', rigor: 'high' } },
   };
   const result = resolveExecutorAndOverrides(cfg, 'fgos-coding-implement');
-  assert.deepEqual(result.overrides, { rigorOverrides: { standard: 'advanced' } });
+  assert.equal(result.executorId, 'agy');
+  assert.equal('overrides' in result, false);
 });
 
 test('resolveExecutorAndOverrides resolves via "prefer" even when the preferred executor declares no "for" at all (D5 -- supersedes D2\'s own symmetry requirement)', () => {
@@ -4848,7 +4899,7 @@ test('resolveExecutorAndOverrides falls back to the plain "for" scan when no "pr
   const cfg = { executors: { 'totally-unrelated-name': { kind: 'agent', command: 'agy', for: ['review'] } } };
   const result = resolveExecutorAndOverrides(cfg, 'review');
   assert.equal(result.executorId, 'totally-unrelated-name');
-  assert.equal(result.overrides, undefined);
+  assert.ok(!Object.hasOwn(result, 'overrides'));
 });
 
 test('resolveExecutorAndOverrides returns configured:false, executorId:null when nothing resolves -- a legitimate state, never thrown', () => {
@@ -4908,32 +4959,34 @@ test('loadRunnerConfig rejects capabilities.<name>.overrides with a key outside 
   assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
 });
 
-test('loadRunnerConfig rejects capabilities.<name>.overrides.rigorOverrides via the SAME rule a executor\'s own rigorOverrides already uses', () => {
+test('loadRunnerConfig rejects every capabilities.<name>.overrides payload with migration guidance', () => {
   const dir = mkTempDir();
-  const configPath = path.join(dir, 'bad-overrides-rigor.json');
+  const configPath = path.join(dir, 'retired-overrides.json');
   fs.writeFileSync(
     configPath,
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { agy: { kind: 'agent', command: 'agy', for: ['fgos-coding-implement'] } },
-      capabilities: { 'fgos-coding-implement': { prefer: 'agy', overrides: { rigorOverrides: { standard: 'ultra-mega' } } } },
+      capabilities: { 'fgos-coding-implement': { prefer: 'agy', overrides: { tier: 'advanced' } } },
       modelPolicies: { claude: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
-  assert.throws(() => loadRunnerConfig(configPath), RunnerConfigError);
+  assert.throws(() => loadRunnerConfig(configPath), /overrides was removed/);
 });
 
-test('loadRunnerConfig accepts a well-formed capabilities.<name>.prefer/overrides pair', () => {
+test('loadRunnerConfig accepts a capability rigor floor with prefer', () => {
   const dir = mkTempDir();
-  const configPath = path.join(dir, 'good-prefer-overrides.json');
+  const configPath = path.join(dir, 'good-prefer-rigor.json');
   fs.writeFileSync(
     configPath,
     JSON.stringify({
       executor: { command: 'claude', args: ['{prompt}'] },
       executors: { agy: { kind: 'agent', command: 'agy', args: ['{prompt}'], for: ['fgos-coding-implement'] } },
-      capabilities: { 'fgos-coding-implement': { description: 'code-implement work', prefer: 'agy', overrides: { tier: 'standard', model: 'sonnet' } } },
+      capabilities: { 'fgos-coding-implement': { description: 'code-implement work', prefer: 'agy', rigor: 'high' } },
       modelPolicies: { claude: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -4950,6 +5003,7 @@ test('loadRunnerConfig accepts "prefer" naming a real executor that declares no 
       executors: { agy: { kind: 'agent' } }, // no "command"/"args"/"for" at all
       capabilities: { 'fgos-coding-implement': { prefer: 'agy' } },
       modelPolicies: { claude: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -4985,6 +5039,7 @@ test('loadRunnerConfig accepts "prefer" as an array of bare executor-id strings'
       executors: { agy: { kind: 'agent' }, claude2: { kind: 'agent' } },
       capabilities: { advise: { prefer: ['agy', 'claude2'] } },
       modelPolicies: { claude: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -5006,6 +5061,7 @@ test('loadRunnerConfig accepts "prefer" as an array of {executor, invocation} ob
         advise: { prefer: [{ executor: 'claude', invocation: 'cli-bwrap' }, { executor: 'agy', invocation: 'cli-bwrap' }] },
       },
       modelPolicies: { claude: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -5112,7 +5168,7 @@ test('resolveExecutorConfig resolves the confined invocation end-to-end through 
 // resolve a purpose name via capabilities.<name>.prefer the same way a
 // literal executorId already did (D3's own real migration case) ----------
 
-test('spawnWorker resolves model via capabilities.<name>.prefer + overrides -- the exact D4 gap (spawnWorker used to have its own separate lookup, distinct from resolveExecutorConfig)', async () => {
+test('spawnWorker applies the selected capability rigor as a raise-only model tier floor', async () => {
   const dir = mkTempDir();
   const scriptPath = writeEchoExecutor(dir);
   const cfg = {
@@ -5120,16 +5176,20 @@ test('spawnWorker resolves model via capabilities.<name>.prefer + overrides -- t
     executors: {
       agy: { kind: 'agent', command: process.execPath, args: [scriptPath, '{prompt}', '--model', '{model}'], for: ['fgos-coding-implement'], providerModel: 'gemini', allowCrossProvider: true },
     },
-    capabilities: { 'fgos-coding-implement': { prefer: 'agy', overrides: { tier: 'nano', model: 'gemini-flash' } } },
-    modelPolicies: { claude: { standard: 'sonnet' }, gemini: { nano: 'gemini-flash' } },
+    capabilities: {
+      'fgos-coding-implement': { prefer: 'agy' },
+      'code:implement': { prefer: 'agy', rigor: 'high' },
+    },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    modelPolicies: { claude: { standard: 'sonnet' }, gemini: { flagship: 'gemini-pro' } },
     timeoutMs: 5000,
   };
 
   const result = await spawnWorker(sampleWork({ domain: 'coding' }), cfg, mkTempDir());
-  assert.equal(result.model, 'gemini-flash');
+  assert.equal(result.model, 'gemini-pro');
   const payload = JSON.parse(result.stdout);
   assert.equal(payload.args[1], '--model');
-  assert.equal(payload.args[2], 'gemini-flash');
+  assert.equal(payload.args[2], 'gemini-pro');
 });
 
 test('executeExecutorCli resolves a purpose-named executorId via capabilities.<name>.prefer, spawning the real preferred executor', async () => {
@@ -5150,44 +5210,19 @@ test('executeExecutorCli resolves a purpose-named executorId via capabilities.<n
   assert.equal(payload.args[0], 'do the thing');
 });
 
-test('executeExecutorCli applies capabilities.<name>.overrides identically whether the purpose is resolved via --for or named positionally -- both doors share ONE resolveExecutorAndOverrides call, never a second one on the already-resolved id that would silently drop overrides', async () => {
-  const dir = mkTempDir();
-  const scriptPath = writeEchoExecutor(dir);
+test('executeExecutorCli rejects retired capability overrides before spawning', async () => {
   const root = mkTempDir();
   writeRunnerConfigFixture(root, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
-    executors: { agy: { kind: 'agent', command: process.execPath, args: [scriptPath, '{model}:{prompt}'], for: ['fgos-coding-implement'], providerModel: 'gemini', allowCrossProvider: true } },
+    executors: { agy: { kind: 'agent', command: process.execPath, args: ['-e', ''], for: ['fgos-coding-implement'], allowCrossProvider: true } },
     capabilities: { 'fgos-coding-implement': { prefer: 'agy', overrides: { tier: 'advanced' } } },
-    modelPolicies: { claude: { standard: 'sonnet' }, gemini: { standard: 'flash', advanced: 'flash-creative' } },
+    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
     timeoutMs: 5000,
   });
-
-  const viaFor = await executeExecutorCli(undefined, { repoRoot: root, for: 'fgos-coding-implement', prompt: 'p' });
-  assert.equal(viaFor.model, 'flash-creative');
-
-  const viaPositional = await executeExecutorCli('fgos-coding-implement', { repoRoot: root, prompt: 'p' });
-  assert.equal(viaPositional.model, 'flash-creative');
-});
-
-test('executeExecutorCli honors capabilities.<name>.overrides.tier/model directly -- found by self-review: these two fields validated as legal (validateCapabilitiesShape) but were never actually consulted anywhere until this fix', async () => {
-  const dir = mkTempDir();
-  const scriptPath = writeEchoExecutor(dir);
-  const root = mkTempDir();
-  writeRunnerConfigFixture(root, {
-    executor: { command: '/global/executor', args: ['{prompt}'] },
-    executors: { agy: { kind: 'agent', command: process.execPath, args: [scriptPath, '{model}:{prompt}'], for: ['fgos-coding-implement'], providerModel: 'gemini', allowCrossProvider: true } },
-    // Deliberately give agy its own tier/model so the assertions below can
-    // only pass if capabilityOverrides genuinely wins -- executor.tier/
-    // .model alone would resolve to 'standard'/'agy-standard-model'.
-    capabilities: { 'fgos-coding-implement': { prefer: 'agy', overrides: { tier: 'heavy', model: 'agy-override-model' } } },
-    modelPolicies: { claude: { standard: 'sonnet' }, gemini: { standard: 'agy-standard-model', frontier: 'agy-heavy-model' } },
-    timeoutMs: 5000,
-  });
-  const result = await executeExecutorCli('fgos-coding-implement', { repoRoot: root, prompt: 'p' });
-  // overrides.model wins outright (no modelForTier computation at all).
-  assert.equal(result.model, 'agy-override-model');
-  const payload = JSON.parse(result.stdout);
-  assert.equal(payload.args[0], 'agy-override-model:p');
+  await assert.rejects(
+    executeExecutorCli('fgos-coding-implement', { repoRoot: root, prompt: 'p' }),
+    (err) => err instanceof RunnerConfigError && /overrides was removed/.test(err.message),
+  );
 });
 
 test('executeExecutorCli now enforces options.disallowedProviders/disallowedExecutors -- a real governance gap this function had no channel for at all before the Dispatch Core Contract Normalization unification with resolveAssignmentDispatchPolicy', async () => {
@@ -5220,15 +5255,15 @@ test('executeExecutorCli now enforces options.disallowedProviders/disallowedExec
   assert.equal(allowed.status, 0);
 });
 
-test('executeExecutorCli: an explicit caller-supplied --tier/--model always wins over capabilities.<name>.overrides -- overrides are a config default, never allowed to shadow a real caller request', async () => {
+test('executeExecutorCli honors an explicit caller model with a capability rigor floor', async () => {
   const dir = mkTempDir();
   const scriptPath = writeEchoExecutor(dir);
   const root = mkTempDir();
   writeRunnerConfigFixture(root, {
     executor: { command: '/global/executor', args: ['{prompt}'] },
     executors: { agy: { kind: 'agent', command: process.execPath, args: [scriptPath, '{model}:{prompt}'], for: ['fgos-coding-implement'], allowCrossProvider: true } },
-    capabilities: { 'fgos-coding-implement': { prefer: 'agy', overrides: { model: 'should-never-win' } } },
-    modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+    capabilities: { 'fgos-coding-implement': { prefer: 'agy', rigor: 'high' } },
+    modelPolicies: { claude: { standard: 'sonnet', flagship: 'opus' }, node: { standard: 'sonnet', flagship: 'opus' } },
     timeoutMs: 5000,
   });
   const result = await executeExecutorCli('fgos-coding-implement', { repoRoot: root, prompt: 'p', model: 'caller-explicit-model' });
@@ -6179,6 +6214,7 @@ test('loadRunnerConfig accepts well-formed "env" block in executors entry', () =
         },
       },
       modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 1000,
     }),
   );
@@ -6572,7 +6608,7 @@ test('compileDispatchPlan merges the same fields for a --for capability selector
   assert.equal(plan.policy.executorPreference[0], 'agy');
 });
 
-test('compileDispatchPlan applies capability overrides when synthesizing policy for a --for capability selector', () => {
+test('compileDispatchPlan applies capability rigor when synthesizing policy for a --for capability selector', () => {
   const cfg = {
     executors: {
       'agy-herdr': {
@@ -6585,14 +6621,12 @@ test('compileDispatchPlan applies capability overrides when synthesizing policy 
     capabilities: {
       'fgos-coding-implement': {
         prefer: 'agy-herdr',
-        overrides: {
-          tier: 'nano',
-          model: 'gemini-flash-medium',
-        },
+        rigor: 'high',
       },
     },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     modelPolicies: {
-      gemini: { nano: 'gemini-flash-medium', standard: 'gemini-flash-high' },
+      gemini: { standard: 'gemini-flash-high', flagship: 'gemini-pro' },
     },
   };
 
@@ -6600,8 +6634,8 @@ test('compileDispatchPlan applies capability overrides when synthesizing policy 
   assert.equal(plan.executorId, 'agy-herdr');
   assert.equal(plan.bindingSource, 'capability.prefer');
   assert.equal(plan.providerModel, 'gemini');
-  assert.equal(plan.tier, 'nano');
-  assert.equal(plan.model, 'gemini-flash-medium');
+  assert.equal(plan.tier, 'flagship');
+  assert.equal(plan.model, 'gemini-pro');
   assert.equal(plan.provenance.provider.value, 'gemini');
 });
 
@@ -6625,15 +6659,15 @@ test('compileDispatchPlan merges policy fields from a real Assignment (assignmen
     assignmentId: 'test-assignment-1',
     operation: 'implement-item',
     role: 'implementer',
-    policy: { preferExecutor: 'agy', minTier: 'frontier' },
+    policy: { preferExecutor: 'agy', rigor: 'critical' },
     skills: [],
   };
   const plan = compileDispatchPlan(cfg, { assignment: assignmentItem.assignmentId, assignmentItem });
   assert.equal(plan.executorId, 'agy');
   assert.equal(plan.tier, 'frontier');
   assert.equal(plan.model, 'opus');
-  assert.equal(plan.provenance.tier.source.scope, 'opPolicy');
-  assert.equal(plan.provenance.tier.source.id, 'implement-item');
+  assert.equal(plan.provenance.rigor.source.scope, 'opPolicy');
+  assert.equal(plan.provenance.rigor.source.id, 'implement-item');
   assert.equal(plan.policy.role, 'implementer');
 });
 

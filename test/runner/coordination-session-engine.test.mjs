@@ -55,11 +55,7 @@ function fakeExecutor(tempDir, { status = 'done', summary = 'Validated.' } = {})
     process.exit(0);
     `,
   );
-  return {
-    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  return { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
 }
 
 // Same shape as fakeExecutor() above, but delays writing the RunResult by
@@ -98,11 +94,7 @@ function fakeExecutorDelayed(tempDir, { delayMs = 800, status = 'done', summary 
     }, ${delayMs});
     `,
   );
-  return {
-    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  return { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
 }
 
 function primaryTaskParams(overrides = {}) {

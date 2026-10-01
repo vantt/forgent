@@ -68,7 +68,7 @@ test('buildAssignment creates frozen Assignment from planning.validate-plan with
   assert.equal(assignment.dispatch, 'assignment');
   assert.deepEqual(assignment.skills, ['fgos-coding-validating']);
   assert.deepEqual(assignment.policy, {
-    minTier: 'standard',
+    rigor: 'standard',
     preferPersona: 'code-reviewer',
     preferExecutor: 'claude',
   });

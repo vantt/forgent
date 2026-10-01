@@ -19,7 +19,7 @@ export const CONFIDENCE_LEVELS = Object.freeze(['verified', 'reported', 'inferre
 export const FAILURE_FAMILIES = Object.freeze(['provider', 'resource', 'contract', 'policy', 'external-interference', 'unknown']);
 export const POLICY_DISPOSITIONS = Object.freeze(['allow', 'refuse', 'needs-input', 'not-applicable']);
 export const DELIVERY_MODES = Object.freeze(['fresh', 'resumed', 'replayed', 'recovered', 'legacy-derived']);
-export const PROVENANCE_VALUES = Object.freeze(['native-v2', 'legacy-derived', 'contract-corrupt']);
+export const PROVENANCE_VALUES = Object.freeze(['native-v2', 'native-v3', 'legacy-derived', 'contract-corrupt']);
 export const RECOGNIZED_LEGACY_STATUSES = Object.freeze(['done', 'failed', 'blocked', 'no-evidence']);
 
 export const CORRUPT_CLASSIFICATION = Object.freeze({

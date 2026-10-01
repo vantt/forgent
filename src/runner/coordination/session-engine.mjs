@@ -207,19 +207,8 @@ function assertKnownReadOnlyRole(role, label) {
   }
 }
 
-// `minTier` (Step 08 P04.2b, optional): when supplied, sets
-// `contract.policy = {minTier}` on the built inline contract --
-// `execution-contract.mjs`'s own narrow, exactly-one-field-wide
-// `contract.policy` exception (see that module's own doc comment). This is
-// the ONLY channel that reaches `resolveAssignmentDispatchPolicy`'s
-// `opPolicy.minTier` starting floor (`assignment-policy.mjs`,
-// `effectiveTier = opPolicy.minTier || 'standard'`) -- `cliOverride.minTier`
-// (composed separately by `dispatchDeclaredOperation` below) can only ever
-// RAISE that floor via `resolveStrongerTier`, never lower it, so without
-// this parameter a caller-composed tier requirement below `'standard'` had
-// no way to actually take effect. Every pre-existing caller omits this
-// parameter, so `contract.policy` stays absent and behavior is
-// byte-identical to before this parameter existed.
+// `tier` (optional): when supplied, sets `contract.policy = {tier}` on the
+// built inline contract.
 // A RESERVED constraint namespace, writable by this module alone. The
 // `protocol-operation:` stamp (imported from dispatch/execution-contract.mjs
 // -- the ONE definition either side of the coordination/dispatch layer
@@ -275,7 +264,7 @@ function assertNoReservedOperationStamp(constraints) {
 // checkout) have already passed -- this function trusts its caller for that
 // legality decision and only shapes the contract, exactly like every other
 // field here.
-function buildSessionContract({ objective, contextRefs, constraints, expectedOutputs, evidenceRequired, role, capabilities, budget, timeoutMs, minTier, protocolOperationRef, mutation = 'read-only', contractTemplate }) {
+function buildSessionContract({ objective, contextRefs, constraints, expectedOutputs, evidenceRequired, role, capabilities, budget, timeoutMs, tier, protocolOperationRef, mutation = 'read-only', contractTemplate }) {
   const declared = Array.isArray(constraints) ? [...constraints] : constraints;
   assertNoReservedOperationStamp(declared);
   const stamped = protocolOperationRef !== undefined && Array.isArray(declared) ? [...declared, protocolOperationRef] : declared;
@@ -289,7 +278,7 @@ function buildSessionContract({ objective, contextRefs, constraints, expectedOut
     role,
     ...(capabilities !== undefined ? { capabilities } : {}),
     budget: budget ?? { timeoutMs: timeoutMs ?? DEFAULT_TASK_TIMEOUT_MS, maxRuns: 1 },
-    ...(minTier !== undefined ? { policy: { minTier } } : {}),
+    ...(tier !== undefined ? { policy: { tier } } : {}),
     ...(contractTemplate !== undefined ? { contractTemplate } : {}),
   };
 }
@@ -902,8 +891,7 @@ export async function proposeConsult(
 // only new execution-adjacent call in this block is `mergePolicyStack()`
 // (`../definitions/schema.mjs`, P02.1's own PolicyPatch monotonicity
 // validator, reused unmodified -- this file never reimplements the
-// "minTier may only raise, never lower" rule), plus one small, additive,
-// backward-compatible extension to `dispatch/assignment-policy.mjs`'s own
+// "tier/rigor may only raise, never lower" rule), plus one small, additive,
 // `resolveAssignmentDispatchPolicy()` (see that module's header) that lets
 // this file report WHICH scope in a fuller precedence chain produced a
 // `cliOverride`-carried value, instead of that resolver's generic
@@ -935,7 +923,7 @@ function assertNoPortableExecutorPin(scopeStack) {
     if (PORTABLE_POLICY_SCOPES.has(entry.scope) && entry.policy && entry.policy.preferExecutor !== undefined) {
       throw new CoordinationError(
         'validation',
-        `dispatchDeclaredOperation: scope "${entry.scope}" (id: "${entry.id}") declares a literal preferExecutor "${entry.policy.preferExecutor}" -- a portable protocol/role/actor scope must express requirements (minTier, capabilities) only, never a concrete executor pin (flow-definition.md PolicyPatch section)`,
+        `dispatchDeclaredOperation: scope "${entry.scope}" (id: "${entry.id}") declares a literal preferExecutor "${entry.policy.preferExecutor}" -- a portable protocol/role/actor scope must express requirements (rigor, capabilities) only, never a concrete executor pin (flow-definition.md PolicyPatch section)`,
       );
     }
   }
@@ -943,10 +931,7 @@ function assertNoPortableExecutorPin(scopeStack) {
 
 /**
  * Source of the LAST (most specific) scope entry in `scopeStack` that sets
- * `field`, or `{scope: 'default'}` when none does. `minTier` is monotonic
- * (raise-only, enforced by `mergePolicyStack` itself, which throws before
- * this is ever consulted for an invalid stack) so the last entry to set it
- * is, by construction, the one that produced the final resolved value;
+ * `field`, or `{scope: 'default'}` when none does.
  * every other field here is already most-specific-wins per the contract, so
  * the same "last entry wins" rule applies identically. This function only
  * tracks PROVENANCE (which scope gets credit) -- it never recomputes or
@@ -987,7 +972,8 @@ function resolveDeclaredPolicyStack(scopeStack) {
     // `repeatMode` value the same way it already could for tier/persona/
     // executor/visibility.
     provenance: {
-      tier: lastSourceFor(scopeStack, 'minTier'),
+      tier: lastSourceFor(scopeStack, 'tier'),
+      rigor: lastSourceFor(scopeStack, 'rigor'),
       persona: lastSourceFor(scopeStack, 'preferPersona'),
       executor: lastSourceFor(scopeStack, 'preferExecutor'),
       invocation: lastSourceFor(scopeStack, 'preferInvocation'),
@@ -2212,7 +2198,7 @@ function assertMutatingDispatchAllowed(mutation, { operationId, operation, cwd }
  * `definition`/`operation`/`actor`) -- through `resolveDeclaredPolicyStack`
  * (above), then forwards the merged, pre-governance PolicyPatch as
  * `opts.cliOverride` to `createAndExecuteSessionTask` (the ONLY channel an
- * inline Assignment contract has for a `minTier`/`preferPersona`/
+ * inline Assignment contract has for a `tier`/`preferPersona`/
  * `preferExecutor`/`visibility` value at all -- `execution-contract.mjs`'s
  * own field whitelist has no `policy` field for an inline contract to
  * carry). `cliOverride.policyProvenance` (this cell's additive extension to
@@ -2644,7 +2630,8 @@ export async function dispatchDeclaredOperationLocked(
   const { merged, provenance: policyProvenance } = resolveDeclaredPolicyStack(scopeStack);
 
   const cliOverride = {
-    ...(merged.minTier !== undefined ? { minTier: merged.minTier } : {}),
+    ...(merged.tier !== undefined ? { tier: merged.tier } : {}),
+    ...(merged.rigor !== undefined ? { rigor: merged.rigor } : {}),
     ...(merged.preferPersona !== undefined ? { preferPersona: merged.preferPersona } : {}),
     ...(merged.preferExecutor !== undefined ? { preferExecutor: merged.preferExecutor } : {}),
     ...(merged.preferInvocation !== undefined ? { preferInvocation: merged.preferInvocation } : {}),
@@ -2673,30 +2660,11 @@ export async function dispatchDeclaredOperationLocked(
     // (assertMutatingDispatchAllowed) if this is 'mutating' and R2/R3 don't
     // both hold -- reaching this line means it is legal to persist verbatim.
     mutation,
-    // Step 08 P04.2b: thread the composed policy stack's own resolved
-    // `minTier` into the inline contract's own `policy.minTier` ONLY when it
-    // resolves BELOW `resolveAssignmentDispatchPolicy`'s hardcoded default
-    // floor ('standard') -- that resolver's `effectiveTier = opPolicy.minTier
-    // || 'standard'` already starts at 'standard', and `cliOverride.minTier`
-    // (set unconditionally below, carrying this SAME `merged.minTier` value)
-    // already reaches and correctly attributes provenance for anything AT or
-    // ABOVE 'standard' by RAISING that default floor (`resolveStrongerTier`,
-    // monotonic, provenance sourced to whichever scope in `policyProvenance`
-    // actually won). Below 'standard' is the one case that channel can never
-    // reach (raise-only), which is the entire reason this parameter exists.
-    // Threading the SAME value through both channels unconditionally would
-    // make `opPolicy.minTier` and `cliOverride.minTier` equal whenever
-    // `merged.minTier` is 'standard' or higher, which collapses
-    // `resolveAssignmentDispatchPolicy`'s own `strength(cliTier) >
-    // strength(effectiveTier)` provenance-update check (strict `>`, ties
-    // don't update) -- misattributing the resolved tier's provenance to a
-    // synthetic `{scope: 'opPolicy', id: undefined}` instead of the real
-    // scope `policyProvenance.tier` names. Confirmed empirically: threading
-    // it unconditionally broke this exact provenance assertion in
-    // `coordination-declared-consult.test.mjs`'s R3 precedence-chain test.
-    minTier:
-      merged.minTier !== undefined && TIER_STRENGTH[merged.minTier] < TIER_STRENGTH.standard
-        ? merged.minTier
+    // thread the composed policy stack's own resolved `tier` into the inline contract
+    // when it resolves below standard.
+    tier:
+      merged.tier !== undefined && TIER_STRENGTH[merged.tier] < TIER_STRENGTH.standard
+        ? merged.tier
         : undefined,
     // Unit I04 / Phase 3: contractTemplate resolution and legacy fallback guardrail.
     // Existing definitions with no resolvable template retain an explicit legacy
@@ -3165,7 +3133,7 @@ export async function dispatchResearchFanOutLocked(
   // dispatchDeclaredOperation -> createAndExecuteSessionTask ->
   // executeAssignment path every other declared-protocol dispatch in this
   // file already uses. `cliPolicy` carries the planner's concrete
-  // `preferExecutor`/`minTier` choice at the ONE scope legally allowed to
+  // `preferExecutor`/`tier` choice at the ONE scope legally allowed to
   // pin a literal executor (the trusted human/CLI scope,
   // `assertNoPortableExecutorPin` above) -- never written into a portable
   // definition/operation/role/actor scope.
@@ -3188,7 +3156,7 @@ export async function dispatchResearchFanOutLocked(
         taskKey: branch.taskKey ?? `research-branch:${branch.actorId}`,
         fanOutPayload: branch,
         actionInvocation,
-        cliPolicy: { preferExecutor: allocation.executorId, minTier: allocation.tier },
+        cliPolicy: { preferExecutor: allocation.executorId, tier: allocation.tier },
       },
       paths,
       { ...opts, releaseLock: null, lockState },

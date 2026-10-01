@@ -48,6 +48,7 @@ import { reapOrphanedConfinementResources, OWNERSHIP_MARKER_FILE } from '../runn
 
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, validateCapabilityServesShape, RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { RIGOR_VALUES } from '../runner/rigor.mjs';
 import { resolveExecutorAndOverrides, deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../state/fgos-file-registry.mjs';
@@ -426,6 +427,38 @@ function checkConfigNotStale(cwd) {
     return { passed: false, message: `stale config — missing keys: ${addedKeys.join(', ')} — run fgos setup` };
   }
   return { passed: true, message: `config up to date at ${sharedPath}` };
+}
+
+function checkRunnerRigorConfig(cwd) {
+  const levels = [
+    ['project', readSharedConfig(cwd)?.runner],
+    ['global', loadGlobalConfig()?.runner],
+  ];
+  const problems = [];
+  for (const [level, runner] of levels) {
+    if (!runner) continue;
+    const map = runner.rigorToTier;
+    if (!map || typeof map !== 'object' || Array.isArray(map)) {
+      problems.push(`${level} runner.rigorToTier missing -- run fgos setup`);
+    } else {
+      for (const rigor of RIGOR_VALUES) {
+        if (!MODEL_POLICY_TIERS.includes(map[rigor])) {
+          problems.push(`${level} runner.rigorToTier.${rigor} must be one of ${MODEL_POLICY_TIERS.join('/')}`);
+        }
+      }
+      for (const rigor of Object.keys(map)) {
+        if (!RIGOR_VALUES.includes(rigor)) problems.push(`${level} runner.rigorToTier has unknown rigor "${rigor}"`);
+      }
+    }
+    for (const [capability, entry] of Object.entries(runner.capabilities ?? {})) {
+      if (entry?.overrides !== undefined) {
+        problems.push(`${level} runner.capabilities.${capability}.overrides was removed; use .rigor`);
+      }
+    }
+  }
+  return problems.length > 0
+    ? { passed: false, message: problems.join('; ') }
+    : { passed: true, message: 'runner rigor maps and capability floors are valid at every configured level' };
 }
 
 // tsk-2t9c (multi-role team harness, D6/D9 task-spec A-lite convention;
@@ -866,8 +899,8 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
               if (disallowedKeys.length > 0) {
                 problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy contains disallowed key(s) [${disallowedKeys.join(', ')}] (allowed: ${[...POLICY_PATCH_FIELDS].join(', ')})`);
               }
-              if (op.policy.minTier && !MODEL_POLICY_TIERS.includes(op.policy.minTier)) {
-                problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy.minTier "${op.policy.minTier}" not in recognized tiers [${MODEL_POLICY_TIERS.join(', ')}]`);
+              if (op.policy.rigor && !RIGOR_VALUES.includes(op.policy.rigor)) {
+                problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy.rigor "${op.policy.rigor}" not in recognized rigors [${RIGOR_VALUES.join(', ')}]`);
               }
               if (op.policy.preferPersona) {
                 if (typeof op.policy.preferPersona !== 'string' || (agentSkillsMap.size > 0 && !agentSkillsMap.has(op.policy.preferPersona))) {
@@ -1033,6 +1066,12 @@ registerCheck({
   id: 'config-not-stale',
   description: '.fgos/config.json exists and has every current registered default key',
   check: (cwd) => checkConfigNotStale(cwd),
+});
+
+registerCheck({
+  id: 'runner-rigor-config',
+  description: 'project and global runner rigorToTier maps are complete and capabilities declare only rigor floors',
+  check: (cwd) => checkRunnerRigorConfig(cwd),
 });
 
 registerCheck({

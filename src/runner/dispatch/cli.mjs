@@ -23,9 +23,9 @@ import { loadAgentDefs, readTaskSpecHeader } from '../agent-roster.mjs';
 import { selectTemplate, hashTemplate } from '../prompt-templates.mjs';
 import { listWork, StoreError } from '../../state/store.mjs';
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
-import { RunnerConfigError, ensureRunnerConfigForDir } from './config.mjs';
+import { RunnerConfigError, ensureRunnerConfigForDir, DEFAULT_TIER_TO_POLICY } from './config.mjs';
 import { resolveExecutorAndOverrides, resolveExecutorIdForPurpose, resolveTierModel, deriveProviderFamily, executorIdForWork, resolveCapabilityIdentityDetails } from './resolve.mjs';
-import { resolveExecutorProvider, resolveExecutorGovernance } from './assignment-policy.mjs';
+import { resolveExecutorProvider, resolveExecutorGovernance, resolveStrongerTier } from './assignment-policy.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
 import { resolveExecutorCommand, DispatchError } from './transport.mjs';
 import { executeThroughConfinement, buildConfinementAttestation } from './confinement/authority.mjs';
@@ -292,15 +292,26 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   // process is spawned — exactly like the spawnSync-based version, and
   // exactly what dispatch.test.mjs's "throws a RunnerConfigError ... before
   // any spawn" test pins.
-  const tier = work.tier ?? DEFAULTS.tier;
-  // executorId computed before resolveTierModel so an executor's own
-  // providerModel can thread into tier resolution.
+  const requestedTier = work.tier ?? DEFAULTS.tier;
+  // Work still speaks light|standard|heavy in Phase 2. Bridge it once here,
+  // then apply the selected capability's demand-side rigor as a raise-only
+  // floor before resolving the provider model.
   const executorId = executorIdForWork(work, opts.stage);
-  const { executorId: resolvedExecutorId, executor: executorForTier, overrides: capabilityOverrides } = executorId ? resolveExecutorAndOverrides(cfg, executorId) : {};
+  const { executorId: resolvedExecutorId, executor: executorForTier } = executorId ? resolveExecutorAndOverrides(cfg, executorId) : {};
+  const { capability: capabilityName } = resolveCapabilityIdentityDetails({
+    cfg,
+    work,
+    stage: opts.stage,
+    executorId,
+    resolvedExecutor: executorForTier,
+  });
+  const capabilityRigor = capabilityName ? cfg.capabilities?.[capabilityName]?.rigor : undefined;
+  const capabilityTier = capabilityRigor ? cfg.rigorToTier?.[capabilityRigor] : undefined;
+  const policyTier = resolveStrongerTier(DEFAULT_TIER_TO_POLICY[requestedTier] ?? requestedTier, capabilityTier);
   const providerFamily = deriveProviderFamily(executorForTier);
-  const effectiveTier = capabilityOverrides?.tier ?? tier;
-  const model = capabilityOverrides?.model ?? executorForTier?.model ?? resolveTierModel(cfg, effectiveTier, providerFamily);
-  const modelSource = { scope: 'placement-policy', id: `${providerFamily}.${effectiveTier}` };
+  const model = executorForTier?.model ?? resolveTierModel(cfg, policyTier, providerFamily);
+  const modelSource = { scope: 'placement-policy', id: `${providerFamily}.${policyTier}` };
+  const tier = requestedTier;
   const prompt = buildPrompt(work, opts.feedback, opts.stage);
   // D20/D22 (review finding H1, tsk-397): only has an observable effect on
   // a command-less/adapter-less/invocation-less executor with no static
@@ -313,7 +324,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   const { command, args, argsTemplate, env, liveOutput, interactiveMode, promptDelivery, permissionMode, confinement, adapter, provider, baseCommit, headRef, governance, method, url, headers, body, resourceBindings } = resolveExecutorCommand(cfg, {
     prompt,
     model,
-    tier,
+    tier: requestedTier,
     executorId,
     fgosDir: opts.fgosDir,
     // tsk-4hl: attest THIS worker's own dispatch worktree, never fgosDir's
@@ -605,20 +616,9 @@ export async function executeExecutorCli(
     };
   }
   const resolvedByPurpose = !executorIdArg;
-  // D4 (docs/history/capability-capacity-remodel/CONTEXT.md): resolve
-  // through the shared resolver on WHICHEVER key this call actually gave
-  // us — `purpose` when purpose-resolved, `executorIdArg` when named
-  // directly (itself possibly a purpose-shaped id with no literal
-  // `cfg.executors` entry of its own, e.g. "fgos-coding-implement"
-  // resolved via `capabilities.<name>.prefer`). A single call per door,
-  // never a second one on the already-resolved id afterward — a prior
-  // version of this fix called `resolveExecutorAndOverrides` a second
-  // time here, on `executorId` post-resolution: for the `--for` door
-  // that id is already a literal `cfg.executors` key by then, so the
-  // second call always hit the literal-key branch and silently dropped
-  // `capabilities.<purpose>.overrides` — found by re-reading this exact
-  // code end to end.
-  //
+  // Resolve through the shared resolver on the supplied capability or
+  // executor id. A capability contributes its rigor floor through the
+  // policy resolver below; executor selection carries no policy override.
   // The two doors keep their own error contracts: `--for` alone throws when
   // nothing resolves ("no executor registered for purpose..." — guides the
   // caller to `decide --for` first); a named `executorIdArg` that resolves
@@ -627,7 +627,6 @@ export async function executeExecutorCli(
   // implicit/global resolution for work-driven execution.
   let executorId = executorIdArg;
   let resolvedExecutor;
-  let capabilityOverrides;
   // `realExecutorId`/`executorConfigured` (Dispatch Core Contract
   // Normalization follow-up): the positional-executorIdArg branch below
   // deliberately never reassigns `executorId` itself -- it stays as the
@@ -651,7 +650,6 @@ export async function executeExecutorCli(
     }
     executorId = resolved.executorId;
     resolvedExecutor = resolved.executor;
-    capabilityOverrides = resolved.overrides;
     realExecutorId = resolved.executorId;
     executorConfigured = resolved.configured;
   } else {
@@ -664,7 +662,6 @@ export async function executeExecutorCli(
       );
     }
     resolvedExecutor = resolved.executor;
-    capabilityOverrides = resolved.overrides;
     realExecutorId = resolved.executorId ?? executorId;
     executorConfigured = resolved.configured;
   }
@@ -791,10 +788,23 @@ export async function executeExecutorCli(
   //
   // The literal MODEL is computed via resolveTierModel and handed to the
   // resolver as an already-resolved `cliOverride.model`.
-  const tier = tierOverride ?? capabilityOverrides?.tier ?? executor?.tier ?? DEFAULTS.tier;
+  const capabilityName = anchorCapability ?? capabilityIdentity ?? purpose ?? executorIdArg;
+  const capabilityRigor = capabilityName ? cfg?.capabilities?.[capabilityName]?.rigor : undefined;
+  const capabilityTier = capabilityRigor ? cfg?.rigorToTier?.[capabilityRigor] : undefined;
+  // Preserve the Phase-2 Work compatibility bridge: legacy light/heavy are
+  // direct placement requests. Canonical six-level tiers remain raise-only
+  // against the capability/default floor.
+  const legacyTierOverride = tierOverride === 'light' || tierOverride === 'heavy'
+    ? DEFAULT_TIER_TO_POLICY[tierOverride]
+    : undefined;
+  const executorTier = executor?.tier !== undefined && Object.prototype.hasOwnProperty.call(DEFAULT_TIER_TO_POLICY, executor.tier)
+    ? DEFAULT_TIER_TO_POLICY[executor.tier]
+    : executor?.tier;
+  const tier = legacyTierOverride
+    ?? resolveStrongerTier(capabilityTier ?? DEFAULTS.tier, tierOverride ?? executorTier);
   const providerFamily = deriveProviderFamily(executor);
   const fallbackModel = resolveTierModel(cfg, tier, providerFamily);
-  const model = modelOverride ?? capabilityOverrides?.model ?? executor?.model ?? fallbackModel;
+  const model = modelOverride ?? executor?.model ?? fallbackModel;
   // `primaryExecutor`/`explicitProviderModel` mirror exactly what the
   // former `resolveAssignmentDispatchPolicy({assignment: {policy: {...}}})`
   // call built for this door: only when a real registered executor

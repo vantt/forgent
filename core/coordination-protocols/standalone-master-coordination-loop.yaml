@@ -67,7 +67,7 @@ spec:
     - id: fixer
       role: fixer
 
-  # Phase 03 (Step 09 P03.1) R2-R6: `policy.minTier` per operation is the
+  # Phase 03 (Step 09 P03.1) R2-R6: `policy.rigor` per operation is the
   # ONLY portable lever that actually changes dispatch resolution outcome
   # for this fixture's own (non-cohort) materialization path
   # (`dispatchDeclaredOperation` -> `resolveAssignmentDispatchPolicy`,
@@ -105,7 +105,7 @@ spec:
     - id: produce-candidate
       role: doer
       policy:
-        minTier: standard
+        rigor: standard
         capability: code:implement
       result:
         kind: work-product
@@ -120,7 +120,7 @@ spec:
       # loop's own doer/fixer round has delivered anything to an external
       # sink, so a repeat of it is always pre-delivery.
       policy:
-        minTier: flagship
+        rigor: high
         repeatMode: pre-delivery
         capability: code:review
         distinctProviderFrom:
@@ -132,7 +132,7 @@ spec:
     - id: red-team-candidate
       role: red-team
       policy:
-        minTier: flagship
+        rigor: high
         repeatMode: pre-delivery
         capability: code:review
         distinctProviderFrom:
@@ -144,7 +144,7 @@ spec:
     - id: revise-candidate
       role: fixer
       policy:
-        minTier: standard
+        rigor: standard
         capability: code:implement
       result:
         kind: work-product
@@ -152,7 +152,7 @@ spec:
     - id: reviewer-recheck
       role: reviewer
       policy:
-        minTier: flagship
+        rigor: high
         capability: code:review
       result:
         kind: advisory
@@ -160,7 +160,7 @@ spec:
     - id: red-team-recheck
       role: red-team
       policy:
-        minTier: flagship
+        rigor: high
         capability: code:review
       result:
         kind: advisory

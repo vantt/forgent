@@ -102,11 +102,7 @@ function fakeExecutor(tempDir, { summary = 'Validated.' } = {}) {
     process.exit(0);
     `,
   );
-  return {
-    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    models: { standard: 'test-model', nano: 'test-model', advanced: 'test-model', flagship: 'test-model', frontier: 'test-model' },
-    timeoutMs: 5000,
-  };
+  return { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model', nano: 'test-model', advanced: 'test-model', flagship: 'test-model', frontier: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
 }
 
 function setup(coordinationId) {
@@ -302,9 +298,10 @@ test('R2: a recheck materializes a new Assignment and leaves the original review
   assert.equal(events.filter((e) => e.type === 'result-linked' && e.payload.assignmentId === reviewed.assignment.assignmentId).length, 1);
   assert.equal(events.filter((e) => e.type === 'result-linked' && e.payload.assignmentId === rechecked.assignment.assignmentId).length, 1);
 
-  // Both verdicts remain readable side by side.
-  assert.equal(JSON.parse(reviewResultBefore).status, 'done');
-  assert.equal(rechecked.runResult.status, 'done');
+  // Both verdicts remain readable side by side under the canonical v3
+  // classification rather than the retired top-level status projection.
+  assert.equal(JSON.parse(reviewResultBefore).classification.outcome.category, 'ok');
+  assert.equal(rechecked.runResult.classification.outcome.category, 'ok');
   assert.deepEqual(readManifest('coord_rd_recheck_new', ctx.opts).assignmentRefs, [
     produced.assignment.assignmentId,
     reviewed.assignment.assignmentId,

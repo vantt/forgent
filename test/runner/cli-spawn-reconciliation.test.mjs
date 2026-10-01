@@ -129,15 +129,11 @@ test('2. Assignment-owned fresh launch writes pending command, baseline, envelop
     `,
   );
 
-  const runnerConfig = {
-    executor: {
-      allowCrossProvider: true,
-      command: process.execPath,
-      args: [workerScript, '{prompt}'],
-    },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  const runnerConfig = { executor: {
+    allowCrossProvider: true,
+    command: process.execPath,
+    args: [workerScript, '{prompt}'],
+  }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
 
   const assignment = buildAssignment({
     workId: 'tsk-fresh-launch',

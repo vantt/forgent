@@ -114,8 +114,8 @@ function countEventLines(tempDir, coordinationId) {
 /** Same fake-executor shape P10.2/P10.5's own suites use for this fixture:
  *  a real Node subprocess, never a JS-level stub, that settles every
  *  not-yet-settled Run under `.fgos/assignments/` with a fixed report and a
- *  "done" result -- carries a `critical` tier entry since RFC-Review-Lite's
- *  objector actors declare `policy.minTier: critical`. */
+ *  "done" result -- carries a `critical` rigor entry since RFC-Review-Lite's
+ *  objector actors declare `policy.rigor: critical`. */
 function fakeRunnerConfig(tempDir) {
   const executorScript = path.join(tempDir, `fake-executor-${Math.random().toString(36).slice(2)}.mjs`);
   fs.writeFileSync(

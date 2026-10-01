@@ -72,7 +72,7 @@ import {
 } from './placement-policy.mjs';
 import { markRunSettled } from './visibility-session.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
-import { extractProtocolOperationStamp, resolveMutatingCwdPosture } from './execution-contract.mjs';
+import { extractProtocolOperationStamp, normalizeSavedPolicyTier, resolveMutatingCwdPosture } from './execution-contract.mjs';
 import { loadCoordinationProtocol } from '../definitions/protocol-loader.mjs';
 import {
   publishNextGeneration,
@@ -1314,11 +1314,24 @@ export async function executeAssignment(assignment, opts = {}) {
         `assignment.json for "${assignment.assignmentId}" exists but could not be read: ${err.message}`,
       );
     }
+    let parsedAssignment;
     try {
-      effectiveAssignment = Object.freeze(JSON.parse(raw));
+      parsedAssignment = JSON.parse(raw);
     } catch (err) {
       throw new RunnerConfigError(
         `assignment.json for "${assignment.assignmentId}" is corrupt (invalid JSON): ${err.message}`,
+      );
+    }
+    try {
+      const normalizedPolicy = normalizeSavedPolicyTier(parsedAssignment.policy, { allowAdditionalFields: true });
+      effectiveAssignment = Object.freeze(
+        normalizedPolicy === parsedAssignment.policy
+          ? parsedAssignment
+          : { ...parsedAssignment, policy: normalizedPolicy },
+      );
+    } catch (err) {
+      throw new RunnerConfigError(
+        `assignment.json for "${assignment.assignmentId}" is corrupt or invalid: ${err.message}`,
       );
     }
   }

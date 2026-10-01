@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { validateExecutionContract, CONTRACT_POLICY_VERSION } from '../../src/runner/dispatch/execution-contract.mjs';
+import { normalizeSavedPolicyTier, validateExecutionContract, CONTRACT_POLICY_VERSION } from '../../src/runner/dispatch/execution-contract.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 
 function validContract(overrides = {}) {
@@ -227,10 +227,7 @@ test('validateExecutionContract rejects a non-string "supports" field', () => {
   );
 });
 
-// ─── Step 08 P04.2b: the narrow "contract.policy = {minTier}" exception ────
-// Explicitly authorized, exactly-one-field-wide addition to the wire
-// contract -- see execution-contract.mjs's own ACCEPTED_CONTRACT_FIELDS doc
-// comment for the full "why" (the tier-floor stop gate this closes).
+// ─── Inline execution contracts may carry an explicit tier override ─────────
 
 test('validateExecutionContract accepts a contract with no "policy" field at all (optional)', () => {
   const contract = validContract();
@@ -238,19 +235,39 @@ test('validateExecutionContract accepts a contract with no "policy" field at all
   assert.doesNotThrow(() => validateExecutionContract({ contract, caller: validCaller() }));
 });
 
-test('validateExecutionContract accepts contract.policy = {minTier: "nano"} (the exact shape this cell exists to legalize)', () => {
+test('validateExecutionContract accepts contract.policy = {tier: "nano"}', () => {
   assert.doesNotThrow(() =>
-    validateExecutionContract({ contract: validContract({ policy: { minTier: 'nano' } }), caller: validCaller() }),
+    validateExecutionContract({ contract: validContract({ policy: { tier: 'nano' } }), caller: validCaller() }),
   );
 });
 
-test('validateExecutionContract accepts every legal MODEL_POLICY_TIERS value for contract.policy.minTier', () => {
+test('validateExecutionContract accepts every legal MODEL_POLICY_TIERS value for contract.policy.tier', () => {
   for (const tier of ['nano', 'mini', 'standard', 'advanced', 'flagship', 'frontier']) {
     assert.doesNotThrow(
-      () => validateExecutionContract({ contract: validContract({ policy: { minTier: tier } }), caller: validCaller() }),
-      `expected contract.policy.minTier "${tier}" to be accepted`,
+      () => validateExecutionContract({ contract: validContract({ policy: { tier } }), caller: validCaller() }),
+      `expected contract.policy.tier "${tier}" to be accepted`,
     );
   }
+});
+
+test('new execution contracts reject the retired policy key', () => {
+  const retiredField = ['min', 'Tier'].join('');
+  assert.throws(
+    () => validateExecutionContract({ contract: validContract({ policy: { [retiredField]: 'advanced' } }), caller: validCaller() }),
+    (err) => err instanceof RunnerConfigError && /unknown field/.test(err.message),
+  );
+});
+
+test('the saved-policy load boundary normalizes the retired key without mutating persisted input', () => {
+  const retiredField = ['min', 'Tier'].join('');
+  const saved = { [retiredField]: 'advanced' };
+  const before = structuredClone(saved);
+  assert.deepEqual(normalizeSavedPolicyTier(saved), { tier: 'advanced' });
+  assert.deepEqual(saved, before);
+  assert.throws(
+    () => normalizeSavedPolicyTier({ [retiredField]: 'advanced', tier: 'flagship' }),
+    (err) => err instanceof RunnerConfigError && /both/.test(err.message),
+  );
 });
 
 test('validateExecutionContract rejects contract.policy that is not an object', () => {
@@ -260,24 +277,23 @@ test('validateExecutionContract rejects contract.policy that is not an object', 
   );
 });
 
-test('validateExecutionContract rejects contract.policy with a missing minTier', () => {
+test('validateExecutionContract rejects contract.policy with a missing tier', () => {
   assert.throws(
     () => validateExecutionContract({ contract: validContract({ policy: {} }), caller: validCaller() }),
-    (err) => err instanceof RunnerConfigError && /contract\.policy\.minTier must be one of/.test(err.message),
+    (err) => err instanceof RunnerConfigError && /contract\.policy\.tier must be one of/.test(err.message),
   );
 });
 
-test('validateExecutionContract rejects contract.policy.minTier with an unrecognized tier value', () => {
+test('validateExecutionContract rejects contract.policy.tier with an unrecognized tier value', () => {
   assert.throws(
-    () => validateExecutionContract({ contract: validContract({ policy: { minTier: 'premium' } }), caller: validCaller() }),
-    (err) => err instanceof RunnerConfigError && /contract\.policy\.minTier must be one of/.test(err.message),
+    () => validateExecutionContract({ contract: validContract({ policy: { tier: 'premium' } }), caller: validCaller() }),
+    (err) => err instanceof RunnerConfigError && /contract\.policy\.tier must be one of/.test(err.message),
   );
 });
 
-// ─── The exactly-one-field-wide guarantee: every OTHER PolicyPatch-shaped ──
-// field is rejected on contract.policy, never silently accepted -- this is
-// not a general PolicyPatch passthrough.
-test('validateExecutionContract rejects any field on contract.policy other than "minTier" (not a general PolicyPatch passthrough)', () => {
+// The inline contract accepts an explicit tier override only; it is not a
+// general PolicyPatch passthrough.
+test('validateExecutionContract rejects any field on contract.policy other than "tier"', () => {
   for (const [field, value] of [
     ['preferExecutor', 'agy-cli'],
     ['preferPersona', 'code-reviewer'],
@@ -288,7 +304,7 @@ test('validateExecutionContract rejects any field on contract.policy other than 
     assert.throws(
       () =>
         validateExecutionContract({
-          contract: validContract({ policy: { minTier: 'nano', [field]: value } }),
+          contract: validContract({ policy: { tier: 'nano', [field]: value } }),
           caller: validCaller(),
         }),
       (err) => err instanceof RunnerConfigError && new RegExp(`unknown field "${field}"`).test(err.message),

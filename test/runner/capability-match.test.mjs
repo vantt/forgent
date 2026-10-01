@@ -14,7 +14,6 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { matchCapability, CapabilityMatchError, RIGOR_VALUES, FORMS } from '../../src/runner/capability-match.mjs';
-import { MIN_RIGOR_VALUES } from '../../src/runner/dispatch/assignment-policy.mjs';
 
 const moduleFile = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../src/runner/capability-match.mjs');
 
@@ -186,10 +185,10 @@ test('an out-of-vocabulary rigor throws naming the rigor vocabulary', () => {
   assert.throws(() => matchCapability(demandFacts({ rigor: 'urgent' }), CATALOG), /demandFacts\.rigor/);
 });
 
-// ─── RIGOR_VALUES drift guard ───────────────────────────────────────────
+// ─── RIGOR_VALUES vocabulary ────────────────────────────────────────────
 
-test('RIGOR_VALUES stays byte-identical to MIN_RIGOR_VALUES (dispatch/assignment-policy.mjs) despite being duplicated for the dispatch/ import boundary', () => {
-  assert.deepEqual([...RIGOR_VALUES], [...MIN_RIGOR_VALUES]);
+test('RIGOR_VALUES exposes the shared demand-side rigor vocabulary', () => {
+  assert.deepEqual([...RIGOR_VALUES], ['low', 'standard', 'high', 'critical']);
 });
 
 // ─── Boundary test: no import of dispatch/plan.mjs, cli.mjs, or transport.mjs ──

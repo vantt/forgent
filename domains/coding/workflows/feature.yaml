@@ -60,7 +60,7 @@ stages:
         skills:
           - fgos-coding-validating
         policy:
-          minTier: standard
+          rigor: standard
           preferPersona: code-reviewer
           preferExecutor: claude
       - id: scout-blast-radius

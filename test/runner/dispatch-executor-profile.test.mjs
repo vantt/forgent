@@ -25,6 +25,7 @@ function loadWith(executorEntry) {
   fs.writeFileSync(file, JSON.stringify({
     executor: { command: 'node', args: ['{prompt}'] },
     modelPolicies: { node: { standard: 'sonnet' }, claude: { standard: 'sonnet' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: 60000,
     executors: { sample: { kind: 'agent', ...executorEntry } },
   }, null, 2));
@@ -155,6 +156,7 @@ test('A1: the profile reaches the resolver without resolve.mjs being changed for
   fs.writeFileSync(file, JSON.stringify({
     executor: { command: 'node', args: ['{prompt}'] },
     modelPolicies: { node: { standard: 'sonnet' }, claude: { standard: 'sonnet' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: 60000,
     executors: {
       profiled: {
@@ -325,7 +327,10 @@ test('Phase C: the real repository config declares identity/supports on "claude"
 function loadRunnerConfigObject(cfgObject) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-redirect-cfg-'));
   const file = path.join(dir, 'config.json');
-  fs.writeFileSync(file, JSON.stringify(cfgObject, null, 2));
+  fs.writeFileSync(file, JSON.stringify({
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    ...cfgObject,
+  }, null, 2));
   try {
     return loadRunnerConfig(file);
   } finally {

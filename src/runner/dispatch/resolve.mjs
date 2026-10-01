@@ -183,16 +183,6 @@ export function resolveExecutorIdForPurpose(cfg, purpose) {
  * found — `{executorId: null, configured: false}`, a legitimate,
  * expected state, never thrown.
  *
- * `overrides` (D2, only when resolved via step 2) is returned, never
- * applied here — each call site decides what it means for ITS OWN
- * resolution (`tier`/`model`).
- * already had before this item — `spawnWorker` resolves `tier` from the
- * WORK ITEM's own classification (`work.tier`, a scope/effort judgment
- * made once at Discovery, not a per-executor opt-out) and never accepted
- * a raw literal model override at all; a capability's `overrides.tier`/
- * `.model` were never meant to reach that door, and self-review found
- * (and left) that scope boundary undisturbed rather than wiring
- * `work.tier` open to being silently overridden by dispatch config.
  */
 export function resolveExecutorAndOverrides(cfg, executorIdOrPurpose) {
   const executors = cfg && cfg.executors && typeof cfg.executors === 'object' ? cfg.executors : {};
@@ -202,7 +192,7 @@ export function resolveExecutorAndOverrides(cfg, executorIdOrPurpose) {
     // returned executorId, surfaced on DispatchPlan.bindingSource by
     // plan.mjs. Pre-existing callers that destructure only
     // {executorId, executor, overrides, configured} are unaffected.
-    return { executorId: executorIdOrPurpose, executor: executors[executorIdOrPurpose], overrides: undefined, configured: true, bindingSource: 'executor-id' };
+    return { executorId: executorIdOrPurpose, executor: executors[executorIdOrPurpose], configured: true, bindingSource: 'executor-id' };
   }
   const capabilityEntry = cfg && cfg.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities[executorIdOrPurpose] : undefined;
   const preferred = capabilityEntry?.prefer;
@@ -226,24 +216,17 @@ export function resolveExecutorAndOverrides(cfg, executorIdOrPurpose) {
     return {
       executorId: primary.executor,
       executor,
-      overrides: capabilityEntry.overrides,
       configured: true,
       bindingSource: 'capability.prefer',
-      // `invocationId`: consumed by resolveExecutorConfig's Gate B2 (Step
-      // 2.1) when set — `undefined` for every legacy bare-string
-      // candidate, so Gate B2's own "first via:cli" default is unchanged.
       invocationId: primary.invocation,
-      // `candidates`: the FULL ordered pool, for a cascade-aware caller
-      // (e.g. a future fallback consumer) — `resolveExecutorConfig` itself
-      // never reads this; it only ever acts on the primary candidate above.
       candidates,
     };
   }
   const found = resolveExecutorIdForPurpose(cfg, executorIdOrPurpose);
   if (found) {
-    return { executorId: found, executor: executors[found], overrides: undefined, configured: true, bindingSource: 'capability.for' };
+    return { executorId: found, executor: executors[found], configured: true, bindingSource: 'capability.for' };
   }
-  return { executorId: null, executor: undefined, overrides: undefined, configured: false, bindingSource: null };
+  return { executorId: null, executor: undefined, configured: false, bindingSource: null };
 }
 
 // Exported (additive, D7 module split): `dispatch/transport.mjs`'s

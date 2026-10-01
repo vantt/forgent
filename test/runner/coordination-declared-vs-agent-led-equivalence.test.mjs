@@ -4,7 +4,7 @@
 // (openDeclaredProtocolSession -> dispatchDeclaredOperation against the real
 // `core/coordination-protocols/declared-consult.yaml` fixture, Phase 03),
 // using the same role-class/evidence requirements and the same trusted
-// (`cliOverride`/`cliPolicy`) minTier preference for both. A deterministic
+// (`cliOverride`/`cliPolicy`) explicit tier preference for both. A deterministic
 // comparator normalizes both resulting records, stripping every field this
 // requirement itself names as EXPECTED and LEGITIMATE to differ (protocol
 // provenance scope/id labels, topology-specific role vocabulary, real
@@ -66,11 +66,7 @@ function fakeExecutor(tempDir) {
     process.exit(0);
     `,
   );
-  return {
-    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    models: { standard: 'test-model', nano: 'test-model', advanced: 'test-model', flagship: 'test-model', frontier: 'test-model' },
-    timeoutMs: 5000,
-  };
+  return { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model', nano: 'test-model', advanced: 'test-model', flagship: 'test-model', frontier: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
 }
 
 /**
@@ -117,7 +113,7 @@ test('R7: one bounded question dispatched once agent-led and once declared produ
   const agentPrimary = await dispatchPrimaryTask(
     'coord_equiv_agent_led',
     { objective: BOUNDED_QUESTION, expectedOutputs: EXPECTED_OUTPUTS, evidenceRequired: 'reported', writerId: 'coordinator-1' },
-    { cwd: tempDir, repoRoot: tempDir, runnerConfig, cliOverride: { minTier: TRUSTED_TIER } },
+    { cwd: tempDir, repoRoot: tempDir, runnerConfig, cliOverride: { tier: TRUSTED_TIER } },
   );
   const agentConsult = await proposeConsult(
     'coord_equiv_agent_led',
@@ -130,7 +126,7 @@ test('R7: one bounded question dispatched once agent-led and once declared produ
       evidenceRequired: 'reported',
       writerId: 'coordinator-1',
     },
-    { cwd: tempDir, repoRoot: tempDir, runnerConfig, cliOverride: { minTier: TRUSTED_TIER } },
+    { cwd: tempDir, repoRoot: tempDir, runnerConfig, cliOverride: { tier: TRUSTED_TIER } },
   );
 
   // ── Mode 2: declared (Phase 03) -- openDeclaredProtocolSession -> request-consult -> provide-consult
@@ -145,7 +141,7 @@ test('R7: one bounded question dispatched once agent-led and once declared produ
       objective: BOUNDED_QUESTION,
       expectedOutputs: EXPECTED_OUTPUTS,
       writerId: 'coordinator-1',
-      cliPolicy: { minTier: TRUSTED_TIER },
+      cliPolicy: { tier: TRUSTED_TIER },
     },
     { cwd: tempDir, repoRoot: tempDir, runnerConfig },
   );
@@ -157,7 +153,7 @@ test('R7: one bounded question dispatched once agent-led and once declared produ
       expectedOutputs: EXPECTED_OUTPUTS,
       writerId: 'coordinator-1',
       fromAssignmentId: declaredRequest.assignment.assignmentId,
-      cliPolicy: { minTier: TRUSTED_TIER },
+      cliPolicy: { tier: TRUSTED_TIER },
     },
     { cwd: tempDir, repoRoot: tempDir, runnerConfig },
   );

@@ -173,15 +173,7 @@ test('executeAssignment executes non-mutating validate-plan assignment through f
   const tempDir = mkTempDir();
   const executorScript = writeEchoExecutor(tempDir);
 
-  const runnerConfig = {
-    executor: {
-      allowCrossProvider: true,
-      command: process.execPath,
-      args: [executorScript, '{prompt}'],
-    },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
 
   const work = { id: 'tsk-test-1', status: 'doing', stage: 'planning', domain: 'coding' };
   const assignment = buildAssignment({
@@ -211,15 +203,7 @@ test('executeAssignment captures stderr and nonzero exit code as failed result w
   const tempDir = mkTempDir();
   const executorScript = writeFailingExecutor(tempDir, 2);
 
-  const runnerConfig = {
-    executor: {
-      allowCrossProvider: true,
-      command: process.execPath,
-      args: [executorScript, '{prompt}'],
-    },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
 
   const work = { id: 'tsk-test-fail', status: 'doing', stage: 'planning', domain: 'coding' };
   const assignment = buildAssignment({
@@ -248,15 +232,7 @@ test('executeAssignment captures timeout with partial stdout and writes failed R
   const tempDir = mkTempDir();
   const executorScript = writeHangingExecutor(tempDir);
 
-  const runnerConfig = {
-    executor: {
-      allowCrossProvider: true,
-      command: process.execPath,
-      args: [executorScript, '{prompt}'],
-    },
-    models: { standard: 'test-model' },
-    timeoutMs: 500,
-  };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 500 };
 
   const work = { id: 'tsk-test-timeout', status: 'doing', stage: 'planning', domain: 'coding' };
   const assignment = buildAssignment({
@@ -320,16 +296,13 @@ test('executeAssignment rejects human-only assignment before spawning', async ()
 });
 
 test('compileDispatchPlan produces selector.type: "assignment" and resolves executor from assignment policy', () => {
-  const cfg = {
-    executors: {
-      claude: { command: 'claude', args: ['{prompt}'] },
-    },
-    modelPolicies: {
-      claude: {
-        standard: 'claude-3-7-sonnet-20250219',
-      },
-    },
-  };
+  const cfg = { executors: {
+    claude: { command: 'claude', args: ['{prompt}'] },
+  }, modelPolicies: { claude: {
+    standard: 'claude-3-7-sonnet-20250219',
+  }, [process.execPath]: {
+    standard: 'claude-3-7-sonnet-20250219',
+  } },  };
 
   const assignment = buildAssignment({
     workId: 'tsk-plan-test',
@@ -375,15 +348,7 @@ test('dispatch CLI execute subcommand with --assignment executes assignment and 
   const tempDir = mkTempDir();
   const executorScript = writeEchoExecutor(tempDir);
 
-  const runnerConfig = {
-    executor: {
-      allowCrossProvider: true,
-      command: process.execPath,
-      args: [executorScript, '{prompt}'],
-    },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
 
   const assignment = buildAssignment({
     workId: 'tsk-cli-exec-asgn',
@@ -407,31 +372,28 @@ test('dispatch CLI execute subcommand with --assignment executes assignment and 
 
   const parsed = JSON.parse(stdout.trim());
   assert.equal(parsed.assignmentId, assignment.assignmentId);
-  assert.equal(parsed.status, 'done');
-  assert.equal(parsed.confidence, 'reported');
+  assert.equal(parsed.classification.outcome.category, 'ok');
+  assert.equal(parsed.classification.confidence.level, 'reported');
 });
 
 test('dispatch CLI execute subcommand with --assignment and --executor dispatches through the named executor', async () => {
   const tempDir = mkTempDir();
   const executorScript = writeEchoExecutor(tempDir);
 
-  const runnerConfig = {
-    executor: {
+  const runnerConfig = { executor: {
+    allowCrossProvider: true,
+    command: process.execPath,
+    args: [executorScript, '{prompt}'],
+  },
+  executors: {
+    named_executor: {
+      kind: 'agent',
       allowCrossProvider: true,
       command: process.execPath,
       args: [executorScript, '{prompt}'],
     },
-    executors: {
-      named_executor: {
-        kind: 'agent',
-        allowCrossProvider: true,
-        command: process.execPath,
-        args: [executorScript, '{prompt}'],
-      },
-    },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+  timeoutMs: 5000, };
 
   const assignment = buildAssignment({
     workId: 'tsk-cli-exec-flag-asgn',
@@ -452,7 +414,7 @@ test('dispatch CLI execute subcommand with --assignment and --executor dispatche
   );
 
   const parsed = JSON.parse(stdout.trim());
-  assert.equal(parsed.status, 'done');
+  assert.equal(parsed.classification.outcome.category, 'ok');
 
   const storedPlan = JSON.parse(
     fs.readFileSync(path.join(asgnDir, 'runs', '01', 'dispatch-plan.json'), 'utf8'),
@@ -464,23 +426,20 @@ test('dispatch CLI execute subcommand with --assignment and an unregistered --ex
   const tempDir = mkTempDir();
   const executorScript = writeEchoExecutor(tempDir);
 
-  const runnerConfig = {
-    executor: {
+  const runnerConfig = { executor: {
+    allowCrossProvider: true,
+    command: process.execPath,
+    args: [executorScript, '{prompt}'],
+  },
+  executors: {
+    named_executor: {
+      kind: 'agent',
       allowCrossProvider: true,
       command: process.execPath,
       args: [executorScript, '{prompt}'],
     },
-    executors: {
-      named_executor: {
-        kind: 'agent',
-        allowCrossProvider: true,
-        command: process.execPath,
-        args: [executorScript, '{prompt}'],
-      },
-    },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+  timeoutMs: 5000, };
 
   const assignment = buildAssignment({
     workId: 'tsk-cli-exec-flag-bad-asgn',
@@ -513,23 +472,20 @@ test('dispatch CLI execute subcommand with --assignment and a duplicate --execut
   const tempDir = mkTempDir();
   const executorScript = writeEchoExecutor(tempDir);
 
-  const runnerConfig = {
-    executor: {
+  const runnerConfig = { executor: {
+    allowCrossProvider: true,
+    command: process.execPath,
+    args: [executorScript, '{prompt}'],
+  },
+  executors: {
+    named_executor: {
+      kind: 'agent',
       allowCrossProvider: true,
       command: process.execPath,
       args: [executorScript, '{prompt}'],
     },
-    executors: {
-      named_executor: {
-        kind: 'agent',
-        allowCrossProvider: true,
-        command: process.execPath,
-        args: [executorScript, '{prompt}'],
-      },
-    },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+  timeoutMs: 5000, };
 
   const assignment = buildAssignment({
     workId: 'tsk-cli-exec-flag-dup-asgn',
@@ -565,23 +521,20 @@ test('dispatch CLI execute subcommand with --assignment and a trailing bare dupl
   const tempDir = mkTempDir();
   const executorScript = writeEchoExecutor(tempDir);
 
-  const runnerConfig = {
-    executor: {
+  const runnerConfig = { executor: {
+    allowCrossProvider: true,
+    command: process.execPath,
+    args: [executorScript, '{prompt}'],
+  },
+  executors: {
+    named_executor: {
+      kind: 'agent',
       allowCrossProvider: true,
       command: process.execPath,
       args: [executorScript, '{prompt}'],
     },
-    executors: {
-      named_executor: {
-        kind: 'agent',
-        allowCrossProvider: true,
-        command: process.execPath,
-        args: [executorScript, '{prompt}'],
-      },
-    },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+  timeoutMs: 5000, };
 
   const assignment = buildAssignment({
     workId: 'tsk-cli-exec-flag-dup-trailing-asgn',
@@ -620,23 +573,20 @@ test('dispatch CLI execute subcommand with --assignment does not false-positive 
   const tempDir = mkTempDir();
   const executorScript = writeEchoExecutor(tempDir);
 
-  const runnerConfig = {
-    executor: {
+  const runnerConfig = { executor: {
+    allowCrossProvider: true,
+    command: process.execPath,
+    args: [executorScript, '{prompt}'],
+  },
+  executors: {
+    named_executor: {
+      kind: 'agent',
       allowCrossProvider: true,
       command: process.execPath,
       args: [executorScript, '{prompt}'],
     },
-    executors: {
-      named_executor: {
-        kind: 'agent',
-        allowCrossProvider: true,
-        command: process.execPath,
-        args: [executorScript, '{prompt}'],
-      },
-    },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+  timeoutMs: 5000, };
 
   const assignment = buildAssignment({
     workId: 'tsk-cli-exec-flag-no-false-dup-asgn',
@@ -727,14 +677,7 @@ test('dispatch CLI execute subcommand refuses a mutating inline Assignment (miss
   const asgnPath = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'assignment.json');
   const tampered = { ...JSON.parse(fs.readFileSync(asgnPath, 'utf8')), mutation: 'mutating' };
   fs.writeFileSync(asgnPath, `${JSON.stringify(tampered, null, 2)}\n`);
-  const runnerConfig = {
-    executor: {
-      allowCrossProvider: true,
-      command: process.execPath,
-      args: [writeEchoExecutor(tempDir), '{prompt}'],
-    },
-    models: { standard: 'test-model' },
-  };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [writeEchoExecutor(tempDir), '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, };
   fs.writeFileSync(path.join(tempDir, '.fgos', 'config.json'), JSON.stringify({ runner: runnerConfig }, null, 2));
 
   const dispatchScript = path.resolve('src/runner/dispatch.mjs');
@@ -757,22 +700,19 @@ test('compileDispatchPlan and executeAssignment respect cliOverride.preferExecut
   const tempDir = mkTempDir();
   const executorScript = writeEchoExecutor(tempDir);
 
-  const runnerConfig = {
-    executor: {
+  const runnerConfig = { executor: {
+    allowCrossProvider: true,
+    command: process.execPath,
+    args: [executorScript, '{prompt}'],
+  },
+  executors: {
+    custom_executor: {
       allowCrossProvider: true,
       command: process.execPath,
       args: [executorScript, '{prompt}'],
     },
-    executors: {
-      custom_executor: {
-        allowCrossProvider: true,
-        command: process.execPath,
-        args: [executorScript, '{prompt}'],
-      },
-    },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+  timeoutMs: 5000, };
 
   const assignment = buildAssignment({
     workId: 'tsk-cli-override-asgn',
@@ -909,15 +849,12 @@ test('Finding 3 regression test: read-only assignment committing a new file leav
     `,
   );
 
-  const cfg = {
-    executor: {
-      kind: 'cli',
-      command: process.execPath,
-      args: [executorScript, '{prompt}'],
-      allowCrossProvider: true,
-    },
-    models: { standard: 'test-model' },
-  };
+  const cfg = { executor: {
+    kind: 'cli',
+    command: process.execPath,
+    args: [executorScript, '{prompt}'],
+    allowCrossProvider: true,
+  }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, };
 
   const runResult = await executeAssignment(assignment, {
     cwd: tempDir,
@@ -936,22 +873,19 @@ test('Cell 6.3 Fix Round 1: a role:reviewer assignment resolves the scoped claud
   const worker = writeArgvRecordingExecutor(tempDir, 'worker');
   const reviewer = writeArgvRecordingExecutor(tempDir, 'reviewer');
 
-  const runnerConfig = {
-    executors: {
-      claude: {
-        command: process.execPath,
-        args: [worker.scriptPath, '{prompt}', '--allowedTools', 'Bash(git add:*),Bash(git commit:*)'],
-        allowCrossProvider: true,
-      },
-      'claude-reviewer': {
-        command: process.execPath,
-        args: [reviewer.scriptPath, '{prompt}'],
-        allowCrossProvider: true,
-      },
+  const runnerConfig = { executors: {
+    claude: {
+      command: process.execPath,
+      args: [worker.scriptPath, '{prompt}', '--allowedTools', 'Bash(git add:*),Bash(git commit:*)'],
+      allowCrossProvider: true,
     },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+    'claude-reviewer': {
+      command: process.execPath,
+      args: [reviewer.scriptPath, '{prompt}'],
+      allowCrossProvider: true,
+    },
+  }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+  timeoutMs: 5000, };
 
   const work = { id: 'tsk-cell63-reviewer-scope', status: 'todo', stage: 'planning', domain: 'coding' };
   const assignment = buildAssignment({
@@ -1741,22 +1675,19 @@ test('a genuinely mutating assignment (implement-item, default implementer role)
     `,
   );
 
-  const runnerConfig = {
-    executors: {
-      claude: {
-        command: process.execPath,
-        args: [workerScriptPath, '{prompt}', '--allowedTools', 'Bash(git add:*),Bash(git commit:*)'],
-        allowCrossProvider: true,
-      },
-      'claude-reviewer': {
-        command: process.execPath,
-        args: [reviewer.scriptPath, '{prompt}'],
-        allowCrossProvider: true,
-      },
+  const runnerConfig = { executors: {
+    claude: {
+      command: process.execPath,
+      args: [workerScriptPath, '{prompt}', '--allowedTools', 'Bash(git add:*),Bash(git commit:*)'],
+      allowCrossProvider: true,
     },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+    'claude-reviewer': {
+      command: process.execPath,
+      args: [reviewer.scriptPath, '{prompt}'],
+      allowCrossProvider: true,
+    },
+  }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+  timeoutMs: 5000, };
 
   const work = { id: 'tsk-cell63-worker-unaffected', status: 'todo', stage: 'executing', domain: 'coding' };
   const assignment = buildAssignment({
@@ -1792,22 +1723,19 @@ test('a read-only-by-operation assignment (shape-plan) at its real default imple
   const worker = writeArgvRecordingExecutor(tempDir, 'worker');
   const reviewer = writeArgvRecordingExecutor(tempDir, 'reviewer');
 
-  const runnerConfig = {
-    executors: {
-      claude: {
-        command: process.execPath,
-        args: [worker.scriptPath, '{prompt}', '--allowedTools', 'Bash(git add:*),Bash(git commit:*)'],
-        allowCrossProvider: true,
-      },
-      'claude-reviewer': {
-        command: process.execPath,
-        args: [reviewer.scriptPath, '{prompt}'],
-        allowCrossProvider: true,
-      },
+  const runnerConfig = { executors: {
+    claude: {
+      command: process.execPath,
+      args: [worker.scriptPath, '{prompt}', '--allowedTools', 'Bash(git add:*),Bash(git commit:*)'],
+      allowCrossProvider: true,
     },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+    'claude-reviewer': {
+      command: process.execPath,
+      args: [reviewer.scriptPath, '{prompt}'],
+      allowCrossProvider: true,
+    },
+  }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+  timeoutMs: 5000, };
 
   const work = { id: 'tsk-cell63-shape-plan-readonly-op', status: 'todo', stage: 'planning', domain: 'coding' };
   const assignment = buildAssignment({
@@ -1835,18 +1763,15 @@ test('Cell 6.3 Fix Round 1: absent claude-reviewer config entry falls back uncha
   const tempDir = mkTempDir();
   const worker = writeArgvRecordingExecutor(tempDir, 'worker');
 
-  const runnerConfig = {
-    executors: {
-      claude: {
-        command: process.execPath,
-        args: [worker.scriptPath, '{prompt}', '--allowedTools', 'Bash(git add:*),Bash(git commit:*)'],
-        allowCrossProvider: true,
-      },
-      // no "claude-reviewer" entry configured
+  const runnerConfig = { executors: {
+    claude: {
+      command: process.execPath,
+      args: [worker.scriptPath, '{prompt}', '--allowedTools', 'Bash(git add:*),Bash(git commit:*)'],
+      allowCrossProvider: true,
     },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+    // no "claude-reviewer" entry configured
+  }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+  timeoutMs: 5000, };
 
   const work = { id: 'tsk-cell63-absent-fallback', status: 'todo', stage: 'planning', domain: 'coding' };
   const assignment = buildAssignment({
@@ -1961,11 +1886,7 @@ test('dispatch CLI execute subcommand with --contract exits non-zero for a mutat
     process.exit(0);
     `,
   );
-  const runnerConfig = {
-    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
   fs.writeFileSync(path.join(tempDir, '.fgos', 'config.json'), JSON.stringify({ runner: runnerConfig }, null, 2));
 
   const contractPath = path.join(tempDir, 'contract.json');
@@ -2036,11 +1957,7 @@ test('dispatch CLI execute subcommand with --contract and --work fires the domai
   });
 
   const executorScript = writeEchoExecutor(tempDir);
-  const runnerConfig = {
-    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
   fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ runner: runnerConfig }, null, 2));
 
   const contractPath = path.join(tempDir, 'contract.json');
@@ -2057,7 +1974,7 @@ test('dispatch CLI execute subcommand with --contract and --work fires the domai
   );
 
   const parsed = JSON.parse(stdout.trim());
-  assert.equal(parsed.status, 'done');
+  assert.equal(parsed.classification.outcome.category, 'ok');
   assert.equal(parsed.workId, 'tsk-contract-cli-seam');
 
   const assignmentJson = JSON.parse(
@@ -2075,11 +1992,7 @@ test('dispatch CLI execute subcommand with --contract and --work fires the domai
 test('dispatch CLI execute subcommand with --contract and no --work builds a standalone inline Assignment, no Stage/domain involved (Proof 1 shape)', async () => {
   const tempDir = mkTempDir();
   const executorScript = writeEchoExecutor(tempDir);
-  const runnerConfig = {
-    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
   fs.mkdirSync(path.join(tempDir, '.fgos'), { recursive: true });
   fs.writeFileSync(path.join(tempDir, '.fgos', 'config.json'), JSON.stringify({ runner: runnerConfig }, null, 2));
 
@@ -2094,7 +2007,7 @@ test('dispatch CLI execute subcommand with --contract and no --work builds a sta
   );
 
   const parsed = JSON.parse(stdout.trim());
-  assert.equal(parsed.status, 'done');
+  assert.equal(parsed.classification.outcome.category, 'ok');
   assert.equal(parsed.workId, null);
 
   const assignmentJson = JSON.parse(
@@ -2114,14 +2027,11 @@ test('dispatch CLI execute subcommand with --contract and no --work builds a sta
 test('dispatch CLI execute subcommand with --contract and --executor dispatches through the named executor', async () => {
   const tempDir = mkTempDir();
   const executorScript = writeEchoExecutor(tempDir);
-  const runnerConfig = {
-    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    executors: {
-      named_executor: { kind: 'agent', allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+  executors: {
+    named_executor: { kind: 'agent', allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+  }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+  timeoutMs: 5000, };
   fs.mkdirSync(path.join(tempDir, '.fgos'), { recursive: true });
   fs.writeFileSync(path.join(tempDir, '.fgos', 'config.json'), JSON.stringify({ runner: runnerConfig }, null, 2));
 
@@ -2136,7 +2046,7 @@ test('dispatch CLI execute subcommand with --contract and --executor dispatches 
   );
 
   const parsed = JSON.parse(stdout.trim());
-  assert.equal(parsed.status, 'done');
+  assert.equal(parsed.classification.outcome.category, 'ok');
 
   const storedPlan = JSON.parse(
     fs.readFileSync(path.join(tempDir, '.fgos', 'assignments', parsed.assignmentId, 'runs', '01', 'dispatch-plan.json'), 'utf8'),
@@ -2147,14 +2057,11 @@ test('dispatch CLI execute subcommand with --contract and --executor dispatches 
 test('dispatch CLI execute subcommand with --contract and an unregistered --executor rejects before spawn with a non-zero exit', () => {
   const tempDir = mkTempDir();
   const executorScript = writeEchoExecutor(tempDir);
-  const runnerConfig = {
-    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    executors: {
-      named_executor: { kind: 'agent', allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+  executors: {
+    named_executor: { kind: 'agent', allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+  }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+  timeoutMs: 5000, };
   fs.mkdirSync(path.join(tempDir, '.fgos'), { recursive: true });
   fs.writeFileSync(path.join(tempDir, '.fgos', 'config.json'), JSON.stringify({ runner: runnerConfig }, null, 2));
 
@@ -2180,14 +2087,11 @@ test('dispatch CLI execute subcommand with --contract and an unregistered --exec
 test('dispatch CLI execute subcommand with --contract and a duplicate --executor flag rejects before spawn with a non-zero exit', () => {
   const tempDir = mkTempDir();
   const executorScript = writeEchoExecutor(tempDir);
-  const runnerConfig = {
-    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    executors: {
-      named_executor: { kind: 'agent', allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+  executors: {
+    named_executor: { kind: 'agent', allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
+  }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+  timeoutMs: 5000, };
   fs.mkdirSync(path.join(tempDir, '.fgos'), { recursive: true });
   fs.writeFileSync(path.join(tempDir, '.fgos', 'config.json'), JSON.stringify({ runner: runnerConfig }, null, 2));
 
@@ -2216,11 +2120,7 @@ test('dispatch CLI execute subcommand with --contract and a duplicate --executor
 test('dispatch CLI execute subcommand with --contract honors a file-supplied caller.writerId verbatim instead of overwriting it', async () => {
   const tempDir = mkTempDir();
   const executorScript = writeEchoExecutor(tempDir);
-  const runnerConfig = {
-    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
   fs.mkdirSync(path.join(tempDir, '.fgos'), { recursive: true });
   fs.writeFileSync(path.join(tempDir, '.fgos', 'config.json'), JSON.stringify({ runner: runnerConfig }, null, 2));
 
@@ -2238,7 +2138,7 @@ test('dispatch CLI execute subcommand with --contract honors a file-supplied cal
   );
 
   const parsed = JSON.parse(stdout.trim());
-  assert.equal(parsed.status, 'done');
+  assert.equal(parsed.classification.outcome.category, 'ok');
 
   const assignmentJson = JSON.parse(
     fs.readFileSync(path.join(tempDir, '.fgos', 'assignments', parsed.assignmentId, 'assignment.json'), 'utf8'),
@@ -2294,11 +2194,7 @@ test('dispatch CLI execute subcommand with --contract computes a distinct assign
   });
 
   const executorScript = writeEchoExecutor(tempDir);
-  const runnerConfig = {
-    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
   fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ runner: runnerConfig }, null, 2));
 
   const contract1Path = path.join(tempDir, 'contract1.json');
@@ -2329,7 +2225,7 @@ test('dispatch CLI execute subcommand with --contract computes a distinct assign
     { encoding: 'utf8', cwd: tempDir },
   );
   const parsed1 = JSON.parse(stdout1.trim());
-  assert.equal(parsed1.status, 'done');
+  assert.equal(parsed1.classification.outcome.category, 'ok');
 
   const stdout2 = execFileSync(
     process.execPath,
@@ -2337,7 +2233,7 @@ test('dispatch CLI execute subcommand with --contract computes a distinct assign
     { encoding: 'utf8', cwd: tempDir },
   );
   const parsed2 = JSON.parse(stdout2.trim());
-  assert.equal(parsed2.status, 'done');
+  assert.equal(parsed2.classification.outcome.category, 'ok');
 
   assert.notEqual(parsed2.assignmentId, parsed1.assignmentId, 'a second --contract --work invocation under the same writer must never collide with the first assignmentId');
 
@@ -2371,11 +2267,7 @@ test('dispatch CLI execute subcommand with --contract computes distinct assignme
   });
 
   const executorScript = writeEchoExecutor(tempDir);
-  const runnerConfig = {
-    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
   fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ runner: runnerConfig }, null, 2));
 
   const contract1Path = path.join(tempDir, 'race-contract1.json');
@@ -2446,11 +2338,7 @@ test('dispatch CLI execute subcommand with --contract computes distinct assignme
 test('dispatch CLI execute subcommand with --contract computes distinct assignmentIds for genuinely concurrent invocations with no --work at all (writer-identity-only fallback id path) (Red-Team fix)', async () => {
   const tempDir = mkTempDir();
   const executorScript = writeEchoExecutor(tempDir);
-  const runnerConfig = {
-    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
   fs.mkdirSync(path.join(tempDir, '.fgos'), { recursive: true });
   fs.writeFileSync(path.join(tempDir, '.fgos', 'config.json'), JSON.stringify({ runner: runnerConfig }, null, 2));
 
@@ -2553,11 +2441,7 @@ fs.writeFileSync(path.join(runDir, 'outbox', 'result-1.json'), JSON.stringify({ 
 console.log('done');
 `);
 
-  const runnerConfig = {
-    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    models: { standard: 'test-model' },
-    timeoutMs: 20000,
-  };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 20000 };
   const work = { id: 'tsk-outbox', status: 'doing', stage: 'planning', domain: 'coding' };
   const assignment = buildAssignment({ work, stage: 'planning', operation: 'validate-plan' });
 
@@ -2583,11 +2467,7 @@ fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status
 console.log('done');
 `);
 
-  const runnerConfig = {
-    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    models: { standard: 'test-model' },
-    timeoutMs: 20000,
-  };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 20000 };
   const work = { id: 'tsk-flat', status: 'doing', stage: 'planning', domain: 'coding' };
   const assignment = buildAssignment({ work, stage: 'planning', operation: 'validate-plan' });
 
@@ -2613,7 +2493,7 @@ fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ contra
   });
   const result = await executeAssignment(assignment, {
     cwd: tempDir, repoRoot: tempDir,
-    runnerConfig: { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, models: { standard: 'test-model' }, timeoutMs: 5000 },
+    runnerConfig: { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 },
   });
   assert.equal(result.status, 'failed');
   assert.equal(result.confidence, 'failed');
@@ -2622,7 +2502,7 @@ fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ contra
   // must be absent, never a runner-fabricated stand-in. The same
   // explanation now lives under runnerNote.
   assert.equal(result.agentClaim, undefined);
-  assert.deepEqual(result.runnerNote, { status: 'failed', summary: 'agent-result.json was present but failed schema validation' });
+  assert.deepEqual(result.runnerNote, { summary: 'agent-result.json was present but failed schema validation' });
 });
 
 test('executeAssignment rejects a legacy failed claim with an object error at the production classification gate', async () => {
@@ -2641,13 +2521,13 @@ fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status
   });
   const result = await executeAssignment(assignment, {
     cwd: tempDir, repoRoot: tempDir,
-    runnerConfig: { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, models: { standard: 'test-model' }, timeoutMs: 5000 },
+    runnerConfig: { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 },
   });
   assert.equal(result.status, 'failed');
   assert.equal(result.confidence, 'failed');
   // Same M4 rationale as the sibling test above.
   assert.equal(result.agentClaim, undefined);
-  assert.deepEqual(result.runnerNote, { status: 'failed', summary: 'agent-result.json was present but failed schema validation' });
+  assert.deepEqual(result.runnerNote, { summary: 'agent-result.json was present but failed schema validation' });
 });
 
 
@@ -2729,11 +2609,7 @@ function spawnExecuteAssignment(tempDir, assignment, runnerConfig, extraOpts = {
 }
 
 function admissionRunnerConfig(executorScript) {
-  return {
-    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  return { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
 }
 
 test('executeAssignment: the same (retryId, destination, payloadDigest) tuple returns the identical committed Run without dispatching a second executor', async () => {
@@ -3264,7 +3140,7 @@ test('executeAssignment: a control token that is superseded mid-flight (a freshe
   const supersededResult = JSON.parse(fs.readFileSync(path.join(runDir, 'result.superseded.json'), 'utf8'));
   assert.equal(supersededResult.runId, `run_${assignment.assignmentId}_01`);
   assert.equal(supersededResult.assignmentId, assignment.assignmentId);
-  assert.deepEqual(supersededResult.contract, { id: 'assignment-run-result', version: 2 });
+  assert.deepEqual(supersededResult.contract, { id: 'assignment-run-result', version: 3 });
 });
 
 test('executeAssignment: late superseded writer cannot overwrite authoritative result.json already settled by a newer controller (R5)', async () => {
@@ -3868,15 +3744,7 @@ test('reconcileCliSpawnRun: two-OS-process TOCTOU barrier race proves stale reco
 test('executeAssignment: an interrupted assignment.json publish leaves it cleanly absent, and a retry recovers instead of permanently bricking the Assignment (S6)', async () => {
   const tempDir = mkTempDir();
   const executorScript = writeEchoExecutor(tempDir);
-  const runnerConfig = {
-    executor: {
-      allowCrossProvider: true,
-      command: process.execPath,
-      args: [executorScript, '{prompt}'],
-    },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
 
   const work = { id: 'tsk-s6-assignment-json', status: 'doing', stage: 'planning', domain: 'coding' };
   const assignment = buildAssignment({ work, stage: 'planning', operation: 'validate-plan' });
@@ -4232,7 +4100,8 @@ fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nWorker done\\
         command: process.execPath,
         args: [executorScript, '{prompt}'],
       },
-      models: { standard: 'test-model' },
+      modelPolicies: { claude: { standard: 'test-model' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 10000,
     },
     retryId: 'retry-n1-test',

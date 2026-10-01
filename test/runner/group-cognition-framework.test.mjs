@@ -25,8 +25,8 @@ import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 
 import { loadCoordinationProtocol, discoverCoordinationProtocols } from '../../src/runner/definitions/protocol-loader.mjs';
-import { validateFlowDefinition, mergePolicyStack, FlowDefinitionError, MIN_TIER_VALUES } from '../../src/runner/definitions/schema.mjs';
-import { MODEL_POLICY_TIERS } from '../../src/runner/dispatch/config.mjs';
+import { validateFlowDefinition, mergePolicyStack, FlowDefinitionError } from '../../src/runner/definitions/schema.mjs';
+import { RIGOR_VALUES } from '../../src/runner/rigor.mjs';
 
 const require = createRequire(import.meta.url);
 // Same 'yaml' package protocol-loader.mjs itself uses (require(), not
@@ -154,28 +154,24 @@ test('R1: no operation declares result.kind other than "advisory" -- never gate-
   }
 });
 
-// ─── R2: cognitive policy -- advanced/flagship/frontier tier floors ──────
+// ─── R2: cognitive policy rigor floors ──────────────────────────────────
 
-test('R2: activity-level tier floors are declared via policy.minTier and exercise all three named tiers (advanced, flagship, frontier) across distinct activities', () => {
+test('R2: activity-level rigor floors are declared via policy.rigor across distinct activities', () => {
   const definition = loadDefinition();
-  const tierByOp = Object.fromEntries(definition.spec.operations.map((op) => [op.id, op.policy?.minTier]));
+  const rigorByOp = Object.fromEntries(definition.spec.operations.map((op) => [op.id, op.policy?.rigor]));
 
-  assert.equal(tierByOp['divergent-exploration'], 'advanced');
-  assert.equal(tierByOp['cluster-deduplicate'], 'flagship');
-  assert.equal(tierByOp['critical-challenge'], 'frontier');
-  assert.equal(tierByOp['evidence-review'], 'flagship');
-  assert.equal(tierByOp['convergent-synthesis'], 'flagship');
-  assert.equal(tierByOp['recommend-with-dissent'], 'frontier');
+  assert.equal(rigorByOp['divergent-exploration'], 'standard');
+  assert.equal(rigorByOp['cluster-deduplicate'], 'high');
+  assert.equal(rigorByOp['critical-challenge'], 'critical');
+  assert.equal(rigorByOp['evidence-review'], 'high');
+  assert.equal(rigorByOp['convergent-synthesis'], 'high');
+  assert.equal(rigorByOp['recommend-with-dissent'], 'critical');
 
-  const declaredTiers = new Set(Object.values(tierByOp).filter(Boolean));
-  assert.ok(declaredTiers.has('advanced') && declaredTiers.has('flagship') && declaredTiers.has('frontier'));
+  const declaredRigors = new Set(Object.values(rigorByOp).filter(Boolean));
+  assert.ok(declaredRigors.has('standard') && declaredRigors.has('high') && declaredRigors.has('critical'));
 
-  // Every declared tier is drawn from the SAME real vocabulary
-  // dispatch/config.mjs's MODEL_POLICY_TIERS defines -- never a
-  // fixture-invented tier name.
-  for (const tier of declaredTiers) {
-    assert.ok(MODEL_POLICY_TIERS.includes(tier), `tier "${tier}" must be one of MODEL_POLICY_TIERS`);
-    assert.ok(MIN_TIER_VALUES.includes(tier), `tier "${tier}" must be one of schema.mjs's own MIN_TIER_VALUES`);
+  for (const rigor of declaredRigors) {
+    assert.ok(RIGOR_VALUES.includes(rigor), `rigor "${rigor}" must be one of the shared rigor vocabulary`);
   }
 });
 
@@ -189,7 +185,7 @@ test('R2: capabilities/persona requirements -- every actor declares a persona; n
   }
 });
 
-test('R2: activity tier floors remain monotonic through the actor policy scope stack -- reuses mergePolicyStack\'s EXISTING (raise-only) enforcement, never a second implementation', () => {
+test('R2: activity rigor floors remain monotonic through the actor policy scope stack -- reuses mergePolicyStack\'s existing raise-only enforcement', () => {
   const definition = loadDefinition();
   const opsById = new Map(definition.spec.operations.map((op) => [op.id, op]));
 
@@ -202,17 +198,15 @@ test('R2: activity tier floors remain monotonic through the actor policy scope s
     { scope: 'actor', source: criticActor.id, policy: criticActor.policy ?? {} },
   ];
   const merged = mergePolicyStack(legalStack);
-  assert.equal(merged.minTier, 'frontier');
+  assert.equal(merged.rigor, 'critical');
 
   // An actor-scope attempt to LOWER the operation-declared floor is
-  // rejected, not silently clamped -- proves this fixture's own operation/
-  // actor pairing genuinely exercises mergePolicyStack's real monotonicity
-  // guard rather than merely being compatible with it by accident.
+  // rejected, not silently clamped.
   assert.throws(
     () =>
       mergePolicyStack([
-        { scope: 'operation', source: criticalChallengeOp.id, policy: { minTier: 'frontier' } },
-        { scope: 'actor', source: criticActor.id, policy: { minTier: 'nano' } },
+        { scope: 'operation', source: criticalChallengeOp.id, policy: { rigor: 'critical' } },
+        { scope: 'actor', source: criticActor.id, policy: { rigor: 'low' } },
       ]),
     (err) => err instanceof FlowDefinitionError && /monotonic/.test(err.message),
   );

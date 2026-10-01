@@ -23,7 +23,7 @@ function collectFiles(dir, extensions = ['.js', '.mjs', '.cjs', '.json', '.yaml'
   return results;
 }
 
-test('dead vocabulary guard: Phase 1 retired symbols do not appear in src, bin, core, domains, scripts', () => {
+test('dead vocabulary guard: Phase 1 & 2 retired symbols do not appear in src, bin, core, domains, scripts', () => {
   const deadSymbols = [
     'modelForTier',
     'resolvePolicyTierModel',
@@ -34,6 +34,12 @@ test('dead vocabulary guard: Phase 1 retired symbols do not appear in src, bin, 
     'evaluatePlacementPolicyShadow',
     'PLACEMENT_POLICY_SHADOW',
     'rigorOverrides',
+    'minTier',
+    'minRigor',
+    'QUALITY_TIER_BRIDGE',
+    'QUALITY_MODE_VALUES',
+    'MIN_RIGOR_VALUES',
+    'MIN_TIER_VALUES',
   ];
 
   const searchDirs = ['src', 'bin', 'core', 'domains', 'scripts'].map((d) => path.join(REPO_ROOT, d));
@@ -105,6 +111,7 @@ test('dead vocabulary guard: loadRunnerConfig rejects dead keys with actionable 
   const base = {
     executor: { command: 'claude', args: ['{prompt}'] },
     modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', advanced: 'sonnet', flagship: 'sonnet', frontier: 'opus' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: 1000,
   };
 
@@ -138,7 +145,7 @@ test('dead vocabulary guard: loadRunnerConfig rejects dead keys with actionable 
   });
   assert.throws(
     () => loadRunnerConfig(fCapRigor),
-    (err) => err instanceof RunnerConfigError && /overrides\.rigorOverrides was removed/.test(err.message),
+    (err) => err instanceof RunnerConfigError && /capabilities\.fgos-coding-implement\.overrides was removed; use "capabilities\.fgos-coding-implement\.rigor"/.test(err.message),
   );
 
   // 4. capabilities.*.overrides.providerModel
@@ -154,7 +161,7 @@ test('dead vocabulary guard: loadRunnerConfig rejects dead keys with actionable 
   });
   assert.throws(
     () => loadRunnerConfig(fCapProvider),
-    (err) => err instanceof RunnerConfigError && /overrides\.providerModel was removed; provider belongs on executors\.<id>\.providerModel/.test(err.message),
+    (err) => err instanceof RunnerConfigError && /capabilities\.fgos-coding-implement\.overrides was removed; use "capabilities\.fgos-coding-implement\.rigor"/.test(err.message),
   );
 });
 
@@ -208,4 +215,86 @@ test('resolveTierModel: resolves tier to model via modelPolicies[provider][tier]
     () => resolveTierModel(incompleteCfg, 'standard', 'custom'),
     (err) => err instanceof RunnerConfigError && /no model configured for tier "standard" under provider "custom"/.test(err.message),
   );
+});
+
+import { mergePolicyStack, FlowDefinitionError } from '../../src/runner/definitions/schema.mjs';
+import { resolveAssignmentDispatchPolicy } from '../../src/runner/dispatch/assignment-policy.mjs';
+import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
+
+test('dead vocabulary guard: schema rejects minTier with guidance and enforces rigor monotonicity', () => {
+  // Reject minTier with guidance
+  assert.throws(
+    () => mergePolicyStack([{ scope: 'operation', id: 'op1', policy: { minTier: 'standard' } }]),
+    (err) => err instanceof FlowDefinitionError && /minTier was removed; use "rigor"/.test(err.message),
+  );
+
+  // Rigor monotonic raise is allowed
+  const raised = mergePolicyStack([
+    { scope: 'definition', id: 'def1', policy: { rigor: 'low' } },
+    { scope: 'operation', id: 'op1', policy: { rigor: 'standard' } },
+    { scope: 'actor', id: 'act1', policy: { rigor: 'high' } },
+  ]);
+  assert.equal(raised.rigor, 'high');
+
+  // Rigor lowering is rejected
+  assert.throws(
+    () => mergePolicyStack([
+      { scope: 'definition', id: 'def1', policy: { rigor: 'high' } },
+      { scope: 'operation', id: 'op1', policy: { rigor: 'low' } },
+    ]),
+    (err) => err instanceof FlowDefinitionError && /lower than the floor/.test(err.message),
+  );
+
+  // tier field in PolicyPatch is rejected at operation scope
+  assert.throws(
+    () => mergePolicyStack([{ scope: 'operation', id: 'op1', policy: { tier: 'advanced' } }]),
+    (err) => err instanceof FlowDefinitionError && /tier is only valid at actor\/assignment\/cli scope/.test(err.message),
+  );
+
+  // tier field in PolicyPatch is accepted at actor scope
+  const actorTier = mergePolicyStack([{ scope: 'actor', id: 'act1', policy: { tier: 'advanced' } }]);
+  assert.equal(actorTier.tier, 'advanced');
+});
+
+test('dead vocabulary guard: capabilities.<cap>.rigor floor elevates tier and capabilities.*.overrides is rejected (D19)', () => {
+  const baseConfig = {
+    executor: { command: 'claude', args: ['{prompt}'] },
+    modelPolicies: {
+      claude: { nano: 'haiku', standard: 'sonnet', advanced: 'sonnet-adv', flagship: 'opus', frontier: 'fable' },
+    },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    timeoutMs: 1000,
+  };
+
+  // 1. capabilities.*.overrides is rejected
+  const fOverrides = mkTempConfig({
+    ...baseConfig,
+    capabilities: {
+      'code:review': { overrides: { tier: 'flagship' } },
+    },
+  });
+  assert.throws(
+    () => loadRunnerConfig(fOverrides),
+    (err) => err instanceof RunnerConfigError && /capabilities\.code:review\.overrides was removed; use "capabilities\.code:review\.rigor"/.test(err.message),
+  );
+
+  // 2. capabilities.<cap>.rigor floor elevates tier
+  const runnerConfig = {
+    ...baseConfig,
+    capabilities: {
+      'code:review': { rigor: 'high' },
+    },
+  };
+  const assignment = buildAssignment({
+    stage: 'planning',
+    operation: 'validate-plan',
+    policy: { capability: 'code:review', rigor: 'standard' },
+  });
+
+  const effective = resolveAssignmentDispatchPolicy({ assignment, runnerConfig });
+  assert.equal(effective.rigor, 'high', 'capability floor high should win over step standard');
+  assert.equal(effective.tier, 'flagship', 'high rigor maps to flagship tier');
+  assert.equal(effective.model, 'opus');
+  assert.equal(effective.provenance.rigor.source.scope, 'capability');
+  assert.equal(effective.provenance.rigor.source.id, 'code:review');
 });

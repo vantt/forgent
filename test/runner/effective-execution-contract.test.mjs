@@ -40,7 +40,7 @@ function validAssignment(overrides = {}) {
     role: 'reviewer',
     mutation: 'read-only',
     budget: { timeoutMs: 60000, maxRuns: 1 },
-    policy: { minTier: 'standard', preferExecutor: 'claude' },
+    policy: { rigor: 'standard', preferExecutor: 'claude' },
     ...overrides,
   };
 }
@@ -399,7 +399,8 @@ test('PRODUCTION-DOOR FIXTURE: executeAssignment persists effective-execution-co
   // Configure a real runner environment with mock executor CLI
   const runnerCfg = {
     timeoutMs: 30000,
-    models: { standard: 'test-model' },
+    modelPolicies: { claude: { standard: 'test-model' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     executor: {
       command: 'mock-cli',
       adapter: 'cli-spawn',

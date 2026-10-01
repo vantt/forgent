@@ -509,7 +509,8 @@ function writeRunnerConfig(cwd, verdict) {
   );
   const cfg = {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
-    models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+    modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: 5000,
   };
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
@@ -557,7 +558,8 @@ function writeShortRunnerConfig(cwd, timeoutMs) {
   // return's own clean-tree check, unrelated to what this test proves.
   const cfg = {
     executor: { command: process.execPath, args: ['{prompt}'] },
-    models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+    modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs,
     parallel: { maxRoots: 4, maxLeavesPerRoot: 4 },
   };

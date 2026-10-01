@@ -390,9 +390,9 @@ export function compileDispatchPlan(
   // caller-supplied cliOverride.preferExecutor disagrees anyway.
   const realAssignmentForPolicy = assignmentItem ?? (typeof assignmentArg === 'object' && assignmentArg ? assignmentArg : null);
   const syntheticPolicy = { preferExecutor: executorId };
-  if (resolved.overrides?.model) syntheticPolicy.model = resolved.overrides.model;
-  const overrideTier = resolved.overrides?.tier;
-  if (overrideTier) syntheticPolicy.minTier = overrideTier;
+  const capRigor = capability ? cfg?.capabilities?.[capability]?.rigor : undefined;
+  if (capRigor) syntheticPolicy.rigor = capRigor;
+  if (capability) syntheticPolicy.capability = capability;
   const assignmentForPolicy = realAssignmentForPolicy ?? {
     operation: capability ?? executorId,
     role: undefined,

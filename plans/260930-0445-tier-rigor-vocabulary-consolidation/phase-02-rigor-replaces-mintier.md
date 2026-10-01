@@ -1,7 +1,7 @@
 ---
 phase: 2
 title: "rigor thay minTier; bảng rigorToTier; xoá quality bridge"
-status: pending
+status: done
 priority: P1
 effort: "1.5d"
 dependencies: [1]

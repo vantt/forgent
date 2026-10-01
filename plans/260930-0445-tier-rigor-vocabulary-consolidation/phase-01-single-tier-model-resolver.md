@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "Một resolver tier→model; xoá cầu nối, rigorOverrides, shadow"
-status: pending
+status: done
 priority: P1
 effort: "1.5d"
 dependencies: []

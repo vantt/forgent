@@ -56,10 +56,10 @@
 #   `.fgos/config.json` declare a matching `for:` array -- a real,
 #   already-discovered config gap, not a guess. Declaring `capabilities`
 #   here would plant the identical landmine for whichever later cell wires
-#   this framework through `planCohort`. `policy.minTier` and each actor's
+#   this framework through `planCohort`. `policy.rigor` and each actor's
 #   `persona` (below) carry R2's "capabilities/persona requirements" instead
 #   -- both are genuinely enforced today (`matchCandidateToRequirement`'s
-#   own `minTier` check; `persona` is descriptive PolicyPatch data, never a
+#   own `rigor` check; `persona` is descriptive PolicyPatch data, never a
 #   hard planner constraint, so it cannot create the same landmine).
 # - `spec.profile.cohort.count` is omitted for the same reason the sibling
 #   fixture omits it: `planCohort` treats a declared `count` as "must equal
@@ -166,7 +166,7 @@ spec:
     - id: divergent-exploration
       role: explorer
       policy:
-        minTier: advanced
+        rigor: standard
       task:
         contractTemplate: divergent-exploration-brief
       result:
@@ -183,7 +183,7 @@ spec:
     - id: cluster-deduplicate
       role: clusterer
       policy:
-        minTier: flagship
+        rigor: high
       task:
         contractTemplate: cluster-deduplicate-candidates
       result:
@@ -196,7 +196,7 @@ spec:
     - id: critical-challenge
       role: critic
       policy:
-        minTier: frontier
+        rigor: critical
       task:
         contractTemplate: critical-challenge-review
       result:
@@ -217,7 +217,7 @@ spec:
     - id: evidence-review
       role: evidence-reviewer
       policy:
-        minTier: flagship
+        rigor: high
       task:
         contractTemplate: evidence-review-assessment
       result:
@@ -231,7 +231,7 @@ spec:
     - id: convergent-synthesis
       role: synthesizer
       policy:
-        minTier: flagship
+        rigor: high
       task:
         contractTemplate: convergent-synthesis-draft
       result:
@@ -271,7 +271,7 @@ spec:
     - id: recommend-with-dissent
       role: synthesizer
       policy:
-        minTier: frontier
+        rigor: critical
       task:
         contractTemplate: recommendation-with-dissent-report
       result:
