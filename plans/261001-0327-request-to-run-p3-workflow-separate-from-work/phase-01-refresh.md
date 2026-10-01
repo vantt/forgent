@@ -11,11 +11,11 @@ dependencies: []
 
 ## Overview
 
-Khớp plan với `main` sau P1 (và P2 nếu đã xong); đo lại quy mô stage trong Work; quyết tách phase 3 thành 3a/3b nếu cần; trả lời trước 2 câu hỏi mở bằng đề xuất có bằng chứng để owner chốt một lượt.
+Khớp plan với `main` sau P1: API `fgos run`/Unit run thật, kết quả ca 1 (ảnh hưởng thiết kế runner), đếm **đủ** consumer của `stage`, `fgos workflow` cũ, `dispatch-runs`, phần merge/worktree tách được khỏi Work; trả lời câu hỏi mở bằng đề xuất có bằng chứng.
 
 ## Requirements
 
-- Functional: bảng con trỏ cũ→mới; danh sách đầy đủ consumer của `stage` (Node, Rust, gateway, web, skill, verb); kết quả ca 1 P1 về vòng lặp pattern (ảnh hưởng thiết kế runner).
+- Functional: bảng con trỏ cũ→mới; danh sách consumer (Node, Rust, gateway, web, skill, verb, test); ranh giới tách helper tích hợp; danh sách caller `dispatch-runs`/`spawnWorker`/`executeExecutorCli`.
 - Non-functional: chỉ sửa plan.
 
 ## Related Code Files
@@ -26,16 +26,16 @@ Khớp plan với `main` sau P1 (và P2 nếu đã xong); đo lại quy mô stag
 
 1. Cổng: P1 merge `main`; báo cáo ca 1 có.
 2. Nhánh `plan/261001-request-to-run-p3` + worktree; symlink; GitNexus analyze.
-3. Đếm lại: `rg -l "workflow-stage-graphs" src bin`, `rg -l "\.stage\b" src`, Rust `packages/work-state`, `herdr-plugin` (gateway + web types), skill/verb theo stage (`/fgOS:discover|plan|discover-loop|plan-loop|*-next`, `fgos-coding-driving`, `fgos-routing`, `fgos-coding-*`).
-4. Đọc `src/state/workflow-stage-graphs.mjs`, `stage-fsm.mjs`, `status-fsm.mjs`, `loop.mjs`, `operation-choice.mjs` để chốt ranh giới runner vs Work status.
-5. Nếu tổng thay đổi phase 3 > ~2.000 dòng hoặc > 60 file → tách 3a (runtime + state + Rust) / 3b (skill + verb + gateway/web); cập nhật bảng sóng.
-6. Viết đề xuất cho 2 câu hỏi mở (có bằng chứng); gửi owner một lượt; phần không phụ thuộc vẫn tiến.
-7. Commit plan.
+3. Đếm: `rg -l "workflow-stage-graphs" src bin`, `rg -l "\.stage\b" src test`, Rust `packages/work-state`, contract `domain-entry-stages.json`, `herdr-plugin` (`rg -c stage`, `pick.rs` gọi verb), skill/verb theo stage, test.
+4. Đọc `src/runner/merge.mjs`, `worktree.mjs` → khoanh phần thuần git (tạo worktree, merge nhánh, dọn) tách được cho helper tích hợp; phần gắn Work giữ lại.
+5. Đọc `src/runner/definitions/protocol-loader.mjs` → phần loader chung chuyển sang `src/workflow/loader.mjs` (bỏ tầng project).
+6. Kiểm verb `fgos workflow` hiện có (`command-registry.mjs:1630`, `bin/fgos.mjs:2163-2172`) → thiết kế subcommand mới không đụng positional cũ.
+7. Viết đề xuất câu hỏi mở; gửi owner một lượt; commit plan.
 
 ## Success Criteria
 
-- [ ] Danh sách consumer `stage` đầy đủ; quyết định 3a/3b có lý do; 2 câu hỏi mở có đề xuất.
+- [ ] Danh sách consumer đầy đủ (có số); ranh giới helper tích hợp; thiết kế verb `workflow` không trùng.
 
 ## Risk Assessment
 
-- Bỏ sót consumer `stage` (web, Rust) → kiểm bằng `rg` + test gateway trước phase 3.
+- Bỏ sót consumer (web, Rust, test) → kiểm bằng `rg` + test gateway trước phase 3.

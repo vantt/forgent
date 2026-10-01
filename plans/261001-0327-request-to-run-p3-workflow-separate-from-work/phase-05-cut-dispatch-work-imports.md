@@ -1,43 +1,45 @@
 ---
 phase: 5
-title: "Cắt dispatch khỏi Work"
+title: "P3b — Cắt dispatch khỏi Work + xoá dispatch-runs"
 status: pending
 priority: P1
-effort: "1d"
+effort: "1.5d"
 dependencies: [3]
 ---
 
-# Phase 5: Cắt dispatch khỏi Work (A4, phần cũ)
+# Phase 5: P3b — Cắt dispatch khỏi Work + xoá `dispatch-runs`
 
 ## Overview
 
-Đóng nốt A4: các file dispatch cũ hết import `src/state/workflow-stage-graphs.mjs` và state Work. `taskSpec`/bundle theo stage do Workflow layer cung cấp qua `inputs` của Unit; `operation-choice.mjs` (đường Work → dispatch) chuyển sang gọi Workflow runner hoặc xoá nếu thừa.
+Đóng nốt A4: các file dispatch cũ hết import `src/state/**`. Đường Work → dispatch (`spawnWorker`, fan-out, `operation-choice.mjs`) chuyển sang Workflow runner + `fgos run`; nhờ vậy **xoá được** writer `dispatch-runs` (`openDispatchRun`), `execute <executor>` thường và 3 reader (ngoại lệ có tên của P1 kết thúc ở đây).
 
 ## Requirements
 
 - Functional:
-  - Xoá import L3 ở `assignment-runner.mjs` (~57), `operation-choice.mjs` (~20), `cli.mjs` (~21: `DOMAINS`, `bundleForStage`, `resolveTaskSpecPath`), `assignment.mjs` (~51), `config.mjs` (state Work).
-  - `resolveTaskSpecPath` chuyển sang `src/workflow/**`; dispatch nhận đường dẫn/nội dung qua assignment.
-  - `operation-choice.mjs`: chức năng còn cần chuyển vào Workflow runner; phần thừa xoá.
-  - Guard test: `src/runner/dispatch/**` và `src/runner/execution/**` không import `src/state/**`, `src/workflow/**` (dispatch ở dưới; workflow gọi xuống, không ngược).
-- Non-functional: hành vi chạy không đổi.
+  - Xoá import L3 ở `assignment-runner.mjs` (~57), `operation-choice.mjs` (~20), `cli.mjs` (~20-38: `DOMAINS`, `bundleForStage`, `resolveTaskSpecPath`, state), `assignment.mjs` (~51), `config.mjs` (~23, 27); `resolveTaskSpecPath` đã ở `src/workflow/**`.
+  - `spawnWorker` (`loop.mjs:83,1035`) và fan-out (`src/runner/fanout-batch.mjs` → `executeExecutorCli`) chuyển sang `fgos run`/runner; `operation-choice.mjs` phần còn cần chuyển vào runner, phần thừa xoá.
+  - Xoá `openDispatchRun` + `.fgos/dispatch-runs` writer, `fgos dispatch execute <executor>` thường, reader `show-run.mjs:58-63`, `visibility-session.mjs:234-249`, `runtime-inspection.mjs:83-84` (hoặc chuyển sang đọc assignments). `execute --assignment` giữ cho engine tới P4.
+  - Guard: `src/runner/dispatch/**`, `src/runner/execution/**` không import `src/state/**`, `src/workflow/**`.
+- Non-functional: hành vi daemon `fgos-runner --watch` và fan-out giữ (qua đường mới) — có test.
 
 ## Related Code Files
 
-- Modify: `src/runner/dispatch/assignment-runner.mjs`, `operation-choice.mjs`, `cli.mjs`, `assignment.mjs`, `config.mjs`; `src/workflow/**` (nhận `resolveTaskSpecPath`)
-- Modify: `test/architecture.test.mjs` (guard một chiều)
+- Modify: `src/runner/dispatch/{assignment-runner,operation-choice,cli,assignment,config}.mjs`, `src/runner/fanout-batch.mjs`, `src/runner/loop.mjs` (chỉ phần spawn — phase 3 sở hữu phần còn lại; làm sau khi phase 3 merge), reader 3 file, `test/architecture.test.mjs`
+- Delete: phần `dispatch-runs`, test tương ứng
 
 ## Implementation Steps
 
-1. GitNexus `impact` từng hàm import.
-2. Chuyển; guard; suite dispatch + workflow.
-3. Commit → merge nhánh plan.
+1. GitNexus `impact` từng hàm import, `spawnWorker`, `executeExecutorCli`, `openDispatchRun`.
+2. Test trước: daemon chạy một item qua đường mới; fan-out chạy N item; không còn file mới dưới `.fgos/dispatch-runs`.
+3. Chuyển; xoá; guard; suite.
+4. Commit → merge nhánh plan.
 
 ## Success Criteria
 
 - [ ] `rg "from '.*state/" src/runner/dispatch src/runner/execution` rỗng; guard xanh.
-- [ ] `docs/platform/component-boundary.md` dòng Dispatch ("forbids direct workflow/stage lookups") **đúng với code**.
+- [ ] `rg "openDispatchRun|dispatch-runs" src` rỗng (ngoài đường đọc dữ liệu cũ nếu giữ).
+- [ ] Dòng Dispatch trong `docs/platform/component-boundary.md` ("forbids direct workflow/stage lookups") **đúng với code**.
 
 ## Risk Assessment
 
-- Caller Work cũ còn gọi `operation-choice` → phase 3 đã chuyển; nếu sót, test đỏ chỉ ra.
+- Daemon/fan-out gãy → test bước 2 bắt; rollback = revert merge phase.
