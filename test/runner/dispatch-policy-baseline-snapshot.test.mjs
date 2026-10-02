@@ -481,7 +481,6 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     model: 'gemini-3.8-flash-low',
     command: 'agy',
     args: [
-      '<prompt>',
       '--mode',
       'accept-edits',
       '--new-project',
@@ -491,7 +490,15 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     envKeys: [
       'HOME'
     ],
-    resourceBindings: [],
+    resourceBindings: [
+      {
+        resource: 'private-home',
+        target: {
+          kind: 'env',
+          name: 'HOME'
+        }
+      }
+    ],
     adapter: 'herdr-spawn',
     promptDelivery: 'file-pointer',
     confinement: 'bwrap',
@@ -505,7 +512,6 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     model: 'gemini-3.8-flash-medium',
     command: 'agy',
     args: [
-      '<prompt>',
       '--mode',
       'accept-edits',
       '--new-project',
@@ -515,7 +521,15 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     envKeys: [
       'HOME'
     ],
-    resourceBindings: [],
+    resourceBindings: [
+      {
+        resource: 'private-home',
+        target: {
+          kind: 'env',
+          name: 'HOME'
+        }
+      }
+    ],
     adapter: 'herdr-spawn',
     promptDelivery: 'file-pointer',
     confinement: 'bwrap',
@@ -529,7 +543,6 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     model: 'gemini-3.1-pro-high',
     command: 'agy',
     args: [
-      '<prompt>',
       '--mode',
       'accept-edits',
       '--new-project',
@@ -539,7 +552,15 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     envKeys: [
       'HOME'
     ],
-    resourceBindings: [],
+    resourceBindings: [
+      {
+        resource: 'private-home',
+        target: {
+          kind: 'env',
+          name: 'HOME'
+        }
+      }
+    ],
     adapter: 'herdr-spawn',
     promptDelivery: 'file-pointer',
     confinement: 'bwrap',
@@ -553,7 +574,6 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     model: 'gemini-3.8-flash-low',
     command: 'agy',
     args: [
-      '<prompt>',
       '--mode',
       'accept-edits',
       '--new-project',
@@ -563,7 +583,15 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     envKeys: [
       'HOME'
     ],
-    resourceBindings: [],
+    resourceBindings: [
+      {
+        resource: 'private-home',
+        target: {
+          kind: 'env',
+          name: 'HOME'
+        }
+      }
+    ],
     adapter: 'herdr-spawn',
     promptDelivery: 'file-pointer',
     confinement: 'bwrap',
@@ -577,7 +605,6 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     model: 'gemini-3.8-flash-medium',
     command: 'agy',
     args: [
-      '<prompt>',
       '--mode',
       'accept-edits',
       '--new-project',
@@ -587,7 +614,15 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     envKeys: [
       'HOME'
     ],
-    resourceBindings: [],
+    resourceBindings: [
+      {
+        resource: 'private-home',
+        target: {
+          kind: 'env',
+          name: 'HOME'
+        }
+      }
+    ],
     adapter: 'herdr-spawn',
     promptDelivery: 'file-pointer',
     confinement: 'bwrap',
@@ -601,7 +636,6 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     model: 'gemini-3.1-pro-high',
     command: 'agy',
     args: [
-      '<prompt>',
       '--mode',
       'accept-edits',
       '--new-project',
@@ -611,7 +645,15 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     envKeys: [
       'HOME'
     ],
-    resourceBindings: [],
+    resourceBindings: [
+      {
+        resource: 'private-home',
+        target: {
+          kind: 'env',
+          name: 'HOME'
+        }
+      }
+    ],
     adapter: 'herdr-spawn',
     promptDelivery: 'file-pointer',
     confinement: 'bwrap',

@@ -596,10 +596,12 @@
             },
             "command": "codex",
             "args": [
-              "--dangerously-bypass-approvals-and-sandbox",
+              "-s",
+              "danger-full-access",
+              "-a",
+              "never",
               "--model",
-              "{model}",
-              "{prompt}"
+              "{model}"
             ],
             "interactiveMode": {
               "exitCommand": "/quit",
@@ -608,6 +610,15 @@
                 "kind": "codex-toml"
               }
             },
+            "resourceBindings": [
+              {
+                "resource": "private-home",
+                "target": {
+                  "kind": "env",
+                  "name": "CODEX_HOME"
+                }
+              }
+            ],
             "env": {
               "CODEX_HOME": "${HOME}/.codex-fgovn"
             }
@@ -793,7 +804,6 @@
             },
             "command": "agy",
             "args": [
-              "{prompt}",
               "--mode",
               "accept-edits",
               "--new-project",
@@ -809,7 +819,16 @@
             },
             "env": {
               "HOME": "${HOME}/.agy-homes/mucdong"
-            }
+            },
+            "resourceBindings": [
+              {
+                "resource": "private-home",
+                "target": {
+                  "kind": "env",
+                  "name": "HOME"
+                }
+              }
+            ]
           },
           {
             "id": "agy-cli-bwrap-mucdong",
@@ -919,8 +938,7 @@
               "medium",
               "--tools",
               "read,write,edit,bash,grep,find,ls",
-              "--approve",
-              "{prompt}"
+              "--approve"
             ],
             "interactiveMode": {
               "exitCommand": "/quit",
@@ -928,7 +946,16 @@
             },
             "env": {
               "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/grok-vantt"
-            }
+            },
+            "resourceBindings": [
+              {
+                "resource": "private-home",
+                "target": {
+                  "kind": "env",
+                  "name": "PI_CODING_AGENT_DIR"
+                }
+              }
+            ]
           }
         ],
         "for": [
