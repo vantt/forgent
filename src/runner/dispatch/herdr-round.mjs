@@ -390,6 +390,8 @@ const sleep = (ms) => new Promise((resolve) => { setTimeout(resolve, ms); });
  * than this, and never more than `SUBMIT_MAX_ENTERS` times. */
 const SUBMIT_ENTER_EVERY_MS = 2500;
 const SUBMIT_MAX_ENTERS = 6;
+/** Consecutive looks with no unsent draft after which the submit check is over. */
+const SUBMIT_NO_DRAFT_POLLS = 4;
 /** How long after typing the runner keeps checking that the brief was taken. */
 const SUBMIT_CONFIRM_MS = 60000;
 /** How often the prompt-ready and submit checks look at the screen detector. */
@@ -797,6 +799,28 @@ function deliverBrief({ client, round, message, promptMs, resultPath }) {
     screen ? { screen } : {});
 }
 
+/**
+ * The agent's state as the poll loop should see it.
+ *
+ * A confined agent runs as a plain process in the pane, so the only status herdr's
+ * `agent get` can give is the one fgos reported at launch ("working") -- and that never
+ * changes, so an agent that finished, hung, or stopped on a provider limit would look
+ * busy forever and the idle and usage-limit checks of the ladder could never fire. For a
+ * confined target the screen detector's verdict is therefore read first; when herdr has
+ * no verdict, or cannot be asked, the reported status is used as before.
+ */
+export function readAgentState(client, target, { detectorFirst = false } = {}) {
+  if (detectorFirst) {
+    try {
+      const seen = client.agentExplain(target);
+      if (typeof seen?.state === 'string' && seen.state) return seen.state;
+    } catch {
+      // fall back to the reported status
+    }
+  }
+  return client.agentGet(target).agentStatus;
+}
+
 /** Whitespace-free form: a prompt box wraps a long line, so text is compared without breaks. */
 const squash = (text) => String(text ?? '').replace(/\s+/g, '');
 
@@ -844,6 +868,9 @@ export async function confirmBriefSubmitted({ client, target, message, paths, ro
   const deadline = Date.now() + windowMs;
   let enters = 0;
   let lastEnterAt = 0;
+  // Idle with no draft in the box means the brief is not waiting to be submitted; a few
+  // such looks in a row end the check instead of holding the poll loop for the whole window.
+  let noDraftStreak = 0;
   while (Date.now() < deadline) {
     if (fs.existsSync(paths.ackPath) || fs.existsSync(paths.resultPath)) break;
     let seen;
@@ -851,7 +878,10 @@ export async function confirmBriefSubmitted({ client, target, message, paths, ro
     if (seen.state === null) break;
     if (seen.visibleBlocker || seen.state === 'blocked') break;
     if (seen.visibleWorking || seen.state === 'working') break;
-    if (seen.state === 'idle' && needle && squash(seen.promptText).includes(needle)) {
+    const draftPresent = seen.state === 'idle' && Boolean(needle) && squash(seen.promptText).includes(needle);
+    noDraftStreak = draftPresent ? 0 : noDraftStreak + 1;
+    if (!draftPresent && noDraftStreak >= SUBMIT_NO_DRAFT_POLLS) break;
+    if (draftPresent) {
       if (enters >= SUBMIT_MAX_ENTERS) break;
       if (Date.now() - lastEnterAt >= SUBMIT_ENTER_EVERY_MS) {
         try {
@@ -926,6 +956,7 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
    * calls happen here, no screen text survives into the next tick.
    */
   const target = round.targetName ?? round.agentName;
+  const confinedTarget = Boolean(round.targetName && round.targetName === round.paneId);
   const decide = (observation) => {
     const first = evaluateLadder({ observation, limits, prior });
     if (!first.needsScreen) return first;
@@ -962,7 +993,7 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
     let agentState = 'unknown';
     let statusReadable = false;
     try {
-      agentState = client.agentGet(target).agentStatus;
+      agentState = readAgentState(client, target, { detectorFirst: confinedTarget });
       statusReadable = true;
     } catch {
       agentState = 'unknown';

@@ -461,3 +461,24 @@ test('the brief a reviewer reads in a pane says its claim needs assessment.verdi
   assert.match(reviewerBrief, /"assessment\.verdict" is required for this assessment role/);
   assert.doesNotMatch(producerBrief, /assessment\.verdict/);
 });
+
+test('a confined pane that herdr only ever reports as working is still seen as stopped on a limit screen', { skip: SKIP }, async () => {
+  const { repoRoot, worktreeDir } = setup(['alpha', 'beta']);
+  const fake = useFakeHerdr({
+    panes: [{ limit: true, detector: true, reportedWorking: true }, {}],
+    limitScreen: "You've hit your usage limit. Try again in 3h.",
+  });
+  const res = await withHerdrBin(fake.herdrBin, () => runUnit({
+    unitData: readOnlyUnit('u-limit-reported-working'),
+    repoRoot,
+    cwd: worktreeDir,
+    worktree: worktreeDir,
+    session: { herdrPresent: true, headless: true },
+  }));
+  assert.equal(res.outcome, 'pass', JSON.stringify(res.results[0]).slice(0, 2000));
+  const first = readJson(path.join(runDirOf(repoRoot, res.unitRunId, 'producer', 1), 'result.json'));
+  assert.equal(first.classification.failure.code, 'provider-limit');
+  const unitRecord = readJson(path.join(repoRoot, '.fgos', 'assignments', res.unitRunId, 'unit.json'));
+  assert.deepEqual(unitRecord.bindings['producer/1'].map((a) => [a.binding.executor, a.outcome]), [['alpha', 'provider-limit'], ['beta', 'pass']]);
+  assert.ok(!fake.closedPaneIds().includes('mock-pane-1'), 'the limited pane stays open');
+});

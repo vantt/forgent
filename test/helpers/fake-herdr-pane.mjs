@@ -14,6 +14,8 @@
 //   limit: true         idle forever; `agent read` shows `limitScreen`
 //   awaitProbe: true    wait for the in-sandbox agent's probe-results.json before settling
 //   detector: true      `agent explain` answers like herdr's screen detector (idle until a brief is taken)
+//   reportedWorking: true  `agent get` says "working" forever, as it does for a confined pane (only the state
+//                       fgos reported at launch exists); only the detector knows what the pane is doing
 //   startupPolls: N     the detector says "unknown" for the first N explain calls (UI still starting);
 //                       a brief typed before the detector turned idle is lost, like a real UI that is not up yet
 //   swallowEnter: N     the first N submit keys are lost: `agent prompt` leaves the brief as an unsent
@@ -108,7 +110,7 @@ if (group === 'pane' && action === 'close') {
 
 if (group === 'agent' && action === 'get') {
   const id = args[2];
-  ok({ agent: { agent_status: scripted(id).limit ? 'idle' : (state.panes[id]?.prompted ? 'idle' : 'idle'), pane_id: id, state_change_seq: 0 } });
+  ok({ agent: { agent_status: scripted(id).reportedWorking ? 'working' : 'idle', pane_id: id, state_change_seq: 0 } });
 }
 
 if (group === 'agent' && action === 'read') {
