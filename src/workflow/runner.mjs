@@ -21,6 +21,52 @@ import { translatePlanToWorkflow } from './plan-source.mjs';
 import { runUnit, snapshotRunnerConfig, resolveGitRoots } from '../runner/execution/run.mjs';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 
+const PRIOR_REPORT_CHAR_LIMIT = 6000;
+
+/**
+ * What a unit needs beyond its template objective: the owner's request the run was started
+ * with, and what the steps it depends on produced. A unit's agent cannot read the run store
+ * (.fgos is closed to workers), so the text goes into the objective itself.
+ */
+function buildUnitObjective({ template, state, step, workflow, mainRoot }) {
+  const parts = [template.objective || ''];
+  if (state.request) parts.push(`Owner request:\n${state.request}`);
+
+  const priorSections = [];
+  const wanted = new Set();
+  const collect = (stepId) => {
+    for (const dep of workflow.steps.find((s) => s.id === stepId)?.dependsOn ?? []) {
+      if (!wanted.has(dep)) {
+        wanted.add(dep);
+        collect(dep);
+      }
+    }
+  };
+  collect(step.id);
+  for (const prior of workflow.steps) {
+    if (!wanted.has(prior.id)) continue;
+    for (const [unitId, unitState] of Object.entries(state.steps[prior.id]?.units ?? {})) {
+      const last = [...(unitState.results ?? [])].reverse().find((r) => r?.runResult);
+      if (!last) continue;
+      const summary = last.runResult.agentClaim?.summary;
+      const report = (last.runResult.evidence?.artifacts ?? []).find((a) => a.endsWith('agent-report.md'));
+      let reportText = '';
+      if (report) {
+        try {
+          reportText = fs.readFileSync(path.resolve(mainRoot, report), 'utf8').slice(0, PRIOR_REPORT_CHAR_LIMIT);
+        } catch {
+          reportText = '';
+        }
+      }
+      if (summary || reportText) {
+        priorSections.push(`### ${prior.id} / ${unitId}\n${summary ? `Summary: ${summary}\n` : ''}${reportText}`.trimEnd());
+      }
+    }
+  }
+  if (priorSections.length > 0) parts.push(`Output of earlier steps:\n\n${priorSections.join('\n\n')}`);
+  return parts.filter(Boolean).join('\n\n');
+}
+
 /**
  * Run loop to advance ready steps in a Workflow run.
  */
@@ -145,7 +191,9 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
           // Build unit object
           const unitData = {
             id: u.id,
-            objective: u.template.objective || `Execute unit ${u.id} in step ${step.id}`,
+            objective:
+              buildUnitObjective({ template: u.template, state, step, workflow, mainRoot }) ||
+              `Execute unit ${u.id} in step ${step.id}`,
             capability: u.template.capability,
             pattern: u.template.pattern || 'solo',
             rigor: u.template.rigor,
@@ -275,6 +323,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
  * @param {string} [params.workflowId] Id of registered workflow
  * @param {object} [params.workflow] In-memory workflow object
  * @param {string} [params.planPath] Path to AgentKit plan.md or plan directory
+ * @param {string} [params.request] The owner's request this run serves; given to every unit
  * @param {string} [params.repoRoot]
  * @param {string} [params.cwd]
  * @param {string} [params.worktree]
@@ -309,6 +358,7 @@ export async function startWorkflow(params = {}) {
     workflowId,
     workflow,
     configSnapshot,
+    request: params.request,
   });
 
   return await advanceWorkflowRun({

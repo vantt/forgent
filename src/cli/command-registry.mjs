@@ -1538,6 +1538,7 @@ export const COMMAND_REGISTRY = [
         sub: { type: 'string', description: 'Subcommand: start, status, answer, resume, operations, stages.' },
         id: { type: 'string', description: 'Workflow ID or Workflow Run ID.' },
         plan: { type: 'string', description: '"start" only: path to AgentKit plan.md or plan directory.' },
+        request: { type: 'string', description: '"start" only: the owner request this run serves; every unit receives it in its objective.' },
         step: { type: 'string', description: '"answer" only: step ID to answer.' },
         answer: { type: 'string', description: '"answer" only: answer text.' },
         dir: { type: 'string', description: 'Main checkout root directory.' },
