@@ -643,7 +643,7 @@ never invent a new filename mid-session.
   `answer-specialist-question` through the normal `operation` step once
   authorized. This door is NOT reachable through
   `fgos-group-thinking`'s own gate — `runGroupThinkingRequest` explicitly
-  refuses a `specialist-authorize` step (Group-Thinking Protocol Pack
+  refuses a `specialist-authorize` step (Group-Thinking Workflow
   bypass #4 stays refused). I24b landed the driver-authenticated
   typed-action/subverb door for this same capability (`fgos coordination
   specialist-authorize`, reaching the locked

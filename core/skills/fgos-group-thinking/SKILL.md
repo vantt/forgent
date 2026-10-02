@@ -5,8 +5,8 @@ description: >-
   Launch, resume, or render replay for named discussion Workflows
   (`delphi`, `nominal-group`, `group-cognition`, `architecture-advisory`)
   and CollaborationPattern presets (`rfc`, `consult`, `research-fan-out`).
-  This is the execution door for named workflows and discussion presets
-  rather than coordination protocol IDs. Use fgos-panel for a person's
+  This is the execution door for named workflows and discussion presets.
+  Use fgos-panel for a person's
   natural-language panel/review/compare/red-team request; use this skill
   when a preset, workflow, or operator already selected the discussion shape.
   Examples: "run the delphi workflow for this decision", "start nominal-group
@@ -37,7 +37,7 @@ Discussion patterns in fgOS are represented as:
 
 This skill coordinates multiple contributions — deliberation, independent
 research passes, cross-provider review, synthesis — across several
-actors through a registered protocol. It never replaces
+actors through a registered Workflow or CollaborationPattern. It never replaces
 [`fgos-researching`](../fgos-researching/SKILL.md) (the single-agent
 "turn one question into one grounded finding" workflow) and never becomes
 a second research engine of its own: it has no research logic, no

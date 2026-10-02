@@ -43,7 +43,7 @@ An agent never decides the mechanism itself (`AGENTS.md`): it queries `decide --
 
 ## Architectural boundaries
 
-- **Unit vs. Protocol:** A capability selects an executor or tool for one independent execution unit. A coordination protocol coordinates multi-actor, multi-step collaboration across units.
+- **Unit vs. Workflow:** A capability selects an executor or tool for one independent execution unit. A Workflow (or CollaborationPattern) coordinates multi-actor, multi-step collaboration across units.
 - **No infrastructure pinning in plans:** Plans declare canonical capability names only. Never pin an executor, provider, model, or tier in a plan.
 - **No double decide:** `decide` is called once per unit immediately before execution (`decide-before-execute`), never during planning and execution.
 - **No Work entity conversion:** A capability is a routing signal, never a Work item, lifecycle stage, or flow step.

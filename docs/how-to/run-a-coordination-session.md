@@ -1,13 +1,11 @@
 # How to run a coordination session with `fgos coordination`
 
-`fgos coordination` is the public CLI onto fgOS's CoordinationSession
-runtime: one or more agent actors working a bounded, read-only objective
-together, either agent-led (a single primary investigator, optionally
-proposing its own consult) or against a declared protocol (a fixed
-topology of actors and operations, such as a request/response consult, an
-independent research fan-out, or the multi-phase Group Cognition
-framework).
+> **Tài liệu lịch sử (Historical — verb `fgos coordination` đã thu hồi):**
+> Kể từ P4 (2026-10-02), engine coordination và verb `fgos coordination` đã được thu hồi.
+> Việc chạy thảo luận và điều phối agent hiện nay được thực hiện qua **Workflow** (`fgos workflow start <name>`) và **CollaborationPattern** (`fgos run --pattern <preset>`).
 
+`fgos coordination` là CLI cũ của CoordinationSession runtime di sản: một hoặc nhiều
+agent làm việc cho một mục tiêu bounded, read-only.
 ## `fgos coordination run --file <request>`
 
 Reads a JSON request file, dispatches every declared step (sequentially by

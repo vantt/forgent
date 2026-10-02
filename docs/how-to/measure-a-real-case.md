@@ -49,7 +49,7 @@ fgos metrics case close <case-name> \
 - `--verdict`: Verdict of the trial (`usable`, `fixed`, or `discarded`).
 - `--interventions`: Integer count of manual interventions during the case window.
 - `--items`: Optional comma-separated work item IDs associated with this case (used to focus section `work`).
-- `--sessions`: Optional comma-separated agent coordination session IDs.
+- `--sessions`: Optional comma-separated session or unit run IDs.
 - `close` captures the workspace HEAD commit at close (`headAtClose`) and calculates total duration.
 
 ### Step 5: Inspect Scorecard
@@ -86,7 +86,7 @@ When running side-by-side or comparative bake-offs between harnesses (e.g., `fgo
 | `runs.total` | Total number of execution runs triggered during the window. |
 | `runs.overall.ok` / `exec_failed` | Breakdown of run outcomes (successes vs execution failures vs verdict failures). |
 | `sessions.assignments_p50` / `p90` | Median and 90th percentile of task assignments per session. |
-| `sessions.duration_sec_p50` / `p90` | Median and 90th percentile duration of coordination sessions in seconds. |
+| `sessions.duration_sec_p50` / `p90` | Median and 90th percentile duration of unit runs / sessions in seconds. |
 | `tokens.total_tokens` | Total LLM tokens consumed (input + output + cache creation + cache read). |
 | `tokens.cache_read_input_tokens` | Prompt tokens serviced from prompt cache (vital for measuring cache efficiency). |
 | `commits.count` | Number of git commits made between `headAtOpen` and `headAtClose`. |

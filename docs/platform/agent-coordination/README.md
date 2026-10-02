@@ -19,10 +19,11 @@ Related:
 - docs/architect/agent-coordination/documentation-standardization-plan.md
 ```
 
+> **Ghi chú chuyển tiếp (2026-10-02):** Engine coordination và các khái niệm `CoordinationSession`/`CoordinationProtocol`/`FlowDefinition` đã được thu hồi ở P4 của track Request-to-Run (D-0050). Hệ thống đã chuyển sang mô hình gọn: **Unit run** qua **CollaborationPattern** (`solo`, `reviewed`, `panel` + preset) và **Workflow run** (`src/workflow/**`). Các tài liệu trong thư mục này lưu giữ thiết kế lịch sử của Step 00–09.
+
 This is the target platform portal for Agent Coordination. During migration,
 legacy docs under [docs/architect/agent-coordination/](../../architect/agent-coordination/)
 remain current unless a target document explicitly supersedes or redirects them.
-
 Agent Coordination is the domain-neutral foundation for governed, evidence-aware
 agent activity across agents, capabilities, providers, models, tiers, execution
 mechanisms, and optional Work integration.

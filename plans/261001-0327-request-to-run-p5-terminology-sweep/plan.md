@@ -1,7 +1,7 @@
 ---
 title: "P5 Quét thuật ngữ: một tên mỗi khái niệm trên toàn tài liệu"
 description: "Sau P4, code đã đổi tên; P5 quét docs/spec/doctrine còn dùng tên cũ (~800 lượt) và thêm guard chặn tái phát, cập nhật bản đồ component cuối."
-status: pending
+status: complete
 priority: P2
 effort: "~2–3d"
 tags: [docs, terminology, guard]
@@ -40,9 +40,9 @@ Ngoại lệ: tài liệu **lịch sử** (`docs/history/**`, "Lịch sử quy�
 
 ## Success Criteria
 
-- [ ] Guard chặn tên cũ ở code + docs (ngoài vùng lịch sử).
-- [ ] `docs/platform/component-boundary.md` phản ánh bản đồ cuối (L0–L7 sau track).
-- [ ] Merge `main`; cập nhật track `plan.md` (trạng thái P5 = done). **Không đóng track**: G7 (herdr làm transport mặc định) + posture read-only còn mở ở plan riêng (owner 2026-10-02); track đóng sau plan đó.
+- [x] Guard chặn tên cũ ở code + docs (ngoài vùng lịch sử).
+- [x] `docs/platform/component-boundary.md` phản ánh bản đồ cuối (L0–L7 sau track).
+- [x] Merge `main`; cập nhật track `plan.md` (trạng thái P5 = done). **Không đóng track**: G7 (herdr làm transport mặc định) + posture read-only còn mở ở plan riêng (owner 2026-10-02); track đóng sau plan đó.
 
 ## Risk Assessment
 

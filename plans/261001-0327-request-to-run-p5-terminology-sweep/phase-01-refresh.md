@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "Làm tươi"
-status: pending
+status: complete
 priority: P2
 effort: "0.5d"
 dependencies: []
@@ -31,7 +31,7 @@ dependencies: []
 
 ## Success Criteria
 
-- [ ] Bảng chia area đầy đủ; không gói nào chung file.
+- [x] Bảng chia area đầy đủ; không gói nào chung file.
 
 ## Risk Assessment
 
