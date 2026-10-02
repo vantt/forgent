@@ -36,3 +36,10 @@ test('claude-herdr reports the claude provider family, so a reviewer on glm-herd
   assert.equal(runner.executors['claude-herdr'].providerModel, 'claude');
   assert.notEqual(runner.executors['claude-herdr'].providerModel, runner.executors['glm-herdr'].providerModel);
 });
+
+test('a herdr round has an idle limit even when the runner config sets none, so a stalled agent is noticed', async () => {
+  const { groupDeadlines, DEFAULT_IDLE_TIMEOUT_MS } = await import('../../src/runner/dispatch/herdr-round.mjs');
+  assert.ok(DEFAULT_IDLE_TIMEOUT_MS > 0);
+  assert.equal(groupDeadlines({ timeoutMs: 1000 }).round.idleMs, DEFAULT_IDLE_TIMEOUT_MS);
+  assert.equal(groupDeadlines({ timeoutMs: 1000, idleTimeoutMs: 1500 }).round.idleMs, 1500, 'a configured value wins');
+});

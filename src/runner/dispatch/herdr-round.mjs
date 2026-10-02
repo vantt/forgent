@@ -386,6 +386,12 @@ const EXIT_DRAIN_MS = 10000;
 
 const sleep = (ms) => new Promise((resolve) => { setTimeout(resolve, ms); });
 
+/** How long a round may show no progress before the ladder looks at the screen. Without one the
+ * idle and usage-limit checks never run and a stalled agent holds its pane until the absolute
+ * timeout. Applies only when the runner config sets no `idleTimeoutMs` (which also governs cli-spawn,
+ * where silence is normal). Progress here is the agent working, an ack, or a new outbox file. */
+export const DEFAULT_IDLE_TIMEOUT_MS = 300000;
+
 /** A typed brief that is still sitting unsubmitted is nudged with Enter no more often
  * than this, and never more than `SUBMIT_MAX_ENTERS` times. */
 const SUBMIT_ENTER_EVERY_MS = 2500;
@@ -425,7 +431,7 @@ function lastScreenLine(text) {
  * the difference between a real decomposition and passing the whole context
  * to every function.
  */
-function groupDeadlines({ idleTimeoutMs, timeoutMs, transportDeadlines = {} }) {
+export function groupDeadlines({ idleTimeoutMs, timeoutMs, transportDeadlines = {} }) {
   const promptMs = transportDeadlines.promptTimeoutMs ?? PROMPT_TIMEOUT_MS;
   return {
     startup: { readyMs: transportDeadlines.readyTimeoutMs ?? READY_TIMEOUT_MS, promptMs },
@@ -435,7 +441,7 @@ function groupDeadlines({ idleTimeoutMs, timeoutMs, transportDeadlines = {} }) {
       resendAfterMs: transportDeadlines.resendAfterMs ?? promptMs,
       maxResends: transportDeadlines.maxResends ?? MAX_RESENDS,
     },
-    round: { idleMs: idleTimeoutMs, ceilingMs: timeoutMs },
+    round: { idleMs: idleTimeoutMs ?? DEFAULT_IDLE_TIMEOUT_MS, ceilingMs: timeoutMs },
   };
 }
 
