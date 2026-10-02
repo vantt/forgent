@@ -1,7 +1,7 @@
 ---
 phase: 5
 title: "Các dạng thảo luận còn lại = Workflow"
-status: pending
+status: done
 priority: P2
 effort: "2d"
 dependencies: [1]
@@ -35,7 +35,7 @@ Biểu diễn lại delphi (chain, feedback-lite), nominal group (chain, lite), 
 
 ## Success Criteria
 
-- [ ] 3 Workflow + conformance xanh; `fgos-panel` định tuyến mọi dạng không cần protocol id.
+- [x] 3 Workflow + conformance xanh; `fgos-panel` định tuyến mọi dạng không cần protocol id.
 
 ## Risk Assessment
 

@@ -1,0 +1,50 @@
+# core/workflows/nominal-group.yaml — Nominal Group Technique Workflow
+# Nominal Group Technique workflow with silent idea generation,
+# round-robin sharing & consolidation, voting & ranking, and final ranking synthesis.
+
+id: nominal-group
+title: Nominal Group Technique Workflow
+description: Nominal group deliberation with silent generation, round-robin sharing, voting/ranking, and final ranking synthesis.
+
+steps:
+  - id: silent-generation
+    title: Silent Idea Generation
+    units:
+      - id: generate-ideas
+        template:
+          capability: nominal-group:generate
+          pattern: panel
+          persona: panelist
+          objective: Silently generate independent ideas and options without cross-influence
+  - id: round-robin-sharing
+    title: Round-Robin Sharing
+    dependsOn: [silent-generation]
+    units:
+      - id: share-and-consolidate
+        template:
+          capability: nominal-group:share
+          pattern: solo
+          persona: synthesizer
+          objective: Pool, clarify, and deduplicate ideas from all participants into a consolidated list
+  - id: voting-ranking
+    title: Voting and Ranking
+    dependsOn: [round-robin-sharing]
+    gate:
+      kind: human
+      question: Review the consolidated ideas, cast votes, and provide priority rankings?
+    units:
+      - id: evaluate-votes
+        template:
+          capability: nominal-group:vote
+          pattern: solo
+          objective: Collect, evaluate, and tally votes and priority rankings for consolidated options
+  - id: final-ranking
+    title: Final Ranking
+    dependsOn: [voting-ranking]
+    units:
+      - id: synthesize-rankings
+        template:
+          capability: nominal-group:rank
+          pattern: solo
+          persona: synthesizer
+          objective: Synthesize final rankings, aggregate group preferences, and document final group outcome
