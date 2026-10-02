@@ -1,7 +1,7 @@
 ---
 title: "Track request-to-run: mô hình gọn từ yêu cầu tới lúc chạy (plan tổng)"
 description: "Umbrella cho 5 plan con P1–P5 + plan nền T. Giữ mục tiêu, tiêu chí, lộ trình, phụ thuộc, trạng thái; không chứa bước triển khai."
-status: pending
+status: done
 priority: P1
 effort: "~5–7 tuần (ước, theo tổng các plan con)"
 tags: [umbrella, dispatch, workflow, work, herdr, observe, simplification]
@@ -50,7 +50,7 @@ T Tier/rigor (agent khác) ──► P1 Lõi thực thi ──► P3a Workflow r
 | P3b | [p3 phase 3–6](../261001-0327-request-to-run-p3-workflow-separate-from-work/plan.md) | **xong** (2026-10-02) — L3: Work không còn `stage`; L5 hết import L3; marketing smoke; A4 đóng | P3a | **P2** |
 | P4 | [p4-discussion-patterns-engine-retirement](../261001-0327-request-to-run-p4-discussion-patterns-engine-retirement/plan.md) | **xong** (2026-10-02) — L4 không còn là runtime riêng; 12 dạng thảo luận là Workflow/preset; engine coordination thu hồi | P1 + P3 (P2 khuyến nghị) | — |
 | P5 | [p5-terminology-sweep](../261001-0327-request-to-run-p5-terminology-sweep/plan.md) | **xong** (2026-10-02) — ngang: một tên mỗi khái niệm; dead vocabulary guard mở rộng docs/skills | P4 | — |
-| P6 | [p6-herdr-posture-quota](../261002-1339-request-to-run-p6-herdr-posture-quota/plan.md) | **xong trên nhánh, chờ merge `main`** — L5: nối thật herdr transport (G7), posture một đường (X-1), fallback quota (X-3); nghiệm thu thật qua pane: [acceptance-herdr.md](../261002-1339-request-to-run-p6-herdr-posture-quota/reports/acceptance-herdr.md) (ca 1, 2, 3, 4, 6 Accepted; ca 5 NOT RUN) | vòng sửa (`9a2e4b0ba`) | — (∥ P5) |
+| P6 | [p6-herdr-posture-quota](../261002-1339-request-to-run-p6-herdr-posture-quota/plan.md) | **xong, đã merge `main` (`af019e638`)** — L5: nối thật herdr transport (G7), posture một đường (X-1), fallback quota (X-3); nghiệm thu thật qua pane: [acceptance-herdr.md](../261002-1339-request-to-run-p6-herdr-posture-quota/reports/acceptance-herdr.md) (ca 1, 2, 3, 4, 6 Accepted; ca 5 NOT RUN) | vòng sửa (`9a2e4b0ba`) | — (∥ P5) |
 
 **P2 ∥ P3b — sở hữu file:** P2: `src/report/capability-plan-lint.mjs`, `src/runner/capability-match.mjs` (xoá), `core/skills/_shared/capability-*.md`, `core/skills/fgos-capability-dispatching/`, `core/skills/fgos-plan-loop/`, `domains/coding/skills/fgos-code-change/`, `fgos-code-panel/`, `core/skills/fgos-run/` (mới), mục `plan-lint`/`capability` trong `bin/fgos.mjs` + `src/cli/command-registry.mjs`, 2 dòng gọi `capability match` trong `core/skills/fgos-panel/SKILL.md` và `fgos-architecture-panel/SKILL.md`. P3b: `src/state/**`, `src/verbs/state/**`, `src/intake/**`, `src/runner/loop.mjs`, `src/runner/dispatch/{operation-choice,cli,assignment,assignment-runner,config}.mjs` (chỉ phần L3 + `dispatch-runs`), skill/verb theo stage, `packages/work-state/rust`, `herdr-plugin` phần stage. File chung bắt buộc (`bin/fgos.mjs`, `src/cli/command-registry.mjs`, `src/setup/registrations.mjs`): mỗi bên chỉ sửa **mục của mình**, merge vào `main` theo thứ tự xong trước, bên sau rebase. **Cây skill sinh ra** (`.agents/skills/**`, `plugins/fgOS/skills/**`): **không commit trong nhánh phase**; tái sinh một lần (`npm run build:skills`) khi merge plan con vào `main`.
 
@@ -178,4 +178,4 @@ P1–P5 xong và merge `main`. P6 xong trên nhánh `plan/261002-request-to-run-
 - Fallback quota mới chứng minh bằng màn hình limit **giả**; `DEFAULT_USAGE_LIMIT_PATTERNS` chưa đo trên màn hình limit thật; cli-spawn không có phát hiện limit.
 - Inventory account provider (`runner.providers.<provider>.accounts`) chỉ ở `~/.fgos/config.json` toàn máy: mỗi máy cần tự khai; `fgos setup` không tạo, `fgos doctor` (`confined-pane-accounts`) chỉ ra pane thiếu.
 
-**Sẵn sàng đóng khi P6 merge `main`** — controller lật `status: done` ở frontmatter sau merge (chưa lật ở đây).
+**Đã đóng (P6 merge `main` `af019e638`, 2026-10-02).**

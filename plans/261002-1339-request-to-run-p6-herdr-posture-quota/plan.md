@@ -1,7 +1,7 @@
 ---
 title: "P6 Nối thật: herdr làm transport mặc định, posture read-only, fallback quota"
 description: "Đóng phần P1 còn dở sau vòng sửa: bind().transport, resolvePosture, nextCandidate đều đã có nhưng không ai gọi. Nối vào đường chạy thật, một đường confinement duy nhất, rồi nghiệm thu bằng lần chạy thật qua pane herdr."
-status: in-progress
+status: complete
 priority: P1
 effort: "~5–6d"
 tags: [herdr, transport, posture, confinement, quota, acceptance]
@@ -65,7 +65,7 @@ Sóng B: 2 ∥ 3 (khác file). Phase 4 sau 2 vì posture phải áp **trong** pa
 - [x] `provider-limit` -> `nextCandidate` -> candidate kế (pane mới, pane cũ giữ) — test qua `runUnit` + lần chạy thật ca 4 **bằng màn hình limit giả**; màn hình limit thật chưa đo.
 - [x] Capability workflow có trong `fgos setup` + doctor (`workflow-capabilities-configured`; phủ cả 27 capability của mọi Workflow đã ship, không chỉ 13); `.fgos/config.json` commit khớp; synthesizer khác họ provider với panelist; worktree Unit được dọn khi Workflow run kết thúc.
 - [x] Chạy lại qua pane herdr: Unit `reviewed` (ca 1) và Workflow `architecture-advisory` (ca 3). So cùng câu hỏi với engine cũ = **NOT RUN** (ca 5; lý do ở [acceptance-herdr.md](./reports/acceptance-herdr.md)) — phương án "ghi NOT RUN + lý do" của tiêu chí, không phải đã so.
-- [ ] Full `npm test` (Node + Rust) xanh trên nhánh (báo cáo nghiệm thu: lần chạy cuối 6550 test, 0 fail) **và** merge `main` — chờ controller merge. Track đóng sau đó.
+- [x] Full `npm test` xanh trên nhánh (6551 test; 1 lỗi guard trích dẫn ADR trong `runner.md` đã sửa, guard chạy lại 31/31) và merge `main` (`af019e638`). Track đóng.
 
 ## Báo cáo
 

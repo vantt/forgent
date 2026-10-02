@@ -1,7 +1,7 @@
 ---
 phase: 6
 title: "Docs + boundary + đóng track"
-status: in-progress
+status: complete
 priority: P2
 effort: "0.5d"
 dependencies: [5]
