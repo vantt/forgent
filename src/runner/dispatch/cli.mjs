@@ -344,6 +344,9 @@ export async function executeExecutorCli(
     // the confined driver copies into the worker's private home; without it a
     // confined pane starts without the account's login.
     providerCapacity,
+    // The dispatch cannot write the workspace (a read-only posture), so it shares the directory with
+    // other dispatches instead of holding it exclusively.
+    sharedCwd = false,
   } = {},
 ) {
   const purpose = purposeArg;
@@ -598,9 +601,12 @@ export async function executeExecutorCli(
   const idleTimeoutMs = idleTimeoutOverride ?? cfg.idleTimeoutMs;
   const maxBuffer = maxBufferOverride ?? 10 * 1024 * 1024;
 
+  // One dispatch at a time per working directory, because two writers in one tree race. A caller that
+  // knows the dispatch cannot write the workspace (a read-only posture) shares the directory instead:
+  // the panelists of one panel run side by side in the same checkout.
   const identity = `${process.pid}:${Date.now()}:${Math.random().toString(36).slice(2)}`;
   const lockFile = dispatchLockFile(cwd);
-  const lockRes = acquireMainCheckoutLock(fgosDir, {
+  const lockRes = sharedCwd ? null : acquireMainCheckoutLock(fgosDir, {
     identity,
     ttlMs: timeoutMs,
     now: Date.now(),
@@ -608,7 +614,7 @@ export async function executeExecutorCli(
     lockFile,
   });
 
-  if (lockRes.status === HELD) {
+  if (lockRes?.status === HELD) {
     const ageStr = formatLockDurationMs(lockRes.lockAgeMs);
     throw new DispatchError(
       'dispatch-in-flight',
@@ -616,14 +622,14 @@ export async function executeExecutorCli(
       { cwd, lockAgeMs: lockRes.lockAgeMs, remainingTtlMs: lockRes.remainingTtlMs, holderPid: lockRes.holderPid },
     );
   }
-  if (lockRes.status === AMBIGUOUS) {
+  if (lockRes?.status === AMBIGUOUS) {
     throw new DispatchError(
       'dispatch-in-flight',
       `dispatch lock for cwd "${cwd}" is ambiguous (corrupt or unparseable lock file).`,
       { cwd, lockAgeMs: lockRes.lockAgeMs },
     );
   }
-  if (lockRes.status !== ACQUIRED) {
+  if (lockRes && lockRes.status !== ACQUIRED) {
     throw new DispatchError(
       'dispatch-in-flight',
       `dispatch lock for cwd "${cwd}" could not be acquired (status: ${lockRes.status}).`,
@@ -642,10 +648,12 @@ export async function executeExecutorCli(
   // no longer owns the lock, so it is safe to call on every tick regardless
   // of how the run ends.
   const heartbeatIntervalMs = Math.max(250, Math.floor(timeoutMs / 3));
-  const heartbeat = setInterval(() => {
-    renewMainCheckoutLockIfOwn(fgosDir, identity, { lockFile });
-  }, heartbeatIntervalMs);
-  heartbeat.unref();
+  const heartbeat = lockRes
+    ? setInterval(() => {
+      renewMainCheckoutLockIfOwn(fgosDir, identity, { lockFile });
+    }, heartbeatIntervalMs)
+    : null;
+  heartbeat?.unref();
 
   try {
     process.stderr.write(
@@ -785,8 +793,8 @@ export async function executeExecutorCli(
     const base = buildDispatchResult({ mechanism, result: resultToBuild, headBefore, headAfter, lostUncommittedPaths, provider, command });
     return resolvedByPurpose ? { ...base, executorId } : base;
   } finally {
-    clearInterval(heartbeat);
-    lockRes.release();
+    if (heartbeat) clearInterval(heartbeat);
+    lockRes?.release();
   }
 
 }

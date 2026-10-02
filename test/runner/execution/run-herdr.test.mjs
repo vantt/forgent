@@ -12,6 +12,7 @@ import { execFileSync } from 'node:child_process';
 
 import { runUnit } from '../../../src/runner/execution/run.mjs';
 import { withRunDirReadAccess } from '../../../src/runner/dispatch/cli.mjs';
+import { acquireMainCheckoutLock, dispatchLockFile, ACQUIRED } from '../../../src/runner/main-checkout-lock.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
 import { createFakeHerdr, SANDBOXED_AGENT_SOURCE } from '../../helpers/fake-herdr-pane.mjs';
 
@@ -358,6 +359,40 @@ test('a codex-style pane trusts its workspace in the private home and leaves the
   const probe = readJson(path.join(runDirOf(repoRoot, res.unitRunId, 'producer', 1), 'outbox', 'probe-results.json'));
   assert.match(probe.account.contents['config.toml'], new RegExp(`\\[projects\\."${worktreeDir.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"\\]`), 'the private config trusts the workspace the agent starts in');
   assert.equal(fs.readFileSync(path.join(accountDir, 'config.toml'), 'utf8'), realConfig, 'the real account config is not edited');
+});
+
+test('a read-only pane shares its checkout with another dispatch in flight; a writing one is still refused', { skip: SKIP }, async () => {
+  const { repoRoot, worktreeDir, signalDir } = setup(['alpha']);
+  // Another dispatch (a sibling panelist, say) holds this checkout right now.
+  const held = acquireMainCheckoutLock(path.join(repoRoot, '.fgos'), {
+    identity: `${process.pid}:test-holder`,
+    ttlMs: 600000,
+    lockFile: dispatchLockFile(path.resolve(worktreeDir)),
+  });
+  assert.equal(held.status, ACQUIRED);
+  try {
+    const fake = useFakeHerdr({ signalDir, panes: [{ awaitProbe: true }, { awaitProbe: true }] });
+    const readOnly = await withHerdrBin(fake.herdrBin, () => runUnit({
+      unitData: readOnlyUnit('u-shared-ro'),
+      repoRoot,
+      cwd: worktreeDir,
+      worktree: worktreeDir,
+      session: { herdrPresent: true, headless: true },
+    }));
+    assert.equal(readOnly.outcome, 'pass', JSON.stringify(readOnly.results[0]).slice(0, 1500));
+
+    const writing = await withHerdrBin(fake.herdrBin, () => runUnit({
+      unitData: { id: 'u-shared-rw', objective: 'Write docs', capability: 'docs:write', writes: ['probe-worktree.txt'], pattern: 'solo' },
+      repoRoot,
+      cwd: worktreeDir,
+      worktree: worktreeDir,
+      session: { herdrPresent: true, headless: true },
+    }));
+    assert.notEqual(writing.outcome, 'pass', 'a writer must not share the checkout with a dispatch in flight');
+    assert.match(JSON.stringify(writing.results[0]), /already in flight/);
+  } finally {
+    held.release();
+  }
 });
 
 test('headless (no herdr) runs cli-spawn with the same posture and never touches herdr', { skip: SKIP }, async () => {

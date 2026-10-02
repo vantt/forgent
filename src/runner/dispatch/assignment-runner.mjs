@@ -2583,6 +2583,9 @@ export async function executeAssignment(assignment, opts = {}) {
           // null here and this call is byte-identical to before this fix.
           ...(needsAssignmentLaunchContext ? { assignmentLaunchContext, launchCommandId, controlEpoch, controlToken } : {}),
           ...(providerCapacitySelection ? { providerCapacity: providerCapacitySelection } : {}),
+          // Read-only Assignments never take the per-cwd lock on the supervisor path above; the
+          // herdr door holds its own, so it is told the same thing or a panel's panelists collide.
+          ...(effectiveMutation !== 'mutating' ? { sharedCwd: true } : {}),
           // The one confinement path: the posture an Assignment was bound with decides
           // what wraps the agent in its pane, exactly as it does for cli-spawn.
           ...(postureBinding?.posture
