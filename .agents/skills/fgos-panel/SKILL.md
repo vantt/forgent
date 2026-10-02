@@ -18,8 +18,7 @@ description: >-
 The natural-language entrypoint for group thinking. The person names the
 question and desired thinking shape; this skill selects a use-case preset and
 routes it to the corresponding named Workflow (`core/workflows/*.yaml`) or
-CollaborationPattern preset (`src/runner/execution/patterns/presets.mjs`) rather
-than coordination protocol IDs.
+CollaborationPattern preset (`src/runner/execution/patterns/presets.mjs`).
 This skill builds on the shared **Generic Driver Discipline**:
 [`../_shared/coordination-driver.md`](../_shared/coordination-driver.md) defines
 the domain-neutral cycle (`observe -> choose legal action -> dispatch -> verify
@@ -100,13 +99,13 @@ the person wants advice only or an actual code change.
 
 ## Boundaries
 
-- This is selection and request filling, not a protocol resolver or execution
-  engine. Pack membership and FlowDefinition validation remain authoritative.
-- Never invent protocol semantics, actors, transitions, visibility, grants,
+- This is selection and request filling, not an execution engine. Workflow and
+  CollaborationPattern definitions remain authoritative.
+- Never invent workflow semantics, actors, transitions, visibility, grants,
   reopen, aggregation, quorum, or close rules in task prose.
 - Never pin a provider, model, executor, or tier. Dispatch resolves the
   existing `advise` or coding capability through the Dispatch Control Plane.
 - Never turn a coding advisory panel into a parallel implementation executor.
-- Never claim that a ranking protocol selected a winner or that mediated
+- Never claim that a ranking workflow selected a winner or that mediated
   feedback guarantees anonymity or consensus; report only artifacts the real
   session produced.
