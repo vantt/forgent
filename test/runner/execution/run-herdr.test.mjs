@@ -443,3 +443,21 @@ test('withRunDirReadAccess adds the run directory for a herdr claude invocation 
   assert.equal(withRunDirReadAccess({ ...claude, runDir: undefined }), base);
   assert.deepEqual(base, ['--model', 'sonnet'], 'the configured args are not mutated');
 });
+
+test('the brief a reviewer reads in a pane says its claim needs assessment.verdict; the producer\'s does not', { skip: SKIP }, async () => {
+  const { repoRoot, worktreeDir, signalDir } = setup(['alpha', 'beta']);
+  const fake = useFakeHerdr({ signalDir, panes: [{ awaitProbe: true }, { awaitProbe: true }] });
+  const res = await withHerdrBin(fake.herdrBin, () => runUnit({
+    unitData: { id: 'u-brief-verdict', objective: 'Write docs', capability: 'docs:write', writes: ['probe-worktree.txt'], pattern: 'reviewed' },
+    repoRoot,
+    cwd: worktreeDir,
+    worktree: worktreeDir,
+    pattern: 'reviewed',
+    session: { herdrPresent: true, headless: true },
+  }));
+  assert.equal(res.outcome, 'pass', JSON.stringify(res.results[0]).slice(0, 1500));
+  const producerBrief = fs.readFileSync(path.join(runDirOf(repoRoot, res.unitRunId, 'producer', 1), 'brief-1.md'), 'utf8');
+  const reviewerBrief = fs.readFileSync(path.join(runDirOf(repoRoot, res.unitRunId, 'reviewer', 1), 'brief-1.md'), 'utf8');
+  assert.match(reviewerBrief, /"assessment\.verdict" is required for this assessment role/);
+  assert.doesNotMatch(producerBrief, /assessment\.verdict/);
+});

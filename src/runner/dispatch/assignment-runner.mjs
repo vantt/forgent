@@ -2562,7 +2562,11 @@ export async function executeAssignment(assignment, opts = {}) {
           agentType: opts.agentType,
           runDir: path.resolve(runDir),
           dispatchBatchKey: opts.dispatchBatchKey,
-          effectiveContract,
+          // The persisted contract does not name the role; the brief a pane worker reads has to
+          // (an assessment role must be told its claim needs assessment.verdict).
+          effectiveContract: effectiveContract
+            ? { ...effectiveContract, assignment: { role: effectiveAssignment.role, operation: effectiveAssignment.operation } }
+            : effectiveContract,
           // needsAssignmentLaunchContext (herdr-spawn, and any other
           // out-of-process adapter besides cli-spawn) reuses the SAME
           // assignmentLaunchContext identity built above -- executeExecutorCli
