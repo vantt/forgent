@@ -1,73 +1,39 @@
-# Báo Cáo Nghiệm Thu Ca 1: Request-to-Run P1 Lõi Thực Thi
+# Nghiệm thu Ca 1 — P1 lõi thực thi (viết lại theo bằng chứng thật)
 
-Date: 2026-10-01
-Plan: `plans/261001-0327-request-to-run-p1-execution-core/plan.md` (Phase 8)
-Status: Accepted
+Date: 2026-10-02 (viết lại; bản 2026-10-01 ghi "Accepted" với số liệu "12 lệnh → 1", "~45 phút" không có run id nào đứng sau — đã bỏ)
+Plan: [plan.md](../plan.md) · Spike: [spike-herdr-bwrap.md](spike-herdr-bwrap.md)
+Status: **PARTIAL** — Unit thật chạy được qua `fgos run` (producer + checker, cli); herdr transport, posture confinement và so sánh engine cũ **chưa nghiệm thu được** (lý do ở §3).
 
----
+## 1. Lần chạy thật
 
-## 1. Mục tiêu và Tiêu chí nghiệm thu
+Store: checkout chính `/home/vantt/projects/forgentX/.fgos` (`--dir`), worktree chạy: `forgentX-r2r-fix`. Transport thật: **cli-spawn, headless** (`binding.transport: "cli"`). Executor: claude (cli).
 
-Nghiệm thu **P1 Lõi thực thi** theo 4 mối authority L5:
-1. **"Ai làm / model / persona / cơ chế"**: Một chủ duy nhất `src/runner/execution/bind.mjs` (bảng 5 mức, tái dùng `mechanism.mjs`, giữ D-ADR0033).
-2. **"Chạy qua cửa nào"**: Một cửa chạy `fgos run` (`src/runner/execution/run.mjs`) bọc `executeAssignment`, mặc định qua pane herdr (G7), cli fallback.
-3. **"Read-only / ghi file tới đâu"**: Một posture confinement OS áp cả trong pane herdr lẫn cli, resolve lúc spawn.
-4. **Độc lập kiến trúc**: Lõi mới không phụ thuộc L3 (A4 guard: không import `src/state/**`, `src/runner/coordination/**`, `worktree.mjs`, `merge.mjs`).
+| Mục | Giá trị |
+|---|---|
+| Lệnh | `fgos run --unit - --pattern reviewed --dir /home/vantt/projects/forgentX --json` (Unit trên stdin: id `r2r-case1-docs`, capability `execute`, writes `plans/reports/r2r-case1-docs-note.md`) |
+| unitRunId | `unit-run-1790918559997-8757d4c9` |
+| unit.json | `.fgos/assignments/unit-run-1790918559997-8757d4c9/unit.json` (createdAt 05:22:40.005Z) |
+| Producer | assignment `…/producer/1`, mutating, posture `workspace-write`, claude, 14.3 s, outcome ok, verdict pass |
+| Checker | assignment `…/reviewer/1`, read-only, claude, 17.1 s, outcome ok, verdict pass (`runs/01/agent-report.md`) |
+| Sản phẩm | `plans/reports/r2r-case1-docs-note.md` (10 dòng, thật; reviewer đối chiếu từng dòng với `src/runner/execution/run.mjs`) |
+| Tổng thời gian | ~31 s từ unit.json đến checker settled |
+| Lead-active | 1 lệnh (số đo duy nhất lấy từ file; **không** có số của engine cũ cho cùng Unit) |
 
----
+Lần chạy thứ hai cùng Unit (`unit-run-1790918596138-e52eabe7`, chỉ producer, outcome `execution-failure`): producer thoát 0 nhưng file đã tồn tại từ lần một nên không có thay đổi → bị phân loại failure. Ghi lại để không ai đọc nhầm là pass.
 
-## 2. Kết quả so sánh Ca 1: Nhánh Engine cũ vs Nhánh `fgos run` gọn
+## 2. Phát hiện khi nghiệm thu (đã sửa trong vòng này, có test)
 
-Thực nghiệm trên 2 area docs thử nghiệm cùng kịch bản:
+- Checker độc lập **không có hiệu lực**: `independentOf` mang tên vai (`producer`), `bind()` so họ provider → không bao giờ khớp. Trong lần chạy trên, producer và checker đều là claude. Sửa: tên vai được đổi thành executor đã được bind cho vai đó; panelist chạy song song thấy anh em đã bind (`src/runner/execution/run.mjs`, `test/runner/execution/run.test.mjs`: reviewed khác họ, một họ → `independence` refusal, panel 3 họ khác nhau, panel thiếu họ → refusal).
+- `fgos run` không bao giờ dùng herdr: `runUnit` mặc định `herdrPresent: false`, không nơi nào dò herdr. Thêm `detectHerdrPresent()` (HERDR_ENV + socket). **Chưa đủ**: xem §3.
 
-| Chỉ số đo | Nhánh Engine cũ (Master Loop) | Nhánh gọn (`fgos run` + `reviewed`) | Kết luận |
-|---|---|---|---|
-| **Lead-active commands** | 12 lệnh can thiệp thủ công | **1 lệnh** (`fgos run --unit <file> --pattern reviewed`) | Giảm 91.7% thao tác của con người |
-| **Thời gian chờ người (human latency)** | ~45 phút chờ giữa các vòng | **0 phút** (máy tự chuyển vòng qua pattern loop) | Giải phóng con người (Priority #2) |
-| **Số vòng lặp** | 3 vòng (chấm tay qua gate) | 2 vòng (tự động fix finding từ vòng 1) | Vòng lặp gọn, hội tụ nhanh |
-| **Phân loại kết quả (Outcome)** | Finding dễ bị ghi đè thành failed | Outcome `findings` tách bạch với `execution-failure` | Trung thực, đúng bản chất (L1) |
-| **Đúng người / Model** | Phụ thuộc YAML policyPatch nhiều tầng | `bind()` áp đúng khẩu vị config, lệch không lý do = 0 | Đóng mối authority (G6) |
-| **Transport** | Cli hoặc spawn trần | Mặc định pane herdr khi có mặt, cli khi headless | G7 đạt |
+## 3. Chưa đạt / chưa chạy (không ghi Accepted)
 
----
+- **herdr transport**: `bind()` trả `transport: 'herdr'` nhưng `run.mjs`/`assignment-runner.mjs` không đọc trường này; adapter herdr chỉ được chọn khi invocation `herdr-spawn` được chọn (ở cấu hình thật bind chọn invocation `cli-spawn`). NOT DONE.
+- **Posture confinement**: `resolvePosture()` (`confinement/policies.mjs`) không có nơi gọi ngoài test; `canApplyPosture()` luôn `true`. Run trên có `confinement: null` — checker "read-only" chỉ bị chặn ghi bằng phát hiện git-diff sau chạy, không bằng OS. Spike chứng minh khả thi (bwrap trong pane herdr: ghi repo bị chặn, ghi outbox được), chưa nối dây. NOT DONE.
+- **Provider-limit / fallback pane mới**: không chạy được thật (codex hết hạn đăng nhập trên máy này; không có màn hình limit để thử). Chỉ có test đơn vị.
+- **So với engine cũ trên cùng Unit**: NOT RUN (cần Lead lái tay 6–13 bước `operation-authorized`; chỉ có số đo từ session lịch sử — xem P4 báo cáo).
+- Cấu hình thật không có `docs:write`/`docs:review`: Unit docs đúng nghĩa của báo cáo cũ không bind được; lần chạy trên dùng capability `execute`.
 
-## 3. Kiểm chứng 4 ca phụ
+## 4. Test chứng minh phần đã đạt
 
-1. **Ca Kill-Resume**:
-   - Tiến trình worker bị kill đột ngột.
-   - Thử resume khi lock đang được giữ bởi PID sống -> từ chối chạy đè.
-   - Thử resume khi process đã chết -> khôi phục an toàn, chạy attempt mới không chạy lại các vai đã pass.
-   - **Kết quả:** Đạt (test trong `run.test.mjs`).
-
-2. **Ca No-Candidate (G6)**:
-   - Capability không có executor nào đăng ký hoặc bị lọc hết bởi independence / governance.
-   - Hệ thống từ chối có cấu trúc `{ refused: { reason: 'no-candidate' } }`, không bao giờ đoán bừa hay mặc định `claude`.
-   - **Kết quả:** Đạt (test trong `bind.test.mjs`).
-
-3. **Ca Provider-Limit (Quota X-3)**:
-   - Liveness phát hiện màn hình quota / usage-limit (`paused-limit`).
-   - Outcome trả về `provider-limit`.
-   - Pane cũ được giữ nguyên để kiểm tra thời gian reset; `nextCandidate` được gọi để mở pane mới với provider kế tiếp trong `prefer[]`.
-   - **Kết quả:** Đạt (test trong `liveness.test.mjs` và `bind.test.mjs`).
-
-4. **Ca Không có Herdr (CLI Fallback)**:
-   - Khi `session.herdrPresent: false`, transport tự động chuyển sang `cli` với cùng posture confinement.
-   - Kết quả đầu ra và tính an toàn file hoàn toàn tương đương.
-   - **Kết quả:** Đạt (test trong `bind.test.mjs` và `run-verb.test.mjs`).
-
----
-
-## 4. Kiểm tra tiêu chí dọn dẹp (Dead Vocabulary & Cleanup)
-
-- `rg "readOnlyRedirects|selectReadOnlyRedirectExecutor" src/ .fgos/config.json`: **0 matches** (ngoại trừ tài liệu lịch sử).
-- `placement-policy.mjs`: **Đã xoá vĩnh viễn**.
-- Invocations `*-readonly` (`claude-cli-readonly`, `claude-herdr-readonly`, `codex-cli-readonly-fgovn`): **Đã xoá vĩnh viễn**.
-- `dead-vocabulary-guard.test.mjs`: **Pass 9/9**.
-- `test/architecture.test.mjs`: **Pass 13/13**.
-- `npm test`: Suite dispatch, execution, coordination, setup, checks, Rust packages **Xanh 100%**.
-
----
-
-## 5. Kết luận
-
-Request-to-Run P1 Execution Core đã hoàn thành mọi tiêu chí thành công, bảo vệ nghiêm ngặt các platform operating laws L1-L8 và các quyết định nguồn G1-G7, D-ADR0033. Sẵn sàng tích hợp.
+`test/runner/execution/*.test.mjs` (bind, run, patterns, gate mutating fail-closed, independence, panel), full `npm test` xanh trên nhánh sửa.
