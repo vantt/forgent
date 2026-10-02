@@ -337,3 +337,72 @@ test('persona rendering: renders persona body from core/agents/<persona>.yaml in
   assert.ok(prompt.includes('can_decide') || prompt.includes('Can decide:'));
   assert.ok(prompt.includes('must_escalate') || prompt.includes('Must escalate:'));
 });
+
+// ── Gate branches that sit behind the worktree check ──────────────────────────
+
+async function mutatingGateFixture({ writeUnitJson = true, corrupt = false } = {}) {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  const { executeAssignment } = await import('../../../src/runner/dispatch/assignment-runner.mjs');
+  const unitRunId = 'unit-run-gate-' + Math.random().toString(36).slice(2, 8);
+  const unitDir = path.join(repoRoot, '.fgos', 'assignments', unitRunId);
+  fs.mkdirSync(unitDir, { recursive: true });
+  const record = {
+    unit: { id: 'u-gate', objective: 'Gate probe', capability: 'docs:write', writes: ['file.txt'] },
+    overrides: [],
+    configSnapshot: snapshotRunnerConfig(repoRoot),
+    worktree: fs.realpathSync(worktreeDir),
+  };
+  if (writeUnitJson) {
+    fs.writeFileSync(path.join(unitDir, 'unit.json'), corrupt ? '{not json' : JSON.stringify(record, null, 2));
+  }
+  const baseAssignment = {
+    assignmentId: `${unitRunId}/producer/1`,
+    unitRunId,
+    role: 'producer',
+    round: 1,
+    mutation: 'mutating',
+    provenance: { kind: 'unit-run', unitRunId, role: 'producer', round: 1 },
+    expectedOutputs: [],
+    contextRefs: [],
+    writes: ['file.txt'],
+  };
+  const run = (assignment) => executeAssignment(assignment, { cwd: worktreeDir, repoRoot, isReadOnlyMode: false });
+  return { baseAssignment, run, record };
+}
+
+test('mutating gate: refuses a unit-run assignment whose unit.json is missing', async () => {
+  const { baseAssignment, run } = await mutatingGateFixture({ writeUnitJson: false });
+  await assert.rejects(() => run(baseAssignment), /refers to missing unit\.json/);
+});
+
+test('mutating gate: refuses a unit-run assignment whose unit.json is corrupt', async () => {
+  const { baseAssignment, run } = await mutatingGateFixture({ corrupt: true });
+  await assert.rejects(() => run(baseAssignment), /has corrupt unit\.json/);
+});
+
+test('mutating gate: refuses a unit-run assignment that carries no binding', async () => {
+  const { baseAssignment, run } = await mutatingGateFixture();
+  await assert.rejects(() => run(baseAssignment), /carries no binding/);
+});
+
+test('mutating gate: refuses a binding that differs from the one bind() recomputes', async () => {
+  const { baseAssignment, run } = await mutatingGateFixture();
+  const forged = { ...baseAssignment, binding: { executor: 'some-other-executor', tier: 'standard', posture: 'write' } };
+  await assert.rejects(() => run(forged), /binding mismatch/);
+});
+
+test('mutating gate: refuses an assignment that pins an executor other than the verified binding', async () => {
+  const { baseAssignment, run, record } = await mutatingGateFixture();
+  const { bind } = await import('../../../src/runner/execution/bind.mjs');
+  const verified = bind(
+    { unit: record.unit, role: 'producer', readOnly: false, overrides: [] },
+    { runnerConfig: record.configSnapshot.runner, session: {} },
+  );
+  assert.ok(verified.executor, 'fixture must produce a real binding');
+  const pinned = {
+    ...baseAssignment,
+    binding: { executor: verified.executor, tier: verified.tier, posture: verified.posture },
+    policy: { preferExecutor: 'rogue-executor' },
+  };
+  await assert.rejects(() => run(pinned), /pins executor "rogue-executor"/);
+});

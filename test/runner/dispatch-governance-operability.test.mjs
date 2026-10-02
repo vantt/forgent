@@ -112,7 +112,7 @@ test('governance-blocked versus unregistered result shape across public CLI and 
 
 // ─── 2. Cross-Provider Refusal Before Spawn ───────────────────────────────────
 
-test('cross-provider redirect without explicit opt-in fails closed BEFORE worker spawn', async () => {
+test('cross-provider executor without explicit opt-in fails closed BEFORE worker spawn', async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-probe-xprovider-'));
   const workerScript = path.join(tmp, 'worker.mjs');
   const capturePath = path.join(tmp, 'spawn-marker.txt');
@@ -123,15 +123,6 @@ test('cross-provider redirect without explicit opt-in fails closed BEFORE worker
   );
 
   const runnerConfig = {
-    placementPolicy: {
-      readOnlyRedirects: {
-        claude: {
-          operations: {
-            'shape-plan': ['codex-bwrap'], // No crossProvider: true!
-          },
-        },
-      },
-    },
     executors: {
       claude: {
         command: process.execPath,
@@ -143,33 +134,38 @@ test('cross-provider redirect without explicit opt-in fails closed BEFORE worker
         command: process.execPath,
         args: [workerScript],
         providerModel: 'openai-codex',
-        allowCrossProvider: true,
+        // No allowCrossProvider: prompt content would leave the Claude ecosystem.
       },
     },
-    modelPolicies: { claude: { standard: 'test-model' } },
+    modelPolicies: { claude: { standard: 'test-model' }, 'openai-codex': { standard: 'test-model' } },
     rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
   };
 
   const work = { id: 'tsk-xprovider-probe', status: 'todo', stage: 'planning', domain: 'coding' };
-  const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan' });
+  const assignment = buildAssignment({
+    work,
+    stage: 'planning',
+    operation: 'shape-plan',
+    policy: { preferExecutor: 'codex-bwrap' },
+  });
 
   await assert.rejects(
     executeAssignment(assignment, { cwd: tmp, repoRoot: tmp, runnerConfig }),
     (err) => {
       assert.ok(err instanceof RunnerConfigError);
-      assert.equal(err.code, 'redirect.cross-provider-not-permitted');
-      assert.match(err.message, /crosses provider family without explicit opt-in/);
+      assert.match(err.message, /cross-provider egress target/);
+      assert.match(err.message, /allowCrossProvider/);
       return true;
     },
   );
 
-  assert.equal(fs.existsSync(capturePath), false, 'worker process must NEVER be spawned when redirect is refused');
+  assert.equal(fs.existsSync(capturePath), false, 'worker process must NEVER be spawned when the executor is refused');
   fs.rmSync(tmp, { recursive: true, force: true });
 });
 
-// ─── 3. Approved Redirect Provenance ───────────────────────────────────────────
+// ─── 3. Approved cross-provider executor records its provenance ────────────────
 
-test('approved redirect records full immutable provenance in dispatch-plan.json', async () => {
+test('an opted-in cross-provider executor runs and records executor + provider in dispatch-plan.json', async () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-probe-provenance-'));
   const workerScript = path.join(tmp, 'worker.mjs');
 
@@ -194,15 +190,6 @@ test('approved redirect records full immutable provenance in dispatch-plan.json'
   );
 
   const runnerConfig = {
-    placementPolicy: {
-      readOnlyRedirects: {
-        claude: {
-          operations: {
-            'shape-plan': [{ executor: 'codex-bwrap', crossProvider: true }],
-          },
-        },
-      },
-    },
     executors: {
       claude: {
         command: process.execPath,
@@ -225,7 +212,12 @@ test('approved redirect records full immutable provenance in dispatch-plan.json'
   };
 
   const work = { id: 'tsk-provenance-probe', status: 'todo', stage: 'planning', domain: 'coding' };
-  const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan' });
+  const assignment = buildAssignment({
+    work,
+    stage: 'planning',
+    operation: 'shape-plan',
+    policy: { preferExecutor: 'codex-bwrap' },
+  });
 
   const result = await executeAssignment(assignment, { cwd: tmp, repoRoot: tmp, runnerConfig });
   assert.equal(result.status, 'done');
@@ -235,12 +227,8 @@ test('approved redirect records full immutable provenance in dispatch-plan.json'
   assert.ok(fs.existsSync(planPath), 'dispatch-plan.json must be persisted');
 
   const plan = JSON.parse(fs.readFileSync(planPath, 'utf8'));
-  assert.ok(plan.redirectDecision, 'redirectDecision must be present in dispatch plan');
-  assert.equal(plan.redirectDecision.sourceExecutorId, 'claude');
-  assert.equal(plan.redirectDecision.sourceProvider, 'claude');
-  assert.equal(plan.redirectDecision.chosen, 'codex-bwrap');
-  assert.equal(plan.redirectDecision.selectedProvider, 'openai-codex');
-  assert.equal(plan.redirectDecision.crossProvider, true);
+  assert.equal(plan.executorId, 'codex-bwrap');
+  assert.equal(plan.redirectDecision, undefined, 'the read-only redirect mechanism is retired');
 
   fs.rmSync(tmp, { recursive: true, force: true });
 });

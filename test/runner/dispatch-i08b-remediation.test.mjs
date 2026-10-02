@@ -76,9 +76,9 @@ test('F4: explicit unregistered executor fails closed across public CLI, compat 
   );
 });
 
-// ─── 2. F5: Declared Vendor Precedence Over CLI Harness in Redirects ──────────
+// ─── 2. F5: Declared Vendor Precedence Over CLI Harness ──────────
 
-test('F5: declared vendor takes precedence over CLI harness; cross-vendor redirect is blocked, intra-family is allowed', async () => {
+test('F5: declared vendor takes precedence over CLI harness; cross-vendor executor needs opt-in, same-family is allowed', async () => {
   // 2a. Unit tests for normalizeProviderFamily: declared vendor takes precedence over command
   assert.equal(normalizeProviderFamily('deepseek', 'pi'), 'deepseek', 'pi harness running deepseek must be deepseek');
   assert.equal(normalizeProviderFamily('openai', 'pi'), 'openai-codex', 'pi harness running openai must normalize to openai-codex');
@@ -96,20 +96,10 @@ test('F5: declared vendor takes precedence over CLI harness; cross-vendor redire
   const workerScript = path.join(tmp, 'worker.mjs');
   fs.writeFileSync(workerScript, 'process.exit(0);');
 
-  // 2b. Both executors use CLI harness 'pi', but declare different vendors:
-  // source: 'claude' (command: 'pi', providerModel: 'deepseek' -> family 'deepseek')
-  // target: 'target-openai' (command: 'pi', providerModel: 'openai' -> family 'openai-codex')
-  // Because they cross vendors, redirect MUST fail closed without crossProvider: true!
+  // 2b. Both executors use CLI harness 'pi' but declare different vendors. The declared
+  // vendor (not the harness command) decides the family, so an executor declaring
+  // 'openai' (family 'openai-codex') without allowCrossProvider fails closed before spawn.
   const runnerConfigPiCrossVendor = {
-    placementPolicy: {
-      readOnlyRedirects: {
-        claude: {
-          operations: {
-            'shape-plan': ['target-openai'],
-          },
-        },
-      },
-    },
     modelPolicies: {
       deepseek: { standard: 'deepseek-chat' },
       openai: { standard: 'gpt-4o' },
@@ -137,8 +127,8 @@ test('F5: declared vendor takes precedence over CLI harness; cross-vendor redire
     workId: 'wrk_f5_1',
     stage: 'planning',
     policy: {
-      providerModel: 'deepseek',
-      executorPreference: ['claude'],
+      providerModel: 'openai',
+      preferExecutor: 'target-openai',
       rigor: 'standard',
     },
     mutation: 'read-only',
@@ -152,39 +142,20 @@ test('F5: declared vendor takes precedence over CLI harness; cross-vendor redire
     }),
     (err) => {
       assert.ok(err instanceof RunnerConfigError);
-      assert.equal(err.code, 'redirect.cross-provider-not-permitted');
-      assert.match(err.message, /crosses provider family without explicit opt-in/);
-      assert.match(err.message, /deepseek/);
-      assert.match(err.message, /openai-codex/);
+      assert.match(err.message, /allowCrossProvider/);
+      assert.match(err.message, /target-openai/);
       return true;
     },
   );
 
-  // 2c. Intra-family redirect:
-  // source: 'claude' (command: 'pi', providerModel: 'openai' -> family 'openai-codex')
-  // target: 'codex-target' (command: process.execPath, providerModel: 'openai-codex' -> family 'openai-codex')
-  // Both are canonical family 'openai-codex', so redirect is allowed without crossProvider: true!
+  // 2c. Same-family executor with the opt-in runs. Declared 'openai' and 'openai-codex'
+  // canonicalize to one family, so a deny list naming the other alias still blocks it.
   const runnerConfigIntraFamily = {
-    placementPolicy: {
-      readOnlyRedirects: {
-        claude: {
-          operations: {
-            'shape-plan': ['codex-target'],
-          },
-        },
-      },
-    },
     modelPolicies: {
       openai: { standard: 'gpt-4o' },
       'openai-codex': { standard: 'gpt-4o' },
     },
     executors: {
-      claude: {
-        command: process.execPath,
-        args: [workerScript],
-        providerModel: 'openai',
-        allowCrossProvider: true,
-      },
       'codex-target': {
         command: process.execPath,
         args: [workerScript],
@@ -201,8 +172,8 @@ test('F5: declared vendor takes precedence over CLI harness; cross-vendor redire
     workId: 'wrk_f5_2',
     stage: 'planning',
     policy: {
-      providerModel: 'openai',
-      executorPreference: ['claude'],
+      providerModel: 'openai-codex',
+      preferExecutor: 'codex-target',
       rigor: 'standard',
     },
     mutation: 'read-only',
@@ -216,14 +187,24 @@ test('F5: declared vendor takes precedence over CLI harness; cross-vendor redire
   assert.ok(intraRes);
   assert.notEqual(intraRes.status, 'failed');
 
-  // Verify provenance in dispatch-plan.json
-  const planPath = path.join(tmp, '.fgos', 'assignments', asgnIntra.assignmentId, 'runs', '01', 'dispatch-plan.json');
-  assert.ok(fs.existsSync(planPath), 'dispatch-plan.json must exist');
-  const plan = JSON.parse(fs.readFileSync(planPath, 'utf8'));
-  assert.ok(plan.redirectDecision);
-  assert.equal(plan.redirectDecision.sourceProvider, 'openai-codex');
-  assert.equal(plan.redirectDecision.selectedProvider, 'openai-codex');
-  assert.equal(plan.redirectDecision.crossProvider, false);
+  const asgnDeny = buildAssignment({
+    assignmentId: 'asgn_f5_deny_' + Date.now(),
+    role: 'planner',
+    operation: 'shape-plan',
+    workId: 'wrk_f5_3',
+    stage: 'planning',
+    policy: { providerModel: 'openai-codex', preferExecutor: 'codex-target', rigor: 'standard' },
+    mutation: 'read-only',
+  });
+  await assert.rejects(
+    executeAssignment(asgnDeny, {
+      runnerConfig: runnerConfigIntraFamily,
+      repoRoot: tmp,
+      cwd: tmp,
+      options: { disallowedProviders: ['openai'] },
+    }),
+    (err) => err instanceof RunnerConfigError && /governance gate rejected provider "openai-codex"/.test(err.message),
+  );
 
   fs.rmSync(tmp, { recursive: true, force: true });
 });

@@ -1,5 +1,5 @@
 // test/runner/dispatch-governance-provider-denylist.test.mjs
-// Verifies canonical provider family governance across direct and read-only redirect dispatch gates.
+// Verifies canonical provider family governance across the direct resolution and execution-door gates.
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -145,85 +145,70 @@ test('direct dispatch gate enforces canonical provider matching for OpenAI famil
   );
 });
 
-// ─── Redirect Gate: OpenAI Family Alias Governance ───────────────────────────
+// ─── Execution door: governance refuses before any worker spawns ─────────────
+// The read-only redirect mechanism is retired; the executor an Assignment runs
+// on is now the one it declares (or that bind() selected), so the family
+// matching below is exercised through executeAssignment itself.
 
-test('read-only redirect gate enforces canonical provider matching for OpenAI family aliases', async () => {
-  const tempDir = mkTempDir();
-  const workerSource = writeRecordingWorker(tempDir, 'source-worker');
-  const workerTarget = writeRecordingWorker(tempDir, 'target-worker');
+const DOOR_FAMILY_CASES = [
+  { name: 'OpenAI (declared openai, deny openai-codex)', providerModel: 'openai', deny: ['openai-codex'], canonical: 'openai-codex' },
+  { name: 'OpenAI (declared openai-codex, deny codex)', providerModel: 'openai-codex', deny: ['codex'], canonical: 'openai-codex' },
+  { name: 'Z-AI (declared z-ai, deny glm)', providerModel: 'z-ai', deny: ['glm'], canonical: 'z-ai' },
+  { name: 'Z-AI (declared glm, deny z-ai)', providerModel: 'glm', deny: ['z-ai'], canonical: 'z-ai' },
+  { name: 'Gemini (declared gemini, deny agy)', providerModel: 'gemini', deny: ['agy'], canonical: 'gemini' },
+  { name: 'Gemini (declared agy, deny gemini)', providerModel: 'agy', deny: ['gemini'], canonical: 'gemini' },
+];
 
-  const runnerConfig = {
-    executor: { command: 'claude', args: [] },
-    placementPolicy: {
-      readOnlyRedirects: {
-        claude: {
-          operations: {
-            'shape-plan': [{ executor: 'target-openai', crossProvider: true }],
-          },
+for (const c of DOOR_FAMILY_CASES) {
+  test(`executeAssignment refuses before spawn on canonical family match: ${c.name}`, async () => {
+    const tempDir = mkTempDir();
+    const worker = writeRecordingWorker(tempDir, 'door-worker');
+    const runnerConfig = {
+      executor: { command: 'claude', args: [] },
+      modelPolicies: { claude: { standard: 'claude-3-7-sonnet' }, [c.providerModel]: { standard: 'door-model' } },
+      executors: {
+        'door-target': {
+          command: process.execPath,
+          args: [worker.scriptPath],
+          providerModel: c.providerModel,
+          allowCrossProvider: true,
         },
       },
-    },
-    modelPolicies: {
-      claude: { standard: 'claude-3-7-sonnet' },
-      openai: { standard: 'gpt-4o' },
-      'openai-codex': { standard: 'gpt-4o' },
-    },
-    executors: {
-      claude: {
-        command: process.execPath,
-        args: [workerSource.scriptPath],
-        providerModel: 'claude',
-        allowCrossProvider: true,
-      },
-      'target-openai': {
-        command: process.execPath,
-        args: [workerTarget.scriptPath],
-        providerModel: 'openai',
-        allowCrossProvider: true,
-      },
-    },
-  };
-
-  const assignment = buildAssignment({
-    work: { id: 'w-redir-openai', status: 'todo', stage: 'planning', domain: 'coding' },
-    assignmentId: 'asgn-redir-openai',
-    role: 'planner',
-    stage: 'planning',
-    operation: 'shape-plan',
-    policy: { preferExecutor: 'claude' },
-    mutation: 'read-only',
+    };
+    const asgnId = 'asgn-door-' + c.providerModel + '-' + c.deny[0];
+    const assignment = buildAssignment({
+      work: { id: 'w-door', status: 'todo', domain: 'coding' },
+      assignmentId: asgnId,
+      role: 'planner',
+      stage: 'planning',
+      operation: 'shape-plan',
+      policy: { preferExecutor: 'door-target' },
+      mutation: 'read-only',
+    });
+    await assert.rejects(
+      executeAssignment(assignment, {
+        cwd: tempDir,
+        repoRoot: tempDir,
+        runnerConfig,
+        options: { disallowedProviders: c.deny },
+      }),
+      (err) => err instanceof RunnerConfigError
+        && new RegExp(`governance gate rejected provider "${c.canonical}"`).test(err.message),
+    );
+    assert.equal(fs.existsSync(worker.markerPath), false, 'worker must not spawn when governance refuses');
+    assert.equal(
+      fs.existsSync(path.join(tempDir, '.fgos', 'assignments', asgnId, 'runs')),
+      false,
+      'runs directory must not exist when governance refuses pre-spawn',
+    );
+    fs.rmSync(tempDir, { recursive: true, force: true });
   });
+}
 
-  // 1. deny 'openai' blocks redirect target declared 'openai'
-  await assert.rejects(
-    executeAssignment(assignment, {
-      cwd: tempDir,
-      repoRoot: tempDir,
-      runnerConfig,
-      options: { disallowedProviders: ['openai'] },
-    }),
-    (err) => /governance gate rejected provider "openai-codex"/.test(err.message) && /readOnlyRedirect/.test(err.message),
-  );
-  assert.equal(fs.existsSync(workerTarget.markerPath), false, 'target worker must not spawn on deny openai');
-
-  // 2. deny 'openai-codex' blocks redirect target declared 'openai'
-  await assert.rejects(
-    executeAssignment(assignment, {
-      cwd: tempDir,
-      repoRoot: tempDir,
-      runnerConfig,
-      options: { disallowedProviders: ['openai-codex'] },
-    }),
-    (err) => /governance gate rejected provider "openai-codex"/.test(err.message) && /readOnlyRedirect/.test(err.message),
-  );
-  assert.equal(fs.existsSync(workerTarget.markerPath), false, 'target worker must not spawn on deny openai-codex');
-
-  fs.rmSync(tempDir, { recursive: true, force: true });
-});
 
 // ─── Z-AI Family Alias Governance (Direct & Redirect) ────────────────────────
 
-test('governance gates enforce canonical provider matching for Z-AI family aliases across direct and redirect', async () => {
+test('governance gates enforce canonical provider matching for Z-AI family aliases (direct gate)', async () => {
   const tempDir = mkTempDir();
   const workerSource = writeRecordingWorker(tempDir, 'z-source-worker');
   const workerGlm = writeRecordingWorker(tempDir, 'glm-worker');
@@ -231,16 +216,6 @@ test('governance gates enforce canonical provider matching for Z-AI family alias
 
   const runnerConfig = {
     executor: { command: 'claude', args: [] },
-    placementPolicy: {
-      readOnlyRedirects: {
-        claude: {
-          operations: {
-            'shape-plan': [{ executor: 'target-glm', crossProvider: true }],
-            'validate-plan': [{ executor: 'target-zai', crossProvider: true }],
-          },
-        },
-      },
-    },
     modelPolicies: {
       claude: { standard: 'claude-3-7-sonnet' },
       'z-ai': { standard: 'glm-4.6' },
@@ -304,54 +279,13 @@ test('governance gates enforce canonical provider matching for Z-AI family alias
     (err) => err instanceof RunnerConfigError && /governance gate rejected provider "z-ai"/.test(err.message),
   );
 
-  // Redirect: deny 'glm' blocks redirect target declared 'z-ai'
-  const asgnRedirZai = buildAssignment({
-    work: { id: 'w-redir-zai', status: 'todo', stage: 'planning', domain: 'coding' },
-    assignmentId: 'asgn-redir-zai',
-    role: 'planner',
-    stage: 'planning',
-    operation: 'validate-plan',
-    policy: { preferExecutor: 'claude' },
-    mutation: 'read-only',
-  });
-  await assert.rejects(
-    executeAssignment(asgnRedirZai, {
-      cwd: tempDir,
-      repoRoot: tempDir,
-      runnerConfig,
-      options: { disallowedProviders: ['glm'] },
-    }),
-    (err) => /governance gate rejected provider "z-ai"/.test(err.message) && /readOnlyRedirect/.test(err.message),
-  );
-  assert.equal(fs.existsSync(workerZai.markerPath), false, 'target z-ai worker must not spawn on deny glm');
-
-  // Redirect: deny 'z-ai' blocks redirect target declared 'glm'
-  const asgnRedirGlm = buildAssignment({
-    work: { id: 'w-redir-glm', status: 'todo', stage: 'planning', domain: 'coding' },
-    assignmentId: 'asgn-redir-glm',
-    role: 'planner',
-    stage: 'planning',
-    operation: 'shape-plan',
-    policy: { preferExecutor: 'claude' },
-    mutation: 'read-only',
-  });
-  await assert.rejects(
-    executeAssignment(asgnRedirGlm, {
-      cwd: tempDir,
-      repoRoot: tempDir,
-      runnerConfig,
-      options: { disallowedProviders: ['z-ai'] },
-    }),
-    (err) => /governance gate rejected provider "z-ai"/.test(err.message) && /readOnlyRedirect/.test(err.message),
-  );
-  assert.equal(fs.existsSync(workerGlm.markerPath), false, 'target glm worker must not spawn on deny z-ai');
 
   fs.rmSync(tempDir, { recursive: true, force: true });
 });
 
 // ─── Gemini Family Alias Governance (Direct & Redirect) ──────────────────────
 
-test('governance gates enforce canonical provider matching for Gemini family aliases across direct and redirect', async () => {
+test('governance gates enforce canonical provider matching for Gemini family aliases (direct gate)', async () => {
   const tempDir = mkTempDir();
   const workerSource = writeRecordingWorker(tempDir, 'gemini-source-worker');
   const workerAgy = writeRecordingWorker(tempDir, 'agy-worker');
@@ -359,16 +293,6 @@ test('governance gates enforce canonical provider matching for Gemini family ali
 
   const runnerConfig = {
     executor: { command: 'claude', args: [] },
-    placementPolicy: {
-      readOnlyRedirects: {
-        claude: {
-          operations: {
-            'shape-plan': [{ executor: 'target-gemini', crossProvider: true }],
-            'validate-plan': [{ executor: 'target-agy', crossProvider: true }],
-          },
-        },
-      },
-    },
     modelPolicies: {
       claude: { standard: 'claude-3-7-sonnet' },
       gemini: { standard: 'gemini-3.8-flash' },
@@ -432,124 +356,57 @@ test('governance gates enforce canonical provider matching for Gemini family ali
     (err) => err instanceof RunnerConfigError && /governance gate rejected provider "gemini"/.test(err.message),
   );
 
-  // Redirect: deny 'agy' blocks redirect target declared 'gemini'
-  const asgnRedirGemini = buildAssignment({
-    work: { id: 'w-redir-gemini', status: 'todo', stage: 'planning', domain: 'coding' },
-    assignmentId: 'asgn-redir-gemini',
-    role: 'planner',
-    stage: 'planning',
-    operation: 'shape-plan',
-    policy: { preferExecutor: 'claude' },
-    mutation: 'read-only',
-  });
-  await assert.rejects(
-    executeAssignment(asgnRedirGemini, {
-      cwd: tempDir,
-      repoRoot: tempDir,
-      runnerConfig,
-      options: { disallowedProviders: ['agy'] },
-    }),
-    (err) => /governance gate rejected provider "gemini"/.test(err.message) && /readOnlyRedirect/.test(err.message),
-  );
-  assert.equal(fs.existsSync(workerGemini.markerPath), false, 'target gemini worker must not spawn on deny agy');
-
-  // Redirect: deny 'gemini' blocks redirect target declared 'agy'
-  const asgnRedirAgy = buildAssignment({
-    work: { id: 'w-redir-agy', status: 'todo', stage: 'planning', domain: 'coding' },
-    assignmentId: 'asgn-redir-agy',
-    role: 'planner',
-    stage: 'planning',
-    operation: 'validate-plan',
-    policy: { preferExecutor: 'claude' },
-    mutation: 'read-only',
-  });
-  await assert.rejects(
-    executeAssignment(asgnRedirAgy, {
-      cwd: tempDir,
-      repoRoot: tempDir,
-      runnerConfig,
-      options: { disallowedProviders: ['gemini'] },
-    }),
-    (err) => /governance gate rejected provider "gemini"/.test(err.message) && /readOnlyRedirect/.test(err.message),
-  );
-  assert.equal(fs.existsSync(workerAgy.markerPath), false, 'target agy worker must not spawn on deny gemini');
 
   fs.rmSync(tempDir, { recursive: true, force: true });
 });
 
 // ─── Negative Controls & Invariants ──────────────────────────────────────────
 
-test('governance negative controls: unrelated providers are allowed, disallowedExecutors is independent, and pre-spawn refusal creates no artifacts', async () => {
+test('governance negative controls: unrelated providers are allowed, disallowedExecutors is independent, cross-provider needs opt-in', async () => {
   const tempDir = mkTempDir();
-  const workerSource = writeRecordingWorker(tempDir, 'ctrl-source');
-  const workerTarget = writeRecordingWorker(tempDir, 'ctrl-target');
+  const workerOpenai = writeRecordingWorker(tempDir, 'ctrl-openai');
 
+  const baseExecutors = {
+    'target-openai': {
+      command: process.execPath,
+      args: [workerOpenai.scriptPath],
+      providerModel: 'openai',
+      allowCrossProvider: true,
+    },
+  };
   const runnerConfig = {
     executor: { command: 'claude', args: [] },
-    placementPolicy: {
-      readOnlyRedirects: {
-        claude: {
-          operations: {
-            'shape-plan': [{ executor: 'target-openai', crossProvider: true }],
-          },
-        },
-      },
-    },
     modelPolicies: {
       claude: { standard: 'claude-3-7-sonnet' },
       openai: { standard: 'gpt-4o' },
       'openai-codex': { standard: 'gpt-4o' },
     },
-    executors: {
-      claude: {
-        command: process.execPath,
-        args: [workerSource.scriptPath],
-        providerModel: 'claude',
-        allowCrossProvider: true,
-      },
-      'target-openai': {
-        command: process.execPath,
-        args: [workerTarget.scriptPath],
-        providerModel: 'openai',
-        allowCrossProvider: true,
-      },
-    },
+    executors: baseExecutors,
   };
-
-  // 1. Unrelated provider is NOT blocked
-  const asgnUnrelated = buildAssignment({
-    work: { id: 'w-unrelated', status: 'todo', stage: 'planning', domain: 'coding' },
-    assignmentId: 'asgn-unrelated',
+  const make = (id, executor) => buildAssignment({
+    work: { id: 'w-' + id, status: 'todo', domain: 'coding' },
+    assignmentId: 'asgn-' + id,
     role: 'planner',
     stage: 'planning',
     operation: 'shape-plan',
-    policy: { preferExecutor: 'claude' },
+    policy: { preferExecutor: executor },
     mutation: 'read-only',
   });
-  const unrelatedRes = await executeAssignment(asgnUnrelated, {
+
+  // 1. Unrelated provider is NOT blocked
+  const unrelatedRes = await executeAssignment(make('unrelated', 'target-openai'), {
     cwd: tempDir,
     repoRoot: tempDir,
     runnerConfig,
     options: { disallowedProviders: ['deepseek'] },
   });
   assert.ok(unrelatedRes);
-  assert.equal(fs.existsSync(workerTarget.markerPath), true, 'worker must spawn when unrelated provider is disallowed');
+  assert.equal(fs.existsSync(workerOpenai.markerPath), true, 'worker must spawn when unrelated provider is disallowed');
+  fs.unlinkSync(workerOpenai.markerPath);
 
-  // Clean marker for next check
-  fs.unlinkSync(workerTarget.markerPath);
-
-  // 2. disallowedExecutors functions independently
-  const asgnExecBlock = buildAssignment({
-    work: { id: 'w-exec-block', status: 'todo', stage: 'planning', domain: 'coding' },
-    assignmentId: 'asgn-exec-block',
-    role: 'planner',
-    stage: 'planning',
-    operation: 'shape-plan',
-    policy: { preferExecutor: 'claude' },
-    mutation: 'read-only',
-  });
+  // 2. disallowedExecutors functions independently of disallowedProviders
   await assert.rejects(
-    executeAssignment(asgnExecBlock, {
+    executeAssignment(make('exec-block', 'target-openai'), {
       cwd: tempDir,
       repoRoot: tempDir,
       runnerConfig,
@@ -557,126 +414,18 @@ test('governance negative controls: unrelated providers are allowed, disallowedE
     }),
     (err) => /governance gate rejected executor "target-openai"/.test(err.message),
   );
-  assert.equal(fs.existsSync(workerTarget.markerPath), false, 'target worker must not spawn on disallowedExecutors');
+  assert.equal(fs.existsSync(workerOpenai.markerPath), false, 'worker must not spawn on disallowedExecutors');
 
-  // 3. Intra-family redirect does NOT require crossProvider: true
-  const runnerConfigIntra = {
-    placementPolicy: {
-      readOnlyRedirects: {
-        claude: {
-          operations: {
-            'shape-plan': ['codex-target'], // crossProvider is false/absent
-          },
-        },
-      },
-    },
-    modelPolicies: {
-      openai: { standard: 'gpt-4o' },
-      'openai-codex': { standard: 'gpt-4o' },
-    },
-    executors: {
-      claude: {
-        command: process.execPath,
-        args: [workerSource.scriptPath],
-        providerModel: 'openai',
-        allowCrossProvider: true,
-      },
-      'codex-target': {
-        command: process.execPath,
-        args: [workerTarget.scriptPath],
-        providerModel: 'openai-codex',
-        allowCrossProvider: true,
-      },
-    },
+  // 3. Cross-provider egress without allowCrossProvider fails closed before spawn
+  const noOptIn = {
+    ...runnerConfig,
+    executors: { 'target-openai': { ...baseExecutors['target-openai'], allowCrossProvider: false } },
   };
-  const asgnIntra = buildAssignment({
-    work: { id: 'w-intra', status: 'todo', stage: 'planning', domain: 'coding' },
-    assignmentId: 'asgn-intra',
-    role: 'planner',
-    stage: 'planning',
-    operation: 'shape-plan',
-    policy: { preferExecutor: 'claude', providerModel: 'openai' },
-    mutation: 'read-only',
-  });
-  const intraRes = await executeAssignment(asgnIntra, {
-    cwd: tempDir,
-    repoRoot: tempDir,
-    runnerConfig: runnerConfigIntra,
-  });
-  assert.ok(intraRes);
-  assert.equal(fs.existsSync(workerTarget.markerPath), true, 'intra-family redirect executes without crossProvider opt-in');
-
-  fs.unlinkSync(workerTarget.markerPath);
-
-  // 4. Cross-family redirect without opt-in fails closed
-  const runnerConfigNoOptIn = {
-    placementPolicy: {
-      readOnlyRedirects: {
-        claude: {
-          operations: {
-            'shape-plan': ['target-openai'], // no crossProvider: true
-          },
-        },
-      },
-    },
-    modelPolicies: {
-      claude: { standard: 'claude-3-7-sonnet' },
-      openai: { standard: 'gpt-4o' },
-      'openai-codex': { standard: 'gpt-4o' },
-    },
-    executors: {
-      claude: {
-        command: process.execPath,
-        args: [workerSource.scriptPath],
-        providerModel: 'claude',
-        allowCrossProvider: true,
-      },
-      'target-openai': {
-        command: process.execPath,
-        args: [workerTarget.scriptPath],
-        providerModel: 'openai',
-        allowCrossProvider: true,
-      },
-    },
-  };
-  const asgnNoOptIn = buildAssignment({
-    work: { id: 'w-no-opt-in', status: 'todo', stage: 'planning', domain: 'coding' },
-    assignmentId: 'asgn-no-opt-in',
-    role: 'planner',
-    stage: 'planning',
-    operation: 'shape-plan',
-    policy: { preferExecutor: 'claude' },
-    mutation: 'read-only',
-  });
   await assert.rejects(
-    executeAssignment(asgnNoOptIn, {
-      cwd: tempDir,
-      repoRoot: tempDir,
-      runnerConfig: runnerConfigNoOptIn,
-    }),
-    (err) => err instanceof RunnerConfigError && err.code === 'redirect.cross-provider-not-permitted',
+    executeAssignment(make('no-opt-in', 'target-openai'), { cwd: tempDir, repoRoot: tempDir, runnerConfig: noOptIn }),
+    (err) => err instanceof RunnerConfigError && /cross-provider egress target/.test(err.message) && /allowCrossProvider/.test(err.message),
   );
-
-  // 5. Rejection creates NO run evidence directory
-  const asgnPreSpawnDeny = buildAssignment({
-    work: { id: 'w-prespawn', status: 'todo', stage: 'planning', domain: 'coding' },
-    assignmentId: 'asgn-prespawn-check',
-    role: 'planner',
-    stage: 'planning',
-    operation: 'shape-plan',
-    policy: { preferExecutor: 'claude' },
-    mutation: 'read-only',
-  });
-  await assert.rejects(
-    executeAssignment(asgnPreSpawnDeny, {
-      cwd: tempDir,
-      repoRoot: tempDir,
-      runnerConfig,
-      options: { disallowedProviders: ['openai'] },
-    }),
-  );
-  const runsDir = path.join(tempDir, '.fgos', 'assignments', 'asgn-prespawn-check', 'runs');
-  assert.equal(fs.existsSync(runsDir), false, 'runs directory must not exist when governance refuses pre-spawn');
+  assert.equal(fs.existsSync(workerOpenai.markerPath), false, 'worker must not spawn without cross-provider opt-in');
 
   fs.rmSync(tempDir, { recursive: true, force: true });
 });

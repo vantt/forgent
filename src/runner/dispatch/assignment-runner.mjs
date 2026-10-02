@@ -516,17 +516,29 @@ function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
       );
     }
 
+    // Fail closed: a mutating unit-run assignment must carry the binding that
+    // bind() produced for it. Without one there is nothing to compare, and an
+    // assignment could pin any executor through `policy.preferExecutor`.
     const asgnBinding = asgn.binding || asgn.provenance?.binding;
-    if (asgnBinding) {
-      if (
-        recomputed.executor !== asgnBinding.executor ||
-        recomputed.tier !== asgnBinding.tier ||
-        recomputed.posture !== asgnBinding.posture
-      ) {
-        throw new RunnerConfigError(
-          `executeAssignment: mutating unit-run assignment "${asgn.assignmentId}" binding mismatch: recomputed { executor: "${recomputed.executor}", tier: "${recomputed.tier}", posture: "${recomputed.posture}" } does not match assignment { executor: "${asgnBinding.executor}", tier: "${asgnBinding.tier}", posture: "${asgnBinding.posture}" } -- refused`,
-        );
-      }
+    if (!asgnBinding) {
+      throw new RunnerConfigError(
+        `executeAssignment: mutating unit-run assignment "${asgn.assignmentId}" carries no binding -- refused`,
+      );
+    }
+    if (
+      recomputed.executor !== asgnBinding.executor ||
+      recomputed.tier !== asgnBinding.tier ||
+      recomputed.posture !== asgnBinding.posture
+    ) {
+      throw new RunnerConfigError(
+        `executeAssignment: mutating unit-run assignment "${asgn.assignmentId}" binding mismatch: recomputed { executor: "${recomputed.executor}", tier: "${recomputed.tier}", posture: "${recomputed.posture}" } does not match assignment { executor: "${asgnBinding.executor}", tier: "${asgnBinding.tier}", posture: "${asgnBinding.posture}" } -- refused`,
+      );
+    }
+    const pinnedExecutor = asgn.policy?.preferExecutor ?? opts.cliOverride?.preferExecutor;
+    if (pinnedExecutor !== undefined && pinnedExecutor !== recomputed.executor) {
+      throw new RunnerConfigError(
+        `executeAssignment: mutating unit-run assignment "${asgn.assignmentId}" pins executor "${pinnedExecutor}" but the verified binding is "${recomputed.executor}" -- refused`,
+      );
     }
 
     return;
