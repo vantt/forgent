@@ -13,6 +13,11 @@
 // A scripted pane is picked by creation order (1-based). Per pane:
 //   limit: true         idle forever; `agent read` shows `limitScreen`
 //   awaitProbe: true    wait for the in-sandbox agent's probe-results.json before settling
+//   detector: true      `agent explain` answers like herdr's screen detector (idle until a brief is taken)
+//   startupPolls: N     the detector says "unknown" for the first N explain calls (UI still starting);
+//                       a brief typed before the detector turned idle is lost, like a real UI that is not up yet
+//   swallowEnter: N     the first N submit keys are lost: `agent prompt` leaves the brief as an unsent
+//                       draft in the prompt box, and only a later `agent send-keys Enter` submits it
 // `signalDir` is where the in-sandbox agent looks for `signal-<pane id>.json` (default: the fake's own dir).
 import fs from 'node:fs';
 import path from 'node:path';
@@ -113,20 +118,7 @@ if (group === 'agent' && action === 'read') {
 
 if (group === 'agent' && action === 'start') ok({ agent: { agent_status: 'idle' } });
 
-if (group === 'agent' && action === 'prompt') {
-  const id = args[2];
-  const text = args[3] ?? '';
-  const pane = state.panes[id];
-  if (text.startsWith('/')) {
-    if (pane) {
-      pane.exited = true;
-      if (pane.pid && alive(pane.pid)) { try { process.kill(pane.pid, 'SIGKILL'); } catch {} }
-      writeState(state);
-    }
-    ok({ agent: { agent_status: 'idle' } });
-  }
-  if (scripted(id).limit) ok({ agent: { agent_status: 'idle' } });
-
+const deliver = (id, text) => {
   let briefText = text;
   const pointer = text.match(/^Read (.+) and do what it says\.$/);
   if (pointer) briefText = fs.readFileSync(pointer[1], 'utf8');
@@ -143,6 +135,73 @@ if (group === 'agent' && action === 'prompt') {
     atomic(path.join(outbox, 'report-1.md'), '# Report\nThe assigned work was inspected and completed with a full explanation of what was checked.\n');
     atomic(path.join(outbox, 'result-1.json'), JSON.stringify({ status: 'done', summary: 'fake pane worker finished', assessment: { verdict: 'pass' } }));
   }
+};
+
+if (group === 'agent' && action === 'explain') {
+  const id = args[2];
+  const script = scripted(id);
+  const pane = state.panes[id];
+  if (!script.detector && !script.startupPolls && !script.swallowEnter) ok({});
+  pane.explainCalls = (pane.explainCalls ?? 0) + 1;
+  writeState(state);
+  const starting = pane.explainCalls <= (script.startupPolls ?? 0);
+  const verdict = starting ? 'unknown' : (pane.delivered ? 'working' : 'idle');
+  console.log(JSON.stringify({
+    agent: 'fake',
+    state: verdict,
+    visible_idle: verdict === 'idle',
+    visible_working: verdict === 'working',
+    visible_blocker: false,
+    matched_rule: { id: 'live_prompt_box', priority: 950, region: 'prompt_box_body', state: verdict },
+    evaluated_rules: [{ id: 'live_prompt_box', matched: true, evidence: { region_preview: '❯ ' + (pane.draft ?? '') + '\n' } }],
+  }));
+  process.exit(0);
+}
+
+if (group === 'agent' && action === 'send-keys') {
+  const id = args[2];
+  const pane = state.panes[id];
+  if (pane && args.slice(3).includes('Enter') && pane.draft) {
+    const text = pane.draft;
+    pane.enters = (pane.enters ?? 0) + 1;
+    if (pane.enters > (scripted(id).swallowEnter ?? 0) - 1) {
+      pane.draft = null;
+      pane.delivered = true;
+      writeState(state);
+      deliver(id, text);
+      ok({});
+    }
+    writeState(state);
+  }
+  ok({});
+}
+
+if (group === 'agent' && action === 'prompt') {
+  const id = args[2];
+  const text = args[3] ?? '';
+  const pane = state.panes[id];
+  if (text.startsWith('/')) {
+    if (pane) {
+      pane.exited = true;
+      if (pane.pid && alive(pane.pid)) { try { process.kill(pane.pid, 'SIGKILL'); } catch {} }
+      writeState(state);
+    }
+    ok({ agent: { agent_status: 'idle' } });
+  }
+  if (scripted(id).limit) ok({ agent: { agent_status: 'idle' } });
+
+  const script = scripted(id);
+  pane.prompts = [...(pane.prompts ?? []), { text, at: Date.now(), explainCallsBefore: pane.explainCalls ?? 0 }];
+  const startingUp = (pane.explainCalls ?? 0) < (script.startupPolls ?? 0);
+  if (script.swallowEnter || startingUp) {
+    // The UI took the text but lost the submit key: it stays an unsent draft.
+    pane.draft = text;
+    writeState(state);
+    ok({ agent: { agent_status: 'working' } });
+  }
+  pane.delivered = true;
+  writeState(state);
+  deliver(id, text);
   ok({ agent: { agent_status: 'working' } });
 }
 ok({});

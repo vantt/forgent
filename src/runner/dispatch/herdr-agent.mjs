@@ -327,6 +327,55 @@ export function createHerdrClient({ herdrBin = 'herdr', cwd, env, run = defaultR
       return invoke(args, { timeoutMs: (timeoutMs ?? 20000) + 15000 });
     },
 
+    /**
+     * What herdr's own screen detector sees in the pane, independent of any state
+     * a process REPORTED for it (a confined pane's agent cannot run herdr's hooks,
+     * so the only state it ever has is the one fgos reported at launch).
+     *
+     * `promptText` is the text of the matched prompt-box region when there is one
+     * -- what is typed and not yet submitted. Returns `{ state: null }` when herdr
+     * answers without a detector verdict, so a caller can tell "no information"
+     * from "not idle". Throws `HerdrError` only for an unreachable or unparseable herdr.
+     */
+    agentExplain(name, { timeoutMs = 10000 } = {}) {
+      const args = ['agent', 'explain', name, '--json'];
+      const res = run(herdrBin, args, { cwd, env, timeoutMs });
+      if (res.spawnCode === 'ENOENT') {
+        throw new HerdrError('herdr_unavailable', `herdr binary "${herdrBin}" not found on PATH.`, { args });
+      }
+      if (res.killed || res.spawnCode === 'ETIMEDOUT') {
+        throw new HerdrError('herdr_call_timeout', `herdr ${args.join(' ')} was killed after ${timeoutMs}ms.`, { args });
+      }
+      let body;
+      for (const stream of [res.stdout, res.stderr]) {
+        if (typeof stream !== 'string' || !stream.trim()) continue;
+        try { body = JSON.parse(stream); break; } catch { /* try the other stream */ }
+      }
+      if (body === undefined) {
+        throw new HerdrError('herdr_unparseable', `herdr ${args.join(' ')} returned no parseable JSON (exit ${res.status ?? 'unknown'}).`, { args, exitCode: res.status });
+      }
+      if (body?.error) {
+        throw new HerdrError(body.error.code ?? 'herdr_error', body.error.message ?? `herdr ${args.join(' ')} failed.`, { args, exitCode: res.status });
+      }
+      const verdict = body?.result && typeof body.result === 'object' && !('state' in body) ? body.result : body;
+      const matchedId = verdict?.matched_rule?.id;
+      const matchedRule = Array.isArray(verdict?.evaluated_rules)
+        ? verdict.evaluated_rules.find((rule) => rule?.matched && rule?.id === matchedId)
+        : null;
+      return {
+        state: typeof verdict?.state === 'string' ? verdict.state : null,
+        visibleBlocker: verdict?.visible_blocker === true,
+        visibleIdle: verdict?.visible_idle === true,
+        visibleWorking: verdict?.visible_working === true,
+        promptText: typeof matchedRule?.evidence?.region_preview === 'string' ? matchedRule.evidence.region_preview : '',
+      };
+    },
+
+    /** Press keys in an agent's pane, e.g. `['Enter']` to submit a typed draft. */
+    agentSendKeys(name, keys, { timeoutMs = 10000 } = {}) {
+      return invoke(['agent', 'send-keys', name, ...keys], { timeoutMs });
+    },
+
     /** Diagnostic only. `agent_status` is never a receipt and never a result;
      * it says whether it is safe to type, nothing more. */
     agentGet(name) {

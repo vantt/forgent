@@ -229,6 +229,21 @@ function captureHeadSha(cwd) {
 }
 
 /**
+ * A claude REPL in a herdr pane is briefed with a pointer to a file in the run directory,
+ * and the run directory lives under the store, which is outside the worker's cwd (its
+ * worktree). Claude asks the human before reading outside its working directories, and
+ * nobody is there to answer -- the worker stalls on the prompt. The run directory is the
+ * only place it must read that is not in its worktree (the brief) or write (the outbox),
+ * so exactly that directory is added as a working directory, nothing broader. This is
+ * claude's own permission prompt; the OS-level posture is unchanged.
+ */
+export function withRunDirReadAccess({ adapter, interactiveMode, args, runDir }) {
+  if (adapter !== 'herdr-spawn' || interactiveMode?.kind !== 'claude' || !runDir) return args;
+  if (!Array.isArray(args) || args.includes('--add-dir')) return args;
+  return [...args, '--add-dir', path.resolve(runDir)];
+}
+
+/**
  * `execute <executorId>` CLI subcommand (tsk-5tm-3 D5): the self-execute
  * counterpart to `resolve` above, matching marketing-cockpit's `run_task()`
  * contract (`task-executor.py:550-611`) — self-execute for every case that
@@ -662,7 +677,7 @@ export async function executeExecutorCli(
         ...(requirement ? { requirement } : {}),
         invocation: {
           command,
-          args,
+          args: withRunDirReadAccess({ adapter, interactiveMode, args, runDir: opened.runDir }),
           argsTemplate,
           prompt,
           env,

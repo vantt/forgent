@@ -11,6 +11,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
 import { runUnit } from '../../../src/runner/execution/run.mjs';
+import { withRunDirReadAccess } from '../../../src/runner/dispatch/cli.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
 import { createFakeHerdr, SANDBOXED_AGENT_SOURCE } from '../../helpers/fake-herdr-pane.mjs';
 
@@ -61,7 +62,7 @@ if (match) {
  * A repo plus a linked worktree, and one executor per name. Each executor has a confined
  * cli-spawn invocation and a confined herdr-spawn invocation; prefer lists them in order.
  */
-function setup(executorNames, { idleTimeoutMs = 1500 } = {}) {
+function setup(executorNames, { idleTimeoutMs = 1500, agentKind = 'fakeagent' } = {}) {
   const repoRoot = fixtureDir('fgos-herdr-run-');
   const git = (args, cwd = repoRoot) => execFileSync('git', args, { cwd, stdio: 'ignore' });
   git(['init', '-b', 'main']);
@@ -101,7 +102,7 @@ function setup(executorNames, { idleTimeoutMs = 1500 } = {}) {
           confinement: { backend: 'bwrap' },
           command,
           args: [agentScript],
-          interactiveMode: { exitCommand: '/exit', kind: 'fakeagent' },
+          interactiveMode: { exitCommand: '/exit', kind: agentKind },
           env: {
             FAKE_AGENT_SIGNAL: path.join(signalDir, `signal-mock-pane-${index + 1}.json`),
             FAKE_AGENT_TARGETS: targets,
@@ -356,4 +357,89 @@ test('guards: the run path reads bound.transport and calls nextCandidate', () =>
   const runSource = fs.readFileSync(new URL('../../../src/runner/execution/run.mjs', import.meta.url), 'utf8');
   assert.match(runSource, /bound\.transport/);
   assert.match(runSource, /nextCandidate\(/);
+});
+
+// ---------------------------------------------------------------------------------------------
+// Delivering the brief to an interactive agent in a pane.
+// ---------------------------------------------------------------------------------------------
+
+const promptCalls = (fake) => fake.calls().filter((c) => c[0] === 'agent' && c[1] === 'prompt' && !String(c[3] ?? '').startsWith('/'));
+const enterCalls = (fake) => fake.calls().filter((c) => c[0] === 'agent' && c[1] === 'send-keys' && c.slice(3).includes('Enter'));
+
+test('a brief whose submit key was lost stays an unsent draft and is submitted with Enter, not by hand', { skip: SKIP }, async () => {
+  const { repoRoot, worktreeDir, signalDir } = setup(['alpha']);
+  const fake = useFakeHerdr({ signalDir, panes: [{ awaitProbe: true, swallowEnter: 2 }] });
+  const res = await withHerdrBin(fake.herdrBin, () => runUnit({
+    unitData: readOnlyUnit('u-submit-lost'),
+    repoRoot,
+    cwd: worktreeDir,
+    worktree: worktreeDir,
+    session: { herdrPresent: true, headless: true },
+  }));
+  assert.equal(res.outcome, 'pass', JSON.stringify(res.results[0]).slice(0, 1500));
+
+  assert.equal(promptCalls(fake).length, 1, 'the brief is typed once, never typed again on top of its own draft');
+  assert.equal(enterCalls(fake).length, 2, 'Enter is pressed until the draft is taken: first press lost, second accepted');
+  const [pane] = Object.values(fake.panes());
+  assert.equal(pane.draft, null, 'no unsent draft is left in the prompt box');
+  const visibility = readJson(path.join(runDirOf(repoRoot, res.unitRunId, 'producer', 1), 'visibility.json'));
+  assert.equal(visibility.briefSubmitKeyResent, 2);
+});
+
+test('the brief is typed only after the agent UI is up, so the submit key is not lost to a UI still starting', { skip: SKIP }, async () => {
+  const { repoRoot, worktreeDir, signalDir } = setup(['alpha']);
+  const fake = useFakeHerdr({ signalDir, panes: [{ awaitProbe: true, startupPolls: 3 }] });
+  const res = await withHerdrBin(fake.herdrBin, () => runUnit({
+    unitData: readOnlyUnit('u-submit-ready'),
+    repoRoot,
+    cwd: worktreeDir,
+    worktree: worktreeDir,
+    session: { herdrPresent: true, headless: true },
+  }));
+  assert.equal(res.outcome, 'pass', JSON.stringify(res.results[0]).slice(0, 1500));
+
+  const [pane] = Object.values(fake.panes());
+  assert.equal(pane.prompts.length, 1);
+  assert.ok(pane.prompts[0].explainCallsBefore >= 3, `typed after the detector stopped saying "unknown" (explain calls before typing: ${pane.prompts[0].explainCallsBefore})`);
+  assert.equal(enterCalls(fake).length, 0, 'nothing needed re-submitting');
+  const visibility = readJson(path.join(runDirOf(repoRoot, res.unitRunId, 'producer', 1), 'visibility.json'));
+  assert.equal(visibility.promptReadiness, 'ready');
+});
+
+test('a claude REPL in a pane is given the run directory as a working directory; no other agent kind is', { skip: SKIP }, async () => {
+  for (const [agentKind, expectAddDir] of [['claude', true], ['fakeagent', false]]) {
+    const { repoRoot, worktreeDir, signalDir } = setup(['alpha'], { agentKind });
+    const fake = useFakeHerdr({ signalDir, panes: [{ awaitProbe: true }] });
+    const res = await withHerdrBin(fake.herdrBin, () => runUnit({
+      unitData: readOnlyUnit(`u-add-dir-${agentKind}`),
+      repoRoot,
+      cwd: worktreeDir,
+      worktree: worktreeDir,
+      session: { herdrPresent: true, headless: true },
+    }));
+    assert.equal(res.outcome, 'pass', JSON.stringify(res.results[0]).slice(0, 1500));
+    const [pane] = Object.values(fake.panes());
+    const runDir = runDirOf(repoRoot, res.unitRunId, 'producer', 1);
+    const i = pane.lastArgv.indexOf('--add-dir');
+    if (expectAddDir) {
+      assert.ok(i > pane.lastArgv.indexOf('--'), 'the flag goes to the agent, after the sandbox wrapper');
+      assert.equal(pane.lastArgv[i + 1], runDir);
+      assert.equal(pane.lastArgv.filter((a) => a === '--add-dir').length, 1, 'only the run directory is added');
+    } else {
+      assert.equal(i, -1);
+    }
+    // The posture is untouched: the run outbox is still the only writable bind.
+    assert.ok(!pane.lastArgv.some((a, k) => a === '--bind' && pane.lastArgv[k + 1] === fs.realpathSync(worktreeDir)));
+  }
+});
+
+test('withRunDirReadAccess adds the run directory for a herdr claude invocation only, once', () => {
+  const base = ['--model', 'sonnet'];
+  const claude = { adapter: 'herdr-spawn', interactiveMode: { kind: 'claude' }, args: base, runDir: '/store/run/01' };
+  assert.deepEqual(withRunDirReadAccess(claude), ['--model', 'sonnet', '--add-dir', '/store/run/01']);
+  assert.deepEqual(withRunDirReadAccess({ ...claude, args: [...base, '--add-dir', '/elsewhere'] }), [...base, '--add-dir', '/elsewhere']);
+  assert.equal(withRunDirReadAccess({ ...claude, interactiveMode: { kind: 'codex' } }), base);
+  assert.equal(withRunDirReadAccess({ ...claude, adapter: 'cli-spawn' }), base);
+  assert.equal(withRunDirReadAccess({ ...claude, runDir: undefined }), base);
+  assert.deepEqual(base, ['--model', 'sonnet'], 'the configured args are not mutated');
 });

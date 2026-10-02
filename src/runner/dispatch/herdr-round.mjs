@@ -386,6 +386,19 @@ const EXIT_DRAIN_MS = 10000;
 
 const sleep = (ms) => new Promise((resolve) => { setTimeout(resolve, ms); });
 
+/** A typed brief that is still sitting unsubmitted is nudged with Enter no more often
+ * than this, and never more than `SUBMIT_MAX_ENTERS` times. */
+const SUBMIT_ENTER_EVERY_MS = 2500;
+const SUBMIT_MAX_ENTERS = 6;
+/** How long after typing the runner keeps checking that the brief was taken. */
+const SUBMIT_CONFIRM_MS = 60000;
+/** How often the prompt-ready and submit checks look at the screen detector. */
+const SUBMIT_POLL_MS = 700;
+/** Settle time after the prompt first looks ready: an agent UI draws its prompt box
+ * before its startup work (hooks, session setup) has finished taking input. */
+const PROMPT_SETTLE_MS = 1500;
+
+
 /** The last line on screen with anything on it -- what a person would read to
  * see why an agent is blocked. Screen text explains a failure; it never
  * establishes that work happened. */
@@ -782,6 +795,78 @@ function deliverBrief({ client, round, message, promptMs, resultPath }) {
   throw round.fail('worker-spawn-fail', err.code ?? 'agent_prompt_failed',
     `executor failed to brief the worker for work "${round.workId}": ${err.message}${screen ? ` -- last line on screen: ${screen}` : ''}`,
     screen ? { screen } : {});
+}
+
+/** Whitespace-free form: a prompt box wraps a long line, so text is compared without breaks. */
+const squash = (text) => String(text ?? '').replace(/\s+/g, '');
+
+/**
+ * Wait until the agent's prompt is up and takes input, before the brief is typed.
+ *
+ * A confined agent is launched as a plain process in the pane, so nothing but the
+ * screen says when it can take input; a brief typed while its UI is still starting
+ * is held as an unsent draft and the submit key is lost. Reads herdr's own screen
+ * detector (never the state fgos reported at launch). A blocking dialog stops the
+ * wait at once -- typing at a dialog answers it -- and so does a detector with no
+ * verdict, so an agent kind herdr cannot detect is not made to wait out the deadline.
+ * Returns what ended the wait.
+ */
+export async function awaitPromptReady({ client, target, readyMs, settleMs = PROMPT_SETTLE_MS, pollMs = SUBMIT_POLL_MS }) {
+  const deadline = Date.now() + readyMs;
+  for (;;) {
+    let seen;
+    try { seen = client.agentExplain(target); } catch { return 'no-detector'; }
+    if (seen.state === null) return 'no-detector';
+    if (seen.visibleBlocker || seen.state === 'blocked') return 'blocked';
+    if (seen.state === 'idle' && !seen.visibleWorking) {
+      await sleep(settleMs);
+      return 'ready';
+    }
+    if (Date.now() >= deadline) return 'timeout';
+    await sleep(pollMs);
+  }
+}
+
+/**
+ * After the brief is typed, make sure it was submitted: an unsent draft left in the
+ * prompt box is submitted with Enter.
+ *
+ * `agent prompt` types and returns without waiting for the turn. If the agent's UI
+ * drops the submit key, the text stays in the box and the worker never starts -- and
+ * because the pane's state is the one fgos reported, nothing else notices. This looks
+ * at herdr's detector: working means the brief was taken; idle with the brief still in
+ * the prompt box means it was not, and Enter is pressed (bounded, spaced). Stops as
+ * soon as the worker's own ack or result file exists, a blocking dialog is up (pressing
+ * a key there would answer it), or the window ends. Returns the number of Enters pressed.
+ */
+export async function confirmBriefSubmitted({ client, target, message, paths, round, windowMs = SUBMIT_CONFIRM_MS, pollMs = SUBMIT_POLL_MS }) {
+  const needle = squash(message).slice(-48);
+  const deadline = Date.now() + windowMs;
+  let enters = 0;
+  let lastEnterAt = 0;
+  while (Date.now() < deadline) {
+    if (fs.existsSync(paths.ackPath) || fs.existsSync(paths.resultPath)) break;
+    let seen;
+    try { seen = client.agentExplain(target); } catch { break; }
+    if (seen.state === null) break;
+    if (seen.visibleBlocker || seen.state === 'blocked') break;
+    if (seen.visibleWorking || seen.state === 'working') break;
+    if (seen.state === 'idle' && needle && squash(seen.promptText).includes(needle)) {
+      if (enters >= SUBMIT_MAX_ENTERS) break;
+      if (Date.now() - lastEnterAt >= SUBMIT_ENTER_EVERY_MS) {
+        try {
+          client.agentSendKeys(target, ['Enter']);
+        } catch {
+          break;
+        }
+        enters += 1;
+        lastEnterAt = Date.now();
+      }
+    }
+    await sleep(pollMs);
+  }
+  if (enters > 0) round.note({ briefSubmitKeyResent: enters });
+  return enters;
 }
 
 /**
@@ -1683,7 +1768,16 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
 
   const message = briefMessage({ delivery, briefText, runDir, roundNumber });
   try {
+    const confinedTarget = Boolean(round.targetName && round.targetName === round.paneId);
+    if (confinedTarget) {
+      // Nothing started this agent through herdr, so herdr never waited for its prompt.
+      const readiness = await awaitPromptReady({ client, target: round.targetName, readyMs: deadlines.startup.readyMs });
+      round.note({ promptReadiness: readiness });
+    }
     deliverBrief({ client, round, message, promptMs: deadlines.startup.promptMs, resultPath: paths.resultPath });
+    if (confinedTarget) {
+      await confirmBriefSubmitted({ client, target: round.targetName, message, paths, round });
+    }
   } catch (err) {
     cleanupIfWorkerStillLive(client, round.paneId);
     throw err;
