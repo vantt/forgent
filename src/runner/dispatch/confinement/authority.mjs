@@ -1125,8 +1125,10 @@ export async function executeThroughConfinement(request, adapterPort = null) {
   }
 
   let adapterResult;
+  let adapterReturned = false;
   try {
     adapterResult = await adapterFn(preparedInvocation, adapterOpts);
+    adapterReturned = true;
     if (preparedLaunch && adapterResult?.receipt) {
       const launchCommandId = request.assignmentLaunchContext.command?.launchCommandId;
       const runDir = request.context?.runDir;
@@ -1245,9 +1247,14 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       },
     );
   } finally {
-    if (preparedConfinement?.cleanup) {
+    // An assignment-owned launch prepared its confinement in prepareConfinementForLaunch, so its
+    // resources (a private home holding a copy of the account login) are not on the outer variable.
+    // They are removed once the worker returned; after a failure they stay, like the pane they belong to.
+    const launchPrepared = adapterReturned ? preparedLaunch?.preparedConfinement : null;
+    for (const prepared of [preparedConfinement, launchPrepared]) {
+      if (!prepared?.cleanup) continue;
       try {
-        await preparedConfinement.cleanup();
+        await prepared.cleanup();
       } catch {
         // cleanup failure preserved
       }

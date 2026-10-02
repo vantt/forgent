@@ -300,6 +300,7 @@ test('a confined pane gets a private account home seeded from the leased account
   // The posture is unchanged: the repository is still read-only.
   assert.match(probe.worktree, BLOCKED);
   assert.deepEqual(fs.readdirSync(accountDir).sort(), realFiles, 'the real account directory is not written to');
+  assert.equal(fs.existsSync(probe.account.dir), false, 'the private home, which holds a copy of the credential, is removed when the run ends');
 
   // The run records which account served it, without the credential.
   const selection = readJson(path.join(runDir, 'provider-capacity-selection.json'));
