@@ -39,6 +39,14 @@ Read `docs/specs/reading-map.md`, then the area spec under `docs/specs/` for wha
 you're about to change. Specs are the state layer — BA-grade, tech-agnostic — read
 the spec before the code.
 
+**Prior art before design.** Before designing a mechanism, find out what already existed
+and why it went away: `git log -S'<symbol>'` / `-G` on the symbol, config key and spec term,
+also under the executor ids and names the thing had before the renames (ids were renamed and
+dormant ones deleted), and read the area spec's "Lịch sử quyết định" and settled-facts
+sections. A plan's facts phase answers "what existed before, and which change removed it,
+and was that intended?" next to its questions about current code. Reuse or extend what is
+found; say in the plan what was reused and what was missing.
+
 ## Definition of done (platform-foundations L5)
 
 A stranger agent with no chat history should be able to answer, for any change:
