@@ -66,7 +66,8 @@ import { stepById } from '../workflow/steps.mjs';
 import { readLocalStatus, classifyRegistryPosture, toolsFromExecutors } from '../state/tool-registry.mjs';
 import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { describeConfigAwareness, loadGlobalConfig } from '../config/global-config.mjs';
-import { inspectProviderCapacity, inspectProviderCapacityLock, defaultProviderCapacityRuntimeDir } from '../runner/dispatch/provider-capacity.mjs';
+import { inspectProviderCapacity, inspectProviderCapacityLock, defaultProviderCapacityRuntimeDir, providerAccountInventory } from '../runner/dispatch/provider-capacity.mjs';
+import { normalizeProviderFamily } from '../runner/dispatch/provider-adapter.mjs';
 import { resolveHerdrBin } from '../runner/dispatch/transport.mjs';
 import { readCodexTrust, readAgyStore, defaultAgySettingsPath } from '../runner/dispatch/trust-store.mjs';
 import { resolveFgosBin, refreshGlobalBinCache } from './bin-discovery.mjs';
@@ -4115,6 +4116,46 @@ export function checkTrustStoresReadable(cwd, runnerCfg = {}) {
   return { passed: true, message: notes.length > 0 ? notes.join('; ') : 'no codex-toml or agy trust store declared' };
 }
 
+/**
+ * A confined herdr pane that binds `private-home` starts in an empty home: the account's login only gets
+ * there when the machine-global provider account inventory names it. Without that entry the agent starts
+ * logged out, and the first symptom is a pane sitting at a sign-in screen until the idle limit. This is the
+ * doctor line that names it, per invocation, before a run does.
+ */
+export function checkConfinedPaneAccounts(runnerCfg = {}) {
+  let inventory;
+  try {
+    inventory = providerAccountInventory(runnerCfg);
+  } catch (err) {
+    return { passed: false, message: `provider account inventory is invalid: ${err.message}` };
+  }
+  const expandHome = (value) => String(value ?? '').replace(/^\$\{HOME\}(?=\/|$)/, os.homedir()).replace(/^~(?=\/|$)/, os.homedir());
+  const problems = [];
+  const notes = [];
+  for (const [id, executor] of Object.entries(runnerCfg.executors ?? {})) {
+    for (const inv of executor?.invocations ?? []) {
+      if (inv?.adapter !== 'herdr-spawn' || !(inv.resourceBindings ?? []).some((b) => b?.resource === 'private-home')) continue;
+      const label = `executor "${id}" invocation "${inv.id ?? '?'}"`;
+      const provider = normalizeProviderFamily(executor.providerModel ?? executor.provider);
+      const accounts = Object.values(inventory[provider]?.accounts ?? {});
+      if (accounts.length === 0) {
+        problems.push(`${label}: no runner.providers.${provider}.accounts in the global config, so its pane starts in an empty private home, logged out`);
+        continue;
+      }
+      for (const account of accounts) {
+        const source = account.credentialSource;
+        const home = expandHome(source.home);
+        const files = source.kind === 'home-files' ? source.files : ['auth.json'];
+        const missing = files.filter((rel) => !fs.existsSync(path.join(home, rel)));
+        if (missing.length > 0) problems.push(`${label}: account "${account.id}" is missing ${missing.join(', ')} under ${home}`);
+        else notes.push(`${label}: account "${account.id}" has its ${files.length} credential file(s)`);
+      }
+    }
+  }
+  if (problems.length > 0) return { passed: false, message: problems.join('; ') };
+  return { passed: true, message: notes.length > 0 ? notes.join('; ') : 'no confined herdr invocation binds a private home' };
+}
+
 /** Second reading of the config door's own C5 invariant. Names the executor and
  * the specific flags, because "confinement incomplete" leaves a reader hunting
  * through three booleans for the one that is false. */
@@ -4283,6 +4324,18 @@ registerCheck({
   id: 'trust-store-readable',
   description: 'the agent folder-trust store is readable and carries a usable "projects" object, so a dispatch into a fresh worktree can be pre-trusted instead of stopping at a dialog',
   check: () => checkTrustStoreWritable(),
+});
+
+registerCheck({
+  id: 'confined-pane-accounts',
+  description: 'every confined herdr invocation that binds a private home has an account in the global provider inventory whose credential files exist, so its pane starts logged in',
+  check: (cwd) => {
+    try {
+      return checkConfinedPaneAccounts(loadRunnerConfigFromDir(cwd));
+    } catch (err) {
+      return { passed: true, message: `runner config not loadable here, confined pane accounts not evaluated: ${err.message}` };
+    }
+  },
 });
 
 registerCheck({
