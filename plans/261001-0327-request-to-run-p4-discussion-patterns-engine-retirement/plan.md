@@ -99,3 +99,8 @@ Sóng B: 2 ∥ 3 ∥ 5 (khác file). Phase 4 sau 3 để dùng lại cách làm 
 Không còn (validate 2026-10-01): (1) **gộp** hai architecture panel thành một Workflow có tham số; (2) dữ liệu session cũ: **tar backup + báo cáo số liệu nền rồi xoá**, không giữ code đọc; (3) visibility **ngang engine**. <!-- Updated: Validation Session 1 -->
 
 <!-- slug: request-to-run-p4-discussion-patterns-engine-retirement -->
+
+## Trạng thái thật (2026-10-02, vòng sửa chung)
+
+Ca 2 và ca 3 đã có Workflow run thật hoàn tất: [acceptance-case-2](reports/acceptance-case-2.md), [acceptance-case-3](reports/acceptance-case-3.md). So engine cũ: chỉ số đo từ session lịch sử, chạy lại NOT RUN.
+Ledger bất biến an toàn — chủ mới có test: gate mutating không binding → `test/runner/execution/run.test.mjs`; provider denylist/operability/remediation → `test/runner/dispatch-governance-*.test.mjs`, `dispatch-i08b-remediation.test.mjs` (đi thẳng `executeAssignment`, cơ chế redirect đã retire theo P1); kiểm operation hợp lệ → `test/runner/assignment-*.test.mjs`; độc lập checker/panel → `run.test.mjs`. Bốn test xoá ngoài engine (`run-result-consumers.characterization`, `cohort-planner*`, `group-cognition-framework`) phủ code của engine đã retire; phần non-engine của characterization còn trong `run-outcome.test.mjs`, `operation-choice.test.mjs`, `loop.test.mjs`.
