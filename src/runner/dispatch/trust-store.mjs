@@ -245,30 +245,40 @@ function codexSectionPattern(projectPath) {
  * exactly as it is rather than rewritten, so this can never downgrade a
  * decision or reformat a file somebody else maintains.
  */
-export function seedCodexTrust(configPath, { projectPath, repoRoot } = {}) {
+export function seedCodexTrust(configPath, { projectPath, repoRoot, rootConfigPath } = {}) {
   if (typeof projectPath !== 'string' || !path.isAbsolute(projectPath)) {
     throw new TrustStoreError('invalid-path', `seedCodexTrust: projectPath must be absolute, got "${projectPath}".`);
   }
   if (typeof repoRoot !== 'string' || !path.isAbsolute(repoRoot)) {
     throw new TrustStoreError('invalid-path', `seedCodexTrust: repoRoot must be absolute, got "${repoRoot}".`);
   }
+  // `rootConfigPath` is the account's own config, where a person made the trust
+  // decision this derives from. `configPath` is where the entry is written; it
+  // differs only for a confined worker, whose private CODEX_HOME starts without
+  // any config.toml, so the entry is written (and the file created) there while
+  // the root is still vouched for by the real account config.
+  const rootStore = rootConfigPath ?? configPath;
   if (readCodexTrust(configPath, projectPath) === true) return false;
-  if (readCodexTrust(configPath, repoRoot) !== true) {
+  if (readCodexTrust(rootStore, repoRoot) !== true) {
     throw new TrustStoreError(
       'untrusted-root',
-      `codex trust seed refused for "${projectPath}": its repo root "${repoRoot}" is not itself trusted in ${configPath}, so there is nothing to derive trust from.`,
-      { projectPath, repoRoot, configPath },
+      `codex trust seed refused for "${projectPath}": its repo root "${repoRoot}" is not itself trusted in ${rootStore}, so there is nothing to derive trust from.`,
+      { projectPath, repoRoot, configPath: rootStore },
     );
   }
   let body;
   try {
     body = fs.readFileSync(configPath, 'utf8');
   } catch (err) {
-    throw new TrustStoreError('unreadable-store', `could not read codex config at ${configPath}: ${err.message}`, { configPath });
+    if (err.code !== 'ENOENT' || rootStore === configPath) {
+      throw new TrustStoreError('unreadable-store', `could not read codex config at ${configPath}: ${err.message}`, { configPath });
+    }
+    body = '';
   }
   const entry = `\n[projects."${projectPath}"]\ntrust_level = "trusted"\n`;
   const tmp = `${configPath}.tmp-${uniqueTmpTag()}`;
   try {
+    fs.mkdirSync(path.dirname(configPath), { recursive: true });
     fs.writeFileSync(tmp, `${body.replace(/\n*$/, '\n')}${entry}`);
     fs.renameSync(tmp, configPath);
   } catch (err) {
@@ -392,7 +402,7 @@ export function readAgyStore(settingsPath) {
  *
  * Idempotent: seeding an already-seeded path rewrites nothing.
  */
-export function seedAgyTrust(settingsPath, { projectPath, repoRoot } = {}) {
+export function seedAgyTrust(settingsPath, { projectPath, repoRoot, rootSettingsPath } = {}) {
   if (typeof settingsPath !== 'string' || !settingsPath.trim()) {
     throw new TrustStoreError('invalid-path', `agy trust seed refused: settingsPath must be a non-empty string, got "${settingsPath}".`);
   }
@@ -406,11 +416,16 @@ export function seedAgyTrust(settingsPath, { projectPath, repoRoot } = {}) {
   const store = readAgyStore(settingsPath);
   const trustedList = Array.isArray(store.trustedWorkspaces) ? store.trustedWorkspaces : [];
 
-  if (!trustedList.some((entry) => matchesPath(entry, repoRoot))) {
+  // `rootSettingsPath`: the account's own settings, where a person trusted the
+  // root. It differs from `settingsPath` only for a confined worker's private HOME.
+  const rootStore = rootSettingsPath ?? settingsPath;
+  const rootData = rootStore === settingsPath ? store : readAgyStore(rootStore);
+  const rootList = Array.isArray(rootData.trustedWorkspaces) ? rootData.trustedWorkspaces : [];
+  if (!rootList.some((entry) => matchesPath(entry, repoRoot))) {
     throw new TrustStoreError(
       'untrusted-root',
-      `agy trust seed refused for "${projectPath}": its repo root "${repoRoot}" is not itself trusted in ${settingsPath}, so there is nothing to derive trust from.`,
-      { projectPath, repoRoot, settingsPath },
+      `agy trust seed refused for "${projectPath}": its repo root "${repoRoot}" is not itself trusted in ${rootStore}, so there is nothing to derive trust from.`,
+      { projectPath, repoRoot, settingsPath: rootStore },
     );
   }
 

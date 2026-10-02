@@ -22,7 +22,8 @@ const FORBIDDEN_ACCOUNT_KEYS = Object.freeze([
 
 const PROVIDER_ENTRY_KEYS = Object.freeze(['accounts']);
 const ACCOUNT_ENTRY_KEYS = Object.freeze(['label', 'credentialSource']);
-const CREDENTIAL_SOURCE_KEYS = Object.freeze(['kind', 'home']);
+const CREDENTIAL_SOURCE_KEYS = Object.freeze(['kind', 'home', 'files']);
+const CREDENTIAL_SOURCE_KINDS = Object.freeze(['codex-home', 'home-files']);
 
 export class ProviderCapacityConfigError extends Error {
   constructor(message) {
@@ -135,16 +136,28 @@ export function validateProviderAccountInventory(runnerConfig, sourceLabel = 'ru
           );
         }
       }
-      if (credentialSource.kind !== 'codex-home') {
-        throw new ProviderCapacityConfigError(`runner config (${sourceLabel}.providers.${provider}.accounts.${accountId}.credentialSource.kind) must be "codex-home" in slice 1.`);
+      if (!CREDENTIAL_SOURCE_KINDS.includes(credentialSource.kind)) {
+        throw new ProviderCapacityConfigError(`runner config (${sourceLabel}.providers.${provider}.accounts.${accountId}.credentialSource.kind) must be one of ${CREDENTIAL_SOURCE_KINDS.join(', ')}.`);
       }
       if (typeof credentialSource.home !== 'string' || !credentialSource.home.trim()) {
         throw new ProviderCapacityConfigError(`runner config (${sourceLabel}.providers.${provider}.accounts.${accountId}.credentialSource.home) must be a non-empty string.`);
       }
+      if (credentialSource.kind === 'home-files') {
+        const files = credentialSource.files;
+        if (!Array.isArray(files) || files.length === 0 || files.some((f) => typeof f !== 'string' || !f.trim() || path.isAbsolute(f) || f.split(/[\\/]/).includes('..'))) {
+          throw new ProviderCapacityConfigError(`runner config (${sourceLabel}.providers.${provider}.accounts.${accountId}.credentialSource.files) must be a non-empty list of relative paths without "..".`);
+        }
+      } else if (credentialSource.files !== undefined) {
+        throw new ProviderCapacityConfigError(`runner config (${sourceLabel}.providers.${provider}.accounts.${accountId}.credentialSource.files) is only valid for kind "home-files".`);
+      }
       normalized[canonicalProvider].accounts[accountId] = {
         id: accountId,
         label: account.label ?? accountId,
-        credentialSource: { kind: credentialSource.kind, home: credentialSource.home },
+        credentialSource: {
+          kind: credentialSource.kind,
+          home: credentialSource.home,
+          ...(credentialSource.kind === 'home-files' ? { files: [...credentialSource.files] } : {}),
+        },
       };
     }
   }

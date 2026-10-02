@@ -367,6 +367,9 @@ export function createHerdrClient({ herdrBin = 'herdr', cwd, env, run = defaultR
         visibleBlocker: verdict?.visible_blocker === true,
         visibleIdle: verdict?.visible_idle === true,
         visibleWorking: verdict?.visible_working === true,
+        // A verdict that matched a screen rule is evidence about the screen; one reached
+        // through `fallback_reason` is herdr's default for a known agent, nothing more.
+        matchedRule: typeof matchedId === 'string' && matchedId ? matchedId : null,
         promptText: typeof matchedRule?.evidence?.region_preview === 'string' ? matchedRule.evidence.region_preview : '',
       };
     },
@@ -391,9 +394,11 @@ export function createHerdrClient({ herdrBin = 'herdr', cwd, env, run = defaultR
 
     /** Screen text. Only ever used to explain a `blocked` agent to a human --
      * never to decide that work happened. */
-    agentRead(name, { lines } = {}) {
+    agentRead(name, { lines, source } = {}) {
       const args = ['agent', 'read', name];
       if (lines) args.push('--lines', String(lines));
+      // `visible` is the one source herdr can serve while the agent is busy drawing.
+      if (source) args.push('--source', source);
       // Measured on herdr 0.9.1: `agent read` prints the screen as plain text, not in the JSON
       // envelope every other call answers in (an older build wrapped it). A failure still comes
       // back as an error envelope, so JSON is tried first and only a body that is not JSON is

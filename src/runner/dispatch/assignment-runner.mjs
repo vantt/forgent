@@ -1643,9 +1643,11 @@ export async function executeAssignment(assignment, opts = {}) {
     }
     // H8: a lease can be selected (an account/credentialSource chosen) for
     // a dispatch shape nothing can actually provision that credential
-    // into -- today only the confined bwrap driver's own prepare() copies
-    // credentialSource into the worker's home (confinement/drivers/
-    // bwrap.mjs's provisionSelectedCodexCredential). Narrowly scoped to
+    // into -- only the confined bwrap driver's own prepare() copies
+    // credentialSource into the worker's private home (confinement/drivers/
+    // bwrap.mjs's provisionSelectedCodexCredential), and both cli-spawn and
+    // herdr-spawn reach that prepare() through prepareConfinementForLaunch
+    // with the same providerCapacity. Narrowly scoped to
     // `confinement.mode: 'required'`: that is the one case where the
     // CALLER explicitly declared it needs confinement, so silently
     // running with no credential provisioned (and no sandbox either) is a
@@ -1659,7 +1661,7 @@ export async function executeAssignment(assignment, opts = {}) {
     if (providerCapacitySelection?.status === 'selected') {
       const confinementMode = compiledPlan?.policy?.confinement?.mode;
       const requiresConfinement = confinementMode === 'required';
-      const canProvisionCredential = !requiresConfinement || resolvedAdapter === 'cli-spawn';
+      const canProvisionCredential = !requiresConfinement || resolvedAdapter === 'cli-spawn' || resolvedAdapter === 'herdr-spawn';
       if (requiresConfinement && !canProvisionCredential) {
         try {
           releaseProviderAccountLease({

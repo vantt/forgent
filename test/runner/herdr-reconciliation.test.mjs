@@ -1092,7 +1092,7 @@ test('20. live Herdr gateway executes confined launch end-to-end when gateway is
   createHerdrLaunchCommand(runDir, launchContext);
 
   const resultPath = path.join(outboxDir, 'result-1.json');
-  const workerCode = `const fs = require('fs'); fs.writeFileSync(${JSON.stringify(resultPath)}, JSON.stringify({ status: 'done', summary: 'live-proof' })); setTimeout(() => {}, 2000);`;
+  const workerCode = `const fs = require('fs'); fs.writeFileSync(${JSON.stringify(resultPath)}, JSON.stringify({ status: 'done', summary: 'live-proof' })); setTimeout(() => {}, 60000);`;
   // The real sandbox shape `prepareBwrap` builds: read-only root, a single
   // writable bind for the resource under test (the run-output outbox), then
   // the worker command after `--`. Everything the worker is NOT explicitly

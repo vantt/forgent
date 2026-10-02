@@ -340,6 +340,10 @@ export async function executeExecutorCli(
     // Directory the confinement authority treats as the writable workspace when the
     // requirement grants one; defaults to the main checkout root.
     workspaceRoot,
+    // The provider account an Assignment run leased. Its credential source is what
+    // the confined driver copies into the worker's private home; without it a
+    // confined pane starts without the account's login.
+    providerCapacity,
   } = {},
 ) {
   const purpose = purposeArg;
@@ -463,7 +467,7 @@ export async function executeExecutorCli(
         // value-preserving (still `undefined`) for all of them; it only
         // stops the `ReferenceError: opts is not defined` crash this
         // function hit on every call.
-        providerCapacity: options?.providerCapacity,
+        providerCapacity: providerCapacity ?? options?.providerCapacity,
         authorityScope: 'external-harness',
         invocation: {
           agentType,
@@ -673,7 +677,7 @@ export async function executeExecutorCli(
         assignmentLaunchContext,
         // Same pre-existing `opts`-is-not-defined fix as the in-process
         // branch above -- see its comment.
-        providerCapacity: options?.providerCapacity,
+        providerCapacity: providerCapacity ?? options?.providerCapacity,
         ...(requirement ? { requirement } : {}),
         invocation: {
           command,

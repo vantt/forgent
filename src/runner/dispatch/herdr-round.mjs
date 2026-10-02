@@ -31,6 +31,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import os from 'node:os';
 import crypto from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import { DispatchError } from './dispatch-error.mjs';
 import { createHerdrClient, createBatchTab, normalizeAgentName, isReadyState } from './herdr-agent.mjs';
 import { briefPaths, renderBrief, renderPointer } from './brief.mjs';
@@ -405,6 +406,9 @@ const SUBMIT_POLL_MS = 700;
 /** Settle time after the prompt first looks ready: an agent UI draws its prompt box
  * before its startup work (hooks, session setup) has finished taking input. */
 const PROMPT_SETTLE_MS = 1500;
+/** How long to wait for the UI of an agent herdr has no screen rule for to draw and hold still,
+ * before typing at it anyway. A process that never draws anything must not be waited on forever. */
+const UNRULED_READY_MS = 15000;
 
 
 /** The last line on screen with anything on it -- what a person would read to
@@ -623,30 +627,65 @@ export async function establishConfinement({ confinement, round, fullEnv, cwd, r
  * already be trusted by some other route, and the dialog it might still hit
  * is reported by name by the very next step anyway.
  */
-function seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv }) {
+function seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, workerEnv = null }) {
   const projectPath = path.resolve(cwd);
-  const repoRootForTrust = repoRoot ?? path.dirname(projectPath);
-  try {
-    if (trustStore.kind === 'codex-toml') {
-      seedCodexTrust(
-        trustStore.path ?? path.join(fullEnv.CODEX_HOME ?? path.join(os.homedir(), '.codex'), 'config.toml'),
-        { projectPath, repoRoot: repoRootForTrust },
-      );
-    } else if (trustStore.kind === 'agy' || trustStore.kind === 'agy-json') {
-      seedAgyTrust(
-        trustStore.path ?? defaultAgySettingsPath(fullEnv.HOME ?? os.homedir()),
-        { projectPath, repoRoot: repoRootForTrust },
-      );
-    } else {
-      seedTrust(
-        trustStore.path ?? path.join(os.homedir(), '.claude.json'),
-        { projectPath, repoRoot: repoRootForTrust },
-      );
+  const roots = trustRoots(projectPath, repoRoot ?? path.dirname(projectPath));
+  const stores = trustStorePaths({ trustStore, fullEnv, workerEnv });
+  let firstError = null;
+  for (const root of roots) {
+    try {
+      if (trustStore.kind === 'codex-toml') {
+        seedCodexTrust(stores.target, { projectPath, repoRoot: root, rootConfigPath: stores.root });
+      } else if (trustStore.kind === 'agy' || trustStore.kind === 'agy-json') {
+        seedAgyTrust(stores.target, { projectPath, repoRoot: root, rootSettingsPath: stores.root });
+      } else {
+        seedTrust(stores.target, { projectPath, repoRoot: root });
+      }
+      round.note({ trustSeeded: trustStore.kind });
+      return;
+    } catch (err) {
+      firstError ??= err;
     }
-    round.note({ trustSeeded: trustStore.kind });
-  } catch (err) {
-    round.note({ trustSeedFailed: err.message });
   }
+  round.note({ trustSeedFailed: firstError?.message ?? 'no trust root to derive from' });
+}
+
+/**
+ * Roots a workspace's trust may be derived from: the repository root the run
+ * was started for and, for a linked worktree, the main checkout that owns it
+ * (the same repository, and the root codex itself asks about). Never invents
+ * a root: each is only a candidate for the "already trusted" check.
+ */
+export function trustRoots(projectPath, repoRoot) {
+  const roots = [repoRoot];
+  try {
+    const common = execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], {
+      cwd: projectPath, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+    if (common && path.basename(common) === '.git') roots.push(path.dirname(common));
+  } catch { /* not a checkout: only the declared root is a candidate */ }
+  return [...new Set(roots)];
+}
+
+/**
+ * Where the trust decision is read (the account's real store) and where the
+ * entry is written. They differ only for a confined worker with a private
+ * home: it reads its store from the private CODEX_HOME / HOME, which starts
+ * empty, so the entry goes there and the account's own store is never touched.
+ */
+export function trustStorePaths({ trustStore, fullEnv, workerEnv }) {
+  if (trustStore.kind === 'codex-toml') {
+    const real = trustStore.path ?? path.join(fullEnv.CODEX_HOME ?? path.join(os.homedir(), '.codex'), 'config.toml');
+    const own = workerEnv?.CODEX_HOME && workerEnv.CODEX_HOME !== fullEnv.CODEX_HOME;
+    return { root: real, target: own ? path.join(workerEnv.CODEX_HOME, 'config.toml') : real };
+  }
+  if (trustStore.kind === 'agy' || trustStore.kind === 'agy-json') {
+    const real = trustStore.path ?? defaultAgySettingsPath(fullEnv.HOME ?? os.homedir());
+    const own = workerEnv?.HOME && workerEnv.HOME !== fullEnv.HOME;
+    return { root: real, target: own ? defaultAgySettingsPath(workerEnv.HOME) : real };
+  }
+  const real = trustStore.path ?? path.join(os.homedir(), '.claude.json');
+  return { root: real, target: real };
 }
 
 /**
@@ -658,25 +697,17 @@ function seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv }) {
  * Never throws, for the same reason `seedWorkspaceTrust` does not: teardown
  * must never be the thing that turns a settled round into a crash.
  */
-function removeWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv }) {
+function removeWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, workerEnv = null }) {
   if (!trustStore) return;
   const projectPath = path.resolve(cwd);
   try {
+    const { target } = trustStorePaths({ trustStore, fullEnv, workerEnv });
     if (trustStore.kind === 'codex-toml') {
-      removeCodexTrust(
-        trustStore.path ?? path.join(fullEnv.CODEX_HOME ?? path.join(os.homedir(), '.codex'), 'config.toml'),
-        projectPath,
-      );
+      removeCodexTrust(target, projectPath);
     } else if (trustStore.kind === 'agy' || trustStore.kind === 'agy-json') {
-      removeAgyTrust(
-        trustStore.path ?? defaultAgySettingsPath(fullEnv.HOME ?? os.homedir()),
-        projectPath,
-      );
+      removeAgyTrust(target, projectPath);
     } else {
-      removeTrust(
-        trustStore.path ?? path.join(os.homedir(), '.claude.json'),
-        projectPath,
-      );
+      removeTrust(target, projectPath);
     }
     round.note({ trustRemoved: trustStore.kind });
   } catch (err) {
@@ -843,14 +874,42 @@ const squash = (text) => String(text ?? '').replace(/\s+/g, '');
  */
 export async function awaitPromptReady({ client, target, readyMs, settleMs = PROMPT_SETTLE_MS, pollMs = SUBMIT_POLL_MS }) {
   const deadline = Date.now() + readyMs;
+  // Only used when herdr has no rule for this agent: see below.
+  let launchScreen = null;
+  let lastScreen = null;
+  let stableSince = null;
+  let unruledSince = null;
   for (;;) {
     let seen;
     try { seen = client.agentExplain(target); } catch { return 'no-detector'; }
     if (seen.state === null) return 'no-detector';
     if (seen.visibleBlocker || seen.state === 'blocked') return 'blocked';
     if (seen.state === 'idle' && !seen.visibleWorking) {
-      await sleep(settleMs);
-      return 'ready';
+      if (seen.matchedRule || seen.visibleIdle) {
+        await sleep(settleMs);
+        return 'ready';
+      }
+      // herdr says "idle" for a known agent it has no screen rule for, which is also what a
+      // process still starting looks like, so that verdict says nothing about whether the UI
+      // takes input. The screen does: it has to change from what the launch left there and then
+      // hold still for a settle period.
+      unruledSince ??= Date.now();
+      let screen = null;
+      try { screen = client.agentRead(target, { source: 'visible' }); } catch { screen = null; }
+      if (typeof screen !== 'string') {
+        await sleep(settleMs);
+        return 'ready';
+      }
+      if (Date.now() - unruledSince >= Math.min(UNRULED_READY_MS, readyMs)) return 'unverified';
+      if (launchScreen === null) {
+        launchScreen = screen;
+      } else if (screen !== launchScreen && screen === lastScreen) {
+        stableSince ??= Date.now();
+        if (Date.now() - stableSince >= settleMs) return 'ready';
+      } else {
+        stableSince = null;
+      }
+      lastScreen = screen;
     }
     if (Date.now() >= deadline) return 'timeout';
     await sleep(pollMs);
@@ -1105,7 +1164,7 @@ function concludeFailure({ client, round, decision, closeAlways }) {
  * dies and a `setsid` descendant survives it. Nothing here reports this round
  * as cancelled, and nothing should.
  */
-async function settleRound({ client, round, paths, exitCommand = '/exit', promptMs, readLiveness, workerHomePath, launcherScriptPath, trustStore, cwd, repoRoot, fullEnv }) {
+async function settleRound({ client, round, paths, exitCommand = '/exit', promptMs, readLiveness, workerHomePath, launcherScriptPath, trustStore, cwd, repoRoot, fullEnv, workerEnv }) {
   const target = round.targetName ?? round.agentName;
   let stdout = '';
   try {
@@ -1145,7 +1204,7 @@ async function settleRound({ client, round, paths, exitCommand = '/exit', prompt
     // store is the other half of B3 -- without removing it here the store
     // grows one entry per settled round, forever, same as an unremoved
     // failed-round entry would.
-    removeWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv });
+    removeWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, workerEnv });
   }
 
   // LOW-11: the launcher script persists the full prepared env, including
@@ -1500,7 +1559,7 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
   // the workspace already trusted, so writing to the operator's own store for
   // a directory only the worker will ever see would be pure side effect.
   if (trustStore && !workerHomePath) {
-    seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv });
+    seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, workerEnv: isConfined ? (preparedWorkerInvocation.env || null) : null });
   }
 
   round.targetName = isConfined ? round.paneId : round.agentName;
@@ -1876,7 +1935,7 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
   const stdout = await settleRound({
     client, round, paths, exitCommand,
     promptMs: deadlines.startup.promptMs, readLiveness, workerHomePath, launcherScriptPath,
-    trustStore, cwd, repoRoot, fullEnv,
+    trustStore, cwd, repoRoot, fullEnv, workerEnv: isConfined ? (preparedWorkerInvocation.env || null) : null,
   });
 
   if (isAssignmentRun) {

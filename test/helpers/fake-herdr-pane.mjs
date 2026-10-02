@@ -255,6 +255,14 @@ import path from 'node:path';
 const signalFile = process.env.FAKE_AGENT_SIGNAL;
 const targets = JSON.parse(fs.readFileSync(process.env.FAKE_AGENT_TARGETS, 'utf8'));
 const attempt = (file) => { try { fs.writeFileSync(file, 'x'); return 'ok'; } catch (err) { return err.code || String(err); } };
+const walk = (dir, base = dir) => fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(path.join(dir, e.name), base) : [path.relative(base, path.join(dir, e.name))]));
+const accountReport = (dir) => {
+  if (!dir) return { dir: null };
+  const files = fs.existsSync(dir) ? walk(dir).filter((f) => !f.startsWith('.fgos-confinement')).sort() : [];
+  const read = (rel) => { try { return fs.readFileSync(path.join(dir, rel), 'utf8'); } catch { return null; } };
+  const modeOf = (rel) => { try { return (fs.statSync(path.join(dir, rel)).mode & 0o777).toString(8); } catch { return null; } };
+  return { dir, files, contents: Object.fromEntries(files.map((f) => [f, read(f)])), modes: Object.fromEntries(files.map((f) => [f, modeOf(f)])), writable: attempt(path.join(dir, 'state-probe.txt')) };
+};
 const deadline = Date.now() + 25000;
 const timer = setInterval(() => {
   if (Date.now() > deadline) { clearInterval(timer); process.exit(0); }
@@ -267,6 +275,8 @@ const timer = setInterval(() => {
     outbox: attempt(path.join(outbox, 'probe-outbox.txt')),
     tty: process.stdin.isTTY === true || process.stdout.isTTY === true,
     home: process.env.HOME ?? null,
+    // An account home the launch provisioned: what it holds, and whether the agent may write in it.
+    account: process.env.FAKE_ACCOUNT_HOME_VAR ? accountReport(process.env[process.env.FAKE_ACCOUNT_HOME_VAR]) : null,
   };
   fs.writeFileSync(path.join(outbox, 'probe-results.json'), JSON.stringify(results));
   setInterval(() => {}, 1000);

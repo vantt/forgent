@@ -62,7 +62,7 @@ if (match) {
  * A repo plus a linked worktree, and one executor per name. Each executor has a confined
  * cli-spawn invocation and a confined herdr-spawn invocation; prefer lists them in order.
  */
-function setup(executorNames, { idleTimeoutMs = 1500, agentKind = 'fakeagent' } = {}) {
+function setup(executorNames, { idleTimeoutMs = 1500, agentKind = 'fakeagent', herdrExtra = {} } = {}) {
   const repoRoot = fixtureDir('fgos-herdr-run-');
   const git = (args, cwd = repoRoot) => execFileSync('git', args, { cwd, stdio: 'ignore' });
   git(['init', '-b', 'main']);
@@ -102,11 +102,13 @@ function setup(executorNames, { idleTimeoutMs = 1500, agentKind = 'fakeagent' } 
           confinement: { backend: 'bwrap' },
           command,
           args: [agentScript],
-          interactiveMode: { exitCommand: '/exit', kind: agentKind },
+          interactiveMode: { exitCommand: '/exit', kind: agentKind, ...(herdrExtra.interactiveMode ?? {}) },
           env: {
             FAKE_AGENT_SIGNAL: path.join(signalDir, `signal-mock-pane-${index + 1}.json`),
             FAKE_AGENT_TARGETS: targets,
+            ...(herdrExtra.env ?? {}),
           },
+          ...(herdrExtra.resourceBindings ? { resourceBindings: herdrExtra.resourceBindings } : {}),
         },
       ],
     };
@@ -242,6 +244,119 @@ test('a producer with declared writes writes in its worktree only, in a pane; it
   assert.match(reviewer.worktree, BLOCKED);
   assert.match(reviewer.main, BLOCKED);
   assert.equal(reviewer.outbox, 'ok');
+});
+
+/** Runs fn with HOME pointing at a scratch home whose global config carries the given runner section. */
+async function withGlobalRunnerConfig(runner, fn) {
+  const home = fixtureDir('fgos-global-home-');
+  fs.mkdirSync(path.join(home, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(home, '.fgos', 'config.json'), JSON.stringify({ runner }, null, 2));
+  const previous = process.env.HOME;
+  process.env.HOME = home;
+  try {
+    return await fn(home);
+  } finally {
+    if (previous === undefined) delete process.env.HOME;
+    else process.env.HOME = previous;
+  }
+}
+
+const accountBinding = { resource: 'private-home', target: { kind: 'env', name: 'ACCOUNT_HOME' } };
+
+test('a confined pane gets a private account home seeded from the leased account, and the real account stays untouched', { skip: SKIP }, async () => {
+  const accountDir = fixtureDir('fgos-account-');
+  fs.mkdirSync(path.join(accountDir, 'nested'), { recursive: true });
+  fs.writeFileSync(path.join(accountDir, 'auth.json'), '{"token":"account-secret"}');
+  fs.writeFileSync(path.join(accountDir, 'nested', 'settings.json'), '{"theme":"dark"}');
+  fs.writeFileSync(path.join(accountDir, 'history.jsonl'), 'must not be copied');
+  const realFiles = fs.readdirSync(accountDir).sort();
+  const { repoRoot, worktreeDir, signalDir } = setup(['alpha'], {
+    herdrExtra: {
+      env: { ACCOUNT_HOME: accountDir, FAKE_ACCOUNT_HOME_VAR: 'ACCOUNT_HOME' },
+      resourceBindings: [accountBinding],
+    },
+  });
+  const fake = useFakeHerdr({ signalDir, panes: [{ awaitProbe: true }] });
+  const res = await withGlobalRunnerConfig(
+    { providers: { alpha: { accounts: { acct: { credentialSource: { kind: 'home-files', home: accountDir, files: ['auth.json', 'nested/settings.json'] } } } } } },
+    () => withHerdrBin(fake.herdrBin, () => runUnit({
+      unitData: readOnlyUnit('u-account-home'),
+      repoRoot,
+      cwd: worktreeDir,
+      worktree: worktreeDir,
+      session: { herdrPresent: true, headless: true },
+    })),
+  );
+  assert.equal(res.outcome, 'pass', JSON.stringify(res.results[0]).slice(0, 1500));
+
+  const runDir = runDirOf(repoRoot, res.unitRunId, 'producer', 1);
+  const probe = readJson(path.join(runDir, 'outbox', 'probe-results.json'));
+  assert.notEqual(probe.account.dir, accountDir, 'the agent runs with a private home, not the real account directory');
+  assert.deepEqual(probe.account.files, ['auth.json', 'nested/settings.json'], 'exactly the listed files are provisioned');
+  assert.equal(probe.account.contents['auth.json'], '{"token":"account-secret"}');
+  assert.equal(probe.account.modes['auth.json'], '600', 'a credential is owner-only');
+  assert.equal(probe.account.writable, 'ok', "the private home takes the agent's own state");
+  // The posture is unchanged: the repository is still read-only.
+  assert.match(probe.worktree, BLOCKED);
+  assert.deepEqual(fs.readdirSync(accountDir).sort(), realFiles, 'the real account directory is not written to');
+
+  // The run records which account served it, without the credential.
+  const selection = readJson(path.join(runDir, 'provider-capacity-selection.json'));
+  assert.equal(selection.accountId, 'acct');
+  assert.equal(JSON.stringify(selection).includes('account-secret'), false);
+});
+
+test('a leased account whose credential file is missing refuses the pane before anything is launched', { skip: SKIP }, async () => {
+  const accountDir = fixtureDir('fgos-account-empty-');
+  const { repoRoot, worktreeDir, signalDir } = setup(['alpha'], {
+    herdrExtra: {
+      env: { ACCOUNT_HOME: accountDir, FAKE_ACCOUNT_HOME_VAR: 'ACCOUNT_HOME' },
+      resourceBindings: [accountBinding],
+    },
+  });
+  const fake = useFakeHerdr({ signalDir, panes: [{ awaitProbe: true }] });
+  const res = await withGlobalRunnerConfig(
+    { providers: { alpha: { accounts: { acct: { credentialSource: { kind: 'home-files', home: accountDir, files: ['auth.json'] } } } } } },
+    () => withHerdrBin(fake.herdrBin, () => runUnit({
+      unitData: readOnlyUnit('u-account-missing'),
+      repoRoot,
+      cwd: worktreeDir,
+      worktree: worktreeDir,
+      session: { herdrPresent: true, headless: true },
+    })),
+  );
+  assert.notEqual(res.outcome, 'pass');
+  assert.equal(fake.calls().filter((c) => c[0] === 'pane' && c[1] === 'run').length, 0, 'no agent may be launched without its credential');
+});
+
+test('a codex-style pane trusts its workspace in the private home and leaves the real account config alone', { skip: SKIP }, async () => {
+  const accountDir = fixtureDir('fgos-account-trust-');
+  fs.writeFileSync(path.join(accountDir, 'auth.json'), '{"token":"t"}');
+  const { repoRoot, worktreeDir, signalDir } = setup(['alpha'], {
+    herdrExtra: {
+      env: { CODEX_HOME: accountDir, FAKE_ACCOUNT_HOME_VAR: 'CODEX_HOME' },
+      resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: 'CODEX_HOME' } }],
+      interactiveMode: { trustStore: { kind: 'codex-toml' } },
+    },
+  });
+  // The person already trusted the repository root in the real account config.
+  const realConfig = `[projects."${repoRoot}"]\ntrust_level = "trusted"\n`;
+  fs.writeFileSync(path.join(accountDir, 'config.toml'), realConfig);
+  const fake = useFakeHerdr({ signalDir, panes: [{ awaitProbe: true }] });
+  const res = await withGlobalRunnerConfig(
+    { providers: { alpha: { accounts: { acct: { credentialSource: { kind: 'home-files', home: accountDir, files: ['auth.json'] } } } } } },
+    () => withHerdrBin(fake.herdrBin, () => runUnit({
+      unitData: readOnlyUnit('u-account-trust'),
+      repoRoot,
+      cwd: worktreeDir,
+      worktree: worktreeDir,
+      session: { herdrPresent: true, headless: true },
+    })),
+  );
+  assert.equal(res.outcome, 'pass', JSON.stringify(res.results[0]).slice(0, 1500));
+  const probe = readJson(path.join(runDirOf(repoRoot, res.unitRunId, 'producer', 1), 'outbox', 'probe-results.json'));
+  assert.match(probe.account.contents['config.toml'], new RegExp(`\\[projects\\."${worktreeDir.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"\\]`), 'the private config trusts the workspace the agent starts in');
+  assert.equal(fs.readFileSync(path.join(accountDir, 'config.toml'), 'utf8'), realConfig, 'the real account config is not edited');
 });
 
 test('headless (no herdr) runs cli-spawn with the same posture and never touches herdr', { skip: SKIP }, async () => {
