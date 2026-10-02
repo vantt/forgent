@@ -237,6 +237,19 @@ export async function runUnit(options = {}) {
     return records;
   };
 
+  // Executors that actually ran each role in this unit run. `independentOf` names roles
+  // ('producer'); bind() compares provider families, so a role name has to be turned into the
+  // executor(s) that played it before it can exclude anything. Roles that have not run yet
+  // (concurrent panelists) stay as role names and exclude nothing.
+  const executorsByRole = new Map();
+  const noteRoleExecutor = (role, executorId) => {
+    if (!executorId) return;
+    if (!executorsByRole.has(role)) executorsByRole.set(role, new Set());
+    executorsByRole.get(role).add(executorId);
+  };
+  const resolveIndependence = (names) =>
+    (names || []).flatMap((name) => (executorsByRole.has(name) ? [...executorsByRole.get(name)] : [name]));
+
   // Helper to run a role
   const runRole = async ({ role, unit: rUnit, readOnly = false, round = 1, independentOf = [], inputs = [] }) => {
     const runnerConfig = unitRecord.configSnapshot.runner;
@@ -253,7 +266,7 @@ export async function runUnit(options = {}) {
         unit: rUnit || unit,
         role,
         readOnly,
-        independentOf,
+        independentOf: resolveIndependence(independentOf),
         overrides: unitRecord.overrides || [],
       },
       {
@@ -285,6 +298,7 @@ export async function runUnit(options = {}) {
         createdAt: new Date().toISOString(),
       };
       fs.writeFileSync(path.join(unitDir, 'pending-inline.json'), JSON.stringify(pendingRecord, null, 2));
+      noteRoleExecutor(role, bound.executor);
       return {
         outcome: 'blocked',
         role,
@@ -337,6 +351,8 @@ export async function runUnit(options = {}) {
       isReadOnlyMode: readOnly,
       session,
     });
+
+    noteRoleExecutor(role, runResult?.executorId ?? bound.executor);
 
     const category = runResult?.classification?.outcome?.category ?? 'ok';
     let outcome = 'pass';
