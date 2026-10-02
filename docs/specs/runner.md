@@ -3047,3 +3047,20 @@ adapter-specific exports (Node side, unit P8a) and `supervisor.rs`/
   3. **Đóng ranh giới A4 (L5 không phụ thuộc L3):** Xoá sạch toàn bộ import `src/state/**` khỏi `src/runner/dispatch/**` và `src/runner/execution/**`. Xoá writer `dispatch-runs` và các reader cũ.
   4. **Thu hồi adapter Workflow cũ:** Xoá `src/runner/definitions/workflow-adapter.mjs`, bỏ profile `Workflow` khỏi `FlowDefinition`, xoá doctor check `workflow-flow-definition-projects-cleanly`. Workflow runner (`src/workflow/**`) là sequencer duy nhất.
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
+
+### 0050 — P6 Nối thật: herdr là transport mặc định, posture một đường, fallback quota qua pane mới
+
+- **Trạng thái:** Settled cho ca 1, 2, 3, 4, 6; ca 5 NOT RUN (xem bằng chứng)
+- **Bối cảnh:** Sau 0047, `bind().transport`, `resolvePosture` và `nextCandidate` tồn tại nhưng không ai gọi: mọi lần chạy thật là cli headless, posture tự dựng `bwrapArgs` riêng song song với driver confinement, `canApplyPosture` luôn `true`.
+- **Quyết định:**
+  1. **Transport do `bind()` quyết, `run.mjs` đọc.** herdr khi herdr có mặt trong session **và** executor có invocation `herdr-spawn` có id mà `canApplyPosture` chấp nhận; ngược lại cli (lý do ghi ở `provenance.transport.source`). Transport và invocation thật nằm trong `assignment.json` / `unit.json`, không chỉ ở giá trị trả về. Executor có CLI vẫn out-of-process (D-ADR0033).
+  2. **Posture một đường.** `resolvePosture` chỉ ánh xạ posture -> `requirement` (policy built-in); `requirement` đi vào `buildConfinementRequest` -> Confinement Authority -> driver bwrap, cho cả pane herdr lẫn cli. Không còn `bwrapArgs` tự dựng trong `policies.mjs` (guard test). `canApplyPosture` phản ánh khả năng thật: invocation khai `confinement.backend`, backend bật trong registry máy, executable chạy được; thiếu thì bind lọc candidate hoặc từ chối `posture-unavailable`, không chạy không confine. Nên mọi invocation `herdr-spawn` muốn được chọn phải khai `confinement`.
+  3. **Fallback quota.** `provider-limit` (herdr đọc màn hình qua detector của herdr, mặc định idle 5 phút nếu config không đặt `idleTimeoutMs`) -> `nextCandidate` đi tiếp `prefer[]` -> pane mới dưới assignment id `<unitRun>/<role>/<round>-fb<n>`; pane cũ giữ nguyên; `fallbackFrom` ghi lại; hết candidate thì outcome vẫn `provider-limit`. cli-spawn không có phát hiện limit nên headless không fallback.
+  4. **Pane confine cho cả năm họ** (claude, claude qua OpenRouter, codex, agy, pi): mỗi agent giữ state trong private home dựng từ account được lease; công thức và lý do ở [confinement-authority.md §13.1](./confinement-authority.md), account inventory toàn máy ở RUL65b (trên).
+- **Bằng chứng:** [acceptance-herdr.md](../../plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/acceptance-herdr.md): ca 1 (Unit `reviewed`), 2 (reviewer bị chặn ghi repo, ghi được outbox), 3 (Workflow `architecture-advisory` 9 role trong pane, 4 họ provider), 4 (fallback, pane cũ giữ), 6 (headless cli cùng posture) Accepted; transport đọc từ `assignment.json`.
+- **Giới hạn đã biết:**
+  - Ca 5 (so cùng câu hỏi với engine cũ, tag `pre-engine-retirement`) **NOT RUN**: engine cũ cần Lead tự viết và authorize từng bước, nên "Lead-active" sẽ đo chính thao tác tay, không đo engine.
+  - Ca 4 dùng màn hình limit **giả** (executor `fake-limit`); `DEFAULT_USAGE_LIMIT_PATTERNS` chưa đo trên màn hình limit thật của claude/codex.
+  - Inventory account (`runner.providers.<provider>.accounts`) chỉ ở `~/.fgos/config.json` toàn máy; mỗi máy phải tự khai, `fgos setup` không tạo; `fgos doctor` (`confined-pane-accounts`) chỉ ra pane thiếu entry.
+  - bind chọn invocation herdr **đầu tiên** của executor; executor nhiều account cần luật chọn tường minh về sau.
+Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.

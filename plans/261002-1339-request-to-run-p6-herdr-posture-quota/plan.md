@@ -1,7 +1,7 @@
 ---
 title: "P6 Nối thật: herdr làm transport mặc định, posture read-only, fallback quota"
 description: "Đóng phần P1 còn dở sau vòng sửa: bind().transport, resolvePosture, nextCandidate đều đã có nhưng không ai gọi. Nối vào đường chạy thật, một đường confinement duy nhất, rồi nghiệm thu bằng lần chạy thật qua pane herdr."
-status: pending
+status: in-progress
 priority: P1
 effort: "~5–6d"
 tags: [herdr, transport, posture, confinement, quota, acceptance]
@@ -59,13 +59,21 @@ Sóng B: 2 ∥ 3 (khác file). Phase 4 sau 2 vì posture phải áp **trong** pa
 
 ## Success Criteria
 
-- [ ] `fgos run` chọn herdr khi herdr có mặt và executor có invocation herdr; cli khi headless — kiểm qua test đi `fgos run`, và qua lần chạy thật (transport ghi trong run record = `herdr`).
-- [ ] Một đường confinement: posture resolve một lần lúc spawn, áp bằng driver hiện có, cho cả herdr và cli; `canApplyPosture` phản ánh khả năng thật (bwrap có mặt, backend hỗ trợ); không còn `bwrapArgs` tự dựng trong `policies.mjs`.
-- [ ] Reviewer read-only chạy thật: ghi repo bị chặn, ghi outbox được — qua pane herdr và qua cli.
-- [ ] `provider-limit` → `nextCandidate` → candidate kế chạy (pane mới, pane cũ giữ) — test qua `fgos run` + một lần chạy thật bằng executor giả lập màn hình limit.
-- [ ] 13 capability có trong `fgos setup` (config-merge) + doctor; `.fgos/config.json` commit khớp; synthesizer khác provider với panelist; worktree Unit được dọn khi Workflow run kết thúc.
-- [ ] Ca 1 và ca 2 chạy lại qua pane herdr; ca 2 so cùng câu hỏi với engine cũ (tag `pre-engine-retirement`) hoặc ghi NOT RUN + lý do.
-- [ ] Full `npm test` (Node + Rust) xanh; merge `main`; track đóng.
+- [x] `fgos run` chọn herdr khi herdr có mặt và executor có invocation herdr; cli khi headless — test `test/runner/execution/run-herdr.test.mjs` qua `runUnit`; lần chạy thật: transport `herdr` đọc từ `assignment.json` (ca 1–4, ca 3 cả 9 role), `cli` ở ca 6.
+- [x] Một đường confinement: `resolvePosture` -> `requirement` -> `buildConfinementRequest` -> driver bwrap, cho herdr và cli; `canApplyPosture` phản ánh backend thật; không còn `bwrapArgs` trong `policies.mjs`.
+- [x] Reviewer read-only chạy thật: ghi repo bị chặn, ghi outbox được — qua pane herdr (ca 2, ca 3) và cli (ca 6).
+- [x] `provider-limit` -> `nextCandidate` -> candidate kế (pane mới, pane cũ giữ) — test qua `runUnit` + lần chạy thật ca 4 **bằng màn hình limit giả**; màn hình limit thật chưa đo.
+- [x] Capability workflow có trong `fgos setup` + doctor (`workflow-capabilities-configured`; phủ cả 27 capability của mọi Workflow đã ship, không chỉ 13); `.fgos/config.json` commit khớp; synthesizer khác họ provider với panelist; worktree Unit được dọn khi Workflow run kết thúc.
+- [x] Chạy lại qua pane herdr: Unit `reviewed` (ca 1) và Workflow `architecture-advisory` (ca 3). So cùng câu hỏi với engine cũ = **NOT RUN** (ca 5; lý do ở [acceptance-herdr.md](./reports/acceptance-herdr.md)) — phương án "ghi NOT RUN + lý do" của tiêu chí, không phải đã so.
+- [ ] Full `npm test` (Node + Rust) xanh trên nhánh (báo cáo nghiệm thu: lần chạy cuối 6550 test, 0 fail) **và** merge `main` — chờ controller merge. Track đóng sau đó.
+
+## Báo cáo
+
+[phase-02](./reports/phase-02-report.md) · [phase-03](./reports/phase-03-report.md) · [phase-04](./reports/phase-04-report.md) · [nghiệm thu herdr](./reports/acceptance-herdr.md) (PARTIAL: ca 1, 2, 3, 4, 6 Accepted; ca 5 NOT RUN).
+
+## Trạng thái
+
+Phase 1–5 complete; phase 6 in-progress (hoàn tất khi controller merge `main`).
 
 ## Risk Assessment
 

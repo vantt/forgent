@@ -1,7 +1,7 @@
 ---
 phase: 5
 title: "Nghiệm thu thật qua herdr"
-status: pending
+status: complete
 priority: P1
 effort: "1d"
 dependencies: [3, 4]
@@ -36,7 +36,9 @@ Chạy thật trên store checkout chính, **trong một session herdr**, execut
 
 ## Success Criteria
 
-- [ ] 6 ca có bằng chứng file (hoặc NOT RUN + lý do); transport = herdr ở ca 1–4.
+- [x] 6 ca có bằng chứng file (hoặc NOT RUN + lý do); transport = herdr ở ca 1–4. Kết quả: ca 1, 2, 3, 4, 6 Accepted; **ca 5 NOT RUN** (lý do trong báo cáo); ca 4 dùng màn hình limit giả.
+
+Báo cáo: [acceptance-herdr.md](./reports/acceptance-herdr.md) (trạng thái PARTIAL).
 
 ## Risk Assessment
 

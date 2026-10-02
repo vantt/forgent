@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "Làm tươi + sự thật"
-status: pending
+status: complete
 priority: P1
 effort: "0.5d"
 dependencies: []
@@ -38,7 +38,7 @@ Khớp plan với `main` (P5 có thể đã merge); xác lập sự thật trư�
 
 ## Success Criteria
 
-- [ ] 5 câu có câu trả lời kèm `file:line`; phase 2–4 khớp.
+- [x] 5 câu có câu trả lời kèm `file:line`; phase 2–4 khớp (ghi ở mục "Sự thật phase 1" của [plan.md](./plan.md)).
 
 ## Risk Assessment
 

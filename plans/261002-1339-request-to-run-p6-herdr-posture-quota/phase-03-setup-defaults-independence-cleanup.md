@@ -1,7 +1,7 @@
 ---
 phase: 3
 title: "Capability mặc định + độc lập synthesizer + dọn worktree"
-status: pending
+status: complete
 priority: P2
 effort: "1d"
 dependencies: [1]
@@ -35,9 +35,11 @@ Ba việc dở từ vòng sửa, khác file với phase 2 nên chạy song song.
 
 ## Success Criteria
 
-- [ ] `fgos setup` + doctor phủ 13 capability; `.fgos/config.json` commit sạch.
-- [ ] Synthesizer khác provider panelist (test).
-- [ ] Worktree Unit được dọn đúng luật (test).
+- [x] `fgos setup` + doctor phủ 13 capability; `.fgos/config.json` commit sạch.
+- [x] Synthesizer khác provider panelist (test).
+- [x] Worktree Unit được dọn đúng luật (test).
+
+Báo cáo: [phase-03-report.md](./reports/phase-03-report.md). Phủ rộng hơn yêu cầu: mọi capability của mọi Workflow đã ship (27), không chỉ 13.
 
 ## Risk Assessment
 
