@@ -18,7 +18,7 @@ import { applyKnowledgeEvent } from './knowledge-registry.mjs';
 import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
 
 // tsk-49e: every top-level key applyEvent ever writes to `view` is either an
-export const VIEW_SCHEMA_VERSION = 2;
+export const VIEW_SCHEMA_VERSION = 3;
 
 // array `.push`ed onto in place (only `decisions`) or reassigned via a
 // `{...oldValue, ...patch}` spread (every other container: work, gates,
@@ -80,6 +80,9 @@ function applyEvent(view, event) {
         }
         if (normalized.rigor === undefined && normalized.risk === 'heavy') {
           normalized.rigor = 'high';
+        }
+        if (normalized.stage !== undefined) {
+          normalized.workflowStep = normalized.stage;
         }
         view.work[item.id] = { ...DEFAULTS, ...normalized };
       }
@@ -374,6 +377,9 @@ function applyEvent(view, event) {
         if (normalizedPatch.risk === 'heavy' && item.rigor === undefined && normalizedPatch.rigor === undefined) {
           normalizedPatch.rigor = 'high';
         }
+        if (normalizedPatch.stage !== undefined) {
+          normalizedPatch.workflowStep = normalizedPatch.stage;
+        }
         Object.assign(item, normalizedPatch);
       }
       // Writer provenance (D8/D15, str46-io-contract): same unconditional,
@@ -438,6 +444,7 @@ function applyEvent(view, event) {
       const item = view.work[id];
       if (item) {
         item.stage = to;
+        item.workflowStep = to;
         if (verify !== undefined) {
           item.verify = verify;
         }

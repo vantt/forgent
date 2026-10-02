@@ -17,11 +17,68 @@ import os from 'node:os';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
-import { DEFAULTS } from '../../state/work.mjs';
-import { DOMAINS, DEFAULT_DOMAIN, resolveDomainName, bundleForStage, resolveTaskSpecPath } from '../../state/workflow-stage-graphs.mjs';
+import { resolveTaskSpecPath } from '../paths.mjs';
 import { loadAgentDefs, readTaskSpecHeader } from '../agent-roster.mjs';
 import { selectTemplate, hashTemplate } from '../prompt-templates.mjs';
-import { listWork, StoreError } from '../../state/store.mjs';
+
+const DEFAULT_DOMAIN = 'coding';
+function resolveDomainName(domain) {
+  return typeof domain === 'string' && domain.trim() ? domain.trim() : DEFAULT_DOMAIN;
+}
+
+function bundleForStage(domain, stage) {
+  if (stage === 'planning') return { skill: 'fgos-coding-planning', taskSpec: 'shape-plan' };
+  if (stage === 'discovery') return { skill: 'fgos-coding-discovering', taskSpec: 'judge-ambiguity' };
+  if (stage === 'exploring') return { skill: 'fgos-coding-exploring', taskSpec: 'lock-decisions' };
+  if (stage === 'executing') return { skill: 'fgos-coding-implement', taskSpec: 'implement-item' };
+  return { skill: null, taskSpec: null };
+}
+
+class StoreError extends Error {
+  constructor(category, message) {
+    super(message);
+    this.name = 'StoreError';
+    this.category = category;
+  }
+}
+
+function readWorkItem(fgosDir, workId) {
+  if (!workId || !fgosDir) return null;
+  const files = [];
+  const baseline = path.join(fgosDir, 'events.jsonl');
+  if (fs.existsSync(baseline)) files.push(baseline);
+  const eventsDir = path.join(fgosDir, 'events');
+  try {
+    if (fs.existsSync(eventsDir)) {
+      for (const name of fs.readdirSync(eventsDir)) {
+        if (name.endsWith('.jsonl')) files.push(path.join(eventsDir, name));
+      }
+    }
+  } catch {}
+
+  let item = null;
+  for (const file of files) {
+    try {
+      const lines = fs.readFileSync(file, 'utf8').split('\n');
+      for (const line of lines) {
+        if (!line.trim()) continue;
+        const event = JSON.parse(line);
+        if (event.type === 'work.add' && event.payload?.id === workId) {
+          item = { id: workId, ...event.payload };
+        } else if (item && event.payload?.id === workId) {
+          if (event.type === 'work.edit' && event.payload.patch) {
+            Object.assign(item, event.payload.patch);
+          } else if (event.type === 'work.move') {
+            item.status = event.payload.to;
+          } else if (event.type === 'work.stage') {
+            item.stage = event.payload.to;
+          }
+        }
+      }
+    } catch {}
+  }
+  return item;
+}
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
 import { RunnerConfigError, ensureRunnerConfigForDir, MODEL_POLICY_TIERS } from './config.mjs';
 import { RIGOR_VALUES, resolveStrongerRigor } from '../rigor.mjs';
@@ -35,7 +92,6 @@ import { markRunSettled } from './visibility-session.mjs';
 import { buildPrompt } from './prepare.mjs';
 import { compileDispatchPlan } from './plan.mjs';
 import { readSharedConfigOrEmpty } from '../../config/shared-config-file.mjs';
-import { hasWorkerSlotRoom } from '../../state/worker-slots.mjs';
 import { buildDispatchResult } from './result-ladder.mjs';
 import { executeAssignment, reconcileCliSpawnRun } from './assignment-runner.mjs';
 export { reconcileCliSpawnRun };
@@ -144,13 +200,13 @@ export function resolveAgentTypeForTaskSpec(taskSpecHeader, agentDefs = [], curr
  * changes their dispatch.
  */
 export function resolveAgentTypeForWork(work, cwd, stage) {
-  const domainObj = DOMAINS[resolveDomainName(work?.domain)];
+  const domainName = resolveDomainName(work?.domain);
   const targetStage = stage ?? work?.stage ?? 'executing';
-  const { taskSpec } = bundleForStage(domainObj, targetStage);
+  const { taskSpec } = bundleForStage(domainName, targetStage);
   if (!taskSpec) return null;
   // resolveTaskSpecPath already returns an absolute path when { cwd } is
   // passed (it joins internally) -- never re-join cwd here too.
-  const taskSpecPath = resolveTaskSpecPath(domainObj, taskSpec, { cwd });
+  const taskSpecPath = resolveTaskSpecPath(domainName, taskSpec, { cwd });
   const header = readTaskSpecHeader(taskSpecPath);
   if (Object.keys(header).length === 0) return null;
   const agentDefs = loadAgentDefs(cwd);
@@ -257,18 +313,14 @@ function strayWriteError({ workId, tier, model, cwd, repoRoot, strayPaths }) {
   );
 }
 
-function openDispatchRun({ fgosDir, workId, executorId, cwd }) {
-  // LOW-3: Accepted R2 tradeoff: openDispatchRun always allocates a real runDir
-  // (under fgosDir when present, or os.tmpdir()/fgos-dispatch-runs when absent)
-  // so that executeThroughConfinement always receives a verified non-empty runDir at the
-  // dispatch seam per R2 specification. Run directories in os.tmpdir() are managed by OS
-  // temp cleanup and retain post-mortem audit records for unconfigured/test dispatches.
-  const baseDir = fgosDir || path.join(os.tmpdir(), 'fgos-dispatch-runs');
-  const runDir = path.join(baseDir, 'dispatch-runs', String(workId ?? executorId), String(Date.now()));
+function openRunnerRun({ fgosDir, workId, executorId, cwd }) {
+  const baseDir = fgosDir || path.join(os.tmpdir(), 'fgos-assignments');
+  const assignmentId = `asgn-${workId || executorId || 'run'}-${Date.now()}`;
+  const runDir = path.join(baseDir, 'assignments', assignmentId, 'runs', '01');
   fs.mkdirSync(runDir, { recursive: true });
   fs.writeFileSync(path.join(runDir, 'run.json'), `${JSON.stringify({
-    contract: 'dispatch-run.legacy',
-    runId: `${path.basename(path.dirname(runDir))}-${path.basename(runDir)}`,
+    contract: 'run.v1',
+    runId: `${assignmentId}-01`,
     workId: workId ?? null,
     executorId,
     cwd,
@@ -278,8 +330,6 @@ function openDispatchRun({ fgosDir, workId, executorId, cwd }) {
 
   return {
     runDir,
-    // `died` is the one failure that says something about the worker's own
-    // process; every other outcome ended the round without establishing that.
     closeRun: (status) => {
       try { markRunSettled(runDir, { status }); } catch { /* a run left open is not worth failing a finished dispatch */ }
     },
@@ -354,7 +404,7 @@ export function spawnWorker(work, cfg, cwd, opts = {}) {
   const templateName = selectTemplate({ kind: work.kind, tier, domain: work.domain, stage: opts.stage });
   const templateHash = hashTemplate(templateName);
 
-  const { runDir: workerRunDir, closeRun } = openDispatchRun({
+  const { runDir: workerRunDir, closeRun } = openRunnerRun({
     fgosDir: opts.fgosDir, workId: work?.id, executorId, cwd,
   });
 
@@ -903,7 +953,7 @@ export async function executeExecutorCli(
     // and unobservable in practice.
     const opened = runDir
       ? { runDir, closeRun: () => {} }
-      : openDispatchRun({ fgosDir, workId: work?.id, executorId, cwd });
+      : openRunnerRun({ fgosDir, workId: work?.id, executorId, cwd });
     const outsideWatch = watchWritesOutsideWorkspace({ repoRoot: root, cwd });
 
     let confinementRequest;
@@ -1135,7 +1185,7 @@ export async function decideExecutorCli(
   let workItem;
   if (!executorIdArg && workIdArg) {
     const fgosDir = fgosDirFromRoot(root);
-    workItem = listWork(fgosDir).work[workIdArg];
+    workItem = readWorkItem(fgosDir, workIdArg);
     if (!workItem) {
       throw new RunnerConfigError(`no work item "${workIdArg}" found -- cannot resolve its dispatch executor.`);
     }
@@ -1482,7 +1532,7 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
         const workIdArg = flagValue('--work');
         let work;
         if (workIdArg) {
-          work = listWork(fgosDir).work[workIdArg];
+          work = readWorkItem(fgosDir, workIdArg);
           if (!work) {
             const msg = `no work item "${workIdArg}" found -- cannot attach inline contract to it`;
             if (returnResult) throw new StoreError('precondition', msg);

@@ -320,7 +320,11 @@ export function TaskDetail({ client, baseUrl, itemId, onBack, pollIntervalMs = 5
               <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${color.bg} ${color.text}`}>
                 {item.status}
               </span>
-              {item.stage && <span className="text-xs text-ink-muted">{item.stage}</span>}
+              {(item.step || item.workflowStep || item.stage) && (
+                <span data-testid="item-step" className="text-xs text-ink-muted">
+                  {item.step || item.workflowStep || item.stage}
+                </span>
+              )}
               {item.risk && <span className="text-xs text-ink-muted">· {item.risk}</span>}
             </div>
 

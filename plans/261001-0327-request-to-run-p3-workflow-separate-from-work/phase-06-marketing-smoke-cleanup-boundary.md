@@ -1,7 +1,7 @@
 ---
 phase: 6
 title: "Smoke marketing + dọn + boundary"
-status: pending
+status: done
 priority: P1
 effort: "1d"
 dependencies: [4, 5]
@@ -36,9 +36,9 @@ Chứng minh Workflow chạy cho domain **không phải code** có cổng ngư�
 
 ## Success Criteria
 
-- [ ] Smoke marketing đạt G4b; Observe đủ.
-- [ ] `rg "workflow-adapter|validateWorkflowProfile|projectWorkflowToFlowDefinition" src` rỗng.
-- [ ] Boundary + spec + CHANGELOG; merge `main`.
+- [x] Smoke marketing đạt G4b; Observe đủ.
+- [x] `rg "workflow-adapter|validateWorkflowProfile|projectWorkflowToFlowDefinition" src` rỗng.
+- [x] Boundary + spec + CHANGELOG; merge `main`.
 
 ## Risk Assessment
 

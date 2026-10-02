@@ -83,7 +83,7 @@ impl WorkSource {
         Self
     }
 
-    pub const VIEW_SCHEMA_VERSION: u64 = 2;
+    pub const VIEW_SCHEMA_VERSION: u64 = 3;
 
     /// Read raw state json from `.fgos/cache/state.json` or `.fgos/state.json`
     pub fn read_state_json(root: &Path) -> Option<Value> {
@@ -102,7 +102,8 @@ impl WorkSource {
         let path = state_path?;
         let content = fs::read_to_string(path).ok()?;
         let val: Value = serde_json::from_str(&content).ok()?;
-        if val.get("viewSchemaVersion").and_then(|v| v.as_u64()) != Some(Self::VIEW_SCHEMA_VERSION) {
+        let v = val.get("viewSchemaVersion").and_then(|v| v.as_u64());
+        if v != Some(2) && v != Some(3) {
             return None;
         }
         Some(val)

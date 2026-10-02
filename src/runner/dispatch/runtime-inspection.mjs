@@ -80,10 +80,6 @@ export function allRuns(root, opts = {}) {
     const runDir = path.join(base, 'assignments', assignmentId, 'runs', attempt), run = json(path.join(runDir, 'run.json'));
     out.push({ kind: 'assignment-run', assignmentId, attempt, runDir, run, malformed: !run || typeof run !== 'object' || Array.isArray(run) });
   }
-  for (const group of dirs(path.join(base, 'dispatch-runs'))) for (const attempt of dirs(path.join(base, 'dispatch-runs', group))) {
-    const runDir = path.join(base, 'dispatch-runs', group, attempt), run = json(path.join(runDir, 'run.json'));
-    out.push({ kind: 'dispatch-run', group, attempt, runDir, run, malformed: !run || typeof run !== 'object' || Array.isArray(run) });
-  }
   if (store) {
     store.set(normRoot, out);
   }

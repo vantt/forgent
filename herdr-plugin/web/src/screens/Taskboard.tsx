@@ -223,9 +223,16 @@ export function Taskboard({ client, baseUrl, onSelectItem, onOpenNeedsAnswer, po
           <span className="text-ink-muted opacity-0 transition group-hover:opacity-100">⋯</span>
         </div>
         <p className="text-sm font-medium text-ink">{item.title}</p>
-        <span className={`mt-2 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${color.bg} ${color.text}`}>
-          {item.status}
-        </span>
+        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+          <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${color.bg} ${color.text}`}>
+            {item.status}
+          </span>
+          {(item.step || item.workflowStep || item.stage) && (
+            <span className="text-xs text-ink-muted">
+              {item.step || item.workflowStep || item.stage}
+            </span>
+          )}
+        </div>
       </div>
     )
   }

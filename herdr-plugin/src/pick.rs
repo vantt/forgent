@@ -130,9 +130,9 @@ fn run_argv_for_command(
         return Err(InvalidId(id.to_string()));
     }
     let command = if skip_permissions {
-        format!("claude --model {model} --dangerously-skip-permissions '{slash_command} {id}'")
+        format!("claude --model {model} --dangerously-skip-permissions 'fgos run --unit - || {slash_command} {id}'")
     } else {
-        format!("claude --model {model} '{slash_command} {id}'")
+        format!("claude --model {model} 'fgos run --unit - || {slash_command} {id}'")
     };
     Ok(vec!["pane".into(), "run".into(), pane_id.into(), command])
 }
@@ -199,9 +199,9 @@ fn no_id_run_argv(pane_id: &str, slash_command: &str, model: &str, skip_permissi
 /// reuse, never closed.
 fn discover_next_run_argv(pane_id: &str, model: &str, skip_permissions: bool) -> Vec<String> {
     let command = if skip_permissions {
-        format!("claude --model {model} --dangerously-skip-permissions '{DISCOVER_NEXT_SLASH_COMMAND}'")
+        format!("claude --model {model} --dangerously-skip-permissions 'fgos workflow start || {DISCOVER_NEXT_SLASH_COMMAND}'")
     } else {
-        format!("claude --model {model} '{DISCOVER_NEXT_SLASH_COMMAND}'")
+        format!("claude --model {model} 'fgos workflow start || {DISCOVER_NEXT_SLASH_COMMAND}'")
     };
     vec!["pane".into(), "run".into(), pane_id.into(), command]
 }
@@ -551,7 +551,7 @@ mod tests {
                 "pane",
                 "run",
                 "wS:p16",
-                "claude --model sonnet --dangerously-skip-permissions '/fgOS:pick tsk-19y-3'",
+                "claude --model sonnet --dangerously-skip-permissions 'fgos run --unit - || /fgOS:pick tsk-19y-3'",
             ]
         );
     }
@@ -565,7 +565,7 @@ mod tests {
                 "pane",
                 "run",
                 "wS:p16",
-                "claude --model sonnet '/fgOS:pick tsk-19y-3'",
+                "claude --model sonnet 'fgos run --unit - || /fgOS:pick tsk-19y-3'",
             ]
         );
     }
@@ -615,7 +615,7 @@ mod tests {
                 "pane",
                 "run",
                 "wS:p16",
-                "claude --model sonnet --dangerously-skip-permissions '/fgOS:discover tsk-19y-3'",
+                "claude --model sonnet --dangerously-skip-permissions 'fgos run --unit - || /fgOS:discover tsk-19y-3'",
             ]
         );
     }
@@ -633,7 +633,7 @@ mod tests {
                 "pane",
                 "run",
                 "wS:p16",
-                "claude --model sonnet '/fgOS:discover tsk-19y-3'",
+                "claude --model sonnet 'fgos run --unit - || /fgOS:discover tsk-19y-3'",
             ]
         );
     }
@@ -682,7 +682,7 @@ mod tests {
                 "pane",
                 "run",
                 "wS:p16",
-                "claude --model sonnet --dangerously-skip-permissions '/fgOS:discover-next'",
+                "claude --model sonnet --dangerously-skip-permissions 'fgos workflow start || /fgOS:discover-next'",
             ]
         );
     }
@@ -721,7 +721,7 @@ mod tests {
                 "pane",
                 "run",
                 "wS:p16",
-                "claude --model sonnet --dangerously-skip-permissions '/fgOS:discover-next'",
+                "claude --model sonnet --dangerously-skip-permissions 'fgos workflow start || /fgOS:discover-next'",
             ]
         );
         assert_eq!(
@@ -730,7 +730,7 @@ mod tests {
                 "pane",
                 "run",
                 "wS:p16",
-                "claude --model sonnet '/fgOS:discover-next'",
+                "claude --model sonnet 'fgos workflow start || /fgOS:discover-next'",
             ]
         );
     }

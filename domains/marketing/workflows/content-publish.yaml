@@ -1,0 +1,39 @@
+# domains/marketing/workflows/content-publish.yaml — Marketing content publication smoke workflow
+
+id: marketing/content-publish
+title: Marketing content publication workflow
+steps:
+  - id: brief
+    title: Research & Brief
+    units:
+      - id: research-brief
+        template:
+          capability: marketing:research
+          pattern: solo
+          objective: Research audience and draft content brief
+  - id: draft
+    title: Write & Review
+    dependsOn: [brief]
+    units:
+      - id: draft-copy
+        template:
+          capability: marketing:write
+          pattern: reviewed
+          persona: brand-guardian
+          objective: Draft marketing copy and review against brand voice
+  - id: approval
+    title: Human Approval Gate
+    dependsOn: [draft]
+    gate:
+      kind: human
+      question: Approve publication of the marketing content?
+  - id: publish
+    title: Publish
+    dependsOn: [approval]
+    units:
+      - id: publish-content
+        template:
+          capability: marketing:publish
+          pattern: solo
+          writes: [content/published/**]
+          objective: Publish approved content artifact

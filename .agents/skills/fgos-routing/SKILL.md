@@ -112,6 +112,10 @@ advanced commit history, and a verify command that actually passed — it
 never takes the caller's word for it. Nothing is "returned" on say-so
 alone.
 
+## Workflow Run Progression
+
+Under the Request-to-Run unified model, Work items do not have `stage`; step progression belongs to Workflow runs. When an item carries `workflowRunId`, driving the item advances its Workflow run via `fgos workflow resume <workflowRunId>` or `fgos workflow status <workflowRunId>`, and executes units via `fgos run`.
+
 ## Route by stage
 
 Every item carries a `stage` field, independent of its `status`, and a

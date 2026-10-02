@@ -1,7 +1,7 @@
 ---
 phase: 5
 title: "P3b — Cắt dispatch khỏi Work + xoá dispatch-runs"
-status: pending
+status: done
 priority: P1
 effort: "1.5d"
 dependencies: [3]
@@ -36,9 +36,9 @@ dependencies: [3]
 
 ## Success Criteria
 
-- [ ] `rg "from '.*state/" src/runner/dispatch src/runner/execution` rỗng; guard xanh.
-- [ ] `rg "openDispatchRun|dispatch-runs" src` rỗng (ngoài đường đọc dữ liệu cũ nếu giữ).
-- [ ] Dòng Dispatch trong `docs/platform/component-boundary.md` ("forbids direct workflow/stage lookups") **đúng với code**.
+- [x] `rg "from '.*state/" src/runner/dispatch src/runner/execution` rỗng; guard xanh.
+- [x] `rg "openDispatchRun|dispatch-runs" src` rỗng (ngoài đường đọc dữ liệu cũ nếu giữ).
+- [x] Dòng Dispatch trong `docs/platform/component-boundary.md` ("forbids direct workflow/stage lookups") **đúng với code**.
 
 ## Risk Assessment
 

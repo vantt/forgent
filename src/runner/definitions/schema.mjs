@@ -20,7 +20,7 @@ import { RIGOR_VALUES, RIGOR_RANK } from '../rigor.mjs';
 export const API_VERSION = 'fgos.dev/v1alpha1';
 export const KIND = 'FlowDefinition';
 
-export const PROFILE_KINDS = Object.freeze(['Workflow', 'CoordinationProtocol']);
+export const PROFILE_KINDS = Object.freeze(['CoordinationProtocol']);
 
 export const TIER_VALUES = Object.freeze(['nano', 'mini', 'standard', 'advanced', 'flagship', 'frontier']);
 const TIER_RANK = new Map(TIER_VALUES.map((tier, index) => [tier, index]));
@@ -583,39 +583,6 @@ function validateAggregationDeclaration(aggregation, label) {
   });
 }
 
-function validateWorkflowProfile(profile) {
-  assertOnlyAcceptedFields(profile, WORKFLOW_PROFILE_FIELDS, 'spec.profile');
-  const result = { kind: 'Workflow' };
-
-  if (profile.work !== undefined) {
-    if (!isPlainObject(profile.work)) fail('spec.profile.work must be an object when provided');
-    assertOnlyAcceptedFields(profile.work, WORKFLOW_WORK_FIELDS, 'spec.profile.work');
-    const work = {};
-    if (profile.work.baseStepMap !== undefined) {
-      if (!isPlainObject(profile.work.baseStepMap)) fail('spec.profile.work.baseStepMap must be an object when provided');
-      // Built on a null-prototype object, not `{}` -- a stageId of
-      // "__proto__" (or any other Object.prototype-shadowing key) would
-      // otherwise hit the inherited `__proto__` accessor setter on plain
-      // `{}` instead of creating an own property. Since the assigned value
-      // is always a string, that setter silently no-ops, and the entry
-      // would vanish from the frozen output with no error thrown --
-      // contradicting this module's fail-closed invariant. A null
-      // prototype has no such accessor, so bracket assignment always
-      // creates a real own property regardless of key name.
-      const baseStepMap = Object.create(null);
-      for (const [stageId, baseStepId] of Object.entries(profile.work.baseStepMap)) {
-        if (!isNonEmptyString(stageId) || !isNonEmptyString(baseStepId)) {
-          fail('spec.profile.work.baseStepMap keys and values must be non-empty strings');
-        }
-        baseStepMap[stageId] = baseStepId;
-      }
-      work.baseStepMap = Object.freeze(baseStepMap);
-    }
-    result.work = Object.freeze(work);
-  }
-
-  return Object.freeze(result);
-}
 
 function validateProtocolProfile(profile) {
   assertOnlyAcceptedFields(profile, PROTOCOL_PROFILE_FIELDS, 'spec.profile');
@@ -734,7 +701,7 @@ function validateProtocolProfile(profile) {
 function validateProfile(profile) {
   if (!isPlainObject(profile)) fail('spec.profile must be a non-null object');
   if (!PROFILE_KINDS.includes(profile.kind)) fail(`spec.profile.kind must be one of ${PROFILE_KINDS.join(' | ')}`);
-  return profile.kind === 'Workflow' ? validateWorkflowProfile(profile) : validateProtocolProfile(profile);
+  return validateProtocolProfile(profile);
 }
 
 function validateRoles(roles) {
@@ -839,8 +806,8 @@ function validateOperations(operations, roleSet, profileKind) {
       }
       // `gate-verdict` is legal only under the Workflow profile (contract's
       // Profiles + Forbidden Fields Summary).
-      if (op.result.kind === 'gate-verdict' && profileKind !== 'Workflow') {
-        fail(`${label}.result.kind "gate-verdict" is legal only under the Workflow profile (profile is "${profileKind}")`);
+      if (op.result.kind === 'gate-verdict') {
+        fail(`${label}.result.kind "gate-verdict" is retired; use Workflow gate instead.`);
       }
       const resultShape = { kind: op.result.kind };
       if (op.result.evidenceRequired !== undefined) {

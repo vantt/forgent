@@ -235,6 +235,7 @@ thing to the caller — see `references/reclaim-and-role-graph.md`.
 - Secondary operation (e.g. `planning.validate-plan`) creates an Assignment only when the stage skill or deterministic rule selects it.
 - Assignment result is evidence input for driver decision, not lifecycle movement by itself.
 - Only engine verbs (`fgos plan`, `fgos discover`, `fgos return`) move Work lifecycle state.
+- **Workflow Run Integration**: When an item carries `workflowRunId`, driving the item advances its Workflow run via `fgos workflow resume <workflowRunId>` or `fgos workflow answer <workflowRunId>`, executing units through `fgos run`. Work items do not have `stage`; step progression belongs to Workflow runs.
 
 ## Caller contract
 

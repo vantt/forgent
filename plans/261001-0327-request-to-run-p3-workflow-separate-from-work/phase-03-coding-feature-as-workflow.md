@@ -1,7 +1,7 @@
 ---
 phase: 3
 title: "P3b — Work không còn stage (state + Rust)"
-status: pending
+status: done
 priority: P1
 effort: "3d"
 dependencies: [2]
@@ -41,8 +41,8 @@ Chuyển lifecycle coding (discovery → exploring → planning → executing �
 
 ## Success Criteria
 
-- [ ] Work không có `stage`; mọi consumer state đọc Workflow run; dữ liệu cũ đọc đúng (test từ `state.json` cũ).
-- [ ] Rust xanh với version mới.
+- [x] Work không có `stage`; mọi consumer state đọc Workflow run; dữ liệu cũ đọc đúng (test từ `state.json` cũ).
+- [x] Rust xanh với version mới.
 
 ## Risk Assessment
 

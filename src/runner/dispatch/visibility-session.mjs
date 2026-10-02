@@ -230,11 +230,9 @@ export function classifyRunOutcome(runDir, { liveness = 'unknown' } = {}) {
   return { outcome, resultPath, runMeta, changed: runMeta.status !== outcome };
 }
 
-/** Every run under `fgosDir` still claiming to be running. Both layouts are
- * scanned: assignment runs, and the flat dispatch-runs a runner dispatch
- * writes when it has no Assignment of its own. */
+/** Every run under `fgosDir` still claiming to be running (assignments/<id>/runs/<NN>). */
 export function findRunningRuns(fgosDir, { driverFreshMs = DRIVER_FRESH_MS, now = Date.now } = {}) {
-  const roots = [path.join(fgosDir, 'assignments'), path.join(fgosDir, 'dispatch-runs')];
+  const roots = [path.join(fgosDir, 'assignments')];
   const found = [];
   const at = now();
   const listDirs = (d) => {
@@ -246,7 +244,7 @@ export function findRunningRuns(fgosDir, { driverFreshMs = DRIVER_FRESH_MS, now 
   };
   for (const root of roots) {
     for (const first of listDirs(root)) {
-      // assignments/<id>/runs/<NN>, dispatch-runs/<workId>/<stamp>
+      // assignments/<id>/runs/<NN>
       const mid = path.join(root, first, 'runs');
       const bases = fs.existsSync(mid) ? [mid] : [path.join(root, first)];
       for (const base of bases) {

@@ -471,6 +471,11 @@ export function validateWorkShape(work, touchedFields) {
       );
     }
   }
+  if (touched('workflowRunId') && work.workflowRunId !== undefined) {
+    if (typeof work.workflowRunId !== 'string' || !work.workflowRunId.trim()) {
+      throw new WorkValidationError('work.workflowRunId must be a non-empty string when present.');
+    }
+  }
   // holder (tsk-2t9c D1): THIRD orthogonal axis (status x stage x
   // role/holder), opt-in per-domain -- never in EDITABLE_FIELDS
   // (store.mjs), moves only through the handoff verb, same exclusion
