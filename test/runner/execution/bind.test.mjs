@@ -3,6 +3,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { bind, nextCandidate, BIND_CONTRACT_VERSION } from '../../../src/runner/execution/bind.mjs';
+import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
+
+// posture filtering consults the machine backend registry; keep it file-local
+seedFileLocalBwrapRegistry();
 
 function createMockRunnerConfig() {
   return {
@@ -67,7 +71,7 @@ function createMockRunnerConfig() {
         provider: 'claude',
         command: 'claude',
         invocations: [
-          { id: 'claude-cli', via: 'cli', adapter: 'cli-spawn' },
+          { id: 'claude-cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' } },
           { id: 'claude-herdr', via: 'cli', adapter: 'herdr-spawn' },
         ],
       },
@@ -76,7 +80,7 @@ function createMockRunnerConfig() {
         provider: 'openai',
         command: 'codex',
         invocations: [
-          { id: 'codex-cli', via: 'cli', adapter: 'cli-spawn' },
+          { id: 'codex-cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' } },
           { id: 'codex-herdr', via: 'cli', adapter: 'herdr-spawn' },
         ],
       },
@@ -85,7 +89,7 @@ function createMockRunnerConfig() {
         provider: 'gemini',
         command: 'agy',
         invocations: [
-          { id: 'gemini-spawn', via: 'cli', adapter: 'cli-spawn' },
+          { id: 'gemini-spawn', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' } },
         ],
       },
       'native-agent': {

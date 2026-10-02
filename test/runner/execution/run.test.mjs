@@ -9,9 +9,17 @@ import { execFileSync } from 'node:child_process';
 
 import { runUnit, recordInlineRun, resolveGitRoots, snapshotRunnerConfig, detectHerdrPresent } from '../../../src/runner/execution/run.mjs';
 import { RunnerConfigError } from '../../../src/runner/dispatch/config.mjs';
+import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
+
+// posture filtering consults the machine backend registry; keep it file-local
+seedFileLocalBwrapRegistry();
+
+// Confined runs mount a private tmpfs over /tmp, so fixtures that the executor
+// must reach (command, worker script, worktree) live outside it.
+const FIXTURE_ROOT = fs.existsSync('/var/tmp') ? '/var/tmp' : os.tmpdir();
 
 function setupGitRepo() {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-run-test-'));
+  const tmp = fs.mkdtempSync(path.join(FIXTURE_ROOT, 'fgos-run-test-'));
   execFileSync('git', ['init', '-b', 'main'], { cwd: tmp, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.name', 'Test Runner'], { cwd: tmp, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.email', 'test@runner.local'], { cwd: tmp, stdio: 'ignore' });
@@ -53,6 +61,7 @@ function setupGitRepo() {
               id: 'cli-default',
               via: 'cli',
               adapter: 'cli-spawn',
+              confinement: { backend: 'bwrap' },
               command: process.execPath,
               args: [],
             },
@@ -86,7 +95,7 @@ function setupGitRepo() {
   fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify(runnerConfig, null, 2));
 
   // Create linked worktree
-  const worktreeDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-run-wt-'));
+  const worktreeDir = fs.mkdtempSync(path.join(FIXTURE_ROOT, 'fgos-run-wt-'));
   execFileSync('git', ['worktree', 'add', '-b', 'wt-branch', worktreeDir], { cwd: tmp, stdio: 'ignore' });
 
   return { repoRoot: tmp, worktreeDir };
@@ -428,7 +437,10 @@ function writeSettlingWorker(dir) {
     const prompt = process.argv.slice(2).join(' ');
     const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
     if (match) {
-      const runDir = path.dirname(match[1]);
+      // A confined worker may only write the run's outbox; an unconfined one writes the run dir.
+      const claimDir = path.dirname(match[1]);
+      const outbox = path.join(claimDir, 'worker-output', 'outbox');
+      const runDir = fs.existsSync(outbox) ? outbox : claimDir;
       fs.mkdirSync(runDir, { recursive: true });
       fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nThe assigned work was inspected and completed with a full explanation of what was checked.\\n');
       fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done', assessment: { verdict: 'pass' } }));
@@ -453,7 +465,7 @@ function reviewedConfig(repoRoot, executorNames) {
       command,
       args: [script, '{prompt}'],
       providerModel: name,
-      invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', command, args: [script, '{prompt}'] }],
+      invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args: [script, '{prompt}'] }],
     };
   }
   cfg.runner.executors = executors;
@@ -521,4 +533,36 @@ test('a panel with fewer provider families than members refuses instead of repea
   });
   assert.equal(res.outcome, 'policy-refusal');
   assert.ok(res.results.some((r) => r.refused?.reason === 'independence'));
+});
+
+test('the panel synthesizer runs on a provider family none of the panelists used', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma', 'delta']);
+  const res = await runUnit({
+    unitData: { id: 'u-panel-synth', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel' },
+    repoRoot,
+    cwd: worktreeDir,
+    worktree: worktreeDir,
+    pattern: 'panel',
+  });
+  const members = res.results.filter((r) => r.role.startsWith('panelist-')).map((r) => r.runResult?.executorId);
+  const synth = res.results.find((r) => r.role === 'synthesizer');
+  assert.equal(members.length, 3);
+  assert.ok(synth?.runResult?.executorId, `synthesizer should have run, got ${JSON.stringify(res).slice(0, 1500)}`);
+  assert.ok(!members.includes(synth.runResult.executorId), 'synthesizer shares a provider family with a panelist');
+});
+
+test('a panel whose every provider family is taken by panelists refuses the synthesizer', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma']);
+  const res = await runUnit({
+    unitData: { id: 'u-panel-synth-2', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel' },
+    repoRoot,
+    cwd: worktreeDir,
+    worktree: worktreeDir,
+    pattern: 'panel',
+  });
+  assert.equal(res.outcome, 'policy-refusal');
+  const synth = res.results.find((r) => r.role === 'synthesizer');
+  assert.equal(synth.refused.reason, 'independence');
 });

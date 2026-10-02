@@ -93,6 +93,7 @@ import {
 import { reconcileHerdrSpawnRun, isHerdrSpawnRunStillWorking } from './herdr-reconcile.mjs';
 import { prepareConfinementForLaunch, finalizeConfinementResources } from './confinement/authority.mjs';
 import { buildConfinementRequest } from './confinement/request.mjs';
+import { resolvePosture } from './confinement/policies.mjs';
 import {
   startDetachedRunSupervisorProcess,
   readDetachedRunSupervisorBinding,
@@ -1398,6 +1399,18 @@ export async function executeAssignment(assignment, opts = {}) {
 
   let effectivePolicy = compiledPlan.policy;
 
+  // One confinement path: an Assignment bound by bind() carries its posture, and
+  // that posture alone picks the requirement handed to the Confinement Authority.
+  // Without a binding (direct callers) the plan's own confinement applies as before.
+  const postureBinding = effectiveAssignment.binding || effectiveAssignment.provenance?.binding;
+  const confinementRequirement = postureBinding?.posture
+    ? resolvePosture(postureBinding, { runnerConfig: cfg }).requirement
+    : compiledPlan.policy?.confinement
+      ? (compiledPlan.policy.confinement.mode === 'unconfined'
+          ? { mode: 'unconfined', policyId: null, policy: null }
+          : compiledPlan.policy.confinement)
+      : { mode: 'unconfined', policyId: null, policy: null };
+
   // executor-id-consolidation Step 2 (fallback confinement preservation):
   // captured HERE, before any read-only-redirect or provider-capacity
   // fallback substitution below can reassign `effectivePolicy`/
@@ -1871,9 +1884,9 @@ export async function executeAssignment(assignment, opts = {}) {
       // The prompt is built before Authority preparation. Derive its posture
       // from the same requirement that will be handed to Authority, never
       // from an executor profile's merely requested confinement fragment.
-      confinement: compiledPlan.policy?.confinement
-        ? { requirement: compiledPlan.policy.confinement }
-        : { requirement: { mode: 'unconfined' }, backend: { id: 'none', type: 'none' } },
+      confinement: confinementRequirement.mode === 'unconfined'
+        ? { requirement: { mode: 'unconfined' }, backend: { id: 'none', type: 'none' } }
+        : { requirement: confinementRequirement },
     });
   }
 
@@ -2319,7 +2332,9 @@ export async function executeAssignment(assignment, opts = {}) {
           providerCapacity: providerCapacitySelection,
           context: {
             cwd: effectiveCwd,
-            repoRoot: root,
+            // A workspace-write posture grants the directory the work happens in
+            // (the Unit worktree), never the main checkout that holds fgOS state.
+            repoRoot: postureBinding?.posture === 'workspace-write' ? effectiveCwd : root,
             runDir: path.resolve(runDir),
             fgosDir,
             timeoutMs,
@@ -2334,11 +2349,7 @@ export async function executeAssignment(assignment, opts = {}) {
             controlEpoch,
             launchCommandId,
           },
-          requirement: compiledPlan.policy?.confinement
-            ? (compiledPlan.policy.confinement.mode === 'unconfined'
-                ? { mode: 'unconfined', policyId: null, policy: null }
-                : compiledPlan.policy.confinement)
-            : { mode: 'unconfined', policyId: null, policy: null },
+          requirement: confinementRequirement,
         });
         prepResult = await prepareConfinementForLaunch(confReq, { adapterPort: opts.adapterPort });
       } catch (err) {

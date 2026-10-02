@@ -6,11 +6,16 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { execFileSync } from 'node:child_process';
+import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
+
+seedFileLocalBwrapRegistry();
+// bwrap mounts a tmpfs over /tmp, so confined workers can only see fixtures elsewhere.
+const FIXTURE_ROOT = fs.existsSync('/var/tmp') ? '/var/tmp' : os.tmpdir();
 
 const BIN_FGOS = path.resolve('bin/fgos.mjs');
 
 function setupTestRepo() {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-cli-run-test-'));
+  const tmp = fs.mkdtempSync(path.join(FIXTURE_ROOT, 'fgos-cli-run-test-'));
   execFileSync('git', ['init', '-b', 'main'], { cwd: tmp, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.name', 'CLI Test'], { cwd: tmp, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.email', 'cli@test.local'], { cwd: tmp, stdio: 'ignore' });
@@ -27,7 +32,7 @@ function setupTestRepo() {
     const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
     let runDir;
     if (match) {
-      runDir = path.dirname(match[1]);
+      runDir = (() => { const d = path.dirname(match[1]); const o = path.join(d, 'worker-output', 'outbox'); return fs.existsSync(o) ? o : d; })();
     } else {
       const asgnDir = path.join(process.cwd(), '.fgos', 'assignments');
       if (fs.existsSync(asgnDir)) {
@@ -59,7 +64,7 @@ function setupTestRepo() {
           command: process.execPath,
           args: [echoScript, '{prompt}'],
           providerModel: 'node',
-          invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', command: process.execPath, args: [echoScript, '{prompt}'] }],
+          invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: process.execPath, args: [echoScript, '{prompt}'] }],
         },
       },
       capabilities: {
