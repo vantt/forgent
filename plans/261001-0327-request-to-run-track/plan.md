@@ -47,7 +47,7 @@ T Tier/rigor (agent khác) ──► P1 Lõi thực thi ──► P3a Workflow r
 | P1 Lõi thực thi | [p1-execution-core](../261001-0327-request-to-run-p1-execution-core/plan.md) | **xong** (2026-10-01) — L5: "ai làm" một `bind()`; một cửa chạy `fgos run` (herdr mặc định); read-only một posture; lõi mới không phụ thuộc L3 | T merge; việc lẻ A+B | — |
 | P3a | [p3 phase 1–2](../261001-0327-request-to-run-p3-workflow-separate-from-work/plan.md) | **xong** (2026-10-01) — "tuần tự bước + cổng người" một Workflow runner; tích hợp/merge không phụ thuộc Work | P1 | — |
 | P2 Plan chạy được | [p2-runnable-plans](../261001-0327-request-to-run-p2-runnable-plans/plan.md) | **xong** (2026-10-02) — L2→dữ liệu: Unit là hợp đồng duy nhất; driver mỏng fgos-run; bỏ DemandFacts | **P3a** | **P3b** |
-| P3b | [p3 phase 3–6](../261001-0327-request-to-run-p3-workflow-separate-from-work/plan.md) | L3: Work không còn `stage`; L5 hết import L3 | P3a | **P2** |
+| P3b | [p3 phase 3–6](../261001-0327-request-to-run-p3-workflow-separate-from-work/plan.md) | **xong** (2026-10-02) — L3: Work không còn `stage`; L5 hết import L3; marketing smoke; A4 đóng | P3a | **P2** |
 | P4 | [p4-discussion-patterns-engine-retirement](../261001-0327-request-to-run-p4-discussion-patterns-engine-retirement/plan.md) | L4 không còn là runtime riêng | P1 + P3 (P2 khuyến nghị) | — |
 | P5 | [p5-terminology-sweep](../261001-0327-request-to-run-p5-terminology-sweep/plan.md) | ngang: một tên mỗi khái niệm | P4 | — |
 
