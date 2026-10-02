@@ -237,10 +237,10 @@ export async function runUnit(options = {}) {
     return records;
   };
 
-  // Executors that actually ran each role in this unit run. `independentOf` names roles
-  // ('producer'); bind() compares provider families, so a role name has to be turned into the
-  // executor(s) that played it before it can exclude anything. Roles that have not run yet
-  // (concurrent panelists) stay as role names and exclude nothing.
+  // Executors bound to each role in this unit run. `independentOf` names roles ('producer');
+  // bind() compares provider families, so a role name has to be turned into the executor(s)
+  // that played it before it can exclude anything. A role not bound yet stays a role name and
+  // excludes nothing.
   const executorsByRole = new Map();
   const noteRoleExecutor = (role, executorId) => {
     if (!executorId) return;
@@ -284,6 +284,10 @@ export async function runUnit(options = {}) {
       };
     }
 
+    // Recorded before anything awaits: roles started together (panelists) bind one after the
+    // other in this same tick, so each sees the executors its siblings were just given.
+    noteRoleExecutor(role, bound.executor);
+
     if (bound.mechanism === 'inline') {
       if (role !== 'producer') {
         throw new RunnerConfigError(`checker role "${role}" cannot be bound inline (G2 / Q-A violation)`);
@@ -298,7 +302,6 @@ export async function runUnit(options = {}) {
         createdAt: new Date().toISOString(),
       };
       fs.writeFileSync(path.join(unitDir, 'pending-inline.json'), JSON.stringify(pendingRecord, null, 2));
-      noteRoleExecutor(role, bound.executor);
       return {
         outcome: 'blocked',
         role,
@@ -351,8 +354,6 @@ export async function runUnit(options = {}) {
       isReadOnlyMode: readOnly,
       session,
     });
-
-    noteRoleExecutor(role, runResult?.executorId ?? bound.executor);
 
     const category = runResult?.classification?.outcome?.category ?? 'ok';
     let outcome = 'pass';

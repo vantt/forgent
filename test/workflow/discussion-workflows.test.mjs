@@ -6,6 +6,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { execFileSync } from 'node:child_process';
+import { withProviderFamilies } from '../helpers/provider-families.mjs';
 import YAML from 'yaml';
 
 import {
@@ -84,7 +85,7 @@ function setupTestRepo() {
       },
     },
   };
-  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify(cfg, null, 2));
+  fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify(withProviderFamilies(cfg), null, 2));
 
   return tmp;
 }

@@ -493,3 +493,32 @@ test('a reviewed run with a single provider family refuses the checker instead o
   const checker = res.results.find((r) => r.role === 'reviewer');
   assert.equal(checker.refused.reason, 'independence');
 });
+
+test('panel members run on different provider families', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma']);
+  const res = await runUnit({
+    unitData: { id: 'u-panel', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel' },
+    repoRoot,
+    cwd: worktreeDir,
+    worktree: worktreeDir,
+    pattern: 'panel',
+  });
+  const members = res.results.filter((r) => r.role.startsWith('panelist-')).map((r) => r.runResult?.executorId);
+  assert.equal(members.length, 3);
+  assert.equal(new Set(members).size, 3, `panelists must not share a provider family, got ${members.join(',')}`);
+});
+
+test('a panel with fewer provider families than members refuses instead of repeating one', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha', 'beta']);
+  const res = await runUnit({
+    unitData: { id: 'u-panel-2', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel' },
+    repoRoot,
+    cwd: worktreeDir,
+    worktree: worktreeDir,
+    pattern: 'panel',
+  });
+  assert.equal(res.outcome, 'policy-refusal');
+  assert.ok(res.results.some((r) => r.refused?.reason === 'independence'));
+});
