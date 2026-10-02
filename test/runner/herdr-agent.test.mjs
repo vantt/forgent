@@ -385,3 +385,21 @@ test('a real capability id fits -- the name that herdr actually refused', () => 
   assert.ok(name.length <= 32, `got ${name.length}: ${name}`);
   assert.match(name, /^[a-z][a-z0-9_-]*$/, "and still matches herdr's own character rule");
 });
+
+test('agent read: the screen comes back whether herdr prints it as plain text (0.9.1) or in the JSON envelope (older)', () => {
+  const plain = fakeBackend(() => ({ status: 0, stdout: "  You've hit your usage limit.\n  Try again in 3 hours.\n", stderr: '' }));
+  assert.equal(createHerdrClient({ run: plain.run }).agentRead('p1', { lines: 60 }), "  You've hit your usage limit.\n  Try again in 3 hours.\n");
+  assert.deepEqual(plain.calls[0].args, ['agent', 'read', 'p1', '--lines', '60']);
+
+  const enveloped = fakeBackend(() => ok({ read: { text: 'screen text' } }));
+  assert.equal(createHerdrClient({ run: enveloped.run }).agentRead('p1'), 'screen text');
+});
+
+test('agent read: a failure is still named, not mistaken for a screen', () => {
+  const failing = fakeBackend(() => herdrErr('agent_not_found', 'no such agent'));
+  assert.throws(() => createHerdrClient({ run: failing.run }).agentRead('p1'), (err) => err.code === 'agent_not_found');
+  const gone = fakeBackend(() => ({ status: null, stdout: '', stderr: 'spawn ENOENT', spawnCode: 'ENOENT' }));
+  assert.throws(() => createHerdrClient({ herdrBin: '/nowhere/herdr', run: gone.run }).agentRead('p1'), (err) => err.code === 'herdr_unavailable');
+  const silent = fakeBackend(() => ({ status: 1, stdout: '', stderr: 'boom' }));
+  assert.throws(() => createHerdrClient({ run: silent.run }).agentRead('p1'), (err) => err.code === 'herdr_unparseable');
+});

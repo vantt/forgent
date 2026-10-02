@@ -394,8 +394,30 @@ export function createHerdrClient({ herdrBin = 'herdr', cwd, env, run = defaultR
     agentRead(name, { lines } = {}) {
       const args = ['agent', 'read', name];
       if (lines) args.push('--lines', String(lines));
-      const result = invoke(args);
-      return result?.read?.text ?? result?.text ?? '';
+      // Measured on herdr 0.9.1: `agent read` prints the screen as plain text, not in the JSON
+      // envelope every other call answers in (an older build wrapped it). A failure still comes
+      // back as an error envelope, so JSON is tried first and only a body that is not JSON is
+      // taken to be the screen itself.
+      const res = run(herdrBin, args, { cwd, env, timeoutMs: 15000 });
+      if (res.spawnCode === 'ENOENT') {
+        throw new HerdrError('herdr_unavailable', `herdr binary "${herdrBin}" not found on PATH.`, { args });
+      }
+      if (res.killed || res.spawnCode === 'ETIMEDOUT') {
+        throw new HerdrError('herdr_call_timeout', `herdr ${args.join(' ')} was killed after 15000ms.`, { args });
+      }
+      const body = typeof res.stdout === 'string' ? res.stdout : '';
+      let parsed;
+      try { parsed = JSON.parse(body); } catch { parsed = undefined; }
+      if (parsed === undefined && res.status === 0) return body;
+      for (const stream of [body, res.stderr]) {
+        let json;
+        try { json = JSON.parse(stream); } catch { continue; }
+        if (json?.error) {
+          throw new HerdrError(json.error.code ?? 'herdr_error', json.error.message ?? `herdr ${args.join(' ')} failed.`, { args, exitCode: res.status });
+        }
+        return json?.result?.read?.text ?? json?.result?.text ?? '';
+      }
+      throw new HerdrError('herdr_unparseable', `herdr ${args.join(' ')} failed with no parseable answer (exit ${res.status ?? 'unknown'}): ${(res.stderr || '').slice(0, 400)}`, { args, exitCode: res.status });
     },
   };
 }
