@@ -49,6 +49,14 @@ synthesis `plans/reports/synthesis-260930-1229-request-to-run-brainstorm.md` §0
 
 Sóng B: 2 ∥ 3 (khác file). Phase 4 sau 2 vì posture phải áp **trong** pane.
 
+## Sự thật phase 1 (kiểm 2026-10-02, `main` d6df056e4)
+
+1. **Spike** (`plans/261001-0327-request-to-run-p1-execution-core/reports/spike-herdr-bwrap.md`) chạy **tay** (`herdr pane split/run` + bwrap argv gõ tay giống `resolvePosture`), không qua `fgos run`/driver. Chứng minh khả thi (TTY, repo bị chặn, outbox ghi được, claude `-p` cần grant `~/.claude`); **không** chứng minh posture được áp qua code, REPL tương tác dưới bwrap trong pane = NOT RUN.
+2. **Đường confinement hiện hành** = `buildConfinementRequest` (`src/runner/dispatch/confinement/request.mjs:~290`, `requirement` suy từ `cfg.capabilities[cap].confinement` hoặc `invocation.confinement` legacy) → `prepareConfinementForLaunch` (`assignment-runner.mjs:2343`, `confinement/authority.mjs`) → driver `confinement/drivers/bwrap.mjs`; backend lấy từ `executors[id].confinement.backend`. Policy built-in `host-write-denied` / `workspace-write` (`policies.mjs:24-61`). `executeAssignment` chỉ dùng `isReadOnlyMode` làm cổng chặn mutating (`assignment-runner.mjs:600-615`), **không** truyền posture → `requirement`. Đường này là đường duy nhất giữ; `resolvePosture` phải trả `{mode:'required', policyId, policy}` đưa vào `buildConfinementRequest({requirement})`.
+3. `bind()` chọn invocation = `candidate.invocation` từ `prefer[]` (`bind.mjs`); `transport` tính ở `bind.mjs:252-256` (`hasHerdrCliInvocation` + `session.herdrPresent`) nhưng chỉ ghi vào provenance; `run.mjs:339/350` truyền `preferInvocation: bound.invocation` — là invocation cli (candidate không biết herdr), `transport` không được đọc nên luôn ra cli.
+4. Config: 3 invocation `adapter: herdr-spawn` (`.fgos/config.json`, vd `codex-herdr-fgovn` ~:404); chúng **không** khai `confinement` (cli tương ứng có `backend: bwrap`). `herdr` = `~/.local/bin/herdr`, `HERDR_ENV=1` có trên session này; `bwrap` = `/usr/bin/bwrap`.
+5. `provider-limit` phân loại ở `liveness.mjs` + `run.mjs` (`category==='infra'` và `failure.code ∈ {provider-limit, paused-limit}`); `nextCandidate` (`bind.mjs`) không có caller; patterns chưa xử lý outcome này.
+
 ## Success Criteria
 
 - [ ] `fgos run` chọn herdr khi herdr có mặt và executor có invocation herdr; cli khi headless — kiểm qua test đi `fgos run`, và qua lần chạy thật (transport ghi trong run record = `herdr`).
