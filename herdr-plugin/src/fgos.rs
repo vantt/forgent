@@ -15,9 +15,10 @@ pub struct TriageRow {
     #[serde(rename = "goalTier")]
     pub goal_tier: Option<String>,
     /// tsk-1e3 D4: the detail modal's Discover button is only enabled at
-    /// `"clarify"` — carried through from `rankImpact`'s own `stage` field
+    /// `"clarify"` — carried through from `rankImpact`'s own `workflowStep` field
     /// (`src/state/impact.mjs`, defaults to `"executing"` when the item
     /// carries none), never re-derived here.
+    #[serde(rename = "workflowStep")]
     pub stage: String,
     /// tsk-64z D1: the Work Items panel's Status column and tab filter
     /// (TODO/DOING/REVIEW/DONE) both key off this raw literal
@@ -58,12 +59,13 @@ pub struct DoingRow {
 struct WorkItemRaw {
     title: String,
     status: String,
-    /// tsk-1pg D1: real state can carry no `stage` at all (an item with no
-    /// `stage` field, e.g. `status: wontfix`) — `Option` so one such item
+    /// tsk-1pg D1: real state can carry no `workflowStep` at all (an item with no
+    /// step field, e.g. `status: wontfix`) — `Option` so one such item
     /// in the map doesn't fail `serde_json::from_str::<ListEnvelope>` for
     /// every other item alongside it. Defaulted to `"executing"` at each
-    /// read site, matching the JS engine's own `item.stage ?? 'executing'`
-    /// convention (`src/state/frontier.mjs`, `src/intake/decompose.mjs`).
+    /// read site, matching the JS engine's own lazy default of the execute
+    /// step (`effectiveStep`, `src/state/domain-registry.mjs`).
+    #[serde(rename = "workflowStep")]
     stage: Option<String>,
     #[serde(rename = "parkReason")]
     park_reason: Option<String>,
@@ -76,22 +78,17 @@ struct WorkItemRaw {
 /// (closest to `compound-learn`) before `planning` before `exploring`
 /// before `discovery`.
 ///
-/// The arms mirror `DOMAINS.coding.stages` (`src/state/workflow-stage-
-/// graphs.mjs`) read back-to-front, so a stage the engine can actually
-/// hand this dashboard always ranks. `decompose` is kept, sharing
-/// `planning`'s rank rather than getting one of its own: it is that same
-/// stage under its pre-rename name, still held by the few items open when
-/// the rename landed, and the engine's own skill map aliases the two to
-/// one skill. It goes when the last item drains off it. `clarify` is not
-/// kept — that stage retired with its items migrated off, so no item can
-/// hold it and an arm for it would rank nothing.
+/// The arms mirror the coding Workflow's steps (`domains/coding/workflows/feature.yaml`)
+/// read back-to-front, so a step the engine can actually hand this dashboard always
+/// ranks. The engine maps the older step name `decompose` onto `planning` before it
+/// reaches the wire, so no arm is kept for it.
 fn doing_tier(status: &str, stage: &str) -> u8 {
     if status == "awaiting-approval" {
         return 0;
     }
     match stage {
         "executing" => 1,
-        "planning" | "decompose" => 2,
+        "planning" => 2,
         "exploring" => 3,
         "discovery" => 4,
         _ => 5,
@@ -121,7 +118,7 @@ pub struct NeedAnswerRow {
 /// tsk-417 D3: AFTER DELIVER box row — `status` is `"retrospective"` (RTR)
 /// or `"cleanup"` (POL), one box, distinct sub-tag per `status`. Neither
 /// status carries a `statusCategory` (the tail chain's own documented
-/// gap, `workflow-stage-graphs.mjs`), so this filters on the literal
+/// gap, `domain-registry.mjs`), so this filters on the literal
 /// `status` string, same as `NeedAnswerRow` above.
 #[derive(Debug, Clone, Deserialize, PartialEq)]
 pub struct AfterDeliverRow {
@@ -502,7 +499,7 @@ mod tests {
                 "status": "wontfix",
                 "blocks": 0,
                 "blockedBy": [],
-                "stage": "executing",
+                "workflowStep": "executing",
                 "goalTier": "mvp",
                 "priority": 300,
                 "componentId": 4,
@@ -515,7 +512,7 @@ mod tests {
                 "status": "doing",
                 "blocks": 2,
                 "blockedBy": ["tsk-mvp-test-1"],
-                "stage": "executing",
+                "workflowStep": "executing",
                 "goalTier": null,
                 "priority": 100,
                 "componentId": 27,
@@ -528,7 +525,7 @@ mod tests {
                 "status": "doing",
                 "blocks": 1,
                 "blockedBy": [],
-                "stage": "executing",
+                "workflowStep": "executing",
                 "goalTier": null,
                 "priority": 200,
                 "componentId": 31,
@@ -541,7 +538,7 @@ mod tests {
                 "status": "todo",
                 "blocks": 0,
                 "blockedBy": [],
-                "stage": "clarify",
+                "workflowStep": "clarify",
                 "goalTier": null,
                 "priority": null,
                 "componentId": 5,
@@ -560,18 +557,18 @@ mod tests {
                 "tsk-19y-2": {
                     "title": "Wire real fgOS data into the dashboard",
                     "status": "doing",
-                    "stage": "executing",
+                    "workflowStep": "executing",
                     "statusCategory": "in-progress"
                 },
                 "tsk-done-item": {
                     "title": "Already finished",
                     "status": "done",
-                    "stage": "compound-learn"
+                    "workflowStep": "compound-learn"
                 },
                 "choke-point-createworktree-callsite-wrapper": {
                     "title": "Choke-point: createWorktree's 6 call sites",
                     "status": "doing",
-                    "stage": "executing",
+                    "workflowStep": "executing",
                     "statusCategory": "in-progress"
                 }
             }
@@ -582,7 +579,7 @@ mod tests {
     /// every pipeline stage, deliberately listed out of sort order in the
     /// raw JSON to prove `parse_doing` does the sorting itself. The stages
     /// here are the ones the coding domain actually declares today
-    /// (`DOMAINS.coding.stages`, `src/state/workflow-stage-graphs.mjs`) —
+    /// (the coding Workflow, `domains/coding/workflows/feature.yaml`) —
     /// `discovery`/`exploring`/`planning`/`executing` — plus the drain-only
     /// legacy alias `decompose` that a few pre-rename items still hold.
     const TIER_SORT_FIXTURE: &str = r#"{
@@ -594,44 +591,38 @@ mod tests {
                 "tsk-exploring": {
                     "title": "Still fuzzy",
                     "status": "doing",
-                    "stage": "exploring",
+                    "workflowStep": "exploring",
                     "statusCategory": "in-progress"
                 },
                 "tsk-approval": {
                     "title": "Awaiting approval",
                     "status": "awaiting-approval",
-                    "stage": "executing",
+                    "workflowStep": "executing",
                     "statusCategory": "review",
                     "parkReason": "natural-finish"
                 },
                 "tsk-executing": {
                     "title": "Building",
                     "status": "doing",
-                    "stage": "executing",
+                    "workflowStep": "executing",
                     "statusCategory": "in-progress"
                 },
                 "tsk-discovery": {
                     "title": "Machine-alone research",
                     "status": "doing",
-                    "stage": "discovery",
+                    "workflowStep": "discovery",
                     "statusCategory": "in-progress"
                 },
                 "tsk-planning": {
                     "title": "Shaping",
                     "status": "doing",
-                    "stage": "planning",
-                    "statusCategory": "in-progress"
-                },
-                "tsk-decompose": {
-                    "title": "Shaping, still on the legacy stage name",
-                    "status": "doing",
-                    "stage": "decompose",
+                    "workflowStep": "planning",
                     "statusCategory": "in-progress"
                 },
                 "tsk-blocked": {
                     "title": "Not in-process",
                     "status": "blocked",
-                    "stage": "executing",
+                    "workflowStep": "executing",
                     "statusCategory": "in-progress",
                     "parkReason": "system-error"
                 }
@@ -695,10 +686,7 @@ mod tests {
         let ids: Vec<&str> = rows.iter().map(|r| r.id.as_str()).collect();
         // D2: awaiting-approval first, then doing sub-sorted in reverse
         // pipeline order — executing -> planning -> exploring -> discovery,
-        // with the legacy `decompose` alias sharing planning's rank (it is
-        // the same stage under its pre-rename name, so `tsk-decompose` and
-        // `tsk-planning` tie and fall back to id ascending). A row at a
-        // stage this dashboard doesn't know sorts after all of them.
+        // A row at a step this dashboard doesn't know sorts after all of them.
         // "blocked" status never appears (D4's combined
         // parkReason+statusCategory predicate excludes it via
         // parkReason == "system-error").
@@ -707,7 +695,6 @@ mod tests {
             vec![
                 "tsk-approval",
                 "tsk-executing",
-                "tsk-decompose",
                 "tsk-planning",
                 "tsk-exploring",
                 "tsk-discovery",
@@ -721,7 +708,7 @@ mod tests {
     /// status_membership`: pins `parse_doing`'s `parkReason`+`statusCategory`
     /// combined membership. `blocked`/`awaiting-human` deliberately share the
     /// coding domain's `"in-progress"` `statusCategory` with `doing`
-    /// (`DOMAINS.coding.statusLabels`, `src/state/workflow-stage-graphs.mjs`)
+    /// (`DOMAINS.coding.statusLabels`, `src/state/domain-registry.mjs`)
     /// — this is exactly why `statusCategory` alone is insufficient and
     /// `parkReason` (`"system-error"`/`"human-question"`) is still needed to
     /// split them out; `tsk-todo` (no `statusCategory` entry) pins the D4
@@ -737,34 +724,34 @@ mod tests {
                 "tsk-doing": {
                     "title": "Actively worked",
                     "status": "doing",
-                    "stage": "executing",
+                    "workflowStep": "executing",
                     "statusCategory": "in-progress"
                 },
                 "tsk-awaiting-approval": {
                     "title": "Ready for review",
                     "status": "awaiting-approval",
-                    "stage": "executing",
+                    "workflowStep": "executing",
                     "statusCategory": "review",
                     "parkReason": "natural-finish"
                 },
                 "tsk-blocked": {
                     "title": "Parked, not actively worked",
                     "status": "blocked",
-                    "stage": "executing",
+                    "workflowStep": "executing",
                     "statusCategory": "in-progress",
                     "parkReason": "system-error"
                 },
                 "tsk-awaiting-human": {
                     "title": "Parked on a question",
                     "status": "awaiting-human",
-                    "stage": "clarify",
+                    "workflowStep": "clarify",
                     "statusCategory": "in-progress",
                     "parkReason": "human-question"
                 },
                 "tsk-todo": {
                     "title": "Not started",
                     "status": "todo",
-                    "stage": "clarify",
+                    "workflowStep": "clarify",
                     "statusCategory": "todo"
                 }
             }
@@ -813,14 +800,14 @@ mod tests {
                 "tsk-awaiting-human": {
                     "title": "Parked on a question",
                     "status": "awaiting-human",
-                    "stage": "clarify",
+                    "workflowStep": "clarify",
                     "statusCategory": "in-progress",
                     "parkReason": "human-question"
                 },
                 "tsk-cleanup": {
                     "title": "TTL-bounded worktree park",
                     "status": "cleanup",
-                    "stage": "executing"
+                    "workflowStep": "executing"
                 },
                 "tsk-no-stage-doing": {
                     "title": "Actively worked, no stage field either",
@@ -860,22 +847,22 @@ mod tests {
                 "tsk-retro": {
                     "title": "Batched learning-synthesis",
                     "status": "retrospective",
-                    "stage": "executing"
+                    "workflowStep": "executing"
                 },
                 "tsk-cleanup": {
                     "title": "TTL-bounded worktree park",
                     "status": "cleanup",
-                    "stage": "executing"
+                    "workflowStep": "executing"
                 },
                 "tsk-delivered": {
                     "title": "Merged, not yet retrospective",
                     "status": "delivered",
-                    "stage": "executing"
+                    "workflowStep": "executing"
                 },
                 "tsk-done": {
                     "title": "Fully closed out",
                     "status": "done",
-                    "stage": "executing"
+                    "workflowStep": "executing"
                 }
             }
         }

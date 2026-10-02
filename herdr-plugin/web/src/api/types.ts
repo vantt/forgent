@@ -44,8 +44,6 @@ export interface WorkItem {
   description?: string
   kind: string
   status: string
-  stage?: string
-  step?: string
   workflowStep?: string
   size?: string
   rigor?: string
@@ -157,7 +155,7 @@ export interface RunnerTickData {
 
 export interface ListWorkParams {
   status?: string
-  stage?: string
+  step?: string
   all?: boolean
   cursor?: string
   limit?: number

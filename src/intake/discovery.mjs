@@ -12,7 +12,7 @@
 //
 // RE-RETARGET (tsk-4b2 D3/D6): a clear verdict at `clarify` now lands on
 // stage `discovery` instead of jumping straight to `decompose` — the
-// `discovery`/`exploring` stages were registered (workflow-stage-graphs.mjs)
+// `discovery`/`exploring` stages were registered (domain-registry.mjs)
 // but structurally unreachable until this item, because every real caller
 // addressed stage transitions through `stepMap`, which deliberately has no
 // entry for either stage. This same verdict-driven machinery now also
@@ -25,17 +25,17 @@
 //
 // RE-RE-RETARGET (tsk-403 D11/D18): `decompose` is renamed to `planning`
 // — `chia-việc` now lives in `plan.mjs` (renamed from `decompose.mjs`).
-// `nextDiscoveryEdge` resolves its destination via `stageForStep(domain,
+// `nextDiscoveryEdge` resolves its destination via `stepForPhase(domain,
 // 'Divide')`, and `Divide` now maps to `planning` in `stepMap` (not
 // `decompose` — that key was removed, D18), so both remaining edges above
 // — `clarify -> decompose` and `exploring -> decompose` — automatically
 // resolve to `clarify -> planning` / `exploring -> planning` for every
 // domain that adopted the rename, with ZERO code change needed in this
 // function beyond the variable rename below. `decompose` itself survives
-// only as a legacy, drain-only stage name (workflow-stage-graphs.mjs) for
+// only as a legacy, drain-only stage name (domain-registry.mjs) for
 // the handful of items still parked there; no new item can reach it
 // through this function anymore. `src/runner/loop.mjs`'s own direct
-// `moveStage` call for `discovery -> exploring` (a separate, older
+// `moveStep` call for `discovery -> exploring` (a separate, older
 // mechanism, pre-dating this
 // item) still exists unchanged here — reconciling it to call this same
 // verb instead is tsk-4v6's own job, not this item's footprint.
@@ -53,8 +53,8 @@ import path from 'node:path';
 import { judgeVerifySemanticCorrectness } from './verify-pattern-check.mjs';
 import { readLockedContext, resolveContentRoot } from './plan.mjs';
 import { DEFAULTS, validateWorkShape } from '../state/work.mjs';
-import { listWork, moveStage, addDiscovery, addDecision, putInAwaiting, editWork, StoreError } from '../state/store.mjs';
-import { getDomain, stageForStep, resolveDomainName, discoverableStages } from '../state/workflow-stage-graphs.mjs';
+import { listWork, moveStep, addDiscovery, addDecision, putInAwaiting, editWork, StoreError } from '../state/store.mjs';
+import { getDomain, stepForPhase, resolveDomainName, discoverableSteps, effectiveStep } from '../state/domain-registry.mjs';
 import { rankImpact } from '../state/impact.mjs';
 import { computeImpact, computePriority, isRecognizedRisk } from '../state/priority-formula.mjs';
 
@@ -112,11 +112,11 @@ function blocksForItem(work, view) {
   return entry ? entry.blocks : 0;
 }
 
-// tsk-4b2 D3/D6: the one function both moveStage call sites below share --
+// tsk-4b2 D3/D6: the one function the moveStep call sites below share --
 // a clear verdict is "a verdict-driven forward move once a Socratic/research
 // pass finishes", the same shape at `clarify` (this item's own D3) and at
 // `exploring` (D6), so this picks the right edge from `work.stage` instead
-// of the two call sites duplicating a hardcoded `stageForStep(...,'Divide')`
+// of the two call sites duplicating a hardcoded `stepForPhase(...,'Divide')`
 // target each.
 //
 // Domain-aware (found by the real `domain-aware-stage-literals.test.mjs`
@@ -127,10 +127,10 @@ function blocksForItem(work, view) {
 // to prove domain-agnosticism) keeps the original direct `clarify ->
 // decompose` edge unchanged, exactly as before this item.
 //
-// MOVED (tsk-64h): `discoverableStages` used to be defined right here and
+// MOVED (tsk-64h): `discoverableSteps` used to be defined right here and
 // exported for `bin/fgos.mjs`'s own `discover` precondition gate. It now
-// lives in `../state/workflow-stage-graphs.mjs` alongside `stageForStep`/
-// `effectiveStage`, because `src/state/discover-pool.mjs` needs the exact
+// lives in `../state/domain-registry.mjs` alongside `stageForStep`/
+// `effectiveStep`, because `src/state/discover-pool.mjs` needs the exact
 // same answer and cannot import a `use-case`-layer module from the
 // `domain` layer (`test/architecture.test.mjs`). Same function, same
 // behavior, one home -- imported below with the other registry lookups.
@@ -144,31 +144,30 @@ function blocksForItem(work, view) {
 // a clear verdict once CONTEXT.md is locked.
 function nextDiscoveryEdge(work, verdict) {
   const domain = getDomain(work.domain);
-  const clarifyStage = stageForStep(domain, 'Clarify');
-  const planningStage = stageForStep(domain, 'Divide');
-  const hasDiscoveryExploring = discoverableStages(domain).length > 1;
+  const clarifyStep = stepForPhase(domain, 'clarify', work.kind);
+  const planStep = stepForPhase(domain, 'plan', work.kind);
+  const discoverSteps = discoverableSteps(domain, work.kind).filter((step) => step !== clarifyStep);
+  const current = work.workflowStep;
 
-  // tsk-qod D1/D2: `clarifyStage !== undefined` guards against a
-  // false-positive match -- once a domain retires `clarify` entirely,
-  // `clarifyStage` is `undefined`, and `work.stage === undefined` would
-  // otherwise wrongly match any item whose own `stage` field is missing or
-  // corrupted, regardless of what domain it actually belongs to.
-  if (clarifyStage !== undefined && work.stage === clarifyStage) {
-    return hasDiscoveryExploring
-      ? { to: 'discovery', expectedStage: clarifyStage }
-      : { to: planningStage, expectedStage: clarifyStage };
+  // A domain that has no clarify-phase step at all must not match an item whose
+  // own `workflowStep` is missing or corrupted just because both are undefined.
+  if (clarifyStep !== undefined && current === clarifyStep) {
+    return discoverSteps.length > 0
+      ? { to: discoverSteps[0], expectedStep: clarifyStep }
+      : { to: planStep, expectedStep: clarifyStep };
   }
-  if (hasDiscoveryExploring && work.stage === 'discovery') {
-    return verdict?.clear
-      ? { to: planningStage, expectedStage: 'discovery' }
-      : { to: 'exploring', expectedStage: 'discovery' };
-  }
-  if (hasDiscoveryExploring && work.stage === 'exploring') {
-    return { to: planningStage, expectedStage: 'exploring' };
+  const at = discoverSteps.indexOf(current);
+  if (at !== -1) {
+    // A clear verdict skips the remaining discover steps; an unclear one (or the
+    // last discover step) goes to the next discover step, then to the plan step.
+    const next = discoverSteps[at + 1];
+    return verdict?.clear || next === undefined
+      ? { to: planStep, expectedStep: current }
+      : { to: next, expectedStep: current };
   }
   throw new StoreError(
     'validation',
-    `resolveDiscovery: work "${work.id}" (domain "${resolveDomainName(work.domain)}") is at stage "${work.stage}", which this engine cannot advance from.`,
+    `resolveDiscovery: work "${work.id}" (domain "${resolveDomainName(work.domain)}") is at step "${current}", which this engine cannot advance from.`,
   );
 }
 
@@ -254,7 +253,7 @@ export function assertCallerClassification(work, callerVerdict) {
  * `role` (per Phase 3 S3-closeout settlement design) attributes WHO ran
  * this pass — the two call sites disagree, so it is the caller's job to say:
  * the runner's clarify sweep passes `'runner'`, the sync `discover` verb
- * passes `'session'`. Optional; a clear verdict's `moveStage` only stamps it
+ * passes `'session'`. Optional; a clear verdict's `moveStep` only stamps it
  * on the settlement record when a caller actually supplies it.
  *
  * `callerVerdict` (tsk-27y D1/D2): `{clear: boolean, question?, verify?}` —
@@ -335,7 +334,7 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
       // that never went through that Gate, e.g. from before this item, keeps
       // today's fallback unchanged). tsk-1ni D2: work.verify wins over both
       // when it is already real.
-      moveStage(dir, {
+      moveStep(dir, {
         id,
         ...nextDiscoveryEdge(work, { clear: true }),
         verify: hasRealVerify(work.verify) ? work.verify : (view.gates?.[id]?.contextApprove?.verify ?? FALLBACK_VERIFY),
@@ -360,7 +359,7 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
   addDiscovery(dir, { id, ...verdict });
 
   // work-item-priority-matrix D6/D7 (was STR8 D4's intentScore -> work.intent):
-  // a SECOND standard-door write, never merged into moveStage's or
+  // a SECOND standard-door write, never merged into moveStep's or
   // putInAwaiting's payload below — scored on EITHER outcome (an unclear
   // verdict still gets scored; the item just doesn't advance stage). D7:
   // `intent` is retired IN PLACE — this is the rough clarify-stage pass
@@ -432,7 +431,7 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
           // tsk-nfa D1: --force overrides the verify dispute only, never a
           // park state. An item already `awaiting-human` here means a PRIOR
           // discover call parked it (this dispute, or an unclear verdict) --
-          // continuing on to moveStage below would advance stage while
+          // continuing on to moveStep below would advance stage while
           // status stays parked, and fgos return's `status !== 'doing'`
           // guard (bin/fgos.mjs) then refuses with no obvious way out.
           // Refuse here instead, pointing at the real resume path: status
@@ -473,7 +472,7 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
     // tsk-60r D1: the plain agree-path (no dispute above, or a dispute the
     // second pass accepted) reaches here regardless of whether this SAME
     // clarify pass already parked the item in `awaiting-human` via an
-    // earlier round's verify dispute (`putInAwaiting` above). `moveStage`
+    // earlier round's verify dispute (`putInAwaiting` above). `moveStep`
     // below only moves `stage` -- it never touches `status` -- so without
     // this guard the item would end up with `stage` advanced but `status`
     // still `awaiting-human`, and `fgos return` later refuses on that
@@ -496,7 +495,7 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
     // already gives a committed CONTEXT.md.
     const verify = hasRealVerify(work.verify) ? work.verify : (verdict.verify ?? FALLBACK_VERIFY);
 
-    moveStage(dir, {
+    moveStep(dir, {
       id,
       ...nextDiscoveryEdge(work, verdict),
       verify,
@@ -511,15 +510,15 @@ export function resolveDiscovery(dir, id, cfg, role, callerVerdict) {
   // a person who answers the park below resumes already sitting at
   // `exploring`, ready for `fgos-coding-exploring`'s own Socratic collab,
   // instead of looping back through `fgos-coding-discovering` for the same
-  // unresolved question. `moveStage` and `putInAwaiting` touch disjoint
+  // unresolved question. `moveStep` and `putInAwaiting` touch disjoint
   // fields (`stage` vs. `status`) — confirmed safe to call in sequence
   // here (RESEARCH.md Round 1, tsk-30v: `stage-fsm.mjs`'s `transitionStage`
   // reads only `work.stage`, `status-fsm.mjs`'s `transitionWork` reads
   // only `work.status`, neither guards against the other). Scoped to
   // `discovery` only — `clarify` (legacy) and `exploring` (its own gate
   // never sends unclear) keep today's park-in-place behavior unchanged.
-  if (work.stage === 'discovery') {
-    moveStage(dir, {
+  if (work.workflowStep === discoverableSteps(getDomain(work.domain), work.kind).find((step) => step !== stepForPhase(getDomain(work.domain), 'clarify', work.kind))) {
+    moveStep(dir, {
       id,
       ...nextDiscoveryEdge(work, verdict),
       verify: hasRealVerify(work.verify) ? work.verify : FALLBACK_VERIFY,

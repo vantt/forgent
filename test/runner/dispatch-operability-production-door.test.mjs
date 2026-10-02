@@ -6,7 +6,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
-import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
+import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { COMMAND_REGISTRY } from '../../src/cli/command-registry.mjs';
 import { invokeDispatchReconcileOperation } from '../../src/verbs/dispatch/reconcile.mjs';

@@ -4,7 +4,7 @@ domain: core | lifecycle: Init | role: classifier | requires-skill: fgos-clarify
 
 ## Input
 - Raw submission text provided at submission time (untrusted string).
-- Registered domain vocabulary (`Object.keys(DOMAINS)` from `src/state/workflow-stage-graphs.mjs`).
+- Registered domain vocabulary (`Object.keys(DOMAINS)` from `src/state/domain-registry.mjs`).
 
 ## Output
 - Verdict object `{title?, description?, domain, question?}` returned directly to caller.

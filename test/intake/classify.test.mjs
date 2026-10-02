@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { deriveTitle, classify, generateId } from '../../src/intake/classify.mjs';
 import { MAX_TITLE_LENGTH } from '../../src/state/work.mjs';
-import { DOMAINS, classificationVocabulary } from '../../src/state/workflow-stage-graphs.mjs';
+import { DOMAINS, classificationVocabulary } from '../../src/state/domain-registry.mjs';
 
 // Mirrors work.mjs's (unexported) ID_PATTERN: kebab-case, letter-start.
 const ID_PATTERN = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;

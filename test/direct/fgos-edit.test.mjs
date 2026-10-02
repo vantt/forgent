@@ -23,7 +23,7 @@ function addTestWork(dir, id, extra = {}) {
     refs: extra.refs ?? [],
     verify: extra.verify ?? 'npm test',
     description: extra.description ?? 'fixture description',
-    stage: extra.stage ?? 'executing',
+    workflowStep: extra.workflowStep ?? 'executing',
     ...extra,
   });
 }

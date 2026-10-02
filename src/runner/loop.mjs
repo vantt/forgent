@@ -70,7 +70,7 @@ import {
 } from '../state/store.mjs';
 import { readClaims } from '../state/runtime-coordination.mjs';
 import { DEFAULTS, truncateTitle } from '../state/work.mjs';
-import { DEFAULT_DOMAIN, getDomain, resolveWorkflow, stageForStep, classificationVocabulary } from '../state/workflow-stage-graphs.mjs';
+import { DEFAULT_DOMAIN, getDomain, domainSteps, stepForPhase, classificationVocabulary } from '../state/domain-registry.mjs';
 import { resolveAction, resolveStaleDoing } from './recovery.mjs';
 import {
   visitCount,
@@ -80,7 +80,8 @@ import {
   MAX_VISITS,
   BREAKER_MISSES,
 } from './anti-loop.mjs';
-import { spawnWorker, resolveTierModel } from './dispatch.mjs';
+import { resolveTierModel } from './dispatch.mjs';
+import { spawnWorker } from './work-dispatch.mjs';
 import { appendEvent } from '../state/events.mjs';
 import { appendWorkerLog, appendWorkerLogChunk } from './worker-log.mjs';
 import { createDispatchWorktree, removeDispatchWorktree, listLeftovers, branchNameFor, createBranchRef } from './worktree.mjs';
@@ -98,7 +99,7 @@ import { resolvePlan, resolveContentRoot } from '../intake/plan.mjs';
 import { planVerdictFromPlanMd } from '../intake/plan-verdict-from-plan-md.mjs';
 import { classify, generateId } from '../intake/classify.mjs';
 import { checkDispatchAttestation } from './attestation-guard.mjs';
-import { chooseStageOperation, executeDriverOperationChoice } from './dispatch/operation-choice.mjs';
+import { chooseStageOperation, executeDriverOperationChoice } from './operation-choice.mjs';
 import { runOutcome } from './dispatch/run-result.mjs';
 import { reapOrphanedConfinementResources } from './dispatch/confinement/cleanup.mjs';
 import { setTimeout as delay } from 'node:timers/promises';
@@ -842,19 +843,13 @@ async function captureDiscoveredWork({ output, item, queue, dir, log }) {
           refs: [],
           verify: FALLBACK_VERIFY,
           tier: derived.tier,
-          // tsk-qod D1/D2: `stageForStep(domain, 'Clarify')` resolves to
-          // `undefined` for a domain that retired `clarify` entirely
-          // (today: only `coding`) -- assigning `stage: undefined` here
-          // would silently corrupt this new item's own required field.
-          // Falls back to the domain's own first declared stage instead
-          // (`stages[0]`), which for `coding` post-retirement is
-          // `discovery` -- exactly D5's own intent: a runner-created item
-          // (already has title/description, needs no clarify pass) enters
-          // the same stage a migrated pre-existing item now lands on
-          // (`scripts/migrate-clarify-split.mjs`'s own "untouched" target).
-          // A domain that still has a real Clarify-mapped stage (e.g.
-          // `triage`) is unaffected -- the `??` never fires for it.
-          stage: stageForStep(domainObj, 'Clarify') ?? domainObj.stages?.[0],
+          // A domain that retired its clarify-phase step entirely (today: only
+          // `coding`) has no step for `clarify`, and assigning `workflowStep:
+          // undefined` here would silently corrupt this new item. Falls back to
+          // the Workflow's own first declared step — a runner-created item
+          // (already has title/description, needs no clarify pass) enters the
+          // same step a migrated pre-existing item lands on.
+          workflowStep: stepForPhase(domainObj, 'clarify', derived.kind) ?? domainSteps(domainObj, derived.kind)[0],
           domain: item.domain,
           discoveredFrom: item.id,
         });
@@ -925,12 +920,11 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       const feedbackView = listWork(dir);
 
       const domain = getDomain(item.domain);
-      const workflow = resolveWorkflow(domain, item.kind);
       const opChoice = chooseStageOperation({
         work: item,
-        stage: item.stage,
+        stage: item.workflowStep,
         domain: domain?.name ?? item.domain,
-        workflow: workflow?.name ?? item.workflow,
+        workflow: item.workflow,
         repoRoot,
       });
 
@@ -1441,7 +1435,8 @@ export async function runOnce(options = {}) {
       // cheaper and more accurate than a batch grant. `break`, not `continue`
       // — the answer will not change within this pass.
       for (const item of Object.values(listWork(dir).work)) {
-        if (item.stage !== 'discovery' || item.status !== 'todo') continue;
+        const discoverEntry = stepForPhase(getDomain(item.domain, { onUnrecognized: () => {} }), 'discover', item.kind);
+        if (discoverEntry === undefined || item.workflowStep !== discoverEntry || item.status !== 'todo') continue;
         const researchRoom = hasWorkerSlotRoom(listWork(dir), {
           ceiling: readSharedConfigOrEmpty(path.dirname(dir))?.workerSlots?.ceiling,
           excludeId: item.id,
@@ -1456,7 +1451,7 @@ export async function runOnce(options = {}) {
           const feedbackView = listWork(dir);
           const worker = await spawnWorker(item, config, wt.path, {
             fgosDir: dir,
-            stage: 'discovery',
+            stage: discoverEntry,
             feedback: {
               answer: feedbackView.gates?.[item.id]?.answer,
               reason: feedbackView.work?.[item.id]?.reason,
@@ -1550,21 +1545,15 @@ export async function runOnce(options = {}) {
           onUnrecognized: (bad) =>
             log(`fgos-runner: work "${item.id}" has unrecognized domain "${bad}" — folding to "${DEFAULT_DOMAIN}".`),
         });
-        const planningStage = stageForStep(domain, 'Divide');
-        // tsk-403 D18: also sweep the legacy `decompose` alias — an item
-        // still parked there (from before the rename) must keep draining
-        // through the SAME mechanical sweep, not be silently excluded from
-        // it just because `stageForStep` no longer resolves NEW items
-        // there. Only activates when a domain declares both names
-        // distinctly (today: only `coding`).
-        const workflow = resolveWorkflow(domain, item.kind);
-        const legacyPlanStage = (workflow?.stages ?? domain.stages)?.includes('decompose') && planningStage !== 'decompose' ? 'decompose' : undefined;
+        // A step older records name `decompose` is mapped onto the plan step by
+        // replay (the workflow's aliases), so it keeps draining through this sweep.
+        const planningStep = stepForPhase(domain, 'plan', item.kind);
         if (
-          planningStage !== undefined &&
-          (item.stage === planningStage || item.stage === legacyPlanStage) &&
+          planningStep !== undefined &&
+          item.workflowStep === planningStep &&
           item.status === 'todo'
         ) {
-          const choice = chooseStageOperation({ work: item, stage: item.stage, domain: domain.name ?? item.domain, workflow: workflow?.name ?? item.workflow, repoRoot });
+          const choice = chooseStageOperation({ work: item, stage: item.workflowStep, domain: domain.name ?? item.domain, workflow: item.workflow, repoRoot });
           if (choice.dispatch === 'assignment' && choice.operation === 'validate-plan') {
             const contentRoot = resolveContentRoot(repoRoot, item.id, item.docsRef);
             const outcome = await executeDriverOperationChoice(item, choice, {

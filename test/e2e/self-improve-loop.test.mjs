@@ -231,7 +231,7 @@ test(
     assert.equal(submit.status, 0, `submit failed: ${submit.stderr}`);
     const submitted = envelopeData(submit.stdout);
     assert.equal(submitted.status, 'todo');
-    assert.equal(submitted.stage, 'discovery');
+    assert.equal(submitted.workflowStep, 'discovery');
     assert.match(submitted.description, /Self-improve candidate self-fix-source/);
     assert.match(submitted.description, /schema migration/);
     commitPending(repoRoot, `state: submit ${submitted.id}`);
@@ -286,7 +286,7 @@ test(
     const afterDispatch = stateView(repoRoot);
     const item = afterDispatch.work[submitted.id];
     assert.equal(item.status, 'awaiting-approval', 'the discovery-aware executor chains the item all the way to proposed in one --once');
-    assert.equal(item.stage, 'executing');
+    assert.equal(item.workflowStep, 'executing');
     assert.equal(branchExists(repoRoot, `fgw/${submitted.id}`), true);
 
     // (6) `fgos review <id>` — real diff shown.

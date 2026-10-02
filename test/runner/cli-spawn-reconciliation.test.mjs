@@ -9,9 +9,7 @@ import {
   executeAssignment,
   reconcileCliSpawnRun,
 } from '../../src/runner/dispatch/assignment-runner.mjs';
-import {
-  buildAssignment,
-} from '../../src/runner/dispatch/assignment.mjs';
+import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import {
   runDetachedRunSupervisor,
   startDetachedRunSupervisorProcess,
@@ -29,7 +27,7 @@ import {
   publishDetachedRunAdapterReceipt,
   DetachedRunReceiptPathCollisionError,
 } from '../../src/runner/dispatch/detached-run-supervisor.mjs';
-import { spawnWorker } from '../../src/runner/dispatch/cli.mjs';
+import { spawnWorker } from '../../src/runner/work-dispatch.mjs';
 import { cliSpawnAdapter } from '../../src/runner/dispatch/transport.mjs';
 import {
   buildConfinementRequest,

@@ -11,7 +11,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { DEFAULT_DOMAIN, resolveDomainName } from '../state/workflow-stage-graphs.mjs';
+import { DEFAULT_DOMAIN, resolveDomainName } from '../state/domain-registry.mjs';
 
 export const TEMPLATE_DIR = path.join(import.meta.dirname, 'prompt-templates');
 

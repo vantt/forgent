@@ -223,17 +223,17 @@ fn build_engine(gateway: Arc<dyn VerbGateway>, output: Arc<Mutex<Vec<String>>>) 
     let gw = gateway.clone();
     engine.register_fn(
         "list_work",
-        move |status: &str, stage: &str, all: bool| -> Result<Dynamic, Box<rhai::EvalAltResult>> {
+        move |status: &str, step: &str, all: bool| -> Result<Dynamic, Box<rhai::EvalAltResult>> {
             let mut args = vec!["list".to_string(), "--json".to_string()];
             if !status.is_empty() {
                 reject_leading_dash(status, "status")?;
                 args.push("--status".to_string());
                 args.push(status.to_string());
             }
-            if !stage.is_empty() {
-                reject_leading_dash(stage, "stage")?;
-                args.push("--stage".to_string());
-                args.push(stage.to_string());
+            if !step.is_empty() {
+                reject_leading_dash(step, "step")?;
+                args.push("--step".to_string());
+                args.push(step.to_string());
             }
             if all {
                 args.push("--all".to_string());

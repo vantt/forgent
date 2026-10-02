@@ -2,27 +2,25 @@ import path from 'node:path';
 import { listWork, editWork, StoreError } from '../../state/store.mjs';
 import { resolveDiscovery, classificationPatchFromVerdict, assertCallerClassification } from '../../intake/discovery.mjs';
 import { resolvePlan, resolveContentRoot } from '../../intake/plan.mjs';
-import { getDomain, stageForStep, discoverableStages, resolveDomainName } from '../../state/workflow-stage-graphs.mjs';
-import { chooseStageOperation, executeDriverOperationChoice } from '../../runner/dispatch/operation-choice.mjs';
+import { getDomain, stepForPhase, discoverableSteps, domainSteps, effectiveStep, resolveDomainName } from '../../state/domain-registry.mjs';
+import { chooseStageOperation, executeDriverOperationChoice } from '../../runner/operation-choice.mjs';
 
 export function discoverUseCase({ dir, runnerConfig }, { id, callerVerdict, role = 'session' }) {
   const work = listWork(dir).work[id];
-  const stage = work?.stage;
+  const step = work?.workflowStep;
   const discoverDomain = getDomain(work?.domain, { onUnrecognized: () => {} });
-  const validStages = discoverableStages(discoverDomain);
-  if (!validStages.includes(stage)) {
-    const planStage = stageForStep(discoverDomain, 'Divide');
-    const planTakesIt = stage === planStage
-      || (stage === 'decompose' && discoverDomain.stages?.includes('decompose'));
+  const validSteps = discoverableSteps(discoverDomain, work?.kind);
+  if (!validSteps.includes(step)) {
+    const planTakesIt = step === stepForPhase(discoverDomain, 'plan', work?.kind);
     throw new StoreError(
       'validation',
-      `discover: work "${id}" is at stage "${stage}", not ${validStages.map((s) => `"${s}"`).join('/')}`
+      `discover: work "${id}" is at step "${step}", not ${validSteps.map((s) => `"${s}"`).join('/')}`
         + (planTakesIt
           ? ` -- use "fgos plan ${id}" instead.`
-          : ` -- and "fgos plan" does not serve that stage either. No stage verb does:`
-            + ` "${stage}" is not registered by domain "${resolveDomainName(work?.domain, { onUnrecognized: () => {} })}"`
-            + ` (${JSON.stringify(discoverDomain.stages)}). Run "fgos doctor" and read the`
-            + ' work-stage-vocabulary check.'),
+          : ` -- and "fgos plan" does not serve that step either. No step verb does:`
+            + ` "${step}" is not registered by domain "${resolveDomainName(work?.domain, { onUnrecognized: () => {} })}"`
+            + ` (${JSON.stringify(domainSteps(discoverDomain, work?.kind))}). Run "fgos doctor" and read the`
+            + ' work-step-vocabulary check.'),
     );
   }
   assertCallerClassification(work, callerVerdict);
@@ -35,26 +33,25 @@ export function discoverUseCase({ dir, runnerConfig }, { id, callerVerdict, role
 
 export async function planUseCase({ dir, repoRoot = path.dirname(dir), runnerConfig }, { id, callerVerdict, validate = false, direct = false, role = 'session' }) {
   const work = listWork(dir).work[id];
-  const stage = work?.stage;
+  const step = work?.workflowStep;
   const domain = getDomain(work?.domain, { onUnrecognized: () => {} });
-  const planningStage = stageForStep(domain, 'Divide');
-  const legacyPlanStage = domain.stages?.includes('decompose') && planningStage !== 'decompose' ? 'decompose' : undefined;
-  if (stage !== planningStage && stage !== legacyPlanStage) {
-    const discoverTakesIt = discoverableStages(domain).includes(stage);
+  const planningStep = stepForPhase(domain, 'plan', work?.kind);
+  if (step !== planningStep) {
+    const discoverTakesIt = discoverableSteps(domain, work?.kind).includes(step);
     throw new StoreError(
       'validation',
-      `plan: work "${id}" is at stage "${stage}", not "${planningStage}"${legacyPlanStage ? ` (or legacy "${legacyPlanStage}")` : ''}`
+      `plan: work "${id}" is at step "${step}", not "${planningStep}"`
         + (discoverTakesIt
           ? ` -- use "fgos discover ${id}" instead.`
-          : ` -- and "fgos discover" does not serve that stage either. No stage verb does:`
-            + ` "${stage}" is not registered by domain "${resolveDomainName(work?.domain, { onUnrecognized: () => {} })}"`
-            + ` (${JSON.stringify(domain.stages)}). Run "fgos doctor" and read the`
-            + ' work-stage-vocabulary check.'),
+          : ` -- and "fgos discover" does not serve that step either. No step verb does:`
+            + ` "${step}" is not registered by domain "${resolveDomainName(work?.domain, { onUnrecognized: () => {} })}"`
+            + ` (${JSON.stringify(domainSteps(domain, work?.kind))}). Run "fgos doctor" and read the`
+            + ' work-step-vocabulary check.'),
     );
   }
   const choice = chooseStageOperation({
     work,
-    stage: work.stage,
+    stage: step,
     domain: domain.name ?? work.domain,
     workflow: work.workflow,
     repoRoot,

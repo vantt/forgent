@@ -33,7 +33,7 @@ export {
   INVOCATION_VIA,
 } from './dispatch/config.mjs';
 
-export { resolveTierModel, resolveExecutorIdForPurpose, resolveExecutorAndOverrides } from './dispatch/resolve.mjs';
+export { resolveTierModel, resolveExecutorAndOverrides } from './dispatch/resolve.mjs';
 export { executorIdForWork, buildPrompt, resolveCapabilityIdentityDetails, resolveCapabilityIdentity } from './work-compat.mjs';
 
 export { decideDispatchMechanism, decideExecutorDispatchMechanism } from './dispatch/mechanism.mjs';
@@ -63,11 +63,9 @@ export { executeThroughConfinement } from './dispatch/confinement/authority.mjs'
 
 export {
   resolveAgentTypeForTaskSpec,
-  resolveAgentTypeForWork,
-  spawnWorker,
   executeExecutorCli,
-  decideExecutorCli,
 } from './dispatch/cli.mjs';
+export { resolveAgentTypeForWork, spawnWorker } from './work-dispatch.mjs';
 
 export { logExecutorDispatch } from './dispatch-log.mjs';
 export { fanoutBatchExecutorCli } from './fanout-batch.mjs';
@@ -88,7 +86,8 @@ export {
   executeAssignment,
 } from './dispatch/assignment-runner.mjs';
 
-import { runDispatchCli as runCoreDispatchCli } from './dispatch/cli.mjs';
+import { runDispatchCli as runCoreDispatchCli, decideExecutorCli as decideCore } from './dispatch/cli.mjs';
+import { resolveWorkForDispatch } from './work-dispatch.mjs';
 import { logExecutorDispatch } from './dispatch-log.mjs';
 import { fanoutBatchExecutorCli } from './fanout-batch.mjs';
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from './paths.mjs';
@@ -153,7 +152,15 @@ export async function runDispatchCli(argv = process.argv.slice(2), { returnResul
     return;
   }
 
-  return runCoreDispatchCli(argv, { returnResult });
+  return runCoreDispatchCli(argv, { returnResult, resolveWork: resolveWorkForDispatch });
+}
+
+/**
+ * `decide` with the Work layer's `--work` lookup attached: dispatch itself holds no
+ * Work store, so a `work` selector is resolved here before the plan is compiled.
+ */
+export function decideExecutorCli(executorId, options = {}) {
+  return decideCore(executorId, { resolveWork: resolveWorkForDispatch, ...options });
 }
 
 // CLI entry point — only runs when this file is executed directly (`node

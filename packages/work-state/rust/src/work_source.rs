@@ -15,7 +15,7 @@ use std::io::{BufRead, BufReader};
 use std::path::{Path, PathBuf};
 
 pub const DOMAIN_ENTRY_STAGES_JSON: &str =
-    include_str!("../../contracts/domain-entry-stages.json");
+    include_str!("../../contracts/domain-entry-steps.json");
 
 pub const FINAL_STATUSES: &[&str] = &[
     "awaiting-approval",
@@ -83,7 +83,7 @@ impl WorkSource {
         Self
     }
 
-    pub const VIEW_SCHEMA_VERSION: u64 = 3;
+    pub const VIEW_SCHEMA_VERSION: u64 = 4;
 
     /// Read raw state json from `.fgos/cache/state.json` or `.fgos/state.json`
     pub fn read_state_json(root: &Path) -> Option<Value> {
@@ -102,8 +102,7 @@ impl WorkSource {
         let path = state_path?;
         let content = fs::read_to_string(path).ok()?;
         let val: Value = serde_json::from_str(&content).ok()?;
-        let v = val.get("viewSchemaVersion").and_then(|v| v.as_u64());
-        if v != Some(2) && v != Some(3) {
+        if val.get("viewSchemaVersion").and_then(|v| v.as_u64()) != Some(Self::VIEW_SCHEMA_VERSION) {
             return None;
         }
         Some(val)
@@ -134,8 +133,8 @@ impl WorkSource {
         claims
     }
 
-    /// Returns the domain-to-entry-stage mapping from contract
-    pub fn domain_entry_stages() -> HashMap<String, String> {
+    /// Returns the domain-to-entry-step mapping from contract (each domain Workflow's first step)
+    pub fn domain_entry_steps() -> HashMap<String, String> {
         serde_json::from_str(DOMAIN_ENTRY_STAGES_JSON).unwrap_or_default()
     }
 
@@ -337,8 +336,8 @@ impl WorkSource {
     pub fn read_entropy_signals(root: &Path) -> WorkEntropySignals {
         let state = Self::read_state_json(root).unwrap_or(Value::Object(Map::new()));
         let claims = Self::read_active_claims(root);
-        let entry_stages = Self::domain_entry_stages();
-        let default_entry = entry_stages.get("coding").cloned().unwrap_or_else(|| "discovery".to_string());
+        let entry_steps = Self::domain_entry_steps();
+        let default_entry = entry_steps.get("coding").cloned().unwrap_or_else(|| "discovery".to_string());
 
         let work_map = state.get("work").and_then(|v| v.as_object());
         let outcomes_map = state.get("outcomes").and_then(|v| v.as_object());
@@ -354,7 +353,7 @@ impl WorkSource {
         if let Some(work) = work_map {
             for (id, item_val) in work {
                 let durable_status = item_val.get("status").and_then(|s| s.as_str()).unwrap_or("");
-                let stage = item_val.get("stage").and_then(|s| s.as_str()).unwrap_or("");
+                let step = item_val.get("workflowStep").and_then(|s| s.as_str()).unwrap_or("");
                 let domain = item_val.get("domain").and_then(|s| s.as_str()).unwrap_or("coding");
 
                 // Overlay active runtime claim
@@ -390,8 +389,8 @@ impl WorkSource {
 
                 let is_resolved = effective_status == "done" || effective_status == "wontfix";
                 if !is_resolved {
-                    let domain_entry = entry_stages.get(domain).unwrap_or(&default_entry);
-                    if stage == domain_entry {
+                    let domain_entry = entry_steps.get(domain).unwrap_or(&default_entry);
+                    if step == domain_entry {
                         stage_entry += 1;
                     }
                 }
@@ -743,12 +742,12 @@ mod tests {
         fs::create_dir_all(&fgos_dir).unwrap();
 
         let state_json = r#"{
-            "viewSchemaVersion": 2,
+            "viewSchemaVersion": 4,
             "work": {
-                "tsk-1": { "id": "tsk-1", "status": "awaiting-approval", "stage": "executing", "domain": "coding" },
-                "tsk-2": { "id": "tsk-2", "status": "doing", "stage": "executing", "domain": "coding" },
-                "tsk-3": { "id": "tsk-3", "status": "todo", "stage": "discovery", "domain": "coding" },
-                "tsk-4": { "id": "tsk-4", "status": "awaiting-human", "stage": "executing", "domain": "coding" }
+                "tsk-1": { "id": "tsk-1", "status": "awaiting-approval", "workflowStep": "executing", "domain": "coding" },
+                "tsk-2": { "id": "tsk-2", "status": "doing", "workflowStep": "executing", "domain": "coding" },
+                "tsk-3": { "id": "tsk-3", "status": "todo", "workflowStep": "discovery", "domain": "coding" },
+                "tsk-4": { "id": "tsk-4", "status": "awaiting-human", "workflowStep": "executing", "domain": "coding" }
             },
             "outcomes": {
                 "tsk-1": { "predicted": {}, "actual": null }
@@ -766,6 +765,27 @@ mod tests {
         assert_eq!(signals.stage_entry, 1);
         assert_eq!(signals.awaiting_human, 1);
         assert_eq!(signals.total_settlements, 1);
+
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn test_state_view_from_an_older_schema_version_is_not_read() {
+        let dir = std::env::temp_dir().join(format!("fgos_test_work_entropy_old_{}", std::process::id()));
+        let _ = fs::remove_dir_all(&dir);
+        let fgos_dir = dir.join(".fgos");
+        fs::create_dir_all(&fgos_dir).unwrap();
+
+        // A view folded before work items recorded `workflowStep` carries `stage`; it must be
+        // refolded by the Node reader rather than read here under the new field name.
+        let state_json = r#"{
+            "viewSchemaVersion": 3,
+            "work": { "tsk-3": { "id": "tsk-3", "status": "todo", "stage": "discovery", "domain": "coding" } }
+        }"#;
+        fs::write(fgos_dir.join("state.json"), state_json).unwrap();
+
+        assert!(WorkSource::read_state_json(&dir).is_none());
+        assert_eq!(WorkSource::read_entropy_signals(&dir).stage_entry, 0);
 
         let _ = fs::remove_dir_all(&dir);
     }

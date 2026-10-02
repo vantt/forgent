@@ -100,7 +100,7 @@ function sampleWork(overrides = {}) {
     risk: 'standard',
     refs: [],
     verify: 'npm test -- reporting',
-    stage: 'decompose',
+    workflowStep: 'planning',
     ...overrides,
   };
 }
@@ -133,7 +133,7 @@ test('resolvePlan with no callerVerdict, no locked plan.md, and role "runner" no
   assert.equal(result.outcome, 'noop');
 
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].stage, 'decompose');
+  assert.equal(view.work['item-x'].workflowStep, 'planning');
   assert.equal(view.work['item-x'].status, 'todo');
 });
 
@@ -157,11 +157,11 @@ test('resolvePlan with no callerVerdict, no locked plan.md, and role "session" r
 
 test('resolvePlan is a no-op on an item already past stage decompose (idempotent, CAS-backed)', () => {
   const storeDir = tmpStoreDir();
-  addWork(storeDir, sampleWork({ stage: 'executing' }));
+  addWork(storeDir, sampleWork({ workflowStep: 'executing' }));
 
   const result = resolvePlan(storeDir, 'item-x', cfg, 'runner');
   assert.equal(result.outcome, 'noop');
-  assert.equal(listWork(storeDir).work['item-x'].stage, 'executing');
+  assert.equal(listWork(storeDir).work['item-x'].workflowStep, 'executing');
 });
 
 test('resolvePlan completes an interrupted decompose (children exist, a decompose decision was already logged, root still at decompose stage) without regenerating children', () => {
@@ -169,8 +169,8 @@ test('resolvePlan completes an interrupted decompose (children exist, a decompos
   addWork(storeDir, sampleWork());
   // Simulates the crash window: the addWork loop already wrote the child
   // and logDecomposeVerdict already logged the 'decompose' completion
-  // decision (plan.mjs's own ordering: decision BEFORE moveStage), but the
-  // root's own moveStage never landed before the crash (tsk-4n8: this is
+  // decision (plan.mjs's own ordering: decision BEFORE moveStep), but the
+  // root's own moveStep never landed before the crash (tsk-4n8: this is
   // the real signal resolvePlan now keys its re-entrancy check on, not
   // bare child existence -- see the "stray child" test below for the case
   // this file used to conflate with this one).
@@ -183,7 +183,7 @@ test('resolvePlan completes an interrupted decompose (children exist, a decompos
     risk: 'standard',
     refs: [],
     verify: 'npm test -- parser',
-    stage: 'executing',
+    workflowStep: 'executing',
     parent: 'item-x',
   });
   addDecision(storeDir, {
@@ -191,14 +191,14 @@ test('resolvePlan completes an interrupted decompose (children exist, a decompos
     text: 'decompose verdict: decompose (1 children)',
     source: 'resolvePlan',
     kind: 'engine',
-    rationale: 'test fixture: simulates the crash window between addWork and moveStage',
+    rationale: 'test fixture: simulates the crash window between addWork and moveStep',
   });
 
   const result = resolvePlan(storeDir, 'item-x', cfg, 'runner');
   assert.equal(result.outcome, 'already-decomposed');
 
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].stage, 'executing');
+  assert.equal(view.work['item-x'].workflowStep, 'executing');
   const children = Object.values(view.work).filter((item) => item.parent === 'item-x');
   assert.equal(children.length, 1, 'no duplicate generated');
 });
@@ -216,7 +216,7 @@ test('resolvePlan on the already-decomposed re-entrant path leaves a held claim 
     risk: 'standard',
     refs: [],
     verify: 'npm test -- parser',
-    stage: 'executing',
+    workflowStep: 'executing',
     parent: 'item-x',
   });
   addDecision(storeDir, {
@@ -224,7 +224,7 @@ test('resolvePlan on the already-decomposed re-entrant path leaves a held claim 
     text: 'decompose verdict: decompose (1 children)',
     source: 'resolvePlan',
     kind: 'engine',
-    rationale: 'test fixture: simulates the crash window between addWork and moveStage',
+    rationale: 'test fixture: simulates the crash window between addWork and moveStep',
   });
 
   const result = resolvePlan(storeDir, 'item-x', cfg, 'session');
@@ -255,7 +255,7 @@ test('resolvePlan does not treat a stray child (no decompose decision logged) as
     risk: 'standard',
     refs: [],
     verify: 'npm test -- parser',
-    stage: 'executing',
+    workflowStep: 'executing',
     parent: 'item-x',
   });
 
@@ -270,7 +270,7 @@ test('resolvePlan does not treat a stray child (no decompose decision logged) as
 
   assert.equal(result.outcome, 'decompose');
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].stage, 'executing');
+  assert.equal(view.work['item-x'].workflowStep, 'executing');
   const children = Object.values(view.work).filter((item) => item.parent === 'item-x');
   assert.equal(children.length, 2, 'the existing stray child is reused, one new child is added');
   assert.ok(view.work['item-x-1'], 'the existing sibling id is reused, not recreated');
@@ -293,7 +293,7 @@ test('resolvePlan still parks need-human when a NEW child\'s footprint collides 
     refs: [],
     verify: 'npm test -- parser',
     footprint: ['src/shared.mjs'],
-    stage: 'executing',
+    workflowStep: 'executing',
     parent: 'item-x',
   });
 
@@ -460,7 +460,7 @@ test('resolvePlan on a caller-supplied pass-through verdict moves the item strai
   assert.equal(result.outcome, 'pass-through');
 
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].stage, 'executing');
+  assert.equal(view.work['item-x'].workflowStep, 'executing');
   assert.equal(view.work['item-x'].verify, 'npm test -- reporting');
 });
 
@@ -488,7 +488,7 @@ test('resolvePlan on a caller-supplied pass-through verdict preserves claim (doi
   assert.equal(result.outcome, 'pass-through');
 
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].stage, 'executing');
+  assert.equal(view.work['item-x'].workflowStep, 'executing');
   assert.equal(view.work['item-x'].status, 'doing');
 });
 
@@ -559,13 +559,13 @@ test('resolvePlan on a caller-supplied decompose verdict writes every child with
   assert.equal(result.childIds.length, 2);
 
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].stage, 'executing');
+  assert.equal(view.work['item-x'].workflowStep, 'executing');
 
   const [firstId, secondId] = result.childIds;
   assert.equal(firstId, 'item-x-1');
   assert.equal(secondId, 'item-x-2');
   assert.equal(view.work[firstId].parent, 'item-x');
-  assert.equal(view.work[firstId].stage, 'executing');
+  assert.equal(view.work[firstId].workflowStep, 'executing');
   assert.equal(view.work[firstId].status, 'todo');
   assert.equal(view.work[firstId].verify, 'npm test -- parser');
   assert.deepEqual(view.work[firstId].deps, []);
@@ -690,7 +690,7 @@ test('resolvePlan gates to awaiting-human when tentative children declare overla
 
   const view = listWork(storeDir);
   assert.equal(view.work['item-x'].status, 'awaiting-human');
-  assert.equal(view.work['item-x'].stage, 'decompose');
+  assert.equal(view.work['item-x'].workflowStep, 'planning');
   assert.match(view.gates['item-x'].ask, /src\/shared\.mjs/);
   assert.match(view.gates['item-x'].ask, /item-x-1/);
   assert.match(view.gates['item-x'].ask, /item-x-2/);
@@ -720,7 +720,7 @@ test('resolvePlan honors a declared deps edge between tentative children as the 
   assert.equal(result.childIds.length, 2);
 
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].stage, 'executing');
+  assert.equal(view.work['item-x'].workflowStep, 'executing');
   assert.deepEqual(view.work[result.childIds[1]].deps, [result.childIds[0]]);
 });
 
@@ -738,7 +738,7 @@ test('resolvePlan proceeds normally when tentative children declare disjoint (or
   });
   assert.equal(result.outcome, 'decompose');
   assert.equal(result.childIds.length, 2);
-  assert.equal(listWork(storeDir).work['item-x'].stage, 'executing');
+  assert.equal(listWork(storeDir).work['item-x'].workflowStep, 'executing');
 });
 
 test('resolvePlan: the heavy-risk gate preempts the footprint-overlap check', () => {
@@ -806,7 +806,7 @@ test('resolvePlan self-resolves the footprint-overlap gate once the next call pr
   });
   assert.equal(second.outcome, 'decompose', 'the gate must pass once the fresh verdict proposes non-overlapping children');
   assert.equal(second.childIds.length, 2);
-  assert.equal(listWork(storeDir).work['item-x'].stage, 'executing');
+  assert.equal(listWork(storeDir).work['item-x'].workflowStep, 'executing');
 });
 
 test('resolvePlan assigns positional child ids `${work.id}-<n>` for n=1..N across N siblings', () => {
@@ -840,7 +840,7 @@ test('resolvePlan on a grandchild decompose produces `<root>-<m>-<n>` ids with n
     risk: 'standard',
     refs: [],
     verify: 'npm test -- renderer',
-    stage: 'decompose',
+    workflowStep: 'planning',
     parent: 'item-x',
   });
 
@@ -863,7 +863,7 @@ test('resolvePlan on a caller-supplied need-human verdict parks the item in awai
 
   const view = listWork(storeDir);
   assert.equal(view.work['item-x'].status, 'awaiting-human');
-  assert.equal(view.work['item-x'].stage, 'decompose');
+  assert.equal(view.work['item-x'].workflowStep, 'planning');
   assert.match(view.gates['item-x'].ask, /Ambiguous scope/);
   assert.equal(Object.values(view.work).filter((item) => item.parent === 'item-x').length, 0);
 });
@@ -901,7 +901,7 @@ test('resolvePlan routes a risk-heavy root through the human gate on a caller-su
 
   const result = resolvePlan(storeDir, 'item-x', cfg, 'runner', { verdict: 'pass-through' });
   assert.equal(result.outcome, 'need-human');
-  assert.equal(listWork(storeDir).work['item-x'].stage, 'decompose');
+  assert.equal(listWork(storeDir).work['item-x'].workflowStep, 'planning');
 });
 
 // --- heavy-risk gate release (tsk-3w8 follow-up): without this, a
@@ -923,7 +923,7 @@ test('resolvePlan releases a risk-heavy root once the human has answered THIS ga
   const second = resolvePlan(storeDir, 'item-x', cfg, 'human', { verdict: 'pass-through' });
   assert.equal(second.outcome, 'pass-through', 'the gate must release once its own prior ask has a real answer on record');
   const finalView = listWork(storeDir);
-  assert.equal(finalView.work['item-x'].stage, 'executing');
+  assert.equal(finalView.work['item-x'].workflowStep, 'executing');
 
   // tsk-6b6: both calls log a decisionsById entry, accumulating rather than
   // overwriting -- the caller-supplied entry + the need-human entry from
@@ -947,7 +947,7 @@ test('resolvePlan does NOT release the risk-heavy gate on a stale/unrelated gate
 
   const result = resolvePlan(storeDir, 'item-x', cfg, 'human', { verdict: 'pass-through' });
   assert.equal(result.outcome, 'need-human', 'an unrelated prior answer must not bypass the heavy-risk gate');
-  assert.equal(listWork(storeDir).work['item-x'].stage, 'decompose');
+  assert.equal(listWork(storeDir).work['item-x'].workflowStep, 'planning');
 });
 
 // --- tsk-wve D1: the heavy-risk floor skips only when the verdict's own
@@ -965,7 +965,7 @@ test('resolvePlan skips the risk-heavy gate when the verdict cites a real locked
     reason: 'D1: already grounded in the locked decision, no split needed.',
   });
   assert.equal(result.outcome, 'pass-through', 'a real D-ID citation grounds the verdict, releasing the heavy-risk floor');
-  assert.equal(listWork(storeDir).work['item-x'].stage, 'executing');
+  assert.equal(listWork(storeDir).work['item-x'].workflowStep, 'executing');
 });
 
 test('resolvePlan still gates a risk-heavy root when its CONTEXT.md carries no locked decisions at all, even if the reason mentions a D-ID-shaped token (tsk-wve D1, fail-safe against a fabricated citation)', () => {
@@ -978,7 +978,7 @@ test('resolvePlan still gates a risk-heavy root when its CONTEXT.md carries no l
     reason: 'D1: nothing real backs this -- the parent never locked a D1.',
   });
   assert.equal(result.outcome, 'need-human', 'a D-ID-shaped token with nothing real to cite must never bypass the floor');
-  assert.equal(listWork(storeDir).work['item-x'].stage, 'decompose');
+  assert.equal(listWork(storeDir).work['item-x'].workflowStep, 'planning');
 });
 
 test('resolvePlan rejects a caller-supplied decompose verdict with a child missing verify, same fail-safe an invalid shape always gets — no partial write', () => {
@@ -993,7 +993,7 @@ test('resolvePlan rejects a caller-supplied decompose verdict with a child missi
   assert.equal(result.outcome, 'invalid');
 
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].stage, 'decompose', 'item left exactly where it was');
+  assert.equal(view.work['item-x'].workflowStep, 'planning', 'item left exactly where it was');
   assert.equal(Object.values(view.work).some((item) => item.parent === 'item-x'), false);
 });
 
@@ -1018,7 +1018,7 @@ test('resolvePlan parks as need-human (no children written) when a child\'s veri
 
   const view = listWork(storeDir);
   // No partial write -- neither child exists, root stays at decompose.
-  assert.equal(view.work['item-x'].stage, 'decompose');
+  assert.equal(view.work['item-x'].workflowStep, 'planning');
   assert.equal(Object.values(view.work).filter((item) => item.parent === 'item-x').length, 0);
   assert.match(view.gates['item-x'].ask, /node --test/);
 });
@@ -1067,7 +1067,7 @@ test('resolvePlan parks as verify-disputed (no stage move) when the item\'s own 
   assert.equal(result.outcome, 'verify-disputed');
 
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].stage, 'decompose', 'item left exactly where it was, never advanced to executing');
+  assert.equal(view.work['item-x'].workflowStep, 'planning', 'item left exactly where it was, never advanced to executing');
   assert.match(view.gates['item-x'].ask, /node --test/);
 });
 
@@ -1077,7 +1077,7 @@ test('resolvePlan --force never overrides a MECHANICAL planApproveVerify disagre
 
   const result = resolvePlan(storeDir, 'item-x', cfg, 'runner', { verdict: 'pass-through', reason: 'single cohesive change', force: true });
   assert.equal(result.outcome, 'verify-disputed');
-  assert.equal(listWork(storeDir).work['item-x'].stage, 'decompose');
+  assert.equal(listWork(storeDir).work['item-x'].workflowStep, 'planning');
 });
 
 test('resolvePlan parks as verify-disputed on the real decompose success path too, before any child is written', () => {
@@ -1099,7 +1099,7 @@ test('resolvePlan still proceeds normally (pass-through) when planApproveVerify 
 
   const result = resolvePlan(storeDir, 'item-x', cfg, 'runner', { verdict: 'pass-through', reason: 'single cohesive change' });
   assert.equal(result.outcome, 'pass-through');
-  assert.equal(listWork(storeDir).work['item-x'].stage, 'executing');
+  assert.equal(listWork(storeDir).work['item-x'].workflowStep, 'executing');
 });
 
 // --- decision-trail capture (tsk-6b6): every verdict branch logs a
@@ -1210,7 +1210,7 @@ test('resolvePlan skips requiring a verdict and advances straight to executing w
   assert.equal(result.outcome, 'pass-through');
 
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].stage, 'executing');
+  assert.equal(view.work['item-x'].workflowStep, 'executing');
   assert.equal(view.work['item-x'].verify, 'npm test -- tiny-item');
   assert.equal(Object.values(view.work).some((item) => item.parent === 'item-x'), false, 'no children ever get written on the skip path');
   const decisions = view.decisionsById?.['item-x'] ?? [];
@@ -1405,7 +1405,7 @@ test('resolvePlan advances to executing on a caller-supplied pass-through verdic
   assert.equal(result.outcome, 'pass-through');
 
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].stage, 'executing');
+  assert.equal(view.work['item-x'].workflowStep, 'executing');
   const decisions = view.decisionsById?.['item-x'] ?? [];
   assert.ok(decisions.some((d) => d.text.startsWith('decompose caller-supplied:')), 'caller-supplied path must log a distinct audit-trail decision');
 });
@@ -1438,7 +1438,7 @@ test('resolvePlan writes real children on a caller-supplied decompose verdict, s
   assert.deepEqual(result.childIds, ['item-x-1', 'item-x-2']);
 
   const view = listWork(storeDir);
-  assert.equal(view.work['item-x'].stage, 'executing');
+  assert.equal(view.work['item-x'].workflowStep, 'executing');
   assert.equal(view.work['item-x-1'].title, 'Build parser');
   assert.equal(view.work['item-x-1'].verify, 'npm test -- parser');
   assert.equal(view.work['item-x-1'].parent, 'item-x');

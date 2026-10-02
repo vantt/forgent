@@ -13,7 +13,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { COMMAND_REGISTRY } from '../../src/cli/command-registry.mjs';
-import { DEFAULT_DOMAIN, DOMAINS, discoverableStages } from '../../src/state/workflow-stage-graphs.mjs';
+import { DEFAULT_DOMAIN, DOMAINS, discoverableSteps, domainSteps } from '../../src/state/domain-registry.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SRC_DIR = path.resolve(__dirname, '../../src');
@@ -93,39 +93,33 @@ test('no registry description names a canAutoApprove* function that no longer ex
   assert.deepEqual(offenders, [], `registry prose names retired canAutoApprove* function(s):\n${offenders.join('\n')}`);
 });
 
-// A stage name the default domain still has FSM edges for but has dropped from
-// its own `stages` array is retired: no new item can land on it, so telling a
-// reader an item sits "at stage <retired>" describes a state they cannot be in.
-// Derived from DOMAINS rather than hardcoded, so the guard follows the next
-// rename on its own.
-test('no registry description names a stage the default domain has retired', () => {
+// A step the domain dropped outright (`clarify`) is retired: no new item can land on it, so
+// telling a reader an item sits "at step <retired>" describes a state they cannot be in. (An
+// alias such as `decompose` is not listed: it is also the name of a plan verdict, which
+// descriptions legitimately use.) The test fails if `clarify` ever comes back as a live step.
+test('no registry description names a step the default domain has retired', () => {
   const domain = DOMAINS[DEFAULT_DOMAIN];
-  const live = new Set(domain.stages);
-  const retired = new Set();
-  for (const edge of domain.transitions) {
-    for (const stage of [edge.from, edge.to]) {
-      if (!live.has(stage)) retired.add(stage);
-    }
-  }
-  assert.ok(retired.size > 0, `domain "${DEFAULT_DOMAIN}" has no retired stage names -- this guard needs updating`);
+  assert.equal(domainSteps(domain).includes('clarify'), false, 'clarify must stay retired for this guard to mean anything');
+  const retired = new Set(['clarify']);
+  assert.ok(retired.size > 0, `domain "${DEFAULT_DOMAIN}" has no retired step names -- this guard needs updating`);
   const offenders = [];
   for (const { where, text } of describedStrings()) {
-    for (const stage of retired) {
-      if (new RegExp(`\\b${stage}\\b`).test(text)) offenders.push(`${where} names retired stage "${stage}"`);
+    for (const step of retired) {
+      if (new RegExp(`\\b${step}\\b`).test(text)) offenders.push(`${where} names retired step "${step}"`);
     }
   }
-  assert.deepEqual(offenders, [], `registry prose names retired stage(s):\n${offenders.join('\n')}`);
+  assert.deepEqual(offenders, [], `registry prose names retired step(s):\n${offenders.join('\n')}`);
 });
 
 // The precondition `discover` actually enforces is computed by
-// discoverableStages (src/intake/discovery.mjs) and checked in bin/fgos.mjs's
+// discoverableSteps (src/state/domain-registry.mjs) and checked in bin/fgos.mjs's
 // own `case 'discover':` -- for the default domain that is discovery/exploring.
 // The description must name those, since it is what a caller reads before
 // choosing between `discover` and `plan`.
 test('discover\'s description names the stages its precondition actually accepts', () => {
   const entry = COMMAND_REGISTRY.find((e) => e.name === 'discover');
   assert.ok(entry, 'COMMAND_REGISTRY is missing a "discover" entry');
-  for (const stage of discoverableStages(DOMAINS[DEFAULT_DOMAIN])) {
+  for (const stage of discoverableSteps(DOMAINS[DEFAULT_DOMAIN])) {
     // Excludes a hyphenated compound (`context-discovery`, the skill name
     // `fgos-coding-exploring`) so an incidental substring cannot satisfy the
     // guard -- the stage has to be named as a stage.

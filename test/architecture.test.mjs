@@ -12,6 +12,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import YAML from 'yaml';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -221,7 +222,7 @@ test('domain-siloing: phát hiện vi phạm fixture (core → domain cụ thể
 
   // DEFAULT_DOMAIN declaration is guarded
   const defaultDomainDefOnly = "export const DEFAULT_DOMAIN = 'coding';";
-  const defTargets = extractDomainCouplings('src/state/workflow-stage-graphs.mjs', defaultDomainDefOnly, ['coding']);
+  const defTargets = extractDomainCouplings('src/state/domain-registry.mjs', defaultDomainDefOnly, ['coding']);
   assert.deepEqual(defTargets, []);
 
   // Regression: the DEFAULT_DOMAIN guard must exempt only the declaration
@@ -303,7 +304,7 @@ export function checkExecuteAssignmentCallSitePostures(sites) {
       if (!/isReadOnlyMode:\s*assignment\.mutation\s*!==\s*'mutating'/.test(callText)) {
         violations.push(`${file}: runExecutorAttempt's executeAssignment(...) call no longer derives isReadOnlyMode from assignment.mutation -- found: ${callText}`);
       }
-    } else if (file === 'src/runner/dispatch/operation-choice.mjs') {
+    } else if (file === 'src/runner/operation-choice.mjs') {
       // Confirmed (R6c): this call's own `assignment` is built two lines
       // above by the SAME function's one buildAssignment({work, stage,
       // operation, ...}) call, which never sets `provenance.kind: 'inline'`
@@ -346,7 +347,7 @@ test('executeAssignment(...) isReadOnlyMode posture: every real call site codeba
   const foundFiles = new Set(sites.map((s) => s.file));
   const expectedFiles = new Set([
     'src/runner/dispatch/cli.mjs',
-    'src/runner/dispatch/operation-choice.mjs',
+    'src/runner/operation-choice.mjs',
     'src/runner/execution/run.mjs',
   ]);
   assert.deepEqual(
@@ -381,7 +382,7 @@ test('R6b posture check actually catches a violation (deliberately broken synthe
   );
   assert.ok(
     checkExecuteAssignmentCallSitePostures([
-      { file: 'src/runner/dispatch/operation-choice.mjs', callText: 'executeAssignment(assignment, { isReadOnlyMode: false })' },
+      { file: 'src/runner/operation-choice.mjs', callText: 'executeAssignment(assignment, { isReadOnlyMode: false })' },
     ]).length > 0,
     'operation-choice.mjs setting isReadOnlyMode explicitly must be flagged for re-investigation',
   );
@@ -396,7 +397,7 @@ test('R6b posture check actually catches a violation (deliberately broken synthe
       { file: 'src/runner/coordination/session-engine.mjs', callText: "executeAssignment(assignment, { ...opts, isReadOnlyMode: assignment.mutation !== 'mutating' })" },
       { file: 'src/runner/dispatch/cli.mjs', callText: "executeAssignment(asgnObj, { isReadOnlyMode: asgnObj.provenance?.kind === 'inline' })" },
       { file: 'src/runner/dispatch/cli.mjs', callText: 'executeAssignment(assignment, { isReadOnlyMode: true })' },
-      { file: 'src/runner/dispatch/operation-choice.mjs', callText: 'executeAssignment(assignment, opts)' },
+      { file: 'src/runner/operation-choice.mjs', callText: 'executeAssignment(assignment, opts)' },
     ]),
     [],
   );
@@ -689,4 +690,66 @@ test('A4 boundary guard: src/runner/dispatch/** and src/runner/execution/** cont
   }
 
   assert.deepEqual(violations, [], `Expected 0 state/workflow imports in dispatch/execution, found:\n${violations.join('\n')}`);
+});
+
+test('A4 boundary guard: src/runner/dispatch/** and src/runner/execution/** import nothing from the Work layer', () => {
+  // The Work layer is everything that knows what a Work item, a domain or a Workflow
+  // step is. Dispatch is handed what it needs (operations, executor identity, capability
+  // hints, agent type) and never looks any of it up.
+  const workLayer = [
+    /(^|\/)work-compat\.mjs$/,
+    /(^|\/)work-dispatch\.mjs$/,
+    /(^|\/)operation-choice\.mjs$/,
+    /(^|\/)loop\.mjs$/,
+    /(^|\/)claim-port\.mjs$/,
+    /(^|\/)prompt-templates\.mjs$/,
+    /\/intake\//,
+    /\/verbs\//,
+  ];
+  const violations = [];
+  for (const dir of ['src/runner/dispatch', 'src/runner/execution']) {
+    for (const file of mjsFilesUnder(dir)) {
+      const source = fs.readFileSync(path.join(root, file), 'utf8');
+      for (const spec of extractImports(source)) {
+        if (workLayer.some((re) => re.test(spec))) {
+          violations.push(`${file} imports Work-layer module: ${spec}`);
+        }
+      }
+    }
+  }
+  assert.deepEqual(violations, [], `Expected 0 Work-layer imports in dispatch/execution, found:\n${violations.join('\n')}`);
+});
+
+test('A4 boundary guard: src/runner/dispatch/** and src/runner/execution/** name no domain or Workflow step literal', () => {
+  // Domains and step ids are data in domains/*/registry.yaml and domains/*/workflows/*.yaml.
+  // Discover them from disk so the guard needs no list of its own to keep in step.
+  const domainsDir = path.join(root, 'domains');
+  const domainNames = fs.readdirSync(domainsDir).filter((d) => fs.statSync(path.join(domainsDir, d)).isDirectory());
+  // Work steps are the ones a workflow declares a `phase` for.
+  const stepIds = new Set();
+  for (const d of domainNames) {
+    const wfDir = path.join(domainsDir, d, 'workflows');
+    if (!fs.existsSync(wfDir)) continue;
+    for (const file of fs.readdirSync(wfDir)) {
+      const wf = YAML.parse(fs.readFileSync(path.join(wfDir, file), 'utf8'));
+      for (const step of wf?.steps ?? []) if (step.phase) stepIds.add(step.id);
+    }
+  }
+  // Step ids that are also generic words a dispatch module legitimately uses are
+  // matched only as a quoted whole-string literal, the shape a stage/domain check takes.
+  const literals = [...new Set([...domainNames, ...stepIds])];
+  const violations = [];
+  for (const dir of ['src/runner/dispatch', 'src/runner/execution']) {
+    for (const file of mjsFilesUnder(dir)) {
+      const lines = fs.readFileSync(path.join(root, file), 'utf8').split('\n');
+      lines.forEach((line, i) => {
+        if (/^\s*(\/\/|\*|\/\*)/.test(line)) return;
+        const code = line.replace(/\/\/.*$/, '');
+        for (const lit of literals) {
+          if (new RegExp(`(['"\`])${lit}\\1`).test(code)) violations.push(`${file}:${i + 1} names "${lit}"`);
+        }
+      });
+    }
+  }
+  assert.deepEqual(violations, [], `Expected no domain/step literal in dispatch/execution, found:\n${violations.join('\n')}`);
 });

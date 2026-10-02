@@ -118,32 +118,31 @@ Under the Request-to-Run unified model, Work items do not have `stage`; step pro
 
 ## Route by stage
 
-Every item carries a `stage` field, independent of its `status`, and a
+Every item carries a `workflowStep` field, independent of its `status`, and a
 `domain` field (an item with none folds to `coding`, matching
 `resolveDomainName`'s own default). Read both on the claimed item, then
 resolve the skill to load through the domain registry in
-`repo/src/state/workflow-stage-graphs.mjs` — never a name hardcoded
+`repo/src/state/domain-registry.mjs` — never a name hardcoded
 here:
 
 ```bash
 node -e "
-import('./src/state/workflow-stage-graphs.mjs').then(({ getDomain, skillForStage }) => {
-  console.log(skillForStage(getDomain(process.argv[1]), process.argv[2]));
+import('./src/state/domain-registry.mjs').then(({ getDomain, skillForStep }) => {
+  console.log(skillForStep(getDomain(process.argv[1]), process.argv[2]));
 });
-" -- "$domain" "$stage"
+" -- "$domain" "$step"
 ```
 
-The table below shows what `skillForStage` resolves to for the `coding`
+The table below shows what `skillForStep` resolves to for the `coding`
 domain today — a different `domain` value resolves through the same
 call, not a different table:
 
-| stage | what's true right now | load (coding domain today) |
+| step | what's true right now | load (coding domain today) |
 |---|---|---|
 | `discovery` | intent is understood (checked at Init, before the item exists — `fgos-clarifying`, called by `/fgOS:submit`); what's left is the machine-alone pass that decides whether anything ambiguous remains — clear skips `exploring` and lands on `planning` directly, unclear falls to `exploring` | `fgos-coding-discovering` (`fgos-researching` is the helper it calls per unresolved question, never the stage's own skill) |
 | `exploring` | the request is still fuzzy — gray areas, missing acceptance criteria, an ambiguous ask | `fgos-coding-exploring` |
 | `planning` — shaping | scope is settled; the work now needs shaping and, where it doesn't fit in one pass, splitting into child items | `fgos-coding-planning` (the registry's entry-point default for `planning`) |
 | `planning` — proving | shape and children (if any) exist; what's left is proving the plan against reality before the item is allowed to move to `executing` | `fgos-coding-validating` — this branch is this skill's own session-side judgment layered on top of the registry's single `planning` default, never a second registry entry |
-| `decompose` (legacy) | the pre-rename name for `planning`, kept drain-only so items already sitting on it can finish; no new item ever lands here | same as `planning` above — `fgos-coding-planning`, then `fgos-coding-validating` |
 | `executing` | the item has already cleared discovery and shaping (or never needed either), and is ready for direct implementation | `fgos-coding-implement` (the build/verify/return path, hand-authored from a bee-inspired implement→verify→cap discipline) |
 
 `compound-learn` is retired as a stage entirely — the synthesis
@@ -155,14 +154,14 @@ stage-routing table.
 the intent check it used to hold moved to Init, run by
 `fgos-clarifying` before `fgos submit` ever creates an item, and the 90
 items open on it at rename time were migrated off for real. `discovery`
-is the domain's own entry point now — `stages[0]`, which is also what
-omitting `--stage` on `fgos submit`/`fgos add` resolves to.
+is the domain's own entry point now — the first step of its Workflow, which is also what
+omitting `--step` on `fgos submit`/`fgos add` resolves to.
 
-`planning` is one stage in the data, not two — "shaping" and "proving"
-above are a judgment call inside that single stage, never a value `stage`
+`planning` is one step in the data, not two — "shaping" and "proving"
+above are a judgment call inside that single stage, never a value `workflowStep`
 itself takes. This skill's whole job is exactly that judgment: read
-`stage`, resolve the domain's registered skill via
-`getDomain`/`skillForStage`, and layer the shaping/proving split on top of it
+`workflowStep`, resolve the domain's registered skill via
+`getDomain`/`skillForStep`, and layer the shaping/proving split on top of it
 (and whether the item is parked per the gate contract below) to decide
 which of `fgos-coding-discovering` / `fgos-coding-exploring` /
 `fgos-coding-planning` / `fgos-coding-validating` answers
@@ -173,8 +172,8 @@ never does their work in their place.
 This skill still never classifies which *domain* an item belongs to —
 it only reads whatever `domain` field the item already carries (or the
 registry's own default when absent) and resolves the stage's skill
-dynamically via `getDomain`/`skillForStage` from
-`repo/src/state/workflow-stage-graphs.mjs`; assigning an item to a
+dynamically via `getDomain`/`skillForStep` from
+`repo/src/state/domain-registry.mjs`; assigning an item to a
 domain in the first place is a separate concern this skill does not
 touch.
 

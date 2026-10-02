@@ -333,7 +333,7 @@ test('CLI: fgos workflow start, status, answer, and legacy operations', () => {
   // 3. Legacy operations inspection remains working
   const opsOut = execFileSync(
     process.execPath,
-    [BIN_FGOS, 'workflow', 'operations', '--stage', 'planning', '--dir', tmp],
+    [BIN_FGOS, 'workflow', 'operations', '--step', 'planning', '--dir', tmp],
     { cwd: tmp, encoding: 'utf8' },
   );
   assert.ok(opsOut.includes('validate-plan') || opsOut.includes('operations'));

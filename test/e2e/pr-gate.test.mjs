@@ -73,7 +73,7 @@ function add(cwd, id, extra = {}) {
     // is exercising the runner's dispatch loop, which only ever picks up
     // executing-stage items, so default this helper's --stage to
     // 'executing' the same way test/cli/fgos.test.mjs's own addOk does.
-    '--stage', extra.stage ?? 'executing',
+    '--step', extra.workflowStep ?? 'executing',
   ];
   const result = fgos(cwd, ['add', id, ...flags]);
   assert.equal(result.status, 0, `fgos add ${id} failed: ${result.stderr}`);

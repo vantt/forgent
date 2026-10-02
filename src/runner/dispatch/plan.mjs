@@ -7,7 +7,7 @@
 // and reasonCodes into a canonical DispatchPlan object.
 
 import { RunnerConfigError } from './config.mjs';
-import { resolveExecutorAndOverrides, resolveExecutorConfig, executorIdForWork } from './resolve.mjs';
+import { resolveExecutorAndOverrides, resolveExecutorConfig } from './resolve.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
 import { resolveAssignmentDispatchPolicy } from './assignment-policy.mjs';
 
@@ -33,11 +33,12 @@ function isKnownCapabilityName(cfg, name) {
  * @param {string} [opts.for] - Purpose identifier
  * @param {string} [opts.work] - Work item identifier
  * @param {string|object} [opts.assignment] - Assignment identifier or object
- * @param {string} [opts.stage] - Workflow stage
  * @param {boolean} [opts.needsSoul=false] - True if caller needs a soul-bearing agent
  * @param {boolean} [opts.hasLiveTaskAccess=false] - True if caller holds live Task tool access
  * @param {object} [opts.caller] - Caller role descriptors ({ role: 'driver'|'launcher' })
  * @param {object} [opts.workItem] - Pre-resolved work item object (for --work option)
+ * @param {string|null} [opts.workExecutorId] - Executor identity the Work layer resolved for that work item
+ *   at its step (null when its Workflow declares none); required with `work`
  * @param {object} [opts.assignmentItem] - Pre-resolved assignment object (for --assignment option)
  * @returns {object} DispatchPlan
  */
@@ -48,11 +49,11 @@ export function compileDispatchPlan(
     for: purpose,
     work: workIdArg,
     assignment: assignmentArg,
-    stage: stageArg,
     needsSoul = false,
     hasLiveTaskAccess = false,
     caller = { role: 'driver' },
     workItem,
+    workExecutorId,
     assignmentItem,
     cliOverride,
     options,
@@ -118,7 +119,12 @@ export function compileDispatchPlan(
     if (!workItem) {
       throw new RunnerConfigError(`no work item "${workIdArg}" found -- cannot resolve its dispatch executor.`);
     }
-    executorId = executorIdForWork(workItem, stageArg);
+    if (workExecutorId === undefined) {
+      throw new RunnerConfigError(
+        `work item "${workIdArg}" was supplied without the executor identity its Workflow step resolves to -- the Work layer must resolve it (dispatch does not look steps up).`,
+      );
+    }
+    executorId = workExecutorId ?? undefined;
     workResolvedInputId = executorId;
     workResolved = resolveExecutorAndOverrides(cfg, executorId);
     const hasExplicitExecutor = workResolved.configured;

@@ -33,7 +33,7 @@ const MODULE_TRIP_CASES = [
   'src/state/status-fsm.mjs',  // equals (D14)
   'src/intake/risk-keywords.mjs', // equals (review-20260717-self-improve-base-workflow f1)
   'src/intake/classify.mjs',      // equals (review-20260717-self-improve-base-workflow f1)
-  'src/state/workflow-stage-graphs.mjs',        // equals (review-20260718-self-improve-loop f03)
+  'src/state/domain-registry.mjs',        // equals (review-20260718-self-improve-loop f03)
   'src/setup/bin-discovery.mjs',  // equals (Phase 10 tier-0 resolver R5)
 ];
 

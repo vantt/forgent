@@ -132,7 +132,7 @@ If CONTEXT.md turns out silent on something this plan actually needs,
 apply the material/grounded/answerable filter: not material → pin as a
 labeled assumption; material → record the gap via `fgos decision` first,
 then hand back to `fgos-coding-exploring` directly, in this same session,
-with `item.stage` staying `planning` throughout (there is no `planning ->
+with `item.workflowStep` staying `planning` throughout (there is no `planning ->
 exploring` edge). Full mechanics: `references/verify-sync-and-gap.md`.
 
 ## No gate here
@@ -206,7 +206,7 @@ Once `plan.md` is written, hand off for validation. Before Step 05 adoption, loa
 - handing back to `fgos-coding-exploring` without first recording the gap
   via `fgos decision` — the hand-back is invisible to any later session
   otherwise
-- moving `item.stage` back to `exploring` for a mid-planning gap — no
+- moving `item.workflowStep` back to `exploring` for a mid-planning gap — no
   such edge exists; hand back via direct invocation instead
 
 Violating the letter of the rules is violating the spirit of the rules.

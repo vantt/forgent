@@ -15,7 +15,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
-import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
+import { buildAssignment } from '../helpers/declared-assignment.mjs';
 
 function mkTempDir(prefix = 'fgos-herdr-assignment-test-') {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));

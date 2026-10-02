@@ -5,13 +5,13 @@ domain: core | role: session | scope: lifecycle-entry | requires-skill: fgos-rou
 ## Input
 - Workspace context and state view (`fgos list`, `fgos ready`, `fgos triage`, `fgos stale`, `fgos rollup`).
 - Claim request parameters (optional `--id <id>` for `discovery`/`exploring`/`planning` stages; omitted `--id` pulling next frontier item for `executing`).
-- Domain registry mapping (`src/state/workflow-stage-graphs.mjs`).
+- Domain registry mapping (`src/state/domain-registry.mjs`).
 
 ## Output
 - Active claim held on one work item (`fgos take --role session [--id <id>]`).
 - Resolved item `domain` and `stage`.
 - Mode/lane classification (`tiny`, `small`, `standard`, `high-risk`, `spike`) for `planning`-stage items based on mechanical flag counting.
-- Resolution of the next skill to load (`skillForStage(getDomain(domain), stage)`).
+- Resolution of the next skill to load (`skillForStep(getDomain(domain), stage)`).
 - Or item parked in `awaiting-human` with attached question (`fgos ask <id>`).
 
 ## Gates

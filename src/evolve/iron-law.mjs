@@ -29,12 +29,13 @@ const MODULE_RULES = [
   // has no coverage of the files that define what it's supposed to flag.
   { kind: 'equals', value: 'src/intake/risk-keywords.mjs' },
   { kind: 'equals', value: 'src/intake/classify.mjs' },
-  // review-20260718-self-improve-loop finding f03: workflow-stage-graphs.mjs
-  // defines each domain's legal FSM stage-transition table, the same
+  // review-20260718-self-improve-loop finding f03: the step FSM decides a Work
+  // item's legal step moves from its Workflow's transition table, the same
   // capability status-fsm.mjs already covers above — missing it let a diff
-  // widen a domain's legal transitions (e.g. skip a stage) with
-  // required:false.
-  { kind: 'equals', value: 'src/state/workflow-stage-graphs.mjs' },
+  // widen a domain's legal transitions (e.g. skip a step) with
+  // required:false. The domain registry resolves which Workflow that is.
+  { kind: 'equals', value: 'src/state/step-fsm.mjs' },
+  { kind: 'equals', value: 'src/state/domain-registry.mjs' },
   // bin-discovery.mjs houses the multi-tier resolver including tier-0
   // workspace shim resolution; diffs touching it are flagged like bin/fgos.mjs.
   { kind: 'equals', value: 'src/setup/bin-discovery.mjs' },

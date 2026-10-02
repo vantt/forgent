@@ -1,12 +1,29 @@
-# domains/coding/workflows/feature.yaml — Feature implementation workflow for coding domain (dual-schema for P3b migration)
+# domains/coding/workflows/feature.yaml — Feature implementation workflow for coding domain
 
 id: coding/feature
 title: Feature implementation workflow for coding domain
 
-# --- New Workflow Schema (P3a / P3b) ---
+# --- Workflow schema ---
+# `phase` is the coarse role a step plays for a Work item walking the workflow;
+# `operations` are the on-demand operations legal at that step (what dispatch is
+# handed instead of looking them up); `transitions` are the legal step moves for
+# a Work item (the runner itself schedules `units` by `dependsOn`).
 steps:
   - id: discovery
     title: Discovery
+    phase: discover
+    skill: fgos-coding-discovering
+    operations:
+      - id: judge-ambiguity
+        primary: true
+        taskSpec: judge-ambiguity
+        role: implementer
+        skills: [fgos-coding-discovering]
+      - id: resolve-question
+        taskSpec: resolve-question
+        role: researcher
+        reason: consult
+        skills: [fgos-researching]
     units:
       - id: judge-ambiguity
         template:
@@ -15,7 +32,26 @@ steps:
           taskSpec: judge-ambiguity
   - id: exploring
     title: Exploring
+    phase: discover
+    skill: fgos-coding-exploring
     dependsOn: [discovery]
+    operations:
+      - id: lock-decisions
+        primary: true
+        taskSpec: lock-decisions
+        role: implementer
+        skills: [fgos-coding-exploring]
+      - id: answer-question
+        taskSpec: answer-question
+        role: advisor
+        reason: advise
+        dispatch: human-only
+        skills: [fgos-coding-exploring]
+      - id: resolve-question
+        taskSpec: resolve-question
+        role: researcher
+        reason: consult
+        skills: [fgos-researching]
     units:
       - id: lock-decisions
         template:
@@ -27,7 +63,32 @@ steps:
       question: Lock decisions for this item?
   - id: planning
     title: Planning
+    phase: plan
+    skill: fgos-coding-planning
     dependsOn: [exploring]
+    operations:
+      - id: shape-plan
+        primary: true
+        taskSpec: shape-plan
+        role: implementer
+        skills: [fgos-coding-planning]
+      - id: validate-plan
+        taskSpec: validate-plan
+        role: reviewer
+        reason: review
+        skills: [fgos-coding-validating]
+        policy:
+          rigor: standard
+      - id: scout-blast-radius
+        taskSpec: scout-blast-radius
+        role: researcher
+        reason: consult
+        skills: [fgos-researching]
+      - id: resolve-question
+        taskSpec: resolve-question
+        role: researcher
+        reason: consult
+        skills: [fgos-researching]
     units:
       - id: shape-plan
         template:
@@ -41,7 +102,39 @@ steps:
           taskSpec: validate-plan
   - id: executing
     title: Executing
+    phase: execute
+    skill: fgos-coding-implement
     dependsOn: [planning]
+    operations:
+      - id: implement-item
+        primary: true
+        taskSpec: implement-item
+        role: implementer
+        skills: [fgos-coding-implement]
+      - id: review-item
+        taskSpec: review-item
+        role: reviewer
+        reason: review
+        skills: [fgos-coding-validating]
+      - id: fix-verify-red
+        taskSpec: fix-verify-red
+        role: implementer
+        skills: [fgos-coding-implement]
+      - id: scoped-subtask
+        taskSpec: scoped-subtask
+        role: helper
+        reason: assist
+        skills: [fgos-coding-implement]
+      - id: scout-blast-radius
+        taskSpec: scout-blast-radius
+        role: researcher
+        reason: consult
+        skills: [fgos-researching]
+      - id: resolve-question
+        taskSpec: resolve-question
+        role: researcher
+        reason: consult
+        skills: [fgos-researching]
     units:
       - id: implement-item
         template:
@@ -57,139 +150,18 @@ steps:
       kind: human
       question: Approve delivery of this item?
 
-# --- Legacy Stage Schema (compatibility for stage-aware readers during P3b) ---
-stages:
-  - name: discovery
-    skill: fgos-coding-discovering
-    taskSpec: judge-ambiguity
-    operations:
-      - id: judge-ambiguity
-        primary: true
-        taskSpec: judge-ambiguity
-        role: implementer
-        skills:
-          - fgos-coding-discovering
-      - id: resolve-question
-        taskSpec: resolve-question
-        role: researcher
-        reason: consult
-        skills:
-          - fgos-researching
-  - name: exploring
-    skill: fgos-coding-exploring
-    taskSpec: lock-decisions
-    operations:
-      - id: lock-decisions
-        primary: true
-        taskSpec: lock-decisions
-        role: implementer
-        skills:
-          - fgos-coding-exploring
-      - id: answer-question
-        taskSpec: answer-question
-        role: advisor
-        reason: advise
-        dispatch: human-only
-        skills:
-          - fgos-coding-exploring
-      - id: resolve-question
-        taskSpec: resolve-question
-        role: researcher
-        reason: consult
-        skills:
-          - fgos-researching
-  - name: decompose
-    skill: fgos-coding-planning
-  - name: planning
-    step: Divide
-    skill: fgos-coding-planning
-    taskSpec: shape-plan
-    operations:
-      - id: shape-plan
-        primary: true
-        taskSpec: shape-plan
-        role: implementer
-        skills:
-          - fgos-coding-planning
-      - id: validate-plan
-        taskSpec: validate-plan
-        role: reviewer
-        reason: review
-        skills:
-          - fgos-coding-validating
-        policy:
-          rigor: standard
-      - id: scout-blast-radius
-        taskSpec: scout-blast-radius
-        role: researcher
-        reason: consult
-        skills:
-          - fgos-researching
-      - id: resolve-question
-        taskSpec: resolve-question
-        role: researcher
-        reason: consult
-        skills:
-          - fgos-researching
-  - name: executing
-    step: Execute
-    skill: fgos-coding-implement
-    taskSpec: implement-item
-    operations:
-      - id: implement-item
-        primary: true
-        taskSpec: implement-item
-        role: implementer
-        skills:
-          - fgos-coding-implement
-      - id: review-item
-        taskSpec: review-item
-        role: reviewer
-        reason: review
-        skills:
-          - fgos-coding-validating
-      - id: fix-verify-red
-        taskSpec: fix-verify-red
-        role: implementer
-        skills:
-          - fgos-coding-implement
-      - id: scoped-subtask
-        taskSpec: scoped-subtask
-        role: helper
-        reason: assist
-        skills:
-          - fgos-coding-implement
-      - id: scout-blast-radius
-        taskSpec: scout-blast-radius
-        role: researcher
-        reason: consult
-        skills:
-          - fgos-researching
-      - id: resolve-question
-        taskSpec: resolve-question
-        role: researcher
-        reason: consult
-        skills:
-          - fgos-researching
-
+# Legal step moves for a Work item walking this workflow.
 transitions:
-  - from: clarify
-    to: discovery
-  - from: clarify
-    to: exploring
-  - from: decompose
-    to: executing
-  - from: exploring
-    to: decompose
-  - from: discovery
-    to: exploring
-  - from: discovery
-    to: planning
-  - from: exploring
-    to: planning
-  - from: planning
-    to: executing
+  - { from: discovery, to: exploring }
+  - { from: discovery, to: planning }
+  - { from: exploring, to: planning }
+  - { from: planning, to: executing }
 
+# Step names older records carry.
+aliases:
+  decompose: planning
+
+# Work statuses handled by a skill rather than a step.
 statusSkills:
   retrospective:
     skill: fgos-coding-knowledge

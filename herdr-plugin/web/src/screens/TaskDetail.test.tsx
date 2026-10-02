@@ -14,7 +14,7 @@ function jsonResponse(body: unknown, init: ResponseInit = {}) {
 
 function workDetail(overrides: Partial<Record<string, unknown>> = {}) {
   return {
-    work: { id: 'tsk-4id', title: 'Task detail', kind: 'task', status: 'todo', stage: 'executing', risk: 'heavy' },
+    work: { id: 'tsk-4id', title: 'Task detail', kind: 'task', status: 'todo', workflowStep: 'executing', risk: 'heavy' },
     gates: {},
     decisions: [],
     settlement: { count: 0, recent: [] },

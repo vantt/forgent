@@ -39,7 +39,7 @@ test('Observe contracts exist and have standard schemas', () => {
     'packages/observe/contracts/observe.case.v1.json',
     'packages/observe/contracts/observe.snapshot.v1.json',
     'packages/run-result/contracts/run-result.read.v1.json',
-    'packages/coordination-state/contracts/session-events.read.v1.json',
+    'packages/observe/contracts/coordination-session.read.v1.json',
     'packages/work-state/contracts/work-events.read.v1.json',
   ];
 
@@ -154,8 +154,8 @@ test('Owner stores match their read contracts', () => {
   assert.ok(result.settledAt);
   assert.ok(result.classification);
 
-  // 2. Coordination owner store
-  const coordRead = readJson('packages/coordination-state/contracts/session-events.read.v1.json');
+  // 2. Historic coordination sessions (engine retired; Observe still reads what it wrote)
+  const coordRead = readJson('packages/observe/contracts/coordination-session.read.v1.json');
   assert.ok(coordRead.properties.sessionEvents);
   assert.ok(coordRead.properties.sessionJson);
 

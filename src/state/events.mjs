@@ -204,7 +204,7 @@ function parsesAsJson(line) {
  * so a concurrent `appendEvent` landing between the read and the
  * `writeFileSync` was silently overwritten/dropped — the same
  * read-then-write TOCTOU `withEventsLock`/`appendEventLocked` already close
- * for `addWork`/`editWork`/`moveWork`/`moveStage` in store.mjs). Folding this
+ * for `addWork`/`editWork`/`moveWork`/`moveStep` in store.mjs). Folding this
  * function into the SAME cross-process lock `appendEvent` holds means a
  * concurrent append can no longer land mid-repair — it either lands before
  * this call acquires the lock (repair then reads the up-to-date file) or
@@ -400,7 +400,7 @@ function acquireEventsLock(logPath, { pid = process.pid, timeoutMs = EVENTS_LOCK
  * Run `fn` while holding the same cross-process `events.lock` `appendEvent`
  * uses (derived from `path.dirname(logPath)`), releasing in a `finally` on
  * every exit path. Exported so a caller with its own precondition check
- * ahead of an append — store.mjs's addWork/editWork/moveWork/moveStage —
+ * ahead of an append — store.mjs's addWork/editWork/moveWork/moveStep —
  * can widen the exclusive window to cover that whole read-check-append
  * sequence as ONE critical section, instead of only the append itself: the
  * precondition read and the append share the lock's single scope, so a
@@ -519,7 +519,7 @@ export { appendEventCore as appendEventLocked };
  * SCOPE: called bare like this, it closes ONLY the duplicate/out-of-order seq
  * race at the append itself — a caller with its own precondition read ahead
  * of the append (store.mjs's addWork existing-id check, moveWork's
- * expectedStatus compare-and-swap, editWork, moveStage) needs that read
+ * expectedStatus compare-and-swap, editWork, moveStep) needs that read
  * inside the SAME held lock to avoid acting on a precondition that's already
  * gone stale; those callers use `withEventsLock` + `appendEventLocked`
  * directly instead of this function, so their whole read-check-append

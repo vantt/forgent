@@ -13,6 +13,7 @@
         "work.discovery",
         "work.move",
         "work.stage",
+        "work.step",
         "work.outcome"
       ],
       "description": "Work event type read by Observe readers."
@@ -75,7 +76,7 @@
         },
         "from": {
           "type": "string",
-          "description": "Source stage (read from work.stage: leaving 'discovery' triggers clarify-pass settlement)."
+          "description": "Source step (read from work.step, or work.stage as written before the rename: leaving 'discovery' triggers clarify-pass settlement)."
         }
       }
     }

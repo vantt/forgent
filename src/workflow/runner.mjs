@@ -4,7 +4,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { validateWorkflow } from './definition.mjs';
+import { validateWorkflowChecked as validateWorkflow } from './checked.mjs';
 import { loadWorkflow } from './loader.mjs';
 import {
   createWorkflowRun,

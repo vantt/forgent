@@ -61,7 +61,7 @@ import {
   makeRunnerProposedLeafItem,
   makeSessionSafeRunnerItem,
   mkLocalDependency,
-  moveStage,
+  moveStep,
   moveToDurableDoingForTest,
   moveWork,
   os,

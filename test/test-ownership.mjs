@@ -73,7 +73,7 @@ export const MANIFEST = [
 
   { id: 'verbs-state-edit', status: 'shadow', pattern: 'src/verbs/state/edit.mjs', directTests: ['test/direct/fgos-edit.test.mjs'], boundaryTests: [] },
   { id: 'verbs-state-read', status: 'shadow', pattern: 'src/verbs/state/read.mjs', directTests: ['test/direct/fgos-read.test.mjs'], boundaryTests: [] },
-  { id: 'verbs-state-stage', status: 'shadow', pattern: 'src/verbs/state/stage.mjs', directTests: ['test/direct/fgos-stage.test.mjs'], boundaryTests: [] },
+  { id: 'verbs-state-step', status: 'shadow', pattern: 'src/verbs/state/step.mjs', directTests: ['test/direct/fgos-step.test.mjs'], boundaryTests: [] },
 ];
 
 // Explicit full-trigger rules (plan's day-one list). Prefix-matched, each

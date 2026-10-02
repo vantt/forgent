@@ -11,7 +11,7 @@
 // What this file closes that `synthetic-domain.test.mjs` and
 // `test/state/workflow-stage-graphs.test.mjs`'s own `triage` coverage never
 // did: neither `synthetic` nor `triage` ever declares a `statusLabels` or
-// `skillMap.retrospective` entry (workflow-stage-graphs.mjs) — both exist
+// `skillMap.retrospective` entry (domain-registry.mjs) — both exist
 // purely to prove the STAGE axis (Clarify/Divide/Execute, base-workflow-
 // model D1-D3) generalizes to a non-coding domain. 0027 (D1-D3) supersedes
 // that model for the STATUS axis's own front segment (todo/doing/blocked/
@@ -19,7 +19,7 @@
 // added skillMap.retrospective and domainFields/fieldSchema on top — none
 // of that machinery had ever been exercised for a domain other than
 // coding, through the real store, before this item. `DOMAINS['fixture-
-// marketing']` (workflow-stage-graphs.mjs) is the fixture this file drives.
+// marketing']` (domain-registry.mjs) is the fixture this file drives.
 //
 // A note on the one deliberate judgment call this file's design rests on
 // (documented in full on the DOMAINS entry itself): status-fsm.mjs's
@@ -45,7 +45,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { getDomain, DOMAINS } from '../../src/state/workflow-stage-graphs.mjs';
+import { getDomain, DOMAINS, skillForStep, domainSteps } from '../../src/state/domain-registry.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -88,9 +88,9 @@ function add(cwd, id, extra = {}) {
     // add-stage-default-gap D1/D2: add now defaults to stage 'clarify'
     // instead of the old implicit 'executing' -- every test in this file
     // needs its item immediately dispatchable/ready, and 'fixture-marketing'
-    // reuses coding's literal stage names (workflow-stage-graphs.mjs), so
+    // reuses coding's literal stage names (domain-registry.mjs), so
     // 'executing' is correct here the same way it is for the coding domain.
-    '--stage', extra.stage ?? 'executing',
+    '--step', extra.workflowStep ?? 'executing',
   ];
   if (extra.domain) flags.push('--domain', extra.domain);
   if (extra.deps) flags.push('--deps', extra.deps.join(','));
@@ -170,15 +170,15 @@ test("DOMAINS['fixture-marketing'] declares its OWN statusLabels/skillMap.retros
 
   // skillMap.retrospective (0027 D5) resolves to a distinct value, not a
   // silent fallback to coding's 'fgos-coding-compounding'.
-  assert.equal(fixture.skillMap.retrospective, 'fgos-fixture-retro');
-  assert.notEqual(fixture.skillMap.retrospective, coding.skillMap.retrospective);
+  assert.equal(skillForStep(fixture, 'retrospective'), 'fgos-fixture-retro');
+  assert.notEqual(skillForStep(fixture, 'retrospective'), skillForStep(coding, 'retrospective'));
 
   // fieldSchema (0027 D6) exists and is a real, distinct declaration.
   assert.deepEqual(fixture.fieldSchema, { campaign: 'string', budget: 'number' });
 });
 
 test('adding "fixture-marketing" leaves DOMAINS.coding completely unchanged (RUL11 — purely additive)', () => {
-  assert.deepEqual(DOMAINS.coding.stages, ['discovery', 'exploring', 'decompose', 'planning', 'executing']);
+  assert.deepEqual(domainSteps(DOMAINS.coding), ['discovery', 'exploring', 'planning', 'executing']);
   assert.deepEqual(DOMAINS.coding.statusLabels, {
     // work-item-backlog-status D3 mapped the new `backlog` status into the
     // already-reserved `backlog` category; every other entry is untouched.
@@ -190,7 +190,7 @@ test('adding "fixture-marketing" leaves DOMAINS.coding completely unchanged (RUL
     'awaiting-approval': 'review',
     wontfix: 'canceled',
   });
-  assert.equal(DOMAINS.coding.skillMap.retrospective, 'fgos-coding-knowledge');
+  assert.equal(skillForStep(DOMAINS.coding, 'retrospective'), 'fgos-coding-knowledge');
   assert.equal(DOMAINS.coding.fieldSchema, undefined);
   assert.equal(DOMAINS.coding.worktreeBacked, true);
 });
@@ -212,7 +212,7 @@ test('e2e: moving a fixture-marketing item into "blocked" stamps statusCategory 
 
   // tsk-40m: todo -> doing is retired -- awaiting-human stands in as the
   // shared "in-progress" example both domains keep grouped the same way
-  // (workflow-stage-graphs.mjs's own fixture-marketing comment: "doing/
+  // (domain-registry.mjs's own fixture-marketing comment: "doing/
   // awaiting-human keep coding's own in-progress grouping"). Entered via
   // the dedicated `ask` verb (the generic `move` verb has no --ask flag).
   const ASK = '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome.';

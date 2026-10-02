@@ -60,7 +60,9 @@ import { postLandDrift } from '../state/postland-drift.mjs';
 import { computeEnduserDocsIndex, generateEnduserDocsIndex, manifestPathFor } from '../report/enduser-index-generate.mjs';
 import { computeDecisionIndex, generateDecisionIndex, indexPathFor } from '../report/decision-index.mjs';
 import { isResolvedStatus } from '../state/frontier.mjs';
-import { DOMAINS, getDomain, resolveDomainName, effectiveStage, resolveTaskSpecPath } from '../state/workflow-stage-graphs.mjs';
+import { DOMAINS, getDomain, resolveDomainName, effectiveStep, domainSteps, skillForStep } from '../state/domain-registry.mjs';
+import { resolveTaskSpecPath } from '../runner/paths.mjs';
+import { stepById } from '../workflow/steps.mjs';
 import { readLocalStatus, classifyRegistryPosture, toolsFromExecutors } from '../state/tool-registry.mjs';
 import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { describeConfigAwareness, loadGlobalConfig } from '../config/global-config.mjs';
@@ -752,35 +754,22 @@ export function checkCoordinationProtocolDeadVocabulary(cwd) {
 }
 
 // tsk-2t9c (multi-role team harness, D6/D9 task-spec A-lite convention;
-// AGENTS.md's install/setup/doctor gate): every domain's `taskSpecMap`
-// (src/state/workflow-stage-graphs.mjs) names task-spec ids a stage-skill
-// will read as read-first material at runtime -- a missing file degrades
-// that skill silently, so this makes the gap visible. Read-only (RUL9):
-// never writes, never scaffolds a stub (a stub contract is worse than an
-// absent one -- it looks authoritative while saying nothing).
+// AGENTS.md's install/setup/doctor gate): every operation a domain's Workflow
+// declares names a task-spec id a step-skill will read as read-first material at
+// runtime -- a missing file degrades that skill silently, so this makes the gap
+// visible. Read-only (RUL9): never writes, never scaffolds a stub (a stub
+// contract is worse than an absent one -- it looks authoritative while saying
+// nothing).
 function checkTaskSpecsResolve(cwd) {
   const missing = [];
   for (const [domainName, domain] of Object.entries(DOMAINS)) {
-    const taskSpecMap = domain.taskSpecMap;
-    if (taskSpecMap) {
-      for (const [stage, specId] of Object.entries(taskSpecMap)) {
-        const specPath = resolveTaskSpecPath(domainName, specId, cwd);
-        if (!fs.existsSync(specPath)) {
-          missing.push(`${domainName}.taskSpecMap.${stage} -> "${specId}" (${path.relative(cwd, specPath)} not found)`);
-        }
-      }
-    }
-    const workflows = domain.workflows ? Object.values(domain.workflows) : [domain];
-    for (const wf of workflows) {
-      if (!wf?.operationMap) continue;
-      for (const [stage, ops] of Object.entries(wf.operationMap)) {
-        if (!Array.isArray(ops)) continue;
-        for (const op of ops) {
-          if (op.taskSpec) {
-            const specPath = resolveTaskSpecPath(domainName, op.taskSpec, cwd);
-            if (!fs.existsSync(specPath)) {
-              missing.push(`${domainName}.operations.${stage}[${op.id || op.taskSpec}] -> "${op.taskSpec}" (${path.relative(cwd, specPath)} not found)`);
-            }
+    for (const wf of Object.values(domain.workflows ?? {})) {
+      for (const step of wf.steps ?? []) {
+        for (const op of step.operations ?? []) {
+          if (!op.taskSpec) continue;
+          const specPath = resolveTaskSpecPath(domainName, op.taskSpec, cwd);
+          if (!fs.existsSync(specPath)) {
+            missing.push(`${domainName}.operations.${step.id}[${op.id || op.taskSpec}] -> "${op.taskSpec}" (${path.relative(cwd, specPath)} not found)`);
           }
         }
       }
@@ -1014,7 +1003,7 @@ function checkAgentClaimsResolve(cwd) {
 }
 
 /**
- * Validates stage operations across domain workflows (Step 02 / D19).
+ * Validates the operations each Workflow step declares, across domain workflows (Step 02 / D19).
  *
  * @param {string} [cwd] Working directory
  * @param {object} [domains] Domain registry map (defaults to DOMAINS)
@@ -1063,29 +1052,17 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
   for (const [domainName, domain] of Object.entries(domains)) {
     if (!domain) continue;
 
-    const workflows = domain.workflows
-      ? Object.entries(domain.workflows)
-      : [['default', domain]];
+    const workflows = Object.entries(domain.workflows ?? {});
 
     for (const [wfName, wf] of workflows) {
       if (!wf) continue;
 
-      if (Array.isArray(wf.stages)) {
-        for (const item of wf.stages) {
-          if (item && typeof item === 'object' && item.name && item.operations !== undefined) {
-            if (!Array.isArray(item.operations)) {
-              problems.push(`${domainName}.${wfName}.${item.name}.operations: must be an array of operation objects`);
-            }
-          }
-        }
-      }
-
-      const operationMap = wf.operationMap;
-      if (operationMap === undefined || operationMap === null) continue;
-      if (typeof operationMap !== 'object' || Array.isArray(operationMap)) {
-        problems.push(`${domainName}.${wfName}.operationMap: must be an object`);
-        continue;
-      }
+      // The Workflow definition's own steps carry the operations (validated for
+      // shape at load by src/workflow/definition.mjs); this check adds what the
+      // loader cannot know: task-spec files, roleGraph roles/edges, skills.
+      const operationMap = Object.fromEntries(
+        (wf.steps ?? []).filter((step) => step.operations !== undefined).map((step) => [step.id, step.operations]),
+      );
 
       for (const [stage, ops] of Object.entries(operationMap)) {
         if (!Array.isArray(ops)) {
@@ -1226,14 +1203,10 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
           problems.push(`${domainName}.${wfName}.${stage}: has ${primaryCount} operations marked primary: true (at most one allowed)`);
         }
 
-        const stageSkill = wf.skillMap?.[stage] ?? domain.skillMap?.[stage];
-        const stageTaskSpec = wf.taskSpecMap?.[stage] ?? domain.taskSpecMap?.[stage];
+        const stageSkill = stepById(wf, stage)?.skill;
         if (primaryOp) {
-          if (stageTaskSpec && primaryOp.taskSpec && primaryOp.taskSpec !== stageTaskSpec) {
-            problems.push(`${domainName}.${wfName}.${stage}: primary operation taskSpec "${primaryOp.taskSpec}" contradicts stage taskSpec "${stageTaskSpec}"`);
-          }
           if (stageSkill && Array.isArray(primaryOp.skills) && primaryOp.skills.length > 0 && !primaryOp.skills.includes(stageSkill)) {
-            problems.push(`${domainName}.${wfName}.${stage}: primary operation skills [${primaryOp.skills.join(', ')}] does not include stage skill "${stageSkill}"`);
+            problems.push(`${domainName}.${wfName}.${stage}: primary operation skills [${primaryOp.skills.join(', ')}] does not include step skill "${stageSkill}"`);
           }
         }
       }
@@ -1404,6 +1377,41 @@ registerCheck({
   id: 'agent-claims-resolve',
   description: 'every agent-type\'s claims list (agents/*.yaml) names real task-specs (tsk-2t9c D12)',
   check: (cwd) => checkAgentClaimsResolve(cwd),
+});
+
+// The Work lifecycle reads each domain's compiled.json (scripts/build-domain-registry.mjs) so it
+// loads with no YAML parser. A missing or unreadable file breaks every command that resolves a
+// domain; a stale one (YAML edited, not rebuilt) silently serves old steps. The freshness half
+// needs the `yaml` package, so it only runs where that package resolves (a checkout after install).
+function checkDomainRegistryCompiled(cwd) {
+  const domainsDir = path.join(cwd, 'domains');
+  if (!fs.existsSync(domainsDir)) return { passed: true, message: 'no domains/ directory here — nothing to check' };
+  const problems = [];
+  let checked = 0;
+  for (const entry of fs.readdirSync(domainsDir, { withFileTypes: true })) {
+    if (!entry.isDirectory() || !fs.existsSync(path.join(domainsDir, entry.name, 'registry.yaml'))) continue;
+    checked += 1;
+    const compiled = path.join(domainsDir, entry.name, 'compiled.json');
+    if (!fs.existsSync(compiled)) {
+      problems.push(`domains/${entry.name}/compiled.json is missing`);
+      continue;
+    }
+    try {
+      JSON.parse(fs.readFileSync(compiled, 'utf8'));
+    } catch (err) {
+      problems.push(`domains/${entry.name}/compiled.json is unreadable (${err.message})`);
+    }
+  }
+  if (problems.length > 0) {
+    return { passed: false, message: `${problems.join('; ')} — run npm run build:domains` };
+  }
+  return { passed: true, message: `${checked} domain registr${checked === 1 ? 'y' : 'ies'} compiled and readable` };
+}
+
+registerCheck({
+  id: 'domain-registry-compiled',
+  description: "every domain's compiled.json (the YAML-free form the Work lifecycle reads) exists and parses",
+  check: (cwd) => checkDomainRegistryCompiled(cwd),
 });
 
 registerCheck({
@@ -1628,23 +1636,22 @@ registerCheck({
   check: (cwd) => checkWorkClassificationVocabulary(cwd),
 });
 
-// tsk-64h: the stage-axis sibling of the risk/kind check above, and the
-// same class of drift — a domain may retire a stage (coding dropped
+// tsk-64h: the step-axis sibling of the risk/kind check above, and the
+// same class of drift — a domain may retire a step (coding dropped
 // `clarify` outright, tsk-qod D1/D2) while items still sit on it. Unlike
-// risk/kind, there is no write door to grandfather against: `stage` is not
-// in `EDITABLE_FIELDS` (store.mjs) and only `moveStage` may change it, so
+// risk/kind, there is no write door to grandfather against: `workflowStep` is
+// not in `EDITABLE_FIELDS` (store.mjs) and only `moveStep` may change it, so
 // a stranded item cannot be corrected by an edit at all — it has to be
 // drained forward through a registered transition or migrated. That makes
-// the drift quieter, not rarer: three items sat at retired `clarify` with
-// nothing surfacing them until a migration script tripped over them.
+// the drift quieter, not rarer.
 //
-// `effectiveStage`, not a bare `item.stage`, so the lazy Execute default
-// (D8 — an item that never had `stage` written) reads as the stage every
+// `effectiveStep`, not a bare `item.workflowStep`, so the lazy default
+// (an item that never had a step written) reads as the step every
 // other consumer already treats it as, instead of being flagged as
 // out-of-vocabulary for being absent. OPEN items only (`!isResolvedStatus`,
 // the one shared open/closed definition), same reasoning as the check
-// above: a resolved item's stage no longer routes anything.
-function checkWorkStageVocabulary(cwd) {
+// above: a resolved item's step no longer routes anything.
+function checkWorkStepVocabulary(cwd) {
   const mainCheckout = resolveMainCheckout(cwd);
   if (mainCheckout === null) {
     return { passed: true, message: 'not inside a git checkout — nothing to check' };
@@ -1655,81 +1662,24 @@ function checkWorkStageVocabulary(cwd) {
     if (isResolvedStatus(item)) continue;
     const domainName = resolveDomainName(item.domain, { onUnrecognized: () => {} });
     const domain = getDomain(domainName);
-    const stage = effectiveStage(item, domain);
-    if (!domain.stages.includes(stage)) {
-      violations.push(`${item.id} (stage: "${stage}", domain: "${domainName}")`);
+    const step = effectiveStep(item, domain);
+    if (!domainSteps(domain, item.kind).includes(step)) {
+      violations.push(`${item.id} (step: "${step}", domain: "${domainName}")`);
     }
   }
   if (violations.length === 0) {
-    return { passed: true, message: 'every open item sits at a stage still registered by its domain' };
+    return { passed: true, message: 'every open item sits at a step still registered by its domain' };
   }
   return {
     passed: false,
-    message: `${violations.length} open item(s) at a stage their domain no longer registers: ${violations.join(', ')} — no verb can relabel a live item's stage; drain each one forward through a registered transition or migrate it (see scripts/migrate-clarify-split.mjs)`,
+    message: `${violations.length} open item(s) at a step their domain no longer registers: ${violations.join(', ')} — no verb can relabel a live item's step; drain each one forward through a registered transition or migrate it`,
   };
 }
 
 registerCheck({
-  id: 'work-stage-vocabulary',
-  description: "every open item sits at a stage its own domain still registers — no item stranded on a retired stage (tsk-64h)",
-  check: (cwd) => checkWorkStageVocabulary(cwd),
-});
-
-// tsk-ogx: the registry-shape sibling of the two domain-vocabulary checks
-// above -- those two catch a work ITEM drifting from its domain's declared
-// vocabulary; this one catches the domain's own DECLARATION drifting
-// internally. `skillMap` stays domain-level by design, never per-workflow
-// (tsk-2t9c D7/D16/D17 -- see docs/history/domain-workflow-skillmap-
-// coverage-check/RESEARCH.md), so the real risk once a second workflow
-// registers is a stage name with no skillMap owner at all -- silent at
-// runtime (`skillForStage`, workflow-stage-graphs.mjs, deliberately folds
-// "declared null" and "key absent" to the same `null` for its own hot-path
-// caller), loud here instead.
-//
-// `domain.workflows` does not exist on `main` yet (tsk-2t9c is unmerged) --
-// a domain with no `workflows` field falls back to its own `stages` array
-// as the one implicit workflow it has today, so this check is real and
-// green on `main` right now, and automatically covers every workflow a
-// domain registers later with zero further change to this check.
-//
-// Exported (not just a private closure) so its fail branch is testable
-// against a synthetic `domains` map -- the real `DOMAINS` is
-// `Object.freeze`d top to bottom and can never carry a deliberately-broken
-// fixture the way a work-item store can.
-export function findDomainWorkflowSkillMapGaps(domains = DOMAINS) {
-  const gaps = [];
-  for (const [domainName, domain] of Object.entries(domains)) {
-    if (!domain.skillMap) continue;
-    const stages = domain.workflows
-      ? [...new Set(Object.values(domain.workflows).flatMap((workflow) => workflow.stages ?? []))]
-      : (domain.stages ?? []);
-    for (const stage of stages) {
-      if (!Object.hasOwn(domain.skillMap, stage)) {
-        gaps.push(`${domainName}.${stage}`);
-      }
-    }
-  }
-  return gaps;
-}
-
-function checkDomainWorkflowSkillMapCoverage() {
-  const gaps = findDomainWorkflowSkillMapGaps();
-  if (gaps.length === 0) {
-    return {
-      passed: true,
-      message: "every stage across every domain's registered workflow(s) resolves to a real skillMap entry (explicit null allowed)",
-    };
-  }
-  return {
-    passed: false,
-    message: `${gaps.length} stage(s) missing a skillMap entry entirely (explicit null is fine, a missing key is not): ${gaps.join(', ')}`,
-  };
-}
-
-registerCheck({
-  id: 'domain-workflow-skillmap-coverage',
-  description: "every stage name across all of a domain's registered workflows resolves to a real skillMap entry, explicit null allowed (tsk-ogx)",
-  check: () => checkDomainWorkflowSkillMapCoverage(),
+  id: 'work-step-vocabulary',
+  description: "every open item sits at a step its own domain's Workflow still registers — no item stranded on a retired step (tsk-64h)",
+  check: (cwd) => checkWorkStepVocabulary(cwd),
 });
 
 export function checkDomainWorkflowOperationsCoverage(cwd) {
@@ -1737,12 +1687,12 @@ export function checkDomainWorkflowOperationsCoverage(cwd) {
   if (problems.length === 0) {
     return {
       passed: true,
-      message: "every stage operation across domain workflows resolves to valid task-specs, roles, skills, and legal roleGraph edges",
+      message: "every step operation across domain workflows resolves to valid task-specs, roles, skills, and legal roleGraph edges",
     };
   }
   return {
     passed: false,
-    message: `${problems.length} workflow stage operation problem(s): ${problems.join('; ')}`,
+    message: `${problems.length} workflow step operation problem(s): ${problems.join('; ')}`,
   };
 }
 
@@ -3900,7 +3850,7 @@ registerFix({
 // alongside these -- discovery is a fixed, deterministic filesystem
 // convention (project `.fgos/coordination-protocols/`, `domains/<name>/
 // coordination-protocols/`, packaged `core/coordination-protocols/`), the
-// same non-configurable style `workflow-stage-graphs.mjs`'s own
+// same non-configurable style `domain-registry.mjs`'s own
 // `domains/`/`core/task-specs/` discovery already uses -- there is no
 // runtime read of a "coordination protocols path" config key to register
 // a default for.

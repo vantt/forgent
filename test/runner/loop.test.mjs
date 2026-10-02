@@ -546,7 +546,7 @@ test('runOnce: an item already advanced to planning (via an explicit prior disco
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   const docsRef = 'docs/history/item-clarify';
   mkLockedContextFixture(repoRoot, docsRef, { mode: 'tiny' });
-  seedItem(dir, { id: 'item-clarify', stage: 'discovery', verify: 'test -f output.txt', docsRef });
+  seedItem(dir, { id: 'item-clarify', workflowStep: 'discovery', verify: 'test -f output.txt', docsRef });
   // tsk-qod D1/D2: `clarify` is retired entirely -- a fresh item now starts
   // at `discovery` (`stages[0]`) directly. tsk-30v D2/D6: a clear verdict at
   // discovery now skips exploring and lands on planning directly in ONE
@@ -561,7 +561,7 @@ test('runOnce: an item already advanced to planning (via an explicit prior disco
   assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
   assert.equal(result.dispatched[0].id, 'item-clarify');
   const view = listWork(dir);
-  assert.equal(view.work['item-clarify'].stage, 'executing');
+  assert.equal(view.work['item-clarify'].workflowStep, 'executing');
   assert.equal(view.settlements['item-clarify'].length, 1);
   assert.equal(view.settlements['item-clarify'][0].kind, 'clarify-pass');
   assert.equal(view.settlements['item-clarify'][0].role, 'session');
@@ -598,7 +598,7 @@ test('runOnce decompose sweep folds an unrecognized item.domain to "coding" (fai
       risk: 'light',
       refs: [],
       verify: 'test -f output.txt',
-      stage: 'discovery',
+      workflowStep: 'discovery',
       domain: 'bogus-domain',
       docsRef,
     },
@@ -623,8 +623,8 @@ test('runOnce decompose sweep folds an unrecognized item.domain to "coding" (fai
 // --- clarify/decompose sweeps never match on a domain with no Clarify/Divide
 // stage (base-workflow-model-4): stageForStep returns undefined for the
 // 'synthetic' domain's Clarify/Divide steps, and an item with no explicit
-// `stage` also reads as `item.stage === undefined` (D8 lazy default) — the
-// pre-fix comparison (`item.stage === clarifyStage`) wrongly matched
+// `stage` also reads as `item.workflowStep === undefined` (D8 lazy default) — the
+// pre-fix comparison (`item.workflowStep === clarifyStage`) wrongly matched
 // undefined === undefined and swept the item into resolveDiscovery, which
 // then threw a stage conflict (synthetic's lazily-resolved "from" stage is
 // its own Execute stage, 'assembling', never 'clarify') and halted the whole
@@ -645,17 +645,17 @@ test('runOnce clarify+decompose sweeps never touch a synthetic-domain item with 
   assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
   assert.equal(result.dispatched[0].id, 'item-synthetic');
   assert.equal(listWork(dir).work['item-synthetic'].status, 'awaiting-approval');
-  // no work.discovery / work.stage event was ever written — the sweeps
+  // no work.discovery / work.step event was ever written — the sweeps
   // genuinely skipped it rather than happening to succeed
   const events = readRawEvents(dir);
-  assert.ok(!events.some((e) => e.type === 'work.discovery' || e.type === 'work.stage'));
+  assert.ok(!events.some((e) => e.type === 'work.discovery' || e.type === 'work.step'));
 });
 
 test('runOnce decompose sweep still fires normally for a coding-domain item advanced to planning (no behavior change for coding)', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   const docsRef = 'docs/history/item-coding-clarify';
   mkLockedContextFixture(repoRoot, docsRef, { mode: 'tiny' });
-  seedItem(dir, { id: 'item-coding-clarify', stage: 'discovery', verify: 'test -f output.txt', docsRef });
+  seedItem(dir, { id: 'item-coding-clarify', workflowStep: 'discovery', verify: 'test -f output.txt', docsRef });
   // tsk-30v D2/D6: a clear verdict at discovery now skips exploring and
   // lands on planning directly in ONE hop (previously two hops walked
   // discovery->exploring->planning).
@@ -667,7 +667,7 @@ test('runOnce decompose sweep still fires normally for a coding-domain item adva
   assert.equal(result.outcome, 'drained');
   assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
   assert.equal(result.dispatched[0].id, 'item-coding-clarify');
-  assert.equal(listWork(dir).work['item-coding-clarify'].stage, 'executing');
+  assert.equal(listWork(dir).work['item-coding-clarify'].workflowStep, 'executing');
 });
 
 // --- real parallelism: two independent items overlap in one runOnce -------
@@ -837,7 +837,7 @@ test('the discovery sweep obeys the shared ceiling too: a full lane spawns no re
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   occupySlots(dir, 2);
   writeCeiling(repoRoot, 2);
-  seedItem(dir, { id: 'item-research-blocked', stage: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
+  seedItem(dir, { id: 'item-research-blocked', workflowStep: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
   const body = JSON.stringify({ clear: true, verify: 'npm test -- research' });
   const config = configFor(writeDiscoveryVerdictExecutor(scriptDir, counterFile, body));
 
@@ -846,7 +846,7 @@ test('the discovery sweep obeys the shared ceiling too: a full lane spawns no re
   assert.equal(countRuns(counterFile), 0, 'no research worker may be stood up while the lane is full');
   assert.equal(result.exitCode, 0, 'a refusal is an answer, not a failure');
   const item = listWork(dir).work['item-research-blocked'];
-  assert.equal(item.stage, 'discovery', 'the item is left exactly where it was, for a later poll');
+  assert.equal(item.workflowStep, 'discovery', 'the item is left exactly where it was, for a later poll');
   assert.equal(item.status, 'todo');
 });
 
@@ -854,14 +854,14 @@ test('the discovery sweep still runs normally when the lane has room', async () 
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   occupySlots(dir, 1);
   writeCeiling(repoRoot, 4);
-  seedItem(dir, { id: 'item-research-ok', stage: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
+  seedItem(dir, { id: 'item-research-ok', workflowStep: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
   const body = JSON.stringify({ clear: true, verify: 'npm test -- research' });
   const config = configFor(writeDiscoveryVerdictExecutor(scriptDir, counterFile, body));
 
   await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   assert.equal(countRuns(counterFile), 1, 'room means the sweep is untouched');
-  assert.equal(listWork(dir).work['item-research-ok'].stage, 'planning');
+  assert.equal(listWork(dir).work['item-research-ok'].workflowStep, 'planning');
 });
 
 // "Nothing to do" and "work is waiting behind a full lane" are opposite
@@ -1614,7 +1614,7 @@ test('wgi-8: a worker fgos-discovered block makes the RUNNER create a new item s
   assert.equal(d.title, 'Wire retry metrics into the dashboard');
   assert.equal(d.description, 'surfaced while doing item-happy');
   assert.equal(d.status, 'todo');
-  assert.equal(d.stage, 'discovery', 'enters at discovery (stages[0], tsk-qod D1/D2: clarify retired) so context-discovery attaches the real verify later');
+  assert.equal(d.workflowStep, 'discovery', 'enters at discovery (stages[0], tsk-qod D1/D2: clarify retired) so context-discovery attaches the real verify later');
   assert.equal(d.kind, 'feature', 'block kind override wins over classify()');
   assert.equal(d.risk, 'standard', 'block risk override wins over classify()');
   assert.equal(d.deps.length, 0);
@@ -1760,7 +1760,7 @@ test('S10: a re-dispatched item re-emitting a block it already captured on a pri
     risk: 'standard',
     refs: [],
     verify: 'chưa xác định',
-    stage: 'discovery',
+    workflowStep: 'discovery',
     discoveredFrom: 'item-redispatch',
   });
   const body = JSON.stringify({ title: 'Wire retry metrics into the dashboard' });
@@ -2052,21 +2052,21 @@ test('tsk-30v: DISCOVERY DISPATCH sweep advances discovery -> planning on a clea
   // FALLBACK_VERIFY, not seedItem's default -- a fresh discovery-stage item
   // has no real verify yet, same starting shape as an item that just landed
   // on discovery via the clarify->discovery edge (D3).
-  seedItem(dir, { id: 'item-research-clear', stage: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
+  seedItem(dir, { id: 'item-research-clear', workflowStep: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
   const body = JSON.stringify({ clear: true, verify: 'npm test -- research' });
   const config = configFor(writeDiscoveryVerdictExecutor(scriptDir, counterFile, body));
 
   await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   const item = listWork(dir).work['item-research-clear'];
-  assert.equal(item.stage, 'planning', 'tsk-30v D2/D6: a clear verdict skips exploring, discovery -> planning directly');
+  assert.equal(item.workflowStep, 'planning', 'tsk-30v D2/D6: a clear verdict skips exploring, discovery -> planning directly');
   assert.equal(item.status, 'todo', 'planning is a fresh todo stop, not doing/awaiting-approval');
   assert.equal(item.verify, 'npm test -- research', "the worker's own proposed verify rides onto the item");
 });
 
 test('tsk-4v6/tsk-30v: DISCOVERY DISPATCH sweep advances the item to exploring AND parks it on an unclear verdict, matching the interactive driver path', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
-  seedItem(dir, { id: 'item-research-unclear', stage: 'discovery' });
+  seedItem(dir, { id: 'item-research-unclear', workflowStep: 'discovery' });
   const question = '## Context\n\nThe research worker needs a retry backoff strategy for this item.\n\n## Why this matters\n\nThis directly affects the outcome: which retry backoff strategy should this follow?';
   const body = JSON.stringify({ clear: false, question });
   const config = configFor(writeDiscoveryVerdictExecutor(scriptDir, counterFile, body));
@@ -2075,14 +2075,14 @@ test('tsk-4v6/tsk-30v: DISCOVERY DISPATCH sweep advances the item to exploring A
 
   const view = listWork(dir);
   const item = view.work['item-research-unclear'];
-  assert.equal(item.stage, 'exploring', 'tsk-30v D2/D3: unclear no longer parks in place -- stage advances to exploring');
+  assert.equal(item.workflowStep, 'exploring', 'tsk-30v D2/D3: unclear no longer parks in place -- stage advances to exploring');
   assert.equal(item.status, 'awaiting-human', 'unclear verdict parks the item, matching resolveDiscovery\'s session-role behavior');
   assert.equal(view.gates?.['item-research-unclear']?.ask, question);
 });
 
 test('tsk-4v6: DISCOVERY DISPATCH sweep never advances the item when a real commit lands but no verdict fence is reported — the exact bug this item fixes', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
-  seedItem(dir, { id: 'item-research-silent', stage: 'discovery' });
+  seedItem(dir, { id: 'item-research-silent', workflowStep: 'discovery' });
   // no verdictBody -- the worker commits real research but reports nothing,
   // the same shape the pre-fix worker-prompt-discovery.txt template produced
   const config = configFor(writeDiscoveryVerdictExecutor(scriptDir, counterFile, undefined));
@@ -2090,7 +2090,7 @@ test('tsk-4v6: DISCOVERY DISPATCH sweep never advances the item when a real comm
   await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   const item = listWork(dir).work['item-research-silent'];
-  assert.equal(item.stage, 'discovery', 'a commit with no verdict never advances the item (the old bug: any real commit used to advance it)');
+  assert.equal(item.workflowStep, 'discovery', 'a commit with no verdict never advances the item (the old bug: any real commit used to advance it)');
   assert.equal(item.status, 'todo', 'left exactly as today\'s no-commit branch already does, for the next sweep to retry');
 });
 
@@ -2185,7 +2185,7 @@ test('tsk-2yo: a headless clear verdict carrying tier/kind/risk actually applies
     refs: [],
     verify: 'npm test',
     size: 'standard',
-    stage: 'discovery',
+    workflowStep: 'discovery',
     domain: 'coding',
   });
   const callerVerdict = { clear: true, verify: 'npm test', size: 'heavy', rigor: 'high', kind: 'bug', risk: 'heavy' };
@@ -2282,7 +2282,7 @@ test('Step 06 executing-stage scout-blast-radius operation choice runs through r
       const resultPath = match[1];
       const runDir = path.dirname(resultPath);
       fs.mkdirSync(runDir, { recursive: true });
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Scout Report\\nSymbol: chooseStageOperation in src/runner/dispatch/operation-choice.mjs\\nSearch posture: active rg cross-check\\nCallers: src/runner/loop.mjs\\nAffected processes: none\\nRisk read: low risk\\n');
+      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Scout Report\\nSymbol: chooseStageOperation in src/runner/operation-choice.mjs\\nSearch posture: active rg cross-check\\nCallers: src/runner/loop.mjs\\nAffected processes: none\\nRisk read: low risk\\n');
       fs.writeFileSync(resultPath, JSON.stringify({ status: 'done', summary: 'Scouted 2 symbols', findings: [] }));
     } else {
       fs.writeFileSync('output.txt', 'done\\n');
@@ -2300,7 +2300,7 @@ test('Step 06 executing-stage scout-blast-radius operation choice runs through r
   const cfg = configFor(executorScript);
   seedItem(dir, {
     id,
-    stage: 'executing',
+    workflowStep: 'executing',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -2313,7 +2313,7 @@ test('Step 06 executing-stage scout-blast-radius operation choice runs through r
 
   const item = listWork(dir).work[id];
   assert.equal(item.status, 'awaiting-approval');
-  assert.equal(item.stage, 'executing');
+  assert.equal(item.workflowStep, 'executing');
 
   const asgnDir = path.join(dir, 'assignments');
   assert.ok(fs.existsSync(asgnDir));
@@ -2344,7 +2344,7 @@ test('driver loop runOnce: executing scout-blast-radius with failed or no-eviden
   const cfg = configFor(executorScript);
   seedItem(dir, {
     id,
-    stage: 'executing',
+    workflowStep: 'executing',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -2361,7 +2361,7 @@ test('driver loop runOnce: executing scout-blast-radius with failed or no-eviden
 
   const itemAfterPass1 = listWork(dir).work[id];
   assert.equal(itemAfterPass1.status, 'blocked');
-  assert.equal(itemAfterPass1.stage, 'executing');
+  assert.equal(itemAfterPass1.workflowStep, 'executing');
   assert.equal(itemAfterPass1.secondaryOperation ?? null, null);
 
   // Pass 2: subsequent runOnce sees item is blocked and does NOT fall through to implement-item
@@ -2425,7 +2425,7 @@ test('driver loop runOnce: executing review-item with REJECT verdict on existing
 
   seedItem(dir, {
     id,
-    stage: 'executing',
+    workflowStep: 'executing',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -2493,7 +2493,7 @@ test('driver loop runOnce: executing review-item with APPROVED verdict and passi
 
   seedItem(dir, {
     id,
-    stage: 'executing',
+    workflowStep: 'executing',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -2564,7 +2564,7 @@ test('driver loop runOnce: executing review-item with APPROVED verdict but faili
 
   seedItem(dir, {
     id,
-    stage: 'executing',
+    workflowStep: 'executing',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -2618,7 +2618,7 @@ test('driver loop runOnce: executing review-item on Work with NO candidate diff/
 
   seedItem(dir, {
     id,
-    stage: 'executing',
+    workflowStep: 'executing',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -2635,7 +2635,7 @@ test('driver loop runOnce: executing review-item on Work with NO candidate diff/
 
   const itemAfter = listWork(dir).work[id];
   assert.equal(itemAfter.status, 'blocked');
-  assert.equal(itemAfter.stage, 'executing');
+  assert.equal(itemAfter.workflowStep, 'executing');
   assert.equal(itemAfter.secondaryOperation ?? null, null);
 });
 
@@ -2670,7 +2670,7 @@ test('Finding 5 regression test: scout-blast-radius/review-item assignment paths
 
   seedItem(dir, {
     id,
-    stage: 'executing',
+    workflowStep: 'executing',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -2699,7 +2699,7 @@ test('Finding 1 regression test: planning Work item with status doing (live clai
 
   seedItem(dir, {
     id,
-    stage: 'planning',
+    workflowStep: 'planning',
     status: 'doing',
     domain: 'coding',
     workflow: 'feature',
@@ -2713,7 +2713,7 @@ test('Finding 1 regression test: planning Work item with status doing (live clai
 
   const item = listWork(dir).work[id];
   assert.equal(item.status, 'doing');
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
 });
 
 test('Fix Step 06 cli-spawn cwd selection for planning.validate-plan: runs assignment in worktree root when plan.md exists only in worktree', async () => {
@@ -2777,7 +2777,7 @@ test('Fix Step 06 cli-spawn cwd selection for planning.validate-plan: runs assig
 
   seedItem(dir, {
     id,
-    stage: 'planning',
+    workflowStep: 'planning',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -2879,7 +2879,7 @@ function setupValidatePlanFixture({ planModeLine = '', executorFactory = writeVa
 
   seedItem(base.dir, {
     id,
-    stage: 'planning',
+    workflowStep: 'planning',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -2912,7 +2912,7 @@ test('Cell 6.1 happy path: runOnce dispatches planning.validate-plan to a fake e
   // fallback then conservatively no-ops, so the item is exactly where the
   // sweep found it.
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.status, 'todo');
 });
 
@@ -2929,10 +2929,10 @@ test('Cell 6.1 happy path: driver consumes READY+reported and feeds the existing
   assert.match(readyLine, /\(pass-through\)/);
 
   // Work stage/status changed only through engine verbs: resolvePlan's
-  // moveStage advanced planning -> executing; the drain run's own claim and
+  // moveStep advanced planning -> executing; the drain run's own claim and
   // settle (verify passed + committed work) then reached awaiting-approval.
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'executing');
+  assert.equal(item.workflowStep, 'executing');
   assert.equal(item.status, 'awaiting-approval');
 
   // Ordering proves the driver, not the Assignment, moved Work: the
@@ -3019,7 +3019,7 @@ function setupValidatePlanDecomposeFixture({ id, docsRef, children }) {
 
   seedItem(base.dir, {
     id,
-    stage: 'planning',
+    workflowStep: 'planning',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -3046,7 +3046,7 @@ test('Cell P01.2: reviewer READY on an item whose plan.md declares split childre
 
   const view = listWork(dir);
   const root = view.work[id];
-  assert.equal(root.stage, 'executing');
+  assert.equal(root.workflowStep, 'executing');
 
   const created = Object.values(view.work).filter((w) => w.parent === id);
   assert.equal(created.length, 2);
@@ -3055,7 +3055,7 @@ test('Cell P01.2: reviewer READY on an item whose plan.md declares split childre
     ['Subtask A', 'Subtask B'],
   );
   for (const child of created) {
-    assert.equal(child.stage, 'executing');
+    assert.equal(child.workflowStep, 'executing');
   }
 });
 
@@ -3080,7 +3080,7 @@ test('Cell P01.2: a child spec without a cited D-ID in plan.md\'s own split JSON
   const root = view.work[id];
   // rejected verdict: the root stays exactly where the sweep found it, and
   // no child is ever written.
-  assert.equal(root.stage, 'planning');
+  assert.equal(root.workflowStep, 'planning');
   assert.equal(root.status, 'todo');
   const created = Object.values(view.work).filter((w) => w.parent === id);
   assert.equal(created.length, 0);
@@ -3412,7 +3412,7 @@ test('Cell 6.2 staleness: plan.md edited after settle is never consumed cross-pa
   assert.ok(!secondLogs.some((l) => l.includes('after READY validation')), 'the V1 verdict must never feed the planning edge');
 
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.status, 'todo');
   assert.deepEqual(item, itemBefore, 'neither dispatch pass may mutate any work-record field');
 });
@@ -3441,7 +3441,7 @@ test('Cell 6.2 staleness: an mtime-hidden plan.md edit is still caught by the re
   assert.ok(!secondLogs.some((l) => l.includes('after READY validation')), 'a verdict on a superseded plan revision must never feed the planning edge');
 
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.status, 'todo');
   assert.deepEqual(item, itemBefore, 'neither dispatch pass may mutate any work-record field');
 });
@@ -3460,7 +3460,7 @@ test('Cell 6.2 red-team: string-only evidenceRefs without a companion report nev
   assert.ok(!logs.some((l) => l.includes('after READY validation')), 'a forged string-only claim must never feed the planning edge');
 
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.status, 'todo');
   assert.deepEqual(item, itemBefore, 'the forged-claim pass must not mutate any work-record field');
 });
@@ -3489,7 +3489,7 @@ test('Cell 6.2 read-back tamper: a schema-broken agentClaim in the stored result
   assert.ok(!secondLogs.some((l) => l.includes('after READY validation')), 'a tampered claim must never feed the planning edge');
 
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.status, 'todo');
   assert.deepEqual(item, itemBefore, 'neither the settle nor the tamper pass may mutate any work-record field');
 });
@@ -3508,7 +3508,7 @@ test('Cell 6.2 read-back tamper: a deleted agent-report.md is never consumed cro
   assert.ok(!secondLogs.some((l) => l.includes('after READY validation')), 'a verdict whose report artifact vanished must not feed the planning edge');
 
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.status, 'todo');
   assert.deepEqual(item, itemBefore, 'neither the settle nor the tamper pass may mutate any work-record field');
 });
@@ -3528,7 +3528,7 @@ test('Cell 6.2 no-evidence stop: an executor that writes nothing leaves Work unt
   assert.ok(!logs.some((l) => l.includes('after READY validation')));
 
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.status, 'todo');
   assert.deepEqual(item, itemBefore, 'the no-evidence stop must not mutate any work-record field');
 });
@@ -3548,7 +3548,7 @@ test('Cell 6.2 failed stop: malformed agent-result.json fails closed and leaves 
   assert.ok(logs.some((l) => l.includes('did not report READY')));
 
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.status, 'todo');
   assert.deepEqual(item, itemBefore, 'the failed stop must not mutate any work-record field');
 });
@@ -3568,7 +3568,7 @@ test('Cell 6.2 NOT READY verdict routes back to the primary planning path withou
   assert.ok(!logs.some((l) => l.includes('after READY validation')));
 
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.status, 'todo');
   assert.deepEqual(item, itemBefore, 'the routing-back pass must not mutate any work-record field');
 });
@@ -3621,7 +3621,7 @@ test('F2d composed: a phantom future run dir with a recomputed plan hash is neve
   assert.ok(!secondLogs.some((l) => l.includes('after READY validation')), 'the forged V2 verdict must never feed the planning edge');
 
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.status, 'todo');
   assert.deepEqual(item, itemBefore, 'the forgery pass must not mutate any work-record field');
 });
@@ -3650,7 +3650,7 @@ test('F2c composed: a schema-valid NOT READY -> READY flip in the stored result.
   assert.ok(!secondLogs.some((l) => l.includes('after READY validation')), 'the flipped verdict must never feed the planning edge');
 
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.status, 'todo');
   assert.deepEqual(item, itemBefore, 'the flip pass must not mutate any work-record field');
 });
@@ -3686,7 +3686,7 @@ test('F5 anti-wedge: honest re-plan then re-dispatch then consume keeps the norm
   assert.ok(!thirdLogs.some((l) => l.includes('after READY validation')), 'a NOT READY verdict must never feed the planning edge');
 
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.status, 'todo');
   assert.deepEqual(item, itemBefore, 'the healthy re-plan cycle must not mutate any work-record field');
 });
@@ -3740,7 +3740,7 @@ test('F2d(c) composed: a result.json-only tamper cannot relocate evidence to a p
   assert.ok(!secondLogs.some((l) => l.includes('after READY validation')), 'evidence read from a planted dir must never feed the planning edge');
 
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.status, 'todo');
   assert.deepEqual(item, itemBefore, 'the redirect-tamper pass must not mutate any work-record field');
 });
@@ -3794,7 +3794,7 @@ test('P4a composed: a planted pinned-dir report and result.json field edits cann
   assert.ok(!secondLogs.some((l) => l.includes('after READY validation')), 'planted pinned-dir evidence must never feed the planning edge');
 
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.status, 'todo');
   assert.deepEqual(item, itemBefore, 'the pinned-dir plant pass must not mutate any work-record field');
 });
@@ -3828,7 +3828,7 @@ test('S3a composed: a single runtime.exitCode flip cannot erase a settle-classif
   assert.ok(!secondLogs.some((l) => l.includes('after READY validation')), 'a re-derived failed verdict must never feed the planning edge');
 
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.status, 'todo');
   assert.deepEqual(item, itemBefore, 'the exitCode-flip pass must not mutate any work-record field');
 });

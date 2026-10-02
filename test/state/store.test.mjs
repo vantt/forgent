@@ -17,7 +17,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fork, execFileSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { initStore, addWork, editWork, moveWork, moveStage, addOutcome, addDecision, recordGateApprove, listWork, readRawEvents, setFocus, rebuild, resolveWriterLogPath, StoreError, assertPlanEvidence } from '../../src/state/store.mjs';
+import { initStore, addWork, editWork, moveWork, moveStep, addOutcome, addDecision, recordGateApprove, listWork, readRawEvents, setFocus, rebuild, resolveWriterLogPath, StoreError, assertPlanEvidence } from '../../src/state/store.mjs';
 import { appendEvent } from '../../src/state/events.mjs';
 import { REGISTRY, ENV, PID, UNRESOLVED } from "../../src/util/session-identity.mjs";
 import { MAX_TITLE_LENGTH } from '../../src/state/work.mjs';
@@ -99,7 +99,7 @@ function sleepMs(ms) {
 async function raceAcrossProcesses(dir, storeCall, nProcesses, extraArgvPerChild = null, batchSize = nProcesses) {
   const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-store-race-'));
   const childScript = `
-import { addWork, editWork, moveWork, moveStage, StoreError, FsmError } from ${JSON.stringify(STORE_MJS)};
+import { addWork, editWork, moveWork, moveStep, StoreError, FsmError } from ${JSON.stringify(STORE_MJS)};
 const dir = process.argv[2];
 const startAt = Number(process.argv[3]);
 const waitMs = startAt - Date.now();
@@ -1134,18 +1134,18 @@ test('setFocus throws StoreError("validation") when the item exists but has no g
   );
 });
 // --- writer provenance (D8/D15/D17/D18, str46-io-contract): every event
-// written through editWork, moveWork and moveStage carries a writer
+// written through editWork, moveWork and moveStep carries a writer
 // object produced by resolveWriterIdentity -- table-driven since the three
 // doors exercise the exact same shape assertion, only the call differs.
-test("editWork, moveWork and moveStage each stamp the event payload with writer id/source, never a joined string, never routed through a validator", () => {
+test("editWork, moveWork and moveStep each stamp the event payload with writer id/source, never a joined string, never routed through a validator", () => {
   const dir = tmpDir();
-  addSampleWork(dir, "writer-a", { stage: "exploring" });
+  addSampleWork(dir, "writer-a", { workflowStep: "exploring" });
   moveToDurableDoingForTest(dir, "writer-a");
 
   const doors = [
     { name: "editWork", call: () => editWork(dir, { id: "writer-a", patch: { title: "Writer A edited" } }) },
     { name: "moveWork", call: () => moveWork(dir, { id: "writer-a", to: "blocked", expectedStatus: "doing" }) },
-    { name: "moveStage", call: () => moveStage(dir, { id: "writer-a", to: "decompose" }) },
+    { name: "moveStep", call: () => moveStep(dir, { id: "writer-a", to: "planning" }) },
   ];
 
   for (const { name, call } of doors) {
@@ -1289,13 +1289,13 @@ function addLegacyWork(dir, id, overrides = {}) {
 
 test('editWork succeeds patching an unrelated field on an item whose stage predates the current enum (grandfathered, not re-validated)', () => {
   const dir = tmpDir();
-  addLegacyWork(dir, 'legacy-stage', { stage: 'compound-learn' });
+  addLegacyWork(dir, 'legacy-stage', { workflowStep: 'compound-learn' });
 
   editWork(dir, { id: 'legacy-stage', patch: { description: 'unrelated edit' } });
 
   const after = listWork(dir).work['legacy-stage'];
   assert.equal(after.description, 'unrelated edit');
-  assert.equal(after.stage, 'compound-learn'); // grandfathered, not silently "fixed"
+  assert.equal(after.workflowStep, 'compound-learn'); // grandfathered, not silently "fixed"
 });
 
 test('editWork succeeds patching an unrelated field on an item whose id exceeds the current 30-char length cap (grandfathered)', () => {
@@ -1322,7 +1322,7 @@ test('editWork succeeds patching an unrelated field on an item whose stored acce
 
 test('editWork still fully validates a field the patch DOES touch, even on an item with other legacy-invalid fields', () => {
   const dir = tmpDir();
-  addLegacyWork(dir, 'legacy-deps-relational', { stage: 'compound-learn', deps: [] });
+  addLegacyWork(dir, 'legacy-deps-relational', { workflowStep: 'compound-learn', deps: [] });
 
   assert.throws(
     () => editWork(dir, { id: 'legacy-deps-relational', patch: { deps: ['does-not-exist'] } }),

@@ -24,7 +24,7 @@ roleGraph:
         to: researcher
         reason: consult
         mode: sync
-    planning: &planningEdges
+    planning:
       - from: implementer
         to: researcher
         reason: consult
@@ -37,7 +37,6 @@ roleGraph:
         to: reviewer
         reason: review
         mode: async
-    decompose: *planningEdges
     executing:
       - from: implementer
         to: researcher
