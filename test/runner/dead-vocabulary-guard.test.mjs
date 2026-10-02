@@ -440,3 +440,78 @@ test('dead vocabulary guard: Request-to-Run P2 retired symbols (DemandFacts, mat
 
   assert.deepEqual(violations, [], `P2 dead symbols detected:\n${violations.join('\n')}`);
 });
+
+test('dead vocabulary guard: Request-to-Run P5 retired symbols (FlowDefinition, CoordinationProtocol, DemandFacts, readOnlyRedirects, matchCapability, deriveForm, retired facades) do not appear in docs/specs, core, domains, AGENTS.md, or README.md', () => {
+  const p5DeadSymbols = [
+    'FlowDefinition',
+    'CoordinationProtocol',
+    'DemandFacts',
+    'readOnlyRedirects',
+    'matchCapability',
+    'deriveForm',
+    'fgos-code-panel',
+    'fgos-plan-loop',
+    'fgos-code-change',
+    'fgos-capability-dispatching',
+  ];
+
+  const searchDirs = ['docs/specs', 'core', 'domains'].map((d) => path.join(REPO_ROOT, d));
+  const docFiles = searchDirs.flatMap((d) => collectFiles(d, ['.md']));
+  const agentsMd = path.join(REPO_ROOT, 'AGENTS.md');
+  if (fs.existsSync(agentsMd)) docFiles.push(agentsMd);
+  const readmeMd = path.join(REPO_ROOT, 'README.md');
+  if (fs.existsSync(readmeMd)) docFiles.push(readmeMd);
+
+  const violations = [];
+  const symbolRegexes = p5DeadSymbols.map((sym) => ({ symbol: sym, regex: new RegExp(`\\b${sym}\\b`) }));
+
+  for (const file of docFiles) {
+    const lines = fs.readFileSync(file, 'utf8').split('\n');
+    let inHistory = false;
+    let historyLevel = 0;
+    let inRuleBullet = false;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const h = line.match(/^(#{1,6})\s+(.*)$/);
+      if (h) {
+        inRuleBullet = false;
+        const lvl = h[1].length;
+        const title = h[2].toLowerCase();
+        if (inHistory && lvl <= historyLevel) {
+          inHistory = false;
+        }
+        if (!inHistory && (title.includes('lịch sử') || title.includes('decision history') || title.includes('quyết định'))) {
+          inHistory = true;
+          historyLevel = lvl;
+        }
+      }
+      if (line.match(/^\s*-\s*\*\*RUL(69|70|72)\b/)) {
+        inRuleBullet = true;
+      } else if (line.match(/^\s*-\s*\*\*RUL\d+\b/) || line.match(/^#{1,6}\s/)) {
+        inRuleBullet = false;
+      }
+      if (inHistory || inRuleBullet) continue;
+
+      for (const { symbol, regex } of symbolRegexes) {
+        if (regex.test(line)) {
+          const rel = path.relative(REPO_ROOT, file);
+          violations.push(`${rel}:${i + 1}: found dead symbol "${symbol}" outside decision history`);
+        }
+      }
+    }
+  }
+
+  // Ensure retired coordination directories remain deleted
+  const deletedPaths = [
+    path.join(REPO_ROOT, 'src', 'runner', 'coordination'),
+    path.join(REPO_ROOT, 'src', 'verbs', 'coordination'),
+    path.join(REPO_ROOT, 'core', 'coordination-protocols'),
+    path.join(REPO_ROOT, 'packages', 'coordination-state'),
+  ];
+  for (const p of deletedPaths) {
+    const rel = path.relative(REPO_ROOT, p);
+    assert.equal(fs.existsSync(p), false, `${rel} must remain deleted`);
+  }
+
+  assert.deepEqual(violations, [], `P5 dead symbols detected in docs/skills:\n${violations.join('\n')}`);
+});

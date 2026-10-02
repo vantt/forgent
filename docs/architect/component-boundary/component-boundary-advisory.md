@@ -9,6 +9,8 @@ Related: [Architecture Map](../../architecture-map.md), [System Overview](../../
 
 ## 1. Purpose
 
+> **Ghi chú chuyển tiếp (2026-10-02):** Bảng phân chia component sau track Request-to-Run (P1–P5) đã thay thế "Agent Coordination Engine" bằng **Workflow Runner** (`src/workflow/**`) và **Collaboration Patterns / Execution Core** (`src/runner/execution/**`). Nguồn chuẩn hiện hành là `docs/platform/component-boundary.md`.
+
 This note records an architecture advisory view of fgOS as a whole under
 single-responsibility and hexagonal-architecture criteria. It is intentionally
 not an implementation plan and does not approve new contracts. Its goal is to
@@ -42,7 +44,7 @@ evidence evaluation replaceable through explicit ports.
 The accepted documents already point in the right direction:
 
 - Work is optional integration, not coordination identity.
-- Workflow or CoordinationProtocol is optional structure, not a universal entry
+- Workflow or CollaborationPattern is optional structure, not a universal entry
   requirement.
 - Every executable request still lowers to a validated semantic contract.
 - Assignment, DispatchPlan, Run, RunResult, and Evidence form the shared
@@ -136,10 +138,10 @@ table below is the management view for the whole system.
 | Component | Role | Internal boundaries | Owning / reference documents |
 |---|---|---|---|
 | Work Lifecycle Engine | fgOS component that owns domain-agnostic Work-unit management: item identity, status, stage, claim/return, related info, context, documents, questions, and Work verbs. It may use Agent Coordination for selected operations, but Agent Coordination never owns this lifecycle. | Work item state machine, domain-agnostic stage/status, claim/return ownership, related refs, context/document refs, human gates. | [Work-State Spec](../../specs/work-state.md), [Work Item Lifecycle Vision](../../work-item-lifecycle-vision.md), [System Overview](../../specs/system-overview.md) |
-| Agent Coordination Engine | Domain-neutral collaboration runtime. It owns a coordination invocation, session/task progress, Assignment membership, team-cognition invocation, and synthesis lifecycle. | CoordinationSession, AdhocTask, session event log, task readiness, Assignment creation, aggregate outcome, Team Cognition Engine. | [Agent Coordination Portal](../agent-coordination/README.md), [CoordinationSession Contract](../agent-coordination/contracts/coordination-session.md), [FlowDefinition Contract](../agent-coordination/contracts/flow-definition.md), [Assignment/Run/RunResult Contract](../agent-coordination/contracts/assignment-run-runresult.md) |
+| Collaboration Patterns & Workflow Runner | Domain-neutral collaboration runtime (replaces retired Agent Coordination Engine per P4). Owns Workflow step DAG scheduling and small collaboration pattern loops (`solo`, `reviewed`, `panel`). | Workflow runner, Unit DAG scheduling, CollaborationPattern presets (`consult`, `research-fan-out`, `rfc`). | [Runner Spec](../../specs/runner.md), [Platform Component Boundary](../../platform/component-boundary.md) |
 | Dispatch And Execution Engine | Governed execution of one approved Assignment. It chooses the allowed executor/provider/model/tier/mechanism and supervises the Run. | dispatch policy resolver, executor registry, governance/egress, DispatchPlan, Run creation, launch/timeout/cancel/retry, executor adapters. | [Runner Spec](../../specs/runner.md), [Dispatch Control Plane](../agent-coordination/architecture/dispatch-control-plane.md), [Assignment/Run/RunResult Contract](../agent-coordination/contracts/assignment-run-runresult.md) |
 | Run Result Evaluator | Truth boundary for one Assignment Run. It turns the Assignment contract, Run settlement, worker claim, artifacts, and evidence into a RunResult confidence decision. | worker result parser, evidence collectors, freshness checks, artifact refs/store, confidence evaluator, RunResult normalizer. | [Evidence And Results](../agent-coordination/architecture/evidence-and-results.md), [Assignment/Run/RunResult Contract](../agent-coordination/contracts/assignment-run-runresult.md), [Runner Spec](../../specs/runner.md) |
-| Domain Components And Extension Layer | Domain packages and smaller extension packages that use the engines while owning domain-specific behavior. A domain package may be large enough to have its own core and sub-workflows. | Coding Domain Component, Marketing Domain Component, Workflow/CoordinationProtocol definitions, TaskSpecs, Skills, domain harnesses, protocol packages, org policy/persona/tier preferences, evidence policy adapters. | [Domainization Architecture](../domainization/README.md), [System Overview](../../specs/system-overview.md), [Work Item Lifecycle Vision](../../work-item-lifecycle-vision.md), `domains/<domain>/AGENTS.md`, `domains/<domain>/manifest.yaml`, `domains/<domain>/workflows/` |
+| Domain Components And Extension Layer | Domain packages and smaller extension packages that use the engines while owning domain-specific behavior. A domain package may be large enough to have its own core and sub-workflows. | Coding Domain Component, Marketing Domain Component, Workflow definitions, TaskSpecs, Skills, domain harnesses, org policy/persona/tier preferences, evidence policy adapters. | [Domainization Architecture](../domainization/README.md), [System Overview](../../specs/system-overview.md), [Work Item Lifecycle Vision](../../work-item-lifecycle-vision.md), `domains/<domain>/AGENTS.md`, `domains/<domain>/manifest.yaml`, `domains/<domain>/workflows/` |
 | Host And Surface Layer | Inbound/outbound surfaces and operator visibility. It translates CLI/API/plugin/dashboard/webhook/chat/Herdr interactions into calls against the engines, without becoming lifecycle or evidence truth. | CLI/API/plugin adapters, Herdr/dashboard visibility, host adapters, surface auth, command/API envelopes. | [fgOS Plugin Spec](../../specs/fgos-plugin.md), [Herdr Web Dashboard Spec](../../specs/herdr-web-dashboard.md), [Visibility And Herdr](../agent-coordination/architecture/visibility-and-herdr.md), [IO Contract](../../io-contract.md) |
 | Setup, Doctor, And Distribution Health | Platform support component that owns install shape, config defaults, health checks, repair posture, and global/project precedence. | setup config merge, doctor check registry, distribution packaging, shell integration, dependency/default discoverability. | [Distribution Spec](../../specs/distribution.md), [Distribution Vision](../../distribution-vision.md), [Reading Map setup entries](../../specs/reading-map.md) |
 | Knowledge, Learning, And Documentation Registry | Lifecycle-adjacent learning component that owns retrospective knowledge, doc/topic registry, end-user document indexing, trace, and evolve signals. | knowledge registry, doc registry, Diataxis index, item trace, friction/outcome learning, evolve candidates. | [Enduser Docs Authoring Spec](../../specs/enduser-docs-authoring.md), [Enduser Docs Index Spec](../../specs/enduser-docs-index.md), [System Overview](../../specs/system-overview.md) |
@@ -441,7 +443,7 @@ Adapter candidates:
 
 ```txt
 YAML Workflow loader
-CoordinationProtocol loader
+Workflow definition loader
 coding-domain harness
 CLI spawn adapter
 Herdr spawn adapter

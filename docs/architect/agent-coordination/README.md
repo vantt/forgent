@@ -10,7 +10,7 @@ Implementation: Partial
 Last reviewed: 2026-09-01
 Canonical for: navigation only
 
-## Purpose
+> **Ghi chú chuyển tiếp (2026-10-02):** Engine coordination và các khái niệm `CoordinationSession`/`CoordinationProtocol`/`FlowDefinition` đã được thu hồi ở P4 của track Request-to-Run (D-0050). Hệ thống đã chuyển sang mô hình gọn: **Unit run** qua **CollaborationPattern** (`solo`, `reviewed`, `panel` + preset) và **Workflow run** (`src/workflow/**`). Các tài liệu trong thư mục này lưu giữ thiết kế lịch sử của Step 00–09.
 
 This documentation describes how fgOS coordinates agents across providers,
 models, tiers, roles, capabilities, and execution mechanisms while preserving

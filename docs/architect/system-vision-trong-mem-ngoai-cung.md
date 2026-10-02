@@ -117,7 +117,7 @@ soft side is incomplete.
 |---|---|---|
 | Workspace Topology | typed roots, identities, capabilities, leases | clear operational guidance for which workspace an agent is in and what it may touch |
 | Packaging/Distribution | release manifests, activation bindings, projection ledgers | projected skills/prose/agents that make the selected runtime usable |
-| Agent Coordination | FlowDefinition, CoordinationSession, Assignment, RunResult | group-thinking protocols, coordinator playbooks, role posture, synthesis style |
+| Execution Core / Workflow | Unit, CollaborationPattern, Workflow, Assignment, RunResult | discussion workflows, role posture, synthesis style |
 | Coding Domain / Step 10 | Work Driver ports, evidence contracts, workspace/occupancy grants | Coding Domain Adapter behavior, coding doctrine, prompts, skills, review/debug/implementation habits |
 | Host Invocation | stable command/API entry and provider routing | surfaces that preserve context and help humans/agents operate the system |
 

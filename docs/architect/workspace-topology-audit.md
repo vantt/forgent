@@ -196,7 +196,7 @@ Status: partially solved / needs focused review.
 
 Gap:
 
-- It is unclear whether coordination sessions are repository-shared,
+- It is unclear whether unit runs / sessions are repository-shared,
   workspace-local, or mode-dependent.
 - If shared, `fgosDirFromRoot(cwd)` can be wrong inside a linked worktree.
 - If local, fanout/session visibility rules need to say so explicitly.

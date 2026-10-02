@@ -1,7 +1,7 @@
 ---
 phase: 3
 title: "Guard từ vựng + boundary cuối"
-status: pending
+status: complete
 priority: P2
 effort: "0.5d"
 dependencies: [2]
@@ -34,7 +34,7 @@ Mở rộng guard từ vựng chết sang docs/skill (ngoài vùng lịch sử);
 
 ## Success Criteria
 
-- [ ] Guard xanh; boundary + reading map đúng với code; track completed.
+- [x] Guard xanh; boundary + reading map đúng với code; track completed.
 
 ## Risk Assessment
 

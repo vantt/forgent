@@ -88,9 +88,9 @@ Vòng lặp tự hành của forgent: tự lấy việc sẵn-sàng từ work-st
 
 ### Hợp đồng rigor → tier (Phase 2, 2026-10-01)
 
-FlowDefinition và operation chỉ phát biểu nhu cầu bằng `rigor = low|standard|high|critical`. `rigor` gộp chỉ-nâng qua definition → operation → actor → assignment, rồi gộp sàn `capabilities.<cap>.rigor`. Runner ánh xạ mức cầu cuối qua `runner.rigorToTier`, sau đó chọn model tại `runner.modelPolicies[provider][tier]`. `reasoningEffort` suy từ `rigor`; một override `tier` tường minh không tự nâng effort.
+Workflow/Unit và operation chỉ phát biểu nhu cầu bằng `rigor = low|standard|high|critical`. `rigor` gộp chỉ-nâng qua workflow → unit → assignment, rồi gộp sàn `capabilities.<cap>.rigor`. Runner ánh xạ mức cầu cuối qua `runner.rigorToTier`, sau đó chọn model tại `runner.modelPolicies[provider][tier]`. `reasoningEffort` suy từ `rigor`; một override `tier` tường minh không tự nâng effort.
 
-`tier` là kênh placement tường minh, chỉ hợp lệ ở actor/assignment/CLI và chỉ được nâng so với tier suy từ rigor. Definition/operation dùng `tier` bị từ chối. Contract/assignment đã lưu trước Phase 2 được đọc một lần tại biên load để đổi field tier cũ thành `tier`; mọi bản ghi mới chỉ ghi `tier`.
+`tier` là kênh placement tường minh, chỉ hợp lệ ở actor/assignment/CLI và chỉ được nâng so với tier suy từ rigor. Workflow/Unit dùng `tier` bị từ chối. Contract/assignment đã lưu trước Phase 2 được đọc một lần tại biên load để đổi field tier cũ thành `tier`; mọi bản ghi mới chỉ ghi `tier`.
 
 Capability không được ghi model hoặc tier trực tiếp: `capabilities.<cap>.rigor` là sàn duy nhất theo loại việc. Config còn `capabilities.*.overrides`, bảng model phẳng, hoặc field quality bridge cũ bị fail-fast với hướng dẫn sửa; setup/doctor sở hữu default và chẩn đoán tương ứng.
 
@@ -1054,7 +1054,7 @@ Một báo-cáo hỏng-hình (không phân tích được, thiếu tên việc) 
 
   Blast radius thật rộng hơn 1 scan ban đầu tưởng: ngoài `MODEL_POLICY_TIERS`/`DEFAULT_TIER_TO_POLICY`/`TIER_STRENGTH`/`QUALITY_TIER_BRIDGE` (src), còn có `core/coordination-protocols/*.yaml`'s `policy.minTier` (11 file, protocol ĐANG LOAD thật — miss ban đầu vì agent scan không quét `core/`), `core/skills/fgos-architecture-panel/SKILL.md`'s bảng role→tier, và ~28 file test dùng chung 1 boilerplate `modelPolicies`/`models` fixture với tên tier cũ làm KEY không dấu ngoặc (miss ban đầu vì regex chỉ khớp string literal có ngoặc, bỏ sót unquoted object key). Bẫy thật cần phân biệt: `MIN_RIGOR_VALUES` (`low|standard|high|critical`) và `QUALITY_MODE_VALUES` (`balanced|creative|analytical|adversarial`) TÁI DÙNG một số chữ giống modelTier cũ cho 2 trục KHÁC hẳn (rigor/mode, Phase 04 quality bridge) — 2 vocab này KHÔNG đổi theo migration này; `QUALITY_TIER_BRIDGE`'s object KEY đổi theo modelTier mới nhưng giá trị `{minRigor, mode}` bên trong giữ nguyên chữ cũ (vd `frontier: {minRigor:'critical', mode:'analytical'}` — 'critical'/'analytical' ở đây là rigor/mode, không phải tier).
 
-  `actors[].fallbackExecutors` (mới, `ACTOR_ALLOWED_KEYS` schema.mjs + `actorPolicyFields` run.mjs): KHÔNG xây cơ chế retry mới. Provider Capacity Rotator + `attemptProviderCapacityFallback` (account-rotator track) đã có sẵn, đã test kỹ, và `dispatchDeclaredOperation`'s PolicyPatch stack đã carry `fallbackExecutors` từ lâu (session-engine.mjs) — cái duy nhất thiếu là actor-level request field chưa được đọc vào `cliPolicy`. Nối xong, `fgos-code-panel`'s 3 role (doer/fixer, reviewer, red-team) khai `fallbackExecutors` thật, cùng modelTier khác provider. Giới hạn đã biết, không phải bug: `runCoordinationUseCase` không forward `providerCapacityRuntimeDir` xuống `executeAssignment`, nên không test hermetic được 1 refusal-thật qua đường coordination (mặc định trỏ `~/.fgos/runtime/provider-capacity`, ngoài tầm cô lập test) — test mới chứng minh qua `executorPreference` (tính unconditionally, không cần refusal thật xảy ra), không phải qua 1 lần refuse-rồi-fallback sống.
+  `actors[].fallbackExecutors` (mới, `ACTOR_ALLOWED_KEYS` schema.mjs + `actorPolicyFields` run.mjs): KHÔNG xây cơ chế retry mới. Provider Capacity Rotator + `attemptProviderCapacityFallback` (account-rotator track) đã có sẵn, đã test kỹ, và `dispatchDeclaredOperation`'s PolicyPatch stack đã carry `fallbackExecutors` từ lâu (session-engine.mjs) — cái duy nhất thiếu là actor-level request field chưa được đọc vào `cliPolicy`. Nối xong, `code-panel`'s 3 role (doer/fixer, reviewer, red-team) khai `fallbackExecutors` thật, cùng modelTier khác provider. Giới hạn đã biết, không phải bug: `runCoordinationUseCase` không forward `providerCapacityRuntimeDir` xuống `executeAssignment`, nên không test hermetic được 1 refusal-thật qua đường coordination (mặc định trỏ …
 
 - **RUL70 (executor id đặt theo `providerModel`, không theo CLI binary; gộp `pi`+`codex` thành executor `openai` vì cùng provider, khác binary; executor-provider-naming, 2026-09-17).** Trước item này, executor id trộn lẫn 2 quy ước — có id theo binary (`codex`, `pi`, `agy`), có id theo alias tuỳ ý (`pi-grok`) — trong khi tầng invocation (`bin`+`account`+`via`) đã đủ sức phân biệt CÁCH gọi, và tầng executor chỉ nên trả lời câu hỏi PROVIDER nào (`providerModel`, khoá tra `modelPolicies`, và neo governance `allowCrossProvider`/`for`). Từ item này: executor id = tên provider thật (`claude`, `gemini`, `xai`, `openai`), không phải tên binary hay account. `agy`→`gemini`, `pi-grok`→`xai` là đổi tên 1-1 (không đụng `rigorOverrides`/`for`/invocation nào). `codex` (executor cũ, chỉ chạy binary `codex`) và `pi` (executor cũ, chỉ chạy binary `pi`, đã có sẵn invocation `pi-cli-tetnu`/`pi-cli-fgovn` nhắm cùng tài khoản OpenAI qua `~/.pi/accounts/{tetnu,fgovn}`) GỘP thành một executor `openai` duy nhất — hợp lệ vì `command` là field CẤP INVOCATION, không phải cấp executor (`resolve.mjs`: mỗi invocation tự khai `command` riêng), nên 2 binary khác nhau nằm chung 1 executor entry không xung đột kỹ thuật. `providerModel: "openai-codex"` (cả ở `.fgos/config.json` lẫn `modelPolicies` key lẫn `PI_EXECUTOR_DEFAULT`'s seed) đổi thành `"openai"` — Codex là TÊN SẢN PHẨM CLI của OpenAI, không phải một provider khác OpenAI, nên giữ `openai-codex` như 1 provider riêng là sai danh xưng, không phải một khoảng cách kỹ thuật cần giữ.
 
@@ -1064,7 +1064,7 @@ Một báo-cáo hỏng-hình (không phân tích được, thiếu tên việc) 
 
 - **RUL72 (Gom thang tier/rigor: 2 thang + 1 bảng, xoá mọi lớp chồng; tier-rigor-vocabulary-consolidation, 2026-09-30).**
   Thay thế RUL69 (vocab modelTier 6 mức thay 5 mức cũ) về cơ chế map model và chuẩn hoá từ vựng toàn repo:
-  1. Bên cầu (việc cần gì): từ duy nhất là `rigor = low | standard | high | critical` (thay thế `minTier`, `minRigor`, `mode`). `rigor` gộp chỉ-nâng qua các scope (FlowDefinition → Operation → Actor → Assignment → CLI), rồi gộp sàn theo loại việc `capabilities.<cap>.rigor`.
+  1. Bên cầu (việc cần gì): từ duy nhất là `rigor = low | standard | high | critical` (thay thế `minTier`, `minRigor`, `mode`). `rigor` gộp chỉ-nâng qua các scope (Workflow/Unit → Operation → Actor → Assignment → CLI), rồi gộp sàn theo loại việc `capabilities.<cap>.rigor`.
   2. Bên cung (khẩu vị owner): ánh xạ qua đúng một bảng config bắt buộc `runner.rigorToTier[rigor] → tier` (`nano|mini|standard|advanced|flagship|frontier`), sau đó chọn model tại `runner.modelPolicies[provider][tier]`.
   3. Override tường minh: `--tier` / `actors[].tier` là kênh placement tường minh (chỉ-nâng, có provenance `tierSource`); definition/operation dùng `tier` bị từ chối.
   4. Work: tách `work.tier` thành `work.size` (độ lớn, không bao giờ tới model) và `work.rigor` (tuỳ chọn, discovery phán). Item cũ có `risk: heavy` và chưa có `rigor` được đọc thành `rigor: high` ở đường đọc duy nhất.
@@ -1227,7 +1227,7 @@ Lớp từ vựng dispatch hiện hành của fgOS phản ánh mô hình control
 | `orchestrator` | (tái gán nghĩa `0029`) | Tầng hợp thành T0 quản lý N đơn vị work (ở lại) | `runner.md:1995` (ADR 0029), `runner.md:2172` (ADR 0031) |
 | `DispatchPlan` | (mới) | Kế hoạch dispatch được resolved gồm mechanism, target agent/tool, và metadata | `src/runner/dispatch/plan.mjs`, `dispatch-control-plane-redesign.md:175` |
 | `DispatchAssignment` | (mới) | Đơn vị phân công dispatch cụ thể gán executor cho work item | `src/runner/dispatch/plan.mjs`, `dispatch-control-plane-redesign.md:210` |
-| `DemandFacts` / `CapabilityMatch` | (mới) | DemandFacts khai báo thuộc tính phía cầu; CapabilityMatch là kết quả khớp qua serves — lời hứa hành vi đọc được bằng máy của capability | `core/skills/_shared/capability-matching.md` |
+| `Unit` / `capability` | (mới, thay matching L2 cũ per 0048) | Unit khai báo thuộc tính và canonical capability; bind() phân giải executor | `core/skills/_shared/capability-matching.md` |
 | `rigor` | (từ vựng chất lượng cũ) | Yêu cầu chất lượng phía cầu (`low | standard | high | critical`), gộp chỉ-nâng qua các scope và sàn capability | RUL72 (Gom thang tier/rigor: 2 thang + 1 bảng, xoá mọi lớp chồng), 0046 |
 | `tier` | `modelTier` | Mức model phía cung (`nano | mini | standard | advanced | flagship | frontier`), cấu hình qua `runner.rigorToTier` và chọn model tại `runner.modelPolicies` | RUL72 (Gom thang tier/rigor: 2 thang + 1 bảng, xoá mọi lớp chồng), 0046 |
 | `work.size` | (hạng việc cũ) | Độ lớn việc (`light | standard | heavy`), không bao giờ dẫn tới model | RUL72 (Gom thang tier/rigor: 2 thang + 1 bảng, xoá mọi lớp chồng), spec Work-State |
@@ -1240,7 +1240,7 @@ Lớp từ vựng dispatch hiện hành của fgOS phản ánh mô hình control
 - `purpose` (tham số nội bộ `resolve.mjs`/`plan.mjs`) và flag CLI `--for <purpose>` KHÔNG phải một ontology thứ ba — cả hai đặt tên cho một giá trị `capability`, chỉ là cú pháp tương thích lịch sử (compatibility syntax), không phải một identity định tuyến riêng.
 - `job` KHÔNG phải một routing identity — ADR-004 dành riêng tên này cho một scheduler tương lai (chưa dùng); nếu xuất hiện trong log, nó chỉ là nhãn ngữ cảnh của một request, không phải mục tiêu dispatch resolve tới. Một `Run` là một lần thực thi cụ thể cho một Assignment, không phải job/operation identity.
 - Dispatch core chỉ nhận đúng hai target identity — `capability` và `executor-id` — cùng hợp đồng `DispatchRequest`/`PolicyPatch`/`DispatchPlan` chính tắc và danh sách sở hữu component-internal (8 thẩm quyền + forbidden dependencies): xem [Dispatch Control Plane](../architect/agent-coordination/architecture/dispatch-control-plane.md).
-- `DemandFacts` và `CapabilityMatch` (Phase 5, Unit I17): `DemandFacts` khai báo các thuộc tính nhu cầu của đơn vị việc; thuộc tính `serves` là phần danh tính của catalog capability theo nghĩa "lời hứa hành vi đọc được bằng máy", phục vụ matching thuần ngữ nghĩa thay vì quét từ khóa (xem `core/skills/_shared/capability-matching.md`).
+- `Unit` và canonical capability (thay thế matching đa tầng L2 per 0048): Unit khai báo các thuộc tính nhu cầu của đơn vị việc và capability (`domain:verb`); `bind()` chọn executor theo 5 mức (xem `core/skills/_shared/capability-matching.md`).
 
 ## ExecutorProfile / Invocation — target vocabulary (Phase 06, executor-policy-dispatch-seams; identity/supports made real config, Phase C, executor-profile-schema-migration)
 
@@ -1307,14 +1307,14 @@ with multiple invocations, but that consolidation has not happened —
 `fgos doctor`'s `executor-profile-warnings` check makes the gap between
 current config and this target vocabulary machine-visible in the meantime.
 
-## CoordinationSession — điều phối agent Work-độc-lập (Step 08 Phase 00)
+## CoordinationSession (Lịch sử — đã thu hồi per P4; thay bằng CollaborationPattern & Workflow runner)
+
+> **Ghi chú chuyển tiếp (2026-10-02):** Engine coordination và khái niệm `CoordinationSession`/`CoordinationProtocol`/`FlowDefinition` đã được thu hồi ở P4. Mọi lần chạy độc lập quy về **Unit run** qua Pattern cộng tác (`CollaborationPattern`: `solo`, `reviewed`, `panel` + preset) hoặc **Workflow run** (`src/workflow/**`). Mục dưới đây giữ bối cảnh thiết kế lịch sử của Step 08.
 
 Đây là mô tả tầm SPEC (BA-grade, WHAT chứ không phải code) của ranh giới
 `CoordinationSession` đã được chốt ở Phase 00 của track `step-08-standalone-
 coordination` — canonical đầy đủ (schema, ADR, ví dụ) sống ở
 `docs/architect/agent-coordination/`; mục này chỉ tóm lược đủ để một phiên
-đọc `docs/specs/` biết ranh giới tồn tại và trỏ đúng chỗ. Tính tới
-2026-09-02 (Phase 06 R1-R7, cell P06.1+P06.2): manifest/event store + replay +
 session engine + quorum/retry/cancellation + hard-budget/security hardening
 đều đã có thật tại `src/runner/coordination/{schema,store,replay,
 session-engine}.mjs` (test: `test/runner/coordination-*.test.mjs`) —
@@ -1352,7 +1352,7 @@ khác nhau nên `resolveBindingOutcome` không bao giờ liên hệ được. `c
 vì vậy refuse mãi với `missing required actor(s)` cho MỌI cell từng có dù
 chỉ 1 finding ở first-pass — phát hiện thật khi chạy `fgos-code-panel` lần
 đầu tới bước close (`code-panel--r3-p1-remote-projector-presenter`). Sửa:
-`FlowDefinition` binding thêm field `rechecks: <operationId>` (`definitions/
+Pattern cộng tác binding thêm field `rechecks: <operationId>` (`definitions/
 schema.mjs`, khai trên `reviewer-recheck`/`red-team-recheck` trong
 `standalone-master-coordination-loop.yaml`); `session-engine.mjs`'s
 `resolveRecheckDischarge` cho một recheck ĐÃ declare, cùng actor, dispatch
@@ -1413,26 +1413,12 @@ Canonical detailed artifacts:
 - `plans/260914-dispatch-operability-evidence-attribution/phase-designs/executor-contract-and-production-proof.md`
 - `docs/how-to/operate-dispatch-runtime-inspection-and-reconciliation.md`
 
-**Tra cứu định nghĩa (definition discovery).** Một CoordinationSession có thể
-agent-led (không cần định nghĩa nào — coordinator tự đề xuất Assignment nội
-tuyến dưới chính sách nền tảng) hoặc declared (chọn một `CoordinationProtocol`
-— cùng họ `FlowDefinition` với `Workflow`, chỉ khác profile: `Workflow` dùng
-Stage + tích hợp vòng đời Work, `CoordinationProtocol` dùng Phase + topology/
-cohort/synthesis, KHÔNG mang thẩm quyền vòng đời Work). `FlowDefinition` là
-một IR (intermediate representation) đồ-thị/operation/policy dùng chung, CỘNG
-THÊM vào loader hiện có (`normalizeWorkflow()`, `getDomain`,
-`operationsForStage` và 15+ điểm gọi khác trong `src/runner/loop.mjs`,
-`src/intake/plan.mjs`, `src/report/entropy.mjs`, `src/state/work.mjs`,
-`src/setup/registrations.mjs`) — không migrate consumer nào trong giai đoạn
-này. Schema đầy đủ:
-`docs/architect/agent-coordination/contracts/flow-definition.md`; quyết định
-nền: `docs/architect/agent-coordination/decisions/ADR-009-flow-definition-shared-ir-and-typed-profiles.md`.
+**Workflow và CollaborationPattern (mô hình gọn per P4).** Một Unit run có thể
+agent-led hoặc declared qua Workflow / CollaborationPattern (`solo`, `reviewed`, `panel` + preset).
+Workflow dùng DAG steps + tích hợp vòng đời Work, CollaborationPattern dùng trong Unit run.
+Workflow runner (`src/workflow/runner.mjs`) nạp định nghĩa từ `core/workflows/*.yaml` và `domains/<d>/workflows/*.yaml`.
 
-**Dispatch-policy.** Một CoordinationSession/CoordinationProtocol không có
-đường dispatch riêng — mọi execution-triggering activity vẫn hội tụ về đúng
-MỘT lõi `Assignment -> DispatchPlan -> Run -> RunResult -> evidence` mà Team
-Dispatch V1 đã accepted (xem "Từ vựng dispatch hiện hành" trên và
-`docs/architect/agent-coordination/architecture/dispatch-control-plane.md`).
+**Dispatch-policy.** Một Unit run không có đường dispatch riêng — mọi execution-triggering activity vẫn hội tụ về đúng MỘT lõi `Assignment -> DispatchPlan -> Run -> RunResult -> evidence` mà Team Dispatch V1 đã accepted (xem "Từ vựng dispatch hiện hành" trên và `docs/architect/agent-coordination/architecture/dispatch-control-plane.md`).
 Một Cohort Planner (điều phối heterogeneous cohort theo provider/model/tier,
 Step 08 Phase 04+) chỉ được phép EMIT policy input cho từng Assignment rồi
 gọi lại đúng resolver đã có — không bao giờ tự spawn executor hay đọc state
@@ -1523,7 +1509,7 @@ quyền chuyển Work thật. Quyết định nền:
 Work-ĐỘC-LẬP (một `operation` step dispatch `mutation: 'mutating'`, không
 đụng Work item nào) nay đã có cơ chế thật (P01.1's mutation-unlock, 4 vòng
 fix, kernel-level) VÀ một live proof thật, hai-cell, trên một project riêng
-biệt (`fgos-plan-loop` skill, P03.1's R5 — báo cáo đầy đủ:
+biệt (`plan-loop` skill, P03.1's R5 — báo cáo đầy đủ:
 `plans/260904-2329-group-thinking-plan-loop/reports/lead-260905-0400-p03-1-r5-live-proof-report.md`),
 đo được zero Work engine touched suốt live proof (state.json/events.jsonl
 sha256 identical trước/sau). Đây KHÔNG phải live proof mà đoạn stop gate

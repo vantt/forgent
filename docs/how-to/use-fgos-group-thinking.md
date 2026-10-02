@@ -5,32 +5,24 @@ with a panel", "compare these three options", "red-team this decision", or
 "get independent opinions before I commit". `fgos-panel` selects the matching
 use-case preset; it never asks you for a protocol id.
 
-The lower-level `fgos-group-thinking` skill remains the pack gate. Its caller
-must name a registered protocol id before anything runs, but that caller is the
-surface skill or an operator, not the end user. The canonical preset map and
-the core/surface boundary live in the
-[Group Thinking Trigger Surface](../architect/agent-coordination/architecture/group-thinking-trigger-surface.md).
+The lower-level `fgos-group-thinking` skill executes named discussion Workflows
+(`delphi`, `nominal-group`, `group-cognition`, `architecture-advisory`) and
+CollaborationPattern presets (`rfc`, `consult`, `research-fan-out`). Its caller
+names the discussion shape, but that caller is the surface skill or an operator,
+not the end user. The canonical preset map and the core/surface boundary live in
+[`fgos-panel`](../../core/skills/fgos-panel/SKILL.md).
 
-This guide is deliberately example-driven. Every request file below is a
-real, committed, end-to-end-tested example (`docs/how-to/coordination-examples/`)
-— not a sketch. Protocol semantics live in the FlowDefinition YAMLs
-themselves (`core/coordination-protocols/group-thinking-*.yaml`), never in
-this guide's own prose; read the skill's own `SKILL.md`
-(`core/skills/fgos-group-thinking/SKILL.md`) for the full mechanism and the
-five bypasses it structurally cannot allow.
+This guide is deliberately example-driven. Workflow definitions live in
+`core/workflows/*.yaml`, and single-unit presets live in
+`src/runner/execution/patterns/presets.mjs`. Read the skill's own `SKILL.md`
+([`core/skills/fgos-group-thinking/SKILL.md`](../../core/skills/fgos-group-thinking/SKILL.md))
+for the execution doors and safety invariants.
 
-## Operator path: see what's registered
+## Operator path: discover available Workflows
 
 ```bash
-fgos coordination pack list --json
+fgos workflow start --help
 ```
-
-Three members today: `core.coordination-protocol.group-thinking-rfc-review-lite`,
-`...nominal-group-lite`, `...delphi-feedback-lite`. Never hand-author a
-protocol id that isn't in this list, even if a loadable FlowDefinition
-exists elsewhere — pack membership is a real narrowing, not a restatement
-of what `protocol-loader.mjs` can find.
-
 ## The multi-call pattern (why this matters)
 
 RFC-Review-Lite and Nominal-Group-Lite each have a **driver-authorized**
@@ -52,8 +44,8 @@ examples below exercise the fix directly, not around it.
 
 ## 1. RFC-Review-Lite — independent objections, controlled reveal, response
 
-**Shape:** a coordinator convenes, a proposer proposes, two objectors
-raise independent objections (neither can see the other's objection until
+**Shape:** a coordinator convenes, a proposer proposes, two red-team reviewers
+raise independent critique (neither can see the other's review until
 both have settled — a real privacy gate, not a suggestion), then the
 driver authorizes the proposer to respond to both together.
 

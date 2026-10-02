@@ -3,17 +3,10 @@
 `fgos-architecture-panel` runs a 9-role advisory panel — lead advisor,
 context investigator, three independent shapers (system, alternative,
 constraint), architecture critic, synthesizer, independent red-team, and an
-on-demand specialist — against the real, registered
-[`core.coordination-protocol.architecture-advisory-panel-v1`](../../core/coordination-protocols/architecture-advisory-panel-v1.yaml)
-protocol. It is a member of the `fgos-group-thinking` Protocol Pack
-(`core/protocol-packs/group-thinking.json`), so everything this guide shows
-runs through the SAME `fgos coordination run --file` / `fgos coordination
-show --json` doors — the same ones
-[`use-fgos-group-thinking.md`](use-fgos-group-thinking.md) already documents
-for RFC-Review-Lite/Nominal-Group-Lite/Delphi-Feedback-Lite. Read that guide
-first if the request-file shape (`kind`, `protocolRef`, `steps[]`, `$ref:`
-chaining, `actors[]` per-role overrides) is unfamiliar; this guide does not
-restate it.
+on-demand specialist — against the registered `architecture-advisory` Workflow
+(`core/workflows/architecture-advisory.yaml`). It is executed through the unified
+`fgos workflow` door (`fgos workflow start architecture-advisory`,
+`fgos workflow status <workflowRunId>`).
 
 Full doctrine — what a good session should think and say, not just which
 door to call — lives in

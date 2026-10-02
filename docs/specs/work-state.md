@@ -261,16 +261,16 @@ Tên đã đổi trên bề mặt: field `workflowStep` (thay `stage`), `workflo
 `fgos ready --phase clarify|plan|execute` (thay `--step Clarify|Divide|Execute`),
 `fgos workflow operations --step`, kiểm doctor `work-step-vocabulary`.
 
-### Giai đoạn Soi-rõ (stage discovery) và Đào-sâu (stage exploring)
+### Giai đoạn Soi-rõ (bước discovery) và Đào-sâu (bước exploring)
 
-Song song với `status` (vi mô, không đổi), mỗi item mang một chiều thứ hai —
-`stage` — trả lời "loại tác vụ nào đang cần cho item này ngay lúc này". Chuỗi
-stage SỐNG của domain `coding` hôm nay có bốn tên một item mới đi qua được:
-`discovery` (soi phần còn mơ hồ, máy tự làm một mình), `exploring` (đào sâu
-cùng người, khi máy tự soi thấy chưa đủ), `planning` (lập hình dạng + phán
-chia-việc — xem "Giai đoạn Lập-kế-hoạch" dưới), và `executing` (đã qua các
+Song song với `status` (vi mô, không đổi), mỗi item mang trường `workflowStep`
+— trả lời "loại tác vụ nào đang cần cho item này ngay lúc này trong Workflow của
+domain". Chuỗi bước SỐNG của domain `coding` hôm nay có bốn bước một item mới
+đi qua được: `discovery` (soi phần còn mơ hồ, máy tự làm một mình), `exploring`
+(đào sâu cùng người, khi máy tự soi thấy chưa đủ), `planning` (lập hình dạng +
+phán chia-việc — xem "Giai đoạn Lập-kế-hoạch" dưới), và `executing` (đã qua các
 bước trên, hoặc chưa từng cần qua). `status` vẫn vận hành y hệt BÊN TRONG mỗi
-stage — một item ở stage `discovery` vẫn có thể là `todo` hay
+bước — một item ở bước `discovery` vẫn có thể là `todo` hay
 `awaiting-human`, ý nghĩa của hai status đó không đổi.
 
 **`clarify` KHÔNG còn là một stage.** Việc làm-rõ ý định của một câu mô tả tự

@@ -129,7 +129,7 @@ Adapter mapping:
 | Intent id | Codex/OpenAI skill | Claude | Gemini | Status |
 | --- | --- | --- | --- | --- |
 | `fgos:code-panel` | `$fgos-code-panel` | `/fgos:code-panel` and compatibility `/fgOS:code-panel` if already shipped | `/fgos:code-panel` | deprecated (stubbed by Unit I29; superseded by `fgos:code-change`) |
-| `fgos:code-change` | `$fgos-code-change` | `/fgos:code-change` | `/fgos:code-change` | implemented (`domains/coding/skills/fgos-code-change`; `user-invocable: false` — selected via `DemandFacts`/`fgos capability match --demand`, not typed directly, same routing shape as `fgos:architecture-panel` below) |
+| `fgos:code-change` | `$fgos-code-change` | `/fgos:code-change` | `/fgos:code-change` | deprecated (superseded by `fgos-run`, routing via canonical capability) |
 | `fgos:architecture-panel` | `$fgos-architecture-panel` | `/fgos:architecture-panel` | `/fgos:architecture-panel` | implemented |
 | `fgos:routing` | `$fgos-routing` | `/fgos:routing` | `/fgos:routing` | implemented |
 | `fgos:pick` | `$fgos-routing` (alias) | `/fgos:pick` (compat `/fgOS:pick`) | `/fgos:pick` | partial (hand-authored plugin command; canonical public-intent mapping planned) |
