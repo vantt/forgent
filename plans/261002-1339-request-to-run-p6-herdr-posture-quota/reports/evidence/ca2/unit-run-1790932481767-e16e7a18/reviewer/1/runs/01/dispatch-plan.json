@@ -1,0 +1,203 @@
+{
+  "selector": {
+    "type": "assignment",
+    "value": "unit-run-1790932481767-e16e7a18/reviewer/1"
+  },
+  "caller": {
+    "role": "driver"
+  },
+  "mechanism": "out-of-process",
+  "executorId": "glm-herdr",
+  "capability": "glm-herdr",
+  "invocation": {
+    "via": "cli",
+    "adapter": "herdr-spawn",
+    "protocol": "prompt-stdout-v1"
+  },
+  "governance": {
+    "providerFamily": "z-ai",
+    "egress": {
+      "kind": "cross-provider",
+      "target": "https://openrouter.ai/api",
+      "content": "repo-content"
+    }
+  },
+  "reasonCodes": [
+    "native-first.0033.cli-spawn-shaped"
+  ],
+  "configured": true,
+  "bindingSource": "executor-id",
+  "tier": "standard",
+  "model": "z-ai/glm-5.2",
+  "providerModel": "z-ai",
+  "provenance": {
+    "executor": {
+      "value": "glm-herdr",
+      "source": {
+        "scope": "cliOverride"
+      }
+    },
+    "provider": {
+      "value": "z-ai",
+      "source": {
+        "scope": "registeredExecutor",
+        "id": "glm-herdr"
+      }
+    },
+    "model": {
+      "value": "z-ai/glm-5.2",
+      "source": {
+        "scope": "cliOverride"
+      }
+    },
+    "rigor": {
+      "value": "standard",
+      "source": {
+        "scope": "default"
+      }
+    },
+    "tier": {
+      "value": "standard",
+      "source": {
+        "scope": "rigor",
+        "id": "standard"
+      }
+    },
+    "reasoningEffort": {
+      "value": "medium",
+      "source": {
+        "scope": "derived",
+        "id": "rigor.standard"
+      }
+    },
+    "persona": {
+      "value": "code-reviewer",
+      "source": {
+        "scope": "default",
+        "id": "reviewer"
+      }
+    },
+    "visibility": {
+      "value": "headless",
+      "source": {
+        "scope": "default"
+      }
+    },
+    "repeatMode": {
+      "value": null,
+      "source": {
+        "scope": "default"
+      }
+    },
+    "constraints": {
+      "value": {
+        "requiresSkills": []
+      },
+      "source": {
+        "scope": "assignment",
+        "id": "unit-run-1790932481767-e16e7a18/reviewer/1"
+      }
+    },
+    "governance": {
+      "value": "allowed",
+      "source": {
+        "scope": "governance",
+        "id": "z-ai"
+      }
+    }
+  },
+  "policy": {
+    "role": "reviewer",
+    "persona": "code-reviewer",
+    "executorPreference": [
+      "glm-herdr"
+    ],
+    "executorId": "glm-herdr",
+    "providerModel": "z-ai",
+    "rigor": "standard",
+    "tier": "standard",
+    "model": "z-ai/glm-5.2",
+    "reasoningEffort": "medium",
+    "visibility": "headless",
+    "repeatMode": null,
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "glm-herdr",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "provider": {
+        "value": "z-ai",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "glm-herdr"
+        }
+      },
+      "model": {
+        "value": "z-ai/glm-5.2",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "rigor": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "tier": {
+        "value": "standard",
+        "source": {
+          "scope": "rigor",
+          "id": "standard"
+        }
+      },
+      "reasoningEffort": {
+        "value": "medium",
+        "source": {
+          "scope": "derived",
+          "id": "rigor.standard"
+        }
+      },
+      "persona": {
+        "value": "code-reviewer",
+        "source": {
+          "scope": "default",
+          "id": "reviewer"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "repeatMode": {
+        "value": null,
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "unit-run-1790932481767-e16e7a18/reviewer/1"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "z-ai"
+        }
+      }
+    }
+  }
+}

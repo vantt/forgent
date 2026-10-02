@@ -1,0 +1,166 @@
+{
+  "unit": {
+    "id": "p6-ca6-docs",
+    "objective": "Documentation note, 8 to 12 lines of markdown, at plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca6-docs-note.md, explaining how fgos run chooses between the herdr and cli transport. Every claim must be grounded in the 'Transport (G7)' block of src/runner/execution/bind.mjs and cite that file. The producer writes the note and touches no other file. The reviewer checks each claim against the source, reports findings in its own report, and never edits repository files.",
+    "capability": "execute",
+    "rigor": "standard",
+    "writes": [
+      "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca6-docs-note.md"
+    ],
+    "dependsOn": [],
+    "inputs": [],
+    "expectedOutputs": [
+      "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca6-docs-note.md"
+    ]
+  },
+  "overrides": [
+    {
+      "scope": {
+        "role": "producer"
+      },
+      "executor": "claude",
+      "invocation": "claude-cli-bwrap",
+      "origin": "human-cli"
+    },
+    {
+      "scope": {
+        "role": "reviewer"
+      },
+      "executor": "gemini",
+      "invocation": "agy-cli-bwrap-mucdong",
+      "origin": "human-cli"
+    }
+  ],
+  "worktree": "/var/tmp/p6-accept-work",
+  "createdBy": "vantt",
+  "createdAt": "2026-10-02T09:51:10.429Z",
+  "bindings": {
+    "producer/1": [
+      {
+        "role": "producer",
+        "round": 1,
+        "assignmentId": "unit-run-1790934670425-5d5c769e/producer/1",
+        "binding": {
+          "contractVersion": "v1alpha1",
+          "executor": "claude",
+          "invocation": "claude-cli-bwrap",
+          "transport": "cli",
+          "candidateIndex": 0,
+          "tier": "standard",
+          "model": "sonnet",
+          "persona": null,
+          "mechanism": "out-of-process",
+          "posture": "workspace-write",
+          "provenance": {
+            "executor": {
+              "value": "claude",
+              "source": "override"
+            },
+            "invocation": {
+              "value": "claude-cli-bwrap",
+              "source": "override"
+            },
+            "transport": {
+              "value": "cli",
+              "source": "override-pinned-invocation"
+            },
+            "tier": {
+              "value": "standard",
+              "source": "rigor:standard"
+            },
+            "model": {
+              "value": "sonnet",
+              "source": "resolveTierModel(claude.standard)"
+            },
+            "persona": {
+              "value": null,
+              "source": "none"
+            },
+            "mechanism": {
+              "value": "out-of-process",
+              "source": "decideExecutorDispatchMechanism"
+            },
+            "posture": {
+              "value": "workspace-write",
+              "source": "producer-writes-declared"
+            },
+            "overridesOrigin": {
+              "value": "human-cli",
+              "source": "override"
+            }
+          }
+        },
+        "transport": "cli",
+        "invocation": "claude-cli-bwrap",
+        "fallbackFrom": null,
+        "boundAt": "2026-10-02T09:51:10.432Z",
+        "outcome": "pass",
+        "runId": "run_unit-run-1790934670425-5d5c769e/producer/1_01"
+      }
+    ],
+    "reviewer/1": [
+      {
+        "role": "reviewer",
+        "round": 1,
+        "assignmentId": "unit-run-1790934670425-5d5c769e/reviewer/1",
+        "binding": {
+          "contractVersion": "v1alpha1",
+          "executor": "gemini",
+          "invocation": "agy-cli-bwrap-mucdong",
+          "transport": "cli",
+          "candidateIndex": 0,
+          "tier": "standard",
+          "model": "gemini-3.8-flash-medium",
+          "persona": null,
+          "mechanism": "out-of-process",
+          "posture": "read-only",
+          "provenance": {
+            "executor": {
+              "value": "gemini",
+              "source": "override"
+            },
+            "invocation": {
+              "value": "agy-cli-bwrap-mucdong",
+              "source": "override"
+            },
+            "transport": {
+              "value": "cli",
+              "source": "override-pinned-invocation"
+            },
+            "tier": {
+              "value": "standard",
+              "source": "rigor:standard"
+            },
+            "model": {
+              "value": "gemini-3.8-flash-medium",
+              "source": "resolveTierModel(gemini.standard)"
+            },
+            "persona": {
+              "value": null,
+              "source": "none"
+            },
+            "mechanism": {
+              "value": "out-of-process",
+              "source": "checker-role-forced-out-of-process"
+            },
+            "posture": {
+              "value": "read-only",
+              "source": "read-only-ask-or-writes-empty"
+            },
+            "overridesOrigin": {
+              "value": "human-cli",
+              "source": "override"
+            }
+          }
+        },
+        "transport": "cli",
+        "invocation": "agy-cli-bwrap-mucdong",
+        "fallbackFrom": null,
+        "boundAt": "2026-10-02T09:51:34.533Z",
+        "outcome": "pass",
+        "runId": "run_unit-run-1790934670425-5d5c769e/reviewer/1_01"
+      }
+    ]
+  },
+  "configSnapshotHash": "f0b2fc454d0eee271ffb572852f9b600ac5167ca7e24676ffa889b505a1390fe"
+}

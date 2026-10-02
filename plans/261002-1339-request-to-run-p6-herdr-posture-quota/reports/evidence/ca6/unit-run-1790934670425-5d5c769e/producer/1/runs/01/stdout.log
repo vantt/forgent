@@ -1,0 +1,19 @@
+I wrote the note, but I couldn't write the result artifact, so the assignment has no `agent-result.json`.
+
+**Note:** `plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca6-docs-note.md` is 9 lines. Every claim comes from the "4. Transport (G7)" block of `src/runner/execution/bind.mjs` (lines 253-272) and `findHerdrInvocation` (line 45), and the note cites that file. I read the source but didn't run anything, and the reviewer hasn't checked it yet. It says:
+- The default transport is `cli`.
+- A human-pinned override invocation stays as pinned. It counts as `herdr` only if the pinned invocation uses the `herdr-spawn` adapter.
+- Without a pin, `herdr` needs all three of these:
+  - the executor has a herdr invocation with an id;
+  - `session.herdrPresent === true`;
+  - the candidate is not the inline lead fallback.
+- The herdr invocation must also pass `canApplyPosture`. If it fails, the transport stays `cli` with the source `cli:herdr-invocation-cannot-apply-posture`.
+- The choice is returned in `transport` and `provenance.transport`.
+
+**Blocker:** writing `/home/vantt/projects/forgentX-p6/.fgos/assignments/unit-run-1790934670425-5d5c769e/producer/1/runs/01/agent-result.json` failed with `EROFS: read-only file system`. That path is outside my write scope (`/var/tmp/p6-accept-work`). I didn't try to work around it. The intended claim is:
+
+```json
+{"contract":{"id":"agent-result-claim","version":2},"status":"done","summary":"Wrote 9-line transport note grounded in the Transport (G7) block of src/runner/execution/bind.mjs (lines 253-272, plus findHerdrInvocation at line 45).","evidenceRefs":["plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca6-docs-note.md","src/runner/execution/bind.mjs"]}
+```
+
+Someone needs to make that path writable, or record the claim from this message.

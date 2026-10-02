@@ -1,0 +1,127 @@
+{
+  "assignmentId": "unit-run-1790932321930-c5ae2d4b/producer/1",
+  "unitRunId": "unit-run-1790932321930-c5ae2d4b",
+  "role": "producer",
+  "round": 1,
+  "objective": "Documentation note, 8 to 12 lines of markdown, at plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca1-docs-note.md, explaining how fgos run chooses between the herdr and cli transport. Every claim must be grounded in the 'Transport (G7)' block of src/runner/execution/bind.mjs and cite that file. The producer writes the note and touches no other file. The reviewer checks each claim against the source, reports findings in its own report, and never edits repository files.",
+  "mutation": "mutating",
+  "binding": {
+    "contractVersion": "v1alpha1",
+    "executor": "claude-herdr",
+    "invocation": "claude-herdr-bwrap",
+    "transport": "herdr",
+    "candidateIndex": 0,
+    "tier": "standard",
+    "model": "sonnet",
+    "persona": null,
+    "mechanism": "out-of-process",
+    "posture": "workspace-write",
+    "provenance": {
+      "executor": {
+        "value": "claude-herdr",
+        "source": "override"
+      },
+      "invocation": {
+        "value": "claude-herdr-bwrap",
+        "source": "override"
+      },
+      "transport": {
+        "value": "herdr",
+        "source": "herdr-invocation-present"
+      },
+      "tier": {
+        "value": "standard",
+        "source": "rigor:standard"
+      },
+      "model": {
+        "value": "sonnet",
+        "source": "resolveTierModel(claude.standard)"
+      },
+      "persona": {
+        "value": null,
+        "source": "none"
+      },
+      "mechanism": {
+        "value": "out-of-process",
+        "source": "decideExecutorDispatchMechanism"
+      },
+      "posture": {
+        "value": "workspace-write",
+        "source": "producer-writes-declared"
+      },
+      "overridesOrigin": {
+        "value": "human-cli",
+        "source": "override"
+      }
+    }
+  },
+  "provenance": {
+    "kind": "unit-run",
+    "unitRunId": "unit-run-1790932321930-c5ae2d4b",
+    "role": "producer",
+    "round": 1,
+    "binding": {
+      "contractVersion": "v1alpha1",
+      "executor": "claude-herdr",
+      "invocation": "claude-herdr-bwrap",
+      "transport": "herdr",
+      "candidateIndex": 0,
+      "tier": "standard",
+      "model": "sonnet",
+      "persona": null,
+      "mechanism": "out-of-process",
+      "posture": "workspace-write",
+      "provenance": {
+        "executor": {
+          "value": "claude-herdr",
+          "source": "override"
+        },
+        "invocation": {
+          "value": "claude-herdr-bwrap",
+          "source": "override"
+        },
+        "transport": {
+          "value": "herdr",
+          "source": "herdr-invocation-present"
+        },
+        "tier": {
+          "value": "standard",
+          "source": "rigor:standard"
+        },
+        "model": {
+          "value": "sonnet",
+          "source": "resolveTierModel(claude.standard)"
+        },
+        "persona": {
+          "value": null,
+          "source": "none"
+        },
+        "mechanism": {
+          "value": "out-of-process",
+          "source": "decideExecutorDispatchMechanism"
+        },
+        "posture": {
+          "value": "workspace-write",
+          "source": "producer-writes-declared"
+        },
+        "overridesOrigin": {
+          "value": "human-cli",
+          "source": "override"
+        }
+      }
+    }
+  },
+  "expectedOutputs": [
+    "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca1-docs-note.md"
+  ],
+  "contextRefs": [],
+  "writes": [
+    "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca1-docs-note.md"
+  ],
+  "policy": {
+    "tier": "standard",
+    "preferExecutor": "claude-herdr",
+    "preferInvocation": "claude-herdr-bwrap",
+    "preferPersona": null
+  }
+}

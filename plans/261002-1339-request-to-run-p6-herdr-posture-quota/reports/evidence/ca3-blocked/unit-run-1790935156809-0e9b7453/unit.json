@@ -1,0 +1,86 @@
+{
+  "unit": {
+    "id": "p6-probe",
+    "objective": "Read src/runner/execution/bind.mjs lines 250-270 and reply in your report with one sentence naming the transport variable values possible. Do not modify any file.",
+    "capability": "review",
+    "writes": [],
+    "dependsOn": [],
+    "inputs": [],
+    "expectedOutputs": []
+  },
+  "overrides": [
+    {
+      "executor": "gemini",
+      "origin": "human-cli"
+    }
+  ],
+  "worktree": "/var/tmp/p6-accept-work",
+  "createdBy": "vantt",
+  "createdAt": "2026-10-02T09:59:16.813Z",
+  "bindings": {
+    "producer/1": [
+      {
+        "role": "producer",
+        "round": 1,
+        "assignmentId": "unit-run-1790935156809-0e9b7453/producer/1",
+        "binding": {
+          "contractVersion": "v1alpha1",
+          "executor": "gemini",
+          "invocation": "agy-herdr-mucdong",
+          "transport": "herdr",
+          "candidateIndex": 0,
+          "tier": "standard",
+          "model": "gemini-3.8-flash-medium",
+          "persona": null,
+          "mechanism": "out-of-process",
+          "posture": "read-only",
+          "provenance": {
+            "executor": {
+              "value": "gemini",
+              "source": "override"
+            },
+            "invocation": {
+              "value": "agy-herdr-mucdong",
+              "source": "override"
+            },
+            "transport": {
+              "value": "herdr",
+              "source": "herdr-invocation-present"
+            },
+            "tier": {
+              "value": "standard",
+              "source": "rigor:standard"
+            },
+            "model": {
+              "value": "gemini-3.8-flash-medium",
+              "source": "resolveTierModel(gemini.standard)"
+            },
+            "persona": {
+              "value": null,
+              "source": "none"
+            },
+            "mechanism": {
+              "value": "out-of-process",
+              "source": "decideExecutorDispatchMechanism"
+            },
+            "posture": {
+              "value": "read-only",
+              "source": "read-only-ask-or-writes-empty"
+            },
+            "overridesOrigin": {
+              "value": "human-cli",
+              "source": "override"
+            }
+          }
+        },
+        "transport": "herdr",
+        "invocation": "agy-herdr-mucdong",
+        "fallbackFrom": null,
+        "boundAt": "2026-10-02T09:59:16.815Z",
+        "outcome": "execution-failure",
+        "runId": "run_unit-run-1790935156809-0e9b7453/producer/1_01"
+      }
+    ]
+  },
+  "configSnapshotHash": "f0b2fc454d0eee271ffb572852f9b600ac5167ca7e24676ffa889b505a1390fe"
+}

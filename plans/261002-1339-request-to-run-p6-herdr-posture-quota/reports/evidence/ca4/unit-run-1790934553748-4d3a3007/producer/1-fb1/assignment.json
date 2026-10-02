@@ -1,0 +1,127 @@
+{
+  "assignmentId": "unit-run-1790934553748-4d3a3007/producer/1-fb1",
+  "unitRunId": "unit-run-1790934553748-4d3a3007",
+  "role": "producer",
+  "round": 1,
+  "objective": "Read src/runner/execution/bind.mjs lines 250-270 and say in your report, in one sentence, which two values the transport variable can take. Do not modify any file.",
+  "mutation": "read-only",
+  "binding": {
+    "contractVersion": "v1alpha1",
+    "executor": "claude-herdr",
+    "invocation": "claude-herdr-bwrap",
+    "transport": "herdr",
+    "candidateIndex": 1,
+    "tier": "standard",
+    "model": "sonnet",
+    "persona": null,
+    "mechanism": "out-of-process",
+    "posture": "read-only",
+    "provenance": {
+      "executor": {
+        "value": "claude-herdr",
+        "source": "capability:acceptance:limit"
+      },
+      "invocation": {
+        "value": "claude-herdr-bwrap",
+        "source": "capability:acceptance:limit"
+      },
+      "transport": {
+        "value": "herdr",
+        "source": "herdr-invocation-present"
+      },
+      "tier": {
+        "value": "standard",
+        "source": "rigor:standard"
+      },
+      "model": {
+        "value": "sonnet",
+        "source": "resolveTierModel(claude.standard)"
+      },
+      "persona": {
+        "value": null,
+        "source": "none"
+      },
+      "mechanism": {
+        "value": "out-of-process",
+        "source": "decideExecutorDispatchMechanism"
+      },
+      "posture": {
+        "value": "read-only",
+        "source": "read-only-ask-or-writes-empty"
+      },
+      "fallbackFrom": {
+        "executor": "fake-limit",
+        "invocation": "fake-limit-herdr",
+        "transport": "herdr",
+        "reason": "provider-limit"
+      }
+    }
+  },
+  "provenance": {
+    "kind": "unit-run",
+    "unitRunId": "unit-run-1790934553748-4d3a3007",
+    "role": "producer",
+    "round": 1,
+    "binding": {
+      "contractVersion": "v1alpha1",
+      "executor": "claude-herdr",
+      "invocation": "claude-herdr-bwrap",
+      "transport": "herdr",
+      "candidateIndex": 1,
+      "tier": "standard",
+      "model": "sonnet",
+      "persona": null,
+      "mechanism": "out-of-process",
+      "posture": "read-only",
+      "provenance": {
+        "executor": {
+          "value": "claude-herdr",
+          "source": "capability:acceptance:limit"
+        },
+        "invocation": {
+          "value": "claude-herdr-bwrap",
+          "source": "capability:acceptance:limit"
+        },
+        "transport": {
+          "value": "herdr",
+          "source": "herdr-invocation-present"
+        },
+        "tier": {
+          "value": "standard",
+          "source": "rigor:standard"
+        },
+        "model": {
+          "value": "sonnet",
+          "source": "resolveTierModel(claude.standard)"
+        },
+        "persona": {
+          "value": null,
+          "source": "none"
+        },
+        "mechanism": {
+          "value": "out-of-process",
+          "source": "decideExecutorDispatchMechanism"
+        },
+        "posture": {
+          "value": "read-only",
+          "source": "read-only-ask-or-writes-empty"
+        },
+        "fallbackFrom": {
+          "executor": "fake-limit",
+          "invocation": "fake-limit-herdr",
+          "transport": "herdr",
+          "reason": "provider-limit"
+        }
+      }
+    }
+  },
+  "expectedOutputs": [],
+  "contextRefs": [],
+  "writes": [],
+  "policy": {
+    "tier": "standard",
+    "preferExecutor": "claude-herdr",
+    "preferInvocation": "claude-herdr-bwrap",
+    "preferPersona": null
+  }
+}

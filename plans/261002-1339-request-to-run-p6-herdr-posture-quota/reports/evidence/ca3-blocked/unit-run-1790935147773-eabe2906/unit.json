@@ -1,0 +1,86 @@
+{
+  "unit": {
+    "id": "p6-probe",
+    "objective": "Read src/runner/execution/bind.mjs lines 250-270 and reply in your report with one sentence naming the transport variable values possible. Do not modify any file.",
+    "capability": "review",
+    "writes": [],
+    "dependsOn": [],
+    "inputs": [],
+    "expectedOutputs": []
+  },
+  "overrides": [
+    {
+      "executor": "openai",
+      "origin": "human-cli"
+    }
+  ],
+  "worktree": "/var/tmp/p6-accept-work",
+  "createdBy": "vantt",
+  "createdAt": "2026-10-02T09:59:07.779Z",
+  "bindings": {
+    "producer/1": [
+      {
+        "role": "producer",
+        "round": 1,
+        "assignmentId": "unit-run-1790935147773-eabe2906/producer/1",
+        "binding": {
+          "contractVersion": "v1alpha1",
+          "executor": "openai",
+          "invocation": "codex-herdr-fgovn",
+          "transport": "herdr",
+          "candidateIndex": 0,
+          "tier": "standard",
+          "model": "gpt-5.6-terra",
+          "persona": null,
+          "mechanism": "out-of-process",
+          "posture": "read-only",
+          "provenance": {
+            "executor": {
+              "value": "openai",
+              "source": "override"
+            },
+            "invocation": {
+              "value": "codex-herdr-fgovn",
+              "source": "override"
+            },
+            "transport": {
+              "value": "herdr",
+              "source": "herdr-invocation-present"
+            },
+            "tier": {
+              "value": "standard",
+              "source": "rigor:standard"
+            },
+            "model": {
+              "value": "gpt-5.6-terra",
+              "source": "resolveTierModel(openai.standard)"
+            },
+            "persona": {
+              "value": null,
+              "source": "none"
+            },
+            "mechanism": {
+              "value": "out-of-process",
+              "source": "decideExecutorDispatchMechanism"
+            },
+            "posture": {
+              "value": "read-only",
+              "source": "read-only-ask-or-writes-empty"
+            },
+            "overridesOrigin": {
+              "value": "human-cli",
+              "source": "override"
+            }
+          }
+        },
+        "transport": "herdr",
+        "invocation": "codex-herdr-fgovn",
+        "fallbackFrom": null,
+        "boundAt": "2026-10-02T09:59:07.781Z",
+        "outcome": "execution-failure",
+        "runId": "run_unit-run-1790935147773-eabe2906/producer/1_01"
+      }
+    ]
+  },
+  "configSnapshotHash": "f0b2fc454d0eee271ffb572852f9b600ac5167ca7e24676ffa889b505a1390fe"
+}

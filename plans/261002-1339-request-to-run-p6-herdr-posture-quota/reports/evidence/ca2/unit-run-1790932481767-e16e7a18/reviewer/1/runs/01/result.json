@@ -1,0 +1,218 @@
+{
+  "contract": {
+    "id": "assignment-run-result",
+    "version": 3
+  },
+  "runId": "run_unit-run-1790932481767-e16e7a18/reviewer/1_01",
+  "assignmentId": "unit-run-1790932481767-e16e7a18/reviewer/1",
+  "controlEpoch": 1,
+  "controlToken": "620c6536-70e5-4959-950f-7230e791ab8a",
+  "executorId": "glm-herdr",
+  "adapter": "herdr-spawn",
+  "confinement": null,
+  "role": "reviewer",
+  "executorRedirected": false,
+  "policy": {
+    "role": "reviewer",
+    "persona": "code-reviewer",
+    "executorPreference": [
+      "glm-herdr"
+    ],
+    "executorId": "glm-herdr",
+    "providerModel": "z-ai",
+    "rigor": "standard",
+    "tier": "standard",
+    "model": "z-ai/glm-5.2",
+    "reasoningEffort": "medium",
+    "visibility": "headless",
+    "repeatMode": null,
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "glm-herdr",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "provider": {
+        "value": "z-ai",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "glm-herdr"
+        }
+      },
+      "model": {
+        "value": "z-ai/glm-5.2",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "rigor": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "tier": {
+        "value": "standard",
+        "source": {
+          "scope": "rigor",
+          "id": "standard"
+        }
+      },
+      "reasoningEffort": {
+        "value": "medium",
+        "source": {
+          "scope": "derived",
+          "id": "rigor.standard"
+        }
+      },
+      "persona": {
+        "value": "code-reviewer",
+        "source": {
+          "scope": "default",
+          "id": "reviewer"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "repeatMode": {
+        "value": null,
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "unit-run-1790932481767-e16e7a18/reviewer/1"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "z-ai"
+        }
+      }
+    }
+  },
+  "promptEnvelope": {
+    "persona": {
+      "ref": "code-reviewer",
+      "delivery": "section",
+      "applied": true,
+      "source": {
+        "scope": "default",
+        "id": "reviewer"
+      }
+    }
+  },
+  "settledAt": "2026-10-02T09:19:02.694Z",
+  "durationMs": 234464,
+  "claimSha256": "884ccbe2ead8ce6dfba49d3dd7eed1cb507ab1f6a54262fa0218fa2527b5086e",
+  "settleReports": [
+    {
+      "path": ".fgos/assignments/unit-run-1790932481767-e16e7a18/reviewer/1/runs/01/outbox/report-1.md",
+      "sha256": "a25fea9b6af14d0cf569e77fe8d7af3e3d9e0562a79b2598eb9460818c4ac025"
+    }
+  ],
+  "classification": {
+    "execution": {
+      "status": "completed",
+      "exitCode": 0
+    },
+    "assessment": {
+      "verdict": "pass"
+    },
+    "confidence": {
+      "level": "reported",
+      "basis": [
+        "valid-agent-result-claim",
+        "captured-stdout"
+      ]
+    },
+    "failure": null,
+    "policy": {
+      "disposition": "allow",
+      "code": null
+    },
+    "delivery": {
+      "mode": "fresh"
+    },
+    "provenance": "native-v3",
+    "outcome": {
+      "category": "ok",
+      "reason": "completed-pass"
+    }
+  },
+  "runtime": {
+    "exitCode": 0,
+    "stdoutLog": ".fgos/assignments/unit-run-1790932481767-e16e7a18/reviewer/1/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/unit-run-1790932481767-e16e7a18/reviewer/1/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "contract": {
+      "id": "agent-result-claim",
+      "version": 2
+    },
+    "status": "done",
+    "summary": "Reviewer note at ca2-posture-note.md verified grounded in policies.mjs (host-write-denied: hostWrite=deny, run-output grant); both sandbox write probes (touch, >>bind.mjs) refused with 'Read-only file system', host file unmodified, outbox writable. Posture holds.",
+    "evidenceRefs": [
+      "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca2-posture-note.md",
+      "src/runner/dispatch/confinement/policies.mjs",
+      "src/runner/execution/bind.mjs"
+    ],
+    "assessment": {
+      "verdict": "pass"
+    }
+  },
+  "runnerNote": {
+    "summary": "Settled"
+  },
+  "usage": {
+    "inputTokens": null,
+    "outputTokens": null,
+    "totalTokens": null,
+    "cacheReadTokens": null,
+    "cacheCreationTokens": null,
+    "source": "unavailable-herdr"
+  },
+  "evidence": {
+    "gitBefore": "eb8898f95933d7b8428ab68aa63e0f7f2549b01a",
+    "gitAfter": "eb8898f95933d7b8428ab68aa63e0f7f2549b01a",
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [],
+    "mutatedDirtyBeforeFiles": [],
+    "attribution": [
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca2-posture-note.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      }
+    ],
+    "artifacts": [
+      ".fgos/assignments/unit-run-1790932481767-e16e7a18/reviewer/1/runs/01/outbox/report-1.md",
+      ".fgos/assignments/unit-run-1790932481767-e16e7a18/reviewer/1/runs/01/outbox/result-1.json"
+    ],
+    "tests": [],
+    "findingRefs": [
+      "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca2-posture-note.md",
+      "src/runner/dispatch/confinement/policies.mjs",
+      "src/runner/execution/bind.mjs"
+    ]
+  }
+}
