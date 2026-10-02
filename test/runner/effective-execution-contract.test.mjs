@@ -489,9 +489,7 @@ process.exit(0);
       allowCrossProvider: true,
       confinement: { mode: 'required', policyId: 'missing-backend', controls: { hostWrite: 'deny' } },
     },
-    executors: {
-      claude: { command: process.execPath, args: [mockBinPath], adapter: 'cli-spawn', allowCrossProvider: true },
-    },
+    executors: {},
   };
 
   const result = await executeAssignment(assignment, {
@@ -520,7 +518,8 @@ process.exit(0);
   assert.deepEqual(contractOnDisk.workspace.writeScope, []);
   assert.equal(contractOnDisk.limits.executorTimeoutMs, 25000);
   assert.equal(contractOnDisk.resultClaim.path, path.join(runDir, 'agent-result.json'));
-  assert.equal(contractOnDisk.executorId, 'claude');
+  // No executor is selected, so the configured default executor's command identifies it.
+  assert.equal(contractOnDisk.executorId, updatedCfg.executor.command);
   assert.equal(contractOnDisk.adapter, 'cli-spawn');
   assert.equal(contractOnDisk.adapterFamily, 'cli-spawn');
   assert.equal(contractOnDisk.enforcementPosture, 'instructed');

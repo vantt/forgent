@@ -71,7 +71,7 @@ test("R9: attestation store caches probe results by fingerprint with TTL", () =>
 test("R9: allRuns is memoized within a verb call via withRunsCache", () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "fgos-r9-allruns-"));
   const fgosDir = path.join(tmpDir, ".fgos");
-  const runsDir = path.join(fgosDir, "dispatch-runs", "g1", "01");
+  const runsDir = path.join(fgosDir, "assignments", "g1", "runs", "01");
   fs.mkdirSync(runsDir, { recursive: true });
   fs.writeFileSync(path.join(runsDir, "run.json"), JSON.stringify({ runId: "r1", status: "launched" }));
 
@@ -82,7 +82,7 @@ test("R9: allRuns is memoized within a verb call via withRunsCache", () => {
     assert.equal(runs1[0].run.runId, "r1");
 
     // Add a second run on disk
-    const runs2Dir = path.join(fgosDir, "dispatch-runs", "g1", "02");
+    const runs2Dir = path.join(fgosDir, "assignments", "g1", "runs", "02");
     fs.mkdirSync(runs2Dir, { recursive: true });
     fs.writeFileSync(path.join(runs2Dir, "run.json"), JSON.stringify({ runId: "r2", status: "launched" }));
 
@@ -101,7 +101,7 @@ test("R9: allRuns is memoized within a verb call via withRunsCache", () => {
   });
 
   // Outside withRunsCache: each call reads disk freshly
-  const runs3Dir = path.join(fgosDir, "dispatch-runs", "g1", "03");
+  const runs3Dir = path.join(fgosDir, "assignments", "g1", "runs", "03");
   fs.mkdirSync(runs3Dir, { recursive: true });
   fs.writeFileSync(path.join(runs3Dir, "run.json"), JSON.stringify({ runId: "r3", status: "launched" }));
 

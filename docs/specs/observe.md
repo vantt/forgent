@@ -57,7 +57,7 @@ Dành cho Phase F5: writer Rust duy nhất, migration lười từ `work.frictio
 ### § Contract & Quyết định (Làn C / F8)
 Dành cho Phase F8: khoá ranh giới contracts, golden fixtures và decision records.
 - Versioned contracts: `packages/observe/contracts/` (`observe.observation.v1.json`, `observe.friction.v1.json`, `observe.case.v1.json`, `observe.snapshot.v1.json`).
-- Source owner read contracts: `packages/run-result/contracts/run-result.read.v1.json`, `packages/coordination-state/contracts/session-events.read.v1.json`, `packages/work-state/contracts/work-events.read.v1.json`.
+- Source owner read contracts: `packages/run-result/contracts/run-result.read.v1.json`, `packages/observe/contracts/coordination-session.read.v1.json` (historic sessions; the coordination engine is retired), `packages/work-state/contracts/work-events.read.v1.json`.
 - Golden fixtures: `test/fixtures/observe/` sinh bằng CLI Rust và Node trong `scripts/regenerate-observe-fixtures.mjs`.
 - Doctor checks: `observe-dir-writable`, `observe-friction-migrated`, `observe-host-resolvable` (`src/setup/registrations.mjs`).
 

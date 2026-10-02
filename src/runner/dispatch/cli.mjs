@@ -82,7 +82,7 @@ function readWorkItem(fgosDir, workId) {
 import { resolveRepoRoot, resolveMainCheckoutRoot, fgosDirFromRoot } from '../paths.mjs';
 import { RunnerConfigError, ensureRunnerConfigForDir, MODEL_POLICY_TIERS } from './config.mjs';
 import { RIGOR_VALUES, resolveStrongerRigor } from '../rigor.mjs';
-import { resolveExecutorAndOverrides, resolveExecutorIdForPurpose, resolveTierModel, deriveProviderFamily, executorIdForWork, resolveCapabilityIdentityDetails } from './resolve.mjs';
+import { resolveExecutorAndOverrides, resolveTierModel, deriveProviderFamily, executorIdForWork, resolveCapabilityIdentityDetails } from './resolve.mjs';
 import { resolveExecutorProvider, resolveExecutorGovernance, resolveStrongerTier } from './assignment-policy.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
 import { resolveExecutorCommand, DispatchError } from './transport.mjs';

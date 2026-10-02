@@ -1,6 +1,6 @@
 // dispatch/resolve.mjs — unit -> executor -> model/tier/command resolution
 // (D7, tsk-2uf-1): `resolveTierModel`, the purpose/executorId resolution chain
-// (`resolveExecutorIdForPurpose`/`resolveExecutorAndOverrides`), and
+// (`resolveExecutorAndOverrides`), and
 // `resolveExecutorConfig` (the executor-block resolve + cross-provider
 // governance gate `dispatch/transport.mjs`'s `resolveExecutorCommand`
 // calls). Split out of the former `src/runner/dispatch.mjs` (2204 lines, 6
@@ -125,28 +125,6 @@ function buildAgentTypeExecutor(baseExecutor, agentType) {
 }
 
 /**
- * Resolve a executorId from a declared PURPOSE (`for`, D5/D6, tsk-1o7) —
- * the purpose-based binding US-027 requires: a caller like a gather branch
- * never has a pre-registered executorId to match by name, since its
- * prompt is composed at runtime (tsk-2ie5/tsk-2c1, the first real
- * consumer). Scans `cfg.executors` for the first entry whose own `for`
- * ARRAY includes `purpose` (D15, tsk-in1-4: `for` widened from a single
- * value to `string[]` — one executor can serve multiple capabilities at
- * once); returns `null` when none is registered — a legitimate, expected
- * state (no gather-purpose executor configured yet), never thrown as an
- * error here so a caller can cleanly fall back to its own native dispatch
- * instead of treating "not configured" as malformed config.
- *
- * (tsk-in1-4 D10: re-confirmed at shaping time — namespace conflict #3
- * between `executorIdForWork`'s job-identity result and this registry's
- * own executor-name keys is resolved by reusing this exact function,
- * unchanged, never by changing how `executors` is keyed.)
- */
-export function resolveExecutorIdForPurpose(cfg, purpose) {
-  return null;
-}
-
-/**
  * Resolve a `executorId`-OR-purpose name to its real serving executor,
  * applying `capabilities.<name>.prefer`/`overrides` (2026-08-16 user
  * decision, `docs/decisions/0033-...md`'s sibling `docs/history/
@@ -170,12 +148,10 @@ export function resolveExecutorIdForPurpose(cfg, purpose) {
  * without a proportional safety benefit — a careless `prefer` edit could
  * add a careless `for` entry just as easily). `prefer` naming an executor
  * id that does not exist at all still throws loud (`RunnerConfigError`),
- * matching every other shape-validation gate in this file. (3) failing
- * that, the existing
- * `resolveExecutorIdForPurpose` scan (unchanged, still the "first `for`
- * match wins" behavior for a purpose with no `prefer` set). (4) nothing
+ * matching every other shape-validation gate in this file. (3) nothing
  * found — `{executorId: null, configured: false}`, a legitimate,
- * expected state, never thrown.
+ * expected state, never thrown. An executor's own `for` never binds a
+ * purpose here: only `capabilities.<name>.prefer` does.
  *
  */
 export function resolveExecutorAndOverrides(cfg, executorIdOrPurpose) {

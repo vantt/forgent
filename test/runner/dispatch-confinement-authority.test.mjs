@@ -847,13 +847,25 @@ test("MED-5: fail-closed policy errors produce structured DispatchError with att
     assert.equal(caughtErr.attestation.phase, "refused");
     assert.equal(caughtErr.attestation.outcome, "refused");
 
-    // Check that run.json is NOT left at status 'running'
-    const runsBase = path.join(fgosDir, "dispatch-runs", "wleak");
-    const runSubdirs = fs.readdirSync(runsBase);
-    assert.ok(runSubdirs.length > 0, "run directory must exist");
-    const runJsonPath = path.join(runsBase, runSubdirs[0], "run.json");
-    const runRecord = JSON.parse(fs.readFileSync(runJsonPath, "utf8"));
-    assert.equal(runRecord.status, "settled", "run.json must be closed at settled, never stuck at running");
+    // The dispatch-runs store is retired: a refused dispatch must not leave one behind,
+    // and no run record under assignments may be left at status 'running'.
+    assert.equal(fs.existsSync(path.join(fgosDir, "dispatch-runs")), false, "no dispatch-runs store is written");
+    const assignmentsDir = path.join(fgosDir, "assignments");
+    const stuck = [];
+    if (fs.existsSync(assignmentsDir)) {
+      const walk = (dir) => {
+        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+          const p = path.join(dir, entry.name);
+          if (entry.isDirectory()) walk(p);
+          else if (entry.name === "run.json") {
+            const rec = JSON.parse(fs.readFileSync(p, "utf8"));
+            if (rec.status === "running") stuck.push(p);
+          }
+        }
+      };
+      walk(assignmentsDir);
+    }
+    assert.deepEqual(stuck, [], "run.json must be closed, never stuck at running");
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }

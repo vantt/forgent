@@ -33,7 +33,7 @@ export {
   INVOCATION_VIA,
 } from './dispatch/config.mjs';
 
-export { resolveTierModel, resolveExecutorIdForPurpose, resolveExecutorAndOverrides } from './dispatch/resolve.mjs';
+export { resolveTierModel, resolveExecutorAndOverrides } from './dispatch/resolve.mjs';
 export { executorIdForWork, buildPrompt, resolveCapabilityIdentityDetails, resolveCapabilityIdentity } from './work-compat.mjs';
 
 export { decideDispatchMechanism, decideExecutorDispatchMechanism } from './dispatch/mechanism.mjs';
