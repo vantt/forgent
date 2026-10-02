@@ -12,7 +12,6 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { createRequire } from 'node:module';
 import { validateWorkflow } from '../workflow/definition.mjs';
 import {
   walkableSteps,
@@ -24,9 +23,6 @@ import {
   taskSpecForStep as workflowTaskSpecForStep,
   operationsForStep as workflowOperationsForStep,
 } from '../workflow/steps.mjs';
-
-const require = createRequire(import.meta.url);
-const { parse: parseYaml } = require('yaml');
 
 /** The domain every item without an explicit `domain` field belongs to. */
 export const DEFAULT_DOMAIN = 'coding';
@@ -63,6 +59,9 @@ function freezeRegistryData(registryData) {
   }
 }
 
+// Each domain's registry.yaml and workflows/*.yaml are compiled to domains/<d>/compiled.json
+// (scripts/build-domain-registry.mjs) so this module needs no YAML parser: the Work lifecycle
+// must load in a plain unpacked copy with no node_modules. A test keeps the two in step.
 function loadDomainsFromDisk() {
   const domains = {};
   const repoRoot = path.resolve(import.meta.dirname, '../../');
@@ -71,19 +70,12 @@ function loadDomainsFromDisk() {
 
   for (const entry of fs.readdirSync(domainsDir, { withFileTypes: true })) {
     if (!entry.isDirectory()) continue;
-    const registryPath = path.join(domainsDir, entry.name, 'registry.yaml');
-    if (!fs.existsSync(registryPath)) continue;
+    const compiledPath = path.join(domainsDir, entry.name, 'compiled.json');
+    if (!fs.existsSync(compiledPath)) continue;
 
-    const registryData = parseYaml(fs.readFileSync(registryPath, 'utf8')) || {};
+    const { registry: registryData = {}, workflows: rawWorkflows = {} } = JSON.parse(fs.readFileSync(compiledPath, 'utf8'));
     const workflows = {};
-    const workflowsDir = path.join(domainsDir, entry.name, 'workflows');
-    if (fs.existsSync(workflowsDir)) {
-      for (const file of fs.readdirSync(workflowsDir).sort()) {
-        if (!/\.ya?ml$/.test(file)) continue;
-        const raw = parseYaml(fs.readFileSync(path.join(workflowsDir, file), 'utf8'));
-        workflows[path.basename(file, path.extname(file))] = validateWorkflow(raw);
-      }
-    }
+    for (const [name, raw] of Object.entries(rawWorkflows)) workflows[name] = validateWorkflow(raw);
 
     freezeRegistryData(registryData);
     domains[entry.name] = Object.freeze({

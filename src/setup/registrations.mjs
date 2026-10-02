@@ -1379,6 +1379,41 @@ registerCheck({
   check: (cwd) => checkAgentClaimsResolve(cwd),
 });
 
+// The Work lifecycle reads each domain's compiled.json (scripts/build-domain-registry.mjs) so it
+// loads with no YAML parser. A missing or unreadable file breaks every command that resolves a
+// domain; a stale one (YAML edited, not rebuilt) silently serves old steps. The freshness half
+// needs the `yaml` package, so it only runs where that package resolves (a checkout after install).
+function checkDomainRegistryCompiled(cwd) {
+  const domainsDir = path.join(cwd, 'domains');
+  if (!fs.existsSync(domainsDir)) return { passed: true, message: 'no domains/ directory here — nothing to check' };
+  const problems = [];
+  let checked = 0;
+  for (const entry of fs.readdirSync(domainsDir, { withFileTypes: true })) {
+    if (!entry.isDirectory() || !fs.existsSync(path.join(domainsDir, entry.name, 'registry.yaml'))) continue;
+    checked += 1;
+    const compiled = path.join(domainsDir, entry.name, 'compiled.json');
+    if (!fs.existsSync(compiled)) {
+      problems.push(`domains/${entry.name}/compiled.json is missing`);
+      continue;
+    }
+    try {
+      JSON.parse(fs.readFileSync(compiled, 'utf8'));
+    } catch (err) {
+      problems.push(`domains/${entry.name}/compiled.json is unreadable (${err.message})`);
+    }
+  }
+  if (problems.length > 0) {
+    return { passed: false, message: `${problems.join('; ')} — run npm run build:domains` };
+  }
+  return { passed: true, message: `${checked} domain registr${checked === 1 ? 'y' : 'ies'} compiled and readable` };
+}
+
+registerCheck({
+  id: 'domain-registry-compiled',
+  description: "every domain's compiled.json (the YAML-free form the Work lifecycle reads) exists and parses",
+  check: (cwd) => checkDomainRegistryCompiled(cwd),
+});
+
 registerCheck({
   id: 'agent-type-names-unique',
   description: 'every agent-type name across core/agents/ and domains/*/agents/ is globally unique (D33)',

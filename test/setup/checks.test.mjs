@@ -91,6 +91,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'task-specs-resolve',
       'agent-claims-resolve',
       'agent-type-names-unique',
+      'domain-registry-compiled',
       'advise-execute-capabilities-configured',
       'capability-serves-valid',
       'decision-index-stale',

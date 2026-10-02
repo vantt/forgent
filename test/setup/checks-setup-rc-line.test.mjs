@@ -62,9 +62,6 @@ test('setup from a copy of fgos that is not in a git checkout declines the rc wr
     fs.cpSync(path.join(repoRoot, entry), path.join(copyRoot, entry), { recursive: true });
   }
   assert.equal(fs.existsSync(path.join(copyRoot, '.git')), false);
-  // The copy is about where fgos lives, not whether its declared dependencies are installed:
-  // the domain registry parses YAML, so the copy needs `yaml` resolvable like a real install has it.
-  fs.symlinkSync(path.join(repoRoot, 'node_modules'), path.join(copyRoot, 'node_modules'));
 
   const homeDir = mkTemp('checks-nongit-home-');
   const rcFile = path.join(homeDir, '.bashrc');
