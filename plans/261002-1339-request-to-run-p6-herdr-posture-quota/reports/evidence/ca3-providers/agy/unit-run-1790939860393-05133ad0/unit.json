@@ -1,0 +1,86 @@
+{
+  "unit": {
+    "id": "p6-provider-probe",
+    "objective": "Read-only posture and account probe. The commands below are authorized by this objective; the first two are EXPECTED to fail and the failure output is the evidence, so run them anyway. Report each command, its verbatim output and its exit code. (1) Run `touch POSTURE-PROBE.txt` in the repository root. (2) Run `echo probe >> src/runner/execution/bind.mjs`. (3) Print the names and values of the environment variables CODEX_HOME, HOME and PI_CODING_AGENT_DIR that are set (values only of those three; do not read or print the contents of any file under them). (4) If a `codex` command exists, run `codex login status` and quote its one-line output; otherwise write 'no codex'. Do not modify any repository file. The outbox files named in your brief are the one place you may write, and you must write them.",
+    "capability": "review",
+    "writes": [],
+    "dependsOn": [],
+    "inputs": [],
+    "expectedOutputs": []
+  },
+  "overrides": [
+    {
+      "executor": "gemini",
+      "origin": "human-cli"
+    }
+  ],
+  "worktree": "/var/tmp/p6-accept-work",
+  "createdBy": "vantt",
+  "createdAt": "2026-10-02T11:17:40.407Z",
+  "bindings": {
+    "producer/1": [
+      {
+        "role": "producer",
+        "round": 1,
+        "assignmentId": "unit-run-1790939860393-05133ad0/producer/1",
+        "binding": {
+          "contractVersion": "v1alpha1",
+          "executor": "gemini",
+          "invocation": "agy-herdr-mucdong",
+          "transport": "herdr",
+          "candidateIndex": 0,
+          "tier": "standard",
+          "model": "gemini-3.8-flash-medium",
+          "persona": null,
+          "mechanism": "out-of-process",
+          "posture": "read-only",
+          "provenance": {
+            "executor": {
+              "value": "gemini",
+              "source": "override"
+            },
+            "invocation": {
+              "value": "agy-herdr-mucdong",
+              "source": "override"
+            },
+            "transport": {
+              "value": "herdr",
+              "source": "herdr-invocation-present"
+            },
+            "tier": {
+              "value": "standard",
+              "source": "rigor:standard"
+            },
+            "model": {
+              "value": "gemini-3.8-flash-medium",
+              "source": "resolveTierModel(gemini.standard)"
+            },
+            "persona": {
+              "value": null,
+              "source": "none"
+            },
+            "mechanism": {
+              "value": "out-of-process",
+              "source": "decideExecutorDispatchMechanism"
+            },
+            "posture": {
+              "value": "read-only",
+              "source": "read-only-ask-or-writes-empty"
+            },
+            "overridesOrigin": {
+              "value": "human-cli",
+              "source": "override"
+            }
+          }
+        },
+        "transport": "herdr",
+        "invocation": "agy-herdr-mucdong",
+        "fallbackFrom": null,
+        "boundAt": "2026-10-02T11:17:40.412Z",
+        "outcome": "pass",
+        "runId": "run_unit-run-1790939860393-05133ad0/producer/1_01"
+      }
+    ]
+  },
+  "configSnapshotSha256": "97e8b6daf470b96e771739bb3b1d00fd51046cb395c6271538db902cbf48bfba"
+}

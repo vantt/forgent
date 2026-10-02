@@ -1,0 +1,187 @@
+{
+  "contract": {
+    "id": "assignment-run-result",
+    "version": 3
+  },
+  "runId": "run_unit-run-1790939860393-05133ad0/producer/1_01",
+  "assignmentId": "unit-run-1790939860393-05133ad0/producer/1",
+  "controlEpoch": 1,
+  "controlToken": "d2ac9fe6-ac7e-4bbc-be32-f589cf5f70ba",
+  "executorId": "gemini",
+  "adapter": "herdr-spawn",
+  "confinement": null,
+  "role": "producer",
+  "executorRedirected": false,
+  "policy": {
+    "role": "producer",
+    "executorPreference": [
+      "gemini"
+    ],
+    "executorId": "gemini",
+    "providerModel": "gemini",
+    "rigor": "standard",
+    "tier": "standard",
+    "model": "gemini-3.8-flash-medium",
+    "reasoningEffort": "medium",
+    "visibility": "headless",
+    "repeatMode": null,
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "gemini",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "provider": {
+        "value": "gemini",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "gemini"
+        }
+      },
+      "model": {
+        "value": "gemini-3.8-flash-medium",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "rigor": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "tier": {
+        "value": "standard",
+        "source": {
+          "scope": "rigor",
+          "id": "standard"
+        }
+      },
+      "reasoningEffort": {
+        "value": "medium",
+        "source": {
+          "scope": "derived",
+          "id": "rigor.standard"
+        }
+      },
+      "persona": {
+        "source": {
+          "scope": "default"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "repeatMode": {
+        "value": null,
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "unit-run-1790939860393-05133ad0/producer/1"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "gemini"
+        }
+      }
+    }
+  },
+  "settledAt": "2026-10-02T11:19:08.980Z",
+  "durationMs": 88390,
+  "claimSha256": "9dfcf92912fe1e76ed9748e5fba03b97e65ca1eb24fa23f68331709f00893c4a",
+  "settleReports": [
+    {
+      "path": ".fgos/assignments/unit-run-1790939860393-05133ad0/producer/1/runs/01/outbox/report-1.md",
+      "sha256": "0ba6d5c63cda62166e37bb68ea509df999ad9e211bd7c827217bad789c73bfd4"
+    }
+  ],
+  "classification": {
+    "execution": {
+      "status": "completed",
+      "exitCode": 0
+    },
+    "assessment": {
+      "verdict": "pass"
+    },
+    "confidence": {
+      "level": "reported",
+      "basis": [
+        "valid-agent-result-claim",
+        "captured-stdout"
+      ]
+    },
+    "failure": null,
+    "policy": {
+      "disposition": "allow",
+      "code": null
+    },
+    "delivery": {
+      "mode": "fresh"
+    },
+    "provenance": "native-v3",
+    "outcome": {
+      "category": "ok",
+      "reason": "completed-pass"
+    }
+  },
+  "runtime": {
+    "exitCode": 0,
+    "stdoutLog": ".fgos/assignments/unit-run-1790939860393-05133ad0/producer/1/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/unit-run-1790939860393-05133ad0/producer/1/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "contract": {
+      "id": "agent-result-claim",
+      "version": 2
+    },
+    "status": "done",
+    "summary": "Completed read-only posture probes confirming active filesystem read-only enforcement and probed environment variables and codex login status.",
+    "evidenceRefs": [
+      "/home/vantt/projects/forgentX-p6/.fgos/assignments/unit-run-1790939860393-05133ad0/producer/1/runs/01/outbox/report-1.md"
+    ]
+  },
+  "runnerNote": {
+    "summary": "Settled"
+  },
+  "usage": {
+    "inputTokens": null,
+    "outputTokens": null,
+    "totalTokens": null,
+    "cacheReadTokens": null,
+    "cacheCreationTokens": null,
+    "source": "unsupported"
+  },
+  "evidence": {
+    "gitBefore": "bda6243a1af4183a3cbf3cbbbd37e5fb7e39a7a3",
+    "gitAfter": "bda6243a1af4183a3cbf3cbbbd37e5fb7e39a7a3",
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [],
+    "mutatedDirtyBeforeFiles": [],
+    "attribution": [],
+    "artifacts": [
+      ".fgos/assignments/unit-run-1790939860393-05133ad0/producer/1/runs/01/outbox/report-1.md",
+      ".fgos/assignments/unit-run-1790939860393-05133ad0/producer/1/runs/01/outbox/result-1.json"
+    ],
+    "tests": [],
+    "findingRefs": [
+      "/home/vantt/projects/forgentX-p6/.fgos/assignments/unit-run-1790939860393-05133ad0/producer/1/runs/01/outbox/report-1.md"
+    ]
+  }
+}

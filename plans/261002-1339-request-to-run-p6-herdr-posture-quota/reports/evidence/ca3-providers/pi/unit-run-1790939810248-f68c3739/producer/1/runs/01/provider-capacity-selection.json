@@ -1,0 +1,17 @@
+{
+  "contract": "provider-capacity-selection.v1",
+  "status": "selected",
+  "provider": "xai",
+  "accountId": "vantt",
+  "accountLabel": "vantt",
+  "selectedAt": "2026-10-02T11:16:50.273Z",
+  "lease": {
+    "runId": "run_unit-run-1790939810248-f68c3739/producer/1_01",
+    "assignmentId": "unit-run-1790939810248-f68c3739/producer/1",
+    "pid": 2699592
+  },
+  "credentialProvisioned": true,
+  "reasonCodes": [
+    "unknown-or-low-confidence"
+  ]
+}

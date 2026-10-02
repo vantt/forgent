@@ -1,0 +1,187 @@
+{
+  "contract": {
+    "id": "assignment-run-result",
+    "version": 3
+  },
+  "runId": "run_unit-run-1790939810248-f68c3739/producer/1_01",
+  "assignmentId": "unit-run-1790939810248-f68c3739/producer/1",
+  "controlEpoch": 1,
+  "controlToken": "38b80590-a5e6-4b87-aa7b-53f51d04e5ef",
+  "executorId": "xai",
+  "adapter": "herdr-spawn",
+  "confinement": null,
+  "role": "producer",
+  "executorRedirected": false,
+  "policy": {
+    "role": "producer",
+    "executorPreference": [
+      "xai"
+    ],
+    "executorId": "xai",
+    "providerModel": "xai",
+    "rigor": "standard",
+    "tier": "standard",
+    "model": "grok-4.3",
+    "reasoningEffort": "medium",
+    "visibility": "headless",
+    "repeatMode": null,
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "xai",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "provider": {
+        "value": "xai",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "xai"
+        }
+      },
+      "model": {
+        "value": "grok-4.3",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "rigor": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "tier": {
+        "value": "standard",
+        "source": {
+          "scope": "rigor",
+          "id": "standard"
+        }
+      },
+      "reasoningEffort": {
+        "value": "medium",
+        "source": {
+          "scope": "derived",
+          "id": "rigor.standard"
+        }
+      },
+      "persona": {
+        "source": {
+          "scope": "default"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "repeatMode": {
+        "value": null,
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "unit-run-1790939810248-f68c3739/producer/1"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "xai"
+        }
+      }
+    }
+  },
+  "settledAt": "2026-10-02T11:17:39.693Z",
+  "durationMs": 49368,
+  "claimSha256": "962f76033a6ccdb03be9c2775a66b4b2534f0161a8b6144f9df1faa5856b1764",
+  "settleReports": [
+    {
+      "path": ".fgos/assignments/unit-run-1790939810248-f68c3739/producer/1/runs/01/outbox/report-1.md",
+      "sha256": "c86aa6b7889887d9dbd6d73399c19f03f27ba872fb8e419b0b5a6585ccb7a2b0"
+    }
+  ],
+  "classification": {
+    "execution": {
+      "status": "completed",
+      "exitCode": 0
+    },
+    "assessment": {
+      "verdict": "pass"
+    },
+    "confidence": {
+      "level": "reported",
+      "basis": [
+        "valid-agent-result-claim",
+        "captured-stdout"
+      ]
+    },
+    "failure": null,
+    "policy": {
+      "disposition": "allow",
+      "code": null
+    },
+    "delivery": {
+      "mode": "fresh"
+    },
+    "provenance": "native-v3",
+    "outcome": {
+      "category": "ok",
+      "reason": "completed-pass"
+    }
+  },
+  "runtime": {
+    "exitCode": 0,
+    "stdoutLog": ".fgos/assignments/unit-run-1790939810248-f68c3739/producer/1/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/unit-run-1790939810248-f68c3739/producer/1/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "contract": {
+      "id": "agent-result-claim",
+      "version": 2
+    },
+    "status": "done",
+    "summary": "Completed read-only posture and account probe successfully; commands (1) and (2) failed as expected on read-only FS providing evidence, env vars and codex status reported without any repo modifications.",
+    "evidenceRefs": [
+      "/home/vantt/projects/forgentX-p6/.fgos/assignments/unit-run-1790939810248-f68c3739/producer/1/runs/01/outbox/report-1.md"
+    ]
+  },
+  "runnerNote": {
+    "summary": "Settled"
+  },
+  "usage": {
+    "inputTokens": null,
+    "outputTokens": null,
+    "totalTokens": null,
+    "cacheReadTokens": null,
+    "cacheCreationTokens": null,
+    "source": "unsupported"
+  },
+  "evidence": {
+    "gitBefore": "bda6243a1af4183a3cbf3cbbbd37e5fb7e39a7a3",
+    "gitAfter": "bda6243a1af4183a3cbf3cbbbd37e5fb7e39a7a3",
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [],
+    "mutatedDirtyBeforeFiles": [],
+    "attribution": [],
+    "artifacts": [
+      ".fgos/assignments/unit-run-1790939810248-f68c3739/producer/1/runs/01/outbox/report-1.md",
+      ".fgos/assignments/unit-run-1790939810248-f68c3739/producer/1/runs/01/outbox/result-1.json"
+    ],
+    "tests": [],
+    "findingRefs": [
+      "/home/vantt/projects/forgentX-p6/.fgos/assignments/unit-run-1790939810248-f68c3739/producer/1/runs/01/outbox/report-1.md"
+    ]
+  }
+}

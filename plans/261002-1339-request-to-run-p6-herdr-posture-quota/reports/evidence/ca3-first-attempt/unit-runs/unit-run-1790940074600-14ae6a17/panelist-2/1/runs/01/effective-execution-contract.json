@@ -1,0 +1,78 @@
+{
+  "contract": {
+    "id": "effective-execution-contract",
+    "version": 1
+  },
+  "assignmentId": "unit-run-1790940074600-14ae6a17/panelist-2/1",
+  "runId": "run_unit-run-1790940074600-14ae6a17/panelist-2/1_01",
+  "mutation": "read-only",
+  "workspace": {
+    "cwd": "/home/vantt/projects/forgentX-p6",
+    "writeScope": [],
+    "mainCheckout": "/home/vantt/projects/forgentX",
+    "posture": "worktree"
+  },
+  "tools": {
+    "shell": {
+      "mode": "restricted",
+      "enforced": false,
+      "enforcement": "instructed",
+      "allowedCommands": []
+    }
+  },
+  "permissions": {
+    "posture": "enforced",
+    "shell": {
+      "mode": "restricted",
+      "enforced": false,
+      "enforcement": "instructed",
+      "allowedCommands": []
+    },
+    "filesystem": {
+      "mode": "read-only",
+      "enforced": true,
+      "enforcement": "enforced",
+      "writeScope": []
+    },
+    "network": {
+      "enforced": false,
+      "enforcement": "instructed"
+    }
+  },
+  "limits": {
+    "executorTimeoutMs": 2100000
+  },
+  "resultClaim": {
+    "contract": {
+      "id": "agent-result-claim",
+      "version": 2
+    },
+    "path": "/home/vantt/projects/forgentX-p6/.fgos/assignments/unit-run-1790940074600-14ae6a17/panelist-2/1/runs/01/agent-result.json"
+  },
+  "provenance": {
+    "dispatchPlanHash": "sha256:304449c5bb59626cc0b7442b9b402b3d058b0db412d2136fdab7974000b30ba5",
+    "configHash": "sha256:a529d7dbbbccda5ebe844ea3fe9e374e46ed999dadff4373d694ddcad76b5ede",
+    "executorId": "openai",
+    "adapter": "herdr-spawn",
+    "adapterFamily": "herdr-spawn"
+  },
+  "providerCapacity": {
+    "contract": "provider-capacity-selection.v1",
+    "status": "selected",
+    "provider": "openai-codex",
+    "accountId": "fgovn",
+    "accountLabel": "fgovn",
+    "selectedAt": "2026-10-02T11:21:14.704Z",
+    "lease": {
+      "runId": "run_unit-run-1790940074600-14ae6a17/panelist-2/1_01",
+      "assignmentId": "unit-run-1790940074600-14ae6a17/panelist-2/1",
+      "pid": 2747104
+    },
+    "credentialProvisioned": false
+  },
+  "enforcementPosture": "enforced",
+  "permissionEnforcementPosture": "enforced",
+  "executorId": "openai",
+  "adapter": "herdr-spawn",
+  "adapterFamily": "herdr-spawn"
+}

@@ -1,0 +1,17 @@
+{
+  "contract": "provider-capacity-selection.v1",
+  "status": "selected",
+  "provider": "openai-codex",
+  "accountId": "fgovn",
+  "accountLabel": "fgovn",
+  "selectedAt": "2026-10-02T11:14:30.059Z",
+  "lease": {
+    "runId": "run_unit-run-1790939670033-64a7b5b3/producer/1_01",
+    "assignmentId": "unit-run-1790939670033-64a7b5b3/producer/1",
+    "pid": 2692362
+  },
+  "credentialProvisioned": false,
+  "reasonCodes": [
+    "unknown-or-low-confidence"
+  ]
+}

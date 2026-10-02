@@ -2,7 +2,7 @@
 
 Date: 2026-10-02. Branch `plan/261002-request-to-run-p6`. Run by the p6 branch's own `node bin/fgos.mjs run`, inside a live herdr session (`HERDR_ENV=1`, herdr 0.9.1-vantt.1, bwrap `/usr/bin/bwrap`).
 
-Status: **PARTIAL.** Cases 1, 2, 4, 6 Accepted with file evidence. Cases 3 and 5 NOT RUN (reasons below). Getting there needed six code fixes in the herdr path (section 3); none of the Accepted runs had a key typed into a pane by hand.
+Status: **PARTIAL.** Cases 1, 2, 3, 4, 6 Accepted with file evidence. Case 5 NOT RUN (reason below). Getting there needed six code fixes in the herdr path (section 3) and, for case 3, the follow-up round in section 3b; none of the Accepted runs had a key typed into a pane by hand.
 
 ## 1. Deviations from the brief
 
@@ -18,7 +18,7 @@ Status: **PARTIAL.** Cases 1, 2, 4, 6 Accepted with file evidence. Cases 3 and 5
 |---|---|---|---|---|---|---|---|
 | 1 | Unit docs, `reviewed`, producer + reviewer in panes | **Accepted** | `unit-run-1790932321930-c5ae2d4b` | herdr / herdr | producer claude (sonnet), reviewer z-ai (glm-5.2) | 2 min 06 s | 1 command, 0 keys into panes |
 | 2 | Posture live: reviewer write refused, outbox write ok | **Accepted** | `unit-run-1790932481767-e16e7a18` | herdr / herdr | same | 4 min 21 s | 1 command, 0 keys |
-| 3 | `architecture-advisory` Workflow in panes, one role on openai | **NOT RUN** (blocked) | none | n/a | n/a | n/a | n/a |
+| 3 | `architecture-advisory` Workflow in panes, one role on openai | **Accepted** (second round) | `wf-run-1790941388891-acbba971` (5 unit runs, 9 role runs) | herdr / herdr in all 9 | panel: claude (sonnet), openai (codex, account fgovn, gpt-5.6-terra), gemini (agy, account mucdong), xai (pi, account vantt, grok-4.3); critique reviewer openai | 8 min 18 s | 1 command, 0 keys |
 | 4 | Provider-limit fallback, new pane, old pane stays | **Accepted** (fake screen) | `unit-run-1790934553748-4d3a3007` | herdr / herdr | fake-limit then claude (sonnet) | 81 s | 1 command, 0 keys |
 | 5 | Same question on the old engine (`pre-engine-retirement`) | **NOT RUN** | none | n/a | n/a | n/a | n/a |
 | 6 | Headless (no herdr), cli, same posture | **Accepted** | `unit-run-1790934670425-5d5c769e` | cli / cli | producer claude (sonnet), reviewer gemini (gemini-3.8-flash-medium) | 6 min 35 s | 1 command |
@@ -40,16 +40,37 @@ Evidence root: `plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/
 - Posture in force for the producer was `workspace-write` (it wrote its note in the worktree), for the reviewer `read-only`.
 - An earlier, unplanned sample of the same thing: in the first reviewer run for case 1 (`unit-run-1790931976358-5dc36b1c`, before the objective was reworded) the reviewer tried to write the note itself and reported `Read-only file system`.
 
-### Case 3 (NOT RUN, blocked) and why
-It cannot be run through herdr panes today, for two independent reasons, both measured:
+### Case 3 (Accepted, second round)
+The first round could not run it: only the claude and glm families ran confined in a pane, and codex, pi and agy died at launch (details kept in `ca3-blocked/`). A second round made the three work, then re-ran the case.
 
-1. **Only two provider families can run confined in a pane** (`claude-herdr`, `glm-herdr`). The `panel` pattern binds every panelist independent of its siblings and the synthesizer independent of all three, so one panel needs four families; with two, `bind()` refuses (that is the designed behaviour).
-2. **The openai, gemini and xai herdr invocations die at launch under the bwrap posture** (probes `ca3-blocked/`, one read-only Unit each, overridden to that executor; pane screens in `ca3-blocked/<executor>-pane-screen.txt`):
-   - openai `codex-herdr-fgovn` (`unit-run-1790935147773-eabe2906`): `Error: failed to open daemon operation lock /home/vantt/.codex-fgovn/app-server-daemon/daemon.lock: Read-only file system`. `CODEX_HOME` is the real account directory, bound read-only; codex needs it writable. It also cannot be redirected to the confinement's private home, because the only code that copies a codex credential into a private home (`drivers/bwrap.mjs provisionSelectedCodexCredential`) needs `providerCapacity` account inventory, and `assignment-runner` explicitly refuses that for a non-`cli-spawn` adapter (`credential-provisioning-unsupported`).
-   - xai `pi-herdr-vantt` (`unit-run-1790935165888-3391dcd1`): `ENOENT: mkdir '/home/vantt/.pi/accounts/grok-vantt/sessions/...'` (state directory read-only).
-   - gemini `agy-herdr-mucdong` (`unit-run-1790935156809-0e9b7453`): `Error: unexpected argument "<full prompt>" ... Prompts are read only from -p/--print ...`: the invocation passes the prompt positionally, which this agy build rejects (a separate config problem; its home would hit the same read-only wall).
-   This is the owner's gate G7 for those three providers, not a regression of the fixes below. A codex role through cli would not be "through herdr panes", so none was substituted.
-- What it would take: a minimal, explicit writable state grant for an executor's account directory (or private-home provisioning for pi/agy/codex, i.e. generalizing credential provisioning beyond `codex-home` and letting herdr-spawn use it), then an agy prompt-delivery fix. That is design work on the confinement layer (credential exposure to a read-only reviewer), not a change to make inside an acceptance phase.
+- Command: `fgos workflow start architecture-advisory --request "<question about where the confined-pane recipe should live>" --dir <p6> --worktree <p6>`; code at commit `bff6fb806` (the tree the full test run covered). The architecture capabilities' `prefer` lists were changed to `claude-herdr, openai, gemini, xai, glm-herdr` (committed) so each role binds a pane-capable executor. Every unit has a read-only posture.
+- Result: `wf-run-1790941388891-acbba971`, status `completed`, outcome `pass`, 2026-10-02 11:43:08 to 11:51:26 (8 min 18 s). Evidence: `ca3/` (`workflow-events.jsonl`, `unit-runs/<unitRunId>/unit.json` with the config snapshot replaced by its hash, per role `assignment.json` and `runs/01/{result.json,run.json,exit.json,visibility.json,dispatch-plan.json,effective-execution-contract.json,brief-1.md,provider-capacity-selection.json,outbox/*}`; `protected/` never copied).
+- Transport and providers, read from each `assignment.json` and `result.json` (`adapter`), not from the return value:
+
+| Step / unit run | Role | Executor / invocation | Transport | Model | Account | Pane | Time |
+|---|---|---|---|---|---|---|---|
+| framing `unit-run-1790941388899-6db479b6` | producer | claude-herdr / claude-herdr-bwrap | herdr | sonnet | default login | wS:p3W1 | 47 s |
+| shaping `unit-run-1790941435696-b0a2d4ec` | panelist-1 | claude-herdr / claude-herdr-bwrap | herdr | sonnet | default login | wS:p3W2 | 50 s |
+| | panelist-2 | **openai / codex-herdr-fgovn** | herdr | gpt-5.6-terra | **fgovn** | wS:p3W3 | 79 s |
+| | panelist-3 | gemini / agy-herdr-mucdong | herdr | gemini-3.8-flash-medium | mucdong | wS:p3W4 | 142 s |
+| | synthesizer | xai / pi-herdr-vantt | herdr | grok-4.3 | vantt | wS:p3W5 | 55 s |
+| critique `unit-run-1790941632741-4cd0aa40` | producer | claude-herdr | herdr | sonnet | default login | wS:p3W6 | 45 s |
+| | reviewer | **openai / codex-herdr-fgovn** | herdr | gpt-5.6-terra | **fgovn** | wS:p3W7 | 114 s |
+| synthesis `unit-run-1790941792112-f9c5002b` | producer | claude-herdr | herdr | sonnet | default login | wS:p3W8 | 45 s |
+| explanation `unit-run-1790941837161-320cbf36` | producer | claude-herdr | herdr | sonnet | default login | wS:p3W9 | 50 s |
+
+- The panel is on four provider families (claude, openai, gemini, xai): the three panelists and the synthesizer each differ from every sibling (`bind()` enforced it; with fewer families it refuses). Every role was `confined-bwrap` (`visibility.json`), posture `read-only`, and wrote `ack-1.json`, `report-1.md`, `result-1.json` into its outbox. The three non-claude roles record `provider-capacity-selection.json` with the leased account (`fgovn`, `mucdong`, `vantt`) and `credentialProvisioned: true`, without any credential value.
+- Per provider, a single read-only Unit with an explicit probe (`ca3-providers/provider-probe-unit.json`) shows (a) the agent logged in, (b) repository writes refused, (c) outbox written:
+
+| Provider | Run | (a) login | (b) repo write | (c) outbox | Note |
+|---|---|---|---|---|---|
+| openai codex, account fgovn | `unit-run-1790939670033-64a7b5b3` | `codex login status`: "Logged in using ChatGPT"; `CODEX_HOME` is a private path under `/tmp/fgos-confinement/` | `touch`: "Read-only file system", exit 1; `echo >> src/...`: "read-only file system", exit 1 | ack, report, result | |
+| xai pi, account vantt | `unit-run-1790939810248-f68c3739` | pane shows grok-4.3 on the subscription; `PI_CODING_AGENT_DIR` is a private path | same two refusals | ack, report, result | |
+| gemini agy, account mucdong | `unit-run-1790939860393-05133ad0` | pane header shows the mucdong account (address redacted in the copy); `HOME` is a private path | same two refusals | ack, report, result | |
+
+  Reports are `ca3-providers/<codex|pi|agy>/<unitRunId>/producer/1/runs/01/outbox/report-1.md`; pane frames (sampled every 4 s, never typed into) are `ca3-providers/<codex|pi|agy>/pane-frames.txt`. The three probe runs were made before the evidence fix in section 3b, so the codex one still shows `credentialProvisioned: false`; the Workflow run shows `true`.
+- Not part of the Accepted run: the first Workflow attempt `wf-run-1790940009740-16803ed6` failed (panelist-2 and panelist-3 were refused with "dispatch for cwd ... is already in flight"; evidence `ca3-first-attempt/`), and a second complete pass `wf-run-1790940254877-1a85385b` ran before the last two fixes of section 3b (private-home removal, evidence flag); its files are not kept, the final run above supersedes it.
+- Limits: the question was a design question about this repo, so the panel proves the transport, the four families and the confinement, not the quality of the advice (the reports are in the evidence folder to read). Only one openai account (fgovn) is in the inventory. During the first attempts (login not yet provisioned into the pane) a codex pane showed a ChatGPT "usage limit ... try again at 8:24 PM" screen; a plain `codex exec` with the tetnu account home showed the same message at that time while fgovn answered. It did not recur once the login was provisioned and its cause is not established. The screen text contains "usage limit", which is one of the configured patterns, but I stopped that run after 10 minutes before the ladder reported, so provider-limit fallback on a real screen is still unmeasured (section 5, point 3).
 
 ### Case 4 (Accepted; limit of the test: a fake screen, not a real provider limit)
 - `ca4/unit-run-1790934553748-4d3a3007/`. Capability `acceptance:limit`, `prefer: [fake-limit, claude-herdr]`. The fake executor (`ca4/fake-limit.sh`) prints "Claude usage limit reached. You have hit your usage limit. Try again in 3 hours ..." plus "[fake screen ... not a real provider limit]" and sleeps. `idleTimeoutMs` was 60 s in the overlay so the case fits in minutes; the default is 5 min (see section 3).
@@ -81,13 +102,32 @@ A worktree at tag `pre-engine-retirement` (`13f7f01fd`) was created and the old 
 
 Verification: `env -u CLAUDE_CODE_SESSION_ID node --test` over `test/runner`, `test/cli`, `test/workflow` after the first four: 3250 tests, 3182 pass, 0 fail, 3 skipped (rest todo); `test/setup` 648/648; targeted herdr and execution suites after the last two: 186 and 213 tests, 0 fail. Full `npm test` after the last commit (`CLAUDE_CODE_SESSION_ID` unset): 6519 tests, 6446 pass, 0 fail, 8 skipped, 65 todo, exit 0. The new `run-herdr` tests were checked to fail without their fix (the sticky-status one fails after 45 s with the detector read disabled).
 
+## 3b. Second round: codex, agy and pi in panes (defects found and fixed)
+
+Prior art first (`docs/specs/confinement-authority.md` section 13.1 records it): the sanctioned way to give a confined agent its account was already there (private-home `resourceBindings` on `codex-cli-bwrap` plus the machine-global provider account inventory, `RUL65b`), but only for cli-spawn and only for codex. The round extended it instead of adding a mechanism.
+
+| Commit | Defect (evidence) | Fix |
+|---|---|---|
+| `6e8d0304e` | A pane's agent could not be logged in: the herdr door never passed the leased account to the confinement request (`executeExecutorCli` read it from a bag nobody filled), and the dispatch refused credential provisioning for any adapter but cli-spawn. A codex pane showed the sign-in screen. | The door takes `providerCapacity`; the refusal no longer excludes herdr-spawn; new `home-files` credential source (explicit file list, owner-only, fail closed, exec bit kept for a helper) next to `codex-home`. |
+| `6e8d0304e` | The private home starts without trust decisions, so codex stopped at its folder-trust dialog; trust was seeded only into the real account store. | Trust is derived from the real store and written to the private one (`config.toml` / agy `settings.json`); a linked worktree may derive it from its main checkout. The real store is not edited. |
+| `6e8d0304e` | agy: the typed brief was lost (the pane showed an empty prompt for 5 minutes). herdr says "idle" for an agent kind it has no screen rule for even while the UI is not drawn, the brief went in 1.7 s after launch, and the resend never fired because a boot spinner counted as "brief taken". | For a verdict with no rule, the brief is typed after the screen has changed from the launch and held still (bounded at 15 s); the live herdr test no longer depends on a 2-second worker. |
+| `acde5fd07` | The three herdr invocations passed the prompt as an argument: agy rejected it ("Prompts are read only from -p/--print"), and codex/pi received the assignment prompt (with an artifact path outside the outbox) beside the brief. | `{prompt}` removed from the herdr args; the round types the brief pointer. codex trades `--dangerously-bypass-approvals-and-sandbox` for `-s danger-full-access -a never` (bwrap encloses it); `resourceBindings` private-home added to all three. |
+| `4106fbc55` | The first Workflow attempt failed: the second and third panelist were refused with "dispatch for cwd ... is already in flight" (`ca3-first-attempt/`). The herdr door held an exclusive per-directory lock for every call. | A read-only dispatch shares the directory (as the supervisor path already did); a writer is still refused. |
+| `2880e3846` | `provider-capacity-selection.json` said `credentialProvisioned: false` for a pane that had its account. | Read from the prepared-invocation record. |
+| `6912291dc` | A successful pane run left its private home, with a copy of the account login, in the temp directory. | Removed once the worker returned; kept after a failure, like its pane. |
+| `27030e1b8` | A confined pane with no matching account in the inventory would only show a sign-in screen. | `fgos doctor` check `confined-pane-accounts`. |
+
+Machine state: the three accounts were added to `runner.providers` in `~/.fgos/config.json` (openai: `fgovn`; xai: `vantt`; gemini: `mucdong`, with their credential file lists; the file before the change is not kept in the repo). That inventory is global-only by design, so a fresh machine needs the same entries; `fgos doctor` names a pane whose entry is missing. Panes I opened were closed; the stale credential copies of earlier failed rounds under `/tmp/fgos-confinement` were removed.
+
+Verification: `CLAUDE_CODE_SESSION_ID` unset, `test/runner` 2416 tests (before the last two fixes), `test/cli` 841 (776 pass, rest todo), `test/workflow` 23, `test/setup` 651; full `npm test` after the last code commit: 6550 tests, 6477 pass, 0 fail, 8 skipped, 65 todo.
+
 ## 4. Trust prompt (claude workspace trust)
 
 Not reproduced on this machine. `visibility.json` of every claude/glm pane records `trustSeedFailed: trust seed refused for "/var/tmp/p6-accept-work": its repo root "/home/vantt/projects/forgentX-p6" is not itself trusted, so there is nothing to derive trust from` (seeding is derived only from a trusted repo root, by design; the p6 worktree is not in `~/.claude.json`, only `/home/vantt/projects/forgentX` is). Despite that no trust dialog appeared in any sampled pane screen (`ca2/ca4 pane logs`, 1-3 s sampling), and `claude` started in `/var/tmp/p6-accept-work` without one (the owner's settings have `skipDangerousModePermissionPrompt: true`). So the code path that seeds for the real cwd works when the root is trusted (existing tests), and where it is not, the new readiness check stops before typing at any visible dialog and the ladder reports `blocked` with the screen line. I did not widen trust derivation and did not touch `~/.claude.json`; the entries the runner seeds are removed on settle (`trustRemoved: claude-json`). If the owner still sees the dialog, send me the pane text: it would be a different build/setting than the one measured here.
 
 ## 5. Concerns and what is not covered
 
-1. **G7 is only met for the claude family** (claude, and claude routed through OpenRouter). openai/gemini/xai herdr invocations cannot run confined (case 3). Before they can, the confinement layer needs a design for writable per-account state and credential provisioning for non-claude agents; and `agy-herdr-mucdong` needs its prompt delivery fixed.
+1. **G7 is now met for five families** (claude, claude routed through OpenRouter as z-ai, openai/codex, gemini/agy, xai/pi), each with one account in the pane executors. Concerns that remain: the inventory entries live in the machine-global config and are not created by `fgos setup`; pi downloads nothing now only because `bin/fd` is in its file list; an agent that keeps state the file list does not name (a new onboarding flag, say) will meet it as a first-run screen, which the readiness check reports as `blocked` or an idle timeout, not as a silent pass.
 2. **Pane startup noise and cost:** every sandboxed claude prints five `SessionStart:startup hook error ... EROFS ... ~/.claude/session-env` lines (harmless; sessions are not persisted). The glm reviewer is slow and its first submit key was lost both times (`enters=1`); durations 101 s and 234 s against 25 s for claude.
 3. **Fallback was proven with a fake screen only**; the limit patterns (`DEFAULT_USAGE_LIMIT_PATTERNS`) remain unmeasured against a real claude/codex limit screen. cli-spawn has no limit detection, so a headless run never falls back.
 4. **Idle limit:** the herdr default (5 min) makes a long silent stretch with the detector reporting `idle` stale; claude working shows as `working` so ordinary runs are not affected, but a run that legitimately waits more than 5 minutes idle needs `idleTimeoutMs`.

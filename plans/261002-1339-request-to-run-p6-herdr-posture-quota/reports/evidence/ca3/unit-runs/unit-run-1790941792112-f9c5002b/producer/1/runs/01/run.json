@@ -1,0 +1,20 @@
+{
+  "contract": "assignment-run.v2",
+  "runId": "run_unit-run-1790941792112-f9c5002b/producer/1_01",
+  "assignmentId": "unit-run-1790941792112-f9c5002b/producer/1",
+  "attempt": 1,
+  "supersedesRunId": null,
+  "retryId": null,
+  "payloadDigest": "sha256:ace0b5be7138091ec6c506d0466b336ea046b800f3e2eaa0df3955005b4f0d6c",
+  "dispatchPlanDigest": "sha256:c2fb621e5ecc73a5ff447d996627a72031783067ba2278d055ee75ac3468424d",
+  "phase": "admitted",
+  "delivery": "not-sent",
+  "executorId": "claude-herdr",
+  "dispatchPlanPath": ".fgos/assignments/unit-run-1790941792112-f9c5002b/producer/1/runs/01/dispatch-plan.json",
+  "effectiveContractPath": ".fgos/assignments/unit-run-1790941792112-f9c5002b/producer/1/runs/01/effective-execution-contract.json",
+  "cwd": "/home/vantt/projects/forgentX-p6",
+  "startedAt": "2026-10-02T11:49:52.116Z",
+  "timeoutMs": 2100000,
+  "status": "settled",
+  "settledAt": "2026-10-02T11:50:37.147Z"
+}

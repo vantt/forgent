@@ -1,0 +1,17 @@
+{
+  "contract": "provider-capacity-selection.v1",
+  "status": "selected",
+  "provider": "gemini",
+  "accountId": "mucdong",
+  "accountLabel": "mucdong",
+  "selectedAt": "2026-10-02T11:17:40.441Z",
+  "lease": {
+    "runId": "run_unit-run-1790939860393-05133ad0/producer/1_01",
+    "assignmentId": "unit-run-1790939860393-05133ad0/producer/1",
+    "pid": 2713339
+  },
+  "credentialProvisioned": true,
+  "reasonCodes": [
+    "unknown-or-low-confidence"
+  ]
+}

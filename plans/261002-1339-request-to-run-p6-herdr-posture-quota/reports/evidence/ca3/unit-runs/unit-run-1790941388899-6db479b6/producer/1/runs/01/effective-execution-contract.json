@@ -1,0 +1,67 @@
+{
+  "contract": {
+    "id": "effective-execution-contract",
+    "version": 1
+  },
+  "assignmentId": "unit-run-1790941388899-6db479b6/producer/1",
+  "runId": "run_unit-run-1790941388899-6db479b6/producer/1_01",
+  "mutation": "read-only",
+  "workspace": {
+    "cwd": "/home/vantt/projects/forgentX-p6",
+    "writeScope": [],
+    "mainCheckout": "/home/vantt/projects/forgentX",
+    "posture": "worktree"
+  },
+  "tools": {
+    "shell": {
+      "mode": "restricted",
+      "enforced": false,
+      "enforcement": "instructed",
+      "allowedCommands": []
+    }
+  },
+  "permissions": {
+    "posture": "enforced",
+    "shell": {
+      "mode": "restricted",
+      "enforced": false,
+      "enforcement": "instructed",
+      "allowedCommands": []
+    },
+    "filesystem": {
+      "mode": "read-only",
+      "enforced": true,
+      "enforcement": "enforced",
+      "writeScope": []
+    },
+    "network": {
+      "enforced": false,
+      "enforcement": "instructed"
+    }
+  },
+  "limits": {
+    "executorTimeoutMs": 2100000
+  },
+  "resultClaim": {
+    "contract": {
+      "id": "agent-result-claim",
+      "version": 2
+    },
+    "path": "/home/vantt/projects/forgentX-p6/.fgos/assignments/unit-run-1790941388899-6db479b6/producer/1/runs/01/outbox/result-1.json"
+  },
+  "provenance": {
+    "dispatchPlanHash": "sha256:f80fe59f46820d6827a39a727f8f181d66f495dcbe3ffecb65712a6ec2a27b86",
+    "configHash": "sha256:a529d7dbbbccda5ebe844ea3fe9e374e46ed999dadff4373d694ddcad76b5ede",
+    "executorId": "claude-herdr",
+    "adapter": "herdr-spawn",
+    "adapterFamily": "herdr-spawn"
+  },
+  "enforcementPosture": "enforced",
+  "permissionEnforcementPosture": "enforced",
+  "executorId": "claude-herdr",
+  "adapter": "herdr-spawn",
+  "adapterFamily": "herdr-spawn",
+  "assignment": {
+    "role": "producer"
+  }
+}

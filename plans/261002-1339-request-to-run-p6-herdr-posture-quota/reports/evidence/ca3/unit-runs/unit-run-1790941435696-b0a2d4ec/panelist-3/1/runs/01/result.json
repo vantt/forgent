@@ -1,0 +1,2051 @@
+{
+  "contract": {
+    "id": "assignment-run-result",
+    "version": 3
+  },
+  "runId": "run_unit-run-1790941435696-b0a2d4ec/panelist-3/1_01",
+  "assignmentId": "unit-run-1790941435696-b0a2d4ec/panelist-3/1",
+  "controlEpoch": 1,
+  "controlToken": "96f688a6-31c3-4927-a364-8525e057eca1",
+  "executorId": "gemini",
+  "adapter": "herdr-spawn",
+  "confinement": null,
+  "role": "panelist-3",
+  "executorRedirected": false,
+  "policy": {
+    "role": "panelist-3",
+    "executorPreference": [
+      "gemini"
+    ],
+    "executorId": "gemini",
+    "providerModel": "gemini",
+    "rigor": "standard",
+    "tier": "standard",
+    "model": "gemini-3.8-flash-medium",
+    "reasoningEffort": "medium",
+    "visibility": "headless",
+    "repeatMode": null,
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "gemini",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "provider": {
+        "value": "gemini",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "gemini"
+        }
+      },
+      "model": {
+        "value": "gemini-3.8-flash-medium",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "rigor": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "tier": {
+        "value": "standard",
+        "source": {
+          "scope": "rigor",
+          "id": "standard"
+        }
+      },
+      "reasoningEffort": {
+        "value": "medium",
+        "source": {
+          "scope": "derived",
+          "id": "rigor.standard"
+        }
+      },
+      "persona": {
+        "source": {
+          "scope": "default"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "repeatMode": {
+        "value": null,
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "unit-run-1790941435696-b0a2d4ec/panelist-3/1"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "gemini"
+        }
+      }
+    }
+  },
+  "settledAt": "2026-10-02T11:46:17.791Z",
+  "durationMs": 141840,
+  "claimSha256": "ba70d8cb9698336e89aece80845d614f4d91171c67dfe8b460020b0ed97d3852",
+  "settleReports": [
+    {
+      "path": ".fgos/assignments/unit-run-1790941435696-b0a2d4ec/panelist-3/1/runs/01/outbox/report-1.md",
+      "sha256": "f105ac0af35c1591833984ffb5d460d6b69e1b484a26b5b9294236ea77282944"
+    }
+  ],
+  "classification": {
+    "execution": {
+      "status": "completed",
+      "exitCode": 0
+    },
+    "assessment": {
+      "verdict": "pass"
+    },
+    "confidence": {
+      "level": "reported",
+      "basis": [
+        "valid-agent-result-claim",
+        "captured-stdout"
+      ]
+    },
+    "failure": null,
+    "policy": {
+      "disposition": "allow",
+      "code": null
+    },
+    "delivery": {
+      "mode": "fresh"
+    },
+    "provenance": "native-v3",
+    "outcome": {
+      "category": "ok",
+      "reason": "completed-pass"
+    }
+  },
+  "runtime": {
+    "exitCode": 0,
+    "stdoutLog": ".fgos/assignments/unit-run-1790941435696-b0a2d4ec/panelist-3/1/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/unit-run-1790941435696-b0a2d4ec/panelist-3/1/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "contract": {
+      "id": "agent-result-claim",
+      "version": 2
+    },
+    "status": "done",
+    "summary": "Completed constraint-focused advisory analysis recommending moving agent home layout and credential declarations from per-invocation config into provider adapters to make confinement safe by construction and eliminate omission regressions.",
+    "evidenceRefs": [
+      "/home/vantt/projects/forgentX-p6/.fgos/assignments/unit-run-1790941435696-b0a2d4ec/panelist-3/1/runs/01/outbox/report-1.md"
+    ]
+  },
+  "runnerNote": {
+    "summary": "Settled"
+  },
+  "usage": {
+    "inputTokens": null,
+    "outputTokens": null,
+    "totalTokens": null,
+    "cacheReadTokens": null,
+    "cacheCreationTokens": null,
+    "source": "unsupported"
+  },
+  "evidence": {
+    "gitBefore": "bff6fb806f680d114f985a0e04f25ab8507ff46a",
+    "gitAfter": "bff6fb806f680d114f985a0e04f25ab8507ff46a",
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [],
+    "mutatedDirtyBeforeFiles": [],
+    "attribution": [
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940009748-8cd431e8/producer/1/assignment.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940009748-8cd431e8/producer/1/runs/01/brief-1.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940009748-8cd431e8/producer/1/runs/01/dispatch-plan.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940009748-8cd431e8/producer/1/runs/01/effective-execution-contract.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940009748-8cd431e8/producer/1/runs/01/exit.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940009748-8cd431e8/producer/1/runs/01/outbox/ack-1.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940009748-8cd431e8/producer/1/runs/01/outbox/report-1.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940009748-8cd431e8/producer/1/runs/01/outbox/result-1.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940009748-8cd431e8/producer/1/runs/01/result.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940009748-8cd431e8/producer/1/runs/01/run.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940009748-8cd431e8/producer/1/runs/01/stderr.log",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940009748-8cd431e8/producer/1/runs/01/visibility.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940009748-8cd431e8/unit.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940074600-14ae6a17/panelist-1/1/assignment.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940074600-14ae6a17/panelist-1/1/runs/01/brief-1.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940074600-14ae6a17/panelist-1/1/runs/01/dispatch-plan.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940074600-14ae6a17/panelist-1/1/runs/01/effective-execution-contract.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940074600-14ae6a17/panelist-1/1/runs/01/exit.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940074600-14ae6a17/panelist-1/1/runs/01/outbox/ack-1.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940074600-14ae6a17/panelist-1/1/runs/01/outbox/report-1.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940074600-14ae6a17/panelist-1/1/runs/01/outbox/result-1.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940074600-14ae6a17/panelist-1/1/runs/01/result.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940074600-14ae6a17/panelist-1/1/runs/01/run.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940074600-14ae6a17/panelist-1/1/runs/01/stderr.log",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940074600-14ae6a17/panelist-1/1/runs/01/visibility.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940074600-14ae6a17/panelist-2/1/assignment.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940074600-14ae6a17/panelist-2/1/runs/01/dispatch-plan.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940074600-14ae6a17/panelist-2/1/runs/01/effective-execution-contract.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940074600-14ae6a17/panelist-2/1/runs/01/exit.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940074600-14ae6a17/panelist-2/1/runs/01/provider-capacity-selection.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940074600-14ae6a17/panelist-2/1/runs/01/result.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940074600-14ae6a17/panelist-2/1/runs/01/run.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940074600-14ae6a17/panelist-2/1/runs/01/stderr.log",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940074600-14ae6a17/panelist-3/1/assignment.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940074600-14ae6a17/panelist-3/1/runs/01/dispatch-plan.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940074600-14ae6a17/panelist-3/1/runs/01/effective-execution-contract.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940074600-14ae6a17/panelist-3/1/runs/01/exit.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940074600-14ae6a17/panelist-3/1/runs/01/provider-capacity-selection.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940074600-14ae6a17/panelist-3/1/runs/01/result.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940074600-14ae6a17/panelist-3/1/runs/01/run.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940074600-14ae6a17/panelist-3/1/runs/01/stderr.log",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/unit-runs/unit-run-1790940074600-14ae6a17/unit.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-first-attempt/workflow-events.jsonl",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/agy/pane-frames.txt",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/agy/unit-run-1790939860393-05133ad0/producer/1/assignment.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/agy/unit-run-1790939860393-05133ad0/producer/1/runs/01/brief-1.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/agy/unit-run-1790939860393-05133ad0/producer/1/runs/01/dispatch-plan.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/agy/unit-run-1790939860393-05133ad0/producer/1/runs/01/effective-execution-contract.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/agy/unit-run-1790939860393-05133ad0/producer/1/runs/01/exit.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/agy/unit-run-1790939860393-05133ad0/producer/1/runs/01/outbox/ack-1.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/agy/unit-run-1790939860393-05133ad0/producer/1/runs/01/outbox/report-1.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/agy/unit-run-1790939860393-05133ad0/producer/1/runs/01/outbox/result-1.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/agy/unit-run-1790939860393-05133ad0/producer/1/runs/01/provider-capacity-selection.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/agy/unit-run-1790939860393-05133ad0/producer/1/runs/01/result.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/agy/unit-run-1790939860393-05133ad0/producer/1/runs/01/run.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/agy/unit-run-1790939860393-05133ad0/producer/1/runs/01/stderr.log",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/agy/unit-run-1790939860393-05133ad0/producer/1/runs/01/visibility.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/agy/unit-run-1790939860393-05133ad0/unit.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/codex/pane-frames.txt",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/codex/unit-run-1790939670033-64a7b5b3/producer/1/assignment.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/codex/unit-run-1790939670033-64a7b5b3/producer/1/runs/01/brief-1.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/codex/unit-run-1790939670033-64a7b5b3/producer/1/runs/01/dispatch-plan.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/codex/unit-run-1790939670033-64a7b5b3/producer/1/runs/01/effective-execution-contract.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/codex/unit-run-1790939670033-64a7b5b3/producer/1/runs/01/exit.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/codex/unit-run-1790939670033-64a7b5b3/producer/1/runs/01/outbox/ack-1.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/codex/unit-run-1790939670033-64a7b5b3/producer/1/runs/01/outbox/report-1.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/codex/unit-run-1790939670033-64a7b5b3/producer/1/runs/01/outbox/result-1.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/codex/unit-run-1790939670033-64a7b5b3/producer/1/runs/01/provider-capacity-selection.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/codex/unit-run-1790939670033-64a7b5b3/producer/1/runs/01/result.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/codex/unit-run-1790939670033-64a7b5b3/producer/1/runs/01/run.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/codex/unit-run-1790939670033-64a7b5b3/producer/1/runs/01/stderr.log",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/codex/unit-run-1790939670033-64a7b5b3/producer/1/runs/01/visibility.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/codex/unit-run-1790939670033-64a7b5b3/unit.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/pi/pane-frames.txt",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/pi/unit-run-1790939810248-f68c3739/producer/1/assignment.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/pi/unit-run-1790939810248-f68c3739/producer/1/runs/01/brief-1.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/pi/unit-run-1790939810248-f68c3739/producer/1/runs/01/dispatch-plan.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/pi/unit-run-1790939810248-f68c3739/producer/1/runs/01/effective-execution-contract.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/pi/unit-run-1790939810248-f68c3739/producer/1/runs/01/exit.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/pi/unit-run-1790939810248-f68c3739/producer/1/runs/01/outbox/ack-1.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/pi/unit-run-1790939810248-f68c3739/producer/1/runs/01/outbox/report-1.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/pi/unit-run-1790939810248-f68c3739/producer/1/runs/01/outbox/result-1.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/pi/unit-run-1790939810248-f68c3739/producer/1/runs/01/provider-capacity-selection.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/pi/unit-run-1790939810248-f68c3739/producer/1/runs/01/result.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/pi/unit-run-1790939810248-f68c3739/producer/1/runs/01/run.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/pi/unit-run-1790939810248-f68c3739/producer/1/runs/01/stderr.log",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/pi/unit-run-1790939810248-f68c3739/producer/1/runs/01/visibility.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/pi/unit-run-1790939810248-f68c3739/unit.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3-providers/provider-probe-unit.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940254886-08364eae/producer/1/assignment.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940254886-08364eae/producer/1/runs/01/brief-1.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940254886-08364eae/producer/1/runs/01/dispatch-plan.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940254886-08364eae/producer/1/runs/01/effective-execution-contract.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940254886-08364eae/producer/1/runs/01/exit.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940254886-08364eae/producer/1/runs/01/outbox/ack-1.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940254886-08364eae/producer/1/runs/01/outbox/report-1.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940254886-08364eae/producer/1/runs/01/outbox/result-1.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940254886-08364eae/producer/1/runs/01/result.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940254886-08364eae/producer/1/runs/01/run.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940254886-08364eae/producer/1/runs/01/stderr.log",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940254886-08364eae/producer/1/runs/01/visibility.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940254886-08364eae/unit.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-1/1/assignment.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-1/1/runs/01/brief-1.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-1/1/runs/01/dispatch-plan.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-1/1/runs/01/effective-execution-contract.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-1/1/runs/01/exit.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-1/1/runs/01/outbox/ack-1.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-1/1/runs/01/outbox/report-1.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-1/1/runs/01/outbox/result-1.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-1/1/runs/01/result.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-1/1/runs/01/run.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-1/1/runs/01/stderr.log",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-1/1/runs/01/visibility.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-2/1/assignment.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-2/1/runs/01/brief-1.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-2/1/runs/01/dispatch-plan.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-2/1/runs/01/effective-execution-contract.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-2/1/runs/01/exit.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-2/1/runs/01/outbox/ack-1.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-2/1/runs/01/outbox/report-1.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-2/1/runs/01/outbox/result-1.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-2/1/runs/01/provider-capacity-selection.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-2/1/runs/01/result.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-2/1/runs/01/run.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-2/1/runs/01/stderr.log",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-2/1/runs/01/visibility.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-3/1/assignment.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-3/1/runs/01/brief-1.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-3/1/runs/01/dispatch-plan.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-3/1/runs/01/effective-execution-contract.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-3/1/runs/01/exit.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-3/1/runs/01/outbox/ack-1.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-3/1/runs/01/outbox/report-1.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-3/1/runs/01/outbox/result-1.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-3/1/runs/01/provider-capacity-selection.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-3/1/runs/01/result.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-3/1/runs/01/run.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-3/1/runs/01/stderr.log",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/panelist-3/1/runs/01/visibility.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/synthesizer/1/assignment.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/synthesizer/1/runs/01/brief-1.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/synthesizer/1/runs/01/dispatch-plan.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/synthesizer/1/runs/01/effective-execution-contract.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/synthesizer/1/runs/01/exit.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/synthesizer/1/runs/01/outbox/ack-1.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/synthesizer/1/runs/01/outbox/report-1.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/synthesizer/1/runs/01/outbox/result-1.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/synthesizer/1/runs/01/provider-capacity-selection.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/synthesizer/1/runs/01/result.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/synthesizer/1/runs/01/run.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/synthesizer/1/runs/01/stderr.log",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/synthesizer/1/runs/01/visibility.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940300142-bd0e7f96/unit.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940467005-a6d0361e/producer/1/assignment.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940467005-a6d0361e/producer/1/runs/01/brief-1.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940467005-a6d0361e/producer/1/runs/01/dispatch-plan.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940467005-a6d0361e/producer/1/runs/01/effective-execution-contract.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940467005-a6d0361e/producer/1/runs/01/exit.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940467005-a6d0361e/producer/1/runs/01/outbox/ack-1.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940467005-a6d0361e/producer/1/runs/01/outbox/report-1.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940467005-a6d0361e/producer/1/runs/01/outbox/result-1.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940467005-a6d0361e/producer/1/runs/01/result.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940467005-a6d0361e/producer/1/runs/01/run.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940467005-a6d0361e/producer/1/runs/01/stderr.log",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940467005-a6d0361e/producer/1/runs/01/visibility.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940467005-a6d0361e/reviewer/1/assignment.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940467005-a6d0361e/reviewer/1/runs/01/brief-1.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940467005-a6d0361e/reviewer/1/runs/01/dispatch-plan.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940467005-a6d0361e/reviewer/1/runs/01/effective-execution-contract.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940467005-a6d0361e/reviewer/1/runs/01/exit.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940467005-a6d0361e/reviewer/1/runs/01/outbox/ack-1.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940467005-a6d0361e/reviewer/1/runs/01/outbox/report-1.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940467005-a6d0361e/reviewer/1/runs/01/outbox/result-1.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940467005-a6d0361e/reviewer/1/runs/01/provider-capacity-selection.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940467005-a6d0361e/reviewer/1/runs/01/result.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940467005-a6d0361e/reviewer/1/runs/01/run.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940467005-a6d0361e/reviewer/1/runs/01/stderr.log",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940467005-a6d0361e/reviewer/1/runs/01/visibility.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940467005-a6d0361e/unit.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940661490-08ea97de/producer/1/assignment.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940661490-08ea97de/producer/1/runs/01/brief-1.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940661490-08ea97de/producer/1/runs/01/dispatch-plan.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940661490-08ea97de/producer/1/runs/01/effective-execution-contract.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940661490-08ea97de/producer/1/runs/01/exit.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940661490-08ea97de/producer/1/runs/01/outbox/ack-1.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940661490-08ea97de/producer/1/runs/01/outbox/report-1.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940661490-08ea97de/producer/1/runs/01/outbox/result-1.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940661490-08ea97de/producer/1/runs/01/result.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940661490-08ea97de/producer/1/runs/01/run.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940661490-08ea97de/producer/1/runs/01/stderr.log",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940661490-08ea97de/producer/1/runs/01/visibility.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940661490-08ea97de/unit.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940721684-831cf324/producer/1/assignment.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940721684-831cf324/producer/1/runs/01/brief-1.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940721684-831cf324/producer/1/runs/01/dispatch-plan.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940721684-831cf324/producer/1/runs/01/effective-execution-contract.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940721684-831cf324/producer/1/runs/01/exit.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940721684-831cf324/producer/1/runs/01/outbox/ack-1.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940721684-831cf324/producer/1/runs/01/outbox/report-1.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940721684-831cf324/producer/1/runs/01/outbox/result-1.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940721684-831cf324/producer/1/runs/01/result.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940721684-831cf324/producer/1/runs/01/run.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940721684-831cf324/producer/1/runs/01/stderr.log",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940721684-831cf324/producer/1/runs/01/visibility.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/unit-runs/unit-run-1790940721684-831cf324/unit.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca3/workflow-events.jsonl",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      }
+    ],
+    "artifacts": [
+      ".fgos/assignments/unit-run-1790941435696-b0a2d4ec/panelist-3/1/runs/01/outbox/report-1.md",
+      ".fgos/assignments/unit-run-1790941435696-b0a2d4ec/panelist-3/1/runs/01/outbox/result-1.json"
+    ],
+    "tests": [],
+    "findingRefs": [
+      "/home/vantt/projects/forgentX-p6/.fgos/assignments/unit-run-1790941435696-b0a2d4ec/panelist-3/1/runs/01/outbox/report-1.md"
+    ]
+  }
+}
