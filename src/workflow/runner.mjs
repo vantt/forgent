@@ -39,7 +39,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
     // Find ready steps that haven't started or are running
     const readySteps = steps.filter((step) => {
       const stepState = state.steps[step.id];
-      if (!stepState || stepState.status === 'completed' || stepState.status === 'parked') {
+      if (!stepState || stepState.status === 'completed' || stepState.status === 'parked' || stepState.status === 'failed') {
         return false;
       }
       return step.dependsOn.every((dep) => completedStepIds.has(dep));
@@ -135,7 +135,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
 
       // 3. Standard step with units
       if (step.units && step.units.length > 0) {
-        let stepFailed = false;
+        let failedUnit = null;
         for (const u of step.units) {
           const uState = stepState.units[u.id];
           if (uState && uState.status === 'completed') {
@@ -202,13 +202,38 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
             },
           });
 
-          if (unitRunResult.outcome !== 'pass') {
-            stepFailed = true;
-          }
           stateChanged = true;
+          // A unit that did not pass stops its step: later units and dependent steps must not
+          // run on top of work that was refused, failed, or is still waiting on someone.
+          if (unitRunResult.outcome !== 'pass') {
+            failedUnit = { unitId: u.id, outcome: unitRunResult.outcome, results: unitRunResult.results || [] };
+            break;
+          }
         }
 
-        if (!stepFailed) {
+        if (failedUnit) {
+          const refusal = failedUnit.results.find((r) => r?.refused)?.refused;
+          const reason = refusal ? `${refusal.reason}: ${refusal.detail}` : `unit ${failedUnit.unitId} ended ${failedUnit.outcome}`;
+          appendWorkflowEvent({
+            repoRoot: mainRoot,
+            workflowRunId,
+            event: {
+              type: 'step.fail',
+              payload: { stepId: step.id, outcome: failedUnit.outcome, unitId: failedUnit.unitId, reason, failedAt: new Date().toISOString() },
+            },
+          });
+          appendWorkflowEvent({
+            repoRoot: mainRoot,
+            workflowRunId,
+            event: {
+              type: 'workflow.fail',
+              payload: { outcome: failedUnit.outcome, stepId: step.id, reason, failedAt: new Date().toISOString() },
+            },
+          });
+          break;
+        }
+
+        {
           appendWorkflowEvent({
             repoRoot: mainRoot,
             workflowRunId,

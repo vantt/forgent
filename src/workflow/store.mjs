@@ -215,6 +215,19 @@ export function projectWorkflowState(events) {
         }
         break;
 
+      case 'step.fail':
+        if (steps[p.stepId]) {
+          steps[p.stepId].status = 'failed';
+          steps[p.stepId].outcome = p.outcome || 'failed';
+          steps[p.stepId].reason = p.reason ?? null;
+        }
+        break;
+
+      case 'workflow.fail':
+        status = 'failed';
+        outcome = p.outcome || 'failed';
+        break;
+
       case 'workflow.complete':
         status = 'completed';
         outcome = p.outcome || 'pass';

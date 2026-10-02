@@ -338,3 +338,38 @@ test('CLI: fgos workflow start, status, answer, and legacy operations', () => {
   );
   assert.ok(opsOut.includes('validate-plan') || opsOut.includes('operations'));
 });
+
+test('a unit refused by policy fails its step and the workflow; dependent steps never run', async () => {
+  const tmp = setupTestRepo();
+  const workflow = validateWorkflow({
+    id: 'refusal-stops-run',
+    steps: [
+      {
+        id: 'first',
+        units: [{ id: 'u1', template: { capability: 'unconfigured:capability', pattern: 'solo', objective: 'no executor serves this' } }],
+      },
+      {
+        id: 'second',
+        dependsOn: ['first'],
+        units: [{ id: 'u2', template: { capability: 'docs:write', pattern: 'solo', objective: 'must never start' } }],
+      },
+    ],
+  });
+
+  const state = await startWorkflow({ workflow, repoRoot: tmp, cwd: tmp, worktree: tmp });
+
+  assert.equal(state.status, 'failed');
+  assert.equal(state.outcome, 'policy-refusal');
+  assert.equal(state.steps.first.status, 'failed');
+  assert.match(state.steps.first.reason, /unconfigured:capability/);
+  assert.equal(state.steps.second.status, 'pending');
+  assert.deepEqual(state.steps.second.units, {});
+
+  // Resuming a failed run must not start the dependent step either.
+  const resumed = await resumeWorkflow(state.workflowRunId, { repoRoot: tmp, cwd: tmp, worktree: tmp });
+  assert.equal(resumed.status, 'failed');
+  assert.equal(resumed.steps.second.status, 'pending');
+  const types = readWorkflowEvents({ repoRoot: tmp, workflowRunId: state.workflowRunId }).map((e) => e.type);
+  assert.ok(!types.includes('step.complete'));
+  assert.deepEqual(types.filter((t) => t === 'step.fail' || t === 'workflow.fail'), ['step.fail', 'workflow.fail']);
+});
