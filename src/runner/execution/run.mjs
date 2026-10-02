@@ -7,10 +7,33 @@ import crypto from 'node:crypto';
 import { execFileSync, execSync } from 'node:child_process';
 
 import { validateUnit } from './unit.mjs';
-import { bind } from './bind.mjs';
+import { bind, nextCandidate } from './bind.mjs';
 import { runPattern } from './patterns/index.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { ensureRunnerConfigForDir, RunnerConfigError } from '../dispatch/config.mjs';
+
+/**
+ * Map a settled RunResult onto the outcome vocabulary the collaboration patterns use.
+ * A provider limit is an infra failure carrying its own code, so a caller can tell
+ * "this provider has no quota" from any other infrastructure failure.
+ */
+export function outcomeOfRunResult(runResult) {
+  const category = runResult?.classification?.outcome?.category ?? 'ok';
+  const failureCode = runResult?.classification?.failure?.code;
+  if (category === 'ok') return 'pass';
+  if (category === 'verdict' && runResult?.classification?.assessment?.verdict === 'findings') return 'findings';
+  if (category === 'blocked') return 'blocked';
+  if (category === 'policy') return 'policy-refusal';
+  if (category === 'infra' && (failureCode === 'provider-limit' || failureCode === 'paused-limit')) return 'provider-limit';
+  return 'execution-failure';
+}
+
+/** Write `file` atomically so a reader never sees half a record. */
+function writeJsonAtomic(file, value) {
+  const tmp = `${file}.${process.pid}.${crypto.randomBytes(4).toString('hex')}.tmp`;
+  fs.writeFileSync(tmp, JSON.stringify(value, null, 2));
+  fs.renameSync(tmp, file);
+}
 
 /**
  * Whether this process runs inside a live herdr session: herdr exports HERDR_ENV=1 and the
@@ -196,7 +219,9 @@ export async function runUnit(options = {}) {
 
   const unitDir = path.join(assignmentsDir, unitRunId);
 
-  // Helper to read history
+  // Helper to read history. A role/round has one assignment directory per attempt: `<round>`
+  // for the first binding and `<round>-fb<n>` for each fallback after a provider limit; the
+  // latest attempt is the one that counts.
   const history = () => {
     const records = [];
     if (!fs.existsSync(unitDir)) return records;
@@ -206,27 +231,30 @@ export async function runUnit(options = {}) {
         if (entry.isDirectory()) {
           const role = entry.name;
           const roleDir = path.join(unitDir, role);
-          const roundEntries = fs.readdirSync(roleDir, { withFileTypes: true });
-          for (const roundEntry of roundEntries) {
-            if (roundEntry.isDirectory()) {
-              const round = Number.parseInt(roundEntry.name, 10);
-              const resultFile = path.join(roleDir, roundEntry.name, 'runs', '01', 'result.json');
-              if (fs.existsSync(resultFile)) {
-                try {
-                  const runResult = JSON.parse(fs.readFileSync(resultFile, 'utf8'));
-                  const category = runResult.classification?.outcome?.category ?? 'ok';
-                  let outcome = 'pass';
-                  if (category === 'ok') outcome = 'pass';
-                  else if (category === 'verdict' && runResult.classification?.assessment?.verdict === 'findings') outcome = 'findings';
-                  else if (category === 'blocked') outcome = 'blocked';
-                  else if (category === 'policy') outcome = 'policy-refusal';
-                  else if (category === 'infra' && (runResult.classification?.failure?.code === 'provider-limit' || runResult.classification?.failure?.code === 'paused-limit')) outcome = 'provider-limit';
-                  else outcome = 'execution-failure';
-                  records.push({ role, round, outcome, runResult });
-                } catch {
-                  // Ignore corrupted result
-                }
-              }
+          const latestByRound = new Map();
+          for (const roundEntry of fs.readdirSync(roleDir, { withFileTypes: true })) {
+            if (!roundEntry.isDirectory()) continue;
+            const match = /^(\d+)(?:-fb(\d+))?$/.exec(roundEntry.name);
+            if (!match) continue;
+            const round = Number.parseInt(match[1], 10);
+            const fallbackNo = match[2] ? Number.parseInt(match[2], 10) : 0;
+            // A resumed binding runs again as a later attempt of the same assignment.
+            const runsDir = path.join(roleDir, roundEntry.name, 'runs');
+            const attempts = fs.existsSync(runsDir)
+              ? fs.readdirSync(runsDir).filter((name) => /^\d+$/.test(name)).sort()
+              : [];
+            const latestAttempt = attempts.reverse().find((name) => fs.existsSync(path.join(runsDir, name, 'result.json')));
+            if (!latestAttempt) continue;
+            const resultFile = path.join(runsDir, latestAttempt, 'result.json');
+            const known = latestByRound.get(round);
+            if (!known || fallbackNo > known.fallbackNo) latestByRound.set(round, { fallbackNo, resultFile });
+          }
+          for (const [round, { resultFile }] of latestByRound) {
+            try {
+              const runResult = JSON.parse(fs.readFileSync(resultFile, 'utf8'));
+              records.push({ role, round, outcome: outcomeOfRunResult(runResult), runResult });
+            } catch {
+              // Ignore corrupted result
             }
           }
         }
@@ -250,6 +278,71 @@ export async function runUnit(options = {}) {
   const resolveIndependence = (names) =>
     (names || []).flatMap((name) => (executorsByRole.has(name) ? [...executorsByRole.get(name)] : [name]));
 
+  // Bindings recorded in unit.json, per role/round, one entry per attempt (the first binding,
+  // then one per provider-limit fallback). A resumed run reuses them instead of binding again,
+  // so a resume never changes which executor or transport a role was already given.
+  if (!unitRecord.bindings || typeof unitRecord.bindings !== 'object') unitRecord.bindings = {};
+  for (const attempts of Object.values(unitRecord.bindings)) {
+    for (const attempt of attempts) noteRoleExecutor(attempt.role, attempt.binding?.executor);
+  }
+  const persistUnitRecord = () => writeJsonAtomic(path.join(unitDir, 'unit.json'), unitRecord);
+
+  // One dispatch of an already-bound role. Returns the settled outcome of that attempt.
+  const dispatchBound = async ({ bound, role, round, readOnly, assignmentId, assignmentDir, session }) => {
+    const runnerConfig = unitRecord.configSnapshot.runner;
+    fs.mkdirSync(assignmentDir, { recursive: true });
+
+    const assignment = {
+      assignmentId,
+      unitRunId,
+      role,
+      round,
+      objective: unit.objective,
+      mutation: readOnly ? 'read-only' : 'mutating',
+      binding: bound,
+      provenance: {
+        kind: 'unit-run',
+        unitRunId,
+        role,
+        round,
+        binding: bound,
+      },
+      expectedOutputs: unit.expectedOutputs || [],
+      contextRefs: unit.inputs || [],
+      writes: unit.writes || [],
+      policy: {
+        tier: bound.tier,
+        preferExecutor: bound.executor,
+        preferInvocation: bound.invocation,
+        preferPersona: bound.persona,
+      },
+    };
+
+    const runResult = await executeAssignment(assignment, {
+      cwd: unitRecord.worktree,
+      repoRoot: mainRoot,
+      runnerConfig,
+      cliOverride: {
+        preferExecutor: bound.executor,
+        // bind() already chose the invocation that carries bound.transport: the executor's
+        // herdr-spawn one for 'herdr', its cli one otherwise.
+        preferInvocation: bound.invocation,
+        tier: bound.tier,
+        model: bound.model,
+      },
+      isReadOnlyMode: readOnly,
+      session,
+    });
+
+    return {
+      outcome: outcomeOfRunResult(runResult),
+      role,
+      round,
+      runResult,
+      binding: bound,
+    };
+  };
+
   // Helper to run a role
   const runRole = async ({ role, unit: rUnit, readOnly = false, round = 1, independentOf = [], inputs = [] }) => {
     const runnerConfig = unitRecord.configSnapshot.runner;
@@ -261,19 +354,19 @@ export async function runUnit(options = {}) {
       headless: options.session?.headless ?? true,
     };
 
-    const bound = bind(
-      {
-        unit: rUnit || unit,
-        role,
-        readOnly,
-        independentOf: resolveIndependence(independentOf),
-        overrides: unitRecord.overrides || [],
-      },
-      {
-        runnerConfig,
-        session,
-      },
-    );
+    const ask = {
+      unit: rUnit || unit,
+      role,
+      readOnly,
+      independentOf: resolveIndependence(independentOf),
+      overrides: unitRecord.overrides || [],
+    };
+    const bindCtx = { runnerConfig, session };
+
+    const key = `${role}/${round}`;
+    const recorded = unitRecord.bindings[key] ?? [];
+    let attemptNo = recorded.length > 0 ? recorded.length - 1 : 0;
+    let bound = recorded.length > 0 ? recorded[recorded.length - 1].binding : bind(ask, bindCtx);
 
     if (bound.refused) {
       return {
@@ -310,66 +403,53 @@ export async function runUnit(options = {}) {
       };
     }
 
-    // Out-of-process dispatch
-    const assignmentId = `${unitRunId}/${role}/${round}`;
-    const assignmentDir = path.join(unitDir, role, String(round));
-    fs.mkdirSync(assignmentDir, { recursive: true });
+    // Out-of-process dispatch, with provider-limit fallback: when the agent stops on a provider
+    // limit, the next candidate of the capability's prefer pool runs in a fresh pane/process and
+    // the limited one is left exactly as it was (its pane stays open). With no candidate left
+    // the outcome stays provider-limit -- no other executor is guessed at.
+    for (;;) {
+      const assignmentId = attemptNo === 0 ? `${unitRunId}/${role}/${round}` : `${unitRunId}/${role}/${round}-fb${attemptNo}`;
+      const assignmentDir = path.join(unitDir, role, attemptNo === 0 ? String(round) : `${round}-fb${attemptNo}`);
 
-    const assignment = {
-      assignmentId,
-      unitRunId,
-      role,
-      round,
-      objective: unit.objective,
-      mutation: readOnly ? 'read-only' : 'mutating',
-      binding: bound,
-      provenance: {
-        kind: 'unit-run',
-        unitRunId,
-        role,
-        round,
-        binding: bound,
-      },
-      expectedOutputs: unit.expectedOutputs || [],
-      contextRefs: unit.inputs || [],
-      writes: unit.writes || [],
-      policy: {
-        tier: bound.tier,
-        preferExecutor: bound.executor,
-        preferInvocation: bound.invocation,
-        preferPersona: bound.persona,
-      },
-    };
+      const attempts = unitRecord.bindings[key] ?? (unitRecord.bindings[key] = []);
+      if (attempts.length <= attemptNo) {
+        attempts.push({
+          role,
+          round,
+          assignmentId,
+          binding: bound,
+          transport: bound.transport,
+          invocation: bound.invocation,
+          fallbackFrom: bound.provenance?.fallbackFrom ?? null,
+          boundAt: new Date().toISOString(),
+        });
+        persistUnitRecord();
+      }
 
-    const runResult = await executeAssignment(assignment, {
-      cwd: unitRecord.worktree,
-      repoRoot: mainRoot,
-      runnerConfig,
-      cliOverride: {
-        preferExecutor: bound.executor,
-        preferInvocation: bound.invocation,
-        tier: bound.tier,
-        model: bound.model,
-      },
-      isReadOnlyMode: readOnly,
-      session,
-    });
+      const result = await dispatchBound({ bound, role, round, readOnly, assignmentId, assignmentDir, session });
 
-    const category = runResult?.classification?.outcome?.category ?? 'ok';
-    let outcome = 'pass';
-    if (category === 'ok') outcome = 'pass';
-    else if (category === 'verdict' && runResult?.classification?.assessment?.verdict === 'findings') outcome = 'findings';
-    else if (category === 'blocked') outcome = 'blocked';
-    else if (category === 'policy') outcome = 'policy-refusal';
-    else if (category === 'infra' && (runResult?.classification?.failure?.code === 'provider-limit' || runResult?.classification?.failure?.code === 'paused-limit')) outcome = 'provider-limit';
-    else outcome = 'execution-failure';
+      attempts[attemptNo].outcome = result.outcome;
+      attempts[attemptNo].runId = result.runResult?.runId ?? null;
+      persistUnitRecord();
 
-    return {
-      outcome,
-      role,
-      round,
-      runResult,
-    };
+      if (result.outcome !== 'provider-limit') return result;
+
+      const next = nextCandidate(bound, ask, bindCtx, 'provider-limit');
+      if (next.refused || next.mechanism === 'inline') {
+        return {
+          ...result,
+          fallbackExhausted: {
+            from: { executor: bound.executor, invocation: bound.invocation, transport: bound.transport },
+            reason: next.refused ? next.refused.reason : 'only-inline-candidate-left',
+            detail: next.refused ? next.refused.detail : 'no out-of-process candidate is left to run this role',
+          },
+        };
+      }
+
+      noteRoleExecutor(role, next.executor);
+      bound = next;
+      attemptNo += 1;
+    }
   };
 
   // Helper for verify command

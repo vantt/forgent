@@ -39,13 +39,16 @@ function normalizeCandidates(prefer) {
 }
 
 /**
- * Check if executor has an invocation with via: 'cli' and adapter: 'herdr-spawn'
+ * The executor's herdr-spawn invocation, when it has one a caller can pin by id.
+ * A herdr invocation without an id cannot be named, so it is never chosen.
  */
-function hasHerdrCliInvocation(executorEntry) {
+function findHerdrInvocation(executorEntry) {
   if (!executorEntry || !Array.isArray(executorEntry.invocations)) {
-    return false;
+    return null;
   }
-  return executorEntry.invocations.some((inv) => inv?.via === 'cli' && inv?.adapter === 'herdr-spawn');
+  return executorEntry.invocations.find(
+    (inv) => inv?.via === 'cli' && inv?.adapter === 'herdr-spawn' && typeof inv.id === 'string' && inv.id,
+  ) ?? null;
 }
 
 /**
@@ -151,16 +154,15 @@ export function bind(ask, ctx, { skipCandidateIndex = -1 } = {}) {
 
   // 3. Candidate resolution & Filtering
   let chosenCandidate = null;
+  let chosenCandidateIndex = -1;
   let refusalReason = null;
   let refusalDetail = null;
 
   if (candidatePool.length > 0) {
-    let poolToSearch = candidatePool;
-    if (skipCandidateIndex >= 0) {
-      poolToSearch = candidatePool.slice(skipCandidateIndex + 1);
-    }
-
-    for (const cand of poolToSearch) {
+    for (let poolIndex = 0; poolIndex < candidatePool.length; poolIndex += 1) {
+      // A fallback walk resumes after the candidate that just failed.
+      if (poolIndex <= skipCandidateIndex) continue;
+      const cand = candidatePool[poolIndex];
       const executorId = cand.executor;
       const executorEntry = executors[executorId];
       const providerFamily = getProviderFamily(runnerConfig, executorId);
@@ -211,6 +213,7 @@ export function bind(ask, ctx, { skipCandidateIndex = -1 } = {}) {
 
       // Candidate passed filters
       chosenCandidate = cand;
+      chosenCandidateIndex = poolIndex;
       break;
     }
   }
@@ -244,16 +247,28 @@ export function bind(ask, ctx, { skipCandidateIndex = -1 } = {}) {
   }
 
   const executorId = chosenCandidate.executor;
-  const invocation = chosenCandidate.invocation;
   const executorEntry = executors[executorId];
   const providerFamily = getProviderFamily(runnerConfig, executorId);
 
-  // 4. Transport (G7)
+  // 4. Transport (G7): herdr when this session runs inside one and the executor has a
+  // herdr-spawn invocation that can carry the posture; the invocation that runs is then
+  // that herdr one. An invocation a human pinned by override stays as pinned.
+  let invocation = chosenCandidate.invocation;
   let transport = 'cli';
   let transportSource = 'default-cli';
-  if (hasHerdrCliInvocation(executorEntry) && session.herdrPresent === true) {
-    transport = 'herdr';
-    transportSource = 'herdr-invocation-present';
+  const herdrInvocation = findHerdrInvocation(executorEntry);
+  if (chosenCandidate.override?.invocation) {
+    transportSource = 'override-pinned-invocation';
+    const pinned = executorEntry?.invocations?.find((inv) => inv?.id === invocation);
+    if (pinned?.adapter === 'herdr-spawn') transport = 'herdr';
+  } else if (herdrInvocation && session.herdrPresent === true && !chosenCandidate.isInlineFallback) {
+    if (canApplyPosture({ executor: executorId, invocation: herdrInvocation.id }, posture, { runnerConfig, executors })) {
+      transport = 'herdr';
+      transportSource = 'herdr-invocation-present';
+      invocation = herdrInvocation.id;
+    } else {
+      transportSource = 'cli:herdr-invocation-cannot-apply-posture';
+    }
   }
 
   // 5. Mechanism (Q-A / D-ADR0033)
@@ -366,6 +381,7 @@ export function bind(ask, ctx, { skipCandidateIndex = -1 } = {}) {
     executor: executorId,
     invocation: invocation ?? null,
     transport,
+    candidateIndex: chosenCandidateIndex,
     tier: finalTier,
     model,
     persona: persona ?? null,
@@ -386,12 +402,16 @@ export function bind(ask, ctx, { skipCandidateIndex = -1 } = {}) {
  * @returns {object} next binding or refusal
  */
 export function nextCandidate(prevBinding, ask, ctx, reason = 'provider-limit') {
-  const { runnerConfig = {} } = ctx ?? {};
-  const { entry: capConfig } = lookupCapabilityConfig(runnerConfig, ask?.unit?.capability);
-  const candidates = normalizeCandidates(capConfig?.prefer);
-
-  const prevIndex = candidates.findIndex((c) => c.executor === prevBinding?.executor);
-  const nextResult = bind(ask, ctx, { skipCandidateIndex: prevIndex >= 0 ? prevIndex : 0 });
+  const prevIndex = Number.isInteger(prevBinding?.candidateIndex) ? prevBinding.candidateIndex : -1;
+  if (prevIndex < 0) {
+    return {
+      refused: {
+        reason: 'no-candidate',
+        detail: 'the previous binding did not come from a capability prefer pool, so there is no next candidate',
+      },
+    };
+  }
+  const nextResult = bind(ask, ctx, { skipCandidateIndex: prevIndex });
 
   if (nextResult.refused) {
     return nextResult;
@@ -402,6 +422,8 @@ export function nextCandidate(prevBinding, ask, ctx, reason = 'provider-limit') 
     ...nextResult.provenance,
     fallbackFrom: {
       executor: prevBinding.executor,
+      invocation: prevBinding.invocation ?? null,
+      transport: prevBinding.transport ?? null,
       reason,
     },
   };

@@ -1437,6 +1437,13 @@ export async function executeAssignment(assignment, opts = {}) {
   const executorRedirected = resolvedExecutorId !== defaultExecutorId;
   // `let`: see the Phase B note on `compiledPlan` above.
   let resolvedAdapter = compiledPlan?.invocation?.adapter || cfg.executors?.[resolvedExecutorId]?.adapter || cfg.executor?.adapter || 'cli-spawn';
+  // The compiled plan describes the pinned invocation already; this only covers a pin
+  // the plan could not see (a compiled plan that predates the pin on resume).
+  if (hasExplicitInvocationPin) {
+    const pinnedInvocation = cfg.executors?.[resolvedExecutorId]?.invocations
+      ?.find((inv) => inv?.id === opts.cliOverride.preferInvocation && inv?.via === 'cli');
+    if (pinnedInvocation?.adapter) resolvedAdapter = pinnedInvocation.adapter;
+  }
 
   let effectiveCwd = compiledPlan?.invocation?.cwd ?? compiledPlan?.cwd ?? cwd;
   const timeoutMs = opts.timeoutMs ?? cfg.timeoutMs ?? 900000;
@@ -2570,15 +2577,28 @@ export async function executeAssignment(assignment, opts = {}) {
           // null here and this call is byte-identical to before this fix.
           ...(needsAssignmentLaunchContext ? { assignmentLaunchContext, launchCommandId, controlEpoch, controlToken } : {}),
           ...(providerCapacitySelection ? { providerCapacity: providerCapacitySelection } : {}),
+          // The one confinement path: the posture an Assignment was bound with decides
+          // what wraps the agent in its pane, exactly as it does for cli-spawn.
+          ...(postureBinding?.posture
+            ? {
+                requirement: confinementRequirement,
+                ...(postureBinding.posture === 'workspace-write' ? { workspaceRoot: effectiveCwd } : {}),
+              }
+            : {}),
+          ...(hasExplicitInvocationPin ? { invocationId: opts.cliOverride.preferInvocation } : {}),
         });
       } catch (err) {
         executionError = err;
-        const isTimeoutErr = err.errorClass === 'worker-timeout' || err.category === 'worker-timeout' || /timed out/i.test(err.message);
+        // The herdr round names the real reason beside the coarse error class; a
+        // provider limit is not a timeout and must not be settled as one.
+        const limitOutcome = err.outcome === 'provider-limit' || err.outcome === 'paused-limit' ? err.outcome : null;
+        const isTimeoutErr = !limitOutcome && (err.errorClass === 'worker-timeout' || err.category === 'worker-timeout' || /timed out/i.test(err.message));
         rawResult = {
           status: isTimeoutErr ? 'timeout' : 'failed',
           signal: isTimeoutErr ? 'SIGTERM' : null,
           stdout: err.stdout || '',
           stderr: err.stderr || err.message || String(err),
+          ...(limitOutcome ? { adapterOutcome: limitOutcome } : {}),
         };
       }
 
@@ -2631,7 +2651,8 @@ export async function executeAssignment(assignment, opts = {}) {
       launchCommandId: useSupervisorRecovery ? launchCommandId : null,
       receipt: supervisorReceipt,
       adapterOutcome: rawResult?.adapterOutcome || rawResult?.outcome || rawResult?.status,
-      opts: { ...opts, repoRoot: root, cwd },
+      // The adapter that really ran, so result.json states the transport instead of a guess.
+      opts: { ...opts, adapter: resolvedAdapter, repoRoot: root, cwd },
     });
     return outcome.runResult;
   } finally {

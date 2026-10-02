@@ -494,7 +494,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     resourceBindings: [],
     adapter: 'herdr-spawn',
     promptDelivery: 'file-pointer',
-    confinement: 'none',
+    confinement: 'bwrap',
     readOnlyMechanism: 'none'
   },
   {
@@ -518,7 +518,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     resourceBindings: [],
     adapter: 'herdr-spawn',
     promptDelivery: 'file-pointer',
-    confinement: 'none',
+    confinement: 'bwrap',
     readOnlyMechanism: 'none'
   },
   {
@@ -542,7 +542,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     resourceBindings: [],
     adapter: 'herdr-spawn',
     promptDelivery: 'file-pointer',
-    confinement: 'none',
+    confinement: 'bwrap',
     readOnlyMechanism: 'none'
   },
   {
@@ -566,7 +566,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     resourceBindings: [],
     adapter: 'herdr-spawn',
     promptDelivery: 'file-pointer',
-    confinement: 'none',
+    confinement: 'bwrap',
     readOnlyMechanism: 'none'
   },
   {
@@ -590,7 +590,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     resourceBindings: [],
     adapter: 'herdr-spawn',
     promptDelivery: 'file-pointer',
-    confinement: 'none',
+    confinement: 'bwrap',
     readOnlyMechanism: 'none'
   },
   {
@@ -614,7 +614,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     resourceBindings: [],
     adapter: 'herdr-spawn',
     promptDelivery: 'file-pointer',
-    confinement: 'none',
+    confinement: 'bwrap',
     readOnlyMechanism: 'none'
   },
   {

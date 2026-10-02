@@ -316,6 +316,15 @@ export async function executeExecutorCli(
     controlEpoch,
     controlToken,
     effectiveContract,
+    // Names which `via:"cli"` invocation of the executor runs (bind() pins the
+    // herdr-spawn one when herdr is the transport). Unset keeps the first cli one.
+    invocationId,
+    // The confinement requirement the caller already resolved (an Assignment's
+    // posture). Unset leaves it to the capability/invocation declaration.
+    requirement,
+    // Directory the confinement authority treats as the writable workspace when the
+    // requirement grants one; defaults to the main checkout root.
+    workspaceRoot,
   } = {},
 ) {
   const purpose = purposeArg;
@@ -564,6 +573,7 @@ export async function executeExecutorCli(
     contentCarries: carries,
     attestRoot: cwd,
     resolvedAgentType,
+    invocationId,
   });
   const timeoutMs = timeoutOverride ?? cfg.timeoutMs;
   const idleTimeoutMs = idleTimeoutOverride ?? cfg.idleTimeoutMs;
@@ -649,6 +659,7 @@ export async function executeExecutorCli(
         // Same pre-existing `opts`-is-not-defined fix as the in-process
         // branch above -- see its comment.
         providerCapacity: options?.providerCapacity,
+        ...(requirement ? { requirement } : {}),
         invocation: {
           command,
           args,
@@ -669,7 +680,7 @@ export async function executeExecutorCli(
         },
         context: {
           cwd,
-          repoRoot: root,
+          repoRoot: workspaceRoot ?? root,
           runDir: opened.runDir,
           fgosDir,
           timeoutMs,

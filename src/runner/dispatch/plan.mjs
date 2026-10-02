@@ -343,7 +343,12 @@ export function compileDispatchPlan(
   let resolveError;
   if (finalMechanism === 'out-of-process') {
     try {
-      resolvedForDispatch = resolveExecutorConfig(cfg, undefined, executorId, undefined, undefined, agentType);
+      // A caller that pinned an invocation (bind() picks herdr-spawn vs cli-spawn that
+      // way) must see the plan describe that very invocation, not the executor's first.
+      const pinnedInvocation = typeof cliOverride?.preferInvocation === 'string' && cliOverride.preferInvocation.trim()
+        ? cliOverride.preferInvocation
+        : undefined;
+      resolvedForDispatch = resolveExecutorConfig(cfg, undefined, executorId, undefined, undefined, agentType, pinnedInvocation);
     } catch (err) {
       resolveError = err;
     }

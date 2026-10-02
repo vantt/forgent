@@ -73,6 +73,14 @@ export function shellEscapeArg(arg) {
 }
 
 /**
+ * Variables the shell that runs the launcher rewrites for every program it starts (`bash`
+ * bumps SHLVL, sets `_` to the command path). They describe the shell, not the invocation:
+ * exporting the fgos process's own values would be overwritten at exec, and comparing the
+ * running process against them would call every honest launch an environment tamper.
+ */
+const SHELL_MANAGED_ENV = Object.freeze(['SHLVL', '_', 'PWD', 'OLDPWD']);
+
+/**
  * Generate the launcher script file content for confined launch.
  */
 export function buildLauncherScriptContent({ argv0, command, args, env, workerCommandDigest }) {
@@ -83,6 +91,7 @@ export function buildLauncherScriptContent({ argv0, command, args, env, workerCo
   ];
   if (env && typeof env === 'object') {
     for (const [k, v] of Object.entries(env)) {
+      if (SHELL_MANAGED_ENV.includes(k)) continue;
       if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(k)) {
         lines.push(`export ${k}=${shellEscapeArg(v)}`);
       }
@@ -276,6 +285,7 @@ export function verifyProcessEnvironment(pid, expectedEnv) {
   if (!actual) return null;
 
   for (const [key, value] of Object.entries(expectedEnv)) {
+    if (SHELL_MANAGED_ENV.includes(key)) continue;
     if (actual[key] !== String(value)) return false;
   }
 

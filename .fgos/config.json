@@ -591,6 +591,9 @@
             "id": "codex-herdr-fgovn",
             "via": "cli",
             "adapter": "herdr-spawn",
+            "confinement": {
+              "backend": "bwrap"
+            },
             "command": "codex",
             "args": [
               "--dangerously-bypass-approvals-and-sandbox",
@@ -785,6 +788,9 @@
             "id": "agy-herdr-mucdong",
             "via": "cli",
             "adapter": "herdr-spawn",
+            "confinement": {
+              "backend": "bwrap"
+            },
             "command": "agy",
             "args": [
               "{prompt}",
@@ -902,6 +908,9 @@
             "id": "pi-herdr-vantt",
             "via": "cli",
             "adapter": "herdr-spawn",
+            "confinement": {
+              "backend": "bwrap"
+            },
             "command": "pi",
             "args": [
               "--model",

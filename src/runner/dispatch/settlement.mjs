@@ -698,7 +698,12 @@ export async function settleRunOutcome({
     ...(evidenceFacts.execStatus ? { execStatusOverride: evidenceFacts.execStatus } : {}),
     ...(evidenceFacts.verdict ? { assessmentOverride: { verdict: evidenceFacts.verdict } } : {}),
     confidenceLevel: evidenceFacts.confidenceLevel,
-    ...(evidenceFacts.failure ? { failureOverride: evidenceFacts.failure } : {}),
+    // A worker that stopped on a provider limit failed for that reason, not for the
+    // generic exit the adapter reported; the code is what lets a caller move to the
+    // next candidate instead of retrying the same provider.
+    ...(adapterOutcome === 'provider-limit' || adapterOutcome === 'paused-limit'
+      ? { failureOverride: { family: 'provider', code: adapterOutcome } }
+      : evidenceFacts.failure ? { failureOverride: evidenceFacts.failure } : {}),
     ...(evidenceFacts.policy ? { policyOverride: evidenceFacts.policy } : {}),
     runtime: {
       exitCode,
