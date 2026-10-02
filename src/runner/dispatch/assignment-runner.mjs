@@ -2608,6 +2608,22 @@ export async function executeAssignment(assignment, opts = {}) {
         };
       }
 
+      // The herdr door prepares confinement inside executeExecutorCli, so the account provisioning it did
+      // is only visible in the prepared-invocation record it published, not in a return value here.
+      if (providerCapacityEvidence && providerCapacityEvidence.credentialProvisioned !== true && needsAssignmentLaunchContext && launchCommandId) {
+        try {
+          const record = JSON.parse(fs.readFileSync(path.join(runDir, 'protected', 'prepared-invocation', `${launchCommandId}.json`), 'utf8'));
+          if (record?.providerCapacity?.credentialProvisioned === true) {
+            providerCapacityEvidence = { ...providerCapacityEvidence, credentialProvisioned: true };
+            const selectionPath = path.join(runDir, 'provider-capacity-selection.json');
+            fs.writeFileSync(selectionPath, `${JSON.stringify(providerCapacityEvidence, null, 2)}\n`);
+            fsyncFileBestEffort(selectionPath);
+          }
+        } catch {
+          // No record, or an unreadable one: the evidence keeps saying "not provisioned", which is the safe claim.
+        }
+      }
+
       // The adapter call above is the ONE async gap this control token has to
       // outlive. The settlement gate below checks isRunControlCurrent before
       // writing result.json: if superseded, it preserves the work product as

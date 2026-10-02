@@ -303,6 +303,7 @@ test('a confined pane gets a private account home seeded from the leased account
   // The run records which account served it, without the credential.
   const selection = readJson(path.join(runDir, 'provider-capacity-selection.json'));
   assert.equal(selection.accountId, 'acct');
+  assert.equal(selection.credentialProvisioned, true, 'the evidence says the account login was provisioned');
   assert.equal(JSON.stringify(selection).includes('account-secret'), false);
 });
 

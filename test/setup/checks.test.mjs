@@ -122,6 +122,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       // Phase 07 (herdr-trust-supervisor R3): codex-toml/agy trust stores had
       // no doctor coverage at all -- only claude-json's default path did.
       'non-claude-trust-stores-readable',
+      'confined-pane-accounts',
       'observe-dir-writable',
       'observe-friction-migrated',
       'observe-host-resolvable',
