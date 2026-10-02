@@ -22,6 +22,7 @@
 import { buildUnifiedEdges } from './dep-graph.mjs';
 import { connectedComponents } from './graph-metrics.mjs';
 import { isResolvedStatus } from './frontier.mjs';
+import { effectiveStep, getDomain } from './domain-registry.mjs';
 
 // Tier ordering used to sort mvp/milestone goals ahead of ungrouped work —
 // lower sorts first. An absent goalTier (plain work item, the common case)
@@ -125,7 +126,7 @@ export function rankImpact(view, opts = {}) {
       status: item.status,
       blocks: blockCounts.get(id),
       blockedBy: blockedByOf.get(id),
-      stage: item.stage ?? 'executing',
+      workflowStep: effectiveStep(item, getDomain(item.domain)),
       goalTier: item.goalTier ?? null,
       priority: item.priority ?? null,
       componentId,
@@ -152,7 +153,7 @@ export function rankImpact(view, opts = {}) {
         status: item.status,
         blocks: 0,
         blockedBy: [],
-        stage: item.stage ?? 'executing',
+        workflowStep: effectiveStep(item, getDomain(item.domain)),
         goalTier: item.goalTier ?? null,
         priority: item.priority ?? null,
         componentId: null,

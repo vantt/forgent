@@ -14,11 +14,13 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { readEvents, readLastLineBefore, readEventsFromByte, parseEventLines } from './events.mjs';
 import { DEFAULTS } from './work.mjs';
+import { getDomain, resolveWorkflow, stepForPhase } from './domain-registry.mjs';
+import { resolveStepAlias } from '../workflow/steps.mjs';
 import { applyKnowledgeEvent } from './knowledge-registry.mjs';
 import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
 
 // tsk-49e: every top-level key applyEvent ever writes to `view` is either an
-export const VIEW_SCHEMA_VERSION = 3;
+export const VIEW_SCHEMA_VERSION = 4;
 
 // array `.push`ed onto in place (only `decisions`) or reassigned via a
 // `{...oldValue, ...patch}` spread (every other container: work, gates,
@@ -36,6 +38,25 @@ function cloneTopLevel(seedView) {
     else out[key] = value;
   }
   return out;
+}
+
+// The ONE place a record's older step label is mapped forward. Records and events
+// written before work items tracked a Workflow step carry `stage` (and the step
+// name `decompose`, now `planning`); a binary from before the rename can still
+// append them. Every read of those shapes goes through here, so the view only
+// ever holds `workflowStep` with the workflow's current step ids.
+function canonicalStep(item, step) {
+  if (typeof step !== 'string') return step;
+  const domain = getDomain(item?.domain, { onUnrecognized: () => {} });
+  return resolveStepAlias(resolveWorkflow(domain, item?.kind), step);
+}
+
+function foldLegacyStage(target, item) {
+  if (target.stage === undefined) return;
+  if (target.workflowStep === undefined) {
+    target.workflowStep = canonicalStep(item ?? target, target.stage);
+  }
+  delete target.stage;
 }
 
 /**
@@ -81,8 +102,9 @@ function applyEvent(view, event) {
         if (normalized.rigor === undefined && normalized.risk === 'heavy') {
           normalized.rigor = 'high';
         }
-        if (normalized.stage !== undefined) {
-          normalized.workflowStep = normalized.stage;
+        foldLegacyStage(normalized);
+        if (normalized.workflowStep !== undefined) {
+          normalized.workflowStep = canonicalStep(normalized, normalized.workflowStep);
         }
         view.work[item.id] = { ...DEFAULTS, ...normalized };
       }
@@ -377,9 +399,7 @@ function applyEvent(view, event) {
         if (normalizedPatch.risk === 'heavy' && item.rigor === undefined && normalizedPatch.rigor === undefined) {
           normalizedPatch.rigor = 'high';
         }
-        if (normalizedPatch.stage !== undefined) {
-          normalizedPatch.workflowStep = normalizedPatch.stage;
-        }
+        foldLegacyStage(normalizedPatch, item);
         Object.assign(item, normalizedPatch);
       }
       // Writer provenance (D8/D15, str46-io-contract): same unconditional,
@@ -430,20 +450,21 @@ function applyEvent(view, event) {
       }
       break;
     }
-    case 'work.stage': {
-      // Additive event type (per stage-clarify D1/D3/D10): a clarify-pass
-      // moves `item.stage` and, when the discovery engine supplied one,
-      // fills in the item's real `verify` at the SAME time — one event,
-      // never two, so there is no window where the item reads `executing`
-      // with a stale placeholder verify (D10). `item.stage` itself is never
-      // defaulted here — a missing `stage` on the record stays missing
-      // (read lazily as `executing` by consumers, per D8); this case only
-      // ever runs for an item that already has a real `work.stage` event in
-      // its history, at which point setting the field explicitly is correct.
-      const { id, from, to, verify, role, writer } = event.payload ?? {};
+    case 'work.stage': // written by a binary from before the rename; same fold as work.step
+    case 'work.step': {
+      // Additive event type: a step move sets `item.workflowStep` and, when the
+      // discovery engine supplied one, fills in the item's real `verify` at the SAME
+      // time — one event, never two, so there is no window where the item reads
+      // as at its execute step with a stale placeholder verify. `workflowStep`
+      // itself is never defaulted here — a missing step on the record stays
+      // missing (read lazily as the execute-phase step by consumers); this case
+      // only ever runs for an item that already has a real step event in its
+      // history, at which point setting the field explicitly is correct.
+      const { id, from: rawFrom, to: rawTo, verify, role, writer } = event.payload ?? {};
       const item = view.work[id];
+      const from = canonicalStep(item, rawFrom);
+      const to = canonicalStep(item, rawTo);
       if (item) {
-        item.stage = to;
         item.workflowStep = to;
         if (verify !== undefined) {
           item.verify = verify;
@@ -497,7 +518,10 @@ function applyEvent(view, event) {
       // stage` move) settles exactly as it did before this fix — only an
       // explicit `clear: false` suppresses.
       const drivingVerdict = view.discovery?.[id]?.at(-1);
-      if (item && from === 'discovery' && drivingVerdict?.clear !== false) {
+      const discoverEntry = item
+        ? stepForPhase(getDomain(item.domain, { onUnrecognized: () => {} }), 'discover', item.kind)
+        : undefined;
+      if (item && from === discoverEntry && drivingVerdict?.clear !== false) {
         if (!view.settlements) {
           view.settlements = {};
         }
@@ -513,7 +537,7 @@ function applyEvent(view, event) {
       // parks for another role, `holder` changes. Two lazy structures,
       // same absent-key-means-never-happened shape `view.outcomes`/
       // `view.discovery` already use: `view.work[id].holder` is a
-      // latest-write-wins field (mirrors `item.stage` above); `callThreads`
+      // latest-write-wins field (mirrors `item.workflowStep` above); `callThreads`
       // is an APPEND-only per-id log (mirrors `view.discovery`), the
       // record a replaying reader needs to derive open-call depth for the
       // callstack cap (src/state/handoff.mjs's own `openCallDepth` input

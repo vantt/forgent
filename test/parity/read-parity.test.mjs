@@ -16,7 +16,7 @@ function addTestWork(dir, id, extra = {}) {
     refs: extra.refs ?? [],
     verify: extra.verify ?? 'npm test',
     description: extra.description ?? 'fixture description',
-    stage: extra.stage ?? 'executing',
+    workflowStep: extra.workflowStep ?? 'executing',
     ...extra,
   });
 }
@@ -72,15 +72,15 @@ test('parity: listUseCase --all matches CLI list --all output', () => {
 test('parity: listUseCase --id and --fields matches CLI list output', () => {
   const cwdDirect = tmpCwdFast();
   const dirDirect = path.join(cwdDirect, '.fgos');
-  addTestWork(dirDirect, 'target-item', { title: 'Target Item', stage: 'executing' });
+  addTestWork(dirDirect, 'target-item', { title: 'Target Item', workflowStep: 'executing' });
 
-  const directResult = listUseCase({ dir: dirDirect }, { id: 'target-item', fields: 'stage,status' });
+  const directResult = listUseCase({ dir: dirDirect }, { id: 'target-item', fields: 'workflowStep,status' });
 
   const cwdCli = tmpCwdFast();
   const dirCli = path.join(cwdCli, '.fgos');
-  addTestWork(dirCli, 'target-item', { title: 'Target Item', stage: 'executing' });
+  addTestWork(dirCli, 'target-item', { title: 'Target Item', workflowStep: 'executing' });
 
-  const cliRun = run(cwdCli, ['list', '--id', 'target-item', '--fields', 'stage,status', '--json']);
+  const cliRun = run(cwdCli, ['list', '--id', 'target-item', '--fields', 'workflowStep,status', '--json']);
   assert.equal(cliRun.status, 0, `CLI run failed: ${cliRun.stderr}`);
   const cliData = envelopeData(cliRun.stdout);
 
@@ -91,13 +91,13 @@ test('parity: graphUseCase matches CLI graph output', () => {
   const cwdDirect = tmpCwdFast();
   const dirDirect = path.join(cwdDirect, '.fgos');
   addTestWork(dirDirect, 'a');
-  addTestWork(dirDirect, 'b', { deps: ['a'], stage: 'discovery' });
+  addTestWork(dirDirect, 'b', { deps: ['a'], workflowStep: 'discovery' });
   const directResult = graphUseCase({ dir: dirDirect });
 
   const cwdCli = tmpCwdFast();
   const dirCli = path.join(cwdCli, '.fgos');
   addTestWork(dirCli, 'a');
-  addTestWork(dirCli, 'b', { deps: ['a'], stage: 'discovery' });
+  addTestWork(dirCli, 'b', { deps: ['a'], workflowStep: 'discovery' });
   const cliRun = run(cwdCli, ['graph', '--json']);
   assert.equal(cliRun.status, 0, `CLI run failed: ${cliRun.stderr}`);
   const cliData = envelopeData(cliRun.stdout);
@@ -105,7 +105,7 @@ test('parity: graphUseCase matches CLI graph output', () => {
   assert.equal(directResult.componentCount, cliData.componentCount);
   assert.deepEqual(directResult.components, cliData.components);
   assert.deepEqual(directResult.criticalPath, cliData.criticalPath);
-  assert.deepEqual(directResult.stageByItem, cliData.stageByItem);
+  assert.deepEqual(directResult.stepByItem, cliData.stepByItem);
 });
 
 test('parity: staleUseCase matches CLI stale output', () => {

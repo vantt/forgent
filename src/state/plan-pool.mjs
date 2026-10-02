@@ -11,19 +11,19 @@
 // gives `planning` the same shape instead of continuing to piggyback on
 // `discover-pool.mjs`.
 import { isDepsAndLineageReady } from './frontier.mjs';
+import { getDomain, stepForPhase } from './domain-registry.mjs';
 
-// tsk-403 D11/D18: `decompose` renamed to `planning` -- both stage names
-// stay candidates, since `decompose` survives as a legacy, drain-only
-// alias (workflow-stage-graphs.mjs) for items that reached it before the
-// rename. Omitting `decompose` here would make this pool blind to those
-// items forever; omitting `planning` would make it blind to every NEW
-// item instead (nothing lands on literal `decompose` anymore).
-const CANDIDATE_STAGES = new Set(['decompose', 'planning']);
-
+// A Work item is a planning candidate when its effective step is the plan-phase
+// step of its own domain's Workflow. The legacy step name `decompose` is mapped
+// onto that step by replay (the workflow's `aliases`), so older records are not
+// invisible to this pool.
 function isCandidate(item, view) {
+  const domain = getDomain(item.domain, { onUnrecognized: () => {} });
+  const planStep = stepForPhase(domain, 'plan', item.kind);
   return (
     item.status === 'todo' &&
-    CANDIDATE_STAGES.has(item.stage) &&
+    planStep !== undefined &&
+    item.workflowStep === planStep &&
     isDepsAndLineageReady(view, item.id)
   );
 }
@@ -43,11 +43,9 @@ function comparePlanningOrder(a, b) {
 }
 
 /**
- * Pick the single next `decompose`/`planning`-stage item for a plan-loop
- * iteration to act on, or `null` when none qualify. The returned `stage`
- * is always the item's OWN real stage — never a hardcoded literal — so a
- * caller (e.g. `/fgOS:plan-next`) sees the truth for both the current
- * `planning` name and the legacy `decompose` drain-only alias (D18).
+ * Pick the single next plan-phase item for a plan-loop iteration to act on, or
+ * `null` when none qualify. The returned `workflowStep` is always the item's OWN
+ * real step — never a hardcoded literal.
  */
 export function pickNextPlanItem(view) {
   const work = view?.work ?? {};
@@ -61,5 +59,5 @@ export function pickNextPlanItem(view) {
   if (candidates.length === 0) return null;
 
   candidates.sort(comparePlanningOrder);
-  return { id: candidates[0].id, stage: candidates[0].stage };
+  return { id: candidates[0].id, workflowStep: candidates[0].workflowStep };
 }

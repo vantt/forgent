@@ -3,9 +3,9 @@
 // reads the `view` object it is handed (built by replay.mjs's `foldEvents`
 // / `rebuildView`, or a literal view in tests) and returns a derived array.
 // It never mutates `view` and never writes an event (the one exception is a
-// diagnostic `console.warn` via workflow-stage-graphs.mjs on a genuinely unrecognized
+// diagnostic `console.warn` via domain-registry.mjs on a genuinely unrecognized
 // `item.domain` value — never a throw, see base-workflow-model D2/D3).
-import { getDomain, stageForStep } from './workflow-stage-graphs.mjs';
+import { getDomain, stepForPhase } from './domain-registry.mjs';
 //
 // Ready = status 'todo' AND every dep's status is RESOLVED (per D5: 'done'
 // means "accepted into the main tree" — a dep sitting at 'awaiting-approval',
@@ -18,7 +18,7 @@ import { getDomain, stageForStep } from './workflow-stage-graphs.mjs';
 // domain — per stage-clarify D1: an item still at stage `clarify` is not
 // yet "ready to start" no matter its status — `fgos ready` would otherwise
 // lie about items that have not passed context-discovery; domain-aware per
-// base-workflow-model D2/D3, workflow-stage-graphs.mjs) AND no open descendant (per
+// base-workflow-model D2/D3, domain-registry.mjs) AND no open descendant (per
 // stage-decompose D4/D5: an item that was decomposed stays
 // anchored — excluded from the frontier — for as long as any item reachable
 // through the `parent` chain below it is not yet 'done'; this is a lineage
@@ -75,34 +75,32 @@ import { getDomain, stageForStep } from './workflow-stage-graphs.mjs';
 // superset of v1, not a behavior change for existing data.
 export const FRONTIER_ORDER_VERSION = 2;
 
-// `step` (tsk-19j D9, generalized for fgos-coding-driving's own loop):
-// which domain step counts as "ready to start" — defaults to `'Execute'`
-// (every pre-existing caller, unparameterized, gets byte-identical
-// behavior). A driver loop wanting the frontier for an earlier step (e.g.
-// `'Clarify'`/`'Divide'`, mirroring discover-loop/planning-loop's own
-// pools) passes it explicitly; `isDepsAndLineageReady` below already covers
-// the stage-independent half of readiness this parameterizes the stage half
-// of.
-export function frontier(view, { step = 'Execute' } = {}) {
+// `phase` (generalized for fgos-coding-driving's own loop): which Workflow phase
+// counts as "ready to start" — defaults to `'execute'` (every unparameterized
+// caller gets that behavior). A driver loop wanting the frontier for an earlier
+// phase (e.g. `'clarify'`/`'plan'`, mirroring discover-loop/planning-loop's own
+// pools) passes it explicitly; `isDepsAndLineageReady` below already covers the
+// step-independent half of readiness this parameterizes the step half of.
+export function frontier(view, { phase = 'execute' } = {}) {
   const work = view?.work ?? {};
   const childrenByParent = indexChildrenByParent(work);
   const ready = [];
   for (const id of Object.keys(work)) {
     const item = work[id];
     if (!isTodoStatus(item)) continue;
-    // Domain-aware per base-workflow-model D2/D3: an unrecognized
-    // item.domain never throws here (workflow-stage-graphs.mjs's fail-safe) — it folds to
-    // 'coding' with a diagnostic warning, so a corrupt/rolled-back domain
-    // value can never wedge the frontier derive itself.
+    // Domain-aware: an unrecognized item.domain never throws here
+    // (domain-registry.mjs's fail-safe) — it folds to 'coding' with a
+    // diagnostic warning, so a corrupt/rolled-back domain value can never
+    // wedge the frontier derive itself.
     const domain = getDomain(item.domain);
-    const executeStage = stageForStep(domain, step);
-    // A domain that never maps `step` at all (e.g. `synthetic` has no
-    // Clarify/Divide, only Execute -> `assembling`) has NO item ready for
-    // it, full stop -- guarded separately from the `??` fallback below,
-    // which would otherwise wrongly admit an item with no `stage` field at
-    // all (undefined ?? undefined === undefined, a false tie).
-    if (executeStage === undefined) continue;
-    if ((item.stage ?? executeStage) !== executeStage) continue;
+    const phaseStep = stepForPhase(domain, phase, item.kind);
+    // A domain that never declares a step for `phase` at all (e.g. `synthetic`
+    // has no clarify/plan, only execute -> `assembling`) has NO item ready for
+    // it, full stop -- guarded separately from the `??` fallback below, which
+    // would otherwise wrongly admit an item with no `workflowStep` at all
+    // (undefined ?? undefined === undefined, a false tie).
+    if (phaseStep === undefined) continue;
+    if ((item.workflowStep ?? stepForPhase(domain, 'execute', item.kind)) !== phaseStep) continue;
     if (hasOpenDescendant(id, work, childrenByParent)) continue;
     const depsReady = item.deps.every((dep) => isResolvedStatus(work[dep]));
     if (depsReady) ready.push(item);
@@ -111,23 +109,23 @@ export function frontier(view, { step = 'Execute' } = {}) {
   return ready;
 }
 
-// Union of `frontier(view, {step})` across multiple steps (tsk-4so D1,
+// Union of `frontier(view, {phase})` across multiple phases (tsk-4so D1,
 // docs/history/execution-fanout/CONTEXT-tsk-4so.md): a footprint-overlap
 // advisory that only ever looks at one step is structurally blind to two
 // items at DIFFERENT steps sharing a footprint — the real gap this exists
 // to close (tsk-1ug at `decompose` vs tsk-4fg/tsk-59x at `executing`, all
 // three declaring the same file, `fgos conflicts` reporting zero pairs).
-// Dedupes by id: an item with no `stage` field matches EVERY step's
-// `executeStage` fallback (`item.stage ?? executeStage` above), so without
+// Dedupes by id: an item with no `workflowStep` field matches EVERY phase's
+// execute-step fallback (`item.workflowStep ?? <execute step>` above), so without
 // dedup it would appear once per step in `steps` instead of once overall.
 // Re-sorts the deduped set once with `compareReadyOrder` — concatenating
 // three already-sorted arrays would NOT preserve `FRONTIER_ORDER_VERSION`'s
 // priority/intent ordering across the combined set. PURE: same read-only
 // contract as `frontier`.
-export function frontierAcrossSteps(view, steps = ['Clarify', 'Divide', 'Execute']) {
+export function frontierAcrossSteps(view, phases = ['clarify', 'plan', 'execute']) {
   const seen = new Map();
-  for (const step of steps) {
-    for (const item of frontier(view, { step })) {
+  for (const phase of phases) {
+    for (const item of frontier(view, { phase })) {
       if (!seen.has(item.id)) seen.set(item.id, item);
     }
   }

@@ -15,10 +15,10 @@ import {
 import {
   discoverUseCase,
   planUseCase,
-} from '../../src/verbs/state/stage.mjs';
+} from '../../src/verbs/state/step.mjs';
 
 function addTestWork(dir, id, extra = {}) {
-  const defaultVerify = extra.stage === 'discovery'
+  const defaultVerify = extra.workflowStep === 'discovery'
     ? 'chưa xác định — fixture verify'
     : 'npm test';
   return addWork(dir, {
@@ -31,7 +31,7 @@ function addTestWork(dir, id, extra = {}) {
     refs: extra.refs ?? [],
     verify: extra.verify ?? defaultVerify,
     description: extra.description ?? 'fixture description',
-    stage: extra.stage ?? 'discovery',
+    workflowStep: extra.workflowStep ?? 'discovery',
     ...extra,
   });
 }
@@ -40,7 +40,7 @@ test('parity: discover clear verdict direct in-process vs CLI', () => {
   // 1. Direct in-process
   const cwdDirect = tmpCwdFast();
   const dirDirect = path.join(cwdDirect, '.fgos');
-  addTestWork(dirDirect, 'item-disc-clear', { stage: 'discovery' });
+  addTestWork(dirDirect, 'item-disc-clear', { workflowStep: 'discovery' });
   const directRes = discoverUseCase(
     { dir: dirDirect },
     {
@@ -83,7 +83,7 @@ test('parity: discover clear verdict direct in-process vs CLI', () => {
 
   // Parity checks
   assert.equal(directRes.outcome, cliEnvelope.data.outcome);
-  assert.equal(directItem.stage, cliItem.stage);
+  assert.equal(directItem.workflowStep, cliItem.workflowStep);
   assert.equal(directItem.verify, cliItem.verify);
   assert.equal(directItem.size, cliItem.size);
   assert.equal(directItem.rigor, cliItem.rigor);
@@ -98,7 +98,7 @@ test('parity: discover unclear verdict direct in-process vs CLI', () => {
   // 1. Direct in-process
   const cwdDirect = tmpCwdFast();
   const dirDirect = path.join(cwdDirect, '.fgos');
-  addTestWork(dirDirect, 'item-disc-unclear', { stage: 'discovery' });
+  addTestWork(dirDirect, 'item-disc-unclear', { workflowStep: 'discovery' });
   const directRes = discoverUseCase(
     { dir: dirDirect },
     {
@@ -126,7 +126,7 @@ test('parity: discover unclear verdict direct in-process vs CLI', () => {
 
   // Parity checks
   assert.equal(directRes.outcome, cliEnvelope.data.outcome);
-  assert.equal(directView.work['item-disc-unclear'].stage, cliView.work[cliId].stage);
+  assert.equal(directView.work['item-disc-unclear'].workflowStep, cliView.work[cliId].workflowStep);
   assert.equal(directView.work['item-disc-unclear'].status, cliView.work[cliId].status);
   assert.equal(directView.gates['item-disc-unclear'].ask, cliView.gates[cliId].ask);
 });
@@ -135,7 +135,7 @@ test('parity: plan pass-through verdict direct in-process vs CLI', async () => {
   // 1. Direct in-process
   const cwdDirect = tmpCwdFast();
   const dirDirect = path.join(cwdDirect, '.fgos');
-  addTestWork(dirDirect, 'item-plan-pt', { stage: 'planning' });
+  addTestWork(dirDirect, 'item-plan-pt', { workflowStep: 'planning' });
   const directRes = await planUseCase(
     { dir: dirDirect },
     {
@@ -166,7 +166,7 @@ test('parity: plan pass-through verdict direct in-process vs CLI', async () => {
 
   // Parity checks
   assert.equal(directRes.outcome, cliEnvelope.data.outcome);
-  assert.equal(directItem.stage, cliItem.stage);
+  assert.equal(directItem.workflowStep, cliItem.workflowStep);
   assert.equal(directItem.status, cliItem.status);
 });
 
@@ -176,7 +176,7 @@ test('parity: plan need-human verdict direct in-process vs CLI', async () => {
   // 1. Direct in-process
   const cwdDirect = tmpCwdFast();
   const dirDirect = path.join(cwdDirect, '.fgos');
-  addTestWork(dirDirect, 'item-plan-human', { stage: 'planning' });
+  addTestWork(dirDirect, 'item-plan-human', { workflowStep: 'planning' });
   const directRes = await planUseCase(
     { dir: dirDirect },
     {
@@ -221,7 +221,7 @@ test('parity: plan decompose verdict direct in-process vs CLI', async () => {
   // 1. Direct in-process
   const cwdDirect = tmpCwdFast();
   const dirDirect = path.join(cwdDirect, '.fgos');
-  addTestWork(dirDirect, 'item-plan-decomp', { stage: 'planning' });
+  addTestWork(dirDirect, 'item-plan-decomp', { workflowStep: 'planning' });
   const directRes = await planUseCase(
     { dir: dirDirect },
     {
@@ -259,7 +259,7 @@ test('parity: plan decompose verdict direct in-process vs CLI', async () => {
   // Parity checks
   assert.equal(directRes.outcome, cliEnvelope.data.outcome);
   assert.equal(directRes.childIds.length, cliEnvelope.data.childIds.length);
-  assert.equal(directView.work['item-plan-decomp'].stage, cliView.work[cliId].stage);
+  assert.equal(directView.work['item-plan-decomp'].workflowStep, cliView.work[cliId].workflowStep);
   assert.equal(directView.work['item-plan-decomp-1'].title, cliView.work[`${cliId}-1`].title);
   assert.equal(directView.work['item-plan-decomp-2'].title, cliView.work[`${cliId}-2`].title);
 });

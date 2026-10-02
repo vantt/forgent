@@ -60,7 +60,7 @@ import {
   makeRunnerProposedLeafItem,
   makeSessionSafeRunnerItem,
   mkLocalDependency,
-  moveStage,
+  moveStep,
   moveWork,
   os,
   path,
@@ -123,29 +123,29 @@ test('rollup on a root with n children, k done, prints k/n and lists every child
   assert.equal(data.doneCount, 2);
   assert.equal(data.totalCount, 3);
   assert.deepEqual(data.children, [
-    { id: 'child-a', title: 'Child A', status: 'done', stageEffective: 'executing' },
-    { id: 'child-b', title: 'Child B', status: 'todo', stageEffective: 'executing' },
-    { id: 'child-c', title: 'Child C', status: 'done', stageEffective: 'executing' },
+    { id: 'child-a', title: 'Child A', status: 'done', workflowStepEffective: 'executing' },
+    { id: 'child-b', title: 'Child B', status: 'todo', workflowStepEffective: 'executing' },
+    { id: 'child-c', title: 'Child C', status: 'done', workflowStepEffective: 'executing' },
   ]);
 });
 
 
-test('rollup renders stageEffective on the root and on each child independently, mixing explicit and defaulted stages (tsk-4zj D6)', () => {
+test('rollup renders workflowStepEffective on the root and on each child independently, mixing explicit and defaulted stages (tsk-4zj D6)', () => {
   const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'root-item', { title: 'Root Item' });
   const dir = path.join(cwd, '.fgos');
-  addWork(dir, { id: 'child-a', title: 'Child A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'npm test', parent: 'root-item', stage: 'discovery' });
-  addWork(dir, { id: 'child-b', title: 'Child B', kind: 'task', status: 'doing', deps: [], risk: 'light', refs: [], verify: 'npm test', parent: 'root-item', stage: 'decompose' });
+  addWork(dir, { id: 'child-a', title: 'Child A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'npm test', parent: 'root-item', workflowStep: 'discovery' });
+  addWork(dir, { id: 'child-b', title: 'Child B', kind: 'task', status: 'doing', deps: [], risk: 'light', refs: [], verify: 'npm test', parent: 'root-item', workflowStep: 'planning' });
   addWork(dir, { id: 'child-c', title: 'Child C', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'npm test', parent: 'root-item' });
 
   const result = run(cwd, ['rollup', 'root-item']);
   assert.equal(result.status, 0);
   const data = envelopeData(result.stdout);
-  assert.equal(data.stageEffective, 'executing');
+  assert.equal(data.workflowStepEffective, 'executing');
   assert.deepEqual(data.children, [
-    { id: 'child-a', title: 'Child A', status: 'todo', stageEffective: 'discovery' },
-    { id: 'child-b', title: 'Child B', status: 'doing', stageEffective: 'decompose' },
-    { id: 'child-c', title: 'Child C', status: 'todo', stageEffective: 'executing' },
+    { id: 'child-a', title: 'Child A', status: 'todo', workflowStepEffective: 'discovery' },
+    { id: 'child-b', title: 'Child B', status: 'doing', workflowStepEffective: 'planning' },
+    { id: 'child-c', title: 'Child C', status: 'todo', workflowStepEffective: 'executing' },
   ]);
 });
 
@@ -283,7 +283,7 @@ test('rollup on an item carrying both children and targets keeps the two count p
   assert.equal(data.totalCount, 1);
   assert.equal(data.targetDoneCount, 1);
   assert.equal(data.targetTotalCount, 1);
-  assert.deepEqual(data.children, [{ id: 'child-a', title: 'Child A', status: 'todo', stageEffective: 'executing' }]);
+  assert.deepEqual(data.children, [{ id: 'child-a', title: 'Child A', status: 'todo', workflowStepEffective: 'executing' }]);
   assert.deepEqual(data.targets, [{ id: 'target-a', title: 'Target A', status: 'done' }]);
 });
 

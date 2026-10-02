@@ -28,7 +28,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
+import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
 
 function mkTempDir() {

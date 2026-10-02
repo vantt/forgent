@@ -6,7 +6,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { execSync, execFileSync, execFile, spawn } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
-import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
+import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { executeAssignment, commitRunSettlement, settleRunOutcome, settleReceiptRunFromOutcome, resolveWorkerArtifactPath, reconcileCliSpawnRun } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 import { compileDispatchPlan } from '../../src/runner/dispatch/plan.mjs';
@@ -174,7 +174,7 @@ test('executeAssignment executes non-mutating validate-plan assignment through f
 
   const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
 
-  const work = { id: 'tsk-test-1', status: 'doing', stage: 'planning', domain: 'coding' };
+  const work = { id: 'tsk-test-1', status: 'doing', workflowStep: 'planning', domain: 'coding' };
   const assignment = buildAssignment({
     work,
     stage: 'planning',
@@ -195,7 +195,7 @@ test('executeAssignment executes non-mutating validate-plan assignment through f
 
   // Verify Work object remains completely unchanged
   assert.equal(work.status, 'doing');
-  assert.equal(work.stage, 'planning');
+  assert.equal(work.workflowStep, 'planning');
 });
 
 test('executeAssignment captures stderr and nonzero exit code as failed result without throwing or altering Work', async () => {
@@ -204,7 +204,7 @@ test('executeAssignment captures stderr and nonzero exit code as failed result w
 
   const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
 
-  const work = { id: 'tsk-test-fail', status: 'doing', stage: 'planning', domain: 'coding' };
+  const work = { id: 'tsk-test-fail', status: 'doing', workflowStep: 'planning', domain: 'coding' };
   const assignment = buildAssignment({
     work,
     stage: 'planning',
@@ -224,7 +224,7 @@ test('executeAssignment captures stderr and nonzero exit code as failed result w
 
   // Work remains untouched
   assert.equal(work.status, 'doing');
-  assert.equal(work.stage, 'planning');
+  assert.equal(work.workflowStep, 'planning');
 });
 
 test('executeAssignment captures timeout with partial stdout and writes failed RunResult storage (P2)', async () => {
@@ -233,7 +233,7 @@ test('executeAssignment captures timeout with partial stdout and writes failed R
 
   const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 500 };
 
-  const work = { id: 'tsk-test-timeout', status: 'doing', stage: 'planning', domain: 'coding' };
+  const work = { id: 'tsk-test-timeout', status: 'doing', workflowStep: 'planning', domain: 'coding' };
   const assignment = buildAssignment({
     work,
     stage: 'planning',
@@ -278,7 +278,7 @@ test('executeAssignment captures timeout with partial stdout and writes failed R
 
   // Work remains untouched
   assert.equal(work.status, 'doing');
-  assert.equal(work.stage, 'planning');
+  assert.equal(work.workflowStep, 'planning');
 });
 
 test('executeAssignment rejects human-only assignment before spawning', async () => {
@@ -723,7 +723,7 @@ test('compileDispatchPlan and executeAssignment respect cliOverride.preferExecut
 test('settleClaim atomically applies patch before releasing runtime claim (Finding P2 fix)', () => {
   const dir = path.join(mkTempDir(), '.fgos');
   initStore(dir);
-  addWork(dir, { id: 'tsk-settle-patch', title: 'Test Settle Patch', domain: 'coding', kind: 'feature', status: 'todo', stage: 'executing', risk: 'standard', priority: 0, verify: 'true', deps: [], refs: [] });
+  addWork(dir, { id: 'tsk-settle-patch', title: 'Test Settle Patch', domain: 'coding', kind: 'feature', status: 'todo', workflowStep: 'executing', risk: 'standard', priority: 0, verify: 'true', deps: [], refs: [] });
 
   const claim = acquireClaim(dir, { id: 'tsk-settle-patch', actor: 'runner' });
   assert.ok(claim.claimId);
@@ -746,7 +746,7 @@ test('settleClaim atomically applies patch before releasing runtime claim (Findi
 test('settleClaim({ patch }) runs full editWork validation suite (Finding P2 fix)', () => {
   const dir = path.join(mkTempDir(), '.fgos');
   initStore(dir);
-  addWork(dir, { id: 'tsk-a', title: 'Task A', domain: 'coding', kind: 'feature', status: 'doing', stage: 'executing', risk: 'standard', priority: 0, verify: 'true', deps: [], refs: [] });
+  addWork(dir, { id: 'tsk-a', title: 'Task A', domain: 'coding', kind: 'feature', status: 'doing', workflowStep: 'executing', risk: 'standard', priority: 0, verify: 'true', deps: [], refs: [] });
 
   const claim = acquireClaim(dir, { id: 'tsk-a', actor: 'runner' });
   assert.ok(claim.claimId);
@@ -778,7 +778,7 @@ test('Finding 3 regression test: read-only assignment committing a new file leav
   addWork(tempDir, {
     id: 'tsk-commit-readonly',
     title: 'Test read-only commit rollback',
-    stage: 'planning',
+    workflowStep: 'planning',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -887,7 +887,7 @@ test('provider capacity selection happens after Run admission, records redacted 
     },
   };
 
-  const work = { id: 'tsk-provider-capacity-run', status: 'todo', stage: 'planning', domain: 'coding' };
+  const work = { id: 'tsk-provider-capacity-run', status: 'todo', workflowStep: 'planning', domain: 'coding' };
   const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan', policy: { preferExecutor: 'codex-bwrap' } });
   const result = await executeAssignment(assignment, {
     cwd: tempDir,
@@ -984,7 +984,7 @@ test('provider capacity refusal after Run admission settles the attempt (never a
     audit: [],
   }));
 
-  const work = { id: 'tsk-provider-capacity-refused', status: 'todo', stage: 'planning', domain: 'coding' };
+  const work = { id: 'tsk-provider-capacity-refused', status: 'todo', workflowStep: 'planning', domain: 'coding' };
   const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan', policy: { preferExecutor: 'codex-bwrap' } });
   const result = await executeAssignment(assignment, {
     cwd: tempDir,
@@ -1075,7 +1075,7 @@ test('Phase B: no fallbackExecutors declared -> byte-identical terminal provider
   const tempDir = mkTempDir();
   const { runnerConfig, runtimeDir } = buildFallbackFixture(tempDir, { primaryQuarantined: true, fallbackQuarantined: false });
 
-  const work = { id: 'tsk-fallback-none-declared', status: 'todo', stage: 'planning', domain: 'coding' };
+  const work = { id: 'tsk-fallback-none-declared', status: 'todo', workflowStep: 'planning', domain: 'coding' };
   const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan' });
   const result = await executeAssignment(assignment, {
     cwd: tempDir,
@@ -1098,7 +1098,7 @@ test('Phase B: a declared fallback with real capacity is actually dispatched, ev
   const tempDir = mkTempDir();
   const { claudeExecutor, codexExecutor, runnerConfig, runtimeDir } = buildFallbackFixture(tempDir, { primaryQuarantined: true, fallbackQuarantined: false });
 
-  const work = { id: 'tsk-fallback-selected', status: 'todo', stage: 'planning', domain: 'coding' };
+  const work = { id: 'tsk-fallback-selected', status: 'todo', workflowStep: 'planning', domain: 'coding' };
   const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan' });
   const result = await executeAssignment(assignment, {
     cwd: tempDir,
@@ -1142,7 +1142,7 @@ test('Phase B: every declared candidate governance-refused or unresolvable -> fa
   const tempDir = mkTempDir();
   const { runnerConfig, runtimeDir } = buildFallbackFixture(tempDir, { primaryQuarantined: true, fallbackQuarantined: false });
 
-  const work = { id: 'tsk-fallback-all-refused', status: 'todo', stage: 'planning', domain: 'coding' };
+  const work = { id: 'tsk-fallback-all-refused', status: 'todo', workflowStep: 'planning', domain: 'coding' };
   const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan' });
   const result = await executeAssignment(assignment, {
     cwd: tempDir,
@@ -1187,7 +1187,7 @@ test('Phase B: bounded to exactly one capacity attempt -- a second declared cand
     accounts: { 'pi-acct': { label: 'pi/third', credentialSource: { kind: 'codex-home', home: path.join(tempDir, 'pi-home') } } },
   };
 
-  const work = { id: 'tsk-fallback-bounded', status: 'todo', stage: 'planning', domain: 'coding' };
+  const work = { id: 'tsk-fallback-bounded', status: 'todo', workflowStep: 'planning', domain: 'coding' };
   const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan' });
   const result = await executeAssignment(assignment, {
     cwd: tempDir,
@@ -1280,7 +1280,7 @@ test('Step 2: a fallback candidate with NO confined invocation at all is refused
   const tempDir = mkTempDir();
   const { claudeExecutor, codexUnconfinedExecutor, runnerConfig, runtimeDir } = buildConfinementFallbackFixture(tempDir, { fallbackHasConfinedInvocation: false });
 
-  const work = { id: 'tsk-confinement-fallback-refused', status: 'todo', stage: 'planning', domain: 'coding' };
+  const work = { id: 'tsk-confinement-fallback-refused', status: 'todo', workflowStep: 'planning', domain: 'coding' };
   const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan' });
   await assert.rejects(
     () => executeAssignment(assignment, {
@@ -1304,7 +1304,7 @@ test('Step 2: a fallback candidate WITH a confined invocation is dispatched thro
   const tempDir = mkTempDir();
   const { claudeExecutor, codexUnconfinedExecutor, codexConfinedExecutor, runnerConfig, runtimeDir } = buildConfinementFallbackFixture(tempDir, { fallbackHasConfinedInvocation: true });
 
-  const work = { id: 'tsk-confinement-fallback-selected', status: 'todo', stage: 'planning', domain: 'coding' };
+  const work = { id: 'tsk-confinement-fallback-selected', status: 'todo', workflowStep: 'planning', domain: 'coding' };
   const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan' });
   const result = await executeAssignment(assignment, {
     cwd: tempDir,
@@ -1324,7 +1324,7 @@ test('Phase B: a resumed Run that already committed a fallback rehydrates the fa
   const tempDir = mkTempDir();
   const { claudeExecutor, codexExecutor, runnerConfig, runtimeDir } = buildFallbackFixture(tempDir, { primaryQuarantined: true, fallbackQuarantined: false });
 
-  const work = { id: 'tsk-fallback-resume', status: 'todo', stage: 'planning', domain: 'coding' };
+  const work = { id: 'tsk-fallback-resume', status: 'todo', workflowStep: 'planning', domain: 'coding' };
   const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan' });
   const first = await executeAssignment(assignment, {
     cwd: tempDir,
@@ -1386,7 +1386,7 @@ test('tool executors bypass provider capacity selection even with matching provi
     },
   };
 
-  const work = { id: 'tsk-provider-capacity-tool-bypass', status: 'todo', stage: 'planning', domain: 'coding' };
+  const work = { id: 'tsk-provider-capacity-tool-bypass', status: 'todo', workflowStep: 'planning', domain: 'coding' };
   const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan' });
   const result = await executeAssignment(assignment, {
     cwd: tempDir,
@@ -1454,7 +1454,7 @@ test('a genuinely mutating assignment (implement-item, default implementer role)
   }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
   timeoutMs: 5000, };
 
-  const work = { id: 'tsk-cell63-worker-unaffected', status: 'todo', stage: 'executing', domain: 'coding' };
+  const work = { id: 'tsk-cell63-worker-unaffected', status: 'todo', workflowStep: 'executing', domain: 'coding' };
   const assignment = buildAssignment({
     work,
     stage: 'executing',
@@ -1492,7 +1492,7 @@ test('Cell 6.3 Fix Round 1: absent claude-reviewer config entry falls back uncha
   }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
   timeoutMs: 5000, };
 
-  const work = { id: 'tsk-cell63-absent-fallback', status: 'todo', stage: 'planning', domain: 'coding' };
+  const work = { id: 'tsk-cell63-absent-fallback', status: 'todo', workflowStep: 'planning', domain: 'coding' };
   const assignment = buildAssignment({
     work,
     stage: 'planning',
@@ -1663,7 +1663,7 @@ test('dispatch CLI execute subcommand with --contract and --work fires the domai
   addWork(fgosDir, {
     id: 'tsk-contract-cli-seam',
     title: 'Contract CLI seam target',
-    stage: 'planning',
+    workflowStep: 'planning',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -1900,7 +1900,7 @@ test('dispatch CLI execute subcommand with --contract computes a distinct assign
   addWork(fgosDir, {
     id: 'tsk-contract-collision',
     title: 'Contract collision regression target',
-    stage: 'planning',
+    workflowStep: 'planning',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -1973,7 +1973,7 @@ test('dispatch CLI execute subcommand with --contract computes distinct assignme
   addWork(fgosDir, {
     id: 'tsk-contract-race',
     title: 'Contract concurrency race target',
-    stage: 'planning',
+    workflowStep: 'planning',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -2161,7 +2161,7 @@ console.log('done');
 `);
 
   const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 20000 };
-  const work = { id: 'tsk-outbox', status: 'doing', stage: 'planning', domain: 'coding' };
+  const work = { id: 'tsk-outbox', status: 'doing', workflowStep: 'planning', domain: 'coding' };
   const assignment = buildAssignment({ work, stage: 'planning', operation: 'validate-plan' });
 
   const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
@@ -2187,7 +2187,7 @@ console.log('done');
 `);
 
   const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 20000 };
-  const work = { id: 'tsk-flat', status: 'doing', stage: 'planning', domain: 'coding' };
+  const work = { id: 'tsk-flat', status: 'doing', workflowStep: 'planning', domain: 'coding' };
   const assignment = buildAssignment({ work, stage: 'planning', operation: 'validate-plan' });
 
   const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig });
@@ -2207,7 +2207,7 @@ fs.writeFileSync(path.join(runDir, 'agent-report.md'), 'Reviewer report with sub
 fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ contract: { id: 'agent-result-claim', version: 2 }, status: 'done', summary: 'Reviewed.' }));
 `);
   const assignment = buildAssignment({
-    work: { id: 'tsk-reviewer-assessment-gate', status: 'todo', stage: 'planning', domain: 'coding' },
+    work: { id: 'tsk-reviewer-assessment-gate', status: 'todo', workflowStep: 'planning', domain: 'coding' },
     stage: 'planning', operation: 'validate-plan', role: 'reviewer',
   });
   const result = await executeAssignment(assignment, {
@@ -2235,7 +2235,7 @@ const runDir = path.dirname(/Write structured JSON to (\\S+agent-result\\.json)/
 fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'failed', summary: 'Legacy failure.', error: { code: 'ELEGACY' } }));
 `);
   const assignment = buildAssignment({
-    work: { id: 'tsk-legacy-error-gate', status: 'todo', stage: 'planning', domain: 'coding' },
+    work: { id: 'tsk-legacy-error-gate', status: 'todo', workflowStep: 'planning', domain: 'coding' },
     stage: 'planning', operation: 'validate-plan',
   });
   const result = await executeAssignment(assignment, {
@@ -2433,7 +2433,7 @@ test('executeAssignment: admission refuses a second attempt while a SIGKILLed ru
   );
   const runnerConfig = admissionRunnerConfig(stallingExecutorScript);
   const assignment = buildAssignment({
-    work: { id: 'tsk-admit-s1-sigkill', status: 'doing', stage: 'planning', domain: 'coding' },
+    work: { id: 'tsk-admit-s1-sigkill', status: 'doing', workflowStep: 'planning', domain: 'coding' },
     stage: 'planning', operation: 'validate-plan',
   });
   const runDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'runs', '01');
@@ -3465,7 +3465,7 @@ test('executeAssignment: an interrupted assignment.json publish leaves it cleanl
   const executorScript = writeEchoExecutor(tempDir);
   const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
 
-  const work = { id: 'tsk-s6-assignment-json', status: 'doing', stage: 'planning', domain: 'coding' };
+  const work = { id: 'tsk-s6-assignment-json', status: 'doing', workflowStep: 'planning', domain: 'coding' };
   const assignment = buildAssignment({ work, stage: 'planning', operation: 'validate-plan' });
   const assignmentDir = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId);
   const assignmentJsonPath = path.join(assignmentDir, 'assignment.json');
@@ -3691,7 +3691,7 @@ fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nWorker done\\
   );
 
   const assignment = buildAssignment({
-    work: { id: 'tsk-n1-m13-test', status: 'todo', stage: 'executing', domain: 'coding' },
+    work: { id: 'tsk-n1-m13-test', status: 'todo', workflowStep: 'executing', domain: 'coding' },
     stage: 'executing',
     operation: 'implement-item',
   });

@@ -14,7 +14,7 @@ import {
   loadRunnerConfig,
 } from '../../src/runner/dispatch/config.mjs';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
-import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
+import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { showRunUseCase, readRunSnapshot } from '../../src/verbs/dispatch/show-run.mjs';
 import { watchRunUseCase } from '../../src/verbs/dispatch/watch.mjs';
 import {

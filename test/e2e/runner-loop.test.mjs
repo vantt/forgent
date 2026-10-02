@@ -65,7 +65,7 @@ function add(cwd, id, extra = {}) {
     // is exercising the runner's dispatch loop, which only ever picks up
     // executing-stage items, so default this helper's --stage to
     // 'executing' the same way test/cli/fgos.test.mjs's own addOk does.
-    '--stage', extra.stage ?? 'executing',
+    '--step', extra.workflowStep ?? 'executing',
   ];
   if (extra.deps && extra.deps.length) flags.push('--deps', extra.deps.join(','));
   const result = fgos(cwd, ['add', id, ...flags]);
@@ -324,23 +324,23 @@ test('e2e stage-clarify+stage-decompose (a) clear+pass-through: --once safely no
   writeRunnerConfig(repoRoot, writeAdaptiveWorkerExecutor(scriptDir));
 
   const submitted = submit(repoRoot, 'Investigate the sluggish overview page');
-  assert.equal(submitted.stage, 'discovery');
+  assert.equal(submitted.workflowStep, 'discovery');
   assert.equal(submitted.verify, 'chưa xác định — P15 bổ sung', 'submit sentinel before discovery runs (D5 fgos.mjs)');
 
   const noop = runner(repoRoot, ['--once']);
   assert.equal(noop.status, 0, `--once failed: ${noop.stderr}`);
-  assert.equal(stateView(repoRoot).work[submitted.id].stage, 'discovery', 'a runner sweep never advances discovery/exploring on its own now (D16)');
+  assert.equal(stateView(repoRoot).work[submitted.id].workflowStep, 'discovery', 'a runner sweep never advances discovery/exploring on its own now (D16)');
 
   const discovered = fgos(repoRoot, ['discover', submitted.id, '--verdict', 'clear', '--verify', 'test -f output.txt && echo VERIFY_OK']);
   assert.equal(discovered.status, 0, `discover failed: ${discovered.stderr}`);
-  assert.equal(stateView(repoRoot).work[submitted.id].stage, 'planning', 'tsk-30v D2/D6: a clear verdict at discovery skips exploring and lands on planning directly, in one hop');
+  assert.equal(stateView(repoRoot).work[submitted.id].workflowStep, 'planning', 'tsk-30v D2/D6: a clear verdict at discovery skips exploring and lands on planning directly, in one hop');
 
   const decomposed = fgos(repoRoot, ['plan', submitted.id, '--verdict', 'pass-through', '--reason', 'single cohesive change']);
   assert.equal(decomposed.status, 0, `decompose failed: ${decomposed.stderr}`);
 
   const afterAdvance = stateView(repoRoot);
   const item = afterAdvance.work[submitted.id];
-  assert.equal(item.stage, 'executing');
+  assert.equal(item.workflowStep, 'executing');
   assert.equal(item.verify, 'test -f output.txt && echo VERIFY_OK', 'the caller-supplied verify replaced the submit sentinel');
   assert.equal(item.status, 'todo', 'a caller-supplied pass-through never dispatches -- the item is only now a frontier head');
 
@@ -354,7 +354,7 @@ test('e2e stage-clarify+stage-decompose (a) clear+pass-through: --once safely no
 
   // `fgos list` (the public read surface) confirms the same facts.
   const list = envelopeData(fgos(repoRoot, ['list']).stdout);
-  assert.equal(list.work[submitted.id].stage, 'executing');
+  assert.equal(list.work[submitted.id].workflowStep, 'executing');
   assert.equal(list.work[submitted.id].verify, 'test -f output.txt && echo VERIFY_OK');
 });
 
@@ -383,7 +383,7 @@ test('e2e stage-clarify (b) unclear verdict: an explicit discover --verdict uncl
 
   const noop = runner(repoRoot, ['--once']);
   assert.equal(noop.status, 0, `--once failed: ${noop.stderr}`);
-  assert.equal(stateView(repoRoot).work[submitted.id].stage, 'discovery', 'a runner sweep never advances discovery on its own now (D16)');
+  assert.equal(stateView(repoRoot).work[submitted.id].workflowStep, 'discovery', 'a runner sweep never advances discovery on its own now (D16)');
 
   const discovered = fgos(repoRoot, ['discover', submitted.id, '--verdict', 'unclear', '--question', question]);
   assert.equal(discovered.status, 0, `discover failed: ${discovered.stderr}`);
@@ -392,7 +392,7 @@ test('e2e stage-clarify (b) unclear verdict: an explicit discover --verdict uncl
   assert.equal(view.work[submitted.id].status, 'awaiting-human');
   // tsk-30v D2/D3: unclear no longer parks in place -- stage advances to
   // exploring even though status stays awaiting-human.
-  assert.equal(view.work[submitted.id].stage, 'exploring');
+  assert.equal(view.work[submitted.id].workflowStep, 'exploring');
   assert.equal(view.gates[submitted.id].ask, question);
   assert.equal(view.discovery[submitted.id].length, 1);
   assert.equal(view.discovery[submitted.id][0].clear, false);
@@ -441,7 +441,7 @@ test('e2e stage-decompose (b) complex item: an explicit decompose --verdict deco
   // becomes the frontier head for the FIRST --once dispatch below.
   let view = stateView(repoRoot);
   const root = view.work[submitted.id];
-  assert.equal(root.stage, 'executing');
+  assert.equal(root.workflowStep, 'executing');
   assert.equal(root.status, 'todo', 'the root itself was never dispatched — its descendants are still open (D4/D5 lineage filter)');
 
   const kids = Object.values(view.work)
@@ -451,8 +451,8 @@ test('e2e stage-decompose (b) complex item: an explicit decompose --verdict deco
   const [childA, childB] = kids;
   assert.equal(childA.deps.length, 0);
   assert.deepEqual(childB.deps, [childA.id], 'sibling dep resolved from the caller-supplied index to a real id');
-  assert.equal(childA.stage, 'executing');
-  assert.equal(childB.stage, 'executing');
+  assert.equal(childA.workflowStep, 'executing');
+  assert.equal(childB.workflowStep, 'executing');
   assert.equal(childA.verify, 'test -f child-a.txt');
   assert.equal(childB.verify, 'test -f child-b.txt');
 
@@ -517,7 +517,7 @@ test('e2e stage-decompose (c) ambiguous verdict: an explicit decompose --verdict
 
   let view = stateView(repoRoot);
   assert.equal(view.work[submitted.id].status, 'awaiting-human');
-  assert.equal(view.work[submitted.id].stage, 'planning', 'need-human never advances stage past planning');
+  assert.equal(view.work[submitted.id].workflowStep, 'planning', 'need-human never advances stage past planning');
   assert.ok(view.gates[submitted.id].ask.includes(reason));
   assert.equal(Object.values(view.work).some((w) => w.parent === submitted.id), false, 'need-human writes nothing to the queue yet (Terms: đề xuất chia)');
   assert.equal(branchExists(repoRoot, `fgw/${submitted.id}`), false);
@@ -530,7 +530,7 @@ test('e2e stage-decompose (c) ambiguous verdict: an explicit decompose --verdict
   assert.equal(noop.status, 0, `--once failed: ${noop.stderr}`);
   view = stateView(repoRoot);
   assert.equal(view.work[submitted.id].status, 'todo', 'the runner sweep still never re-judges decompose on its own (D16) -- a human must call decompose again');
-  assert.equal(view.work[submitted.id].stage, 'planning');
+  assert.equal(view.work[submitted.id].workflowStep, 'planning');
 });
 
 // --- stage-discovery e2e (tsk-5mj D1/D6/D7, tsk-4v6): the runner
@@ -579,15 +579,15 @@ test('e2e stage-discovery: --once dispatches a stage:discovery item to a real wo
   assert.equal(fgos(repoRoot, ['init']).status, 0);
   writeRunnerConfig(repoRoot, writeResearchWorkerExecutor(scriptDir, featureDir));
 
-  add(repoRoot, 'item-research', { stage: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
-  assert.equal(stateView(repoRoot).work['item-research'].stage, 'discovery');
+  add(repoRoot, 'item-research', { workflowStep: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
+  assert.equal(stateView(repoRoot).work['item-research'].workflowStep, 'discovery');
 
   const result = runner(repoRoot, ['--once']);
   assert.equal(result.status, 0, `--once failed: ${result.stderr}`);
 
   const view = stateView(repoRoot);
   const item = view.work['item-research'];
-  assert.equal(item.stage, 'planning', 'tsk-30v D2/D6: a clear verdict skips exploring, advancing discovery -> planning directly');
+  assert.equal(item.workflowStep, 'planning', 'tsk-30v D2/D6: a clear verdict skips exploring, advancing discovery -> planning directly');
   assert.equal(item.status, 'todo', 'discovery dispatch never claims/proposes -- planning is the next stop, not a terminal one');
   assert.equal(item.verify, 'test -f later.txt', "the worker's own proposed verify rode onto the item");
   assert.equal(branchExists(repoRoot, 'fgw/item-research'), true, 'the worker ran on its own real dispatch branch');
@@ -602,14 +602,14 @@ test('e2e stage-discovery: --once advances the item to exploring and parks it in
   assert.equal(fgos(repoRoot, ['init']).status, 0);
   writeRunnerConfig(repoRoot, writeResearchWorkerExecutor(scriptDir, featureDir, { clear: false, question: '## Context\n\nThe worker needs to pick a retry backoff strategy for the research step.\n\n## Why this matters\n\nThis directly affects the outcome: which retry backoff strategy?' }));
 
-  add(repoRoot, 'item-research-unclear', { stage: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
+  add(repoRoot, 'item-research-unclear', { workflowStep: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
 
   const result = runner(repoRoot, ['--once']);
   assert.equal(result.status, 0, `--once failed: ${result.stderr}`);
 
   const view = stateView(repoRoot);
   const item = view.work['item-research-unclear'];
-  assert.equal(item.stage, 'exploring', 'tsk-30v D2/D3: unclear no longer parks in place -- it advances stage to exploring');
+  assert.equal(item.workflowStep, 'exploring', 'tsk-30v D2/D3: unclear no longer parks in place -- it advances stage to exploring');
   assert.equal(item.status, 'awaiting-human', 'an unclear verdict parks the item, matching the interactive driver path');
   assert.equal(view.gates['item-research-unclear'].ask, '## Context\n\nThe worker needs to pick a retry backoff strategy for the research step.\n\n## Why this matters\n\nThis directly affects the outcome: which retry backoff strategy?');
 });
@@ -623,14 +623,14 @@ test('e2e stage-discovery fail-safe: a worker that crashes leaves the item at st
   assert.equal(fgos(repoRoot, ['init']).status, 0);
   writeRunnerConfig(repoRoot, crashingScript);
 
-  add(repoRoot, 'item-research-crash', { stage: 'discovery', verify: 'test -f later.txt' });
+  add(repoRoot, 'item-research-crash', { workflowStep: 'discovery', verify: 'test -f later.txt' });
 
   const result = runner(repoRoot, ['--once']);
   assert.equal(result.status, 0, `--once must still exit 0 -- one item's failed research dispatch never halts the whole tick: ${result.stderr}`);
 
   const view = stateView(repoRoot);
   const item = view.work['item-research-crash'];
-  assert.equal(item.stage, 'discovery', 'left exactly where it was for the next sweep to retry');
+  assert.equal(item.workflowStep, 'discovery', 'left exactly where it was for the next sweep to retry');
   assert.equal(item.status, 'todo');
 });
 
@@ -654,7 +654,7 @@ test('e2e S2-pull: submit pass-throughs 2 stages via discover, a human takes the
   writeRunnerConfig(repoRoot, writeAdaptiveWorkerExecutor(scriptDir));
 
   const submitted = submit(repoRoot, 'Rename a single config key, take by hand');
-  assert.equal(submitted.stage, 'discovery');
+  assert.equal(submitted.workflowStep, 'discovery');
 
   // Pass-through both stages via the SYNC session-role `discover`/`decompose`
   // verbs, each supplying an explicit --verdict (tsk-1x3 D1/D9/D16: a
@@ -665,12 +665,12 @@ test('e2e S2-pull: submit pass-throughs 2 stages via discover, a human takes the
   // never auto-dispatched to a worker.
   const firstDiscover = fgos(repoRoot, ['discover', submitted.id, '--verdict', 'clear', '--verify', 'test -f pull-done.txt && echo PULL_OK']);
   assert.equal(firstDiscover.status, 0, `first discover failed: ${firstDiscover.stderr}`);
-  assert.equal(stateView(repoRoot).work[submitted.id].stage, 'planning', 'tsk-30v D2/D6: a clear verdict at discovery skips exploring and lands on planning directly, in one hop');
+  assert.equal(stateView(repoRoot).work[submitted.id].workflowStep, 'planning', 'tsk-30v D2/D6: a clear verdict at discovery skips exploring and lands on planning directly, in one hop');
 
   const decomposed = fgos(repoRoot, ['plan', submitted.id, '--verdict', 'pass-through', '--reason', 'single cohesive change']);
   assert.equal(decomposed.status, 0, `decompose failed: ${decomposed.stderr}`);
   let view = stateView(repoRoot);
-  assert.equal(view.work[submitted.id].stage, 'executing', 'discovery->planning->executing chained via discover then plan');
+  assert.equal(view.work[submitted.id].workflowStep, 'executing', 'discovery->planning->executing chained via discover then plan');
   assert.equal(view.work[submitted.id].status, 'todo', 'pass-through never dispatches — a human takes it next');
   assert.equal(view.work[submitted.id].verify, 'test -f pull-done.txt && echo PULL_OK');
 

@@ -7,7 +7,8 @@ import { listWork } from '../state/store.mjs';
 import { hasWorkerSlotRoom } from '../state/worker-slots.mjs';
 import { compileDispatchPlan } from './dispatch/plan.mjs';
 import { executeExecutorCli } from './dispatch/cli.mjs';
-import { buildPrompt } from './work-compat.mjs';
+import { buildPrompt, executorIdForWork } from './work-compat.mjs';
+import { workDispatchContext } from './work-dispatch.mjs';
 import fs from 'node:fs';
 import { resolveFgosBin } from '../setup/bin-discovery.mjs';
 
@@ -70,6 +71,7 @@ export async function fanoutBatchExecutorCli(
       const { mechanism, executorId } = compileDispatchPlan(cfg, {
         work: candidateId,
         workItem,
+        workExecutorId: executorIdForWork(workItem),
         hasLiveTaskAccess,
       });
 
@@ -105,7 +107,7 @@ export async function fanoutBatchExecutorCli(
           cwd: wtPath,
           repoRoot: root,
           hasLiveTaskAccess,
-          work: workItem,
+          ...workDispatchContext({ work: workItem, cwd: wtPath, executorId }),
         });
 
         const returnArgs = ['return', candidateId, '--dir', root];

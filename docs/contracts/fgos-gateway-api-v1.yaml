@@ -117,7 +117,7 @@ paths:
           in: query
           schema: { type: string }
           description: Filter by exact status value.
-        - name: stage
+        - name: step
           in: query
           schema: { type: string }
         - name: all
@@ -717,7 +717,7 @@ components:
         description: { type: string }
         kind: { type: string }
         status: { type: string }
-        stage: { type: string }
+        workflowStep: { type: string }
         tier: { type: string }
         risk: { type: string }
         domain: { type: string }
@@ -786,9 +786,9 @@ components:
         `src/state/store.mjs`'s `EDITABLE_FIELDS` allows `fgos edit` to
         change (25 entries, read directly from that constant, never
         re-guessed). All optional; only fields present in the body are
-        patched. `id`/`status`/`domain`/`stage` are never editable through
+        patched. `id`/`status`/`domain`/`workflowStep` are never editable through
         this route (`status` moves only through `/work/{id}/move`,
-        `stage`/`domain` only through the engine's own stage-graph
+        `workflowStep`/`domain` only through the engine's own step
         transitions -- neither is in `EDITABLE_FIELDS`).
       properties:
         title: { type: string }

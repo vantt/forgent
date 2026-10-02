@@ -19,10 +19,8 @@ import {
   PACKAGE_ROOT,
 } from '../../src/runner/dispatch/operation-prompt-templates.mjs';
 
-import {
-  renderAssignmentPrompt,
-  buildAssignment,
-} from '../../src/runner/dispatch/assignment.mjs';
+import { renderAssignmentPrompt } from '../../src/runner/dispatch/assignment.mjs';
+import { buildAssignment } from '../helpers/declared-assignment.mjs';
 
 import {
   buildEffectiveExecutionContract,
@@ -804,6 +802,7 @@ test('I04-REV-01 regression: executeAssignment retry uses pinned template snapsh
       workflow: 'test-wf',
       stage: 'planning',
       operation: 'validate-plan',
+      provenance: { kind: 'declared', declared: { legalOperations: ['shape-plan', 'validate-plan'] } },
       contractTemplate: 'runner-retry-op',
       role: 'tester',
       objective: 'Test runner retry snapshot retention',

@@ -15,13 +15,12 @@ import {
   STATUSES,
   SIZES,
   RIGOR_VALUES,
-  STAGES,
   GOAL_TIERS,
   URGENCY_LEVELS,
   DEFAULTS,
   SCHEMA_VERSION,
 } from '../../src/state/work.mjs';
-import { DOMAINS, classificationVocabulary } from '../../src/state/workflow-stage-graphs.mjs';
+import { DOMAINS, classificationVocabulary } from '../../src/state/domain-registry.mjs';
 
 function mkRepoRoot() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-work-repo-'));
@@ -484,20 +483,27 @@ test('DEFAULTS.size is itself a member of SIZES, and SCHEMA_VERSION is a positiv
   assert.ok(Number.isInteger(SCHEMA_VERSION) && SCHEMA_VERSION > 0);
 });
 
-test('STAGES: "clarify" is retired entirely (tsk-qod D1/D2) — "discovery" is stages[0], the domain\'s own entry point; "decompose" survives only as a legacy, drain-only alias (D18) ahead of "planning" (tsk-403 D11)', () => {
-  assert.deepEqual(STAGES, ['discovery', 'exploring', 'decompose', 'planning', 'executing']);
-});
+const CODING_STEPS = ['discovery', 'exploring', 'planning', 'executing'];
 
-test('validateWork accepts every stage in STAGES', () => {
-  for (const stage of STAGES) {
-    assert.doesNotThrow(() => validateWork(baseWork({ stage })));
+test('validateWork accepts every step the coding Workflow declares', () => {
+  for (const workflowStep of CODING_STEPS) {
+    assert.doesNotThrow(() => validateWork(baseWork({ workflowStep })));
   }
 });
 
-test('validateWork rejects a stage outside the STAGES domain', () => {
+test('validateWork rejects a step outside the domain\'s Workflow, including the retired "clarify" and "decompose" names', () => {
+  for (const workflowStep of ['bogus-step', 'clarify', 'decompose']) {
+    assert.throws(
+      () => validateWork(baseWork({ workflowStep })),
+      (err) => err instanceof WorkValidationError && /workflowStep/.test(err.message),
+    );
+  }
+});
+
+test('validateWork refuses a record that still carries the retired "stage" field', () => {
   assert.throws(
-    () => validateWork(baseWork({ stage: 'bogus-stage' })),
-    (err) => err instanceof WorkValidationError && /stage/.test(err.message),
+    () => validateWork(baseWork({ stage: 'executing' })),
+    (err) => err instanceof WorkValidationError && /work\.stage is retired/.test(err.message),
   );
 });
 
@@ -521,9 +527,9 @@ test('validateWork rejects a domain outside the DOMAINS registry', () => {
   );
 });
 
-test('validateWork accepts every stage in STAGES when domain is explicitly "coding" (same stage-enum as the default)', () => {
-  for (const stage of STAGES) {
-    assert.doesNotThrow(() => validateWork(baseWork({ domain: 'coding', stage })));
+test('validateWork accepts every coding step when domain is explicitly "coding" (same step set as the default)', () => {
+  for (const workflowStep of CODING_STEPS) {
+    assert.doesNotThrow(() => validateWork(baseWork({ domain: 'coding', workflowStep })));
   }
 });
 
@@ -959,7 +965,7 @@ test('validateWorkShape rejects a holder outside coding\'s declared roles', () =
 
 test('validateWorkShape rejects any holder on a domain with no roleGraph (synthetic)', () => {
   assert.throws(
-    () => validateWorkShape(baseWork({ domain: 'synthetic', stage: 'assembling', holder: 'implementer' })),
+    () => validateWorkShape(baseWork({ domain: 'synthetic', workflowStep: 'assembling', holder: 'implementer' })),
     WorkValidationError,
   );
 });

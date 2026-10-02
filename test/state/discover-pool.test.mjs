@@ -5,7 +5,7 @@ import { pickNextDiscoverItem } from '../../src/state/discover-pool.mjs';
 // Pure lib — every view here is a literal; no fs, no mkdtemp, no `.fgos/`
 // writes anywhere in this file (same convention as frontier.test.mjs).
 function item(id, stage, status, extra = {}) {
-  return { id, title: id, kind: 'task', stage, status, deps: [], risk: 'light', refs: [], verify: 'true', ...extra };
+  return { id, title: id, kind: 'task', workflowStep: stage, status, deps: [], risk: 'light', refs: [], verify: 'true', ...extra };
 }
 
 test('pickNextDiscoverItem on an empty view returns null', () => {
@@ -41,7 +41,7 @@ test('a single discoverable-stage candidate is picked regardless of a stage:deco
       b: item('b', 'discovery', 'todo'),
     },
   };
-  assert.deepEqual(pickNextDiscoverItem(view), { id: 'b', stage: 'discovery' });
+  assert.deepEqual(pickNextDiscoverItem(view), { id: 'b', workflowStep: 'discovery' });
 });
 
 test('clarify pool orders by blocks DESCENDING (item blocking more open work wins)', () => {
@@ -55,7 +55,7 @@ test('clarify pool orders by blocks DESCENDING (item blocking more open work win
   // `dependent` (status:todo, stage:executing) is not itself a candidate,
   // but it makes `blocker` block 1 open item via rankImpact -- `base`
   // blocks nothing.
-  assert.deepEqual(pickNextDiscoverItem(view), { id: 'blocker', stage: 'discovery' });
+  assert.deepEqual(pickNextDiscoverItem(view), { id: 'blocker', workflowStep: 'discovery' });
 });
 
 test('clarify pool ties on blocks: urgent item wins', () => {
@@ -65,7 +65,7 @@ test('clarify pool ties on blocks: urgent item wins', () => {
       b: item('b', 'discovery', 'todo', { urgent: true }),
     },
   };
-  assert.deepEqual(pickNextDiscoverItem(view), { id: 'b', stage: 'discovery' });
+  assert.deepEqual(pickNextDiscoverItem(view), { id: 'b', workflowStep: 'discovery' });
 });
 
 test('clarify pool ties on blocks and urgent: FIFO (declaration order) wins', () => {
@@ -75,19 +75,19 @@ test('clarify pool ties on blocks and urgent: FIFO (declaration order) wins', ()
       second: item('second', 'discovery', 'todo'),
     },
   };
-  assert.deepEqual(pickNextDiscoverItem(view), { id: 'first', stage: 'discovery' });
+  assert.deepEqual(pickNextDiscoverItem(view), { id: 'first', workflowStep: 'discovery' });
 });
 
 // --- tsk-1w7 D10: 'discovery'/'exploring' join the clarify-shaped pool ----
 
 test('a stage:discovery item is picked into the clarify-shaped pool, with its own real stage returned', () => {
   const view = { work: { a: item('a', 'discovery', 'todo') } };
-  assert.deepEqual(pickNextDiscoverItem(view), { id: 'a', stage: 'discovery' });
+  assert.deepEqual(pickNextDiscoverItem(view), { id: 'a', workflowStep: 'discovery' });
 });
 
 test('a stage:exploring item is picked into the clarify-shaped pool, with its own real stage returned', () => {
   const view = { work: { a: item('a', 'exploring', 'todo') } };
-  assert.deepEqual(pickNextDiscoverItem(view), { id: 'a', stage: 'exploring' });
+  assert.deepEqual(pickNextDiscoverItem(view), { id: 'a', workflowStep: 'exploring' });
 });
 
 test('clarify/discovery/exploring items share ONE pool, ordered by blocks like any other clarify-shaped candidate — never three separate buckets', () => {
@@ -103,7 +103,7 @@ test('clarify/discovery/exploring items share ONE pool, ordered by blocks like a
   // two block nothing — same "picked into the pool, ordered by blocks"
   // discipline the pre-existing clarify-only tests above already prove,
   // now covering all three clarify-shaped stages at once.
-  assert.deepEqual(pickNextDiscoverItem(view), { id: 'discoveryItem', stage: 'discovery' });
+  assert.deepEqual(pickNextDiscoverItem(view), { id: 'discoveryItem', workflowStep: 'discovery' });
 });
 
 test('a stage:exploring candidate is picked regardless of a stage:decompose item present', () => {
@@ -113,7 +113,7 @@ test('a stage:exploring candidate is picked regardless of a stage:decompose item
       exploringItem: item('exploringItem', 'exploring', 'todo'),
     },
   };
-  assert.deepEqual(pickNextDiscoverItem(view), { id: 'exploringItem', stage: 'exploring' });
+  assert.deepEqual(pickNextDiscoverItem(view), { id: 'exploringItem', workflowStep: 'exploring' });
 });
 
 // --- tsk-2v3: isCandidate() now checks isDepsAndLineageReady -------------
@@ -125,7 +125,7 @@ test('an item with an unmet dep is never picked, even as the only candidate', ()
       dependent: item('dependent', 'discovery', 'todo', { deps: ['blocker'] }),
     },
   };
-  assert.deepEqual(pickNextDiscoverItem(view), { id: 'blocker', stage: 'discovery' });
+  assert.deepEqual(pickNextDiscoverItem(view), { id: 'blocker', workflowStep: 'discovery' });
 });
 
 test('an item becomes pickable once its dep resolves', () => {
@@ -135,7 +135,7 @@ test('an item becomes pickable once its dep resolves', () => {
       dependent: item('dependent', 'discovery', 'todo', { deps: ['blocker'] }),
     },
   };
-  assert.deepEqual(pickNextDiscoverItem(view), { id: 'dependent', stage: 'discovery' });
+  assert.deepEqual(pickNextDiscoverItem(view), { id: 'dependent', workflowStep: 'discovery' });
 });
 
 // --- tsk-64h: candidate stages derive from the domain, not a literal copy -
@@ -147,7 +147,7 @@ test('a stage:clarify item is never picked — the coding domain retired that st
 
 test("a triage-domain item at that domain's OWN Clarify-mapped stage is picked, even though no coding stage carries that name", () => {
   const view = { work: { a: item('a', 'triage', 'todo', { domain: 'triage' }) } };
-  assert.deepEqual(pickNextDiscoverItem(view), { id: 'a', stage: 'triage' });
+  assert.deepEqual(pickNextDiscoverItem(view), { id: 'a', workflowStep: 'triage' });
 });
 
 test("a coding-domain item parked at another domain's stage name is never picked", () => {
@@ -162,7 +162,7 @@ test('two domains in one view resolve their candidate stages independently, per 
       triageItem: item('triageItem', 'triage', 'todo', { domain: 'triage' }),
     },
   };
-  assert.deepEqual(pickNextDiscoverItem(view), { id: 'triageItem', stage: 'triage' });
+  assert.deepEqual(pickNextDiscoverItem(view), { id: 'triageItem', workflowStep: 'triage' });
 });
 
 // work-item-backlog-status Piece 3 (tsk-1av): `backlog` means "an idea,
@@ -170,12 +170,12 @@ test('two domains in one view resolve their candidate stages independently, per 
 // should still be allowed, so this pool accepts it alongside `todo`.
 test('a stage:exploring item with status:backlog IS a candidate', () => {
   const view = { work: { a: item('a', 'exploring', 'backlog') } };
-  assert.deepEqual(pickNextDiscoverItem(view), { id: 'a', stage: 'exploring' });
+  assert.deepEqual(pickNextDiscoverItem(view), { id: 'a', workflowStep: 'exploring' });
 });
 
 test('a stage:discovery item with status:backlog IS a candidate', () => {
   const view = { work: { a: item('a', 'discovery', 'backlog') } };
-  assert.deepEqual(pickNextDiscoverItem(view), { id: 'a', stage: 'discovery' });
+  assert.deepEqual(pickNextDiscoverItem(view), { id: 'a', workflowStep: 'discovery' });
 });
 
 // The widening is scoped to clarify-shaped stages only. `planning` (and

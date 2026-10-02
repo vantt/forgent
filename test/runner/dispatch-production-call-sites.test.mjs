@@ -14,7 +14,8 @@ import path from 'node:path';
 import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
-import { spawnWorker, executeExecutorCli } from '../../src/runner/dispatch/cli.mjs';
+import { executeExecutorCli } from '../../src/runner/dispatch/cli.mjs';
+import { spawnWorker } from '../../src/runner/work-dispatch.mjs';
 import { fanoutBatchExecutorCli } from '../../src/runner/fanout-batch.mjs';
 import { loadRunnerConfigFromDir, normalizeLegacyConfinement } from '../../src/runner/dispatch/config.mjs';
 import { addWork, listWork } from '../../src/state/store.mjs';
@@ -630,7 +631,7 @@ test('fanoutBatchExecutorCli in Work Driver coordinates pick -> execute -> retur
     kind: 'task',
     status: 'todo',
     domain: 'coding',
-    stage: 'planning',
+    workflowStep: 'planning',
     deps: [],
     refs: [],
     risk: 'light',
@@ -643,7 +644,7 @@ test('fanoutBatchExecutorCli in Work Driver coordinates pick -> execute -> retur
     kind: 'task',
     status: 'todo',
     domain: 'coding',
-    stage: 'executing',
+    workflowStep: 'executing',
     deps: [],
     refs: [],
     risk: 'light',
@@ -715,7 +716,7 @@ test('fgos return --blocked sets item status to blocked with outcome and reason 
     kind: 'task',
     status: 'todo',
     domain: 'coding',
-    stage: 'executing',
+    workflowStep: 'executing',
     deps: [],
     refs: [],
     risk: 'light',

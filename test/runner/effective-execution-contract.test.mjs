@@ -15,7 +15,8 @@ import {
   assertNoSecrets,
 } from '../../src/runner/dispatch/effective-execution-contract.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
-import { buildAssignment, renderAssignmentPrompt } from '../../src/runner/dispatch/assignment.mjs';
+import { renderAssignmentPrompt } from '../../src/runner/dispatch/assignment.mjs';
+import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { renderBrief, briefPaths } from '../../src/runner/dispatch/brief.mjs';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
 

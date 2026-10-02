@@ -9,7 +9,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { DOMAINS, DEFAULT_DOMAIN, getDomain, classificationVocabulary, roleGraphFor } from './workflow-stage-graphs.mjs';
+import { DOMAINS, DEFAULT_DOMAIN, getDomain, classificationVocabulary, roleGraphFor, domainSteps } from './domain-registry.mjs';
 import { RIGOR_VALUES } from '../runner/rigor.mjs';
 
 export { RIGOR_VALUES };
@@ -124,7 +124,7 @@ export const FINAL_STATUSES = new Set(['awaiting-approval', 'blocked', 'delivere
  * status-category-schema/CONTEXT.md`) — a lossy compression of the six
  * front-segment statuses (`todo`/`doing`/`blocked`/`awaiting-human`/
  * `awaiting-approval`/`wontfix`; see `DOMAINS[domain].statusLabels`,
- * `workflow-stage-graphs.mjs`) that lets every domain-agnostic mechanism of
+ * `domain-registry.mjs`) that lets every domain-agnostic mechanism of
  * fgOS (frontier's `ready` filter, rollup, outcome/friction,
  * discovery-judge — none of them migrated yet, that is tsk-38t-4's own
  * scope) read "which bucket is this item in" without learning a domain's
@@ -183,29 +183,23 @@ export const URGENCY_LEVELS = Object.freeze(['low', 'medium', 'high', 'critical'
 export const GOAL_TIERS = Object.freeze(['mvp', 'milestone']);
 
 /**
- * Stage domain for `work.stage` (per stage-clarify D1/D2/D8, extended by
- * stage-decompose D2) — the macro-level lifecycle stage of a work item
- * (clarify -> decompose -> executing), orthogonal to the FSM's micro-level
- * `status` (status-fsm.mjs's TRANSITIONS is unchanged by this field). `stage` is
- * OPTIONAL and NOT in DEFAULTS (D8): a missing `stage` reads as `executing`
- * lazily wherever it is consumed (frontier.mjs, store.mjs), never injected
- * onto the record itself — this keeps every existing add/submit/legacy path
- * byte-for-byte unchanged.
- *
- * Sourced from the 'coding' domain's registry entry (base-workflow-model
- * D2/D3, src/state/workflow-stage-graphs.mjs) rather than declared inline — this keeps
- * exactly one definition of coding's stage list, but the exported value
- * (and every existing consumer of it) is unchanged.
+ * `work.workflowStep` — which step of its domain's Workflow (domains/<domain>/
+ * workflows/*.yaml) a work item is at: the macro-level lifecycle dimension,
+ * orthogonal to the FSM's micro-level `status`. OPTIONAL and NOT in DEFAULTS: a
+ * missing `workflowStep` reads as the domain's execute-phase step lazily wherever
+ * it is consumed (domain-registry.mjs's `effectiveStep`), never injected onto the
+ * record itself. The valid steps are the Workflow's own; this module declares
+ * none. Records written before the rename carry `stage` instead — replay.mjs is
+ * the single place that maps it forward.
  */
-export const STAGES = DOMAINS[DEFAULT_DOMAIN].stages;
 
 /**
  * Domain field domain for `work.domain` (per base-workflow-model D1-D3) —
- * which domain's stage semantics (list + step-mapping + transition edges,
- * `src/state/workflow-stage-graphs.mjs`) govern this item's `stage` value. OPTIONAL and
- * NOT in DEFAULTS — same D8 lazy-default shape as `stage` itself: a missing
+ * which domain's Workflow (steps + transition edges, `src/state/domain-registry.mjs`)
+ * govern this item's `workflowStep` value. OPTIONAL and
+ * NOT in DEFAULTS — same lazy-default shape as `workflowStep` itself: a missing
  * `domain` reads as `'coding'` lazily wherever it is consumed (frontier.mjs,
- * loop.mjs, stage-fsm.mjs, and this module's own `validateWork`), never injected
+ * loop.mjs, step-fsm.mjs, and this module's own `validateWork`), never injected
  * onto the record — every existing (100% coding) item needs zero migration.
  */
 
@@ -275,11 +269,11 @@ function requireDeclaredClassification(work, field) {
  * Omitted (the default, `addWork`'s own call) means "check everything,"
  * byte-for-byte the original behavior. `editWork` (store.mjs) is the one
  * caller that ever passes a real Set: an edit patch can only ever contain
- * `EDITABLE_FIELDS` keys (id/status/stage/domain are never among them, so
+ * `EDITABLE_FIELDS` keys (id/status/workflowStep/domain are never among them, so
  * their checks below can never fire for an edit either way), and
  * re-rejecting an UNCHANGED field's pre-existing value on every edit — the
  * bug this parameter fixes — blocked 65/112 items from being edited at all
- * for legacy shape that predates a since-tightened rule (stage enum,
+ * for legacy shape that predates a since-tightened rule (step enum,
  * id-length cap). This never widens what a NEW value in the patch must
  * satisfy — every check below still runs in full for any field actually
  * present in `touchedFields`.
@@ -324,7 +318,7 @@ export function validateWorkShape(work, touchedFields) {
     }
   }
   // mergeAfter (D4/D5, docs/history/tsk-3bn-merge-conductor-harness-v2/):
-  // OPTIONAL and NOT in DEFAULTS (same lazy-additive shape as parent/stage
+  // OPTIONAL and NOT in DEFAULTS (same lazy-additive shape as parent/workflowStep
   // above) — a weak, merge-order-only edge read ONLY by mergeReadiness's
   // waiting gate, never by frontier.mjs. Shape mirrors `deps` (array of
   // non-empty strings); self-reference check mirrors `parent`'s. Existence
@@ -458,16 +452,18 @@ export function validateWorkShape(work, touchedFields) {
       `work.effort must be a non-negative number when present, got: ${JSON.stringify(work.effort)}`,
     );
   }
-  if (touched('stage') && work.stage !== undefined) {
-    // Domain-aware per base-workflow-model D2/D3: look up the item's own
-    // domain's stage list instead of the flat STAGES constant, so a future
-    // Slice-2 domain's own stage names validate too. work.domain was already
-    // confirmed to be a real DOMAINS key (or absent) just above, so this
-    // lookup can never miss.
+  if (work.stage !== undefined) {
+    throw new WorkValidationError('work.stage is retired; a work item records its step as work.workflowStep.');
+  }
+  if (touched('workflowStep') && work.workflowStep !== undefined) {
+    // Domain-aware: the item's own domain's Workflow declares the valid steps.
+    // work.domain was already confirmed to be a real DOMAINS key (or absent)
+    // just above, so this lookup can never miss.
     const domain = DOMAINS[work.domain ?? DEFAULT_DOMAIN];
-    if (!domain.stages.includes(work.stage)) {
+    const steps = domainSteps(domain, work.kind);
+    if (!steps.includes(work.workflowStep)) {
       throw new WorkValidationError(
-        `work.stage must be one of ${JSON.stringify(domain.stages)} when present, got: ${JSON.stringify(work.stage)}`,
+        `work.workflowStep must be one of ${JSON.stringify(steps)} when present, got: ${JSON.stringify(work.workflowStep)}`,
       );
     }
   }
@@ -476,10 +472,10 @@ export function validateWorkShape(work, touchedFields) {
       throw new WorkValidationError('work.workflowRunId must be a non-empty string when present.');
     }
   }
-  // holder (tsk-2t9c D1): THIRD orthogonal axis (status x stage x
+  // holder (tsk-2t9c D1): THIRD orthogonal axis (status x workflowStep x
   // role/holder), opt-in per-domain -- never in EDITABLE_FIELDS
   // (store.mjs), moves only through the handoff verb, same exclusion
-  // stage/status/domain already get. A domain with no roleGraph must
+  // workflowStep/status/domain already get. A domain with no roleGraph must
   // carry no holder at all (the compatibility path for every existing
   // item and every non-role-aware domain); a domain WITH a roleGraph
   // constrains holder to its declared roles list.
@@ -510,7 +506,7 @@ export function validateWorkShape(work, touchedFields) {
   // that unified graph, so `parent` now participates in acyclicity alongside
   // `deps`. This is a read-projection only: zero stored `edges[]` field, no
   // schema change, SCHEMA_VERSION unchanged. OPTIONAL and NOT in DEFAULTS,
-  // same additive shape as `stage` — absent on every item that predates this
+  // same additive shape as `workflowStep` — absent on every item that predates this
   // field or was never decomposed.
   if (touched('parent') && work.parent !== undefined && work.parent !== null) {
     if (typeof work.parent !== 'string' || !work.parent.trim()) {
@@ -527,7 +523,7 @@ export function validateWorkShape(work, touchedFields) {
   // b5c0ba0c/0012): an item a worker reported finding mid-task carries
   // `discoveredFrom` — the id of the item that was being worked when it was
   // discovered. Mirrors `parent` immediately above: its own stored field,
-  // OPTIONAL and NOT in DEFAULTS (same lazy-additive shape as parent/stage/
+  // OPTIONAL and NOT in DEFAULTS (same lazy-additive shape as parent/workflowStep/
   // domain), rides SCHEMA_VERSION 2 unchanged (no bump — precedent: every
   // prior additive field stayed on v2). Existence of the referenced id is
   // deliberately NOT enforced here, exactly like parent — a dangling
@@ -689,8 +685,8 @@ export function validateWorkShape(work, touchedFields) {
   // rejected). Whether `work.domainFields[work.domain]` actually matches
   // the fieldSchema that domain declared (if any) is a SEPARATE, narrower
   // concern handled by `validateDomainFields` below — mirroring how this
-  // function checks `work.stage` is one of `DOMAINS[domain].stages` above
-  // without opening a per-stage schema engine of its own.
+  // function checks `work.workflowStep` is one of the domain's Workflow steps above
+  // without opening a per-step schema engine of its own.
   if (touched('domainFields') && work.domainFields !== undefined && work.domainFields !== null) {
     if (typeof work.domainFields !== 'object' || Array.isArray(work.domainFields)) {
       throw new WorkValidationError(

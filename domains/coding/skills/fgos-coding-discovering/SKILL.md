@@ -32,7 +32,7 @@ này tồn tại.
 Skill này cũng là nơi phán `size`/`rigor`/`kind`/`risk` (Phase 3): trên bằng
 chứng đã research xong ở bước 3, không phải suy đoán từ text submit —
 đọc vựng qua `classificationVocabulary(domain, field)`
-(`src/state/workflow-stage-graphs.mjs`), không hardcode mảng giá trị. Xem
+(`src/state/domain-registry.mjs`), không hardcode mảng giá trị. Xem
 bước 4/5.
 
 Hợp đồng đầu việc: `domains/coding/task-specs/judge-ambiguity.md` (D6/D9)
@@ -168,7 +168,7 @@ lệch khỏi hợp đồng đã khoá (tsk-2t9c D16 — task-spec này đã t�
    `size` là độ lớn, công sức (ước lượng, chia việc).
    Đọc vựng `kind`/`risk` qua `classificationVocabulary(domain, 'kind')` /
    `classificationVocabulary(domain, 'risk')`
-   (`src/state/workflow-stage-graphs.mjs`, không hardcode mảng giá trị);
+   (`src/state/domain-registry.mjs`, không hardcode mảng giá trị);
    `size` so với `SIZES` toàn cục của `work.mjs` (`light`/`standard`/`heavy`);
    `rigor` so với `RIGOR_VALUES` toàn cục (`low`/`standard`/`high`/`critical`). Một
    verdict `unclear` không phán classification — chưa đủ bằng chứng.

@@ -32,9 +32,9 @@ import { withEventsLock, appendEventLocked } from './events.mjs';
 import { viewRevision, serializeView, readAllEventsFromDir, rebuildViewFromDir, buildSnapshotFromDir, VIEW_SCHEMA_VERSION } from './replay.mjs';
 import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, classifyStalePostDelivery, footprintOverlapAmong, goalScopedCriticalPath, goalScopedGreedyTopUnblock, computeSchedule, detectCycles } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './status-fsm.mjs';
-import { transitionStage } from './stage-fsm.mjs';
+import { transitionStep } from './step-fsm.mjs';
 import { validateWork, validateDomainFields, checkAcceptanceEvidenceTraceable, WorkValidationError, DEFAULTS, GOAL_TIERS, truncateTitle } from './work.mjs';
-import { getDomain, statusCategoryFor, parkReasonForStatus, roleGraphFor, effectiveStage } from './workflow-stage-graphs.mjs';
+import { getDomain, statusCategoryFor, parkReasonForStatus, roleGraphFor, effectiveStep, stepForPhase } from './domain-registry.mjs';
 import { evaluateHandoff } from './handoff.mjs';
 import { EventLogError } from './events.mjs';
 import { frontier, frontierAcrossSteps, isDepsAndLineageReady as depsAndLineageReadyView } from './frontier.mjs';
@@ -287,8 +287,8 @@ export function addWork(dir, work) {
     // validateWork above confirms `item.domain` is either absent or a real
     // DOMAINS key — deliberately not folded into the tier/title normalize
     // step above it, because `getDomain` falls back to DEFAULT_DOMAIN with
-    // a `console.warn` for a genuinely unrecognized domain (workflow-stage-
-    // graphs.mjs's `resolveDomainName`), and an invalid `item.domain` must
+    // a `console.warn` for a genuinely unrecognized domain (domain-registry.mjs's
+    // `resolveDomainName`), and an invalid `item.domain` must
     // still fail validation with exactly the same single stderr line as
     // before this cell existed (test/cli/fgos.test.mjs's `submit --domain
     // <bad>` stderr-parity assertion) — never a stray "folding to coding"
@@ -309,7 +309,7 @@ export function addWork(dir, work) {
     }
     // tsk-48i D1: same write-time-stamp shape as statusCategory above, for
     // the domain-owned parkReason table (parkReasonForStatus,
-    // workflow-stage-graphs.mjs) -- lets a domain-agnostic reader (e.g.
+    // domain-registry.mjs) -- lets a domain-agnostic reader (e.g.
     // herdr-plugin) tell "actively worked" apart from "parked on a person"
     // or "parked on a system error" without learning the domain's own
     // literal status strings.
@@ -345,10 +345,10 @@ export function addWork(dir, work) {
   });
 }
 
-// D4/D5: the exact field set `edit` may patch. `id`, `status`, `stage`, and
+// D4/D5: the exact field set `edit` may patch. `id`, `status`, `workflowStep`, and
 // `domain` are deliberately absent — each already has its own dedicated
-// write path (identity is immutable; `status` is `move`'s; `stage` is
-// `moveStage`'s) and mixing them into `edit` would open a second door onto
+// write path (identity is immutable; `status` is `move`'s; `workflowStep` is
+// `moveStep`'s) and mixing them into `edit` would open a second door onto
 // the same field.
 const EDITABLE_FIELDS = new Set(['title', 'description', 'kind', 'risk', 'verify', 'size', 'rigor', 'refs', 'deps', 'acceptance', 'priority', 'intent', 'docsRef', 'parent', 'urgent', 'impact', 'effort', 'footprint', 'action', 'mergeAfter', 'supersededBy', 'duplicates', 'domainFields', 'goalTier', 'nextOperation', 'secondaryOperation', 'workflowRunId']);
 
@@ -356,7 +356,7 @@ const EDITABLE_FIELDS = new Set(['title', 'description', 'kind', 'risk', 'verify
  * Patch fields on an existing work item, through the SAME single write door
  * as `addWork`/`moveWork` (per D3). Unlike `addWork` (a full new record),
  * `patch` is a PARTIAL set of fields — only the D4 allowlist above may
- * appear in it; anything else (including a stray `id`/`status`/`stage`/
+ * appear in it; anything else (including a stray `id`/`status`/`workflowStep`/
  * `domain`) is rejected as `validation` before the merge even happens, so an
  * over-broad patch never silently no-ops instead of failing loud. The merged
  * candidate is validated by the SAME `validateWork` entry point `addWork`
@@ -367,7 +367,7 @@ const EDITABLE_FIELDS = new Set(['title', 'description', 'kind', 'risk', 'verify
 // Same held-lock critical section as addWork above (existence + validation
 // check through the append, one withEventsLock/appendEventLocked scope): two
 // processes racing editWork on the same id, or racing editWork against
-// addWork/moveWork/moveStage on ids that would collide (e.g. a deps/parent
+// addWork/moveWork/moveStep on ids that would collide (e.g. a deps/parent
 // cycle only the second writer's patch creates), can no longer both read a
 // precondition that the other's not-yet-visible write is about to invalidate.
 function validateWorkPatch(view, dir, id, patch, role, writer) {
@@ -390,7 +390,7 @@ function validateWorkPatch(view, dir, id, patch, role, writer) {
     throw new StoreError(
       'validation',
       `edit cannot change "kind" on work "${id}" -- status is "${work.status}", not "todo". `
-      + `kind selects the item's workflow/stage graph; it can only change while status is still todo, `
+      + `kind selects the item's Workflow; it can only change while status is still todo, `
       + `before a claim lets the item start walking that graph.`,
     );
   }
@@ -670,7 +670,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   }
   // tsk-48i D1: same write-time-stamp shape as statusCategory above, for
   // the domain-owned parkReason table (parkReasonForStatus,
-  // workflow-stage-graphs.mjs).
+  // domain-registry.mjs).
   const parkReason = parkReasonForStatus(getDomain(work.domain), to);
   if (parkReason !== undefined) {
     rawEvent.payload.parkReason = parkReason;
@@ -1436,16 +1436,16 @@ export function answerAwaiting(dir, { id, answer, expectedStatus, role, rational
 }
 
 /**
- * Move a work item to a new stage (per stage-clarify D1/D10/D12). Mirrors
- * `moveWork` exactly, one dimension up: looks the item up fresh from the
- * log, delegates the precondition/CAS decision to stage-fsm.mjs (pure — never
- * writes), and only then appends the event it returns.
+ * Move a work item to a new Workflow step. Mirrors `moveWork` exactly, one
+ * dimension up: looks the item up fresh from the log, delegates the
+ * precondition/CAS decision to step-fsm.mjs (pure — never writes), and only
+ * then appends the event it returns.
  *
  * Same held-lock critical section as moveWork above — the lookup, the
- * `expectedStage` CAS decision, and the append all run inside one
+ * `expectedStep` CAS decision, and the append all run inside one
  * `withEventsLock`/`appendEventLocked` scope.
  */
-export function moveStage(dir, { id, to, expectedStage, verify, role } = {}) {
+export function moveStep(dir, { id, to, expectedStep, verify, role } = {}) {
   const { logPath } = paths(dir);
   let shouldResolveClarify = false;
   const result = withEventsLockAndRefresh(dir, logPath, () => {
@@ -1456,19 +1456,20 @@ export function moveStage(dir, { id, to, expectedStage, verify, role } = {}) {
     }
 
     const drivingVerdict = before.discovery?.[id]?.at(-1);
-    if (work.stage === 'discovery' && drivingVerdict?.clear !== false) {
+    const discoverEntry = stepForPhase(getDomain(work.domain, { onUnrecognized: () => {} }), 'discover', work.kind);
+    if (discoverEntry !== undefined && effectiveStep(work, getDomain(work.domain, { onUnrecognized: () => {} })) === discoverEntry && drivingVerdict?.clear !== false) {
       shouldResolveClarify = true;
     }
 
-    const rawEvent = transitionStage({ work, to, expectedStage, verify }); // FsmError: precondition | conflict
-    // Same post-transition role stamp as moveWork above — stage-fsm.mjs is pure
+    const rawEvent = transitionStep({ work, to, expectedStep, verify }); // FsmError: precondition | conflict
+    // Same post-transition role stamp as moveWork above — step-fsm.mjs is pure
     // and only ever returns the fields it knows about.
     if (role !== undefined) {
       rawEvent.payload.role = role;
     }
     // Writer provenance (D8/D15/D17/D18, str46-io-contract) -- same
     // post-transition stamp as role above, but unconditional: every
-    // moveStage call records who wrote it, never blocking on a malformed
+    // moveStep call records who wrote it, never blocking on a malformed
     // identity (D18).
     rawEvent.payload.writer = resolveWriterIdentity(dir);
     return appendEventLocked(resolveWriterLogPath(dir), rawEvent, dir);
@@ -1551,18 +1552,17 @@ export function recordCall(dir, { id, toRole, reason, note, outcome, openSyncDep
     const domain = getDomain(work.domain);
     const roleGraph = roleGraphFor(domain);
     const fromRole = work.holder ?? roleGraph?.defaultRole;
-    // effectiveStage, not raw work.stage (tsk-2t9c bugfix, found in
-    // self-review): a work item's `stage` is legitimately absent under
-    // D8's lazy-default rule (workflow-stage-graphs.mjs's own
-    // effectiveStage/stage-fsm.mjs precedent) -- reading work.stage
+    // effectiveStep, not raw work.workflowStep: a work item's step is
+    // legitimately absent under the lazy-default rule (domain-registry.mjs's own
+    // effectiveStep/step-fsm.mjs precedent) -- reading work.workflowStep
     // directly here made every handoff attempt on an item that never had
-    // an explicit moveStage refuse with "stage: undefined", including
-    // split children born straight at 'executing' without ever calling
-    // moveStage (src/intake/plan.mjs's normalizeChild path).
-    const stage = effectiveStage(work, domain);
+    // an explicit moveStep refuse, including split children born straight at
+    // their execute step without ever calling moveStep (src/intake/plan.mjs's
+    // normalizeChild path).
+    const step = effectiveStep(work, domain);
     const openCallDepth = openCallStack(before.callThreads?.[id]).length;
 
-    const result = evaluateHandoff({ domain, stage, fromRole, toRole, reason, openCallDepth, openSyncDepth });
+    const result = evaluateHandoff({ domain, step, fromRole, toRole, reason, openCallDepth, openSyncDepth });
     if (!result.ok) {
       throw new StoreError(
         'validation',
@@ -1879,19 +1879,18 @@ export function listWork(dir) {
  * so `frontier` on it returns `[]` — never an error, exit 0, exactly like
  * `listWork` on an uninitialized dir. A corrupt log throws the same
  * `EventLogError('corrupt-log')` `rebuildView`/`listWork` already throw.
- * `step` (tsk-4so, optional): which domain step counts as "ready to start"
- * — passed straight through to `frontier`'s own `step` option
- * (`'Clarify'`/`'Divide'`/`'Execute'`); omitted, `frontier`'s own default
- * (`'Execute'`) applies, byte-identical to every pre-existing caller.
+ * `phase` (optional): which Workflow phase counts as "ready to start" — passed
+ * straight through to `frontier`'s own `phase` option (`'clarify'`/`'plan'`/
+ * `'execute'`); omitted, `frontier`'s own default (`'execute'`) applies.
  */
-export function readyWork(dir, { step } = {}) {
-  return frontier(currentEffectiveView(dir), step ? { step } : undefined);
+export function readyWork(dir, { phase } = {}) {
+  return frontier(currentEffectiveView(dir), phase ? { phase } : undefined);
 }
 
 /**
  * Read-only stage-independent readiness check (choke-point-take-vs-pick-
  * claim-eligibility): true when `id` has every dep done and no open
- * decomposed child, regardless of its `stage` — see frontier.mjs's
+ * decomposed child, regardless of its `workflowStep` — see frontier.mjs's
  * `isDepsAndLineageReady` for the full rationale. `take`'s explicit `--id`
  * branch uses this instead of `readyWork` so it can claim a clarify/decompose
  * item without losing the deps/lineage guard.

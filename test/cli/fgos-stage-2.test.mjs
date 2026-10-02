@@ -60,7 +60,7 @@ import {
   makeRunnerProposedLeafItem,
   makeSessionSafeRunnerItem,
   mkLocalDependency,
-  moveStage,
+  moveStep,
   moveWork,
   os,
   path,
@@ -103,7 +103,7 @@ test('discover with an out-of-vocabulary --kind is rejected as validation (exit 
   assert.match(result.stderr, /work\.kind must be one of/);
 
   const item = envelopeData(run(cwd, ['list']).stdout).work[id];
-  assert.equal(item.stage, 'discovery', 'a rejected classification must never leave the item half-advanced');
+  assert.equal(item.workflowStep, 'discovery', 'a rejected classification must never leave the item half-advanced');
   assert.notEqual(item.kind, 'bogus');
 });
 
@@ -115,7 +115,7 @@ test('discover with retired --tier is rejected as validation (exit 4) before the
   const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- bad-tier', '--tier', 'enormous']);
   assert.equal(result.status, 4);
   assert.match(result.stderr, /--tier is retired/);
-  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'discovery');
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].workflowStep, 'discovery');
 });
 
 test('discover with an out-of-vocabulary --size is rejected as validation (exit 4) before the item moves at all', () => {
@@ -125,7 +125,7 @@ test('discover with an out-of-vocabulary --size is rejected as validation (exit 
   const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- bad-size', '--size', 'enormous']);
   assert.equal(result.status, 4);
   assert.match(result.stderr, /work\.size must be one of/);
-  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'discovery');
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].workflowStep, 'discovery');
 });
 
 
@@ -136,7 +136,7 @@ test('discover with a bare --risk (no value) is rejected as validation, exit 4',
   const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- bare-risk', '--risk']);
   assert.equal(result.status, 4);
   assert.match(result.stderr, /--risk/);
-  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'discovery');
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].workflowStep, 'discovery');
 });
 
 
@@ -196,7 +196,7 @@ test('plan --verdict with an unrecognized value is rejected as validation, exit 
 });
 
 
-test.todo('discover (sync verb) on a clear verdict stamps role "session" on the work.stage event and folds into a clarify-pass settlement - migrated to test/direct/fgos-stage.test.mjs');
+test.todo('discover (sync verb) on a clear verdict stamps role "session" on the work.step event and folds into a clarify-pass settlement - migrated to test/direct/fgos-stage.test.mjs');
 
 
 

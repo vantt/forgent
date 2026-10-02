@@ -123,7 +123,7 @@ impl WorkTab {
     /// work-item-backlog-status D3: `backlog` only — its own tab, never
     /// folded into `Todo`, so nothing here reads it as ready.
     /// D1: `todo` only. D1: `doing`/`blocked`/`awaiting-human` — the same
-    /// `in-progress` `statusCategory` grouping `workflow-stage-graphs.mjs`
+    /// `in-progress` `statusCategory` grouping `domain-registry.mjs`
     /// already uses for the `coding` domain. D1: `awaiting-approval` only.
     /// D7: the `delivered`/`retrospective`/`cleanup`/`done` tail chain PLUS
     /// `wontfix` (D7 explicitly folds canceled items into this tab too).

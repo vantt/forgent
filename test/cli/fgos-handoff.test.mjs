@@ -37,7 +37,7 @@ function seedExecutingItem(dir, id = 'implement-thing') {
     title: 'Implement thing',
     kind: 'feature',
     status: 'todo',
-    stage: 'executing',
+    workflowStep: 'executing',
     deps: [],
     risk: 'light',
     refs: [],
@@ -51,7 +51,7 @@ function seedExecutingItem(dir, id = 'implement-thing') {
 // field (D8's lazy-default -- absent reads as the domain's Execute stage,
 // the shape a split child born via normalizeChild can carry) used to
 // refuse every handoff with "stage: undefined" because recordCall read
-// work.stage directly instead of through effectiveStage.
+// work.step directly instead of through effectiveStage.
 test('regression: a handoff succeeds on an item with no explicit stage field (D8 lazy-default)', () => {
   const dir = tmpDir();
   const id = 'lazy-stage-item';
@@ -177,7 +177,7 @@ test('a domain with no roleGraph refuses cleanly, never crashes', () => {
     title: 'Synthetic item',
     kind: 'task',
     status: 'todo',
-    stage: 'assembling',
+    workflowStep: 'assembling',
     deps: [],
     risk: 'light',
     refs: [],
@@ -217,7 +217,7 @@ test('D18: a domain with no roleGraph reaching awaiting-approval is unaffected (
     title: 'Synthetic awaiting',
     kind: 'task',
     status: 'todo',
-    stage: 'assembling',
+    workflowStep: 'assembling',
     deps: [],
     risk: 'light',
     refs: [],
@@ -290,7 +290,7 @@ test('D16: a domain with no roleGraph reaching delivered is unaffected (no crash
     title: 'Synthetic delivered',
     kind: 'task',
     status: 'todo',
-    stage: 'assembling',
+    workflowStep: 'assembling',
     deps: [],
     risk: 'light',
     refs: [],

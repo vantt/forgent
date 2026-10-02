@@ -10,11 +10,123 @@
 // CONTEXT.md` D7 for the split rationale.
 
 import { RunnerConfigError, EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, MODEL_POLICY_TIERS, supportsPolicyTier, normalizePreferCandidates } from './config.mjs';
-export {
-  executorIdForWork,
-  resolveCapabilityIdentityDetails,
-  resolveCapabilityIdentity,
-} from '../work-compat.mjs';
+
+/**
+ * Canonical capability identity for a dispatch, independent of any Work item.
+ * `hints` carries what the caller knows about what the dispatch is FOR:
+ * extra candidate capability names, one capability to prefer when it is a
+ * candidate, and a label to fall back to when nothing else resolves. A Work-driven
+ * caller derives those from its Workflow step (src/runner/work-compat.mjs).
+ *
+ * Single, order-independent resolution rules: an explicit purpose wins; else a
+ * candidate with required confinement, then any configured confinement, then the
+ * preferred one, then a registered capability, then the first sorted candidate.
+ */
+export function resolveCapabilityDetailsFromHints({
+  cfg,
+  executorId,
+  resolvedExecutor,
+  purpose,
+  hints,
+} = {}) {
+  const { candidates = [], preferred = null, fallbackLabel = null } = hints ?? {};
+  const capabilities = cfg?.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities : {};
+
+  function resolveAlias(name) {
+    if (!name || typeof name !== 'string') return name;
+    if (capabilities[name]) return name;
+    for (const [capName, capEntry] of Object.entries(capabilities)) {
+      if (Array.isArray(capEntry?.aliases) && capEntry.aliases.includes(name)) {
+        return capName;
+      }
+    }
+    return name;
+  }
+
+  const explicitPurpose = purpose && typeof purpose === 'string' && purpose.trim()
+    ? resolveAlias(purpose.trim())
+    : null;
+
+  const candidateSet = new Set(candidates);
+
+  // Executor declared capabilities (`for: [...]`)
+  if (Array.isArray(resolvedExecutor?.for)) {
+    for (const f of resolvedExecutor.for) {
+      if (typeof f === 'string' && f.trim()) {
+        candidateSet.add(f.trim());
+      }
+    }
+  }
+
+  // Capabilities in config that `prefer` this executor
+  if (executorId || resolvedExecutor) {
+    for (const [capName, capEntry] of Object.entries(capabilities)) {
+      if (capEntry?.prefer && (capEntry.prefer === executorId || (resolvedExecutor && cfg?.executors?.[capEntry.prefer] === resolvedExecutor))) {
+        candidateSet.add(capName);
+      }
+    }
+  }
+
+  // Executor ID itself
+  if (executorId && typeof executorId === 'string') {
+    candidateSet.add(executorId);
+  }
+
+  // Normalize all candidates through aliases
+  const normalizedCandidates = Array.from(candidateSet)
+    .map((c) => resolveAlias(c))
+    .filter(Boolean);
+
+  let capability = explicitPurpose;
+  if (!capability && normalizedCandidates.length === 0) {
+    capability = fallbackLabel ?? executorId ?? '(unknown-capability)';
+  }
+
+  // 1. Any candidate with required confinement (confinement.mode === 'required') wins!
+  const requiredCandidates = normalizedCandidates.filter(
+    (c) => capabilities[c]?.confinement?.mode === 'required',
+  );
+  if (!capability && requiredCandidates.length > 0) {
+    requiredCandidates.sort();
+    capability = requiredCandidates[0];
+  }
+
+  // 2. Any candidate with configured confinement wins next
+  const configuredConfinementCandidates = normalizedCandidates.filter(
+    (c) => Boolean(capabilities[c]?.confinement),
+  );
+  if (!capability && configuredConfinementCandidates.length > 0) {
+    configuredConfinementCandidates.sort();
+    capability = configuredConfinementCandidates[0];
+  }
+
+  // 3. The caller's preferred capability, when it is a candidate
+  if (!capability && preferred && normalizedCandidates.includes(preferred)) {
+    capability = preferred;
+  }
+
+  // 4. Prefer registered capabilities in cfg.capabilities
+  const registeredCandidates = normalizedCandidates.filter((c) => Boolean(capabilities[c]));
+  if (!capability && registeredCandidates.length > 0) {
+    registeredCandidates.sort();
+    capability = registeredCandidates[0];
+  }
+
+  // 5. Fallback: sorted candidates first.
+  if (!capability) {
+    normalizedCandidates.sort();
+    capability = normalizedCandidates[0];
+  }
+
+  const policyAnchors = normalizedCandidates
+    .filter((candidate) => candidate !== capability && capabilities[candidate]?.confinement);
+  const requiredAnchors = policyAnchors.filter(
+    (candidate) => capabilities[candidate]?.confinement?.mode === 'required',
+  ).sort();
+  const anchorCapability = requiredAnchors[0] ?? policyAnchors.sort()[0] ?? null;
+
+  return { capability, anchorCapability };
+}
 
 /**
  * Resolve a tier to a model name using cfg.modelPolicies[provider][tier].

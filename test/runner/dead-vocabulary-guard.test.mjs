@@ -277,7 +277,7 @@ test('resolveTierModel: resolves tier to model via modelPolicies[provider][tier]
   );
 });
 import { resolveAssignmentDispatchPolicy } from '../../src/runner/dispatch/assignment-policy.mjs';
-import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
+import { buildAssignment } from '../helpers/declared-assignment.mjs';
 
 test('dead vocabulary guard: capabilities.<cap>.rigor floor elevates tier and capabilities.*.overrides is rejected (D19)', () => {
   const baseConfig = {

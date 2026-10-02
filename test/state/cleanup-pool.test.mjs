@@ -6,7 +6,7 @@ import { pickNextCleanupItem } from '../../src/state/cleanup-pool.mjs';
 // `.fgos/` writes anywhere in this file (same convention as
 // discover-pool.test.mjs).
 function item(id, status, extra = {}) {
-  return { id, title: id, kind: 'task', stage: 'executing', status, deps: [], risk: 'light', refs: [], verify: 'true', ...extra };
+  return { id, title: id, kind: 'task', workflowStep: 'executing', status, deps: [], risk: 'light', refs: [], verify: 'true', ...extra };
 }
 
 // D7-revised (person's call, 2026-09-11): checkCleanupTTLElapsed anchors to

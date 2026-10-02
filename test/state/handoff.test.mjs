@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { evaluateHandoff } from '../../src/state/handoff.mjs';
-import { DOMAINS, roleGraphFor, legalCallEdges, workerContractFor } from '../../src/state/workflow-stage-graphs.mjs';
+import { DOMAINS, roleGraphFor, legalCallEdges, workerContractFor } from '../../src/state/domain-registry.mjs';
 
 const coding = DOMAINS.coding;
 const synthetic = DOMAINS.synthetic;
@@ -30,7 +30,7 @@ test('legalCallEdges: empty for a domain with no roleGraph', () => {
 test('legal call: implementer --consult--> researcher at discovery (D14 correction)', () => {
   const result = evaluateHandoff({
     domain: coding,
-    stage: 'discovery',
+    step: 'discovery',
     fromRole: 'implementer',
     toRole: 'researcher',
     reason: 'consult',
@@ -42,7 +42,7 @@ test('legal call: implementer --consult--> researcher at discovery (D14 correcti
 test('discovery declares ONLY consult -- no advise, since discovery never asks a human directly', () => {
   const result = evaluateHandoff({
     domain: coding,
-    stage: 'discovery',
+    step: 'discovery',
     fromRole: 'implementer',
     toRole: 'advisor',
     reason: 'advise',
@@ -51,32 +51,17 @@ test('discovery declares ONLY consult -- no advise, since discovery never asks a
   assert.deepEqual(result.legalEdges.map((e) => e.reason), ['consult']);
 });
 
-// tsk-2t9c D16: found by independent review of D14/D15. `decompose` is the
-// legacy pre-rename name for `planning` (skillMap points both at
-// fgos-coding-planning), drain-only, no new item ever lands there -- but
-// the roleGraph had no edges for it at all, so a legacy item still
-// draining at `decompose` would have its first consult attempt refused
-// purely because of which of the two stage names it happens to carry.
-test('legal call: implementer --consult--> researcher at decompose (D16 correction, same edges as planning)', () => {
-  const result = evaluateHandoff({
-    domain: coding,
-    stage: 'decompose',
-    fromRole: 'implementer',
-    toRole: 'researcher',
-    reason: 'consult',
-  });
-  assert.equal(result.ok, true);
-  assert.equal(result.edge.mode, 'sync');
-});
-
-test('decompose and planning share the exact same edge array by reference, never a copy that could drift', () => {
-  assert.equal(roleGraphFor(coding).edges.decompose, roleGraphFor(coding).edges.planning);
+// The legacy step name `decompose` is no longer a key of the role graph: replay maps it
+// onto `planning` (the Workflow's aliases) before any consumer sees it.
+test('the role graph has no "decompose" key — the alias is resolved before the graph is consulted', () => {
+  assert.equal(roleGraphFor(coding).edges.decompose, undefined);
+  assert.ok(roleGraphFor(coding).edges.planning.length > 0);
 });
 
 test('legal call: implementer --review--> reviewer at executing', () => {
   const result = evaluateHandoff({
     domain: coding,
-    stage: 'executing',
+    step: 'executing',
     fromRole: 'implementer',
     toRole: 'reviewer',
     reason: 'review',
@@ -88,7 +73,7 @@ test('legal call: implementer --review--> reviewer at executing', () => {
 test('off-graph refusal lists the legal edges for the caller (chặn và dạy)', () => {
   const result = evaluateHandoff({
     domain: coding,
-    stage: 'executing',
+    step: 'executing',
     fromRole: 'helper',
     toRole: 'reviewer',
     reason: 'review',
@@ -99,10 +84,10 @@ test('off-graph refusal lists the legal edges for the caller (chặn và dạy)'
   assert.deepEqual(result.legalEdges, []);
 });
 
-test('wrong-stage refusal returns that stage\'s own legal edges', () => {
+test('wrong-step refusal returns that step\'s own legal edges', () => {
   const result = evaluateHandoff({
     domain: coding,
-    stage: 'exploring',
+    step: 'exploring',
     fromRole: 'implementer',
     toRole: 'reviewer',
     reason: 'review',
@@ -115,7 +100,7 @@ test('wrong-stage refusal returns that stage\'s own legal edges', () => {
 test('nested async call under the cap succeeds, at the cap is refused', () => {
   const under = evaluateHandoff({
     domain: coding,
-    stage: 'executing',
+    step: 'executing',
     fromRole: 'reviewer',
     toRole: 'advisor',
     reason: 'advise',
@@ -125,7 +110,7 @@ test('nested async call under the cap succeeds, at the cap is refused', () => {
 
   const atCap = evaluateHandoff({
     domain: coding,
-    stage: 'executing',
+    step: 'executing',
     fromRole: 'reviewer',
     toRole: 'advisor',
     reason: 'advise',
@@ -138,7 +123,7 @@ test('nested async call under the cap succeeds, at the cap is refused', () => {
 test('sync call has no async callstack cap applied', () => {
   const result = evaluateHandoff({
     domain: coding,
-    stage: 'executing',
+    step: 'executing',
     fromRole: 'implementer',
     toRole: 'researcher',
     reason: 'consult',
@@ -150,7 +135,7 @@ test('sync call has no async callstack cap applied', () => {
 test('nested sync call under the cap succeeds, at the cap is refused (D25/D28)', () => {
   const under = evaluateHandoff({
     domain: coding,
-    stage: 'executing',
+    step: 'executing',
     fromRole: 'implementer',
     toRole: 'researcher',
     reason: 'consult',
@@ -160,7 +145,7 @@ test('nested sync call under the cap succeeds, at the cap is refused (D25/D28)',
 
   const atCap = evaluateHandoff({
     domain: coding,
-    stage: 'executing',
+    step: 'executing',
     fromRole: 'implementer',
     toRole: 'researcher',
     reason: 'consult',
@@ -173,7 +158,7 @@ test('nested sync call under the cap succeeds, at the cap is refused (D25/D28)',
 test('async call has no sync callstack cap applied (openSyncDepth ignored)', () => {
   const result = evaluateHandoff({
     domain: coding,
-    stage: 'executing',
+    step: 'executing',
     fromRole: 'implementer',
     toRole: 'reviewer',
     reason: 'review',
@@ -185,7 +170,7 @@ test('async call has no sync callstack cap applied (openSyncDepth ignored)', () 
 test('domain with no roleGraph refuses with a domain-level message, never crashes', () => {
   const result = evaluateHandoff({
     domain: synthetic,
-    stage: 'assembling',
+    step: 'assembling',
     fromRole: 'implementer',
     toRole: 'reviewer',
     reason: 'review',
@@ -197,7 +182,7 @@ test('domain with no roleGraph refuses with a domain-level message, never crashe
 test('unknown fromRole never throws, just yields no legal edges', () => {
   const result = evaluateHandoff({
     domain: coding,
-    stage: 'executing',
+    step: 'executing',
     fromRole: 'nonexistent-role',
     toRole: 'reviewer',
     reason: 'review',
@@ -209,7 +194,7 @@ test('unknown fromRole never throws, just yields no legal edges', () => {
 test('pure function: same inputs, same output, no fs/config dependency', () => {
   const args = {
     domain: coding,
-    stage: 'executing',
+    step: 'executing',
     fromRole: 'implementer',
     toRole: 'reviewer',
     reason: 'review',

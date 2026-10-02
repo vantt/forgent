@@ -22,7 +22,7 @@ function validContract(overrides = {}) {
 }
 
 function planningWork(overrides = {}) {
-  return { id: 'tsk-harness-1', stage: 'planning', domain: 'coding', workflow: 'feature', ...overrides };
+  return { id: 'tsk-harness-1', workflowStep: 'planning', domain: 'coding', workflow: 'feature', ...overrides };
 }
 
 // ─── R1: rejects a contract with no/illegal supports for the Work's stage ──
@@ -36,7 +36,7 @@ test('enrichAndValidateContract rejects a contract.supports naming an operation 
       }),
     (err) =>
       err instanceof RunnerConfigError &&
-      /not a legal operation for stage "planning"/.test(err.message) &&
+      /not a legal operation for step "planning"/.test(err.message) &&
       /ADR-007 §3/.test(err.message),
   );
 });
@@ -53,7 +53,7 @@ test('enrichAndValidateContract rejects a missing contract.supports the same way
 test('enrichAndValidateContract rejects when the Work has no declared stage', () => {
   assert.throws(
     () => enrichAndValidateContract(validContract(), { domain: 'coding', work: { id: 'tsk-no-stage', domain: 'coding' } }),
-    (err) => err instanceof RunnerConfigError && /no declared stage/.test(err.message),
+    (err) => err instanceof RunnerConfigError && /no declared step/.test(err.message),
   );
 });
 

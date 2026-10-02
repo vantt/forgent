@@ -18,7 +18,7 @@ import {
 } from '../../src/runner/dispatch/transport.mjs';
 import { executeExecutorCli } from '../../src/runner/dispatch/cli.mjs';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
-import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
+import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { interpretRunResult, validateRunResultV2 } from '../../src/runner/dispatch/run-result.mjs';
 import { normalizeProviderFamily } from '../../src/runner/dispatch/provider-adapter.mjs';
 import { readRunSnapshot } from '../../src/verbs/dispatch/show-run.mjs';

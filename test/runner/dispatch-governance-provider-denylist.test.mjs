@@ -8,7 +8,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { resolveAssignmentDispatchPolicy } from '../../src/runner/dispatch/assignment-policy.mjs';
-import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
+import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 import {
   normalizeProviderFamily,

@@ -93,14 +93,14 @@ export function generateEnvelopeVectors() {
       id: "tsk-001",
       title: "Parity harness",
       status: "done",
-      stage: "validating",
+      workflowStep: "validating",
       tags: ["rust", "harness"],
     },
     {
       id: "tsk-002",
       title: "Envelope vectors and serialization corpus",
       status: "in-progress",
-      stage: "executing",
+      workflowStep: "executing",
       tags: ["rust", "vectors", "serialization"],
     },
   ];

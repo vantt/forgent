@@ -60,7 +60,7 @@ import {
   makeRunnerProposedLeafItem,
   makeSessionSafeRunnerItem,
   mkLocalDependency,
-  moveStage,
+  moveStep,
   moveWork,
   os,
   path,
@@ -221,7 +221,7 @@ test('ready opens a todo item once its dep reaches done (approved, not merely pr
   toProposed(cwd, 'dep-approved');
   assert.equal(toDoneViaChain(cwd, 'dep-approved').status, 0);
   assert.equal(
-    run(cwd, ['add', 'unblocked-item', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--deps', 'dep-approved', '--stage', 'executing', '--description', 'tsk-535 fixture description.']).status,
+    run(cwd, ['add', 'unblocked-item', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--deps', 'dep-approved', '--step', 'executing', '--description', 'tsk-535 fixture description.']).status,
     0,
   );
 
@@ -255,27 +255,27 @@ test('ready on a corrupt log is refused as corrupt-log, exit 5', () => {
 
 test('ready --step Divide returns only planning-stage items, not the default Execute frontier (tsk-qod D1/D2: Clarify no longer maps to any coding stage, so Divide is the demonstration step now)', () => {
   const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'atplanning', { stage: 'planning' });
-  addOk(cwd, 'atexecuting', { stage: 'executing' });
+  addOk(cwd, 'atplanning', { workflowStep: 'planning' });
+  addOk(cwd, 'atexecuting', { workflowStep: 'executing' });
 
-  const divide = envelopeData(run(cwd, ['ready', '--step', 'Divide']).stdout);
+  const divide = envelopeData(run(cwd, ['ready', '--phase', 'plan']).stdout);
   assert.deepEqual(divide.map((i) => i.id), ['atplanning']);
 
   // tsk-qod D1/D2: `clarify` is retired as a coding stage entirely --
   // stageForStep(domain, 'Clarify') is undefined for coding now, so no
   // item (whatever its own `stage` field reads) can ever match this step.
-  const clarify = envelopeData(run(cwd, ['ready', '--step', 'Clarify']).stdout);
+  const clarify = envelopeData(run(cwd, ['ready', '--phase', 'clarify']).stdout);
   assert.deepEqual(clarify, []);
 });
 
 
 test('ready with no --step defaults to Execute, byte-identical to before --step wiring existed', () => {
   const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'atdiscovery', { stage: 'discovery' });
-  addOk(cwd, 'atexecuting', { stage: 'executing' });
+  addOk(cwd, 'atdiscovery', { workflowStep: 'discovery' });
+  addOk(cwd, 'atexecuting', { workflowStep: 'executing' });
 
   const bare = envelopeData(run(cwd, ['ready']).stdout);
-  const explicitExecute = envelopeData(run(cwd, ['ready', '--step', 'Execute']).stdout);
+  const explicitExecute = envelopeData(run(cwd, ['ready', '--phase', 'execute']).stdout);
   assert.deepEqual(bare.map((i) => i.id), ['atexecuting']);
   assert.deepEqual(bare, explicitExecute);
 });

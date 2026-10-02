@@ -20,7 +20,7 @@
 import { rankImpact } from './impact.mjs';
 import { footprintOverlapAmong } from './graph-metrics.mjs';
 import { isResolvedStatus, resolveRoot } from './frontier.mjs';
-import { effectiveStage, getDomain } from './workflow-stage-graphs.mjs';
+import { effectiveStep, getDomain } from './domain-registry.mjs';
 
 /**
  * Rank `proposed` items by merge-readiness.
@@ -229,13 +229,13 @@ export function mergeReadiness(view, opts = {}) {
   // `mergeSets`/`mergeTier` above are all id-referencing, never full item
   // objects (unlike this function's own internal `candidates`/`syncClear`
   // locals, which never reach the return) — so, same as `graphMetrics`'s
-  // own `stageByItem` (graph-metrics.mjs), this adds one flat side-map
+  // own `stepByItem` (graph-metrics.mjs), this adds one flat side-map
   // rather than changing any existing id-array shape to an object-array.
   // Covers every id in `work`, not just ids already surfaced in one of the
   // buckets above, so a reader never has to guess which sub-shape an id
-  // came from before looking its stage up here.
-  const stageByItem = Object.fromEntries(
-    Object.keys(work).map((id) => [id, effectiveStage(work[id], getDomain(work[id].domain))]),
+  // came from before looking its step up here.
+  const stepByItem = Object.fromEntries(
+    Object.keys(work).map((id) => [id, effectiveStep(work[id], getDomain(work[id].domain))]),
   );
 
   return {
@@ -251,7 +251,7 @@ export function mergeReadiness(view, opts = {}) {
     strandedByResolvedRoot: orderByRank(strandedByResolvedRoot),
     mergeTier,
     supersededOut,
-    stageByItem,
+    stepByItem,
   };
 }
 

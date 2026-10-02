@@ -188,7 +188,7 @@ export function Taskboard({ client, baseUrl, onSelectItem, onOpenNeedsAnswer, po
   const needsAnswer = useMemo(() => allItems.filter((item) => NEEDS_ANSWER_STATUSES.has(item.status)), [allItems]);
 
   const filtered = useMemo(
-    () => allItems.filter((item) => (!stageFilter || item.stage === stageFilter) && (!riskFilter || item.risk === riskFilter)),
+    () => allItems.filter((item) => (!stageFilter || item.workflowStep === stageFilter) && (!riskFilter || item.risk === riskFilter)),
     [allItems, stageFilter, riskFilter],
   )
 
@@ -202,7 +202,7 @@ export function Taskboard({ client, baseUrl, onSelectItem, onOpenNeedsAnswer, po
     return [...byStatus.entries()].sort(([a], [b]) => a.localeCompare(b))
   }, [filtered])
 
-  const stages = useMemo(() => [...new Set(allItems.map((i) => i.stage).filter(isPresent))], [allItems])
+  const stages = useMemo(() => [...new Set(allItems.map((i) => i.workflowStep).filter(isPresent))], [allItems])
   const risks = useMemo(() => [...new Set(allItems.map((i) => i.risk).filter(isPresent))], [allItems])
 
   const exposed = isNonLoopbackHost(baseUrl)
@@ -227,9 +227,9 @@ export function Taskboard({ client, baseUrl, onSelectItem, onOpenNeedsAnswer, po
           <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${color.bg} ${color.text}`}>
             {item.status}
           </span>
-          {(item.step || item.workflowStep || item.stage) && (
+          {item.workflowStep && (
             <span className="text-xs text-ink-muted">
-              {item.step || item.workflowStep || item.stage}
+              {item.workflowStep}
             </span>
           )}
         </div>

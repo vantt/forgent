@@ -54,7 +54,7 @@ import { execFileSync } from 'node:child_process';
 import { bind } from '../execution/bind.mjs';
 import { RunnerConfigError, ensureRunnerConfigForDir } from './config.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot, resolveContentRoot } from '../paths.mjs';
-import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim, operationsForStage } from './assignment.mjs';
+import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
 import { resolveAndRenderOperationPrompt, TemplateResolutionError } from './operation-prompt-templates.mjs';
 import { executeExecutorCli } from './cli.mjs';
 import { compileDispatchPlan } from './plan.mjs';
@@ -558,7 +558,7 @@ function validateAssignmentLegality(asgn, opts = {}) {
   // ADR-006 R8: an inline Assignment (provenance.kind === 'inline') never
   // carries domain/stage/operation -- buildInlineAssignment sets none of
   // these (ADR-006 R4), so the declared-operation legality check below
-  // (operationsForStage/matchedOp, and the matchedOp-driven human-only
+  // (matchedOp, and the matchedOp-driven human-only
   // dispatch check it feeds) is meaningless for it and is skipped
   // entirely; `matchedOp` stays `undefined` in that case, which is safe --
   // its return value is never consumed by either call site of this
@@ -570,12 +570,26 @@ function validateAssignmentLegality(asgn, opts = {}) {
   // still runs unconditionally for both shapes.
   let matchedOp = undefined;
   if (asgn.provenance?.kind !== 'inline' && asgn.stage && asgn.operation) {
-    const stageOps = operationsForStage(asgn.domain, asgn.stage, { kind: asgn.workflow });
-    matchedOp = stageOps.find((o) => o.id === asgn.operation);
-    if (!matchedOp) {
+    // The legal operations of the step come from the Workflow the Work layer built
+    // this Assignment from: either handed in now (`opts.operations`, stricter) or
+    // the list buildAssignment validated against and recorded on the Assignment.
+    // Dispatch never resolves a step's operations itself, so an Assignment that
+    // carries neither is refused rather than trusted.
+    const legal = Array.isArray(opts.operations) ? opts.operations : asgn.provenance?.declared?.legalOperations;
+    if (!Array.isArray(legal)) {
       throw new RunnerConfigError(
-        `unknown operation "${asgn.operation}" for stage "${asgn.stage}" in domain "${asgn.domain}" (declared operations: [${stageOps.map((o) => o.id).join(', ')}])`,
+        `declared assignment "${asgn.assignmentId}" carries no legal-operation list for stage "${asgn.stage}" -- refused`,
       );
+    }
+    const legalIds = legal.map((o) => (typeof o === 'string' ? o : o?.id));
+    if (!legalIds.includes(asgn.operation)) {
+      throw new RunnerConfigError(
+        `unknown operation "${asgn.operation}" for stage "${asgn.stage}" in domain "${asgn.domain}" (declared operations: [${legalIds.join(', ')}])`,
+      );
+    }
+    matchedOp = Array.isArray(opts.operations) ? opts.operations.find((o) => o.id === asgn.operation) : undefined;
+    if (matchedOp?.dispatch === 'human-only') {
+      throw new RunnerConfigError(`cannot execute human-only operation "${asgn.operation}" via cli-spawn`);
     }
   }
   if (asgn.dispatch === 'human-only') {
@@ -1083,9 +1097,7 @@ function attemptProviderCapacityFallback({
         compilePlan: (id) => compileDispatchPlan(cfg, {
           assignment: effectiveAssignment.assignmentId,
           assignmentItem: effectiveAssignment,
-          work: effectiveAssignment.workId,
           workItem: work,
-          stage: effectiveAssignment.stage,
           hasLiveTaskAccess: hasLiveTaskAccess ?? false,
           cliOverride: {
             ...(cliOverride || {}),
@@ -1373,9 +1385,7 @@ export async function executeAssignment(assignment, opts = {}) {
   let compiledPlan = compileDispatchPlan(cfg, {
     assignment: effectiveAssignment.assignmentId,
     assignmentItem: effectiveAssignment,
-    work: effectiveAssignment.workId,
     workItem: opts.work,
-    stage: effectiveAssignment.stage,
     hasLiveTaskAccess: opts.hasLiveTaskAccess ?? false,
     cliOverride: opts.cliOverride,
     options: opts.options,
@@ -2528,8 +2538,10 @@ export async function executeAssignment(assignment, opts = {}) {
           tier: effectivePolicy.tier,
           timeoutMs,
           onChunk: opts.onChunk,
+          // Work-layer inputs the caller resolved from the item's Workflow step.
           work: opts.work,
-          stage: effectiveAssignment.stage,
+          capabilityHints: opts.capabilityHints,
+          agentType: opts.agentType,
           runDir: path.resolve(runDir),
           dispatchBatchKey: opts.dispatchBatchKey,
           effectiveContract,

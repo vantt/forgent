@@ -44,7 +44,7 @@ import { buildDispatchResult } from '../../src/runner/dispatch/result-ladder.mjs
 import { initStore, addWork, listWork, readRawEvents } from '../../src/state/store.mjs';
 import { findExecutableOnPath } from '../../src/state/tool-registry.mjs';
 import { resolveAssignmentDispatchPolicy } from '../../src/runner/dispatch/assignment-policy.mjs';
-import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
+import { buildAssignment } from '../helpers/declared-assignment.mjs';
 
 // Fake executors only — every "command" spawned here is a node script this
 // file writes to a mkdtemp directory at test time. No real agent CLI is
@@ -5341,12 +5341,12 @@ test('executorIdForWork is exported and resolves a coding-domain (or no-domain) 
   assert.equal(executorIdForWork(sampleWork()), 'fgos-coding-implement');
 });
 
-test('executorIdForWork respects stage parameter and work.stage property, and has length 2 (dead role param removed)', () => {
+test('executorIdForWork respects the step parameter and the work.workflowStep property, and has length 2 (dead role param removed)', () => {
   assert.equal(executorIdForWork.length, 2);
   assert.equal(executorIdForWork(sampleWork(), 'discovery'), 'fgos-coding-discovering');
   assert.equal(executorIdForWork(sampleWork(), 'planning'), 'fgos-coding-planning');
-  assert.equal(executorIdForWork({ domain: 'coding', stage: 'exploring' }), 'fgos-coding-exploring');
-  assert.equal(executorIdForWork({ domain: 'coding', stage: 'planning' }), 'fgos-coding-planning');
+  assert.equal(executorIdForWork({ domain: 'coding', workflowStep: 'exploring' }), 'fgos-coding-exploring');
+  assert.equal(executorIdForWork({ domain: 'coding', workflowStep: 'planning' }), 'fgos-coding-planning');
 });
 
 test('resolveAgentTypeForTaskSpec implements D32 tie-break scenarios correctly', () => {
@@ -5882,7 +5882,7 @@ test('fanoutBatchExecutorCli returns slotsFull when worker slots ceiling is full
   // Write shared config with ceiling = 1 into .fgos/config.json
   fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ workerSlots: { ceiling: 1 } }));
   // Add 1 doing item to consume the slot
-  addWork(fgosDir, { id: 't1', title: 'Running Item', kind: 'task', status: 'doing', domain: 'coding', stage: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
+  addWork(fgosDir, { id: 't1', title: 'Running Item', kind: 'task', status: 'doing', domain: 'coding', workflowStep: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
 
   const result = await fanoutBatchExecutorCli(['c1', 'c2'], { repoRoot: repo.repoRoot });
   assert.equal(result.slotsFull, true);
@@ -5896,8 +5896,8 @@ test('fanoutBatchExecutorCli trims candidates to free slots when ceiling is conf
   initStore(fgosDir);
   fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify({ workerSlots: { ceiling: 1 } }));
 
-  addWork(fgosDir, { id: 'c1', title: 'Cand 1', kind: 'task', status: 'todo', domain: 'coding', stage: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
-  addWork(fgosDir, { id: 'c2', title: 'Cand 2', kind: 'task', status: 'todo', domain: 'coding', stage: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
+  addWork(fgosDir, { id: 'c1', title: 'Cand 1', kind: 'task', status: 'todo', domain: 'coding', workflowStep: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
+  addWork(fgosDir, { id: 'c2', title: 'Cand 2', kind: 'task', status: 'todo', domain: 'coding', workflowStep: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
 
   const result = await fanoutBatchExecutorCli(['c1', 'c2'], { repoRoot: repo.repoRoot, hasLiveTaskAccess: true });
   assert.equal(result.slotsFull, undefined);
@@ -5910,8 +5910,8 @@ test('fgos schedule --candidates filters schedule to specified candidates', () =
   const repo = mkTempGitRepo();
   const fgosDir = repo.fgosDir;
   initStore(fgosDir);
-  addWork(fgosDir, { id: 'w1', title: 'Item 1', kind: 'task', status: 'todo', domain: 'coding', stage: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
-  addWork(fgosDir, { id: 'w2', title: 'Item 2', kind: 'task', status: 'todo', domain: 'coding', stage: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
+  addWork(fgosDir, { id: 'w1', title: 'Item 1', kind: 'task', status: 'todo', domain: 'coding', workflowStep: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
+  addWork(fgosDir, { id: 'w2', title: 'Item 2', kind: 'task', status: 'todo', domain: 'coding', workflowStep: 'executing', deps: [], refs: [], risk: 'light', verify: 'npm test' });
   const fgosScript = path.resolve(process.cwd(), 'bin/fgos.mjs');
 
   const outAll = execFileSync(process.execPath, [fgosScript, 'schedule', '--json', '--dir', repo.repoRoot], { encoding: 'utf8' });
@@ -5960,7 +5960,7 @@ test('fanoutBatchExecutorCli: real end-to-end out-of-process fire -- pick/execut
     kind: 'task',
     status: 'todo',
     domain: 'coding',
-    stage: 'executing',
+    workflowStep: 'executing',
     deps: [],
     refs: [],
     risk: 'light',
@@ -5997,7 +5997,7 @@ test('fanoutBatchExecutorCli returns candidate as unavailable when executor is g
     kind: 'task',
     status: 'todo',
     domain: 'coding',
-    stage: 'executing',
+    workflowStep: 'executing',
     deps: [],
     refs: [],
     risk: 'light',
@@ -6049,7 +6049,7 @@ test('fanoutBatchExecutorCli fires candidates in batch concurrently with overlap
     kind: 'task',
     status: 'todo',
     domain: 'coding',
-    stage: 'executing',
+    workflowStep: 'executing',
     deps: [],
     refs: [],
     risk: 'light',
@@ -6061,7 +6061,7 @@ test('fanoutBatchExecutorCli fires candidates in batch concurrently with overlap
     kind: 'task',
     status: 'todo',
     domain: 'coding',
-    stage: 'executing',
+    workflowStep: 'executing',
     deps: [],
     refs: [],
     risk: 'light',
@@ -6327,7 +6327,7 @@ test('spawnWorker / cliSpawnAdapter passes per-executor resolved env to child pr
       timeoutMs: 5000,
     };
 
-    const res = await spawnWorker(sampleWork(), cfg, dir, { stage: 'executing' });
+    const res = await spawnWorker(sampleWork(), cfg, dir, { workflowStep: 'executing' });
     const output = JSON.parse(res.stdout);
     assert.equal(output.BASE_URL, 'https://openrouter.ai/api');
     assert.equal(output.AUTH_TOKEN, 'secret-test-key-12345');
@@ -6437,7 +6437,7 @@ test('compileDispatchPlan builds a canonical DispatchPlan for all four selector 
 
   // Form 3: work selector (--work)
   const sample = sampleWork();
-  const plan3 = compileDispatchPlan(cfg, { work: sample.id, workItem: sample });
+  const plan3 = compileDispatchPlan(cfg, { work: sample.id, workItem: sample, workExecutorId: executorIdForWork(sample) });
   assert.equal(plan3.selector.type, 'work');
   assert.equal(plan3.selector.value, sample.id);
   assert.equal(plan3.mechanism, 'out-of-process');

@@ -17,7 +17,7 @@ function jsonResponse(body: unknown, init: ResponseInit = {}) {
 }
 
 function workItem(overrides: Partial<Record<string, unknown>> = {}) {
-  return { id: 'tsk-1', title: 'Do the thing', kind: 'task', status: 'todo', stage: 'executing', risk: 'standard', ...overrides }
+  return { id: 'tsk-1', title: 'Do the thing', kind: 'task', status: 'todo', workflowStep: 'executing', risk: 'standard', ...overrides }
 }
 
 afterEach(() => {
@@ -65,8 +65,8 @@ describe('Taskboard', () => {
           jsonResponse(
             envelope({
               work: {
-                'tsk-1': workItem({ id: 'tsk-1', stage: 'executing', risk: 'standard' }),
-                'tsk-2': workItem({ id: 'tsk-2', stage: 'planning', risk: 'high-risk' }),
+                'tsk-1': workItem({ id: 'tsk-1', workflowStep: 'executing', risk: 'standard' }),
+                'tsk-2': workItem({ id: 'tsk-2', workflowStep: 'planning', risk: 'high-risk' }),
               },
             }),
           ),

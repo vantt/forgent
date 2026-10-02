@@ -7,7 +7,7 @@
 import { createHash } from 'node:crypto';
 import { HEAVY_KEYWORDS, matchesKeyword } from './risk-keywords.mjs';
 // work.mjs is a pure, dependency-free module (it imports only the equally pure
-// workflow-stage-graphs.mjs), so taking the shared title bound from it keeps
+// domain-registry.mjs), so taking the shared title bound from it keeps
 // this file's own "deterministic, synchronous transform" promise intact. The
 // same import direction decompose.mjs and discovery.mjs already use.
 import { truncateTitle } from '../state/work.mjs';

@@ -16,7 +16,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { addOutcome, recordFriction, addDiscovery, moveWork, moveStage, addWork, editWork, listWork, StoreError, resolveWriterLogPath, rebuild, initStore } from '../../../src/state/store.mjs';
+import { addOutcome, recordFriction, addDiscovery, moveWork, moveStep, addWork, editWork, listWork, StoreError, resolveWriterLogPath, rebuild, initStore } from '../../../src/state/store.mjs';
 import { appendEvent } from '../../../src/state/events.mjs';
 import { releaseClaim } from '../../../src/state/runtime-coordination.mjs';
 import { createSession, endSession } from '../../../src/runner/session.mjs';
@@ -242,10 +242,10 @@ function addOk(cwd, id, extra = {}) {
   // own stage semantics) relied on that old implicit default to get an
   // immediately frontier-ready item — default this helper's own --stage to
   // 'executing' so those call sites stay byte-identical without touching
-  // each one; a caller testing add's own stage behavior passes extra.stage
+  // each one; a caller testing add's own stage behavior passes extra.workflowStep
   // (or bypasses this helper entirely, same as the dedicated --stage tests
   // near "add stamps stage" above do).
-  const flags = ['--title', extra.title ?? `Title ${id}`, '--kind', extra.kind ?? 'task', '--risk', extra.risk ?? 'light', '--verify', extra.verify ?? 'npm test', '--stage', extra.stage ?? 'executing'];
+  const flags = ['--title', extra.title ?? `Title ${id}`, '--kind', extra.kind ?? 'task', '--risk', extra.risk ?? 'light', '--verify', extra.verify ?? 'npm test', '--step', extra.workflowStep ?? 'executing'];
   // --footprint stays omitted unless a caller actually passes one (tsk-598
   // own-file-set tests): matches the CLI's own present-or-absent optional
   // shape, so every existing call site (no extra.footprint) is unaffected.
@@ -407,8 +407,8 @@ const ADD_BAD_FLAG_CASES = [
   ['a retired --tier flag', ['--tier', 'heavy']],
   ['an unrecognized --domain value', ['--domain', 'bogus']],
   ['a bare --domain (no value)', ['--domain']],
-  ['a --stage outside the domain\'s own stage enum', ['--stage', 'assembling']],
-  ['a bare --stage (no value)', ['--stage']],
+  ['a --stage outside the domain\'s own stage enum', ['--step', 'assembling']],
+  ['a bare --stage (no value)', ['--step']],
   ['an empty --discovered-from ""', ['--discovered-from', '']],
   ['a bare --discovered-from (no value)', ['--discovered-from']],
   ['a --goal-tier outside its own domain', ['--goal-tier', 'bogus']],
@@ -1246,7 +1246,7 @@ export {
   makeRunnerProposedLeafItem,
   makeSessionSafeRunnerItem,
   mkLocalDependency,
-  moveStage,
+  moveStep,
   moveToDurableDoingForTest,
   moveWork,
   os,

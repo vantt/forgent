@@ -1,7 +1,9 @@
-// dispatch/operation-choice.mjs — Stage operation selection helper for Team Dispatch V1 (Step 05).
+// runner/operation-choice.mjs — Work-layer operation selection for a Work item's current step.
+// Dispatch never looks a step's operations up: this module resolves them from the
+// item's Workflow (domain-registry.mjs) and hands them to buildAssignment.
 //
 // Pure helper:
-// - chooseStageOperation: resolves legal stage operations via operationsForStage and
+// - chooseStageOperation: resolves the legal operations of the current step via operationsForStep and
 //   selects either the primary stage owner path or a secondary Assignment operation.
 // - executeDriverOperationChoice: executes chosen stage operation (builds/executes Assignment
 //   if requested) and consumes hardened RunResult conservatively.
@@ -11,48 +13,16 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-const DEFAULT_DOMAIN = 'coding';
-function resolveDomainName(domain) {
-  return typeof domain === 'string' && domain.trim() ? domain.trim() : DEFAULT_DOMAIN;
-}
-function operationsForStage(domain, stage, options = {}) {
-  // Fallback for stage operations in coding feature workflow
-  if (stage === 'planning') {
-    return Object.freeze([
-      Object.freeze({ id: 'shape-plan', primary: true, taskSpec: 'shape-plan', role: 'implementer' }),
-      Object.freeze({ id: 'validate-plan', taskSpec: 'validate-plan', role: 'reviewer' }),
-    ]);
-  }
-  if (stage === 'discovery') {
-    return Object.freeze([
-      Object.freeze({ id: 'judge-ambiguity', primary: true, taskSpec: 'judge-ambiguity', role: 'implementer' }),
-      Object.freeze({ id: 'clarify-brief', taskSpec: 'clarify-brief', role: 'reviewer' }),
-    ]);
-  }
-  if (stage === 'exploring') {
-    return Object.freeze([
-      Object.freeze({ id: 'lock-decisions', primary: true, taskSpec: 'lock-decisions', role: 'implementer' }),
-    ]);
-  }
-  if (stage === 'executing') {
-    return Object.freeze([
-      Object.freeze({ id: 'implement-item', primary: true, taskSpec: 'implement-item', role: 'implementer' }),
-      Object.freeze({ id: 'review-item', taskSpec: 'review-item', role: 'reviewer' }),
-      Object.freeze({ id: 'scout-blast-radius', taskSpec: 'scout-blast-radius', role: 'researcher' }),
-    ]);
-  }
-  return Object.freeze([
-    Object.freeze({ id: stage || 'default', primary: true, taskSpec: stage || 'default', role: 'implementer' }),
-  ]);
-}
-import { resolveContentRoot } from '../../intake/plan.mjs';
-import { planVerdictFromPlanMd } from '../../intake/plan-verdict-from-plan-md.mjs';
-import { executorIdForWork, resolveCapabilityIdentityDetails, resolveCapabilityIdentity, buildPrompt } from '../work-compat.mjs';
-import { buildAssignment, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
-import { executeAssignment, isSubstantiveReportText } from './assignment-runner.mjs';
-import { interpretRunResult, runOutcome } from './run-result.mjs';
-import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
-import { detectTrunk } from '../worktree.mjs';
+import { DEFAULT_DOMAIN, resolveDomainName, getDomain, operationsForStep } from '../state/domain-registry.mjs';
+import { resolveContentRoot } from '../intake/plan.mjs';
+import { planVerdictFromPlanMd } from '../intake/plan-verdict-from-plan-md.mjs';
+import { executorIdForWork, resolveCapabilityIdentityDetails, resolveCapabilityIdentity, buildPrompt } from './work-compat.mjs';
+import { workDispatchContext } from './work-dispatch.mjs';
+import { buildAssignment, isReadOnlyAssignment, validateAgentResultClaim } from './dispatch/assignment.mjs';
+import { executeAssignment, isSubstantiveReportText } from './dispatch/assignment-runner.mjs';
+import { interpretRunResult, runOutcome } from './dispatch/run-result.mjs';
+import { stampDeclaredAssignment } from './dispatch/assignment-normalizer.mjs';
+import { detectTrunk } from './worktree.mjs';
 
 // Non-enumerable stamp the cross-pass scan attaches to a consumed runResult:
 // the dispatched member dir the result was physically read from. Evidence
@@ -133,7 +103,7 @@ function findLatestAssignmentRunResult({ work, repoRoot, stage, resultKind = 'ga
   const assignmentsDir = path.join(repoRoot, '.fgos', 'assignments');
   if (!fs.existsSync(assignmentsDir)) return null;
 
-  const targetStage = stage ?? work?.stage;
+  const targetStage = stage ?? work?.workflowStep;
 
   try {
     const asgnDirs = fs.readdirSync(assignmentsDir);
@@ -694,7 +664,7 @@ export function deriveCandidateReviewRefs({ work, contextSignals, repoRoot }) {
  *
  * @param {object} params
  * @param {object} params.work Work item object
- * @param {string} [params.stage] Current stage (defaults to work.stage)
+ * @param {string} [params.stage] Current Workflow step (defaults to work.workflowStep)
  * @param {string} [params.domain] Domain (defaults to work.domain or 'coding')
  * @param {string} [params.workflow] Workflow (defaults to work.workflow or 'feature')
  * @param {readonly object[]} [params.availableOperations] Optional pre-resolved operations array
@@ -743,7 +713,7 @@ export function chooseStageOperation({
     }
   }
 
-  const currentStage = stage ?? work?.stage;
+  const currentStage = stage ?? work?.workflowStep;
   if (!currentStage) {
     return Object.freeze({
       operation: null,
@@ -758,7 +728,7 @@ export function chooseStageOperation({
   const resolvedDomain = resolveDomainName(domainInput ?? work?.domain ?? DEFAULT_DOMAIN);
   const resolvedWorkflow = workflow ?? work?.workflow ?? 'feature';
 
-  const ops = availableOperations ?? operationsForStage(resolvedDomain, currentStage, { kind: resolvedWorkflow });
+  const ops = availableOperations ?? operationsForStep(getDomain(resolvedDomain), currentStage, work?.kind);
 
   if (!ops || ops.length === 0) {
     return Object.freeze({
@@ -792,7 +762,7 @@ export function chooseStageOperation({
   // Deterministic rules per stage (Step 05 §6)
 
   // 1. Planning stage choice (Step 05 §6.2)
-  if (currentStage === 'planning' || currentStage === 'decompose') {
+  if (currentStage === 'planning') {
     const validateOp = ops.find((o) => o.id === 'validate-plan');
 
     // Check if plan.md exists
@@ -2229,14 +2199,20 @@ export async function executeDriverOperationChoice(work, choice, opts = {}) {
   if (choice.dispatch === 'assignment') {
     const assignment = buildAssignment({
       work,
-      stage: choice.stage ?? work.stage,
+      domain: resolveDomainName(work?.domain),
+      workflow: work?.workflow ?? getDomain(work?.domain).defaultWorkflow,
+      stage: choice.stage ?? work.workflowStep,
+      operations: operationsForStep(getDomain(work?.domain), choice.stage ?? work.workflowStep, work?.kind),
       operation: choice.operation,
       contextRefs: choice.contextRefs,
       expectedFiles: choice.expectedFiles,
       options: opts,
     });
 
-    const runResult = await executeAssignment(assignment, opts);
+    const runResult = await executeAssignment(assignment, {
+      ...(work ? workDispatchContext({ work, stage: assignment.stage, cwd: opts.cwd }) : {}),
+      ...opts,
+    });
     const interpreted = interpretAssignmentRunResult({
       choice: { ...choice, assignment, work: choice?.work ?? work },
       runResult,

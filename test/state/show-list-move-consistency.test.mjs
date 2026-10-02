@@ -18,7 +18,7 @@ import {
   rebuild,
 } from '../../src/state/store.mjs';
 import { rebuildViewFromDir } from '../../src/state/replay.mjs';
-import { getDomain, effectiveStage } from '../../src/state/workflow-stage-graphs.mjs';
+import { getDomain, effectiveStep } from '../../src/state/domain-registry.mjs';
 import { acquireClaim, releaseClaim } from '../../src/state/runtime-coordination.mjs';
 
 function tmpDir() {
@@ -32,8 +32,8 @@ function getShowRead(dir, id) {
   const domain = getDomain(item.domain);
   return {
     status: item.status,
-    stage: item.stage,
-    stageEffective: effectiveStage(item, domain),
+    stage: item.workflowStep,
+    workflowStepEffective: effectiveStep(item, domain),
   };
 }
 
@@ -44,8 +44,8 @@ function getListRead(dir, id) {
   const domain = getDomain(item.domain);
   return {
     status: item.status,
-    stage: item.stage,
-    stageEffective: effectiveStage(item, domain),
+    stage: item.workflowStep,
+    workflowStepEffective: effectiveStep(item, domain),
   };
 }
 
@@ -56,8 +56,8 @@ function getMovePreconditionRead(dir, id) {
   const domain = getDomain(item.domain);
   return {
     status: item.status,
-    stage: item.stage,
-    stageEffective: effectiveStage(item, domain),
+    stage: item.workflowStep,
+    workflowStepEffective: effectiveStep(item, domain),
   };
 }
 
@@ -82,25 +82,25 @@ function assertReadPathsAgree(dir, id, label) {
   );
 
   assert.equal(
-    showRead.stage,
-    listRead.stage,
-    `${label}: show stage (${showRead.stage}) does not match list stage (${listRead.stage})`,
+    showRead.workflowStep,
+    listRead.workflowStep,
+    `${label}: show stage (${showRead.workflowStep}) does not match list stage (${listRead.workflowStep})`,
   );
   assert.equal(
-    listRead.stage,
-    moveRead.stage,
-    `${label}: list stage (${listRead.stage}) does not match move precondition stage (${moveRead.stage})`,
+    listRead.workflowStep,
+    moveRead.workflowStep,
+    `${label}: list stage (${listRead.workflowStep}) does not match move precondition stage (${moveRead.workflowStep})`,
   );
 
   assert.equal(
-    showRead.stageEffective,
-    listRead.stageEffective,
-    `${label}: show stageEffective (${showRead.stageEffective}) does not match list stageEffective (${listRead.stageEffective})`,
+    showRead.workflowStepEffective,
+    listRead.workflowStepEffective,
+    `${label}: show workflowStepEffective (${showRead.workflowStepEffective}) does not match list workflowStepEffective (${listRead.workflowStepEffective})`,
   );
   assert.equal(
-    listRead.stageEffective,
-    moveRead.stageEffective,
-    `${label}: list stageEffective (${listRead.stageEffective}) does not match move precondition stageEffective (${moveRead.stageEffective})`,
+    listRead.workflowStepEffective,
+    moveRead.workflowStepEffective,
+    `${label}: list workflowStepEffective (${listRead.workflowStepEffective}) does not match move precondition workflowStepEffective (${moveRead.workflowStepEffective})`,
   );
 }
 
@@ -115,7 +115,7 @@ test('show, list, and move precondition read paths report identical stage and st
     title: 'Test read path consistency',
     kind: 'feature',
     status: 'todo',
-    stage: 'planning',
+    workflowStep: 'planning',
     deps: [],
     risk: 'light',
     refs: [],

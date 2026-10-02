@@ -195,7 +195,8 @@ impl LegacyFrictionSource for WorkStateLegacyFrictionSource {
                             });
                         }
                     }
-                    "work.stage" => {
+                    // `work.stage` is the name a binary from before the rename still writes.
+                    "work.step" | "work.stage" => {
                         let from = payload.and_then(|p| p.get("from")).and_then(|f| f.as_str()).unwrap_or("");
                         let last_verdict = discovery_verdicts.get(&id).and_then(|v| v.last()).copied();
 

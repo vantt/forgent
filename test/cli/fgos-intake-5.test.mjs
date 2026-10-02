@@ -60,7 +60,7 @@ import {
   makeRunnerProposedLeafItem,
   makeSessionSafeRunnerItem,
   mkLocalDependency,
-  moveStage,
+  moveStep,
   moveWork,
   os,
   path,
@@ -218,12 +218,12 @@ test('submit with no text at all is rejected as validation, exit 4, no event wri
 });
 
 
-test("submit tags the new item with stage:'discovery', visible via list", () => {
+test("submit tags the new item with workflowStep: 'discovery', visible via list", () => {
   const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);
   assert.equal(result.status, 0);
   const id = JSON.parse(result.stdout).data.id;
-  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'discovery');
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].workflowStep, 'discovery');
 });
 
 
@@ -234,7 +234,7 @@ test('add stamps stage "discovery" by default (D1/D2, add-stage-default-gap; tsk
   // specifically about the CLI's bare, flagless default.
   run(cwd, ['add', 'plain-add', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--description', 'tsk-535 fixture description.']);
   const item = envelopeData(run(cwd, ['list']).stdout).work['plain-add'];
-  assert.equal(item.stage, 'discovery');
+  assert.equal(item.workflowStep, 'discovery');
 });
 
 
@@ -247,7 +247,7 @@ test('submit without --domain is byte-identical to before: domain unset, stage "
   const id = JSON.parse(result.stdout).data.id;
   const item = envelopeData(run(cwd, ['list']).stdout).work[id];
   assert.equal(item.domain, undefined);
-  assert.equal(item.stage, 'discovery');
+  assert.equal(item.workflowStep, 'discovery');
 });
 
 
@@ -258,7 +258,7 @@ test('submit --domain coding is explicit and still resolves stage to "discovery"
   const id = JSON.parse(result.stdout).data.id;
   const item = envelopeData(run(cwd, ['list']).stdout).work[id];
   assert.equal(item.domain, 'coding');
-  assert.equal(item.stage, 'discovery');
+  assert.equal(item.workflowStep, 'discovery');
 });
 
 
@@ -269,7 +269,7 @@ test('submit --domain synthetic persists work.domain and resolves stage to its o
   const id = JSON.parse(result.stdout).data.id;
   const item = envelopeData(run(cwd, ['list']).stdout).work[id];
   assert.equal(item.domain, 'synthetic');
-  assert.equal(item.stage, 'assembling');
+  assert.equal(item.workflowStep, 'assembling');
 });
 
 

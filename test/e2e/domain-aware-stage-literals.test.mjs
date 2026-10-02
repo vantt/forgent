@@ -8,13 +8,13 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
 
 // e2e regression for tsk-3xo: bin/fgos.mjs's `discover`/`decompose` CLI
-// gates and discovery.mjs/decompose.mjs's internal `moveStage` calls used to
+// gates and discovery.mjs/decompose.mjs's internal `moveStep` calls used to
 // hardcode the literal stage names 'clarify'/'decompose'/'executing'
 // instead of resolving them via stageForStep(getDomain(work.domain), step).
 // A domain whose registry entry maps a stage to Clarify/Divide under a
 // non-coding-literal name (the 'triage' fixture domain,
-// workflow-stage-graphs.mjs) could never cross those stages: the sync CLI
-// gate rejected it outright, and the runner sweep's internal moveStage call
+// domain-registry.mjs) could never cross those stages: the sync CLI
+// gate rejected it outright, and the runner sweep's internal moveStep call
 // threw FsmError('precondition') on the mismatched literal — caught by
 // runOnce's outer catch and turned into a 'halted' outcome for the WHOLE
 // TICK, not just the mismatched item, per
@@ -196,7 +196,7 @@ test('sync CLI: fgos discover / fgos plan cross a "triage" fixture-domain item t
 
   const submitted = submit(repoRoot, 'Cross-domain regression fixture item', { domain: 'triage' });
   assert.equal(submitted.domain, 'triage');
-  assert.equal(submitted.stage, 'triage', 'submit lands the item on its OWN domain\'s Clarify-mapped stage, not the coding literal "clarify"');
+  assert.equal(submitted.workflowStep, 'triage', 'submit lands the item on its OWN domain\'s Clarify-mapped stage, not the coding literal "clarify"');
 
   const discoverResult = fgos(repoRoot, [
     'discover', submitted.id,
@@ -207,7 +207,7 @@ test('sync CLI: fgos discover / fgos plan cross a "triage" fixture-domain item t
   assert.equal(envelopeData(discoverResult.stdout).outcome, 'clear');
 
   const afterDiscover = stateView(repoRoot).work[submitted.id];
-  assert.equal(afterDiscover.stage, 'shaping', 'discover moved the item to triage\'s OWN Divide-mapped stage ("shaping"), not the coding literal "decompose"');
+  assert.equal(afterDiscover.workflowStep, 'shaping', 'discover moved the item to triage\'s OWN Divide-mapped stage ("shaping"), not the coding literal "decompose"');
 
   const decomposeResult = fgos(repoRoot, [
     'plan', submitted.id,
@@ -218,7 +218,7 @@ test('sync CLI: fgos discover / fgos plan cross a "triage" fixture-domain item t
   assert.equal(envelopeData(decomposeResult.stdout).outcome, 'pass-through');
 
   const afterDecompose = stateView(repoRoot).work[submitted.id];
-  assert.equal(afterDecompose.stage, 'assembling', 'decompose moved the item to triage\'s OWN Execute-mapped stage ("assembling"), not the coding literal "executing"');
+  assert.equal(afterDecompose.workflowStep, 'assembling', 'decompose moved the item to triage\'s OWN Execute-mapped stage ("assembling"), not the coding literal "executing"');
 });
 
 // tsk-4sz: decompose.mjs's child addWork and loop.mjs's discovered-from
@@ -250,7 +250,7 @@ test('domain-aware decompose child addWork inherits parent domain+stage', () => 
     '--verify', 'test -f triage-output.txt && echo TRIAGE_OK',
   ]);
   assert.equal(discoverResult.status, 0, `fgos discover failed: ${discoverResult.stderr}`);
-  assert.equal(stateView(repoRoot).work[submitted.id].stage, 'shaping');
+  assert.equal(stateView(repoRoot).work[submitted.id].workflowStep, 'shaping');
 
   // A REAL split (--verdict decompose, not pass-through) so decompose.mjs's
   // own child-addWork branch (the exact code this item fixes) actually runs.
@@ -275,7 +275,7 @@ test('domain-aware decompose child addWork inherits parent domain+stage', () => 
   assert.ok(child, 'child item was created');
   assert.equal(child.domain, 'triage', "child inherits the PARENT's domain, not the coding default");
   assert.equal(
-    child.stage,
+    child.workflowStep,
     'assembling',
     'child lands on triage\'s OWN Execute-mapped stage ("assembling"), not the coding literal "executing"',
   );
@@ -363,7 +363,7 @@ test('domain-aware discovered-from addWork inherits parent domain+stage', () => 
   assert.ok(discovered, 'runner captured the fgos-discovered block into a new work item');
   assert.equal(discovered.domain, 'triage', "discovered-from item inherits the PARENT's domain, not the coding default");
   assert.equal(
-    discovered.stage,
+    discovered.workflowStep,
     'triage',
     'discovered-from item lands on triage\'s OWN Clarify-mapped stage ("triage"), not the coding literal "clarify"',
   );
@@ -390,13 +390,13 @@ test('runner sweep: a "triage" fixture-domain item at its own Clarify-mapped sta
   // SAME parallel drain-run below, unchanged code.
   mkLockedContextFixture(repoRoot, triageDocsRef);
   const triageItem = submit(repoRoot, 'Cross-domain regression fixture item', { domain: 'triage', docsRef: triageDocsRef });
-  assert.equal(triageItem.stage, 'triage');
+  assert.equal(triageItem.workflowStep, 'triage');
   assert.equal(fgos(repoRoot, ['discover', triageItem.id, '--verdict', 'clear', '--verify', 'test -f triage-output.txt && echo TRIAGE_OK']).status, 0);
   assert.equal(fgos(repoRoot, ['plan', triageItem.id, '--verdict', 'pass-through', '--reason', 'single fixture item, no split needed']).status, 0);
 
   mkLockedContextFixture(repoRoot, codingDocsRef);
   const codingItem = submit(repoRoot, 'An unrelated plain coding item, same sweep', { docsRef: codingDocsRef });
-  assert.equal(codingItem.stage, 'discovery');
+  assert.equal(codingItem.workflowStep, 'discovery');
   // tsk-30v D2/D6: a clear verdict at `discovery` now skips `exploring` and
   // lands directly on `planning` in ONE discover call (triage above is
   // unaffected: it has no discovery/exploring stages registered, so its
@@ -418,14 +418,14 @@ test('runner sweep: a "triage" fixture-domain item at its own Clarify-mapped sta
   const coding = afterFirst.work[codingItem.id];
 
   assert.equal(triage.domain, 'triage');
-  assert.equal(triage.stage, 'assembling', 'the triage item crossed Clarify->Divide->Execute via its OWN domain\'s stage names in one sweep, same pass-through chaining coding gets');
+  assert.equal(triage.workflowStep, 'assembling', 'the triage item crossed Clarify->Divide->Execute via its OWN domain\'s stage names in one sweep, same pass-through chaining coding gets');
   assert.equal(triage.status, 'awaiting-approval', 'the triage item was actually dispatched by the real runner, not just stage-advanced');
   assert.equal(branchExists(repoRoot, `fgw/${triageItem.id}`), true);
   assert.match(branchLog(repoRoot, `fgw/${triageItem.id}`), /worker: triage-output\.txt/);
 
   // The regression proof: an ordinary coding item riding the SAME sweep
   // tick as the triage item is completely unaffected.
-  assert.equal(coding.stage, 'executing');
+  assert.equal(coding.workflowStep, 'executing');
   assert.equal(coding.status, 'awaiting-approval', 'the plain coding item was dispatched in the SAME tick -- the triage item never halted the sweep');
   assert.equal(branchExists(repoRoot, `fgw/${codingItem.id}`), true);
   assert.match(branchLog(repoRoot, `fgw/${codingItem.id}`), /worker: output\.txt/);

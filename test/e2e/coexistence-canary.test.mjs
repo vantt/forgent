@@ -329,7 +329,7 @@ if (prompt.includes('# Context-discovery')) {
   const submitted = JSON.parse(
     spawnSync(process.execPath, [FGOS, 'submit', 'Canary footprint proof'], { cwd: fx, encoding: 'utf8' }).stdout,
   ).data;
-  assert.equal(submitted.stage, 'discovery');
+  assert.equal(submitted.workflowStep, 'discovery');
 
   const runOnce = spawnSync(process.execPath, [RUNNER, '--once'], { cwd: fx, encoding: 'utf8' });
   assert.equal(runOnce.status, 0, `runner --once failed: ${runOnce.stderr}`);

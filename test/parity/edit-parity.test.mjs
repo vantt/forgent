@@ -16,7 +16,7 @@ function addTestWork(dir, id, extra = {}) {
     refs: extra.refs ?? [],
     verify: extra.verify ?? 'npm test',
     description: extra.description ?? 'fixture description',
-    stage: extra.stage ?? 'executing',
+    workflowStep: extra.workflowStep ?? 'executing',
     ...extra,
   });
 }
@@ -50,5 +50,5 @@ test('parity: editUseCase result matches CLI edit output for representative inpu
   assert.equal(directItem.risk, cliItem.risk);
   assert.equal(directItem.description, cliItem.description);
   assert.equal(directItem.status, cliItem.status);
-  assert.equal(directItem.stage, cliItem.stage);
+  assert.equal(directItem.workflowStep, cliItem.workflowStep);
 });

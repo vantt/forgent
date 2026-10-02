@@ -60,7 +60,7 @@ import {
   makeRunnerProposedLeafItem,
   makeSessionSafeRunnerItem,
   mkLocalDependency,
-  moveStage,
+  moveStep,
   moveWork,
   os,
   path,
@@ -305,14 +305,14 @@ test('submit stays byte-identical after the submitWork extraction: a plain call 
   assert.equal(plainItem.status, 'todo');
   assert.equal(plainItem.mode, 'sync');
   assert.equal(plainItem.domain, undefined);
-  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[plainItem.id].stage, 'discovery');
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[plainItem.id].workflowStep, 'discovery');
 
   const flagged = run(cwd, ['submit', 'Try the synthetic domain', '--async', '--domain', 'synthetic']);
   assert.equal(flagged.status, 0);
   const flaggedItem = JSON.parse(flagged.stdout).data;
   assert.equal(flaggedItem.mode, 'async');
   assert.equal(flaggedItem.domain, 'synthetic');
-  assert.equal(flaggedItem.stage, 'assembling');
+  assert.equal(flaggedItem.workflowStep, 'assembling');
 
   const unattended = run(cwd, ['submit', 'Draft the onboarding walkthrough', '--unattended']);
   assert.equal(unattended.status, 0);

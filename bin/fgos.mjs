@@ -83,7 +83,7 @@ import { promoteToComponentUseCase } from '../src/verbs/merge/promote-to-compone
 import { approveUseCase } from '../src/verbs/merge/approve.mjs';
 import { mergeList, mergeNext } from '../src/verbs/merge/merge.mjs';
 import { catchupUseCase } from '../src/verbs/merge/catchup.mjs';
-import { discoverUseCase, planUseCase } from '../src/verbs/state/stage.mjs';
+import { discoverUseCase, planUseCase } from '../src/verbs/state/step.mjs';
 import { editUseCase, parseEditFlags } from '../src/verbs/state/edit.mjs';
 import { moveUseCase } from '../src/verbs/state/move.mjs';
 import { listUseCase, graphUseCase, workflowUseCase, gateCheckUseCase, staleUseCase } from '../src/verbs/state/read.mjs';
@@ -113,7 +113,7 @@ import { createSession, endSession, listSessions, reclaimOrphanedSessions, isSes
 import { startGateway, stopGateway, gatewayStatus, GatewayControlError } from '../src/runner/gateway-control.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
-import { DEFAULT_DOMAIN, getDomain, stageForStep, effectiveStage, resolveDomainName } from '../src/state/workflow-stage-graphs.mjs';
+import { DEFAULT_DOMAIN, getDomain, stepForPhase, domainSteps, effectiveStep, resolveDomainName } from '../src/state/domain-registry.mjs';
 import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
 import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
 import { recordInvocationFault, resolveFaultLogPath } from '../src/cli/invocation-fault-log.mjs';
@@ -597,15 +597,24 @@ function readPaginationFlags(flags, verbLabel) {
 // (per D35: the four paginated verbs' default output stays byte-identical to
 // before this cell). `order` is this verb's own literal order tag (e.g.
 // 'ready-v1'), named once at the call site.
-// tsk-4zj D1/D4: additive-only projection — never mutates `item`, never
-// touches `stage` itself (stays absent when never explicitly set, per the
-// D8 lazy-default contract `test/state/frontier.test.mjs:205`/
-// `test/state/backward-compat.test.mjs:277` lock at the storage layer).
-// Read-verb print sites spread this onto whatever they already return so a
-// reader can tell "explicitly at this stage" from "defaulted here" instead
-// of seeing an absent field with no explanation either way.
-function withStageEffective(item) {
-  return { ...item, stageEffective: effectiveStage(item, getDomain(item.domain)) };
+// Additive-only projection — never mutates `item`, never touches `workflowStep`
+// itself (stays absent when never explicitly set, per the lazy-default contract
+// `test/state/frontier.test.mjs`/`test/state/backward-compat.test.mjs` lock at the
+// storage layer). Read-verb print sites spread this onto whatever they already
+// return so a reader can tell "explicitly at this step" from "defaulted here"
+// instead of seeing an absent field with no explanation either way.
+function withStepEffective(item) {
+  return { ...item, workflowStepEffective: effectiveStep(item, getDomain(item.domain)) };
+}
+
+// The step a freshly created Work item enters: its Workflow's clarify-phase step, or
+// (a domain with none, e.g. coding) the first step the item can be at. A no-op
+// onUnrecognized: an out-of-registry domain is about to be rejected by addWork's
+// validateWork anyway, so getDomain's "folding to coding" warning would describe a
+// fold that never happens.
+function entryStepFor(domainName, kind) {
+  const domain = getDomain(domainName, { onUnrecognized: () => {} });
+  return stepForPhase(domain, 'clarify', kind) ?? domainSteps(domain, kind)[0];
 }
 
 function paginateVerbResult(items, flags, order, verbLabel) {
@@ -768,7 +777,7 @@ function collectRollupData(view, id) {
     id,
     title: item.title,
     status: item.status,
-    stageEffective: effectiveStage(item, getDomain(item.domain)),
+    workflowStepEffective: effectiveStep(item, getDomain(item.domain)),
     // Children-only, unchanged by tsk-1ug: every already-published
     // consumer of these two fields keeps reading exactly the number it
     // read before. A milestone's own progress lives in the `target*` pair
@@ -779,7 +788,7 @@ function collectRollupData(view, id) {
       id: c.id,
       title: c.title,
       status: c.status,
-      stageEffective: effectiveStage(c, getDomain(c.domain)),
+      workflowStepEffective: effectiveStep(c, getDomain(c.domain)),
     })),
     targetDoneCount: targets.filter((t) => t.status === 'done').length,
     targetTotalCount: targets.length,
@@ -883,8 +892,7 @@ function submitWork(dir, text, opts = {}) {
     // handling never calls getDomain at all for this reason; `submit` still
     // needs the eager stage lookup for a legal domain, so it silences the
     // fallback rather than skip it.
-    stage: stageForStep(getDomain(opts.domain, { onUnrecognized: () => {} }), 'Clarify')
-      ?? getDomain(opts.domain, { onUnrecognized: () => {} }).stages[0],
+    workflowStep: entryStepFor(opts.domain, opts.kind),
   };
   const { event } = addWork(dir, work);
   return event.payload;
@@ -972,9 +980,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         // is rejected downstream by store.mjs's validateWorkShape (the
         // single source for the STAGES domain), same "don't duplicate the
         // validation source" discipline --domain/--tier already follow.
-        stage: optionalField(flags.stage, 'add --stage requires a stage value (e.g. discovery/decompose/executing); omit --stage entirely to use the default.')
-          ?? stageForStep(getDomain(flags.domain, { onUnrecognized: () => {} }), 'Clarify')
-          ?? getDomain(flags.domain, { onUnrecognized: () => {} }).stages[0],
+        workflowStep: optionalField(flags.step, 'add --step requires a step value (e.g. discovery/planning/executing); omit --step entirely to use the default.')
+          ?? entryStepFor(flags.domain, flags.kind),
         // Per work-graph-intelligence S2b (producer A): --discovered-from is
         // an explicit, optional scalar provenance flag — same omitted-leaves-
         // undefined shape as --domain/--tier above. work.mjs's
@@ -2088,7 +2095,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         throw new StoreError('validation', `show: work "${id}" not found.`);
       }
       return {
-        work: withStageEffective(item),
+        work: withStepEffective(item),
         discovery: rawView.discovery?.[id] ?? [],
         decisions: rawView.decisionsById?.[id] ?? [],
         gates: rawView.gates?.[id] ?? null,
@@ -2108,7 +2115,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // omitted, readyWork's own default (`Execute`) applies, byte-identical
     // to every pre-existing caller.
     case 'ready': {
-      return paginateVerbResult(readyWork(dir, flags.step ? { step: flags.step } : undefined).map(withStageEffective), flags, 'ready-v1', 'ready');
+      return paginateVerbResult(readyWork(dir, flags.phase ? { phase: flags.phase } : undefined).map(withStepEffective), flags, 'ready-v1', 'ready');
     }
 
     // Request-class per D1 (same contract as `ready`/`list`): a pure read —
@@ -2186,21 +2193,21 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         return await resumeWorkflow(workflowRunId, { repoRoot: flags.dir, worktree: flags.worktree });
       }
 
-      // Legacy stage operations inspection
-      let stage = flags.stage;
-      if (!stage) {
-        if (positional[0] === 'operations' || positional[0] === 'stages') {
-          stage = positional[1] || flags.stage;
+      // Operations a step offers, read from the Workflow definition
+      let step = flags.step;
+      if (!step) {
+        if (positional[0] === 'operations') {
+          step = positional[1] || flags.step;
         } else if (positional[0]) {
-          stage = positional[0];
+          step = positional[0];
         }
       }
-      if (!stage) {
-        throw new StoreError('validation', 'workflow operations requires --stage <stage>');
+      if (!step) {
+        throw new StoreError('validation', 'workflow operations requires --step <step>');
       }
       const domain = flags.domain || DEFAULT_DOMAIN;
       const workflow = flags.workflow || undefined;
-      return workflowUseCase({ dir }, { stage, domain, workflow });
+      return workflowUseCase({ dir }, { step, domain, workflow });
     }
 
     case 'gate-check': {
@@ -2294,10 +2301,10 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         ids.add(a);
         ids.add(b);
       }
-      const stageByItem = Object.fromEntries(
-        [...ids].map((id) => [id, effectiveStage(conflictsView.work[id], getDomain(conflictsView.work[id].domain))]),
+      const stepByItem = Object.fromEntries(
+        [...ids].map((id) => [id, effectiveStep(conflictsView.work[id], getDomain(conflictsView.work[id].domain))]),
       );
-      return { conflicts, stageByItem };
+      return { conflicts, stepByItem };
     }
 
 

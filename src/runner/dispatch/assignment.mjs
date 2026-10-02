@@ -45,44 +45,6 @@ import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { resolveTaskSpecPath } from '../paths.mjs';
 
-const DEFAULT_DOMAIN = 'coding';
-function resolveDomainName(domain) {
-  return typeof domain === 'string' && domain.trim() ? domain.trim() : DEFAULT_DOMAIN;
-}
-
-export function operationsForStage(domain, stage, options = {}) {
-  if (stage === 'planning') {
-    return Object.freeze([
-      Object.freeze({ id: 'shape-plan', primary: true, taskSpec: 'shape-plan', role: 'implementer' }),
-      Object.freeze({ id: 'validate-plan', taskSpec: 'validate-plan', role: 'reviewer' }),
-    ]);
-  }
-  if (stage === 'discovery') {
-    return Object.freeze([
-      Object.freeze({ id: 'judge-ambiguity', primary: true, taskSpec: 'judge-ambiguity', role: 'implementer' }),
-      Object.freeze({ id: 'clarify-brief', taskSpec: 'clarify-brief', role: 'reviewer' }),
-    ]);
-  }
-  if (stage === 'exploring') {
-    return Object.freeze([
-      Object.freeze({ id: 'lock-decisions', primary: true, taskSpec: 'lock-decisions', role: 'implementer' }),
-      Object.freeze({ id: 'resolve-question', taskSpec: 'resolve-question', role: 'researcher' }),
-      Object.freeze({ id: 'answer-question', taskSpec: 'answer-question', role: 'human', dispatch: 'human-only' }),
-    ]);
-  }
-  if (stage === 'executing') {
-    return Object.freeze([
-      Object.freeze({ id: 'implement-item', primary: true, taskSpec: 'implement-item', role: 'implementer' }),
-      Object.freeze({ id: 'review-item', taskSpec: 'review-item', role: 'reviewer' }),
-      Object.freeze({ id: 'scout-blast-radius', taskSpec: 'scout-blast-radius', role: 'researcher' }),
-      Object.freeze({ id: 'scoped-subtask', taskSpec: 'scoped-subtask', role: 'implementer' }),
-      Object.freeze({ id: 'fix-verify-red', taskSpec: 'fix-verify-red', role: 'implementer' }),
-    ]);
-  }
-  return Object.freeze([
-    Object.freeze({ id: stage || 'default', primary: true, taskSpec: stage || 'default', role: 'implementer' }),
-  ]);
-}
 import { RunnerConfigError } from './config.mjs';
 import {
   NORMALIZER_VERSION,
@@ -110,7 +72,7 @@ import { resolveAndRenderOperationPrompt, TemplateResolutionError } from './oper
 // empirically while building this block. So this discovers every domain's
 // own harness module that actually exists on disk, once, at module load,
 // entirely off filesystem enumeration -- mirroring
-// `workflow-stage-graphs.mjs`'s own `DOMAINS` registry
+// `domain-registry.mjs`'s own `DOMAINS` registry
 // (`loadDomainsFromDisk`, same module-load-time `readdirSync` rationale,
 // same file). The directory name loaded on each loop pass is always a
 // runtime value read off the filesystem, never a source-code literal, so
@@ -338,6 +300,7 @@ function buildDeclaredAssignment({
   workflow,
   stage,
   operation,
+  operations,
   objective,
   contextRefs = [],
   expectedOutputs = [],
@@ -356,16 +319,25 @@ function buildDeclaredAssignment({
     throw new RunnerConfigError('buildAssignment requires a non-empty operation id');
   }
 
-  const resolvedDomain = resolveDomainName(domain ?? work?.domain ?? DEFAULT_DOMAIN);
-  const resolvedWorkflow = workflow ?? work?.workflow ?? 'feature';
+  // The Work layer resolves the domain and the step's operations from the Workflow
+  // definition and hands them in; dispatch never looks a step up itself.
+  const resolvedDomain = typeof domain === 'string' && domain.trim() ? domain.trim() : null;
+  if (!resolvedDomain) {
+    throw new RunnerConfigError('buildAssignment requires a non-empty "domain" (the caller resolves it from the Work item)');
+  }
+  if (!Array.isArray(operations)) {
+    throw new RunnerConfigError(
+      'buildAssignment requires "operations": the legal operations of the step, resolved from its Workflow by the caller',
+    );
+  }
+  const resolvedWorkflow = workflow ?? work?.workflow ?? null;
   const resolvedWorkId = work?.id ?? workId ?? null;
 
-  const stageOps = operationsForStage(resolvedDomain, stage, { kind: resolvedWorkflow });
-  const matchedOp = stageOps.find((o) => o.id === operation);
+  const matchedOp = operations.find((o) => o.id === operation);
 
   if (!matchedOp) {
     throw new RunnerConfigError(
-      `unknown operation "${operation}" for stage "${stage}" in domain "${resolvedDomain}" (declared operations: [${stageOps.map((o) => o.id).join(', ')}])`,
+      `unknown operation "${operation}" for stage "${stage}" in domain "${resolvedDomain}" (declared operations: [${operations.map((o) => o.id).join(', ')}])`,
     );
   }
 
@@ -457,7 +429,7 @@ function buildDeclaredAssignment({
   // change any branch above (Step 02-06 golden behavior is unaffected).
   const stamped = stampDeclaredAssignment({ role: targetRole, operation: matchedOp.id });
   const provenanceValidators = Object.freeze([
-    'workflow-stage-graph-legality',
+    'workflow-step-legality',
     ...(options.allowSyntheticCompatibilityOperation ? [] : ['task-spec-existence']),
   ]);
 
@@ -465,7 +437,7 @@ function buildDeclaredAssignment({
     assignmentId,
     workId: resolvedWorkId,
     domain: resolvedDomain,
-    workflow: resolvedWorkflow,
+    ...(resolvedWorkflow ? { workflow: resolvedWorkflow } : {}),
     stage,
     operation: matchedOp.id,
     role: targetRole,
@@ -488,10 +460,11 @@ function buildDeclaredAssignment({
       validators: provenanceValidators,
       declared: Object.freeze({
         domain: resolvedDomain,
-        workflow: resolvedWorkflow,
+        ...(resolvedWorkflow ? { workflow: resolvedWorkflow } : {}),
         stage,
         operation: matchedOp.id,
         taskSpec: matchedOp.taskSpec,
+        legalOperations: Object.freeze(operations.map((o) => o.id)),
       }),
     }),
     mutation: stamped.mutation,
@@ -534,14 +507,14 @@ function buildInlineAssignment({ provenance, work, workId, createdBy, options = 
   // resolvable for this call, on a Work at a declared Stage -- a work
   // attached with its own `domain` field, or an explicit `options.domain`
   // supplied alongside that same attached work. A standalone inline call
-  // (no work, e.g. mission-lite's own shape) or a work with no `.stage`
+  // (no work, e.g. mission-lite's own shape) or a work with no `.workflowStep`
   // yet skips the seam entirely and passes on generic validation alone
   // (the `validateExecutionContract` call above) -- this is the actual
   // evidence the foundation boundary does not depend on any domain.
   // Deliberately NOT the declared path's `resolveDomainName(... ??
   // DEFAULT_DOMAIN)` silent fold: an inline Work with no explicit
   // `domain`/`options.domain` skips rather than assuming 'coding'.
-  const resolvedDomain = work?.stage ? (work.domain ?? options.domain) : undefined;
+  const resolvedDomain = work?.workflowStep ? (work.domain ?? options.domain) : undefined;
   // Seam enforcement -- including the ADR-007 §3 `contract.supports`
   // legality check below -- is per-domain opt-in, gated on that domain
   // actually having shipped a harness/enrich-and-validate-contract.mjs

@@ -12,10 +12,10 @@ import {
 import {
   discoverUseCase,
   planUseCase,
-} from '../../src/verbs/state/stage.mjs';
+} from '../../src/verbs/state/step.mjs';
 
 function addTestWork(dir, id, extra = {}) {
-  const defaultVerify = extra.stage === 'discovery'
+  const defaultVerify = extra.workflowStep === 'discovery'
     ? 'chưa xác định — fixture verify'
     : 'npm test';
   return addWork(dir, {
@@ -28,7 +28,7 @@ function addTestWork(dir, id, extra = {}) {
     refs: extra.refs ?? [],
     verify: extra.verify ?? defaultVerify,
     description: extra.description ?? 'fixture description',
-    stage: extra.stage ?? 'discovery',
+    workflowStep: extra.workflowStep ?? 'discovery',
     ...extra,
   });
 }
@@ -40,7 +40,7 @@ function addTestWork(dir, id, extra = {}) {
 test('discover on a clear verdict moves the submitted item to stage planning with the caller-supplied verify', () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
-  addTestWork(dir, 'disc-1', { stage: 'discovery' });
+  addTestWork(dir, 'disc-1', { workflowStep: 'discovery' });
 
   const res = discoverUseCase(
     { dir },
@@ -49,14 +49,14 @@ test('discover on a clear verdict moves the submitted item to stage planning wit
   assert.equal(res.outcome, 'clear');
 
   const item = listWork(dir).work['disc-1'];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.verify, 'npm test -- proven');
 });
 
 test('discover on an unclear verdict parks the item in awaiting-human with the question, and advances it to exploring', () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
-  addTestWork(dir, 'disc-2', { stage: 'discovery' });
+  addTestWork(dir, 'disc-2', { workflowStep: 'discovery' });
 
   const question = '## Context\n\nBackground needed to understand this question.\n\n## Why this matters\n\nThis directly affects the outcome: Which service?';
   const res = discoverUseCase(
@@ -67,26 +67,26 @@ test('discover on an unclear verdict parks the item in awaiting-human with the q
 
   const view = listWork(dir);
   assert.equal(view.work['disc-2'].status, 'awaiting-human');
-  assert.equal(view.work['disc-2'].stage, 'exploring');
+  assert.equal(view.work['disc-2'].workflowStep, 'exploring');
   assert.equal(view.gates['disc-2'].ask, question);
 });
 
 test('discover on a planning-stage item errors with StoreError("validation") suggesting fgos plan', () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
-  addTestWork(dir, 'disc-3', { stage: 'planning' });
+  addTestWork(dir, 'disc-3', { workflowStep: 'planning' });
 
   assert.throws(
     () => discoverUseCase({ dir }, { id: 'disc-3', callerVerdict: { clear: true, verify: 'npm test' } }),
     (err) => err instanceof StoreError && err.category === 'validation' && /fgos plan/.test(err.message),
   );
-  assert.equal(listWork(dir).work['disc-3'].stage, 'planning');
+  assert.equal(listWork(dir).work['disc-3'].workflowStep, 'planning');
 });
 
 test('discover on an invalid stage (e.g. executing) errors with StoreError("validation")', () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
-  addTestWork(dir, 'disc-4', { stage: 'executing' });
+  addTestWork(dir, 'disc-4', { workflowStep: 'executing' });
 
   assert.throws(
     () => discoverUseCase({ dir }, { id: 'disc-4', callerVerdict: { clear: true, verify: 'npm test' } }),
@@ -97,7 +97,7 @@ test('discover on an invalid stage (e.g. executing) errors with StoreError("vali
 test('discover on a nonexistent item errors with StoreError("validation")', () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
-  addTestWork(dir, 'disc-exist', { stage: 'discovery' });
+  addTestWork(dir, 'disc-exist', { workflowStep: 'discovery' });
 
   assert.throws(
     () => discoverUseCase({ dir }, { id: 'ghost-item', callerVerdict: { clear: true, verify: 'npm test' } }),
@@ -108,43 +108,43 @@ test('discover on a nonexistent item errors with StoreError("validation")', () =
 test('discover with an out-of-vocabulary kind is rejected as validation before item moves', () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
-  addTestWork(dir, 'disc-5', { stage: 'discovery' });
+  addTestWork(dir, 'disc-5', { workflowStep: 'discovery' });
 
   assert.throws(
     () => discoverUseCase({ dir }, { id: 'disc-5', callerVerdict: { clear: true, verify: 'npm test', kind: 'bogus' } }),
     (err) => err.category === 'validation' && /work\.kind must be one of/.test(err.message),
   );
-  assert.equal(listWork(dir).work['disc-5'].stage, 'discovery');
+  assert.equal(listWork(dir).work['disc-5'].workflowStep, 'discovery');
 });
 
 test('discover with an out-of-vocabulary size is rejected as validation before item moves', () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
-  addTestWork(dir, 'disc-6', { stage: 'discovery' });
+  addTestWork(dir, 'disc-6', { workflowStep: 'discovery' });
 
   assert.throws(
     () => discoverUseCase({ dir }, { id: 'disc-6', callerVerdict: { clear: true, verify: 'npm test', size: 'enormous' } }),
     (err) => err.category === 'validation' && /work\.size must be one of/.test(err.message),
   );
-  assert.equal(listWork(dir).work['disc-6'].stage, 'discovery');
+  assert.equal(listWork(dir).work['disc-6'].workflowStep, 'discovery');
 });
 
 test('discover with an out-of-vocabulary risk is rejected as validation before item moves', () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
-  addTestWork(dir, 'disc-7', { stage: 'discovery' });
+  addTestWork(dir, 'disc-7', { workflowStep: 'discovery' });
 
   assert.throws(
     () => discoverUseCase({ dir }, { id: 'disc-7', callerVerdict: { clear: true, verify: 'npm test', risk: 'critical' } }),
     (err) => err.category === 'validation' && /work\.risk must be one of/.test(err.message),
   );
-  assert.equal(listWork(dir).work['disc-7'].stage, 'discovery');
+  assert.equal(listWork(dir).work['disc-7'].workflowStep, 'discovery');
 });
 
 test('discover --verdict clear with size/rigor/kind/risk applies classification to the item', () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
-  addTestWork(dir, 'disc-8', { stage: 'discovery' });
+  addTestWork(dir, 'disc-8', { workflowStep: 'discovery' });
 
   const res = discoverUseCase(
     { dir },
@@ -167,13 +167,13 @@ test('discover --verdict clear with size/rigor/kind/risk applies classification 
   assert.equal(item.rigor, 'high');
   assert.equal(item.kind, 'bug');
   assert.equal(item.risk, 'heavy');
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
 });
 
 test('discover applies only classification fields actually passed, leaving the rest untouched', () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
-  addTestWork(dir, 'disc-9', { stage: 'discovery', size: 'standard', risk: 'standard', kind: 'task' });
+  addTestWork(dir, 'disc-9', { workflowStep: 'discovery', size: 'standard', risk: 'standard', kind: 'task' });
 
   const res = discoverUseCase(
     { dir },
@@ -197,7 +197,7 @@ test('discover applies only classification fields actually passed, leaving the r
 test('discover --verdict unclear never applies classification', () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
-  addTestWork(dir, 'disc-10', { stage: 'discovery', size: 'standard', risk: 'standard', kind: 'task' });
+  addTestWork(dir, 'disc-10', { workflowStep: 'discovery', size: 'standard', risk: 'standard', kind: 'task' });
 
   const question = '## Context\n\nBackground needed to understand question.\n\n## Why this matters\n\nDirectly affects outcome: Which provider?';
   const res = discoverUseCase(
@@ -223,10 +223,10 @@ test('discover --verdict unclear never applies classification', () => {
   assert.equal(item.status, 'awaiting-human');
 });
 
-test('discover (sync verb) on a clear verdict stamps role "session" on work.stage event and folds into a clarify-pass settlement', () => {
+test('discover (sync verb) on a clear verdict stamps role "session" on work.step event and folds into a clarify-pass settlement', () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
-  addTestWork(dir, 'disc-11', { stage: 'discovery' });
+  addTestWork(dir, 'disc-11', { workflowStep: 'discovery' });
 
   discoverUseCase(
     { dir },
@@ -234,7 +234,7 @@ test('discover (sync verb) on a clear verdict stamps role "session" on work.stag
   );
 
   const lines = eventLines(cwd);
-  const stageEvent = lines.map((l) => JSON.parse(l)).find((e) => e.type === 'work.stage' && e.payload.id === 'disc-11');
+  const stageEvent = lines.map((l) => JSON.parse(l)).find((e) => e.type === 'work.step' && e.payload.id === 'disc-11');
   assert.equal(stageEvent.payload.role, 'session');
 
   const view = listWork(dir);
@@ -246,7 +246,7 @@ test('discover (sync verb) on a clear verdict stamps role "session" on work.stag
 test('discover without callerVerdict throws StoreError("validation") when no committed context exists', () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
-  addTestWork(dir, 'disc-12', { stage: 'discovery' });
+  addTestWork(dir, 'disc-12', { workflowStep: 'discovery' });
 
   assert.throws(
     () => discoverUseCase({ dir }, { id: 'disc-12' }),
@@ -261,32 +261,32 @@ test('discover without callerVerdict throws StoreError("validation") when no com
 test('plan on an item sitting at stage planning passes through to executing', async () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
-  addTestWork(dir, 'plan-1', { stage: 'planning' });
+  addTestWork(dir, 'plan-1', { workflowStep: 'planning' });
 
   const res = await planUseCase(
     { dir },
     { id: 'plan-1', direct: true, callerVerdict: { verdict: 'pass-through', reason: 'single cohesive change' } },
   );
   assert.equal(res.outcome, 'pass-through');
-  assert.equal(listWork(dir).work['plan-1'].stage, 'executing');
+  assert.equal(listWork(dir).work['plan-1'].workflowStep, 'executing');
 });
 
 test('plan on a discovery-stage item errors with StoreError("validation") suggesting fgos discover', async () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
-  addTestWork(dir, 'plan-2', { stage: 'discovery' });
+  addTestWork(dir, 'plan-2', { workflowStep: 'discovery' });
 
   await assert.rejects(
     async () => planUseCase({ dir }, { id: 'plan-2', direct: true }),
     (err) => err instanceof StoreError && err.category === 'validation' && /fgos discover/.test(err.message),
   );
-  assert.equal(listWork(dir).work['plan-2'].stage, 'discovery');
+  assert.equal(listWork(dir).work['plan-2'].workflowStep, 'discovery');
 });
 
 test('plan on an invalid stage (e.g. executing) errors with StoreError("validation")', async () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
-  addTestWork(dir, 'plan-3', { stage: 'executing' });
+  addTestWork(dir, 'plan-3', { workflowStep: 'executing' });
 
   await assert.rejects(
     async () => planUseCase({ dir }, { id: 'plan-3', direct: true }),
@@ -297,7 +297,7 @@ test('plan on an invalid stage (e.g. executing) errors with StoreError("validati
 test('plan on a nonexistent item errors with StoreError("validation")', async () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
-  addTestWork(dir, 'plan-exist', { stage: 'planning' });
+  addTestWork(dir, 'plan-exist', { workflowStep: 'planning' });
 
   await assert.rejects(
     async () => planUseCase({ dir }, { id: 'ghost-plan', direct: true }),
@@ -308,7 +308,7 @@ test('plan on a nonexistent item errors with StoreError("validation")', async ()
 test('plan --verdict need-human --reason parks in awaiting-human with that exact reason', async () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
-  addTestWork(dir, 'plan-4', { stage: 'planning' });
+  addTestWork(dir, 'plan-4', { workflowStep: 'planning' });
 
   const res = await planUseCase(
     { dir },
@@ -324,7 +324,7 @@ test('plan --verdict need-human --reason parks in awaiting-human with that exact
 test('plan --verdict decompose with invalid children returns outcome invalid and leaves item untouched', async () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
-  addTestWork(dir, 'plan-5', { stage: 'planning' });
+  addTestWork(dir, 'plan-5', { workflowStep: 'planning' });
 
   const res = await planUseCase(
     { dir },
@@ -339,13 +339,13 @@ test('plan --verdict decompose with invalid children returns outcome invalid and
     },
   );
   assert.equal(res.outcome, 'invalid');
-  assert.equal(listWork(dir).work['plan-5'].stage, 'planning', 'invalid verdict leaves item untouched');
+  assert.equal(listWork(dir).work['plan-5'].workflowStep, 'planning', 'invalid verdict leaves item untouched');
 });
 
 test('plan --verdict decompose with no reason returns outcome invalid and leaves item untouched', async () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
-  addTestWork(dir, 'plan-6', { stage: 'planning' });
+  addTestWork(dir, 'plan-6', { workflowStep: 'planning' });
 
   const res = await planUseCase(
     { dir },
@@ -359,13 +359,13 @@ test('plan --verdict decompose with no reason returns outcome invalid and leaves
     },
   );
   assert.equal(res.outcome, 'invalid');
-  assert.equal(listWork(dir).work['plan-6'].stage, 'planning');
+  assert.equal(listWork(dir).work['plan-6'].workflowStep, 'planning');
 });
 
 test('plan --verdict decompose with valid children writes real children with parent pointer and advances parent', async () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
-  addTestWork(dir, 'plan-7', { stage: 'planning' });
+  addTestWork(dir, 'plan-7', { workflowStep: 'planning' });
 
   const children = [
     { title: 'Build parser', verify: 'npm test -- parser', action: 'implement the parser' },
@@ -387,7 +387,7 @@ test('plan --verdict decompose with valid children writes real children with par
   assert.deepEqual(res.childIds, ['plan-7-1', 'plan-7-2']);
 
   const view = listWork(dir);
-  assert.equal(view.work['plan-7'].stage, 'executing');
+  assert.equal(view.work['plan-7'].workflowStep, 'executing');
   assert.equal(view.work['plan-7-1'].title, 'Build parser');
   assert.equal(view.work['plan-7-1'].parent, 'plan-7');
   assert.equal(view.work['plan-7-2'].title, 'Build renderer');
@@ -397,7 +397,7 @@ test('plan --verdict decompose with valid children writes real children with par
 test('plan with docsRef and plan.md present directly processes caller verdict without running validate-plan', async () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
-  addTestWork(dir, 'plan-8', { stage: 'planning' });
+  addTestWork(dir, 'plan-8', { workflowStep: 'planning' });
 
   const docsRef = 'docs/history/plan-8';
   editWork(dir, { id: 'plan-8', patch: { docsRef } });
@@ -423,13 +423,13 @@ test('plan with docsRef and plan.md present directly processes caller verdict wi
   );
   assert.equal(res.outcome, 'decompose');
   assert.equal(res.childIds.length, 2);
-  assert.equal(listWork(dir).work['plan-8'].stage, 'executing');
+  assert.equal(listWork(dir).work['plan-8'].workflowStep, 'executing');
 });
 
 test('plan --verdict pass-through preserves doing status when crossing boundary', async () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
-  addTestWork(dir, 'plan-9', { stage: 'planning' });
+  addTestWork(dir, 'plan-9', { workflowStep: 'planning' });
   moveToDurableDoingForTest(cwd, 'plan-9');
 
   assert.equal(listWork(dir).work['plan-9'].status, 'doing');
@@ -443,7 +443,7 @@ test('plan --verdict pass-through preserves doing status when crossing boundary'
     },
   );
   assert.equal(res.outcome, 'pass-through');
-  assert.equal(listWork(dir).work['plan-9'].stage, 'executing');
+  assert.equal(listWork(dir).work['plan-9'].workflowStep, 'executing');
   // tsk-40m D5: releaseClaimOnExecuting retired, planning->executing edge leaves status doing
   assert.equal(listWork(dir).work['plan-9'].status, 'doing');
 });

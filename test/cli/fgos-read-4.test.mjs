@@ -60,7 +60,7 @@ import {
   makeRunnerProposedLeafItem,
   makeSessionSafeRunnerItem,
   mkLocalDependency,
-  moveStage,
+  moveStep,
   moveToDurableDoingForTest,
   moveWork,
   os,
@@ -189,7 +189,7 @@ test('triage rows carry stage, goalTier, and component membership; declared goal
   const data = envelopeData(result.stdout);
   const plain = data.find((r) => r.id === 'plain');
   const goal = data.find((r) => r.id === 'goal-item');
-  assert.equal(plain.stage, 'executing');
+  assert.equal(plain.workflowStep, 'executing');
   assert.equal(plain.goalTier, null);
   assert.equal(plain.isIsolated, true);
   assert.equal(plain.componentSize, 1);

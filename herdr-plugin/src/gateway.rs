@@ -599,7 +599,7 @@ where
 /// starting with `--` as a flag, regardless of position -- a value like
 /// `POST /v1/work {"text": "--force"}` would silently become a boolean
 /// `force` flag instead of `submit`'s own positional text. Every field
-/// this guards (`id`, `role`, `to`, `expect`, `status`, `stage`, `cursor`)
+/// this guards (`id`, `role`, `to`, `expect`, `status`, `step`, `cursor`)
 /// is enum/id-shaped: no legitimate value in any of them ever begins with
 /// `-`, so rejecting one here has zero false positives. Free-text fields
 /// (`text`, `reason`) are a deliberate scope boundary -- see `plan.md`.
@@ -615,7 +615,7 @@ pub(crate) fn reject_leading_dash(value: &str, field: &str) -> Result<(), Gatewa
 #[derive(Debug, Deserialize, Default)]
 struct ListWorkQuery {
     status: Option<String>,
-    stage: Option<String>,
+    step: Option<String>,
     #[serde(default)]
     all: bool,
     cursor: Option<String>,
@@ -629,10 +629,10 @@ async fn get_work(State(state): State<AppState>, AppQuery(q): AppQuery<ListWorkQ
         args.push("--status".to_string());
         args.push(status);
     }
-    if let Some(stage) = q.stage {
-        reject_leading_dash(&stage, "stage")?;
-        args.push("--stage".to_string());
-        args.push(stage);
+    if let Some(step) = q.step {
+        reject_leading_dash(&step, "step")?;
+        args.push("--step".to_string());
+        args.push(step);
     }
     if q.all {
         args.push("--all".to_string());
@@ -650,12 +650,9 @@ async fn get_work(State(state): State<AppState>, AppQuery(q): AppQuery<ListWorkQ
     if let Some(work_map) = data.get_mut("data").and_then(|d| d.get_mut("work")).and_then(|w| w.as_object_mut()) {
         for (_id, item) in work_map.iter_mut() {
             if let Some(item_obj) = item.as_object_mut() {
-                let step_val = item_obj.get("workflowStep")
-                    .cloned()
-                    .or_else(|| item_obj.get("stage").cloned())
-                    .unwrap_or(Value::Null);
-                item_obj.insert("step".to_string(), step_val.clone());
-                item_obj.insert("workflowStep".to_string(), step_val);
+                // The wire contract names the step `workflowStep`; an item with none
+                // reads null rather than a missing key.
+                item_obj.entry("workflowStep").or_insert(Value::Null);
             }
         }
     }
@@ -682,12 +679,7 @@ async fn get_work_by_id(State(state): State<AppState>, AxPath(id): AxPath<String
     let args = vec!["show".to_string(), id, "--json".to_string()];
     let mut data = run_verb_blocking(state.gateway, args).await?;
     if let Some(work_obj) = data.get_mut("data").and_then(|d| d.get_mut("work")).and_then(|w| w.as_object_mut()) {
-        let step_val = work_obj.get("workflowStep")
-            .cloned()
-            .or_else(|| work_obj.get("stage").cloned())
-            .unwrap_or(Value::Null);
-        work_obj.insert("step".to_string(), step_val.clone());
-        work_obj.insert("workflowStep".to_string(), step_val);
+        work_obj.entry("workflowStep").or_insert(Value::Null);
     }
     Ok(Json(data))
 }
@@ -720,7 +712,7 @@ async fn patch_work(
     // name vs camelCase JSON key): docs-ref, parent, superseded-by,
     // goal-tier. Every one is enum/id/short-text shaped, so the same
     // leading-dash guard the rest of this file already applies to
-    // similarly-shaped fields (`to`, `expect`, `status`, `stage`) applies
+    // similarly-shaped fields (`to`, `expect`, `status`, `step`) applies
     // here too -- title/description are the only borderline cases, kept
     // guarded for consistency rather than carved out like `text`/`reason`
     // (tsk-1ah's own exemption is for genuinely long free text, not a

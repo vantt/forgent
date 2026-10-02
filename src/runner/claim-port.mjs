@@ -13,7 +13,7 @@ import { moveWork, addOutcome, addDecision, recordClaimAttempt, readRawEvents, F
 import { withEventsLock } from '../state/events.mjs';
 import { foldEvents } from '../state/replay.mjs';
 import { isResolvedStatus, resolveRoot } from '../state/frontier.mjs';
-import { getDomain, stageForStep } from '../state/workflow-stage-graphs.mjs';
+import { getDomain, stepForPhase, effectiveStep } from '../state/domain-registry.mjs';
 import { visitCount } from './anti-loop.mjs';
 import { acquireMainCheckoutLock, forceReclaimAmbiguousLock, HELD, AMBIGUOUS, DEFAULT_TTL_MS, formatLockDurationMs, HOLDER_PID_ENV_VAR } from './main-checkout-lock.mjs';
 import { createClaimWorktree, branchNameFor, branchExists } from './worktree.mjs';
@@ -260,8 +260,10 @@ export function claimWork(dir, { id, actor, isolate, claimTrigger, repoRoot = pr
           // "never started". `phase` mirrors anti-loop.mjs's own
           // executing-stage check (claim-lock) so a reclaim of a clarify/
           // decompose-phase claim never inflates the execute-phase budget.
-          const executeStage = stageForStep(getDomain(item.domain), 'Execute');
-          const claimPhase = (item.stage ?? executeStage) === executeStage ? 'execute' : (item.stage || 'unknown');
+          const claimDomain = getDomain(item.domain);
+          const claimPhase = effectiveStep(item, claimDomain) === stepForPhase(claimDomain, 'execute', item.kind)
+            ? 'execute'
+            : (item.workflowStep || 'unknown');
           recordClaimAttempt(dir, { id, phase: claimPhase, result: 'reclaimed', claimId: activeClaim.claimId, actor: activeClaim.actor });
           releaseClaim(dir, { id, claimId: activeClaim.claimId });
         } else if (item.status === 'doing') {
