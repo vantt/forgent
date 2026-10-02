@@ -447,6 +447,95 @@ test('nextCandidate: a binding that did not come from a prefer pool has no next 
   assert.equal(none.refused.reason, 'no-candidate');
 });
 
+function twoInvocationConfig(extraCapabilities = {}) {
+  return {
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    capabilities: { 'docs:write': { prefer: [{ executor: 'duo' }] }, ...extraCapabilities },
+    executors: {
+      duo: {
+        kind: 'agent',
+        provider: 'claude',
+        command: 'duo',
+        invocations: [
+          { id: 'duo-plain', via: 'cli', adapter: 'cli-spawn', command: 'duo' },
+          { id: 'duo-herdr', via: 'cli', adapter: 'herdr-spawn', command: 'duo', confinement: { backend: 'bwrap' } },
+          {
+            id: 'duo-confined',
+            via: 'cli',
+            adapter: 'cli-spawn',
+            command: 'duo',
+            confinement: { backend: 'bwrap' },
+            resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: 'HOME' } }],
+          },
+        ],
+      },
+    },
+  };
+}
+
+test('bind: with no invocation named, records the plain cli invocation that can carry the posture', () => {
+  const ask = { unit: { id: 'u1', capability: 'docs:write', writes: [] }, role: 'producer' };
+  const result = bind(ask, { runnerConfig: twoInvocationConfig(), session: { headless: true } });
+  assert.equal(result.transport, 'cli');
+  assert.equal(result.invocation, 'duo-confined', 'not the executor first cli invocation, and not its herdr-spawn one');
+  assert.equal(result.provenance.invocation.value, 'duo-confined');
+});
+
+test('bind: a candidate that names an invocation keeps it', () => {
+  const config = twoInvocationConfig({ 'docs:write': { prefer: [{ executor: 'duo', invocation: 'duo-herdr' }] } });
+  const ask = { unit: { id: 'u1', capability: 'docs:write', writes: [] }, role: 'producer' };
+  const result = bind(ask, { runnerConfig: config, session: { headless: true } });
+  assert.equal(result.invocation, 'duo-herdr');
+});
+
+test('bind: inside herdr the herdr invocation is recorded; a herdr-only executor is only usable there', () => {
+  const ask = { unit: { id: 'u1', capability: 'docs:write', writes: [] }, role: 'producer' };
+  const inside = bind(ask, { runnerConfig: twoInvocationConfig(), session: { headless: true, herdrPresent: true } });
+  assert.equal(inside.transport, 'herdr');
+  assert.equal(inside.invocation, 'duo-herdr');
+
+  const herdrOnly = twoInvocationConfig();
+  herdrOnly.executors.duo.invocations = [herdrOnly.executors.duo.invocations[1]];
+  const headless = bind(ask, { runnerConfig: herdrOnly, session: { headless: true } });
+  assert.equal(headless.refused.reason, 'posture-unavailable');
+  const withHerdr = bind(ask, { runnerConfig: herdrOnly, session: { headless: true, herdrPresent: true } });
+  assert.equal(withHerdr.invocation, 'duo-herdr');
+});
+
+test('bind: a candidate with no invocation able to carry the posture is refused as posture-unavailable', () => {
+  const config = twoInvocationConfig();
+  config.executors.duo.invocations = [config.executors.duo.invocations[0]];
+  const ask = { unit: { id: 'u1', capability: 'docs:write', writes: [] }, role: 'producer' };
+  const result = bind(ask, { runnerConfig: config, session: { headless: true } });
+  assert.equal(result.refused.reason, 'posture-unavailable');
+});
+
+test('bind: a description-only exact entry does not hide a bare-verb entry that has a prefer pool', () => {
+  const config = twoInvocationConfig({
+    'docs:plan': { description: 'slot with no prefer' },
+    plan: { prefer: [{ executor: 'duo' }] },
+  });
+  const ask = { unit: { id: 'u1', capability: 'docs:plan', writes: [] }, role: 'producer' };
+  const result = bind(ask, { runnerConfig: config, session: { headless: true } });
+  assert.equal(result.executor, 'duo');
+  assert.equal(result.provenance.executor.source, 'capability:plan');
+});
+
+test('bind: an exact entry with a prefer pool still wins over the bare verb', () => {
+  const config = twoInvocationConfig({
+    'docs:plan': { prefer: [{ executor: 'duo' }] },
+    plan: { prefer: [{ executor: 'missing' }] },
+  });
+  const ask = { unit: { id: 'u1', capability: 'docs:plan', writes: [] }, role: 'producer' };
+  assert.equal(bind(ask, { runnerConfig: config, session: { headless: true } }).provenance.executor.source, 'capability:docs:plan');
+});
+
+test('bind: with no prefer pool anywhere a headless unit is refused and its description-only entry still supplies rigor', () => {
+  const config = twoInvocationConfig({ 'docs:plan': { description: 'slot', rigor: 'high' } });
+  const ask = { unit: { id: 'u1', capability: 'docs:plan', writes: [] }, role: 'producer' };
+  assert.equal(bind(ask, { runnerConfig: config, session: { headless: true } }).refused.reason, 'headless-no-executor');
+});
+
 test('architecture guard: bind.mjs does NOT import src/state or src/runner/coordination', async () => {
   const fs = await import('node:fs/promises');
   const content = await fs.readFile(new URL('../../../src/runner/execution/bind.mjs', import.meta.url), 'utf8');
