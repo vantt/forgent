@@ -84,6 +84,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'events-jsonl-not-truncated',
       'cli-version-visible',
       'worker-slots-ceiling-usable',
+      'workflow-capabilities-configured',
       'gateway-token-configured',
       'readme-install-tag-exists',
       'iron-law-configured',

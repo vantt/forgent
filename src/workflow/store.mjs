@@ -135,6 +135,7 @@ export function projectWorkflowState(events) {
   let request = null;
   let status = 'running';
   let outcome = null;
+  let worktrees = null;
   const steps = {};
   const questions = [];
 
@@ -174,6 +175,7 @@ export function projectWorkflowState(events) {
             unitId: p.unitId,
             unitRunId: p.unitRunId,
             status: 'running',
+            ...(p.worktreePath ? { worktreePath: p.worktreePath, branch: p.branch ?? null } : {}),
           };
         }
         break;
@@ -226,6 +228,10 @@ export function projectWorkflowState(events) {
         }
         break;
 
+      case 'workflow.worktrees':
+        worktrees = { removed: p.removed || [], kept: p.kept || [] };
+        break;
+
       case 'workflow.fail':
         status = 'failed';
         outcome = p.outcome || 'failed';
@@ -248,6 +254,7 @@ export function projectWorkflowState(events) {
     request,
     status,
     outcome,
+    worktrees,
     steps,
     questions,
   };

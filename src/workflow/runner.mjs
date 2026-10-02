@@ -3,6 +3,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 
 import { validateWorkflowChecked as validateWorkflow } from './checked.mjs';
 import { loadWorkflow } from './loader.mjs';
@@ -65,6 +66,63 @@ function buildUnitObjective({ template, state, step, workflow, mainRoot }) {
   }
   if (priorSections.length > 0) parts.push(`Output of earlier steps:\n\n${priorSections.join('\n\n')}`);
   return parts.filter(Boolean).join('\n\n');
+}
+
+function gitOk(cwd, args) {
+  try {
+    execFileSync('git', args, { cwd, stdio: 'ignore' });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function gitOut(cwd, args) {
+  try {
+    return execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Remove the worktrees of Units whose work reached the main line; keep the rest and say where
+ * they are. A passed Unit counts as integrated only when its branch is already part of main (the integrate step's target) and
+ * its worktree holds nothing uncommitted -- removing a worktree forgets anything left in it. A
+ * Unit that failed, was refused, or never finished keeps its worktree for investigation.
+ */
+function settleUnitWorktrees({ mainRoot, state }) {
+  const removed = [];
+  const kept = [];
+  for (const step of Object.values(state.steps)) {
+    for (const unit of Object.values(step.units)) {
+      if (!unit.worktreePath) continue;
+      const entry = { stepId: step.id, unitId: unit.unitId, worktreePath: unit.worktreePath, branch: unit.branch };
+      let reason = null;
+      if (unit.status !== 'completed' || unit.outcome !== 'pass') {
+        reason = `unit ended ${unit.outcome ?? 'unfinished'}`;
+      } else if (!fs.existsSync(unit.worktreePath)) {
+        removed.push(entry);
+        continue;
+      } else if (unit.branch && !gitOk(mainRoot, ['merge-base', '--is-ancestor', unit.branch, 'main'])) {
+        reason = 'branch not integrated';
+      } else if ((gitOut(unit.worktreePath, ['status', '--porcelain']) ?? 'unknown').trim() !== '') {
+        reason = 'worktree has uncommitted changes';
+      }
+      if (reason) {
+        kept.push({ ...entry, reason });
+        continue;
+      }
+      cleanupWorkflowWorktree({
+        repoRoot: mainRoot,
+        worktreePath: unit.worktreePath,
+        branch: unit.branch,
+        deleteBranch: Boolean(unit.branch),
+      });
+      removed.push(entry);
+    }
+  }
+  return { removed, kept };
 }
 
 /**
@@ -204,6 +262,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
           // If unit has writes, prepare worktree
           let unitWorktree = worktreePath;
           let uBranch = null;
+          let ownsWorktree = false;
           if (unitData.writes.length > 0) {
             uBranch = `wf/${workflowRunId}/${u.id}`;
             try {
@@ -212,6 +271,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
                 branch: uBranch,
               });
               unitWorktree = wtInfo.worktreePath;
+              ownsWorktree = true;
             } catch {
               unitWorktree = worktreePath;
             }
@@ -222,7 +282,11 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
             workflowRunId,
             event: {
               type: 'unit.scheduled',
-              payload: { stepId: step.id, unitId: u.id },
+              payload: {
+                stepId: step.id,
+                unitId: u.id,
+                ...(ownsWorktree ? { worktreePath: unitWorktree, branch: uBranch } : {}),
+              },
             },
           });
 
@@ -310,6 +374,18 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
 
     if (!stateChanged) {
       break;
+    }
+  }
+
+  if ((state.status === 'completed' || state.status === 'failed') && !state.worktrees) {
+    const { removed, kept } = settleUnitWorktrees({ mainRoot, state });
+    if (removed.length > 0 || kept.length > 0) {
+      appendWorkflowEvent({
+        repoRoot: mainRoot,
+        workflowRunId,
+        event: { type: 'workflow.worktrees', payload: { removed, kept } },
+      });
+      state = projectWorkflowState(readWorkflowEvents({ repoRoot: mainRoot, workflowRunId }));
     }
   }
 

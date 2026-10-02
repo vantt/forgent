@@ -10,11 +10,16 @@ import { withProviderFamilies } from '../helpers/provider-families.mjs';
 
 import { loadWorkflow } from '../../src/workflow/loader.mjs';
 import { startWorkflow, answerWorkflow } from '../../src/workflow/runner.mjs';
+import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
+
+seedFileLocalBwrapRegistry();
+// bwrap mounts a tmpfs over /tmp, so confined workers can only see fixtures elsewhere.
+const FIXTURE_ROOT = fs.existsSync('/var/tmp') ? '/var/tmp' : os.tmpdir();
 
 const BIN_FGOS = path.resolve('bin/fgos.mjs');
 
 function setupTestRepo() {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-biz-wf-test-'));
+  const tmp = fs.mkdtempSync(path.join(FIXTURE_ROOT, 'fgos-biz-wf-test-'));
   execFileSync('git', ['init', '-b', 'main'], { cwd: tmp, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.name', 'Biz Test'], { cwd: tmp, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.email', 'biz@test.local'], { cwd: tmp, stdio: 'ignore' });
@@ -34,7 +39,7 @@ function setupTestRepo() {
     const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
     let runDir;
     if (match) {
-      runDir = path.dirname(match[1]);
+      runDir = (() => { const d = path.dirname(match[1]); const o = path.join(d, 'worker-output', 'outbox'); return fs.existsSync(o) ? o : d; })();
       fs.mkdirSync(runDir, { recursive: true });
       fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Strategic Report\\nComprehensive strategic business analysis completed with clear market viability and financial risk assessments.\\n');
       fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
@@ -58,7 +63,7 @@ function setupTestRepo() {
           command: process.execPath,
           args: [echoScript, '{prompt}'],
           providerModel: 'node',
-          invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', command: process.execPath, args: [echoScript, '{prompt}'] }],
+          invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: process.execPath, args: [echoScript, '{prompt}'] }],
         },
       },
       capabilities: {

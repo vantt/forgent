@@ -142,89 +142,272 @@
           "mutates": true,
           "behaviorPreserving": true
         }
+      },
+      "marketing:research": {
+        "description": "acceptance-run binding for a Workflow unit",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "deepseek"
+          }
+        ]
+      },
+      "marketing:write": {
+        "description": "acceptance-run binding for a Workflow unit",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "deepseek"
+          }
+        ]
+      },
+      "marketing:publish": {
+        "description": "acceptance-run binding for a Workflow unit",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "deepseek"
+          }
+        ]
+      },
+      "architecture:frame": {
+        "description": "acceptance-run binding for a Workflow unit",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "deepseek"
+          }
+        ]
+      },
+      "architecture:shape": {
+        "description": "acceptance-run binding for a Workflow unit",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "deepseek"
+          }
+        ]
+      },
+      "architecture:critique": {
+        "description": "acceptance-run binding for a Workflow unit",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "deepseek"
+          }
+        ]
+      },
+      "architecture:synthesize": {
+        "description": "acceptance-run binding for a Workflow unit",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "deepseek"
+          }
+        ]
+      },
+      "architecture:explain": {
+        "description": "acceptance-run binding for a Workflow unit",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "deepseek"
+          }
+        ]
+      },
+      "business:frame": {
+        "description": "acceptance-run binding for a Workflow unit",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "deepseek"
+          }
+        ]
+      },
+      "business:perspectives": {
+        "description": "acceptance-run binding for a Workflow unit",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "deepseek"
+          }
+        ]
+      },
+      "business:critique": {
+        "description": "acceptance-run binding for a Workflow unit",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "deepseek"
+          }
+        ]
+      },
+      "business:synthesize": {
+        "description": "acceptance-run binding for a Workflow unit",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "deepseek"
+          }
+        ]
+      },
+      "business:plan": {
+        "description": "acceptance-run binding for a Workflow unit",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "deepseek"
+          }
+        ]
+      },
+      "delphi:propose": {
+        "description": "Workflow unit capability \"delphi:propose\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "delphi:synthesize": {
+        "description": "Workflow unit capability \"delphi:synthesize\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "group-cognition:explore": {
+        "description": "Workflow unit capability \"group-cognition:explore\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "group-cognition:critique": {
+        "description": "Workflow unit capability \"group-cognition:critique\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "group-cognition:synthesize": {
+        "description": "Workflow unit capability \"group-cognition:synthesize\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "nominal-group:generate": {
+        "description": "Workflow unit capability \"nominal-group:generate\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "nominal-group:share": {
+        "description": "Workflow unit capability \"nominal-group:share\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "nominal-group:vote": {
+        "description": "Workflow unit capability \"nominal-group:vote\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "nominal-group:rank": {
+        "description": "Workflow unit capability \"nominal-group:rank\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "coding:discover": {
+        "description": "Workflow unit capability \"coding:discover\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "coding:explore": {
+        "description": "Workflow unit capability \"coding:explore\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "coding:plan": {
+        "description": "Workflow unit capability \"coding:plan\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "coding:validate": {
+        "description": "Workflow unit capability \"coding:validate\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "coding:implement": {
+        "description": "Workflow unit capability \"coding:implement\" -- declare a \"prefer\" pool to choose which executors serve it."
       }
     },
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-"executors": {
+    "executors": {
       "claude": {
         "kind": "agent",
         "description": "Claude Code CLI -- consolidated executor (executor-id-consolidation Step 2): cli/cli-bwrap invocations, replacing the former separate claude-reviewer/claude-reviewer-herdr/claude-bwrap ids.",

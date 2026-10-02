@@ -22,11 +22,16 @@ import {
   answerWorkflow,
   resumeWorkflow,
 } from '../../src/workflow/index.mjs';
+import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
+
+seedFileLocalBwrapRegistry();
+// bwrap mounts a tmpfs over /tmp, so confined workers can only see fixtures elsewhere.
+const FIXTURE_ROOT = fs.existsSync('/var/tmp') ? '/var/tmp' : os.tmpdir();
 
 const BIN_FGOS = path.resolve('bin/fgos.mjs');
 
 function setupTestRepo() {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-wf-test-'));
+  const tmp = fs.mkdtempSync(path.join(FIXTURE_ROOT, 'fgos-wf-test-'));
   execFileSync('git', ['init', '-b', 'main'], { cwd: tmp, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.name', 'Workflow Test'], { cwd: tmp, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.email', 'wf@test.local'], { cwd: tmp, stdio: 'ignore' });
@@ -46,7 +51,7 @@ function setupTestRepo() {
     const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
     let runDir;
     if (match) {
-      runDir = path.dirname(match[1]);
+      runDir = (() => { const d = path.dirname(match[1]); const o = path.join(d, 'worker-output', 'outbox'); return fs.existsSync(o) ? o : d; })();
       fs.mkdirSync(runDir, { recursive: true });
       fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nAssignment execution completed successfully with full report content.\\n');
       fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
@@ -70,7 +75,7 @@ function setupTestRepo() {
           command: process.execPath,
           args: [echoScript, '{prompt}'],
           providerModel: 'node',
-          invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', command: process.execPath, args: [echoScript, '{prompt}'] }],
+          invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: process.execPath, args: [echoScript, '{prompt}'] }],
         },
       },
       capabilities: {
@@ -207,7 +212,7 @@ test('integrate helpers: create worktree, merge branch, and cleanup', () => {
 });
 
 test('translatePlanToWorkflow translates multi-phase plan into DAG Workflow', () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'plan-trans-'));
+  const tmp = fs.mkdtempSync(path.join(FIXTURE_ROOT, 'plan-trans-'));
   fs.writeFileSync(
     path.join(tmp, 'plan.md'),
     `---
@@ -376,9 +381,8 @@ test('a unit refused by policy fails its step and the workflow; dependent steps 
 
 test('the owner request and earlier step output reach each unit objective', async () => {
   const tmp = setupTestRepo();
-  // Outside the repo: a worker that writes into the checkout would trip the read-only guard.
-  const promptsLog = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-wf-prompts-')), 'prompts.log');
-  // Worker that records the prompt it was given into a file the test can read back.
+  // Worker that records the prompt it was given into its outbox, the one place a confined
+  // worker may write; the test reads those files back from the run store.
   const spy = path.join(tmp, 'spy-worker.mjs');
   fs.writeFileSync(
     spy,
@@ -386,11 +390,11 @@ test('the owner request and earlier step output reach each unit objective', asyn
     import fs from 'node:fs';
     import path from 'node:path';
     const prompt = process.argv.slice(2).join(' ');
-    fs.appendFileSync(${JSON.stringify(promptsLog)}, prompt.replace(/\\n/g, ' ') + '\\n---\\n');
     const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
     if (match) {
-      const runDir = path.dirname(match[1]);
+      const runDir = (() => { const d = path.dirname(match[1]); const o = path.join(d, 'worker-output', 'outbox'); return fs.existsSync(o) ? o : d; })();
       fs.mkdirSync(runDir, { recursive: true });
+      fs.writeFileSync(path.join(runDir, 'prompt.txt'), prompt);
       fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nFINDING-FROM-FIRST-STEP is the finding the second step must see in full detail.\\n');
       fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'first step summary' }));
     }
@@ -413,7 +417,19 @@ test('the owner request and earlier step output reach each unit objective', asyn
   assert.equal(state.request, 'Ship the pricing page by Friday');
   assert.equal(state.status, 'completed', JSON.stringify(state.steps));
 
-  const prompts = fs.readFileSync(promptsLog, 'utf8').split('---\n').filter(Boolean);
+  const assignmentsDir = path.join(tmp, '.fgos', 'assignments');
+  const promptFiles = [];
+  const collect = (dir) => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) collect(full);
+      else if (entry.name === 'prompt.txt') promptFiles.push(full);
+    }
+  };
+  collect(assignmentsDir);
+  const prompts = promptFiles
+    .sort((a, b) => fs.statSync(a).mtimeMs - fs.statSync(b).mtimeMs)
+    .map((f) => fs.readFileSync(f, 'utf8'));
   assert.equal(prompts.length, 2);
   assert.match(prompts[0], /Do the first thing/);
   assert.match(prompts[0], /Ship the pricing page by Friday/);
@@ -421,4 +437,83 @@ test('the owner request and earlier step output reach each unit objective', asyn
   assert.match(prompts[1], /Ship the pricing page by Friday/);
   assert.match(prompts[1], /first step summary/);
   assert.match(prompts[1], /FINDING-FROM-FIRST-STEP/);
+});
+
+function seedRunWithUnitWorktrees(tmp, { terminal }) {
+  const workflow = validateWorkflow({
+    id: 'test/cleanup',
+    title: 'Cleanup',
+    steps: [
+      {
+        id: 's1',
+        units: [
+          { id: 'merged', template: { capability: 'docs:write', writes: ['a.txt'] } },
+          { id: 'unmerged', template: { capability: 'docs:write', writes: ['b.txt'] } },
+          { id: 'dirty', template: { capability: 'docs:write', writes: ['c.txt'] } },
+          { id: 'broken', template: { capability: 'docs:write', writes: ['d.txt'] } },
+        ],
+      },
+    ],
+  });
+  const { workflowRunId } = createWorkflowRun({ repoRoot: tmp, workflowId: workflow.id, workflow });
+  const units = {};
+  for (const id of ['merged', 'unmerged', 'dirty', 'broken']) {
+    const branch = `wf/${workflowRunId}/${id}`;
+    const wt = createWorkflowWorktree({ repoRoot: tmp, branch });
+    units[id] = { branch, worktreePath: wt.worktreePath };
+    appendWorkflowEvent({
+      repoRoot: tmp,
+      workflowRunId,
+      event: { type: 'unit.scheduled', payload: { stepId: 's1', unitId: id, worktreePath: wt.worktreePath, branch } },
+    });
+  }
+  const commitIn = (id, file) => {
+    fs.writeFileSync(path.join(units[id].worktreePath, file), `${id}\n`);
+    execFileSync('git', ['add', file], { cwd: units[id].worktreePath, stdio: 'ignore' });
+    execFileSync('git', ['-c', 'user.name=T', '-c', 'user.email=t@t.local', 'commit', '-m', id], { cwd: units[id].worktreePath, stdio: 'ignore' });
+  };
+  commitIn('merged', 'a.txt');
+  mergeWorkflowBranch({ repoRoot: tmp, sourceBranch: units.merged.branch, targetBranch: 'main' });
+  commitIn('unmerged', 'b.txt');
+  fs.writeFileSync(path.join(units.dirty.worktreePath, 'scratch.txt'), 'uncommitted\n');
+  for (const id of ['merged', 'unmerged', 'dirty']) {
+    appendWorkflowEvent({ repoRoot: tmp, workflowRunId, event: { type: 'unit.complete', payload: { stepId: 's1', unitId: id, outcome: 'pass' } } });
+  }
+  appendWorkflowEvent({ repoRoot: tmp, workflowRunId, event: { type: 'unit.complete', payload: { stepId: 's1', unitId: 'broken', outcome: 'execution-failure' } } });
+  appendWorkflowEvent({ repoRoot: tmp, workflowRunId, event: { type: terminal, payload: { outcome: terminal === 'workflow.fail' ? 'execution-failure' : 'pass' } } });
+  return { workflowRunId, units };
+}
+
+test('a finished workflow removes integrated unit worktrees and keeps the others with their paths in the run event', async () => {
+  const tmp = setupTestRepo();
+  const { workflowRunId, units } = seedRunWithUnitWorktrees(tmp, { terminal: 'workflow.complete' });
+
+  const state = await resumeWorkflow(workflowRunId, { repoRoot: tmp, cwd: tmp });
+
+  assert.equal(fs.existsSync(units.merged.worktreePath), false, 'integrated unit worktree should be removed');
+  assert.equal(execFileSync('git', ['branch', '--list', units.merged.branch], { cwd: tmp, encoding: 'utf8' }).trim(), '');
+  for (const id of ['unmerged', 'dirty', 'broken']) {
+    assert.equal(fs.existsSync(units[id].worktreePath), true, `${id} worktree must stay`);
+  }
+  assert.deepEqual(state.worktrees.removed.map((e) => e.unitId), ['merged']);
+  const kept = Object.fromEntries(state.worktrees.kept.map((e) => [e.unitId, e]));
+  assert.equal(kept.broken.worktreePath, units.broken.worktreePath);
+  assert.match(kept.broken.reason, /execution-failure/);
+  assert.match(kept.unmerged.reason, /not integrated/);
+  assert.match(kept.dirty.reason, /uncommitted/);
+  const logged = readWorkflowEvents({ repoRoot: tmp, workflowRunId }).filter((e) => e.type === 'workflow.worktrees');
+  assert.equal(logged.length, 1);
+
+  // A second pass over the finished run changes nothing and logs nothing more.
+  await resumeWorkflow(workflowRunId, { repoRoot: tmp, cwd: tmp });
+  assert.equal(readWorkflowEvents({ repoRoot: tmp, workflowRunId }).filter((e) => e.type === 'workflow.worktrees').length, 1);
+});
+
+test('a failed workflow cleans up the same way', async () => {
+  const tmp = setupTestRepo();
+  const { workflowRunId, units } = seedRunWithUnitWorktrees(tmp, { terminal: 'workflow.fail' });
+  const state = await resumeWorkflow(workflowRunId, { repoRoot: tmp, cwd: tmp });
+  assert.equal(state.status, 'failed');
+  assert.equal(fs.existsSync(units.merged.worktreePath), false);
+  assert.equal(fs.existsSync(units.broken.worktreePath), true);
 });

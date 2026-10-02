@@ -74,6 +74,10 @@ export async function runPanel(unit, cfg, { runRole, verify, history, members = 
     role: synthesizeRole,
     unit,
     readOnly: (unit?.writes || []).length === 0,
+    // The synthesizer judges every panelist, so it must not share a provider family with any of
+    // them; the runner turns these role names into the executors that played them and bind()
+    // compares provider families.
+    independentOf: allPanelistRoles,
     inputs: memberResults,
   });
 
