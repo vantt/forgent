@@ -993,6 +993,72 @@
         "for": [
           "execute"
         ]
+      },
+      "claude-herdr": {
+        "kind": "agent",
+        "description": "Claude Code REPL in a herdr pane under the bwrap posture, same provider family as `claude`. Separate id because `claude` is merged with the global default executor, which drops its own invocations.",
+        "allowCrossProvider": true,
+        "providerModel": "claude",
+        "invocations": [
+          {
+            "id": "claude-herdr-bwrap",
+            "via": "cli",
+            "adapter": "herdr-spawn",
+            "command": "claude",
+            "args": [
+              "--model",
+              "{model}"
+            ],
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "interactiveMode": {
+              "exitCommand": "/exit",
+              "kind": "claude",
+              "trustStore": {
+                "kind": "claude-json"
+              }
+            }
+          }
+        ]
+      },
+      "glm-herdr": {
+        "kind": "agent",
+        "description": "Claude Code REPL routed to OpenRouter GLM (z-ai) in a herdr pane under the bwrap posture. CLAUDE_CODE_AUTO_MODE_SERVER=0 keeps claude from raising its blocking auto-mode billing notice, which a gateway session always gets and nobody is there to answer. The key is substituted from the environment at launch (GLM_OPENROUTER_API_KEY), never stored here.",
+        "allowCrossProvider": true,
+        "providerModel": "z-ai",
+        "invocations": [
+          {
+            "id": "glm-herdr-bwrap",
+            "via": "cli",
+            "adapter": "herdr-spawn",
+            "command": "claude",
+            "args": [
+              "--model",
+              "{model}"
+            ],
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "interactiveMode": {
+              "exitCommand": "/exit",
+              "kind": "claude",
+              "trustStore": {
+                "kind": "claude-json"
+              }
+            },
+            "env": {
+              "ANTHROPIC_BASE_URL": "https://openrouter.ai/api",
+              "ANTHROPIC_AUTH_TOKEN": "${GLM_OPENROUTER_API_KEY}",
+              "ANTHROPIC_MODEL": "z-ai/glm-5.2",
+              "ANTHROPIC_API_KEY": "",
+              "ANTHROPIC_DEFAULT_HAIKU_MODEL": "z-ai/glm-5.2",
+              "ANTHROPIC_DEFAULT_SONNET_MODEL": "z-ai/glm-5.2",
+              "ANTHROPIC_DEFAULT_OPUS_MODEL": "z-ai/glm-5.2",
+              "CLAUDE_CODE_AUTO_MODE_SERVER": "0"
+            }
+          }
+        ]
       }
     },
     "timeoutMs": 2100000,
