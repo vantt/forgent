@@ -42,7 +42,7 @@ Ngoại lệ: tài liệu **lịch sử** (`docs/history/**`, "Lịch sử quy�
 
 - [ ] Guard chặn tên cũ ở code + docs (ngoài vùng lịch sử).
 - [ ] `docs/platform/component-boundary.md` phản ánh bản đồ cuối (L0–L7 sau track).
-- [ ] Merge `main`; cập nhật track `plan.md` = completed.
+- [ ] Merge `main`; cập nhật track `plan.md` (trạng thái P5 = done). **Không đóng track**: G7 (herdr làm transport mặc định) + posture read-only còn mở ở plan riêng (owner 2026-10-02); track đóng sau plan đó.
 
 ## Risk Assessment
 

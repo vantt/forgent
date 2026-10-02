@@ -19,7 +19,7 @@ Mở rộng guard từ vựng chết sang docs/skill (ngoài vùng lịch sử);
   - `test/runner/dead-vocabulary-guard.test.mjs` (file do plan T tạo; mọi plan trước đã **append**): thêm docs/core/domains/AGENTS.md vào phạm vi, loại trừ module đọc dữ liệu cũ (vd đường map `stage` cũ của P3), loại vùng lịch sử; danh sách từ theo bảng thuật ngữ.
   - `docs/platform/component-boundary.md`: bảng component sau track — Work (bản ghi/board/lifecycle), Workflow (định nghĩa + run + runner + tích hợp), Execution core (Unit, Unit run, `bind()`, Pattern cộng tác, cửa `fgos run`, posture), herdr (transport chính + bề mặt quan sát), Dispatch transport/confinement, Observe, Host/Surface, Packaging; bỏ "Agent Coordination Engine". `Last reviewed` cập nhật.
   - `docs/specs/reading-map.md`: trỏ spec mới (Workflow, execution core) và bỏ spec đã thu hồi.
-  - Cập nhật track `plan.md`: trạng thái mọi plan con, bằng chứng; đóng track.
+  - Cập nhật track `plan.md`: trạng thái P5 + bằng chứng. **Không đóng track**: G7 (herdr làm transport mặc định) + posture read-only còn mở ở plan riêng (owner 2026-10-02); track đóng sau plan đó. Bản đồ component ghi đúng hiện trạng: herdr transport + posture = **chưa nối** (`bind().transport` chưa được dùng, `resolvePosture` chưa có caller).
 - Non-functional: full `npm test` xanh; merge `main`.
 
 ## Related Code Files
@@ -30,7 +30,7 @@ Mở rộng guard từ vựng chết sang docs/skill (ngoài vùng lịch sử);
 
 1. Guard (test đỏ trước nếu còn sót → sửa).
 2. Boundary + reading map.
-3. Full suite → merge `main` → đóng track; dọn worktree P5 (và mọi worktree còn lại của track).
+3. Full suite → merge `main` → cập nhật track (không đóng); dọn worktree P5 (và mọi worktree còn lại của track).
 
 ## Success Criteria
 
