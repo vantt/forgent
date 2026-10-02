@@ -52,8 +52,8 @@ test('blocks a real Agent call whose subagent_type resolves to a registered out-
   const repoRoot = mkTempGitRepo();
   writeRunnerConfigFixture(repoRoot, {
     executor: { command: 'claude', args: ['{prompt}'] },
-    capabilities: { blocked: {} },
-    executors: { 'tool-only': { kind: 'tool', for: ['blocked'], command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    capabilities: { blocked: { prefer: 'tool-only' } },
+    executors: { 'tool-only': { kind: 'tool', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
     modelPolicies: { claude: { standard: 'sonnet' } },
     rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: 5000,

@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "Làm tươi + mức bảo đảm visibility"
-status: pending
+status: done
 priority: P1
 effort: "1d"
 dependencies: []
@@ -37,8 +37,8 @@ Khớp plan với `main` sau P1 + P3; xác nhận mức bảo đảm visibility 
 
 ## Success Criteria
 
-- [ ] Kết luận visibility xác nhận; ledger bất biến an toàn đầy đủ.
-- [ ] Danh sách caller engine đầy đủ.
+- [x] Kết luận visibility xác nhận; ledger bất biến an toàn đầy đủ.
+- [x] Danh sách caller engine đầy đủ.
 
 ## Risk Assessment
 

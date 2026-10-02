@@ -1,7 +1,7 @@
 ---
 phase: 3
 title: "Architecture advisor = Workflow (ca nghiệm thu 2)"
-status: pending
+status: done
 priority: P1
 effort: "2.5d"
 dependencies: [1]
@@ -39,8 +39,8 @@ Biểu diễn lại architecture advisory panel (9 vai, 6 pha, visibility window
 
 ## Success Criteria
 
-- [ ] Ca 2 không thua engine ở tiêu chí 1, 2, 4; owner chấm chất lượng ≥ engine.
-- [ ] Thành viên shaping không thấy nhau (test + kiểm log).
+- [x] Ca 2 không thua engine ở tiêu chí 1, 2, 4; owner chấm chất lượng ≥ engine.
+- [x] Thành viên shaping không thấy nhau (test + kiểm log).
 
 ## Risk Assessment
 

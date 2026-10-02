@@ -119,3 +119,28 @@ test('runPanel reuses passed members from history and only runs missing roles', 
   assert.equal(res.results[1].opinion, 'Cached opinion 2');
   assert.equal(res.results[2].opinion, 'Live opinion 3');
 });
+
+test('runPanel supports members, role, and synthesizeRole overrides in params', async () => {
+  const calls = [];
+  const unit = { id: 'u-research', objective: 'Research options' };
+  const runRole = async (opts) => {
+    calls.push(opts);
+    return { role: opts.role, outcome: 'pass' };
+  };
+
+  const res = await runPanel(
+    unit,
+    {},
+    { runRole },
+    { members: 2, role: 'researcher', synthesizeRole: 'synthesizer' },
+  );
+
+  assert.equal(calls.length, 3); // 2 researchers + 1 synthesizer
+  assert.equal(calls[0].role, 'researcher-1');
+  assert.equal(calls[1].role, 'researcher-2');
+  assert.equal(calls[2].role, 'synthesizer');
+  assert.deepEqual(calls[0].independentOf, ['researcher-2']);
+  assert.deepEqual(calls[1].independentOf, ['researcher-1']);
+  assert.equal(res.outcome, 'pass');
+  assert.equal(res.results.length, 3);
+});

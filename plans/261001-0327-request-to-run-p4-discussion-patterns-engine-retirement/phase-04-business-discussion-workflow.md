@@ -1,7 +1,7 @@
 ---
 phase: 4
 title: "Business discussion = Workflow (ca nghiệm thu 3)"
-status: pending
+status: done
 priority: P2
 effort: "1.5d"
 dependencies: [3]
@@ -36,7 +36,7 @@ Tạo Workflow `business-discussion` (thảo luận vấn đề business — use
 
 ## Success Criteria
 
-- [ ] Ca 3 đạt G4b và §0 tiêu chí 1, 2, 4; owner chấm hữu ích.
+- [x] Ca 3 đạt G4b và §0 tiêu chí 1, 2, 4; owner chấm hữu ích.
 
 ## Risk Assessment
 

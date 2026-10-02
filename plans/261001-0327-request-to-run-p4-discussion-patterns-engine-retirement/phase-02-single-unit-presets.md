@@ -1,7 +1,7 @@
 ---
 phase: 2
 title: "Preset cho dạng một-unit"
-status: pending
+status: done
 priority: P1
 effort: "1d"
 dependencies: [1]
@@ -35,7 +35,7 @@ Biểu diễn 5 file protocol "một unit" thành **preset có tên** của Patt
 
 ## Success Criteria
 
-- [ ] 4 preset + conformance xanh; panel thành viên không thấy nhau (test).
+- [x] 4 preset + conformance xanh; panel thành viên không thấy nhau (test).
 
 ## Risk Assessment
 

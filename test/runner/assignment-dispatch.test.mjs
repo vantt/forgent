@@ -11,7 +11,6 @@ import { executeAssignment, commitRunSettlement, settleRunOutcome, settleReceipt
 import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 import { compileDispatchPlan } from '../../src/runner/dispatch/plan.mjs';
 import { decideExecutorCli } from '../../src/runner/dispatch/cli.mjs';
-import { openSession, createSessionAssignment } from '../../src/runner/coordination/store.mjs';
 import { acquireRunControl, releaseRunControl } from '../../src/runner/dispatch/run-lock.mjs';
 import { canonicalJson, computeSha256Digest } from '../../src/runner/dispatch/detached-run-supervisor.mjs';
 import { initStore, addWork, listWork, settleClaim } from '../../src/state/store.mjs';
@@ -634,49 +633,26 @@ test('dispatch CLI execute subcommand with --assignment does not false-positive 
 
 test('dispatch CLI execute subcommand refuses a mutating inline Assignment (mission-refusal / read-only-mode gate for cli.mjs execute)', () => {
   const tempDir = mkTempDir();
-
-  openSession(
-    {
-      coordinationId: 'coord_cli_inline_refuse_test',
-      objective: 'Evaluate reviewer assignment for planning validation.',
-      provenanceRoot: { writerId: 'test-writer-cli-inline-refuse' },
+  const asgnId = 'asgn_cli_inline_refuse_test';
+  const asgnDir = path.join(tempDir, '.fgos', 'assignments', asgnId);
+  fs.mkdirSync(asgnDir, { recursive: true });
+  const assignment = {
+    schemaVersion: 1,
+    assignmentId: asgnId,
+    coordinationId: 'coord_cli_inline_refuse_test',
+    provenance: { kind: 'inline' },
+    mutation: 'mutating',
+    contract: {
+      objective: 'Gather facts and existing code paths for planning validation.',
+      contextRefs: [],
+      constraints: [],
+      expectedOutputs: ['agent-result.json (status, summary)'],
+      mutation: 'mutating',
+      role: 'researcher',
+      budget: { timeoutMs: 60000, maxRuns: 1 },
     },
-    { cwd: tempDir },
-  );
-
-  const assignment = createSessionAssignment(
-    {
-      coordinationId: 'coord_cli_inline_refuse_test',
-      taskKey: 'researcher-round-1',
-      contract: {
-        objective: 'Gather facts and existing code paths for planning validation.',
-        contextRefs: [],
-        constraints: [],
-        expectedOutputs: ['agent-result.json (status, summary)'],
-        mutation: 'read-only',
-        evidence: { required: 'reported' },
-        role: 'researcher',
-        budget: { timeoutMs: 60000, maxRuns: 1 },
-      },
-      caller: { writerId: 'test-writer-cli-inline-refuse' },
-    },
-    { cwd: tempDir },
-  );
-  assert.equal(assignment.mutation, 'read-only');
-  assert.equal(assignment.provenance.kind, 'inline');
-  assert.equal(assignment.stage, undefined);
-  assert.equal(assignment.operation, undefined);
-  assert.equal(assignment.missionId, undefined);
-
-  // Tamper the canonical assignment.json on disk (the only copy
-  // createSessionAssignment ever writes) to mutation: 'mutating' -- the
-  // real inline shape it produces (no stage/operation/missionId field,
-  // provenance.kind: 'inline'), so `asgnObj.provenance?.kind === 'inline'`
-  // alone is what signals "apply the mission-refusal / read-only-mode
-  // gate" for this shape.
-  const asgnPath = path.join(tempDir, '.fgos', 'assignments', assignment.assignmentId, 'assignment.json');
-  const tampered = { ...JSON.parse(fs.readFileSync(asgnPath, 'utf8')), mutation: 'mutating' };
-  fs.writeFileSync(asgnPath, `${JSON.stringify(tampered, null, 2)}\n`);
+  };
+  fs.writeFileSync(path.join(asgnDir, 'assignment.json'), JSON.stringify(assignment, null, 2) + '\n');
   const runnerConfig = { executor: { allowCrossProvider: true, command: process.execPath, args: [writeEchoExecutor(tempDir), '{prompt}'], providerModel: 'claude' }, modelPolicies: { claude: { standard: 'test-model' }, [process.execPath]: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, };
   fs.writeFileSync(path.join(tempDir, '.fgos', 'config.json'), JSON.stringify({ runner: runnerConfig }, null, 2));
 
@@ -3525,51 +3501,6 @@ test('executeAssignment: an interrupted assignment.json publish leaves it cleanl
   assert.equal(onDisk.assignmentId, assignment.assignmentId);
 });
 
-test('createSessionAssignment: an interrupted assignment.json publish leaves it cleanly absent rather than corrupt-but-unreadable (S6, coordination/store.mjs writer)', async () => {
-  const tempDir = mkTempDir();
-  const coordinationId = 's6-store-write';
-  openSession(
-    { coordinationId, objective: 'test', provenanceRoot: { writerId: 'test-writer' } },
-    { repoRoot: tempDir },
-  );
-
-  const assignmentsDir = path.join(tempDir, '.fgos', 'assignments');
-  const restore = injectSingleWriteFailureForDir(assignmentsDir, 'Injected crash mid assignment.json publish (store.mjs)', { matchSubdir: true });
-  let crashed = false;
-  try {
-    createSessionAssignment(
-      {
-        coordinationId,
-        taskKey: 's6-task',
-        contract: {
-          objective: 'Validate the plan for S6 recovery coverage.',
-          contextRefs: [],
-          constraints: [],
-          expectedOutputs: ['agent-result.json (status, summary)'],
-          mutation: 'read-only',
-          evidence: { required: 'reported' },
-          role: 'researcher',
-          budget: { timeoutMs: 60000, maxRuns: 1 },
-        },
-        caller: { writerId: 'test-writer' },
-      },
-      { repoRoot: tempDir },
-    );
-  } catch (err) {
-    crashed = true;
-    assert.match(err.message, /Injected crash mid assignment\.json publish \(store\.mjs\)/);
-  } finally {
-    restore();
-  }
-  assert.equal(crashed, true, 'expected the injected fault to interrupt the write');
-
-  // Find the assignmentId the claim reserved before the interrupted write,
-  // and prove no torn/partial assignment.json ever landed under it.
-  const assignmentIds = fs.readdirSync(assignmentsDir);
-  assert.equal(assignmentIds.length, 1);
-  const assignmentJsonPath = path.join(assignmentsDir, assignmentIds[0], 'assignment.json');
-  assert.equal(fs.existsSync(assignmentJsonPath), false);
-});
 
 test('commitRunSettlement: a crash between control-settlement and result-publication is recoverable, not permanently stuck (S8)', () => {
   const tempDir = mkTempDir();

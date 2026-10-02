@@ -1,0 +1,56 @@
+# core/workflows/business-discussion.yaml — Business discussion and strategic deliberation workflow
+
+id: business-discussion
+title: Business strategic deliberation and analysis workflow
+steps:
+  - id: framing
+    title: Problem Framing & Context
+    units:
+      - id: frame-problem
+        template:
+          capability: business:frame
+          pattern: solo
+          objective: Frame business problem, market context, constraints, and decision criteria
+  - id: perspectives
+    title: Multi-Perspective Deliberation
+    dependsOn: [framing]
+    units:
+      - id: explore-perspectives
+        template:
+          capability: business:perspectives
+          pattern: panel
+          objective: Analyze strategic problem from multiple independent business angles (product, finance, customer)
+  - id: critique
+    title: Risk Assessment & Red-Team Critique
+    dependsOn: [perspectives]
+    units:
+      - id: challenge-assumptions
+        template:
+          capability: business:critique
+          pattern: reviewed
+          objective: Stress-test assumptions and identify financial, regulatory, and operational risks
+  - id: synthesis
+    title: Strategic Synthesis & Trade-offs
+    dependsOn: [critique]
+    units:
+      - id: synthesize-strategy
+        template:
+          capability: business:synthesize
+          pattern: solo
+          objective: Formulate coherent strategic recommendation documenting consensus, trade-offs, and dissent
+  - id: approval
+    title: Executive Gate
+    dependsOn: [synthesis]
+    gate:
+      kind: human
+      question: Approve strategic business recommendation and proceed to action plan?
+  - id: action-plan
+    title: Execution & Action Roadmap
+    dependsOn: [approval]
+    units:
+      - id: develop-roadmap
+        template:
+          capability: business:plan
+          pattern: solo
+          writes: []
+          objective: Develop operational roadmap, milestones, and success metrics

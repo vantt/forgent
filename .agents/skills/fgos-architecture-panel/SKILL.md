@@ -3,18 +3,15 @@ name: fgos-architecture-panel
 user-invocable: false
 description: >-
   Help one real person make one real software-architecture decision, by
-  running a 9-role advisory panel (lead advisor, context investigator,
-  system/alternative shapers, constraint advocate, architecture critic,
-  synthesizer, independent red-team, on-demand specialist) through the
-  real, registered `core.coordination-protocol.architecture-advisory-
-  panel-v1` protocol -- hard visibility windows, driver-authorized
-  reveals, bounded dialogue reopen, replay -- instead of a single agent
-  opining. Takes raw, ambiguous intent directly; never requires a person
-  to write a problem brief or name a protocol. Use when someone wants a
-  second opinion on an architecture direction, wants competing designs
-  argued honestly before committing, or wants to keep talking to a
-  recommendation after it lands. Examples: "should we split this service
-  or keep it one", "get me a real panel opinion on this pipeline
+  running an advisory panel (framing, 3-panelist shaping, critique with
+  red-team, synthesis, explanation) through the registered
+  `architecture-advisory` Workflow (`fgos workflow start architecture-advisory`)
+  instead of a single agent opining. Takes raw, ambiguous intent directly;
+  never requires a person to write a problem brief or name a protocol. Use
+  when someone wants a second opinion on an architecture direction, wants
+  competing designs argued honestly before committing, or wants to keep
+  talking to a recommendation after it lands. Examples: "should we split
+  this service or keep it one", "get me a real panel opinion on this pipeline
   redesign, not just your take", "I disagree with the recommendation,
   here's why", "what would change your mind about that Postgres call".
   This is advisory and can be selected by fgos-panel; it never implements
@@ -30,26 +27,16 @@ when it needs repository-grounded alternatives and a recommendation; an
 explicit request to implement a concrete change belongs to `fgos-run`
 only after the advice/implementation boundary is clear.
 
-Dispatches through the real, registered
-[`core.coordination-protocol.architecture-advisory-panel-v1`](../../../core/coordination-protocols/architecture-advisory-panel-v1.yaml)
-FlowDefinition (the same `CoordinationSession` engine, request schema, and
-`fgos-group-thinking` pack gate every sibling group-thinking protocol
-uses — not a copy, the same code path, confirmed live: 757/757 focused
-coordination tests, 13 conformance cases naming premature reveal, hidden
-dissent, unauthorized specialist, over-cap reopen, human-authority
-impersonation, and heterogeneous actor/tier provenance — see
-[P03.2](../../../docs/architect/agent-coordination/verification/architecture-advisory-panel/P03.2.md)).
-That protocol declares legality and collaboration posture only: who may
-act when, what stays hidden until a window opens, what needs driver
-authorization, what is bounded and how many times. It does **not** know
+Dispatches through the registered
+[`core/workflows/architecture-advisory.yaml`](../../../core/workflows/architecture-advisory.yaml)
+Workflow definition using the unified `fgos workflow` door (`fgos workflow start architecture-advisory`,
+`fgos workflow status <workflowRunId>`, `fgos workflow answer <workflowRunId>`).
+That workflow declares the execution steps and DAG dependencies: framing, 3-panelist
+shaping, reviewed critique with red-team, synthesis, and explanation. It does **not** know
 what a good architecture recommendation looks like, what a premature
 question looks like, or what a shaper producing a designated-loser
 alternative looks like — that intelligence is this file, condensed from
-the real doctrine proven across two live manual sessions
-([P01.2](../../../docs/architect/agent-coordination/verification/architecture-advisory-panel/P01.2.md),
-[P01.3](../../../docs/architect/agent-coordination/verification/architecture-advisory-panel/P01.3.md))
-before this protocol existed to carry it.
-
+the real doctrine proven across live sessions.
 **Deep reference, not restated here in full:** the four Phase 01
 playbooks are the canonical doctrine and stay unchanged —
 [coordinator prompt](../../../docs/architect/agent-coordination/playbooks/prompts/architecture-advisory-coordinator.md),
@@ -77,16 +64,15 @@ into something new; they *are* the fragment's `disposition criteria` and
 
 | Hook Slot | Value |
 |---|---|
-| `unit of iteration` | One `architecture-advisory-panel-v1` coordination session (one `coordinationId`), from `phase-framing` entry through explicit `close-dialogue` -- the Entry Flow table's own row-by-row graph traversal, below, is the concrete shape of this hook. |
-| `open inputs` | (a) result kind: advisory, never work-product -- this skill never implements the chosen architecture (frontmatter; Bounds #1, #5). (b) exactly one primary canonical capability, resolved directly as `advise` (or domain-specific advisory capability such as `architecture:advise` from runner configuration), never a keyword-matched guess. (c) the raw case intake (frozen `intake.md`) and the resolved roster (Executor Roster table) -- Phase 1's own coordinator-only framing step, below. |
-| `evidence verification` | Never describe a coordination outcome to the person until it has actually come back through one of the real doors -- `fgos coordination show <coordinationId> --json`, an `operation` result, or the `human-turn`/`specialist-authorize` request steps. No "the panel would probably say" fallback (Never Reimplements The Kernel; Bounds #7). |
-| `disposition criteria` | The six dispositions in Driver Disposition (below) are this skill's own `dispositions.md` vocabulary; each is still recorded through the real door -- `fgos coordination disposition --id <coordinationId> --action-key <actionKey> --writer-id <writerId> --disposition <LITERAL> --rationale <text>` -- passing exactly one of three LITERAL `--disposition` values, chosen by packet-level bucket, never by echoing the six-value word itself: `accepted`/`mitigated` -> pass literal `accepted` (each changes the packet, so each requires the Step-6 independent recheck below -- `revise-synthesis`/`revise-explanation` -- before the finding is discharged; driver disposition alone never discharges it). `answered`/`invalidated-by-evidence` -> pass literal `rejected` (no packet change, backed by cited evidence, no recheck owed). `deferred`/`unresolved` -> pass literal `deferred` (`unresolved` also escalates to the person as visible dissent, per the human-escalation row below, and can never be "recheck-confirmed resolved" the way an `accepted` finding must be, so it belongs in this bucket, never under `accepted`). **This mapping is load-bearing, not decorative:** the real kernel (`recordDriverDispositionLocked`, `src/runner/coordination/store.mjs`) treats any literal disposition string outside its own five-item denylist (`rejected`/`reject`/`deferred`/`defer`/`recheck-required`) as accepting -- passing the literal words `answered` or `invalidated-by-evidence` themselves as the CLI value would silently accept the finding, the opposite of what this row intends. A finding about the driver's own conduct is never self-dispositioned (Driver Disposition, below). |
-| `adaptation bounds` | `revise-synthesis` and `revise-explanation` each hard-capped at `activation.maxInvocations: 2` (Decision Dialogue's reopen-budget note). Once both are spent, or a reopen would need re-dispatching a shaper or the critic -- a backward edge this graph does not have -- the driver opens a new cell inheriting `intake.md`/`scout-report.md` as context rather than continuing this session (Bounded Reopen Scope). |
-| `human-escalation triggers` | A gap earns a Decision Request only if it fails Scout Before Ask's third test -- material *now*, not material in the abstract (Lead Advisor Discipline). The one standing exception: a fact about the person's own obligations (a compliance boundary, a contractual commitment) that cannot be defaulted safely is asked immediately. A gap that fails the test is never deleted -- it is carried forward as a named default. Questions are batched, non-blocking. Two further triggers beyond an information gap: an `unresolved` disposition always escalates to the person as visible dissent, in the packet body, never smoothed into a footnote (Driver Disposition, below); and a finding about the driver's own conduct (an authority violation, an isolation breach, a fabricated turn) is never self-dispositioned -- it escalates to the person or an independent role (Driver Disposition, below). |
-| `close criteria` | `close-dialogue` gated by `post-explanation-open`, itself unreachable until every earlier phase's window has opened and settled (Entry Flow table) -- plus every finding in `dispositions.md` carrying one of the six dispositions above, and no fabricated human input anywhere in the packet (Bounds #6). |
-| `after-close action` | No git mutation inside PROJECT_ROOT, ever -- the session's own evidence commits are a separate repository and must never resolve to a path inside PROJECT_ROOT (Bounds #2). No implementation-plan generation -- naming the first reversible step is advisory; a phased build plan is a different product (Bounds #5). |
-| `continuity artifact` | Fresh-Session Resume's own orientation packet, in its full stated reading order (steps 1-6), below: `fgos coordination show`'s own output first (hard, replay-derived truth), then `session.md`, `intake.md`, the newest `human/<n>-person.md`, `interpretation.md`, and `dispositions.md`, reading only as far as the next action actually needs (never re-reading every artifact "to feel oriented"), and finally checking every actor with a prompt but no matching run record for a needed re-dispatch under a new ordinal. |
-
+| `unit of iteration` | One `architecture-advisory` workflow run (one `workflowRunId`), from `framing` entry through `explanation` and human dialogue review. |
+| `open inputs` | (a) result kind: advisory, never work-product -- this skill never implements the chosen architecture (frontmatter; Bounds #1, #5). (b) canonical capabilities resolved as `architecture:frame`, `architecture:shape`, `architecture:critique`, `architecture:synthesize`, `architecture:explain`. (c) raw case intake. |
+| `evidence verification` | Never describe an outcome to the person until it has come back through the real workflow door -- `fgos workflow status <workflowRunId>`, an executed unit result, or human gate questions. |
+| `disposition criteria` | Findings are dispositioned as accepted, mitigated, answered, invalidated-by-evidence, deferred, or unresolved visible dissent. |
+| `adaptation bounds` | Synthesis revision is bounded. If a fundamental revisit is needed beyond the workflow DAG, open a new workflow run with prior intake as context. |
+| `human-escalation triggers` | Material information gaps or genuine visible dissent escalate to the person via human gates or decision requests. |
+| `close criteria` | Explanation step complete, all questions answered, and no unresolved items without visible dissent. |
+| `after-close action` | No git mutation inside PROJECT_ROOT -- advisory recommendation only. |
+| `continuity artifact` | `fgos workflow status <workflowRunId>` state plus step artifacts. |
 ## What This Skill Does Not Require Of The Person
 
 - No problem brief. Raw words, however vague ("EOD and intraday
@@ -110,104 +96,34 @@ into something new; they *are* the fragment's `disposition criteria` and
   recording this as 'the person decided to build.'" A skill that treated
   that phrase as a decision would have misclassified it.
 
-## Never Reimplements The Kernel
+## Unified Workflow Execution Door
 
-This skill's task prose invokes the registered protocol through the
-existing doors only:
+This skill invokes the registered `architecture-advisory` workflow through the unified `fgos workflow` CLI door:
 
-- **Dispatch/resume:** `fgos-group-thinking`'s own gate
-  (`runGroupThinkingRequest`,
-  [`core/skills/fgos-group-thinking/SKILL.md`](../fgos-group-thinking/SKILL.md))
-  with `protocolId: "core.coordination-protocol.architecture-advisory-panel-v1"`
-  — this protocol is a registered member of the group-thinking Protocol
-  Pack (`core/protocol-packs/group-thinking.json`, P03.2). Read that
-  skill's own steps 1-5 for the exact request shape, the `actors[]`
-  per-role override shape, and why the gate cannot be bypassed; this
-  file does not restate them. **Before naming any executor in an
-  `actors[]` override, read the note at the top of Executor Roster,
-  below** — the three proven-safe pairs are registered for this door
-  (`tsk-1o4`, closed by P05.2), but a genuinely unregistered name still
-  does not fail loudly.
-- **Replay/status:** `fgos coordination show <coordinationId> --json`,
-  unmodified.
-- **Human-turn recording:** the `human-turn` request-step type
-  (`recordHumanTurn`, Phase 03.1) — session-level, protocol-agnostic
-  infrastructure, not a graph node in this protocol's own FlowDefinition.
-- **Specialist authorization:** the `specialist-authorize` request-step
-  type (`src/verbs/coordination/schema.mjs`, I24a) reaches
-  `authorizeSpecialistSlot` through any raw coordination request door
-  (`coordination run --file`, `coordination start --steps`, the headless
-  adapter) — never through `fgos-group-thinking`'s own gate, which
-  explicitly refuses this step type (see Known Gaps, `tsk-3xk`, retired).
-  I24b landed the driver-authenticated typed-action door for this same
-  capability: the `fgos coordination specialist-authorize` subverb, reaching
-  the locked `authorizeSpecialistSlotLocked`/
-  `recordSpecialistAuthorizationLocked` twins. A session opened through
-  `fgos-group-thinking`'s own pack gate can still have a specialist
-  authorized through this separate subverb — the gate refusal above blocks
-  only the raw request-step path, never this driver-authenticated route.
+- **Start workflow:** `fgos workflow start architecture-advisory` (or with `--dir <repoRoot>`).
+  Returns `{ workflowRunId, status, steps, ... }`.
+- **Check status / inspect outputs:** `fgos workflow status <workflowRunId>` (or with `--dir <repoRoot>`).
+  Reports status of every step (`framing`, `shaping`, `critique`, `synthesis`, `explanation`),
+  active units, and any pending questions at gates.
+- **Answer human gate or questions:** `fgos workflow answer <workflowRunId> --step <stepId> --answer "<answer>"`.
+  Resumes the workflow execution after answering.
+- **Resume workflow execution:** `fgos workflow resume <workflowRunId>`.
 
-No authority, visibility, aggregation, bounds-checking, or replay logic
-is described or implied here beyond what those doors already enforce.
-Never describe a coordination outcome to the person until it has
-actually come back through one of these doors — this skill has no
-"the panel would probably say" fallback (BOUNDS #7, below).
+Never describe an outcome to the person until verified through `fgos workflow status`.
 
-## Entry Flow: The Nine Phases, Mapped Onto The Real Graph
+## Entry Flow: The Five Workflow Steps
 
-The full judgment content for each phase is the coordinator prompt's own
-nine-phase section; what follows is the mapping onto
-`architecture-advisory-panel-v1`'s real nodes, so a fresh agent knows
-which request to build at each point. `activation` and gating below are
-exactly as declared in the FlowDefinition — the engine re-derives every
-window fresh from the event log on every call, so no request shape can
-skip a gate.
+The workflow executes along a clean DAG of 5 steps:
 
-| Phase | Node | Operation(s) | Actor | Activation | Gated by |
-|---|---|---|---|---|---|
-| 1 Intake and Framing | — (coordinator only) | none — freeze `intake.md`, resolve roster | you | — | — |
-| 1 (dispatch) / 2 Understand The Person / 3 Understand The Problem | `phase-framing` | `interpret-request`, `investigate-context` | lead-advisor, context-investigator | `required` | session open |
-| 4 Ask Reluctantly | — (coordinator only — see Decision Dialogue's reconciliation note) | none — `decision-request.md`, sent or explicitly not sent | you | — | — |
-| 5 Diverge Honestly | `phase-shaping` | `shape-system-proposal`, `shape-alternative-proposal`, `shape-constraint-proposal` | 3 shapers | `required` | `framing-shaping-open` (open from session start — a vacuous window that exists only so these `proposal`-typed contributions have somewhere legal to record) |
-| 6 Debate Claims | `phase-critique` | `critique-proposals`, `assess-constraints`, (`answer-specialist-question` if authorized) | critic, constraint-advocate, specialist | `driver-authorized` | `post-shaping-open` — opens ONLY once all three Phase-5 bindings have a linked result; a partial trio never opens it (this is the real "premature reveal" refusal, mechanically enforced, not prose) |
-| 7 Converge Without Flattening | `phase-synthesis` | `synthesize-recommendation` | synthesizer | `driver-authorized` | `post-critique-open` — opens only once BOTH `critique-proposals` AND `assess-constraints` are linked; transitively unreachable until every Phase-5/6 branch settles |
-| (red-team) | `phase-redteam` | `red-team-packet` | red-team | `driver-authorized` | `post-synthesis-open` |
-| 8 Explain For Ownership | `phase-explanation` | `explain-recommendation` | lead-advisor | `driver-authorized` | `post-redteam-open` |
-| 9 Stay In Dialogue | `phase-dialogue-reopen` | `revise-synthesis` (≤2), `revise-explanation` (≤2), `close-dialogue` | synthesizer, lead-advisor, lead-advisor | `driver-authorized` | `revise-*` ungated (available once the graph reaches this node); `close-dialogue` gated by `post-explanation-open` |
+| Step | Purpose | Capability | Pattern & Roles |
+|---|---|---|---|
+| `framing` | Intake, context investigation & framing | `architecture:frame` | `solo` (advisor) |
+| `shaping` | Diverge into 3 independent proposals | `architecture:shape` | `panel` (3 panelists: panelist-1, panelist-2, panelist-3) |
+| `critique` | Attack proposals & stress-test constraints | `architecture:critique` | `reviewed` (with red-team) |
+| `synthesis` | Converge into coherent recommendation | `architecture:synthesize` | `solo` (synthesizer) |
+| `explanation` | Actionable explanation for ownership | `architecture:explain` | `solo` (advisor) |
 
-Every `driver-authorized` operation needs an `authorize` step (your own
-authorization, with a free-text `reason` — see `tsk-44p` in Known Gaps
-for why that reason can't yet be a real `human-turn:`/`contribution:`
-ref) immediately followed by the matching `operation` step, in the same
-or a later resumed request against the same `coordinationId`.
-
-**Bounded reopen scope — a real, deliberate narrowing from the manual
-playbook, not an oversight.** The manual playbook's Phase 9 can reopen
-Phase 3, 5, 6, or 7 with a fresh dispatch. This protocol's graph has
-**no backward edge** — `phase-dialogue-reopen` offers exactly
-`revise-synthesis`/`revise-explanation`/`close-dialogue`, nothing that
-re-dispatches a shaper or the critic. Concretely, when a human turn
-would (per the manual doctrine) reopen Phase 5 or 6:
-
-- The synthesizer's `revise-synthesis` run is the mechanism: it
-  incorporates the human turn's new fact, requested alternative, or
-  requested composition into a revised Decision Packet **using the
-  existing ledger plus what the turn itself supplies as fact** — it does
-  not fabricate a fresh independent shaper's output to fill the gap.
-- If the synthesizer's own revised output states that the new material
-  genuinely requires a fresh independent shaper or critic pass (not
-  something integratable from existing evidence), record that
-  explicitly in `dialogue/<n>-response.md` and open a **new cell** (a
-  new `coordinationId`, fresh `phase-framing` entry, reusing this
-  session's `intake.md`/`scout-report.md` as inherited context) for that
-  follow-on work — never invent the fresh shaper's voice inside
-  `revise-synthesis` itself.
-
-Say this plainly to the person in the response: "a full re-run of [X]
-would need a new session; here is what the panel can tell you today
-without one." This is not a workaround to hide — it is the accurate
-picture of what V1 bounds.
-
+Each step's outputs are clean inputs for downstream steps, ensuring independent divergence during shaping and rigorous review during critique before synthesis.
 ## Executor Roster, With Cognitive Rationale
 
 > **Executor registration — verified live.**
@@ -629,16 +545,15 @@ legitimate here.
 ## Fresh-Session Resume
 
 A fresh agent resumes from `EVIDENCE_DIR` plus one call to `fgos
-coordination show <coordinationId> --json` — never from chat history or
+workflow status <workflowRunId>` — never from chat history or
 raw dispatch logs.
 
 **The orientation packet, in reading order:**
 
-1. `fgos coordination show`'s own output: phase/quorum state, which
-   operations have a linked result, which `driver-authorized` operations
-   are still pending authorization, and every recorded disposition —
-   this is the hard, replay-derived truth of where the session actually
-   is, independent of what any prose file claims.
+1. `fgos workflow status <workflowRunId>`: status of each step, which units
+   completed or failed, and active gate questions — this is the hard,
+   replay-derived truth of where the workflow run actually is,
+   independent of what any prose file claims.
 2. `session.md` — the coordinator's own compact status board: case,
    phase, roster, one imperative next action. If this and (1) disagree,
    trust (1) and correct `session.md`.

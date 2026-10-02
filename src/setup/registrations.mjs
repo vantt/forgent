@@ -88,9 +88,7 @@ import { resolveDocPath } from '../report/knowledge-resolver.mjs';
 import { isLiveDocLifecycle } from '../state/knowledge-registry.mjs';
 import { findDuplicateAuthoritativeClaims } from '../report/authoritative-match.mjs';
 import { parseFrontmatter } from '../report/frontmatter.mjs';
-import { discoverCoordinationProtocols, loadCoordinationProtocol } from '../runner/definitions/protocol-loader.mjs';
-import { FlowDefinitionError, POLICY_PATCH_FIELDS } from '../runner/definitions/schema.mjs';
-import { validateCoordinationRequest } from '../verbs/coordination/schema.mjs';
+import { POLICY_PATCH_FIELDS } from '../runner/dispatch/execution-contract.mjs';
 import { discoverOperationPromptTemplates, TemplateResolutionError } from '../runner/dispatch/operation-prompt-templates.mjs';
 import { resolveHostBin } from '../util/host-bin.mjs';
 export { mainCheckoutHookWired } from './git-hooks.mjs';
@@ -720,6 +718,7 @@ export function checkCoordinationProtocolDeadVocabulary(cwd) {
   const scanDirs = [
     path.join(cwd, '.fgos', 'coordination-protocols'),
     path.join(cwd, 'core', 'coordination-protocols'),
+    path.join(cwd, 'core', 'workflows'),
     path.join(cwd, 'domains'),
   ];
   const yamlFiles = [];
@@ -2376,62 +2375,7 @@ function checkOperationCapabilitiesResolve(cwd) {
   if (!runnerConfig) {
     return { passed: false, message: 'runner config section missing -- run fgos setup' };
   }
-  let entries;
-  try {
-    entries = discoverCoordinationProtocols({ cwd });
-  } catch (err) {
-    if (err instanceof FlowDefinitionError) {
-      return { passed: false, message: `malformed CoordinationProtocol definition -- ${err.message}` };
-    }
-    throw err;
-  }
-
-  const unresolved = [];
-  const providerFamilies = new Set();
-  let declaredCount = 0;
-  for (const entry of entries) {
-    const definitionId = entry.definition.metadata.id;
-    for (const op of entry.definition.spec.operations ?? []) {
-      const capability = op.policy?.capability;
-      if (!capability) continue;
-      declaredCount += 1;
-      let resolved;
-      try {
-        resolved = resolveExecutorAndOverrides(runnerConfig, capability);
-      } catch (err) {
-        if (err instanceof RunnerConfigError) {
-          unresolved.push(`${definitionId}.${op.id} -> "${capability}": ${err.message}`);
-          continue;
-        }
-        throw err;
-      }
-      // Fix (round 3, MEDIUM): `binding.mjs`'s `bindOperations` (the actual
-      // runtime consumer this check exists to verify) only ever treats
-      // `bindingSource === 'capability.prefer'` as a genuine capability
-      // resolution (H1/H4, red-team rounds 1/2) -- a bare `executor-id`
-      // match or a `capability.for` orphan-executor fallback is refused
-      // there and leaves the actor unbound at real dispatch time. Checking
-      // only `resolved.configured` here would report a capability as
-      // "resolving" (and count its provider family) even when
-      // `bindOperations` would never actually bind it -- a false-positive
-      // on the exact contract this check exists to verify.
-      if (!resolved.configured || resolved.bindingSource !== 'capability.prefer') {
-        unresolved.push(`${definitionId}.${op.id} -> "${capability}": nothing registered through capabilities.${capability}.prefer (a bare executor-id match or a "for"-array fallback does not count -- bindOperations refuses both and leaves the actor unbound)`);
-        continue;
-      }
-      providerFamilies.add(deriveProviderFamily(resolved.executor));
-    }
-  }
-
-  if (unresolved.length > 0) {
-    return { passed: false, message: `${unresolved.length} declared operation.policy.capability value(s) do not resolve: ${unresolved.join('; ')}` };
-  }
-  return {
-    passed: true,
-    message: declaredCount === 0
-      ? 'no CoordinationProtocol operation declares policy.capability yet (nothing to check)'
-      : `${declaredCount} declared operation.policy.capability value(s) resolve; ${providerFamilies.size} distinct provider famil${providerFamilies.size === 1 ? 'y' : 'ies'} reachable ([${[...providerFamilies].sort().join(', ')}])`,
-  };
+  return { passed: true, message: 'no coordination protocols active (retired in favor of workflows)' };
 }
 
 registerCheck({
@@ -3968,18 +3912,7 @@ registerFix({
 // which already carries the offending source path (protocol-loader.mjs's
 // `relativeToPackageRoot` suffix on every thrown error).
 function checkCoordinationProtocolFixturesValid(cwd) {
-  try {
-    const entries = discoverCoordinationProtocols({ cwd });
-    return {
-      passed: true,
-      message: `${entries.length} CoordinationProtocol definition(s) discovered and normalized cleanly (project/domain/core tiers)`,
-    };
-  } catch (err) {
-    if (err instanceof FlowDefinitionError) {
-      return { passed: false, message: `malformed CoordinationProtocol definition -- ${err.message}` };
-    }
-    throw err;
-  }
+  return { passed: true, message: 'coordination protocol fixtures retired' };
 }
 
 registerCheck({
@@ -4024,43 +3957,7 @@ registerCheck({
 // (RUL9): only reads the example files and the protocol registry, never
 // writes.
 function checkCoordinationExampleRequestsValid(cwd) {
-  const examplesDir = path.join(cwd, 'docs', 'how-to', 'coordination-examples');
-  if (!fs.existsSync(examplesDir)) {
-    return { passed: false, message: `no example request files found at ${path.relative(cwd, examplesDir)} -- Phase 07 R3 requires publishing one agent-led request, declared consult, research protocol, and Group Cognition framework example` };
-  }
-  const files = fs.readdirSync(examplesDir).filter((f) => f.endsWith('.json')).sort();
-  if (files.length === 0) {
-    return { passed: false, message: `${path.relative(cwd, examplesDir)} exists but contains no .json example request files` };
-  }
-  const problems = [];
-  for (const file of files) {
-    const filePath = path.join(examplesDir, file);
-    let raw;
-    try {
-      raw = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-    } catch (err) {
-      problems.push(`${file}: not valid JSON (${err.message})`);
-      continue;
-    }
-    let normalized;
-    try {
-      normalized = validateCoordinationRequest(raw, {});
-    } catch (err) {
-      problems.push(`${file}: fails validateCoordinationRequest (${err.message})`);
-      continue;
-    }
-    if (normalized.kind === 'declared-protocol') {
-      try {
-        loadCoordinationProtocol(normalized.protocolRef.id, { cwd });
-      } catch (err) {
-        problems.push(`${file}: protocolRef.id "${normalized.protocolRef.id}" does not resolve (${err.message})`);
-      }
-    }
-  }
-  if (problems.length > 0) {
-    return { passed: false, message: problems.join('; ') };
-  }
-  return { passed: true, message: `${files.length} coordination example request(s) under ${path.relative(cwd, examplesDir)} validate cleanly and resolve every referenced protocolRef` };
+  return { passed: true, message: 'coordination example requests retired' };
 }
 
 registerCheck({

@@ -1,7 +1,7 @@
 ---
 phase: 6
 title: "Thu hồi engine + đổi tên"
-status: pending
+status: complete
 priority: P1
 effort: "2d"
 dependencies: [2, 3, 4, 5]

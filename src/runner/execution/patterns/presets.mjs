@@ -21,13 +21,24 @@ export const PRESETS = Object.freeze({
     pattern: 'panel',
     params: Object.freeze({
       members: 3,
+      role: 'researcher',
+      synthesizeRole: 'synthesizer',
+    }),
+  }),
+  'research-fan-out-gated': Object.freeze({
+    pattern: 'panel',
+    params: Object.freeze({
+      members: 3,
+      role: 'researcher',
+      synthesizeRole: 'synthesizer',
+      gated: true,
     }),
   }),
   'rfc': Object.freeze({
     pattern: 'reviewed',
     params: Object.freeze({
       maxRounds: 1,
-      minCheckers: Object.freeze(['red-team']),
+      minCheckers: Object.freeze(['reviewer', 'red-team']),
     }),
   }),
 });

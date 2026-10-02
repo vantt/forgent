@@ -12,12 +12,6 @@ import {
   runOutcome,
 } from '../../src/runner/dispatch/run-result.mjs';
 
-import {
-  readLinkedRunResultFromDisk,
-  synthesizeResearchFanIn,
-} from '../../src/runner/coordination/session-engine.mjs';
-
-import { DEFAULT_AGGREGATE_BOUNDS } from '../../src/runner/coordination/schema.mjs';
 
 function makeValidV3(overrides = {}) {
   const classification = {
@@ -135,91 +129,3 @@ test('interpretRunResult: branches cleanly across v1, v2, and v3 contracts', () 
   assert.equal(interpretedAlien.classification.provenance, 'contract-corrupt');
 });
 
-test('session reader integration: session containing both v2 and v3 results reads cleanly', () => {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-v2-v3-session-'));
-  const fgosDir = path.join(tmp, '.fgos');
-  const coordinationId = 'coord_mixed_versions';
-  const sessDir = path.join(fgosDir, 'coordination', 'sessions', coordinationId);
-
-  fs.mkdirSync(sessDir, { recursive: true });
-
-  const asgn1Id = 'asgn_worker_v2';
-  const asgn2Id = 'asgn_worker_v3';
-  const run1Id = `run_${asgn1Id}_01`;
-  const run2Id = `run_${asgn2Id}_01`;
-
-  const v2Record = {
-    contract: { id: 'assignment-run-result', version: 2 },
-    runId: run1Id,
-    assignmentId: asgn1Id,
-    status: 'done',
-    confidence: 'verified',
-    classification: {
-      execution: { status: 'completed', exitCode: 0 },
-      assessment: { verdict: 'pass' },
-      confidence: { level: 'verified', basis: ['claim'] },
-      failure: null,
-      policy: { disposition: 'allow', code: null },
-      delivery: { mode: 'fresh' },
-      provenance: 'native-v2',
-    },
-  };
-
-  const v3Record = makeValidV3({
-    runId: run2Id,
-    assignmentId: asgn2Id,
-  });
-
-  // Write assignments and runs
-  for (const [asgnId, record] of [[asgn1Id, v2Record], [asgn2Id, v3Record]]) {
-    const asgnDir = path.join(fgosDir, 'assignments', asgnId);
-    fs.mkdirSync(path.join(asgnDir, 'runs', '01'), { recursive: true });
-    fs.writeFileSync(path.join(asgnDir, 'assignment.json'), JSON.stringify({
-      id: asgnId,
-      assignmentId: asgnId,
-      provenance: { inline: { contract: { contextRefs: [] } } },
-    }));
-    fs.writeFileSync(path.join(asgnDir, 'runs', '01', 'result.json'), JSON.stringify(record));
-  }
-
-  // Write session manifest and events
-  fs.writeFileSync(path.join(sessDir, 'session.json'), JSON.stringify({
-    schemaVersion: '2',
-    coordinationId,
-    status: 'active',
-    objective: 'Mixed v2 and v3 test session',
-    createdAt: new Date().toISOString(),
-    provenanceRoot: { writerId: 'test-writer' },
-    aggregateBounds: { ...DEFAULT_AGGREGATE_BOUNDS },
-    assignmentRefs: [asgn1Id, asgn2Id],
-  }));
-
-  fs.writeFileSync(path.join(sessDir, 'events.jsonl'), [
-    JSON.stringify({ seq: 1, type: 'assignment-created', payload: { actorId: 'worker-v2', assignmentId: asgn1Id } }),
-    JSON.stringify({ seq: 2, type: 'result-linked', payload: { assignmentId: asgn1Id, runId: run1Id } }),
-    JSON.stringify({ seq: 3, type: 'assignment-created', payload: { actorId: 'worker-v3', assignmentId: asgn2Id } }),
-    JSON.stringify({ seq: 4, type: 'result-linked', payload: { assignmentId: asgn2Id, runId: run2Id } }),
-  ].join('\n') + '\n');
-
-  // Verify direct readLinkedRunResultFromDisk
-  const r1 = readLinkedRunResultFromDisk(fgosDir, asgn1Id, run1Id);
-  assert.equal(r1.contract.version, 2);
-  const o1 = runOutcome(r1);
-  assert.equal(o1.category, 'ok');
-  assert.equal(o1.satisfied, true);
-
-  const r2 = readLinkedRunResultFromDisk(fgosDir, asgn2Id, run2Id);
-  assert.equal(r2.contract.version, 3);
-  const o2 = runOutcome(r2);
-  assert.equal(o2.category, 'ok');
-  assert.equal(o2.satisfied, true);
-
-  // Verify synthesizeResearchFanIn handles mixed v2/v3 session cleanly
-  const fanIn = synthesizeResearchFanIn(coordinationId, {
-    branchActorIds: ['worker-v2', 'worker-v3'],
-  }, { cwd: tmp, repoRoot: tmp });
-
-  assert.equal(fanIn.status, 'synthesized');
-  assert.equal(fanIn.accepted.length, 2);
-  assert.deepEqual(fanIn.accepted.map((x) => x.actorId).sort(), ['worker-v2', 'worker-v3']);
-});

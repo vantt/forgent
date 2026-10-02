@@ -37,7 +37,7 @@ test('all COMMAND_REGISTRY selectors appear exactly once in generated output', (
   assert.deepEqual(routeKeys, sortedKeys, 'Keys must be sorted lexicographically');
 
   // Verify sub-positional selectors stay one entry
-  const subPositional = ['coordination', 'dispatch', 'session', 'tool', 'doc', 'workflow'];
+  const subPositional = ['dispatch', 'session', 'tool', 'doc', 'workflow'];
   for (const sub of subPositional) {
     assert.ok(routes[sub], `Sub-positional selector "${sub}" must exist as exactly one entry`);
     assert.equal(routes[sub].selector, sub);

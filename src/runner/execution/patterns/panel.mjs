@@ -34,10 +34,13 @@ const ERROR_OUTCOMES = Object.freeze([
  */
 export async function runPanel(unit, cfg, { runRole, verify, history, members = 3 } = {}, params = {}) {
   const memberCount = params?.members ?? members ?? cfg?.patterns?.panel?.members ?? 3;
+  const baseRole = params?.role || 'panelist';
+  const synthesizeRole = params?.synthesizeRole || 'synthesizer';
   const prior = typeof history === 'function' ? history() : (Array.isArray(history) ? history : []);
 
-  const allPanelistRoles = Array.from({ length: memberCount }, (_, idx) => `panelist-${idx + 1}`);
-
+  const allPanelistRoles = Array.isArray(params?.role)
+    ? params.role
+    : Array.from({ length: memberCount }, (_, idx) => `${baseRole}-${idx + 1}`);
   // Dispatch all panel members in PARALLEL
   const memberPromises = allPanelistRoles.map(async (role) => {
     const existing = prior?.find((h) => h.role === role && h.outcome === 'pass');
@@ -66,10 +69,11 @@ export async function runPanel(unit, cfg, { runRole, verify, history, members = 
   }
 
   // Once all members complete, run synthesizer
-  const existingSynth = prior?.find((h) => h.role === 'synthesizer' && h.outcome === 'pass');
+  const existingSynth = prior?.find((h) => h.role === synthesizeRole && h.outcome === 'pass');
   const synthResult = existingSynth || await runRole({
-    role: 'synthesizer',
+    role: synthesizeRole,
     unit,
+    readOnly: (unit?.writes || []).length === 0,
     inputs: memberResults,
   });
 

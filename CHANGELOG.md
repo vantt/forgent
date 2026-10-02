@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- **Added**: Request-to-Run P4 Discussion Patterns on Lean Model and Coordination Engine Retirement:
+  - **Single-Unit Discussion Presets**: Added `consult` (pattern `solo`, role `advisor`), `research-fan-out` (pattern `panel`, 3 members), and `rfc` (pattern `reviewed` with red-team) in `src/runner/execution/patterns/presets.mjs`.
+  - **Discussion Workflows**: Ported 5 multi-unit discussion types to DAG Workflows in `core/workflows/`: `architecture-advisory.yaml` (Acceptance Case 2), `business-discussion.yaml` (Acceptance Case 3), `delphi.yaml`, `nominal-group.yaml`, and `group-cognition.yaml`.
+  - **Retirement of Coordination Engine L4**: Completely removed `src/runner/coordination/**`, `src/verbs/coordination/**`, `src/runner/definitions/**`, `src/runner/team-cognition/**`, `src/runner/deliberation/**`, `core/coordination-protocols/**`, `core/protocol-packs/**`, `packages/coordination-state/` (Rust), and CLI verb `fgos coordination`.
+  - **Coordination Data Backup**: Backed up historical `.fgos/coordination/sessions` to `.fgos/backups/coordination-sessions-backup.tar.gz`.
+  - **Doc & Surface Routing**: Updated `fgos-panel` and `fgos-group-thinking` to route to discussion Workflows and presets; updated component boundary and architecture manifest.
 - **Added**: Request-to-Run P3b Workflow Separation from Work:
   - **Decoupled Work from Stage**: Removed `stage` field from Work records and state mutations (`src/state/work.mjs`, `store.mjs`). Work state focuses strictly on status lifecycle, board, and metadata, referencing `workflowRunId?`.
   - **Single-path Replay for Historical Data**: Upgraded to `viewSchemaVersion: 3` (supported across Node and Rust). Historical `stage` events map gracefully to `workflowStep`.

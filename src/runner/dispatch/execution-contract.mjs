@@ -38,7 +38,11 @@
 
 import { MODEL_POLICY_TIERS, RunnerConfigError } from './config.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot } from '../paths.mjs';
-import { POLICY_PATCH_FIELDS } from '../definitions/schema.mjs';
+export const REPEAT_MODE_VALUES = Object.freeze(['pre-delivery', 'post-delivery']);
+export const POLICY_PATCH_FIELDS = new Set([
+  'rigor', 'tier', 'fallbackExecutors', 'visibility', 'repeatMode',
+  'capability', 'distinctProviderFrom',
+]);
 
 export const CONTRACT_POLICY_VERSION = '1';
 

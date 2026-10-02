@@ -66,7 +66,6 @@ const BANNED_FILES = [
   'src/runner/dispatch/recovery-planner.mjs', // resume/reassign/retry recommendation planning
   'src/runner/recovery.mjs', // retry decision matrix
   'src/verbs/dispatch/recover.mjs', // recovery verb: observes/applies resume/reassign for a standalone Run
-  'src/runner/coordination/session-engine.mjs', // CoordinationSession admission/resumption/takeover
   'src/runner/claim-port.mjs', // work-item claim admission gate
   'src/runner/dispatch/run-lock.mjs', // run-lock ledger writer
   'src/runner/dispatch/confinement/policies.mjs', // worker confinement policy for a spawned process

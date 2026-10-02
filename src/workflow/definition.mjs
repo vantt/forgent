@@ -1,8 +1,8 @@
 // src/workflow/definition.mjs — Workflow definition contract and schema validator
 // Architecture guard: MUST NOT import src/state/** or src/runner/coordination/** (A4 boundary)
 
+import path from 'node:path';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
-
 const DISALLOWED_G2_FIELDS = new Set([
   'executor',
   'provider',

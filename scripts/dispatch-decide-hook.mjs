@@ -26,8 +26,6 @@
 
 import fs from 'node:fs';
 import { decideExecutorCli } from '../src/runner/dispatch.mjs';
-import { bind } from '../src/runner/execution/bind.mjs';
-import { ensureRunnerConfigForDir } from '../src/runner/dispatch/config.mjs';
 
 const AGENT_TOOL_NAMES = new Set(['Agent', 'Task']);
 
@@ -51,19 +49,7 @@ async function decideBlock() {
 
   let decided;
   try {
-    const runnerConfig = ensureRunnerConfigForDir(payloadCwd);
-    const bound = bind(
-      { unit: { capability: subagentType }, role: 'producer', readOnly: true },
-      { runnerConfig, session: { hasNativeAgent: true } },
-    );
-    if (bound?.refused) {
-      decided = await decideExecutorCli(undefined, { cwd: payloadCwd, for: subagentType, needsSoul: true, hasLiveTaskAccess: true });
-    } else {
-      decided = {
-        mechanism: bound.mechanism,
-        executorId: bound.executor,
-      };
-    }
+    decided = await decideExecutorCli(undefined, { cwd: payloadCwd, for: subagentType, needsSoul: true, hasLiveTaskAccess: true });
   } catch {
     return null;
   }

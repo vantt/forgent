@@ -68,6 +68,68 @@ test('runPattern dispatches named preset "code-change"', async () => {
   assert.ok(calls.some((c) => c.role === 'red-team'));
 });
 
+test('runPattern dispatches named preset "consult" with advisor role', async () => {
+  const calls = [];
+  const runRole = async (opts) => {
+    calls.push(opts);
+    return { role: opts.role, outcome: 'pass' };
+  };
+
+  const res = await runPattern(
+    'consult',
+    { id: 'u-consult', objective: 'Consult' },
+    {},
+    { runRole },
+  );
+
+  assert.equal(res.outcome, 'pass');
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].role, 'advisor');
+});
+
+test('runPattern dispatches named preset "research-fan-out" with researcher roles', async () => {
+  const calls = [];
+  const runRole = async (opts) => {
+    calls.push(opts);
+    return { role: opts.role, outcome: 'pass' };
+  };
+
+  const res = await runPattern(
+    'research-fan-out',
+    { id: 'u-research', objective: 'Research' },
+    {},
+    { runRole },
+  );
+
+  assert.equal(res.outcome, 'pass');
+  assert.equal(calls.length, 4);
+  assert.equal(calls[0].role, 'researcher-1');
+  assert.equal(calls[1].role, 'researcher-2');
+  assert.equal(calls[2].role, 'researcher-3');
+  assert.equal(calls[3].role, 'synthesizer');
+});
+
+test('runPattern dispatches named preset "rfc" with reviewer and red-team checkers', async () => {
+  const calls = [];
+  const runRole = async (opts) => {
+    calls.push(opts);
+    return { role: opts.role, outcome: 'pass' };
+  };
+
+  const res = await runPattern(
+    'rfc',
+    { id: 'u-rfc', objective: 'RFC review', capability: 'docs:write' },
+    {},
+    { runRole },
+  );
+
+  assert.equal(res.outcome, 'pass');
+  assert.equal(res.rounds, 1);
+  assert.ok(calls.some((c) => c.role === 'producer'));
+  assert.ok(calls.some((c) => c.role === 'reviewer'));
+  assert.ok(calls.some((c) => c.role === 'red-team'));
+});
+
 test('runPattern uses unit.pattern when nameOrPreset is omitted', async () => {
   const calls = [];
   const runRole = async (opts) => {

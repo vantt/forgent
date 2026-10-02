@@ -259,7 +259,7 @@ const DUMMY_CONFIG = {
 
 function configFor(scriptPath) {
   return {
-    executor: { allowCrossProvider: true, command: process.execPath, args: [scriptPath, '{prompt}', '--model', '{model}'] },
+    executor: { allowCrossProvider: true, providerModel: 'node', command: process.execPath, args: [scriptPath, '{prompt}', '--model', '{model}'] },
     modelPolicies: {
       node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' },
       claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' },
@@ -2308,7 +2308,6 @@ test('Step 06 executing-stage scout-blast-radius operation choice runs through r
   });
 
   const res = await runOnce({ repoRoot, config: cfg, worktreeDir, log: noLog });
-
   assert.equal(res.outcome, 'drained');
   assert.equal(res.dispatched[0].outcome, 'awaiting-approval');
 
@@ -2320,7 +2319,8 @@ test('Step 06 executing-stage scout-blast-radius operation choice runs through r
   assert.ok(fs.existsSync(asgnDir));
   const assignments = fs.readdirSync(asgnDir);
   assert.ok(assignments.length > 0);
-  const runsDir = path.join(asgnDir, assignments[0], 'runs', '01');
+  const scoutAsgn = assignments.find((a) => a.includes('scout_blast_radius')) || assignments[0];
+  const runsDir = path.join(asgnDir, scoutAsgn, 'runs', '01');
   assert.ok(fs.existsSync(path.join(runsDir, 'result.json')));
   assert.ok(fs.existsSync(path.join(runsDir, 'dispatch-plan.json')));
 });

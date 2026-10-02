@@ -9,13 +9,19 @@ import { validateWorkflow } from './definition.mjs';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 
 function resolvePackageRoot(cwd = process.cwd()) {
-  // Find package root from cwd or fallback to nearest package.json
+  // Find package root from cwd or fallback to nearest directory containing package.json or core/workflows
   let cur = path.resolve(cwd);
   while (cur !== path.dirname(cur)) {
-    if (fs.existsSync(path.join(cur, 'package.json'))) {
+    if (fs.existsSync(path.join(cur, 'core', 'workflows')) || fs.existsSync(path.join(cur, 'package.json'))) {
       return cur;
     }
     cur = path.dirname(cur);
+  }
+  // Final fallback: check repo root containing this file
+  const fileDir = path.dirname(new URL(import.meta.url).pathname);
+  const repoRoot = path.resolve(fileDir, '..', '..');
+  if (fs.existsSync(path.join(repoRoot, 'core', 'workflows'))) {
+    return repoRoot;
   }
   return path.resolve(cwd);
 }
@@ -117,8 +123,16 @@ export function loadWorkflow(id, options = {}) {
     throw new RunnerConfigError('loadWorkflow requires a non-empty string id');
   }
 
-  const all = discoverWorkflows(options);
-  const found = all.get(id);
+  let all = discoverWorkflows(options);
+  let found = all.get(id);
+  if (!found && options.packageRoot) {
+    // If not found in target repo (e.g. temporary test worktree), check core/domains from install root
+    const fallbackAll = discoverWorkflows({ cwd: process.cwd() });
+    found = fallbackAll.get(id);
+    if (found) {
+      all = fallbackAll;
+    }
+  }
   if (!found) {
     const known = [...all.keys()].join(', ');
     throw new RunnerConfigError(`Workflow "${id}" not found. Known workflows: [${known || 'none'}]`);
