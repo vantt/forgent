@@ -23,7 +23,7 @@ import path from 'node:path';
 import { mergeConfigDefaults } from '../../setup/config-merge.mjs';
 import { sharedConfigFilePath } from '../../config/shared-config-file.mjs';
 import { mergeWithGlobalConfig } from '../../config/global-config.mjs';
-import { findExecutableOnPath } from '../../state/tool-registry.mjs';
+import { findExecutableOnPath } from '../paths.mjs';
 import {
   rejectProjectProviderAccountInventory,
   validateProviderAccountInventory,

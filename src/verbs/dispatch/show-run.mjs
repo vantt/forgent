@@ -53,24 +53,14 @@ function listDirs(dir) {
 export function findRunDir(repoRoot, runId) {
   const fgosDir = fgosDirFromRoot(repoRoot);
 
-  // Both Run layouts, because both are real. An Assignment's runs are nested
-  // one level deeper than a runner dispatch's, which writes into
-  // `dispatch-runs/<workId>/<stamp>` when it has no Assignment of its own.
-  // Knowing only the first meant a real dispatch could be running, its files
-  // exactly where they belong, and this door would answer "no such run".
-  const searchRoots = [
-    { base: path.join(fgosDir, 'assignments'), runsSubdir: 'runs' },
-    { base: path.join(fgosDir, 'dispatch-runs'), runsSubdir: null },
-  ];
-
-  for (const { base, runsSubdir } of searchRoots) {
-    for (const group of listDirs(base)) {
-      const runsDir = runsSubdir ? path.join(base, group, runsSubdir) : path.join(base, group);
-      for (const attempt of listDirs(runsDir)) {
-        const runDir = path.join(runsDir, attempt);
-        const meta = readJsonOrNull(path.join(runDir, 'run.json'));
-        if (meta && meta.runId === runId) return runDir;
-      }
+  // Assignment's runs layout: assignments/<id>/runs/<attempt>
+  const base = path.join(fgosDir, 'assignments');
+  for (const group of listDirs(base)) {
+    const runsDir = path.join(base, group, 'runs');
+    for (const attempt of listDirs(runsDir)) {
+      const runDir = path.join(runsDir, attempt);
+      const meta = readJsonOrNull(path.join(runDir, 'run.json'));
+      if (meta && meta.runId === runId) return runDir;
     }
   }
   return null;

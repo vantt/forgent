@@ -151,6 +151,48 @@ export function readLockedContext(repoRoot, docsRef) {
   return sections.join('\n\n');
 }
 
+/** Resolve an executable on PATH. Platform-aware (handles PATHEXT on win32). */
+export function findExecutableOnPath(candidateNames, pathEnv = process.env.PATH) {
+  const dirs = typeof pathEnv === 'string' && pathEnv ? pathEnv.split(path.delimiter).filter(Boolean) : [];
+  const defaultExts = process.platform === 'win32' ? (process.env.PATHEXT || '.EXE;.CMD;.BAT').split(';').filter(Boolean) : [''];
+  for (const name of candidateNames) {
+    const hasExt = process.platform === 'win32' && path.extname(name) !== '';
+    const exts = hasExt ? ['', ...defaultExts] : defaultExts;
+    for (const dir of dirs) {
+      for (const ext of exts) {
+        try {
+          fs.accessSync(path.join(dir, name + ext), fs.constants.X_OK);
+          return name;
+        } catch {
+          // not found in this PATH entry — keep scanning
+        }
+      }
+    }
+  }
+  return null;
+}
+
+export const DEFAULT_DOMAIN = 'coding';
+
+/** Resolve the file path for a task-spec (`specId`) belonging to `domain` (or `'core'`). */
+export function resolveTaskSpecPath(domain, specId, options = {}) {
+  const root = typeof options === 'string' ? options : (options?.cwd ?? '');
+  let domainName;
+  if (typeof domain === 'string') {
+    domainName = domain;
+  } else if (domain && typeof domain === 'object') {
+    domainName = domain.name ?? DEFAULT_DOMAIN;
+  } else {
+    domainName = DEFAULT_DOMAIN;
+  }
+  const filename = specId && specId.endsWith('.md') ? specId : `${specId}.md`;
+  const relativePath = domainName === 'core'
+    ? path.join('core', 'task-specs', filename)
+    : path.join('domains', domainName, 'task-specs', filename);
+
+  return root ? path.join(root, relativePath) : relativePath;
+}
+
 // CONTENT-ROOT RESOLUTION (tsk-1ni D1, moved from src/intake/plan.mjs per
 // Cell 6.7 G1 -- see readLockedContext's own MOVED HERE note above): every
 // caller of readLockedContext used to pass `stateRoot` (`path.dirname(dir)`,

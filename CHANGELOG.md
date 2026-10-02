@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+- **Added**: Request-to-Run P3b Workflow Separation from Work:
+  - **Decoupled Work from Stage**: Removed `stage` field from Work records and state mutations (`src/state/work.mjs`, `store.mjs`). Work state focuses strictly on status lifecycle, board, and metadata, referencing `workflowRunId?`.
+  - **Single-path Replay for Historical Data**: Upgraded to `viewSchemaVersion: 3` (supported across Node and Rust). Historical `stage` events map gracefully to `workflowStep`.
+  - **A4 Boundary Guard Complete**: Completely severed all `src/state/**` imports from `src/runner/dispatch/**` and `src/runner/execution/**`. Removed `openDispatchRun` and legacy `.fgos/dispatch-runs` writers/readers.
+  - **Retired Legacy Workflow Profile**: Deleted `src/runner/definitions/workflow-adapter.mjs`, retired `Workflow` profile from `FlowDefinition` schema, removed doctor check `workflow-flow-definition-projects-cleanly`.
+  - **Non-coding Marketing Smoke Workflow**: Added `domains/marketing/workflows/content-publish.yaml` proving multi-step domain workflow execution with human gates.
 - **Added**: Request-to-Run P2 Runnable Plans (`fgos-run`, Unit-driven plan-lint, retirement of DemandFacts & legacy facades):
   - **Unit-driven plan-lint**: Extended `fgos plan-lint <planPath> [--phase <N>] [--json]` (`src/report/capability-plan-lint.mjs`) to parse `- unit:` blocks in phase files, validate with `validateUnit`, and enforce G2 constraints, cycle detection, and writes collision.
   - **Single execution driver `fgos-run`**: Introduced `core/skills/fgos-run/SKILL.md` replacing domain-specific facades (`fgos-code-change`, `fgos-code-panel`, `fgos-plan-loop`).

@@ -115,7 +115,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'no-stuck-merge-abort',
       'coordination-protocol-fixtures-valid',
       'coordination-example-requests-valid',
-      'workflow-flow-definition-projects-cleanly',
       // Phase 01 group D: the three preconditions for an interactive dispatch.
       'herdr-available',
       'trust-store-readable',

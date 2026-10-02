@@ -45,6 +45,8 @@ export interface WorkItem {
   kind: string
   status: string
   stage?: string
+  step?: string
+  workflowStep?: string
   size?: string
   rigor?: string
   risk?: string

@@ -682,3 +682,25 @@ test('F-R01 posture check catches violations (deliberate mutator introduction or
     'must catch an action path that never validates the production request',
   );
 });
+
+test('A4 boundary guard: src/runner/dispatch/** and src/runner/execution/** contain ZERO imports from state/ or workflow/', () => {
+  const targetDirs = ['src/runner/dispatch', 'src/runner/execution'];
+  const violations = [];
+
+  for (const dir of targetDirs) {
+    for (const file of mjsFilesUnder(dir)) {
+      const source = fs.readFileSync(path.join(root, file), 'utf8');
+      const imports = extractImports(source);
+      for (const spec of imports) {
+        if (/(\/state\/|^state\/|\.\.\/.*state\/)/.test(spec)) {
+          violations.push(`${file} imports state module: ${spec}`);
+        }
+        if (/(\/workflow\/|^workflow\/|\.\.\/.*workflow\/)/.test(spec)) {
+          violations.push(`${file} imports workflow module: ${spec}`);
+        }
+      }
+    }
+  }
+
+  assert.deepEqual(violations, [], `Expected 0 state/workflow imports in dispatch/execution, found:\n${violations.join('\n')}`);
+});

@@ -89,7 +89,6 @@ import { isLiveDocLifecycle } from '../state/knowledge-registry.mjs';
 import { findDuplicateAuthoritativeClaims } from '../report/authoritative-match.mjs';
 import { parseFrontmatter } from '../report/frontmatter.mjs';
 import { discoverCoordinationProtocols, loadCoordinationProtocol } from '../runner/definitions/protocol-loader.mjs';
-import { projectWorkflowToFlowDefinition } from '../runner/definitions/workflow-adapter.mjs';
 import { FlowDefinitionError, POLICY_PATCH_FIELDS } from '../runner/definitions/schema.mjs';
 import { validateCoordinationRequest } from '../verbs/coordination/schema.mjs';
 import { discoverOperationPromptTemplates, TemplateResolutionError } from '../runner/dispatch/operation-prompt-templates.mjs';
@@ -3953,8 +3952,7 @@ registerFix({
 // this makes it discoverable through `fgos doctor` rather than standing
 // alone unregistered. Both checks are READ-ONLY (same RUL9 discipline
 // every other check in this file follows): `discoverCoordinationProtocols`
-// and `projectWorkflowToFlowDefinition` only read from disk/the in-memory
-// domain registry, never write. No new config default is registered
+// only reads from disk, never writes. No new config default is registered
 // alongside these -- discovery is a fixed, deterministic filesystem
 // convention (project `.fgos/coordination-protocols/`, `domains/<name>/
 // coordination-protocols/`, packaged `core/coordination-protocols/`), the
@@ -4009,75 +4007,6 @@ registerCheck({
   id: 'operation-prompt-templates-valid',
   description: 'every discoverable operation prompt template (project/domain/core tiers) validates against bounded variables and schema (Phase 03 I04)',
   check: (cwd) => checkOperationPromptTemplatesValid(cwd),
-});
-
-// Exercises R5's adapter itself (not just R7's protocol fixtures) as a
-// doctor-visible health check: every domain that declares `workflows`
-// (today: only `coding`) must still project cleanly into a Workflow-
-// profile FlowDefinition. A domain with no `workflows` at all (every
-// other domain today) is not a failure -- `projectWorkflowToFlowDefinition`
-// only applies where the existing primary-operation compatibility path
-// already applies (flow-definition.md's Workflow profile section), so
-// those domains are a clean skip, not scanned at all.
-//
-// `projectWorkflowToFlowDefinition`'s public contract takes a `kind`, not a
-// workflow NAME (same `operationsForStage`/`resolveWorkflow` calling
-// convention it deliberately mirrors) -- a workflow reached only via
-// `domain.defaultWorkflow` is addressed with `kind: undefined`; a workflow
-// reached only through `domain.workflowFor`'s mapping needs a `kind` that
-// actually maps to it, found here by inverting that table. A workflow name
-// reachable through NEITHER (registered in `domain.workflows` but never
-// wired as anyone's default or `workflowFor` target) has no `kind` this
-// check can legitimately construct -- reported as `unreachable`, a real,
-// separate signal from a validation failure, not silently skipped.
-function checkWorkflowFlowDefinitionProjectsCleanly() {
-  const problems = [];
-  const unreachable = [];
-  let checkedCount = 0;
-  for (const [domainName, domain] of Object.entries(DOMAINS)) {
-    if (!domain?.workflows) continue;
-    const kindByWorkflowName = new Map();
-    for (const [kind, mappedName] of Object.entries(domain.workflowFor || {})) {
-      if (!kindByWorkflowName.has(mappedName)) kindByWorkflowName.set(mappedName, kind);
-    }
-    for (const workflowName of Object.keys(domain.workflows)) {
-      let kind;
-      if (workflowName === domain.defaultWorkflow) {
-        kind = undefined;
-      } else if (kindByWorkflowName.has(workflowName)) {
-        kind = kindByWorkflowName.get(workflowName);
-      } else {
-        unreachable.push(`${domainName}.${workflowName}`);
-        continue;
-      }
-      checkedCount += 1;
-      try {
-        projectWorkflowToFlowDefinition(domainName, { kind });
-      } catch (err) {
-        if (err instanceof FlowDefinitionError) {
-          problems.push(`${domainName}.${workflowName}: ${err.message}`);
-        } else {
-          throw err;
-        }
-      }
-    }
-  }
-  if (problems.length > 0) {
-    return { passed: false, message: problems.join('; ') };
-  }
-  const unreachableNote = unreachable.length > 0
-    ? ` (${unreachable.length} workflow(s) unreachable via any kind, not checked: ${unreachable.join(', ')})`
-    : '';
-  if (checkedCount === 0) {
-    return { passed: true, message: `no domain declares a reachable workflow -- nothing to project${unreachableNote}` };
-  }
-  return { passed: true, message: `${checkedCount} domain workflow(s) project cleanly into a Workflow-profile FlowDefinition${unreachableNote}` };
-}
-
-registerCheck({
-  id: 'workflow-flow-definition-projects-cleanly',
-  description: 'every domain-declared workflow projects cleanly into a Workflow-profile FlowDefinition via the additive adapter (Phase 02 R5)',
-  check: () => checkWorkflowFlowDefinitionProjectsCleanly(),
 });
 
 // Step 08 Phase 07 R3, AGENTS.md's install/setup/doctor gate: `fgos

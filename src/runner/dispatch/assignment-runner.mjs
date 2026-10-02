@@ -52,10 +52,6 @@ export {
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { bind } from '../execution/bind.mjs';
-import {
-  DEFAULT_DOMAIN,
-  operationsForStage,
-} from '../../state/workflow-stage-graphs.mjs';
 import { RunnerConfigError, ensureRunnerConfigForDir } from './config.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot, resolveContentRoot } from '../paths.mjs';
 import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
@@ -591,24 +587,10 @@ function validateAssignmentLegality(asgn, opts = {}) {
   // gate immediately below, and `executeAssignment`'s own
   // `effectiveAssignment` mutation backfill) stays exactly as-is and
   // still runs unconditionally for both shapes.
-  const isDeclared = !asgn.provenance || (asgn.provenance.kind !== 'inline' && asgn.provenance.kind !== 'unit-run');
-  let matchedOp;
-
-  if (isDeclared) {
-    const stageOps = operationsForStage(asgn.domain, asgn.stage, { kind: asgn.workflow });
-    matchedOp = stageOps.find((o) => o.id === asgn.operation);
-
-    if (!matchedOp) {
-      throw new RunnerConfigError(
-        `unknown operation "${asgn.operation}" for stage "${asgn.stage}" in domain "${asgn.domain}" (declared operations: [${stageOps.map((o) => o.id).join(', ')}])`,
-      );
-    }
-
-    if (asgn.dispatch === 'human-only' || matchedOp.dispatch === 'human-only') {
-      throw new RunnerConfigError(`cannot execute human-only operation "${asgn.operation}" via cli-spawn`);
-    }
+  let matchedOp = undefined;
+  if (asgn.dispatch === 'human-only') {
+    throw new RunnerConfigError(`cannot execute human-only operation "${asgn.operation}" via cli-spawn`);
   }
-
   // Step 07 §7 / Step 08 Phase 01 R4: some callers require strictly
   // read-only execution and reject a mutating Assignment outright.
   // `opts.isReadOnlyMode` is an explicit, caller-supplied flag (mission-lite's

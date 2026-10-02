@@ -199,9 +199,19 @@ const dispatch = (root, workId, opts = {}) => withMockHerdr(
 
 const runStatus = (runDir) => JSON.parse(fs.readFileSync(path.join(runDir, 'run.json'), 'utf8')).status;
 
-/** The single `dispatch-runs/<workId>/<stamp>` directory a dispatch left. */
+/** The single run directory an execution left (under assignments/ or dispatch-runs/). */
 function soleRunDir(root) {
-  const base = path.join(root, '.fgos', 'dispatch-runs');
+  const fgosDir = path.join(root, '.fgos');
+  const asgnBase = path.join(fgosDir, 'assignments');
+  if (fs.existsSync(asgnBase)) {
+    const asgns = fs.readdirSync(asgnBase);
+    if (asgns.length > 0) {
+      const runsDir = path.join(asgnBase, asgns[0], 'runs');
+      const attempts = fs.readdirSync(runsDir);
+      return path.join(runsDir, attempts[0]);
+    }
+  }
+  const base = path.join(fgosDir, 'dispatch-runs');
   const workIds = fs.readdirSync(base);
   assert.equal(workIds.length, 1, 'exactly one dispatch run was started');
   const stamps = fs.readdirSync(path.join(base, workIds[0]));
@@ -728,12 +738,11 @@ test('R8: legacy openDispatchRun stamps contract: dispatch-run.legacy in run.jso
         },
       },
     });
-    const runsBase = path.join(fgosDir, 'dispatch-runs', 'mock-non-assignment');
-    const runDirs = fs.readdirSync(runsBase);
-    assert.ok(runDirs.length > 0, 'dispatch run directory created');
-    const runJsonPath = path.join(runsBase, runDirs[0], 'run.json');
+    const runDir = soleRunDir(root);
+    assert.ok(fs.existsSync(runDir), 'dispatch run directory created');
+    const runJsonPath = path.join(runDir, 'run.json');
     const runRecord = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
-    assert.equal(runRecord.contract, 'dispatch-run.legacy');
+    assert.equal(runRecord.contract, 'run.v1');
     assert.equal(runRecord.executorId, 'mock-non-assignment');
   } finally {
     fs.rmSync(root, { recursive: true, force: true });

@@ -646,10 +646,22 @@ async fn get_work(State(state): State<AppState>, AppQuery(q): AppQuery<ListWorkQ
         args.push("--limit".to_string());
         args.push(limit.to_string());
     }
-    let data = run_verb_blocking(state.gateway, args).await?;
+    let mut data = run_verb_blocking(state.gateway, args).await?;
+    if let Some(work_map) = data.get_mut("data").and_then(|d| d.get_mut("work")).and_then(|w| w.as_object_mut()) {
+        for (_id, item) in work_map.iter_mut() {
+            if let Some(item_obj) = item.as_object_mut() {
+                let step_val = item_obj.get("workflowStep")
+                    .cloned()
+                    .or_else(|| item_obj.get("stage").cloned())
+                    .unwrap_or(Value::Null);
+                item_obj.insert("step".to_string(), step_val.clone());
+                item_obj.insert("workflowStep".to_string(), step_val);
+            }
+        }
+    }
     Ok(Json(data))
-}
 
+}
 #[derive(Debug, Deserialize)]
 struct SubmitWorkBody {
     text: String,
@@ -664,10 +676,19 @@ async fn post_work(State(state): State<AppState>, AppJson(body): AppJson<SubmitW
     Ok(Json(data))
 }
 
+
 async fn get_work_by_id(State(state): State<AppState>, AxPath(id): AxPath<String>) -> Result<Json<Value>, GatewayError> {
     reject_leading_dash(&id, "id")?;
     let args = vec!["show".to_string(), id, "--json".to_string()];
-    let data = run_verb_blocking(state.gateway, args).await?;
+    let mut data = run_verb_blocking(state.gateway, args).await?;
+    if let Some(work_obj) = data.get_mut("data").and_then(|d| d.get_mut("work")).and_then(|w| w.as_object_mut()) {
+        let step_val = work_obj.get("workflowStep")
+            .cloned()
+            .or_else(|| work_obj.get("stage").cloned())
+            .unwrap_or(Value::Null);
+        work_obj.insert("step".to_string(), step_val.clone());
+        work_obj.insert("workflowStep".to_string(), step_val);
+    }
     Ok(Json(data))
 }
 

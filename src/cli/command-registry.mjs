@@ -180,7 +180,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'discover',
     invoke: 'fgos discover',
-    description: 'Run context-discovery for an item at stage discovery or exploring (the precondition is per-domain, computed by discoverableStages -- a domain that still maps a stage to the Clarify step accepts that stage too). A clear verdict moves the item forward to planning; an unclear verdict at discovery moves it on to exploring and parks it in awaiting-human. Errors if the item is at any other stage -- use "plan" for a planning-stage item. --verdict lets a caller that already reasoned about clarity (e.g. a live session running fgos-coding-exploring) supply its own verdict directly instead of relying on the committed-CONTEXT.md trust signal.',
+    description: 'Run context-discovery for an item at stage discovery or exploring, or query/advance its Workflow run if bound to one. A clear verdict moves the item forward to planning; an unclear verdict at discovery moves it on to exploring and parks it in awaiting-human. When bound to a workflow run, delegates to or reports workflow step status with clear guidance on the unified "fgos workflow" door. Errors if the item is at any other stage -- use "plan" for a planning-stage item. --verdict lets a caller that already reasoned about clarity supply its own verdict directly.',
     parameters: {
       type: 'object',
       properties: {
@@ -194,6 +194,7 @@ export const COMMAND_REGISTRY = [
         rigor: { type: 'string', description: "Only meaningful with --verdict clear: the rigor this discovery pass judged for the item ('low'/'standard'/'high'/'critical'), applied once the outcome actually resolves clear. Omit to leave the item's rigor unchanged." },
         kind: { type: 'string', description: "Only meaningful with --verdict clear: the kind this discovery pass judged for the item, from the item's own domain vocabulary (coding: bug/chore/design/docs/feature/task). An out-of-vocabulary value is refused as validation before the item moves at all. Omit to leave the item's kind unchanged." },
         risk: { type: 'string', description: "Only meaningful with --verdict clear: the risk this discovery pass judged for the item ('light'/'standard'/'heavy'). An out-of-vocabulary value is refused as validation before the item moves at all. Omit to leave the item's risk unchanged." },
+        resume: { type: 'boolean', description: 'When bound to a workflow run, resumes execution of the workflow run.' },
       },
       positional: ['id'],
       required: ['id'],
@@ -208,7 +209,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'plan',
     invoke: 'fgos plan',
-    description: 'Run chia-viec (split-work judgment) for an item at stage planning (renamed from decompose, tsk-403 D11 -- the legacy decompose stage alias still routes here too, D18), moving it forward to executing (pass-through or split into children) or parking it in awaiting-human. Errors if the item is not at stage planning (or the legacy decompose alias) -- use "discover" for an item still at stage discovery or exploring. --verdict lets a caller that already reasoned about split-work (e.g. a live session running fgos-coding-planning) supply its own verdict directly instead of relying on the plan.md tiny/small-mode trust signal -- downstream safety gates (heavy-risk/blast-radius/footprint-overlap) still apply unconditionally.',
+    description: 'Run chia-viec (split-work judgment) for an item at stage planning, or query/advance its Workflow run if bound to one. Moving forward advances to executing (pass-through or split into children) or parks in awaiting-human. When bound to a workflow run, delegates to or reports workflow step status with clear guidance on the unified "fgos workflow" door. Errors if the item is not at stage planning -- use "discover" for an item still at stage discovery or exploring. --verdict lets a caller supply its own verdict directly.',
     parameters: {
       type: 'object',
       properties: {
@@ -220,6 +221,7 @@ export const COMMAND_REGISTRY = [
         force: { type: 'boolean', description: 'Only meaningful with --verdict decompose: proceed past a disputed second-pass verify judge on a child, instead of parking the whole decompose verdict in awaiting-human. Always logged as a decision naming the disagreement it overrode -- never a silent bypass. Mirrors discover --force (tsk-5cf D1b).' },
         validate: { type: 'boolean', description: 'Explicitly run reviewer validation (planning.validate-plan) before processing the plan verdict.' },
         direct: { type: 'boolean', description: 'Bypass reviewer validation (planning.validate-plan) and proceed directly to resolvePlan.' },
+        resume: { type: 'boolean', description: 'When bound to a workflow run, resumes execution of the workflow run.' },
       },
       positional: ['id'],
       required: ['id'],
@@ -985,6 +987,10 @@ export const COMMAND_REGISTRY = [
       },
       required: [],
     },
+    examples: [
+      'fgos run --unit path/to/unit.yaml --pattern solo',
+      'fgos run --unit path/to/unit.yaml --pattern reviewed',
+    ],
     touchesState: true,
     requiresExistingStore: false,
     externalEffect: true,

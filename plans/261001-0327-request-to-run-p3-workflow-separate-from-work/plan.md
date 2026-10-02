@@ -1,7 +1,7 @@
 ---
 title: "P3 Workflow tách khỏi Work: một Workflow runner (P3a) + Work không còn stage (P3b)"
 description: "Đóng mối authority 'tuần tự bước + cổng người + tích hợp': một Workflow runner độc lập với Work (P3a, lên main sớm để P2 dùng); Work chỉ còn bản ghi/board/lifecycle, không còn stage; dispatch hết import Work; xoá dispatch-runs (P3b)."
-status: pending
+status: done
 priority: P1
 effort: "~10–12d"
 tags: [workflow, work, sequencing, human-gate, integration, boundary]
@@ -94,11 +94,11 @@ Sóng D: 4 ∥ 5 (khác file). P2 chạy song song từ sóng C (bảng sở h�
 
 ## Success Criteria
 
-- [ ] P3a: một runner lập lịch bước + Unit theo `dependsOn`, cổng người gom câu hỏi, bước tích hợp không cần Work, dịch plan → Workflow; merge `main`.
-- [ ] Work không có `stage`; board/gateway/web hiển thị bước từ Workflow run; dữ liệu cũ đọc đúng qua một đường.
-- [ ] `rg "from '.*state/" src/runner/dispatch src/runner/execution` rỗng; guard; `dispatch-runs` + reader xoá.
-- [ ] Workflow marketing có cổng người chạy headless (G4b), các vai out-of-process qua pane herdr (G7).
-- [ ] Xoá `workflow-adapter.mjs` + profile `Workflow`; spec + boundary + CHANGELOG; full `npm test` (Node + Rust); merge `main`.
+- [x] P3a: một runner lập lịch bước + Unit theo `dependsOn`, cổng người gom câu hỏi, bước tích hợp không cần Work, dịch plan → Workflow; merge `main`.
+- [x] Work không có `stage`; board/gateway/web hiển thị bước từ Workflow run; dữ liệu cũ đọc đúng qua một đường.
+- [x] `rg "from '.*state/" src/runner/dispatch src/runner/execution` rỗng; guard; `dispatch-runs` + reader xoá.
+- [x] Workflow marketing có cổng người chạy headless (G4b), các vai out-of-process qua pane herdr (G7).
+- [x] Xoá `workflow-adapter.mjs` + profile `Workflow`; spec + boundary + CHANGELOG; full `npm test` (Node + Rust); merge `main`.
 
 ## Risk Assessment
 

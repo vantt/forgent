@@ -3044,3 +3044,14 @@ adapter-specific exports (Node side, unit P8a) and `supervisor.rs`/
   3. **Cổng người thống nhất:** Authorize không parse từ prose plan. Phase chưa được duyệt sẽ dừng ở cổng người của Workflow run (`gate: { kind: "human" }`), owner trả lời qua `fgos workflow answer`. Mọi câu hỏi treo được gom thành một bộ duy nhất.
   4. **Xoá bỏ DemandFacts & matcher:** Xoá `src/runner/capability-match.mjs`, verb `fgos capability match`, các fragment `capability-matching.md`. L2 chỉ còn hiểu yêu cầu và viết Unit với `capability` (`domain:verb`).
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
+
+### 0049 — P3b Work không còn stage: Work chỉ còn bản ghi/lifecycle, Workflow runner là sequencer duy nhất, đóng A4
+
+- **Trạng thái:** Settled (Request-to-Run P3b hoàn tất, 2026-10-02)
+- **Bối cảnh:** Trước P3, Work mang trường `stage`, và dispatch đọc thẳng stage/workflow của Work (vi phạm A4). Điều này khiến logic tuần tự bước bị phân tán giữa `loop.mjs`, FSM stage, và prose của skill, đồng thời kéo dispatch phụ thuộc vào state.
+- **Quyết định:**
+  1. **Work không còn `stage`:** Work trở về đúng bản chất là bản ghi yêu cầu, bảng tiến độ và FSM trạng thái (status lifecycle). Thêm `workflowRunId?` để trỏ tới phiên chạy Workflow độc lập.
+  2. **Một đường đọc dữ liệu cũ:** Replay map các event `stage` lịch sử sang `workflowStep` mà không ghi đè dữ liệu cũ. Bump `viewSchemaVersion: 3` (Rust và Node đọc tương thích cả 2 và 3).
+  3. **Đóng ranh giới A4 (L5 không phụ thuộc L3):** Xoá sạch toàn bộ import `src/state/**` khỏi `src/runner/dispatch/**` và `src/runner/execution/**`. Xoá writer `dispatch-runs` và các reader cũ.
+  4. **Thu hồi adapter Workflow cũ:** Xoá `src/runner/definitions/workflow-adapter.mjs`, bỏ profile `Workflow` khỏi `FlowDefinition`, xoá doctor check `workflow-flow-definition-projects-cleanly`. Workflow runner (`src/workflow/**`) là sequencer duy nhất.
+Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.

@@ -1144,6 +1144,22 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         ? loadRunnerConfig(flags.config)
         : ensureRunnerConfigForDir(path.dirname(dir));
       const callerVerdict = parseDiscoverCallerVerdict(flags);
+      const repoRoot = path.dirname(dir);
+      const list = listWork(dir).work;
+      const work = list?.[id];
+      if (work?.workflowRunId) {
+        const { statusWorkflow, resumeWorkflow } = await import('../src/workflow/index.mjs');
+        if (flags.resume) {
+          return await resumeWorkflow(work.workflowRunId, { repoRoot, worktree: flags.worktree });
+        }
+        const runState = statusWorkflow(work.workflowRunId, { repoRoot });
+        return {
+          guidance: `Item "${id}" is bound to workflow run "${work.workflowRunId}". Use "fgos workflow status ${work.workflowRunId}" or "fgos workflow resume ${work.workflowRunId}".`,
+          workflowRunId: work.workflowRunId,
+          workflowRun: runState,
+          step: runState.status,
+        };
+      }
       return discoverUseCase({ dir, runnerConfig: cfg }, { id, callerVerdict, role: 'session' });
     }
 
@@ -1166,6 +1182,21 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         : ensureRunnerConfigForDir(path.dirname(dir));
       const callerVerdict = parsePlanCallerVerdict(flags);
       const repoRoot = path.dirname(dir);
+      const list = listWork(dir).work;
+      const work = list?.[id];
+      if (work?.workflowRunId) {
+        const { statusWorkflow, resumeWorkflow } = await import('../src/workflow/index.mjs');
+        if (flags.resume) {
+          return await resumeWorkflow(work.workflowRunId, { repoRoot, worktree: flags.worktree });
+        }
+        const runState = statusWorkflow(work.workflowRunId, { repoRoot });
+        return {
+          guidance: `Item "${id}" is bound to workflow run "${work.workflowRunId}". Use "fgos workflow status ${work.workflowRunId}" or "fgos workflow resume ${work.workflowRunId}".`,
+          workflowRunId: work.workflowRunId,
+          workflowRun: runState,
+          step: runState.status,
+        };
+      }
       return planUseCase(
         { dir, repoRoot, runnerConfig: cfg },
         { id, callerVerdict, validate: Boolean(flags.validate), direct: Boolean(flags.direct), role: 'session' },

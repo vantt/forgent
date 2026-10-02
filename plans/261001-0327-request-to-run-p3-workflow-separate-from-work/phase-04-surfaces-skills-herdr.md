@@ -1,7 +1,7 @@
 ---
 phase: 4
 title: "P3b — Bề mặt: verb, skill, herdr, web"
-status: pending
+status: done
 priority: P1
 effort: "2d"
 dependencies: [3]
@@ -35,7 +35,7 @@ Chuyển mọi bề mặt đang dựa vào `stage` sang Workflow run: verb `disc
 
 ## Success Criteria
 
-- [ ] Không còn verb/skill theo stage; herdr gateway/web/pick dùng Workflow run.
+- [x] Không còn verb/skill theo stage; herdr gateway/web/pick dùng Workflow run.
 
 ## Risk Assessment
 

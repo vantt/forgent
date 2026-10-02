@@ -11,13 +11,40 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import {
-  DEFAULT_DOMAIN,
-  resolveDomainName,
-  operationsForStage,
-  DOMAINS,
-  skillForStage,
-} from '../../state/workflow-stage-graphs.mjs';
+const DEFAULT_DOMAIN = 'coding';
+function resolveDomainName(domain) {
+  return typeof domain === 'string' && domain.trim() ? domain.trim() : DEFAULT_DOMAIN;
+}
+function operationsForStage(domain, stage, options = {}) {
+  // Fallback for stage operations in coding feature workflow
+  if (stage === 'planning') {
+    return Object.freeze([
+      Object.freeze({ id: 'shape-plan', primary: true, taskSpec: 'shape-plan', role: 'implementer' }),
+      Object.freeze({ id: 'validate-plan', taskSpec: 'validate-plan', role: 'reviewer' }),
+    ]);
+  }
+  if (stage === 'discovery') {
+    return Object.freeze([
+      Object.freeze({ id: 'judge-ambiguity', primary: true, taskSpec: 'judge-ambiguity', role: 'implementer' }),
+      Object.freeze({ id: 'clarify-brief', taskSpec: 'clarify-brief', role: 'reviewer' }),
+    ]);
+  }
+  if (stage === 'exploring') {
+    return Object.freeze([
+      Object.freeze({ id: 'lock-decisions', primary: true, taskSpec: 'lock-decisions', role: 'implementer' }),
+    ]);
+  }
+  if (stage === 'executing') {
+    return Object.freeze([
+      Object.freeze({ id: 'implement-item', primary: true, taskSpec: 'implement-item', role: 'implementer' }),
+      Object.freeze({ id: 'review-item', taskSpec: 'review-item', role: 'reviewer' }),
+      Object.freeze({ id: 'scout-blast-radius', taskSpec: 'scout-blast-radius', role: 'researcher' }),
+    ]);
+  }
+  return Object.freeze([
+    Object.freeze({ id: stage || 'default', primary: true, taskSpec: stage || 'default', role: 'implementer' }),
+  ]);
+}
 import { resolveContentRoot } from '../../intake/plan.mjs';
 import { planVerdictFromPlanMd } from '../../intake/plan-verdict-from-plan-md.mjs';
 import { executorIdForWork, resolveCapabilityIdentityDetails, resolveCapabilityIdentity, buildPrompt } from '../work-compat.mjs';
