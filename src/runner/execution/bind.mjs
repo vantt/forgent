@@ -4,7 +4,7 @@
 import { decideExecutorDispatchMechanism } from '../dispatch/mechanism.mjs';
 import { deriveProviderFamily, resolveTierModel } from '../dispatch/resolve.mjs';
 import { checkProviderDisallowed } from '../dispatch/provider-adapter.mjs';
-import { canApplyPosture } from '../dispatch/confinement/policies.mjs';
+import { canApplyPosture, resolvePostureInvocation } from '../dispatch/confinement/policies.mjs';
 import { RIGOR_VALUES, RIGOR_RANK, resolveStrongerRigor } from '../rigor.mjs';
 import { MODEL_POLICY_TIERS } from '../dispatch/config.mjs';
 import { resolveStrongerTier, TIER_STRENGTH } from '../dispatch/assignment-policy.mjs';
@@ -55,20 +55,23 @@ function findHerdrInvocation(executorEntry) {
  * Look up capability config in runnerConfig:
  * First capabilities[domain:verb], then fallback capabilities[verb].
  */
+export function hasUsablePrefer(entry) {
+  const prefer = entry?.prefer;
+  return typeof prefer === 'string' ? prefer.trim() !== '' : Array.isArray(prefer) && prefer.length > 0;
+}
+
 function lookupCapabilityConfig(runnerConfig, capability) {
   if (!runnerConfig || typeof runnerConfig !== 'object' || !capability) {
     return { entry: null, key: null };
   }
   const capabilities = runnerConfig.capabilities ?? runnerConfig.runner?.capabilities ?? {};
-  if (capabilities[capability]) {
-    return { entry: capabilities[capability], key: capability };
-  }
-  if (capability.includes(':')) {
-    const [, verb] = capability.split(':');
-    if (capabilities[verb]) {
-      return { entry: capabilities[verb], key: verb };
-    }
-  }
+  // An entry wins only with a usable prefer pool: a description-only slot must not
+  // hide a bare-verb entry that has one. With no usable pool anywhere, the exact
+  // entry (then the bare verb) is still returned so its rigor/persona apply.
+  const verb = capability.includes(':') ? capability.split(':')[1] : null;
+  const ordered = [capability, verb].filter(Boolean).map((key) => ({ key, entry: capabilities[key] })).filter((hit) => hit.entry);
+  const hit = ordered.find((h) => hasUsablePrefer(h.entry)) ?? ordered[0];
+  if (hit) return { entry: hit.entry, key: hit.key };
   return { entry: null, key: null };
 }
 
@@ -205,14 +208,17 @@ export function bind(ask, ctx, { skipCandidateIndex = -1 } = {}) {
       }
 
       // Filter: Posture capability (Phase 6)
-      if (!canApplyPosture(cand, posture, { runnerConfig, executors })) {
+      // The invocation that can carry the posture is decided here, once, and recorded
+      // in the binding: it is exactly the one the run pins.
+      const approved = resolvePostureInvocation(cand, posture, { runnerConfig, executors, herdrPresent: session.herdrPresent === true });
+      if (!approved.ok) {
         refusalReason = 'posture-unavailable';
         refusalDetail = `Candidate "${executorId}" cannot apply posture "${posture}"`;
         continue;
       }
 
       // Candidate passed filters
-      chosenCandidate = cand;
+      chosenCandidate = { ...cand, invocation: approved.invocation };
       chosenCandidateIndex = poolIndex;
       break;
     }

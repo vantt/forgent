@@ -675,52 +675,72 @@ function resolveExecutableOnPath(executable, envPath = process.env.PATH ?? '') {
   return false;
 }
 
-function pickConfinedInvocation(executorEntry, invocationId) {
+function pickConfinedInvocation(executorEntry, invocationId, { herdrPresent = false } = {}) {
   const invocations = Array.isArray(executorEntry?.invocations) ? executorEntry.invocations : [];
   if (invocationId) {
     const named = invocations.find((inv) => inv?.id === invocationId);
     return named ? { inv: named, effective: named.confinement ?? executorEntry.confinement } : null;
   }
-  const withBackend = invocations.find((inv) => inv?.via === 'cli' && (inv.confinement ?? executorEntry.confinement)?.backend);
+  // No invocation named: the first plain cli invocation that declares a backend (a
+  // herdr-spawn invocation only runs on the herdr transport, which names it). An
+  // invocation without an id cannot be pinned, so it only counts when it is also
+  // the one a run would take by default (the first cli invocation).
+  const cliInvocations = invocations.filter((inv) => inv?.via === 'cli');
+  const withBackend = cliInvocations.find(
+    (inv) => (herdrPresent || inv.adapter !== 'herdr-spawn')
+      && (inv.confinement ?? executorEntry.confinement)?.backend
+      && (inv.id || inv === cliInvocations[0]),
+  );
   if (withBackend) return { inv: withBackend, effective: withBackend.confinement ?? executorEntry.confinement };
   return executorEntry?.confinement ? { inv: null, effective: executorEntry.confinement } : null;
 }
 
 /**
- * Whether a candidate executor/invocation can really apply a posture on this
- * machine: it declares a confinement backend and that backend is enabled in the
- * machine registry with a usable executable. Any other answer is false, so
- * bind() drops the candidate instead of the run going out unconfined.
+ * Decide whether a candidate can really apply a posture on this machine and
+ * WHICH invocation carries it. This is the single decision: bind() records the
+ * returned invocation, so the invocation approved here is the one that runs.
+ *
+ * The candidate must declare a confinement backend that is enabled in the
+ * machine registry with a usable executable. An invocation the candidate names
+ * is kept as named; otherwise the first cli invocation that can carry the
+ * posture is selected (not simply the executor's first cli invocation).
  *
  * @param {object} candidate { executor, invocation }
  * @param {string} posture 'read-only' | 'workspace-write' (both need the same backend)
- * @param {object} [ctx] { runnerConfig, executors, registryPath, envPath }
- * @returns {boolean}
+ * @param {object} [ctx] { runnerConfig, executors, registryPath, envPath, herdrPresent }
+ * @returns {{ ok: boolean, invocation: string|null }}
  */
-export function canApplyPosture(candidate, posture, ctx = {}) {
-  if (!candidate || !candidate.executor) return false;
+export function resolvePostureInvocation(candidate, posture, ctx = {}) {
+  const none = { ok: false, invocation: null };
+  if (!candidate || !candidate.executor) return none;
   const executors = ctx.executors ?? ctx.runnerConfig?.executors ?? ctx.runnerConfig?.runner?.executors ?? {};
   const executorEntry = executors[candidate.executor];
-  if (!executorEntry) return false;
+  if (!executorEntry) return none;
 
   // A pure native agent (no command, adapter or invocation) runs inside the
   // Lead's own session as an in-process capability: there is no spawned process
   // for an OS backend to wrap, and checker roles are never bound to it.
   if (executorEntry.agentType && !executorEntry.command && !executorEntry.adapter && !executorEntry.invocations) {
-    return true;
+    return { ok: true, invocation: candidate.invocation ?? null };
   }
 
-  const picked = pickConfinedInvocation(executorEntry, candidate.invocation);
+  const picked = pickConfinedInvocation(executorEntry, candidate.invocation, { herdrPresent: ctx.herdrPresent === true });
   const backendId = picked?.effective?.backend;
-  if (typeof backendId !== 'string' || !backendId) return false;
+  if (typeof backendId !== 'string' || !backendId) return none;
 
   let registry;
   try {
     registry = ctx.registryPath ? loadMachineBackendRegistry(ctx.registryPath) : loadMachineBackendRegistry();
   } catch {
-    return false;
+    return none;
   }
   const instance = registry?.confinementBackends?.[backendId];
-  if (!instance || instance.enabled === false || instance.type !== 'bwrap') return false;
-  return resolveExecutableOnPath(instance.executable || 'bwrap', ctx.envPath);
+  if (!instance || instance.enabled === false || instance.type !== 'bwrap') return none;
+  if (!resolveExecutableOnPath(instance.executable || 'bwrap', ctx.envPath)) return none;
+  return { ok: true, invocation: candidate.invocation ?? picked.inv?.id ?? null };
+}
+
+/** Boolean view of resolvePostureInvocation. */
+export function canApplyPosture(candidate, posture, ctx = {}) {
+  return resolvePostureInvocation(candidate, posture, ctx).ok;
 }

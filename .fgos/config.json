@@ -383,16 +383,67 @@
         "description": "Workflow unit capability \"delphi:propose\" -- declare a \"prefer\" pool to choose which executors serve it."
       },
       "delphi:synthesize": {
-        "description": "Workflow unit capability \"delphi:synthesize\" -- declare a \"prefer\" pool to choose which executors serve it."
+        "description": "Workflow unit capability \"delphi:synthesize\" -- declare a \"prefer\" pool to choose which executors serve it.",
+        "prefer": [
+          {
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm-herdr"
+          }
+        ]
       },
       "group-cognition:explore": {
         "description": "Workflow unit capability \"group-cognition:explore\" -- declare a \"prefer\" pool to choose which executors serve it."
       },
       "group-cognition:critique": {
-        "description": "Workflow unit capability \"group-cognition:critique\" -- declare a \"prefer\" pool to choose which executors serve it."
+        "description": "Workflow unit capability \"group-cognition:critique\" -- declare a \"prefer\" pool to choose which executors serve it.",
+        "prefer": [
+          {
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm-herdr"
+          }
+        ]
       },
       "group-cognition:synthesize": {
-        "description": "Workflow unit capability \"group-cognition:synthesize\" -- declare a \"prefer\" pool to choose which executors serve it."
+        "description": "Workflow unit capability \"group-cognition:synthesize\" -- declare a \"prefer\" pool to choose which executors serve it.",
+        "prefer": [
+          {
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm-herdr"
+          }
+        ]
       },
       "nominal-group:generate": {
         "description": "Workflow unit capability \"nominal-group:generate\" -- declare a \"prefer\" pool to choose which executors serve it."
@@ -413,7 +464,21 @@
         "description": "Workflow unit capability \"coding:explore\" -- declare a \"prefer\" pool to choose which executors serve it."
       },
       "coding:plan": {
-        "description": "Workflow unit capability \"coding:plan\" -- declare a \"prefer\" pool to choose which executors serve it."
+        "description": "Workflow unit capability \"coding:plan\" -- declare a \"prefer\" pool to choose which executors serve it.",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "deepseek"
+          }
+        ]
       },
       "coding:validate": {
         "description": "Workflow unit capability \"coding:validate\" -- declare a \"prefer\" pool to choose which executors serve it."
@@ -861,7 +926,16 @@
             },
             "env": {
               "HOME": "${HOME}/.agy-homes/mucdong"
-            }
+            },
+            "resourceBindings": [
+              {
+                "resource": "private-home",
+                "target": {
+                  "kind": "env",
+                  "name": "HOME"
+                }
+              }
+            ]
           },
           {
             "id": "agy-cli-tetnu",
@@ -936,7 +1010,16 @@
             },
             "env": {
               "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/grok-vantt"
-            }
+            },
+            "resourceBindings": [
+              {
+                "resource": "private-home",
+                "target": {
+                  "kind": "env",
+                  "name": "PI_CODING_AGENT_DIR"
+                }
+              }
+            ]
           },
           {
             "id": "pi-herdr-vantt",
@@ -1029,7 +1112,16 @@
             },
             "env": {
               "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openrouter"
-            }
+            },
+            "resourceBindings": [
+              {
+                "resource": "private-home",
+                "target": {
+                  "kind": "env",
+                  "name": "PI_CODING_AGENT_DIR"
+                }
+              }
+            ]
           }
         ],
         "for": [

@@ -460,10 +460,43 @@ test('workflow-capabilities-configured accepts a bare-verb entry the way bind() 
   const { 'architecture:critique': _omitted, ...rest } = DEFAULT_CAPABILITY_SLOTS;
   fs.writeFileSync(
     path.join(cwd, '.fgos', 'config.json'),
-    JSON.stringify({ runner: { capabilities: { ...rest, critique: { description: 'verb entry' } } } }),
+    JSON.stringify({ runner: { capabilities: { ...rest, critique: { description: 'verb entry', prefer: [{ executor: 'x' }] } } } }),
   );
   const { message } = checkById('workflow-capabilities-configured').check(cwd);
   assert.doesNotMatch(message, /architecture:critique/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('workflow-capabilities-configured warns, naming each Workflow capability with no prefer pool', () => {
+  const cwd = mkTemp('doctor-workflow-caps-nopool-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities: DEFAULT_CAPABILITY_SLOTS } }));
+  const { passed, message } = checkById('workflow-capabilities-configured').check(cwd);
+  assert.equal(passed, true, 'a taste-free fresh setup is a warning, not a failure');
+  assert.match(message, /^warning: .*no "prefer" pool/);
+  assert.match(message, /coding:plan/);
+  assert.match(message, /delphi:propose/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('workflow-capabilities-configured is clean when each capability resolves to a prefer pool, exact or bare verb', () => {
+  const cwd = mkTemp('doctor-workflow-caps-pool-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  const capabilities = {};
+  for (const [name, slot] of Object.entries(DEFAULT_CAPABILITY_SLOTS)) {
+    capabilities[name] = slot;
+  }
+  for (const name of Object.keys(DEFAULT_CAPABILITY_SLOTS)) {
+    if (!name.includes(':')) continue;
+    const [domain, verb] = name.split(':');
+    // half by exact name, half by bare verb
+    if (domain.length % 2 === 0) capabilities[name] = { ...capabilities[name], prefer: [{ executor: 'x' }] };
+    else capabilities[verb] = { ...(capabilities[verb] ?? {}), prefer: [{ executor: 'x' }] };
+  }
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities } }));
+  const { passed, message } = checkById('workflow-capabilities-configured').check(cwd);
+  assert.equal(passed, true);
+  assert.doesNotMatch(message, /^warning/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 

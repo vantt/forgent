@@ -14,6 +14,7 @@ import crypto from 'node:crypto';
 import { DOCTOR_CHECKS, CONFIG_DEFAULT_REGISTRATIONS, FIX_REGISTRATIONS, registerCheck, registerConfigDefault, registerFix, runFixes, ensureSharedConfigDefaults } from '../../src/setup/checks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
 import { DEFAULT_CAPABILITY_SLOTS, PI_EXECUTOR_DEFAULT, findWorkflowStageOperationProblems } from '../../src/setup/registrations.mjs';
+import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { recordMainCheckoutGuardWarning } from '../../src/state/main-checkout-guard-warnings.mjs';
 
 
@@ -224,6 +225,27 @@ test('ensureSharedConfigDefaults adds missing Workflow capabilities without touc
   assert.deepEqual(config.runner.capabilities['marketing:write'], tuned);
   assert.ok(config.runner.capabilities['marketing:research']);
   assert.ok(config.runner.capabilities['business:plan']);
+});
+
+seedFileLocalBwrapRegistry();
+
+test('setup adds a coding:plan slot beside a project bare-verb plan pool and bind still serves it from that pool', async () => {
+  const { bind } = await import('../../src/runner/execution/bind.mjs');
+  const dir = mkTempDir();
+  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
+  const plan = { prefer: [{ executor: 'mine' }] };
+  fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities: { plan } } }));
+  const { config } = ensureSharedConfigDefaults(dir);
+  assert.deepEqual(config.runner.capabilities.plan, plan, 'the project entry is untouched');
+  assert.equal(typeof config.runner.capabilities['coding:plan']?.description, 'string', 'the slot is still added');
+  assert.equal(config.runner.capabilities['coding:plan'].prefer, undefined);
+  const runnerConfig = {
+    ...config.runner,
+    executors: { mine: { kind: 'agent', command: 'mine', invocations: [{ id: 'mine-cli', via: 'cli', confinement: { backend: 'bwrap' } }] } },
+  };
+  const bound = bind({ unit: { id: 'u', capability: 'coding:plan', writes: [] }, role: 'producer' }, { runnerConfig, session: { headless: true } });
+  assert.equal(bound.executor, 'mine');
+  assert.equal(bound.provenance.executor.source, 'capability:plan');
 });
 
 // ─── spec/registry agreement. Data Dictionary #7 and #7b used to say the
