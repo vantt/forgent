@@ -195,10 +195,13 @@
         ]
       },
       "architecture:frame": {
-        "description": "acceptance-run binding for a Workflow unit",
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude"
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
           },
           {
             "executor": "gemini"
@@ -207,15 +210,18 @@
             "executor": "xai"
           },
           {
-            "executor": "deepseek"
+            "executor": "glm-herdr"
           }
         ]
       },
       "architecture:shape": {
-        "description": "acceptance-run binding for a Workflow unit",
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude"
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
           },
           {
             "executor": "gemini"
@@ -224,15 +230,18 @@
             "executor": "xai"
           },
           {
-            "executor": "deepseek"
+            "executor": "glm-herdr"
           }
         ]
       },
       "architecture:critique": {
-        "description": "acceptance-run binding for a Workflow unit",
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude"
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
           },
           {
             "executor": "gemini"
@@ -241,15 +250,18 @@
             "executor": "xai"
           },
           {
-            "executor": "deepseek"
+            "executor": "glm-herdr"
           }
         ]
       },
       "architecture:synthesize": {
-        "description": "acceptance-run binding for a Workflow unit",
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude"
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
           },
           {
             "executor": "gemini"
@@ -258,15 +270,18 @@
             "executor": "xai"
           },
           {
-            "executor": "deepseek"
+            "executor": "glm-herdr"
           }
         ]
       },
       "architecture:explain": {
-        "description": "acceptance-run binding for a Workflow unit",
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
         "prefer": [
           {
-            "executor": "claude"
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
           },
           {
             "executor": "gemini"
@@ -275,7 +290,7 @@
             "executor": "xai"
           },
           {
-            "executor": "deepseek"
+            "executor": "glm-herdr"
           }
         ]
       },
