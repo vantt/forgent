@@ -345,7 +345,6 @@ test('executeAssignment(...) isReadOnlyMode posture: every real call site codeba
 
   const foundFiles = new Set(sites.map((s) => s.file));
   const expectedFiles = new Set([
-    'src/runner/coordination/session-engine.mjs',
     'src/runner/dispatch/cli.mjs',
     'src/runner/dispatch/operation-choice.mjs',
     'src/runner/execution/run.mjs',
@@ -356,8 +355,7 @@ test('executeAssignment(...) isReadOnlyMode posture: every real call site codeba
     `executeAssignment(...) call sites changed -- update this enumeration's expectedFiles/postures (found in: ${[...foundFiles].sort().join(', ')})`,
   );
 
-  const sessionEngineSites = sites.filter((s) => s.file === 'src/runner/coordination/session-engine.mjs');
-  assert.equal(sessionEngineSites.length, 1, `expected exactly one executeAssignment(...) call site in session-engine.mjs, found ${sessionEngineSites.length}`);
+
 
   const cliSites = sites.filter((s) => s.file === 'src/runner/dispatch/cli.mjs');
   assert.equal(cliSites.length, 2, `expected exactly two executeAssignment(...) call sites in cli.mjs, found ${cliSites.length}`);
@@ -583,21 +581,9 @@ export function checkCoordinationActionsArchitecture(actionsSource, runSource, c
   return violations;
 }
 
-test('F-R01 architectural authority: actions.mjs contains NO *Locked mutators and delegates to executeCoordinationRunKernel and executeCoordinationCloseKernel', () => {
+test('F-R01 architectural authority: coordination actions.mjs retired', () => {
   const actionsPath = path.join(root, 'src/verbs/coordination/actions.mjs');
-  const runPath = path.join(root, 'src/verbs/coordination/run.mjs');
-  const closePath = path.join(root, 'src/verbs/coordination/close.mjs');
-
-  const actionsSource = fs.readFileSync(actionsPath, 'utf8');
-  const runSource = fs.readFileSync(runPath, 'utf8');
-  const closeSource = fs.readFileSync(closePath, 'utf8');
-
-  const violations = checkCoordinationActionsArchitecture(actionsSource, runSource, closeSource);
-  assert.deepEqual(
-    violations,
-    [],
-    `coordination action architecture violations: ${violations.join('; ')}`,
-  );
+  assert.ok(!fs.existsSync(actionsPath), 'actions.mjs must be retired');
 });
 
 test('F-R01 posture check catches violations (deliberate mutator introduction or missing kernel delegation)', () => {

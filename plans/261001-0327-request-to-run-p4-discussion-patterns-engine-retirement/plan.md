@@ -1,7 +1,7 @@
 ---
 title: "P4 Dạng thảo luận trên mô hình gọn + thu hồi engine coordination"
 description: "Đóng mối authority L4: không còn runtime coordination riêng. 12 dạng thảo luận chuyển thành preset Pattern cộng tác hoặc Workflow, qua nghiệm thu (architecture advisor, business discussion, các dạng còn lại), rồi xoá engine và đổi tên CollaborationPattern trong code."
-status: pending
+status: complete
 priority: P1
 effort: "~8–10d"
 tags: [coordination, discussion, collaboration-pattern, workflow, engine-retirement]

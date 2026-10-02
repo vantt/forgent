@@ -25,12 +25,13 @@ export const VALID_OUTCOMES = Object.freeze([
  * @returns {Promise<{ outcome: string, rounds: number, results: Array<object> }>}
  */
 export async function runSolo(unit, cfg, { runRole, verify, history } = {}, params = {}) {
+  const role = params?.role || 'producer';
   const prior = typeof history === 'function' ? history() : (Array.isArray(history) ? history : []);
-  const existing = prior?.find((r) => r.role === 'producer' && r.outcome === 'pass');
+  const existing = prior?.find((r) => r.role === role && r.outcome === 'pass');
 
   const readOnly = (unit?.writes || []).length === 0;
   const result = existing || await runRole({
-    role: 'producer',
+    role,
     unit,
     readOnly,
   });

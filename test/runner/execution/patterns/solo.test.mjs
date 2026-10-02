@@ -80,3 +80,18 @@ test('runSolo preserves non-pass outcomes strictly from valid set', async () => 
     assert.equal(result.outcome, outcome);
   }
 });
+
+test('runSolo supports role override in params', async () => {
+  const calls = [];
+  const unit = { id: 'u-consult', objective: 'Consult advisor' };
+  const runRole = async (opts) => {
+    calls.push(opts);
+    return { role: opts.role, outcome: 'pass', output: 'advice' };
+  };
+
+  const result = await runSolo(unit, {}, { runRole }, { role: 'advisor' });
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].role, 'advisor');
+  assert.equal(result.outcome, 'pass');
+  assert.equal(result.results[0].role, 'advisor');
+});

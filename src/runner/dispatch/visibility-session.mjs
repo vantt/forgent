@@ -232,7 +232,7 @@ export function classifyRunOutcome(runDir, { liveness = 'unknown' } = {}) {
 
 /** Every run under `fgosDir` still claiming to be running (assignments/<id>/runs/<NN>). */
 export function findRunningRuns(fgosDir, { driverFreshMs = DRIVER_FRESH_MS, now = Date.now } = {}) {
-  const roots = [path.join(fgosDir, 'assignments')];
+  const roots = [path.join(fgosDir, 'assignments'), path.join(fgosDir, 'dispatch-runs')];
   const found = [];
   const at = now();
   const listDirs = (d) => {

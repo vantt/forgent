@@ -1,6 +1,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import YAML from 'yaml';
+import { createRequire } from 'node:module';
+const require = createRequire(import.meta.url);
+let YAML = null;
+try {
+  YAML = require('yaml');
+} catch {
+  YAML = null;
+}
 
 import { validateUnit } from '../runner/execution/unit.mjs';
 
@@ -294,7 +301,11 @@ export function lintPhaseUnits(contentOrPath, { config, phase, cellId } = {}) {
     const unitText = block.lines.join('\n');
     let parsed;
     try {
-      parsed = YAML.parse(unitText);
+      if (YAML) {
+        parsed = YAML.parse(unitText);
+      } else {
+        parsed = JSON.parse(unitText);
+      }
     } catch (err) {
       pushFinding({
         line: block.startLine,

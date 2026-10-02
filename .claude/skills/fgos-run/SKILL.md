@@ -1,6 +1,6 @@
 ---
 name: fgos-run
-user-invocable: true
+user-invocable: false
 description: >-
   Single execution driver for all domains: runs free-form requests, AgentKit plans,
   or specific phases through the Workflow runner and P1 Execution Core.

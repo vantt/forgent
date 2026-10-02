@@ -23,7 +23,7 @@
 
 import { MODEL_POLICY_TIERS, RunnerConfigError, REASONING_EFFORT_VALUES, DEFAULT_RIGOR_TO_TIER } from './config.mjs';
 import { resolveTierModel, deriveProviderFamily } from './resolve.mjs';
-import { REPEAT_MODE_VALUES } from '../definitions/schema.mjs';
+import { REPEAT_MODE_VALUES } from './execution-contract.mjs';
 import { checkProviderDisallowed } from './provider-adapter.mjs';
 import { RIGOR_VALUES, RIGOR_RANK, resolveStrongerRigor } from '../rigor.mjs';
 import { deriveOperationCapability } from '../operation-capability.mjs';
@@ -334,7 +334,8 @@ export function resolveAssignmentDispatchPolicy({
     cliOverride.preferExecutor ??
     opPolicy.preferExecutor ??
     runnerConfig?.executor?.command ??
-    (runnerConfig?.executor?.invocations?.[0]?.command ?? runnerConfig?.executor?.invocations?.[0]?.id);
+    (runnerConfig?.executor?.invocations?.[0]?.command ?? runnerConfig?.executor?.invocations?.[0]?.id) ??
+    'claude';
   const executorSource = cliOverride.preferExecutor
     ? (cliOverride.policyProvenance?.executor ?? { scope: 'cliOverride' })
     : opPolicy.preferExecutor
@@ -362,7 +363,8 @@ export function resolveAssignmentDispatchPolicy({
   // 2. Persona Resolution
   const resolvedPersona =
     cliOverride.preferPersona ??
-    opPolicy.preferPersona;
+    opPolicy.preferPersona ??
+    (assignment.role === 'reviewer' ? 'code-reviewer' : undefined);
   const personaSource = cliOverride.preferPersona
     ? (cliOverride.policyProvenance?.persona ?? { scope: 'cliOverride' })
     : opPolicy.preferPersona

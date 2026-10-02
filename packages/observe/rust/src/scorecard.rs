@@ -344,7 +344,7 @@ pub fn compute_sessions(observations: &[Observation]) -> SessionsSection {
     // 1. Group observations by session id
     let mut session_obs: HashMap<String, Vec<&Observation>> = HashMap::new();
     for obs in observations {
-        if obs.source == "coordination" && obs.subject.kind == crate::contract::SubjectKind::Session {
+        if (obs.source == "coordination" || obs.source == "workflow") && obs.subject.kind == crate::contract::SubjectKind::Session {
             session_obs.entry(obs.subject.id.clone()).or_default().push(obs);
         }
     }

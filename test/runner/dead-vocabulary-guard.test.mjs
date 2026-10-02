@@ -276,45 +276,8 @@ test('resolveTierModel: resolves tier to model via modelPolicies[provider][tier]
     (err) => err instanceof RunnerConfigError && /no model configured for tier "standard" under provider "custom"/.test(err.message),
   );
 });
-
-import { mergePolicyStack, FlowDefinitionError } from '../../src/runner/definitions/schema.mjs';
 import { resolveAssignmentDispatchPolicy } from '../../src/runner/dispatch/assignment-policy.mjs';
 import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
-
-test('dead vocabulary guard: schema rejects minTier with guidance and enforces rigor monotonicity', () => {
-  // Reject minTier with guidance
-  assert.throws(
-    () => mergePolicyStack([{ scope: 'operation', id: 'op1', policy: { minTier: 'standard' } }]),
-    (err) => err instanceof FlowDefinitionError && /minTier was removed; use "rigor"/.test(err.message),
-  );
-
-  // Rigor monotonic raise is allowed
-  const raised = mergePolicyStack([
-    { scope: 'definition', id: 'def1', policy: { rigor: 'low' } },
-    { scope: 'operation', id: 'op1', policy: { rigor: 'standard' } },
-    { scope: 'actor', id: 'act1', policy: { rigor: 'high' } },
-  ]);
-  assert.equal(raised.rigor, 'high');
-
-  // Rigor lowering is rejected
-  assert.throws(
-    () => mergePolicyStack([
-      { scope: 'definition', id: 'def1', policy: { rigor: 'high' } },
-      { scope: 'operation', id: 'op1', policy: { rigor: 'low' } },
-    ]),
-    (err) => err instanceof FlowDefinitionError && /lower than the floor/.test(err.message),
-  );
-
-  // tier field in PolicyPatch is rejected at operation scope
-  assert.throws(
-    () => mergePolicyStack([{ scope: 'operation', id: 'op1', policy: { tier: 'advanced' } }]),
-    (err) => err instanceof FlowDefinitionError && /tier is only valid at actor\/assignment\/cli scope/.test(err.message),
-  );
-
-  // tier field in PolicyPatch is accepted at actor scope
-  const actorTier = mergePolicyStack([{ scope: 'actor', id: 'act1', policy: { tier: 'advanced' } }]);
-  assert.equal(actorTier.tier, 'advanced');
-});
 
 test('dead vocabulary guard: capabilities.<cap>.rigor floor elevates tier and capabilities.*.overrides is rejected (D19)', () => {
   const baseConfig = {

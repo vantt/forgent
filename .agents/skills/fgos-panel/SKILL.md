@@ -57,10 +57,10 @@ extend that map in this skill.
      1 critique round with red-team).
    - `consult` -> preset `consult` (pattern `solo`, role `advisor`).
    - `research-fan-out` -> preset `research-fan-out` (pattern `panel`, 3 members).
-   - `code-change-panel` -> follow `fgos-code-change` / `fgos-run`.
+   - `code-change-panel` -> follow `fgos-run`.
 3. For `architecture-panel`, follow [`fgos-architecture-panel`](../fgos-architecture-panel/SKILL.md).
 4. For `code-change-panel`, continue only when the person explicitly asked to
-   implement/change/fix code, then follow `fgos-code-change`. A coding decision,
+   implement/change/fix code, then follow `fgos-run`. A coding decision,
    design review, or "plugin versus core" question is advisory and must not take
    this route.
 5. For discussion workflows (`delphi`, `nominal-group`, `group-cognition`),

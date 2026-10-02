@@ -5,7 +5,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { execFileSync, execSync } from 'node:child_process';
-import YAML from 'yaml';
 
 import { validateUnit } from './unit.mjs';
 import { bind } from './bind.mjs';
@@ -148,10 +147,20 @@ export async function runUnit(options = {}) {
       raw = options.unitData;
     } else if (options.unitPath === '-') {
       const stdinContent = fs.readFileSync(0, 'utf8');
-      raw = YAML.parse(stdinContent);
+      try {
+        raw = JSON.parse(stdinContent);
+      } catch {
+        const YAML = await import('yaml');
+        raw = (YAML.default || YAML).parse(stdinContent);
+      }
     } else if (options.unitPath) {
       const content = fs.readFileSync(path.resolve(options.unitPath), 'utf8');
-      raw = YAML.parse(content);
+      try {
+        raw = JSON.parse(content);
+      } catch {
+        const YAML = await import('yaml');
+        raw = (YAML.default || YAML).parse(content);
+      }
     } else {
       throw new RunnerConfigError('runUnit requires --unit <file|-> or unitData');
     }

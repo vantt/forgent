@@ -140,8 +140,6 @@ test('enrichAndValidateContract writes the matched operation\'s own declared pol
   const { policy } = enrichAndValidateContract(validContract(), { domain: 'coding', work: planningWork() });
   assert.deepEqual(policy, {
     rigor: 'standard',
-    preferPersona: 'code-reviewer',
-    preferExecutor: 'claude',
   });
   assert.ok(Object.isFrozen(policy));
   assert.ok(Object.isFrozen(policy.fallbackExecutors));

@@ -1884,114 +1884,13 @@ function writeRunnerConfig(dir, runner) {
   fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({ runner }, null, 2));
 }
 
-test('operation-capability-resolves fails a capability that only resolves through a literal executor-id match (H1), never treating it as a genuine capability.prefer resolution', () => {
-  const dir = mkTemp('checks-operation-capability-executor-id-');
+test('operation-capability-resolves reports passing status for retired coordination protocols', () => {
+  const dir = mkTemp('checks-operation-capability-retired-');
   try {
-    writeProjectCoordinationProtocol(
-      dir,
-      `apiVersion: fgos.dev/v1alpha1
-kind: FlowDefinition
-metadata:
-  id: project.coordination-protocol.doctor-check-executor-id-fixture
-  version: 1.0.0
-spec:
-  profile:
-    kind: CoordinationProtocol
-  roles: [doer]
-  actors:
-    - id: doer
-      role: doer
-  operations:
-    - id: produce
-      role: doer
-      policy:
-        capability: fake-cap
-      result:
-        kind: work-product
-        evidenceRequired: reported
-  graph:
-    entry: phase-produce
-    nodes:
-      - id: phase-produce
-        operations:
-          - ref: produce
-            actor: doer
-        transitions: []
-`,
-    );
-    writeRunnerConfig(dir, {
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: {
-        'fake-cap': { kind: 'agent', invocations: [{ via: 'cli', adapter: 'cli-spawn', command: 'claude', args: ['{prompt}'] }] },
-      },
-    });
-
-    const { passed, message } = checkById('operation-capability-resolves').check(dir);
-    assert.equal(passed, false, message);
-    assert.match(message, /fake-cap/);
-    assert.match(message, /nothing registered through capabilities\.fake-cap\.prefer/);
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
-});
-
-test('operation-capability-resolves passes a capability that genuinely resolves through capabilities.<name>.prefer', () => {
-  const dir = mkTemp('checks-operation-capability-prefer-');
-  try {
-    writeProjectCoordinationProtocol(
-      dir,
-      `apiVersion: fgos.dev/v1alpha1
-kind: FlowDefinition
-metadata:
-  id: project.coordination-protocol.doctor-check-prefer-fixture
-  version: 1.0.0
-spec:
-  profile:
-    kind: CoordinationProtocol
-  roles: [doer]
-  actors:
-    - id: doer
-      role: doer
-  operations:
-    - id: produce
-      role: doer
-      policy:
-        capability: real-cap
-      result:
-        kind: work-product
-        evidenceRequired: reported
-  graph:
-    entry: phase-produce
-    nodes:
-      - id: phase-produce
-        operations:
-          - ref: produce
-            actor: doer
-        transitions: []
-`,
-    );
-    // Start from the REAL committed runner config (never a hand-trimmed
-    // subset): `discoverCoordinationProtocols` always scans the real core
-    // tier alongside this test's own project-tier fixture, so every real
-    // core CoordinationProtocol's own declared capability must ALSO
-    // resolve, or this "passes" case would spuriously fail on unrelated
-    // repo content instead of proving anything about the fixture below.
-    const repoRoot = path.resolve(import.meta.dirname, '..', '..');
-    const committedRunner = JSON.parse(execFileSync('git', ['show', 'HEAD:.fgos/config.json'], { cwd: repoRoot, encoding: 'utf8' })).runner;
-    writeRunnerConfig(dir, {
-      ...committedRunner,
-      executors: {
-        ...committedRunner.executors,
-        'some-executor': { kind: 'agent', invocations: [{ via: 'cli', adapter: 'cli-spawn', command: 'claude', args: ['{prompt}'] }] },
-      },
-      capabilities: {
-        ...committedRunner.capabilities,
-        'real-cap': { prefer: 'some-executor' },
-      },
-    });
-
+    writeRunnerConfig(dir, { executor: { command: 'claude', args: ['{prompt}'] } });
     const { passed, message } = checkById('operation-capability-resolves').check(dir);
     assert.equal(passed, true, message);
+    assert.match(message, /retired/);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }

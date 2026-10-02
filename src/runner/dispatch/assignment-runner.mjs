@@ -54,7 +54,7 @@ import { execFileSync } from 'node:child_process';
 import { bind } from '../execution/bind.mjs';
 import { RunnerConfigError, ensureRunnerConfigForDir } from './config.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot, fgosDirFromRoot, resolveContentRoot } from '../paths.mjs';
-import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim } from './assignment.mjs';
+import { renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim, operationsForStage } from './assignment.mjs';
 import { resolveAndRenderOperationPrompt, TemplateResolutionError } from './operation-prompt-templates.mjs';
 import { executeExecutorCli } from './cli.mjs';
 import { compileDispatchPlan } from './plan.mjs';
@@ -64,7 +64,6 @@ import { normalizeProviderFamily, checkProviderDisallowed } from './provider-ada
 import { markRunSettled } from './visibility-session.mjs';
 import { stampDeclaredAssignment } from './assignment-normalizer.mjs';
 import { extractProtocolOperationStamp, normalizeSavedPolicyTier, resolveMutatingCwdPosture } from './execution-contract.mjs';
-import { loadCoordinationProtocol } from '../definitions/protocol-loader.mjs';
 import {
   publishNextGeneration,
   currentGeneration,
@@ -441,39 +440,9 @@ function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
   // Check 1: Engine protocol-operation stamp exception (named legacy path until P4 phase 6)
   const stamp = extractProtocolOperationStamp(asgn.provenance?.inline?.contract?.constraints);
   if (stamp) {
-    let definition;
-    try {
-      definition = loadCoordinationProtocol(stamp.definitionId, { cwd, packageRoot: opts.packageRoot });
-    } catch (err) {
-      throw new RunnerConfigError(
-        `executeAssignment: mutating inline assignment "${asgn.assignmentId}" claims protocol-operation stamp for definition "${stamp.definitionId}", which does not resolve to a real CoordinationProtocol -- refused (${err.message})`,
-      );
-    }
-    if (definition.metadata.version !== stamp.definitionVersion) {
-      throw new RunnerConfigError(
-        `executeAssignment: mutating inline assignment "${asgn.assignmentId}" stamp names definition version "${stamp.definitionVersion}", but the resolved definition "${stamp.definitionId}" is version "${definition.metadata.version}" -- refused (stale or forged stamp)`,
-      );
-    }
-    const operation = definition.spec.operations?.find((op) => op.id === stamp.operationId);
-    if (!operation || operation.result?.kind !== 'work-product') {
-      throw new RunnerConfigError(
-        `executeAssignment: mutating inline assignment "${asgn.assignmentId}" claims operation "${stamp.operationId}" in definition "${stamp.definitionId}" -- that operation does not declare result.kind "work-product" -- refused`,
-      );
-    }
-
-    const posture = resolveMutatingCwdPosture(cwd);
-    if (!posture.ok) {
-      const reason =
-        posture.reason === 'main-checkout'
-          ? `resolves to the main checkout ("${posture.repoRoot}"); a mutating dispatch must run in a linked git worktree, never the main checkout`
-          : posture.reason === 'outside-git'
-            ? 'does not resolve inside any git checkout (fail closed on an unresolvable root, never fail open)'
-            : 'toplevel could not be resolved; fail closed, never fail open';
-      throw new RunnerConfigError(
-        `executeAssignment: mutating inline assignment "${asgn.assignmentId}" refused -- cwd "${cwd}" ${reason}`,
-      );
-    }
-    return;
+    throw new RunnerConfigError(
+      `executeAssignment: mutating inline assignment "${asgn.assignmentId}" claims protocol-operation stamp for definition "${stamp.definitionId}", but CoordinationProtocol engine has been retired`,
+    );
   }
 
   // Check 2: Verifiable Unit run mutating gate (Q9, supersede ADR-006 §6)
@@ -588,6 +557,15 @@ function validateAssignmentLegality(asgn, opts = {}) {
   // `effectiveAssignment` mutation backfill) stays exactly as-is and
   // still runs unconditionally for both shapes.
   let matchedOp = undefined;
+  if (asgn.provenance?.kind !== 'inline' && asgn.stage && asgn.operation) {
+    const stageOps = operationsForStage(asgn.domain, asgn.stage, { kind: asgn.workflow });
+    matchedOp = stageOps.find((o) => o.id === asgn.operation);
+    if (!matchedOp) {
+      throw new RunnerConfigError(
+        `unknown operation "${asgn.operation}" for stage "${asgn.stage}" in domain "${asgn.domain}" (declared operations: [${stageOps.map((o) => o.id).join(', ')}])`,
+      );
+    }
+  }
   if (asgn.dispatch === 'human-only') {
     throw new RunnerConfigError(`cannot execute human-only operation "${asgn.operation}" via cli-spawn`);
   }
@@ -1409,7 +1387,7 @@ export async function executeAssignment(assignment, opts = {}) {
   // primary).
   const declaredPrimaryExecutorId = effectivePolicy.executorPreference?.[0] ?? 'claude';
 
-  const defaultExecutorId = effectivePolicy.executorPreference[0] ?? 'claude';
+  const defaultExecutorId = effectivePolicy.executorPreference?.[0] ?? 'claude';
   const hasExplicitInvocationPin = typeof opts.cliOverride?.preferInvocation === 'string' && opts.cliOverride.preferInvocation.trim();
   let resolvedExecutorId = defaultExecutorId;
   effectivePolicy = policyForActualExecutor(cfg, effectivePolicy, resolvedExecutorId, defaultExecutorId);
@@ -2514,7 +2492,6 @@ export async function executeAssignment(assignment, opts = {}) {
       const isTimeout = supervisorReceipt?.completion?.kind === 'timeout' || supervisorReceipt?.completion?.kind === 'idle-timeout';
       const exitCode = supervisorReceipt?.completion?.exitCode ?? (isTimeout ? 124 : 0);
       const signal = supervisorReceipt?.completion?.signal ?? (isTimeout ? 'SIGTERM' : null);
-
       rawResult = {
         status: isTimeout ? 'timeout' : (exitCode === 0 ? 0 : 'failed'),
         exitCode,

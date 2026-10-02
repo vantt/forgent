@@ -18,11 +18,6 @@ import { spawnWorker, executeExecutorCli } from '../../src/runner/dispatch/cli.m
 import { fanoutBatchExecutorCli } from '../../src/runner/fanout-batch.mjs';
 import { loadRunnerConfigFromDir, normalizeLegacyConfinement } from '../../src/runner/dispatch/config.mjs';
 import { addWork, listWork } from '../../src/state/store.mjs';
-import {
-  openDeclaredProtocolSession,
-  dispatchDeclaredOperation,
-} from '../../src/runner/coordination/session-engine.mjs';
-
 const WORKER_SESSION = 'fgos-worker';
 
 const testHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-prod-callsite-home-'));
@@ -674,46 +669,6 @@ test('fanoutBatchExecutorCli in Work Driver coordinates pick -> execute -> retur
   }
 });
 
-test('dispatchDeclaredOperation routes to adapter in production coordination flow (R1)', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper' }, async () => {
-  const root = fixtureRepo();
-  const mock = mockHerdr(root);
-  const DEFINITION_ID = 'core.coordination-protocol.standalone-master-coordination-loop';
-
-  try {
-    await openDeclaredProtocolSession(
-      {
-        definitionId: DEFINITION_ID,
-        coordinationId: 'coord-prod-test',
-        objective: 'Test coordination dispatch down to adapter',
-        writerId: 'coord-driver',
-      },
-      { cwd: root, repoRoot: root },
-    );
-
-    const cfg = loadRunnerConfigFromDir(root);
-    // Explicitly prefer herdr-worker for doer actor
-    cfg.actors = { doer: { prefer: 'herdr-worker' } };
-
-    const res = await withMockHerdr(path.join(root, 'herdr'), () => dispatchDeclaredOperation(
-      'coord-prod-test',
-      {
-        operationId: 'produce-candidate',
-        targetActorId: 'doer',
-        objective: 'Produce candidate through mock adapter',
-        expectedOutputs: ['agent-result.json (status, summary)'],
-        writerId: 'coord-driver',
-        cliPolicy: { preferExecutor: 'herdr-worker' },
-      },
-      { cwd: root, repoRoot: root, runnerConfig: cfg },
-    ));
-
-    assert.ok(res, 'coordination dispatch returned a result');
-    const calls = mock.calls();
-    assert.ok(calls.some((c) => c[0] === 'workspace' || c[0] === 'pane'), 'mock herdr adapter was invoked by dispatchDeclaredOperation');
-  } finally {
-    fs.rmSync(root, { recursive: true, force: true });
-  }
-});
 
 test('R8: legacy openDispatchRun stamps contract: dispatch-run.legacy in run.json', async () => {
   const root = fixtureRepo();

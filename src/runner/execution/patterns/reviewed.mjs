@@ -41,7 +41,9 @@ export function resolveCheckers(unit, cfg, params = {}) {
 
   const capConfig = cfg?.capabilities?.[unit?.capability];
   const minFromCap = capConfig?.minCheckers || [];
-  const minFromParams = params?.minCheckers || [];
+  const minFromParams = Array.isArray(params?.minCheckers)
+    ? params.minCheckers
+    : (params?.minCheckers ? [params.minCheckers] : []);
 
   const checkers = new Set([...fromRigor, ...minFromCap, ...minFromParams]);
 

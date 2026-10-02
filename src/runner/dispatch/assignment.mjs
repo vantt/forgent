@@ -42,7 +42,6 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import YAML from 'yaml';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { resolveTaskSpecPath } from '../paths.mjs';
 
@@ -51,7 +50,7 @@ function resolveDomainName(domain) {
   return typeof domain === 'string' && domain.trim() ? domain.trim() : DEFAULT_DOMAIN;
 }
 
-function operationsForStage(domain, stage, options = {}) {
+export function operationsForStage(domain, stage, options = {}) {
   if (stage === 'planning') {
     return Object.freeze([
       Object.freeze({ id: 'shape-plan', primary: true, taskSpec: 'shape-plan', role: 'implementer' }),
@@ -67,6 +66,8 @@ function operationsForStage(domain, stage, options = {}) {
   if (stage === 'exploring') {
     return Object.freeze([
       Object.freeze({ id: 'lock-decisions', primary: true, taskSpec: 'lock-decisions', role: 'implementer' }),
+      Object.freeze({ id: 'resolve-question', taskSpec: 'resolve-question', role: 'researcher' }),
+      Object.freeze({ id: 'answer-question', taskSpec: 'answer-question', role: 'human', dispatch: 'human-only' }),
     ]);
   }
   if (stage === 'executing') {
@@ -74,6 +75,8 @@ function operationsForStage(domain, stage, options = {}) {
       Object.freeze({ id: 'implement-item', primary: true, taskSpec: 'implement-item', role: 'implementer' }),
       Object.freeze({ id: 'review-item', taskSpec: 'review-item', role: 'reviewer' }),
       Object.freeze({ id: 'scout-blast-radius', taskSpec: 'scout-blast-radius', role: 'researcher' }),
+      Object.freeze({ id: 'scoped-subtask', taskSpec: 'scoped-subtask', role: 'implementer' }),
+      Object.freeze({ id: 'fix-verify-red', taskSpec: 'fix-verify-red', role: 'implementer' }),
     ]);
   }
   return Object.freeze([
@@ -698,17 +701,64 @@ function buildInlineAssignment({ provenance, work, workId, createdBy, options = 
   return Object.freeze(assignment);
 }
 
+function parseSimplePersonaYaml(raw) {
+  try {
+    const result = { persona: {}, decision_boundary: { can_decide: [], must_escalate: [] } };
+    const lines = raw.split('\n');
+    let currentSection = null;
+    let currentSubSection = null;
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) continue;
+
+      const topMatch = line.match(/^([a-zA-Z0-9_-]+):\s*(.*)$/);
+      if (topMatch && !line.startsWith(' ') && !line.startsWith('\t')) {
+        const key = topMatch[1];
+        const val = topMatch[2].trim();
+        if (val) {
+          result[key] = val.replace(/^["'](.*)["']$/, '$1');
+          currentSection = null;
+          currentSubSection = null;
+        } else {
+          currentSection = key;
+          currentSubSection = null;
+        }
+        continue;
+      }
+
+      if (currentSection === 'persona') {
+        const pMatch = line.match(/^\s+([a-zA-Z0-9_-]+):\s*(.*)$/);
+        if (pMatch) {
+          result.persona[pMatch[1]] = pMatch[2].trim().replace(/^["'](.*)["']$/, '$1');
+        }
+      } else if (currentSection === 'decision_boundary') {
+        const dMatch = line.match(/^\s{2}([a-zA-Z0-9_-]+):\s*$/);
+        if (dMatch) {
+          currentSubSection = dMatch[1];
+        } else if (currentSubSection) {
+          const itemMatch = line.match(/^\s+-\s*(.*)$/);
+          if (itemMatch) {
+            if (!result.decision_boundary[currentSubSection]) {
+              result.decision_boundary[currentSubSection] = [];
+            }
+            result.decision_boundary[currentSubSection].push(itemMatch[1].trim());
+          }
+        }
+      }
+    }
+    return result;
+  } catch {
+    return null;
+  }
+}
+
 function renderPersonaSection(personaRef, options = {}) {
   const root = options.repoRoot ?? options.cwd ?? process.cwd();
   const personaFile = path.join(root, 'core', 'agents', `${personaRef}.yaml`);
   let content = null;
   if (fs.existsSync(personaFile)) {
-    try {
-      const raw = fs.readFileSync(personaFile, 'utf8');
-      content = YAML.parse(raw);
-    } catch {
-      content = null;
-    }
+    const raw = fs.readFileSync(personaFile, 'utf8');
+    content = parseSimplePersonaYaml(raw);
   }
 
   const lines = [
