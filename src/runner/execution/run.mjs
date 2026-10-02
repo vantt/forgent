@@ -13,6 +13,17 @@ import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { ensureRunnerConfigForDir, RunnerConfigError } from '../dispatch/config.mjs';
 
 /**
+ * Whether this process runs inside a live herdr session: herdr exports HERDR_ENV=1 and the
+ * socket path into every pane it starts. A caller that already knows passes
+ * `session.herdrPresent` and skips the probe.
+ */
+export function detectHerdrPresent(env = process.env) {
+  if (env.HERDR_ENV !== '1') return false;
+  const socket = env.HERDR_SOCKET_PATH;
+  return typeof socket === 'string' && socket !== '' && fs.existsSync(socket);
+}
+
+/**
  * Resolve git main checkout root and worktree path without importing worktree.mjs.
  */
 export function resolveGitRoots(cwd = process.cwd()) {
@@ -233,7 +244,7 @@ export async function runUnit(options = {}) {
       provider: options.session?.provider,
       tier: options.session?.tier,
       hasNativeAgent: options.session?.hasNativeAgent ?? false,
-      herdrPresent: options.session?.herdrPresent ?? false,
+      herdrPresent: options.session?.herdrPresent ?? detectHerdrPresent(),
       headless: options.session?.headless ?? true,
     };
 

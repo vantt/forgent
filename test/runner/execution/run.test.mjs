@@ -7,7 +7,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { execFileSync } from 'node:child_process';
 
-import { runUnit, recordInlineRun, resolveGitRoots, snapshotRunnerConfig } from '../../../src/runner/execution/run.mjs';
+import { runUnit, recordInlineRun, resolveGitRoots, snapshotRunnerConfig, detectHerdrPresent } from '../../../src/runner/execution/run.mjs';
 import { RunnerConfigError } from '../../../src/runner/dispatch/config.mjs';
 
 function setupGitRepo() {
@@ -91,6 +91,16 @@ function setupGitRepo() {
 
   return { repoRoot: tmp, worktreeDir };
 }
+
+test('detectHerdrPresent needs the herdr marker and a socket that exists', () => {
+  const sock = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-herdr-probe-')), 'herdr.sock');
+  assert.equal(detectHerdrPresent({}), false);
+  assert.equal(detectHerdrPresent({ HERDR_ENV: '1' }), false);
+  assert.equal(detectHerdrPresent({ HERDR_ENV: '1', HERDR_SOCKET_PATH: sock }), false);
+  fs.writeFileSync(sock, '');
+  assert.equal(detectHerdrPresent({ HERDR_ENV: '1', HERDR_SOCKET_PATH: sock }), true);
+  assert.equal(detectHerdrPresent({ HERDR_SOCKET_PATH: sock }), false);
+});
 
 test('resolveGitRoots resolves main checkout root and linked worktree', () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
