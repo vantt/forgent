@@ -2171,6 +2171,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         return await startWorkflow({
           workflowId,
           planPath,
+          request: typeof flags.request === 'string' ? flags.request : undefined,
           repoRoot: flags.dir,
           worktree: flags.worktree,
         });

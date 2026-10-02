@@ -416,3 +416,109 @@ test('mutating gate: refuses an assignment that pins an executor other than the 
   };
   await assert.rejects(() => run(pinned), /pins executor "rogue-executor"/);
 });
+
+// A worker that always settles as done, whatever it was asked: enough to reach the checker role.
+function writeSettlingWorker(dir) {
+  const script = path.join(dir, 'settling-worker.mjs');
+  fs.writeFileSync(
+    script,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const prompt = process.argv.slice(2).join(' ');
+    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    if (match) {
+      const runDir = path.dirname(match[1]);
+      fs.mkdirSync(runDir, { recursive: true });
+      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nThe assigned work was inspected and completed with a full explanation of what was checked.\\n');
+      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done', assessment: { verdict: 'pass' } }));
+    }
+    `,
+  );
+  return script;
+}
+
+function reviewedConfig(repoRoot, executorNames) {
+  const cfgPath = path.join(repoRoot, '.fgos', 'config.json');
+  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  const script = writeSettlingWorker(repoRoot);
+  const executors = {};
+  for (const name of executorNames) {
+    // Each executor is its own provider family (providerModel), with a distinct command name.
+    const command = path.join(repoRoot, `${name}-bin`);
+    fs.symlinkSync(process.execPath, command);
+    executors[name] = {
+      kind: 'agent',
+      allowCrossProvider: true,
+      command,
+      args: [script, '{prompt}'],
+      providerModel: name,
+      invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', command, args: [script, '{prompt}'] }],
+    };
+  }
+  cfg.runner.executors = executors;
+  const prefer = executorNames.map((executor) => ({ executor }));
+  cfg.runner.capabilities['docs:write'] = { prefer, rigor: 'standard' };
+  cfg.runner.capabilities['docs:review'] = { prefer, persona: 'code-reviewer', rigor: 'standard' };
+  cfg.runner.defaultExecutor = executorNames[0];
+  fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
+}
+
+test('a reviewed run never lets the producer family also check its own work', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha', 'beta']);
+  const res = await runUnit({
+    unitData: { id: 'u-indep', objective: 'Write docs', capability: 'docs:write', writes: [], pattern: 'reviewed' },
+    repoRoot,
+    cwd: worktreeDir,
+    worktree: worktreeDir,
+    pattern: 'reviewed',
+  });
+  const byRole = Object.fromEntries(res.results.map((r) => [r.role, r.runResult?.executorId]));
+  assert.equal(byRole.producer, 'alpha');
+  assert.equal(byRole.reviewer, 'beta', 'the reviewer must run on a different provider family than the producer');
+});
+
+test('a reviewed run with a single provider family refuses the checker instead of self-reviewing', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha']);
+  const res = await runUnit({
+    unitData: { id: 'u-indep-1', objective: 'Write docs', capability: 'docs:write', writes: [], pattern: 'reviewed' },
+    repoRoot,
+    cwd: worktreeDir,
+    worktree: worktreeDir,
+    pattern: 'reviewed',
+  });
+  assert.equal(res.outcome, 'policy-refusal');
+  const checker = res.results.find((r) => r.role === 'reviewer');
+  assert.equal(checker.refused.reason, 'independence');
+});
+
+test('panel members run on different provider families', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma']);
+  const res = await runUnit({
+    unitData: { id: 'u-panel', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel' },
+    repoRoot,
+    cwd: worktreeDir,
+    worktree: worktreeDir,
+    pattern: 'panel',
+  });
+  const members = res.results.filter((r) => r.role.startsWith('panelist-')).map((r) => r.runResult?.executorId);
+  assert.equal(members.length, 3);
+  assert.equal(new Set(members).size, 3, `panelists must not share a provider family, got ${members.join(',')}`);
+});
+
+test('a panel with fewer provider families than members refuses instead of repeating one', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha', 'beta']);
+  const res = await runUnit({
+    unitData: { id: 'u-panel-2', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel' },
+    repoRoot,
+    cwd: worktreeDir,
+    worktree: worktreeDir,
+    pattern: 'panel',
+  });
+  assert.equal(res.outcome, 'policy-refusal');
+  assert.ok(res.results.some((r) => r.refused?.reason === 'independence'));
+});

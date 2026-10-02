@@ -1,7 +1,7 @@
 ---
 title: "P1 Lõi thực thi: Unit, một bind(), một cửa chạy (herdr mặc định), 3 Pattern cộng tác"
 description: "Đóng mối authority L5: 'ai làm' một chỗ (bind), 'chạy qua cửa nào' một cửa (pane herdr mặc định, cli fallback), read-only một posture confinement OS; lõi mới không phụ thuộc L3. Gộp plan read-only X."
-status: done
+status: partial
 priority: P1
 effort: "~10–12d"
 tags: [dispatch, execution-core, bind, collaboration-pattern, read-only, herdr, observe]
@@ -125,3 +125,9 @@ Sóng B: 2 ∥ 3 ∥ 4 (file mới/khác nhau; dùng hợp đồng ở trên). S
 | Snapshot config làm khẩu vị đổi giữa chừng không có hiệu lực | owner đổi config khi Unit run đang chạy | có chủ đích (tái lập được); Unit run mới đọc config mới |
 
 <!-- slug: request-to-run-p1-execution-core -->
+
+## Trạng thái thật (2026-10-02, vòng sửa chung)
+
+Đã đạt: Unit, `bind()`, `fgos run` với solo/reviewed/panel chạy thật (xem [acceptance-case-1](reports/acceptance-case-1.md)), gate mutating fail-closed, ép checker/panelist khác họ provider (`test/runner/execution/run.test.mjs`), dò herdr trong `runUnit`.
+Chưa đạt (không còn ghi done): transport herdr trong `fgos run` (`bind().transport` không có nơi dùng), posture confinement một hàm cho herdr+cli (`resolvePosture` không có caller, `canApplyPosture` luôn true), quota fallback thử thật, doctor check "≥2 họ provider áp được posture". Spike khả thi: [spike-herdr-bwrap](reports/spike-herdr-bwrap.md) PASS (claude, `-p`; REPL tương tác NOT RUN).
+Việc kế: nối `bind().transport` → invocation `herdr-spawn` và `resolvePosture` vào cả hai adapter; thay stub `canApplyPosture`.

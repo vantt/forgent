@@ -115,3 +115,7 @@ Sóng D: 4 ∥ 5 (khác file). P2 chạy song song từ sóng C (bảng sở h�
 Không còn. Work `awaiting-approval` **phản chiếu cổng người cuối** của Workflow run — một chỗ giữ "chờ duyệt" (validate 2026-10-01). <!-- Updated: Validation Session 1 -->
 
 <!-- slug: request-to-run-p3-workflow-separate-from-work -->
+
+## Trạng thái thật (2026-10-02, vòng sửa chung)
+
+P3b làm lại thật: Work ghi `workflowStep` từ Workflow (đường đọc `stage` cũ duy nhất ở `replay.mjs`), đồ thị stage chép cứng trong dispatch xoá, dispatch nhận domain/operations qua Assignment và kiểm "operation hợp lệ", guard kiến trúc cấm literal domain/step trong `src/runner/dispatch/**` và `execution/**`. Smoke marketing chạy thật tới gate và hoàn tất: [acceptance](reports/acceptance.md). Concerns ở report đó (herdr transport, tên operation, dọn unit worktree).

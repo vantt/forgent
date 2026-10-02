@@ -21,6 +21,52 @@ import { translatePlanToWorkflow } from './plan-source.mjs';
 import { runUnit, snapshotRunnerConfig, resolveGitRoots } from '../runner/execution/run.mjs';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 
+const PRIOR_REPORT_CHAR_LIMIT = 6000;
+
+/**
+ * What a unit needs beyond its template objective: the owner's request the run was started
+ * with, and what the steps it depends on produced. A unit's agent cannot read the run store
+ * (.fgos is closed to workers), so the text goes into the objective itself.
+ */
+function buildUnitObjective({ template, state, step, workflow, mainRoot }) {
+  const parts = [template.objective || ''];
+  if (state.request) parts.push(`Owner request:\n${state.request}`);
+
+  const priorSections = [];
+  const wanted = new Set();
+  const collect = (stepId) => {
+    for (const dep of workflow.steps.find((s) => s.id === stepId)?.dependsOn ?? []) {
+      if (!wanted.has(dep)) {
+        wanted.add(dep);
+        collect(dep);
+      }
+    }
+  };
+  collect(step.id);
+  for (const prior of workflow.steps) {
+    if (!wanted.has(prior.id)) continue;
+    for (const [unitId, unitState] of Object.entries(state.steps[prior.id]?.units ?? {})) {
+      const last = [...(unitState.results ?? [])].reverse().find((r) => r?.runResult);
+      if (!last) continue;
+      const summary = last.runResult.agentClaim?.summary;
+      const report = (last.runResult.evidence?.artifacts ?? []).find((a) => a.endsWith('agent-report.md'));
+      let reportText = '';
+      if (report) {
+        try {
+          reportText = fs.readFileSync(path.resolve(mainRoot, report), 'utf8').slice(0, PRIOR_REPORT_CHAR_LIMIT);
+        } catch {
+          reportText = '';
+        }
+      }
+      if (summary || reportText) {
+        priorSections.push(`### ${prior.id} / ${unitId}\n${summary ? `Summary: ${summary}\n` : ''}${reportText}`.trimEnd());
+      }
+    }
+  }
+  if (priorSections.length > 0) parts.push(`Output of earlier steps:\n\n${priorSections.join('\n\n')}`);
+  return parts.filter(Boolean).join('\n\n');
+}
+
 /**
  * Run loop to advance ready steps in a Workflow run.
  */
@@ -39,7 +85,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
     // Find ready steps that haven't started or are running
     const readySteps = steps.filter((step) => {
       const stepState = state.steps[step.id];
-      if (!stepState || stepState.status === 'completed' || stepState.status === 'parked') {
+      if (!stepState || stepState.status === 'completed' || stepState.status === 'parked' || stepState.status === 'failed') {
         return false;
       }
       return step.dependsOn.every((dep) => completedStepIds.has(dep));
@@ -135,7 +181,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
 
       // 3. Standard step with units
       if (step.units && step.units.length > 0) {
-        let stepFailed = false;
+        let failedUnit = null;
         for (const u of step.units) {
           const uState = stepState.units[u.id];
           if (uState && uState.status === 'completed') {
@@ -145,7 +191,9 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
           // Build unit object
           const unitData = {
             id: u.id,
-            objective: u.template.objective || `Execute unit ${u.id} in step ${step.id}`,
+            objective:
+              buildUnitObjective({ template: u.template, state, step, workflow, mainRoot }) ||
+              `Execute unit ${u.id} in step ${step.id}`,
             capability: u.template.capability,
             pattern: u.template.pattern || 'solo',
             rigor: u.template.rigor,
@@ -202,13 +250,38 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
             },
           });
 
-          if (unitRunResult.outcome !== 'pass') {
-            stepFailed = true;
-          }
           stateChanged = true;
+          // A unit that did not pass stops its step: later units and dependent steps must not
+          // run on top of work that was refused, failed, or is still waiting on someone.
+          if (unitRunResult.outcome !== 'pass') {
+            failedUnit = { unitId: u.id, outcome: unitRunResult.outcome, results: unitRunResult.results || [] };
+            break;
+          }
         }
 
-        if (!stepFailed) {
+        if (failedUnit) {
+          const refusal = failedUnit.results.find((r) => r?.refused)?.refused;
+          const reason = refusal ? `${refusal.reason}: ${refusal.detail}` : `unit ${failedUnit.unitId} ended ${failedUnit.outcome}`;
+          appendWorkflowEvent({
+            repoRoot: mainRoot,
+            workflowRunId,
+            event: {
+              type: 'step.fail',
+              payload: { stepId: step.id, outcome: failedUnit.outcome, unitId: failedUnit.unitId, reason, failedAt: new Date().toISOString() },
+            },
+          });
+          appendWorkflowEvent({
+            repoRoot: mainRoot,
+            workflowRunId,
+            event: {
+              type: 'workflow.fail',
+              payload: { outcome: failedUnit.outcome, stepId: step.id, reason, failedAt: new Date().toISOString() },
+            },
+          });
+          break;
+        }
+
+        {
           appendWorkflowEvent({
             repoRoot: mainRoot,
             workflowRunId,
@@ -250,6 +323,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
  * @param {string} [params.workflowId] Id of registered workflow
  * @param {object} [params.workflow] In-memory workflow object
  * @param {string} [params.planPath] Path to AgentKit plan.md or plan directory
+ * @param {string} [params.request] The owner's request this run serves; given to every unit
  * @param {string} [params.repoRoot]
  * @param {string} [params.cwd]
  * @param {string} [params.worktree]
@@ -284,6 +358,7 @@ export async function startWorkflow(params = {}) {
     workflowId,
     workflow,
     configSnapshot,
+    request: params.request,
   });
 
   return await advanceWorkflowRun({

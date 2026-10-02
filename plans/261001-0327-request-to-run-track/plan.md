@@ -159,3 +159,10 @@ Không còn (đã chốt ở Validation Log). Q5 hoãn có chủ đích tới P2
 Ghi chú trạng thái (2026-10-01 20:50): **T đã merge `main`** (`dc677ac16`); việc lẻ A, B xong; full `npm test` trên `main` 7858 pass / 0 fail. Cổng điều kiện (phase 1 của track) đóng → **P1 bắt đầu được**.
 
 <!-- slug: request-to-run-track -->
+
+## Trạng thái thật (2026-10-02, sau vòng sửa chung)
+
+- Suite: Node 6470 test / 0 fail; Rust workspace xanh. Nhánh `fix/request-to-run-round` đã merge `main`.
+- P1 `partial` (herdr transport + posture chưa nối dây), P2 done (chưa chạy thật riêng), P3 done, P4 complete (ca 2/3 có run thật), P5 pending — chưa làm.
+- Phát hiện chạy thật đã sửa: step fail bị tính pass; checker/panel không độc lập; workflow không nhận yêu cầu; `fgos run` không dò herdr.
+- Còn mở: nối herdr transport + posture; cấp mặc định capability workflow qua `fgos setup`; dọn unit worktree workflow; so engine cũ cùng câu hỏi (NOT RUN).

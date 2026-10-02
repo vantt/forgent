@@ -338,3 +338,87 @@ test('CLI: fgos workflow start, status, answer, and legacy operations', () => {
   );
   assert.ok(opsOut.includes('validate-plan') || opsOut.includes('operations'));
 });
+
+test('a unit refused by policy fails its step and the workflow; dependent steps never run', async () => {
+  const tmp = setupTestRepo();
+  const workflow = validateWorkflow({
+    id: 'refusal-stops-run',
+    steps: [
+      {
+        id: 'first',
+        units: [{ id: 'u1', template: { capability: 'unconfigured:capability', pattern: 'solo', objective: 'no executor serves this' } }],
+      },
+      {
+        id: 'second',
+        dependsOn: ['first'],
+        units: [{ id: 'u2', template: { capability: 'docs:write', pattern: 'solo', objective: 'must never start' } }],
+      },
+    ],
+  });
+
+  const state = await startWorkflow({ workflow, repoRoot: tmp, cwd: tmp, worktree: tmp });
+
+  assert.equal(state.status, 'failed');
+  assert.equal(state.outcome, 'policy-refusal');
+  assert.equal(state.steps.first.status, 'failed');
+  assert.match(state.steps.first.reason, /unconfigured:capability/);
+  assert.equal(state.steps.second.status, 'pending');
+  assert.deepEqual(state.steps.second.units, {});
+
+  // Resuming a failed run must not start the dependent step either.
+  const resumed = await resumeWorkflow(state.workflowRunId, { repoRoot: tmp, cwd: tmp, worktree: tmp });
+  assert.equal(resumed.status, 'failed');
+  assert.equal(resumed.steps.second.status, 'pending');
+  const types = readWorkflowEvents({ repoRoot: tmp, workflowRunId: state.workflowRunId }).map((e) => e.type);
+  assert.ok(!types.includes('step.complete'));
+  assert.deepEqual(types.filter((t) => t === 'step.fail' || t === 'workflow.fail'), ['step.fail', 'workflow.fail']);
+});
+
+test('the owner request and earlier step output reach each unit objective', async () => {
+  const tmp = setupTestRepo();
+  // Outside the repo: a worker that writes into the checkout would trip the read-only guard.
+  const promptsLog = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-wf-prompts-')), 'prompts.log');
+  // Worker that records the prompt it was given into a file the test can read back.
+  const spy = path.join(tmp, 'spy-worker.mjs');
+  fs.writeFileSync(
+    spy,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const prompt = process.argv.slice(2).join(' ');
+    fs.appendFileSync(${JSON.stringify(promptsLog)}, prompt.replace(/\\n/g, ' ') + '\\n---\\n');
+    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    if (match) {
+      const runDir = path.dirname(match[1]);
+      fs.mkdirSync(runDir, { recursive: true });
+      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nFINDING-FROM-FIRST-STEP is the finding the second step must see in full detail.\\n');
+      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'first step summary' }));
+    }
+    `,
+  );
+  const cfgPath = path.join(tmp, '.fgos', 'config.json');
+  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  cfg.runner.executors['test-node'].args = [spy, '{prompt}'];
+  cfg.runner.executors['test-node'].invocations[0].args = [spy, '{prompt}'];
+  fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
+
+  const workflow = validateWorkflow({
+    id: 'request-flows-through',
+    steps: [
+      { id: 'one', units: [{ id: 'u1', template: { capability: 'docs:write', pattern: 'solo', objective: 'Do the first thing', writes: [] } }] },
+      { id: 'two', dependsOn: ['one'], units: [{ id: 'u2', template: { capability: 'docs:write', pattern: 'solo', objective: 'Do the second thing', writes: [] } }] },
+    ],
+  });
+  const state = await startWorkflow({ workflow, repoRoot: tmp, cwd: tmp, worktree: tmp, request: 'Ship the pricing page by Friday' });
+  assert.equal(state.request, 'Ship the pricing page by Friday');
+  assert.equal(state.status, 'completed', JSON.stringify(state.steps));
+
+  const prompts = fs.readFileSync(promptsLog, 'utf8').split('---\n').filter(Boolean);
+  assert.equal(prompts.length, 2);
+  assert.match(prompts[0], /Do the first thing/);
+  assert.match(prompts[0], /Ship the pricing page by Friday/);
+  assert.doesNotMatch(prompts[0], /FINDING-FROM-FIRST-STEP/);
+  assert.match(prompts[1], /Ship the pricing page by Friday/);
+  assert.match(prompts[1], /first step summary/);
+  assert.match(prompts[1], /FINDING-FROM-FIRST-STEP/);
+});

@@ -25,7 +25,7 @@ function eventsFilePath(repoRoot, workflowRunId) {
  * @param {object} [params.configSnapshot]
  * @returns {{ workflowRunId: string, runDir: string }}
  */
-export function createWorkflowRun({ repoRoot, workflowRunId, workflowId, workflow, configSnapshot }) {
+export function createWorkflowRun({ repoRoot, workflowRunId, workflowId, workflow, configSnapshot, request }) {
   if (!repoRoot) throw new RunnerConfigError('createWorkflowRun requires repoRoot');
   if (!workflowId) throw new RunnerConfigError('createWorkflowRun requires workflowId');
 
@@ -42,6 +42,7 @@ export function createWorkflowRun({ repoRoot, workflowRunId, workflowId, workflo
       workflowId,
       workflow,
       configSnapshot: configSnapshot || null,
+      request: typeof request === 'string' && request.trim() ? request : null,
     },
   };
 
@@ -131,6 +132,7 @@ export function projectWorkflowState(events) {
   let workflowId = null;
   let workflowRunId = null;
   let workflow = null;
+  let request = null;
   let status = 'running';
   let outcome = null;
   const steps = {};
@@ -144,6 +146,7 @@ export function projectWorkflowState(events) {
         workflowId = p.workflowId;
         workflowRunId = p.workflowRunId;
         workflow = p.workflow;
+        request = p.request ?? null;
         if (workflow?.steps) {
           for (const s of workflow.steps) {
             steps[s.id] = {
@@ -215,6 +218,19 @@ export function projectWorkflowState(events) {
         }
         break;
 
+      case 'step.fail':
+        if (steps[p.stepId]) {
+          steps[p.stepId].status = 'failed';
+          steps[p.stepId].outcome = p.outcome || 'failed';
+          steps[p.stepId].reason = p.reason ?? null;
+        }
+        break;
+
+      case 'workflow.fail':
+        status = 'failed';
+        outcome = p.outcome || 'failed';
+        break;
+
       case 'workflow.complete':
         status = 'completed';
         outcome = p.outcome || 'pass';
@@ -229,6 +245,7 @@ export function projectWorkflowState(events) {
     workflowRunId,
     workflowId,
     workflow,
+    request,
     status,
     outcome,
     steps,

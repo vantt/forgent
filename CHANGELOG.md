@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Fixed
+
+- `fgos workflow start` takes `--request <text>`; every unit gets the request and the output of the steps it depends on. A unit that is refused or fails now ends its step and the run as `failed` instead of being counted as passed.
+- A reviewer or panelist now runs on a different provider family than the producer or its sibling panelists; with too few families the run is refused instead of repeating one.
+- `fgos run` detects a live herdr session.
 - **Changed**: Work no longer carries `stage`; dispatch no longer knows Work, domains or steps (fix round for Request-to-Run P1-P4):
   - **Work records its step as `workflowStep`**, an id in the Workflow of its domain. Steps, phases (`clarify`/`discover`/`plan`/`execute`), skills, operations, legal moves (`transitions`) and the old name `decompose` (`aliases`) are data in `domains/<domain>/workflows/*.yaml`, read through `src/state/domain-registry.mjs`. `src/state/workflow-stage-graphs.mjs`, `src/state/stage-fsm.mjs` and the `stage` verb module are gone (`step-fsm.mjs`, `verbs/state/step.mjs`). Event type `work.step`; one read path (`replay.mjs`) maps older `stage` records and `work.stage` events; `VIEW_SCHEMA_VERSION` 4, the Rust work-state reader accepts only 4. Surface renames: `workflowStep`, `workflowStepEffective`, `stepByItem`, `fgos add --step`, `fgos ready --phase`, `fgos workflow operations --step`, doctor check `work-step-vocabulary` (`domain-workflow-skillmap-coverage` retired: skills live on the step).
   - **Dispatch is handed what it needs.** `buildAssignment` takes the domain and the step's legal operations from its caller and checks `operation` against them; `executeAssignment` refuses a declared Assignment without that list. The three hand-copied stage graphs and the second Work event reader in `dispatch/` are deleted; `operation-choice`, `spawnWorker` and the Work-aware lookups moved to the Work layer (`src/runner/operation-choice.mjs`, `work-dispatch.mjs`, `work-compat.mjs`). New architecture guards: no Work-layer import and no domain/step literal in `dispatch/**` and `execution/**`.
