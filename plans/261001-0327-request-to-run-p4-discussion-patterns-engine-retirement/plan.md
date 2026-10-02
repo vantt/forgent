@@ -42,6 +42,30 @@ Owner chốt (Q8, 2026-09-30 23:45): **các dạng thảo luận là năng lực
 | định tuyến yêu cầu thảo luận (`fgos-panel`) | chọn preset/Workflow theo tên; không chọn protocol id |
 | tên trong code | `CollaborationPattern`; không còn `FlowDefinition`, `CoordinationProtocol`, Protocol Pack, "objector" |
 
+
+## Làm tươi & Ledger bất biến an toàn (Phase 1 kết quả)
+
+### 1. Mức bảo đảm visibility (Xác nhận red-team mục 14)
+- Bwrap hiện tại không hỗ trợ `hostRead: deny` (`src/runner/dispatch/confinement/drivers/bwrap.mjs:181-189`). Mọi policy confinement đều mang `hostRead: allow` (`policies.mjs:28,50`).
+- Cả engine coordination cũ và mô hình gọn mới đều ép visibility ở **mức prompt/context**: chỉ đưa vào `inputs` các artifacts được phép thấy; các vai độc lập chạy ở các process riêng biệt (mặc định pane herdr — G7).
+- Mức bảo đảm của mô hình gọn là **ngang bằng engine hôm nay** (đúng quyết định owner 2026-10-01).
+
+### 2. Ledger bất biến an toàn (Safety Invariants Ledger)
+
+| Gate/Bất biến cũ của Engine | Chủ mới trên mô hình gọn | Trạng thái đóng |
+|---|---|---|
+| `assertMutatingDispatchAllowed` (`session-engine.mjs:2135`) | Cổng mutating kiểm chứng được: `realpath(cwd) == unit.json.worktree` + `bind()` deep-equal (`assignment-runner.mjs:560`) | Đã đóng ở P1 |
+| `assertNoPortableExecutorPin` (`session-engine.mjs:933`) | Ràng buộc G2 trong `validateUnit` và `validateWorkflow` | Đã đóng ở P1 + P3a |
+| `READ_ONLY_ROLES` | `readOnly` posture trong `bind()` và `writes: []` | Đã đóng ở P1 |
+| Cửa chạy và transport | `fgos run` bọc `executeAssignment`, herdr pane mặc định (G7) | Đã đóng ở P1 |
+| Tuần tự bước & Unit `dependsOn` | `Workflow runner` (`src/workflow/runner.mjs`) | Đã đóng ở P3a |
+| Protocol stamp mutating exception | Được xoá khi engine coordination thu hồi | Sẽ đóng ở Phase 6 |
+
+### 3. Danh sách caller và thành phần của Engine sẽ thu hồi (Phase 6)
+- Runtime engine: `src/runner/coordination/**`, `src/verbs/coordination/**`, `src/runner/deliberation/**`, `src/runner/team-cognition/**`.
+- Definitions: `core/coordination-protocols/**`, `src/runner/definitions/protocol-loader.mjs`.
+- Rust: `packages/coordination-state/rust` (gỡ khỏi Cargo workspace), `packages/observe/rust` (chuyển scorecard nguồn coordination sang nguồn Unit run & Workflow run).
+- CLI verb: `fgos coordination`.
 ## Phases và song song
 
 | # | Phase | Phụ thuộc | Sóng | Sở hữu file |
