@@ -442,6 +442,31 @@ test('advise-execute-capabilities-configured passes when both slots are declared
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
+test('workflow-capabilities-configured names a capability a Workflow uses that config lacks', () => {
+  const cwd = mkTemp('doctor-workflow-caps-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  const { 'architecture:frame': _omitted, ...rest } = DEFAULT_CAPABILITY_SLOTS;
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities: rest } }));
+  const { passed, message } = checkById('workflow-capabilities-configured').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /architecture:frame \(architecture-advisory\)/);
+  assert.doesNotMatch(message, /marketing:write/, 'a registered capability must not be reported');
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('workflow-capabilities-configured accepts a bare-verb entry the way bind() resolves it', () => {
+  const cwd = mkTemp('doctor-workflow-caps-verb-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  const { 'architecture:critique': _omitted, ...rest } = DEFAULT_CAPABILITY_SLOTS;
+  fs.writeFileSync(
+    path.join(cwd, '.fgos', 'config.json'),
+    JSON.stringify({ runner: { capabilities: { ...rest, critique: { description: 'verb entry' } } } }),
+  );
+  const { message } = checkById('workflow-capabilities-configured').check(cwd);
+  assert.doesNotMatch(message, /architecture:critique/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
 test('gate-bypass-configured check fails when the shared file has no gateBypass key at all', () => {
   const cwd = mkTemp('doctor-gatebypass-absent-');
   const { passed, message } = checkById('gate-bypass-configured').check(cwd);

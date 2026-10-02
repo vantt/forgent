@@ -1,0 +1,16 @@
+{
+  "status": "reconciled",
+  "agentName": "fgos-run_unit-run-1790939b95f500",
+  "round": 1,
+  "lastSeenAt": "2026-10-02T09:19:02.641Z",
+  "confinement": {
+    "status": "confined-bwrap",
+    "confined": true
+  },
+  "paneId": "wS:p3TF",
+  "trustSeedFailed": "trust seed refused for \"/var/tmp/p6-accept-work\": its repo root \"/home/vantt/projects/forgentX-p6\" is not itself trusted, so there is nothing to derive trust from.",
+  "promptReadiness": "ready",
+  "briefSubmitKeyResent": 1,
+  "outcome": "settled",
+  "trustRemoved": "claude-json"
+}

@@ -1,7 +1,7 @@
 ---
 phase: 4
 title: "herdr transport + fallback quota"
-status: pending
+status: complete
 priority: P1
 effort: "1.5d"
 dependencies: [2]
@@ -37,8 +37,10 @@ Nối `bind().transport` vào spawn thật (G7) và `nextCandidate` vào vòng c
 
 ## Success Criteria
 
-- [ ] Test qua `fgos run`: chọn transport đúng; posture trong pane; fallback quota.
-- [ ] Run record ghi transport thật.
+- [x] Test qua `fgos run`: chọn transport đúng; posture trong pane; fallback quota.
+- [x] Run record ghi transport thật.
+
+Báo cáo: [phase-04-report.md](./reports/phase-04-report.md).
 
 ## Risk Assessment
 

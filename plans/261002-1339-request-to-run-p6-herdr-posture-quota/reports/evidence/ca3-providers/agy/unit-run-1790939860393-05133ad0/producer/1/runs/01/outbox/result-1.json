@@ -1,0 +1,11 @@
+{
+  "contract": {
+    "id": "agent-result-claim",
+    "version": 2
+  },
+  "status": "done",
+  "summary": "Completed read-only posture probes confirming active filesystem read-only enforcement and probed environment variables and codex login status.",
+  "evidenceRefs": [
+    "/home/vantt/projects/forgentX-p6/.fgos/assignments/unit-run-1790939860393-05133ad0/producer/1/runs/01/outbox/report-1.md"
+  ]
+}

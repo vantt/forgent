@@ -3,6 +3,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { bind, nextCandidate, BIND_CONTRACT_VERSION } from '../../../src/runner/execution/bind.mjs';
+import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
+
+// posture filtering consults the machine backend registry; keep it file-local
+seedFileLocalBwrapRegistry();
 
 function createMockRunnerConfig() {
   return {
@@ -67,8 +71,8 @@ function createMockRunnerConfig() {
         provider: 'claude',
         command: 'claude',
         invocations: [
-          { id: 'claude-cli', via: 'cli', adapter: 'cli-spawn' },
-          { id: 'claude-herdr', via: 'cli', adapter: 'herdr-spawn' },
+          { id: 'claude-cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' } },
+          { id: 'claude-herdr', via: 'cli', adapter: 'herdr-spawn', confinement: { backend: 'bwrap' } },
         ],
       },
       codex: {
@@ -76,8 +80,8 @@ function createMockRunnerConfig() {
         provider: 'openai',
         command: 'codex',
         invocations: [
-          { id: 'codex-cli', via: 'cli', adapter: 'cli-spawn' },
-          { id: 'codex-herdr', via: 'cli', adapter: 'herdr-spawn' },
+          { id: 'codex-cli', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' } },
+          { id: 'codex-herdr', via: 'cli', adapter: 'herdr-spawn', confinement: { backend: 'bwrap' } },
         ],
       },
       'gemini-cli': {
@@ -85,7 +89,7 @@ function createMockRunnerConfig() {
         provider: 'gemini',
         command: 'agy',
         invocations: [
-          { id: 'gemini-spawn', via: 'cli', adapter: 'cli-spawn' },
+          { id: 'gemini-spawn', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' } },
         ],
       },
       'native-agent': {
@@ -127,6 +131,44 @@ test('bind: successfully binds producer with herdr transport when herdrPresent i
   assert.equal(result.model, 'claude-3-5-sonnet');
   assert.equal(result.persona, 'code-author');
   assert.ok(result.provenance.transport.source.includes('herdr'));
+  // The invocation that runs is the executor's herdr-spawn one, not the prefer entry's cli one.
+  assert.equal(result.invocation, 'claude-herdr');
+  assert.equal(result.provenance.invocation.value, 'claude-herdr');
+});
+
+test('bind: a herdr invocation that cannot carry the posture leaves the transport on cli, and says why', () => {
+  const runnerConfig = createMockRunnerConfig();
+  runnerConfig.executors.claude.invocations[1] = { id: 'claude-herdr', via: 'cli', adapter: 'herdr-spawn' };
+  const result = bind(
+    { unit: { id: 'u1', capability: 'code:implement', writes: ['src/foo.js'], rigor: 'standard' }, role: 'producer', independentOf: [] },
+    { runnerConfig, session: { herdrPresent: true, hasNativeAgent: true } },
+  );
+  assert.equal(result.transport, 'cli');
+  assert.equal(result.invocation, 'claude-cli');
+  assert.equal(result.provenance.transport.source, 'cli:herdr-invocation-cannot-apply-posture');
+});
+
+test('bind: without herdr the transport is cli and the prefer invocation is kept', () => {
+  const result = bind(
+    { unit: { id: 'u1', capability: 'code:implement', writes: ['src/foo.js'], rigor: 'standard' }, role: 'producer', independentOf: [] },
+    { runnerConfig: createMockRunnerConfig(), session: { herdrPresent: false, headless: true } },
+  );
+  assert.equal(result.transport, 'cli');
+  assert.equal(result.invocation, 'claude-cli');
+});
+
+test('bind: a human override that pins an invocation is not moved to herdr', () => {
+  const result = bind(
+    {
+      unit: { id: 'u1', capability: 'code:implement', writes: ['src/foo.js'], rigor: 'standard' },
+      role: 'producer',
+      independentOf: [],
+      overrides: [{ executor: 'claude', invocation: 'claude-cli', origin: 'human-cli' }],
+    },
+    { runnerConfig: createMockRunnerConfig(), session: { herdrPresent: true, hasNativeAgent: true } },
+  );
+  assert.equal(result.transport, 'cli');
+  assert.equal(result.invocation, 'claude-cli');
 });
 
 test('bind: transports fallback to cli when session.herdrPresent is false', () => {
@@ -375,6 +417,34 @@ test('nextCandidate: falls back to subsequent candidate on quota/provider-limit'
   assert.equal(secondBinding.executor, 'codex');
   assert.equal(secondBinding.provenance.fallbackFrom.executor, 'claude');
   assert.equal(secondBinding.provenance.fallbackFrom.reason, 'provider-limit');
+});
+
+test('nextCandidate: walks the prefer pool in order, never revisits a candidate, and refuses when none is left', () => {
+  const runnerConfig = createMockRunnerConfig();
+  runnerConfig.capabilities['code:implement'].prefer = [
+    { executor: 'claude', invocation: 'claude-cli' },
+    { executor: 'claude', invocation: 'claude-herdr' },
+    { executor: 'codex', invocation: 'codex-cli' },
+  ];
+  const ask = { unit: { id: 'u1', capability: 'code:implement', writes: ['src/foo.js'] }, role: 'producer' };
+  const ctx = { runnerConfig, session: {} };
+
+  const first = bind(ask, ctx);
+  assert.equal(first.candidateIndex, 0);
+  const second = nextCandidate(first, ask, ctx);
+  assert.equal(second.candidateIndex, 1);
+  assert.equal(second.executor, 'claude');
+  const third = nextCandidate(second, ask, ctx);
+  assert.equal(third.candidateIndex, 2);
+  assert.equal(third.executor, 'codex');
+  assert.equal(third.provenance.fallbackFrom.executor, 'claude');
+  const none = nextCandidate(third, ask, ctx);
+  assert.ok(none.refused, 'no candidate is left, so nothing is guessed');
+});
+
+test('nextCandidate: a binding that did not come from a prefer pool has no next candidate', () => {
+  const none = nextCandidate({ executor: 'lead', candidateIndex: -1 }, { unit: { capability: 'code:implement' }, role: 'producer' }, { runnerConfig: createMockRunnerConfig(), session: {} });
+  assert.equal(none.refused.reason, 'no-candidate');
 });
 
 test('architecture guard: bind.mjs does NOT import src/state or src/runner/coordination', async () => {

@@ -327,6 +327,58 @@ export function createHerdrClient({ herdrBin = 'herdr', cwd, env, run = defaultR
       return invoke(args, { timeoutMs: (timeoutMs ?? 20000) + 15000 });
     },
 
+    /**
+     * What herdr's own screen detector sees in the pane, independent of any state
+     * a process REPORTED for it (a confined pane's agent cannot run herdr's hooks,
+     * so the only state it ever has is the one fgos reported at launch).
+     *
+     * `promptText` is the text of the matched prompt-box region when there is one
+     * -- what is typed and not yet submitted. Returns `{ state: null }` when herdr
+     * answers without a detector verdict, so a caller can tell "no information"
+     * from "not idle". Throws `HerdrError` only for an unreachable or unparseable herdr.
+     */
+    agentExplain(name, { timeoutMs = 10000 } = {}) {
+      const args = ['agent', 'explain', name, '--json'];
+      const res = run(herdrBin, args, { cwd, env, timeoutMs });
+      if (res.spawnCode === 'ENOENT') {
+        throw new HerdrError('herdr_unavailable', `herdr binary "${herdrBin}" not found on PATH.`, { args });
+      }
+      if (res.killed || res.spawnCode === 'ETIMEDOUT') {
+        throw new HerdrError('herdr_call_timeout', `herdr ${args.join(' ')} was killed after ${timeoutMs}ms.`, { args });
+      }
+      let body;
+      for (const stream of [res.stdout, res.stderr]) {
+        if (typeof stream !== 'string' || !stream.trim()) continue;
+        try { body = JSON.parse(stream); break; } catch { /* try the other stream */ }
+      }
+      if (body === undefined) {
+        throw new HerdrError('herdr_unparseable', `herdr ${args.join(' ')} returned no parseable JSON (exit ${res.status ?? 'unknown'}).`, { args, exitCode: res.status });
+      }
+      if (body?.error) {
+        throw new HerdrError(body.error.code ?? 'herdr_error', body.error.message ?? `herdr ${args.join(' ')} failed.`, { args, exitCode: res.status });
+      }
+      const verdict = body?.result && typeof body.result === 'object' && !('state' in body) ? body.result : body;
+      const matchedId = verdict?.matched_rule?.id;
+      const matchedRule = Array.isArray(verdict?.evaluated_rules)
+        ? verdict.evaluated_rules.find((rule) => rule?.matched && rule?.id === matchedId)
+        : null;
+      return {
+        state: typeof verdict?.state === 'string' ? verdict.state : null,
+        visibleBlocker: verdict?.visible_blocker === true,
+        visibleIdle: verdict?.visible_idle === true,
+        visibleWorking: verdict?.visible_working === true,
+        // A verdict that matched a screen rule is evidence about the screen; one reached
+        // through `fallback_reason` is herdr's default for a known agent, nothing more.
+        matchedRule: typeof matchedId === 'string' && matchedId ? matchedId : null,
+        promptText: typeof matchedRule?.evidence?.region_preview === 'string' ? matchedRule.evidence.region_preview : '',
+      };
+    },
+
+    /** Press keys in an agent's pane, e.g. `['Enter']` to submit a typed draft. */
+    agentSendKeys(name, keys, { timeoutMs = 10000 } = {}) {
+      return invoke(['agent', 'send-keys', name, ...keys], { timeoutMs });
+    },
+
     /** Diagnostic only. `agent_status` is never a receipt and never a result;
      * it says whether it is safe to type, nothing more. */
     agentGet(name) {
@@ -342,11 +394,35 @@ export function createHerdrClient({ herdrBin = 'herdr', cwd, env, run = defaultR
 
     /** Screen text. Only ever used to explain a `blocked` agent to a human --
      * never to decide that work happened. */
-    agentRead(name, { lines } = {}) {
+    agentRead(name, { lines, source } = {}) {
       const args = ['agent', 'read', name];
       if (lines) args.push('--lines', String(lines));
-      const result = invoke(args);
-      return result?.read?.text ?? result?.text ?? '';
+      // `visible` is the one source herdr can serve while the agent is busy drawing.
+      if (source) args.push('--source', source);
+      // Measured on herdr 0.9.1: `agent read` prints the screen as plain text, not in the JSON
+      // envelope every other call answers in (an older build wrapped it). A failure still comes
+      // back as an error envelope, so JSON is tried first and only a body that is not JSON is
+      // taken to be the screen itself.
+      const res = run(herdrBin, args, { cwd, env, timeoutMs: 15000 });
+      if (res.spawnCode === 'ENOENT') {
+        throw new HerdrError('herdr_unavailable', `herdr binary "${herdrBin}" not found on PATH.`, { args });
+      }
+      if (res.killed || res.spawnCode === 'ETIMEDOUT') {
+        throw new HerdrError('herdr_call_timeout', `herdr ${args.join(' ')} was killed after 15000ms.`, { args });
+      }
+      const body = typeof res.stdout === 'string' ? res.stdout : '';
+      let parsed;
+      try { parsed = JSON.parse(body); } catch { parsed = undefined; }
+      if (parsed === undefined && res.status === 0) return body;
+      for (const stream of [body, res.stderr]) {
+        let json;
+        try { json = JSON.parse(stream); } catch { continue; }
+        if (json?.error) {
+          throw new HerdrError(json.error.code ?? 'herdr_error', json.error.message ?? `herdr ${args.join(' ')} failed.`, { args, exitCode: res.status });
+        }
+        return json?.result?.read?.text ?? json?.result?.text ?? '';
+      }
+      throw new HerdrError('herdr_unparseable', `herdr ${args.join(' ')} failed with no parseable answer (exit ${res.status ?? 'unknown'}): ${(res.stderr || '').slice(0, 400)}`, { args, exitCode: res.status });
     },
   };
 }

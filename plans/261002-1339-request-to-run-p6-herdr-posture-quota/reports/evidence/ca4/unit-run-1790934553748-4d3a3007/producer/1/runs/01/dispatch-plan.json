@@ -1,0 +1,198 @@
+{
+  "selector": {
+    "type": "assignment",
+    "value": "unit-run-1790934553748-4d3a3007/producer/1"
+  },
+  "caller": {
+    "role": "driver"
+  },
+  "mechanism": "out-of-process",
+  "executorId": "fake-limit",
+  "capability": "fake-limit",
+  "invocation": {
+    "via": "cli",
+    "adapter": "herdr-spawn",
+    "protocol": "prompt-stdout-v1"
+  },
+  "governance": {
+    "providerFamily": "fakelimit",
+    "egress": {
+      "kind": "cross-provider",
+      "target": "/var/tmp/p6-accept-bin/fake-limit.sh",
+      "content": "repo-content"
+    }
+  },
+  "reasonCodes": [
+    "native-first.0033.cli-spawn-shaped"
+  ],
+  "configured": true,
+  "bindingSource": "executor-id",
+  "tier": "standard",
+  "model": "fake",
+  "providerModel": "fakelimit",
+  "provenance": {
+    "executor": {
+      "value": "fake-limit",
+      "source": {
+        "scope": "cliOverride"
+      }
+    },
+    "provider": {
+      "value": "fakelimit",
+      "source": {
+        "scope": "registeredExecutor",
+        "id": "fake-limit"
+      }
+    },
+    "model": {
+      "value": "fake",
+      "source": {
+        "scope": "cliOverride"
+      }
+    },
+    "rigor": {
+      "value": "standard",
+      "source": {
+        "scope": "default"
+      }
+    },
+    "tier": {
+      "value": "standard",
+      "source": {
+        "scope": "rigor",
+        "id": "standard"
+      }
+    },
+    "reasoningEffort": {
+      "value": "medium",
+      "source": {
+        "scope": "derived",
+        "id": "rigor.standard"
+      }
+    },
+    "persona": {
+      "source": {
+        "scope": "default"
+      }
+    },
+    "visibility": {
+      "value": "headless",
+      "source": {
+        "scope": "default"
+      }
+    },
+    "repeatMode": {
+      "value": null,
+      "source": {
+        "scope": "default"
+      }
+    },
+    "constraints": {
+      "value": {
+        "requiresSkills": []
+      },
+      "source": {
+        "scope": "assignment",
+        "id": "unit-run-1790934553748-4d3a3007/producer/1"
+      }
+    },
+    "governance": {
+      "value": "allowed",
+      "source": {
+        "scope": "governance",
+        "id": "fakelimit"
+      }
+    }
+  },
+  "policy": {
+    "role": "producer",
+    "executorPreference": [
+      "fake-limit"
+    ],
+    "executorId": "fake-limit",
+    "providerModel": "fakelimit",
+    "rigor": "standard",
+    "tier": "standard",
+    "model": "fake",
+    "reasoningEffort": "medium",
+    "visibility": "headless",
+    "repeatMode": null,
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "fake-limit",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "provider": {
+        "value": "fakelimit",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "fake-limit"
+        }
+      },
+      "model": {
+        "value": "fake",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "rigor": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "tier": {
+        "value": "standard",
+        "source": {
+          "scope": "rigor",
+          "id": "standard"
+        }
+      },
+      "reasoningEffort": {
+        "value": "medium",
+        "source": {
+          "scope": "derived",
+          "id": "rigor.standard"
+        }
+      },
+      "persona": {
+        "source": {
+          "scope": "default"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "repeatMode": {
+        "value": null,
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "unit-run-1790934553748-4d3a3007/producer/1"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "fakelimit"
+        }
+      }
+    }
+  }
+}

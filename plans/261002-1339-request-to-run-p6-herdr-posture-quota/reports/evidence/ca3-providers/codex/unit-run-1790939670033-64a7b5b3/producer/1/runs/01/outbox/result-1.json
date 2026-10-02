@@ -1,0 +1,1 @@
+{"contract":{"id":"agent-result-claim","version":2},"status":"done","summary":"Completed the prescribed read-only posture and account probes; both attempted repository writes were rejected and no repository file was modified.","evidenceRefs":["/home/vantt/projects/forgentX-p6/.fgos/assignments/unit-run-1790939670033-64a7b5b3/producer/1/runs/01/outbox/report-1.md"]}

@@ -620,6 +620,95 @@ test('provider capacity: selected missing credential fails closed before spawn',
   }
 });
 
+// A leased account whose credentials are several files (an agent that keeps its login, settings and
+// helper binary in its own home) is provisioned from an explicit list, never by mounting the real home.
+function homeFilesFixture() {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-home-files-test-'));
+  const source = path.join(tmp, 'account');
+  fs.mkdirSync(path.join(source, 'nested'), { recursive: true });
+  fs.mkdirSync(path.join(source, 'bin'), { recursive: true });
+  fs.writeFileSync(path.join(source, 'auth.json'), '{"token":"t"}', { mode: 0o644 });
+  fs.writeFileSync(path.join(source, 'nested', 'settings.json'), '{"a":1}');
+  fs.writeFileSync(path.join(source, 'bin', 'helper'), '#!/bin/sh\n', { mode: 0o755 });
+  fs.writeFileSync(path.join(source, 'history.jsonl'), 'private history');
+  const privateHomeHost = path.join(tmp, 'private-home');
+  const plan = {
+    contract: 'confinement-plan.v1',
+    dispatchId: 'disp_home_files',
+    decision: 'execute',
+    coverage: {},
+    resources: [{
+      resource: 'private-home',
+      hostTarget: privateHomeHost,
+      executionTarget: { location: 'host', path: '/home/sandbox' },
+      access: 'read-write',
+      delivery: 'mount',
+      allocation: 'temporary',
+    }],
+  };
+  const request = (credentialSource) => ({
+    dispatchId: 'disp_home_files',
+    executorId: 'agent-bwrap',
+    invocation: { command: 'agent-cli', args: [], env: {}, resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: 'AGENT_HOME' } }] },
+    providerCapacity: { provider: 'p', accountId: 'a', credentialSource },
+    context: { cwd: tmp, runDir: tmp },
+  });
+  return { tmp, source, privateHomeHost, plan, request };
+}
+
+test('provider capacity: a home-files credential copies only the listed files, owner-only, keeping the exec bit of a helper', async () => {
+  const f = homeFilesFixture();
+  try {
+    const prepared = await prepareBwrap(f.plan, f.request({ kind: 'home-files', home: f.source, files: ['auth.json', 'nested/settings.json', 'bin/helper'] }), { id: 'bwrap', type: 'bwrap', config: {} });
+    try {
+      const listed = fs.readdirSync(f.privateHomeHost, { recursive: true, withFileTypes: true }).filter((e) => e.isFile() && !e.name.startsWith('.fgos-confinement')).map((e) => path.relative(f.privateHomeHost, path.join(e.parentPath, e.name))).sort();
+      assert.deepEqual(listed, ['auth.json', 'bin/helper', 'nested/settings.json']);
+      assert.equal(fs.readFileSync(path.join(f.privateHomeHost, 'auth.json'), 'utf8'), '{"token":"t"}');
+      assert.equal(fs.statSync(path.join(f.privateHomeHost, 'auth.json')).mode & 0o777, 0o600);
+      assert.equal(fs.statSync(path.join(f.privateHomeHost, 'bin', 'helper')).mode & 0o777, 0o700);
+      assert.equal(prepared.providerCapacity.credentialProvisioned, true);
+      assert.equal(prepared.invocation.env.AGENT_HOME, '/home/sandbox');
+      assert.ok(!prepared.invocation.args.includes(f.source), 'the real account home is never mounted');
+    } finally {
+      await prepared.cleanup();
+    }
+  } finally {
+    fs.rmSync(f.tmp, { recursive: true, force: true });
+  }
+});
+
+test('provider capacity: a home-files credential that is missing, escapes its home, or is not a file fails closed and leaves nothing behind', async () => {
+  const f = homeFilesFixture();
+  try {
+    fs.symlinkSync('/etc/hostname', path.join(f.source, 'link-out'));
+    const cases = [
+      [['auth.json', 'gone.json'], /selected credential file "gone\.json" is missing/],
+      [['../outside'], /must be a relative path without "\.\."/],
+      [['/etc/hostname'], /must be a relative path without "\.\."/],
+      [['link-out'], /not a regular file inside the credential home/],
+      [['nested'], /not a regular file inside the credential home/],
+    ];
+    for (const [files, pattern] of cases) {
+      await assert.rejects(
+        () => prepareBwrap(f.plan, f.request({ kind: 'home-files', home: f.source, files }), { id: 'bwrap', type: 'bwrap', config: {} }),
+        pattern,
+        JSON.stringify(files),
+      );
+      assert.equal(fs.existsSync(f.privateHomeHost), false, 'the allocated private home is cleaned up when provisioning fails');
+    }
+    await assert.rejects(
+      () => prepareBwrap(f.plan, f.request({ kind: 'home-files', home: path.join(f.tmp, 'no-such-home'), files: ['auth.json'] }), { id: 'bwrap', type: 'bwrap', config: {} }),
+      /credential home is not readable/,
+    );
+    await assert.rejects(
+      () => prepareBwrap(f.plan, f.request({ kind: 'home-files', home: f.source, files: [] }), { id: 'bwrap', type: 'bwrap', config: {} }),
+      /needs an absolute "home" and a non-empty "files" list/,
+    );
+  } finally {
+    fs.rmSync(f.tmp, { recursive: true, force: true });
+  }
+});
+
 // =========================================================================
 // R5: Ownership markers and idempotent reaper
 // =========================================================================

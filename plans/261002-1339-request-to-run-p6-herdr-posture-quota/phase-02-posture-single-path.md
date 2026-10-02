@@ -1,7 +1,7 @@
 ---
 phase: 2
 title: "Posture một đường"
-status: pending
+status: complete
 priority: P1
 effort: "1.5d"
 dependencies: [1]
@@ -37,8 +37,10 @@ Một posture (`read-only` | `workspace-write`) do `bind()` quyết, resolve **m
 
 ## Success Criteria
 
-- [ ] Test qua `fgos run` chứng minh chặn/cho ghi đúng posture (cli).
-- [ ] Một đường confinement; guard test.
+- [x] Test qua `fgos run` chứng minh chặn/cho ghi đúng posture (cli).
+- [x] Một đường confinement; guard test.
+
+Báo cáo: [phase-02-report.md](./reports/phase-02-report.md).
 
 ## Risk Assessment
 

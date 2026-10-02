@@ -1,0 +1,21 @@
+{
+  "contract": "assignment-run.v2",
+  "runId": "run_unit-run-1790941435696-b0a2d4ec/synthesizer/1_01",
+  "assignmentId": "unit-run-1790941435696-b0a2d4ec/synthesizer/1",
+  "attempt": 1,
+  "supersedesRunId": null,
+  "retryId": null,
+  "payloadDigest": "sha256:50a1e9143c8daac4ddc42a4e7a8dd247de7dc7845f453d37b781ff844f0ab0f3",
+  "dispatchPlanDigest": "sha256:4ed470c9fa5fb37ec3fbda59868a14a4f4c43a8591fabdc41d6b90ce312d8df7",
+  "phase": "admitted",
+  "delivery": "not-sent",
+  "executorId": "xai",
+  "dispatchPlanPath": ".fgos/assignments/unit-run-1790941435696-b0a2d4ec/synthesizer/1/runs/01/dispatch-plan.json",
+  "effectiveContractPath": ".fgos/assignments/unit-run-1790941435696-b0a2d4ec/synthesizer/1/runs/01/effective-execution-contract.json",
+  "cwd": "/home/vantt/projects/forgentX-p6",
+  "startedAt": "2026-10-02T11:46:17.837Z",
+  "timeoutMs": 2100000,
+  "status": "settled",
+  "providerCapacitySelectionPath": ".fgos/assignments/unit-run-1790941435696-b0a2d4ec/synthesizer/1/runs/01/provider-capacity-selection.json",
+  "settledAt": "2026-10-02T11:47:12.726Z"
+}

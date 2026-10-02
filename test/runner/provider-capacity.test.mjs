@@ -623,3 +623,21 @@ test('manual clear refuses unknown and non-quarantined accounts unless forced, t
   assert.equal(audit.previousQuarantine.reasonCode, 'auth-token');
   assert.equal(inspectProviderCapacity({ runnerConfig: runnerConfig(), runtimeDir }).providers['openai-codex'].accounts.a.quarantine, null);
 });
+
+test('inventory: a home-files credential source lists relative files and is carried through to the selected account', () => {
+  const inventory = validateProviderAccountInventory({
+    providers: { xai: { accounts: { vantt: { credentialSource: { kind: 'home-files', home: '/home/u/.pi/accounts/x', files: ['auth.json', 'bin/fd'] } } } } },
+  });
+  assert.deepEqual(inventory.xai.accounts.vantt.credentialSource, { kind: 'home-files', home: '/home/u/.pi/accounts/x', files: ['auth.json', 'bin/fd'] });
+});
+
+test('inventory: a home-files source with no files, an escaping or absolute path, or files on another kind is refused by name', () => {
+  const withSource = (credentialSource) => ({ providers: { xai: { accounts: { a: { credentialSource } } } } });
+  const home = '/home/u/x';
+  assert.throws(() => validateProviderAccountInventory(withSource({ kind: 'home-files', home })), /files\) must be a non-empty list of relative paths/);
+  assert.throws(() => validateProviderAccountInventory(withSource({ kind: 'home-files', home, files: [] })), /non-empty list/);
+  assert.throws(() => validateProviderAccountInventory(withSource({ kind: 'home-files', home, files: ['../up'] })), /relative paths without "\.\."/);
+  assert.throws(() => validateProviderAccountInventory(withSource({ kind: 'home-files', home, files: ['/abs'] })), /relative paths without "\.\."/);
+  assert.throws(() => validateProviderAccountInventory(withSource({ kind: 'codex-home', home, files: ['auth.json'] })), /only valid for kind "home-files"/);
+  assert.throws(() => validateProviderAccountInventory(withSource({ kind: 'dir-mount', home })), /must be one of codex-home, home-files/);
+});

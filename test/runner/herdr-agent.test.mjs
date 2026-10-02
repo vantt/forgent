@@ -385,3 +385,44 @@ test('a real capability id fits -- the name that herdr actually refused', () => 
   assert.ok(name.length <= 32, `got ${name.length}: ${name}`);
   assert.match(name, /^[a-z][a-z0-9_-]*$/, "and still matches herdr's own character rule");
 });
+
+test('agent read: the screen comes back whether herdr prints it as plain text (0.9.1) or in the JSON envelope (older)', () => {
+  const plain = fakeBackend(() => ({ status: 0, stdout: "  You've hit your usage limit.\n  Try again in 3 hours.\n", stderr: '' }));
+  assert.equal(createHerdrClient({ run: plain.run }).agentRead('p1', { lines: 60 }), "  You've hit your usage limit.\n  Try again in 3 hours.\n");
+  assert.deepEqual(plain.calls[0].args, ['agent', 'read', 'p1', '--lines', '60']);
+
+  const enveloped = fakeBackend(() => ok({ read: { text: 'screen text' } }));
+  assert.equal(createHerdrClient({ run: enveloped.run }).agentRead('p1'), 'screen text');
+});
+
+test('agent read: a failure is still named, not mistaken for a screen', () => {
+  const failing = fakeBackend(() => herdrErr('agent_not_found', 'no such agent'));
+  assert.throws(() => createHerdrClient({ run: failing.run }).agentRead('p1'), (err) => err.code === 'agent_not_found');
+  const gone = fakeBackend(() => ({ status: null, stdout: '', stderr: 'spawn ENOENT', spawnCode: 'ENOENT' }));
+  assert.throws(() => createHerdrClient({ herdrBin: '/nowhere/herdr', run: gone.run }).agentRead('p1'), (err) => err.code === 'herdr_unavailable');
+  const silent = fakeBackend(() => ({ status: 1, stdout: '', stderr: 'boom' }));
+  assert.throws(() => createHerdrClient({ run: silent.run }).agentRead('p1'), (err) => err.code === 'herdr_unparseable');
+});
+
+test('agentExplain says whether a screen rule matched or herdr only fell back to its default for the agent kind', () => {
+  const ruled = fakeBackend(() => ok({ state: 'idle', visible_idle: true, matched_rule: { id: 'live_prompt_box' }, evaluated_rules: [{ id: 'live_prompt_box', matched: true, evidence: { region_preview: '> typed' } }] }));
+  const seenRuled = createHerdrClient({ run: ruled.run }).agentExplain('p1');
+  assert.equal(seenRuled.matchedRule, 'live_prompt_box');
+  assert.equal(seenRuled.visibleIdle, true);
+  assert.equal(seenRuled.promptText, '> typed');
+
+  const fallback = fakeBackend(() => ok({ state: 'idle', matched_rule: null, fallback_reason: 'default_known_agent_idle_fallback', visible_idle: false }));
+  const seenFallback = createHerdrClient({ run: fallback.run }).agentExplain('p1');
+  assert.equal(seenFallback.state, 'idle');
+  assert.equal(seenFallback.matchedRule, null, 'a fallback verdict carries no rule');
+  assert.equal(seenFallback.visibleIdle, false);
+});
+
+test('agentRead can ask for the visible source, the one herdr serves while an agent is busy drawing', () => {
+  const backend = fakeBackend(() => ({ status: 0, stdout: 'screen\n', stderr: '' }));
+  const client = createHerdrClient({ run: backend.run });
+  client.agentRead('p1', { source: 'visible' });
+  assert.deepEqual(backend.calls[0].args, ['agent', 'read', 'p1', '--source', 'visible']);
+  client.agentRead('p1', { lines: 20 });
+  assert.deepEqual(backend.calls[1].args, ['agent', 'read', 'p1', '--lines', '20']);
+});

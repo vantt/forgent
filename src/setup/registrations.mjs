@@ -66,7 +66,8 @@ import { stepById } from '../workflow/steps.mjs';
 import { readLocalStatus, classifyRegistryPosture, toolsFromExecutors } from '../state/tool-registry.mjs';
 import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { describeConfigAwareness, loadGlobalConfig } from '../config/global-config.mjs';
-import { inspectProviderCapacity, inspectProviderCapacityLock, defaultProviderCapacityRuntimeDir } from '../runner/dispatch/provider-capacity.mjs';
+import { inspectProviderCapacity, inspectProviderCapacityLock, defaultProviderCapacityRuntimeDir, providerAccountInventory } from '../runner/dispatch/provider-capacity.mjs';
+import { normalizeProviderFamily } from '../runner/dispatch/provider-adapter.mjs';
 import { resolveHerdrBin } from '../runner/dispatch/transport.mjs';
 import { readCodexTrust, readAgyStore, defaultAgySettingsPath } from '../runner/dispatch/trust-store.mjs';
 import { resolveFgosBin, refreshGlobalBinCache } from './bin-discovery.mjs';
@@ -2080,6 +2081,24 @@ registerCheck({
 // `prefer`/`aliases`/`overrides`: naming which executor serves a purpose
 // is a dispatch-mechanism decision, and tsk-5tm-3 D5 forbids `execute`
 // (or, by the same reasoning, this registration) re-deciding that.
+// Capabilities the shipped Workflow units
+// name. Without a `runner.capabilities` entry bind() has no candidate pool for
+// the unit and refuses it, so a fresh project could not run these Workflows.
+// Description-only on purpose (no `prefer`): which executors serve a
+// capability is that project's own taste, and `mergeConfigDefaults` only adds
+// a missing slot, never overwrites one the project already tuned.
+function workflowCapabilitySlots(verbsByDomain) {
+  const slots = {};
+  for (const [domain, verbs] of Object.entries(verbsByDomain)) {
+    for (const verb of verbs) {
+      slots[`${domain}:${verb}`] = {
+        description: `Workflow unit capability "${domain}:${verb}" -- declare a "prefer" pool to choose which executors serve it.`,
+      };
+    }
+  }
+  return slots;
+}
+
 export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
   advise: {
     description:
@@ -2135,6 +2154,15 @@ export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
       'Canonical coding refactor capability -- behavior-preserving structural change to existing code (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',
     serves: { outputKind: 'change', domain: 'code', mutates: true, behaviorPreserving: true },
   },
+  ...workflowCapabilitySlots({
+    marketing: ['research', 'write', 'publish'],
+    architecture: ['frame', 'shape', 'critique', 'synthesize', 'explain'],
+    business: ['frame', 'perspectives', 'critique', 'synthesize', 'plan'],
+    delphi: ['propose', 'synthesize'],
+    'group-cognition': ['explore', 'critique', 'synthesize'],
+    'nominal-group': ['generate', 'share', 'vote', 'rank'],
+    coding: ['discover', 'explore', 'plan', 'validate', 'implement'],
+  }),
 });
 
 // tsk-47r: `pi` as a second `agent`-kind executor, layered onto this SAME
@@ -2244,6 +2272,68 @@ registerCheck({
   id: 'advise-execute-capabilities-configured',
   description: 'runner.capabilities declares the "advise" and "execute" purpose slots decide --for resolves against (tsk-2uf-3)',
   check: (cwd) => checkAdviseExecuteCapabilitiesConfigured(cwd),
+});
+
+// Every capability a core/domain Workflow unit names must resolve the way
+// bind() resolves it (exact name, then the bare verb). One that does not has
+// no candidate pool, so that unit is refused at run time with no earlier signal.
+// Read straight from the definition files with a line match instead of loading them
+// through the Workflow loader: `fgos setup` runs from copies of fgos that have no
+// installed dependencies, and the loader needs the YAML parser.
+function workflowCapabilityUses(root) {
+  const uses = new Map();
+  const dirs = [];
+  const core = path.join(root, 'core', 'workflows');
+  if (fs.existsSync(core)) dirs.push([core, '']);
+  const domainsDir = path.join(root, 'domains');
+  if (fs.existsSync(domainsDir)) {
+    for (const d of fs.readdirSync(domainsDir, { withFileTypes: true })) {
+      const dir = path.join(domainsDir, d.name, 'workflows');
+      if (d.isDirectory() && fs.existsSync(dir)) dirs.push([dir, `${d.name}/`]);
+    }
+  }
+  for (const [dir, prefix] of dirs) {
+    for (const file of fs.readdirSync(dir).sort()) {
+      if (!/\.(ya?ml|json)$/i.test(file)) continue;
+      const id = `${prefix}${file.replace(/\.[^.]+$/, '')}`;
+      for (const line of fs.readFileSync(path.join(dir, file), 'utf8').split('\n')) {
+        const match = /^\s*"?capability"?\s*:\s*["']?([^\s"',#]+)/.exec(line);
+        if (!match) continue;
+        if (!uses.has(match[1])) uses.set(match[1], new Set());
+        uses.get(match[1]).add(id);
+      }
+    }
+  }
+  return uses;
+}
+
+function checkWorkflowCapabilitiesConfigured(cwd) {
+  const capabilities = readSharedConfig(cwd)?.runner?.capabilities;
+  const declared = capabilities && typeof capabilities === 'object' && !Array.isArray(capabilities) ? capabilities : {};
+  const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+  const uses = workflowCapabilityUses(packageRoot);
+  if (path.resolve(cwd) !== packageRoot) {
+    for (const [capability, ids] of workflowCapabilityUses(cwd)) {
+      uses.set(capability, new Set([...(uses.get(capability) ?? []), ...ids]));
+    }
+  }
+  const missing = [...uses].filter(
+    ([capability]) => !declared[capability] && !(capability.includes(':') && declared[capability.split(':')[1]]),
+  );
+  if (missing.length > 0) {
+    const list = missing.map(([cap, ids]) => `${cap} (${[...ids].join(', ')})`).join('; ');
+    return {
+      passed: false,
+      message: `runner.capabilities has no entry for Workflow capabilities: ${list} -- declare each under runner.capabilities (fgos setup adds every shipped Workflow's)`,
+    };
+  }
+  return { passed: true, message: `every capability a Workflow unit names (${uses.size}) is declared in runner.capabilities` };
+}
+
+registerCheck({
+  id: 'workflow-capabilities-configured',
+  description: 'every capability a core/domain Workflow unit names is declared in runner.capabilities',
+  check: (cwd) => checkWorkflowCapabilitiesConfigured(cwd),
 });
 
 // I19 (core/skills/_shared/capability-matching.md): `serves` is optional at
@@ -4026,6 +4116,46 @@ export function checkTrustStoresReadable(cwd, runnerCfg = {}) {
   return { passed: true, message: notes.length > 0 ? notes.join('; ') : 'no codex-toml or agy trust store declared' };
 }
 
+/**
+ * A confined herdr pane that binds `private-home` starts in an empty home: the account's login only gets
+ * there when the machine-global provider account inventory names it. Without that entry the agent starts
+ * logged out, and the first symptom is a pane sitting at a sign-in screen until the idle limit. This is the
+ * doctor line that names it, per invocation, before a run does.
+ */
+export function checkConfinedPaneAccounts(runnerCfg = {}) {
+  let inventory;
+  try {
+    inventory = providerAccountInventory(runnerCfg);
+  } catch (err) {
+    return { passed: false, message: `provider account inventory is invalid: ${err.message}` };
+  }
+  const expandHome = (value) => String(value ?? '').replace(/^\$\{HOME\}(?=\/|$)/, os.homedir()).replace(/^~(?=\/|$)/, os.homedir());
+  const problems = [];
+  const notes = [];
+  for (const [id, executor] of Object.entries(runnerCfg.executors ?? {})) {
+    for (const inv of executor?.invocations ?? []) {
+      if (inv?.adapter !== 'herdr-spawn' || !(inv.resourceBindings ?? []).some((b) => b?.resource === 'private-home')) continue;
+      const label = `executor "${id}" invocation "${inv.id ?? '?'}"`;
+      const provider = normalizeProviderFamily(executor.providerModel ?? executor.provider);
+      const accounts = Object.values(inventory[provider]?.accounts ?? {});
+      if (accounts.length === 0) {
+        problems.push(`${label}: no runner.providers.${provider}.accounts in the global config, so its pane starts in an empty private home, logged out`);
+        continue;
+      }
+      for (const account of accounts) {
+        const source = account.credentialSource;
+        const home = expandHome(source.home);
+        const files = source.kind === 'home-files' ? source.files : ['auth.json'];
+        const missing = files.filter((rel) => !fs.existsSync(path.join(home, rel)));
+        if (missing.length > 0) problems.push(`${label}: account "${account.id}" is missing ${missing.join(', ')} under ${home}`);
+        else notes.push(`${label}: account "${account.id}" has its ${files.length} credential file(s)`);
+      }
+    }
+  }
+  if (problems.length > 0) return { passed: false, message: problems.join('; ') };
+  return { passed: true, message: notes.length > 0 ? notes.join('; ') : 'no confined herdr invocation binds a private home' };
+}
+
 /** Second reading of the config door's own C5 invariant. Names the executor and
  * the specific flags, because "confinement incomplete" leaves a reader hunting
  * through three booleans for the one that is false. */
@@ -4194,6 +4324,18 @@ registerCheck({
   id: 'trust-store-readable',
   description: 'the agent folder-trust store is readable and carries a usable "projects" object, so a dispatch into a fresh worktree can be pre-trusted instead of stopping at a dialog',
   check: () => checkTrustStoreWritable(),
+});
+
+registerCheck({
+  id: 'confined-pane-accounts',
+  description: 'every confined herdr invocation that binds a private home has an account in the global provider inventory whose credential files exist, so its pane starts logged in',
+  check: (cwd) => {
+    try {
+      return checkConfinedPaneAccounts(loadRunnerConfigFromDir(cwd));
+    } catch (err) {
+      return { passed: true, message: `runner config not loadable here, confined pane accounts not evaluated: ${err.message}` };
+    }
+  },
 });
 
 registerCheck({

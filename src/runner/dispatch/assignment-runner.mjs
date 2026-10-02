@@ -93,6 +93,7 @@ import {
 import { reconcileHerdrSpawnRun, isHerdrSpawnRunStillWorking } from './herdr-reconcile.mjs';
 import { prepareConfinementForLaunch, finalizeConfinementResources } from './confinement/authority.mjs';
 import { buildConfinementRequest } from './confinement/request.mjs';
+import { resolvePosture } from './confinement/policies.mjs';
 import {
   startDetachedRunSupervisorProcess,
   readDetachedRunSupervisorBinding,
@@ -1398,6 +1399,18 @@ export async function executeAssignment(assignment, opts = {}) {
 
   let effectivePolicy = compiledPlan.policy;
 
+  // One confinement path: an Assignment bound by bind() carries its posture, and
+  // that posture alone picks the requirement handed to the Confinement Authority.
+  // Without a binding (direct callers) the plan's own confinement applies as before.
+  const postureBinding = effectiveAssignment.binding || effectiveAssignment.provenance?.binding;
+  const confinementRequirement = postureBinding?.posture
+    ? resolvePosture(postureBinding, { runnerConfig: cfg }).requirement
+    : compiledPlan.policy?.confinement
+      ? (compiledPlan.policy.confinement.mode === 'unconfined'
+          ? { mode: 'unconfined', policyId: null, policy: null }
+          : compiledPlan.policy.confinement)
+      : { mode: 'unconfined', policyId: null, policy: null };
+
   // executor-id-consolidation Step 2 (fallback confinement preservation):
   // captured HERE, before any read-only-redirect or provider-capacity
   // fallback substitution below can reassign `effectivePolicy`/
@@ -1424,6 +1437,13 @@ export async function executeAssignment(assignment, opts = {}) {
   const executorRedirected = resolvedExecutorId !== defaultExecutorId;
   // `let`: see the Phase B note on `compiledPlan` above.
   let resolvedAdapter = compiledPlan?.invocation?.adapter || cfg.executors?.[resolvedExecutorId]?.adapter || cfg.executor?.adapter || 'cli-spawn';
+  // The compiled plan describes the pinned invocation already; this only covers a pin
+  // the plan could not see (a compiled plan that predates the pin on resume).
+  if (hasExplicitInvocationPin) {
+    const pinnedInvocation = cfg.executors?.[resolvedExecutorId]?.invocations
+      ?.find((inv) => inv?.id === opts.cliOverride.preferInvocation && inv?.via === 'cli');
+    if (pinnedInvocation?.adapter) resolvedAdapter = pinnedInvocation.adapter;
+  }
 
   let effectiveCwd = compiledPlan?.invocation?.cwd ?? compiledPlan?.cwd ?? cwd;
   const timeoutMs = opts.timeoutMs ?? cfg.timeoutMs ?? 900000;
@@ -1623,9 +1643,11 @@ export async function executeAssignment(assignment, opts = {}) {
     }
     // H8: a lease can be selected (an account/credentialSource chosen) for
     // a dispatch shape nothing can actually provision that credential
-    // into -- today only the confined bwrap driver's own prepare() copies
-    // credentialSource into the worker's home (confinement/drivers/
-    // bwrap.mjs's provisionSelectedCodexCredential). Narrowly scoped to
+    // into -- only the confined bwrap driver's own prepare() copies
+    // credentialSource into the worker's private home (confinement/drivers/
+    // bwrap.mjs's provisionSelectedCodexCredential), and both cli-spawn and
+    // herdr-spawn reach that prepare() through prepareConfinementForLaunch
+    // with the same providerCapacity. Narrowly scoped to
     // `confinement.mode: 'required'`: that is the one case where the
     // CALLER explicitly declared it needs confinement, so silently
     // running with no credential provisioned (and no sandbox either) is a
@@ -1639,7 +1661,7 @@ export async function executeAssignment(assignment, opts = {}) {
     if (providerCapacitySelection?.status === 'selected') {
       const confinementMode = compiledPlan?.policy?.confinement?.mode;
       const requiresConfinement = confinementMode === 'required';
-      const canProvisionCredential = !requiresConfinement || resolvedAdapter === 'cli-spawn';
+      const canProvisionCredential = !requiresConfinement || resolvedAdapter === 'cli-spawn' || resolvedAdapter === 'herdr-spawn';
       if (requiresConfinement && !canProvisionCredential) {
         try {
           releaseProviderAccountLease({
@@ -1871,9 +1893,9 @@ export async function executeAssignment(assignment, opts = {}) {
       // The prompt is built before Authority preparation. Derive its posture
       // from the same requirement that will be handed to Authority, never
       // from an executor profile's merely requested confinement fragment.
-      confinement: compiledPlan.policy?.confinement
-        ? { requirement: compiledPlan.policy.confinement }
-        : { requirement: { mode: 'unconfined' }, backend: { id: 'none', type: 'none' } },
+      confinement: confinementRequirement.mode === 'unconfined'
+        ? { requirement: { mode: 'unconfined' }, backend: { id: 'none', type: 'none' } }
+        : { requirement: confinementRequirement },
     });
   }
 
@@ -2319,7 +2341,9 @@ export async function executeAssignment(assignment, opts = {}) {
           providerCapacity: providerCapacitySelection,
           context: {
             cwd: effectiveCwd,
-            repoRoot: root,
+            // A workspace-write posture grants the directory the work happens in
+            // (the Unit worktree), never the main checkout that holds fgOS state.
+            repoRoot: postureBinding?.posture === 'workspace-write' ? effectiveCwd : root,
             runDir: path.resolve(runDir),
             fgosDir,
             timeoutMs,
@@ -2334,11 +2358,7 @@ export async function executeAssignment(assignment, opts = {}) {
             controlEpoch,
             launchCommandId,
           },
-          requirement: compiledPlan.policy?.confinement
-            ? (compiledPlan.policy.confinement.mode === 'unconfined'
-                ? { mode: 'unconfined', policyId: null, policy: null }
-                : compiledPlan.policy.confinement)
-            : { mode: 'unconfined', policyId: null, policy: null },
+          requirement: confinementRequirement,
         });
         prepResult = await prepareConfinementForLaunch(confReq, { adapterPort: opts.adapterPort });
       } catch (err) {
@@ -2544,7 +2564,11 @@ export async function executeAssignment(assignment, opts = {}) {
           agentType: opts.agentType,
           runDir: path.resolve(runDir),
           dispatchBatchKey: opts.dispatchBatchKey,
-          effectiveContract,
+          // The persisted contract does not name the role; the brief a pane worker reads has to
+          // (an assessment role must be told its claim needs assessment.verdict).
+          effectiveContract: effectiveContract
+            ? { ...effectiveContract, assignment: { role: effectiveAssignment.role, operation: effectiveAssignment.operation } }
+            : effectiveContract,
           // needsAssignmentLaunchContext (herdr-spawn, and any other
           // out-of-process adapter besides cli-spawn) reuses the SAME
           // assignmentLaunchContext identity built above -- executeExecutorCli
@@ -2559,16 +2583,48 @@ export async function executeAssignment(assignment, opts = {}) {
           // null here and this call is byte-identical to before this fix.
           ...(needsAssignmentLaunchContext ? { assignmentLaunchContext, launchCommandId, controlEpoch, controlToken } : {}),
           ...(providerCapacitySelection ? { providerCapacity: providerCapacitySelection } : {}),
+          // Read-only Assignments never take the per-cwd lock on the supervisor path above; the
+          // herdr door holds its own, so it is told the same thing or a panel's panelists collide.
+          ...(effectiveMutation !== 'mutating' ? { sharedCwd: true } : {}),
+          // The one confinement path: the posture an Assignment was bound with decides
+          // what wraps the agent in its pane, exactly as it does for cli-spawn.
+          ...(postureBinding?.posture
+            ? {
+                requirement: confinementRequirement,
+                ...(postureBinding.posture === 'workspace-write' ? { workspaceRoot: effectiveCwd } : {}),
+              }
+            : {}),
+          ...(hasExplicitInvocationPin ? { invocationId: opts.cliOverride.preferInvocation } : {}),
         });
       } catch (err) {
         executionError = err;
-        const isTimeoutErr = err.errorClass === 'worker-timeout' || err.category === 'worker-timeout' || /timed out/i.test(err.message);
+        // The herdr round names the real reason beside the coarse error class; a
+        // provider limit is not a timeout and must not be settled as one.
+        const limitOutcome = err.outcome === 'provider-limit' || err.outcome === 'paused-limit' ? err.outcome : null;
+        const isTimeoutErr = !limitOutcome && (err.errorClass === 'worker-timeout' || err.category === 'worker-timeout' || /timed out/i.test(err.message));
         rawResult = {
           status: isTimeoutErr ? 'timeout' : 'failed',
           signal: isTimeoutErr ? 'SIGTERM' : null,
           stdout: err.stdout || '',
           stderr: err.stderr || err.message || String(err),
+          ...(limitOutcome ? { adapterOutcome: limitOutcome } : {}),
         };
+      }
+
+      // The herdr door prepares confinement inside executeExecutorCli, so the account provisioning it did
+      // is only visible in the prepared-invocation record it published, not in a return value here.
+      if (providerCapacityEvidence && providerCapacityEvidence.credentialProvisioned !== true && needsAssignmentLaunchContext && launchCommandId) {
+        try {
+          const record = JSON.parse(fs.readFileSync(path.join(runDir, 'protected', 'prepared-invocation', `${launchCommandId}.json`), 'utf8'));
+          if (record?.providerCapacity?.credentialProvisioned === true) {
+            providerCapacityEvidence = { ...providerCapacityEvidence, credentialProvisioned: true };
+            const selectionPath = path.join(runDir, 'provider-capacity-selection.json');
+            fs.writeFileSync(selectionPath, `${JSON.stringify(providerCapacityEvidence, null, 2)}\n`);
+            fsyncFileBestEffort(selectionPath);
+          }
+        } catch {
+          // No record, or an unreadable one: the evidence keeps saying "not provisioned", which is the safe claim.
+        }
       }
 
       // The adapter call above is the ONE async gap this control token has to
@@ -2620,7 +2676,8 @@ export async function executeAssignment(assignment, opts = {}) {
       launchCommandId: useSupervisorRecovery ? launchCommandId : null,
       receipt: supervisorReceipt,
       adapterOutcome: rawResult?.adapterOutcome || rawResult?.outcome || rawResult?.status,
-      opts: { ...opts, repoRoot: root, cwd },
+      // The adapter that really ran, so result.json states the transport instead of a guess.
+      opts: { ...opts, adapter: resolvedAdapter, repoRoot: root, cwd },
     });
     return outcome.runResult;
   } finally {

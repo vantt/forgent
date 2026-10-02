@@ -1,0 +1,9 @@
+{
+  "id": "p6-provider-probe",
+  "objective": "Read-only posture and account probe. The commands below are authorized by this objective; the first two are EXPECTED to fail and the failure output is the evidence, so run them anyway. Report each command, its verbatim output and its exit code. (1) Run `touch POSTURE-PROBE.txt` in the repository root. (2) Run `echo probe >> src/runner/execution/bind.mjs`. (3) Print the names and values of the environment variables CODEX_HOME, HOME and PI_CODING_AGENT_DIR that are set (values only of those three; do not read or print the contents of any file under them). (4) If a `codex` command exists, run `codex login status` and quote its one-line output; otherwise write 'no codex'. Do not modify any repository file. The outbox files named in your brief are the one place you may write, and you must write them.",
+  "capability": "review",
+  "writes": [],
+  "dependsOn": [],
+  "inputs": [],
+  "expectedOutputs": []
+}

@@ -1,0 +1,164 @@
+{
+  "unit": {
+    "id": "p6-ca2-posture",
+    "objective": "Write a 4 to 6 line markdown note at plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca2-posture-note.md saying what the read-only posture is for a reviewer (the repository is read-only, only the run outbox is writable), grounded in src/runner/dispatch/confinement/policies.mjs. The producer writes that note and touches no other file. The reviewer verifies the note and ALSO runs a sandbox self-check, as part of the review: (1) try `touch POSTURE-PROBE-reviewer.txt` in its working directory (the repository), (2) try `echo probe >> src/runner/execution/bind.mjs`, then record the exact command output (the error text) of both attempts in its report, and (3) write its report and result into its outbox as instructed. The reviewer must not try to work around a refusal.",
+    "capability": "execute",
+    "rigor": "standard",
+    "writes": [
+      "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca2-posture-note.md"
+    ],
+    "dependsOn": [],
+    "inputs": [],
+    "expectedOutputs": [
+      "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca2-posture-note.md"
+    ]
+  },
+  "overrides": [
+    {
+      "scope": {
+        "role": "producer"
+      },
+      "executor": "claude-herdr",
+      "origin": "human-cli"
+    },
+    {
+      "scope": {
+        "role": "reviewer"
+      },
+      "executor": "glm-herdr",
+      "origin": "human-cli"
+    }
+  ],
+  "worktree": "/var/tmp/p6-accept-work",
+  "createdBy": "vantt",
+  "createdAt": "2026-10-02T09:14:41.774Z",
+  "bindings": {
+    "producer/1": [
+      {
+        "role": "producer",
+        "round": 1,
+        "assignmentId": "unit-run-1790932481767-e16e7a18/producer/1",
+        "binding": {
+          "contractVersion": "v1alpha1",
+          "executor": "claude-herdr",
+          "invocation": "claude-herdr-bwrap",
+          "transport": "herdr",
+          "candidateIndex": 0,
+          "tier": "standard",
+          "model": "sonnet",
+          "persona": null,
+          "mechanism": "out-of-process",
+          "posture": "workspace-write",
+          "provenance": {
+            "executor": {
+              "value": "claude-herdr",
+              "source": "override"
+            },
+            "invocation": {
+              "value": "claude-herdr-bwrap",
+              "source": "override"
+            },
+            "transport": {
+              "value": "herdr",
+              "source": "herdr-invocation-present"
+            },
+            "tier": {
+              "value": "standard",
+              "source": "rigor:standard"
+            },
+            "model": {
+              "value": "sonnet",
+              "source": "resolveTierModel(claude.standard)"
+            },
+            "persona": {
+              "value": null,
+              "source": "none"
+            },
+            "mechanism": {
+              "value": "out-of-process",
+              "source": "decideExecutorDispatchMechanism"
+            },
+            "posture": {
+              "value": "workspace-write",
+              "source": "producer-writes-declared"
+            },
+            "overridesOrigin": {
+              "value": "human-cli",
+              "source": "override"
+            }
+          }
+        },
+        "transport": "herdr",
+        "invocation": "claude-herdr-bwrap",
+        "fallbackFrom": null,
+        "boundAt": "2026-10-02T09:14:41.777Z",
+        "outcome": "pass",
+        "runId": "run_unit-run-1790932481767-e16e7a18/producer/1_01"
+      }
+    ],
+    "reviewer/1": [
+      {
+        "role": "reviewer",
+        "round": 1,
+        "assignmentId": "unit-run-1790932481767-e16e7a18/reviewer/1",
+        "binding": {
+          "contractVersion": "v1alpha1",
+          "executor": "glm-herdr",
+          "invocation": "glm-herdr-bwrap",
+          "transport": "herdr",
+          "candidateIndex": 0,
+          "tier": "standard",
+          "model": "z-ai/glm-5.2",
+          "persona": null,
+          "mechanism": "out-of-process",
+          "posture": "read-only",
+          "provenance": {
+            "executor": {
+              "value": "glm-herdr",
+              "source": "override"
+            },
+            "invocation": {
+              "value": "glm-herdr-bwrap",
+              "source": "override"
+            },
+            "transport": {
+              "value": "herdr",
+              "source": "herdr-invocation-present"
+            },
+            "tier": {
+              "value": "standard",
+              "source": "rigor:standard"
+            },
+            "model": {
+              "value": "z-ai/glm-5.2",
+              "source": "resolveTierModel(z-ai.standard)"
+            },
+            "persona": {
+              "value": null,
+              "source": "none"
+            },
+            "mechanism": {
+              "value": "out-of-process",
+              "source": "checker-role-forced-out-of-process"
+            },
+            "posture": {
+              "value": "read-only",
+              "source": "read-only-ask-or-writes-empty"
+            },
+            "overridesOrigin": {
+              "value": "human-cli",
+              "source": "override"
+            }
+          }
+        },
+        "transport": "herdr",
+        "invocation": "glm-herdr-bwrap",
+        "fallbackFrom": null,
+        "boundAt": "2026-10-02T09:15:08.182Z",
+        "outcome": "pass",
+        "runId": "run_unit-run-1790932481767-e16e7a18/reviewer/1_01"
+      }
+    ]
+  },
+  "configSnapshotHash": "f0b2fc454d0eee271ffb572852f9b600ac5167ca7e24676ffa889b505a1390fe"
+}

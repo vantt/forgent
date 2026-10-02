@@ -1,0 +1,198 @@
+{
+  "selector": {
+    "type": "assignment",
+    "value": "unit-run-1790939810248-f68c3739/producer/1"
+  },
+  "caller": {
+    "role": "driver"
+  },
+  "mechanism": "out-of-process",
+  "executorId": "xai",
+  "capability": "xai",
+  "invocation": {
+    "via": "cli",
+    "adapter": "herdr-spawn",
+    "protocol": "prompt-stdout-v1"
+  },
+  "governance": {
+    "providerFamily": "xai",
+    "egress": {
+      "kind": "cross-provider",
+      "target": "pi",
+      "content": "repo-content"
+    }
+  },
+  "reasonCodes": [
+    "native-first.0033.cli-spawn-shaped"
+  ],
+  "configured": true,
+  "bindingSource": "executor-id",
+  "tier": "standard",
+  "model": "grok-4.3",
+  "providerModel": "xai",
+  "provenance": {
+    "executor": {
+      "value": "xai",
+      "source": {
+        "scope": "cliOverride"
+      }
+    },
+    "provider": {
+      "value": "xai",
+      "source": {
+        "scope": "registeredExecutor",
+        "id": "xai"
+      }
+    },
+    "model": {
+      "value": "grok-4.3",
+      "source": {
+        "scope": "cliOverride"
+      }
+    },
+    "rigor": {
+      "value": "standard",
+      "source": {
+        "scope": "default"
+      }
+    },
+    "tier": {
+      "value": "standard",
+      "source": {
+        "scope": "rigor",
+        "id": "standard"
+      }
+    },
+    "reasoningEffort": {
+      "value": "medium",
+      "source": {
+        "scope": "derived",
+        "id": "rigor.standard"
+      }
+    },
+    "persona": {
+      "source": {
+        "scope": "default"
+      }
+    },
+    "visibility": {
+      "value": "headless",
+      "source": {
+        "scope": "default"
+      }
+    },
+    "repeatMode": {
+      "value": null,
+      "source": {
+        "scope": "default"
+      }
+    },
+    "constraints": {
+      "value": {
+        "requiresSkills": []
+      },
+      "source": {
+        "scope": "assignment",
+        "id": "unit-run-1790939810248-f68c3739/producer/1"
+      }
+    },
+    "governance": {
+      "value": "allowed",
+      "source": {
+        "scope": "governance",
+        "id": "xai"
+      }
+    }
+  },
+  "policy": {
+    "role": "producer",
+    "executorPreference": [
+      "xai"
+    ],
+    "executorId": "xai",
+    "providerModel": "xai",
+    "rigor": "standard",
+    "tier": "standard",
+    "model": "grok-4.3",
+    "reasoningEffort": "medium",
+    "visibility": "headless",
+    "repeatMode": null,
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "xai",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "provider": {
+        "value": "xai",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "xai"
+        }
+      },
+      "model": {
+        "value": "grok-4.3",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "rigor": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "tier": {
+        "value": "standard",
+        "source": {
+          "scope": "rigor",
+          "id": "standard"
+        }
+      },
+      "reasoningEffort": {
+        "value": "medium",
+        "source": {
+          "scope": "derived",
+          "id": "rigor.standard"
+        }
+      },
+      "persona": {
+        "source": {
+          "scope": "default"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "repeatMode": {
+        "value": null,
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "unit-run-1790939810248-f68c3739/producer/1"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "xai"
+        }
+      }
+    }
+  }
+}

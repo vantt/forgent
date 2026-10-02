@@ -229,6 +229,21 @@ function captureHeadSha(cwd) {
 }
 
 /**
+ * A claude REPL in a herdr pane is briefed with a pointer to a file in the run directory,
+ * and the run directory lives under the store, which is outside the worker's cwd (its
+ * worktree). Claude asks the human before reading outside its working directories, and
+ * nobody is there to answer -- the worker stalls on the prompt. The run directory is the
+ * only place it must read that is not in its worktree (the brief) or write (the outbox),
+ * so exactly that directory is added as a working directory, nothing broader. This is
+ * claude's own permission prompt; the OS-level posture is unchanged.
+ */
+export function withRunDirReadAccess({ adapter, interactiveMode, args, runDir }) {
+  if (adapter !== 'herdr-spawn' || interactiveMode?.kind !== 'claude' || !runDir) return args;
+  if (!Array.isArray(args) || args.includes('--add-dir')) return args;
+  return [...args, '--add-dir', path.resolve(runDir)];
+}
+
+/**
  * `execute <executorId>` CLI subcommand (tsk-5tm-3 D5): the self-execute
  * counterpart to `resolve` above, matching marketing-cockpit's `run_task()`
  * contract (`task-executor.py:550-611`) — self-execute for every case that
@@ -316,6 +331,22 @@ export async function executeExecutorCli(
     controlEpoch,
     controlToken,
     effectiveContract,
+    // Names which `via:"cli"` invocation of the executor runs (bind() pins the
+    // herdr-spawn one when herdr is the transport). Unset keeps the first cli one.
+    invocationId,
+    // The confinement requirement the caller already resolved (an Assignment's
+    // posture). Unset leaves it to the capability/invocation declaration.
+    requirement,
+    // Directory the confinement authority treats as the writable workspace when the
+    // requirement grants one; defaults to the main checkout root.
+    workspaceRoot,
+    // The provider account an Assignment run leased. Its credential source is what
+    // the confined driver copies into the worker's private home; without it a
+    // confined pane starts without the account's login.
+    providerCapacity,
+    // The dispatch cannot write the workspace (a read-only posture), so it shares the directory with
+    // other dispatches instead of holding it exclusively.
+    sharedCwd = false,
   } = {},
 ) {
   const purpose = purposeArg;
@@ -439,7 +470,7 @@ export async function executeExecutorCli(
         // value-preserving (still `undefined`) for all of them; it only
         // stops the `ReferenceError: opts is not defined` crash this
         // function hit on every call.
-        providerCapacity: options?.providerCapacity,
+        providerCapacity: providerCapacity ?? options?.providerCapacity,
         authorityScope: 'external-harness',
         invocation: {
           agentType,
@@ -564,14 +595,18 @@ export async function executeExecutorCli(
     contentCarries: carries,
     attestRoot: cwd,
     resolvedAgentType,
+    invocationId,
   });
   const timeoutMs = timeoutOverride ?? cfg.timeoutMs;
   const idleTimeoutMs = idleTimeoutOverride ?? cfg.idleTimeoutMs;
   const maxBuffer = maxBufferOverride ?? 10 * 1024 * 1024;
 
+  // One dispatch at a time per working directory, because two writers in one tree race. A caller that
+  // knows the dispatch cannot write the workspace (a read-only posture) shares the directory instead:
+  // the panelists of one panel run side by side in the same checkout.
   const identity = `${process.pid}:${Date.now()}:${Math.random().toString(36).slice(2)}`;
   const lockFile = dispatchLockFile(cwd);
-  const lockRes = acquireMainCheckoutLock(fgosDir, {
+  const lockRes = sharedCwd ? null : acquireMainCheckoutLock(fgosDir, {
     identity,
     ttlMs: timeoutMs,
     now: Date.now(),
@@ -579,7 +614,7 @@ export async function executeExecutorCli(
     lockFile,
   });
 
-  if (lockRes.status === HELD) {
+  if (lockRes?.status === HELD) {
     const ageStr = formatLockDurationMs(lockRes.lockAgeMs);
     throw new DispatchError(
       'dispatch-in-flight',
@@ -587,14 +622,14 @@ export async function executeExecutorCli(
       { cwd, lockAgeMs: lockRes.lockAgeMs, remainingTtlMs: lockRes.remainingTtlMs, holderPid: lockRes.holderPid },
     );
   }
-  if (lockRes.status === AMBIGUOUS) {
+  if (lockRes?.status === AMBIGUOUS) {
     throw new DispatchError(
       'dispatch-in-flight',
       `dispatch lock for cwd "${cwd}" is ambiguous (corrupt or unparseable lock file).`,
       { cwd, lockAgeMs: lockRes.lockAgeMs },
     );
   }
-  if (lockRes.status !== ACQUIRED) {
+  if (lockRes && lockRes.status !== ACQUIRED) {
     throw new DispatchError(
       'dispatch-in-flight',
       `dispatch lock for cwd "${cwd}" could not be acquired (status: ${lockRes.status}).`,
@@ -613,10 +648,12 @@ export async function executeExecutorCli(
   // no longer owns the lock, so it is safe to call on every tick regardless
   // of how the run ends.
   const heartbeatIntervalMs = Math.max(250, Math.floor(timeoutMs / 3));
-  const heartbeat = setInterval(() => {
-    renewMainCheckoutLockIfOwn(fgosDir, identity, { lockFile });
-  }, heartbeatIntervalMs);
-  heartbeat.unref();
+  const heartbeat = lockRes
+    ? setInterval(() => {
+      renewMainCheckoutLockIfOwn(fgosDir, identity, { lockFile });
+    }, heartbeatIntervalMs)
+    : null;
+  heartbeat?.unref();
 
   try {
     process.stderr.write(
@@ -648,10 +685,11 @@ export async function executeExecutorCli(
         assignmentLaunchContext,
         // Same pre-existing `opts`-is-not-defined fix as the in-process
         // branch above -- see its comment.
-        providerCapacity: options?.providerCapacity,
+        providerCapacity: providerCapacity ?? options?.providerCapacity,
+        ...(requirement ? { requirement } : {}),
         invocation: {
           command,
-          args,
+          args: withRunDirReadAccess({ adapter, interactiveMode, args, runDir: opened.runDir }),
           argsTemplate,
           prompt,
           env,
@@ -669,7 +707,7 @@ export async function executeExecutorCli(
         },
         context: {
           cwd,
-          repoRoot: root,
+          repoRoot: workspaceRoot ?? root,
           runDir: opened.runDir,
           fgosDir,
           timeoutMs,
@@ -755,8 +793,8 @@ export async function executeExecutorCli(
     const base = buildDispatchResult({ mechanism, result: resultToBuild, headBefore, headAfter, lostUncommittedPaths, provider, command });
     return resolvedByPurpose ? { ...base, executorId } : base;
   } finally {
-    clearInterval(heartbeat);
-    lockRes.release();
+    if (heartbeat) clearInterval(heartbeat);
+    lockRes?.release();
   }
 
 }

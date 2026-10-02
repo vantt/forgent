@@ -1,0 +1,115 @@
+{
+  "assignmentId": "unit-run-1790934553748-4d3a3007/producer/1",
+  "unitRunId": "unit-run-1790934553748-4d3a3007",
+  "role": "producer",
+  "round": 1,
+  "objective": "Read src/runner/execution/bind.mjs lines 250-270 and say in your report, in one sentence, which two values the transport variable can take. Do not modify any file.",
+  "mutation": "read-only",
+  "binding": {
+    "contractVersion": "v1alpha1",
+    "executor": "fake-limit",
+    "invocation": "fake-limit-herdr",
+    "transport": "herdr",
+    "candidateIndex": 0,
+    "tier": "standard",
+    "model": "fake",
+    "persona": null,
+    "mechanism": "out-of-process",
+    "posture": "read-only",
+    "provenance": {
+      "executor": {
+        "value": "fake-limit",
+        "source": "capability:acceptance:limit"
+      },
+      "invocation": {
+        "value": "fake-limit-herdr",
+        "source": "capability:acceptance:limit"
+      },
+      "transport": {
+        "value": "herdr",
+        "source": "herdr-invocation-present"
+      },
+      "tier": {
+        "value": "standard",
+        "source": "rigor:standard"
+      },
+      "model": {
+        "value": "fake",
+        "source": "resolveTierModel(fakelimit.standard)"
+      },
+      "persona": {
+        "value": null,
+        "source": "none"
+      },
+      "mechanism": {
+        "value": "out-of-process",
+        "source": "decideExecutorDispatchMechanism"
+      },
+      "posture": {
+        "value": "read-only",
+        "source": "read-only-ask-or-writes-empty"
+      }
+    }
+  },
+  "provenance": {
+    "kind": "unit-run",
+    "unitRunId": "unit-run-1790934553748-4d3a3007",
+    "role": "producer",
+    "round": 1,
+    "binding": {
+      "contractVersion": "v1alpha1",
+      "executor": "fake-limit",
+      "invocation": "fake-limit-herdr",
+      "transport": "herdr",
+      "candidateIndex": 0,
+      "tier": "standard",
+      "model": "fake",
+      "persona": null,
+      "mechanism": "out-of-process",
+      "posture": "read-only",
+      "provenance": {
+        "executor": {
+          "value": "fake-limit",
+          "source": "capability:acceptance:limit"
+        },
+        "invocation": {
+          "value": "fake-limit-herdr",
+          "source": "capability:acceptance:limit"
+        },
+        "transport": {
+          "value": "herdr",
+          "source": "herdr-invocation-present"
+        },
+        "tier": {
+          "value": "standard",
+          "source": "rigor:standard"
+        },
+        "model": {
+          "value": "fake",
+          "source": "resolveTierModel(fakelimit.standard)"
+        },
+        "persona": {
+          "value": null,
+          "source": "none"
+        },
+        "mechanism": {
+          "value": "out-of-process",
+          "source": "decideExecutorDispatchMechanism"
+        },
+        "posture": {
+          "value": "read-only",
+          "source": "read-only-ask-or-writes-empty"
+        }
+      }
+    }
+  },
+  "expectedOutputs": [],
+  "contextRefs": [],
+  "writes": [],
+  "policy": {
+    "tier": "standard",
+    "preferExecutor": "fake-limit",
+    "preferInvocation": "fake-limit-herdr",
+    "preferPersona": null
+  }
+}

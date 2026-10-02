@@ -8,7 +8,10 @@
 //   - validateOverrideConfinementShape: checks that invocation overrides only narrow/harden posture
 //   - normalizeLegacyConfinement: converts legacy {privateHome, isolatedSession, ownWorktree} to v1 controls
 
+import fs from 'node:fs';
 import net from 'node:net';
+import path from 'node:path';
+import { loadMachineBackendRegistry } from './backend-registry.mjs';
 
 export class ConfinementPolicyError extends Error {
   constructor(message) {
@@ -636,58 +639,88 @@ export function resolveConfinementPolicy(policyId, customPolicies = {}) {
   return null;
 }
 /**
- * Resolve posture into confinement parameters (Phase 6 / X-1).
+ * Map a binding posture onto the one existing confinement path.
  *
- * @param {object} binding { executor, invocation, posture, transport }
- * @param {object} [ctx] { runnerConfig, session, runDir, cwd, repoRoot }
- * @returns {object} { policyId, policy, bwrapArgs, envPatch }
+ * Returns a `requirement` shaped for `buildConfinementRequest({ requirement })`;
+ * the backend driver (confinement/drivers/bwrap.mjs) builds the actual argv from
+ * the policy's grants, so nothing here assembles sandbox arguments.
+ *
+ * @param {object} binding { posture } -- anything but 'workspace-write' resolves read-only
+ * @param {object} [ctx] { runnerConfig }
+ * @returns {{ posture: string, policyId: string, policy: object, requirement: object }}
  */
 export function resolvePosture(binding, ctx = {}) {
-  const posture = binding?.posture ?? 'read-only';
+  const posture = binding?.posture === 'workspace-write' ? 'workspace-write' : 'read-only';
   const policyId = posture === 'workspace-write' ? 'workspace-write' : 'host-write-denied';
   const policy = resolveConfinementPolicy(policyId, ctx.runnerConfig?.confinementPolicies);
-
-  const runDir = ctx.runDir || ctx.context?.runDir;
-  const cwd = ctx.cwd || ctx.context?.cwd || process.cwd();
-  const repoRoot = ctx.repoRoot || ctx.context?.repoRoot || cwd;
-
-  const bwrapArgs = [
-    '--ro-bind', '/', '/',
-    '--dev', '/dev',
-    '--proc', '/proc',
-    '--tmpfs', '/tmp',
-  ];
-
-  if (runDir) {
-    bwrapArgs.push('--bind', runDir, runDir);
-  }
-
-  if (posture === 'workspace-write') {
-    bwrapArgs.push('--bind', repoRoot, repoRoot);
-    if (cwd !== repoRoot && !cwd.startsWith(repoRoot)) {
-      bwrapArgs.push('--bind', cwd, cwd);
-    }
-  }
-
   return {
     posture,
     policyId,
     policy,
-    bwrapArgs,
+    requirement: { mode: 'required', policyId, policy },
   };
 }
 
+function resolveExecutableOnPath(executable, envPath = process.env.PATH ?? '') {
+  const dirs = executable.includes('/') ? [''] : envPath.split(path.delimiter).filter(Boolean);
+  for (const dir of dirs) {
+    const full = dir ? path.join(dir, executable) : executable;
+    try {
+      fs.accessSync(full, fs.constants.X_OK);
+      return true;
+    } catch {
+      // try next PATH entry
+    }
+  }
+  return false;
+}
+
+function pickConfinedInvocation(executorEntry, invocationId) {
+  const invocations = Array.isArray(executorEntry?.invocations) ? executorEntry.invocations : [];
+  if (invocationId) {
+    const named = invocations.find((inv) => inv?.id === invocationId);
+    return named ? { inv: named, effective: named.confinement ?? executorEntry.confinement } : null;
+  }
+  const withBackend = invocations.find((inv) => inv?.via === 'cli' && (inv.confinement ?? executorEntry.confinement)?.backend);
+  if (withBackend) return { inv: withBackend, effective: withBackend.confinement ?? executorEntry.confinement };
+  return executorEntry?.confinement ? { inv: null, effective: executorEntry.confinement } : null;
+}
+
 /**
- * Check whether a candidate executor/invocation can apply the given posture.
+ * Whether a candidate executor/invocation can really apply a posture on this
+ * machine: it declares a confinement backend and that backend is enabled in the
+ * machine registry with a usable executable. Any other answer is false, so
+ * bind() drops the candidate instead of the run going out unconfined.
  *
  * @param {object} candidate { executor, invocation }
- * @param {string} posture 'read-only' | 'workspace-write'
- * @param {object} [ctx]
+ * @param {string} posture 'read-only' | 'workspace-write' (both need the same backend)
+ * @param {object} [ctx] { runnerConfig, executors, registryPath, envPath }
  * @returns {boolean}
  */
 export function canApplyPosture(candidate, posture, ctx = {}) {
   if (!candidate || !candidate.executor) return false;
-  // In Phase 6, all registered executors on Linux can apply OS confinement posture (bwrap)
-  // or native workspace-write.
-  return true;
+  const executors = ctx.executors ?? ctx.runnerConfig?.executors ?? ctx.runnerConfig?.runner?.executors ?? {};
+  const executorEntry = executors[candidate.executor];
+  if (!executorEntry) return false;
+
+  // A pure native agent (no command, adapter or invocation) runs inside the
+  // Lead's own session as an in-process capability: there is no spawned process
+  // for an OS backend to wrap, and checker roles are never bound to it.
+  if (executorEntry.agentType && !executorEntry.command && !executorEntry.adapter && !executorEntry.invocations) {
+    return true;
+  }
+
+  const picked = pickConfinedInvocation(executorEntry, candidate.invocation);
+  const backendId = picked?.effective?.backend;
+  if (typeof backendId !== 'string' || !backendId) return false;
+
+  let registry;
+  try {
+    registry = ctx.registryPath ? loadMachineBackendRegistry(ctx.registryPath) : loadMachineBackendRegistry();
+  } catch {
+    return false;
+  }
+  const instance = registry?.confinementBackends?.[backendId];
+  if (!instance || instance.enabled === false || instance.type !== 'bwrap') return false;
+  return resolveExecutableOnPath(instance.executable || 'bwrap', ctx.envPath);
 }

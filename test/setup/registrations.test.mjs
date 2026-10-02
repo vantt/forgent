@@ -198,6 +198,34 @@ test('ensureSharedConfigDefaults on an already-complete shared file does not rew
   assert.equal(fs.statSync(sharedPath).mtimeMs, before);
 });
 
+const WORKFLOW_CAPABILITIES = [
+  'marketing:research', 'marketing:write', 'marketing:publish',
+  'architecture:frame', 'architecture:shape', 'architecture:critique', 'architecture:synthesize', 'architecture:explain',
+  'business:frame', 'business:perspectives', 'business:critique', 'business:synthesize', 'business:plan',
+];
+
+test('ensureSharedConfigDefaults on an empty project registers the Workflow capabilities', () => {
+  const dir = mkTempDir();
+  const { config } = ensureSharedConfigDefaults(dir);
+  for (const name of WORKFLOW_CAPABILITIES) {
+    assert.equal(typeof config.runner.capabilities[name]?.description, 'string', `${name} missing`);
+  }
+});
+
+test('ensureSharedConfigDefaults adds missing Workflow capabilities without touching one the project already tuned', () => {
+  const dir = mkTempDir();
+  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
+  const tuned = { description: 'project taste', prefer: [{ executor: 'mine' }] };
+  fs.writeFileSync(
+    path.join(dir, '.fgos', 'config.json'),
+    JSON.stringify({ runner: { capabilities: { 'marketing:write': tuned } } }),
+  );
+  const { config } = ensureSharedConfigDefaults(dir);
+  assert.deepEqual(config.runner.capabilities['marketing:write'], tuned);
+  assert.ok(config.runner.capabilities['marketing:research']);
+  assert.ok(config.runner.capabilities['business:plan']);
+});
+
 // ─── spec/registry agreement. Data Dictionary #7 and #7b used to say the
 // list "grows without a spec update whenever a module registers a new one",
 // which let it rot: a module registered `claude-plugin-marketplace` as both

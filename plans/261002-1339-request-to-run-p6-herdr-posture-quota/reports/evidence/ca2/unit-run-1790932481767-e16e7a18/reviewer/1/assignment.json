@@ -1,0 +1,127 @@
+{
+  "assignmentId": "unit-run-1790932481767-e16e7a18/reviewer/1",
+  "unitRunId": "unit-run-1790932481767-e16e7a18",
+  "role": "reviewer",
+  "round": 1,
+  "objective": "Write a 4 to 6 line markdown note at plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca2-posture-note.md saying what the read-only posture is for a reviewer (the repository is read-only, only the run outbox is writable), grounded in src/runner/dispatch/confinement/policies.mjs. The producer writes that note and touches no other file. The reviewer verifies the note and ALSO runs a sandbox self-check, as part of the review: (1) try `touch POSTURE-PROBE-reviewer.txt` in its working directory (the repository), (2) try `echo probe >> src/runner/execution/bind.mjs`, then record the exact command output (the error text) of both attempts in its report, and (3) write its report and result into its outbox as instructed. The reviewer must not try to work around a refusal.",
+  "mutation": "read-only",
+  "binding": {
+    "contractVersion": "v1alpha1",
+    "executor": "glm-herdr",
+    "invocation": "glm-herdr-bwrap",
+    "transport": "herdr",
+    "candidateIndex": 0,
+    "tier": "standard",
+    "model": "z-ai/glm-5.2",
+    "persona": null,
+    "mechanism": "out-of-process",
+    "posture": "read-only",
+    "provenance": {
+      "executor": {
+        "value": "glm-herdr",
+        "source": "override"
+      },
+      "invocation": {
+        "value": "glm-herdr-bwrap",
+        "source": "override"
+      },
+      "transport": {
+        "value": "herdr",
+        "source": "herdr-invocation-present"
+      },
+      "tier": {
+        "value": "standard",
+        "source": "rigor:standard"
+      },
+      "model": {
+        "value": "z-ai/glm-5.2",
+        "source": "resolveTierModel(z-ai.standard)"
+      },
+      "persona": {
+        "value": null,
+        "source": "none"
+      },
+      "mechanism": {
+        "value": "out-of-process",
+        "source": "checker-role-forced-out-of-process"
+      },
+      "posture": {
+        "value": "read-only",
+        "source": "read-only-ask-or-writes-empty"
+      },
+      "overridesOrigin": {
+        "value": "human-cli",
+        "source": "override"
+      }
+    }
+  },
+  "provenance": {
+    "kind": "unit-run",
+    "unitRunId": "unit-run-1790932481767-e16e7a18",
+    "role": "reviewer",
+    "round": 1,
+    "binding": {
+      "contractVersion": "v1alpha1",
+      "executor": "glm-herdr",
+      "invocation": "glm-herdr-bwrap",
+      "transport": "herdr",
+      "candidateIndex": 0,
+      "tier": "standard",
+      "model": "z-ai/glm-5.2",
+      "persona": null,
+      "mechanism": "out-of-process",
+      "posture": "read-only",
+      "provenance": {
+        "executor": {
+          "value": "glm-herdr",
+          "source": "override"
+        },
+        "invocation": {
+          "value": "glm-herdr-bwrap",
+          "source": "override"
+        },
+        "transport": {
+          "value": "herdr",
+          "source": "herdr-invocation-present"
+        },
+        "tier": {
+          "value": "standard",
+          "source": "rigor:standard"
+        },
+        "model": {
+          "value": "z-ai/glm-5.2",
+          "source": "resolveTierModel(z-ai.standard)"
+        },
+        "persona": {
+          "value": null,
+          "source": "none"
+        },
+        "mechanism": {
+          "value": "out-of-process",
+          "source": "checker-role-forced-out-of-process"
+        },
+        "posture": {
+          "value": "read-only",
+          "source": "read-only-ask-or-writes-empty"
+        },
+        "overridesOrigin": {
+          "value": "human-cli",
+          "source": "override"
+        }
+      }
+    }
+  },
+  "expectedOutputs": [
+    "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca2-posture-note.md"
+  ],
+  "contextRefs": [],
+  "writes": [
+    "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca2-posture-note.md"
+  ],
+  "policy": {
+    "tier": "standard",
+    "preferExecutor": "glm-herdr",
+    "preferInvocation": "glm-herdr-bwrap",
+    "preferPersona": null
+  }
+}

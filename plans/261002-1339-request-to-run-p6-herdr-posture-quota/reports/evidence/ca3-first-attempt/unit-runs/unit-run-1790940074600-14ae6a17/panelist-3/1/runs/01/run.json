@@ -1,0 +1,21 @@
+{
+  "contract": "assignment-run.v2",
+  "runId": "run_unit-run-1790940074600-14ae6a17/panelist-3/1_01",
+  "assignmentId": "unit-run-1790940074600-14ae6a17/panelist-3/1",
+  "attempt": 1,
+  "supersedesRunId": null,
+  "retryId": null,
+  "payloadDigest": "sha256:a546a36064448745096bea766531257932fa7df511c808d85f0043efcaf17258",
+  "dispatchPlanDigest": "sha256:fc4276c336d38c9ee59db301c6f4a386ce61347bdbfc5d3981b12e05f1693187",
+  "phase": "admitted",
+  "delivery": "not-sent",
+  "executorId": "gemini",
+  "dispatchPlanPath": ".fgos/assignments/unit-run-1790940074600-14ae6a17/panelist-3/1/runs/01/dispatch-plan.json",
+  "effectiveContractPath": ".fgos/assignments/unit-run-1790940074600-14ae6a17/panelist-3/1/runs/01/effective-execution-contract.json",
+  "cwd": "/home/vantt/projects/forgentX-p6",
+  "startedAt": "2026-10-02T11:21:14.771Z",
+  "timeoutMs": 2100000,
+  "status": "settled",
+  "providerCapacitySelectionPath": ".fgos/assignments/unit-run-1790940074600-14ae6a17/panelist-3/1/runs/01/provider-capacity-selection.json",
+  "settledAt": "2026-10-02T11:21:14.901Z"
+}

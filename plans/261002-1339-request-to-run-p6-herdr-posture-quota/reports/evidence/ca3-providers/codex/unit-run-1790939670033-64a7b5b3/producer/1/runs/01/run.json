@@ -1,0 +1,21 @@
+{
+  "contract": "assignment-run.v2",
+  "runId": "run_unit-run-1790939670033-64a7b5b3/producer/1_01",
+  "assignmentId": "unit-run-1790939670033-64a7b5b3/producer/1",
+  "attempt": 1,
+  "supersedesRunId": null,
+  "retryId": null,
+  "payloadDigest": "sha256:227f9f20df00fc557334de52b6efdaa1f8fc00d86a4123e8e7b6f8ca177a283a",
+  "dispatchPlanDigest": "sha256:8b44e9e5d3009cf6f1fc44836bf79900c7570dee97ed726ad4c12d77dad01067",
+  "phase": "admitted",
+  "delivery": "not-sent",
+  "executorId": "openai",
+  "dispatchPlanPath": ".fgos/assignments/unit-run-1790939670033-64a7b5b3/producer/1/runs/01/dispatch-plan.json",
+  "effectiveContractPath": ".fgos/assignments/unit-run-1790939670033-64a7b5b3/producer/1/runs/01/effective-execution-contract.json",
+  "cwd": "/var/tmp/p6-accept-work",
+  "startedAt": "2026-10-02T11:14:30.051Z",
+  "timeoutMs": 2100000,
+  "status": "settled",
+  "providerCapacitySelectionPath": ".fgos/assignments/unit-run-1790939670033-64a7b5b3/producer/1/runs/01/provider-capacity-selection.json",
+  "settledAt": "2026-10-02T11:15:42.335Z"
+}

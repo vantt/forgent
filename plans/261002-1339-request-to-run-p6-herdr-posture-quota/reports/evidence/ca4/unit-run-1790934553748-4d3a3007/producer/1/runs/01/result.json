@@ -1,0 +1,177 @@
+{
+  "contract": {
+    "id": "assignment-run-result",
+    "version": 3
+  },
+  "runId": "run_unit-run-1790934553748-4d3a3007/producer/1_01",
+  "assignmentId": "unit-run-1790934553748-4d3a3007/producer/1",
+  "controlEpoch": 1,
+  "controlToken": "c7b4eefa-3b2d-4e02-a6aa-030ff1d9af65",
+  "executorId": "fake-limit",
+  "adapter": "herdr-spawn",
+  "confinement": null,
+  "role": "producer",
+  "executorRedirected": false,
+  "policy": {
+    "role": "producer",
+    "executorPreference": [
+      "fake-limit"
+    ],
+    "executorId": "fake-limit",
+    "providerModel": "fakelimit",
+    "rigor": "standard",
+    "tier": "standard",
+    "model": "fake",
+    "reasoningEffort": "medium",
+    "visibility": "headless",
+    "repeatMode": null,
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "fake-limit",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "provider": {
+        "value": "fakelimit",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "fake-limit"
+        }
+      },
+      "model": {
+        "value": "fake",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "rigor": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "tier": {
+        "value": "standard",
+        "source": {
+          "scope": "rigor",
+          "id": "standard"
+        }
+      },
+      "reasoningEffort": {
+        "value": "medium",
+        "source": {
+          "scope": "derived",
+          "id": "rigor.standard"
+        }
+      },
+      "persona": {
+        "source": {
+          "scope": "default"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "repeatMode": {
+        "value": null,
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "unit-run-1790934553748-4d3a3007/producer/1"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "fakelimit"
+        }
+      }
+    }
+  },
+  "settledAt": "2026-10-02T09:50:18.367Z",
+  "durationMs": 64555,
+  "settleReports": [],
+  "classification": {
+    "execution": {
+      "status": "failed",
+      "exitCode": 1
+    },
+    "assessment": {
+      "verdict": "not-applicable"
+    },
+    "confidence": {
+      "level": "failed",
+      "basis": [
+        "captured-stdout",
+        "failed-exit"
+      ]
+    },
+    "failure": {
+      "family": "provider",
+      "code": "provider-limit"
+    },
+    "policy": {
+      "disposition": "needs-input",
+      "code": "provider-limit"
+    },
+    "delivery": {
+      "mode": "fresh"
+    },
+    "provenance": "native-v3",
+    "outcome": {
+      "category": "infra",
+      "reason": "provider-limit"
+    }
+  },
+  "runtime": {
+    "exitCode": 1,
+    "stdoutLog": ".fgos/assignments/unit-run-1790934553748-4d3a3007/producer/1/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/unit-run-1790934553748-4d3a3007/producer/1/runs/01/stderr.log"
+  },
+  "runnerNote": {
+    "summary": "executor for work \"fake-limit\" ended as provider-limit: the screen says a provider limit was reached. Last line on screen: Claude usage limit reached. Pane wS:p3TP is left open."
+  },
+  "usage": {
+    "inputTokens": null,
+    "outputTokens": null,
+    "totalTokens": null,
+    "cacheReadTokens": null,
+    "cacheCreationTokens": null,
+    "source": "unsupported"
+  },
+  "evidence": {
+    "gitBefore": "eb8898f95933d7b8428ab68aa63e0f7f2549b01a",
+    "gitAfter": "eb8898f95933d7b8428ab68aa63e0f7f2549b01a",
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [],
+    "mutatedDirtyBeforeFiles": [],
+    "attribution": [
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca2-posture-note.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      }
+    ],
+    "artifacts": [],
+    "tests": []
+  }
+}

@@ -18,11 +18,16 @@ import {
   loadWorkflow,
   discoverWorkflows,
 } from '../../src/workflow/index.mjs';
+import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
+
+seedFileLocalBwrapRegistry();
+// bwrap mounts a tmpfs over /tmp, so confined workers can only see fixtures elsewhere.
+const FIXTURE_ROOT = fs.existsSync('/var/tmp') ? '/var/tmp' : os.tmpdir();
 
 const BIN_FGOS = path.resolve('bin/fgos.mjs');
 
 function setupTestRepo() {
-  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-disc-wf-test-'));
+  const tmp = fs.mkdtempSync(path.join(FIXTURE_ROOT, 'fgos-disc-wf-test-'));
   execFileSync('git', ['init', '-b', 'main'], { cwd: tmp, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.name', 'Workflow Test'], { cwd: tmp, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.email', 'wf@test.local'], { cwd: tmp, stdio: 'ignore' });
@@ -41,7 +46,7 @@ function setupTestRepo() {
     const prompt = process.argv.slice(2).join(' ');
     const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
     if (match) {
-      const runDir = path.dirname(match[1]);
+      const runDir = (() => { const d = path.dirname(match[1]); const o = path.join(d, 'worker-output', 'outbox'); return fs.existsSync(o) ? o : d; })();
       fs.mkdirSync(runDir, { recursive: true });
       fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Discussion Report\\nCompleted finding.\\n');
       fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done' }));
@@ -65,7 +70,7 @@ function setupTestRepo() {
           command: process.execPath,
           args: [echoScript, '{prompt}'],
           providerModel: 'node',
-          invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', command: process.execPath, args: [echoScript, '{prompt}'] }],
+          invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command: process.execPath, args: [echoScript, '{prompt}'] }],
         },
       },
       capabilities: {

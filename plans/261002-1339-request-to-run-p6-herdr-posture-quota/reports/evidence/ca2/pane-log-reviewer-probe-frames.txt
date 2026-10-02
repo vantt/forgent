@@ -1,0 +1,81 @@
+# Distinct pane screens (herdr pane read, every 3s) in which the reviewer pane shows the refused writes; first and last such frame.
+=== 2026-10-02T09:18:48.135Z pane wS:p3TF
+  Thought for 5s, listed 1 directory
+● bind.mjs is unmodified (ends with original export { canApplyPosture };), and the outbox is
+  writable (ack-1.json present). Now I'll write the report and result files.
+● Write(~/projects/forgentX-p6/.fgos/assignments/unit-run-1790932481767-e1…/report-1.md.tmp)
+  ⎿  Wrote 81 lines to ../../../home/vantt/projects/forgentX-p6/.fgos/assignments/unit-
+     run-1790932481767-e16e7a18/reviewer/1/runs/01/outbox/report-1.md.tmp
+      1 # Reviewer report — unit-run-1790932481767-e16e7a18 / reviewer/1 / run 01
+      2
+      3 ## Assignment
+      4
+      5 Role: reviewer (read-only posture). Objective: verify the producer's note at
+      6 `plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca2
+        -posture-note.md`
+      7 is grounded in `src/runner/dispatch/confinement/policies.mjs`, then run a
+      8 sandbox self-check (two write probes into the repository) and record the
+      9 exact refusal output.
+     … +80 lines
+  Ran 1 shell command
+● Write(~/projects/forgentX-p6/.fgos/assignments/unit-run-1790932481767-…/result-1.json.tmp)
+  ⎿  Wrote 1 line to ../../../home/vantt/projects/forgentX-p6/.fgos/assignments/unit-ru
+     n-1790932481767-e16e7a18/reviewer/1/runs/01/outbox/result-1.json.tmp
+      1 {"contract":{"id":"agent-result-claim","version":2},"status":"done","summary"
+        :"Reviewer note at ca2-posture-note.md verified grounded in policies.mjs (hos
+        t-write-denied: hostWrite=deny, run-output grant); both sandbox write probes
+        (touch, >>bind.mjs) refused with 'Read-only file system', host file unmodifie
+        d, outbox writable. Posture holds.","evidenceRefs":["plans/261002-1339-reques
+        t-to-run-p6-herdr-posture-quota/reports/evidence/ca2-posture-note.md","src/ru
+        nner/dispatch/confinement/policies.mjs","src/runner/execution/bind.mjs"],"ass
+        essment":{"verdict":"pass"}}
+✻ Mustering… (3m 38s · ↓ 3.1k tokens)
+  ⎿  Tip: Use /btw to ask a quick side question without interrupting Claude's current work
+────────────────────────────────────────────────────────────────────────────────────────────
+❯
+────────────────────────────────────────────────────────────────────────────────────────────
+  ⚠ Transcript saving is off — inherited CLAUDE_CODE_CHILD_SESSION marker · restart with …
+  🤖 z-ai/glm-5.2  ▰▰▰▰▰▱▱▱▱▱▱▱ 40%  📁 /var/tmp/p6-accept-work  🌿 eb8898f95
+  📝 +84 -0
+  ⏵⏵ auto mode on (shift+tab to cycle)
+=== 2026-10-02T09:19:00.347Z pane wS:p3TF
+● Write(~/projects/forgentX-p6/.fgos/assignments/unit-run-1790932481767-e1…/report-1.md.tmp)
+  ⎿  Wrote 81 lines to ../../../home/vantt/projects/forgentX-p6/.fgos/assignments/unit-
+     run-1790932481767-e16e7a18/reviewer/1/runs/01/outbox/report-1.md.tmp
+      1 # Reviewer report — unit-run-1790932481767-e16e7a18 / reviewer/1 / run 01
+      2
+      3 ## Assignment
+      4
+      5 Role: reviewer (read-only posture). Objective: verify the producer's note at
+      6 `plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca2
+        -posture-note.md`
+      7 is grounded in `src/runner/dispatch/confinement/policies.mjs`, then run a
+      8 sandbox self-check (two write probes into the repository) and record the
+      9 exact refusal output.
+     … +80 lines
+  Ran 1 shell command
+● Write(~/projects/forgentX-p6/.fgos/assignments/unit-run-1790932481767-…/result-1.json.tmp)
+  ⎿  Wrote 1 line to ../../../home/vantt/projects/forgentX-p6/.fgos/assignments/unit-ru
+     n-1790932481767-e16e7a18/reviewer/1/runs/01/outbox/result-1.json.tmp
+      1 {"contract":{"id":"agent-result-claim","version":2},"status":"done","summary"
+        :"Reviewer note at ca2-posture-note.md verified grounded in policies.mjs (hos
+        t-write-denied: hostWrite=deny, run-output grant); both sandbox write probes
+        (touch, >>bind.mjs) refused with 'Read-only file system', host file unmodifie
+        d, outbox writable. Posture holds.","evidenceRefs":["plans/261002-1339-reques
+        t-to-run-p6-herdr-posture-quota/reports/evidence/ca2-posture-note.md","src/ru
+        nner/dispatch/confinement/policies.mjs","src/runner/execution/bind.mjs"],"ass
+        essment":{"verdict":"pass"}}
+  Running 1 shell command…
+  ⎿  $ mv /home/vantt/projects/forgentX-p6/.fgos/assignments/unit-run-1790932481767-e16e7a18
+     /reviewer/1/runs/01/outbox/result-1.json.tmp /home/vantt/projects/forgentX-p6/.fgos/ass
+     ignments/unit-run-1790932481767-e16e7a18/reviewer/1/runs/01/outbox/result-1.json && ls
+     -la /home/vantt/projects/forgentX-p6/.…
+* Mustering… (3m 50s · ↓ 3.3k tokens)
+  ⎿  Tip: Use /btw to ask a quick side question without interrupting Claude's current work
+────────────────────────────────────────────────────────────────────────────────────────────
+❯
+────────────────────────────────────────────────────────────────────────────────────────────
+  ⚠ Transcript saving is off — inherited CLAUDE_CODE_CHILD_SESSION marker · restart with …
+  🤖 z-ai/glm-5.2  ▰▰▰▰▰▱▱▱▱▱▱▱ 40%  📁 /var/tmp/p6-accept-work  🌿 eb8898f95
+  📝 +86 -0
+  ⏵⏵ auto mode on (shift+tab to cycle)

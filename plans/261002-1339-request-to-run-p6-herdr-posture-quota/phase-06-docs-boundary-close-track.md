@@ -1,7 +1,7 @@
 ---
 phase: 6
 title: "Docs + boundary + đóng track"
-status: pending
+status: in-progress
 priority: P2
 effort: "0.5d"
 dependencies: [5]
@@ -33,7 +33,11 @@ Ghi hiện trạng đã chứng minh vào spec/bản đồ component; merge `mai
 
 ## Success Criteria
 
-- [ ] Docs khớp bằng chứng; suite xanh; merge `main`; track đóng (nếu P5 xong).
+- [x] Docs khớp bằng chứng: `docs/specs/runner.md` (quyết định 0050), `docs/platform/component-boundary.md` (bỏ ghi chú chưa nối; không đổi bản đồ component), `CHANGELOG.md`.
+- [x] Track `plan.md` ghi P6 xong kèm bằng chứng và việc còn mở.
+- [ ] Merge `main` (controller, `git merge --no-ff` từ checkout chính).
+- [ ] Track `status: done` (controller lật sau merge; P5 đã merge `main`).
+- [ ] Dọn worktree P6 (gom cuối track).
 
 ## Risk Assessment
 

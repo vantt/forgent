@@ -1,0 +1,127 @@
+{
+  "assignmentId": "unit-run-1790932481767-e16e7a18/producer/1",
+  "unitRunId": "unit-run-1790932481767-e16e7a18",
+  "role": "producer",
+  "round": 1,
+  "objective": "Write a 4 to 6 line markdown note at plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca2-posture-note.md saying what the read-only posture is for a reviewer (the repository is read-only, only the run outbox is writable), grounded in src/runner/dispatch/confinement/policies.mjs. The producer writes that note and touches no other file. The reviewer verifies the note and ALSO runs a sandbox self-check, as part of the review: (1) try `touch POSTURE-PROBE-reviewer.txt` in its working directory (the repository), (2) try `echo probe >> src/runner/execution/bind.mjs`, then record the exact command output (the error text) of both attempts in its report, and (3) write its report and result into its outbox as instructed. The reviewer must not try to work around a refusal.",
+  "mutation": "mutating",
+  "binding": {
+    "contractVersion": "v1alpha1",
+    "executor": "claude-herdr",
+    "invocation": "claude-herdr-bwrap",
+    "transport": "herdr",
+    "candidateIndex": 0,
+    "tier": "standard",
+    "model": "sonnet",
+    "persona": null,
+    "mechanism": "out-of-process",
+    "posture": "workspace-write",
+    "provenance": {
+      "executor": {
+        "value": "claude-herdr",
+        "source": "override"
+      },
+      "invocation": {
+        "value": "claude-herdr-bwrap",
+        "source": "override"
+      },
+      "transport": {
+        "value": "herdr",
+        "source": "herdr-invocation-present"
+      },
+      "tier": {
+        "value": "standard",
+        "source": "rigor:standard"
+      },
+      "model": {
+        "value": "sonnet",
+        "source": "resolveTierModel(claude.standard)"
+      },
+      "persona": {
+        "value": null,
+        "source": "none"
+      },
+      "mechanism": {
+        "value": "out-of-process",
+        "source": "decideExecutorDispatchMechanism"
+      },
+      "posture": {
+        "value": "workspace-write",
+        "source": "producer-writes-declared"
+      },
+      "overridesOrigin": {
+        "value": "human-cli",
+        "source": "override"
+      }
+    }
+  },
+  "provenance": {
+    "kind": "unit-run",
+    "unitRunId": "unit-run-1790932481767-e16e7a18",
+    "role": "producer",
+    "round": 1,
+    "binding": {
+      "contractVersion": "v1alpha1",
+      "executor": "claude-herdr",
+      "invocation": "claude-herdr-bwrap",
+      "transport": "herdr",
+      "candidateIndex": 0,
+      "tier": "standard",
+      "model": "sonnet",
+      "persona": null,
+      "mechanism": "out-of-process",
+      "posture": "workspace-write",
+      "provenance": {
+        "executor": {
+          "value": "claude-herdr",
+          "source": "override"
+        },
+        "invocation": {
+          "value": "claude-herdr-bwrap",
+          "source": "override"
+        },
+        "transport": {
+          "value": "herdr",
+          "source": "herdr-invocation-present"
+        },
+        "tier": {
+          "value": "standard",
+          "source": "rigor:standard"
+        },
+        "model": {
+          "value": "sonnet",
+          "source": "resolveTierModel(claude.standard)"
+        },
+        "persona": {
+          "value": null,
+          "source": "none"
+        },
+        "mechanism": {
+          "value": "out-of-process",
+          "source": "decideExecutorDispatchMechanism"
+        },
+        "posture": {
+          "value": "workspace-write",
+          "source": "producer-writes-declared"
+        },
+        "overridesOrigin": {
+          "value": "human-cli",
+          "source": "override"
+        }
+      }
+    }
+  },
+  "expectedOutputs": [
+    "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca2-posture-note.md"
+  ],
+  "contextRefs": [],
+  "writes": [
+    "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca2-posture-note.md"
+  ],
+  "policy": {
+    "tier": "standard",
+    "preferExecutor": "claude-herdr",
+    "preferInvocation": "claude-herdr-bwrap",
+    "preferPersona": null
+  }
+}

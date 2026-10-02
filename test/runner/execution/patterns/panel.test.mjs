@@ -55,6 +55,7 @@ test('runPanel runs N panel members in parallel and synthesizes results', async 
   assert.equal(synthCall.role, 'synthesizer');
   assert.equal(synthCall.unit, unit);
   assert.equal(synthCall.inputs.length, 3);
+  assert.deepEqual(synthCall.independentOf, ['panelist-1', 'panelist-2', 'panelist-3']);
   assert.equal(synthCall.inputs[0].role, 'panelist-1');
 
   // Verify returned result shape

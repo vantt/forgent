@@ -25,27 +25,72 @@ function expandCredentialHome(home) {
     .replace(/^~(?=\/|$)/, process.env.HOME || '');
 }
 
+function credentialError(message) {
+  const err = new Error(message);
+  err.code = 'credential-provisioning';
+  return err;
+}
+
+/**
+ * Copies an explicit allow-list of files from an account's real home into the
+ * private home, at the same relative paths. Nothing outside the list is
+ * copied and the real home is never mounted. Fails closed: a missing, escaping
+ * or non-regular entry aborts before the worker is spawned.
+ */
+function copyHomeFiles(privateHomeTarget, sourceHome, files) {
+  let realHome;
+  try {
+    realHome = fs.realpathSync(sourceHome);
+  } catch (err) {
+    throw credentialError(`selected credential home is not readable: ${err.message}`);
+  }
+  for (const rel of files) {
+    if (typeof rel !== 'string' || !rel.trim() || path.isAbsolute(rel) || rel.split(/[\\/]/).includes('..')) {
+      throw credentialError(`credential file ${JSON.stringify(rel)} must be a relative path without "..".`);
+    }
+    let realSource;
+    try {
+      realSource = fs.realpathSync(path.join(realHome, rel));
+    } catch {
+      throw credentialError(`selected credential file "${rel}" is missing`);
+    }
+    if (!realSource.startsWith(realHome + path.sep) || !fs.statSync(realSource).isFile()) {
+      throw credentialError(`selected credential file "${rel}" is not a regular file inside the credential home`);
+    }
+    const destination = path.join(privateHomeTarget, rel);
+    try {
+      fs.mkdirSync(path.dirname(destination), { recursive: true });
+      fs.copyFileSync(realSource, destination);
+      // Credentials stay owner-only; a listed helper binary keeps its exec bit.
+      fs.chmodSync(destination, fs.statSync(realSource).mode & 0o100 ? 0o700 : 0o600);
+    } catch (copyErr) {
+      throw credentialError(`selected credential file "${rel}" could not be copied: ${copyErr.message}`);
+    }
+  }
+}
+
 function provisionSelectedCodexCredential(privateHomeTarget, request) {
   const source = request?.providerCapacity?.credentialSource;
   if (!source) return false;
-  if (source.kind !== 'codex-home') {
-    const err = new Error(`unsupported provider credential source kind "${source.kind}"`);
-    err.code = 'credential-provisioning';
-    throw err;
-  }
   const home = expandCredentialHome(source.home);
+  if (source.kind === 'home-files') {
+    if (!home || !path.isAbsolute(home) || !Array.isArray(source.files) || source.files.length === 0) {
+      throw credentialError('selected home-files credential needs an absolute "home" and a non-empty "files" list');
+    }
+    copyHomeFiles(privateHomeTarget, home, source.files);
+    return true;
+  }
+  if (source.kind !== 'codex-home') {
+    throw credentialError(`unsupported provider credential source kind "${source.kind}"`);
+  }
   const authCandidate = home ? path.join(home, 'auth.json') : null;
   if (!authCandidate || !fs.existsSync(authCandidate)) {
-    const err = new Error('selected Codex credential auth.json is missing');
-    err.code = 'credential-provisioning';
-    throw err;
+    throw credentialError('selected Codex credential auth.json is missing');
   }
   try {
     fs.copyFileSync(authCandidate, path.join(privateHomeTarget, 'auth.json'));
   } catch (copyErr) {
-    const err = new Error(`selected Codex credential auth.json could not be copied: ${copyErr.message}`);
-    err.code = 'credential-provisioning';
-    throw err;
+    throw credentialError(`selected Codex credential auth.json could not be copied: ${copyErr.message}`);
   }
   return true;
 }

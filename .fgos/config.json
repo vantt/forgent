@@ -142,89 +142,287 @@
           "mutates": true,
           "behaviorPreserving": true
         }
+      },
+      "marketing:research": {
+        "description": "acceptance-run binding for a Workflow unit",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "deepseek"
+          }
+        ]
+      },
+      "marketing:write": {
+        "description": "acceptance-run binding for a Workflow unit",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "deepseek"
+          }
+        ]
+      },
+      "marketing:publish": {
+        "description": "acceptance-run binding for a Workflow unit",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "deepseek"
+          }
+        ]
+      },
+      "architecture:frame": {
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
+        "prefer": [
+          {
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm-herdr"
+          }
+        ]
+      },
+      "architecture:shape": {
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
+        "prefer": [
+          {
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm-herdr"
+          }
+        ]
+      },
+      "architecture:critique": {
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
+        "prefer": [
+          {
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm-herdr"
+          }
+        ]
+      },
+      "architecture:synthesize": {
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
+        "prefer": [
+          {
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm-herdr"
+          }
+        ]
+      },
+      "architecture:explain": {
+        "description": "acceptance-run binding for a Workflow unit, over the five provider families that can run in a confined herdr pane",
+        "prefer": [
+          {
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm-herdr"
+          }
+        ]
+      },
+      "business:frame": {
+        "description": "acceptance-run binding for a Workflow unit",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "deepseek"
+          }
+        ]
+      },
+      "business:perspectives": {
+        "description": "acceptance-run binding for a Workflow unit",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "deepseek"
+          }
+        ]
+      },
+      "business:critique": {
+        "description": "acceptance-run binding for a Workflow unit",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "deepseek"
+          }
+        ]
+      },
+      "business:synthesize": {
+        "description": "acceptance-run binding for a Workflow unit",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "deepseek"
+          }
+        ]
+      },
+      "business:plan": {
+        "description": "acceptance-run binding for a Workflow unit",
+        "prefer": [
+          {
+            "executor": "claude"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "deepseek"
+          }
+        ]
+      },
+      "delphi:propose": {
+        "description": "Workflow unit capability \"delphi:propose\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "delphi:synthesize": {
+        "description": "Workflow unit capability \"delphi:synthesize\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "group-cognition:explore": {
+        "description": "Workflow unit capability \"group-cognition:explore\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "group-cognition:critique": {
+        "description": "Workflow unit capability \"group-cognition:critique\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "group-cognition:synthesize": {
+        "description": "Workflow unit capability \"group-cognition:synthesize\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "nominal-group:generate": {
+        "description": "Workflow unit capability \"nominal-group:generate\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "nominal-group:share": {
+        "description": "Workflow unit capability \"nominal-group:share\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "nominal-group:vote": {
+        "description": "Workflow unit capability \"nominal-group:vote\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "nominal-group:rank": {
+        "description": "Workflow unit capability \"nominal-group:rank\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "coding:discover": {
+        "description": "Workflow unit capability \"coding:discover\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "coding:explore": {
+        "description": "Workflow unit capability \"coding:explore\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "coding:plan": {
+        "description": "Workflow unit capability \"coding:plan\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "coding:validate": {
+        "description": "Workflow unit capability \"coding:validate\" -- declare a \"prefer\" pool to choose which executors serve it."
+      },
+      "coding:implement": {
+        "description": "Workflow unit capability \"coding:implement\" -- declare a \"prefer\" pool to choose which executors serve it."
       }
     },
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-"executors": {
+    "executors": {
       "claude": {
         "kind": "agent",
         "description": "Claude Code CLI -- consolidated executor (executor-id-consolidation Step 2): cli/cli-bwrap invocations, replacing the former separate claude-reviewer/claude-reviewer-herdr/claude-bwrap ids.",
@@ -408,12 +606,17 @@
             "id": "codex-herdr-fgovn",
             "via": "cli",
             "adapter": "herdr-spawn",
+            "confinement": {
+              "backend": "bwrap"
+            },
             "command": "codex",
             "args": [
-              "--dangerously-bypass-approvals-and-sandbox",
+              "-s",
+              "danger-full-access",
+              "-a",
+              "never",
               "--model",
-              "{model}",
-              "{prompt}"
+              "{model}"
             ],
             "interactiveMode": {
               "exitCommand": "/quit",
@@ -422,6 +625,15 @@
                 "kind": "codex-toml"
               }
             },
+            "resourceBindings": [
+              {
+                "resource": "private-home",
+                "target": {
+                  "kind": "env",
+                  "name": "CODEX_HOME"
+                }
+              }
+            ],
             "env": {
               "CODEX_HOME": "${HOME}/.codex-fgovn"
             }
@@ -602,9 +814,11 @@
             "id": "agy-herdr-mucdong",
             "via": "cli",
             "adapter": "herdr-spawn",
+            "confinement": {
+              "backend": "bwrap"
+            },
             "command": "agy",
             "args": [
-              "{prompt}",
               "--mode",
               "accept-edits",
               "--new-project",
@@ -620,7 +834,16 @@
             },
             "env": {
               "HOME": "${HOME}/.agy-homes/mucdong"
-            }
+            },
+            "resourceBindings": [
+              {
+                "resource": "private-home",
+                "target": {
+                  "kind": "env",
+                  "name": "HOME"
+                }
+              }
+            ]
           },
           {
             "id": "agy-cli-bwrap-mucdong",
@@ -719,6 +942,9 @@
             "id": "pi-herdr-vantt",
             "via": "cli",
             "adapter": "herdr-spawn",
+            "confinement": {
+              "backend": "bwrap"
+            },
             "command": "pi",
             "args": [
               "--model",
@@ -727,8 +953,7 @@
               "medium",
               "--tools",
               "read,write,edit,bash,grep,find,ls",
-              "--approve",
-              "{prompt}"
+              "--approve"
             ],
             "interactiveMode": {
               "exitCommand": "/quit",
@@ -736,7 +961,16 @@
             },
             "env": {
               "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/grok-vantt"
-            }
+            },
+            "resourceBindings": [
+              {
+                "resource": "private-home",
+                "target": {
+                  "kind": "env",
+                  "name": "PI_CODING_AGENT_DIR"
+                }
+              }
+            ]
           }
         ],
         "for": [
@@ -800,6 +1034,72 @@
         ],
         "for": [
           "execute"
+        ]
+      },
+      "claude-herdr": {
+        "kind": "agent",
+        "description": "Claude Code REPL in a herdr pane under the bwrap posture, same provider family as `claude`. Separate id because `claude` is merged with the global default executor, which drops its own invocations.",
+        "allowCrossProvider": true,
+        "providerModel": "claude",
+        "invocations": [
+          {
+            "id": "claude-herdr-bwrap",
+            "via": "cli",
+            "adapter": "herdr-spawn",
+            "command": "claude",
+            "args": [
+              "--model",
+              "{model}"
+            ],
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "interactiveMode": {
+              "exitCommand": "/exit",
+              "kind": "claude",
+              "trustStore": {
+                "kind": "claude-json"
+              }
+            }
+          }
+        ]
+      },
+      "glm-herdr": {
+        "kind": "agent",
+        "description": "Claude Code REPL routed to OpenRouter GLM (z-ai) in a herdr pane under the bwrap posture. CLAUDE_CODE_AUTO_MODE_SERVER=0 keeps claude from raising its blocking auto-mode billing notice, which a gateway session always gets and nobody is there to answer. The key is substituted from the environment at launch (GLM_OPENROUTER_API_KEY), never stored here.",
+        "allowCrossProvider": true,
+        "providerModel": "z-ai",
+        "invocations": [
+          {
+            "id": "glm-herdr-bwrap",
+            "via": "cli",
+            "adapter": "herdr-spawn",
+            "command": "claude",
+            "args": [
+              "--model",
+              "{model}"
+            ],
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "interactiveMode": {
+              "exitCommand": "/exit",
+              "kind": "claude",
+              "trustStore": {
+                "kind": "claude-json"
+              }
+            },
+            "env": {
+              "ANTHROPIC_BASE_URL": "https://openrouter.ai/api",
+              "ANTHROPIC_AUTH_TOKEN": "${GLM_OPENROUTER_API_KEY}",
+              "ANTHROPIC_MODEL": "z-ai/glm-5.2",
+              "ANTHROPIC_API_KEY": "",
+              "ANTHROPIC_DEFAULT_HAIKU_MODEL": "z-ai/glm-5.2",
+              "ANTHROPIC_DEFAULT_SONNET_MODEL": "z-ai/glm-5.2",
+              "ANTHROPIC_DEFAULT_OPUS_MODEL": "z-ai/glm-5.2",
+              "CLAUDE_CODE_AUTO_MODE_SERVER": "0"
+            }
+          }
         ]
       }
     },
