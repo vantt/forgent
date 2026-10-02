@@ -51,7 +51,7 @@ import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, DEFAULT_RIGO
 import { RIGOR_VALUES } from '../runner/rigor.mjs';
 import { resolveExecutorAndOverrides, deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
-import { bind } from '../runner/execution/bind.mjs';
+import { bind, hasUsablePrefer } from '../runner/execution/bind.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../state/fgos-file-registry.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
 import { listWork, StoreError } from '../state/store.mjs';
@@ -2277,6 +2277,7 @@ registerCheck({
 // Every capability a core/domain Workflow unit names must resolve the way
 // bind() resolves it (exact name, then the bare verb). One that does not has
 // no candidate pool, so that unit is refused at run time with no earlier signal.
+// A declared entry that carries no `prefer` pool (exact or bare verb) is reported too.
 // Read straight from the definition files with a line match instead of loading them
 // through the Workflow loader: `fgos setup` runs from copies of fgos that have no
 // installed dependencies, and the loader needs the YAML parser.
@@ -2327,7 +2328,21 @@ function checkWorkflowCapabilitiesConfigured(cwd) {
       message: `runner.capabilities has no entry for Workflow capabilities: ${list} -- declare each under runner.capabilities (fgos setup adds every shipped Workflow's)`,
     };
   }
-  return { passed: true, message: `every capability a Workflow unit names (${uses.size}) is declared in runner.capabilities` };
+  // Declared is not enough: bind() needs a prefer pool, on the exact entry or the bare
+  // verb, or it refuses the unit headless. Setup's own slots are description-only on
+  // purpose (which executors serve a capability is the project's taste), so this is a
+  // warning that names the gap rather than a failure on a fresh project.
+  const noPool = [...uses].filter(
+    ([capability]) => !hasUsablePrefer(declared[capability]) && !(capability.includes(':') && hasUsablePrefer(declared[capability.split(':')[1]])),
+  );
+  if (noPool.length > 0) {
+    const list = noPool.map(([cap, ids]) => `${cap} (${[...ids].join(', ')})`).join('; ');
+    return {
+      passed: true,
+      message: `warning: Workflow capabilities declared but with no "prefer" pool, so a headless run of those units is refused: ${list} -- add "prefer" under the exact name or its bare verb in runner.capabilities`,
+    };
+  }
+  return { passed: true, message: `every capability a Workflow unit names (${uses.size}) is declared in runner.capabilities with a prefer pool` };
 }
 
 registerCheck({
