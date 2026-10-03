@@ -429,6 +429,9 @@ export async function runUnit(options = {}) {
           transport: bound.transport,
           invocation: bound.invocation,
           fallbackFrom: bound.provenance?.fallbackFrom ?? null,
+          // Where this attempt's candidate walk resumed (-1 = from the start of the pool).
+          skipCandidateIndex: attemptNo > 0 ? (attempts[attemptNo - 1]?.binding?.candidateIndex ?? -1) : -1,
+          candidateIndex: bound.candidateIndex ?? null,
           boundAt: new Date().toISOString(),
         });
         persistUnitRecord();

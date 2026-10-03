@@ -1,7 +1,7 @@
 ---
 phase: 2
 title: "Bỏ quyền git của producer"
-status: pending
+status: completed-with-exception
 priority: P2
 effort: "0.15d"
 dependencies: []

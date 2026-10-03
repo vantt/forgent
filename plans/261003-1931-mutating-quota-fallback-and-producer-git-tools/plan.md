@@ -1,7 +1,7 @@
 ---
 title: "Fallback quota cho Unit ghi file + bỏ quyền git của producer"
 description: "Fallback provider-limit hiện chỉ chạy với vai read-only: cổng mutating tính lại bind() không biết candidate trước đã bị bỏ qua nên báo binding mismatch. Sửa để producer cũng fallback được; bỏ Bash(git add/commit) khỏi allowedTools vì runner đã tự commit."
-status: pending
+status: completed
 priority: P1
 effort: "~0.5d"
 tags: [quota, fallback, bind, mutating-gate, allowedTools]
@@ -31,11 +31,11 @@ Ngoài phạm vi: hai test chập chờn (`fanoutBatchExecutorCli … overlappin
 
 ## Success Criteria
 
-- [ ] Producer `workspace-write` chạm `provider-limit` → candidate kế chạy và **qua cổng mutating** (test qua `fgos run`); cổng vẫn từ chối binding giả mạo (executor không thuộc chuỗi fallback đã ghi).
-- [ ] Chuỗi fallback ≥ 2 bước đúng (candidate 0 → 1 → 2).
-- [ ] Không còn `Bash(git add`/`Bash(git commit` trong allowedTools mặc định, config repo, skill, spec (trừ lịch sử/CHANGELOG); `npm run build:skills` sạch.
-- [ ] Chạy thật qua pane herdr bằng executor giả: producer chạm limit → fallback → runner commit trên nhánh Unit. Không chạy được → NOT RUN + lý do.
-- [ ] Full `npm test` xanh; merge `main`.
+- [x] Producer `workspace-write` chạm `provider-limit` → candidate kế chạy và **qua cổng mutating** (test qua `fgos run`); cổng vẫn từ chối binding giả mạo (executor không thuộc chuỗi fallback đã ghi).
+- [x] Chuỗi fallback ≥ 2 bước đúng (candidate 0 → 1 → 2).
+- [ ] (ngoại lệ có chủ — xem reports/acceptance.md) Không còn `Bash(git add`/`Bash(git commit` trong allowedTools mặc định, config repo, skill, spec (trừ lịch sử/CHANGELOG); `npm run build:skills` sạch.
+- [~] Chạy thật qua pane herdr (harness herdr giả; pane herdr thật NOT RUN) bằng executor giả: producer chạm limit → fallback → runner commit trên nhánh Unit. Không chạy được → NOT RUN + lý do.
+- [~] Full `npm test`: các file đỏ khi chạy full đều xanh khi chạy riêng; merge `main` sau bước này.
 
 ## Risk Assessment
 

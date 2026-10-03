@@ -359,7 +359,7 @@ test('persona rendering: renders persona body from core/agents/<persona>.yaml in
 
 // ── Gate branches that sit behind the worktree check ──────────────────────────
 
-async function mutatingGateFixture({ writeUnitJson = true, corrupt = false } = {}) {
+async function mutatingGateFixture({ writeUnitJson = true, corrupt = false, twoCandidates = false, attempts = null, bindings = null } = {}) {
   const { repoRoot, worktreeDir } = setupGitRepo();
   const { executeAssignment } = await import('../../../src/runner/dispatch/assignment-runner.mjs');
   const unitRunId = 'unit-run-gate-' + Math.random().toString(36).slice(2, 8);
@@ -371,6 +371,15 @@ async function mutatingGateFixture({ writeUnitJson = true, corrupt = false } = {
     configSnapshot: snapshotRunnerConfig(repoRoot),
     worktree: fs.realpathSync(worktreeDir),
   };
+  if (twoCandidates) {
+    // A second executor behind the first, so a fallback walk has somewhere to go.
+    const runner = record.configSnapshot.runner;
+    runner.executors['test-node-2'] = { ...runner.executors['test-node'], providerModel: 'node2' };
+    runner.capabilities['docs:write'].prefer = [{ executor: 'test-node' }, { executor: 'test-node-2' }];
+    runner.modelPolicies.node2 = runner.modelPolicies.node;
+  }
+  if (attempts) record.bindings = { 'producer/1': attempts(unitRunId) };
+  if (bindings) record.bindings = bindings(unitRunId);
   if (writeUnitJson) {
     fs.writeFileSync(path.join(unitDir, 'unit.json'), corrupt ? '{not json' : JSON.stringify(record, null, 2));
   }
@@ -424,6 +433,62 @@ test('mutating gate: refuses an assignment that pins an executor other than the 
     policy: { preferExecutor: 'rogue-executor' },
   };
   await assert.rejects(() => run(pinned), /pins executor "rogue-executor"/);
+});
+
+const gateAttempt = (unitRunId, n, executor, candidateIndex, outcome) => ({
+  role: 'producer',
+  round: 1,
+  assignmentId: n === 0 ? `${unitRunId}/producer/1` : `${unitRunId}/producer/1-fb${n}`,
+  binding: { executor, candidateIndex },
+  ...(outcome ? { outcome } : {}),
+});
+
+test('mutating gate: a fallback attempt must follow a provider-limit attempt the runner recorded', async () => {
+  // Attempt 0 settled as a pass, yet the assignment claims the second candidate.
+  const { baseAssignment, run } = await mutatingGateFixture({
+    twoCandidates: true,
+    attempts: (id) => [gateAttempt(id, 0, 'test-node', 0, 'pass'), gateAttempt(id, 1, 'test-node-2', 1)],
+  });
+  const forged = { ...baseAssignment, assignmentId: `${baseAssignment.unitRunId}/producer/1-fb1`, binding: { executor: 'test-node-2', tier: 'standard', posture: 'workspace-write' } };
+  await assert.rejects(() => run(forged), /binding mismatch/);
+});
+
+test('mutating gate: an assignment the runner never recorded cannot claim a fallback binding', async () => {
+  const { baseAssignment, run } = await mutatingGateFixture({
+    twoCandidates: true,
+    attempts: (id) => [gateAttempt(id, 0, 'test-node', 0, 'provider-limit')],
+  });
+  const forged = { ...baseAssignment, assignmentId: `${baseAssignment.unitRunId}/producer/1-fb1`, binding: { executor: 'test-node-2', tier: 'standard', posture: 'workspace-write' } };
+  await assert.rejects(() => run(forged), /binding mismatch/);
+});
+
+test('mutating gate: a recorded fallback attempt cannot be rebound to the candidate that already hit its limit', async () => {
+  const { baseAssignment, run } = await mutatingGateFixture({
+    twoCandidates: true,
+    attempts: (id) => [gateAttempt(id, 0, 'test-node', 0, 'provider-limit'), gateAttempt(id, 1, 'test-node-2', 1)],
+  });
+  const replay = { ...baseAssignment, assignmentId: `${baseAssignment.unitRunId}/producer/1-fb1`, binding: { executor: 'test-node', tier: 'standard', posture: 'workspace-write' } };
+  await assert.rejects(() => run(replay), /binding mismatch/);
+});
+
+test('mutating gate: a producer cannot borrow the fallback attempt of another role or round', async () => {
+  const other = (id, role, round) => [
+    { role, round, assignmentId: `${id}/${role}/${round}`, binding: { executor: 'test-node', candidateIndex: 0 }, outcome: 'provider-limit' },
+    { role, round, assignmentId: `${id}/${role}/${round}-fb1`, binding: { executor: 'test-node-2', candidateIndex: 1 } },
+  ];
+  const { baseAssignment, run } = await mutatingGateFixture({
+    twoCandidates: true,
+    bindings: (id) => ({
+      'producer/1': [gateAttempt(id, 0, 'test-node', 0, 'pass')],
+      'checker/1': other(id, 'checker', 1),
+      'producer/2': other(id, 'producer', 2),
+    }),
+  });
+  const claimed = { executor: 'test-node-2', tier: 'standard', posture: 'workspace-write' };
+  for (const borrowed of ['checker/1-fb1', 'producer/2-fb1']) {
+    const forged = { ...baseAssignment, assignmentId: `${baseAssignment.unitRunId}/${borrowed}`, binding: claimed };
+    await assert.rejects(() => run(forged), /binding mismatch/, borrowed);
+  }
 });
 
 // A worker that always settles as done, whatever it was asked: enough to reach the checker role.

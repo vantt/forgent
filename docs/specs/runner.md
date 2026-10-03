@@ -3065,3 +3065,13 @@ adapter-specific exports (Node side, unit P8a) and `supervisor.rs`/
   - Inventory account (`runner.providers.<provider>.accounts`) chỉ ở `~/.fgos/config.json` toàn máy; mỗi máy phải tự khai, `fgos setup` không tạo; `fgos doctor` (`confined-pane-accounts`) chỉ ra pane thiếu entry.
   - bind chọn invocation herdr **đầu tiên** của executor; executor nhiều account cần luật chọn tường minh về sau.
 Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
+
+### 0051 — Cổng ghi file đi theo chuỗi fallback; quyền git của invocation giữ lại cho Work loop
+
+- **Trạng thái:** Settled (2026-10-03)
+- **Bối cảnh:** 0050 cho `provider-limit` đi tiếp `prefer[]`, nhưng cổng ghi file của 0047 §5 tính lại `bind()` từ đầu pool nên một producer ghi file fallback sang candidate kế bị từ chối `binding mismatch`; chỉ vai read-only (không qua cổng) fallback được. Ngoài ra `allowedTools` của invocation claude/glm không confine vẫn cấp `Bash(git add:*)`/`Bash(git commit:*)` dù runner đã tự commit cho producer (`commit-unit-work.mjs`).
+- **Quyết định:**
+  1. **Cổng đi tiếp sau candidate đã chạm limit.** Với assignment `<unitRun>/<role>/<round>-fb<n>`, cổng tính lại `bind()` bỏ qua đến `candidateIndex` của attempt liền trước trong `unit.json`, **chỉ khi** attempt đó có outcome `provider-limit` (`fallbackSkipIndex`, `assignment-runner.mjs`). Giá trị đọc từ chuỗi attempt runner đã persist trước khi dispatch, không từ assignment; assignment không có trong chuỗi `<role>/<round>` của chính nó (id mượn từ vai hoặc vòng khác không tính), hoặc attempt trước không phải `provider-limit`, thì bind từ đầu pool như cũ → binding giả mạo vẫn bị từ chối. Mỗi attempt trong `unit.json` ghi thêm `skipCandidateIndex` và `candidateIndex`.
+  2. **Quyền git của invocation KHÔNG bỏ.** Các invocation `claude-cli`, `glm` và `runner.executor` mặc định (không confine) cũng là đường chạy của worker coding trong Work loop (`loop.mjs`), nơi worker tự commit trên nhánh item theo hợp đồng worker (Layer 2 rule 3) và loop không có bước commit của runner; bỏ grant sẽ làm worker không commit được (đã từng đo: tsk-1jt, tsk-1dsr). Invocation bwrap không cần grant vì git metadata đọc-only trong sandbox. Ngoại lệ có chủ này kết thúc khi Work loop chuyển sang runner commit.
+- **Giới hạn đã biết:** grant còn lại làm `provider-adapter` không đánh dấu invocation không confine là `applied-via-tool-gating`; producer không confine vẫn có thể tự `git add`/`git commit` (runner commit sau đó ghi `no-changes`, không lỗi).
+Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
