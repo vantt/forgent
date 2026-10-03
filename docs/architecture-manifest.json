@@ -206,6 +206,7 @@
     "src/setup/instruction-projections.mjs": "infra",
     "src/runner/execution/unit.mjs": "infra",
     "src/runner/execution/bind.mjs": "infra",
+    "src/runner/execution/commit-unit-work.mjs": "infra",
     "src/runner/execution/run.mjs": "use-case",
     "src/runner/execution/patterns/index.mjs": "domain",
     "src/runner/execution/patterns/panel.mjs": "domain",
