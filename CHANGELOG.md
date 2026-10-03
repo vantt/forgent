@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- A `workspace-write` worker in a linked git worktree can now commit inside the bwrap sandbox: its grant also covers the shared object store, branch refs and reflogs in the main checkout's git directory (previously `git add` failed with "failed to insert into database"). Hooks, repository config and other worktrees' state stay read-only. Note the grant lets such a worker move any branch ref, not only its own.
 - `fgos workflow start` takes `--request <text>`; every unit gets the request and the output of the steps it depends on. A unit that is refused or fails now ends its step and the run as `failed` instead of being counted as passed.
 - A reviewer or panelist now runs on a different provider family than the producer or its sibling panelists; with too few families the run is refused instead of repeating one.
 - `fgos run` detects a live herdr session.
