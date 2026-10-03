@@ -147,6 +147,19 @@ export function validateWorkflow(raw) {
       throw new WorkflowDefinitionError(`${stepLabel} unknown kind "${kind}", must be one of [${[...VALID_STEP_KINDS].join(', ')}]`);
     }
 
+    // Where an integrate step lands its units' branches. Absent means "the
+    // repository's own trunk" (resolved at run time), never a literal name.
+    let target;
+    if (s.target !== undefined && s.target !== null) {
+      if (kind !== 'integrate') {
+        throw new WorkflowDefinitionError(`${stepLabel} "target" is only valid on a step of kind "integrate"`);
+      }
+      if (typeof s.target !== 'string' || !s.target.trim()) {
+        throw new WorkflowDefinitionError(`${stepLabel} "target" must be a non-empty branch name`);
+      }
+      target = s.target.trim();
+    }
+
     let gate = null;
     if (s.gate !== undefined && s.gate !== null) {
       if (typeof s.gate !== 'object' || Array.isArray(s.gate)) {
@@ -267,6 +280,7 @@ export function validateWorkflow(raw) {
         title: typeof s.title === 'string' ? s.title.trim() : sId,
         dependsOn,
         kind,
+        ...(target ? { target } : {}),
         ...(phase ? { phase } : {}),
         ...(skill ? { skill } : {}),
         operations: Object.freeze(operations),

@@ -1200,3 +1200,44 @@ test('Cleanup: adapter failure and timeout/cancel clean up temporary resources i
     fs.rmSync(tmp, { recursive: true, force: true });
   }
 });
+
+test('a workspace-write producer in a linked worktree can commit under bwrap, without being able to touch hooks or config', async (t) => {
+  const bwrapOk = os.platform() === 'linux'
+    && cp.spawnSync('/usr/bin/bwrap', ['--ro-bind', '/', '/', '--', 'true'], { stdio: 'ignore' }).status === 0;
+  if (!bwrapOk) return t.skip('no working bwrap on this machine');
+  // Outside /tmp: the sandbox mounts a private tmpfs there.
+  const base = fs.mkdtempSync(path.join(fs.existsSync('/var/tmp') ? '/var/tmp' : os.tmpdir(), 'fgos-wt-commit-'));
+  try {
+    const main = path.join(base, 'main');
+    const wt = path.join(base, 'wt');
+    const git = (cwd, ...args) => cp.execFileSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', ...args], { cwd, encoding: 'utf8' });
+    fs.mkdirSync(main);
+    git(main, 'init', '-q', '-b', 'main');
+    git(main, 'commit', '-q', '--allow-empty', '-m', 'init');
+    git(main, 'worktree', 'add', '-q', wt, '-b', 'feat');
+
+    const resources = resolveConfinementResources({
+      dispatchId: 'disp_wt_commit',
+      context: { cwd: wt, repoRoot: wt },
+      grants: [
+        { resource: 'workspace', access: 'read-write', scope: 'dispatch' },
+        { resource: 'workspace-git-metadata', access: 'read-write', scope: 'dispatch' },
+      ],
+    });
+    const plan = { contract: 'confinement-plan.v1', dispatchId: 'disp_wt_commit', decision: 'execute', coverage: {}, resources };
+    // The commit must succeed; appending to a hook or to the shared config must not.
+    const script = 'echo y > f && git add f && git -c user.name=t -c user.email=t@t commit -qm c && ! (echo x >> "$COMMON/hooks/post-commit") 2>/dev/null && ! (echo x >> "$COMMON/config") 2>/dev/null';
+    const prepared = await prepareBwrap(plan, {
+      dispatchId: 'disp_wt_commit',
+      executorId: 'x',
+      invocation: { command: 'sh', args: ['-c', script], env: { PATH: process.env.PATH, COMMON: path.join(main, '.git') }, resourceBindings: [] },
+      context: { cwd: wt, runDir: base },
+    }, { id: 'bwrap', type: 'bwrap', config: {} });
+    const run = cp.spawnSync(prepared.invocation.command, prepared.invocation.args, { cwd: wt, env: prepared.invocation.env, encoding: 'utf8' });
+    assert.equal(run.status, 0, `${run.stderr}${run.stdout}`);
+    assert.match(git(wt, 'log', '--oneline'), / c$/m, 'the commit landed on the worktree branch');
+    assert.doesNotMatch(git(main, 'log', '--oneline', 'main'), / c$/m, 'main did not move');
+  } finally {
+    fs.rmSync(base, { recursive: true, force: true });
+  }
+});

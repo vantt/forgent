@@ -138,6 +138,24 @@ export function resolveWorkspaceGitMetadata(workspaceRoot) {
 }
 
 /**
+ * The parts of a linked worktree's shared git directory a commit has to write:
+ * the object store, the branch refs and their reflogs. Everything else there
+ * (hooks, config, other worktrees' state) stays read-only, so a confined
+ * worker can commit but cannot plant a hook or rewrite repository config.
+ * Returns [] for a plain checkout, whose own `.git` already holds all of it.
+ */
+export function resolveSharedGitWritablePaths(gitDir) {
+  const commondirFile = path.join(gitDir, 'commondir');
+  if (!fs.existsSync(commondirFile)) return [];
+  const rel = fs.readFileSync(commondirFile, 'utf8').trim();
+  const commonDir = fs.realpathSync(path.resolve(gitDir, rel));
+  if (commonDir === gitDir) return [];
+  return ['objects', path.join('refs', 'heads'), 'logs']
+    .map((sub) => path.join(commonDir, sub))
+    .filter((p) => fs.existsSync(p));
+}
+
+/**
  * Canonical resource resolver implementation (spec §6.3, R2).
  */
 export function resolveConfinementResources({
@@ -267,6 +285,24 @@ export function resolveConfinementResources({
         access: grant.access,
         allocation: 'existing',
       });
+      // A linked worktree's objects and branch refs live in the main
+      // checkout's git directory; without them `git commit` fails inside the
+      // sandbox ("failed to insert into database"). Only a writable grant
+      // needs them.
+      if (grant.access === 'write' || grant.access === 'read-write') {
+        for (const shared of resolveSharedGitWritablePaths(gitDir)) {
+          resolved.push({
+            resource: 'workspace-git-metadata',
+            identity: `workspace-git-metadata:shared:${path.relative(path.dirname(path.dirname(path.dirname(gitDir))), shared)}`,
+            hostTarget: shared,
+            executionTarget: { location: 'host', path: shared },
+            delivery: 'mount',
+            collect: 'none',
+            access: grant.access,
+            allocation: 'existing',
+          });
+        }
+      }
     }
   }
 
