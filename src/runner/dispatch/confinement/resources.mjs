@@ -13,6 +13,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import { resolveConfinementTempRoot } from './cleanup.mjs';
 
 export class ConfinementResourceError extends Error {
   constructor(code, message) {
@@ -275,17 +276,18 @@ export function resolveConfinementResources({
     const tempRoot =
       backendConfig.privateHomeRoot ||
       backendConfig.tempRoot ||
-      path.join(os.tmpdir(), 'fgos-confinement');
+      resolveConfinementTempRoot();
 
     const allocatedHome = path.join(tempRoot, dispatchId, 'home');
     // Validate before any mutation: a hostile dispatchId must never leave an
     // escaped directory behind when validation refuses it.
-    const { hostTarget } = canonicalizeAndVerifySubpath(allocatedHome, tempRoot, 'private-home');
+    const { hostTarget, declaredRoot: realTempRoot } = canonicalizeAndVerifySubpath(allocatedHome, tempRoot, 'private-home');
 
     resolved.push({
       resource: 'private-home',
       identity: `private-home:${dispatchId}`,
       hostTarget,
+      tempRoot: realTempRoot,
       executionTarget: { location: 'host', path: hostTarget },
       delivery: 'mount',
       collect: 'none',

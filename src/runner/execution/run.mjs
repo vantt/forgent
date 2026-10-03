@@ -11,6 +11,8 @@ import { bind, nextCandidate } from './bind.mjs';
 import { runPattern } from './patterns/index.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { ensureRunnerConfigForDir, RunnerConfigError } from '../dispatch/config.mjs';
+import { commitUnitWork } from './commit-unit-work.mjs';
+import { reapOrphanedConfinementResources, resolveConfinementTempRoot } from '../dispatch/confinement/cleanup.mjs';
 
 /**
  * Map a settled RunResult onto the outcome vocabulary the collaboration patterns use.
@@ -132,6 +134,12 @@ export function snapshotRunnerConfig(mainCheckoutRoot) {
  * @returns {Promise<{unitRunId: string, outcome: string, rounds: number, results: Array}>}
  */
 export async function runUnit(options = {}) {
+  // Private homes left by an earlier run (a failed round that kept its pane)
+  // hold a copy of an account login; `fgos run` is the one door every such run
+  // goes through, so it is also where the ones whose pane has since closed are
+  // reclaimed. Best effort: a reap problem never blocks the run.
+  try { reapOrphanedConfinementResources({ tempRoot: resolveConfinementTempRoot() }); } catch { /* best effort */ }
+
   const cwd = options.cwd ?? process.cwd();
   const roots = resolveGitRoots(cwd);
   const mainRoot = options.repoRoot ? path.resolve(options.repoRoot) : roots.mainCheckoutRoot;
@@ -427,6 +435,19 @@ export async function runUnit(options = {}) {
       }
 
       const result = await dispatchBound({ bound, role, round, readOnly, assignmentId, assignmentDir, session });
+
+      // The worker only writes files; this trusted code, outside the confinement, commits them.
+      // No change is recorded as such, and a commit that cannot be made fails the round.
+      if (!readOnly && result.outcome === 'pass') {
+        const commit = commitUnitWork({
+          worktree: unitRecord.worktree,
+          unitId: (rUnit || unit).id,
+          summary: result.runResult?.agentClaim?.summary,
+        });
+        result.commit = commit;
+        attempts[attemptNo].commit = commit;
+        if (commit.status === 'failed') result.outcome = 'execution-failure';
+      }
 
       attempts[attemptNo].outcome = result.outcome;
       attempts[attemptNo].runId = result.runResult?.runId ?? null;

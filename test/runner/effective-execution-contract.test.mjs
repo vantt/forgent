@@ -162,7 +162,7 @@ test('buildEffectiveExecutionContract projects mutating contract with writeScope
   assert.equal(contract.workspace.posture, 'worktree');
   assert.equal(contract.workspace.mainCheckout, repoDir);
   assert.deepEqual(contract.workspace.writeScope, [worktreeDir]);
-  assert.deepEqual(contract.tools.shell.allowedCommands, ['git add', 'git commit']);
+  assert.deepEqual(contract.tools.shell.allowedCommands, [], 'the worker writes files only; the runner commits');
   assert.equal(contract.tools.shell.enforced, false);
   assert.equal(contract.tools.shell.enforcement, 'instructed');
 

@@ -1,0 +1,200 @@
+{
+  "contract": {
+    "id": "assignment-run-result",
+    "version": 3
+  },
+  "runId": "run_unit-run-1790991390730-761228f7/producer/1_01",
+  "assignmentId": "unit-run-1790991390730-761228f7/producer/1",
+  "controlEpoch": 1,
+  "controlToken": "ae8c0557-f3eb-4eb0-b2e9-ed769c5a35d1",
+  "executorId": "fake-agent",
+  "adapter": "herdr-spawn",
+  "confinement": null,
+  "role": "producer",
+  "executorRedirected": false,
+  "policy": {
+    "role": "producer",
+    "executorPreference": [
+      "fake-agent"
+    ],
+    "executorId": "fake-agent",
+    "providerModel": "claude",
+    "rigor": "standard",
+    "tier": "standard",
+    "model": "fake",
+    "reasoningEffort": "medium",
+    "visibility": "headless",
+    "repeatMode": null,
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "fake-agent",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "provider": {
+        "value": "claude",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "fake-agent"
+        }
+      },
+      "model": {
+        "value": "fake",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "rigor": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "tier": {
+        "value": "standard",
+        "source": {
+          "scope": "rigor",
+          "id": "standard"
+        }
+      },
+      "reasoningEffort": {
+        "value": "medium",
+        "source": {
+          "scope": "derived",
+          "id": "rigor.standard"
+        }
+      },
+      "persona": {
+        "source": {
+          "scope": "default"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "repeatMode": {
+        "value": null,
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "unit-run-1790991390730-761228f7/producer/1"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "claude"
+        }
+      }
+    }
+  },
+  "settledAt": "2026-10-03T01:36:48.031Z",
+  "durationMs": 17236,
+  "claimSha256": "ba168ab53f9e0e345e63289c80c5496d3d6917cb43685bbe5f4744f0db0b434a",
+  "settleReports": [
+    {
+      "path": ".fgos/assignments/unit-run-1790991390730-761228f7/producer/1/runs/01/outbox/report-1.md",
+      "sha256": "5dfe44a7582e55ae677cda0e7b549264f6a4b4be80d69843f5f70f5e33266e38"
+    }
+  ],
+  "classification": {
+    "execution": {
+      "status": "completed",
+      "exitCode": 0
+    },
+    "assessment": {
+      "verdict": "pass"
+    },
+    "confidence": {
+      "level": "verified",
+      "basis": [
+        "valid-agent-result-claim",
+        "captured-stdout",
+        "workspace-git-diff"
+      ]
+    },
+    "failure": null,
+    "policy": {
+      "disposition": "allow",
+      "code": null
+    },
+    "delivery": {
+      "mode": "fresh"
+    },
+    "provenance": "native-v3",
+    "outcome": {
+      "category": "ok",
+      "reason": "completed-pass"
+    }
+  },
+  "runtime": {
+    "exitCode": 0,
+    "stdoutLog": ".fgos/assignments/unit-run-1790991390730-761228f7/producer/1/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/unit-run-1790991390730-761228f7/producer/1/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "contract": {
+      "id": "agent-result-claim",
+      "version": 2
+    },
+    "status": "done",
+    "summary": "Add src/feature.txt from the fake agent",
+    "evidenceRefs": [
+      "src/feature.txt"
+    ]
+  },
+  "runnerNote": {
+    "summary": "Settled"
+  },
+  "usage": {
+    "inputTokens": null,
+    "outputTokens": null,
+    "totalTokens": null,
+    "cacheReadTokens": null,
+    "cacheCreationTokens": null,
+    "source": "unsupported"
+  },
+  "evidence": {
+    "gitBefore": "5b52ac27d3beec7d63f62172aefc01cf1c2ffb2a",
+    "gitAfter": "5b52ac27d3beec7d63f62172aefc01cf1c2ffb2a",
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [
+      "src/feature.txt"
+    ],
+    "mutatedDirtyBeforeFiles": [],
+    "attribution": [
+      {
+        "path": "src/feature.txt",
+        "firstObserved": "post-run",
+        "level": "correlated",
+        "basis": [
+          "pre-post-git-snapshot"
+        ],
+        "coverageMatched": false
+      }
+    ],
+    "artifacts": [
+      ".fgos/assignments/unit-run-1790991390730-761228f7/producer/1/runs/01/outbox/report-1.md",
+      ".fgos/assignments/unit-run-1790991390730-761228f7/producer/1/runs/01/outbox/result-1.json"
+    ],
+    "tests": [],
+    "findingRefs": [
+      "src/feature.txt"
+    ]
+  }
+}

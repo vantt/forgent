@@ -1,0 +1,4 @@
+retained home=/tmp/fgos-confinement/disp_1790991666530_a1df15fe pane=wS:p3WP mode=700 700 
+run#2 (pane OPEN) rc-done; home exists: yes
+pane closed:  matches left
+run#3 (pane CLOSED): home exists: gone

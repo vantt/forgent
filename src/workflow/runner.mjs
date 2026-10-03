@@ -16,6 +16,7 @@ import {
 import {
   createWorkflowWorktree,
   mergeWorkflowBranch,
+  resolveIntegrationTarget,
   cleanupWorkflowWorktree,
 } from './integrate.mjs';
 import { translatePlanToWorkflow } from './plan-source.mjs';
@@ -87,11 +88,12 @@ function gitOut(cwd, args) {
 
 /**
  * Remove the worktrees of Units whose work reached the main line; keep the rest and say where
- * they are. A passed Unit counts as integrated only when its branch is already part of main (the integrate step's target) and
+ * they are. A passed Unit counts as integrated only when its branch is already part of the integration target (the integrate step's `target`, else the repository trunk) and
  * its worktree holds nothing uncommitted -- removing a worktree forgets anything left in it. A
  * Unit that failed, was refused, or never finished keeps its worktree for investigation.
  */
-function settleUnitWorktrees({ mainRoot, state }) {
+function settleUnitWorktrees({ mainRoot, state, workflow }) {
+  const integrationTarget = resolveIntegrationTarget({ repoRoot: mainRoot, workflow });
   const removed = [];
   const kept = [];
   for (const step of Object.values(state.steps)) {
@@ -104,7 +106,7 @@ function settleUnitWorktrees({ mainRoot, state }) {
       } else if (!fs.existsSync(unit.worktreePath)) {
         removed.push(entry);
         continue;
-      } else if (unit.branch && !gitOk(mainRoot, ['merge-base', '--is-ancestor', unit.branch, 'main'])) {
+      } else if (unit.branch && !gitOk(mainRoot, ['merge-base', '--is-ancestor', unit.branch, integrationTarget])) {
         reason = 'branch not integrated';
       } else if ((gitOut(unit.worktreePath, ['status', '--porcelain']) ?? 'unknown').trim() !== '') {
         reason = 'worktree has uncommitted changes';
@@ -205,6 +207,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
 
       // 2. Integration step
       if (step.kind === 'integrate') {
+        const integrationTarget = resolveIntegrationTarget({ repoRoot: mainRoot, workflow });
         // Collect branches from predecessor units
         for (const depId of step.dependsOn) {
           const depStep = workflow.steps.find((s) => s.id === depId);
@@ -215,7 +218,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
                 mergeWorkflowBranch({
                   repoRoot: mainRoot,
                   sourceBranch: uBranch,
-                  targetBranch: 'main',
+                  targetBranch: integrationTarget,
                   commitMessage: `integrate: merge step ${depId} unit ${u.id}`,
                 });
               } catch {
@@ -378,7 +381,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
   }
 
   if ((state.status === 'completed' || state.status === 'failed') && !state.worktrees) {
-    const { removed, kept } = settleUnitWorktrees({ mainRoot, state });
+    const { removed, kept } = settleUnitWorktrees({ mainRoot, state, workflow });
     if (removed.length > 0 || kept.length > 0) {
       appendWorkflowEvent({
         repoRoot: mainRoot,

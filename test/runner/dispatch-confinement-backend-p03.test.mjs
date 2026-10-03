@@ -7,6 +7,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import cp from 'node:child_process';
+import { commitUnitWork } from '../../src/runner/execution/commit-unit-work.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 
 import {
@@ -1198,5 +1199,65 @@ test('Cleanup: adapter failure and timeout/cancel clean up temporary resources i
     assert.equal(failedAttestation.phase, 'failed');
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('a workspace-write producer in a linked worktree cannot write git metadata; the runner commits for it', async (t) => {
+  const bwrapOk = os.platform() === 'linux'
+    && cp.spawnSync('/usr/bin/bwrap', ['--ro-bind', '/', '/', '--', 'true'], { stdio: 'ignore' }).status === 0;
+  if (!bwrapOk) return t.skip('no working bwrap on this machine');
+  // Outside /tmp: the sandbox mounts a private tmpfs there.
+  const base = fs.mkdtempSync(path.join(fs.existsSync('/var/tmp') ? '/var/tmp' : os.tmpdir(), 'fgos-wt-commit-'));
+  try {
+    const main = path.join(base, 'main');
+    const wt = path.join(base, 'wt');
+    const git = (cwd, ...args) => cp.execFileSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', ...args], { cwd, encoding: 'utf8' });
+    fs.mkdirSync(main);
+    git(main, 'init', '-q', '-b', 'main');
+    git(main, 'commit', '-q', '--allow-empty', '-m', 'init');
+    git(main, 'worktree', 'add', '-q', wt, '-b', 'feat');
+    const objectCount = () => git(main, 'count-objects', '-v').match(/^count: (\d+)/m)[1];
+    const mainBefore = git(main, 'rev-parse', 'main');
+    const objectsBefore = objectCount();
+
+    const resources = resolveConfinementResources({
+      dispatchId: 'disp_wt_commit',
+      context: { cwd: wt, repoRoot: wt },
+      grants: [
+        { resource: 'workspace', access: 'read-write', scope: 'dispatch' },
+        { resource: 'workspace-git-metadata', access: 'read', scope: 'dispatch' },
+      ],
+    });
+    const plan = { contract: 'confinement-plan.v1', dispatchId: 'disp_wt_commit', decision: 'execute', coverage: {}, resources };
+    // The worker may write a file in its worktree, but every git write must fail: staging,
+    // committing, moving a ref, appending to a hook or to the shared config.
+    const script = [
+      'echo produced > f',
+      '! git add f 2>/dev/null',
+      '! git -c user.name=t -c user.email=t@t commit --allow-empty -qm sneaky 2>/dev/null',
+      '! git update-ref refs/heads/main HEAD 2>/dev/null',
+      '! (echo x >> "$COMMON/hooks/post-commit") 2>/dev/null',
+      '! (echo x >> "$COMMON/config") 2>/dev/null',
+    ].join(' && ');
+    const prepared = await prepareBwrap(plan, {
+      dispatchId: 'disp_wt_commit',
+      executorId: 'x',
+      invocation: { command: 'sh', args: ['-c', script], env: { PATH: process.env.PATH, COMMON: path.join(main, '.git') }, resourceBindings: [] },
+      context: { cwd: wt, runDir: base },
+    }, { id: 'bwrap', type: 'bwrap', config: {} });
+    const run = cp.spawnSync(prepared.invocation.command, prepared.invocation.args, { cwd: wt, env: prepared.invocation.env, encoding: 'utf8' });
+    assert.equal(run.status, 0, `${run.stderr}${run.stdout}`);
+    assert.equal(fs.readFileSync(path.join(wt, 'f'), 'utf8').trim(), 'produced', 'the worker could write its file');
+
+    // Then the runner, outside the sandbox, commits it.
+    const commit = commitUnitWork({ worktree: wt, unitId: 'u1', summary: 'Added f\nmore detail' });
+    assert.equal(commit.status, 'committed');
+    assert.deepEqual(commit.files, ['f']);
+    assert.equal(git(wt, 'log', '-1', '--format=%s'), 'Added f\n');
+    assert.equal(git(main, 'rev-parse', 'main'), mainBefore, 'refs/heads/main did not move');
+    assert.notEqual(objectCount(), objectsBefore, 'the runner (not the worker) added the commit objects');
+    assert.equal(commitUnitWork({ worktree: wt, unitId: 'u1', summary: 'again' }).status, 'no-changes');
+  } finally {
+    fs.rmSync(base, { recursive: true, force: true });
   }
 });

@@ -15,6 +15,7 @@ import {
   projectWorkflowState,
   createWorkflowWorktree,
   mergeWorkflowBranch,
+  resolveIntegrationTarget,
   cleanupWorkflowWorktree,
   translatePlanToWorkflow,
   startWorkflow,
@@ -439,7 +440,7 @@ test('the owner request and earlier step output reach each unit objective', asyn
   assert.match(prompts[1], /FINDING-FROM-FIRST-STEP/);
 });
 
-function seedRunWithUnitWorktrees(tmp, { terminal }) {
+function seedRunWithUnitWorktrees(tmp, { terminal, trunk = 'main' }) {
   const workflow = validateWorkflow({
     id: 'test/cleanup',
     title: 'Cleanup',
@@ -473,7 +474,7 @@ function seedRunWithUnitWorktrees(tmp, { terminal }) {
     execFileSync('git', ['-c', 'user.name=T', '-c', 'user.email=t@t.local', 'commit', '-m', id], { cwd: units[id].worktreePath, stdio: 'ignore' });
   };
   commitIn('merged', 'a.txt');
-  mergeWorkflowBranch({ repoRoot: tmp, sourceBranch: units.merged.branch, targetBranch: 'main' });
+  mergeWorkflowBranch({ repoRoot: tmp, sourceBranch: units.merged.branch, targetBranch: trunk });
   commitIn('unmerged', 'b.txt');
   fs.writeFileSync(path.join(units.dirty.worktreePath, 'scratch.txt'), 'uncommitted\n');
   for (const id of ['merged', 'unmerged', 'dirty']) {
@@ -516,4 +517,42 @@ test('a failed workflow cleans up the same way', async () => {
   assert.equal(state.status, 'failed');
   assert.equal(fs.existsSync(units.merged.worktreePath), false);
   assert.equal(fs.existsSync(units.broken.worktreePath), true);
+});
+
+test('a repository whose trunk is "master" still gets its integrated unit worktrees removed', async () => {
+  const tmp = setupTestRepo();
+  execFileSync('git', ['branch', '-m', 'main', 'master'], { cwd: tmp, stdio: 'ignore' });
+  const { workflowRunId, units } = seedRunWithUnitWorktrees(tmp, { terminal: 'workflow.complete', trunk: 'master' });
+
+  const state = await resumeWorkflow(workflowRunId, { repoRoot: tmp, cwd: tmp });
+
+  assert.equal(fs.existsSync(units.merged.worktreePath), false, 'a unit merged into master is integrated');
+  assert.deepEqual(state.worktrees.removed.map((e) => e.unitId), ['merged']);
+  assert.match(state.worktrees.kept.find((e) => e.unitId === 'unmerged').reason, /not integrated/);
+});
+
+test('integration target: declared step target, then origin/HEAD, then the checkout branch', () => {
+  const tmp = setupTestRepo();
+  execFileSync('git', ['branch', '-m', 'main', 'trunk'], { cwd: tmp, stdio: 'ignore' });
+  const plain = { steps: [{ id: 'i', kind: 'integrate' }] };
+  assert.equal(resolveIntegrationTarget({ repoRoot: tmp, workflow: plain }), 'trunk', 'local-only repo: its own branch');
+
+  const origin = fs.mkdtempSync(path.join(FIXTURE_ROOT, 'fgos-wf-origin-'));
+  execFileSync('git', ['init', '--bare', '-b', 'develop', origin], { stdio: 'ignore' });
+  execFileSync('git', ['remote', 'add', 'origin', origin], { cwd: tmp, stdio: 'ignore' });
+  execFileSync('git', ['push', '-q', 'origin', 'trunk:develop'], { cwd: tmp, stdio: 'ignore' });
+  execFileSync('git', ['fetch', '-q', 'origin'], { cwd: tmp, stdio: 'ignore' });
+  execFileSync('git', ['remote', 'set-head', 'origin', 'develop'], { cwd: tmp, stdio: 'ignore' });
+  assert.equal(resolveIntegrationTarget({ repoRoot: tmp, workflow: plain }), 'develop', "remote's default branch wins over the checkout");
+
+  const declared = { steps: [{ id: 'i', kind: 'integrate', target: 'release' }] };
+  assert.equal(resolveIntegrationTarget({ repoRoot: tmp, workflow: declared }), 'release', 'declared target wins over everything');
+});
+
+test('a step target is accepted on integrate steps only', () => {
+  const base = { id: 'test/target', title: 'T' };
+  const unit = { id: 'u', template: { capability: 'docs:write', writes: ['a.txt'] } };
+  const ok = validateWorkflow({ ...base, steps: [{ id: 's1', units: [unit] }, { id: 'i', kind: 'integrate', dependsOn: ['s1'], target: 'release' }] });
+  assert.equal(ok.steps[1].target, 'release');
+  assert.throws(() => validateWorkflow({ ...base, steps: [{ id: 's1', target: 'release', units: [unit] }] }), /only valid on a step of kind "integrate"/);
 });

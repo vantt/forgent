@@ -240,7 +240,8 @@ export function buildEffectiveExecutionContract({
   // or bwrap confinement; be completely honest and label it 'instructed'.
   const isShellEnforced = false;
   const shellMode = effectiveMutation === 'read-only' ? 'restricted' : 'worktree-write';
-  const allowedCommands = effectiveMutation === 'read-only' ? [] : ['git add', 'git commit'];
+  // The worker writes files only; the runner stages and commits them after the round.
+  const allowedCommands = [];
   const overallPosture = isConfinementEnforced ? 'enforced' : 'instructed';
 
   // Limits

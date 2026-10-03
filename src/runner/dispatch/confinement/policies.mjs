@@ -58,7 +58,7 @@ export const BUILTIN_POLICIES = Object.freeze({
       Object.freeze({ resource: 'private-home', access: 'read-write', scope: 'dispatch' }),
       Object.freeze({ resource: 'executor-credentials', access: 'read', scope: 'dispatch' }),
       Object.freeze({ resource: 'workspace', access: 'read-write', scope: 'dispatch' }),
-      Object.freeze({ resource: 'workspace-git-metadata', access: 'read-write', scope: 'dispatch' }),
+      Object.freeze({ resource: 'workspace-git-metadata', access: 'read', scope: 'dispatch' }),
     ]),
   }),
 });

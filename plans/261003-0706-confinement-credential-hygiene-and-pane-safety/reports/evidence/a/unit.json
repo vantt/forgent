@@ -1,0 +1,500 @@
+{
+  "unit": {
+    "id": "acc-a",
+    "objective": "Add src/feature.txt",
+    "capability": "acc:write",
+    "writes": [
+      "src/feature.txt"
+    ],
+    "dependsOn": [],
+    "inputs": [],
+    "expectedOutputs": []
+  },
+  "overrides": [],
+  "configSnapshot": {
+    "hash": "4381b0c04fd2da3f31f2f287492d2d7ede0969c08ef549dc82333444612efd69",
+    "runner": {
+      "defaultExecutor": "fake-agent",
+      "rigorToTier": {
+        "low": "nano",
+        "standard": "standard",
+        "high": "flagship",
+        "critical": "frontier"
+      },
+      "modelPolicies": {
+        "claude": {
+          "standard": "fake",
+          "flagship": "fake",
+          "nano": "haiku",
+          "advanced": "sonnet",
+          "frontier": "opus"
+        },
+        "openai-codex": {
+          "nano": "gpt-5.5",
+          "mini": "gpt-5.5",
+          "standard": "gpt-5.5",
+          "advanced": "gpt-5.5",
+          "flagship": "gpt-5.5",
+          "frontier": "gpt-5.5"
+        },
+        "openai": {
+          "nano": "gpt-5.5"
+        }
+      },
+      "idleTimeoutMs": 60000,
+      "executors": {
+        "fake-limit": {
+          "kind": "agent",
+          "allowCrossProvider": true,
+          "providerModel": "claude",
+          "invocations": [
+            {
+              "id": "fake-limit-herdr",
+              "via": "cli",
+              "adapter": "herdr-spawn",
+              "command": "/var/tmp/hyg-accept/fake-limit.sh",
+              "args": [],
+              "confinement": {
+                "backend": "bwrap"
+              },
+              "interactiveMode": {
+                "exitCommand": "exit",
+                "kind": "claude"
+              }
+            }
+          ]
+        },
+        "fake-agent": {
+          "kind": "agent",
+          "allowCrossProvider": true,
+          "providerModel": "claude",
+          "invocations": [
+            {
+              "id": "fake-agent-herdr",
+              "via": "cli",
+              "adapter": "herdr-spawn",
+              "command": "/var/tmp/hyg-accept/fake-agent.sh",
+              "args": [],
+              "confinement": {
+                "backend": "bwrap"
+              },
+              "interactiveMode": {
+                "exitCommand": "exit",
+                "kind": "claude"
+              }
+            }
+          ]
+        },
+        "pi": {
+          "kind": "agent",
+          "description": "pi coding agent (openai-codex/gpt-5.5) -- reference runtime for the coding-worker-contract, D4 proof-test GREEN (tsk-47r)",
+          "allowCrossProvider": true,
+          "invocations": [
+            {
+              "via": "cli",
+              "adapter": "cli-spawn",
+              "command": "pi",
+              "args": [
+                "--provider",
+                "openai-codex",
+                "--model",
+                "{model}",
+                "--tools",
+                "read,write,edit,bash,grep,find,ls",
+                "--mode",
+                "json",
+                "--approve",
+                "-p",
+                "{prompt}"
+              ]
+            }
+          ],
+          "providerModel": "openai-codex"
+        },
+        "openai": {
+          "kind": "agent",
+          "description": "pi coding agent (openai/gpt-5.5) -- reference runtime for the coding-worker-contract, D4 proof-test GREEN (tsk-47r)",
+          "allowCrossProvider": true,
+          "invocations": [
+            {
+              "via": "cli",
+              "adapter": "cli-spawn",
+              "command": "pi",
+              "args": [
+                "--provider",
+                "openai-codex",
+                "--model",
+                "{model}",
+                "--tools",
+                "read,write,edit,bash,grep,find,ls",
+                "--mode",
+                "json",
+                "--approve",
+                "-p",
+                "{prompt}"
+              ]
+            }
+          ],
+          "providerModel": "openai"
+        }
+      },
+      "capabilities": {
+        "acc:write": {
+          "prefer": [
+            {
+              "executor": "fake-agent"
+            }
+          ],
+          "rigor": "standard"
+        },
+        "acc:limit": {
+          "prefer": [
+            {
+              "executor": "fake-limit"
+            },
+            {
+              "executor": "fake-agent"
+            }
+          ],
+          "rigor": "standard"
+        },
+        "advise": {
+          "description": "Async or sync advice / guidance without direct state mutation",
+          "confinement": {
+            "mode": "unconfined"
+          },
+          "serves": {
+            "outputKind": "decision",
+            "mutates": false
+          }
+        },
+        "execute": {
+          "description": "Autonomous execution of work items within boundaries",
+          "confinement": {
+            "mode": "unconfined"
+          },
+          "serves": {
+            "outputKind": "change",
+            "mutates": true
+          }
+        },
+        "code:implement": {
+          "description": "Canonical coding implementation capability -- compliance-driven coding execution before implementation (D1/D2, docs/history/capability-aware-dispatch-activation/CONTEXT.md)",
+          "confinement": {
+            "mode": "unconfined"
+          },
+          "serves": {
+            "outputKind": "change",
+            "domain": "code",
+            "mutates": true
+          }
+        },
+        "code:review": {
+          "description": "Canonical coding review capability -- independent review of a coding implementation unit before merge (P2-runtime, docs/history/agent-coordination-foundation/plan.md).",
+          "confinement": {
+            "mode": "unconfined"
+          },
+          "serves": {
+            "outputKind": "finding",
+            "domain": "code",
+            "mutates": false
+          }
+        },
+        "code:test": {
+          "description": "Canonical coding test capability -- author or run tests for a coding implementation unit (P2-runtime, docs/history/agent-coordination-foundation/plan.md).",
+          "confinement": {
+            "mode": "unconfined"
+          },
+          "serves": {
+            "outputKind": "verification",
+            "domain": "code"
+          }
+        },
+        "code:debug": {
+          "description": "Canonical coding debug capability -- root-cause investigation of a coding defect (P2-runtime, docs/history/agent-coordination-foundation/plan.md).",
+          "confinement": {
+            "mode": "unconfined"
+          },
+          "serves": {
+            "outputKind": "finding",
+            "domain": "code"
+          }
+        },
+        "code:refactor": {
+          "description": "Canonical coding refactor capability -- behavior-preserving structural change to existing code (P2-runtime, docs/history/agent-coordination-foundation/plan.md).",
+          "confinement": {
+            "mode": "unconfined"
+          },
+          "serves": {
+            "outputKind": "change",
+            "domain": "code",
+            "mutates": true,
+            "behaviorPreserving": true
+          }
+        },
+        "review": {
+          "description": "Independent read-only review of a non-code artifact (docs, design, spec, config) before merge/decision -- distinct from code:review (I19, core/skills/_shared/capability-catalog.md).",
+          "confinement": {
+            "mode": "unconfined"
+          },
+          "serves": {
+            "outputKind": "finding",
+            "mutates": false
+          }
+        },
+        "marketing:research": {
+          "description": "Workflow unit capability \"marketing:research\" -- declare a \"prefer\" pool to choose which executors serve it."
+        },
+        "marketing:write": {
+          "description": "Workflow unit capability \"marketing:write\" -- declare a \"prefer\" pool to choose which executors serve it."
+        },
+        "marketing:publish": {
+          "description": "Workflow unit capability \"marketing:publish\" -- declare a \"prefer\" pool to choose which executors serve it."
+        },
+        "architecture:frame": {
+          "description": "Workflow unit capability \"architecture:frame\" -- declare a \"prefer\" pool to choose which executors serve it."
+        },
+        "architecture:shape": {
+          "description": "Workflow unit capability \"architecture:shape\" -- declare a \"prefer\" pool to choose which executors serve it."
+        },
+        "architecture:critique": {
+          "description": "Workflow unit capability \"architecture:critique\" -- declare a \"prefer\" pool to choose which executors serve it."
+        },
+        "architecture:synthesize": {
+          "description": "Workflow unit capability \"architecture:synthesize\" -- declare a \"prefer\" pool to choose which executors serve it."
+        },
+        "architecture:explain": {
+          "description": "Workflow unit capability \"architecture:explain\" -- declare a \"prefer\" pool to choose which executors serve it."
+        },
+        "business:frame": {
+          "description": "Workflow unit capability \"business:frame\" -- declare a \"prefer\" pool to choose which executors serve it."
+        },
+        "business:perspectives": {
+          "description": "Workflow unit capability \"business:perspectives\" -- declare a \"prefer\" pool to choose which executors serve it."
+        },
+        "business:critique": {
+          "description": "Workflow unit capability \"business:critique\" -- declare a \"prefer\" pool to choose which executors serve it."
+        },
+        "business:synthesize": {
+          "description": "Workflow unit capability \"business:synthesize\" -- declare a \"prefer\" pool to choose which executors serve it."
+        },
+        "business:plan": {
+          "description": "Workflow unit capability \"business:plan\" -- declare a \"prefer\" pool to choose which executors serve it."
+        },
+        "delphi:propose": {
+          "description": "Workflow unit capability \"delphi:propose\" -- declare a \"prefer\" pool to choose which executors serve it."
+        },
+        "delphi:synthesize": {
+          "description": "Workflow unit capability \"delphi:synthesize\" -- declare a \"prefer\" pool to choose which executors serve it."
+        },
+        "group-cognition:explore": {
+          "description": "Workflow unit capability \"group-cognition:explore\" -- declare a \"prefer\" pool to choose which executors serve it."
+        },
+        "group-cognition:critique": {
+          "description": "Workflow unit capability \"group-cognition:critique\" -- declare a \"prefer\" pool to choose which executors serve it."
+        },
+        "group-cognition:synthesize": {
+          "description": "Workflow unit capability \"group-cognition:synthesize\" -- declare a \"prefer\" pool to choose which executors serve it."
+        },
+        "nominal-group:generate": {
+          "description": "Workflow unit capability \"nominal-group:generate\" -- declare a \"prefer\" pool to choose which executors serve it."
+        },
+        "nominal-group:share": {
+          "description": "Workflow unit capability \"nominal-group:share\" -- declare a \"prefer\" pool to choose which executors serve it."
+        },
+        "nominal-group:vote": {
+          "description": "Workflow unit capability \"nominal-group:vote\" -- declare a \"prefer\" pool to choose which executors serve it."
+        },
+        "nominal-group:rank": {
+          "description": "Workflow unit capability \"nominal-group:rank\" -- declare a \"prefer\" pool to choose which executors serve it."
+        },
+        "coding:discover": {
+          "description": "Workflow unit capability \"coding:discover\" -- declare a \"prefer\" pool to choose which executors serve it."
+        },
+        "coding:explore": {
+          "description": "Workflow unit capability \"coding:explore\" -- declare a \"prefer\" pool to choose which executors serve it."
+        },
+        "coding:plan": {
+          "description": "Workflow unit capability \"coding:plan\" -- declare a \"prefer\" pool to choose which executors serve it."
+        },
+        "coding:validate": {
+          "description": "Workflow unit capability \"coding:validate\" -- declare a \"prefer\" pool to choose which executors serve it."
+        },
+        "coding:implement": {
+          "description": "Workflow unit capability \"coding:implement\" -- declare a \"prefer\" pool to choose which executors serve it."
+        }
+      },
+      "patterns": {
+        "defaultRule": {
+          "mutatingMinRigor": "standard"
+        },
+        "reviewed": {
+          "maxRounds": 2,
+          "checkersByRigor": {
+            "standard": [
+              "reviewer"
+            ],
+            "high": [
+              "reviewer",
+              "red-team"
+            ],
+            "critical": [
+              "reviewer",
+              "red-team",
+              "tester"
+            ]
+          }
+        }
+      },
+      "coordination": {
+        "orgPolicy": {
+          "dischargeOn": [
+            "accepted"
+          ]
+        }
+      },
+      "executor": {
+        "command": "claude",
+        "args": [
+          "-p",
+          "{prompt}",
+          "--model",
+          "{model}",
+          "--permission-mode",
+          "acceptEdits",
+          "--allowedTools",
+          "Bash(git add:*),Bash(git commit:*)"
+        ]
+      },
+      "timeoutMs": 900000,
+      "confinement": {
+        "strict": false
+      },
+      "parallel": {
+        "maxRoots": 4,
+        "maxLeavesPerRoot": 4
+      },
+      "providers": {
+        "openai": {
+          "accounts": {
+            "fgovn": {
+              "label": "fgovn",
+              "credentialSource": {
+                "kind": "codex-home",
+                "home": "${HOME}/.codex-fgovn"
+              }
+            }
+          }
+        },
+        "xai": {
+          "accounts": {
+            "vantt": {
+              "label": "vantt",
+              "credentialSource": {
+                "kind": "home-files",
+                "home": "${HOME}/.pi/accounts/grok-vantt",
+                "files": [
+                  "auth.json",
+                  "models-store.json",
+                  "settings.json",
+                  "trust.json",
+                  "bin/fd"
+                ]
+              }
+            }
+          }
+        },
+        "gemini": {
+          "accounts": {
+            "mucdong": {
+              "label": "mucdong",
+              "credentialSource": {
+                "kind": "home-files",
+                "home": "${HOME}/.agy-homes/mucdong",
+                "files": [
+                  ".gemini/antigravity-cli/antigravity-oauth-token",
+                  ".gemini/antigravity-cli/settings.json",
+                  ".gemini/antigravity-cli/installation_id",
+                  ".gemini/antigravity-cli/jetski_state.pbtxt",
+                  ".gemini/antigravity-cli/cache/onboarding.json"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "worktree": "/var/tmp/hyg-accept/wt",
+  "createdBy": "vantt",
+  "createdAt": "2026-10-03T01:36:30.735Z",
+  "bindings": {
+    "producer/1": [
+      {
+        "role": "producer",
+        "round": 1,
+        "assignmentId": "unit-run-1790991390730-761228f7/producer/1",
+        "binding": {
+          "contractVersion": "v1alpha1",
+          "executor": "fake-agent",
+          "invocation": "fake-agent-herdr",
+          "transport": "herdr",
+          "candidateIndex": 0,
+          "tier": "standard",
+          "model": "fake",
+          "persona": null,
+          "mechanism": "out-of-process",
+          "posture": "workspace-write",
+          "provenance": {
+            "executor": {
+              "value": "fake-agent",
+              "source": "capability:acc:write"
+            },
+            "invocation": {
+              "value": "fake-agent-herdr",
+              "source": "capability:acc:write"
+            },
+            "transport": {
+              "value": "herdr",
+              "source": "herdr-invocation-present"
+            },
+            "tier": {
+              "value": "standard",
+              "source": "rigor:standard"
+            },
+            "model": {
+              "value": "fake",
+              "source": "resolveTierModel(claude.standard)"
+            },
+            "persona": {
+              "value": null,
+              "source": "none"
+            },
+            "mechanism": {
+              "value": "out-of-process",
+              "source": "decideExecutorDispatchMechanism"
+            },
+            "posture": {
+              "value": "workspace-write",
+              "source": "producer-writes-declared"
+            }
+          }
+        },
+        "transport": "herdr",
+        "invocation": "fake-agent-herdr",
+        "fallbackFrom": null,
+        "boundAt": "2026-10-03T01:36:30.737Z",
+        "commit": {
+          "status": "committed",
+          "sha": "b49ec8ba9795494009d4d520929a8da45af80d6c",
+          "subject": "Add src/feature.txt from the fake agent",
+          "files": [
+            "src/feature.txt"
+          ]
+        },
+        "outcome": "pass",
+        "runId": "run_unit-run-1790991390730-761228f7/producer/1_01"
+      }
+    ]
+  }
+}
