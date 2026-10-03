@@ -243,4 +243,5 @@ test('an adapter failure that left its pane open keeps the home, tags it with th
   assert.equal(calls.cleanup, 0, 'a live pane is still using the home');
   assert.deepEqual(calls.retain, ['p-2']);
   assert.deepEqual(thrown.retainedPrivateHomes, ['/fake/home']);
+  assert.match(thrown.message, /Private home kept for the open pane.*\/fake\/home/, 'the failure record names the path');
 });

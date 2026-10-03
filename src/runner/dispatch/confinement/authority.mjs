@@ -1162,7 +1162,12 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       for (const prepared of [preparedConfinement, preparedLaunch?.preparedConfinement]) {
         try { retainedHomes.push(...(prepared?.retain?.({ paneId: err.paneId }) ?? [])); } catch { /* best effort */ }
       }
-      if (retainedHomes.length > 0) err.retainedPrivateHomes = [...retainedHomes];
+      if (retainedHomes.length > 0) {
+        err.retainedPrivateHomes = [...retainedHomes];
+        // The message is what lands in the run's failure record (stderr.log / runnerNote), so the
+        // path of a login copy kept alive for a pane is written down where an operator looks.
+        err.message = `${err.message} Private home kept for the open pane (removed once the pane is closed): ${retainedHomes.join(', ')}.`;
+      }
     }
     if (preparedLaunch) {
       const launchCommandId = request.assignmentLaunchContext.command?.launchCommandId;
