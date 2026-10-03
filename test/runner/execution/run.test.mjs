@@ -595,3 +595,50 @@ test('fgos run reclaims a private home whose owning process is gone before it do
     fs.rmSync(base, { recursive: true, force: true });
   }
 });
+
+// A worker that writes a file in its worktree and never touches git.
+function writeFileWritingWorker(repoRoot) {
+  const script = path.join(repoRoot, 'settling-worker.mjs');
+  fs.writeFileSync(
+    script,
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const prompt = process.argv.slice(2).join(' ');
+    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    if (true) {
+      fs.mkdirSync('src', { recursive: true });
+      fs.writeFileSync('src/feature.txt', 'feature\\n');
+    }
+    if (match) {
+      const claimDir = path.dirname(match[1]);
+      const outbox = path.join(claimDir, 'worker-output', 'outbox');
+      const runDir = fs.existsSync(outbox) ? outbox : claimDir;
+      fs.mkdirSync(runDir, { recursive: true });
+      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\nThe assigned work was carried out and checked in full detail.\\n');
+      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Added the feature file', assessment: { verdict: 'pass' } }));
+    }
+    `,
+  );
+}
+
+test('after a producer round passes, the runner commits what the worker wrote, with the agent summary as message', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha']);
+  writeFileWritingWorker(repoRoot);
+  const before = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: worktreeDir, encoding: 'utf8' }).trim();
+
+  const res = await runUnit({
+    unitData: { id: 'u-commit', objective: 'Implement feature', capability: 'docs:write', writes: ['src/feature.txt'] },
+    repoRoot, cwd: worktreeDir, pattern: 'solo',
+  });
+
+  assert.equal(res.outcome, 'pass');
+  assert.equal(res.results[0].commit.status, 'committed');
+  assert.deepEqual(res.results[0].commit.files, ['src/feature.txt']);
+  assert.equal(execFileSync('git', ['log', '-1', '--format=%s'], { cwd: worktreeDir, encoding: 'utf8' }).trim(), 'Added the feature file');
+  assert.notEqual(execFileSync('git', ['rev-parse', 'HEAD'], { cwd: worktreeDir, encoding: 'utf8' }).trim(), before);
+  assert.equal(execFileSync('git', ['status', '--porcelain'], { cwd: worktreeDir, encoding: 'utf8' }).trim(), '', 'nothing left uncommitted');
+  const unitRecord = JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'assignments', res.unitRunId, 'unit.json'), 'utf8'));
+  assert.equal(Object.values(unitRecord.bindings)[0][0].commit.status, 'committed', 'the run record says what the runner committed');
+});

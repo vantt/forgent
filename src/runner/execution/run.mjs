@@ -11,6 +11,7 @@ import { bind, nextCandidate } from './bind.mjs';
 import { runPattern } from './patterns/index.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { ensureRunnerConfigForDir, RunnerConfigError } from '../dispatch/config.mjs';
+import { commitUnitWork } from './commit-unit-work.mjs';
 import { reapOrphanedConfinementResources, resolveConfinementTempRoot } from '../dispatch/confinement/cleanup.mjs';
 
 /**
@@ -434,6 +435,19 @@ export async function runUnit(options = {}) {
       }
 
       const result = await dispatchBound({ bound, role, round, readOnly, assignmentId, assignmentDir, session });
+
+      // The worker only writes files; this trusted code, outside the confinement, commits them.
+      // No change is recorded as such, and a commit that cannot be made fails the round.
+      if (!readOnly && result.outcome === 'pass') {
+        const commit = commitUnitWork({
+          worktree: unitRecord.worktree,
+          unitId: (rUnit || unit).id,
+          summary: result.runResult?.agentClaim?.summary,
+        });
+        result.commit = commit;
+        attempts[attemptNo].commit = commit;
+        if (commit.status === 'failed') result.outcome = 'execution-failure';
+      }
 
       attempts[attemptNo].outcome = result.outcome;
       attempts[attemptNo].runId = result.runResult?.runId ?? null;
