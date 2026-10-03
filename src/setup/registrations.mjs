@@ -44,7 +44,7 @@ import {
   loadMachineBackendRegistry,
 } from '../runner/dispatch/confinement/backend-registry.mjs';
 import { runAllConfinementProbes } from '../runner/dispatch/confinement/probes/harness.mjs';
-import { reapOrphanedConfinementResources, OWNERSHIP_MARKER_FILE } from '../runner/dispatch/confinement/cleanup.mjs';
+import { reapOrphanedConfinementResources, resolveConfinementTempRoot, OWNERSHIP_MARKER_FILE } from '../runner/dispatch/confinement/cleanup.mjs';
 
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, DEFAULT_RIGOR_TO_TIER, validateCapabilityServesShape, RunnerConfigError } from '../runner/dispatch/config.mjs';
@@ -4825,7 +4825,7 @@ registerFix({
 // --fix`) and at runner start (loop.mjs) is what actually reclaims it.
 
 export function defaultConfinementTempRoots() {
-  const roots = new Set([path.join(os.tmpdir(), 'fgos-confinement')]);
+  const roots = new Set([resolveConfinementTempRoot()]);
   try {
     const registry = loadMachineBackendRegistry();
     for (const instance of Object.values(registry?.confinementBackends || {})) {
@@ -4838,19 +4838,39 @@ export function defaultConfinementTempRoots() {
   return [...roots];
 }
 
+/** Temp roots we own whose mode is not owner-only: a private home under one
+ * holds a copy of an account login, so a group- or world-readable root is a
+ * finding in its own right (counts only; never reads the contents). */
+function looseConfinementRoots(roots) {
+  const uid = typeof process.getuid === 'function' ? process.getuid() : null;
+  const loose = [];
+  for (const root of roots) {
+    try {
+      const st = fs.statSync(root);
+      if ((uid === null || st.uid === uid) && (st.mode & 0o077) !== 0) loose.push(root);
+    } catch { /* absent root: nothing to protect yet */ }
+  }
+  return loose;
+}
+
 export function checkConfinementOrphanedResourcesReaped() {
   // Read-only: reapOrphanedConfinementResources has no dry-run mode of its
   // own (it deletes), so this counts dead-owned markers itself instead of
   // calling it -- a `check` must never mutate.
   const roots = defaultConfinementTempRoots();
   const markedDeadOwnerDirs = countDeadOwnedConfinementDirs(roots);
-  if (markedDeadOwnerDirs === 0) {
+  const loose = looseConfinementRoots(roots);
+  if (markedDeadOwnerDirs === 0 && loose.length === 0) {
     return { passed: true, message: 'no orphaned confinement resources found under ' + roots.join(', ') };
   }
-  return {
-    passed: false,
-    message: `${markedDeadOwnerDirs} confinement resource dir(s) owned by a dead process across ${roots.join(', ')} -- run "fgos doctor --fix"`,
-  };
+  const problems = [];
+  if (markedDeadOwnerDirs > 0) {
+    problems.push(`${markedDeadOwnerDirs} confinement resource dir(s) owned by a dead process across ${roots.join(', ')}`);
+  }
+  if (loose.length > 0) {
+    problems.push(`confinement root(s) readable beyond the owner (should be 0700): ${loose.join(', ')}`);
+  }
+  return { passed: false, message: `${problems.join('; ')} -- run "fgos doctor --fix"` };
 }
 
 function countDeadOwnedConfinementDirs(roots) {
@@ -4877,6 +4897,8 @@ function countDeadOwnedConfinementDirs(roots) {
         if (!fs.existsSync(markerPath)) continue;
         try {
           const marker = JSON.parse(fs.readFileSync(markerPath, 'utf8'));
+          // A home kept for a left-open pane is awaiting that pane, not orphaned.
+          if (marker.paneId) continue;
           const alive = Number.isInteger(marker.pid) && marker.pid > 0 && (() => {
             try { process.kill(marker.pid, 0); return true; } catch (err) { return err.code === 'EPERM'; }
           })();
@@ -4895,16 +4917,24 @@ export function fixConfinementOrphanedResourcesReaped() {
   const roots = defaultConfinementTempRoots();
   let totalReaped = 0;
   const messages = [];
+  const tightened = looseConfinementRoots(roots);
+  for (const root of tightened) {
+    try { fs.chmodSync(root, 0o700); } catch { /* reported again by the check */ }
+  }
   for (const tempRoot of roots) {
     const { reaped } = reapOrphanedConfinementResources({ tempRoot });
     totalReaped += reaped.length;
     if (reaped.length > 0) messages.push(`${reaped.length} under ${tempRoot}`);
   }
+  const tightenedNote = tightened.length > 0 ? `set ${tightened.join(', ')} to 0700` : '';
   return {
-    changed: totalReaped > 0,
-    message: totalReaped > 0
-      ? `reaped ${totalReaped} orphaned confinement resource dir(s): ${messages.join('; ')}`
-      : 'no orphaned confinement resources to reap',
+    changed: totalReaped > 0 || tightened.length > 0,
+    message: [
+      totalReaped > 0
+        ? `reaped ${totalReaped} orphaned confinement resource dir(s): ${messages.join('; ')}`
+        : 'no orphaned confinement resources to reap',
+      tightenedNote,
+    ].filter(Boolean).join('; '),
   };
 }
 

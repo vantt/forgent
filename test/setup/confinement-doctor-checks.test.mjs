@@ -105,6 +105,50 @@ test('fixConfinementOrphanedResourcesReaped reports changed:false when nothing n
   assert.equal(typeof result.message, 'string');
 });
 
+test('doctor flags a confinement root readable beyond its owner, and fix sets it to 0700', () => {
+  const base = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-confinement-root-mode-'));
+  const previousTmp = process.env.TMPDIR;
+  process.env.TMPDIR = base;
+  try {
+    const root = path.join(base, 'fgos-confinement');
+    fs.mkdirSync(root);
+    fs.chmodSync(root, 0o775);
+
+    const before = checkConfinementOrphanedResourcesReaped();
+    assert.equal(before.passed, false);
+    assert.match(before.message, /0700/);
+    assert.ok(before.message.includes(root));
+
+    const fixed = fixConfinementOrphanedResourcesReaped();
+    assert.equal(fixed.changed, true);
+    assert.equal(fs.statSync(root).mode & 0o777, 0o700);
+    assert.equal(checkConfinementOrphanedResourcesReaped().passed, true);
+  } finally {
+    if (previousTmp === undefined) delete process.env.TMPDIR; else process.env.TMPDIR = previousTmp;
+    fs.rmSync(base, { recursive: true, force: true });
+  }
+});
+
+test('doctor does not call a home kept for an open pane orphaned', () => {
+  const base = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-confinement-retained-'));
+  const previousTmp = process.env.TMPDIR;
+  process.env.TMPDIR = base;
+  try {
+    const root = path.join(base, 'fgos-confinement');
+    const home = path.join(root, 'disp_kept', 'home');
+    fs.mkdirSync(home, { recursive: true, mode: 0o700 });
+    fs.chmodSync(root, 0o700);
+    writeOwnershipMarker(home, { dispatchId: 'disp_kept', pid: 2 ** 22 + 1 });
+    const markerPath = path.join(home, '.fgos-confinement-owner.json');
+    const marker = JSON.parse(fs.readFileSync(markerPath, 'utf8'));
+    fs.writeFileSync(markerPath, JSON.stringify({ ...marker, paneId: 'p-3' }));
+    assert.equal(checkConfinementOrphanedResourcesReaped().passed, true);
+  } finally {
+    if (previousTmp === undefined) delete process.env.TMPDIR; else process.env.TMPDIR = previousTmp;
+    fs.rmSync(base, { recursive: true, force: true });
+  }
+});
+
 // ─── Check 1: confinement-policies-declared ─────────────────────────────────
 
 test('confinement-policies-declared passes when all referenced policies are declared', () => {

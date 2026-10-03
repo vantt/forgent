@@ -1150,7 +1150,7 @@ function concludeFailure({ client, round, decision, closeAlways }) {
     `executor for work "${round.workId}" ended as ${decision.outcome}: ${decision.reason}.${
       screenLine ? ` Last line on screen: ${screenLine}` : ''
     }${fate === 'keep' ? ` Pane ${round.paneId} is left open.` : ''}`,
-    { outcome: decision.outcome, ...(screenLine ? { screen: screenLine } : {}) },
+    { outcome: decision.outcome, paneRetained: fate !== 'close', ...(screenLine ? { screen: screenLine } : {}) },
   );
 }
 

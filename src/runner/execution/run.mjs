@@ -11,6 +11,7 @@ import { bind, nextCandidate } from './bind.mjs';
 import { runPattern } from './patterns/index.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { ensureRunnerConfigForDir, RunnerConfigError } from '../dispatch/config.mjs';
+import { reapOrphanedConfinementResources, resolveConfinementTempRoot } from '../dispatch/confinement/cleanup.mjs';
 
 /**
  * Map a settled RunResult onto the outcome vocabulary the collaboration patterns use.
@@ -132,6 +133,12 @@ export function snapshotRunnerConfig(mainCheckoutRoot) {
  * @returns {Promise<{unitRunId: string, outcome: string, rounds: number, results: Array}>}
  */
 export async function runUnit(options = {}) {
+  // Private homes left by an earlier run (a failed round that kept its pane)
+  // hold a copy of an account login; `fgos run` is the one door every such run
+  // goes through, so it is also where the ones whose pane has since closed are
+  // reclaimed. Best effort: a reap problem never blocks the run.
+  try { reapOrphanedConfinementResources({ tempRoot: resolveConfinementTempRoot() }); } catch { /* best effort */ }
+
   const cwd = options.cwd ?? process.cwd();
   const roots = resolveGitRoots(cwd);
   const mainRoot = options.repoRoot ? path.resolve(options.repoRoot) : roots.mainCheckoutRoot;

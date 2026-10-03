@@ -566,3 +566,32 @@ test('a panel whose every provider family is taken by panelists refuses the synt
   const synth = res.results.find((r) => r.role === 'synthesizer');
   assert.equal(synth.refused.reason, 'independence');
 });
+
+test('fgos run reclaims a private home whose owning process is gone before it does anything else', async () => {
+  const base = fs.mkdtempSync(path.join(FIXTURE_ROOT, 'fgos-run-reap-'));
+  const previousTmp = process.env.TMPDIR;
+  process.env.TMPDIR = base;
+  try {
+    const root = path.join(base, 'fgos-confinement');
+    const home = path.join(root, 'disp_stale', 'home');
+    fs.mkdirSync(home, { recursive: true });
+    fs.writeFileSync(path.join(home, 'auth.json'), '{}');
+    fs.writeFileSync(
+      path.join(home, '.fgos-confinement-owner.json'),
+      JSON.stringify({
+        contract: 'confinement-resource-ownership.v1',
+        creator: 'fgos-confinement',
+        dispatchId: 'disp_stale',
+        resource: 'private-home',
+        pid: 2 ** 22 + 1, // above the kernel's pid ceiling: never alive
+        createdAt: new Date().toISOString(),
+      }),
+    );
+    // No unit given: the run refuses, but only after the reap.
+    await assert.rejects(() => runUnit({ cwd: base }), RunnerConfigError);
+    assert.equal(fs.existsSync(path.join(root, 'disp_stale')), false);
+  } finally {
+    if (previousTmp === undefined) delete process.env.TMPDIR; else process.env.TMPDIR = previousTmp;
+    fs.rmSync(base, { recursive: true, force: true });
+  }
+});

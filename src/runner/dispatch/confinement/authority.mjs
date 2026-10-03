@@ -1125,10 +1125,9 @@ export async function executeThroughConfinement(request, adapterPort = null) {
   }
 
   let adapterResult;
-  let adapterReturned = false;
+  let retainedHomes = [];
   try {
     adapterResult = await adapterFn(preparedInvocation, adapterOpts);
-    adapterReturned = true;
     if (preparedLaunch && adapterResult?.receipt) {
       const launchCommandId = request.assignmentLaunchContext.command?.launchCommandId;
       const runDir = request.context?.runDir;
@@ -1155,6 +1154,16 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       }
     }
   } catch (err) {
+    // A failed round whose pane was left open still has a worker running in
+    // that pane against the private home, so the home stays and is tagged
+    // with the pane; every other failure takes the home (and the login copy
+    // in it) away in the finally below.
+    if (err?.paneRetained === true && err.paneId) {
+      for (const prepared of [preparedConfinement, preparedLaunch?.preparedConfinement]) {
+        try { retainedHomes.push(...(prepared?.retain?.({ paneId: err.paneId }) ?? [])); } catch { /* best effort */ }
+      }
+      if (retainedHomes.length > 0) err.retainedPrivateHomes = [...retainedHomes];
+    }
     if (preparedLaunch) {
       const launchCommandId = request.assignmentLaunchContext.command?.launchCommandId;
       const runDir = request.context?.runDir;
@@ -1244,15 +1253,17 @@ export async function executeThroughConfinement(request, adapterPort = null) {
         cleanup: failedAttestation.cleanup,
         result: adapterResult,
         cause: err.message,
+        ...(retainedHomes.length > 0 ? { retainedPrivateHomes: [...retainedHomes] } : {}),
       },
     );
   } finally {
     // An assignment-owned launch prepared its confinement in prepareConfinementForLaunch, so its
     // resources (a private home holding a copy of the account login) are not on the outer variable.
-    // They are removed once the worker returned; after a failure they stay, like the pane they belong to.
-    const launchPrepared = adapterReturned ? preparedLaunch?.preparedConfinement : null;
-    for (const prepared of [preparedConfinement, launchPrepared]) {
+    // They are removed whether the worker returned or threw -- the one exception is a failure that
+    // left its pane open, whose home was retained above and is reaped once that pane closes.
+    for (const prepared of [preparedConfinement, preparedLaunch?.preparedConfinement]) {
       if (!prepared?.cleanup) continue;
+      if (retainedHomes.length > 0 && prepared.retain) continue;
       try {
         await prepared.cleanup();
       } catch {

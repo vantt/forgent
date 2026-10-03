@@ -11,7 +11,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { cleanupConfinementResource, writeOwnershipMarker } from '../cleanup.mjs';
+import { cleanupConfinementResource, writeOwnershipMarker, ensurePrivateDir, markResourceRetained } from '../cleanup.mjs';
 import { resolveConfinementResources } from '../resources.mjs';
 import { assertAttestationStoreIsolated } from '../attestation-store.mjs';
 
@@ -59,7 +59,7 @@ function copyHomeFiles(privateHomeTarget, sourceHome, files) {
     }
     const destination = path.join(privateHomeTarget, rel);
     try {
-      fs.mkdirSync(path.dirname(destination), { recursive: true });
+      ensurePrivateDir(path.dirname(destination), { root: privateHomeTarget });
       fs.copyFileSync(realSource, destination);
       // Credentials stay owner-only; a listed helper binary keeps its exec bit.
       fs.chmodSync(destination, fs.statSync(realSource).mode & 0o100 ? 0o700 : 0o600);
@@ -88,7 +88,9 @@ function provisionSelectedCodexCredential(privateHomeTarget, request) {
     throw credentialError('selected Codex credential auth.json is missing');
   }
   try {
-    fs.copyFileSync(authCandidate, path.join(privateHomeTarget, 'auth.json'));
+    const authCopy = path.join(privateHomeTarget, 'auth.json');
+    fs.copyFileSync(authCandidate, authCopy);
+    fs.chmodSync(authCopy, 0o600);
   } catch (copyErr) {
     throw credentialError(`selected Codex credential auth.json could not be copied: ${copyErr.message}`);
   }
@@ -409,7 +411,10 @@ export async function prepareBwrap(plan, request, backend) {
       if (!res.hostTarget || !res.executionTarget?.path) continue;
 
       if (res.allocation === 'temporary') {
-        fs.mkdirSync(res.hostTarget, { recursive: true });
+        // <tempRoot>/<dispatchId>/home: when the resolver names the temp root, the
+        // root, the per-dispatch parent and the home all end up owner-only -- the
+        // home receives a login copy. Nothing above the named root is touched.
+        ensurePrivateDir(res.hostTarget, { root: res.tempRoot ?? res.hostTarget });
         writeOwnershipMarker(res.hostTarget, { dispatchId: request.dispatchId, resource: res.resource });
         allocatedPaths.push(res.hostTarget);
         if (res.resource === 'private-home') {
@@ -469,11 +474,17 @@ export async function prepareBwrap(plan, request, backend) {
       }
     };
 
+    // The worker's pane was left open after a failed run: keep the homes, tag
+    // them with the pane, and hand back where they are so the failure record
+    // can say. They are reaped once the pane is gone.
+    const retain = ({ paneId } = {}) => allocatedPaths.filter((p) => markResourceRetained(p, { paneId }));
+
     return {
       invocation: preparedInvocation,
       claims: { ...plan.coverage },
       providerCapacity: credentialProvisioned ? { credentialProvisioned: true } : undefined,
       cleanup,
+      retain,
     };
   } catch (err) {
     // On prepare error: clean up any allocated resources before throwing
