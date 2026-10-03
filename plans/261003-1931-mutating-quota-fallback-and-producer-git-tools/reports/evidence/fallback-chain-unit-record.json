@@ -1,0 +1,38 @@
+{
+  "unitRunId": "unit-run-1791034966301-4a69a877",
+  "attempts": [
+    {
+      "assignmentId": "unit-run-1791034966301-4a69a877/producer/1",
+      "executor": "alpha",
+      "transport": "herdr",
+      "skipCandidateIndex": -1,
+      "candidateIndex": 0,
+      "outcome": "provider-limit"
+    },
+    {
+      "assignmentId": "unit-run-1791034966301-4a69a877/producer/1-fb1",
+      "executor": "beta",
+      "transport": "herdr",
+      "skipCandidateIndex": 0,
+      "candidateIndex": 1,
+      "outcome": "provider-limit"
+    },
+    {
+      "assignmentId": "unit-run-1791034966301-4a69a877/producer/1-fb2",
+      "executor": "gamma",
+      "transport": "herdr",
+      "skipCandidateIndex": 1,
+      "candidateIndex": 2,
+      "outcome": "pass",
+      "commit": {
+        "status": "committed",
+        "sha": "43bb326c31719877d3da80f7d44d703905317875",
+        "subject": "fake pane worker finished",
+        "files": [
+          "probe-worktree.txt"
+        ]
+      }
+    }
+  ],
+  "worktreeLog": "43bb326c31719877d3da80f7d44d703905317875 fake pane worker finished\n\n probe-worktree.txt | 1 +\n 1 file changed, 1 insertion(+)\nff4de910f361ce1e01e84da4159279051150a80d initial\n\n README.md | 1 +\n 1 file changed, 1 insertion(+)\n"
+}
