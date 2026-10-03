@@ -509,6 +509,7 @@ function assertInlineMutatingAssignmentAuthorized(asgn, opts) {
         runnerConfig: unitRecord.configSnapshot?.runner || opts.runnerConfig,
         session: opts.session || {},
       },
+      { skipCandidateIndex: fallbackSkipIndex(unitRecord, asgn.assignmentId) },
     );
 
     if (recomputed.refused) {
@@ -1209,6 +1210,26 @@ function attemptProviderCapacityFallback({
     // before this phase.
     evidence: declaredCandidates.length ? { declaredPrimary: resolvedExecutorId, reasonCode: 'provider-capacity-refused', primaryRefusalReason, skippedCandidates } : null,
   };
+}
+
+/**
+ * Where a provider-limit fallback attempt resumes its candidate walk, read from the attempt
+ * chain the runner persisted in unit.json -- never from the assignment, which a caller could
+ * forge. An attempt only skips candidates when the attempt right before it, for the same
+ * role/round, stopped on a provider limit; the skip is that attempt's own candidate index.
+ * Anything else (first attempt, unknown assignment, earlier attempt not limited) binds from
+ * the start of the pool, exactly as before.
+ */
+function fallbackSkipIndex(unitRecord, assignmentId) {
+  for (const attempts of Object.values(unitRecord.bindings ?? {})) {
+    if (!Array.isArray(attempts)) continue;
+    const at = attempts.findIndex((attempt) => attempt?.assignmentId === assignmentId);
+    if (at <= 0) continue;
+    const previous = attempts[at - 1];
+    const index = previous?.binding?.candidateIndex;
+    if (previous?.outcome === 'provider-limit' && Number.isInteger(index) && index >= 0) return index;
+  }
+  return -1;
 }
 
 /**

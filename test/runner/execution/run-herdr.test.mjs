@@ -457,6 +457,46 @@ test('a provider-limit screen moves the role to the next candidate in a new pane
   assert.equal(attempts[1].fallbackFrom.executor, 'alpha');
 });
 
+const writerUnit = (id) => ({ id, objective: 'Write docs', capability: 'docs:write', writes: ['probe-worktree.txt'], pattern: 'solo' });
+const LIMIT_SCREEN = "You've hit your usage limit. Try again in 3h.";
+
+test('a writing producer that hits a provider limit falls back to the next candidate through the mutating gate', { skip: SKIP }, async () => {
+  const { repoRoot, worktreeDir, signalDir } = setup(['alpha', 'beta']);
+  const fake = useFakeHerdr({ signalDir, panes: [{ limit: true }, { awaitProbe: true }], limitScreen: LIMIT_SCREEN });
+  const res = await withHerdrBin(fake.herdrBin, () => runUnit({
+    unitData: writerUnit('u-limit-writer'),
+    repoRoot,
+    cwd: worktreeDir,
+    worktree: worktreeDir,
+    session: { herdrPresent: true, headless: true },
+  }));
+  assert.equal(res.outcome, 'pass', JSON.stringify(res.results[0]).slice(0, 2000));
+
+  const unitRecord = readJson(path.join(repoRoot, '.fgos', 'assignments', res.unitRunId, 'unit.json'));
+  const attempts = unitRecord.bindings['producer/1'];
+  assert.deepEqual(attempts.map((a) => [a.binding.executor, a.outcome]), [['alpha', 'provider-limit'], ['beta', 'pass']]);
+  assert.deepEqual(attempts.map((a) => [a.skipCandidateIndex, a.candidateIndex]), [[-1, 0], [0, 1]]);
+  // The fallback attempt wrote in the worktree and the runner committed it.
+  assert.equal(fs.existsSync(path.join(worktreeDir, 'probe-worktree.txt')), true);
+  assert.equal(attempts[1].commit.status, 'committed');
+});
+
+test('a writing producer falls back along a chain of three candidates', { skip: SKIP }, async () => {
+  const { repoRoot, worktreeDir, signalDir } = setup(['alpha', 'beta', 'gamma']);
+  const fake = useFakeHerdr({ signalDir, panes: [{ limit: true }, { limit: true }, { awaitProbe: true }], limitScreen: LIMIT_SCREEN });
+  const res = await withHerdrBin(fake.herdrBin, () => runUnit({
+    unitData: writerUnit('u-limit-writer-chain'),
+    repoRoot,
+    cwd: worktreeDir,
+    worktree: worktreeDir,
+    session: { herdrPresent: true, headless: true },
+  }));
+  assert.equal(res.outcome, 'pass', JSON.stringify(res.results[0]).slice(0, 2000));
+  const attempts = readJson(path.join(repoRoot, '.fgos', 'assignments', res.unitRunId, 'unit.json')).bindings['producer/1'];
+  assert.deepEqual(attempts.map((a) => [a.binding.executor, a.outcome]), [['alpha', 'provider-limit'], ['beta', 'provider-limit'], ['gamma', 'pass']]);
+  assert.deepEqual(attempts.map((a) => [a.skipCandidateIndex, a.candidateIndex]), [[-1, 0], [0, 1], [1, 2]]);
+});
+
 test('with no candidate left a provider limit stays a structured provider-limit outcome', { skip: SKIP }, async () => {
   const { repoRoot, worktreeDir } = setup(['alpha']);
   const fake = useFakeHerdr({ panes: [{ limit: true }], limitScreen: 'Rate limit reached, try again later.' });
