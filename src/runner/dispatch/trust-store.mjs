@@ -67,6 +67,19 @@ function readStore(storePath) {
   }
 }
 
+/** Write `body` to `tmp` and rename it over `target`, keeping the target's own
+ * permission bits. The stores this module edits hold provider credentials or
+ * trust decisions (a 0600 file stays 0600); a temp file created with the
+ * process default would silently widen it to 0664 under a 002 umask. A target
+ * that does not exist yet is created owner-only. */
+function writeFileKeepingMode(tmp, target, body) {
+  let mode = 0o600;
+  try { mode = fs.statSync(target).mode & 0o777; } catch { /* new file: owner-only */ }
+  fs.writeFileSync(tmp, body, { mode });
+  fs.chmodSync(tmp, mode); // writeFileSync's mode is masked by umask; chmod is not
+  fs.renameSync(tmp, target);
+}
+
 /** Write the store atomically: a temp file in the SAME directory (so the rename
  * cannot cross a filesystem boundary and degrade into a copy), then rename over
  * the target. A reader therefore sees either the whole old file or the whole new
@@ -76,8 +89,7 @@ function writeStoreAtomic(storePath, data) {
   const dir = path.dirname(storePath);
   const tmp = path.join(dir, `.${path.basename(storePath)}.fgos-${process.pid}-${Date.now()}.tmp`);
   try {
-    fs.writeFileSync(tmp, `${JSON.stringify(data, null, 2)}\n`);
-    fs.renameSync(tmp, storePath);
+    writeFileKeepingMode(tmp, storePath, `${JSON.stringify(data, null, 2)}\n`);
   } catch (err) {
     try { fs.unlinkSync(tmp); } catch {}
     throw new TrustStoreError('write-failed', `trust store at "${storePath}" could not be written: ${err.message}.`, { storePath });
@@ -279,8 +291,7 @@ export function seedCodexTrust(configPath, { projectPath, repoRoot, rootConfigPa
   const tmp = `${configPath}.tmp-${uniqueTmpTag()}`;
   try {
     fs.mkdirSync(path.dirname(configPath), { recursive: true });
-    fs.writeFileSync(tmp, `${body.replace(/\n*$/, '\n')}${entry}`);
-    fs.renameSync(tmp, configPath);
+    writeFileKeepingMode(tmp, configPath, `${body.replace(/\n*$/, '\n')}${entry}`);
   } catch (err) {
     try { fs.rmSync(tmp, { force: true }); } catch { /* the temp file is not worth a second failure */ }
     throw new TrustStoreError('write-failed', `could not write codex config at ${configPath}: ${err.message}`, { configPath });
@@ -300,8 +311,7 @@ export function removeCodexTrust(configPath, projectPath) {
   const next = body.replace(codexSectionPattern(projectPath), '');
   const tmp = `${configPath}.tmp-${uniqueTmpTag()}`;
   try {
-    fs.writeFileSync(tmp, next);
-    fs.renameSync(tmp, configPath);
+    writeFileKeepingMode(tmp, configPath, next);
   } catch (err) {
     try { fs.rmSync(tmp, { force: true }); } catch { /* nothing further to do */ }
     throw new TrustStoreError('write-failed', `could not write codex config at ${configPath}: ${err.message}`, { configPath });
@@ -437,8 +447,7 @@ export function seedAgyTrust(settingsPath, { projectPath, repoRoot, rootSettings
   fs.mkdirSync(dir, { recursive: true });
   const tmp = path.join(dir, `.${path.basename(settingsPath)}.fgos-${process.pid}-${Date.now().toString(36)}.tmp`);
   try {
-    fs.writeFileSync(tmp, `${JSON.stringify(store, null, 2)}\n`);
-    fs.renameSync(tmp, settingsPath);
+    writeFileKeepingMode(tmp, settingsPath, `${JSON.stringify(store, null, 2)}\n`);
   } catch (err) {
     try { fs.unlinkSync(tmp); } catch {}
     throw new TrustStoreError('write-failed', `agy trust store at "${settingsPath}" could not be written: ${err.message}.`, { settingsPath });
@@ -460,8 +469,7 @@ export function removeAgyTrust(settingsPath, projectPath) {
     const dir = path.dirname(settingsPath);
     const tmp = path.join(dir, `.${path.basename(settingsPath)}.fgos-${process.pid}-${Date.now().toString(36)}.tmp`);
     try {
-      fs.writeFileSync(tmp, `${JSON.stringify(store, null, 2)}\n`);
-      fs.renameSync(tmp, settingsPath);
+      writeFileKeepingMode(tmp, settingsPath, `${JSON.stringify(store, null, 2)}\n`);
     } catch {
       try { fs.unlinkSync(tmp); } catch {}
       return false;

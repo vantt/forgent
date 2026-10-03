@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { readTrust, seedTrust, removeTrust, seedAgyTrust, removeAgyTrust, readAgyTrust, TrustStoreError } from '../../src/runner/dispatch/trust-store.mjs';
+import { readTrust, seedTrust, removeTrust, seedAgyTrust, removeAgyTrust, readAgyTrust, seedCodexTrust, removeCodexTrust, TrustStoreError } from '../../src/runner/dispatch/trust-store.mjs';
 
 // Phase 01 group B. Every test here runs against a FIXTURE store, never the real
 // ~/.claude.json -- the module takes the store path as an argument precisely so a
@@ -243,4 +243,47 @@ test('L11-R1: removeAgyTrust deletes only its own entry and reports whether ther
     assert.ok(after.trustedWorkspaces.includes(repoRoot), 'the operator root is untouched');
     assert.equal(removeAgyTrust(f.file, '/tmp/wt-5'), false, 'removing an absent entry is false, not an error');
   } finally { f.cleanup(); }
+});
+
+// --- Credential-bearing stores keep their permission bits across a rewrite ---
+
+function modeOf(file) { return fs.statSync(file).mode & 0o777; }
+
+test('a 0600 claude store is still 0600 after seed and after remove, even under a 002 umask', () => {
+  const f = fixtureStore(storeWithTrustedRoot());
+  const previous = process.umask(0o002);
+  try {
+    fs.chmodSync(f.file, 0o600);
+    seedTrust(f.file, { projectPath: '/tmp/wt-mode', repoRoot: trustedRoot });
+    assert.equal(modeOf(f.file), 0o600, 'seed must not widen the store');
+    removeTrust(f.file, '/tmp/wt-mode');
+    assert.equal(modeOf(f.file), 0o600, 'remove must not widen the store');
+  } finally { process.umask(previous); f.cleanup(); }
+});
+
+test('a 0600 agy settings file is still 0600 after seed and after remove', () => {
+  const repoRoot = '/home/someone/projects/repo';
+  const f = agyFixture({ trustedWorkspaces: [repoRoot] });
+  const previous = process.umask(0o002);
+  try {
+    fs.chmodSync(f.file, 0o600);
+    seedAgyTrust(f.file, { projectPath: '/tmp/wt-mode', repoRoot });
+    assert.equal(modeOf(f.file), 0o600);
+    removeAgyTrust(f.file, '/tmp/wt-mode');
+    assert.equal(modeOf(f.file), 0o600);
+  } finally { process.umask(previous); f.cleanup(); }
+});
+
+test('a 0600 codex config is still 0600 after seed and after remove', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-codex-mode-'));
+  const file = path.join(dir, 'config.toml');
+  const previous = process.umask(0o002);
+  try {
+    fs.writeFileSync(file, `[projects."${trustedRoot}"]\ntrust_level = "trusted"\n`);
+    fs.chmodSync(file, 0o600);
+    seedCodexTrust(file, { projectPath: '/tmp/wt-mode', repoRoot: trustedRoot });
+    assert.equal(modeOf(file), 0o600);
+    removeCodexTrust(file, '/tmp/wt-mode');
+    assert.equal(modeOf(file), 0o600);
+  } finally { process.umask(previous); fs.rmSync(dir, { recursive: true, force: true }); }
 });
