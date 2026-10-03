@@ -1,0 +1,14 @@
+{
+  "status": "briefed",
+  "agentName": "fgos-run_unit-run-1790998750de32",
+  "round": 1,
+  "lastSeenAt": "2026-10-03T01:42:24.695Z",
+  "confinement": {
+    "status": "confined-bwrap",
+    "confined": true
+  },
+  "paneId": "wS:p3WP",
+  "promptReadiness": "unverified",
+  "outcome": "provider-limit",
+  "screen": "Claude usage limit reached."
+}

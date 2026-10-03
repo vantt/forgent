@@ -1,7 +1,7 @@
 ---
 title: "Vệ sinh credential confinement + an toàn pane herdr + đích tích hợp Workflow"
 description: "Sửa 4 mục Medium còn mở từ code review P6: bản sao credential trong private home không được dọn và quyền lỏng (M1), trust store hạ quyền file 0600 (M4), gõ brief vào pane đang có dialog (M2), dọn worktree hardcode 'main' (M3)."
-status: pending
+status: in-review
 priority: P1
 effort: "~1–1.5d"
 tags: [security, credentials, confinement, herdr, workflow]
@@ -50,6 +50,10 @@ Test tự động đi qua đường thật (`fgos run` / herdr round với herdr
 |---|---|---|
 | Xoá home khi pane còn sống làm agent trong pane mất credential | agent trong pane giữ lại báo lỗi auth | chỉ xoá khi pane **đã đóng**; pane giữ lại → ghi path, reap sau khi pane đóng |
 | Root `/tmp/fgos-confinement` do user khác tạo | chmod thất bại | dùng root theo user (`fgos-confinement-<uid>`) nếu không sở hữu root; doctor báo |
+
+## Decisions
+
+- **2026-10-03, owner: no git write grant for workers; the runner commits.** The grant on `objects`, `refs/heads` and `logs` of the main checkout (added to let a `workspace-write` producer commit from a linked worktree) is removed: it would let a worker move `refs/heads/main` and overwrite objects of the whole repository. A confined worker writes files in its Unit worktree and its outbox only; every git path (own gitdir and common dir) is read-only. After a producer round passes, the runner (trusted, outside the confinement) runs `git add -A` (minus `.fgos/`) and `git commit` with the agent's summary as message; no change → no commit, recorded as `no-changes`. The effective execution contract no longer lists `git add`/`git commit` for workers.
 
 ## Câu hỏi mở
 
