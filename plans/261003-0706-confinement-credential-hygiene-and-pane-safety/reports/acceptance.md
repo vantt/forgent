@@ -35,7 +35,7 @@ After `provider-limit`, the fallback to the next candidate (`fake-agent`) is **r
 
 ## Automated
 
-- Full `npm test` on the integration branch before this change: 6516 pass, 0 fail (8 skipped, 65 todo). Re-run after the runner-commit change: see the final line in plan.md "Status".
+- Full `npm test` on the integration branch before this change: 6516 pass, 0 fail (8 skipped, 65 todo). Re-run after the runner-commit change and the architecture-manifest row: **6517 pass, 0 fail, 8 skipped** (`npm test`, exit 0). An earlier run of the same tree had one timing flake (`fanoutBatchExecutorCli … overlapping execution windows`, green alone) and two real failures (new file missing from `docs/architecture-manifest.json`), the latter fixed.
 - New tests: `test/runner/dispatch-confinement-credential-hygiene.test.mjs`, `dispatch-trust-store.test.mjs`, `herdr-prompt-ready.test.mjs`, `workflow-runner.test.mjs`, `execution/run.test.mjs` (runner commit), real-bwrap `dispatch-confinement-backend-p03.test.mjs` (worker cannot add/commit/move refs/touch hooks or config; runner commits; `refs/heads/main` unchanged).
 
 ## Unresolved

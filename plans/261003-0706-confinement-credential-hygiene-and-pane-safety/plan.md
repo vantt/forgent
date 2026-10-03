@@ -1,7 +1,7 @@
 ---
 title: "Vệ sinh credential confinement + an toàn pane herdr + đích tích hợp Workflow"
 description: "Sửa 4 mục Medium còn mở từ code review P6: bản sao credential trong private home không được dọn và quyền lỏng (M1), trust store hạ quyền file 0600 (M4), gõ brief vào pane đang có dialog (M2), dọn worktree hardcode 'main' (M3)."
-status: in-review
+status: completed
 priority: P1
 effort: "~1–1.5d"
 tags: [security, credentials, confinement, herdr, workflow]
