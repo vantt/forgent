@@ -63,19 +63,42 @@ export function createWorkflowWorktree({ repoRoot, branch, baseRef = 'HEAD', wor
 }
 
 /**
+ * The branch a Workflow's units are integrated into: the `target` an
+ * integrate step declares; otherwise the remote's default branch
+ * (`origin/HEAD`); otherwise the branch the main checkout is on. No branch
+ * name is assumed, so a repository whose trunk is `master` or `trunk` works.
+ *
+ * @param {object} params
+ * @param {string} params.repoRoot main checkout
+ * @param {object} [params.workflow] validated Workflow definition
+ * @returns {string}
+ */
+export function resolveIntegrationTarget({ repoRoot, workflow } = {}) {
+  const declared = workflow?.steps?.find((s) => s.kind === 'integrate' && s.target)?.target;
+  if (declared) return declared;
+  try {
+    const ref = git(repoRoot, ['symbolic-ref', '--short', 'refs/remotes/origin/HEAD']);
+    if (ref) return ref.replace(/^origin\//, '');
+  } catch {
+    // no remote default: fall through to the checkout's own branch
+  }
+  return git(repoRoot, ['symbolic-ref', '--short', 'HEAD']);
+}
+
+/**
  * Merge a source branch into a target branch cleanly using pure git.
  *
  * @param {object} params
  * @param {string} params.repoRoot
  * @param {string} params.sourceBranch
- * @param {string} [params.targetBranch] Target branch (e.g. 'main' or integration branch)
+ * @param {string} params.targetBranch Target branch (the repository trunk or an integration branch)
  * @param {string} [params.commitMessage]
  * @param {boolean} [params.squash]
  * @returns {{ merged: boolean, sourceBranch: string, targetBranch: string }}
  */
-export function mergeWorkflowBranch({ repoRoot, sourceBranch, targetBranch = 'main', commitMessage, squash = false }) {
-  if (!repoRoot || !sourceBranch) {
-    throw new RunnerConfigError('mergeWorkflowBranch requires repoRoot and sourceBranch');
+export function mergeWorkflowBranch({ repoRoot, sourceBranch, targetBranch, commitMessage, squash = false }) {
+  if (!repoRoot || !sourceBranch || !targetBranch) {
+    throw new RunnerConfigError('mergeWorkflowBranch requires repoRoot, sourceBranch and targetBranch');
   }
 
   const msg = commitMessage || `merge: integrate workflow branch ${sourceBranch} into ${targetBranch}`;

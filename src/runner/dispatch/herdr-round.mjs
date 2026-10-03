@@ -917,6 +917,27 @@ export async function awaitPromptReady({ client, target, readyMs, settleMs = PRO
 }
 
 /**
+ * A brief typed into a pane that is showing a dialog (or never reached its
+ * prompt) is not a brief: it answers the dialog, and the round then hangs until
+ * the idle ceiling. When readiness says `blocked` or `timeout`, fail the round
+ * now, with the line on screen, and type nothing.
+ */
+export function refuseBriefIntoUnreadyPane({ client, round, readiness }) {
+  if (readiness !== 'blocked' && readiness !== 'timeout') return;
+  const target = round.targetName ?? round.agentName;
+  let screenLine = null;
+  try { screenLine = lastScreenLine(client.agentRead(target, { lines: 60 })); } catch { /* the failure stands without it */ }
+  const reason = readiness === 'blocked' ? 'agent_blocked' : 'agent_not_ready';
+  const why = readiness === 'blocked'
+    ? 'the agent is showing a dialog that needs an answer'
+    : 'the agent never reached a prompt that takes input';
+  cleanupIfWorkerStillLive(client, round.paneId);
+  throw round.fail('worker-spawn-fail', reason,
+    `executor for work "${round.workId}" not briefed: ${why}.${screenLine ? ` Last line on screen: ${screenLine}` : ''}`,
+    { readiness, ...(screenLine ? { screen: screenLine } : {}) });
+}
+
+/**
  * After the brief is typed, make sure it was submitted: an unsent draft left in the
  * prompt box is submitted with Enter.
  *
@@ -1869,6 +1890,7 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
       // Nothing started this agent through herdr, so herdr never waited for its prompt.
       const readiness = await awaitPromptReady({ client, target: round.targetName, readyMs: deadlines.startup.readyMs });
       round.note({ promptReadiness: readiness });
+      refuseBriefIntoUnreadyPane({ client, round, readiness });
     }
     deliverBrief({ client, round, message, promptMs: deadlines.startup.promptMs, resultPath: paths.resultPath });
     if (confinedTarget) {

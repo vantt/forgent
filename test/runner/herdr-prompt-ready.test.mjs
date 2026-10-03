@@ -5,7 +5,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { awaitPromptReady } from '../../src/runner/dispatch/herdr-round.mjs';
+import { awaitPromptReady, refuseBriefIntoUnreadyPane } from '../../src/runner/dispatch/herdr-round.mjs';
 
 const idle = { state: 'idle', visibleBlocker: false, visibleIdle: false, visibleWorking: false, matchedRule: null, promptText: '' };
 
@@ -73,4 +73,41 @@ test('a blocking dialog stops the wait at once, and a missing detector ends it w
 test('an agent that is still working is waited on until the deadline', async () => {
   const working = scriptedClient({ verdicts: [{ ...idle, state: 'working', visibleWorking: true }] });
   assert.equal(await awaitPromptReady({ client: working, target: 'p', readyMs: 40, ...fast }), 'timeout');
+});
+
+// --- A pane that is not ready is never typed at ------------------------------
+
+function roundStub() {
+  return {
+    workId: 'w1', agentName: 'a', paneId: 'p-1', targetName: 'p-1',
+    fail(errorClass, reason, message, extra = {}) { return Object.assign(new Error(message), { errorClass, reason, ...extra }); },
+  };
+}
+
+test('a blocked pane fails the round with the dialog line and nothing is typed', () => {
+  const typed = [];
+  const client = {
+    agentRead: () => 'header\nDo you trust the files in this folder? (y/n)\n',
+    paneProcessInfo: () => ({ foregroundProcesses: [] }),
+    agentPrompt: (...a) => typed.push(a),
+  };
+  assert.throws(
+    () => refuseBriefIntoUnreadyPane({ client, round: roundStub(), readiness: 'blocked' }),
+    (err) => err.errorClass === 'worker-spawn-fail' && err.reason === 'agent_blocked' && /trust the files/.test(err.message) && err.screen.includes('trust'),
+  );
+  assert.deepEqual(typed, []);
+});
+
+test('a pane that never reached its prompt fails the round the same way', () => {
+  const client = { agentRead: () => 'starting...', paneProcessInfo: () => ({ foregroundProcesses: [] }) };
+  assert.throws(
+    () => refuseBriefIntoUnreadyPane({ client, round: roundStub(), readiness: 'timeout' }),
+    (err) => err.errorClass === 'worker-spawn-fail' && err.reason === 'agent_not_ready',
+  );
+});
+
+test('ready, unverified and no-detector panes are briefed as before', () => {
+  for (const readiness of ['ready', 'unverified', 'no-detector']) {
+    assert.doesNotThrow(() => refuseBriefIntoUnreadyPane({ client: {}, round: roundStub(), readiness }));
+  }
 });
