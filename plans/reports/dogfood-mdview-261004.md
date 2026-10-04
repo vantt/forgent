@@ -53,3 +53,21 @@ Wait time for the person (the run was driven by me, no human was waiting); a pub
 - Is the missing `yaml` package also true of the published GitHub release tarballs?
 - Should a fresh project get a default executor set from `fgctl init`, or is that meant to be a person's job?
 - Should folder trust be a doctor check per executor family?
+
+## Addendum 23:40: after the missing-dependency fix
+
+Fix: commit `dbaf4ce0f` (`scripts/build-rust-distribution.mjs` now stages the production dependencies; new test in `test/rust-host/release-tree.test.mjs`, red before; 103 rust-host tests green; the external-consumer CI script now runs a dependency-loading verb; spec and CHANGELOG updated). Verified end to end: fresh project, `fgctl init --from`, `fgos workflow status` loads. mdview upgraded with `fgctl upgrade --from`; the staged tree grew from 615 to 848 files.
+
+Question 4 retried (workflow `nominal-group`, which has the human gate):
+- `workflow start` now works and runs its steps inside the call (66 s to 392 s per try), returning the whole run object. It does not stop early to say "needs a person".
+- Hand edit needed again: the `nominal-group:*` capabilities ship as empty stubs ("declare a prefer pool"), in forgentX as well as mdview. I gave them a prefer pool.
+- Step 1 (silent-generation) reached its three panelists successfully (claude-herdr, xai, openai). The synthesizer then failed on every family available in mdview: gemini (agy has not been told to trust the folder: `trustSeedFailed`), glm-herdr (its Claude Code pane stops at "Please run /login, API Error: 401 Missing Authentication header", the owner saw this live), deepseek (cli only, cannot write its report: `EROFS`). The run ended `execution-failure` before steps 2 to 4, so the human gate was never reached.
+- The synthesizer brief again carried the panelists' objective ("silently generate independent ideas") instead of a synthesis task, and listed the three panelist reports as context refs (the earlier fix working in a Workflow unit).
+- At the owner's request the Lead carried out that brief by hand and wrote ack, report and claim into the run's outbox, with the provenance stated in the report. `workflow resume` ignores it: a run already marked failed stays failed, so the run record is unchanged.
+- glm-herdr stops at that login prompt every time it is used; the first A/B run today lost its synthesizer to a 300 s idle timeout on the same executor, almost certainly the same cause. Root cause not established (the key variable is resolved into the pane environment by the runner; the confined private home may be overriding it). Needs its own investigation.
+
+Updated verdict for question 4: **Not reached.** Blocked by provider availability, not by the Workflow engine: the fourth provider family needed for an independent synthesizer cannot run in a confined pane in this project without the owner trusting mdview in agy, fixing glm-herdr's login, or making deepseek able to write its report.
+
+Extra hand interventions in this retry: 2 more config edits (prefer pools for `nominal-group:*`, then replacing gemini with glm-herdr in them). Total hand interventions across the dogfood: 8.
+
+Added to the "left in mdview" list: the `nominal-group:*` prefer pools in `.fgos/config.json`, the failed workflow runs `wf-run-1791131045451-7649c869`, `wf-run-1791131113453-0c626595`, `wf-run-1791131206776-a446a652` and their unit runs under `.fgos/assignments/`, and the upgraded `.fgos/installation`.
