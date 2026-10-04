@@ -1,7 +1,7 @@
 ---
 phase: 2
 title: "Crate dùng chung + crate fgos-gateway"
-status: pending
+status: completed
 priority: P1
 effort: "0.5d"
 dependencies: [1]

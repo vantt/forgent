@@ -1,7 +1,7 @@
 ---
 title: "Tách fgos gateway ra khỏi herdr-plugin; herdr-plugin thành herdr-dashboard"
 description: "Một crate herdr-plugin hiện chứa hai thứ khác nhau: (1) fgos gateway — REST API + MCP + bundle web dashboard, chạy detached qua `fgos gateway start`; (2) plugin herdr thật — TUI trong pane herdr + supervisor pick/pane. Vì gộp chung nên toàn repo gọi lẫn là 'herdr-gateway' (trùng tên repo tham chiếu ngoài ~/projects/herdr-gateway). Tách thuần cơ học: gateway thành component riêng có tên và authority riêng; phần còn lại đổi tên herdr-dashboard. Không tối ưu, không đổi hành vi."
-status: pending
+status: completed
 priority: P1
 effort: "~1–1.5d"
 tags: [boundary, rename, gateway, herdr, rust, docs]
