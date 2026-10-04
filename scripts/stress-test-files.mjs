@@ -7,13 +7,17 @@
 // --round-timeout-s has its process group killed and counts as a hang.
 //
 //   node scripts/stress-test-files.mjs [--rounds=N] [--burners=K]
-//        [--concurrency=C] [--round-timeout-s=S] [--log-dir=DIR] <test files...>
+//        [--concurrency=C] [--round-timeout-s=S] [--log-dir=DIR]
+//        [--burner=shell|node] <test files...>
 //
 // With --log-dir, every non-passing round's full output is kept there.
 //
-// Burners are `node` busy loops that expire on their own after the whole
-// budget, and are SIGKILLed on exit, so an interrupted run leaves nothing
-// behind for longer than that budget.
+// Burners expire on their own after the whole budget and are SIGKILLed on
+// exit, so an interrupted run leaves nothing behind for longer than that
+// budget. `--burner=shell` (default) is a `bash` busy loop, a few MB each:
+// CPU contention only. `--burner=node` is a busy `node` process (~40 MB
+// each): CPU contention plus memory pressure, which on a machine already
+// short of RAM stalls processes for seconds at a time.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -32,14 +36,15 @@ const burners = Number(opts.burners ?? os.availableParallelism());
 const concurrency = opts.concurrency === undefined ? null : Number(opts.concurrency);
 const roundTimeoutS = Number(opts['round-timeout-s'] ?? 300);
 if (files.length === 0 || !(rounds > 0)) {
-  console.error('usage: stress-test-files.mjs [--rounds=N] [--burners=K] [--concurrency=C] [--round-timeout-s=S] [--log-dir=DIR] <test files...>');
+  console.error('usage: stress-test-files.mjs [--rounds=N] [--burners=K] [--concurrency=C] [--round-timeout-s=S] [--log-dir=DIR] [--burner=shell|node] <test files...>');
   process.exit(2);
 }
 
 const budgetMs = (rounds * roundTimeoutS + 30) * 1000;
-const burnerProcs = Array.from({ length: burners }, () =>
-  spawn(process.execPath, ['-e', `const end = Date.now() + ${budgetMs}; while (Date.now() < end) {}`], { stdio: 'ignore' }),
-);
+const burnerCommand = opts.burner === 'node'
+  ? [process.execPath, ['-e', `const end = Date.now() + ${budgetMs}; while (Date.now() < end) {}`]]
+  : ['bash', ['-c', `while [ $SECONDS -lt ${Math.ceil(budgetMs / 1000)} ]; do :; done`]];
+const burnerProcs = Array.from({ length: burners }, () => spawn(burnerCommand[0], burnerCommand[1], { stdio: 'ignore' }));
 function stopBurners() {
   for (const b of burnerProcs) {
     try { b.kill('SIGKILL'); } catch { /* already gone */ }
@@ -83,6 +88,6 @@ for (let round = 1; round <= rounds; round += 1) {
     }
   }
 }
-console.log(`summary: rounds=${rounds} burners=${burners} concurrency=${concurrency ?? 'default'} pass=${tally.pass} fail=${tally.fail} hang=${tally.hang}`);
+console.log(`summary: rounds=${rounds} burners=${burners}(${opts.burner ?? 'shell'}) concurrency=${concurrency ?? 'default'} pass=${tally.pass} fail=${tally.fail} hang=${tally.hang}`);
 stopBurners();
 process.exitCode = tally.fail + tally.hang > 0 ? 1 : 0;
