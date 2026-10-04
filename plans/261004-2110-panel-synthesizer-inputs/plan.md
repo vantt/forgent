@@ -1,6 +1,6 @@
 ---
 title: "Role inputs reach the next role (panel synthesizer fix)"
-status: pending
+status: in-progress
 priority: P1
 created: 2026-10-04
 ---
@@ -45,7 +45,7 @@ byte-identical.
 
 | # | Phase | Status |
 |---|---|---|
-| 1 | [Wire `inputs` into `contextRefs`](phase-01-wire-inputs-into-context-refs.md) | pending |
+| 1 | [Wire `inputs` into `contextRefs`](phase-01-wire-inputs-into-context-refs.md) | code, tests, docs done; live proof of refs done; synthesizer-use proof blocked (see reports/acceptance-live-run.md) |
 | 2 | [Say what to do with them (conditional)](phase-02-role-task-statement-conditional.md) | pending, only if phase 1 acceptance shows refs are ignored; needs the per-role unit to reach `dispatchBound` |
 
 ## Not in this plan
