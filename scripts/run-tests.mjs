@@ -20,7 +20,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawnSync, execFileSync } from 'node:child_process';
+import { spawn as spawnAsync, spawnSync, execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { acquireFullSuiteQueue, QUEUE_HELD_ENV } from './lib/full-suite-queue.mjs';
@@ -153,6 +153,49 @@ export function buildTestEnv(env = process.env) {
  * selected. Returns `{ status, files }`, same shape as `runTests()`.
  */
 export const KEEP_TMP_ENV = 'FGOS_TEST_KEEP_TMP';
+export const FILE_TIMEOUT_ENV = 'FGOS_TEST_FILE_TIMEOUT_MS';
+export const DEFAULT_FILE_TIMEOUT_MS = 10 * 60 * 1000;
+// Explicit per-file limits (repo-relative posix path -> ms) for a test that is
+// legitimately slower than the default. Empty on purpose: add an entry only
+// with the measured duration that justifies it, never to hide a hang.
+export const FILE_TIMEOUT_OVERRIDES_MS = {};
+const WATCHDOG_PATH = fileURLToPath(new URL('./lib/test-file-watchdog.mjs', import.meta.url));
+const DEFAULT_WATCHDOG_POLL_MS = 5000;
+
+/**
+ * Starts the per-file time limit supervisor (see lib/test-file-watchdog.mjs)
+ * as a sibling process -- the caller blocks in spawnSync, so it cannot watch
+ * itself. Returns `{ stop() -> [{file, elapsedMs, limitMs}] }`; `stop()` ends
+ * the supervisor and reports every file it killed for running too long.
+ */
+function startFileWatchdog({ files, env, fileTimeoutMs, pollMs, tempDir, log }) {
+  if (process.platform === 'win32') {
+    log('run-tests: warning: per-file time limit needs `ps`; not available on win32, running without it');
+    return { stop: () => [] };
+  }
+  const limits = {};
+  for (const file of files) {
+    // Keyed exactly as passed to `node --test`: each file's runner process
+    // carries that same string as its last argv element.
+    limits[file] = FILE_TIMEOUT_OVERRIDES_MS[file.split(path.sep).join('/')] ?? fileTimeoutMs;
+  }
+  const limitsFile = path.join(tempDir, 'file-limits.json');
+  const outFile = path.join(tempDir, 'file-timeouts.jsonl');
+  fs.writeFileSync(limitsFile, JSON.stringify(limits));
+  fs.writeFileSync(outFile, '');
+  const child = spawnAsync(
+    process.execPath,
+    [WATCHDOG_PATH, `--parent=${process.pid}`, `--poll-ms=${pollMs}`, `--limits=${limitsFile}`, `--out=${outFile}`],
+    { env, stdio: ['ignore', 'ignore', 'inherit'] },
+  );
+  child.on('error', (err) => log(`run-tests: warning: per-file time limit not running: ${err.message}`));
+  return {
+    stop() {
+      child.kill('SIGTERM');
+      return fs.readFileSync(outFile, 'utf8').split('\n').filter(Boolean).map((line) => JSON.parse(line));
+    },
+  };
+}
 export const SENSITIVE_FGOS_FILES = new Set(['secrets.local.env', 'secrets.env']);
 
 /**
@@ -241,6 +284,10 @@ export function runSelectedTests(files, {
   stdio = 'inherit',
   log = (msg) => console.error(msg),
   allowedFgosMutations = new Set(),
+  fileTimeoutMs = Number(env[FILE_TIMEOUT_ENV]) || DEFAULT_FILE_TIMEOUT_MS,
+  watchdogPollMs = DEFAULT_WATCHDOG_POLL_MS,
+  // Only a real spawnSync has child processes to supervise.
+  watchdog = spawn === spawnSync,
 } = {}) {
   const relFiles = files.map((file) => path.relative(cwd, file));
   const childEnv = buildTestEnv(env);
@@ -258,10 +305,15 @@ export function runSelectedTests(files, {
   const fgosBefore = snapshotFgos(cwd);
 
   let result;
+  let timedOut = [];
+  const supervisor = watchdog && runTemp
+    ? startFileWatchdog({ files: relFiles, env: childEnv, fileTimeoutMs, pollMs: watchdogPollMs, tempDir: runTemp, log })
+    : null;
   try {
     const spawnResult = spawn(execPath, buildTestArgv(relFiles, forwardedArgs), { cwd, env: childEnv, stdio });
     result = { status: spawnResult.status ?? 1, files: relFiles, runTemp };
   } finally {
+    if (supervisor) timedOut = supervisor.stop();
     if (runTemp) {
       if (env[KEEP_TMP_ENV] === '1') {
         log(`run-tests: kept this run's temp dir (${KEEP_TMP_ENV}=1): ${runTemp}`);
@@ -273,6 +325,15 @@ export function runSelectedTests(files, {
         }
       }
     }
+  }
+
+  result.timedOut = timedOut;
+  if (timedOut.length) {
+    log('run-tests: ERROR: test file(s) exceeded the per-file time limit and were killed (process tree):');
+    for (const { file, elapsedMs, limitMs } of timedOut) {
+      log(`  ${file}: timed out after ${Math.round(elapsedMs / 1000)}s (limit ${Math.round(limitMs / 1000)}s)`);
+    }
+    result.status = result.status !== 0 ? result.status : 1;
   }
 
   const fgosAfter = snapshotFgos(cwd);
@@ -317,6 +378,7 @@ export function runTests({
   stdio = 'inherit',
   queue = null,
   allowedFgosMutations = new Set(),
+  ...limitOptions
 } = {}) {
   const files = discoverTestFiles(root);
   if (files.length === 0) {
@@ -330,10 +392,10 @@ export function runTests({
   // `queue` (the CLI door passes acquireFullSuiteQueue): taken only once
   // there is real work to run, and marked on the child's env so a test that
   // spawns this door itself never waits on its own parent's lock.
-  if (!queue) return runSelectedTests(files, { cwd, forwardedArgs, execPath, spawn, env, stdio, allowedFgosMutations });
+  if (!queue) return runSelectedTests(files, { cwd, forwardedArgs, execPath, spawn, env, stdio, allowedFgosMutations, ...limitOptions });
   const release = queue({ env });
   try {
-    return runSelectedTests(files, { cwd, forwardedArgs, execPath, spawn, env: { ...env, [QUEUE_HELD_ENV]: '1' }, stdio, allowedFgosMutations });
+    return runSelectedTests(files, { cwd, forwardedArgs, execPath, spawn, env: { ...env, [QUEUE_HELD_ENV]: '1' }, stdio, allowedFgosMutations, ...limitOptions });
   } finally {
     release();
   }

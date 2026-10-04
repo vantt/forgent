@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "Giới hạn thời gian mỗi file + tái hiện dưới tải"
-status: pending
+status: completed
 priority: P2
 effort: "0.25d"
 dependencies: []
@@ -35,7 +35,7 @@ Lưới an toàn trước: không file nào treo cả giờ. Sau đó dựng cá
 
 ## Success Criteria
 
-- [ ] Test timeout mỗi file xanh; tái hiện có số liệu trước khi sửa.
+- [x] Test timeout mỗi file xanh; tái hiện có số liệu trước khi sửa.
 
 ## Risk Assessment
 
