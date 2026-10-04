@@ -51,4 +51,14 @@ Phương án đã cân nhắc: cho Work loop chạy hẳn qua Workflow runner (k
 
 Không có.
 
+## Sự thật phase 1
+
+impact-analysis: degraded (không có GitNexus MCP trong phiên này; dùng rg tìm caller). Caller `runOnce` (loop.mjs:1348): `bin/fgos-runner.mjs:155` (+ `runWatch`). Điểm sửa nằm trong thân vòng retry của `claimAndDispatch` — lưới: `test/runner/loop.test.mjs`, `test/e2e/runner-loop.test.mjs`.
+
+1. Worker trả về → goal-check: `loop.mjs:1044` (spawnWorker) → `appendWorkerLog` (~:1096) → `runGoalCheck` `:1108`. "worker không commit" = `check.passed && facts.aheadCount === 0` → `errorClass: 'verify-miss'` (~:1145). Worker timeout ném DispatchError → nhánh `catch`, không tới goal-check; retry reset về `dispatchBaseline` (`:909`) nên không cần commit ở nhánh timeout.
+2. `goal-check.mjs` chỉ chạy `verify` (exit status); "có commit" do `loop.mjs` đo bằng `branchFacts().aheadCount`.
+3. Quyền git còn cấp: `src/runner/dispatch/config.mjs:196`, `.fgos/config.json:19,526,566`, `core/skills/fgos-architecture-panel/SKILL.md:140`, `core/skills/_shared/coding-worker-contract.md:151,169`, `docs/specs/runner.md` (0051, :1631), ngoài ra `provider-adapter.mjs:369` suy "read-only" từ chuỗi `git add`/`git commit` trong allowedTools.
+4. Yêu cầu worker tự commit: `coding-worker-contract.md:91`, 3 prompt template `src/runner/prompt-templates/worker-prompt-{default,discovery,skill-pointer}.txt` (+ snapshot `test/runner/prompt-templates.test.mjs`). Không có skill `fgos-coding-*` trong `core/skills`. Self-check Iron Law trong `worker-prompt-skill-pointer.txt` dùng `changedFiles` (diff `trunk...branch`) nên cần commit — phải đổi sang đọc cây làm việc.
+5. `commitUnitWork` dùng được: `git add -A -- . :(exclude).fgos`, identity repo có sẵn, fallback identity; cây sạch → `no-changes`.
+
 <!-- slug: work-loop-runner-commit -->
