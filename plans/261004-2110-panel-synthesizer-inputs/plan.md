@@ -10,8 +10,8 @@ created: 2026-10-04
 ## Problem (verified in code, 2026-10-04)
 
 `panel.mjs` calls `runRole({ role: 'synthesizer', inputs: memberResults })`. `runRole`
-(`src/runner/execution/run.mjs`, the `runRole` arrow) destructures `inputs` and never reads it.
-The assignment is built with `contextRefs: unit.inputs || []`, so the synthesizer brief says
+(`src/runner/execution/run.mjs:355`) destructures `inputs` and never reads it. The assignment
+is built in `dispatchBound` (:299) with `contextRefs: unit.inputs || []` (:319), so the synthesizer brief says
 `Context refs: - (none)`. Live evidence: `plans/reports/council-ab-comparison-261004.md`
 (synthesizer contradicted two of three panelists and named none of them).
 
@@ -35,9 +35,10 @@ but their outbox.
 rendered one per line in the brief, mounted read-only (`--ro-bind / /`). Each role result already
 lists its artifacts in `runResult.evidence.artifacts` (live and from `history()` alike).
 
-So: `runRole` turns `inputs` (prior role results) into absolute paths of their report artifacts
-and appends them to the assignment's `contextRefs`. One pure helper, no new store, no new
-format, no change to any pattern, and `inputs` defaults to `[]` so every other caller is
+So: `runRole` passes `inputs` to `dispatchBound` (signature :299, call :440), which turns them
+into absolute paths of the report artifacts and appends them to the assignment's `contextRefs`.
+Three small edits in `run.mjs` plus one pure helper, no new store, no new format, no change to
+any pattern, and `inputs` defaults to `[]` so every other caller is
 byte-identical.
 
 ## Phases
@@ -45,7 +46,7 @@ byte-identical.
 | # | Phase | Status |
 |---|---|---|
 | 1 | [Wire `inputs` into `contextRefs`](phase-01-wire-inputs-into-context-refs.md) | pending |
-| 2 | [Say what to do with them (conditional)](phase-02-role-task-statement-conditional.md) | pending, only if phase 1 acceptance shows refs are ignored |
+| 2 | [Say what to do with them (conditional)](phase-02-role-task-statement-conditional.md) | pending, only if phase 1 acceptance shows refs are ignored; needs the per-role unit to reach `dispatchBound` |
 
 ## Not in this plan
 
@@ -74,3 +75,7 @@ Shape: a read-only projection over the existing files (Unit run id in, ordered m
 per role the seen inputs, the answer, the executor/persona, the outcome), blind by construction
 because it reads storage, not the roles. Needs its own spec check and plan; it depends on
 phase 1 only for showing which inputs the synthesizer saw.
+
+## Review log
+
+Opus read-only review (2026-10-04) verified: `inputs` unread, only `panel.mjs` passes it, brief shows `(none)`, prior art commit, bwrap `--ro-bind / /` makes main `.fgos` readable, resume/fallback keep refs identical (assignment.json written once). Corrections applied: edit site is `dispatchBound` not `runRole`; artifact lookup is by file name; contract validator is not on this path; panel test already asserts 3 inputs; phase 2 needs the per-role unit plumbed.
