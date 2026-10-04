@@ -56,7 +56,8 @@ these four rules:
    happened — it reads a fixed, minimal status signal. Two tokens cover
    every outcome this contract defines:
    - `[DONE]` — the work described in your boundary is complete (and, for
-     a lifecycle-bearing unit, committed — see Layer 2). Your caller will
+     a lifecycle-bearing unit, left in the worktree for the runner to commit —
+     see Layer 2). Your caller will
      independently re-verify; your own say-so is never trusted on its own.
    - `[BLOCKED] <exactly what's missing or what stopped you>` — cold-pickup
      refusal (rule 3), or a real mid-work stop: something you needed turned
@@ -88,10 +89,13 @@ cover that case instead.
    Run it yourself; if it fails, fix the root cause and rerun the exact
    command. Never weaken it, swap in an easier check, or report `[DONE]` on
    the strength of your own read of the diff.
-3. **Commit your changes, then stop.** One commit, on the item's own
-   branch, with the item's id in the message. Do not merge, push, tag, or
-   approve your own work — those stay the driver's job, downstream of your
-   `[DONE]`.
+3. **Edit files, then stop — never commit.** Leave your changes in the
+   item's worktree; the runner stages and commits them after you return,
+   with the item id in the message (a fenced JSON Result with a `summary`
+   field becomes the commit subject; its `commit` field is filled in by the
+   runner, not by you). You have no git write access. Do not merge, push,
+   tag, or approve your own work — those stay the driver's job, downstream
+   of your `[DONE]`.
 
 ## The negative rule (V3 — do not violate)
 

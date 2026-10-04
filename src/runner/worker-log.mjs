@@ -35,7 +35,7 @@ function section(label, text) {
  * status/stdout/stderr) and a bare WorktreeError (errorClass + message only)
  * both render without throwing on missing fields. */
 function formatEntry(workId, entry) {
-  const { attempt, errorClass, message, tier, model, templateName, templateHash, status, signal, stdout, stderr } = entry;
+  const { attempt, errorClass, message, tier, model, templateName, templateHash, status, signal, commit, stdout, stderr } = entry;
 
   const header = [`work ${workId}`];
   if (attempt != null) header.push(`attempt ${attempt}`);
@@ -47,6 +47,8 @@ function formatEntry(workId, entry) {
   if (templateName != null) header.push(`template ${templateName}@${templateHash ? templateHash.slice(0, 8) : 'unknown'}`);
   if (status != null) header.push(`exit ${status}`);
   if (signal != null) header.push(`signal ${signal}`);
+  // Who committed the worker's changes: runner | self | none.
+  if (commit != null) header.push(`commit ${commit}`);
 
   const lines = [`=== ${new Date().toISOString()} | ${header.join(' | ')} ===`];
   if (message) lines.push(`message: ${message}`);

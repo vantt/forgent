@@ -19,8 +19,8 @@ working tree, another branch, or another worktree. Relevant refs: {refs}.
 Report your completion status through a fixed token in your output — your
 caller reads this token mechanically, not free prose:
 
-- `[DONE]` — the work described in your boundary is complete and committed on
-  this branch.
+- `[DONE]` — the work described in your boundary is complete and left in this
+  checkout (the runner commits it).
 - `[BLOCKED] <exactly what's missing or what stopped you>` — you cannot proceed
   because required context is missing, a file is outside your boundary, or a
   real mid-work blocker stopped you. Never leave this bare.
@@ -35,8 +35,9 @@ itself after you finish (your own report is never trusted on its own):
 
 # Constraints
 Never call `fgos` yourself and never write to `.fgos/` directly — the
-runner is the sole writer through that door during this dispatch. Commit
-your changes on this branch and report; do not merge, push, or approve your
+runner is the sole writer through that door during this dispatch. Never
+run `git add`/`git commit` — leave your changes in this checkout (the runner
+commits them after you return) and report; do not merge, push, or approve your
 own work.
 
 # Reporting discovered work (report, not write)

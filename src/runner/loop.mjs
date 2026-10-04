@@ -86,6 +86,7 @@ import { appendEvent } from '../state/events.mjs';
 import { appendWorkerLog, appendWorkerLogChunk } from './worker-log.mjs';
 import { createDispatchWorktree, removeDispatchWorktree, listLeftovers, branchNameFor, createBranchRef } from './worktree.mjs';
 import { runGoalCheck } from './goal-check.mjs';
+import { commitUnitWork } from './execution/commit-unit-work.mjs';
 import { createWriteQueue } from './write-queue.mjs';
 import { createOwnershipStore, claimRoot, steerFrontier } from './root-affinity.mjs';
 import { resolveRoot, hasOpenDescendant, indexChildrenByParent } from '../state/frontier.mjs';
@@ -339,6 +340,50 @@ export { resolveRepoRoot };
 
 function git(repoRoot, args) {
   return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false });
+}
+
+// The worker only edits files; the runner commits what it left. The commit
+// subject is the worker's own fenced-JSON Result `summary` when it reported
+// one, else `<id>: <title>` — never the free prose around it.
+const RESULT_FENCE = /```json[^\n]*\n([\s\S]*?)```/g;
+
+function workerResultSummary(output) {
+  if (typeof output !== 'string' || !output) return null;
+  let summary = null;
+  for (const match of output.matchAll(RESULT_FENCE)) {
+    try {
+      const parsed = JSON.parse(match[1]);
+      if (parsed && typeof parsed === 'object' && typeof parsed.summary === 'string' && parsed.summary.trim()) {
+        summary = parsed.summary;
+      }
+    } catch {
+      // malformed block — keep scanning
+    }
+  }
+  return summary;
+}
+
+/** Commit whatever the worker left in the item's worktree, before goal-check.
+ * A clean tree is not an error: a worker that committed itself (older
+ * contract) or changed nothing leaves nothing to commit. Returns how the
+ * branch tip moved: `runner` (committed here), `self` (worker committed),
+ * `none` (no change at all). A failed commit throws a `worktree-fail`
+ * (environment) error so the recovery matrix routes it like any other
+ * infrastructure failure. */
+function commitWorkerChanges(item, worktree, headBeforeWorker, workerOutput) {
+  const result = commitUnitWork({
+    worktree,
+    unitId: item.id,
+    summary: workerResultSummary(workerOutput) ?? `${item.id}: ${item.title}`,
+  });
+  if (result.status === 'failed') {
+    const err = new Error(`runner commit of the worker's changes failed: ${result.error}`);
+    err.errorClass = 'worktree-fail';
+    throw err;
+  }
+  if (result.status === 'committed') return 'runner';
+  const head = git(worktree, ['rev-parse', 'HEAD']).trim();
+  return head === headBeforeWorker ? 'none' : 'self';
 }
 
 /** Branch facts the recovery matrix needs (stale-doing resolution, goal-
@@ -1027,6 +1072,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
         }
       }
 
+      const headBeforeWorker = git(wt.path, ['rev-parse', 'HEAD']).trim();
       const worker = await spawnWorker(item, config, wt.path, {
         // tsk-62v D6: lets a `kind: "cli"` executor's presence be checked
         // via `fgos tool query`'s own functions instead of re-probing PATH.
@@ -1092,9 +1138,14 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       });
       // Persist the worker's own output for after-the-fact recovery (D1/D3/D4):
       // right after the spawn resolves, before goal-check — so success AND
-      // verify-miss are both captured (goal-check runs next).
+      // verify-miss are both captured (goal-check runs next). The runner
+      // commits the worker's file changes first, so goal-check judges the
+      // committed branch.
+      const commit = commitWorkerChanges(item, wt.path, headBeforeWorker, worker.stdout);
+      log(`fgos-runner: commit for "${item.id}": ${commit}`);
       appendWorkerLog(dir, item.id, {
         attempt,
+        commit,
         tier: worker.tier,
         model: worker.model,
         templateName: worker.templateName,
@@ -1147,7 +1198,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
         : {
             errorClass: 'verify-miss',
             message: check.passed
-              ? 'verify passed but the branch carries no commit — the worker must commit its work'
+              ? 'verify passed but the worker changed nothing, so the branch carries no commit'
               : `goal-check failed (exit ${check.status})`,
           };
       breaker.recordMiss(item.id);
@@ -1449,6 +1500,7 @@ export async function runOnce(options = {}) {
         try {
           wt = createDispatchWorktree(repoRoot, item.id, { worktreeDir });
           const feedbackView = listWork(dir);
+          const headBeforeWorker = git(wt.path, ['rev-parse', 'HEAD']).trim();
           const worker = await spawnWorker(item, config, wt.path, {
             fgosDir: dir,
             stage: discoverEntry,
@@ -1459,7 +1511,9 @@ export async function runOnce(options = {}) {
             onChunk: (stream, chunk) => appendWorkerLogChunk(dir, item.id, chunk),
           });
           log(`fgos-runner: research worker for "${item.id}" exited ${worker.status ?? `signal ${worker.signal}`} (tier ${worker.tier} -> ${worker.model})`);
+          const commit = commitWorkerChanges(item, wt.path, headBeforeWorker, worker.stdout);
           appendWorkerLog(dir, item.id, {
+            commit,
             tier: worker.tier,
             model: worker.model,
             templateName: worker.templateName,

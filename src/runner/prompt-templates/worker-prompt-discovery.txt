@@ -19,7 +19,7 @@ working tree, another branch, or another worktree. Relevant refs: {refs}.
 Research the goal above per the skill's own flow: search this repo first,
 look up anything not found in it externally, record every round in
 `docs/history/<feature>/RESEARCH.md` (accumulate, never overwrite), and
-commit that file on this branch. Once you are done recording your findings,
+leave that file in this checkout (the runner commits it). Once you are done recording your findings,
 report your verdict as DATA ONLY by emitting exactly one fenced block:
 
 ```fgos-verdict
@@ -49,8 +49,9 @@ verdict itself.
 
 # Constraints
 Never call `fgos` yourself and never write to `.fgos/` directly — the
-runner is the sole writer through that door during this dispatch. Commit
-your changes on this branch and report; do not merge, push, or approve your
+runner is the sole writer through that door during this dispatch. Never
+run `git add`/`git commit` — leave your changes in this checkout (the runner
+commits them after you return) and report; do not merge, push, or approve your
 own work.
 
 # Reporting discovered work (report, not write)
