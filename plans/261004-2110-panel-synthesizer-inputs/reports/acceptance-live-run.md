@@ -30,3 +30,21 @@ so no runnable 4th family was available.
 - Full suite: 6550 pass, 1 fail. The failure (`self-uninstall-spike`) passes alone; `npm pack` hit a transient
   `.tmp-` file another process was writing under `.agents/skills`. An earlier full run had 9 failures: one was the
   missing architecture-manifest row for the new module (fixed), seven passed alone (load flakes).
+
+## Update 22:06 — synthesizer use proven
+
+Cause of the earlier blockers: the claude-based herdr executors stopped at the folder-trust dialog because
+`~/.claude.json` had no accepted-trust flag for this repo, so the runner refused to derive worker trust
+(`visibility.json` of the failed run: "its repo root ... is not itself trusted"). The owner accepted the dialog; the
+flag is set now. Why the flag was missing is not known. deepseek still fails with "No API key found for openrouter":
+the key does not reach the worker (not an out-of-credit error), separate item.
+
+Run `unit-run-1791126251945-31382d3b`, default panel (panelist-1 claude-herdr, panelist-2 openai, panelist-3 gemini,
+synthesizer xai), outcome pass:
+
+- Synthesizer brief lists the three panelist reports (absolute paths).
+- Its output ends with "Evidence read: panelist reports (all 3 converge on no)" and its position matches the
+  panelists. The earlier run without refs contradicted two of three panelists and named none.
+- Copy: `acceptance-synthesizer-report.md`.
+
+One live run only. Phase 2 trigger (refs ignored) not met; closed as not needed unless a later run shows refs ignored.

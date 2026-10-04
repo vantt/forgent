@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "Wire inputs into contextRefs"
-status: pending
+status: completed
 priority: P1
 effort: "0.25d"
 dependencies: []
@@ -62,9 +62,9 @@ Make the `inputs` argument of `runRole` do what `panel.mjs` already assumes.
 
 ## Success Criteria
 
-- [ ] Synthesizer brief lists all panelist reports; others unchanged.
-- [ ] Helper and run tests fail before the change, pass after.
-- [ ] Suite green; docs and changelog updated.
+- [x] Synthesizer brief lists all panelist reports; others unchanged.
+- [x] Helper and run tests fail before the change, pass after.
+- [x] Suite green; docs and changelog updated.
 
 ## Risk Assessment
 
