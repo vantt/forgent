@@ -2783,7 +2783,7 @@ registerFix({
 
 // tsk-4r1 (found by the gateway audit, plans/reports/gateway-audit-
 // 260814-2110-fable-hidden-bugs-report.md Finding 9): `gateway.token`/
-// `gateway.port` (herdr-plugin/src/gateway.rs's `load_gateway_config`,
+// `gateway.port` (apps/fgos-gateway/src/gateway.rs's `load_gateway_config`,
 // D4/D5) lived nowhere in this registry -- a fresh machine's `fgos setup`
 // never provisioned the section, and `fgos doctor` had no way to notice,
 // violating AGENTS.md's own install/setup/doctor gate.
@@ -2795,7 +2795,7 @@ registerFix({
 // would silently target the wrong file entirely.
 const GATEWAY_HOME_CONFIG_DIR = () => os.homedir();
 
-// Matches herdr-plugin/src/gateway.rs's own `DEFAULT_PORT`.
+// Matches apps/fgos-gateway/src/gateway.rs's own `DEFAULT_PORT`.
 const DEFAULT_GATEWAY_PORT = 4170;
 
 function checkGatewayTokenConfigured() {
@@ -3195,7 +3195,7 @@ registerCheck({
 
 // tsk-2m5 (docs/history/stage-status-driving-coordination/): the
 // herdr-launcher's own auto-launch toggles, read fail-closed from Rust
-// (herdr-plugin/src/settings.rs). Mirrors gateBypass's own shape exactly
+// (packages/herdr-fgos-common/rust/src/settings.rs). Mirrors gateBypass's own shape exactly
 // (config-default + a dedicated check for a present-but-malformed value --
 // `checkConfigNotStale` above already catches the section being entirely
 // MISSING via `assembleRegistryDefaults()`, same as it does for
@@ -3249,7 +3249,7 @@ registerCheck({
 // tsk-48w (D14 of docs/history/herdr-web-dashboard-plan-realignment/
 // CONTEXT.md, carrying forward D10 of the original cluster's own
 // CONTEXT.md): the web dashboard's static-serving toggle, read fail-OPEN
-// from Rust (herdr-plugin/src/settings.rs's `WebDashboardSettings` --
+// from Rust (packages/herdr-fgos-common/rust/src/settings.rs's `WebDashboardSettings` --
 // `static_serving: true` when the section/file is missing). Same
 // registerConfigDefault + registerCheck shape as `herdrOrchestrator`
 // immediately above, deliberately with the opposite default value -- this

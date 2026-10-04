@@ -1,6 +1,6 @@
 // release-binary-path.mjs -- the one place that knows a `cargo build
 // --release` binary needs `.exe` on win32 and nothing extra anywhere else.
-// Every caller resolving a compiled fgos/fgctl/herdr-fgos path under
+// Every caller resolving a compiled fgos/fgctl/fgos-gateway/herdr-dashboard path under
 // target/release/<name> needs the identical rule; before this existed each
 // call site hardcoded the extensionless POSIX name, so every one of them
 // reported a genuinely-built Windows binary as missing.

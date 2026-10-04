@@ -1,14 +1,14 @@
 [package]
-name = "herdr-fgos"
+name = "herdr-dashboard"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
-name = "herdr_fgos"
+name = "herdr_dashboard"
 path = "src/lib.rs"
 
 [[bin]]
-name = "herdr-fgos"
+name = "herdr-dashboard"
 path = "src/main.rs"
 
 [dependencies]

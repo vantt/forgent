@@ -2248,7 +2248,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // re-slice; never mutates anything.
     // Read-only worker-slot ledger: how many work items are running and
     // whether the execution lane has room. This verb IS the port — decision
-    // 0014 makes the CLI the door, and herdr-plugin (Rust) and fgos-fanout
+    // 0014 makes the CLI the door, and herdr-dashboard (Rust) and fgos-fanout
     // (a prose skill) have no other way to ask the engine before they stand a
     // worker up. Pure read: worker-slots.mjs never touches fs, and the
     // ceiling comes from the same config resolution claimWork's own gate uses.
@@ -3615,7 +3615,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     }
 
     // Gateway process lifecycle (tsk-31v): the one-door way any agent
-    // starts/stops/checks the herdr-fgos gateway (REST API + web
+    // starts/stops/checks the fgos gateway (REST API + web
     // dashboard) as a detached background process instead of hand-rolling
     // nohup/tmux/systemd. AGENTS.md's own dispatch doctrine names this as
     // the mandatory entry point.

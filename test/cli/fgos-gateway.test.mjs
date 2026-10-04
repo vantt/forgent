@@ -1,5 +1,5 @@
 // fgos-gateway.test.mjs -- tsk-31v: CLI-dispatch coverage for `fgos gateway
-// <start|stop|status>` (the one-door lifecycle for the herdr-fgos gateway
+// <start|stop|status>` (the one-door lifecycle for the fgos gateway
 // process). The underlying logic (registry read/write, PID liveness, real
 // HTTP reachability, real SIGTERM delivery) is covered by
 // test/runner/gateway-control.test.mjs -- this file only proves the CLI
@@ -59,11 +59,11 @@ test('fgos gateway stop on a fresh repo (nothing running) reports alreadyStopped
   assert.deepEqual(envelope.data, { alreadyStopped: true });
 });
 
-test('fgos gateway start on a repo with no herdr-plugin/ directory is a real, named refusal', () => {
+test('fgos gateway start on a repo with no apps/fgos-gateway/ directory is a real, named refusal', () => {
   const cwd = tmpCwd();
   const result = run(cwd, ['gateway', 'start']);
   assert.notEqual(result.status, 0);
-  assert.match(result.stderr, /no herdr-plugin\/ directory found/);
+  assert.match(result.stderr, /no apps\/fgos-gateway\/ directory found/);
 });
 
 test('fgos --help --json lists gateway with its start|stop|status sub-verb enum', () => {

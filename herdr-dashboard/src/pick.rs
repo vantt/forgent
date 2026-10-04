@@ -101,7 +101,7 @@ pub fn skip_permissions_enabled() -> bool {
 }
 
 /// Mirrors `skip_permissions_enabled` above (tsk-4iz D2/D3): the model
-/// every herdr-plugin-launched `claude` session is pinned to, read once
+/// every herdr-dashboard-launched `claude` session is pinned to, read once
 /// per launch, never cached. Set `FGOS_HERDR_MODEL` to override; defaults
 /// to `sonnet` — this repo's own already-established `--model` alias
 /// (`.fgos/config.json`'s `runner.executor.args`/`capacities.*.args`).
@@ -286,7 +286,7 @@ pub fn open_discover_pane(
 /// `/fgOS:merge-loop` before) — unlike `open_pick_pane`/`open_discover_pane`
 /// above, this never calls `layout::place_new_agent_pane`: the fixed
 /// `fg:operation` tab's four slot panes are resolved once, eagerly, at
-/// herdr-plugin startup (`layout::ensure_operation_tab`, tsk-5lr) and
+/// herdr-dashboard startup (`layout::ensure_operation_tab`, tsk-5lr) and
 /// passed in by the caller.
 pub fn run_merge_next(
     herdr_bin: &str,

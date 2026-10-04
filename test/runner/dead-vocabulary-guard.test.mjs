@@ -331,10 +331,10 @@ test('dead vocabulary guard: Phase 3 Work tier retired, size and rigor enforced'
   assert.ok(Array.isArray(workModule.SIZES), 'SIZES must be exported from work.mjs');
   assert.deepEqual(workModule.SIZES, ['light', 'standard', 'heavy']);
 
-  // 2. Pattern \b(item|work|workItem)\??\.tier\b does not appear in src, bin, packages, herdr-plugin/src
+  // 2. Pattern \b(item|work|workItem)\??\.tier\b does not appear in src, bin, packages, herdr-dashboard/src
   // Exception: src/state/work.mjs where work.tier is checked and rejected
   const pattern = /\b(item|work|workItem)\??\.tier\b/;
-  const checkDirs = ['src', 'bin', 'packages', path.join('herdr-plugin', 'src')].map((d) => path.join(REPO_ROOT, d));
+  const checkDirs = ['src', 'bin', 'packages', path.join('herdr-dashboard', 'src')].map((d) => path.join(REPO_ROOT, d));
   const allFiles = checkDirs.flatMap((d) => collectFiles(d, ['.js', '.mjs', '.cjs', '.rs']));
   const violations = [];
   for (const file of allFiles) {

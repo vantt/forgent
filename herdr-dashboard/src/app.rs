@@ -305,7 +305,7 @@ pub struct App {
     /// Deliberately in-process and never persisted: this is the adapter's
     /// bookkeeping about its own actions, not orchestrator state (which
     /// D2 puts in the engine). Being in-process is also what keeps it from
-    /// becoming the very bug this item removes — a herdr-plugin restart
+    /// becoming the very bug this item removes — a herdr-dashboard restart
     /// clears it, whereas the pane label it replaces could stay stuck
     /// forever.
     pub pending_worker_panes: HashSet<String>,
@@ -321,7 +321,7 @@ pub struct App {
     /// fresh discover launch behind an unrelated execution-lane one. Only
     /// ever holds at most one pane id, since `next_auto_discover_candidate`
     /// picks at most one candidate per tick. Same in-process, never-
-    /// persisted discipline as `pending_worker_panes` — a herdr-plugin
+    /// persisted discipline as `pending_worker_panes` — a herdr-dashboard
     /// restart clears it, which is correct: nothing this adapter believed
     /// about an in-flight launch survives a restart either.
     pub pending_discover_pane: Option<String>,
@@ -335,7 +335,7 @@ pub struct App {
     /// id is no longer present in a scan (`retire_settled_pending_operation_panes`,
     /// below) — never "claimed and doing", since there is nothing to
     /// claim. Same in-process, never-persisted discipline as
-    /// `pending_discover_pane`: a herdr-plugin restart clears it, which
+    /// `pending_discover_pane`: a herdr-dashboard restart clears it, which
     /// is correct, since nothing this adapter believed about an in-flight
     /// launch survives a restart either.
     pub pending_merge_pane: Option<String>,

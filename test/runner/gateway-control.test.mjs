@@ -12,7 +12,7 @@ const GATEWAY_CONTROL_MOD_PATH = fileURLToPath(new URL('../../src/runner/gateway
 
 // Every test builds its own disposable temp dir (mkdtemp) for both the fake
 // repo root and its `.fgos` -- no test ever touches THIS repo's real
-// .fgos/gateway.json or spawns the real herdr-fgos binary (that pipeline is
+// .fgos/gateway.json or spawns the real fgos-gateway binary (that pipeline is
 // proven separately by a real manual run, tsk-31v's own plan.md). What IS
 // real here: process spawning, SIGTERM delivery, PID liveness, and an actual
 // HTTP reachability check against a real (fake-content) local server.
@@ -42,7 +42,7 @@ function isAlive(pid) {
 }
 
 /** A real, throwaway long-lived process this test controls entirely --
- * gives a genuinely live pid without depending on the real herdr-fgos
+ * gives a genuinely live pid without depending on the real fgos-gateway
  * binary or cargo. Spawned as a genuine ORPHAN (via `setsid` backgrounded
  * from a `sh -c` that itself exits immediately), never a direct Node
  * child of this test process -- matching real production topology, where
@@ -257,22 +257,22 @@ test('startGateway: refuses with no side effects when the registry already names
   try {
     writeRegistry(fgosDir, { pid: child.pid, port: 4170, startedAt: new Date().toISOString(), logPath: '/dev/null' });
     assert.throws(() => startGateway(repoRoot, fgosDir), GatewayControlError);
-    // Refusal happens before ever touching herdr-plugin/ -- no herdr-plugin
+    // Refusal happens before ever touching apps/fgos-gateway/ -- no apps/fgos-gateway
     // dir exists in this fixture at all, proving the check really is
     // ordered before any cargo/binary work, not just coincidentally fast.
-    assert.equal(fs.existsSync(path.join(repoRoot, 'herdr-plugin')), false);
+    assert.equal(fs.existsSync(path.join(repoRoot, 'apps', 'fgos-gateway')), false);
   } finally {
     child.kill('SIGKILL');
     cleanup(repoRoot);
   }
 });
 
-test('startGateway: a repo with no herdr-plugin/ directory is refused with a real, named error', () => {
+test('startGateway: a repo with no apps/fgos-gateway/ directory is refused with a real, named error', () => {
   const { repoRoot, fgosDir } = mkFgosDir();
   try {
     assert.throws(() => startGateway(repoRoot, fgosDir), (err) => {
       assert.ok(err instanceof GatewayControlError);
-      assert.match(err.message, /no herdr-plugin\/ directory found/);
+      assert.match(err.message, /no apps\/fgos-gateway\/ directory found/);
       return true;
     });
   } finally {

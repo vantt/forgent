@@ -68,7 +68,7 @@ export function resolveWorkspaceInstallationBin(cwd) {
     // `-x` and Herdr's executable-metadata check both follow the same
     // symlink chain and execute whatever it resolves to, so they need the
     // matching realpath confinement too -- see fgos-shell-integration.sh
-    // and herdr-plugin/src/fgos.rs.
+    // and packages/herdr-fgos-common/rust/src/fgos.rs.
     let realBin;
     let realBase;
     try {

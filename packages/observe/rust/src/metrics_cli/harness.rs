@@ -207,7 +207,7 @@ fn compute_loc_breakdown(root: &Path) -> LocBreakdown {
                     loc.packages += line_count;
                 } else if rel_path.starts_with("apps/") {
                     loc.apps += line_count;
-                } else if rel_path.starts_with("herdr-plugin/") {
+                } else if rel_path.starts_with("herdr-dashboard/") {
                     loc.herdr_plugin += line_count;
                 } else {
                     loc.other += line_count;

@@ -10,7 +10,7 @@ members = [
     "packages/herdr-fgos-common/rust",
 ]
 exclude = [
-    "herdr-plugin",
+    "herdr-dashboard",
     "apps/fgos-gateway",
     "upstreams",
 ]

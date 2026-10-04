@@ -82,7 +82,7 @@ import { effectiveStep, getDomain } from './domain-registry.mjs';
  *     bucket means "the root branch itself needs syncing," not "the root
  *     is closed out and nothing will ever sync it"), kept as its own
  *     bucket rather than folded into `blockedOnSync` so that name's
- *     existing cross-language contract (`herdr-plugin/src/fgos.rs`
+ *     existing cross-language contract (`packages/herdr-fgos-common/rust/src/fgos.rs`
  *     deserializes it by name) keeps its current meaning unchanged.
  *     Checked independently of `opts.drift` (item status, not a git-shelled
  *     drift computation) — never empty just because `opts.drift` was
