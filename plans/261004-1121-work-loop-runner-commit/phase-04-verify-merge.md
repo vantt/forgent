@@ -1,7 +1,7 @@
 ---
 phase: 4
 title: "Nghiệm thu + merge"
-status: pending
+status: completed
 priority: P2
 effort: "0.25d"
 dependencies: [3]

@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "Sự thật + impact"
-status: pending
+status: completed
 priority: P2
 effort: "0.25d"
 dependencies: []

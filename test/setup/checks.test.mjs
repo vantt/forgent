@@ -127,6 +127,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'observe-friction-migrated',
       'observe-host-resolvable',
       'executor-confinement',
+      'invocation-git-write-grants',
       'herdr-executor-kinds',
       // Phase 06 (executor-policy-dispatch-seams): legacy policy-shaped
       // executor/capability warnings, named with their migration target.

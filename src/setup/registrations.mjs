@@ -4194,6 +4194,37 @@ export function checkExecutorConfinement(runnerCfg = {}) {
   };
 }
 
+/** A worker holds no git write grant: the runner commits what it leaves in the
+ * worktree. A config that still grants `git add`/`git commit` (bare or
+ * `rtk`-wrapped) through an allowlist predates that rule and lets an unconfined
+ * worker move branch refs; named per executor/invocation so the fix is a
+ * one-line edit. Reported as a warning, never auto-removed from a user's file. */
+const GIT_WRITE_GRANT = /\bgit (add|commit)\b/;
+
+function grantsGitWrite(args) {
+  if (!Array.isArray(args)) return false;
+  const at = args.indexOf('--allowedTools');
+  return at !== -1 && typeof args[at + 1] === 'string' && GIT_WRITE_GRANT.test(args[at + 1]);
+}
+
+export function checkInvocationGitWriteGrants(runnerCfg = {}) {
+  const offenders = [];
+  if (grantsGitWrite(runnerCfg.executor?.args)) offenders.push('executor');
+  for (const [id, executor] of Object.entries(runnerCfg.executors ?? {})) {
+    if (grantsGitWrite(executor?.args)) offenders.push(`executors.${id}`);
+    for (const invocation of executor?.invocations ?? []) {
+      if (grantsGitWrite(invocation?.args)) offenders.push(`executors.${id}.invocations.${invocation.id ?? '?'}`);
+    }
+  }
+  if (offenders.length === 0) {
+    return { passed: true, message: 'no executor or invocation grants git add/git commit to a worker' };
+  }
+  return {
+    passed: true,
+    message: `warning: ${offenders.join(', ')} still grant git add/git commit in --allowedTools; workers no longer commit (the runner does) -- remove the grant`,
+  };
+}
+
 /** herdr's own list of agent kinds it can start, read from the command that
  * enforces it rather than copied into this repo where it would go stale in
  * silence. Returns null when herdr cannot be asked -- absence is already
@@ -4375,6 +4406,18 @@ registerCheck({
       // A directory with no loadable runner config is not a confinement problem;
       // saying otherwise would make doctor cry wolf everywhere fgOS is not set up.
       return { passed: true, message: `runner config not loadable here, confinement not evaluated: ${err.message}` };
+    }
+  },
+});
+
+registerCheck({
+  id: 'invocation-git-write-grants',
+  description: 'warns when an executor or invocation still grants git add/git commit to a worker through --allowedTools (the runner commits; workers hold no git write grant)',
+  check: (cwd) => {
+    try {
+      return checkInvocationGitWriteGrants(loadRunnerConfigFromDir(cwd));
+    } catch (err) {
+      return { passed: true, message: `runner config not loadable here, git write grants not evaluated: ${err.message}` };
     }
   },
 });

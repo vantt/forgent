@@ -224,6 +224,22 @@ execFileSync('git', ['commit', '-q', '-m', ${JSON.stringify(`worker: ${produce}`
   return scriptPath;
 }
 
+/** A fake executor that only edits files and never touches git — the
+ * contract: the runner commits what the worker leaves behind. */
+function writeEditOnlyExecutor(scriptDir, produce = 'output.txt', { summary } = {}) {
+  const scriptPath = path.join(scriptDir, 'edit-only-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+import fs from 'node:fs';
+${produce ? `fs.writeFileSync(${JSON.stringify(produce)}, 'produced by worker\\n');` : ''}
+${summary ? `console.log('\`\`\`json\\n' + JSON.stringify({ summary: ${JSON.stringify(summary)} }) + '\\n\`\`\`');` : ''}
+console.log('[DONE]');
+`,
+  );
+  return scriptPath;
+}
+
 /** A fake executor that commits something that does NOT satisfy the item's
  * verify — every dispatch is a real, deterministic goal-check miss. */
 function writeWrongCommitExecutor(scriptDir) {
@@ -553,7 +569,7 @@ test('e2e stage-decompose (c) ambiguous verdict: an explicit decompose --verdict
  * fgos-coding-discovering's own real content shape (nor the
  * fgos-researching helper it calls) is followed (out of this item's
  * scope -- that skill's own job). */
-function writeResearchWorkerExecutor(scriptDir, featureDir, { clear = true, verify = 'test -f later.txt', question = 'Which approach?' } = {}) {
+function writeResearchWorkerExecutor(scriptDir, featureDir, { clear = true, verify = 'test -f later.txt', question = 'Which approach?', selfCommit = true } = {}) {
   const scriptPath = path.join(scriptDir, 'research-worker-executor.mjs');
   const verdictBody = clear ? { clear: true, verify } : { clear: false, question };
   fs.writeFileSync(
@@ -563,8 +579,8 @@ import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 fs.mkdirSync(${JSON.stringify(featureDir)}, { recursive: true });
 fs.writeFileSync(${JSON.stringify(path.posix.join(featureDir, 'RESEARCH.md'))}, '## Round 1\\n\\nFound: nothing blocking.\\n');
-execFileSync('git', ['add', ${JSON.stringify(path.posix.join(featureDir, 'RESEARCH.md'))}]);
-execFileSync('git', ['commit', '-q', '-m', 'research: round 1']);
+${selfCommit ? `execFileSync('git', ['add', ${JSON.stringify(path.posix.join(featureDir, 'RESEARCH.md'))}]);
+execFileSync('git', ['commit', '-q', '-m', 'research: round 1']);` : ''}
 process.stdout.write(${JSON.stringify('```fgos-verdict\n' + JSON.stringify(verdictBody) + '\n```\n')});
 `,
   );
@@ -592,6 +608,23 @@ test('e2e stage-discovery: --once dispatches a stage:discovery item to a real wo
   assert.equal(item.verify, 'test -f later.txt', "the worker's own proposed verify rode onto the item");
   assert.equal(branchExists(repoRoot, 'fgw/item-research'), true, 'the worker ran on its own real dispatch branch');
   assert.match(branchLog(repoRoot, 'fgw/item-research'), /research: round 1/);
+});
+
+test('e2e stage-discovery: a research worker that only writes RESEARCH.md (no git) still advances — the runner commits it', () => {
+  const repoRoot = initTempRepo();
+  const scriptDir = mkTempDir('fgos-runner-e2e-discovery-edit-only-');
+  const featureDir = 'docs/history/discovery-edit-only-item';
+
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+  writeRunnerConfig(repoRoot, writeResearchWorkerExecutor(scriptDir, featureDir, { selfCommit: false }));
+  add(repoRoot, 'item-research-eo', { workflowStep: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
+
+  const result = runner(repoRoot, ['--once']);
+  assert.equal(result.status, 0, `--once failed: ${result.stderr}`);
+
+  assert.equal(stateView(repoRoot).work['item-research-eo'].workflowStep, 'planning');
+  assert.equal(branchAheadCount(repoRoot, 'fgw/item-research-eo'), 1);
+  assert.match(branchLog(repoRoot, 'fgw/item-research-eo'), /item-research-eo: /);
 });
 
 test('e2e stage-discovery: --once advances the item to exploring and parks it in awaiting-human when the real worker reports an unclear verdict (tsk-4v6/tsk-30v)', () => {
@@ -898,6 +931,90 @@ test('e2e verify-red: a worker that commits the wrong thing fails goal-check on 
   assert.equal(actualOutcomeEvent.payload.actual.outcome, 'parked');
   assert.equal(actualOutcomeEvent.payload.actual.passed, false);
   assert.equal(actualOutcomeEvent.payload.actual.errorClass, 'verify-miss');
+});
+
+test('e2e runner commit: a worker that only edits files gets its work committed by the runner before goal-check -> awaiting-approval with exactly one commit whose subject is the Result summary', () => {
+  const repoRoot = initTempRepo();
+  const scriptDir = mkTempDir('fgos-runner-e2e-exec-');
+
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+  add(repoRoot, 'item-edit', { verify: 'test -f output.txt' });
+  writeRunnerConfig(repoRoot, writeEditOnlyExecutor(scriptDir, 'output.txt', { summary: 'add output file' }));
+
+  const result = runner(repoRoot, ['--once']);
+  assert.equal(result.status, 0, `--once failed: ${result.stderr}`);
+  assert.match(result.stdout, /awaiting-approval/);
+  assert.equal(stateView(repoRoot).work['item-edit'].status, 'awaiting-approval');
+  assert.equal(branchAheadCount(repoRoot, 'fgw/item-edit'), 1);
+  assert.match(branchLog(repoRoot, 'fgw/item-edit'), /add output file/);
+  assert.match(`${result.stdout}${result.stderr}`, /commit for "item-edit": runner/);
+  const workerLog = fs.readFileSync(path.join(repoRoot, '.fgos', 'logs', 'item-edit.log'), 'utf8');
+  assert.match(workerLog, /commit runner/);
+});
+
+test('e2e runner commit: with no Result summary the commit subject falls back to "<id>: <title>"', () => {
+  const repoRoot = initTempRepo();
+  const scriptDir = mkTempDir('fgos-runner-e2e-exec-');
+
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+  add(repoRoot, 'item-fallback', { title: 'Produce the file', verify: 'test -f output.txt' });
+  writeRunnerConfig(repoRoot, writeEditOnlyExecutor(scriptDir));
+
+  const result = runner(repoRoot, ['--once']);
+  assert.equal(result.status, 0, `--once failed: ${result.stderr}`);
+  assert.match(branchLog(repoRoot, 'fgw/item-fallback'), /item-fallback: Produce the file/);
+});
+
+test('e2e runner commit: a worker that already committed itself (older contract) gets no second commit', () => {
+  const repoRoot = initTempRepo();
+  const scriptDir = mkTempDir('fgos-runner-e2e-exec-');
+
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+  add(repoRoot, 'item-self', { verify: 'test -f output.txt' });
+  writeRunnerConfig(repoRoot, writeCommittingExecutor(scriptDir, 'output.txt'));
+
+  const result = runner(repoRoot, ['--once']);
+  assert.equal(result.status, 0, `--once failed: ${result.stderr}`);
+  assert.equal(stateView(repoRoot).work['item-self'].status, 'awaiting-approval');
+  assert.equal(branchAheadCount(repoRoot, 'fgw/item-self'), 1);
+  assert.match(`${result.stdout}${result.stderr}`, /commit for "item-self": self/);
+});
+
+test('e2e runner commit: a worker that changes nothing leaves no commit -> verify-miss, parked, never proposed', () => {
+  const repoRoot = initTempRepo();
+  const scriptDir = mkTempDir('fgos-runner-e2e-exec-');
+
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+  add(repoRoot, 'item-noop', { verify: 'test -f seed.txt' });
+  writeRunnerConfig(repoRoot, writeEditOnlyExecutor(scriptDir, null));
+
+  const result = runner(repoRoot, ['--once']);
+  assert.equal(result.status, 0, `--once should still exit 0 for a parked item: ${result.stderr}`);
+  assert.equal(stateView(repoRoot).work['item-noop'].status, 'blocked');
+  assert.equal(branchAheadCount(repoRoot, 'fgw/item-noop'), 0);
+  assert.match(`${result.stdout}${result.stderr}`, /commit for "item-noop": none/);
+  const actual = events(repoRoot).find((e) => e.type === 'work.outcome' && e.payload.actual);
+  assert.equal(actual.payload.actual.errorClass, 'verify-miss');
+});
+
+test('e2e runner commit: a failing commit (rejecting pre-commit hook) is an infrastructure failure routed through the recovery matrix, never a silent no-commit', () => {
+  const repoRoot = initTempRepo();
+  const scriptDir = mkTempDir('fgos-runner-e2e-exec-');
+  const hook = path.join(repoRoot, '.git', 'hooks', 'pre-commit');
+  fs.writeFileSync(hook, '#!/bin/sh\necho rejected-by-hook >&2\nexit 1\n');
+  fs.chmodSync(hook, 0o755);
+
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+  add(repoRoot, 'item-hook', { verify: 'test -f output.txt' });
+  writeRunnerConfig(repoRoot, writeEditOnlyExecutor(scriptDir, 'output.txt'));
+
+  const result = runner(repoRoot, ['--once']);
+  assert.equal(result.status, 0, `--once should still exit 0 for a parked item: ${result.stderr}`);
+  assert.equal(stateView(repoRoot).work['item-hook'].status, 'blocked');
+  assert.match(`${result.stdout}${result.stderr}`, /worktree-fail for "item-hook"/);
+  assert.match(`${result.stdout}${result.stderr}`, /rejected-by-hook/);
+  const actual = events(repoRoot).find((e) => e.type === 'work.outcome' && e.payload.actual);
+  assert.equal(actual.payload.actual.errorClass, 'worktree-fail');
 });
 
 // --- case 3: crash-idempotency ----------------------------------------------

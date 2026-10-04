@@ -120,7 +120,8 @@ execFileSync('git', ['commit', '-q', '-m', 'worker: ' + file]);
   return scriptPath;
 }
 
-/** A worker that produces the verify target but never commits it. */
+/** A worker that produces the verify target but never commits it — the
+ * contract: the runner commits what the worker leaves in the worktree. */
 function writeNonCommittingExecutor(scriptDir, counterFile) {
   const scriptPath = path.join(scriptDir, 'non-committing-executor.mjs');
   fs.writeFileSync(
@@ -129,6 +130,19 @@ function writeNonCommittingExecutor(scriptDir, counterFile) {
 import fs from 'node:fs';
 fs.appendFileSync(${JSON.stringify(counterFile)}, 'run\\n');
 fs.writeFileSync('output.txt', 'uncommitted\\n');
+`,
+  );
+  return scriptPath;
+}
+
+/** A worker that runs but leaves the worktree untouched. */
+function writeNoChangeExecutor(scriptDir, counterFile) {
+  const scriptPath = path.join(scriptDir, 'no-change-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+import fs from 'node:fs';
+fs.appendFileSync(${JSON.stringify(counterFile)}, 'run\\n');
 `,
   );
   return scriptPath;
@@ -1054,17 +1068,38 @@ test('P1 fix (defect-class sweep): a retry on a root item whose branch already c
   assert.equal(fileAtRef(repoRoot, branch, 'junk.txt'), false, "the failed first attempt's own commit was discarded");
 });
 
-test('verify passes but the worker never committed -> classified verify-miss, parked after retries', async () => {
+test('a worker that only edits files is committed by the runner before goal-check -> proposed with exactly one runner commit', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
-  seedItem(dir, { id: 'item-nocommit' });
+  seedItem(dir, { id: 'item-nocommit', title: 'Produce the output file' });
   const config = configFor(writeNonCommittingExecutor(scriptDir, counterFile));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.outcome, 'drained');
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
+  assert.equal(result.dispatched[0].attempts, 1);
+  const branch = branchNameFor('item-nocommit');
+  assert.equal(fileAtRef(repoRoot, branch, 'output.txt'), true, 'the runner committed the worker file');
+  assert.equal(
+    execFileSync('git', ['log', '--format=%s', `HEAD..${branch}`], { cwd: repoRoot, encoding: 'utf8' }).trim(),
+    'item-nocommit: Produce the output file',
+    'subject falls back to "<id>: <title>" when the worker reported no Result summary',
+  );
+  assert.deepEqual(fs.readdirSync(worktreeDir), []);
+});
+
+test('verify passes but the worker changed nothing -> no commit, classified verify-miss, parked after retries', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  // `seed.txt` is already on trunk, so verify passes with zero worker changes.
+  seedItem(dir, { id: 'item-nochange', verify: 'test -f seed.txt' });
+  const config = configFor(writeNoChangeExecutor(scriptDir, counterFile));
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   assert.equal(result.outcome, 'drained');
   assert.equal(result.dispatched[0].outcome, 'parked');
   assert.equal(result.dispatched[0].errorClass, 'verify-miss');
-  assert.equal(listWork(dir).work['item-nocommit'].status, 'blocked');
+  assert.equal(listWork(dir).work['item-nochange'].status, 'blocked');
   assert.deepEqual(fs.readdirSync(worktreeDir), []);
 });
 

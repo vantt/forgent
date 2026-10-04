@@ -26,18 +26,19 @@ working tree, another branch, or another worktree. Relevant refs: {refs}.
 This repo is self-modifying: fix any of its own runner/evolve/state modules
 (`src/evolve/iron-law.mjs`'s `MODULE_RULES`) and one extra guardrail applies
 — proof a fix was validated against a real failing test before it existed.
-AFTER your implementation is committed on this branch (running this BEFORE
-committing reads an empty diff and gives a false "not required" — see
+AFTER your implementation is written in this checkout (running this BEFORE
+your edits exist reads an empty diff and gives a false "not required" — see
 `docs/how-to/produce-failing-test-first-proof-for-an-iron-law-gated-diff.md`'s
-"Watch out for" section), classify your own diff:
+"Watch out for" section), classify your own diff (the runner commits later, so
+the changed files come from the working tree, not from a branch diff):
 
 ```bash
 node --input-type=module -e "
-import { changedFiles } from './src/runner/merge.mjs';
+import { execFileSync } from 'node:child_process';
 import { classifyIronLaw } from './src/evolve/iron-law.mjs';
 const id = process.argv[1];
 const description = process.argv[2];
-console.log(JSON.stringify(classifyIronLaw({ filesChanged: changedFiles('.', { id }), description })));
+console.log(JSON.stringify(classifyIronLaw({ filesChanged: execFileSync('git', ['status', '--porcelain', '-uall'], { encoding: 'utf8' }).split('\n').filter(Boolean).map((l) => l.slice(3)), description })));
 " "<your item id — your current branch name, `git branch --show-current`, with the fgw/ prefix stripped>" "<your item's own Description text, verbatim, from the Description section above>"
 ```
 
@@ -53,16 +54,16 @@ actual stderr/assertion text, never a paraphrase), `git stash apply`
 same command and confirm it passes (green), then write
 `docs/history/<your item id>/iron-law-evidence.md` with the matched
 flags/modules from the classification above and the real red/green
-transcript excerpts, and commit it as a follow-up commit on this branch —
-before reporting `[DONE]`. Skipping or fabricating this evidence when
+transcript excerpts, and leave it in this checkout (the runner commits it with
+the rest) before reporting `[DONE]`. Skipping or fabricating this evidence when
 `required` is `true` is not a valid way to finish.
 
 # How to finish
 Report your completion status through a fixed token in your output — your
 caller reads this token mechanically, not free prose:
 
-- `[DONE]` — the work described in your boundary is complete and committed on
-  this branch.
+- `[DONE]` — the work described in your boundary is complete and left in this
+  checkout (the runner commits it).
 - `[BLOCKED] <exactly what's missing or what stopped you>` — you cannot proceed
   because required context is missing, a file is outside your boundary, or a
   real mid-work blocker stopped you. Never leave this bare.
@@ -77,8 +78,9 @@ itself after you finish (your own report is never trusted on its own):
 
 # Constraints
 Never call `fgos` yourself and never write to `.fgos/` directly — the
-runner is the sole writer through that door during this dispatch. Commit
-your changes on this branch and report; do not merge, push, or approve your
+runner is the sole writer through that door during this dispatch. Never
+run `git add`/`git commit` — leave your changes in this checkout (the runner
+commits them after you return) and report; do not merge, push, or approve your
 own work.
 
 # Reporting discovered work (report, not write)
