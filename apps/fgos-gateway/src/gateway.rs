@@ -1,6 +1,6 @@
 //! tsk-7l9-2: fgOS gateway — the REST surface `docs/history/fgos-interface-daemon/`
 //! locks (CONTEXT.md D1/D4/D5/D7/D8, `docs/contracts/fgos-gateway-api-v1.yaml`,
-//! CTR010). Lives inside the `herdr-fgos` binary (D8) as a new async adapter
+//! CTR010). Lives inside the `fgos-gateway` binary (D8) as a new async adapter
 //! sitting beside the existing synchronous TUI/orchestrator code — nothing in
 //! `app.rs`/`main.rs`'s TUI path changes shape or gains an async dependency.
 //!
@@ -379,8 +379,8 @@ fn wait_with_timeout(
 /// too, or those two verbs silently act on wherever the gateway process
 /// happened to be launched from.
 fn build_fgos_command(root: &Path, args: &[String]) -> std::process::Command {
-    let fgos_bin = crate::fgos::resolve_fgos(root).unwrap_or_else(|_| root.join("bin/fgos.mjs"));
-    if crate::fgos::is_tier_zero(root, &fgos_bin) {
+    let fgos_bin = herdr_fgos_common::fgos::resolve_fgos(root).unwrap_or_else(|_| root.join("bin/fgos.mjs"));
+    if herdr_fgos_common::fgos::is_tier_zero(root, &fgos_bin) {
         let mut cmd = std::process::Command::new(&fgos_bin);
         cmd.args(args);
         cmd.arg("--dir").arg(root);
@@ -1258,8 +1258,8 @@ pub fn build_router(gateway: Arc<dyn VerbGateway>, config: GatewayConfig, root: 
     Router::new().nest("/v1", api).with_state(state).layer(cors)
 }
 
-/// tsk-48w (D14): `herdr-plugin/web`'s built bundle, embedded into the
-/// binary at compile time. `herdr-plugin/build.rs` guarantees `static/`
+/// tsk-48w (D14): `apps/fgos-gateway/web`'s built bundle, embedded into the
+/// binary at compile time. `apps/fgos-gateway/build.rs` guarantees `static/`
 /// exists even before `npm run bundle` has run, so this derive never
 /// fails `cargo build`/`test`/`clippy` on a fresh checkout -- it just
 /// embeds an empty directory until the bundle exists. `debug-embed`
@@ -1315,7 +1315,7 @@ pub fn with_static_serving(router: Router, enabled: bool, static_dir: &Path) -> 
 
 /// Runs the gateway to completion (i.e. forever, until the process is
 /// killed). Builds its own multi-threaded tokio runtime — the rest of
-/// `herdr-fgos` (the TUI) stays fully synchronous, so only this entry point
+/// `herdr-dashboard` (the TUI) stays fully synchronous, so only this entry point
 /// pays the async-runtime startup cost (`main.rs`'s dispatch, D1: one
 /// process, gateway mode chosen at launch rather than the TUI's default).
 pub fn run(root: PathBuf) -> std::io::Result<()> {
@@ -1337,7 +1337,7 @@ pub fn run(root: PathBuf) -> std::io::Result<()> {
     // config file `load_gateway_config` already reads (`~/.fgos/
     // config.json`'s sibling section `herdrWebDashboard`), fail-open
     // default per `settings::WebDashboardSettings`'s own doc comment.
-    let web_settings = crate::settings::read_web_dashboard_settings(&root);
+    let web_settings = herdr_fgos_common::settings::read_web_dashboard_settings(&root);
     let router = build_router(gateway, config, root);
     let router = with_static_serving(router, web_settings.static_serving, Path::new("static"));
 
@@ -1938,7 +1938,7 @@ mod tests {
         let gateway: Arc<dyn VerbGateway> = Arc::new(FakeGateway { response: Ok(json!({})) });
         let router = build_router(gateway, test_config(), PathBuf::from("/tmp"));
         // A static_dir with no index.html forces the embedded-bundle
-        // branch (WebAssets, compiled from herdr-plugin/static/) rather
+        // branch (WebAssets, compiled from apps/fgos-gateway/static/) rather
         // than the on-disk dev-override branch.
         let empty_dir = std::env::temp_dir().join(format!("fgos-gateway-embed-test-{}", std::process::id()));
         std::fs::create_dir_all(&empty_dir).unwrap();
