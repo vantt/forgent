@@ -310,7 +310,7 @@ export function addWork(dir, work) {
     // tsk-48i D1: same write-time-stamp shape as statusCategory above, for
     // the domain-owned parkReason table (parkReasonForStatus,
     // domain-registry.mjs) -- lets a domain-agnostic reader (e.g.
-    // herdr-plugin) tell "actively worked" apart from "parked on a person"
+    // herdr-dashboard) tell "actively worked" apart from "parked on a person"
     // or "parked on a system error" without learning the domain's own
     // literal status strings.
     const addParkReason = parkReasonForStatus(getDomain(item.domain), item.status);

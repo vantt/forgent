@@ -1,7 +1,7 @@
 ---
 phase: 4
 title: "Docs, boundary, guard, chạy thật, merge"
-status: pending
+status: completed
 priority: P1
 effort: "0.25d"
 dependencies: [3]

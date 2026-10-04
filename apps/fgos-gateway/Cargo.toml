@@ -1,22 +1,20 @@
 [package]
-name = "herdr-fgos"
+name = "fgos-gateway"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
-name = "herdr_fgos"
+name = "fgos_gateway"
 path = "src/lib.rs"
 
 [[bin]]
-name = "herdr-fgos"
+name = "fgos-gateway"
 path = "src/main.rs"
 
 [dependencies]
-ratatui = { version = "0.30", features = ["unstable-rendered-line-info"] }
-crossterm = "0.29"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-# tsk-7l9-2 D8: herdr-fgos's first async dependency -- the gateway's REST
+# tsk-7l9-2 D8: fgos-gateway's first async dependency -- the gateway's REST
 # surface (D1/D7) is what needs one; the TUI/orchestrator code stays fully
 # synchronous and untouched.
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "process", "net", "time", "fs"] }
@@ -53,7 +51,7 @@ serde_yaml = "0.9"
 # dependency graph (docs/history/tsk-54y-gateway-cors-bind/plan.md).
 tower-http = { version = "0.7", features = ["cors", "fs"] }
 # tsk-48w (D14 of docs/history/herdr-web-dashboard-plan-realignment/
-# CONTEXT.md): embeds herdr-plugin/web's built bundle into the binary so
+# CONTEXT.md): embeds apps/fgos-gateway/web's built bundle into the binary so
 # the "máy được chọn" can serve it with no separate deploy step.
 # Versions resolved by real `cargo add --dry-run` against this crate's
 # existing dependency graph (docs/history/herdr-web-dashboard/plan.md,
@@ -79,8 +77,9 @@ axum-embed = "0.1"
 jsonwebtoken = { version = "11", default-features = false, features = ["use_pem", "aws_lc_rs"] }
 reqwest = { version = "0.13", default-features = false, features = ["json", "rustls"] }
 base64 = "0.23"
-fgos-host-runtime = { path = "../packages/host-runtime/rust" }
-fgos-distribution = { path = "../packages/distribution/rust" }
+herdr-fgos-common = { path = "../../packages/herdr-fgos-common/rust" }
+fgos-host-runtime = { path = "../../packages/host-runtime/rust" }
+fgos-distribution = { path = "../../packages/distribution/rust" }
 
 [dev-dependencies]
 tower = { version = "0.4", features = ["util"] }

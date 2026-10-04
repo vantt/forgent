@@ -1,10 +1,11 @@
 use std::collections::HashSet;
 
-use crate::fgos::{merge_tree_line_count, MergeListSummary, MergeTreeNode};
+use herdr_fgos_common::fgos::{merge_tree_line_count, MergeListSummary, MergeTreeNode};
 use crate::layout::OperationPanes;
 use crate::pane_scan::{task_id_map, PaneIdentity, PaneSnapshot};
-use crate::ports::{PaneRegistry, WorkItemSource};
-use crate::settings::OrchestratorSettings;
+use crate::ports::PaneRegistry;
+use herdr_fgos_common::ports::WorkItemSource;
+use herdr_fgos_common::settings::OrchestratorSettings;
 
 /// tsk-417 D3: NEED ANSWER box row — `status` is `"blocked"` (ERR tag) or
 /// `"awaiting-human"` (ASK tag), one box, distinct sub-tag per row.
@@ -304,7 +305,7 @@ pub struct App {
     /// Deliberately in-process and never persisted: this is the adapter's
     /// bookkeeping about its own actions, not orchestrator state (which
     /// D2 puts in the engine). Being in-process is also what keeps it from
-    /// becoming the very bug this item removes — a herdr-plugin restart
+    /// becoming the very bug this item removes — a herdr-dashboard restart
     /// clears it, whereas the pane label it replaces could stay stuck
     /// forever.
     pub pending_worker_panes: HashSet<String>,
@@ -320,7 +321,7 @@ pub struct App {
     /// fresh discover launch behind an unrelated execution-lane one. Only
     /// ever holds at most one pane id, since `next_auto_discover_candidate`
     /// picks at most one candidate per tick. Same in-process, never-
-    /// persisted discipline as `pending_worker_panes` — a herdr-plugin
+    /// persisted discipline as `pending_worker_panes` — a herdr-dashboard
     /// restart clears it, which is correct: nothing this adapter believed
     /// about an in-flight launch survives a restart either.
     pub pending_discover_pane: Option<String>,
@@ -334,7 +335,7 @@ pub struct App {
     /// id is no longer present in a scan (`retire_settled_pending_operation_panes`,
     /// below) — never "claimed and doing", since there is nothing to
     /// claim. Same in-process, never-persisted discipline as
-    /// `pending_discover_pane`: a herdr-plugin restart clears it, which
+    /// `pending_discover_pane`: a herdr-dashboard restart clears it, which
     /// is correct, since nothing this adapter believed about an in-flight
     /// launch survives a restart either.
     pub pending_merge_pane: Option<String>,
@@ -957,7 +958,7 @@ impl App {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::fgos::{DoingRow, FgosError, TriageRow};
+    use herdr_fgos_common::fgos::{DoingRow, FgosError, TriageRow};
     use std::collections::HashMap;
 
     struct FakeSource {
@@ -973,11 +974,11 @@ mod tests {
             Ok(Vec::new())
         }
 
-        fn fetch_need_answer(&self) -> Result<Vec<crate::fgos::NeedAnswerRow>, FgosError> {
+        fn fetch_need_answer(&self) -> Result<Vec<herdr_fgos_common::fgos::NeedAnswerRow>, FgosError> {
             Ok(Vec::new())
         }
 
-        fn fetch_after_deliver(&self) -> Result<Vec<crate::fgos::AfterDeliverRow>, FgosError> {
+        fn fetch_after_deliver(&self) -> Result<Vec<herdr_fgos_common::fgos::AfterDeliverRow>, FgosError> {
             Ok(Vec::new())
         }
 
@@ -1015,7 +1016,7 @@ mod tests {
             }
         }
 
-        fn fetch_need_answer(&self) -> Result<Vec<crate::fgos::NeedAnswerRow>, FgosError> {
+        fn fetch_need_answer(&self) -> Result<Vec<herdr_fgos_common::fgos::NeedAnswerRow>, FgosError> {
             if self.fail_need_answer {
                 Err(FgosError::ExitStatus("need_answer failed".into()))
             } else {
@@ -1023,7 +1024,7 @@ mod tests {
             }
         }
 
-        fn fetch_after_deliver(&self) -> Result<Vec<crate::fgos::AfterDeliverRow>, FgosError> {
+        fn fetch_after_deliver(&self) -> Result<Vec<herdr_fgos_common::fgos::AfterDeliverRow>, FgosError> {
             if self.fail_after_deliver {
                 Err(FgosError::ExitStatus("after_deliver failed".into()))
             } else {

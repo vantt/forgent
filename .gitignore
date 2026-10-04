@@ -84,11 +84,12 @@ packages/host-runtime/contracts/*.tmp.*
 # Rust build output
 /target/
 /apps/fgos/target/
-/herdr-plugin/target/
-# tsk-48w: herdr-plugin/web's bundled output, embedded into the binary at
-# compile time (RustEmbed) -- never committed, herdr-plugin/build.rs
+/herdr-dashboard/target/
+/apps/fgos-gateway/target/
+# tsk-48w: apps/fgos-gateway/web's bundled output, embedded into the binary at
+# compile time (RustEmbed) -- never committed, apps/fgos-gateway/build.rs
 # guarantees this directory exists even when npm run bundle hasn't run.
-/herdr-plugin/static/
+/apps/fgos-gateway/static/
 
 # Distribution packaging output
 /dist/

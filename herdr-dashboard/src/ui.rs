@@ -17,7 +17,7 @@ use ratatui::widgets::{Block, Borders, Clear, Paragraph, Row, Table, TableState,
 use ratatui::{Frame, Terminal};
 
 use crate::app::{App, InProcessTask, Panel, WorkTab};
-use crate::fgos::{merge_tree_node_count, MergeTreeNode};
+use herdr_fgos_common::fgos::{merge_tree_node_count, MergeTreeNode};
 use crate::ports::{TerminalUi as TerminalUiPort, UiEvent};
 
 /// tsk-jo1 D1 palette (ANSI-16): the Work Items panel's optional Status

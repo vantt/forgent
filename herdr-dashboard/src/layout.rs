@@ -561,7 +561,7 @@ fn operation_tab_layout(herdr_bin: &str, any_pane_id: &str) -> Result<TabLayout,
 
 /// Finds (or creates) the fixed `fg:operation` tab and returns its four
 /// fixed slot panes (tsk-5lr CONTEXT.md D1, with its D2 superseded by
-/// tsk-1zq). Created eagerly, at herdr-plugin startup, the same
+/// tsk-1zq). Created eagerly, at herdr-dashboard startup, the same
 /// find-or-create-by-label shape `ensure_cockpit_tab` already uses for
 /// `fg:cockpit` (D1). This function only locates the tab/panes — it never
 /// renders pane content or decides which loop launches where (tsk-417 and
@@ -694,7 +694,7 @@ mod tests {
     ],"type":"tab_list"}}"#;
 
     // Same shape as TAB_LIST_FIXTURE, plus a tab already labeled
-    // `fg:operation` -- a prior herdr-plugin startup's own tab.
+    // `fg:operation` -- a prior herdr-dashboard startup's own tab.
     const TAB_LIST_WITH_OPERATION_FIXTURE: &str = r#"{"id":"cli:tab:list","result":{"tabs":[
         {"agent_status":"idle","focused":false,"label":"workers-3","number":8,"pane_count":3,"tab_id":"wS:t8","workspace_id":"wS"},
         {"agent_status":"idle","focused":false,"label":"fg:operation","number":10,"pane_count":4,"tab_id":"wS:tOp","workspace_id":"wS"}

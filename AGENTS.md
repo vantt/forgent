@@ -129,9 +129,9 @@ Three possible `mechanism` results, each needing a different response:
 Every result also carries `configured: true|false`, additive `reasonCodes: [...]`, and optional `blockedReason` (e.g. when blocked by governance policy) — `false` means nothing is configured for that name or job, and the answer came from the default.
 A skill that dispatches should not re-derive any of this. Point its reasoning step at the shared fragment `.agents/skills/_shared/executor-dispatch-fallback.md` (mirrored byte-identical at `plugins/fgOS/skills/_shared/`). `.claude/skills` contains generated wrappers only; it has no `_shared` directory of its own.
 
-## Starting the herdr gateway — one door, never a raw process
+## Starting the fgos gateway — one door, never a raw process
 
-**If a task needs the herdr-fgos gateway (REST API + web dashboard) running, run `fgos gateway start` — never a hand-rolled `cargo run`/`nohup`/`tmux`/systemd invocation.** (tsk-31v) This is the one place that builds the release binary and spawns it detached, so the process outlives the CLI call. `fgos gateway status` reports real liveness plus an actual `/v1/contract` reachability check; `fgos gateway stop` sends SIGTERM and clears the registry. The gateway's own MCP surface (`search`/`execute`, `herdr-plugin/src/mcp.rs`) is mounted on this SAME process — it cannot bootstrap itself, so starting the gateway is always a `fgos` CLI call, never an MCP tool call.
+**If a task needs the fgos gateway (REST API + web dashboard, binary `fgos-gateway` built from `apps/fgos-gateway`) running, run `fgos gateway start` — never a hand-rolled `cargo run`/`nohup`/`tmux`/systemd invocation.** (tsk-31v) This is the one place that builds the release binary and spawns it detached, so the process outlives the CLI call. `fgos gateway status` reports real liveness plus an actual `/v1/contract` reachability check; `fgos gateway stop` sends SIGTERM and clears the registry. The gateway's own MCP surface (`search`/`execute`, `apps/fgos-gateway/src/mcp.rs`) is mounted on this SAME process — it cannot bootstrap itself, so starting the gateway is always a `fgos` CLI call, never an MCP tool call.
 
 <!-- mdview:START -->
 ## Documentation Viewing (MDView)

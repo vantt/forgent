@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* Design tokens extracted from the stitch-generated mockups (D16/D17,
-   docs/history/herdr-web-dashboard/CONTEXT.md; herdr-plugin/web/
+   docs/history/herdr-web-dashboard/CONTEXT.md; apps/fgos-gateway/web/
    stitch-exports/{S01,S02,S03,S04}/design.html's own Tailwind config) --
    a light Monday.com/ClickUp-style SaaS palette, not the dark-terminal
    look the first design pass wrongly defaulted to. */

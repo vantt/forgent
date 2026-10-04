@@ -636,7 +636,7 @@ Those facts come from runner state, structured agent events, artifact refs, and 
 
 ### 12.1a Herdr Own Rust Vocabulary Is a Separate Namespace
 
-Herdr's Rust implementation (`herdr-plugin/src/`) names several of its own
+Herdr's Rust implementation (`herdr-dashboard/src/`) names several of its own
 types with "orchestrator" in Rust-identifier casing: the `PaneOrchestrator`
 trait (`ports.rs`) governing pane open/reuse/focus, and the
 `OrchestratorSettings`/`HerdrOrchestratorToggles` structs (`settings.rs`,

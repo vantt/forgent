@@ -1,5 +1,5 @@
-// gateway-control.mjs — one-door lifecycle for the herdr-fgos gateway
-// (REST API + web dashboard, herdr-plugin/src/gateway.rs) as a detached
+// gateway-control.mjs — one-door lifecycle for the fgos gateway
+// (REST API + web dashboard, apps/fgos-gateway/src/gateway.rs) as a detached
 // background process, so an agent never hand-rolls nohup/tmux/systemd
 // (tsk-31v). Registry shape and PID-liveness technique mirror
 // src/runner/session.mjs's existing pattern deliberately, but this is a
@@ -232,12 +232,12 @@ function resolveConfiguredPort() {
   return DEFAULT_PORT;
 }
 
-function herdrPluginDir(repoRoot) {
-  return path.join(repoRoot, 'herdr-plugin');
+function gatewayCrateDir(repoRoot) {
+  return path.join(repoRoot, 'apps', 'fgos-gateway');
 }
 
 function releaseBinaryPath(repoRoot) {
-  return path.join(herdrPluginDir(repoRoot), 'target', 'release', 'herdr-fgos');
+  return path.join(gatewayCrateDir(repoRoot), 'target', 'release', 'fgos-gateway');
 }
 
 /**
@@ -264,16 +264,16 @@ export function startGateway(repoRoot, fgosDir) {
       );
     }
 
-    const pluginDir = herdrPluginDir(repoRoot);
-    if (!fs.existsSync(pluginDir)) {
-      throw new GatewayControlError(`no herdr-plugin/ directory found at "${pluginDir}" — this repo has no gateway to start`, { pluginDir });
+    const gatewayDir = gatewayCrateDir(repoRoot);
+    if (!fs.existsSync(gatewayDir)) {
+      throw new GatewayControlError(`no apps/fgos-gateway/ directory found at "${gatewayDir}" — this repo has no gateway to start`, { gatewayDir });
     }
 
     try {
-      execFileSync('cargo', ['build', '--release', '--bin', 'herdr-fgos'], { cwd: pluginDir, stdio: 'pipe', maxBuffer: BUILD_MAX_BUFFER });
+      execFileSync('cargo', ['build', '--release', '--bin', 'fgos-gateway'], { cwd: gatewayDir, stdio: 'pipe', maxBuffer: BUILD_MAX_BUFFER });
     } catch (err) {
       const stderr = err.stderr ? err.stderr.toString('utf8') : err.message;
-      throw new GatewayControlError(`building the release binary failed: ${stderr}`, { pluginDir });
+      throw new GatewayControlError(`building the release binary failed: ${stderr}`, { gatewayDir });
     }
 
     const binaryPath = releaseBinaryPath(repoRoot);
@@ -292,8 +292,8 @@ export function startGateway(repoRoot, fgosDir) {
 
     let child;
     try {
-      child = spawn(binaryPath, ['gateway'], {
-        cwd: pluginDir,
+      child = spawn(binaryPath, [], {
+        cwd: gatewayDir,
         detached: true,
         stdio: ['ignore', logFd, logFd],
       });

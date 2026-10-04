@@ -16,7 +16,7 @@ description: >-
 
 Wraps `pickNextDiscoverItem` (`src/state/discover-pool.mjs`) plus
 `/fgOS:discover` so a person (or a `/fgOS:discover-loop` iteration, or
-`herdr-plugin`'s unattended auto-discover launcher) can process the single
+`herdr-dashboard`'s unattended auto-discover launcher) can process the single
 next discovery-shaped backlog item without hand-typing the CLI, re-deriving
 the pick order, or picking an id itself. Never writes `.fgos/` state
 directly, and never re-implements the pick logic itself —

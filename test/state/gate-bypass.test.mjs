@@ -75,7 +75,7 @@ None
 const CLEAR_ARTIFACT_TODO_WORD_IN_PROSE = `# feature — plan
 
 A refused claim leaves the item at todo rather than orphaning it at doing.
-herdr-plugin's own WorkTab::Todo enum variant and the "TODO" tab label are
+herdr-dashboard's own WorkTab::Todo enum variant and the "TODO" tab label are
 unrelated to this plan. A TODO-only placeholder is never acceptable here.
 This plan discusses the TODO/FIXME marker family only as a concept.
 

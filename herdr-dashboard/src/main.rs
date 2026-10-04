@@ -5,16 +5,15 @@ use std::time::{Duration, Instant};
 
 use serde::Deserialize;
 
-use herdr_fgos::app::{App, Panel, WorkItem};
-use herdr_fgos::fgos::{self, FgosCliSource};
-use herdr_fgos::layout;
-use herdr_fgos::pane_scan::HerdrPaneScanner;
-use herdr_fgos::pick::{self, HerdrPaneAdapter};
-use herdr_fgos::ports::{
-    PaneOrchestrator, PaneRegistry, TerminalUi, UiEvent, WorkItemSource, WorkerLaneView,
-};
-use herdr_fgos::settings;
-use herdr_fgos::ui::RatatuiTerminalUi;
+use herdr_dashboard::app::{App, Panel, WorkItem};
+use herdr_fgos_common::fgos::{self, FgosCliSource};
+use herdr_dashboard::layout;
+use herdr_dashboard::pane_scan::HerdrPaneScanner;
+use herdr_dashboard::pick::{self, HerdrPaneAdapter};
+use herdr_dashboard::ports::{PaneOrchestrator, PaneRegistry, TerminalUi, UiEvent, WorkerLaneView};
+use herdr_fgos_common::ports::WorkItemSource;
+use herdr_fgos_common::settings;
+use herdr_dashboard::ui::RatatuiTerminalUi;
 
 /// Same poll cadence as the existing STR40 bash cockpit's dashboard pane —
 /// also the one tick pane-state refresh piggybacks on (tsk-4zo D1's
@@ -22,17 +21,6 @@ use herdr_fgos::ui::RatatuiTerminalUi;
 const POLL_INTERVAL: Duration = Duration::from_secs(5);
 
 fn main() -> io::Result<()> {
-    // tsk-7l9-2 D1: gateway mode is a separate launch path from the TUI's
-    // default -- `herdr-fgos gateway` never touches the terminal at all
-    // (no `RatatuiTerminalUi::init()` below), it just runs the REST server
-    // to completion. D8: same binary/process either way, chosen at launch
-    // rather than a `--role gateway`/`--role orchestrator` split across
-    // machines.
-    if std::env::args().nth(1).as_deref() == Some("gateway") {
-        let root = fgos::repo_root()?;
-        return herdr_fgos::gateway::run(root);
-    }
-
     // tsk-45u D1: resolved once, up front, so the fixed `fg:operation`
     // tab this dashboard creates at startup (below) and every pane it
     // opens later both start in the same project root.
@@ -718,8 +706,8 @@ mod tests {
     use super::*;
     use std::cell::Cell;
 
-    use herdr_fgos::fgos::{DoingRow, FgosError, TriageRow};
-    use herdr_fgos::pane_scan::{PaneIdentity, PaneScanError, PaneSnapshot};
+    use herdr_fgos_common::fgos::{DoingRow, FgosError, TriageRow};
+    use herdr_dashboard::pane_scan::{PaneIdentity, PaneScanError, PaneSnapshot};
 
     struct CountingSource {
         calls: Cell<u32>,
@@ -735,16 +723,16 @@ mod tests {
             Ok(Vec::new())
         }
 
-        fn fetch_need_answer(&self) -> Result<Vec<herdr_fgos::fgos::NeedAnswerRow>, FgosError> {
+        fn fetch_need_answer(&self) -> Result<Vec<herdr_fgos_common::fgos::NeedAnswerRow>, FgosError> {
             Ok(Vec::new())
         }
 
-        fn fetch_after_deliver(&self) -> Result<Vec<herdr_fgos::fgos::AfterDeliverRow>, FgosError> {
+        fn fetch_after_deliver(&self) -> Result<Vec<herdr_fgos_common::fgos::AfterDeliverRow>, FgosError> {
             Ok(Vec::new())
         }
 
-        fn fetch_merge_list(&self) -> Result<herdr_fgos::fgos::MergeListSummary, FgosError> {
-            Ok(herdr_fgos::fgos::MergeListSummary::default())
+        fn fetch_merge_list(&self) -> Result<herdr_fgos_common::fgos::MergeListSummary, FgosError> {
+            Ok(herdr_fgos_common::fgos::MergeListSummary::default())
         }
     }
 
@@ -985,7 +973,7 @@ mod tests {
     #[test]
     fn mouse_click_inside_pick_button_rect_fires_pick() {
         let mut app = App::empty();
-        app.work_items = vec![herdr_fgos::app::WorkItem {
+        app.work_items = vec![herdr_dashboard::app::WorkItem {
             id: "tsk-a".into(),
             title: "A".into(),
             goal_tier: "mvp".into(),
@@ -1000,7 +988,7 @@ mod tests {
         // recorded Pick button Rect, exactly what a real `draw()` call
         // would have left behind.
         app.detail_modal_open = true;
-        app.pick_button_rect = Some(herdr_fgos::app::ButtonRect {
+        app.pick_button_rect = Some(herdr_dashboard::app::ButtonRect {
             x: 10,
             y: 5,
             width: 10,
@@ -1030,7 +1018,7 @@ mod tests {
     #[test]
     fn mouse_click_outside_pick_button_rect_fires_nothing() {
         let mut app = App::empty();
-        app.work_items = vec![herdr_fgos::app::WorkItem {
+        app.work_items = vec![herdr_dashboard::app::WorkItem {
             id: "tsk-a".into(),
             title: "A".into(),
             goal_tier: "mvp".into(),
@@ -1042,7 +1030,7 @@ mod tests {
         }];
         app.select_next();
         app.detail_modal_open = true;
-        app.pick_button_rect = Some(herdr_fgos::app::ButtonRect {
+        app.pick_button_rect = Some(herdr_dashboard::app::ButtonRect {
             x: 10,
             y: 5,
             width: 10,
@@ -1099,7 +1087,7 @@ mod tests {
     fn next_tab_event_cycles_the_active_tab() {
         let mut ui = NextTabTwiceThenQuit { calls: Cell::new(0) };
         let mut app = App::empty();
-        assert_eq!(app.active_tab, herdr_fgos::app::WorkTab::Todo);
+        assert_eq!(app.active_tab, herdr_dashboard::app::WorkTab::Todo);
         let pane_orchestrator = NoopPaneOrchestrator;
 
         run(&mut ui, &mut app, None, None, &pane_orchestrator, Duration::ZERO, None)
@@ -1107,7 +1095,7 @@ mod tests {
 
         assert_eq!(
             app.active_tab,
-            herdr_fgos::app::WorkTab::Review,
+            herdr_dashboard::app::WorkTab::Review,
             "TODO -> DOING -> REVIEW after two NextTab events"
         );
     }
@@ -1259,7 +1247,7 @@ mod tests {
     fn pane_focus_jumps_to_selected_in_process_pane_after_switching_panels() {
         let mut ui = SwitchThenPickThenQuit { calls: Cell::new(0) };
         let mut app = App::empty();
-        app.in_process = vec![herdr_fgos::app::InProcessTask {
+        app.in_process = vec![herdr_dashboard::app::InProcessTask {
             id: "tsk-a".into(),
             title: "A".into(),
             pane: Some(PaneIdentity {
@@ -1283,7 +1271,7 @@ mod tests {
     fn pane_focus_reports_no_pane_when_selected_in_process_task_is_orphaned() {
         let mut ui = SwitchThenPickThenQuit { calls: Cell::new(0) };
         let mut app = App::empty();
-        app.in_process = vec![herdr_fgos::app::InProcessTask {
+        app.in_process = vec![herdr_dashboard::app::InProcessTask {
             id: "tsk-b".into(),
             title: "B".into(),
             pane: None,
@@ -1304,7 +1292,7 @@ mod tests {
     fn work_item_enter_opens_detail_modal_and_pick_only_fires_on_second_enter() {
         let mut ui = PickTwiceThenQuit { calls: Cell::new(0) };
         let mut app = App::empty();
-        app.work_items = vec![herdr_fgos::app::WorkItem {
+        app.work_items = vec![herdr_dashboard::app::WorkItem {
             id: "tsk-a".into(),
             title: "A".into(),
             goal_tier: "mvp".into(),
@@ -1340,7 +1328,7 @@ mod tests {
     fn discover_button_fires_pane_open_when_item_is_at_discovery_stage() {
         let mut ui = DiscoverTwiceThenQuit { calls: Cell::new(0) };
         let mut app = App::empty();
-        app.work_items = vec![herdr_fgos::app::WorkItem {
+        app.work_items = vec![herdr_dashboard::app::WorkItem {
             id: "tsk-a".into(),
             title: "A".into(),
             goal_tier: "mvp".into(),
@@ -1380,7 +1368,7 @@ mod tests {
     fn discover_button_is_inert_when_item_is_not_at_discovery_stage() {
         let mut ui = DiscoverThenQuit { calls: Cell::new(0) };
         let mut app = App::empty();
-        app.work_items = vec![herdr_fgos::app::WorkItem {
+        app.work_items = vec![herdr_dashboard::app::WorkItem {
             id: "tsk-a".into(),
             title: "A".into(),
             goal_tier: "mvp".into(),
@@ -1416,7 +1404,7 @@ mod tests {
     fn discover_button_is_inert_when_item_is_blocked_even_at_eligible_stage() {
         let mut ui = DiscoverThenQuit { calls: Cell::new(0) };
         let mut app = App::empty();
-        app.work_items = vec![herdr_fgos::app::WorkItem {
+        app.work_items = vec![herdr_dashboard::app::WorkItem {
             id: "tsk-a".into(),
             title: "A".into(),
             goal_tier: "mvp".into(),
@@ -1450,7 +1438,7 @@ mod tests {
             modal_open_history: std::cell::RefCell::new(Vec::new()),
         };
         let mut app = App::empty();
-        app.work_items = vec![herdr_fgos::app::WorkItem {
+        app.work_items = vec![herdr_dashboard::app::WorkItem {
             id: "tsk-a".into(),
             title: "A".into(),
             goal_tier: "mvp".into(),
@@ -1678,7 +1666,7 @@ mod tests {
     // run, since no two tests here share a tag.
     fn unique_temp_root(tag: &str) -> std::path::PathBuf {
         let dir = std::env::temp_dir().join(format!(
-            "herdr-fgos-auto-operation-tab-test-{tag}-{}",
+            "herdr-dashboard-auto-operation-tab-test-{tag}-{}",
             std::process::id()
         ));
         std::fs::create_dir_all(dir.join(".fgos")).expect("create temp .fgos dir");

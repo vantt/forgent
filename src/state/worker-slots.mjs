@@ -12,7 +12,7 @@
 // plan.md §Shape T1):
 //
 //   - the read-only face a launcher asks BEFORE it stands a worker up —
-//     herdr-plugin opening a pane, fgos-fanout firing an Agent. Cheap, holds
+//     herdr-dashboard opening a pane, fgos-fanout firing an Agent. Cheap, holds
 //     nothing, reserves nothing. Those two reach it through `fgos slots`
 //     rather than by importing this file: one is Rust and one is prose, and
 //     decision 0014 makes the CLI the door.

@@ -2,21 +2,7 @@ use std::io;
 use std::time::Duration;
 
 use crate::app::App;
-use crate::fgos::{AfterDeliverRow, DoingRow, FgosError, MergeListSummary, NeedAnswerRow, TriageRow};
 use crate::pane_scan::{PaneScanError, PaneSnapshot};
-
-/// (a) fgOS data source seam (tsk-3t9 D1) — the domain asks for rows
-/// through this trait instead of importing `crate::fgos` directly.
-pub trait WorkItemSource {
-    fn fetch_triage(&self) -> Result<Vec<TriageRow>, FgosError>;
-    fn fetch_doing(&self) -> Result<Vec<DoingRow>, FgosError>;
-    /// tsk-417 D3: NEED ANSWER box source.
-    fn fetch_need_answer(&self) -> Result<Vec<NeedAnswerRow>, FgosError>;
-    /// tsk-417 D3: AFTER DELIVER box source.
-    fn fetch_after_deliver(&self) -> Result<Vec<AfterDeliverRow>, FgosError>;
-    /// tsk-417 D3: MERGE LIST box source.
-    fn fetch_merge_list(&self) -> Result<MergeListSummary, FgosError>;
-}
 
 /// Pane-tracking seam (tsk-4zo D1): scans the dashboard's own herdr
 /// workspace. The domain never shells out to `herdr` itself — only
@@ -105,30 +91,6 @@ pub trait PaneOrchestrator {
     /// (`main::discovery_worker_alive`), so the write side of the guard
     /// goes with it rather than being left behind as decoration.
     fn open_auto_discover_pane(&self, lane: &WorkerLaneView) -> io::Result<String>;
-}
-
-/// (D7) Gateway verb-chokepoint seam (tsk-7l9-2): the ONE trait a gateway
-/// HTTP handler calls through to run an `fgos <verb>` invocation. This is a
-/// new, sibling seam to (a) `WorkItemSource` above — the TUI's own
-/// `fgos.rs` read calls stay on that port, untouched; a gateway route
-/// calls this one instead, so both ultimately funnel through the same
-/// "only ever spawn `fgos <verb>` as a subprocess, never link the core lib"
-/// boundary D8 already locked, just via two different callers of the same
-/// underlying CLI-shelling mechanism.
-///
-/// Deliberately synchronous (not `async fn`, which would need the
-/// `async-trait` crate or a hand-rolled boxed future): `fgos.rs`'s own
-/// `FgosCliSource` already shells out to `node bin/fgos.mjs` synchronously
-/// via `std::process::Command`, so the concrete adapter
-/// (`gateway::FgosCliGateway`) does the same. Axum route handlers run it
-/// through `tokio::task::spawn_blocking` (see `gateway.rs`) so this
-/// blocking call never stalls the async runtime's own worker threads.
-pub trait VerbGateway: Send + Sync {
-    /// Runs `fgos <args...> --dir <root>`, parses the resulting `fgos.v1`
-    /// envelope on stdout, and returns its `data` field on exit 0 — or a
-    /// `GatewayError` carrying the same closed category taxonomy CTR001's
-    /// own `EXIT_CODES` defines (`src/state/store.mjs`) on a non-zero exit.
-    fn run_verb(&self, args: &[String]) -> Result<serde_json::Value, crate::gateway::GatewayError>;
 }
 
 /// Domain-level input the render adapter translates real terminal events

@@ -113,7 +113,7 @@ physical source layout.
 
 It describes the `apps/` plus `packages/` direction: apps are thin entrypoints
 and packages hold reusable implementation logic. Its concrete scope is the
-Rust/web `herdr-plugin` split. The Node side is outside this document.
+Rust/web split of the former `herdr-plugin/` package (now `apps/fgos-gateway/`, `herdr-dashboard/` and `packages/herdr-fgos-common/rust/`; see its status note). The Node side is outside this document.
 
 Use this document when deciding:
 

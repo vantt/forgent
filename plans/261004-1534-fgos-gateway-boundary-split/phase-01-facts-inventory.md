@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "Sự thật + inventory"
-status: pending
+status: completed
 priority: P1
 effort: "0.25d"
 dependencies: []

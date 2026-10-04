@@ -31,19 +31,19 @@ R3 proves at least one production gateway route as a true peer invocation: remot
 
 ### 1.2 Adapter Status (R3-P1, 2026-09-18)
 
-`herdr-plugin/src/remote_invocation.rs` implements the remote projector,
+`apps/fgos-gateway/src/remote_invocation.rs` implements the remote projector,
 presenter, and `InvocationService` assembly for `distribution.build.show`.
 Focused proof passed:
 
 ```sh
-cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation --quiet
+cargo test --manifest-path apps/fgos-gateway/Cargo.toml remote_invocation --quiet
 ```
 
 The run passed 10 tests on 2026-09-18.
 
 ### 1.3 Route Wiring And Hard Regression Proof (R3-P2 / R3-P3, 2026-09-18)
 
-`GET /v1/runtime` is wired into `herdr-plugin/src/gateway.rs`:
+`GET /v1/runtime` is wired into `apps/fgos-gateway/src/gateway.rs`:
 - **Handler & Wiring:** Handler `get_runtime` calls `crate::remote_invocation::build_invocation_service()`, `project_remote_build_show_invocation()`, invokes `InvocationService`, and presents the outcome via `present_remote_outcome()`. Mounted as `.route("/runtime", get(get_runtime))` inside the existing `authenticated` router in `build_router`, nested under `/v1` (`GET /v1/runtime`).
 - **Auth Behavior:** Sits behind the same `require_token` middleware as every other authenticated route (`Authorization: Bearer <token>` / Cf-Access). Unauthenticated and wrong-token requests are rejected with 401 Unauthorized (proven by `get_runtime_requires_authentication`).
 - **Hard No-VerbGateway Proof:** `CountingGateway` regression test (`get_runtime_does_not_call_verb_gateway_and_has_no_envelope_wrapping`) implements `VerbGateway` with an atomic counter and asserts zero calls after `GET /v1/runtime` succeeds with HTTP 200, proving no `VerbGateway` call happened regardless of whether a regression would surface as an HTTP 500 or discarded Result.
@@ -52,14 +52,14 @@ The run passed 10 tests on 2026-09-18.
 Focused proof passed:
 
 ```sh
-cargo test --manifest-path herdr-plugin/Cargo.toml --lib gateway --quiet
+cargo test --manifest-path apps/fgos-gateway/Cargo.toml --lib gateway --quiet
 ```
 
 All 47 tests passed on 2026-09-18.
 
 ## 2. No-Shell / No-`fgos.v1`-Parse Proof Strategy (Proven at R3-P3)
 
-The proof requirements frozen at R3-P0 are satisfied in `herdr-plugin/src/gateway.rs`:
+The proof requirements frozen at R3-P0 are satisfied in `apps/fgos-gateway/src/gateway.rs`:
 
 - `CountingGateway` call-counting regression test proves `distribution.build.show` never reaches `VerbGateway` / `run_verb_blocking` through `GET /v1/runtime`;
 - Assertion tests prove `GET /v1/runtime` returns the typed `BuildShowOutcome` structure rather than parsing CLI `fgos.v1` stdout (no `contract`, `data`, or `data_hash` envelope keys).

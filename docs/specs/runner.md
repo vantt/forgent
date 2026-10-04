@@ -2114,7 +2114,7 @@ implement gì).
     HEADLESS, không cần người ngồi terminal — hình dung là tương lai khi
     không cần thao tác tay nhiều nữa, tự claim + spawn worker headless
     cho từng rootTask.
-  - `herdr-plugin` (quản lý pane/tab terminal) — hạ tầng để đứng 1
+  - `herdr-dashboard` (quản lý pane/tab terminal) — hạ tầng để đứng 1
     agent-terminal lên (tìm/mở pane), CÓ THỂ được 1 launcher dùng để
     đứng rootTask lên, và tự nó cũng có thể được bọc thành 1 launcher
     (ví dụ 1 automation dùng herdr mở N pane, mỗi pane chạy 1 rootTask).
@@ -2280,7 +2280,7 @@ Người dùng chốt tên thay thế là **launcher** (2026-08-08), sau khi so 
 hữu (decision doc, `docs/history/*`, `docs/how-to/*`, comment trong
 `src/runner/*.mjs`, và mọi chỗ khác dùng từ này theo đúng nghĩa vai trò
 `0026` mô tả — kiểm từng chỗ, không đổi hàng loạt mù). KHÔNG đổi:
-`herdr-plugin/src/**/*.rs`'s `PaneOrchestrator` (khái niệm Rust khác hẳn —
+`herdr-dashboard/src/**/*.rs`'s `PaneOrchestrator` (khái niệm Rust khác hẳn —
 trait mở/focus terminal pane, dùng từ đúng, giữ nguyên), `docs/distillery/**`
 (trích dẫn verbatim từ nguồn upstream), `plans/reports/**` (bản ghi lịch
 sử, không sửa ngược).
@@ -2575,7 +2575,7 @@ Lưới 2×2 của `0029` là từ vựng hiện hành, dùng thẳng, không c�
 - `0028` nhận `superseded_by: [0031]` trong frontmatter, đúng khuôn STR72
   trỏ-ngược-bắt-buộc; `docs/decisions/0000-index.md` nhận dòng của `0031`
   và ghi chú trên dòng `0028`.
-- Không đụng: `herdr-plugin/src/**/*.rs`'s `PaneOrchestrator` (khái niệm
+- Không đụng: `herdr-dashboard/src/**/*.rs`'s `PaneOrchestrator` (khái niệm
   Rust khác hẳn), `docs/distillery/**` (trích verbatim upstream),
   `plans/reports/**` (bản ghi lịch sử). Ba nhóm này vốn đã nằm ngoài phạm
   vi guard và không đổi gì.

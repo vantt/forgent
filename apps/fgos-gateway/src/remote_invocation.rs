@@ -1,4 +1,4 @@
-//! Remote host invocation projector, presenter, and service assembly for `herdr-fgos`.
+//! Remote host invocation projector, presenter, and service assembly for `fgos-gateway`.
 //!
 //! Implements R3-P1 (Remote Projector And Presenter) from
 //! `plans/260918-host-invocation-r3-remote-peer/plan.md` §5.
@@ -449,9 +449,9 @@ mod tests {
     #[test]
     fn test_workspace_isolation_contract() {
         let manifest_dir = env!("CARGO_MANIFEST_DIR");
-        let root_cargo_path = std::path::Path::new(manifest_dir).join("../Cargo.toml");
+        let root_cargo_path = std::path::Path::new(manifest_dir).join("../../Cargo.toml");
         let content = std::fs::read_to_string(&root_cargo_path)
-            .or_else(|_| std::fs::read_to_string("../Cargo.toml"))
+            .or_else(|_| std::fs::read_to_string("../../Cargo.toml"))
             .expect("repo root Cargo.toml must be readable");
 
         let workspace_part = content
@@ -472,8 +472,8 @@ mod tests {
             .next()
             .expect("exclude block must have closing bracket");
         assert!(
-            exclude_block.contains("herdr-plugin"),
-            "[workspace].exclude must declare herdr-plugin"
+            exclude_block.contains("apps/fgos-gateway"),
+            "[workspace].exclude must declare apps/fgos-gateway"
         );
 
         let members_part = workspace_section
@@ -485,8 +485,8 @@ mod tests {
             .next()
             .expect("members block must have closing bracket");
         assert!(
-            !members_block.contains("herdr-plugin"),
-            "[workspace].members must not contain herdr-plugin"
+            !members_block.contains("apps/fgos-gateway"),
+            "[workspace].members must not contain apps/fgos-gateway"
         );
     }
 }

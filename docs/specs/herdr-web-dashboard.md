@@ -1,6 +1,6 @@
 ---
 area: herdr-web-dashboard
-updated: 2026-08-14
+updated: 2026-10-04
 sources: [herdr-web-dashboard, fgos-interface-daemon]
 decisions: []
 coverage: partial
@@ -21,14 +21,14 @@ only lives as long as a terminal pane is absent precisely when it is needed.
 
 Three things bound this surface:
 
-- It runs **alongside** the herdr TUI, never replacing it (boundary: web dashboard is a new subsystem inside the herdr-plugin Rust binary, runs alongside not instead of the TUI). A
+- It runs **alongside** the herdr TUI, never replacing it (boundary: the web dashboard belongs to the fgos gateway, `apps/fgos-gateway/`; it runs alongside, not instead of, the `herdr-dashboard` TUI plugin). A
   person at a terminal keeps the TUI; the dashboard serves the person who is
   not at one.
-- It is an **independent client project**, not code inside the `herdr-fgos`
-  binary (per fgos-interface-daemon — gateway/orchestrator/TUI stay inside the herdr-fgos binary via hexagonal ports; the web client is a separate adapter calling in from outside). It calls the gateway's REST/RPC API from the outside,
+- It is an **independent client project**, not server code inside the gateway
+  (per fgos-interface-daemon — gateway and TUI sit behind hexagonal ports; the web client is a separate adapter calling in from outside). Its source lives at `apps/fgos-gateway/web/`; the fgos gateway embeds the built bundle and serves it, which is hosting, not ownership of any API logic. It calls the gateway's REST/RPC API from the outside,
   which is what decision `0014` requires of any non-terminal UI. An earlier
-  decision of this feature (tsk-ldb's own — web dashboard as a new subsystem inside herdr-plugin) proposed embedding an HTTP server
-  directly in `herdr-fgos`; that branch is closed — cite fgos-interface-daemon's hexagonal-ports decision, not
+  decision of this feature (tsk-ldb's own — web dashboard as a new subsystem inside the former single herdr crate) proposed embedding an HTTP server
+  directly in the former combined gateway-and-TUI binary (since split into `fgos-gateway` and `herdr-dashboard`); that branch is closed — cite fgos-interface-daemon's hexagonal-ports decision, not
   tsk-ldb's original one, for where the web client lives.
 - It never becomes a second write path. Every change it makes goes through
   an fgOS one-door-write verb executed by the gateway (R2 below).
@@ -198,7 +198,7 @@ leaving a reader to discover them:
 ## Business Rules
 
 - **R1.** The surface is a client of the gateway's API, never an embedded
-  server inside `herdr-fgos` (per fgos-interface-daemon's hexagonal-ports decision, decision `0014`). It is built to
+  server inside the former combined binary (per fgos-interface-daemon's hexagonal-ports decision, decision `0014`). It is built to
   address more than one gateway, so no single fixed origin may be baked into
   it (per fgos-interface-daemon's per-machine-scope decision).
 - **R2.** Every write goes through an fgOS one-door-write verb — `answer`,
@@ -275,7 +275,7 @@ leaving a reader to discover them:
   client.
 - **The gateway's own API contract now exists** —
   `docs/contracts/fgos-gateway-api-v1.yaml`, landed by tsk-7l9, carrying 18
-  paths that match `herdr-plugin/src/gateway.rs`'s registered routes 1-to-1.
+  paths that match `apps/fgos-gateway/src/gateway.rs`'s registered routes 1-to-1.
   This spec still describes operations in product terms rather than
   restating endpoint shapes, but that contract — not this prose — is the
   boundary's source of truth, and any surface built against it cites it

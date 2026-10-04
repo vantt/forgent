@@ -1,6 +1,6 @@
 //! Guarantees `static/` exists before `RustEmbed`'s derive macro scans it
 //! (`src/gateway.rs`'s `WebAssets`), so `cargo build`/`test`/`clippy` never
-//! fail on a fresh checkout where `npm run bundle` (herdr-plugin/web/)
+//! fail on a fresh checkout where `npm run bundle` (apps/fgos-gateway/web/)
 //! hasn't produced the web UI yet -- `static/` is gitignored. Minimal port
 //! of the reference implementation herdr-gateway's own `build.rs`: only the
 //! directory guarantee, per D14 of docs/history/herdr-web-dashboard-plan-

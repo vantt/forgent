@@ -1,8 +1,8 @@
 use ratatui::backend::TestBackend;
 use ratatui::Terminal;
 
-use herdr_fgos::app::App;
-use herdr_fgos::ui::draw;
+use herdr_dashboard::app::App;
+use herdr_dashboard::ui::draw;
 
 #[test]
 fn dashboard_renders_without_panicking() {
