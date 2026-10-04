@@ -48,3 +48,26 @@ Council: 13 lần gọi agent, cùng một provider, đa vòng. fgOS: 4 assignme
    Đây là việc nền, làm trước mọi cổng và trước persona-per-seat.
 2. Sau đó mới đo lại A/B; kỳ vọng khoảng cách thu hẹp mạnh.
 3. Persona-per-seat vẫn đáng làm (đã chứng minh chạy); cổng/cross-exam theo kill criteria K1-K5.
+
+## Cập nhật 2026-10-04 22:47: chạy lại sau khi sửa
+
+Cùng câu hỏi, cùng ba persona (Socrates, Torvalds, Meadows), mã đã sửa. Panelist: openai, gemini, xai; synthesizer: deepseek qua OpenRouter
+(claude-herdr không dùng được lúc đó, xem `finding-trust-entry-removed-on-settle-261004.md`). Synthesizer nhận 3 ref và đọc cả 3 báo cáo.
+Đầu ra: `council-lens-experiment-261004/outputs/ab2-fgos-synthesizer-after-fix.md` (lấy từ stdout vì deepseek không ghi được report, lỗi EROFS đã biết).
+
+Chấm mù lại (giám khảo opus, cùng rubric, không biết nguồn):
+
+| Tiêu chí | Council | fgOS panel đã sửa | fgOS trước khi sửa |
+|---|---|---|---|
+| Perspective spread | 2 | 1 | 0 |
+| Decision clarity | 2 | 1 | 1 |
+| Counterfactual depth | 2 | 1 | 0 |
+| Evidence discipline | 1 | 2 | 1 |
+| Execution quality | 1 | 0 | 0 |
+| Tổng | 8 | 5 | 2 |
+
+Cách đọc:
+- Khoảng cách thu hẹp từ 7 điểm xuống 3 chỉ nhờ nối dây, chưa đổi gì khác. Phần lớn điểm còn thiếu là cấu trúc của đầu ra (một báo cáo đơn của synthesizer, không có chủ sở hữu, hạn, tiêu chí rollback, không bày từng lăng kính), không phải chất lượng lập luận.
+- fgOS thắng ở bằng chứng: trích file:line cụ thể, gắn với test. Council thắng ở thế giằng co, phản biện, tiêu chí xem lại có ngưỡng.
+- Giới hạn: một câu hỏi, một giám khảo, bản fgOS bị chấm kèm vỏ JSON và đường dẫn nhiễu, council chạy một provider, provider của synthesizer khác lần trước.
+- Nghĩa là: bù khoảng cách còn lại là việc của lược đồ đầu ra của synthesizer (thứ tự "điều chưa biết trước", kill criteria, một bước tiếp theo), tức ứng viên `verdict-unresolved-first-schema`, không cần engine mới.
