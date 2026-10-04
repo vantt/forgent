@@ -40,6 +40,12 @@ Make the `inputs` argument of `runRole` do what `panel.mjs` already assumes.
 
 ## Implementation Steps
 
+0. Verify first, empirically: `src/workflow/runner.mjs:29-31` states `.fgos` is closed to workers
+   (that is why Workflow steps inline prior reports into the objective). The code review found no
+   enforcement of that (bwrap `--ro-bind / /`), but a worker-side hook or policy could still block
+   it. Have one real herdr worker read an absolute `.fgos/assignments/.../report-1.md` path. If
+   it cannot, stop and replan (inline the report text like the Workflow runner does, or grant a
+   read resource); do not proceed on the code review alone.
 1. Impact check on `runRole` (GitNexus index is stale: cross-check with `rg runRole`/`rg inputs`;
    only `panel.mjs` passes `inputs`).
 2. Write the helper test first: results with `evidence.artifacts`, missing evidence, no report,

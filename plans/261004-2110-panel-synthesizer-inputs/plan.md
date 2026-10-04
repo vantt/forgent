@@ -79,3 +79,12 @@ phase 1 only for showing which inputs the synthesizer saw.
 ## Review log
 
 Opus read-only review (2026-10-04) verified: `inputs` unread, only `panel.mjs` passes it, brief shows `(none)`, prior art commit, bwrap `--ro-bind / /` makes main `.fgos` readable, resume/fallback keep refs identical (assignment.json written once). Corrections applied: edit site is `dispatchBound` not `runRole`; artifact lookup is by file name; contract validator is not on this path; panel test already asserts 3 inputs; phase 2 needs the per-role unit plumbed.
+
+## Related finding: two hand-off mechanisms (RUL11 signal)
+
+`src/workflow/runner.mjs:33` (`buildUnitObjective`) already hands a prior STEP's output to the next
+step, by inlining report text into the objective. It picks the report with
+`endsWith('agent-report.md')`, but live herdr workers write `outbox/report-N.md`, so it very
+likely drops them silently (not yet reproduced). Patterns (this plan, contextRefs) and Workflows
+(inline text) then hand off differently. Do not widen this plan; after phase 1, decide one
+mechanism and share the report-lookup helper. Record as follow-up.
