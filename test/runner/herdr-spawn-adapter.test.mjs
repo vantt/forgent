@@ -621,6 +621,48 @@ test('R1/R2 (agy trust store): kind agy seeds settings.json.trustedWorkspaces vi
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
+test('a workspace the person already trusted keeps its claude trust entry after the round settles', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-claude-trust-kept-'));
+  const mock = createMockHerdr(tmpDir, {});
+  const storePath = path.join(tmpDir, 'claude.json');
+  const workspace = path.resolve(tmpDir);
+  // The dispatch cwd is itself an entry the person vouched for (a read-only run in the main checkout).
+  fs.writeFileSync(storePath, JSON.stringify({ projects: { [workspace]: { hasTrustDialogAccepted: true, allowedTools: [] } } }, null, 2));
+
+  const res = await dispatchThroughMock(tmpDir, mock, {
+    prompt: 'do the thing',
+    interactiveMode: { kind: 'claude', trustStore: { kind: 'claude-json', path: storePath } },
+  });
+  assert.equal(res.status, 0);
+
+  const after = JSON.parse(fs.readFileSync(storePath, 'utf8'));
+  assert.equal(after.projects[workspace]?.hasTrustDialogAccepted, true, 'teardown must not delete an entry it did not write');
+  const visibility = readVisibility(path.join(tmpDir, 'run'));
+  assert.equal(visibility.trustRemoved, undefined, 'nothing was removed');
+  assert.equal(visibility.trustSeeded, undefined, 'nothing was written');
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('a workspace the person already trusted keeps its agy trust entry after the round settles', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-agy-trust-kept-'));
+  const mock = createMockHerdr(tmpDir, {});
+  const settingsPath = path.join(tmpDir, 'agy-settings.json');
+  const workspace = path.resolve(tmpDir);
+  fs.writeFileSync(settingsPath, JSON.stringify({ trustedWorkspaces: [path.dirname(workspace), workspace] }, null, 2));
+
+  const res = await dispatchThroughMock(tmpDir, mock, {
+    prompt: 'do the thing',
+    interactiveMode: { kind: 'agy', trustStore: { kind: 'agy', path: settingsPath } },
+  });
+  assert.equal(res.status, 0);
+
+  const after = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
+  assert.ok(after.trustedWorkspaces.includes(workspace), 'teardown must not delete an entry it did not write');
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
 test('R6: a bare submit timeout with no result yet does not fail the round -- it resends and settles once the retry lands', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-submit-timeout-'));
   // Attempt 1 times out at the transport layer before the mock worker ever

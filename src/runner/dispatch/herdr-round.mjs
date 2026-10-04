@@ -469,6 +469,9 @@ function openRound({ runDir, workId, tier, model, agentName }) {
     model,
     agentName,
     paneId: null,
+    // True only when this round wrote a trust entry, so teardown removes what it wrote and
+    // never an entry a person vouched for.
+    trustWritten: false,
     note(patch) {
       try { writeVisibility(runDir, patch); } catch { /* a courtesy, not a contract */ }
     },
@@ -634,14 +637,20 @@ function seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, workerE
   let firstError = null;
   for (const root of roots) {
     try {
+      let wrote;
       if (trustStore.kind === 'codex-toml') {
-        seedCodexTrust(stores.target, { projectPath, repoRoot: root, rootConfigPath: stores.root });
+        wrote = seedCodexTrust(stores.target, { projectPath, repoRoot: root, rootConfigPath: stores.root });
       } else if (trustStore.kind === 'agy' || trustStore.kind === 'agy-json') {
-        seedAgyTrust(stores.target, { projectPath, repoRoot: root, rootSettingsPath: stores.root });
+        wrote = seedAgyTrust(stores.target, { projectPath, repoRoot: root, rootSettingsPath: stores.root });
       } else {
-        seedTrust(stores.target, { projectPath, repoRoot: root });
+        wrote = seedTrust(stores.target, { projectPath, repoRoot: root });
       }
-      round.note({ trustSeeded: trustStore.kind });
+      // A seed that finds the entry already there wrote nothing: the person (or an earlier
+      // round) owns it, so this round must not remove it on teardown.
+      if (wrote) {
+        round.trustWritten = true;
+        round.note({ trustSeeded: trustStore.kind });
+      }
       return;
     } catch (err) {
       firstError ??= err;
@@ -698,7 +707,10 @@ export function trustStorePaths({ trustStore, fullEnv, workerEnv }) {
  * must never be the thing that turns a settled round into a crash.
  */
 function removeWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, workerEnv = null }) {
-  if (!trustStore) return;
+  // Only an entry this round wrote. A read-only dispatch runs in the main checkout, whose
+  // entry is the one the person vouched for: deleting it makes every later claude start in
+  // that folder stop at the trust dialog.
+  if (!trustStore || !round.trustWritten) return;
   const projectPath = path.resolve(cwd);
   try {
     const { target } = trustStorePaths({ trustStore, fullEnv, workerEnv });

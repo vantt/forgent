@@ -18,7 +18,10 @@ Claude-Code-based herdr executors (claude-herdr, glm-herdr) stopped at the folde
 ## Impact
 Every claude-based herdr dispatch into the main checkout can make the owner's own Claude sessions ask for trust again, and makes the next claude dispatch fail.
 
-## Fix direction (not done)
+## Fix (done)
+The round now records whether it wrote an entry (`round.trustWritten`, set only when the seed returned true) and teardown removes only then. Covers the claude, codex and agy stores (one guard in `removeWorkspaceTrust`). Tests: two new cases in `test/runner/herdr-spawn-adapter.test.mjs` (claude-json and agy; both red before the change).
+
+## Original fix direction
 Remove only an entry this dispatch created: carry the seed result from seed to remove (per round) and skip removal when the entry pre-existed. Same for codex/agy.
 Test: seed on an already-trusted root, settle, entry survives. Touches `herdr-round.mjs`, a 92 KB file: impact analysis first.
 
