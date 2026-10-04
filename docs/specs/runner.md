@@ -1418,6 +1418,8 @@ agent-led hoặc declared qua Workflow / CollaborationPattern (`solo`, `reviewed
 Workflow dùng DAG steps + tích hợp vòng đời Work, CollaborationPattern dùng trong Unit run.
 Workflow runner (`src/workflow/runner.mjs`) nạp định nghĩa từ `core/workflows/*.yaml` và `domains/<d>/workflows/*.yaml`.
 
+**Truyền kết quả giữa các vai trong một Unit run.** Pattern gọi `runRole({ inputs })` với kết quả của các vai đã chạy; runner đổi chúng thành đường dẫn tuyệt đối tới report của từng vai (hoặc result claim khi không có report) và thêm vào `contextRefs` của assignment, sau `unit.inputs` (`src/runner/execution/role-input-refs.mjs`). Hiện chỉ `panel` truyền `inputs`: synthesizer đọc report của mọi panelist; panelist và `reviewed` không đổi. Worker đọc các đường dẫn này như mọi context ref khác; ở lớp Workflow, kết quả của bước trước vẫn được nhúng vào objective (`buildUnitObjective`), hai cơ chế chưa gộp.
+
 **Dispatch-policy.** Một Unit run không có đường dispatch riêng — mọi execution-triggering activity vẫn hội tụ về đúng MỘT lõi `Assignment -> DispatchPlan -> Run -> RunResult -> evidence` mà Team Dispatch V1 đã accepted (xem "Từ vựng dispatch hiện hành" trên và `docs/architect/agent-coordination/architecture/dispatch-control-plane.md`).
 Một Cohort Planner (điều phối heterogeneous cohort theo provider/model/tier,
 Step 08 Phase 04+) chỉ được phép EMIT policy input cho từng Assignment rồi
