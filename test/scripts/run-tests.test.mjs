@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
+import { parseEtime, parsePs, treeOf, findOverdue } from '../../scripts/lib/test-file-watchdog.mjs';
 import { discoverTestFiles, buildTestArgv, buildTestEnv, runTests, runSelectedTests, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT, snapshotFgos, diffFgosSnapshots, SENSITIVE_FGOS_FILES } from '../../scripts/run-tests.mjs';
 
 function tmpFixtureRoot() {
@@ -500,4 +501,64 @@ test('runSelectedTests permits allowed mutations without failing the suite', () 
   assert.equal(result.status, 0);
   assert.equal(result.fgosDiff.leaked, false);
   fs.rmSync(base, { recursive: true, force: true });
+});
+
+// --- Per-file time limit ----------------------------------------------------
+
+test('parseEtime reads ps elapsed-time formats', () => {
+  assert.equal(parseEtime('00:07'), 7000);
+  assert.equal(parseEtime('12:34'), (12 * 60 + 34) * 1000);
+  assert.equal(parseEtime('01:02:03'), ((1 * 60 + 2) * 60 + 3) * 1000);
+  assert.equal(parseEtime('2-03:04:05'), (((2 * 24 + 3) * 60 + 4) * 60 + 5) * 1000);
+  assert.ok(Number.isNaN(parseEtime('garbage')));
+});
+
+test('findOverdue picks only in-tree test-file processes past their own limit; treeOf lists children first', () => {
+  const procs = parsePs([
+    '  100     1    10:00 node run-tests.mjs',
+    '  200   100    10:00 node --test test/a.test.mjs test/b.test.mjs',
+    '  300   200    09:00 /usr/bin/node test/a.test.mjs',
+    '  400   300    08:59 sleep 99999',
+    '  500   200    00:05 /usr/bin/node test/b.test.mjs',
+    '  600     1    99:00 /usr/bin/node test/a.test.mjs',
+  ].join('\n'));
+  const limits = { 'test/a.test.mjs': 60_000, 'test/b.test.mjs': 60_000 };
+  const overdue = findOverdue(procs, 100, limits);
+  assert.deepEqual(overdue.map((o) => [o.pid, o.file]), [[300, 'test/a.test.mjs']]);
+  assert.deepEqual(treeOf(procs, 300), [400, 300]);
+});
+
+test('a hung test file is killed with its whole process tree, named, and the rest of the suite still runs', () => {
+  const root = tmpFixtureRoot();
+  const grandchildPidFile = path.join(root, 'grandchild.pid');
+  const okMarker = path.join(root, 'ok.ran');
+  write(
+    root,
+    'a-hang.test.mjs',
+    "import { test } from 'node:test';\nimport { spawn } from 'node:child_process';\nimport fs from 'node:fs';\n" +
+      "const child = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { detached: true, stdio: 'ignore' });\n" +
+      `fs.writeFileSync(${JSON.stringify(grandchildPidFile)}, String(child.pid));\n` +
+      "test('passes, then the process never exits', () => {});\nsetInterval(() => {}, 1000);\n",
+  );
+  write(
+    root,
+    'b-ok.test.mjs',
+    `import { test } from 'node:test';\nimport fs from 'node:fs';\ntest('ok', () => fs.writeFileSync(${JSON.stringify(okMarker)}, '1'));\n`,
+  );
+  const logs = [];
+  const started = Date.now();
+  const result = runTests({
+    root,
+    cwd: root,
+    stdio: 'ignore',
+    fileTimeoutMs: 2000,
+    watchdogPollMs: 300,
+    log: (m) => logs.push(m),
+  });
+  assert.notEqual(result.status, 0);
+  assert.ok(Date.now() - started < 60_000, 'a hung file must not hold the run');
+  assert.deepEqual(result.timedOut.map((t) => t.file), ['a-hang.test.mjs']);
+  assert.ok(fs.existsSync(okMarker), 'the other file still ran');
+  const grandchildPid = Number(fs.readFileSync(grandchildPidFile, 'utf8'));
+  assert.throws(() => process.kill(grandchildPid, 0), { code: 'ESRCH' }, 'the detached grandchild was killed too');
 });
