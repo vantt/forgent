@@ -214,6 +214,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The fgos gateway (REST API, MCP and the embedded web dashboard) is now its own component: it lives in `apps/fgos-gateway`, builds to the `fgos-gateway` binary and `fgos gateway start|status|stop` runs that binary directly with no extra argument. The herdr plugin crate was renamed `herdr-dashboard` (binary `herdr-dashboard`, manifest still `herdr-plugin.toml`), and the fgos CLI adapter and settings both share moved to the `herdr-fgos-common` crate. Behaviour is unchanged. After updating, re-register the plugin with herdr: `herdr plugin unlink fgos.dashboard` then `herdr plugin link <repo>/herdr-dashboard`, and build it with `cargo build --release` inside `herdr-dashboard/`.
 - Deduplicated `PlacementPolicy` redirect stable pool indexing in
   `assignment-runner.mjs` to import and share `stablePoolIndex` from
   `placement-policy.mjs`.

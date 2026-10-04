@@ -1,12 +1,12 @@
 ---
-authoritative_for: fgos gateway start/stop/status — the one-door verb for launching/stopping/checking the herdr-fgos gateway (REST API + web dashboard) as a detached background process, replacing hand-rolled nohup/tmux/systemd, motivated by the chicken-and-egg constraint that the gateway's own MCP search/execute tools are mounted on its own router and so cannot bootstrap the gateway itself — this is the origin of the mandatory doctrine AGENTS.md now names
+authoritative_for: fgos gateway start/stop/status — the one-door verb for launching/stopping/checking the fgos gateway (REST API + web dashboard) as a detached background process, replacing hand-rolled nohup/tmux/systemd, motivated by the chicken-and-egg constraint that the gateway's own MCP search/execute tools are mounted on its own router and so cannot bootstrap the gateway itself — this is the origin of the mandatory doctrine AGENTS.md now names
 ---
 
 # Why the gateway needs its own CLI door, not a hand-rolled background process
 
 `tsk-31v` added `fgos gateway start|stop|status`, giving any agent working
-in this repo a single door to launch, stop, or check the herdr-fgos
-gateway (REST API + web dashboard, `herdr-plugin/src/gateway.rs`) as a
+in this repo a single door to launch, stop, or check the fgos
+gateway (REST API + web dashboard, `apps/fgos-gateway/src/gateway.rs`) as a
 detached background process — without hand-rolling
 `nohup`/`tmux`/systemd.
 
@@ -75,5 +75,5 @@ A short doctrine line was added to `AGENTS.md` (near the existing
 agent that needs the gateway/web dashboard running to run
 `fgos gateway start` rather than a raw `cargo run`/`nohup` — the same
 line this repo's own `AGENTS.md` still carries today: "**If a task needs
-the herdr-fgos gateway ... running, run `fgos gateway start` — never a
+the fgos gateway ... running, run `fgos gateway start` — never a
 hand-rolled `cargo run`/`nohup`/`tmux`/systemd invocation.**"

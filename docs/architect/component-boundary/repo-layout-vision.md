@@ -11,6 +11,30 @@ behavior by itself.
 The locked target in this document is the Rust/web slice around
 `herdr-plugin/`. The Node side is intentionally left for a later discussion.
 
+## Implementation Status (2026-10-04)
+
+A smaller slice of this vision is implemented. It is a pure move and rename,
+with no change to behavior:
+
+- the gateway is `apps/fgos-gateway/` (crate and binary `fgos-gateway`, no
+  `gateway` argument); it keeps `gateway.rs`, `mcp.rs`, `cf_access.rs`,
+  `remote_invocation.rs`, `web/` and the embedded `static/` together instead of
+  the `packages/gateway`, `packages/mcp` and `packages/web-dashboard` split;
+- the herdr plugin stays one crate at `herdr-dashboard/` (renamed from
+  `herdr-plugin/`; binary `herdr-dashboard`, manifest `herdr-plugin.toml`)
+  instead of `apps/herdr-tui` plus `packages/herdr-core` and
+  `packages/herdr-ui`;
+- the shared fgos CLI adapter, settings and `WorkItemSource` port are
+  `packages/herdr-fgos-common/rust/`, standing in for `packages/fgos-ports`;
+  the gateway's `VerbGateway` port moved next to its only users in the gateway
+  crate;
+- both Rust crates stay outside the root Cargo workspace with their own lock
+  file and `target/`, because herdr loads the plugin binary from
+  `$HERDR_PLUGIN_ROOT/target/release/`.
+
+The finer `packages/*` split below remains the long-term direction and is not
+yet done.
+
 ## 1. Decision Summary
 
 Move the current single `herdr-plugin/` package shape toward:

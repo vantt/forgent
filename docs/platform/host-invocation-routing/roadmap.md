@@ -79,7 +79,7 @@ its precondition satisfied (Phase E delivered `fixture.echo.echo`, a semantic
 operation that is not only a built-in CLI route) and can proceed on its own
 rollout plan. Phase F is now implemented preview: R3-P0 through R3-P5 are
 closed on 2026-09-18, proving native remote peer invocation for
-`distribution.build.show` (`GET /v1/runtime` in `herdr-plugin/src/gateway.rs`)
+`distribution.build.show` (`GET /v1/runtime` in `apps/fgos-gateway/src/gateway.rs`)
 without `VerbGateway`, CLI shelling, or `fgos.v1` envelope parsing. All other
 gateway routes remain on `VerbGateway` per the
 [R3 execution record](../../../plans/260918-host-invocation-r3-remote-peer/plan.md).
@@ -227,8 +227,8 @@ Detailed rollout plan: [R3 execution record](../../../plans/260918-host-invocati
 
 Current status: Closed as implemented preview on 2026-09-18 (R3-P0 through
 R3-P5). `GET /v1/runtime` (`distribution.build.show`) is wired directly to
-`InvocationService` via `herdr-plugin/src/remote_invocation.rs` inside the
-`authenticated` router in `herdr-plugin/src/gateway.rs`. Hard regression
+`InvocationService` via `apps/fgos-gateway/src/remote_invocation.rs` inside the
+`authenticated` router in `apps/fgos-gateway/src/gateway.rs`. Hard regression
 tests prove no `VerbGateway` calls (`PanicGateway`) and no `fgos.v1` envelope
 parsing. All other gateway routes remain legacy `VerbGateway` / CLI-shelling
 consumers.

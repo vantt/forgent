@@ -515,3 +515,53 @@ test('dead vocabulary guard: Request-to-Run P5 retired symbols (FlowDefinition, 
 
   assert.deepEqual(violations, [], `P5 dead symbols detected in docs/skills:\n${violations.join('\n')}`);
 });
+
+test('dead vocabulary guard: the fgos gateway and the herdr-dashboard plugin never go by their retired names', () => {
+  const skipDirs = new Set(['node_modules', '.git', 'target', 'static']);
+  const extensions = ['.mjs', '.js', '.cjs', '.rs', '.md', '.ts', '.tsx', '.toml', '.yaml', '.json'];
+  const walk = (dir) => {
+    const out = [];
+    if (!fs.existsSync(dir)) return out;
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        if (!skipDirs.has(entry.name)) out.push(...walk(full));
+      } else if (entry.isFile() && extensions.some((ext) => entry.name.endsWith(ext))) {
+        out.push(full);
+      }
+    }
+    return out;
+  };
+
+  const roots = ['src', 'bin', 'core', 'domains', 'packages', 'apps', 'herdr-dashboard', path.join('docs', 'specs')];
+  const files = [
+    ...roots.flatMap((d) => walk(path.join(REPO_ROOT, d))),
+    path.join(REPO_ROOT, 'AGENTS.md'),
+    path.join(REPO_ROOT, 'docs', 'platform', 'component-boundary.md'),
+  ];
+
+  // `herdr-plugin.toml` is herdr's own manifest file name and `herdr-fgos-common`
+  // is the shared crate; neither is the retired crate/binary/directory name.
+  const retired = /herdr-plugin(?!\.toml)|herdr-fgos(?!-common)|herdr_fgos(?!_common)/;
+  // "herdr-gateway" is the external reference repository (~/projects/herdr-gateway),
+  // never the name of this repo's own gateway. A mention is fine when the nearby
+  // lines say it is the reference implementation or name a path inside it.
+  const referenceMarker = /reference implementation|repo tham chiếu|tham chiếu ngoài|projects\/herdr-gateway|herdr-gateway-token|herdr-gateway\/src\/|crate herdr-go|ngoài `forgentX`/;
+
+  const violations = [];
+  for (const file of files) {
+    const rel = path.relative(REPO_ROOT, file);
+    const lines = fs.readFileSync(file, 'utf8').split('\n');
+    lines.forEach((line, i) => {
+      // Directory slugs under docs/history are archived records, not live names.
+      if (retired.test(line.replace(/docs\/history\/\S*/g, ''))) violations.push(`${rel}:${i + 1}: retired name for the gateway or dashboard plugin`);
+      if (line.includes('herdr-gateway')) {
+        const window = lines.slice(Math.max(0, i - 3), i + 4).join('\n');
+        if (!referenceMarker.test(window)) {
+          violations.push(`${rel}:${i + 1}: "herdr-gateway" used for the fgos gateway instead of the external reference repository`);
+        }
+      }
+    });
+  }
+  assert.deepEqual(violations, [], `Retired gateway/plugin vocabulary found:\n${violations.join('\n')}`);
+});

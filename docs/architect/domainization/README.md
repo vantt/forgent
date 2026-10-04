@@ -246,7 +246,7 @@ possible instead of introducing a separate package system only for enforcement.
 
 Domainization is not a mandate to relocate all core runtime code.
 
-`bin/`, `src/`, and `herdr-plugin/` can remain at top level while still being
+`bin/`, `src/`, and `herdr-dashboard/` can remain at top level while still being
 core. Moving heavily referenced runtime paths only to make the tree look
 symmetrical creates churn without clarifying authority.
 

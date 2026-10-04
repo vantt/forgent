@@ -682,7 +682,7 @@ MỌI verb — chỉ bốn verb mang `paginated: true`: `ready`, `triage`,
 verb này nhận thêm hai tham số tuỳ chọn `--cursor`/`--limit`: không
 truyền cờ nào → kết quả y hệt hôm nay (mảng/map đầy đủ, không đổi hình
 dạng) — NGOẠI LỆ DUY NHẤT: `list --all --json` không kèm `--cursor`/
-`--limit` giữ nguyên hình dạng thô này VĨNH VIỄN, vì `herdr-plugin/src/
+`--limit` giữ nguyên hình dạng thô này VĨNH VIỄN, vì `packages/herdr-fgos-common/rust/src/
 fgos.rs` (crate Rust ngoài repo Node này) đọc đúng lời gọi đó làm hợp
 đồng công khai. Mọi tổ hợp KHÁC của `list` (mặc định trần không cờ nào,
 `--id`, hoặc bất kỳ tổ hợp nào có `--cursor`/`--limit` — kể cả kèm
@@ -2035,7 +2035,7 @@ cùng category) — không còn là 1 Set string thuần.
 | `src/state/retro-pool.mjs:12,21` | `isRetrospectiveReady`: `item.status === 'retrospective'` literal | **KHÔNG đổi — xác nhận trực tiếp** ("`retro-pool.mjs`'s literal `status === 'retrospective'` đúng mãi mãi, không cần đổi") |
 | `src/intake/discovery.mjs:128,649,651,674-690` | `statusAtAsk`/ask-answer gate đọc `work.status` (`todo`/`doing`/`awaiting-human`) để resume đúng chỗ | Đoạn đầu — domain-owned; cơ chế bản thân domain-agnostic (mirror `status-fsm.mjs`'s async-human-gate), nên về sau nên đọc category thay vì literal 3 tên này |
 | `docs/reference/triage-table-columns.md:18` | Bảng cột hiển thị CLI liệt kê CHỈ 7 status cũ (`todo`/`doing`/`blocked`/`awaiting-human`/`awaiting-approval`/`done`), "rendered as-is" — literal, đã lệch 10 status thật hôm nay (thiếu `delivered`/`retrospective`/`cleanup`/`wontfix`) | **Gap có thật, ĐỘC LẬP với quyết định category** (DISCUSSION.md §3 #6) — cần sửa dù thiết kế category chốt kiểu gì; hiển thị "as-is" hôm nay đã ngầm giả định 1 domain, sẽ hiện sai khi domain khác dùng nhãn khác cho cùng category |
-| `herdr-plugin/src/fgos.rs:46,101,110,203-272` | Tiến trình Rust NGOÀI runtime Node — parse `fgos list --all --json` stdout, lọc `item.status == "doing" \|\| item.status == "awaiting-approval"` (tsk-4vo) để hiển thị pane "in-process" | **Consumer NGOÀI biên `src/`/`bin/`, qua ranh giới CLI/JSON** — domain-owned, đọc literal string coding hôm nay; nếu domain khác đổi nhãn 2 status này, `herdr-plugin` vỡ ngầm trừ khi tự đọc `statusCategory` thay literal — phải liệt vào backlog migrate-consumer của `tsk-38t-3` (consumer-migration), không chỉ audit mã nguồn `.mjs` |
+| `packages/herdr-fgos-common/rust/src/fgos.rs:46,101,110,203-272` | Tiến trình Rust NGOÀI runtime Node — parse `fgos list --all --json` stdout, lọc `item.status == "doing" \|\| item.status == "awaiting-approval"` (tsk-4vo) để hiển thị pane "in-process" | **Consumer NGOÀI biên `src/`/`bin/`, qua ranh giới CLI/JSON** — domain-owned, đọc literal string coding hôm nay; nếu domain khác đổi nhãn 2 status này, `herdr-dashboard` vỡ ngầm trừ khi tự đọc `statusCategory` thay literal — phải liệt vào backlog migrate-consumer của `tsk-38t-3` (consumer-migration), không chỉ audit mã nguồn `.mjs` |
 
 ##### 6. Gap liên quan nhưng KHÔNG phải phạm vi audit status literal (ghi nhận để không lặp lại công sức)
 
@@ -2068,7 +2068,7 @@ phải một "consumer literal status" cần audit ở record này.
   `entropy.mjs`/`bin/fgos.mjs`'s `FINAL_STATUSES` cục bộ là 2 bản sao ĐÃ LỆCH
   nghĩa nhau (khác tập con) — cần rà đồng thời, không chỉ theo dấu
   `RESOLVED_STATUSES`.
-- `herdr-plugin/src/fgos.rs` xác nhận việc audit "consumer của status" không
+- `packages/herdr-fgos-common/rust/src/fgos.rs` xác nhận việc audit "consumer của status" không
   dừng ở biên `src/`/`bin/` của repo Node — bất kỳ tiến trình ngoài nào đọc
   `fgos list --all --json` cũng là 1 consumer thật của vocabulary status, cần
   đưa vào phạm vi khi `tsk-38t-3` (consumer-migration) thực thi.

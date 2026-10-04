@@ -1,5 +1,5 @@
 ---
-authoritative_for: the boundary between Herdr's own Rust "orchestrator" vocabulary (PaneOrchestrator, OrchestratorSettings, HerdrOrchestratorToggles — pane lifecycle/toggle mechanics in herdr-plugin/src/) and fgOS dispatch's own "orchestrator" glossary sense (the T0 composition layer that manages N units of work and stays attached, per docs/architect's own dispatch-control-plane-redesign.md §5.1) — two unrelated meanings sharing one English word, never to be conflated or renamed toward each other
+authoritative_for: the boundary between Herdr's own Rust "orchestrator" vocabulary (PaneOrchestrator, OrchestratorSettings, HerdrOrchestratorToggles — pane lifecycle/toggle mechanics in herdr-dashboard/src/) and fgOS dispatch's own "orchestrator" glossary sense (the T0 composition layer that manages N units of work and stays attached, per docs/architect's own dispatch-control-plane-redesign.md §5.1) — two unrelated meanings sharing one English word, never to be conflated or renamed toward each other
 ---
 
 # Herdr's `PaneOrchestrator` and fgOS's "orchestrator" are two different words that happen to be spelled the same
@@ -11,7 +11,7 @@ for unrelated reasons.
 
 ## The two senses
 
-- **Herdr's `PaneOrchestrator`** (`herdr-plugin/src/ports.rs`) is a Rust
+- **Herdr's `PaneOrchestrator`** (`herdr-dashboard/src/ports.rs`) is a Rust
   trait governing pane open/reuse/focus — pure terminal-pane lifecycle.
   Its siblings `OrchestratorSettings`/`HerdrOrchestratorToggles`
   (`settings.rs`, `main.rs`) govern the `herdrOrchestrator` auto-launch
@@ -40,7 +40,7 @@ change — stating explicitly:
    layer is being described.
 
 Acceptance was verified live: `rg -n "orchestrator|PaneOrchestrator|Herdr"
-docs herdr-plugin src` — every hit has a clear/allowlisted meaning.
+docs herdr-dashboard src` — every hit has a clear/allowlisted meaning.
 
 ## Where the doc lives now
 
@@ -54,7 +54,7 @@ merge record.
 
 ## Explicitly out of scope
 
-No renaming, no code change to `herdr-plugin/src/` — this item is a pure
+No renaming, no code change to `herdr-dashboard/src/` — this item is a pure
 documentation boundary note. It does not relitigate ADR 0029's own
 reassignment of "orchestrator" for fgOS, only prevents that reassignment
 from bleeding into Herdr's unrelated Rust vocabulary.
