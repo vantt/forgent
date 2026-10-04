@@ -1,0 +1,15 @@
+# Decision Position: Mechanical Quality Gates vs. Pattern Red-Team
+
+### Position
+**Do not add mechanical dissent/agreement gates to `panel.mjs`.** Provider-distinct independence in `panel.mjs` combined with `reviewed.mjs`'s red-team balancing loop is structurally sufficient.
+
+### System Analysis & Reasons
+1. **Perverse Reinforcing Loop (Goodhart's Trap):** Imposing artificial quotas (at least 2 objections, forced counterfactuals at >70% agreement) creates a reinforcing loop of synthetic noise: models generate cosmetic objections to satisfy the mechanical gate, triggering downstream re-prompts. In [`src/runner/execution/patterns/panel.mjs:45-60`](file:///home/vantt/projects/forgentX/src/runner/execution/patterns/panel.mjs#L45-L60), panelists already run under strict provider-family isolation (`independentOf`). Distorting honest consensus with forced dissent adds latency without epistemic signal, violating Ship Faster ([`docs/specs/runner.md:14-20`](file:///home/vantt/projects/forgentX/docs/specs/runner.md#L14-L20)).
+2. **Conflating Divergence with Balancing Feedback:** The system structure already separates independent sampling from adversarial correction. `panel.mjs` is a single-pass fan-out with cross-provider synthesis ([`src/runner/execution/patterns/panel.mjs:73-82`](file:///home/vantt/projects/forgentX/src/runner/execution/patterns/panel.mjs#L73-L82)). When adversarial pressure is required, [`src/runner/execution/patterns/reviewed.mjs:25-26,141-201`](file:///home/vantt/projects/forgentX/src/runner/execution/patterns/reviewed.mjs#L25-L26) supplies a tested balancing loop using `red-team` checkers across iterative rounds. Adding cross-examination cycles to `panel.mjs` breaks the minimal purity of CollaborationPatterns ([`docs/specs/runner.md:3024`](file:///home/vantt/projects/forgentX/docs/specs/runner.md#L3024)).
+3. **Leverage Point is Information Flow, Not Control Gates:** Consensus bias stems from synthesis prompts, not pipeline mechanics. In [`src/runner/execution/patterns/panel.mjs:81`](file:///home/vantt/projects/forgentX/src/runner/execution/patterns/panel.mjs#L81), all `memberResults` reach the synthesizer. The high-leverage intervention is modifying the prompt to reward reporting splits rather than adding stateful gating machinery.
+
+### What Would Change My Mind
+Empirical production logs showing provider-distinct panelists consistently collapse into correlated groupthink on high-rigor decisions where `reviewed` red-teaming fails to trigger findings, and where synthetic counterfactuals yield actionable findings rather than hallucinated churn.
+
+### Concrete Next Step
+Update the synthesizer role prompt in [`src/runner/execution/patterns/panel.mjs:73-82`](file:///home/vantt/projects/forgentX/src/runner/execution/patterns/panel.mjs#L73-L82) (and presets in [`src/runner/execution/patterns/presets.mjs:20-27`](file:///home/vantt/projects/forgentX/src/runner/execution/patterns/presets.mjs#L20-L27)) to explicitly instruct the synthesizer to surface unreconciled minority splits instead of smoothing over dissent.

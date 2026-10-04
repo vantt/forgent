@@ -1,0 +1,1193 @@
+fgos: dispatch capability=(none declared) executor=claude-herdr via=herdr-spawn provider=claude model=sonnet tier=standard
+fgos: dispatch capability=code:review,code:debug executor=openai via=herdr-spawn provider=openai model=gpt-5.6-terra tier=standard
+fgos: dispatch capability=advise executor=gemini via=herdr-spawn provider=gemini model=gemini-3.8-flash-medium tier=standard
+fgos: herdr-spawn work=claude-herdr pane=wS:p3XG agent=fgos-run_unit-run-1791123c3c27db runDir=/home/vantt/projects/forgentX/.fgos/assignments/unit-run-1791121759834-6c5289d5/panelist-1/1/runs/01
+fgos: herdr-spawn work=openai pane=wS:p3XH agent=fgos-run_unit-run-179112aefacf86 runDir=/home/vantt/projects/forgentX/.fgos/assignments/unit-run-1791121759834-6c5289d5/panelist-2/1/runs/01
+fgos: herdr-spawn work=gemini pane=wS:p3XJ agent=fgos-run_unit-run-1791122dd63722 runDir=/home/vantt/projects/forgentX/.fgos/assignments/unit-run-1791121759834-6c5289d5/panelist-3/1/runs/01
+fgos: dispatch capability=review,code:review executor=xai via=herdr-spawn provider=xai model=grok-4.3 tier=standard
+fgos: herdr-spawn work=xai pane=wS:p3XK agent=fgos-run_unit-run-179112da7e609c runDir=/home/vantt/projects/forgentX/.fgos/assignments/unit-run-1791121759834-6c5289d5/synthesizer/1/runs/01
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-10-04T13:53:05.606Z",
+  "data_hash": "766e5ebe77f10f1e186f9b23ef41d859c9607f745fc4b94a44200c8ea85c56a5",
+  "data": {
+    "unitRunId": "unit-run-1791121759834-6c5289d5",
+    "outcome": "pass",
+    "results": [
+      {
+        "outcome": "pass",
+        "role": "panelist-1",
+        "round": 1,
+        "runResult": {
+          "contract": {
+            "id": "assignment-run-result",
+            "version": 3
+          },
+          "runId": "run_unit-run-1791121759834-6c5289d5/panelist-1/1_01",
+          "assignmentId": "unit-run-1791121759834-6c5289d5/panelist-1/1",
+          "controlEpoch": 1,
+          "controlToken": "07245653-2ebc-43e2-8241-04db4e323bde",
+          "executorId": "claude-herdr",
+          "adapter": "herdr-spawn",
+          "confinement": null,
+          "role": "panelist-1",
+          "executorRedirected": false,
+          "policy": {
+            "role": "panelist-1",
+            "persona": "council-socrates",
+            "executorPreference": [
+              "claude-herdr"
+            ],
+            "executorId": "claude-herdr",
+            "providerModel": "claude",
+            "rigor": "standard",
+            "tier": "standard",
+            "model": "sonnet",
+            "reasoningEffort": "medium",
+            "visibility": "headless",
+            "repeatMode": null,
+            "constraints": {
+              "requiresSkills": []
+            },
+            "provenance": {
+              "executor": {
+                "value": "claude-herdr",
+                "source": {
+                  "scope": "cliOverride"
+                }
+              },
+              "provider": {
+                "value": "claude",
+                "source": {
+                  "scope": "registeredExecutor",
+                  "id": "claude-herdr"
+                }
+              },
+              "model": {
+                "value": "sonnet",
+                "source": {
+                  "scope": "cliOverride"
+                }
+              },
+              "rigor": {
+                "value": "standard",
+                "source": {
+                  "scope": "default"
+                }
+              },
+              "tier": {
+                "value": "standard",
+                "source": {
+                  "scope": "rigor",
+                  "id": "standard"
+                }
+              },
+              "reasoningEffort": {
+                "value": "medium",
+                "source": {
+                  "scope": "derived",
+                  "id": "rigor.standard"
+                }
+              },
+              "persona": {
+                "value": "council-socrates",
+                "source": {
+                  "scope": "opPolicy"
+                }
+              },
+              "visibility": {
+                "value": "headless",
+                "source": {
+                  "scope": "default"
+                }
+              },
+              "repeatMode": {
+                "value": null,
+                "source": {
+                  "scope": "default"
+                }
+              },
+              "constraints": {
+                "value": {
+                  "requiresSkills": []
+                },
+                "source": {
+                  "scope": "assignment",
+                  "id": "unit-run-1791121759834-6c5289d5/panelist-1/1"
+                }
+              },
+              "governance": {
+                "value": "allowed",
+                "source": {
+                  "scope": "governance",
+                  "id": "claude"
+                }
+              }
+            }
+          },
+          "promptEnvelope": {
+            "persona": {
+              "ref": "council-socrates",
+              "delivery": "section",
+              "applied": true,
+              "source": {
+                "scope": "opPolicy"
+              }
+            }
+          },
+          "settledAt": "2026-10-04T13:50:19.132Z",
+          "durationMs": 59225,
+          "claimSha256": "dd6c8026f7035ba6e802364ce5468525e0f05f92fd43edd444a222f4850a2088",
+          "settleReports": [
+            {
+              "path": ".fgos/assignments/unit-run-1791121759834-6c5289d5/panelist-1/1/runs/01/outbox/report-1.md",
+              "sha256": "31529ebc819b88e1c66995e95a8afb79c84b32cf4e4d8041c1a3be1736cd51f7"
+            }
+          ],
+          "classification": {
+            "execution": {
+              "status": "completed",
+              "exitCode": 0
+            },
+            "assessment": {
+              "verdict": "pass"
+            },
+            "confidence": {
+              "level": "reported",
+              "basis": [
+                "valid-agent-result-claim",
+                "captured-stdout"
+              ]
+            },
+            "failure": null,
+            "policy": {
+              "disposition": "allow",
+              "code": null
+            },
+            "delivery": {
+              "mode": "fresh"
+            },
+            "provenance": "native-v3",
+            "outcome": {
+              "category": "ok",
+              "reason": "completed-pass"
+            }
+          },
+          "runtime": {
+            "exitCode": 0,
+            "stdoutLog": ".fgos/assignments/unit-run-1791121759834-6c5289d5/panelist-1/1/runs/01/stdout.log",
+            "stderrLog": ".fgos/assignments/unit-run-1791121759834-6c5289d5/panelist-1/1/runs/01/stderr.log"
+          },
+          "agentClaim": {
+            "contract": {
+              "id": "agent-result-claim",
+              "version": 2
+            },
+            "status": "done",
+            "summary": "Position: don't port the 4 council gates; add only a deterministic split-preserving agreement tally to runPanel (panel.mjs:84-87 discards panelist verdicts). Report written.",
+            "evidenceRefs": [
+              "src/runner/execution/patterns/panel.mjs:51-57",
+              "src/runner/execution/patterns/panel.mjs:84-87",
+              "src/runner/execution/patterns/reviewed.mjs:22-27",
+              "core/workflows/group-cognition.yaml:36"
+            ]
+          },
+          "runnerNote": {
+            "summary": "Settled"
+          },
+          "usage": {
+            "inputTokens": null,
+            "outputTokens": null,
+            "totalTokens": null,
+            "cacheReadTokens": null,
+            "cacheCreationTokens": null,
+            "source": "unavailable-herdr"
+          },
+          "evidence": {
+            "gitBefore": "d1e17d074e7accd6ffcd309bf541c52710b3700f",
+            "gitAfter": "d1e17d074e7accd6ffcd309bf541c52710b3700f",
+            "gitBeforeSource": "pre-launch",
+            "changedFiles": [],
+            "mutatedDirtyBeforeFiles": [],
+            "attribution": [
+              {
+                "path": "core/agents/council-meadows.yaml",
+                "firstObserved": "pre-launch",
+                "level": "excluded",
+                "basis": [
+                  "pre-launch-git-status"
+                ],
+                "coverageMatched": false
+              },
+              {
+                "path": "core/agents/council-socrates.yaml",
+                "firstObserved": "pre-launch",
+                "level": "excluded",
+                "basis": [
+                  "pre-launch-git-status"
+                ],
+                "coverageMatched": false
+              },
+              {
+                "path": "core/agents/council-torvalds.yaml",
+                "firstObserved": "pre-launch",
+                "level": "excluded",
+                "basis": [
+                  "pre-launch-git-status"
+                ],
+                "coverageMatched": false
+              },
+              {
+                "path": "plans/journals/2026-10-02-p5-terminology-sweep-and-vocabulary-guard.md",
+                "firstObserved": "pre-launch",
+                "level": "excluded",
+                "basis": [
+                  "pre-launch-git-status"
+                ],
+                "coverageMatched": false
+              }
+            ],
+            "artifacts": [
+              ".fgos/assignments/unit-run-1791121759834-6c5289d5/panelist-1/1/runs/01/outbox/report-1.md",
+              ".fgos/assignments/unit-run-1791121759834-6c5289d5/panelist-1/1/runs/01/outbox/result-1.json"
+            ],
+            "tests": [],
+            "findingRefs": [
+              "src/runner/execution/patterns/panel.mjs:51-57",
+              "src/runner/execution/patterns/panel.mjs:84-87",
+              "src/runner/execution/patterns/reviewed.mjs:22-27",
+              "core/workflows/group-cognition.yaml:36"
+            ]
+          }
+        },
+        "binding": {
+          "contractVersion": "v1alpha1",
+          "executor": "claude-herdr",
+          "invocation": "claude-herdr-bwrap",
+          "transport": "herdr",
+          "candidateIndex": 0,
+          "tier": "standard",
+          "model": "sonnet",
+          "persona": "council-socrates",
+          "mechanism": "out-of-process",
+          "posture": "read-only",
+          "provenance": {
+            "executor": {
+              "value": "claude-herdr",
+              "source": "capability:architecture:shape"
+            },
+            "invocation": {
+              "value": "claude-herdr-bwrap",
+              "source": "capability:architecture:shape"
+            },
+            "transport": {
+              "value": "herdr",
+              "source": "herdr-invocation-present"
+            },
+            "tier": {
+              "value": "standard",
+              "source": "rigor:standard"
+            },
+            "model": {
+              "value": "sonnet",
+              "source": "resolveTierModel(claude.standard)"
+            },
+            "persona": {
+              "value": "council-socrates",
+              "source": "override:cli"
+            },
+            "mechanism": {
+              "value": "out-of-process",
+              "source": "checker-role-forced-out-of-process"
+            },
+            "posture": {
+              "value": "read-only",
+              "source": "read-only-ask-or-writes-empty"
+            },
+            "overridesOrigin": {
+              "value": "cli",
+              "source": "override"
+            }
+          }
+        }
+      },
+      {
+        "outcome": "pass",
+        "role": "panelist-2",
+        "round": 1,
+        "runResult": {
+          "contract": {
+            "id": "assignment-run-result",
+            "version": 3
+          },
+          "runId": "run_unit-run-1791121759834-6c5289d5/panelist-2/1_01",
+          "assignmentId": "unit-run-1791121759834-6c5289d5/panelist-2/1",
+          "controlEpoch": 1,
+          "controlToken": "68ea42db-460d-490b-9df9-b6bc5bdf922d",
+          "executorId": "openai",
+          "adapter": "herdr-spawn",
+          "confinement": null,
+          "role": "panelist-2",
+          "executorRedirected": false,
+          "policy": {
+            "role": "panelist-2",
+            "persona": "council-torvalds",
+            "executorPreference": [
+              "openai"
+            ],
+            "executorId": "openai",
+            "providerModel": "openai",
+            "rigor": "standard",
+            "tier": "standard",
+            "model": "gpt-5.6-terra",
+            "reasoningEffort": "medium",
+            "visibility": "headless",
+            "repeatMode": null,
+            "constraints": {
+              "requiresSkills": []
+            },
+            "provenance": {
+              "executor": {
+                "value": "openai",
+                "source": {
+                  "scope": "cliOverride"
+                }
+              },
+              "provider": {
+                "value": "openai",
+                "source": {
+                  "scope": "registeredExecutor",
+                  "id": "openai"
+                }
+              },
+              "model": {
+                "value": "gpt-5.6-terra",
+                "source": {
+                  "scope": "cliOverride"
+                }
+              },
+              "rigor": {
+                "value": "standard",
+                "source": {
+                  "scope": "default"
+                }
+              },
+              "tier": {
+                "value": "standard",
+                "source": {
+                  "scope": "rigor",
+                  "id": "standard"
+                }
+              },
+              "reasoningEffort": {
+                "value": "medium",
+                "source": {
+                  "scope": "derived",
+                  "id": "rigor.standard"
+                }
+              },
+              "persona": {
+                "value": "council-torvalds",
+                "source": {
+                  "scope": "opPolicy"
+                }
+              },
+              "visibility": {
+                "value": "headless",
+                "source": {
+                  "scope": "default"
+                }
+              },
+              "repeatMode": {
+                "value": null,
+                "source": {
+                  "scope": "default"
+                }
+              },
+              "constraints": {
+                "value": {
+                  "requiresSkills": []
+                },
+                "source": {
+                  "scope": "assignment",
+                  "id": "unit-run-1791121759834-6c5289d5/panelist-2/1"
+                }
+              },
+              "governance": {
+                "value": "allowed",
+                "source": {
+                  "scope": "governance",
+                  "id": "openai-codex"
+                }
+              }
+            }
+          },
+          "promptEnvelope": {
+            "persona": {
+              "ref": "council-torvalds",
+              "delivery": "section",
+              "applied": true,
+              "source": {
+                "scope": "opPolicy"
+              }
+            }
+          },
+          "settledAt": "2026-10-04T13:50:31.988Z",
+          "durationMs": 71746,
+          "claimSha256": "e76b897b95caf57e83d5d00ea88a67b659aaa67bb095911777b2d37433f91571",
+          "settleReports": [
+            {
+              "path": ".fgos/assignments/unit-run-1791121759834-6c5289d5/panelist-2/1/runs/01/outbox/report-1.md",
+              "sha256": "a694de9d09a3d53b00722829674ced7ceadf1fa817d6d061d1c402d76235f23a"
+            }
+          ],
+          "classification": {
+            "execution": {
+              "status": "completed",
+              "exitCode": 0
+            },
+            "assessment": {
+              "verdict": "pass"
+            },
+            "confidence": {
+              "level": "reported",
+              "basis": [
+                "valid-agent-result-claim",
+                "captured-stdout"
+              ]
+            },
+            "failure": null,
+            "policy": {
+              "disposition": "allow",
+              "code": null
+            },
+            "delivery": {
+              "mode": "fresh"
+            },
+            "provenance": "native-v3",
+            "outcome": {
+              "category": "ok",
+              "reason": "completed-pass"
+            }
+          },
+          "runtime": {
+            "exitCode": 0,
+            "stdoutLog": ".fgos/assignments/unit-run-1791121759834-6c5289d5/panelist-2/1/runs/01/stdout.log",
+            "stderrLog": ".fgos/assignments/unit-run-1791121759834-6c5289d5/panelist-2/1/runs/01/stderr.log"
+          },
+          "agentClaim": {
+            "contract": {
+              "id": "agent-result-claim",
+              "version": 2
+            },
+            "status": "done",
+            "summary": "Recommended keeping the generic panel pattern simple; use reviewed/workflow red-team paths for adversarial decision work until a named, measured deliberation subsystem is justified.",
+            "evidenceRefs": [
+              "report-1.md",
+              "src/runner/execution/patterns/panel.mjs:44-86",
+              "src/runner/execution/patterns/reviewed.mjs:22-54",
+              "docs/specs/runner.md:3016-3026",
+              "test/runner/execution/run.test.mjs:574-632"
+            ]
+          },
+          "runnerNote": {
+            "summary": "Settled"
+          },
+          "usage": {
+            "inputTokens": null,
+            "outputTokens": null,
+            "totalTokens": null,
+            "cacheReadTokens": null,
+            "cacheCreationTokens": null,
+            "source": "unsupported"
+          },
+          "evidence": {
+            "gitBefore": "d1e17d074e7accd6ffcd309bf541c52710b3700f",
+            "gitAfter": "d1e17d074e7accd6ffcd309bf541c52710b3700f",
+            "gitBeforeSource": "pre-launch",
+            "changedFiles": [],
+            "mutatedDirtyBeforeFiles": [],
+            "attribution": [
+              {
+                "path": "core/agents/council-meadows.yaml",
+                "firstObserved": "pre-launch",
+                "level": "excluded",
+                "basis": [
+                  "pre-launch-git-status"
+                ],
+                "coverageMatched": false
+              },
+              {
+                "path": "core/agents/council-socrates.yaml",
+                "firstObserved": "pre-launch",
+                "level": "excluded",
+                "basis": [
+                  "pre-launch-git-status"
+                ],
+                "coverageMatched": false
+              },
+              {
+                "path": "core/agents/council-torvalds.yaml",
+                "firstObserved": "pre-launch",
+                "level": "excluded",
+                "basis": [
+                  "pre-launch-git-status"
+                ],
+                "coverageMatched": false
+              },
+              {
+                "path": "plans/journals/2026-10-02-p5-terminology-sweep-and-vocabulary-guard.md",
+                "firstObserved": "pre-launch",
+                "level": "excluded",
+                "basis": [
+                  "pre-launch-git-status"
+                ],
+                "coverageMatched": false
+              }
+            ],
+            "artifacts": [
+              ".fgos/assignments/unit-run-1791121759834-6c5289d5/panelist-2/1/runs/01/outbox/report-1.md",
+              ".fgos/assignments/unit-run-1791121759834-6c5289d5/panelist-2/1/runs/01/outbox/result-1.json"
+            ],
+            "tests": [],
+            "findingRefs": [
+              "report-1.md",
+              "src/runner/execution/patterns/panel.mjs:44-86",
+              "src/runner/execution/patterns/reviewed.mjs:22-54",
+              "docs/specs/runner.md:3016-3026",
+              "test/runner/execution/run.test.mjs:574-632"
+            ]
+          }
+        },
+        "binding": {
+          "contractVersion": "v1alpha1",
+          "executor": "openai",
+          "invocation": "codex-herdr-fgovn",
+          "transport": "herdr",
+          "candidateIndex": 1,
+          "tier": "standard",
+          "model": "gpt-5.6-terra",
+          "persona": "council-torvalds",
+          "mechanism": "out-of-process",
+          "posture": "read-only",
+          "provenance": {
+            "executor": {
+              "value": "openai",
+              "source": "capability:architecture:shape"
+            },
+            "invocation": {
+              "value": "codex-herdr-fgovn",
+              "source": "capability:architecture:shape"
+            },
+            "transport": {
+              "value": "herdr",
+              "source": "herdr-invocation-present"
+            },
+            "tier": {
+              "value": "standard",
+              "source": "rigor:standard"
+            },
+            "model": {
+              "value": "gpt-5.6-terra",
+              "source": "resolveTierModel(openai.standard)"
+            },
+            "persona": {
+              "value": "council-torvalds",
+              "source": "override:cli"
+            },
+            "mechanism": {
+              "value": "out-of-process",
+              "source": "checker-role-forced-out-of-process"
+            },
+            "posture": {
+              "value": "read-only",
+              "source": "read-only-ask-or-writes-empty"
+            },
+            "overridesOrigin": {
+              "value": "cli",
+              "source": "override"
+            }
+          }
+        }
+      },
+      {
+        "outcome": "pass",
+        "role": "panelist-3",
+        "round": 1,
+        "runResult": {
+          "contract": {
+            "id": "assignment-run-result",
+            "version": 3
+          },
+          "runId": "run_unit-run-1791121759834-6c5289d5/panelist-3/1_01",
+          "assignmentId": "unit-run-1791121759834-6c5289d5/panelist-3/1",
+          "controlEpoch": 1,
+          "controlToken": "4981de5b-b375-41dd-9e66-5b3f90f06183",
+          "executorId": "gemini",
+          "adapter": "herdr-spawn",
+          "confinement": null,
+          "role": "panelist-3",
+          "executorRedirected": false,
+          "policy": {
+            "role": "panelist-3",
+            "persona": "council-meadows",
+            "executorPreference": [
+              "gemini"
+            ],
+            "executorId": "gemini",
+            "providerModel": "gemini",
+            "rigor": "standard",
+            "tier": "standard",
+            "model": "gemini-3.8-flash-medium",
+            "reasoningEffort": "medium",
+            "visibility": "headless",
+            "repeatMode": null,
+            "constraints": {
+              "requiresSkills": []
+            },
+            "provenance": {
+              "executor": {
+                "value": "gemini",
+                "source": {
+                  "scope": "cliOverride"
+                }
+              },
+              "provider": {
+                "value": "gemini",
+                "source": {
+                  "scope": "registeredExecutor",
+                  "id": "gemini"
+                }
+              },
+              "model": {
+                "value": "gemini-3.8-flash-medium",
+                "source": {
+                  "scope": "cliOverride"
+                }
+              },
+              "rigor": {
+                "value": "standard",
+                "source": {
+                  "scope": "default"
+                }
+              },
+              "tier": {
+                "value": "standard",
+                "source": {
+                  "scope": "rigor",
+                  "id": "standard"
+                }
+              },
+              "reasoningEffort": {
+                "value": "medium",
+                "source": {
+                  "scope": "derived",
+                  "id": "rigor.standard"
+                }
+              },
+              "persona": {
+                "value": "council-meadows",
+                "source": {
+                  "scope": "opPolicy"
+                }
+              },
+              "visibility": {
+                "value": "headless",
+                "source": {
+                  "scope": "default"
+                }
+              },
+              "repeatMode": {
+                "value": null,
+                "source": {
+                  "scope": "default"
+                }
+              },
+              "constraints": {
+                "value": {
+                  "requiresSkills": []
+                },
+                "source": {
+                  "scope": "assignment",
+                  "id": "unit-run-1791121759834-6c5289d5/panelist-3/1"
+                }
+              },
+              "governance": {
+                "value": "allowed",
+                "source": {
+                  "scope": "governance",
+                  "id": "gemini"
+                }
+              }
+            }
+          },
+          "promptEnvelope": {
+            "persona": {
+              "ref": "council-meadows",
+              "delivery": "section",
+              "applied": true,
+              "source": {
+                "scope": "opPolicy"
+              }
+            }
+          },
+          "settledAt": "2026-10-04T13:52:09.172Z",
+          "durationMs": 168819,
+          "claimSha256": "65438b843d09629ab21edfc61ec721e807c98c18f4d213cc568311963af31ad4",
+          "settleReports": [
+            {
+              "path": ".fgos/assignments/unit-run-1791121759834-6c5289d5/panelist-3/1/runs/01/outbox/report-1.md",
+              "sha256": "f4a619f0f5fde9a8aed553fc11498c5d38a4d4a1bbfc9ea8f744cca4f02550d5"
+            }
+          ],
+          "classification": {
+            "execution": {
+              "status": "completed",
+              "exitCode": 0
+            },
+            "assessment": {
+              "verdict": "pass"
+            },
+            "confidence": {
+              "level": "reported",
+              "basis": [
+                "valid-agent-result-claim",
+                "captured-stdout"
+              ]
+            },
+            "failure": null,
+            "policy": {
+              "disposition": "allow",
+              "code": null
+            },
+            "delivery": {
+              "mode": "fresh"
+            },
+            "provenance": "native-v3",
+            "outcome": {
+              "category": "ok",
+              "reason": "completed-pass"
+            }
+          },
+          "runtime": {
+            "exitCode": 0,
+            "stdoutLog": ".fgos/assignments/unit-run-1791121759834-6c5289d5/panelist-3/1/runs/01/stdout.log",
+            "stderrLog": ".fgos/assignments/unit-run-1791121759834-6c5289d5/panelist-3/1/runs/01/stderr.log"
+          },
+          "agentClaim": {
+            "contract": {
+              "id": "agent-result-claim",
+              "version": 2
+            },
+            "status": "done",
+            "summary": "Completed council-meadows evaluation recommending against mechanical dissent/agreement gates in panel.mjs in favor of existing cross-provider independence and reviewed red-team balancing loops.",
+            "evidenceRefs": [
+              "/home/vantt/projects/forgentX/.fgos/assignments/unit-run-1791121759834-6c5289d5/panelist-3/1/runs/01/outbox/report-1.md",
+              "src/runner/execution/patterns/panel.mjs:45-82",
+              "src/runner/execution/patterns/reviewed.mjs:25-26,141-201",
+              "docs/specs/runner.md:14-20,3024"
+            ]
+          },
+          "runnerNote": {
+            "summary": "Settled"
+          },
+          "usage": {
+            "inputTokens": null,
+            "outputTokens": null,
+            "totalTokens": null,
+            "cacheReadTokens": null,
+            "cacheCreationTokens": null,
+            "source": "unsupported"
+          },
+          "evidence": {
+            "gitBefore": "d1e17d074e7accd6ffcd309bf541c52710b3700f",
+            "gitAfter": "d1e17d074e7accd6ffcd309bf541c52710b3700f",
+            "gitBeforeSource": "pre-launch",
+            "changedFiles": [],
+            "mutatedDirtyBeforeFiles": [],
+            "attribution": [
+              {
+                "path": "core/agents/council-meadows.yaml",
+                "firstObserved": "pre-launch",
+                "level": "excluded",
+                "basis": [
+                  "pre-launch-git-status"
+                ],
+                "coverageMatched": false
+              },
+              {
+                "path": "core/agents/council-socrates.yaml",
+                "firstObserved": "pre-launch",
+                "level": "excluded",
+                "basis": [
+                  "pre-launch-git-status"
+                ],
+                "coverageMatched": false
+              },
+              {
+                "path": "core/agents/council-torvalds.yaml",
+                "firstObserved": "pre-launch",
+                "level": "excluded",
+                "basis": [
+                  "pre-launch-git-status"
+                ],
+                "coverageMatched": false
+              },
+              {
+                "path": "plans/journals/2026-10-02-p5-terminology-sweep-and-vocabulary-guard.md",
+                "firstObserved": "pre-launch",
+                "level": "excluded",
+                "basis": [
+                  "pre-launch-git-status"
+                ],
+                "coverageMatched": false
+              }
+            ],
+            "artifacts": [
+              ".fgos/assignments/unit-run-1791121759834-6c5289d5/panelist-3/1/runs/01/outbox/report-1.md",
+              ".fgos/assignments/unit-run-1791121759834-6c5289d5/panelist-3/1/runs/01/outbox/result-1.json"
+            ],
+            "tests": [],
+            "findingRefs": [
+              "/home/vantt/projects/forgentX/.fgos/assignments/unit-run-1791121759834-6c5289d5/panelist-3/1/runs/01/outbox/report-1.md",
+              "src/runner/execution/patterns/panel.mjs:45-82",
+              "src/runner/execution/patterns/reviewed.mjs:25-26,141-201",
+              "docs/specs/runner.md:14-20,3024"
+            ]
+          }
+        },
+        "binding": {
+          "contractVersion": "v1alpha1",
+          "executor": "gemini",
+          "invocation": "agy-herdr-mucdong",
+          "transport": "herdr",
+          "candidateIndex": 2,
+          "tier": "standard",
+          "model": "gemini-3.8-flash-medium",
+          "persona": "council-meadows",
+          "mechanism": "out-of-process",
+          "posture": "read-only",
+          "provenance": {
+            "executor": {
+              "value": "gemini",
+              "source": "capability:architecture:shape"
+            },
+            "invocation": {
+              "value": "agy-herdr-mucdong",
+              "source": "capability:architecture:shape"
+            },
+            "transport": {
+              "value": "herdr",
+              "source": "herdr-invocation-present"
+            },
+            "tier": {
+              "value": "standard",
+              "source": "rigor:standard"
+            },
+            "model": {
+              "value": "gemini-3.8-flash-medium",
+              "source": "resolveTierModel(gemini.standard)"
+            },
+            "persona": {
+              "value": "council-meadows",
+              "source": "override:cli"
+            },
+            "mechanism": {
+              "value": "out-of-process",
+              "source": "checker-role-forced-out-of-process"
+            },
+            "posture": {
+              "value": "read-only",
+              "source": "read-only-ask-or-writes-empty"
+            },
+            "overridesOrigin": {
+              "value": "cli",
+              "source": "override"
+            }
+          }
+        }
+      },
+      {
+        "outcome": "pass",
+        "role": "synthesizer",
+        "round": 1,
+        "runResult": {
+          "contract": {
+            "id": "assignment-run-result",
+            "version": 3
+          },
+          "runId": "run_unit-run-1791121759834-6c5289d5/synthesizer/1_01",
+          "assignmentId": "unit-run-1791121759834-6c5289d5/synthesizer/1",
+          "controlEpoch": 1,
+          "controlToken": "6e4befcb-660e-4b83-a970-d73fe9b15d8c",
+          "executorId": "xai",
+          "adapter": "herdr-spawn",
+          "confinement": null,
+          "role": "synthesizer",
+          "executorRedirected": false,
+          "policy": {
+            "role": "synthesizer",
+            "executorPreference": [
+              "xai"
+            ],
+            "executorId": "xai",
+            "providerModel": "xai",
+            "rigor": "standard",
+            "tier": "standard",
+            "model": "grok-4.3",
+            "reasoningEffort": "medium",
+            "visibility": "headless",
+            "repeatMode": null,
+            "constraints": {
+              "requiresSkills": []
+            },
+            "provenance": {
+              "executor": {
+                "value": "xai",
+                "source": {
+                  "scope": "cliOverride"
+                }
+              },
+              "provider": {
+                "value": "xai",
+                "source": {
+                  "scope": "registeredExecutor",
+                  "id": "xai"
+                }
+              },
+              "model": {
+                "value": "grok-4.3",
+                "source": {
+                  "scope": "cliOverride"
+                }
+              },
+              "rigor": {
+                "value": "standard",
+                "source": {
+                  "scope": "default"
+                }
+              },
+              "tier": {
+                "value": "standard",
+                "source": {
+                  "scope": "rigor",
+                  "id": "standard"
+                }
+              },
+              "reasoningEffort": {
+                "value": "medium",
+                "source": {
+                  "scope": "derived",
+                  "id": "rigor.standard"
+                }
+              },
+              "persona": {
+                "source": {
+                  "scope": "default"
+                }
+              },
+              "visibility": {
+                "value": "headless",
+                "source": {
+                  "scope": "default"
+                }
+              },
+              "repeatMode": {
+                "value": null,
+                "source": {
+                  "scope": "default"
+                }
+              },
+              "constraints": {
+                "value": {
+                  "requiresSkills": []
+                },
+                "source": {
+                  "scope": "assignment",
+                  "id": "unit-run-1791121759834-6c5289d5/synthesizer/1"
+                }
+              },
+              "governance": {
+                "value": "allowed",
+                "source": {
+                  "scope": "governance",
+                  "id": "xai"
+                }
+              }
+            }
+          },
+          "settledAt": "2026-10-04T13:53:05.563Z",
+          "durationMs": 56291,
+          "claimSha256": "a594f119a25a91c7df0418eec22385ce5cd4778fed05b13a1407fe34420bddea",
+          "settleReports": [
+            {
+              "path": ".fgos/assignments/unit-run-1791121759834-6c5289d5/synthesizer/1/runs/01/outbox/report-1.md",
+              "sha256": "3036d73802808e1442ae8f40c65ff1f8143fbc60ff1be498ba0952e835367621"
+            }
+          ],
+          "classification": {
+            "execution": {
+              "status": "completed",
+              "exitCode": 0
+            },
+            "assessment": {
+              "verdict": "pass"
+            },
+            "confidence": {
+              "level": "reported",
+              "basis": [
+                "valid-agent-result-claim",
+                "captured-stdout"
+              ]
+            },
+            "failure": null,
+            "policy": {
+              "disposition": "allow",
+              "code": null
+            },
+            "delivery": {
+              "mode": "fresh"
+            },
+            "provenance": "native-v3",
+            "outcome": {
+              "category": "ok",
+              "reason": "completed-pass"
+            }
+          },
+          "runtime": {
+            "exitCode": 0,
+            "stdoutLog": ".fgos/assignments/unit-run-1791121759834-6c5289d5/synthesizer/1/runs/01/stdout.log",
+            "stderrLog": ".fgos/assignments/unit-run-1791121759834-6c5289d5/synthesizer/1/runs/01/stderr.log"
+          },
+          "agentClaim": {
+            "contract": {
+              "id": "agent-result-claim",
+              "version": 2
+            },
+            "status": "done",
+            "summary": "Read panel/reviewed impl + runner spec; position: add mechanical dissent gates to panel (provider diversity + red-team insufficient for council); 3 reasons with line evidence; change-mind test + next-step prototype.",
+            "evidenceRefs": [
+              "/home/vantt/projects/forgentX/src/runner/execution/patterns/panel.mjs",
+              "/home/vantt/projects/forgentX/src/runner/execution/patterns/reviewed.mjs",
+              "/home/vantt/projects/forgentX/docs/specs/runner.md"
+            ]
+          },
+          "runnerNote": {
+            "summary": "Settled"
+          },
+          "usage": {
+            "inputTokens": null,
+            "outputTokens": null,
+            "totalTokens": null,
+            "cacheReadTokens": null,
+            "cacheCreationTokens": null,
+            "source": "unsupported"
+          },
+          "evidence": {
+            "gitBefore": "d1e17d074e7accd6ffcd309bf541c52710b3700f",
+            "gitAfter": "d1e17d074e7accd6ffcd309bf541c52710b3700f",
+            "gitBeforeSource": "pre-launch",
+            "changedFiles": [],
+            "mutatedDirtyBeforeFiles": [],
+            "attribution": [
+              {
+                "path": "core/agents/council-meadows.yaml",
+                "firstObserved": "pre-launch",
+                "level": "excluded",
+                "basis": [
+                  "pre-launch-git-status"
+                ],
+                "coverageMatched": false
+              },
+              {
+                "path": "core/agents/council-socrates.yaml",
+                "firstObserved": "pre-launch",
+                "level": "excluded",
+                "basis": [
+                  "pre-launch-git-status"
+                ],
+                "coverageMatched": false
+              },
+              {
+                "path": "core/agents/council-torvalds.yaml",
+                "firstObserved": "pre-launch",
+                "level": "excluded",
+                "basis": [
+                  "pre-launch-git-status"
+                ],
+                "coverageMatched": false
+              },
+              {
+                "path": "plans/journals/2026-10-02-p5-terminology-sweep-and-vocabulary-guard.md",
+                "firstObserved": "pre-launch",
+                "level": "excluded",
+                "basis": [
+                  "pre-launch-git-status"
+                ],
+                "coverageMatched": false
+              }
+            ],
+            "artifacts": [
+              ".fgos/assignments/unit-run-1791121759834-6c5289d5/synthesizer/1/runs/01/outbox/report-1.md",
+              ".fgos/assignments/unit-run-1791121759834-6c5289d5/synthesizer/1/runs/01/outbox/result-1.json"
+            ],
+            "tests": [],
+            "findingRefs": [
+              "/home/vantt/projects/forgentX/src/runner/execution/patterns/panel.mjs",
+              "/home/vantt/projects/forgentX/src/runner/execution/patterns/reviewed.mjs",
+              "/home/vantt/projects/forgentX/docs/specs/runner.md"
+            ]
+          }
+        },
+        "binding": {
+          "contractVersion": "v1alpha1",
+          "executor": "xai",
+          "invocation": "pi-herdr-vantt",
+          "transport": "herdr",
+          "candidateIndex": 3,
+          "tier": "standard",
+          "model": "grok-4.3",
+          "persona": null,
+          "mechanism": "out-of-process",
+          "posture": "read-only",
+          "provenance": {
+            "executor": {
+              "value": "xai",
+              "source": "capability:architecture:shape"
+            },
+            "invocation": {
+              "value": "pi-herdr-vantt",
+              "source": "capability:architecture:shape"
+            },
+            "transport": {
+              "value": "herdr",
+              "source": "herdr-invocation-present"
+            },
+            "tier": {
+              "value": "standard",
+              "source": "rigor:standard"
+            },
+            "model": {
+              "value": "grok-4.3",
+              "source": "resolveTierModel(xai.standard)"
+            },
+            "persona": {
+              "value": null,
+              "source": "none"
+            },
+            "mechanism": {
+              "value": "out-of-process",
+              "source": "checker-role-forced-out-of-process"
+            },
+            "posture": {
+              "value": "read-only",
+              "source": "read-only-ask-or-writes-empty"
+            }
+          }
+        }
+      }
+    ],
+    "findings": []
+  }
+}
+exit=0 secs=227
