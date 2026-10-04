@@ -40,7 +40,7 @@ Make the `inputs` argument of `runRole` do what `panel.mjs` already assumes.
 
 ## Implementation Steps
 
-0. Verify first, empirically: `src/workflow/runner.mjs:29-31` states `.fgos` is closed to workers
+0. DONE (see reports/step0-worker-read-access.md; works for openai, claude-herdr blocked by an unrelated dialog). Verify first, empirically: `src/workflow/runner.mjs:29-31` states `.fgos` is closed to workers
    (that is why Workflow steps inline prior reports into the objective). The code review found no
    enforcement of that (bwrap `--ro-bind / /`), but a worker-side hook or policy could still block
    it. Have one real herdr worker read an absolute `.fgos/assignments/.../report-1.md` path. If
