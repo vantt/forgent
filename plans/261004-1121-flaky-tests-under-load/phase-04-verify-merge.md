@@ -1,7 +1,7 @@
 ---
 phase: 4
 title: "Nghiệm thu + merge"
-status: pending
+status: completed
 priority: P2
 effort: "0.25d"
 dependencies: [2, 3]
@@ -31,7 +31,7 @@ Chứng minh hết chập chờn và không còn treo; merge `main`.
 
 ## Success Criteria
 
-- [ ] Số liệu trước/sau; suite xanh; merge `main`.
+- [x] Số liệu trước/sau; suite xanh; merge `main`.
 
 ## Risk Assessment
 

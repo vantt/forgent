@@ -102,6 +102,15 @@ function ppidOf(pid, execFile) {
   if (execFile === execFileSync && pid === process.pid && typeof process.ppid === 'number' && process.ppid > 0) {
     return process.ppid;
   }
+  // On Linux the kernel already answers this from /proc: a plain file read
+  // with no subprocess, so it cannot time out. A `ps` that overran
+  // PPID_TIMEOUT_MS on a loaded host cut the walk short at a different hop
+  // in each process, and a claim taken by one `fgos` process then refused
+  // to settle from another ("writer identity mismatch").
+  if (execFile === execFileSync && process.platform === 'linux') {
+    const procParent = procPpidOf(pid);
+    if (procParent !== undefined) return procParent;
+  }
   // Git-for-Windows/MSYS ships a `ps` binary, but it is a different dialect
   // that rejects GNU-style `-o ppid= -p <pid>` outright ("unknown option --
   // o") -- and that failure's stderr has been observed to leak into and
@@ -119,6 +128,23 @@ function ppidOf(pid, execFile) {
   } catch {
     return null;
   }
+}
+
+/** Parent pid of `pid` from /proc/<pid>/stat: null when the process is gone
+ * or the line is unparsable, undefined when /proc is not usable here at all
+ * (so the caller falls back to `ps`). The command name (field 2) is wrapped
+ * in parentheses and may itself contain spaces or parentheses, so fields are
+ * counted from the LAST ")" -- after it come state, then ppid. */
+export function procPpidOf(pid, { readFile = fs.readFileSync } = {}) {
+  let stat;
+  try {
+    stat = readFile(`/proc/${pid}/stat`, 'utf8');
+  } catch (err) {
+    return err.code === 'ENOENT' && fs.existsSync('/proc/self/stat') ? null : undefined;
+  }
+  const afterComm = String(stat).slice(String(stat).lastIndexOf(')') + 1).trim().split(/\s+/);
+  const parsed = Number.parseInt(afterComm[1], 10);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
 }
 
 /**

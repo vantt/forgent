@@ -10,6 +10,7 @@ import os from 'node:os';
 import path from 'node:path';
 import {
   resolveWriterIdentity,
+  procPpidOf,
   REGISTRY,
   ENV,
   PID,
@@ -295,4 +296,39 @@ process.stdout.write(JSON.stringify({ first, second }));
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
+});
+
+// --- /proc parent lookup (Linux): no subprocess, so no timeout under load ---
+
+test('procPpidOf reads the parent pid of a real process from /proc without spawning anything', { skip: process.platform !== 'linux' }, () => {
+  assert.equal(procPpidOf(process.pid), process.ppid);
+});
+
+test('procPpidOf counts fields from the last ")" so a command name with spaces and parentheses cannot shift the ppid', () => {
+  const readFile = () => '4321 (weird ) (name) S 987 4321 4321 0 -1 4194560 100 0 0 0\n';
+  assert.equal(procPpidOf(4321, { readFile }), 987);
+});
+
+test('procPpidOf: null for an unparsable stat line or a vanished process, undefined when /proc itself is not readable', { skip: process.platform !== 'linux' }, () => {
+  assert.equal(procPpidOf(4321, { readFile: () => 'garbage' }), null);
+  assert.equal(procPpidOf(2 ** 31 - 2), null);
+  const denied = () => { throw Object.assign(new Error('denied'), { code: 'EACCES' }); };
+  assert.equal(procPpidOf(4321, { readFile: denied }), undefined);
+});
+
+test('two separate processes resolve the same ancestor identity even when every `ps` call is too slow to finish', { skip: process.platform !== 'linux' }, () => {
+  const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-slow-ps-'));
+  fs.writeFileSync(path.join(binDir, 'ps'), '#!/bin/sh\nsleep 5\n', { mode: 0o755 });
+  const script = `import { resolveWriterIdentity } from ${JSON.stringify(new URL('../../src/util/session-identity.mjs', import.meta.url).href)};
+console.log(JSON.stringify(resolveWriterIdentity(undefined, { env: {} })));`;
+  const env = { ...process.env, PATH: `${binDir}${path.delimiter}${process.env.PATH}` };
+  delete env.FGOS_SESSION_ID;
+  delete env.CLAUDE_CODE_SESSION_ID;
+  const run = () => JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e', script], { env, encoding: 'utf8' }));
+  const first = run();
+  const second = run();
+  assert.deepEqual(second, first);
+  assert.equal(first.source, PID);
+  // Three hops up from the child: this process, its parent, its grandparent.
+  assert.equal(first.id, procPpidOf(process.ppid) ?? process.ppid);
 });

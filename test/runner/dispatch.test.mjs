@@ -6017,12 +6017,24 @@ test('fanoutBatchExecutorCli fires candidates in batch concurrently with overlap
     import { execFileSync } from 'node:child_process';
     import fs from 'node:fs';
 
+    // Concurrency is proven by a rendezvous, not by how long a sleep lasts:
+    // each executor announces itself, then stays inside its execution window
+    // until it has seen the other announce too. A sequential fan-out can
+    // never satisfy that (the first executor would wait for a peer that is
+    // not started until it exits), so it fails here no matter how loaded
+    // the machine is; a concurrent one passes however slow the machine is.
     const start = Date.now();
-    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 3000);
+    fs.writeFileSync(${JSON.stringify(dir)} + '/started-' + process.pid, '');
+    const peersStarted = () => fs.readdirSync(${JSON.stringify(dir)}).filter((n) => n.startsWith('started-')).length;
+    const giveUpAt = Date.now() + 30000;
+    while (peersStarted() < 2 && Date.now() < giveUpAt) {
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 20);
+    }
+    const sawPeer = peersStarted() >= 2;
     execFileSync('git', ['commit', '--allow-empty', '-m', 'fake work'], { stdio: 'ignore' });
     const end = Date.now();
 
-    fs.appendFileSync(${JSON.stringify(logFile)}, JSON.stringify({ start, end, pid: process.pid }) + '\\n');
+    fs.appendFileSync(${JSON.stringify(logFile)}, JSON.stringify({ start, end, pid: process.pid, sawPeer }) + '\\n');
     process.stdout.write(JSON.stringify({ ok: true }));
     process.exit(0);
     `,
@@ -6033,7 +6045,8 @@ test('fanoutBatchExecutorCli fires candidates in batch concurrently with overlap
     capabilities: { 'fgos-coding-implement': { prefer: 'fgos-coding-implement' } },
     executors: { 'fgos-coding-implement': { kind: 'agent', command: process.execPath, args: [scriptPath], allowCrossProvider: true } },
     modelPolicies: { claude: { standard: 'sonnet' }, node: { standard: 'sonnet' } },
-    timeoutMs: 5000,
+    // Only a fuse: the rendezvous above gives up after 30s on its own.
+    timeoutMs: 60000,
   });
 
   addWork(fgosDir, {
@@ -6064,20 +6077,15 @@ test('fanoutBatchExecutorCli fires candidates in batch concurrently with overlap
   const result = await fanoutBatchExecutorCli(['cand1', 'cand2'], { repoRoot, hasLiveTaskAccess: false });
 
   assert.equal(result.fired.length, 2);
-  assert.equal(result.fired[0].status, 0);
-  assert.equal(result.fired[1].status, 0);
+  assert.equal(result.fired[0].status, 0, JSON.stringify(result.fired[0]));
+  assert.equal(result.fired[1].status, 0, JSON.stringify(result.fired[1]));
 
   const lines = fs.readFileSync(logFile, 'utf8').trim().split('\n').map((l) => JSON.parse(l));
   assert.equal(lines.length, 2);
 
-  // Assert execution windows overlap: max(start1, start2) < min(end1, end2)
-  const [t1, t2] = lines;
-  const overlapStart = Math.max(t1.start, t2.start);
-  const overlapEnd = Math.min(t1.end, t2.end);
-  assert.ok(
-    overlapStart < overlapEnd,
-    `Expected execution windows to overlap, but candidate 1: [${t1.start}, ${t1.end}] and candidate 2: [${t2.start}, ${t2.end}]`,
-  );
+  // Each executor saw the other already started while still inside its own
+  // window, so the two execution windows overlapped.
+  assert.deepEqual(lines.map((l) => l.sawPeer), [true, true], JSON.stringify(lines));
 });
 
 // --- resolveAgentTypeForWork (D20/D22 wiring, review finding H1, tsk-397) ---
