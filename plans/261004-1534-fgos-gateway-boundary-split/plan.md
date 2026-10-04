@@ -71,6 +71,16 @@ Quyết định đi kèm (owner có thể đổi trước khi chạy):
 | Kéo theo sửa logic "nhân tiện" | diff ngoài `use`/path | phase 4 từ chối; mở item khác |
 | Tên crate chung gây tranh cãi | — | phase 1 chốt một tên, ghi lý do một dòng; không bàn thêm |
 
+## Sự thật phase 1 (kiểm 2026-10-04, impact-analysis: degraded, dùng rg)
+
+1. `src/runner/gateway-control.mjs`: cargo `--release --bin herdr-fgos` với `cwd: herdr-plugin/` (`:273`), binary `herdr-plugin/target/release/herdr-fgos` (`:240`), spawn `[binary, 'gateway']` cwd plugin dir. herdr-plugin là crate **standalone** (`Cargo.toml` gốc `exclude`, có `Cargo.lock` + `target/` riêng). Test: `test/runner/gateway-control.test.mjs:260-275`, `test/cli/fgos-gateway.test.mjs:62-66` khẳng định thông báo `no herdr-plugin/ directory found`.
+2. Phụ thuộc chéo: gateway chỉ cần `fgos::{resolve_fgos,is_tier_zero}` (`gateway.rs:382-383`), `settings::read_web_dashboard_settings` (`:1340`), `ports::VerbGateway` (`gateway.rs:38`, `mcp.rs:53`). Plugin cần `fgos` (nhiều), `settings::OrchestratorSettings`, `ports::{WorkItemSource,PaneRegistry,PaneOrchestrator,TerminalUi,UiEvent,WorkerLaneView}`. **`ports.rs` không move nguyên được**: `VerbGateway::run_verb` trả `crate::gateway::GatewayError` (`ports.rs:131`), `TerminalUi` dùng `crate::app::App` (`:4`), `PaneRegistry` dùng `crate::pane_scan` (`:6`), còn `fgos.rs:7` impl `crate::ports::WorkItemSource`. Cách chẻ chỉ-chuyển-chỗ (trait nguyên văn): `WorkItemSource` sang crate chung (`ports.rs` ở đó), `VerbGateway` sang `apps/fgos-gateway/src/ports.rs` (giữ `crate::gateway::GatewayError`), phần còn lại ở plugin.
+3. `build.rs` chỉ `create_dir_all("static")`; `RustEmbed` `#[folder = "static/"]` (`gateway.rs:1270`); `web/package.json` script `bundle` ghi `--outDir ../static` nên đi theo `web/` sang gateway, không đổi.
+4. Inventory ngoài crate: Node `gateway-control.mjs`, `command-registry.mjs:1309`, `registrations.mjs:2786,2798,3198,3252` (comment), `bin-discovery.mjs:71`, `release-binary-path.mjs:3`, `store.mjs:313`, `graph-harness.mjs:85`, `worker-slots.mjs:15`, `bin/fgos.mjs:2251,3618`; Rust `packages/observe/rust/src/metrics_cli/harness.rs:210`; test `gateway-control`, `fgos-gateway`, `gate-bypass:78`, `dead-vocabulary-guard.test.mjs:334-337` (đường `herdr-plugin/src` trong danh sách thư mục quét, phải đổi cùng lúc rename); `.gitignore:87-91`, `Cargo.toml:12`, `AGENTS.md:134`.
+5. `~/.config/herdr/plugins.json`: plugin id `fgos.dashboard`, `plugin_root` và `manifest_path` trỏ `<repo>/herdr-plugin`, source local. Đăng ký lại: `herdr plugin unlink fgos.dashboard && herdr plugin link <repo>/herdr-dashboard` (id trong manifest giữ `fgos.dashboard`).
+6. Tên crate chung: `herdr-fgos-common` (lib `herdr_fgos_common`), vì là lớp adapter CLI fgos + cấu hình dùng chung cho cả hai bên.
+7. Cấu trúc build: gateway và dashboard giữ **standalone** (exclude khỏi workspace gốc, `Cargo.lock` + `target/` riêng). herdr nạp binary từ `$HERDR_PLUGIN_ROOT/target/release/`, `.gitignore` đã tách `target/` theo crate, và giữ nguyên bản khoá phụ thuộc. Crate chung là member workspace gốc; hai crate kia build/test bằng `--manifest-path`. Lệch so với "thêm 2 member" ở phase 2, có chủ đích.
+
 ## Câu hỏi mở
 
 Không có (hai quyết định đi kèm ở trên đã chốt theo đề xuất; owner đổi thì sửa plan trước khi chạy).
