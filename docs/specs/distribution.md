@@ -292,6 +292,17 @@ of it).
 - `fgos doctor`'s `config-not-stale` check on a machine where `fgos setup`
   was never run reports "not configured yet", not an error and not a
   silently-created file.
+- A release tree staged for `fgctl` (`scripts/build-rust-distribution.mjs`)
+  carries the legacy-node payload TOGETHER WITH its production dependencies
+  (the package's `dependencies` and theirs), copied next to the sources, so
+  every verb runs from the installed release alone. Before this, the staged
+  tree held no dependencies and any verb that loads one (`fgos workflow`,
+  found when dogfooding a project that had run `fgctl init`) failed with a
+  missing-package error while `fgos version` and `fgos doctor` still passed.
+  A dependency that is not installed when the tree is built fails the build
+  instead of thinning the payload; two installed copies of one name are
+  refused. The external-consumer CI step runs a dependency-loading verb for
+  this reason, because `version` never imports one.
 
 ## Open Gaps
 

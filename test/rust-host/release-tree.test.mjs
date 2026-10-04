@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 import {
@@ -24,6 +25,38 @@ import { DOCTOR_CHECKS } from '../../src/setup/checks.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const DEPENDENCY_DIR = 'node' + '_modules';
+
+test('the staged legacy-node payload carries its production dependencies and can load them', () => {
+  const tempOut = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-rel-deps-'));
+  const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-rel-deps-work-'));
+  try {
+    buildRustDistribution({ outDir: tempOut, repoRoot: REPO_ROOT });
+    const legacyNodeDir = path.join(tempOut, 'libexec', 'legacy-node');
+    const declared = Object.keys(JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'package.json'), 'utf8')).dependencies ?? {});
+    assert.ok(declared.length > 0, 'the checkout declares at least one runtime dependency');
+
+    const manifest = JSON.parse(fs.readFileSync(path.join(tempOut, 'manifest.json'), 'utf8'));
+    const listed = new Set(manifest.files.map((f) => f.path));
+    for (const dep of declared) {
+      const rel = `libexec/legacy-node/${DEPENDENCY_DIR}/${dep}/package.json`;
+      assert.ok(fs.existsSync(path.join(tempOut, rel)), `${dep} must be staged next to the legacy-node sources`);
+      assert.ok(listed.has(rel), `${dep} must be listed in manifest files[] so verify covers it`);
+    }
+
+    // A verb that loads a dependency must run from the staged tree alone, with no checkout around it.
+    const res = spawnSync(process.execPath, [path.join(legacyNodeDir, 'bin', 'fgos.mjs'), 'workflow', 'status', '--dir', workDir], {
+      cwd: workDir,
+      encoding: 'utf8',
+      env: { ...process.env, NODE_PATH: '' },
+    });
+    assert.doesNotMatch(`${res.stdout}${res.stderr}`, /Cannot find package/, 'the staged tree resolves its own dependencies');
+  } finally {
+    fs.rmSync(tempOut, { recursive: true, force: true });
+    fs.rmSync(workDir, { recursive: true, force: true });
+  }
+});
 
 test('R1 & R2: Release tree builder stages release tree and produces canonical manifest with reproducible artifactDigest', () => {
   const tempOut = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-rel-test-'));

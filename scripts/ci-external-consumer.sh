@@ -204,6 +204,20 @@ VERSION_OUTPUT="$(
   exit 1
 }
 
+# A verb that loads a runtime dependency (workflow imports the yaml package) must run from the
+# installed release alone. `version` above never imports it, so only this step catches a release
+# tree that shipped without its dependencies.
+WORKFLOW_OUTPUT="$(
+  cd "$TEMP_PROJECT" &&
+  .fgos/installation/bin/fgos workflow status 2>&1 || true
+)"
+case "$WORKFLOW_OUTPUT" in
+  *"Cannot find package"*)
+    echo "Step failed: .fgos/installation/bin/fgos workflow status cannot load a runtime dependency: $WORKFLOW_OUTPUT" >&2
+    exit 1
+    ;;
+esac
+
 FGOS_BASENAME="$(basename "$FGOS_TARBALL")"
 SHA_RECORD="$(awk -v f="$FGOS_BASENAME" '{ n = $2; sub(/^\*/, "", n); sub(/^dist\//, "", n); if (n == f) { print $1; exit } }' "$ASSETS_DIR/SHA256SUMS")"
 if [ -z "$SHA_RECORD" ]; then
