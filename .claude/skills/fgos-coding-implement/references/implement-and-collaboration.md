@@ -19,18 +19,18 @@ its answer:
 - **`out-of-process`** — dispatch via `node src/runner/dispatch.mjs
   execute <executorId> --prompt "..." --has-live-task-access` instead of
   writing the change yourself; read the result's `stdout` as the work
-  product. **Commit ownership shifts here:** per
+  product. **Commit ownership:** per
   `../_shared/coding-worker-contract.md`'s Layer 2 rules, the dispatched
-  worker already ran the item's own verify and committed its own change
-  before returning — you do NOT run Verify/Commit yourself for this
-  mechanism. Confirm the worker's own commit is real (`git log -1` shows
-  a new commit citing this item, `git status` is clean) and read `verifiedSha`
-  from the `execute` call's JSON stdout if present, then skip
-  straight to Step 4's Iron Law classification against that commit. If
-  the worker returned `[BLOCKED]` or the tree is not clean, that is a
-  driver-side problem to handle (park the item / retry dispatch) — never
-  silently run Verify/Commit yourself to paper over a worker that didn't
-  finish its own half.
+  worker ran the item's own verify and left its edits in the worktree —
+  it never commits. You commit them in Step 4, exactly as you would your
+  own change; you do NOT re-run Verify (the worker already did). Check
+  `git status` shows the worker's changes (an empty status means the
+  worker changed nothing, or committed itself — read `git log -1` before
+  deciding). If the worker returned `[BLOCKED]`, that is a driver-side
+  problem to handle (park the item / retry dispatch) — never write the
+  change yourself to paper over a worker that didn't finish its own half.
+  `verifiedSha` from the `execute` call names the worker's own tip, which
+  your Step 4 commit moves past — call `fgos return` bare after you commit.
 
 Either way, before editing a symbol yourself, apply `CLAUDE.md`'s
 impact-analysis capability gate rather than assuming GitNexus is on this

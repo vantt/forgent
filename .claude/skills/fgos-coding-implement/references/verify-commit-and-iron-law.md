@@ -34,14 +34,11 @@ earlier plan.md/CONTEXT.md commits), so the classification comes back
 skipping `iron-law-evidence.md` and forcing a retroactive scramble to
 reconstruct proof once `approve` correctly catches it later. So:
 
-**If mechanism was `out-of-process`**: the worker already committed its
-own change per the Hard rule — do NOT `git add`/`git commit` again here
-(the tree is already clean; a second commit attempt on a clean tree
-fails or no-ops). Skip straight to the classification step below,
-against the worker's own commit.
-
-**Otherwise** (you did the work yourself): `git add` and `git commit`
-the real implementation (and its now-passing verify from Step 3) FIRST —
+Commit the real implementation (and its now-passing verify from Step 3)
+FIRST — for an `out-of-process` mechanism that means the edits the worker
+left in the worktree (the worker never commits; if `git status` is already
+clean because an older worker committed itself, skip the commit and
+classify against that commit) —
 
 ```bash
 git add <files this item actually changed>
