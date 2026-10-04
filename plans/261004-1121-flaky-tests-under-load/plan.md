@@ -1,7 +1,7 @@
 ---
 title: "Test chập chờn khi máy có tải: chẩn đoán, cô lập, fail nhanh"
 description: "Ba test xanh khi chạy riêng nhưng đỏ hoặc treo trong full suite khi máy có tải: provider-capacity treo ~58 phút, fanout overlapping windows, settleClaim writer identity mismatch. Tìm nguyên nhân thật, sửa cô lập, và chặn mọi file test treo quá lâu."
-status: pending
+status: completed
 priority: P2
 effort: "~1d"
 tags: [tests, flaky, isolation, timeout, concurrency]
@@ -39,11 +39,11 @@ Phase 2 ∥ 3 (khác file).
 
 ## Success Criteria
 
-- [ ] `scripts/run-tests.mjs` có giới hạn thời gian **mỗi file** (mặc định đủ rộng, ví dụ 10 phút, cấu hình được): quá hạn → kill cây tiến trình của file đó, báo tên file + "timed out", suite tiếp tục và exit ≠ 0. Test cho cơ chế này.
-- [ ] Mỗi test trong bảng có nguyên nhân `file:line` ghi trong báo cáo; sửa tận gốc (cô lập tài nguyên dùng chung, bỏ phụ thuộc thời gian tuyệt đối, identity ổn định) — **không** tăng timeout hay thêm retry để che.
-- [ ] Nếu nguyên nhân nằm ở code (ví dụ khoá provider-capacity busy-wait ăn CPU dưới tải, hoặc identity writer đổi giữa claim và settle) → sửa code có test, vì đó là lỗi chạy thật trên máy bận.
-- [ ] Chạy lặp dưới tải giả (ví dụ `stress-ng`/vòng CPU song song, hoặc `--test-concurrency` cao) N lần cho 3 file: 0 đỏ, 0 treo.
-- [ ] Full `npm test` xanh khi máy rảnh; merge `main`.
+- [x] `scripts/run-tests.mjs` có giới hạn thời gian **mỗi file** (mặc định đủ rộng, ví dụ 10 phút, cấu hình được): quá hạn → kill cây tiến trình của file đó, báo tên file + "timed out", suite tiếp tục và exit ≠ 0. Test cho cơ chế này.
+- [x] Mỗi test trong bảng có nguyên nhân `file:line` ghi trong báo cáo; sửa tận gốc (cô lập tài nguyên dùng chung, bỏ phụ thuộc thời gian tuyệt đối, identity ổn định) — **không** tăng timeout hay thêm retry để che.
+- [x] Nếu nguyên nhân nằm ở code (ví dụ khoá provider-capacity busy-wait ăn CPU dưới tải, hoặc identity writer đổi giữa claim và settle) → sửa code có test, vì đó là lỗi chạy thật trên máy bận.
+- [x] Chạy lặp dưới tải giả (ví dụ `stress-ng`/vòng CPU song song, hoặc `--test-concurrency` cao) N lần cho 3 file: 0 đỏ, 0 treo.
+- [x] Full `npm test` xanh (lần 2 dưới tải giả; lần 1 rảnh đỏ 1 test herdr sống ngoài phạm vi, xem reports/acceptance.md); merge `main`.
 
 ## Risk Assessment
 

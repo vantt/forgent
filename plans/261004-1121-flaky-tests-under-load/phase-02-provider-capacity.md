@@ -1,7 +1,7 @@
 ---
 phase: 2
 title: "Sửa provider-capacity"
-status: pending
+status: completed
 priority: P2
 effort: "0.25d"
 dependencies: [1]
@@ -35,7 +35,7 @@ Tìm vì sao `provider-capacity.test.mjs` treo cả file dưới tải dù mỗi
 
 ## Success Criteria
 
-- [ ] Nguyên nhân có `file:line`; chạy lặp dưới tải sạch.
+- [x] Nguyên nhân có `file:line`; chạy lặp dưới tải sạch.
 
 ## Risk Assessment
 

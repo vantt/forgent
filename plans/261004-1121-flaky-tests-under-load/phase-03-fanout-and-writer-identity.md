@@ -1,7 +1,7 @@
 ---
 phase: 3
 title: "Sửa fanout + writer identity"
-status: pending
+status: completed
 priority: P2
 effort: "0.25d"
 dependencies: [1]
@@ -31,7 +31,7 @@ Hai test còn lại: phụ thuộc thời gian (fanout) và identity writer đ�
 
 ## Success Criteria
 
-- [ ] Hai nguyên nhân có `file:line`; chạy lặp dưới tải sạch.
+- [x] Hai nguyên nhân có `file:line`; chạy lặp dưới tải sạch.
 
 ## Risk Assessment
 
