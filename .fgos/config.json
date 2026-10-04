@@ -14,9 +14,7 @@
         "--model",
         "{model}",
         "--permission-mode",
-        "acceptEdits",
-        "--allowedTools",
-        "Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)"
+        "acceptEdits"
       ]
     },
     "capabilities": {
@@ -521,9 +519,7 @@
               "--model",
               "{model}",
               "--permission-mode",
-              "acceptEdits",
-              "--allowedTools",
-              "Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)"
+              "acceptEdits"
             ]
           },
           {
@@ -561,9 +557,7 @@
               "--model",
               "{model}",
               "--permission-mode",
-              "acceptEdits",
-              "--allowedTools",
-              "Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)"
+              "acceptEdits"
             ],
             "env": {
               "ANTHROPIC_BASE_URL": "https://openrouter.ai/api",

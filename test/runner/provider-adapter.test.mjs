@@ -170,7 +170,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
 
   describe('per-provider family rendering, applied statuses, and policyShapedFlags', () => {
     describe('Claude CLI family', () => {
-      test('claude baseline: model, permission-mode, allowedTools', () => {
+      test('claude baseline: model, permission-mode, no tool allowlist (the worker holds no git grant)', () => {
         const template = cfg.executors.claude.invocations[0].args;
         const res = renderProviderInvocation({
           providerFamily: 'claude',
@@ -183,13 +183,13 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
         assert.equal(res.command, 'claude');
         assert.equal(res.applied.model, 'applied');
         assert.equal(res.applied.reasoningEffort, 'unsupported');
-        assert.equal(res.applied.toolIntent, 'applied-via-allowedTools');
+        assert.equal(res.applied.toolIntent, 'unsupported');
         assert.equal(res.applied.readOnly, 'unsupported');
         assert.equal(res.applied.persona, 'unsupported');
 
         assert.ok(res.policyShapedFlags.includes('--model'));
         assert.ok(res.policyShapedFlags.includes('--permission-mode'));
-        assert.ok(res.policyShapedFlags.includes('--allowedTools'));
+        assert.ok(!res.policyShapedFlags.includes('--allowedTools'));
         assert.ok(!res.policyShapedFlags.includes('--effort'));
       });
 
@@ -409,12 +409,12 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
 
         assert.equal(res.command, 'claude');
         assert.equal(res.applied.model, 'applied');
-        assert.equal(res.applied.toolIntent, 'applied-via-allowedTools');
+        assert.equal(res.applied.toolIntent, 'unsupported');
         assert.equal(res.envPatch.ANTHROPIC_BASE_URL, 'https://openrouter.ai/api');
         assert.equal(res.envPatch.ANTHROPIC_MODEL, 'z-ai/glm-5.2');
         assert.ok(res.policyShapedFlags.includes('--model'));
         assert.ok(res.policyShapedFlags.includes('--permission-mode'));
-        assert.ok(res.policyShapedFlags.includes('--allowedTools'));
+        assert.ok(!res.policyShapedFlags.includes('--allowedTools'));
       });
     });
 

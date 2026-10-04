@@ -180,16 +180,14 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '--model',
       'haiku',
       '--permission-mode',
-      'acceptEdits',
-      '--allowedTools',
-      'Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)'
+      'acceptEdits'
     ],
     envKeys: [],
     resourceBindings: [],
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
-    readOnlyMechanism: 'tool-allowlist-not-read-only-enforced'
+    readOnlyMechanism: 'none'
   },
   {
     selector: 'claude',
@@ -204,16 +202,14 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '--model',
       'sonnet',
       '--permission-mode',
-      'acceptEdits',
-      '--allowedTools',
-      'Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)'
+      'acceptEdits'
     ],
     envKeys: [],
     resourceBindings: [],
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
-    readOnlyMechanism: 'tool-allowlist-not-read-only-enforced'
+    readOnlyMechanism: 'none'
   },
   {
     selector: 'claude',
@@ -228,16 +224,14 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '--model',
       'fable',
       '--permission-mode',
-      'acceptEdits',
-      '--allowedTools',
-      'Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)'
+      'acceptEdits'
     ],
     envKeys: [],
     resourceBindings: [],
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
-    readOnlyMechanism: 'tool-allowlist-not-read-only-enforced'
+    readOnlyMechanism: 'none'
   },
   {
     selector: 'claude-reviewer',
@@ -1080,9 +1074,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '--model',
       'z-ai/glm-5.2',
       '--permission-mode',
-      'acceptEdits',
-      '--allowedTools',
-      'Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)'
+      'acceptEdits'
     ],
     envKeys: [
       'ANTHROPIC_BASE_URL',
@@ -1097,7 +1089,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
-    readOnlyMechanism: 'tool-allowlist-not-read-only-enforced'
+    readOnlyMechanism: 'none'
   },
   {
     selector: 'glm-cli',
@@ -1112,9 +1104,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '--model',
       'z-ai/glm-5.2',
       '--permission-mode',
-      'acceptEdits',
-      '--allowedTools',
-      'Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)'
+      'acceptEdits'
     ],
     envKeys: [
       'ANTHROPIC_BASE_URL',
@@ -1129,7 +1119,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
-    readOnlyMechanism: 'tool-allowlist-not-read-only-enforced'
+    readOnlyMechanism: 'none'
   },
   {
     selector: 'glm-cli',
@@ -1144,9 +1134,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '--model',
       'z-ai/glm-5.2',
       '--permission-mode',
-      'acceptEdits',
-      '--allowedTools',
-      'Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)'
+      'acceptEdits'
     ],
     envKeys: [
       'ANTHROPIC_BASE_URL',
@@ -1161,7 +1149,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
-    readOnlyMechanism: 'tool-allowlist-not-read-only-enforced'
+    readOnlyMechanism: 'none'
   }
 ];
 
@@ -1259,12 +1247,14 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
       for (const tier of tiers) {
         // codex-readonly was retired in Phase 6 (posture is enforced via OS confinement)
 
-        for (const toolGated of ['claude', 'glm-cli']) {
-          const row = resolveSnapshotRowByLabel(cfg, toolGated, tier, throwawayDir);
+        // claude/glm-cli no longer carry an allowlist (workers hold no git
+        // grant; the runner commits), so they report no read-only mechanism.
+        for (const ungranted of ['claude', 'glm-cli']) {
+          const row = resolveSnapshotRowByLabel(cfg, ungranted, tier, throwawayDir);
           assert.equal(
             row.readOnlyMechanism,
-            'tool-allowlist-not-read-only-enforced',
-            `${toolGated} [${tier}] readOnlyMechanism must be tool-allowlist-not-read-only-enforced`
+            'none',
+            `${ungranted} [${tier}] readOnlyMechanism must be none`
           );
         }
 

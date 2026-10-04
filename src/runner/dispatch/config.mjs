@@ -192,8 +192,6 @@ export const DEFAULT_RUNNER_CONFIG = {
       '{model}',
       '--permission-mode',
       'acceptEdits',
-      '--allowedTools',
-      'Bash(git add:*),Bash(git commit:*)',
     ],
   },
   // tsk-5tm-5 D9: modelPolicies replaces the old flat `models` map --

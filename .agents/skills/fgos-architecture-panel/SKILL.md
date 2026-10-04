@@ -136,11 +136,11 @@ Each step's outputs are clean inputs for downstream steps, ensuring independent 
 > result means `resolveExecutorConfig`'s fallback
 > (`src/runner/dispatch/resolve.mjs:399`) is silently substituting the
 > **global default executor** instead — in this repository that is
-> `claude -p {prompt} --model {model} --permission-mode acceptEdits
-> --allowedTools Bash(git add:*),Bash(git commit:*),...`, a mutating,
-> git-write-enabled invocation, the exact shape P00.1 spent its whole
-> cell falsifying and excluding (`claude-reviewer`); do not forward the
-> roster through `fgos coordination run` while that is the answer.
+> `claude -p {prompt} --model {model} --permission-mode acceptEdits`, a
+> mutating, unconfined invocation (it can write files in the worktree), the
+> exact shape P00.1 spent its whole cell falsifying and excluding
+> (`claude-reviewer`); do not forward the roster through `fgos
+> coordination run` while that is the answer.
 >
 > **`codex-readonly` is retired for dispatch — never bind it to a role.**
 > `-s read-only` has no writable-exception mechanism, so a dispatched

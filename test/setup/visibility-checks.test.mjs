@@ -7,6 +7,7 @@ import {
   checkHerdrAvailable,
   checkTrustStoreWritable,
   checkExecutorConfinement,
+  checkInvocationGitWriteGrants,
   checkConfinedPaneAccounts,
   checkHerdrExecutorKinds,
   readHerdrAgentKinds,
@@ -296,4 +297,27 @@ test('checkConfinedPaneAccounts has nothing to say when no herdr invocation bind
   const r = checkConfinedPaneAccounts({ executors: { a: { invocations: [{ id: 'x', adapter: 'herdr-spawn' }] } } });
   assert.equal(r.passed, true);
   assert.match(r.message, /no confined herdr invocation binds a private home/);
+});
+
+test('checkInvocationGitWriteGrants passes when no executor or invocation grants git add/commit', () => {
+  const r = checkInvocationGitWriteGrants({
+    executor: { command: 'claude', args: ['-p', '{prompt}', '--permission-mode', 'acceptEdits'] },
+    executors: { a: { invocations: [{ id: 'x', args: ['--allowedTools', 'Bash(rg:*)'] }] } },
+  });
+  assert.equal(r.passed, true);
+  assert.doesNotMatch(r.message, /warning/);
+});
+
+test('checkInvocationGitWriteGrants warns, naming each executor and invocation that still grants git add/commit (bare or rtk-wrapped)', () => {
+  const r = checkInvocationGitWriteGrants({
+    executor: { command: 'claude', args: ['--allowedTools', 'Bash(git add:*),Bash(git commit:*)'] },
+    executors: {
+      claude: { invocations: [{ id: 'claude-cli', args: ['--allowedTools', 'Bash(rtk git commit:*)'] }, { id: 'clean', args: ['--allowedTools', 'Bash(rg:*)'] }] },
+    },
+  });
+  assert.equal(r.passed, true, 'a warning never fails doctor');
+  assert.match(r.message, /^warning: /);
+  assert.match(r.message, /executor,/);
+  assert.match(r.message, /executors\.claude\.invocations\.claude-cli/);
+  assert.doesNotMatch(r.message, /clean/);
 });
