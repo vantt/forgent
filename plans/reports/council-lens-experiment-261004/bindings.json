@@ -1,0 +1,55 @@
+{
+  "panelist-1/1": [
+    {
+      "executor": "claude-herdr",
+      "candidateIndex": 0,
+      "persona": "council-socrates",
+      "transport": "herdr",
+      "posture": "read-only",
+      "fallbackFrom": null
+    }
+  ],
+  "panelist-2/1": [
+    {
+      "executor": "openai",
+      "candidateIndex": 1,
+      "persona": "council-torvalds",
+      "transport": "herdr",
+      "posture": "read-only",
+      "fallbackFrom": null
+    }
+  ],
+  "panelist-3/1": [
+    {
+      "executor": "gemini",
+      "candidateIndex": 2,
+      "persona": "council-meadows",
+      "transport": "herdr",
+      "posture": "read-only",
+      "fallbackFrom": null
+    },
+    {
+      "executor": "xai",
+      "candidateIndex": 3,
+      "persona": "council-meadows",
+      "transport": "herdr",
+      "posture": "read-only",
+      "fallbackFrom": {
+        "executor": "gemini",
+        "invocation": "agy-herdr-mucdong",
+        "transport": "herdr",
+        "reason": "provider-limit"
+      }
+    }
+  ],
+  "synthesizer/1": [
+    {
+      "executor": "glm-herdr",
+      "candidateIndex": 4,
+      "persona": null,
+      "transport": "herdr",
+      "posture": "read-only",
+      "fallbackFrom": null
+    }
+  ]
+}
