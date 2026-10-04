@@ -617,6 +617,31 @@ test('the panel synthesizer runs on a provider family none of the panelists used
   assert.ok(!members.includes(synth.runResult.executorId), 'synthesizer shares a provider family with a panelist');
 });
 
+test('the panel synthesizer is told to read every panelist report; the panelists are told nothing', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma', 'delta']);
+  const res = await runUnit({
+    unitData: { id: 'u-panel-refs', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel' },
+    repoRoot,
+    cwd: worktreeDir,
+    worktree: worktreeDir,
+    pattern: 'panel',
+  });
+  assert.equal(res.outcome, 'pass');
+  const assignmentOf = (role) =>
+    JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'assignments', res.unitRunId, role, '1', 'assignment.json'), 'utf8'));
+
+  const refs = assignmentOf('synthesizer').contextRefs;
+  assert.equal(refs.length, 3, `synthesizer refs: ${JSON.stringify(refs)}`);
+  for (const [i, ref] of refs.entries()) {
+    assert.ok(path.isAbsolute(ref), `ref is absolute: ${ref}`);
+    assert.ok(ref.includes(`/panelist-${i + 1}/`), `ref ${i} points at panelist-${i + 1}: ${ref}`);
+    assert.ok(/(report-\d+|agent-report)\.md$/.test(ref), `ref is a report: ${ref}`);
+    assert.ok(fs.existsSync(ref), `ref exists: ${ref}`);
+  }
+  for (const n of [1, 2, 3]) assert.deepEqual(assignmentOf(`panelist-${n}`).contextRefs, []);
+});
+
 test('a panel whose every provider family is taken by panelists refuses the synthesizer', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma']);

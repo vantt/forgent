@@ -12,6 +12,7 @@ import { runPattern } from './patterns/index.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { ensureRunnerConfigForDir, RunnerConfigError } from '../dispatch/config.mjs';
 import { commitUnitWork } from './commit-unit-work.mjs';
+import { contextRefsFromRoleResults } from './role-input-refs.mjs';
 import { reapOrphanedConfinementResources, resolveConfinementTempRoot } from '../dispatch/confinement/cleanup.mjs';
 
 /**
@@ -296,7 +297,7 @@ export async function runUnit(options = {}) {
   const persistUnitRecord = () => writeJsonAtomic(path.join(unitDir, 'unit.json'), unitRecord);
 
   // One dispatch of an already-bound role. Returns the settled outcome of that attempt.
-  const dispatchBound = async ({ bound, role, round, readOnly, assignmentId, assignmentDir, session }) => {
+  const dispatchBound = async ({ bound, role, round, readOnly, assignmentId, assignmentDir, session, inputs = [] }) => {
     const runnerConfig = unitRecord.configSnapshot.runner;
     fs.mkdirSync(assignmentDir, { recursive: true });
 
@@ -316,7 +317,9 @@ export async function runUnit(options = {}) {
         binding: bound,
       },
       expectedOutputs: unit.expectedOutputs || [],
-      contextRefs: unit.inputs || [],
+      // What the unit names, then the accounts of the roles whose work this role judges
+      // (a panel synthesizer reads its panelists' reports).
+      contextRefs: [...(unit.inputs || []), ...contextRefsFromRoleResults(inputs, mainRoot)],
       writes: unit.writes || [],
       policy: {
         tier: bound.tier,
@@ -437,7 +440,7 @@ export async function runUnit(options = {}) {
         persistUnitRecord();
       }
 
-      const result = await dispatchBound({ bound, role, round, readOnly, assignmentId, assignmentDir, session });
+      const result = await dispatchBound({ bound, role, round, readOnly, assignmentId, assignmentDir, session, inputs });
 
       // The worker only writes files; this trusted code, outside the confinement, commits them.
       // No change is recorded as such, and a commit that cannot be made fails the round.
