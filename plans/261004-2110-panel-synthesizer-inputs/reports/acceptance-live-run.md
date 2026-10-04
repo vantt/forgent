@@ -48,3 +48,19 @@ synthesizer xai), outcome pass:
 - Copy: `acceptance-synthesizer-report.md`.
 
 One live run only. Phase 2 trigger (refs ignored) not met; closed as not needed unless a later run shows refs ignored.
+
+## Update 22:17 — deepseek through OpenRouter, same key as glm
+
+`.fgos/config.json`: both deepseek invocations now carry `OPENROUTER_API_KEY: "${GLM_OPENROUTER_API_KEY}"` (only the
+variable name is committed; the value lives in the untracked `.fgos/secrets.local.env`). pi reads
+`OPENROUTER_API_KEY` for OpenRouter. The runner process needs that variable in its environment: nothing in the repo
+loads the secrets file, so the run above exported it in a child shell for that one command.
+
+Run `unit-run-1791126838232-96f54c6b` (panelists openai, gemini, xai; synthesizer deepseek via OpenRouter):
+- deepseek (`deepseek/deepseek-v4-flash`) ran, no more "No API key" error.
+- It read all three panelist reports and its synthesis names and reconciles each panelist's position. Second live
+  confirmation that the synthesizer uses the refs, on a different provider.
+- Run outcome is still `execution-failure`: deepseek could not write its report (`EROFS` on `runs/01/agent-report.md`
+  and `agent-result.json`), so the runner saw no evidence (`verdict-inconclusive`). deepseek only has cli-spawn
+  invocations, and a cli-spawn worker's writable place is `worker-output/outbox`, while it tried the flat run
+  directory. Not caused by this change; not investigated further. Separate item.
