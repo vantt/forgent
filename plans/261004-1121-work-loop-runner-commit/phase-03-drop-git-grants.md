@@ -1,7 +1,7 @@
 ---
 phase: 3
 title: "Bỏ quyền git + xoá ngoại lệ 0051"
-status: pending
+status: completed
 priority: P2
 effort: "0.25d"
 dependencies: [2]

@@ -1,7 +1,7 @@
 ---
 phase: 2
 title: "Runner commit trong Work loop"
-status: pending
+status: completed
 priority: P2
 effort: "0.5d"
 dependencies: [1]

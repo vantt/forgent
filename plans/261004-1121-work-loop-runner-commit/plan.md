@@ -1,7 +1,7 @@
 ---
 title: "Work loop chuyển sang runner commit, bỏ quyền git của mọi worker"
 description: "Coding worker của Work loop (src/runner/loop.mjs) còn tự git add/commit nên invocation vẫn phải cấp Bash(git add/commit) (ngoại lệ 0051). Chuyển commit về runner (tái dùng commit-unit-work.mjs) như đường fgos run, rồi bỏ quyền git ở mọi nơi và xoá ngoại lệ."
-status: pending
+status: completed
 priority: P2
 effort: "~1–1.5d"
 tags: [work-loop, runner-commit, allowedTools, security, contract]
