@@ -1,10 +1,11 @@
 use std::collections::HashSet;
 
-use crate::fgos::{merge_tree_line_count, MergeListSummary, MergeTreeNode};
+use herdr_fgos_common::fgos::{merge_tree_line_count, MergeListSummary, MergeTreeNode};
 use crate::layout::OperationPanes;
 use crate::pane_scan::{task_id_map, PaneIdentity, PaneSnapshot};
-use crate::ports::{PaneRegistry, WorkItemSource};
-use crate::settings::OrchestratorSettings;
+use crate::ports::PaneRegistry;
+use herdr_fgos_common::ports::WorkItemSource;
+use herdr_fgos_common::settings::OrchestratorSettings;
 
 /// tsk-417 D3: NEED ANSWER box row — `status` is `"blocked"` (ERR tag) or
 /// `"awaiting-human"` (ASK tag), one box, distinct sub-tag per row.
@@ -957,7 +958,7 @@ impl App {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::fgos::{DoingRow, FgosError, TriageRow};
+    use herdr_fgos_common::fgos::{DoingRow, FgosError, TriageRow};
     use std::collections::HashMap;
 
     struct FakeSource {
@@ -973,11 +974,11 @@ mod tests {
             Ok(Vec::new())
         }
 
-        fn fetch_need_answer(&self) -> Result<Vec<crate::fgos::NeedAnswerRow>, FgosError> {
+        fn fetch_need_answer(&self) -> Result<Vec<herdr_fgos_common::fgos::NeedAnswerRow>, FgosError> {
             Ok(Vec::new())
         }
 
-        fn fetch_after_deliver(&self) -> Result<Vec<crate::fgos::AfterDeliverRow>, FgosError> {
+        fn fetch_after_deliver(&self) -> Result<Vec<herdr_fgos_common::fgos::AfterDeliverRow>, FgosError> {
             Ok(Vec::new())
         }
 
@@ -1015,7 +1016,7 @@ mod tests {
             }
         }
 
-        fn fetch_need_answer(&self) -> Result<Vec<crate::fgos::NeedAnswerRow>, FgosError> {
+        fn fetch_need_answer(&self) -> Result<Vec<herdr_fgos_common::fgos::NeedAnswerRow>, FgosError> {
             if self.fail_need_answer {
                 Err(FgosError::ExitStatus("need_answer failed".into()))
             } else {
@@ -1023,7 +1024,7 @@ mod tests {
             }
         }
 
-        fn fetch_after_deliver(&self) -> Result<Vec<crate::fgos::AfterDeliverRow>, FgosError> {
+        fn fetch_after_deliver(&self) -> Result<Vec<herdr_fgos_common::fgos::AfterDeliverRow>, FgosError> {
             if self.fail_after_deliver {
                 Err(FgosError::ExitStatus("after_deliver failed".into()))
             } else {

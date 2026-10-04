@@ -6,14 +6,13 @@ use std::time::{Duration, Instant};
 use serde::Deserialize;
 
 use herdr_fgos::app::{App, Panel, WorkItem};
-use herdr_fgos::fgos::{self, FgosCliSource};
+use herdr_fgos_common::fgos::{self, FgosCliSource};
 use herdr_fgos::layout;
 use herdr_fgos::pane_scan::HerdrPaneScanner;
 use herdr_fgos::pick::{self, HerdrPaneAdapter};
-use herdr_fgos::ports::{
-    PaneOrchestrator, PaneRegistry, TerminalUi, UiEvent, WorkItemSource, WorkerLaneView,
-};
-use herdr_fgos::settings;
+use herdr_fgos::ports::{PaneOrchestrator, PaneRegistry, TerminalUi, UiEvent, WorkerLaneView};
+use herdr_fgos_common::ports::WorkItemSource;
+use herdr_fgos_common::settings;
 use herdr_fgos::ui::RatatuiTerminalUi;
 
 /// Same poll cadence as the existing STR40 bash cockpit's dashboard pane —
@@ -22,17 +21,6 @@ use herdr_fgos::ui::RatatuiTerminalUi;
 const POLL_INTERVAL: Duration = Duration::from_secs(5);
 
 fn main() -> io::Result<()> {
-    // tsk-7l9-2 D1: gateway mode is a separate launch path from the TUI's
-    // default -- `herdr-fgos gateway` never touches the terminal at all
-    // (no `RatatuiTerminalUi::init()` below), it just runs the REST server
-    // to completion. D8: same binary/process either way, chosen at launch
-    // rather than a `--role gateway`/`--role orchestrator` split across
-    // machines.
-    if std::env::args().nth(1).as_deref() == Some("gateway") {
-        let root = fgos::repo_root()?;
-        return herdr_fgos::gateway::run(root);
-    }
-
     // tsk-45u D1: resolved once, up front, so the fixed `fg:operation`
     // tab this dashboard creates at startup (below) and every pane it
     // opens later both start in the same project root.
@@ -718,7 +706,7 @@ mod tests {
     use super::*;
     use std::cell::Cell;
 
-    use herdr_fgos::fgos::{DoingRow, FgosError, TriageRow};
+    use herdr_fgos_common::fgos::{DoingRow, FgosError, TriageRow};
     use herdr_fgos::pane_scan::{PaneIdentity, PaneScanError, PaneSnapshot};
 
     struct CountingSource {
@@ -735,16 +723,16 @@ mod tests {
             Ok(Vec::new())
         }
 
-        fn fetch_need_answer(&self) -> Result<Vec<herdr_fgos::fgos::NeedAnswerRow>, FgosError> {
+        fn fetch_need_answer(&self) -> Result<Vec<herdr_fgos_common::fgos::NeedAnswerRow>, FgosError> {
             Ok(Vec::new())
         }
 
-        fn fetch_after_deliver(&self) -> Result<Vec<herdr_fgos::fgos::AfterDeliverRow>, FgosError> {
+        fn fetch_after_deliver(&self) -> Result<Vec<herdr_fgos_common::fgos::AfterDeliverRow>, FgosError> {
             Ok(Vec::new())
         }
 
-        fn fetch_merge_list(&self) -> Result<herdr_fgos::fgos::MergeListSummary, FgosError> {
-            Ok(herdr_fgos::fgos::MergeListSummary::default())
+        fn fetch_merge_list(&self) -> Result<herdr_fgos_common::fgos::MergeListSummary, FgosError> {
+            Ok(herdr_fgos_common::fgos::MergeListSummary::default())
         }
     }
 
