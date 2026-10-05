@@ -279,6 +279,9 @@ const timer = setInterval(() => {
     account: process.env.FAKE_ACCOUNT_HOME_VAR ? accountReport(process.env[process.env.FAKE_ACCOUNT_HOME_VAR]) : null,
   };
   fs.writeFileSync(path.join(outbox, 'probe-results.json'), JSON.stringify(results));
-  setInterval(() => {}, 1000);
+  // Stay up like a REPL waiting for /exit, but only for a bounded time. The fake herdr kills the
+  // pane's wrapper process on close, not this process inside the sandbox, so an agent that waited
+  // forever outlived its test: hundreds of these piled up, holding gigabytes.
+  setTimeout(() => process.exit(0), 30000);
 }, 50);
 `;
