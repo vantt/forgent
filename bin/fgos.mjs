@@ -4660,7 +4660,11 @@ async function main() {
     // 1 a hard finding present) rather than always-0-unless-thrown -- its own
     // contract, distinct from the StoreError/EXIT_CODES category map every
     // other verb uses for a THROWN refusal.
-    process.exitCode = verb === 'plan-lint' ? (data.ok ? 0 : 1) : 0;
+    // `doctor --strict` is the other data-dependent exit: 1 when any check still fails after
+    // the (optional) fixes ran. Without it doctor stays exit 0 -- fgctl's init/upgrade/repair
+    // tail runs `doctor --fix` and `doctor` and treats a non-zero exit as a degraded install.
+    const doctorFailed = verb === 'doctor' && flags.strict === true && data.checks.some((c) => !c.passed);
+    process.exitCode = verb === 'plan-lint' ? (data.ok ? 0 : 1) : (doctorFailed ? 1 : 0);
   } catch (err) {
     // tsk-5z0: record before reporting, and only say the record exists when
     // one actually landed — `recordInvocationFault` returns null when the

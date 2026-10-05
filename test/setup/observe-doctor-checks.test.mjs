@@ -62,7 +62,27 @@ test('observe-friction-migrated fails when legacy friction exists but no observe
     const res = checkObserveFrictionMigrated(cwd);
     assert.equal(res.passed, false);
     assert.match(res.message, /friction migration not run/);
+    assert.match(res.message, /friction migrate --dir /);
   } finally {
+    fs.rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+test('observe-friction-migrated names the resolved host binary in its fix command', () => {
+  const cwd = mkTempDir();
+  const prev = process.env.FGOS_HOST_BIN;
+  try {
+    const hostBin = path.join(cwd, 'host-bin');
+    fs.writeFileSync(hostBin, '', 'utf8');
+    process.env.FGOS_HOST_BIN = hostBin;
+    const event = { seq: 1, ts: '2026-09-29T10:00:00Z', type: 'work.friction', payload: { id: 'tsk-1' } };
+    fs.writeFileSync(path.join(cwd, '.fgos', 'events.jsonl'), JSON.stringify(event) + '\n', 'utf8');
+    const res = checkObserveFrictionMigrated(cwd);
+    assert.equal(res.passed, false);
+    assert.ok(res.message.includes(`run: ${hostBin} friction migrate --dir `), res.message);
+  } finally {
+    if (prev === undefined) delete process.env.FGOS_HOST_BIN;
+    else process.env.FGOS_HOST_BIN = prev;
     fs.rmSync(cwd, { recursive: true, force: true });
   }
 });

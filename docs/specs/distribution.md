@@ -43,9 +43,12 @@ of it).
 - `fgos setup` (run anywhere) → deprecated legacy compatibility command;
   wires the shell helper's source line into every shell profile the caller
   actually has, and brings the local config file up to date with the current
-  defaults. New workspace onboarding should use `fgctl init` plus local
-  `fgos doctor --fix` and `fgos doctor`; shell/global integration remains
-  legacy setup compatibility until the compatibility-window decision retires it.
+  defaults. New workspace onboarding should use `fgctl init` (with `--from
+  <source>` when `.fgos/distribution.json` is absent) plus local `fgos doctor
+  --fix` and `fgos doctor`; `doctor --fix` runs only registered fixes, so the
+  config defaults, hook wiring and Claude Code hook still come from one `fgos
+  setup` in the project. Shell/global integration remains legacy setup
+  compatibility until the compatibility-window decision retires it.
 - `fgos doctor` (run anywhere) → reports whether the environment is set up
   correctly (Node/git present, shell helper sourced, config up to date).
 
@@ -179,7 +182,9 @@ of it).
 
 - **Blocked when:** never — `fgos doctor` always runs every check and
   reports the result; it never fails the invocation itself, only reports
-  individual checks as passing or not.
+  individual checks as passing or not. Exit stays 0 because `fgctl
+  init|upgrade|repair` run it as their tail and mark the install degraded on
+  a non-zero exit; `--strict` is the opt-in that exits 1 when any check fails.
 - **What changes:** nothing — this is a read-only diagnostic. It never
   writes a config file, never modifies a shell profile, and never installs
   anything, even when a check reports a problem (`config-not-stale`

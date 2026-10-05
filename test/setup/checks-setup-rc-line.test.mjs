@@ -75,7 +75,7 @@ test('setup from a copy of fgos that is not in a git checkout declines the rc wr
 
   assert.equal(result.status, 0, `setup failed: ${result.stderr}`);
   const { data } = JSON.parse(result.stdout);
-  assert.equal(data.deprecation, 'since 2026-09-14; target workspace onboarding uses fgctl init, then .fgos/installation/bin/fgos doctor --fix, then .fgos/installation/bin/fgos doctor; legacy setup remains the compatibility path for shell/global integration until a compatibility-window decision retires it');
+  assert.equal(data.deprecation, 'since 2026-09-14; target workspace onboarding starts with fgctl init (plain fgctl init needs --from <source> when .fgos/distribution.json is absent), then .fgos/installation/bin/fgos doctor --fix and .fgos/installation/bin/fgos doctor; doctor --fix runs only the registered fixes, so run fgos setup once in the project for the config defaults, git hook and Claude Code hook it does not write; shell/global integration stays here until a compatibility-window decision retires it');
   assert.match(data.deprecationMessage, /fgos setup is legacy compatibility/);
   assert.deepEqual(data.rcFilesInserted, []);
   assert.deepEqual(data.rcFilesAlreadyConfigured, []);

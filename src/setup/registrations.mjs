@@ -337,6 +337,14 @@ export function describeNonGitShellIntegration(cwd) {
   };
 }
 
+// A shell started by an agent harness (Claude Code) hands its tools a snapshot of the
+// user's shell functions, and that snapshot can drop underscore-prefixed helpers. The
+// probe below reproduces exactly that, so inside such a shell its verdict says nothing
+// about the user's own terminal and is reported as information, not a failure.
+function insideHarnessShell(env = process.env) {
+  return Boolean(env.CLAUDECODE || env.CLAUDE_CODE_SESSION_ID);
+}
+
 function checkShellIntegrationSourced(cwd) {
   const scriptPath = integrationScriptPath();
   if (scriptPath === null) {
@@ -366,6 +374,7 @@ function checkShellIntegrationSourced(cwd) {
   // somewhere (missing.length < rcFiles.length) -- the failure mode lives
   // in the shared script itself, not in which rc file references it, so
   // one probe against scriptPath covers every rc file that sources it.
+  let harnessProbeNote = '';
   if (missing.length < rcFiles.length) {
     // FGOS_SHELL_INTEGRATION_PROBE_SCRIPT (test-only seam, mirrors
     // FGOS_CLAUDE_COMMAND/FGOS_GH_COMMAND below): lets a test probe a
@@ -380,9 +389,12 @@ function checkShellIntegrationSourced(cwd) {
       const helperNote = strippedFunctions.length > 0
         ? ` after stripping ${strippedFunctions.join(', ')} (an underscore-prefixed helper a harness shell-function snapshot can drop)`
         : '';
-      problems.push(
-        `sourced correctly, but "fgos --help" fails${helperNote} -- the source line being present is not proof the command actually works`,
-      );
+      const probeMessage = `sourced correctly, but "fgos --help" fails${helperNote} -- the source line being present is not proof the command actually works`;
+      if (insideHarnessShell()) {
+        harnessProbeNote = ` (informational, running inside an agent harness shell: ${probeMessage}; re-run fgos doctor from your own terminal to confirm)`;
+      } else {
+        problems.push(probeMessage);
+      }
     }
   }
   if (dead.length > 0) {
@@ -406,7 +418,7 @@ function checkShellIntegrationSourced(cwd) {
   if (problems.length > 0) {
     return { passed: false, message: problems.join('; ') };
   }
-  return { passed: true, message: `sourced in: ${rcFiles.join(', ')}` };
+  return { passed: true, message: `sourced in: ${rcFiles.join(', ')}${harnessProbeNote}` };
 }
 
 // config-not-stale is READ-ONLY by construction: `readSharedConfig` only
@@ -763,16 +775,23 @@ export function checkCoordinationProtocolDeadVocabulary(cwd) {
 // visible. Read-only (RUL9): never writes, never scaffolds a stub (a stub
 // contract is worse than an absent one -- it looks authoritative while saying
 // nothing).
-function checkTaskSpecsResolve(cwd) {
+//
+// The domain registry these checks walk is code loaded from this install, and the
+// task-spec/agent files it names ship in the same payload. They therefore resolve
+// against the install's own root, never the target project's tree -- a plain target
+// project carries no domains/ or core/ of its own.
+const FGOS_INSTALL_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+
+export function checkTaskSpecsResolve(root = FGOS_INSTALL_ROOT) {
   const missing = [];
   for (const [domainName, domain] of Object.entries(DOMAINS)) {
     for (const wf of Object.values(domain.workflows ?? {})) {
       for (const step of wf.steps ?? []) {
         for (const op of step.operations ?? []) {
           if (!op.taskSpec) continue;
-          const specPath = resolveTaskSpecPath(domainName, op.taskSpec, cwd);
+          const specPath = resolveTaskSpecPath(domainName, op.taskSpec, root);
           if (!fs.existsSync(specPath)) {
-            missing.push(`${domainName}.operations.${step.id}[${op.id || op.taskSpec}] -> "${op.taskSpec}" (${path.relative(cwd, specPath)} not found)`);
+            missing.push(`${domainName}.operations.${step.id}[${op.id || op.taskSpec}] -> "${op.taskSpec}" (${path.relative(root, specPath)} not found)`);
           }
         }
       }
@@ -788,9 +807,9 @@ function checkTaskSpecsResolve(cwd) {
     'distill',
   ];
   for (const specId of CORE_TASK_SPECS) {
-    const specPath = resolveTaskSpecPath('core', specId, cwd);
+    const specPath = resolveTaskSpecPath('core', specId, root);
     if (!fs.existsSync(specPath)) {
-      missing.push(`core.taskSpec -> "${specId}" (${path.relative(cwd, specPath)} not found)`);
+      missing.push(`core.taskSpec -> "${specId}" (${path.relative(root, specPath)} not found)`);
     }
   }
   if (missing.length > 0) {
@@ -1008,14 +1027,15 @@ function checkAgentClaimsResolve(cwd) {
 /**
  * Validates the operations each Workflow step declares, across domain workflows (Step 02 / D19).
  *
- * @param {string} [cwd] Working directory
+ * @param {string} [cwd] Project directory (only its shared config is read)
  * @param {object} [domains] Domain registry map (defaults to DOMAINS)
+ * @param {string} [root] Root holding the task-specs and agents the registry names (defaults to this install)
  * @returns {string[]} List of problem descriptions, empty if all valid.
  */
-export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains = DOMAINS) {
+export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains = DOMAINS, root = FGOS_INSTALL_ROOT) {
   const problems = [];
 
-  const agentFiles = allAgentYamlFiles(cwd);
+  const agentFiles = allAgentYamlFiles(root);
   const agentSkillsMap = new Map();
   for (const file of agentFiles) {
     try {
@@ -1099,9 +1119,9 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
           if (!op.taskSpec || typeof op.taskSpec !== 'string' || op.taskSpec.trim() === '') {
             problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> taskSpec must be a non-empty string`);
           } else {
-            const specPath = resolveTaskSpecPath(domainName, op.taskSpec, cwd);
+            const specPath = resolveTaskSpecPath(domainName, op.taskSpec, root);
             if (!fs.existsSync(specPath)) {
-              problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> taskSpec "${op.taskSpec}" (${path.relative(cwd, specPath)} not found)`);
+              problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> taskSpec "${op.taskSpec}" (${path.relative(root, specPath)} not found)`);
             }
           }
 
@@ -1373,7 +1393,7 @@ registerCheck({
 registerCheck({
   id: 'task-specs-resolve',
   description: 'every domain\'s taskSpecMap entry resolves to a real domains/<domain>/task-specs/ file (tsk-2t9c D6/D9)',
-  check: (cwd) => checkTaskSpecsResolve(cwd),
+  check: () => checkTaskSpecsResolve(),
 });
 
 registerCheck({
@@ -1685,8 +1705,8 @@ registerCheck({
   check: (cwd) => checkWorkStepVocabulary(cwd),
 });
 
-export function checkDomainWorkflowOperationsCoverage(cwd) {
-  const problems = findWorkflowStageOperationProblems(cwd);
+export function checkDomainWorkflowOperationsCoverage(cwd, root = FGOS_INSTALL_ROOT) {
+  const problems = findWorkflowStageOperationProblems(cwd, DOMAINS, root);
   if (problems.length === 0) {
     return {
       passed: true,
@@ -5603,6 +5623,12 @@ export function checkObserveDirWritable(cwd) {
 
 export function checkObserveFrictionMigrated(cwd) {
   const root = resolveMainCheckoutRoot(cwd) ?? cwd;
+  // `friction` is a Rust host verb: the Node fgos entry refuses it, so the fix is named
+  // against the host binary when one resolves, and by its install location otherwise.
+  const hostBin = resolveHostBin(cwd);
+  const migrateFix = hostBin
+    ? `run: ${hostBin} friction migrate --dir ${root}`
+    : `run \`fgos friction migrate --dir ${root}\` with the Rust host binary (<project>/.fgos/installation/bin/fgos, or FGOS_HOST_BIN); the Node fgos entry has no friction verb and no host binary resolved here`;
   const fgosDir = path.join(root, '.fgos');
   if (!fs.existsSync(fgosDir)) {
     return { passed: true, message: 'no .fgos directory present' };
@@ -5654,7 +5680,7 @@ export function checkObserveFrictionMigrated(cwd) {
   if (!fs.existsSync(frictionDir) || !fs.statSync(frictionDir).isDirectory()) {
     return {
       passed: false,
-      message: 'friction migration not run: .fgos/observe/friction directory missing while legacy work.friction records exist',
+      message: `friction migration not run: .fgos/observe/friction directory missing while legacy work.friction records exist -- ${migrateFix}`,
     };
   }
 
@@ -5688,7 +5714,7 @@ export function checkObserveFrictionMigrated(cwd) {
   if (!hasMigrationRecord) {
     return {
       passed: false,
-      message: 'friction migration not run: no migration record found in .fgos/observe/friction/*.jsonl',
+      message: `friction migration not run: no migration record found in .fgos/observe/friction/*.jsonl -- ${migrateFix}`,
     };
   }
 
@@ -5696,7 +5722,7 @@ export function checkObserveFrictionMigrated(cwd) {
   if (unmigrated.length > 0) {
     return {
       passed: false,
-      message: `${unmigrated.length} legacy work.friction record(s) newer than cursor (not migrated)`,
+      message: `${unmigrated.length} legacy work.friction record(s) newer than cursor (not migrated) -- ${migrateFix}`,
     };
   }
 

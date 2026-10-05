@@ -74,8 +74,8 @@ refuses outside one).
 
    If any tail command exits non-zero, `fgctl init` exits non-zero and the
    install is recorded as `ready-degraded`. Note that `fgos doctor` exits 0
-   even when checks fail (see section 3), so a green `fgctl init` does not mean a
-   green doctor.
+   even when checks fail (see section 3; `--strict` changes that, but the tail
+   does not use it), so a green `fgctl init` does not mean a green doctor.
 
 3. Read the doctor report yourself and clear everything the tool could not fix
    (section 4 says which is which):
@@ -119,6 +119,7 @@ Check what is active with `fgctl status` (`--json` for machines).
 | `fgos init` | Creates the `.fgos/` store (event log, empty view, coexistence manifest) | `.fgos/` |
 | `fgos doctor` | Runs every check and reports | nothing |
 | `fgos doctor --fix` | Runs every registered fix, then reports the checks again | the fixes listed in section 4 |
+| `fgos doctor --strict` | Same report; exits 1 when any check fails (also with `--fix`) | nothing |
 | `fgos setup` | Legacy. Wires shell integration, fills config defaults, wires git and Claude Code hooks, runs every registered fix, materializes skills | project and global config, rc files, hooks |
 
 If the shim says `no active runtime -- run fgctl init` or
@@ -126,13 +127,12 @@ If the shim says `no active runtime -- run fgctl init` or
 
 ### 2.2. What setup still does that doctor --fix does not
 
-`fgos setup` is marked deprecated: its own help says workspace onboarding is
-`fgctl init`, then `fgos doctor --fix`, then `fgos doctor`. In practice that
-sequence does not fill the config defaults. `doctor --fix` only runs the fixes
-in section 4; the check messages for missing config sections, the git hook and
-the Claude Code dispatch hook all still say "run fgos setup", and only `setup`
-writes them. Until that changes, treat `fgos setup` as part of onboarding when
-those checks are red. It never overwrites a value you already set.
+`fgos setup` is marked deprecated, but `fgctl init`, then `fgos doctor --fix`,
+then `fgos doctor` does not fill the config defaults. `doctor --fix` only runs
+the fixes in section 4; the check messages for missing config sections, the git
+hook and the Claude Code dispatch hook all still say "run fgos setup", and only
+`setup` writes them (its help now says so too). Run `fgos setup` once in the
+project when those checks are red. It never overwrites a value you already set.
 
 ## 3. Reading doctor output
 
@@ -142,8 +142,13 @@ fgos doctor --json      # {"data": {"checks": [{id, description, passed, message
 fgos doctor --fix --json   # adds data.fixed: [{id, changed, message}] and re-reports checks
 ```
 
-- Plain `doctor` and `doctor --fix` both exit 0 whatever the checks say. Read
-  `passed`, do not rely on the exit code.
+- Plain `doctor` and `doctor --fix` both exit 0 whatever the checks say: the
+  `fgctl init|upgrade|repair` tail runs them and treats a non-zero exit as a
+  degraded install, and a project that has not run `fgos setup` always has red
+  checks. Read `passed`, or pass `--strict` (`fgos doctor --strict`,
+  `fgos doctor --fix --strict`) to get exit 1 when any check fails, for scripts
+  and CI. A check that reports `passed: true` with an "informational" note never
+  trips `--strict`.
 - A check that cannot be evaluated here (no runner config, not a fgOS checkout,
   nothing to check) reports `passed: true` with a "not applicable" or "nothing
   to check" message. A green line is not always a proof, read the message.
@@ -172,7 +177,7 @@ file or key in their message; the message always names the exact target.
 |---|---|---|---|---|
 | `node-version-and-git` | Node 18 or newer and git on `PATH` | `node v16.x -- need >=18` | you | Install Node 18+ or git |
 | `cli-version-visible` | `fgos version` resolves this build's version and verbs | `fgos version did not resolve a packageVersion...` | you | No fix is registered: repair the runtime (`fgctl repair`) or reinstall |
-| `shell-integration-sourced` | The shell-integration `source` line is in your rc files and the `fgos` function really works | `not sourced in: ~/.zshrc -- run fgos setup`; `sourced correctly, but "fgos --help" fails after stripping ...` | setup, you | `fgos setup` adds the line. Dead `source` lines it reports must be deleted by hand. Open a new shell. The "fails after stripping" form is a harness shell snapshot dropping a helper, not a project problem. Only relevant to dev checkouts |
+| `shell-integration-sourced` | The shell-integration `source` line is in your rc files and the `fgos` function really works | `not sourced in: ~/.zshrc -- run fgos setup`; `sourced correctly, but "fgos --help" fails after stripping ...` (shown as an informational, still passing, note when doctor runs inside an agent harness shell) | setup, you | `fgos setup` adds the line. Dead `source` lines it reports must be deleted by hand. Open a new shell. The "fails after stripping" form is a harness shell snapshot dropping a helper, not a project problem; run doctor from your own terminal to see the real verdict. Only relevant to dev checkouts |
 | `plugin-skill-cli-reachable` | A `fgos` CLI is reachable from this project (workspace installation, local `bin/fgos.mjs`, project-local install, or global `PATH`) | `no bin/fgos.mjs at <cwd>, no project-local node_modules/.bin/fgos, and no global fgos install on PATH -- every /fgOS:* slash command will fail on first use` | you | `fgctl init` in the project (its message still names the legacy `npm install -g github:vantt/forgent`) |
 | `bin-discovery-cache` | (fix only, no check) refreshes the cached global `fgos` path | none | tool | `fgos doctor --fix` |
 | `rust-host-binary-present` | The active release's `bin/fgos` exists and is executable | `no active fgos rust host release or dev checkout found` | you | `fgctl repair` |
@@ -256,13 +261,13 @@ Mostly relevant after the project has real work items.
 |---|---|---|---|---|
 | `mutating-assignment-binding-snapshot` | Every mutating assignment result matches its unit snapshot | `error scanning assignments` or a mismatch | you | Report it; do not edit the assignment files |
 | `coordination-protocol-dead-vocabulary` | Coordination protocols and workflows do not use retired `minTier` / `minRigor` | names the file | you | Edit the named definition |
-| `task-specs-resolve` | Every domain's task spec and every core task spec resolves to a real file | `missing task-spec file(s): coding.operations.discovery[judge-ambiguity] -> ... not found` | info | Resolved against the project root. A project that does not carry fgOS's own `domains/` and `core/` trees reports this; it did not stop a Workflow run in the first external dogfood, and neither `--fix` nor `setup` repairs it |
+| `task-specs-resolve` | Every domain's task spec and every core task spec resolves to a real file | `missing task-spec file(s): coding.operations.discovery[judge-ambiguity] -> ... not found` | you | Resolved against the fgOS install doctor runs from, not the project, so a plain project without fgOS's own `domains/` and `core/` trees passes. A failure means the installed release itself is incomplete: run `fgctl repair` |
 | `agent-claims-resolve` | Every agent type's claims name real task specs | names the unresolved claim | info | Same as above |
 | `domain-registry-compiled` | Every domain's `compiled.json` exists and parses | `... -- run npm run build:domains` | you | In an fgOS source checkout, `npm run build:domains` |
 | `agent-type-names-unique` | Agent type names are globally unique | names the duplicate | you | Rename one |
 | `work-classification-vocabulary` | Open items' risk and kind match their domain's vocabulary | `N open item(s) outside their domain's classification` | you | Re-classify the named items |
 | `work-step-vocabulary` | No open item is stranded on a retired step | `2 open item(s) at a step their domain no longer registers` | you | Drain the named items; no verb relabels a live item's step |
-| `domain-workflow-operations-coverage` | Every Workflow step operation resolves to valid task specs, roles, skills and legal edges | `15 workflow step operation problem(s): ...` | info | Same cause as `task-specs-resolve` on a project without the fgOS trees |
+| `domain-workflow-operations-coverage` | Every Workflow step operation resolves to valid task specs, roles, skills and legal edges | `15 workflow step operation problem(s): ...` | you | Same root as `task-specs-resolve` (the fgOS install, not the project); a failure means the installed release is inconsistent |
 | `root-drift` | No `fgw/<root>` branch is ahead of its target | `drifted root branch(es) need syncing: ... -- run fgos sync-root <root-id>` | you | `fgos sync-root <root-id>` |
 | `leaf-notify-drift` | No live session branch has post-land drift | names the branch | you | Rebase or resync the named branch |
 | `delivered-not-on-trunk` | Every handed-over item's branch is reachable from the trunk | names the item | you | Merge or catch up the named item |
@@ -278,7 +283,7 @@ Mostly relevant after the project has real work items.
 | `coordination-sessions-closed` | Coordination sessions reach a terminal status | `5 coordination session(s) still "active" past 7 days` | info | Review; no auto-fix |
 | `shadow-binder-divergence` | Placement shadow-binder divergence is recorded durably | names the divergence | info | Report it |
 | `observe-dir-writable` | `.fgos/observe` is writable | names the path | you | Fix directory permissions |
-| `observe-friction-migrated` | Legacy friction records are migrated to `.fgos/observe/friction` | `N legacy work.friction record(s) newer than cursor (not migrated)` | info | Report it; no fix is registered |
+| `observe-friction-migrated` | Legacy friction records are migrated to `.fgos/observe/friction` | `N legacy work.friction record(s) newer than cursor (not migrated) -- run: <host binary> friction migrate --dir <project>` | you | Run the named command. `friction` is a Rust host verb (`.fgos/installation/bin/fgos`, or `FGOS_HOST_BIN`); the Node `fgos` entry has no such verb and no registered fix does it |
 | `observe-host-resolvable` | The Rust host resolves and supports observe commands | `host binary unavailable (FGOS_HOST_BIN unset and no active installation ...)` | you | `fgctl repair` |
 
 ### 4.6. Docs and generated projections

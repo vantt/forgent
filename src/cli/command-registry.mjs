@@ -1370,7 +1370,7 @@ export const COMMAND_REGISTRY = [
   {
     name: 'setup',
     invoke: 'fgos setup',
-    description: 'Legacy compatibility command: insert the fgos shell-integration source line into detected shell rc file(s), ensure shared config defaults, wire support hooks, and run registered fixes. Target workspace onboarding is fgctl init followed by local fgos doctor --fix and fgos doctor; shell/global setup compatibility stays here until a compatibility-window decision retires it.',
+    description: 'Legacy compatibility command: insert the fgos shell-integration source line into detected shell rc file(s), ensure shared config defaults, wire support hooks, and run registered fixes. Target workspace onboarding is fgctl init (it needs --from <source> when .fgos/distribution.json is absent), then local fgos doctor --fix and fgos doctor; doctor --fix runs only the registered fixes, so run fgos setup once in the project for the config defaults, git hook and Claude Code hook it does not write. Shell/global setup compatibility stays here until a compatibility-window decision retires it.',
     parameters: {
       type: 'object',
       properties: {
@@ -1383,7 +1383,7 @@ export const COMMAND_REGISTRY = [
     requiresExistingStore: false,
     externalEffect: false,
     paginated: false,
-    deprecated: 'since 2026-09-14; target workspace onboarding uses fgctl init, then .fgos/installation/bin/fgos doctor --fix, then .fgos/installation/bin/fgos doctor; legacy setup remains the compatibility path for shell/global integration until a compatibility-window decision retires it',
+    deprecated: 'since 2026-09-14; target workspace onboarding starts with fgctl init (plain fgctl init needs --from <source> when .fgos/distribution.json is absent), then .fgos/installation/bin/fgos doctor --fix and .fgos/installation/bin/fgos doctor; doctor --fix runs only the registered fixes, so run fgos setup once in the project for the config defaults, git hook and Claude Code hook it does not write; shell/global integration stays here until a compatibility-window decision retires it',
   },
   {
     name: 'uninstall',
@@ -1408,16 +1408,17 @@ export const COMMAND_REGISTRY = [
   {
     name: 'doctor',
     invoke: 'fgos doctor',
-    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing.',
+    description: 'Diagnostic by default (Node/git availability, whether the shell-integration source line is present in detected rc file(s), and whether the shared config file is not stale relative to every registered default). --fix runs every registered fix (docs/history/doctor-fix-gate-bypass/CONTEXT.md D2/D3) before re-reporting checks -- a deliberate reversal of RUL9/RUL11 (docs/specs/distribution.md); without --fix, behavior is unchanged and writes nothing. Exits 0 whatever the checks say (fgctl init/upgrade/repair run it as their tail and treat a non-zero exit as a degraded install); pass --strict to exit 1 when any check still fails.',
     parameters: {
       type: 'object',
       properties: {
         pretty: { type: 'boolean', description: 'Render colored human-readable text instead of the JSON envelope.' },
         fix: { type: 'boolean', description: 'Run every registered fix against the current cwd before reporting checks. Omit to keep doctor read-only (default, unchanged behavior).' },
+        strict: { type: 'boolean', description: 'Exit 1 when any check fails (after the fixes ran, with --fix). Omit to keep the default exit 0 whatever the checks say.' },
       },
       required: [],
     },
-    examples: ['fgos doctor', 'fgos doctor --pretty', 'fgos doctor --fix'],
+    examples: ['fgos doctor', 'fgos doctor --pretty', 'fgos doctor --fix', 'fgos doctor --strict'],
     touchesState: true,
     requiresExistingStore: false,
     externalEffect: false,
