@@ -73,6 +73,10 @@ Ba bất biến, tách bạch rõ để không ai đọc nhầm đây là sandbo
   `dispatch.mjs`'s "TRUSTED-CONFIG NOTE"). File này committed (D2 — bền
   vĩnh viễn, review được như code) nhưng mang đúng mức tin cậy của code: chỉ
   áp dụng từ một checkout đã tin cậy sẵn.
+- **Context ref tới kết quả vai/bước trước là đường dẫn tuyệt đối dưới
+  `.fgos/assignments/` của main checkout.** Worker chỉ đọc, không ghi; runner
+  kiểm sha256 lúc settle trước khi trao. Không mở rộng quyền đọc: worker vốn
+  đọc được (`--ro-bind / /`, `hostRead: allow`).
 
 ## Tham chiếu
 
