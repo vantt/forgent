@@ -125,6 +125,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'confined-pane-accounts',
       'agent-cli-project-trusted',
       'workflow-pools-satisfy-independence',
+      'blind-steps-use-proven-pools',
       'observe-dir-writable',
       'observe-friction-migrated',
       'observe-host-resolvable',

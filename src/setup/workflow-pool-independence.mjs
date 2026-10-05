@@ -50,7 +50,7 @@ function workflowDefinitionFiles(root) {
 /** Workflow definitions under `roots` (package root, then the project), each as { id, steps }.
  * The YAML parser is loaded lazily: `fgos setup` runs from copies that have no installed
  * dependencies, and a missing parser must read as "cannot evaluate", not as a crash. */
-function loadWorkflowDefinitions(roots) {
+export function loadWorkflowDefinitions(roots) {
   let YAML;
   try {
     YAML = createRequire(import.meta.url)('yaml');

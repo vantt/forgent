@@ -37,6 +37,7 @@ import { claudeCodeHookWired } from './claude-code-hooks.mjs';
 import { checkExecutorProfileWarnings } from './executor-profile-warnings.mjs';
 import { checkAgentCliProjectTrusted } from './agent-cli-trust.mjs';
 import { checkWorkflowPoolsSatisfyIndependence } from './workflow-pool-independence.mjs';
+import { checkBlindStepsUseProvenPools } from './blind-steps-proven-pools.mjs';
 import { checkAgyPermissionsConfigured, checkAgySubHomesConfigured, fixAgyPermissionsConfigured } from './agy-permissions.mjs';
 import { BUILTIN_POLICY_IDS, validateConfinementPolicyShape, normalizeLegacyConfinement } from '../runner/dispatch/confinement/policies.mjs';
 import {
@@ -4430,6 +4431,15 @@ registerCheck({
   id: 'workflow-pools-satisfy-independence',
   description: 'for every panel or reviewed Workflow unit, the capability prefer pool supplies enough distinct provider families for bind() to place every role independently',
   check: (cwd) => checkWorkflowPoolsSatisfyIndependence(cwd, {
+    packageRoot: path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..'),
+    loadRunnerConfig: loadRunnerConfigFromDir,
+  }),
+});
+
+registerCheck({
+  id: 'blind-steps-use-proven-pools',
+  description: 'every blind Workflow unit can only bind executors whose provider family and transport were proven to keep a worker blind (read-only, no model call)',
+  check: (cwd) => checkBlindStepsUseProvenPools(cwd, {
     packageRoot: path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..'),
     loadRunnerConfig: loadRunnerConfigFromDir,
   }),

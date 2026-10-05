@@ -176,6 +176,7 @@
     "src/setup/claude-code-hooks.mjs": "infra",
     "src/setup/agy-permissions.mjs": "infra",
     "src/setup/agent-cli-trust.mjs": "infra",
+    "src/setup/blind-steps-proven-pools.mjs": "use-case",
     "src/setup/workflow-pool-independence.mjs": "use-case",
     "src/setup/checks.mjs": "use-case",
     "src/setup/executor-profile-warnings.mjs": "infra",
