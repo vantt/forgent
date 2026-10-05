@@ -917,6 +917,9 @@ test('shell-integration-sourced fails when the source line is present but the so
   );
   const prevProbe = process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT;
   process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT = fragileFixture;
+  const prevHarness = { CLAUDECODE: process.env.CLAUDECODE, CLAUDE_CODE_SESSION_ID: process.env.CLAUDE_CODE_SESSION_ID };
+  delete process.env.CLAUDECODE;
+  delete process.env.CLAUDE_CODE_SESSION_ID;
   try {
     withHome(homeDir, () => {
       const { passed, message } = checkById('shell-integration-sourced').check(process.cwd());
@@ -924,7 +927,19 @@ test('shell-integration-sourced fails when the source line is present but the so
       assert.match(message, /fgos --help.*fails/);
       assert.match(message, /_fgos_helper/);
     });
+    // Inside an agent harness shell the same dead function is information, not a failure.
+    process.env.CLAUDECODE = '1';
+    withHome(homeDir, () => {
+      const { passed, message } = checkById('shell-integration-sourced').check(process.cwd());
+      assert.equal(passed, true);
+      assert.match(message, /informational, running inside an agent harness shell/);
+      assert.match(message, /_fgos_helper/);
+    });
   } finally {
+    for (const [key, value] of Object.entries(prevHarness)) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
     if (prevProbe === undefined) delete process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT;
     else process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT = prevProbe;
     fs.rmSync(homeDir, { recursive: true, force: true });

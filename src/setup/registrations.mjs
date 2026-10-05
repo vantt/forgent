@@ -337,6 +337,14 @@ export function describeNonGitShellIntegration(cwd) {
   };
 }
 
+// A shell started by an agent harness (Claude Code) hands its tools a snapshot of the
+// user's shell functions, and that snapshot can drop underscore-prefixed helpers. The
+// probe below reproduces exactly that, so inside such a shell its verdict says nothing
+// about the user's own terminal and is reported as information, not a failure.
+function insideHarnessShell(env = process.env) {
+  return Boolean(env.CLAUDECODE || env.CLAUDE_CODE_SESSION_ID);
+}
+
 function checkShellIntegrationSourced(cwd) {
   const scriptPath = integrationScriptPath();
   if (scriptPath === null) {
@@ -366,6 +374,7 @@ function checkShellIntegrationSourced(cwd) {
   // somewhere (missing.length < rcFiles.length) -- the failure mode lives
   // in the shared script itself, not in which rc file references it, so
   // one probe against scriptPath covers every rc file that sources it.
+  let harnessProbeNote = '';
   if (missing.length < rcFiles.length) {
     // FGOS_SHELL_INTEGRATION_PROBE_SCRIPT (test-only seam, mirrors
     // FGOS_CLAUDE_COMMAND/FGOS_GH_COMMAND below): lets a test probe a
@@ -380,9 +389,12 @@ function checkShellIntegrationSourced(cwd) {
       const helperNote = strippedFunctions.length > 0
         ? ` after stripping ${strippedFunctions.join(', ')} (an underscore-prefixed helper a harness shell-function snapshot can drop)`
         : '';
-      problems.push(
-        `sourced correctly, but "fgos --help" fails${helperNote} -- the source line being present is not proof the command actually works`,
-      );
+      const probeMessage = `sourced correctly, but "fgos --help" fails${helperNote} -- the source line being present is not proof the command actually works`;
+      if (insideHarnessShell()) {
+        harnessProbeNote = ` (informational, running inside an agent harness shell: ${probeMessage}; re-run fgos doctor from your own terminal to confirm)`;
+      } else {
+        problems.push(probeMessage);
+      }
     }
   }
   if (dead.length > 0) {
@@ -406,7 +418,7 @@ function checkShellIntegrationSourced(cwd) {
   if (problems.length > 0) {
     return { passed: false, message: problems.join('; ') };
   }
-  return { passed: true, message: `sourced in: ${rcFiles.join(', ')}` };
+  return { passed: true, message: `sourced in: ${rcFiles.join(', ')}${harnessProbeNote}` };
 }
 
 // config-not-stale is READ-ONLY by construction: `readSharedConfig` only
