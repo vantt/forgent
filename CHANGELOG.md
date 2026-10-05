@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- A later pass consuming a settled run now finds a confined worker's claim and report under `worker-output/outbox/`, the same way settlement does, instead of only the flat run directory, and reconciliation of a crashed run finds that claim through the same lookup.
 - Onboarding text is corrected: the README no longer says a plain `fgctl init` is enough after `install.sh` (it needs `--from <source>` until `.fgos/distribution.json` exists), and `fgos setup`'s help now says `doctor --fix` runs only registered fixes, so one `fgos setup` is still needed for the config defaults, hook wiring and Claude Code hook.
 - `fgos doctor --strict` (also with `--fix`) exits 1 when any check fails. The default stays exit 0 because `fgctl init`, `upgrade` and `repair` run doctor as their tail and mark the install degraded on a non-zero exit.
 - `fgos doctor`'s `observe-friction-migrated` failures now name the exact fix, `<host binary> friction migrate --dir <project>`, and say that `friction` is reachable only through the Rust host (the Node `fgos` entry has no such verb).
