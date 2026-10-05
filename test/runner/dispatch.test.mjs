@@ -3407,14 +3407,16 @@ test('cliSpawnAdapter kills the whole process GROUP on timeout, not just the dir
     },
   );
 
-  // Give the OS a moment to actually reap the grandchild after the SIGTERM.
-  await new Promise((r) => setTimeout(r, 300));
+  // The OS reaps the grandchild some time after the SIGTERM; poll until it is gone.
   const grandchildPid = Number(fs.readFileSync(markerPath, 'utf8').trim());
   let alive = true;
-  try {
-    process.kill(grandchildPid, 0);
-  } catch {
-    alive = false;
+  for (const deadline = Date.now() + 30_000; alive && Date.now() < deadline;) {
+    try {
+      process.kill(grandchildPid, 0);
+      await new Promise((r) => setTimeout(r, 50));
+    } catch {
+      alive = false;
+    }
   }
   assert.equal(alive, false, 'grandchild process must be dead after the parent was killed via process-group SIGTERM');
 });

@@ -26,7 +26,8 @@ test('verifyProcessEnvironment ignores shell-managed variables but still catches
     stdio: 'ignore',
   });
   try {
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    // 'spawn' fires once exec has succeeded, which is when /proc shows the child's own environment.
+    await new Promise((resolve, reject) => { child.once('spawn', resolve); child.once('error', reject); });
     assert.equal(verifyProcessEnvironment(child.pid, { KEEP_ME: 'yes', SHLVL: '9', _: '/usr/bin/env' }), true);
     assert.equal(verifyProcessEnvironment(child.pid, { KEEP_ME: 'no' }), false);
   } finally {

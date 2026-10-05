@@ -1232,7 +1232,8 @@ test('21. confined path resourceIncarnation fencing distinguishes reattach from 
 test('22. verifyProcessEnvironment catches value overrides and injected additions', async () => {
   if (process.platform !== 'linux') return;
 
-  const child = spawn(process.execPath, ['-e', 'setTimeout(() => {}, 5000)'], {
+  // Stays alive until the finally block kills it, so a slow run never races the child's own exit.
+  const child = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], {
     env: {
       ...process.env,
       FGOS_TEST_MARKER: 'expected-value',
@@ -1246,8 +1247,8 @@ test('22. verifyProcessEnvironment catches value overrides and injected addition
   });
 
   try {
-    // Give the child a moment to actually be running before /proc is read.
-    await new Promise((resolve) => setTimeout(resolve, 200));
+    // 'spawn' fires once exec has succeeded, which is when /proc shows the child's own environment.
+    await new Promise((resolve, reject) => { child.once('spawn', resolve); child.once('error', reject); });
 
     assert.equal(
       verifyProcessEnvironment(child.pid, { FGOS_TEST_MARKER: 'expected-value' }),
