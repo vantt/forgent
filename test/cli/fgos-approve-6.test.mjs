@@ -213,18 +213,18 @@ test('approve --no-wait fails immediately on a live-held lock, main left untouch
   commitPendingBeforeApprove(cwd, 'wait-no-wait-approve');
   writeLiveLock(cwd, 1000);
 
-  const start = Date.now();
   const result = run(cwd, ['approve', 'wait-no-wait-approve', '--no-wait']);
-  const elapsed = Date.now() - start;
 
   // 9 ('merge-fail'), not 7 ('lock-timeout') -- MergeError's category is
   // unconditionally 'merge-fail' for every failure mode (pre-existing,
   // unrelated to this item's own `code` discriminator addition).
   assert.equal(result.status, 9, result.stderr);
   assert.match(result.stderr, /main checkout is locked by pid \d+/);
-  // The default wait is 10s, so anything well under it proves the flag skipped the wait; a tighter
-  // bound only measures how loaded the machine is while the CLI starts.
-  assert.ok(elapsed < 5000, `--no-wait must fail fast (took ${elapsed}ms)`);
+  // A run that waited would print its retry progress line before every sleep and tag the final
+  // error with the time it waited; neither appears when the flag skipped the wait. The lock holder
+  // (this process) never releases, so a waiting run could not have succeeded either.
+  assert.doesNotMatch(result.stderr, /still waiting on main-checkout lock/, '--no-wait must not enter the retry loop');
+  assert.doesNotMatch(result.stderr, /waited \d+ms before giving up/, '--no-wait must not wait before giving up');
   assert.equal(stateView(cwd).work['wait-no-wait-approve'].status, 'awaiting-approval', 'a refused-before-merge attempt must leave the item exactly where it was');
 });
 

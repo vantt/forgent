@@ -1119,17 +1119,18 @@ test('merge next --no-wait fails immediately on a live-held lock -- proves the f
   commitPendingBeforeApprove(cwd, 'wait-merge-next-no-wait');
   writeLiveLock(cwd, 1000);
 
-  const start = Date.now();
   const result = run(cwd, ['merge', 'next', '--no-wait']);
-  const elapsed = Date.now() - start;
 
   // `merge next` only special-cases an Iron Law rejection (bin/fgos.mjs's
   // `sub === 'next'` case) -- any other error from the inner `runVerb('approve', ...)`
   // rethrows as-is, so this fails exactly like a direct `approve` call does.
   assert.equal(result.status, 9, result.stderr);
   assert.match(result.stderr, /main checkout is locked by pid \d+/);
-  // The default wait is 10s, so anything well under it proves the flag skipped the wait.
-  assert.ok(elapsed < 5000, `--no-wait forwarded through merge next must still fail fast, not wait (took ${elapsed}ms)`);
+  // A run that waited would print its retry progress line before every sleep and tag the final
+  // error with the time it waited; neither appears when the flag was forwarded. The lock holder
+  // (this process) never releases, so a waiting run could not have succeeded either.
+  assert.doesNotMatch(result.stderr, /still waiting on main-checkout lock/, '--no-wait forwarded through merge next must not enter the retry loop');
+  assert.doesNotMatch(result.stderr, /waited \d+ms before giving up/, '--no-wait forwarded through merge next must not wait before giving up');
 });
 
 test('sync-root never reports outcome "synced" when mergeRunnerItem returns an outcome it does not explicitly handle -- proves the defensive guard closes the false-success gap D4 found', () => {
