@@ -445,7 +445,10 @@ export async function runUnit(options = {}) {
     }
   };
 
-  const patternName = unit.pattern || options.pattern || 'solo';
+  // A caller that passes `{ pattern, params }` is choosing the pattern's params as well as its
+  // name, so that object form wins over the unit's own pattern string.
+  const callerPattern = options.pattern && typeof options.pattern === 'object' ? options.pattern : null;
+  const patternName = callerPattern || unit.pattern || options.pattern || 'solo';
   const patternResult = await runPattern(patternName, unit, unitRecord.configSnapshot.runner, {
     runRole,
     verify,

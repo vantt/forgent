@@ -318,6 +318,69 @@ test('runner: executes workflow with parallel steps and parks at human gate', as
   assert.equal(state.steps['step-c'].status, 'completed');
 });
 
+test('a human gate answer reaches the units of the gated step and of every step that depends on it, as a context ref', async () => {
+  const tmp = setupTestRepo();
+  const unit = (id, objective) => ({ id, template: { capability: 'docs:write', pattern: 'solo', objective, writes: [] } });
+  const workflow = validateWorkflow({
+    id: 'gate-answer-flows-through',
+    steps: [
+      { id: 'prep', units: [unit('u-prep', 'Prepare the options')] },
+      { id: 'vote', dependsOn: ['prep'], gate: { kind: 'human', question: 'Which option do you pick?' }, units: [unit('u-vote', 'Tally the votes')] },
+      { id: 'side', dependsOn: ['prep'], units: [unit('u-side', 'Work that never depends on the vote')] },
+      { id: 'final', dependsOn: ['vote'], units: [unit('u-final', 'Rank the options')] },
+      { id: 'after', dependsOn: ['final'], units: [unit('u-after', 'Write the outcome')] },
+    ],
+  });
+  let state = await startWorkflow({ workflow, repoRoot: tmp, cwd: tmp, worktree: tmp });
+  assert.equal(state.status, 'parked', JSON.stringify(state.steps));
+  assert.equal(state.steps.side.status, 'completed');
+
+  const answer = `Option B first. ${'because of cost '.repeat(20)}END-OF-ANSWER`;
+  state = await answerWorkflow(state.workflowRunId, { stepId: 'vote', answer, repoRoot: tmp, cwd: tmp, worktree: tmp });
+  assert.equal(state.status, 'completed', JSON.stringify(state.steps));
+
+  // The answer is written once, with the question and the time of the answer, in the run directory.
+  const answerFile = path.join(tmp, '.fgos', 'workflow-runs', state.workflowRunId, 'gate-answers', 'vote.md');
+  const text = fs.readFileSync(answerFile, 'utf8');
+  assert.ok(text.includes('Which option do you pick?'));
+  assert.ok(text.includes(answer));
+  assert.match(text, /\b20\d\d-\d\d-\d\dT/);
+
+  const assignmentOf = (stepId, unitId) =>
+    JSON.parse(fs.readFileSync(path.join(tmp, '.fgos', 'assignments', state.steps[stepId].units[unitId].unitRunId, 'producer', '1', 'assignment.json'), 'utf8'));
+  const note = `owner's answer at the "vote" gate`;
+  for (const [stepId, unitId] of [['vote', 'u-vote'], ['final', 'u-final'], ['after', 'u-after']]) {
+    const assignment = assignmentOf(stepId, unitId);
+    assert.ok(assignment.contextRefs.includes(answerFile), `${stepId}: ${JSON.stringify(assignment.contextRefs)}`);
+    assert.ok(assignment.objective.toLowerCase().includes(note), `${stepId}: ${assignment.objective}`);
+    // One line, the first 200 characters of the answer; the rest is in the file.
+    assert.ok(assignment.objective.includes(answer.slice(0, 200).trimEnd()), assignment.objective);
+    assert.ok(!assignment.objective.includes('END-OF-ANSWER'));
+  }
+
+  // Steps that do not depend on the gate, and steps that ran before it, get nothing of it.
+  for (const [stepId, unitId] of [['prep', 'u-prep'], ['side', 'u-side']]) {
+    const assignment = assignmentOf(stepId, unitId);
+    assert.ok(!assignment.contextRefs.includes(answerFile), stepId);
+    assert.ok(!assignment.objective.includes('Option B first'), stepId);
+  }
+});
+
+test('a gate answer that cannot be written is refused before the answer is recorded', async () => {
+  const tmp = setupTestRepo();
+  const workflow = validateWorkflow({
+    id: 'gate-answer-unsafe-step',
+    steps: [{ id: 'vote', gate: { kind: 'human', question: 'Pick?' }, units: [{ id: 'u', template: { capability: 'docs:write', pattern: 'solo', objective: 'x', writes: [] } }] }],
+  });
+  const state = await startWorkflow({ workflow, repoRoot: tmp, cwd: tmp, worktree: tmp });
+  assert.equal(state.status, 'parked');
+  await assert.rejects(
+    () => answerWorkflow(state.workflowRunId, { stepId: '../vote', answer: 'yes', repoRoot: tmp, cwd: tmp, worktree: tmp }),
+    /gate answer/i,
+  );
+  assert.equal(statusWorkflow(state.workflowRunId, { repoRoot: tmp, cwd: tmp }).status, 'parked');
+});
+
 test('CLI: fgos workflow start, status, answer, and legacy operations', () => {
   const tmp = setupTestRepo();
   const planDir = path.join(tmp, 'my-plan');
@@ -750,4 +813,93 @@ test('a step target is accepted on integrate steps only', () => {
   const ok = validateWorkflow({ ...base, steps: [{ id: 's1', units: [unit] }, { id: 'i', kind: 'integrate', dependsOn: ['s1'], target: 'release' }] });
   assert.equal(ok.steps[1].target, 'release');
   assert.throws(() => validateWorkflow({ ...base, steps: [{ id: 's1', target: 'release', units: [unit] }] }), /only valid on a step of kind "integrate"/);
+});
+
+test('validateWorkflow keeps a unit template persona and params and rejects params that are not an object', () => {
+  const base = { id: 'test/persona-params', steps: [{ id: 's1', units: [{ id: 'u1', template: { capability: 'docs:write', pattern: 'panel', persona: ' panelist ', params: { members: 2 } } }] }] };
+  const template = validateWorkflow(base).steps[0].units[0].template;
+  assert.equal(template.persona, 'panelist');
+  assert.deepEqual(template.params, { members: 2 });
+
+  for (const bad of ['x', ['a'], 3]) {
+    const workflow = { ...base, steps: [{ id: 's1', units: [{ id: 'u1', template: { capability: 'docs:write', params: bad } }] }] };
+    assert.throws(() => validateWorkflow(workflow), /params must be an object/);
+  }
+});
+
+// Executors of distinct provider families, so a panel can bind every seat.
+function useDistinctFamilies(tmp, names) {
+  const cfgPath = path.join(tmp, '.fgos', 'config.json');
+  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  const script = path.join(tmp, 'echo-worker.mjs');
+  cfg.runner.executors = {};
+  for (const name of names) {
+    const command = path.join(tmp, `${name}-bin`);
+    fs.symlinkSync(process.execPath, command);
+    cfg.runner.executors[name] = {
+      kind: 'agent',
+      allowCrossProvider: true,
+      command,
+      args: [script, '{prompt}'],
+      providerModel: name,
+      invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args: [script, '{prompt}'] }],
+    };
+  }
+  cfg.runner.defaultExecutor = names[0];
+  for (const capability of Object.values(cfg.runner.capabilities)) {
+    capability.prefer = names.map((executor) => ({ executor }));
+  }
+  fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
+}
+
+test('a unit template persona and params reach the binding and the per-role objective like a CLI override', async () => {
+  const tmp = setupTestRepo();
+  useDistinctFamilies(tmp, ['alpha', 'beta', 'gamma']);
+
+  const workflow = validateWorkflow({
+    id: 'persona-params',
+    steps: [
+      {
+        id: 'panel',
+        units: [
+          {
+            id: 'p',
+            template: {
+              capability: 'docs:write',
+              pattern: 'panel',
+              persona: 'panelist',
+              params: { members: 2, roleTasks: { synthesizer: 'WORKFLOW-SYNTH-TASK for: {objective}' } },
+              objective: 'Review the design',
+              writes: [],
+            },
+          },
+        ],
+      },
+      { id: 'plain', dependsOn: ['panel'], units: [{ id: 's', template: { capability: 'docs:write', pattern: 'solo', objective: 'Decide', writes: [] } }] },
+    ],
+  });
+  const state = await startWorkflow({ workflow, repoRoot: tmp, cwd: tmp, worktree: tmp });
+  assert.equal(state.status, 'completed', JSON.stringify(state.steps));
+
+  const runDir = (runId) => path.join(tmp, '.fgos', 'assignments', runId);
+  const readAssignment = (runId, role) => JSON.parse(fs.readFileSync(path.join(runDir(runId), role, '1', 'assignment.json'), 'utf8'));
+  const panelRunId = state.steps.panel.units.p.unitRunId;
+
+  // params.members reached the pattern: two panelists, not the default three.
+  assert.ok(fs.existsSync(path.join(runDir(panelRunId), 'panelist-2')));
+  assert.ok(!fs.existsSync(path.join(runDir(panelRunId), 'panelist-3')));
+  // params.roleTasks reached roleUnit: the synthesizer was given the workflow's own task text.
+  assert.match(readAssignment(panelRunId, 'synthesizer').objective, /^WORKFLOW-SYNTH-TASK for: Review the design/);
+
+  // persona reached bind() as an override scoped to the unit, so its seats carry the persona.
+  for (const role of ['panelist-1', 'panelist-2']) {
+    assert.equal(readAssignment(panelRunId, role).policy.preferPersona, 'panelist', role);
+  }
+  const unitRecord = JSON.parse(fs.readFileSync(path.join(runDir(panelRunId), 'unit.json'), 'utf8'));
+  assert.equal(unitRecord.overrides[0].origin, 'workflow');
+  assert.deepEqual(unitRecord.overrides[0].scope, { unit: 'p' });
+
+  // a unit that declares no persona gets none from the workflow.
+  const soloRunId = state.steps.plain.units.s.unitRunId;
+  assert.notEqual(readAssignment(soloRunId, 'producer').policy.preferPersona, 'panelist');
 });

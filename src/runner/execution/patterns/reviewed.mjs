@@ -224,7 +224,7 @@ export async function runReviewed(unit, cfg, { runRole, verify, history } = {}, 
         role: 'producer',
         // Round 1 is the unit as given; a later round also lists what the checks found, so the
         // producer knows what to fix.
-        unit: roleUnit(unit, { role: 'producer', findings: r > 1 ? priorFindings : [] }),
+        unit: roleUnit(unit, { role: 'producer', params, findings: r > 1 ? priorFindings : [] }),
         readOnly: (unit?.writes || []).length === 0,
         round: r,
       };
