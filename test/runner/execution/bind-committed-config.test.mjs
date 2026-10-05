@@ -86,7 +86,7 @@ test('Workflow capabilities that name a same-verb pool bind headless', () => {
 });
 
 test('a Workflow capability with no prefer pool is refused with a structured reason, never guessed', () => {
-  const result = bind(ask('delphi:propose'), { runnerConfig, session: headless });
+  const result = bind(ask('coding:discover'), { runnerConfig, session: headless });
   assert.equal(result.refused.reason, 'headless-no-executor');
-  assert.match(result.refused.detail, /delphi:propose/);
+  assert.match(result.refused.detail, /coding:discover/);
 });
