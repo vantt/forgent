@@ -18,9 +18,15 @@ authoritative_for: adding a per-executor env override to the fgOS runner dispatc
 > **Which invocation to use.** Run headless (`glm` with `pi-cli-bwrap-openrouter`),
 > `z-ai/glm-5.2` answers, calls `bash` and writes its report correctly (checked
 > 2026-10-05, a read-only Unit that read a file under `.fgos` and quoted its first
-> line). In an interactive herdr pane (`glm-herdr`) the model was seen repeating
-> one `bash` call (`echo hello`) with no progress until the pane was closed; the
-> cause is not known. The capability preference pools therefore name
+> line). The model sometimes degenerates, in a herdr pane
+> and headless alike (measured 2026-10-05: 1 of 3 headless runs, then 0 of 24 with
+> `--thinking` medium, high and off, so the thinking level is not the cause): it
+> streams one tool call whose JSON argument starts normally, then continues with
+> GLM's own XML tool-call text (`..."README.md</arg_value></tool_call><tool_call>read<arg_key>...`)
+> and repeats it without ever closing the JSON, so the call never executes. In a
+> pane this looks like one call repeated forever. The Unit then runs until the
+> output buffer (10 MiB) or the ceiling kills it and fails as an execution failure
+> with no fallback to the next executor. The capability preference pools name
 > `glm` with `pi-cli-bwrap-openrouter`, not `glm-herdr`, which stays defined for
 > investigation.
 
