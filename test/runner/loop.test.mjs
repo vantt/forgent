@@ -2023,10 +2023,15 @@ test('runWatch threads the SAME breaker instance into every cycle: misses accumu
 
 test('runWatch catches a runOnce throw, reports it via onCycle with outcome "error", and keeps looping instead of terminating', async () => {
   const { repoRoot, dir, worktreeDir } = setup(); // empty frontier -- reaches the idle log call every cycle
-  let logCalls = 0;
-  const flakyLog = () => {
-    logCalls += 1;
-    if (logCalls === 1) throw new Error('injected-log-throw'); // only the first cycle's log call throws
+  // Throw on the first idle line only. Earlier log calls in a cycle are machine-dependent (a
+  // startup reap logs when other processes left orphaned resources behind, and a throw there is
+  // swallowed by the reap's own catch), so "the first log call" is not always the idle one.
+  let thrown = false;
+  const flakyLog = (message) => {
+    if (!thrown && /frontier empty/.test(message)) {
+      thrown = true;
+      throw new Error('injected-log-throw');
+    }
   };
   const results = [];
   const controller = new AbortController();
