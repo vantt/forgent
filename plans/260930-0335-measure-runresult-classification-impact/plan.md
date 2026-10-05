@@ -3,8 +3,11 @@ title: "Đo tác động RunResult classification và chốt producer friction t
 status: pending
 priority: P1
 created: 2026-09-30
+blockedBy: [261005-1143-observe-run-visibility-and-discussion-measurement]
 blocks: []
 ---
+
+> **Blocked (2026-10-05):** `metrics runs` does not see any run made by the execution core since 2026-10-01 (nested `unit-run-*` assignment layout). "After" numbers measured before the fix undercount; wait for phase 3 (rebaseline) of [observe-run-visibility-and-discussion-measurement](../261005-1143-observe-run-visibility-and-discussion-measurement/plan.md).
 
 # Plan: Đo tác động RunResult classification và chốt producer friction tầng nền
 
