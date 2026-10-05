@@ -354,6 +354,36 @@ test('prompt and brief agree with effective execution contract on claim path, mu
   assert.ok(brief.includes('effective-execution-contract.json'), 'brief must link to persisted contract file');
 });
 
+test('a confined cli-spawn worker is told to write its claim and report where the sandbox lets it', () => {
+  const assignment = validAssignment({ mutation: 'read-only' });
+  const runDir = '/tmp/assignment-1/runs/01';
+  const outbox = path.join(runDir, 'worker-output', 'outbox');
+  const build = (adapter, confinement) => buildEffectiveExecutionContract({
+    assignment,
+    dispatchPlan: validDispatchPlan({ invocation: { via: 'cli', adapter, protocol: 'prompt-stdout-v1' } }),
+    runId: 'run_01',
+    runDir,
+    cwd: '/tmp/assignment-1',
+    ...(confinement ? { confinement } : {}),
+  });
+  const required = { requirement: { mode: 'required', policyId: 'host-write-denied' } };
+
+  const confined = build('cli-spawn', required);
+  assert.equal(confined.resultClaim.path, path.join(outbox, 'agent-result.json'));
+  const confinedPrompt = renderAssignmentPrompt(assignment, { runDir, effectiveContract: confined });
+  assert.ok(confinedPrompt.includes(`Write structured JSON to ${path.join(outbox, 'agent-result.json')}`));
+  assert.ok(confinedPrompt.includes(path.join(outbox, 'agent-report.md')));
+  assert.ok(!confinedPrompt.includes(path.join(runDir, 'agent-result.json')), 'no flat path the sandbox keeps read-only');
+
+  const unconfined = build('cli-spawn');
+  assert.equal(unconfined.resultClaim.path, path.join(runDir, 'agent-result.json'));
+  const unconfinedPrompt = renderAssignmentPrompt(assignment, { runDir, effectiveContract: unconfined });
+  assert.ok(unconfinedPrompt.includes(path.join(runDir, 'agent-report.md')));
+
+  // herdr-spawn keeps its own outbox contract: the brief rewrites the claim path.
+  assert.equal(build('herdr-spawn', required).resultClaim.path, path.join(runDir, 'agent-result.json'));
+});
+
 test('readEffectiveExecutionContract reads, parses, and validates the contract on disk', () => {
   const tempDir = mkTempDir();
   const runDir = path.join(tempDir, 'runs', '01');

@@ -255,9 +255,16 @@ export function buildEffectiveExecutionContract({
 
   // Result claim
   const absRunDir = path.resolve(runDir);
+  // A sandboxed cli-spawn worker can only write under `worker-output/outbox`
+  // (the one run-output directory the confinement authority binds writable),
+  // so that is where its claim has to be named; the flat run directory is
+  // read-only to it and a write there fails with EROFS.
+  const confinedCliSpawn = isConfinementEnforced && resolvedAdapter === 'cli-spawn';
   const claimPath = resultClaimPath
     ? path.resolve(resultClaimPath)
-    : path.join(absRunDir, 'agent-result.json');
+    : confinedCliSpawn
+      ? path.join(absRunDir, 'worker-output', 'outbox', 'agent-result.json')
+      : path.join(absRunDir, 'agent-result.json');
 
   // Provenance (sanitized of secrets)
   const dispatchPlanHash = computeSha256Digest(stripSecrets(dispatchPlan));

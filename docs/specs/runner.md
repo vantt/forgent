@@ -1080,6 +1080,7 @@ Một báo-cáo hỏng-hình (không phân tích được, thiếu tên việc) 
 
 ## Edge Cases Settled
 
+- Worker `cli-spawn` chạy trong sandbox (bwrap) chỉ ghi được dưới `runs/<n>/worker-output/outbox`: effective contract và prompt gọi tên claim/report ở đó (không phải thư mục run phẳng, vốn read-only → `EROFS`); collector đã đọc outbox sẵn. herdr-spawn giữ outbox riêng của brief.
 - Runner bị giết giữa việc: lần chạy sau gặt lại đúng trạng thái (proof đạt → awaiting-approval, không → blocked), nhánh có ĐÚNG MỘT commit worker — test giết thật.
 - Nhánh bị worktree mồ côi giữ (path còn hoặc đã mất) đều đòi lại được — bug thật do e2e bắt sau khi code ship, vá bằng cell fix-first (phase-2-routing-10).
 - Đề xuất bị người duyệt trả (`awaiting-approval→todo` kèm lý do): việc vào lại frontier, chống-lặp đếm và chặn lặp vô hạn.
