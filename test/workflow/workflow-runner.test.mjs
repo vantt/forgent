@@ -470,8 +470,77 @@ test('the owner request and earlier step output reach each unit objective', asyn
   assert.match(prompts[0], /Ship the pricing page by Friday/);
   assert.doesNotMatch(prompts[0], /FINDING-FROM-FIRST-STEP/);
   assert.match(prompts[1], /Ship the pricing page by Friday/);
+  // The earlier report travels as a context ref, not as pasted text.
   assert.match(prompts[1], /first step summary/);
-  assert.match(prompts[1], /FINDING-FROM-FIRST-STEP/);
+  assert.match(prompts[1], /unit run unit-run-/);
+  assert.doesNotMatch(prompts[1], /FINDING-FROM-FIRST-STEP/);
+  const firstRunId = state.steps.one.units.u1.unitRunId;
+  const refPaths = prompts[1].match(new RegExp(`/\\S+/assignments/${firstRunId}/producer/\\S+report\\S*\\.md`, 'g')) ?? [];
+  assert.equal(refPaths.length, 1, `one report path of the first unit run in the second prompt, got ${refPaths}`);
+  assert.match(fs.readFileSync(refPaths[0], 'utf8'), /FINDING-FROM-FIRST-STEP/);
+});
+
+test('a step after a panel step is handed the report of every panelist and of the synthesizer', async () => {
+  const tmp = setupTestRepo();
+  const cfgPath = path.join(tmp, '.fgos', 'config.json');
+  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  const script = path.join(tmp, 'echo-worker.mjs');
+  // A panel needs one provider family per member plus one for the synthesizer.
+  cfg.runner.executors = {};
+  for (const name of ['alpha', 'beta', 'gamma', 'delta']) {
+    const command = path.join(tmp, `${name}-bin`);
+    fs.symlinkSync(process.execPath, command);
+    cfg.runner.executors[name] = {
+      kind: 'agent',
+      allowCrossProvider: true,
+      command,
+      args: [script, '{prompt}'],
+      providerModel: name,
+      invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args: [script, '{prompt}'] }],
+    };
+  }
+  cfg.runner.defaultExecutor = 'alpha';
+  for (const capability of Object.values(cfg.runner.capabilities)) {
+    capability.prefer = ['alpha', 'beta', 'gamma', 'delta'].map((executor) => ({ executor }));
+  }
+  fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
+
+  const workflow = validateWorkflow({
+    id: 'panel-then-solo',
+    steps: [
+      { id: 'panel', units: [{ id: 'p', template: { capability: 'docs:write', pattern: 'panel', objective: 'Review the design', writes: [] } }] },
+      { id: 'after', dependsOn: ['panel'], units: [{ id: 's', template: { capability: 'docs:write', pattern: 'solo', objective: 'Decide', writes: [] } }] },
+    ],
+  });
+  const state = await startWorkflow({ workflow, repoRoot: tmp, cwd: tmp, worktree: tmp });
+  assert.equal(state.status, 'completed', JSON.stringify(state.steps));
+
+  const panelRunId = state.steps.panel.units.p.unitRunId;
+  const soloRunId = state.steps.after.units.s.unitRunId;
+  const refs = JSON.parse(
+    fs.readFileSync(path.join(tmp, '.fgos', 'assignments', soloRunId, 'producer', '1', 'assignment.json'), 'utf8'),
+  ).contextRefs;
+  assert.equal(refs.length, 4, `refs: ${JSON.stringify(refs)}`);
+  for (const role of ['panelist-1', 'panelist-2', 'panelist-3', 'synthesizer']) {
+    const ref = refs.find((r) => r.includes(`/assignments/${panelRunId}/${role}/`));
+    assert.ok(ref && path.isAbsolute(ref) && fs.existsSync(ref), `${role} report is listed: ${JSON.stringify(refs)}`);
+  }
+});
+
+test('a completed unit keeps the id of the Unit run that produced it', () => {
+  const tmp = setupTestRepo();
+  const workflow = validateWorkflow({
+    id: 'unit-run-id-projection',
+    steps: [{ id: 's1', units: [{ id: 'u1', template: { capability: 'docs:write', objective: 'x' } }] }],
+  });
+  const { workflowRunId } = createWorkflowRun({ repoRoot: tmp, workflowId: workflow.id, workflow });
+  const append = (type, payload) => appendWorkflowEvent({ repoRoot: tmp, workflowRunId, event: { type, payload } });
+  const unitOf = () => projectWorkflowState(readWorkflowEvents({ repoRoot: tmp, workflowRunId })).steps.s1.units.u1;
+
+  append('unit.scheduled', { stepId: 's1', unitId: 'u1' });
+  assert.equal(unitOf().unitRunId, undefined, 'a scheduled unit has no Unit run id yet');
+  append('unit.complete', { stepId: 's1', unitId: 'u1', unitRunId: 'unit-run-123-abcd', outcome: 'pass', results: [] });
+  assert.equal(unitOf().unitRunId, 'unit-run-123-abcd');
 });
 
 function seedRunWithUnitWorktrees(tmp, { terminal, trunk = 'main' }) {
