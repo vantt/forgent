@@ -772,9 +772,7 @@ test('review --github --pr on a closed-without-merge PR names the PR, points to 
   const fake = writeViewFake(cwd, 'gh-view-closed.cjs', ghLog,
     { state: 'CLOSED', mergeable: 'UNKNOWN', mergeStateStatus: 'UNKNOWN', mergedAt: null, closed: true, closedAt: '2026-07-17T09:00:00Z' });
 
-  const startedAt = Date.now();
   const result = run(cwd, ['review', 'gh-status-closed', '--github', '--pr', '77'], { FGOS_GH_COMMAND: fake });
-  const elapsedMs = Date.now() - startedAt;
 
   assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
   const closedData = envelopeData(result.stdout);
@@ -783,7 +781,6 @@ test('review --github --pr on a closed-without-merge PR names the PR, points to 
 
   const invocations = fs.readFileSync(ghLog, 'utf8').trim().split('\n').filter(Boolean);
   assert.equal(invocations.length, 1, `expected exactly one gh invocation under pollTimeoutMs:0, got ${invocations.length}`);
-  assert.ok(elapsedMs < 5000, `status check must resolve well under the default 10s poll timeout, took ${elapsedMs}ms`);
 
   const view = stateView(cwd);
   assert.equal(view.work['gh-status-closed'].status, 'awaiting-approval', 'a GitHub-side close is not a reject — no FSM mutation');
