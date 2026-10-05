@@ -228,7 +228,6 @@
     "src/workflow/store.mjs": "infra",
     "src/workflow/integrate.mjs": "infra",
     "src/workflow/plan-source.mjs": "infra",
-    "src/workflow/dir-guard.mjs": "infra",
     "src/workflow/runner.mjs": "use-case",
     "src/workflow/index.mjs": "use-case",
     "src/workflow/checked.mjs": "infra",
