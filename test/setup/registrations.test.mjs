@@ -13,7 +13,7 @@ import { execFileSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import { DOCTOR_CHECKS, CONFIG_DEFAULT_REGISTRATIONS, FIX_REGISTRATIONS, registerCheck, registerConfigDefault, registerFix, runFixes, ensureSharedConfigDefaults } from '../../src/setup/checks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
-import { DEFAULT_CAPABILITY_SLOTS, PI_EXECUTOR_DEFAULT, findWorkflowStageOperationProblems } from '../../src/setup/registrations.mjs';
+import { DEFAULT_CAPABILITY_SLOTS, PI_EXECUTOR_DEFAULT, findWorkflowStageOperationProblems, checkTaskSpecsResolve, checkDomainWorkflowOperationsCoverage } from '../../src/setup/registrations.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { recordMainCheckoutGuardWarning } from '../../src/state/main-checkout-guard-warnings.mjs';
 
@@ -491,6 +491,35 @@ test('task-specs-resolve doctor check passes when core/task-specs/ and domain ta
   assert.ok(entry, 'task-specs-resolve check must be registered');
   const result = entry.check(process.cwd());
   assert.equal(result.passed, true, `task-specs-resolve failed: ${result.message}`);
+});
+
+test('task-spec and workflow-operation checks pass on a plain target project that carries no fgOS trees', () => {
+  const project = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-plain-target-'));
+  try {
+    assert.equal(fs.existsSync(path.join(project, 'domains')), false);
+    assert.equal(fs.existsSync(path.join(project, 'core')), false);
+    for (const id of ['task-specs-resolve', 'domain-workflow-operations-coverage']) {
+      const entry = DOCTOR_CHECKS.find((c) => c.id === id);
+      const result = entry.check(project);
+      assert.equal(result.passed, true, `${id} failed on a plain target: ${result.message}`);
+    }
+  } finally {
+    fs.rmSync(project, { recursive: true, force: true });
+  }
+});
+
+test('task-spec and workflow-operation checks still fail when the install root lacks its own task-specs', () => {
+  const emptyRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-broken-install-'));
+  try {
+    const specs = checkTaskSpecsResolve(emptyRoot);
+    assert.equal(specs.passed, false);
+    assert.match(specs.message, /missing task-spec file/);
+    const coverage = checkDomainWorkflowOperationsCoverage(emptyRoot, emptyRoot);
+    assert.equal(coverage.passed, false);
+    assert.match(coverage.message, /not found/);
+  } finally {
+    fs.rmSync(emptyRoot, { recursive: true, force: true });
+  }
 });
 
 test('agent-type-names-unique doctor check passes when agent-type names are globally unique', () => {
