@@ -18,11 +18,17 @@ clone, no npm, no Rust toolchain required:
 curl -fsSL https://raw.githubusercontent.com/vantt/forgent/main/install.sh | sh
 ```
 
-Then initialize your project:
+Then initialize your project. A plain `fgctl init` works only when the project
+already carries a committed `.fgos/distribution.json` pin; for a first install
+pass the release asset:
 
 ```bash
-fgctl init
+fgctl init --from ./fgos-<version>-x86_64-unknown-linux-gnu.tar.gz
 ```
+
+`fgctl init` ends by running `fgos doctor --fix` and `fgos doctor`, which only run
+registered fixes: run `fgos setup` once in the project for the config defaults,
+hook wiring and Claude Code hook they do not write.
 
 `npm install -g github:vantt/forgent#v0.1.0` is kept as a documented
 compatibility channel for the Node host this platform is migrating away
@@ -77,11 +83,13 @@ fgos setup --pretty   # colored plain text instead of JSON
 
 `fgos doctor` is a read-only diagnostic: Node/git availability, whether
 the shell-integration line is sourced, and whether your config file is
-missing any current default key. It never writes anything on its own.
+missing any current default key. It never writes anything on its own, and it
+exits 0 whatever the checks say; add `--strict` to exit 1 when a check fails.
 
 ```bash
 fgos doctor
 fgos doctor --fix     # runs every registered fix, then re-reports checks
+fgos doctor --strict  # same report, exit 1 if any check fails (for scripts/CI)
 ```
 
 For the full onboarding order, what every doctor check means and which ones you

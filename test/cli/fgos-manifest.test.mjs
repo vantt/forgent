@@ -140,7 +140,7 @@ test('fgos --help prints non-empty text listing every verb', () => {
 test('setup is marked deprecated with the fgctl init workspace-onboarding path', () => {
   const setupEntry = COMMAND_REGISTRY.find((entry) => entry.name === 'setup');
   assert.ok(setupEntry, 'COMMAND_REGISTRY is missing a "setup" entry');
-  assert.equal(setupEntry.deprecated, 'since 2026-09-14; target workspace onboarding uses fgctl init, then .fgos/installation/bin/fgos doctor --fix, then .fgos/installation/bin/fgos doctor; legacy setup remains the compatibility path for shell/global integration until a compatibility-window decision retires it');
+  assert.equal(setupEntry.deprecated, 'since 2026-09-14; target workspace onboarding starts with fgctl init (plain fgctl init needs --from <source> when .fgos/distribution.json is absent), then .fgos/installation/bin/fgos doctor --fix and .fgos/installation/bin/fgos doctor; doctor --fix runs only the registered fixes, so run fgos setup once in the project for the config defaults, git hook and Claude Code hook it does not write; shell/global integration stays here until a compatibility-window decision retires it');
 
   const cwd = tmpCwd();
   const manifestResult = run(cwd, ['--help', '--json']);
