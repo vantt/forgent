@@ -47,6 +47,7 @@ import { loadRunnerConfig, ensureRunnerConfigForDir, loadRunnerConfigFromDir, Ru
 import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
 import { checkDispatchAttestation } from '../src/runner/attestation-guard.mjs';
 import { formatDeprecation } from '../src/cli/deprecation.mjs';
+import { checkDirDiffersFromCwd, attachDirWarning } from '../src/workflow/dir-guard.mjs';
 import { lintPlanCapabilityAnnotations, lintPhaseUnits } from '../src/report/capability-plan-lint.mjs';
 import { appendWorkerLog } from '../src/runner/worker-log.mjs';
 
@@ -2182,7 +2183,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         };
         // Default: record the run, hand advancing to a detached process, return the run id.
         // --foreground keeps the run in this process until it completes, fails, or parks.
-        return foreground ? await startWorkflow(startParams) : startWorkflowDetached(startParams);
+        const startWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
+        return attachDirWarning(foreground ? await startWorkflow(startParams) : startWorkflowDetached(startParams), startWarning);
       }
       if (sub === 'status') {
         const { statusWorkflow } = await import('../src/workflow/index.mjs');
@@ -2195,13 +2197,15 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const stepId = requireField(flags.step, 'workflow answer requires --step <stepId>');
         const answer = requireField(flags.answer, 'workflow answer requires --answer <text>');
         const answerParams = { stepId, answer, repoRoot: flags.dir, worktree: flags.worktree };
-        return foreground ? await answerWorkflow(workflowRunId, answerParams) : answerWorkflowDetached(workflowRunId, answerParams);
+        const answerWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
+        return attachDirWarning(foreground ? await answerWorkflow(workflowRunId, answerParams) : answerWorkflowDetached(workflowRunId, answerParams), answerWarning);
       }
       if (sub === 'resume') {
         const { resumeWorkflow, resumeWorkflowDetached } = await import('../src/workflow/index.mjs');
         const workflowRunId = requireField(positional[1] ?? flags.id ?? swallowedId, 'workflow resume requires a workflowRunId: fgos workflow resume <id>');
         const resumeOptions = { repoRoot: flags.dir, worktree: flags.worktree };
-        return foreground ? await resumeWorkflow(workflowRunId, resumeOptions) : resumeWorkflowDetached(workflowRunId, resumeOptions);
+        const resumeWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
+        return attachDirWarning(foreground ? await resumeWorkflow(workflowRunId, resumeOptions) : resumeWorkflowDetached(workflowRunId, resumeOptions), resumeWarning);
       }
 
       // Operations a step offers, read from the Workflow definition
@@ -2670,15 +2674,16 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       }
       const repoRoot = flags.dir;
       const worktree = flags.worktree;
+      const runWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
 
-      return await runUnit({
+      return attachDirWarning(await runUnit({
         unitPath,
         pattern,
         overrides,
         resumeUnitRunId,
         repoRoot,
         worktree,
-      });
+      }), runWarning);
     }
 
 
