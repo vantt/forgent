@@ -84,6 +84,10 @@ fgos doctor
 fgos doctor --fix     # runs every registered fix, then re-reports checks
 ```
 
+For the full onboarding order, what every doctor check means and which ones you
+must fix by hand, see
+[How to install fgOS in a project and use fgos doctor](docs/how-to/install-fgos-in-a-project-and-use-doctor.md).
+
 ### Config
 
 Setup and doctor share one local file, `.fgos/config.json`. `fgos setup`
