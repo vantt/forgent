@@ -2618,8 +2618,8 @@ export async function executeAssignment(assignment, opts = {}) {
       } catch (err) {
         executionError = err;
         // The herdr round names the real reason beside the coarse error class; a
-        // provider limit is not a timeout and must not be settled as one.
-        const limitOutcome = err.outcome === 'provider-limit' || err.outcome === 'paused-limit' ? err.outcome : null;
+        // provider limit, or an agent waiting on a person, is not a timeout and must not be settled as one.
+        const limitOutcome = err.outcome === 'provider-limit' || err.outcome === 'paused-limit' || err.outcome === 'blocked' ? err.outcome : null;
         const isTimeoutErr = !limitOutcome && (err.errorClass === 'worker-timeout' || err.category === 'worker-timeout' || /timed out/i.test(err.message));
         rawResult = {
           status: isTimeoutErr ? 'timeout' : 'failed',

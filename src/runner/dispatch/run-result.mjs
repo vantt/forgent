@@ -1124,6 +1124,7 @@ export const OUTCOME_CATEGORIES = Object.freeze(['ok', 'verdict', 'blocked', 'po
 /**
  * Derive high-level outcome from RunResult classification.
  * Rules evaluated in strict order (Red Team finding #1):
+ * 0. failure.code === 'blocked' (an agent waiting on a person) -> blocked
  * 1. execution.status in {failed, cancelled, completion-unknown} and failure.family in {provider, resource, unknown} (or no failure) -> infra
  * 2. policy.disposition === 'refuse' OR failure.family in {contract, policy} -> policy
  * 3. policy.disposition === 'needs-input' -> infra
@@ -1154,6 +1155,14 @@ export function deriveOutcome(classification) {
   const failureFamily = classification.failure?.family;
   const policyDisp = classification.policy?.disposition;
   const verdict = classification.assessment?.verdict;
+
+  // An agent waiting on a prompt only a person can answer is blocked, whatever exit the stop produced.
+  if (failureFamily === 'provider' && classification.failure?.code === 'blocked') {
+    return Object.freeze({
+      category: 'blocked',
+      reason: 'blocked',
+    });
+  }
 
   // Rule 1: execution failed/cancelled/unknown with provider/resource/unknown failure (or no failure)
   const isFailedExec = execStatus === 'failed' || execStatus === 'cancelled' || execStatus === 'completion-unknown';

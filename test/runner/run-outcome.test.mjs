@@ -89,6 +89,16 @@ test('runOutcome: applies evidenceFloor to downgrade spoofed pass', () => {
   assert.equal(downgraded.infraFailure, true);
 });
 
+test('deriveOutcome: an agent waiting on a person is blocked, not an infra failure', () => {
+  const outcome = deriveOutcome({
+    execution: { status: 'failed' },
+    failure: { family: 'provider', code: 'blocked' },
+    policy: { disposition: 'needs-input', code: 'blocked' },
+  });
+  assert.equal(outcome.category, 'blocked');
+  assert.equal(outcome.reason, 'blocked');
+});
+
 test('deriveOutcome: strict rule order verification', () => {
   // 1. execution failed + provider failure -> infra
   assert.equal(

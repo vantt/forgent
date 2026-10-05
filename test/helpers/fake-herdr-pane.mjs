@@ -12,6 +12,8 @@
 //
 // A scripted pane is picked by creation order (1-based). Per pane:
 //   limit: true         idle forever; `agent read` shows `limitScreen`
+//   blockedAfterBrief: true  once the brief is typed the agent sits on a dialog only a person can answer: `agent get`
+//                       says "blocked", `agent read` shows `blockScreen`, and no ack or result is ever written
 //   awaitProbe: true    wait for the in-sandbox agent's probe-results.json before settling
 //   detector: true      `agent explain` answers like herdr's screen detector (idle until a brief is taken)
 //   reportedWorking: true  `agent get` says "working" forever, as it does for a confined pane (only the state
@@ -110,12 +112,14 @@ if (group === 'pane' && action === 'close') {
 
 if (group === 'agent' && action === 'get') {
   const id = args[2];
-  ok({ agent: { agent_status: scripted(id).reportedWorking ? 'working' : 'idle', pane_id: id, state_change_seq: 0 } });
+  const blocked = scripted(id).blockedAfterBrief && state.panes[id]?.delivered;
+  ok({ agent: { agent_status: blocked ? 'blocked' : scripted(id).reportedWorking ? 'working' : 'idle', pane_id: id, state_change_seq: 0 } });
 }
 
 if (group === 'agent' && action === 'read') {
   const id = args[2];
-  ok({ read: { text: scripted(id).limit ? (scenario.limitScreen ?? '') : '' } });
+  const blockedText = scripted(id).blockedAfterBrief && state.panes[id]?.delivered ? (scenario.blockScreen ?? '') : '';
+  ok({ read: { text: scripted(id).limit ? (scenario.limitScreen ?? '') : blockedText } });
 }
 
 if (group === 'agent' && action === 'start') ok({ agent: { agent_status: 'idle' } });
@@ -124,6 +128,7 @@ const deliver = (id, text) => {
   let briefText = text;
   const pointer = text.match(/^Read (.+) and do what it says\.$/);
   if (pointer) briefText = fs.readFileSync(pointer[1], 'utf8');
+  if (scripted(id).blockedAfterBrief) return;
   const ackMatch = briefText.match(/(\/\S+\/outbox\/ack-1\.json)/);
   if (ackMatch) {
     const outbox = path.dirname(ackMatch[1]);
@@ -211,7 +216,7 @@ ok({});
 
 /**
  * @param {string} dir  scratch directory (created if missing)
- * @param {{panes?: object[], limitScreen?: string}} [scenario]
+ * @param {{panes?: object[], limitScreen?: string, blockScreen?: string}} [scenario]
  */
 export function createFakeHerdr(dir, scenario = {}) {
   fs.mkdirSync(dir, { recursive: true });

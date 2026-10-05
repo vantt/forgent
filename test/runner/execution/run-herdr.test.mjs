@@ -514,6 +514,30 @@ test('with no candidate left a provider limit stays a structured provider-limit 
   assert.ok(!fake.closedPaneIds().includes('mock-pane-1'));
 });
 
+test('an agent stopped on a trust prompt ends as blocked, not as a timeout, and the failure names the repair', { skip: SKIP }, async () => {
+  const { repoRoot, worktreeDir } = setup(['alpha', 'beta']);
+  const fake = useFakeHerdr({
+    panes: [{ blockedAfterBrief: true }, {}],
+    blockScreen: '  Trust this folder? Codex can read, edit, and run files here.\n› 1. Trust and continue\n  2. Back to Agent Command Center\n',
+  });
+  const res = await withHerdrBin(fake.herdrBin, () => runUnit({
+    unitData: readOnlyUnit('u-trust-prompt'),
+    repoRoot,
+    cwd: worktreeDir,
+    worktree: worktreeDir,
+    session: { herdrPresent: true, headless: true },
+  }));
+  assert.equal(res.outcome, 'blocked', JSON.stringify(res.results[0]).slice(0, 1500));
+  const runResult = readJson(path.join(runDirOf(repoRoot, res.unitRunId, 'producer', 1), 'result.json'));
+  assert.equal(runResult.classification.failure.code, 'blocked');
+  assert.equal(runResult.classification.outcome.category, 'blocked');
+  assert.match(runResult.runnerNote.summary, /Back to Agent Command Center/);
+  assert.match(runResult.runnerNote.summary, /grant trust for this project in the agent's own home/);
+  // Not a timeout and not a provider limit: no second candidate is tried, the pane stays for the person.
+  assert.equal(fake.calls().filter((c) => c[0] === 'pane' && c[1] === 'split').length, 1);
+  assert.ok(!fake.closedPaneIds().includes('mock-pane-1'));
+});
+
 test('a resumed run reuses the binding recorded in unit.json instead of binding again', { skip: SKIP }, async () => {
   const { repoRoot, worktreeDir } = setup(['alpha', 'beta']);
   const limited = useFakeHerdr({ panes: [{ limit: true }, { limit: true }], limitScreen: 'Usage limit reached.' });
