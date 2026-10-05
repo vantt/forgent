@@ -65,7 +65,8 @@ extend that map in this skill.
 5. For discussion workflows (`delphi`, `nominal-group`, `group-cognition`),
    start the workflow via `fgos workflow start <workflowId>` (or delegate to
    [`fgos-group-thinking`](../fgos-group-thinking/SKILL.md)).
-   Inspect progress and findings via `fgos workflow status <workflowRunId>`.
+   `start` returns at once (the run continues detached); inspect progress and findings via
+   `fgos workflow status <workflowRunId>`, polling until the run completes or parks at a gate.
    If a workflow parks at a human gate (such as `voting-ranking` in `nominal-group`),
    submit answers via `fgos workflow answer <workflowRunId> --step <stepId> --answer <text>`.
 6. For single-unit presets (`rfc`, `consult`, `research-fan-out`), dispatch

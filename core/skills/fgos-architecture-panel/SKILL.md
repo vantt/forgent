@@ -101,7 +101,10 @@ into something new; they *are* the fragment's `disposition criteria` and
 This skill invokes the registered `architecture-advisory` workflow through the unified `fgos workflow` CLI door:
 
 - **Start workflow:** `fgos workflow start architecture-advisory` (or with `--dir <repoRoot>`).
-  Returns `{ workflowRunId, status, steps, ... }`.
+  Returns at once with `{ workflowRunId, detached: { pid, logPath, statusCommand } }`; the run continues
+  in a detached process and its log is `.fgos/workflow-runs/<workflowRunId>/advance.log`. It does NOT return
+  the finished run: poll `fgos workflow status <workflowRunId>` until the run is `completed`, `failed` or
+  parked at a gate. Add `--foreground` only when the caller must wait in place.
 - **Check status / inspect outputs:** `fgos workflow status <workflowRunId>` (or with `--dir <repoRoot>`).
   Reports status of every step (`framing`, `shaping`, `critique`, `synthesis`, `explanation`),
   active units, and any pending questions at gates.

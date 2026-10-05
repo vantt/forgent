@@ -75,6 +75,11 @@ fgos workflow start group-cognition
 fgos workflow start architecture-advisory
 ```
 
+`start` returns at once with the `workflowRunId` and a `detached` block (`pid`, `logPath`,
+`statusCommand`); the run continues in a detached process. Never treat the output of `start` as the
+result: poll `fgos workflow status <workflowRunId>` (section 3) until the run is `completed`, `failed`
+or parked at a gate. Pass `--foreground` only when the caller must wait in place.
+
 The Workflow Runner parses the YAML definition, resolves unit capability bindings
 via `src/runner/execution/bind.mjs`, and executes steps sequentially or in parallel
 according to declared DAG dependencies (`dependsOn`).
