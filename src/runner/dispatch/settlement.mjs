@@ -700,8 +700,9 @@ export async function settleRunOutcome({
     confidenceLevel: evidenceFacts.confidenceLevel,
     // A worker that stopped on a provider limit failed for that reason, not for the
     // generic exit the adapter reported; the code is what lets a caller move to the
-    // next candidate instead of retrying the same provider.
-    ...(adapterOutcome === 'provider-limit' || adapterOutcome === 'paused-limit'
+    // next candidate instead of retrying the same provider. One waiting on a prompt only
+    // a person can answer is `blocked`: retrying or moving on does not clear it.
+    ...(adapterOutcome === 'provider-limit' || adapterOutcome === 'paused-limit' || adapterOutcome === 'blocked'
       ? { failureOverride: { family: 'provider', code: adapterOutcome } }
       : evidenceFacts.failure ? { failureOverride: evidenceFacts.failure } : {}),
     ...(evidenceFacts.policy ? { policyOverride: evidenceFacts.policy } : {}),

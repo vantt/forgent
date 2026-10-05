@@ -862,7 +862,7 @@ function deliverBrief({ client, round, message, promptMs, resultPath }) {
   }
   throw round.fail('worker-spawn-fail', err.code ?? 'agent_prompt_failed',
     `executor failed to brief the worker for work "${round.workId}": ${err.message}${screen ? ` -- last line on screen: ${screen}` : ''}`,
-    screen ? { screen } : {});
+    { ...(err.code === 'agent_blocked' ? { outcome: 'blocked' } : {}), ...(screen ? { screen } : {}) });
 }
 
 /**
@@ -992,7 +992,7 @@ export function refuseBriefIntoUnreadyPane({ client, round, readiness }) {
   cleanupIfWorkerStillLive(client, round.paneId);
   throw round.fail('worker-spawn-fail', reason,
     `executor for work "${round.workId}" not briefed: ${why}.${screenLine ? ` Last line on screen: ${screenLine}` : ''}`,
-    { readiness, ...(screenLine ? { screen: screenLine } : {}) });
+    { readiness, ...(readiness === 'blocked' ? { outcome: 'blocked' } : {}), ...(screenLine ? { screen: screenLine } : {}) });
 }
 
 /**
@@ -1267,7 +1267,7 @@ function concludeFailure({ client, round, decision, closeAlways }) {
     decision.outcome,
     `executor for work "${round.workId}" ended as ${decision.outcome}: ${decision.reason}.${
       screenLine ? ` Last line on screen: ${screenLine}` : ''
-    }${fate === 'keep' ? ` Pane ${round.paneId} is left open.` : ''}`,
+    }${decision.outcome === 'blocked' ? ` Answer the prompt in the pane, or grant trust for this project in the agent's own home, then run again.` : ''}${fate === 'keep' ? ` Pane ${round.paneId} is left open.` : ''}`,
     { outcome: decision.outcome, paneRetained: fate !== 'close', ...(screenLine ? { screen: screenLine } : {}), ...(diagnosis ? { diagnosis } : {}) },
   );
 }
