@@ -16,6 +16,7 @@ const DISALLOWED_UNIT_FIELDS = Object.freeze([
 ]);
 
 const UNIT_RUN_INPUT_PATTERN = /^unit-run:[^/\s]+\/[^/\s]+$/;
+const GATE_ANSWER_INPUT_PATTERN = /^gate-answer:[^/\s]+\/[^/\s]+$/;
 
 /**
  * Validates whether a path is a safe repo-relative path.
@@ -37,12 +38,16 @@ function isValidRepoRelativePath(p) {
 }
 
 /**
- * Validates whether an input is either a safe repo-relative path or a 'unit-run:<id>/<role>' reference.
+ * Validates whether an input is a safe repo-relative path, a 'unit-run:<id>/<role>' reference, or a
+ * 'gate-answer:<workflowRunId>/<stepId>' reference.
  */
 function isValidInput(inp) {
   if (typeof inp !== 'string' || !inp.trim()) return false;
   if (inp.startsWith('unit-run:')) {
     return UNIT_RUN_INPUT_PATTERN.test(inp);
+  }
+  if (inp.startsWith('gate-answer:')) {
+    return GATE_ANSWER_INPUT_PATTERN.test(inp);
   }
   return isValidRepoRelativePath(inp);
 }
@@ -169,7 +174,7 @@ export function validateUnit(raw) {
     const inp = rawInputs[i];
     if (!isValidInput(inp)) {
       throw new RunnerConfigError(
-        `unit.inputs[${i}] must be a repo-relative path or "unit-run:<id>/<role>" ref, got: ${JSON.stringify(inp)}.`,
+        `unit.inputs[${i}] must be a repo-relative path or "unit-run:<id>/<role>" ref (or "gate-answer:<workflowRunId>/<stepId>"), got: ${JSON.stringify(inp)}.`,
       );
     }
     inputs.push(inp);

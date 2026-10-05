@@ -23,6 +23,9 @@ import {
 import { translatePlanToWorkflow } from './plan-source.mjs';
 import { runUnit, snapshotRunnerConfig, resolveGitRoots } from '../runner/execution/run.mjs';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { gateAnswerFile } from '../runner/execution/handoff-refs.mjs';
+
+const GATE_ANSWER_NOTE_CHARS = 200;
 
 /**
  * What a unit needs beyond its template objective: the owner's request the run was started
@@ -63,6 +66,22 @@ function buildUnitHandoff({ template, state, step, workflow }) {
   if (index.length > 0) {
     parts.push(
       `Output of earlier steps (the full report of every role is listed under Context refs; read them before answering):\n\n${index.join('\n\n')}`,
+    );
+  }
+
+  // The owner's answers to human gates -- the gated step's own and those of the steps it builds on.
+  // Each travels as a file ref; the objective keeps one line per answer, tagged as the owner's.
+  const answerNotes = [];
+  for (const gated of workflow.steps) {
+    const answer = state.steps[gated.id]?.answer;
+    if (answer === null || answer === undefined || (!wanted.has(gated.id) && gated.id !== step.id)) continue;
+    inputs.push(`gate-answer:${state.workflowRunId}/${gated.id}`);
+    const oneLine = String(answer).replace(/\s+/g, ' ').trim();
+    answerNotes.push(`- ${gated.id} (owner's answer at the "${gated.id}" gate): ${oneLine.slice(0, GATE_ANSWER_NOTE_CHARS)}`);
+  }
+  if (answerNotes.length > 0) {
+    parts.push(
+      `The owner's own answers at human gates of this run -- the owner's input, not another agent's output, and it decides what is open at that gate (the full text of each is listed under Context refs; read it before answering):\n${answerNotes.join('\n')}`,
     );
   }
   return { objective: parts.filter(Boolean).join('\n\n'), inputs };
@@ -691,6 +710,12 @@ function recordGateAnswer(workflowRunId, params, mainRoot) {
   }
   const state = projectWorkflowState(events);
 
+  // The file comes first: an answer that cannot be kept where later units read it is refused,
+  // not recorded.
+  const answeredAt = new Date().toISOString();
+  const question = state.questions.find((q) => q.stepId === params.stepId)?.question ?? state.steps[params.stepId]?.gate?.question ?? '';
+  writeGateAnswerFile({ mainRoot, workflowRunId, stepId: params.stepId, question, answer: String(params.answer), answeredAt });
+
   appendWorkflowEvent({
     repoRoot: mainRoot,
     workflowRunId,
@@ -699,11 +724,46 @@ function recordGateAnswer(workflowRunId, params, mainRoot) {
       payload: {
         stepId: params.stepId,
         answer: params.answer,
-        answeredAt: new Date().toISOString(),
+        answeredAt,
       },
     },
   });
   return state;
+}
+
+/**
+ * Keep the owner's answer to a human gate as a file in the run directory, the one place later
+ * units are handed it from (`gate-answer:<workflowRunId>/<stepId>`). A second answer to the same
+ * gate replaces the first.
+ */
+function writeGateAnswerFile({ mainRoot, workflowRunId, stepId, question, answer, answeredAt }) {
+  const file = gateAnswerFile(mainRoot, workflowRunId, stepId);
+  if (!file) {
+    throw new RunnerConfigError(`gate answer refused: "${stepId}" is not a step id that can name an answer file`);
+  }
+  const text = [
+    `# Owner's answer at the "${stepId}" gate`,
+    '',
+    `This is input from the owner of the Workflow run, given at a human gate; it is not output of another agent.`,
+    '',
+    `- Workflow run: ${workflowRunId}`,
+    `- Step: ${stepId}`,
+    `- Answered by: the owner, through "fgos workflow answer"`,
+    `- Answered at: ${answeredAt}`,
+    '',
+    '## Question',
+    '',
+    question,
+    '',
+    '## Answer',
+    '',
+    answer,
+    '',
+  ].join('\n');
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  const tmp = `${file}.${process.pid}.tmp`;
+  fs.writeFileSync(tmp, text);
+  fs.renameSync(tmp, file);
 }
 
 /**

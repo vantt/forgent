@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- A human gate answer (`fgos workflow answer`) now reaches the units that come after it. The answer is kept in the run directory (`gate-answers/<stepId>.md`) and handed to the gated step's units and every step that depends on it as a context ref (`gate-answer:<workflowRunId>/<stepId>`), with a one-line note in the objective marked as the owner's answer. Before, the answer was only logged, so a final ranking was written without the human's votes.
+- A Workflow unit template's `persona` and `params` now take effect. They were declared in `core/workflows/*.yaml` but never passed on; `params` now reach the pattern (`members`, `roleTasks`, ...) and `persona` is bound on the unit's seats the way `fgos run --override` does it.
 - Workflow steps now hand every earlier role's full report to the next step as context refs (`unit-run:<unitRunId>/<role>` in a unit's `inputs`, resolved once into `unit.json`); nothing is truncated and no panelist report is dropped. The step's objective keeps the owner request and one summary line per earlier unit.
 - The `z-ai` model policy (glm) now uses `z-ai/glm-5.3` for every tier instead of `z-ai/glm-5.2`.
 

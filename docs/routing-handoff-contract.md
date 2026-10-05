@@ -76,7 +76,10 @@ Ba bất biến, tách bạch rõ để không ai đọc nhầm đây là sandbo
 - **Context ref tới kết quả vai/bước trước là đường dẫn tuyệt đối dưới
   `.fgos/assignments/` của main checkout.** Worker chỉ đọc, không ghi; runner
   kiểm sha256 lúc settle trước khi trao. Không mở rộng quyền đọc: worker vốn
-  đọc được (`--ro-bind / /`, `hostRead: allow`).
+  đọc được (`--ro-bind / /`, `hostRead: allow`). Câu trả lời của owner ở cổng
+  người của một Workflow run cũng đi đường này (`gate-answer:` → file dưới
+  `.fgos/workflow-runs/<id>/gate-answers/`): là input của owner, không phải
+  output của agent khác, và brief nói rõ như vậy.
 
 ## Tham chiếu
 

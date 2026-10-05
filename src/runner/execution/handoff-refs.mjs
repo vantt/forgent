@@ -4,7 +4,8 @@
 // Inside a Unit run the pattern passes the earlier role's record (`reportRefOf`). Across Units a
 // Unit names `unit-run:<unitRunId>/<role>` in its `inputs`; `resolveUnitInputs` turns that into
 // the path once, when the Unit run is created, and the result is kept in unit.json so a resume or
-// a fallback hands out the same list.
+// a fallback hands out the same list. The owner's answer to a human gate of a Workflow run travels
+// the same way as `gate-answer:<workflowRunId>/<stepId>`.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -14,6 +15,7 @@ import { RunnerConfigError } from '../dispatch/config.mjs';
 import { readUnitRunHistory } from './unit-run-history.mjs';
 
 const UNIT_RUN_PREFIX = 'unit-run:';
+const GATE_ANSWER_PREFIX = 'gate-answer:';
 
 /** A hand-off that cannot be turned into a path; `reason` names why. */
 export class HandoffRefError extends RunnerConfigError {
@@ -75,6 +77,25 @@ export function reportRefsOf(records, where) {
   return refs;
 }
 
+const isPathSegment = (s) => typeof s === 'string' && s !== '' && s !== '.' && s !== '..' && !/[/\\\0\s]/.test(s);
+
+/**
+ * Where the owner's answer to one human gate of a Workflow run is kept, absolute; null when
+ * either id could not name a file inside the run's `gate-answers` directory. The Workflow runner
+ * writes the file when the answer is recorded; `gate-answer:` inputs resolve to it.
+ */
+export function gateAnswerFile(mainRoot, workflowRunId, stepId) {
+  if (!isPathSegment(workflowRunId) || !isPathSegment(stepId)) return null;
+  return path.join(mainRoot, '.fgos', 'workflow-runs', workflowRunId, 'gate-answers', `${stepId}.md`);
+}
+
+function resolveGateAnswerRef(input, mainRoot) {
+  const [workflowRunId, stepId, ...rest] = input.slice(GATE_ANSWER_PREFIX.length).split('/');
+  const file = rest.length === 0 ? gateAnswerFile(mainRoot, workflowRunId, stepId) : null;
+  if (!file || !fs.existsSync(file)) throw new HandoffRefError(input, 'no-such-answer');
+  return file;
+}
+
 function resolveUnitRunRef(input, mainRoot) {
   const [unitRunId, role] = input.slice(UNIT_RUN_PREFIX.length).split('/');
   const fail = (reason) => new HandoffRefError(input, reason);
@@ -105,7 +126,8 @@ function resolveUnitRunRef(input, mainRoot) {
 
 /**
  * Turn a Unit's `inputs` into the context refs its roles are given: a repo-relative path stays as
- * it is, a `unit-run:<unitRunId>/<role>` becomes the absolute path of that role's report.
+ * it is, a `unit-run:<unitRunId>/<role>` becomes the absolute path of that role's report, a
+ * `gate-answer:<workflowRunId>/<stepId>` the absolute path of the owner's recorded gate answer.
  * Throws before anything is dispatched when a ref cannot be resolved.
  *
  * @param {readonly string[]} inputs
@@ -115,7 +137,9 @@ function resolveUnitRunRef(input, mainRoot) {
 export function resolveUnitInputs(inputs, mainRoot) {
   const refs = [];
   for (const input of inputs ?? []) {
-    const ref = input.startsWith(UNIT_RUN_PREFIX) ? resolveUnitRunRef(input, mainRoot) : input;
+    let ref = input;
+    if (input.startsWith(UNIT_RUN_PREFIX)) ref = resolveUnitRunRef(input, mainRoot);
+    else if (input.startsWith(GATE_ANSWER_PREFIX)) ref = resolveGateAnswerRef(input, mainRoot);
     if (!refs.includes(ref)) refs.push(ref);
   }
   return refs;

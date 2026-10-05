@@ -132,3 +132,43 @@ test('the highest round of a role wins, and within a round the latest fallback a
   const fallback = settleAttempt(root, 'unit-run-b', 'reviewer', '1-fb1', { report: 'after the provider limit\n' });
   assert.deepEqual(resolveUnitInputs(['unit-run:unit-run-b/reviewer'], root), [path.join(fallback.runDir, 'report.md')]);
 });
+
+/** Write the answer file of one gate the way the Workflow runner leaves it. */
+function recordAnswer(root, workflowRunId, stepId, text = '# answer\n') {
+  const dir = path.join(root, '.fgos', 'workflow-runs', workflowRunId, 'gate-answers');
+  fs.mkdirSync(dir, { recursive: true });
+  const file = path.join(dir, `${stepId}.md`);
+  fs.writeFileSync(file, text);
+  return file;
+}
+
+test('a gate-answer input resolves to the absolute path of the recorded answer', () => {
+  const root = makeRoot();
+  const file = recordAnswer(root, 'wf-run-1', 'voting-ranking');
+  const { runDir } = settleAttempt(root, 'unit-run-a', 'producer', '1', { report: '# done\n' });
+  assert.deepEqual(
+    resolveUnitInputs(['unit-run:unit-run-a/producer', 'gate-answer:wf-run-1/voting-ranking', 'gate-answer:wf-run-1/voting-ranking'], root),
+    [path.join(runDir, 'report.md'), file],
+  );
+  assert.ok(path.isAbsolute(file));
+});
+
+test('a gate-answer input names its failure: no answer recorded, or an id that leaves the answers directory', () => {
+  const root = makeRoot();
+  recordAnswer(root, 'wf-run-1', 'voting-ranking');
+  const reasonOf = (input) => {
+    try {
+      resolveUnitInputs([input], root);
+    } catch (err) {
+      assert.ok(err instanceof HandoffRefError, String(err));
+      assert.ok(err.message.includes(`handoff-ref-unresolved: ${input}: ${err.reason}`), err.message);
+      return err.reason;
+    }
+    return null;
+  };
+  assert.equal(reasonOf('gate-answer:wf-run-1/other-step'), 'no-such-answer');
+  assert.equal(reasonOf('gate-answer:wf-run-missing/voting-ranking'), 'no-such-answer');
+  assert.equal(reasonOf('gate-answer:../wf-run-1/voting-ranking'), 'no-such-answer');
+  assert.equal(reasonOf('gate-answer:wf-run-1/..'), 'no-such-answer');
+  assert.equal(reasonOf('gate-answer:malformed'), 'no-such-answer');
+});
