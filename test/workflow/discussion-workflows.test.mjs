@@ -348,7 +348,7 @@ test('CLI: fgos workflow start and status for discussion workflows', () => {
   // Answer nominal-group gate via CLI
   const answerNominal = execFileSync(
     process.execPath,
-    [BIN_FGOS, 'workflow', 'answer', matchNominal[1], '--step', 'voting-ranking', '--answer', 'Priority 1,2,3', '--dir', tmp],
+    [BIN_FGOS, 'workflow', 'answer', matchNominal[1], '--step', 'voting-ranking', '--answer', 'Priority 1,2,3', '--dir', tmp, '--foreground'],
     { cwd: tmp, encoding: 'utf8' },
   );
   assert.ok(answerNominal.includes('completed'), 'workflow answer should resume and complete');
