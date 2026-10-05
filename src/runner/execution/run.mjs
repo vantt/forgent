@@ -8,6 +8,7 @@ import { execFileSync, execSync } from 'node:child_process';
 
 import { validateUnit } from './unit.mjs';
 import { bind, nextCandidate } from './bind.mjs';
+import { createRoleExecutorLedger } from './role-ledger.mjs';
 import { runPattern } from './patterns/index.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { ensureRunnerConfigForDir, RunnerConfigError } from '../dispatch/config.mjs';
@@ -221,18 +222,10 @@ export async function runUnit(options = {}) {
 
   const history = () => readUnitRunHistory(unitDir);
 
-  // Executors bound to each role in this unit run. `independentOf` names roles ('producer');
-  // bind() compares provider families, so a role name has to be turned into the executor(s)
-  // that played it before it can exclude anything. A role not bound yet stays a role name and
-  // excludes nothing.
-  const executorsByRole = new Map();
-  const noteRoleExecutor = (role, executorId) => {
-    if (!executorId) return;
-    if (!executorsByRole.has(role)) executorsByRole.set(role, new Set());
-    executorsByRole.get(role).add(executorId);
-  };
-  const resolveIndependence = (names) =>
-    (names || []).flatMap((name) => (executorsByRole.has(name) ? [...executorsByRole.get(name)] : [name]));
+  // Which executors played which role; `independentOf` role names resolve through it (see role-ledger.mjs).
+  const roleLedger = createRoleExecutorLedger();
+  const noteRoleExecutor = roleLedger.note;
+  const resolveIndependence = roleLedger.resolve;
 
   // Bindings recorded in unit.json, per role/round, one entry per attempt (the first binding,
   // then one per provider-limit fallback). A resumed run reuses them instead of binding again,

@@ -3938,10 +3938,12 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // silently checking/writing the wrong tree).
       const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());
       const fixed = flags.fix ? runFixes(repoRoot) : undefined;
-      const checks = DOCTOR_CHECKS.map(({ id, description, check }) => {
-        const { passed, message } = check(repoRoot);
-        return { id, description, passed, message };
-      });
+      // A check may return its result directly or as a promise (one drives promise-based runner code).
+      const checks = [];
+      for (const { id, description, check } of DOCTOR_CHECKS) {
+        const { passed, message } = await check(repoRoot);
+        checks.push({ id, description, passed, message });
+      }
       return fixed === undefined ? { checks } : { fixed, checks };
     }
 

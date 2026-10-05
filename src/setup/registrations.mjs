@@ -35,6 +35,8 @@ import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { loadRunnerConfigFromDir } from '../runner/dispatch/config.mjs';
 import { claudeCodeHookWired } from './claude-code-hooks.mjs';
 import { checkExecutorProfileWarnings } from './executor-profile-warnings.mjs';
+import { checkAgentCliProjectTrusted } from './agent-cli-trust.mjs';
+import { checkWorkflowPoolsSatisfyIndependence } from './workflow-pool-independence.mjs';
 import { checkAgyPermissionsConfigured, checkAgySubHomesConfigured, fixAgyPermissionsConfigured } from './agy-permissions.mjs';
 import { BUILTIN_POLICY_IDS, validateConfinementPolicyShape, normalizeLegacyConfinement } from '../runner/dispatch/confinement/policies.mjs';
 import {
@@ -4394,6 +4396,23 @@ registerCheck({
       return { passed: true, message: `runner config not loadable here, non-claude trust stores not evaluated: ${err.message}` };
     }
   },
+});
+
+registerCheck({
+  id: 'agent-cli-project-trusted',
+  description: 'the project root is trusted in every codex home and agy sub-HOME the configured executors run under, so a headless dispatch does not stop at a "Trust this folder?" prompt',
+  check: (cwd) => checkAgentCliProjectTrusted(cwd, { loadRunnerConfig: loadRunnerConfigFromDir }),
+});
+
+// Async: the check drives the runner's own pattern code, which is promise-based. `fgos doctor`
+// awaits every check, so a check may return its result directly or as a promise.
+registerCheck({
+  id: 'workflow-pools-satisfy-independence',
+  description: 'for every panel or reviewed Workflow unit, the capability prefer pool supplies enough distinct provider families for bind() to place every role independently',
+  check: (cwd) => checkWorkflowPoolsSatisfyIndependence(cwd, {
+    packageRoot: path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..'),
+    loadRunnerConfig: loadRunnerConfigFromDir,
+  }),
 });
 
 registerCheck({
