@@ -25,7 +25,7 @@ import {
 import { computeProbeFingerprint, runAllConfinementProbes } from "./probes/harness.mjs";
 import { normalizeLegacyConfinement, requestIsBlind } from "./policies.mjs";
 import { evaluateBypassPairing } from "./bypass-pairing.mjs";
-import { OWNERSHIP_MARKER_FILE } from "./cleanup.mjs";
+import { OWNERSHIP_MARKER_FILE, removeEmptyDispatchParent } from "./cleanup.mjs";
 import {
   canonicalJson,
   computeSha256Digest,
@@ -1795,11 +1795,14 @@ export async function finalizeConfinementResources({
         allAbsent = false;
         const markerPath = path.join(targetPath, OWNERSHIP_MARKER_FILE);
         let markerDigest = null;
+        let markerDispatchId = null;
         if (fs.existsSync(markerPath)) {
           try {
             const raw = fs.readFileSync(markerPath, 'utf8');
             try {
-              markerDigest = computeSha256Digest(JSON.parse(raw));
+              const parsed = JSON.parse(raw);
+              markerDispatchId = parsed?.dispatchId ?? null;
+              markerDigest = computeSha256Digest(parsed);
             } catch {
               markerDigest = computeSha256Digest(raw);
             }
@@ -1817,6 +1820,7 @@ export async function finalizeConfinementResources({
           typedReason = `cleanup-failed: ${err.message}`;
           break;
         }
+        removeEmptyDispatchParent(targetPath, markerDispatchId);
       }
     }
     if (willClean) {

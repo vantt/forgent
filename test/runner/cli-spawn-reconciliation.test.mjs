@@ -33,6 +33,7 @@ import {
   buildConfinementRequest,
   validateAssignmentLaunchContext,
 } from '../../src/runner/dispatch/confinement/request.mjs';
+import { writeOwnershipMarker } from '../../src/runner/dispatch/confinement/cleanup.mjs';
 import {
   prepareConfinementForLaunch,
   finalizeConfinementResources,
@@ -1029,6 +1030,36 @@ test('16. confinement temporary resources are cleaned or retained idempotently w
     descriptor: { ...descriptor, temporaryDirectories: [{ path: '/tmp/some-path', ownershipMarkerDigest: 'none' }] },
   });
   assert.equal(res3.cleanupState, 'retained');
+});
+
+// Finalizing a private home leaves no empty per-dispatch directory behind, and keeps a parent that still holds a sibling.
+test('16b. finalizing a private home removes its per-dispatch parent unless a sibling remains', async () => {
+  const tmp = mkTempDir();
+  try {
+    const runDir = path.join(tmp, 'run');
+    fs.mkdirSync(runDir, { recursive: true });
+    const finalize = async (dispatchId, launchCommandId, withSibling) => {
+      const parent = path.join(tmp, 'confinement', dispatchId);
+      const home = path.join(parent, 'home');
+      fs.mkdirSync(home, { recursive: true });
+      if (withSibling) fs.mkdirSync(path.join(parent, 'sibling'));
+      const markerPath = writeOwnershipMarker(home, { dispatchId, resource: 'private-home' });
+      const ownershipMarkerDigest = computeSha256Digest(JSON.parse(fs.readFileSync(markerPath, 'utf8')));
+      const res = await finalizeConfinementResources({
+        runDir,
+        launchCommandId,
+        receipt: { outcome: { kind: 'exit' } },
+        descriptor: { contract: 'confinement-finalization.v1', launchCommandId, runDir, temporaryDirectories: [{ path: home, ownershipMarkerDigest }] },
+      });
+      assert.equal(res.cleanupState, 'cleaned');
+      assert.equal(fs.existsSync(home), false);
+      return parent;
+    };
+    assert.equal(fs.existsSync(await finalize('disp_1_aaaaaaaa', 'cmd_a', false)), false);
+    assert.equal(fs.existsSync(await finalize('disp_2_bbbbbbbb', 'cmd_b', true)), true);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
 });
 
 // 17. Unsupported recovered cancel and shared-cwd takeover return typed park or refusal
