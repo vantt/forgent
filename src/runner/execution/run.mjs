@@ -12,24 +12,9 @@ import { runPattern } from './patterns/index.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { ensureRunnerConfigForDir, RunnerConfigError } from '../dispatch/config.mjs';
 import { commitUnitWork } from './commit-unit-work.mjs';
-import { contextRefsFromRoleResults } from './role-input-refs.mjs';
+import { reportRefsOf, resolveUnitInputs } from './handoff-refs.mjs';
+import { outcomeOfRunResult, readUnitRunHistory } from './unit-run-history.mjs';
 import { reapOrphanedConfinementResources, resolveConfinementTempRoot } from '../dispatch/confinement/cleanup.mjs';
-
-/**
- * Map a settled RunResult onto the outcome vocabulary the collaboration patterns use.
- * A provider limit is an infra failure carrying its own code, so a caller can tell
- * "this provider has no quota" from any other infrastructure failure.
- */
-export function outcomeOfRunResult(runResult) {
-  const category = runResult?.classification?.outcome?.category ?? 'ok';
-  const failureCode = runResult?.classification?.failure?.code;
-  if (category === 'ok') return 'pass';
-  if (category === 'verdict' && runResult?.classification?.assessment?.verdict === 'findings') return 'findings';
-  if (category === 'blocked') return 'blocked';
-  if (category === 'policy') return 'policy-refusal';
-  if (category === 'infra' && (failureCode === 'provider-limit' || failureCode === 'paused-limit')) return 'provider-limit';
-  return 'execution-failure';
-}
 
 /** Write `file` atomically so a reader never sees half a record. */
 function writeJsonAtomic(file, value) {
@@ -160,6 +145,9 @@ export async function runUnit(options = {}) {
     }
     unitRecord = JSON.parse(fs.readFileSync(unitJsonPath, 'utf8'));
     unit = validateUnit(unitRecord.unit);
+    if (!Array.isArray(unitRecord.resolvedInputs)) {
+      throw new RunnerConfigError(`cannot resume unit run "${unitRunId}": unit.json has no resolvedInputs`);
+    }
 
     // Check in-flight lock for holder
     const safeKey = worktreePath.replace(/[^a-zA-Z0-9_-]/g, '_');
@@ -209,6 +197,8 @@ export async function runUnit(options = {}) {
     }
 
     unit = validateUnit(raw);
+    // Resolved before the unit directory exists, so a ref that points nowhere leaves nothing behind.
+    const resolvedInputs = resolveUnitInputs(unit.inputs, mainRoot);
     unitRunId = `unit-run-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
     const unitDir = path.join(assignmentsDir, unitRunId);
     fs.mkdirSync(unitDir, { recursive: true });
@@ -218,6 +208,7 @@ export async function runUnit(options = {}) {
       unit,
       overrides: options.overrides || [],
       configSnapshot,
+      resolvedInputs,
       worktree: fs.realpathSync(worktreePath),
       createdBy: process.env.USER || 'system',
       createdAt: new Date().toISOString(),
@@ -228,51 +219,7 @@ export async function runUnit(options = {}) {
 
   const unitDir = path.join(assignmentsDir, unitRunId);
 
-  // Helper to read history. A role/round has one assignment directory per attempt: `<round>`
-  // for the first binding and `<round>-fb<n>` for each fallback after a provider limit; the
-  // latest attempt is the one that counts.
-  const history = () => {
-    const records = [];
-    if (!fs.existsSync(unitDir)) return records;
-    try {
-      const entries = fs.readdirSync(unitDir, { withFileTypes: true });
-      for (const entry of entries) {
-        if (entry.isDirectory()) {
-          const role = entry.name;
-          const roleDir = path.join(unitDir, role);
-          const latestByRound = new Map();
-          for (const roundEntry of fs.readdirSync(roleDir, { withFileTypes: true })) {
-            if (!roundEntry.isDirectory()) continue;
-            const match = /^(\d+)(?:-fb(\d+))?$/.exec(roundEntry.name);
-            if (!match) continue;
-            const round = Number.parseInt(match[1], 10);
-            const fallbackNo = match[2] ? Number.parseInt(match[2], 10) : 0;
-            // A resumed binding runs again as a later attempt of the same assignment.
-            const runsDir = path.join(roleDir, roundEntry.name, 'runs');
-            const attempts = fs.existsSync(runsDir)
-              ? fs.readdirSync(runsDir).filter((name) => /^\d+$/.test(name)).sort()
-              : [];
-            const latestAttempt = attempts.reverse().find((name) => fs.existsSync(path.join(runsDir, name, 'result.json')));
-            if (!latestAttempt) continue;
-            const resultFile = path.join(runsDir, latestAttempt, 'result.json');
-            const known = latestByRound.get(round);
-            if (!known || fallbackNo > known.fallbackNo) latestByRound.set(round, { fallbackNo, resultFile });
-          }
-          for (const [round, { resultFile }] of latestByRound) {
-            try {
-              const runResult = JSON.parse(fs.readFileSync(resultFile, 'utf8'));
-              records.push({ role, round, outcome: outcomeOfRunResult(runResult), runResult });
-            } catch {
-              // Ignore corrupted result
-            }
-          }
-        }
-      }
-    } catch {
-      // Best effort history read
-    }
-    return records;
-  };
+  const history = () => readUnitRunHistory(unitDir);
 
   // Executors bound to each role in this unit run. `independentOf` names roles ('producer');
   // bind() compares provider families, so a role name has to be turned into the executor(s)
@@ -319,9 +266,9 @@ export async function runUnit(options = {}) {
         binding: bound,
       },
       expectedOutputs: unit.expectedOutputs || [],
-      // What the unit names, then the accounts of the roles whose work this role judges
-      // (a panel synthesizer reads its panelists' reports).
-      contextRefs: [...(unit.inputs || []), ...contextRefsFromRoleResults(inputs, mainRoot)],
+      // What the unit names (already resolved to paths), then the accounts of the roles whose
+      // work this role judges (a panel synthesizer reads its panelists' reports).
+      contextRefs: [...new Set([...unitRecord.resolvedInputs, ...reportRefsOf(inputs, { mainRoot, worktree: unitRecord.worktree })])],
       writes: unit.writes || [],
       policy: {
         tier: bound.tier,
