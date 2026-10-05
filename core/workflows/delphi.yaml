@@ -26,6 +26,7 @@ steps:
           pattern: solo
           persona: synthesizer
           objective: Synthesize round 1 proposals into an anonymized mediated feedback summary
+          anonymizeInputs: true
   - id: second-round
     title: Second Round Proposals
     dependsOn: [feedback-synthesis]
@@ -36,6 +37,7 @@ steps:
           pattern: panel
           persona: panelist
           objective: Revise proposals in light of synthesized panel feedback
+          anonymizeInputs: true
   - id: final-consensus
     title: Final Consensus
     dependsOn: [second-round]

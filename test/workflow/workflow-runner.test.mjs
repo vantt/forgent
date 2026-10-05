@@ -806,6 +806,65 @@ test('a step after a panel step is handed the report of every panelist and of th
   }
 });
 
+test('anonymizeInputs hands a later unit neutral copies and a brief that names no step, unit, run or role', async () => {
+  const tmp = setupTestRepo();
+  const cfgPath = path.join(tmp, '.fgos', 'config.json');
+  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  const script = path.join(tmp, 'echo-worker.mjs');
+  cfg.runner.executors = {};
+  for (const name of ['alpha', 'beta', 'gamma', 'delta']) {
+    const command = path.join(tmp, `${name}-bin`);
+    fs.symlinkSync(process.execPath, command);
+    cfg.runner.executors[name] = {
+      kind: 'agent',
+      allowCrossProvider: true,
+      command,
+      args: [script, '{prompt}'],
+      providerModel: name,
+      invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args: [script, '{prompt}'] }],
+    };
+  }
+  cfg.runner.defaultExecutor = 'alpha';
+  for (const capability of Object.values(cfg.runner.capabilities)) {
+    capability.prefer = ['alpha', 'beta', 'gamma', 'delta'].map((executor) => ({ executor }));
+  }
+  fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
+
+  const workflow = validateWorkflow({
+    id: 'panel-then-anonymous-solo',
+    steps: [
+      { id: 'independent-opinions', units: [{ id: 'p', template: { capability: 'docs:write', pattern: 'panel', objective: 'Review the design', writes: [] } }] },
+      { id: 'cross-examine', dependsOn: ['independent-opinions'], units: [{ id: 'x', template: { capability: 'docs:write', pattern: 'solo', objective: 'Cross-examine', writes: [], anonymizeInputs: true } }] },
+    ],
+  });
+  const state = await startWorkflow({ workflow, repoRoot: tmp, cwd: tmp, worktree: tmp });
+  assert.equal(state.status, 'completed', JSON.stringify(state.steps));
+
+  const panelRunId = state.steps['independent-opinions'].units.p.unitRunId;
+  const xRunId = state.steps['cross-examine'].units.x.unitRunId;
+  const xDir = path.join(tmp, '.fgos', 'assignments', xRunId);
+  const assignment = JSON.parse(fs.readFileSync(path.join(xDir, 'producer', '1', 'assignment.json'), 'utf8'));
+
+  assert.deepEqual(
+    assignment.contextRefs,
+    ['A', 'B', 'C', 'D'].map((letter) => path.join(xDir, 'inputs', `seat-${letter}.md`)),
+  );
+  for (const ref of assignment.contextRefs) assert.ok(fs.existsSync(ref), ref);
+  assert.match(assignment.objective, /### seat-A/);
+  assert.match(assignment.objective, /### seat-D/);
+  for (const leak of [panelRunId, 'independent-opinions', 'panelist', 'synthesizer', 'unit run']) {
+    assert.ok(!assignment.objective.includes(leak), `objective names ${leak}`);
+    assert.ok(!assignment.contextRefs.join('\n').includes(leak), `context refs name ${leak}`);
+  }
+
+  // The mapping is kept for the owner, in unit.json only.
+  const { inputMap } = JSON.parse(fs.readFileSync(path.join(xDir, 'unit.json'), 'utf8'));
+  assert.deepEqual(
+    inputMap.map((m) => m.input),
+    ['panelist-1', 'panelist-2', 'panelist-3', 'synthesizer'].map((role) => `unit-run:${panelRunId}/${role}`),
+  );
+});
+
 test('a completed unit keeps the id of the Unit run that produced it', () => {
   const tmp = setupTestRepo();
   const workflow = validateWorkflow({
@@ -950,6 +1009,13 @@ test('validateWorkflow keeps a unit template persona and params and rejects para
     const workflow = { ...base, steps: [{ id: 's1', units: [{ id: 'u1', template: { capability: 'docs:write', params: bad } }] }] };
     assert.throws(() => validateWorkflow(workflow), /params must be an object/);
   }
+});
+
+test('validateWorkflow keeps anonymizeInputs only when true and rejects a non-boolean', () => {
+  const withFlag = (anonymizeInputs) => ({ id: 'test/anon', steps: [{ id: 's1', units: [{ id: 'u1', template: { capability: 'docs:write', anonymizeInputs } }] }] });
+  assert.equal(validateWorkflow(withFlag(true)).steps[0].units[0].template.anonymizeInputs, true);
+  assert.equal(validateWorkflow(withFlag(undefined)).steps[0].units[0].template.anonymizeInputs, undefined);
+  assert.throws(() => validateWorkflow(withFlag('yes')), /anonymizeInputs must be true or false/);
 });
 
 // Executors of distinct provider families, so a panel can bind every seat.

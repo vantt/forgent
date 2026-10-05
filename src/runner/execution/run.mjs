@@ -199,9 +199,15 @@ export async function runUnit(options = {}) {
 
     unit = validateUnit(raw);
     // Resolved before the unit directory exists, so a ref that points nowhere leaves nothing behind.
-    const resolvedInputs = resolveUnitInputs(unit.inputs, mainRoot);
     unitRunId = `unit-run-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
     const unitDir = path.join(assignmentsDir, unitRunId);
+    let resolved;
+    try {
+      resolved = resolveUnitInputs(unit.inputs, mainRoot, unit.anonymizeInputs ? { anonymizeInto: path.join(unitDir, 'inputs') } : {});
+    } catch (err) {
+      fs.rmSync(unitDir, { recursive: true, force: true });
+      throw err;
+    }
     fs.mkdirSync(unitDir, { recursive: true });
 
     const configSnapshot = snapshotRunnerConfig(mainRoot);
@@ -209,7 +215,9 @@ export async function runUnit(options = {}) {
       unit,
       overrides: options.overrides || [],
       configSnapshot,
-      resolvedInputs,
+      resolvedInputs: resolved.refs,
+      // Which input each neutral name stands for; only the owner reads this, never a role.
+      ...(unit.anonymizeInputs ? { inputMap: resolved.inputMap } : {}),
       worktree: fs.realpathSync(worktreePath),
       createdBy: process.env.USER || 'system',
       createdAt: new Date().toISOString(),

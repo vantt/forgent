@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- A Unit (and a Workflow unit template) can set `anonymizeInputs: true`: the reports it is handed from earlier Unit runs are copied byte for byte into its own directory as `seat-A.md`, `seat-B.md`, ... and the brief names them that way, so a blind role is not told which seat, unit or run said what. Off by default. It hides identity in what is handed over; it does not stop a worker that goes looking from reading other files.
 - `fgos doctor` now catches two failures before a paid Workflow run: `workflow-pools-satisfy-independence` reports a panel or reviewed Workflow unit whose capability prefer pool cannot supply enough distinct provider families (three panelists plus an independent synthesizer need four), and `agent-cli-project-trusted` reports a codex home or agy sub-HOME that does not trust the project folder and would stop at "Trust this folder?" until the dispatch timeout, naming the exact line to add. Both are read-only. `fgos doctor` now awaits each check, so a check may be asynchronous.
 - A round that does not settle now leaves herdr's own account of the agent in its run directory, `herdr-diagnosis.json`: what `agent get` and `agent explain` said (state, the rule that matched, the detection manifest and its version, the fallback reason when nothing matched) and the screen herdr uses for detection. It is written before the pane can be closed and `visibility.json` points at it, so the next stall does not have to be guessed at.
 

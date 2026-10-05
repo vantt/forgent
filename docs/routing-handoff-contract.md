@@ -79,7 +79,9 @@ Ba bất biến, tách bạch rõ để không ai đọc nhầm đây là sandbo
   đọc được (`--ro-bind / /`, `hostRead: allow`). Câu trả lời của owner ở cổng
   người của một Workflow run cũng đi đường này (`gate-answer:` → file dưới
   `.fgos/workflow-runs/<id>/gate-answers/`): là input của owner, không phải
-  output của agent khác, và brief nói rõ như vậy.
+  output của agent khác, và brief nói rõ như vậy. Với `anonymizeInputs` các
+  report được chép sang `<unitDir>/inputs/seat-*.md` để brief không lộ ai nói;
+  đó chỉ là ẩn danh theo thứ được trao, không phải ranh giới đọc.
 
 ## Tham chiếu
 
