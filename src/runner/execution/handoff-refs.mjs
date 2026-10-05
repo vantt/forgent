@@ -5,7 +5,8 @@
 // Unit names `unit-run:<unitRunId>/<role>` in its `inputs`; `resolveUnitInputs` turns that into
 // the path once, when the Unit run is created, and the result is kept in unit.json so a resume or
 // a fallback hands out the same list. The owner's answer to a human gate of a Workflow run travels
-// the same way as `gate-answer:<workflowRunId>/<stepId>`.
+// the same way as `gate-answer:<workflowRunId>/<stepId>`. A blind role cannot read that run state,
+// so for a blind Unit the same refs are handed over as copies in the role's own directory.
 
 import fs from 'node:fs';
 import path from 'node:path';

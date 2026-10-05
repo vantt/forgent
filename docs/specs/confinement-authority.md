@@ -1205,8 +1205,26 @@ tracked (config, events) — che cả thư mục làm chúng hiện thành "đã
 và worker ghi được workspace có thể commit việc xoá đó; (2) `--unshare-pid` vì không có nó worker
 đọc được cmdline của tiến trình anh em; (3) socket herdr nằm trong danh sách vì `--ro-bind / /`
 vẫn cho `connect()`, tức worker có thể `pane read` pane của anh em. Blind chỉ dùng được khi cái
-worker *được trao* nằm sẵn trong thư mục của chính nó: ref `unit-run:`/`gate-answer:` phải do
-bước hand-off chép vào (chưa làm ở slice này), nên ref trỏ vào hidden root bị từ chối.
+worker *được trao* nằm sẵn trong thư mục của chính nó, nên với Unit `blind` resolver hand-off
+(`resolveUnitInputs`, `src/runner/execution/handoff-refs.mjs`) không giao đường dẫn gốc: mọi input
+`unit-run:`, `gate-answer:` và mọi ref nằm trong hidden root được chép nguyên byte (kiểm lại sha256
+lúc chép; nguồn đã đổi sau settle thì từ chối `report-changed-after-settle`) vào `inputs/` của
+*round dir của chính vai đó* (`<round>/inputs/<tên>`), vô điều kiện, không cần `anonymizeInputs`; tên
+trung tính `seat-A...` cho input `unit-run:` khi `anonymizeInputs` bật, tên cố định `<n>-<vai>-r<vòng>`
+hoặc `<n>-gate-<bước>` nếu không. Mỗi vai một bản riêng (không chia sẻ giữa các vai của Unit), nên
+chỉ vai đó đọc được; danh sách ref của vai là các bản chép. `unit.json` giữ `resolvedInputs` (ref
+đọc được tại chỗ) và `inputMap` (nguồn, tên, sha256); resume dùng lại bản chép đã có, fallback chép
+lại vào round dir của lần thử mới. Synthesizer của pattern `panel` nhận report của panelist theo
+đúng cách đó. `blind-ref-hidden` chỉ còn cho ref không chép được.
+
+Canary sống (2026-10-05, mỗi họ executor một Unit blind chỉ-đọc, input `unit-run:`, và đường dẫn
+tuyệt đối tới report nguồn): claude (herdr), codex (herdr và cli bwrap), xai (pi herdr), glm và
+deepseek (pi cli bwrap) đều đọc bản chép, gặp `ENOENT` ở nguồn và chỉ thấy chuỗi của chính mình
+trong `.fgos/assignments`. Dưới `--unshare-pid` và mask thư mục socket herdr, herdr vẫn nhận ra agent
+trong pane (`agentKnownToHerdr: detected`, trạng thái `unknown` → `working` → `idle`/kết thúc), nên
+mask và `--unshare-pid` giữ nguyên. agy chưa chứng minh được: `agy-herdr` hỏng cả khi không blind
+(`foreground process ... does not match prepared command argv`), `agy-cli-bwrap` dừng vì hết quota
+của tài khoản.
 
 Dispatch `blind` bị **từ chối, không bao giờ chạy không-blind**, với lý do có tên, trước khi
 spawn: `blind-requires-confinement` (mode không phải `required`/không có policy),
