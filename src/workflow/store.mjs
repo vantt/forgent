@@ -173,7 +173,6 @@ export function projectWorkflowState(events) {
         if (steps[p.stepId]) {
           steps[p.stepId].units[p.unitId] = {
             unitId: p.unitId,
-            unitRunId: p.unitRunId,
             status: 'running',
             ...(p.worktreePath ? { worktreePath: p.worktreePath, branch: p.branch ?? null } : {}),
           };
@@ -183,6 +182,7 @@ export function projectWorkflowState(events) {
       case 'unit.complete':
         if (steps[p.stepId] && steps[p.stepId].units[p.unitId]) {
           steps[p.stepId].units[p.unitId].status = 'completed';
+          steps[p.stepId].units[p.unitId].unitRunId = p.unitRunId ?? null;
           steps[p.stepId].units[p.unitId].outcome = p.outcome;
           steps[p.stepId].units[p.unitId].results = p.results || [];
         }

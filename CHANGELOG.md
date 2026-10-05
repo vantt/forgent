@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Workflow steps now hand every earlier role's full report to the next step as context refs (`unit-run:<unitRunId>/<role>` in a unit's `inputs`, resolved once into `unit.json`); nothing is truncated and no panelist report is dropped. The step's objective keeps the owner request and one summary line per earlier unit.
 - The `z-ai` model policy (glm) now uses `z-ai/glm-5.3` for every tier instead of `z-ai/glm-5.2`.
 
 ### Fixed

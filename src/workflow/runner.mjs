@@ -24,18 +24,19 @@ import { translatePlanToWorkflow } from './plan-source.mjs';
 import { runUnit, snapshotRunnerConfig, resolveGitRoots } from '../runner/execution/run.mjs';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
 
-const PRIOR_REPORT_CHAR_LIMIT = 6000;
-
 /**
  * What a unit needs beyond its template objective: the owner's request the run was started
- * with, and what the steps it depends on produced. A unit's agent cannot read the run store
- * (.fgos is closed to workers), so the text goes into the objective itself.
+ * with, and what the steps it depends on (directly or not) produced.
+ *
+ * The objective carries only an index of the earlier units -- one summary line each, tagged with
+ * its Unit run id. The reports themselves travel as `inputs`, one `unit-run:<id>/<role>` per role
+ * of every earlier unit; the Execution Core turns them into absolute report paths in the
+ * assignment's context refs, so nothing is truncated and no panelist is dropped.
  */
-function buildUnitObjective({ template, state, step, workflow, mainRoot }) {
+function buildUnitHandoff({ template, state, step, workflow }) {
   const parts = [template.objective || ''];
   if (state.request) parts.push(`Owner request:\n${state.request}`);
 
-  const priorSections = [];
   const wanted = new Set();
   const collect = (stepId) => {
     for (const dep of workflow.steps.find((s) => s.id === stepId)?.dependsOn ?? []) {
@@ -46,28 +47,25 @@ function buildUnitObjective({ template, state, step, workflow, mainRoot }) {
     }
   };
   collect(step.id);
+
+  const index = [];
+  const inputs = [];
   for (const prior of workflow.steps) {
     if (!wanted.has(prior.id)) continue;
     for (const [unitId, unitState] of Object.entries(state.steps[prior.id]?.units ?? {})) {
-      const last = [...(unitState.results ?? [])].reverse().find((r) => r?.runResult);
-      if (!last) continue;
-      const summary = last.runResult.agentClaim?.summary;
-      const report = (last.runResult.evidence?.artifacts ?? []).find((a) => a.endsWith('agent-report.md'));
-      let reportText = '';
-      if (report) {
-        try {
-          reportText = fs.readFileSync(path.resolve(mainRoot, report), 'utf8').slice(0, PRIOR_REPORT_CHAR_LIMIT);
-        } catch {
-          reportText = '';
-        }
-      }
-      if (summary || reportText) {
-        priorSections.push(`### ${prior.id} / ${unitId}\n${summary ? `Summary: ${summary}\n` : ''}${reportText}`.trimEnd());
-      }
+      if (!unitState.unitRunId) continue;
+      const results = (unitState.results ?? []).filter((r) => r?.runResult);
+      const summary = results.at(-1)?.runResult.agentClaim?.summary;
+      index.push(`### ${prior.id} / ${unitId} (unit run ${unitState.unitRunId})${summary ? `\nSummary: ${summary}` : ''}`);
+      for (const role of new Set(results.map((r) => r.role))) inputs.push(`unit-run:${unitState.unitRunId}/${role}`);
     }
   }
-  if (priorSections.length > 0) parts.push(`Output of earlier steps:\n\n${priorSections.join('\n\n')}`);
-  return parts.filter(Boolean).join('\n\n');
+  if (index.length > 0) {
+    parts.push(
+      `Output of earlier steps (the full report of every role is listed under Context refs; read them before answering):\n\n${index.join('\n\n')}`,
+    );
+  }
+  return { objective: parts.filter(Boolean).join('\n\n'), inputs };
 }
 
 function gitOk(cwd, args) {
@@ -251,16 +249,16 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
           }
 
           // Build unit object
+          const handoff = buildUnitHandoff({ template: u.template, state, step, workflow });
           const unitData = {
             id: u.id,
-            objective:
-              buildUnitObjective({ template: u.template, state, step, workflow, mainRoot }) ||
-              `Execute unit ${u.id} in step ${step.id}`,
+            objective: handoff.objective || `Execute unit ${u.id} in step ${step.id}`,
             capability: u.template.capability,
             pattern: u.template.pattern || 'solo',
             rigor: u.template.rigor,
             writes: u.template.writes || [],
             dependsOn: u.dependsOn || [],
+            inputs: handoff.inputs,
           };
 
           // If unit has writes, prepare worktree

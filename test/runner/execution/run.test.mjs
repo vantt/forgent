@@ -648,6 +648,62 @@ test('the panel synthesizer is told to read every panelist report; the panelists
   assert.ok(synthObjective.includes('Review the design'), 'the panel\'s task is quoted to the synthesizer');
 });
 
+test('a unit-run input reaches the roles as the absolute path of that role\'s report, resolved once into unit.json', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha']);
+  const run = (unitData, extra = {}) =>
+    runUnit({ unitData, repoRoot, cwd: worktreeDir, worktree: worktreeDir, pattern: 'solo', ...extra });
+
+  const first = await run({ id: 'u-a', objective: 'Write docs', capability: 'docs:write', writes: [] });
+  assert.equal(first.outcome, 'pass');
+  const reportOfA = path.join(repoRoot, first.results[0].runResult.settleReports[0].path);
+
+  const second = await run({
+    id: 'u-b',
+    objective: 'Build on it',
+    capability: 'docs:write',
+    writes: [],
+    inputs: ['docs/a.md', `unit-run:${first.unitRunId}/producer`],
+  });
+  assert.equal(second.outcome, 'pass');
+  const dirOfB = path.join(repoRoot, '.fgos', 'assignments', second.unitRunId);
+  const expected = ['docs/a.md', reportOfA];
+  assert.deepEqual(JSON.parse(fs.readFileSync(path.join(dirOfB, 'producer', '1', 'assignment.json'), 'utf8')).contextRefs, expected);
+  assert.deepEqual(JSON.parse(fs.readFileSync(path.join(dirOfB, 'unit.json'), 'utf8')).resolvedInputs, expected);
+
+  // A resume reuses the stored list: it neither re-reads nor re-checks the earlier report.
+  fs.writeFileSync(reportOfA, 'edited after the fact\n');
+  const resumed = await run(undefined, { resumeUnitRunId: second.unitRunId });
+  assert.equal(resumed.outcome, 'pass');
+  assert.deepEqual(JSON.parse(fs.readFileSync(path.join(dirOfB, 'unit.json'), 'utf8')).resolvedInputs, expected);
+
+  // A unit run recorded without the resolved list cannot be resumed.
+  const unitJson = JSON.parse(fs.readFileSync(path.join(dirOfB, 'unit.json'), 'utf8'));
+  delete unitJson.resolvedInputs;
+  fs.writeFileSync(path.join(dirOfB, 'unit.json'), JSON.stringify(unitJson));
+  await assert.rejects(() => run(undefined, { resumeUnitRunId: second.unitRunId }), /no resolvedInputs/);
+});
+
+test('a unit-run input that cannot be resolved is refused before any unit directory exists', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha']);
+  const assignmentsDir = path.join(repoRoot, '.fgos', 'assignments');
+  const before = fs.existsSync(assignmentsDir) ? fs.readdirSync(assignmentsDir) : [];
+  await assert.rejects(
+    () =>
+      runUnit({
+        unitData: { id: 'u-bad', objective: 'x', capability: 'docs:write', writes: [], inputs: ['unit-run:unit-run-nope/producer'] },
+        repoRoot,
+        cwd: worktreeDir,
+        worktree: worktreeDir,
+        pattern: 'solo',
+      }),
+    /handoff-ref-unresolved: unit-run:unit-run-nope\/producer: no-such-run/,
+  );
+  const after = fs.existsSync(assignmentsDir) ? fs.readdirSync(assignmentsDir) : [];
+  assert.deepEqual(after, before);
+});
+
 test('a reviewed run tells the reviewer to review and hands it the producer\'s report', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha', 'beta']);
