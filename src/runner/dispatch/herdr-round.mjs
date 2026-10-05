@@ -35,7 +35,9 @@ import { execFileSync } from 'node:child_process';
 import { DispatchError } from './dispatch-error.mjs';
 import { createHerdrClient, createBatchTab, normalizeAgentName, isReadyState } from './herdr-agent.mjs';
 import { briefPaths, renderBrief, renderPointer } from './brief.mjs';
-import { evaluateLadder, paneFateFor } from './liveness.mjs';
+import {
+  evaluateLadder, evaluateWorkingScreen, paneFateFor, WORKING_STALL_PROBE_MS, WORKING_STALL_TAIL_LINES,
+} from './liveness.mjs';
 import { writeVisibility } from './visibility-session.mjs';
 import { createWorkerHome, removeWorkerHome, redactWorkerHome } from './worker-home.mjs';
 import {
@@ -445,7 +447,12 @@ export function groupDeadlines({ idleTimeoutMs, timeoutMs, transportDeadlines = 
       resendAfterMs: transportDeadlines.resendAfterMs ?? promptMs,
       maxResends: transportDeadlines.maxResends ?? MAX_RESENDS,
     },
-    round: { idleMs: idleTimeoutMs ?? DEFAULT_IDLE_TIMEOUT_MS, ceilingMs: timeoutMs },
+    round: {
+      idleMs: idleTimeoutMs ?? DEFAULT_IDLE_TIMEOUT_MS,
+      ceilingMs: timeoutMs,
+      // How often the screen of an agent that reports `working` is checked for a parked provider error.
+      stallProbeMs: transportDeadlines.stallProbeMs ?? WORKING_STALL_PROBE_MS,
+    },
   };
 }
 
@@ -1064,6 +1071,9 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
   };
 
   let lastBeatAt = 0;
+  // The watch on a `working` agent's screen: when it last looked and what it has seen standing there.
+  let lastStallProbeAt = 0;
+  let stall = { line: null, since: null };
 
   for (;;) {
     // Say the driver is still here. A round can run for half an hour with no
@@ -1129,6 +1139,23 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
     });
     prior = decision;
     if (decision.outcome) return decision;
+
+    // `working` counts as progress, so the ladder never reads the screen of a pane that keeps saying it,
+    // and an agent parked on a provider error would run to the ceiling with no fallback. Look at the
+    // tail of its screen now and then for the narrow wordings that mean exactly that.
+    if (agentState === 'working' && observedAt - lastStallProbeAt >= deadlines.round.stallProbeMs) {
+      lastStallProbeAt = observedAt;
+      let tail = '';
+      try { tail = client.agentRead(target, { lines: WORKING_STALL_TAIL_LINES }); } catch { tail = ''; }
+      const watched = evaluateWorkingScreen({ screen: tail, now: observedAt, prior: stall, probeMs: deadlines.round.stallProbeMs });
+      stall = watched.next;
+      if (watched.outcome) {
+        return {
+          outcome: watched.outcome, reason: watched.reason, screenLine: watched.screenLine,
+          absentStreak: decision.absentStreak ?? 0, needsScreen: false,
+        };
+      }
+    }
 
     if (!ackSeen && resends < deadlines.brief.maxResends
       && Date.now() - lastResendAt >= deadlines.brief.resendAfterMs) {

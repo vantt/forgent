@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   evaluateLadder,
+  evaluateWorkingScreen,
   matchUsageLimit,
   paneFateFor,
   LADDER_OUTCOMES,
@@ -157,6 +158,52 @@ test('matchUsageLimit recognises the wording a codex pane printed when its model
   ].join('\n');
   assert.equal(matchUsageLimit(screen), '■ Selected model is at capacity. Please try a different model.');
   assert.equal(matchUsageLimit('Planning capacity for the next quarter'), null, 'ordinary talk about capacity is not a provider limit');
+});
+
+const CAPACITY_LINE = '■ Selected model is at capacity. Please try a different model.';
+const PROBE = { probeMs: 30000 };
+
+test('a working agent whose screen shows the capacity error is a provider limit once the line has stood for a probe interval', () => {
+  const screen = `• Ran something\n${CAPACITY_LINE}\n• Reconnected. No input was resent.\n── ⠋ Working ──`;
+  const first = evaluateWorkingScreen({ screen, now: 100000, prior: {}, ...PROBE });
+  assert.equal(first.outcome, null, 'one sighting is not enough: a healthy agent can print the line and recover');
+  assert.equal(first.next.line, CAPACITY_LINE);
+
+  const tooSoon = evaluateWorkingScreen({ screen, now: 100000 + 10000, prior: first.next, ...PROBE });
+  assert.equal(tooSoon.outcome, null);
+  assert.deepEqual(tooSoon.next, first.next, 'the first sighting time is kept, not restarted');
+
+  const stood = evaluateWorkingScreen({ screen, now: 100000 + 30000, prior: first.next, ...PROBE });
+  assert.equal(stood.outcome, 'provider-limit');
+  assert.equal(stood.screenLine, CAPACITY_LINE);
+  assert.match(stood.reason, /working/);
+});
+
+test('a capacity line that has gone from the screen resets the watch', () => {
+  const seen = evaluateWorkingScreen({ screen: CAPACITY_LINE, now: 1000, prior: {}, ...PROBE });
+  const recovered = evaluateWorkingScreen({ screen: 'the agent carried on and wrote a file', now: 20000, prior: seen.next, ...PROBE });
+  assert.equal(recovered.outcome, null);
+  assert.deepEqual(recovered.next, { line: null, since: null });
+  const again = evaluateWorkingScreen({ screen: CAPACITY_LINE, now: 60000, prior: recovered.next, ...PROBE });
+  assert.equal(again.outcome, null, 'a later sighting starts a new interval');
+});
+
+test('text that only talks about capacity or limits is never taken for a provider limit while the agent is working', () => {
+  for (const screen of [
+    'The model is at capacity according to the docs I am reading',
+    'let me explain the rate limit handling in this module',
+    'usage limit: see src/limits.mjs',
+    'Selected model is at capacity',
+  ]) {
+    const a = evaluateWorkingScreen({ screen, now: 1000, prior: {}, ...PROBE });
+    const b = evaluateWorkingScreen({ screen, now: 1000 + 60000, prior: a.next, ...PROBE });
+    assert.equal(b.outcome, null, screen);
+  }
+});
+
+test('an unreadable screen changes nothing', () => {
+  assert.equal(evaluateWorkingScreen({ screen: null, now: 1, prior: {}, ...PROBE }).outcome, null);
+  assert.equal(evaluateWorkingScreen({ screen: '', now: 1, prior: { line: CAPACITY_LINE, since: 0 }, ...PROBE }).outcome, null);
 });
 
 test('an unknown outcome defaults to keeping the pane rather than closing it', () => {

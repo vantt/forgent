@@ -824,6 +824,47 @@ test('a stale worker whose screen names a provider limit is paused, not timed ou
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
+test('an agent that keeps reporting working while its screen is parked on "model is at capacity" is a provider limit, not a wait for the ceiling', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-working-stall-'));
+  const mock = createMockHerdr(tmpDir, {
+    worker: 'silent',
+    statuses: ['working'],
+    screen: '• Ran out=/work/outbox\n■ Selected model is at capacity. Please try a different model.\n• Reconnected. No input was resent.\n── ⠋ Working ──',
+  });
+
+  const started = Date.now();
+  await assert.rejects(
+    () => dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing', timeoutMs: 20000, idleTimeoutMs: 15000, transportDeadlines: { stallProbeMs: 300 } }),
+    (err) => {
+      assert.equal(err.outcome, 'provider-limit');
+      assert.match(err.screen, /model is at capacity/i);
+      return true;
+    },
+  );
+  assert.ok(Date.now() - started < 10000, 'concluded long before the absolute ceiling');
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('a working agent whose screen only talks about capacity runs on to the ceiling untouched', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-working-talk-'));
+  const mock = createMockHerdr(tmpDir, {
+    worker: 'silent',
+    statuses: ['working'],
+    screen: 'Reviewing the docs: the selected model is at capacity during peak hours, and a rate limit applies.',
+  });
+
+  await assert.rejects(
+    () => dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing', timeoutMs: 2500, idleTimeoutMs: 15000, transportDeadlines: { stallProbeMs: 300 } }),
+    (err) => {
+      assert.equal(err.outcome, 'timed-out-ceiling', 'ordinary text is not a limit');
+      return true;
+    },
+  );
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
 test('a stale worker with an ordinary screen is an idle timeout that still quotes the screen', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-idle-'));
   const mock = createMockHerdr(tmpDir, {

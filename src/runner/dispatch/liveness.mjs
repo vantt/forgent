@@ -114,6 +114,65 @@ export function matchUsageLimit(screen, patterns = DEFAULT_USAGE_LIMIT_PATTERNS)
 }
 
 /**
+ * What an agent that herdr calls `working` can be stuck on.
+ *
+ * The ladder reads the screen only once progress has stopped, and `working` counts as progress, so a
+ * pane that keeps saying `working` while it is really parked on a provider error is never looked at
+ * and the round runs to its absolute ceiling with no fallback (seen 2026-10-05: a codex pane that
+ * printed "Selected model is at capacity" and sat there for fifteen minutes).
+ *
+ * These patterns are deliberately narrow, because a working agent legitimately prints all kinds of
+ * text, "rate limit" included. They match a line that STARTS with the CLI's own error marker and
+ * names the condition. Only measured wordings belong here.
+ */
+export const WORKING_STALL_PATTERNS = Object.freeze([
+  /^■.*model is at capacity/i,
+]);
+
+/** How long the same stall line has to stand on the screen before a working agent is called limited. */
+export const WORKING_STALL_PROBE_MS = 30000;
+
+/** How many lines from the bottom of the screen are read for it. */
+export const WORKING_STALL_TAIL_LINES = 15;
+
+/**
+ * Look at the tail of the screen of an agent that reports `working`.
+ *
+ * Pure, like the ladder: the caller reads the screen, threads `next` back in, and acts on `outcome`.
+ * One sighting is not a verdict, because an agent can print the line and recover. The same line still
+ * on the screen a full `probeMs` later is: a recovering agent has printed more by then and the line
+ * has scrolled out of the tail.
+ *
+ * @param {{ screen: string|null, now: number, prior?: { line?: string|null, since?: number|null },
+ *           probeMs?: number, patterns?: RegExp[] }} args
+ * @returns {{ outcome: 'provider-limit'|null, reason: string|null, screenLine: string|null,
+ *             next: { line: string|null, since: number|null } }}
+ */
+export function evaluateWorkingScreen({ screen, now, prior = {}, probeMs = WORKING_STALL_PROBE_MS, patterns = WORKING_STALL_PATTERNS } = {}) {
+  const kept = { line: prior.line ?? null, since: prior.since ?? null };
+  // An unreadable screen is no evidence either way.
+  if (typeof screen !== 'string' || screen === '') {
+    return { outcome: null, reason: null, screenLine: null, next: kept };
+  }
+  const line = matchUsageLimit(screen, patterns);
+  if (!line) {
+    return { outcome: null, reason: null, screenLine: null, next: { line: null, since: null } };
+  }
+  if (kept.line !== line || kept.since === null) {
+    return { outcome: null, reason: null, screenLine: null, next: { line, since: now } };
+  }
+  if (now - kept.since >= probeMs) {
+    return {
+      outcome: 'provider-limit',
+      reason: `the screen has said a provider limit was reached for ${now - kept.since}ms while the agent reports working`,
+      screenLine: line,
+      next: kept,
+    };
+  }
+  return { outcome: null, reason: null, screenLine: null, next: kept };
+}
+
+/**
  * Run the ladder once.
  *
  * `observation` is what was just read:
