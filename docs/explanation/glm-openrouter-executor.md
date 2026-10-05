@@ -8,7 +8,7 @@ authoritative_for: adding a per-executor env override to the fgOS runner dispatc
 > OpenRouter gateway, the claude CLI in a herdr pane stopped at
 > "Please run /login · API Error: 401 Missing Authentication header" every
 > time, so `glm` and `glm-herdr` now run the `pi` CLI against OpenRouter
-> (`z-ai/glm-5.2` from the `z-ai` model policy), the same shape as `deepseek`
+> (`z-ai/glm-5.3` from the `z-ai` model policy, raised from 5.2 on 2026-10-05), the same shape as `deepseek`
 > (headless) and `xai` (herdr pane). The key is still only a `${VAR}`
 > reference: `OPENROUTER_API_KEY` is set from `${GLM_OPENROUTER_API_KEY}`.
 > The per-executor `env` mechanism described below is unchanged and is what
@@ -16,7 +16,7 @@ authoritative_for: adding a per-executor env override to the fgOS runner dispatc
 > `ANTHROPIC_*` variables describes the superseded route.
 >
 > **Which invocation to use.** Run headless (`glm` with `pi-cli-bwrap-openrouter`),
-> `z-ai/glm-5.2` answers, calls `bash` and writes its report correctly (checked
+> `z-ai/glm-5.2` answered, calls `bash` and writes its report correctly (checked
 > 2026-10-05, a read-only Unit that read a file under `.fgos` and quoted its first
 > line). The model sometimes degenerates, in a herdr pane
 > and headless alike (measured 2026-10-05: 1 of 3 headless runs, then 0 of 24 with
@@ -28,7 +28,9 @@ authoritative_for: adding a per-executor env override to the fgOS runner dispatc
 > output buffer (10 MiB) or the ceiling kills it and fails as an execution failure
 > with no fallback to the next executor. The capability preference pools name
 > `glm` with `pi-cli-bwrap-openrouter`, not `glm-herdr`, which stays defined for
-> investigation.
+> investigation. The model was raised to `z-ai/glm-5.3` on 2026-10-05 in the hope that it
+> does not degenerate: 16 of 16 headless runs passed (medium and high), but 5.2 also passed
+> 24 of 24 in the same session, so this is not proof the loop is gone; watch for it.
 
 `tsk-gb3` added a new fgOS runner executor named `glm` that reuses the
 `claude` CLI as its command but routes to GLM 5.2 (`z-ai/glm-5.2`) via

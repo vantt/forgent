@@ -552,7 +552,7 @@
       },
       "glm": {
         "kind": "agent",
-        "description": "GLM 5.2 (z-ai/glm-5.2) through the pi CLI and OpenRouter, headless. Replaces the claude-CLI-through-gateway route.",
+        "description": "GLM 5.3 (z-ai/glm-5.3) through the pi CLI and OpenRouter, headless. Replaces the claude-CLI-through-gateway route.",
         "allowCrossProvider": true,
         "invocations": [
           {
@@ -1198,7 +1198,7 @@
       },
       "glm-herdr": {
         "kind": "agent",
-        "description": "GLM 5.2 (z-ai/glm-5.2) through the pi CLI and OpenRouter, in a herdr pane under the bwrap posture. Replaces the claude-CLI-through-gateway route, whose pane stopped at a /login prompt with a 401.",
+        "description": "GLM 5.3 (z-ai/glm-5.3) through the pi CLI and OpenRouter, in a herdr pane under the bwrap posture. Replaces the claude-CLI-through-gateway route, whose pane stopped at a /login prompt with a 401.",
         "allowCrossProvider": true,
         "providerModel": "z-ai",
         "invocations": [
@@ -1268,11 +1268,11 @@
         "frontier": "gpt-6-astra"
       },
       "z-ai": {
-        "nano": "z-ai/glm-5.2",
-        "standard": "z-ai/glm-5.2",
-        "advanced": "z-ai/glm-5.2",
-        "flagship": "z-ai/glm-5.2",
-        "frontier": "z-ai/glm-5.2"
+        "nano": "z-ai/glm-5.3",
+        "standard": "z-ai/glm-5.3",
+        "advanced": "z-ai/glm-5.3",
+        "flagship": "z-ai/glm-5.3",
+        "frontier": "z-ai/glm-5.3"
       },
       "xai": {
         "standard": "grok-4.3",

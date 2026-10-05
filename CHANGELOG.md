@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - A round that does not settle now leaves herdr's own account of the agent in its run directory, `herdr-diagnosis.json`: what `agent get` and `agent explain` said (state, the rule that matched, the detection manifest and its version, the fallback reason when nothing matched) and the screen herdr uses for detection. It is written before the pane can be closed and `visibility.json` points at it, so the next stall does not have to be guessed at.
 
+### Changed
+
+- The `z-ai` model policy (glm) now uses `z-ai/glm-5.3` for every tier instead of `z-ai/glm-5.2`.
+
 ### Fixed
 
 - A confined agent's status in herdr is now true. fgos used to report the state "working" for the pane when it launched the agent, which made fgos the pane's status authority: `agent get` stayed "working" for the whole round even when the agent had finished, stalled or stopped on a limit, and an earlier workaround read the screen detector's verdict first (two herdr calls per poll). Measured on herdr 0.9.1: claude, codex, agy and pi are recognised behind the bwrap wrapper on their own, and their status moves idle, working, done as they work. fgos now reports a state only for a process herdr cannot recognise as an agent (after a six second grace), and reads `agent get`, asking the detector only when the status is unknown. One herdr call per poll instead of two, and `agent wait` and `agent prompt --wait` work for confined panes.

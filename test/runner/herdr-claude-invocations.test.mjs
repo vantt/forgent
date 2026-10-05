@@ -33,7 +33,7 @@ test('glm-herdr runs pi in a pane under the bwrap posture and carries no key', (
   assert.ok(!inv.args.includes('--dangerously-skip-permissions'), 'the posture is the OS sandbox; no bypass flag stands in for it');
   assert.equal(inv.env.OPENROUTER_API_KEY, '${GLM_OPENROUTER_API_KEY}', 'the key is substituted from the environment at launch, never stored in config');
   assert.equal(runner.executors['glm-herdr'].providerModel, 'z-ai');
-  assert.equal(runner.modelPolicies['z-ai'].standard, 'z-ai/glm-5.2');
+  assert.equal(runner.modelPolicies['z-ai'].standard, 'z-ai/glm-5.3');
 });
 
 test('glm is headless pi through OpenRouter with the same key variable and no claude gateway variables', () => {
