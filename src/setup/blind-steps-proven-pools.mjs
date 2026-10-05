@@ -20,7 +20,8 @@ import { loadWorkflowDefinitions } from './workflow-pool-independence.mjs';
  * Pairs a live canary proved blind: a worker of that provider family, run through that transport
  * under that confinement backend, could not read a peer run's report, run directory or process.
  * Evidence: plans/reports/read-confinement-slice-2-261005.md (canary table, 2026-10-05) and, for
- * gemini (agy), plans/reports/agy-blind-canary-261005.md (2026-10-05, account tetcu72).
+ * gemini (agy), plans/reports/agy-blind-canary-261005.md (2026-10-05, account tetcu72); claude/cli and xai/cli were proven
+ * the same day with the same unit (plans/reports/agy-blind-canary-261005.md, addendum).
  *
  * `family` is the provider family bind() derives for the executor (its `providerModel`, else
  * `provider`, else its command). `transport` is `herdr` (a herdr-spawn invocation) or `cli` (a
@@ -35,6 +36,8 @@ export const BLIND_PROVEN_PAIRS = [
   { family: 'deepseek', transport: 'cli', backend: 'bwrap' },
   { family: 'gemini', transport: 'herdr', backend: 'bwrap' },
   { family: 'gemini', transport: 'cli', backend: 'bwrap' },
+  { family: 'claude', transport: 'cli', backend: 'bwrap' },
+  { family: 'xai', transport: 'cli', backend: 'bwrap' },
 ];
 
 const TRANSPORT_BY_ADAPTER = { 'herdr-spawn': 'herdr', 'cli-spawn': 'cli' };

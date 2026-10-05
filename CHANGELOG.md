@@ -28,6 +28,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `fgos doctor` no longer has the `coordination-sessions-closed` check. The coordination engine it watched was retired, so it only counted leftover session folders that nothing can close.
+- The blind pool check passes in this repo now that the discussion capabilities have pools (the same five provider families as `architecture:shape`), `claude/cli` and `xai/cli` joined the proven blind pairs after a live canary, and the `tetnu` agy account gained its confined invocations.
+- A failure of the concurrent dispatch test now names the child's output and any empty or unparseable JSON file under the store, so a rare failure is explained.
 - A later pass consuming a settled run now finds a confined worker's claim and report under `worker-output/outbox/`, the same way settlement does, instead of only the flat run directory, and reconciliation of a crashed run finds that claim through the same lookup.
 - A confined dispatch no longer leaves an empty `disp_*` directory under the confinement temp root: finalizing a run removed the private home but not the per-dispatch folder that held it (a full test run left about 180 of them).
 

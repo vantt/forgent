@@ -149,7 +149,6 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'confinement-blind-read',
       'confinement-strict-readiness',
       'coordination-abandoned-claims',
-      'coordination-sessions-closed',
       'operation-prompt-templates-valid',
       'operation-capability-resolves',
       'runner-coordination-orgPolicy-shape',
@@ -1814,63 +1813,6 @@ test('operation-capability-resolves reports passing status for retired coordinat
     const { passed, message } = checkById('operation-capability-resolves').check(dir);
     assert.equal(passed, true, message);
     assert.match(message, /retired/);
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
-});
-
-function writeCoordinationSession(dir, coordinationId, { status, createdAt }) {
-  const sessionDir = path.join(dir, '.fgos', 'coordination', 'sessions', coordinationId);
-  fs.mkdirSync(sessionDir, { recursive: true });
-  fs.writeFileSync(
-    path.join(sessionDir, 'session.json'),
-    JSON.stringify({ schemaVersion: '1', coordinationId, status, createdAt }, null, 2),
-  );
-}
-
-test('coordination-sessions-closed passes when there is no coordination sessions directory at all', () => {
-  const dir = initRepo('checks-coordination-sessions-closed-absent-');
-  try {
-    const { passed, message } = checkById('coordination-sessions-closed').check(dir);
-    assert.equal(passed, true, message);
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
-});
-
-test('coordination-sessions-closed passes for a fresh active session (well under the 7-day threshold) and for an old session that already reached a terminal status', () => {
-  const dir = initRepo('checks-coordination-sessions-closed-fresh-');
-  try {
-    writeCoordinationSession(dir, 'fresh-active', { status: 'active', createdAt: new Date().toISOString() });
-    writeCoordinationSession(dir, 'old-but-completed', {
-      status: 'completed',
-      createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-    });
-
-    const { passed, message } = checkById('coordination-sessions-closed').check(dir);
-    assert.equal(passed, true, message);
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
-});
-
-test('coordination-sessions-closed fails and names the oldest offender when a session has been "active" past 7 days', () => {
-  const dir = initRepo('checks-coordination-sessions-closed-stale-');
-  try {
-    writeCoordinationSession(dir, 'stale-active-younger', {
-      status: 'active',
-      createdAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
-    });
-    writeCoordinationSession(dir, 'stale-active-oldest', {
-      status: 'active',
-      createdAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
-    });
-    writeCoordinationSession(dir, 'fresh-active-unrelated', { status: 'active', createdAt: new Date().toISOString() });
-
-    const { passed, message } = checkById('coordination-sessions-closed').check(dir);
-    assert.equal(passed, false, 'two sessions are past the 7-day active threshold; the fresh one must not count');
-    assert.match(message, /\b2\b/, `message must report the count of 2 stale sessions, got: ${message}`);
-    assert.match(message, /stale-active-oldest/, `message must name the OLDEST offender specifically, got: ${message}`);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }

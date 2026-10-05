@@ -383,7 +383,25 @@
         ]
       },
       "delphi:propose": {
-        "description": "Workflow unit capability \"delphi:propose\" -- declare a \"prefer\" pool to choose which executors serve it."
+        "description": "Workflow unit capability \"delphi:propose\" -- declare a \"prefer\" pool to choose which executors serve it.",
+        "prefer": [
+          {
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap-openrouter"
+          }
+        ]
       },
       "delphi:synthesize": {
         "description": "Workflow unit capability \"delphi:synthesize\" -- declare a \"prefer\" pool to choose which executors serve it.",
@@ -407,7 +425,25 @@
         ]
       },
       "group-cognition:explore": {
-        "description": "Workflow unit capability \"group-cognition:explore\" -- declare a \"prefer\" pool to choose which executors serve it."
+        "description": "Workflow unit capability \"group-cognition:explore\" -- declare a \"prefer\" pool to choose which executors serve it.",
+        "prefer": [
+          {
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap-openrouter"
+          }
+        ]
       },
       "group-cognition:critique": {
         "description": "Workflow unit capability \"group-cognition:critique\" -- declare a \"prefer\" pool to choose which executors serve it.",
@@ -452,16 +488,88 @@
         ]
       },
       "nominal-group:generate": {
-        "description": "Workflow unit capability \"nominal-group:generate\" -- declare a \"prefer\" pool to choose which executors serve it."
+        "description": "Workflow unit capability \"nominal-group:generate\" -- declare a \"prefer\" pool to choose which executors serve it.",
+        "prefer": [
+          {
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap-openrouter"
+          }
+        ]
       },
       "nominal-group:share": {
-        "description": "Workflow unit capability \"nominal-group:share\" -- declare a \"prefer\" pool to choose which executors serve it."
+        "description": "Workflow unit capability \"nominal-group:share\" -- declare a \"prefer\" pool to choose which executors serve it.",
+        "prefer": [
+          {
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap-openrouter"
+          }
+        ]
       },
       "nominal-group:vote": {
-        "description": "Workflow unit capability \"nominal-group:vote\" -- declare a \"prefer\" pool to choose which executors serve it."
+        "description": "Workflow unit capability \"nominal-group:vote\" -- declare a \"prefer\" pool to choose which executors serve it.",
+        "prefer": [
+          {
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap-openrouter"
+          }
+        ]
       },
       "nominal-group:rank": {
-        "description": "Workflow unit capability \"nominal-group:rank\" -- declare a \"prefer\" pool to choose which executors serve it."
+        "description": "Workflow unit capability \"nominal-group:rank\" -- declare a \"prefer\" pool to choose which executors serve it.",
+        "prefer": [
+          {
+            "executor": "claude-herdr"
+          },
+          {
+            "executor": "openai"
+          },
+          {
+            "executor": "gemini"
+          },
+          {
+            "executor": "xai"
+          },
+          {
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap-openrouter"
+          }
+        ]
       },
       "coding:discover": {
         "description": "Workflow unit capability \"coding:discover\" -- declare a \"prefer\" pool to choose which executors serve it."
@@ -886,7 +994,7 @@
       },
       "gemini": {
         "kind": "agent",
-        "description": "Gemini provider via Antigravity CLI (2026-09-17 provider-naming pass, was executor id \"agy\"). Invocation id = <bin>-<mode>-<account>: agy-cli-mucdong/agy-herdr-mucdong/agy-cli-bwrap-mucdong (mucdong account) + agy-cli-tetnu (tetnu account) + agy-herdr-tetcu72/agy-cli-bwrap-tetcu72 (tetcu72 account).",
+        "description": "Gemini provider via Antigravity CLI (2026-09-17 provider-naming pass, was executor id \"agy\"). Invocation id = <bin>-<mode>-<account>: agy-cli-mucdong/agy-herdr-mucdong/agy-cli-bwrap-mucdong (mucdong account) + agy-cli-tetnu (tetnu account) + agy-herdr-tetcu72/agy-cli-bwrap-tetcu72 (tetcu72 account) + agy-herdr-tetnu/agy-cli-bwrap-tetnu (tetnu account, confined).",
         "allowCrossProvider": true,
         "providerModel": "gemini",
         "for": [
@@ -1046,6 +1154,68 @@
             },
             "env": {
               "HOME": "${HOME}/.agy-homes/tetcu72"
+            },
+            "resourceBindings": [
+              {
+                "resource": "private-home",
+                "target": {
+                  "kind": "env",
+                  "name": "HOME"
+                }
+              }
+            ]
+          },
+          {
+            "id": "agy-herdr-tetnu",
+            "via": "cli",
+            "adapter": "herdr-spawn",
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "command": "agy",
+            "args": [
+              "--mode",
+              "accept-edits",
+              "--new-project",
+              "--model",
+              "{model}"
+            ],
+            "interactiveMode": {
+              "exitCommand": "/exit",
+              "kind": "agy",
+              "trustStore": {
+                "kind": "agy"
+              }
+            },
+            "env": {
+              "HOME": "${HOME}/.agy-homes/tetnu"
+            },
+            "resourceBindings": [
+              {
+                "resource": "private-home",
+                "target": {
+                  "kind": "env",
+                  "name": "HOME"
+                }
+              }
+            ]
+          },
+          {
+            "id": "agy-cli-bwrap-tetnu",
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "agy",
+            "args": [
+              "-p",
+              "{prompt}",
+              "--model",
+              "{model}"
+            ],
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "env": {
+              "HOME": "${HOME}/.agy-homes/tetnu"
             },
             "resourceBindings": [
               {

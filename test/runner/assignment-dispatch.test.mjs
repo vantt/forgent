@@ -2011,12 +2011,31 @@ test('dispatch CLI execute subcommand with --contract computes distinct assignme
   );
 
   const dispatchScript = path.resolve('src/runner/dispatch.mjs');
+  // A child that dies with a bare parse error says nothing about which file it read; name the
+  // empty or unparseable JSON files under the store at that moment so a rare failure is explained.
+  const damagedJsonFiles = () => {
+    const found = [];
+    const walk = (dir) => {
+      for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) walk(full);
+        else if (entry.name.endsWith('.json')) {
+          try { JSON.parse(fs.readFileSync(full, 'utf8')); } catch { found.push(path.relative(tempDir, full)); }
+        }
+      }
+    };
+    try { walk(tempDir); } catch { /* the store may be mid-write */ }
+    return found;
+  };
   const run = (contractPath) =>
     execFileAsync(
       process.execPath,
       [dispatchScript, 'execute', '--contract', contractPath, '--work', 'tsk-contract-race', '--cwd', tempDir],
       { encoding: 'utf8', cwd: tempDir },
-    );
+    ).catch((err) => {
+      err.message += `\nchild stdout: ${JSON.stringify(err.stdout)}\nchild stderr: ${JSON.stringify(err.stderr)}\nempty or unparseable json files now: ${JSON.stringify(damagedJsonFiles())}`;
+      throw err;
+    });
 
   const [result1, result2] = await Promise.all([run(contract1Path), run(contract2Path)]);
   const parsed1 = JSON.parse(result1.stdout.trim());

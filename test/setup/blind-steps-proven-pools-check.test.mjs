@@ -14,10 +14,10 @@ const herdrBwrap = (id, command) => ({ id, via: 'cli', adapter: 'herdr-spawn', c
 const EXECUTORS = {
   // proven: deepseek through a bwrap cli invocation
   deepseek: { kind: 'agent', providerModel: 'deepseek', invocations: [cliBwrap('pi-cli-bwrap', 'pi')] },
-  // proven: xai through herdr only
+  // proven: xai through herdr
   xai: { kind: 'agent', providerModel: 'xai', invocations: [herdrBwrap('pi-herdr', 'pi')] },
-  // xai through its cli is not a proven pair
-  'xai-cli': { kind: 'agent', providerModel: 'xai', invocations: [cliBwrap('pi-cli-bwrap-xai', 'pi')] },
+  // deepseek through herdr is not a proven pair (only its cli was measured)
+  'deepseek-herdr': { kind: 'agent', providerModel: 'deepseek', invocations: [herdrBwrap('pi-herdr-deepseek', 'pi')] },
   // mistral is a family no canary has proven on either transport
   mistral: { kind: 'agent', providerModel: 'mistral', invocations: [herdrBwrap('agy-herdr', 'agy'), cliBwrap('agy-cli-bwrap', 'agy')] },
   // proven family but no confinement: blind could not be enforced on it
@@ -65,7 +65,7 @@ test('the check is registered in the doctor registry', () => {
 
 test('the proven table holds exactly the canary pairs and not an unmeasured family', () => {
   const rows = BLIND_PROVEN_PAIRS.map((p) => `${p.family}/${p.transport}`).sort();
-  assert.deepEqual(rows, ['claude/herdr', 'deepseek/cli', 'gemini/cli', 'gemini/herdr', 'openai/cli', 'openai/herdr', 'xai/herdr', 'z-ai/cli']);
+  assert.deepEqual(rows, ['claude/cli', 'claude/herdr', 'deepseek/cli', 'gemini/cli', 'gemini/herdr', 'openai/cli', 'openai/herdr', 'xai/cli', 'xai/herdr', 'z-ai/cli']);
   assert.ok(BLIND_PROVEN_PAIRS.every((p) => p.backend === 'bwrap'));
 });
 
@@ -93,9 +93,9 @@ test('a blind unit whose pool includes mistral fails and names the executor, the
 });
 
 test('a proven family on a transport that was not proven still fails', async () => {
-  const result = await run(BLIND, { 'fixture:propose': prefer('xai-cli') });
+  const result = await run(BLIND, { 'fixture:propose': prefer('deepseek-herdr') });
   assert.equal(result.passed, false);
-  assert.match(result.message, /xai-cli via pi-cli-bwrap-xai \(family xai, cli/);
+  assert.match(result.message, /deepseek-herdr via pi-herdr-deepseek \(family deepseek, herdr/);
 });
 
 test('an unconfined invocation is never a candidate, so it is not reported here', async () => {
