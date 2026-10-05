@@ -7,7 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
 
-import { reportRefOf, reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, anonymousInputName, HandoffRefError } from '../../../src/runner/execution/handoff-refs.mjs';
+import { reportRefOf, reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, anonymousInputName, isSeatInput, HandoffRefError } from '../../../src/runner/execution/handoff-refs.mjs';
 
 const resolveRefs = (inputs, root, options) => resolveUnitInputs(inputs, root, options).refs;
 const sha = (text) => crypto.createHash('sha256').update(text).digest('hex');
@@ -326,4 +326,45 @@ test('refIsHiddenFromBlind tells run state from the rest of the checkout', () =>
   fs.writeFileSync(path.join(root, 'docs', 'a.md'), 'x');
   assert.equal(refIsHiddenFromBlind(path.join(runDir, 'report.md'), root), true);
   assert.equal(refIsHiddenFromBlind('docs/a.md', root), false);
+});
+
+test('an own-seat input is left out of the unit-level resolution and resolved to the receiving role\'s own report', () => {
+  const root = makeRoot();
+  const first = settleAttempt(root, 'unit-run-a', 'panelist-1', '1', { report: 'one\n' });
+  const second = settleAttempt(root, 'unit-run-a', 'panelist-2', '1', { report: 'two\n' });
+  const inputs = ['docs/a.md', 'unit-run:unit-run-a/{seat}'];
+  assert.equal(isSeatInput(inputs[1]), true);
+  assert.equal(isSeatInput('unit-run:unit-run-a/panelist-1'), false);
+
+  assert.deepEqual(resolveUnitInputs(inputs, root), { refs: ['docs/a.md'], inputMap: [] });
+  assert.deepEqual(resolveUnitInputs(inputs, root, { blind: true }), { refs: ['docs/a.md'], inputMap: [] });
+
+  const own = (seat) => resolveUnitInputs(inputs, root, { seat });
+  assert.deepEqual(own('panelist-2').refs, []);
+  assert.deepEqual(own('panelist-2').inputMap, [
+    { name: 'own-previous.md', input: 'unit-run:unit-run-a/{seat}', source: path.join(second.runDir, 'report.md'), sha256: sha('two\n') },
+  ]);
+  assert.equal(own('panelist-1').inputMap[0].source, path.join(first.runDir, 'report.md'));
+
+  const [copy] = copyHandoffsInto(path.join(root, 'role-dir'), own('panelist-1').inputMap);
+  assert.equal(fs.readFileSync(copy, 'utf8'), 'one\n');
+  assert.equal(path.basename(copy), 'own-previous.md');
+});
+
+test('an own-seat input names its failure: a seat the earlier run did not have, an edited report, no such run', () => {
+  const root = makeRoot();
+  const { runDir } = settleAttempt(root, 'unit-run-a', 'panelist-1', '1', { report: 'one\n' });
+  const reasonOf = (input, seat) => {
+    try {
+      resolveUnitInputs([input], root, { seat });
+    } catch (err) {
+      assert.ok(err instanceof HandoffRefError, String(err));
+      return err.reason;
+    }
+    return null;
+  };
+  assert.equal(reasonOf('unit-run:unit-run-a/{seat}', 'panelist-9'), 'no-such-seat');
+  assert.equal(reasonOf('unit-run:unit-run-nope/{seat}', 'panelist-1'), 'no-such-run');
+  fs.writeFileSync(path.join(runDir, 'report.md'), 'changed\n');
+  assert.equal(reasonOf('unit-run:unit-run-a/{seat}', 'panelist-1'), 'report-changed-after-settle');
 });

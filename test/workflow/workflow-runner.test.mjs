@@ -865,6 +865,101 @@ test('anonymizeInputs hands a later unit neutral copies and a brief that names n
   );
 });
 
+test('a unit template that declares inputs gets only those steps, and its own seat\'s result of a same-seat step', async () => {
+  const tmp = setupTestRepo();
+  const cfgPath = path.join(tmp, '.fgos', 'config.json');
+  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  const script = path.join(tmp, 'echo-worker.mjs');
+  cfg.runner.executors = {};
+  for (const name of ['alpha', 'beta', 'gamma', 'delta']) {
+    const command = path.join(tmp, `${name}-bin`);
+    fs.symlinkSync(process.execPath, command);
+    cfg.runner.executors[name] = {
+      kind: 'agent',
+      allowCrossProvider: true,
+      command,
+      args: [script, '{prompt}'],
+      providerModel: name,
+      invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args: [script, '{prompt}'] }],
+    };
+  }
+  cfg.runner.defaultExecutor = 'alpha';
+  for (const capability of Object.values(cfg.runner.capabilities)) {
+    capability.prefer = ['alpha', 'beta', 'gamma', 'delta'].map((executor) => ({ executor }));
+  }
+  fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
+
+  const panel = (extra = {}) => ({ capability: 'docs:write', pattern: 'panel', writes: [], ...extra });
+  const workflow = validateWorkflow({
+    id: 'own-seat-round',
+    steps: [
+      { id: 'round-1', units: [{ id: 'p1', template: panel({ objective: 'Propose' }) }] },
+      { id: 'summary', dependsOn: ['round-1'], units: [{ id: 's', template: { capability: 'docs:write', pattern: 'solo', objective: 'Summarize', writes: [], anonymizeInputs: true } }] },
+      {
+        id: 'round-2',
+        dependsOn: ['summary'],
+        units: [{
+          id: 'p2',
+          template: panel({
+            objective: 'Revise',
+            anonymizeInputs: true,
+            inputs: [{ step: 'summary', label: 'group summary' }, { step: 'round-1', sameSeat: true, label: 'your own previous proposal' }],
+          }),
+        }],
+      },
+      { id: 'after', dependsOn: ['round-2'], units: [{ id: 'a', template: { capability: 'docs:write', pattern: 'solo', objective: 'Wrap up', writes: [] } }] },
+    ],
+  });
+  const state = await startWorkflow({ workflow, repoRoot: tmp, cwd: tmp, worktree: tmp });
+  assert.equal(state.status, 'completed', JSON.stringify(state.steps));
+
+  const runId = (step, unit) => state.steps[step].units[unit].unitRunId;
+  const assignment = (id, role) => JSON.parse(fs.readFileSync(path.join(tmp, '.fgos', 'assignments', id, role, '1', 'assignment.json'), 'utf8'));
+  const r2Dir = path.join(tmp, '.fgos', 'assignments', runId('round-2', 'p2'));
+
+  for (const role of ['panelist-1', 'panelist-2', 'panelist-3']) {
+    const { contextRefs, objective } = assignment(runId('round-2', 'p2'), role);
+    assert.deepEqual(contextRefs, [path.join(r2Dir, 'inputs', 'seat-A.md'), path.join(r2Dir, role, '1', 'inputs', 'own-previous.md')], role);
+    const own = state.steps['round-1'].units.p1.results.find((r) => r.role === role).runResult.settleReports[0].path;
+    assert.ok(fs.readFileSync(contextRefs[1]).equals(fs.readFileSync(path.join(tmp, own))), `${role} gets its own round 1 report`);
+    assert.match(objective, /### seat-A \(group summary\)/);
+    assert.match(objective, /### your own previous proposal\nIt is the file named "own-previous"/);
+    for (const leak of [runId('round-1', 'p1'), 'round-1', 'panelist', 'synthesizer', 'seat-B']) {
+      assert.ok(!objective.includes(leak), `objective names ${leak}`);
+    }
+  }
+
+  // A step with no declaration still gets every report of every step it builds on.
+  const afterRefs = assignment(runId('after', 'a'), 'producer').contextRefs;
+  for (const id of [runId('round-1', 'p1'), runId('summary', 's'), runId('round-2', 'p2')]) {
+    assert.ok(afterRefs.some((ref) => ref.includes(`/assignments/${id}/`)), `${id} is still handed over: ${JSON.stringify(afterRefs)}`);
+  }
+});
+
+test('validateWorkflow checks a unit template\'s inputs: known earlier steps only, with a clear error', () => {
+  const wf = (inputs, extraStep = {}) => ({
+    id: 'test/inputs',
+    steps: [
+      { id: 'a', units: [{ id: 'ua', template: { capability: 'docs:write' } }] },
+      { id: 'b', dependsOn: ['a'], units: [{ id: 'ub', template: { capability: 'docs:write' } }] },
+      { id: 'c', dependsOn: ['b'], units: [{ id: 'uc', template: { capability: 'docs:write', inputs } }] },
+      { id: 'side', ...extraStep, units: [{ id: 'us', template: { capability: 'docs:write' } }] },
+    ],
+  });
+  const ok = validateWorkflow(wf([{ step: 'a', sameSeat: true, label: 'mine' }, { step: 'b' }]));
+  assert.deepEqual(ok.steps[2].units[0].template.inputs, [{ step: 'a', sameSeat: true, label: 'mine' }, { step: 'b' }]);
+  assert.equal(ok.steps[1].units[0].template.inputs, undefined);
+
+  assert.throws(() => validateWorkflow(wf([{ step: 'nope' }])), /step "c" unit "uc" inputs\[0\] names undeclared step "nope"/);
+  assert.throws(() => validateWorkflow(wf([{ step: 'side' }])), /inputs\[0\] names step "side", which this step does not depend on/);
+  assert.throws(() => validateWorkflow(wf([{ step: 'c' }])), /names step "c", which this step does not depend on/);
+  assert.throws(() => validateWorkflow(wf('a')), /inputs must be an array/);
+  assert.throws(() => validateWorkflow(wf(['a'])), /inputs\[0\] must be an object/);
+  assert.throws(() => validateWorkflow(wf([{}])), /requires "step"/);
+  assert.throws(() => validateWorkflow(wf([{ step: 'a', 'same-seat': true }])), /unknown key "same-seat"/);
+  assert.throws(() => validateWorkflow(wf([{ step: 'a', sameSeat: 'yes' }])), /sameSeat must be true or false/);
+});
+
 test('a completed unit keeps the id of the Unit run that produced it', () => {
   const tmp = setupTestRepo();
   const workflow = validateWorkflow({

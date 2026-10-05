@@ -28,6 +28,34 @@ const VALID_STEP_KINDS = new Set(['standard', 'integrate']);
 const VALID_STEP_PHASES = new Set(['clarify', 'discover', 'plan', 'execute']);
 const VALID_OPERATION_DISPATCH = new Set(['human-only']);
 
+const INPUT_ENTRY_KEYS = new Set(['step', 'sameSeat', 'label']);
+
+/** One `inputs` entry of a unit template: which earlier step's results the unit receives. */
+function normalizeInputEntry(raw, label) {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+    throw new WorkflowDefinitionError(`${label} must be an object like { step: <step id> }`);
+  }
+  for (const key of Object.keys(raw)) {
+    if (!INPUT_ENTRY_KEYS.has(key)) {
+      throw new WorkflowDefinitionError(`${label} has unknown key "${key}" (allowed: step, sameSeat, label)`);
+    }
+  }
+  if (typeof raw.step !== 'string' || !raw.step.trim()) {
+    throw new WorkflowDefinitionError(`${label} requires "step" (the id of an earlier step)`);
+  }
+  if (raw.sameSeat !== undefined && typeof raw.sameSeat !== 'boolean') {
+    throw new WorkflowDefinitionError(`${label} sameSeat must be true or false`);
+  }
+  if (raw.label !== undefined && (typeof raw.label !== 'string' || !raw.label.trim())) {
+    throw new WorkflowDefinitionError(`${label} label must be a non-empty string`);
+  }
+  return Object.freeze({
+    step: raw.step.trim(),
+    ...(raw.sameSeat === true ? { sameSeat: true } : {}),
+    ...(raw.label ? { label: raw.label.trim() } : {}),
+  });
+}
+
 function normalizeOperation(raw, label) {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
     throw new WorkflowDefinitionError(`${label} must be a non-null object`);
@@ -268,6 +296,14 @@ export function validateWorkflow(raw) {
           throw new WorkflowDefinitionError(`${unitLabel} blind must be true or false`);
         }
 
+        let inputs;
+        if (template.inputs !== undefined) {
+          if (!Array.isArray(template.inputs)) {
+            throw new WorkflowDefinitionError(`${unitLabel} inputs must be an array of { step, sameSeat?, label? } entries`);
+          }
+          inputs = template.inputs.map((entry, iIdx) => normalizeInputEntry(entry, `${unitLabel}.inputs[${iIdx}]`));
+        }
+
         units.push(
           Object.freeze({
             id: uId,
@@ -282,6 +318,7 @@ export function validateWorkflow(raw) {
               params: template.params === undefined ? undefined : structuredClone(template.params),
               anonymizeInputs: template.anonymizeInputs === true ? true : undefined,
               blind: template.blind === true ? true : undefined,
+              inputs: inputs ? Object.freeze(inputs) : undefined,
             }),
             dependsOn: uDependsOn,
           }),
@@ -314,6 +351,34 @@ export function validateWorkflow(raw) {
       if (dep === step.id) {
         throw new WorkflowDefinitionError(`Workflow "${id}" step "${step.id}" cannot depend on itself`);
       }
+    }
+  }
+
+  // A unit's `inputs` name earlier steps: only a step this one builds on, directly or not.
+  const stepsById = new Map(normalizedSteps.map((s) => [s.id, s]));
+  const builtOn = (stepId) => {
+    const seen = new Set();
+    const walk = (id) => {
+      for (const dep of stepsById.get(id).dependsOn) {
+        if (!seen.has(dep)) {
+          seen.add(dep);
+          walk(dep);
+        }
+      }
+    };
+    walk(stepId);
+    return seen;
+  };
+  for (const step of normalizedSteps) {
+    const earlier = builtOn(step.id);
+    for (const u of step.units) {
+      (u.template.inputs ?? []).forEach((entry, iIdx) => {
+        const where = `Workflow "${id}" step "${step.id}" unit "${u.id}" inputs[${iIdx}]`;
+        if (!stepIds.has(entry.step)) throw new WorkflowDefinitionError(`${where} names undeclared step "${entry.step}"`);
+        if (!earlier.has(entry.step)) {
+          throw new WorkflowDefinitionError(`${where} names step "${entry.step}", which this step does not depend on (directly or not)`);
+        }
+      });
     }
   }
 

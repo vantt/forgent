@@ -23,7 +23,7 @@ import {
 import { translatePlanToWorkflow } from './plan-source.mjs';
 import { runUnit, snapshotRunnerConfig, resolveGitRoots } from '../runner/execution/run.mjs';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
-import { anonymousInputName, gateAnswerFile } from '../runner/execution/handoff-refs.mjs';
+import { anonymousInputName, gateAnswerFile, OWN_PREVIOUS_NAME, SEAT_PLACEHOLDER } from '../runner/execution/handoff-refs.mjs';
 
 const GATE_ANSWER_NOTE_CHARS = 200;
 
@@ -51,27 +51,40 @@ function buildUnitHandoff({ template, state, step, workflow }) {
   };
   collect(step.id);
 
+  // Which earlier steps the unit receives: every step it builds on, unless its template declares
+  // `inputs`, which then names the steps (and, per entry, whether it is the unit's own seat's
+  // result of that step only) in the order they are listed.
+  const picks = template.inputs
+    ? template.inputs.map((entry) => ({ prior: workflow.steps.find((s) => s.id === entry.step), sameSeat: entry.sameSeat === true, label: entry.label }))
+    : workflow.steps.filter((s) => wanted.has(s.id)).map((prior) => ({ prior }));
+
   // With anonymizeInputs the Execution Core copies each role's report as seat-A, seat-B, ... in
   // the order of `inputs`, so the index below names them that way and nothing else: no step,
-  // unit, unit run or role.
+  // unit, unit run or role. A same-seat input is not part of that numbering: the role it is for
+  // gets it as its own earlier result, and the brief only says so.
   const anonymize = template.anonymizeInputs === true;
   const index = [];
   const inputs = [];
-  for (const prior of workflow.steps) {
-    if (!wanted.has(prior.id)) continue;
+  let anonymized = 0;
+  for (const { prior, sameSeat, label } of picks) {
     for (const [unitId, unitState] of Object.entries(state.steps[prior.id]?.units ?? {})) {
       if (!unitState.unitRunId) continue;
       const results = (unitState.results ?? []).filter((r) => r?.runResult);
+      if (sameSeat) {
+        inputs.push(`unit-run:${unitState.unitRunId}/${SEAT_PLACEHOLDER}`);
+        index.push(`### ${label ?? 'Your own earlier result'}\nIt is the file named "${OWN_PREVIOUS_NAME}" under Context refs: what you yourself produced in an earlier step.`);
+        continue;
+      }
       if (anonymize) {
         for (const role of new Set(results.map((r) => r.role))) {
           const summary = results.filter((r) => r.role === role).at(-1)?.runResult.agentClaim?.summary;
-          index.push(`### ${anonymousInputName(inputs.length)}${summary ? `\nSummary: ${summary}` : ''}`);
+          index.push(`### ${anonymousInputName(anonymized++)}${label ? ` (${label})` : ''}${summary ? `\nSummary: ${summary}` : ''}`);
           inputs.push(`unit-run:${unitState.unitRunId}/${role}`);
         }
         continue;
       }
       const summary = results.at(-1)?.runResult.agentClaim?.summary;
-      index.push(`### ${prior.id} / ${unitId} (unit run ${unitState.unitRunId})${summary ? `\nSummary: ${summary}` : ''}`);
+      index.push(`### ${prior.id} / ${unitId} (unit run ${unitState.unitRunId})${label ? ` (${label})` : ''}${summary ? `\nSummary: ${summary}` : ''}`);
       for (const role of new Set(results.map((r) => r.role))) inputs.push(`unit-run:${unitState.unitRunId}/${role}`);
     }
   }

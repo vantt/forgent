@@ -13,7 +13,7 @@ import { runPattern } from './patterns/index.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { ensureRunnerConfigForDir, RunnerConfigError } from '../dispatch/config.mjs';
 import { commitUnitWork } from './commit-unit-work.mjs';
-import { reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, plainInputName } from './handoff-refs.mjs';
+import { reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, plainInputName, isSeatInput } from './handoff-refs.mjs';
 import { outcomeOfRunResult, readUnitRunHistory } from './unit-run-history.mjs';
 import { reapOrphanedConfinementResources, resolveConfinementTempRoot } from '../dispatch/confinement/cleanup.mjs';
 
@@ -268,6 +268,12 @@ export async function runUnit(options = {}) {
         ...inRun.map((source, i) => ({ name: `${plainInputName((unitRecord.inputMap?.length ?? 0) + i, source, mainRoot)}${path.extname(source)}`, source })),
       ];
       contextRefs = [...contextRefs.filter((ref) => !inRun.includes(ref)), ...copyHandoffsInto(assignmentDir, entries)];
+    }
+
+    // What an earlier run's same seat left for this role: the role's own previous result, copied
+    // into its own directory whether the unit is blind or not.
+    if (unit.inputs.some(isSeatInput)) {
+      contextRefs = [...contextRefs, ...copyHandoffsInto(assignmentDir, resolveUnitInputs(unit.inputs, mainRoot, { seat: role }).inputMap)];
     }
 
     const assignment = {

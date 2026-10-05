@@ -7,6 +7,12 @@
 // a fallback hands out the same list. The owner's answer to a human gate of a Workflow run travels
 // the same way as `gate-answer:<workflowRunId>/<stepId>`. A blind role cannot read that run state,
 // so for a blind Unit the same refs are handed over as copies in the role's own directory.
+//
+// One input depends on the role that receives it: `unit-run:<unitRunId>/{seat}` stands for the
+// report the receiving role's own seat left in that earlier run (the panelist playing
+// `panelist-2` gets the result of `panelist-2`). It is resolved here too, once per role, when that
+// role is dispatched (`resolveUnitInputs` with `seat`), and handed over as a copy in the role's
+// own directory under a name that says it is the role's own earlier result.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -18,6 +24,11 @@ import { readUnitRunHistory } from './unit-run-history.mjs';
 
 const UNIT_RUN_PREFIX = 'unit-run:';
 const GATE_ANSWER_PREFIX = 'gate-answer:';
+export const SEAT_PLACEHOLDER = '{seat}';
+export const OWN_PREVIOUS_NAME = 'own-previous';
+
+/** Whether an input names the earlier result of the receiving role's own seat. */
+export const isSeatInput = (input) => typeof input === 'string' && input.startsWith(UNIT_RUN_PREFIX) && input.endsWith(`/${SEAT_PLACEHOLDER}`);
 
 /** A hand-off that cannot be turned into a path; `reason` names why. */
 export class HandoffRefError extends RunnerConfigError {
@@ -98,9 +109,10 @@ function resolveGateAnswerRef(input, mainRoot) {
   return file;
 }
 
-function resolveUnitRunRef(input, mainRoot) {
-  const [unitRunId, role] = input.slice(UNIT_RUN_PREFIX.length).split('/');
-  const fail = (reason) => new HandoffRefError(input, reason);
+function resolveUnitRunRef(input, mainRoot, seat) {
+  const [unitRunId, named] = input.slice(UNIT_RUN_PREFIX.length).split('/');
+  const role = seat ?? named;
+  const fail = (reason) => new HandoffRefError(input, seat && reason === 'no-such-role' ? 'no-such-seat' : reason);
 
   const assignmentsDir = path.join(mainRoot, '.fgos', 'assignments');
   const unitDir = path.resolve(assignmentsDir, unitRunId);
@@ -159,10 +171,35 @@ export function refIsHiddenFromBlind(ref, mainRoot) {
 }
 
 /**
+ * The own-seat inputs of one role: each `unit-run:<id>/{seat}` resolved to the report `seat` left
+ * in that run, as an entry for `copyHandoffsInto` (`own-previous.md`, `own-previous-2.md`, ...).
+ * A seat the earlier run did not have is refused as `no-such-seat`.
+ */
+function resolveSeatInputs(inputs, mainRoot, seat) {
+  const inputMap = [];
+  for (const input of inputs.filter(isSeatInput)) {
+    if (inputMap.some((e) => e.input === input)) continue;
+    const source = resolveUnitRunRef(input, mainRoot, seat);
+    let sha256;
+    try {
+      sha256 = sha256OfFile(source);
+    } catch (err) {
+      throw new HandoffRefError(input, `copy-failed: ${err.message}`);
+    }
+    const base = inputMap.length === 0 ? OWN_PREVIOUS_NAME : `${OWN_PREVIOUS_NAME}-${inputMap.length + 1}`;
+    inputMap.push({ name: `${base}${path.extname(source)}`, input, source, sha256 });
+  }
+  return { refs: [], inputMap };
+}
+
+/**
  * Turn a Unit's `inputs` into the context refs its roles are given: a repo-relative path stays as
  * it is, a `unit-run:<unitRunId>/<role>` becomes the absolute path of that role's report, a
  * `gate-answer:<workflowRunId>/<stepId>` the absolute path of the owner's recorded gate answer.
  * Throws before anything is dispatched when a ref cannot be resolved.
+ *
+ * A `unit-run:<id>/{seat}` input belongs to one role, so it is left out here; with `seat` (the
+ * role about to be dispatched) only those inputs are resolved, to that role's own entries.
  *
  * With `anonymizeInto` (a directory inside the receiving Unit run), every `unit-run:` report is
  * instead copied there, byte for byte, as `seat-A`, `seat-B`, ... in input order, and only the
@@ -179,15 +216,17 @@ export function refIsHiddenFromBlind(ref, mainRoot) {
  *
  * @param {readonly string[]} inputs
  * @param {string} mainRoot main checkout root
- * @param {{anonymizeInto?: string, blind?: boolean, anonymize?: boolean}} [options]
+ * @param {{anonymizeInto?: string, blind?: boolean, anonymize?: boolean, seat?: string}} [options]
  * @returns {{refs: string[], inputMap: Array<{name: string, input: string, source: string, sha256?: string}>}}
  */
-export function resolveUnitInputs(inputs, mainRoot, { anonymizeInto, blind = false, anonymize = false } = {}) {
+export function resolveUnitInputs(inputs, mainRoot, { anonymizeInto, blind = false, anonymize = false, seat } = {}) {
+  if (seat !== undefined) return resolveSeatInputs(inputs ?? [], mainRoot, seat);
+  inputs = (inputs ?? []).filter((input) => !isSeatInput(input));
   const refs = [];
   const sources = [];
   const copies = [];
   const hiddenRoots = blind ? resolveBlindHiddenRoots({ fgosDir: path.join(mainRoot, '.fgos') }) : [];
-  for (const input of inputs ?? []) {
+  for (const input of inputs) {
     let ref = input;
     const isUnitRun = input.startsWith(UNIT_RUN_PREFIX);
     if (isUnitRun) {
@@ -205,7 +244,7 @@ export function resolveUnitInputs(inputs, mainRoot, { anonymizeInto, blind = fal
   }
 
   const inputMap = [];
-  let seat = 0;
+  let anonymized = 0;
   copies.forEach(({ input, source, isUnitRun }, index) => {
     let sha256;
     try {
@@ -213,7 +252,7 @@ export function resolveUnitInputs(inputs, mainRoot, { anonymizeInto, blind = fal
     } catch (err) {
       throw new HandoffRefError(input, `copy-failed: ${err.message}`);
     }
-    const base = anonymize && isUnitRun ? anonymousInputName(seat++) : plainInputName(index, source, mainRoot);
+    const base = anonymize && isUnitRun ? anonymousInputName(anonymized++) : plainInputName(index, source, mainRoot);
     inputMap.push({ name: `${base}${path.extname(source)}`, input, source, sha256 });
   });
   if (sources.length > 0) {
