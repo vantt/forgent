@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- A round that does not settle now leaves herdr's own account of the agent in its run directory, `herdr-diagnosis.json`: what `agent get` and `agent explain` said (state, the rule that matched, the detection manifest and its version, the fallback reason when nothing matched) and the screen herdr uses for detection. It is written before the pane can be closed and `visibility.json` points at it, so the next stall does not have to be guessed at.
+
 ### Fixed
 
 - Each role of a Unit run now gets its own task. Every role used to be dispatched with the unit's objective, so a reviewer told to "replace the placeholder line" tried to replace it instead of checking the producer's work, and a panel synthesizer was told to "silently generate independent ideas". The `reviewed` and `panel` patterns now tell the reviewer, red-team and synthesizer what they are for (default texts live in `role-tasks.mjs` and can be replaced with `params.roleTasks`), hand the reviewer and red-team the producer's report, and, from round 2, list the previous round's findings for the producer (they were passed along but never reached it).

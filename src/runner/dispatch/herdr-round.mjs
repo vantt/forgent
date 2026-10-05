@@ -38,6 +38,7 @@ import { briefPaths, renderBrief, renderPointer } from './brief.mjs';
 import {
   evaluateLadder, evaluateWorkingScreen, paneFateFor, WORKING_STALL_PROBE_MS, WORKING_STALL_TAIL_LINES,
 } from './liveness.mjs';
+import { captureHerdrDiagnosis, writeHerdrDiagnosis } from './herdr-diagnosis.mjs';
 import { writeVisibility } from './visibility-session.mjs';
 import { createWorkerHome, removeWorkerHome, redactWorkerHome } from './worker-home.mjs';
 import {
@@ -1192,6 +1193,10 @@ function concludeFailure({ client, round, decision, closeAlways }) {
     try { screenLine = lastScreenLine(client.agentRead(target, { lines: 60 })); } catch { screenLine = null; }
   }
 
+  // herdr's own account of the agent, taken before the pane can be closed: the pane is often gone
+  // soon after, and the next stall should not have to be guessed at again.
+  const diagnosis = writeHerdrDiagnosis(round.runDir, captureHerdrDiagnosis(client, target));
+
   // `died` and `blocked` are states a watcher can act on; the timeouts have
   // no state of their own, so they leave the last real one standing and add
   // the outcome beside it rather than overwriting it with a worse word.
@@ -1199,6 +1204,7 @@ function concludeFailure({ client, round, decision, closeAlways }) {
     ...(decision.outcome === 'died' || decision.outcome === 'blocked' ? { status: decision.outcome } : {}),
     outcome: decision.outcome,
     ...(screenLine ? { screen: screenLine } : {}),
+    ...(diagnosis ? { diagnosis } : {}),
   });
 
   const fate = paneFateFor(decision.outcome, { closeAlways });
@@ -1210,7 +1216,7 @@ function concludeFailure({ client, round, decision, closeAlways }) {
     `executor for work "${round.workId}" ended as ${decision.outcome}: ${decision.reason}.${
       screenLine ? ` Last line on screen: ${screenLine}` : ''
     }${fate === 'keep' ? ` Pane ${round.paneId} is left open.` : ''}`,
-    { outcome: decision.outcome, paneRetained: fate !== 'close', ...(screenLine ? { screen: screenLine } : {}) },
+    { outcome: decision.outcome, paneRetained: fate !== 'close', ...(screenLine ? { screen: screenLine } : {}), ...(diagnosis ? { diagnosis } : {}) },
   );
 }
 

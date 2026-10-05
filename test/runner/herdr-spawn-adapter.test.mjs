@@ -882,6 +882,25 @@ test('a stale worker with an ordinary screen is an idle timeout that still quote
     },
   );
 
+  // herdr's own account of the agent is kept next to the round's other evidence
+  const diagnosis = JSON.parse(fs.readFileSync(path.join(tmpDir, 'run', 'herdr-diagnosis.json'), 'utf8'));
+  assert.equal(diagnosis.contract, 'herdr-diagnosis.v1');
+  assert.ok(diagnosis.target);
+  assert.ok(Date.parse(diagnosis.capturedAt) > 0);
+  assert.equal(diagnosis.agent.agentStatus, 'idle', 'what `agent get` said');
+  assert.ok('state' in diagnosis.explain || 'error' in diagnosis.explain, 'what `agent explain` said, or why it could not');
+  assert.match(String(diagnosis.detectionScreen), /waiting for you/, 'the screen herdr uses for detection');
+  assert.equal(readVisibility(path.join(tmpDir, 'run')).diagnosis, 'herdr-diagnosis.json', 'visibility points at it');
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('a settled round writes no diagnosis: there is nothing to explain', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-no-diagnosis-'));
+  const mock = createMockHerdr(tmpDir);
+  const res = await dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing' });
+  assert.equal(res.status, 0);
+  assert.equal(fs.existsSync(path.join(tmpDir, 'run', 'herdr-diagnosis.json')), false);
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 

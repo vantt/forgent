@@ -371,6 +371,9 @@ export function createHerdrClient({ herdrBin = 'herdr', cwd, env, run = defaultR
         // through `fallback_reason` is herdr's default for a known agent, nothing more.
         matchedRule: typeof matchedId === 'string' && matchedId ? matchedId : null,
         promptText: typeof matchedRule?.evidence?.region_preview === 'string' ? matchedRule.evidence.region_preview : '',
+        // herdr's whole answer (manifest source and version, evaluated rules, fallback reason), kept
+        // for the diagnosis written when a round does not settle.
+        raw: verdict,
       };
     },
 
