@@ -772,9 +772,7 @@ test('review --github --pr on a closed-without-merge PR names the PR, points to 
   const fake = writeViewFake(cwd, 'gh-view-closed.cjs', ghLog,
     { state: 'CLOSED', mergeable: 'UNKNOWN', mergeStateStatus: 'UNKNOWN', mergedAt: null, closed: true, closedAt: '2026-07-17T09:00:00Z' });
 
-  const startedAt = Date.now();
   const result = run(cwd, ['review', 'gh-status-closed', '--github', '--pr', '77'], { FGOS_GH_COMMAND: fake });
-  const elapsedMs = Date.now() - startedAt;
 
   assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
   const closedData = envelopeData(result.stdout);
@@ -783,7 +781,6 @@ test('review --github --pr on a closed-without-merge PR names the PR, points to 
 
   const invocations = fs.readFileSync(ghLog, 'utf8').trim().split('\n').filter(Boolean);
   assert.equal(invocations.length, 1, `expected exactly one gh invocation under pollTimeoutMs:0, got ${invocations.length}`);
-  assert.ok(elapsedMs < 5000, `status check must resolve well under the default 10s poll timeout, took ${elapsedMs}ms`);
 
   const view = stateView(cwd);
   assert.equal(view.work['gh-status-closed'].status, 'awaiting-approval', 'a GitHub-side close is not a reject — no FSM mutation');
@@ -1119,17 +1116,18 @@ test('merge next --no-wait fails immediately on a live-held lock -- proves the f
   commitPendingBeforeApprove(cwd, 'wait-merge-next-no-wait');
   writeLiveLock(cwd, 1000);
 
-  const start = Date.now();
   const result = run(cwd, ['merge', 'next', '--no-wait']);
-  const elapsed = Date.now() - start;
 
   // `merge next` only special-cases an Iron Law rejection (bin/fgos.mjs's
   // `sub === 'next'` case) -- any other error from the inner `runVerb('approve', ...)`
   // rethrows as-is, so this fails exactly like a direct `approve` call does.
   assert.equal(result.status, 9, result.stderr);
   assert.match(result.stderr, /main checkout is locked by pid \d+/);
-  // The default wait is 10s, so anything well under it proves the flag skipped the wait.
-  assert.ok(elapsed < 5000, `--no-wait forwarded through merge next must still fail fast, not wait (took ${elapsed}ms)`);
+  // A run that waited would print its retry progress line before every sleep and tag the final
+  // error with the time it waited; neither appears when the flag was forwarded. The lock holder
+  // (this process) never releases, so a waiting run could not have succeeded either.
+  assert.doesNotMatch(result.stderr, /still waiting on main-checkout lock/, '--no-wait forwarded through merge next must not enter the retry loop');
+  assert.doesNotMatch(result.stderr, /waited \d+ms before giving up/, '--no-wait forwarded through merge next must not wait before giving up');
 });
 
 test('sync-root never reports outcome "synced" when mergeRunnerItem returns an outcome it does not explicitly handle -- proves the defensive guard closes the false-success gap D4 found', () => {

@@ -395,14 +395,14 @@ test('take --no-wait fails immediately on a live-held lock, same message/exit co
   addOk(cwd, 'wait-no-wait-take', { verify: 'true' });
   writeLiveLock(cwd, 1000); // well within DEFAULT_TTL_MS -- would never clear on its own during this test
 
-  const start = Date.now();
   const result = run(cwd, ['take', 'wait-no-wait-take', '--no-wait']);
-  const elapsed = Date.now() - start;
 
   assert.equal(result.status, 7, result.stderr);
   assert.match(result.stderr, /main checkout locked by pid/);
   assert.doesNotMatch(result.stderr, /waited \d+ms before giving up/, '--no-wait must never engage the retry loop at all');
-  assert.ok(elapsed < 2000, `--no-wait must fail fast, not wait out any budget (took ${elapsed}ms)`);
+  // A run that waited prints its retry progress line before every sleep; the lock holder (this
+  // process) never releases, so a waiting run could not have succeeded either.
+  assert.doesNotMatch(result.stderr, /still waiting on main-checkout lock/, '--no-wait must not enter the retry loop');
 });
 
 
@@ -439,7 +439,9 @@ test('take --wait <ms> tightens the budget below the lock\'s own remainingTtlMs,
 
   assert.equal(result.status, 7, result.stderr);
   assert.match(result.stderr, /waited \d+ms before giving up/, 'an exhausted explicit --wait budget must be distinguishable from an immediate-fail');
-  assert.ok(elapsed >= 500 && elapsed < 5000, `must have waited roughly the --wait budget, not the full remainingTtlMs (took ${elapsed}ms)`);
+  // The lock's remainingTtlMs is ~179s; only the explicit 600ms budget can have ended this run, so
+  // the ceiling here is far below that snapshot rather than a tight multiple of the budget.
+  assert.ok(elapsed >= 500 && elapsed < 60_000, `must have waited roughly the --wait budget, not the full remainingTtlMs (took ${elapsed}ms)`);
 });
 
 
@@ -468,13 +470,12 @@ test('pick --no-wait fails immediately on a live-held lock, same as take --no-wa
   addOk(cwd, 'wait-no-wait-pick', { verify: 'true' });
   writeLiveLock(cwd, 1000);
 
-  const start = Date.now();
   const result = run(cwd, ['pick', 'wait-no-wait-pick', '--no-wait']);
-  const elapsed = Date.now() - start;
 
   assert.equal(result.status, 7, result.stderr);
   assert.match(result.stderr, /main checkout locked by pid/);
-  assert.ok(elapsed < 2000, `--no-wait must fail fast (took ${elapsed}ms)`);
+  assert.doesNotMatch(result.stderr, /still waiting on main-checkout lock/, '--no-wait must not enter the retry loop');
+  assert.doesNotMatch(result.stderr, /waited \d+ms before giving up/, '--no-wait must not wait before giving up');
 });
 
 

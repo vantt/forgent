@@ -59,10 +59,16 @@ test('a file that hangs is recorded as coverage-collection-timeout and collectio
 test('files run at most `concurrency` at a time, and more than one at a time when allowed', async () => {
   const markDir = fs.mkdtempSync(path.join(os.tmpdir(), 'coverage-map-marks-'));
   // Each file records when it started and ended; overlap is computed from
-  // those real timestamps, not inferred from callback order.
+  // those real timestamps, not inferred from callback order. A file first waits until two files
+  // have started, so the two the pool runs together provably overlap however far apart a loaded
+  // machine boots them.
   const slow = (n) => `import fs from 'node:fs'; import { test } from 'node:test';
 test('slow', async () => {
   const start = Date.now();
+  fs.writeFileSync(${JSON.stringify(markDir)} + '/${n}.start', '');
+  while (fs.readdirSync(${JSON.stringify(markDir)}).filter((f) => f.endsWith('.start')).length < 2) {
+    await new Promise((r) => setTimeout(r, 20));
+  }
   await new Promise((r) => setTimeout(r, 600));
   fs.writeFileSync(${JSON.stringify(markDir)} + '/${n}.json', JSON.stringify({ start, end: Date.now() }));
 });

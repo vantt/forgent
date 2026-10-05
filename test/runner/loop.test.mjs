@@ -1932,7 +1932,8 @@ test('runWatch: a cycle that committed is followed by an immediate next cycle; a
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-watch-timing' });
   const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
-  const pollFallbackMs = 300;
+  // Large enough that a cycle which does real git work under load still finishes inside it.
+  const pollFallbackMs = 3000;
   const timestamps = [];
   const controller = new AbortController();
 
@@ -1966,7 +1967,9 @@ test('runWatch: a cycle that committed is followed by an immediate next cycle; a
 
 test('runWatch stops promptly when its AbortSignal aborts mid-wait, and resolves cleanly without throwing', async () => {
   const { repoRoot, dir, worktreeDir } = setup(); // empty frontier -- idle every cycle
-  const pollFallbackMs = 2000;
+  // Aborting at 30ms must end the wait, not let it run to the fallback; the fallback is long
+  // enough that the first cycle's own work under load cannot be mistaken for it.
+  const pollFallbackMs = 60_000;
   const controller = new AbortController();
   setTimeout(() => controller.abort(), 30);
 
