@@ -369,6 +369,10 @@ const ERROR_CLASS_FOR_OUTCOME = Object.freeze({
  */
 /** `agent start`'s own documented default. */
 const READY_TIMEOUT_MS = 30000;
+/** How long herdr gets to recognise an agent that fgos launched itself (a confined one) before a
+ * state is reported for it. A real agent is recognised within a poll or two; only a process herdr
+ * has no manifest for waits all of it. */
+const AGENT_DETECT_GRACE_MS = 6000;
 /** herdr's own stall detector fires at 5000ms; anything shorter on this side
  * wins the race and hands the caller a bare timeout instead of the real
  * reason. Measured upstream: 5s broke, 20s worked. */
@@ -441,7 +445,12 @@ function lastScreenLine(text) {
 export function groupDeadlines({ idleTimeoutMs, timeoutMs, transportDeadlines = {} }) {
   const promptMs = transportDeadlines.promptTimeoutMs ?? PROMPT_TIMEOUT_MS;
   return {
-    startup: { readyMs: transportDeadlines.readyTimeoutMs ?? READY_TIMEOUT_MS, promptMs },
+    startup: {
+      readyMs: transportDeadlines.readyTimeoutMs ?? READY_TIMEOUT_MS,
+      promptMs,
+      // How long herdr gets to recognise an agent fgos launched before a state is reported for it.
+      detectMs: transportDeadlines.detectTimeoutMs ?? AGENT_DETECT_GRACE_MS,
+    },
     brief: {
       // A brief is re-offered no sooner than one submission is allowed to take;
       // any less and the resend races the delivery it is waiting on.
@@ -857,25 +866,54 @@ function deliverBrief({ client, round, message, promptMs, resultPath }) {
 }
 
 /**
- * The agent's state as the poll loop should see it.
+ * The agent's state as the poll loop should see it: herdr's `agent get`.
  *
- * A confined agent runs as a plain process in the pane, so the only status herdr's
- * `agent get` can give is the one fgos reported at launch ("working") -- and that never
- * changes, so an agent that finished, hung, or stopped on a provider limit would look
- * busy forever and the idle and usage-limit checks of the ladder could never fire. For a
- * confined target the screen detector's verdict is therefore read first; when herdr has
- * no verdict, or cannot be asked, the reported status is used as before.
+ * herdr detects the agent in the pane on its own, also behind a sandbox wrapper (measured
+ * 2026-10-05 on 0.9.1 for claude, codex, agy and pi behind bwrap), so its status is true. That
+ * only holds while nothing else reports a state for the pane: a state fgos reported at launch
+ * used to freeze `agent get` at "working" for good, and this function had to read the screen
+ * detector first to see through it, two herdr calls per poll. fgos no longer reports one.
+ * The detector is asked only when `agent get` has no answer.
  */
-export function readAgentState(client, target, { detectorFirst = false } = {}) {
-  if (detectorFirst) {
-    try {
-      const seen = client.agentExplain(target);
-      if (typeof seen?.state === 'string' && seen.state) return seen.state;
-    } catch {
-      // fall back to the reported status
-    }
+export function readAgentState(client, target) {
+  const status = client.agentGet(target).agentStatus;
+  if (status !== 'unknown') return status;
+  try {
+    const seen = client.agentExplain(target);
+    if (typeof seen?.state === 'string' && seen.state) return seen.state;
+  } catch {
+    // the detector cannot be asked either: the status stays unknown
   }
-  return client.agentGet(target).agentStatus;
+  return status;
+}
+
+/**
+ * Make sure herdr can address the agent in a pane that fgos launched itself.
+ *
+ * herdr recognises claude, codex, agy, pi and the other agents it has manifests for from the process
+ * in the pane, also behind a sandbox wrapper, and then `agent get` is its own, true status. A process
+ * it does not recognise cannot be addressed at all ("agent target not found") until a state is reported
+ * for it, so that is the fallback, after a grace period for detection. Reporting is not the default
+ * because a reported state is the pane's status authority and never changes.
+ *
+ * @returns {Promise<'detected'|'reported'>}
+ */
+export async function ensureHerdrKnowsAgent({ client, round, paneId, agentKind, graceMs = AGENT_DETECT_GRACE_MS, pollMs = 250 }) {
+  const deadline = Date.now() + graceMs;
+  for (;;) {
+    try {
+      client.agentGet(paneId);
+      round.note({ agentKnownToHerdr: 'detected' });
+      return 'detected';
+    } catch {
+      // not recognised (yet)
+    }
+    if (Date.now() >= deadline) break;
+    await sleep(pollMs);
+  }
+  client.reportAgent(paneId, { source: 'fgos', agent: agentKind, state: 'working' });
+  round.note({ agentKnownToHerdr: 'reported' });
+  return 'reported';
 }
 
 /** Whitespace-free form: a prompt box wraps a long line, so text is compared without breaks. */
@@ -1062,7 +1100,6 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
    * calls happen here, no screen text survives into the next tick.
    */
   const target = round.targetName ?? round.agentName;
-  const confinedTarget = Boolean(round.targetName && round.targetName === round.paneId);
   const decide = (observation) => {
     const first = evaluateLadder({ observation, limits, prior });
     if (!first.needsScreen) return first;
@@ -1102,7 +1139,7 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
     let agentState = 'unknown';
     let statusReadable = false;
     try {
-      agentState = readAgentState(client, target, { detectorFirst: confinedTarget });
+      agentState = readAgentState(client, target);
       statusReadable = true;
     } catch {
       agentState = 'unknown';
@@ -1849,12 +1886,11 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
     }
 
     if (!existingCmd?.resourceIncarnation) {
-      client.reportAgent(round.paneId, {
-        source: 'fgos',
-        agent: agentKindToUse,
-        state: 'working',
-      });
-
+      // herdr detects the agent behind the wrapper on its own, so nothing is reported for it: a state
+      // fgos reported ("working") became the pane's status authority and froze `agent get` for the
+      // whole round, hiding a finished, stalled or limited agent. Only a process herdr cannot
+      // recognise as an agent gets a reported state, because that is the one way to address it.
+      await ensureHerdrKnowsAgent({ client, round, paneId: round.paneId, agentKind: agentKindToUse, graceMs: deadlines.startup.detectMs });
       try {
         const ag = client.agentGet(round.paneId);
         if (ag?.agentSession) {

@@ -654,14 +654,29 @@ test('the brief a reviewer reads in a pane says its claim needs assessment.verdi
   assert.doesNotMatch(producerBrief, /assessment\.verdict/);
 });
 
-test('a confined pane that herdr only ever reports as working is still seen as stopped on a limit screen', { skip: SKIP }, async () => {
+test('a confined launch reports no state of its own: herdr detects the agent, so its status stays true', { skip: SKIP }, async () => {
+  const { repoRoot, worktreeDir, signalDir } = setup(['alpha', 'beta']);
+  const fake = useFakeHerdr({ signalDir, panes: [{ awaitProbe: true }, { awaitProbe: true }] });
+  const res = await withHerdrBin(fake.herdrBin, () => runUnit({
+    unitData: readOnlyUnit('u-no-reported-state'),
+    repoRoot,
+    cwd: worktreeDir,
+    worktree: worktreeDir,
+    session: { herdrPresent: true, headless: true },
+  }));
+  assert.equal(res.outcome, 'pass', JSON.stringify(res.results[0]).slice(0, 1500));
+  const reported = fake.calls().filter((c) => c[0] === 'pane' && String(c[1]).startsWith('report-agent'));
+  assert.deepEqual(reported, [], 'a state fgos reported would freeze `agent get` and hide what the agent is really doing');
+});
+
+test('a confined pane stopped on a limit screen is seen as stopped and the next executor takes over', { skip: SKIP }, async () => {
   const { repoRoot, worktreeDir } = setup(['alpha', 'beta']);
   const fake = useFakeHerdr({
-    panes: [{ limit: true, detector: true, reportedWorking: true }, {}],
+    panes: [{ limit: true, detector: true }, {}],
     limitScreen: "You've hit your usage limit. Try again in 3h.",
   });
   const res = await withHerdrBin(fake.herdrBin, () => runUnit({
-    unitData: readOnlyUnit('u-limit-reported-working'),
+    unitData: readOnlyUnit('u-limit-native-status'),
     repoRoot,
     cwd: worktreeDir,
     worktree: worktreeDir,
