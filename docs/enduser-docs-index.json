@@ -3610,6 +3610,14 @@
     "quadrant": "how-to",
     "purpose": "Show the steps to accomplish one specific, already-understood goal.",
     "audience": "A user who already knows the system and wants a concrete recipe.",
+    "docPath": "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+    "title": "How to install fgOS in a project and use fgos doctor",
+    "sourceCaptureId": null
+  },
+  {
+    "quadrant": "how-to",
+    "purpose": "Show the steps to accomplish one specific, already-understood goal.",
+    "audience": "A user who already knows the system and wants a concrete recipe.",
     "docPath": "docs/how-to/measure-a-real-case.md",
     "title": "How-To: Measure a Real Case with Observe Metrics",
     "sourceCaptureId": null
