@@ -43,5 +43,5 @@ Closed the two stale herdr panes this run left (`wS:p420`, `wS:p42Z`). mdview co
 ## Unresolved
 
 - Should a unit tolerate one failed seat when every candidate of that seat fails (quorum)? Not done: product decision.
-- Not re-verified live yet: auth probe and the new objective wording need another Delphi run.
+- Run 3 (`wf-run-1791198761595-28f05967`, after the fixes): completed in 7 min, no fallback needed, group summary has no role ids; tetcu72 selected again (no quarantine). The dead-credential probe was not exercised live (xai was logged in), only by tests.
 - Where should blind attestation be recorded per assignment (finding 5)?
