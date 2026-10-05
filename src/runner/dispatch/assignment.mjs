@@ -879,8 +879,11 @@ export function renderAssignmentPrompt(assignment, options = {}) {
   // evidenced -- a requirement this prompt never disclosed. Both facts are
   // now stated explicitly instead of discovered by two failed attempts.
   if (options.runDir) {
-    const agentResultPath = path.join(options.runDir, 'agent-result.json');
-    const agentReportPath = path.join(options.runDir, 'agent-report.md');
+    // The contract names where this worker may write (a sandboxed worker's
+    // claim lives under worker-output/outbox); the report sits beside it.
+    const agentResultPath = options.effectiveContract?.resultClaim?.path
+      ?? path.join(options.runDir, 'agent-result.json');
+    const agentReportPath = path.join(path.dirname(agentResultPath), 'agent-report.md');
     const readOnly = isReadOnlyAssignment(assignment);
     lines.push('Result artifact:');
     lines.push(`- Write structured JSON to ${agentResultPath}`);
