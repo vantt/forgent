@@ -129,6 +129,32 @@ test('doctor flags a confinement root readable beyond its owner, and fix sets it
   }
 });
 
+test('doctor flags empty per-dispatch shells left behind, and fix removes them', () => {
+  const base = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-confinement-shells-'));
+  const previousTmp = process.env.TMPDIR;
+  process.env.TMPDIR = base;
+  try {
+    const root = path.join(base, 'fgos-confinement');
+    const shell = path.join(root, 'disp_old_shell');
+    fs.mkdirSync(shell, { recursive: true, mode: 0o700 });
+    fs.chmodSync(root, 0o700);
+    const longAgo = new Date(Date.now() - 2 * 3600 * 1000);
+    fs.utimesSync(shell, longAgo, longAgo);
+
+    const before = checkConfinementOrphanedResourcesReaped();
+    assert.equal(before.passed, false);
+    assert.match(before.message, /1 empty/);
+
+    const fixed = fixConfinementOrphanedResourcesReaped();
+    assert.equal(fixed.changed, true);
+    assert.ok(!fs.existsSync(shell));
+    assert.equal(checkConfinementOrphanedResourcesReaped().passed, true);
+  } finally {
+    if (previousTmp === undefined) delete process.env.TMPDIR; else process.env.TMPDIR = previousTmp;
+    fs.rmSync(base, { recursive: true, force: true });
+  }
+});
+
 test('doctor does not call a home kept for an open pane orphaned', () => {
   const base = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-confinement-retained-'));
   const previousTmp = process.env.TMPDIR;

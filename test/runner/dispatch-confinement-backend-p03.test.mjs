@@ -773,6 +773,29 @@ test('R5: cleanup stops a process still running from inside the directory it rem
   }
 });
 
+test('R5: reapOrphanedConfinementResources removes empty per-dispatch shells once they are old enough, and nothing else without a marker', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-reap-test-'));
+  try {
+    const oldEmpty = path.join(tmp, 'disp_1_old');
+    const freshEmpty = path.join(tmp, 'disp_2_fresh');
+    const foreign = path.join(tmp, 'disp_3_foreign');
+    fs.mkdirSync(oldEmpty);
+    fs.mkdirSync(freshEmpty);
+    fs.mkdirSync(path.join(foreign, 'home'), { recursive: true });
+    fs.writeFileSync(path.join(foreign, 'home', 'keep.txt'), 'not ours');
+    const longAgo = new Date(Date.now() - 2 * 3600 * 1000);
+    fs.utimesSync(oldEmpty, longAgo, longAgo);
+
+    const pass = reapOrphanedConfinementResources({ tempRoot: tmp });
+    assert.ok(!fs.existsSync(oldEmpty), 'an empty shell left behind is removed');
+    assert.ok(fs.existsSync(freshEmpty), 'a new empty directory may still be filled by a dispatch that is starting');
+    assert.ok(fs.existsSync(path.join(foreign, 'home', 'keep.txt')), 'a directory without our marker is never touched');
+    assert.deepEqual(pass.reaped.map((r) => [r.dispatchId, r.reason]), [['disp_1_old', 'empty']]);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
 test('R5: reapOrphanedConfinementResources is idempotent and ignores living processes', () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-reap-test-'));
   try {

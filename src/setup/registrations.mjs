@@ -44,7 +44,7 @@ import {
   loadMachineBackendRegistry,
 } from '../runner/dispatch/confinement/backend-registry.mjs';
 import { runAllConfinementProbes } from '../runner/dispatch/confinement/probes/harness.mjs';
-import { reapOrphanedConfinementResources, resolveConfinementTempRoot, OWNERSHIP_MARKER_FILE } from '../runner/dispatch/confinement/cleanup.mjs';
+import { reapOrphanedConfinementResources, resolveConfinementTempRoot, OWNERSHIP_MARKER_FILE, EMPTY_SHELL_GRACE_MS } from '../runner/dispatch/confinement/cleanup.mjs';
 
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
 import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, DEFAULT_RIGOR_TO_TIER, validateCapabilityServesShape, RunnerConfigError } from '../runner/dispatch/config.mjs';
@@ -4903,10 +4903,14 @@ export function checkConfinementOrphanedResourcesReaped() {
   const roots = defaultConfinementTempRoots();
   const markedDeadOwnerDirs = countDeadOwnedConfinementDirs(roots);
   const loose = looseConfinementRoots(roots);
-  if (markedDeadOwnerDirs === 0 && loose.length === 0) {
+  const emptyShells = countEmptyDispatchShells(roots);
+  if (markedDeadOwnerDirs === 0 && emptyShells === 0 && loose.length === 0) {
     return { passed: true, message: 'no orphaned confinement resources found under ' + roots.join(', ') };
   }
   const problems = [];
+  if (emptyShells > 0) {
+    problems.push(`${emptyShells} empty per-dispatch dir(s) left behind across ${roots.join(', ')}`);
+  }
   if (markedDeadOwnerDirs > 0) {
     problems.push(`${markedDeadOwnerDirs} confinement resource dir(s) owned by a dead process across ${roots.join(', ')}`);
   }
@@ -4914,6 +4918,23 @@ export function checkConfinementOrphanedResourcesReaped() {
     problems.push(`confinement root(s) readable beyond the owner (should be 0700): ${loose.join(', ')}`);
   }
   return { passed: false, message: `${problems.join('; ')} -- run "fgos doctor --fix"` };
+}
+
+/** Empty per-dispatch directories old enough that the reaper removes them (see reapOrphanedConfinementResources). */
+function countEmptyDispatchShells(roots) {
+  let count = 0;
+  for (const tempRoot of roots) {
+    try {
+      for (const entry of fs.readdirSync(tempRoot, { withFileTypes: true })) {
+        if (!entry.isDirectory()) continue;
+        const dir = path.join(tempRoot, entry.name);
+        if (fs.readdirSync(dir).length === 0 && Date.now() - fs.statSync(dir).mtimeMs > EMPTY_SHELL_GRACE_MS) count += 1;
+      }
+    } catch {
+      // an unreadable or missing root has nothing to count
+    }
+  }
+  return count;
 }
 
 function countDeadOwnedConfinementDirs(roots) {

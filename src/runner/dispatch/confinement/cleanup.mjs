@@ -12,6 +12,9 @@ import { spawnSync } from 'node:child_process';
 import { stopProcessesInside } from '../stop-processes-inside.mjs';
 
 export const OWNERSHIP_MARKER_FILE = '.fgos-confinement-owner.json';
+
+/** How old an empty per-dispatch directory must be before the reaper removes it. */
+export const EMPTY_SHELL_GRACE_MS = 600000;
 export const OWNERSHIP_CONTRACT = 'confinement-resource-ownership.v1';
 export const OWNERSHIP_CREATOR = 'fgos-confinement';
 
@@ -211,6 +214,19 @@ export function reapOrphanedConfinementResources({
   for (const entry of entries) {
     if (!entry.isDirectory()) continue;
     const dispatchDir = path.join(tempRoot, entry.name);
+
+    // A per-dispatch directory with nothing in it holds no credential copy and no marker to
+    // trust; it is a shell a dispatch left behind. Removing it is safe once it is old enough
+    // that no dispatch can still be about to fill it (rmdir refuses a non-empty directory).
+    try {
+      if (fs.readdirSync(dispatchDir).length === 0 && now - fs.statSync(dispatchDir).mtimeMs > Math.min(maxAgeMs, EMPTY_SHELL_GRACE_MS)) {
+        fs.rmdirSync(dispatchDir);
+        reaped.push({ path: dispatchDir, dispatchId: entry.name, reason: 'empty' });
+        continue;
+      }
+    } catch {
+      // vanished or filled meanwhile: leave it to the marker rules below
+    }
 
     // Check dispatchDir or subdirectories (e.g. dispatchDir/home)
     const candidates = [dispatchDir];
