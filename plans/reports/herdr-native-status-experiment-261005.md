@@ -18,7 +18,12 @@ herdr 0.9.1-vantt.1, API protocol 22. Panes created by the experiment only, each
 - `readAgentState` reads `agent get` (one herdr call per poll instead of two) and asks `agent explain` only for `unknown`.
 - Rounds that do not settle write `herdr-diagnosis.json`.
 
-## Not done
+## Live check after the change
 
-- Replacing the per-tick CLI poll with `agent wait --timeout`: now possible for confined panes, not attempted.
-- An upstream herdr manifest rule for the codex capacity screen.
+- claude-herdr solo read-only unit: pass, `agentKnownToHerdr: detected`, no `report-agent` needed.
+- glm-herdr (confined, bwrap, pi) read-only unit: herdr detected agent `pi` with a live `working` status (`agent get`), `agentKnownToHerdr: detected`. The agent then looped on malformed tool calls (the open glm-herdr issue); run stopped by hand and its pane closed.
+
+## Decisions on the remaining ideas
+
+- `agent wait` as the poll sleep: not done. A round ends only on the result file; agent state matters for `blocked` and idle detection (seconds to minutes), so waking up to 1.5 s earlier gains nothing, and `agent wait` returns at once on an already-idle agent, which would spin the loop.
+- Local manifest override for the codex "model is at capacity" screen: not done. herdr has only idle/working/blocked/done/unknown. `blocked` would make fgos wait for a person instead of falling back to the next executor; `idle` would be found only after the idle timeout, later than the existing 30 s working-screen probe. Upstream proposal if wanted: a limit state, or an `error` marker region in the codex manifest that suppresses `osc_title_working` while the line is on screen.
