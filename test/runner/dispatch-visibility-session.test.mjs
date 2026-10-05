@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { resolveWorkerArtifactPath } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { resolveWorkerArtifactPath, resolveRunWorkerArtifactPath } from '../../src/runner/dispatch/assignment-runner.mjs';
 import {
   readVisibility,
   writeVisibility,
@@ -265,6 +265,23 @@ test('a run whose driver just checked in is busy, not orphaned', () => {
     // run reads as abandoned.
     assert.equal(findRunningRuns(fgosDir, { now: () => now, driverFreshMs: 1000 }).length, 3);
   } finally { fs.rmSync(fgosDir, { recursive: true, force: true }); }
+});
+
+test('a crashed confined run whose claim is only under worker-output/outbox reconciles to settled', () => {
+  const dir = makeRunDir();
+  try {
+    const outbox = path.join(dir, 'worker-output', 'outbox');
+    fs.mkdirSync(outbox, { recursive: true });
+    fs.writeFileSync(path.join(outbox, 'agent-result.json'), JSON.stringify({ status: 'settled' }));
+
+    assert.equal(findWorkerResult(dir), path.join(outbox, 'agent-result.json'));
+    assert.equal(
+      findWorkerResult(dir),
+      resolveRunWorkerArtifactPath(dir, /^result-(\d+)\.json$/, 'agent-result.json'),
+      'reconciliation and settlement resolve one claim to one path',
+    );
+    assert.equal(reconcileRun(dir, { liveness: 'absent' }).outcome, 'settled');
+  } finally { cleanup(dir); }
 });
 
 test('a crashed cli-spawn run that did write its claim reconciles to settled, not unknown', () => {

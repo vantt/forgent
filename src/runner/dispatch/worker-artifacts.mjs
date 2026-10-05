@@ -1,9 +1,10 @@
 // dispatch/worker-artifacts.mjs — where a worker's own claim and report are,
 // under either name a worker may have been told to use.
 //
-// Two names exist for one artifact. A worker launched through `cli-spawn` is
-// told by the assignment prompt to write `agent-result.json` / `agent-report.md`
-// flat in the run directory. One launched through `herdr-spawn` is told by its
+// Two names exist for one artifact, in up to three directories. A worker
+// launched through `cli-spawn` is told by the assignment prompt to write
+// `agent-result.json` / `agent-report.md` flat in the run directory, or under
+// `worker-output/outbox/` when it runs confined. One launched through `herdr-spawn` is told by its
 // brief to write `outbox/result-<round>.json` / `outbox/report-<round>.md`,
 // because the outbox is the one directory an interactive worker is allowed to
 // write in at all.
@@ -23,29 +24,39 @@ import fs from 'node:fs';
 /**
  * The path a worker's artifact would be at, outbox first.
  *
- * The outbox wins because it is the newer contract and the only one an
- * interactive worker was ever told about. The highest round wins when several
- * are present -- ordered by NUMBER, or `result-9` would beat `result-11` and a
- * resumed Run would be judged on a stale claim.
+ * Directories are tried in order: `worker-output/outbox` (where a confined
+ * cli-spawn worker can write), `worker-output`, then `outbox` (the interactive
+ * worker's directory). The outbox wins over the flat name because it is the
+ * newer contract. Within a directory the highest round wins when several are
+ * present -- ordered by NUMBER, or `result-9` would beat `result-11` and a
+ * resumed Run would be judged on a stale claim. A directory without a round
+ * file but holding the legacy name yields that name.
  *
- * Returns the legacy flat path when the outbox holds nothing, whether or not
- * that file exists: a caller that needs to know it is really there checks, and
- * the collector wants the path either way.
+ * Returns the legacy flat path when no directory holds anything, whether or
+ * not that file exists: a caller that needs to know it is really there checks,
+ * and the collector wants the path either way.
  */
 export function resolveWorkerArtifactPath(runDir, roundPattern, legacyName) {
-  const outbox = path.join(runDir, 'outbox');
-  let entries = [];
-  try {
-    entries = fs.readdirSync(outbox);
-  } catch {
-    entries = [];
+  const candidateDirs = [
+    path.join(runDir, 'worker-output', 'outbox'),
+    path.join(runDir, 'worker-output'),
+    path.join(runDir, 'outbox'),
+  ];
+  for (const dir of candidateDirs) {
+    let entries = [];
+    try {
+      entries = fs.readdirSync(dir);
+    } catch {
+      continue;
+    }
+    const latest = entries
+      .map((name) => ({ name, round: Number((name.match(roundPattern) ?? [])[1]) }))
+      .filter((e) => Number.isFinite(e.round))
+      .sort((a, b) => a.round - b.round)
+      .pop();
+    if (latest) return path.join(dir, latest.name);
+    if (legacyName && entries.includes(legacyName)) return path.join(dir, legacyName);
   }
-  const latest = entries
-    .map((name) => ({ name, round: Number((name.match(roundPattern) ?? [])[1]) }))
-    .filter((e) => Number.isFinite(e.round))
-    .sort((a, b) => a.round - b.round)
-    .pop();
-  if (latest) return path.join(outbox, latest.name);
   return path.join(runDir, legacyName);
 }
 

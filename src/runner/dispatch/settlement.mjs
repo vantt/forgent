@@ -25,26 +25,6 @@ import { attributeWorkspaceChanges } from './evidence-attribution.mjs';
 import { parseUsageForAdapter } from './usage-parsers.mjs';
 
 export function resolveRunWorkerArtifactPath(runDir, roundPattern, legacyName) {
-  const candidateDirs = [
-    path.join(runDir, 'worker-output', 'outbox'),
-    path.join(runDir, 'worker-output'),
-    path.join(runDir, 'outbox'),
-  ];
-  for (const dir of candidateDirs) {
-    if (fs.existsSync(dir)) {
-      let entries = [];
-      try { entries = fs.readdirSync(dir); } catch {}
-      const latest = entries
-        .map((name) => ({ name, round: Number((name.match(roundPattern) ?? [])[1]) }))
-        .filter((e) => Number.isFinite(e.round))
-        .sort((a, b) => a.round - b.round)
-        .pop();
-      if (latest) return path.join(dir, latest.name);
-      if (legacyName && entries.includes(legacyName)) {
-        return path.join(dir, legacyName);
-      }
-    }
-  }
   return resolveWorkerArtifactPath(runDir, roundPattern, legacyName);
 }
 import { finalizeConfinementResources } from './confinement/authority.mjs';

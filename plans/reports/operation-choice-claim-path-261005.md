@@ -24,6 +24,10 @@
 
 Run: operation-choice, effective-execution-contract, dispatch-reconciliation-import-graph, architecture suites: 203 pass.
 
-## Concern
+## Follow-up: reconciliation lookup (same branch)
 
-`findWorkerClaim` in `worker-artifacts.mjs` (used by reconciliation) still ignores `worker-output/outbox`; a crashed confined run that wrote its claim there would reconcile as if no claim existed. It is a different resolver and outside the files I may touch, so left for a follow-up.
+`findWorkerClaim` (reconciliation) ignored `worker-output/outbox`. Rather than add a second path list, the settlement resolver's lookup order (`worker-output/outbox`, `worker-output`, `outbox`, flat) now lives in `resolveWorkerArtifactPath` in `worker-artifacts.mjs`; `resolveRunWorkerArtifactPath` in `settlement.mjs` delegates to it, and `findWorkerClaim` uses it. One lookup for the collector, reconciliation and operation-choice. Claim digest and identity checks are untouched (this only changes which path is read).
+
+Test: `test/runner/dispatch-visibility-session.test.mjs` adds a crashed confined run with the claim only under `worker-output/outbox`; it fails before the change, passes after, and asserts both resolvers return the same path. Existing flat and outbox layout tests pass. Suites run: visibility-session, assignment-dispatch, operation-choice, effective-execution-contract, import-graph, run-result v2/v3, architecture, reconciliation, cli-spawn-reconciliation, reconcile-operation, recovery, herdr-round-reconcile, runtime-inspect, assignment-runresult (466 tests, all pass).
+
+`docs/specs/runner.md` sentence on the confined outbox updated to name the single lookup.
