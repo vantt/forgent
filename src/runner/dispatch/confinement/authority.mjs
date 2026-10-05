@@ -23,7 +23,7 @@ import {
   getBackendDriver,
 } from "./backend-registry.mjs";
 import { computeProbeFingerprint, runAllConfinementProbes } from "./probes/harness.mjs";
-import { normalizeLegacyConfinement } from "./policies.mjs";
+import { normalizeLegacyConfinement, requestIsBlind } from "./policies.mjs";
 import { evaluateBypassPairing } from "./bypass-pairing.mjs";
 import { OWNERSHIP_MARKER_FILE } from "./cleanup.mjs";
 import {
@@ -92,6 +92,9 @@ function applyBackendPlanToAttestation(attestation, backendPlan) {
   attestation.readiness = backendPlan.readiness;
   attestation.grants = backendPlan.grants;
   attestation.backend = backendPlan.backend;
+  // What a blind dispatch could not read, as resolved for this dispatch.
+  const hiddenRoots = (backendPlan.resources || []).filter((r) => r.resource === "hidden-root").map((r) => r.hostTarget);
+  if (hiddenRoots.length > 0) attestation.hiddenRoots = hiddenRoots;
   if (Array.isArray(backendPlan.mismatches)) {
     const existingCodes = new Set((attestation.mismatches || []).map((m) => m.code));
     attestation.mismatches = [
@@ -143,11 +146,14 @@ function verifyRequiredProbe(request, backendInstance, driver) {
     return { passed: false, message: `no falsification probe profile for backend type "${backendInstance.type}"` };
   }
   const executable = backendInstance.config?.executable || "bwrap";
+  // A blind dispatch needs the blind-read probe on top of the standard set, and its own cache entry.
+  const blind = requestIsBlind(request);
   const fingerprint = computeProbeFingerprint({
     policy: request.requirement.policy,
     driverVersion: driver.version,
     backendConfig: backendInstance.config || {},
     bwrapExecutable: executable,
+    blind,
   });
 
   const cached = loadProbeCacheRecord(fingerprint, request?.context);
@@ -158,7 +164,7 @@ function verifyRequiredProbe(request, backendInstance, driver) {
     };
   }
 
-  const result = runAllConfinementProbes({ bwrapBin: executable });
+  const result = runAllConfinementProbes({ bwrapBin: executable, blind });
   if (result.passed) {
     try {
       saveProbeCacheRecord(fingerprint, result, request?.context);
@@ -307,6 +313,8 @@ export function buildConfinementAttestation({
     ...(legacy?.controls ? { ...legacy.controls } : {}),
     ...(hasHostWriteDeny ? { hostWrite: "deny" } : {}),
     ...(hasProcessIsolation ? { process: "isolated" } : {}),
+    // The driver claims it satisfied the request's own hostRead: blind.
+    ...(requestIsBlind(request) && driverClaims?.["control:hostRead"] === "satisfied" ? { hostRead: "blind" } : {}),
   };
 
   const coverage = {};
@@ -501,6 +509,7 @@ export function buildConfinementAttestation({
       mode: reqMode,
       policyId: request.requirement?.policyId ?? null,
       policy: request.requirement?.policy ?? null,
+      ...(request.override ? { override: request.override } : {}),
     },
     coverage,
     effectiveControls,

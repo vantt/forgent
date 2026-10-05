@@ -156,13 +156,14 @@ Run doctor:
 fgos doctor
 ```
 
-Output includes six dedicated confinement checks:
+Output includes seven dedicated confinement checks:
 
 | Check ID | Description | Healthy Outcome | Remediation |
 |---|---|---|---|
 | `confinement-backend-registry-readable` | Machine backend registry exists and validates | `machine backend registry valid at ~/.fgos/confinement-backends.json` | Run `fgos doctor --fix` |
 | `confinement-bwrap-platform` | Linux host has a functional `bwrap` executable | `bwrap backend status: ready (Linux, binary "/usr/bin/bwrap" working, enabled)` | Install `bubblewrap` package (`apt install bubblewrap`) |
 | `confinement-probe-freshness` | 8 falsification probes confirm allowed vs denied behaviors | `confinement probe freshness: all 8 local-bwrap-v1 probes passed (fresh)` | Run probes to refresh cached fingerprint |
+| `confinement-blind-read` | A blind unit can be enforced: a worker under `hostRead: blind` cannot read a peer run, home or process | `blind-read: pass (a blind worker cannot read a peer run, home or process)`; `blind-read: backend-unsupported (...)` when no bwrap backend is usable, so blind units are refused | Fix bwrap as for `confinement-bwrap-platform`; on `fail` the message shows what the worker could still read |
 | `confinement-policies-declared` | All referenced capability policies exist | `all capability confinement policies are declared` | Declare missing policy in `runner.confinementPolicies` |
 | `confinement-strict-readiness` | Strict mode readiness across all capabilities | `strict confinement readiness satisfied` (or warning if strict disabled) | Ensure every canonical capability has an explicit policy |
 | `confinement-herdr-maturity` | Evaluates Herdr executor convergence maturity | `herdr confinement maturity: partial` | Verify bypass-mode executors declare full confinement |
@@ -255,6 +256,12 @@ When a dispatch refuses, the Authority throws an actionable error code:
   - *Fix:* Internal driver failure; inspect runner dispatch logs.
 - `confinement-mode-unsupported`: Attempted to dispatch with `preferred` mode.
   - *Fix:* Change mode to `required` or `unconfined`.
+- `blind-requires-confinement`, `blind-in-process`, `blind-hides-workspace`, `blind-ref-hidden`: a unit with `blind: true` cannot be enforced, so it is refused instead of running unblind (see "Blind units" below).
+  - *Fix:* Give the capability a `required` policy, dispatch out of process, keep the worktree and the unit's inputs outside `.fgos/assignments`, `.fgos/workflow-runs` and `.fgos/dispatch-runs`.
+
+### Blind units
+
+A Unit (or Workflow unit template) with `blind: true` runs every role with `hostRead: blind`: the worker cannot read a peer's run state (`.fgos/assignments`, `.fgos/workflow-runs`, `.fgos/dispatch-runs`), the herdr socket directory, another dispatch's private home or process list. It still reads the repo, tracked `.fgos` files and `node`, reads its own assignment directory (read-only) and writes its outbox. Blind needs a working bwrap backend and a fresh blind probe; otherwise the unit is refused, never run unblind. Check readiness with the `confinement-blind-read` row of `fgos doctor`. Details: `docs/specs/confinement-authority.md` §9.2.
 
 ---
 

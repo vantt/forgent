@@ -13,6 +13,13 @@ import {
   ConfinementPolicyError,
 } from "./policies.mjs";
 
+/** A refusal that names why a blind dispatch cannot be enforced, before anything launches. */
+function blindRefusal(code, detail) {
+  const err = new ConfinementPolicyError(`${code}: ${detail}`);
+  err.code = code;
+  return err;
+}
+
 const VALID_REQUIREMENT_MODES = new Set(["unconfined", "preferred", "required"]);
 
 const ALLOWED_REQUEST_KEYS = new Set([
@@ -267,6 +274,7 @@ export function buildConfinementRequest({
   cfg = null,
   requirement = null,
   override = null,
+  blind = false,
   resourceNeeds = [],
   backendId = null,
   authorityScope = null,
@@ -357,6 +365,31 @@ export function buildConfinementRequest({
     }
   }
 
+  // A blind dispatch is never run unblind: it needs a required policy, and a live
+  // sandbox around the worker (an in-process agent has none).
+  if (blind) {
+    if (authorityScope === "external-harness") {
+      throw blindRefusal("blind-in-process", "a blind dispatch cannot run in-process: no sandbox wraps an in-process agent.");
+    }
+    if (resolvedRequirement?.mode !== "required" || !resolvedRequirement?.policy) {
+      throw blindRefusal(
+        "blind-requires-confinement",
+        `a blind dispatch needs required confinement with a policy, got mode "${resolvedRequirement?.mode ?? "none"}".`,
+      );
+    }
+  }
+  const blindOverride = blind
+    ? {
+        ...(override ?? invocation?.confinement?.override ?? cfg?.executors?.[execId]?.confinement?.override ?? {}),
+      }
+    : null;
+  if (blindOverride) {
+    // deny is stricter than blind and stays as it is; the driver names it unsupported.
+    const controls = { ...(blindOverride.controls ?? {}) };
+    if (controls.hostRead !== "deny") controls.hostRead = "blind";
+    blindOverride.controls = controls;
+  }
+
   const id = dispatchId || `disp_${Date.now()}_${crypto.randomBytes(4).toString("hex")}`;
 
   const req = {
@@ -405,9 +438,10 @@ export function buildConfinementRequest({
       closeAlways: context.closeAlways,
       dispatchBatchKey: context.dispatchBatchKey,
       effectiveContract: context.effectiveContract,
+      ...(blind && Array.isArray(context.contextRefs) ? { contextRefs: context.contextRefs } : {}),
     },
     requirement: resolvedRequirement,
-    override: override ?? invocation?.confinement?.override ?? cfg?.executors?.[execId]?.confinement?.override ?? undefined,
+    override: blindOverride ?? override ?? invocation?.confinement?.override ?? cfg?.executors?.[execId]?.confinement?.override ?? undefined,
     resourceNeeds: Array.isArray(resourceNeeds) ? resourceNeeds : [],
     // Invocation data is untrusted at this boundary. Backend selection belongs
     // to the trusted executor registration (or an explicit caller argument).

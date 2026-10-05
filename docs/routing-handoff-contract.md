@@ -82,6 +82,10 @@ Ba bất biến, tách bạch rõ để không ai đọc nhầm đây là sandbo
   output của agent khác, và brief nói rõ như vậy. Với `anonymizeInputs` các
   report được chép sang `<unitDir>/inputs/seat-*.md` để brief không lộ ai nói;
   đó chỉ là ẩn danh theo thứ được trao, không phải ranh giới đọc.
+  Hợp đồng cấm worker *ghi* `.fgos`; Unit `blind: true` còn cấm nó *đọc* run state của
+  peer (`.fgos/assignments`, `.fgos/workflow-runs`, `.fgos/dispatch-runs`, socket herdr,
+  home và tiến trình của dispatch khác): vai blind chỉ đọc thư mục của chính nó và bị từ
+  chối chạy nếu không thực thi được (`docs/specs/confinement-authority.md` §9.2).
 
 ## Tham chiếu
 

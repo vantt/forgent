@@ -172,6 +172,14 @@ test('validateUnit: anonymizeInputs is an optional boolean, absent unless true',
   assert.throws(() => validateUnit({ ...base, anonymizeInputs: 'yes' }), RunnerConfigError);
 });
 
+test('validateUnit: blind is an optional boolean, absent unless true', () => {
+  const base = { id: 'u1', objective: 'obj', capability: 'verb' };
+  assert.equal(validateUnit({ ...base, blind: true }).blind, true);
+  assert.equal('blind' in validateUnit(base), false);
+  assert.equal('blind' in validateUnit({ ...base, blind: false }), false);
+  assert.throws(() => validateUnit({ ...base, blind: 'yes' }), RunnerConfigError);
+});
+
 test('validateUnit: accepts gate-answer refs and rejects malformed ones', () => {
   const unit = validateUnit({ id: 'u1', objective: 'obj', capability: 'verb', inputs: ['gate-answer:wf-run-1/voting-ranking'] });
   assert.deepEqual(unit.inputs, ['gate-answer:wf-run-1/voting-ranking']);

@@ -250,6 +250,7 @@ manual step.
 | `confinement-orphaned-resources-reaped` | No confinement temp dirs are left by a dead process | `1 empty per-dispatch dir(s) left behind across /tmp/fgos-confinement -- run "fgos doctor --fix"` | tool | `fgos doctor --fix` |
 | `confinement-bwrap-platform` | The bwrap backend in the machine registry is enabled and its executable verified | the message names the broken state | you | Install or enable bubblewrap; re-run |
 | `confinement-probe-freshness` | The 8 confinement probes pass | names the failing probe | you | Fix the named probe's cause (usually bwrap or namespace permissions) |
+| `confinement-blind-read` | A blind unit can be enforced (the bwrap backend hides peer run state from a worker) | `blind-read: fail (...)` names what the worker could still read; `backend-unsupported` means blind units are refused | you | Fix bwrap or namespace permissions, as for the probe row |
 | `confinement-strict-readiness` | Strict confinement is possible (all capabilities have known policies, bwrap ready) | `warning: strict confinement disabled (capability "x" missing confinement policy ...)` | info | Declare a policy per capability if you want strict mode |
 | `confinement-herdr-maturity` | Reports how far herdr confinement has converged | never fails | info | none |
 

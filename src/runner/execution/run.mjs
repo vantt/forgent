@@ -293,6 +293,8 @@ export async function runUnit(options = {}) {
       },
       isReadOnlyMode: readOnly,
       session,
+      // Every role of a blind unit is dispatched blind or refused, never run unblind.
+      ...(unit.blind ? { blind: true } : {}),
     });
 
     return {
@@ -321,6 +323,7 @@ export async function runUnit(options = {}) {
       readOnly,
       independentOf: resolveIndependence(independentOf),
       overrides: unitRecord.overrides || [],
+      ...(unit.blind ? { blind: true } : {}),
     };
     const bindCtx = { runnerConfig, session };
 

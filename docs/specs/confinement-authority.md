@@ -123,7 +123,7 @@ Contract diễn tả riêng từng trục. Không có một boolean `confined` c
 | Trục | Giá trị chuẩn | Default đầu tiên |
 |---|---|---|
 | `hostWrite` | `deny` / `allow` | `deny`, trừ các grant được cấp |
-| `hostRead` | `deny` / `allow` | `allow` |
+| `hostRead` | `deny` / `blind` / `allow` | `allow` |
 | `networkEgress` | `deny` / `allow` / `filtered` | `allow` |
 | `process` | `isolated` / `host` | `host` |
 | `home` | `private` / `host` | `host`; `private` khi policy yêu cầu |
@@ -224,7 +224,7 @@ interface ConfinementPolicyV1 {
   contract: 'confinement-policy.v1';
   controls: {
     hostWrite: 'deny' | 'allow';
-    hostRead: 'deny' | 'allow';
+    hostRead: 'deny' | 'blind' | 'allow';
     networkEgress: 'deny' | 'allow' | 'filtered';
     process: 'isolated' | 'host';
     home: 'private' | 'host';
@@ -282,7 +282,7 @@ interface ResourceGrantV1 {
 ```
 
 Thứ tự mức bảo vệ cố định theo từng control: `hostWrite deny > allow`,
-`hostRead deny > allow`, `networkEgress deny > filtered > allow`,
+`hostRead deny > blind > allow`, `networkEgress deny > filtered > allow`,
 `process isolated > host`, `home private > host`, `session isolated > shared`,
 và `workspace own > shared`. Override chỉ hợp lệ khi mỗi control bằng hoặc
 mạnh hơn minimum. `allow`, `host`, `shared` là không đòi hạn chế trên trục đó,
@@ -1167,18 +1167,60 @@ backend, generic composition cho mọi tổ hợp control, hoặc đổi tên ex
 | Contract surface | Default v1 |
 |---|---|
 | Mode | `required`, `unconfined`; `preferred` có trong contract nhưng default chưa nhận config này |
-| Invocation override | Contract đích giữ shape/partial-order; default v1 từ chối config override, dùng policy ID/capability khác |
+| Invocation override | Contract đích giữ shape/partial-order; default v1 từ chối config override, dùng policy ID/capability khác — trừ một override duy nhất, `{ controls: { hostRead: 'blind' } }` (§9.2) |
 | `hostWrite` | `deny` qua bwrap, hoặc `allow` khi explicit `unconfined` |
 | Write grant | run-output, private-home khi cần; workspace/git-metadata cho workspace-write theo readiness |
 | Read grant | `executor-credentials` khi policy của dispatch yêu cầu |
 | `home` | host mặc định; private resource khi provider cần; home private nếu policy thực sự yêu cầu và đã prove |
 | `session`, `workspace` | effective value là `shared`; legacy `isolated/own` được normalize nhưng chưa di dời enforcement ở slice đầu |
-| `hostRead`, `networkEgress`, `process` | effective value là `allow`, `allow`, `host`; request `deny/filtered/isolated` bị `unsupported` |
+| `hostRead` | `allow`, hoặc `blind` (§9.2); request `deny` bị `unsupported` |
+| `networkEgress`, `process` | effective value là `allow`, `host`; request `deny/filtered/isolated` bị `unsupported` |
 | Resource delivery/collect | host direct/mount; copy/remote/workspace-change chưa hỗ trợ |
 | Backend | Linux bwrap; backend khác trả `unsupported` có lý do |
 
 Việc parser hiểu một field không có nghĩa backend đã support field đó. Default
 phải từ chối requirement ngoài matrix thay vì nhận rồi bỏ qua.
+
+### 9.2 `hostRead: blind` — worker mù trước run state của peer
+
+`blind` là giá trị thứ ba của trục `hostRead` (`deny > blind > allow`): host vẫn đọc được,
+trừ run state của các dispatch khác và phiên agent đang sống. Runner gửi nó như một override
+chỉ-thu-hẹp qua slot `override` của request (Unit mang `blind: true`, mọi vai của Unit đó đều
+mù); built-in policy không đổi, không có policy ID mới. Mặc định tắt: argv của dispatch không
+`blind` giữ nguyên từng byte.
+
+Với `blind`, driver bwrap giữ `--ro-bind / /` và thêm, theo đúng thứ tự: `--unshare-pid` (ẩn
+`/proc/<pid>/cmdline` của tiến trình khác); `--tmpfs` che từng *hidden root* đang tồn tại;
+`--ro-bind` thư mục của chính dispatch (round dir `<assignments>/<unit run>/<role>/<round>`,
+hoặc run dir nếu không có assignment) chỉ-đọc; các mount nằm dưới mask (outbox ghi được, private
+home); cuối cùng `--remount-ro` trên các mask. Hidden root là dữ liệu của contract
+(`BLIND_HIDDEN_ROOTS`), không phải code của driver: `{fgosDir}/assignments`,
+`{fgosDir}/workflow-runs`, `{fgosDir}/dispatch-runs` của project dispatch đang chạy, thư mục
+socket của herdr, và confinement temp root (private home của dispatch khác, chứa transcript agent).
+Resource `hidden-root` và `own-assignment` đi vào plan/attestation; attestation ghi thêm
+`requested.override`, `effectiveControls.hostRead: blind` và `hiddenRoots`.
+
+Vì sao như vậy: (1) chỉ che ba thư mục run state chứ không che cả `.fgos`, vì `.fgos` có file
+tracked (config, events) — che cả thư mục làm chúng hiện thành "đã xoá" trong trạng thái checkout,
+và worker ghi được workspace có thể commit việc xoá đó; (2) `--unshare-pid` vì không có nó worker
+đọc được cmdline của tiến trình anh em; (3) socket herdr nằm trong danh sách vì `--ro-bind / /`
+vẫn cho `connect()`, tức worker có thể `pane read` pane của anh em. Blind chỉ dùng được khi cái
+worker *được trao* nằm sẵn trong thư mục của chính nó: ref `unit-run:`/`gate-answer:` phải do
+bước hand-off chép vào (chưa làm ở slice này), nên ref trỏ vào hidden root bị từ chối.
+
+Dispatch `blind` bị **từ chối, không bao giờ chạy không-blind**, với lý do có tên, trước khi
+spawn: `blind-requires-confinement` (mode không phải `required`/không có policy),
+`blind-in-process` (Agent tool/inline không có sandbox quanh worker; `bind()` cũng không chọn nó),
+`blind-hides-workspace` (cwd hoặc repo root nằm trong hidden root), `blind-ref-hidden` (context
+ref nằm trong hidden root ngoài thư mục của chính dispatch), `confinement-backend-missing` /
+`confinement-backend-disabled` (không có bwrap), `confinement-probe-failed` (probe chưa tươi hoặc
+không qua). Probe `peer-run-hidden` (thứ chín, chỉ cho dispatch blind; fingerprint và cache riêng)
+dựng argv từ chính `prepareBwrap`: worker không đọc được report của peer, home của peer, cmdline
+của tiến trình anh em, nhưng đọc được thư mục của mình (chỉ-đọc) và ghi được outbox; falsifier bỏ
+mask thì phải đọc được file peer. `fgos doctor` báo `blind-read: pass | fail |
+backend-unsupported` (check `confinement-blind-read`). Giới hạn còn mở: transcript agent của Lead
+trong host home, `.fgos/secrets.local.env` và project khác (bí mật, không phải mù), và mạng
+localhost.
 
 ## 10. Lộ trình rollout và trạng thái hoàn thành
 

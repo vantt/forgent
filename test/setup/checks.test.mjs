@@ -145,6 +145,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'confinement-herdr-maturity',
       'confinement-orphaned-resources-reaped',
       'confinement-probe-freshness',
+      'confinement-blind-read',
       'confinement-strict-readiness',
       'coordination-abandoned-claims',
       'coordination-sessions-closed',

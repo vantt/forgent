@@ -880,3 +880,60 @@ test('after a producer round passes, the runner commits what the worker wrote, w
   const unitRecord = JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'assignments', res.unitRunId, 'unit.json'), 'utf8'));
   assert.equal(Object.values(unitRecord.bindings)[0][0].commit.status, 'committed', 'the run record says what the runner committed');
 });
+
+// A worker that reports whether it can read a peer's report and which assignment directories it can see.
+function writePeerProbingWorker(dir, peerReport) {
+  fs.writeFileSync(
+    path.join(dir, 'settling-worker.mjs'),
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const prompt = process.argv.slice(2).join(' ');
+    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    if (match) {
+      const code = (fn) => { try { fn(); return 'ok'; } catch (e) { return e.code; } };
+      const peer = code(() => fs.readFileSync(${JSON.stringify(peerReport)}));
+      const claimDir = path.dirname(match[1]);
+      const outbox = path.join(claimDir, 'worker-output', 'outbox');
+      const runDir = fs.existsSync(outbox) ? outbox : claimDir;
+      fs.mkdirSync(runDir, { recursive: true });
+      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\npeer-read: ' + peer + '\\nThe assigned work was inspected and completed with a full explanation of what was checked.\\n');
+      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done', assessment: { verdict: 'pass' } }));
+    }
+    `,
+  );
+}
+
+test('a blind unit runs confined with its peers\' run state hidden; the same unit unblind reads it', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha']);
+  const run = (unitData) => runUnit({ unitData, repoRoot, cwd: worktreeDir, worktree: worktreeDir, pattern: 'solo' });
+  const reportOf = (res) => fs.readFileSync(path.join(repoRoot, res.results[0].runResult.settleReports[0].path), 'utf8');
+
+  const first = await run({ id: 'u-peer', objective: 'Write docs', capability: 'docs:write', writes: [] });
+  assert.equal(first.outcome, 'pass');
+  writePeerProbingWorker(repoRoot, path.join(repoRoot, first.results[0].runResult.settleReports[0].path));
+
+  const unblind = await run({ id: 'u-open', objective: 'Look around', capability: 'docs:write', writes: [] });
+  assert.equal(unblind.outcome, 'pass');
+  assert.match(reportOf(unblind), /peer-read: ok/);
+
+  const blind = await run({ id: 'u-blind', objective: 'Look around', capability: 'docs:write', writes: [], blind: true });
+  assert.equal(blind.outcome, 'pass');
+  assert.match(reportOf(blind), /peer-read: ENOENT/);
+});
+
+test('a blind unit whose input lies in a peer\'s run state is refused before it launches, never run unblind', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha']);
+  const run = (unitData) => runUnit({ unitData, repoRoot, cwd: worktreeDir, worktree: worktreeDir, pattern: 'solo' });
+
+  const first = await run({ id: 'u-peer', objective: 'Write docs', capability: 'docs:write', writes: [] });
+  await assert.rejects(
+    () => run({
+      id: 'u-blind-ref', objective: 'Build on it', capability: 'docs:write', writes: [], blind: true,
+      inputs: [`unit-run:${first.unitRunId}/producer`],
+    }),
+    (err) => err.code === 'blind-ref-hidden' && err.data?.status === 'refused',
+  );
+});

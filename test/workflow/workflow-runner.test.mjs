@@ -1018,6 +1018,14 @@ test('validateWorkflow keeps anonymizeInputs only when true and rejects a non-bo
   assert.throws(() => validateWorkflow(withFlag('yes')), /anonymizeInputs must be true or false/);
 });
 
+test('validateWorkflow keeps blind only when true and rejects a non-boolean', () => {
+  const withFlag = (blind) => ({ id: 'test/blind', steps: [{ id: 's1', units: [{ id: 'u1', template: { capability: 'docs:write', blind } }] }] });
+  assert.equal(validateWorkflow(withFlag(true)).steps[0].units[0].template.blind, true);
+  assert.equal(validateWorkflow(withFlag(undefined)).steps[0].units[0].template.blind, undefined);
+  assert.equal(validateWorkflow(withFlag(false)).steps[0].units[0].template.blind, undefined);
+  assert.throws(() => validateWorkflow(withFlag('yes')), /blind must be true or false/);
+});
+
 // Executors of distinct provider families, so a panel can bind every seat.
 function useDistinctFamilies(tmp, names) {
   const cfgPath = path.join(tmp, '.fgos', 'config.json');

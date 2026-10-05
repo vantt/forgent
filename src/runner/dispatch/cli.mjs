@@ -337,6 +337,10 @@ export async function executeExecutorCli(
     // The confinement requirement the caller already resolved (an Assignment's
     // posture). Unset leaves it to the capability/invocation declaration.
     requirement,
+    // hostRead: blind for this dispatch, and the refs the worker is handed (checked against
+    // what blind hides). A blind dispatch is refused rather than run unblind.
+    blind = false,
+    contextRefs,
     // Directory the confinement authority treats as the writable workspace when the
     // requirement grants one; defaults to the main checkout root.
     workspaceRoot,
@@ -471,6 +475,7 @@ export async function executeExecutorCli(
         // stops the `ReferenceError: opts is not defined` crash this
         // function hit on every call.
         providerCapacity: providerCapacity ?? options?.providerCapacity,
+        blind,
         authorityScope: 'external-harness',
         invocation: {
           agentType,
@@ -686,6 +691,7 @@ export async function executeExecutorCli(
         // Same pre-existing `opts`-is-not-defined fix as the in-process
         // branch above -- see its comment.
         providerCapacity: providerCapacity ?? options?.providerCapacity,
+        blind,
         ...(requirement ? { requirement } : {}),
         invocation: {
           command,
@@ -710,6 +716,7 @@ export async function executeExecutorCli(
           repoRoot: workspaceRoot ?? root,
           runDir: opened.runDir,
           fgosDir,
+          contextRefs,
           timeoutMs,
           idleTimeoutMs,
           maxBuffer,

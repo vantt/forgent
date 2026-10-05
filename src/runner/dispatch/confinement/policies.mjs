@@ -69,7 +69,7 @@ export const CONFINEMENT_MODES = Object.freeze(['required', 'preferred', 'unconf
 
 export const CONTROL_AXES = Object.freeze({
   hostWrite: Object.freeze(['deny', 'allow']),
-  hostRead: Object.freeze(['deny', 'allow']),
+  hostRead: Object.freeze(['deny', 'blind', 'allow']),
   networkEgress: Object.freeze(['deny', 'filtered', 'allow']),
   process: Object.freeze(['isolated', 'host']),
   home: Object.freeze(['private', 'host']),
@@ -80,7 +80,7 @@ export const CONTROL_AXES = Object.freeze({
 /**
  * Control protection strength order (spec §6.1):
  * hostWrite: deny > allow
- * hostRead: deny > allow
+ * hostRead: deny > blind > allow
  * networkEgress: deny > filtered > allow
  * process: isolated > host
  * home: private > host
@@ -89,13 +89,17 @@ export const CONTROL_AXES = Object.freeze({
  */
 export const CONTROL_ORDER = Object.freeze({
   hostWrite: Object.freeze({ deny: 2, allow: 1 }),
-  hostRead: Object.freeze({ deny: 2, allow: 1 }),
+  hostRead: Object.freeze({ deny: 3, blind: 2, allow: 1 }),
   networkEgress: Object.freeze({ deny: 3, filtered: 2, allow: 1 }),
   process: Object.freeze({ isolated: 2, host: 1 }),
   home: Object.freeze({ private: 2, host: 1 }),
   session: Object.freeze({ isolated: 2, shared: 1 }),
   workspace: Object.freeze({ own: 2, shared: 1 }),
 });
+
+// The hidden roots of `hostRead: blind` and the question whether a request asks for it live in
+// resources.mjs, which resolves them; they are part of this vocabulary and re-exported here.
+export { BLIND_HIDDEN_ROOTS, requestIsBlind } from './resources.mjs';
 
 export const GRANT_ACCESS_LEVELS = Object.freeze({
   'read-write': 3,
