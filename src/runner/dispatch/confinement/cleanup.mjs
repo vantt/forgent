@@ -9,6 +9,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { stopProcessesInside } from '../stop-processes-inside.mjs';
 
 export const OWNERSHIP_MARKER_FILE = '.fgos-confinement-owner.json';
 export const OWNERSHIP_CONTRACT = 'confinement-resource-ownership.v1';
@@ -140,6 +141,9 @@ export function cleanupConfinementResource(dirPath, dispatchId) {
   }
 
   try {
+    // Whatever still runs from inside a resource that is being deleted is a leftover of its
+    // dispatch (an agent CLI's own background server); it would outlive the files it runs from.
+    stopProcessesInside(dirPath);
     fs.rmSync(dirPath, { recursive: true, force: true });
     // The per-dispatch parent exists only to hold this resource; leave no
     // empty shell behind (rmdir refuses a non-empty directory, so a sibling

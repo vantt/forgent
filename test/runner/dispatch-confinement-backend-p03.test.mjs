@@ -750,6 +750,29 @@ test('R5: writeOwnershipMarker writes valid marker and cleanup removes only owne
   }
 });
 
+test('R5: cleanup stops a process still running from inside the directory it removes', async () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-clean-proc-'));
+  const alive = (pid) => { try { process.kill(pid, 0); return true; } catch { return false; } };
+  let child;
+  try {
+    const ownedDir = path.join(tmp, 'owned');
+    fs.mkdirSync(ownedDir, { recursive: true });
+    writeOwnershipMarker(ownedDir, { dispatchId: 'disp_proc', resource: 'private-home' });
+    // A background server an agent CLI started for itself out of its private home.
+    child = cp.spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { cwd: ownedDir, detached: true, stdio: 'ignore' });
+    child.unref();
+    assert.ok(alive(child.pid));
+
+    assert.equal(cleanupConfinementResource(ownedDir, 'disp_proc').cleaned, true);
+    const end = Date.now() + 4000;
+    while (alive(child.pid) && Date.now() < end) await new Promise((r) => setTimeout(r, 25));
+    assert.equal(alive(child.pid), false, 'nothing keeps running from a directory that was deleted');
+  } finally {
+    try { if (child) process.kill(child.pid, 'SIGKILL'); } catch { /* already gone */ }
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
 test('R5: reapOrphanedConfinementResources is idempotent and ignores living processes', () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-reap-test-'));
   try {

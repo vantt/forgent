@@ -39,6 +39,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { readTrust, trustedProjectEntry, TrustStoreError } from './trust-store.mjs';
+import { stopProcessesInside } from './stop-processes-inside.mjs';
 
 /** Marker file written into every home this module creates. `removeWorkerHome`
  * refuses to delete a directory that does not carry it, so a teardown bug can
@@ -175,6 +176,9 @@ export function removeWorkerHome(homePath) {
       { homePath },
     );
   }
+  // A home is private to one dispatch: whatever still runs from it (an agent CLI's own background
+  // server) is a leftover of that dispatch and would outlive the files it runs from.
+  stopProcessesInside(homePath);
   fs.rmSync(homePath, { recursive: true, force: true });
   return true;
 }
