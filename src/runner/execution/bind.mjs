@@ -13,6 +13,11 @@ export const BIND_CONTRACT_VERSION = 'v1alpha1';
 
 const CHECKER_ROLES = new Set(['reviewer', 'red-team', 'tester', 'panelist', 'synthesizer']);
 
+/** Checker and panel roles never run inline or in-process. */
+function isCheckerOrPanelRole(role) {
+  return CHECKER_ROLES.has(role) || Boolean(role && role.startsWith('panelist-'));
+}
+
 /**
  * Normalizes capability prefer pool to array of { executor, invocation }
  */
@@ -117,6 +122,7 @@ export function bind(ask, ctx, { skipCandidateIndex = -1 } = {}) {
     independentOf = [],
     lockedPersona = null,
     overrides = [],
+    blind = false,
   } = ask ?? {};
 
   const {
@@ -217,6 +223,15 @@ export function bind(ask, ctx, { skipCandidateIndex = -1 } = {}) {
         continue;
       }
 
+      // Filter: a blind role needs a sandbox around its worker. An in-process agent has none,
+      // so a candidate that would run in-process is never chosen for it.
+      if (blind && !isCheckerOrPanelRole(role)
+        && decideExecutorDispatchMechanism(runnerConfig, executorId, { hasLiveTaskAccess: Boolean(session.hasNativeAgent) }) !== 'out-of-process') {
+        refusalReason = 'blind-in-process';
+        refusalDetail = `Candidate "${executorId}" would run in-process, where no sandbox can keep a blind role blind`;
+        continue;
+      }
+
       // Candidate passed filters
       chosenCandidate = { ...cand, invocation: approved.invocation };
       chosenCandidateIndex = poolIndex;
@@ -227,7 +242,7 @@ export function bind(ask, ctx, { skipCandidateIndex = -1 } = {}) {
   // Fallback: If no candidate chosen yet
   if (!chosenCandidate) {
     // If role === 'producer' and session has Lead (not headless) -> inline
-    if (role === 'producer' && isLeadPresent) {
+    if (role === 'producer' && isLeadPresent && !blind) {
       chosenCandidate = {
         executor: session.provider ?? 'lead',
         invocation: null,
@@ -285,8 +300,7 @@ export function bind(ask, ctx, { skipCandidateIndex = -1 } = {}) {
     mechanism = 'inline';
     mechanismSource = 'lead-producer-inline';
   } else {
-    const isCheckerOrPanelRole = CHECKER_ROLES.has(role) || (role && role.startsWith('panelist-'));
-    if (isCheckerOrPanelRole) {
+    if (isCheckerOrPanelRole(role)) {
       // Checker/reviewer/red-team/panel MUST NEVER be inline
       mechanism = 'out-of-process';
       mechanismSource = 'checker-role-forced-out-of-process';

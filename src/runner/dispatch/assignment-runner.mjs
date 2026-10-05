@@ -2358,8 +2358,10 @@ export async function executeAssignment(assignment, opts = {}) {
             resourceBindings: resolvedCmd.resourceBindings,
           },
           providerCapacity: providerCapacitySelection,
+          ...(opts.blind === true ? { blind: true } : {}),
           context: {
             cwd: effectiveCwd,
+            ...(opts.blind === true ? { contextRefs: effectiveAssignment.contextRefs } : {}),
             // A workspace-write posture grants the directory the work happens in
             // (the Unit worktree), never the main checkout that holds fgOS state.
             repoRoot: postureBinding?.posture === 'workspace-write' ? effectiveCwd : root,
@@ -2614,6 +2616,7 @@ export async function executeAssignment(assignment, opts = {}) {
               }
             : {}),
           ...(hasExplicitInvocationPin ? { invocationId: opts.cliOverride.preferInvocation } : {}),
+          ...(opts.blind === true ? { blind: true, contextRefs: effectiveAssignment.contextRefs } : {}),
         });
       } catch (err) {
         executionError = err;

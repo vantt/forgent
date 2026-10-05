@@ -400,6 +400,37 @@ test('bind: in-process mechanism allowed for native agent without CLI', () => {
   assert.equal(result.mechanism, 'in-process');
 });
 
+test('bind: a blind role is never bound in-process or inline, and is refused with a named reason when nothing else is left', () => {
+  const runnerConfig = createMockRunnerConfig();
+  runnerConfig.capabilities['native:run'] = { prefer: [{ executor: 'native-agent' }] };
+  const unit = { id: 'u1', capability: 'native:run', writes: [] };
+
+  const refusedInProcess = bind({ unit, role: 'producer', blind: true }, { runnerConfig, session: { hasNativeAgent: true } });
+  assert.equal(refusedInProcess.refused.reason, 'blind-in-process');
+
+  // The lead's own session is not a way around it either.
+  const refusedInline = bind(
+    { unit: { id: 'u2', capability: 'unknown:verb', writes: ['src/foo.js'] }, role: 'producer', blind: true },
+    { runnerConfig, session: { headless: false, hasNativeAgent: true, provider: 'claude' } },
+  );
+  assert.ok(refusedInline.refused);
+});
+
+test('bind: a blind role skips an in-process candidate for an out-of-process one, and the default binding is unchanged', () => {
+  const runnerConfig = createMockRunnerConfig();
+  runnerConfig.capabilities['native:run'] = { prefer: [{ executor: 'native-agent' }, { executor: 'claude', invocation: 'claude-cli' }] };
+  const unit = { id: 'u1', capability: 'native:run', writes: [] };
+  const ctx = { runnerConfig, session: { hasNativeAgent: true } };
+
+  const blind = bind({ unit, role: 'producer', blind: true }, ctx);
+  assert.equal(blind.executor, 'claude');
+  assert.equal(blind.mechanism, 'out-of-process');
+
+  const plain = bind({ unit, role: 'producer' }, ctx);
+  assert.equal(plain.executor, 'native-agent');
+  assert.equal(plain.mechanism, 'in-process');
+});
+
 test('nextCandidate: falls back to subsequent candidate on quota/provider-limit', () => {
   const runnerConfig = createMockRunnerConfig();
   const unit = {

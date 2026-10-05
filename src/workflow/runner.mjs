@@ -336,6 +336,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
             dependsOn: u.dependsOn || [],
             inputs: handoff.inputs,
             ...(u.template.anonymizeInputs ? { anonymizeInputs: true } : {}),
+            ...(u.template.blind ? { blind: true } : {}),
           };
 
           // If unit has writes, prepare worktree

@@ -264,6 +264,10 @@ export function validateWorkflow(raw) {
           throw new WorkflowDefinitionError(`${unitLabel} anonymizeInputs must be true or false`);
         }
 
+        if (template.blind !== undefined && typeof template.blind !== 'boolean') {
+          throw new WorkflowDefinitionError(`${unitLabel} blind must be true or false`);
+        }
+
         units.push(
           Object.freeze({
             id: uId,
@@ -277,6 +281,7 @@ export function validateWorkflow(raw) {
               persona: typeof template.persona === 'string' && template.persona.trim() ? template.persona.trim() : undefined,
               params: template.params === undefined ? undefined : structuredClone(template.params),
               anonymizeInputs: template.anonymizeInputs === true ? true : undefined,
+              blind: template.blind === true ? true : undefined,
             }),
             dependsOn: uDependsOn,
           }),

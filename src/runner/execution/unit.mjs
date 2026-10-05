@@ -65,6 +65,8 @@ function isValidInput(inp) {
  * - pattern?: optional string (e.g. 'solo', 'reviewed', 'panel', or preset name)
  * - inputs: array of repo-relative paths or 'unit-run:<id>/<role>' refs
  * - anonymizeInputs?: optional boolean; copy the 'unit-run:' reports under neutral names (seat-A, ...)
+ * - blind?: optional boolean; every role of the unit runs with hostRead: blind (no peer run state
+ *   is readable) or is refused, never run unblind
  * - expectedOutputs: array of strings
  * - MUST NOT contain: executor, provider, model, tier, invocation, actors, prefer, overrides (G2)
  *
@@ -185,6 +187,10 @@ export function validateUnit(raw) {
     throw new RunnerConfigError('unit.anonymizeInputs must be a boolean when present.');
   }
 
+  if (raw.blind !== undefined && typeof raw.blind !== 'boolean') {
+    throw new RunnerConfigError('unit.blind must be a boolean when present.');
+  }
+
   // expectedOutputs
   if (raw.expectedOutputs !== undefined && !Array.isArray(raw.expectedOutputs)) {
     throw new RunnerConfigError('unit.expectedOutputs must be an array of strings.');
@@ -211,6 +217,7 @@ export function validateUnit(raw) {
     ...(pattern !== undefined ? { pattern } : {}),
     inputs: Object.freeze(inputs),
     ...(raw.anonymizeInputs === true ? { anonymizeInputs: true } : {}),
+    ...(raw.blind === true ? { blind: true } : {}),
     expectedOutputs: Object.freeze(expectedOutputs),
   };
 
