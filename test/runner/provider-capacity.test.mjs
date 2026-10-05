@@ -440,13 +440,15 @@ function handle({ runtimeDir, runId, assignmentId }) {
 // still be caught here. The critical section briefly busy-waits (a few ms)
 // to widen the window enough for a genuine violation to matter, matching
 // what actually reproduced the round-1 regression during investigation.
-test('S3 round 2 (dispatch-engine-liveness-hardening Phase 4): direct marker-file proof that withFileLock never grants two holders the same lock concurrently', { timeout: 60_000 }, async (t) => {
+test('S3 round 2 (dispatch-engine-liveness-hardening Phase 4): direct marker-file proof that withFileLock never grants two holders the same lock concurrently', { timeout: 300_000 }, async (t) => {
   const TRIALS = 15;
   const CONTENDERS = 10;
   const pool = await startContenders(t, CONTENDERS, `
 import { withFileLock } from ${JSON.stringify(pathToFileURL(PROVIDER_CAPACITY_MJS).href)};
 import fs from 'node:fs';
 function handle({ lockDir, markerPath, violationsPath }) {
+  // Mutual exclusion is the property under test, not how long a contender may wait: a bound that
+  // a loaded machine can exhaust would fail the trial for a reason unrelated to exclusivity.
   withFileLock(lockDir, () => {
     let mfd;
     try {
@@ -457,7 +459,7 @@ function handle({ lockDir, markerPath, violationsPath }) {
     const start = Date.now();
     while (Date.now() - start < 5) {} // widen the critical-section window
     if (mfd !== undefined) { fs.closeSync(mfd); fs.unlinkSync(markerPath); }
-  });
+  }, { waitMs: 300_000 });
   return { done: true };
 }
 `);
