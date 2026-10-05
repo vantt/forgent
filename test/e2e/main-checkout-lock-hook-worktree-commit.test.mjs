@@ -427,6 +427,21 @@ test('tsk-1i3: a commit on main branch staging a .fgos/*.jsonl modification with
   assert.equal(result.status, 0, `commit with more lines must succeed -- got: ${result.stderr}`);
 });
 
+test('tsk-1i3: a deliberate shrink of a non-log .fgos file such as config.json is not refused; only append-only logs are line-count guarded', () => {
+  const { mainRoot } = initSharedAbsoluteHooksPathFixture();
+  const configPath = path.join(mainRoot, '.fgos', 'config.json');
+  fs.writeFileSync(configPath, '{\n  "a": 1,\n  "b": 2,\n  "c": 3\n}\n');
+  execFileSync('git', ['add', '.fgos/config.json'], { cwd: mainRoot });
+  execFileSync('git', ['commit', '-q', '-m', 'add multi-line config.json'], { cwd: mainRoot });
+
+  fs.writeFileSync(configPath, '{\n  "a": 1\n}\n');
+  execFileSync('git', ['add', '.fgos/config.json'], { cwd: mainRoot });
+
+  const result = spawnSync('git', ['commit', '-q', '-m', 'removed config entries'], { cwd: mainRoot, encoding: 'utf8' });
+
+  assert.equal(result.status, 0, `removing entries from config.json on main must succeed -- got: ${result.stderr}`);
+});
+
 test('tsk-1i3: a brand-new .fgos/* file addition is not refused', () => {
   const { mainRoot } = initSharedAbsoluteHooksPathFixture();
   const newFilePath = path.join(mainRoot, '.fgos', 'brand-new-log.jsonl');

@@ -204,9 +204,9 @@ function countLines(str) {
 }
 
 // tsk-1i3 -- staged .fgos/* content-precedence guard on main/default branch.
-// Refuses any commit staging a modification (--diff-filter=M) under .fgos/
-// whose staged line count is strictly lower than HEAD's own line count for that
-// same path (D1-D4).
+// Refuses any commit staging a modification (--diff-filter=M) of an append-only
+// .fgos/**/*.jsonl log whose staged line count is strictly lower than HEAD's own
+// line count for that same path (D1-D4).
 function stagedFgosModificationsRegressLineCount(committingToplevel) {
   let branch;
   try {
@@ -234,7 +234,10 @@ function stagedFgosModificationsRegressLineCount(committingToplevel) {
   const modifiedFgosPaths = output
     .split('\n')
     .filter((p) => p !== '')
-    .filter((p) => p === '.fgos' || p.startsWith('.fgos/'));
+    // Only the append-only logs (events.jsonl and the like) are guarded: a stale worktree's older log
+    // must never replace main's newer one. A config or state file is edited on purpose, and a
+    // legitimate edit may remove lines from it.
+    .filter((p) => p.startsWith('.fgos/') && p.endsWith('.jsonl'));
 
   if (modifiedFgosPaths.length === 0) return { regressedPaths: [] };
 
