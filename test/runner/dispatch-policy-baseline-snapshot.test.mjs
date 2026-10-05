@@ -1067,23 +1067,23 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     bindingSource: 'executor-id',
     provider: 'z-ai',
     model: 'z-ai/glm-5.2',
-    command: 'claude',
+    command: 'pi',
     args: [
-      '-p',
-      '<prompt>',
       '--model',
       'z-ai/glm-5.2',
-      '--permission-mode',
-      'acceptEdits'
+      '--thinking',
+      'medium',
+      '--tools',
+      'read,write,edit,bash,grep,find,ls',
+      '--mode',
+      'json',
+      '--approve',
+      '-p',
+      '<prompt>'
     ],
     envKeys: [
-      'ANTHROPIC_BASE_URL',
-      'ANTHROPIC_AUTH_TOKEN',
-      'ANTHROPIC_MODEL',
-      'ANTHROPIC_API_KEY',
-      'ANTHROPIC_DEFAULT_HAIKU_MODEL',
-      'ANTHROPIC_DEFAULT_SONNET_MODEL',
-      'ANTHROPIC_DEFAULT_OPUS_MODEL'
+      'PI_CODING_AGENT_DIR',
+      'OPENROUTER_API_KEY'
     ],
     resourceBindings: [],
     adapter: 'cli-spawn',
@@ -1097,23 +1097,23 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     bindingSource: 'executor-id',
     provider: 'z-ai',
     model: 'z-ai/glm-5.2',
-    command: 'claude',
+    command: 'pi',
     args: [
-      '-p',
-      '<prompt>',
       '--model',
       'z-ai/glm-5.2',
-      '--permission-mode',
-      'acceptEdits'
+      '--thinking',
+      'medium',
+      '--tools',
+      'read,write,edit,bash,grep,find,ls',
+      '--mode',
+      'json',
+      '--approve',
+      '-p',
+      '<prompt>'
     ],
     envKeys: [
-      'ANTHROPIC_BASE_URL',
-      'ANTHROPIC_AUTH_TOKEN',
-      'ANTHROPIC_MODEL',
-      'ANTHROPIC_API_KEY',
-      'ANTHROPIC_DEFAULT_HAIKU_MODEL',
-      'ANTHROPIC_DEFAULT_SONNET_MODEL',
-      'ANTHROPIC_DEFAULT_OPUS_MODEL'
+      'PI_CODING_AGENT_DIR',
+      'OPENROUTER_API_KEY'
     ],
     resourceBindings: [],
     adapter: 'cli-spawn',
@@ -1127,23 +1127,23 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     bindingSource: 'executor-id',
     provider: 'z-ai',
     model: 'z-ai/glm-5.2',
-    command: 'claude',
+    command: 'pi',
     args: [
-      '-p',
-      '<prompt>',
       '--model',
       'z-ai/glm-5.2',
-      '--permission-mode',
-      'acceptEdits'
+      '--thinking',
+      'medium',
+      '--tools',
+      'read,write,edit,bash,grep,find,ls',
+      '--mode',
+      'json',
+      '--approve',
+      '-p',
+      '<prompt>'
     ],
     envKeys: [
-      'ANTHROPIC_BASE_URL',
-      'ANTHROPIC_AUTH_TOKEN',
-      'ANTHROPIC_MODEL',
-      'ANTHROPIC_API_KEY',
-      'ANTHROPIC_DEFAULT_HAIKU_MODEL',
-      'ANTHROPIC_DEFAULT_SONNET_MODEL',
-      'ANTHROPIC_DEFAULT_OPUS_MODEL'
+      'PI_CODING_AGENT_DIR',
+      'OPENROUTER_API_KEY'
     ],
     resourceBindings: [],
     adapter: 'cli-spawn',

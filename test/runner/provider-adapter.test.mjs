@@ -395,26 +395,26 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
       });
     });
 
-    describe('glm (z-ai via Claude route)', () => {
-      test('glm: renders claude invocation with z-ai envPatch', () => {
+    describe('glm (z-ai via pi and OpenRouter)', () => {
+      test('glm: renders a pi invocation under the z-ai family, with the OpenRouter key variable', () => {
         const inv = cfg.executors['glm'].invocations[0];
         const res = renderProviderInvocation({
           providerFamily: 'z-ai',
-          command: 'claude',
+          command: 'pi',
           baseArgs: inv.args,
           promptPlaceholder: '<prompt>',
           model: 'z-ai/glm-5.2',
           executorFacts: { env: inv.env },
         });
 
-        assert.equal(res.command, 'claude');
+        assert.equal(res.command, 'pi', 'the adapter follows the command, not the vendor family');
         assert.equal(res.applied.model, 'applied');
-        assert.equal(res.applied.toolIntent, 'unsupported');
-        assert.equal(res.envPatch.ANTHROPIC_BASE_URL, 'https://openrouter.ai/api');
-        assert.equal(res.envPatch.ANTHROPIC_MODEL, 'z-ai/glm-5.2');
+        assert.equal(res.applied.toolIntent, 'applied-via-tools');
+        assert.ok(Object.hasOwn(res.envPatch, 'OPENROUTER_API_KEY'), 'the key is a substituted environment variable');
+        assert.equal(res.envPatch.ANTHROPIC_BASE_URL, undefined, 'no claude gateway variables remain');
         assert.ok(res.policyShapedFlags.includes('--model'));
-        assert.ok(res.policyShapedFlags.includes('--permission-mode'));
-        assert.ok(!res.policyShapedFlags.includes('--allowedTools'));
+        assert.ok(res.policyShapedFlags.includes('--tools'));
+        assert.ok(!res.policyShapedFlags.includes('--permission-mode'));
       });
     });
 
