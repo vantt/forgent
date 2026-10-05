@@ -123,6 +123,8 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       // no doctor coverage at all -- only claude-json's default path did.
       'non-claude-trust-stores-readable',
       'confined-pane-accounts',
+      'agent-cli-project-trusted',
+      'workflow-pools-satisfy-independence',
       'observe-dir-writable',
       'observe-friction-migrated',
       'observe-host-resolvable',
