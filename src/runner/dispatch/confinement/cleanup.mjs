@@ -126,6 +126,17 @@ export function readOwnershipMarker(dirPath) {
 }
 
 /**
+ * The per-dispatch parent exists only to hold its resources; once one is
+ * removed, leave no empty shell behind (rmdir refuses a non-empty directory,
+ * so a sibling resource keeps it alive).
+ */
+export function removeEmptyDispatchParent(removedPath, dispatchId) {
+  const parent = path.dirname(removedPath);
+  if (!dispatchId || path.basename(parent) !== dispatchId) return;
+  try { fs.rmdirSync(parent); } catch { /* still in use */ }
+}
+
+/**
  * Cleanup a single confinement resource safely.
  * Only removes if ownership marker matches dispatchId.
  */
@@ -148,13 +159,7 @@ export function cleanupConfinementResource(dirPath, dispatchId) {
     // dispatch (an agent CLI's own background server); it would outlive the files it runs from.
     stopProcessesInside(dirPath);
     fs.rmSync(dirPath, { recursive: true, force: true });
-    // The per-dispatch parent exists only to hold this resource; leave no
-    // empty shell behind (rmdir refuses a non-empty directory, so a sibling
-    // resource keeps it alive).
-    const parent = path.dirname(dirPath);
-    if (path.basename(parent) === marker.dispatchId) {
-      try { fs.rmdirSync(parent); } catch { /* still in use */ }
-    }
+    removeEmptyDispatchParent(dirPath, marker.dispatchId);
     return { cleaned: true, path: dirPath, dispatchId: marker.dispatchId };
   } catch (err) {
     return { cleaned: false, reason: 'removal-failed', error: err.message };
