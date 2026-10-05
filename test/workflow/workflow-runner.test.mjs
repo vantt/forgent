@@ -1,6 +1,6 @@
 // test/workflow/workflow-runner.test.mjs — Integration tests for Workflow runner & sequencer (P3a)
 
-import test from 'node:test';
+import test, { after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -24,6 +24,12 @@ import {
   resumeWorkflow,
 } from '../../src/workflow/index.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
+
+// Worktrees created in the default location outlive the test unless removed here.
+const worktreeDirs = [];
+after(() => {
+  for (const dir of worktreeDirs) fs.rmSync(dir, { recursive: true, force: true });
+});
 
 seedFileLocalBwrapRegistry();
 // bwrap mounts a tmpfs over /tmp, so confined workers can only see fixtures elsewhere.
@@ -182,6 +188,7 @@ test('integrate helpers: create worktree, merge branch, and cleanup', () => {
     repoRoot: tmp,
     branch: branchName,
   });
+  worktreeDirs.push(worktreePath);
   assert.ok(fs.existsSync(worktreePath));
   assert.equal(branch, branchName);
 
@@ -461,6 +468,7 @@ function seedRunWithUnitWorktrees(tmp, { terminal, trunk = 'main' }) {
   for (const id of ['merged', 'unmerged', 'dirty', 'broken']) {
     const branch = `wf/${workflowRunId}/${id}`;
     const wt = createWorkflowWorktree({ repoRoot: tmp, branch });
+    worktreeDirs.push(wt.worktreePath);
     units[id] = { branch, worktreePath: wt.worktreePath };
     appendWorkflowEvent({
       repoRoot: tmp,

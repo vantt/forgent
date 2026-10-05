@@ -1,6 +1,6 @@
 // Machine-readable verb manifest tests (entry-standardization P37 deliverable
 // b) — mirrors the run()/spawnSync harness of test/cli/fgos.test.mjs.
-import { test } from 'node:test';
+import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -14,8 +14,15 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
 const FGOS_SOURCE_PATH = path.resolve(__dirname, '../../bin/fgos.mjs');
 
+const madeDirs = [];
+after(() => {
+  for (const dir of madeDirs) fs.rmSync(dir, { recursive: true, force: true });
+});
+
 function tmpCwd() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-manifest-cli-'));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-manifest-cli-'));
+  madeDirs.push(dir);
+  return dir;
 }
 
 function run(cwd, args) {
