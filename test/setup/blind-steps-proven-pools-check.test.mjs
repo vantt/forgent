@@ -18,8 +18,8 @@ const EXECUTORS = {
   xai: { kind: 'agent', providerModel: 'xai', invocations: [herdrBwrap('pi-herdr', 'pi')] },
   // xai through its cli is not a proven pair
   'xai-cli': { kind: 'agent', providerModel: 'xai', invocations: [cliBwrap('pi-cli-bwrap-xai', 'pi')] },
-  // gemini is not proven on either transport
-  gemini: { kind: 'agent', providerModel: 'gemini', invocations: [herdrBwrap('agy-herdr', 'agy'), cliBwrap('agy-cli-bwrap', 'agy')] },
+  // mistral is a family no canary has proven on either transport
+  mistral: { kind: 'agent', providerModel: 'mistral', invocations: [herdrBwrap('agy-herdr', 'agy'), cliBwrap('agy-cli-bwrap', 'agy')] },
   // proven family but no confinement: blind could not be enforced on it
   'deepseek-bare': { kind: 'agent', providerModel: 'deepseek', invocations: [{ id: 'pi-cli', via: 'cli', adapter: 'cli-spawn', command: 'pi', args: ['-p', '{prompt}'] }] },
 };
@@ -63,14 +63,14 @@ test('the check is registered in the doctor registry', () => {
   assert.ok(DOCTOR_CHECKS.map((c) => c.id).includes('blind-steps-use-proven-pools'));
 });
 
-test('the proven table holds exactly the canary pairs and not gemini', () => {
+test('the proven table holds exactly the canary pairs and not an unmeasured family', () => {
   const rows = BLIND_PROVEN_PAIRS.map((p) => `${p.family}/${p.transport}`).sort();
-  assert.deepEqual(rows, ['claude/herdr', 'deepseek/cli', 'openai/cli', 'openai/herdr', 'xai/herdr', 'z-ai/cli']);
+  assert.deepEqual(rows, ['claude/herdr', 'deepseek/cli', 'gemini/cli', 'gemini/herdr', 'openai/cli', 'openai/herdr', 'xai/herdr', 'z-ai/cli']);
   assert.ok(BLIND_PROVEN_PAIRS.every((p) => p.backend === 'bwrap'));
 });
 
 test('a workflow with no blind unit is not applicable', async () => {
-  const result = await run(workflow(''), { 'fixture:propose': prefer('gemini') });
+  const result = await run(workflow(''), { 'fixture:propose': prefer('mistral') });
   assert.equal(result.passed, true);
   assert.match(result.message, /not applicable/);
 });
@@ -81,12 +81,12 @@ test('a blind unit whose pool holds only proven pairs passes', async () => {
   assert.match(result.message, /\(1\)/);
 });
 
-test('a blind unit whose pool includes gemini fails and names the executor, the invocation and the fix', async () => {
-  const result = await run(BLIND, { 'fixture:propose': prefer('deepseek', 'gemini') });
+test('a blind unit whose pool includes mistral fails and names the executor, the invocation and the fix', async () => {
+  const result = await run(BLIND, { 'fixture:propose': prefer('deepseek', 'mistral') });
   assert.equal(result.passed, false);
   assert.match(result.message, /blind-fixture\/propose\/ideas \(capability "fixture:propose"\)/);
-  assert.match(result.message, /gemini via agy-herdr \(family gemini, herdr/);
-  assert.match(result.message, /gemini via agy-cli-bwrap \(family gemini, cli/);
+  assert.match(result.message, /mistral via agy-herdr \(family mistral, herdr/);
+  assert.match(result.message, /mistral via agy-cli-bwrap \(family mistral, cli/);
   assert.doesNotMatch(result.message, /deepseek via/);
   assert.match(result.message, /remove that executor from the capability's prefer pool/);
   assert.match(result.message, /BLIND_PROVEN_PAIRS/);
@@ -104,9 +104,9 @@ test('an unconfined invocation is never a candidate, so it is not reported here'
 });
 
 test('a capability pool from a bare verb entry is resolved by bind like at run time', async () => {
-  const result = await run(BLIND, { propose: prefer('gemini') });
+  const result = await run(BLIND, { propose: prefer('mistral') });
   assert.equal(result.passed, false);
-  assert.match(result.message, /gemini via agy-herdr/);
+  assert.match(result.message, /mistral via agy-herdr/);
 });
 
 test('a runner config that cannot be loaded passes with a note instead of throwing', async () => {

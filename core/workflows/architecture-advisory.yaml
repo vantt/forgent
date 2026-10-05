@@ -23,6 +23,7 @@ steps:
         template:
           capability: architecture:shape
           pattern: panel
+          blind: true
           objective: Diverge into system, alternative, and constraint-focused proposals across 3 panelists
   - id: critique
     title: Critique & Stress-Test

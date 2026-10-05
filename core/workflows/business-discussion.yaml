@@ -19,6 +19,7 @@ steps:
         template:
           capability: business:perspectives
           pattern: panel
+          blind: true
           objective: Analyze strategic problem from multiple independent business angles (product, finance, customer)
   - id: critique
     title: Risk Assessment & Red-Team Critique
