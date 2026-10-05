@@ -7,7 +7,7 @@ import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
 
-import { reportRefOf, reportRefsOf, resolveUnitInputs, anonymousInputName, HandoffRefError } from '../../../src/runner/execution/handoff-refs.mjs';
+import { reportRefOf, reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, anonymousInputName, HandoffRefError } from '../../../src/runner/execution/handoff-refs.mjs';
 
 const resolveRefs = (inputs, root, options) => resolveUnitInputs(inputs, root, options).refs;
 const sha = (text) => crypto.createHash('sha256').update(text).digest('hex');
@@ -237,4 +237,93 @@ test('a copy that cannot be made is a named hand-off failure', () => {
 
 test('neutral names run on past Z', () => {
   assert.deepEqual([0, 1, 25, 26, 27].map(anonymousInputName), ['seat-A', 'seat-B', 'seat-Z', 'seat-AA', 'seat-AB']);
+});
+
+test('a blind unit lists every unit-run, gate-answer and hidden-root input to be copied per role, and nothing else', () => {
+  const root = makeRoot();
+  const a = settleAttempt(root, 'unit-run-a', 'panelist-1', '1', { report: 'first\n' });
+  const answer = recordAnswer(root, 'wf-run-1', 'gate');
+  fs.mkdirSync(path.join(root, 'docs'), { recursive: true });
+  fs.writeFileSync(path.join(root, 'docs', 'a.md'), 'repo file\n');
+  const hiddenRel = path.relative(root, path.join(a.runDir, 'report.md'));
+
+  const { refs, inputMap } = resolveUnitInputs(
+    ['docs/a.md', 'unit-run:unit-run-a/panelist-1', 'gate-answer:wf-run-1/gate', hiddenRel],
+    root,
+    { blind: true },
+  );
+
+  assert.deepEqual(refs, ['docs/a.md']);
+  assert.deepEqual(inputMap.map(({ name, input, source }) => ({ name, input, source })), [
+    { name: '1-panelist-1-r1.md', input: 'unit-run:unit-run-a/panelist-1', source: path.join(a.runDir, 'report.md') },
+    { name: '2-gate-gate.md', input: 'gate-answer:wf-run-1/gate', source: answer },
+    { name: '3-panelist-1-r1.md', input: hiddenRel, source: path.join(a.runDir, 'report.md') },
+  ]);
+  assert.equal(inputMap[0].sha256, sha('first\n'));
+  assert.equal(fs.existsSync(path.join(root, '.fgos', 'assignments', 'unit-run-a', 'inputs')), false, 'nothing is copied at resolution');
+});
+
+test('a blind unit with anonymized inputs gets neutral names for its unit-run inputs only', () => {
+  const root = makeRoot();
+  settleAttempt(root, 'unit-run-a', 'panelist-1', '1', { report: 'first\n' });
+  settleAttempt(root, 'unit-run-a', 'panelist-2', '1', { report: 'second\n' });
+  recordAnswer(root, 'wf-run-1', 'gate');
+  const { inputMap } = resolveUnitInputs(
+    ['unit-run:unit-run-a/panelist-2', 'gate-answer:wf-run-1/gate', 'unit-run:unit-run-a/panelist-1'],
+    root,
+    { blind: true, anonymize: true },
+  );
+  assert.deepEqual(inputMap.map((e) => e.name), ['seat-A.md', '2-gate-gate.md', 'seat-B.md']);
+});
+
+test('a blind unit still names the failure of an input that cannot be resolved', () => {
+  const root = makeRoot();
+  assert.throws(
+    () => resolveUnitInputs(['unit-run:unit-run-nope/producer'], root, { blind: true }),
+    (err) => err instanceof HandoffRefError && err.reason === 'no-such-run',
+  );
+  const { runDir } = settleAttempt(root, 'unit-run-a', 'producer', '1', { report: 'x\n' });
+  fs.writeFileSync(path.join(runDir, 'report.md'), 'changed\n');
+  assert.throws(
+    () => resolveUnitInputs(['unit-run:unit-run-a/producer'], root, { blind: true }),
+    (err) => err instanceof HandoffRefError && err.reason === 'report-changed-after-settle',
+  );
+});
+
+test('copies are made byte for byte in the role directory, kept on a resume, and refused when the source changed', () => {
+  const root = makeRoot();
+  const { runDir } = settleAttempt(root, 'unit-run-a', 'producer', '1', { report: 'opinion é\n' });
+  const { inputMap } = resolveUnitInputs(['unit-run:unit-run-a/producer'], root, { blind: true });
+  const roleDir = path.join(root, 'role-dir');
+
+  const [copy] = copyHandoffsInto(roleDir, inputMap);
+  assert.equal(copy, path.join(roleDir, 'inputs', inputMap[0].name));
+  assert.ok(fs.readFileSync(copy).equals(fs.readFileSync(path.join(runDir, 'report.md'))));
+  assert.ok(!fs.lstatSync(copy).isSymbolicLink());
+
+  // The same role again (a resume) reads the same copy without touching the source.
+  const original = fs.readFileSync(path.join(runDir, 'report.md'));
+  fs.rmSync(path.join(runDir, 'report.md'));
+  assert.deepEqual(copyHandoffsInto(roleDir, inputMap), [copy]);
+  assert.throws(
+    () => copyHandoffsInto(path.join(root, 'third-role-dir'), inputMap),
+    (err) => err instanceof HandoffRefError && /^copy-failed/.test(err.reason),
+  );
+
+  // Another role's directory cannot be filled from a source that changed since resolution.
+  fs.writeFileSync(path.join(runDir, 'report.md'), 'changed\n');
+  assert.throws(
+    () => copyHandoffsInto(path.join(root, 'other-role-dir'), inputMap),
+    (err) => err instanceof HandoffRefError && err.reason === 'report-changed-after-settle',
+  );
+  assert.ok(original.length > 0);
+});
+
+test('refIsHiddenFromBlind tells run state from the rest of the checkout', () => {
+  const root = makeRoot();
+  const { runDir } = settleAttempt(root, 'unit-run-a', 'producer', '1', { report: 'x\n' });
+  fs.mkdirSync(path.join(root, 'docs'), { recursive: true });
+  fs.writeFileSync(path.join(root, 'docs', 'a.md'), 'x');
+  assert.equal(refIsHiddenFromBlind(path.join(runDir, 'report.md'), root), true);
+  assert.equal(refIsHiddenFromBlind('docs/a.md', root), false);
 });

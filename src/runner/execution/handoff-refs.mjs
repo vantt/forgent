@@ -12,6 +12,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 
 import { RunnerConfigError } from '../dispatch/config.mjs';
+import { resolveBlindHiddenRoots, isInsideRoot } from '../dispatch/confinement/resources.mjs';
 import { readUnitRunHistory } from './unit-run-history.mjs';
 
 const UNIT_RUN_PREFIX = 'unit-run:';
@@ -135,6 +136,27 @@ export function anonymousInputName(index) {
   return `seat-${letters}`;
 }
 
+/** Whether `ref` (resolved against `base`) lies inside one of the given roots. */
+function liesInsideAny(ref, base, roots) {
+  if (/^[a-z][a-z0-9+.-]*:/i.test(ref)) return false;
+  const abs = path.resolve(base, ref);
+  let real = abs;
+  try {
+    real = fs.realpathSync(abs);
+  } catch {
+    // a ref that does not exist yet is judged by its spelling
+  }
+  return roots.some((root) => isInsideRoot(real, root));
+}
+
+/**
+ * Whether a blind worker would be unable to read `ref` where it lies: it is inside a root
+ * `hostRead: blind` hides. Such a ref reaches the worker only as a copy in its own directory.
+ */
+export function refIsHiddenFromBlind(ref, mainRoot) {
+  return liesInsideAny(ref, mainRoot, resolveBlindHiddenRoots({ fgosDir: path.join(mainRoot, '.fgos') }));
+}
+
 /**
  * Turn a Unit's `inputs` into the context refs its roles are given: a repo-relative path stays as
  * it is, a `unit-run:<unitRunId>/<role>` becomes the absolute path of that role's report, a
@@ -147,27 +169,52 @@ export function anonymousInputName(index) {
  * kept in unit.json and never shown to a role. Repo paths and gate answers are not anonymized.
  * The directory is created only once every source has resolved.
  *
+ * With `blind` (a unit whose roles cannot read other runs' state) nothing is copied here, because
+ * each role needs the copy in its own directory (`copyHandoffsInto`, at dispatch). `refs` then
+ * lists only what a blind worker can read where it lies; `inputMap` lists every `unit-run:` and
+ * `gate-answer:` input and every other ref inside a hidden root, with the name its copy gets
+ * (`seat-A`, ... for `unit-run:` inputs when `anonymize`, a plain name otherwise) and the sha256
+ * of the bytes resolved now, which the copy must still have.
+ *
  * @param {readonly string[]} inputs
  * @param {string} mainRoot main checkout root
- * @param {{anonymizeInto?: string}} [options]
- * @returns {{refs: string[], inputMap: Array<{name: string, input: string, source: string}>}}
+ * @param {{anonymizeInto?: string, blind?: boolean, anonymize?: boolean}} [options]
+ * @returns {{refs: string[], inputMap: Array<{name: string, input: string, source: string, sha256?: string}>}}
  */
-export function resolveUnitInputs(inputs, mainRoot, { anonymizeInto } = {}) {
+export function resolveUnitInputs(inputs, mainRoot, { anonymizeInto, blind = false, anonymize = false } = {}) {
   const refs = [];
   const sources = [];
+  const copies = [];
+  const hiddenRoots = blind ? resolveBlindHiddenRoots({ fgosDir: path.join(mainRoot, '.fgos') }) : [];
   for (const input of inputs ?? []) {
     let ref = input;
-    if (input.startsWith(UNIT_RUN_PREFIX)) {
+    const isUnitRun = input.startsWith(UNIT_RUN_PREFIX);
+    if (isUnitRun) {
       ref = resolveUnitRunRef(input, mainRoot);
-      if (anonymizeInto) {
+      if (anonymizeInto && !blind) {
         if (!sources.some((s) => s.input === input)) sources.push({ input, source: ref });
         continue;
       }
     } else if (input.startsWith(GATE_ANSWER_PREFIX)) ref = resolveGateAnswerRef(input, mainRoot);
+    if (blind && (ref !== input || liesInsideAny(ref, mainRoot, hiddenRoots))) {
+      if (!copies.some((c) => c.input === input)) copies.push({ input, source: path.resolve(mainRoot, ref), isUnitRun });
+      continue;
+    }
     if (!refs.includes(ref)) refs.push(ref);
   }
 
   const inputMap = [];
+  let seat = 0;
+  copies.forEach(({ input, source, isUnitRun }, index) => {
+    let sha256;
+    try {
+      sha256 = sha256OfFile(source);
+    } catch (err) {
+      throw new HandoffRefError(input, `copy-failed: ${err.message}`);
+    }
+    const base = anonymize && isUnitRun ? anonymousInputName(seat++) : plainInputName(index, source, mainRoot);
+    inputMap.push({ name: `${base}${path.extname(source)}`, input, source, sha256 });
+  });
   if (sources.length > 0) {
     try {
       fs.mkdirSync(anonymizeInto, { recursive: true });
@@ -182,4 +229,48 @@ export function resolveUnitInputs(inputs, mainRoot, { anonymizeInto } = {}) {
     }
   }
   return { refs, inputMap };
+}
+
+/**
+ * The stable plain name (without extension) of the nth copied hand-off: its position, then what it
+ * is when that can be told from where it lies (`<role>-r<round>` for an assignment's report,
+ * `gate-<step>` for a gate answer), else the file's own name.
+ */
+export function plainInputName(index, source, mainRoot) {
+  const rel = path.relative(path.join(mainRoot, '.fgos'), source).split(path.sep);
+  let what = path.basename(source, path.extname(source));
+  if (rel[0] === 'assignments' && rel.length > 4) what = `${rel[2]}-r${rel[3]}`;
+  else if (rel[0] === 'workflow-runs' && rel[2] === 'gate-answers') what = `gate-${what}`;
+  return `${index + 1}-${what}`;
+}
+
+/**
+ * The copies of hand-off files a blind role reads, made in the role's own directory (`dir`, the
+ * one it can read back) as `<dir>/inputs/<name>`; returns their paths in entry order. An entry
+ * with a `sha256` is refused when its source no longer has those bytes; a copy already in place
+ * with those bytes is kept, so a resume reads the same files. Entries are `{name, source, sha256?}`.
+ */
+export function copyHandoffsInto(dir, entries) {
+  const target = path.join(dir, 'inputs');
+  const copies = [];
+  for (const { name, source, sha256 } of entries) {
+    const dest = path.join(target, name);
+    try {
+      fs.mkdirSync(target, { recursive: true });
+      if (sha256 && fs.existsSync(dest) && sha256OfFile(dest) === sha256) {
+        copies.push(dest);
+        continue;
+      }
+      const bytes = fs.readFileSync(source);
+      if (sha256 && crypto.createHash('sha256').update(bytes).digest('hex') !== sha256) {
+        throw new HandoffRefError(name, 'report-changed-after-settle');
+      }
+      fs.writeFileSync(dest, bytes);
+    } catch (err) {
+      if (err instanceof HandoffRefError) throw err;
+      throw new HandoffRefError(name, `copy-failed: ${err.message}`);
+    }
+    copies.push(dest);
+  }
+  return copies;
 }
