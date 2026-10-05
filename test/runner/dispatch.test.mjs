@@ -1038,7 +1038,11 @@ test('the committed .fgos/config.json runner section declares the consolidated g
   assert.ok(executor, 'executors.gemini must exist');
   assert.equal(executor.kind, 'agent');
   assert.equal(executor.allowCrossProvider, true);
-  assert.ok(Array.isArray(executor.invocations) && executor.invocations.length === 4);
+  assert.ok(Array.isArray(executor.invocations));
+  const ids = executor.invocations.map((inv) => inv.id);
+  for (const id of ['agy-cli-mucdong', 'agy-herdr-mucdong', 'agy-cli-bwrap-mucdong', 'agy-cli-tetnu', 'agy-herdr-tetcu72', 'agy-cli-bwrap-tetcu72']) {
+    assert.ok(ids.includes(id), `gemini must declare the "${id}" invocation`);
+  }
   const invocation = executor.invocations.find((inv) => inv.id === 'agy-cli-mucdong');
   assert.ok(invocation, 'gemini must declare an "agy-cli-mucdong" invocation');
   assert.equal(invocation.via, 'cli');
