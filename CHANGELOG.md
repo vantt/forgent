@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- The `glm` executors run the `pi` CLI through OpenRouter (model `z-ai/glm-5.2`) instead of the claude CLI behind a gateway. In a herdr pane the claude route stopped at "Please run /login, API Error: 401" every time, so a synthesizer bound to `glm-herdr` never produced anything. The API key is still only the `${GLM_OPENROUTER_API_KEY}` environment reference.
 - A project set up with `fgctl init` can run `fgos workflow` (and every other verb that loads a dependency). The release tree used to ship the CLI without its `yaml` package, so these verbs failed with "Cannot find package 'yaml'" even though `fgos version` and `fgos doctor` passed. The tree now carries its production dependencies, a missing dependency fails the build, and the external-consumer CI step runs a dependency-loading verb.
 - A herdr dispatch no longer deletes a folder-trust entry it did not write. A read-only run in the main checkout used to remove the entry you had vouched for when it settled, so every later Claude start in that folder (yours and the next dispatch) stopped at the trust dialog. Teardown now removes only the entry its own round seeded, for the claude, codex and agy trust stores alike.
 - A `panel` synthesizer now receives its panelists' reports: the runner hands the results of earlier roles to the next role as context refs. Before, the synthesizer was dispatched with no context refs and judged without seeing the panel.

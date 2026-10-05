@@ -1,5 +1,6 @@
-// The committed config's herdr invocations for the claude CLI family: claude itself and the
-// OpenRouter-routed glm. These are what a pane runs, so what must be true of them is pinned here.
+// The committed config's herdr invocations for claude itself and for glm, which runs through the
+// pi CLI and OpenRouter (the claude CLI behind an OpenRouter gateway stopped at a /login prompt
+// with a 401). These are what a pane runs, so what must be true of them is pinned here.
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -11,25 +12,39 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 const runner = JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'config.json'), 'utf8')).runner;
 const invocation = (executor) => runner.executors[executor].invocations.find((inv) => inv.adapter === 'herdr-spawn');
 
-for (const executor of ['claude-herdr', 'glm-herdr']) {
-  test(`${executor} runs a claude REPL in a pane under the bwrap posture`, () => {
-    const inv = invocation(executor);
-    assert.ok(inv, `${executor} must have a herdr-spawn invocation`);
-    assert.equal(typeof inv.id, 'string', 'bind() can only pick an invocation it can name');
-    assert.equal(inv.command, 'claude');
-    assert.deepEqual(inv.confinement, { backend: 'bwrap' });
-    assert.equal(inv.interactiveMode.kind, 'claude');
-    assert.ok(!inv.args.includes('--dangerously-skip-permissions'), 'the posture is the OS sandbox; no bypass flag stands in for it');
-    assert.ok(!inv.args.includes('--permission-mode'), 'the permission mode is left to the operator settings');
-  });
-}
+test('claude-herdr runs a claude REPL in a pane under the bwrap posture', () => {
+  const inv = invocation('claude-herdr');
+  assert.ok(inv, 'claude-herdr must have a herdr-spawn invocation');
+  assert.equal(typeof inv.id, 'string', 'bind() can only pick an invocation it can name');
+  assert.equal(inv.command, 'claude');
+  assert.deepEqual(inv.confinement, { backend: 'bwrap' });
+  assert.equal(inv.interactiveMode.kind, 'claude');
+  assert.ok(!inv.args.includes('--dangerously-skip-permissions'), 'the posture is the OS sandbox; no bypass flag stands in for it');
+  assert.ok(!inv.args.includes('--permission-mode'), 'the permission mode is left to the operator settings');
+});
 
-test('glm-herdr turns off the server-side auto-mode notice a gateway session cannot satisfy, and carries no key', () => {
+test('glm-herdr runs pi in a pane under the bwrap posture and carries no key', () => {
   const inv = invocation('glm-herdr');
-  assert.equal(inv.env.CLAUDE_CODE_AUTO_MODE_SERVER, '0');
-  assert.equal(inv.env.ANTHROPIC_BASE_URL, 'https://openrouter.ai/api');
-  assert.equal(inv.env.ANTHROPIC_AUTH_TOKEN, '${GLM_OPENROUTER_API_KEY}', 'the key is substituted from the environment at launch, never stored in config');
+  assert.ok(inv, 'glm-herdr must have a herdr-spawn invocation');
+  assert.equal(typeof inv.id, 'string', 'bind() can only pick an invocation it can name');
+  assert.equal(inv.command, 'pi');
+  assert.deepEqual(inv.confinement, { backend: 'bwrap' });
+  assert.ok(inv.args.includes('{model}'), 'the model comes from the z-ai model policy, not from the invocation');
+  assert.ok(!inv.args.includes('--dangerously-skip-permissions'), 'the posture is the OS sandbox; no bypass flag stands in for it');
+  assert.equal(inv.env.OPENROUTER_API_KEY, '${GLM_OPENROUTER_API_KEY}', 'the key is substituted from the environment at launch, never stored in config');
   assert.equal(runner.executors['glm-herdr'].providerModel, 'z-ai');
+  assert.equal(runner.modelPolicies['z-ai'].standard, 'z-ai/glm-5.2');
+});
+
+test('glm is headless pi through OpenRouter with the same key variable and no claude gateway variables', () => {
+  const glm = runner.executors.glm;
+  assert.equal(glm.providerModel, 'z-ai');
+  assert.ok(glm.invocations.length > 0 && glm.invocations.every((inv) => inv.command === 'pi'));
+  for (const inv of glm.invocations) {
+    assert.equal(inv.env.OPENROUTER_API_KEY, '${GLM_OPENROUTER_API_KEY}');
+    assert.equal(inv.env.ANTHROPIC_BASE_URL, undefined);
+    assert.equal(inv.env.ANTHROPIC_AUTH_TOKEN, undefined);
+  }
 });
 
 test('claude-herdr reports the claude provider family, so a reviewer on glm-herdr is a different family', () => {

@@ -544,30 +544,66 @@
       },
       "glm": {
         "kind": "agent",
-        "description": "Claude Code CLI routed to OpenRouter's GLM 5.2 model (z-ai/glm-5.2), not real Anthropic -- ANTHROPIC_BASE_URL/AUTH_TOKEN/MODEL overridden via this invocation's own env block (dispatch/transport.mjs's ${VAR} substitution against process.env, never a shell). Real key lives in .fgos/secrets.local.env (untracked, gitignored) as GLM_OPENROUTER_API_KEY -- never committed here. See docs/history/glm-openrouter-executor/plan.md (tsk-gb3).",
+        "description": "GLM 5.2 (z-ai/glm-5.2) through the pi CLI and OpenRouter, headless. Replaces the claude-CLI-through-gateway route.",
         "allowCrossProvider": true,
         "invocations": [
           {
+            "id": "pi-cli-openrouter",
             "via": "cli",
             "adapter": "cli-spawn",
-            "command": "claude",
+            "command": "pi",
             "args": [
-              "-p",
-              "{prompt}",
               "--model",
               "{model}",
-              "--permission-mode",
-              "acceptEdits"
+              "--thinking",
+              "medium",
+              "--tools",
+              "read,write,edit,bash,grep,find,ls",
+              "--mode",
+              "json",
+              "--approve",
+              "-p",
+              "{prompt}"
             ],
             "env": {
-              "ANTHROPIC_BASE_URL": "https://openrouter.ai/api",
-              "ANTHROPIC_AUTH_TOKEN": "${GLM_OPENROUTER_API_KEY}",
-              "ANTHROPIC_MODEL": "z-ai/glm-5.2",
-              "ANTHROPIC_API_KEY": "",
-              "ANTHROPIC_DEFAULT_HAIKU_MODEL": "z-ai/glm-5.2",
-              "ANTHROPIC_DEFAULT_SONNET_MODEL": "z-ai/glm-5.2",
-              "ANTHROPIC_DEFAULT_OPUS_MODEL": "z-ai/glm-5.2"
+              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openrouter",
+              "OPENROUTER_API_KEY": "${GLM_OPENROUTER_API_KEY}"
             }
+          },
+          {
+            "id": "pi-cli-bwrap-openrouter",
+            "via": "cli",
+            "adapter": "cli-spawn",
+            "command": "pi",
+            "args": [
+              "--model",
+              "{model}",
+              "--thinking",
+              "medium",
+              "--tools",
+              "read,write,edit,bash,grep,find,ls",
+              "--mode",
+              "json",
+              "--approve",
+              "-p",
+              "{prompt}"
+            ],
+            "confinement": {
+              "backend": "bwrap"
+            },
+            "env": {
+              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openrouter",
+              "OPENROUTER_API_KEY": "${GLM_OPENROUTER_API_KEY}"
+            },
+            "resourceBindings": [
+              {
+                "resource": "private-home",
+                "target": {
+                  "kind": "env",
+                  "name": "PI_CODING_AGENT_DIR"
+                }
+              }
+            ]
           }
         ],
         "providerModel": "z-ai",
@@ -1154,39 +1190,44 @@
       },
       "glm-herdr": {
         "kind": "agent",
-        "description": "Claude Code REPL routed to OpenRouter GLM (z-ai) in a herdr pane under the bwrap posture. CLAUDE_CODE_AUTO_MODE_SERVER=0 keeps claude from raising its blocking auto-mode billing notice, which a gateway session always gets and nobody is there to answer. The key is substituted from the environment at launch (GLM_OPENROUTER_API_KEY), never stored here.",
+        "description": "GLM 5.2 (z-ai/glm-5.2) through the pi CLI and OpenRouter, in a herdr pane under the bwrap posture. Replaces the claude-CLI-through-gateway route, whose pane stopped at a /login prompt with a 401.",
         "allowCrossProvider": true,
         "providerModel": "z-ai",
         "invocations": [
           {
-            "id": "glm-herdr-bwrap",
+            "id": "pi-herdr-openrouter",
             "via": "cli",
             "adapter": "herdr-spawn",
-            "command": "claude",
-            "args": [
-              "--model",
-              "{model}"
-            ],
             "confinement": {
               "backend": "bwrap"
             },
+            "command": "pi",
+            "args": [
+              "--model",
+              "{model}",
+              "--thinking",
+              "medium",
+              "--tools",
+              "read,write,edit,bash,grep,find,ls",
+              "--approve"
+            ],
             "interactiveMode": {
-              "exitCommand": "/exit",
-              "kind": "claude",
-              "trustStore": {
-                "kind": "claude-json"
-              }
+              "exitCommand": "/quit",
+              "kind": "pi"
             },
             "env": {
-              "ANTHROPIC_BASE_URL": "https://openrouter.ai/api",
-              "ANTHROPIC_AUTH_TOKEN": "${GLM_OPENROUTER_API_KEY}",
-              "ANTHROPIC_MODEL": "z-ai/glm-5.2",
-              "ANTHROPIC_API_KEY": "",
-              "ANTHROPIC_DEFAULT_HAIKU_MODEL": "z-ai/glm-5.2",
-              "ANTHROPIC_DEFAULT_SONNET_MODEL": "z-ai/glm-5.2",
-              "ANTHROPIC_DEFAULT_OPUS_MODEL": "z-ai/glm-5.2",
-              "CLAUDE_CODE_AUTO_MODE_SERVER": "0"
-            }
+              "PI_CODING_AGENT_DIR": "${HOME}/.pi/accounts/openrouter",
+              "OPENROUTER_API_KEY": "${GLM_OPENROUTER_API_KEY}"
+            },
+            "resourceBindings": [
+              {
+                "resource": "private-home",
+                "target": {
+                  "kind": "env",
+                  "name": "PI_CODING_AGENT_DIR"
+                }
+              }
+            ]
           }
         ]
       }

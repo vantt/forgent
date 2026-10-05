@@ -4,6 +4,17 @@ authoritative_for: adding a per-executor env override to the fgOS runner dispatc
 
 # Giving one executor its own environment without touching the default one
 
+> **Update 2026-10-05: glm no longer uses the claude CLI.** Behind the
+> OpenRouter gateway, the claude CLI in a herdr pane stopped at
+> "Please run /login · API Error: 401 Missing Authentication header" every
+> time, so `glm` and `glm-herdr` now run the `pi` CLI against OpenRouter
+> (`z-ai/glm-5.2` from the `z-ai` model policy), the same shape as `deepseek`
+> (headless) and `xai` (herdr pane). The key is still only a `${VAR}`
+> reference: `OPENROUTER_API_KEY` is set from `${GLM_OPENROUTER_API_KEY}`.
+> The per-executor `env` mechanism described below is unchanged and is what
+> carries that reference. Everything below that names the claude CLI or
+> `ANTHROPIC_*` variables describes the superseded route.
+
 `tsk-gb3` added a new fgOS runner executor named `glm` that reuses the
 `claude` CLI as its command but routes to GLM 5.2 (`z-ai/glm-5.2`) via
 OpenRouter instead of Anthropic's real API — without affecting the
