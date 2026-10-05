@@ -15,6 +15,30 @@ import path from 'node:path';
 import os from 'node:os';
 import { resolveConfinementTempRoot } from './cleanup.mjs';
 
+/**
+ * `hostRead: blind` leaves the host readable except what other dispatches and live agent
+ * sessions keep: the run state of the project the dispatch runs in, the herdr socket dir, and
+ * the confinement temp root (sibling private homes). Tokens, resolved per dispatch below; the
+ * driver never names a path of its own. Only the three run-state directories are listed,
+ * never all of `.fgos`: tracked files live there and would appear deleted in the checkout
+ * status under a mask.
+ */
+export const BLIND_HIDDEN_ROOTS = Object.freeze([
+  '{fgosDir}/assignments',
+  '{fgosDir}/workflow-runs',
+  '{fgosDir}/dispatch-runs',
+  '{herdrSocketDir}',
+  '{confinementTempRoot}',
+]);
+
+/** Whether a confinement request asks for `hostRead: blind`, by override or by its policy. */
+export function requestIsBlind(request) {
+  return (
+    request?.override?.controls?.hostRead === 'blind' ||
+    request?.requirement?.policy?.controls?.hostRead === 'blind'
+  );
+}
+
 export class ConfinementResourceError extends Error {
   constructor(code, message) {
     super(message);
@@ -137,6 +161,70 @@ export function resolveWorkspaceGitMetadata(workspaceRoot) {
   return realDotGit;
 }
 
+/** Where the private homes of this machine's dispatches live. */
+function confinementTempRootFor(backendConfig = {}) {
+  return backendConfig.privateHomeRoot || backendConfig.tempRoot || resolveConfinementTempRoot();
+}
+
+/** Whether `target` is `root` itself or lies inside it. */
+export function isInsideRoot(target, root) {
+  return target === root || target.startsWith(root + path.sep);
+}
+
+function realPathOrNull(p) {
+  try {
+    return fs.realpathSync(p);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * The directory holding the herdr API sockets: the one the caller's own socket sits in, else
+ * herdr's default. A confined reader that can connect to a socket there can list and read a
+ * sibling's pane.
+ */
+function herdrSocketDir(env = process.env) {
+  const socket = env.HERDR_SOCKET_PATH;
+  if (typeof socket === 'string' && path.isAbsolute(socket)) return path.dirname(socket);
+  return path.join(os.homedir(), '.config', 'herdr');
+}
+
+/**
+ * The absolute paths `hostRead: blind` hides for a dispatch (BLIND_HIDDEN_ROOTS with its tokens
+ * filled in). A root that does not exist on this machine is skipped: there is nothing to hide.
+ */
+export function resolveBlindHiddenRoots({ fgosDir, backendConfig = {}, env = process.env } = {}) {
+  if (typeof fgosDir !== 'string' || !fgosDir.trim()) {
+    throw new ConfinementResourceError(
+      'confinement-grant-invalid',
+      'hostRead: blind requires context.fgosDir to name the run state it hides.',
+    );
+  }
+  const tokens = {
+    '{fgosDir}': path.resolve(fgosDir),
+    '{herdrSocketDir}': herdrSocketDir(env),
+    '{confinementTempRoot}': confinementTempRootFor(backendConfig),
+  };
+  const roots = [];
+  for (const template of BLIND_HIDDEN_ROOTS) {
+    const raw = template.replace(/\{[A-Za-z]+\}/, (token) => tokens[token] ?? token);
+    const real = realPathOrNull(raw);
+    if (real && fs.statSync(real).isDirectory() && !roots.includes(real)) roots.push(real);
+  }
+  return roots;
+}
+
+/**
+ * The directory that belongs to this dispatch alone under the hidden roots: its assignment
+ * round directory (`<assignments>/<unit run>/<role>/<round>`, the parent of `runs/<attempt>`),
+ * or the run directory itself when the dispatch has no assignment.
+ */
+function ownDispatchDir(runDir) {
+  const run = path.resolve(runDir);
+  return path.basename(path.dirname(run)) === 'runs' ? path.dirname(path.dirname(run)) : run;
+}
+
 /**
  * Canonical resource resolver implementation (spec §6.3, R2).
  */
@@ -147,6 +235,7 @@ export function resolveConfinementResources({
   resourceNeeds = [],
   backendConfig = {},
   providerSources = {},
+  blind = false,
 } = {}) {
   if (!dispatchId || typeof dispatchId !== 'string') {
     throw new ConfinementResourceError('confinement-grant-invalid', 'dispatchId is required.');
@@ -273,10 +362,7 @@ export function resolveConfinementResources({
   // 4. private-home
   if (grantsByResource.has('private-home')) {
     const grant = grantsByResource.get('private-home');
-    const tempRoot =
-      backendConfig.privateHomeRoot ||
-      backendConfig.tempRoot ||
-      resolveConfinementTempRoot();
+    const tempRoot = confinementTempRootFor(backendConfig);
 
     const allocatedHome = path.join(tempRoot, dispatchId, 'home');
     // Validate before any mutation: a hostile dispatchId must never leave an
@@ -324,6 +410,43 @@ export function resolveConfinementResources({
         allocation: 'existing',
       });
     }
+  }
+
+  // 6. hostRead: blind — hide the hidden roots, keep the dispatch's own directory
+  if (blind) {
+    if (!context.runDir) {
+      throw new ConfinementResourceError('confinement-grant-invalid', 'hostRead: blind requires context.runDir.');
+    }
+    const hiddenRoots = resolveBlindHiddenRoots({ fgosDir: context.fgosDir, backendConfig });
+    const { hostTarget: ownDir } = canonicalizeAndVerifySubpath(ownDispatchDir(context.runDir), context.fgosDir, 'own-assignment');
+    if (!fs.existsSync(ownDir)) {
+      throw new ConfinementResourceError(
+        'confinement-grant-invalid',
+        `hostRead: blind needs the dispatch's own directory "${ownDir}" to exist before launch.`,
+      );
+    }
+    for (const root of hiddenRoots) {
+      resolved.push({
+        resource: 'hidden-root',
+        identity: `hidden-root:${root}`,
+        hostTarget: root,
+        executionTarget: { location: 'host', path: root },
+        delivery: 'mask',
+        collect: 'none',
+        access: 'hidden',
+        allocation: 'existing',
+      });
+    }
+    resolved.push({
+      resource: 'own-assignment',
+      identity: `own-assignment:${path.basename(ownDir)}`,
+      hostTarget: ownDir,
+      executionTarget: { location: 'host', path: ownDir },
+      delivery: 'mount',
+      collect: 'none',
+      access: 'read',
+      allocation: 'existing',
+    });
   }
 
   return resolved;

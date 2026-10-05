@@ -45,7 +45,7 @@ import {
   ensureMachineBackendRegistryDefaults,
   loadMachineBackendRegistry,
 } from '../runner/dispatch/confinement/backend-registry.mjs';
-import { runAllConfinementProbes } from '../runner/dispatch/confinement/probes/harness.mjs';
+import { runAllConfinementProbes, probePeerRunHidden } from '../runner/dispatch/confinement/probes/harness.mjs';
 import { reapOrphanedConfinementResources, resolveConfinementTempRoot, OWNERSHIP_MARKER_FILE, EMPTY_SHELL_GRACE_MS } from '../runner/dispatch/confinement/cleanup.mjs';
 
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
@@ -5151,6 +5151,49 @@ registerCheck({
   id: 'confinement-probe-freshness',
   description: 'confinement probe freshness status (runs the 8-probe falsification harness against the registered bwrap backend)',
   check: () => checkConfinementProbeFreshness(),
+});
+
+// A blind unit is refused, never run unblind, when its backend cannot keep a worker from
+// reading peer run state. This row says which of those a machine is in: pass, fail (the probe
+// ran and failed), or backend-unsupported (no enabled bwrap backend on Linux, so every blind
+// unit is refused, which is by design and not a fault of an install that runs none).
+export function checkConfinementBlindRead() {
+  let registry;
+  try {
+    registry = loadMachineBackendRegistry();
+  } catch (err) {
+    return { passed: false, message: `blind-read: fail (machine registry not readable: ${err.message})` };
+  }
+
+  const bwrapBackend = registry.confinementBackends?.bwrap;
+  if (!bwrapBackend || bwrapBackend.enabled === false) {
+    return { passed: true, message: 'blind-read: backend-unsupported (no enabled bwrap backend; blind units are refused)' };
+  }
+  if (os.platform() !== 'linux') {
+    return { passed: true, message: `blind-read: backend-unsupported (platform "${os.platform()}" is not Linux; blind units are refused)` };
+  }
+
+  const binaryPath = bwrapBackend.executable || 'bwrap';
+  const available = checkBwrapAvailable(binaryPath);
+  if (!available.passed) {
+    return { passed: true, message: `blind-read: backend-unsupported (bwrap "${binaryPath}" is not usable: ${available.message}; blind units are refused)` };
+  }
+
+  const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-blind-probe-'));
+  try {
+    const result = probePeerRunHidden({ bwrapBin: binaryPath, scratchDir: scratch });
+    return result.passed
+      ? { passed: true, message: 'blind-read: pass (a blind worker cannot read a peer run, home or process)' }
+      : { passed: false, message: `blind-read: fail (${result.detail})` };
+  } finally {
+    fs.rmSync(scratch, { recursive: true, force: true });
+  }
+}
+
+registerCheck({
+  id: 'confinement-blind-read',
+  description: 'a blind unit can be enforced: the registered bwrap backend hides peer run state, homes and processes from a worker',
+  check: () => checkConfinementBlindRead(),
 });
 
 export function checkConfinementStrictReadiness(cwd) {

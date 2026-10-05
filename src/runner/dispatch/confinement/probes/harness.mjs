@@ -18,7 +18,8 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { BWRAP_DRIVER_VERSION } from '../drivers/bwrap.mjs';
+import { BWRAP_DRIVER_VERSION, prepareBwrapSync } from '../drivers/bwrap.mjs';
+import { resolveConfinementResources } from '../resources.mjs';
 
 export const PROOF_PROFILE = 'local-bwrap-v1';
 
@@ -42,6 +43,7 @@ export function computeProbeFingerprint({
   driverVersion = BWRAP_DRIVER_VERSION,
   backendConfig = {},
   bwrapExecutable = '/usr/bin/bwrap',
+  blind = false,
 } = {}) {
   const policyDigest = crypto.createHash('sha256').update(JSON.stringify(policy)).digest('hex');
   const backendConfigDigest = crypto.createHash('sha256').update(JSON.stringify(backendConfig)).digest('hex');
@@ -54,6 +56,7 @@ export function computeProbeFingerprint({
     backendConfigDigest,
     platformDigest,
     proofProfile: PROOF_PROFILE,
+    ...(blind ? { blind: true } : {}),
   };
 }
 
@@ -453,11 +456,102 @@ export function probeHostReadAndNetworkNotOverclaimed({ bwrapBin = '/usr/bin/bwr
 }
 
 /**
- * Run all 8 probes against a bwrap executable and test directory.
+ * Probe 9 (blind dispatches only): a worker run under `hostRead: blind` cannot see a peer
+ * dispatch's run state, a peer's private home or a peer's process, and still reads its own
+ * directory (read-only) and writes its outbox. The sandbox argv comes from the real
+ * prepareBwrap, fed with resources the real resolver produced, so the probe cannot pass on a
+ * shape the driver would never emit.
+ *
+ * RED FALSIFIER (`brokenConfig`): the same plan without its hidden-root masks must let the
+ * worker read the planted peer file.
+ */
+export function probePeerRunHidden({ bwrapBin = '/usr/bin/bwrap', scratchDir, brokenConfig = false } = {}) {
+  const root = fs.realpathSync(scratchDir);
+  const project = path.join(root, 'project');
+  const fgosDir = path.join(project, '.fgos');
+  const peerReport = path.join(fgosDir, 'assignments', 'probe-unit', 'peer', '1', 'outbox', 'report-1.md');
+  const ownDir = path.join(fgosDir, 'assignments', 'probe-unit', 'self', '1');
+  const ownBrief = path.join(ownDir, 'brief.md');
+  const runDir = path.join(ownDir, 'runs', '01');
+  const outboxFile = path.join(runDir, 'worker-output', 'outbox', 'probe-out.txt');
+  const tempRoot = path.join(root, 'confinement-temp');
+  const peerHomeFile = path.join(tempRoot, 'peer-dispatch', 'home', 'transcript.txt');
+
+  for (const file of [peerReport, ownBrief, peerHomeFile]) {
+    fs.mkdirSync(path.dirname(file), { recursive: true });
+    fs.writeFileSync(file, 'PLANTED');
+  }
+  fs.mkdirSync(path.dirname(outboxFile), { recursive: true });
+
+  const sibling = cp.spawn('sleep', ['60'], { stdio: 'ignore' });
+  try {
+    const resources = resolveConfinementResources({
+      dispatchId: 'probe-peer-run-hidden',
+      context: { cwd: project, repoRoot: project, runDir, fgosDir, assignmentLaunchContext: {} },
+      grants: [
+        { resource: 'run-output', access: 'write', scope: 'dispatch' },
+        { resource: 'workspace', access: 'read', scope: 'dispatch' },
+      ],
+      backendConfig: { tempRoot },
+      blind: true,
+    }).filter((res) => !(brokenConfig && res.resource === 'hidden-root'));
+
+    const script = `
+      const fs = require('fs');
+      const code = (fn) => { try { fn(); return 'ok'; } catch (e) { return e.code; } };
+      process.stdout.write(JSON.stringify({
+        peerReport: code(() => fs.readFileSync(${JSON.stringify(peerReport)})),
+        peerHome: code(() => fs.readFileSync(${JSON.stringify(peerHomeFile)})),
+        peerProcess: code(() => fs.readFileSync('/proc/${sibling.pid}/cmdline')),
+        ownBrief: code(() => fs.readFileSync(${JSON.stringify(ownBrief)})),
+        ownBriefWrite: code(() => fs.writeFileSync(${JSON.stringify(ownBrief)}, 'EDIT')),
+        outbox: code(() => fs.writeFileSync(${JSON.stringify(outboxFile)}, 'WRITTEN')),
+      }));
+    `;
+    const request = {
+      dispatchId: 'probe-peer-run-hidden',
+      override: { controls: { hostRead: 'blind' } },
+      invocation: { command: 'node', args: ['-e', script], env: {}, resourceBindings: [] },
+      context: { cwd: project, repoRoot: project, runDir, fgosDir },
+    };
+    const prepared = prepareBwrapSync({ resources }, request, { id: 'bwrap', config: { executable: bwrapBin } });
+    const res = cp.spawnSync(prepared.invocation.command, prepared.invocation.args, { encoding: 'utf8' });
+
+    let seen = null;
+    try {
+      seen = JSON.parse(res.stdout);
+    } catch {
+      // seen stays null: the worker never reported
+    }
+    const outboxHostSide = fs.existsSync(outboxFile) && fs.readFileSync(outboxFile, 'utf8') === 'WRITTEN';
+    const passed = Boolean(seen)
+      && seen.peerReport === 'ENOENT'
+      && seen.peerHome === 'ENOENT'
+      && seen.peerProcess === 'ENOENT'
+      && seen.ownBrief === 'ok'
+      && seen.ownBriefWrite === 'EROFS'
+      && seen.outbox === 'ok'
+      && outboxHostSide;
+    return {
+      probe: 'peer-run-hidden',
+      passed,
+      detail: passed
+        ? 'a blind worker cannot read a peer run, a peer home or a peer process, and keeps its own directory and outbox'
+        : `blind read probe failed: ${seen ? JSON.stringify(seen) : (res.stderr || 'worker reported nothing')}`,
+    };
+  } finally {
+    sibling.kill();
+  }
+}
+
+/**
+ * Run all 8 probes against a bwrap executable and test directory. A blind dispatch adds a
+ * ninth, probePeerRunHidden.
  */
 export function runAllConfinementProbes({
   bwrapBin = '/usr/bin/bwrap',
   scratchDir = null,
+  blind = false,
 } = {}) {
   if (os.platform() !== 'linux') {
     return {
@@ -495,6 +589,11 @@ export function runAllConfinementProbes({
       probeExecutorCredentialsReadOnly({ bwrapBin, credsDir }),
       probeHostReadAndNetworkNotOverclaimed({ bwrapBin }),
     ];
+    if (blind) {
+      const blindDir = path.join(tempRoot, 'blind');
+      fs.mkdirSync(blindDir, { recursive: true });
+      results.push(probePeerRunHidden({ bwrapBin, scratchDir: blindDir }));
+    }
 
     const allPassed = results.every((r) => r.passed);
     const failed = results.filter((r) => !r.passed);
@@ -502,7 +601,7 @@ export function runAllConfinementProbes({
     return {
       passed: allPassed,
       message: allPassed
-        ? 'all 8 local-bwrap-v1 confinement probes passed'
+        ? `all ${results.length} local-bwrap-v1 confinement probes passed`
         : `confinement probes failed: ${failed.map((f) => `${f.probe} (${f.detail})`).join('; ')}`,
       results,
     };
