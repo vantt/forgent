@@ -101,6 +101,34 @@ test('fgos doctor --fix never touches an existing trustedWorkspaces list or an a
   fs.rmSync(homeDir, { recursive: true, force: true });
 });
 
+test('findAgySubHomes also finds the credential homes of the declared gemini accounts, which a confined pane actually runs as', () => {
+  const fakeHome = '/home/fakeuser';
+  const config = {
+    runner: {
+      executors: {
+        gemini: { invocations: [{ id: 'agy-1', command: 'agy', env: { HOME: '${HOME}/.agy-homes/acc-1' } }] },
+      },
+      providers: {
+        gemini: {
+          accounts: {
+            'acc-1': { credentialSource: { kind: 'home-files', home: '${HOME}/.agy-homes/acc-1', files: ['x'] } },
+            'acc-2': { credentialSource: { kind: 'home-files', home: '${HOME}/.agy-homes/acc-2', files: ['x'] } },
+          },
+        },
+        xai: {
+          accounts: { vantt: { credentialSource: { kind: 'home-files', home: '${HOME}/.pi/accounts/grok-vantt', files: ['x'] } } },
+        },
+      },
+    },
+  };
+  const found = findAgySubHomes('/dummy', { homeDir: fakeHome, config });
+  assert.deepEqual(
+    found.map((f) => f.resolvedPath).sort(),
+    [path.resolve('/home/fakeuser/.agy-homes/acc-1'), path.resolve('/home/fakeuser/.agy-homes/acc-2')].sort(),
+    'one entry per home, the xai pi account is not an agy home',
+  );
+});
+
 test('findAgySubHomes discovers agy sub-HOMEs across single and multi-executor configs and resolves ${HOME}', () => {
   const fakeHome = '/home/fakeuser';
   const config = {

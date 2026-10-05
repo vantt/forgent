@@ -1,21 +1,21 @@
 # agy blind canary (2026-10-05)
 
-Account: `~/.agy-homes/tetcu72` (always-proceed, forgentX trusted). Invocations added to `.fgos/config.json` under executor `gemini`: `agy-herdr-tetcu72` (herdr-spawn, bwrap) and `agy-cli-bwrap-tetcu72` (cli-spawn, bwrap), copied from the mucdong ones with only the home changed.
+**Correction (same day).** These runs were first described as run on the `tetcu72` account through new `agy-*-tetcu72` invocations. They were not: `provider-capacity-selection.json` of each run shows account `mucdong`. The capacity layer picks the account per provider from `runner.providers.gemini.accounts` and seeds the pane's private home from it, ignoring the `HOME` in the invocation name. The `tetcu72` and `tetnu` invocations were therefore removed, and both are now declared as gemini accounts in the global config; the blind and herdr results below stand, since neither depends on the account.
 
 ## Results
 
 | Check | Invocation | Result |
 |---|---|---|
-| Plain read-only unit | agy-herdr-tetcu72 | pass (claim: README first heading, 137 lines). Pane started clean, herdr detected `agy`, brief taken: the confined-pane HOME fix works end to end |
-| Blind unit with a `unit-run:` input | agy-herdr-tetcu72 | pass: nonce read from its own copy; the source report path gave "no such file or directory"; `ls .fgos/assignments` showed 1 entry (its own) |
-| Blind unit, same probe | agy-cli-bwrap-tetcu72 | pass: same three results |
+| Plain read-only unit | agy-herdr (account mucdong) | pass (claim: README first heading, 137 lines). Pane started clean, herdr detected `agy`, brief taken: the confined-pane HOME fix works end to end |
+| Blind unit with a `unit-run:` input | agy-herdr (account mucdong) | pass: nonce read from its own copy; the source report path gave "no such file or directory"; `ls .fgos/assignments` showed 1 entry (its own) |
+| Blind unit, same probe | agy-cli-bwrap (account mucdong) | pass: same three results |
 
 Evidence runs: unit A `unit-run-1791192696761-bcf946dd` (wrote `NONCE=agy-blind-5521`), blind units `unit-run-1791192719865-869baa90` (herdr) and `unit-run-1791192852426-b9ae79dc` (cli bwrap). `inputMap` in the blind unit's `unit.json` records the neutral copy name and the source sha256.
 
 ## Quota notes
 
-- mucdong still answered "Individual quota reached ... Resets in 5m" at 16:22; tetcu72 answered the same once ("Resets in 2s") and then ran normally. Quota resets fast, so a canary can need one retry.
-- tetnu has only `agy-cli-tetnu` (not confined), so a read-only unit is refused with `posture-unavailable` on it.
+- The account (mucdong) answered "Individual quota reached ... Resets in 5m" at 16:22 and "Resets in 2s" at 16:27, then ran normally. Quota resets fast, so a canary can need one retry.
+- tetnu has only `agy-cli-tetnu` (not confined), so a read-only unit is refused with `posture-unavailable` on it: for read-only and blind units use the confined invocations, which take their account from the capacity layer.
 
 ## Changes made from this canary
 

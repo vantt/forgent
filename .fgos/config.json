@@ -994,7 +994,7 @@
       },
       "gemini": {
         "kind": "agent",
-        "description": "Gemini provider via Antigravity CLI (2026-09-17 provider-naming pass, was executor id \"agy\"). Invocation id = <bin>-<mode>-<account>: agy-cli-mucdong/agy-herdr-mucdong/agy-cli-bwrap-mucdong (mucdong account) + agy-cli-tetnu (tetnu account) + agy-herdr-tetcu72/agy-cli-bwrap-tetcu72 (tetcu72 account) + agy-herdr-tetnu/agy-cli-bwrap-tetnu (tetnu account, confined).",
+        "description": "Gemini provider via Antigravity CLI (2026-09-17 provider-naming pass, was executor id \"agy\"). Invocation id = <bin>-<mode>-<account>: agy-cli-mucdong/agy-herdr-mucdong/agy-cli-bwrap-mucdong (mucdong account) + agy-cli-tetnu (tetnu account). The account a confined (herdr or bwrap) invocation runs as is chosen per provider by the capacity layer from runner.providers.gemini.accounts (mucdong, tetcu72, tetnu), not by the invocation name.",
         "allowCrossProvider": true,
         "providerModel": "gemini",
         "for": [
@@ -1102,130 +1102,6 @@
             "env": {
               "HOME": "${HOME}/.agy-homes/tetnu"
             }
-          },
-          {
-            "id": "agy-herdr-tetcu72",
-            "via": "cli",
-            "adapter": "herdr-spawn",
-            "confinement": {
-              "backend": "bwrap"
-            },
-            "command": "agy",
-            "args": [
-              "--mode",
-              "accept-edits",
-              "--new-project",
-              "--model",
-              "{model}"
-            ],
-            "interactiveMode": {
-              "exitCommand": "/exit",
-              "kind": "agy",
-              "trustStore": {
-                "kind": "agy"
-              }
-            },
-            "env": {
-              "HOME": "${HOME}/.agy-homes/tetcu72"
-            },
-            "resourceBindings": [
-              {
-                "resource": "private-home",
-                "target": {
-                  "kind": "env",
-                  "name": "HOME"
-                }
-              }
-            ]
-          },
-          {
-            "id": "agy-cli-bwrap-tetcu72",
-            "via": "cli",
-            "adapter": "cli-spawn",
-            "command": "agy",
-            "args": [
-              "-p",
-              "{prompt}",
-              "--model",
-              "{model}"
-            ],
-            "confinement": {
-              "backend": "bwrap"
-            },
-            "env": {
-              "HOME": "${HOME}/.agy-homes/tetcu72"
-            },
-            "resourceBindings": [
-              {
-                "resource": "private-home",
-                "target": {
-                  "kind": "env",
-                  "name": "HOME"
-                }
-              }
-            ]
-          },
-          {
-            "id": "agy-herdr-tetnu",
-            "via": "cli",
-            "adapter": "herdr-spawn",
-            "confinement": {
-              "backend": "bwrap"
-            },
-            "command": "agy",
-            "args": [
-              "--mode",
-              "accept-edits",
-              "--new-project",
-              "--model",
-              "{model}"
-            ],
-            "interactiveMode": {
-              "exitCommand": "/exit",
-              "kind": "agy",
-              "trustStore": {
-                "kind": "agy"
-              }
-            },
-            "env": {
-              "HOME": "${HOME}/.agy-homes/tetnu"
-            },
-            "resourceBindings": [
-              {
-                "resource": "private-home",
-                "target": {
-                  "kind": "env",
-                  "name": "HOME"
-                }
-              }
-            ]
-          },
-          {
-            "id": "agy-cli-bwrap-tetnu",
-            "via": "cli",
-            "adapter": "cli-spawn",
-            "command": "agy",
-            "args": [
-              "-p",
-              "{prompt}",
-              "--model",
-              "{model}"
-            ],
-            "confinement": {
-              "backend": "bwrap"
-            },
-            "env": {
-              "HOME": "${HOME}/.agy-homes/tetnu"
-            },
-            "resourceBindings": [
-              {
-                "resource": "private-home",
-                "target": {
-                  "kind": "env",
-                  "name": "HOME"
-                }
-              }
-            ]
           }
         ]
       },

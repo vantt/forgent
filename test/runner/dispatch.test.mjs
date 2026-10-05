@@ -1040,7 +1040,7 @@ test('the committed .fgos/config.json runner section declares the consolidated g
   assert.equal(executor.allowCrossProvider, true);
   assert.ok(Array.isArray(executor.invocations));
   const ids = executor.invocations.map((inv) => inv.id);
-  for (const id of ['agy-cli-mucdong', 'agy-herdr-mucdong', 'agy-cli-bwrap-mucdong', 'agy-cli-tetnu', 'agy-herdr-tetcu72', 'agy-cli-bwrap-tetcu72']) {
+  for (const id of ['agy-cli-mucdong', 'agy-herdr-mucdong', 'agy-cli-bwrap-mucdong', 'agy-cli-tetnu']) {
     assert.ok(ids.includes(id), `gemini must declare the "${id}" invocation`);
   }
   const invocation = executor.invocations.find((inv) => inv.id === 'agy-cli-mucdong');

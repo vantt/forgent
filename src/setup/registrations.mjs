@@ -1476,7 +1476,13 @@ registerFix({
 registerCheck({
   id: 'agy-sub-homes-configured',
   description: 'agy sub-HOMEs referenced in executor configs have settings.json configured with toolPermission: always-proceed',
-  check: (cwd) => checkAgySubHomesConfigured(cwd),
+  // The merged config (project + global): the credential homes of the declared gemini accounts live in
+  // the global one, and a confined invocation runs as one of those accounts.
+  check: (cwd) => {
+    let config = null;
+    try { config = { runner: loadRunnerConfigFromDir(cwd) }; } catch { /* fall back to the project file */ }
+    return checkAgySubHomesConfigured(cwd, { config });
+  },
 });
 
 let cachedBwrapResult = null;
