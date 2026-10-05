@@ -7,8 +7,9 @@ import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
 
-import { reportRefOf, reportRefsOf, resolveUnitInputs, HandoffRefError } from '../../../src/runner/execution/handoff-refs.mjs';
+import { reportRefOf, reportRefsOf, resolveUnitInputs, anonymousInputName, HandoffRefError } from '../../../src/runner/execution/handoff-refs.mjs';
 
+const resolveRefs = (inputs, root, options) => resolveUnitInputs(inputs, root, options).refs;
 const sha = (text) => crypto.createHash('sha256').update(text).digest('hex');
 
 function makeRoot() {
@@ -88,17 +89,17 @@ test('in-run refs keep input order and list the same path once', () => {
 test('a unit-run input resolves to the report of that role', () => {
   const root = makeRoot();
   const { runDir } = settleAttempt(root, 'unit-run-a', 'producer', '1', { report: '# done\n' });
-  assert.deepEqual(resolveUnitInputs(['unit-run:unit-run-a/producer'], root), [path.join(runDir, 'report.md')]);
+  assert.deepEqual(resolveRefs(['unit-run:unit-run-a/producer'], root), [path.join(runDir, 'report.md')]);
 });
 
 test('repo-relative inputs pass through unchanged and each ref is listed once', () => {
   const root = makeRoot();
   const { runDir } = settleAttempt(root, 'unit-run-a', 'producer', '1', { report: '# done\n' });
   assert.deepEqual(
-    resolveUnitInputs(['docs/a.md', 'unit-run:unit-run-a/producer', 'docs/a.md', 'unit-run:unit-run-a/producer'], root),
+    resolveRefs(['docs/a.md', 'unit-run:unit-run-a/producer', 'docs/a.md', 'unit-run:unit-run-a/producer'], root),
     ['docs/a.md', path.join(runDir, 'report.md')],
   );
-  assert.deepEqual(resolveUnitInputs(undefined, root), []);
+  assert.deepEqual(resolveRefs(undefined, root), []);
 });
 
 test('a unit-run input names its failure: no such run, no such role, no report', () => {
@@ -108,7 +109,7 @@ test('a unit-run input names its failure: no such run, no such role, no report',
 
   const reasonOf = (input) => {
     try {
-      resolveUnitInputs([input], root);
+      resolveRefs([input], root);
     } catch (err) {
       assert.ok(err instanceof HandoffRefError, String(err));
       assert.ok(err.message.includes(`handoff-ref-unresolved: ${input}: ${err.reason}`), err.message);
@@ -126,11 +127,11 @@ test('the highest round of a role wins, and within a round the latest fallback a
   const root = makeRoot();
   settleAttempt(root, 'unit-run-a', 'producer', '1', { report: 'round one\n' });
   const second = settleAttempt(root, 'unit-run-a', 'producer', '2', { report: 'round two\n' });
-  assert.deepEqual(resolveUnitInputs(['unit-run:unit-run-a/producer'], root), [path.join(second.runDir, 'report.md')]);
+  assert.deepEqual(resolveRefs(['unit-run:unit-run-a/producer'], root), [path.join(second.runDir, 'report.md')]);
 
   settleAttempt(root, 'unit-run-b', 'reviewer', '1', { report: 'first binding\n' });
   const fallback = settleAttempt(root, 'unit-run-b', 'reviewer', '1-fb1', { report: 'after the provider limit\n' });
-  assert.deepEqual(resolveUnitInputs(['unit-run:unit-run-b/reviewer'], root), [path.join(fallback.runDir, 'report.md')]);
+  assert.deepEqual(resolveRefs(['unit-run:unit-run-b/reviewer'], root), [path.join(fallback.runDir, 'report.md')]);
 });
 
 /** Write the answer file of one gate the way the Workflow runner leaves it. */
@@ -147,7 +148,7 @@ test('a gate-answer input resolves to the absolute path of the recorded answer',
   const file = recordAnswer(root, 'wf-run-1', 'voting-ranking');
   const { runDir } = settleAttempt(root, 'unit-run-a', 'producer', '1', { report: '# done\n' });
   assert.deepEqual(
-    resolveUnitInputs(['unit-run:unit-run-a/producer', 'gate-answer:wf-run-1/voting-ranking', 'gate-answer:wf-run-1/voting-ranking'], root),
+    resolveRefs(['unit-run:unit-run-a/producer', 'gate-answer:wf-run-1/voting-ranking', 'gate-answer:wf-run-1/voting-ranking'], root),
     [path.join(runDir, 'report.md'), file],
   );
   assert.ok(path.isAbsolute(file));
@@ -158,7 +159,7 @@ test('a gate-answer input names its failure: no answer recorded, or an id that l
   recordAnswer(root, 'wf-run-1', 'voting-ranking');
   const reasonOf = (input) => {
     try {
-      resolveUnitInputs([input], root);
+      resolveRefs([input], root);
     } catch (err) {
       assert.ok(err instanceof HandoffRefError, String(err));
       assert.ok(err.message.includes(`handoff-ref-unresolved: ${input}: ${err.reason}`), err.message);
@@ -171,4 +172,69 @@ test('a gate-answer input names its failure: no answer recorded, or an id that l
   assert.equal(reasonOf('gate-answer:../wf-run-1/voting-ranking'), 'no-such-answer');
   assert.equal(reasonOf('gate-answer:wf-run-1/..'), 'no-such-answer');
   assert.equal(reasonOf('gate-answer:malformed'), 'no-such-answer');
+});
+
+test('anonymized inputs are copied under neutral names in input order, byte for byte, and only the copies are listed', () => {
+  const root = makeRoot();
+  const a = settleAttempt(root, 'unit-run-a', 'panelist-1', '1', { report: 'first opinion é\n' });
+  const b = settleAttempt(root, 'unit-run-a', 'panelist-2', '1', { report: 'second opinion\n' });
+  const answer = recordAnswer(root, 'wf-run-1', 'gate');
+  const into = path.join(root, 'own-unit-dir', 'inputs');
+
+  const { refs, inputMap } = resolveUnitInputs(
+    ['docs/a.md', 'unit-run:unit-run-a/panelist-2', 'gate-answer:wf-run-1/gate', 'unit-run:unit-run-a/panelist-1'],
+    root,
+    { anonymizeInto: into },
+  );
+
+  // Other refs keep their form and order; the copies follow, A for the first unit-run input.
+  assert.deepEqual(refs, ['docs/a.md', answer, path.join(into, 'seat-A.md'), path.join(into, 'seat-B.md')]);
+  assert.ok(fs.readFileSync(path.join(into, 'seat-A.md')).equals(fs.readFileSync(path.join(b.runDir, 'report.md'))));
+  assert.ok(fs.readFileSync(path.join(into, 'seat-B.md')).equals(fs.readFileSync(path.join(a.runDir, 'report.md'))));
+  for (const ref of refs.filter((r) => r.startsWith(into))) {
+    assert.ok(!/panelist|unit-run-a|runs/.test(ref), `no identity in ${ref}`);
+  }
+  assert.deepEqual(inputMap, [
+    { name: 'seat-A.md', input: 'unit-run:unit-run-a/panelist-2', source: path.join(b.runDir, 'report.md') },
+    { name: 'seat-B.md', input: 'unit-run:unit-run-a/panelist-1', source: path.join(a.runDir, 'report.md') },
+  ]);
+});
+
+test('without the option nothing is copied and no mapping is made', () => {
+  const root = makeRoot();
+  const { runDir } = settleAttempt(root, 'unit-run-a', 'panelist-1', '1', { report: 'x\n' });
+  const { refs, inputMap } = resolveUnitInputs(['unit-run:unit-run-a/panelist-1'], root);
+  assert.deepEqual(refs, [path.join(runDir, 'report.md')]);
+  assert.deepEqual(inputMap, []);
+});
+
+test('anonymizing still refuses an edited report and leaves no directory behind', () => {
+  const root = makeRoot();
+  const { runDir } = settleAttempt(root, 'unit-run-a', 'panelist-1', '1', { report: 'x\n' });
+  fs.writeFileSync(path.join(runDir, 'report.md'), 'changed\n');
+  const into = path.join(root, 'own-unit-dir', 'inputs');
+  assert.throws(
+    () => resolveUnitInputs(['unit-run:unit-run-a/panelist-1'], root, { anonymizeInto: into }),
+    (err) => err instanceof HandoffRefError && err.reason === 'report-changed-after-settle',
+  );
+  assert.throws(
+    () => resolveUnitInputs(['unit-run:unit-run-a/nobody'], root, { anonymizeInto: into }),
+    (err) => err instanceof HandoffRefError && err.reason === 'no-such-role',
+  );
+  assert.equal(fs.existsSync(into), false);
+});
+
+test('a copy that cannot be made is a named hand-off failure', () => {
+  const root = makeRoot();
+  settleAttempt(root, 'unit-run-a', 'panelist-1', '1', { report: 'x\n' });
+  const blocker = path.join(root, 'blocker');
+  fs.writeFileSync(blocker, 'a file where a directory is needed');
+  assert.throws(
+    () => resolveUnitInputs(['unit-run:unit-run-a/panelist-1'], root, { anonymizeInto: path.join(blocker, 'inputs') }),
+    (err) => err instanceof HandoffRefError && /^copy-failed/.test(err.reason),
+  );
+});
+
+test('neutral names run on past Z', () => {
+  assert.deepEqual([0, 1, 25, 26, 27].map(anonymousInputName), ['seat-A', 'seat-B', 'seat-Z', 'seat-AA', 'seat-AB']);
 });

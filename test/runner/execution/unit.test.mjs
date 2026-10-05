@@ -164,6 +164,14 @@ test('validateUnit: validates inputs as repo-relative paths or unit-run refs', (
   assert.deepEqual(unit.inputs, ['docs/readme.md', 'unit-run:u0/reviewer']);
 });
 
+test('validateUnit: anonymizeInputs is an optional boolean, absent unless true', () => {
+  const base = { id: 'u1', objective: 'obj', capability: 'verb' };
+  assert.equal(validateUnit({ ...base, anonymizeInputs: true }).anonymizeInputs, true);
+  assert.equal('anonymizeInputs' in validateUnit(base), false);
+  assert.equal('anonymizeInputs' in validateUnit({ ...base, anonymizeInputs: false }), false);
+  assert.throws(() => validateUnit({ ...base, anonymizeInputs: 'yes' }), RunnerConfigError);
+});
+
 test('validateUnit: accepts gate-answer refs and rejects malformed ones', () => {
   const unit = validateUnit({ id: 'u1', objective: 'obj', capability: 'verb', inputs: ['gate-answer:wf-run-1/voting-ranking'] });
   assert.deepEqual(unit.inputs, ['gate-answer:wf-run-1/voting-ranking']);

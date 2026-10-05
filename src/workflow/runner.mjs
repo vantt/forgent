@@ -23,7 +23,7 @@ import {
 import { translatePlanToWorkflow } from './plan-source.mjs';
 import { runUnit, snapshotRunnerConfig, resolveGitRoots } from '../runner/execution/run.mjs';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
-import { gateAnswerFile } from '../runner/execution/handoff-refs.mjs';
+import { anonymousInputName, gateAnswerFile } from '../runner/execution/handoff-refs.mjs';
 
 const GATE_ANSWER_NOTE_CHARS = 200;
 
@@ -51,6 +51,10 @@ function buildUnitHandoff({ template, state, step, workflow }) {
   };
   collect(step.id);
 
+  // With anonymizeInputs the Execution Core copies each role's report as seat-A, seat-B, ... in
+  // the order of `inputs`, so the index below names them that way and nothing else: no step,
+  // unit, unit run or role.
+  const anonymize = template.anonymizeInputs === true;
   const index = [];
   const inputs = [];
   for (const prior of workflow.steps) {
@@ -58,6 +62,14 @@ function buildUnitHandoff({ template, state, step, workflow }) {
     for (const [unitId, unitState] of Object.entries(state.steps[prior.id]?.units ?? {})) {
       if (!unitState.unitRunId) continue;
       const results = (unitState.results ?? []).filter((r) => r?.runResult);
+      if (anonymize) {
+        for (const role of new Set(results.map((r) => r.role))) {
+          const summary = results.filter((r) => r.role === role).at(-1)?.runResult.agentClaim?.summary;
+          index.push(`### ${anonymousInputName(inputs.length)}${summary ? `\nSummary: ${summary}` : ''}`);
+          inputs.push(`unit-run:${unitState.unitRunId}/${role}`);
+        }
+        continue;
+      }
       const summary = results.at(-1)?.runResult.agentClaim?.summary;
       index.push(`### ${prior.id} / ${unitId} (unit run ${unitState.unitRunId})${summary ? `\nSummary: ${summary}` : ''}`);
       for (const role of new Set(results.map((r) => r.role))) inputs.push(`unit-run:${unitState.unitRunId}/${role}`);
@@ -65,7 +77,7 @@ function buildUnitHandoff({ template, state, step, workflow }) {
   }
   if (index.length > 0) {
     parts.push(
-      `Output of earlier steps (the full report of every role is listed under Context refs; read them before answering):\n\n${index.join('\n\n')}`,
+      `Output of earlier steps${anonymize ? ', anonymized' : ''} (the full report of every role is listed under Context refs; read them before answering):\n\n${index.join('\n\n')}`,
     );
   }
 
@@ -323,6 +335,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
             writes: u.template.writes || [],
             dependsOn: u.dependsOn || [],
             inputs: handoff.inputs,
+            ...(u.template.anonymizeInputs ? { anonymizeInputs: true } : {}),
           };
 
           // If unit has writes, prepare worktree

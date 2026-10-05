@@ -260,6 +260,10 @@ export function validateWorkflow(raw) {
           throw new WorkflowDefinitionError(`${unitLabel} params must be an object (pattern params such as members or roleTasks)`);
         }
 
+        if (template.anonymizeInputs !== undefined && typeof template.anonymizeInputs !== 'boolean') {
+          throw new WorkflowDefinitionError(`${unitLabel} anonymizeInputs must be true or false`);
+        }
+
         units.push(
           Object.freeze({
             id: uId,
@@ -272,6 +276,7 @@ export function validateWorkflow(raw) {
               taskSpec: typeof template.taskSpec === 'string' ? template.taskSpec.trim() : undefined,
               persona: typeof template.persona === 'string' && template.persona.trim() ? template.persona.trim() : undefined,
               params: template.params === undefined ? undefined : structuredClone(template.params),
+              anonymizeInputs: template.anonymizeInputs === true ? true : undefined,
             }),
             dependsOn: uDependsOn,
           }),

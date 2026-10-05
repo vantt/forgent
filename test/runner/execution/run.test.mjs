@@ -684,6 +684,66 @@ test('a unit-run input reaches the roles as the absolute path of that role\'s re
   await assert.rejects(() => run(undefined, { resumeUnitRunId: second.unitRunId }), /no resolvedInputs/);
 });
 
+test('anonymizeInputs hands the role a copy under a neutral name, keeps the mapping in unit.json, and a resume reuses it', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha']);
+  const run = (unitData, extra = {}) =>
+    runUnit({ unitData, repoRoot, cwd: worktreeDir, worktree: worktreeDir, pattern: 'solo', ...extra });
+
+  const first = await run({ id: 'u-a', objective: 'Write docs', capability: 'docs:write', writes: [] });
+  const reportOfA = path.join(repoRoot, first.results[0].runResult.settleReports[0].path);
+  const original = fs.readFileSync(reportOfA);
+
+  const second = await run({
+    id: 'u-b',
+    objective: 'Judge it',
+    capability: 'docs:write',
+    writes: [],
+    inputs: ['docs/a.md', `unit-run:${first.unitRunId}/producer`],
+    anonymizeInputs: true,
+  });
+  assert.equal(second.outcome, 'pass');
+  const dirOfB = path.join(repoRoot, '.fgos', 'assignments', second.unitRunId);
+  const copy = path.join(dirOfB, 'inputs', 'seat-A.md');
+  const expected = ['docs/a.md', copy];
+  assert.deepEqual(JSON.parse(fs.readFileSync(path.join(dirOfB, 'producer', '1', 'assignment.json'), 'utf8')).contextRefs, expected);
+  assert.ok(fs.readFileSync(copy).equals(original));
+
+  const unitJson = JSON.parse(fs.readFileSync(path.join(dirOfB, 'unit.json'), 'utf8'));
+  assert.deepEqual(unitJson.resolvedInputs, expected);
+  assert.deepEqual(unitJson.inputMap, [{ name: 'seat-A.md', input: `unit-run:${first.unitRunId}/producer`, source: reportOfA }]);
+
+  // Neither the brief's assignment nor its context refs name the earlier run or role.
+  const assignmentText = fs.readFileSync(path.join(dirOfB, 'producer', '1', 'assignment.json'), 'utf8');
+  assert.ok(!assignmentText.includes(first.unitRunId), 'earlier unit run id not in the assignment');
+
+  // A resume reuses the stored copy and list; the source is not read again.
+  fs.writeFileSync(reportOfA, 'edited after the fact\n');
+  const resumed = await run(undefined, { resumeUnitRunId: second.unitRunId });
+  assert.equal(resumed.outcome, 'pass');
+  assert.deepEqual(JSON.parse(fs.readFileSync(path.join(dirOfB, 'unit.json'), 'utf8')).resolvedInputs, expected);
+  assert.ok(fs.readFileSync(copy).equals(original));
+});
+
+test('an anonymized input that cannot be copied is refused before any unit directory exists', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha']);
+  const assignmentsDir = path.join(repoRoot, '.fgos', 'assignments');
+  const before = fs.existsSync(assignmentsDir) ? fs.readdirSync(assignmentsDir) : [];
+  await assert.rejects(
+    () =>
+      runUnit({
+        unitData: { id: 'u-bad', objective: 'x', capability: 'docs:write', writes: [], inputs: ['unit-run:unit-run-nope/producer'], anonymizeInputs: true },
+        repoRoot,
+        cwd: worktreeDir,
+        worktree: worktreeDir,
+        pattern: 'solo',
+      }),
+    /handoff-ref-unresolved: unit-run:unit-run-nope\/producer: no-such-run/,
+  );
+  assert.deepEqual(fs.existsSync(assignmentsDir) ? fs.readdirSync(assignmentsDir) : [], before);
+});
+
 test('a unit-run input that cannot be resolved is refused before any unit directory exists', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha']);

@@ -124,23 +124,62 @@ function resolveUnitRunRef(input, mainRoot) {
   }
 }
 
+/** The neutral name (without extension) of the nth anonymized input: seat-A ... seat-Z, seat-AA, ... */
+export function anonymousInputName(index) {
+  let n = index;
+  let letters = '';
+  do {
+    letters = String.fromCharCode(65 + (n % 26)) + letters;
+    n = Math.floor(n / 26) - 1;
+  } while (n >= 0);
+  return `seat-${letters}`;
+}
+
 /**
  * Turn a Unit's `inputs` into the context refs its roles are given: a repo-relative path stays as
  * it is, a `unit-run:<unitRunId>/<role>` becomes the absolute path of that role's report, a
  * `gate-answer:<workflowRunId>/<stepId>` the absolute path of the owner's recorded gate answer.
  * Throws before anything is dispatched when a ref cannot be resolved.
  *
+ * With `anonymizeInto` (a directory inside the receiving Unit run), every `unit-run:` report is
+ * instead copied there, byte for byte, as `seat-A`, `seat-B`, ... in input order, and only the
+ * copies are listed, after the other refs. `inputMap` says which input each name stands for; it is
+ * kept in unit.json and never shown to a role. Repo paths and gate answers are not anonymized.
+ * The directory is created only once every source has resolved.
+ *
  * @param {readonly string[]} inputs
  * @param {string} mainRoot main checkout root
- * @returns {string[]}
+ * @param {{anonymizeInto?: string}} [options]
+ * @returns {{refs: string[], inputMap: Array<{name: string, input: string, source: string}>}}
  */
-export function resolveUnitInputs(inputs, mainRoot) {
+export function resolveUnitInputs(inputs, mainRoot, { anonymizeInto } = {}) {
   const refs = [];
+  const sources = [];
   for (const input of inputs ?? []) {
     let ref = input;
-    if (input.startsWith(UNIT_RUN_PREFIX)) ref = resolveUnitRunRef(input, mainRoot);
-    else if (input.startsWith(GATE_ANSWER_PREFIX)) ref = resolveGateAnswerRef(input, mainRoot);
+    if (input.startsWith(UNIT_RUN_PREFIX)) {
+      ref = resolveUnitRunRef(input, mainRoot);
+      if (anonymizeInto) {
+        if (!sources.some((s) => s.input === input)) sources.push({ input, source: ref });
+        continue;
+      }
+    } else if (input.startsWith(GATE_ANSWER_PREFIX)) ref = resolveGateAnswerRef(input, mainRoot);
     if (!refs.includes(ref)) refs.push(ref);
   }
-  return refs;
+
+  const inputMap = [];
+  if (sources.length > 0) {
+    try {
+      fs.mkdirSync(anonymizeInto, { recursive: true });
+      sources.forEach(({ input, source }, index) => {
+        const name = `${anonymousInputName(index)}${path.extname(source)}`;
+        fs.copyFileSync(source, path.join(anonymizeInto, name));
+        inputMap.push({ name, input, source });
+        refs.push(path.join(anonymizeInto, name));
+      });
+    } catch (err) {
+      throw new HandoffRefError('anonymized inputs', `copy-failed: ${err.message}`);
+    }
+  }
+  return { refs, inputMap };
 }
