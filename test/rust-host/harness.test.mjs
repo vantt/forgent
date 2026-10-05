@@ -280,9 +280,48 @@ test("R5: Coverage floor enumerates all selectors from command-routes.json", () 
   assert.ok(cases.some((c) => c.id === "coverage-signal-process-tree-case"));
 });
 
+test("R5: jsonIgnorePaths drops only the named paths from both sides and still fails any other difference", () => {
+  const result = (data) => ({
+    exitCode: 0,
+    signal: null,
+    spawnedChildren: [],
+    stderrText: "",
+    stdoutText: JSON.stringify({ data_hash: JSON.stringify(data), data }),
+  });
+  const base = { id: "ignore-paths", modes: ["semantic-json"], ignoreChildren: true };
+  const ignore = ["data.gitCommit", "data_hash"];
+
+  const moved = compareResults(
+    { ...base, jsonIgnorePaths: ignore },
+    result({ gitCommit: "aaaaaaa", verbs: ["add"] }),
+    result({ gitCommit: "bbbbbbb", verbs: ["add"] })
+  );
+  assert.equal(moved.passed, true, moved.differences.join("; "));
+
+  const notIgnored = compareResults(
+    base,
+    result({ gitCommit: "aaaaaaa", verbs: ["add"] }),
+    result({ gitCommit: "bbbbbbb", verbs: ["add"] })
+  );
+  assert.equal(notIgnored.passed, false, "without the ignore list a moved commit is a real difference");
+
+  const otherField = compareResults(
+    { ...base, jsonIgnorePaths: ignore },
+    result({ gitCommit: "aaaaaaa", verbs: ["add"] }),
+    result({ gitCommit: "aaaaaaa", verbs: ["add", "ask"] })
+  );
+  assert.equal(otherField.passed, false, "a difference outside the ignored paths must still fail");
+});
+
 test("R5: Node-against-Node passes all coverage-floor cases", async () => {
   const { entryA, entryB } = resolveEntries();
-  const cases = generateCoverageFloorCases();
+  // Both entries are the same source tree, and `version` asks git for HEAD on each invocation, so
+  // a commit made while the suite runs lands between the two. `data_hash` is a digest of `data`,
+  // which is still compared field by field, so ignoring it hides nothing beyond the commit itself.
+  const cases = generateCoverageFloorCases().map((c) => ({
+    ...c,
+    jsonIgnorePaths: ["data.gitCommit", "data_hash"],
+  }));
 
   const scratchReportPath = path.join(os.tmpdir(), `coverage-floor-report-${Date.now()}.json`);
   const suiteResult = await runParitySuite(cases, {
