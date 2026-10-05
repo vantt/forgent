@@ -3,7 +3,8 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
 import { validateWorkflowChecked as validateWorkflow } from './checked.mjs';
 import { loadWorkflow } from './loader.mjs';
@@ -396,20 +397,11 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
 }
 
 /**
- * Start a new Workflow run.
- *
- * @param {object} params
- * @param {string} [params.workflowId] Id of registered workflow
- * @param {object} [params.workflow] In-memory workflow object
- * @param {string} [params.planPath] Path to AgentKit plan.md or plan directory
- * @param {string} [params.request] The owner's request this run serves; given to every unit
- * @param {string} [params.repoRoot]
- * @param {string} [params.cwd]
- * @param {string} [params.worktree]
- * @param {Function} [params.onLog]
- * @returns {Promise<object>} Projected workflow state
+ * Resolve the Workflow definition and record a new run, without advancing it. The run exists
+ * in the store (status `running`, nothing started) as soon as this returns, so its id can be
+ * handed to a caller before any step executes.
  */
-export async function startWorkflow(params = {}) {
+function prepareWorkflowRun(params) {
   const cwd = params.cwd ?? process.cwd();
   const roots = resolveGitRoots(cwd);
   const mainRoot = params.repoRoot ? path.resolve(params.repoRoot) : roots.mainCheckoutRoot;
@@ -432,13 +424,72 @@ export async function startWorkflow(params = {}) {
   }
 
   const configSnapshot = snapshotRunnerConfig(mainRoot);
-  const { workflowRunId } = createWorkflowRun({
+  const { workflowRunId, runDir } = createWorkflowRun({
     repoRoot: mainRoot,
     workflowId,
     workflow,
     configSnapshot,
     request: params.request,
   });
+
+  return { workflowRunId, runDir, workflow, mainRoot, worktreePath };
+}
+
+/**
+ * Start a new Workflow run and hand its advancing to a detached process, returning as soon as
+ * the run is recorded. The caller gets the run id and where to read progress
+ * (`fgos workflow status <id>`); the detached process is `fgos workflow resume <id>`, so it
+ * survives the caller exiting or being killed and stays readable through the same event log.
+ *
+ * Same params as startWorkflow, plus `params.cliPath` to override the CLI entry that is spawned.
+ *
+ * @returns {object} Projected state of the just-recorded run plus `detached: { pid, logPath, statusCommand }`
+ */
+export function startWorkflowDetached(params = {}) {
+  const { workflowRunId, runDir, mainRoot, worktreePath } = prepareWorkflowRun(params);
+
+  const cliPath = params.cliPath ?? fileURLToPath(new URL('../../bin/fgos.mjs', import.meta.url));
+  const args = [cliPath, 'workflow', 'resume', workflowRunId, '--dir', mainRoot];
+  if (params.worktree) args.push('--worktree', worktreePath);
+
+  const logPath = path.join(runDir, 'advance.log');
+  const logFd = fs.openSync(logPath, 'a');
+  let child;
+  try {
+    child = spawn(process.execPath, args, {
+      cwd: params.cwd ?? process.cwd(),
+      detached: true,
+      stdio: ['ignore', logFd, logFd],
+    });
+  } finally {
+    fs.closeSync(logFd);
+  }
+  child.on('error', () => {});
+  child.unref();
+
+  const state = projectWorkflowState(readWorkflowEvents({ repoRoot: mainRoot, workflowRunId }));
+  return {
+    ...state,
+    detached: { pid: child.pid ?? null, logPath, statusCommand: `fgos workflow status ${workflowRunId}` },
+  };
+}
+
+/**
+ * Start a new Workflow run and advance it in this process until it completes, fails, or parks.
+ *
+ * @param {object} params
+ * @param {string} [params.workflowId] Id of registered workflow
+ * @param {object} [params.workflow] In-memory workflow object
+ * @param {string} [params.planPath] Path to AgentKit plan.md or plan directory
+ * @param {string} [params.request] The owner's request this run serves; given to every unit
+ * @param {string} [params.repoRoot]
+ * @param {string} [params.cwd]
+ * @param {string} [params.worktree]
+ * @param {Function} [params.onLog]
+ * @returns {Promise<object>} Projected workflow state
+ */
+export async function startWorkflow(params = {}) {
+  const { workflowRunId, workflow, mainRoot, worktreePath } = prepareWorkflowRun(params);
 
   return await advanceWorkflowRun({
     repoRoot: mainRoot,

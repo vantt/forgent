@@ -319,7 +319,7 @@ test('CLI: fgos workflow start, status, answer, and legacy operations', () => {
   // 1. fgos workflow start --plan
   const startOut = execFileSync(
     process.execPath,
-    [BIN_FGOS, 'workflow', 'start', '--plan', planDir, '--dir', tmp],
+    [BIN_FGOS, 'workflow', 'start', '--plan', planDir, '--dir', tmp, '--foreground'],
     { cwd: tmp, encoding: 'utf8' },
   );
   assert.ok(startOut.includes('wf-run-'));
@@ -343,6 +343,33 @@ test('CLI: fgos workflow start, status, answer, and legacy operations', () => {
     { cwd: tmp, encoding: 'utf8' },
   );
   assert.ok(opsOut.includes('validate-plan') || opsOut.includes('operations'));
+});
+
+test('CLI: fgos workflow start returns the run id at once and a detached process finishes the run', async () => {
+  const tmp = setupTestRepo();
+  const planDir = path.join(tmp, 'detached-plan');
+  fs.mkdirSync(planDir);
+  fs.writeFileSync(path.join(planDir, 'plan.md'), '---\ntitle: "Detached Plan"\n---\n');
+  fs.writeFileSync(path.join(planDir, 'phase-01-start.md'), '---\nphase: 1\ntitle: "Start Phase"\ndependencies: []\n---\n');
+
+  const startOut = execFileSync(
+    process.execPath,
+    [BIN_FGOS, 'workflow', 'start', '--plan', planDir, '--dir', tmp],
+    { cwd: tmp, encoding: 'utf8' },
+  );
+  const wfRunId = /"workflowRunId":\s*"([^"]+)"/.exec(startOut)?.[1];
+  assert.ok(wfRunId, 'start must print the workflowRunId');
+  assert.ok(startOut.includes(`fgos workflow status ${wfRunId}`), 'start must say where to read progress');
+  const logPath = path.join(tmp, '.fgos', 'workflow-runs', wfRunId, 'advance.log');
+  assert.ok(fs.existsSync(logPath), 'the detached process log must exist from the start');
+
+  // The detached process advances the run; it is read back through the status verb.
+  let status = null;
+  for (let i = 0; i < 100 && status !== 'completed'; i += 1) {
+    status = statusWorkflow(wfRunId, { repoRoot: tmp, cwd: tmp }).status;
+    if (status !== 'completed') await new Promise((r) => setTimeout(r, 200));
+  }
+  assert.equal(status, 'completed', 'the detached process must finish the run');
 });
 
 test('a unit refused by policy fails its step and the workflow; dependent steps never run', async () => {

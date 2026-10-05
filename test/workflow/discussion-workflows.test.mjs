@@ -315,7 +315,7 @@ test('CLI: fgos workflow start and status for discussion workflows', () => {
   // Test delphi CLI
   const startDelphi = execFileSync(
     process.execPath,
-    [BIN_FGOS, 'workflow', 'start', 'delphi', '--dir', tmp],
+    [BIN_FGOS, 'workflow', 'start', 'delphi', '--dir', tmp, '--foreground'],
     { cwd: tmp, encoding: 'utf8' },
   );
   assert.ok(startDelphi.includes('wf-run-'), 'start should print workflowRunId');
@@ -332,7 +332,7 @@ test('CLI: fgos workflow start and status for discussion workflows', () => {
   // Test nominal-group CLI (parks at human gate)
   const startNominal = execFileSync(
     process.execPath,
-    [BIN_FGOS, 'workflow', 'start', 'nominal-group', '--dir', tmp],
+    [BIN_FGOS, 'workflow', 'start', 'nominal-group', '--dir', tmp, '--foreground'],
     { cwd: tmp, encoding: 'utf8' },
   );
   const matchNominal = /"workflowRunId":\s*"([^"]+)"/.exec(startNominal);

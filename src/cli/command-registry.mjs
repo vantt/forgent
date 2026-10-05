@@ -1539,6 +1539,7 @@ export const COMMAND_REGISTRY = [
         id: { type: 'string', description: 'Workflow ID or Workflow Run ID.' },
         plan: { type: 'string', description: '"start" only: path to AgentKit plan.md or plan directory.' },
         request: { type: 'string', description: '"start" only: the owner request this run serves; every unit receives it in its objective.' },
+        foreground: { type: 'boolean', description: '"start" only: advance the run in this process and return when it completes, fails, or parks. Without it, "start" records the run, hands it to a detached process (log: .fgos/workflow-runs/<id>/advance.log) and returns the run id at once; read progress with "status".' },
         step: { type: 'string', description: '"answer" only: step ID to answer.' },
         answer: { type: 'string', description: '"answer" only: answer text.' },
         dir: { type: 'string', description: 'Main checkout root directory.' },
@@ -1552,6 +1553,7 @@ export const COMMAND_REGISTRY = [
     examples: [
       'fgos workflow start coding/feature',
       'fgos workflow start --plan plans/my-plan',
+      'fgos workflow start delphi --foreground',
       'fgos workflow status wf-run-1234',
       'fgos workflow answer wf-run-1234 --step approve --answer yes',
       'fgos workflow resume wf-run-1234',
