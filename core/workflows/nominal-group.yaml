@@ -16,6 +16,7 @@ steps:
           pattern: panel
           persona: panelist
           objective: Silently generate independent ideas and options without cross-influence
+          blind: true
   - id: round-robin-sharing
     title: Round-Robin Sharing
     dependsOn: [silent-generation]

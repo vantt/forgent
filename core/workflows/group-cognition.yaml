@@ -16,6 +16,7 @@ steps:
           pattern: panel
           persona: researcher
           objective: Conduct divergent exploration and sense-making across multiple independent researcher perspectives
+          blind: true
   - id: dialectical-inquiry
     title: Dialectical Inquiry
     dependsOn: [sense-making]
