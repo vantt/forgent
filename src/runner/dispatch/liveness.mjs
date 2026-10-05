@@ -58,11 +58,12 @@ export const DEFAULT_DEATH_THRESHOLD = 3;
 
 /**
  * Screen text that means "this agent is paused by a provider limit, not
- * broken". NOT MEASURED: no provider's exact wording has been captured in
- * this repo yet, so these are conservative guesses kept deliberately generic,
- * and the list is replaceable per executor. A miss costs a `timed-out-idle`
- * instead of a `paused-limit` -- the pane is kept either way, so a wrong
- * guess here loses a label, never a worker.
+ * broken". Mostly NOT MEASURED: most of these are conservative guesses kept
+ * deliberately generic, and the list is replaceable per executor. The one
+ * measured wording is the codex pane's "Selected model is at capacity. Please
+ * try a different model." (captured 2026-10-05). A miss costs a
+ * `timed-out-idle` instead of a `paused-limit` -- the pane is kept either way,
+ * so a wrong guess here loses a label, never a worker.
  */
 export const DEFAULT_USAGE_LIMIT_PATTERNS = Object.freeze([
   /usage limit/i,
@@ -70,6 +71,7 @@ export const DEFAULT_USAGE_LIMIT_PATTERNS = Object.freeze([
   /quota (?:exceeded|reached)/i,
   /too many requests/i,
   /try again (?:later|in \d)/i,
+  /model is at capacity/i,
 ]);
 
 /**

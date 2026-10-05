@@ -147,6 +147,18 @@ test('matchUsageLimit returns the line itself and ignores blank noise', () => {
   assert.equal(matchUsageLimit('\n\n  Rate limit exceeded  \n'), 'Rate limit exceeded');
 });
 
+test('matchUsageLimit recognises the wording a codex pane printed when its model was at capacity', () => {
+  // Captured from a real pane (2026-10-05): the agent stalled on this line and the round could only
+  // time out idle, instead of reporting a provider limit that the runner can fall back from.
+  const screen = [
+    '• Ran out=/work/outbox',
+    '■ Selected model is at capacity. Please try a different model.',
+    '• Reconnected. No input was resent.',
+  ].join('\n');
+  assert.equal(matchUsageLimit(screen), '■ Selected model is at capacity. Please try a different model.');
+  assert.equal(matchUsageLimit('Planning capacity for the next quarter'), null, 'ordinary talk about capacity is not a provider limit');
+});
+
 test('an unknown outcome defaults to keeping the pane rather than closing it', () => {
   assert.equal(paneFateFor('something-nobody-declared'), 'keep');
 });
