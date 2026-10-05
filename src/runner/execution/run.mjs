@@ -13,7 +13,7 @@ import { runPattern } from './patterns/index.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { ensureRunnerConfigForDir, RunnerConfigError } from '../dispatch/config.mjs';
 import { commitUnitWork } from './commit-unit-work.mjs';
-import { reportRefsOf, resolveUnitInputs } from './handoff-refs.mjs';
+import { reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, plainInputName } from './handoff-refs.mjs';
 import { outcomeOfRunResult, readUnitRunHistory } from './unit-run-history.mjs';
 import { reapOrphanedConfinementResources, resolveConfinementTempRoot } from '../dispatch/confinement/cleanup.mjs';
 
@@ -203,7 +203,14 @@ export async function runUnit(options = {}) {
     const unitDir = path.join(assignmentsDir, unitRunId);
     let resolved;
     try {
-      resolved = resolveUnitInputs(unit.inputs, mainRoot, unit.anonymizeInputs ? { anonymizeInto: path.join(unitDir, 'inputs') } : {});
+      // A blind unit's roles each get their copies in their own directory at dispatch, so nothing is copied here.
+      resolved = resolveUnitInputs(
+        unit.inputs,
+        mainRoot,
+        unit.blind
+          ? { blind: true, anonymize: unit.anonymizeInputs === true }
+          : unit.anonymizeInputs ? { anonymizeInto: path.join(unitDir, 'inputs') } : {},
+      );
     } catch (err) {
       fs.rmSync(unitDir, { recursive: true, force: true });
       throw err;
@@ -217,7 +224,7 @@ export async function runUnit(options = {}) {
       configSnapshot,
       resolvedInputs: resolved.refs,
       // Which input each neutral name stands for; only the owner reads this, never a role.
-      ...(unit.anonymizeInputs ? { inputMap: resolved.inputMap } : {}),
+      ...(unit.anonymizeInputs || unit.blind ? { inputMap: resolved.inputMap } : {}),
       worktree: fs.realpathSync(worktreePath),
       createdBy: process.env.USER || 'system',
       createdAt: new Date().toISOString(),
@@ -249,6 +256,20 @@ export async function runUnit(options = {}) {
     const runnerConfig = unitRecord.configSnapshot.runner;
     fs.mkdirSync(assignmentDir, { recursive: true });
 
+    // What the unit names (already resolved to paths), then the accounts of the roles whose
+    // work this role judges (a panel synthesizer reads its panelists' reports).
+    let contextRefs = [...new Set([...unitRecord.resolvedInputs, ...reportRefsOf(inputs, { mainRoot, worktree: unitRecord.worktree })])];
+    if (unit.blind) {
+      // A blind role reads only its own directory of the run state, so what lies elsewhere in it
+      // reaches the role as a copy there, byte for byte; the copies are what its refs list.
+      const inRun = contextRefs.filter((ref) => refIsHiddenFromBlind(ref, mainRoot));
+      const entries = [
+        ...(unitRecord.inputMap ?? []),
+        ...inRun.map((source, i) => ({ name: `${plainInputName((unitRecord.inputMap?.length ?? 0) + i, source, mainRoot)}${path.extname(source)}`, source })),
+      ];
+      contextRefs = [...contextRefs.filter((ref) => !inRun.includes(ref)), ...copyHandoffsInto(assignmentDir, entries)];
+    }
+
     const assignment = {
       assignmentId,
       unitRunId,
@@ -267,9 +288,7 @@ export async function runUnit(options = {}) {
         binding: bound,
       },
       expectedOutputs: unit.expectedOutputs || [],
-      // What the unit names (already resolved to paths), then the accounts of the roles whose
-      // work this role judges (a panel synthesizer reads its panelists' reports).
-      contextRefs: [...new Set([...unitRecord.resolvedInputs, ...reportRefsOf(inputs, { mainRoot, worktree: unitRecord.worktree })])],
+      contextRefs,
       writes: unit.writes || [],
       policy: {
         tier: bound.tier,

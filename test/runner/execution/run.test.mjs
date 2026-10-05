@@ -923,17 +923,127 @@ test('a blind unit runs confined with its peers\' run state hidden; the same uni
   assert.match(reportOf(blind), /peer-read: ENOENT/);
 });
 
-test('a blind unit whose input lies in a peer\'s run state is refused before it launches, never run unblind', async () => {
+// A worker that lists the context refs it was given with what it reads at each, and what it reads
+// at the absolute path of each source of those refs.
+function writeRefReadingWorker(dir, sources) {
+  fs.writeFileSync(
+    path.join(dir, 'settling-worker.mjs'),
+    `
+    import fs from 'node:fs';
+    import path from 'node:path';
+    const prompt = process.argv.slice(2).join(' ');
+    const match = /Write structured JSON to (\\S+agent-result\\.json)/.exec(prompt);
+    if (match) {
+      const code = (fn) => { try { return fn(); } catch (e) { return e.code; } };
+      const claimDir = path.dirname(match[1]);
+      let up = claimDir; while (!fs.existsSync(path.join(up, 'assignment.json'))) up = path.dirname(up);
+      const assignment = JSON.parse(fs.readFileSync(path.join(up, 'assignment.json'), 'utf8'));
+      const lines = assignment.contextRefs.map((ref) => 'ref ' + path.basename(path.dirname(ref)) + '/' + path.basename(ref) + ': ' + String(code(() => fs.readFileSync(ref, 'utf8'))).trim());
+      for (const source of ${JSON.stringify(sources)}) lines.push('source: ' + String(code(() => fs.readFileSync(source, 'utf8') && 'readable')));
+      const outbox = path.join(claimDir, 'worker-output', 'outbox');
+      const runDir = fs.existsSync(outbox) ? outbox : claimDir;
+      fs.mkdirSync(runDir, { recursive: true });
+      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Report\\n' + lines.join('\\n') + '\\nThe assigned work was inspected and completed with a full explanation of what was checked.\\n');
+      fs.writeFileSync(path.join(runDir, 'agent-result.json'), JSON.stringify({ status: 'done', summary: 'Done', assessment: { verdict: 'pass' } }));
+    }
+    `,
+  );
+}
+
+test('a blind unit reads its unit-run and gate-answer inputs as copies in its own directory, and cannot read the sources', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha']);
+  const run = (unitData, extra = {}) => runUnit({ unitData, repoRoot, cwd: worktreeDir, worktree: worktreeDir, pattern: 'solo', ...extra });
+  const reportOf = (res) => fs.readFileSync(path.join(repoRoot, res.results[0].runResult.settleReports[0].path), 'utf8');
+
+  const first = await run({ id: 'u-peer', objective: 'Write docs', capability: 'docs:write', writes: [] });
+  const source = path.join(repoRoot, first.results[0].runResult.settleReports[0].path);
+  const answer = path.join(repoRoot, '.fgos', 'workflow-runs', 'wf-run-1', 'gate-answers', 'gate.md');
+  fs.mkdirSync(path.dirname(answer), { recursive: true });
+  fs.writeFileSync(answer, 'the owner said go\n');
+  writeRefReadingWorker(repoRoot, [source, answer]);
+
+  const res = await run({
+    id: 'u-blind-in', objective: 'Build on it', capability: 'docs:write', writes: [], blind: true,
+    inputs: ['docs/a.md', `unit-run:${first.unitRunId}/producer`, 'gate-answer:wf-run-1/gate'],
+  });
+  assert.equal(res.outcome, 'pass');
+
+  const dirOfB = path.join(repoRoot, '.fgos', 'assignments', res.unitRunId);
+  const refs = JSON.parse(fs.readFileSync(path.join(dirOfB, 'producer', '1', 'assignment.json'), 'utf8')).contextRefs;
+  const copies = [path.join(dirOfB, 'producer', '1', 'inputs', '1-producer-r1.md'), path.join(dirOfB, 'producer', '1', 'inputs', '2-gate-gate.md')];
+  assert.deepEqual(refs, ['docs/a.md', ...copies]);
+  assert.ok(fs.readFileSync(copies[0]).equals(fs.readFileSync(source)), 'byte-identical to the report');
+  assert.equal(fs.readFileSync(copies[1], 'utf8'), 'the owner said go\n');
+
+  const seen = reportOf(res);
+  assert.match(seen, /ref inputs\/1-producer-r1\.md: #/, 'the copy of the report is readable by the role');
+  assert.match(seen, /ref inputs\/2-gate-gate\.md: the owner said go/);
+  assert.equal((seen.match(/source: ENOENT/g) ?? []).length, 2, 'the sources are not visible to the blind role');
+
+  const unitJson = JSON.parse(fs.readFileSync(path.join(dirOfB, 'unit.json'), 'utf8'));
+  assert.deepEqual(unitJson.resolvedInputs, ['docs/a.md']);
+  assert.deepEqual(unitJson.inputMap.map((e) => e.name), ['1-producer-r1.md', '2-gate-gate.md']);
+
+  // A resume hands the same copies again, with the sources gone.
+  fs.rmSync(source);
+  const resumed = await run(undefined, { resumeUnitRunId: res.unitRunId });
+  assert.equal(resumed.outcome, 'pass');
+  assert.ok(fs.existsSync(copies[0]));
+});
+
+test('a blind unit with anonymized inputs gets neutral names in its own directory', async () => {
   const { repoRoot, worktreeDir } = setupGitRepo();
   reviewedConfig(repoRoot, ['alpha']);
   const run = (unitData) => runUnit({ unitData, repoRoot, cwd: worktreeDir, worktree: worktreeDir, pattern: 'solo' });
 
   const first = await run({ id: 'u-peer', objective: 'Write docs', capability: 'docs:write', writes: [] });
+  const res = await run({
+    id: 'u-blind-anon', objective: 'Judge it', capability: 'docs:write', writes: [], blind: true, anonymizeInputs: true,
+    inputs: [`unit-run:${first.unitRunId}/producer`],
+  });
+  assert.equal(res.outcome, 'pass');
+  const dirOfB = path.join(repoRoot, '.fgos', 'assignments', res.unitRunId);
+  const assignment = fs.readFileSync(path.join(dirOfB, 'producer', '1', 'assignment.json'), 'utf8');
+  assert.deepEqual(JSON.parse(assignment).contextRefs, [path.join(dirOfB, 'producer', '1', 'inputs', 'seat-A.md')]);
+  assert.ok(!assignment.includes(first.unitRunId), 'the earlier run is not named');
+  assert.equal(fs.existsSync(path.join(dirOfB, 'inputs')), false, 'no copy is shared between the roles of the unit');
+});
+
+test('a blind unit whose input cannot be copied is refused with the reason, before anything launches', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha']);
+  const run = (unitData) => runUnit({ unitData, repoRoot, cwd: worktreeDir, worktree: worktreeDir, pattern: 'solo' });
+
+  const first = await run({ id: 'u-peer', objective: 'Write docs', capability: 'docs:write', writes: [] });
+  const source = path.join(repoRoot, first.results[0].runResult.settleReports[0].path);
+  fs.writeFileSync(source, 'edited after settle\n');
   await assert.rejects(
-    () => run({
-      id: 'u-blind-ref', objective: 'Build on it', capability: 'docs:write', writes: [], blind: true,
-      inputs: [`unit-run:${first.unitRunId}/producer`],
-    }),
-    (err) => err.code === 'blind-ref-hidden' && err.data?.status === 'refused',
+    () => run({ id: 'u-edited', objective: 'x', capability: 'docs:write', writes: [], blind: true, inputs: [`unit-run:${first.unitRunId}/producer`] }),
+    /report-changed-after-settle/,
   );
+  await assert.rejects(
+    () => run({ id: 'u-missing', objective: 'x', capability: 'docs:write', writes: [], blind: true, inputs: ['unit-run:unit-run-nope/producer'] }),
+    /no-such-run/,
+  );
+});
+
+test('a blind panel synthesizer reads its panelists\' reports as copies in its own directory', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma', 'delta']);
+  const res = await runUnit({
+    unitData: { id: 'u-panel-blind', objective: 'Review the design', capability: 'docs:write', writes: [], pattern: 'panel', blind: true },
+    repoRoot,
+    cwd: worktreeDir,
+    worktree: worktreeDir,
+    pattern: 'panel',
+  });
+  assert.equal(res.outcome, 'pass');
+  const synthDir = path.join(repoRoot, '.fgos', 'assignments', res.unitRunId, 'synthesizer', '1');
+  const refs = JSON.parse(fs.readFileSync(path.join(synthDir, 'assignment.json'), 'utf8')).contextRefs;
+  assert.deepEqual(refs.map((ref) => path.dirname(ref)), [1, 2, 3].map(() => path.join(synthDir, 'inputs')));
+  for (const [i, ref] of refs.entries()) {
+    assert.ok(ref.includes(`panelist-${i + 1}`), `ref ${i} is the copy of panelist-${i + 1}'s report: ${ref}`);
+    assert.ok(fs.statSync(ref).size > 0 && !fs.lstatSync(ref).isSymbolicLink());
+  }
 });

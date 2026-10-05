@@ -16,6 +16,7 @@ steps:
           pattern: panel
           persona: panelist
           objective: Generate independent, anonymous initial proposals without cross-participant visibility
+          blind: true
   - id: feedback-synthesis
     title: Feedback Synthesis
     dependsOn: [blind-proposals]
@@ -37,6 +38,7 @@ steps:
           pattern: panel
           persona: panelist
           objective: Revise proposals in light of synthesized panel feedback
+          blind: true
           anonymizeInputs: true
   - id: final-consensus
     title: Final Consensus

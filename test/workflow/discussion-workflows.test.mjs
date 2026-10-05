@@ -368,3 +368,13 @@ test('skills: fgos-panel and fgos-group-thinking route to named discussion workf
   assert.ok(groupThinkingSkill.includes('group-cognition'), 'fgos-group-thinking must reference group-cognition');
   assert.ok(groupThinkingSkill.includes('fgos workflow start'), 'must reference fgos workflow start');
 });
+
+test('the panel steps of delphi, nominal-group and group-cognition that must not see each other run blind; the other workflows stay as they were', () => {
+  const blindUnits = (id) =>
+    loadWorkflow(id).steps.flatMap((s) => s.units.filter((u) => u.template.blind === true).map((u) => u.id));
+  assert.deepEqual(blindUnits('delphi'), ['propose-round-1', 'propose-round-2']);
+  assert.deepEqual(blindUnits('nominal-group'), ['generate-ideas']);
+  assert.deepEqual(blindUnits('group-cognition'), ['sense-making-panel']);
+  assert.deepEqual(blindUnits('architecture-advisory'), []);
+  assert.deepEqual(blindUnits('business-discussion'), []);
+});
