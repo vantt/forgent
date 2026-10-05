@@ -107,6 +107,11 @@ if (group === 'pane' && action === 'run') {
 if (group === 'pane' && (action === 'report-agent' || action === 'report-agent-session')) {
   ok({ type: 'ok' });
 }
+// The pane was closed after the brief went in: herdr no longer knows the pane
+// or the agent in it, and says so with its own not-found codes.
+const paneVanished = scenario.paneVanishesAfterBrief && readState().prompts >= 1;
+if (paneVanished && group === 'pane' && action === 'process-info') fail('pane_not_found', 'pane not found');
+if (paneVanished && group === 'agent' && action === 'get') fail('agent_not_found', 'agent target mock-pane-1 not found');
 if (group === 'pane' && action === 'process-info') {
   // A real pane always lists its own shell. "The agent is there" means a
   // foreground process that is NOT the shell -- so an agent that exited, or
@@ -798,6 +803,39 @@ test('an agent that leaves the pane without writing a result is reported dead, a
   assert.ok(
     !mock.calls().some((c) => c[0] === 'pane' && c[1] === 'close'),
     'the pane is forensics now, not rubbish',
+  );
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('a pane that herdr no longer knows ends the round as died instead of running to the ceiling', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-pane-vanished-'));
+  const mock = createMockHerdr(tmpDir, { worker: 'silent', paneVanishesAfterBrief: true, statuses: ['idle'] });
+
+  const startedAt = Date.now();
+  await assert.rejects(
+    () => dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing', timeoutMs: 20000 }),
+    (err) => {
+      assert.equal(err.outcome, 'died');
+      assert.match(err.message, /not found/);
+      return true;
+    },
+  );
+  assert.ok(Date.now() - startedAt < 15000, 'the round ends on the reads, not at the ceiling');
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('a herdr that cannot be reached is not evidence the pane is gone', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-unreachable-'));
+  const mock = createMockHerdr(tmpDir, { worker: 'silent', getError: 'session_unavailable', statuses: ['idle'] });
+
+  await assert.rejects(
+    () => dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing', timeoutMs: 4000 }),
+    (err) => {
+      assert.notEqual(err.outcome, 'died');
+      return true;
+    },
   );
 
   fs.rmSync(tmpDir, { recursive: true, force: true });

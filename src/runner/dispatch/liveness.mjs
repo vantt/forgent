@@ -34,6 +34,10 @@
 //     the idle window used to end a healthy round `timed-out-idle` -- a
 //     claim about a worker nobody looked at.
 //
+// The converse is also true: herdr ANSWERING that the pane is not found is a
+// reading, not a failure to take one. A closed pane has no agent in it, so
+// that answer is `absent` and counts towards `died` like any other absence.
+//
 // `agent_status` appears here only as a progress hint and as the blocked
 // signal. It never concludes that work finished -- it was wrong about that
 // twice in production, once before the agent had started at all and once in a
@@ -177,7 +181,10 @@ export function evaluateWorkingScreen({ screen, now, prior = {}, probeMs = WORKI
  *
  * `observation` is what was just read:
  *   resultFilePresent  the worker's own result file exists
- *   liveness           'present' | 'absent' | 'unknown' (failed read -> unknown)
+ *   liveness           'present' | 'absent' | 'unknown' (failed read -> unknown;
+ *                      herdr answering "pane not found" is `absent`, not a failed read)
+ *   livenessCause      why an `absent` reading is absent, when the probe knows (names the
+ *                      `died` reason); optional
  *   agentState         herdr's agent_status, or 'unknown'
  *   lastProgressAt     epoch ms of the last progress signal, or null
  *   blindMs            ms since `lastProgressAt` during which the caller
@@ -200,6 +207,7 @@ export function evaluateLadder({ observation = {}, limits = {}, prior = {} } = {
   const {
     resultFilePresent = false,
     liveness = 'unknown',
+    livenessCause = null,
     agentState = 'unknown',
     lastProgressAt = null,
     blindMs = 0,
@@ -235,7 +243,9 @@ export function evaluateLadder({ observation = {}, limits = {}, prior = {} } = {
 
   // 3. Died. Consecutive absences only.
   if (absentStreak >= deathThreshold) {
-    return settle('died', `no agent process in the pane on ${absentStreak} consecutive reads`);
+    return settle('died', livenessCause
+      ? `${livenessCause} on ${absentStreak} consecutive reads`
+      : `no agent process in the pane on ${absentStreak} consecutive reads`);
   }
 
   // 4. Ceiling. Absolute, regardless of how busy the worker looks.

@@ -1050,18 +1050,32 @@ export async function confirmBriefSubmitted({ client, target, message, paths, ro
  * that distinction, since a single `unknown` resets an absent streak. A pane
  * that still exists proves nothing about the agent: an idle pane always lists
  * its own shell, so `present` means a foreground process that is not it.
+ *
+ * The one failure that is an answer is herdr saying the pane itself is not
+ * found: the pane was closed, so the agent in it is gone. That counts as
+ * `absent` (and the probe's `cause` says why); an unreachable, timed-out or
+ * unparseable herdr stays `unknown`.
  */
+export const PANE_NOT_FOUND_CODE = 'pane_not_found';
+
 function livenessProbe(client, paneId) {
-  return () => {
+  const probe = () => {
+    probe.cause = null;
     try {
       const info = client.paneProcessInfo(paneId);
       return info.foregroundProcesses.some((p) => p.pid && p.pid !== info.shellPid)
         ? 'present'
         : 'absent';
-    } catch {
+    } catch (err) {
+      if (err?.code === PANE_NOT_FOUND_CODE) {
+        probe.cause = `herdr reports pane ${paneId} not found`;
+        return 'absent';
+      }
       return 'unknown';
     }
   };
+  probe.cause = null;
+  return probe;
 }
 
 /**
@@ -1168,6 +1182,7 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
     const decision = decide({
       resultFilePresent: fs.existsSync(paths.resultPath),
       liveness,
+      livenessCause: liveness === 'absent' ? (readLiveness.cause ?? null) : null,
       agentState,
       lastProgressAt,
       blindMs,

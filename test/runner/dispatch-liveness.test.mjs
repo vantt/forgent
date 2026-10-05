@@ -45,6 +45,17 @@ test('death needs consecutive absences, and reaching the threshold is what settl
   assert.equal(final.absentStreak, DEFAULT_DEATH_THRESHOLD);
 });
 
+test('an absence that names its cause carries that cause into the died reason', () => {
+  let prior = {};
+  let r;
+  for (let i = 0; i < DEFAULT_DEATH_THRESHOLD; i += 1) {
+    r = run({ liveness: 'absent', livenessCause: 'herdr reports pane p1 not found' }, LIMITS, prior);
+    prior = r;
+  }
+  assert.equal(r.outcome, 'died');
+  assert.match(r.reason, /pane p1 not found on 3 consecutive reads/);
+});
+
 test('absent, unknown, absent never kills a healthy run -- one unknown resets the count', () => {
   const a = run({ liveness: 'absent' }, LIMITS, {});
   assert.equal(a.absentStreak, 1);
