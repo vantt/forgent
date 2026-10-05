@@ -3,6 +3,8 @@
  * Runs N independent panel members in parallel, followed by a synthesizer.
  */
 
+import { roleUnit } from './role-tasks.mjs';
+
 export const VALID_OUTCOMES = Object.freeze([
   'pass',
   'findings',
@@ -72,7 +74,8 @@ export async function runPanel(unit, cfg, { runRole, verify, history, members = 
   const existingSynth = prior?.find((h) => h.role === synthesizeRole && h.outcome === 'pass');
   const synthResult = existingSynth || await runRole({
     role: synthesizeRole,
-    unit,
+    // The panelists answer the unit's objective; the synthesizer is told to synthesize their answers.
+    unit: roleUnit(unit, { role: synthesizeRole, kind: 'synthesizer', params }),
     readOnly: (unit?.writes || []).length === 0,
     // The synthesizer judges every panelist, so it must not share a provider family with any of
     // them; the runner turns these role names into the executors that played them and bind()

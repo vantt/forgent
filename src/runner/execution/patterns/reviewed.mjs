@@ -3,6 +3,8 @@
  * Producer-checker loop with optional deterministic verify and max rounds.
  */
 
+import { roleUnit } from './role-tasks.mjs';
+
 export const VALID_OUTCOMES = Object.freeze([
   'pass',
   'findings',
@@ -220,10 +222,11 @@ export async function runReviewed(unit, cfg, { runRole, verify, history } = {}, 
     } else {
       const payload = {
         role: 'producer',
-        unit,
+        // Round 1 is the unit as given; a later round also lists what the checks found, so the
+        // producer knows what to fix.
+        unit: roleUnit(unit, { role: 'producer', findings: r > 1 ? priorFindings : [] }),
         readOnly: (unit?.writes || []).length === 0,
         round: r,
-        ...(r > 1 && priorFindings.length > 0 ? { findings: priorFindings } : {}),
       };
       producerResult = await runRole(payload);
     }
@@ -267,10 +270,12 @@ export async function runReviewed(unit, cfg, { runRole, verify, history } = {}, 
     const checkerPromises = pendingCheckerRoles.map((checkerRole) =>
       runRole({
         role: checkerRole,
-        unit,
+        // Told to check rather than to do the work, and handed the producer's account of this round.
+        unit: roleUnit(unit, { role: checkerRole, params }),
         readOnly: true,
         independentOf: ['producer'],
         round: r,
+        inputs: [producerResult],
       }),
     );
 

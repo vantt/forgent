@@ -214,6 +214,7 @@
     "src/runner/execution/patterns/panel.mjs": "domain",
     "src/runner/execution/patterns/presets.mjs": "domain",
     "src/runner/execution/patterns/reviewed.mjs": "domain",
+    "src/runner/execution/patterns/role-tasks.mjs": "domain",
     "src/runner/execution/patterns/solo.mjs": "domain",
     "src/workflow/definition.mjs": "kernel",
     "src/workflow/loader.mjs": "infra",

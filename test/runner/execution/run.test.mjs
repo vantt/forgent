@@ -640,6 +640,38 @@ test('the panel synthesizer is told to read every panelist report; the panelists
     assert.ok(fs.existsSync(ref), `ref exists: ${ref}`);
   }
   for (const n of [1, 2, 3]) assert.deepEqual(assignmentOf(`panelist-${n}`).contextRefs, []);
+
+  // Each role is told its own task: the panelists the plain objective, the synthesizer a synthesis of it.
+  for (const n of [1, 2, 3]) assert.equal(assignmentOf(`panelist-${n}`).objective, 'Review the design');
+  const synthObjective = assignmentOf('synthesizer').objective;
+  assert.match(synthObjective, /synthesizer/i);
+  assert.ok(synthObjective.includes('Review the design'), 'the panel\'s task is quoted to the synthesizer');
+});
+
+test('a reviewed run tells the reviewer to review and hands it the producer\'s report', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha', 'beta']);
+  const res = await runUnit({
+    unitData: { id: 'u-role-task', objective: 'Write docs', capability: 'docs:write', writes: [], pattern: 'reviewed' },
+    repoRoot,
+    cwd: worktreeDir,
+    worktree: worktreeDir,
+    pattern: 'reviewed',
+  });
+  assert.equal(res.outcome, 'pass');
+  const assignmentOf = (role) =>
+    JSON.parse(fs.readFileSync(path.join(repoRoot, '.fgos', 'assignments', res.unitRunId, role, '1', 'assignment.json'), 'utf8'));
+
+  assert.equal(assignmentOf('producer').objective, 'Write docs', 'the producer is given the task itself');
+  assert.deepEqual(assignmentOf('producer').contextRefs, []);
+
+  const reviewer = assignmentOf('reviewer');
+  assert.match(reviewer.objective, /reviewer/i);
+  assert.match(reviewer.objective, /do not change any file/i);
+  assert.ok(reviewer.objective.includes('Write docs'), 'the reviewer is told what the work was supposed to be');
+  assert.equal(reviewer.contextRefs.length, 1);
+  assert.ok(reviewer.contextRefs[0].includes('/producer/'), `the reviewer reads the producer's report: ${reviewer.contextRefs[0]}`);
+  assert.ok(fs.existsSync(reviewer.contextRefs[0]));
 });
 
 test('a panel whose every provider family is taken by panelists refuses the synthesizer', async () => {

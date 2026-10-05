@@ -152,10 +152,23 @@ test('runReviewed loops to round 2 when findings exist and passes on fix', async
   assert.equal(producerCalls, 2);
   assert.equal(reviewerCalls, 2);
 
-  // Check that round 2 producer received prior findings
+  // Round 2's producer is told what to fix; round 1's producer keeps the plain unit
+  const round1Producer = calls.find((c) => c.role === 'producer' && c.round === 1);
+  assert.equal(round1Producer.unit, unit, 'the first round is the unit as it was given');
   const round2Producer = calls.find((c) => c.role === 'producer' && c.round === 2);
   assert.ok(round2Producer, 'Producer called for round 2');
-  assert.deepEqual(round2Producer.findings, ['Missing section 3']);
+  assert.ok(round2Producer.unit.objective.startsWith(unit.objective));
+  assert.match(round2Producer.unit.objective, /- Missing section 3/);
+
+  // The reviewer is told to review, and gets the producer's result of that round to read
+  const reviewerRound1 = calls.find((c) => c.role === 'reviewer' && c.round === 1);
+  assert.match(reviewerRound1.unit.objective, /reviewer/i);
+  assert.ok(reviewerRound1.unit.objective.includes(unit.objective));
+  assert.equal(reviewerRound1.inputs.length, 1);
+  assert.equal(reviewerRound1.inputs[0].role, 'producer');
+  assert.equal(reviewerRound1.inputs[0].attempt, 1);
+  const reviewerRound2 = calls.find((c) => c.role === 'reviewer' && c.round === 2);
+  assert.equal(reviewerRound2.inputs[0].attempt, 2, 'round 2 reviews round 2 producer, not round 1');
 });
 
 test('runReviewed returns findings (NEVER failed) when maxRounds is reached', async () => {
@@ -228,7 +241,7 @@ test('runReviewed executes deterministic verify hook when configured and treats 
   // Round 2 producer should have received verify findings
   const r2Producer = calls.find((c) => c.role === 'producer' && c.round === 2);
   assert.ok(r2Producer);
-  assert.deepEqual(r2Producer.findings, ['Tests failed: 1 assertion error']);
+  assert.match(r2Producer.unit.objective, /- Tests failed: 1 assertion error/);
 });
 
 test('runReviewed propagates execution-failure and other hard error outcomes', async () => {

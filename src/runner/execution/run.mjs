@@ -297,7 +297,7 @@ export async function runUnit(options = {}) {
   const persistUnitRecord = () => writeJsonAtomic(path.join(unitDir, 'unit.json'), unitRecord);
 
   // One dispatch of an already-bound role. Returns the settled outcome of that attempt.
-  const dispatchBound = async ({ bound, role, round, readOnly, assignmentId, assignmentDir, session, inputs = [] }) => {
+  const dispatchBound = async ({ bound, role, round, readOnly, assignmentId, assignmentDir, session, inputs = [], objective = unit.objective }) => {
     const runnerConfig = unitRecord.configSnapshot.runner;
     fs.mkdirSync(assignmentDir, { recursive: true });
 
@@ -306,7 +306,9 @@ export async function runUnit(options = {}) {
       unitRunId,
       role,
       round,
-      objective: unit.objective,
+      // The role's own task when the pattern gave it a unit of its own (a reviewer is told to
+      // review, not to redo the work); otherwise the unit's objective.
+      objective,
       mutation: readOnly ? 'read-only' : 'mutating',
       binding: bound,
       provenance: {
@@ -440,7 +442,7 @@ export async function runUnit(options = {}) {
         persistUnitRecord();
       }
 
-      const result = await dispatchBound({ bound, role, round, readOnly, assignmentId, assignmentDir, session, inputs });
+      const result = await dispatchBound({ bound, role, round, readOnly, assignmentId, assignmentDir, session, inputs, objective: (rUnit || unit).objective });
 
       // The worker only writes files; this trusted code, outside the confinement, commits them.
       // No change is recorded as such, and a commit that cannot be made fails the round.
