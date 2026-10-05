@@ -2162,19 +2162,25 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     case 'workflow': {
       const sub = positional[0];
       if (sub === 'start') {
-        const { startWorkflow } = await import('../src/workflow/index.mjs');
-        const workflowId = positional[1] ?? flags.id;
+        const { startWorkflow, startWorkflowDetached } = await import('../src/workflow/index.mjs');
+        // The arg parser hands `--foreground <id>` the id as the flag's value.
+        const foreground = flags.foreground !== undefined && flags.foreground !== 'false';
+        const swallowedId = typeof flags.foreground === 'string' && flags.foreground !== 'true' ? flags.foreground : undefined;
+        const workflowId = positional[1] ?? flags.id ?? swallowedId;
         const planPath = flags.plan;
         if (!workflowId && !planPath) {
           throw new StoreError('validation', 'workflow start requires <workflowId> or --plan <path>');
         }
-        return await startWorkflow({
+        const startParams = {
           workflowId,
           planPath,
           request: typeof flags.request === 'string' ? flags.request : undefined,
           repoRoot: flags.dir,
           worktree: flags.worktree,
-        });
+        };
+        // Default: record the run, hand advancing to a detached process, return the run id.
+        // --foreground keeps the run in this process until it completes, fails, or parks.
+        return foreground ? await startWorkflow(startParams) : startWorkflowDetached(startParams);
       }
       if (sub === 'status') {
         const { statusWorkflow } = await import('../src/workflow/index.mjs');

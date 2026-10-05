@@ -169,7 +169,7 @@ test('CLI: fgos workflow start architecture-advisory and status', () => {
   // running fgos from tmp will find core/workflows at the root of forgentX if dir points to tmp.
   const startOut = execFileSync(
     process.execPath,
-    [BIN_FGOS, 'workflow', 'start', 'architecture-advisory', '--dir', tmp],
+    [BIN_FGOS, 'workflow', 'start', 'architecture-advisory', '--dir', tmp, '--foreground'],
     { cwd: tmp, encoding: 'utf8' },
   );
 
