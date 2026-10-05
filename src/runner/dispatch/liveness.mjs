@@ -79,6 +79,28 @@ export const DEFAULT_USAGE_LIMIT_PATTERNS = Object.freeze([
 ]);
 
 /**
+ * Screen text that means "this agent cannot reach its provider because its credential is dead",
+ * not "it is thinking". The pane shows the error and the agent sits idle, so without this the
+ * round waits out the whole idle timeout and ends as `timed-out-idle`. Anchored to wordings
+ * measured on a real pane (pi: "OAuth refresh failed for xai ... invalid_grant") plus the
+ * standard login prompts. The round ends as `provider-limit`: the provider cannot serve now,
+ * so the walk moves to the next candidate; the capacity classifier reads the same line and
+ * quarantines the account as an auth fault, not a quota one.
+ */
+export const AUTH_FAILURE_PATTERNS = Object.freeze([
+  /oauth (?:token )?refresh failed/i,
+  /\binvalid_grant\b/i,
+  /(?:please )?run \/login/i,
+  /authentication (?:failed|required)/i,
+  /login required/i,
+  /not logged in/i,
+  /api key.{0,20}(?:missing|invalid|expired)/i,
+]);
+
+/** How long an agent has to sit not-working before its screen is read for a credential failure. */
+export const AUTH_PROBE_IDLE_MS = 15000;
+
+/**
  * What happens to the pane for each outcome.
  *
  * `keep-always` is stronger than `keep`: a run paused on a provider limit
@@ -261,8 +283,21 @@ export function evaluateLadder({ observation = {}, limits = {}, prior = {} } = {
   // it is an absolute bound on the round, not a claim about the worker.
   const progressRef = lastProgressAt ?? startedAt;
   const idleFor = Math.max(0, now - progressRef - blindMs);
-  const stale = agentState !== 'working' && idleTimeoutMs > 0 && idleFor >= idleTimeoutMs;
+  const notWorking = agentState !== 'working';
+  const stale = notWorking && idleTimeoutMs > 0 && idleFor >= idleTimeoutMs;
   if (!stale) {
+    // A dead credential leaves the agent idle with the error on its screen: look for it long
+    // before the idle timeout, so the next candidate starts minutes sooner.
+    if (!notWorking || idleFor < AUTH_PROBE_IDLE_MS) {
+      return { outcome: null, reason: null, screenLine: null, absentStreak, needsScreen: false };
+    }
+    if (screen === null) {
+      return { outcome: null, reason: null, screenLine: null, absentStreak, needsScreen: true };
+    }
+    const earlyAuthLine = matchUsageLimit(screen, AUTH_FAILURE_PATTERNS);
+    if (earlyAuthLine) {
+      return settle('provider-limit', 'the screen says the provider credential failed', earlyAuthLine);
+    }
     return { outcome: null, reason: null, screenLine: null, absentStreak, needsScreen: false };
   }
 
@@ -272,6 +307,10 @@ export function evaluateLadder({ observation = {}, limits = {}, prior = {} } = {
     return { outcome: null, reason: null, screenLine: null, absentStreak, needsScreen: true };
   }
 
+  const authLine = matchUsageLimit(screen, AUTH_FAILURE_PATTERNS);
+  if (authLine) {
+    return settle('provider-limit', 'the screen says the provider credential failed', authLine);
+  }
   const limitLine = matchUsageLimit(screen, usageLimitPatterns);
   if (limitLine) {
     return settle('provider-limit', 'the screen says a provider limit was reached', limitLine);

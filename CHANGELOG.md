@@ -30,6 +30,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- A herdr pane whose agent sits idle on a dead credential (for example pi showing `OAuth refresh failed ... invalid_grant`) now ends as a provider limit after about 15 seconds instead of waiting out the whole idle timeout and being recorded as a timeout: the walk moves on to the next executor in the pool, and the account is quarantined as an auth fault until someone logs in again and clears it.
+- A quota quarantine lasts as long as the provider says (`Resets in 24m1s`, hours/minutes/seconds), not a flat hour.
+- The Delphi feedback-synthesis step is told to name positions only by seat label, so the anonymized group summary no longer repeats role ids or the seat-to-role order.
 - `fgos doctor` now also checks the credential homes of the declared `gemini` accounts for agy permissions and project trust. A confined agy invocation runs as the account the capacity layer picks for the provider, not as the `HOME` its invocation names, so those homes are the ones that decide whether agy stops at a trust prompt; before this, only the homes named by invocations were looked at, and the agy-sub-homes check read the project config without the global accounts.
 - `fgos doctor` no longer has the `coordination-sessions-closed` check. The coordination engine it watched was retired, so it only counted leftover session folders that nothing can close.
 - The blind pool check passes in this repo now that the discussion capabilities have pools (the same five provider families as `architecture:shape`), `claude/cli` and `xai/cli` joined the proven blind pairs after a live canary,.

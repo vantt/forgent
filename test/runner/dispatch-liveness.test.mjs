@@ -124,7 +124,8 @@ test('with no progress ever recorded, staleness is measured from the start of th
 });
 
 test('a zero idleTimeout disables staleness entirely rather than making everything stale', () => {
-  const r = run({ agentState: 'idle', lastProgressAt: 1000, now: 999999 }, { ...LIMITS, idleTimeoutMs: 0, ceilingMs: 0 });
+  const limits = { ...LIMITS, idleTimeoutMs: 0, ceilingMs: 0 };
+  const r = run({ agentState: 'idle', lastProgressAt: 1000, now: 999999, screen: 'waiting for you\n> ' }, limits);
   assert.equal(r.outcome, null);
   assert.equal(r.needsScreen, false);
 });
@@ -250,4 +251,36 @@ test('the ceiling is not adjusted for blind time -- it bounds the round, not the
     { ...LIMITS, ceilingMs: 60000 },
   );
   assert.equal(r.outcome, 'timed-out-ceiling');
+});
+
+const AUTH_SCREEN = [
+  ' Read /x/brief-1.md and do what it says.',
+  ' Error: OAuth refresh failed for xai: xAI OAuth token refresh failed (HTTP 400): invalid_grant',
+  '$0.000 (sub) 0.7%/1.0M (auto)   grok-4.3 • medium',
+].join('\n');
+
+test('an idle agent showing a dead credential is called provider-limit long before the idle timeout', () => {
+  const limits = { idleTimeoutMs: 300000, ceilingMs: 3600000, deathThreshold: 3 };
+  const observation = { agentState: 'idle', lastProgressAt: 1000, now: 21000 };
+  const asked = run(observation, limits);
+  assert.equal(asked.outcome, null);
+  assert.equal(asked.needsScreen, true, 'an idle agent past the probe delay has its screen read');
+  const r = run({ ...observation, screen: AUTH_SCREEN }, limits);
+  assert.equal(r.outcome, 'provider-limit');
+  assert.match(r.screenLine, /invalid_grant/);
+});
+
+test('an idle agent with an ordinary screen is left alone until the idle timeout', () => {
+  const limits = { idleTimeoutMs: 300000, ceilingMs: 3600000, deathThreshold: 3 };
+  const r = run({ agentState: 'idle', lastProgressAt: 1000, now: 21000, screen: 'thinking about it\n> ' }, limits);
+  assert.equal(r.outcome, null);
+  assert.equal(r.needsScreen, false);
+  const young = run({ agentState: 'idle', lastProgressAt: 1000, now: 5000 }, limits);
+  assert.equal(young.needsScreen, false, 'a short pause does not cost a screen read');
+});
+
+test('a working agent is never probed for a credential failure', () => {
+  const limits = { idleTimeoutMs: 300000, ceilingMs: 3600000, deathThreshold: 3 };
+  const r = run({ agentState: 'working', lastProgressAt: 1000, now: 90000 }, limits);
+  assert.equal(r.needsScreen, false);
 });

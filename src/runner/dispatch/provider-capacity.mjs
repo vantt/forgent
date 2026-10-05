@@ -7,6 +7,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { normalizeProviderFamily } from './provider-adapter.mjs';
+import { AUTH_FAILURE_PATTERNS } from './liveness.mjs';
 import { getProcessStartTime, resolveHolderLiveness } from './process-identity.mjs';
 
 export const PROVIDER_CAPACITY_STATE_CONTRACT = 'provider-capacity-state.v1';
@@ -817,6 +818,27 @@ export function inspectProviderCapacityLock(runtimeDir) {
 // rather than lean on the defensive fallback silently.
 const DEFAULT_QUOTA_QUARANTINE_TTL_MS = 60 * 60 * 1000; // 1 hour, conservative default reset window.
 
+/**
+ * The reset window a provider names in its own words: "resets in 2h", "Resets in 24m1s",
+ * "reset in 1h 30m". Returns milliseconds, or null when no window is named.
+ */
+export function parseQuotaResetWindowMs(text) {
+  if (typeof text !== 'string') return null;
+  const match = /resets?\s+in\s+((?:\d+\s*[hms](?![a-z])\s*)+)/i.exec(text);
+  if (!match) return null;
+  const unitMs = { h: 3600000, m: 60000, s: 1000 };
+  let total = 0;
+  for (const [, amount, unit] of match[1].matchAll(/(\d+)\s*([hms])(?![a-z])/gi)) {
+    total += Number(amount) * unitMs[unit.toLowerCase()];
+  }
+  return total > 0 ? total : null;
+}
+
+function quotaQuarantineUntil(text, now) {
+  const windowMs = parseQuotaResetWindowMs(text);
+  return new Date(now + (windowMs === null ? DEFAULT_QUOTA_QUARANTINE_TTL_MS : windowMs)).toISOString();
+}
+
 // C2b: the auth-fault regex used to scan the ENTIRE stderr text for the
 // bare words "token"/"auth"/"login" anywhere near "failed"/"expired"/etc,
 // with no provider check at all when `provider` was omitted (a wildcard
@@ -849,25 +871,26 @@ export function classifyProviderCapacityFault({ provider, stderr = '', adapterOu
   }
   const text = typeof stderr === 'string' ? stderr : '';
   if (adapterOutcome === 'paused-limit' || adapterOutcome === 'provider-limit' || structuredAgent?.stopReason === 'paused-limit' || structuredAgent?.stopReason === 'provider-limit') {
-    // No stderr text to parse a reset window from at all in this branch --
-    // always the conservative default, never an expiry-less quarantine.
+    // A round that ended on a dead credential is not a quota hit: the account stays out until a
+    // person logs in again, and the reset-window rule below must not retry it in an hour.
+    if (AUTH_FAILURE_PATTERNS.some((pattern) => pattern.test(text))) {
+      return { action: 'quarantine', reasonCode: 'auth-token', quarantineKind: 'manual-clear' };
+    }
+    // The text carries the reset window when the provider named one; otherwise the
+    // conservative default, never an expiry-less quarantine.
     return {
       action: 'quarantine',
       reasonCode: 'quota-limit',
       quarantineKind: 'temporary',
-      until: new Date(now + DEFAULT_QUOTA_QUARANTINE_TTL_MS).toISOString(),
+      until: quotaQuarantineUntil(text, now),
     };
   }
   if (provider === 'openai' || provider === 'openai-codex') {
     if (/you(?:'|’)ve hit your usage limit/i.test(text) || /usage limit has been reached/i.test(text) || /individual quota reached/i.test(text)) {
-      const reset = /resets?\s+in\s+(\d+)\s*h/i.exec(text);
       // Missing/unparseable reset text falls back to the SAME conservative
       // default TTL -- never an expiry-less "temporary" quarantine, which
       // isQuarantined() would otherwise have to catch defensively instead.
-      const until = reset
-        ? new Date(now + Number(reset[1]) * 60 * 60 * 1000).toISOString()
-        : new Date(now + DEFAULT_QUOTA_QUARANTINE_TTL_MS).toISOString();
-      return { action: 'quarantine', reasonCode: 'quota-limit', quarantineKind: 'temporary', until };
+      return { action: 'quarantine', reasonCode: 'quota-limit', quarantineKind: 'temporary', until: quotaQuarantineUntil(text, now) };
     }
     // C2b: auth-token is the manual-clear (operator-intervention) outcome,
     // the more disruptive of the two -- require BOTH a corroborating

@@ -10,6 +10,7 @@ import {
   acquireProviderAccountLease,
   clearProviderAccountQuarantine,
   classifyProviderCapacityFault,
+  parseQuotaResetWindowMs,
   inspectProviderCapacity,
   providerCapacityStatePaths,
   quarantineProviderAccount,
@@ -658,4 +659,29 @@ test('inventory: a home-files source with no files, an escaping or absolute path
   assert.throws(() => validateProviderAccountInventory(withSource({ kind: 'home-files', home, files: ['/abs'] })), /relative paths without "\.\."/);
   assert.throws(() => validateProviderAccountInventory(withSource({ kind: 'codex-home', home, files: ['auth.json'] })), /only valid for kind "home-files"/);
   assert.throws(() => validateProviderAccountInventory(withSource({ kind: 'dir-mount', home })), /must be one of codex-home, home-files/);
+});
+
+test('a quota quarantine lasts as long as the provider says, in hours, minutes and seconds', () => {
+  const now = Date.parse('2026-10-05T10:00:00.000Z');
+  const fromScreen = classifyProviderCapacityFault({
+    provider: 'gemini',
+    stderr: 'executor ended as provider-limit: Last line on screen: ⚠ Individual quota reached. Please upgrade your subscription to increase your limits. Resets in 24m1s.',
+    adapterOutcome: 'provider-limit',
+    now,
+  });
+  assert.equal(fromScreen.reasonCode, 'quota-limit');
+  assert.equal(fromScreen.until, new Date(now + (24 * 60 + 1) * 1000).toISOString());
+  assert.equal(parseQuotaResetWindowMs('quota reached, reset in 1h 30m'), 90 * 60 * 1000);
+  assert.equal(parseQuotaResetWindowMs('no window named here'), null);
+});
+
+test('a round that ended on a dead credential quarantines the account as an auth fault until a person clears it', () => {
+  const fault = classifyProviderCapacityFault({
+    provider: 'xai',
+    stderr: 'executor ended as provider-limit: Last line on screen: Error: OAuth refresh failed for xai: xAI OAuth token refresh failed (HTTP 400): invalid_grant',
+    adapterOutcome: 'provider-limit',
+  });
+  assert.equal(fault.reasonCode, 'auth-token');
+  assert.equal(fault.quarantineKind, 'manual-clear');
+  assert.equal(fault.until, undefined);
 });

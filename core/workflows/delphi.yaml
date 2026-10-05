@@ -26,7 +26,7 @@ steps:
           capability: delphi:synthesize
           pattern: solo
           persona: synthesizer
-          objective: Synthesize round 1 proposals into an anonymized mediated feedback summary
+          objective: Synthesize round 1 proposals into an anonymized mediated feedback summary. Name each position only by its seat label and never repeat role ids such as panelist-1 or the order in which seats map to roles, so no reader can tell whose position is whose
           anonymizeInputs: true
   - id: second-round
     title: Second Round Proposals
