@@ -1047,3 +1047,44 @@ test('a blind panel synthesizer reads its panelists\' reports as copies in its o
     assert.ok(fs.statSync(ref).size > 0 && !fs.lstatSync(ref).isSymbolicLink());
   }
 });
+
+test('each role of a panel gets its own seat\'s earlier report as own-previous, blind or not, and not the other seats\'', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma', 'delta']);
+  const run = (unitData) => runUnit({ unitData, repoRoot, cwd: worktreeDir, worktree: worktreeDir, pattern: 'panel' });
+  const first = await run({ id: 'u-round-1', objective: 'Propose', capability: 'docs:write', writes: [], pattern: 'panel' });
+  const reportOf = (role) => path.join(repoRoot, first.results.find((r) => r.role === role).runResult.settleReports[0].path);
+
+  for (const blind of [false, true]) {
+    const res = await run({
+      id: `u-round-2-${blind}`, objective: 'Revise', capability: 'docs:write', writes: [], pattern: 'panel', blind,
+      inputs: [`unit-run:${first.unitRunId}/{seat}`],
+    });
+    assert.equal(res.outcome, 'pass');
+    const unitDir = path.join(repoRoot, '.fgos', 'assignments', res.unitRunId);
+    assert.deepEqual(JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8')).resolvedInputs, [], 'resolved per role, not for the unit');
+
+    for (const role of ['panelist-1', 'panelist-2', 'panelist-3']) {
+      const roleDir = path.join(unitDir, role, '1');
+      const refs = JSON.parse(fs.readFileSync(path.join(roleDir, 'assignment.json'), 'utf8')).contextRefs;
+      const own = path.join(roleDir, 'inputs', 'own-previous.md');
+      assert.deepEqual(refs, [own], `${role} gets only its own earlier result`);
+      assert.ok(fs.readFileSync(own).equals(fs.readFileSync(reportOf(role))));
+    }
+    // The synthesizer is a seat of the earlier run too; the panelists' reports reach it as before.
+    const synthRefs = JSON.parse(fs.readFileSync(path.join(unitDir, 'synthesizer', '1', 'assignment.json'), 'utf8')).contextRefs;
+    assert.ok(synthRefs.some((ref) => ref.endsWith('own-previous.md')));
+    assert.equal(synthRefs.length, 4);
+  }
+});
+
+test('a seat the earlier run did not have is refused with a named reason when that role is dispatched', async () => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  reviewedConfig(repoRoot, ['alpha', 'beta', 'gamma', 'delta']);
+  const run = (unitData, pattern) => runUnit({ unitData, repoRoot, cwd: worktreeDir, worktree: worktreeDir, pattern });
+  const first = await run({ id: 'u-panel', objective: 'Write docs', capability: 'docs:write', writes: [], pattern: 'panel' }, 'panel');
+  await assert.rejects(
+    () => run({ id: 'u-own', objective: 'x', capability: 'docs:write', writes: [], pattern: 'solo', inputs: [`unit-run:${first.unitRunId}/{seat}`] }, 'solo'),
+    /no-such-seat/,
+  );
+});

@@ -40,6 +40,10 @@ steps:
           objective: Revise proposals in light of synthesized panel feedback
           blind: true
           anonymizeInputs: true
+          # Each panelist sees the anonymized group summary and its own round 1 proposal, not the others' proposals.
+          inputs:
+            - { step: feedback-synthesis, label: group summary }
+            - { step: blind-proposals, sameSeat: true, label: your own previous proposal }
   - id: final-consensus
     title: Final Consensus
     dependsOn: [second-round]
