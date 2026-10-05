@@ -43,7 +43,8 @@ When the user asks to run a plan, a phase ("run phase 2"), or a phase range ("ru
    ```
    `start` returns at once with the `workflowRunId` and a `detached` block; the run continues in a
    detached process. Read progress with `fgos workflow status <workflowRunId>` (or pass `--foreground`
-   to wait in place); do not treat the output of `start` as the final state.
+   to wait in place); `fgos workflow answer` and `fgos workflow resume` return the same way. Do not treat
+   the output of `start`, `answer` or `resume` as the final state.
 3. The Workflow runner automatically translates phases into DAG steps, schedules units according to `dependsOn`, executes each unit via `fgos run` in its own isolated worktree, and integrates changes cleanly using pure git.
 
 ---

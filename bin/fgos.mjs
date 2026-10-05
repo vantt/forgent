@@ -2161,11 +2161,13 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // resolution/RESEARCH.md).
     case 'workflow': {
       const sub = positional[0];
+      // start, answer and resume return at once with the run id and where to read progress,
+      // handing the advancing to a detached process; --foreground keeps it in this process.
+      // The arg parser hands `--foreground <id>` the id as the flag's value.
+      const foreground = flags.foreground !== undefined && flags.foreground !== 'false';
+      const swallowedId = typeof flags.foreground === 'string' && flags.foreground !== 'true' ? flags.foreground : undefined;
       if (sub === 'start') {
         const { startWorkflow, startWorkflowDetached } = await import('../src/workflow/index.mjs');
-        // The arg parser hands `--foreground <id>` the id as the flag's value.
-        const foreground = flags.foreground !== undefined && flags.foreground !== 'false';
-        const swallowedId = typeof flags.foreground === 'string' && flags.foreground !== 'true' ? flags.foreground : undefined;
         const workflowId = positional[1] ?? flags.id ?? swallowedId;
         const planPath = flags.plan;
         if (!workflowId && !planPath) {
@@ -2188,16 +2190,18 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         return statusWorkflow(workflowRunId, { repoRoot: flags.dir });
       }
       if (sub === 'answer') {
-        const { answerWorkflow } = await import('../src/workflow/index.mjs');
-        const workflowRunId = requireField(positional[1] ?? flags.id, 'workflow answer requires a workflowRunId: fgos workflow answer <id> --step <stepId> --answer <text>');
+        const { answerWorkflow, answerWorkflowDetached } = await import('../src/workflow/index.mjs');
+        const workflowRunId = requireField(positional[1] ?? flags.id ?? swallowedId, 'workflow answer requires a workflowRunId: fgos workflow answer <id> --step <stepId> --answer <text>');
         const stepId = requireField(flags.step, 'workflow answer requires --step <stepId>');
         const answer = requireField(flags.answer, 'workflow answer requires --answer <text>');
-        return await answerWorkflow(workflowRunId, { stepId, answer, repoRoot: flags.dir, worktree: flags.worktree });
+        const answerParams = { stepId, answer, repoRoot: flags.dir, worktree: flags.worktree };
+        return foreground ? await answerWorkflow(workflowRunId, answerParams) : answerWorkflowDetached(workflowRunId, answerParams);
       }
       if (sub === 'resume') {
-        const { resumeWorkflow } = await import('../src/workflow/index.mjs');
-        const workflowRunId = requireField(positional[1] ?? flags.id, 'workflow resume requires a workflowRunId: fgos workflow resume <id>');
-        return await resumeWorkflow(workflowRunId, { repoRoot: flags.dir, worktree: flags.worktree });
+        const { resumeWorkflow, resumeWorkflowDetached } = await import('../src/workflow/index.mjs');
+        const workflowRunId = requireField(positional[1] ?? flags.id ?? swallowedId, 'workflow resume requires a workflowRunId: fgos workflow resume <id>');
+        const resumeOptions = { repoRoot: flags.dir, worktree: flags.worktree };
+        return foreground ? await resumeWorkflow(workflowRunId, resumeOptions) : resumeWorkflowDetached(workflowRunId, resumeOptions);
       }
 
       // Operations a step offers, read from the Workflow definition

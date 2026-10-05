@@ -22,6 +22,8 @@ import {
   statusWorkflow,
   answerWorkflow,
   resumeWorkflow,
+  answerWorkflowDetached,
+  resumeWorkflowDetached,
 } from '../../src/workflow/index.mjs';
 import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 
@@ -377,6 +379,95 @@ test('CLI: fgos workflow start returns the run id at once and a detached process
     if (status !== 'completed') await new Promise((r) => setTimeout(r, 200));
   }
   assert.equal(status, 'completed', 'the detached process must finish the run');
+});
+
+// A gate-only workflow needs no worker: it parks at the gate and, once answered, completes.
+const GATE_WORKFLOW = {
+  id: 'test/gate-only',
+  steps: [
+    { id: 'step-gate', dependsOn: [], gate: { kind: 'human', question: 'Ready to proceed?' } },
+    { id: 'step-after', dependsOn: ['step-gate'] },
+  ],
+};
+
+// The CLI wraps its result in a contract envelope; the run state is under `data`.
+function parseCliData(stdout) {
+  return JSON.parse(stdout).data;
+}
+
+async function waitForStatus(wfRunId, repoRoot, wanted) {
+  let status = null;
+  for (let i = 0; i < 100 && status !== wanted; i += 1) {
+    status = statusWorkflow(wfRunId, { repoRoot, cwd: repoRoot }).status;
+    if (status !== wanted) await new Promise((r) => setTimeout(r, 200));
+  }
+  return status;
+}
+
+test('CLI: fgos workflow answer records the answer, returns at once and a detached process finishes the run', async () => {
+  const tmp = setupTestRepo();
+  const parked = await startWorkflow({ workflow: validateWorkflow(GATE_WORKFLOW), repoRoot: tmp, cwd: tmp });
+  assert.equal(parked.status, 'parked');
+
+  const out = parseCliData(
+    execFileSync(
+      process.execPath,
+      [BIN_FGOS, 'workflow', 'answer', parked.workflowRunId, '--step', 'step-gate', '--answer', 'yes', '--dir', tmp],
+      { cwd: tmp, encoding: 'utf8' },
+    ),
+  );
+  assert.equal(out.workflowRunId, parked.workflowRunId);
+  assert.equal(out.detached.statusCommand, `fgos workflow status ${parked.workflowRunId}`);
+  const types = readWorkflowEvents({ repoRoot: tmp, workflowRunId: parked.workflowRunId }).map((e) => e.type);
+  assert.ok(types.includes('gate.answer'), 'the answer is recorded before the command returns');
+  assert.equal(await waitForStatus(parked.workflowRunId, tmp, 'completed'), 'completed');
+});
+
+test('CLI: fgos workflow resume returns at once and a detached process advances the run once', async () => {
+  const tmp = setupTestRepo();
+  const workflow = validateWorkflow({ id: 'test/no-gate', steps: [{ id: 'only', dependsOn: [] }] });
+  const { workflowRunId } = createWorkflowRun({ repoRoot: tmp, workflowId: workflow.id, workflow });
+
+  const out = parseCliData(
+    execFileSync(process.execPath, [BIN_FGOS, 'workflow', 'resume', workflowRunId, '--dir', tmp], {
+      cwd: tmp,
+      encoding: 'utf8',
+    }),
+  );
+  assert.equal(out.detached.statusCommand, `fgos workflow status ${workflowRunId}`);
+  assert.ok(out.detached.pid > 0);
+  assert.equal(await waitForStatus(workflowRunId, tmp, 'completed'), 'completed');
+  const completions = readWorkflowEvents({ repoRoot: tmp, workflowRunId }).filter((e) => e.type === 'workflow.complete');
+  assert.equal(completions.length, 1, 'the detached child advances in the foreground and does not spawn another advance');
+});
+
+test('a run already being advanced by a live process refuses a second advance and records nothing', async () => {
+  const tmp = setupTestRepo();
+  const parked = await startWorkflow({ workflow: validateWorkflow(GATE_WORKFLOW), repoRoot: tmp, cwd: tmp });
+  const id = parked.workflowRunId;
+  const lockPath = path.join(tmp, '.fgos', 'workflow-runs', id, 'advance.lock');
+  assert.equal(fs.existsSync(lockPath), false, 'the lock is released when an advance ends');
+
+  // This test process stands in for the live advancing process.
+  fs.writeFileSync(lockPath, String(process.pid));
+  const eventCount = () => readWorkflowEvents({ repoRoot: tmp, workflowRunId: id }).length;
+  const before = eventCount();
+  const opts = { repoRoot: tmp, cwd: tmp };
+  const answer = { stepId: 'step-gate', answer: 'yes', ...opts };
+
+  assert.throws(() => resumeWorkflowDetached(id, opts), /already being advanced/);
+  assert.throws(() => answerWorkflowDetached(id, answer), /already being advanced/);
+  await assert.rejects(resumeWorkflow(id, opts), /already being advanced/);
+  await assert.rejects(answerWorkflow(id, answer), /already being advanced/);
+  assert.equal(eventCount(), before, 'a refused advance must not record the gate answer');
+  assert.equal(fs.readFileSync(lockPath, 'utf8'), String(process.pid), 'a refused advance leaves the holder lock alone');
+
+  // A lock left by a process that is gone is taken over.
+  const dead = execFileSync(process.execPath, ['-e', 'process.stdout.write(String(process.pid))'], { encoding: 'utf8' });
+  fs.writeFileSync(lockPath, dead);
+  const state = await answerWorkflow(id, answer);
+  assert.equal(state.status, 'completed');
+  assert.equal(fs.existsSync(lockPath), false);
 });
 
 test('a unit refused by policy fails its step and the workflow; dependent steps never run', async () => {
