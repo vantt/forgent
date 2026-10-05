@@ -222,7 +222,9 @@ test('approve --no-wait fails immediately on a live-held lock, main left untouch
   // unrelated to this item's own `code` discriminator addition).
   assert.equal(result.status, 9, result.stderr);
   assert.match(result.stderr, /main checkout is locked by pid \d+/);
-  assert.ok(elapsed < 2000, `--no-wait must fail fast (took ${elapsed}ms)`);
+  // The default wait is 10s, so anything well under it proves the flag skipped the wait; a tighter
+  // bound only measures how loaded the machine is while the CLI starts.
+  assert.ok(elapsed < 5000, `--no-wait must fail fast (took ${elapsed}ms)`);
   assert.equal(stateView(cwd).work['wait-no-wait-approve'].status, 'awaiting-approval', 'a refused-before-merge attempt must leave the item exactly where it was');
 });
 

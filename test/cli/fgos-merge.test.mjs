@@ -1128,7 +1128,8 @@ test('merge next --no-wait fails immediately on a live-held lock -- proves the f
   // rethrows as-is, so this fails exactly like a direct `approve` call does.
   assert.equal(result.status, 9, result.stderr);
   assert.match(result.stderr, /main checkout is locked by pid \d+/);
-  assert.ok(elapsed < 2000, `--no-wait forwarded through merge next must still fail fast, not wait (took ${elapsed}ms)`);
+  // The default wait is 10s, so anything well under it proves the flag skipped the wait.
+  assert.ok(elapsed < 5000, `--no-wait forwarded through merge next must still fail fast, not wait (took ${elapsed}ms)`);
 });
 
 test('sync-root never reports outcome "synced" when mergeRunnerItem returns an outcome it does not explicitly handle -- proves the defensive guard closes the false-success gap D4 found', () => {
