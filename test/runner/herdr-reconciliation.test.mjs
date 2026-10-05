@@ -1051,6 +1051,62 @@ test('19. confined execution under required bwrap executes via launcher script a
   assert.equal(receipt.completion?.kind, 'settled');
 });
 
+test('19b. a confined round opens its pane without the worker HOME, which only the launcher script exports', async (t) => {
+  if (!HAS_WORKING_BWRAP) return t.skip('working bwrap backend not available');
+  const tmp = mkTempDir();
+  const runDir = path.join(tmp, 'run');
+  const fgProcess = spawn(process.execPath, ['-e', 'setTimeout(() => {}, 10000)'], {
+    cwd: tmp,
+    env: { ...process.env, TEST_CONF_ENV: 'active', HOME: path.join(tmp, 'private-home') },
+    stdio: 'ignore',
+  });
+  t.after(() => { try { fgProcess.kill('SIGKILL'); } catch {} });
+  const mock = createMockHerdr(tmp, { runDir, mockArgv: ['claude', '--ro-bind', '/', '/', 'node', 'worker.mjs'], foregroundPid: fgProcess.pid });
+  createHerdrLaunchCommand(runDir, {
+    contract: 'assignment-herdr-spawn-launch-context.v1',
+    runId: 'run-conf-home', launchCommandId: 'cmd-conf-home', controlEpoch: 1, controlToken: 'tok-conf',
+  });
+  const workerInvocation = {
+    command: process.execPath,
+    args: ['--ro-bind', '/', '/', 'node', 'worker.mjs'],
+    cwd: tmp,
+    env: { TEST_CONF_ENV: 'active', HOME: path.join(tmp, 'private-home') },
+    workerCommandDigest: computeSha256Digest({ command: process.execPath, args: ['--ro-bind', '/', '/', 'node', 'worker.mjs'] }),
+  };
+  const prepDir = path.join(runDir, 'protected', 'prepared-invocation');
+  fs.mkdirSync(prepDir, { recursive: true });
+  const prepRec = { contract: 'authority-prepared-invocation.v1', workerInvocation };
+  const prepDigest = computeSha256Digest(prepRec);
+  publishImmutableProof(path.join(prepDir, 'cmd-conf-home.json'), { ...prepRec, digest: prepDigest });
+
+  await runHerdrRound({
+    herdrBin: mock.herdrBin,
+    workId: 'item-conf-home',
+    runId: 'run-conf-home',
+    launchCommandId: 'cmd-conf-home',
+    preparedInvocationDigest: prepDigest,
+    runDir,
+    command: 'node',
+    args: ['worker.mjs'],
+    cwd: tmp,
+    fullEnv: process.env,
+    paneEnv: { HOME: path.join(tmp, 'private-home'), KEEP_ME: 'yes' },
+    delivery: 'file-pointer',
+    agentKind: 'claude',
+    confinementRequirement: { mode: 'required' },
+    backendId: 'bwrap',
+    workerInvocation,
+    transportDeadlines: { startup: { readyMs: 500, promptMs: 500 }, round: { idleMs: 1000, ceilingMs: 2000 } },
+  });
+
+  const split = mock.calls().find((c) => c[0] === 'pane' && c[1] === 'split');
+  assert.ok(split, 'the round must open a pane');
+  const envArgs = split.filter((a, i) => split[i - 1] === '--env');
+  assert.ok(envArgs.includes('KEEP_ME=yes'), 'ordinary pane variables still reach the pane');
+  assert.ok(!envArgs.some((a) => a.startsWith('HOME=')),
+    'a private HOME without shell startup files makes the pane shell run its first-use wizard, which swallows the launch command');
+});
+
 // 20. Live Herdr gateway executes confined launch end-to-end when gateway is running
 //
 // HIGH-2: this used to launch a bare `node -e workerCode` as the "worker

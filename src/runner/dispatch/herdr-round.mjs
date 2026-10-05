@@ -1637,6 +1637,16 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
     round.note({ confinement: { status: 'confined-bwrap', confined: true } });
   }
 
+  // A confined launch exports its private HOME from the launcher script, so the
+  // pane's own shell never needs it. Handing it the private HOME as well would
+  // start that shell in a home without startup files, where zsh opens its
+  // first-use wizard and swallows the launch command typed right after.
+  let splitEnv = effectivePaneEnv;
+  if (isConfined && splitEnv && 'HOME' in splitEnv) {
+    const { HOME: _workerHome, ...rest } = splitEnv;
+    splitEnv = rest;
+  }
+
   if (existingCmd?.paneId) {
     round.paneId = existingCmd.paneId;
     round.note({ status: 'pane-reused', paneId: round.paneId });
@@ -1652,8 +1662,8 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
 
     try {
       round.paneId = isConfined
-        ? client.paneSplit({ pane: anchor, direction: 'down', ratio: 0.3, focus: false, cwd, env: effectivePaneEnv })
-        : client.paneSplit({ pane: anchor, cwd, env: effectivePaneEnv });
+        ? client.paneSplit({ pane: anchor, direction: 'down', ratio: 0.3, focus: false, cwd, env: splitEnv })
+        : client.paneSplit({ pane: anchor, cwd, env: splitEnv });
       round.note({ status: 'pane-created', paneId: round.paneId });
     } catch (err) {
       if (!anchor || err.code !== 'pane_not_found') {
@@ -1663,8 +1673,8 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
       batchTab?.invalidate(sessionKey);
       try {
         round.paneId = isConfined
-          ? client.paneSplit({ direction: 'down', ratio: 0.3, focus: false, cwd, env: effectivePaneEnv })
-          : client.paneSplit({ cwd, env: effectivePaneEnv });
+          ? client.paneSplit({ direction: 'down', ratio: 0.3, focus: false, cwd, env: splitEnv })
+          : client.paneSplit({ cwd, env: splitEnv });
         round.note({ status: 'pane-created', paneId: round.paneId, anchorLost: true });
       } catch (retryErr) {
         throw round.fail('worker-spawn-fail', retryErr.code ?? 'pane_split_failed',
