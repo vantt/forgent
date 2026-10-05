@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `fgos doctor`'s `observe-friction-migrated` failures now name the exact fix, `<host binary> friction migrate --dir <project>`, and say that `friction` is reachable only through the Rust host (the Node `fgos` entry has no such verb).
 - `fgos doctor`'s `shell-integration-sourced` check now reports its "fgos --help fails after stripping an underscore helper" probe as information (still passing) when run inside an agent harness shell, where that stripping is what the harness does; outside a harness shell it still fails.
 - `fgos doctor`'s `task-specs-resolve` and `domain-workflow-operations-coverage` checks no longer fail in a plain target project that has no fgOS `domains/` or `core/` tree; they resolve the task-specs and agent files against the fgOS install they run from.
 - A sandboxed headless (`cli-spawn`) worker is now told to write its result claim and report under the run's `worker-output/outbox`, the one run directory the sandbox leaves writable. The prompt and effective contract used to name the flat run directory, which is read-only there, so a worker that followed the prompt literally (deepseek through pi) failed with `EROFS` and landed no claim.

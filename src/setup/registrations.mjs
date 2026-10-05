@@ -5623,6 +5623,12 @@ export function checkObserveDirWritable(cwd) {
 
 export function checkObserveFrictionMigrated(cwd) {
   const root = resolveMainCheckoutRoot(cwd) ?? cwd;
+  // `friction` is a Rust host verb: the Node fgos entry refuses it, so the fix is named
+  // against the host binary when one resolves, and by its install location otherwise.
+  const hostBin = resolveHostBin(cwd);
+  const migrateFix = hostBin
+    ? `run: ${hostBin} friction migrate --dir ${root}`
+    : `run \`fgos friction migrate --dir ${root}\` with the Rust host binary (<project>/.fgos/installation/bin/fgos, or FGOS_HOST_BIN); the Node fgos entry has no friction verb and no host binary resolved here`;
   const fgosDir = path.join(root, '.fgos');
   if (!fs.existsSync(fgosDir)) {
     return { passed: true, message: 'no .fgos directory present' };
@@ -5674,7 +5680,7 @@ export function checkObserveFrictionMigrated(cwd) {
   if (!fs.existsSync(frictionDir) || !fs.statSync(frictionDir).isDirectory()) {
     return {
       passed: false,
-      message: 'friction migration not run: .fgos/observe/friction directory missing while legacy work.friction records exist',
+      message: `friction migration not run: .fgos/observe/friction directory missing while legacy work.friction records exist -- ${migrateFix}`,
     };
   }
 
@@ -5708,7 +5714,7 @@ export function checkObserveFrictionMigrated(cwd) {
   if (!hasMigrationRecord) {
     return {
       passed: false,
-      message: 'friction migration not run: no migration record found in .fgos/observe/friction/*.jsonl',
+      message: `friction migration not run: no migration record found in .fgos/observe/friction/*.jsonl -- ${migrateFix}`,
     };
   }
 
@@ -5716,7 +5722,7 @@ export function checkObserveFrictionMigrated(cwd) {
   if (unmigrated.length > 0) {
     return {
       passed: false,
-      message: `${unmigrated.length} legacy work.friction record(s) newer than cursor (not migrated)`,
+      message: `${unmigrated.length} legacy work.friction record(s) newer than cursor (not migrated) -- ${migrateFix}`,
     };
   }
 
