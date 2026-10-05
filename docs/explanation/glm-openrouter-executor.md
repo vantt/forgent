@@ -14,6 +14,15 @@ authoritative_for: adding a per-executor env override to the fgOS runner dispatc
 > The per-executor `env` mechanism described below is unchanged and is what
 > carries that reference. Everything below that names the claude CLI or
 > `ANTHROPIC_*` variables describes the superseded route.
+>
+> **Which invocation to use.** Run headless (`glm` with `pi-cli-bwrap-openrouter`),
+> `z-ai/glm-5.2` answers, calls `bash` and writes its report correctly (checked
+> 2026-10-05, a read-only Unit that read a file under `.fgos` and quoted its first
+> line). In an interactive herdr pane (`glm-herdr`) the model was seen repeating
+> one `bash` call (`echo hello`) with no progress until the pane was closed; the
+> cause is not known. The capability preference pools therefore name
+> `glm` with `pi-cli-bwrap-openrouter`, not `glm-herdr`, which stays defined for
+> investigation.
 
 `tsk-gb3` added a new fgOS runner executor named `glm` that reuses the
 `claude` CLI as its command but routes to GLM 5.2 (`z-ai/glm-5.2`) via

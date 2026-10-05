@@ -208,7 +208,8 @@
             "executor": "xai"
           },
           {
-            "executor": "glm-herdr"
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap-openrouter"
           }
         ]
       },
@@ -228,7 +229,8 @@
             "executor": "xai"
           },
           {
-            "executor": "glm-herdr"
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap-openrouter"
           }
         ]
       },
@@ -248,7 +250,8 @@
             "executor": "xai"
           },
           {
-            "executor": "glm-herdr"
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap-openrouter"
           }
         ]
       },
@@ -268,7 +271,8 @@
             "executor": "xai"
           },
           {
-            "executor": "glm-herdr"
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap-openrouter"
           }
         ]
       },
@@ -288,7 +292,8 @@
             "executor": "xai"
           },
           {
-            "executor": "glm-herdr"
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap-openrouter"
           }
         ]
       },
@@ -396,7 +401,8 @@
             "executor": "xai"
           },
           {
-            "executor": "glm-herdr"
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap-openrouter"
           }
         ]
       },
@@ -419,7 +425,8 @@
             "executor": "xai"
           },
           {
-            "executor": "glm-herdr"
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap-openrouter"
           }
         ]
       },
@@ -439,7 +446,8 @@
             "executor": "xai"
           },
           {
-            "executor": "glm-herdr"
+            "executor": "glm",
+            "invocation": "pi-cli-bwrap-openrouter"
           }
         ]
       },
