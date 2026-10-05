@@ -256,6 +256,10 @@ export function validateWorkflow(raw) {
           ? u.dependsOn.map((ud) => String(ud).trim()).filter(Boolean)
           : [];
 
+        if (template.params !== undefined && (template.params === null || typeof template.params !== 'object' || Array.isArray(template.params))) {
+          throw new WorkflowDefinitionError(`${unitLabel} params must be an object (pattern params such as members or roleTasks)`);
+        }
+
         units.push(
           Object.freeze({
             id: uId,
@@ -266,7 +270,8 @@ export function validateWorkflow(raw) {
               rigor,
               writes,
               taskSpec: typeof template.taskSpec === 'string' ? template.taskSpec.trim() : undefined,
-              persona: typeof template.persona === 'string' ? template.persona.trim() : undefined,
+              persona: typeof template.persona === 'string' && template.persona.trim() ? template.persona.trim() : undefined,
+              params: template.params === undefined ? undefined : structuredClone(template.params),
             }),
             dependsOn: uDependsOn,
           }),

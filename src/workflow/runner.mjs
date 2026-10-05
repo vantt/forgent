@@ -68,6 +68,25 @@ function buildUnitHandoff({ template, state, step, workflow }) {
   return { objective: parts.filter(Boolean).join('\n\n'), inputs };
 }
 
+/**
+ * The pattern a template runs: its name, or the name with the template's `params` when it has
+ * any -- the same `{ pattern, params }` shape the Execution Core accepts from a CLI caller.
+ */
+function unitPatternOf(template) {
+  const name = template.pattern || 'solo';
+  return template.params ? { pattern: name, params: template.params } : name;
+}
+
+/**
+ * The overrides a template implies. `persona` binds that persona on every seat of the unit, as the
+ * `--override` JSON `{"scope":{"unit":"<id>"},"persona":"<name>"}` would; the origin says the
+ * Workflow definition set it, not a person at the CLI.
+ */
+function unitOverridesOf(unit) {
+  const persona = unit.template.persona;
+  return persona ? [{ scope: { unit: unit.id }, persona, origin: 'workflow' }] : [];
+}
+
 function gitOk(cwd, args) {
   try {
     execFileSync('git', args, { cwd, stdio: 'ignore' });
@@ -298,7 +317,8 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
             repoRoot: mainRoot,
             cwd: unitWorktree,
             worktree: unitWorktree,
-            pattern: unitData.pattern,
+            pattern: unitPatternOf(u.template),
+            overrides: unitOverridesOf(u),
           });
 
           appendWorkflowEvent({

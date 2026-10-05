@@ -751,3 +751,92 @@ test('a step target is accepted on integrate steps only', () => {
   assert.equal(ok.steps[1].target, 'release');
   assert.throws(() => validateWorkflow({ ...base, steps: [{ id: 's1', target: 'release', units: [unit] }] }), /only valid on a step of kind "integrate"/);
 });
+
+test('validateWorkflow keeps a unit template persona and params and rejects params that are not an object', () => {
+  const base = { id: 'test/persona-params', steps: [{ id: 's1', units: [{ id: 'u1', template: { capability: 'docs:write', pattern: 'panel', persona: ' panelist ', params: { members: 2 } } }] }] };
+  const template = validateWorkflow(base).steps[0].units[0].template;
+  assert.equal(template.persona, 'panelist');
+  assert.deepEqual(template.params, { members: 2 });
+
+  for (const bad of ['x', ['a'], 3]) {
+    const workflow = { ...base, steps: [{ id: 's1', units: [{ id: 'u1', template: { capability: 'docs:write', params: bad } }] }] };
+    assert.throws(() => validateWorkflow(workflow), /params must be an object/);
+  }
+});
+
+// Executors of distinct provider families, so a panel can bind every seat.
+function useDistinctFamilies(tmp, names) {
+  const cfgPath = path.join(tmp, '.fgos', 'config.json');
+  const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+  const script = path.join(tmp, 'echo-worker.mjs');
+  cfg.runner.executors = {};
+  for (const name of names) {
+    const command = path.join(tmp, `${name}-bin`);
+    fs.symlinkSync(process.execPath, command);
+    cfg.runner.executors[name] = {
+      kind: 'agent',
+      allowCrossProvider: true,
+      command,
+      args: [script, '{prompt}'],
+      providerModel: name,
+      invocations: [{ id: 'cli-default', via: 'cli', adapter: 'cli-spawn', confinement: { backend: 'bwrap' }, command, args: [script, '{prompt}'] }],
+    };
+  }
+  cfg.runner.defaultExecutor = names[0];
+  for (const capability of Object.values(cfg.runner.capabilities)) {
+    capability.prefer = names.map((executor) => ({ executor }));
+  }
+  fs.writeFileSync(cfgPath, JSON.stringify(cfg, null, 2));
+}
+
+test('a unit template persona and params reach the binding and the per-role objective like a CLI override', async () => {
+  const tmp = setupTestRepo();
+  useDistinctFamilies(tmp, ['alpha', 'beta', 'gamma']);
+
+  const workflow = validateWorkflow({
+    id: 'persona-params',
+    steps: [
+      {
+        id: 'panel',
+        units: [
+          {
+            id: 'p',
+            template: {
+              capability: 'docs:write',
+              pattern: 'panel',
+              persona: 'panelist',
+              params: { members: 2, roleTasks: { synthesizer: 'WORKFLOW-SYNTH-TASK for: {objective}' } },
+              objective: 'Review the design',
+              writes: [],
+            },
+          },
+        ],
+      },
+      { id: 'plain', dependsOn: ['panel'], units: [{ id: 's', template: { capability: 'docs:write', pattern: 'solo', objective: 'Decide', writes: [] } }] },
+    ],
+  });
+  const state = await startWorkflow({ workflow, repoRoot: tmp, cwd: tmp, worktree: tmp });
+  assert.equal(state.status, 'completed', JSON.stringify(state.steps));
+
+  const runDir = (runId) => path.join(tmp, '.fgos', 'assignments', runId);
+  const readAssignment = (runId, role) => JSON.parse(fs.readFileSync(path.join(runDir(runId), role, '1', 'assignment.json'), 'utf8'));
+  const panelRunId = state.steps.panel.units.p.unitRunId;
+
+  // params.members reached the pattern: two panelists, not the default three.
+  assert.ok(fs.existsSync(path.join(runDir(panelRunId), 'panelist-2')));
+  assert.ok(!fs.existsSync(path.join(runDir(panelRunId), 'panelist-3')));
+  // params.roleTasks reached roleUnit: the synthesizer was given the workflow's own task text.
+  assert.match(readAssignment(panelRunId, 'synthesizer').objective, /^WORKFLOW-SYNTH-TASK for: Review the design/);
+
+  // persona reached bind() as an override scoped to the unit, so its seats carry the persona.
+  for (const role of ['panelist-1', 'panelist-2']) {
+    assert.equal(readAssignment(panelRunId, role).policy.preferPersona, 'panelist', role);
+  }
+  const unitRecord = JSON.parse(fs.readFileSync(path.join(runDir(panelRunId), 'unit.json'), 'utf8'));
+  assert.equal(unitRecord.overrides[0].origin, 'workflow');
+  assert.deepEqual(unitRecord.overrides[0].scope, { unit: 'p' });
+
+  // a unit that declares no persona gets none from the workflow.
+  const soloRunId = state.steps.plain.units.s.unitRunId;
+  assert.notEqual(readAssignment(soloRunId, 'producer').policy.preferPersona, 'panelist');
+});
