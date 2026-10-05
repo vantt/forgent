@@ -4515,7 +4515,7 @@ const READY_CLAIM_GATES = {
  * runner records before the worker runs, the runner-owned dispatched-run
  * manifest in assignment.json, and the claim-bytes binding (sha256 of the
  * exact agent-result.json bytes the runner classified). */
-function seedStoredValidatePlanResult(tempDir, { id, docsRef, planContent = PLAN_V1_CONTENT, withHash = false, withBinding = true, withReport = true, claimOverride = null, resultExtra = {}, manifest = ['01'], failedExit = null } = {}) {
+function seedStoredValidatePlanResult(tempDir, { id, docsRef, planContent = PLAN_V1_CONTENT, withHash = false, withBinding = true, withReport = true, claimOverride = null, resultExtra = {}, manifest = ['01'], failedExit = null, claimInConfinedOutbox = false } = {}) {
   const docsDir = path.join(tempDir, docsRef);
   fs.mkdirSync(docsDir, { recursive: true });
   const planPath = path.join(docsDir, 'plan.md');
@@ -4555,7 +4555,10 @@ function seedStoredValidatePlanResult(tempDir, { id, docsRef, planContent = PLAN
   // The claim exists as worker-written bytes on disk; the binding recorded in
   // result.json is the sha256 of those exact bytes.
   const claimBytes = JSON.stringify(agentClaim);
-  fs.writeFileSync(path.join(runDir, 'agent-result.json'), claimBytes);
+  // A confined worker can only write under worker-output/outbox.
+  const claimDir = claimInConfinedOutbox ? path.join(runDir, 'worker-output', 'outbox') : runDir;
+  fs.mkdirSync(claimDir, { recursive: true });
+  fs.writeFileSync(path.join(claimDir, 'agent-result.json'), claimBytes);
 
   const resultJson = {
     runId: `run_${asgnId}_01`,
@@ -4615,6 +4618,49 @@ test('stored validate-plan result with a matching plan content hash is consumabl
   const choice = choosePlanning(tempDir, planningWorkFor('tsk-hash-consume', docsRef));
   assert.equal(choice.canAdvanceEdge, true);
   assert.equal(choice.reason, 'validation-passed-ready-for-planning-edge');
+});
+
+test('stored validate-plan result whose claim lives only under the confined worker-output outbox is consumable cross-pass', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/confined-claim';
+  const { resultPath, runDir } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-confined-claim',
+    docsRef,
+    withHash: true,
+    claimInConfinedOutbox: true,
+  });
+  assert.equal(fs.existsSync(path.join(runDir, 'agent-result.json')), false);
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-confined-claim', docsRef));
+  assert.equal(choice.canAdvanceEdge, true);
+  assert.equal(choice.reason, 'validation-passed-ready-for-planning-edge');
+});
+
+test('stored validate-plan result whose confined claim bytes were edited after settle is not consumed', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/confined-claim-tamper';
+  const { resultPath, runDir } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-confined-claim-tamper',
+    docsRef,
+    withHash: true,
+    claimInConfinedOutbox: true,
+  });
+  fs.appendFileSync(path.join(runDir, 'worker-output', 'outbox', 'agent-result.json'), ' ');
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-confined-claim-tamper', docsRef));
+  assert.notEqual(choice.reason, 'validation-passed-ready-for-planning-edge');
 });
 
 test('stored validate-plan result whose plan content hash mismatches the current plan.md is never consumed cross-pass', () => {

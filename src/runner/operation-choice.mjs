@@ -19,7 +19,7 @@ import { planVerdictFromPlanMd } from '../intake/plan-verdict-from-plan-md.mjs';
 import { executorIdForWork, resolveCapabilityIdentityDetails, resolveCapabilityIdentity, buildPrompt } from './work-compat.mjs';
 import { workDispatchContext } from './work-dispatch.mjs';
 import { buildAssignment, isReadOnlyAssignment, validateAgentResultClaim } from './dispatch/assignment.mjs';
-import { executeAssignment, isSubstantiveReportText } from './dispatch/assignment-runner.mjs';
+import { executeAssignment, isSubstantiveReportText, resolveRunWorkerArtifactPath } from './dispatch/assignment-runner.mjs';
 import { interpretRunResult, runOutcome } from './dispatch/run-result.mjs';
 import { stampDeclaredAssignment } from './dispatch/assignment-normalizer.mjs';
 import { detectTrunk } from './worktree.mjs';
@@ -225,12 +225,13 @@ function findLatestAssignmentRunResult({ work, repoRoot, stage, resultKind = 'ga
           // verdict in result.json, or in the worker's own file) breaks the
           // pairing. A schema-valid result recorded without the binding is
           // not consumable (fail closed, same stance as the plan hash).
+          const storedClaimPath = resolveRunWorkerArtifactPath(path.join(runsDir, runSub), /^result-(\d+)\.json$/, 'agent-result.json');
           if (runResult.agentClaim !== undefined && runResult.agentClaim !== null) {
             const recordedClaimHash = typeof runResult.claimSha256 === 'string' ? runResult.claimSha256 : '';
             if (!recordedClaimHash) continue;
             let storedClaimBytes = null;
             try {
-              storedClaimBytes = fs.readFileSync(path.join(runsDir, runSub, 'agent-result.json'));
+              storedClaimBytes = fs.readFileSync(storedClaimPath);
             } catch {
               continue;
             }
@@ -398,7 +399,7 @@ function findLatestAssignmentRunResult({ work, repoRoot, stage, resultKind = 'ga
             claimInvalid: false,
             workerArtifacts: [
               ...settleReports.map((e) => e.path),
-              path.relative(repoRoot, path.join(runsDir, runSub, 'agent-result.json')),
+              path.relative(repoRoot, storedClaimPath),
             ],
             changedFiles: Array.isArray(runResult.evidence?.changedFiles)
               ? runResult.evidence.changedFiles.filter((f) => typeof f === 'string')
@@ -1580,7 +1581,7 @@ export function getReportText(runResult, repoRoot) {
     (resolvedRecorded === consumingDir || resolvedRecorded.startsWith(`${consumingDir}${path.sep}`));
   if (recordedInRun) candidatePaths.push(resolvedRecorded);
   candidatePaths.push(path.join(consumingDir, path.basename(reportPath)));
-  candidatePaths.push(path.join(consumingDir, 'agent-report.md'));
+  candidatePaths.push(resolveRunWorkerArtifactPath(consumingDir, /^report-(\d+)\.md$/, 'agent-report.md'));
 
   for (const p of candidatePaths) {
     try {
