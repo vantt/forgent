@@ -1,7 +1,7 @@
 ---
 phase: 2
 title: "Say what to do with the refs (conditional)"
-status: not-needed
+status: superseded
 priority: P2
 effort: "0.25d"
 dependencies: [1]
