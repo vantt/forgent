@@ -164,10 +164,36 @@ function settleUnitWorktrees({ mainRoot, state, workflow }) {
   return { removed, kept };
 }
 
+const PROGRESS_LINE_LIMIT = 300;
+
+/** One log line for the events that mark a step's progress, null for every other event. */
+function progressLine({ ts, type, payload }) {
+  const step = payload?.stepId;
+  let what;
+  if (type === 'step.start') what = 'started';
+  else if (type === 'step.complete') what = 'completed';
+  else if (type === 'step.fail') what = `failed: ${payload.reason ?? payload.outcome}`;
+  else if (type === 'gate.park') what = 'parked, waiting for an answer';
+  else return null;
+  return `[${ts}] step ${step} ${what}`.slice(0, PROGRESS_LINE_LIMIT);
+}
+
+// The detached advance process is the only one whose output is a log nobody is watching live, so
+// it alone prints progress; a foreground advance keeps its stdout for the result.
+const ADVANCE_DETACHED_ENV = 'FGOS_WORKFLOW_ADVANCE_DETACHED';
+const detachedChildLog = process.env[ADVANCE_DETACHED_ENV] === '1' ? (line) => process.stderr.write(`${line}\n`) : null;
+
 /**
  * Run loop to advance ready steps in a Workflow run.
  */
-async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot, worktreePath, onLog }) {
+async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot, worktreePath, onLog = detachedChildLog }) {
+  // Every event is recorded in the event log; a step's start, end or park also reaches onLog as one line.
+  const recordEvent = (args) => {
+    const stored = appendWorkflowEvent(args);
+    const line = progressLine(stored);
+    if (line && onLog) onLog(line);
+    return stored;
+  };
   let events = readWorkflowEvents({ repoRoot: mainRoot, workflowRunId });
   let state = projectWorkflowState(events);
 
@@ -192,7 +218,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
       // Check if all steps completed
       const allDone = steps.every((s) => state.steps[s.id]?.status === 'completed');
       if (allDone) {
-        appendWorkflowEvent({
+        recordEvent({
           repoRoot: mainRoot,
           workflowRunId,
           event: {
@@ -212,7 +238,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
 
       // 1. Human gate check
       if (step.gate && step.gate.kind === 'human' && stepState.status !== 'answered') {
-        appendWorkflowEvent({
+        recordEvent({
           repoRoot: mainRoot,
           workflowRunId,
           event: {
@@ -231,7 +257,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
 
       // Mark step start if pending
       if (stepState.status === 'pending' || stepState.status === 'answered') {
-        appendWorkflowEvent({
+        recordEvent({
           repoRoot: mainRoot,
           workflowRunId,
           event: {
@@ -265,7 +291,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
           }
         }
 
-        appendWorkflowEvent({
+        recordEvent({
           repoRoot: mainRoot,
           workflowRunId,
           event: {
@@ -317,7 +343,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
             }
           }
 
-          appendWorkflowEvent({
+          recordEvent({
             repoRoot: mainRoot,
             workflowRunId,
             event: {
@@ -340,7 +366,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
             overrides: unitOverridesOf(u),
           });
 
-          appendWorkflowEvent({
+          recordEvent({
             repoRoot: mainRoot,
             workflowRunId,
             event: {
@@ -367,7 +393,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
         if (failedUnit) {
           const refusal = failedUnit.results.find((r) => r?.refused)?.refused;
           const reason = refusal ? `${refusal.reason}: ${refusal.detail}` : `unit ${failedUnit.unitId} ended ${failedUnit.outcome}`;
-          appendWorkflowEvent({
+          recordEvent({
             repoRoot: mainRoot,
             workflowRunId,
             event: {
@@ -375,7 +401,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
               payload: { stepId: step.id, outcome: failedUnit.outcome, unitId: failedUnit.unitId, reason, failedAt: new Date().toISOString() },
             },
           });
-          appendWorkflowEvent({
+          recordEvent({
             repoRoot: mainRoot,
             workflowRunId,
             event: {
@@ -387,7 +413,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
         }
 
         {
-          appendWorkflowEvent({
+          recordEvent({
             repoRoot: mainRoot,
             workflowRunId,
             event: {
@@ -398,7 +424,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
         }
       } else {
         // Step with no units
-        appendWorkflowEvent({
+        recordEvent({
           repoRoot: mainRoot,
           workflowRunId,
           event: {
@@ -421,7 +447,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
   if ((state.status === 'completed' || state.status === 'failed') && !state.worktrees) {
     const { removed, kept } = settleUnitWorktrees({ mainRoot, state, workflow });
     if (removed.length > 0 || kept.length > 0) {
-      appendWorkflowEvent({
+      recordEvent({
         repoRoot: mainRoot,
         workflowRunId,
         event: { type: 'workflow.worktrees', payload: { removed, kept } },
@@ -510,6 +536,49 @@ function acquireAdvanceLock(mainRoot, workflowRunId) {
   throw advanceRefusal(workflowRunId, 0);
 }
 
+const ADVANCE_TAIL_LINES = 20;
+const ADVANCE_TAIL_READ_BYTES = 64 * 1024;
+// A recorded run whose advance has not taken the lock yet is still starting; past this age with no
+// live holder it is a dead child.
+const ADVANCE_STALE_MS = 30 * 1000;
+
+function tailAdvanceLog(logPath) {
+  let fd;
+  try {
+    fd = fs.openSync(logPath, 'r');
+    const { size } = fs.fstatSync(fd);
+    const length = Math.min(size, ADVANCE_TAIL_READ_BYTES);
+    const buffer = Buffer.alloc(length);
+    fs.readSync(fd, buffer, 0, length, size - length);
+    return buffer
+      .toString('utf8')
+      .split('\n')
+      .filter((line) => line.length > 0)
+      .slice(-ADVANCE_TAIL_LINES)
+      .map((line) => line.slice(0, PROGRESS_LINE_LIMIT));
+  } catch {
+    return [];
+  } finally {
+    if (fd !== undefined) fs.closeSync(fd);
+  }
+}
+
+/** What the detached advance of a run is doing: liveness from the lock holder, plus its log tail. */
+function advanceReport(runDir, workflowRunId, state, events) {
+  const holder = liveAdvanceHolder(runDir);
+  const logPath = path.join(runDir, 'advance.log');
+  const advance = { running: holder !== null, pid: holder || null, logPath };
+  if (state.status !== 'completed') {
+    const lastLines = tailAdvanceLog(logPath);
+    if (lastLines.length > 0) advance.lastLines = lastLines;
+  }
+  const lastTs = Date.parse(events[events.length - 1].ts);
+  if (state.status === 'running' && holder === null && Date.now() - lastTs > ADVANCE_STALE_MS) {
+    advance.hint = `The advance of this run is not running and nothing was recorded for a while; continue it with: fgos workflow resume ${workflowRunId}`;
+  }
+  return advance;
+}
+
 /** Run `advance` while this process holds the run's advance lock. */
 async function withAdvanceLock(mainRoot, workflowRunId, advance) {
   const release = acquireAdvanceLock(mainRoot, workflowRunId);
@@ -537,6 +606,7 @@ function spawnDetachedAdvance({ mainRoot, workflowRunId, runDir, worktree, cwd, 
     child = spawn(process.execPath, args, {
       cwd: cwd ?? process.cwd(),
       detached: true,
+      env: { ...process.env, [ADVANCE_DETACHED_ENV]: '1' },
       stdio: ['ignore', logFd, logFd],
     });
   } finally {
@@ -644,7 +714,8 @@ export async function startWorkflow(params = {}) {
 }
 
 /**
- * Get current projected status of a Workflow run.
+ * Get current projected status of a Workflow run, plus `advance: { running, pid, logPath, lastLines?, hint? }`
+ * describing its detached advance.
  *
  * @param {string} workflowRunId
  * @param {object} [options]
@@ -662,7 +733,8 @@ export function statusWorkflow(workflowRunId, options = {}) {
   if (events.length === 0) {
     throw new RunnerConfigError(`Workflow run "${workflowRunId}" not found`);
   }
-  return projectWorkflowState(events);
+  const state = projectWorkflowState(events);
+  return { ...state, advance: advanceReport(workflowRunDirOf(mainRoot, workflowRunId), workflowRunId, state, events) };
 }
 
 /**

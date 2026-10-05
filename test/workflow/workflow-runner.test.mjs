@@ -533,6 +533,131 @@ test('a run already being advanced by a live process refuses a second advance an
   assert.equal(fs.existsSync(lockPath), false);
 });
 
+function writeRunLog(tmp, id, text) {
+  fs.writeFileSync(path.join(tmp, '.fgos', 'workflow-runs', id, 'advance.log'), text);
+}
+
+// Rewrites every event timestamp so a run looks as if nothing was recorded for `ageMs`.
+function ageRunEvents(tmp, id, ageMs) {
+  const file = path.join(tmp, '.fgos', 'workflow-runs', id, 'events.jsonl');
+  const ts = new Date(Date.now() - ageMs).toISOString();
+  const lines = fs.readFileSync(file, 'utf8').trim().split('\n').map((l) => JSON.stringify({ ...JSON.parse(l), ts }));
+  fs.writeFileSync(file, lines.join('\n') + '\n');
+}
+
+test('status reports a live advance holder and the tail of the advance log', async () => {
+  const tmp = setupTestRepo();
+  const parked = await startWorkflow({ workflow: validateWorkflow(GATE_WORKFLOW), repoRoot: tmp, cwd: tmp });
+  const id = parked.workflowRunId;
+  const opts = { repoRoot: tmp, cwd: tmp };
+  const runDir = path.join(tmp, '.fgos', 'workflow-runs', id);
+
+  const idle = statusWorkflow(id, opts).advance;
+  assert.equal(idle.running, false);
+  assert.equal(idle.pid, null);
+  assert.equal(idle.logPath, path.join(runDir, 'advance.log'));
+  assert.equal(idle.lastLines, undefined, 'an empty or absent log has nothing to tail');
+  assert.equal(idle.hint, undefined, 'a parked run is waiting for an answer, not for a restart');
+
+  // This test process stands in for the live advancing process.
+  fs.writeFileSync(path.join(runDir, 'advance.lock'), String(process.pid));
+  const lines = Array.from({ length: 30 }, (_, i) => `line-${i + 1} ${'x'.repeat(i === 29 ? 500 : 0)}`);
+  writeRunLog(tmp, id, lines.join('\n') + '\n');
+
+  const live = statusWorkflow(id, opts).advance;
+  assert.equal(live.running, true);
+  assert.equal(live.pid, process.pid);
+  assert.equal(live.lastLines.length, 20, 'the tail is the last 20 lines');
+  assert.ok(live.lastLines[0].startsWith('line-11'));
+  assert.equal(live.lastLines[19].length, 300, 'each line is capped at 300 characters');
+  assert.equal(live.hint, undefined);
+});
+
+test('status says a running run has no live advance and names resume once the last event is old', async () => {
+  const tmp = setupTestRepo();
+  const workflow = validateWorkflow({ id: 'test/no-gate', steps: [{ id: 'only', dependsOn: [] }] });
+  const { workflowRunId: id } = createWorkflowRun({ repoRoot: tmp, workflowId: workflow.id, workflow });
+  const opts = { repoRoot: tmp, cwd: tmp };
+  const lockPath = path.join(tmp, '.fgos', 'workflow-runs', id, 'advance.lock');
+
+  const fresh = statusWorkflow(id, opts);
+  assert.equal(fresh.status, 'running');
+  assert.equal(fresh.advance.running, false);
+  assert.equal(fresh.advance.hint, undefined, 'a just-recorded run may still be starting its advance');
+
+  ageRunEvents(tmp, id, 10 * 60 * 1000);
+  writeRunLog(tmp, id, 'Error: spawn failed\n');
+  const dead = execFileSync(process.execPath, ['-e', 'process.stdout.write(String(process.pid))'], { encoding: 'utf8' });
+  fs.writeFileSync(lockPath, dead);
+
+  const stale = statusWorkflow(id, opts).advance;
+  assert.equal(stale.running, false, 'a lock left by a dead process is not a live advance');
+  assert.equal(stale.pid, null);
+  assert.match(stale.hint, /not running/);
+  assert.ok(stale.hint.includes(`fgos workflow resume ${id}`));
+  assert.deepEqual(stale.lastLines, ['Error: spawn failed'], 'whatever the dead child printed stays readable');
+
+  // A live holder means the run is being advanced, however old the last event.
+  fs.writeFileSync(lockPath, String(process.pid));
+  const held = statusWorkflow(id, opts).advance;
+  assert.equal(held.running, true);
+  assert.equal(held.hint, undefined);
+});
+
+test('status shows no log tail for a completed run', async () => {
+  const tmp = setupTestRepo();
+  const state = await startWorkflow({
+    workflow: validateWorkflow({ id: 'test/no-gate', steps: [{ id: 'only', dependsOn: [] }] }),
+    repoRoot: tmp,
+    cwd: tmp,
+  });
+  assert.equal(state.status, 'completed');
+  writeRunLog(tmp, state.workflowRunId, 'step only completed\n');
+  const advance = statusWorkflow(state.workflowRunId, { repoRoot: tmp, cwd: tmp }).advance;
+  assert.equal(advance.lastLines, undefined);
+  assert.equal(advance.hint, undefined);
+});
+
+test('CLI: the detached child logs a line per step start and end, and workflow status prints the advance block', async () => {
+  const tmp = setupTestRepo();
+  const planDir = path.join(tmp, 'progress-plan');
+  fs.mkdirSync(planDir);
+  fs.writeFileSync(path.join(planDir, 'plan.md'), '---\ntitle: "Progress Plan"\n---\n');
+  fs.writeFileSync(path.join(planDir, 'phase-01-start.md'), '---\nphase: 1\ntitle: "Start Phase"\ndependencies: []\n---\n');
+
+  const wfRunId = parseCliData(
+    execFileSync(process.execPath, [BIN_FGOS, 'workflow', 'start', '--plan', planDir, '--dir', tmp], { cwd: tmp, encoding: 'utf8' }),
+  ).workflowRunId;
+  assert.equal(await waitForStatus(wfRunId, tmp, 'completed'), 'completed');
+  const stepId = Object.keys(statusWorkflow(wfRunId, { repoRoot: tmp, cwd: tmp }).steps)[0];
+
+  const log = fs.readFileSync(path.join(tmp, '.fgos', 'workflow-runs', wfRunId, 'advance.log'), 'utf8');
+  const stepLines = log.split('\n').filter((l) => l.includes(`step ${stepId}`));
+  assert.equal(stepLines.length, 2, `one line when the step starts and one when it ends, got: ${log}`);
+  assert.match(stepLines[0], /started/);
+  assert.match(stepLines[1], /completed/);
+
+  const status = parseCliData(
+    execFileSync(process.execPath, [BIN_FGOS, 'workflow', 'status', wfRunId, '--dir', tmp], { cwd: tmp, encoding: 'utf8' }),
+  );
+  assert.equal(status.advance.running, false);
+  assert.ok(status.advance.logPath.endsWith('advance.log'));
+});
+
+test('a foreground advance writes no log file; an explicit onLog receives the progress lines', async () => {
+  const tmp = setupTestRepo();
+  const lines = [];
+  const state = await startWorkflow({
+    workflow: validateWorkflow({ id: 'test/no-gate', steps: [{ id: 'only', dependsOn: [] }] }),
+    repoRoot: tmp,
+    cwd: tmp,
+    onLog: (line) => lines.push(line),
+  });
+  assert.equal(state.status, 'completed');
+  assert.equal(lines.length, 2, 'one line when the step starts and one when it ends');
+  assert.equal(fs.existsSync(path.join(tmp, '.fgos', 'workflow-runs', state.workflowRunId, 'advance.log')), false);
+});
+
 test('a unit refused by policy fails its step and the workflow; dependent steps never run', async () => {
   const tmp = setupTestRepo();
   const workflow = validateWorkflow({
