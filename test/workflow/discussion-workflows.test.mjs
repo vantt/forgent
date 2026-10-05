@@ -133,6 +133,13 @@ test('delphi.yaml schema validation & discovery', () => {
   assert.equal(wf.steps[3].units[0].template.capability, 'delphi:synthesize');
   assert.equal(wf.steps[3].units[0].template.pattern, 'solo');
 
+  // Round 2 hands each panelist the group summary and its own round 1 proposal only.
+  assert.deepEqual(wf.steps[2].units[0].template.inputs, [
+    { step: 'feedback-synthesis', label: 'group summary' },
+    { step: 'blind-proposals', sameSeat: true, label: 'your own previous proposal' },
+  ]);
+  assert.equal(wf.steps[3].units[0].template.inputs, undefined);
+
   // Check discovery from core directory
   const discovered = discoverWorkflows();
   assert.ok(discovered.has('delphi'));
