@@ -1124,11 +1124,10 @@ test('validateWorkflow keeps blind only when true and rejects a non-boolean', ()
 // Executors of distinct provider families, so a panel can bind every seat.
 //
 // Each executor command is a symlink to the node binary (over 100 MB). Left as
-// untracked files, every seat's dispatch reads and hashes each of them as a
-// pre-existing dirty file, once before launch and again at settlement, and
-// keeps the bytes: one `fgos` CLI process then peaks near 2 GB of RSS. A few
-// such tests in parallel exhaust memory, the kernel kills a process mid-run, and
-// the seat is only given up at its timeout. The symlinks are excluded from git
+// untracked files, every seat's dispatch hashes each of them as a pre-existing
+// dirty file, once before launch and again at settlement. The hash streams the
+// file, so memory stays flat, but reading 100 MB per seat is still slow work
+// that a test of seat wiring does not need. The symlinks are excluded from git
 // so they are not part of the worktree the dispatch snapshots.
 //
 // `runner.timeoutMs` is bounded so a seat whose worker never answers fails the

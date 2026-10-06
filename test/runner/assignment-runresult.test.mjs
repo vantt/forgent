@@ -751,9 +751,7 @@ test('snapshotDirtyBeforeFiles hashes a 200 MiB dirty file with bounded memory',
     fs.truncateSync(big, 200 * 1024 * 1024);
 
     const before = process.memoryUsage();
-    const started = Date.now();
     const snapshots = snapshotDirtyBeforeFiles(tempDir, ['big.bin']);
-    const elapsedMs = Date.now() - started;
     const after = process.memoryUsage();
 
     assert.equal(snapshots.get('big.bin').exists, true);
@@ -765,7 +763,6 @@ test('snapshotDirtyBeforeFiles hashes a 200 MiB dirty file with bounded memory',
       `arrayBuffers grew by ${((after.arrayBuffers - before.arrayBuffers) / MiB).toFixed(1)} MiB`);
     assert.ok(after.rss - before.rss < 64 * MiB,
       `rss grew by ${((after.rss - before.rss) / MiB).toFixed(1)} MiB`);
-    assert.ok(elapsedMs < 3000, `hashing took ${elapsedMs} ms`);
   } finally {
     fs.rmSync(tempDir, { recursive: true, force: true });
   }

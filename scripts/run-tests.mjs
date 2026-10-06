@@ -302,6 +302,18 @@ export function runSelectedTests(files, {
     runTemp = null;
   }
 
+  // Fixtures that confined workers must reach live outside /tmp. A per-run root removed here also
+  // covers a test file the watchdog killed, which never runs its own exit cleanup.
+  let fixtureRoot = null;
+  if (fs.existsSync('/var/tmp') && env[KEEP_TMP_ENV] !== '1') {
+    try {
+      fixtureRoot = fs.mkdtempSync('/var/tmp/fgos-test-fixtures-');
+      childEnv.FGOS_TEST_FIXTURE_ROOT = fixtureRoot;
+    } catch {
+      fixtureRoot = null;
+    }
+  }
+
   const fgosBefore = snapshotFgos(cwd);
 
   let result;
@@ -314,6 +326,13 @@ export function runSelectedTests(files, {
     result = { status: spawnResult.status ?? 1, files: relFiles, runTemp };
   } finally {
     if (supervisor) timedOut = supervisor.stop();
+    if (fixtureRoot) {
+      try {
+        fs.rmSync(fixtureRoot, { recursive: true, force: true, maxRetries: 3 });
+      } catch {
+        // Best effort: leftover fixtures must not fail a finished run.
+      }
+    }
     if (runTemp) {
       if (env[KEEP_TMP_ENV] === '1') {
         log(`run-tests: kept this run's temp dir (${KEEP_TMP_ENV}=1): ${runTemp}`);
