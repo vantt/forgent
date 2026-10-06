@@ -18,8 +18,8 @@ Related:
 
 Hợp đồng giao tiếp VÀO/RA hạng nhất cho bề mặt CLI của fgOS (`bin/fgos.mjs`)
 và bề mặt stdout của vòng tự hành (`bin/fgos-runner.mjs`), theo record
-[0014](../../../decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md) (kiến trúc cửa, đã
-khoá) và [0011](../../../decisions/0011-version-tuong-minh-cho-moi-contract.md) (mọi
+`0014` (`docs/decisions/0014-kien-truc-giao-tiep-nguoi-fgos.md`) (kiến trúc cửa, đã
+khoá) và [0011](../decisions/retired-decision-history.md#7-adr-0011-explicit-version-for-every-contract) (mọi
 contract mang version tường minh `<name>/v<N>`). Tài liệu này là bản chốt
 bằng văn xuôi hợp nhất những gì `str46-io-contract` đã dựng qua ba lát —
 không phải code runtime mới, không lặp lại chi tiết cài đặt đã có trong
@@ -327,7 +327,7 @@ ví dụ) — không phải toàn bộ sổ verb. Áp dụng ĐỒNG NHẤT cho 
 
 ## 10. Version Tokens
 
-Theo [0011](../../../decisions/0011-version-tuong-minh-cho-moi-contract.md): mỗi
+Theo [0011](../decisions/retired-decision-history.md#7-adr-0011-explicit-version-for-every-contract): mỗi
 contract mang version tường minh trong định danh của chính nó.
 
 | Bề mặt | Token | Hiện thân |
