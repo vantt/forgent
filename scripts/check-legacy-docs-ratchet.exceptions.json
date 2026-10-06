@@ -6,10 +6,10 @@
     {
       "path": "docs/specs/reading-map.md",
       "kind": "allowed-edit",
-      "rationale": "Phase 01 verified stale standing route correction: update transitional rule banner to cite docs/transitional-switchboard.md, record Phase 00 and Phase 01 completion, and replace defunct fgos-coding-compounding skill references with fgos-coding-knowledge. Re-reviewed 2026-09-29 after main sync: feat(coding): convert fgos-plan-loop/fgos-code-panel to deprecated stubs (Unit I29) Re-accounted 2026-10-06: Main-side docs edit carried in by sync of main at e63a17b8e (2026-10-06, 7 commit(s) since 81f7db801): feat(observe): see nested runs, add unit summaries, a stance sensor and an eval store | docs(gateway): name the fgos gateway as its own component and guard the retired names | merge: main into p6 (terminology sweep) (+4 more)",
+      "rationale": "Phase 01 verified stale standing route correction: update transitional rule banner to cite docs/transitional-switchboard.md, record Phase 00 and Phase 01 completion, and replace defunct fgos-coding-compounding skill references with fgos-coding-knowledge. Re-reviewed 2026-09-29 after main sync: feat(coding): convert fgos-plan-loop/fgos-code-panel to deprecated stubs (Unit I29) Re-accounted 2026-10-06: Main-side docs edit carried in by sync of main at 2fd5cb6a3 (2026-10-06, 8 commit(s) since 81f7db801): docs(observe): record the second acceptance round and correct the evidence wording | feat(observe): see nested runs, add unit summaries, a stance sensor and an eval store | docs(gateway): name the fgos gateway as its own component and guard the retired names (+5 more)",
       "approvedBy": "Phase 01 unification authorization (asgn_pi_lead_phase01_op_001); human approval 2026-09-29 (user, forgentX session); resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report)",
       "owner": "documentation-authority-unification-lead",
-      "expectedDigest": "7401cdb708d2da30b5b0c33996a6f8e794ea00b6bc3c47502c1645cb9fb3c1b0",
+      "expectedDigest": "106bc093aed5bd272cc54d6c520e433ec081a1937c21f1c0bf2e5f4abd7d3efa",
       "reviewedAt": "2026-10-06",
       "revisitTrigger": "Phase 08 cutover (retirement of legacy reading-map in favor of docs/reading-map.md)"
     },
@@ -96,10 +96,10 @@
     {
       "path": "docs/specs/runner.md",
       "kind": "allowed-edit",
-      "rationale": "Main-side docs edit accompanying landed code, carried in by sync of main: docs(runner): add D-ADR0043 narrative (bound-invocation-supervisor vs detached-run-supervisor) | docs(dispatch): add capability demand-matching doctrine Re-accounted 2026-10-06: Main-side docs edit carried in by sync of main at e63a17b8e (2026-10-06, 53 commit(s) since 81f7db801): fix(observe): reconcile eligible history and refuse ambiguous runs | fix(observe): preserve unit settlement authority and measure declared voters | feat(observe): see nested runs, add unit summaries, a stance sensor and an eval store (+50 more)",
+      "rationale": "Main-side docs edit accompanying landed code, carried in by sync of main: docs(runner): add D-ADR0043 narrative (bound-invocation-supervisor vs detached-run-supervisor) | docs(dispatch): add capability demand-matching doctrine Re-accounted 2026-10-06: Main-side docs edit carried in by sync of main at 2fd5cb6a3 (2026-10-06, 54 commit(s) since 81f7db801): docs(observe): record the second acceptance round and correct the evidence wording | fix(observe): reconcile eligible history and refuse ambiguous runs | fix(observe): preserve unit settlement authority and measure declared voters (+51 more)",
       "approvedBy": "human approval 2026-09-29 (user, forgentX session); resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report)",
       "owner": "documentation-authority-unification-lead",
-      "expectedDigest": "2adb477c0e95fe55c6fd5b7deddf2731607d3cac2a2f211a8b37465296ae6370",
+      "expectedDigest": "c2e1f4412748d2e30d6cab5d0a69a900e9653054b70a977c543d39647217e0b7",
       "reviewedAt": "2026-10-06",
       "revisitTrigger": "Phase 08 cutover"
     },
@@ -226,10 +226,10 @@
     {
       "path": "docs/specs/observe.md",
       "kind": "allowed-new-file",
-      "rationale": "Main-side docs edit carried in by sync of main at e63a17b8e (2026-10-06, 7 commit(s) since 81f7db801): fix(observe): enforce rubric completeness and atomic eval identity | fix(observe): reconcile eligible history and refuse ambiguous runs | fix(observe): preserve unit settlement authority and measure declared voters (+4 more)",
+      "rationale": "Main-side docs edit carried in by sync of main at 2fd5cb6a3 (2026-10-06, 8 commit(s) since 81f7db801): docs(observe): record the second acceptance round and correct the evidence wording | fix(observe): enforce rubric completeness and atomic eval identity | fix(observe): reconcile eligible history and refuse ambiguous runs (+5 more)",
       "approvedBy": "resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report)",
       "owner": "documentation-authority-unification-lead",
-      "expectedDigest": "3d53da00998e79a47831c077ed07710b5e3bd6be7b3fe1d5f243cb5d6b8f53e6",
+      "expectedDigest": "052ec53fa48d012d4e869a86782d01310fdc2b15bbf7eec1f4d4ee2fa3ff6a38",
       "reviewedAt": "2026-10-06",
       "revisitTrigger": "atomic platform-authority cutover (plan phase 9)"
     },
