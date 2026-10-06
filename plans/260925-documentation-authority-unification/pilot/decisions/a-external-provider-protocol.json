@@ -1,0 +1,646 @@
+{
+  "version": 1,
+  "shard": "a-external-provider-protocol",
+  "sources": [
+    "docs/architect/host-invocation-routing/external-provider-protocol.md"
+  ],
+  "files": [
+    {
+      "path": "docs/architect/host-invocation-routing/external-provider-protocol.md",
+      "disposition": "merge",
+      "rationale": "Several claims are carried by the promoted architecture, component-protocol and manifest contracts (mostly in reduced form); component class definitions, mechanism descriptions, cross-process cost and linker procedure remain uncarried and are recorded as blocking at claim level.",
+      "targets": [
+        "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+        "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+        "docs/platform/host-invocation-routing/contracts/external-provider-manifest.md",
+        "docs/platform/host-invocation-routing/contracts/operation-provider.md",
+        "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "claimId": "claim_f2da6bf482131501faac8d716a4dcb44",
+      "sourceUnitDigest": "f85ccab90dedc3cb",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "targetAnchor": "architecture-external-provider-protocol",
+      "claimKind": "navigation",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Source title is carried by the target architecture title \"Architecture: External Provider Protocol\"."
+    },
+    {
+      "claimId": "claim_825ecbc106eb49b18701b0d68c204d22",
+      "sourceUnitDigest": "ab6730b94dcd1c31",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "targetAnchor": "unheaded-block-1",
+      "claimKind": "historical-context",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Source status line (vision/advisory, not a locked law, not an implementation plan), date 2026-09-10 and the revision pointer to the design review report are not carried; the target header says Design status Draft, Canonical after review, Last reviewed 2026-09-18."
+    },
+    {
+      "claimId": "claim_765685b7bf189a9f81cf2d5e671efde2",
+      "sourceUnitDigest": "6e86400d1ffaf4d5",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "navigation",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Source says this document depends on the kernel contract (host-invocation-provider-routing.md) and must be read after it, and scopes itself to external providers (component classes, mechanisms, wire protocol, linker). No target states this dependency or scope; the target architecture Related list omits the kernel document.",
+      "searched": [
+        "host-invocation-provider-routing.md",
+        "read it first",
+        "everything specific to a provider",
+        "kernel contract",
+        "every file under docs/platform/host-invocation-routing (29 md files)"
+      ]
+    },
+    {
+      "claimId": "claim_4a49679c5f81a5e86ab79f533fcf3470",
+      "sourceUnitDigest": "38d7528327830a9c",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "navigation",
+      "disposition": "delete-as-obsolete",
+      "reviewStatus": "pending",
+      "rationale": "Heading of a migration-pass note; the source itself says it is valid only \"during the 2026-09-14 promotion pass\" and the targets are the promoted docs that note points to, so the note no longer applies.",
+      "searched": [
+        "Migration Status Note",
+        "promotion pass",
+        "legacy-current source",
+        "every file under docs/platform/host-invocation-routing (29 md files)"
+      ]
+    },
+    {
+      "claimId": "claim_72b068a205f5bdb963a0c90a64a51038",
+      "sourceUnitDigest": "ee6cfc9db675fd37",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "navigation",
+      "disposition": "delete-as-obsolete",
+      "reviewStatus": "pending",
+      "rationale": "Source states it remains legacy-current during the promotion pass and links to the three promoted docs and a preservation ledger; the promoted architecture, component-protocol and manifest docs now exist and carry \"Source type: Promoted from ...\", so this pointer is obsolete navigation.",
+      "searched": [
+        "promotion pass",
+        "promoted platform docs",
+        "architecture/external-provider-protocol.md",
+        "every file under docs/platform/host-invocation-routing (29 md files)"
+      ]
+    },
+    {
+      "claimId": "claim_af6831310fe9fcdaa7c8e69902e3c767",
+      "sourceUnitDigest": "a180ac1d80159115",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "targetAnchor": "1-claim",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Heading \"1. Component Classes\": the target 1-claim keeps only one paragraph naming the three classes and four mechanisms; definitions, table and the two-mistakes note of the section are not carried."
+    },
+    {
+      "claimId": "claim_77dded3a2079c1d8caf108207f16bf68",
+      "sourceUnitDigest": "8feb0186702101ea",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "targetAnchor": "unheaded-block-2",
+      "claimKind": "architecture",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Target states component class and invocation mechanism are separate axes, class describing ownership/authority posture and mechanism describing runtime invocation."
+    },
+    {
+      "claimId": "claim_8afb754fa120109518a42e75a5a381ed",
+      "sourceUnitDigest": "847afa67c9b3ccac",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "targetAnchor": "unheaded-block-2",
+      "claimKind": "architecture",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Target says classes describe \"ownership and authority posture\" and mechanisms \"runtime invocation mechanism\", but drops the source formulation of who owns/releases/configures versus how the selected provider is invoked."
+    },
+    {
+      "claimId": "claim_28ec0a05e5b83caab05627b76795ac43",
+      "sourceUnitDigest": "e80cb47720a5fc49",
+      "targetOwner": "docs/platform/host-invocation-routing/contracts/operation-provider.md",
+      "targetAnchor": "unheaded-block-2",
+      "claimKind": "contract",
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "rationale": "operation-provider states ProviderDescriptor declares component class and invocation mechanism; the architecture 1-claim names the class and mechanism values (core, packaged extension, user plugin; built-in, external process, WASM, legacy Node)."
+    },
+    {
+      "claimId": "claim_d90840823918415e74ddd353dae32ea3",
+      "sourceUnitDigest": "ca3175301f93d1e7",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "specification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Core component definition (required for a useful release, fgOS-owned, atomically released with host, normally statically linked once migrated, not optional/replaceable by default, extension points do not make a plugin the authority owner, examples Work Lifecycle etc.) is absent; target only names the class.",
+      "searched": [
+        "Core component",
+        "released atomically",
+        "atomically with the host",
+        "not replaceable by default",
+        "every file under docs/platform/host-invocation-routing (29 md files)"
+      ]
+    },
+    {
+      "claimId": "claim_2ce14ab31e5b889ce37c4e99735c69e5",
+      "sourceUnitDigest": "1b283b4d1bd5d772",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "specification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Packaged extension definition (fgOS-owned and shipped, optional, may be enabled/disabled by config/edition/environment, follows release discipline, disabling must not corrupt core state or block boot, examples) is absent; target only names the class.",
+      "searched": [
+        "Packaged extension",
+        "edition",
+        "must not corrupt core state",
+        "optional domain packages",
+        "every file under docs/platform/host-invocation-routing (29 md files)"
+      ]
+    },
+    {
+      "claimId": "claim_2449df5feff7fcfb17a45340a08ef7a9",
+      "sourceUnitDigest": "a98b91fde83ce7dd",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Target preserved details say external providers may add vendor-scoped operations or implement published extension points but never own core namespaces or ambient host access (and manifest contract adds vendor-scoped/extension-point rule); absent: outside the release train, never assumed present, never compiled into the host, discovered from manifests and granted only explicit capabilities as part of the class definition."
+    },
+    {
+      "claimId": "claim_95063c4b27e671f29631d4fd68427008",
+      "sourceUnitDigest": "f57d1f9db82a03d7",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "specification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Table mapping component class to common invocation mechanism (core: built-in after migration / LegacyNode during transition; packaged extension: built-in, process or WASM; user plugin: process or WASM) is absent from all targets.",
+      "searched": [
+        "Common invocation mechanism",
+        "Built-in after migration",
+        "LegacyNode during transition",
+        "ExternalProcess or ExternalWasm",
+        "every file under docs/platform/host-invocation-routing (29 md files)"
+      ]
+    },
+    {
+      "claimId": "claim_bb84143c32c84b94257bfeb7ca6dacd2",
+      "sourceUnitDigest": "242f609e08654c18",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "decision",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Rationale that the classification blocks two mistakes (every static implementation is core; every out-of-process implementation is a user plugin) and that packaging/authority follow class while runtime calling follows mechanism is absent.",
+      "searched": [
+        "treating every statically linked",
+        "blocks two mistakes",
+        "architecturally core",
+        "Packaging and authority follow",
+        "every file under docs/platform/host-invocation-routing (29 md files)"
+      ]
+    },
+    {
+      "claimId": "claim_d5dd5fbdb3483914743a14791a5f02a8",
+      "sourceUnitDigest": "19bd3465163fc281",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "targetAnchor": "1-claim",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Heading \"2. Invocation Mechanisms\": target 1-claim only lists the mechanism names; descriptions of each mechanism and the surrounding subsections are not carried."
+    },
+    {
+      "claimId": "claim_3f7b5a5b5b1c39251e56f0d232e11ec3",
+      "sourceUnitDigest": "d09d58dd69d2e872",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "specification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Illustrative Rust enum Provider { BuiltIn(Arc<dyn OperationProvider>), ExternalProcess(ProcessRpcClient), ExternalWasm(WasmComponent) } is absent.",
+      "searched": [
+        "enum Provider",
+        "Arc<dyn",
+        "ProcessRpcClient",
+        "WasmComponent",
+        "every file under docs/platform/host-invocation-routing (29 md files)"
+      ]
+    },
+    {
+      "claimId": "claim_669c64d8e42de3025275c34b12b3aaa5",
+      "sourceUnitDigest": "b180e6e7779b4bdd",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/legacy-cli-transition.md",
+      "targetAnchor": "1-claim",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "legacy-cli-transition states LegacyCliPassthroughProvider is CLI-only and bypasses the kernel; the claim that the enum is an illustrative host-implementation detail and not the public ABI, and covers semantic providers only, is absent."
+    },
+    {
+      "claimId": "claim_962d99a375bab41c2063612523bdf348",
+      "sourceUnitDigest": "ad59236e4c47fac3",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "specification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Built-In mechanism definition (trusted Rust crate statically linked, called through OperationProvider trait, no serialization cost, still obeys port/authority boundary, normal for core, may serve packaged extensions) is absent; invocation-kernel only says built-ins receive typed Rust inputs.",
+      "searched": [
+        "Built-In",
+        "statically linked",
+        "trusted Rust crate",
+        "cross-process cost",
+        "every file under docs/platform/host-invocation-routing (29 md files)"
+      ]
+    },
+    {
+      "claimId": "claim_f2755ef85799b9a6ec4fd4f5d03e9106",
+      "sourceUnitDigest": "e0492b4f17e96958",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "specification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "External Process mechanism (independently installed language-neutral plugin, persistent framed RPC, fits filesystem/Git/network/subprocess needs, crash/restart and resource isolation part of adapter contract) is absent.",
+      "searched": [
+        "language-neutral",
+        "persistent framed RPC",
+        "Crash/restart",
+        "resource isolation",
+        "every file under docs/platform/host-invocation-routing (29 md files)"
+      ]
+    },
+    {
+      "claimId": "claim_66ce4edf221963b22ad02dbdf872da1c",
+      "sourceUnitDigest": "4188ad667cd103db",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "specification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "External WebAssembly mechanism (sandboxed, typed component interface such as WIT, fits pure/capability-scoped extensions, host functions are explicit capabilities) is absent; no target mentions WIT or ExternalWasm.",
+      "searched": [
+        "WIT",
+        "typed component interface",
+        "ExternalWasm",
+        "Required host functions",
+        "every file under docs/platform/host-invocation-routing (29 md files)"
+      ]
+    },
+    {
+      "claimId": "claim_8948a9c62d80ce2692687f3fcfbaf8ff",
+      "sourceUnitDigest": "f32d862a6e984052",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "decision",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Decision that native Rust dynamic libraries are not the default external mechanism (no stable Rust ABI, loses crash/memory isolation) is absent.",
+      "searched": [
+        "dynamic librar",
+        "stable ABI",
+        "Native Rust",
+        "memory isolation",
+        "every file under docs/platform/host-invocation-routing (29 md files)"
+      ]
+    },
+    {
+      "claimId": "claim_6ac894a939b9efb6725758fd6c4eb039",
+      "sourceUnitDigest": "f1565b0ed8c1af04",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "specification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading \"Same-Process Built-Ins Versus Runtime Extensions\": no target has this section or carries its content.",
+      "searched": [
+        "Same-Process",
+        "Runtime Extensions",
+        "Built-Ins Versus",
+        "every file under docs/platform/host-invocation-routing (29 md files)"
+      ]
+    },
+    {
+      "claimId": "claim_f8dc56c8e292eacb0d186f5dd16b7e52",
+      "sourceUnitDigest": "7ebc9148a52b87a2",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Router presents one semantic interface; built-in is fastest, external pays runtime boundary for language neutrality/isolation/no-recompile; no promise of both hot replacement and direct-call performance; class decides ownership, mechanism decides call path. Absent from all targets.",
+      "searched": [
+        "hot replacement",
+        "one deployment mechanism",
+        "direct function-call",
+        "no-recompile",
+        "every file under docs/platform/host-invocation-routing (29 md files)"
+      ]
+    },
+    {
+      "claimId": "claim_d03d06ad4a63b00a87a934ab594587c9",
+      "sourceUnitDigest": "2907e5e6fb1d4da1",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "specification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Heading \"Cross-Process Cost\": no target has this section or carries its content.",
+      "searched": [
+        "Cross-Process Cost",
+        "Cross-Process",
+        "cold process",
+        "every file under docs/platform/host-invocation-routing (29 md files)"
+      ]
+    },
+    {
+      "claimId": "claim_db4217b66dba7e00b2af5d10624b795d",
+      "sourceUnitDigest": "46867e5caee91b29",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "architecture",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Cold process startup cost versus persistent stdio/socket, ports expose complete use-case operations and batch hot loops, one-shot CLI should not keep plugin alive beyond host lifetime, persistence justified for remote host/interactive sessions. Absent from all targets.",
+      "searched": [
+        "Cold process startup",
+        "daemon lifecycle",
+        "helper-sized calls",
+        "batch hot loops",
+        "every file under docs/platform/host-invocation-routing (29 md files)"
+      ]
+    },
+    {
+      "claimId": "claim_8066684d5e7c7159d6f58caeef26d8cc",
+      "sourceUnitDigest": "4788de97424c5b10",
+      "targetOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "targetAnchor": "contract-component-protocol",
+      "claimKind": "navigation",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading \"3. Component Protocol\" corresponds to the target contract titled \"Contract: Component Protocol\", which carries the section content."
+    },
+    {
+      "claimId": "claim_4ab5b8aa8fb1c32df6244b6c78a58a8e",
+      "sourceUnitDigest": "aa5e4116035d0b11",
+      "targetOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "targetAnchor": "unheaded-block-2",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Target says component protocol is versioned independently from CLI fgos.v1 and remote API versions; absent: the name fgos.component.v1 and the list of what the protocol carries (operation identity/version range, request and correlation IDs, typed payloads, deadline/cancellation/progress/events, capability context, provider identity/diagnostics)."
+    },
+    {
+      "claimId": "claim_05483c4fc63f856b045c5482b4e367d9",
+      "sourceUnitDigest": "1af671b76ffb03e2",
+      "targetOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "targetAnchor": "unheaded-block-2",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Target carries JSON-RPC 2.0 over 4-byte big-endian length-prefixed UTF-8 JSON frames on stdio; absent: newline-delimited JSON is not the contract, the reason (single enforceable max frame boundary), and stdout-protocol-only with logs on stderr or a log notification."
+    },
+    {
+      "claimId": "claim_ff86ac2f6a77ac8383807091f62ffb4a",
+      "sourceUnitDigest": "1953850e14f35be6",
+      "targetOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Target lifecycle rules carry the handshake contents (identity, manifest digest, protocol range, operation/contract pairs, concurrency limit) and that discovery does not depend on handshake; absent: host starts a process only after static manifest selection and a mismatch terminates the provider and fails closed."
+    },
+    {
+      "claimId": "claim_d36b9adbb7ef7eaf80a7cabbf3bd9a2b",
+      "sourceUnitDigest": "4c3725080a1aa176",
+      "targetOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "targetAnchor": "2-lifecycle-rules",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Lead-in to the lifecycle rules list; carried by the target heading \"2. Lifecycle Rules\"."
+    },
+    {
+      "claimId": "claim_53f264f62d89d4bb82b2f8fe16f159ef",
+      "sourceUnitDigest": "1bc3eca84b6665bb",
+      "targetOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Target lists unique request IDs, out-of-order only with concurrency >1, bounded frames/queues/events, cancel notification then bounded grace then terminate, crash after dispatch yields completion-unknown unless idempotency permits retry; absent: cancellation ack does not claim side effects rolled back, retry needs explicit idempotency key, one-shot CLI may own one process while a gateway may pool/persist connections under health/restart policy."
+    },
+    {
+      "claimId": "claim_d1c4102dc6dea3ae86434fb12c0abf71",
+      "sourceUnitDigest": "ee1d8bfda872a950",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "decision",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Statement that the semantic contract stays transport-neutral and a future binary codec or local socket transport may replace framing without renaming the operation is absent.",
+      "searched": [
+        "transport-neutral",
+        "binary codec",
+        "local socket",
+        "without renaming",
+        "every file under docs/platform/host-invocation-routing (29 md files)"
+      ]
+    },
+    {
+      "claimId": "claim_dd05e638e2f559c3a1fa4d0b0df49eaa",
+      "sourceUnitDigest": "d576dc5ed95e55dd",
+      "targetOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Target states EncodedMessage is used only at the external boundary (never inside the kernel; invocation-kernel adds built-ins never decode it)."
+    },
+    {
+      "claimId": "claim_fc8c5a33cd65b0099fc07e731833c037",
+      "sourceUnitDigest": "b09deaedb0776c71",
+      "targetOwner": "docs/platform/host-invocation-routing/contracts/component-protocol.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Target states EncodedMessage carries contract id, version, content type and bytes, the same four fields as the source struct, in prose instead of Rust."
+    },
+    {
+      "claimId": "claim_9a5781f0086209a17330035ff0e58638",
+      "sourceUnitDigest": "f26fe2980e00f599",
+      "targetOwner": "docs/platform/host-invocation-routing/contracts/external-provider-manifest.md",
+      "targetAnchor": "1-contract",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Heading \"4. Plugin Registry Linker\": only fragments are carried by the manifest contract (static discovery, derived registry); linker steps, inputs and cache rules are largely absent."
+    },
+    {
+      "claimId": "claim_7a761122f6ca753ec06390f4c45a3874",
+      "sourceUnitDigest": "db002cc2af859f74",
+      "targetOwner": "docs/platform/host-invocation-routing/contracts/external-provider-manifest.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "specification",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Target states discovery scans static manifests and does not execute provider code."
+    },
+    {
+      "claimId": "claim_6a33b8904ea382ebff720a5af6690880",
+      "sourceUnitDigest": "cc575d03569a1ab4",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "contract",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Required manifest declaration contents (plugin ID, version, publisher, protocol range; provided OperationIds or extension points; request/result schema refs; invocation mechanism and executable/module location; requested host capabilities; platform compatibility and integrity metadata; health and describe operations) are absent; the target lists only a short common-field set.",
+      "searched": [
+        "publisher",
+        "integrity",
+        "describe",
+        "schema references",
+        "platform compatibility",
+        "every file under docs/platform/host-invocation-routing (29 md files)"
+      ]
+    },
+    {
+      "claimId": "claim_d391a391012d4582caf4ad2bbc04a3a5",
+      "sourceUnitDigest": "f1bc210b1bb630ce",
+      "targetOwner": "docs/platform/host-invocation-routing/contracts/external-provider-manifest.md",
+      "targetAnchor": "unheaded-block-2",
+      "claimKind": "contract",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Target carries manifest.yaml as canonical filename, kind distinguishing shape, and common fields manifestVersion, id, version, provides, requires, capabilities; absent: the example kinds fgos.component/fgos.plugin/fgos.domain and that common fields are validated before kind-specific fields."
+    },
+    {
+      "claimId": "claim_db3ed4e42ea9ea6300ddb1e2e4154308",
+      "sourceUnitDigest": "9dabcbdedbe8b9ea",
+      "targetOwner": "docs/platform/host-invocation-routing/contracts/external-provider-manifest.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Target says the derived registry cache/lock records accepted claims; absent: Registry names only the derived runtime index and never another authored file, and discovery validates by kind before linking."
+    },
+    {
+      "claimId": "claim_08172f75766eb1d002d4cba2669f9bbd",
+      "sourceUnitDigest": "abb21d45c93741d8",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "procedure",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Registry linker procedure (scan global and project plugin locations, validate without running provider, verify compatibility/presence/integrity policy, resolve IDs/namespaces/precedence/replacements, emit deterministic derived lock/cache, start provider and use describe only to confirm) is absent.",
+      "searched": [
+        "deterministic",
+        "integrity policy",
+        "global and project",
+        "describe",
+        "every file under docs/platform/host-invocation-routing (29 md files)"
+      ]
+    },
+    {
+      "claimId": "claim_7e15be77fb7c4bff223728491df3e212",
+      "sourceUnitDigest": "ac979e91f46e51f3",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "specification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Lead-in \"Its complete input/output physics\" for the linker inputs/outputs; no target states it.",
+      "searched": [
+        "input/output physics",
+        "source fingerprint",
+        "immutable RegistrySnapshot",
+        "every file under docs/platform/host-invocation-routing (29 md files)"
+      ]
+    },
+    {
+      "claimId": "claim_0f401249972ad0ce465e24e0932a2834",
+      "sourceUnitDigest": "85985ef935d65edf",
+      "targetOwner": null,
+      "targetAnchor": null,
+      "claimKind": "specification",
+      "disposition": "unknown-blocking",
+      "reviewStatus": "blocking",
+      "rationale": "Linker input/output formula (authored OperationCatalog + built-in descriptors + transitional CLI bindings + validated manifests + enable/disable/replacement policy -> immutable RegistrySnapshot + source fingerprint) is absent; provider-routing mentions only the immutable RegistrySnapshot as router input.",
+      "searched": [
+        "authored OperationCatalog",
+        "CLI-compatibility bindings",
+        "enable-disable-replacement",
+        "source fingerprint",
+        "every file under docs/platform/host-invocation-routing (29 md files)"
+      ]
+    },
+    {
+      "claimId": "claim_11a0a710a684fc412dce19dba175ad54",
+      "sourceUnitDigest": "11fafc70d6f9cf43",
+      "targetOwner": "docs/platform/host-invocation-routing/contracts/external-provider-manifest.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Target says derived cache/lock never outranks authored sources and alignment table calls the registry derived rebuildable state; absent: records host version and source fingerprint, replaced atomically, ignored/rebuilt when stale or corrupt, and that the linker is a compiler only in the linking sense (does not compile plugin source or the host)."
+    },
+    {
+      "claimId": "claim_059863b5abc9b69746bb7df19fd8ecc4",
+      "sourceUnitDigest": "d4969bf09a84a796",
+      "targetOwner": "docs/platform/host-invocation-routing/contracts/external-provider-manifest.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "specification",
+      "disposition": "split",
+      "reviewStatus": "pending",
+      "rationale": "Manifest rules and provider-routing selection rules carry: duplicate claims without explicit replacement fail closed, replacement names both selected and replaced providers, config never replaces a built-in, project-over-global is not authority precedence; the clause that replacement policy only governs the external/plugin surface is not stated."
+    },
+    {
+      "claimId": "claim_085be633814f3655a406c6a9c130d686",
+      "sourceUnitDigest": "7d972ac75372926d",
+      "targetOwner": "docs/platform/host-invocation-routing/contracts/external-provider-manifest.md",
+      "targetAnchor": "2-rules",
+      "claimKind": "specification",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading \"5. Namespace Rules\"; the namespace rules are carried by the target \"2. Rules\" section."
+    },
+    {
+      "claimId": "claim_8639855f2f9ae8cb40b4988ddec9b3ba",
+      "sourceUnitDigest": "001e773b95334e7e",
+      "targetOwner": "docs/platform/host-invocation-routing/contracts/external-provider-manifest.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "specification",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Target carries reserved core namespaces, vendor-scoped operations, published extension points, unknown capability/ambiguous claims fail closed, and (provider-routing) manifests never grant authority; absent: example acme.deploy.release, the capability-gated categories (.fgos writes, Git mutation, process execution, network, secrets, host callbacks), and admission/grant applying identically."
+    },
+    {
+      "claimId": "claim_28d176804d2f5580604186adabcfcf90",
+      "sourceUnitDigest": "3a191305488c472c",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "targetAnchor": "4-related-files",
+      "claimKind": "navigation",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Heading \"Related Documents\" corresponds to target \"4. Related Files\"."
+    },
+    {
+      "claimId": "claim_6fad9fd73c3cc8187ccf2d1687595234",
+      "sourceUnitDigest": "845c1ebae529d20d",
+      "targetOwner": "docs/platform/host-invocation-routing/architecture/external-provider-protocol.md",
+      "targetAnchor": "unheaded-block-5",
+      "claimKind": "navigation",
+      "disposition": "supersede",
+      "reviewStatus": "pending",
+      "rationale": "Target related-files table links the component protocol, manifest contract, R2 proof and source protocol; the source links to the kernel contract and Legacy CLI Transition are not listed."
+    }
+  ]
+}
