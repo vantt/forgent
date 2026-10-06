@@ -1,7 +1,7 @@
 //! Run Result Evaluator observation source (Lane A2 - Phase F2).
 
 pub mod unit_summary;
-pub use unit_summary::UnitSummarySource;
+pub use unit_summary::{scan_unit_summaries, UnitSummarySource};
 
 use fgos_observe::{Observation, ObservationSource, SourceError, Subject, SubjectKind, Window};
 use serde::{Deserialize, Serialize};

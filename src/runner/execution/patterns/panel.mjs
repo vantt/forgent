@@ -21,6 +21,19 @@ const ERROR_OUTCOMES = Object.freeze([
   'blocked',
 ]);
 
+/** Canonical semantic roles, shared by execution and its derived read model. */
+export function resolvePanelRoles(cfg = {}, { members = 3 } = {}, params = {}) {
+  const memberCount = params?.members ?? members ?? cfg?.patterns?.panel?.members ?? 3;
+  const baseRole = params?.role || 'panelist';
+  return {
+    panelists: (Array.isArray(params?.role)
+      ? params.role
+      : Array.from({ length: memberCount }, (_, idx) => `${baseRole}-${idx + 1}`))
+      .map((role) => ({ role, kind: 'panelist' })),
+    synthesizer: { role: params?.synthesizeRole || 'synthesizer', kind: 'synthesizer' },
+  };
+}
+
 /**
  * Run panel pattern for a unit.
  *
@@ -35,16 +48,13 @@ const ERROR_OUTCOMES = Object.freeze([
  * @returns {Promise<{ outcome: string, results: Array<object> }>}
  */
 export async function runPanel(unit, cfg, { runRole, verify, history, members = 3 } = {}, params = {}) {
-  const memberCount = params?.members ?? members ?? cfg?.patterns?.panel?.members ?? 3;
-  const baseRole = params?.role || 'panelist';
-  const synthesizeRole = params?.synthesizeRole || 'synthesizer';
+  const { panelists, synthesizer } = resolvePanelRoles(cfg, { members }, params);
+  const synthesizeRole = synthesizer.role;
   const prior = typeof history === 'function' ? history() : (Array.isArray(history) ? history : []);
 
-  const allPanelistRoles = Array.isArray(params?.role)
-    ? params.role
-    : Array.from({ length: memberCount }, (_, idx) => `${baseRole}-${idx + 1}`);
+  const allPanelistRoles = panelists.map(({ role }) => role);
   // Dispatch all panel members in PARALLEL
-  const memberPromises = allPanelistRoles.map(async (role) => {
+  const memberPromises = panelists.map(async ({ role, kind }) => {
     const existing = prior?.find((h) => h.role === role && h.outcome === 'pass');
     if (existing) {
       return existing;
@@ -53,7 +63,7 @@ export async function runPanel(unit, cfg, { runRole, verify, history, members = 
     const independentOf = allPanelistRoles.filter((r) => r !== role);
     return await runRole({
       role,
-      unit: roleUnit(unit, { role, kind: 'panelist', params }),
+      unit: roleUnit(unit, { role, kind }),
       readOnly: true,
       independentOf,
     });
@@ -79,7 +89,7 @@ export async function runPanel(unit, cfg, { runRole, verify, history, members = 
   const synthResult = existingSynth || await runRole({
     role: synthesizeRole,
     // The panelists answer the unit's objective; the synthesizer is told to synthesize their answers.
-    unit: roleUnit(unit, { role: synthesizeRole, kind: 'synthesizer', params }),
+    unit: roleUnit(unit, { ...synthesizer, params }),
     readOnly: (unit?.writes || []).length === 0,
     // The synthesizer judges every panelist, so it must not share a provider family with any of
     // them; the runner turns these role names into the executors that played them and bind()

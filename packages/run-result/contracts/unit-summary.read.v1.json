@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "unit-summary.read.v1",
   "title": "Execution-owned Unit Summary Read Contract v1",
-  "description": "Read only direct .fgos/assignments/unit-run-*/unit-summary.json files, at most 1 MiB each. Never recurse into unit directories or read results, workflow events, transcripts, protected data or outboxes. Skip symlink state roots, unit directories and summary files; skip malformed/unsupported records and summaries without owner-owned RFC3339 settledAt. unitRunId must equal the directory name. Compare timestamp windows temporally in UTC milliseconds with inclusive bounds, never lexicographically; bounds accept RFC3339 or YYYY-MM-DD (UTC midnight), and invalid/reversed bounds are named errors. Emit source unit-summary, kind unit.settled, subject kind run with id unit-run:<unitRunId>. This distinct kind does not increase run.settled totals. Outcome and final selection are owned by the Node writer using unit-run-history; Rust never derives or selects attempts.",
+  "description": "Read only direct .fgos/assignments/unit-run-*/unit-summary.json files, at most 1 MiB each. Never recurse into unit directories or read results, workflow events, transcripts, protected data or outboxes. Skip symlink state roots and unit directories. Each real direct unit directory contributes once to summaryDirsSeen: an in-window observation, summariesMissing, summariesUnusable, or summariesOutsideWindow. Structural diagnostics are root-wide, not window-filtered: missing summaries can belong to active units and undated/unusable summaries cannot be assigned to a time window. summariesSkippedByReason partitions only summariesUnusable (unreadable, oversized, symlink, nonregular, invalid-json, invalid-contract, missing-timestamp, invalid-timestamp). Outside-window counts include only otherwise valid summaries with valid owner-owned RFC3339 settledAt. unitRunId must equal the directory name. Compare timestamp windows temporally in UTC milliseconds with inclusive bounds, never lexicographically; bounds accept RFC3339 or YYYY-MM-DD (UTC midnight), and invalid/reversed bounds are named errors. Emit source unit-summary, kind unit.settled, subject kind run with id unit-run:<unitRunId>. This distinct kind does not increase run.settled totals. Outcome, seat kind and final selection are owned by the Node writer using unit-run-history; Rust never derives or selects attempts.",
   "type": "object",
   "required": ["contract", "unitRunId", "workflow", "pattern", "capability", "outcome", "startedAt", "settledAt", "seats", "inline", "stanceOptions"],
   "properties": {
@@ -37,9 +37,10 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["role", "round", "final", "attempts"],
+        "required": ["role", "kind", "round", "final", "attempts"],
         "properties": {
           "role": {"type": "string", "minLength": 1},
+          "kind": {"type": "string", "pattern": "\\S", "description": "Execution-owned semantic seat kind, independent of its role label. Exactly panelist votes; synthesizer and every other kind do not vote. Missing or invalid kinds make the summary unusable."},
           "round": {"type": "integer", "minimum": 1},
           "final": {"allOf": [{"$ref": "#/definitions/attempt"}, {"type": "object", "required": ["stance"], "properties": {"stance": {"$ref": "#/definitions/stance"}}}]},
           "attempts": {"type": "array", "items": {"$ref": "#/definitions/attempt"}}
@@ -79,7 +80,7 @@
       ]
     },
     "stance": {
-      "description": "Tolerant writer extraction from the settled result agentClaim. No report or transcript scanning. Confidence is unweighted. Voting roles are exactly panelist or panelist-N; synthesizers/other roles do not vote. With declared options and voting seats, largest valid choice group divided by all final voting seats gives agreement; genuineSplit is largest*3 < seats*2. Missing/invalid remain explicit and in the denominator. No options or no voting seats is unmeasured.",
+      "description": "Tolerant writer extraction from the settled result agentClaim. No report or transcript scanning. Confidence is unweighted. Exactly seats with kind panelist vote, regardless of role label. With declared options and at least one valid vote, largest valid choice group divided by all final voting seats gives agreement; genuineSplit is largest*3 < seats*2. Missing/invalid remain explicit and in the denominator. No options, no voting seats or no valid votes is unmeasured with null agreement and genuineSplit.",
       "oneOf": [
         {"type": "object", "required": ["status"], "properties": {"status": {"const": "missing"}}},
         {"type": "object", "required": ["status", "reason"], "properties": {"status": {"const": "invalid"}, "reason": {"type": "string", "minLength": 1}}},

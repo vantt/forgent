@@ -19,3 +19,7 @@ pub fn build_metrics_sources() -> Vec<Box<dyn ObservationSource>> {
 pub fn build_work_observation_source() -> Option<Box<dyn fgos_observe::contract::WorkObservationSource>> {
     Some(Box::new(WorkSource::new()))
 }
+
+pub fn build_unit_summary_scanner() -> fgos_observe::UnitSummaryScanner {
+    fgos_run_result::scan_unit_summaries
+}

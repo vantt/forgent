@@ -1,6 +1,6 @@
 use fgos_observe::{Observation, ObservationSource, ObserveRequest, SourceError, Window};
 use fgos_observe::metrics_cli::discussions::dispatch_discussions;
-use fgos_run_result::{RunResultSource, UnitSummarySource};
+use fgos_run_result::{scan_coverage, scan_unit_summaries, RunResultSource, UnitSummarySource};
 use serde_json::{json, Value};
 use std::fs;
 use std::path::PathBuf;
@@ -48,7 +48,7 @@ impl Fixture {
         let sources: Vec<Box<dyn ObservationSource>> = vec![
             Box::new(RunResultSource::new()), Box::new(UnitSummarySource::new()), Box::new(UnavailableTranscripts),
         ];
-        dispatch_discussions(&request, &sources).unwrap()
+        fgos_observe::metrics_cli::dispatch(&request, &sources, None, scan_coverage, scan_unit_summaries).unwrap()
     }
 }
 
@@ -68,13 +68,13 @@ fn attempt(run_id: Option<&str>, executor: &str, outcome: &str, fallback: Option
     })
 }
 
-fn seat(role: &str, choice: Option<&str>) -> Value {
+fn seat(role: &str, kind: &str, choice: Option<&str>) -> Value {
     let mut final_attempt = attempt(Some(role), "alpha", "pass", None);
     final_attempt["stance"] = match choice {
         Some(choice) => json!({"status": "valid", "choice": choice, "confidence": 0.8}),
         None => json!({"status": "missing"}),
     };
-    json!({"role": role, "round": 1, "final": final_attempt, "attempts": [attempt(Some(role), "alpha", "pass", None)]})
+    json!({"role": role, "kind": kind, "round": 1, "final": final_attempt, "attempts": [attempt(Some(role), "alpha", "pass", None)]})
 }
 
 fn unit(id: &str, choices: &[Option<&str>]) -> Value {
@@ -83,7 +83,7 @@ fn unit(id: &str, choices: &[Option<&str>]) -> Value {
         "workflow": {"runId": "workflow-synthetic", "stepId": "discuss", "unitId": "panel"},
         "pattern": "panel", "capability": "analysis", "outcome": "pass",
         "startedAt": "2026-10-05T12:00:00.000Z", "settledAt": "2026-10-05T12:01:00.000Z",
-        "seats": choices.iter().enumerate().map(|(i, choice)| seat(&format!("panelist-{}", i + 1), *choice)).collect::<Vec<_>>(),
+        "seats": choices.iter().enumerate().map(|(i, choice)| seat(&format!("panelist-{}", i + 1), "panelist", *choice)).collect::<Vec<_>>(),
         "inline": false, "stanceOptions": ["a", "b", "c"],
     })
 }
@@ -101,7 +101,7 @@ fn consumer_separates_all_attempts_final_seats_groups_and_refusals() {
         attempt(Some("fallback-first"), "alpha", "provider-limit", None),
         attempt(Some("resumed-first"), "alpha", "provider-limit", None)
     ]);
-    fallback["seats"].as_array_mut().unwrap().push(seat("synthesizer", None));
+    fallback["seats"].as_array_mut().unwrap().push(seat("synthesizer", "synthesizer", None));
     root.summary(&fallback);
     let mut refusal = unit("unit-run-refusal", &[]);
     refusal["outcome"] = json!("policy-refusal");
@@ -110,7 +110,7 @@ fn consumer_separates_all_attempts_final_seats_groups_and_refusals() {
     let mut inline = unit("unit-run-inline", &[]);
     inline["inline"] = json!(true);
     inline["workflow"] = Value::Null;
-    let mut inline_seat = seat("producer", None);
+    let mut inline_seat = seat("producer", "producer", None);
     inline_seat["final"]["runId"] = Value::Null;
     inline_seat["attempts"][0]["runId"] = Value::Null;
     inline["seats"] = json!([inline_seat]);
@@ -154,7 +154,6 @@ fn passive_threshold_uses_all_final_voting_seats_without_changing_outcomes() {
         ("unit-run-split", [Some("a"), Some("b"), Some("c")], 1.0 / 3.0, true, 0),
         ("unit-run-one-missing", [Some("a"), Some("a"), None], 2.0 / 3.0, false, 1),
         ("unit-run-two-missing", [Some("a"), None, None], 1.0 / 3.0, true, 2),
-        ("unit-run-all-missing", [None, None, None], 0.0, true, 3),
         ("unit-run-other", [Some("other"), Some("other"), Some("a")], 2.0 / 3.0, false, 0),
     ];
     for (id, choices, _, _, _) in &cases { root.summary(&unit(id, choices)); }
@@ -168,7 +167,7 @@ fn passive_threshold_uses_all_final_voting_seats_without_changing_outcomes() {
     no_options["stanceOptions"] = json!([]);
     root.summary(&no_options);
     let mut solo = unit("unit-run-solo", &[]);
-    solo["seats"] = json!([seat("producer", Some("a"))]);
+    solo["seats"] = json!([seat("producer", "producer", Some("a"))]);
     root.summary(&solo);
     let report = root.metrics(&[]);
     let units = report["units"].as_array().unwrap();
@@ -219,7 +218,7 @@ fn summary_source_never_rebuilds_results_and_does_not_double_count_runs() {
 }
 
 #[test]
-fn reader_skips_missing_timestamps_bad_contracts_oversized_and_nested_summaries() {
+fn reader_reports_root_wide_missing_and_unusable_summaries_without_reconstruction() {
     let root = Fixture::new();
     root.summary(&unit("unit-run-good", &[]));
     let mut no_timestamp = unit("unit-run-no-time", &[]);
@@ -235,11 +234,43 @@ fn reader_skips_missing_timestamps_bad_contracts_oversized_and_nested_summaries(
     let mismatch = root.summary(&unit("unit-run-mismatch", &[]));
     fs::write(mismatch, serde_json::to_vec(&unit("unit-run-elsewhere", &[])).unwrap()).unwrap();
     let planted = root.0.join(".fgos/assignments/unit-run-good/panelist-1/1/runs/01/outbox/unit-run-planted");
+    fs::create_dir_all(root.0.join(".fgos/assignments/unit-run-missing")).unwrap();
+    fs::create_dir_all(root.0.join(".fgos/assignments/unrelated-assignment")).unwrap();
+    let mut invalid_timestamp = unit("unit-run-invalid-time", &[]);
+    invalid_timestamp["settledAt"] = json!("not-a-timestamp");
+    root.summary(&invalid_timestamp);
+    let nonregular = root.summary(&unit("unit-run-nonregular", &[]));
+    fs::remove_file(&nonregular).unwrap();
+    fs::create_dir(&nonregular).unwrap();
+    let mut no_kind = unit("unit-run-no-kind", &[Some("a")]);
+    no_kind["seats"][0].as_object_mut().unwrap().remove("kind");
+    root.summary(&no_kind);
     fs::create_dir_all(&planted).unwrap();
     fs::write(planted.join("unit-summary.json"), serde_json::to_vec(&unit("unit-run-planted", &[])).unwrap()).unwrap();
-    assert_eq!(root.metrics(&[])["totals"]["unitRuns"], 1);
-    assert_eq!(root.metrics(&["--since=2026-10-06"])["totals"]["unitRuns"], 0);
-    assert_eq!(root.metrics(&["--until", "2026-10-04"])["totals"]["unitRuns"], 0);
+    for (args, observed, outside) in [
+        (vec![], 1, 0),
+        (vec!["--since=2026-10-06"], 0, 1),
+        (vec!["--until", "2026-10-04"], 0, 1),
+    ] {
+        let report = root.metrics(&args);
+        assert_eq!(report["totals"]["unitRuns"], observed);
+        assert_eq!(report["summaryDiagnosticsScope"], "root-wide");
+        assert_eq!(report["summaryDirsSeen"], 10);
+        assert_eq!(report["summariesMissing"], 1);
+        assert_eq!(report["summariesUnusable"], 8);
+        assert_eq!(report["summariesOutsideWindow"], outside);
+        assert_eq!(report["summariesSkippedByReason"], json!({
+            "missing-timestamp": 1, "invalid-timestamp": 1, "invalid-contract": 3,
+            "invalid-json": 1, "oversized": 1, "nonregular": 1
+        }));
+        let skipped: u64 = report["summariesSkippedByReason"].as_object().unwrap()
+            .values().map(|count| count.as_u64().unwrap()).sum();
+        assert_eq!(report["summariesUnusable"].as_u64().unwrap(), skipped);
+        assert_eq!(report["summaryDirsSeen"].as_u64().unwrap(),
+            report["totals"]["unitRuns"].as_u64().unwrap()
+                + report["summariesMissing"].as_u64().unwrap()
+                + skipped + report["summariesOutsideWindow"].as_u64().unwrap());
+    }
 }
 
 #[cfg(unix)]
@@ -253,15 +284,21 @@ fn reader_does_not_follow_unit_file_or_state_symlinks() {
     let link_file = root.summary(&unit("unit-run-link-file", &[]));
     fs::remove_file(&link_file).unwrap();
     symlink(&real, &link_file).unwrap();
-    assert_eq!(root.metrics(&[])["totals"]["unitRuns"], 1);
+    let report = root.metrics(&[]);
+    assert_eq!(report["totals"]["unitRuns"], 1);
+    assert_eq!(report["summaryDirsSeen"], 2);
+    assert_eq!(report["summariesUnusable"], 1);
+    assert_eq!(report["summariesSkippedByReason"], json!({"symlink": 1}));
     let other = Fixture::new();
     fs::remove_dir_all(other.0.join(".fgos/assignments")).unwrap();
     symlink(root.0.join(".fgos/assignments"), other.0.join(".fgos/assignments")).unwrap();
     assert_eq!(other.metrics(&[])["totals"]["unitRuns"], 0);
+    assert_eq!(other.metrics(&[])["summaryDirsSeen"], 0);
     let state = Fixture::new();
     fs::remove_dir_all(state.0.join(".fgos")).unwrap();
     symlink(root.0.join(".fgos"), state.0.join(".fgos")).unwrap();
     assert_eq!(state.metrics(&[])["totals"]["unitRuns"], 0);
+    assert_eq!(state.metrics(&[])["summaryDirsSeen"], 0);
 }
 
 #[test]
@@ -360,11 +397,88 @@ fn invalid_timestamp_bounds_are_named_errors_before_scanning() {
             operation: "metrics".into(), sub: "discussions".into(),
             args: vec![flag.into(), value.into()], root: root.0.clone(), stdin: None,
         };
-        assert!(dispatch_discussions(&request, &[]).unwrap_err().contains(&format!("invalid {flag}")));
+        assert!(dispatch_discussions(&request, scan_unit_summaries).unwrap_err().contains(&format!("invalid {flag}")));
         let window = Window {
             since: (flag == "--since").then(|| value.to_owned()),
             until: (flag == "--until").then(|| value.to_owned()),
         };
         assert!(source.observations(&root.0, &window).unwrap_err().to_string().contains(&format!("invalid {flag}")));
     }
+}
+
+#[test]
+fn voting_kind_is_independent_of_role_names_and_preserves_nonvoting_seats() {
+    let root = Fixture::new();
+    let mut summary = unit("unit-run-custom-roles", &[]);
+    summary["pattern"] = json!("research-fan-out");
+    summary["seats"] = json!([
+        seat("researcher-1", "panelist", Some("a")),
+        seat("researcher-2", "panelist", Some("a")),
+        seat("legal-adviser", "panelist", Some("b")),
+        seat("panelist", "producer", Some("c")),
+        seat("panelist-9", "synthesizer", Some("c")),
+        seat("synthesizer", "synthesizer", Some("c"))
+    ]);
+    root.summary(&summary);
+    let report = root.metrics(&[]);
+    let row = &report["units"][0];
+    assert_eq!(row["seats"], 6);
+    assert_eq!(row["stanceSeats"], 3);
+    assert_eq!(row["stances"], json!({"a": 2, "b": 1}));
+    assert_eq!(row["stancesValid"], 3);
+    assert_eq!(row["stancesMissing"], 0);
+    assert_eq!(row["stancesInvalid"], 0);
+    assert_eq!(row["measurement"], "measured");
+    assert_eq!(row["agreement"], json!(2.0 / 3.0));
+    assert_eq!(row["genuineSplit"], false);
+}
+
+#[test]
+fn no_valid_votes_are_unmeasured_with_declared_seats_and_missing_invalid_counts() {
+    let root = Fixture::new();
+    root.summary(&unit("unit-run-all-missing", &[None, None, None]));
+    let mut invalid = unit("unit-run-all-invalid", &[Some("a"), Some("b"), Some("undeclared")]);
+    for seat in &mut invalid["seats"].as_array_mut().unwrap()[..2] {
+        seat["final"]["stance"] = json!({"status": "invalid", "reason": "wrong-type"});
+    }
+    root.summary(&invalid);
+    let mut mixed = unit("unit-run-missing-invalid", &[None, Some("undeclared"), None]);
+    mixed["seats"][2]["final"]["stance"] = json!({"status": "invalid", "reason": "wrong-type"});
+    root.summary(&mixed);
+    let report = root.metrics(&[]);
+    for (id, missing, invalid) in [
+        ("unit-run-all-missing", 3, 0),
+        ("unit-run-all-invalid", 0, 3),
+        ("unit-run-missing-invalid", 1, 2),
+    ] {
+        let row = report["units"].as_array().unwrap().iter().find(|row| row["unitRunId"] == id).unwrap();
+        assert_eq!(row["measurement"], "unmeasured");
+        assert!(row["agreement"].is_null());
+        assert!(row["genuineSplit"].is_null());
+        assert_eq!(row["stanceSeats"], 3);
+        assert_eq!(row["stancesValid"], 0);
+        assert_eq!(row["stancesMissing"], missing);
+        assert_eq!(row["stancesInvalid"], invalid);
+        assert_eq!(row["seatsFailed"], 0);
+    }
+}
+
+#[test]
+fn invalid_or_absent_owner_seat_kinds_make_a_summary_unusable() {
+    let root = Fixture::new();
+    for (id, kind) in [
+        ("unit-run-null-kind", Value::Null),
+        ("unit-run-empty-kind", json!("")),
+        ("unit-run-blank-kind", json!(" ")),
+        ("unit-run-numeric-kind", json!(4)),
+    ] {
+        let mut summary = unit(id, &[Some("a")]);
+        summary["seats"][0]["kind"] = kind;
+        root.summary(&summary);
+    }
+    let report = root.metrics(&[]);
+    assert_eq!(report["totals"]["unitRuns"], 0);
+    assert_eq!(report["summaryDirsSeen"], 4);
+    assert_eq!(report["summariesUnusable"], 4);
+    assert_eq!(report["summariesSkippedByReason"], json!({"invalid-contract": 4}));
 }

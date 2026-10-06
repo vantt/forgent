@@ -5,6 +5,7 @@ import crypto from 'node:crypto';
 import { readUnitRunSeats } from './unit-run-history.mjs';
 import { resolvePattern } from './patterns/presets.mjs';
 import { reviewedHistoryOutcome } from './patterns/reviewed.mjs';
+import { resolvePanelRoles, VALID_OUTCOMES } from './patterns/panel.mjs';
 
 export const UNIT_SUMMARY_CONTRACT = Object.freeze({ id: 'unit-summary', version: 1 });
 
@@ -31,11 +32,49 @@ function workflowLink(value) {
     ? { runId: value.runId, stepId: value.stepId, unitId: value.unitId } : null;
 }
 
+/** A published attempt without its terminal result remains unsettled, even after a crash. */
+function unitHasActiveRun(unitDir, record) {
+  if (fs.existsSync(path.join(unitDir, 'pending-inline.json'))) return true;
+  if (record.execution?.status) return record.execution.status !== 'settled';
+  for (const role of fs.readdirSync(unitDir, { withFileTypes: true })) {
+    if (!role.isDirectory()) continue;
+    const roleDir = path.join(unitDir, role.name);
+    for (const round of fs.readdirSync(roleDir, { withFileTypes: true })) {
+      if (!round.isDirectory() || !/^\d+(?:-fb\d+)?$/.test(round.name)) continue;
+      const runsDir = path.join(roleDir, round.name, 'runs');
+      if (!fs.existsSync(runsDir)) continue;
+      for (const run of fs.readdirSync(runsDir, { withFileTypes: true })) {
+        if (run.isDirectory()
+          && fs.existsSync(path.join(runsDir, run.name, 'run.json'))
+          && !fs.existsSync(path.join(runsDir, run.name, 'result.json'))) return true;
+      }
+    }
+  }
+  return false;
+}
+
+function patternHistoryOutcome(patternName, params, cfg, unit, history, panelRoles) {
+  if (patternName === 'reviewed') return reviewedHistoryOutcome(unit, cfg, history, params);
+  if (patternName === 'solo') return history.find((seat) => seat.role === (params.role || 'producer'))?.outcome ?? null;
+  if (patternName !== 'panel') return null;
+  const members = panelRoles.panelists.map(({ role }) => history.find((seat) => seat.role === role));
+  if (members.some((seat) => !seat)) return null;
+  const error = members.find((seat) => ['execution-failure', 'policy-refusal', 'provider-limit', 'blocked'].includes(seat.outcome));
+  if (error) return error.outcome;
+  return history.find((seat) => seat.role === panelRoles.synthesizer.role)?.outcome ?? null;
+}
+
 /** Build without changing original records. legacyCompletion must name this exact unit run. */
 export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
   const record = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8'));
   const unitRunId = path.basename(unitDir);
   if (legacyCompletion && legacyCompletion.unitRunId !== unitRunId) throw new Error('completion belongs to another unit run');
+  const pattern = record.pattern ?? record.unit?.pattern ?? 'solo';
+  const { patternName, params } = resolvePattern(pattern);
+  const cfg = record.configSnapshot?.runner ?? {};
+  const panelRoles = patternName === 'panel' ? resolvePanelRoles(cfg, {}, params) : null;
+  const kinds = new Map(panelRoles
+    ? [...panelRoles.panelists, panelRoles.synthesizer].map(({ role, kind }) => [role, kind]) : []);
   const options = record.unit?.stanceOptions ?? [];
   const rawSeats = readUnitRunSeats(unitDir);
   const settlementTimes = [];
@@ -63,23 +102,25 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
     };
     return {
       role: seat.role,
+      kind: panelRoles ? kinds.get(seat.role) ?? 'unknown'
+        : patternName === 'solo' || seat.role === 'producer' ? 'producer'
+          : seat.role === 'verify' || seat.role === 'verifier' ? 'verifier'
+            : patternName === 'reviewed' ? 'checker' : 'unknown',
       round: seat.round,
       final: { ...project(seat.final), stance: extractStance(seat.final.runResult?.agentClaim ?? seat.final.runResult?.result, options) },
       attempts: seat.attempts.map(project),
     };
   }).sort((a, b) => a.role.localeCompare(b.role) || a.round - b.round);
   settlementTimes.sort((a, b) => Date.parse(a) - Date.parse(b));
-  const settlement = record.settlement;
-  const pattern = record.pattern ?? record.unit?.pattern ?? 'solo';
-  const { patternName, params } = resolvePattern(pattern);
-  const derivedOutcome = patternName === 'reviewed'
-    ? reviewedHistoryOutcome(record.unit, record.configSnapshot?.runner ?? {},
-      rawSeats.filter((seat) => seat.final).map((seat) => ({
-        role: seat.role, round: seat.round, outcome: seat.final.outcome,
-      })), params) ?? 'unknown'
-    : seats.find((seat) => seat.final.outcome !== 'pass')?.final.outcome
-      ?? (seats.length > 0 ? 'pass' : 'unknown');
-  const outcome = settlement?.outcome ?? legacyCompletion?.outcome ?? derivedOutcome;
+  const active = unitHasActiveRun(unitDir, record);
+  const validCompletion = (completion) => VALID_OUTCOMES.includes(completion?.outcome) && timestamp(completion?.settledAt);
+  const settlement = validCompletion(record.settlement) ? record.settlement : null;
+  const legacy = validCompletion(legacyCompletion) ? legacyCompletion : null;
+  const derivedOutcome = patternHistoryOutcome(patternName, params, cfg, record.unit,
+    rawSeats.filter((seat) => seat.final).map((seat) => ({
+      role: seat.role, round: seat.round, outcome: seat.final.outcome,
+    })), panelRoles);
+  const outcome = active ? 'unknown' : settlement?.outcome ?? legacy?.outcome ?? derivedOutcome ?? 'unknown';
   return {
     contract: UNIT_SUMMARY_CONTRACT,
     unitRunId,
@@ -88,17 +129,22 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
     capability: record.unit?.capability ?? null,
     outcome,
     startedAt: timestamp(record.createdAt),
-    settledAt: timestamp(settlement?.settledAt) ?? timestamp(legacyCompletion?.settledAt) ?? settlementTimes.at(-1) ?? null,
+    settledAt: outcome === 'unknown' ? null
+      : timestamp(settlement?.settledAt) ?? timestamp(legacy?.settledAt) ?? settlementTimes.at(-1) ?? null,
     stanceOptions: [...options],
     seats,
     inline,
-    ...(legacyCompletion?.evidence && !record.settlement ? { derivation: legacyCompletion.evidence } : {}),
+    ...(legacy?.evidence && !settlement ? { derivation: legacy.evidence } : {}),
   };
 }
 
 /** Atomic and byte-idempotent; dry-run performs no writes. */
 export function writeUnitSummary(unitDir, options = {}) {
   const summary = buildUnitSummary(unitDir, options);
+  if (summary.outcome === 'unknown' || !summary.settledAt) {
+    const record = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8'));
+    return { summary, changed: false, skipped: unitHasActiveRun(unitDir, record) ? 'active' : 'unsettled' };
+  }
   const file = path.join(unitDir, 'unit-summary.json');
   const content = `${JSON.stringify(summary, null, 2)}\n`;
   let existing = null;

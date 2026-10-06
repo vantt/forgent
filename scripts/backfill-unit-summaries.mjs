@@ -38,15 +38,20 @@ export function backfillUnitSummaries({ repoRoot = process.cwd(), dryRun = false
   repoRoot = path.resolve(repoRoot);
   const root = path.join(repoRoot, '.fgos', 'assignments');
   const completions = readLegacyUnitCompletions(repoRoot);
-  const report = { repoRoot, dryRun, units: 0, changed: 0, unchanged: 0, errors: [], summaries: [] };
+  const report = { repoRoot, dryRun, units: 0, changed: 0, unchanged: 0, skippedActive: 0, skippedUnsettled: 0,
+    errors: [], summaries: [] };
   if (!fs.existsSync(root)) return report;
   for (const entry of fs.readdirSync(root, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
     if (!entry.isDirectory() || !entry.name.startsWith('unit-run-')) continue;
     const unitDir = path.join(root, entry.name);
     try {
       if (!fs.lstatSync(path.join(unitDir, 'unit.json')).isFile()) continue;
-      const { summary, changed } = writeUnitSummary(unitDir, { dryRun, legacyCompletion: completions.get(entry.name) });
+      const { summary, changed, skipped } = writeUnitSummary(unitDir, { dryRun, legacyCompletion: completions.get(entry.name) });
       report.units += 1;
+      if (skipped) {
+        report[skipped === 'active' ? 'skippedActive' : 'skippedUnsettled'] += 1;
+        continue;
+      }
       report[changed ? 'changed' : 'unchanged'] += 1;
       report.summaries.push({ unitRunId: entry.name, changed, workflow: summary.workflow, outcome: summary.outcome,
         seats: summary.seats.length, attempts: summary.seats.reduce((sum, seat) => sum + seat.attempts.length, 0),

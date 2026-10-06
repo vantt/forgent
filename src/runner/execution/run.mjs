@@ -10,6 +10,7 @@ import { validateUnit, normalizeWorkflowLink } from './unit.mjs';
 import { bind, nextCandidate } from './bind.mjs';
 import { createRoleExecutorLedger } from './role-ledger.mjs';
 import { runPattern } from './patterns/index.mjs';
+import { resolvePattern } from './patterns/presets.mjs';
 import { executeAssignment } from '../dispatch/assignment-runner.mjs';
 import { ensureRunnerConfigForDir, RunnerConfigError } from '../dispatch/config.mjs';
 import { commitUnitWork } from './commit-unit-work.mjs';
@@ -23,6 +24,13 @@ function writeJsonAtomic(file, value) {
   const tmp = `${file}.${process.pid}.${crypto.randomBytes(4).toString('hex')}.tmp`;
   fs.writeFileSync(tmp, JSON.stringify(value, null, 2));
   fs.renameSync(tmp, file);
+}
+
+function publishUnitSummary(unitDir) {
+  try { writeUnitSummary(unitDir); }
+  catch (error) {
+    console.warn(`fgos: could not write derived unit summary for "${path.basename(unitDir)}": ${error.message}`);
+  }
 }
 
 /**
@@ -122,6 +130,9 @@ export function snapshotRunnerConfig(mainCheckoutRoot) {
  * @returns {Promise<{unitRunId: string, outcome: string, rounds: number, results: Array}>}
  */
 export async function runUnit(options = {}) {
+  if (options.resumeUnitRunId && options.stanceOptions !== undefined) {
+    throw new RunnerConfigError('cannot provide stanceOptions when resuming a unit run: the stored question is immutable');
+  }
   // Private homes left by an earlier run (a failed round that kept its pane)
   // hold a copy of an account login; `fgos run` is the one door every such run
   // goes through, so it is also where the ones whose pane has since closed are
@@ -232,16 +243,31 @@ export async function runUnit(options = {}) {
       worktree: fs.realpathSync(worktreePath),
       createdBy: process.env.USER || 'system',
       createdAt: new Date().toISOString(),
+      execution: { status: 'running' },
     };
 
     fs.writeFileSync(path.join(unitDir, 'unit.json'), JSON.stringify(unitRecord, null, 2));
   }
 
   const unitDir = path.join(assignmentsDir, unitRunId);
+  if (options.resumeUnitRunId) {
+    const summaryFile = path.join(unitDir, 'unit-summary.json');
+    try {
+      if (fs.lstatSync(summaryFile).isFile()) fs.unlinkSync(summaryFile);
+    } catch (error) {
+      if (error.code !== 'ENOENT') {
+        throw new RunnerConfigError(`cannot invalidate published summary before resuming "${unitRunId}": ${error.message}`);
+      }
+    }
+  }
+  delete unitRecord.settlement;
+  unitRecord.execution = { status: 'running' };
+  writeJsonAtomic(path.join(unitDir, 'unit.json'), unitRecord);
   const settle = (outcome) => {
     unitRecord.settlement = { outcome, settledAt: new Date().toISOString() };
+    unitRecord.execution = { status: 'settled' };
     writeJsonAtomic(path.join(unitDir, 'unit.json'), unitRecord);
-    writeUnitSummary(unitDir);
+    publishUnitSummary(unitDir);
   };
 
   let executionSettled = false;
@@ -505,7 +531,12 @@ export async function runUnit(options = {}) {
     history,
   });
   executionSettled = true;
-  settle(patternResult.outcome);
+  if (fs.existsSync(path.join(unitDir, 'pending-inline.json'))) {
+    unitRecord.execution = { status: 'pending-inline' };
+    persistUnitRecord();
+  } else {
+    settle(patternResult.outcome);
+  }
 
   return {
     unitRunId,
@@ -598,9 +629,16 @@ export function recordInlineRun(params = {}) {
     result,
   };
   fs.writeFileSync(path.join(attemptDir, 'result.json'), JSON.stringify(recordPayload, null, 2));
-  unitJson.settlement = { outcome: outcomeOfRunResult(recordPayload), settledAt: recordPayload.recordedAt };
+  const { patternName } = resolvePattern(unitJson.pattern ?? unitJson.unit?.pattern ?? 'solo');
+  if (patternName === 'solo') {
+    unitJson.settlement = { outcome: outcomeOfRunResult(recordPayload), settledAt: recordPayload.recordedAt };
+    unitJson.execution = { status: 'settled' };
+  } else {
+    delete unitJson.settlement;
+    unitJson.execution = { status: 'pending' };
+  }
   writeJsonAtomic(path.join(unitDir, 'unit.json'), unitJson);
-  writeUnitSummary(unitDir);
+  if (patternName === 'solo') publishUnitSummary(unitDir);
 
   return {
     ok: true,

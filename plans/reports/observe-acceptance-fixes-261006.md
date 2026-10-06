@@ -64,17 +64,17 @@ Each row will receive its commit and exercised proof, or an explicit non-fix/UNP
 | Foundation Low: symlink files count as run-dir barriers | Pending disposition | — |
 | Foundation Low: assignments/runs empty assignment id | Pending disposition | — |
 | Foundation Low: watchdog out-of-plan | Already separate `ea1c8fee0`; no rewrite | Commit reported in user prompt. |
-| Discussion H1: researcher seats unmeasured | Pending writer-owned kind | — |
-| Discussion M1: inline producer prematurely settles unit | Pending | — |
-| Discussion M2: zero valid claims reported genuineSplit | Pending | — |
-| Discussion M3: reviewed checker throw loses peer | Pending | — |
-| Discussion M4: crashed/killed units lack detector | Pending summariesMissing diagnostics | — |
-| Discussion L1: unusable summaries silently dropped | Pending counted skip reasons | — |
-| Discussion L2: stance line for every worker | Pending measured-seat-only prompting | — |
-| Discussion L3: backfill races in-flight units | Pending active-unit exclusion | — |
-| Discussion L4: derived summary error fatal | Pending nonfatal warning | — |
-| Discussion L5: roleTasks now apply to panel members | Pending restore unrequested behavior or explicit disposition | — |
-| Discussion L6: resume silently ignores stance options | Pending explicit refusal | — |
+| Discussion H1: researcher seats unmeasured | **Fixed**: canonical owner role definitions emit mandatory seat.kind | Writer/reader regressions and owner-to-native CLI proof below; group commit pending. |
+| Discussion M1: inline producer prematurely settles unit | **Fixed**: multi-role producer remains pending until pattern settlement | Actual inline API no settlement/summary; resume and refusal regressions pass. |
+| Discussion M2: zero valid claims reported genuineSplit | **Fixed**: unmeasured/null agreement/null split, counters retained | Rust cases and actual CLI three-missing-vote proof below. |
+| Discussion M3: reviewed checker throw loses peer | **Fixed**: checker/verify peers drained, original rejection retained | Corrected producer-report fixture verifies sibling result in final summary. |
+| Discussion M4: crashed/killed units lack detector | **Fixed structurally**: root-wide summariesMissing | Missing may also be active; no crash-state inference claimed. |
+| Discussion L1: unusable summaries silently dropped | **Fixed**: reason counts include missing/invalid timestamps and unsafe artifacts | Reader 12-case suite and actual missing-timestamp CLI counter. |
+| Discussion L2: stance line for every worker | **Fixed**: generic redundant line removed; scoped roleUnit remains | Claim validation unchanged; HIGH radius disclosed before edit. |
+| Discussion L3: backfill races in-flight units | **Fixed**: explicit active/pending state skipped; unfinished history cannot settle | Backfill/source-nonmutation regressions in passing writer suite. |
+| Discussion L4: derived summary error fatal | **Fixed**: warning preserves authoritative outcome/original exception | Normal, inline and execution-error I/O regressions pass. |
+| Discussion L5: roleTasks now apply to panel members | **Restored prior behavior**: member task wrapping ignored except stance | Prefeature source checked; synthesizer/generic roleUnit overrides unchanged. |
+| Discussion L6: resume silently ignores stance options | **Fixed**: explicit refusal without altering stored question | Actual CLI exits4 with named immutable-question error; regressions pass. |
 | Eval Medium: incomplete known rubric | Pending | — |
 | Eval Low-Medium: duplicate evalId | Pending | — |
 | Eval Low-Medium: architecture-specific no-follow constant | Pending | — |
@@ -107,3 +107,23 @@ No final full-suite run has started. Final Rust, CLI, narrow and full-suite outp
 - `target/debug/fgos metrics eval list --dir /home/vantt/projects/forgentX --question 'fgOS có nên thêm cổng dissent/agreement vào panel?'` returned exactly the two corrected records with `invalid: []`.
 - Narrow store regression: `cargo test -p fgos-observe --test eval_journal_test`, **27 pass / zero fail** (artifact://296). This exercises existing record/list behavior; rubric/uniqueness/portable-open repairs are not yet implemented.
 - `claude --help` confirms isolation flags exist, but default dispatch does not append them. No new isolated judge or fair comparison is claimed in this commit.
+
+### Measurement diagnosis and selected repair
+
+- Provenance correction committed separately as `75606d308`; the corrected scores remain historical, not a fair re-comparison.
+- Writer/reader responsibilities remain separate: Node owns pattern role definitions, final-seat selection and Unit completion; Rust owns bounded structural summary scanning and passive aggregation. A coverage-style callback carries observations plus diagnostics without broadening the shared source trait or rescanning.
+- Required writer-owned seat `kind` replaces role-prefix voting. Zero valid votes cannot establish disagreement. Root-wide missing/unusable counts intentionally do not label an active Unit as crashed or guess which time window an undated artifact belongs to.
+- Prior art `git show 0b06824a7^:src/runner/execution/patterns/panel.mjs` shows panel members previously received the original Unit directly, while only the synthesizer had roleTasks wrapping. Panel-member task wrapping introduced by the stance change is being restored to the original behavior; measured members still receive their scoped stance instructions.
+- GitNexus reports HIGH for the generic claim renderer (brief/assignment/dispatch/workflow callers) and `isRoundSettledInHistory` (reviewed resume/outcome, runPattern/dry-bind/Unit summary callers). Owner warned before edits. Renderer change is only deletion of redundant global stance prose; round completion requires drained peer evidence rather than a lone checker failure.
+- Rust LSP was repaired by installing rust-analyzer. Parent resolved dispatcher/provider/discussions/source references for workers, whose tool mounts lacked LSP. No JavaScript language server is configured; zero graph callers are UNKNOWN and require actual source callsite inspection.
+- These design notes preceded verification; subsequent exercised proof follows.
+
+### Measurement verification
+
+- Narrow Node blast radius covered 257 cases: initial 255 pass / 2 fail (`artifact://330`); the new drain fixture lacked the producer report required by handoff, and an old workflow test pinned newly reverted panelist roleTasks prose. Production source was unchanged by diagnosis corrections. The two corrected files reran **85 pass / zero fail** (`artifact://336`); the other 172 cases had already passed.
+- Rust reader **12 pass**, actual host/provider discussion integration **1 pass** (`artifact://332`).
+- Throwaway owner-to-host CLI smoke produced researcher kinds `panelist` and a synthesizer named `panelist` with kind `synthesizer`: valid votes a/a/b measured agreement 2/3, split false; three missing votes remained unmeasured with null agreement/split despite a synthesizer claim. Four direct Unit directories partitioned into two observable settled artifacts, one missing, one unusable `missing-timestamp`, diagnostic scope `root-wide`.
+- Actual inline API smoke persisted the reviewed producer with `execution.status: pending`, no Unit settlement and no summary. Actual resume CLI with new options exited **4**: `cannot provide stanceOptions when resuming a unit run: the stored question is immutable`. Its first temporary fixture lacked the API's Git-repository prerequisite; corrected fixture initialized only its own temporary Git root. Both smoke scripts and their temporary roots were removed.
+- Exact golden command `env -u CLAUDE_CODE_SESSION_ID node scripts/regenerate-observe-fixtures.mjs` succeeded, including `cargo build -p fgos`. Required pre-stage `git diff --stat -- test/fixtures/observe` is empty.
+- Independent reader/composition review found no patch-introduced correctness defect (confidence 0.94). Writer/lifecycle review found a new resume defect: cleared owner settlement left the old terminal artifact observable. Parent invalidates the old regular summary before reopening, aborts if it cannot be removed, and adds a regression proving failed republish cannot preserve a stale refusal. Four directly affected consumer files then passed **107 / zero fail** (`artifact://355`); reviewer acknowledged the described fix, not a new universal review approval.
+- Final measurement Node blast-radius rerun after resume invalidation: **259 pass / zero fail** (`artifact://357`). Includes failed invalidation preserving old authority and failed republish removing stale outcome. Pre-commit change analysis reports HIGH / seven expected dispatch-bound confinement/handoff flows; generic renderer and reviewed-history HIGH risks were disclosed before changes.

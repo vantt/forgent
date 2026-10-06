@@ -1,5 +1,5 @@
 use fgos_observe::{ObservationSource, ObserveRequest, Window};
-use fgos_run_result::{scan_coverage, scan_runs, RunResultSource, MAX_ASSIGNMENT_DEPTH};
+use fgos_run_result::{scan_coverage, scan_runs, scan_unit_summaries, RunResultSource, MAX_ASSIGNMENT_DEPTH};
 use serde_json::{json, Value};
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -152,15 +152,15 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
         stdin: None,
     };
     let coverage =
-        fgos_observe::metrics_cli::dispatch(&req, &sources, None, scan_coverage).unwrap();
+        fgos_observe::metrics_cli::dispatch(&req, &sources, None, scan_coverage, scan_unit_summaries).unwrap();
     assert_eq!(coverage["layoutRule"], expected["layoutRule"]);
     assert_eq!(coverage["observed"], scan.runs.len());
     assert_eq!(coverage["recentRuns"], 9);
     req.sub = "runs".to_string();
-    let runs = fgos_observe::metrics_cli::dispatch(&req, &sources, None, scan_coverage).unwrap();
+    let runs = fgos_observe::metrics_cli::dispatch(&req, &sources, None, scan_coverage, scan_unit_summaries).unwrap();
     assert_eq!(runs["total"], coverage["observed"]);
     req.sub = "harness".to_string();
-    let harness = fgos_observe::metrics_cli::dispatch(&req, &sources, None, scan_coverage).unwrap();
+    let harness = fgos_observe::metrics_cli::dispatch(&req, &sources, None, scan_coverage, scan_unit_summaries).unwrap();
     assert_eq!(harness["runs"]["total"], coverage["observed"]);
     let window = Window {
         since: Some("2026-10-06".to_string()),

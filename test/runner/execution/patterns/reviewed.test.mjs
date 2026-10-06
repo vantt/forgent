@@ -318,3 +318,76 @@ test('legacy history evaluator shares terminal outcomes with reviewed execution 
   assert.equal(reviewedHistoryOutcome(unit, {}, recovered.slice(0, 3)), null);
   assert.equal(reviewedHistoryOutcome(unit, { capabilities: { 'docs:write': { verify: 'synthetic-check' } } }, recovered), null);
 });
+
+test('reviewed rejection drains every checker and verify before preserving the first error', async () => {
+  for (const failedPeer of ['reviewer', 'red-team', 'verify']) {
+    const releases = new Map();
+    const started = new Map();
+    const ready = new Map(['reviewer', 'red-team', 'verify'].map((role) => [
+      role, new Promise((resolve) => started.set(role, resolve)),
+    ]));
+    const barriers = new Map(['reviewer', 'red-team', 'verify'].map((role) => [
+      role, new Promise((resolve) => releases.set(role, resolve)),
+    ]));
+    const completed = new Set();
+    const failure = new Error(`${failedPeer} could not complete`);
+    const laterFailure = new Error('another peer failed later');
+    const peer = async (role) => {
+      started.get(role)();
+      await barriers.get(role);
+      completed.add(role);
+      if (role === failedPeer) throw failure;
+      if (role === 'verify') throw laterFailure;
+      return { role, outcome: 'pass' };
+    };
+    let finished = false;
+    const run = runReviewed({ id: 'drain-review', capability: 'code:implement', verify: 'check' }, {}, {
+      runRole: ({ role }) => role === 'producer' ? { role, outcome: 'pass' } : peer(role),
+      verify: () => peer('verify'),
+    });
+    const rejection = assert.rejects(run, (error) => {
+      finished = true;
+      assert.equal(error, failure);
+      assert.equal(completed.size, 3);
+      return true;
+    });
+    await Promise.all(ready.values());
+    releases.get(failedPeer)();
+    await new Promise(setImmediate);
+    assert.equal(finished, false);
+    for (const [role, release] of releases) if (role !== failedPeer) release();
+    await rejection;
+  }
+});
+
+test('a synchronous checker rejection still dispatches and drains its sibling and verification', async () => {
+  let release;
+  const barrier = new Promise((resolve) => { release = resolve; });
+  let peersStarted;
+  const started = new Promise((resolve) => { peersStarted = resolve; });
+  const completed = [];
+  const failure = new Error('checker refused synchronously');
+  let pending = 0;
+  const peer = async (role) => {
+    if (++pending === 2) peersStarted();
+    await barrier;
+    completed.push(role);
+    return { role, outcome: 'pass', pass: true };
+  };
+  const run = runReviewed({ id: 'sync-refusal', capability: 'code:implement', verify: 'check' }, {}, {
+    runRole: ({ role }) => {
+      if (role === 'producer') return { role, outcome: 'pass' };
+      if (role === 'reviewer') throw failure;
+      return peer(role);
+    },
+    verify: () => peer('verify'),
+  });
+  const rejection = assert.rejects(run, (error) => {
+    assert.equal(error, failure);
+    assert.deepEqual(completed.sort(), ['red-team', 'verify']);
+    return true;
+  });
+  await started;
+  release();
+  await rejection;
+});

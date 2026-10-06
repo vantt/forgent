@@ -1,13 +1,13 @@
 //! Discussion measurement consumes only owner-written `unit.settled` observations.
 
-use crate::contract::{Observation, ObservationSource, ObserveRequest, Window};
+use crate::contract::{Observation, ObserveRequest, UnitSummaryScanner, Window};
 use crate::time::{parse_timestamp_millis, ParsedWindow};
 use serde_json::{json, Map, Value};
 use std::collections::{BTreeMap, BTreeSet};
 
 pub fn dispatch_discussions(
     req: &ObserveRequest,
-    sources: &[Box<dyn ObservationSource>],
+    scanner: UnitSummaryScanner,
 ) -> Result<Value, String> {
     let mut window = Window::default();
     let mut by = "workflow".to_owned();
@@ -40,11 +40,15 @@ pub fn dispatch_discussions(
         }
     }
     let parsed_window = ParsedWindow::parse(&window)?;
-    let mut observations = Vec::new();
-    for source in sources.iter().filter(|source| source.source_id() == "unit-summary") {
-        observations.extend(source.observations(&req.root, &window).map_err(|err| err.to_string())?);
-    }
-    Ok(compute_discussions(&observations, &by, &window, &parsed_window))
+    let scan = scanner(&req.root, &window).map_err(|err| err.to_string())?;
+    let mut output = compute_discussions(&scan.observations, &by, &window, &parsed_window);
+    output["summaryDiagnosticsScope"] = json!("root-wide");
+    output["summaryDirsSeen"] = json!(scan.summary_dirs_seen);
+    output["summariesMissing"] = json!(scan.summaries_missing);
+    output["summariesUnusable"] = json!(scan.summaries_unusable);
+    output["summariesSkippedByReason"] = json!(scan.summaries_skipped_by_reason);
+    output["summariesOutsideWindow"] = json!(scan.summaries_outside_window);
+    Ok(output)
 }
 
 #[derive(Default)]
@@ -120,10 +124,6 @@ fn group_key(value: &Value, key: &str) -> String {
     value[key].as_str().unwrap_or("unknown").to_owned()
 }
 
-fn panelist(role: &str) -> bool {
-    role == "panelist" || role.strip_prefix("panelist-")
-        .is_some_and(|suffix| !suffix.is_empty() && suffix.bytes().all(|b| b.is_ascii_digit()))
-}
 
 /// All final panelist seats (not synthesizers or fallback attempts) are voters.
 /// Missing/invalid votes stay in the denominator and remain explicit counts:
@@ -135,7 +135,7 @@ fn agreement(unit: &Map<String, Value>) -> Value {
     let mut voters = 0;
     let options = unit["stanceOptions"].as_array();
     if let Some(seats) = unit["seats"].as_array() {
-        for seat in seats.iter().filter(|seat| seat["role"].as_str().is_some_and(panelist)) {
+        for seat in seats.iter().filter(|seat| seat["kind"] == "panelist") {
             voters += 1;
             let stance = &seat["final"]["stance"];
             match stance["status"].as_str() {
@@ -154,7 +154,7 @@ fn agreement(unit: &Map<String, Value>) -> Value {
         }
     }
     let valid: usize = stances.values().sum();
-    let measured = options.is_some_and(|options| !options.is_empty()) && voters > 0;
+    let measured = options.is_some_and(|options| !options.is_empty()) && valid > 0;
     let largest = stances.values().copied().max().unwrap_or(0);
     json!({
         "measurement": if measured { "measured" } else { "unmeasured" },

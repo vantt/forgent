@@ -62,10 +62,14 @@ mod tests {
         )
     }
 
+    fn forbidden_summary_scanner(_: &Path, _: &crate::Window) -> Result<crate::UnitSummaryScan, crate::SourceError> {
+        panic!("coverage must not scan discussion summaries")
+    }
+
     #[test]
     fn coverage_calls_only_the_injected_run_scanner() {
         let sources: Vec<Box<dyn crate::ObservationSource>> = vec![Box::new(ForbiddenSource)];
-        crate::metrics_cli::dispatch(&request(&[]), &sources, None, scanner).unwrap();
+        crate::metrics_cli::dispatch(&request(&[]), &sources, None, scanner, forbidden_summary_scanner).unwrap();
         assert!(dispatch_coverage(&request(&["--since=2026-10-05"]), scanner).is_err());
         assert!(dispatch_coverage(&request(&["--dir"]), scanner).is_err());
     }

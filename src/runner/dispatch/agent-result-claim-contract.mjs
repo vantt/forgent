@@ -36,7 +36,6 @@ export function renderAgentResultClaimInstructions(context = {}) {
     `- "contract" may be omitted only for legacy claim input; for v2 use {"id":"${AGENT_RESULT_CLAIM_CONTRACT.id}","version":${AGENT_RESULT_CLAIM_CONTRACT.version}}`,
     ...CLAIM_FIELD_RULES.map((field) => `- "${field.path}" must be ${field.description}`),
     '- Nothing in this claim is proof; evidenceRefs remain untrusted until independently validated',
-    '- \"stance\" is optional passive measurement: {\"choice\": <declared option or \"other\">, \"confidence\": <0..1, optional>}; missing or malformed stance is recorded by the unit summary and never invalidates this claim',
   ];
   if (assessmentRequirement(context).required) {
     lines.push(`- "assessment.verdict" is required for this assessment role and must be one of: ${ASSESSMENT_VERDICTS.join(' | ')}`);

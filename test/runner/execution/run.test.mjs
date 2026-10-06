@@ -9,6 +9,7 @@ import { execFileSync } from 'node:child_process';
 
 import { runUnit, recordInlineRun, resolveGitRoots, snapshotRunnerConfig, detectHerdrPresent } from '../../../src/runner/execution/run.mjs';
 import { RunnerConfigError } from '../../../src/runner/dispatch/config.mjs';
+import { writeUnitSummary } from '../../../src/runner/execution/unit-summary.mjs';
 import { seedFileLocalBwrapRegistry } from '../confinement-registry-fixture.helper.mjs';
 
 // posture filtering consults the machine backend registry; keep it file-local
@@ -1128,4 +1129,212 @@ test('unit summaries cover refusal, thrown execution and resume without duplicat
   assert.equal(readSummary().seats.length, 1);
   assert.equal(readSummary().seats[0].attempts.length, 1);
   assert.equal(readSummary().seats[0].final.runId, 'synthetic-resumed-run');
+});
+
+function recordedUnitFixture(t, pattern = 'solo') {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
+  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
+  const unitRunId = 'unit-run-recorded';
+  const unitDir = path.join(repoRoot, '.fgos', 'assignments', unitRunId);
+  fs.mkdirSync(unitDir, { recursive: true });
+  const record = {
+    unit: { id: 'recorded-question', objective: 'Answer the question', capability: 'not-configured:answer',
+      writes: [], pattern, stanceOptions: ['a', 'b'] },
+    pattern,
+    resolvedInputs: [],
+    configSnapshot: snapshotRunnerConfig(repoRoot),
+    overrides: [],
+    worktree: fs.realpathSync(worktreeDir),
+    createdAt: '2026-10-05T01:00:00Z',
+  };
+  fs.writeFileSync(path.join(unitDir, 'unit.json'), JSON.stringify(record));
+  const readRecord = () => JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8'));
+  const readSummary = () => JSON.parse(fs.readFileSync(path.join(unitDir, 'unit-summary.json'), 'utf8'));
+  return { repoRoot, worktreeDir, unitRunId, unitDir, record, readRecord, readSummary };
+}
+
+function pendingInlineFixture(fixture) {
+  fs.writeFileSync(path.join(fixture.unitDir, 'pending-inline.json'), JSON.stringify({
+    role: 'producer', round: 1, nonce: 'single-use', binding: { executor: 'lead' },
+  }));
+  return { repoRoot: fixture.repoRoot, unitRunId: fixture.unitRunId, role: 'producer', round: 1,
+    nonce: 'single-use', evidenceRefs: ['README.md'], result: { status: 'done', summary: 'Answered' } };
+}
+
+test('inline reviewed producer remains pending and resume continues through checker settlement', async (t) => {
+  const fixture = recordedUnitFixture(t, 'reviewed');
+  const inline = recordInlineRun(pendingInlineFixture(fixture));
+  assert.equal(inline.ok, true);
+  assert.equal(fixture.readRecord().settlement, undefined);
+  assert.equal(fixture.readRecord().execution.status, 'pending');
+  assert.equal(fs.existsSync(path.join(fixture.unitDir, 'unit-summary.json')), false);
+  const producerResult = path.join(fixture.unitDir, 'producer', '1', 'runs', '01', 'result.json');
+  const originalProducer = fs.readFileSync(producerResult, 'utf8');
+  const resumed = await runUnit({ repoRoot: fixture.repoRoot, cwd: fixture.worktreeDir,
+    resumeUnitRunId: fixture.unitRunId });
+  assert.equal(resumed.outcome, 'policy-refusal');
+  assert.deepEqual(resumed.results.map(({ role }) => role), ['producer', 'reviewer']);
+  assert.ok(resumed.results[1].refused);
+  assert.equal(fs.readFileSync(producerResult, 'utf8'), originalProducer);
+  assert.equal(fixture.readRecord().settlement.outcome, 'policy-refusal');
+  assert.equal(fixture.readSummary().outcome, 'policy-refusal');
+  assert.equal(fixture.readSummary().seats[0].kind, 'producer');
+});
+
+test('inline producer for a multi-role preset does not publish final settlement', (t) => {
+  for (const pattern of ['code-change', 'panel']) {
+    const fixture = recordedUnitFixture(t, pattern);
+    recordInlineRun(pendingInlineFixture(fixture));
+    assert.equal(fixture.readRecord().settlement, undefined);
+    assert.equal(fs.existsSync(path.join(fixture.unitDir, 'unit-summary.json')), false);
+    assert.ok(fs.existsSync(path.join(fixture.unitDir, 'producer', '1', 'runs', '01', 'result.json')));
+  }
+});
+
+test('requesting inline work does not publish a settled unit before the result is recorded', async (t) => {
+  const fixture = recordedUnitFixture(t, 'reviewed');
+  const pending = await runUnit({ repoRoot: fixture.repoRoot, cwd: fixture.worktreeDir,
+    resumeUnitRunId: fixture.unitRunId, session: { headless: false, hasNativeAgent: true, provider: 'lead' } });
+  assert.equal(pending.outcome, 'blocked');
+  assert.ok(pending.results[0].pendingInline);
+  assert.equal(fixture.readRecord().settlement, undefined);
+  assert.equal(fixture.readRecord().execution.status, 'pending-inline');
+  assert.equal(fs.existsSync(path.join(fixture.unitDir, 'unit-summary.json')), false);
+});
+
+test('summary I/O failure leaves a successful resumed execution successful and authoritative', async (t) => {
+  const fixture = recordedUnitFixture(t);
+  const runDir = path.join(fixture.unitDir, 'producer', '1', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({
+    runId: 'settled-producer', settledAt: '2026-10-05T01:01:00Z', classification: { outcome: { category: 'ok' } },
+  }));
+  fs.mkdirSync(path.join(fixture.unitDir, 'unit-summary.json'));
+  const warning = t.mock.method(console, 'warn', () => {});
+  const resumed = await runUnit({ repoRoot: fixture.repoRoot, cwd: fixture.worktreeDir,
+    resumeUnitRunId: fixture.unitRunId });
+  assert.equal(resumed.outcome, 'pass');
+  assert.equal(fixture.readRecord().settlement.outcome, 'pass');
+  assert.ok(fixture.readRecord().settlement.settledAt);
+  assert.equal(warning.mock.callCount(), 1);
+});
+
+test('a reopened unit cannot retain its prior terminal summary when republishing fails', async (t) => {
+  const fixture = recordedUnitFixture(t);
+  fixture.record.settlement = { outcome: 'policy-refusal', settledAt: '2026-10-05T01:01:00Z' };
+  fs.writeFileSync(path.join(fixture.unitDir, 'unit.json'), JSON.stringify(fixture.record));
+  writeUnitSummary(fixture.unitDir);
+  assert.equal(fixture.readSummary().outcome, 'policy-refusal');
+  const runDir = path.join(fixture.unitDir, 'producer', '1', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({
+    runId: 'settled-producer', settledAt: '2026-10-05T01:02:00Z', classification: { outcome: { category: 'ok' } },
+  }));
+  const summaryFile = path.join(fixture.unitDir, 'unit-summary.json');
+  const rename = fs.renameSync;
+  t.mock.method(fs, 'renameSync', (from, to) => {
+    if (to === summaryFile) throw new Error('summary storage unavailable');
+    return rename(from, to);
+  });
+  t.mock.method(console, 'warn', () => {});
+  const resumed = await runUnit({ repoRoot: fixture.repoRoot, cwd: fixture.worktreeDir,
+    resumeUnitRunId: fixture.unitRunId });
+  assert.equal(resumed.outcome, 'pass');
+  assert.equal(fixture.readRecord().settlement.outcome, 'pass');
+  assert.equal(fs.existsSync(summaryFile), false);
+});
+
+test('failed invalidation leaves the prior settled unit and published artifact authoritative', async (t) => {
+  const fixture = recordedUnitFixture(t);
+  fixture.record.settlement = { outcome: 'policy-refusal', settledAt: '2026-10-05T01:01:00Z' };
+  const unitFile = path.join(fixture.unitDir, 'unit.json');
+  fs.writeFileSync(unitFile, JSON.stringify(fixture.record));
+  writeUnitSummary(fixture.unitDir);
+  const summaryFile = path.join(fixture.unitDir, 'unit-summary.json');
+  const beforeUnit = fs.readFileSync(unitFile, 'utf8');
+  const beforeSummary = fs.readFileSync(summaryFile, 'utf8');
+  const unlink = fs.unlinkSync;
+  t.mock.method(fs, 'unlinkSync', (file) => {
+    if (file === summaryFile) throw Object.assign(new Error('directory is read-only'), { code: 'EACCES' });
+    return unlink(file);
+  });
+  await assert.rejects(runUnit({ repoRoot: fixture.repoRoot, cwd: fixture.worktreeDir,
+    resumeUnitRunId: fixture.unitRunId }), RunnerConfigError);
+  assert.equal(fs.readFileSync(unitFile, 'utf8'), beforeUnit);
+  assert.equal(fs.readFileSync(summaryFile, 'utf8'), beforeSummary);
+});
+
+test('summary I/O failure cannot replace the original execution error', async (t) => {
+  const fixture = recordedUnitFixture(t);
+  fs.mkdirSync(path.join(fixture.unitDir, 'unit-summary.json'));
+  const failure = new Error('inline request could not be persisted');
+  const writeFile = fs.writeFileSync;
+  t.mock.method(fs, 'writeFileSync', (file, ...args) => {
+    if (file === path.join(fixture.unitDir, 'pending-inline.json')) throw failure;
+    return writeFile(file, ...args);
+  });
+  const warning = t.mock.method(console, 'warn', () => {});
+  await assert.rejects(runUnit({ repoRoot: fixture.repoRoot, cwd: fixture.worktreeDir,
+    resumeUnitRunId: fixture.unitRunId, session: { headless: false, hasNativeAgent: true, provider: 'lead' } }),
+  (error) => {
+    assert.equal(error, failure);
+    return true;
+  });
+  assert.equal(fixture.readRecord().settlement.outcome, 'execution-failure');
+  assert.equal(warning.mock.callCount(), 1);
+});
+
+test('summary I/O failure after inline solo completion warns without losing the recorded result', (t) => {
+  const fixture = recordedUnitFixture(t);
+  const params = pendingInlineFixture(fixture);
+  fs.mkdirSync(path.join(fixture.unitDir, 'unit-summary.json'));
+  const warning = t.mock.method(console, 'warn', () => {});
+  assert.equal(recordInlineRun(params).ok, true);
+  assert.equal(fixture.readRecord().settlement.outcome, 'pass');
+  assert.equal(fixture.readRecord().execution.status, 'settled');
+  assert.equal(fs.existsSync(path.join(fixture.unitDir, 'pending-inline.json')), false);
+  assert.ok(fs.existsSync(path.join(fixture.unitDir, 'producer', '1', 'runs', '01', 'result.json')));
+  assert.equal(warning.mock.callCount(), 1);
+});
+
+test('resume refuses supplied stance options without altering the stored question or publishing a summary', async (t) => {
+  const fixture = recordedUnitFixture(t);
+  const before = fs.readFileSync(path.join(fixture.unitDir, 'unit.json'), 'utf8');
+  for (const stanceOptions of [['a', 'b'], ['changed'], [], null]) {
+    await assert.rejects(runUnit({ repoRoot: fixture.repoRoot, cwd: fixture.worktreeDir,
+      resumeUnitRunId: fixture.unitRunId, stanceOptions }), RunnerConfigError);
+    assert.equal(fs.readFileSync(path.join(fixture.unitDir, 'unit.json'), 'utf8'), before);
+    assert.equal(fs.existsSync(path.join(fixture.unitDir, 'unit-summary.json')), false);
+  }
+});
+
+test('a reviewed execution error publishes its summary only after the dispatched sibling result exists', async (t) => {
+  const fixture = recordedUnitFixture(t, 'rfc');
+  reviewedConfig(fixture.repoRoot, ['alpha', 'beta']);
+  fixture.record.unit.capability = 'docs:write';
+  fixture.record.configSnapshot = snapshotRunnerConfig(fixture.repoRoot);
+  fixture.record.bindings = {
+    'producer/1': [{ role: 'producer', round: 1, binding: { executor: 'alpha' } }],
+    'reviewer/1': [{ role: 'reviewer', round: 1, binding: { executor: 'beta', mechanism: 'inline' } }],
+  };
+  fs.writeFileSync(path.join(fixture.unitDir, 'unit.json'), JSON.stringify(fixture.record));
+  const producerDir = path.join(fixture.unitDir, 'producer', '1', 'runs', '01');
+  fs.mkdirSync(producerDir, { recursive: true });
+  const reportFile = path.join(producerDir, 'agent-report.md');
+  fs.writeFileSync(reportFile, '# Producer report\nThe requested source evidence was inspected and the proposed change was documented.\n');
+  fs.writeFileSync(path.join(producerDir, 'result.json'), JSON.stringify({
+    runId: 'prior-producer', settledAt: '2026-10-05T01:01:00Z', executorId: 'alpha',
+    evidence: { artifacts: [path.relative(fixture.repoRoot, reportFile)] },
+    classification: { outcome: { category: 'ok' } },
+  }));
+  await assert.rejects(runUnit({ repoRoot: fixture.repoRoot, cwd: fixture.worktreeDir,
+    resumeUnitRunId: fixture.unitRunId }), (error) => error instanceof RunnerConfigError && /cannot be bound inline/.test(error.message));
+  const summary = fixture.readSummary();
+  assert.equal(summary.outcome, 'execution-failure');
+  const sibling = summary.seats.find((seat) => seat.role === 'red-team');
+  assert.ok(sibling?.final.runId);
+  assert.equal(sibling.final.outcome, 'pass');
+  assert.equal(sibling.kind, 'checker');
+  assert.equal(fixture.readRecord().settlement.outcome, 'execution-failure');
 });

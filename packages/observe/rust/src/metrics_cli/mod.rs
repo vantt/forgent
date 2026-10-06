@@ -11,7 +11,7 @@ pub mod outcomes;
 pub mod runs;
 pub mod snapshot;
 
-use crate::contract::{ObservationSource, ObserveRequest, WorkObservationSource};
+use crate::contract::{ObservationSource, ObserveRequest, UnitSummaryScanner, WorkObservationSource};
 use serde_json::json;
 
 pub const AVAILABLE_SUBCOMMANDS: &[&str] = &[
@@ -24,6 +24,7 @@ pub fn dispatch(
     sources: &[Box<dyn ObservationSource>],
     work_source: Option<&dyn WorkObservationSource>,
     coverage_scanner: coverage::CoverageScanner,
+    unit_summary_scanner: UnitSummaryScanner,
 ) -> Result<serde_json::Value, String> {
     match req.sub.as_str() {
         "ping" => {
@@ -41,7 +42,7 @@ pub fn dispatch(
         "faults" => faults::dispatch_faults(req),
         "runs" => runs::dispatch_runs(req, sources),
         "coverage" => coverage::dispatch_coverage(req, coverage_scanner),
-        "discussions" => discussions::dispatch_discussions(req, sources),
+        "discussions" => discussions::dispatch_discussions(req, unit_summary_scanner),
         "eval" => eval::dispatch_eval(req),
         "outcomes" => outcomes::dispatch_outcomes(req, work_source),
         "entropy" => entropy::dispatch_entropy(req, work_source),

@@ -83,6 +83,20 @@ pub trait ObservationSource: Send + Sync {
     fn observations(&self, root: &Path, w: &Window) -> Result<Vec<Observation>, SourceError>;
 }
 
+/// One reader-owned scan: observations are windowed; structural counts are root-wide.
+#[derive(Debug, Default)]
+pub struct UnitSummaryScan {
+    pub observations: Vec<Observation>,
+    pub summary_dirs_seen: usize,
+    pub summaries_missing: usize,
+    pub summaries_unusable: usize,
+    pub summaries_skipped_by_reason: std::collections::BTreeMap<&'static str, usize>,
+    pub summaries_outside_window: usize,
+}
+
+/// Injected by the host so Observe never interprets execution storage or lifecycle.
+pub type UnitSummaryScanner = fn(&Path, &Window) -> Result<UnitSummaryScan, SourceError>;
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LegacyFrictionRecord {
     pub src: String,

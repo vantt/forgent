@@ -50,6 +50,7 @@ pub struct ObserveMetricsProvider {
     sources: Arc<Vec<Box<dyn crate::ObservationSource>>>,
     work_source: Arc<Option<Box<dyn crate::WorkObservationSource>>>,
     coverage_scanner: metrics_cli::coverage::CoverageScanner,
+    unit_summary_scanner: crate::UnitSummaryScanner,
 }
 
 impl ObserveMetricsProvider {
@@ -57,12 +58,14 @@ impl ObserveMetricsProvider {
         sources: Vec<Box<dyn crate::ObservationSource>>,
         work_source: Option<Box<dyn crate::WorkObservationSource>>,
         coverage_scanner: metrics_cli::coverage::CoverageScanner,
+        unit_summary_scanner: crate::UnitSummaryScanner,
     ) -> Self {
         Self {
             descriptor: OBSERVE_METRICS_DESCRIPTOR,
             sources: Arc::new(sources),
             work_source: Arc::new(work_source),
             coverage_scanner,
+            unit_summary_scanner,
         }
     }
 }
@@ -89,7 +92,7 @@ impl OperationProvider for ObserveMetricsProvider {
             let work_src_ref: Option<&dyn crate::WorkObservationSource> =
                 self.work_source.as_ref().as_ref().map(|b| b.as_ref());
             let res_json =
-                metrics_cli::dispatch(req, &self.sources, work_src_ref, self.coverage_scanner)
+                metrics_cli::dispatch(req, &self.sources, work_src_ref, self.coverage_scanner, self.unit_summary_scanner)
                     .map_err(ProviderError::ProviderFailed)?;
             Ok(ProviderOutcome::completed(
                 self.descriptor().outcome_contract.clone(),

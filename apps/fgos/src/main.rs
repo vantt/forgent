@@ -129,6 +129,7 @@ fn main() {
             wiring::metrics_sources::build_metrics_sources(),
             wiring::metrics_sources::build_work_observation_source(),
             fgos_run_result::scan_coverage,
+            wiring::metrics_sources::build_unit_summary_scanner(),
         ),
     ));
     service.register_provider(Arc::new(

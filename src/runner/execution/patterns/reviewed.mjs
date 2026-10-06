@@ -106,7 +106,6 @@ function isRoundSettledInHistory(r, priorResults, checkerList, hasVerify) {
   for (const checkerRole of checkerList) {
     const chk = priorResults.find((h) => h.role === checkerRole && (h.round ?? 1) === r);
     if (!chk) return false;
-    if (ERROR_OUTCOMES.includes(chk.outcome)) return true;
   }
 
   if (hasVerify) {
@@ -270,7 +269,7 @@ export async function runReviewed(unit, cfg, { runRole, verify, history } = {}, 
       };
     }
 
-    // Step B: Run checkers in PARALLEL (Promise.all)
+    // Step B: Dispatch checkers and verification together, then drain every peer.
     const pendingCheckerRoles = [];
     const reusedCheckerResults = [];
 
@@ -295,7 +294,7 @@ export async function runReviewed(unit, cfg, { runRole, verify, history } = {}, 
     }
 
     const checkerPromises = pendingCheckerRoles.map((checkerRole) =>
-      runRole({
+      Promise.resolve().then(() => runRole({
         role: checkerRole,
         // Told to check rather than to do the work, and handed the producer's account of this round.
         unit: roleUnit(unit, { role: checkerRole, params }),
@@ -303,7 +302,7 @@ export async function runReviewed(unit, cfg, { runRole, verify, history } = {}, 
         independentOf: ['producer'],
         round: r,
         inputs: [producerResult],
-      }),
+      })),
     );
 
     const verifyPromise = runPendingVerify
@@ -318,10 +317,19 @@ export async function runReviewed(unit, cfg, { runRole, verify, history } = {}, 
         })
       : null;
 
-    const [dispatchedCheckers, dispatchedVerify] = await Promise.all([
-      Promise.all(checkerPromises),
-      verifyPromise,
-    ]);
+    let firstRejection;
+    let rejected = false;
+    const peers = [...checkerPromises, ...(verifyPromise ? [verifyPromise] : [])];
+    const settledPeers = await Promise.allSettled(peers.map((peer) => peer.catch((error) => {
+      if (!rejected) {
+        rejected = true;
+        firstRejection = error;
+      }
+      throw error;
+    })));
+    if (rejected) throw firstRejection;
+    const dispatchedCheckers = settledPeers.slice(0, checkerPromises.length).map((peer) => peer.value);
+    const dispatchedVerify = verifyPromise ? settledPeers.at(-1).value : null;
 
     for (const res of reusedCheckerResults) {
       currentRoundResults.push(res);
