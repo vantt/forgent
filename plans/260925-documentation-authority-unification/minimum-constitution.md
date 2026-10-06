@@ -5,7 +5,7 @@ Document type: Specification
 Audience: Human reviewer, architect, implementer, agent
 Purpose: State the minimum rules the documentation migration needs before inventory-driven transformation
 Design status: Accepted (frozen 2026-10-06 by the owner)
-Implementation: Implemented (validated by scripts/check-doc-constitution.mjs; metadata and conservation checks planned)
+Implementation: Implemented (validated by scripts/check-doc-constitution.mjs; conservation, candidate-status and retirement dry-run checks wired; the evidence relocation verifier and the cutover lease are designed, not built)
 Provenance: plans/260925-documentation-authority-unification/plan.md §6.3
 Writer type: Human + agent coauthor
 Canonical for: Migration-time placement, cardinality, metadata, conflict, promotion and retirement rules
@@ -218,9 +218,9 @@ Promotion is atomic for the whole platform-documentation system (plan §3, item
 |---|---|
 | Every retained claim has exactly one target owner and no `unknown-blocking` row remains | [check-doc-inventory-gates.mjs](../../scripts/check-doc-inventory-gates.mjs) |
 | No unreviewed legacy growth | [check-legacy-docs-ratchet.mjs](../../scripts/check-legacy-docs-ratchet.mjs) |
-| Candidate fields on candidate material, promotion fields on a document becoming canonical, and placement | candidate fields: planned check; promotion fields: reported by `check-doc-constitution.mjs --promotion` |
-| Relative links and `Related` paths resolve | planned: candidate-status metadata check |
-| Every claim row is `reviewed` | planned: conservation checker |
+| Candidate fields on candidate material, promotion fields on a document becoming canonical, and placement | [check-doc-candidate-status.mjs](../../scripts/check-doc-candidate-status.mjs) (status read from the switchboard, never from `Design status`); promotion fields also reported by `check-doc-constitution.mjs --promotion` |
+| Relative links and `Related` paths resolve | [check-doc-candidate-status.mjs](../../scripts/check-doc-candidate-status.mjs) |
+| Every claim row is `reviewed` | [check-doc-inventory-gates.mjs](../../scripts/check-doc-inventory-gates.mjs) `--strict` |
 | Intent ledger updated when a vision is narrowed; component-boundary check recorded | review (governance §8, §11) |
 
 ## 7. Retirement Gate
@@ -230,18 +230,18 @@ A legacy source is deleted or redirected only at the cutover and only when:
 | Check | Enforced by |
 |---|---|
 | The file has one non-blocking disposition | [check-doc-inventory-gates.mjs](../../scripts/check-doc-inventory-gates.mjs) |
-| No claim row is blocking or unreviewed | planned: conservation checker |
-| Every dropped-claims register entry has a reviewed disposition | planned: conservation checker |
-| Immutable historical references resolve through the alias table | planned: alias table and resolver contract |
-| Every consumer edge is rewritten or proven non-authority | planned: retirement-check dry-run |
-| Relocated evidence matches its digests | planned: evidence relocation policy and consumer proof |
-| Every previous claim identity is present or has a recorded removal | planned: conservation checker |
-| Rows that share a `semanticClaimId` name one distinct owner | planned: conservation checker |
+| No claim row is blocking or unreviewed | [check-doc-inventory-gates.mjs](../../scripts/check-doc-inventory-gates.mjs) `--strict` |
+| Every dropped-claims register entry has a reviewed disposition | [check-doc-inventory-gates.mjs](../../scripts/check-doc-inventory-gates.mjs) `--strict` |
+| Immutable historical references resolve through the alias table | [check-doc-retirement.mjs](../../scripts/check-doc-retirement.mjs) over the [alias table](alias-table.json) ([contract](alias-table-and-resolver-contract.md)) |
+| Every consumer edge is rewritten or proven non-authority | [check-doc-retirement.mjs](../../scripts/check-doc-retirement.mjs) `--cutover` |
+| Relocated evidence matches its digests | planned: relocation verifier (policy and consumer proof: [evidence-payload-relocation-policy.md](evidence-payload-relocation-policy.md)) |
+| Every previous claim identity is present or has a recorded removal | [check-doc-inventory-gates.mjs](../../scripts/check-doc-inventory-gates.mjs) (always fatal) |
+| Rows that share a `semanticClaimId` name one distinct owner | [check-doc-inventory-gates.mjs](../../scripts/check-doc-inventory-gates.mjs) (always fatal) |
 | Every canonical document carries all promotion fields | [check-doc-constitution.mjs](../../scripts/check-doc-constitution.mjs) `--promotion` |
-| A row reviewed at cutover carries its own reviewed rationale, not the item's `proposedRationale` fallback | planned: retirement-check dry-run |
-| The ledger validator passes in cutover mode (owner, anchor, classified kind, reviewed; usage drift fatal) | planned: retirement-check dry-run |
+| A row reviewed at cutover carries its own reviewed rationale, not the item's `proposedRationale` fallback | [check-doc-constitution.mjs](../../scripts/check-doc-constitution.mjs) `--cutover` |
+| The ledger validator passes in cutover mode (owner, anchor, classified kind, reviewed; usage drift fatal) | [check-doc-constitution.mjs](../../scripts/check-doc-constitution.mjs) `--cutover` |
 | The legacy ratchet is clean | [check-legacy-docs-ratchet.mjs](../../scripts/check-legacy-docs-ratchet.mjs) |
-| The cutover runs under the documentation-cutover lease | planned: lease design |
+| The cutover runs under the documentation-cutover lease | planned: lease door (design: [cutover-write-lease-design.md](cutover-write-lease-design.md)) |
 
 ## 8. Validation
 
@@ -252,6 +252,11 @@ The JSON is a checked projection of the governance prose, not a second source.
 Amendments: the rules are frozen in meaning (frozen 2026-10-06 by the owner). An addition (a kind, a placement, a
 gate check) is a recorded exception with evidence and keeps the pinned vocabulary
 major version; changing a rule needs a new major version and an owner decision.
+
+Enforcement wiring (2026-10-06, no rule changed): eleven gate checks that named a
+planned deliverable now name the script that enforces them, so the retirement dry-run
+([check-doc-retirement.mjs](../../scripts/check-doc-retirement.mjs)) can evaluate every
+check of both gates. Only `evidence-digests` and `write-lease` stay planned.
 
 `node scripts/check-doc-constitution.mjs` checks that the vocabulary,
 constitution and schema agree (every referenced id exists, no duplicates, every
@@ -286,10 +291,14 @@ counted as gaps, never as invalid.
 | Agent Context Engine, context packets, budgeting | A separate plan is authorized |
 | Executable proof receipt and attester ABI | The proof contract seam is implemented |
 | Consolidation of every user-facing knowledge location | A reviewed scope amendment admits it |
+| Objective credibility signals instead of stored subjective scores | The engine event model is designed |
+| A small interchange conformance floor beneath profile governance | The engine manifest is written |
+| Generated progressive-disclosure indexes | The maintenance minimum viable product is scoped |
 
 These are recorded in the platform
 [intent ledger](../../docs/platform/intent-preservation-ledger.md) as PF-I011 to
-PF-I020; the four that PF-I007 to PF-I010 already cover are cross-referenced there.
+PF-I020 and PF-I021; the four that PF-I007 to PF-I010 already cover are cross-referenced there.
+The last three rows (the OKF lessons of plan §12.3 that no earlier entry named) were added on 2026-10-06 as an additive exception after the completeness check.
 
 ## 10. Related Files
 

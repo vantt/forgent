@@ -858,24 +858,24 @@
         "id": "metadata-and-structure",
         "rule": "Candidate material carries candidateCore; a document becoming canonical carries the full promotionFields list and meets its placement pattern.",
         "enforcedBy": {
-          "kind": "planned",
-          "deliverable": "candidate-status metadata check"
+          "kind": "script",
+          "path": "scripts/check-doc-candidate-status.mjs"
         }
       },
       {
         "id": "links-resolve",
         "rule": "Every relative link and Related path resolves.",
         "enforcedBy": {
-          "kind": "planned",
-          "deliverable": "candidate-status metadata check"
+          "kind": "script",
+          "path": "scripts/check-doc-candidate-status.mjs"
         }
       },
       {
         "id": "claims-reviewed",
         "rule": "Every claim row of the document has reviewStatus reviewed.",
         "enforcedBy": {
-          "kind": "planned",
-          "deliverable": "conservation checker"
+          "kind": "script",
+          "path": "scripts/check-doc-inventory-gates.mjs"
         }
       },
       {
@@ -903,32 +903,32 @@
         "id": "claims-closed",
         "rule": "No claim row of the file is unknown-blocking or unreviewed.",
         "enforcedBy": {
-          "kind": "planned",
-          "deliverable": "conservation checker"
+          "kind": "script",
+          "path": "scripts/check-doc-inventory-gates.mjs"
         }
       },
       {
         "id": "dropped-claims-resolved",
         "rule": "Every entry of the dropped-claims register has a reviewed disposition.",
         "enforcedBy": {
-          "kind": "planned",
-          "deliverable": "conservation checker"
+          "kind": "script",
+          "path": "scripts/check-doc-inventory-gates.mjs"
         }
       },
       {
         "id": "aliases-cover-immutable-refs",
         "rule": "Immutable historical references to the file resolve through the alias table.",
         "enforcedBy": {
-          "kind": "planned",
-          "deliverable": "alias table and resolver contract"
+          "kind": "script",
+          "path": "scripts/check-doc-retirement.mjs"
         }
       },
       {
         "id": "consumers-rewritten",
         "rule": "Every consumer edge is rewritten or proven non-authority.",
         "enforcedBy": {
-          "kind": "planned",
-          "deliverable": "retirement-check dry-run"
+          "kind": "script",
+          "path": "scripts/check-doc-retirement.mjs"
         }
       },
       {
@@ -959,32 +959,32 @@
         "id": "row-set-conserved",
         "rule": "Every claim identity of the previous ledger and identity registry is present in the current row set, or has a recorded removal with rationale and disposition.",
         "enforcedBy": {
-          "kind": "planned",
-          "deliverable": "conservation checker"
+          "kind": "script",
+          "path": "scripts/check-doc-inventory-gates.mjs"
         }
       },
       {
         "id": "one-owner-per-semantic-claim",
         "rule": "Rows that share a semanticClaimId name one distinct targetOwner.",
         "enforcedBy": {
-          "kind": "planned",
-          "deliverable": "conservation checker"
+          "kind": "script",
+          "path": "scripts/check-doc-inventory-gates.mjs"
         }
       },
       {
         "id": "cutover-mode",
         "rule": "The ledger validator runs in a cutover mode: every retained claim has an owner, an anchor, a classified kind and review status reviewed, and vocabulary usage drift is fatal.",
         "enforcedBy": {
-          "kind": "planned",
-          "deliverable": "retirement-check dry-run (validator --cutover mode)"
+          "kind": "script",
+          "path": "scripts/check-doc-constitution.mjs"
         }
       },
       {
         "id": "reviewed-rationale",
         "rule": "A row reviewed at cutover carries its own reviewed rationale on the row; the inventory item's proposedRationale fallback is not enough.",
         "enforcedBy": {
-          "kind": "planned",
-          "deliverable": "retirement-check dry-run (validator --cutover mode)"
+          "kind": "script",
+          "path": "scripts/check-doc-constitution.mjs"
         }
       },
       {
@@ -1075,6 +1075,24 @@
       "item": "Final consolidation of every user-facing knowledge location",
       "source": "plan §4",
       "revisitTrigger": "A reviewed scope amendment admits it into a plan."
+    },
+    {
+      "id": "credibility-signals",
+      "item": "Objective credibility signals derived from evidence instead of stored subjective scores",
+      "source": "plan §12.3",
+      "revisitTrigger": "The engine event model is designed."
+    },
+    {
+      "id": "interchange-conformance-floor",
+      "item": "A small interchange conformance floor beneath stricter profile governance",
+      "source": "plan §12.3",
+      "revisitTrigger": "The engine manifest is written."
+    },
+    {
+      "id": "progressive-disclosure-indexes",
+      "item": "Generated progressive-disclosure indexes of the documentation tree",
+      "source": "plan §12.3",
+      "revisitTrigger": "The post-cutover maintenance minimum viable product is scoped."
     }
   ],
   "status": "Accepted (frozen 2026-10-06 by the owner)",
