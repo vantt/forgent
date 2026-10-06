@@ -97,7 +97,7 @@ import { parseFrontmatter } from '../report/frontmatter.mjs';
 import { POLICY_PATCH_FIELDS } from '../runner/dispatch/execution-contract.mjs';
 import { discoverOperationPromptTemplates, TemplateResolutionError } from '../runner/dispatch/operation-prompt-templates.mjs';
 import { resolveHostBin, invokeHost } from '../util/host-bin.mjs';
-import { listAssignmentRuns, scanAssignmentLayout } from '../runner/dispatch/assignment-layout.mjs';
+import { listAssignmentRuns, scanAssignmentLayout, projectRunEligibility } from '../runner/dispatch/assignment-layout.mjs';
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 export { claudeCodeHookWired } from './claude-code-hooks.mjs';
 export { checkAgySubHomesConfigured } from './agy-permissions.mjs';
@@ -5784,20 +5784,22 @@ export function checkObserveRunCoverage(cwd, { hostRunner = invokeHost, scan = s
   } catch (err) {
     return { passed: false, message: `cannot enumerate run directories for ${location}: ${err.message}` };
   }
+  const eligible = projectRunEligibility(layout);
   let recent = 0;
   for (const run of layout.runs) {
     try {
-      const stat = fs.lstatSync(path.join(run.runDir, 'result.json'));
-      if (stat.isFile() && now - stat.mtimeMs <= 60_000) recent++;
+      const stat = fs.lstatSync(run.runDir);
+      if (stat.isDirectory() && now - stat.mtimeMs <= 60_000) recent++;
     } catch {}
   }
-  const difference = layout.runDirsSeen - coverage.runDirsSeen;
+  const directoryDifference = layout.runDirsSeen - coverage.runDirsSeen;
+  const admissionDifference = eligible.observed - coverage.observed;
   const tolerance = Math.max(recent, coverage.recentRuns);
-  if (Math.abs(difference) > tolerance) {
+  if (Math.abs(directoryDifference) > tolerance || Math.abs(admissionDifference) > tolerance) {
     const examples = layout.runs.slice(0, 3).map((run) => path.relative(root, run.runDir)).join(', ');
-    return { passed: false, message: `run coverage differs by ${Math.abs(difference)} (${difference > 0 ? 'host shortfall' : 'host excess'}): Node ${layout.runDirsSeen}, host ${coverage.runDirsSeen}, recent ${tolerance}; ${location}; candidate paths: ${examples || '(none)'}` };
+    return { passed: false, message: `run coverage differs: directories Node ${layout.runDirsSeen}, host ${coverage.runDirsSeen} (difference ${directoryDifference}); eligible Node ${eligible.observed}, observed host ${coverage.observed} (difference ${admissionDifference}); recent tolerance ${tolerance}; ${location}; sample candidates (not confirmed missing): ${examples || '(none)'}` };
   }
-  return { passed: true, message: `run coverage matches: Node ${layout.runDirsSeen}, host ${coverage.runDirsSeen}, recent tolerance ${tolerance}; ${location}` };
+  return { passed: true, message: `run coverage matches: directories Node ${layout.runDirsSeen}, host ${coverage.runDirsSeen}; eligible Node ${eligible.observed}, observed host ${coverage.observed}; recent tolerance ${tolerance}; ${location}` };
 }
 
 registerCheck({
@@ -5820,6 +5822,6 @@ registerCheck({
 
 registerCheck({
   id: 'observe-run-coverage',
-  description: 'Observe sees the same assignment run directories as the independent Node layout scan',
+  description: 'Observe directory totals and admitted runs match the independent Node layout and eligibility projections',
   check: (cwd) => checkObserveRunCoverage(cwd),
 });

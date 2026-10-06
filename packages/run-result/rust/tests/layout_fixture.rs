@@ -89,6 +89,22 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
         if entry["skip"] != "no-timestamp" {
             record["settledAt"] = expected["timestamp"].clone();
         }
+        if let Some(fields) = entry["result"].as_object() {
+            record.as_object_mut().unwrap().extend(fields.clone());
+        }
+        let dir = root.assignments().join(assignment).join("runs").join(attempt);
+        fs::create_dir_all(&dir).unwrap();
+        let mut run = json!({
+            "runId": entry.get("runId").unwrap_or(&Value::Null),
+            "startedAt": expected["timestamp"]
+        });
+        if let Some(fields) = entry["run"].as_object() {
+            run.as_object_mut().unwrap().extend(fields.clone());
+        }
+        fs::write(dir.join("run.json"), serde_json::to_vec(&run).unwrap()).unwrap();
+        if entry["skip"] == "missing-result" {
+            continue;
+        }
         let path = root.result(assignment, attempt, &record);
         if entry["skip"] == "unparseable" {
             fs::write(path, "NOT JSON").unwrap();
@@ -155,13 +171,50 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
         fgos_observe::metrics_cli::dispatch(&req, &sources, None, scan_coverage, scan_unit_summaries).unwrap();
     assert_eq!(coverage["layoutRule"], expected["layoutRule"]);
     assert_eq!(coverage["observed"], scan.runs.len());
-    assert_eq!(coverage["recentRuns"], 9);
+    assert_eq!(coverage["recentRuns"], 13);
     req.sub = "runs".to_string();
     let runs = fgos_observe::metrics_cli::dispatch(&req, &sources, None, scan_coverage, scan_unit_summaries).unwrap();
     assert_eq!(runs["total"], coverage["observed"]);
     req.sub = "harness".to_string();
     let harness = fgos_observe::metrics_cli::dispatch(&req, &sources, None, scan_coverage, scan_unit_summaries).unwrap();
     assert_eq!(harness["runs"]["total"], coverage["observed"]);
+    for (id, timestamp) in [
+        ("owner-settled", "2026-10-05T11:00:00Z"),
+        ("result-time", "2026-10-05T12:00:00Z"),
+        ("settled-precedence", "2026-10-05T13:00:00Z"),
+    ] {
+        let observation = scan.runs.iter().find(|o| o.subject.id == id).unwrap();
+        assert_eq!(observation.ts, timestamp);
+        assert_eq!(observation.source, "run-result");
+        assert_eq!(observation.kind, "run.settled");
+        assert_eq!(observation.attrs["assignmentId"], id);
+        assert_eq!(observation.attrs["status"], "done");
+    }
+    req.args = vec![
+        "--since".to_string(), "2026-10-05T11:00:00Z".to_string(),
+        "--until".to_string(), "2026-10-05T12:00:00Z".to_string(),
+    ];
+    req.sub = "runs".to_string();
+    let windowed_runs = fgos_observe::metrics_cli::dispatch(
+        &req, &sources, None, scan_coverage, scan_unit_summaries,
+    ).unwrap();
+    assert_eq!(windowed_runs["total"], 2);
+    req.sub = "harness".to_string();
+    let windowed_harness = fgos_observe::metrics_cli::dispatch(
+        &req, &sources, None, scan_coverage, scan_unit_summaries,
+    ).unwrap();
+    assert_eq!(windowed_harness["runs"]["total"], 2);
+    req.sub = "coverage".to_string();
+    assert!(fgos_observe::metrics_cli::dispatch(
+        &req, &sources, None, scan_coverage, scan_unit_summaries,
+    ).unwrap_err().contains("unexpected argument for metrics coverage"));
+    req.args.clear();
+    let windowed_coverage = fgos_observe::metrics_cli::dispatch(
+        &req, &sources, None, scan_coverage, scan_unit_summaries,
+    ).unwrap();
+    assert_eq!(windowed_coverage["observed"], 7);
+    assert_eq!(windowed_coverage["runDirsSeen"], 15);
+    assert_eq!(windowed_coverage["skipped"], expected["skipped"]);
     let window = Window {
         since: Some("2026-10-06".to_string()),
         until: None,
@@ -197,7 +250,7 @@ fn timestamps_come_from_results_and_unsettled_attempts_are_accounted() {
     assert_eq!(scan.runs.len(), 1);
     assert_eq!(scan.skipped["no-timestamp"], 1);
     assert_eq!(scan.skipped["no-run-id"], 1);
-    assert_eq!(scan.skipped["unparseable"], 1);
+    assert_eq!(scan.skipped["missing-result"], 1);
     assert_eq!(scan.recent_runs, 3);
     assert_accounting(&root.0);
 }
@@ -340,4 +393,127 @@ fn an_invalid_duplicate_does_not_hide_the_first_valid_record() {
         .unwrap()
         .is_empty());
     assert_accounting(&root.0);
+}
+
+#[cfg(unix)]
+#[test]
+fn owner_settlement_requires_regular_parseable_metadata_without_changing_results() {
+    let root = FixtureRoot::new();
+    let owner_time = "2026-10-05T11:00:00Z";
+    let target = root.0.join("outside-run.json");
+    fs::write(&target, serde_json::to_vec(&json!({"settledAt": owner_time})).unwrap()).unwrap();
+    for metadata_kind in ["valid", "invalid", "symlink", "directory", "blank", "started"] {
+        for primary in [false, true] {
+            let id = format!("{metadata_kind}-{primary}");
+            let record = if primary {
+                json!({"runId": id, "settledAt": "2026-10-05T12:00:00Z", "timestamp": owner_time,
+                    "executorId": "executor", "role": "producer", "status": "done"})
+            } else {
+                json!({"runId": id, "settledAt": null, "timestamp": " "})
+            };
+            let result = root.result(&id, "01", &record);
+            let run = result.parent().unwrap().join("run.json");
+            match metadata_kind {
+                "valid" => fs::write(&run, serde_json::to_vec(&json!({"settledAt": owner_time})).unwrap()).unwrap(),
+                "invalid" => fs::write(&run, "NOT JSON").unwrap(),
+                "symlink" => std::os::unix::fs::symlink(&target, &run).unwrap(),
+                "directory" => fs::create_dir(&run).unwrap(),
+                "blank" => fs::write(&run, r#"{"settledAt":" ","startedAt":"2026-10-05T11:00:00Z"}"#).unwrap(),
+                "started" => fs::write(&run, r#"{"startedAt":"2026-10-05T11:00:00Z"}"#).unwrap(),
+                _ => unreachable!(),
+            }
+            fs::write(result.parent().unwrap().parent().unwrap().parent().unwrap().join("assignment.json"),
+                r#"{"createdAt":"2026-10-05T11:00:00Z"}"#).unwrap();
+        }
+    }
+    let scan = scan_runs(&root.0).unwrap();
+    assert_eq!(scan.runs.len(), 7);
+    assert_eq!(scan.skipped["no-timestamp"], 5);
+    assert_eq!(scan.recent_runs, 12);
+    for observation in &scan.runs {
+        assert_eq!(observation.source, "run-result");
+        assert_eq!(observation.kind, "run.settled");
+        assert_eq!(observation.attrs["assignmentId"], observation.subject.id);
+        if observation.subject.id.ends_with("-true") {
+            assert_eq!(observation.ts, "2026-10-05T12:00:00Z");
+            assert_eq!(observation.attrs["executor"], "executor");
+            assert_eq!(observation.attrs["role"], "producer");
+            assert_eq!(observation.attrs["status"], "done");
+        } else {
+            assert_eq!(observation.subject.id, "valid-false");
+            assert_eq!(observation.ts, owner_time);
+        }
+        let result = root.assignments().join(&observation.subject.id).join("runs/01/result.json");
+        let record: Value = serde_json::from_slice(&fs::read(result).unwrap()).unwrap();
+        if observation.subject.id == "valid-false" {
+            assert_eq!(record["settledAt"], Value::Null);
+            assert_eq!(record["timestamp"], " ");
+        } else {
+            assert_eq!(record["settledAt"], "2026-10-05T12:00:00Z");
+            assert_eq!(record["timestamp"], owner_time);
+        }
+    }
+    assert_accounting(&root.0);
+}
+
+#[test]
+fn absent_and_malformed_results_have_distinct_accounting() {
+    let root = FixtureRoot::new();
+    let missing = root.assignments().join("missing/runs/01");
+    fs::create_dir_all(&missing).unwrap();
+    fs::write(missing.join("run.json"), r#"{"settledAt":"2026-10-05T11:00:00Z"}"#).unwrap();
+    let malformed = root.result("malformed", "01", &json!({}));
+    fs::write(malformed, "NOT JSON").unwrap();
+    fs::create_dir_all(root.assignments().join("nonregular/runs/01/result.json")).unwrap();
+    root.result("verbatim", "01", &json!({"runId": " id ", "settledAt": " non-date "}));
+    root.result("blank-id", "01", &json!({"runId": " ", "settledAt": "non-date"}));
+    let scan = scan_runs(&root.0).unwrap();
+    assert_eq!(scan.run_dirs_seen, 5);
+    assert_eq!(scan.runs.len(), 1);
+    assert_eq!(scan.runs[0].subject.id, " id ");
+    assert_eq!(scan.runs[0].ts, " non-date ");
+    assert_eq!(scan.skipped["missing-result"], 1);
+    assert_eq!(scan.skipped["unparseable"], 2);
+    assert_eq!(scan.skipped["no-run-id"], 1);
+    assert_eq!(scan.recent_runs, 3);
+    assert_accounting(&root.0);
+}
+
+#[test]
+fn owner_settlement_duplicates_keep_component_lexical_order_before_windowing() {
+    let root = FixtureRoot::new();
+    let first = root.result("a", "01", &json!({"runId": "shared", "settledAt": " "}));
+    fs::write(first.parent().unwrap().join("run.json"),
+        r#"{"settledAt":"2026-10-05T11:00:00Z"}"#).unwrap();
+    root.result("a-", "01", &json!({
+        "runId": "shared", "settledAt": "2026-10-06T11:00:00Z"
+    }));
+    let scan = scan_runs(&root.0).unwrap();
+    assert_eq!(scan.runs.len(), 1);
+    assert_eq!(scan.runs[0].attrs["assignmentId"], "a");
+    assert_eq!(scan.runs[0].ts, "2026-10-05T11:00:00Z");
+    assert_eq!(scan.skipped["duplicate-run-id"], 1);
+    let window = Window {
+        since: Some("2026-10-06T00:00:00Z".to_string()),
+        until: None,
+    };
+    assert!(RunResultSource::new().observations(&root.0, &window).unwrap().is_empty());
+    assert_eq!(scan_coverage(&root.0).unwrap()["observed"], 1);
+    assert_accounting(&root.0);
+}
+
+#[test]
+fn unicode_duplicate_winner_uses_utf8_component_order() {
+    let root = FixtureRoot::new();
+    for (name, timestamp) in [
+        ("\u{10000}", "2026-10-05T11:00:00Z"),
+        ("\u{e000}", "2026-10-05T10:00:00Z"),
+    ] {
+        root.result(name, "01", &json!({"runId": "same", "settledAt": timestamp}));
+    }
+    let scan = scan_runs(&root.0).unwrap();
+    assert_eq!(scan.runs.len(), 1);
+    assert_eq!(scan.runs[0].attrs["assignmentId"], "\u{e000}");
+    assert_eq!(scan.runs[0].ts, "2026-10-05T10:00:00Z");
+    assert_eq!(scan.skipped.get("duplicate-run-id"), Some(&1));
 }

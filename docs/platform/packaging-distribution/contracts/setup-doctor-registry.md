@@ -45,12 +45,16 @@ The registries are independent. A module may register only a check, only a fix, 
 - should tell the user what command or fix path applies when a check fails.
 
 Run coverage is checked by `observe-run-coverage`: the host's `metrics coverage`
-must report layout rule `v2`, valid observed/skipped accounting, and the same
-candidate-directory count as the independent Node assignment-layout scan. Both
-read the main checkout store, including when doctor is invoked from a worktree.
-Results changed in the last 60 seconds permit a bounded transient difference.
-An unknown coverage subcommand or a response without `layoutRule` identifies an
-old host positively and reports passed-but-degraded; other host errors fail.
+must report layout rule `v2` and valid observed/skipped accounting. Doctor
+independently compares both eligible unique results and candidate-directory/
+barrier counts against the Node production admission projection and layout scan.
+Both read the main checkout store, including from a worktree. A candidate run
+directory changed in the last 60 seconds permits a bounded transient difference,
+even before a result exists; future mtimes are recent for clock skew. The host's
+`recentRuns` remains result-file based. Diagnostic paths are sample candidates,
+not verified host omissions. An unknown coverage subcommand or a response
+without `layoutRule` identifies an old host positively and reports
+passed-but-degraded with an upgrade instruction; other host errors fail.
 This check is read-only, introduces no config default, and never rewrites runs.
 
 `fgos doctor --fix`:

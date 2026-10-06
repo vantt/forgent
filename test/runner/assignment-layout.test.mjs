@@ -3,10 +3,11 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { assignmentDir, findRunDir, listAssignmentRuns, scanAssignmentLayout } from '../../src/runner/dispatch/assignment-layout.mjs';
+import { assignmentDir, findRunDir, RunLookupError, listAssignmentRuns, scanAssignmentLayout, projectRunEligibility } from '../../src/runner/dispatch/assignment-layout.mjs';
 import { allRuns, inspectDispatchRuntime, withRunsCache } from '../../src/runner/dispatch/runtime-inspection.mjs';
-import { showRunUseCase, readRunSnapshot } from '../../src/verbs/dispatch/show-run.mjs';
+import { showRunUseCase, readRunSnapshot, DispatchObserveError } from '../../src/verbs/dispatch/show-run.mjs';
 import { watchRunUseCase } from '../../src/verbs/dispatch/watch.mjs';
+import { recoverObserveUseCase, recoverApplyUseCase, RecoveryError } from '../../src/verbs/dispatch/recover.mjs';
 
 const fixture = JSON.parse(fs.readFileSync(new URL('../fixtures/run-layout/expected.json', import.meta.url), 'utf8'));
 const writeJson = (file, value) => { fs.mkdirSync(path.dirname(file), { recursive: true }); fs.writeFileSync(file, JSON.stringify(value)); };
@@ -22,14 +23,17 @@ function materialize(t) {
     const runDir = path.join(dir, 'runs', entry.attempt);
     fs.mkdirSync(runDir, { recursive: true });
     if (entry.assignmentJson !== false) writeJson(path.join(dir, 'assignment.json'), { assignmentId: entry.assignmentId, role: entry.role ?? null });
-    const result = { ...(entry.runId ? { runId: entry.runId } : {}), ...(entry.unitRunId ? { unitRunId: entry.unitRunId } : {}), ...(entry.skip === 'no-timestamp' ? {} : { timestamp: fixture.timestamp }), status: 'done', confidence: 'reported' };
-    fs.writeFileSync(path.join(runDir, 'result.json'), entry.skip === 'unparseable' ? '{ invalid' : JSON.stringify(result));
-    if (entry.runId) writeJson(path.join(runDir, 'run.json'), { runId: entry.runId, assignmentId: entry.assignmentId, status: 'settled' });
+    const result = { ...(entry.runId ? { runId: entry.runId } : {}), ...(entry.unitRunId ? { unitRunId: entry.unitRunId } : {}), ...(entry.skip === 'no-timestamp' ? {} : { timestamp: fixture.timestamp }), status: 'done', confidence: 'reported', ...entry.result };
+    if (entry.skip !== 'missing-result') {
+      fs.writeFileSync(path.join(runDir, 'result.json'), entry.skip === 'unparseable' ? '{ invalid' : JSON.stringify(result));
+    }
+    if (entry.runId || entry.run) writeJson(path.join(runDir, 'run.json'), { runId: entry.runId, assignmentId: entry.assignmentId, status: 'settled', ...entry.run });
   }
   const link = path.join(env.base, fixture.symlink.path);
   fs.mkdirSync(path.dirname(link), { recursive: true });
   fs.symlinkSync(path.join(env.base, fixture.symlink.target), link);
   writeJson(path.join(env.base, fixture.planted.path, 'run.json'), { runId: fixture.planted.runId, status: 'running' });
+  for (const entry of fixture.entries) fs.utimesSync(path.join(env.base, entry.assignmentId, 'runs', entry.attempt), 1, 1);
   return env;
 }
 
@@ -39,19 +43,20 @@ test('shared layout fixture yields every safe directory candidate, never worker 
   assert.equal(scan.runDirsSeen, fixture.runDirsSeen);
   assert.deepEqual(scan.skipped, { symlink: fixture.skipped.symlink });
   assert.deepEqual(scan.runs.map(({ assignmentId, attempt }) => `${assignmentId}/runs/${attempt}`).sort(), fixture.entries.map((e) => `${e.assignmentId}/runs/${e.attempt}`).sort());
-  const observed = new Set();
-  for (const { runDir } of listAssignmentRuns(fgosDir)) {
-    let result;
-    try { result = JSON.parse(fs.readFileSync(path.join(runDir, 'result.json'), 'utf8')); } catch { continue; }
-    if (typeof result.runId !== 'string' || !result.runId) continue;
-    if (!Number.isFinite(Date.parse(result.settledAt ?? result.timestamp))) continue;
-    observed.add(result.runId);
-  }
-  assert.deepEqual([...observed].sort(), fixture.observedRunIds);
+  const eligible = projectRunEligibility(scan);
+  assert.deepEqual(eligible.runs.map((run) => run.runId).sort(), fixture.observedRunIds);
+  assert.deepEqual(eligible.skipped, fixture.skipped);
+  assert.equal(eligible.observed + Object.values(eligible.skipped).reduce((sum, count) => sum + count, 0), scan.runDirsSeen);
+  assert.deepEqual([...listAssignmentRuns(fgosDir)], scan.runs);
   assert.equal(scan.runs.find((r) => r.assignmentId === 'without-assignment').hasAssignmentJson, false);
   assert.equal(findRunDir(fgosDir, fixture.planted.runId), null);
-  for (const entry of fixture.entries.filter((e) => e.runId && e.skip !== 'duplicate-run-id')) {
-    assert.equal(findRunDir(fgosDir, entry.runId), path.join(base, entry.assignmentId, 'runs', entry.attempt));
+  for (const entry of fixture.entries.filter((e) => e.runId)) {
+    const matches = fixture.entries.filter((e) => e.runId === entry.runId);
+    if (matches.length > 1) {
+      assert.throws(() => findRunDir(fgosDir, entry.runId), (err) => err instanceof RunLookupError && err.code === 'run-ambiguous');
+    } else {
+      assert.equal(findRunDir(fgosDir, entry.runId), path.join(base, entry.assignmentId, 'runs', entry.attempt));
+    }
   }
   assert.equal(allRuns(root).length, fixture.entries.length, 'inspection retains malformed/unsettled candidates');
 });
@@ -104,6 +109,9 @@ test('walk recognizes runs at the depth boundary and counts deeper barriers with
   assert.equal(scan.runs[0].assignmentId, id);
   assert.deepEqual(scan.skipped, { depth: 1 });
   assert.equal(scan.runDirsSeen, 2);
+  const eligible = projectRunEligibility(scan);
+  assert.equal(eligible.observed, 0);
+  assert.deepEqual(eligible.skipped, { depth: 1, 'missing-result': 1 });
   assert.equal(findRunDir(fgosDir, 'hidden'), null);
 });
 
@@ -134,4 +142,129 @@ test('verb-local run cache retains nested membership and bypass sees new candida
     assert.equal(allRuns(root).length, 1);
     assert.equal(allRuns(root, { bypassCache: true }).length, 2);
   });
+});
+
+for (const identities of [['metadata', 'metadata'], ['result', 'result'], ['metadata', 'result']]) {
+  test(`duplicate ${identities.join('/')} identities refuse every explicit run door without mutation`, async (t) => {
+    const { root, fgosDir, base } = temp(t);
+    const runId = 'duplicate';
+    const locations = ['aaa', 'zzz'].map((id, i) => {
+      const dir = path.join(base, id, 'runs', '01');
+      writeJson(path.join(dir, identities[i] === 'metadata' ? 'run.json' : 'result.json'), { runId, assignmentId: id, status: 'running' });
+      writeJson(path.join(base, id, 'dispatch.claim'), { runId });
+      return dir;
+    });
+    const before = locations.map((dir) => ({
+      files: fs.readdirSync(dir),
+      contents: fs.readdirSync(dir).map((name) => fs.readFileSync(path.join(dir, name), 'utf8')),
+      claim: fs.readFileSync(path.join(path.dirname(path.dirname(dir)), 'dispatch.claim'), 'utf8'),
+    }));
+    const ambiguous = (ErrorType) => (err) => {
+      assert.ok(err instanceof ErrorType);
+      assert.equal(err.code, 'run-ambiguous');
+      if (ErrorType !== RunLookupError) assert.equal(err.category, 'precondition');
+      assert.deepEqual(err.locations, locations);
+      return true;
+    };
+    assert.throws(() => findRunDir(fgosDir, runId), ambiguous(RunLookupError));
+    assert.throws(() => showRunUseCase({ repoRoot: root }, { runId }), ambiguous(DispatchObserveError));
+    let ticks = 0;
+    await assert.rejects(watchRunUseCase({ repoRoot: root }, { runId, maxTicks: 1, onTick: () => ticks++ }), ambiguous(DispatchObserveError));
+    assert.equal(ticks, 0);
+    assert.throws(() => recoverObserveUseCase({ repoRoot: root }, { runId }), ambiguous(RecoveryError));
+    assert.throws(() => recoverApplyUseCase({ repoRoot: root }, {
+      runId, action: { type: 'resume-driver' }, expectedSnapshot: 'snapshot',
+      expectedControlEpoch: 0, expectedExpiresAt: fixture.timestamp, actionKey: 'action',
+    }), ambiguous(RecoveryError));
+    locations.forEach((dir, i) => {
+      assert.deepEqual(fs.readdirSync(dir), before[i].files);
+      assert.deepEqual(fs.readdirSync(dir).map((name) => fs.readFileSync(path.join(dir, name), 'utf8')), before[i].contents);
+      assert.equal(fs.readFileSync(path.join(path.dirname(path.dirname(dir)), 'dispatch.claim'), 'utf8'), before[i].claim);
+    });
+  });
+}
+
+test('lookup keeps metadata identity authoritative over a different result identity', (t) => {
+  const { fgosDir, base } = temp(t);
+  const dir = path.join(base, 'owner', 'runs', '01');
+  writeJson(path.join(dir, 'run.json'), { runId: 'owner-id' });
+  writeJson(path.join(dir, 'result.json'), { runId: 'result-id' });
+  assert.equal(findRunDir(fgosDir, 'owner-id'), dir);
+  assert.equal(findRunDir(fgosDir, 'result-id'), null);
+});
+
+test('eligibility uses actual settlement precedence without parsing nonblank timestamps', (t) => {
+  const { fgosDir, base } = temp(t);
+  const cases = [
+    ['settled', { settledAt: 'result-settled', timestamp: 'result-time' }, { settledAt: 'owner-settled' }, 'result-settled'],
+    ['timestamp', { settledAt: ' ', timestamp: 'result-time' }, { settledAt: 'owner-settled' }, 'result-time'],
+    ['owner', { settledAt: null, timestamp: null }, { settledAt: 'owner-settled' }, 'owner-settled'],
+    ['started', {}, { startedAt: fixture.timestamp }, null],
+    ['created', {}, {}, null],
+    ['preserved', { timestamp: ' non-date ', runId: ' padded ' }, {}, ' non-date '],
+  ];
+  for (const [id, result, run] of cases) {
+    const dir = path.join(base, id, 'runs', '01');
+    writeJson(path.join(base, id, 'assignment.json'), { createdAt: fixture.timestamp });
+    writeJson(path.join(dir, 'result.json'), { runId: id, ...result });
+    writeJson(path.join(dir, 'run.json'), run);
+  }
+  const eligible = projectRunEligibility(scanAssignmentLayout(fgosDir));
+  assert.deepEqual(eligible.runs.map(({ assignmentId, timestamp }) => [assignmentId, timestamp]), cases.filter(([, , , time]) => time).map(([id, , , time]) => [id, time]).sort());
+  assert.equal(eligible.runs.find((run) => run.assignmentId === 'preserved').runId, ' padded ');
+  assert.deepEqual(eligible.skipped, { 'no-timestamp': 2 });
+});
+
+test('eligibility classifies missing, invalid, nonregular and symlink results separately', (t) => {
+  const { fgosDir, base } = temp(t);
+  for (const id of ['missing', 'invalid', 'nonregular', 'linked', 'blank-id', 'blank-inline', 'inline', 'scalar']) {
+    fs.mkdirSync(path.join(base, id, 'runs', '01'), { recursive: true });
+  }
+  const resultPath = (id) => path.join(base, id, 'runs', '01', 'result.json');
+  fs.writeFileSync(resultPath('invalid'), '{invalid');
+  fs.mkdirSync(resultPath('nonregular'));
+  fs.symlinkSync(resultPath('invalid'), resultPath('linked'));
+  writeJson(resultPath('blank-id'), { runId: '  ', timestamp: fixture.timestamp });
+  writeJson(resultPath('blank-inline'), { unitRunId: '  ' });
+  writeJson(resultPath('inline'), { unitRunId: 'inline-id' });
+  writeJson(resultPath('scalar'), null);
+  const eligible = projectRunEligibility(scanAssignmentLayout(fgosDir));
+  assert.equal(eligible.observed, 0);
+  assert.deepEqual(eligible.skipped, { 'missing-result': 1, unparseable: 2, symlink: 1, 'no-run-id': 3, 'inline-record': 1 });
+  assert.equal(Object.values(eligible.skipped).reduce((sum, count) => sum + count, 0), eligible.runDirsSeen);
+});
+
+test('eligibility ignores nonregular owner metadata and reserves duplicate identity for eligible results', (t) => {
+  const { fgosDir, base } = temp(t);
+  for (const id of ['aaa-undated', 'bbb-valid', 'ccc-duplicate', 'invalid-owner', 'directory-owner', 'symlink-owner']) {
+    writeJson(path.join(base, id, 'runs', '01', 'result.json'), { runId: id.endsWith('owner') ? id : 'same', ...(id === 'bbb-valid' || id === 'ccc-duplicate' ? { timestamp: fixture.timestamp } : {}) });
+  }
+  fs.writeFileSync(path.join(base, 'invalid-owner/runs/01/run.json'), '{invalid');
+  fs.mkdirSync(path.join(base, 'directory-owner/runs/01/run.json'));
+  const owner = path.join(base, 'owner.json');
+  writeJson(owner, { settledAt: fixture.timestamp });
+  fs.symlinkSync(owner, path.join(base, 'symlink-owner/runs/01/run.json'));
+  const eligible = projectRunEligibility(scanAssignmentLayout(fgosDir));
+  assert.deepEqual(eligible.runs.map(({ assignmentId, runId }) => [assignmentId, runId]), [['bbb-valid', 'same']]);
+  assert.deepEqual(eligible.skipped, { 'no-timestamp': 4, 'duplicate-run-id': 1 });
+});
+
+test('eligibility preserves lexical component traversal when duplicate paths share a prefix', (t) => {
+  const { fgosDir, base } = temp(t);
+  for (const id of ['a-', 'a']) {
+    writeJson(path.join(base, id, 'runs', '01', 'result.json'), { runId: 'same', timestamp: fixture.timestamp });
+  }
+  const eligible = projectRunEligibility(scanAssignmentLayout(fgosDir));
+  assert.deepEqual(eligible.runs.map((run) => run.assignmentId), ['a']);
+  assert.deepEqual(eligible.skipped, { 'duplicate-run-id': 1 });
+});
+
+test('eligibility selects the same Unicode duplicate in UTF-8 component order', (t) => {
+  const { fgosDir, base } = temp(t);
+  for (const [name, timestamp] of [['\u{10000}', '2026-10-05T11:00:00Z'], ['\uE000', '2026-10-05T10:00:00Z']]) {
+    writeJson(path.join(base, name, 'runs', '01', 'result.json'), { runId: 'same', timestamp });
+  }
+  const eligible = projectRunEligibility(scanAssignmentLayout(fgosDir));
+  assert.deepEqual(eligible.runs.map(({ assignmentId, timestamp }) => [assignmentId, timestamp]), [['\uE000', '2026-10-05T10:00:00Z']]);
+  assert.deepEqual(eligible.skipped, { 'duplicate-run-id': 1 });
 });

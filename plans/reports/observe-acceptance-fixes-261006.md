@@ -53,18 +53,18 @@ Each row will receive its commit and exercised proof, or an explicit non-fix/UNP
 
 | Report finding | Disposition | Commit / proof |
 |---|---|---|
-| Foundation H1: dropped owner-dated history / incomplete policy choice | Pending settled-time fallback and doctor eligibility | Owner criteria above; 706 settled / 219 started-only is reviewer baseline, not a fresh count. |
+| Foundation H1: dropped owner-dated history / incomplete policy choice | **Fixed**: actual sibling settlement fallback; no start/creation substitute; independent doctor admissions | Current forgentX eligible/observed929; 219 started-only remain excluded; fixture/native proof below. Group commit pending. |
 | Foundation H2: deleted closure / missing source guard | **Not fixed: runtime test-policy conflict**; original criterion reopened | Current 12-module throwaway closure above; no permanent prevention claimed. |
-| Foundation M1: Node/Rust admission equivalence overclaimed | Pending product classification or explicit directory-only scope | — |
-| Foundation M2: newly created dir tolerance | Pending | — |
-| Foundation M3: misleading shortfall example paths | Pending | — |
-| Foundation M4: missing result called unparseable | Pending missing-result reason | — |
-| Foundation M5: duplicate id spoof / outbox protection scope | Pending ambiguous lookup and scoped wording | — |
-| Foundation Low: degraded flag not consumed | Pending disposition; no silent extra scope | — |
-| Foundation Low: symlink files count as run-dir barriers | Pending disposition | — |
-| Foundation Low: assignments/runs empty assignment id | Pending disposition | — |
+| Foundation M1: Node/Rust admission equivalence overclaimed | **Fixed**: production Node projection separate from directory-only lister | Shared fixture IDs/reasons/accounting exercised by both implementations; live dual-root parity below. |
+| Foundation M2: newly created dir tolerance | **Fixed**: candidate directory recency, including missing result | Sixty-second boundary/clock-skew/stale-directory regressions pass. |
+| Foundation M3: misleading shortfall example paths | **Fixed**: explicitly sample candidates, not confirmed missing | Doctor code has counts only; no invented per-path omission evidence. |
+| Foundation M4: missing result called unparseable | **Fixed**: distinct missing-result reason | Rust/Node consumer regressions; live forgentX51, mdview1. |
+| Foundation M5: duplicate id spoof / outbox protection scope | **Fixed**: show/watch/recover refuse run-ambiguous; outbox-only prevention claim | Meta/meta, result/result, mixed duplicate regressions prove no watch tick/recovery mutation. No identity authentication claimed. |
+| Foundation Low: degraded flag not consumed | **Not changed**: existing overall doctor report has passed/message, no degraded status vocabulary | Real old-host check explicitly instructs upgrade; no claim overall doctor exposes a distinct degraded state. |
+| Foundation Low: symlink files count as run-dir barriers | **Retained and clarified**: conservative traversal barriers, not physical-directory guarantee | A link can conceal a directory; accounting includes one barrier. Live find parity has zero barriers in both roots. |
+| Foundation Low: assignments/runs empty assignment id | **Retained and documented**: root-relative assignment id may be empty | Primary run identity remains runId; no silent rewrite of directory definition. |
 | Foundation Low: watchdog out-of-plan | Already separate `ea1c8fee0`; no rewrite | Commit reported in user prompt. |
-| Discussion H1: researcher seats unmeasured | **Fixed**: canonical owner role definitions emit mandatory seat.kind | Writer/reader regressions and owner-to-native CLI proof below; group commit pending. |
+| Discussion H1: researcher seats unmeasured | **Fixed**: canonical owner role definitions emit mandatory seat.kind | `b2c7b4588`; writer/reader regressions and owner-to-native CLI proof below. Same commit covers all discussion rows. |
 | Discussion M1: inline producer prematurely settles unit | **Fixed**: multi-role producer remains pending until pattern settlement | Actual inline API no settlement/summary; resume and refusal regressions pass. |
 | Discussion M2: zero valid claims reported genuineSplit | **Fixed**: unmeasured/null agreement/null split, counters retained | Rust cases and actual CLI three-missing-vote proof below. |
 | Discussion M3: reviewed checker throw loses peer | **Fixed**: checker/verify peers drained, original rejection retained | Corrected producer-report fixture verifies sibling result in final summary. |
@@ -127,3 +127,13 @@ No final full-suite run has started. Final Rust, CLI, narrow and full-suite outp
 - Exact golden command `env -u CLAUDE_CODE_SESSION_ID node scripts/regenerate-observe-fixtures.mjs` succeeded, including `cargo build -p fgos`. Required pre-stage `git diff --stat -- test/fixtures/observe` is empty.
 - Independent reader/composition review found no patch-introduced correctness defect (confidence 0.94). Writer/lifecycle review found a new resume defect: cleared owner settlement left the old terminal artifact observable. Parent invalidates the old regular summary before reopening, aborts if it cannot be removed, and adds a regression proving failed republish cannot preserve a stale refusal. Four directly affected consumer files then passed **107 / zero fail** (`artifact://355`); reviewer acknowledged the described fix, not a new universal review approval.
 - Final measurement Node blast-radius rerun after resume invalidation: **259 pass / zero fail** (`artifact://357`). Includes failed invalidation preserving old authority and failed republish removing stale outcome. Pre-commit change analysis reports HIGH / seven expected dispatch-bound confinement/handoff flows; generic renderer and reviewed-history HIGH risks were disclosed before changes.
+
+### Foundation verification
+
+- Narrow Node consumers: **98 pass / zero fail** (`bg_93` output); Rust layout/admission consumers: **10 pass / zero fail**, then `cargo build -p fgos` succeeded (`artifact://384`). All peer editor checks were deferred to parent.
+- Real rebuilt coverage plus independent `find` (`artifact://385`): forgentX **1199 directories = 929 observed + 51 missing-result + 219 no-timestamp**; mdview **90 = 83 observed + 1 missing-result + 6 no-timestamp**. Node eligible counts929/83 agree. Both independent physical counts match and traversal barriers are zero. Actual nested `dispatch show-run run_unit-run-1790918559997-8757d4c9/producer/1_01` exited0 and resolved its nested directory.
+- Real full doctor runs: rebuilt host reports Node/host1199 and eligible/observed929 (`artifact://386`); installed release `sha256:a1ba0d0682a7c00598a9873cd13dbe9bb9500b0a7f6b8260a776a5de0e407c4c` reports old-host upgrade/degraded message (`artifact://387`). Other pre-existing check failures remain; neither overall doctor run is claimed entirely green.
+- `node bin/fgos.mjs metrics ...` exits4 because metrics is Rust-owned, even with FGOS_HOST_BIN; actual metrics proof uses the absolute rebuilt host. This was a command-surface mistake, not suppressed evidence.
+- Mandatory seat.kind clean cutover initially reports32 old summaries invalid-contract at mdview. Existing owner backfill migrated **31 changed / 2 unchanged / 1 active skipped / 3 unsettled skipped / zero errors**, derived artifacts only. Actual `metrics discussions --since=2026-10-05` then reports28 units, and all four historical Delphi workflow groups including zero-seat policy refusal (`artifact://394`); root-wide diagnostics37 = 28 observed + 4 unusable + 5 outside-window. Remaining unusable: one active old-contract artifact and three missing-timestamp artifacts.
+- Exact golden regeneration succeeded; required pre-stage `git diff --stat -- test/fixtures/observe` empty (`bg_98`). No golden edits required.
+- Independent foundation review found a Unicode duplicate-winner defect (Node UTF-16 versus Rust byte order). Regression failed before the comparator fix; Node caches UTF-8 keys per entry to match valid-Unicode component order. Corrected full narrow consumers: **99 pass / zero fail** (`bg_108`); matching Rust timestamp/assignment regression added. The private helper impact is LOW with walker and three recovery flows; root scanner's zero indexed callers is UNKNOWN, actual doctor/inspection consumers are exercised.

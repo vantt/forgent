@@ -203,33 +203,75 @@ function coverageData(runDirsSeen, recentRuns = 0) {
   return { layoutRule: 'v2', runDirsSeen, observed: runDirsSeen, skipped: {}, recentRuns };
 }
 
-test('run coverage detects a host hiding a settled nested run and names candidate paths', () => {
+test('run coverage detects a stable hidden settled nested run', () => {
   const cwd = mkTempDir();
   try {
     const runDir = path.join(cwd, '.fgos/assignments/unit-run-example/panelist-1/1/runs/01');
     fs.mkdirSync(runDir, { recursive: true });
-    fs.writeFileSync(path.join(runDir, 'result.json'), '{}');
+    fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({ runId: 'nested', timestamp: '2026-10-05T10:00:00Z' }));
     fs.utimesSync(path.join(runDir, 'result.json'), 1, 1);
-    const hidden = checkObserveRunCoverage(cwd, { hostRunner: () => coverageData(0) });
-    assert.equal(hidden.passed, false);
-    assert.match(hidden.message, /host shortfall/);
-    assert.ok(hidden.message.includes('unit-run-example/panelist-1/1/runs/01'));
+    fs.utimesSync(runDir, 1, 1);
+    assert.equal(checkObserveRunCoverage(cwd, { hostRunner: () => coverageData(0) }).passed, false);
     assert.equal(checkObserveRunCoverage(cwd, { hostRunner: () => coverageData(1) }).passed, true);
   } finally {
     fs.rmSync(cwd, { recursive: true, force: true });
   }
 });
 
-test('run coverage tolerates in-flight results but not stale omissions', () => {
+test('run coverage tolerates a new directory without a result but not stale directory omissions', () => {
   const cwd = mkTempDir();
   try {
     const runDir = path.join(cwd, '.fgos/assignments/new/runs/01');
     fs.mkdirSync(runDir, { recursive: true });
-    fs.writeFileSync(path.join(runDir, 'result.json'), '{}');
     assert.equal(checkObserveRunCoverage(cwd, { hostRunner: () => coverageData(0) }).passed, true);
-    fs.utimesSync(path.join(runDir, 'result.json'), 1, 1);
+    fs.utimesSync(runDir, 1, 1);
     assert.equal(checkObserveRunCoverage(cwd, { hostRunner: () => coverageData(0) }).passed, false);
-    assert.equal(checkObserveRunCoverage(cwd, { hostRunner: () => coverageData(2, 1) }).passed, true);
+    const matching = { ...coverageData(1), observed: 0, skipped: { 'missing-result': 1 } };
+    assert.equal(checkObserveRunCoverage(cwd, { hostRunner: () => matching }).passed, true);
+    assert.equal(checkObserveRunCoverage(cwd, { hostRunner: () => ({ ...matching, runDirsSeen: 2, skipped: { 'missing-result': 2 }, recentRuns: 1 }) }).passed, true);
+  } finally {
+    fs.rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+test('run coverage independently detects admission mismatch even when directory totals agree', () => {
+  const cwd = mkTempDir();
+  try {
+    const runDir = path.join(cwd, '.fgos/assignments/stable/runs/01');
+    fs.mkdirSync(runDir, { recursive: true });
+    fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({ runId: 'stable', timestamp: '2026-10-05T10:00:00Z' }));
+    fs.utimesSync(path.join(runDir, 'result.json'), 1, 1);
+    fs.utimesSync(runDir, 1, 1);
+    const hostSkipped = { ...coverageData(1), observed: 0, skipped: { 'no-timestamp': 1 } };
+    assert.equal(checkObserveRunCoverage(cwd, { hostRunner: () => hostSkipped }).passed, false);
+    fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({ runId: 'stable' }));
+    fs.utimesSync(path.join(runDir, 'result.json'), 1, 1);
+    fs.utimesSync(runDir, 1, 1);
+    assert.equal(checkObserveRunCoverage(cwd, { hostRunner: () => coverageData(1) }).passed, false);
+    assert.equal(checkObserveRunCoverage(cwd, { hostRunner: () => hostSkipped }).passed, true);
+  } finally {
+    fs.rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
+test('run coverage uses directory recency with a bounded sixty-second window and clock skew tolerance', () => {
+  const cwd = mkTempDir();
+  const now = Date.parse('2026-10-06T12:00:00Z');
+  try {
+    const runDir = path.join(cwd, '.fgos/assignments/racing/runs/01');
+    fs.mkdirSync(runDir, { recursive: true });
+    for (const [mtime, passed] of [[now - 60_000, true], [now - 61_000, false], [now + 60_000, true]]) {
+      fs.utimesSync(runDir, new Date(mtime), new Date(mtime));
+      assert.equal(checkObserveRunCoverage(cwd, { now, hostRunner: () => coverageData(0) }).passed, passed);
+    }
+    fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({ runId: 'racing', timestamp: '2026-10-05T10:00:00Z' }));
+    fs.utimesSync(path.join(runDir, 'result.json'), new Date(now), new Date(now));
+    fs.utimesSync(runDir, 1, 1);
+    assert.equal(checkObserveRunCoverage(cwd, { now, hostRunner: () => coverageData(0) }).passed, false);
+    assert.equal(checkObserveRunCoverage(cwd, { now, hostRunner: () => coverageData(2, 1) }).passed, true);
+    fs.utimesSync(path.join(runDir, 'result.json'), 1, 1);
+    fs.utimesSync(runDir, new Date(now), new Date(now));
+    assert.equal(checkObserveRunCoverage(cwd, { now, hostRunner: () => coverageData(0) }).passed, true);
   } finally {
     fs.rmSync(cwd, { recursive: true, force: true });
   }

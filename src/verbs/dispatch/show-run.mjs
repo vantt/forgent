@@ -14,14 +14,14 @@ import path from 'node:path';
 import { fgosDirFromRoot } from '../../runner/paths.mjs';
 import { readVisibility } from '../../runner/dispatch/visibility-session.mjs';
 import { interpretRunResult } from '../../runner/dispatch/run-result.mjs';
-import { findRunDir } from '../../runner/dispatch/assignment-layout.mjs';
+import { findRunDir, RunLookupError } from '../../runner/dispatch/assignment-layout.mjs';
 
 export class DispatchObserveError extends Error {
   constructor(code, message, details = {}) {
     super(message);
     this.name = 'DispatchObserveError';
     this.code = code;
-    this.category = (code === 'run-not-found' || code === 'missing-run') ? 'precondition' : 'validation';
+    this.category = (code === 'run-not-found' || code === 'missing-run' || code === 'run-ambiguous') ? 'precondition' : 'validation';
     Object.assign(this, details);
   }
 }
@@ -153,7 +153,14 @@ export function showRunUseCase(ctx, { runId } = {}) {
     throw new DispatchObserveError('invalid-run-id', 'dispatch show-run requires a runId');
   }
   const repoRoot = ctx?.repoRoot ?? ctx?.cwd ?? process.cwd();
-  const runDir = findRunDir(fgosDirFromRoot(repoRoot), runId);
+  let runDir;
+  try { runDir = findRunDir(fgosDirFromRoot(repoRoot), runId); }
+  catch (err) {
+    if (err instanceof RunLookupError) {
+      throw new DispatchObserveError(err.code, err.message, { runId, repoRoot, locations: err.locations });
+    }
+    throw err;
+  }
   if (!runDir) {
     throw new DispatchObserveError('run-not-found', `no run "${runId}" under ${repoRoot}`, { runId, repoRoot });
   }

@@ -5,7 +5,14 @@ import path from 'node:path';
 export const ASSIGNMENT_LAYOUT_MAX_DEPTH = 16;
 
 function entries(dir) {
-  try { return fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0); }
+  try {
+    // Cache UTF-8 keys once per entry: Unix Rust uses byte component order,
+    // not JavaScript UTF-16 or locale collation, for valid Unicode names.
+    return fs.readdirSync(dir, { withFileTypes: true })
+      .map(entry => ({ entry, key: Buffer.from(entry.name, 'utf8') }))
+      .sort((a, b) => Buffer.compare(a.key, b.key))
+      .map(({ entry }) => entry);
+  }
   catch { return []; }
 }
 function regularFile(file) {
@@ -84,13 +91,56 @@ export function* listAssignmentRuns(fgosDir) {
   yield* scanAssignmentLayout(fgosDir).runs;
 }
 
+/** Result admission projected from an already-scanned directory layout. */
+export function projectRunEligibility(layout) {
+  const runs = [], skipped = { ...layout.skipped }, seen = new Set();
+  const skip = (reason) => { skipped[reason] = (skipped[reason] ?? 0) + 1; };
+  const nonblank = (value) => typeof value === 'string' && value.trim().length > 0;
+  for (const candidate of layout.runs) {
+    const resultPath = path.join(candidate.runDir, 'result.json');
+    let stat;
+    try { stat = fs.lstatSync(resultPath); }
+    catch (err) { skip(err.code === 'ENOENT' ? 'missing-result' : 'unparseable'); continue; }
+    if (stat.isSymbolicLink()) { skip('symlink'); continue; }
+    if (!stat.isFile()) { skip('unparseable'); continue; }
+    let result;
+    try { result = JSON.parse(fs.readFileSync(resultPath, 'utf8')); }
+    catch { skip('unparseable'); continue; }
+    if (!nonblank(result?.runId)) {
+      skip(nonblank(result?.unitRunId) ? 'inline-record' : 'no-run-id');
+      continue;
+    }
+    const timestamp = nonblank(result.settledAt) ? result.settledAt
+      : nonblank(result.timestamp) ? result.timestamp
+        : readJson(path.join(candidate.runDir, 'run.json'))?.settledAt;
+    if (!nonblank(timestamp)) { skip('no-timestamp'); continue; }
+    if (seen.has(result.runId)) { skip('duplicate-run-id'); continue; }
+    seen.add(result.runId);
+    runs.push({ ...candidate, runId: result.runId, timestamp });
+  }
+  return { runs, observed: runs.length, skipped, runDirsSeen: layout.runDirsSeen };
+}
+
+export class RunLookupError extends Error {
+  constructor(runId, locations) {
+    super(`run "${runId}" has multiple materializations: ${locations.join(', ')}`);
+    this.name = 'RunLookupError';
+    this.code = 'run-ambiguous';
+    this.runId = runId;
+    this.locations = locations;
+  }
+}
+
 /** Ids are fields, never paths. Prefer run metadata, including unsettled runs. */
 export function findRunDir(fgosDir, runId) {
   if (typeof runId !== 'string' || !runId) return null;
+  const locations = [];
   for (const { runDir } of listAssignmentRuns(fgosDir)) {
     const run = readJson(path.join(runDir, 'run.json'));
-    if (run?.runId === runId) return runDir;
-    if (!run?.runId && readJson(path.join(runDir, 'result.json'))?.runId === runId) return runDir;
+    if (run?.runId === runId || (!run?.runId && readJson(path.join(runDir, 'result.json'))?.runId === runId)) {
+      locations.push(runDir);
+    }
   }
-  return null;
+  if (locations.length > 1) throw new RunLookupError(runId, locations);
+  return locations[0] ?? null;
 }

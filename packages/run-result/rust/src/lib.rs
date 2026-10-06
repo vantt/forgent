@@ -508,6 +508,10 @@ fn scan_assignment_runs(
         let result_path = entry.path().join("result.json");
         let metadata = match std::fs::symlink_metadata(&result_path) {
             Ok(metadata) => metadata,
+            Err(err) if err.kind() == std::io::ErrorKind::NotFound => {
+                scan.skip("missing-result");
+                continue;
+            }
             Err(_) => {
                 scan.skip("unparseable");
                 continue;
@@ -547,9 +551,25 @@ fn scan_assignment_runs(
                 continue;
             }
         };
-        let timestamp = match nonempty_string(record.get("settledAt"))
-            .or_else(|| nonempty_string(record.get("timestamp")))
-        {
+        let result_timestamp = nonempty_string(record.get("settledAt"))
+            .or_else(|| nonempty_string(record.get("timestamp")));
+        // Consult owner settlement metadata only when the result has no time.
+        let owner_record: Option<Value> = if result_timestamp.is_none() {
+            let run_path = entry.path().join("run.json");
+            match std::fs::symlink_metadata(&run_path) {
+                Ok(metadata) if metadata.file_type().is_file() => File::open(run_path)
+                    .ok()
+                    .and_then(|file| serde_json::from_reader(BufReader::new(file)).ok()),
+                _ => None,
+            }
+        } else {
+            None
+        };
+        let timestamp = match result_timestamp.or_else(|| {
+            owner_record
+                .as_ref()
+                .and_then(|run| nonempty_string(run.get("settledAt")))
+        }) {
             Some(timestamp) => timestamp,
             None => {
                 scan.skip("no-timestamp");
