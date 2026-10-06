@@ -251,9 +251,15 @@
           "route": "docs/work-item-lifecycle-vision.md",
           "authorityStatus": "legacy-current",
           "role": "Retained original work lifecycle direction"
+        },
+        {
+          "scope": "candidate-target",
+          "route": "docs/platform/work-state/**",
+          "authorityStatus": "candidate",
+          "role": "Candidate target; not read by any reader; canonical route stays docs/specs/work-state.md"
         }
       ],
-      "scopeSummary": "docs/specs/work-state.md owns core state, events, fsm, store, and envelope. docs/io-contract.md owns CLI I/O contract.",
+      "scopeSummary": "docs/specs/work-state.md owns core state, events, fsm, store, and envelope. docs/io-contract.md owns CLI I/O contract. Candidate material under docs/platform/work-state/** is non-canonical until the cutover.",
       "currentRoutes": [
         {
           "scope": "core-engine-and-state",
@@ -272,6 +278,12 @@
           "route": "docs/work-item-lifecycle-vision.md",
           "authorityStatus": "legacy-current",
           "role": "Retained original work lifecycle direction"
+        },
+        {
+          "scope": "candidate-target",
+          "route": "docs/platform/work-state/**",
+          "authorityStatus": "candidate",
+          "role": "Candidate target; not read by any reader; canonical route stays docs/specs/work-state.md"
         }
       ]
     },
