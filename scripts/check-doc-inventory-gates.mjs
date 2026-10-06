@@ -372,6 +372,11 @@ export function validateIdentityRegistry(inventory, registry) {
     if (inventory.identityRegistry.documents !== (registry.documents || []).length) findings.push({ type: 'identity-registry-document-count-binding-mismatch', message: `inventory identityRegistry.documents ${inventory.identityRegistry.documents} does not match registry ${(registry.documents || []).length}` });
     if (inventory.identityRegistry.units !== (registry.units || []).length) findings.push({ type: 'identity-registry-unit-count-binding-mismatch', message: `inventory identityRegistry.units ${inventory.identityRegistry.units} does not match registry ${(registry.units || []).length}` });
   }
+  const seenClaimIds = new Set();
+  for (const row of [...(registry.units || []), ...(registry.retiredUnits || []), ...(registry.identityGaps || [])]) {
+    if (seenClaimIds.has(row?.claimId)) findings.push({ type: 'identity-registry-duplicate-claim-id', message: `identity registry holds claim id ${row?.claimId} more than once across units, retiredUnits and identityGaps` });
+    seenClaimIds.add(row?.claimId);
+  }
   const index = buildIdentityRegistryIndex(registry);
   const registryDocPaths = new Set((registry.documents || []).map((d) => normalizePosix(d.path || '')).filter(Boolean));
   const itemPaths = new Set((inventory.items || []).map((i) => i.path));
@@ -407,13 +412,43 @@ export function validateIdentityRegistry(inventory, registry) {
   return findings;
 }
 
-export function checkInventory({ repoRoot, inventory, vocabulary, identityRegistry = null }) {
+/**
+ * A dropped claim must stay conserved: its Phase 3 claim id has to be present in
+ * the ledger or in the identity registry (live, retired, or identity-gap rows),
+ * and the entry has to name its status, restoration owner and gate.
+ */
+export function validateDroppedClaims(register, { ledgerClaimIds = new Set(), registry = null } = {}) {
+  const findings = [];
+  if (!Array.isArray(register?.entries)) return [{ type: 'dropped-claims-register-malformed', message: 'dropped-claims register must be an object with an "entries" array' }];
+  const registryIds = new Set([...(registry?.units || []), ...(registry?.retiredUnits || []), ...(registry?.identityGaps || [])].map((row) => row?.claimId).filter(Boolean));
+  for (const entry of register?.entries || []) {
+    const label = entry?.id || '<missing id>';
+    const missing = ['status', 'restorationOwner', 'gate'].filter((field) => typeof entry?.[field] !== 'string' || entry[field].trim() === '');
+    if (missing.length > 0) findings.push({ type: 'dropped-claim-incomplete-entry', message: `dropped claim ${label}: missing ${missing.join(', ')}` });
+    const claimId = entry?.phase3Ledger?.claimId;
+    if (typeof claimId !== 'string' || claimId === '' || (!ledgerClaimIds.has(claimId) && !registryIds.has(claimId))) {
+      findings.push({ type: 'dropped-claim-absent-from-ledger', message: `dropped claim ${label}: phase3Ledger.claimId ${claimId || '<missing>'} is absent from the claim ledger and the identity registry` });
+    }
+  }
+  return findings;
+}
+
+/** Retired registry rows that still lack a vocabulary disposition. Reported as open rows, never fatal. */
+export function validateRetiredDispositions(registry, vocabulary) {
+  const known = new Set((vocabulary?.sourceDispositions || []).map((d) => d.id));
+  return (registry?.retiredUnits || [])
+    .filter((row) => row?.status === 'removed-pending-disposition' && !known.has(row.disposition))
+    .map((row) => ({ claimId: row.claimId, sourcePath: row.sourcePath, sourceAnchor: row.sourceAnchor }));
+}
+
+export function checkInventory({ repoRoot, inventory, vocabulary, identityRegistry = null, droppedClaimsRegister = null }) {
   const fatalFindings = [
     ...validateStructure(inventory),
     ...validateAgainstVocabulary(inventory, vocabulary, inventory.commit ? deriveValidTargetOwnersFromSwitchboard(loadSwitchboard(inventory.commit, repoRoot)) : null),
     ...validateCommitBlobIntegrity(repoRoot, inventory),
     ...validateSourceUnitCoverage(repoRoot, inventory),
     ...validateIdentityRegistry(inventory, identityRegistry),
+    ...(droppedClaimsRegister ? validateDroppedClaims(droppedClaimsRegister, { ledgerClaimIds: new Set((inventory.claimLedger || []).map((c) => c.claimId)), registry: identityRegistry }) : []),
   ];
 
   let coverageFindings = [];
@@ -439,6 +474,7 @@ export function checkInventory({ repoRoot, inventory, vocabulary, identityRegist
   const routingGapItems = unknownBlockingItems.filter((i) => i.gap || i.gapType === 'route-conflict');
   const ownerBlockingItems = unknownBlockingItems.filter((i) => !routingGapItems.includes(i));
   const claimIdentityGapRows = (inventory.claimLedger || []).filter((claim) => claim.identityStatus && claim.identityStatus !== 'carried-forward');
+  const retiredWithoutDisposition = validateRetiredDispositions(identityRegistry, vocabulary);
   const duplicateGroups = inventory.duplicateContentGroups || [];
   const semanticConflictGroups = inventory.semanticConflictGroups || [];
 
@@ -460,6 +496,9 @@ export function checkInventory({ repoRoot, inventory, vocabulary, identityRegist
       ],
       routingGapPaths: routingGapItems.map((i) => i.path),
       missingOwnerPaths: ownerBlockingItems.map((i) => i.path),
+      registryIdentityGapCount: (identityRegistry?.identityGaps || []).length,
+      retiredWithoutDispositionCount: retiredWithoutDisposition.length,
+      retiredWithoutDispositionRows: retiredWithoutDisposition,
       duplicateContentGroupCount: duplicateGroups.length,
       duplicateContentGroups: duplicateGroups,
       semanticConflictGroupCount: semanticConflictGroups.length,
@@ -480,7 +519,17 @@ function loadInventory(filePath) {
 
 export const DEFAULT_INVENTORY_PATH = 'plans/260925-documentation-authority-unification/reports/phase-02-doc-inventory.json';
 export const DEFAULT_VOCABULARY_PATH = 'plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.json';
+export const DEFAULT_DROPPED_CLAIMS_REGISTER_PATH = 'plans/260925-documentation-authority-unification/dropped-claims-register.json';
 export const DEFAULT_IDENTITY_REGISTRY_PATH = 'plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json';
+
+/** Explicit flag: the file must exist. Default path: a missing file skips the check with a notice. */
+export function loadDroppedClaimsRegister(argv, cwd) {
+  const idx = argv.indexOf('--dropped-claims-register');
+  if (idx >= 0) return { register: loadJson(path.resolve(cwd, argv[idx + 1])), notice: null };
+  const defaultPath = path.resolve(cwd, DEFAULT_DROPPED_CLAIMS_REGISTER_PATH);
+  if (!fs.existsSync(defaultPath)) return { register: null, notice: `dropped-claims register not found at ${DEFAULT_DROPPED_CLAIMS_REGISTER_PATH}; dropped-claim conservation check skipped` };
+  return { register: loadJson(defaultPath), notice: null };
+}
 
 export function runCli(argv, cwd = process.cwd()) {
   const inventoryIdx = argv.indexOf('--inventory');
@@ -497,10 +546,14 @@ export function runCli(argv, cwd = process.cwd()) {
   let inventory;
   let vocabulary;
   let identityRegistry;
+  let droppedClaimsRegister;
+  let droppedClaimsNotice;
   try {
     inventory = loadInventory(inventoryPath);
     vocabulary = loadJson(vocabularyPath);
     identityRegistry = loadJson(identityRegistryPath);
+    ({ register: droppedClaimsRegister, notice: droppedClaimsNotice } = loadDroppedClaimsRegister(argv, cwd));
+    if (droppedClaimsNotice) console.error(`check-doc-inventory-gates: ${droppedClaimsNotice}`);
   } catch (err) {
     console.error(`check-doc-inventory-gates error loading input: ${err.message}`);
     return 1;
@@ -508,7 +561,7 @@ export function runCli(argv, cwd = process.cwd()) {
 
   let result;
   try {
-    result = checkInventory({ repoRoot, inventory, vocabulary, identityRegistry });
+    result = checkInventory({ repoRoot, inventory, vocabulary, identityRegistry, droppedClaimsRegister });
   } catch (err) {
     console.error(`check-doc-inventory-gates evaluation error: ${err.message}`);
     return 1;
@@ -531,7 +584,9 @@ export function runCli(argv, cwd = process.cwd()) {
     `check-doc-inventory-gates: structural and vocabulary gates pass. ` +
     `Explicit open findings (not blocking the inventory phase, Phase 3; must be resolved before candidate transformation, Phase 6): ` +
     `${result.explicitOpenFindings.gapCount} gap/blocker(s) (${result.explicitOpenFindings.fileGapCount} file/routing, ${result.explicitOpenFindings.claimIdentityGapCount} claim-identity), ${result.explicitOpenFindings.duplicateContentGroupCount} duplicate-content group(s), ` +
-    `${result.explicitOpenFindings.semanticConflictGroupCount} semantic-conflict group(s).`
+    `${result.explicitOpenFindings.semanticConflictGroupCount} semantic-conflict group(s), ` +
+    `${result.explicitOpenFindings.registryIdentityGapCount} registry identity-gap row(s), ${result.explicitOpenFindings.retiredWithoutDispositionCount} retired row(s) without disposition; ` +
+    `${droppedClaimsRegister ? `${droppedClaimsRegister.entries.length} dropped claim(s) conserved.` : 'dropped-claim check skipped.'}`
   );
   return 0;
 }

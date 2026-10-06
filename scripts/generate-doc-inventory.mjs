@@ -1230,6 +1230,100 @@ export function buildSemanticConflictGroups(items) {
     .sort((a, b) => a.key.localeCompare(b.key));
 }
 
+function compareText(a, b) {
+  const x = String(a ?? '');
+  const y = String(b ?? '');
+  return x < y ? -1 : x > y ? 1 : 0;
+}
+
+function multimap(rows, keyFn) {
+  const map = new Map();
+  for (const row of rows) {
+    const key = keyFn(row);
+    if (!key) continue;
+    map.set(key, (map.get(key) || []).concat(row));
+  }
+  return map;
+}
+
+/**
+ * Looks up the single previous unit a current unit carries identity from:
+ * fingerprint first, digest second. Marks the match consumed. A key that still
+ * has several unconsumed candidates is reported as ambiguous, never guessed.
+ */
+function matchPreviousUnit({ oldByFingerprint, oldByDigest, consumed }, unit, unitDigest) {
+  const attempts = [];
+  if (unit.identityFingerprint) attempts.push(['fingerprint', unit.identityFingerprint, oldByFingerprint.get(unit.identityFingerprint) || []]);
+  attempts.push(['digest', unitDigest, oldByDigest.get(unitDigest) || []]);
+  const ambiguousNotes = [];
+  const ambiguousRows = new Set();
+  for (const [kind, key, rows] of attempts) {
+    const available = rows.filter((row) => !consumed.has(row));
+    if (available.length === 1) {
+      consumed.add(available[0]);
+      return { row: available[0] };
+    }
+    if (available.length > 1) {
+      ambiguousNotes.push(`${kind} ${key} has ${available.length} possible old units`);
+      for (const row of available) ambiguousRows.add(row);
+    }
+  }
+  return ambiguousNotes.length > 0 ? { ambiguous: ambiguousNotes.join('; '), ambiguousRows: [...ambiguousRows] } : {};
+}
+
+const CARRY_MARKER_FIELDS = ['reviewStatus', 'lineage', 'movedFrom', 'identityNote', 'origin'];
+
+/** Drops per-carry markers so a later carry only reports what it did itself. */
+function withoutCarryMarkers(row) {
+  const copy = { ...row };
+  for (const field of CARRY_MARKER_FIELDS) delete copy[field];
+  return copy;
+}
+
+function carriedUnitRow(previous, u, { sourcePath, unitDigest, documentType, classification }) {
+  return {
+    ...previous,
+    sourcePath,
+    unitDigest,
+    identityFingerprint: u.identityFingerprint || unitDigest,
+    claimId: previous.claimId,
+    sourceAnchor: u.anchor,
+    unitKind: u.unitKind,
+    sourceUnitDigest: u.textDigest,
+    claimKind: inferClaimKindFromPathAndText(sourcePath, u.sample || u.title, documentType),
+    status: deriveClaimStatus(classification),
+  };
+}
+
+function freshUnitRow(u, { sourcePath, unitDigest, documentType, classification }) {
+  return {
+    sourcePath,
+    unitDigest,
+    identityFingerprint: u.identityFingerprint || unitDigest,
+    claimId: randomOpaqueId('claim'),
+    sourceAnchor: u.anchor,
+    unitKind: u.unitKind,
+    sourceUnitDigest: u.textDigest,
+    claimKind: inferClaimKindFromPathAndText(sourcePath, u.sample || u.title, documentType),
+    status: deriveClaimStatus(classification),
+  };
+}
+
+function anchorWithoutNumericSuffix(anchor) {
+  const m = String(anchor).match(/^(.+)-\d+$/);
+  return m ? m[1] : null;
+}
+
+/** Anchors that cannot be mistaken for a duplicate-title suffix of another anchor in the same file. */
+function stableHeadingAnchors(anchors) {
+  const all = new Set(anchors);
+  return new Set([...all].filter((a) => {
+    const base = anchorWithoutNumericSuffix(a);
+    if (base && all.has(base)) return false;
+    return ![...all].some((b) => anchorWithoutNumericSuffix(b) === a);
+  }));
+}
+
 export function carryForwardIdentityRegistry(repoRoot = process.cwd(), options = {}) {
   const registryPath = options.identityRegistryPath;
   const sourcePath = normalizePosix(options.sourcePath || '');
@@ -1249,49 +1343,17 @@ export function carryForwardIdentityRegistry(repoRoot = process.cwd(), options =
   if (toSourcePath !== sourcePath && (registry.documents || []).some((d) => normalizePosix(d.path || '') === toSourcePath)) throw new Error(`${toSourcePath}: identity carry-forward refused because destination already exists in identity registry`);
   if (toSourcePath !== sourcePath && (registry.units || []).some((u) => normalizePosix(u.sourcePath || '') === toSourcePath)) throw new Error(`${toSourcePath}: identity carry-forward refused because destination units already exist in identity registry`);
   const oldUnits = (registry.units || []).filter((u) => normalizePosix(u.sourcePath || '') === sourcePath);
-  function multimap(rows, keyFn) {
-    const map = new Map();
-    for (const row of rows) {
-      const key = keyFn(row);
-      if (!key) continue;
-      map.set(key, (map.get(key) || []).concat(row));
-    }
-    return map;
-  }
-  const oldByFingerprint = multimap(oldUnits, (u) => u.identityFingerprint);
-  const oldByDigest = multimap(oldUnits, (u) => u.unitDigest);
-  const consumed = new Set();
+  const matchState = { oldByFingerprint: multimap(oldUnits, (u) => u.identityFingerprint), oldByDigest: multimap(oldUnits, (u) => u.unitDigest), consumed: new Set() };
+  const consumed = matchState.consumed;
   function pickUniquePrevious(u, unitDigest) {
-    const attempts = [];
-    if (u.identityFingerprint) attempts.push(['fingerprint', u.identityFingerprint, oldByFingerprint.get(u.identityFingerprint) || []]);
-    attempts.push(['digest', unitDigest, oldByDigest.get(unitDigest) || []]);
-    let sawAmbiguous = null;
-    for (const [kind, key, rows] of attempts) {
-      const available = rows.filter((row) => !consumed.has(row));
-      if (available.length === 1) {
-        consumed.add(available[0]);
-        return available[0];
-      }
-      if (available.length > 1) sawAmbiguous = `${kind} ${key} has ${available.length} possible old units`;
-    }
-    throw new Error(`${toSourcePath}: identity carry-forward refused for unit ${u.anchor || unitDigest}: ${sawAmbiguous || 'no uniquely matchable old unit (edited/new unit)'}`);
+    const match = matchPreviousUnit(matchState, u, unitDigest);
+    if (match.row) return match.row;
+    throw new Error(`${toSourcePath}: identity carry-forward refused for unit ${u.anchor || unitDigest}: ${match.ambiguous || 'no uniquely matchable old unit (edited/new unit)'}`);
   }
   const newUnitRows = units.map((u) => {
-    const claimKind = inferClaimKindFromPathAndText(toSourcePath, u.sample || u.title, documentType);
     const unitDigest = buildUnitIdentityDigest(u);
     const previous = pickUniquePrevious(u, unitDigest);
-    return {
-      ...previous,
-      sourcePath: toSourcePath,
-      unitDigest,
-      identityFingerprint: u.identityFingerprint || unitDigest,
-      claimId: previous.claimId,
-      sourceAnchor: u.anchor,
-      unitKind: u.unitKind,
-      sourceUnitDigest: u.textDigest,
-      claimKind,
-      status: deriveClaimStatus(classification),
-    };
+    return carriedUnitRow(previous, u, { sourcePath: toSourcePath, unitDigest, documentType, classification });
   });
   const unconsumed = oldUnits.filter((u) => !consumed.has(u));
   if (unconsumed.length > 0) throw new Error(`${toSourcePath}: identity carry-forward refused because ${unconsumed.length} old unit(s) from ${sourcePath} were not uniquely preserved`);
@@ -1300,6 +1362,177 @@ export function carryForwardIdentityRegistry(repoRoot = process.cwd(), options =
   documents.push({ ...(oldDoc || {}), path: toSourcePath, sourceId: oldDoc?.sourceId || randomOpaqueId('src'), sourceDigest: sha256Bytes(blob), blobSha: entry.blobSha });
   const otherUnits = (registry.units || []).filter((u) => normalizePosix(u.sourcePath || '') !== sourcePath && normalizePosix(u.sourcePath || '') !== toSourcePath);
   return { ...registry, commit: commitSha, documents: documents.sort((a, b) => normalizePosix(a.path).localeCompare(normalizePosix(b.path))), units: [...otherUnits, ...newUnitRows].sort((a, b) => normalizePosix(a.sourcePath).localeCompare(normalizePosix(b.sourcePath)) || String(a.sourceAnchor || '').localeCompare(String(b.sourceAnchor || ''))) };
+}
+
+/**
+ * Carries identity for every in-scope source from a registry bound to an older
+ * commit onto `options.commit`. Each old unit ends in exactly one of: kept
+ * (unchanged or moved), edited-kept (stable heading anchor, flagged for review),
+ * identity gap (ambiguous or edited positional unit), or retired (no
+ * counterpart; kept pending disposition). Nothing is derived from content and
+ * no old id is dropped.
+ */
+export function carryForwardIdentityRegistryRepoWide(repoRoot = process.cwd(), options = {}) {
+  const registry = readIdentityRegistryPath(options.identityRegistryPath, repoRoot);
+  const commit = options.commit;
+  if (!commit || typeof commit !== 'string' || commit.trim() === '') throw new Error('Explicit commit/treeish is required for identity carry-forward');
+  const commitSha = resolveCommitSha(commit, repoRoot);
+  const seenClaimIds = new Set();
+  for (const row of [...(registry.units || []), ...(registry.retiredUnits || []), ...(registry.identityGaps || [])]) {
+    if (seenClaimIds.has(row.claimId)) throw new Error(`identity registry holds claim id ${row.claimId} more than once across units, retiredUnits and identityGaps`);
+    seenClaimIds.add(row.claimId);
+  }
+  const fromCommit = registry.commit;
+  const origin = `added-since-${fromCommit}`;
+  const switchboardIndex = buildSwitchboardIndex(loadSwitchboard(commitSha, repoRoot));
+  const files = scanInScopeFiles(repoRoot, commitSha).sort((a, b) => compareText(normalizePosix(a.path), normalizePosix(b.path)));
+  const blobContentsByPath = readCommitBlobMap(repoRoot, files);
+
+  const oldUnitsByPath = multimap(registry.units || [], (u) => normalizePosix(u.sourcePath || ''));
+  const oldUnits = registry.units || [];
+  const sources = [];
+  for (const f of files) {
+    const sourcePath = normalizePosix(f.path);
+    if (f.size > 20 * 1024 * 1024) throw new Error(`${sourcePath}: cannot carry identity for >20MB blob without an explicit reviewed gap`);
+    const blob = blobContentsByPath.get(sourcePath) || readBlobBufferAtCommit(commitSha, sourcePath, repoRoot);
+    const content = decodeUtf8(blob);
+    const isMarkdown = sourcePath.toLowerCase().endsWith('.md');
+    const ctx = { sourcePath, documentType: isMarkdown ? extractDocumentType(content) : null, classification: classifyDocPath(sourcePath, switchboardIndex) };
+    const units = (isMarkdown ? extractMarkdownConservationUnits(content) : extractMixedFileConservationUnit(sourcePath, content)).map((u) => ({ u, unitDigest: buildUnitIdentityDigest(u) }));
+    sources.push({ f, blob, ctx, units, matched: new Array(units.length).fill(null), ambiguous: new Array(units.length).fill(null) });
+  }
+
+  const keptRows = [];
+  const consumedOld = new Set();
+  const ambiguityByOld = new Map();
+  const matchedOld = (previous) => consumedOld.add(previous);
+
+  // Same path, same digest or fingerprint: identity carries unchanged.
+  for (const src of sources) {
+    const oldHere = oldUnitsByPath.get(src.ctx.sourcePath) || [];
+    const state = { oldByFingerprint: multimap(oldHere, (u) => u.identityFingerprint), oldByDigest: multimap(oldHere, (u) => u.unitDigest), consumed: consumedOld };
+    src.units.forEach(({ u, unitDigest }, idx) => {
+      const match = matchPreviousUnit(state, u, unitDigest);
+      if (match.row) src.matched[idx] = { previous: match.row, kind: 'kept' };
+      else if (match.ambiguous) {
+        src.ambiguous[idx] = `ambiguous match: ${match.ambiguous}`;
+        for (const row of match.ambiguousRows) ambiguityByOld.set(row, src.ambiguous[idx]);
+      }
+    });
+  }
+
+  // Different path, digest unique on both sides: the unit moved.
+  const orphanOld = oldUnits.filter((u) => !consumedOld.has(u) && !ambiguityByOld.has(u));
+  const orphanNew = [];
+  sources.forEach((src, sIdx) => src.units.forEach(({ unitDigest }, idx) => { if (!src.matched[idx] && !src.ambiguous[idx]) orphanNew.push({ sIdx, idx, unitDigest }); }));
+  const oldByDigest = multimap(orphanOld, (u) => u.unitDigest);
+  const newByDigest = multimap(orphanNew, (n) => n.unitDigest);
+  for (const [digest, olds] of oldByDigest) {
+    const news = newByDigest.get(digest) || [];
+    if (news.length === 0) continue;
+    if (olds.length === 1 && news.length === 1 && normalizePosix(olds[0].sourcePath || '') !== sources[news[0].sIdx].ctx.sourcePath) {
+      matchedOld(olds[0]);
+      sources[news[0].sIdx].matched[news[0].idx] = { previous: olds[0], kind: 'moved' };
+    } else {
+      for (const old of olds) ambiguityByOld.set(old, `ambiguous match: move digest ${digest} has ${olds.length} old and ${news.length} new unmatched unit(s)`);
+      for (const n of news) sources[n.sIdx].ambiguous[n.idx] = `ambiguous match: move digest ${digest}`;
+    }
+  }
+
+  // Same file, same stable heading anchor, changed content: edited-kept.
+  for (const src of sources) {
+    const oldHere = oldUnitsByPath.get(src.ctx.sourcePath) || [];
+    const oldStable = stableHeadingAnchors(oldHere.filter((u) => u.unitKind === 'heading').map((u) => u.sourceAnchor));
+    const newStable = stableHeadingAnchors(src.units.filter(({ u }) => u.unitKind === 'heading').map(({ u }) => u.anchor));
+    const freeOld = multimap(oldHere.filter((u) => !consumedOld.has(u) && !ambiguityByOld.has(u) && u.unitKind === 'heading' && oldStable.has(u.sourceAnchor)), (u) => u.sourceAnchor);
+    src.units.forEach(({ u }, idx) => {
+      if (src.matched[idx] || src.ambiguous[idx] || u.unitKind !== 'heading' || !newStable.has(u.anchor)) return;
+      const candidates = freeOld.get(u.anchor) || [];
+      if (candidates.length !== 1) return;
+      matchedOld(candidates[0]);
+      src.matched[idx] = { previous: candidates[0], kind: 'edited-kept' };
+    });
+  }
+
+  const units = [];
+  const counts = { kept: 0, moved: 0, editedKept: 0, added: 0 };
+  const newAnchorsByPath = new Map();
+  for (const src of sources) {
+    const unmatchedAnchors = new Set();
+    src.units.forEach(({ u, unitDigest }, idx) => {
+      const match = src.matched[idx];
+      if (!match) {
+        unmatchedAnchors.add(u.anchor);
+        const row = freshUnitRow(u, { ...src.ctx, unitDigest });
+        row.origin = origin;
+        if (src.ambiguous[idx]) row.identityNote = src.ambiguous[idx];
+        units.push(row);
+        counts.added += 1;
+        return;
+      }
+      const row = carriedUnitRow(withoutCarryMarkers(match.previous), u, { ...src.ctx, unitDigest });
+      if (match.kind === 'moved') {
+        row.movedFrom = { sourcePath: match.previous.sourcePath, sourceAnchor: match.previous.sourceAnchor };
+        counts.moved += 1;
+      } else if (match.kind === 'edited-kept') {
+        row.reviewStatus = 'needs-review';
+        row.lineage = { fromCommit, fromUnitDigest: match.previous.unitDigest, toUnitDigest: unitDigest, fromSourceUnitDigest: match.previous.sourceUnitDigest, toSourceUnitDigest: u.textDigest };
+        counts.editedKept += 1;
+      } else counts.kept += 1;
+      units.push(row);
+    });
+    newAnchorsByPath.set(src.ctx.sourcePath, unmatchedAnchors);
+  }
+
+  const currentPaths = new Set(sources.map((s) => s.ctx.sourcePath));
+  const identityGaps = [];
+  const retiredUnits = [];
+  for (const old of oldUnits) {
+    if (consumedOld.has(old)) continue;
+    const oldPath = normalizePosix(old.sourcePath || '');
+    const ambiguity = ambiguityByOld.get(old);
+    if (ambiguity) identityGaps.push({ ...old, identityStatus: 'identity-gap', gapReason: ambiguity });
+    else if ((newAnchorsByPath.get(oldPath) || new Set()).has(old.sourceAnchor)) identityGaps.push({ ...old, identityStatus: 'identity-gap', gapReason: `edited unit whose anchor ${old.sourceAnchor} is not a stable heading anchor` });
+    else retiredUnits.push({ ...old, priorStatus: old.status, status: 'removed-pending-disposition', retiredAtCommit: commitSha, retiredReason: currentPaths.has(oldPath) ? 'no counterpart in current source' : 'source removed' });
+  }
+
+  // Documents: same path keeps its source id; a vanished path whose units moved together hands its id on.
+  const oldDocByPath = new Map((registry.documents || []).map((d) => [normalizePosix(d.path || ''), d]));
+  const inheritedDocPaths = new Set();
+  const documents = sources.map((src) => {
+    const sourcePath = src.ctx.sourcePath;
+    const base = { path: sourcePath, sourceDigest: sha256Bytes(src.blob), blobSha: src.f.blobSha };
+    const same = oldDocByPath.get(sourcePath);
+    if (same) return { ...withoutCarryMarkers(same), ...base };
+    const fromCounts = new Map();
+    for (const m of src.matched) if (m?.kind === 'moved') fromCounts.set(normalizePosix(m.previous.sourcePath || ''), (fromCounts.get(normalizePosix(m.previous.sourcePath || '')) || 0) + 1);
+    const donor = [...fromCounts.entries()].sort((a, b) => b[1] - a[1] || compareText(a[0], b[0])).map(([p]) => p).find((p) => !currentPaths.has(p) && oldDocByPath.has(p) && !inheritedDocPaths.has(p));
+    if (donor) {
+      inheritedDocPaths.add(donor);
+      return { ...withoutCarryMarkers(oldDocByPath.get(donor)), ...base, movedFrom: { sourcePath: donor } };
+    }
+    return { ...base, sourceId: randomOpaqueId('src'), origin };
+  });
+  const retiredDocuments = (registry.documents || [])
+    .filter((d) => !currentPaths.has(normalizePosix(d.path || '')) && !inheritedDocPaths.has(normalizePosix(d.path || '')))
+    .map((d) => ({ ...d, priorStatus: d.status, status: 'removed-pending-disposition', retiredAtCommit: commitSha }));
+
+  const byPathAnchor = (a, b) => compareText(normalizePosix(a.sourcePath), normalizePosix(b.sourcePath)) || compareText(a.sourceAnchor, b.sourceAnchor) || compareText(a.claimId, b.claimId);
+  units.sort(byPathAnchor);
+  const carriedRetired = [...(registry.retiredUnits || []), ...retiredUnits].sort(byPathAnchor);
+  const carriedGaps = [...(registry.identityGaps || []), ...identityGaps].sort(byPathAnchor);
+  const carriedRetiredDocuments = [...(registry.retiredDocuments || []), ...retiredDocuments].sort((a, b) => compareText(normalizePosix(a.path), normalizePosix(b.path)));
+  return {
+    ...registry,
+    commit: commitSha,
+    carriedFromCommit: fromCommit,
+    documents: documents.sort((a, b) => compareText(normalizePosix(a.path), normalizePosix(b.path))),
+    units,
+    identityGaps: carriedGaps,
+    retiredUnits: carriedRetired,
+    retiredDocuments: carriedRetiredDocuments,
+    carryForward: { fromCommit, toCommit: commitSha, oldUnits: oldUnits.length, newUnits: units.length, ...counts, gaps: identityGaps.length, retired: retiredUnits.length, retiredDocuments: retiredDocuments.length },
+  };
 }
 
 export function bootstrapIdentityRegistry(repoRoot = process.cwd(), options = {}) {
@@ -1318,24 +1551,11 @@ export function bootstrapIdentityRegistry(repoRoot = process.cwd(), options = {}
     const sourceDigest = sha256Bytes(blobContentsByPath.get(sourcePath) || Buffer.from(content));
     const classification = classifyDocPath(sourcePath, switchboardIndex);
     const documentType = sourcePath.toLowerCase().endsWith('.md') ? extractDocumentType(content) : null;
-    const claimStatus = deriveClaimStatus(classification);
     const conservationUnits = sourcePath.toLowerCase().endsWith('.md') ? extractMarkdownConservationUnits(content) : extractMixedFileConservationUnit(sourcePath, content);
     const sourceId = randomOpaqueId('src');
     documents.push({ path: sourcePath, sourceId, sourceDigest, blobSha: f.blobSha });
     for (const u of conservationUnits) {
-      const claimKind = inferClaimKindFromPathAndText(sourcePath, u.sample || u.title, documentType);
-      const unitDigest = buildUnitIdentityDigest(u);
-      units.push({
-        sourcePath,
-        unitDigest,
-        identityFingerprint: u.identityFingerprint || unitDigest,
-        claimId: randomOpaqueId('claim'),
-        sourceAnchor: u.anchor,
-        unitKind: u.unitKind,
-        sourceUnitDigest: u.textDigest,
-        claimKind,
-        status: claimStatus,
-      });
+      units.push(freshUnitRow(u, { sourcePath, unitDigest: buildUnitIdentityDigest(u), documentType, classification }));
     }
   }
   return {
@@ -1602,7 +1822,9 @@ export function runCli(argv, cwd = process.cwd()) {
     const toIdx = argv.indexOf('--to-source-path');
     if (!jsonOut) { console.error('Error: --carry-forward-identity-registry requires --json-out <path>'); return 1; }
     try {
-      const registry = carryForwardIdentityRegistry(cwd, { commit, identityRegistryPath, sourcePath: sourceIdx >= 0 ? argv[sourceIdx + 1] : null, toSourcePath: toIdx >= 0 ? argv[toIdx + 1] : null });
+      const registry = sourceIdx >= 0
+        ? carryForwardIdentityRegistry(cwd, { commit, identityRegistryPath, sourcePath: argv[sourceIdx + 1], toSourcePath: toIdx >= 0 ? argv[toIdx + 1] : null })
+        : carryForwardIdentityRegistryRepoWide(cwd, { commit, identityRegistryPath });
       fs.mkdirSync(path.dirname(jsonOut), { recursive: true });
       fs.writeFileSync(jsonOut, JSON.stringify(registry) + '\n');
       console.log(`generate-doc-inventory: wrote carried-forward identity registry to ${path.relative(cwd, jsonOut)} (${registry.documents.length} documents, ${registry.units.length} units)`);

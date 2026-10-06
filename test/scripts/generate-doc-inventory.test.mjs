@@ -32,6 +32,7 @@ import {
   carryForwardIdentityRegistry,
 } from '../../scripts/generate-doc-inventory.mjs';
 import * as generator from '../../scripts/generate-doc-inventory.mjs';
+import * as gates from '../../scripts/check-doc-inventory-gates.mjs';
 import {
   validateStructure,
   validateAgainstVocabulary,
@@ -1035,4 +1036,347 @@ test('validateIdentityRegistry detects exact equality and stale units', () => {
   const findings = validateIdentityRegistry(inventory, registry);
   assert.equal(findings.some((f) => f.type === 'identity-registry-source-unit-digest-mismatch'), true);
   assert.equal(findings.some((f) => f.type === 'identity-registry-stale-unit'), true);
+});
+
+const REGISTRY_REL = 'plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json';
+
+function makeCarryRepo() {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-inventory-carry-all-'));
+  const git = (...args) => execFileSync('git', args, { cwd: tmp, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }).trim();
+  git('init');
+  git('config', 'user.email', 't@example.test');
+  git('config', 'user.name', 'Test');
+  fs.mkdirSync(path.join(tmp, 'plans/260925-documentation-authority-unification/reports'), { recursive: true });
+  fs.writeFileSync(path.join(tmp, 'plans/260925-documentation-authority-unification/transitional-switchboard.json'), JSON.stringify(FIXTURE_SWITCHBOARD));
+  return {
+    tmp,
+    write(rel, content) { fs.mkdirSync(path.dirname(path.join(tmp, rel)), { recursive: true }); fs.writeFileSync(path.join(tmp, rel), content); },
+    remove(rel) { fs.rmSync(path.join(tmp, rel)); },
+    rename(from, to) { fs.mkdirSync(path.dirname(path.join(tmp, to)), { recursive: true }); fs.renameSync(path.join(tmp, from), path.join(tmp, to)); },
+    commit(message) { git('add', '.'); git('commit', '-m', message); return git('rev-parse', 'HEAD'); },
+    registryPath: path.join(tmp, REGISTRY_REL),
+    saveRegistry(registry) { fs.writeFileSync(path.join(tmp, REGISTRY_REL), JSON.stringify(registry)); },
+    cleanup() { fs.rmSync(tmp, { recursive: true, force: true }); },
+  };
+}
+
+function carryAll(repo, newCommit) {
+  return generator.carryForwardIdentityRegistryRepoWide(repo.tmp, { commit: newCommit, identityRegistryPath: repo.registryPath });
+}
+
+function unitsAt(registry, sourcePath) {
+  return registry.units.filter((u) => u.sourcePath === sourcePath);
+}
+
+const BODY = 'Payload with enough detail to be conserved.';
+
+test('repo-wide carry-forward keeps ids of unchanged units, binds to the new commit and gives added units fresh opaque ids', () => {
+  const repo = makeCarryRepo();
+  try {
+    repo.write('docs/a.md', `# A\n\n${BODY}\n`);
+    const oldCommit = repo.commit('old');
+    const old = bootstrapIdentityRegistry(repo.tmp, { commit: oldCommit });
+    repo.saveRegistry(old);
+    repo.write('docs/c.md', `# C\n\n${BODY} Added later.\n`);
+    const newCommit = repo.commit('add c');
+    const next = carryAll(repo, newCommit);
+    assert.equal(next.commit, newCommit);
+    assert.deepEqual(unitsAt(next, 'docs/a.md').map((u) => u.claimId), unitsAt(old, 'docs/a.md').map((u) => u.claimId));
+    assert.equal(next.documents.find((d) => d.path === 'docs/a.md').sourceId, old.documents.find((d) => d.path === 'docs/a.md').sourceId);
+    const added = unitsAt(next, 'docs/c.md');
+    assert.equal(added.length > 0, true);
+    for (const u of added) {
+      assert.match(u.claimId, /^claim_[0-9a-f]{32}$/);
+      assert.equal(u.origin, `added-since-${oldCommit}`);
+    }
+    assert.equal(next.documents.find((d) => d.path === 'docs/c.md').origin, `added-since-${oldCommit}`);
+    assert.equal(next.carryForward.added, added.length);
+  } finally { repo.cleanup(); }
+});
+
+test('repo-wide carry-forward keeps ids of a unit that moved to another path when its digest is unique', () => {
+  const repo = makeCarryRepo();
+  try {
+    repo.write('docs/old/a.md', `# A\n\n${BODY}\n`);
+    repo.write('docs/b.md', `# B\n\nOther ${BODY}\n`);
+    const oldCommit = repo.commit('old');
+    const old = bootstrapIdentityRegistry(repo.tmp, { commit: oldCommit });
+    repo.saveRegistry(old);
+    repo.rename('docs/old/a.md', 'docs/new/a.md');
+    const next = carryAll(repo, repo.commit('move'));
+    assert.deepEqual(unitsAt(next, 'docs/new/a.md').map((u) => u.claimId), unitsAt(old, 'docs/old/a.md').map((u) => u.claimId));
+    assert.equal(unitsAt(next, 'docs/new/a.md')[0].movedFrom.sourcePath, 'docs/old/a.md');
+    assert.equal(next.documents.find((d) => d.path === 'docs/new/a.md').sourceId, old.documents.find((d) => d.path === 'docs/old/a.md').sourceId);
+    assert.equal(next.retiredUnits.length, 0);
+    assert.equal(next.carryForward.moved, unitsAt(old, 'docs/old/a.md').length);
+  } finally { repo.cleanup(); }
+});
+
+test('repo-wide carry-forward keeps the id of an edited heading with a stable anchor, records lineage and marks it for review', () => {
+  const repo = makeCarryRepo();
+  try {
+    repo.write('docs/a.md', `# Alpha\n\n${BODY}\n\n# Beta\n\nSecond ${BODY}\n`);
+    const oldCommit = repo.commit('old');
+    const old = bootstrapIdentityRegistry(repo.tmp, { commit: oldCommit });
+    repo.saveRegistry(old);
+    repo.write('docs/a.md', `# Alpha\n\n${BODY} Edited sentence.\n\n# Beta\n\nSecond ${BODY}\n`);
+    const next = carryAll(repo, repo.commit('edit'));
+    const oldAlpha = unitsAt(old, 'docs/a.md').find((u) => u.sourceAnchor === 'alpha');
+    const newAlpha = unitsAt(next, 'docs/a.md').find((u) => u.sourceAnchor === 'alpha');
+    assert.equal(newAlpha.claimId, oldAlpha.claimId);
+    assert.equal(newAlpha.reviewStatus, 'needs-review');
+    assert.equal(newAlpha.lineage.fromUnitDigest, oldAlpha.unitDigest);
+    assert.equal(newAlpha.lineage.toUnitDigest, newAlpha.unitDigest);
+    assert.notEqual(newAlpha.lineage.fromUnitDigest, newAlpha.lineage.toUnitDigest);
+    const beta = unitsAt(next, 'docs/a.md').find((u) => u.sourceAnchor === 'beta');
+    assert.equal(beta.reviewStatus, undefined);
+    assert.equal(next.carryForward.editedKept, 1);
+  } finally { repo.cleanup(); }
+});
+
+test('repo-wide carry-forward never matches an edited positional unit: old id becomes a gap row, the new unit gets a fresh id', () => {
+  const repo = makeCarryRepo();
+  try {
+    repo.write('docs/a.md', `Unheaded preamble ${BODY}\n`);
+    const oldCommit = repo.commit('old');
+    const old = bootstrapIdentityRegistry(repo.tmp, { commit: oldCommit });
+    repo.saveRegistry(old);
+    const oldId = unitsAt(old, 'docs/a.md')[0].claimId;
+    repo.write('docs/a.md', `Unheaded preamble ${BODY} Edited.\n`);
+    const next = carryAll(repo, repo.commit('edit'));
+    assert.equal(next.units.some((u) => u.claimId === oldId), false);
+    const gap = next.identityGaps.find((g) => g.claimId === oldId);
+    assert.ok(gap);
+    assert.match(gap.gapReason, /anchor/);
+    const fresh = unitsAt(next, 'docs/a.md');
+    assert.equal(fresh.length, 1);
+    assert.match(fresh[0].claimId, /^claim_[0-9a-f]{32}$/);
+    assert.notEqual(fresh[0].claimId, oldId);
+    assert.equal(fresh[0].origin, `added-since-${oldCommit}`);
+  } finally { repo.cleanup(); }
+});
+
+test('repo-wide carry-forward does not match a heading whose title slug is duplicated in the file', () => {
+  const repo = makeCarryRepo();
+  try {
+    repo.write('docs/a.md', `# Same\n\nFirst ${BODY}\n\n# Same\n\nSecond ${BODY}\n`);
+    const oldCommit = repo.commit('old');
+    const old = bootstrapIdentityRegistry(repo.tmp, { commit: oldCommit });
+    repo.saveRegistry(old);
+    repo.write('docs/a.md', `# Same\n\nFirst ${BODY} Edited.\n\n# Same\n\nSecond ${BODY}\n`);
+    const next = carryAll(repo, repo.commit('edit'));
+    const oldIds = unitsAt(old, 'docs/a.md').map((u) => u.claimId);
+    const oldFirstSame = unitsAt(old, 'docs/a.md').find((u) => u.sourceAnchor === 'same');
+    assert.equal(next.units.some((u) => u.claimId === oldFirstSame.claimId), false);
+    assert.equal(next.identityGaps.some((g) => g.claimId === oldFirstSame.claimId), true);
+    assert.equal(oldIds.length > 0, true);
+    assert.equal(next.units.filter((u) => u.reviewStatus === 'needs-review').length, 0);
+  } finally { repo.cleanup(); }
+});
+
+test('repo-wide carry-forward turns indistinguishable duplicates into explicit gap rows instead of guessing', () => {
+  const repo = makeCarryRepo();
+  try {
+    repo.write('docs/a.md', `# Same\n\n${BODY}\n\n# Same\n\n${BODY}\n`);
+    const oldCommit = repo.commit('old');
+    const old = bootstrapIdentityRegistry(repo.tmp, { commit: oldCommit });
+    repo.saveRegistry(old);
+    repo.write('docs/z.md', `# Z\n\nUnrelated ${BODY}\n`);
+    const next = carryAll(repo, repo.commit('add z'));
+    const oldIds = unitsAt(old, 'docs/a.md').map((u) => u.claimId);
+    assert.deepEqual(next.identityGaps.map((g) => g.claimId).sort(), [...oldIds].sort());
+    assert.equal(next.identityGaps.every((g) => /ambiguous/.test(g.gapReason)), true);
+    assert.equal(next.units.some((u) => oldIds.includes(u.claimId)), false);
+  } finally { repo.cleanup(); }
+});
+
+test('repo-wide carry-forward keeps removed units as retired rows pending disposition, never dropping an old id', () => {
+  const repo = makeCarryRepo();
+  try {
+    repo.write('docs/a.md', `# Alpha\n\n${BODY}\n\n# Beta\n\nSecond ${BODY}\n`);
+    repo.write('docs/gone.md', `# Gone\n\nGone ${BODY}\n`);
+    const oldCommit = repo.commit('old');
+    const old = bootstrapIdentityRegistry(repo.tmp, { commit: oldCommit });
+    repo.saveRegistry(old);
+    repo.write('docs/a.md', `# Alpha\n\n${BODY}\n`);
+    repo.remove('docs/gone.md');
+    const newCommit = repo.commit('remove');
+    const next = carryAll(repo, newCommit);
+    const oldBeta = unitsAt(old, 'docs/a.md').find((u) => u.sourceAnchor === 'beta');
+    const retiredBeta = next.retiredUnits.find((r) => r.claimId === oldBeta.claimId);
+    assert.equal(retiredBeta.status, 'removed-pending-disposition');
+    assert.equal(retiredBeta.retiredAtCommit, newCommit);
+    assert.equal(retiredBeta.sourcePath, 'docs/a.md');
+    const oldGone = unitsAt(old, 'docs/gone.md').map((u) => u.claimId);
+    assert.deepEqual(next.retiredUnits.filter((r) => r.sourcePath === 'docs/gone.md').map((r) => r.claimId).sort(), [...oldGone].sort());
+    assert.equal(next.retiredDocuments.some((d) => d.path === 'docs/gone.md' && d.status === 'removed-pending-disposition'), true);
+    assert.equal(next.documents.some((d) => d.path === 'docs/gone.md'), false);
+    assert.equal(next.units.some((u) => u.claimId === oldBeta.claimId), false);
+  } finally { repo.cleanup(); }
+});
+
+test('repo-wide carry-forward partitions every old unit exactly once and emits deterministic order', () => {
+  const repo = makeCarryRepo();
+  try {
+    repo.write('docs/b.md', `# B\n\n${BODY}\n\n# Same\n\nx ${BODY}\n\n# Same\n\nx ${BODY}\n`);
+    repo.write('docs/a.md', `# A1\n\n${BODY}\n\n# A2\n\nSecond ${BODY}\n\nUnheaded ${BODY} here\n`);
+    repo.write('docs/gone.md', `# Gone\n\nGone ${BODY}\n`);
+    repo.write('docs/mv.md', `# Mv\n\nMoved ${BODY}\n`);
+    const oldCommit = repo.commit('old');
+    const old = bootstrapIdentityRegistry(repo.tmp, { commit: oldCommit });
+    repo.saveRegistry(old);
+    repo.write('docs/a.md', `# A1\n\n${BODY} Edited.\n\n# A2\n\nSecond ${BODY}\n\nUnheaded ${BODY} changed\n`);
+    repo.remove('docs/gone.md');
+    repo.rename('docs/mv.md', 'docs/moved/mv.md');
+    const next = carryAll(repo, repo.commit('mixed'));
+    const buckets = [next.units.filter((u) => !u.origin).map((u) => u.claimId), next.identityGaps.map((g) => g.claimId), next.retiredUnits.map((r) => r.claimId)];
+    const flat = buckets.flat();
+    const oldIds = old.units.map((u) => u.claimId);
+    assert.equal(new Set(flat).size, flat.length);
+    assert.deepEqual([...flat].sort(), [...oldIds].sort());
+    const c = next.carryForward;
+    assert.equal(c.oldUnits, oldIds.length);
+    assert.equal(c.kept + c.moved + c.editedKept + c.gaps + c.retired, c.oldUnits);
+    const keys = next.units.map((u) => `${u.sourcePath}\u0000${u.sourceAnchor}`);
+    assert.deepEqual(keys, [...keys].sort());
+    assert.deepEqual(JSON.stringify(next.units), JSON.stringify(carryAllUnitsSorted(next)));
+  } finally { repo.cleanup(); }
+});
+
+function carryAllUnitsSorted(registry) {
+  return [...registry.units].sort((a, b) => (a.sourcePath < b.sourcePath ? -1 : a.sourcePath > b.sourcePath ? 1 : a.sourceAnchor < b.sourceAnchor ? -1 : a.sourceAnchor > b.sourceAnchor ? 1 : a.claimId < b.claimId ? -1 : 1));
+}
+
+test('repo-wide carry-forward registry is accepted by inventory generation for the new commit', () => {
+  const repo = makeCarryRepo();
+  try {
+    repo.write('plans/260925-documentation-authority-unification/shipped-path-conventions-inventory.json', JSON.stringify({ entries: [] }));
+    repo.write('docs/a.md', `# Alpha\n\n${BODY}\n`);
+    const oldCommit = repo.commit('old');
+    repo.saveRegistry(bootstrapIdentityRegistry(repo.tmp, { commit: oldCommit }));
+    repo.write('docs/a.md', `# Alpha\n\n${BODY} Edited.\n`);
+    const newCommit = repo.commit('edit');
+    repo.saveRegistry(carryAll(repo, newCommit));
+    const inventory = generateInventory(repo.tmp, { commit: newCommit, identityRegistryPath: repo.registryPath });
+    const alpha = inventory.claimLedger.find((c) => c.sourcePath === 'docs/a.md' && c.sourceAnchor === 'alpha');
+    assert.equal(alpha.identityStatus, 'carried-forward');
+  } finally { repo.cleanup(); }
+});
+
+const DROPPED_ENTRY = { id: 'dropped-001', status: 'dropped-needs-restoration', restorationOwner: 'owner', gate: 'blocks cutover', phase3Ledger: { claimId: 'claim_x' } };
+
+test('validateDroppedClaims accepts an entry whose claim id is in the ledger or in the registry (including retired rows)', () => {
+  const ledgerOnly = gates.validateDroppedClaims({ entries: [DROPPED_ENTRY] }, { ledgerClaimIds: new Set(['claim_x']), registry: null });
+  assert.deepEqual(ledgerOnly, []);
+  const retired = gates.validateDroppedClaims({ entries: [DROPPED_ENTRY] }, { ledgerClaimIds: new Set(), registry: { units: [], retiredUnits: [{ claimId: 'claim_x' }] } });
+  assert.deepEqual(retired, []);
+  const gap = gates.validateDroppedClaims({ entries: [DROPPED_ENTRY] }, { ledgerClaimIds: new Set(), registry: { units: [], identityGaps: [{ claimId: 'claim_x' }] } });
+  assert.deepEqual(gap, []);
+});
+
+test('validateDroppedClaims fails when the claim id is absent from registry and ledger or missing from the entry', () => {
+  const absent = gates.validateDroppedClaims({ entries: [DROPPED_ENTRY] }, { ledgerClaimIds: new Set(['claim_other']), registry: { units: [{ claimId: 'claim_y' }] } });
+  assert.equal(absent.some((f) => f.type === 'dropped-claim-absent-from-ledger'), true);
+  const noId = gates.validateDroppedClaims({ entries: [{ ...DROPPED_ENTRY, phase3Ledger: {} }] }, { ledgerClaimIds: new Set(['claim_x']), registry: null });
+  assert.equal(noId.some((f) => f.type === 'dropped-claim-absent-from-ledger'), true);
+});
+
+test('validateDroppedClaims fails when an entry lacks status, restorationOwner or gate', () => {
+  for (const field of ['status', 'restorationOwner', 'gate']) {
+    const entry = { ...DROPPED_ENTRY, [field]: '' };
+    const findings = gates.validateDroppedClaims({ entries: [entry] }, { ledgerClaimIds: new Set(['claim_x']), registry: null });
+    assert.equal(findings.some((f) => f.type === 'dropped-claim-incomplete-entry' && f.message.includes(field)), true, field);
+  }
+});
+
+test('validateRetiredDispositions reports retired rows without a vocabulary disposition as open rows, not fatal findings', () => {
+  const vocabulary = { sourceDispositions: [{ id: 'archive-with-reason' }] };
+  const registry = { retiredUnits: [
+    { claimId: 'claim_a', sourcePath: 'docs/a.md', sourceAnchor: 'a', status: 'removed-pending-disposition' },
+    { claimId: 'claim_b', sourcePath: 'docs/a.md', sourceAnchor: 'b', status: 'removed-pending-disposition', disposition: 'archive-with-reason' },
+    { claimId: 'claim_c', sourcePath: 'docs/a.md', sourceAnchor: 'c', status: 'removed-pending-disposition', disposition: 'bogus' },
+  ] };
+  const rows = gates.validateRetiredDispositions(registry, vocabulary);
+  assert.deepEqual(rows.map((r) => r.claimId), ['claim_a', 'claim_c']);
+  assert.deepEqual(gates.validateRetiredDispositions({}, vocabulary), []);
+});
+
+test('repo-wide carry-forward does not let carry markers survive into a later carry', () => {
+  const repo = makeCarryRepo();
+  try {
+    repo.write('docs/a.md', `# Alpha\n\n${BODY}\n`);
+    const c0 = repo.commit('base');
+    repo.saveRegistry(bootstrapIdentityRegistry(repo.tmp, { commit: c0 }));
+    repo.write('docs/a.md', `# Alpha\n\n${BODY} Edited.\n`);
+    repo.write('docs/c.md', `# C\n\n${BODY} Added.\n`);
+    const c1 = repo.commit('edit and add');
+    const first = carryAll(repo, c1);
+    assert.equal(unitsAt(first, 'docs/a.md').some((u) => u.reviewStatus === 'needs-review' && u.lineage), true);
+    assert.equal(unitsAt(first, 'docs/c.md').every((u) => u.origin), true);
+    repo.saveRegistry(first);
+    repo.write('docs/z.md', `# Z\n\n${BODY} Unrelated.\n`);
+    const c2 = repo.commit('unrelated');
+    const second = carryAll(repo, c2);
+    for (const rel of ['docs/a.md', 'docs/c.md']) {
+      for (const u of unitsAt(second, rel)) {
+        for (const field of ['reviewStatus', 'lineage', 'movedFrom', 'identityNote', 'origin']) assert.equal(field in u, false, `${rel} ${u.sourceAnchor} ${field}`);
+      }
+    }
+    assert.equal('origin' in second.documents.find((d) => d.path === 'docs/c.md'), false);
+    assert.deepEqual(unitsAt(second, 'docs/a.md').map((u) => u.claimId), unitsAt(first, 'docs/a.md').map((u) => u.claimId));
+  } finally { repo.cleanup(); }
+});
+
+test('repo-wide carry-forward reports a fingerprint ambiguity as ambiguous even when the digest finds nothing', () => {
+  const repo = makeCarryRepo();
+  try {
+    repo.write('docs/a.md', `# Same\n\n${BODY}\n\n# SAME\n\n${BODY}\n`);
+    const c0 = repo.commit('base');
+    const old = bootstrapIdentityRegistry(repo.tmp, { commit: c0 });
+    repo.saveRegistry(old);
+    repo.write('docs/a.md', `# same\n\n${BODY}\n\n# Other\n\nOther ${BODY}\n`);
+    const next = carryAll(repo, repo.commit('retitle'));
+    const gapReasons = next.identityGaps.filter((g) => g.sourcePath === 'docs/a.md' && g.unitKind === 'heading').map((g) => g.gapReason);
+    assert.equal(gapReasons.length >= 1, true);
+    assert.equal(gapReasons.every((r) => /^ambiguous/.test(r)), true);
+  } finally { repo.cleanup(); }
+});
+
+test('repo-wide carry-forward refuses an input registry that holds a claim id twice', () => {
+  const repo = makeCarryRepo();
+  try {
+    repo.write('docs/a.md', `# A\n\n${BODY}\n`);
+    const c0 = repo.commit('base');
+    const old = bootstrapIdentityRegistry(repo.tmp, { commit: c0 });
+    old.retiredUnits = [{ ...old.units[0], status: 'removed-pending-disposition' }];
+    repo.saveRegistry(old);
+    repo.write('docs/b.md', `# B\n\n${BODY} More.\n`);
+    assert.throws(() => carryAll(repo, repo.commit('next')), /more than once/);
+  } finally { repo.cleanup(); }
+});
+
+test('validateIdentityRegistry reports a claim id repeated across units, retired rows and gap rows', () => {
+  const inventory = { commit: 'c', items: [], claimLedger: [] };
+  const registry = { commit: 'c', documents: [], units: [{ sourcePath: 'docs/x.md', unitDigest: 'u', claimId: 'claim_x' }], retiredUnits: [{ claimId: 'claim_x' }], identityGaps: [] };
+  assert.equal(validateIdentityRegistry(inventory, registry).some((f) => f.type === 'identity-registry-duplicate-claim-id'), true);
+});
+
+test('validateDroppedClaims fails on a register whose entries are missing or not an array', () => {
+  for (const register of [{}, { entries: 'x' }, null]) {
+    const findings = gates.validateDroppedClaims(register, { ledgerClaimIds: new Set(), registry: null });
+    assert.equal(findings.some((f) => f.type === 'dropped-claims-register-malformed'), true);
+  }
+});
+
+test('loadDroppedClaimsRegister skips a missing default file with a notice but fails on a missing explicit file', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'dropped-register-'));
+  try {
+    const skipped = gates.loadDroppedClaimsRegister([], tmp);
+    assert.equal(skipped.register, null);
+    assert.match(skipped.notice, /dropped-claims/);
+    assert.throws(() => gates.loadDroppedClaimsRegister(['--dropped-claims-register', 'missing.json'], tmp), /File not found/);
+    const file = path.join(tmp, 'r.json');
+    fs.writeFileSync(file, JSON.stringify({ entries: [] }));
+    assert.deepEqual(gates.loadDroppedClaimsRegister(['--dropped-claims-register', 'r.json'], tmp).register, { entries: [] });
+  } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
 });
