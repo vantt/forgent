@@ -1,13 +1,17 @@
 ---
 phase: 5
 title: "Stance and agreement sensor"
-status: pending
+status: completed
 priority: P2
 effort: "1.25d"
 dependencies: [4]
 ---
 
 # Phase 5: Stance and agreement sensor
+
+Execution gate: owner explicitly requested all remaining phases on 2026-10-05,
+superseding the foundation-only gate. Passive measurement only; no dissent gate.
+
 
 ## Overview
 
@@ -40,9 +44,11 @@ D2. The claim validator (`src/runner/dispatch/agent-result-claim-contract.mjs`) 
 
 ## Success Criteria
 
-- [ ] One live panel gives per-seat stances and a correct agreement ratio.
-- [ ] A unit without options reads `unmeasured`; a malformed stance is counted `invalid` and the seat still passes.
-- [ ] Existing workflows and tests behave identically when `stance` is absent.
+- [x] Live panel `unit-run-1791219961331-276f364c`: three valid `no-gate` votes, hand/native agreement 3/3 = 1, genuineSplit false.
+- [x] Without options reads `unmeasured`; malformed stance is counted `invalid` and the seat still passes (real CLI-prompt/settlement regression).
+- [x] Existing no-stance workflow behavior remains covered and passes the integrated workflow suite.
+
+Evidence: [`observe-discussion-measurement-261005.md`](../reports/observe-discussion-measurement-261005.md); initial blocked panel is preserved as partial evidence, not counted as three valid votes.
 
 ## Risk Assessment
 

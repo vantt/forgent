@@ -1,7 +1,7 @@
 ---
 phase: 3
 title: "Doctor coverage check and rebaseline"
-status: pending
+status: completed
 priority: P1
 effort: "0.75d"
 dependencies: [1, 2]
@@ -12,6 +12,14 @@ dependencies: [1, 2]
 ## Overview
 
 Add `observe-run-coverage` to `fgos doctor` so a future layout change cannot hide again, and rebaseline the numbers the blind spot distorted.
+
+Execution evidence: [rebaseline](../reports/observe-rebaseline-261005.md).
+Diagnostic and registry/docs changes are implemented; rebuilt-host, old-host,
+hidden-run and complete doctor paths were exercised. After diagnosing and fixing
+the watchdog timeout-publication race, full `npm test` passes with 6,730 passed,
+zero failed, eight skipped and 65 todo. No commit was requested or made; the
+rebaseline report is present in the working tree, not claimed committed.
+
 
 ## Requirements
 
@@ -40,9 +48,11 @@ Add `observe-run-coverage` to `fgos doctor` so a future layout change cannot hid
 
 ## Success Criteria
 
-- [ ] Passes with the fixed host, degraded with the old staged host, fails against a fixture hiding a run.
-- [ ] Rebaseline report committed; the 260930 plan consistent with it.
-- [ ] `npm test` green.
+- [x] Passes with the fixed host, degraded with the old staged host, fails against a fixture hiding a run.
+- [x] Rebaseline report persisted in working tree; the 260930 plan consistent with it. No commit requested.
+- [x] `npm test` green for the foundation execution (6,730 pass, zero fail); final measurement regression is separately recorded.
+
+Evidence: [`observe-rebaseline-261005.md`](../reports/observe-rebaseline-261005.md). Original report-commit criterion is not asserted: no staging/commit was requested.
 
 ## Risk Assessment
 

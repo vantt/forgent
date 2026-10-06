@@ -1,0 +1,54 @@
+{
+  "judge": {
+    "provider": "claude",
+    "model": "opus",
+    "transport": "cli-spawn",
+    "tools": [],
+    "mcpServers": [],
+    "settingSources": []
+  },
+  "scratchInventory": [
+    "A.md",
+    "B.md"
+  ],
+  "normalization": "Runtime paths and ids redacted identically in A/B; substantive prose retained; no source mapping supplied.",
+  "rubric": "discussion-quality.v1",
+  "A": {
+    "scores": {
+      "perspective-spread": 1,
+      "decision-clarity": 1,
+      "counterfactual-depth": 2,
+      "evidence-discipline": 2,
+      "execution-quality": 1
+    },
+    "rationale": {
+      "perspective-spread": "Quote: 'Ship-speed (priority 1): ... This view favors no-gate.' / 'Human-release (priority 2): ... favors no-gate or optional-gate.' / 'Steelman for a gate: panels of the same model can converge too easily.' The response lays out distinct lenses, and the steelman is a real counter-view. However, every lens ends at no-gate or close to it. The one point of tension, 'arguably the right moment to involve someone', is settled in a single clause instead of being kept open as an unresolved disagreement. There are no independent voices that actually dissent, so the tension is partly flattened.",
+      "decision-clarity": "Quote: 'Re-evaluate after about 30 or more units with declared options. Promote to an optional, per-workflow gate only if the data shows that low-agreement runs had worse downstream outcomes.' The revisit count is explicit. Several triggers are left undefined, though: 'low-agreement' and 'high-missing' flags have no numeric thresholds, and 'worse downstream outcomes' has no effect size or metric cutoff. The response is actionable, but some of its conditions are vague.",
+      "counterfactual-depth": "Quote: the scenario table that compares Mandatory / Optional / No gate across 'Seat omits stance', 'Unanimous agreement', 'Real split', and 'Open-ended question'. It also says 'A gate that rejects a run whenever a stance is missing would have failed 1 of the 2 measured runs.' The strongest alternative is tested against observed cases, and the response states what would change the decision (evidence that low-agreement runs led to worse outcomes). It also separates a composition control from an acceptance gate. One gap: the 'Real split (not seen yet)' row is hypothetical.",
+      "evidence-discipline": "Quote: 'There are 36 unit summaries with 79 seats in total. Only 6 seats (7.6%) carry a valid stance' and 'The evidence is small and comes from a single question... I did not inspect fgOS source code.' The key claims rest on a stated data scan, and the response is explicit about sample size, possible same-model convergence, and what it did not inspect. Limit: the scan path is redacted and none of the counts can be verified externally here. The score assumes the stated numbers are accurate.",
+      "execution-quality": "Quote: '1. Keep passive stance measurement and add no gate... 2. Increase measurement coverage first. Declare stanceOptions...' The next steps are concrete and ordered. None of them has an owner or a calendar deadline; the only time marker is a count trigger ('about 30 or more units'). There is also no rollback plan if the advisory flags or the stanceOptions requirement cause friction."
+    }
+  },
+  "B": {
+    "scores": {
+      "perspective-spread": 2,
+      "decision-clarity": 2,
+      "counterfactual-depth": 1,
+      "evidence-discipline": 1,
+      "execution-quality": 1
+    },
+    "rationale": {
+      "perspective-spread": "Quote: 'Disagreements (kept visible, not averaged away)' and 'panelist-1 wants a non-blocking synthesis warning... panelist-2 and panelist-3 do not propose any active signal... This is a real, unresolved difference.' It also compares revisit triggers and confidences (0.78 vs. unstated vs. 0.95). Three distinct positions are attributed, and the material disagreements are kept and compared rather than merged. Missing: all three panelists share the same conclusion, so no pro-gate view is represented by any panelist.",
+      "decision-clarity": "Quote: 'when all panelists declare the same choice at confidence ≥ 0.8 — flag only, never block' and 'Revisit with evidence after ~20 panels: if agreement correlates with later reversals/defects, promote to optional-gate; mandatory-gate only if optional-gate shows a clear defect-catch rate at acceptable latency.' The flag threshold is numeric and the revisit count is explicit, with a staged escalation path. Remaining vagueness: 'correlates', 'clear defect-catch rate', and 'acceptable latency' have no numbers. The core decision conditions are still explicit enough to score 2.",
+      "counterfactual-depth": "Quote: 'The worst case under no-gate is an undetected groupthink episode... The worst case under any gate is guaranteed latency and human re-capture on every panel.' The alternative is compared only at the level of worst cases. There is no scenario-by-scenario test of optional-gate, and no strong argument made for a gate. The claim that a gate would cause 'guaranteed latency... on every panel' is asserted, not shown. What would change the decision is stated (correlation with reversals), but the strongest alternative is only partly examined.",
+      "evidence-discipline": "Quote: 'Evidence for the recommendation: unanimous independent convergence of three panelists... The convergence itself is high-agreement — which, per panelist-1's own argument, is weak evidence of correctness.' This candidly flags that convergence is weak evidence. However, the main support is panelist opinion, not data. Claims such as 'easy to add later, and hard to remove once shipped' and 'no evidence gates catch defects' are asserted without support. The panelist reports are cited only as 'paths in evidenceRefs' and cannot be checked externally here.",
+      "execution-quality": "Quote: '1. Keep stance strictly passive... 3. Adopt panelist-1's cheap, non-blocking advisory as an optional synthesis note... If downstream consumers object even to this, defer it.' This gives concrete steps and a soft back-out condition for the advisory. There is no owner, no deadline (only '~20 panels'), and no explicit rollback procedure beyond 'defer it' and the general claim that the decision is reversible."
+    }
+  },
+  "limits": [
+    "Neither response's citations, file paths, runtime IDs, panelist reports, or numeric data (for example 36 units, 79 seats, 6 valid stances, panelist confidences) can be verified externally here. Evidence-discipline scores assume the stated facts are accurate.",
+    "Paths and IDs are redacted in both responses, so internal consistency between cited sources and claims could not be checked.",
+    "The scores judge discussion quality only, not whether no-gate is actually the right decision for fgOS.",
+    "The two responses are different artifact types (a single-author analysis vs. a synthesis of panelists). The perspective-spread anchors may naturally favor the multi-voice format."
+  ]
+}

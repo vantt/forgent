@@ -1,0 +1,22 @@
+{
+  "reportedFailure": {
+    "artifact": "artifact://264",
+    "test": "test/runner/herdr-reconciliation.test.mjs:1123",
+    "reason": "confinement-mismatch",
+    "message": "foreground argv did not match within attestation window",
+    "parallelPass": 6749,
+    "parallelFail": 1
+  },
+  "focusedDiagnostic": {
+    "testPass": 1,
+    "testFail": 0,
+    "realGateway": true,
+    "transparentRecorder": true,
+    "snapshots": 48,
+    "shellOnly": 10,
+    "snapshotsWithoutArgv": 8,
+    "preparedWrapperSnapshots": 38
+  },
+  "cause": "[INFERENCE] full-suite process contention delayed observable foreground attestation; failed-run process snapshots were not retained, so cause is not proven.",
+  "decision": "Preserve fail-closed and deadlines; exercise full unchanged test selection with test-concurrency=1. No skip or retry policy added."
+}

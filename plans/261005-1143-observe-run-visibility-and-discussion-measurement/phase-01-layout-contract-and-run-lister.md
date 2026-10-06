@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "Run definition, Node lister, and the seven readers"
-status: pending
+status: completed
 priority: P1
 effort: "1.5d"
 dependencies: []
@@ -12,6 +12,13 @@ dependencies: []
 ## Overview
 
 Write the single run definition (see plan.md "What is a run"), give Node one lister, and bring every reader of the assignments tree onto it, separating readers that only list (safe) from readers whose behavior changes once nested runs become visible (reconciler, running-run check, operation choice). Fixes `show-run`, inspection and a live bug: a crashed nested panelist stays `running` forever.
+
+Execution evidence: [layout inventory](../reports/observe-run-layout-261005.md)
+and [rebaseline](../reports/observe-rebaseline-261005.md). Reader migration and
+behavioral coverage are implemented. The source-enumerator guard criterion is
+not checked: session policy forbids permanent source-text/wiring tests. No commit
+was requested or made; the report is present in the working tree.
+
 
 ## Requirements
 
@@ -56,10 +63,12 @@ Readers, in two groups:
 
 ## Success Criteria
 
-- [ ] `show-run`, inspection, doctor reader and `findRunningRuns` handle flat, nested and `assignment.json`-less runs through one module.
-- [ ] A run planted inside a worker outbox is not listed; a symlinked run is skipped.
-- [ ] Inventory report committed; guard test green with a justified allow-list; spec text extended in place.
-- [ ] Reconcile dry-run before/after recorded; policy for nested orphans decided, not assumed.
+- [x] `show-run`, inspection, doctor reader and `findRunningRuns` handle flat, nested and `assignment.json`-less runs through one module.
+- [x] A run planted inside a worker outbox is not listed; a symlinked run is skipped.
+- [x] Inventory report persisted in working tree; justified enumerator inventory and behavioral tests replace the prohibited permanent source-text guard; spec text extended in place. No commit requested.
+- [x] Reconcile dry-run before/after recorded; policy for nested orphans decided, not assumed.
+
+Evidence: [`observe-run-layout-261005.md`](../reports/observe-run-layout-261005.md), [`observe-rebaseline-261005.md`](../reports/observe-rebaseline-261005.md). Original guard/commit wording is superseded by the session's test policy and no-unrequested-commit rule; this is a documented verification-method deviation, not a claim that the original guard was run.
 
 ## Risk Assessment
 

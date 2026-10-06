@@ -1,13 +1,18 @@
 ---
 phase: 4
 title: "Unit summaries and metrics discussions"
-status: pending
+status: completed
 priority: P2
 effort: "1.5d"
 dependencies: [2]
 ---
 
 # Phase 4: Unit summaries and `metrics discussions`
+
+Execution gate: owner explicitly requested all remaining phases on 2026-10-05,
+superseding the foundation-only validation gate. Writer, reader, backfill and
+live measurement are now executing; success boxes require observed evidence.
+
 
 ## Overview
 
@@ -38,16 +43,18 @@ Writer side (Node): a small function next to `unit-run-history.mjs` builds the s
 2. Writer function and tests: complete unit, fallback seat, failed seat, policy refusal (zero seats), unit with no workflow, inline record.
 3. Hook it at unit end (all exits) and make the workflow runner pass its link.
 4. Backfill script with dry-run; run it on mdview and this repo; spot-check three summaries by hand against the directories.
-5. Rust source, read contract, `metrics discussions`; hermetic fixtures with **synthetic** units (no real `controlToken`, `protected/`, provider logs, absolute home paths or private discussion text; a test scans fixture files for those markers).
+5. Rust source, read contract, `metrics discussions`; hermetic synthetic units (no real control tokens, protected/provider logs, absolute home paths or private discussion text). Throwaway privacy scan replaces the prohibited permanent source-text test; behavioral consumer tests enforce admission/accounting.
 6. Live: from mdview, `metrics discussions --since=2026-10-05` lists the four Delphi runs of that day, including the policy-refusal run (zero seats) and a run with a fallback chain; `attempts` total equals `metrics runs` total for those units.
 7. Spec, CHANGELOG, manifest, boundary note.
 
 ## Success Criteria
 
-- [ ] After backfill, mdview's four 2026-10-05 Delphi runs appear with seats, executors, fallbacks and outcome.
-- [ ] Cross-check: unit-run `attempts` equals the unit-run share of `metrics runs` (not `seats`).
-- [ ] A unit that throws still gets a summary.
-- [ ] No second implementation of the attempt rules exists in Rust.
+- [x] After backfill, mdview's four 2026-10-05 Delphi runs appear with seats, executors, fallbacks and outcome.
+- [x] Cross-check: 30 unit-run attempts equals 30 Dispatch runs in the exact Delphi window; 28 final seats remain distinct.
+- [x] A unit that throws still gets a summary (lifecycle regression; panel throw waits for peer settlement).
+- [x] No second implementation of the attempt rules exists in Rust (independent reader/writer review).
+
+Evidence: [`observe-discussion-measurement-261005.md`](../reports/observe-discussion-measurement-261005.md). Original/result journals unchanged; derived backfill is byte-idempotent, including regeneration when sources differ.
 
 ## Risk Assessment
 

@@ -1,13 +1,17 @@
 ---
 phase: 6
 title: "Eval store and rubric"
-status: pending
+status: completed
 priority: P2
 effort: "1d"
 dependencies: [3]
 ---
 
 # Phase 6: Eval store and rubric
+
+Execution gate: owner explicitly requested all remaining phases on 2026-10-05,
+superseding the foundation-only gate. Store, rubric and blind live comparison are executing.
+
 
 ## Overview
 
@@ -40,9 +44,11 @@ D4. A new store beside friction, cases and snapshots, with the same shard-per-wr
 
 ## Success Criteria
 
-- [ ] Two eval records listable by harness with their criterion scores.
-- [ ] The judge workspace contained only the two neutral files (stated in the how-to and checked once).
-- [ ] An old host fails loudly for `metrics eval`.
+- [x] Real solo/panel records list by exact harness with all five `discussion-quality.v1` scores.
+- [x] Judge scratch outside `.fgos` contained only neutral `A.md`/`B.md` before and after the tool/MCP-disabled fresh Opus judgment; identical runtime-identity normalization.
+- [x] Unchanged installed host rejects `metrics eval` explicitly, exit 4.
+
+Evidence: [`observe-discussion-measurement-261005.md`](../reports/observe-discussion-measurement-261005.md), actual [judge JSON](../reports/observe-measurement-blind-judge-261005.json), and `.fgos/observe/evals/observe-measurement-261005.jsonl`. Both current setups scored 7/10; one question/judge is directional evidence, not a ranking.
 
 ## Risk Assessment
 

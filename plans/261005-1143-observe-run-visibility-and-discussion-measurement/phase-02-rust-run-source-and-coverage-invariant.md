@@ -1,7 +1,7 @@
 ---
 phase: 2
 title: "Rust run scan, metrics coverage, hermetic invariant"
-status: pending
+status: completed
 priority: P1
 effort: "1.25d"
 dependencies: [1]
@@ -42,10 +42,10 @@ Same rule as phase 1, implemented once in `fgos_run_result`. The Rust test reads
 
 ## Success Criteria
 
-- [ ] `metrics runs --since=2026-10-01` > 0 and `--by=role` lists today's roles.
-- [ ] `metrics coverage` accounting holds: `observed + skipped = runDirsSeen`; skip reasons present.
-- [ ] Rust and Node produce the same run set from the shared fixture.
-- [ ] No test pins an audit-time count; no cargo test depends on the live store.
+- [x] `metrics runs --since=2026-10-01` > 0 and `--by=role` lists today's roles.
+- [x] `metrics coverage` accounting holds: `observed + skipped = runDirsSeen`; skip reasons present.
+- [x] Rust and Node produce the same run set from the shared fixture.
+- [x] No test pins an audit-time count; no cargo test depends on the live store.
 
 ## Risk Assessment
 

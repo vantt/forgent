@@ -1,7 +1,7 @@
 ---
 title: "Observe sees every run, and measures discussions"
 description: "One run definition and one lister per language for .fgos/assignments (nested unit-run ids), so Observe, show-run, inspection and the reconciler stop missing discussion runs; then the measurement discussion power needs: coverage subcommand, writer-owned unit summaries, stance/agreement sensor, eval store."
-status: pending
+status: completed
 priority: P1
 effort: "~7d"
 tags: [observe, metrics, run-result, discussion, measurement, contract, doctor]
@@ -65,26 +65,26 @@ Root cause: a result's **location and record shape** are implicit contracts each
 
 | # | Phase | Effort | Depends | Status |
 |---|---|---|---|---|
-| 1 | [Run definition, Node lister, and the seven readers](./phase-01-layout-contract-and-run-lister.md) | 1.5d | — | pending |
-| 2 | [Rust run scan, `metrics coverage`, hermetic invariant](./phase-02-rust-run-source-and-coverage-invariant.md) | 1.25d | 1 (rule + fixture) | pending |
-| 3 | [Doctor coverage check and rebaseline](./phase-03-doctor-coverage-check-and-rebaseline.md) | 0.75d | 1, 2 | pending |
-| 4 | [Unit summaries and `metrics discussions`](./phase-04-unit-summaries-and-discussions.md) | 1.5d | 2 | deferred-decision |
-| 5 | [Stance and agreement sensor](./phase-05-stance-and-agreement-sensor.md) | 1.25d | 4 | deferred-decision |
-| 6 | [Eval store and rubric](./phase-06-eval-store-and-rubric.md) | 1d | 3 | deferred-decision |
+| 1 | [Run definition, Node lister, and the seven readers](./phase-01-layout-contract-and-run-lister.md) | 1.5d | — | completed (documented test-policy deviation) |
+| 2 | [Rust run scan, `metrics coverage`, hermetic invariant](./phase-02-rust-run-source-and-coverage-invariant.md) | 1.25d | 1 (rule + fixture) | completed |
+| 3 | [Doctor coverage check and rebaseline](./phase-03-doctor-coverage-check-and-rebaseline.md) | 0.75d | 1, 2 | completed |
+| 4 | [Unit summaries and `metrics discussions`](./phase-04-unit-summaries-and-discussions.md) | 1.5d | 2 | completed |
+| 5 | [Stance and agreement sensor](./phase-05-stance-and-agreement-sensor.md) | 1.25d | 4 | completed |
+| 6 | [Eval store and rubric](./phase-06-eval-store-and-rubric.md) | 1d | 3 | completed |
 
-Phases 1-3 are the foundation and ship first (they fix live defects). 4-6 only add measurement; per the validation session they are re-decided after the foundation lands. Golden fixtures under `test/fixtures/observe/` are regenerated in phases 2, 4, 5 and 6: do it one phase at a time, with the suite's real invocation, reading `git diff --stat` before staging.
+Phases 1–3 shipped first as the foundation; the owner explicitly authorized all phases on 2026-10-05. Phases 4–6 now execute under that go decision. Golden fixtures under `test/fixtures/observe/` use the real regeneration command; the measurement regeneration produced no fixture diff. No staging/commit is performed without a request.
 
 ## Acceptance (whole plan)
 
-- [ ] `fgos dispatch show-run <nested run id>` resolves a run from today's discussion runs.
-- [ ] `findRunningRuns` reports a nested run that has `run.json` and no `result.json` (test with the real shape).
-- [ ] `metrics coverage` on this repo and on `/home/vantt/projects/mdview`: `runDirsSeen` equals the independent Node count (excluding runs changed in the last 60 s); `observed + skipped = runDirsSeen`.
-- [ ] `metrics runs --by=role --since=2026-10-05` lists `panelist-N` and `synthesizer`.
-- [ ] `fgos doctor` has `observe-run-coverage`: passes with a fixed host, reports degraded (passed) with the old staged host, fails against a fixture that hides a run.
-- [ ] After backfill, `metrics discussions --since=2026-10-05` run from mdview lists the four Delphi runs of that day, including the policy-refusal run (zero seats) and a run with a fallback chain, and attempts total matches `metrics runs` for those runs.
-- [ ] One live panel with `--stance-options` yields a stance per seat and a correct agreement ratio; a unit without options reads `unmeasured`; a malformed stance never fails a seat.
-- [ ] Two eval records (two setups, same question, blind Opus judge) listable with `metrics eval list`.
-- [ ] Full `npm test` and Rust `observe` + `run-result` suites green; spec, CHANGELOG, architecture manifest, doctor spec rows, command registry updated; `docs/platform/component-boundary.md` checked (note "No component-boundary change" or update).
+- [x] `fgos dispatch show-run <nested run id>` resolves today's panelist run `run_unit-run-1791219961331-276f364c/panelist-1/1_01`.
+- [x] `findRunningRuns` reports a nested run with `run.json` and no `result.json` (real-shape regression and foundation dry-run).
+- [x] Live `metrics coverage` matches independent Node counts exactly: forgentX 1199, mdview 90; observed + skipped = runDirsSeen, recentRuns 0.
+- [x] `metrics runs --by=role --since=2026-10-05` lists panelist-N/synthesizer; exact Delphi-window roles and 30 runs are recorded.
+- [x] `observe-run-coverage` passes with rebuilt host, degrades/pass with old host, fails against hidden-run fixture (foundation evidence).
+- [x] Four mdview Delphi workflows include refusal zero seats and two fallback seats; 30 attempts = 30 Dispatch runs, distinct from 28 final seats.
+- [x] Live three-seat panel gives three valid votes and hand/native agreement 1; no-options is unmeasured and malformed stance preserves passing seat (behavioral CLI regression).
+- [x] Two real current-setup records judged by isolated blind Opus list by exact question/harness in `metrics eval list`.
+- [x] Full suite `FGOS_HOST_BIN=target/debug/fgos npm test -- --test-concurrency=1`: 6,750 pass, zero fail (6,823 tests, eight skip, 65 todo); Rust 74 pass/build. Specs, CHANGELOG, architecture manifest, doctor spec rows and command registry updated; No component-boundary change.
 
 ## How Rust changes are verified (important)
 
@@ -137,8 +137,46 @@ Propagation: phases 4-6 carry status `deferred-decision` in the table below; D2 
 ### Whole-Plan Consistency Sweep
 Re-read `plan.md` and all six phases after this session. No unresolved contradictions: the ledger appears only as a non-goal and in this log; D2/D3/D4 wording is the same in `plan.md` and phases 4-6; efforts add to about 7d total, 3.5d for the foundation.
 
+### Foundation execution — 2026-10-05
+
+Phases 1–3 implementation was executed in parallel where independent, followed
+by shared-fixture regression checks, rebuilt-host smoke in forgentX/mdview,
+complete doctor invocations, a depth-mutation check, and independent review.
+Evidence and actual metrics: [rebaseline](../reports/observe-rebaseline-261005.md).
+
+The live count decrease exposed the timestamp-policy tradeoff. The owner stated
+that backward compatibility is unnecessary and asked for the best policy:
+retain result-owned `settledAt`/`timestamp`, never use assignment creation as a
+fictional settlement time. Historical records without a result timestamp remain
+visible as counted `no-timestamp` skips, and pre-fix snapshots are incomparable.
+Current writers already emit settlement time; no history migration was applied.
+
+Phase 2 criteria are checked. Phase 1's proposed permanent source-text guard is
+not implemented because session test policy forbids source-text/wiring tests;
+the inventory and behavioral tests supply its reachable evidence. The first
+authoritative suite's watchdog failure was diagnosed with captured real-process
+evidence: timeout publication raced process-tree kill and parent cleanup. After
+publishing evidence before kill, the full rerun passed: 6,730 pass, zero fail,
+eight skipped, 65 todo. Phase 3's suite gate is satisfied. Phases 4–6 remain
+deferred by the validated gate and were not implemented.
+
+### Measurement go — resumed execution
+
+The owner explicitly requested “làm hết tất cả phase đi” after re-invoking
+`ak:cook --auto --parallel`. This supersedes the phases 4–6 deferral gate:
+implement unit summaries/discussions, passive stance/agreement and eval storage
+with their live acceptance scenarios. No behavior gate or decision ledger is
+added. The strict timestamp decision and completed foundation evidence remain.
+
+### Measurement evidence
+
+[`observe-discussion-measurement-261005.md`](../reports/observe-discussion-measurement-261005.md) records live backfill, four Delphi runs, stance panel, two current setups, blind Opus scores and actual eval shards. Both compared setups scored 7/10; no ranking/gate is inferred from one question. Integrated Rust 74 tests/build and focused Node 55 tests pass; independent writer/reader re-reviews approved all corrections. No component-boundary change, no history rewrite, no staging/commit.
+
+Final full-suite verification passed with the unchanged test selection: `FGOS_HOST_BIN=target/debug/fgos npm test -- --test-concurrency=1`, 6,823 tests / 6,750 pass / zero fail / eight skip / 65 todo (artifact://270). The default parallel run had one existing live-Herdr attestation failure; the actual-gateway diagnostic and complete serial suite both passed, without narrowing/skipping or changing fail-closed/deadlines. [Diagnostic limits](../reports/observe-herdr-acceptance-diagnostic-261005.json) retain the default failure and label contention as an unproven hypothesis.
+
+
 ## Open questions
 
-- None blocking phases 1-3. Phases 4-6 need a go/no-go after phase 3, including whether the numbers from phase 3 change what discussion measurement is worth building.
+- Measurement go resolved: the owner requested every phase; no further go/no-go is pending.
 - Is the inline `fgos run record` result meant to be an Observe run? Applied: no (skipped as `inline-record`), but it becomes a seat in the unit summary.
-- Reconciler policy for the 4 nested orphans (run.json without result.json) once they become visible: confirm in phase 1 from the dry-run listing, not assumed.
+- Reconciler policy confirmed by the phase 1 dry-run: the four nested producer runs without a result have the same authority as flat running runs. The main-checkout inspection moves from five to nine active run ids; the existing fail-closed cwd-lock guard must refuse mutation while any remain active. No automatic cleanup, retry, exemption or recovery was performed. Evidence: [layout inventory and dry-run](../reports/observe-run-layout-261005.md).
