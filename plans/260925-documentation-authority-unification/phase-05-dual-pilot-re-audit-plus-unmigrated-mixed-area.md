@@ -121,14 +121,40 @@ Executed 2026-10-07 on the plan branch by the delegate of the Lead (doers: in-pr
 - [x] 8 Alias and history lookup test: [reports/phase-05/pilot-b-alias-test.md](reports/phase-05/pilot-b-alias-test.md): 12 of 12 resolve, table validates; 14 of 20 history references resolve (E6 not met).
 - [x] 9 Link rewrite preview: [reports/phase-05/pilot-b-link-rewrite-preview.md](reports/phase-05/pilot-b-link-rewrite-preview.md): 780 edges classified; 15.6% of the 77 rewrite-class edges carry an anchor (E7 not met).
 - [x] 10 Fresh-reader review: [reports/phase-05/pilot-b-fresh-reader.md](reports/phase-05/pilot-b-fresh-reader.md) with the key committed first (`2a4f8c877`): 6 of 6 per reader and scenario; reader 1 cited 2 anchors that do not exist (E8 not met for reader 1).
-- [x] 11 Red-team: see the findings table below.
+- [x] 11 Red-team (`ak:plan red-team`): 3 hostile reviewers, findings table below; fixes `cfecd5aba` and the record edits.
 - [x] 12 Defects, verdict, close: [reports/phase-05/pilot-method-defects.md](reports/phase-05/pilot-method-defects.md): 20 defects (4 High: M-01, M-05, M-11, M-13), scorecard, verdict: not PASS; owner rulings needed on E1, E6, E7, E8. Not closed.
 
 Gate and test numbers at the end of the work: script suite 765 pass, 0 fail (`env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/*.test.mjs`); ratchet exit 0 (995 legacy files, 24 accounted edits, 1 accounted new file); scoped strict gate for the two Pilot B sources exit 0; `check-doc-constitution.mjs --check-placement` 446 files, 445 matched, 0 leftover; `git diff 1f17938c1 -- docs/specs docs/architect docs/platform/host-invocation-routing docs/io-contract.md AGENTS.md docs/reading-map.md plans/260925-documentation-authority-unification/alias-table.json` empty.
 
 ### Red-team findings
 
-Pending.
+Three hostile reviewers (assumption destroyer, failure-mode analyst, scope and complexity critic) read the Phase 5 results; 29 findings, de-duplicated and adjudicated by the delegate (evidence filter applied: every finding carried file or command evidence). One side effect to disclose: the assumption destroyer ran the generator with `--refresh` by mistake, rewrote three committed artifacts and then restored them with `git checkout -- <3 files>` and removed the shard directory; `git status` was clean afterwards (checked by the delegate).
+
+| # | Reviewer, severity | Finding | Disposition |
+|---|---|---|---|
+| 1 | FM Critical | Reviewed rows anchor on positional `unheaded-block-N` and the gate only checks existence | Accept: fixed with `targetUnitDigest` binding and `decision-target-drift` (M-21, `cfecd5aba`); positional renumbering becomes a finding, the anchor form is unchanged |
+| 2 | FM High, AD High | A review is bound to the source digest only; wrong-but-existing anchor passes; no such mutation in E2 | Accept: same fix; mutation m11 added and reported |
+| 3 | FM High | A pending claim decision or an `unknown-blocking` gap decision clears a registry gap | Accept: overlay only for reviewed, non-`unknown-blocking` decisions (M-22) |
+| 4 | FM High | `files` decisions are not deduplicated | Accept: `decision-file-duplicate` (M-22) |
+| 5 | FM Medium | Declared sources with undecided claims pass the non-strict gate | Reject: strict (scoped) reports every undecided row because inventory rows are never seeded as reviewed; non-strict is not a conservation gate |
+| 6 | FM Medium, SC | Short-block blind spot (extractor) | Reject as duplicate of M-05 (needs owner, generator) |
+| 7 | FM Medium | Candidate marker is prose in the switchboard only | Reject: every candidate document carries `Design status: Candidate` and the candidate-status check reads the switchboard; no inbound link exists (`rg`); recorded as not a defect |
+| 8 | FM Medium | Alias table covers H2 anchors only | Accept as a note on M-12 (107 deeper anchors unmapped) |
+| 9 | FM Medium | Validators see different registries | Accept: comment in code that only the conservation summary reads the overlay |
+| 10 | FM Medium | `reviewedBy` is free text; `blocking` pairs with a promoting disposition | Accept in part: blocking pairing fixed (M-22); reviewer independence stays open for Phase 6 |
+| 11 | AD High | The gate cannot see a wrong-but-existing anchor | Accept: see 1, 2 |
+| 12 | AD Medium | E3 rests on a planted pack | Accept: scorecard reads "Met (pack only)" |
+| 13 | AD Medium | The candidate carries the `coordination` example the code contradicts, row reviewed | Accept as recorded (M-15, M-23): content defect for the owner, not a carry defect |
+| 14 | AD Medium | The seven gap rows are superseded by the legacy source | Reject with reason recorded in M-23 (retired-row precedent; the unit rows point at the candidate) |
+| 15 | AD Medium | Amendment 2.2-001 evidence includes unreviewed rows; weak test pin | Accept: evidence text states the limits; test pins minor version 2 and the amendment ids; a test ties the amendment to the committed shards |
+| 16 | AD Medium | Scorecard not reproducible from the committed artifacts | Accept: the committed manifest and registry were refreshed at the end (last line of the record) and the command is stated |
+| 17 | AD Medium | "Only additive" and the E10 path list overstated | Accept: wording and path list corrected in the scorecard |
+| 18 | AD Medium | dropped-008 and dropped-013 say "never present" although a carrier exists for part | Accept: both entries narrowed to the missing part, existing carriers named |
+| 19 | AD Medium | "16 drops" is a floor | Accept: register description says so |
+| 20 | SC High | `registryGaps` goes beyond `--decisions` and `--scope` | Not decided by the delegate: flagged for the owner (M-06) |
+| 21 | SC Medium | No tests for the scope guard; weakened minor-version pin; amendment evidence unreproducible; shards are the only carrier; candidate date | Accept the first three (tests added, pin restored, amendment test); shards: the phase file and the pilot README now state the invocation (`--decisions plans/.../pilot/decisions`); date: Reject, the phase file fixes `Last reviewed 2026-10-06` for the candidates |
+
+Open Critical or High after the fixes: none that the delegate can fix without the owner; the owner-level items are M-01, M-05, M-11, M-13 and the registry-gap extension (M-06).
 
 ## Success Criteria
 

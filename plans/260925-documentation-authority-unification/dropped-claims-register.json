@@ -1,7 +1,7 @@
 {
   "$schema": "https://forgent.dev/schemas/documentation-authority.dropped-claims-register.v1.json",
   "version": 1,
-  "description": "Claims known to be missing from their promoted docs/platform/** target although the source still holds them. Each entry must have an explicit reviewed disposition before the atomic platform-authority cutover (restored at a target anchor, or a restoration owner named). Entries are added by hand with evidence; the generated inventory does not write this file.",
+  "description": "Claims known to be missing from their promoted docs/platform/** target although the source still holds them. Each entry must have an explicit reviewed disposition before the atomic platform-authority cutover (restored at a target anchor, or a restoration owner named). Entries are added by hand with evidence; the generated inventory does not write this file. Entries dropped-002 to dropped-017 (2026-10-07) hold only the groups that a blind audit found and the lead reproduced by hand; they are a floor, not the full list: other rows of that audit stay unknown-blocking in the pilot decision shards without an entry here and need an owner path before the cutover.",
   "entries": [
     {
       "id": "dropped-001",
@@ -250,11 +250,11 @@
     },
     {
       "id": "dropped-008",
-      "title": "Registry linker procedure and its input/output formula (authored catalog + built-in descriptors + CLI binding…",
+      "title": "Registry linker procedure and its input/output formula (partly carried: the linker exists in code and proofs; the formula and the procedure steps are missing)",
       "recordedAt": "2026-10-07",
       "status": "dropped-needs-review",
       "intentional": null,
-      "intentionalEvidence": "None found. The text was never present under docs/platform/host-invocation-routing (git log -S on distinctive terms lists only commits to docs/architect/host-invocation-routing), so it was not carried when the area was promoted and no later removal records a reason. A blind source-to-target audit (pilot, 2026-10-07) and a hand re-check by the lead found no promoted document, including the intent ledger and source inventory, that states it.",
+      "intentionalEvidence": "None found for the missing part. A linker is described in docs/platform/host-invocation-routing/spec.md and roadmap.md, in the R2 proof (refusal cases) and RegistrySnapshot in architecture/provider-routing.md, so the carried part is not missing; the missing part is the authored input list, the input/output formula and the scan/validate/verify procedure of the legacy source (never present under the promoted area according to git log -S on those phrases).",
       "source": {
         "path": "docs/architect/host-invocation-routing/external-provider-protocol.md",
         "anchors": [
@@ -279,7 +279,7 @@
       },
       "expectedTarget": "a section of docs/platform/host-invocation-routing/ (architecture, contracts or verification, by the constitution placement rules); to be chosen at restoration",
       "absenceCheck": "rg -i over docs/platform/host-invocation-routing with terms [\"linker\",\"RegistrySnapshot\",\"immutable\",\"source fingerprint\"] returns no hit that states the claim",
-      "relatedOverclaim": "matrix: 'Component class versus invocation mechanism, built-in/process/WASM protocol placement, JSON-RPC 2.0 semantics over length-prefixed stdio frames, static manifest discovery, registry/linker meaning, namespace and replacement rules' (registry/linker mean",
+      "relatedOverclaim": "matrix: 'Component class versus invocation mechanism, built-in/process/WASM protocol placement, JSON-RPC 2.0 semantics over length-prefixed stdio frames, static manifest discovery, registry/linker meaning, namespace and replacement rules' (registry/linker mean Existing carriers of the partly carried topic: spec.md, roadmap.md, architecture/provider-routing.md, verification/r2-external-process-proof.md.",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
       "restorationOwner": "Unassigned. Owner decides before the cutover: restore at a target anchor, defer with a named owner, or record an intentional-retirement rationale.",
       "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition."
@@ -420,7 +420,7 @@
       "recordedAt": "2026-10-07",
       "status": "dropped-needs-review",
       "intentional": null,
-      "intentionalEvidence": "None found. The text was never present under docs/platform/host-invocation-routing (git log -S on distinctive terms lists only commits to docs/architect/host-invocation-routing), so it was not carried when the area was promoted and no later removal records a reason. A blind source-to-target audit (pilot, 2026-10-07) and a hand re-check by the lead found no promoted document, including the intent ledger and source inventory, that states it.",
+      "intentionalEvidence": "None found for the missing part. The rejected migration choices themselves are carried (the old audit lists Node-thinning-first and the big-bang rewrite as preserved rejected choices); the rationale of the rejected options (the Option A and Option C reasoning and the cost argument) was never present under the promoted area according to git log -S on those phrases.",
       "source": {
         "path": "docs/architect/host-invocation-routing/node-to-rust-component-migration.md",
         "anchors": [
