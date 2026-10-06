@@ -43,16 +43,16 @@ unchanged.
 | `promote` | Source content moves into the target `docs/platform/**` structure as canonical authority. | Yes | No | Yes | in-use |
 | `move` | Source file moves directly to target structure with minimal rewriting. | Yes | No | Yes | reserved |
 | `merge` | Content from multiple sources is combined into a single canonical target document. | Yes | No | Yes | in-use |
-| `split` | Source is partitioned into multiple target documents with claim-level ledger tracking. | Yes | No | Yes | reserved |
+| `split` | Source is partitioned into multiple target documents with claim-level ledger tracking. | Yes | No | Yes | in-use |
 | `extract` | Specific claims or contracts are extracted into a dedicated target document. | Yes | No | Yes | reserved |
 | `redirect` | Source is replaced with an explicit read-only pointer to the canonical target. | Yes | No | No | reserved |
 | `retain-as-evidence` | Source is preserved as immutable historical evidence, test fixture, or audit receipt. | No | Yes | No | in-use |
 | `regenerate-from-source` | File is a derived machine projection generated from code, events, or state. | No | No | No | in-use |
 | `reclassify-out-of-platform-scope` | File belongs to a non-platform corpus (user knowledge, domain doctrine, etc.). | No | Yes | No | in-use |
-| `supersede` | Source or claim has been explicitly superseded by newer approved decisions and retired. | Yes | Yes | No | reserved |
-| `archive-with-reason` | Source is retired and relocated to history/archive with a recorded rationale. | No | Yes | No | reserved |
+| `supersede` | Source or claim has been explicitly superseded by newer approved decisions and retired. | Yes | Yes | No | in-use |
+| `archive-with-reason` | Source is retired and relocated to history/archive with a recorded rationale. | No | Yes | No | in-use |
 | `delete-as-duplicate` | Source is an unneeded exact or semantic duplicate of another document. | Yes | Yes | No | reserved |
-| `delete-as-obsolete` | Source is obsolete with zero evidentiary or historical value. | No | Yes | No | reserved |
+| `delete-as-obsolete` | Source is obsolete with zero evidentiary or historical value. | No | Yes | No | in-use |
 | `defer-with-owner` | Source claim is deferred to a named future phase or engine with a named owner. | Yes | Yes | No | reserved |
 | `reject-with-rationale` | Proposed candidate design or source was evaluated and rejected with rationale. | No | Yes | No | reserved |
 | `unknown-blocking` | Source status is unresolved; blocks cutover until audited and assigned a disposition. | No | Yes | No | in-use |
@@ -97,7 +97,7 @@ generator can emit the value but the committed inventory has none yet;
 | `corpus` (item) | `platform-authority`, `user-knowledge`, `history-evidence`, `consumer-project` |
 | `authorityKind` (claim) | `legacy-current`, `candidate`, `promoted`, `non-authority`, `unclassified` |
 | `status` (claim) | `current`, `future`, `historical` |
-| `reviewStatus` (claim) | `blocking`, `pending` in use; `reviewed` reserved; `needs-review` registry-only |
+| `reviewStatus` (claim) | `blocking`, `pending` in use; `reviewed` in use; `needs-review` registry-only |
 | `relations[].type` | `duplicate-content-member` in use; `same-source-indistinguishable-duplicate-blocker` generator-only; `defines`, `constrains`, `implements`, `explains`, `evidenced_by`, `supersedes`, `consumes` reserved |
 | `identityStatus` | `carried-forward`, `ambiguous-registry-gap` in use; four further gap values generator-only |
 
@@ -124,7 +124,7 @@ Version 2 is frozen for the meaning of every existing value. A new value or
 section is added only as an additive amendment (2.1, 2.2, ...) listed in
 `amendments` with its evidence, after the validator passes; the constitution keeps
 pinning the major version. Changing or removing a value needs a new major version
-and an owner decision. One amendment exists: 2.1-001 adds the `authorityClasses` section and the class `verification-record`. The canonical verification kind's class was `evidence`, which collided with the locked rule that evidence is not authority (plan §3 item 10); `evidence` now belongs only to non-authority kinds (`evidence-payload`, `history`). Owner decision 2026-10-06.
+and an owner decision. Two amendments exist: 2.1-001 adds the `authorityClasses` section and the class `verification-record`. The canonical verification kind's class was `evidence`, which collided with the locked rule that evidence is not authority (plan §3 item 10); `evidence` now belongs only to non-authority kinds (`evidence-payload`, `history`). Owner decision 2026-10-06. 2.2-001 moves `split`, `supersede`, `archive-with-reason`, `delete-as-obsolete` and the review status `reviewed` from `reserved` to `in-use` (no meaning changes); evidence: the dual pilot used them (see the amendment in the JSON file).
 
 ## 6. Related Files
 

@@ -640,7 +640,7 @@ test('the freeze is recorded and the additive amendment carries its reason', () 
   const amendment = vocabulary.amendments.find((a) => a.change.includes('verification-record'));
   assert.equal(amendment.minor, 1);
   assert.match(amendment.evidence, /evidence is not authority/);
-  assert.equal(vocabulary.minorVersion, 1);
+  assert.equal(vocabulary.minorVersion, vocabulary.amendments.at(-1).minor);
 });
 
 test('the reading map stays outside docs/platform for a recorded reason', () => {

@@ -120,7 +120,7 @@
       "allowedFileClasses": [
         "maintained-authority"
       ],
-      "usage": "reserved"
+      "usage": "in-use"
     },
     {
       "id": "extract",
@@ -190,7 +190,7 @@
         "maintained-authority",
         "retained-source"
       ],
-      "usage": "reserved"
+      "usage": "in-use"
     },
     {
       "id": "archive-with-reason",
@@ -202,7 +202,7 @@
         "history-evidence",
         "retained-source"
       ],
-      "usage": "reserved"
+      "usage": "in-use"
     },
     {
       "id": "delete-as-duplicate",
@@ -226,7 +226,7 @@
         "maintained-authority",
         "history-evidence"
       ],
-      "usage": "reserved"
+      "usage": "in-use"
     },
     {
       "id": "defer-with-owner",
@@ -689,7 +689,7 @@
     {
       "id": "reviewed",
       "definition": "A named reviewer accepted the disposition, owner and target anchor.",
-      "usage": "reserved"
+      "usage": "in-use"
     },
     {
       "id": "needs-review",
@@ -784,9 +784,15 @@
       "minor": 1,
       "change": "add section authorityClasses and the class verification-record for the canonical verification kind",
       "evidence": "Naming the canonical verification kind's class evidence collided with the locked rule that evidence is not authority (plan §3 item 10). The class evidence now belongs only to non-authority kinds (evidence-payload, history); verification is canonical and becomes verification-record. Owner decision 2026-10-06."
+    },
+    {
+      "id": "v2.2-001",
+      "minor": 2,
+      "change": "move the dispositions split, supersede, archive-with-reason and delete-as-obsolete and the review status reviewed from usage reserved to usage in-use; no value, definition or rule text changes",
+      "evidence": "Used by the dual pilot (2026-10-07): the 966 decision rows (600 of the host-invocation audit, 366 of the work-state transformation) of the shards under plans/260925-documentation-authority-unification/pilot/decisions/ carry split (6 rows), supersede (196), archive-with-reason (20) and delete-as-obsolete (7) next to promote (361), merge (149) and unknown-blocking (227); all 366 rows of the work-state sources carry reviewStatus reviewed with a reviewer and a date, accepted by scripts/check-doc-inventory-gates.mjs --decisions --strict --scope. move, extract, redirect, delete-as-duplicate, defer-with-owner and reject-with-rationale were not used and stay reserved."
     }
   ],
-  "minorVersion": 1,
+  "minorVersion": 2,
   "authorityClasses": [
     {
       "id": "navigation",
