@@ -23,6 +23,7 @@ import {
 import { translatePlanToWorkflow } from './plan-source.mjs';
 import { runUnit, snapshotRunnerConfig, resolveGitRoots } from '../runner/execution/run.mjs';
 import { RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { normalizeStanceOptions } from '../runner/execution/unit.mjs';
 import { anonymousInputName, gateAnswerFile, OWN_PREVIOUS_NAME, SEAT_PLACEHOLDER } from '../runner/execution/handoff-refs.mjs';
 
 const GATE_ANSWER_NOTE_CHARS = 200;
@@ -348,6 +349,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
             writes: u.template.writes || [],
             dependsOn: u.dependsOn || [],
             inputs: handoff.inputs,
+            stanceOptions: state.stanceOptions?.length ? state.stanceOptions : u.template.stanceOptions,
             ...(u.template.anonymizeInputs ? { anonymizeInputs: true } : {}),
             ...(u.template.blind ? { blind: true } : {}),
           };
@@ -391,6 +393,7 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
             worktree: unitWorktree,
             pattern: unitPatternOf(u.template),
             overrides: unitOverridesOf(u),
+            workflow: { runId: workflowRunId, stepId: step.id, unitId: u.id },
           });
 
           recordEvent({
@@ -683,6 +686,7 @@ function prepareWorkflowRun(params) {
     workflow,
     configSnapshot,
     request: params.request,
+    stanceOptions: normalizeStanceOptions(params.stanceOptions),
   });
 
   return { workflowRunId, runDir, workflow, mainRoot, worktreePath };

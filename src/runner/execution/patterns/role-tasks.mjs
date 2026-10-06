@@ -58,11 +58,16 @@ function wrap(task, objective) {
 export function roleUnit(unit, { role, kind = role, params = {}, findings = [] } = {}) {
   const task = params?.roleTasks?.[role] ?? params?.roleTasks?.[kind] ?? DEFAULT_ROLE_TASKS[kind];
   const hasFindings = Array.isArray(findings) && findings.length > 0;
-  if (typeof task !== 'string' && !hasFindings) return unit;
+  const stanceOptions = unit.stanceOptions ?? [];
+  const hasStance = kind === 'panelist' && stanceOptions.length > 0;
+  if (typeof task !== 'string' && !hasFindings && !hasStance) return unit;
 
   let objective = typeof task === 'string' ? wrap(task, unit.objective) : unit.objective;
   if (hasFindings) {
     objective += `\n\nThe previous round's checks reported these findings. Fix them and change nothing else:\n${findings.map((f) => `- ${f}`).join('\n')}`;
+  }
+  if (hasStance) {
+    objective += `\n\nPassive stance measurement for this question. Declared choices: ${JSON.stringify(stanceOptions)}; \"other\" is also allowed.\nEnd your report by stating your stance and include \"stance\": {\"choice\": <one declared choice or \"other\">, \"confidence\": <number from 0 to 1>} in your agent-result.json claim. This optional measurement never changes whether your work passes.`;
   }
   return { ...unit, objective };
 }

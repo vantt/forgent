@@ -152,6 +152,10 @@ test('runUnit runs solo read-only unit end-to-end', async () => {
   const record = JSON.parse(fs.readFileSync(unitJsonPath, 'utf8'));
   assert.equal(record.unit.id, 'u-docs-1');
   assert.equal(record.worktree, fs.realpathSync(worktreeDir));
+  const summary = JSON.parse(fs.readFileSync(path.join(path.dirname(unitJsonPath), 'unit-summary.json'), 'utf8'));
+  assert.equal(summary.unitRunId, res.unitRunId);
+  assert.equal(summary.outcome, res.outcome);
+  assert.ok(summary.settledAt);
 });
 
 test('recordInlineRun admits valid producer nonce with existing evidenceRefs', () => {
@@ -198,6 +202,11 @@ test('recordInlineRun admits valid producer nonce with existing evidenceRefs', (
   assert.ok(fs.existsSync(resultPath));
   const saved = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
   assert.deepEqual(saved.evidenceRefs, ['output.txt']);
+  const summary = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit-summary.json'), 'utf8'));
+  assert.equal(summary.inline, true);
+  assert.equal(summary.seats[0].role, 'producer');
+  assert.equal(summary.seats[0].final.runId, null);
+  assert.equal(summary.settledAt, saved.recordedAt);
 });
 
 test('recordInlineRun refuses invalid nonce, non-producer role, or missing evidence', () => {
@@ -1087,4 +1096,36 @@ test('a seat the earlier run did not have is refused with a named reason when th
     () => run({ id: 'u-own', objective: 'x', capability: 'docs:write', writes: [], pattern: 'solo', inputs: [`unit-run:${first.unitRunId}/{seat}`] }, 'solo'),
     /no-such-seat/,
   );
+});
+
+test('unit summaries cover refusal, thrown execution and resume without duplicating settled seats', async (t) => {
+  const { repoRoot, worktreeDir } = setupGitRepo();
+  t.after(() => fs.rmSync(repoRoot, { recursive: true, force: true }));
+  t.after(() => fs.rmSync(worktreeDir, { recursive: true, force: true }));
+  const unitData = { id: 'summary-doors', capability: 'not-configured:answer', objective: 'Answer question', writes: [] };
+  const refused = await runUnit({ unitData, repoRoot, cwd: worktreeDir });
+  const dir = path.join(repoRoot, '.fgos', 'assignments', refused.unitRunId);
+  const readSummary = () => JSON.parse(fs.readFileSync(path.join(dir, 'unit-summary.json'), 'utf8'));
+  assert.equal(refused.outcome, 'policy-refusal');
+  assert.equal(readSummary().outcome, 'policy-refusal');
+  assert.deepEqual(readSummary().seats, []);
+  assert.equal(readSummary().workflow, null);
+  // An unknown pattern throws after owner metadata exists.
+  await assert.rejects(runUnit({ unitData, repoRoot, cwd: worktreeDir, pattern: 'nonexistent-pattern' }));
+  const other = fs.readdirSync(path.dirname(dir)).find((name) => name !== refused.unitRunId);
+  const thrown = JSON.parse(fs.readFileSync(path.join(path.dirname(dir), other, 'unit-summary.json'), 'utf8'));
+  assert.equal(thrown.outcome, 'execution-failure');
+  assert.ok(thrown.settledAt);
+  // A resumed solo uses settled history and never launches the unavailable executor.
+  const runDir = path.join(dir, 'producer', '1', 'runs', '01');
+  fs.mkdirSync(runDir, { recursive: true });
+  fs.writeFileSync(path.join(runDir, 'result.json'), JSON.stringify({
+    runId: 'synthetic-resumed-run', settledAt: '2026-10-05T01:00:00Z',
+    classification: { outcome: { category: 'ok' } },
+  }));
+  const resumed = await runUnit({ resumeUnitRunId: refused.unitRunId, repoRoot, cwd: worktreeDir });
+  assert.equal(resumed.outcome, 'pass');
+  assert.equal(readSummary().seats.length, 1);
+  assert.equal(readSummary().seats[0].attempts.length, 1);
+  assert.equal(readSummary().seats[0].final.runId, 'synthetic-resumed-run');
 });

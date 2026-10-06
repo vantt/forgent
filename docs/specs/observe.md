@@ -11,7 +11,7 @@ Observe được chuyển trọn gói sang Rust trong kế hoạch `plans/260929
 
 ### Owns
 - Quản lý nhật ký và vòng đời case đo lường (`fgos metrics case`).
-- Thu thập và tính toán scorecard tầng nền (`fgos metrics harness`, `fgos metrics runs`, `fgos metrics outcomes`, `fgos metrics entropy`, `fgos metrics snapshot`).
+- Thu thập và tính toán scorecard tầng nền (`fgos metrics harness`, `fgos metrics runs`, `fgos metrics coverage`, `fgos metrics outcomes`, `fgos metrics entropy`, `fgos metrics snapshot`).
 - Quản lý kho lưu trữ friction độc lập, phi tập trung (`fgos friction record`, `fgos friction resolve`, `fgos friction list`, `fgos friction show`, `fgos friction rank`).
 - Quản lý store lock (`.fgos/observe/.lock`) và phân mảnh writer shard (`.fgos/observe/<store>/<writerId>.jsonl`).
 - Khai báo traits `ObservationSource` và `LegacyFrictionSource` cho các crate khác triển khai.
@@ -27,6 +27,7 @@ Observe được chuyển trọn gói sang Rust trong kế hoạch `plans/260929
 | Subject Kind | Định dạng ID | Ví dụ | Owner dữ liệu |
 |---|---|---|---|
 | `run` | `run:<runId>` | `run:run_1a2b3c` | `packages/run-result/rust` |
+| `run` (unit observation) | `unit-run:<unitRunId>` | `unit-run:unit-run-example` | Node execution writer; Rust run-result read contract |
 | `session` | `session:<id>` | `session:coord_4d5e6f` | `packages/coordination-state/rust` |
 | `executor` | `executor:<id>` | `executor:judge-discovery` | `.fgos/config.json` |
 | `case` | `case:<name>` | `case:observe-f2` | `packages/observe/rust` |
@@ -40,7 +41,7 @@ Observe được chuyển trọn gói sang Rust trong kế hoạch `plans/260929
 
 ## 4. Commands & Routing
 
-- `fgos metrics <subcommand>` — lệnh đo lường native (Rust host). Subcommands: `ping`, `case`, `harness`, `faults`, `runs`, `outcomes`, `entropy`, `snapshot`.
+- `fgos metrics <subcommand>` — lệnh đo lường native (Rust host). Subcommands: `ping`, `case`, `harness`, `faults`, `runs`, `coverage`, `discussions`, `eval`, `outcomes`, `entropy`, `snapshot`.
 - `fgos friction <subcommand>` — lệnh friction native (Rust host). Subcommands: `ping`, `record`, `resolve`, `list`, `show`, `rank`.
 
 Node legacy CLI cắm cờ `nativeOnly: true` cho `metrics` và `friction`, từ chối chạy trực tiếp với exit 4.
@@ -51,15 +52,24 @@ Mọi component Node hoặc ngôn ngữ ngoài gọi qua helper `src/util/host-b
 ### § Metrics (Làn A)
 Dành cho Phase F3 (`case`), F4 (`harness`, `faults`), F6 (`work` source), F7 (`runs`, `outcomes`, `entropy`, `snapshot`).
 - **Claude Transcripts Source**: Thu thập token usage từ `~/.claude/projects/` (`CLAUDE_CONFIG_DIR`). Nhận tất cả thư mục có tên khớp với encoding của bất kỳ path nào trong `git worktree list` (project root cộng từng worktree ngoài) hoặc bắt đầu bằng `enc + "--claude-worktrees-"`. Giữ bộ lọc `cwd` cho từng record để ngăn match nhầm repo khác, và dedupe theo `message.id`.
+- **Run Result Source — layout rule `v2`**: `packages/run-result/rust::scan_runs(root)` là scanner duy nhất của Rust. Walk `.fgos/assignments` theo thứ tự lexical; directory tên `runs` đánh dấu parent là assignment, id là relative path (có thể chứa `/`, gồm role/round/fallback). Không cần `assignment.json`; role/adapter thiếu là null. Chỉ đọc `runs/<attempt>/result.json`, không descend vào attempt/outbox và không follow symlink (kể cả result/assignment metadata). Assignment-relative depth tối đa 16; attempt không cộng depth. Child directory không đọc được hoặc biến mất bị bỏ qua, sibling vẫn được scan; root không đọc được trả lỗi, root thiếu trả nguồn rỗng.
+- **Observed run**: result parseable, `runId` nonempty, timestamp nonempty từ `settledAt` hoặc `timestamp` (không fallback sang `assignment.createdAt`). First valid record theo lexical path thắng khi trùng `runId`, trước khi lọc window. `ObservationSource` giữ nguyên contract; `RunResultSource::observations` lấy observations từ scanner rồi lọc window.
+- **`fgos metrics coverage [--dir <root>]`**: chỉ scan run source, không scan transcripts; payload `{ layoutRule: "v2", runDirsSeen, observed, skipped: {reason: count}, recentRuns }` trong envelope `fgos.v1`. Reasons: `unparseable`, `no-run-id`, `no-timestamp`, `symlink`, `duplicate-run-id`, `depth`, `inline-record` (unit result có `unitRunId` nhưng không `runId`). Chỉ reasons có count xuất hiện trong map. Symlink/depth traversal barrier tính một skipped candidate; result symlink là skip của candidate run, không tính thêm. Luôn `observed + sum(skipped) = runDirsSeen`. `recentRuns` đếm candidate có regular result file mtime trong 60 giây gần nhất, kể cả result hỏng/trùng/inline; future mtime cũng là recent để chịu clock skew. Composition root inject callback `scan_coverage` từ owner vào Observe; không reverse dependency và không đổi observation trait.
+- **Hermetic consumer invariant**: Rust và Node materialize cùng fixture declarative `test/fixtures/run-layout/expected.json`; run ids và accounting phải khớp, planted run trong outbox không được enumerate. Rust cargo tests không đọc live `.fgos/assignments` và không pin audit-time totals. Live divergence chỉ được chẩn đoán qua doctor.
+- **Unit summaries — writer-owned contract**: Execution ghi `.fgos/assignments/<unitRunId>/unit-summary.json` theo `unit-summary.read.v1`, kể cả refusal không có seat và inline record. Chọn final seat, numeric attempt, fallback và outcome thuộc Node `unit-run-history.mjs`; Observe chỉ đọc bản đã settle, không join `unit.json`, Dispatch result hay workflow events để suy diễn. `UnitSummarySource` phát `unit.settled` với subject `unit-run:<id>`, không cộng vào tổng Dispatch runs. Backfill tái sinh summary derived theo byte-idempotence, có thể thay summary cũ đã drift nhưng không sửa unit/result/event gốc; linkage legacy chỉ dùng `unit.complete` có exact unitRunId, không đoán từ unit id.
+- **`metrics discussions [--since <date>] [--by workflow|executor|persona]`**: đo unit runs/pass rate, final seats/failed seats, attempts/fallback và median settled duration; attempts không đồng nghĩa seats. Optional stance cuối seat lấy từ claim worker: choice thuộc stanceOptions hoặc `other`, confidence nếu có phải hữu hạn trong [0,1] (null/thiếu không cân trọng số). Missing/malformed stance không làm seat thất bại. Không có options hoặc không có voting seats là `unmeasured`; agreement là largest valid-choice group / final voting seats, genuineSplit khi không nhóm nào đạt 2/3 số ghế. Missing và invalid được báo riêng, vẫn ở mẫu số; split khi thiếu claim là incomplete-evidence signal, không chứng minh dissent. Synthesizer không bỏ phiếu thay panelist. Group executor/persona giữ attempts theo executor/persona thực thi và seats theo final; một unit có thể xuất hiện nhiều group, không cộng group unit totals làm global total.
+- **Discussion time windows**: `--since`/`--until` so sánh inclusive theo UTC milliseconds, không lexical timestamp; offset spellings của cùng instant cho cùng kết quả. `YYYY-MM-DD` là UTC midnight, không end-of-day. Bound malformed hoặc since sau until trả named error trước scan; owner timestamp malformed không được đoán hay đổi payload gốc.
+- **`metrics eval record|list`**: record append-only vào `.fgos/observe/evals/<writerId>.jsonl` qua Observe lock; `observe.eval.v1` giữ harness/question/setup/rubric/judge/runRefs và từng score integer 0–2. Writer tạo timestamp/envelope; reader cũng validate range, báo invalid records thay vì âm thầm chấm. List lọc exact harness/question. Journal lưu đánh giá, không tự chạy judge hay tuyên bố chất lượng khách quan; A/B blind judge phải nhận neutral inputs ngoài `.fgos`, không kèm setup labels hay run metadata.
+- **Eval journal safety**: writer id phải là một filename component, không path; symlinked/nonregular writer shard bị từ chối, Unix open dùng no-follow và xác nhận regular descriptor. Reader giữ tối đa 1 MiB + một byte mỗi logical line, drain line quá lớn rồi tiếp tục, báo file/line/error kể cả partial EOF. Parent directory symlink được preflight nhưng không tuyên bố chống mọi race thay directory. Không thêm config/env/tool prerequisite: dùng Observe dir-writable doctor row, shard identity và lock hiện có; evals tạo lười như các store Observe khác.
 ### § Friction (Làn B)
 Dành cho Phase F5: writer Rust duy nhất, migration lười từ `work.friction`, các lệnh `friction record/resolve/list/show/rank`.
 
 ### § Contract & Quyết định (Làn C / F8)
 Dành cho Phase F8: khoá ranh giới contracts, golden fixtures và decision records.
-- Versioned contracts: `packages/observe/contracts/` (`observe.observation.v1.json`, `observe.friction.v1.json`, `observe.case.v1.json`, `observe.snapshot.v1.json`).
-- Source owner read contracts: `packages/run-result/contracts/run-result.read.v1.json`, `packages/observe/contracts/coordination-session.read.v1.json` (historic sessions; the coordination engine is retired), `packages/work-state/contracts/work-events.read.v1.json`.
+- Versioned contracts: `packages/observe/contracts/` (`observe.observation.v1.json`, `observe.friction.v1.json`, `observe.case.v1.json`, `observe.snapshot.v1.json`, `observe.eval.v1.json`). Eval rubric: [`discussion-quality.v1`](../reference/discussion-quality-rubric.md); [blind comparison how-to](../how-to/compare-discussion-setups-with-metrics-eval.md).
+- Source owner read contracts: `packages/run-result/contracts/run-result.read.v1.json`, `packages/run-result/contracts/unit-summary.read.v1.json`, `packages/observe/contracts/coordination-session.read.v1.json` (historic sessions; the coordination engine is retired), `packages/work-state/contracts/work-events.read.v1.json`.
 - Golden fixtures: `test/fixtures/observe/` sinh bằng CLI Rust và Node trong `scripts/regenerate-observe-fixtures.mjs`.
-- Doctor checks: `observe-dir-writable`, `observe-friction-migrated`, `observe-host-resolvable` (`src/setup/registrations.mjs`).
+- Doctor checks: `observe-dir-writable`, `observe-friction-migrated`, `observe-host-resolvable`, `observe-run-coverage` (`src/setup/registrations.mjs`). Coverage check gọi host `metrics coverage` qua helper với main-checkout dir, kiểm tra `v2` + accounting rồi so `runDirsSeen` với Node directory-only `scanAssignmentLayout` (gồm symlink/depth barriers). Tolerance là max(Node recent result files, host `recentRuns`) trong cửa sổ 60 giây. Chỉ positive unknown subcommand hoặc payload thiếu `layoutRule` được degraded/pass vì old host; malformed coverage và các lỗi khác fail.
 
 ## 6. Lịch sử quyết định
 

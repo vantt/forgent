@@ -96,7 +96,8 @@ import { findDuplicateAuthoritativeClaims } from '../report/authoritative-match.
 import { parseFrontmatter } from '../report/frontmatter.mjs';
 import { POLICY_PATCH_FIELDS } from '../runner/dispatch/execution-contract.mjs';
 import { discoverOperationPromptTemplates, TemplateResolutionError } from '../runner/dispatch/operation-prompt-templates.mjs';
-import { resolveHostBin } from '../util/host-bin.mjs';
+import { resolveHostBin, invokeHost } from '../util/host-bin.mjs';
+import { listAssignmentRuns, scanAssignmentLayout } from '../runner/dispatch/assignment-layout.mjs';
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 export { claudeCodeHookWired } from './claude-code-hooks.mjs';
 export { checkAgySubHomesConfigured } from './agy-permissions.mjs';
@@ -565,63 +566,50 @@ export function checkMutatingAssignmentBindingSnapshot(cwd) {
   }
 
   const problems = [];
+  const units = new Map();
   try {
-    const entries = fs.readdirSync(assignmentsDir, { withFileTypes: true });
-    for (const entry of entries) {
-      if (!entry.isDirectory()) continue;
-      const unitJsonPath = path.join(assignmentsDir, entry.name, 'unit.json');
-      if (!fs.existsSync(unitJsonPath)) continue;
-
-      let unitRecord;
-      try {
-        unitRecord = JSON.parse(fs.readFileSync(unitJsonPath, 'utf8'));
-      } catch {
-        problems.push(`corrupted unit.json in unit run "${entry.name}"`);
-        continue;
-      }
-
-      const unitDir = path.join(assignmentsDir, entry.name);
-      const roles = fs.readdirSync(unitDir, { withFileTypes: true });
-      for (const roleEntry of roles) {
-        if (!roleEntry.isDirectory()) continue;
-        const role = roleEntry.name;
-        const roleDir = path.join(unitDir, role);
-        let rounds;
+    for (const run of listAssignmentRuns(path.join(root, '.fgos'))) {
+      const [unitId, role, round] = run.assignmentId.split('/');
+      if (!role || !round) continue;
+      if (!units.has(unitId)) {
+        const unitJsonPath = path.join(assignmentsDir, unitId, 'unit.json');
+        let unitRecord = null;
         try {
-          rounds = fs.readdirSync(roleDir, { withFileTypes: true });
-        } catch {
-          continue;
-        }
-        for (const roundEntry of rounds) {
-          if (!roundEntry.isDirectory()) continue;
-          const round = roundEntry.name;
-          const attemptDir = path.join(roleDir, round, 'runs', '01');
-          const resultFile = path.join(attemptDir, 'result.json');
-          if (!fs.existsSync(resultFile)) continue;
-
-          try {
-            const resultData = JSON.parse(fs.readFileSync(resultFile, 'utf8'));
-            if (resultData.binding && resultData.role) {
-              const recomputed = bind(
-                {
-                  unit: unitRecord.unit,
-                  role: resultData.role,
-                  readOnly: false,
-                  overrides: unitRecord.overrides || [],
-                },
-                {
-                  runnerConfig: unitRecord.configSnapshot?.runner,
-                  session: {},
-                },
-              );
-              if (recomputed.refused || recomputed.executor !== resultData.binding.executor) {
-                problems.push(`unit run "${entry.name}" role "${role}" round "${round}" binding mismatches unit.json snapshot`);
-              }
+          if (fs.lstatSync(unitJsonPath).isFile()) {
+            try {
+              unitRecord = JSON.parse(fs.readFileSync(unitJsonPath, 'utf8'));
+            } catch {
+              problems.push(`corrupted unit.json in unit run "${unitId}"`);
             }
-          } catch {
-            // ignore
+          }
+        } catch {}
+        units.set(unitId, unitRecord);
+      }
+      const unitRecord = units.get(unitId);
+      if (!unitRecord) continue;
+      const resultFile = path.join(run.runDir, 'result.json');
+      try {
+        if (!fs.lstatSync(resultFile).isFile()) continue;
+        const resultData = JSON.parse(fs.readFileSync(resultFile, 'utf8'));
+        if (resultData.binding && resultData.role) {
+          const recomputed = bind(
+            {
+              unit: unitRecord.unit,
+              role: resultData.role,
+              readOnly: false,
+              overrides: unitRecord.overrides || [],
+            },
+            {
+              runnerConfig: unitRecord.configSnapshot?.runner,
+              session: {},
+            },
+          );
+          if (recomputed.refused || recomputed.executor !== resultData.binding.executor) {
+            problems.push(`unit run "${unitId}" role "${role}" round "${round}" attempt "${run.attempt}" binding mismatches unit.json snapshot`);
           }
         }
+      } catch {
+        // Unsettled or unreadable results have no binding evidence to compare.
       }
     }
   } catch (err) {
@@ -5762,6 +5750,56 @@ export function checkObserveHostResolvable(cwd) {
   }
 }
 
+export function checkObserveRunCoverage(cwd, { hostRunner = invokeHost, scan = scanAssignmentLayout, now = Date.now() } = {}) {
+  const root = resolveMainCheckoutRoot(cwd) ?? cwd;
+  const location = root === cwd ? root : `${root} (main checkout; requested ${cwd})`;
+  let coverage;
+  try {
+    coverage = hostRunner(['metrics', 'coverage'], { dir: root });
+  } catch (err) {
+    if (err.code === 'host-version-mismatch') {
+      return { passed: true, degraded: true, message: `old host predates the run layout rule; upgrade the active release (${location})` };
+    }
+    return { passed: false, message: `run coverage unavailable for ${location}: ${err.message}` };
+  }
+  if (!coverage || typeof coverage !== 'object' || Array.isArray(coverage)) {
+    return { passed: false, message: `invalid run coverage response for ${location}` };
+  }
+  if (!Object.hasOwn(coverage, 'layoutRule')) {
+    return { passed: true, degraded: true, message: `old host predates the run layout rule; upgrade the active release (${location})` };
+  }
+  const counts = Object.values(coverage.skipped ?? {});
+  if (coverage.layoutRule !== 'v2' || !Number.isSafeInteger(coverage.runDirsSeen) || coverage.runDirsSeen < 0
+    || !Number.isSafeInteger(coverage.observed) || coverage.observed < 0
+    || !Number.isSafeInteger(coverage.recentRuns) || coverage.recentRuns < 0
+    || coverage.recentRuns > coverage.runDirsSeen
+    || !coverage.skipped || typeof coverage.skipped !== 'object' || Array.isArray(coverage.skipped)
+    || counts.some((n) => !Number.isSafeInteger(n) || n < 0)
+    || coverage.observed + counts.reduce((sum, n) => sum + n, 0) !== coverage.runDirsSeen) {
+    return { passed: false, message: `invalid run coverage accounting or unsupported layout rule for ${location}` };
+  }
+  let layout;
+  try {
+    layout = scan(path.join(root, '.fgos'));
+  } catch (err) {
+    return { passed: false, message: `cannot enumerate run directories for ${location}: ${err.message}` };
+  }
+  let recent = 0;
+  for (const run of layout.runs) {
+    try {
+      const stat = fs.lstatSync(path.join(run.runDir, 'result.json'));
+      if (stat.isFile() && now - stat.mtimeMs <= 60_000) recent++;
+    } catch {}
+  }
+  const difference = layout.runDirsSeen - coverage.runDirsSeen;
+  const tolerance = Math.max(recent, coverage.recentRuns);
+  if (Math.abs(difference) > tolerance) {
+    const examples = layout.runs.slice(0, 3).map((run) => path.relative(root, run.runDir)).join(', ');
+    return { passed: false, message: `run coverage differs by ${Math.abs(difference)} (${difference > 0 ? 'host shortfall' : 'host excess'}): Node ${layout.runDirsSeen}, host ${coverage.runDirsSeen}, recent ${tolerance}; ${location}; candidate paths: ${examples || '(none)'}` };
+  }
+  return { passed: true, message: `run coverage matches: Node ${layout.runDirsSeen}, host ${coverage.runDirsSeen}, recent tolerance ${tolerance}; ${location}` };
+}
+
 registerCheck({
   id: 'observe-dir-writable',
   description: '.fgos/observe directory is writable',
@@ -5778,4 +5816,10 @@ registerCheck({
   id: 'observe-host-resolvable',
   description: 'Rust host binary resolves and supports observe commands (friction ping)',
   check: (cwd) => checkObserveHostResolvable(cwd),
+});
+
+registerCheck({
+  id: 'observe-run-coverage',
+  description: 'Observe sees the same assignment run directories as the independent Node layout scan',
+  check: (cwd) => checkObserveRunCoverage(cwd),
 });

@@ -1,10 +1,13 @@
 // What a Unit run has settled so far, read back from its directory under .fgos/assignments.
 //
-// Two readers need the same answer -- the Unit run itself (patterns look at earlier roles) and the
-// hand-off resolver (a later Unit names a role of this run) -- so it lives in its own module.
+// Execution, hand-offs and the derived discussion summary share these attempt rules.
 
 import fs from 'node:fs';
 import path from 'node:path';
+
+function compareRunNames(a, b) {
+  return Number(a) - Number(b) || a.localeCompare(b);
+}
 
 /**
  * Map a settled RunResult onto the outcome vocabulary the collaboration patterns use.
@@ -23,52 +26,67 @@ export function outcomeOfRunResult(runResult) {
 }
 
 /**
- * One record per settled role/round. A role/round has one assignment directory per attempt:
- * `<round>` for the first binding and `<round>-fb<n>` for each fallback after a provider limit;
- * the latest attempt is the one that counts.
- *
- * @param {string} unitDir `.fgos/assignments/<unitRunId>`
- * @returns {Array<{role: string, round: number, outcome: string, runResult: object}>}
+ * Read all settled attempts and select the final attempt of each role/round.
+ * Selection is shared by execution history and the derived discussion summary:
+ * highest settled fallback wins, then the latest settled run of that assignment.
+ * A corrupt selected result is ignored, not replaced with an older success.
  */
-export function readUnitRunHistory(unitDir) {
-  const records = [];
-  if (!fs.existsSync(unitDir)) return records;
+export function readUnitRunSeats(unitDir) {
+  const seats = [];
+  if (!fs.existsSync(unitDir)) return seats;
   try {
-    const entries = fs.readdirSync(unitDir, { withFileTypes: true });
-    for (const entry of entries) {
-      if (entry.isDirectory()) {
-        const role = entry.name;
-        const roleDir = path.join(unitDir, role);
-        const latestByRound = new Map();
-        for (const roundEntry of fs.readdirSync(roleDir, { withFileTypes: true })) {
-          if (!roundEntry.isDirectory()) continue;
-          const match = /^(\d+)(?:-fb(\d+))?$/.exec(roundEntry.name);
-          if (!match) continue;
-          const round = Number.parseInt(match[1], 10);
-          const fallbackNo = match[2] ? Number.parseInt(match[2], 10) : 0;
-          // A resumed binding runs again as a later attempt of the same assignment.
-          const runsDir = path.join(roleDir, roundEntry.name, 'runs');
-          const attempts = fs.existsSync(runsDir)
-            ? fs.readdirSync(runsDir).filter((name) => /^\d+$/.test(name)).sort()
-            : [];
-          const latestAttempt = attempts.reverse().find((name) => fs.existsSync(path.join(runsDir, name, 'result.json')));
-          if (!latestAttempt) continue;
-          const resultFile = path.join(runsDir, latestAttempt, 'result.json');
-          const known = latestByRound.get(round);
-          if (!known || fallbackNo > known.fallbackNo) latestByRound.set(round, { fallbackNo, resultFile });
-        }
-        for (const [round, { resultFile }] of latestByRound) {
+    for (const entry of fs.readdirSync(unitDir, { withFileTypes: true })) {
+      if (!entry.isDirectory()) continue;
+      const role = entry.name;
+      const roleDir = path.join(unitDir, role);
+      const byRound = new Map();
+      for (const roundEntry of fs.readdirSync(roleDir, { withFileTypes: true })) {
+        if (!roundEntry.isDirectory()) continue;
+        const match = /^(\d+)(?:-fb(\d+))?$/.exec(roundEntry.name);
+        if (!match) continue;
+        const round = Number.parseInt(match[1], 10);
+        const fallbackNo = match[2] ? Number.parseInt(match[2], 10) : 0;
+        const assignmentDir = path.join(roleDir, roundEntry.name);
+        const runsDir = path.join(assignmentDir, 'runs');
+        const runNames = fs.existsSync(runsDir)
+          ? fs.readdirSync(runsDir).filter((name) => /^\d+$/.test(name)).sort(compareRunNames)
+          : [];
+        const settled = runNames.filter((name) => fs.existsSync(path.join(runsDir, name, 'result.json')));
+        if (settled.length === 0) continue;
+        const seat = byRound.get(round) ?? { role, round, attempts: [], selected: null };
+        byRound.set(round, seat);
+        let assignment = null;
+        try { assignment = JSON.parse(fs.readFileSync(path.join(assignmentDir, 'assignment.json'), 'utf8')); } catch { /* optional metadata */ }
+        for (const runName of settled) {
+          const resultFile = path.join(runsDir, runName, 'result.json');
+          let attempt = null;
           try {
             const runResult = JSON.parse(fs.readFileSync(resultFile, 'utf8'));
-            records.push({ role, round, outcome: outcomeOfRunResult(runResult), runResult });
-          } catch {
-            // Ignore corrupted result
+            attempt = {
+              assignmentId: `${path.basename(unitDir)}/${role}/${roundEntry.name}`,
+              assignment, fallbackNo, runName, runResult,
+              outcome: outcomeOfRunResult(runResult),
+            };
+            seat.attempts.push(attempt);
+          } catch { /* Ignore corrupted result. */ }
+          if (runName === settled[settled.length - 1]
+            && (!seat.selected || fallbackNo > seat.selected.fallbackNo)) {
+            seat.selected = { fallbackNo, attempt };
           }
         }
       }
+      for (const seat of byRound.values()) {
+        seat.attempts.sort((a, b) => a.fallbackNo - b.fallbackNo || compareRunNames(a.runName, b.runName));
+        seats.push({ role, round: seat.round, attempts: seat.attempts, final: seat.selected?.attempt ?? null });
+      }
     }
-  } catch {
-    // Best effort history read
-  }
-  return records;
+  } catch { /* Best effort history read. */ }
+  return seats;
+}
+
+/** One final settled record per role/round, preserving the pattern history vocabulary. */
+export function readUnitRunHistory(unitDir) {
+  return readUnitRunSeats(unitDir).filter((seat) => seat.final).map(({ role, round, final }) => ({
+    role, round, outcome: final.outcome, runResult: final.runResult,
+  }));
 }

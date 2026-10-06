@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   runReviewed,
   resolveCheckers,
+  reviewedHistoryOutcome,
   DEFAULT_CHECKERS_BY_RIGOR,
 } from '../../../../src/runner/execution/patterns/reviewed.mjs';
 
@@ -294,4 +295,26 @@ test('runReviewed resumes from history across settled rounds and pending roles',
   assert.equal(res.outcome, 'pass');
   assert.equal(res.rounds, 2);
   assert.equal(res.results.length, 6); // 3 from round 1 + 3 from round 2
+});
+
+test('legacy history evaluator shares terminal outcomes with reviewed execution without launching work', async () => {
+  const unit = { id: 'legacy-review', capability: 'docs:write', objective: 'Review question' };
+  const recovered = [
+    { role: 'producer', round: 1, outcome: 'pass' },
+    { role: 'reviewer', round: 1, outcome: 'findings' },
+    { role: 'producer', round: 2, outcome: 'pass' },
+    { role: 'reviewer', round: 2, outcome: 'pass' },
+  ];
+  for (const terminal of ['pass', 'findings', 'execution-failure']) {
+    const history = recovered.map((record) => record.role === 'reviewer' && record.round === 2 ? { ...record, outcome: terminal } : record);
+    const actual = await runReviewed(unit, {}, {
+      history,
+      runRole: () => assert.fail('a fully settled history must never dispatch'),
+      verify: () => assert.fail('this fixture has no verify command'),
+    });
+    assert.equal(reviewedHistoryOutcome(unit, {}, history), actual.outcome);
+    assert.equal(actual.outcome, terminal);
+  }
+  assert.equal(reviewedHistoryOutcome(unit, {}, recovered.slice(0, 3)), null);
+  assert.equal(reviewedHistoryOutcome(unit, { capabilities: { 'docs:write': { verify: 'synthetic-check' } } }, recovered), null);
 });

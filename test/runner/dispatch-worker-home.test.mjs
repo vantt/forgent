@@ -5,6 +5,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { spawn } from 'node:child_process';
 import { createWorkerHome, removeWorkerHome, redactWorkerHome, WorkerHomeError } from '../../src/runner/dispatch/worker-home.mjs';
+import { normalizeAgentName } from '../../src/runner/dispatch/proof-helpers.mjs';
 
 // Phase 01 group C1. Nothing here touches the operator's real HOME: a synthetic
 // source home is built per test and every read comes from that.
@@ -239,4 +240,17 @@ test('redact refuses a directory this module did not create', () => {
     });
     assert.ok(fs.existsSync(path.join(stranger, '.claude', '.credentials.json')), 'it touched nothing');
   });
+});
+
+test('nested assignment run ids reach worker-home through the normalized herdr agent name', () => {
+  const src = synthSourceHome();
+  try {
+    withBase((base) => {
+      const runId = normalizeAgentName('fgos-run_unit-run-example/producer/1_01-launch-1');
+      assert.ok(!runId.includes('/'));
+      const { homePath } = createWorkerHome(base, { runId, sourceHome: src.dir, workspacePath: WORKSPACE, repoRoot: REPO_ROOT });
+      assert.equal(path.dirname(homePath), base);
+      assert.equal(fs.readFileSync(path.join(homePath, '.fgos-worker-home'), 'utf8'), `${runId}\n`);
+    });
+  } finally { src.cleanup(); }
 });

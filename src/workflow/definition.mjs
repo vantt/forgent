@@ -288,6 +288,17 @@ export function validateWorkflow(raw) {
           throw new WorkflowDefinitionError(`${unitLabel} params must be an object (pattern params such as members or roleTasks)`);
         }
 
+        let stanceOptions;
+        if (template.stanceOptions !== undefined) {
+          if (!Array.isArray(template.stanceOptions) || template.stanceOptions.some((option) => typeof option !== 'string' || !option.trim())) {
+            throw new WorkflowDefinitionError(`${unitLabel} stanceOptions must be an array of non-empty strings`);
+          }
+          stanceOptions = template.stanceOptions.map((option) => option.trim());
+          if (new Set(stanceOptions).size !== stanceOptions.length || stanceOptions.includes('other')) {
+            throw new WorkflowDefinitionError(`${unitLabel} stanceOptions must be unique; "other" is reserved`);
+          }
+        }
+
         if (template.anonymizeInputs !== undefined && typeof template.anonymizeInputs !== 'boolean') {
           throw new WorkflowDefinitionError(`${unitLabel} anonymizeInputs must be true or false`);
         }
@@ -316,6 +327,7 @@ export function validateWorkflow(raw) {
               taskSpec: typeof template.taskSpec === 'string' ? template.taskSpec.trim() : undefined,
               persona: typeof template.persona === 'string' && template.persona.trim() ? template.persona.trim() : undefined,
               params: template.params === undefined ? undefined : structuredClone(template.params),
+              ...(stanceOptions === undefined ? {} : { stanceOptions: Object.freeze(stanceOptions) }),
               anonymizeInputs: template.anonymizeInputs === true ? true : undefined,
               blind: template.blind === true ? true : undefined,
               inputs: inputs ? Object.freeze(inputs) : undefined,

@@ -53,13 +53,17 @@ export async function runPanel(unit, cfg, { runRole, verify, history, members = 
     const independentOf = allPanelistRoles.filter((r) => r !== role);
     return await runRole({
       role,
-      unit,
+      unit: roleUnit(unit, { role, kind: 'panelist', params }),
       readOnly: true,
       independentOf,
     });
   });
 
-  const memberResults = await Promise.all(memberPromises);
+  // Wait for every seat before propagating a throw, so the owner can summarize all settled attempts.
+  const settledMembers = await Promise.allSettled(memberPromises);
+  const thrown = settledMembers.find((result) => result.status === 'rejected');
+  if (thrown) throw thrown.reason;
+  const memberResults = settledMembers.map((result) => result.value);
 
   // If any member had execution failure / policy refusal / provider limit / blocked -> propagate
   const errorResult = memberResults.find((r) => ERROR_OUTCOMES.includes(r.outcome));

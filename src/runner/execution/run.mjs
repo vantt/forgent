@@ -6,7 +6,7 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import { execFileSync, execSync } from 'node:child_process';
 
-import { validateUnit } from './unit.mjs';
+import { validateUnit, normalizeWorkflowLink } from './unit.mjs';
 import { bind, nextCandidate } from './bind.mjs';
 import { createRoleExecutorLedger } from './role-ledger.mjs';
 import { runPattern } from './patterns/index.mjs';
@@ -15,6 +15,7 @@ import { ensureRunnerConfigForDir, RunnerConfigError } from '../dispatch/config.
 import { commitUnitWork } from './commit-unit-work.mjs';
 import { reportRefsOf, resolveUnitInputs, copyHandoffsInto, refIsHiddenFromBlind, plainInputName, isSeatInput } from './handoff-refs.mjs';
 import { outcomeOfRunResult, readUnitRunHistory } from './unit-run-history.mjs';
+import { writeUnitSummary } from './unit-summary.mjs';
 import { reapOrphanedConfinementResources, resolveConfinementTempRoot } from '../dispatch/confinement/cleanup.mjs';
 
 /** Write `file` atomically so a reader never sees half a record. */
@@ -131,6 +132,7 @@ export async function runUnit(options = {}) {
   const roots = resolveGitRoots(cwd);
   const mainRoot = options.repoRoot ? path.resolve(options.repoRoot) : roots.mainCheckoutRoot;
   const worktreePath = options.worktree ? path.resolve(options.worktree) : roots.worktreeRoot;
+  const workflowLink = normalizeWorkflowLink(options.workflow);
 
   let unit;
   let unitRunId;
@@ -197,7 +199,7 @@ export async function runUnit(options = {}) {
       throw new RunnerConfigError('runUnit requires --unit <file|-> or unitData');
     }
 
-    unit = validateUnit(raw);
+    unit = validateUnit(options.stanceOptions === undefined ? raw : { ...raw, stanceOptions: options.stanceOptions });
     // Resolved before the unit directory exists, so a ref that points nowhere leaves nothing behind.
     unitRunId = `unit-run-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
     const unitDir = path.join(assignmentsDir, unitRunId);
@@ -220,6 +222,8 @@ export async function runUnit(options = {}) {
     const configSnapshot = snapshotRunnerConfig(mainRoot);
     unitRecord = {
       unit,
+      workflow: workflowLink,
+      pattern: options.pattern ?? unit.pattern ?? 'solo',
       overrides: options.overrides || [],
       configSnapshot,
       resolvedInputs: resolved.refs,
@@ -234,6 +238,14 @@ export async function runUnit(options = {}) {
   }
 
   const unitDir = path.join(assignmentsDir, unitRunId);
+  const settle = (outcome) => {
+    unitRecord.settlement = { outcome, settledAt: new Date().toISOString() };
+    writeJsonAtomic(path.join(unitDir, 'unit.json'), unitRecord);
+    writeUnitSummary(unitDir);
+  };
+
+  let executionSettled = false;
+  try {
 
   const history = () => readUnitRunHistory(unitDir);
 
@@ -485,11 +497,15 @@ export async function runUnit(options = {}) {
   // name, so that object form wins over the unit's own pattern string.
   const callerPattern = options.pattern && typeof options.pattern === 'object' ? options.pattern : null;
   const patternName = callerPattern || unit.pattern || options.pattern || 'solo';
+  unitRecord.pattern = patternName;
+  persistUnitRecord();
   const patternResult = await runPattern(patternName, unit, unitRecord.configSnapshot.runner, {
     runRole,
     verify,
     history,
   });
+  executionSettled = true;
+  settle(patternResult.outcome);
 
   return {
     unitRunId,
@@ -498,6 +514,10 @@ export async function runUnit(options = {}) {
     results: patternResult.results,
     findings: patternResult.findings || [],
   };
+  } catch (error) {
+    if (!executionSettled) settle('execution-failure');
+    throw error;
+  }
 }
 
 /**
@@ -573,10 +593,14 @@ export function recordInlineRun(params = {}) {
     role,
     round,
     recordedAt: new Date().toISOString(),
+    binding: pending.binding ?? null,
     evidenceRefs,
     result,
   };
   fs.writeFileSync(path.join(attemptDir, 'result.json'), JSON.stringify(recordPayload, null, 2));
+  unitJson.settlement = { outcome: outcomeOfRunResult(recordPayload), settledAt: recordPayload.recordedAt };
+  writeJsonAtomic(path.join(unitDir, 'unit.json'), unitJson);
+  writeUnitSummary(unitDir);
 
   return {
     ok: true,

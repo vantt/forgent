@@ -63,10 +63,10 @@ export const COMMAND_REGISTRY = [
   {
     name: 'metrics',
     invoke: 'fgos metrics <subcommand>',
-    description: 'Observation metrics suite (cases, harness scorecard, runs, outcomes, entropy, snapshot). Native Rust host command.',
+    description: 'Observation metrics suite (cases, harness scorecard, runs, run coverage, discussions and passive agreement, eval records, outcomes, entropy, snapshot). Native Rust host command.',
     parameters: { type: 'object', properties: {}, required: [] },
-    examples: ['fgos metrics ping'],
-    touchesState: false,
+    examples: ['fgos metrics ping', 'fgos metrics coverage', 'fgos metrics discussions --by workflow', 'fgos metrics eval list'],
+    touchesState: true,
     requiresExistingStore: false,
     externalEffect: false,
     paginated: false,

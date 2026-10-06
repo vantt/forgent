@@ -25,7 +25,7 @@ function eventsFilePath(repoRoot, workflowRunId) {
  * @param {object} [params.configSnapshot]
  * @returns {{ workflowRunId: string, runDir: string }}
  */
-export function createWorkflowRun({ repoRoot, workflowRunId, workflowId, workflow, configSnapshot, request }) {
+export function createWorkflowRun({ repoRoot, workflowRunId, workflowId, workflow, configSnapshot, request, stanceOptions = [] }) {
   if (!repoRoot) throw new RunnerConfigError('createWorkflowRun requires repoRoot');
   if (!workflowId) throw new RunnerConfigError('createWorkflowRun requires workflowId');
 
@@ -43,6 +43,7 @@ export function createWorkflowRun({ repoRoot, workflowRunId, workflowId, workflo
       workflow,
       configSnapshot: configSnapshot || null,
       request: typeof request === 'string' && request.trim() ? request : null,
+      stanceOptions: [...stanceOptions],
     },
   };
 
@@ -133,6 +134,7 @@ export function projectWorkflowState(events) {
   let workflowRunId = null;
   let workflow = null;
   let request = null;
+  let stanceOptions = [];
   let status = 'running';
   let outcome = null;
   let worktrees = null;
@@ -148,6 +150,7 @@ export function projectWorkflowState(events) {
         workflowRunId = p.workflowRunId;
         workflow = p.workflow;
         request = p.request ?? null;
+        stanceOptions = p.stanceOptions ?? [];
         if (workflow?.steps) {
           for (const s of workflow.steps) {
             steps[s.id] = {
@@ -252,6 +255,7 @@ export function projectWorkflowState(events) {
     workflowId,
     workflow,
     request,
+    stanceOptions,
     status,
     outcome,
     worktrees,

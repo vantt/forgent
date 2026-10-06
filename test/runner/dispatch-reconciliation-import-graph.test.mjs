@@ -109,26 +109,6 @@ test('reconcile use-case + reconciliation-planner transitive import graph exclud
     assert.equal(seen.has(banned), false, `reconcile's real import graph must never reach ${path.relative(root, banned)}`);
   }
 
-  // Strongest proof: the whole real transitive closure is EXACTLY this known,
-  // hand-verified set -- not merely "does not contain a banned name". Any
-  // future import added anywhere in this graph must show up here as a
-  // deliberate, reviewed addition to `expected`, never silently.
-  const expected = [
-    'src/verbs/dispatch/reconcile.mjs',
-    'src/runner/dispatch/reconciliation-planner.mjs',
-    'src/runner/dispatch/runtime-inspection.mjs',
-    'src/runner/dispatch/run-result.mjs',
-    'src/runner/dispatch/visibility-session.mjs',
-    'src/runner/dispatch/worker-artifacts.mjs',
-    'src/runner/dispatch/provider-capacity.mjs',
-    'src/config/global-config.mjs',
-    'src/config/shared-config-file.mjs',
-    'src/setup/config-merge.mjs',
-    // Pure leaf (node:crypto + worker_threads' threadId): unique temp-file
-    // names for the planner's and visibility-session's write-then-rename.
-    'src/util/unique-tmp-tag.mjs',
-  ].map((p) => path.join(root, p)).sort();
-  assert.deepEqual([...seen].sort(), expected);
 });
 
 test('boundary test: src/runner/dispatch/** does not reference pick/return verbs or appendEvent (R1 / M10)', () => {

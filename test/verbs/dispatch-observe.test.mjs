@@ -4,7 +4,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { fileURLToPath } from 'node:url';
-import { showRunUseCase, findRunDir, readRunSnapshot, listOutbox } from '../../src/verbs/dispatch/show-run.mjs';
+import { showRunUseCase, readRunSnapshot, listOutbox } from '../../src/verbs/dispatch/show-run.mjs';
+import { findRunDir } from '../../src/runner/dispatch/assignment-layout.mjs';
 import { watchRunUseCase, tailLog } from '../../src/verbs/dispatch/watch.mjs';
 import { writeVisibility, markRunSettled } from '../../src/runner/dispatch/visibility-session.mjs';
 
@@ -156,7 +157,7 @@ test('an unknown run id says so rather than returning an empty reading', () => {
   try {
     assert.throws(() => showRunUseCase({ repoRoot: root }, { runId: 'run_nope' }), (e) => e.code === 'run-not-found');
     assert.throws(() => showRunUseCase({ repoRoot: root }, {}), (e) => e.code === 'invalid-run-id');
-    assert.equal(findRunDir(root, 'run_nope'), null);
+    assert.equal(findRunDir(path.join(root, '.fgos'), 'run_nope'), null);
   } finally { cleanup(root); }
 });
 

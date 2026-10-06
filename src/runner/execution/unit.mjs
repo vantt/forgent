@@ -18,6 +18,27 @@ const DISALLOWED_UNIT_FIELDS = Object.freeze([
 const UNIT_RUN_INPUT_PATTERN = /^unit-run:[^/\s]+\/[^/\s]+$/;
 const GATE_ANSWER_INPUT_PATTERN = /^gate-answer:[^/\s]+\/[^/\s]+$/;
 
+/** Question-local labels; never infer options from free text or a model's response. */
+export function normalizeStanceOptions(value = []) {
+  if (!Array.isArray(value) || value.some((option) => typeof option !== 'string' || !option.trim())) {
+    throw new RunnerConfigError('stanceOptions must be an array of non-empty strings.');
+  }
+  const options = value.map((option) => option.trim());
+  if (new Set(options).size !== options.length || options.includes('other')) {
+    throw new RunnerConfigError('stanceOptions must be unique; "other" is reserved.');
+  }
+  return Object.freeze(options);
+}
+
+export function normalizeWorkflowLink(value) {
+  if (value === undefined || value === null) return null;
+  if (typeof value !== 'object' || Array.isArray(value)
+    || ['runId', 'stepId', 'unitId'].some((key) => typeof value[key] !== 'string' || !value[key].trim())) {
+    throw new RunnerConfigError('workflow link requires non-empty runId, stepId, and unitId.');
+  }
+  return Object.freeze(Object.fromEntries(['runId', 'stepId', 'unitId'].map((key) => [key, value[key].trim()])));
+}
+
 /**
  * Validates whether a path is a safe repo-relative path.
  * - must be string
@@ -68,6 +89,7 @@ function isValidInput(inp) {
  * - blind?: optional boolean; every role of the unit runs with hostRead: blind (no peer run state
  *   is readable) or is refused, never run unblind
  * - expectedOutputs: array of strings
+ * - stanceOptions?: question-local option labels; "other" is reserved; omitted means unmeasured
  * - MUST NOT contain: executor, provider, model, tier, invocation, actors, prefer, overrides (G2)
  *
  * @param {unknown} raw
@@ -218,6 +240,7 @@ export function validateUnit(raw) {
     inputs: Object.freeze(inputs),
     ...(raw.anonymizeInputs === true ? { anonymizeInputs: true } : {}),
     ...(raw.blind === true ? { blind: true } : {}),
+    ...(raw.stanceOptions !== undefined ? { stanceOptions: normalizeStanceOptions(raw.stanceOptions) } : {}),
     expectedOutputs: Object.freeze(expectedOutputs),
   };
 

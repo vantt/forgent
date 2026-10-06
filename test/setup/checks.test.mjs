@@ -129,6 +129,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'observe-dir-writable',
       'observe-friction-migrated',
       'observe-host-resolvable',
+      'observe-run-coverage',
       'executor-confinement',
       'invocation-git-write-grants',
       'herdr-executor-kinds',

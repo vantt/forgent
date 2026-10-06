@@ -1,6 +1,9 @@
 //! CLI dispatch for `fgos metrics <sub>` (Lane A).
 
 pub mod case;
+pub mod coverage;
+pub mod discussions;
+pub mod eval;
 pub mod entropy;
 pub mod faults;
 pub mod harness;
@@ -12,13 +15,15 @@ use crate::contract::{ObservationSource, ObserveRequest, WorkObservationSource};
 use serde_json::json;
 
 pub const AVAILABLE_SUBCOMMANDS: &[&str] = &[
-    "ping", "case", "harness", "faults", "runs", "outcomes", "entropy", "snapshot",
+    "ping", "case", "harness", "faults", "runs", "coverage", "discussions", "eval",
+    "outcomes", "entropy", "snapshot",
 ];
 
 pub fn dispatch(
     req: &ObserveRequest,
     sources: &[Box<dyn ObservationSource>],
     work_source: Option<&dyn WorkObservationSource>,
+    coverage_scanner: coverage::CoverageScanner,
 ) -> Result<serde_json::Value, String> {
     match req.sub.as_str() {
         "ping" => {
@@ -35,6 +40,9 @@ pub fn dispatch(
         "harness" => harness::dispatch_harness(req, sources),
         "faults" => faults::dispatch_faults(req),
         "runs" => runs::dispatch_runs(req, sources),
+        "coverage" => coverage::dispatch_coverage(req, coverage_scanner),
+        "discussions" => discussions::dispatch_discussions(req, sources),
+        "eval" => eval::dispatch_eval(req),
         "outcomes" => outcomes::dispatch_outcomes(req, work_source),
         "entropy" => entropy::dispatch_entropy(req, work_source),
         "snapshot" => snapshot::dispatch_snapshot(req, work_source),

@@ -149,3 +149,34 @@ test('runPanel supports members, role, and synthesizeRole overrides in params', 
   assert.equal(res.outcome, 'pass');
   assert.equal(res.results.length, 3);
 });
+
+test('a thrown panelist waits for the other seat to settle before the unit can be summarized', async () => {
+  let release;
+  const barrier = new Promise((resolve) => { release = resolve; });
+  let otherSettled = false;
+  let finished = false;
+  const failure = new Error('seat dispatch failed');
+  const panel = runPanel({ id: 'throwing-panel', objective: 'Answer question' }, {}, {
+    members: 2,
+    runRole: async ({ role }) => {
+      if (role === 'panelist-1') throw failure;
+      if (role === 'panelist-2') {
+        await barrier;
+        otherSettled = true;
+        return { role, outcome: 'pass' };
+      }
+      assert.fail('synthesizer must not run after a seat throws');
+    },
+  });
+  const rejection = assert.rejects(panel, (error) => {
+    finished = true;
+    assert.equal(error, failure);
+    assert.equal(otherSettled, true);
+    return true;
+  });
+  await Promise.resolve();
+  await Promise.resolve();
+  assert.equal(finished, false);
+  release();
+  await rejection;
+});

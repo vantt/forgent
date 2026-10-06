@@ -14,6 +14,7 @@ import path from 'node:path';
 import { fgosDirFromRoot } from '../../runner/paths.mjs';
 import { readVisibility } from '../../runner/dispatch/visibility-session.mjs';
 import { interpretRunResult } from '../../runner/dispatch/run-result.mjs';
+import { findRunDir } from '../../runner/dispatch/assignment-layout.mjs';
 
 export class DispatchObserveError extends Error {
   constructor(code, message, details = {}) {
@@ -34,37 +35,6 @@ function readJsonOrNull(file) {
   }
 }
 
-function listDirs(dir) {
-  try {
-    return fs.readdirSync(dir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
-  } catch {
-    return [];
-  }
-}
-
-/**
- * Find the run directory holding `runId`.
- *
- * Runs live at `.fgos/assignments/<assignmentId>/runs/<NN>/`, and a run's id
- * is a field inside its own `run.json` rather than part of the path, so this
- * walks the two levels and reads. Bounded by how many assignments exist, and
- * a directory that cannot be read is skipped rather than fatal.
- */
-export function findRunDir(repoRoot, runId) {
-  const fgosDir = fgosDirFromRoot(repoRoot);
-
-  // Assignment's runs layout: assignments/<id>/runs/<attempt>
-  const base = path.join(fgosDir, 'assignments');
-  for (const group of listDirs(base)) {
-    const runsDir = path.join(base, group, 'runs');
-    for (const attempt of listDirs(runsDir)) {
-      const runDir = path.join(runsDir, attempt);
-      const meta = readJsonOrNull(path.join(runDir, 'run.json'));
-      if (meta && meta.runId === runId) return runDir;
-    }
-  }
-  return null;
-}
 
 /** What the worker has put in its outbox so far. Names, sizes and times only
  * -- the contents are the worker's account of its own work, and reading them
@@ -141,8 +111,8 @@ export function readRunSnapshot(runDir) {
   let result = null;
   if (fs.existsSync(resultFile)) {
     try {
-      const st = fs.statSync(resultFile);
-      if (st.isDirectory()) {
+      const st = fs.lstatSync(resultFile);
+      if (!st.isFile()) {
         resultCorrupt = true;
       } else {
         const interpreted = interpretRunResult(resultFile, { expectedRunId: run?.runId });
@@ -183,7 +153,7 @@ export function showRunUseCase(ctx, { runId } = {}) {
     throw new DispatchObserveError('invalid-run-id', 'dispatch show-run requires a runId');
   }
   const repoRoot = ctx?.repoRoot ?? ctx?.cwd ?? process.cwd();
-  const runDir = findRunDir(repoRoot, runId);
+  const runDir = findRunDir(fgosDirFromRoot(repoRoot), runId);
   if (!runDir) {
     throw new DispatchObserveError('run-not-found', `no run "${runId}" under ${repoRoot}`, { runId, repoRoot });
   }

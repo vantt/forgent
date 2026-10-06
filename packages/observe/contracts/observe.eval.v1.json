@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "observe.eval.v1",
+  "title": "Observe Rubric Evaluation Journal Contract v1",
+  "description": "Append-only evaluations in .fgos/observe/evals/<writerId>.jsonl. The writer owns v/type/ts; callers supply the remaining fields. Question, setup, rubric and judge are stable identifiers; harness is a free label. Scores are validated on write and read.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["v", "type", "ts", "evalId", "harness", "question", "setup", "scores", "rubric", "judge", "runRefs"],
+  "properties": {
+    "v": { "type": "integer", "const": 1 },
+    "type": { "type": "string", "const": "eval" },
+    "ts": { "type": "string", "pattern": "\\S", "description": "Writer-owned ISO 8601 capture time, using the Observe clock convention." },
+    "evalId": { "type": "string", "pattern": "\\S" },
+    "harness": { "type": "string", "pattern": "\\S" },
+    "question": { "type": "string", "pattern": "\\S", "description": "Identifier of the exact shared question." },
+    "setup": { "type": "string", "pattern": "\\S", "description": "Identifier of the recorded protocol, roles, personas, providers and models." },
+    "scores": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": { "pattern": "\\S" },
+      "additionalProperties": { "type": "integer", "minimum": 0, "maximum": 2 }
+    },
+    "rubric": { "type": "string", "pattern": "\\S", "description": "Versioned rubric identifier, e.g. discussion-quality.v1." },
+    "judge": { "type": "string", "pattern": "\\S", "description": "Judge run/setup identifier, not just a model family label." },
+    "runRefs": { "type": "array", "items": { "type": "string", "pattern": "\\S" }, "description": "Identifiers of the actual evaluated unit/attempt runs, not paths to guessed reports." }
+  }
+}

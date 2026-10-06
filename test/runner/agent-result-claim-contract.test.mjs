@@ -38,3 +38,11 @@ test('prompt and validator derive every required field and vocabulary from the s
   assert.ok(prompt.includes('assessment.verdict'), 'prompt missing assessment requirement');
   for (const verdict of ASSESSMENT_VERDICTS) assert.ok(prompt.includes(verdict), `prompt missing assessment verdict ${verdict}`);
 });
+
+test('optional stance and unknown fields never affect claim validity, even when malformed', () => {
+  for (const stance of [undefined, null, 'wrong', [], { choice: 'unlisted' }, { choice: 'a', confidence: 'wrong' }, { choice: 'a', confidence: 0.9 }]) {
+    const claim = { contract: AGENT_RESULT_CLAIM_CONTRACT, status: 'done', summary: 'Answered', stance, unknown: { future: true } };
+    assert.deepEqual(validateAgentResultClaimContract(claim, { role: 'panelist-1' }), { valid: true });
+    assert.deepEqual(validateAgentResultClaimContract({ ...claim, assessment: { verdict: 'pass' } }, { role: 'reviewer' }), { valid: true });
+  }
+});

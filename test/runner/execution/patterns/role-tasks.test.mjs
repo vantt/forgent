@@ -66,3 +66,14 @@ test('the default tasks are data: plain strings, frozen', () => {
   assert.ok(Object.isFrozen(DEFAULT_ROLE_TASKS));
   for (const text of Object.values(DEFAULT_ROLE_TASKS)) assert.equal(typeof text, 'string');
 });
+
+test('question options augment panelist tasks, including overrides, but never synthesize a stance instruction for other roles', () => {
+  const measured = { ...unit, stanceOptions: ['incremental', 'full'] };
+  const task = roleUnit(measured, { role: 'panelist-2', kind: 'panelist', params: { roleTasks: { panelist: 'Use a correctness lens. {objective}' } } });
+  assert.match(task.objective, /correctness lens/);
+  assert.match(task.objective, /incremental/);
+  assert.match(task.objective, /full/);
+  assert.match(task.objective, /agent-result.json/);
+  assert.match(task.objective, /never changes whether your work passes/);
+  assert.doesNotMatch(roleUnit(measured, { role: 'synthesizer' }).objective, /Passive stance measurement/);
+});

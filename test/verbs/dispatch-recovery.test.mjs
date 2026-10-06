@@ -370,6 +370,37 @@ test('applying resume-driver clears the assignment dispatch.claim after dead-dri
   } finally { cleanup(root); }
 });
 
+test('nested standalone driver recovery clears only its nested assignment claim', () => {
+  const { root } = makeRepo();
+  try {
+    const assignmentId = 'unit-run-example/producer/1';
+    const runDir = path.join(root, '.fgos', 'assignments', assignmentId, 'runs', '01');
+    fs.mkdirSync(runDir, { recursive: true });
+    fs.writeFileSync(path.join(runDir, 'run.json'), JSON.stringify({ runId: 'nested', assignmentId, status: 'running' }));
+    const claimPath = path.join(root, '.fgos', 'assignments', assignmentId, 'dispatch.claim');
+    fs.writeFileSync(claimPath, 'stale nested claim\n');
+    const rec = recoverObserveUseCase({ repoRoot: root }, { runId: 'nested', intent: 'resume' });
+    const result = recoverApplyUseCase({ repoRoot: root }, applyFrom(rec, { runId: 'nested' }));
+    assert.equal(result.dispatchClaimCleared, true);
+    assert.equal(fs.existsSync(claimPath), false);
+  } finally { cleanup(root); }
+});
+
+test('recovered driver cannot unlink a claim through a symlinked assignment ancestor', () => {
+  const { root, runDir } = makeRepo();
+  try {
+    const outside = path.join(root, 'outside');
+    fs.mkdirSync(outside);
+    const claimPath = path.join(outside, 'dispatch.claim');
+    fs.writeFileSync(claimPath, 'must survive\n');
+    fs.symlinkSync(outside, path.join(root, '.fgos', 'assignments', 'escape'));
+    fs.writeFileSync(path.join(runDir, 'run.json'), JSON.stringify({ runId: 'run_1', assignmentId: 'escape', status: 'running' }));
+    const rec = recoverObserveUseCase({ repoRoot: root }, { runId: 'run_1', intent: 'resume' });
+    assert.throws(() => recoverApplyUseCase({ repoRoot: root }, applyFrom(rec)), (err) => err.code === 'invalid-assignment-id');
+    assert.equal(fs.readFileSync(claimPath, 'utf8'), 'must survive\n');
+  } finally { cleanup(root); }
+});
+
 test('checkApply is pure and agrees with the use case: same inputs, same outcome', () => {
   const snapshot = { run: { runId: 'run_1', status: 'running', controlEpoch: 0 }, visibility: null, outbox: [], visibilityError: null };
   const evidence = collectEvidence(snapshot, { now: '2026-01-01T00:00:00.000Z' });

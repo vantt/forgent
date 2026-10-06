@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { validateUnit } from '../../../src/runner/execution/unit.mjs';
+import { validateUnit, normalizeWorkflowLink } from '../../../src/runner/execution/unit.mjs';
 import { RunnerConfigError } from '../../../src/runner/dispatch/config.mjs';
 
 test('validateUnit: accepts a minimal valid unit and returns frozen object', () => {
@@ -205,4 +205,21 @@ test('architecture guard: src/runner/execution/unit.mjs does NOT import src/stat
   assert.doesNotMatch(source, /from\s+['"][^'"]*\/runner\/coordination\//);
   assert.doesNotMatch(source, /from\s+['"][^'"]*\/runner\/worktree/);
   assert.doesNotMatch(source, /from\s+['"][^'"]*\/runner\/merge/);
+});
+
+test('stanceOptions are frozen question-local labels; omitted options keep the prior Unit shape', () => {
+  const raw = { id: 'question', objective: 'Choose a strategy', capability: 'docs:write' };
+  assert.equal(Object.hasOwn(validateUnit(raw), 'stanceOptions'), false);
+  const unit = validateUnit({ ...raw, stanceOptions: [' a ', 'b'] });
+  assert.deepEqual(unit.stanceOptions, ['a', 'b']);
+  assert.ok(Object.isFrozen(unit.stanceOptions));
+  for (const stanceOptions of [null, 'a|b', [''], ['a', 'a'], ['other'], [7]]) {
+    assert.throws(() => validateUnit({ ...raw, stanceOptions }), /stanceOptions/);
+  }
+});
+
+test('workflow link is owner-provided normalized metadata, never guessed from unit ids', () => {
+  assert.equal(normalizeWorkflowLink(undefined), null);
+  assert.deepEqual(normalizeWorkflowLink({ runId: ' wf ', stepId: ' s ', unitId: ' u ', ignored: true }), { runId: 'wf', stepId: 's', unitId: 'u' });
+  for (const value of ['wf', {}, { runId: 'wf', stepId: 's', unitId: '' }]) assert.throws(() => normalizeWorkflowLink(value), /workflow link/);
 });

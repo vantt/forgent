@@ -49,31 +49,21 @@ pub struct ObserveMetricsProvider {
     descriptor: ProviderDescriptor,
     sources: Arc<Vec<Box<dyn crate::ObservationSource>>>,
     work_source: Arc<Option<Box<dyn crate::WorkObservationSource>>>,
+    coverage_scanner: metrics_cli::coverage::CoverageScanner,
 }
 
 impl ObserveMetricsProvider {
-    pub fn new() -> Self {
-        Self {
-            descriptor: OBSERVE_METRICS_DESCRIPTOR,
-            sources: Arc::new(Vec::new()),
-            work_source: Arc::new(None),
-        }
-    }
     pub fn with_sources(
         sources: Vec<Box<dyn crate::ObservationSource>>,
         work_source: Option<Box<dyn crate::WorkObservationSource>>,
+        coverage_scanner: metrics_cli::coverage::CoverageScanner,
     ) -> Self {
         Self {
             descriptor: OBSERVE_METRICS_DESCRIPTOR,
             sources: Arc::new(sources),
             work_source: Arc::new(work_source),
+            coverage_scanner,
         }
-    }
-}
-
-impl Default for ObserveMetricsProvider {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
@@ -96,9 +86,11 @@ impl OperationProvider for ObserveMetricsProvider {
                 .downcast_ref::<ObserveRequest>()
                 .ok_or_else(|| ProviderError::SemanticValidation("input is not ObserveRequest".into()))?;
 
-            let work_src_ref: Option<&dyn crate::WorkObservationSource> = self.work_source.as_ref().as_ref().map(|b| b.as_ref());
-            let res_json = metrics_cli::dispatch(req, &self.sources, work_src_ref)
-                .map_err(ProviderError::ProviderFailed)?;
+            let work_src_ref: Option<&dyn crate::WorkObservationSource> =
+                self.work_source.as_ref().as_ref().map(|b| b.as_ref());
+            let res_json =
+                metrics_cli::dispatch(req, &self.sources, work_src_ref, self.coverage_scanner)
+                    .map_err(ProviderError::ProviderFailed)?;
             Ok(ProviderOutcome::completed(
                 self.descriptor().outcome_contract.clone(),
                 Box::new(JsonOutcome(res_json)),

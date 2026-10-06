@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `fgos metrics coverage` reports assignment-run coverage and skip reasons; `fgos doctor` compares it with an independent directory scan and identifies older hosts as degraded.
+- `fgos metrics discussions` reads writer-owned settled Unit summaries: seat/attempt/fallback accounting, workflow grouping, duration, and passive stance agreement. `workflow start --stance-options "a|b|c"` supplies answer options; missing or malformed stance never rejects worker output. `scripts/backfill-unit-summaries.mjs` adds historical summaries without rewriting original results.
+- `fgos metrics eval record|list` stores per-writer append-only evaluation records with 0–2 rubric scores and harness/question filters. Blind A/B evaluation instructions keep setup identities outside judge inputs.
+
 - A Workflow unit template can declare `inputs: [{ step, sameSeat?, label? }]` to choose which earlier steps' results it receives (without it, every step it builds on, as before). `sameSeat: true` hands each role of a panel the result its own seat left in that step, copied into its own directory as `own-previous.md`, and the brief names it as the role's own earlier result without naming other seats. `delphi` round 2 now gives each panelist the anonymized group summary and its own round 1 proposal instead of every round 1 proposal.
 - A blind unit passed the live canary on agy (gemini) through both its herdr and its confined cli invocation (nonce read from its own copy, the source report not readable, only its own run visible), so gemini is added to the proven blind pairs and the independent panel rounds of `architecture-advisory` (`shape-proposals`) and `business-discussion` (`explore-perspectives`) are now blind. Which agy account a confined invocation runs as is chosen per provider by the capacity layer, so the `tetcu72` and `tetnu` agy accounts are declared as `runner.providers.gemini.accounts` in the global config (one account per credential home) instead of as per-account invocations.
 - A Unit (and a Workflow unit template) can set `blind: true`: every role of the unit runs with `hostRead: blind`, so a worker cannot read a peer's run state (`.fgos/assignments`, `.fgos/workflow-runs`, `.fgos/dispatch-runs`), the herdr socket directory, or another dispatch's private home or process list, while the repo, tracked `.fgos` files, `node` and DNS stay as they are. A blind unit is refused with a named reason instead of running unblind when it cannot be enforced (in-process, no bwrap, unconfined, a stale or failing probe, a ref or cwd inside a hidden root). Off by default. `fgos doctor` has a `confinement-blind-read` row (`pass`, `fail`, `backend-unsupported`).
@@ -29,6 +33,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The `z-ai` model policy (glm) now uses `z-ai/glm-5.3` for every tier instead of `z-ai/glm-5.2`.
 
 ### Fixed
+
+- Run inspection, `dispatch show-run`, the running-run reconciler and Observe now discover nested execution-core assignments through the bounded run-layout rule; worker outboxes and symlinks cannot plant extra runs.
+- The test-file watchdog publishes timeout evidence before killing the hung process tree, so the suite cannot finish and remove the journal before the timeout is recorded. Its real subprocess regression now captures nested output and deterministically exercises that scheduling gap.
+- Unit history selects resumed attempts numerically, including attempt 100 after 99; legacy reviewed-unit summaries use the final complete reviewed round rather than letting earlier findings poison a later success.
 
 - A herdr pane whose agent sits idle on a dead credential (for example pi showing `OAuth refresh failed ... invalid_grant`) now ends as a provider limit after about 15 seconds instead of waiting out the whole idle timeout and being recorded as a timeout: the walk moves on to the next executor in the pool, and the account is quarantined as an auth fault until someone logs in again and clears it.
 - A quota quarantine lasts as long as the provider says (`Resets in 24m1s`, hours/minutes/seconds), not a flat hour.

@@ -117,6 +117,38 @@ function isRoundSettledInHistory(r, priorResults, checkerList, hasVerify) {
   return true;
 }
 
+/** Shared by live/history execution and the legacy summary projection. */
+function assessRound(results) {
+  const error = results.find((res) => ERROR_OUTCOMES.includes(res.outcome));
+  if (error) return { outcome: error.outcome, findings: [] };
+  const findings = results.flatMap((res) =>
+    res.outcome === 'findings' || (res.role === 'verify' && res.outcome !== 'pass')
+      ? extractFindings(res) : []);
+  return { outcome: findings.length > 0 ? 'findings' : 'pass', findings };
+}
+
+/**
+ * Read a terminal outcome without dispatching/verification. Incomplete history
+ * cannot establish completion and must remain unknown to the summary.
+ */
+export function reviewedHistoryOutcome(unit, cfg, priorResults, params = {}) {
+  const maxRounds = params?.maxRounds ?? cfg?.patterns?.reviewed?.maxRounds ?? 2;
+  const checkerList = resolveCheckers(unit, cfg, params);
+  const hasVerify = hasVerifyCommand(unit, cfg, params);
+  for (let round = 1; round <= maxRounds; round++) {
+    if (!isRoundSettledInHistory(round, priorResults, checkerList, hasVerify)) return null;
+    const producer = priorResults.find((res) => res.role === 'producer' && (res.round ?? 1) === round);
+    if (ERROR_OUTCOMES.includes(producer.outcome)) return producer.outcome;
+    const results = [producer, ...checkerList.map((role) =>
+      priorResults.find((res) => res.role === role && (res.round ?? 1) === round))];
+    if (hasVerify) results.push(priorResults.find((res) =>
+      (res.role === 'verify' || res.role === 'verifier') && (res.round ?? 1) === round));
+    const assessment = assessRound(results.filter(Boolean));
+    if (assessment.outcome !== 'findings' || round === maxRounds) return assessment.outcome;
+  }
+  return null;
+}
+
 /**
  * Run reviewed pattern for a unit.
  *
@@ -169,10 +201,10 @@ export async function runReviewed(unit, cfg, { runRole, verify, history } = {}, 
       }
 
       // Check for errors in history
-      const errorInHist = roundHistoryResults.find((res) => ERROR_OUTCOMES.includes(res.outcome));
-      if (errorInHist) {
+      const assessment = assessRound(roundHistoryResults);
+      if (ERROR_OUTCOMES.includes(assessment.outcome)) {
         return {
-          outcome: errorInHist.outcome,
+          outcome: assessment.outcome,
           rounds: r,
           results: allResults,
           findings: allFindings,
@@ -180,12 +212,7 @@ export async function runReviewed(unit, cfg, { runRole, verify, history } = {}, 
       }
 
       // Check for findings in history
-      const roundFindings = [];
-      for (const res of roundHistoryResults) {
-        if (res.outcome === 'findings' || (res.role === 'verify' && res.outcome !== 'pass')) {
-          roundFindings.push(...extractFindings(res));
-        }
-      }
+      const roundFindings = assessment.findings;
 
       if (roundFindings.length > 0) {
         allFindings.push(...roundFindings);
@@ -315,10 +342,10 @@ export async function runReviewed(unit, cfg, { runRole, verify, history } = {}, 
 
     // Step C: Evaluate results
     // Check for execution failure / policy refusal / provider limit / blocked
-    const errorResult = currentRoundResults.find((res) => ERROR_OUTCOMES.includes(res.outcome));
-    if (errorResult) {
+    const assessment = assessRound(currentRoundResults);
+    if (ERROR_OUTCOMES.includes(assessment.outcome)) {
       return {
-        outcome: errorResult.outcome,
+        outcome: assessment.outcome,
         rounds: r,
         results: allResults,
         findings: allFindings,
@@ -326,12 +353,7 @@ export async function runReviewed(unit, cfg, { runRole, verify, history } = {}, 
     }
 
     // Check for findings or verify failure
-    const roundFindings = [];
-    for (const res of currentRoundResults) {
-      if (res.outcome === 'findings' || (res.role === 'verify' && res.outcome !== 'pass')) {
-        roundFindings.push(...extractFindings(res));
-      }
-    }
+    const roundFindings = assessment.findings;
 
     if (roundFindings.length > 0) {
       allFindings.push(...roundFindings);

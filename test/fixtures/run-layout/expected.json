@@ -1,0 +1,21 @@
+{
+  "layoutRule": "v2",
+  "maxDepth": 16,
+  "timestamp": "2026-10-05T10:00:00Z",
+  "entries": [
+    { "assignmentId": "legacy", "attempt": "01", "runId": "flat", "role": "producer" },
+    { "assignmentId": "unit-run-example/panelist-1/1", "attempt": "01", "runId": "nested", "role": "panelist-1" },
+    { "assignmentId": "unit-run-example/panelist-1/1-fb1", "attempt": "01", "runId": "fallback", "role": "panelist-1" },
+    { "assignmentId": "without-assignment", "attempt": "02", "runId": "no-assignment", "assignmentJson": false },
+    { "assignmentId": "inline", "attempt": "01", "unitRunId": "unit-inline", "skip": "inline-record" },
+    { "assignmentId": "broken", "attempt": "01", "skip": "unparseable" },
+    { "assignmentId": "no-id", "attempt": "01", "skip": "no-run-id" },
+    { "assignmentId": "no-time", "attempt": "01", "runId": "no-time", "skip": "no-timestamp" },
+    { "assignmentId": "zz-duplicate", "attempt": "01", "runId": "flat", "skip": "duplicate-run-id" }
+  ],
+  "symlink": { "path": "symlinked/runs/01", "target": "legacy/runs/01", "skip": "symlink" },
+  "planted": { "path": "legacy/runs/01/outbox/forged/runs/01", "runId": "planted" },
+  "observedRunIds": ["fallback", "flat", "nested", "no-assignment"],
+  "runDirsSeen": 10,
+  "skipped": { "inline-record": 1, "unparseable": 1, "no-run-id": 1, "no-timestamp": 1, "duplicate-run-id": 1, "symlink": 1 }
+}

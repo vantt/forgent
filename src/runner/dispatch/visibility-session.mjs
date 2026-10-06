@@ -26,6 +26,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { findWorkerClaim } from './worker-artifacts.mjs';
 import { uniqueTmpTag } from '../../util/unique-tmp-tag.mjs';
+import { listAssignmentRuns } from './assignment-layout.mjs';
 
 export class VisibilityError extends Error {
   constructor(code, message, details = {}) {
@@ -230,39 +231,35 @@ export function classifyRunOutcome(runDir, { liveness = 'unknown' } = {}) {
   return { outcome, resultPath, runMeta, changed: runMeta.status !== outcome };
 }
 
-/** Every run under `fgosDir` still claiming to be running (assignments/<id>/runs/<NN>). */
+/** Running assignment runs and legacy dispatch-runs with no fresh driver heartbeat. */
 export function findRunningRuns(fgosDir, { driverFreshMs = DRIVER_FRESH_MS, now = Date.now } = {}) {
-  const roots = [path.join(fgosDir, 'assignments'), path.join(fgosDir, 'dispatch-runs')];
+  const candidates = [...listAssignmentRuns(fgosDir)].map(({ runDir, assignmentId }) => ({ runDir, assignmentId }));
   const found = [];
   const at = now();
   const listDirs = (d) => {
     try {
+      if (!fs.lstatSync(d).isDirectory()) return [];
       return fs.readdirSync(d, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
     } catch {
       return [];
     }
   };
-  for (const root of roots) {
-    for (const first of listDirs(root)) {
-      // assignments/<id>/runs/<NN>
-      const mid = path.join(root, first, 'runs');
-      const bases = fs.existsSync(mid) ? [mid] : [path.join(root, first)];
-      for (const base of bases) {
-        for (const leaf of listDirs(base)) {
-          const dir = path.join(base, leaf);
-          const meta = readJson(path.join(dir, RUN_FILE));
-          if (!meta || meta.status !== 'running') continue;
-          // A run whose driver checked in moments ago is not orphaned, it is
-          // busy. Reading it as orphaned and writing `unknown` over it would
-          // stop every watcher on a run that is still being driven -- and a
-          // long round can go half an hour with nothing else to say.
-          const seen = readJson(path.join(dir, VISIBILITY_FILE))?.lastSeenAt;
-          const seenAt = seen ? Date.parse(seen) : NaN;
-          if (Number.isFinite(seenAt) && at - seenAt < driverFreshMs) continue;
-          found.push({ runDir: dir, runId: meta.runId ?? null, startedAt: meta.startedAt ?? null, lastSeenAt: seen ?? null });
-        }
-      }
+  // The retired dispatch-runs writer used <workId>/<timestamp>, not runs/.
+  // Keep this legacy repository readable without applying that shape to assignments.
+  const legacyRoot = path.join(fgosDir, 'dispatch-runs');
+  for (const workId of listDirs(legacyRoot)) {
+    for (const stamp of listDirs(path.join(legacyRoot, workId))) {
+      candidates.push({ runDir: path.join(legacyRoot, workId, stamp) });
     }
+  }
+  for (const { runDir: dir, assignmentId } of candidates) {
+    const meta = readJson(path.join(dir, RUN_FILE));
+    if (!meta || meta.status !== 'running') continue;
+    // Driver evidence has the same freshness policy at every assignment depth.
+    const seen = readJson(path.join(dir, VISIBILITY_FILE))?.lastSeenAt;
+    const seenAt = seen ? Date.parse(seen) : NaN;
+    if (Number.isFinite(seenAt) && at - seenAt < driverFreshMs) continue;
+    found.push({ runDir: dir, runId: meta.runId ?? null, startedAt: meta.startedAt ?? null, lastSeenAt: seen ?? null, ...(assignmentId ? { assignmentId } : {}) });
   }
   return found;
 }

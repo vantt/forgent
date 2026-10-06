@@ -2178,6 +2178,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           workflowId,
           planPath,
           request: typeof flags.request === 'string' ? flags.request : undefined,
+          stanceOptions: flags['stance-options'] === undefined ? undefined : requireField(flags['stance-options'], '--stance-options requires pipe-separated option labels').split('|'),
           repoRoot: flags.dir,
           worktree: flags.worktree,
         };
@@ -2679,6 +2680,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       return attachDirWarning(await runUnit({
         unitPath,
         pattern,
+        stanceOptions: flags['stance-options'] === undefined ? undefined : requireField(flags['stance-options'], '--stance-options requires pipe-separated option labels').split('|'),
         overrides,
         resumeUnitRunId,
         repoRoot,

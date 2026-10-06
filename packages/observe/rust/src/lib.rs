@@ -4,6 +4,7 @@
 //! store locking, and native CLI dispatch for `fgos metrics` and `fgos friction`.
 
 pub mod case_journal;
+pub mod eval_journal;
 pub mod contract;
 pub mod friction;
 pub mod friction_cli;
@@ -13,6 +14,7 @@ pub mod provider;
 pub mod shard;
 pub mod sources;
 pub mod store_lock;
+pub mod time;
 
 pub use contract::*;
 pub use provider::{

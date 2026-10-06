@@ -1,12 +1,16 @@
 //! Run Result Evaluator observation source (Lane A2 - Phase F2).
 
+pub mod unit_summary;
+pub use unit_summary::UnitSummarySource;
+
 use fgos_observe::{Observation, ObservationSource, SourceError, Subject, SubjectKind, Window};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashSet};
 use std::fs::File;
 use std::io::BufReader;
 use std::path::Path;
+use std::time::{Duration, SystemTime};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Outcome {
@@ -333,175 +337,300 @@ impl ObservationSource for RunResultSource {
     }
 
     fn observations(&self, root: &Path, w: &Window) -> Result<Vec<Observation>, SourceError> {
-        let assignments_dir = root.join(".fgos").join("assignments");
-        if !assignments_dir.exists() {
-            return Ok(Vec::new());
-        }
+        let mut runs = scan_runs(root)?.runs;
+        runs.retain(|o| {
+            w.since
+                .as_ref()
+                .map_or(true, |since| o.ts.as_str() >= since.as_str())
+                && w.until
+                    .as_ref()
+                    .map_or(true, |until| o.ts.as_str() <= until.as_str())
+        });
+        Ok(runs)
+    }
+}
 
-        let mut observations = Vec::new();
-        // Cache per assignment: (role, adapter, created_at)
-        let mut assignment_cache: HashMap<String, (Value, Value, Option<String>)> = HashMap::new();
+/// Assignment-relative depth; run attempts under `runs/` do not add depth.
+pub const MAX_ASSIGNMENT_DEPTH: usize = 16;
 
-        let entries = match std::fs::read_dir(&assignments_dir) {
-            Ok(e) => e,
-            Err(err) => return Err(SourceError::Io("run-result", err)),
+#[derive(Debug, Default)]
+pub struct RunScan {
+    pub runs: Vec<Observation>,
+    pub skipped: BTreeMap<&'static str, usize>,
+    pub run_dirs_seen: usize,
+    pub recent_runs: usize,
+}
+
+impl RunScan {
+    fn skip(&mut self, reason: &'static str) {
+        *self.skipped.entry(reason).or_default() += 1;
+    }
+
+    fn barrier(&mut self, reason: &'static str) {
+        self.run_dirs_seen += 1;
+        self.skip(reason);
+    }
+}
+
+/// Scan the owner's settled run records once. Never descend into a `runs/`
+/// directory's attempts, which keeps worker output outside this read contract.
+pub fn scan_runs(root: &Path) -> Result<RunScan, SourceError> {
+    let assignments = root.join(".fgos/assignments");
+    let mut scan = RunScan::default();
+    let metadata = match std::fs::symlink_metadata(&assignments) {
+        Ok(metadata) => metadata,
+        Err(err) if err.kind() == std::io::ErrorKind::NotFound => return Ok(scan),
+        Err(err) => return Err(SourceError::Io("run-result", err)),
+    };
+    if metadata.file_type().is_symlink() {
+        scan.barrier("symlink");
+        return Ok(scan);
+    }
+    let mut seen_ids = HashSet::new();
+    walk_assignments(
+        &assignments,
+        &assignments,
+        0,
+        SystemTime::now(),
+        &mut seen_ids,
+        &mut scan,
+    )?;
+    scan.runs.sort_by(|a, b| {
+        a.ts.cmp(&b.ts)
+            .then_with(|| a.subject.id.cmp(&b.subject.id))
+    });
+    Ok(scan)
+}
+
+/// Composition-root callback for Observe. No transcripts or other sources.
+pub fn scan_coverage(root: &Path) -> Result<Value, String> {
+    let scan = scan_runs(root).map_err(|err| err.to_string())?;
+    Ok(serde_json::json!({
+        "layoutRule": "v2",
+        "runDirsSeen": scan.run_dirs_seen,
+        "observed": scan.runs.len(),
+        "skipped": scan.skipped,
+        "recentRuns": scan.recent_runs,
+    }))
+}
+
+fn sorted_entries(dir: &Path) -> Result<Vec<std::fs::DirEntry>, SourceError> {
+    let mut entries = std::fs::read_dir(dir)
+        .map_err(|err| SourceError::Io("run-result", err))?
+        .filter_map(Result::ok)
+        .collect::<Vec<_>>();
+    entries.sort_by_cached_key(|entry| entry.file_name());
+    Ok(entries)
+}
+
+fn walk_assignments(
+    assignments: &Path,
+    dir: &Path,
+    depth: usize,
+    now: SystemTime,
+    seen_ids: &mut HashSet<String>,
+    scan: &mut RunScan,
+) -> Result<(), SourceError> {
+    let entries = match sorted_entries(dir) {
+        Ok(entries) => entries,
+        Err(err) if depth == 0 => return Err(err),
+        Err(_) => return Ok(()), // Unreadable/disappearing child; continue its siblings.
+    };
+    for entry in entries {
+        let file_type = match entry.file_type() {
+            Ok(file_type) => file_type,
+            Err(_) => continue,
         };
-
-        for entry in entries {
-            let entry = match entry {
-                Ok(e) => e,
-                Err(_) => continue,
-            };
-            let asgn_path = entry.path();
-            if !asgn_path.is_dir() {
-                continue;
-            }
-
-            let asgn_id = entry.file_name().to_string_lossy().to_string();
-            let runs_dir = asgn_path.join("runs");
-            if !runs_dir.is_dir() {
-                continue;
-            }
-
-            let run_entries = match std::fs::read_dir(&runs_dir) {
-                Ok(e) => e,
-                Err(_) => continue,
-            };
-
-            for run_entry in run_entries {
-                let run_entry = match run_entry {
-                    Ok(re) => re,
-                    Err(_) => continue,
-                };
-                let run_path = run_entry.path();
-                if !run_path.is_dir() {
-                    continue;
-                }
-
-                let result_file = run_path.join("result.json");
-                if !result_file.is_file() {
-                    continue;
-                }
-
-                let file = match File::open(&result_file) {
-                    Ok(f) => f,
-                    Err(_) => continue,
-                };
-                let reader = BufReader::new(file);
-                let json_val: Value = match serde_json::from_reader(reader) {
-                    Ok(v) => v,
-                    Err(_) => continue, // record hỏng thì bỏ qua
-                };
-
-                let run_id = match json_val.get("runId").and_then(|v| v.as_str()) {
-                    Some(id) => id.to_string(),
-                    None => continue,
-                };
-
-                // Read role, adapter, createdAt from assignment.json (cached per assignment)
-                let (role, adapter, asgn_created_at) = assignment_cache
-                    .entry(asgn_id.clone())
-                    .or_insert_with(|| {
-                        let asgn_json_path = asgn_path.join("assignment.json");
-                        if asgn_json_path.is_file() {
-                            if let Ok(af) = File::open(&asgn_json_path) {
-                                if let Ok(av) = serde_json::from_reader::<_, Value>(BufReader::new(af)) {
-                                    let r = av.get("role").cloned().unwrap_or(Value::Null);
-                                    let a = av.get("adapter").cloned().unwrap_or(Value::Null);
-                                    let ca = av.get("createdAt").and_then(|v| v.as_str()).map(|s| s.to_string());
-                                    return (r, a, ca);
-                                }
-                            }
-                        }
-                        (Value::Null, Value::Null, None)
-                    })
-                    .clone();
-
-                let settled_at = match json_val.get("settledAt").and_then(|v| v.as_str()) {
-                    Some(s) => s.to_string(),
-                    None => match json_val.get("timestamp").and_then(|v| v.as_str()) {
-                        Some(s) => s.to_string(),
-                        None => match asgn_created_at {
-                            Some(ca) => ca,
-                            None => continue,
-                        },
-                    },
-                };
-
-                if let Some(since) = &w.since {
-                    if settled_at.as_str() < since.as_str() {
-                        continue;
-                    }
-                }
-                if let Some(until) = &w.until {
-                    if settled_at.as_str() > until.as_str() {
-                        continue;
-                    }
-                }
-
-                let mut attrs = serde_json::Map::new();
-                if let Some(executor) = json_val.get("executorId") {
-                    attrs.insert("executor".to_string(), executor.clone());
-                } else if let Some(executor) = json_val.get("executor") {
-                    attrs.insert("executor".to_string(), executor.clone());
-                } else {
-                    attrs.insert("executor".to_string(), Value::Null);
-                }
-
-                if let Some(status) = json_val.get("status") {
-                    attrs.insert("status".to_string(), status.clone());
-                } else {
-                    attrs.insert("status".to_string(), Value::Null);
-                }
-
-                if let Some(classification) = json_val.get("classification") {
-                    attrs.insert("classification".to_string(), classification.clone());
-                }
-
-                let outcome = derive_legacy_outcome(&json_val);
-                attrs.insert(
-                    "outcome".to_string(),
-                    serde_json::to_value(&outcome).unwrap_or(Value::Null),
-                );
-                attrs.insert("category".to_string(), Value::String(outcome.category.clone()));
-
-                let adapter_val = json_val.get("adapter").cloned().unwrap_or(adapter);
-                attrs.insert("adapter".to_string(), adapter_val);
-
-                let role_val = json_val.get("role").cloned().unwrap_or(role);
-                attrs.insert("role".to_string(), role_val);
-
-                let confinement_val = json_val.get("confinement").cloned().unwrap_or(Value::Null);
-                attrs.insert("confinement".to_string(), confinement_val);
-
-                let duration_ms_val = json_val.get("durationMs").cloned().unwrap_or(Value::Null);
-                attrs.insert("durationMs".to_string(), duration_ms_val);
-
-                let usage_val = json_val.get("usage").cloned().unwrap_or(Value::Null);
-                attrs.insert("usage".to_string(), usage_val);
-
-                attrs.insert(
-                    "assignmentId".to_string(),
-                    json_val
-                        .get("assignmentId")
-                        .cloned()
-                        .unwrap_or_else(|| Value::String(asgn_id.clone())),
-                );
-                observations.push(Observation {
-                    ts: settled_at,
-                    subject: Subject {
-                        kind: SubjectKind::Run,
-                        id: run_id,
-                    },
-                    kind: "run.settled".to_string(),
-                    attrs,
-                    source: "run-result",
-                });
+        if file_type.is_symlink() {
+            scan.barrier("symlink");
+        } else if file_type.is_dir() {
+            let path = entry.path();
+            if entry.file_name() == "runs" {
+                scan_assignment_runs(assignments, dir, &path, now, seen_ids, scan)?;
+            } else if depth >= MAX_ASSIGNMENT_DEPTH {
+                scan.barrier("depth");
+            } else {
+                walk_assignments(assignments, &path, depth + 1, now, seen_ids, scan)?;
             }
         }
+    }
+    Ok(())
+}
 
-        observations.sort_by(|a, b| a.ts.cmp(&b.ts));
-        Ok(observations)
+fn read_assignment(dir: &Path) -> Value {
+    let path = dir.join("assignment.json");
+    // Optional metadata is never a reason to lose an otherwise valid run.
+    match std::fs::symlink_metadata(&path) {
+        Ok(metadata) if metadata.file_type().is_file() => File::open(path)
+            .ok()
+            .and_then(|file| serde_json::from_reader(BufReader::new(file)).ok())
+            .unwrap_or(Value::Null),
+        _ => Value::Null,
+    }
+}
+
+fn nonempty_string(value: Option<&Value>) -> Option<&str> {
+    value
+        .and_then(Value::as_str)
+        .filter(|s| !s.trim().is_empty())
+}
+
+fn scan_assignment_runs(
+    assignments: &Path,
+    assignment_dir: &Path,
+    runs_dir: &Path,
+    now: SystemTime,
+    seen_ids: &mut HashSet<String>,
+    scan: &mut RunScan,
+) -> Result<(), SourceError> {
+    let assignment_id = assignment_dir
+        .strip_prefix(assignments)
+        .expect("assignment inside scanner root")
+        .to_string_lossy();
+    let assignment = read_assignment(assignment_dir);
+    let entries = match sorted_entries(runs_dir) {
+        Ok(entries) => entries,
+        Err(_) => return Ok(()),
+    };
+    for entry in entries {
+        let file_type = match entry.file_type() {
+            Ok(file_type) => file_type,
+            Err(_) => continue,
+        };
+        if file_type.is_symlink() {
+            scan.barrier("symlink");
+            continue;
+        }
+        if !file_type.is_dir() {
+            continue;
+        }
+        scan.run_dirs_seen += 1;
+        let result_path = entry.path().join("result.json");
+        let metadata = match std::fs::symlink_metadata(&result_path) {
+            Ok(metadata) => metadata,
+            Err(_) => {
+                scan.skip("unparseable");
+                continue;
+            }
+        };
+        if metadata.file_type().is_symlink() {
+            scan.skip("symlink");
+            continue;
+        }
+        if !metadata.file_type().is_file() {
+            scan.skip("unparseable");
+            continue;
+        }
+        if metadata.modified().ok().is_some_and(|mtime| {
+            now.duration_since(mtime).unwrap_or_default() <= Duration::from_secs(60)
+        }) {
+            scan.recent_runs += 1;
+        }
+        let record: Value = match File::open(&result_path)
+            .ok()
+            .and_then(|file| serde_json::from_reader(BufReader::new(file)).ok())
+        {
+            Some(record) => record,
+            None => {
+                scan.skip("unparseable");
+                continue;
+            }
+        };
+        let run_id = match nonempty_string(record.get("runId")) {
+            Some(id) => id,
+            None => {
+                scan.skip(if nonempty_string(record.get("unitRunId")).is_some() {
+                    "inline-record"
+                } else {
+                    "no-run-id"
+                });
+                continue;
+            }
+        };
+        let timestamp = match nonempty_string(record.get("settledAt"))
+            .or_else(|| nonempty_string(record.get("timestamp")))
+        {
+            Some(timestamp) => timestamp,
+            None => {
+                scan.skip("no-timestamp");
+                continue;
+            }
+        };
+        // Lexical directory order picks the first valid occurrence, independently
+        // of a consumer's window and of filesystem enumeration order.
+        if seen_ids.contains(run_id) {
+            scan.skip("duplicate-run-id");
+            continue;
+        }
+        seen_ids.insert(run_id.to_string());
+        scan.runs.push(run_observation(
+            &record,
+            &assignment,
+            &assignment_id,
+            run_id,
+            timestamp,
+        ));
+    }
+    Ok(())
+}
+
+fn run_observation(
+    record: &Value,
+    assignment: &Value,
+    assignment_id: &str,
+    run_id: &str,
+    timestamp: &str,
+) -> Observation {
+    let mut attrs = serde_json::Map::new();
+    attrs.insert(
+        "executor".to_string(),
+        record
+            .get("executorId")
+            .or_else(|| record.get("executor"))
+            .cloned()
+            .unwrap_or(Value::Null),
+    );
+    for key in ["status", "confinement", "durationMs", "usage"] {
+        attrs.insert(
+            key.to_string(),
+            record.get(key).cloned().unwrap_or(Value::Null),
+        );
+    }
+    if let Some(classification) = record.get("classification") {
+        attrs.insert("classification".to_string(), classification.clone());
+    }
+    let outcome = derive_legacy_outcome(record);
+    attrs.insert(
+        "category".to_string(),
+        Value::String(outcome.category.clone()),
+    );
+    attrs.insert(
+        "outcome".to_string(),
+        serde_json::to_value(outcome).unwrap_or(Value::Null),
+    );
+    for key in ["adapter", "role"] {
+        attrs.insert(
+            key.to_string(),
+            record
+                .get(key)
+                .or_else(|| assignment.get(key))
+                .cloned()
+                .unwrap_or(Value::Null),
+        );
+    }
+    attrs.insert(
+        "assignmentId".to_string(),
+        Value::String(assignment_id.to_string()),
+    );
+    Observation {
+        ts: timestamp.to_string(),
+        subject: Subject {
+            kind: SubjectKind::Run,
+            id: run_id.to_string(),
+        },
+        kind: "run.settled".to_string(),
+        attrs,
+        source: "run-result",
     }
 }
 

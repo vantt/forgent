@@ -2,24 +2,28 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "run-result.read.v1",
   "title": "Run Result Read Contract for Observe Source v1",
-  "description": "Defines the subset of fields read by Observe's RunResultSource from .fgos/assignments/<asgnId>/runs/<runId>/result.json and assignment.json.",
+  "description": "Layout rule v2: walk .fgos/assignments lexically to depth 16. A runs directory marks its parent as an assignment; its relative assignment id may contain /. Read only direct runs/<attempt>/result.json children, never descend into attempts or follow symlinks. assignment.json is optional, with absent/unreadable/symlink metadata yielding null role and adapter. Inline unit records with unitRunId but no runId are skipped as inline-record. Coverage counts unparseable, no-run-id, no-timestamp, symlink, duplicate-run-id and depth skips; traversal barriers count one skipped candidate, preserving observed + skipped = runDirsSeen.",
   "type": "object",
   "properties": {
     "result": {
       "type": "object",
-      "description": "Fields read from result.json.",
+      "description": "Fields read from result.json. Observed records require a nonempty runId and a nonempty settledAt or timestamp string. Lexical traversal retains the first valid record for a duplicate runId. Missing/unparseable result files are skipped, including unsettled attempts.",
       "required": ["runId"],
+      "anyOf": [{ "required": ["settledAt"] }, { "required": ["timestamp"] }],
       "properties": {
         "runId": {
           "type": "string",
+          "minLength": 1,
           "description": "Identifier of the run, used as subject id."
         },
         "settledAt": {
           "type": "string",
+          "minLength": 1,
           "description": "Timestamp of settlement, primary timestamp for the observation."
         },
         "timestamp": {
           "type": "string",
+          "minLength": 1,
           "description": "Fallback timestamp if settledAt is missing."
         },
         "executorId": {
@@ -40,25 +44,21 @@
         },
         "assignmentId": {
           "type": "string",
-          "description": "Assignment identifier (fallback to directory name if absent)."
+          "description": "Historical record field; the observation assignmentId is the assignment directory's relative path beneath assignments and may contain /."
         }
       }
     },
     "assignment": {
       "type": "object",
-      "description": "Fields read from assignment.json (cached per assignment).",
+      "description": "Optional assignment.json metadata read once per assignment; never follows a symlink. It is not required to observe a run.",
       "properties": {
         "role": {
-          "type": "string",
+          "type": ["string", "null"],
           "description": "Dispatched agent role attribute."
         },
         "adapter": {
-          "type": "string",
+          "type": ["string", "null"],
           "description": "Dispatched provider adapter attribute."
-        },
-        "createdAt": {
-          "type": "string",
-          "description": "Assignment creation timestamp, used as ultimate fallback for observation timestamp."
         }
       }
     }
