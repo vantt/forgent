@@ -131,6 +131,8 @@ Thêm trạng thái **`proposed`** vào FSM, với các cạnh:
 - `blocked` giữ nguyên hai chiều với `todo`/`doing` (muốn "park" thì dùng
   `todo → blocked` sẵn có).
 
+Ngữ nghĩa:
+
 - **`done` vẫn là trạng thái terminal**, và từ nay nghĩa là **"đã nhận vào cây
   chính"** (không chỉ "worker báo xong").
 - **Frontier chỉ mở việc phụ thuộc khi dep thật sự `done`** — nên B không bao giờ
