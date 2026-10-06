@@ -15,7 +15,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H2 \"Behaviors & Operations\" at line 801 is carried as the numbered H2 \"9. Behaviors And Operations\"; title changed to the frozen registry form, section reordered to position 9 of spec.md.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "a68620a509501efbe707cdffef8d9e9a"
     },
     {
       "claimId": "claim_b8dbd6e5b0014db31359419b93bb22f7",
@@ -27,7 +28,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source heading at line 803 is carried as the frozen target heading \"Init Verb\" (anchor init-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "044d32feeaadf43b8ebd50cbb9328e60"
     },
     {
       "claimId": "claim_32d0beb22a64eadc4714946feef4bb4c",
@@ -39,7 +41,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Body of the init verb section (source lines 805-831) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-64 of spec.md under the init verb heading; behavior-format specification of the CLI verb.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "6507aee6bfe4534417362ff8fbb85c58"
     },
     {
       "claimId": "claim_b7cdc84d6130cac22511eed0ed6e4e6c",
@@ -51,7 +54,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source heading at line 833 is carried as the frozen target heading \"Add Verb\" (anchor add-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "97220d9ee3bd063ef67cfdfa00688496"
     },
     {
       "claimId": "claim_320ba6224015cc3877738795b80dabb7",
@@ -63,7 +67,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Body of the add verb section (source lines 835-840) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-65 of spec.md under the add verb heading; behavior-format specification of the CLI verb.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "96b669468dbe4f3a8fd6eaa112986cea"
     },
     {
       "claimId": "claim_22efb604ffdcadbc5fd3d9a3df00d539",
@@ -75,7 +80,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Body of the add verb section (source lines 842-855) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-66 of spec.md under the add verb heading; behavior-format specification of the CLI verb.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "dd49a6c2fced83cebc38d9acb4a40dc3"
     },
     {
       "claimId": "claim_bf41e5090dd12c430e3a55206ea11658",
@@ -87,7 +93,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source heading at line 857 is carried as the frozen target heading \"Submit Verb\" (anchor submit-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "efb90fe882b0fbb11659db82440c3c00"
     },
     {
       "claimId": "claim_e56acda46bfc3c474d9bb6eed3c6b2ac",
@@ -99,7 +106,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Body of the submit verb section (source lines 859-912) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-67 of spec.md under the submit verb heading; behavior-format specification of the CLI verb.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "0cee9be267f694d7ef523f3c96e35b18"
     },
     {
       "claimId": "claim_bee83aee35ec25ec87d88a57a984cf50",
@@ -111,7 +119,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source heading at line 914 is carried as the frozen target heading \"Discover Verb\" (anchor discover-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "f33a86417aeeb82bb3127686df99ed16"
     },
     {
       "claimId": "claim_e3d06a1b8f2bf25a2fb2a85d80cdf7db",
@@ -123,7 +132,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Body of the discover verb section (source lines 916-950) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-68 of spec.md under the discover verb heading; behavior-format specification of the CLI verb.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "ecb4ec26f8d1cd8578eb40c2e93a7e12"
     },
     {
       "claimId": "claim_e2682084346c72123f9bad31f345fb99",
@@ -135,7 +145,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source heading at line 952 is carried as the frozen target heading \"Plan Verb\" (anchor plan-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "740f2ae9b28f097c07927fe74376ff62"
     },
     {
       "claimId": "claim_51cd8773ebe1fd970ca4d3dd8c718b17",
@@ -147,7 +158,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Body of the plan verb section (source lines 954-974) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-69 of spec.md under the plan verb heading; behavior-format specification of the CLI verb.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "876c0093197ca07debf3dbbc4844f926"
     },
     {
       "claimId": "claim_d91ae89ffb766e69e4a544b9b81c8c4b",
@@ -159,7 +171,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source heading at line 976 is carried as the frozen target heading \"Move Verb\" (anchor move-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "685d7431d20a366b69624974b7fa6cf3"
     },
     {
       "claimId": "claim_c43065f0988aa74de6c17c9a17ea138b",
@@ -171,7 +184,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Body of the move verb section (source lines 978-981) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-70 of spec.md under the move verb heading; behavior-format specification of the CLI verb.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "03e628ac0acb982ad74952d25a5455b0"
     },
     {
       "claimId": "claim_e7f5c77c843747d054f54f58e6429262",
@@ -183,7 +197,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source heading at line 983 is carried as the frozen target heading \"Edit Verb\" (anchor edit-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "689202f851d08a96234a5a232f112d06"
     },
     {
       "claimId": "claim_c0b05f63cf59ca8de5eb30a847394aca",
@@ -195,7 +210,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Body of the edit verb section (source lines 985-999) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-71 of spec.md under the edit verb heading; behavior-format specification of the CLI verb.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "62894935652369b5403e491ef4abbb29"
     },
     {
       "claimId": "claim_ff435eb0a41c23d9066c658cdbd2c2b9",
@@ -207,7 +223,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Body of the edit verb section (source lines 1001-1025) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-72 of spec.md under the edit verb heading; behavior-format specification of the CLI verb.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "c36313e9a59bc69c1f04a65dc22c55bd"
     },
     {
       "claimId": "claim_099cfdfdc16d8e8b4946219c7ed988f3",
@@ -219,7 +236,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source heading at line 1027 is carried as the frozen target heading \"Decision Verb\" (anchor decision-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "dbf59c33ac4e331f1f85a643593063ff"
     },
     {
       "claimId": "claim_b96048ae94d1c4ef2735793bd5243751",
@@ -231,7 +249,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Body of the decision verb section (source lines 1029-1030) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-73 of spec.md under the decision verb heading; behavior-format specification of the CLI verb.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "8e520755293c85e501ebeaff9485524a"
     },
     {
       "claimId": "claim_75500caff35f59b62abf19b6b88dc5ae",
@@ -243,7 +262,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source heading at line 1032 is carried as the frozen target heading \"Ask Verb\" (anchor ask-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "2c04890a8a028ad8c2cea00ffc025f82"
     },
     {
       "claimId": "claim_6542850539c0c00e6ec1f1fa5b31f6a5",
@@ -255,7 +275,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Body of the ask verb section (source lines 1034-1038) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-74 of spec.md under the ask verb heading; behavior-format specification of the CLI verb.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "3934104c59667221af37e30f52693b53"
     },
     {
       "claimId": "claim_b406721dd14005f1f8721b2329dd53d6",
@@ -267,7 +288,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source heading at line 1040 is carried as the frozen target heading \"Answer Verb\" (anchor answer-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "4258f20e24c76303e4229789ba35dfb0"
     },
     {
       "claimId": "claim_14629503e9cad5ebf8241447b03649cc",
@@ -279,7 +301,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Body of the answer verb section (source lines 1042-1046) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-75 of spec.md under the answer verb heading; behavior-format specification of the CLI verb.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "504b6a5b42d39ff1886b7e1865b5cd54"
     },
     {
       "claimId": "claim_0f34f596e1d30c6195234ae86ff49537",
@@ -291,7 +314,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source heading at line 1048 is carried as the frozen target heading \"Outcome Recording\" (anchor outcome-recording) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "1cead60d786aa453151e1ed45cc0ad04"
     },
     {
       "claimId": "claim_80498f2c23623a2165e2fe2bf39af2d8",
@@ -303,7 +327,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Body of the outcome verb section (source lines 1050-1054) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-76 of spec.md under the outcome verb heading; behavior-format specification of the CLI verb.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "def08282f651f17f0d259f239b2ad9cc"
     },
     {
       "claimId": "claim_87ab779ddfa1909428d88042b42754f5",
@@ -315,7 +340,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source heading at line 1056 is carried as the frozen target heading \"Check Verb\" (anchor check-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "b78e269b113fe52a189e91db3cc0cb1f"
     },
     {
       "claimId": "claim_4d0a469da5aa54fe21e1f0ba954dee18",
@@ -327,7 +353,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Body of the check verb section (source lines 1058-1061) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-77 of spec.md under the check verb heading; behavior-format specification of the CLI verb.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "4a561ae476fb9a96d25fdd9172c3a452"
     },
     {
       "claimId": "claim_2c5f685ef7ce4a68703207540518c20f",
@@ -339,7 +366,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source heading at line 1063 is carried as the frozen target heading \"Docs Index Verb\" (anchor docs-index-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "e8318f23e767c0e0775f5fb1e566f3ee"
     },
     {
       "claimId": "claim_39cbc86a2ed322069e28cf4ed8efdbfd",
@@ -351,7 +379,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Body of the docs-index verb section (source lines 1065-1068) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-78 of spec.md under the docs-index verb heading; behavior-format specification of the CLI verb.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "fc9cf98c574c23b2d1cadd3b9c0c73dd"
     },
     {
       "claimId": "claim_630475260ac68684638bc1a7aee5b610",
@@ -363,7 +392,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source heading at line 1070 is carried as the frozen target heading \"Rollup Verb\" (anchor rollup-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "ed414778b43df6e52ed94cc677937583"
     },
     {
       "claimId": "claim_87f14f490b3dc3b8d34fba3dbf4a35f1",
@@ -375,7 +405,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Body of the rollup verb section (source lines 1072-1075) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-79 of spec.md under the rollup verb heading; behavior-format specification of the CLI verb.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "8df771b9a95fb4b30a9156cd5e9d7a35"
     },
     {
       "claimId": "claim_3ce01ed0c5831b032d0fb9114c465c35",
@@ -387,7 +418,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source heading at line 1077 is carried as the frozen target heading \"Triage Verb\" (anchor triage-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "b14350bc6836dcbb82ec7b0a834b6c56"
     },
     {
       "claimId": "claim_49246718fefa63a9fa016017a2072f1e",
@@ -399,7 +431,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Body of the triage verb section (source lines 1079-1082) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-80 of spec.md under the triage verb heading; behavior-format specification of the CLI verb.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "595c67ae94bc2fe4f46251ba6d6d35f1"
     },
     {
       "claimId": "claim_8ab73081ca23b57d7e1000709c6afb7a",
@@ -411,7 +444,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source heading at line 1084 is carried as the frozen target heading \"Take Verb\" (anchor take-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "9d733d0265fc3f50452d82169301c1c4"
     },
     {
       "claimId": "claim_2e4a2eebcc3ac6e8600590e0df9d3282",
@@ -423,7 +457,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Body of the take verb section (source lines 1086-1090) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-81 of spec.md under the take verb heading; behavior-format specification of the CLI verb.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "c353e48e7f6e9d099ed7acc8db76b98b"
     },
     {
       "claimId": "claim_d365a6a94d068bc2ba274b535299db86",
@@ -435,7 +470,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source heading at line 1092 is carried as the frozen target heading \"Pick Verb\" (anchor pick-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "9d6b89d822737055f2fde27c45a03a8a"
     },
     {
       "claimId": "claim_39a6cc5306f849af650f26e27e473d2a",
@@ -447,7 +483,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Body of the pick verb section (source lines 1094-1098) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-82 of spec.md under the pick verb heading; behavior-format specification of the CLI verb.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "09be94379bedfc46f88f54503e52daa5"
     },
     {
       "claimId": "claim_5bcb955bde6e229ab09e5002c1911076",
@@ -459,7 +496,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source heading at line 1100 is carried as the frozen target heading \"Return Verb\" (anchor return-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "fd5055fd4d167520785637d135539dfe"
     },
     {
       "claimId": "claim_6cfb40f6b0796d53b8fa927a862e67ce",
@@ -471,7 +509,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Body of the return verb section (source lines 1102-1106) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-83 of spec.md under the return verb heading; behavior-format specification of the CLI verb.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "b2eaf8daf7008b991917f223318d5e1d"
     },
     {
       "claimId": "claim_54ab90a57c23e9ceabed9e79ad78dd7f",
@@ -483,7 +522,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source heading at line 1108 is carried as the frozen target heading \"Rebuild Verb\" (anchor rebuild-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "cfb4d9d1b43c6a4f40c13357f9d9124a"
     },
     {
       "claimId": "claim_a80bb774c7d1a17e08befd309803e0a2",
@@ -495,7 +535,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Body of the rebuild verb section (source lines 1110-1112) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-84 of spec.md under the rebuild verb heading; behavior-format specification of the CLI verb.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "3b409a02d049a208d8dd89ec1517d283"
     },
     {
       "claimId": "claim_d54d2955da490ed329bf2f80c4540800",
@@ -507,7 +548,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source heading at line 1114 is carried as the frozen target heading \"List And Ready Verbs\" (anchor list-and-ready-verbs) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "19092cecd7a48ba649e05e533b65fe6c"
     },
     {
       "claimId": "claim_0a1c2b6c0eabf83074bb042b962024d7",
@@ -519,7 +561,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Body of the list and ready verb section (source lines 1116-1118) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-85 of spec.md under the list and ready verb heading; behavior-format specification of the CLI verb.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "47f8d1203550fbf1cf157dc6f4b44f5d"
     },
     {
       "claimId": "claim_806561c52e1172c2bd94ba1e87a5a0b9",
@@ -531,7 +574,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source heading at line 1120 is carried as the frozen target heading \"Graph Verb\" (anchor graph-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "dcd7eb9471aac0ed9c6f305e7b3b8a67"
     },
     {
       "claimId": "claim_27804afda28daba4d5a2f2b2c5593294",
@@ -543,7 +587,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Body of the graph verb section (source lines 1122-1122) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-86 of spec.md under the graph verb heading; behavior-format specification of the CLI verb.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "6070f51f4128ebf3bdcc18334e1a4ecb"
     },
     {
       "claimId": "claim_82e5b138d21e606463ef458783510a14",
@@ -555,7 +600,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Body of the graph verb section (source lines 1124-1132) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-87 of spec.md under the graph verb heading; behavior-format specification of the CLI verb.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "c1a962fe830292f73a80e7dbca5e8d0c"
     },
     {
       "claimId": "claim_78b2df24acd3461e45462add5ee00a73",
@@ -567,7 +613,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source heading at line 1134 is carried as the frozen target heading \"Stale Verb\" (anchor stale-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "a20fc04fd5996f8baf9803dcf9430e97"
     },
     {
       "claimId": "claim_f9746ce25ba57acff13c1e5d7f159f07",
@@ -579,7 +626,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Body of the stale verb section (source lines 1136-1136) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-88 of spec.md under the stale verb heading; behavior-format specification of the CLI verb.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "31897e527213803203f7a7e3fb5b1269"
     },
     {
       "claimId": "claim_872c3173f1d52ab7503e3762dc83c091",
@@ -591,7 +639,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Body of the stale verb section (source lines 1138-1140) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-89 of spec.md under the stale verb heading; behavior-format specification of the CLI verb.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "6eb3dc776fa680fbcd958d313c4a1a6a"
     },
     {
       "claimId": "claim_a773a3b3e0730bd8624c641dc1671dd6",
@@ -603,7 +652,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source heading at line 1142 is carried as the frozen target heading \"Conflicts Verb\" (anchor conflicts-verb) in the Behaviors And Operations section; the title is changed (English, punctuation and Vietnamese diacritics removed) per the heading registry, the section position is the same.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "6b8b08326d50473e91ef55a457c57a64"
     },
     {
       "claimId": "claim_90c314f669a8c8a6e06c8c114d5e8232",
@@ -615,7 +665,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Body of the conflicts verb section (source lines 1144-1144) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-90 of spec.md under the conflicts verb heading; behavior-format specification of the CLI verb.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "3694cfa1568e58a1b3fb4fa4e447f9cf"
     },
     {
       "claimId": "claim_2636bbab8d7aeb5e65b5a30fa56de8a9",
@@ -627,7 +678,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Body of the conflicts verb section (source lines 1146-1147) is carried byte-identical (checked line by line against the candidate block, no link rewrite) in unheaded-block-91 of spec.md under the conflicts verb heading; behavior-format specification of the CLI verb.",
       "reviewedBy": "independent reviewer (review-b-behaviors)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "27a3ba1515c8ffa4c6db8e9123168b72"
     }
   ]
 }

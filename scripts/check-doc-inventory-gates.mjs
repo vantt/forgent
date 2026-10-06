@@ -229,6 +229,25 @@ export function buildTargetAnchorLookup(repoRoot, commitSha) {
   };
 }
 
+/**
+ * Text digest of the unit that carries `anchor` in `owner` at a commit, so a review can be
+ * bound to the target text it vouched for. Returns null when owner or anchor is unreadable.
+ */
+export function buildTargetUnitDigestLookup(repoRoot, commitSha) {
+  const cache = new Map();
+  return (owner, anchor) => {
+    if (!cache.has(owner)) {
+      let byAnchor = null;
+      try {
+        byAnchor = new Map();
+        for (const u of extractMarkdownConservationUnits(readBlobAtCommit(commitSha, owner, repoRoot))) for (const a of [u.anchor, u.githubAnchor, u.stableAnchor]) if (a && !byAnchor.has(a)) byAnchor.set(a, u.textDigest);
+      } catch { byAnchor = null; }
+      cache.set(owner, byAnchor);
+    }
+    return cache.get(owner)?.get(anchor) ?? null;
+  };
+}
+
 function defaultSwitchboardOwners(inventory) {
   return new Set((inventory.items || [])
     .filter((item) => ['rootDocument', 'scopedRoute', 'corpusRoot'].includes(item.switchboardSource) && typeof item.path === 'string' && item.path.startsWith('docs/platform/'))
@@ -508,7 +527,7 @@ export function decidedPlatformOwners(inventory, shards) {
   return new Set((shards || []).flatMap((shard) => shard.claims || []).map((d) => d?.targetOwner).filter((owner) => platform.has(owner)));
 }
 
-export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf = null, registry = null } = {}) {
+export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf = null, targetUnitDigestOf = null, registry = null } = {}) {
   const findings = [];
   const dispositions = new Map((vocabulary?.sourceDispositions || []).map((d) => [d.id, d]));
   const claimKinds = new Set((vocabulary?.claimKinds || []).map((k) => k.id));
@@ -519,6 +538,7 @@ export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf 
   const decided = new Set();
   const gapRows = registry ? [...(registry.identityGaps || [])] : null;
   const decidedGaps = new Set();
+  const decidedFiles = new Set();
   const fail = (type, message, extra = {}) => findings.push({ type, message, ...extra });
 
   for (const shard of shards || []) {
@@ -547,9 +567,15 @@ export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf 
           const anchors = targetAnchorsOf(d.targetOwner);
           if (anchors === null || anchors === undefined) fail('decision-target-anchor-missing', `claim ${id}: targetOwner ${d.targetOwner} is unreadable at the inventory commit, so targetAnchor ${d.targetAnchor} cannot be verified`, at);
           else if (!anchors.has(d.targetAnchor)) fail('decision-target-anchor-missing', `claim ${id}: targetAnchor ${d.targetAnchor} is not a heading or block anchor of ${d.targetOwner}`, at);
+          else if (typeof targetUnitDigestOf === 'function' && d.targetUnitDigest !== undefined) {
+            const current = targetUnitDigestOf(d.targetOwner, d.targetAnchor);
+            if (typeof d.targetUnitDigest !== 'string' || d.targetUnitDigest.length < 16 || !String(current || '').startsWith(d.targetUnitDigest)) fail('decision-target-drift', `claim ${id}: the unit at ${d.targetOwner}#${d.targetAnchor} is not the text this decision was recorded against (targetUnitDigest differs from the current unit digest)`, at);
+          }
         }
       }
       if (d.reviewStatus === 'reviewed' && !(nonEmpty(d.reviewedBy) && nonEmpty(d.reviewedAt) && nonEmpty(d.rationale))) fail('decision-reviewed-incomplete', `claim ${id}: reviewStatus reviewed needs reviewedBy, reviewedAt and rationale`, at);
+      if (d.reviewStatus === 'reviewed' && hasOwner && typeof targetUnitDigestOf === 'function' && d.targetUnitDigest === undefined) fail('decision-reviewed-incomplete', `claim ${id}: a reviewed decision with a target needs targetUnitDigest, the digest of the target unit the reviewer compared`, at);
+      if (d.reviewStatus === 'blocking' && d.disposition !== 'unknown-blocking') fail('decision-blocking-status-mismatch', `claim ${id}: reviewStatus blocking is only for disposition unknown-blocking, found "${d.disposition}"`, at);
       if (d.disposition === 'unknown-blocking' && d.reviewStatus !== 'blocking') fail('decision-blocking-status-mismatch', `claim ${id}: disposition unknown-blocking needs reviewStatus blocking, found "${d.reviewStatus}"`, at);
       if ((d.disposition === 'unknown-blocking' || String(d.disposition).startsWith('delete-')) && !(Array.isArray(d.searched) && d.searched.length > 0)) fail('decision-searched-missing', `claim ${id}: disposition "${d.disposition}" needs a non-empty searched list`, at);
       if (!nonEmpty(d.rationale)) fail('decision-rationale-missing', `claim ${id}: rationale is empty`, at);
@@ -558,7 +584,7 @@ export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf 
       for (const field of ['reviewedBy', 'reviewedAt', 'searched']) if (d[field] !== undefined) merged[field] = d[field];
       claimLedger[idx] = merged;
       const gapIdx = gapRows ? gapRows.findIndex((gap) => gap?.claimId === id) : -1;
-      if (gapIdx >= 0) gapRows[gapIdx] = { ...gapRows[gapIdx], disposition: d.disposition };
+      if (gapIdx >= 0 && d.reviewStatus === 'reviewed' && d.disposition !== 'unknown-blocking') gapRows[gapIdx] = { ...gapRows[gapIdx], disposition: d.disposition };
     }
     for (const g of shard.registryGaps || []) {
       const idx = gapRows ? gapRows.findIndex((row) => row?.claimId === g?.claimId) : -1;
@@ -571,9 +597,11 @@ export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf 
       else if (disposition.requiresTargetOwner && !(nonEmpty(g.targetOwner) && itemPaths.has(g.targetOwner))) fail('decision-gap-invalid', `registry gap ${g.claimId}: disposition "${g.disposition}" requires a targetOwner that is a document of the inventory`, at);
       if (!nonEmpty(g.rationale)) fail('decision-gap-invalid', `registry gap ${g.claimId}: rationale is empty`, at);
       if (gapRows[idx].sourcePath !== g.sourcePath) fail('decision-gap-invalid', `registry gap ${g.claimId}: sourcePath ${g.sourcePath} is not the registry's ${gapRows[idx].sourcePath}`, at);
-      gapRows[idx] = { ...gapRows[idx], disposition: g.disposition, targetOwner: g.targetOwner ?? null, targetAnchor: g.targetAnchor ?? null, dispositionRationale: g.rationale };
+      if (g.disposition !== 'unknown-blocking') gapRows[idx] = { ...gapRows[idx], disposition: g.disposition, targetOwner: g.targetOwner ?? null, targetAnchor: g.targetAnchor ?? null, dispositionRationale: g.rationale };
     }
     for (const f of shard.files || []) {
+      if (decidedFiles.has(f?.path)) { fail('decision-file-duplicate', `file ${f?.path} is decided more than once (again in shard ${shard.shard})`, { path: f?.path }); continue; }
+      decidedFiles.add(f?.path);
       const idx = items.findIndex((i) => i.path === f?.path);
       if (idx < 0) { fail('decision-file-unknown', `shard ${shard.shard}: file ${f?.path} is not an inventory item`, { path: f?.path }); continue; }
       const disposition = dispositions.get(f.disposition);
@@ -674,6 +702,11 @@ export function isEvidenceMirrorPath(p) {
   return /^docs\/(?:architect|platform)\/(?:.+\/)?verification\/[^/]+\/.+/.test(p);
 }
 
+/** The first scope value that is an option-looking string or matches no inventory path: such a scope would filter every row out and let strict pass vacuously. */
+export function findUnmatchedScope(scope, inventory) {
+  return (scope || []).find((value) => value.startsWith('--') || !(inventory?.items || []).some((item) => pathInScope(item.path, [value])));
+}
+
 /** A path is in scope when no scope is given, or it equals a scope value or lies below one. */
 export function pathInScope(p, scope) {
   if (!Array.isArray(scope) || scope.length === 0) return true;
@@ -732,8 +765,9 @@ export function checkInventory({ repoRoot, inventory, vocabulary, identityRegist
   let conservationRegistry = identityRegistry;
   let validTargetOwners = inventory.commit ? deriveValidTargetOwnersFromSwitchboard(loadSwitchboard(inventory.commit, repoRoot)) : null;
   if (decisions && decisions.length > 0) {
-    const applied = applyDecisions(inventory, decisions, { vocabulary, targetAnchorsOf, registry: identityRegistry });
+    const applied = applyDecisions(inventory, decisions, { vocabulary, targetAnchorsOf, targetUnitDigestOf: inventory.commit ? buildTargetUnitDigestLookup(repoRoot, inventory.commit) : null, registry: identityRegistry });
     inventory = applied.inventory;
+    // Only the conservation open-data summary reads the overlaid gap rows; the identity and dropped-claim validators keep the registry as committed.
     conservationRegistry = applied.registry || identityRegistry;
     decisionFindings.push(...applied.findings);
     validTargetOwners = new Set([...(validTargetOwners || defaultSwitchboardOwners(inventory)), ...decidedPlatformOwners(inventory, decisions)]);
@@ -936,7 +970,7 @@ export function runCli(argv, cwd = process.cwd()) {
     return 1;
   }
 
-  const scopeProblem = scope.find((value) => value.startsWith('--') || !(inventory.items || []).some((item) => pathInScope(item.path, [value])));
+  const scopeProblem = findUnmatchedScope(scope, inventory);
   if (scopeProblem !== undefined) {
     console.error(`check-doc-inventory-gates error loading input: --scope ${scopeProblem} matches no inventory path (a scope that matches nothing would make strict pass vacuously)`);
     return 1;

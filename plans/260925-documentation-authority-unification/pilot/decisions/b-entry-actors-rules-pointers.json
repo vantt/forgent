@@ -15,7 +15,8 @@
       "reviewStatus": "reviewed",
       "rationale": "YAML front matter (area, updated, sources, decisions, coverage: partial) carried byte-identical into the provenance block of section 15 of the candidate spec; it is source-slice and decision-hash provenance, not behavior, so the generator kind specification is wrong.",
       "reviewedBy": "independent reviewer (review-b-entry-actors-rules-pointers)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "9635c37a607caab23d8c57b594b11914"
     },
     {
       "claimId": "claim_36389ecd6a08422af17bd5af68a6fce5",
@@ -27,7 +28,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H1 \"Spec: Work-State (tầng quản việc của forgent)\" is represented by the frozen heading \"1. Purpose And Scope\"; only the heading title differs (map section 4 rows 9-11), the title text itself is not carried as a separate heading.",
       "reviewedBy": "independent reviewer (review-b-entry-actors-rules-pointers)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "9d285ca494f440b3261e24c05c801a4a"
     },
     {
       "claimId": "claim_c613cb5faff29ae8bd2374be9af5b48f",
@@ -39,7 +41,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Purpose paragraph carried line-for-line identical under 1. Purpose And Scope; no wording change.",
       "reviewedBy": "independent reviewer (review-b-entry-actors-rules-pointers)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "d9f06bbaa0ffe5ab3f54dd8fba4e9514"
     },
     {
       "claimId": "claim_8f6ab9b2c2de71369769d27719a09b8e",
@@ -51,7 +54,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source heading \"Entry Points & Triggers\" is represented by the frozen heading \"2. Entry Points And Triggers\"; only the title (ampersand and numbering) differs.",
       "reviewedBy": "independent reviewer (review-b-entry-actors-rules-pointers)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "6e306b169de96db64ba2f8cd2b68bf36"
     },
     {
       "claimId": "claim_a5326477491a9bc30a98744da8e9bfb9",
@@ -63,7 +67,8 @@
       "reviewStatus": "reviewed",
       "rationale": "The 24-line CLI entry-point verb list is identical in the candidate block under 2. Entry Points And Triggers (diff clean); the map keeps it as specification, not contract.",
       "reviewedBy": "independent reviewer (review-b-entry-actors-rules-pointers)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "c8fc6e5bf49179cb6f37f3247ad25c32"
     },
     {
       "claimId": "claim_949f208343809a8ca04870aea74402de",
@@ -75,7 +80,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source heading \"Actors & Access\" is represented by frozen heading \"10. Actors And Access\"; only the title differs.",
       "reviewedBy": "independent reviewer (review-b-entry-actors-rules-pointers)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "d60d7f1c5d8687c8d48f47902e6fedfd"
     },
     {
       "claimId": "claim_f323a5093b365db84b200bcd86a3e019",
@@ -87,7 +93,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Capability-by-actor table carried identical (diff clean) under 10. Actors And Access.",
       "reviewedBy": "independent reviewer (review-b-entry-actors-rules-pointers)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "6d080b8078df1fa4538a1750f5a61c2a"
     },
     {
       "claimId": "claim_477a30f4902261e390c34ab888145dcd",
@@ -99,7 +106,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source heading \"Business Rules\" is represented by frozen heading \"11. Business Rules\"; only the numbering prefix differs.",
       "reviewedBy": "independent reviewer (review-b-entry-actors-rules-pointers)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "f2474c3ac228cfed151f61614ff4c467"
     },
     {
       "claimId": "claim_9bb5739f68a7b4bafcd959ef59104e6a",
@@ -111,7 +119,8 @@
       "reviewStatus": "reviewed",
       "rationale": "The RUL1..RULn single unit is identical in the candidate (diff clean); kind stays specification, not normative-law, since the vocabulary reserves normative-law for platform laws L1-L8 (map section 7).",
       "reviewedBy": "independent reviewer (review-b-entry-actors-rules-pointers)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "19f7dcac1af1f366369c2b1b75261b37"
     },
     {
       "claimId": "claim_904f21e704c3d43d63ae2a762bf9791c",
@@ -123,7 +132,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source heading \"Edge Cases Settled\" is represented by frozen heading \"12. Edge Cases Settled\"; only the numbering prefix differs.",
       "reviewedBy": "independent reviewer (review-b-entry-actors-rules-pointers)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "bbea0adadc95834d9a32460e3b4abeaa"
     },
     {
       "claimId": "claim_b64e4bcb5061a6c42c0db1d5a1f2887b",
@@ -135,7 +145,8 @@
       "reviewStatus": "reviewed",
       "rationale": "The 66-line settled edge-case list is identical in the candidate (diff clean), kept whole as one unit (map section 11 item 9).",
       "reviewedBy": "independent reviewer (review-b-entry-actors-rules-pointers)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "dbace0a231a15099a8ff774d2c937cdb"
     },
     {
       "claimId": "claim_d011d26d0e584f25caa838e02c59b613",
@@ -147,7 +158,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source heading \"Open Gaps\" is represented by frozen heading \"13. Known Gaps And Deferred Work\"; the title differs.",
       "reviewedBy": "independent reviewer (review-b-entry-actors-rules-pointers)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "a2f7b6b14e08d0b250b4cdb0674d45e5"
     },
     {
       "claimId": "claim_a27bf300f6a6f7901c1c072d5cf9e7da",
@@ -159,7 +171,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Open-gaps bullets list work deliberately deferred or not yet decided (typed gates only when a real consumer needs them, no timeout/reminder, no multi-user permissions, fleet orchestrator, rollup view) with revisit conditions, which matches the vocabulary intent kind (design intent, must-not-preclude constraints, revisit triggers); text carried identical under 13. Known Gaps And Deferred Work. Earlier specification choice followed the map and is corrected after review.",
       "reviewedBy": "independent reviewer (review-b-entry-actors-rules-pointers)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "5ad9c97f20aa0e6f61669617556fca87"
     },
     {
       "claimId": "claim_294491cc27c7f037d7b904b6cfb2eddb",
@@ -171,7 +184,8 @@
       "reviewStatus": "reviewed",
       "rationale": "The Da dong note records a gap that was once listed here and has since been fixed (CAS residue, pointing to history), i.e. a retired past observation, so historical-context; text carried identical under 13. Known Gaps And Deferred Work. Earlier specification choice corrected after review.",
       "reviewedBy": "independent reviewer (review-b-entry-actors-rules-pointers)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "d9e8b7000d47817bb9f18c512831b226"
     },
     {
       "claimId": "claim_1a9c10544a642b6001a8bacae1b6817b",
@@ -183,7 +197,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source heading \"Visuals\" is represented by frozen heading \"14. Presentation Surface\"; only the title differs.",
       "reviewedBy": "independent reviewer (review-b-entry-actors-rules-pointers)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "267b58ca8eeabc14f6baf905c51e2163"
     },
     {
       "claimId": "claim_2cfd89083b61b2c263e84f24624a6f3c",
@@ -195,7 +210,8 @@
       "reviewStatus": "reviewed",
       "rationale": "\"Not applicable - không có màn hình.\" carried identical under 14. Presentation Surface.",
       "reviewedBy": "independent reviewer (review-b-entry-actors-rules-pointers)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "b0a0db080dad061ca93e63826e562c47"
     },
     {
       "claimId": "claim_40f7857c31724be3b7ca7a6de1097818",
@@ -207,7 +223,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source heading \"Pointers (implementation)\" is represented by frozen heading \"2. Implementation Pointers\" in the implementation-pointers document; the title differs and the owner moves out of spec.md.",
       "reviewedBy": "independent reviewer (review-b-entry-actors-rules-pointers)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "648524a55f28a05fe49ed3cd1f7ed917"
     },
     {
       "claimId": "claim_2e2bc9264b289319dfae5c6487978f99",
@@ -219,7 +236,8 @@
       "reviewStatus": "reviewed",
       "rationale": "The 24-bullet module-pointer list is identical in implementation-pointers.md (diff clean); architecture because the bullets state module responsibilities (map section 11 item 5), and its file names may be stale.",
       "reviewedBy": "independent reviewer (review-b-entry-actors-rules-pointers)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "7542cfb4d64398d37bafa7ce4cb4bc91"
     }
   ]
 }

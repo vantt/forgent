@@ -15,7 +15,8 @@
       "disposition": "promote",
       "rationale": "Source H2 stating where the retired records came from is represented by the frozen H2 \"1. Provenance Of Retired Decisions\"; only the heading title differs (numbered, English, no tsk id in the title).",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "260da5fd6eab8c113ea7e756985b782b"
     },
     {
       "claimId": "claim_192ebab9dbc6cec8b8957683e3ff8c82",
@@ -27,7 +28,8 @@
       "disposition": "promote",
       "rationale": "Relocation statement (ADRs moved verbatim from docs/decisions/, corpus retired) carried unchanged as the body of section 1; text identical to the source line.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "ac2b043c0d4f9fde1e7ecee60609cbe7"
     },
     {
       "claimId": "claim_5412ac73c702e4ec33e4b59dd9ad1940",
@@ -39,7 +41,8 @@
       "disposition": "promote",
       "rationale": "Source ADR 0002 title heading is represented by the frozen H2 \"2. ADR 0002 ...\" (2-adr-0002-flat-work-model); title is renumbered and re-worded in English, text of the record is unchanged.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "dfbfbdbf1e8717cabbe38306651ad15e"
     },
     {
       "claimId": "claim_0201a1d648765d578fb8fd96673da674",
@@ -51,7 +54,8 @@
       "disposition": "promote",
       "rationale": "Supersession blockquote of ADR 0002 (partly superseded by 0012) carried in the ADR 0002 section; the only change is the link, rewritten from the retired 0012 file path to the in-document anchor #8-adr-0012-unified-typed-edge-graph-model.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "0a885e8073f37063ef015b0288f7517c"
     },
     {
       "claimId": "claim_f8e2b48d6234ca8a73e15cdaad7d9c07",
@@ -63,7 +67,8 @@
       "disposition": "merge",
       "rationale": "Repeated duplicate title \"# 0002 - Mo hinh viec phang\" inside the ADR 0002 text: merged into the single ADR 0002 H2 (no second H1 in the candidate), so no claim is lost but the heading itself does not appear twice.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "dfbfbdbf1e8717cabbe38306651ad15e"
     },
     {
       "claimId": "claim_faeaa8e46158de47c45810fb0a595dcc",
@@ -75,7 +80,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Bối cảnh\" of ADR 0002 is represented by the frozen H3 \"0002 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "5cd2a9a136e3025d04ed41810213e2a9"
     },
     {
       "claimId": "claim_310b7c85756d5a5631a83fd5b6f51450",
@@ -87,7 +93,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0002 (source lines 1348-1351, starting \"forgent cần một mô hình dữ liệu cho công việc tự-quản, đồng thời mở đư\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "2d791158021d4df9eabbc0897dffa6df"
     },
     {
       "claimId": "claim_5b6cd72833b3ee7ea7a2862b4eadb328",
@@ -99,7 +106,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Quyết định\" of ADR 0002 is represented by the frozen H3 \"0002 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "6a7b90c72430f1cb8d04a666d3fa9751"
     },
     {
       "claimId": "claim_6f1392a7f197c9824233896cf218bda9",
@@ -111,7 +119,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0002 (source lines 1355-1361, starting \"- **Một loại work item duy nhất, một FSM duy nhất.** Item trỏ **deps**\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "6d29bd75988172380cec9e3e8c6d38c0"
     },
     {
       "claimId": "claim_e8b18c86c4297b05e04a14793817bf6a",
@@ -123,7 +132,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Hệ quả\" of ADR 0002 is represented by the frozen H3 \"0002 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "fc62699538350fccc923e8874a342f8d"
     },
     {
       "claimId": "claim_6bf5e5b90a15803e49010737491afdb9",
@@ -135,7 +145,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0002 (source lines 1365-1370, starting \"- **Fan-out đa-agent xuyên câu chuyện tự nhiên:** frontier gom mọi việ\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "a45346dbf45eca841ecf385d6a2d1444"
     },
     {
       "claimId": "claim_c56e0ea4200729ae5cf5542803b2fe10",
@@ -147,7 +158,8 @@
       "disposition": "promote",
       "rationale": "Supersession-rule line of ADR 0002 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e7"
     },
     {
       "claimId": "claim_0e062808f47ce5c348b6b44a91650ecc",
@@ -159,7 +171,8 @@
       "disposition": "promote",
       "rationale": "Source ADR 0003 title heading is represented by the frozen H2 \"3. ADR 0003 ...\" (3-adr-0003-naming-and-data-layout); title is renumbered and re-worded in English, text of the record is unchanged.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "eed7c45e529a07ba42be1926c4715e28"
     },
     {
       "claimId": "claim_75f47ef3fd99abd07c138f106f1ca023",
@@ -171,7 +184,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Bối cảnh\" of ADR 0003 is represented by the frozen H3 \"0003 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "c6a2c64d4858021065b5e9f3a7dd0566"
     },
     {
       "claimId": "claim_70c83eabb546f46e040404b3b908a02e",
@@ -183,7 +197,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0003 (source lines 1378-1380, starting \"Cần chốt danh xưng và bố cục dữ liệu trên đĩa cho lớp work-state trước\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "152aead220875817c189bb95c64a8e95"
     },
     {
       "claimId": "claim_c6a1314c4583518f5100cc53e78b1979",
@@ -195,7 +210,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Quyết định\" of ADR 0003 is represented by the frozen H3 \"0003 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "d0f79f2a53f7edfc1d92c6e8c71d50e3"
     },
     {
       "claimId": "claim_45c662066b6e70bac4ff5991ee40afca",
@@ -207,7 +223,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0003 (source lines 1384-1389, starting \"- **CLI = `fgos`** (cửa lệnh của sản phẩm).\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "6f7961ba49b014f58ba0ec626d207f11"
     },
     {
       "claimId": "claim_f161fbd15476131b86b7c2fd2f1d8f59",
@@ -219,7 +236,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Hệ quả\" of ADR 0003 is represented by the frozen H3 \"0003 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "e6a929b78a9cc9b4254c5e289f33c764"
     },
     {
       "claimId": "claim_0f85275ad3f392256b805bf226c9562d",
@@ -231,7 +249,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0003 (source lines 1393-1397, starting \"- **Brand nhất quán** giữa CLI, tài liệu và data dir.\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "37d75ce7b883a61c5bee0ad0e4bcc382"
     },
     {
       "claimId": "claim_c57c39536b983d5f172833853e8b3344",
@@ -243,7 +262,8 @@
       "disposition": "promote",
       "rationale": "Supersession-rule line of ADR 0003 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e7"
     },
     {
       "claimId": "claim_5908b357cb98d52934398e26e43fcb39",
@@ -255,7 +275,8 @@
       "disposition": "promote",
       "rationale": "Source ADR 0004 title heading is represented by the frozen H2 \"4. ADR 0004 ...\" (4-adr-0004-scope-and-non-goals); title is renumbered and re-worded in English, text of the record is unchanged.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "2d2db2abca61349471af2e2a3d0f5581"
     },
     {
       "claimId": "claim_67494c7de8ad006fcb01b825ea00e6b2",
@@ -267,7 +288,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Bối cảnh\" of ADR 0004 is represented by the frozen H3 \"0004 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "2d45d4866f7526c232afdeaf650c17f9"
     },
     {
       "claimId": "claim_c23f1c3ed45f72de28f6ed3c605bc43a",
@@ -279,7 +301,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0004 (source lines 1405-1407, starting \"Trước khi xây lớp state, cần chốt hai biên: nó phục vụ *ai trước*, và \") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "e64dd190deebcac53e83492fe91319c1"
     },
     {
       "claimId": "claim_4a9e0c360118d90051bb7c03002ff4d9",
@@ -291,7 +314,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0004 (source lines 1409-1411, starting \"> Ghi chú viết lại: quyết định gốc phát biểu qua quan hệ với harness p\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "7fa451435e5be174a0cf5118a1eaccb4"
     },
     {
       "claimId": "claim_4063855a9287de7cf5b27cb77d96955f",
@@ -303,7 +327,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Quyết định\" of ADR 0004 is represented by the frozen H3 \"0004 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "59bda06684c6859316ad8f0b236bc7b6"
     },
     {
       "claimId": "claim_93d9f629f8c7258d208b1c2d3fc413ab",
@@ -315,7 +340,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0004 (source lines 1415-1421, starting \"1. **Domain đầu tiên của lớp state là work-state của chính forgent** —\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "fc46702e212ac516c32faa5292ce6399"
     },
     {
       "claimId": "claim_0b4d53be3903ac1ce9299b5d7174feab",
@@ -327,7 +353,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Hệ quả\" of ADR 0004 is represented by the frozen H3 \"0004 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "12d505aab6487945d39c7e3a3f15ad06"
     },
     {
       "claimId": "claim_664fd1639ad346a2d2d240596a2a6604",
@@ -339,7 +366,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0004 (source lines 1425-1428, starting \"- **Scope bước đầu nhỏ:** không phải cover ngay các cơ chế điều phối n\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "9d43cd58043503f832f75d165615f47a"
     },
     {
       "claimId": "claim_7bc17cd130d9b9600e3a8db9bd57ca88",
@@ -351,7 +379,8 @@
       "disposition": "promote",
       "rationale": "Supersession-rule line of ADR 0004 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e7"
     },
     {
       "claimId": "claim_dbc0da98acd1c90327ebd67850cc8983",
@@ -363,7 +392,8 @@
       "disposition": "promote",
       "rationale": "Source ADR 0006 title heading is represented by the frozen H2 \"5. ADR 0006 ...\" (5-adr-0006-proposed-status); title is renumbered and re-worded in English, text of the record is unchanged.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "67c97b2b884ac9505324dc3b688a7989"
     },
     {
       "claimId": "claim_a79114f19bb479ea6b69c50166af8972",
@@ -375,7 +405,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Bối cảnh\" of ADR 0006 is represented by the frozen H3 \"0006 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "6163b36b62dbb7c76e3510b09ab0d83b"
     },
     {
       "claimId": "claim_423abdded73e62ffd62a773173555583",
@@ -387,7 +418,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0006 (source lines 1436-1436, starting \"Runner (0005) cho worker sinh kết quả trên **nhánh chưa merge**. Điều \") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "b2285ceac14bdb7210baf54029fa70b8"
     },
     {
       "claimId": "claim_0fe4212f0537cfd4b9232280e9e6781b",
@@ -399,7 +431,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0006 (source lines 1438-1441, starting \"1. Một việc B phụ thuộc A có thể chạy trên nền **thiếu code của A** (A\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "3077bff801c5d9f092db1c250ec56309"
     },
     {
       "claimId": "claim_99fa84eefd3c917530ef1a453f08be21",
@@ -411,7 +444,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Quyết định\" of ADR 0006 is represented by the frozen H3 \"0006 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "ffd717cc616acfaa71c4fb8a61763bcf"
     },
     {
       "claimId": "claim_9283d5a06984f8b7a0bb9b53cb947051",
@@ -423,7 +457,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0006 (source lines 1445-1445, starting \"Thêm trạng thái **`proposed`** vào FSM, với các cạnh:\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "bc5ca7e6617538adf69f4c157336e967"
     },
     {
       "claimId": "claim_aadb6e62ef42d3ea549cc667328aa410",
@@ -435,7 +470,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0006 (source lines 1447-1452, starting \"- `doing → proposed` — goal-check pass, runner ghi `proposed`.\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "23622b5a51f195a41cc870aac9b70d45"
     },
     {
       "claimId": "claim_2e390ae8e0379eae085591d9d6ff9af3",
@@ -447,7 +483,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0006 (source lines 1456-1459, starting \"- **`done` vẫn là trạng thái terminal**, và từ nay nghĩa là **\"đã nhận\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "8510e498faf8f8219f1feb772eb5c6fb"
     },
     {
       "claimId": "claim_e602fe2731b631f7be06ccebc5cf8e91",
@@ -459,7 +496,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Hệ quả\" of ADR 0006 is represented by the frozen H3 \"0006 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "783e9b5f2b2e44c3010507770e87c978"
     },
     {
       "claimId": "claim_453534a2ccfccba30980d90ae47b6e63",
@@ -471,7 +509,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0006 (source lines 1463-1468, starting \"- **Ghép nối qua nhánh an toàn:** phụ thuộc chỉ mở khi dep đã vào cây \") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "b7287de2ff36f57cb44f105c8ee8d259"
     },
     {
       "claimId": "claim_ad95e550092bec4474133ac2a451649d",
@@ -483,7 +522,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0006 (source lines 1470-1471, starting \"- Record này supersede **Tập trạng thái FSM của Phase 1 (spec work-sta\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "12602590029a0f3b8fe58c0ef444d338"
     },
     {
       "claimId": "claim_2f1ede55aaf8adff2f15c46ffc646e8d",
@@ -495,7 +535,8 @@
       "disposition": "promote",
       "rationale": "Source ADR 0007 title heading is represented by the frozen H2 \"6. ADR 0007 ...\" (6-adr-0007-schema-and-event-evolution); title is renumbered and re-worded in English, text of the record is unchanged.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "38c7e64350e2c0ead7dc9dab84c6ecc2"
     },
     {
       "claimId": "claim_208f5cc84da2b23ab24abde2c91c4f06",
@@ -507,7 +548,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Bối cảnh\" of ADR 0007 is represented by the frozen H3 \"0007 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "ab86aba22bff4bd95dfd666582cad23d"
     },
     {
       "claimId": "claim_5f4f81607ad69719e2fed9631a8dcd2b",
@@ -519,7 +561,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0007 (source lines 1477-1479, starting \"Trạng thái `proposed` (0006) và trường `tier` (0005) **đổi shape dữ li\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "8dd703c9d39dc60ba48ae30e587eb759"
     },
     {
       "claimId": "claim_886f9acc902249e303bacc887ffb9882",
@@ -531,7 +574,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Quyết định\" of ADR 0007 is represented by the frozen H3 \"0007 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "08f6311c148ae29221fd5d1a3613d38b"
     },
     {
       "claimId": "claim_37315ade5a8ca0c583456c157daaecba",
@@ -543,7 +587,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0007 (source lines 1483-1483, starting \"Ba luật cho mọi tiến hoá schema/event từ đây về sau:\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "cc510df779670e7b9c13293a5a14adce"
     },
     {
       "claimId": "claim_4c29ddf395edf0a905c5cf76729c2d26",
@@ -555,7 +600,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0007 (source lines 1485-1491, starting \"1. **Log đã commit là bất khả xâm phạm.** Không bao giờ chạy migration\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "3544a54900acf99fb0dc62fc6dad1f1d"
     },
     {
       "claimId": "claim_9faf2f6fcfad6a089f7077f61abb3b56",
@@ -567,7 +613,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Hệ quả\" of ADR 0007 is represented by the frozen H3 \"0007 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "55d9c1f19dff0d40bd97abcc406422ba"
     },
     {
       "claimId": "claim_d0aa35a58456de6d8e5f552bdad1b08c",
@@ -579,7 +626,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0007 (source lines 1495-1500, starting \"- **Log là hợp đồng tiến-tới:** thêm trường an toàn; đổi ngữ nghĩa thì\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "a7f8e3a1618320c0c7ba6fa420ed0cb2"
     },
     {
       "claimId": "claim_576e295be7d60ab95a555f11ada15da5",
@@ -591,7 +639,8 @@
       "disposition": "promote",
       "rationale": "Supersession-rule line of ADR 0007 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e7"
     },
     {
       "claimId": "claim_e375b70390617716823280eb03a82a87",
@@ -603,7 +652,8 @@
       "disposition": "promote",
       "rationale": "Source ADR 0011 title heading is represented by the frozen H2 \"7. ADR 0011 ...\" (7-adr-0011-explicit-version-for-every-contract); title is renumbered and re-worded in English, text of the record is unchanged.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "7b520a895337dc7ea9a23e4bcc1debc3"
     },
     {
       "claimId": "claim_a93bf40197e2bf32890a9cf931226e15",
@@ -615,7 +665,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Bối cảnh\" of ADR 0011 is represented by the frozen H3 \"0011 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "e113b11d301e876e8e3b3d3f59eca420"
     },
     {
       "claimId": "claim_bad3eb429a52fae0b9100c7468c2d4d6",
@@ -627,7 +678,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0011 (source lines 1508-1514, starting \"0007 đã khoá \"mỗi **event** mang trường schema version\". Nhưng fgOS kh\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "3a9e4da78591f573c1cf6b4019c03802"
     },
     {
       "claimId": "claim_33c9953761a4fe99a4072b008cefc634",
@@ -639,7 +691,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0011 (source lines 1516-1523, starting \"Bằng chứng sống trong chính workshop: bee (harness phát triển cạnh fgO\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "f0eb277249c05d987db88e8f1d6b6889"
     },
     {
       "claimId": "claim_ff4510bb2afe125aedac972ed943ce2c",
@@ -651,7 +704,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Quyết định\" of ADR 0011 is represented by the frozen H3 \"0011 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "28cc1686008a465c5f12c2c878349dc0"
     },
     {
       "claimId": "claim_50eed5d7ed0c4f2107e50cca1ffcee82",
@@ -663,7 +717,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0011 (source lines 1527-1530, starting \"Ba loại contract fgOS expose ra ngoài code của nó — **schema** (shape \") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "4746d446f503df656947b8c1b4b27210"
     },
     {
       "claimId": "claim_6346dec77f2dff715949806586e100d3",
@@ -675,7 +730,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0011 (source lines 1532-1544, starting \"1. **Artifact có shape ổn định mang `contract: <name>/v<N>`** trong\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "f665548de1acd2a9a08cd71ec99df897"
     },
     {
       "claimId": "claim_0dd6189a9d8ed1bcdd656127bf71774e",
@@ -687,7 +743,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Hệ quả\" of ADR 0011 is represented by the frozen H3 \"0011 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "54a5977501d4d13b842a24d99b66e459"
     },
     {
       "claimId": "claim_9be26c9507109484cc9b1663ca4ca2d9",
@@ -699,7 +756,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0011 (source lines 1548-1554, starting \"- **0007 không bị supersede** — 0011 mở rộng phạm vi (event → +schema,\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "da125878208e7de6ec45f980e4c8e5bb"
     },
     {
       "claimId": "claim_08dc68ef23395b8f3f5b095508348e00",
@@ -711,7 +769,8 @@
       "disposition": "promote",
       "rationale": "Supersession-rule line of ADR 0011 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e7"
     },
     {
       "claimId": "claim_e3c928a8fca5c645487d1b574f0c5d36",
@@ -723,7 +782,8 @@
       "disposition": "promote",
       "rationale": "Source ADR 0012 title heading is represented by the frozen H2 \"8. ADR 0012 ...\" (8-adr-0012-unified-typed-edge-graph-model); title is renumbered and re-worded in English, text of the record is unchanged.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "e9c5857a60ea685d3aab78eae8e2b44b"
     },
     {
       "claimId": "claim_386a8c90d7f9d79a52190add7a82f33f",
@@ -735,7 +795,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Bối cảnh\" of ADR 0012 is represented by the frozen H3 \"0012 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "0dc5cda4fa7fbd44208f88a810d9e6f7"
     },
     {
       "claimId": "claim_4806fa4d3041b4b051cddf6a2490730b",
@@ -747,7 +808,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0012 (source lines 1562-1567, starting \"0002 khoá \"deps và parent là hai quan hệ tách rời có chủ đích\": `deps`\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "46ed30006ee6e00a1f81320cb86f1e91"
     },
     {
       "claimId": "claim_d1d70b955b085baafa10ffcec2702b8d",
@@ -759,7 +821,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0012 (source lines 1569-1575, starting \"Việc dò tay lúc validating S2a phát hiện một lỗ hổng sống **khác**, be\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "e4554b1ed9990b0f5dbf12aa19075d6d"
     },
     {
       "claimId": "claim_dc663544c2f4766e60ca2ce841c6ffd6",
@@ -771,7 +834,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0012 (source lines 1577-1581, starting \"Beads (nguồn tham khảo đã mined — `beads.md:36`, `work-item-management\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "1186cfa23b3d3a5f227a6f05ceacf581"
     },
     {
       "claimId": "claim_3b4da5c5b12c6780b24e84b53ca73e49",
@@ -783,7 +847,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Quyết định\" of ADR 0012 is represented by the frozen H3 \"0012 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "9dee590708c4181b56606cd803fd345e"
     },
     {
       "claimId": "claim_f44a3645601fbc48b21a8d73b3ac3426",
@@ -795,7 +860,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0012 (source lines 1585-1620, starting \"- **fgOS mô hình hoá quan hệ giữa các work item bằng MỘT đồ thị cạnh-đ\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "0f8f279453f179f3b8c688e65b42d55f"
     },
     {
       "claimId": "claim_c6a32a1e4ab8c7078b89199236f3d5e0",
@@ -807,7 +873,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Hệ quả\" of ADR 0012 is represented by the frozen H3 \"0012 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "764a0029f0ee73f78c522c71e69830fa"
     },
     {
       "claimId": "claim_4da244a64b6f33711d89feb47331b4f0",
@@ -819,7 +886,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0012 (source lines 1624-1631, starting \"- `docs/architecture-map.md` nâng v0.2 → v0.3: dòng version trỏ record\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "df6252739cffc35e81a7acce610d94cd"
     },
     {
       "claimId": "claim_a7c2e1310de5bcd152e86f3833e90033",
@@ -831,7 +899,8 @@
       "disposition": "promote",
       "rationale": "Supersession-rule line of ADR 0012 (change by superseding with a new record) carried verbatim at the end of its consequences section; the located suggestion pointed at the first identical copy, so the anchor was set to this ADR's own block.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e7"
     },
     {
       "claimId": "claim_2d27908b73621a411fcf708b067b6ba2",
@@ -843,7 +912,8 @@
       "disposition": "promote",
       "rationale": "Source ADR 0013 title heading is represented by the frozen H2 \"9. ADR 0013 ...\" (9-adr-0013-report-not-write-channel-for-discovered-from); title is renumbered and re-worded in English, text of the record is unchanged.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "bb9207e0916a5823e45378afb7d0247d"
     },
     {
       "claimId": "claim_e68c14be45a430e3676761d7bdc9e6db",
@@ -855,7 +925,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Bối cảnh\" of ADR 0013 is represented by the frozen H3 \"0013 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "39a94a27f6e89fec290ba89590cff979"
     },
     {
       "claimId": "claim_62c3b825e8cc887ad822b8d1b5316769",
@@ -867,7 +938,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0013 (source lines 1639-1643, starting \"work-graph-intelligence S2b thêm `discoveredFrom` — một trường lineage\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "a00c0f5592ff571cf91553ec9c8faad0"
     },
     {
       "claimId": "claim_2591914de0c8f3b95488576fb8643dfb",
@@ -879,7 +951,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0013 (source lines 1645-1650, starting \"Nhà sản xuất (B) va thẳng vào một bất biến đã khoá: **runner là nhà gh\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "ad532d04b4ed06951112d9fecaf14648"
     },
     {
       "claimId": "claim_1f9265c6ad8bc4b9e8cf754fb1b8b164",
@@ -891,7 +964,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Quyết định\" of ADR 0013 is represented by the frozen H3 \"0013 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "dc61b855030de6ec8c01fd1fd4621552"
     },
     {
       "claimId": "claim_e2589be21644922e0424a20d39bbd6e3",
@@ -903,7 +977,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0013 (source lines 1654-1655, starting \"Phát minh một **kênh báo-cáo-không-ghi** (report-not-write) giữa worke\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "c56d7ec3b4f47f64c9a1c99b5401e17c"
     },
     {
       "claimId": "claim_ebf8d11889aea2db10db3f7d03fb7d50",
@@ -915,7 +990,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0013 (source lines 1657-1661, starting \"1. **Worker chỉ báo cáo, dữ liệu thuần.** Prompt dispatch mô tả một kê\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "f17f548794a78bbc05c2553918d93b56"
     },
     {
       "claimId": "claim_afaa4b9499e137528bcf889ef6ef93f0",
@@ -927,7 +1003,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0013 (source lines 1663-1668, starting \"2. **Runner đọc và tự ghi.** `loop.mjs` `dispatchClaimedItem` parse cá\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "fe25484d362341cc389e461a59cba3bb"
     },
     {
       "claimId": "claim_185e1f6f4d1ef50fead4ce341980898d",
@@ -939,7 +1016,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0013 (source lines 1670-1673, starting \"3. **Parse là an-toàn-hỏng (fail-safe).** Khối méo/thiếu `title`/không\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "a25b933f983753d92ab77173127f6af1"
     },
     {
       "claimId": "claim_fc4d5078de5528578407ea0e3715e723",
@@ -951,7 +1029,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0013 (source lines 1675-1682, starting \"4. **Item tạo ra có hình dạng như một `submit` tươi.** `generateId(tit\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "2bc3f7c954aa9f7464b354246e208cbc"
     },
     {
       "claimId": "claim_df1ec9feeaeb131a98f44cebcd3c8f6c",
@@ -963,7 +1042,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Hệ quả\" of ADR 0013 is represented by the frozen H3 \"0013 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "19ae019de9e9e6e87ca9d19d8bb92a18"
     },
     {
       "claimId": "claim_b8d85d30862c55869062b5418f430f69",
@@ -975,7 +1055,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0013 (source lines 1686-1693, starting \"- **Runner vẫn một-cửa-ghi.** Worker phát dữ liệu; RUNNER ghi. Không c\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "dd8567cf8f5236817bec1f249d0b2189"
     },
     {
       "claimId": "claim_9f56719f95c81edecfe6dfda00ca0268",
@@ -987,7 +1068,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Ranh giới tin cậy (bổ chú 2026-07-18, review-fix S11)\" of ADR 0013 is represented by the frozen H3 \"0013 Trust Boundary\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "f4b2987afebaa4bfcb171bf9122acb39"
     },
     {
       "claimId": "claim_a4c7eec1fc96a1ad212a5de75a8942c5",
@@ -999,7 +1081,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0013 (source lines 1697-1709, starting \"`title`/`description` trong một khối `fgos-discovered` là VĂN BẢN KHÔN\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "1e83f0bc05ec81d1fe854887d220e203"
     },
     {
       "claimId": "claim_4e04420f3322b42d6a313faa72216ae9",
@@ -1011,7 +1094,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Bảo đảm giao-nhận (bổ chú 2026-07-18, review-fix S11)\" of ADR 0013 is represented by the frozen H3 \"0013 Delivery Guarantee\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "42a5b4fd66d36c0accc5dd7dffd9f8d1"
     },
     {
       "claimId": "claim_bd1c7b0191b236990a4740f007de2397",
@@ -1023,7 +1107,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0013 (source lines 1713-1717, starting \"Kênh này là **cố-gắng-tối-đa, tối-đa-một-lần** (best-effort, at-most-o\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "9a5163f6849965777501890f2c895955"
     },
     {
       "claimId": "claim_fe29583fb3eaae959e22d8ea42f76e6d",
@@ -1035,7 +1120,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Phương án đã cân nhắc và bỏ\" of ADR 0013 is represented by the frozen H3 \"0013 Alternatives Considered\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "dd8d4e0029a8249cf8149298e7a2d77c"
     },
     {
       "claimId": "claim_8beebc48272beb4cf5dd32b6ed94d5d0",
@@ -1047,7 +1133,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0013 (source lines 1721-1726, starting \"- **Worker tự gọi `fgos add`.** Bỏ — phá vỡ runner-một-cửa-ghi và làm \") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "61cda065233d2cdb3c74df03865aa0ac"
     },
     {
       "claimId": "claim_e763e03b02e0c2d677ef4b49f30a9ad3",
@@ -1059,7 +1146,8 @@
       "disposition": "promote",
       "rationale": "Source ADR 0019 title heading is represented by the frozen H2 \"10. ADR 0019 ...\" (10-adr-0019-pre-release-exemption-for-the-schema-evolution-rule); title is renumbered and re-worded in English, text of the record is unchanged.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "76fc593cba1fa3b5ebaf7e373e9251e1"
     },
     {
       "claimId": "claim_a9ff1aae0ff13bbce2c3ba5e9f30b19e",
@@ -1071,7 +1159,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Bối cảnh\" of ADR 0019 is represented by the frozen H3 \"0019 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "b589b460ed77e03ef37631a2f2e38752"
     },
     {
       "claimId": "claim_b87e27dca1c9e551eb4d296c858d0f08",
@@ -1083,7 +1172,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0019 (source lines 1732-1735, starting \"`RUL11 (tiến hóa schema)` (`docs/specs/work-state.md:886`, D-ID `feed7\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "5a365fcd8c5b99f79d1a6f32be9ae436"
     },
     {
       "claimId": "claim_5770fe5a53057464d4c4795b24abb38a",
@@ -1095,7 +1185,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0019 (source lines 1737-1742, starting \"STR46 đổi tên trường `actor` (và các trường phái sinh: `claimActor`, k\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "04c1c4fb64c70d916b094a4a20866c35"
     },
     {
       "claimId": "claim_86e1127b120054dafe55e52585c2a1d9",
@@ -1107,7 +1198,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Quyết định\" of ADR 0019 is represented by the frozen H3 \"0019 Decision\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "f4473462b5e03712e55bee9a240b00c7"
     },
     {
       "claimId": "claim_ef05e66d20bc35c8c80ac2a83dbe7d92",
@@ -1119,7 +1211,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0019 (source lines 1746-1749, starting \"Ghi nhận một **miễn trừ pre-release** cho `RUL11 (tiến hóa schema)`: t\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "8dc8ecc4dc88503fd629b00fef6a1841"
     },
     {
       "claimId": "claim_16901b7106220f70f44d600ba4dbb40f",
@@ -1131,7 +1224,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0019 (source lines 1751-1773, starting \"- **Phạm vi (coverage).** Miễn trừ bao trùm cả BA kho `.fgos` liệt ở t\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "98bb7f4e04652171ceed757c50de5df4"
     },
     {
       "claimId": "claim_6ce44d19e0f7b99b1c363579bf6eb68e",
@@ -1143,7 +1237,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0019 (source lines 1775-1779, starting \"Vì `RUL11 (tiến hóa schema)` là một luật trong spec chứ không phải một\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "2f6e935eb95f8af8bd54cd1a01fc3f7c"
     },
     {
       "claimId": "claim_9974f7370cd9be4ca66f08057a94d3d7",
@@ -1155,7 +1250,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Hệ quả\" of ADR 0019 is represented by the frozen H3 \"0019 Consequences\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "de5943f8259424b72bc4cfb00883277e"
     },
     {
       "claimId": "claim_38fc27aadc8aecf157c5db30cda1862b",
@@ -1167,7 +1263,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0019 (source lines 1783-1789, starting \"- **Replay không còn đọc hai tên cho một trường.** Sau khi viết lại và\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "03dc0e5f689c7e6c592f7134944ef404"
     },
     {
       "claimId": "claim_ebfb0421fa0d9c6693aaf57a262dd471",
@@ -1179,7 +1276,8 @@
       "disposition": "promote",
       "rationale": "Source ADR 0024 title heading is represented by the frozen H2 \"11. ADR 0024 ...\" (11-adr-0024-rename-proposed-status-to-awaiting-approval); title is renumbered and re-worded in English, text of the record is unchanged.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "9a20af2987019cf46f528ef85e14e942"
     },
     {
       "claimId": "claim_aa501f53cee0b7ec6adc656971266a97",
@@ -1191,7 +1289,8 @@
       "disposition": "promote",
       "rationale": "Section heading \"Bối cảnh\" of ADR 0024 is represented by the frozen H3 \"0024 Context\"; the title differs (prefixed with the ADR number, English) but the section it opens is the same.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "e7d340683e7d23c9fc7e740c59e3218b"
     },
     {
       "claimId": "claim_7d0cfc9e7e784ee0492be9c2d04fa93b",
@@ -1203,7 +1302,8 @@
       "disposition": "promote",
       "rationale": "Body of ADR 0024 (source lines 1795-1800, starting \"`0006` đặt tên status `proposed` cho trạng thái \"goal-check đạt, đề xu\") carried line for line into its own block; text identical to the source.",
       "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "7ef891c3b1ad980c1d7b4816db14927c"
     }
   ]
 }

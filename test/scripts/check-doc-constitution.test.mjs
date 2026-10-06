@@ -640,7 +640,21 @@ test('the freeze is recorded and the additive amendment carries its reason', () 
   const amendment = vocabulary.amendments.find((a) => a.change.includes('verification-record'));
   assert.equal(amendment.minor, 1);
   assert.match(amendment.evidence, /evidence is not authority/);
-  assert.equal(vocabulary.minorVersion, vocabulary.amendments.at(-1).minor);
+  assert.equal(vocabulary.minorVersion, 2);
+  assert.deepEqual(vocabulary.amendments.map((a) => a.id), ['v2.1-001', 'v2.2-001']);
+});
+
+test('the usage amendment rests on dispositions that the committed decision shards use', () => {
+  const shardsDir = path.resolve(REPO_ROOT, 'plans/260925-documentation-authority-unification/pilot/decisions');
+  const used = new Set();
+  const statuses = new Set();
+  for (const name of fs.readdirSync(shardsDir).filter((n) => n.endsWith('.json'))) {
+    for (const claim of JSON.parse(fs.readFileSync(path.join(shardsDir, name), 'utf8')).claims || []) { used.add(claim.disposition); statuses.add(claim.reviewStatus); }
+  }
+  const inUse = vocabulary.sourceDispositions.filter((d) => d.usage === 'in-use').map((d) => d.id);
+  for (const id of ['split', 'supersede', 'archive-with-reason', 'delete-as-obsolete']) assert.ok(inUse.includes(id) && used.has(id), id);
+  assert.ok(statuses.has('reviewed'));
+  assert.equal(vocabulary.reviewStatuses.find((r) => r.id === 'reviewed').usage, 'in-use');
 });
 
 test('the reading map stays outside docs/platform for a recorded reason', () => {

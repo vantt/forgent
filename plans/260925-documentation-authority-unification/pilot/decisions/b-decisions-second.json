@@ -15,7 +15,8 @@
       "reviewStatus": "reviewed",
       "rationale": "ADR 0024 context paragraph: code check showing the FSM holding proposed is domain-agnostic; text identical in the candidate 0024 Context.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "4b0aa9f66af44b8646bc59ceecd4cd0a"
     },
     {
       "claimId": "claim_7a2a3390e3beca0100dbfebb57cb6aab",
@@ -27,7 +28,8 @@
       "reviewStatus": "reviewed",
       "rationale": "ADR 0024 context paragraph: proposed is shared vocabulary between work.status and the outcome fields; text identical, only the surrounding heading levels changed.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "bc40e0a51da3f0b6c1bc1f2d9e080ca9"
     },
     {
       "claimId": "claim_69ddf8650201dae7cbe8fe80373c6a7c",
@@ -39,7 +41,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H4 \"Quyết định\" of ADR 0024 is carried as the H3 \"0024 Decision\"; title differs (English, ADR-prefixed), heading-only unit.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "83a65ba5e8f913c18138dea769b80eef"
     },
     {
       "claimId": "claim_5fb4a29b7884b27f3d265612f67e4f31",
@@ -51,7 +54,8 @@
       "reviewStatus": "reviewed",
       "rationale": "ADR 0024 decision paragraph (rename proposed to awaiting-approval, FSM edges untouched) carried verbatim.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "f0688f3556688d27119ec8c0d5d0d390"
     },
     {
       "claimId": "claim_5eca88140b6e1a8d5c14095b6cb31045",
@@ -63,7 +67,8 @@
       "reviewStatus": "reviewed",
       "rationale": "ADR 0024 migration paragraph (pre-release exemption, migration script, three stores in scope) carried verbatim.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "e63e9faed67fe666896d680ac13dbc95"
     },
     {
       "claimId": "claim_b1c9fa89736c52b8bff6d5ec328cc553",
@@ -75,7 +80,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H4 \"Hệ quả\" of ADR 0024 is carried as H3 \"0024 Consequences\"; title differs, heading-only unit.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "1cf238e42a2f95624c1b9839bb786556"
     },
     {
       "claimId": "claim_ec3bfee565512c6d032778295c5838c1",
@@ -87,7 +93,8 @@
       "reviewStatus": "reviewed",
       "rationale": "ADR 0024 consequences list (consumers switch with migration, duplicate-seq finding, 0006 only partly superseded) carried verbatim.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "1d55a3e34d5b0515071b018c1d53482d"
     },
     {
       "claimId": "claim_82f766f5320ab6bbe5174aeda52e710b",
@@ -99,7 +106,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Closing sentence of ADR 0024 (changing it means a new superseding record); the sentence recurs under other ADRs so the owner is block 64 after 0024 Consequences (found by position, not by first-line match).",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "95a357e29712c3c07eb935e2ea3696e7"
     },
     {
       "claimId": "claim_aa3cf298aaa31c6dc9b4c8382434bc9c",
@@ -111,7 +119,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H3 for ADR 0027 is carried as H2 \"12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary\"; title shortened/translated and level changed.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "6ac1fb5912f4bccdf38301b753d5c1c7"
     },
     {
       "claimId": "claim_818a58278988ed797931b14ca91614e2",
@@ -123,7 +132,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H4 \"Bối cảnh\" of ADR 0027 is carried as H3 \"0027 Context\"; title differs, heading-only unit.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "452a2ba22e0a3ab3caa9b41add3ce44e"
     },
     {
       "claimId": "claim_2d89ae63cbc81e492eb80e9a28174b67",
@@ -135,7 +145,8 @@
       "reviewStatus": "reviewed",
       "rationale": "ADR 0027 context opening: base-workflow-model does not exist as a file and what was lost; carried verbatim.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "f4a426a2b8673dfb37672014bca42672"
     },
     {
       "claimId": "claim_a92d8b1ad203c61b04078fa8b94c9b17",
@@ -147,7 +158,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Quoted original rule (RUL35 text from work-state.md) inside ADR 0027 context; carried verbatim as historical text within a decision.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "9e779d390baf10f4993b0973177117e4"
     },
     {
       "claimId": "claim_a3944b679053b61dc2d743795cde3d77",
@@ -159,7 +171,8 @@
       "reviewStatus": "reviewed",
       "rationale": "ADR 0027 reasons why the original rule was revised (multi-domain schema need); carried verbatim.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "5e566c132da3b486f17ad15991b3409a"
     },
     {
       "claimId": "claim_466331635349f55e32c11e0fcf56d334",
@@ -171,7 +184,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H4 \"Quyết định\" of ADR 0027 is carried as H3 \"0027 Decision\"; title differs, heading-only unit.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "3969babe82040ce7d1d34672b372c59d"
     },
     {
       "claimId": "claim_3f65fc24d3eeb760ecc11ff781159152",
@@ -183,7 +197,8 @@
       "reviewStatus": "reviewed",
       "rationale": "ADR 0027 statement of the exact supersede scope (only the first segment); carried verbatim.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "1c7ea2fda926300b7351bee9c39ec931"
     },
     {
       "claimId": "claim_a4a77d7c336663f81a9bc8ac697ab518",
@@ -195,7 +210,8 @@
       "reviewStatus": "reviewed",
       "rationale": "ADR 0027 list of the six pre-delivered statuses and the tail group; carried verbatim.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "46ec1457959a8895465a7d7320215bb4"
     },
     {
       "claimId": "claim_a4ed529f5ed4745e1c6bbbb06eb3a4b2",
@@ -207,7 +223,8 @@
       "reviewStatus": "reviewed",
       "rationale": "ADR 0027 sentence introducing the statusCategory mapping table; carried verbatim.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "127c7c7a99d0a8fcab543606c597226d"
     },
     {
       "claimId": "claim_f3d9c6dbb704d09c37ab5cfd4f65927e",
@@ -219,7 +236,8 @@
       "reviewStatus": "reviewed",
       "rationale": "ADR 0027 status-to-statusCategory mapping table; carried verbatim (table markup intact).",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "7b133e87cfdf8159a9ddd402d8ce2f59"
     },
     {
       "claimId": "claim_6c5753df306960b46d20e133a2a36894",
@@ -231,7 +249,8 @@
       "reviewStatus": "reviewed",
       "rationale": "ADR 0027 paragraph on statusCategory being a proven lossy compression; carried verbatim.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "6d99060fca9f1fb5602ee7d2ec14775a"
     },
     {
       "claimId": "claim_1d98a4a5c3391d5318f53153b3f5f442",
@@ -243,7 +262,8 @@
       "reviewStatus": "reviewed",
       "rationale": "ADR 0027 paragraph that the four tail statuses need no statusCategory; carried verbatim.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "7c211b5505c4924dd9c23a68d64ab366"
     },
     {
       "claimId": "claim_546450931dd47024138ce0a32699cd72",
@@ -255,7 +275,8 @@
       "reviewStatus": "reviewed",
       "rationale": "ADR 0027 out-of-scope list of the supersede; carried verbatim.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "31a4c4ddccf1d5d56990ceba0e49bc09"
     },
     {
       "claimId": "claim_0da8b597cb243173df9f5eb46a34ec76",
@@ -267,7 +288,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H4 \"Audit: mọi consumer thật ...\" is carried as H3 \"0027 Consumer Audit\"; title shortened and translated.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "e8596bf17b33258ee768e967da03d9ef"
     },
     {
       "claimId": "claim_0cabbd5a6b95edeb9aab6832ad276c50",
@@ -279,7 +301,8 @@
       "reviewStatus": "reviewed",
       "rationale": "ADR 0027 audit method paragraph (rg scan of STATUSES/TRANSITIONS) carried verbatim.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "c2f2baeae1bc366d51a16dbf1b083a2a"
     },
     {
       "claimId": "claim_7889671f1f2783b634ef6d90a251f3e9",
@@ -291,7 +314,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H5 \"1. Nguồn sự thật\" is carried as H4 \"0027 Audit 1 Status Source Of Truth\"; title and level changed.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "50248a7774c2a4f3faf5bf48e4204713"
     },
     {
       "claimId": "claim_fc0f124b5b1368034455207d6378bc00",
@@ -303,7 +327,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Audit 1 table (status source-of-truth file:line, role, changed?) carried verbatim into block 76 under Audit 1; the shared first-line suggestion was checked against the Audit 1 position.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "bdee4fb8f864c64bb1ccdda044960818"
     },
     {
       "claimId": "claim_c0adce3f717a031d4159eee6dd0aaaa1",
@@ -315,7 +340,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H5 \"2. RESOLVED_STATUSES\" is carried as H4 \"0027 Audit 2 Resolved Statuses Set\"; title and level changed.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "a4b78ba726bd39959cca89e81fa9d1bd"
     },
     {
       "claimId": "claim_d97ba7f5ff310af83839fea58329acdd",
@@ -327,7 +353,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Audit 2 paragraph on RESOLVED_STATUSES in frontier.mjs; carried verbatim.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "827c7ac395f16aea73f4b6cb168d3876"
     },
     {
       "claimId": "claim_84950cfff9d75392b847739c4812768a",
@@ -339,7 +366,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Audit 2 table of RESOLVED_STATUSES consumers; carried verbatim into block 78 (the located suggestion of block 76 was a first-line collision, the whole-text match is block 78).",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "4e6cda4b133d000a59389f9baa14d539"
     },
     {
       "claimId": "claim_ebfe14fc1ae59246f7b3c8871b402520",
@@ -351,7 +379,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H5 \"3. Literal status trong verb logic\" is carried as H4 \"0027 Audit 3 CLI Status Literals\"; title and level changed.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "f921d3b97d03d68d8e8ea0e0722b1893"
     },
     {
       "claimId": "claim_72ee6b558f807216affeb2559c6a597d",
@@ -363,7 +392,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Audit 3 table of CLI status literals; carried verbatim.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "707bfd13096596cdaacead82be520468"
     },
     {
       "claimId": "claim_6a85836cdc08fbdfde62f6d3fd9c2d8f",
@@ -375,7 +405,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H5 \"4. runner/ ...\" is carried as H4 \"0027 Audit 4 Runner Consumers\"; title and level changed.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "cab0851daca0bf6a441036d7b9e02d4f"
     },
     {
       "claimId": "claim_4fceb5ca59ea256ccd77c0975d3576e1",
@@ -387,7 +418,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Audit 4 runner table; carried verbatim into block 80 (the located suggestion of block 76 was a first-line collision, whole-text match is block 80).",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "78c3de3f1ca205dedc7323091a92d4c1"
     },
     {
       "claimId": "claim_f1507b5008c678f9474202706e018774",
@@ -399,7 +431,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H5 \"5. Cơ chế domain-agnostic khác\" is carried as H4 \"0027 Audit 5 Other Domain-Agnostic Mechanisms\"; title and level changed.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "42d14b107b6ba2a390f6c7881ba8471c"
     },
     {
       "claimId": "claim_042b85c001dab92b6ae561f89eac6337",
@@ -411,7 +444,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Audit 5 table of other domain-agnostic mechanisms; carried verbatim into block 81 (located suggestion block 76 was a first-line collision).",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "fa83039437009e5f88a38c2bc19014eb"
     },
     {
       "claimId": "claim_3fbb7ac76d27f06cc8e095a1d0e6b88e",
@@ -423,7 +457,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H5 \"6. Gap liên quan ...\" is carried as H4 \"0027 Audit 6 Adjacent Gaps\"; title and level changed.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "379c5e08a01f354caaa42087399545a3"
     },
     {
       "claimId": "claim_c5f9a98133b0fd6692dd0c7555d775e1",
@@ -435,7 +470,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Audit 6 note that fgos-coding-compounding is called hard for every retrospective item; carried verbatim.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "d398e694ec2837bbe5052cfea277526d"
     },
     {
       "claimId": "claim_e2d3709ee991f35ec6153e7e84c46e2f",
@@ -447,7 +483,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H4 \"Hệ quả\" of ADR 0027 is carried as H3 \"0027 Consequences\"; title differs, heading-only unit.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "7729270993aaa029e4ceb8b643006703"
     },
     {
       "claimId": "claim_8eeec687713e79da23a9339df1179b60",
@@ -459,7 +496,8 @@
       "reviewStatus": "reviewed",
       "rationale": "ADR 0027 consequences list (precondition for the multi-domain schema work and follow-ups); carried verbatim.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "e12e5b17bd0afd2f30ca5edac6ad58cf"
     },
     {
       "claimId": "claim_217bf9908c0941c13b1eaf2f7a2d9d64",
@@ -471,7 +509,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H3 \"0032 — Multi-role Team Harness: trục role/holder ...\" is carried as H2 \"13. ADR 0032 Multi-Role Team Harness\"; title shortened and translated.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "adc471524e7f457d3d74097885286fe9"
     },
     {
       "claimId": "claim_63db75c2d22d1861c69845d62518ee60",
@@ -483,7 +522,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Distill-evidence blockquote opening ADR 0032 (24 discussion rounds, 2026-08-15); carried verbatim under the 0032 H2.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "6f54e9c73c49cc06bd93ba1401ddb0bd"
     },
     {
       "claimId": "claim_e6ae96517c239248948c36255ae4dcac",
@@ -495,7 +535,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H4 \"Hành trình\" is carried as H2 \"2. Distill Journey\" in the history document, not in the decision record; title differs.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "8cb65c5075a2a4c13e78b4300f757cfe"
     },
     {
       "claimId": "claim_634d509e158ed8fc22f610e4c51030ba",
@@ -507,7 +548,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Dated distill-journey narrative (comparison request and the scouting rounds); carried verbatim into the history document, classified historical-context rather than decision.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "9f9c5aa1e0bc5a1c034b9356fe0d0dc2"
     },
     {
       "claimId": "claim_7e0016df70b7640b0337c5daf5f80e90",
@@ -519,7 +561,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H4 \"I. Kiến trúc nền (seq ...)\" is carried as H3 \"0032 Foundation Architecture\"; title translated and seq references dropped.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "43773d8a795297806063bf0a0df747a4"
     },
     {
       "claimId": "claim_a9be2da803446c73efbfcac40ee82637",
@@ -531,7 +574,8 @@
       "reviewStatus": "reviewed",
       "rationale": "ADR 0032 foundation list (mechanism vs policy and related axes); carried verbatim.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "2a1722766193d70b5f41165f820655b6"
     },
     {
       "claimId": "claim_f30f58465c33adf6343057d6c3fcb2b3",
@@ -543,7 +587,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H4 \"II. Handoff ...\" is carried as H3 \"0032 Handoff\"; title shortened and seq references dropped.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "6b297c17245b7ff04f30f0e8abc72bbb"
     },
     {
       "claimId": "claim_6f7a10c04ee1414d39b0b2ef8d7d2d6d",
@@ -555,7 +600,8 @@
       "reviewStatus": "reviewed",
       "rationale": "ADR 0032 handoff list (Call vs hand-off kinds and rules); carried verbatim.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "dce677680de09c58dce4e54b16850671"
     },
     {
       "claimId": "claim_45840c035132a9c46aa748567ae37648",
@@ -567,7 +613,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H4 \"III. Cấu trúc khai báo ...\" is carried as H3 \"0032 Declarative Structure\"; title translated and seq references dropped.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "f13c8f30093babf6efcf6b2fbb0062ee"
     },
     {
       "claimId": "claim_10986602d5cab816cf923616dc6b58f8",
@@ -579,7 +626,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Long ADR 0032 declarative-structure list (hierarchy domain, workflow, item and the declared structures); 66 lines carried verbatim as one block.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "7dfb88e6ee480189beccd2e878bedb9e"
     },
     {
       "claimId": "claim_7baf6e6911d7bdc8cbb66425d0aff57a",
@@ -591,7 +639,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H4 \"IV. Trình tự triển khai (seq 18030)\" is carried as H3 \"0032 Implementation Sequence\"; title translated.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "861c399f16053144093e08b8bf68e573"
     },
     {
       "claimId": "claim_2e0270967476b583f5548c2d0632c6f7",
@@ -603,7 +652,8 @@
       "reviewStatus": "reviewed",
       "rationale": "ADR 0032 statement that coding goes first (user decision reversing the proposal); carried verbatim.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "4b806f05cc974fa81ae9b0ebd50789a5"
     },
     {
       "claimId": "claim_b7d1849e7cde5d799b984dbf0ea3bcff",
@@ -615,7 +665,8 @@
       "reviewStatus": "reviewed",
       "rationale": "ADR 0032 table of reason versus existing implicit interaction; carried verbatim.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "d6ebd90319d8f7c2c586f0790b3649a8"
     },
     {
       "claimId": "claim_fd3c6c93c220012e1e08d65c9276ab24",
@@ -627,7 +678,8 @@
       "reviewStatus": "reviewed",
       "rationale": "ADR 0032 ordering sentence for the three delivery pieces; carried verbatim.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "a53db20b6d5f1c2bd15b3fee81feaa4d"
     },
     {
       "claimId": "claim_963bf3272df983c42aead0351a429ce4",
@@ -639,7 +691,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H4 \"V. Kết luận so sánh marketing-cockpit ...\" is carried as H3 \"0032 Marketing Cockpit Comparison Conclusion\"; title translated.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "8a71adf68dd932df92f4e48b38dabd72"
     },
     {
       "claimId": "claim_68304d9e3c8f531fd5dcc25392c6d072",
@@ -651,7 +704,8 @@
       "reviewStatus": "reviewed",
       "rationale": "ADR 0032 list of what is taken from the cockpit into fgOS; carried verbatim.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "6bfb192eaa61ff2f393e5621a2ccb051"
     },
     {
       "claimId": "claim_8d8de83dcecd115c8b517cbf12d08795",
@@ -663,7 +717,8 @@
       "reviewStatus": "reviewed",
       "rationale": "ADR 0032 four-way split port rule for a cockpit task yaml; carried verbatim.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "a0a6b146892e904d63cafd64b0a130c3"
     },
     {
       "claimId": "claim_331e9d0a3a7f29b20ec75ed8981f7fb7",
@@ -675,7 +730,8 @@
       "reviewStatus": "reviewed",
       "rationale": "ADR 0032 list of what the cockpit drops on entry; carried verbatim.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "b18e4845b71df780025ec4c6b82b4551"
     },
     {
       "claimId": "claim_c696887f984b8248a620d445d341cf0b",
@@ -687,7 +743,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H4 \"VI. Treo có chủ đích (không phải quên)\" is carried as H3 \"0032 Deliberately Deferred Questions\"; title translated.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "c71143d4c041f9d8943b66c9a1138bf3"
     },
     {
       "claimId": "claim_092f7d288e8617bb3b8abff586e988f8",
@@ -699,7 +756,8 @@
       "reviewStatus": "reviewed",
       "rationale": "ADR 0032 numbered list of deliberately deferred questions; carried verbatim.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "2431462c129b13b99afc3b1e18061c82"
     },
     {
       "claimId": "claim_cf9060b6664b21d6e5fac0b31aac0ff6",
@@ -711,7 +769,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H4 \"VII. Trạng thái tại thời điểm distill (2026-08-15)\" is carried as H2 \"3. State At Distill Time\" in the history document; dated snapshot, title differs.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "dda4c28cba5f1a13d782c50c996bc50d"
     },
     {
       "claimId": "claim_be0cd74b4a0bd4c5860e9116aa8dd6c6",
@@ -723,7 +782,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Dated state-at-distill list (validating finished, reality gate 6/6); carried verbatim into the history document as historical-context.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "09bb0ef5d78c9357cc67cc5622d215a4"
     },
     {
       "claimId": "claim_581643ec8243af5744e04c222f13c214",
@@ -735,7 +795,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Source H4 \"VIII. Sau distill ...\" is carried as H2 \"4. Implementation Review And Verification After Distill\"; dated section, title translated.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "a88add6a18b0023671d9f83c9261dfd5"
     },
     {
       "claimId": "claim_690988881136792349476d55b83bd81d",
@@ -747,7 +808,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Note that this section was not in the original distill and was added when copying to docs/decisions; carried verbatim.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "721cb9fe837087d22e83ba6ac1761a6c"
     },
     {
       "claimId": "claim_e24e9588d1d0d0ec87a1a90db87e62b9",
@@ -759,7 +821,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Paragraph on the three pieces implemented, tested, self-reviewed and committed sequentially; carried verbatim.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "42f0a4f36be3f8722adbd5bc7066fc53"
     },
     {
       "claimId": "claim_6866da75d153e251a298ec889e5e67f8",
@@ -771,7 +834,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Long post-distill list (real handoff wiring, independent review, real verify); 22 lines carried verbatim.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "0ce476ffc3451d8e11c1e2c4c802eb70"
     },
     {
       "claimId": "claim_48a16587298cde876c7142378489c618",
@@ -783,7 +847,8 @@
       "reviewStatus": "reviewed",
       "rationale": "Closing lesson paragraph of the post-distill section (unit/integration tests prove engine, not real run); carried verbatim.",
       "reviewedBy": "independent reviewer (review-b-decisions-second)",
-      "reviewedAt": "2026-10-07"
+      "reviewedAt": "2026-10-07",
+      "targetUnitDigest": "71b2516db6bbf541250e88bbb6278687"
     }
   ]
 }

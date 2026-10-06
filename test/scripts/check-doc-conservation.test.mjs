@@ -376,13 +376,15 @@ test('a clean decision merges onto its claim row without mutating the input inve
   assert.notEqual(result.inventory.items, inventory.items);
 });
 
-test('a decision on a claim that is a registry identity gap gives the gap row its disposition without touching the registry', () => {
+test('a reviewed decision on a claim that is a registry identity gap gives the gap row its disposition, a pending one does not', () => {
   const registry = { identityGaps: [{ claimId: DECIDED_CLAIM_ID, sourcePath: 'docs/specs/runner.md', sourceAnchor: 'a' }, { claimId: `claim_${'c'.repeat(32)}`, sourcePath: 'docs/specs/runner.md', sourceAnchor: 'b' }] };
   const before = JSON.stringify(registry);
-  const result = gates.applyDecisions(decisionInventory(), [goodShard()], { vocabulary: VOCABULARY, targetAnchorsOf: anchorsOf, registry });
+  const reviewed = { ...goodDecision(), reviewStatus: 'reviewed', reviewedBy: 'rev', reviewedAt: '2026-10-07' };
+  const result = gates.applyDecisions(decisionInventory(), [goodShard([reviewed])], { vocabulary: VOCABULARY, targetAnchorsOf: anchorsOf, registry });
   assert.deepEqual(result.findings, []);
   assert.equal(JSON.stringify(registry), before);
   assert.deepEqual(result.registry.identityGaps.map((row) => row.disposition), ['move', undefined]);
+  assert.equal(gates.applyDecisions(decisionInventory(), [goodShard()], { vocabulary: VOCABULARY, targetAnchorsOf: anchorsOf, registry }).registry.identityGaps[0].disposition, undefined);
   assert.equal(gates.applyDecisions(decisionInventory(), [goodShard()], { vocabulary: VOCABULARY, targetAnchorsOf: anchorsOf }).registry, null);
 });
 
@@ -402,6 +404,41 @@ test('a registry gap decision overlays the gap row and reports an unknown, repea
   assert.deepEqual(types([{ ...gap, targetOwner: null }]), ['decision-gap-invalid']);
   assert.deepEqual(types([{ ...gap, rationale: '' }]), ['decision-gap-invalid']);
   assert.deepEqual(types([{ ...gap, sourcePath: 'docs/other.md' }]), ['decision-gap-invalid']);
+});
+
+test('a reviewed decision is bound to the target unit it compared and drifts when that unit changes', () => {
+  const digests = { [`${OWNER}#intro`]: 'ab'.repeat(32) };
+  const digestOf = (owner, anchor) => digests[`${owner}#${anchor}`] ?? null;
+  const run = (d) => gates.applyDecisions(decisionInventory(), [goodShard([d])], { vocabulary: VOCABULARY, targetAnchorsOf: anchorsOf, targetUnitDigestOf: digestOf }).findings.map((f) => f.type);
+  const reviewed = { ...goodDecision(), reviewStatus: 'reviewed', reviewedBy: 'rev', reviewedAt: '2026-10-07' };
+  assert.deepEqual(run({ ...reviewed, targetUnitDigest: 'ab'.repeat(8) }), []);
+  assert.deepEqual(run({ ...reviewed, targetUnitDigest: 'cd'.repeat(8) }), ['decision-target-drift']);
+  assert.deepEqual(run({ ...reviewed, targetUnitDigest: 'ab' }), ['decision-target-drift']);
+  assert.deepEqual(run(reviewed), ['decision-reviewed-incomplete']);
+  assert.deepEqual(run({ ...goodDecision(), targetUnitDigest: 'cd'.repeat(8) }), ['decision-target-drift']);
+  assert.deepEqual(run(goodDecision()), []);
+});
+
+test('blocking pairs only with unknown-blocking, a file is decided once, and an unknown-blocking gap stays open', () => {
+  const blockingPromote = gates.applyDecisions(decisionInventory(), [goodShard([{ ...goodDecision(), reviewStatus: 'blocking' }])], { vocabulary: VOCABULARY, targetAnchorsOf: anchorsOf }).findings.map((f) => f.type);
+  assert.deepEqual(blockingPromote, ['decision-blocking-status-mismatch']);
+  const file = { path: 'docs/specs/runner.md', disposition: 'move', rationale: 'carried', targets: [OWNER] };
+  const twice = gates.applyDecisions(decisionInventory(), [goodShard([], { files: [file] }), { ...goodShard([], { files: [{ ...file, disposition: 'retain-as-evidence', targets: [] }] }), shard: 'two' }], { vocabulary: VOCABULARY, targetAnchorsOf: anchorsOf });
+  assert.deepEqual(twice.findings.map((f) => f.type), ['decision-file-duplicate']);
+  const GAP = `claim_${'d'.repeat(32)}`;
+  const registry = { identityGaps: [{ claimId: GAP, sourcePath: 'docs/specs/runner.md', sourceAnchor: 'x' }] };
+  const open = gates.applyDecisions(decisionInventory(), [goodShard([], { registryGaps: [{ claimId: GAP, sourcePath: 'docs/specs/runner.md', disposition: 'unknown-blocking', rationale: 'still open' }] })], { vocabulary: VOCABULARY, targetAnchorsOf: anchorsOf, registry });
+  assert.equal(open.registry.identityGaps[0].disposition, undefined);
+});
+
+test('a scope that is an option or matches no inventory path is reported', () => {
+  const inventory = { items: [{ path: 'docs/specs/runner.md' }, { path: 'docs/io-contract.md' }] };
+  assert.equal(gates.findUnmatchedScope(['docs/specs/runner.md', 'docs/io-contract.md'], inventory), undefined);
+  assert.equal(gates.findUnmatchedScope(['docs/specs'], inventory), undefined);
+  assert.equal(gates.findUnmatchedScope(['docs/specs/runner.md', 'docs/nowhere.md'], inventory), 'docs/nowhere.md');
+  assert.equal(gates.findUnmatchedScope(['--strict'], inventory), '--strict');
+  assert.equal(gates.findUnmatchedScope(['./docs/io-contract.md'], inventory), './docs/io-contract.md');
+  assert.equal(gates.findUnmatchedScope([], inventory), undefined);
 });
 
 test('a file decision replaces the proposed disposition, rationale and target owner of its item', () => {
