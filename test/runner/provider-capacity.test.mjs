@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { fork, spawnSync } from 'node:child_process';
+import { fork, spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import {
@@ -12,6 +12,7 @@ import {
   classifyProviderCapacityFault,
   parseQuotaResetWindowMs,
   inspectProviderCapacity,
+  ProviderCapacityLockError,
   providerCapacityStatePaths,
   quarantineProviderAccount,
   rankProviderAccounts,
@@ -388,6 +389,10 @@ function handle({ runtimeDir, runId, assignmentId }) {
     runId,
     seed: runId,
     runtimeDir,
+    // A lost lease is the property under test, not how long a contender may wait: a bound that a
+    // busy disk can exhaust (the holder fsyncs inside the lock) would fail the trial for a reason
+    // unrelated to whether any lease was lost.
+    lockWaitMs: 300_000,
   });
   return { runId, status: result?.status ?? null };
 }
@@ -488,6 +493,45 @@ function handle({ lockDir, markerPath, violationsPath }) {
         : undefined,
     );
   }
+});
+
+// A real second process holds the state lock for HOLD_MS, then releases it.
+// An explicit short lockWaitMs must give up with ProviderCapacityLockError
+// well before the holder lets go; omitting lockWaitMs must keep the
+// production default, which outlasts that hold and then selects normally.
+test('lease acquire waits for a live lock holder only as long as lockWaitMs, and by default outlasts a short hold', { timeout: 30_000 }, async (t) => {
+  const HOLD_MS = 1500;
+  const runtimeDir = mkTempDir();
+  t.after(() => fs.rmSync(runtimeDir, { recursive: true, force: true }));
+  const { lockDir } = providerCapacityStatePaths(runtimeDir);
+
+  const holder = spawn(process.execPath, ['--input-type=module', '-e', `
+import fs from 'node:fs';
+import { withFileLock } from ${JSON.stringify(pathToFileURL(PROVIDER_CAPACITY_MJS).href)};
+withFileLock(${JSON.stringify(lockDir)}, () => {
+  fs.writeSync(1, 'held\\n');
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ${HOLD_MS});
+});
+`], { stdio: ['ignore', 'pipe', 'inherit'] });
+  t.after(() => holder.kill());
+  const holderExited = new Promise((resolve) => holder.once('exit', resolve));
+  await new Promise((resolve, reject) => {
+    holder.stdout.once('data', resolve);
+    holder.once('exit', (code) => reject(new Error(`lock holder exited (code ${code}) before taking the lock`)));
+  });
+
+  const args = { runnerConfig: runnerConfig(), provider: 'openai-codex', runId: 'run_lock_wait', runtimeDir };
+  const started = Date.now();
+  assert.throws(
+    () => acquireProviderAccountLease({ ...args, lockWaitMs: 50 }),
+    (err) => err instanceof ProviderCapacityLockError && err.holderPid === holder.pid,
+  );
+  assert.ok(Date.now() - started < HOLD_MS, `a 50ms lockWaitMs must give up before the ${HOLD_MS}ms hold ends`);
+
+  const selected = acquireProviderAccountLease(args);
+  assert.equal(selected?.status, 'selected');
+  assert.ok(Date.now() - started >= HOLD_MS - 100, 'the default wait must have outlasted the holder rather than finding the lock free');
+  assert.equal(await holderExited, 0);
 });
 
 test('classifier quarantines only high-confidence stderr/provider outcomes', () => {
