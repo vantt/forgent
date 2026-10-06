@@ -81,12 +81,12 @@ Each row will receive its commit and exercised proof, or an explicit non-fix/UNP
 | Eval Low: lexical timestamp list ordering | Pending disposition | — |
 | Eval Low: unsafe shard silently skipped | Pending disposition | — |
 | Eval concurrency: same shard not exercised | Pending cross-process same-shard regression | — |
-| Honesty High: false isolation provenance | Pending records/report/plan/journal/how-to correction | Reviewer transcript findings are ground truth. |
-| Honesty High: solo consumed panel output | Pending explicit confound disclosure | Old scores stay real but not an independent comparison. |
+| Honesty High: false isolation provenance | **Corrected before first commit** in both records; metadata, report, plan, journal and how-to aligned | `metrics eval list` returned both corrected records, invalid empty; scores unchanged. |
+| Honesty High: solo consumed panel output | **Disclosed** in setup/judge metadata and every comparison claim | Old scores are not an independent comparison; new proof remains conditional. |
 | Honesty High: weakened exact import closure | Same unresolved runtime-policy conflict as foundation H2 | No restoration claimed. |
-| Honesty Medium: different historical question | Pending explicit deviation disclosure | — |
-| Honesty Medium: raw judge command contradicts dispatch door | Pending how-to routed invocation / data-only blindness limit | — |
-| Honesty Medium: cross-project unqualified runRefs | Pending root qualification in setup provenance | — |
+| Honesty Medium: different historical question | **Disclosed**; original objective retained for any fresh run | Vietnamese 1000-word vs English repo-reading 300-word distinction explicit. |
+| Honesty Medium: raw judge command contradicts dispatch door | **Corrected**: how-to uses decide/execute and requires configured/audited invocation | Default executor is explicitly data-blind only; actual installed `claude --help` checked. |
+| Honesty Medium: cross-project unqualified runRefs | **Corrected** setup provenance names `/home/vantt/projects/mdview` | IDs/refs unchanged; owning root explicit in both real rows. |
 | Authorization unproven | **Owner confirmed now** | Exact answer above, historical transcript discoverability remains separate. |
 | Watchdog residual append failure may prevent kill | Not changed: outside requested repair groups | Review identifies risk; no claim it is resolved here. |
 | Original all-phase completion / re-review approval claims | Reopened by acceptance; not proof that all consumer defects were absent | New regression and finding-specific proof pending. |
@@ -99,3 +99,11 @@ No final full-suite run has started. Final Rust, CLI, narrow and full-suite outp
 
 - The existing reconciliation import-graph suite was exercised unchanged: `env -u CLAUDE_CODE_SESSION_ID node --test test/runner/dispatch-reconciliation-import-graph.test.mjs`, **22 pass / zero fail**. This does not restore the missing exact assertion or source-enumerator guard.
 - GitNexus incremental refresh failed on an inconsistent derived FTS index; `analyze --force` rebuilt successfully at the current checkout (58,821 nodes, 81,138 edges). Pre-commit `detect-changes --scope all --repo /home/vantt/projects/forgentX` reports docs only, no affected processes, LOW risk. Generated AGENTS.md/CLAUDE.md edits are not staged.
+
+### Provenance correction
+
+- Initial verification-honesty commit: `842287533`. The original source guard remains unmet, not waived.
+- Original eval shard was untracked at start, so its two false `judge` strings were corrected before first commit, as requested. IDs, timestamps, score vectors and runRefs were preserved; setup now names the actual mdview root and the independence/question confounds.
+- `target/debug/fgos metrics eval list --dir /home/vantt/projects/forgentX --question 'fgOS có nên thêm cổng dissent/agreement vào panel?'` returned exactly the two corrected records with `invalid: []`.
+- Narrow store regression: `cargo test -p fgos-observe --test eval_journal_test`, **27 pass / zero fail** (artifact://296). This exercises existing record/list behavior; rubric/uniqueness/portable-open repairs are not yet implemented.
+- `claude --help` confirms isolation flags exist, but default dispatch does not append them. No new isolated judge or fair comparison is claimed in this commit.

@@ -1,6 +1,6 @@
 # Observe discussion measurement — execution evidence
 
-Owner go: “làm hết tất cả phase đi” superseded the foundation-only gate on 2026-10-05. Phases 4–6 add measurement, not a dissent gate, retry policy or decision ledger. Foundation evidence remains in [layout inventory](observe-run-layout-261005.md) and [rebaseline](observe-rebaseline-261005.md); its historical counts are not replaced by current counts.
+Owner go: “làm hết tất cả phase đi” superseded the foundation-only gate on 2026-10-05; the owner confirmed this in the 2026-10-06 repair conversation. Phases 4–6 add measurement, not a dissent gate, retry policy or decision ledger. Foundation evidence remains in [layout inventory](observe-run-layout-261005.md) and [rebaseline](observe-rebaseline-261005.md); its historical counts are not replaced by current counts. [Acceptance corrections](observe-acceptance-fixes-261006.md) supersede the isolation and fair-comparison claims below.
 
 ## Ownership and contract
 
@@ -60,11 +60,11 @@ New explicitly routed panel `unit-run-1791219961331-276f364c` passed. Panelists:
 
 Two earlier solo attempts in the actively edited forgentX checkout produced reports but settled policy-refusal (`read-only-mutation`); they are not relabeled successful. The compared solo ran on mdview, `unit-run-1791220096823-0f5e7675`, Claude Opus through herdr, and passed. Comparing both in the consumer project avoids treating concurrent implementation edits as worker mutations.
 
-## Fresh blind Opus comparison and real journal
+## Data-blind Opus judgment and real journal — not isolated
 
-Scratch directory `/tmp/observe-blind-4nZiJ8` was outside `.fgos`, and actual inventories before/after judgment contained only `A.md` and `B.md`. The final judge received complete substantive deliverables with identical normalization: runtime paths and IDs redacted in both. No setup-to-A/B mapping was supplied. Initial unnormalized judging is excluded because citations exposed runtime IDs; a fresh stateless normalized evaluation replaced it.
+The author reported a scratch directory `/tmp/observe-blind-4nZiJ8` outside `.fgos` containing only A/B before and after judgment. The directory was deleted and no independently auditable inventory/hash artifact was retained: scratch contents are **UNPROVEN** from the repository evidence. The final prompt supplied complete substantive deliverables under neutral A/B labels with runtime paths/IDs normalized; no setup mapping was supplied. Reviewer-inspected transcripts contain no tool calls. The earlier unnormalized session gave the same scores; the normalized session was persisted, not stateless.
 
-Opus ran via the Dispatch execution adapter (`claude`, `cli-spawn`, model `opus`, flagship), not a raw provider invocation. Tools, MCP servers and setting sources were empty; safe mode, no session persistence and slash commands disabled. `dispatch decide` returned configured out-of-process; completed calls were logged. The adapter printed non-git-cwd diagnostics for the fresh scratch, but status was zero; scratch remained two regular files.
+Opus ran via Dispatch (`claude`, `cli-spawn`); the transcript model is `claude-opus-5-5`. **The prior isolation claim was false.** Tools and 93 deferred tools, MCP instructions, custom instructions and skills were loaded; hooks ran, but no tool call occurred. The effective configured invocation did not apply the intended isolation flags. This supports data-level blindness only, not a tool/MCP/settings-disabled environment. The author's `dispatch decide` assertion has no retained independent decision artifact. Scratch inventory and coordinator-authored capability metadata are not judge-originated proof.
 
 Durable normalized inputs: [A](observe-measurement-261005/A.md), [B](observe-measurement-261005/B.md). [Actual judge JSON with quoted rationales and limits](observe-measurement-blind-judge-261005.json).
 
@@ -84,7 +84,7 @@ Native `metrics eval record` appended real records to `.fgos/observe/evals/obser
 
 Both list under the exact question; each exact harness filter returns its own record, and `invalid` is empty. The unchanged installed release (`sha256:a1ba0d0682a7c00598a9873cd13dbe9bb9500b0a7f6b8260a776a5de0e407c4c`) rejects `metrics eval list` with explicit unknown subcommand, exit 4.
 
-Limits: one question, one judge, different provider/model/setup and artifact types. Citation truth cannot be externally verified by the tool-disabled judge; output styles may favor multi-voice perspective spread. These are directional measurements, not an objective ranking or evidence to add a gate.
+Limits: **the setups were not independent**. The solo ran after the panel and inspected summaries, explicitly citing the panel's stance results; its evidence/counterfactual scores therefore partly depend on arm B. **The entire 2026-10-04 objective was not reused**: this was a Vietnamese 1000-word question in mdview, not the English source-reading 300-word historical task. Tools/MCP were available with zero tool calls; hooks ran and custom settings/instructions were loaded. Citations were not externally verified. These real 7/10 judgments describe these texts, not an independent comparison of setups or grounds for a gate. Both runRefs belong to `/home/vantt/projects/mdview`, while the journal is in forgentX; corrected setup provenance names that root.
 
 ## Verification and corrections
 
@@ -96,7 +96,7 @@ Review corrections: string-only fallback provenance, lexical timestamp windows, 
 
 Independent Node writer and Rust reader re-reviews closed every reported finding and returned no additional concrete defect. Eval list now validates existing real-directory parents without creating missing state. On platforms without supported atomic no-follow flags, append to an existing shard conservatively fails closed; Linux is the exercised runtime. Parent-directory replacement races are not claimed prevented.
 
-`node scripts/regenerate-observe-fixtures.mjs` succeeded; `git diff --stat -- test/fixtures/observe` was empty. A throwaway privacy scan of synthetic run-layout/Observe fixtures found no control tokens, protected paths, absolute home paths or provider-log markers; no permanent source-text test was added. The phase-1 source-text guard and unrequested report commits remain explicit verification-method deviations, replaced by inventory/behavioral proof and persisted working-tree reports.
+`node scripts/regenerate-observe-fixtures.mjs` succeeded; `git diff --stat -- test/fixtures/observe` was empty. A throwaway privacy scan of synthetic fixtures found no control tokens, protected paths, absolute home paths or provider-log markers. The permanent source-enumerator guard and exact import-closure assertion are not implemented/restored due to runtime test-policy conflict, not a repository rule. The original criterion is reopened; inventory and behavioral tests are not claimed as equivalent prevention.
 
 ### Full-suite live-Herdr diagnostic
 
@@ -106,4 +106,4 @@ A transparent wrapper around the real Herdr CLI recorded a focused live run with
 
 Final full-suite command `FGOS_HOST_BIN=/home/vantt/projects/forgentX/target/debug/fgos npm test -- --test-concurrency=1` passed with the full discovered file list: **6,823 tests / 6,750 pass / zero fail / eight skip / 65 todo**, 22 suites, duration 1,318,042 ms (artifact://270; background result bg_64). This includes the actual live-Herdr confined-launch smoke. The default parallel failure remains recorded above; serial verification does not claim its root cause is fixed.
 
-All six phase statuses and every plan acceptance checkbox are synchronized; independent writer/reader reviews are approved. No release activation or unrequested staging/commit was performed; dogfood used the rebuilt host through `FGOS_HOST_BIN`.
+Historical implementation completion was reported after the tests above; independent acceptance on 2026-10-06 found additional reachable defects and false provenance, so plan criteria are reopened in [acceptance repairs](observe-acceptance-fixes-261006.md). The old test/re-review outputs do not prove all consumer boundaries. Dogfood used the rebuilt host through `FGOS_HOST_BIN`, with no release activation; the implementation was subsequently committed in `0b06824a7`.

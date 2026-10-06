@@ -1,10 +1,10 @@
 ---
-title: Observe discussion measurement completed
+title: Observe discussion measurement implementation
 date: 2026-10-05
-summary: "All six phases completed with real panel/solo eval records, independent reviews and full serialized regression proof."
+summary: "Implementation and regression exercised; independent acceptance later found consumer defects and false judge-isolation/fair-comparison claims."
 ---
 
-# Observe discussion measurement completed
+# Observe discussion measurement implementation
 
 ## What happened
 
@@ -12,7 +12,7 @@ The owner authorized every phase of `261005-1143-observe-run-visibility-and-disc
 
 ## Live proof
 
-Backfilled 81 main and 37 mdview units; repeated backfill changed zero. Four mdview Delphi workflows measured 28 seats and 30 attempts, matching 30 Dispatch runs. A real three-seat panel yielded three valid no-gate votes, agreement 1. A real solo and that panel were judged blind by tool/MCP-disabled Opus from neutral normalized A/B artifacts; both scored 7/10. Both real eval records list by exact question and harness.
+Backfilled 81 main and 37 mdview units; repeated backfill changed zero. Four mdview Delphi workflows measured 28 seats and 30 attempts, matching 30 Dispatch runs. A real three-seat panel yielded three valid no-gate votes, agreement 1. A real solo and that panel were judged from neutral normalized A/B prompt data; both scored 7/10. Correction on 2026-10-06: tools/MCP were available and instructions/skills loaded; hooks ran, though the judge made zero tool calls. The solo consumed the earlier panel's results, and the Vietnamese 1000-word objective was not the English source-reading 300-word task required from 2026-10-04. Thus the real records list, but they do not prove isolation or an independent setup comparison.
 
 ## Verification
 
@@ -21,6 +21,8 @@ Integrated Rust suites: 74 pass plus host build. Focused Node summary/workflow t
 ## Decision and limits
 
 Run timestamps remain writer-owned; no createdAt fallback. Summaries are regenerable derived state; original Dispatch/workflow journals stay unchanged. Stance is measurement, not a gate. One question and one judge are directional evidence, not a setup ranking. Eval writes reuse Observe lock/fsync and fail closed on unsafe shards. No new installation prerequisite or component boundary; installed release remains unchanged. No staging/commit.
+
+Independent Opus acceptance returned ACCEPT WITH FIXES on 2026-10-06. The earlier “all phases completed” and “tool/MCP-disabled” claims were overstated; [acceptance corrections](../reports/observe-acceptance-fixes-261006.md) preserve actual results and enumerate unresolved criteria. The owner reconfirmed all-phase authorization in the repair conversation. Original scratch inventory was not retained as an auditable artifact. The previous no-follow safety evidence exercised Linux x64, not every Unix architecture.
 
 ## Evidence
 

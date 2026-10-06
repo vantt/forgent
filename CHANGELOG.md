@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Evaluation provenance now distinguishes data-blind judging from actual isolation and discloses cross-arm result access and question deviations; existing real scores are not presented as an independent setup comparison.
 - Run inspection, `dispatch show-run`, the running-run reconciler and Observe now discover nested execution-core assignments through the bounded run-layout rule; worker outboxes and symlinks cannot plant extra runs.
 - The test-file watchdog publishes timeout evidence before killing the hung process tree, so the suite cannot finish and remove the journal before the timeout is recorded. Its real subprocess regression now captures nested output and deterministically exercises that scheduling gap.
 - Unit history selects resumed attempts numerically, including attempt 100 after 99; legacy reviewed-unit summaries use the final complete reviewed round rather than letting earlier findings poison a later success.

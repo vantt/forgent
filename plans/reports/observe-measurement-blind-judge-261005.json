@@ -3,15 +3,24 @@
     "provider": "claude",
     "model": "opus",
     "transport": "cli-spawn",
-    "tools": [],
-    "mcpServers": [],
-    "settingSources": []
+    "resolvedModel": "claude-opus-5-5",
+    "isolation": "not-isolated",
+    "availableCapabilities": "Built-in and 93 deferred tools, MCP instructions, skills and custom instructions were loaded; hooks ran.",
+    "toolCalls": 0,
+    "blindness": "data-level-only",
+    "provenance": "Capability metadata is coordinator-authored; correction follows reviewer-inspected persisted Claude transcripts."
   },
-  "scratchInventory": [
-    "A.md",
-    "B.md"
-  ],
+  "scratchInventory": {
+    "claimedNames": ["A.md", "B.md"],
+    "status": "unproven",
+    "reason": "Scratch removed; no independent before/after inventory or hashes retained in repository evidence."
+  },
   "normalization": "Runtime paths and ids redacted identically in A/B; substantive prose retained; no source mapping supplied.",
+  "comparisonConfounds": [
+    "Solo arm A ran after panel arm B and cited B's summary/stance results; arms were not independent.",
+    "A Vietnamese 1000-word question was used instead of the entire English source-reading 300-word objective from 2026-10-04.",
+    "runRefs belong to /home/vantt/projects/mdview; journal is stored in forgentX."
+  ],
   "rubric": "discussion-quality.v1",
   "A": {
     "scores": {

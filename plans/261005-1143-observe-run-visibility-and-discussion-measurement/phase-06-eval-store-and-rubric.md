@@ -1,7 +1,7 @@
 ---
 phase: 6
 title: "Eval store and rubric"
-status: completed
+status: in-progress
 priority: P2
 effort: "1d"
 dependencies: [3]
@@ -9,8 +9,9 @@ dependencies: [3]
 
 # Phase 6: Eval store and rubric
 
-Execution gate: owner explicitly requested all remaining phases on 2026-10-05,
-superseding the foundation-only gate. Store, rubric and blind live comparison are executing.
+Execution gate: the owner confirmed on 2026-10-06 that the 2026-10-05 request
+authorized every remaining phase. Store and rubric exist; fair-comparison
+acceptance is reopened after the independent review.
 
 
 ## Overview
@@ -45,10 +46,10 @@ D4. A new store beside friction, cases and snapshots, with the same shard-per-wr
 ## Success Criteria
 
 - [x] Real solo/panel records list by exact harness with all five `discussion-quality.v1` scores.
-- [x] Judge scratch outside `.fgos` contained only neutral `A.md`/`B.md` before and after the tool/MCP-disabled fresh Opus judgment; identical runtime-identity normalization.
+- [ ] Judge isolation and retained scratch inventory are demonstrated for an independent comparison using the entire 2026-10-04 objective. The original judgments were data-blind only: tools/MCP available with zero tool calls; hooks ran, instructions loaded, solo consumed panel results, and a different question was used.
 - [x] Unchanged installed host rejects `metrics eval` explicitly, exit 4.
 
-Evidence: [`observe-discussion-measurement-261005.md`](../reports/observe-discussion-measurement-261005.md), actual [judge JSON](../reports/observe-measurement-blind-judge-261005.json), and `.fgos/observe/evals/observe-measurement-261005.jsonl`. Both current setups scored 7/10; one question/judge is directional evidence, not a ranking.
+Evidence: [`observe-discussion-measurement-261005.md`](../reports/observe-discussion-measurement-261005.md), corrected [judge metadata and actual rationales](../reports/observe-measurement-blind-judge-261005.json), and `.fgos/observe/evals/observe-measurement-261005.jsonl`. Both original texts scored 7/10, but the setup-independence and historical-question confounds invalidate presenting this as a fair setup comparison. [Acceptance repairs](../reports/observe-acceptance-fixes-261006.md) track any new run and unresolved proof; no isolation acceptance is claimed from the old scores.
 
 ## Risk Assessment
 

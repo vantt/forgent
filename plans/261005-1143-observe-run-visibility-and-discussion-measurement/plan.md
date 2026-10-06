@@ -70,7 +70,7 @@ Root cause: a result's **location and record shape** are implicit contracts each
 | 3 | [Doctor coverage check and rebaseline](./phase-03-doctor-coverage-check-and-rebaseline.md) | 0.75d | 1, 2 | completed |
 | 4 | [Unit summaries and `metrics discussions`](./phase-04-unit-summaries-and-discussions.md) | 1.5d | 2 | completed |
 | 5 | [Stance and agreement sensor](./phase-05-stance-and-agreement-sensor.md) | 1.25d | 4 | completed |
-| 6 | [Eval store and rubric](./phase-06-eval-store-and-rubric.md) | 1d | 3 | completed |
+| 6 | [Eval store and rubric](./phase-06-eval-store-and-rubric.md) | 1d | 3 | in-progress (fair-comparison proof reopened) |
 
 Phases 1–3 shipped first as the foundation; the owner explicitly authorized all phases on 2026-10-05. Phases 4–6 now execute under that go decision. Golden fixtures under `test/fixtures/observe/` use the real regeneration command; the measurement regeneration produced no fixture diff. No staging/commit is performed without a request.
 
@@ -83,7 +83,7 @@ Phases 1–3 shipped first as the foundation; the owner explicitly authorized al
 - [x] `observe-run-coverage` passes with rebuilt host, degrades/pass with old host, fails against hidden-run fixture (foundation evidence).
 - [x] Four mdview Delphi workflows include refusal zero seats and two fallback seats; 30 attempts = 30 Dispatch runs, distinct from 28 final seats.
 - [x] Live three-seat panel gives three valid votes and hand/native agreement 1; no-options is unmeasured and malformed stance preserves passing seat (behavioral CLI regression).
-- [x] Two real current-setup records judged by isolated blind Opus list by exact question/harness in `metrics eval list`.
+- [ ] Independent current setups reuse the complete 2026-10-04 objective and have an audited isolated Opus judgment. Old records list but were only data-blind, solo consumed panel results and the question differed; corrected provenance is not new comparison proof.
 - [ ] Acceptance repairs: full final npm/Rust suites and live CLI evidence verified after consumer defects are fixed; original baseline was 6,750 pass, zero fail with serial full selection. Specs, CHANGELOG, manifest and doctor rows updated; No component-boundary change.
 
 ## How Rust changes are verified (important)
