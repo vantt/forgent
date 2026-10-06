@@ -1,0 +1,659 @@
+{
+  "version": 1,
+  "shard": "b-decisions-second",
+  "sources": [
+    "docs/specs/work-state.md"
+  ],
+  "claims": [
+    {
+      "claimId": "claim_67c5f9d1a031030f5bd1f3ab27320130",
+      "sourceUnitDigest": "4b0aa9f66af44b86",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-59",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "ADR 0024 context paragraph: code check showing the FSM holding proposed is domain-agnostic; text identical in the candidate 0024 Context."
+    },
+    {
+      "claimId": "claim_7a2a3390e3beca0100dbfebb57cb6aab",
+      "sourceUnitDigest": "bc40e0a51da3f0b6",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-60",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "ADR 0024 context paragraph: proposed is shared vocabulary between work.status and the outcome fields; text identical, only the surrounding heading levels changed."
+    },
+    {
+      "claimId": "claim_69ddf8650201dae7cbe8fe80373c6a7c",
+      "sourceUnitDigest": "1c78b8c81620de3d",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "0024-decision",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source H4 \"Quyết định\" of ADR 0024 is carried as the H3 \"0024 Decision\"; title differs (English, ADR-prefixed), heading-only unit."
+    },
+    {
+      "claimId": "claim_5fb4a29b7884b27f3d265612f67e4f31",
+      "sourceUnitDigest": "f0688f3556688d27",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-61",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "ADR 0024 decision paragraph (rename proposed to awaiting-approval, FSM edges untouched) carried verbatim."
+    },
+    {
+      "claimId": "claim_5eca88140b6e1a8d5c14095b6cb31045",
+      "sourceUnitDigest": "e63e9faed67fe666",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-62",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "ADR 0024 migration paragraph (pre-release exemption, migration script, three stores in scope) carried verbatim."
+    },
+    {
+      "claimId": "claim_b1c9fa89736c52b8bff6d5ec328cc553",
+      "sourceUnitDigest": "6b827c7b203c054c",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "0024-consequences",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source H4 \"Hệ quả\" of ADR 0024 is carried as H3 \"0024 Consequences\"; title differs, heading-only unit."
+    },
+    {
+      "claimId": "claim_ec3bfee565512c6d032778295c5838c1",
+      "sourceUnitDigest": "1d55a3e34d5b0515",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-63",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "ADR 0024 consequences list (consumers switch with migration, duplicate-seq finding, 0006 only partly superseded) carried verbatim."
+    },
+    {
+      "claimId": "claim_82f766f5320ab6bbe5174aeda52e710b",
+      "sourceUnitDigest": "95a357e29712c3c0",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-64",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Closing sentence of ADR 0024 (changing it means a new superseding record); the sentence recurs under other ADRs so the owner is block 64 after 0024 Consequences (found by position, not by first-line match)."
+    },
+    {
+      "claimId": "claim_aa3cf298aaa31c6dc9b4c8382434bc9c",
+      "sourceUnitDigest": "8a864bfaf25cf078",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "12-adr-0027-domain-owns-the-pre-delivered-status-vocabulary",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source H3 for ADR 0027 is carried as H2 \"12. ADR 0027 Domain Owns The Pre-Delivered Status Vocabulary\"; title shortened/translated and level changed."
+    },
+    {
+      "claimId": "claim_818a58278988ed797931b14ca91614e2",
+      "sourceUnitDigest": "a06a29884a79a4eb",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "0027-context",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source H4 \"Bối cảnh\" of ADR 0027 is carried as H3 \"0027 Context\"; title differs, heading-only unit."
+    },
+    {
+      "claimId": "claim_2d89ae63cbc81e492eb80e9a28174b67",
+      "sourceUnitDigest": "f4a426a2b8673dfb",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-65",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "ADR 0027 context opening: base-workflow-model does not exist as a file and what was lost; carried verbatim."
+    },
+    {
+      "claimId": "claim_a92d8b1ad203c61b04078fa8b94c9b17",
+      "sourceUnitDigest": "9e779d390baf10f4",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-66",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Quoted original rule (RUL35 text from work-state.md) inside ADR 0027 context; carried verbatim as historical text within a decision."
+    },
+    {
+      "claimId": "claim_a3944b679053b61dc2d743795cde3d77",
+      "sourceUnitDigest": "5e566c132da3b486",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-67",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "ADR 0027 reasons why the original rule was revised (multi-domain schema need); carried verbatim."
+    },
+    {
+      "claimId": "claim_466331635349f55e32c11e0fcf56d334",
+      "sourceUnitDigest": "d76f5cf17475a3fb",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "0027-decision",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source H4 \"Quyết định\" of ADR 0027 is carried as H3 \"0027 Decision\"; title differs, heading-only unit."
+    },
+    {
+      "claimId": "claim_3f65fc24d3eeb760ecc11ff781159152",
+      "sourceUnitDigest": "1c7ea2fda926300b",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-68",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "ADR 0027 statement of the exact supersede scope (only the first segment); carried verbatim."
+    },
+    {
+      "claimId": "claim_a4a77d7c336663f81a9bc8ac697ab518",
+      "sourceUnitDigest": "46ec1457959a8895",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-69",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "ADR 0027 list of the six pre-delivered statuses and the tail group; carried verbatim."
+    },
+    {
+      "claimId": "claim_a4ed529f5ed4745e1c6bbbb06eb3a4b2",
+      "sourceUnitDigest": "127c7c7a99d0a8fc",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-70",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "ADR 0027 sentence introducing the statusCategory mapping table; carried verbatim."
+    },
+    {
+      "claimId": "claim_f3d9c6dbb704d09c37ab5cfd4f65927e",
+      "sourceUnitDigest": "7b133e87cfdf8159",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-71",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "ADR 0027 status-to-statusCategory mapping table; carried verbatim (table markup intact)."
+    },
+    {
+      "claimId": "claim_6c5753df306960b46d20e133a2a36894",
+      "sourceUnitDigest": "6d99060fca9f1fb5",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-72",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "ADR 0027 paragraph on statusCategory being a proven lossy compression; carried verbatim."
+    },
+    {
+      "claimId": "claim_1d98a4a5c3391d5318f53153b3f5f442",
+      "sourceUnitDigest": "7c211b5505c4924d",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-73",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "ADR 0027 paragraph that the four tail statuses need no statusCategory; carried verbatim."
+    },
+    {
+      "claimId": "claim_546450931dd47024138ce0a32699cd72",
+      "sourceUnitDigest": "31a4c4ddccf1d5d5",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-74",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "ADR 0027 out-of-scope list of the supersede; carried verbatim."
+    },
+    {
+      "claimId": "claim_0da8b597cb243173df9f5eb46a34ec76",
+      "sourceUnitDigest": "7dae6b0f1c8a4ba4",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "0027-consumer-audit",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source H4 \"Audit: mọi consumer thật ...\" is carried as H3 \"0027 Consumer Audit\"; title shortened and translated."
+    },
+    {
+      "claimId": "claim_0cabbd5a6b95edeb9aab6832ad276c50",
+      "sourceUnitDigest": "c2f2baeae1bc366d",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-75",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "ADR 0027 audit method paragraph (rg scan of STATUSES/TRANSITIONS) carried verbatim."
+    },
+    {
+      "claimId": "claim_7889671f1f2783b634ef6d90a251f3e9",
+      "sourceUnitDigest": "cfb28f2fabec3889",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "0027-audit-1-status-source-of-truth",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source H5 \"1. Nguồn sự thật\" is carried as H4 \"0027 Audit 1 Status Source Of Truth\"; title and level changed."
+    },
+    {
+      "claimId": "claim_fc0f124b5b1368034455207d6378bc00",
+      "sourceUnitDigest": "bdee4fb8f864c64b",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-76",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Audit 1 table (status source-of-truth file:line, role, changed?) carried verbatim into block 76 under Audit 1; the shared first-line suggestion was checked against the Audit 1 position."
+    },
+    {
+      "claimId": "claim_c0adce3f717a031d4159eee6dd0aaaa1",
+      "sourceUnitDigest": "517a80cc0c3f64d3",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "0027-audit-2-resolved-statuses-set",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source H5 \"2. RESOLVED_STATUSES\" is carried as H4 \"0027 Audit 2 Resolved Statuses Set\"; title and level changed."
+    },
+    {
+      "claimId": "claim_d97ba7f5ff310af83839fea58329acdd",
+      "sourceUnitDigest": "827c7ac395f16aea",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-77",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Audit 2 paragraph on RESOLVED_STATUSES in frontier.mjs; carried verbatim."
+    },
+    {
+      "claimId": "claim_84950cfff9d75392b847739c4812768a",
+      "sourceUnitDigest": "4e6cda4b133d000a",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-78",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Audit 2 table of RESOLVED_STATUSES consumers; carried verbatim into block 78 (the located suggestion of block 76 was a first-line collision, the whole-text match is block 78)."
+    },
+    {
+      "claimId": "claim_ebfe14fc1ae59246f7b3c8871b402520",
+      "sourceUnitDigest": "8590e597d5f07589",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "0027-audit-3-cli-status-literals",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source H5 \"3. Literal status trong verb logic\" is carried as H4 \"0027 Audit 3 CLI Status Literals\"; title and level changed."
+    },
+    {
+      "claimId": "claim_72ee6b558f807216affeb2559c6a597d",
+      "sourceUnitDigest": "707bfd13096596cd",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-79",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Audit 3 table of CLI status literals; carried verbatim."
+    },
+    {
+      "claimId": "claim_6a85836cdc08fbdfde62f6d3fd9c2d8f",
+      "sourceUnitDigest": "96096e1e5dd0a59c",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "0027-audit-4-runner-consumers",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source H5 \"4. runner/ ...\" is carried as H4 \"0027 Audit 4 Runner Consumers\"; title and level changed."
+    },
+    {
+      "claimId": "claim_4fceb5ca59ea256ccd77c0975d3576e1",
+      "sourceUnitDigest": "78c3de3f1ca205de",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-80",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Audit 4 runner table; carried verbatim into block 80 (the located suggestion of block 76 was a first-line collision, whole-text match is block 80)."
+    },
+    {
+      "claimId": "claim_f1507b5008c678f9474202706e018774",
+      "sourceUnitDigest": "80901672ceab8f8c",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "0027-audit-5-other-domain-agnostic-mechanisms",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source H5 \"5. Cơ chế domain-agnostic khác\" is carried as H4 \"0027 Audit 5 Other Domain-Agnostic Mechanisms\"; title and level changed."
+    },
+    {
+      "claimId": "claim_042b85c001dab92b6ae561f89eac6337",
+      "sourceUnitDigest": "fa83039437009e5f",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-81",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Audit 5 table of other domain-agnostic mechanisms; carried verbatim into block 81 (located suggestion block 76 was a first-line collision)."
+    },
+    {
+      "claimId": "claim_3fbb7ac76d27f06cc8e095a1d0e6b88e",
+      "sourceUnitDigest": "a2754368a8483a13",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "0027-audit-6-adjacent-gaps",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source H5 \"6. Gap liên quan ...\" is carried as H4 \"0027 Audit 6 Adjacent Gaps\"; title and level changed."
+    },
+    {
+      "claimId": "claim_c5f9a98133b0fd6692dd0c7555d775e1",
+      "sourceUnitDigest": "d398e694ec2837bb",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-82",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Audit 6 note that fgos-coding-compounding is called hard for every retrospective item; carried verbatim."
+    },
+    {
+      "claimId": "claim_e2d3709ee991f35ec6153e7e84c46e2f",
+      "sourceUnitDigest": "d35b961952abd6b3",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "0027-consequences",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source H4 \"Hệ quả\" of ADR 0027 is carried as H3 \"0027 Consequences\"; title differs, heading-only unit."
+    },
+    {
+      "claimId": "claim_8eeec687713e79da23a9339df1179b60",
+      "sourceUnitDigest": "e12e5b17bd0afd2f",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-83",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "ADR 0027 consequences list (precondition for the multi-domain schema work and follow-ups); carried verbatim."
+    },
+    {
+      "claimId": "claim_217bf9908c0941c13b1eaf2f7a2d9d64",
+      "sourceUnitDigest": "f617f1c06417c2f7",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "13-adr-0032-multi-role-team-harness",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source H3 \"0032 — Multi-role Team Harness: trục role/holder ...\" is carried as H2 \"13. ADR 0032 Multi-Role Team Harness\"; title shortened and translated."
+    },
+    {
+      "claimId": "claim_63db75c2d22d1861c69845d62518ee60",
+      "sourceUnitDigest": "6f54e9c73c49cc06",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-84",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Distill-evidence blockquote opening ADR 0032 (24 discussion rounds, 2026-08-15); carried verbatim under the 0032 H2."
+    },
+    {
+      "claimId": "claim_e6ae96517c239248948c36255ae4dcac",
+      "sourceUnitDigest": "8f1228fba7212659",
+      "targetOwner": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "targetAnchor": "2-distill-journey",
+      "claimKind": "historical-context",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source H4 \"Hành trình\" is carried as H2 \"2. Distill Journey\" in the history document, not in the decision record; title differs."
+    },
+    {
+      "claimId": "claim_634d509e158ed8fc22f610e4c51030ba",
+      "sourceUnitDigest": "9f9c5aa1e0bc5a1c",
+      "targetOwner": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "historical-context",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Dated distill-journey narrative (comparison request and the scouting rounds); carried verbatim into the history document, classified historical-context rather than decision."
+    },
+    {
+      "claimId": "claim_7e0016df70b7640b0337c5daf5f80e90",
+      "sourceUnitDigest": "18b3552e741e5967",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "0032-foundation-architecture",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source H4 \"I. Kiến trúc nền (seq ...)\" is carried as H3 \"0032 Foundation Architecture\"; title translated and seq references dropped."
+    },
+    {
+      "claimId": "claim_a9be2da803446c73efbfcac40ee82637",
+      "sourceUnitDigest": "2a1722766193d70b",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-85",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "ADR 0032 foundation list (mechanism vs policy and related axes); carried verbatim."
+    },
+    {
+      "claimId": "claim_f30f58465c33adf6343057d6c3fcb2b3",
+      "sourceUnitDigest": "bade02e702bb44fe",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "0032-handoff",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source H4 \"II. Handoff ...\" is carried as H3 \"0032 Handoff\"; title shortened and seq references dropped."
+    },
+    {
+      "claimId": "claim_6f7a10c04ee1414d39b0b2ef8d7d2d6d",
+      "sourceUnitDigest": "dce677680de09c58",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-86",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "ADR 0032 handoff list (Call vs hand-off kinds and rules); carried verbatim."
+    },
+    {
+      "claimId": "claim_45840c035132a9c46aa748567ae37648",
+      "sourceUnitDigest": "fe8801065e62f36e",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "0032-declarative-structure",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source H4 \"III. Cấu trúc khai báo ...\" is carried as H3 \"0032 Declarative Structure\"; title translated and seq references dropped."
+    },
+    {
+      "claimId": "claim_10986602d5cab816cf923616dc6b58f8",
+      "sourceUnitDigest": "7dfb88e6ee480189",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-87",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Long ADR 0032 declarative-structure list (hierarchy domain, workflow, item and the declared structures); 66 lines carried verbatim as one block."
+    },
+    {
+      "claimId": "claim_7baf6e6911d7bdc8cbb66425d0aff57a",
+      "sourceUnitDigest": "58d933902652fcbf",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "0032-implementation-sequence",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source H4 \"IV. Trình tự triển khai (seq 18030)\" is carried as H3 \"0032 Implementation Sequence\"; title translated."
+    },
+    {
+      "claimId": "claim_2e0270967476b583f5548c2d0632c6f7",
+      "sourceUnitDigest": "4b806f05cc974fa8",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-88",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "ADR 0032 statement that coding goes first (user decision reversing the proposal); carried verbatim."
+    },
+    {
+      "claimId": "claim_b7d1849e7cde5d799b984dbf0ea3bcff",
+      "sourceUnitDigest": "d6ebd90319d8f7c2",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-89",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "ADR 0032 table of reason versus existing implicit interaction; carried verbatim."
+    },
+    {
+      "claimId": "claim_fd3c6c93c220012e1e08d65c9276ab24",
+      "sourceUnitDigest": "a53db20b6d5f1c2b",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-90",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "ADR 0032 ordering sentence for the three delivery pieces; carried verbatim."
+    },
+    {
+      "claimId": "claim_963bf3272df983c42aead0351a429ce4",
+      "sourceUnitDigest": "7d8d4de935f8bf82",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "0032-marketing-cockpit-comparison-conclusion",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source H4 \"V. Kết luận so sánh marketing-cockpit ...\" is carried as H3 \"0032 Marketing Cockpit Comparison Conclusion\"; title translated."
+    },
+    {
+      "claimId": "claim_68304d9e3c8f531fd5dcc25392c6d072",
+      "sourceUnitDigest": "6bfb192eaa61ff2f",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-91",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "ADR 0032 list of what is taken from the cockpit into fgOS; carried verbatim."
+    },
+    {
+      "claimId": "claim_8d8de83dcecd115c8b517cbf12d08795",
+      "sourceUnitDigest": "a0a6b146892e904d",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-92",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "ADR 0032 four-way split port rule for a cockpit task yaml; carried verbatim."
+    },
+    {
+      "claimId": "claim_331e9d0a3a7f29b20ec75ed8981f7fb7",
+      "sourceUnitDigest": "b18e4845b71df780",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-93",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "ADR 0032 list of what the cockpit drops on entry; carried verbatim."
+    },
+    {
+      "claimId": "claim_c696887f984b8248a620d445d341cf0b",
+      "sourceUnitDigest": "6c186518993aba9c",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "0032-deliberately-deferred-questions",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source H4 \"VI. Treo có chủ đích (không phải quên)\" is carried as H3 \"0032 Deliberately Deferred Questions\"; title translated."
+    },
+    {
+      "claimId": "claim_092f7d288e8617bb3b8abff586e988f8",
+      "sourceUnitDigest": "2431462c129b13b9",
+      "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "targetAnchor": "unheaded-block-94",
+      "claimKind": "decision",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "ADR 0032 numbered list of deliberately deferred questions; carried verbatim."
+    },
+    {
+      "claimId": "claim_cf9060b6664b21d6e5fac0b31aac0ff6",
+      "sourceUnitDigest": "a88af4784f074e4e",
+      "targetOwner": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "targetAnchor": "3-state-at-distill-time",
+      "claimKind": "historical-context",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source H4 \"VII. Trạng thái tại thời điểm distill (2026-08-15)\" is carried as H2 \"3. State At Distill Time\" in the history document; dated snapshot, title differs."
+    },
+    {
+      "claimId": "claim_be0cd74b4a0bd4c5860e9116aa8dd6c6",
+      "sourceUnitDigest": "09bb0ef5d78c9357",
+      "targetOwner": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "historical-context",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Dated state-at-distill list (validating finished, reality gate 6/6); carried verbatim into the history document as historical-context."
+    },
+    {
+      "claimId": "claim_581643ec8243af5744e04c222f13c214",
+      "sourceUnitDigest": "a143984b5d286e28",
+      "targetOwner": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "targetAnchor": "4-implementation-review-and-verification-after-distill",
+      "claimKind": "historical-context",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source H4 \"VIII. Sau distill ...\" is carried as H2 \"4. Implementation Review And Verification After Distill\"; dated section, title translated."
+    },
+    {
+      "claimId": "claim_690988881136792349476d55b83bd81d",
+      "sourceUnitDigest": "721cb9fe837087d2",
+      "targetOwner": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "targetAnchor": "unheaded-block-5",
+      "claimKind": "historical-context",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Note that this section was not in the original distill and was added when copying to docs/decisions; carried verbatim."
+    },
+    {
+      "claimId": "claim_e24e9588d1d0d0ec87a1a90db87e62b9",
+      "sourceUnitDigest": "42f0a4f36be3f872",
+      "targetOwner": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "targetAnchor": "unheaded-block-6",
+      "claimKind": "historical-context",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Paragraph on the three pieces implemented, tested, self-reviewed and committed sequentially; carried verbatim."
+    },
+    {
+      "claimId": "claim_6866da75d153e251a298ec889e5e67f8",
+      "sourceUnitDigest": "0ce476ffc3451d8e",
+      "targetOwner": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "targetAnchor": "unheaded-block-7",
+      "claimKind": "historical-context",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Long post-distill list (real handoff wiring, independent review, real verify); 22 lines carried verbatim."
+    },
+    {
+      "claimId": "claim_48a16587298cde876c7142378489c618",
+      "sourceUnitDigest": "71b2516db6bbf541",
+      "targetOwner": "docs/platform/work-state/history/multi-role-harness-distill-record.md",
+      "targetAnchor": "unheaded-block-8",
+      "claimKind": "historical-context",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Closing lesson paragraph of the post-distill section (unit/integration tests prove engine, not real run); carried verbatim."
+    }
+  ]
+}
