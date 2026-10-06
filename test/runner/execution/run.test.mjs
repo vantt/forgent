@@ -17,10 +17,10 @@ seedFileLocalBwrapRegistry();
 
 // Confined runs mount a private tmpfs over /tmp, so fixtures that the executor
 // must reach (command, worker script, worktree) live outside it.
-const FIXTURE_ROOT = fs.existsSync('/var/tmp') ? '/var/tmp' : os.tmpdir();
+import { makeFixtureDir } from '../../helpers/fixture-dir.mjs';
 
 function setupGitRepo() {
-  const tmp = fs.mkdtempSync(path.join(FIXTURE_ROOT, 'fgos-run-test-'));
+  const tmp = makeFixtureDir('fgos-run-test-');
   execFileSync('git', ['init', '-b', 'main'], { cwd: tmp, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.name', 'Test Runner'], { cwd: tmp, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.email', 'test@runner.local'], { cwd: tmp, stdio: 'ignore' });
@@ -96,7 +96,7 @@ function setupGitRepo() {
   fs.writeFileSync(path.join(fgosDir, 'config.json'), JSON.stringify(runnerConfig, null, 2));
 
   // Create linked worktree
-  const worktreeDir = fs.mkdtempSync(path.join(FIXTURE_ROOT, 'fgos-run-wt-'));
+  const worktreeDir = makeFixtureDir('fgos-run-wt-');
   execFileSync('git', ['worktree', 'add', '-b', 'wt-branch', worktreeDir], { cwd: tmp, stdio: 'ignore' });
 
   return { repoRoot: tmp, worktreeDir };
@@ -816,7 +816,7 @@ test('a panel whose every provider family is taken by panelists refuses the synt
 });
 
 test('fgos run reclaims a private home whose owning process is gone before it does anything else', async () => {
-  const base = fs.mkdtempSync(path.join(FIXTURE_ROOT, 'fgos-run-reap-'));
+  const base = makeFixtureDir('fgos-run-reap-');
   const previousTmp = process.env.TMPDIR;
   process.env.TMPDIR = base;
   try {

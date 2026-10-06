@@ -10,12 +10,12 @@ import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixtu
 
 seedFileLocalBwrapRegistry();
 // bwrap mounts a tmpfs over /tmp, so confined workers can only see fixtures elsewhere.
-const FIXTURE_ROOT = fs.existsSync('/var/tmp') ? '/var/tmp' : os.tmpdir();
+import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 
 const BIN_FGOS = path.resolve('bin/fgos.mjs');
 
 function setupTestRepo() {
-  const tmp = fs.mkdtempSync(path.join(FIXTURE_ROOT, 'fgos-cli-run-test-'));
+  const tmp = makeFixtureDir('fgos-cli-run-test-');
   execFileSync('git', ['init', '-b', 'main'], { cwd: tmp, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.name', 'CLI Test'], { cwd: tmp, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.email', 'cli@test.local'], { cwd: tmp, stdio: 'ignore' });

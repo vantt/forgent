@@ -35,12 +35,12 @@ after(() => {
 
 seedFileLocalBwrapRegistry();
 // bwrap mounts a tmpfs over /tmp, so confined workers can only see fixtures elsewhere.
-const FIXTURE_ROOT = fs.existsSync('/var/tmp') ? '/var/tmp' : os.tmpdir();
+import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 
 const BIN_FGOS = path.resolve('bin/fgos.mjs');
 
 function setupTestRepo() {
-  const tmp = fs.mkdtempSync(path.join(FIXTURE_ROOT, 'fgos-wf-test-'));
+  const tmp = makeFixtureDir('fgos-wf-test-');
   execFileSync('git', ['init', '-b', 'main'], { cwd: tmp, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.name', 'Workflow Test'], { cwd: tmp, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.email', 'wf@test.local'], { cwd: tmp, stdio: 'ignore' });
@@ -222,7 +222,7 @@ test('integrate helpers: create worktree, merge branch, and cleanup', () => {
 });
 
 test('translatePlanToWorkflow translates multi-phase plan into DAG Workflow', () => {
-  const tmp = fs.mkdtempSync(path.join(FIXTURE_ROOT, 'plan-trans-'));
+  const tmp = makeFixtureDir('plan-trans-');
   fs.writeFileSync(
     path.join(tmp, 'plan.md'),
     `---
@@ -1074,7 +1074,7 @@ test('integration target: declared step target, then origin/HEAD, then the check
   const plain = { steps: [{ id: 'i', kind: 'integrate' }] };
   assert.equal(resolveIntegrationTarget({ repoRoot: tmp, workflow: plain }), 'trunk', 'local-only repo: its own branch');
 
-  const origin = fs.mkdtempSync(path.join(FIXTURE_ROOT, 'fgos-wf-origin-'));
+  const origin = makeFixtureDir('fgos-wf-origin-');
   execFileSync('git', ['init', '--bare', '-b', 'develop', origin], { stdio: 'ignore' });
   execFileSync('git', ['remote', 'add', 'origin', origin], { cwd: tmp, stdio: 'ignore' });
   execFileSync('git', ['push', '-q', 'origin', 'trunk:develop'], { cwd: tmp, stdio: 'ignore' });

@@ -38,7 +38,7 @@ function hasWorkingBwrap(binary = '/usr/bin/bwrap') {
 const HAS_WORKING_BWRAP = hasWorkingBwrap();
 
 // Confined runs mount a private tmpfs over /tmp, so fixtures a worker must reach live outside it.
-const FIXTURE_ROOT = fs.existsSync('/var/tmp') ? '/var/tmp' : os.tmpdir();
+import { makeFixtureDir } from '../helpers/fixture-dir.mjs';
 
 seedFileLocalBwrapRegistry();
 
@@ -64,7 +64,7 @@ function git(cwd, ...args) {
  * peer's home.
  */
 function makeProject() {
-  const root = fs.realpathSync(fs.mkdtempSync(path.join(FIXTURE_ROOT, 'fgos-blind-')));
+  const root = fs.realpathSync(makeFixtureDir('fgos-blind-'));
   roots.push(root);
   const proj = path.join(root, 'project');
   const fgosDir = path.join(proj, '.fgos');
@@ -348,7 +348,7 @@ test('the outbox a blind worker writes lands on the host and its brief is left a
 test('the blind-read probe passes on the real argv and fails when the masks are left out', (t) => {
   if (!HAS_WORKING_BWRAP) return t.skip('working bwrap backend not available');
   const run = (brokenConfig) => {
-    const dir = fs.mkdtempSync(path.join(FIXTURE_ROOT, 'fgos-blind-probe-'));
+    const dir = makeFixtureDir('fgos-blind-probe-');
     roots.push(dir);
     return probePeerRunHidden({ bwrapBin: '/usr/bin/bwrap', scratchDir: dir, brokenConfig });
   };
