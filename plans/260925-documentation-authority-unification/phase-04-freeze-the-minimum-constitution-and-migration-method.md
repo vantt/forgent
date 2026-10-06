@@ -17,6 +17,16 @@ dependencies: [3]
 **Mode:** plan branch
 **Purpose:** Turn inventory evidence into a small, testable migration contract.
 
+## Pre-step: gate tooling (owner-authorized 2026-10-06; runs first, before any deliverable below)
+
+**Why:** the inventory generator cannot run on the branch head. It reads every text file in the tree, including its own ~250 MB of saved output, and runs out of memory; the 2026-10-06 resume worked around it by generating on a temporary commit without those files (17 s).
+
+**0a (authorized):** make `scripts/generate-doc-inventory.mjs` skip its own saved output artifacts. Take the artifact paths from the existing artifact definition (`scripts/doc-inventory-artifact.mjs`) instead of repeating a second list. Add a test first (red) in `test/scripts/generate-doc-inventory.test.mjs`: a tree containing a large artifact at the output location must be ignored, and ordinary inputs must still be counted. Acceptance (measured with scripts, method stated): the generator completes on the branch head without removing any file; peak memory and runtime recorded; the claim count on a tree without artifacts is unchanged by the fix (86,085 at the 2026-10-06 sync, `reports/resync-261006/inventory-comparison.json`); the inventory gate checker `scripts/check-doc-inventory-gates.mjs` still exits 0 on the regenerated inventory. This changes which files the generator reads, not what it counts or how it judges.
+
+**0b (investigate only; no gate edit):** record the cause of the `verify-phase-02` failure and of the two shipped-path inventory tests that were already failing before 2026-10-06 (on `551687021`), each with the command and output; propose a fix as a decision for the owner. Do not change these gates without a new owner decision.
+
+**Rollback:** `git revert` the generator commit; nothing else depends on it.
+
 ## Requirements
 
 **Deliverables:**

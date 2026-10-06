@@ -346,7 +346,10 @@ Required order: **Phase 9 (atomic cutover) runs after Plan A phase 06 and Plan B
 
 - **Syncs and legacy-root edits:** each sync of main appends the new main-side edits to `scripts/check-legacy-docs-ratchet.exceptions.json` as accounted exceptions (precedent: `b3fbcdd41`), each marked content-review-owed; the content review is done as one batch before the cutover. Approved by the owner.
 - **Knowledge-registry plan move:** main's move of `plans/260825-1841-knowledge-registry/` into `archive/plans/` is accepted; the Phase 1 requirement that it stay at the historical path is amended to "reachable through a pointer note at the historical path". Approved by the owner.
-- **Still not authorized:** Phase 4 and later. Changing the plan's own gate scripts (inventory generator, `verify-phase-02`, shipped-path tests) is pending the owner's decision.
+- **Execution venue:** this plan is executed in a **dedicated chat session of its own**. The harness-investigation chat only maintains the plan and its intent; it does not run any phase, script or migration step. Decided by the owner 2026-10-06.
+- **Authorized gate-tooling pre-step (job 1):** the owner authorized one minimal change to a gate script: the inventory generator (`scripts/generate-doc-inventory.mjs`) must skip its own saved output artifacts (the files and directories it writes under `plans/260925-documentation-authority-unification/reports/`, for example `phase-02-doc-inventory.{json,md}`, `phase-02-doc-inventory.parts/`, `phase-02-identity-registry.json`), because on the branch head it reads about 250 MB of its own output and runs out of memory. It runs as the first step of Phase 4 (see the pre-step in the Phase 4 file) once the owner starts that phase. This authorization covers only that change and its test; it does not authorize Phase 4 itself.
+- **Investigate first, no gate change without a new owner decision (jobs 2 and 3):** the `verify-phase-02` failure (it needs `--base <sha>`; the resume agent reported a different cause, a pointer to files moved into `reports/`, which the lead could not reproduce) and the two shipped-path inventory tests that were already failing before 2026-10-06 (checked on `551687021`). The executor records the cause and a proposal; it does not edit these gates.
+- **Still not authorized:** Phase 4 and later, even though the pre-step above is.
 
 ## 7.6. Known split authorities (re-checked 2026-10-06 on the synced tree)
 
@@ -357,6 +360,18 @@ Measured with a script over the working tree (method in the resume report); none
 - `plan.md` in three homes: 612 under `docs/history/**`, 19 under `plans/`, 36 under `archive/plans/`; 22 skill/task-spec files in `core/`, `domains/`, `.agents/`, `plugins/` still point plans at `docs/history/<feature>/plan.md`;
 - journals in two places: 11 files under `plans/journals/`, 5 under `docs/journals/`;
 - 302 Markdown files byte-identical between `docs/architect/**` and `docs/platform/**` at the same relative path (372 shared relative paths; 868 identical across all file types).
+
+## 7.7. Executor session brief
+
+Read in this order: this file §1, §3, §5, §7.3 to §7.6, then the phase file you are asked to run. Rules for any executor session:
+
+- Work only in this worktree; run `pwd` and `git branch --show-current` before git commands. Never write to the main checkout (other sessions work there). Merge main into this branch with `git merge`; never rebase, never force-push, never push without the owner asking.
+- Count with scripts or `rtk proxy <cmd>`, never `grep | wc` through the rtk hook (it truncated one count from 3320 to 130). State the measuring method with every number.
+- Run tests with `env -u CLAUDE_CODE_SESSION_ID`. Use `node bin/fgos.mjs` for read-only queries; no state-mutating fgos/fgctl commands.
+- One authorization per phase from the owner is required (§5). Commit only your own paths (`git commit -- <paths>`), conventional messages, no AI references, no phase or finding labels in code comments or test names.
+- Stop and report (do not decide) when: a merge conflicts inside `docs/platform/**` content or in 10 or more files; a gate script fails for an unknown reason; claims disappear without accounting; a gate script would need a change beyond what §7.5b authorizes.
+- The dropped-claims register (`dropped-claims-register.json`) must be restored or dispositioned before the cutover; Plan C is a draft and is not a dependency of the cutover (§7.5).
+- Report to the owner in Vietnamese (xưng "em", gọi "anh"), short, evidence-based, UNPROVEN where unproven, unresolved questions at the end.
 
 ## 8. Dependency Graph
 
