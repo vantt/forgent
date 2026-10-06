@@ -36,16 +36,19 @@ into a multi-profile registry without translation.
 - A bare-path reference never matches an alias recorded for a specific anchor.
 - A hit returns `{resolved: true, toOwner, toAnchor, kind, via}` where `via` is the `aliasId`. A retirement returns `toOwner: null` and carries its `evidenceRef`.
 - A miss returns `{resolved: false}`.
+- A split document is aliased per anchor: one entry per old `path#anchor`, each with its own owner. A bare path resolves to exactly one owner, so a `split` entry must name an anchor.
+- Only repo-relative posix paths resolve. Relative links (`../..`) must be normalized against the referring file before lookup, and absolute machine paths (`/home/...`) are not resolvable and are not aliased.
+- Coverage of a legacy document by history references needs a bare-path alias; an alias recorded for one anchor covers only references to that anchor.
 
 ## 4. Validation rules
 
 The validator reports a finding for: schema violations, duplicate `fromPath`,
 duplicate `aliasId`, a `toOwner` outside `docs/platform/` (except for
 retirements), a `toAnchor` without a `toOwner`, a retirement without
-`evidenceRef`, and any alias whose `toOwner` is itself an alias `fromPath`
-(a chain; a loop is reported as a cycle). Chains are rejected so one lookup
-always lands on a current owner. With a repo root the owner file must exist;
-with a constitution it must match a document-kind placement.
+`evidenceRef`, a `split` entry without an anchor, and any alias whose `toOwner` (or `toOwner#toAnchor`) is itself an alias `fromPath`
+(a chain, compared by the full old path; a loop is reported as a cycle). Chains are rejected so one lookup
+always lands on a current owner. With a repo root the owner file must exist and `toAnchor` must be a heading or block anchor of it;
+with a constitution the owner must match a document-kind placement. The command line passes both.
 
 ## 5. Not in scope
 

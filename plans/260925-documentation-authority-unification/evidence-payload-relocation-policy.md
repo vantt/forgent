@@ -18,7 +18,7 @@ Related files: [plan.md](plan.md), [minimum-constitution.md](minimum-constitutio
 
 - Every evidence payload sits under one area, `agent-coordination`. It exists **twice, byte for byte**: once under `docs/architect/` (legacy) and once under `docs/platform/` (target). Relocation is therefore a **deduplication**: repoint consumers to the platform copy, verify digests, delete the legacy copy. No bytes need to move.
 - No product runtime code and no test reads a payload file from disk. The readers are documentation links, three generated skill copies, historical logs, and tools that walk the whole docs tree.
-- Deleting the legacy copy before the cutover is blocked by the legacy ratchet (deletions are forbidden) and by 195 files that name the legacy path. The safe action now is to record the manifest and build the checker; the deletion belongs to the cutover.
+- Deleting the legacy copy before the cutover is blocked by the legacy ratchet (deletions are forbidden) and by about 190 files that name the legacy path (section 3). The ratchet also guards only the legacy copy: its roots are `docs/specs` and `docs/architect`, so deduplication deletes the protected copy and keeps the one no gate protects (decision 8). The safe action now is to record the manifest and build the checker; the deletion belongs to the cutover.
 
 ## 2. What counts as an evidence payload
 
@@ -70,13 +70,13 @@ Collections (one tree; the other tree is identical):
 | coordination-envelope | 7 | 26,919 |
 | executor-policy-dispatch-seams | 1 | 8,169 |
 
-Content that makes a naive move unsafe (method: node scan of the 867 platform payload files): 45 are `.mjs`/`.sh` scripts; 17 carry path-dependent code: 16 use `import.meta.url` (most with a fixed 7-level `../` climb to import repo source or find the repo root) and 1 shell driver names `docs/` paths; 136 files mention `docs/architect/` and 217 mention an absolute `/home/` path in their text. The legacy and platform copies sit at the same depth, so the depth-bound scripts resolve the same way in either place. A location with a different depth would break re-running them, and any rewrite of their text would change the digest.
+Content that makes a naive move unsafe (method: node scan of the 867 platform payload files): 45 are `.mjs`/`.sh` scripts; 17 carry path-dependent code: 16 use `import.meta.url` (the deepest `../` climb is 7 levels in 6 of them, 6 levels in 6, 1 level in 3 and none in 1) and 1 shell driver names `docs/` paths; 136 files mention `docs/architect/` and 218 mention an absolute `/home/` path in their text (platform tree, method: node scan). The legacy and platform copies sit at the same depth, so the depth-bound scripts resolve the same way in either place. A location with a different depth would break re-running them, and any rewrite of their text would change the digest.
 
 ## 3. Consumer proof
 
 Method: `git grep -l -F` over every tracked file (`.`), excluding the two payload trees and the plan reports, for the pinned patterns `agent-coordination/verification` and each of the 17 collection names; then `git grep -n -F` over `src test scripts bin apps core domains plugins .agents` for the full path, and a read of every hit. A collection name alone is not evidence of a path read: `runtime-recovery`, `coordination-envelope`, `step-07-mvp` and similar words appear as track and coordination ids, which were checked and discarded. The union of all patterns hit 521 distinct files, which were sorted by hand into the table below (most are `archive/plans`).
 
-Counts of files naming any form of the legacy payload path (full or relative, pattern `agent-coordination/verification/`), outside the two payload trees and this plan directory (method: `git grep -l -F`, grouped by top directory with a node script): 195 files: 114 under `archive/`, 23 under `docs/architect`, 19 under `docs/platform`, 12 other docs (9 how-to, 2 `docs/history`, 1 `docs/knowledge`), 11 under `test/`, 6 under `plans/`, 3 skill copies, 3 under `src/`, 2 `.fgos/events`, 1 `CHANGELOG.md`, 1 script. The 195 do not include the 8 links in the area's own `verification/README.md`, which sits inside the payload tree. Of the 195, the full path `docs/architect/agent-coordination/verification/` appears in 189 (the 6 others use relative links).
+Counts of files naming any form of the legacy payload path (full or relative, pattern `agent-coordination/verification/`), outside the two payload trees and this plan directory (method: `git grep -l -F`, grouped by top directory with a node script): about 195 files (the exact number depends on how the two README files and this directory are excluded: 195 in the first count, 197 when a node re-scan excludes only the payload trees, the two `verification/README.md` files and this plan directory): 114 under `archive/`, 23 under `docs/architect`, 19 under `docs/platform`, 12 other docs (9 how-to, 2 `docs/history`, 1 `docs/knowledge`), 11 under `test/`, 6 under `plans/`, 3 skill copies, 3 under `src/`, 2 `.fgos/events`, 1 `CHANGELOG.md`, 1 script. Which form they name (node re-scan of the 197): the legacy form `architect/agent-coordination/verification` in 188, the full path `docs/architect/agent-coordination/verification/` in 176, the platform form in 10 (some name both). The platform-form mentions are not consumers of the legacy copy; the legacy-form count is the figure that matters for deletion.
 
 | Consumer | Kind | Path pattern read | What breaks if the legacy copy is deleted |
 |---|---|---|---|
@@ -109,11 +109,11 @@ True runtime or test readers of payload files: **none found**. This matches the 
 
 | Action | When | Reason |
 |---|---|---|
-| Generate and commit the manifest, build the verifier, run `--before` | now (Phase 4) | read-only, changes no authority |
+| Generate and commit the manifest, build the verifier, run `--before` | designed now; built and run before the cutover (not built in Phase 4, owner decision 9) | read-only, changes no authority |
 | Record this consumer table, refresh before cutover | now, then again at cutover | the table has to match the cutover commit |
 | Repoint the promoted area's own links (verification README, proof-preservation table) to the platform copy | Phase 8 consumer rewrite | candidate-area edit; the table of 8 links states "current proof root" as an intentional migration state |
 | Rewrite skill sources (`core/skills`), how-to links, code comments | Phase 8 | consumer rewrite; render targets regenerate |
-| Delete the legacy payload copy | cutover step 6, after `--before` passes and consumers are repointed | the ratchet forbids earlier deletion; 195 files still name the path; plan section 10 and cutover step 6 already order it |
+| Delete the legacy payload copy | cutover step 6, after `--before` passes and consumers are repointed | the ratchet forbids earlier deletion; about 190 files still name the legacy path; plan section 10 and cutover step 6 already order it |
 | Anything that edits payload bytes | never | digest contract |
 
 Early deletion on main before the cutover is permitted by plan section 5 item 9 but gains little: it would need a new ratchet exception kind and an accounted edit of every legacy file that links to the payloads.
@@ -125,8 +125,10 @@ Early deletion on main before the cutover is permitted by plan section 5 item 9 
 3. **Ratchet handling.** Recommendation: no new exception kind; the ratchet is retired or rebaselined in the same change as the cutover. If the owner chooses early deletion, add a single exception kind `allowed-relocation` that requires a matching manifest entry.
 4. **Manifest home.** Recommendation: `docs/platform/history/documentation-authority-unification/evidence-relocation-manifest.json`, sealed with the migration ledger.
 5. **Classification mismatch.** The ratchet calls 296 payload Markdown files `maintained-authority`; the constitution calls them `evidence-payload`. Recommendation: the inventory and cutover reports follow the constitution (location rule), and the dispositions of those files are `retain-as-evidence`. UNPROVEN: how the final inventory dispositions the 302 payload Markdown files; check before cutover with the validator's placement report.
-6. **Absolute `/home/` paths and legacy paths inside payload text** (217 and 136 files). Recommendation: leave them, resolve through aliases; do not rewrite payloads.
+6. **Absolute `/home/` paths and legacy paths inside payload text** (218 and 136 files). Recommendation: leave them and do not rewrite payloads. The alias table resolves repo-relative paths only (`fromPath` rejects a leading `/`), so it covers the legacy-path mentions (136) but not the 218 absolute paths, which are machine-specific and were never resolvable.
 7. **Skill links already dead in installed copies.** Recommendation: when `core/skills/fgos-architecture-panel/SKILL.md` is rewritten in Phase 8, link to the platform copy and regenerate the render targets; no separate fix.
+8. **The ratchet protects the wrong copy.** Its roots are `docs/specs` and `docs/architect`, so the legacy payload copy is baselined and the platform copy is not. Recommendation: before the legacy copy is deleted, the manifest verifier (`--before`, `--after`) is the only guard of the platform copy; add the platform payload tree to a baseline or give the verifier a standing run in `npm test`.
+9. **Build the verifier now or at the cutover.** The policy above is designed in Phase 4; the manifest generator and `check-evidence-relocation` verifier are not built. Recommendation: build them in the cutover preparation (Phase 8), because the manifest must be generated from the cutover base commit anyway; until then the retirement dry run reports `evidence-digests` as blocked.
 
 ## 7. Unproven
 
