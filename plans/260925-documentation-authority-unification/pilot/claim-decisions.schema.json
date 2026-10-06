@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forgent.dev/schemas/claim-decisions-shard.v1.json",
+  "title": "Claim decisions shard",
+  "description": "Reviewed decisions for claim rows and files of the claim ledger. A shard is merged onto the inventory in memory by scripts/check-doc-inventory-gates.mjs --decisions; the inventory itself is never rewritten. Enumerated values are not repeated here: a property marked x-vocabulary is checked against that section of claim-and-disposition-vocabulary.json. One shard has one author; one claim has at most one decision across all shards.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "shard", "sources", "claims"],
+  "properties": {
+    "version": { "const": 1 },
+    "shard": { "type": "string", "minLength": 1, "description": "Shard name, equal to the file name without .json." },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Repository-relative paths of the source files this shard decides. Every claim of the shard must belong to one of them."
+    },
+    "files": {
+      "type": "array",
+      "description": "File-level decisions. They replace the inventory item's proposedDisposition, proposedRationale and proposedTargetOwner (the first entry of targets).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "disposition", "rationale", "targets"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "disposition": { "type": "string", "x-vocabulary": "sourceDispositions" },
+          "rationale": { "type": "string", "minLength": 1 },
+          "targets": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "Documents that carry the file's claims; the first is the file-level target owner. Empty when the disposition needs no target owner." },
+          "reviewedBy": { "type": "string", "minLength": 1 },
+          "reviewedAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}" }
+        }
+      }
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["claimId", "sourceUnitDigest", "targetOwner", "targetAnchor", "claimKind", "disposition", "reviewStatus", "rationale"],
+        "properties": {
+          "claimId": { "type": "string", "pattern": "^claim_[0-9a-f]{32}$" },
+          "sourceUnitDigest": { "type": "string", "pattern": "^[0-9a-f]{16,64}$", "description": "A prefix of at least 16 hex characters of the row's sourceUnitDigest; it binds the decision to the exact source text that was judged." },
+          "targetOwner": { "type": ["string", "null"], "minLength": 1, "description": "The one document that carries the claim; null only when the disposition needs no target owner." },
+          "targetAnchor": { "type": ["string", "null"], "minLength": 1, "description": "A heading or block anchor of targetOwner (the anchors the conservation extractor yields); null only when targetOwner is null." },
+          "claimKind": { "type": "string", "x-vocabulary": "claimKinds" },
+          "disposition": { "type": "string", "x-vocabulary": "sourceDispositions" },
+          "reviewStatus": { "enum": ["blocking", "pending", "reviewed"], "description": "An author writes pending, or blocking for an unknown-blocking row. reviewed is written only after an independent review." },
+          "rationale": { "type": "string", "minLength": 1, "description": "The row's own reason: where the claim went and why, or why it was not carried." },
+          "reviewedBy": { "type": "string", "minLength": 1 },
+          "reviewedAt": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}" },
+          "searched": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "Evidence of where the author looked (grep terms and files); mandatory for unknown-blocking and every delete-* disposition." }
+        }
+      }
+    }
+  }
+}
