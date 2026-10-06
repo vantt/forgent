@@ -3,12 +3,16 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import {
   executeAssignment,
   reconcileCliSpawnRun,
+  snapshotDirtyBeforeFiles,
 } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { findMutatedDirtyBeforeFiles } from '../../src/runner/dispatch/settlement.mjs';
+import { sha256FileSync } from '../../src/runner/dispatch/proof-helpers.mjs';
 import { validateRunResultV2, validateRunResultV3, runOutcome } from '../../src/runner/dispatch/run-result.mjs';
 
 function classifyRunEvidence({
@@ -679,6 +683,124 @@ test('executeAssignment persists mutatedDirtyBeforeFiles (in both evidence.json 
   const evidence = JSON.parse(fs.readFileSync(evidencePath, 'utf8'));
   assert.deepEqual(evidence.mutatedDirtyBeforeFiles, ['preexisting-dirty.txt'],
     'evidence.json must also persist the mutated pre-existing dirty file (R6)');
+});
+
+test('sha256FileSync matches a whole-buffer sha256 for multi-chunk, empty and symlinked files', () => {
+  const tempDir = mkTempDir();
+  try {
+    const odd = path.join(tempDir, 'odd.bin');
+    // Three full 1 MiB chunks plus a ragged tail, so the last read is partial.
+    const bytes = crypto.randomBytes(3 * 1024 * 1024 + 12345);
+    fs.writeFileSync(odd, bytes);
+    const empty = path.join(tempDir, 'empty.bin');
+    fs.writeFileSync(empty, '');
+    const link = path.join(tempDir, 'link.bin');
+    fs.symlinkSync(odd, link);
+
+    const whole = (f) => crypto.createHash('sha256').update(fs.readFileSync(f)).digest('hex');
+    assert.equal(sha256FileSync(odd), whole(odd));
+    assert.equal(sha256FileSync(empty), whole(empty));
+    assert.equal(sha256FileSync(link), whole(odd), 'a symlink hashes the bytes of its target');
+  } finally {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  }
+});
+
+test('sha256FileSync refuses directories and FIFOs instead of reading or blocking on them', () => {
+  const tempDir = mkTempDir();
+  try {
+    assert.throws(() => sha256FileSync(tempDir));
+    if (process.platform !== 'win32') {
+      const fifo = path.join(tempDir, 'pipe');
+      execFileSync('mkfifo', [fifo]);
+      const started = Date.now();
+      assert.throws(() => sha256FileSync(fifo), (err) => err.code === 'ENOTREGULAR');
+      assert.ok(Date.now() - started < 2000, 'a FIFO with no writer must not block the hash');
+    }
+  } finally {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  }
+});
+
+test('snapshotDirtyBeforeFiles records only existence and hash, never file content', () => {
+  const tempDir = mkTempDir();
+  try {
+    fs.writeFileSync(path.join(tempDir, 'dirty.txt'), 'dirty before run\n');
+    fs.mkdirSync(path.join(tempDir, 'a-dir'));
+    const snapshots = snapshotDirtyBeforeFiles(tempDir, ['dirty.txt', 'gone.txt', 'a-dir']);
+
+    assert.deepEqual(snapshots.get('dirty.txt'), {
+      hash: crypto.createHash('sha256').update('dirty before run\n').digest('hex'),
+      exists: true,
+    });
+    assert.deepEqual(snapshots.get('gone.txt'), { hash: null, exists: false });
+    assert.equal(snapshots.has('a-dir'), false, 'an unreadable entry is skipped, as before');
+    for (const snap of snapshots.values()) {
+      assert.deepEqual(Object.keys(snap).sort(), ['exists', 'hash']);
+    }
+  } finally {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  }
+});
+
+test('snapshotDirtyBeforeFiles hashes a 200 MiB dirty file with bounded memory', () => {
+  const tempDir = mkTempDir();
+  try {
+    const big = path.join(tempDir, 'big.bin');
+    fs.writeFileSync(big, '');
+    fs.truncateSync(big, 200 * 1024 * 1024);
+
+    const before = process.memoryUsage();
+    const started = Date.now();
+    const snapshots = snapshotDirtyBeforeFiles(tempDir, ['big.bin']);
+    const elapsedMs = Date.now() - started;
+    const after = process.memoryUsage();
+
+    assert.equal(snapshots.get('big.bin').exists, true);
+    assert.match(snapshots.get('big.bin').hash, /^[0-9a-f]{64}$/);
+    const MiB = 1024 * 1024;
+    // The snapshot must not keep the file: neither heap nor external buffers
+    // may grow by anything close to the file size.
+    assert.ok(after.arrayBuffers - before.arrayBuffers < 64 * MiB,
+      `arrayBuffers grew by ${((after.arrayBuffers - before.arrayBuffers) / MiB).toFixed(1)} MiB`);
+    assert.ok(after.rss - before.rss < 64 * MiB,
+      `rss grew by ${((after.rss - before.rss) / MiB).toFixed(1)} MiB`);
+    assert.ok(elapsedMs < 3000, `hashing took ${elapsedMs} ms`);
+  } finally {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  }
+});
+
+test('findMutatedDirtyBeforeFiles reports changed, deleted and created files but not unchanged ones', () => {
+  const tempDir = mkTempDir();
+  try {
+    const big = crypto.randomBytes(2 * 1024 * 1024 + 7);
+    fs.writeFileSync(path.join(tempDir, 'same.bin'), big);
+    fs.writeFileSync(path.join(tempDir, 'edited.txt'), 'before\n');
+    fs.writeFileSync(path.join(tempDir, 'deleted.txt'), 'before\n');
+    const snapshots = snapshotDirtyBeforeFiles(
+      tempDir, ['same.bin', 'edited.txt', 'deleted.txt', 'created.txt'],
+    );
+
+    fs.writeFileSync(path.join(tempDir, 'edited.txt'), 'after\n');
+    fs.rmSync(path.join(tempDir, 'deleted.txt'));
+    fs.writeFileSync(path.join(tempDir, 'created.txt'), 'new\n');
+
+    assert.deepEqual(
+      findMutatedDirtyBeforeFiles(tempDir, snapshots).sort(),
+      ['created.txt', 'deleted.txt', 'edited.txt'],
+    );
+    // The persisted baseline shape ({ exists, sha256 }) compares the same way.
+    const persisted = Object.fromEntries(
+      [...snapshots].map(([p, s]) => [p, { exists: s.exists, sha256: s.hash }]),
+    );
+    assert.deepEqual(
+      findMutatedDirtyBeforeFiles(tempDir, persisted).sort(),
+      ['created.txt', 'deleted.txt', 'edited.txt'],
+    );
+  } finally {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  }
 });
 
 test('executeAssignment counts only new dirty files as run evidence (Step 04 §5.3)', async () => {

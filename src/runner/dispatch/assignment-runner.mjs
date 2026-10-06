@@ -94,6 +94,7 @@ import { reconcileHerdrSpawnRun, isHerdrSpawnRunStillWorking } from './herdr-rec
 import { prepareConfinementForLaunch, finalizeConfinementResources } from './confinement/authority.mjs';
 import { buildConfinementRequest } from './confinement/request.mjs';
 import { resolvePosture } from './confinement/policies.mjs';
+import { sha256FileSync } from './proof-helpers.mjs';
 import {
   startDetachedRunSupervisorProcess,
   readDetachedRunSupervisorBinding,
@@ -335,18 +336,16 @@ function rollbackReadOnlyMutations(dir, changedFiles, dirtyBefore, gitBefore, gi
  * - `inferred`: no structured claim, but external evidence (git/artifact delta) exists.
  * - `no-evidence`: process settled, but no structured claim with worker artifact, and no external proof.
  */
-function snapshotDirtyBeforeFiles(dir, dirtyBefore) {
+export function snapshotDirtyBeforeFiles(dir, dirtyBefore) {
   const snapshots = new Map();
   if (!dir || !Array.isArray(dirtyBefore)) return snapshots;
   for (const relPath of dirtyBefore) {
     const fullPath = path.join(dir, relPath);
     try {
       if (fs.existsSync(fullPath)) {
-        const content = fs.readFileSync(fullPath);
-        const hash = crypto.createHash('sha256').update(content).digest('hex');
-        snapshots.set(relPath, { content, hash, exists: true });
+        snapshots.set(relPath, { hash: sha256FileSync(fullPath), exists: true });
       } else {
-        snapshots.set(relPath, { content: null, hash: null, exists: false });
+        snapshots.set(relPath, { hash: null, exists: false });
       }
     } catch {}
   }

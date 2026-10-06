@@ -41,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Dispatch no longer loads every pre-existing dirty file into memory for the whole run: dirty-before snapshots keep only existence and a streamed sha256, so a worktree with large untracked files no longer drives `fgos run` to multi-GB RSS or OOM, and a FIFO or device among the dirty files no longer hangs the run.
 - A failure to record a unit's failed settlement no longer hides the execution error that caused it.
 - `metrics eval record` refusing an invalid eval store now names each offending shard file and line, and how to repair it.
 - Evaluation provenance now distinguishes data-blind judging from actual isolation and discloses cross-arm result access and question deviations; existing real scores are not presented as an independent setup comparison.
