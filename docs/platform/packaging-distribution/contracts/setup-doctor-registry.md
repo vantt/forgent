@@ -57,6 +57,18 @@ without `layoutRule` identifies an old host positively and reports
 passed-but-degraded with an upgrade instruction; other host errors fail.
 This check is read-only, introduces no config default, and never rewrites runs.
 
+`active-release-matches-checkout` compares a source checkout's Node payload
+working-tree bytes with its own activated manifest, using the release builder's
+source enumeration. It reports changed, missing and extra source files, excludes
+staged production dependencies, and does not certify Rust host freshness.
+Outside source checkouts, without activation, with a same-checkout development
+manifest, or in a linked worktree whose activation belongs to main, it reports
+a reasoned skip. Unsafe paths and unreadable inputs fail this check rather than
+throwing out the whole doctor run. It is read-only, with no registered fix:
+`npm run fgos:dev -- <verb>` runs working-tree code; build/stage/upgrade updates
+plain `fgos`. Diagnosis never changes the activation implicitly.
+
+
 `fgos doctor --fix`:
 
 - runs every registered fix;

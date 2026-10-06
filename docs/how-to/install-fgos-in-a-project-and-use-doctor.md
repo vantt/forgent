@@ -33,6 +33,25 @@ A third context exists for contributors only: sourcing
 owner does not need it. Resolution order, when several are present, is
 workspace installation, dev checkout, project-local install, global install.
 
+For changes to fgOS itself, use `npm run fgos:dev -- <verb> [args]` in the
+source checkout to run the Rust host with its working-tree Node payload.
+The runtime keeps the invoking directory through npm's `INIT_CWD`; Cargo
+builds from the script's checkout and respects relative or absolute
+`CARGO_TARGET_DIR`. The fresh native executable and dev manifest are
+materialized in an invocation-specific directory under `.fgos/runtime/dev-host/`,
+with the existing manifest containment and symlink checks unchanged; that
+invocation removes only its own artifacts after the child exits. Serialize
+`fgos:dev` invocations across worktrees that share a Cargo target directory.
+
+Plain `fgos` still runs the activated release, not files you just edited.
+To update it, follow the [build, stage and upgrade procedure](measure-a-real-case.md#5-staging--verifying-the-host-runtime),
+then run doctor through `.fgos/installation/bin/fgos`. From a linked worktree,
+`fgctl init`/`upgrade` selects the main checkout through `git-common-dir`;
+do not use that route to change another session's activation. An old release's
+`fgos setup` can overwrite generated skill headers until the release is
+restaged. `active-release-matches-checkout` compares only the Node payload
+against doctor's source directory, not HEAD or Rust binary freshness.
+
 Separately from both layers, the config has two levels: a project file
 `<project>/.fgos/config.json` and a global file `~/.fgos/config.json`. The
 project file wins over the global one.
@@ -166,8 +185,7 @@ Who fixes it:
 - **you**: only the project owner can, by hand. fgOS never edits those files.
 - **info**: informational, or only reports. No action required unless you care.
 
-The list below is the live output of `fgos doctor --json` (96 checks), in
-registration order, which lives in `src/setup/registrations.mjs`
+The registered checks below come from `src/setup/registrations.mjs`
 (`src/setup/checks.mjs` re-exports it). Some read-only checks list the failing
 file or key in their message; the message always names the exact target.
 
@@ -183,6 +201,7 @@ file or key in their message; the message always names the exact target.
 | `rust-host-binary-present` | The active release's `bin/fgos` exists and is executable | `no active fgos rust host release or dev checkout found` | you | `fgctl repair` |
 | `rust-host-target-supported` | The OS and CPU are an approved Rust host target | names the unsupported platform | you | Use `x86_64-unknown-linux-gnu`; no other target is shipped |
 | `legacy-node-payload-present` | The legacy Node payload named by the release manifest exists | `no active fgos rust host release or dev checkout found` | you | `fgctl repair` |
+| `active-release-matches-checkout` | Activated Node payload matches doctor's source working tree; staged dependencies excluded | changed/missing/extra counts, up to five paths, digest and activation time | you | Use `npm run fgos:dev -- <verb>` for working-tree code, or rebuild/stage/upgrade to update plain `fgos`; no automatic fix. Skips outside source checkouts, absent activation, same-checkout dev manifests and linked worktrees whose activation belongs to main. Does not certify Rust host freshness |
 | `command-routes-drift` | The command-routes descriptor matches the command registry | lists the drifted verbs | info | A release or contributor issue, not yours; report it |
 | `dependencies-installed` | `package.json` dependencies are in `node_modules` | `missing from node_modules: <pkg> -- run npm install` | you | `npm install` (or your package manager's equivalent) in the project |
 | `config-awareness` | Which config level is active (project or global) and whether the other exists | never fails | info | none |

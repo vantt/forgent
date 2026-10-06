@@ -1,0 +1,704 @@
+COMMAND ['node', '--test', 'test/e2e/main-checkout-lock-hook.test.mjs', 'test/e2e/main-checkout-lock-hook-worktree-commit.test.mjs', 'test/e2e/resync-worktree-bare-invocation.test.mjs', 'test/runner/merge.test.mjs', 'test/runner/claim-port.test.mjs', 'test/runner/main-checkout-lock.test.mjs', 'test/cli/fgos-claim-2.test.mjs', 'test/setup/uninstall-wiring.test.mjs', 'test/setup/checks.test.mjs', 'test/scripts/install-git-hooks.test.mjs', 'test/setup/checks-doctor-config.test.mjs', 'test/setup/checks-setup-config.test.mjs', 'test/setup/checks-setup-hookspath.test.mjs', 'test/setup/dir-resolution.test.mjs', 'test/setup/uninstall-wiring-2.test.mjs', 'test/setup/uninstall-wiring-3.test.mjs']
+✔ session list shows a started session, then omits it after it ends (1520.730981ms)
+✔ session end removes a non-diverged session cleanly — exit 0, worktree gone (668.608261ms)
+✔ session end on a diverged session refuses at the CLI level and names the dangling sha, exit 4 (841.479683ms)
+✔ session end --force removes a diverged session anyway, exit 0 (673.968062ms)
+✔ session end on an unknown session id is a clean validation error, exit 4, no crash (203.682322ms)
+✔ session with no sub-verb, and an unknown sub-verb, are both rejected as validation, exit 4 (370.234736ms)
+✔ session gc reclaims a clean, untouched session and reports it, exit 0 (552.250593ms)
+✔ session gc spares a diverged session and reports it as skipped, exit 0 (696.27763ms)
+✔ session gc spares a session with uncommitted (never-committed) changes, exit 0 (528.7965ms)
+✔ unlock: no lock file present -- reports cleared, exit 0 (159.500688ms)
+✔ unlock: lock held by a dead pid -- self-heals via the existing reclaim path, reports cleared (137.581957ms)
+✔ unlock: lock genuinely held by a live session -- refuses, reports the holder identity, never deletes the file (141.296131ms)
+✔ unlock: string-identity lock within TTL -- still refuses (D5 fail-closed, unchanged), but never claims "live session" (tsk-24t) (137.984841ms)
+✔ unlock: corrupt (unparseable) lock content -- force-reclaims via forceReclaimAmbiguousLock, removes the file (145.085976ms)
+✔ unlock: registered in the --help --json manifest with write-only touchesState/externalEffect labels (114.404608ms)
+✔ lock-status: no lock file present -- reports "free" (110.890454ms)
+✔ lock-status: held by a live session -- reports "live" with holder identity, age, and remaining TTL, exit 0 (never refuses) (110.201736ms)
+✔ lock-status: held by a dead pid -- reports "stale" and never reclaims the file (107.103303ms)
+✔ lock-status: corrupt lock content -- reports "ambiguous" and never removes the file (110.865735ms)
+✔ lock-status: registered in the --help --json manifest as read-only (touchesState/externalEffect both false) (106.059723ms)
+✔ take --no-wait fails immediately on a live-held lock, same message/exit code as an unwaited claim, no retry delay (246.376315ms)
+✔ take (default, no flags) retries through a lock whose remainingTtlMs is short, and succeeds once it clears -- D3's default-ON behavior (3222.940165ms)
+✔ take --wait <ms> tightens the budget below the lock's own remainingTtlMs, and fails with the exhausted-budget message once spent (1124.140943ms)
+✔ take --wait rejects a non-numeric or non-positive value the same way --timeout already does (290.520796ms)
+✔ take --wait rejects a value above the 900000ms (15 min) cap -- tsk-2rf D3 (264.122365ms)
+✔ pick --no-wait fails immediately on a live-held lock, same as take --no-wait (250.27767ms)
+✔ take/pick/approve are documented in the --help --json manifest with wait/no-wait properties (110.296069ms)
+✔ pick on an item whose fgw/<id> worktree is still live hands back that SAME worktree instead of removing it out from under the session working there (444.10265ms)
+✔ pick reattaches even when the live worktree has uncommitted work, leaving that work untouched (453.333415ms)
+✔ take refuses a todo item whose own fgw/<id> branch already exists, naming pick instead of silently claiming source:main (409.201393ms)
+✔ take still claims a todo item that has no fgw/<id> branch of its own (293.129366ms)
+✔ tsk-sir: a worktree commit is wrongly refused while another session holds the main-checkout lock (175.656181ms)
+✔ tsk-1d7: a commit from a worktree whose branch was force-moved forward (ancestor, but behind) is refused, naming fgos resync-worktree (398.224784ms)
+✔ tsk-1d7: a worktree whose branch tip has NOT moved since last sync still commits normally (no-op, no false positive) (257.690184ms)
+✔ tsk-1d7: a commit from a worktree whose branch was rewritten backward (not an ancestor) is refused as diverged (250.094601ms)
+✔ tsk-2cl: a commit whose branch tip becomes unreadable (rev-parse fails) is refused, not silently allowed through (226.440271ms)
+✔ tsk-2cl: a normal commit is unaffected when rev-parse succeeds (regression guard on the fake-git harness itself) (222.465364ms)
+✔ tsk-56u: a worktree commit staging a .fgos/ deletion (git add -A after the ADR0020 strip) is refused (108.880839ms)
+✔ tsk-56u: the same staged .fgos/ deletion is refused in the main checkout too, not gated by hookRunsAtHome (102.832706ms)
+✔ tsk-56u: a normal commit that never touches .fgos/ still succeeds in the worktree (110.913395ms)
+✔ tsk-56u: a legitimate .fgos/ addition/modification (never a deletion) is unaffected -- the guard filters --diff-filter=D only (121.28516ms)
+✔ tsk-5pb: a worktree commit staging a .fgos/ modification on a worker branch is refused (104.005626ms)
+✔ tsk-5pb: the same staged .fgos/ modification is allowed on main (not a fgw/* branch) (116.677589ms)
+✔ tsk-5pb: a normal commit that never touches .fgos/ succeeds on a worker branch (122.412072ms)
+✔ tsk-1i3: a commit on main branch staging a .fgos/*.jsonl modification with fewer lines than HEAD is refused (197.014797ms)
+✔ tsk-1i3: a commit on main branch staging a .fgos/*.jsonl modification with equal-or-more lines succeeds (208.500106ms)
+✔ tsk-1i3: a deliberate shrink of a non-log .fgos file such as config.json is not refused; only append-only logs are line-count guarded (178.164997ms)
+✔ tsk-1i3: a brand-new .fgos/* file addition is not refused (110.432063ms)
+✔ a solo git commit in a checkout with no existing lock succeeds (174.390065ms)
+✔ the same session's second commit a few minutes later still succeeds (self-recognition) (468.394741ms)
+✔ a git commit is refused when a fresh lock is held under a different identity (concurrent session) (232.936369ms)
+✔ a git commit succeeds once a different-identity lock has gone stale (ttl expired) (442.69078ms)
+✔ a git commit succeeds against a different-identity lock older than 20s but younger than 3 minutes, with NO env var override (proves the hook falls back to its own short default, not the old 180s one) (119.920909ms)
+✔ a git commit is refused when the lock file is corrupt, and the refusal never leaks a raw pid/session id (90.004311ms)
+✔ fgos unlock clears a corrupt lock left behind by a refused commit, and the next commit then succeeds (512.958013ms)
+✔ a commit inside a real detached git worktree writes the lock at the worktree's own .fgos, not under its hooks directory (121.904665ms)
+✔ a commit still succeeds after the identity shape change, and the lock records a usable token (207.740002ms)
+✔ a git commit on the main checkout is refused when checked out to a fgw/* branch (120.367883ms)
+✔ a git commit inside a linked (non-detached) worktree on a fgw/* branch still succeeds (133.216149ms)
+✔ FGOS_MAIN_LOCK_HOLDER_PID lets the hook self-recognize a real live holder pid its own session id would never match (105.399871ms)
+✔ the same live-pid lock record refuses the commit when FGOS_MAIN_LOCK_HOLDER_PID is absent -- the fallback path is untouched (96.859293ms)
+✔ a non-numeric FGOS_MAIN_LOCK_HOLDER_PID is never trusted blindly -- falls back to normal session-id resolution, same refusal as absent (87.444491ms)
+✔ tsk-jgs: `fgos resync-worktree` run bare (no --dir) from inside a stale worktree resolves the main checkout and repairs it (545.360824ms)
+✔ tsk-jgs: `fgos resync-worktree --dir <mainRoot>` still works explicitly (unchanged behavior) (483.667623ms)
+Switched to a new branch 'fgw/doing-item'
+Switched to branch 'master'
+fgos: unclaim: claim for "doing-item" is held by writer 3517969 (session), acquired 0s ago -- refusing to clear live claim.
+Switched to a new branch 'fgw/doing-item'
+Switched to branch 'master'
+✔ claimWork reads the event log fully at most 7 times per call, not 8+ (tsk-3jh dedupe + tsk-49e incremental snapshot + Tầng A multi-file + tsk-40m claim/doing split + tsk-40m TOCTOU re-fold) (113.401887ms)
+✔ claimWork reclaims a stale hook-written (string-identity) lock past DEFAULT_TTL_MS, instead of failing lock-ambiguous forever (70.74498ms)
+✔ claimWork throws a categorized ClaimError (not an uncategorized crash) when a fresh hook-written lock is still within DEFAULT_TTL_MS (27.351657ms)
+✔ claimWork self-heals a transiently-corrupt lock (unreadable content, not a hook-shaped string-identity record) instead of failing lock-ambiguous (77.516869ms)
+✔ claimWork throws a categorized ClaimError when the lock content is still ambiguous after one reclaim-and-retry — genuinely ambiguous, fails closed (27.557769ms)
+✔ claimWork on a claim-lock §3b-marked release preserves the ORIGINAL branchHeadAtTake on reclaim, instead of recomputing to the tip that already includes the pre-release commit (tsk-2zv) (164.779646ms)
+✔ claimWork on an UNMARKED todo-with-branch reclaim (e.g. reject) still recomputes branchHeadAtTake fresh, never preserving a stale value (tsk-2zv D3) (171.7324ms)
+✔ claimWork isolates a leaf whose dep is "wontfix" without throwing deps-not-merged (D1: wontfix satisfies the merge-guard, same as done) (92.082129ms)
+✔ claimWork still refuses to isolate a leaf whose dep is only "blocked" (D1 does not over-broaden the merge-guard past done/wontfix) (54.605499ms)
+✔ claimWork rejects a runner claim on an item already claimed (doing) by a live session claim, and leaves the session claim untouched (tsk-49a) (113.673099ms)
+✔ claimWork reverts the todo->doing claim back to todo when createClaimWorktree fails, instead of orphaning the item in doing (tsk-4m0 D1) (72.68292ms)
+✔ claimWork reverts a branch-take blocked->doing claim back to blocked when createClaimWorktree fails (tsk-4m0 D1) (137.024204ms)
+✔ claimWork transparently reclaims a conclusively-quiet session doing claim via pick, reattaching to the existing branch (D2/D4/D5) (160.232968ms)
+✔ a stale-claim reclaim records a durable work.attempt(result:"reclaimed") before releasing, distinguishing "started then reclaimed" from "never started" (tsk-40m) (164.519101ms)
+✔ tsk-37t: a stale-claim reclaim succeeds even when the repo is already drifted past its worker-slot ceiling (151.769574ms)
+✔ tsk-37t: a genuinely NEW claim still refuses when the repo is at ceiling, unchanged (the exemption never widens past reclaims) (48.476789ms)
+✔ claimWork still refuses a session doing claim with recent activity, unchanged (tsk-2ec regression) (111.179148ms)
+✔ claimWork pre-check is a no-op for a runner-claimed doing item -- stays startupReap's domain alone (D2 scope) (76.085391ms)
+✔ claimWork pre-check never fires for a runner CALLER, even against a conclusively-quiet session claim (validating finding: no back door around startupReap's human/session exclusion) (99.048885ms)
+✔ claimWork pre-check never fires for take (isolate:false), even against a conclusively-quiet session claim (implementation finding: take's own branch-reuse gap is separately scoped, tsk-65n) (100.917367ms)
+✔ fgos unclaim on an id with no claim at all returns {released:false, reason:"no-claim"}, no error (tsk-uio) (279.492167ms)
+✔ fgos unclaim clears unconditionally with durable-status-mismatch when claim exists but durable status is todo or non-existent (tsk-uio) (633.775069ms)
+✔ fgos unclaim refuses with a clear error naming holder when durable status is doing and activity is fresh (tsk-uio) (264.777623ms)
+✔ fgos unclaim clears stale claim with {released:true, reason:"stale-liveness"} when durable status is doing and activity is stale (tsk-uio) (247.27921ms)
+✔ claimWork invokes runOpportunisticMainCheckoutChecks non-blockingly and succeeds even when truncation guard detects a break (34.748385ms)
+✔ claimWork re-validates preClaimStatus against a FRESH durable read: a durable move landing mid-flight (a different process, while THIS call is still between its own early read and its final commit) must conflict, never claim over a status it never actually saw (105.605841ms)
+✔ HOOK_TTL_MS is a positive number strictly shorter than DEFAULT_TTL_MS (11.244169ms)
+✔ formatLockDurationMs renders seconds-only under a minute (0.41399ms)
+✔ formatLockDurationMs renders minutes and seconds at or above a minute (0.278288ms)
+✔ formatLockDurationMs never fabricates a duration for non-numeric or negative input (0.223873ms)
+✔ inspectMainCheckoutLock reports "free" for a missing lock file, and never creates one (34.028713ms)
+✔ inspectMainCheckoutLock reports "live" for a live holder within ttlMs, without mutating the file (31.755448ms)
+✔ inspectMainCheckoutLock reports "stale" for a dead-pid holder, without reclaiming it (69.795589ms)
+✔ inspectMainCheckoutLock reports "ambiguous" for unparseable content, with no age fabricated (29.301846ms)
+✔ inspectMainCheckoutLock reports "ambiguous" with a known age for a string identity with no ttlMs supplied (29.391005ms)
+✔ acquires the lock when no lock file exists (missing lock file is NOT ambiguous) (26.825919ms)
+✔ refuses when held by a live other pid (two racing processes cannot both succeed) (25.228946ms)
+✔ reclaims a lock held by a dead pid (70.736644ms)
+✔ reclaims a lock held by a live pid whose last-touched timestamp exceeds ttlMs (30.48936ms)
+✔ does NOT reclaim a lock held by a live pid whose timestamp is within ttlMs (28.824061ms)
+✔ falls back to pure PID-liveness when ttlMs is omitted (old timestamp, live pid, still held) (23.545371ms)
+✔ reports AMBIGUOUS for an unparseable (non-JSON) lock file, never free or held (22.726481ms)
+✔ reports AMBIGUOUS for a lock file whose pid field is not a usable number (24.96818ms)
+✔ reports AMBIGUOUS for a lock file with a valid pid but no usable timestamp (22.905012ms)
+✔ release removes the lock so a subsequent acquire by another pid succeeds cleanly (33.556038ms)
+✔ releaseMainCheckoutLock is idempotent when no lock file exists (35.202339ms)
+✔ releaseMainCheckoutLockIfOwn releases a lock recorded under the caller's own identity (25.921951ms)
+✔ releaseMainCheckoutLockIfOwn leaves a DIFFERENT identity's live lock untouched (never a blind unlink) (24.976926ms)
+✔ releaseMainCheckoutLockIfOwn is a no-op when no lock file exists (20.662625ms)
+✔ releaseMainCheckoutLockIfOwn leaves an unparseable (AMBIGUOUS) lock file untouched (25.407762ms)
+✔ releaseMainCheckoutLockIfOwn works for a numeric (pid) identity too, not just strings (26.067093ms)
+✔ renewMainCheckoutLockIfOwn refreshes the timestamp of a lock recorded under the caller's own identity (26.308215ms)
+✔ renewMainCheckoutLockIfOwn leaves a DIFFERENT identity's lock untouched (never steals or refreshes someone else's) (24.761091ms)
+✔ renewMainCheckoutLockIfOwn is a no-op when no lock file exists (never creates one) (24.396549ms)
+✔ renewMainCheckoutLockIfOwn leaves an unparseable (AMBIGUOUS) lock file untouched (24.64938ms)
+✔ renewMainCheckoutLockIfOwn works for a numeric (pid) identity too, not just strings (27.004394ms)
+✔ a live holder that never renews gets reclaimed by a contender once its ttlMs elapses (the bug, reproduced without the fix) (25.591686ms)
+✔ a live holder that renews on a heartbeat is judged still HELD by a contender using the same short ttlMs (the fix) (24.23394ms)
+✔ abandoned-lock self-healing is unchanged: a dead holder whose last heartbeat exceeds ttlMs is still reclaimed (70.757862ms)
+✔ HELD no longer overclaims verified liveness -- was "held-by-live-other-pid", a status also returned for a holder whose liveness (a string identity, or now-reclaimed dead pid) was never actually confirmed live (0.234724ms)
+✔ acquireMainCheckoutLock recognizes a dead-pid dispatch-lock composite identity as dead immediately, reclaiming it well before a long ttlMs elapses (S2 fix, real dead process) (73.200071ms)
+✔ acquireMainCheckoutLock still honors ttlMs for a LIVE dispatch-lock composite identity -- only a confirmed-dead pid short-circuits, a live one is unaffected (23.082566ms)
+✔ acquireMainCheckoutLock still fails closed (AMBIGUOUS) for a non-composite string identity with no ttlMs supplied -- the S2 fix only special-cases the dispatch lock's own pid-embedded shape (22.429109ms)
+✔ acquire does NOT register exit/SIGINT/SIGTERM listeners by default (releaseOnExit omitted) — required for .githooks/pre-commit's intentional lingering-lock design (20.931471ms)
+✔ acquire with releaseOnExit:true registers exit/SIGINT/SIGTERM listeners, and release() removes them again (no leak across cycles) (22.554467ms)
+✔ a held lock acquired with releaseOnExit:true is released automatically when the holding process is killed with SIGINT (crash-safety net) (76.918718ms)
+✔ a held lock acquired WITHOUT releaseOnExit survives the holding process exiting normally (the .githooks/pre-commit contract) (75.081861ms)
+✔ acquires the lock when free using a string identity (19.796486ms)
+✔ a different string identity is held within ttlMs of its last refresh (22.286831ms)
+✔ a different string identity is reclaimed once ttlMs has elapsed since its last refresh (21.754494ms)
+✔ checking a different string identity lock with no ttlMs supplied is AMBIGUOUS, never silently free or held (20.091557ms)
+✔ self-recognition: the same numeric identity refreshes its own lock regardless of ttlMs or liveness (21.63297ms)
+✔ self-recognition: the same string identity refreshes its own lock regardless of ttlMs (19.163285ms)
+✔ self-recognition: the same string identity refreshes its own lock with no ttlMs supplied at all (18.94079ms)
+✔ allowSelfRecognition omitted still self-recognizes (byte-identical default) (20.166408ms)
+✔ allowSelfRecognition:false treats the caller's own identity as a real holder, not a refresh — string identity under ttlMs judges it HELD (21.661275ms)
+✔ allowSelfRecognition:false still lets a genuinely fresh acquire succeed (no lock file yet) (21.567546ms)
+✔ forceReclaimAmbiguousLock: already-clear when no lock file exists (20.753574ms)
+✔ forceReclaimAmbiguousLock: reclaims a lock file that is still unparseable on the second read (20.423587ms)
+✔ forceReclaimAmbiguousLock: never unlinks a lock that now parses (a legitimate holder wrote a fresh valid record since the caller's own read) (16.237733ms)
+✔ forceReclaimAmbiguousLock: reclaims a lock file with a valid pid but an unusable timestamp (AMBIGUOUS per acquireMainCheckoutLock) (17.813347ms)
+✔ acquire (fresh create) and acquire (self-recognition refresh) never leave a dangling temp file behind (19.931588ms)
+✔ deterministic: the create path never makes lockPath observable via fs.openSync(path, "wx") before its content is fully written (tsk-2tm) (18.081484ms)
+✔ deterministic: the self-recognition refresh path never truncates lockPath in place via a direct fs.writeFileSync(lockPath, ...) (tsk-2tm) (16.825528ms)
+✔ two processes racing to create a genuinely NEW lock always produce exactly one ACQUIRED and one HELD, never AMBIGUOUS from a torn read (tsk-2tm) (713.201861ms)
+✔ self-recognition refresh is atomic: a reader between two refreshes always sees a fully-formed, parseable record, never a truncated one (tsk-2tm) (62.409792ms)
+✔ mergeSlotLockFile is injective: a naive "/" -> "-" substitution would collide, encodeURIComponent does not (0.334008ms)
+✔ mergeSlotLockFile output only ever contains filesystem-safe characters (no "/", no null byte) (0.228125ms)
+✔ dispatchLockFile is injective and produces filesystem-safe lock filenames (tsk-64hk) (0.196799ms)
+✔ acquireMainCheckoutLock omitting lockFile still resolves to LOCK_FILE (byte-identical default) (18.856797ms)
+✔ two different lockFile values never contend with each other — both acquire, both are HELD-refusing to a different identity, independently (20.394669ms)
+✔ releaseMainCheckoutLockIfOwn/renewMainCheckoutLockIfOwn/inspectMainCheckoutLock/forceReclaimAmbiguousLock all thread a non-default lockFile correctly, independent of LOCK_FILE (18.472024ms)
+✔ run-lock: isProcessAlive is true for this test's own live pid and false for a guaranteed-dead pid (32.157963ms)
+✔ run-lock: publishNextGeneration never unlinks/overwrites -- repeated publishes accumulate distinct, immutable generation files (21.284891ms)
+✔ run-lock: publishNextGeneration lets `decide` stop without publishing anything (idempotent recognition) (4.101069ms)
+✔ run-lock: two racing processes publishing into the SAME generations dir always produce two distinct, non-colliding epochs, never a torn/duplicate generation 1 (65.797914ms)
+✔ run-lock: acquireRunControl on a free Run succeeds with epoch 1 and a fresh token (3.912163ms)
+✔ run-lock: two controller acquisitions of the same Run receive different epochs and different tokens (8.602733ms)
+✔ run-lock: acquireRunControl refuses a second acquisition while the first controller is still live and never released (held, not reclaimed) (3.601818ms)
+✔ run-lock: acquireRunControl with expectedControlEpoch refuses "stale" when the ambient epoch has moved on (8.470556ms)
+✔ run-lock: SIGKILL without a release marker can be reclaimed only after PID-dead proof (83.033123ms)
+✔ run-lock: SIGSTOP with an expired heartbeat/ttl remains HELD -- a live-but-stopped PID is never mistaken for dead (452.870505ms)
+✔ run-lock: a successor generation is never deleted or shadowed by a stale release of an old, already-superseded epoch (72.465507ms)
+✔ run-lock: isRunControlCurrent detects a token that has outlived its own control generation, so an in-flight adapter call can notice it was superseded (8.062643ms)
+✔ run-lock: releaseRunControl is idempotent and never throws for an unknown generation or a mismatched token (9.332557ms)
+✔ run-lock: settleRunControl commits settlement on current generation and fences future acquisition (6.487494ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+Switched to a new branch 'fgw/parent-root'
+Switched to branch 'main'
+Switched to branch 'fgw/parent-root'
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+Already on 'main'
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+Switched to a new branch 'fgw/parent-root'
+Switched to branch 'main'
+Switched to branch 'fgw/parent-root'
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+Already on 'main'
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ classifySource returns "runner" when a live fgw/<id> branch exists (75.759152ms)
+✔ classifySource returns "pull" when no branch exists but headAtTake/headAtReturn are both present (32.230269ms)
+✔ classifySource returns "legacy" when neither a branch nor headAtTake/headAtReturn exist (29.698138ms)
+✔ classifySource prefers "runner" even when headAtTake/headAtReturn are also present (branch existence wins) (69.124403ms)
+✔ reviewDiff for a runner item with an explicit opts.trunk diffs against that trunk instead of main (87.765168ms)
+✔ reviewDiff for a runner item with no opts.trunk still defaults to main (regression) (67.059815ms)
+✔ reviewDiff for a pull item diffs headAtTake..headAtReturn with no warning for a single-commit range (58.69669ms)
+✔ reviewDiff for a pull item warns when the range contains more than one commit (possible interleaved session) (77.353243ms)
+✔ reviewDiff for a legacy item (no branch, no head markers) returns a null diff and a non-throwing warning (36.088124ms)
+✔ reviewDiff succeeds on a diff larger than Node's old 1 MiB execFileSync default (tsk-648 regression) (140.948407ms)
+✔ reviewDiff reports a diagnosable MergeError, not a raw ENOBUFS passthrough, when a diff still exceeds maxBuffer (65.184274ms)
+✔ changedFiles returns a runner branch's changed paths as an array (repo-relative, reusing the runner branch/trunk resolution) (63.067417ms)
+✔ changedFiles returns every changed path when a runner branch touches several files (66.136376ms)
+✔ changedFiles honors an explicit opts.trunk (leaf diffs against its parent root, not main) (86.526289ms)
+✔ changedFiles returns an empty array for a pull-source item (Iron Law approve-check is runner-only) (37.513525ms)
+✔ changedFiles returns an empty array for a legacy-source item (no branch, no head markers) (31.675095ms)
+✔ isWorkingTreeClean is true when the only pending change is inside .fgos/ (41.327095ms)
+✔ isWorkingTreeClean is false when a non-.fgos path is dirty, even alongside a dirty .fgos/ (41.405196ms)
+✔ isWorkingTreeClean(repoRoot) still recognizes its own .fgos/ as excluded when repoRoot is a subdirectory of the real git top-level (44.112081ms)
+✔ isWorkingTreeClean(repoRoot) still scans the WHOLE repo when repoRoot is a subdirectory — a dirty file elsewhere still counts (approve is a whole-tree gate, unlike return) (30.319017ms)
+✔ isWorkingTreeClean(repoRoot, ownFileSet) is true when the only dirty path is outside ownFileSet (31.02263ms)
+✔ isWorkingTreeClean(repoRoot, ownFileSet) is false when the dirty path IS in ownFileSet (27.252165ms)
+✔ isWorkingTreeClean(repoRoot) with no ownFileSet argument reproduces the strict pre-tsk-598 default (28.134835ms)
+✔ isFgosOnlyStatusLine with no prefix (default) matches only a bare top-level .fgos/ path — unchanged prior behavior (0.327551ms)
+✔ isFgosOnlyStatusLine with a prefix matches that prefix's own .fgos/ path, not a bare top-level one (0.224661ms)
+✔ isFgosOnlyStatusLine: omitted ownFileSet (default null) still blocks any non-.fgos path — fail-safe, unchanged from before tsk-598 (0.208143ms)
+✔ isFgosOnlyStatusLine: a non-.fgos path OUTSIDE ownFileSet is ignorable (does not block) (0.218479ms)
+✔ isFgosOnlyStatusLine: a non-.fgos path INSIDE ownFileSet still blocks — a real conflict (0.215019ms)
+✔ isFgosOnlyStatusLine: a .fgos/ path is always ignorable regardless of ownFileSet (0.18691ms)
+✔ isFgosOnlyStatusLine: a rename line ("a -> b") blocks if EITHER side is in ownFileSet (0.217812ms)
+✔ buildOwnFileSet: unions committed-diff paths and footprint, normalized the same way frozenJudgeHits normalizes footprint (0.486852ms)
+✔ buildOwnFileSet: tolerates an absent footprint (item.footprint undefined) and an empty diff (0.365201ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ mergeRunnerItem merges cleanly, verify passes, and commits — outcome "merged" (99.974481ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ mergeRunnerItem sweeps a dirty untracked .fgos/events/ shard file into its own merge commit (114.124669ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+fatal: Needed a single revision
+Switched to a new branch 'fgw/other-item'
+Switched to branch 'main'
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+Automatic merge went well; stopped before committing as requested
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ mergeRunnerItem sweeps a dirty .fgos/events/ shard under lockRoot (not repoRoot) into lockRoot's own index when lockRoot !== repoRoot (129.652843ms)
+✔ mergeRunnerItem aborts cleanly on a real conflict — main left byte-for-byte unchanged, outcome "conflict" (109.063069ms)
+✔ mergeRunnerItem reports "merge-failed-unclassified" (not "conflict") when the merge fails without ever creating MERGE_HEAD (75.560357ms)
+✔ mergeRunnerItem reports "merge-blocked-other-item" (not "conflict") and never touches a pre-existing MERGE_HEAD from a different branch (90.016545ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ mergeRunnerItem reports "lock-lost-mid-merge" when final lock renewal fails before commit and never calls abortMergeIfPossible (106.99228ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ mergeRunnerItem self-resolves a decision-ID collision (both sides independently claim the same next-free id under two different files) -- renumbers the branch's file to the real next-free id, keeps both rows, outcome "merged" with selfResolved (137.859828ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+fatal: Needed a single revision
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ tsk-2iz: mergeRunnerItem's decision-ID auto-resolve considers the BRANCH's own new ids too, not just HEAD -- never mints an id that collides with the branch's own already-clean file (128.452413ms)
+✔ tsk-2iz: a real failure INSIDE the decision-ID auto-resolve attempt (not the "doesn't match the shape" false case) still falls through to the same abort -- never leaves MERGE_HEAD or a half-renamed file behind (110.9323ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ mergeRunnerItem self-resolves a purely positional decision-index collision (two DIFFERENT, non-colliding ids inserted at the same position) without renumbering either side (112.295238ms)
+✔ mergeRunnerItem does NOT self-resolve a same-row edit dispute inside docs/decisions/0000-index.md (both sides change the SAME existing row's text) -- classifyDecisionIndexCollision returns null, outcome stays "conflict" (115.028876ms)
+✔ classifyDecisionIndexCollision returns null for a same-row edit dispute even in isolation (shared link target between ours/theirs) (70.175612ms)
+✔ mergeRunnerItem does NOT self-resolve when the conflict is not confined to docs/decisions/0000-index.md (an otherwise-self-resolvable index collision alongside an unrelated real conflict) (109.157842ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ mergeRunnerItem aborts cleanly when the staged merge fails its own verify — main left unchanged, outcome "verify-fail" (85.305884ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ mergeRunnerItem aborts the merge when "git commit" itself fails (e.g. a refusing pre-commit hook) — main left unchanged (70.383995ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+Switched to a new branch 'fgw/demo-item-a'
+Switched to branch 'main'
+Switched to a new branch 'fgw/demo-item-b'
+Switched to branch 'main'
+✔ mergeRunnerItem carries the real "git commit" stderr/status on its thrown MergeError, not just the generic wrapper message (72.471731ms)
+✔ mergeRunnerItem refuses to even attempt the merge when another identity already holds the main-checkout lock (53.400237ms)
+CHILD_OUTCOME:merged
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ mergeRunnerItem refuses a REAL second root->main merge sharing the same inherited env session id — the fanout bug tsk-70l closes (237.748226ms)
+✔ mergeRunnerItem refuses when a REAL different live process holds the main-checkout lock (45.108633ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ mergeRunnerItem reclaims the lock immediately (never waiting out the TTL) when its recorded pid belongs to an already-exited process (95.585545ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ mergeRunnerItem resolves the main-checkout lock against lockRoot, not repoRoot (54.712595ms)
+✔ mergeRunnerItem refuses when lockRoot (not repoRoot) already holds the main-checkout lock — proves a leaf-approve-shaped call now actually contends (44.483613ms)
+✔ withMergeTargetSlot acquires and releases cleanly around a successful fn (1.210701ms)
+✔ withMergeTargetSlot releases the slot even when fn throws (0.580629ms)
+✔ withMergeTargetSlot refuses when the SAME target ref is already held by another live identity — code lock-held (0.583481ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ withMergeTargetSlot for TWO DIFFERENT target refs run concurrently — no shared serialization between them (acceptance 3) (4.895956ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+Switched to a new branch 'fgw/tsk-51m'
+Switched to branch 'main'
+Switched to a new branch 'fgw/leaf-a'
+Switched to branch 'main'
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ mergeRunnerItem with targetSlot:true does NOT take main-checkout.lock — a concurrent holder of main-checkout.lock does not block it (acceptance: additive, unchanged default when omitted) (60.604742ms)
+✔ mergeRunnerItem omitting targetSlot (default false) still takes main-checkout.lock exactly as before — byte-identical default (41.22552ms)
+✔ the target-slot pattern in practice: withMergeTargetSlot held around withMergeEphemeralWorktree blocks a second concurrent attempt on the SAME target BEFORE it can read the target tip (acceptance 7) (50.16432ms)
+✔ mergeRunnerItem: an ambiguous (unparseable) lock file carries code "lock-ambiguous", distinct from "lock-held" -- a retry wrapper must never retry this one either (39.858937ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ mergeRunnerItem merges normally when the lock is free, and releases it afterward (59.27078ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ mergeRunnerItem is idempotent: a branch already merged into HEAD returns outcome "merged" without attempting a redundant commit (75.255899ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+Automatic merge went well; stopped before committing as requested
+fatal: Needed a single revision
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+Switched to a new branch 'fgw/other-item'
+Switched to branch 'main'
+✔ mergeRunnerItem on an already-merged branch still re-runs verify and returns "verify-fail" if HEAD has since regressed (66.285764ms)
+✔ abortMergeIfPossible is a no-op when there is no MERGE_HEAD (the tsk-2j9 no-op-merge case) — never throws "no merge to abort" (28.519243ms)
+✔ abortMergeIfPossible still aborts a real in-progress merge when MERGE_HEAD does exist (51.360427ms)
+✔ mergeRunnerItem does not report "merged" when an already-ancestor branch had its content discarded by an earlier "git merge -s ours" (60.108378ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ mergeRunnerItem does not false-flag an already-merged branch just because a later unrelated already-merged branch also touched the same file (122.909081ms)
+✔ mergeRunnerItem refuses a branch that stages a change under .fgos/ — main left byte-for-byte unchanged, outcome "fgos-write-rejected" (65.242761ms)
+✔ formatFgosWriteRejectedDetail includes playbook recovery doc path (0.318339ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+Switched to branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ mergeRunnerItem merges normally when the branch touches ordinary files alongside an untouched .fgos/ (80.39997ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ mergeRunnerItem resolves two-sided-drift-after-forced-restore cleanly via merge=union for diagnostic logs (tsk-2xg regression) (111.020208ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ mergeRunnerItem merges cleanly when a merge=union .fgos/ file genuinely diverges between branch and main (tsk-4gi regression) (95.658155ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+Switched to branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ mergeRunnerItem does not false-flag an already-merged branch over a legitimate .fgos/ divergence (tsk-52p regression) (109.841335ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ mergeRunnerItem merges cleanly when a non-union .fgos/ path auto-merges to a value differing from HEAD, but the branch's own field is unchanged since branchHeadAtTake (tsk-4s6) (111.778607ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ mergeRunnerItem merges cleanly when a .fgos/ path is absent at branchHeadAtTake, absent on branch, and present on main (tsk-198) (89.028651ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ mergeRunnerItem merges cleanly when a .fgos/ path is unchanged on the branch since branchHeadAtTake but main has since fully untracked it (tsk-28x) (76.582116ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+Switched to branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ mergeRunnerItem prefers item.lastAttempt.branchHeadAtTake over a stale top-level branchHeadAtTake when resolving whether a .fgos/ path is unchanged (tsk-28x) (87.072187ms)
+✔ mergeRunnerItem still refuses a non-union .fgos/ path that auto-merges cleanly on non-overlapping lines (tsk-4gi: fix must not weaken this) (88.139538ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+Switched to branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ performCatchUp resolves a stale deleted-.fgos-shard branch cleanly instead of a false modify/delete conflict (tsk-tr9 regression) (114.774173ms)
+fatal: update_ref failed for ref 'refs/heads/fgw/root-item': cannot lock ref 'refs/heads/fgw/root-item': is at dccdf147bb3cb9b4c52ab2f5b09e7a412b3dc275 but expected 71bdd1c0dd9d12b2a8f8d3f4f834490077d83b50
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ mergeRunnerItem resolves a stale deleted-.fgos-shard branch cleanly instead of a false modify/delete conflict (tsk-tr9 regression) (112.065897ms)
+✔ withMergeEphemeralWorktree refuses to force-move the branch when it moved since this call started (concurrent merge already landed) -- the losing commit is never silently discarded (74.314961ms)
+✔ withMergeEphemeralWorktree still force-moves normally when nothing else touched the branch in the meantime (50.658093ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'master'
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ cleanupMergedBranch deletes the now-fully-merged branch and never throws (60.678011ms)
+✔ cleanupMergedBranch never throws even if the branch is already gone (idempotent, reports a warning instead) (18.415059ms)
+✔ detectTrunk resolves "master" on a repo whose only trunk branch is master (no origin remote) (20.885791ms)
+✔ reviewDiff diffs a runner branch against the detected master trunk (no hardcoded main) (35.787526ms)
+✔ detectTrunk resolves the origin/HEAD target branch, not the local main/master fallback (22.458843ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ a red repo-invariant check blocks the merge even when the item verify is green (65.759842ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ a green repo-invariant check lets the merge land (59.678157ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ no invariantChecks config means no invariant check runs at merge (59.505527ms)
+✔ D5: the merged tree already verified at return skips both the verify and the invariant checks (57.909573ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ D5: main advancing past the fork on an overlapping path forces the checks to run again (66.774275ms)
+✔ D5: main advancing past the fork on a disjoint path still allows skip (75.252461ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ D5: main renaming a path that branch modified forces checks to run again (74.390499ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ D5: a branch tip that moved past branchHeadAtReturn forces the checks to run again (73.302843ms)
+Switched to a new branch 'fgw/landed'
+Switched to branch 'main'
+Switched to a new branch 'fgw/leaf'
+Switched to branch 'main'
+Switched to a new branch 'fgw/landed'
+Switched to branch 'main'
+Switched to a new branch 'fgw/leaf'
+Switched to branch 'main'
+Switched to a new branch 'fgw/landed'
+Switched to branch 'main'
+Switched to a new branch 'fgw/leaf'
+Switched to branch 'main'
+Switched to a new branch 'fgw/landed'
+Switched to branch 'main'
+Switched to a new branch 'fgw/leaf'
+Switched to branch 'main'
+Switched to a new branch 'fgw/landed'
+Switched to branch 'main'
+Switched to a new branch 'fgw/live'
+Switched to branch 'main'
+Switched to a new branch 'fgw/resolved'
+Switched to branch 'main'
+Switched to a new branch 'fgw/otherTarget'
+Switched to branch 'main'
+Switched to a new branch 'fgw/leaf'
+Switched to branch 'main'
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ D5: an item with no branchHeadAtReturn is never eligible for the skip (52.320591ms)
+✔ detectPostLandDrift: no shared path produces nothing at all -- no notification, no mark (51.305388ms)
+✔ detectPostLandDrift: a shared path with a live session notifies that exact session and leaves its branch untouched (55.800668ms)
+✔ detectPostLandDrift: a shared path with no live session is marked stale only (56.75209ms)
+✔ detectPostLandDrift runs no verify at all -- the whole reason this is a detection point (53.050764ms)
+✔ detectPostLandDrift examines exactly the open leaves sharing the target -- O(open leaves) (76.380972ms)
+✔ detectPostLandDrift: a landed item with no branch of its own contributes no paths, so nothing is flagged (35.881899ms)
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ mergeRunnerItem attaches a postLand report whose landed paths were captured BEFORE the merge (60.932105ms)
+Switched to a new branch 'fgw/tsk-5et'
+Switched to branch 'main'
+Already on 'main'
+error: Entry 'f.txt' not uptodate. Cannot merge.
+Switched to a new branch 'fgw/tsk-5et'
+Switched to branch 'main'
+Already on 'main'
+Switched to a new branch 'fgw/demo-item'
+Switched to branch 'main'
+Switched to branch 'fgw/demo-item'
+Switched to branch 'main'
+✔ mergeRunnerItem attaches no postLand report when the merge did not land (47.303792ms)
+✔ performCatchUp pre-merge-refusal fixture returns merge-refused outcome without conflictedFiles (55.115098ms)
+✔ performCatchUp genuine conflict returns conflict outcome with non-empty conflictedFiles (66.32998ms)
+✔ abortMergeIfPossible throws MergeError with category merge-fail when merge abort fails on dirty staged merge (52.549181ms)
+✔ package.json has no prepare script and exposes setup:hooks running install-git-hooks.mjs (2.207886ms)
+✔ installGitHooks sets core.hooksPath to this repo root's absolute .githooks path inside a real git checkout (22.692306ms)
+✔ installGitHooks no-ops silently when no .git entry exists (0.890459ms)
+✔ installGitHooks is idempotent -- running it twice does not throw and leaves the same config (27.312155ms)
+✔ installGitHooks returns { wired: true, skippedExisting: null } on a fresh repo, { wired: false, skippedExisting: null } with no .git (16.34851ms)
+✔ installGitHooks never overwrites a pre-existing custom core.hooksPath -- fill-only, matches this verb's other side effects (18.876344ms)
+✔ installGitHooks treats a pre-existing absolute core.hooksPath resolving to repoRoot/.githooks as already wired, not a foreign custom hook (27.395856ms)
+✔ CLI: running install-git-hooks.mjs inside a fresh temp git clone sets core.hooksPath to the fixture root's absolute .githooks path (99.850325ms)
+✔ CLI: running install-git-hooks.mjs where no .git exists exits 0 without error (81.611876ms)
+✔ setup/doctor CLI e2e tests fail closed against real Claude provider execution (5.958357ms)
+✔ tool-registry-configured passes when no tool-capable executor is declared at all (inactive — a clean skip, never a failure) (410.478721ms)
+✔ tool-registry-configured passes when every declared tool is checked present (full) (727.885685ms)
+✔ tsk-3oa2: tool-registry-configured FAILS when a declared tool is missing or never checked (degraded) -- no longer a silent passed:true (311.610141ms)
+✔ node-version-and-git passes under the current process (real Node, real git) (2.834467ms)
+✔ shell-integration-sourced passes trivially when no rc files exist (3.44607ms)
+✔ shell-integration-sourced fails when a detected rc file is missing the source line (4.053581ms)
+✔ shell-integration-sourced passes when every detected rc file already has the source line, and the sourced function actually works (17.702122ms)
+✔ shell-integration-sourced fails when the source line is present but the sourced function itself is dead (tsk-2wpi: a text-present source line is not proof the command works) (33.268397ms)
+✔ config-not-stale reports failed/not-configured when the shared file is absent (0.699967ms)
+✔ config-not-stale passes when the existing config already has every default key (1.182677ms)
+✔ config-not-stale fails when the shared file is complete except gateBypass (0.613449ms)
+✔ config-not-stale fails when the existing config is missing a default key (0.485608ms)
+✔ invariant-checks-configured fails when the section is missing entirely (0.351734ms)
+✔ invariant-checks-configured fails when the section is present but yields no runnable command (1.189124ms)
+✔ invariant-checks-configured passes and names the configured commands (0.448955ms)
+✔ worktree-setup-configured passes when the section is absent or empty (0.79933ms)
+✔ worktree-setup-configured fails when the section is present but malformed (1.130587ms)
+✔ worktree-setup-configured passes and names the configured commands (0.442587ms)
+✔ worker-slots-ceiling-usable fails when the section is missing entirely (0.388725ms)
+✔ worker-slots-ceiling-usable fails on a ceiling that silently enforces nothing (1.307617ms)
+✔ worker-slots-ceiling-usable passes on the unarmed null fgos setup writes, and says so (0.41686ms)
+✔ worker-slots-ceiling-usable passes and names a real armed ceiling (0.454984ms)
+✔ advise-execute-capabilities-configured fails when runner.capabilities is missing entirely (0.564225ms)
+✔ advise-execute-capabilities-configured fails when a slot is missing or malformed (1.629224ms)
+✔ advise-execute-capabilities-configured passes when both slots are declared (0.594115ms)
+✔ workflow-capabilities-configured names a capability a Workflow uses that config lacks (2.024203ms)
+✔ workflow-capabilities-configured accepts a bare-verb entry the way bind() resolves it (1.678027ms)
+✔ workflow-capabilities-configured warns, naming each Workflow capability with no prefer pool (1.586773ms)
+✔ workflow-capabilities-configured is clean when each capability resolves to a prefer pool, exact or bare verb (1.510859ms)
+✔ gate-bypass-configured check fails when the shared file has no gateBypass key at all (0.38993ms)
+✔ gate-bypass-configured check fails when gateBypass.level is present but not a recognized level (0.428593ms)
+✔ gate-bypass-configured check passes when gateBypass.level is a recognized level (0.431562ms)
+✔ gate-bypass-configured fix writes a default level when the shared file has no gateBypass key, preserving other keys (1.657918ms)
+✔ gate-bypass-configured fix repairs a malformed level back to the default (0.582276ms)
+✔ gate-bypass-configured fix is idempotent: reports unchanged and never rewrites when level is already valid (0.563079ms)
+✔ fgos doctor --fix (CLI e2e) actually bootstraps gateBypass.level via the real fix (1311.083275ms)
+✔ fgos doctor --fix --pretty (CLI e2e) renders a fix line green even when the fix found nothing to change (1957.471507ms)
+✔ herdr-launcher-configured check fails when the shared file has no herdrOrchestrator key at all (0.535867ms)
+✔ herdr-launcher-configured check fails when a toggle is present but not a boolean (0.682549ms)
+✔ herdr-launcher-configured check passes when every toggle is a boolean (0.631712ms)
+✔ herdr-web-dashboard-configured check fails when the shared file has no herdrWebDashboard key at all (0.29569ms)
+✔ herdr-web-dashboard-configured check fails when staticServing is present but not a boolean (0.301992ms)
+✔ herdr-web-dashboard-configured check passes when staticServing is a boolean (0.285543ms)
+✔ config-awareness is registered on DOCTOR_CHECKS and always passes (0.245424ms)
+✔ config-awareness reports "none" when neither project nor global config exists (0.340038ms)
+✔ config-awareness reports project active with global not present, when only project config exists (0.384958ms)
+✔ config-awareness reports project active with global also present, when both exist (0.51683ms)
+✔ config-awareness falls back to global active with project not present, when only global config exists (0.384982ms)
+✔ mainCheckoutHookWired is false in a cwd with no .git at all, and never throws (2.134494ms)
+✔ mainCheckoutHookWired is false in a real git repo whose core.hooksPath is unset (5.212632ms)
+✔ mainCheckoutHookWired is false when core.hooksPath points somewhere other than .githooks (8.065026ms)
+✔ mainCheckoutHookWired is true once core.hooksPath is set to .githooks (8.82244ms)
+✔ mainCheckoutHookWired is true when core.hooksPath is an absolute path resolving to repoRoot/.githooks (9.971101ms)
+✔ mainCheckoutHookWired is true from inside a linked worktree when the main checkout has an absolute core.hooksPath, not just from the main checkout itself (31.850321ms)
+✔ main-checkout-hook-wired doctor check reports passed/failed matching mainCheckoutHookWired, with an actionable message (11.876087ms)
+✔ fgos doctor (no flags) produces valid wrapEnvelope-shaped JSON on stdout (335.204548ms)
+✔ fgos doctor --pretty prints colored ANSI text, not JSON (299.980731ms)
+✔ fgos doctor against a fresh cwd with no runner config never creates the shared config file (read-only proof) (293.016261ms)
+✔ resolveMainCheckout from inside a linked worktree resolves the main checkout, not the worktree (29.563481ms)
+✔ resolveMainCheckout returns null outside a git checkout entirely (2.331033ms)
+✔ integrationScriptPath returns a path that actually exists on disk (2.489843ms)
+✔ integrationScriptPath names the main checkout even when this copy runs from a linked worktree (4.491192ms)
+✔ shell-integration-sourced fails on a dead fgos source line even when the live line is present (23.932631ms)
+✔ shell-integration-sourced counts dead lines per rc file across both bash and zsh (24.639811ms)
+✔ shell-integration-sourced still passes when every rc file has only the live line (13.306924ms)
+✔ shell-integration-sourced samples dead paths instead of printing all of them (24.502945ms)
+✔ no-stuck-merge-abort check passes and fix reports nothing to fix on a clean repo with no MERGE_HEAD (24.725531ms)
+✔ no-stuck-merge-abort check fails and fix reports manual command when MERGE_HEAD exists (23.714343ms)
+✔ tier-vocabulary-dead-keys check passes on clean config (0.883621ms)
+✔ tier-vocabulary-dead-keys check fails when retired keys are present (0.471637ms)
+✔ model-policy-tier-coverage check passes when all needed tiers are covered (0.579448ms)
+✔ model-policy-tier-coverage check fails when an executor provider lacks tier coverage (0.524322ms)
+✔ coordination-protocol-dead-vocabulary check fails when minTier is in protocol YAML (0.575868ms)
+✔ fgos setup wires core.hooksPath to this checkout's absolute .githooks path, and reports hooksWired: true (528.486277ms)
+✔ fgos setup initializes ~/.fgos/config.json with the full default shape (tsk-1ri D1) when it does not exist (476.147584ms)
+✔ fgos setup in a cwd with no .git reports hooksWired: false and does not throw (506.626758ms)
+✔ fgos setup leaves a pre-existing custom core.hooksPath untouched — fill-only, never silently repoint someone else's hooks (508.12761ms)
+✔ DOCTOR_CHECKS has exactly the registered setup/doctor checks, including instruction-projections-stale (4.974421ms)
+✔ root-drift passes when no fgw/<root> branch is ahead of its target (100.656732ms)
+✔ root-drift fails and names the drifted root when fgw/<root> is ahead of main (99.02428ms)
+✔ root-drift reports a CLOSED-OUT root whose branch still holds work outside its target (93.351977ms)
+✔ root-drift stays silent for a wontfix root whose branch is ahead — abandoned work is meant to sit outside (103.79627ms)
+✔ leaf-notify-drift passes when no live session branch has post-land drift against its target (56.046793ms)
+✔ leaf-notify-drift fails and names the leaf when a live session branch overlaps files with target land (125.586993ms)
+✔ events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead) (0.251679ms)
+✔ events-jsonl-not-truncated passes and bootstraps a mark on first run against a healthy log (37.741414ms)
+✔ events-jsonl-not-truncated fails when the log was truncated then reappended past the old mark (35.313867ms)
+✔ work-classification-vocabulary passes on an empty store (30.950298ms)
+✔ work-classification-vocabulary passes when every item is already in-vocabulary (33.383994ms)
+✔ work-classification-vocabulary fails and names an OPEN item carrying a stale risk value (32.618873ms)
+✔ work-classification-vocabulary fails and names an OPEN item carrying an out-of-vocabulary kind (36.840004ms)
+✔ work-classification-vocabulary passes despite a stale risk/kind on an already-resolved (done) item (33.265483ms)
+✔ work-classification-vocabulary lists every violating id, not just the first (31.997176ms)
+✔ work-step-vocabulary passes on an empty store (30.87064ms)
+✔ work-step-vocabulary passes for an item whose stage was never written (lazy Execute default) (32.410822ms)
+✔ work-step-vocabulary passes when every open item sits at a stage its domain registers (33.367413ms)
+✔ work-step-vocabulary fails and names an OPEN item sitting at a stage its domain retired (32.941289ms)
+✔ work-step-vocabulary judges each item against its OWN domain's stages, not the default domain's (30.782708ms)
+✔ work-step-vocabulary passes despite a retired stage on an already-resolved (done) item (29.768239ms)
+✔ work-step-vocabulary lists every violating id, not just the first (30.742625ms)
+✔ changelog-unreleased-stale passes when CHANGELOG.md does not exist (3.402157ms)
+✔ changelog-unreleased-stale fails when CHANGELOG.md exists but ## [Unreleased] has no pending entries (3.430692ms)
+✔ changelog-unreleased-stale passes when ## [Unreleased] has a pending entry (3.588632ms)
+✔ enduser-docs-index-stale passes when docs/enduser-docs-index.json does not exist yet (8.189367ms)
+✔ enduser-docs-index-stale fails and reports a count (not a path list) when a doc on disk is missing from the index (8.203854ms)
+✔ enduser-docs-index-stale passes when the index already covers every on-disk doc (7.848105ms)
+✔ enduser-docs-index-stale fails and reports orphan count when an index entry has no matching doc on disk (6.850162ms)
+✔ enduser-docs-index-stale counts a doc under docs/decisions toward the explanation quadrant (alias, D6) (6.780707ms)
+✔ enduser-docs-index-stale fix regenerates the index via the same path fgos docs-index uses, resolving the drift (20.632307ms)
+✔ enduser-docs-index-stale fix is idempotent -- a second run reports changed:false (12.379612ms)
+✔ decision-index-stale passes when docs/decisions/index.md does not exist yet (tsk-1lv review-fix F10) (6.939838ms)
+✔ decision-index-stale fails when state.decisions has a scope-carrying decision the on-disk index does not reflect (7.598165ms)
+✔ decision-index-stale passes when the on-disk index already matches state.decisions (11.686001ms)
+✔ decision-index-stale fix regenerates the index via the same path fgos decision-index uses, resolving the drift (17.992652ms)
+✔ decision-index-stale fix is idempotent -- a second run reports changed:false (13.813048ms)
+✔ decision-index-stale check FAILS when the index is missing but state.decisions has real rows to index -- H2 tsk-1lv round-2 regression (a missing index with real decisions to project is drift, not "nothing to check") (9.673995ms)
+✔ decision-index-stale fix reports a graceful skip (changed:false, no throw) when generateDecisionIndex refuses to blank an existing populated index -- B3 tsk-1lv round-2 regression (a thrown StoreError here used to abort fgos doctor --fix entirely, discarding every other fix's result) (16.65289ms)
+✔ tool-registry-configured passes when no tool-capable executor is declared at all (inactive — a clean skip, never a failure) (284.640614ms)
+✔ tool-registry-configured passes when every declared tool is checked present (full) (552.717777ms)
+✔ tsk-3oa2: tool-registry-configured FAILS when a declared tool is missing or never checked (degraded) -- no longer a silent passed:true (306.056949ms)
+✔ node-version-and-git passes under the current process (real Node, real git) (2.718978ms)
+✔ shell-integration-sourced passes trivially when no rc files exist (3.341469ms)
+✔ shell-integration-sourced fails when a detected rc file is missing the source line (3.706891ms)
+✔ shell-integration-sourced passes when every detected rc file already has the source line, and the sourced function actually works (16.955981ms)
+✔ shell-integration-sourced fails when the source line is present but the sourced function itself is dead (tsk-2wpi: a text-present source line is not proof the command works) (33.139247ms)
+✔ config-not-stale reports failed/not-configured when the shared file is absent (0.517899ms)
+✔ config-not-stale passes when the existing config already has every default key (1.498325ms)
+✔ config-not-stale fails when the shared file is complete except gateBypass (1.025718ms)
+✔ config-not-stale fails when the existing config is missing a default key (1.043388ms)
+✔ invariant-checks-configured fails when the section is missing entirely (0.578875ms)
+✔ invariant-checks-configured fails when the section is present but yields no runnable command (1.332302ms)
+✔ invariant-checks-configured passes and names the configured commands (0.546079ms)
+✔ worker-slots-ceiling-usable fails when the section is missing entirely (0.391848ms)
+✔ worker-slots-ceiling-usable fails on a ceiling that silently enforces nothing (1.156945ms)
+✔ worker-slots-ceiling-usable passes on the unarmed null fgos setup writes, and says so (0.410705ms)
+✔ worker-slots-ceiling-usable passes and names a real armed ceiling (0.376457ms)
+✔ advise-execute-capabilities-configured fails when runner.capabilities is missing entirely (0.344658ms)
+✔ advise-execute-capabilities-configured fails when a slot is missing or malformed (1.319433ms)
+✔ advise-execute-capabilities-configured passes when both slots are declared (0.503817ms)
+✔ capability-serves-valid fails when runner.capabilities is missing entirely (0.459516ms)
+✔ capability-serves-valid passes on the curated defaults (serves on every slot, none identical, "review" present) (10.212952ms)
+✔ capability-serves-valid is a no-op pass on a config with no "serves" anywhere (an entry without one stays valid) (0.623255ms)
+✔ capability-serves-valid fails when a "serves" value has an unknown key or wrong type (1.726345ms)
+✔ capability-serves-valid fails when two entries declare the identical "serves" attribute set (0.475381ms)
+✔ capability-serves-valid fails when the "review" slot is missing (0.419768ms)
+✔ gate-bypass-configured check fails when the shared file has no gateBypass key at all (0.345949ms)
+✔ gate-bypass-configured check fails when gateBypass.level is present but not a recognized level (0.503309ms)
+✔ gate-bypass-configured check passes when gateBypass.level is a recognized level (0.457563ms)
+✔ gate-bypass-configured fix writes a default level when the shared file has no gateBypass key, preserving other keys (0.741328ms)
+✔ gate-bypass-configured fix repairs a malformed level back to the default (0.550458ms)
+✔ gate-bypass-configured fix is idempotent: reports unchanged and never rewrites when level is already valid (0.535795ms)
+✔ fgos doctor --fix (CLI e2e) actually bootstraps gateBypass.level via the real fix (1103.79071ms)
+✔ fgos doctor --fix --pretty (CLI e2e) renders a fix line green even when the fix found nothing to change (1849.933214ms)
+✔ herdr-launcher-configured check fails when the shared file has no herdrOrchestrator key at all (0.345785ms)
+✔ herdr-launcher-configured check fails when a toggle is present but not a boolean (0.342581ms)
+✔ herdr-launcher-configured check passes when every toggle is a boolean (0.35755ms)
+✔ herdr-web-dashboard-configured check fails when the shared file has no herdrWebDashboard key at all (0.250618ms)
+✔ herdr-web-dashboard-configured check fails when staticServing is present but not a boolean (0.269544ms)
+✔ herdr-web-dashboard-configured check passes when staticServing is a boolean (0.280057ms)
+✔ config-awareness is registered on DOCTOR_CHECKS and always passes (0.200968ms)
+✔ config-awareness reports "none" when neither project nor global config exists (0.26833ms)
+✔ config-awareness reports project active with global not present, when only project config exists (0.388832ms)
+✔ config-awareness reports project active with global also present, when both exist (0.409896ms)
+✔ config-awareness falls back to global active with project not present, when only global config exists (0.326503ms)
+✔ provider-capacity-state doctor check reports quarantine without clearing it (1.421216ms)
+✔ mainCheckoutHookWired is false in a cwd with no .git at all, and never throws (1.868937ms)
+✔ mainCheckoutHookWired is false in a real git repo whose core.hooksPath is unset (6.220567ms)
+✔ mainCheckoutHookWired is false when core.hooksPath points somewhere other than .githooks (8.968143ms)
+✔ mainCheckoutHookWired is true once core.hooksPath is set to .githooks (7.182828ms)
+✔ mainCheckoutHookWired is true when core.hooksPath is an absolute path resolving to repoRoot/.githooks (8.390259ms)
+✔ mainCheckoutHookWired is true from inside a linked worktree when the main checkout has an absolute core.hooksPath, not just from the main checkout itself (29.511629ms)
+✔ main-checkout-hook-wired doctor check reports passed/failed matching mainCheckoutHookWired, with an actionable message (9.758343ms)
+✔ fgos doctor (no flags) produces valid wrapEnvelope-shaped JSON on stdout (311.993882ms)
+✔ fgos doctor --pretty prints colored ANSI text, not JSON (306.356913ms)
+✔ fgos doctor against a fresh cwd with no runner config never creates the shared config file (read-only proof) (280.468234ms)
+✔ resolveMainCheckout from inside a linked worktree resolves the main checkout, not the worktree (24.75543ms)
+✔ resolveMainCheckout returns null outside a git checkout entirely (2.067634ms)
+✔ integrationScriptPath returns a path that actually exists on disk (2.314084ms)
+✔ integrationScriptPath names the main checkout even when this copy runs from a linked worktree (4.251475ms)
+✔ shell-integration-sourced fails on a dead fgos source line even when the live line is present (22.001508ms)
+✔ shell-integration-sourced counts dead lines per rc file across both bash and zsh (21.941449ms)
+✔ shell-integration-sourced still passes when every rc file has only the live line (12.440286ms)
+✔ shell-integration-sourced samples dead paths instead of printing all of them (22.682086ms)
+✔ no-stuck-merge-abort check passes and fix reports nothing to fix on a clean repo with no MERGE_HEAD (20.308727ms)
+✔ no-stuck-merge-abort check fails and fix reports manual command when MERGE_HEAD exists (23.050716ms)
+✔ operation-capability-resolves reports passing status for retired coordination protocols (0.64108ms)
+✔ tsk-2xj: fgos doctor run bare from a linked worktree reports the same checks as running directly at the main checkout (2762.047799ms)
+✔ tsk-2xj: fgos doctor --fix run bare from a linked worktree never materializes .fgos/ inside the worktree (781.743972ms)
+✔ tsk-2xj: fgos setup run bare from a linked worktree writes to the main checkout, never the worktree (272.100513ms)
+✔ tsk-2xj: fgos uninstall --yes run bare from a linked worktree unwires the main checkout's git hooks, not the worktree's (471.293603ms)
+✔ uninstall with no --yes refuses (exit 4) and touches nothing (1264.861525ms)
+✔ uninstall --yes unwires hooks, reports (never deletes) the shell-rc source line, and leaves .fgos/config.json byte-identical (1299.366578ms)
+✔ uninstallGitHooks unwires and deletes .githooks/pre-commit + the now-empty dir when hooksPath is exactly .githooks (38.59254ms)
+✔ uninstallGitHooks unwires an absolute core.hooksPath resolving to repoRoot/.githooks, same as the relative form (30.165675ms)
+✔ uninstallGitHooks leaves a custom hooksPath completely untouched (35.619584ms)
+✔ uninstallGitHooks is a no-op when hooksPath was never set (18.219ms)
+ℹ tests 486
+ℹ suites 0
+ℹ pass 486
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 14673.414559
+
+RESULT {"name": "phase-05-tests-consumers-post-review", "exit": 0, "timed_out": false, "elapsed_seconds": 14.698, "log": "/home/vantt/projects/worktrees/forgentX-single-door-execution/plans/261006-1415-fgos-single-door-mechanisms/reports/phase-05-tests-consumers-post-review.log", "process_group_cleanup": "SIGTERM sent to owned group; missing group already exited"}

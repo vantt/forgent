@@ -1,0 +1,4 @@
+Command: env -u CLAUDE_CODE_SESSION_ID node --test test/setup/checks.test.mjs test/setup/registrations.test.mjs test/rust-host/release-tree.test.mjs test/rust-host/fgctl-init.test.mjs test/rust-host/fgctl-upgrade.test.mjs test/rust-host/fgctl-stage.test.mjs test/setup/checks-setup-envelope.test.mjs test/setup/checks-setup-idempotent.test.mjs test/setup/doctor-strict-exit.test.mjs
+Observed outcome: Python subprocess.TimeoutExpired after 240 seconds; no final suite totals available.
+Evidence limitation: stdout/stderr captured in subprocess.run were not persisted before the timeout exception; the eval wrapper did not display the partial bytes. sys.last_value was absent, and get_ipython was unavailable; no individual test pass/fail outcome is claimed.
+Cleanup: subsequent ps inspection showed no surviving matching test/native descendants; no processes killed and no blanket cleanup performed.

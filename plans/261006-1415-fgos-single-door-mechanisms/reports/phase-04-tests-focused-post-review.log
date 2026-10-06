@@ -1,0 +1,403 @@
+env -u CLAUDE_CODE_SESSION_ID node --test --test-reporter=tap test/setup/active-release-drift-check.test.mjs test/rust-host/dev-host.test.mjs
+TAP version 13
+# Subtest: dev door runs the real Node consumer from INIT_CWD with default Cargo output
+ok 1 - dev door runs the real Node consumer from INIT_CWD with default Cargo output
+  ---
+  duration_ms: 824.880268
+  type: 'test'
+  ...
+# Subtest: dev door runs the real Node consumer from INIT_CWD with shared-default Cargo output
+ok 2 - dev door runs the real Node consumer from INIT_CWD with shared-default Cargo output
+  ---
+  duration_ms: 713.620861
+  type: 'test'
+  ...
+# Subtest: dev door runs the real Node consumer from INIT_CWD with relative Cargo output
+ok 3 - dev door runs the real Node consumer from INIT_CWD with relative Cargo output
+  ---
+  duration_ms: 700.777422
+  type: 'test'
+  ...
+# Subtest: dev door runs the real Node consumer from INIT_CWD with absolute Cargo output
+ok 4 - dev door runs the real Node consumer from INIT_CWD with absolute Cargo output
+  ---
+  duration_ms: 723.866515
+  type: 'test'
+  ...
+# Subtest: dev door refuses symlink segment .fgos without modifying its target
+ok 5 - dev door refuses symlink segment .fgos without modifying its target
+  ---
+  duration_ms: 86.096777
+  type: 'test'
+  ...
+# Subtest: dev door refuses symlink segment .fgos/runtime without modifying its target
+ok 6 - dev door refuses symlink segment .fgos/runtime without modifying its target
+  ---
+  duration_ms: 84.142742
+  type: 'test'
+  ...
+# Subtest: dev door refuses symlink segment .fgos/runtime/dev-host without modifying its target
+ok 7 - dev door refuses symlink segment .fgos/runtime/dev-host without modifying its target
+  ---
+  duration_ms: 86.911478
+  type: 'test'
+  ...
+# Subtest: dev door refuses symlink segment bin/fgos.mjs without modifying its target
+ok 8 - dev door refuses symlink segment bin/fgos.mjs without modifying its target
+  ---
+  duration_ms: 82.558901
+  type: 'test'
+  ...
+# Subtest: dev door propagates Cargo failure without materializing or executing a host
+ok 9 - dev door propagates Cargo failure without materializing or executing a host
+  ---
+  duration_ms: 84.755041
+  type: 'test'
+  ...
+# Subtest: concurrent dev consumers with distinct Cargo targets keep independent verified artifacts
+ok 10 - concurrent dev consumers with distinct Cargo targets keep independent verified artifacts
+  ---
+  duration_ms: 372.18113
+  type: 'test'
+  ...
+# Subtest: equal payload passes against explicit doctor dir, not cwd; check has no fix and writes nothing
+ok 11 - equal payload passes against explicit doctor dir, not cwd; check has no fix and writes nothing
+  ---
+  duration_ms: 8.105327
+  type: 'test'
+  ...
+# Subtest: working-tree edit including source bin/fgos.mjs reports changed and B/A guidance
+ok 12 - working-tree edit including source bin/fgos.mjs reports changed and B/A guidance
+  ---
+  duration_ms: 4.903215
+  type: 'test'
+  ...
+# Subtest: added source is missing in release and removed source is extra in release
+ok 13 - added source is missing in release and removed source is extra in release
+  ---
+  duration_ms: 4.670675
+  type: 'test'
+  ...
+# Subtest: drift examples are deterministic and capped at five paths
+ok 14 - drift examples are deterministic and capped at five paths
+  ---
+  duration_ms: 4.34434
+  type: 'test'
+  ...
+# Subtest: outside source checkout skips even with explicit active release
+ok 15 - outside source checkout skips even with explicit active release
+  ---
+  duration_ms: 1.285024
+  type: 'test'
+  ...
+# Subtest: source without activation skips rather than borrowing cwd activation or a staged manifest
+ok 16 - source without activation skips rather than borrowing cwd activation or a staged manifest
+  ---
+  duration_ms: 3.601002
+  type: 'test'
+  ...
+# Subtest: explicit development manifest root dot pointing at checkout skips
+ok 17 - explicit development manifest root dot pointing at checkout skips
+  ---
+  duration_ms: 4.93949
+  type: 'test'
+  ...
+# Subtest: development manifest pointing at another checkout does not skip this checkout
+ok 18 - development manifest pointing at another checkout does not skip this checkout
+  ---
+  duration_ms: 5.367984
+  type: 'test'
+  ...
+# Subtest: linked worktree skips activation owned only by main, including inherited shim environment
+ok 19 - linked worktree skips activation owned only by main, including inherited shim environment
+  ---
+  duration_ms: 28.388451
+  type: 'test'
+  ...
+# Subtest: inherited foreign release environment cannot override a dir-owned activation
+ok 20 - inherited foreign release environment cannot override a dir-owned activation
+  ---
+  duration_ms: 7.160867
+  type: 'test'
+  ...
+# Subtest: production dependencies, generated shims and neighboring legacy-root prefix are not source extras
+ok 21 - production dependencies, generated shims and neighboring legacy-root prefix are not source extras
+  ---
+  duration_ms: 3.928318
+  type: 'test'
+  ...
+# Subtest: declared dependency namespace is excluded without excluding selected source files
+ok 22 - declared dependency namespace is excluded without excluding selected source files
+  ---
+  duration_ms: 4.412286
+  type: 'test'
+  ...
+# Subtest: invalid activation JSON fails check without throwing
+ok 23 - invalid activation JSON fails check without throwing
+  ---
+  duration_ms: 1.832237
+  type: 'test'
+  ...
+# Subtest: invalid manifest JSON fails check without throwing
+ok 24 - invalid manifest JSON fails check without throwing
+  ---
+  duration_ms: 1.155936
+  type: 'test'
+  ...
+# Subtest: unreadable manifest path fails check without throwing
+ok 25 - unreadable manifest path fails check without throwing
+  ---
+  duration_ms: 1.043118
+  type: 'test'
+  ...
+# Subtest: missing active manifest fails check without throwing
+ok 26 - missing active manifest fails check without throwing
+  ---
+  duration_ms: 1.079893
+  type: 'test'
+  ...
+# Subtest: missing manifest files fails check without throwing
+ok 27 - missing manifest files fails check without throwing
+  ---
+  duration_ms: 3.398998
+  type: 'test'
+  ...
+# Subtest: invalid digest fails check without throwing
+ok 28 - invalid digest fails check without throwing
+  ---
+  duration_ms: 3.180637
+  type: 'test'
+  ...
+# Subtest: duplicate manifest source fails check without throwing
+ok 29 - duplicate manifest source fails check without throwing
+  ---
+  duration_ms: 3.914712
+  type: 'test'
+  ...
+# Subtest: source symlink fails check without throwing
+ok 30 - source symlink fails check without throwing
+  ---
+  duration_ms: 4.523793
+  type: 'test'
+  ...
+# Subtest: source intermediate symlink fails check without throwing
+ok 31 - source intermediate symlink fails check without throwing
+  ---
+  duration_ms: 5.144948
+  type: 'test'
+  ...
+# Subtest: declared empty directory intermediate symlink fails check without throwing
+ok 32 - declared empty directory intermediate symlink fails check without throwing
+  ---
+  duration_ms: 3.066888
+  type: 'test'
+  ...
+# Subtest: broken source symlink fails check without throwing
+ok 33 - broken source symlink fails check without throwing
+  ---
+  duration_ms: 3.93735
+  type: 'test'
+  ...
+# Subtest: broken activation symlink fails check without throwing
+ok 34 - broken activation symlink fails check without throwing
+  ---
+  duration_ms: 2.062904
+  type: 'test'
+  ...
+# Subtest: package symlink fails check without throwing
+ok 35 - package symlink fails check without throwing
+  ---
+  duration_ms: 4.325128
+  type: 'test'
+  ...
+# Subtest: manifest symlink fails check without throwing
+ok 36 - manifest symlink fails check without throwing
+  ---
+  duration_ms: 1.309688
+  type: 'test'
+  ...
+# Subtest: release source symlink fails check without throwing
+ok 37 - release source symlink fails check without throwing
+  ---
+  duration_ms: 4.132566
+  type: 'test'
+  ...
+# Subtest: legacy root escape fails check without throwing
+ok 38 - legacy root escape fails check without throwing
+  ---
+  duration_ms: 3.747947
+  type: 'test'
+  ...
+# Subtest: manifest source escape fails check without throwing
+ok 39 - manifest source escape fails check without throwing
+  ---
+  duration_ms: 4.094916
+  type: 'test'
+  ...
+# Subtest: dependency-shaped manifest escape fails check without throwing
+ok 40 - dependency-shaped manifest escape fails check without throwing
+  ---
+  duration_ms: 4.276094
+  type: 'test'
+  ...
+# Subtest: declared source escape fails check without throwing
+ok 41 - declared source escape fails check without throwing
+  ---
+  duration_ms: 3.589856
+  type: 'test'
+  ...
+# Subtest: missing declared source fails check without throwing
+ok 42 - missing declared source fails check without throwing
+  ---
+  duration_ms: 4.506582
+  type: 'test'
+  ...
+# Subtest: missing listed release source fails check without throwing
+ok 43 - missing listed release source fails check without throwing
+  ---
+  duration_ms: 4.692576
+  type: 'test'
+  ...
+# Subtest: excluded dependency with malformed kind still fails manifest safety
+ok 44 - excluded dependency with malformed kind still fails manifest safety
+  ---
+  duration_ms: 4.179519
+  type: 'test'
+  ...
+# Subtest: excluded dependency with invalid digest still fails manifest safety
+ok 45 - excluded dependency with invalid digest still fails manifest safety
+  ---
+  duration_ms: 3.904716
+  type: 'test'
+  ...
+# Subtest: excluded dependency with duplicate path still fails manifest safety
+ok 46 - excluded dependency with duplicate path still fails manifest safety
+  ---
+  duration_ms: 4.246617
+  type: 'test'
+  ...
+# Subtest: excluded dependency with symlink still fails manifest safety
+ok 47 - excluded dependency with symlink still fails manifest safety
+  ---
+  duration_ms: 5.308035
+  type: 'test'
+  ...
+# Subtest: excluded dependency with missing file still fails manifest safety
+ok 48 - excluded dependency with missing file still fails manifest safety
+  ---
+  duration_ms: 4.471975
+  type: 'test'
+  ...
+# Subtest: excluded payload shim with malformed kind still fails manifest safety
+ok 49 - excluded payload shim with malformed kind still fails manifest safety
+  ---
+  duration_ms: 3.831477
+  type: 'test'
+  ...
+# Subtest: excluded payload shim with invalid digest still fails manifest safety
+ok 50 - excluded payload shim with invalid digest still fails manifest safety
+  ---
+  duration_ms: 4.20548
+  type: 'test'
+  ...
+# Subtest: excluded payload shim with duplicate path still fails manifest safety
+ok 51 - excluded payload shim with duplicate path still fails manifest safety
+  ---
+  duration_ms: 4.772418
+  type: 'test'
+  ...
+# Subtest: excluded payload shim with symlink still fails manifest safety
+ok 52 - excluded payload shim with symlink still fails manifest safety
+  ---
+  duration_ms: 4.164722
+  type: 'test'
+  ...
+# Subtest: excluded payload shim with missing file still fails manifest safety
+ok 53 - excluded payload shim with missing file still fails manifest safety
+  ---
+  duration_ms: 4.866923
+  type: 'test'
+  ...
+# Subtest: excluded outer shim with malformed kind still fails manifest safety
+ok 54 - excluded outer shim with malformed kind still fails manifest safety
+  ---
+  duration_ms: 3.380266
+  type: 'test'
+  ...
+# Subtest: excluded outer shim with invalid digest still fails manifest safety
+ok 55 - excluded outer shim with invalid digest still fails manifest safety
+  ---
+  duration_ms: 3.96116
+  type: 'test'
+  ...
+# Subtest: excluded outer shim with duplicate path still fails manifest safety
+ok 56 - excluded outer shim with duplicate path still fails manifest safety
+  ---
+  duration_ms: 4.475179
+  type: 'test'
+  ...
+# Subtest: excluded outer shim with symlink still fails manifest safety
+ok 57 - excluded outer shim with symlink still fails manifest safety
+  ---
+  duration_ms: 3.14117
+  type: 'test'
+  ...
+# Subtest: excluded outer shim with missing file still fails manifest safety
+ok 58 - excluded outer shim with missing file still fails manifest safety
+  ---
+  duration_ms: 5.093195
+  type: 'test'
+  ...
+# Subtest: excluded neighboring payload prefix with malformed kind still fails manifest safety
+ok 59 - excluded neighboring payload prefix with malformed kind still fails manifest safety
+  ---
+  duration_ms: 5.123537
+  type: 'test'
+  ...
+# Subtest: excluded neighboring payload prefix with invalid digest still fails manifest safety
+ok 60 - excluded neighboring payload prefix with invalid digest still fails manifest safety
+  ---
+  duration_ms: 4.023841
+  type: 'test'
+  ...
+# Subtest: excluded neighboring payload prefix with duplicate path still fails manifest safety
+ok 61 - excluded neighboring payload prefix with duplicate path still fails manifest safety
+  ---
+  duration_ms: 4.023628
+  type: 'test'
+  ...
+# Subtest: excluded neighboring payload prefix with symlink still fails manifest safety
+ok 62 - excluded neighboring payload prefix with symlink still fails manifest safety
+  ---
+  duration_ms: 4.002699
+  type: 'test'
+  ...
+# Subtest: excluded neighboring payload prefix with missing file still fails manifest safety
+ok 63 - excluded neighboring payload prefix with missing file still fails manifest safety
+  ---
+  duration_ms: 4.466724
+  type: 'test'
+  ...
+# Subtest: unsafe source fails only this check and CLI doctor continues with normal and strict exits
+ok 64 - unsafe source fails only this check and CLI doctor continues with normal and strict exits
+  ---
+  duration_ms: 579.649228
+  type: 'test'
+  ...
+# Subtest: real builder selection and staged production dependency payload agree with doctor
+ok 65 - real builder selection and staged production dependency payload agree with doctor
+  ---
+  duration_ms: 7.045857
+  type: 'test'
+  ...
+1..65
+# tests 65
+# suites 0
+# pass 65
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3813.801602
+
+Observed exit: 0; wall seconds: 3.841

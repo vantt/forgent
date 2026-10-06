@@ -1,6 +1,15 @@
+---
+title: "Preconditions and baseline evidence"
+status: pending
+dependencies: []
+requiresReview: true
+---
+
 # Phase 00 — Preconditions và verify-and-close
 
-Plan status: Proposed — not authorized for execution
+Plan status: Revision ready — baseline evidence completed; implementation not started or authorized.
+
+Dependencies: none. Evidence completion is not implementation acceptance.
 
 ## Context links
 
@@ -10,33 +19,36 @@ Plan status: Proposed — not authorized for execution
 
 ## Requirements
 
-1. Ghi lại baseline đo được cho mọi acceptance criterion của plan, trước khi sửa gì.
-2. Đóng H1d (M06) và xác nhận T03 bằng bằng chứng commit, không bằng trạng thái item.
-3. Xác nhận PC1 có chủ: thay đổi chưa commit ở `AGENTS.md`/`CLAUDE.md` thuộc về ai và xử lý thế nào.
-4. Xác định posture impact-analysis cho toàn plan.
+1. Baseline đã được thu thập read-only trong [reports/phase-00-baseline.md](reports/phase-00-baseline.md), snapshot HEAD `b3d8fa4`. Không chạy lại để xác nhận quan sát đã báo; chỉ lấy số đo mới nếu cây thực thi đã đổi và ghi rõ snapshot.
+2. H1d (M06) đóng bằng commit và caller hiện hành; T03 vắng trong snapshot, không suy ra mọi acceptance của plan đã qua.
+3. PC1 đã xử lý bằng commit riêng `5df843bdb`; vẫn cần kiểm contemporaneous trước Phase 06, không tự revert thay đổi của người khác.
+4. Impact-analysis khả dụng nhưng posture **degraded** vì index cũ 19 commit và bound main checkout; đối chiếu current-source search.
+5. Historical confinement binding trả required `host-write-denied`, nhưng live enforcement chưa đo; `bind()+resolvePosture()` không phải sandbox proof. Phase 01 giữ source-binding smoke và config confinement đúng phạm vi single-door. Early runtime feasibility và installed advisory product/confinement acceptance thuộc [advisory capability completion](../261006-1408-advisory-capability-completion/plan.md), không phải prerequisite của plan này.
 
 ## Files
 
-- Modify/create/delete: **không**. Phase này chỉ đọc; kết quả ghi vào commit message/PR note của Phase 01 hoặc vào `plans/261006-1415-fgos-single-door-mechanisms/reports/phase-00-baseline.md` (thư mục `reports/` của plan, tạo lúc thực thi).
+- Source/config/doctrine: **không sửa**. Báo cáo đã có tại `reports/phase-00-baseline.md`; chỉ bổ sung bằng chứng mới có provenance khi được giao. Không build, test, stage, setup hoặc đổi activation trong phase baseline.
 
 ## Steps
 
-1. **PC1.** `git diff --stat AGENTS.md CLAUDE.md`. Hôm nay (2026-10-06) diff là dòng số liệu GitNexus (`AGENTS.md:169`, khối `<!-- gitnexus:start -->`) do `gitnexus analyze` ghi lại. Hỏi anh: commit riêng (`chore: refresh code-intelligence index stats`) hay `git checkout -- AGENTS.md CLAUDE.md`. Không phase nào của plan được commit hai file này kèm thay đổi đó.
-2. **Impact-analysis posture.** `node bin/fgos.mjs tool query --capability impact-analysis --status present` (2026-10-06: `gitnexus` present). Đọc `gitnexus://repo/forgent/context` để xem index có cũ hơn HEAD không. Ghi posture `full` hoặc `degraded` kèm lý do. Ghi chú: `src/setup/registrations.mjs` (255 KB) có thể bị index thiếu symbol giống `bin/fgos.mjs` (tsk-38h) → mọi kết quả "0 caller" phải cross-check bằng `rg`.
-3. **H1a baseline.** Chạy (raw, không qua rtk compression: `rtk proxy grep ...`):
-   - `rtk proxy grep -rnoE "\b(claude-bwrap|agy-bwrap|codex-bwrap)\b" core/skills domains/*/skills` → baseline 2026-10-06: chỉ `core/skills/fgos-architecture-panel/SKILL.md` (dòng 191, 194, 223-231, 606, 607, 613, 682).
-   - Model id có chữ số trong `runner.modelPolicies` xuất hiện trong skill sources → baseline: `gemini-3.1-pro-low`, `gemini-3.1-pro-high`, `gpt-5.6-terra` ở cùng file; `gpt-5.6-sol` (không có trong config).
+1. **PC1 completed snapshot; fresh gate retained.** Report §1 ghi main `AGENTS.md`/`CLAUDE.md` clean theo quan sát do parent cung cấp, thống kê GitNexus đã commit riêng `5df843bdb`. Trước Phase 06 kiểm trạng thái hiện tại và ownership của mọi diff mới; không commit lẫn hoặc discard chúng.
+2. **Impact-analysis posture recorded.** Report §2: provider GitNexus present, indexed commit `b3346957`, HEAD `b3d8fa4`, stale 19 commit. Dùng explicit repository path thay vì tên `forgent` mơ hồ; mọi “0 caller”, nhất là `registrations.mjs`, phải đối chiếu tìm kiếm source hiện hành. Không reindex trong baseline.
+3. **H1a baseline completed (report §3, raw Node scan).**
+   - Baseline đủ **28** retired-token occurrences, đều trong `core/skills/fgos-architecture-panel/SKILL.md`: `claude-bwrap` (9) ở 134,137,163,191,223,224,225,229,606; `agy-bwrap` (10) ở 134,163,168,191,226,228,230,606,613,682; `codex-bwrap` (9) ở 134,159,171,191,194,227,230,231,607. Report §3 thay cho danh sách thiếu khối 134–171.
+   - Configured model values: `gemini-3.1-pro-low`, `gpt-5.6-terra`, `gemini-3.1-pro-high`; thêm nonconfigured `gpt-5.6-sol` tại panel. Shape scan có hai historical model mentions trong `_shared/coding-worker-contract.md`; ghi allowlist historical riêng, không biến chúng thành scope rewrite mới.
    - `git log --diff-filter=D --oneline -- '*fgos-plan-loop/SKILL.md' '*fgos-code-panel/SKILL.md'` → `6527596eb`. Ghi đính chính: synthesis ghi `8eff54d0f`, commit đó chỉ đổi thành stub.
    - `node -e` đọc `.fgos/config.json`: `runner.pools` không tồn tại; roster nằm ở `runner.executors` và `runner.capabilities[*].prefer`.
-4. **H1d verify-and-close (M06).** Bằng chứng: `e92cfe66f` (tsk-c5u, tách playbook ra `_shared/catchup-self-recovery.md`), `d74dfea58` (tsk-6av, gom self-recovery về `approve`, merge-next/merge-loop thành caller mỏng). Đọc lại `plugins/fgOS/skills/approve/SKILL.md:163-164,207-221`, `merge-loop/SKILL.md:85-88`, `merge-next/SKILL.md:69-78`: cả ba trỏ một playbook, Red flag của approve chỉ còn "vượt trần hai lần retry hoặc không theo evidence bar". Kết luận đóng; không thêm check (nguồn duy nhất đã là fragment `_shared`, được byte-mirror test bảo vệ). M10: skill gây ra đã bị xoá (`6527596eb`).
-5. **T03.** `rtk proxy grep -rn FGOS_TEST_SUITE src bin test scripts` → 0 hit (2026-10-06). Ghi lại; luật chặn tái phát là rule ở Phase 06.
-6. **Render baseline.** Đếm file `.md` trong render targets không chứa header (hôm nay: `.agents/skills` 53/53; `plugins/fgOS/skills/{fgos-*,_shared}` 48; wrapper `.claude/skills/fgos-*` 18 có marker `GENERATED_WRAPPER_MARKER` nhưng câu "canonical skill source" sai).
-7. **Root baseline.** `git ls-files | grep -v / | wc -l` = 45; 30 file tạo ở `ca854f443`; `output.txt` untracked và gitignored (`.gitignore:33`).
-8. **H6 ownership.** Xác nhận `plans/260925-documentation-authority-unification/plan.md` vẫn "Proposed — not authorized for execution". Plan này **không** sửa `docs/specs/reading-map.md` (thuộc H6) — xem câu hỏi mở.
+4. **H1d verified closed (M06).** Report §4: `e92cfe66f` (tsk-c5u, shared playbook `_shared/catchup-self-recovery.md`) và `d74dfea58` (tsk-6av, approve owns recovery, merge callers thin); ba caller approve/merge-next/merge-loop hiện trỏ một playbook. Red flag approve là vượt retry ceiling hoặc bỏ evidence bar. Không thêm check; mirror protection tồn tại nhưng chưa được chạy trong baseline. M10 source bị xoá tại `6527596eb`.
+5. **T03 completed absence evidence.** Report §5 raw Node scan tracked `src/`, `bin/`, `test/`, `scripts/`: 0 files/0 occurrences `FGOS_TEST_SUITE`; Phase 06 giữ anti-recurrence rule.
+6. **Render baseline completed.** Report §6: `.agents` 53/53 thiếu; plugin 48/48 thiếu; `.claude/skills/fgos-*/**` có 37 markdown, 18 wrapper marker và 19 reference thiếu cả marker/header. Tổng 138 file, 120 thiếu cả hai; 18 wrappers không phải toàn bộ recursive target.
+7. **Root baseline completed.** Report §7: 45 tracked root files; 32 additions lịch sử từ `ca854f443`, còn 30 tracked hiện tại. D2 move vào `docs/history/` cho số đích `45-30-1=14`. Main-only ignored `output.txt` 19 bytes; không tồn tại ở worktree này. G1 vẫn cần tag `pre-root-junk-cleanup` và xác nhận cuối lúc thi hành, chưa xoá gì.
+8. **H6 ownership completed.** Report §8 xác nhận plan H6 chưa được authorize; không sửa `docs/specs/reading-map.md`.
+9. **Extra inventories completed.** Report ghi 8 manifests, 2 có 233 `node_modules` entries, active có 0; 16 hook-test consumer files và 7 builder consumers liệt kê đầy đủ ở report. Không suy ra release integrity hoặc test pass.
+10. **Historical advisory handoff.** Report ghi old eight-role/actors/specialist contract không map bằng roster-only edit; expanded advisory completion được chuyển sang [advisory capability completion](../261006-1408-advisory-capability-completion/plan.md). Giữ provenance của `bind()+resolvePosture()` như static binding evidence, không sandbox proof; old-v-current quality history **NOT RUN**, không phải gate hoàn tất single-door.
 
 ## Tests / validation
 
-- Không có thay đổi code. Validation = baseline file có đủ 8 mục, mỗi mục có lệnh và con số.
+- Evidence gate đã hoàn thành: report có tám mục và ba extra inventories với provenance/snapshot. Không có tests chạy. Fresh PC1, Phase 01 source-binding/config-confinement acceptance, release drift và native implementation acceptance vẫn là bằng chứng tương lai. Advisory runtime/quality/product proof thuộc plan advisory riêng; không được đánh dấu xanh từ baseline và không chặn plan single-door.
 
 ## Risks
 
@@ -46,9 +58,3 @@ Plan status: Proposed — not authorized for execution
 
 - Không có gì để rollback.
 
-## Hiệu chỉnh sau red-team (2026-10-06)
-
-Mục này **thắng** nội dung cũ của phase khi mâu thuẫn. Bằng chứng đã được lead tự đo lại (script hoặc `rtk proxy`), chi tiết ở bảng Red Team Review trong `plan.md`.
-
-- **Baseline bị thiếu (đã xác nhận):** id đã gỡ (`claude-bwrap`, `agy-bwrap`, `codex-bwrap`) xuất hiện ở `core/skills/fgos-architecture-panel/SKILL.md` các dòng 134, 137, 159, 163, 168, 171 (khối "Executor registration — verified live"), cộng 191, 194, 223-231, 606, 607, 613, 682. Baseline cũ chỉ nêu nhóm sau. Ghi đủ danh sách vào báo cáo baseline bằng script, không bằng grep qua hook.
-- Ghi vào báo cáo baseline ba số đo mà các phase sau dựa vào: số mục `node_modules` trong manifest mỗi release (hôm nay: 233 ở hai release dựng sau commit `dbaf4ce0f`, 0 ở release đang kích hoạt), số file test chạm hook (16), số nơi dùng `build-rust-distribution` (7).

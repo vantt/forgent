@@ -31,6 +31,7 @@ import { fileURLToPath } from 'node:url';
 import { detectRcFiles, hasSourceLine, deadSourceLines, probeShellIntegrationInvocation } from './shell-rc.mjs';
 import { mergeConfigDefaults } from './config-merge.mjs';
 import { releaseBinaryPath } from '../util/release-binary-path.mjs';
+import { hashFile, listLegacyNodeSourceFiles } from '../../scripts/build-rust-distribution.mjs';
 import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { loadRunnerConfigFromDir } from '../runner/dispatch/config.mjs';
 import { claudeCodeHookWired } from './claude-code-hooks.mjs';
@@ -1434,7 +1435,7 @@ registerCheck({
 
 registerCheck({
   id: 'main-checkout-hook-wired',
-  description: 'core.hooksPath wired to .githooks (str65 main-checkout lock guards every commit)',
+  description: 'core.hooksPath wired to .githooks (main-checkout lock and source-checkout new-root-file guards)',
   check: (cwd) => checkMainCheckoutHookWired(cwd),
 });
 
@@ -4506,14 +4507,15 @@ function resolveConfinedManifestPath(releasePath, ...segments) {
   return resolved;
 }
 
-function resolveActiveReleaseForDoctor(dir) {
+function resolveActiveReleaseForDoctor(dir, scope = {}) {
   const root = resolveMainCheckout(dir) ?? dir;
-  const candidateDirs = [dir, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);
+  const candidateDirs = scope.candidateDirs ?? [dir, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);
+  const env = scope.env ?? process.env;
 
   // 1. Explicit env vars
-  if (process.env.FGOS_ACTIVE_RELEASE_PATH) {
-    const releasePath = process.env.FGOS_ACTIVE_RELEASE_PATH;
-    const manifestPath = process.env.FGOS_ACTIVE_MANIFEST_PATH ||
+  if (env.FGOS_ACTIVE_RELEASE_PATH) {
+    const releasePath = env.FGOS_ACTIVE_RELEASE_PATH;
+    const manifestPath = env.FGOS_ACTIVE_MANIFEST_PATH ||
       (fs.existsSync(path.join(releasePath, 'manifest.json'))
         ? path.join(releasePath, 'manifest.json')
         : path.join(releasePath, 'target', 'dev-manifest.json'));
@@ -4693,6 +4695,171 @@ function checkLegacyNodePayloadPresent(cwd) {
   return { passed: false, message: `legacy node payload does not exist at ${payloadPath}` };
 }
 
+// Unlike the legacy packaging checks, checkout diagnosis must not borrow cwd/main
+// bindings. Keep the resolver's default behavior and explicitly scope this caller.
+function doctorDriftPath(base, relative = '.', optional = false) {
+  if (typeof relative !== 'string' || !relative || path.isAbsolute(relative) ||
+      relative.includes('\\') || relative.split('/').includes('..')) {
+    throw new Error(`Manifest path escapes containment or is invalid: ${relative}`);
+  }
+  const resolvedBase = path.resolve(base);
+  const resolved = path.resolve(resolvedBase, relative);
+  if (resolved !== resolvedBase && !resolved.startsWith(resolvedBase + path.sep)) {
+    throw new Error(`Path escapes containment: ${relative}`);
+  }
+  // lstat each segment: realpath containment alone still accepts in-root links,
+  // and existsSync hides broken links or unreadable paths as "not applicable".
+  let current = path.parse(resolved).root;
+  for (const segment of resolved.slice(current.length).split(path.sep).filter(Boolean)) {
+    current = path.join(current, segment);
+    let stat;
+    try {
+      stat = fs.lstatSync(current);
+    } catch (error) {
+      if (optional && error.code === 'ENOENT') return null;
+      throw error;
+    }
+    if (stat.isSymbolicLink()) throw new Error(`Symlink refused in checkout diagnosis: ${current}`);
+  }
+  return resolved;
+}
+
+function doctorDriftActivation(checkout) {
+  const activationPath = doctorDriftPath(checkout, '.fgos/installation/activation.json', true);
+  if (!activationPath) return null;
+  const activation = JSON.parse(fs.readFileSync(activationPath, 'utf8'));
+  if (!activation || typeof activation.releasePath !== 'string' || !path.isAbsolute(activation.releasePath)) {
+    throw new Error(`Invalid activation releasePath in ${activationPath}; an absolute release path is required`);
+  }
+  return activation;
+}
+
+function checkActiveReleaseMatchesCheckout(dir) {
+  const guidance = 'B: npm run fgos:dev -- <verb> runs working-tree code. A: rebuild/stage, then fgctl upgrade --from <release> in this workspace to update plain fgos.';
+  try {
+    const checkout = path.resolve(dir);
+    const marker = doctorDriftPath(checkout, 'apps/fgos/Cargo.toml', true);
+    if (!marker) return { passed: true, message: 'active-release-matches-checkout skipped: outside an fgOS source checkout (apps/fgos/Cargo.toml absent)' };
+    if (!fs.statSync(marker).isFile()) throw new Error(`Source checkout marker is not a file: ${marker}`);
+
+    const activation = doctorDriftActivation(checkout);
+    const explicitRelease = process.env.FGOS_ACTIVE_RELEASE_PATH;
+    let scopedEnv = {};
+    // A dev wrapper binds this exact source checkout. An inherited installation
+    // shim env may instead name main's release: it cannot override doctor's dir.
+    if (explicitRelease && path.isAbsolute(explicitRelease) &&
+        (path.resolve(explicitRelease) === checkout ||
+         (activation && path.resolve(explicitRelease) === path.resolve(activation.releasePath)))) {
+      scopedEnv = {
+        FGOS_ACTIVE_RELEASE_PATH: explicitRelease,
+        FGOS_ACTIVE_MANIFEST_PATH: process.env.FGOS_ACTIVE_MANIFEST_PATH,
+      };
+    } else if (!activation) {
+      const main = resolveMainCheckout(checkout);
+      if (main && path.resolve(main) !== checkout &&
+          doctorDriftPath(main, '.fgos/installation/activation.json', true)) {
+        return { passed: true, message: `active-release-matches-checkout skipped: activation belongs to main checkout ${main}, not this linked worktree` };
+      }
+      return { passed: true, message: 'active-release-matches-checkout skipped: no activation owned by doctor dir' };
+    }
+
+    const releasePath = scopedEnv.FGOS_ACTIVE_RELEASE_PATH ?? activation.releasePath;
+    doctorDriftPath(releasePath);
+    const manifestPath = scopedEnv.FGOS_ACTIVE_MANIFEST_PATH ??
+      (scopedEnv.FGOS_ACTIVE_RELEASE_PATH && !doctorDriftPath(releasePath, 'manifest.json', true)
+        ? path.join(releasePath, 'target', 'dev-manifest.json')
+        : path.join(releasePath, 'manifest.json'));
+    doctorDriftPath(releasePath, path.relative(path.resolve(releasePath), path.resolve(manifestPath)).replaceAll('\\', '/'));
+    // Read strictly before invoking the resolver, whose older consumers tolerate
+    // malformed manifests as a missing release. This check must report the error.
+    JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    const info = resolveActiveReleaseForDoctor(checkout, { candidateDirs: [checkout], env: scopedEnv });
+    const manifest = info.manifest;
+    if (!manifest || !Array.isArray(manifest.files)) throw new Error('Active release manifest must contain files[]');
+    const rawRoot = manifest.components?.legacyNode?.root;
+    if (typeof rawRoot !== 'string' || !rawRoot) throw new Error('Active release manifest missing components.legacyNode.root');
+    if (rawRoot !== '.' && path.posix.normalize(rawRoot) !== rawRoot) {
+      throw new Error(`Non-canonical legacyNode.root in active manifest: ${rawRoot}`);
+    }
+    const payloadRoot = doctorDriftPath(releasePath, rawRoot);
+    if (rawRoot === '.' && payloadRoot === checkout) {
+      return { passed: true, message: 'active-release-matches-checkout skipped: development manifest uses this checkout directly (legacyNode.root=".")' };
+    }
+    if (!activation) {
+      return { passed: true, message: 'active-release-matches-checkout skipped: no activation owned by doctor dir (explicit manifest is not this checkout development payload)' };
+    }
+
+    const packagePath = doctorDriftPath(checkout, 'package.json');
+    const pkg = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
+    // Validate declared paths before the shared walker can traverse an
+    // intermediate symlink (including an otherwise empty linked directory).
+    for (const declared of Array.isArray(pkg.files) ? pkg.files : []) {
+      doctorDriftPath(checkout, declared);
+    }
+    const sourceFiles = listLegacyNodeSourceFiles(checkout).filter((relative) =>
+      relative !== 'node_modules' && !relative.startsWith('node_modules/'));
+    const sourceSet = new Set(sourceFiles);
+    const releaseSources = new Map();
+    const manifestPaths = new Set();
+    const prefix = rawRoot === '.' ? '' : rawRoot.replace(/\/+$/, '') + '/';
+    for (const entry of manifest.files) {
+      if (!entry || typeof entry.path !== 'string' || !entry.path ||
+          entry.path.includes('\\') || path.posix.isAbsolute(entry.path) ||
+          path.posix.normalize(entry.path) !== entry.path || entry.path.split('/').includes('..')) {
+        throw new Error(`Non-canonical or escaping manifest files[] path: ${entry?.path}`);
+      }
+      if (entry.kind !== 'file' || typeof entry.digest !== 'string' || !/^sha256:[0-9a-f]{64}$/.test(entry.digest)) {
+        throw new Error(`Invalid file kind or digest for manifest file ${entry.path}`);
+      }
+      if (manifestPaths.has(entry.path)) throw new Error(`Duplicate manifest file path: ${entry.path}`);
+      manifestPaths.add(entry.path);
+      const stagedPath = doctorDriftPath(releasePath, entry.path);
+      if (!fs.statSync(stagedPath).isFile()) throw new Error(`Manifest entry is not a regular file: ${entry.path}`);
+      if (prefix && !entry.path.startsWith(prefix)) continue;
+      const relative = entry.path.slice(prefix.length);
+      if (!relative || relative === 'node_modules' || relative.startsWith('node_modules/')) continue;
+      const generatedShim = !sourceSet.has(relative) &&
+        ((relative === 'bin/fgos' && entry.path === manifest.entries?.fgos) ||
+         (relative === 'bin/fgos-runner' && entry.path === manifest.entries?.fgosRunner));
+      if (generatedShim) continue;
+      releaseSources.set(relative, entry.digest);
+    }
+
+    let changed = 0;
+    let missing = 0;
+    let extra = 0;
+    const examples = [];
+    const example = (kind, relative) => {
+      if (examples.length < 5) examples.push(`${kind}: ${relative}`);
+    };
+    for (const relative of sourceFiles) {
+      const sourcePath = doctorDriftPath(checkout, relative);
+      const digest = hashFile(sourcePath);
+      if (!releaseSources.has(relative)) {
+        missing++;
+        example('missing', relative);
+      } else if (digest !== releaseSources.get(relative)) {
+        changed++;
+        example('changed', relative);
+      }
+    }
+    for (const relative of [...releaseSources.keys()].sort()) {
+      if (!sourceSet.has(relative)) {
+        extra++;
+        example('extra', relative);
+      }
+    }
+    const passed = changed + missing + extra === 0;
+    const metadata = `artifactDigest=${manifest.artifactDigest ?? activation.artifactDigest ?? 'unknown'}, activatedAt=${activation.activatedAt ?? 'unknown'}`;
+    return {
+      passed,
+      message: `Node payload versus working tree: changed=${changed}, missing in release=${missing}, extra in release=${extra}; ${metadata}${examples.length ? `; examples: ${examples.join(', ')}` : ''}. Rust host/source freshness is not checked.${passed ? '' : ` ${guidance}`}`,
+    };
+  } catch (error) {
+    return { passed: false, message: `active-release-matches-checkout could not safely compare Node payload: ${error.message}. ${guidance}` };
+  }
+}
+
 function checkCommandRoutesDrift(cwd) {
   const root = resolveMainCheckout(cwd) ?? cwd;
   const candidateDirs = [cwd, process.cwd(), root].filter((d, i, arr) => d && arr.indexOf(d) === i);
@@ -4749,6 +4916,12 @@ registerCheck({
   id: 'legacy-node-payload-present',
   description: 'the legacy node payload components.legacyNode.root/entry resolves to a real file',
   check: (cwd) => checkLegacyNodePayloadPresent(cwd),
+});
+
+registerCheck({
+  id: 'active-release-matches-checkout',
+  description: 'activated legacy Node payload matches this source checkout working tree (not Rust freshness)',
+  check: checkActiveReleaseMatchesCheckout,
 });
 
 registerCheck({

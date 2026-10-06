@@ -1,0 +1,55 @@
+COMMAND ['node', '-e', 'const fs=require(\'node:fs\'),os=require(\'node:os\'),path=require(\'node:path\'),assert=require(\'node:assert/strict\'),{spawnSync}=require(\'node:child_process\');\nconst source=process.cwd(), temp=fs.mkdtempSync(path.join(os.tmpdir(),\'fgos-phase05-git-smoke-\')),repo=path.join(temp,\'main\'),wt=path.join(temp,\'linked\');\nconst start=Date.now();let scenarios=[];\nfunction git(args,cwd=repo,expected=0){console.log(\'GIT\',JSON.stringify(args),\'cwd=\'+cwd);const r=spawnSync(\'git\',args,{cwd,env:process.env,encoding:\'utf8\',timeout:30000});if(r.stdout)process.stdout.write(r.stdout);if(r.stderr)process.stdout.write(r.stderr);console.log(\'EXIT\',r.status);assert.equal(r.error,undefined);if(expected===0)assert.equal(r.status,0);else assert.notEqual(r.status,0);return r;}\nfunction put(relative,text,cwd=repo){const dest=path.join(cwd,relative);fs.mkdirSync(path.dirname(dest),{recursive:true});fs.writeFileSync(dest,text);}\ntry {fs.mkdirSync(repo);git([\'init\',\'-q\',\'-b\',\'main\']);git([\'config\',\'user.name\',\'Phase05 smoke\']);git([\'config\',\'user.email\',\'phase05@example.invalid\']);\nfor(const rel of [\'.githooks/pre-commit\',\'src/runner/main-checkout-lock.mjs\',\'src/runner/dispatch/process-identity.mjs\',\'src/util/session-identity.mjs\']){const dest=path.join(repo,rel);fs.mkdirSync(path.dirname(dest),{recursive:true});fs.copyFileSync(path.join(source,rel),dest);}fs.chmodSync(path.join(repo,\'.githooks/pre-commit\'),0o755);\nput(\'apps/fgos/Cargo.toml\',\'[package]\\nname="smoke"\\n\');put(\'README.md\',\'# Smoke\\n\');put(\'.fgos/cache/smoke.json\',\'{}\\n\');git([\'add\',\'.\']);git([\'commit\',\'-q\',\'-m\',\'smoke baseline\']);git([\'config\',\'core.hooksPath\',path.join(repo,\'.githooks\')]);\nconst baseline=git([\'rev-parse\',\'HEAD\']).stdout.trim();put(\'scratch.cjs\',\'scratch\\n\');git([\'add\',\'scratch.cjs\']);let r=git([\'commit\',\'-m\',\'must refuse root\'],repo,1);assert.match(r.stderr,/scratch\\.cjs/);assert.equal(git([\'rev-parse\',\'HEAD\']).stdout.trim(),baseline);scenarios.push(\'source-marker root addition refused; HEAD unchanged\');git([\'reset\',\'-q\',\'--\',\'scratch.cjs\']);\nput(\'src/smoke/nested.mjs\',\'export const smoke = true;\\n\');git([\'add\',\'src/smoke/nested.mjs\']);git([\'commit\',\'-m\',\'nested allowed\']);assert.equal(git([\'show\',\'HEAD:src/smoke/nested.mjs\']).stdout.trim(),\'export const smoke = true;\');scenarios.push(\'nested addition committed through actual hook\');\ngit([\'worktree\',\'add\',\'-q\',\'-b\',\'fgw/phase05-smoke\',wt]);const linkedHead=git([\'rev-parse\',\'HEAD\'],wt).stdout.trim();put(\'worker-scratch.cjs\',\'scratch\\n\',wt);git([\'add\',\'worker-scratch.cjs\'],wt);r=git([\'commit\',\'-m\',\'must refuse linked root\'],wt,1);assert.match(r.stderr,/worker-scratch\\.cjs/);assert.equal(git([\'rev-parse\',\'HEAD\'],wt).stdout.trim(),linkedHead);scenarios.push(\'linked fgw root addition refused with shared absolute hook; HEAD unchanged\');\nconsole.log(\'SMOKE_RESULT\',JSON.stringify({scenarios,elapsed_seconds:(Date.now()-start)/1000}));\n}finally{fs.rmSync(temp,{recursive:true,force:true});console.log(\'CLEANUP\',JSON.stringify({owned_fixture:temp,removed:!fs.existsSync(temp)}));}']
+GIT ["init","-q","-b","main"] cwd=/tmp/fgos-phase05-git-smoke-6d23pE/main
+EXIT 0
+GIT ["config","user.name","Phase05 smoke"] cwd=/tmp/fgos-phase05-git-smoke-6d23pE/main
+EXIT 0
+GIT ["config","user.email","phase05@example.invalid"] cwd=/tmp/fgos-phase05-git-smoke-6d23pE/main
+EXIT 0
+GIT ["add","."] cwd=/tmp/fgos-phase05-git-smoke-6d23pE/main
+EXIT 0
+GIT ["commit","-q","-m","smoke baseline"] cwd=/tmp/fgos-phase05-git-smoke-6d23pE/main
+EXIT 0
+GIT ["config","core.hooksPath","/tmp/fgos-phase05-git-smoke-6d23pE/main/.githooks"] cwd=/tmp/fgos-phase05-git-smoke-6d23pE/main
+EXIT 0
+GIT ["rev-parse","HEAD"] cwd=/tmp/fgos-phase05-git-smoke-6d23pE/main
+9f1f396d27141f30c146935f3f23e73f5f07e9d2
+EXIT 0
+GIT ["add","scratch.cjs"] cwd=/tmp/fgos-phase05-git-smoke-6d23pE/main
+EXIT 0
+GIT ["commit","-m","must refuse root"] cwd=/tmp/fgos-phase05-git-smoke-6d23pE/main
+commit refused: new root files outside .githooks/pre-commit's allowlist (scratch.cjs). Move scratch files to .fgos/runtime/tmp/ (or /tmp/fgos-work/); place durable files under their owning directory. Legitimate root additions require an allowlist change landed separately on main first.
+See docs/how-to-parallel-lanes.md (workshop root, one level up from repo/) for how to work in an isolated worktree/session.
+EXIT 1
+GIT ["rev-parse","HEAD"] cwd=/tmp/fgos-phase05-git-smoke-6d23pE/main
+9f1f396d27141f30c146935f3f23e73f5f07e9d2
+EXIT 0
+GIT ["reset","-q","--","scratch.cjs"] cwd=/tmp/fgos-phase05-git-smoke-6d23pE/main
+EXIT 0
+GIT ["add","src/smoke/nested.mjs"] cwd=/tmp/fgos-phase05-git-smoke-6d23pE/main
+EXIT 0
+GIT ["commit","-m","nested allowed"] cwd=/tmp/fgos-phase05-git-smoke-6d23pE/main
+[main 472a06b] nested allowed
+ 1 file changed, 1 insertion(+)
+ create mode 100644 src/smoke/nested.mjs
+EXIT 0
+GIT ["show","HEAD:src/smoke/nested.mjs"] cwd=/tmp/fgos-phase05-git-smoke-6d23pE/main
+export const smoke = true;
+EXIT 0
+GIT ["worktree","add","-q","-b","fgw/phase05-smoke","/tmp/fgos-phase05-git-smoke-6d23pE/linked"] cwd=/tmp/fgos-phase05-git-smoke-6d23pE/main
+EXIT 0
+GIT ["rev-parse","HEAD"] cwd=/tmp/fgos-phase05-git-smoke-6d23pE/linked
+472a06b4b63b23acecaf511212d79cf8bd51657a
+EXIT 0
+GIT ["add","worker-scratch.cjs"] cwd=/tmp/fgos-phase05-git-smoke-6d23pE/linked
+EXIT 0
+GIT ["commit","-m","must refuse linked root"] cwd=/tmp/fgos-phase05-git-smoke-6d23pE/linked
+commit refused: new root files outside .githooks/pre-commit's allowlist (worker-scratch.cjs). Move scratch files to .fgos/runtime/tmp/ (or /tmp/fgos-work/); place durable files under their owning directory. Legitimate root additions require an allowlist change landed separately on main first.
+See docs/how-to-parallel-lanes.md (workshop root, one level up from repo/) for how to work in an isolated worktree/session.
+EXIT 1
+GIT ["rev-parse","HEAD"] cwd=/tmp/fgos-phase05-git-smoke-6d23pE/linked
+472a06b4b63b23acecaf511212d79cf8bd51657a
+EXIT 0
+SMOKE_RESULT {"scenarios":["source-marker root addition refused; HEAD unchanged","nested addition committed through actual hook","linked fgw root addition refused with shared absolute hook; HEAD unchanged"],"elapsed_seconds":0.207}
+CLEANUP {"owned_fixture":"/tmp/fgos-phase05-git-smoke-6d23pE","removed":true}
+
+RESULT {"name": "phase-05-tests-actual-git-smoke-post-review", "exit": 0, "timed_out": false, "elapsed_seconds": 0.234, "log": "/home/vantt/projects/worktrees/forgentX-single-door-execution/plans/261006-1415-fgos-single-door-mechanisms/reports/phase-05-tests-actual-git-smoke-post-review.log", "process_group_cleanup": "SIGTERM sent to owned group; missing group already exited"}
