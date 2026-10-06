@@ -96,10 +96,10 @@
     {
       "path": "docs/specs/runner.md",
       "kind": "allowed-edit",
-      "rationale": "Main-side docs edit accompanying landed code, carried in by sync of main: docs(runner): add D-ADR0043 narrative (bound-invocation-supervisor vs detached-run-supervisor) | docs(dispatch): add capability demand-matching doctrine Re-accounted 2026-10-06: Main-side docs edit carried in by sync of main at 2fd5cb6a3 (2026-10-06, 54 commit(s) since 81f7db801): docs(observe): record the second acceptance round and correct the evidence wording | fix(observe): reconcile eligible history and refuse ambiguous runs | fix(observe): preserve unit settlement authority and measure declared voters (+51 more)",
-      "approvedBy": "human approval 2026-09-29 (user, forgentX session); resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report)",
+      "rationale": "Main-side docs edit accompanying landed code, carried in by sync of main: docs(runner): add D-ADR0043 narrative (bound-invocation-supervisor vs detached-run-supervisor) | docs(dispatch): add capability demand-matching doctrine Re-accounted 2026-10-06: Main-side docs edit carried in by sync of main at 2fd5cb6a3 (2026-10-06, 54 commit(s) since 81f7db801): docs(observe): record the second acceptance round and correct the evidence wording | fix(observe): reconcile eligible history and refuse ambiguous runs | fix(observe): preserve unit settlement authority and measure declared voters (+51 more) Re-accounted 2026-10-06: carried in by sync of main at 36dc5f083 (Phase 4 sync): docs(observe): record the third acceptance round and close the plan | fix(observe): a panel needs more than half of its voters before agreement is measured",
+      "approvedBy": "human approval 2026-09-29 (user, forgentX session); resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report); Phase 4 sync under the standing sync policy (plan.md §7.5b), per-file content review pending",
       "owner": "documentation-authority-unification-lead",
-      "expectedDigest": "c2e1f4412748d2e30d6cab5d0a69a900e9653054b70a977c543d39647217e0b7",
+      "expectedDigest": "29632fe0c7d966513e98edb50631078d37a4bc3aed40f654ad79c3b4cac6e563",
       "reviewedAt": "2026-10-06",
       "revisitTrigger": "Phase 08 cutover"
     },
@@ -226,10 +226,10 @@
     {
       "path": "docs/specs/observe.md",
       "kind": "allowed-new-file",
-      "rationale": "Main-side docs edit carried in by sync of main at 2fd5cb6a3 (2026-10-06, 8 commit(s) since 81f7db801): docs(observe): record the second acceptance round and correct the evidence wording | fix(observe): enforce rubric completeness and atomic eval identity | fix(observe): reconcile eligible history and refuse ambiguous runs (+5 more)",
-      "approvedBy": "resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report)",
+      "rationale": "Main-side docs edit carried in by sync of main at 2fd5cb6a3 (2026-10-06, 8 commit(s) since 81f7db801): docs(observe): record the second acceptance round and correct the evidence wording | fix(observe): enforce rubric completeness and atomic eval identity | fix(observe): reconcile eligible history and refuse ambiguous runs (+5 more) Re-accounted 2026-10-06: carried in by sync of main at 36dc5f083 (Phase 4 sync): docs(observe): record the third acceptance round and close the plan | fix(observe): a panel needs more than half of its voters before agreement is measured",
+      "approvedBy": "resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report); Phase 4 sync under the standing sync policy (plan.md §7.5b), per-file content review pending",
       "owner": "documentation-authority-unification-lead",
-      "expectedDigest": "052ec53fa48d012d4e869a86782d01310fdc2b15bbf7eec1f4d4ee2fa3ff6a38",
+      "expectedDigest": "f367b7dbe06df621ddc178e6fd7d1f610483e1504dec324fb1dfd49c97ee5272",
       "reviewedAt": "2026-10-06",
       "revisitTrigger": "atomic platform-authority cutover (plan phase 9)"
     },
