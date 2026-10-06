@@ -1,0 +1,43 @@
+240 {
+  globalHook_time_report: 106,
+  projectHook_time_noReport: 61,
+  dateSuffix: 50,
+  otherReport: 8,
+  other: 15
+} {
+  dateSuffix: [
+    'agy-blind-canary-261005.md',
+    'advisor-read-confinement-design-261005.md',
+    'council-of-high-intelligence-distill-and-protocol-feasibility-261004.md'
+  ],
+  projectHook_time_noReport: [
+    'impl-i32-260928-1556-readonly-redirect-vs-capability-prefer-orthogonality.md',
+    'architecture-investigation-260927-1154-capability-aware-dispatch-gate-phase4-decisions.md',
+    'distill-superpowers-skills-inventory-260728-1653-report.md'
+  ],
+  globalHook_time_report: [
+    'plan-review-260814-1744-tsk-5tm-fable-second-opinion-report.md',
+    'distill-consult-260730-2152-tool-registry-capability-vocab-report.md',
+    'distill-consult-260728-1647-worktree-in-out-report.md'
+  ],
+  other: [
+    'investigation-260921-flake-corpus-3-13-4-11-found-live-toctou-bug.md',
+    'red-team-scope-complexity-critic-261005-observe-run-visibility.md',
+    'pilot-260921-fixture-template-clone-vs-subprocess-init.md'
+  ],
+  otherReport: [
+    'review-r4-260824-tsk-3tp-confirmation-report.md',
+    'unit-i12-boundary-simplification-implementation-report.md',
+    'review-r1-260824-tsk-3tp-sweep-checkpoint-report.md'
+  ]
+}
+{
+  'before project(-HHMM-…, no -report)': 20,
+  'since260901 date-suffix': 46,
+  'since260901 project(-HHMM-…, no -report)': 41,
+  'before global(-HHMM-…-report)': 73,
+  'since260901 other': 15,
+  'since260901 global(-HHMM-…-report)': 33,
+  'before other': 5,
+  'before date-suffix': 4
+}

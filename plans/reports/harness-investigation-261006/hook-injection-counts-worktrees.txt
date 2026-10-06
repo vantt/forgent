@@ -1,0 +1,17 @@
+files scanned: 97
+user text prompts (approx): 348
+hook injections by event (count, total bytes, avg bytes):
+  UserPromptSubmit: n=296 bytes=1021782 avg=3452
+  PostToolUse:Write: n=139 bytes=501340 avg=3607
+  PostToolUse:Edit: n=124 bytes=447357 avg=3608
+  PreToolUse:Write: n=445 bytes=237691 avg=534
+  SessionStart:startup: n=178 bytes=100464 avg=564
+  PreToolUse:Bash: n=28 bytes=10352 avg=370
+  SessionStart:compact: n=6 bytes=9906 avg=1651
+  PostToolUse:Bash: n=59 bytes=6018 avg=102
+  SessionStart:clear: n=5 bytes=1205 avg=241
+  SessionStart:resume: n=3 bytes=749 avg=250
+UserPromptSubmit prompts carrying a dev-rules block: 228
+  both global-YAGNI and project-YAGNI blocks on same prompt: 66
+  only global: 133, only project: 29
+PreToolUse:Write calls with descriptive-name guidance: 296; both contradictory blocks: 149

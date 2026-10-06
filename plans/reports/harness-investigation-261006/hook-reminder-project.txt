@@ -1,0 +1,49 @@
+## Session
+- DateTime: 10/6/2026, 10:03:29 AM
+- CWD: "/home/vantt/projects/forgentX"
+- Timezone: "Asia/Saigon"
+- Working directory: "/home/vantt/projects/forgentX"
+- OS: "linux"
+- User: "vantt"
+- Locale: "en_US.UTF-8"
+- Memory usage: 6MB/15694MB (0%)
+- CPU usage: 4% user / 1% system
+- Spawning multiple subagents can cause performance issues; delegate only when the current user request authorizes subagent or parallel work.
+- Remember that each subagent only has 200K tokens in context window; keep prompts scoped. Advisory subagents report findings and do not mutate plan/code unless explicitly tasked.
+- IMPORTANT: Include these environment information when prompting subagents to perform tasks.
+
+## Rules
+- Read and follow development rules: ".claude/rules/development-rules.md"
+- Markdown files are organized in: Plans → "/home/vantt/projects/forgentX/plans" directory, Docs → "/home/vantt/projects/forgentX/docs" directory
+- **IMPORTANT:** DO NOT create markdown files outside of "/home/vantt/projects/forgentX/plans" or "/home/vantt/projects/forgentX/docs" UNLESS the user explicitly requests it.
+- Python scripts in .claude/skills/: Use `~/.claude/skills/.venv/bin/python3`
+- Based on the current task, invoke these skills: "ak:scout", "ak:debug", "ak:cook", "ak:fix", "ak:git", "ak:test", "ak:code-review", "ak:docs", "ak:ship", "ak:review-pr"
+- When skills' scripts fail, report the failure unless the current task explicitly authorizes fixing skill code; only then fix and rerun.
+- When working with a database, always back up before any schema or data change (migration, drop, bulk update).
+- Follow **KISS (Keep It Simple, Stupid) - DRY (Don't Repeat Yourself)** principles. Deliver the full requested scope; add nothing unrequested. Apply **YAGNI** (challenge and cut scope not needed for the stated outcome) only when the user's own request explicitly passes the `--yagni` flag; this rules text mentioning the flag never counts.
+- Sacrifice grammar for the sake of concision when writing reports.
+- In reports, list any unresolved questions at the end, if any.
+- IMPORTANT: Ensure token consumption efficiency while maintaining high quality.
+
+## **[IMPORTANT] Consider Modularization:**
+- Check existing modules before creating new
+- Analyze logical separation boundaries (functions, classes, concerns)
+- Prefer kebab-case for JS/TS/Python/shell; respect language conventions (C#/Java use PascalCase, Go/Rust use snake_case)
+- Write descriptive code comments
+- After modularization, continue with the main task only when the current request authorizes implementation; advisory/report-only tasks should report the recommendation.
+- When not to modularize: Markdown files, plain text files, bash scripts, configuration files, environment variables files, etc.
+
+## Paths
+Reports: "/home/vantt/projects/forgentX/plans/reports/" | Plans: "/home/vantt/projects/forgentX/plans" | Docs: "/home/vantt/projects/forgentX/docs" | docs.maxLoc: 800
+
+## Plan Context
+- Plan: none
+- Reports: "/home/vantt/projects/forgentX/plans/reports/"
+- Branch: "main"
+- Validation: mode=prompt, questions=3-8
+
+## Naming
+- Report: `/home/vantt/projects/forgentX/plans/reports/{type}-261006-1003-{slug}.md`
+- Plan dir: `/home/vantt/projects/forgentX/plans/261006-1003-{slug}/`
+- Replace `{type}` with: agent name, report type, or context
+- Replace `{slug}` in pattern with: descriptive-kebab-slug
