@@ -1,0 +1,8 @@
+{
+  "stage": "execution-observation configuration",
+  "actualError": "dispatch decide blocked operation \"undefined\": executor \"claude\" resolves to cross-provider egress target \"/home/vantt/.nvm/versions/node/v24.18.0/bin/node\" — prompt content would leave the Claude ecosystem. Set executors.claude.allowCrossProvider: true to permit this.",
+  "bothArms": "rejected before successful provider completion",
+  "temporaryConfigRestored": true,
+  "proof": "Actual runner output bg_124, exit 1",
+  "decision": "Preserve literal provider commands; do not set allowCrossProvider merely to accommodate an observation wrapper. Capture actual judge execution from the foreground dispatch spawn seam instead."
+}

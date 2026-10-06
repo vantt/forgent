@@ -1,0 +1,210 @@
+{
+  "profileId": "observed-source-packet",
+  "declarations": {
+    "claude": {
+      "providerModel": "claude",
+      "invocation": {
+        "id": "observed-source-packet",
+        "via": "cli",
+        "adapter": "cli-spawn",
+        "command": "claude",
+        "args": [
+          "-p",
+          "{prompt}",
+          "--model",
+          "{model}",
+          "--safe-mode",
+          "--tools",
+          "Read,Write",
+          "--permission-mode",
+          "acceptEdits",
+          "--strict-mcp-config",
+          "--mcp-config",
+          "{\"mcpServers\":{}}",
+          "--setting-sources",
+          "",
+          "--disable-slash-commands",
+          "--no-session-persistence",
+          "--output-format",
+          "stream-json",
+          "--verbose",
+          "--include-hook-events",
+          "--system-prompt-snapshot",
+          "on",
+          "--add-dir",
+          "/home/vantt/projects/mdview/.fgos/assignments"
+        ],
+        "confinement": {
+          "backend": "bwrap"
+        }
+      }
+    },
+    "xai": {
+      "providerModel": "xai",
+      "invocation": {
+        "id": "observed-source-packet",
+        "via": "cli",
+        "adapter": "cli-spawn",
+        "command": "pi",
+        "args": [
+          "--provider",
+          "xai",
+          "--model",
+          "{model}",
+          "--mode",
+          "json",
+          "--print",
+          "--no-session",
+          "--tools",
+          "read,write",
+          "--no-extensions",
+          "--no-skills",
+          "--no-prompt-templates",
+          "--no-themes",
+          "--no-context-files",
+          "--offline",
+          "{prompt}"
+        ],
+        "confinement": {
+          "backend": "bwrap"
+        },
+        "resourceBindings": [
+          {
+            "resource": "private-home",
+            "target": {
+              "kind": "env",
+              "name": "PI_CODING_AGENT_DIR"
+            }
+          }
+        ]
+      }
+    },
+    "glm": {
+      "providerModel": "z-ai",
+      "invocation": {
+        "id": "observed-source-packet",
+        "via": "cli",
+        "adapter": "cli-spawn",
+        "command": "pi",
+        "args": [
+          "--model",
+          "{model}",
+          "--mode",
+          "json",
+          "--print",
+          "--no-session",
+          "--tools",
+          "read,write",
+          "--no-extensions",
+          "--no-skills",
+          "--no-prompt-templates",
+          "--no-themes",
+          "--no-context-files",
+          "--offline",
+          "{prompt}"
+        ],
+        "confinement": {
+          "backend": "bwrap"
+        },
+        "resourceBindings": [
+          {
+            "resource": "private-home",
+            "target": {
+              "kind": "env",
+              "name": "PI_CODING_AGENT_DIR"
+            }
+          }
+        ]
+      }
+    },
+    "gemini": {
+      "providerModel": "gemini",
+      "invocation": {
+        "id": "observed-source-packet",
+        "via": "cli",
+        "adapter": "cli-spawn",
+        "command": "agy",
+        "args": [
+          "--print",
+          "{prompt}",
+          "--model",
+          "{model}",
+          "--output-format",
+          "stream-json",
+          "--new-project",
+          "--disable-slash-commands",
+          "--print-timeout",
+          "180s"
+        ],
+        "confinement": {
+          "backend": "bwrap"
+        },
+        "resourceBindings": [
+          {
+            "resource": "private-home",
+            "target": {
+              "kind": "env",
+              "name": "HOME"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "decisions": {
+    "claude": {
+      "contract": "fgos.v1",
+      "generated_at": "2026-10-06T07:00:02.123Z",
+      "data_hash": "764fc7ad001139fae526aeff54321ed391bb27157edce9ba419a8dc4ce292fe1",
+      "data": {
+        "mechanism": "out-of-process",
+        "configured": true,
+        "reasonCodes": [
+          "native-first.0033.cli-spawn-shaped"
+        ]
+      }
+    },
+    "xai": {
+      "contract": "fgos.v1",
+      "generated_at": "2026-10-06T07:00:02.244Z",
+      "data_hash": "764fc7ad001139fae526aeff54321ed391bb27157edce9ba419a8dc4ce292fe1",
+      "data": {
+        "mechanism": "out-of-process",
+        "configured": true,
+        "reasonCodes": [
+          "native-first.0033.cli-spawn-shaped"
+        ]
+      }
+    },
+    "glm": {
+      "contract": "fgos.v1",
+      "generated_at": "2026-10-06T07:00:02.359Z",
+      "data_hash": "764fc7ad001139fae526aeff54321ed391bb27157edce9ba419a8dc4ce292fe1",
+      "data": {
+        "mechanism": "out-of-process",
+        "configured": true,
+        "reasonCodes": [
+          "native-first.0033.cli-spawn-shaped"
+        ]
+      }
+    },
+    "gemini": {
+      "contract": "fgos.v1",
+      "generated_at": "2026-10-06T07:00:02.480Z",
+      "data_hash": "764fc7ad001139fae526aeff54321ed391bb27157edce9ba419a8dc4ce292fe1",
+      "data": {
+        "mechanism": "out-of-process",
+        "configured": true,
+        "reasonCodes": [
+          "native-first.0033.cli-spawn-shaped"
+        ]
+      }
+    }
+  },
+  "sourceSha256": "9a93aa925f7d3f5c4693227357a0100c79889a45180a1031d5fceac9db7782d2",
+  "objective": "DECISION QUESTION (council-style, read-only, give a position): fgOS's `panel` collaboration pattern (src/runner/execution/patterns/panel.mjs) runs N independent panelists in parallel then a synthesizer on a different provider. The 'council-of-high-intelligence' project adds mechanical quality gates around such a panel: (1) a dissent quota (at least 2 non-overlapping objections else re-prompt), (2) an agreement check (>70% agree -> force a counterfactual from 2 members), (3) anonymized cross-examination round, (4) a confidence-weighted tally that returns a genuine split to the user instead of forcing consensus. Should fgOS add a mechanical dissent/agreement gate to the panel pattern, or is provider-distinct panelists plus the reviewed pattern's red-team already enough? Read the repo to ground your answer (panel.mjs, reviewed.mjs, docs/specs). Reply with: your position, the 2-3 strongest reasons with file:line evidence, what would change your mind, and one concrete next step. Maximum 300 words.",
+  "workspaces": [
+    "/var/tmp/fgos-independent-position-AyAbpu",
+    "/var/tmp/fgos-independent-position-VId13Z"
+  ]
+}

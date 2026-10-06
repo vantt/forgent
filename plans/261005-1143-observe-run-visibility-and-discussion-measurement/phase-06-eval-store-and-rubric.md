@@ -1,7 +1,7 @@
 ---
 phase: 6
 title: "Eval store and rubric"
-status: in-progress
+status: completed
 priority: P2
 effort: "1d"
 dependencies: [3]
@@ -10,8 +10,8 @@ dependencies: [3]
 # Phase 6: Eval store and rubric
 
 Execution gate: the owner confirmed on 2026-10-06 that the 2026-10-05 request
-authorized every remaining phase. Store and rubric exist; fair-comparison
-acceptance is reopened after the independent review.
+authorized every remaining phase. Store/rubric repairs and a new audited independent
+historical-question comparison are complete; original confounded scores remain labeled.
 
 
 ## Overview
@@ -46,12 +46,12 @@ D4. A new store beside friction, cases and snapshots, with the same shard-per-wr
 ## Success Criteria
 
 - [x] Real solo/panel records list by exact harness with all five `discussion-quality.v1` scores.
-- [ ] Judge isolation and retained scratch inventory are demonstrated for an independent comparison using the entire 2026-10-04 objective. The original judgments were data-blind only: tools/MCP available with zero tool calls; hooks ran, instructions loaded, solo consumed panel results, and a different question was used.
+- [x] Judge isolation and retained scratch inventory are demonstrated for a new independent comparison using the entire 2026-10-04 objective. Actual selected argv, SDK tools/MCP/skills/slash-empty metadata, zero tool/hook events and unchanged two-file inventory are retained. Original judgments remain data-blind/confounded, not retrospectively validated.
 - [x] Unchanged installed host rejects `metrics eval` explicitly, exit 4.
 
 Evidence: [`observe-discussion-measurement-261005.md`](../reports/observe-discussion-measurement-261005.md), corrected [judge metadata and actual rationales](../reports/observe-measurement-blind-judge-261005.json), and `.fgos/observe/evals/observe-measurement-261005.jsonl`. Both original texts scored 7/10, but the setup-independence and historical-question confounds invalidate presenting this as a fair setup comparison. [Acceptance repairs](../reports/observe-acceptance-fixes-261006.md) track any new run and unresolved proof; no isolation acceptance is claimed from the old scores.
 
-Store integrity repair `f11504363`: main eval harness23 pass, including six-process same-shard and two-process same-ID behavior; native rejects partial/duplicate/invalid-store writes without inventing scores. Arm64 cargo check is compile-only proof. Fresh Opus isolation canary has real captured argv and SDK tools/MCP/skills-empty transcript, not comparison scores. Full historical-question owner-unit attempts produce real solo pass and Sonnet/Gemini passes, but confined xai cannot create its inherited credential-store lock on readonly storage. A provisioned writable private Pi runtime is missing; no credentials are copied/extracted and no substitute model or fake eval is used. Fair-comparison criterion remains unchecked.
+Store integrity repair `f11504363`: main eval harness23 pass, including six-process same-shard and two-process same-ID behavior; native rejects partial/duplicate/invalid-store writes without inventing scores. Arm64 cargo check is compile-only proof. The earlier readonly Pi lock issue is resolved by existing owning-root account-backed private-home profiles and normal opaque fgOS provisioning, not manual credential extraction. New solo `unit-run-1791270002490-60cc7659` is retained without rerun; contaminated panel `unit-run-1791270002581-a9476c1b` is excluded, and replacement panel `unit-run-1791270868625-812a0306` passes all four roles with identical source-packet bytes. Actual isolated Opus judgment scores solo7/panel5; native append/list proves two new complete records, four total, invalid[]. The [repair ledger](../reports/observe-acceptance-fixes-261006.md#independent-comparison-completion--2026-10-06) links SDK, access, inventory, rationale and record evidence. One question/one successfully isolated judge, unverified citations, unchanged overlength outputs and different CLI transport limit the inference; no general setup ranking is claimed.
 
 ## Risk Assessment
 

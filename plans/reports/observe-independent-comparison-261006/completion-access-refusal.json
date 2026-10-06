@@ -1,0 +1,11 @@
+{
+  "soloUnitRunId": "unit-run-1791269743317-544a3c6e",
+  "panelUnitRunId": "unit-run-1791269743393-3b902e5d",
+  "temporaryConfigRestored": true,
+  "actualSoloSdk": {"cwd": "/var/tmp/fgos-independent-position-uWrcD9", "model": "claude-opus-5-5", "tools": ["Read", "Write"], "mcp_servers": []},
+  "claudeClassification": "exit 0; inconclusive/no-evidence; no valid claim because source-packet reads and own outbox write were permission-denied",
+  "actualAssistantExcerpt": "I'm blocked: I couldn't read the repo or write either result file. Permission was denied for every path I needed.",
+  "otherSeats": {"xai": "pass", "gemini": "pass"},
+  "proof": "bg_125 actual run plus whitelisted SDK/tool/final-message inspection of its producer stdout.log",
+  "decision": "Declare supported Claude --add-dir for the already-confined assignment root. OS blind masking still hides peers, and OS write grant remains the current seat outbox only. Do not use bypassPermissions or change provider/model."
+}

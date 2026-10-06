@@ -70,7 +70,7 @@ Root cause: a result's **location and record shape** are implicit contracts each
 | 3 | [Doctor coverage check and rebaseline](./phase-03-doctor-coverage-check-and-rebaseline.md) | 0.75d | 1, 2 | completed |
 | 4 | [Unit summaries and `metrics discussions`](./phase-04-unit-summaries-and-discussions.md) | 1.5d | 2 | completed |
 | 5 | [Stance and agreement sensor](./phase-05-stance-and-agreement-sensor.md) | 1.25d | 4 | completed |
-| 6 | [Eval store and rubric](./phase-06-eval-store-and-rubric.md) | 1d | 3 | in-progress (fair-comparison proof reopened) |
+| 6 | [Eval store and rubric](./phase-06-eval-store-and-rubric.md) | 1d | 3 | completed |
 
 Phases 1–3 shipped first; the owner confirmed the all-phase authorization in the 2026-10-06 conversation. Feature commit `0b06824a7` and the five ordered acceptance repair commits are linked in the repair ledger. Exact golden regeneration produces no fixture diff. The original guard remains unmet, so the whole plan stays in progress.
 
@@ -83,7 +83,7 @@ Phases 1–3 shipped first; the owner confirmed the all-phase authorization in t
 - [x] `observe-run-coverage` passes with rebuilt host, degrades/pass with old host, fails against hidden-run fixture (foundation evidence).
 - [x] Four mdview Delphi workflows include refusal zero seats and two fallback seats; 30 attempts = 30 Dispatch runs, distinct from 28 final seats.
 - [x] Live three-seat panel gives three valid votes and hand/native agreement 1; no-options is unmeasured and malformed stance preserves passing seat (behavioral CLI regression).
-- [ ] Independent current setups reuse the complete 2026-10-04 objective and have an audited isolated Opus judgment. Old records list but were only data-blind, solo consumed panel results and the question differed; corrected provenance is not new comparison proof.
+- [x] Independent current setups reuse the complete 2026-10-04 objective with identical source-packet bytes and an audited isolated Opus judgment. Two actual complete evals have owning-project-qualified refs. Original data-blind/confounded records remain labeled; one-question results and untrimmed word-limit violations are disclosed in the repair ledger.
 - [x] Acceptance repairs: final Rust suites, live CLI proof and exactly one final `env -u CLAUDE_CODE_SESSION_ID npm test` verified (6,851 tests / 6,778 pass / zero fail / eight skip / 65 todo). Specs, CHANGELOG, manifest and doctor rows updated; no component-boundary change. This gate does not waive the unchecked original guard or prove a fresh independent comparison.
 
 ## How Rust changes are verified (important)
@@ -178,7 +178,7 @@ Final full-suite verification passed with the unchanged test selection: `FGOS_HO
 
 The three Opus acceptance reports returned **ACCEPT WITH FIXES**: passing tests did not prove every reachable measurement/lifecycle boundary. [Acceptance repair ledger](../reports/observe-acceptance-fixes-261006.md) tracks all findings, commits, exercised evidence and non-fixes. The original source-enumerator guard criterion is restored unchecked; the runtime test prohibition is not represented as a repository law or owner waiver.
 
-The owner confirmed in this conversation that the 2026-10-05 all-phase request was real. Accuracy, stability, speed and simplicity govern timestamp selection: actual result settlement fields, then sibling owner settlement, never start/creation time. All five repair groups are committed; narrow Node consumers, complete Rust suites, rebuilt/old-host doctor and live dual-root CLI proof are in the repair ledger. Exactly one final full npm run passed: 6,778 pass / zero fail, eight skipped and 65 todo (`artifact://456`). Fresh historical-question Unit seats were actually exercised, but the panel failed before synthesis on a readonly Pi auth-file lock; no quota exhaustion, independent A/B judgment or two new scores is claimed. The original guard stays unchecked and the whole plan stays in progress.
+The owner confirmed in this conversation that the 2026-10-05 all-phase request was real. Accuracy, stability, speed and simplicity govern timestamp selection: actual result settlement fields, then sibling owner settlement, never start/creation time. All five repair groups are committed; narrow Node consumers, complete Rust suites, rebuilt/old-host doctor and live dual-root CLI proof are in the repair ledger. Exactly one final full npm run passed: 6,778 pass / zero fail, eight skipped and 65 todo (`artifact://456`), not repeated for later evidence-only work. Existing private-home provisioning resolves the earlier Pi lock configuration failure. A clean solo is retained, a contaminated panel excluded and only its replacement regenerated; actual isolated Opus judgment and two new native evals complete phase6. New scores are solo7/panel5 with scoped limits, not a general ranking. The original permanent source/import guards stay unmet because of the runtime-policy conflict, so the whole plan stays in progress.
 
 
 ## Open questions

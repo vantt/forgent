@@ -1,0 +1,297 @@
+[
+  {
+    "unit": "unit-run-1791270002490-60cc7659",
+    "role": "producer",
+    "inits": [
+      {
+        "cwd": "/var/tmp/fgos-independent-position-AyAbpu",
+        "model": "claude-opus-5-5",
+        "tools": [
+          "Read",
+          "Write"
+        ]
+      }
+    ],
+    "modelIds": [
+      "claude-opus-5-5"
+    ],
+    "calls": [
+      {
+        "name": "Read",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002490-60cc7659/producer/1/inputs/1-source-packet-d55108fd3c6d.txt"
+      },
+      {
+        "name": "Read",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002490-60cc7659/producer/1/inputs/1-source-packet-d55108fd3c6d.txt"
+      },
+      {
+        "name": "Write",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002490-60cc7659/producer/1/runs/01/worker-output/outbox/agent-report.md"
+      },
+      {
+        "name": "Write",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002490-60cc7659/producer/1/runs/01/worker-output/outbox/agent-result.json"
+      }
+    ],
+    "toolEvents": []
+  },
+  {
+    "unit": "unit-run-1791270002581-a9476c1b",
+    "role": "panelist-1",
+    "inits": [
+      {
+        "cwd": "/var/tmp/fgos-independent-position-VId13Z",
+        "model": "claude-sonnet-5-5",
+        "tools": [
+          "Read",
+          "Write"
+        ]
+      }
+    ],
+    "modelIds": [
+      "claude-sonnet-5-5"
+    ],
+    "calls": [
+      {
+        "name": "Read",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/panelist-1/1/inputs/1-source-packet-d55108fd3c6d.txt"
+      },
+      {
+        "name": "Read",
+        "path": "/var/tmp/fgos-independent-position-VId13Z/src/runner/execution/patterns/panel.mjs"
+      },
+      {
+        "name": "Read",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/panelist-1/1/inputs/1-source-packet-d55108fd3c6d.txt"
+      },
+      {
+        "name": "Write",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/panelist-1/1/runs/01/worker-output/outbox/agent-report.md"
+      },
+      {
+        "name": "Write",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/panelist-1/1/runs/01/worker-output/outbox/agent-result.json"
+      }
+    ],
+    "toolEvents": []
+  },
+  {
+    "unit": "unit-run-1791270002581-a9476c1b",
+    "role": "panelist-2",
+    "inits": [],
+    "modelIds": [
+      "grok-4.3"
+    ],
+    "calls": [
+      {
+        "name": "read",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/panelist-2/1/inputs/1-source-packet-d55108fd3c6d.txt"
+      },
+      {
+        "name": "read",
+        "path": "/home/vantt/projects/mdview/src/runner/execution/patterns/panel.mjs"
+      },
+      {
+        "name": "read",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/panelist-2/1/inputs/1-source-packet-d55108fd3c6d.txt"
+      },
+      {
+        "name": "read",
+        "path": "/home/vantt/projects/mdview/src/runner/execution/patterns/panel.mjs"
+      },
+      {
+        "name": "read",
+        "path": "/home/vantt/projects/mdview/src/runner/execution/patterns/panel.mjs"
+      },
+      {
+        "name": "read",
+        "path": "/home/vantt/projects/mdview/src/runner/execution/patterns/panel.mjs"
+      },
+      {
+        "name": "write",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/panelist-2/1/runs/01/worker-output/outbox/agent-result.json"
+      },
+      {
+        "name": "write",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/panelist-2/1/runs/01/worker-output/outbox/agent-report.md"
+      },
+      {
+        "name": "write",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/panelist-2/1/runs/01/worker-output/outbox/agent-result.json"
+      },
+      {
+        "name": "write",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/panelist-2/1/runs/01/worker-output/outbox/agent-report.md"
+      }
+    ],
+    "toolEvents": [
+      {
+        "type": "tool_execution_start",
+        "name": "read",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/panelist-2/1/inputs/1-source-packet-d55108fd3c6d.txt"
+      },
+      {
+        "type": "tool_execution_start",
+        "name": "read",
+        "path": "/home/vantt/projects/mdview/src/runner/execution/patterns/panel.mjs"
+      },
+      {
+        "type": "tool_execution_end",
+        "name": "read"
+      },
+      {
+        "type": "tool_execution_end",
+        "name": "read"
+      },
+      {
+        "type": "tool_execution_start",
+        "name": "read",
+        "path": "/home/vantt/projects/mdview/src/runner/execution/patterns/panel.mjs"
+      },
+      {
+        "type": "tool_execution_end",
+        "name": "read"
+      },
+      {
+        "type": "tool_execution_start",
+        "name": "write",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/panelist-2/1/runs/01/worker-output/outbox/agent-result.json"
+      },
+      {
+        "type": "tool_execution_start",
+        "name": "write",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/panelist-2/1/runs/01/worker-output/outbox/agent-report.md"
+      },
+      {
+        "type": "tool_execution_end",
+        "name": "write"
+      },
+      {
+        "type": "tool_execution_end",
+        "name": "write"
+      }
+    ]
+  },
+  {
+    "unit": "unit-run-1791270002581-a9476c1b",
+    "role": "panelist-3",
+    "inits": [],
+    "modelIds": [],
+    "calls": [],
+    "toolEvents": []
+  },
+  {
+    "unit": "unit-run-1791270002581-a9476c1b",
+    "role": "synthesizer",
+    "inits": [],
+    "modelIds": [
+      "z-ai/glm-5.3"
+    ],
+    "calls": [
+      {
+        "name": "read",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/synthesizer/1/inputs/1-source-packet-d55108fd3c6d.txt"
+      },
+      {
+        "name": "read",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/synthesizer/1/inputs/2-panelist-1-r1.md"
+      },
+      {
+        "name": "read",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/synthesizer/1/inputs/3-panelist-2-r1.md"
+      },
+      {
+        "name": "read",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/synthesizer/1/inputs/4-panelist-3-r1.md"
+      },
+      {
+        "name": "read",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/synthesizer/1/inputs/1-source-packet-d55108fd3c6d.txt"
+      },
+      {
+        "name": "read",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/synthesizer/1/inputs/2-panelist-1-r1.md"
+      },
+      {
+        "name": "read",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/synthesizer/1/inputs/3-panelist-2-r1.md"
+      },
+      {
+        "name": "read",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/synthesizer/1/inputs/4-panelist-3-r1.md"
+      },
+      {
+        "name": "write",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/synthesizer/1/runs/01/worker-output/outbox/agent-report.md"
+      },
+      {
+        "name": "write",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/synthesizer/1/runs/01/worker-output/outbox/agent-result.json"
+      },
+      {
+        "name": "write",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/synthesizer/1/runs/01/worker-output/outbox/agent-report.md"
+      },
+      {
+        "name": "write",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/synthesizer/1/runs/01/worker-output/outbox/agent-result.json"
+      }
+    ],
+    "toolEvents": [
+      {
+        "type": "tool_execution_start",
+        "name": "read",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/synthesizer/1/inputs/1-source-packet-d55108fd3c6d.txt"
+      },
+      {
+        "type": "tool_execution_start",
+        "name": "read",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/synthesizer/1/inputs/2-panelist-1-r1.md"
+      },
+      {
+        "type": "tool_execution_start",
+        "name": "read",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/synthesizer/1/inputs/3-panelist-2-r1.md"
+      },
+      {
+        "type": "tool_execution_start",
+        "name": "read",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/synthesizer/1/inputs/4-panelist-3-r1.md"
+      },
+      {
+        "type": "tool_execution_end",
+        "name": "read"
+      },
+      {
+        "type": "tool_execution_end",
+        "name": "read"
+      },
+      {
+        "type": "tool_execution_end",
+        "name": "read"
+      },
+      {
+        "type": "tool_execution_end",
+        "name": "read"
+      },
+      {
+        "type": "tool_execution_start",
+        "name": "write",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/synthesizer/1/runs/01/worker-output/outbox/agent-report.md"
+      },
+      {
+        "type": "tool_execution_start",
+        "name": "write",
+        "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/synthesizer/1/runs/01/worker-output/outbox/agent-result.json"
+      },
+      {
+        "type": "tool_execution_end",
+        "name": "write"
+      },
+      {
+        "type": "tool_execution_end",
+        "name": "write"
+      }
+    ]
+  }
+]

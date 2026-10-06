@@ -24,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Discussion comparison guidance now includes actual selected-argv/SDK/scratch auditing, normal private-home account provisioning, and prior-result access checks; historical confounded scores remain distinct from new independent evals.
+
 - The pre-commit guard that refuses a commit making a `.fgos/` file shorter than HEAD now applies only to the append-only logs (`.fgos/**/*.jsonl`), which is what it was built and tested for: a stale worktree's older log must not replace main's newer one. A config or state file such as `.fgos/config.json` is edited on purpose and may lose lines.
 - `fgos workflow start|answer|resume` and `fgos run` now warn (one stderr line plus `warnings: [{code: 'dir-differs-from-cwd', message, fix}]` in the output) when `--dir` names a different project than the current directory: state goes to `--dir` but workers start in the current directory and stop on a read-outside-working-directory prompt. The fix is to `cd` into that project or pass `--worktree`; it stays a warning, and a detached `resume` child does not repeat it.
 - A detached Workflow run is now observable: its `advance.log` gets one line when each step starts, ends, fails or parks, and `fgos workflow status <id>` adds `advance: { running, pid, logPath, lastLines, hint }` (live holder of the advance lock, tail of the log, and a `fgos workflow resume <id>` hint when a running run has no live advance and nothing recorded for 30 seconds).
