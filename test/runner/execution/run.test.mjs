@@ -1338,3 +1338,26 @@ test('a reviewed execution error publishes its summary only after the dispatched
   assert.equal(sibling.kind, 'checker');
   assert.equal(fixture.readRecord().settlement.outcome, 'execution-failure');
 });
+
+test('a failed settlement write never replaces the execution error that caused it', async (t) => {
+  const fixture = recordedUnitFixture(t, 'nonexistent-pattern');
+  const unitFile = path.join(fixture.unitDir, 'unit.json');
+  const rename = fs.renameSync;
+  const read = fs.readFileSync;
+  t.mock.method(fs, 'renameSync', (from, to) => {
+    // Only the settlement record fails to land; the earlier running-state writes succeed.
+    if (to === unitFile && JSON.parse(read(from, 'utf8')).execution?.status === 'settled') {
+      throw Object.assign(new Error('unit record storage unavailable'), { code: 'EIO' });
+    }
+    return rename(from, to);
+  });
+  const warning = t.mock.method(console, 'warn', () => {});
+  await assert.rejects(runUnit({ repoRoot: fixture.repoRoot, cwd: fixture.worktreeDir,
+    resumeUnitRunId: fixture.unitRunId }),
+  (error) => /Unknown collaboration pattern: "nonexistent-pattern"/.test(error.message));
+  assert.equal(warning.mock.callCount(), 1);
+  assert.match(warning.mock.calls[0].arguments[0], /could not record the failed settlement.*unit record storage unavailable/);
+  assert.equal(fixture.readRecord().execution.status, 'running', 'the record keeps the last state that was written');
+  assert.equal(fixture.readRecord().settlement, undefined);
+  assert.deepEqual(fs.readdirSync(fixture.unitDir).filter((name) => name.endsWith('.tmp')), [], 'no partial record is left behind');
+});

@@ -79,7 +79,7 @@ fn seat(role: &str, kind: &str, choice: Option<&str>) -> Value {
 
 fn unit(id: &str, choices: &[Option<&str>]) -> Value {
     json!({
-        "contract": {"id": "unit-summary", "version": 1}, "unitRunId": id,
+        "contract": {"id": "unit-summary", "version": 2}, "unitRunId": id,
         "workflow": {"runId": "workflow-synthetic", "stepId": "discuss", "unitId": "panel"},
         "pattern": "panel", "capability": "analysis", "outcome": "pass",
         "startedAt": "2026-10-05T12:00:00.000Z", "settledAt": "2026-10-05T12:01:00.000Z",
@@ -153,7 +153,6 @@ fn passive_threshold_uses_all_final_voting_seats_without_changing_outcomes() {
         ("unit-run-two-one", [Some("a"), Some("a"), Some("b")], 2.0 / 3.0, false, 0),
         ("unit-run-split", [Some("a"), Some("b"), Some("c")], 1.0 / 3.0, true, 0),
         ("unit-run-one-missing", [Some("a"), Some("a"), None], 2.0 / 3.0, false, 1),
-        ("unit-run-two-missing", [Some("a"), None, None], 1.0 / 3.0, true, 2),
         ("unit-run-other", [Some("other"), Some("other"), Some("a")], 2.0 / 3.0, false, 0),
     ];
     for (id, choices, _, _, _) in &cases { root.summary(&unit(id, choices)); }
@@ -225,8 +224,11 @@ fn reader_reports_root_wide_missing_and_unusable_summaries_without_reconstructio
     no_timestamp["settledAt"] = Value::Null;
     root.summary(&no_timestamp);
     let mut bad_contract = unit("unit-run-contract", &[]);
-    bad_contract["contract"]["version"] = json!(2);
+    bad_contract["contract"]["id"] = json!("something-else");
     root.summary(&bad_contract);
+    let mut old_version = unit("unit-run-old-version", &[]);
+    old_version["contract"]["version"] = json!(1);
+    root.summary(&old_version);
     let malformed = root.summary(&unit("unit-run-malformed", &[]));
     fs::write(malformed, "{").unwrap();
     let oversized = root.summary(&unit("unit-run-oversized", &[]));
@@ -255,13 +257,13 @@ fn reader_reports_root_wide_missing_and_unusable_summaries_without_reconstructio
         let report = root.metrics(&args);
         assert_eq!(report["totals"]["unitRuns"], observed);
         assert_eq!(report["summaryDiagnosticsScope"], "root-wide");
-        assert_eq!(report["summaryDirsSeen"], 10);
+        assert_eq!(report["summaryDirsSeen"], 11);
         assert_eq!(report["summariesMissing"], 1);
-        assert_eq!(report["summariesUnusable"], 8);
+        assert_eq!(report["summariesUnusable"], 9);
         assert_eq!(report["summariesOutsideWindow"], outside);
         assert_eq!(report["summariesSkippedByReason"], json!({
             "missing-timestamp": 1, "invalid-timestamp": 1, "invalid-contract": 3,
-            "invalid-json": 1, "oversized": 1, "nonregular": 1
+            "unsupported-version": 1, "invalid-json": 1, "oversized": 1, "nonregular": 1
         }));
         let skipped: u64 = report["summariesSkippedByReason"].as_object().unwrap()
             .values().map(|count| count.as_u64().unwrap()).sum();
@@ -481,4 +483,64 @@ fn invalid_or_absent_owner_seat_kinds_make_a_summary_unusable() {
     assert_eq!(report["summaryDirsSeen"], 4);
     assert_eq!(report["summariesUnusable"], 4);
     assert_eq!(report["summariesSkippedByReason"], json!({"invalid-contract": 4}));
+}
+
+#[test]
+fn fewer_than_two_valid_votes_is_unmeasured_and_keeps_its_counts() {
+    let root = Fixture::new();
+    root.summary(&unit("unit-run-two-missing", &[Some("a"), None, None]));
+    let mut one_missing_one_invalid = unit("unit-run-one-valid", &[Some("a"), None, Some("b")]);
+    one_missing_one_invalid["seats"][2]["final"]["stance"] = json!({"status": "invalid", "reason": "wrong-type"});
+    root.summary(&one_missing_one_invalid);
+    root.summary(&unit("unit-run-lone-voter", &[Some("b")]));
+    root.summary(&unit("unit-run-two-valid", &[Some("a"), Some("b"), None]));
+    let report = root.metrics(&[]);
+    let row = |id: &str| report["units"].as_array().unwrap().iter().find(|row| row["unitRunId"] == id).unwrap().clone();
+    for (id, seats, missing, invalid) in [
+        ("unit-run-two-missing", 3, 2, 0),
+        ("unit-run-one-valid", 3, 1, 1),
+        ("unit-run-lone-voter", 1, 0, 0),
+    ] {
+        let row = row(id);
+        assert_eq!(row["measurement"], "unmeasured", "{id}");
+        assert!(row["agreement"].is_null(), "{id}");
+        assert!(row["genuineSplit"].is_null(), "{id}");
+        assert_eq!(row["stancesValid"], 1, "{id}");
+        assert_eq!(row["stanceSeats"], seats, "{id}");
+        assert_eq!(row["stancesMissing"], missing, "{id}");
+        assert_eq!(row["stancesInvalid"], invalid, "{id}");
+    }
+    // Two valid votes are enough; the missing third voter stays in the denominator.
+    let row = row("unit-run-two-valid");
+    assert_eq!(row["measurement"], "measured");
+    assert_eq!(row["agreement"], json!(1.0 / 3.0));
+    assert_eq!(row["genuineSplit"], true);
+}
+
+#[test]
+fn undetermined_units_are_counted_but_never_passed_or_failed() {
+    let root = Fixture::new();
+    root.summary(&unit("unit-run-passed", &[]));
+    let mut failed = unit("unit-run-failed", &[]);
+    failed["outcome"] = json!("blocked");
+    root.summary(&failed);
+    let mut undetermined = unit("unit-run-undetermined", &[Some("a"), Some("a")]);
+    undetermined["outcome"] = json!("undetermined");
+    undetermined["pattern"] = Value::Null;
+    for seat in undetermined["seats"].as_array_mut().unwrap() {
+        seat["kind"] = json!("unknown");
+    }
+    root.summary(&undetermined);
+    let report = root.metrics(&[]);
+    assert_eq!(report["totals"]["unitRuns"], 3);
+    assert_eq!(report["totals"]["unitsPassed"], 1);
+    assert_eq!(report["totals"]["unitsFailed"], 1);
+    assert_eq!(report["totals"]["unitsUndetermined"], 1);
+    assert_eq!(report["totals"]["passRate"], json!(0.5));
+    assert_eq!(report["totals"]["seats"], 2, "its recorded seats still count");
+    let row = report["units"].as_array().unwrap().iter().find(|row| row["unitRunId"] == "unit-run-undetermined").unwrap();
+    assert_eq!(row["outcome"], "undetermined");
+    assert_eq!(row["passRate"], Value::Null);
+    assert_eq!(row["stanceSeats"], 0, "a seat of unknown kind never votes");
+    assert_eq!(row["measurement"], "unmeasured");
 }

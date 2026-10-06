@@ -1,6 +1,6 @@
 # Observe discussion measurement — execution evidence
 
-Owner go: “làm hết tất cả phase đi” superseded the foundation-only gate on 2026-10-05; the owner confirmed this in the 2026-10-06 repair conversation. Phases 4–6 add measurement, not a dissent gate, retry policy or decision ledger. Foundation evidence remains in [layout inventory](observe-run-layout-261005.md) and [rebaseline](observe-rebaseline-261005.md); its historical counts are not replaced by current counts. [Acceptance corrections](observe-acceptance-fixes-261006.md) supersede the isolation and fair-comparison claims below.
+Owner go: “làm hết tất cả phase đi” superseded the foundation-only gate on 2026-10-05; Owner xác nhận ngày 2026-10-06 trong phiên lead; bản ghi hội thoại không nằm trong repo. Phases 4–6 add measurement, not a dissent gate, retry policy or decision ledger. Foundation evidence remains in [layout inventory](observe-run-layout-261005.md) and [rebaseline](observe-rebaseline-261005.md); its historical counts are not replaced by current counts. [Acceptance corrections](observe-acceptance-fixes-261006.md) supersede the isolation and fair-comparison claims below. The 2026-10-06 replacement comparison recorded there is separated by read audit only, not by sandbox isolation, and its source packet contains the post-2026-10-04 decision; see its [second-acceptance update](observe-acceptance-fixes-261006.md#cập-nhật-sau-nghiệm-thu-lần-hai).
 
 ## Ownership and contract
 

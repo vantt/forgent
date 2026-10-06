@@ -113,6 +113,9 @@
       }
     }
   ],
+  "isolated": false,
+  "isolationNote": "Not an isolated judge. The applied claude argv is the default executor profile (-p, --model opus, --permission-mode acceptEdits): no --safe-mode, no --tools '', no MCP/setting-source restriction and no --include-hook-events, so hookEventCount 0 does not show that hooks did not run. Rejected as isolation evidence and not recorded as an eval.",
+  "labelSwappedReplicate": "Data-blind, label-swapped replicate of the accepted judgment: here A = panel synthesis and B = solo (the accepted judge had A = solo). Totals from the retained transcript: solo 7/10, panel 6/10, the same direction as the accepted judgment (solo 7, panel 5). Directional only; not an isolated replicate.",
   "toolEventCount": 0,
   "hookEventCount": 0,
   "status": 0,
@@ -276,8 +279,9 @@
     }
   },
   "limits": [
+    "Not isolated: default executor argv; tools, MCP, settings and hooks may have been available.",
     "Builtin plugins and admin-managed policy may remain; no complete hidden-instruction snapshot is asserted.",
-    "Citation correctness cannot be independently verified by a tool-disabled judge.",
+    "Citation correctness was not independently verified.",
     "One question and one judge provide directional evidence only."
   ],
   "dispatchDecision": {

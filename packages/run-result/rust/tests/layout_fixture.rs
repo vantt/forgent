@@ -171,7 +171,7 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
         fgos_observe::metrics_cli::dispatch(&req, &sources, None, scan_coverage, scan_unit_summaries).unwrap();
     assert_eq!(coverage["layoutRule"], expected["layoutRule"]);
     assert_eq!(coverage["observed"], scan.runs.len());
-    assert_eq!(coverage["recentRuns"], 13);
+    assert_eq!(coverage["recentRuns"], 17);
     req.sub = "runs".to_string();
     let runs = fgos_observe::metrics_cli::dispatch(&req, &sources, None, scan_coverage, scan_unit_summaries).unwrap();
     assert_eq!(runs["total"], coverage["observed"]);
@@ -212,17 +212,21 @@ fn shared_layout_fixture_and_consumers_have_identical_run_sets() {
     let windowed_coverage = fgos_observe::metrics_cli::dispatch(
         &req, &sources, None, scan_coverage, scan_unit_summaries,
     ).unwrap();
-    assert_eq!(windowed_coverage["observed"], 7);
-    assert_eq!(windowed_coverage["runDirsSeen"], 15);
+    assert_eq!(windowed_coverage["observed"], expected["observedRunIds"].as_array().unwrap().len());
+    assert_eq!(windowed_coverage["runDirsSeen"], expected["runDirsSeen"]);
     assert_eq!(windowed_coverage["skipped"], expected["skipped"]);
-    let window = Window {
-        since: Some("2026-10-06".to_string()),
-        until: None,
-    };
-    assert!(sources[0]
-        .observations(&root.0, &window)
-        .unwrap()
-        .is_empty());
+    // Invalid settlement times are not admitted, so they join no window,
+    // including one a lexical comparison would otherwise let them into.
+    for since in ["2026-10-06", "2099-01-01"] {
+        let window = Window {
+            since: Some(since.to_string()),
+            until: None,
+        };
+        assert!(sources[0]
+            .observations(&root.0, &window)
+            .unwrap()
+            .is_empty());
+    }
 }
 
 #[test]
@@ -334,12 +338,14 @@ fn absent_assignments_are_an_empty_source() {
 }
 
 #[test]
-fn recent_runs_use_result_mtime_and_include_clock_skew() {
+fn recent_runs_use_result_mtime_and_bound_clock_skew() {
     let root = FixtureRoot::new();
     let now = std::time::SystemTime::now();
     for (id, mtime) in [
         ("old", now - std::time::Duration::from_secs(120)),
-        ("future", now + std::time::Duration::from_secs(120)),
+        ("skewed", now + std::time::Duration::from_secs(30)),
+        ("far-future", now + std::time::Duration::from_secs(120)),
+        ("year-ahead", now + std::time::Duration::from_secs(365 * 86_400)),
     ] {
         let path = root.result(
             id,
@@ -356,7 +362,8 @@ fn recent_runs_use_result_mtime_and_include_clock_skew() {
             .unwrap();
     }
     let scan = scan_runs(&root.0).unwrap();
-    assert_eq!(scan.runs.len(), 2);
+    assert_eq!(scan.runs.len(), 4);
+    // Only small clock skew counts as recent; a far-future mtime never does.
     assert_eq!(scan.recent_runs, 1);
     assert_accounting(&root.0);
 }
@@ -465,17 +472,18 @@ fn absent_and_malformed_results_have_distinct_accounting() {
     let malformed = root.result("malformed", "01", &json!({}));
     fs::write(malformed, "NOT JSON").unwrap();
     fs::create_dir_all(root.assignments().join("nonregular/runs/01/result.json")).unwrap();
-    root.result("verbatim", "01", &json!({"runId": " id ", "settledAt": " non-date "}));
+    root.result("verbatim", "01", &json!({"runId": " id ", "settledAt": "2026-10-05T10:00:00Z"}));
+    root.result("non-date", "01", &json!({"runId": "non-date", "settledAt": " non-date "}));
     root.result("blank-id", "01", &json!({"runId": " ", "settledAt": "non-date"}));
     let scan = scan_runs(&root.0).unwrap();
-    assert_eq!(scan.run_dirs_seen, 5);
+    assert_eq!(scan.run_dirs_seen, 6);
     assert_eq!(scan.runs.len(), 1);
     assert_eq!(scan.runs[0].subject.id, " id ");
-    assert_eq!(scan.runs[0].ts, " non-date ");
     assert_eq!(scan.skipped["missing-result"], 1);
     assert_eq!(scan.skipped["unparseable"], 2);
     assert_eq!(scan.skipped["no-run-id"], 1);
-    assert_eq!(scan.recent_runs, 3);
+    assert_eq!(scan.skipped["invalid-timestamp"], 1);
+    assert_eq!(scan.recent_runs, 4);
     assert_accounting(&root.0);
 }
 

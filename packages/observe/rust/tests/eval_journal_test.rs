@@ -384,6 +384,30 @@ fn invalid_existing_data_blocks_identity_check_without_mutating_the_store() {
 }
 
 #[test]
+fn torn_tail_refusal_names_the_shard_and_line_and_leaves_bytes_untouched() {
+    let root = TempRoot::new("torn-tail");
+    eval_journal::record(&root.0, input("seed", "panel", "q")).unwrap();
+    let dir = root.0.join(".fgos/observe/evals");
+    let shard = fs::read_dir(&dir).unwrap().next().unwrap().unwrap().path();
+    // A short write (full disk, killed writer) leaves a partial final line.
+    fs::OpenOptions::new().append(true).open(&shard).unwrap().write_all(b"{\"v\":1,\"kind\":\"ev").unwrap();
+    let before = fs::read(&shard).unwrap();
+    let relative = shard.strip_prefix(&root.0).unwrap().to_string_lossy().into_owned();
+    for attempt in ["next-1", "next-2"] {
+        let error = eval_journal::record(&root.0, input(attempt, "panel", "q")).unwrap_err();
+        assert!(error.contains("cannot establish evalId uniqueness"), "{error}");
+        assert!(error.contains(&format!("{relative}:2 (")), "error must name shard and line: {error}");
+        assert!(error.contains("metrics eval list"), "error must point at the repair view: {error}");
+        assert_eq!(fs::read(&shard).unwrap(), before, "refusal must not repair or append");
+    }
+    let mut many = String::new();
+    for _ in 0..7 { many.push_str("{broken}\n"); }
+    fs::write(dir.join("many.jsonl"), many).unwrap();
+    let error = eval_journal::record(&root.0, input("next-3", "panel", "q")).unwrap_err();
+    assert!(error.contains("and 3 more"), "long invalid lists stay bounded: {error}");
+}
+
+#[test]
 fn concurrent_processes_share_one_shard_without_torn_or_lost_records() {
     let root = TempRoot::new("same-shard");
     let exe = std::env::current_exe().unwrap();

@@ -3,6 +3,7 @@
 pub mod unit_summary;
 pub use unit_summary::{scan_unit_summaries, UnitSummarySource};
 
+use fgos_observe::time::parse_timestamp_millis;
 use fgos_observe::{Observation, ObservationSource, SourceError, Subject, SubjectKind, Window};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -469,6 +470,20 @@ fn read_assignment(dir: &Path) -> Value {
     }
 }
 
+/// Result files written within the last minute may still be settling.
+const RECENT_RUN_WINDOW: Duration = Duration::from_secs(60);
+/// Local writers share this host's clock, so a future mtime is only legitimate
+/// within a small skew (e.g. a networked filesystem). Beyond it the mtime is
+/// untrustworthy and must not permanently widen the doctor's tolerance.
+const MAX_FUTURE_MTIME_SKEW: Duration = Duration::from_secs(60);
+
+fn is_recent(mtime: SystemTime, now: SystemTime) -> bool {
+    match now.duration_since(mtime) {
+        Ok(age) => age <= RECENT_RUN_WINDOW,
+        Err(ahead) => ahead.duration() <= MAX_FUTURE_MTIME_SKEW,
+    }
+}
+
 fn nonempty_string(value: Option<&Value>) -> Option<&str> {
     value
         .and_then(Value::as_str)
@@ -525,9 +540,7 @@ fn scan_assignment_runs(
             scan.skip("unparseable");
             continue;
         }
-        if metadata.modified().ok().is_some_and(|mtime| {
-            now.duration_since(mtime).unwrap_or_default() <= Duration::from_secs(60)
-        }) {
+        if metadata.modified().ok().is_some_and(|mtime| is_recent(mtime, now)) {
             scan.recent_runs += 1;
         }
         let record: Value = match File::open(&result_path)
@@ -576,6 +589,12 @@ fn scan_assignment_runs(
                 continue;
             }
         };
+        // Windows compare settlement time; a value that is not an RFC3339
+        // instant cannot be placed in any window, so it is not admitted.
+        if parse_timestamp_millis(timestamp).is_none() {
+            scan.skip("invalid-timestamp");
+            continue;
+        }
         // Lexical directory order picks the first valid occurrence, independently
         // of a consumer's window and of filesystem enumeration order.
         if seen_ids.contains(run_id) {

@@ -46,6 +46,7 @@ D2 remains optional and tolerant. Canonical measured-role construction adds stan
 
 - [x] Live panel `unit-run-1791219961331-276f364c`: three valid `no-gate` votes, hand/native agreement 3/3 = 1, genuineSplit false.
 - [x] Without options reads `unmeasured`; malformed stance is counted `invalid` and the seat still passes (real CLI-prompt/settlement regression).
+  - Ghi chú 2026-10-06 (nghiệm thu lần hai): phần "real CLI-prompt regression" **đang khôi phục**. Commit `b2c7b4588` đã xoá các assertion prompt/linkage của test này ([evals and honesty re-acceptance](../reports/opus-reacceptance-evals-and-honesty-261006.md), HIGH-1); một agent khác đang khôi phục. Dòng này chưa được khẳng định lại cho tới khi test được khôi phục và chạy xanh.
 - [x] Existing no-stance workflow behavior remains covered and passes the integrated workflow suite.
 
 Evidence: [historical measurement](../reports/observe-discussion-measurement-261005.md) and [acceptance repairs](../reports/observe-acceptance-fixes-261006.md), commit `b2c7b4588`. Actual owner-to-native researcher-name and zero-valid-vote scenarios, immutable-resume CLI refusal and no-stance workflow regressions are exercised. Initial blocked panel remains partial evidence.

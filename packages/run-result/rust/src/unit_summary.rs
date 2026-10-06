@@ -8,6 +8,8 @@ use std::io::Read;
 use std::path::Path;
 
 pub const MAX_UNIT_SUMMARY_BYTES: u64 = 1024 * 1024;
+/// The only summary contract version this reader accepts; the Node writer owns the bump.
+pub const UNIT_SUMMARY_VERSION: u64 = 2;
 
 #[derive(Default)]
 pub struct UnitSummarySource;
@@ -61,7 +63,7 @@ fn stance(value: &Value) -> bool {
 
 fn valid_summary(value: &Value, directory_name: &str) -> bool {
     value["contract"]["id"] == "unit-summary"
-        && value["contract"]["version"] == 1
+        && value["contract"]["version"] == UNIT_SUMMARY_VERSION
         && value["unitRunId"] == directory_name
         && nullable_string(value.get("startedAt"))
         && nullable_string(value.get("pattern"))
@@ -148,6 +150,11 @@ pub fn scan_unit_summaries(root: &Path, window: &Window) -> Result<UnitSummarySc
             let ts = value["settledAt"].as_str().filter(|ts| !ts.trim().is_empty())
                 .ok_or("missing-timestamp")?;
             let timestamp = parse_timestamp_millis(ts).ok_or("invalid-timestamp")?;
+            // An older or newer writer is not corruption: name it so a regeneration can be told apart.
+            if value["contract"]["id"] == "unit-summary"
+                && value["contract"]["version"].as_u64().is_some_and(|version| version != UNIT_SUMMARY_VERSION) {
+                return Err("unsupported-version");
+            }
             if !valid_summary(&value, name) {
                 return Err("invalid-contract");
             }

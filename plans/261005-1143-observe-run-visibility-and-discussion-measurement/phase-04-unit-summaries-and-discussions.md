@@ -9,7 +9,8 @@ dependencies: [2]
 
 # Phase 4: Unit summaries and `metrics discussions`
 
-Execution gate: the owner confirmed all-phase authorization on 2026-10-06.
+Execution gate: Owner xác nhận ngày 2026-10-06 trong phiên lead rằng yêu cầu
+all-phase ngày 2026-10-05 là của owner; bản ghi hội thoại không nằm trong repo.
 Writer/reader lifecycle repairs are committed as `b2c7b4588`; current evidence,
 including clean-cutover backfill and missing/unusable diagnostics, is linked below.
 

@@ -7,6 +7,7 @@ import { assignmentDir, findRunDir, RunLookupError, listAssignmentRuns, scanAssi
 import { allRuns, inspectDispatchRuntime, withRunsCache } from '../../src/runner/dispatch/runtime-inspection.mjs';
 import { showRunUseCase, readRunSnapshot, DispatchObserveError } from '../../src/verbs/dispatch/show-run.mjs';
 import { watchRunUseCase } from '../../src/verbs/dispatch/watch.mjs';
+import { findRunningRuns } from '../../src/runner/dispatch/visibility-session.mjs';
 import { recoverObserveUseCase, recoverApplyUseCase, RecoveryError } from '../../src/verbs/dispatch/recover.mjs';
 
 const fixture = JSON.parse(fs.readFileSync(new URL('../fixtures/run-layout/expected.json', import.meta.url), 'utf8'));
@@ -61,7 +62,7 @@ test('shared layout fixture yields every safe directory candidate, never worker 
   assert.equal(allRuns(root).length, fixture.entries.length, 'inspection retains malformed/unsettled candidates');
 });
 
-test('nested runs without assignment metadata are discoverable by inspection, show-run and watch', async (t) => {
+test('nested runs without assignment metadata are discoverable by inspection, show-run, watch and the running-run reconciler', async (t) => {
   const { root, fgosDir, base } = temp(t);
   const id = 'unit-run-example/panelist-1/1-fb1';
   const runDir = path.join(base, id, 'runs', '02');
@@ -72,9 +73,12 @@ test('nested runs without assignment metadata are discoverable by inspection, sh
   assert.deepEqual(inspectDispatchRuntime(root, { run: runId }).links.assignmentIds, [id]);
   const active = inspectDispatchRuntime(root, { cwd: root }).observations[0].value.activeRunIds;
   assert.ok(active.includes(runId), 'nested orphan participates in the existing cwd guard');
+  const running = findRunningRuns(fgosDir, { now: () => Date.parse('2026-10-06T12:00:00Z') });
+  assert.deepEqual(running.map((run) => ({ runDir: run.runDir, runId: run.runId, assignmentId: run.assignmentId })), [{ runDir, runId, assignmentId: id }]);
   writeJson(path.join(runDir, 'result.json'), { runId, assignmentId: id, status: 'done', confidence: 'reported', timestamp: fixture.timestamp });
   const shown = showRunUseCase({ repoRoot: root }, { runId });
   assert.equal(shown.settled, true);
+  assert.equal(inspectDispatchRuntime(root, { run: runId }).runObservation.evidenceCompleteness.result, 'complete');
   assert.equal(shown.result.runId, runId);
   const ticks = [];
   const watched = await watchRunUseCase({ repoRoot: root }, { runId, maxTicks: 1, onTick: (tick) => ticks.push(tick) });
@@ -193,15 +197,28 @@ test('lookup keeps metadata identity authoritative over a different result ident
   assert.equal(findRunDir(fgosDir, 'result-id'), null);
 });
 
-test('eligibility uses actual settlement precedence without parsing nonblank timestamps', (t) => {
+test('eligibility uses actual settlement precedence and admits only valid RFC3339 instants', (t) => {
   const { fgosDir, base } = temp(t);
+  const [resultSettled, resultTime, ownerSettled] = ['2026-10-05T13:00:00Z', '2026-10-05T12:00:00.250+07:00', '2026-10-05T11:00:00Z'];
   const cases = [
-    ['settled', { settledAt: 'result-settled', timestamp: 'result-time' }, { settledAt: 'owner-settled' }, 'result-settled'],
-    ['timestamp', { settledAt: ' ', timestamp: 'result-time' }, { settledAt: 'owner-settled' }, 'result-time'],
-    ['owner', { settledAt: null, timestamp: null }, { settledAt: 'owner-settled' }, 'owner-settled'],
+    ['settled', { settledAt: resultSettled, timestamp: resultTime }, { settledAt: ownerSettled }, resultSettled],
+    ['timestamp', { settledAt: ' ', timestamp: resultTime }, { settledAt: ownerSettled }, resultTime],
+    ['owner', { settledAt: null, timestamp: null }, { settledAt: ownerSettled }, ownerSettled],
     ['started', {}, { startedAt: fixture.timestamp }, null],
     ['created', {}, {}, null],
-    ['preserved', { timestamp: ' non-date ', runId: ' padded ' }, {}, ' non-date '],
+    ['preserved', { timestamp: fixture.timestamp, runId: ' padded ' }, {}, fixture.timestamp],
+    // The first nonblank time is the declared one; an invalid value is not
+    // replaced by a later field, and it joins no time window.
+    ['garbage', { settledAt: 'garbage', timestamp: resultTime }, { settledAt: ownerSettled }, null],
+    ['padded-time', { timestamp: ' 2026-10-05T10:00:00Z ' }, {}, null],
+    ['owner-garbage', {}, { settledAt: 'yesterday' }, null],
+    ['leap-day', { timestamp: '2028-02-29T23:59:59Z' }, {}, '2028-02-29T23:59:59Z'],
+    ['not-leap', { timestamp: '2026-02-29T00:00:00Z' }, {}, null],
+    ['hour-24', { timestamp: '2026-10-05T24:00:00Z' }, {}, null],
+    ['bad-offset', { timestamp: '2026-10-05T10:00:00+24:00' }, {}, null],
+    ['no-zone', { timestamp: '2026-10-05T10:00:00' }, {}, null],
+    ['empty-fraction', { timestamp: '2026-10-05T10:00:00.Z' }, {}, null],
+    ['lower-case', { timestamp: '2026-10-05t10:00:00z' }, {}, '2026-10-05t10:00:00z'],
   ];
   for (const [id, result, run] of cases) {
     const dir = path.join(base, id, 'runs', '01');
@@ -212,7 +229,7 @@ test('eligibility uses actual settlement precedence without parsing nonblank tim
   const eligible = projectRunEligibility(scanAssignmentLayout(fgosDir));
   assert.deepEqual(eligible.runs.map(({ assignmentId, timestamp }) => [assignmentId, timestamp]), cases.filter(([, , , time]) => time).map(([id, , , time]) => [id, time]).sort());
   assert.equal(eligible.runs.find((run) => run.assignmentId === 'preserved').runId, ' padded ');
-  assert.deepEqual(eligible.skipped, { 'no-timestamp': 2 });
+  assert.deepEqual(eligible.skipped, { 'no-timestamp': 2, 'invalid-timestamp': 8 });
 });
 
 test('eligibility classifies missing, invalid, nonregular and symlink results separately', (t) => {

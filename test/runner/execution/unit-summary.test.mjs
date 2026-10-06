@@ -36,7 +36,7 @@ test('complete summary uses owner workflow/outcome and only exposes measurement 
   result(dir, 'panelist-1', '1', '01');
   result(dir, 'synthesizer', '1', '01', { agentClaim: {} });
   const summary = buildUnitSummary(dir);
-  assert.deepEqual(summary.contract, { id: 'unit-summary', version: 1 });
+  assert.deepEqual(summary.contract, { id: 'unit-summary', version: 2 });
   assert.deepEqual(summary.workflow, workflow);
   assert.equal(summary.startedAt, startedAt);
   assert.equal(summary.settledAt, settledAt);
@@ -296,5 +296,93 @@ test('settled owner evidence backfills without seats and complete solo history b
     assert.equal(report.skippedActive + report.skippedUnsettled, 0);
     assert.equal(report.summaries[0].outcome, ownerEvidence ? 'blocked' : 'pass');
     assert.equal(fs.readFileSync(path.join(dir, 'unit.json'), 'utf8'), before);
+  }
+});
+
+// A unit record written before the owner stored its pattern: the caller's --pattern was never kept.
+const patternless = { unit: { id: 'legacy-question', capability: 'code:implement' } };
+
+test('a finished unit without a recorded pattern is undetermined, never derived as a solo pass', (t) => {
+  const { dir } = fixture(t, patternless);
+  result(dir, 'producer', '1', '01', { settledAt: '2026-10-05T01:00:30Z' });
+  result(dir, 'red-team', '1', '01');
+  result(dir, 'reviewer', '1', '01', { classification: { outcome: { category: 'blocked' } } });
+  const { summary, changed } = writeUnitSummary(dir);
+  assert.equal(changed, true);
+  assert.equal(summary.pattern, null);
+  assert.equal(summary.outcome, 'undetermined');
+  assert.equal(summary.settledAt, settledAt, 'the latest settled seat dates a finished unit');
+  assert.deepEqual(summary.seats.map(({ role, kind }) => ({ role, kind })), [
+    { role: 'producer', kind: 'unknown' }, { role: 'red-team', kind: 'unknown' }, { role: 'reviewer', kind: 'unknown' },
+  ]);
+  assert.equal(summary.seats.find((seat) => seat.role === 'reviewer').final.outcome, 'blocked', 'seat facts stay recorded');
+  assert.deepEqual(JSON.parse(fs.readFileSync(path.join(dir, 'unit-summary.json'), 'utf8')), summary);
+});
+
+test('owner completion still decides a patternless unit, and one that never ran stays unpublished', (t) => {
+  const { dir } = fixture(t, { ...patternless, settlement: { outcome: 'blocked', settledAt } });
+  result(dir, 'producer', '1', '01');
+  const summary = buildUnitSummary(dir);
+  assert.equal(summary.outcome, 'blocked');
+  assert.equal(summary.seats[0].kind, 'unknown');
+  const empty = fixture(t, patternless);
+  const unpublished = writeUnitSummary(empty.dir);
+  assert.equal(unpublished.skipped, 'unsettled');
+  assert.equal(fs.existsSync(path.join(empty.dir, 'unit-summary.json')), false);
+});
+
+test('backfill keeps stored summaries by default and regenerate rewrites stale ones idempotently', (t) => {
+  const { root, dir } = fixture(t, patternless);
+  result(dir, 'producer', '1', '01');
+  result(dir, 'reviewer', '1', '01', { classification: { outcome: { category: 'blocked' } } });
+  const file = path.join(dir, 'unit-summary.json');
+  // What an earlier writer published: an older contract that derived the unit as a solo pass.
+  const stale = `${JSON.stringify({ contract: { id: 'unit-summary', version: 1 }, unitRunId: 'unit-run-synthetic', outcome: 'pass' })}\n`;
+  fs.writeFileSync(file, stale);
+  const kept = backfillUnitSummaries({ repoRoot: root });
+  assert.equal(kept.stale, 1);
+  assert.deepEqual(kept.staleSummaries, [{ unitRunId: 'unit-run-synthetic', derivedOutcome: 'undetermined', reason: 'differs' }]);
+  assert.equal(kept.changed, 0);
+  assert.equal(fs.readFileSync(file, 'utf8'), stale);
+  const dry = backfillUnitSummaries({ repoRoot: root, regenerate: true, dryRun: true });
+  assert.equal(dry.changed, 1);
+  assert.equal(dry.summaries[0].outcome, 'undetermined');
+  assert.equal(fs.readFileSync(file, 'utf8'), stale, 'dry-run writes nothing');
+  assert.equal(backfillUnitSummaries({ repoRoot: root, regenerate: true }).changed, 1);
+  const rewritten = JSON.parse(fs.readFileSync(file, 'utf8'));
+  assert.deepEqual(rewritten.contract, { id: 'unit-summary', version: 2 });
+  assert.equal(rewritten.outcome, 'undetermined');
+  const before = fs.statSync(file).mtimeMs;
+  const again = backfillUnitSummaries({ repoRoot: root, regenerate: true });
+  assert.equal(again.unchanged, 1);
+  assert.equal(again.changed, 0);
+  assert.equal(fs.statSync(file).mtimeMs, before);
+  assert.equal(backfillUnitSummaries({ repoRoot: root }).unchanged, 1, 'a regenerated summary is no longer stale');
+});
+
+test('regenerate removes a stored summary the current writer cannot establish but never touches an active unit', (t) => {
+  const stale = `${JSON.stringify({ contract: { id: 'unit-summary', version: 1 }, unitRunId: 'unit-run-synthetic', outcome: 'unknown', settledAt: null })}\n`;
+  const finished = fixture(t, { pattern: 'panel' });
+  result(finished.dir, 'panelist-1', '1', '01');
+  const finishedFile = path.join(finished.dir, 'unit-summary.json');
+  fs.writeFileSync(finishedFile, stale);
+  assert.deepEqual(backfillUnitSummaries({ repoRoot: finished.root }).staleSummaries,
+    [{ unitRunId: 'unit-run-synthetic', derivedOutcome: null, reason: 'unsettled' }]);
+  const dry = backfillUnitSummaries({ repoRoot: finished.root, regenerate: true, dryRun: true });
+  assert.deepEqual(dry.removedSummaries, ['unit-run-synthetic']);
+  assert.equal(fs.existsSync(finishedFile), true);
+  assert.equal(backfillUnitSummaries({ repoRoot: finished.root, regenerate: true }).removed, 1);
+  assert.equal(fs.existsSync(finishedFile), false);
+  assert.equal(backfillUnitSummaries({ repoRoot: finished.root, regenerate: true }).removed, 0);
+
+  const active = fixture(t, { ...patternless, execution: { status: 'running' } });
+  result(active.dir, 'producer', '1', '01');
+  const activeFile = path.join(active.dir, 'unit-summary.json');
+  fs.writeFileSync(activeFile, stale);
+  for (const regenerate of [false, true]) {
+    const report = backfillUnitSummaries({ repoRoot: active.root, regenerate });
+    assert.equal(report.skippedActive, 1);
+    assert.equal(report.changed + report.removed + report.stale, 0);
+    assert.equal(fs.readFileSync(activeFile, 'utf8'), stale);
   }
 });

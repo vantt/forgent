@@ -9,9 +9,11 @@ dependencies: [3]
 
 # Phase 6: Eval store and rubric
 
-Execution gate: the owner confirmed on 2026-10-06 that the 2026-10-05 request
-authorized every remaining phase. Store/rubric repairs and a new audited independent
-historical-question comparison are complete; original confounded scores remain labeled.
+Execution gate: Owner xác nhận ngày 2026-10-06 trong phiên lead rằng yêu cầu
+"làm hết tất cả phase đi" (2026-10-05) là của owner và ghi đè cổng "chỉ làm nền
+tảng trước"; bản ghi hội thoại không nằm trong repo. Store/rubric repairs and a
+new read-audited (not sandbox-isolated) historical-question comparison are
+complete; original confounded scores remain labeled.
 
 
 ## Overview
@@ -46,12 +48,12 @@ D4. A new store beside friction, cases and snapshots, with the same shard-per-wr
 ## Success Criteria
 
 - [x] Real solo/panel records list by exact harness with all five `discussion-quality.v1` scores.
-- [x] Judge isolation and retained scratch inventory are demonstrated for a new independent comparison using the entire 2026-10-04 objective. Actual selected argv, SDK tools/MCP/skills/slash-empty metadata, zero tool/hook events and unchanged two-file inventory are retained. Original judgments remain data-blind/confounded, not retrospectively validated.
+- [x] Judge isolation is demonstrated for a new comparison using the entire 2026-10-04 objective: actual selected argv, SDK tools/MCP/skills/slash-empty metadata and zero tool/hook events are retained. The scratch inventory (only `A.md`/`B.md` before and after) is asserted only in coordinator-authored JSON, and the scratch was deleted, so it is **UNPROVEN**; outputs reached the judge inline and it had zero tools. The arms are separated by read audit only (no seat read the other arm's output, checked from raw tool calls); they were **not** sandbox-isolated: forgentX stayed readable to every seat except Gemini, including a file with the solo's position summary written before the panel launched and the 2026-10-04 outputs. Both arms received a coordinator-built source packet that contains the decision settled after 2026-10-04, so the evidence condition differs from 2026-10-04. One question and one isolated judge: directional only. Original judgments remain data-blind/confounded, not retrospectively validated.
 - [x] Unchanged installed host rejects `metrics eval` explicitly, exit 4.
 
 Evidence: [`observe-discussion-measurement-261005.md`](../reports/observe-discussion-measurement-261005.md), corrected [judge metadata and actual rationales](../reports/observe-measurement-blind-judge-261005.json), and `.fgos/observe/evals/observe-measurement-261005.jsonl`. Both original texts scored 7/10, but the setup-independence and historical-question confounds invalidate presenting this as a fair setup comparison. [Acceptance repairs](../reports/observe-acceptance-fixes-261006.md) track any new run and unresolved proof; no isolation acceptance is claimed from the old scores.
 
-Store integrity repair `f11504363`: main eval harness23 pass, including six-process same-shard and two-process same-ID behavior; native rejects partial/duplicate/invalid-store writes without inventing scores. Arm64 cargo check is compile-only proof. The earlier readonly Pi lock issue is resolved by existing owning-root account-backed private-home profiles and normal opaque fgOS provisioning, not manual credential extraction. New solo `unit-run-1791270002490-60cc7659` is retained without rerun; contaminated panel `unit-run-1791270002581-a9476c1b` is excluded, and replacement panel `unit-run-1791270868625-812a0306` passes all four roles with identical source-packet bytes. Actual isolated Opus judgment scores solo7/panel5; native append/list proves two new complete records, four total, invalid[]. The [repair ledger](../reports/observe-acceptance-fixes-261006.md#independent-comparison-completion--2026-10-06) links SDK, access, inventory, rationale and record evidence. One question/one successfully isolated judge, unverified citations, unchanged overlength outputs and different CLI transport limit the inference; no general setup ranking is claimed.
+Store integrity repair `f11504363`: main eval harness23 pass, including six-process same-shard and two-process same-ID behavior; native rejects partial/duplicate/invalid-store writes without inventing scores. Arm64 cargo check is compile-only proof. The earlier readonly Pi lock issue is resolved by existing owning-root account-backed private-home profiles and normal opaque fgOS provisioning, not manual credential extraction. New solo `unit-run-1791270002490-60cc7659` is retained without rerun; contaminated panel `unit-run-1791270002581-a9476c1b` is excluded, and replacement panel `unit-run-1791270868625-812a0306` passes all four roles with identical source-packet bytes. Actual isolated Opus judgment scores solo7/panel5; native append/list proves two new complete records, four total, invalid[]. Two rejected judges ran with the default (non-isolated) argv and swapped labels (A = panel); their retained transcripts still score solo 7 vs panel 6 and solo 7 vs panel 5, the same direction, as data-blind replicates only. The [repair ledger](../reports/observe-acceptance-fixes-261006.md#independent-comparison-completion--2026-10-06) links SDK, access, inventory, rationale and record evidence. One question/one successfully isolated judge, unverified citations, unchanged overlength outputs and different CLI transport limit the inference; no general setup ranking is claimed.
 
 ## Risk Assessment
 

@@ -1,15 +1,15 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "unit-summary.read.v1",
-  "title": "Execution-owned Unit Summary Read Contract v1",
-  "description": "Read only direct .fgos/assignments/unit-run-*/unit-summary.json files, at most 1 MiB each. Never recurse into unit directories or read results, workflow events, transcripts, protected data or outboxes. Skip symlink state roots and unit directories. Each real direct unit directory contributes once to summaryDirsSeen: an in-window observation, summariesMissing, summariesUnusable, or summariesOutsideWindow. Structural diagnostics are root-wide, not window-filtered: missing summaries can belong to active units and undated/unusable summaries cannot be assigned to a time window. summariesSkippedByReason partitions only summariesUnusable (unreadable, oversized, symlink, nonregular, invalid-json, invalid-contract, missing-timestamp, invalid-timestamp). Outside-window counts include only otherwise valid summaries with valid owner-owned RFC3339 settledAt. unitRunId must equal the directory name. Compare timestamp windows temporally in UTC milliseconds with inclusive bounds, never lexicographically; bounds accept RFC3339 or YYYY-MM-DD (UTC midnight), and invalid/reversed bounds are named errors. Emit source unit-summary, kind unit.settled, subject kind run with id unit-run:<unitRunId>. This distinct kind does not increase run.settled totals. Outcome, seat kind and final selection are owned by the Node writer using unit-run-history; Rust never derives or selects attempts.",
+  "$id": "unit-summary.read.v2",
+  "title": "Execution-owned Unit Summary Read Contract v2",
+  "description": "Read only direct .fgos/assignments/unit-run-*/unit-summary.json files, at most 1 MiB each. Never recurse into unit directories or read results, workflow events, transcripts, protected data or outboxes. Skip symlink state roots and unit directories. Each real direct unit directory contributes once to summaryDirsSeen: an in-window observation, summariesMissing, summariesUnusable, or summariesOutsideWindow. Structural diagnostics are root-wide, not window-filtered: missing summaries can belong to active units and undated/unusable summaries cannot be assigned to a time window. summariesSkippedByReason partitions only summariesUnusable (unreadable, oversized, symlink, nonregular, invalid-json, unsupported-version, invalid-contract, missing-timestamp, invalid-timestamp). unsupported-version is a dated unit-summary of any other contract version (v1 lacked owner seat kinds and derived pattern-less records as solo); scripts/backfill-unit-summaries.mjs --regenerate rewrites such summaries from the unit records. summariesMissing counts units with no summary whether they are still running or were abandoned: the reader has no owner liveness signal and never reads unit.json to guess. Outside-window counts include only otherwise valid summaries with valid owner-owned RFC3339 settledAt. unitRunId must equal the directory name. Compare timestamp windows temporally in UTC milliseconds with inclusive bounds, never lexicographically; bounds accept RFC3339 or YYYY-MM-DD (UTC midnight), and invalid/reversed bounds are named errors. Emit source unit-summary, kind unit.settled, subject kind run with id unit-run:<unitRunId>. This distinct kind does not increase run.settled totals. Outcome, seat kind and final selection are owned by the Node writer using unit-run-history; Rust never derives or selects attempts.",
   "type": "object",
   "required": ["contract", "unitRunId", "workflow", "pattern", "capability", "outcome", "startedAt", "settledAt", "seats", "inline", "stanceOptions"],
   "properties": {
     "contract": {
       "type": "object",
       "required": ["id", "version"],
-      "properties": {"id": {"const": "unit-summary"}, "version": {"const": 1}}
+      "properties": {"id": {"const": "unit-summary"}, "version": {"const": 2}}
     },
     "unitRunId": {"type": "string", "pattern": "^unit-run-.+"},
     "workflow": {
@@ -26,9 +26,9 @@
         }
       ]
     },
-    "pattern": {"$ref": "#/definitions/nullableString"},
+    "pattern": {"$ref": "#/definitions/nullableString", "description": "The pattern the owner recorded; null for a legacy unit record that never stored one."},
     "capability": {"$ref": "#/definitions/nullableString"},
-    "outcome": {"type": "string", "minLength": 1, "description": "Opaque execution-owned unit outcome. pass counts as a passing unit; other values remain visible."},
+    "outcome": {"type": "string", "minLength": 1, "description": "Execution-owned unit outcome. pass counts as a passing unit. undetermined marks a finished unit whose outcome its records cannot establish (a legacy record without a recorded pattern and no owner completion): it counts in unitRuns and unitsUndetermined, never as passed or failed, and stays out of the passRate denominator. Other values are failures and remain visible."},
     "startedAt": {"$ref": "#/definitions/nullableString", "description": "Unit creation time, used only for duration; never a substitute for settlement."},
     "settledAt": {"type": "string", "minLength": 1, "description": "Required owner settlement time; historical null timestamps are skipped, never creation-derived."},
     "inline": {"type": "boolean"},
@@ -40,7 +40,7 @@
         "required": ["role", "kind", "round", "final", "attempts"],
         "properties": {
           "role": {"type": "string", "minLength": 1},
-          "kind": {"type": "string", "pattern": "\\S", "description": "Execution-owned semantic seat kind, independent of its role label. Exactly panelist votes; synthesizer and every other kind do not vote. Missing or invalid kinds make the summary unusable."},
+          "kind": {"type": "string", "pattern": "\\S", "description": "Execution-owned semantic seat kind, independent of its role label: panelist, synthesizer, producer, checker, verifier, or unknown when the record does not say which pattern ran. Exactly panelist votes; synthesizer, unknown and every other kind do not vote. Missing or invalid kinds make the summary unusable."},
           "round": {"type": "integer", "minimum": 1},
           "final": {"allOf": [{"$ref": "#/definitions/attempt"}, {"type": "object", "required": ["stance"], "properties": {"stance": {"$ref": "#/definitions/stance"}}}]},
           "attempts": {"type": "array", "items": {"$ref": "#/definitions/attempt"}}
@@ -80,7 +80,7 @@
       ]
     },
     "stance": {
-      "description": "Tolerant writer extraction from the settled result agentClaim. No report or transcript scanning. Confidence is unweighted. Exactly seats with kind panelist vote, regardless of role label. With declared options and at least one valid vote, largest valid choice group divided by all final voting seats gives agreement; genuineSplit is largest*3 < seats*2. Missing/invalid remain explicit and in the denominator. No options, no voting seats or no valid votes is unmeasured with null agreement and genuineSplit.",
+      "description": "Tolerant writer extraction from the settled result agentClaim. No report or transcript scanning. Confidence is unweighted. Exactly seats with kind panelist vote, regardless of role label. With declared options and at least two valid votes, largest valid choice group divided by all final voting seats gives agreement; genuineSplit is largest*3 < seats*2. Missing/invalid remain explicit and in the denominator. No options, no voting seats or fewer than two valid votes is unmeasured with null agreement and genuineSplit; the stance counters are still reported.",
       "oneOf": [
         {"type": "object", "required": ["status"], "properties": {"status": {"const": "missing"}}},
         {"type": "object", "required": ["status", "reason"], "properties": {"status": {"const": "invalid"}, "reason": {"type": "string", "minLength": 1}}},
