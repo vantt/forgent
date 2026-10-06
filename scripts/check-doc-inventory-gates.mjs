@@ -229,6 +229,12 @@ export function buildTargetAnchorLookup(repoRoot, commitSha) {
   };
 }
 
+function defaultSwitchboardOwners(inventory) {
+  return new Set((inventory.items || [])
+    .filter((item) => ['rootDocument', 'scopedRoute', 'corpusRoot'].includes(item.switchboardSource) && typeof item.path === 'string' && item.path.startsWith('docs/platform/'))
+    .map((item) => item.path));
+}
+
 export function validateAgainstVocabulary(inventory, vocabulary, validTargetOwners = null, { targetAnchorsOf = null } = {}) {
   const findings = [];
   const dispositionsById = new Map((vocabulary?.sourceDispositions || []).map((d) => [d.id, d]));
@@ -236,9 +242,7 @@ export function validateAgainstVocabulary(inventory, vocabulary, validTargetOwne
   claimKinds.add('unclassified');
   const RECOGNIZED_FILE_CLASSES = new Set(['maintained-authority', 'retained-source', 'generated', 'history-evidence']);
   const RETAINED_CLAIM_DISPOSITIONS = new Set(['promote', 'move', 'merge', 'split', 'extract', 'redirect', 'supersede', 'delete-as-duplicate', 'defer-with-owner']);
-  const switchboardBackedTargetOwners = validTargetOwners || new Set((inventory.items || [])
-    .filter((item) => ['rootDocument', 'scopedRoute', 'corpusRoot'].includes(item.switchboardSource) && typeof item.path === 'string' && item.path.startsWith('docs/platform/'))
-    .map((item) => item.path));
+  const switchboardBackedTargetOwners = validTargetOwners || defaultSwitchboardOwners(inventory);
   const claimsBySourcePath = new Map();
   for (const claim of inventory.claimLedger || []) {
     const sourcePath = claim.sourcePath;
@@ -468,6 +472,102 @@ export function validateRetiredDispositions(registry, vocabulary) {
     .map((row) => ({ claimId: row.claimId, sourcePath: row.sourcePath, sourceAnchor: row.sourceAnchor }));
 }
 
+// ---- Reviewed decision shards ---------------------------------------------
+// A shard is merged onto the inventory in memory; the inventory is never rewritten.
+
+const DECISION_REVIEW_STATUSES = new Set(['blocking', 'pending', 'reviewed']);
+const nonEmpty = (v) => typeof v === 'string' && v.trim() !== '';
+
+export function loadDecisionShards(target) {
+  let files;
+  try {
+    files = fs.statSync(target).isDirectory()
+      ? fs.readdirSync(target).filter((name) => name.endsWith('.json')).sort().map((name) => path.join(target, name))
+      : [target];
+  } catch (err) { throw new Error(`decisions path unreadable: ${target} (${err.message})`); }
+  return files.map((file) => {
+    let shard;
+    try { shard = JSON.parse(fs.readFileSync(file, 'utf8')); }
+    catch (err) { throw new Error(`decision shard ${file} is unreadable or not valid JSON (${err.message})`); }
+    if (!shard || typeof shard !== 'object' || Array.isArray(shard)) throw new Error(`decision shard ${file} must be a JSON object`);
+    if (shard.version !== 1) throw new Error(`decision shard ${file}: unsupported version ${JSON.stringify(shard.version)} (expected 1)`);
+    for (const field of ['version', 'shard', 'sources', 'claims']) {
+      if (!(field in shard)) throw new Error(`decision shard ${file}: missing required field "${field}"`);
+    }
+    return shard;
+  });
+}
+
+/** Owners decided by the shards that are promoted or candidate platform documents of the inventory. */
+export function decidedPlatformOwners(inventory, shards) {
+  const platform = new Set((inventory.items || []).filter((i) => ['promoted', 'candidate'].includes(i.authorityStatus) && typeof i.path === 'string' && i.path.startsWith('docs/platform/')).map((i) => i.path));
+  return new Set((shards || []).flatMap((shard) => shard.claims || []).map((d) => d?.targetOwner).filter((owner) => platform.has(owner)));
+}
+
+export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf = null } = {}) {
+  const findings = [];
+  const dispositions = new Map((vocabulary?.sourceDispositions || []).map((d) => [d.id, d]));
+  const claimKinds = new Set((vocabulary?.claimKinds || []).map((k) => k.id));
+  const itemPaths = new Set((inventory.items || []).map((i) => i.path));
+  const claimIndex = new Map((inventory.claimLedger || []).map((c, idx) => [c.claimId, idx]));
+  const claimLedger = [...(inventory.claimLedger || [])];
+  const items = [...(inventory.items || [])];
+  const decided = new Set();
+  const fail = (type, message, extra = {}) => findings.push({ type, message, ...extra });
+
+  for (const shard of shards || []) {
+    const sources = new Set(shard.sources || []);
+    for (const d of shard.claims || []) {
+      const id = d?.claimId;
+      const idx = claimIndex.get(id);
+      if (idx === undefined) { fail('decision-claim-unknown', `shard ${shard.shard}: claim ${id} is not in the claim ledger`); continue; }
+      if (decided.has(id)) { fail('decision-claim-duplicate', `claim ${id} is decided more than once (again in shard ${shard.shard})`); continue; }
+      decided.add(id);
+      const row = claimLedger[idx];
+      const at = { path: row.sourcePath };
+      if (!sources.has(row.sourcePath)) fail('decision-claim-outside-sources', `shard ${shard.shard}: claim ${id} belongs to ${row.sourcePath}, which is not one of the shard's sources`, at);
+      if (typeof d.sourceUnitDigest !== 'string' || d.sourceUnitDigest.length < 16 || !String(row.sourceUnitDigest || '').startsWith(d.sourceUnitDigest)) fail('decision-digest-stale', `claim ${id}: sourceUnitDigest does not match the current source text (needs at least 16 hex characters of the row's digest)`, at);
+      const disposition = dispositions.get(d.disposition);
+      if (!disposition) fail('decision-disposition-invalid', `claim ${id}: disposition "${d.disposition}" is not in the vocabulary`, at);
+      if (!claimKinds.has(d.claimKind)) fail('decision-claim-kind-invalid', `claim ${id}: claimKind "${d.claimKind}" is not in the vocabulary`, at);
+      if (!DECISION_REVIEW_STATUSES.has(d.reviewStatus)) fail('decision-review-status-invalid', `claim ${id}: reviewStatus "${d.reviewStatus}" is not one of blocking, pending, reviewed`, at);
+      const hasOwner = nonEmpty(d.targetOwner);
+      if (disposition?.requiresTargetOwner && !hasOwner) fail('decision-target-owner-missing', `claim ${id}: disposition "${d.disposition}" requires a targetOwner`, at);
+      if (hasOwner) {
+        if (!itemPaths.has(d.targetOwner)) fail('decision-target-owner-missing', `claim ${id}: targetOwner ${d.targetOwner} is not a document of the inventory`, at);
+        if (!nonEmpty(d.targetAnchor)) fail('decision-target-anchor-missing', `claim ${id}: targetOwner ${d.targetOwner} needs a targetAnchor`, at);
+        else if (typeof targetAnchorsOf === 'function' && itemPaths.has(d.targetOwner)) {
+          const anchors = targetAnchorsOf(d.targetOwner);
+          if (anchors === null || anchors === undefined) fail('decision-target-anchor-missing', `claim ${id}: targetOwner ${d.targetOwner} is unreadable at the inventory commit, so targetAnchor ${d.targetAnchor} cannot be verified`, at);
+          else if (!anchors.has(d.targetAnchor)) fail('decision-target-anchor-missing', `claim ${id}: targetAnchor ${d.targetAnchor} is not a heading or block anchor of ${d.targetOwner}`, at);
+        }
+      }
+      if (d.reviewStatus === 'reviewed' && !(nonEmpty(d.reviewedBy) && nonEmpty(d.reviewedAt) && nonEmpty(d.rationale))) fail('decision-reviewed-incomplete', `claim ${id}: reviewStatus reviewed needs reviewedBy, reviewedAt and rationale`, at);
+      if (d.disposition === 'unknown-blocking' && d.reviewStatus !== 'blocking') fail('decision-blocking-status-mismatch', `claim ${id}: disposition unknown-blocking needs reviewStatus blocking, found "${d.reviewStatus}"`, at);
+      if ((d.disposition === 'unknown-blocking' || String(d.disposition).startsWith('delete-')) && !(Array.isArray(d.searched) && d.searched.length > 0)) fail('decision-searched-missing', `claim ${id}: disposition "${d.disposition}" needs a non-empty searched list`, at);
+      if (!nonEmpty(d.rationale)) fail('decision-rationale-missing', `claim ${id}: rationale is empty`, at);
+
+      const merged = { ...row, targetOwner: d.targetOwner ?? null, targetAnchor: d.targetAnchor ?? null, claimKind: d.claimKind, disposition: d.disposition, reviewStatus: d.reviewStatus, rationale: d.rationale };
+      for (const field of ['reviewedBy', 'reviewedAt', 'searched']) if (d[field] !== undefined) merged[field] = d[field];
+      claimLedger[idx] = merged;
+    }
+    for (const f of shard.files || []) {
+      const idx = items.findIndex((i) => i.path === f?.path);
+      if (idx < 0) { fail('decision-file-unknown', `shard ${shard.shard}: file ${f?.path} is not an inventory item`, { path: f?.path }); continue; }
+      const disposition = dispositions.get(f.disposition);
+      const targets = Array.isArray(f.targets) ? f.targets : [];
+      const at = { path: f.path };
+      if (!disposition) fail('decision-file-invalid', `${f.path}: disposition "${f.disposition}" is not in the vocabulary`, at);
+      else {
+        if (disposition.requiresTargetOwner && targets.length === 0) fail('decision-file-invalid', `${f.path}: disposition "${f.disposition}" requires a target owner but targets is empty`, at);
+        if (disposition.requiresRationale && !nonEmpty(f.rationale)) fail('decision-file-invalid', `${f.path}: disposition "${f.disposition}" requires a rationale`, at);
+      }
+      items[idx] = { ...items[idx], proposedDisposition: f.disposition, proposedRationale: f.rationale, proposedTargetOwner: targets[0] ?? null };
+    }
+  }
+  return { inventory: { ...inventory, items, claimLedger }, findings };
+}
+
 // ---- Conservation ---------------------------------------------------------
 // Invariants hold on today's data and are fatal in every mode: a claim identity
 // that vanished, a live row without a known disposition, a retired row without
@@ -552,10 +652,17 @@ export function isEvidenceMirrorPath(p) {
   return /^docs\/(?:architect|platform)\/(?:.+\/)?verification\/[^/]+\/.+/.test(p);
 }
 
+/** A path is in scope when no scope is given, or it equals a scope value or lies below one. */
+export function pathInScope(p, scope) {
+  if (!Array.isArray(scope) || scope.length === 0) return true;
+  return typeof p === 'string' && scope.some((s) => p === s || p.startsWith(s.endsWith('/') ? s : `${s}/`));
+}
+
 /** Open data that blocks the cutover but is not corruption before it. */
-export function summarizeConservationCompleteness({ inventory, registry, vocabulary, droppedClaimsRegister = null }) {
+export function summarizeConservationCompleteness({ inventory, registry, vocabulary, droppedClaimsRegister = null, scope = null }) {
   const dispositions = new Map((vocabulary?.sourceDispositions || []).map((d) => [d.id, d]));
-  const claims = inventory?.claimLedger || [];
+  const inScope = (p) => pathInScope(p, scope);
+  const claims = (inventory?.claimLedger || []).filter((c) => inScope(c?.sourcePath));
   const unitOwners = new Map();
   for (const claim of claims) {
     if (!claim?.sourceUnitDigest || typeof claim.targetOwner !== 'string' || claim.targetOwner === '') continue;
@@ -564,17 +671,19 @@ export function summarizeConservationCompleteness({ inventory, registry, vocabul
     unitOwners.set(claim.sourceUnitDigest, set);
   }
   const open = [
-    summarizeOpen('files-unknown-blocking', 'inventory files whose file-level disposition is unknown-blocking', (inventory?.items || []).filter((i) => i.proposedDisposition === 'unknown-blocking'), (i) => i.path),
+    summarizeOpen('files-unknown-blocking', 'inventory files whose file-level disposition is unknown-blocking', (inventory?.items || []).filter((i) => i.proposedDisposition === 'unknown-blocking' && inScope(i.path)), (i) => i.path),
     summarizeOpen('claims-unknown-blocking', 'claim rows whose disposition is unknown-blocking', claims.filter((c) => c.disposition === 'unknown-blocking'), (c) => `${c.sourcePath}#${c.sourceAnchor}`),
     summarizeOpen('claims-not-reviewed', 'claim rows whose reviewStatus is not reviewed', claims.filter((c) => c.reviewStatus !== 'reviewed'), (c) => `${c.sourcePath}#${c.sourceAnchor}`),
     summarizeOpen('claims-without-own-rationale', 'claim rows whose disposition requires a rationale and that carry none of their own', claims.filter((c) => dispositions.get(c.disposition)?.requiresRationale && !(typeof c.rationale === 'string' && c.rationale !== '')), (c) => `${c.sourcePath}#${c.sourceAnchor}`),
     summarizeOpen('identical-units-multiple-owners', 'identical source units whose rows name different target owners', [...unitOwners.entries()].filter(([, set]) => set.size > 1), ([digest, set]) => `${digest.slice(0, 12)}: ${[...set].sort().join(', ')}`),
-    summarizeOpen('registry-gaps-without-disposition', 'registry identity-gap rows with no vocabulary disposition', (registry?.identityGaps || []).filter((row) => !dispositions.has(row?.disposition)), (row) => `${row.sourcePath}#${row.sourceAnchor}`),
+    summarizeOpen('registry-gaps-without-disposition', 'registry identity-gap rows with no vocabulary disposition', (registry?.identityGaps || []).filter((row) => inScope(row?.sourcePath) && !dispositions.has(row?.disposition)), (row) => `${row.sourcePath}#${row.sourceAnchor}`),
     summarizeOpen('retired-rows-incomplete', 'retired rows without a required target owner or a rationale', (registry?.retiredUnits || []).filter((row) => {
+      if (!inScope(row?.sourcePath)) return false;
       const disposition = dispositions.get(row?.disposition);
       return disposition && ((disposition.requiresTargetOwner && !row.targetOwner) || (disposition.requiresRationale && !(row.dispositionRationale || row.retiredReason)));
     }), (row) => `${row.sourcePath}#${row.sourceAnchor}`),
     summarizeOpen('dropped-claims-unreviewed', 'dropped-claims register entries without a reviewedDisposition (decision, reviewer, reviewedAt)', (droppedClaimsRegister?.entries || []).filter((entry) => {
+      if (!inScope(entry?.source?.path)) return false;
       const review = entry?.reviewedDisposition;
       return !review || ['decision', 'reviewer', 'reviewedAt'].some((field) => typeof review[field] !== 'string' || review[field].trim() === '');
     }), (entry) => entry.id),
@@ -583,7 +692,7 @@ export function summarizeConservationCompleteness({ inventory, registry, vocabul
 }
 
 /** Runs every conservation rule; invariant findings are fatal in all modes, open findings only when strict. */
-export function checkConservation({ inventory, registry, previousRegistries = [], vocabulary, droppedClaimsRegister = null, ratchetResult = null }) {
+export function checkConservation({ inventory, registry, previousRegistries = [], vocabulary, droppedClaimsRegister = null, ratchetResult = null, scope = null }) {
   const invariant = [
     ...previousRegistries.flatMap(({ registry: previous, label }) => validateRowSetConservation(registry, previous, label)),
     ...validateSemanticClaimOwners(inventory?.claimLedger),
@@ -591,20 +700,30 @@ export function checkConservation({ inventory, registry, previousRegistries = []
     ...validateRetiredRowDispositions(registry, vocabulary),
     ...(ratchetResult ? validateLegacyGrowth(ratchetResult) : []),
   ];
-  const open = summarizeConservationCompleteness({ inventory, registry, vocabulary, droppedClaimsRegister });
+  const open = summarizeConservationCompleteness({ inventory, registry, vocabulary, droppedClaimsRegister, scope });
   return { invariant, open };
 }
 
-export function checkInventory({ repoRoot, inventory, vocabulary, identityRegistry = null, droppedClaimsRegister = null, previousRegistries = [], ratchetResult = null, strict = false, headCommit = null, registryBytes = null, missingInputs = [] }) {
+export function checkInventory({ repoRoot, inventory, vocabulary, identityRegistry = null, droppedClaimsRegister = null, previousRegistries = [], ratchetResult = null, strict = false, headCommit = null, registryBytes = null, missingInputs = [], decisions = null, scope = null }) {
+  const targetAnchorsOf = inventory.commit ? buildTargetAnchorLookup(repoRoot, inventory.commit) : null;
+  const decisionFindings = [];
+  let validTargetOwners = inventory.commit ? deriveValidTargetOwnersFromSwitchboard(loadSwitchboard(inventory.commit, repoRoot)) : null;
+  if (decisions && decisions.length > 0) {
+    const applied = applyDecisions(inventory, decisions, { vocabulary, targetAnchorsOf });
+    inventory = applied.inventory;
+    decisionFindings.push(...applied.findings);
+    validTargetOwners = new Set([...(validTargetOwners || defaultSwitchboardOwners(inventory)), ...decidedPlatformOwners(inventory, decisions)]);
+  }
   const fatalFindings = [
+    ...decisionFindings,
     ...validateStructure(inventory),
-    ...validateAgainstVocabulary(inventory, vocabulary, inventory.commit ? deriveValidTargetOwnersFromSwitchboard(loadSwitchboard(inventory.commit, repoRoot)) : null, { targetAnchorsOf: inventory.commit ? buildTargetAnchorLookup(repoRoot, inventory.commit) : null }),
+    ...validateAgainstVocabulary(inventory, vocabulary, validTargetOwners, { targetAnchorsOf }),
     ...validateCommitBlobIntegrity(repoRoot, inventory),
     ...validateSourceUnitCoverage(repoRoot, inventory),
     ...validateIdentityRegistry(inventory, identityRegistry, { repoRoot }),
     ...(droppedClaimsRegister ? validateDroppedClaims(droppedClaimsRegister, { ledgerClaimIds: new Set((inventory.claimLedger || []).map((c) => c.claimId)), registry: identityRegistry }) : []),
   ];
-  const conservation = checkConservation({ inventory, registry: identityRegistry, previousRegistries, vocabulary, droppedClaimsRegister, ratchetResult });
+  const conservation = checkConservation({ inventory, registry: identityRegistry, previousRegistries, vocabulary, droppedClaimsRegister, ratchetResult, scope });
   fatalFindings.push(...validateInventoryFreshness({ inventory, headCommit, repoRoot, registryBytes }), ...conservation.invariant);
   const strictFindings = strict ? [
     ...conservation.open.map((o) => ({ type: o.type, message: `${o.count} ${o.message} (e.g. ${o.examples.join(', ')})` })),
@@ -758,8 +877,11 @@ export function runCli(argv, cwd = process.cwd()) {
   const asJson = argv.includes('--json');
   const strict = argv.includes('--strict') || argv.includes('--cutover');
   const previousIdx = argv.indexOf('--previous-registry');
+  const decisionsIdx = argv.indexOf('--decisions');
+  const scope = argv.flatMap((arg, idx) => (arg === '--scope' && argv[idx + 1] ? [argv[idx + 1]] : []));
 
   let inventory;
+  let decisions = null;
   let vocabulary;
   let identityRegistry;
   let previousRegistries = [];
@@ -781,6 +903,7 @@ export function runCli(argv, cwd = process.cwd()) {
       console.error(`check-doc-inventory-gates: ${gone} not found; row-set conservation against it skipped`);
       missingInputs.push(gone);
     }
+    if (decisionsIdx >= 0) decisions = loadDecisionShards(path.resolve(cwd, argv[decisionsIdx + 1]));
     ratchetResult = loadRatchetResult(repoRoot, argv);
     if (ratchetResult === null) missingInputs.push('the legacy-docs ratchet (baseline missing or --no-ratchet)');
     if (droppedClaimsNotice) console.error(`check-doc-inventory-gates: ${droppedClaimsNotice}`);
@@ -789,9 +912,11 @@ export function runCli(argv, cwd = process.cwd()) {
     return 1;
   }
 
+  if (scope.length > 0 && !asJson) console.log(`check-doc-inventory-gates: strict open-data checks scoped to ${scope.join(', ')}`);
+
   let result;
   try {
-    result = checkInventory({ repoRoot, inventory, vocabulary, identityRegistry, droppedClaimsRegister, previousRegistries, ratchetResult, strict, headCommit: headCommitOf(repoRoot), registryBytes, missingInputs });
+    result = checkInventory({ repoRoot, inventory, vocabulary, identityRegistry, droppedClaimsRegister, previousRegistries, ratchetResult, strict, headCommit: headCommitOf(repoRoot), registryBytes, missingInputs, decisions, scope });
   } catch (err) {
     console.error(`check-doc-inventory-gates evaluation error: ${err.message}`);
     return 1;
