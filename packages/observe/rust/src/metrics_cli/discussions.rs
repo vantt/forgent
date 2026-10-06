@@ -56,6 +56,14 @@ const UNDETERMINED_OUTCOME: &str = "undetermined";
 /// Agreement needs at least two valid votes; one vote cannot agree or split with anyone.
 const MIN_VALID_VOTES: usize = 2;
 
+/// Valid votes form a quorum when there are at least two of them and they are at least half
+/// of the voting seats, rounded up. Missing and invalid votes stay in the denominator of the
+/// agreement ratio, so without the relative bound two agreeing votes among five seats would
+/// read as a split that no voter expressed.
+fn has_quorum(valid: usize, voters: usize) -> bool {
+    valid >= MIN_VALID_VOTES && valid * 2 >= voters
+}
+
 #[derive(Default)]
 struct Totals {
     units: usize,
@@ -138,7 +146,8 @@ fn group_key(value: &Value, key: &str) -> String {
 /// All final panelist seats (not synthesizers or fallback attempts) are voters.
 /// Missing/invalid votes stay in the denominator and remain explicit counts:
 /// the threshold is a passive signal, not proof that missing voters dissented.
-/// Fewer than two valid votes is unmeasured: a lone vote expresses no agreement or split.
+/// Without a quorum of valid votes (see `has_quorum`) the unit is unmeasured and only the
+/// counts are reported.
 fn agreement(unit: &Map<String, Value>) -> Value {
     let mut stances = BTreeMap::<String, usize>::new();
     let mut missing = 0;
@@ -165,7 +174,7 @@ fn agreement(unit: &Map<String, Value>) -> Value {
         }
     }
     let valid: usize = stances.values().sum();
-    let measured = options.is_some_and(|options| !options.is_empty()) && valid >= MIN_VALID_VOTES;
+    let measured = options.is_some_and(|options| !options.is_empty()) && has_quorum(valid, voters);
     let largest = stances.values().copied().max().unwrap_or(0);
     json!({
         "measurement": if measured { "measured" } else { "unmeasured" },
@@ -268,6 +277,64 @@ mod tests {
         Observation {
             ts: ts.to_owned(), subject: Subject { kind: SubjectKind::Run, id: format!("unit-run:{id}") },
             kind: "unit.settled".into(), attrs, source: "unit-summary",
+        }
+    }
+
+    /// A panel unit whose panelist seats voted `votes` (None = no vote), plus a synthesizer
+    /// that never votes.
+    fn panel(votes: &[Option<&str>]) -> Map<String, Value> {
+        let mut seats: Vec<Value> = votes.iter().enumerate().map(|(i, vote)| json!({
+            "role": format!("panelist-{}", i + 1), "kind": "panelist",
+            "final": {"stance": match vote {
+                Some(choice) => json!({"status": "valid", "choice": choice, "confidence": 0.8}),
+                None => json!({"status": "missing"}),
+            }},
+        })).collect();
+        seats.push(json!({"role": "synthesizer", "kind": "synthesizer", "final": {"stance": {"status": "missing"}}}));
+        let Value::Object(unit) = json!({"stanceOptions": ["a", "b", "c"], "seats": seats}) else { unreachable!() };
+        unit
+    }
+
+    #[test]
+    fn agreement_is_measured_only_with_a_quorum_of_valid_votes() {
+        let (a, b, c) = (Some("a"), Some("b"), Some("c"));
+        // (votes, measured, agreement, genuineSplit)
+        let cases: [(&[Option<&str>], bool, f64, bool); 7] = [
+            (&[a, a, a], true, 1.0, false),
+            (&[a, a, None], true, 2.0 / 3.0, false),
+            (&[a, None, None], false, 0.0, false),
+            (&[a, b, c], true, 1.0 / 3.0, true),
+            (&[a, a, None, None, None], false, 0.0, false),
+            (&[a, a, a, None, None], true, 3.0 / 5.0, true),
+            (&[a, a, b, None, None], true, 2.0 / 5.0, true),
+        ];
+        for (votes, measured, expected_agreement, split) in cases {
+            let row = agreement(&panel(votes));
+            let valid = votes.iter().flatten().count();
+            let context = format!("{votes:?}: {row}");
+            // The counters are reported whether or not the unit is measured.
+            assert_eq!(row["stanceSeats"], votes.len(), "{context}");
+            assert_eq!(row["stancesValid"], valid, "{context}");
+            assert_eq!(row["stancesMissing"], votes.len() - valid, "{context}");
+            if measured {
+                assert_eq!(row["measurement"], "measured", "{context}");
+                assert_eq!(row["agreement"], expected_agreement, "{context}");
+                assert_eq!(row["genuineSplit"], split, "{context}");
+            } else {
+                assert_eq!(row["measurement"], "unmeasured", "{context}");
+                assert!(row["agreement"].is_null(), "{context}");
+                assert!(row["genuineSplit"].is_null(), "{context}");
+            }
+        }
+    }
+
+    #[test]
+    fn quorum_needs_two_valid_votes_and_half_the_voting_seats_rounded_up() {
+        for (valid, voters, expected) in [
+            (0, 0, false), (1, 1, false), (2, 2, true), (2, 3, true), (1, 3, false),
+            (2, 4, true), (2, 5, false), (3, 5, true), (3, 7, false), (4, 7, true),
+        ] {
+            assert_eq!(has_quorum(valid, voters), expected, "{valid} valid of {voters} seats");
         }
     }
 

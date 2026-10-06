@@ -147,14 +147,16 @@ pub fn scan_unit_summaries(root: &Path, window: &Window) -> Result<UnitSummarySc
         }
         scan.summary_dirs_seen += 1;
         let result = read_summary(&entry.path().join("unit-summary.json")).and_then(|value| {
-            let ts = value["settledAt"].as_str().filter(|ts| !ts.trim().is_empty())
-                .ok_or("missing-timestamp")?;
-            let timestamp = parse_timestamp_millis(ts).ok_or("invalid-timestamp")?;
             // An older or newer writer is not corruption: name it so a regeneration can be told apart.
+            // The version is checked first because an older contract may not carry the fields this
+            // version requires, such as a settlement timestamp.
             if value["contract"]["id"] == "unit-summary"
                 && value["contract"]["version"].as_u64().is_some_and(|version| version != UNIT_SUMMARY_VERSION) {
                 return Err("unsupported-version");
             }
+            let ts = value["settledAt"].as_str().filter(|ts| !ts.trim().is_empty())
+                .ok_or("missing-timestamp")?;
+            let timestamp = parse_timestamp_millis(ts).ok_or("invalid-timestamp")?;
             if !valid_summary(&value, name) {
                 return Err("invalid-contract");
             }
