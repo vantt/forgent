@@ -1,7 +1,7 @@
 ---
 phase: 4
 title: "Freeze the minimum constitution and migration method"
-status: in-progress
+status: completed
 priority: P1
 effort: ""
 dependencies: [3]
@@ -13,7 +13,7 @@ dependencies: [3]
 
 ## Overview
 
-**Status:** `in-progress`. Authorized by the owner on 2026-10-06; the pre-step ran first and is done.
+**Status:** `completed` (owner closed 2026-10-06 after accepting the review answers; content commits `3b409a373..7c632737b`, then the closing commit). Authorized by the owner on 2026-10-06; the pre-step ran first and is done.
 **Mode:** plan branch
 **Purpose:** Turn inventory evidence into a small, testable migration contract.
 
