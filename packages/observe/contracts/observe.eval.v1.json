@@ -2,10 +2,17 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "observe.eval.v1",
   "title": "Observe Rubric Evaluation Journal Contract v1",
-  "description": "Append-only evaluations in .fgos/observe/evals/<writerId>.jsonl. The writer owns v/type/ts; callers supply the remaining fields. Question, setup, rubric and judge are stable identifiers; harness is a free label. Scores are validated on write and read.",
+  "description": "Append-only evaluations in .fgos/observe/evals/<writerId>.jsonl. The writer owns v/type/ts; callers supply the remaining fields. evalId is globally unique across shards, checked under the shared Observe lock; cross-record uniqueness is not expressible in this schema. Scores are validated on write and read.",
   "type": "object",
   "additionalProperties": false,
   "required": ["v", "type", "ts", "evalId", "harness", "question", "setup", "scores", "rubric", "judge", "runRefs"],
+  "allOf": [{
+    "if": { "properties": { "rubric": { "const": "discussion-quality.v1" } }, "required": ["rubric"] },
+    "then": { "properties": { "scores": {
+      "required": ["perspective-spread", "decision-clarity", "counterfactual-depth", "evidence-discipline", "execution-quality"],
+      "maxProperties": 5
+    } } }
+  }],
   "properties": {
     "v": { "type": "integer", "const": 1 },
     "type": { "type": "string", "const": "eval" },

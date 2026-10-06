@@ -3,12 +3,19 @@
 use crate::shard;
 use crate::store_lock::{acquire_store_lock, format_iso_now};
 use serde::{Deserialize, Serialize};
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashSet};
 use std::fs::{self, OpenOptions};
 use std::io::{BufRead, BufReader, Write};
 use std::path::Path;
 
 const MAX_LINE_BYTES: usize = 1024 * 1024;
+const DISCUSSION_QUALITY_CRITERIA: [&str; 5] = [
+    "perspective-spread",
+    "decision-clarity",
+    "counterfactual-depth",
+    "evidence-discipline",
+    "execution-quality",
+];
 
 /// Callers supply identities and judgments, not the journal envelope.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -61,6 +68,7 @@ fn validate_fields(
     labels: &[(&str, &str)],
     scores: &BTreeMap<String, i64>,
     run_refs: &[String],
+    rubric: &str,
 ) -> Result<(), String> {
     for (name, value) in labels {
         if value.trim().is_empty() {
@@ -78,6 +86,12 @@ fn validate_fields(
             return Err(format!("score for \"{}\" must be an integer in 0..2 (got {})", criterion, score));
         }
     }
+    if rubric == "discussion-quality.v1"
+        && (scores.len() != DISCUSSION_QUALITY_CRITERIA.len()
+            || DISCUSSION_QUALITY_CRITERIA.iter().any(|key| !scores.contains_key(*key)))
+    {
+        return Err("discussion-quality.v1 scores must contain exactly its five criteria".into());
+    }
     if run_refs.iter().any(|id| id.trim().is_empty()) {
         return Err("runRefs must contain only nonempty run identifiers".into());
     }
@@ -91,6 +105,7 @@ pub fn validate_input(input: &EvalInput) -> Result<(), String> {
           ("rubric", &input.rubric), ("judge", &input.judge)],
         &input.scores,
         &input.run_refs,
+        &input.rubric,
     )
 }
 
@@ -104,6 +119,7 @@ fn validate_record(record: &EvalRecord) -> Result<(), String> {
           ("setup", &record.setup), ("rubric", &record.rubric), ("judge", &record.judge)],
         &record.scores,
         &record.run_refs,
+        &record.rubric,
     )
 }
 
@@ -147,16 +163,15 @@ fn open_append_shard(path: &Path) -> Result<fs::File, std::io::Error> {
     #[cfg(any(target_os = "linux", target_os = "android"))]
     {
         use std::os::unix::fs::OpenOptionsExt;
-        // Linux/Android O_NOFOLLOW | O_NONBLOCK; nonblock prevents a raced FIFO
-        // from hanging before descriptor verification.
-        options.custom_flags(0x20000 | 0x800);
+        // Target-specific no-follow and nonblock flags; the latter prevents a
+        // raced FIFO from hanging before descriptor verification.
+        options.custom_flags(libc::O_NOFOLLOW | libc::O_NONBLOCK);
     }
     #[cfg(any(target_os = "macos", target_os = "ios", target_os = "freebsd",
               target_os = "openbsd", target_os = "netbsd", target_os = "dragonfly"))]
     {
         use std::os::unix::fs::OpenOptionsExt;
-        // Darwin/BSD O_NOFOLLOW | O_NONBLOCK.
-        options.custom_flags(0x100 | 0x4);
+        options.custom_flags(libc::O_NOFOLLOW | libc::O_NONBLOCK);
     }
     #[cfg(not(any(target_os = "linux", target_os = "android", target_os = "macos",
                   target_os = "ios", target_os = "freebsd", target_os = "openbsd",
@@ -230,6 +245,15 @@ pub fn record(root: &Path, input: EvalInput) -> Result<EvalRecord, String> {
     // Same global Observe lock, shard identity, O_APPEND and fsync as case/friction.
     eval_store_exists(root, true)?;
     let _guard = acquire_store_lock(root).map_err(|e| e.to_string())?;
+    // Check every shard under the same lock as append. Invalid tracked records
+    // may conceal an identity, so fail closed until the store is repaired.
+    let existing = list(root, None, None)?;
+    if existing.evals.iter().any(|eval| eval.eval_id == record.eval_id) {
+        return Err(format!("duplicate evalId: {}", record.eval_id));
+    }
+    if !existing.invalid.is_empty() {
+        return Err("cannot establish evalId uniqueness while the eval store contains invalid records".into());
+    }
     let path = shard::shard_path(root, "evals").map_err(|e| e.to_string())?;
     if path != root.join(".fgos/observe/evals").join(format!("{}.jsonl", writer_id)) {
         return Err("eval writer shard path changed during record".into());
@@ -255,12 +279,22 @@ pub fn list(root: &Path, harness: Option<&str>, question: Option<&str>) -> Resul
     let mut paths = Vec::new();
     for entry in entries {
         let entry = entry.map_err(|e| e.to_string())?;
-        if entry.file_type().map_err(|e| e.to_string())?.is_file()
-            && entry.path().extension().and_then(|s| s.to_str()) == Some("jsonl") {
-            paths.push(entry.path());
+        let path = entry.path();
+        if path.extension().and_then(|s| s.to_str()) != Some("jsonl") {
+            continue;
+        }
+        if entry.file_type().map_err(|e| e.to_string())?.is_file() {
+            paths.push(path);
+        } else {
+            result.invalid.push(InvalidEvalLine {
+                file: path.strip_prefix(root).unwrap_or(&path).to_string_lossy().into_owned(),
+                line: 0,
+                error: "eval shard must be a regular file, not a symlink".into(),
+            });
         }
     }
     paths.sort();
+    let mut seen_ids = HashSet::new();
     for path in paths {
         let file = fs::File::open(&path).map_err(|e| e.to_string())?;
         let mut reader = BufReader::new(file);
@@ -279,6 +313,14 @@ pub fn list(root: &Path, harness: Option<&str>, question: Option<&str>) -> Resul
             };
             match parsed {
                 Ok(record) => {
+                    if !seen_ids.insert(record.eval_id.clone()) {
+                        result.invalid.push(InvalidEvalLine {
+                            file: path.strip_prefix(root).unwrap_or(&path).to_string_lossy().into_owned(),
+                            line: line_number,
+                            error: format!("duplicate evalId: {}", record.eval_id),
+                        });
+                        continue;
+                    }
                     if harness.is_none_or(|h| record.harness == h)
                         && question.is_none_or(|q| record.question == q) {
                         result.evals.push(record);

@@ -139,6 +139,7 @@ name = "fgos-observe"
 version = "0.1.0"
 dependencies = [
  "fgos-host-runtime",
+ "libc",
  "serde",
  "serde_json",
  "serde_yaml",

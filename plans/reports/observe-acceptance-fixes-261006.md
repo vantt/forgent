@@ -53,7 +53,7 @@ Each row will receive its commit and exercised proof, or an explicit non-fix/UNP
 
 | Report finding | Disposition | Commit / proof |
 |---|---|---|
-| Foundation H1: dropped owner-dated history / incomplete policy choice | **Fixed**: actual sibling settlement fallback; no start/creation substitute; independent doctor admissions | Current forgentX eligible/observed929; 219 started-only remain excluded; fixture/native proof below. Group commit pending. |
+| Foundation H1: dropped owner-dated history / incomplete policy choice | **Fixed**: actual sibling settlement fallback; no start/creation substitute; independent doctor admissions | `c439264cd` covers foundation rows; current forgentX eligible/observed929, 219 started-only excluded; native/fixture proof below. |
 | Foundation H2: deleted closure / missing source guard | **Not fixed: runtime test-policy conflict**; original criterion reopened | Current 12-module throwaway closure above; no permanent prevention claimed. |
 | Foundation M1: Node/Rust admission equivalence overclaimed | **Fixed**: production Node projection separate from directory-only lister | Shared fixture IDs/reasons/accounting exercised by both implementations; live dual-root parity below. |
 | Foundation M2: newly created dir tolerance | **Fixed**: candidate directory recency, including missing result | Sixty-second boundary/clock-skew/stale-directory regressions pass. |
@@ -75,12 +75,12 @@ Each row will receive its commit and exercised proof, or an explicit non-fix/UNP
 | Discussion L4: derived summary error fatal | **Fixed**: warning preserves authoritative outcome/original exception | Normal, inline and execution-error I/O regressions pass. |
 | Discussion L5: roleTasks now apply to panel members | **Restored prior behavior**: member task wrapping ignored except stance | Prefeature source checked; synthesizer/generic roleUnit overrides unchanged. |
 | Discussion L6: resume silently ignores stance options | **Fixed**: explicit refusal without altering stored question | Actual CLI exits4 with named immutable-question error; regressions pass. |
-| Eval Medium: incomplete known rubric | Pending | — |
-| Eval Low-Medium: duplicate evalId | Pending | — |
-| Eval Low-Medium: architecture-specific no-follow constant | Pending | — |
-| Eval Low: lexical timestamp list ordering | Pending disposition | — |
-| Eval Low: unsafe shard silently skipped | Pending disposition | — |
-| Eval concurrency: same shard not exercised | Pending cross-process same-shard regression | — |
+| Eval Medium: incomplete known rubric | **Fixed**: exactly five canonical keys on write/read, other rubrics extensible | Main eval suite23 pass; native partial record rejected before store creation. Group commit pending. |
+| Eval Low-Medium: duplicate evalId | **Fixed**: all-shard identity check and append hold shared Observe lock | Same/different shard, hand-edited duplicates and two-process identity race; native duplicate refuses unchanged original bytes. |
+| Eval Low-Medium: architecture-specific no-follow constant | **Fixed**: target libc constants on existing supported Unix branches | `cargo check -p fgos-observe --target aarch64-unknown-linux-gnu` succeeds; compile proof, not execution on arm64. |
+| Eval Low: lexical timestamp list ordering | **Not changed; documented**: writer UTC/Z sorts correctly, hand-edited offsets have lexical order | No chronological guarantee claimed for arbitrary read timestamps. |
+| Eval Low: unsafe shard silently skipped | **Fixed**: unsafe/nonregular *.jsonl reported invalidline0 without following | Consumer test proves no external scores/writes; invalid store blocks uniqueness-dependent append. Read preflight race remains explicit. |
+| Eval concurrency: same shard not exercised | **Fixed**: six processes / one shard / 30 unique complete records; two same-ID writers exactly one success | Main eval suite23 pass; helpers don't mutate parent process environment. |
 | Honesty High: false isolation provenance | **Corrected before first commit** in both records; metadata, report, plan, journal and how-to aligned | `metrics eval list` returned both corrected records, invalid empty; scores unchanged. |
 | Honesty High: solo consumed panel output | **Disclosed** in setup/judge metadata and every comparison claim | Old scores are not an independent comparison; new proof remains conditional. |
 | Honesty High: weakened exact import closure | Same unresolved runtime-policy conflict as foundation H2 | No restoration claimed. |
@@ -137,3 +137,11 @@ No final full-suite run has started. Final Rust, CLI, narrow and full-suite outp
 - Mandatory seat.kind clean cutover initially reports32 old summaries invalid-contract at mdview. Existing owner backfill migrated **31 changed / 2 unchanged / 1 active skipped / 3 unsettled skipped / zero errors**, derived artifacts only. Actual `metrics discussions --since=2026-10-05` then reports28 units, and all four historical Delphi workflow groups including zero-seat policy refusal (`artifact://394`); root-wide diagnostics37 = 28 observed + 4 unusable + 5 outside-window. Remaining unusable: one active old-contract artifact and three missing-timestamp artifacts.
 - Exact golden regeneration succeeded; required pre-stage `git diff --stat -- test/fixtures/observe` empty (`bg_98`). No golden edits required.
 - Independent foundation review found a Unicode duplicate-winner defect (Node UTF-16 versus Rust byte order). Regression failed before the comparator fix; Node caches UTF-8 keys per entry to match valid-Unicode component order. Corrected full narrow consumers: **99 pass / zero fail** (`bg_108`); matching Rust timestamp/assignment regression added. The private helper impact is LOW with walker and three recovery flows; root scanner's zero indexed callers is UNKNOWN, actual doctor/inspection consumers are exercised.
+- Matching Rust Unicode duplicate regression passed with the full layout suite **11 / zero fail** (`artifact://425`). Foundation commit amended to `c439264cd`; the previous hash `9e47cee82` is superseded, not a second repair group.
+
+### Eval integrity verification
+
+- Main eval test harness: **23 pass / zero fail**, including actual same-shard and duplicate-ID processes; tool aggregate41 includes child harness output (`artifact://403`). Rebuilt host succeeded. Independent scoped eval integrity review found no concrete regression (confidence0.93), no tests run by reviewer.
+- `cargo check -p fgos-observe --target aarch64-unknown-linux-gnu` succeeded (`artifact://405`). Required complete `cargo test -p fgos-run-result -p fgos-observe` succeeded (`artifact://415`, tool aggregate94 including child harnesses); a later added Rust Unicode case is separately11-pass above.
+- Actual native CLI smoke (foreground transcript output from `node /tmp/fgos-eval-integrity-smoke.mjs`): partial known rubric exits1 before store creation; duplicate exits1 without changing shard bytes; duplicate detection remains visible under unmatched harness filter; a new ID refuses existing invalid store. Throwaway root removed. Real live eval list still has the two original corrected records and invalid[]; no synthetic smoke score enters it.
+- Optional comparison prerequisite: target-project `dispatch decide claude` returned configured/out-of-process; `dispatch execute ... --model opus --tier flagship` returned READY, actual status0/modelopus/providerclaude (`bg_107`). This is only an availability probe using the default unconfined profile, not a fresh arm, isolated judge or score. Quota absence cannot be claimed.

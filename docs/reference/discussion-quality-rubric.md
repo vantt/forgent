@@ -57,8 +57,9 @@ scores into new records as if current setups had been judged.
 
 The record shape is owned by
 [`observe.eval.v1`](../../packages/observe/contracts/observe.eval.v1.json);
-the store accepts free criterion names so other versioned rubrics can coexist.
-For this rubric submit **all five keys** above. A missing criterion is not a
+The store accepts free criterion names for other versioned rubrics. For
+`discussion-quality.v1`, write and read validation require **exactly all five
+keys** above; extras and missing keys are invalid. A missing criterion is not a
 zero, and a partial score vector must not be presented as a comparable total.
 
 Follow [the blind-comparison how-to](../how-to/compare-discussion-setups-with-metrics-eval.md)
