@@ -118,8 +118,10 @@ function main(argv) {
       return;
     }
     for (const hit of findOverdue(procs, parentPid, limits)) {
-      killTree(procs, hit.pid);
+      // Killing the file can finish node --test immediately. Publish first:
+      // its caller stops us, reads this journal, and removes the temp dir.
       fs.appendFileSync(opts.out, `${JSON.stringify(hit)}\n`);
+      killTree(procs, hit.pid);
     }
   }, pollMs);
   process.on('SIGTERM', () => {

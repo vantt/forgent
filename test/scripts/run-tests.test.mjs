@@ -3,8 +3,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
+import { setTimeout as delay } from 'node:timers/promises';
 import { parseEtime, parsePs, treeOf, findOverdue } from '../../scripts/lib/test-file-watchdog.mjs';
 import { discoverTestFiles, buildTestArgv, buildTestEnv, runTests, runSelectedTests, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT, snapshotFgos, diffFgosSnapshots, SENSITIVE_FGOS_FILES } from '../../scripts/run-tests.mjs';
 
@@ -528,37 +529,142 @@ test('findOverdue picks only in-tree test-file processes past their own limit; t
   assert.deepEqual(treeOf(procs, 300), [400, 300]);
 });
 
-test('a hung test file is killed with its whole process tree, named, and the rest of the suite still runs', () => {
-  const root = tmpFixtureRoot();
-  const grandchildPidFile = path.join(root, 'grandchild.pid');
-  const okMarker = path.join(root, 'ok.ran');
-  write(
-    root,
-    'a-hang.test.mjs',
-    "import { test } from 'node:test';\nimport { spawn } from 'node:child_process';\nimport fs from 'node:fs';\n" +
-      "const child = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { detached: true, stdio: 'ignore' });\n" +
-      `fs.writeFileSync(${JSON.stringify(grandchildPidFile)}, String(child.pid));\n` +
-      "test('passes, then the process never exits', () => {});\nsetInterval(() => {}, 1000);\n",
-  );
-  write(
-    root,
-    'b-ok.test.mjs',
-    `import { test } from 'node:test';\nimport fs from 'node:fs';\ntest('ok', () => fs.writeFileSync(${JSON.stringify(okMarker)}, '1'));\n`,
-  );
-  const logs = [];
-  const started = Date.now();
-  const result = runTests({
-    root,
-    cwd: root,
-    stdio: 'ignore',
-    fileTimeoutMs: 2000,
-    watchdogPollMs: 300,
-    log: (m) => logs.push(m),
+for (const pauseAfterKill of [false, true]) {
+  test(pauseAfterKill
+    ? 'timeout evidence survives the nested runner finishing while the watchdog is paused after killing a file'
+    : 'a hung test file is killed with its whole process tree, named, and the rest of the suite still runs', async (t) => {
+    const root = tmpFixtureRoot();
+    const runnerPidFile = path.join(root, 'runner.pid');
+    const grandchildPidFile = path.join(root, 'grandchild.pid');
+    const okMarker = path.join(root, 'ok.ran');
+    const acknowledged = path.join(root, 'parent-read');
+    const killGapMarker = path.join(root, 'kill-gap');
+    const supervisorPidFile = path.join(root, 'supervisor.pid');
+    const supervisorExited = path.join(root, 'supervisor.exited');
+    const env = { ...process.env };
+    t.after(async () => {
+      try {
+        // Release the real supervisor even if an assertion or spawn failed.
+        fs.writeFileSync(acknowledged, '1');
+        for (const pidFile of [grandchildPidFile, runnerPidFile]) {
+          if (!fs.existsSync(pidFile)) continue;
+          const pid = Number(fs.readFileSync(pidFile, 'utf8'));
+          if (Number.isInteger(pid) && pid > 0) {
+            try { process.kill(pid, 'SIGKILL'); } catch (err) {
+              if (err.code !== 'ESRCH') throw err;
+            }
+          }
+        }
+        if (fs.existsSync(supervisorPidFile)) {
+          const deadline = Date.now() + 60_000;
+          while (!fs.existsSync(supervisorExited) && Date.now() < deadline) await delay(10);
+          if (!fs.existsSync(supervisorExited)) {
+            const pid = Number(fs.readFileSync(supervisorPidFile, 'utf8'));
+            try { process.kill(pid, 'SIGKILL'); } catch (err) {
+              if (err.code !== 'ESRCH') throw err;
+            }
+            assert.fail('the watchdog must exit after the parent acknowledges its result');
+          }
+        }
+      } finally {
+        fs.rmSync(root, { recursive: true, force: true });
+      }
+    });
+    if (pauseAfterKill) {
+      // Hold the real SIGKILL boundary until runTests has read the journal.
+      // No fake process table, source pin, or production-only testing seam:
+      // the nested runner, supervisor, and detached child all run for real.
+      const watchdogPath = fileURLToPath(new URL('../../scripts/lib/test-file-watchdog.mjs', import.meta.url));
+      const preload = write(root, 'pause-watchdog.mjs', `
+import fs from 'node:fs';
+if (process.argv[1] === ${JSON.stringify(watchdogPath)}) {
+  fs.writeFileSync(${JSON.stringify(supervisorPidFile)}, String(process.pid));
+  process.on('exit', () => fs.writeFileSync(${JSON.stringify(supervisorExited)}, '1'));
+  const kill = process.kill;
+  process.kill = function(pid, signal) {
+    const isRunner = signal === 'SIGKILL'
+      && fs.existsSync(${JSON.stringify(runnerPidFile)})
+      && pid === Number(fs.readFileSync(${JSON.stringify(runnerPidFile)}, 'utf8'));
+    const result = kill.call(process, pid, signal);
+    if (isRunner) {
+      fs.writeFileSync(${JSON.stringify(killGapMarker)}, '1');
+      const deadline = Date.now() + 60_000;
+      while (!fs.existsSync(${JSON.stringify(acknowledged)}) && Date.now() < deadline) {
+        Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 10);
+      }
+      if (!fs.existsSync(${JSON.stringify(acknowledged)})) throw new Error('parent never acknowledged the journal read');
+    }
+    return result;
+  };
+}
+`);
+      env.NODE_OPTIONS = `${env.NODE_OPTIONS || ''} --import=${JSON.stringify(pathToFileURL(preload).href)}`.trim();
+    }
+    write(
+      root,
+      'a-hang.test.mjs',
+      "import { test } from 'node:test';\nimport { spawn } from 'node:child_process';\nimport fs from 'node:fs';\n" +
+        `fs.writeFileSync(${JSON.stringify(runnerPidFile)}, String(process.pid));\n` +
+        "const child = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { detached: true, stdio: 'ignore' });\n" +
+        `fs.writeFileSync(${JSON.stringify(grandchildPidFile)}, String(child.pid));\n` +
+        "test('passes, then the process never exits', () => {});\nsetInterval(() => {}, 1000);\n",
+    );
+    write(
+      root,
+      'b-ok.test.mjs',
+      `import { test } from 'node:test';\nimport fs from 'node:fs';\ntest('ok', () => fs.writeFileSync(${JSON.stringify(okMarker)}, '1'));\n`,
+    );
+    const logs = [];
+    const started = Date.now();
+    let nested;
+    let invocation;
+    let result;
+    try {
+      try {
+        result = runTests({
+          root,
+          cwd: root,
+          env,
+          stdio: 'pipe',
+          fileTimeoutMs: 2000,
+          watchdogPollMs: 300,
+          watchdog: true,
+          spawn(execPath, argv, opts) {
+            invocation = {
+              execPath, argv, cwd: opts.cwd,
+              env: Object.fromEntries(['NODE_TEST_CONTEXT', 'NODE_OPTIONS', 'UV_THREADPOOL_SIZE', 'TMPDIR', 'FGOS_HOST_BIN']
+                .map((key) => [key, opts.env[key] ?? null])),
+            };
+            nested = spawnSync(execPath, argv, { ...opts, encoding: 'utf8' });
+            return nested;
+          },
+          log: (m) => logs.push(m),
+        });
+      } finally {
+        fs.writeFileSync(acknowledged, '1');
+      }
+      assert.equal(nested.error, undefined, 'the nested runner must spawn successfully');
+      assert.equal(nested.signal, null, 'the nested runner itself must not be killed');
+      assert.notEqual(result.status, 0);
+      assert.ok(Date.now() - started < 60_000, 'a hung file must not hold the run');
+      assert.deepEqual(result.timedOut.map((hit) => hit.file), ['a-hang.test.mjs']);
+      assert.match(logs.join('\n'), /a-hang\.test\.mjs: timed out/);
+      assert.ok(fs.existsSync(okMarker), 'the other file still ran');
+      const grandchildPid = Number(fs.readFileSync(grandchildPidFile, 'utf8'));
+      assert.throws(() => process.kill(grandchildPid, 0), { code: 'ESRCH' }, 'the detached grandchild was killed too');
+      if (pauseAfterKill) assert.ok(fs.existsSync(killGapMarker), 'the post-kill scheduling gap was exercised');
+      assert.equal(fs.existsSync(result.runTemp), false, 'the run temp dir was cleaned up');
+    } catch (err) {
+      t.diagnostic(JSON.stringify({
+        node: process.version, platform: process.platform, parallelism: os.availableParallelism(),
+        loadavg: os.loadavg(), freeMemory: os.freemem(), durationMs: Date.now() - started,
+        invocation, status: nested?.status, signal: nested?.signal, pid: nested?.pid,
+        error: nested?.error && { message: nested.error.message, code: nested.error.code, syscall: nested.error.syscall },
+        timedOut: result?.timedOut, logs, otherFileRan: fs.existsSync(okMarker),
+      }));
+      t.diagnostic(`nested stdout:\n${nested?.stdout ?? '(not captured)'}`);
+      t.diagnostic(`nested stderr:\n${nested?.stderr ?? '(not captured)'}`);
+      throw err;
+    }
   });
-  assert.notEqual(result.status, 0);
-  assert.ok(Date.now() - started < 60_000, 'a hung file must not hold the run');
-  assert.deepEqual(result.timedOut.map((t) => t.file), ['a-hang.test.mjs']);
-  assert.ok(fs.existsSync(okMarker), 'the other file still ran');
-  const grandchildPid = Number(fs.readFileSync(grandchildPidFile, 'utf8'));
-  assert.throws(() => process.kill(grandchildPid, 0), { code: 'ESRCH' }, 'the detached grandchild was killed too');
-});
+}
