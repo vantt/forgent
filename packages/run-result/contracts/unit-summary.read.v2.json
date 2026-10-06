@@ -80,7 +80,7 @@
       ]
     },
     "stance": {
-      "description": "Tolerant writer extraction from the settled result agentClaim. No report or transcript scanning. Confidence is unweighted. Exactly seats with kind panelist vote, regardless of role label. With declared options and at least two valid votes that are also at least half of the voting seats (rounded up), largest valid choice group divided by all final voting seats gives agreement; genuineSplit is largest*3 < seats*2. Missing/invalid remain explicit and in the denominator. No options, no voting seats or fewer than two valid votes, or fewer than half of the voting seats, is unmeasured with null agreement and genuineSplit; the stance counters are still reported.",
+      "description": "Tolerant writer extraction from the settled result agentClaim. No report or transcript scanning. Confidence is unweighted. Exactly seats with kind panelist vote, regardless of role label. With declared options and at least two valid votes that are also more than half of the voting seats, largest valid choice group divided by all final voting seats gives agreement; genuineSplit is largest*3 < seats*2. Missing/invalid remain explicit and in the denominator. No options, no voting seats or fewer than two valid votes, or no more than half of the voting seats, is unmeasured with null agreement and genuineSplit; the stance counters are still reported.",
       "oneOf": [
         {"type": "object", "required": ["status"], "properties": {"status": {"const": "missing"}}},
         {"type": "object", "required": ["status", "reason"], "properties": {"status": {"const": "invalid"}, "reason": {"type": "string", "minLength": 1}}},

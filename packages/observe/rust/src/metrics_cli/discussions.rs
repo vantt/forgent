@@ -56,12 +56,12 @@ const UNDETERMINED_OUTCOME: &str = "undetermined";
 /// Agreement needs at least two valid votes; one vote cannot agree or split with anyone.
 const MIN_VALID_VOTES: usize = 2;
 
-/// Valid votes form a quorum when there are at least two of them and they are at least half
-/// of the voting seats, rounded up. Missing and invalid votes stay in the denominator of the
-/// agreement ratio, so without the relative bound two agreeing votes among five seats would
+/// Valid votes form a quorum when there are at least two of them and they are more than half
+/// of the voting seats. Missing and invalid votes stay in the denominator of the agreement
+/// ratio, so without the relative bound two agreeing votes among four or five seats would
 /// read as a split that no voter expressed.
 fn has_quorum(valid: usize, voters: usize) -> bool {
-    valid >= MIN_VALID_VOTES && valid * 2 >= voters
+    valid >= MIN_VALID_VOTES && valid * 2 > voters
 }
 
 #[derive(Default)]
@@ -299,7 +299,7 @@ mod tests {
     fn agreement_is_measured_only_with_a_quorum_of_valid_votes() {
         let (a, b, c) = (Some("a"), Some("b"), Some("c"));
         // (votes, measured, agreement, genuineSplit)
-        let cases: [(&[Option<&str>], bool, f64, bool); 7] = [
+        let cases: [(&[Option<&str>], bool, f64, bool); 9] = [
             (&[a, a, a], true, 1.0, false),
             (&[a, a, None], true, 2.0 / 3.0, false),
             (&[a, None, None], false, 0.0, false),
@@ -307,6 +307,8 @@ mod tests {
             (&[a, a, None, None, None], false, 0.0, false),
             (&[a, a, a, None, None], true, 3.0 / 5.0, true),
             (&[a, a, b, None, None], true, 2.0 / 5.0, true),
+            (&[a, a, None, None], false, 0.0, false),
+            (&[a, a, a, None], true, 3.0 / 4.0, false),
         ];
         for (votes, measured, expected_agreement, split) in cases {
             let row = agreement(&panel(votes));
@@ -329,10 +331,10 @@ mod tests {
     }
 
     #[test]
-    fn quorum_needs_two_valid_votes_and_half_the_voting_seats_rounded_up() {
+    fn quorum_needs_two_valid_votes_and_more_than_half_the_voting_seats() {
         for (valid, voters, expected) in [
             (0, 0, false), (1, 1, false), (2, 2, true), (2, 3, true), (1, 3, false),
-            (2, 4, true), (2, 5, false), (3, 5, true), (3, 7, false), (4, 7, true),
+            (2, 4, false), (3, 4, true), (2, 5, false), (3, 5, true), (3, 7, false), (4, 7, true),
         ] {
             assert_eq!(has_quorum(valid, voters), expected, "{valid} valid of {voters} seats");
         }
