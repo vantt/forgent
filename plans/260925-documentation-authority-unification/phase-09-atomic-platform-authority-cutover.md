@@ -13,7 +13,7 @@ dependencies: [8]
 
 ## Overview
 
-**Status:** `not-started`, `not-authorized`, blocked by Phase 8, a separate explicit cutover approval, and the cross-plan order in `plan.md` §7.5: runs only after Plan A phase 06, Plan B phase 06 and Plan C phase 05 have landed, because all write `AGENTS.md`. Every entry in `dropped-claims-register.json` must be restored or dispositioned first.
+**Status:** `not-started`, `not-authorized`, blocked by Phase 8, a separate explicit cutover approval, and the cross-plan order in `plan.md` §7.5: runs only after Plan A phase 06 and Plan B phase 06 have landed, because both write `AGENTS.md`. Plan C (draft, unscheduled) is not a dependency. Every entry in `dropped-claims-register.json` must be restored or dispositioned first; dropped-001 may be dispositioned as "restore later, tracked by Plan C draft".
 **Mode:** dedicated cutover worktree; serialized mutation
 **Purpose:** Promote one system and physically retire the competing system in one
 reviewable integration change.

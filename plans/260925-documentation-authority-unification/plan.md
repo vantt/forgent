@@ -338,9 +338,15 @@ Three plans pending approval in the main checkout (uncommitted there on 2026-10-
 |---|---|---|
 | A `plans/261006-1415-fgos-single-door-mechanisms/` | `docs/specs/distribution.md`, possibly a `docs/specs/reading-map.md` line | phase 06 only (single writer) |
 | B `plans/261006-1415-fgos-convention-component/` | new `docs/platform/convention/spec.md`; pointer lines in `docs/specs/reading-map.md`, `docs/specs/system-overview.md`; a row in `docs/platform/component-boundary.md` | phase 06, after Plan A phase 06 |
-| C `plans/261006-1445-fgctl-dev-activation/` (draft) | `docs/platform/packaging-distribution/**`, row #7 of `docs/specs/distribution.md`; restores dropped-001 | phase 05, after A06 and B06 |
+| C `plans/261006-1445-fgctl-dev-activation/` (draft) | `docs/platform/packaging-distribution/**`, row #7 of `docs/specs/distribution.md`; restores dropped-001 | phase 05; draft and unscheduled, so **not** a cutover dependency; if scheduled it runs after cutover |
 
-Required order: **Phase 9 (atomic cutover) runs after Plan A phase 06, Plan B phase 06 and Plan C phase 05**, because all of them write `AGENTS.md` and Phase 9 rewrites every reader of legacy paths, `AGENTS.md` included. Phases 4-8 work on this branch and may run in parallel with A/B/C, absorbing their legacy edits at each sync. Phase 6 transforms packaging-distribution only after Plan C's docs land, or carries dropped-001 as an open conflict.
+Required order: **Phase 9 (atomic cutover) runs after Plan A phase 06 and Plan B phase 06**, because both write `AGENTS.md` and Phase 9 rewrites every reader of legacy paths, `AGENTS.md` included. **Plan C is an unscheduled draft and must not gate the cutover** (a plan cannot depend on work nobody has approved): dropped-001 is dispositioned before cutover as a claim restored later, pointing at Plan C's draft; if Plan C is scheduled afterwards, it writes `AGENTS.md` and `docs/platform/packaging-distribution/**` after the cutover. Phases 4-8 work on this branch and may run in parallel with A/B/C, absorbing their legacy edits at each sync. Phase 6 transforms packaging-distribution only after Plan C's docs land, or carries dropped-001 as an open conflict.
+
+### 7.5b. Owner decisions recorded 2026-10-06
+
+- **Syncs and legacy-root edits:** each sync of main appends the new main-side edits to `scripts/check-legacy-docs-ratchet.exceptions.json` as accounted exceptions (precedent: `b3fbcdd41`), each marked content-review-owed; the content review is done as one batch before the cutover. Approved by the owner.
+- **Knowledge-registry plan move:** main's move of `plans/260825-1841-knowledge-registry/` into `archive/plans/` is accepted; the Phase 1 requirement that it stay at the historical path is amended to "reachable through a pointer note at the historical path". Approved by the owner.
+- **Still not authorized:** Phase 4 and later. Changing the plan's own gate scripts (inventory generator, `verify-phase-02`, shipped-path tests) is pending the owner's decision.
 
 ## 7.6. Known split authorities (re-checked 2026-10-06 on the synced tree)
 
@@ -425,7 +431,7 @@ reconciled.
 | Cutover rollback restores git but not runtime state | Snapshot/restore projections, aliases, installation ledgers, and installed surfaces; append no cutover events |
 | A drift check is mistaken for a write freeze | Migration-specific lease enforced by registered writers/dispatch/merge gates plus clean-worktree and digest checks for raw writers |
 | Main keeps editing legacy roots while the branch lives | Account every main-side legacy edit at each sync (ratchet exceptions) and rerun inventory before Phase 9 |
-| Plans A/B/C and cutover race on `AGENTS.md` | Cutover after Plan A phase 06, Plan B phase 06 and Plan C phase 05 (§7.5) |
+| Plans A/B/C and cutover race on `AGENTS.md` | Cutover after Plan A phase 06 and Plan B phase 06 (§7.5); Plan C is not a dependency |
 | A promoted target silently lacks a settled claim | Dropped-claim register blocks Phase 9 (§7.3) |
 | Final claim ledger is lost with the plan branch | Seal it under `docs/platform/history/documentation-authority-unification/` with digest proof before cutover |
 | Repo cleanup changes shipped fgOS conventions | Inventory `core/`, domains, plugins, and generated instructions as a separate mission #1/#2 contract |
