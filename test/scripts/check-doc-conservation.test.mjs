@@ -376,6 +376,16 @@ test('a clean decision merges onto its claim row without mutating the input inve
   assert.notEqual(result.inventory.items, inventory.items);
 });
 
+test('a decision on a claim that is a registry identity gap gives the gap row its disposition without touching the registry', () => {
+  const registry = { identityGaps: [{ claimId: DECIDED_CLAIM_ID, sourcePath: 'docs/specs/runner.md', sourceAnchor: 'a' }, { claimId: `claim_${'c'.repeat(32)}`, sourcePath: 'docs/specs/runner.md', sourceAnchor: 'b' }] };
+  const before = JSON.stringify(registry);
+  const result = gates.applyDecisions(decisionInventory(), [goodShard()], { vocabulary: VOCABULARY, targetAnchorsOf: anchorsOf, registry });
+  assert.deepEqual(result.findings, []);
+  assert.equal(JSON.stringify(registry), before);
+  assert.deepEqual(result.registry.identityGaps.map((row) => row.disposition), ['move', undefined]);
+  assert.equal(gates.applyDecisions(decisionInventory(), [goodShard()], { vocabulary: VOCABULARY, targetAnchorsOf: anchorsOf }).registry, null);
+});
+
 test('a file decision replaces the proposed disposition, rationale and target owner of its item', () => {
   const inventory = decisionInventory();
   const files = [{ path: 'docs/specs/runner.md', disposition: 'move', rationale: 'carried by the platform owner', targets: [OWNER, 'docs/platform/cand/README.md'] }, { path: OWNER, disposition: 'retain-as-evidence', rationale: 'kept', targets: [] }];
@@ -406,6 +416,8 @@ const DECISION_FAULTS = [
   ['decision-searched-missing', (d) => { d.disposition = 'unknown-blocking'; d.reviewStatus = 'blocking'; d.targetOwner = null; d.targetAnchor = null; }],
   ['decision-searched-missing', (d) => { d.disposition = 'delete-as-obsolete'; d.targetOwner = null; d.targetAnchor = null; d.searched = []; }],
   ['decision-rationale-missing', (d) => { d.rationale = ''; }],
+  ['decision-target-owner-missing', (d) => { d.disposition = 'retain-as-evidence'; d.targetOwner = 'docs/specs/runner.md'; d.targetAnchor = 'a'; }],
+  ['decision-target-anchor-missing', (d) => { d.disposition = 'delete-as-obsolete'; d.targetOwner = null; d.targetAnchor = 'a'; d.searched = ['grep x']; }],
 ];
 
 test('each rule violated by a claim decision is reported with its own finding type', () => {
@@ -464,6 +476,9 @@ test('loadDecisionShards reads one file or a directory in name order and rejects
     const bad = (name, value, re) => { put(name, value); assert.throws(() => gates.loadDecisionShards(path.join(tmp, name)), re); };
     bad('c.json', '{ not json', /c\.json/);
     bad('d.json', { ...goodShard(), version: 2 }, /version/);
+    for (const field of ['sources', 'claims', 'files']) bad(`g-${field}.json`, { ...goodShard(), [field]: {} }, new RegExp(`"${field}" must be an array`));
+    const empty = fs.mkdtempSync(path.join(tmp, 'empty-'));
+    assert.throws(() => gates.loadDecisionShards(empty), /holds no \*\.json shard/);
     for (const field of ['version', 'shard', 'sources', 'claims']) {
       const shard = goodShard();
       delete shard[field];

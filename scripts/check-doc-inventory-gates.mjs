@@ -485,6 +485,7 @@ export function loadDecisionShards(target) {
       ? fs.readdirSync(target).filter((name) => name.endsWith('.json')).sort().map((name) => path.join(target, name))
       : [target];
   } catch (err) { throw new Error(`decisions path unreadable: ${target} (${err.message})`); }
+  if (files.length === 0) throw new Error(`decisions path ${target} holds no *.json shard`);
   return files.map((file) => {
     let shard;
     try { shard = JSON.parse(fs.readFileSync(file, 'utf8')); }
@@ -493,6 +494,9 @@ export function loadDecisionShards(target) {
     if (shard.version !== 1) throw new Error(`decision shard ${file}: unsupported version ${JSON.stringify(shard.version)} (expected 1)`);
     for (const field of ['version', 'shard', 'sources', 'claims']) {
       if (!(field in shard)) throw new Error(`decision shard ${file}: missing required field "${field}"`);
+    }
+    for (const field of ['sources', 'claims', ...('files' in shard ? ['files'] : [])]) {
+      if (!Array.isArray(shard[field])) throw new Error(`decision shard ${file}: "${field}" must be an array`);
     }
     return shard;
   });
@@ -504,7 +508,7 @@ export function decidedPlatformOwners(inventory, shards) {
   return new Set((shards || []).flatMap((shard) => shard.claims || []).map((d) => d?.targetOwner).filter((owner) => platform.has(owner)));
 }
 
-export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf = null } = {}) {
+export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf = null, registry = null } = {}) {
   const findings = [];
   const dispositions = new Map((vocabulary?.sourceDispositions || []).map((d) => [d.id, d]));
   const claimKinds = new Set((vocabulary?.claimKinds || []).map((k) => k.id));
@@ -513,6 +517,7 @@ export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf 
   const claimLedger = [...(inventory.claimLedger || [])];
   const items = [...(inventory.items || [])];
   const decided = new Set();
+  const gapRows = registry ? [...(registry.identityGaps || [])] : null;
   const fail = (type, message, extra = {}) => findings.push({ type, message, ...extra });
 
   for (const shard of shards || []) {
@@ -533,8 +538,9 @@ export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf 
       if (!DECISION_REVIEW_STATUSES.has(d.reviewStatus)) fail('decision-review-status-invalid', `claim ${id}: reviewStatus "${d.reviewStatus}" is not one of blocking, pending, reviewed`, at);
       const hasOwner = nonEmpty(d.targetOwner);
       if (disposition?.requiresTargetOwner && !hasOwner) fail('decision-target-owner-missing', `claim ${id}: disposition "${d.disposition}" requires a targetOwner`, at);
+      if (!hasOwner && nonEmpty(d.targetAnchor)) fail('decision-target-anchor-missing', `claim ${id}: targetAnchor ${d.targetAnchor} is set without a targetOwner`, at);
       if (hasOwner) {
-        if (!itemPaths.has(d.targetOwner)) fail('decision-target-owner-missing', `claim ${id}: targetOwner ${d.targetOwner} is not a document of the inventory`, at);
+        if (!itemPaths.has(d.targetOwner) || !d.targetOwner.startsWith('docs/platform/')) fail('decision-target-owner-missing', `claim ${id}: targetOwner ${d.targetOwner} is not a docs/platform document of the inventory`, at);
         if (!nonEmpty(d.targetAnchor)) fail('decision-target-anchor-missing', `claim ${id}: targetOwner ${d.targetOwner} needs a targetAnchor`, at);
         else if (typeof targetAnchorsOf === 'function' && itemPaths.has(d.targetOwner)) {
           const anchors = targetAnchorsOf(d.targetOwner);
@@ -550,6 +556,8 @@ export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf 
       const merged = { ...row, targetOwner: d.targetOwner ?? null, targetAnchor: d.targetAnchor ?? null, claimKind: d.claimKind, disposition: d.disposition, reviewStatus: d.reviewStatus, rationale: d.rationale };
       for (const field of ['reviewedBy', 'reviewedAt', 'searched']) if (d[field] !== undefined) merged[field] = d[field];
       claimLedger[idx] = merged;
+      const gapIdx = gapRows ? gapRows.findIndex((gap) => gap?.claimId === id) : -1;
+      if (gapIdx >= 0) gapRows[gapIdx] = { ...gapRows[gapIdx], disposition: d.disposition };
     }
     for (const f of shard.files || []) {
       const idx = items.findIndex((i) => i.path === f?.path);
@@ -565,7 +573,7 @@ export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf 
       items[idx] = { ...items[idx], proposedDisposition: f.disposition, proposedRationale: f.rationale, proposedTargetOwner: targets[0] ?? null };
     }
   }
-  return { inventory: { ...inventory, items, claimLedger }, findings };
+  return { inventory: { ...inventory, items, claimLedger }, registry: registry ? { ...registry, identityGaps: gapRows } : null, findings };
 }
 
 // ---- Conservation ---------------------------------------------------------
@@ -707,10 +715,12 @@ export function checkConservation({ inventory, registry, previousRegistries = []
 export function checkInventory({ repoRoot, inventory, vocabulary, identityRegistry = null, droppedClaimsRegister = null, previousRegistries = [], ratchetResult = null, strict = false, headCommit = null, registryBytes = null, missingInputs = [], decisions = null, scope = null }) {
   const targetAnchorsOf = inventory.commit ? buildTargetAnchorLookup(repoRoot, inventory.commit) : null;
   const decisionFindings = [];
+  let conservationRegistry = identityRegistry;
   let validTargetOwners = inventory.commit ? deriveValidTargetOwnersFromSwitchboard(loadSwitchboard(inventory.commit, repoRoot)) : null;
   if (decisions && decisions.length > 0) {
-    const applied = applyDecisions(inventory, decisions, { vocabulary, targetAnchorsOf });
+    const applied = applyDecisions(inventory, decisions, { vocabulary, targetAnchorsOf, registry: identityRegistry });
     inventory = applied.inventory;
+    conservationRegistry = applied.registry || identityRegistry;
     decisionFindings.push(...applied.findings);
     validTargetOwners = new Set([...(validTargetOwners || defaultSwitchboardOwners(inventory)), ...decidedPlatformOwners(inventory, decisions)]);
   }
@@ -723,7 +733,7 @@ export function checkInventory({ repoRoot, inventory, vocabulary, identityRegist
     ...validateIdentityRegistry(inventory, identityRegistry, { repoRoot }),
     ...(droppedClaimsRegister ? validateDroppedClaims(droppedClaimsRegister, { ledgerClaimIds: new Set((inventory.claimLedger || []).map((c) => c.claimId)), registry: identityRegistry }) : []),
   ];
-  const conservation = checkConservation({ inventory, registry: identityRegistry, previousRegistries, vocabulary, droppedClaimsRegister, ratchetResult, scope });
+  const conservation = checkConservation({ inventory, registry: conservationRegistry, previousRegistries, vocabulary, droppedClaimsRegister, ratchetResult, scope });
   fatalFindings.push(...validateInventoryFreshness({ inventory, headCommit, repoRoot, registryBytes }), ...conservation.invariant);
   const strictFindings = strict ? [
     ...conservation.open.map((o) => ({ type: o.type, message: `${o.count} ${o.message} (e.g. ${o.examples.join(', ')})` })),
@@ -912,6 +922,11 @@ export function runCli(argv, cwd = process.cwd()) {
     return 1;
   }
 
+  const scopeProblem = scope.find((value) => value.startsWith('--') || !(inventory.items || []).some((item) => pathInScope(item.path, [value])));
+  if (scopeProblem !== undefined) {
+    console.error(`check-doc-inventory-gates error loading input: --scope ${scopeProblem} matches no inventory path (a scope that matches nothing would make strict pass vacuously)`);
+    return 1;
+  }
   if (scope.length > 0 && !asJson) console.log(`check-doc-inventory-gates: strict open-data checks scoped to ${scope.join(', ')}`);
 
   let result;
