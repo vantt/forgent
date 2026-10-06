@@ -1,15 +1,17 @@
 ---
 title: "Config binding and truthful current advisory interface"
-status: pending
+status: done
 dependencies: [0]
 requiresReview: true
 ---
 
 # Phase 01 — Original H1a binding cleanup, not advisory completion
 
+**Current execution evidence:** this minimal binding/truth phase is complete; see [Phase01 execution/review](reports/phase-01-execution.md) and [full-plan sync](reports/final-plan-sync.md). Advisory product completion remains separate and pending. The requirements and implementation steps below retain the accepted planning contract.
+
 ## Context and boundary
 
-Read [plan.md](plan.md), Phase00 baseline, runner spec/bind and current canonical skill/workflow. This phase owns removal of infrastructure duplication and inaccurate retired-runtime commands. Expanded cognitive/runtime migration is [separate advisory plan](../261006-1408-advisory-capability-completion/plan.md), especially its [owner challenges](../261006-1408-advisory-capability-completion/reports/owner-challenges-and-rationale.md). Neither document update authorizes implementation.
+Read [plan.md](plan.md), Phase00 baseline, runner spec/bind and current canonical skill/workflow. This phase owns removal of infrastructure duplication and inaccurate retired-runtime commands. Expanded cognitive/runtime migration is [separate advisory plan](../261006-1408-advisory-capability-completion/plan.md), especially its [owner challenges](../261006-1408-advisory-capability-completion/reports/owner-challenges-and-rationale.md). Historical revision boundary: neither document update itself authorized implementation; subsequent owner-authorized execution is linked above.
 
 ## Requirements
 

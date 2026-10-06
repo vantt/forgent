@@ -1,13 +1,15 @@
 ---
 title: "Canonical door read-only research"
-status: pending
+status: done
 dependencies: [0]
 requiresReview: true
 ---
 
 # Phase 03 — Canonical door: completed read-only evidence for D1=B
 
-Plan status: Revision ready — read-only research completed; implementation not started or authorized.
+> Historical revision note: Revision ready — read-only research completed; implementation not started or authorized in that planning assignment.
+
+**Current execution evidence:** Phase03 read-only research is complete and retained unchanged. Its source/layout observations and “future Phase04” wording below describe that research snapshot, not the implementation now delivered in [Phase04 tests](reports/phase-04-tests.md) and [actual native/dev/shim proof](reports/phase-04-live.md). See [full-plan sync](reports/final-plan-sync.md) for the current whole-plan gate; research itself did not run builds or runtime acceptance.
 
 Dependencies: Phase 00. This evidence branch can run independently of 01→02; its handoff is required by Phase 04.
 

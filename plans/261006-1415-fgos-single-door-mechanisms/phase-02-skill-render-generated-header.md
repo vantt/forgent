@@ -1,13 +1,15 @@
 ---
 title: "Generated skill render headers"
-status: pending
+status: done
 dependencies: [1]
 requiresReview: true
 ---
 
 # Phase 02 — Generated header on every skill render file
 
-Plan status: Revision ready — pending; implementation not started or authorized.
+> Historical revision note: Revision ready — pending; implementation not started or authorized in that planning assignment.
+
+**Current execution evidence:** generated-header implementation, coherent projections, corrected atomic publication and native installed-shim handoff are complete; see [header/consumer observations](reports/phase-02-tests.md), [native handoff](reports/phase-02-native-handoff.md), and [full-plan sync](reports/final-plan-sync.md). The accepted requirements/steps below remain the planning contract; historical future checks are not current NOT RUN claims for these delivered behaviors. Whole-doctor readiness and separate advisory acceptance are not asserted green.
 
 Dependencies: Phase 01 config binding/document truth cleanup. Regenerate one coherent config-cleaned skill set after Phase 01; no advisory source migration or early/full advisory acceptance prerequisite. Header generation is independent of the separate advisory thin-skill cutover.
 

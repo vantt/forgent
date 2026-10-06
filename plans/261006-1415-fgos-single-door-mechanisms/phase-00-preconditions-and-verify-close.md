@@ -1,13 +1,15 @@
 ---
 title: "Preconditions and baseline evidence"
-status: pending
+status: done
 dependencies: []
 requiresReview: true
 ---
 
 # Phase 00 — Preconditions và verify-and-close
 
-Plan status: Revision ready — baseline evidence completed; implementation not started or authorized.
+> Historical revision note: Revision ready — baseline evidence completed; implementation not started or authorized in that planning assignment.
+
+**Current execution evidence:** baseline/preconditions complete; see [execution preconditions](reports/execution-preconditions.md) and [full-plan sync](reports/final-plan-sync.md). The CLI's zero-number rejection was resolved without a manual status edit: the owned file was temporarily renamed to unused Phase99, closed through the supported CLI, restored to this original path and reindexed. Phase00 frontmatter is now `done`; no temporary phase file remains. Downstream implementation proof is recorded in the phase reports; the historical baseline observations and future-work wording below describe the original snapshot, not current whole-plan progress.
 
 Dependencies: none. Evidence completion is not implementation acceptance.
 

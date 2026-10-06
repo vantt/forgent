@@ -1,13 +1,15 @@
 ---
 title: "Doctor active release drift and development door"
-status: pending
+status: done
 dependencies: [2, 3]
 requiresReview: true
 ---
 
 # Phase 04 — Doctor check: active release vs checkout, và lệnh dev `fgos:dev`
 
-Plan status: Revision ready — pending; implementation not started or authorized.
+> Historical revision note: Revision ready — pending; implementation not started or authorized in that planning assignment.
+
+**Current execution evidence:** this phase's comparator/dev-door/native handoff acceptance is complete; see [behavioral tests](reports/phase-04-tests.md), [review closure](reports/phase-04-review-closure.md), [actual development/installed-shim proof](reports/phase-04-live.md), and [full-plan sync](reports/final-plan-sync.md). “Future”/“NOT RUN in current plan revision” below is preserved historical planning wording, superseded by those dated observations, not a present implementation claim. Main activation remains untouched; matching Node freshness does not certify Rust freshness or all doctor readiness.
 
 Dependencies: Phase 02 coherent config-cleaned render + native restage/shim handoff, and Phase 03 completed research. No advisory source migration, early runtime gate or installed advisory product proof is required. Shared build/stage artifacts and shared spec/changelog edits serialize with the separate advisory plan by explicit writer baton, not whole-plan blocking.
 

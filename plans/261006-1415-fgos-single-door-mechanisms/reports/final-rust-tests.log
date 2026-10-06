@@ -1,0 +1,278 @@
+# Final native Rust tests
+{"started_at": "2026-10-06T16:25:09.578817+00:00", "cwd": "/home/vantt/projects/worktrees/forgentX-single-door-execution", "stdin": "DEVNULL (ignore)", "CLAUDE_variables_unset": [], "CARGO_TARGET_DIR": "unset; existing checkout target symlink preserved", "CARGO_HOME": "/home/vantt/.cargo", "RUSTUP_HOME": "/home/vantt/.rustup", "deadline_per_command_seconds": 1800, "serialized_cargo_lane": true, "test_threads": 1}
+
+COMMAND ["cargo", "test", "-p", "fgos", "-p", "fgctl", "-j", "1", "--", "--test-threads=1"]
+   Compiling fgos v0.1.0 (/home/vantt/projects/worktrees/forgentX-single-door-execution/apps/fgos)
+   Compiling fgctl v0.1.0 (/home/vantt/projects/worktrees/forgentX-single-door-execution/apps/fgctl)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.36s
+     Running unittests src/main.rs (target/debug/deps/fgctl-438c624925bdf6a8)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/debug/deps/fgos-2b25eca246a135a6)
+
+running 14 tests
+test cli_presenter::tests::test_envelope_list_vector ... ok
+test cli_presenter::tests::test_envelope_version_vector ... ok
+test cli_presenter::tests::test_format_iso8601 ... ok
+test cli_presenter::tests::test_format_iso8601_civil_date_table ... ok
+test cli_presenter::tests::test_serialization_corpus_floating_exponent_formatting ... ok
+test cli_presenter::tests::test_serialization_corpus_integer_limits ... ok
+test cli_presenter::tests::test_serialization_corpus_negative_zero ... ok
+test cli_presenter::tests::test_serialization_corpus_nested_arrays_maps ... ok
+test cli_presenter::tests::test_serialization_corpus_null_booleans ... ok
+test cli_presenter::tests::test_serialization_corpus_object_insertion_order ... ok
+test cli_presenter::tests::test_serialization_corpus_unicode_control_characters ... ok
+test cli_projector::tests::test_project_cli_invocation_for_gate_bypass ... ok
+test cli_projector::tests::test_project_cli_invocation_for_metrics ... ok
+test cli_projector::tests::test_project_cli_invocation_for_version ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/cli_tests.rs (target/debug/deps/cli_tests-0bb247816f2ae0ac)
+
+running 20 tests
+test native_discussions_reports_owner_voters_and_root_wide_summary_diagnostics ... ok
+test test_absolute_manifest_entry_is_rejected ... ok
+test test_host_manifest_v1_invariants_are_rejected ... ok
+test test_host_rejects_full_manifest_with_legacy_node_digest_only_mismatch ... ok
+test test_host_rejects_full_manifest_with_mismatched_artifact_digest ... ok
+test test_host_rejects_full_manifest_with_mismatched_file_digest ... ok
+test test_host_rejects_full_manifest_with_path_traversal_before_launch ... ok
+test test_host_rejects_manifest_with_in_root_directory_symlink ... ok
+test test_host_rejects_manifest_with_unlisted_payload_symlink ... ok
+test test_host_rejects_partial_manifest_missing_required_v1_fields ... ok
+test test_leading_unlisted_option_does_not_bypass_selector_validation ... ok
+test test_legacy_exec_invocation_record_sink ... ok
+test test_manifest_without_components_legacy_node_is_rejected ... ok
+test test_native_gate_bypass_succeeds_with_envelope ... ok
+test test_native_gate_bypass_zero_node_child_process_spy ... ok
+test test_native_version_succeeds_with_envelope ... ok
+test test_native_version_zero_node_child_process_spy ... ok
+test test_one_node_child_process_spy ... ok
+test test_recursion_trap_fails_closed ... ok
+test test_unlisted_selector_fails_closed_with_exit_4 ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.50s
+
+
+COMMAND_RESULT {"command": ["cargo", "test", "-p", "fgos", "-p", "fgctl", "-j", "1", "--", "--test-threads=1"], "exit_code": 0, "timed_out": false, "elapsed_seconds": 1.926, "owned_process_group": 3031405, "group_members_after_command": [], "cleanup_signals": [], "group_members_after_cleanup": []}
+
+COMMAND ["cargo", "test", "-p", "fgos-host-runtime", "-p", "fgos-distribution", "-j", "1", "--", "--test-threads=1"]
+   Compiling fgos-distribution v0.1.0 (/home/vantt/projects/worktrees/forgentX-single-door-execution/packages/distribution/rust)
+   Compiling fgos-host-runtime v0.1.0 (/home/vantt/projects/worktrees/forgentX-single-door-execution/packages/host-runtime/rust)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.88s
+     Running unittests src/lib.rs (target/debug/deps/fgos_distribution-52c28dc8e6a0a24e)
+
+running 43 tests
+test canonical::tests::test_normalize_and_sort ... ok
+test canonical::tests::test_refuse_absolute_path ... ok
+test canonical::tests::test_refuse_case_collision ... ok
+test canonical::tests::test_refuse_dot_segment ... ok
+test canonical::tests::test_refuse_empty_segment ... ok
+test canonical::tests::test_refuse_path_traversal ... ok
+test canonical::tests::test_refuse_symlink ... ok
+test extract::tests::test_extract_refuses_absolute_entry ... ok
+test extract::tests::test_extract_refuses_backslash_traversal_entry ... ok
+test extract::tests::test_extract_refuses_path_traversal_entry ... ok
+test extract::tests::test_extract_refuses_symlink_entry ... ok
+test extract::tests::test_extract_refuses_windows_drive_letter_entry ... ok
+test extract::tests::test_validate_entry_accepts_normal_file_and_dir ... ok
+test extract::tests::test_validate_entry_refuses_backslash_traversal ... ok
+test extract::tests::test_validate_entry_refuses_hardlink ... ok
+test extract::tests::test_validate_entry_refuses_windows_drive_letter ... ok
+test init::tests::preflight_never_executes_a_hostile_but_well_formed_candidate ... ok
+test init::tests::preflight_refuses_entries_fgos_that_is_not_the_shim_exec_path ... ok
+test init::tests::preflight_refuses_host_entry_not_covered_by_manifest_files ... ok
+test init::tests::preflight_refuses_non_executable_host_entry ... ok
+test lock::tests::test_check_live_pid_expired_ttl_is_free ... ok
+test lock::tests::test_check_missing_lock_is_free ... ok
+test lock::tests::test_default_ttl_matches_mjs_constant ... ok
+test lock::tests::test_parse_invalid_lock ... ok
+test lock::tests::test_parse_numeric_lock ... ok
+test lock::tests::test_parse_string_lock ... ok
+test store::tests::test_lock_exclusive_and_release ... ok
+test store::tests::test_release_and_quarantine_dir_paths ... ok
+test store::tests::test_resolve_store_root_precedence ... ok
+test tests::test_descriptor_matches_catalog ... ok
+test tests::test_git_commit_no_panic ... ok
+test tests::test_package_version_resolved ... ok
+test tests::test_provider_invoke_completed ... ok
+test tests::test_vector_parity_version ... ok
+test tests::test_verbs_sorted_and_match_routes_json ... ok
+test verify::tests::test_to_canonical_json_sorting ... ok
+test verify::tests::test_verify_legacy_node_success_and_failures ... ok
+test verify::tests::test_verify_release_files_rejects_forbidden_paths_and_symlinks ... ok
+test verify::tests::test_verify_release_files_success_and_mismatch ... ok
+test workspace::tests::test_compute_work_state_id_equals_workspace_id ... ok
+test workspace::tests::test_compute_workspace_id_length_and_determinism ... ok
+test workspace::tests::test_resolve_workspace_root_in_current_repo ... ok
+test workspace::tests::test_resolve_workspace_root_non_git_refused ... ok
+
+test result: ok. 43 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests/schema_golden.rs (target/debug/deps/schema_golden-f913064059c669c9)
+
+running 15 tests
+test test_activation_binding_forward_compatibility_ignores_unknown_fields ... ok
+test test_activation_binding_full_golden_roundtrip ... ok
+test test_activation_binding_minimal_backward_compatible ... ok
+test test_distribution_pin_forward_compatibility_ignores_unknown_fields ... ok
+test test_distribution_pin_full_golden_roundtrip ... ok
+test test_distribution_pin_minimal_backward_compatible ... ok
+test test_install_transaction_record_golden_roundtrip ... ok
+test test_release_manifest_forward_compatibility_ignores_unknown_fields ... ok
+test test_release_manifest_full_golden_roundtrip ... ok
+test test_release_manifest_legacy_node_invariant_enforcement ... ok
+test test_release_manifest_minimal_backward_compatible ... ok
+test test_release_manifest_read_boundary_rejects_unsupported_v1_semantics ... ok
+test test_release_status_and_workspace_status_serde ... ok
+test test_workspace_root_binding_forward_compatibility ... ok
+test test_workspace_root_binding_golden_roundtrip ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/fgos_host_runtime-ab57d5fcf664092b)
+
+running 33 tests
+test authority_gate::tests::admission_refused_for_disallowed_host ... ok
+test authority_gate::tests::admission_refused_for_unknown_operation ... ok
+test authority_gate::tests::admission_refused_for_unsatisfied_policy ... ok
+test authority_gate::tests::admission_succeeds_for_valid_call ... ok
+test authority_gate::tests::default_gate_denies_by_policy_even_for_a_real_catalog_operation ... ok
+test authority_gate::tests::grant_refused_when_capability_not_admitted ... ok
+test authority_gate::tests::grant_succeeds_and_intersects_when_capability_is_admitted ... ok
+test authority_gate::tests::grant_succeeds_for_provider_with_no_capabilities ... ok
+test authority_gate::tests::wildcard_capability_no_longer_grants_everything ... ok
+test catalog::tests::catalog_contains_required_operations ... ok
+test catalog::tests::every_catalog_operation_id_reparses_through_the_validating_parser ... ok
+test contracts::tests::parse_invalid_operation_ids ... ok
+test contracts::tests::parse_valid_operation_id ... ok
+test contracts::tests::provider_error_provider_failed ... ok
+test contracts::tests::provider_outcome_parked ... ok
+test invocation_service::tests::admission_refused::admission_refused ... ok
+test invocation_service::tests::cancellation::cancellation ... ok
+test invocation_service::tests::cancellation_tx_pruned_after_terminal::cancellation_tx_pruned_after_terminal ... ok
+test invocation_service::tests::concurrent_duplicate_invocation_id_cancellation::concurrent_duplicate_invocation_id_cancellation ... ok
+test invocation_service::tests::deadline::deadline ... ok
+test invocation_service::tests::grant_refused::grant_refused ... ok
+test invocation_service::tests::late_response_after_cancel::late_response_after_cancel ... ok
+test invocation_service::tests::parked::parked ... ok
+test invocation_service::tests::provider_crash::provider_crash ... ok
+test operation_provider_router::tests::ambiguous_binding::ambiguous_binding ... ok
+test operation_provider_router::tests::disallowed_host::disallowed_host ... ok
+test operation_provider_router::tests::duplicate_binding::duplicate_binding - should panic ... ok
+test operation_provider_router::tests::exact_version_pair_selection::exact_version_pair_selection ... ok
+test operation_provider_router::tests::incompatible_contract::incompatible_contract ... ok
+test operation_provider_router::tests::missing_binding::missing_binding ... ok
+test operation_provider_router::tests::shuffle_order_stability::shuffle_order_stability ... ok
+test operation_provider_router::tests::wrong_mode::wrong_mode ... ok
+test registry::tests::snapshot_for_tests_contains_only_fixtures ... ok
+
+test result: ok. 33 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+     Running unittests tests/fixtures/external-provider/echo_process.rs (target/debug/deps/fixture_echo_process-2edc766ba5084441)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/external_process_router_integration.rs (target/debug/deps/external_process_router_integration-2f0c214ee7f25e27)
+
+running 5 tests
+test test_claims_to_reserved_namespaces_are_refused ... ok
+test test_fixture_echo_resolves_only_to_builtin_provider ... ok
+test test_invocation_service_invokes_fixture_echo_end_to_end ... ok
+test test_linker_accepts_and_derives_fixture_echo_entry ... ok
+test test_registry_snapshot_links_catalog_and_derived_adapter_without_panic ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/external_process_tests.rs (target/debug/deps/external_process_tests-bce426dc453c6a84)
+
+running 20 tests
+test test_discovery_does_not_spawn_fixture_process ... ok
+test test_frame_codec_rejects_invalid_json ... ok
+test test_frame_codec_rejects_invalid_utf8 ... ok
+test test_frame_codec_rejects_non_jsonrpc_shapes ... ok
+test test_frame_codec_rejects_oversized_frame ... ok
+test test_frame_codec_rejects_truncated_frame ... ok
+test test_frame_codec_round_trips_request_response_notification ... ok
+test test_supervisor_bad_handshake ... ok
+test test_supervisor_cancellation_path ... ok
+test test_supervisor_crash_after_dispatch ... ok
+test test_supervisor_crash_before_dispatch ... ok
+test test_supervisor_drain_bounded_when_grandchild_holds_stdout_dispatch ... ok
+test test_supervisor_drain_bounded_when_grandchild_holds_stdout_handshake ... ok
+test test_supervisor_flood_bounds_memory_and_terminates ... ok
+test test_supervisor_happy_path_fixture_invocation ... ok
+test test_supervisor_malformed_frame ... ok
+test test_supervisor_startup_failure ... ok
+test test_supervisor_timeout_handshake ... ok
+test test_supervisor_timeout_request ... ok
+test test_to_provider_outcome_rejects_missing_version_delimiter ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.37s
+
+     Running tests/external_provider_manifest_and_registry.rs (target/debug/deps/external_provider_manifest_and_registry-73c4cb419026919f)
+
+running 20 tests
+test discovery_never_executes_provider_executable ... ok
+test linker_refusal_builtin_replacement ... ok
+test linker_refusal_contract_version_exact_match_regression ... ok
+test linker_refusal_duplicate_operation_casing_and_whitespace ... ok
+test linker_refusal_duplicate_operation_claims ... ok
+test linker_refusal_incompatible_contract ... ok
+test linker_refusal_reserved_namespace ... ok
+test linker_refusal_unknown_capability ... ok
+test linker_refuses_invalid_manifest_directly_deserialized ... ok
+test malformed_manifest_non_utf8_fails_closed ... ok
+test malformed_manifest_syntax_error_fails_closed ... ok
+test malformed_manifest_truncated_fails_closed ... ok
+test missing_manifest_fails_closed ... ok
+test path_escaping_manifest_absolute_path_fails_closed ... ok
+test path_escaping_manifest_relative_traversal_fails_closed ... ok
+test path_escaping_manifest_symlink_escape_fails_closed ... ok
+test positive_fixture_manifest_parses ... ok
+test registry_snapshot_deterministic_output ... ok
+test unsupported_manifest_version_fails_closed ... ok
+test unsupported_runtime_kind_fails_closed ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/module_graph.rs (target/debug/deps/module_graph-d1f127e1a553e462)
+
+running 5 tests
+test catalog_never_uses_upper_layers ... ok
+test contracts_never_uses_upper_layers ... ok
+test projector_shims_never_use_each_other ... ok
+test registry_never_uses_upper_layers ... ok
+test router_never_uses_upper_layers ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/two_projectors.rs (target/debug/deps/two_projectors-a479d77a32f4ee2b)
+
+running 1 test
+test two_projectors_same_outcome ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests fgos_distribution
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests fgos_host_runtime
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+COMMAND_RESULT {"command": ["cargo", "test", "-p", "fgos-host-runtime", "-p", "fgos-distribution", "-j", "1", "--", "--test-threads=1"], "exit_code": 0, "timed_out": false, "elapsed_seconds": 10.758, "owned_process_group": 3031801, "group_members_after_command": [{"pid": 3033967, "state": "S", "command": "python3 -c \nimport sys, struct, json, os, time\n# Step 1: Handshake\nprefix = sys.stdin.buffer.read(4)\nif len(prefix) == 4:\n    n = struct.unpack('>I', prefix)[0]\n    sys.stdin.buffer.read(n)\n    resp = json.dumps({\n        'jsonrpc': '2.0',\n        'id': 1,\n        'result': {\n            'provider_id': 'fixture.echo.process',\n            'protocol_version': 'fgos.component.v1',\n            'supported_operations': []\n        }\n    }).encode('utf-8')\n    sys.stdout.buffer.write(struct.pack('>I', len(resp)) + resp)\n    sys.stdout.buffer.flush()\n\n    # Step 2: Invoke dispatch\n    prefix = sys.stdin.buffer.read(4)\n    if len(prefix) == 4:\n        n = struct.unpack('>I', prefix)[0]\n        sys.stdin.buffer.read(n)\n        # Fork grandchild that inherits stdout and sleeps\n        if os.fork() == 0:\n            time.sleep(10)\n            os._exit(0)\n        # Direct child exits immediately\n        os._exit(0)\n "}, {"pid": 3033985, "state": "S", "command": "sleep 10 "}], "cleanup_signals": ["SIGTERM"], "group_members_after_cleanup": []}
+
+FINISHED 2026-10-06T16:25:22.277951+00:00

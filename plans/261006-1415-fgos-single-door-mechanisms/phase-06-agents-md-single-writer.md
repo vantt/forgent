@@ -1,13 +1,15 @@
 ---
 title: "Single doctrine writer and final acceptance"
-status: pending
+status: done
 dependencies: [2, 4, 5]
 requiresReview: true
 ---
 
 # Phase 06 — AGENTS.md single-writer doctrine + temporary placement validation
 
-Plan status: Pending — revision ready; implementation not started or authorized.
+> Historical revision note: Pending — revision ready; implementation not started or authorized in that planning assignment.
+
+**Current execution: complete under the approved execution-only scope.** The five doctrine edits, fresh PC1/generated-block preservation and correct/zero-findings placement review are recorded in [doctrine evidence](reports/phase-06-doctrine-review.md); [Rust verification](reports/final-rust-tests.md) passed176/176. The unchanged standard [Node suite](reports/final-node-tests.md) ran once, exit0:6,948 total/6,875 passed/0 failed/0 cancelled/8 skipped/65 existing migrated TODO. Parent accepted the complete original behavior and authorized CLI closure of this phase/overall plan; see [full-plan sync](reports/final-plan-sync.md). The owner explicitly approved “Hoàn tất trên nhánh execution”: committed/integrated execution phases substitute only for the original precondition requiring Phase02/04/05 main merge below. The separate **Plan B main-integration barrier remains closed** until actual doctrine integration and permanent root-hook behavior-test presence on main. Original requirements/history remain intact; skips/TODO and doctor readiness are not claimed green.
 
 ## Context links
 

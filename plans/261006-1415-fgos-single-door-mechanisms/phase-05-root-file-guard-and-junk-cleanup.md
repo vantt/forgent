@@ -1,13 +1,15 @@
 ---
 title: "Root guard and gated junk cleanup"
-status: pending
+status: done
 dependencies: [4]
 requiresReview: true
 ---
 
 # Phase 05 — Root-file guard + gated junk deletion
 
-Plan status: Pending — revision ready; implementation not started or authorized.
+> Historical revision note: Pending — revision ready; implementation not started or authorized in that planning assignment.
+
+**Current execution evidence:** root-guard behavior and all approved G1/D2 cleanup are complete; see [hook tests/actual git smoke](reports/phase-05-tests.md), [preservation tag/final owner approval/executed cleanup](reports/phase-05-cleanup-gate.md), and [full-plan sync](reports/final-plan-sync.md). Inventories and deletion instructions below retain historical provenance/accepted requirements; they do not imply the approved deletion is still unexecuted. Full-suite final acceptance remains coordinated in Phase06.
 
 ## Context links
 

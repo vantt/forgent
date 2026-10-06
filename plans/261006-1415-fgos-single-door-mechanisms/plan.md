@@ -1,7 +1,7 @@
 ---
 title: "fgOS single-door mechanisms: binding, render, doctor/dev door and root hygiene"
 description: "H1/H3/H5: one binding source, generated headers, doctor/dev door, gated root cleanup and one doctrine writer. Advisory capability completion is a separate plan."
-status: in-progress
+status: completed
 priority: P2
 branch: feat/single-door-mechanisms
 tags: [harness, skills, distribution, doctor, githooks, agents-md, rul11]
@@ -12,7 +12,11 @@ created: 2026-10-06
 
 ## Decision and scope
 
-This remains the original single-door/harness hygiene plan. Advisory completion was added during scope-gap research and has now been separated into [advisory-capability-completion](../261006-1408-advisory-capability-completion/plan.md) at owner's request. Same worktree holds planning documents only; neither plan revision authorizes implementation. Main unrelated changes, runtime/config/release/hooks/junk files remain untouched.
+This remains the original single-door/harness hygiene plan. Advisory completion was added during scope-gap research and has now been separated into [advisory-capability-completion](../261006-1408-advisory-capability-completion/plan.md) at owner's request.
+
+> Historical separation-revision note: the planning worktree held documents only; neither plan revision itself authorized implementation. Main unrelated changes, runtime/config/release/hooks/junk files were untouched by that revision.
+
+**Current execution: completed on the owner-approved execution branch.** All Phase00–06 evidence and supported-CLI status synchronization are complete. See [entire-plan sync/evidence](reports/final-plan-sync.md), [doctrine review](reports/phase-06-doctrine-review.md), [standard Node final result](reports/final-node-tests.md), and [Rust result](reports/final-rust-tests.md). The reported CLI Phase00-number bug was resolved with the bounded rename/CLI-close/restore workaround, preserving canonical paths and requirements. Advisory remains pending. The owner approved the Phase06 execution-only precondition exception; Plan B remains closed until actual main integration plus the permanent root-hook behavior test on main. Full-suite skips/TODO and unrelated doctor-readiness failures remain explicitly reported, not counted as passing proof. All original requirements and historical snapshots below remain retained, not substitutes for the linked execution proof.
 
 Goal: H1 binding/render/canonical door/recovery-source, H3 root hygiene, H5 ask-vs-decide doctrine. Do not promise that roster/config cleanup completes advisory cognition, specialist, dialogue or crash recovery. Those are acceptance of the new plan, not prerequisites for doctor/root hygiene.
 
