@@ -13,7 +13,7 @@ dependencies: [4]
 
 ## Overview
 
-**Status:** `in-progress`, authorized by the owner on 2026-10-06 (decisions recorded in `plan.md` §7.5b). Phase 4 is closed. Plan written 2026-10-06. Evidence and the owner question bundle: [reports/phase-05-planning-261006.md](reports/phase-05-planning-261006.md). Harness per `plan.md` §7.2 (2026-10-06). Pilot A must also check promoted targets for dropped claims of the dropped-001 kind (`plan.md` §7.3).
+**Status:** `in-progress` (work done 2026-10-07; awaiting owner review; not completed), authorized by the owner on 2026-10-06 (decisions recorded in `plan.md` §7.5b). Phase 4 is closed. Plan written 2026-10-06. Results: [reports/phase-05/pilot-method-defects.md](reports/phase-05/pilot-method-defects.md). Evidence and the owner question bundle: [reports/phase-05-planning-261006.md](reports/phase-05-planning-261006.md). Harness per `plan.md` §7.2 (2026-10-06). Pilot A must also check promoted targets for dropped claims of the dropped-001 kind (`plan.md` §7.3).
 **Mode:** isolated worktree (the plan worktree), candidate/review only
 **Purpose:** Falsify both conservation and transformation before applying them globally.
 
@@ -108,7 +108,27 @@ Common to every step. Scratch inventory (never into the tree; the committed shar
 
 ## Execution record
 
-Not started.
+Executed 2026-10-07 on the plan branch by the delegate of the Lead (doers: in-process Sonnet subagents after `fgos dispatch decide --for review --needs-soul --has-live-task-access` answered `in-process`; the delegate verified and committed everything). Full evidence per step is in `reports/phase-05/`; the scorecard with measured numbers and the verdict are in [reports/phase-05/pilot-method-defects.md](reports/phase-05/pilot-method-defects.md). Phase 5 is NOT closed; no tag; Phase 6 not started.
+
+- [x] 0 Pre-flight and pin: [reports/phase-05/baseline.md](reports/phase-05/baseline.md) (HEAD `1f17938c1`, main `60b5dd371`, nine source digests, gate exit 0, ratchet exit 0, no main drift on the pilot sources). Commit `ac0619e3f`.
+- [x] 1 Reviewed-ledger channel: shard format `pilot/claim-decisions.schema.json` and `pilot/README.md` (`338a5f523`); `--decisions` and `--scope` in `scripts/check-doc-inventory-gates.mjs`, tests first (11 red, then green) (`123c5ccd5`); independent read-only code review returned 0 Critical or High, 2 Medium and 4 Low; fixed (`ffd79539d`). Added later: `registryGaps` for registry-only identity-gap rows (`dc088c518`). Default behavior unchanged (existing tests). Vocabulary amendment 2.2-001 recorded after the pilots had used the values, so that its evidence is real (`e6688bb1e`).
+- [x] 2 Pilot A blind audit: seven shards (six sources plus the control), 600 rows decided (`pilot/decisions/a-*.json`), commits `f5aef2766` to `d26bed476`; target-to-source pass over 191 headings: [reports/phase-05/pilot-a-target-to-source.md](reports/phase-05/pilot-a-target-to-source.md) (92 source-derived, 25 code-derived, 11 added after migration, 42 navigation, 21 unproven because the four blinded files were not read).
+- [x] 3 Pilot A discrepancy report: [reports/phase-05/pilot-a-discrepancy.md](reports/phase-05/pilot-a-discrepancy.md): 431 units, 303 compared, D1 122 units in 28 groups, D2 142 in 28, D3 16 in 10, D4 23 in 9; 16 real drops registered as `dropped-002` to `dropped-017` (open) in `dropped-claims-register.json` (`08a0fd2d2`); no promoted target edited.
+- [x] 4 Pilot B target map frozen ([reports/phase-05/pilot-b-target-map.md](reports/phase-05/pilot-b-target-map.md), 6 documents, 151 named headings, 366 of 366 rows mapped by script) and the additive candidate route `docs/platform/work-state/**` in the switchboard (`f5a1a2dda`); probe shows the new paths classify as area "Work state / work lifecycle engine", `candidate`.
+- [x] 5 Pilot B candidate authoring: six documents under `docs/platform/work-state/`, one commit each (`7e95fb116` to `f0cadf365`); candidate-status check shows no finding for them after commit; no legacy or reader document links to them (`rg` finds only the switchboard and a pre-existing "potential future area" note in `docs/work-item-lifecycle-vision.md`).
+- [x] 6 Pilot B ledger decisions and review: six author shards plus `b-files.json` (366 rows, 7 registry gap rows, 2 file decisions), six independent reviewer reports (`review-b-*.md`), 3 claim-kind defects returned once and corrected, re-verified; all 366 rows `reviewed`; `check-doc-inventory-gates.mjs --strict --decisions ... --scope docs/specs/work-state.md --scope docs/io-contract.md` exit 0. The checkpoint refresh of the committed manifest and registry was done once, at the end of the phase (see the last line of this record), not twice.
+- [x] 7 Sensitivity tests: [reports/phase-05/pilot-b-sensitivity.md](reports/phase-05/pilot-b-sensitivity.md): structural 10 of 10, 0 on the unmutated copy; semantic 6 of 6 with 0 false flags in 24; sampling simulation 51.6% chance that a 20% sample catches at least one of the 3 real defects.
+- [x] 8 Alias and history lookup test: [reports/phase-05/pilot-b-alias-test.md](reports/phase-05/pilot-b-alias-test.md): 12 of 12 resolve, table validates; 14 of 20 history references resolve (E6 not met).
+- [x] 9 Link rewrite preview: [reports/phase-05/pilot-b-link-rewrite-preview.md](reports/phase-05/pilot-b-link-rewrite-preview.md): 780 edges classified; 15.6% of the 77 rewrite-class edges carry an anchor (E7 not met).
+- [x] 10 Fresh-reader review: [reports/phase-05/pilot-b-fresh-reader.md](reports/phase-05/pilot-b-fresh-reader.md) with the key committed first (`2a4f8c877`): 6 of 6 per reader and scenario; reader 1 cited 2 anchors that do not exist (E8 not met for reader 1).
+- [x] 11 Red-team: see the findings table below.
+- [x] 12 Defects, verdict, close: [reports/phase-05/pilot-method-defects.md](reports/phase-05/pilot-method-defects.md): 20 defects (4 High: M-01, M-05, M-11, M-13), scorecard, verdict: not PASS; owner rulings needed on E1, E6, E7, E8. Not closed.
+
+Gate and test numbers at the end of the work: script suite 765 pass, 0 fail (`env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/*.test.mjs`); ratchet exit 0 (995 legacy files, 24 accounted edits, 1 accounted new file); scoped strict gate for the two Pilot B sources exit 0; `check-doc-constitution.mjs --check-placement` 446 files, 445 matched, 0 leftover; `git diff 1f17938c1 -- docs/specs docs/architect docs/platform/host-invocation-routing docs/io-contract.md AGENTS.md docs/reading-map.md plans/260925-documentation-authority-unification/alias-table.json` empty.
+
+### Red-team findings
+
+Pending.
 
 ## Success Criteria
 
