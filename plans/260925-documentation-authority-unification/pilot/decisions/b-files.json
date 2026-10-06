@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "shard": "b-files",
+  "sources": [
+    "docs/specs/work-state.md",
+    "docs/io-contract.md"
+  ],
+  "files": [
+    {
+      "path": "docs/specs/work-state.md",
+      "disposition": "merge",
+      "rationale": "Every claim unit of the spec is carried by the candidate documents under docs/platform/work-state/ (spec, CLI I/O contract, implementation pointers, retired decision history, distill record); the unit-level decisions are in the sibling shards of this pilot.",
+      "targets": [
+        "docs/platform/work-state/spec.md",
+        "docs/platform/work-state/contracts/cli-io-contract.md",
+        "docs/platform/work-state/decisions/retired-decision-history.md",
+        "docs/platform/work-state/architecture/implementation-pointers.md",
+        "docs/platform/work-state/history/multi-role-harness-distill-record.md"
+      ]
+    },
+    {
+      "path": "docs/io-contract.md",
+      "disposition": "merge",
+      "rationale": "Every claim unit of the contract is carried by docs/platform/work-state/contracts/cli-io-contract.md; the unit-level decisions are in the b-io-contract shard.",
+      "targets": [
+        "docs/platform/work-state/contracts/cli-io-contract.md"
+      ]
+    }
+  ],
+  "registryGaps": [
+    {
+      "claimId": "claim_dd06c2555dc0e81c54c80376fee8ff91",
+      "sourcePath": "docs/specs/work-state.md",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/work-state.md",
+      "targetAnchor": "unheaded-block-111",
+      "rationale": "Identity-gap row of seven identical source units whose old identities could not be paired one to one; the live unit at the same anchor of the source carries the claim and is decided in its own shard, so this registry row is superseded by it."
+    },
+    {
+      "claimId": "claim_16abc69cd658a382c456cdaf23f64d87",
+      "sourcePath": "docs/specs/work-state.md",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/work-state.md",
+      "targetAnchor": "unheaded-block-115",
+      "rationale": "Identity-gap row of seven identical source units whose old identities could not be paired one to one; the live unit at the same anchor of the source carries the claim and is decided in its own shard, so this registry row is superseded by it."
+    },
+    {
+      "claimId": "claim_9c7e133ec44851189185dbb7b04a78a0",
+      "sourcePath": "docs/specs/work-state.md",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/work-state.md",
+      "targetAnchor": "unheaded-block-120",
+      "rationale": "Identity-gap row of seven identical source units whose old identities could not be paired one to one; the live unit at the same anchor of the source carries the claim and is decided in its own shard, so this registry row is superseded by it."
+    },
+    {
+      "claimId": "claim_7a0776311f7105750a4f234681f513a3",
+      "sourcePath": "docs/specs/work-state.md",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/work-state.md",
+      "targetAnchor": "unheaded-block-132",
+      "rationale": "Identity-gap row of seven identical source units whose old identities could not be paired one to one; the live unit at the same anchor of the source carries the claim and is decided in its own shard, so this registry row is superseded by it."
+    },
+    {
+      "claimId": "claim_35d0f259a0c0828577dcfd003821fb3a",
+      "sourcePath": "docs/specs/work-state.md",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/work-state.md",
+      "targetAnchor": "unheaded-block-138",
+      "rationale": "Identity-gap row of seven identical source units whose old identities could not be paired one to one; the live unit at the same anchor of the source carries the claim and is decided in its own shard, so this registry row is superseded by it."
+    },
+    {
+      "claimId": "claim_aace4a1d3e3df2ac329d0930b81bd9f4",
+      "sourcePath": "docs/specs/work-state.md",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/work-state.md",
+      "targetAnchor": "unheaded-block-144",
+      "rationale": "Identity-gap row of seven identical source units whose old identities could not be paired one to one; the live unit at the same anchor of the source carries the claim and is decided in its own shard, so this registry row is superseded by it."
+    },
+    {
+      "claimId": "claim_1d724afb521915455a45db2b1f3b34cd",
+      "sourcePath": "docs/specs/work-state.md",
+      "disposition": "supersede",
+      "targetOwner": "docs/specs/work-state.md",
+      "targetAnchor": "unheaded-block-168",
+      "rationale": "Identity-gap row of seven identical source units whose old identities could not be paired one to one; the live unit at the same anchor of the source carries the claim and is decided in its own shard, so this registry row is superseded by it."
+    }
+  ],
+  "claims": []
+}
