@@ -1,7 +1,7 @@
 ---
 title: "Observe sees every run, and measures discussions"
 description: "One run definition and one lister per language for .fgos/assignments (nested unit-run ids), so Observe, show-run, inspection and the reconciler stop missing discussion runs; then the measurement discussion power needs: coverage subcommand, writer-owned unit summaries, stance/agreement sensor, eval store."
-status: in-progress
+status: completed
 priority: P1
 effort: "~7d"
 tags: [observe, metrics, run-result, discussion, measurement, contract, doctor]
@@ -65,14 +65,14 @@ Root cause: a result's **location and record shape** are implicit contracts each
 
 | # | Phase | Effort | Depends | Status |
 |---|---|---|---|---|
-| 1 | [Run definition, Node lister, and the seven readers](./phase-01-layout-contract-and-run-lister.md) | 1.5d | — | in-progress (original source guard unmet) |
+| 1 | [Run definition, Node lister, and the seven readers](./phase-01-layout-contract-and-run-lister.md) | 1.5d | — | completed |
 | 2 | [Rust run scan, `metrics coverage`, hermetic invariant](./phase-02-rust-run-source-and-coverage-invariant.md) | 1.25d | 1 (rule + fixture) | completed |
 | 3 | [Doctor coverage check and rebaseline](./phase-03-doctor-coverage-check-and-rebaseline.md) | 0.75d | 1, 2 | completed |
 | 4 | [Unit summaries and `metrics discussions`](./phase-04-unit-summaries-and-discussions.md) | 1.5d | 2 | completed |
 | 5 | [Stance and agreement sensor](./phase-05-stance-and-agreement-sensor.md) | 1.25d | 4 | completed |
 | 6 | [Eval store and rubric](./phase-06-eval-store-and-rubric.md) | 1d | 3 | completed |
 
-Phases 1–3 shipped first. Owner xác nhận ngày 2026-10-06 trong phiên lead rằng yêu cầu "làm hết tất cả phase đi" (2026-10-05) là của owner và ghi đè cổng "chỉ làm nền tảng trước"; bản ghi hội thoại không nằm trong repo. Feature commit `0b06824a7` and the five ordered acceptance repair commits are linked in the repair ledger. Exact golden regeneration produces no fixture diff. The original guard remains unmet, so the whole plan stays in progress.
+Phases 1–3 shipped first. Owner xác nhận ngày 2026-10-06 trong phiên lead rằng yêu cầu "làm hết tất cả phase đi" (2026-10-05) là của owner và ghi đè cổng "chỉ làm nền tảng trước"; bản ghi hội thoại không nằm trong repo. Feature commit `0b06824a7` and the five ordered acceptance repair commits are linked in the repair ledger. Exact golden regeneration produces no fixture diff. The original source guard was written after the second acceptance round (`5608387d3`) and hardened after the third (see the guard test header for its known blind spots).
 
 ## Acceptance (whole plan)
 
@@ -84,8 +84,8 @@ Phases 1–3 shipped first. Owner xác nhận ngày 2026-10-06 trong phiên lead
 - [x] Four mdview Delphi workflows include refusal zero seats and two fallback seats; 30 attempts = 30 Dispatch runs, distinct from 28 final seats.
 - [x] Live three-seat panel gives three valid votes and hand/native agreement 1; no-options is unmeasured and malformed stance preserves passing seat (behavioral CLI regression).
 - [x] Fresh current solo and panel arms reuse the complete 2026-10-04 objective with identical source-packet bytes and an audited isolated Opus judgment. Two actual complete evals have owning-project-qualified refs. Arm separation is by read audit only: no seat read the other arm's output (checked from raw tool calls), but the arms were **not** sandbox-isolated (forgentX, including the solo's position summary and the 2026-10-04 outputs, stayed readable to every seat except Gemini). The evidence condition differs from 2026-10-04: the coordinator-built source packet contains the decision settled after that date. One question and one isolated judge: directional only. Original data-blind/confounded records remain labeled; untrimmed word-limit violations are disclosed in the repair ledger.
-- [x] Acceptance repairs: final Rust suites, live CLI proof and exactly one final `env -u CLAUDE_CODE_SESSION_ID npm test` verified (6,851 tests / 6,778 pass / zero fail / eight skip / 65 todo). Specs, CHANGELOG, manifest and doctor rows updated; no component-boundary change. This gate does not waive the unchecked original guard and does not add independence evidence beyond the read-audited comparison above.
-- [ ] Source/import guard: exact import-closure assertion plus an allow-list of assignments-tree enumerators (phase 1 original criterion). Status: **in progress** (being written by a separate agent after the second acceptance round); not met until that test lands and passes.
+- [x] Acceptance repairs: on the final tree after the third repair round the lead ran `env -u CLAUDE_CODE_SESSION_ID npm test` once more (6,869 tests / 6,796 pass / zero fail / eight skipped / 65 todo) plus `cargo test -p fgos-run-result -p fgos-observe` (100 passed) and `cargo test -p fgos --test cli_tests` (20 passed). The earlier 6,851-test run belongs to the tree before the second and third repair rounds. Specs, CHANGELOG, manifest and doctor rows updated; no component-boundary change. This gate adds no independence evidence beyond the read-audited comparison above.
+- [x] Source/import guard: exact import-closure assertion (`test/runner/dispatch-reconciliation-import-graph.test.mjs`, with a behavioral loaded-module check) plus an allow-list of assignments-tree enumerators (`test/runner/assignment-enumerator-guard.test.mjs`), phase 1 original criterion. Known blind spots, stated in the guard test header: it analyses statically inside one file (a path passed through another file, string concatenation and computed property calls are missed) and the closure test does not follow dynamic `import()`.
 
 ## How Rust changes are verified (important)
 
@@ -152,9 +152,9 @@ fictional settlement time. Historical records without a result timestamp remain
 visible as counted `no-timestamp` skips, and pre-fix snapshots are incomparable.
 Current writers already emit settlement time; no history migration was applied.
 
-Phase 2 criteria are checked. Phase 1's proposed permanent source-text guard is
-not implemented because session test policy forbids source-text/wiring tests;
-the inventory and behavioral tests supply its reachable evidence. The first
+Phase 2 criteria are checked. Phase 1's guard was first declined on the grounds of a
+session test policy that no repository rule contains; it was written afterwards and is
+recorded as met in the acceptance list above. The first
 authoritative suite's watchdog failure was diagnosed with captured real-process
 evidence: timeout publication raced process-tree kill and parent cleanup. After
 publishing evidence before kill, the full rerun passed: 6,730 pass, zero fail,

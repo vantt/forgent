@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "Run definition, Node lister, and the seven readers"
-status: in-progress
+status: completed
 priority: P1
 effort: "1.5d"
 dependencies: []
@@ -16,8 +16,7 @@ Write the single run definition (see plan.md "What is a run"), give Node one lis
 Execution evidence: [layout inventory](../reports/observe-run-layout-261005.md)
 and [rebaseline](../reports/observe-rebaseline-261005.md). Reader migration and
 behavioral coverage are implemented and committed in `0b06824a7`. The original
-source-enumerator guard remains unmet: this runtime forbids permanent
-source-text/wiring tests, not a repository rule. Inventory is not that guard.
+source-enumerator guard was first declined (the cited policy belongs to one agent runtime, not to the repository) and was then written in `5608387d3` together with the exact import-closure assertion, hardened afterwards; see plan.md for its stated blind spots.
 
 
 ## Requirements
@@ -65,7 +64,7 @@ Readers, in two groups:
 
 - [x] `show-run`, inspection, doctor reader and `findRunningRuns` handle flat, nested and `assignment.json`-less runs through one module.
 - [x] A run planted inside a worker outbox is not listed; a symlinked run is skipped.
-- [ ] Inventory report committed; guard test green with a justified allow-list; spec text extended in place.
+- [x] Inventory report committed; guard test green with a justified allow-list; spec text extended in place.
 - [x] Reconcile dry-run before/after recorded; policy for nested orphans decided, not assumed.
 
 Evidence: [`observe-run-layout-261005.md`](../reports/observe-run-layout-261005.md), [`observe-rebaseline-261005.md`](../reports/observe-rebaseline-261005.md), and [acceptance repairs](../reports/observe-acceptance-fixes-261006.md). The original guard criterion is restored verbatim and unchecked. No owner waiver or equivalent permanent prevention is claimed.
