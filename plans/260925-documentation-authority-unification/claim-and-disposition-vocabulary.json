@@ -1,10 +1,77 @@
 {
-  "$schema": "https://forgent.dev/schemas/claim-and-disposition-vocabulary.v1.json",
-  "version": 1,
-  "generatedAt": "2026-09-25T00:00:00.000Z",
-  "phase": "01",
-  "description": "Preliminary machine-readable claim-kind vocabulary and complete plan-§6 source-disposition vocabulary for documentation authority unification",
+  "$schema": "https://forgent.dev/schemas/claim-and-disposition-vocabulary.v2.json",
+  "version": 2,
+  "supersedesVersion": 1,
+  "generatedAt": "2026-10-06T00:00:00.000Z",
+  "phase": "04",
+  "description": "Frozen, evidence-corrected claim-kind, source-disposition and ledger-value vocabulary for documentation authority unification. Version 1 meanings are kept; version 2 adds the values the inventory actually emits.",
   "provenance": "plans/260925-documentation-authority-unification/plan.md §6.1, §6.2, §6.3",
+  "evidence": {
+    "inventoryCommit": "79530b22149de0decb4dfd389d2f018e8ed9d8e3",
+    "inventoryManifest": "plans/260925-documentation-authority-unification/reports/doc-inventory.json",
+    "method": "Distinct values counted over the 86,085 claimLedger rows and 4,311 inventory items of the regenerated inventory (scripts/generate-doc-inventory.mjs); generator-only values read from the generator source.",
+    "claimRows": 86085,
+    "items": 4311,
+    "observedClaimRowsByDisposition": {
+      "unknown-blocking": 39585,
+      "merge": 2143,
+      "regenerate-from-source": 106,
+      "reclassify-out-of-platform-scope": 12297,
+      "retain-as-evidence": 31868,
+      "promote": 86
+    },
+    "observedClaimRowsByClaimKind": {
+      "unclassified": 10826,
+      "vision": 353,
+      "specification": 4866,
+      "historical-context": 17401,
+      "contract": 8562,
+      "decision": 3493,
+      "architecture": 22014,
+      "verification": 17988,
+      "procedure": 350,
+      "navigation": 169,
+      "intent": 46,
+      "normative-law": 17
+    }
+  },
+  "changesFromV1": [
+    {
+      "id": "v2-001",
+      "change": "add claimKind \"unclassified\" (blocksCutover)",
+      "evidence": "10,826 claim rows and 4,252 of 4,311 files emit it; scripts/check-doc-inventory-gates.mjs adds it to the vocabulary by hand (claimKinds.add)."
+    },
+    {
+      "id": "v2-002",
+      "change": "add a fileClasses section, including \"unclassified\"",
+      "evidence": "v1 named four classes only inside allowedFileClasses; the inventory emits a fifth for 14 files (docs/templates/**, docs/architecture-manifest.json, docs/doc-registry.json, docs/user/README.md), and the gates checker keeps a private four-class list. unknown-blocking therefore also allows the new class."
+    },
+    {
+      "id": "v2-003",
+      "change": "add authorityKinds, claimStatuses, reviewStatuses, corpora, relationTypes and identityStatuses sections",
+      "evidence": "plan §6.2 requires these ledger fields but v1 defined no values; the inventory emits legacy-current, candidate, promoted, non-authority, unclassified; current, future, historical; blocking, pending; four corpora; one relation type; two identity statuses."
+    },
+    {
+      "id": "v2-004",
+      "change": "mark ten dispositions \"reserved\" (move, split, extract, redirect, supersede, archive-with-reason, delete-as-duplicate, delete-as-obsolete, defer-with-owner, reject-with-rationale)",
+      "evidence": "No inventory item and no ledger row uses them yet; they are assigned by the transformation phases. Meanings are unchanged."
+    },
+    {
+      "id": "v2-005",
+      "change": "add reviewStatus \"reviewed\" as the reserved terminal value and \"needs-review\" as the carry-forward marker",
+      "evidence": "The ledger only holds blocking and pending; the identity registry marks 122 edited units needs-review (generate-doc-inventory.mjs carry-forward). A review phase needs a closing value."
+    },
+    {
+      "id": "v2-006",
+      "change": "correct the documented ledger-field count from 14 to 15 (Markdown only)",
+      "evidence": "minimumLedgerFields in v1 lists 15 names; the Markdown said \"14 ledger fields\"."
+    },
+    {
+      "id": "v2-007",
+      "change": "record per-value usage (in-use, reserved, generator-only) and keep value definitions unchanged",
+      "evidence": "Plan §6.3 requires every emitted value to be defined and every unused one flagged."
+    }
+  ],
   "sourceDispositions": [
     {
       "id": "promote",
@@ -12,7 +79,10 @@
       "requiresTargetOwner": true,
       "requiresRationale": false,
       "retainsAuthority": true,
-      "allowedFileClasses": ["maintained-authority"]
+      "allowedFileClasses": [
+        "maintained-authority"
+      ],
+      "usage": "in-use"
     },
     {
       "id": "move",
@@ -20,7 +90,10 @@
       "requiresTargetOwner": true,
       "requiresRationale": false,
       "retainsAuthority": true,
-      "allowedFileClasses": ["maintained-authority"]
+      "allowedFileClasses": [
+        "maintained-authority"
+      ],
+      "usage": "reserved"
     },
     {
       "id": "merge",
@@ -28,7 +101,10 @@
       "requiresTargetOwner": true,
       "requiresRationale": false,
       "retainsAuthority": true,
-      "allowedFileClasses": ["maintained-authority"]
+      "allowedFileClasses": [
+        "maintained-authority"
+      ],
+      "usage": "in-use"
     },
     {
       "id": "split",
@@ -36,7 +112,10 @@
       "requiresTargetOwner": true,
       "requiresRationale": false,
       "retainsAuthority": true,
-      "allowedFileClasses": ["maintained-authority"]
+      "allowedFileClasses": [
+        "maintained-authority"
+      ],
+      "usage": "reserved"
     },
     {
       "id": "extract",
@@ -44,7 +123,10 @@
       "requiresTargetOwner": true,
       "requiresRationale": false,
       "retainsAuthority": true,
-      "allowedFileClasses": ["maintained-authority"]
+      "allowedFileClasses": [
+        "maintained-authority"
+      ],
+      "usage": "reserved"
     },
     {
       "id": "redirect",
@@ -52,7 +134,11 @@
       "requiresTargetOwner": true,
       "requiresRationale": false,
       "retainsAuthority": false,
-      "allowedFileClasses": ["maintained-authority", "retained-source"]
+      "allowedFileClasses": [
+        "maintained-authority",
+        "retained-source"
+      ],
+      "usage": "reserved"
     },
     {
       "id": "retain-as-evidence",
@@ -60,7 +146,10 @@
       "requiresTargetOwner": false,
       "requiresRationale": true,
       "retainsAuthority": false,
-      "allowedFileClasses": ["history-evidence"]
+      "allowedFileClasses": [
+        "history-evidence"
+      ],
+      "usage": "in-use"
     },
     {
       "id": "regenerate-from-source",
@@ -68,7 +157,10 @@
       "requiresTargetOwner": false,
       "requiresRationale": false,
       "retainsAuthority": false,
-      "allowedFileClasses": ["generated"]
+      "allowedFileClasses": [
+        "generated"
+      ],
+      "usage": "in-use"
     },
     {
       "id": "reclassify-out-of-platform-scope",
@@ -76,7 +168,12 @@
       "requiresTargetOwner": false,
       "requiresRationale": true,
       "retainsAuthority": false,
-      "allowedFileClasses": ["maintained-authority", "retained-source", "history-evidence"]
+      "allowedFileClasses": [
+        "maintained-authority",
+        "retained-source",
+        "history-evidence"
+      ],
+      "usage": "in-use"
     },
     {
       "id": "supersede",
@@ -84,7 +181,11 @@
       "requiresTargetOwner": true,
       "requiresRationale": true,
       "retainsAuthority": false,
-      "allowedFileClasses": ["maintained-authority", "retained-source"]
+      "allowedFileClasses": [
+        "maintained-authority",
+        "retained-source"
+      ],
+      "usage": "reserved"
     },
     {
       "id": "archive-with-reason",
@@ -92,7 +193,11 @@
       "requiresTargetOwner": false,
       "requiresRationale": true,
       "retainsAuthority": false,
-      "allowedFileClasses": ["history-evidence", "retained-source"]
+      "allowedFileClasses": [
+        "history-evidence",
+        "retained-source"
+      ],
+      "usage": "reserved"
     },
     {
       "id": "delete-as-duplicate",
@@ -100,7 +205,11 @@
       "requiresTargetOwner": true,
       "requiresRationale": true,
       "retainsAuthority": false,
-      "allowedFileClasses": ["maintained-authority", "history-evidence"]
+      "allowedFileClasses": [
+        "maintained-authority",
+        "history-evidence"
+      ],
+      "usage": "reserved"
     },
     {
       "id": "delete-as-obsolete",
@@ -108,7 +217,11 @@
       "requiresTargetOwner": false,
       "requiresRationale": true,
       "retainsAuthority": false,
-      "allowedFileClasses": ["maintained-authority", "history-evidence"]
+      "allowedFileClasses": [
+        "maintained-authority",
+        "history-evidence"
+      ],
+      "usage": "reserved"
     },
     {
       "id": "defer-with-owner",
@@ -116,7 +229,11 @@
       "requiresTargetOwner": true,
       "requiresRationale": true,
       "retainsAuthority": false,
-      "allowedFileClasses": ["retained-source", "history-evidence"]
+      "allowedFileClasses": [
+        "retained-source",
+        "history-evidence"
+      ],
+      "usage": "reserved"
     },
     {
       "id": "reject-with-rationale",
@@ -124,7 +241,10 @@
       "requiresTargetOwner": false,
       "requiresRationale": true,
       "retainsAuthority": false,
-      "allowedFileClasses": ["history-evidence"]
+      "allowedFileClasses": [
+        "history-evidence"
+      ],
+      "usage": "reserved"
     },
     {
       "id": "unknown-blocking",
@@ -132,7 +252,14 @@
       "requiresTargetOwner": false,
       "requiresRationale": true,
       "retainsAuthority": false,
-      "allowedFileClasses": ["maintained-authority", "retained-source", "history-evidence", "generated"]
+      "allowedFileClasses": [
+        "maintained-authority",
+        "retained-source",
+        "history-evidence",
+        "generated",
+        "unclassified"
+      ],
+      "usage": "in-use"
     }
   ],
   "dispositionConstraints": [
@@ -144,68 +271,507 @@
     {
       "id": "normative-law",
       "description": "Immutable platform axioms, operating laws (L1–L8), and constitutional rules.",
-      "canonicalDocumentTypes": ["Vision", "Platform Foundations"],
-      "minimumLedgerFields": ["claimId", "sourceId", "sourcePath", "sourceAnchor", "sourceDigest", "targetOwner", "targetAnchor", "claimKind", "authorityKind", "status", "relations", "decisionRefs", "evidenceLinks", "disposition", "reviewStatus"]
+      "canonicalDocumentTypes": [
+        "Vision",
+        "Platform Foundations"
+      ],
+      "minimumLedgerFields": [
+        "claimId",
+        "sourceId",
+        "sourcePath",
+        "sourceAnchor",
+        "sourceDigest",
+        "targetOwner",
+        "targetAnchor",
+        "claimKind",
+        "authorityKind",
+        "status",
+        "relations",
+        "decisionRefs",
+        "evidenceLinks",
+        "disposition",
+        "reviewStatus"
+      ],
+      "usage": "in-use"
     },
     {
       "id": "contract",
       "description": "Normative schema, protocol, interface invariant, boundary obligation, or handoff rule.",
-      "canonicalDocumentTypes": ["Contract"],
-      "minimumLedgerFields": ["claimId", "sourceId", "sourcePath", "sourceAnchor", "sourceDigest", "targetOwner", "targetAnchor", "claimKind", "authorityKind", "status", "relations", "decisionRefs", "evidenceLinks", "disposition", "reviewStatus"]
+      "canonicalDocumentTypes": [
+        "Contract"
+      ],
+      "minimumLedgerFields": [
+        "claimId",
+        "sourceId",
+        "sourcePath",
+        "sourceAnchor",
+        "sourceDigest",
+        "targetOwner",
+        "targetAnchor",
+        "claimKind",
+        "authorityKind",
+        "status",
+        "relations",
+        "decisionRefs",
+        "evidenceLinks",
+        "disposition",
+        "reviewStatus"
+      ],
+      "usage": "in-use"
     },
     {
       "id": "specification",
       "description": "Observable current behavior, state model, operations, shared entities, and lifecycle transitions.",
-      "canonicalDocumentTypes": ["Spec"],
-      "minimumLedgerFields": ["claimId", "sourceId", "sourcePath", "sourceAnchor", "sourceDigest", "targetOwner", "targetAnchor", "claimKind", "authorityKind", "status", "relations", "decisionRefs", "evidenceLinks", "disposition", "reviewStatus"]
+      "canonicalDocumentTypes": [
+        "Spec"
+      ],
+      "minimumLedgerFields": [
+        "claimId",
+        "sourceId",
+        "sourcePath",
+        "sourceAnchor",
+        "sourceDigest",
+        "targetOwner",
+        "targetAnchor",
+        "claimKind",
+        "authorityKind",
+        "status",
+        "relations",
+        "decisionRefs",
+        "evidenceLinks",
+        "disposition",
+        "reviewStatus"
+      ],
+      "usage": "in-use"
     },
     {
       "id": "architecture",
       "description": "System or component topology, design rationale, boundary definition, and trade-off analysis.",
-      "canonicalDocumentTypes": ["Architecture"],
-      "minimumLedgerFields": ["claimId", "sourceId", "sourcePath", "sourceAnchor", "sourceDigest", "targetOwner", "targetAnchor", "claimKind", "authorityKind", "status", "relations", "decisionRefs", "evidenceLinks", "disposition", "reviewStatus"]
+      "canonicalDocumentTypes": [
+        "Architecture"
+      ],
+      "minimumLedgerFields": [
+        "claimId",
+        "sourceId",
+        "sourcePath",
+        "sourceAnchor",
+        "sourceDigest",
+        "targetOwner",
+        "targetAnchor",
+        "claimKind",
+        "authorityKind",
+        "status",
+        "relations",
+        "decisionRefs",
+        "evidenceLinks",
+        "disposition",
+        "reviewStatus"
+      ],
+      "usage": "in-use"
     },
     {
       "id": "decision",
       "description": "Architectural or product choice, problem statement, options evaluated, rationale, and supersession links.",
-      "canonicalDocumentTypes": ["Decision"],
-      "minimumLedgerFields": ["claimId", "sourceId", "sourcePath", "sourceAnchor", "sourceDigest", "targetOwner", "targetAnchor", "claimKind", "authorityKind", "status", "relations", "decisionRefs", "evidenceLinks", "disposition", "reviewStatus"]
+      "canonicalDocumentTypes": [
+        "Decision"
+      ],
+      "minimumLedgerFields": [
+        "claimId",
+        "sourceId",
+        "sourcePath",
+        "sourceAnchor",
+        "sourceDigest",
+        "targetOwner",
+        "targetAnchor",
+        "claimKind",
+        "authorityKind",
+        "status",
+        "relations",
+        "decisionRefs",
+        "evidenceLinks",
+        "disposition",
+        "reviewStatus"
+      ],
+      "usage": "in-use"
     },
     {
       "id": "vision",
       "description": "High-level mission, long-horizon intended direction, scope, and explicit non-scope.",
-      "canonicalDocumentTypes": ["Vision"],
-      "minimumLedgerFields": ["claimId", "sourceId", "sourcePath", "sourceAnchor", "sourceDigest", "targetOwner", "targetAnchor", "claimKind", "authorityKind", "status", "relations", "decisionRefs", "evidenceLinks", "disposition", "reviewStatus"]
+      "canonicalDocumentTypes": [
+        "Vision"
+      ],
+      "minimumLedgerFields": [
+        "claimId",
+        "sourceId",
+        "sourcePath",
+        "sourceAnchor",
+        "sourceDigest",
+        "targetOwner",
+        "targetAnchor",
+        "claimKind",
+        "authorityKind",
+        "status",
+        "relations",
+        "decisionRefs",
+        "evidenceLinks",
+        "disposition",
+        "reviewStatus"
+      ],
+      "usage": "in-use"
     },
     {
       "id": "intent",
       "description": "Preserved design intent across simplified implementation slices, must-not-preclude constraints, and revisit triggers.",
-      "canonicalDocumentTypes": ["Intent preservation ledger"],
-      "minimumLedgerFields": ["claimId", "sourceId", "sourcePath", "sourceAnchor", "sourceDigest", "targetOwner", "targetAnchor", "claimKind", "authorityKind", "status", "relations", "decisionRefs", "evidenceLinks", "disposition", "reviewStatus"]
+      "canonicalDocumentTypes": [
+        "Intent preservation ledger"
+      ],
+      "minimumLedgerFields": [
+        "claimId",
+        "sourceId",
+        "sourcePath",
+        "sourceAnchor",
+        "sourceDigest",
+        "targetOwner",
+        "targetAnchor",
+        "claimKind",
+        "authorityKind",
+        "status",
+        "relations",
+        "decisionRefs",
+        "evidenceLinks",
+        "disposition",
+        "reviewStatus"
+      ],
+      "usage": "in-use"
     },
     {
       "id": "procedure",
       "description": "Supported operator procedure, runbook, or maintenance instructions.",
-      "canonicalDocumentTypes": ["Guide / runbook"],
-      "minimumLedgerFields": ["claimId", "sourceId", "sourcePath", "sourceAnchor", "sourceDigest", "targetOwner", "targetAnchor", "claimKind", "authorityKind", "status", "relations", "decisionRefs", "evidenceLinks", "disposition", "reviewStatus"]
+      "canonicalDocumentTypes": [
+        "Guide / runbook"
+      ],
+      "minimumLedgerFields": [
+        "claimId",
+        "sourceId",
+        "sourcePath",
+        "sourceAnchor",
+        "sourceDigest",
+        "targetOwner",
+        "targetAnchor",
+        "claimKind",
+        "authorityKind",
+        "status",
+        "relations",
+        "decisionRefs",
+        "evidenceLinks",
+        "disposition",
+        "reviewStatus"
+      ],
+      "usage": "in-use"
     },
     {
       "id": "verification",
       "description": "Empirical proof, test suite receipt, benchmark output, or verification record supporting a claim.",
-      "canonicalDocumentTypes": ["Verification"],
-      "minimumLedgerFields": ["claimId", "sourceId", "sourcePath", "sourceAnchor", "sourceDigest", "targetOwner", "targetAnchor", "claimKind", "authorityKind", "status", "relations", "decisionRefs", "evidenceLinks", "disposition", "reviewStatus"]
+      "canonicalDocumentTypes": [
+        "Verification"
+      ],
+      "minimumLedgerFields": [
+        "claimId",
+        "sourceId",
+        "sourcePath",
+        "sourceAnchor",
+        "sourceDigest",
+        "targetOwner",
+        "targetAnchor",
+        "claimKind",
+        "authorityKind",
+        "status",
+        "relations",
+        "decisionRefs",
+        "evidenceLinks",
+        "disposition",
+        "reviewStatus"
+      ],
+      "usage": "in-use"
     },
     {
       "id": "historical-context",
       "description": "Provenance, historical milestone, retrospective observation, or retired context.",
-      "canonicalDocumentTypes": ["History", "Knowledge"],
-      "minimumLedgerFields": ["claimId", "sourceId", "sourcePath", "sourceAnchor", "sourceDigest", "targetOwner", "targetAnchor", "claimKind", "authorityKind", "status", "relations", "decisionRefs", "evidenceLinks", "disposition", "reviewStatus"]
+      "canonicalDocumentTypes": [
+        "History",
+        "Knowledge"
+      ],
+      "minimumLedgerFields": [
+        "claimId",
+        "sourceId",
+        "sourcePath",
+        "sourceAnchor",
+        "sourceDigest",
+        "targetOwner",
+        "targetAnchor",
+        "claimKind",
+        "authorityKind",
+        "status",
+        "relations",
+        "decisionRefs",
+        "evidenceLinks",
+        "disposition",
+        "reviewStatus"
+      ],
+      "usage": "in-use"
     },
     {
       "id": "navigation",
       "description": "Area portal, subcomponent map, reading map, or index routing readers to canonical documents.",
-      "canonicalDocumentTypes": ["Area portal", "Subcomponent portal", "Reading map"],
-      "minimumLedgerFields": ["claimId", "sourceId", "sourcePath", "sourceAnchor", "sourceDigest", "targetOwner", "targetAnchor", "claimKind", "authorityKind", "status", "relations", "decisionRefs", "evidenceLinks", "disposition", "reviewStatus"]
+      "canonicalDocumentTypes": [
+        "Area portal",
+        "Subcomponent portal",
+        "Reading map"
+      ],
+      "minimumLedgerFields": [
+        "claimId",
+        "sourceId",
+        "sourcePath",
+        "sourceAnchor",
+        "sourceDigest",
+        "targetOwner",
+        "targetAnchor",
+        "claimKind",
+        "authorityKind",
+        "status",
+        "relations",
+        "decisionRefs",
+        "evidenceLinks",
+        "disposition",
+        "reviewStatus"
+      ],
+      "usage": "in-use"
+    },
+    {
+      "id": "unclassified",
+      "description": "Placeholder for a claim unit the inventory could not yet classify. Never a final value: every row with this kind must be re-kinded before conservation can close.",
+      "canonicalDocumentTypes": [],
+      "minimumLedgerFields": [
+        "claimId",
+        "sourceId",
+        "sourcePath",
+        "sourceAnchor",
+        "sourceDigest",
+        "targetOwner",
+        "targetAnchor",
+        "claimKind",
+        "authorityKind",
+        "status",
+        "relations",
+        "decisionRefs",
+        "evidenceLinks",
+        "disposition",
+        "reviewStatus"
+      ],
+      "usage": "in-use",
+      "blocksCutover": true
     }
-  ]
+  ],
+  "fileClasses": [
+    {
+      "id": "maintained-authority",
+      "definition": "Maintained prose that may establish authority for a claim.",
+      "usage": "in-use"
+    },
+    {
+      "id": "retained-source",
+      "definition": "Maintained source prose kept only until its claims are carried to a canonical owner or retired.",
+      "usage": "in-use"
+    },
+    {
+      "id": "history-evidence",
+      "definition": "Non-authority evidence, proof payloads, reports and archived context.",
+      "usage": "in-use"
+    },
+    {
+      "id": "generated",
+      "definition": "Derived projection that never outranks its source.",
+      "usage": "in-use"
+    },
+    {
+      "id": "unclassified",
+      "definition": "File with no switchboard route; only unknown-blocking is allowed until an area assigns a class.",
+      "usage": "in-use",
+      "allowedDispositions": [
+        "unknown-blocking"
+      ],
+      "blocksCutover": true
+    }
+  ],
+  "corpora": [
+    {
+      "id": "platform-authority",
+      "definition": "Platform documentation in scope of the authority migration.",
+      "usage": "in-use"
+    },
+    {
+      "id": "user-knowledge",
+      "definition": "End-user knowledge corpus governed by the knowledge registry; out of platform authority.",
+      "usage": "in-use"
+    },
+    {
+      "id": "history-evidence",
+      "definition": "History and evidence corpus; never default reading authority.",
+      "usage": "in-use"
+    },
+    {
+      "id": "consumer-project",
+      "definition": "Material owned by consumer projects (for example the distillery); out of platform authority.",
+      "usage": "in-use"
+    }
+  ],
+  "authorityKinds": [
+    {
+      "id": "legacy-current",
+      "definition": "Current authority still living in a legacy root or root document until superseded.",
+      "usage": "in-use"
+    },
+    {
+      "id": "candidate",
+      "definition": "Target material under docs/platform/** that is not yet canonical.",
+      "usage": "in-use"
+    },
+    {
+      "id": "promoted",
+      "definition": "Target material already declared the canonical owner by the switchboard.",
+      "usage": "in-use"
+    },
+    {
+      "id": "non-authority",
+      "definition": "Evidence, history or generated output that establishes no claim.",
+      "usage": "in-use"
+    },
+    {
+      "id": "unclassified",
+      "definition": "No switchboard route yet; blocks cutover.",
+      "usage": "in-use",
+      "blocksCutover": true
+    }
+  ],
+  "claimStatuses": [
+    {
+      "id": "current",
+      "definition": "The claim describes what is true now.",
+      "usage": "in-use"
+    },
+    {
+      "id": "future",
+      "definition": "The claim describes intended or planned state.",
+      "usage": "in-use"
+    },
+    {
+      "id": "historical",
+      "definition": "The claim describes retired, past or evidentiary state.",
+      "usage": "in-use"
+    }
+  ],
+  "reviewStatuses": [
+    {
+      "id": "blocking",
+      "definition": "Disposition is unknown-blocking or identity is ambiguous; blocks cutover.",
+      "usage": "in-use"
+    },
+    {
+      "id": "pending",
+      "definition": "Proposed disposition exists and awaits review.",
+      "usage": "in-use"
+    },
+    {
+      "id": "reviewed",
+      "definition": "A named reviewer accepted the disposition, owner and target anchor.",
+      "usage": "reserved"
+    },
+    {
+      "id": "needs-review",
+      "definition": "Carry-forward marker for a unit edited since it was last reviewed; lives in the identity registry.",
+      "usage": "registry-only"
+    }
+  ],
+  "relationTypes": [
+    {
+      "id": "duplicate-content-member",
+      "definition": "The claim shares identical content with other source paths (one semantic claim, several occurrences).",
+      "usage": "in-use"
+    },
+    {
+      "id": "same-source-indistinguishable-duplicate-blocker",
+      "definition": "Identical units inside one file that carry-forward could not pair; blocks until paired by anchor.",
+      "usage": "generator-only"
+    },
+    {
+      "id": "defines",
+      "definition": "Typed documentation relationship (doc-governance §11).",
+      "usage": "reserved"
+    },
+    {
+      "id": "constrains",
+      "definition": "Typed documentation relationship (doc-governance §11).",
+      "usage": "reserved"
+    },
+    {
+      "id": "implements",
+      "definition": "Typed documentation relationship (doc-governance §11).",
+      "usage": "reserved"
+    },
+    {
+      "id": "explains",
+      "definition": "Typed documentation relationship (doc-governance §11).",
+      "usage": "reserved"
+    },
+    {
+      "id": "evidenced_by",
+      "definition": "Typed documentation relationship (doc-governance §11).",
+      "usage": "reserved"
+    },
+    {
+      "id": "supersedes",
+      "definition": "Typed documentation relationship (doc-governance §11).",
+      "usage": "reserved"
+    },
+    {
+      "id": "consumes",
+      "definition": "Typed documentation relationship (doc-governance §11).",
+      "usage": "reserved"
+    }
+  ],
+  "identityStatuses": [
+    {
+      "id": "carried-forward",
+      "definition": "Identity carried from the committed registry.",
+      "usage": "in-use"
+    },
+    {
+      "id": "ambiguous-registry-gap",
+      "definition": "Several registry rows could match; identity is a blocking gap.",
+      "usage": "in-use"
+    },
+    {
+      "id": "ambiguous-duplicate-registry-gap",
+      "definition": "Identical duplicate units that could not be paired.",
+      "usage": "generator-only"
+    },
+    {
+      "id": "missing-registry-gap",
+      "definition": "No registry row matches the unit.",
+      "usage": "generator-only"
+    },
+    {
+      "id": "ambiguous-source-registry-gap",
+      "definition": "Source identity conflicts between registry documents.",
+      "usage": "generator-only"
+    },
+    {
+      "id": "missing-source-registry-gap",
+      "definition": "Source has no registry identity.",
+      "usage": "generator-only"
+    }
+  ],
+  "status": "Proposed (freeze pending owner)",
+  "amendmentRule": "Version 2 is frozen for the meaning of every existing value. A new value or section is added only as an additive amendment (version 2.1, 2.2, ...) recorded in amendments with its evidence; the validator is re-run and the constitution keeps pinning the major version. Changing or removing an existing value needs a new major version and an owner decision.",
+  "amendments": []
 }

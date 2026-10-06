@@ -1,0 +1,1048 @@
+{
+  "$schema": "https://forgent.dev/schemas/minimum-constitution.v1.json",
+  "version": 1,
+  "generatedAt": "2026-10-06T00:00:00.000Z",
+  "phase": "04",
+  "description": "Minimum machine-readable constitution for the documentation authority migration: exactly the plan §6.3 rules. It encodes docs/doc-governance.md for the migration; it is not a second prose governance and not the future docs/doc-types.yaml engine manifest.",
+  "provenance": "plans/260925-documentation-authority-unification/plan.md §6.3",
+  "vocabulary": {
+    "path": "plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.json",
+    "version": 2
+  },
+  "reuses": [
+    {
+      "source": "docs/doc-governance.md §2, §3, §4, §5, §8, §9, §10, §11",
+      "what": "Document types, placement map, authority matrix and conflict rules, metadata baseline, subcomponent shape, writing method and typed relationships. The constitution restates only the machine-checkable part and links back."
+    },
+    {
+      "source": "docs/transitional-switchboard.md and plans/260925-documentation-authority-unification/transitional-switchboard.json",
+      "what": "authorityStatus values (legacy-current, candidate, promoted, non-authority), fileClass values and the rule that the switchboard, not a path or date, decides authority during migration."
+    },
+    {
+      "source": "docs/platform/migration-authoring-rules.md",
+      "what": "One-owner discipline, candidate marker in the Design status field, legacy-root ratchet and its exception ledger."
+    },
+    {
+      "source": "archive/plans/260825-1841-knowledge-registry/phase-01-registry-domain-model.md and src/state/knowledge-registry.mjs",
+      "what": "The invariant activeDoc(topicId, role) <= 1 is reused as the singleton cardinality rule; the registry lifecycle names (reserved, provisional, active, superseded, retired) are reused when document lifecycle is modeled later (deferred). No second registry or event store is introduced."
+    },
+    {
+      "source": "docs/platform/proposals/documentation-system-unification.md §3.3, §4.2",
+      "what": "Only the plan §6.3 items are taken: placement, cardinality, required metadata, authority conflict handling, promotion and retirement gates. Everything else is listed under deferredToEngine."
+    }
+  ],
+  "scopes": [
+    {
+      "id": "platform",
+      "pathPrefix": "docs/platform/",
+      "definition": "Whole-platform anchors that belong to no single area."
+    },
+    {
+      "id": "area",
+      "pathPrefix": "docs/platform/<area>/",
+      "definition": "One platform area, such as packaging-distribution."
+    },
+    {
+      "id": "subcomponent",
+      "pathPrefix": "docs/platform/<area>/subcomponents/<subcomponent>/",
+      "definition": "One child component inside an area."
+    }
+  ],
+  "placeholders": [
+    "area",
+    "subcomponent",
+    "collection",
+    "name",
+    "feature"
+  ],
+  "documentKinds": [
+    {
+      "id": "platform-portal",
+      "typeName": "Platform portal",
+      "introduced": true,
+      "authorityClass": "navigation",
+      "canonical": true,
+      "claimKinds": [
+        "navigation"
+      ],
+      "placements": [
+        {
+          "pattern": "docs/platform/README.md",
+          "cardinality": "singleton",
+          "per": "platform"
+        }
+      ]
+    },
+    {
+      "id": "area-portal",
+      "typeName": "Area portal",
+      "authorityClass": "navigation",
+      "canonical": true,
+      "claimKinds": [
+        "navigation"
+      ],
+      "placements": [
+        {
+          "pattern": "docs/platform/<area>/README.md",
+          "cardinality": "singleton",
+          "per": "area"
+        }
+      ],
+      "governanceRef": "3. Document Types"
+    },
+    {
+      "id": "subcomponent-portal",
+      "typeName": "Subcomponent portal",
+      "authorityClass": "navigation",
+      "canonical": true,
+      "claimKinds": [
+        "navigation"
+      ],
+      "placements": [
+        {
+          "pattern": "docs/platform/<area>/subcomponents/<subcomponent>/README.md",
+          "cardinality": "singleton",
+          "per": "subcomponent"
+        }
+      ],
+      "governanceRef": "3. Document Types"
+    },
+    {
+      "id": "collection-index",
+      "typeName": "Collection index",
+      "introduced": true,
+      "authorityClass": "navigation",
+      "canonical": true,
+      "claimKinds": [
+        "navigation"
+      ],
+      "placements": [
+        {
+          "pattern": "docs/platform/<area>/<collection>/README.md",
+          "cardinality": "singleton",
+          "per": "directory"
+        },
+        {
+          "pattern": "docs/platform/<area>/subcomponents/<subcomponent>/<collection>/README.md",
+          "cardinality": "singleton",
+          "per": "directory"
+        }
+      ]
+    },
+    {
+      "id": "reading-map",
+      "typeName": "Reading map",
+      "introduced": true,
+      "authorityClass": "navigation",
+      "canonical": true,
+      "claimKinds": [
+        "navigation"
+      ],
+      "placements": [
+        {
+          "pattern": "docs/reading-map.md",
+          "cardinality": "singleton",
+          "per": "platform"
+        }
+      ]
+    },
+    {
+      "id": "vision",
+      "typeName": "Vision",
+      "authorityClass": "direction",
+      "canonical": true,
+      "claimKinds": [
+        "vision"
+      ],
+      "placements": [
+        {
+          "pattern": "docs/platform/vision.md",
+          "cardinality": "singleton",
+          "per": "platform"
+        },
+        {
+          "pattern": "docs/platform/<area>/vision.md",
+          "cardinality": "singleton",
+          "per": "area"
+        }
+      ],
+      "governanceRef": "3. Document Types"
+    },
+    {
+      "id": "intent-preservation-ledger",
+      "typeName": "Intent preservation ledger",
+      "authorityClass": "intent-traceability",
+      "canonical": true,
+      "claimKinds": [
+        "intent"
+      ],
+      "placements": [
+        {
+          "pattern": "docs/platform/intent-preservation-ledger.md",
+          "cardinality": "singleton",
+          "per": "platform"
+        },
+        {
+          "pattern": "docs/platform/<area>/intent-preservation-ledger.md",
+          "cardinality": "singleton",
+          "per": "area"
+        }
+      ],
+      "governanceRef": "3. Document Types"
+    },
+    {
+      "id": "platform-foundations",
+      "typeName": "Platform Foundations",
+      "introduced": true,
+      "authorityClass": "normative",
+      "canonical": true,
+      "claimKinds": [
+        "normative-law"
+      ],
+      "placements": [
+        {
+          "pattern": "docs/platform/platform-foundations.md",
+          "cardinality": "singleton",
+          "per": "platform"
+        }
+      ]
+    },
+    {
+      "id": "spec",
+      "typeName": "Spec",
+      "authorityClass": "current-state",
+      "canonical": true,
+      "claimKinds": [
+        "specification"
+      ],
+      "placements": [
+        {
+          "pattern": "docs/platform/<area>/spec.md",
+          "cardinality": "singleton",
+          "per": "area"
+        },
+        {
+          "pattern": "docs/platform/<area>/subcomponents/<subcomponent>/spec.md",
+          "cardinality": "singleton",
+          "per": "subcomponent"
+        }
+      ],
+      "governanceRef": "3. Document Types"
+    },
+    {
+      "id": "architecture",
+      "typeName": "Architecture",
+      "authorityClass": "design",
+      "canonical": true,
+      "claimKinds": [
+        "architecture"
+      ],
+      "placements": [
+        {
+          "pattern": "docs/platform/architecture-map.md",
+          "cardinality": "singleton",
+          "per": "platform"
+        },
+        {
+          "pattern": "docs/platform/component-boundary.md",
+          "cardinality": "singleton",
+          "per": "platform"
+        },
+        {
+          "pattern": "docs/platform/<area>/architecture/**",
+          "cardinality": "collection",
+          "per": "area"
+        },
+        {
+          "pattern": "docs/platform/<area>/subcomponents/<subcomponent>/architecture/**",
+          "cardinality": "collection",
+          "per": "subcomponent"
+        }
+      ],
+      "governanceRef": "3. Document Types"
+    },
+    {
+      "id": "contract",
+      "typeName": "Contract",
+      "authorityClass": "normative",
+      "canonical": true,
+      "claimKinds": [
+        "contract"
+      ],
+      "placements": [
+        {
+          "pattern": "docs/platform/contracts/**",
+          "cardinality": "collection",
+          "per": "platform"
+        },
+        {
+          "pattern": "docs/platform/<area>/contracts/**",
+          "cardinality": "collection",
+          "per": "area"
+        },
+        {
+          "pattern": "docs/platform/<area>/subcomponents/<subcomponent>/contracts/**",
+          "cardinality": "collection",
+          "per": "subcomponent"
+        }
+      ],
+      "governanceRef": "3. Document Types"
+    },
+    {
+      "id": "decision",
+      "typeName": "Decision",
+      "authorityClass": "decision-provenance",
+      "canonical": true,
+      "claimKinds": [
+        "decision"
+      ],
+      "placements": [
+        {
+          "pattern": "docs/platform/decisions/**",
+          "cardinality": "collection",
+          "per": "platform"
+        },
+        {
+          "pattern": "docs/platform/<area>/decisions/**",
+          "cardinality": "collection",
+          "per": "area"
+        },
+        {
+          "pattern": "docs/platform/<area>/subcomponents/<subcomponent>/decisions/**",
+          "cardinality": "collection",
+          "per": "subcomponent"
+        }
+      ],
+      "governanceRef": "3. Document Types"
+    },
+    {
+      "id": "verification",
+      "typeName": "Verification",
+      "authorityClass": "evidence",
+      "canonical": true,
+      "claimKinds": [
+        "verification"
+      ],
+      "placements": [
+        {
+          "pattern": "docs/platform/verification/**",
+          "cardinality": "collection",
+          "per": "platform"
+        },
+        {
+          "pattern": "docs/platform/<area>/verification/**",
+          "cardinality": "collection",
+          "per": "area"
+        },
+        {
+          "pattern": "docs/platform/<area>/reports/**",
+          "cardinality": "collection",
+          "per": "area"
+        },
+        {
+          "pattern": "docs/platform/<area>/subcomponents/<subcomponent>/verification/**",
+          "cardinality": "collection",
+          "per": "subcomponent"
+        }
+      ],
+      "governanceRef": "3. Document Types"
+    },
+    {
+      "id": "guide-runbook",
+      "typeName": "Guide / runbook",
+      "authorityClass": "operational",
+      "canonical": true,
+      "claimKinds": [
+        "procedure"
+      ],
+      "placements": [
+        {
+          "pattern": "docs/platform/<area>/operations/**",
+          "cardinality": "collection",
+          "per": "area"
+        },
+        {
+          "pattern": "docs/platform/<area>/playbooks/**",
+          "cardinality": "collection",
+          "per": "area"
+        }
+      ],
+      "governanceRef": "3. Document Types"
+    },
+    {
+      "id": "proposal",
+      "typeName": "Proposal",
+      "authorityClass": "non-canonical",
+      "canonical": false,
+      "claimKinds": [],
+      "placements": [
+        {
+          "pattern": "docs/platform/proposals/**",
+          "cardinality": "collection",
+          "per": "platform"
+        },
+        {
+          "pattern": "docs/platform/<area>/proposals/**",
+          "cardinality": "collection",
+          "per": "area"
+        }
+      ],
+      "governanceRef": "3. Document Types"
+    },
+    {
+      "id": "discussion-scratchpad",
+      "typeName": "Discussion scratchpad",
+      "authorityClass": "non-canonical",
+      "canonical": false,
+      "claimKinds": [],
+      "placements": [
+        {
+          "pattern": "docs/history/<feature>/DISCUSSION.md",
+          "cardinality": "singleton",
+          "per": "feature"
+        }
+      ],
+      "governanceRef": "3. Document Types"
+    },
+    {
+      "id": "generated-doc",
+      "typeName": "Generated doc / index",
+      "authorityClass": "derived",
+      "canonical": false,
+      "claimKinds": [],
+      "placements": [
+        {
+          "pattern": "docs/generated/**",
+          "cardinality": "collection",
+          "per": "platform"
+        }
+      ],
+      "note": "Other declared generator outputs (for example docs/backlog.md) stay at the path the switchboard declares.",
+      "governanceRef": "3. Document Types"
+    },
+    {
+      "id": "history",
+      "typeName": "History",
+      "authorityClass": "evidence",
+      "canonical": false,
+      "claimKinds": [
+        "historical-context"
+      ],
+      "placements": [
+        {
+          "pattern": "docs/platform/history/**",
+          "cardinality": "collection",
+          "per": "platform"
+        },
+        {
+          "pattern": "docs/platform/<area>/history/**",
+          "cardinality": "collection",
+          "per": "area"
+        },
+        {
+          "pattern": "docs/platform/<area>/subcomponents/<subcomponent>/history/**",
+          "cardinality": "collection",
+          "per": "subcomponent"
+        },
+        {
+          "pattern": "docs/history/<feature>/**",
+          "cardinality": "collection",
+          "per": "feature"
+        }
+      ],
+      "governanceRef": "3. Document Types"
+    },
+    {
+      "id": "knowledge",
+      "typeName": "Knowledge",
+      "authorityClass": "retrospective",
+      "canonical": false,
+      "claimKinds": [
+        "historical-context"
+      ],
+      "placements": [
+        {
+          "pattern": "docs/knowledge/**",
+          "cardinality": "collection",
+          "per": "platform"
+        }
+      ],
+      "governanceRef": "3. Document Types"
+    },
+    {
+      "id": "redirect-stub",
+      "typeName": "Redirect",
+      "introduced": true,
+      "authorityClass": "temporary-pointer",
+      "canonical": false,
+      "claimKinds": [],
+      "placements": [],
+      "marker": {
+        "field": "Document type",
+        "value": "Redirect"
+      },
+      "note": "Identified by its header marker, never by path."
+    },
+    {
+      "id": "vocabulary",
+      "typeName": "Vocabulary",
+      "introduced": true,
+      "authorityClass": "normative",
+      "canonical": true,
+      "claimKinds": [
+        "specification"
+      ],
+      "placements": [
+        {
+          "pattern": "docs/platform/<area>/vocabulary/**",
+          "cardinality": "collection",
+          "per": "area"
+        }
+      ]
+    },
+    {
+      "id": "roadmap",
+      "typeName": "Roadmap",
+      "introduced": true,
+      "authorityClass": "planning",
+      "canonical": false,
+      "claimKinds": [],
+      "placements": [
+        {
+          "pattern": "docs/platform/<area>/roadmap.md",
+          "cardinality": "singleton",
+          "per": "area"
+        },
+        {
+          "pattern": "docs/platform/<area>/roadmap/**",
+          "cardinality": "collection",
+          "per": "area"
+        }
+      ]
+    },
+    {
+      "id": "rollout-plan",
+      "typeName": "Implementation plan",
+      "introduced": true,
+      "authorityClass": "planning",
+      "canonical": false,
+      "claimKinds": [],
+      "placements": [
+        {
+          "pattern": "docs/platform/<area>/<name>-rollout-plan.md",
+          "cardinality": "collection",
+          "per": "area"
+        }
+      ]
+    }
+  ],
+  "documentTypeAliases": {
+    "Platform portal": "platform-portal",
+    "Area portal": "area-portal",
+    "Subcomponent portal": "subcomponent-portal",
+    "Contract index": "collection-index",
+    "Architecture index": "collection-index",
+    "Verification index": "collection-index",
+    "Decisions index": "collection-index",
+    "Reading map": "reading-map",
+    "Vision": "vision",
+    "Platform vision": "vision",
+    "Intent preservation ledger": "intent-preservation-ledger",
+    "Platform foundations": "platform-foundations",
+    "Spec": "spec",
+    "Area spec": "spec",
+    "Architecture": "architecture",
+    "Platform architecture map": "architecture",
+    "Platform architecture anchor": "architecture",
+    "Contract": "contract",
+    "Decision": "decision",
+    "Verification": "verification",
+    "Verification audit": "verification",
+    "Verification closeout": "verification",
+    "Proposal": "proposal",
+    "Architecture Proposal": "proposal",
+    "Discussion scratchpad": "discussion-scratchpad",
+    "Generated artifact": "generated-doc",
+    "Generated docs portal": "generated-doc",
+    "History": "history",
+    "Claim preservation table": "history",
+    "Proof preservation table": "history",
+    "Proposal status table": "history",
+    "Migration status": "history",
+    "Migration completion report": "history",
+    "Source inventory": "history",
+    "Redirect": "redirect-stub",
+    "Roadmap": "roadmap",
+    "Implementation plan": "rollout-plan"
+  },
+  "unmappedObservedDocumentTypes": [
+    {
+      "value": "Migration plan",
+      "files": 2,
+      "examplePath": "docs/architect/agent-coordination/documentation-standardization-plan.md",
+      "reason": "Legacy migration plan; no governance type; likely history or plans/."
+    },
+    {
+      "value": "Architecture design",
+      "files": 1,
+      "examplePath": "docs/architect/documentation-system-design.md",
+      "reason": "Source design discussion for governance; could be architecture or history."
+    },
+    {
+      "value": "Governance",
+      "files": 1,
+      "examplePath": "docs/doc-governance.md",
+      "reason": "Governance contract has no governance type of its own."
+    },
+    {
+      "value": "Governance guide",
+      "files": 1,
+      "examplePath": "docs/platform/migration-authoring-rules.md",
+      "reason": "Migration-time rules; temporary, ends with the cutover."
+    },
+    {
+      "value": "Documentation portal",
+      "files": 1,
+      "examplePath": "docs/README.md",
+      "reason": "Top-level docs portal sits outside docs/platform/."
+    },
+    {
+      "value": "User docs portal",
+      "files": 1,
+      "examplePath": "docs/user/README.md",
+      "reason": "User corpus portal; out of platform authority."
+    },
+    {
+      "value": "<type>",
+      "files": 1,
+      "examplePath": "docs/architect/agent-coordination/documentation-governance.md",
+      "reason": "Unfilled template placeholder in a legacy header; defect to fix when the file is dispositioned."
+    },
+    {
+      "value": "Transitional switchboard",
+      "files": 1,
+      "examplePath": "docs/transitional-switchboard.md",
+      "reason": "Migration-time routing table; temporary, retires with the cutover."
+    }
+  ],
+  "placementRules": [
+    {
+      "id": "target-topology",
+      "rule": "Maintained platform authority lives under docs/platform/**: platform-wide documents directly under docs/platform/, area documents under docs/platform/<area>/.",
+      "governanceRef": "2. Placement Map"
+    },
+    {
+      "id": "forbidden-containers",
+      "rule": "No docs/platform/system/ and no docs/platform/areas/.",
+      "forbiddenPaths": [
+        "docs/platform/system/",
+        "docs/platform/areas/"
+      ],
+      "governanceRef": "2. Placement Map"
+    },
+    {
+      "id": "no-new-legacy-files",
+      "rule": "No new maintained prose under the legacy roots docs/specs/** and docs/architect/**; the legacy-docs ratchet enforces it.",
+      "legacyRoots": [
+        "docs/specs/",
+        "docs/architect/"
+      ]
+    },
+    {
+      "id": "placement-by-kind",
+      "rule": "Each document kind may live only at one of its listed placement patterns."
+    },
+    {
+      "id": "authority-by-claims",
+      "rule": "A file's class is decided by its claims and consumers, never by its physical location alone (plan §2.3)."
+    },
+    {
+      "id": "external-governed-surfaces",
+      "rule": "domains/, .agents/skills/, plugins/fgOS/skills/ and plans/ stay outside the docs/platform topology. They follow the document taxonomy but are shipped or working surfaces, not moved by the cutover (plan §3 item 11).",
+      "surfaces": [
+        "domains/",
+        ".agents/skills/",
+        "plugins/fgOS/skills/",
+        "plans/"
+      ]
+    }
+  ],
+  "corpusPlacement": [
+    {
+      "corpus": "platform-authority",
+      "target": "docs/platform/**",
+      "note": "Maintained platform authority; the only corpus whose authority this migration unifies."
+    },
+    {
+      "corpus": "user-knowledge",
+      "target": "docs/knowledge/** and the live Diataxis roots",
+      "note": "Governed by the knowledge registry; classify the boundary and rewrite platform links only (plan §2.3, §4)."
+    },
+    {
+      "corpus": "history-evidence",
+      "target": "docs/history/**, docs/platform/history/**, docs/platform/<area>/history/**",
+      "note": "Kept only through explicit relationships; never default reading authority."
+    },
+    {
+      "corpus": "consumer-project",
+      "target": "unchanged (for example docs/distillery/**)",
+      "note": "Owned by consumer-project corpora; reclassified out of platform scope."
+    }
+  ],
+  "requiredMetadata": {
+    "appliesTo": "Every maintained canonical document and every candidate document under docs/platform/**.",
+    "headerForm": "A fenced txt block directly under the H1 with plain `Field: value` lines.",
+    "promotedCore": [
+      "Document type",
+      "Audience",
+      "Purpose",
+      "Design status",
+      "Last reviewed",
+      "Related"
+    ],
+    "governanceBaselineExtra": [
+      "Implementation",
+      "Provenance",
+      "Writer type",
+      "Canonical for",
+      "Use this when",
+      "Do not use this for"
+    ],
+    "generatedExtra": [
+      "Source of truth",
+      "Generator",
+      "Generator version",
+      "Generated at",
+      "Freshness check",
+      "Do not edit"
+    ],
+    "candidateMarker": {
+      "source": "authorityStatus of the area or route in the transitional switchboard (docs/transitional-switchboard.md and transitional-switchboard.json)",
+      "rule": "A document is a candidate or promoted according to the switchboard, never according to the text of its Design status field. Draft, Proposed and Candidate in Design status are descriptive only; promoted portals say Draft today."
+    },
+    "structure": [
+      "exactly one H1, and it is the document title",
+      "every section starts at H2; maintained canonical documents use numbered headings",
+      "relationships listed in the Related field are also markdown links in the body",
+      "a document that lists related paths links them with relative markdown links"
+    ],
+    "evidence": "The six promotedCore fields are present in all 72 headered documents under docs/platform/** and in all three promoted area portals; the other six fields are present in 13 of them (measured by script on the plan branch, 2026-10-06).",
+    "checkedBy": {
+      "kind": "planned",
+      "deliverable": "candidate-status metadata check"
+    },
+    "governanceRef": "5. Metadata"
+  },
+  "classification": {
+    "generated": {
+      "fileClass": "generated",
+      "authorityKind": "non-authority",
+      "disposition": "regenerate-from-source",
+      "rules": [
+        "A generated document names its source of truth and generator and states Do not edit: true.",
+        "Generated output never outranks its source and is never edited by hand.",
+        "A generated projection must be reproducible and carry its freshness information."
+      ]
+    },
+    "history": {
+      "fileClass": "history-evidence",
+      "authorityKind": "non-authority",
+      "dispositions": [
+        "retain-as-evidence",
+        "archive-with-reason"
+      ],
+      "rules": [
+        "History and evidence establish no current claim and are not default reading authority.",
+        "History is kept only with an explicit relationship from a canonical document or an alias, and with a recorded reason.",
+        "Evidence payloads may be relocated before the cutover only after their consumers are inventoried and their digests verified."
+      ]
+    },
+    "unclassified": {
+      "fileClass": "unclassified",
+      "rule": "A file with no switchboard route stays unknown-blocking until an area assigns its class; it blocks the cutover."
+    }
+  },
+  "authorityConflict": {
+    "principle": "A conflict is a documentation defect. Surface and reconcile it; no agent silently chooses a winner.",
+    "precedence": [
+      {
+        "id": "contract-over-guide",
+        "rule": "Contracts outrank guides and runbooks."
+      },
+      {
+        "id": "spec-over-stale-architecture",
+        "rule": "A current spec outranks stale architecture wording about present behavior."
+      },
+      {
+        "id": "newer-decision-supersedes",
+        "rule": "A newer approved decision supersedes an older one."
+      },
+      {
+        "id": "generated-never-outranks-source",
+        "rule": "Generated output never outranks its source."
+      }
+    ],
+    "procedure": [
+      "Detect: duplicate-content groups, semantic-conflict groups, two claim rows with different owners, or a reader-reported contradiction.",
+      "Record: keep every conflicting claim row with disposition unknown-blocking and reviewStatus blocking, and relate the rows to each other.",
+      "Classify the conflict: identical duplicate, stale versus current, contradictory decision, or contract versus guide.",
+      "Resolve mechanically only when one precedence rule above applies; otherwise record an owner decision with its rationale.",
+      "Encode the outcome in dispositions so exactly one canonical owner remains.",
+      "Close the conflict only when no claim has two owners and the surviving rows are reviewed."
+    ],
+    "outcomeDispositions": [
+      "promote",
+      "merge",
+      "supersede",
+      "delete-as-duplicate",
+      "reject-with-rationale",
+      "redirect"
+    ],
+    "governanceRef": "4. Authority Matrix"
+  },
+  "promotionGate": {
+    "definition": "A candidate document or claim becomes canonical. Promotion is atomic for the whole platform-documentation system (plan §3 item 5); until the cutover every target stays a candidate.",
+    "checks": [
+      {
+        "id": "owner-per-claim",
+        "rule": "Every retained claim row has exactly one targetOwner and no unknown-blocking row remains for the promoted sources.",
+        "enforcedBy": {
+          "kind": "script",
+          "path": "scripts/check-doc-inventory-gates.mjs"
+        }
+      },
+      {
+        "id": "no-new-legacy-growth",
+        "rule": "No unreviewed edit or new maintained file under the legacy roots.",
+        "enforcedBy": {
+          "kind": "script",
+          "path": "scripts/check-legacy-docs-ratchet.mjs"
+        }
+      },
+      {
+        "id": "metadata-and-structure",
+        "rule": "The document meets requiredMetadata and its placement pattern.",
+        "enforcedBy": {
+          "kind": "planned",
+          "deliverable": "candidate-status metadata check"
+        }
+      },
+      {
+        "id": "links-resolve",
+        "rule": "Every relative link and Related path resolves.",
+        "enforcedBy": {
+          "kind": "planned",
+          "deliverable": "candidate-status metadata check"
+        }
+      },
+      {
+        "id": "claims-reviewed",
+        "rule": "Every claim row of the document has reviewStatus reviewed.",
+        "enforcedBy": {
+          "kind": "planned",
+          "deliverable": "conservation checker"
+        }
+      },
+      {
+        "id": "intent-and-boundary",
+        "rule": "The intent ledger is updated when the document narrows a vision, and the component-boundary check is recorded.",
+        "enforcedBy": {
+          "kind": "review",
+          "reference": "docs/doc-governance.md §8, §11"
+        }
+      }
+    ]
+  },
+  "retirementGate": {
+    "definition": "A legacy source may be deleted or redirected only when all checks pass, at the atomic cutover.",
+    "checks": [
+      {
+        "id": "file-disposition",
+        "rule": "The file has one non-blocking file-level disposition.",
+        "enforcedBy": {
+          "kind": "script",
+          "path": "scripts/check-doc-inventory-gates.mjs"
+        }
+      },
+      {
+        "id": "claims-closed",
+        "rule": "No claim row of the file is unknown-blocking or unreviewed.",
+        "enforcedBy": {
+          "kind": "planned",
+          "deliverable": "conservation checker"
+        }
+      },
+      {
+        "id": "dropped-claims-resolved",
+        "rule": "Every entry of the dropped-claims register has a reviewed disposition.",
+        "enforcedBy": {
+          "kind": "planned",
+          "deliverable": "conservation checker"
+        }
+      },
+      {
+        "id": "aliases-cover-immutable-refs",
+        "rule": "Immutable historical references to the file resolve through the alias table.",
+        "enforcedBy": {
+          "kind": "planned",
+          "deliverable": "alias table and resolver contract"
+        }
+      },
+      {
+        "id": "consumers-rewritten",
+        "rule": "Every consumer edge is rewritten or proven non-authority.",
+        "enforcedBy": {
+          "kind": "planned",
+          "deliverable": "retirement-check dry-run"
+        }
+      },
+      {
+        "id": "evidence-digests",
+        "rule": "Relocated evidence payloads match their recorded digests.",
+        "enforcedBy": {
+          "kind": "planned",
+          "deliverable": "evidence relocation policy and consumer proof"
+        }
+      },
+      {
+        "id": "no-new-legacy-growth",
+        "rule": "The legacy-docs ratchet is clean.",
+        "enforcedBy": {
+          "kind": "script",
+          "path": "scripts/check-legacy-docs-ratchet.mjs"
+        }
+      },
+      {
+        "id": "write-lease",
+        "rule": "The cutover runs under the migration documentation-cutover lease.",
+        "enforcedBy": {
+          "kind": "planned",
+          "deliverable": "documentation-cutover lease design"
+        }
+      },
+      {
+        "id": "row-set-conserved",
+        "rule": "Every claim identity of the previous ledger and identity registry is present in the current row set, or has a recorded removal with rationale and disposition.",
+        "enforcedBy": {
+          "kind": "planned",
+          "deliverable": "conservation checker"
+        }
+      },
+      {
+        "id": "one-owner-per-semantic-claim",
+        "rule": "Rows that share a semanticClaimId name one distinct targetOwner.",
+        "enforcedBy": {
+          "kind": "planned",
+          "deliverable": "conservation checker"
+        }
+      },
+      {
+        "id": "cutover-mode",
+        "rule": "The ledger validator runs in a cutover mode: every retained claim has an owner, an anchor, a classified kind and review status reviewed, and vocabulary usage drift is fatal.",
+        "enforcedBy": {
+          "kind": "planned",
+          "deliverable": "retirement-check dry-run (validator --cutover mode)"
+        }
+      }
+    ]
+  },
+  "deferredToEngine": [
+    {
+      "id": "doc-types-manifest",
+      "item": "Multi-profile docs/doc-types.yaml manifest and platform-docs profile with docId identity",
+      "source": "docs/platform/proposals/documentation-system-unification.md §4.2, §4.3",
+      "revisitTrigger": "The Knowledge and Documentation Engine plan is authorized after the verified cutover."
+    },
+    {
+      "id": "document-lifecycle",
+      "item": "Per-type lifecycle states and transitions (registry names reserved, provisional, active, superseded, retired)",
+      "source": "docs/platform/proposals/documentation-system-unification.md §4.2",
+      "revisitTrigger": "The platform-docs registry profile is designed."
+    },
+    {
+      "id": "required-typed-relationships",
+      "item": "Required typed relationships per document type and graph validation",
+      "source": "docs/doc-governance.md §11; plan §4",
+      "revisitTrigger": "The typed documentation graph work starts."
+    },
+    {
+      "id": "templates-and-sections",
+      "item": "Required sections per document type and templates selected by the constitution",
+      "source": "docs/platform/proposals/documentation-system-unification.md §4.2, §4.4",
+      "revisitTrigger": "The documentation authoring skill and its single authoring door are built."
+    },
+    {
+      "id": "four-axis-classification",
+      "item": "Independent documentType, purpose, audience and authorityKind axes with plural vocabularies and allowed combinations",
+      "source": "docs/platform/proposals/documentation-system-unification.md §3.3",
+      "revisitTrigger": "The engine manifest is written."
+    },
+    {
+      "id": "authority-policy",
+      "item": "authorityPolicy: evidence, review and approval gates per document type and claim kind",
+      "source": "docs/platform/proposals/documentation-system-unification.md §4.2",
+      "revisitTrigger": "Contribution events are introduced."
+    },
+    {
+      "id": "origin-and-contribution-events",
+      "item": "originKind provenance and append-only contribution events for every prose change",
+      "source": "docs/platform/proposals/documentation-system-unification.md §3.3; plan §4",
+      "revisitTrigger": "The engine event model is designed."
+    },
+    {
+      "id": "clause-level-supersession",
+      "item": "Claim and clause level decision supersession",
+      "source": "plan §4",
+      "revisitTrigger": "Decision records move into the engine registry."
+    },
+    {
+      "id": "semantic-checks-per-type",
+      "item": "Semantic and doctor checks per document type",
+      "source": "docs/platform/proposals/documentation-system-unification.md §4.2",
+      "revisitTrigger": "The engine validator is built."
+    },
+    {
+      "id": "generator-freshness-rules",
+      "item": "Machine-checked generator and freshness rules for every derived artifact",
+      "source": "docs/platform/proposals/documentation-system-unification.md §4.2; plan §3 item 8",
+      "revisitTrigger": "The post-cutover maintenance minimum viable product is scoped."
+    },
+    {
+      "id": "agent-context-engine",
+      "item": "Agent Context Engine, dynamic fgos doc context packets, context budgeting and delta expansion",
+      "source": "plan §4, §12.2",
+      "revisitTrigger": "A separate Agent Context Engine plan is authorized."
+    },
+    {
+      "id": "executable-proof-abi",
+      "item": "Executable proof runtime, receipt and attester ABI",
+      "source": "plan §4, §12.3",
+      "revisitTrigger": "The engine proof contract seam is implemented."
+    },
+    {
+      "id": "user-knowledge-consolidation",
+      "item": "Final consolidation of every user-facing knowledge location",
+      "source": "plan §4",
+      "revisitTrigger": "A reviewed scope amendment admits it into a plan."
+    }
+  ],
+  "status": "Proposed (freeze pending owner)",
+  "amendmentRule": "The constitution is frozen at major version 1 for the meaning of every existing rule. Additions (a document kind, a placement, a gate check) are made by recorded exception with evidence and keep the pinned vocabulary major version; a change to an existing rule needs a new major version and an owner decision.",
+  "areaNameRules": {
+    "reserved": [
+      "contracts",
+      "decisions",
+      "verification",
+      "history",
+      "proposals"
+    ],
+    "definition": "Directory names directly under docs/platform/ that hold platform-wide collections; they are never area names."
+  },
+  "placementPrecedence": "Each path belongs to exactly one document kind. A header marker of a kind wins; otherwise the most specific matching pattern wins (fewest ** segments, then fewest placeholders). Equally specific patterns of different kinds are an error. <placeholder> matches one path segment (inside a segment it matches the rest of the name); ** matches one or more segments.",
+  "placementExceptions": [
+    {
+      "path": "docs/platform/migration-authoring-rules.md",
+      "reason": "Migration-time authoring rules; temporary and retired with the cutover, so it gets no permanent kind."
+    }
+  ]
+}

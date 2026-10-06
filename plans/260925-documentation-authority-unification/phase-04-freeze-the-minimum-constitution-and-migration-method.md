@@ -58,7 +58,7 @@ Program-level data model and execution boundary: `plan.md` §5 (Execution Bounda
 Type **Decision + Code slice**. See `plan.md` §7.2 (rewritten 2026-10-06; the coordination-session harness of `reports/harness-readiness-2026-09-29.md` is obsolete).
 - Owner decision 2026-10-06: doers may be Sonnet subagents dispatched in-process (`node bin/fgos.mjs dispatch decide`, answer `in-process`). The Lead plans, reviews, verifies independently and commits, and reviews every change before each commit. This supersedes "the Lead authors" for script, test and document edits.
 - Review is read-only through the door that `node bin/fgos.mjs dispatch decide --for review --needs-soul --has-live-task-access` returns at phase start (`in-process` on 2026-10-06): one review for the documents, one for the gate scripts, at most one re-review each.
-- Decision record: Doc review plus the `rfc` preset or the `architecture-advisory` workflow.
+- Decision record: Doc review plus `ak:plan red-team` (owner, 2026-10-06; `rfc` and `architecture-advisory` are not finished and are not used).
 - Observe is optional: `fgos metrics case open doc-authority-p4 ...` if the owner wants numbers; never a start condition.
 - Authorized 2026-10-06.
 
@@ -75,14 +75,25 @@ Already decided (see `plan.md` §7.5b): the standing policy for main-side legacy
 
 ## Related Code Files
 
-Determined when this phase is authorized; deliverable paths are listed under Requirements.
+Step 2 files: `minimum-constitution.{json,md}`, `claim-and-disposition-vocabulary.{json,md}`, `claim-ledger.schema.json` (this plan directory), `scripts/check-doc-constitution.mjs`, `test/scripts/check-doc-constitution.test.mjs`. Existing gate scripts: `scripts/check-doc-inventory-gates.mjs`, `scripts/check-legacy-docs-ratchet.mjs`. Later steps add their own paths under Requirements.
 
 ## Implementation Steps
 
-To be detailed when this phase is explicitly authorized (plan.md §5). Deliverables and rules under Requirements are the contract.
+Done:
+
+1. Pre-steps 0a and 0b (generator memory fix, gate-failure investigation).
+2. Step 1: identity carry-forward, dispositions of the removed and edited units, dropped-claims register in the inventory gates.
+3. Step 2: minimum constitution (`minimum-constitution.{json,md}`), vocabulary version 2, `claim-ledger.schema.json`, `scripts/check-doc-constitution.mjs` with tests. Freeze is pending owner decisions (metadata level; see `reports/minimum-constitution-261006.md`).
+
+Pending:
+
+3. Conservation checker: row-set conservation against the previous registry, one owner per `semanticClaimId`, dropped-claims register per entry.
+4. Alias table and resolver contract; retirement-check dry-run including a validator cutover mode; evidence relocation policy and consumer proof.
+5. Documentation-cutover lease design; candidate-status metadata check (candidate status read from the switchboard, not from `Design status`).
 
 ## Success Criteria
 
+- [x] constitution, vocabulary, row schema and validator exist and pass on the full ledger (step 2)
 - [ ] the method can reject duplicate owners, missing dispositions, missing targets,
   and unauthorized legacy growth mechanically.
 
