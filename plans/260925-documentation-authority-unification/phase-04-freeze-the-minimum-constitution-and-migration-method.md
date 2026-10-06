@@ -1,7 +1,7 @@
 ---
 phase: 4
 title: "Freeze the minimum constitution and migration method"
-status: pending
+status: in-progress
 priority: P1
 effort: ""
 dependencies: [3]
@@ -13,17 +13,19 @@ dependencies: [3]
 
 ## Overview
 
-**Status:** `not-started`, `not-authorized`. Phase 3 is complete and the former Observe blockers are completed; this phase waits only for the owner's explicit authorization (re-checked 2026-10-06).
+**Status:** `in-progress`. Authorized by the owner on 2026-10-06; the pre-step ran first and is done.
 **Mode:** plan branch
 **Purpose:** Turn inventory evidence into a small, testable migration contract.
 
-## Pre-step: gate tooling (owner-authorized 2026-10-06; runs first, before any deliverable below)
+## Pre-step: gate tooling (owner-authorized 2026-10-06; done)
 
 **Why:** the inventory generator cannot run on the branch head. It reads every text file in the tree, including its own ~250 MB of saved output, and runs out of memory; the 2026-10-06 resume worked around it by generating on a temporary commit without those files (17 s).
 
-**0a (authorized):** make `scripts/generate-doc-inventory.mjs` skip its own saved output artifacts. Take the artifact paths from the existing artifact definition (`scripts/doc-inventory-artifact.mjs`) instead of repeating a second list. Add a test first (red) in `test/scripts/generate-doc-inventory.test.mjs`: a tree containing a large artifact at the output location must be ignored, and ordinary inputs must still be counted. Acceptance (measured with scripts, method stated): the generator completes on the branch head without removing any file; peak memory and runtime recorded; the claim count on a tree without artifacts is unchanged by the fix (86,085 at the 2026-10-06 sync, `reports/resync-261006/inventory-comparison.json`); the inventory gate checker `scripts/check-doc-inventory-gates.mjs` still exits 0 on the regenerated inventory. This changes which files the generator reads, not what it counts or how it judges.
+**0a (done, commit `6397a9970`):** make `scripts/generate-doc-inventory.mjs` skip its own saved output artifacts. Take the artifact paths from the existing artifact definition (`scripts/doc-inventory-artifact.mjs`) instead of repeating a second list. Add a test first (red) in `test/scripts/generate-doc-inventory.test.mjs`: a tree containing a large artifact at the output location must be ignored, and ordinary inputs must still be counted. Acceptance (measured with scripts, method stated): the generator completes on the branch head without removing any file; peak memory and runtime recorded; the claim count on a tree without artifacts is unchanged by the fix (86,085 at the 2026-10-06 sync, `reports/resync-261006/inventory-comparison.json`); the inventory gate checker `scripts/check-doc-inventory-gates.mjs` still exits 0 on the regenerated inventory. This changes which files the generator reads, not what it counts or how it judges.
 
-**0b (investigate only; no gate edit):** record the cause of the `verify-phase-02` failure and of the two shipped-path inventory tests that were already failing before 2026-10-06 (on `551687021`), each with the command and output; propose a fix as a decision for the owner. Do not change these gates without a new owner decision.
+**0a result (measured on `50639672a`, `/usr/bin/time -v`):** exit 0, 22.7 s, max RSS 1.92 GB; claim rows 86,085 unchanged; files 4,311; gates clean, 1,361 gaps; consumer edges 105,923 against 101,286 at the resync (plan files changed since then, mostly `reports/resync-261006/`, 4,496 edges). Independent read-only review: no findings of medium or higher. Known limit: artifacts that sat at the plan root before the 2026-09-29 move into `reports/` (commit `4d80eaf29`) are not skipped; this matters only on a commit between 2026-09-26 and 2026-09-29.
+
+**0b (done, commit `3809d692c`):** record the cause of the `verify-phase-02` failure and of the two shipped-path inventory tests that were already failing before 2026-10-06 (on `551687021`), each with the command and output; propose a fix as a decision for the owner. The report is `reports/gate-failures-investigation-261006.md`. Owner decisions on 2026-10-06: (1) `verify-phase-02` is frozen, valid only for its approved range, and is not run on later heads; (2) the two shipped-path tests are rewritten to use fixtures (separate commit, in progress); (3) the `verify-phase-01` historical-plan byte-hash check becomes a pointer-note check (separate commit, in progress). See `plan.md` §7.4 and §7.5b.
 
 **Rollback:** `git revert` the generator commit; nothing else depends on it.
 
@@ -54,20 +56,22 @@ Program-level data model and execution boundary: `plan.md` §5 (Execution Bounda
 ### Execution harness
 
 Type **Decision + Code slice**. See `plan.md` §7.2 (rewritten 2026-10-06; the coordination-session harness of `reports/harness-readiness-2026-09-29.md` is obsolete).
-- The Lead authors the constitution, the method and the gate scripts.
+- Owner decision 2026-10-06: doers may be Sonnet subagents dispatched in-process (`node bin/fgos.mjs dispatch decide`, answer `in-process`). The Lead plans, reviews, verifies independently and commits, and reviews every change before each commit. This supersedes "the Lead authors" for script, test and document edits.
 - Review is read-only through the door that `node bin/fgos.mjs dispatch decide --for review --needs-soul --has-live-task-access` returns at phase start (`in-process` on 2026-10-06): one review for the documents, one for the gate scripts, at most one re-review each.
 - Decision record: Doc review plus the `rfc` preset or the `architecture-advisory` workflow.
 - Observe is optional: `fgos metrics case open doc-authority-p4 ...` if the owner wants numbers; never a start condition.
-- Start only on explicit authorization of this phase.
+- Authorized 2026-10-06.
 
 ### Resume inputs (2026-10-06)
 
 Must be handled before the method is frozen (see `plan.md` §7.3-§7.4):
 - rerun conservation on the synced tree with identity carry-forward, then disposition the 43 removed and 248 edited claim units listed in `reports/resync-261006/inventory-comparison.json` and the new routing gap `docs/specs/observe.md`;
-- make the plan tooling run on the branch head: the generator must not ingest its own committed inventory artifacts; `scripts/verify-phase-02.mjs` artifact paths must follow the `reports/` move; the content-coupled shipped-path inventory tests used by `scripts/verify-phase-01.mjs` need a decision;
-- decide a standing policy for main-side legacy-root edits until cutover instead of one exception batch per sync;
 - carry `dropped-claims-register.json` into the conservation checker so a dropped claim fails the gate;
-- decide how the Phase 1 "historical path" requirement treats main's move of the knowledge-registry plan to `archive/plans/`.
+- `scripts/verify-phase-02.mjs` is frozen (owner decision 2026-10-06): do not repair its paths; build this phase's own gates instead;
+- take the legacy-docs ratchet (script, baseline regenerated against main, exceptions, test) to main early as a separate small reviewed change; the switchboard waits for Phase 8 (`plan.md` §7.5b, decision F);
+- known generator limit: artifacts that sat at the plan root before the 2026-09-29 move into `reports/` are not skipped; matters only when generating on a commit between 2026-09-26 and 2026-09-29.
+
+Already decided (see `plan.md` §7.5b): the standing policy for main-side legacy-root edits and the knowledge-registry plan move.
 
 ## Related Code Files
 

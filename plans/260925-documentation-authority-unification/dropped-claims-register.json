@@ -1,7 +1,7 @@
 {
   "$schema": "https://forgent.dev/schemas/documentation-authority.dropped-claims-register.v1.json",
   "version": 1,
-  "description": "Claims known to be missing from their promoted docs/platform/** target although the source still holds them. Each entry must be restored or given an explicit disposition before the atomic platform-authority cutover. Entries are added by hand with evidence; the generated inventory does not write this file.",
+  "description": "Claims known to be missing from their promoted docs/platform/** target although the source still holds them. Each entry must have an explicit reviewed disposition before the atomic platform-authority cutover (restored at a target anchor, or a restoration owner named). Entries are added by hand with evidence; the generated inventory does not write this file.",
   "entries": [
     {
       "id": "dropped-001",
@@ -12,7 +12,9 @@
       "intentionalEvidence": "Owner confirmed on 2026-10-06 that the drop was not intended (plans/261006-1445-fgctl-dev-activation/plan.md, Questions section, main checkout).",
       "source": {
         "path": "docs/architect/packaging-distribution/runtime-identity-and-activation.md",
-        "anchors": ["dev-source-activation"],
+        "anchors": [
+          "dev-source-activation"
+        ],
         "lines": "73 (settled-facts table row) and 895-920 (section body)",
         "introducedBy": "6733de7cf (2026-09-06, docs: reconcile packaging and workspace architecture)",
         "authority": "Settled for V1"
@@ -27,8 +29,8 @@
       "absenceCheck": "rtk proxy grep -rn -i 'activationKind\\|dev-source\\|source activation' docs/platform/packaging-distribution returns nothing at branch head after the 2026-10-06 sync",
       "relatedOverclaim": "docs/platform/host-invocation-routing/intent-preservation-ledger.md:81 (HI-I027) states '`dev:<rev>` and staged release use same mechanism' with status 'implemented preview'; Plan C reports the dev path is not implemented in code. Not verified in this record.",
       "dropCause": "UNPROVEN: not investigated; do not infer.",
-      "restorationOwner": "Plan C (plans/261006-1445-fgctl-dev-activation/, draft) re-implements the mechanism and its docs; the claim row must point at the restored target anchor before cutover.",
-      "gate": "Blocks the atomic platform-authority cutover until restored or given an explicit reviewed disposition."
+      "restorationOwner": "Plan C (plans/261006-1445-fgctl-dev-activation/, draft, unscheduled) re-implements the mechanism and its docs after the cutover. The cutover does not wait for it. If Plan C lands first, the claim row points at the restored target anchor.",
+      "gate": "Blocks the atomic platform-authority cutover until the entry has an explicit reviewed disposition: before cutover, 'restore after cutover via Plan C (draft, unscheduled)'; if Plan C lands first, a pointer at the restored anchor."
     }
   ]
 }
