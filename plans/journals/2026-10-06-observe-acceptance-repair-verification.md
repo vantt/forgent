@@ -42,4 +42,8 @@ A separate isolated Opus canary captured actual argv and SDK tools/MCP/skills/sl
 
 [Complete finding ledger and evidence](../reports/observe-acceptance-fixes-261006.md). All six phase documents and the root plan are synced; the original three Opus reports remain immutable. AgentWiki publication skipped. No push, work-item lifecycle command, event/backup staging, or release activation.
 
+## Correction after the third acceptance round
+
+The "not fixed" guard statement above (summary and Honest limits) is superseded. Commit `5608387d3` adds the source-enumerator guard (`test/runner/assignment-enumerator-guard.test.mjs`) and restores the exact import-closure assertion (`test/runner/dispatch-reconciliation-import-graph.test.mjs`). Known limits: the enumerator guard is a static heuristic over one file at a time (no cross-file flow, no glob or `child_process` listing, a multi-line `path.join` binding is missed, and an allow-listed file can add another walker under the same key); the closure assertion follows static imports only, and dynamic `import()` is not followed. The full-suite figures above describe the tree before the later code commits, not the current HEAD.
+
 > Historical work record — not durable authority. Prefer docs/specs/ADRs for current decisions.

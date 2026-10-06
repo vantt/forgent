@@ -19,7 +19,7 @@
     "ts": { "type": "string", "pattern": "\\S", "description": "Writer-owned ISO 8601 capture time, using the Observe clock convention." },
     "evalId": { "type": "string", "pattern": "\\S" },
     "harness": { "type": "string", "pattern": "\\S" },
-    "question": { "type": "string", "pattern": "\\S", "description": "Identifier of the exact shared question." },
+    "question": { "type": "string", "pattern": "\\S", "description": "Verbatim text of the exact question shared by every compared arm (it may be the full objective). `metrics eval list --question` matches it by exact string equality." },
     "setup": { "type": "string", "pattern": "\\S", "description": "Identifier of the recorded protocol, roles, personas, providers and models." },
     "scores": {
       "type": "object",
@@ -29,6 +29,6 @@
     },
     "rubric": { "type": "string", "pattern": "\\S", "description": "Versioned rubric identifier, e.g. discussion-quality.v1." },
     "judge": { "type": "string", "pattern": "\\S", "description": "Judge run/setup identifier, not just a model family label." },
-    "runRefs": { "type": "array", "items": { "type": "string", "pattern": "\\S" }, "description": "Identifiers of the actual evaluated unit/attempt runs, not paths to guessed reports." }
+    "runRefs": { "type": "array", "items": { "type": "string", "pattern": "\\S" }, "description": "Caller-written references to the actual evaluated runs and their evidence; the store does not parse or resolve them. Examples in use: `unit-run:<unitRunId>`, or one `;`-separated `key=value` string naming project, unit, run, the evaluated report path and the judge evidence path. Any path must name the actual evaluated output, not a guessed report." }
   }
 }

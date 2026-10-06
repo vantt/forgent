@@ -229,6 +229,11 @@ fn reader_reports_root_wide_missing_and_unusable_summaries_without_reconstructio
     let mut old_version = unit("unit-run-old-version", &[]);
     old_version["contract"]["version"] = json!(1);
     root.summary(&old_version);
+    // An older contract without a settlement timestamp is still named by its version.
+    let mut old_version_untimed = unit("unit-run-old-untimed", &[]);
+    old_version_untimed["contract"]["version"] = json!(1);
+    old_version_untimed.as_object_mut().unwrap().remove("settledAt");
+    root.summary(&old_version_untimed);
     let malformed = root.summary(&unit("unit-run-malformed", &[]));
     fs::write(malformed, "{").unwrap();
     let oversized = root.summary(&unit("unit-run-oversized", &[]));
@@ -257,13 +262,13 @@ fn reader_reports_root_wide_missing_and_unusable_summaries_without_reconstructio
         let report = root.metrics(&args);
         assert_eq!(report["totals"]["unitRuns"], observed);
         assert_eq!(report["summaryDiagnosticsScope"], "root-wide");
-        assert_eq!(report["summaryDirsSeen"], 11);
+        assert_eq!(report["summaryDirsSeen"], 12);
         assert_eq!(report["summariesMissing"], 1);
-        assert_eq!(report["summariesUnusable"], 9);
+        assert_eq!(report["summariesUnusable"], 10);
         assert_eq!(report["summariesOutsideWindow"], outside);
         assert_eq!(report["summariesSkippedByReason"], json!({
             "missing-timestamp": 1, "invalid-timestamp": 1, "invalid-contract": 3,
-            "unsupported-version": 1, "invalid-json": 1, "oversized": 1, "nonregular": 1
+            "unsupported-version": 2, "invalid-json": 1, "oversized": 1, "nonregular": 1
         }));
         let skipped: u64 = report["summariesSkippedByReason"].as_object().unwrap()
             .values().map(|count| count.as_u64().unwrap()).sum();

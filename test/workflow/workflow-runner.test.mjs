@@ -1122,11 +1122,26 @@ test('validateWorkflow keeps blind only when true and rejects a non-boolean', ()
 });
 
 // Executors of distinct provider families, so a panel can bind every seat.
+//
+// Each executor command is a symlink to the node binary (over 100 MB). Left as
+// untracked files, every seat's dispatch reads and hashes each of them as a
+// pre-existing dirty file, once before launch and again at settlement, and
+// keeps the bytes: one `fgos` CLI process then peaks near 2 GB of RSS. A few
+// such tests in parallel exhaust memory, the kernel kills a process mid-run, and
+// the seat is only given up at its timeout. The symlinks are excluded from git
+// so they are not part of the worktree the dispatch snapshots.
+//
+// `runner.timeoutMs` is bounded so a seat whose worker never answers fails the
+// run within a minute, naming the seat, instead of after the 35-minute default.
+const FIXTURE_SEAT_TIMEOUT_MS = 45_000;
 function useDistinctFamilies(tmp, names) {
   const cfgPath = path.join(tmp, '.fgos', 'config.json');
   const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
   const script = path.join(tmp, 'echo-worker.mjs');
   cfg.runner.executors = {};
+  cfg.runner.timeoutMs = FIXTURE_SEAT_TIMEOUT_MS;
+  fs.mkdirSync(path.join(tmp, '.git', 'info'), { recursive: true });
+  fs.appendFileSync(path.join(tmp, '.git', 'info', 'exclude'),names.map((name) => `/${name}-bin\n`).join(''));
   for (const name of names) {
     const command = path.join(tmp, `${name}-bin`);
     fs.symlinkSync(process.execPath, command);
@@ -1198,10 +1213,21 @@ test('a unit template persona and params reach the binding and the per-role obje
   assert.notEqual(readAssignment(soloRunId, 'producer').policy.preferPersona, 'panelist');
 });
 
-test('workflow and unit CLI options reach the actually dispatched prompts and drive settled stance behavior', (t) => {
+// Two CLI runs of three seats each; alone it takes seconds. The bounds below are
+// backstops only: a seat that never answers is failed by FIXTURE_SEAT_TIMEOUT_MS.
+const STANCE_CLI_CALL_TIMEOUT_MS = 60_000;
+test('workflow and unit CLI options reach the actually dispatched prompts and drive settled stance behavior', { timeout: 3 * STANCE_CLI_CALL_TIMEOUT_MS }, (t) => {
   const tmp = setupTestRepo();
   t.after(() => fs.rmSync(tmp, { recursive: true, force: true }));
   useDistinctFamilies(tmp, ['alpha', 'beta', 'gamma', 'delta']);
+  const runFgos = (label, args) => {
+    try {
+      return parseCliData(execFileSync(process.execPath, [BIN_FGOS, ...args], { cwd: tmp, encoding: 'utf8', timeout: STANCE_CLI_CALL_TIMEOUT_MS }));
+    } catch (error) {
+      const how = error.signal ? `was killed by ${error.signal} (still running after ${STANCE_CLI_CALL_TIMEOUT_MS} ms)` : `exited ${error.status}`;
+      throw new Error(`waiting for ${label}: the CLI ${how}; seat directories under ${path.join(tmp, '.fgos', 'assignments')}\nstderr:\n${error.stderr ?? ''}`, { cause: error });
+    }
+  };
   // cli-spawn delivers the brief in argv, not herdr's brief-N.md file. The worker answers only from
   // what it was actually told: it votes for the second declared choice, and only when asked.
   fs.writeFileSync(path.join(tmp, 'echo-worker.mjs'), String.raw`
@@ -1236,11 +1262,11 @@ test('workflow and unit CLI options reach the actually dispatched prompts and dr
   };
   fs.mkdirSync(path.join(tmp, 'core', 'workflows'), { recursive: true });
   fs.writeFileSync(path.join(tmp, 'core', 'workflows', 'stance.json'), JSON.stringify(workflow));
-  const state = parseCliData(execFileSync(process.execPath, [
-    BIN_FGOS, 'workflow', 'start', 'stance-cli', '--request', 'Assess correctness', '--stance-options', 'incremental|full',
+  const state = runFgos('`fgos workflow start stance-cli --foreground`', [
+    'workflow', 'start', 'stance-cli', '--request', 'Assess correctness', '--stance-options', 'incremental|full',
     '--dir', tmp, '--foreground',
-  ], { cwd: tmp, encoding: 'utf8' }));
-  assert.equal(state.status, 'completed');
+  ]);
+  assert.equal(state.status, 'completed', `the workflow did not complete; its steps: ${JSON.stringify(state.steps)}`);
   assert.deepEqual(state.stanceOptions, ['incremental', 'full']);
   const unitRunId = state.steps.opinions.units.question.unitRunId;
   const unitDir = path.join(tmp, '.fgos', 'assignments', unitRunId);
@@ -1268,9 +1294,9 @@ test('workflow and unit CLI options reach the actually dispatched prompts and dr
   // The same labels have a direct-unit CLI door and do not acquire a workflow link.
   const unitFile = path.join(tmp, 'unit.json');
   fs.writeFileSync(unitFile, JSON.stringify({ id: 'direct-question', capability: 'docs:write', pattern: 'panel', objective: 'Choose rebuilding strategy', writes: [] }));
-  const direct = parseCliData(execFileSync(process.execPath, [
-    BIN_FGOS, 'run', '--unit', unitFile, '--stance-options', 'incremental|full', '--dir', tmp,
-  ], { cwd: tmp, encoding: 'utf8' }));
+  const direct = runFgos('`fgos run --unit`', [
+    'run', '--unit', unitFile, '--stance-options', 'incremental|full', '--dir', tmp,
+  ]);
   const directDir = path.join(tmp, '.fgos', 'assignments', direct.unitRunId);
   const directRecord = JSON.parse(fs.readFileSync(path.join(directDir, 'unit.json'), 'utf8'));
   const directSummary = JSON.parse(fs.readFileSync(path.join(directDir, 'unit-summary.json'), 'utf8'));

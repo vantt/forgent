@@ -366,7 +366,9 @@
   "limits": [
     "Builtin plugins and admin-managed policy may remain; no complete hidden-instruction snapshot is asserted.",
     "Citation correctness cannot be independently verified by a tool-disabled judge.",
-    "One question and one judge provide directional evidence only."
+    "One question and one judge provide directional evidence only.",
+    "The before/after scratch inventory above is coordinator-authored; the scratch directory was deleted and no independently retained listing exists, so it is UNPROVEN.",
+    "The two judged arms were separated by read audit only (no seat read the other arm's output), not by sandbox isolation."
   ],
   "dispatchDecision": {
     "contract": "fgos.v1",

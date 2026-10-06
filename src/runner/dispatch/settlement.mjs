@@ -8,6 +8,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
+import { sha256FileSync } from './proof-helpers.mjs';
 import { RunnerConfigError } from './config.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot } from '../paths.mjs';
 import {
@@ -41,6 +42,35 @@ import {
 /**
  * Safely resolve root path without failing if not in a git repository.
  */
+/**
+ * Re-hash every pre-launch dirty file under `cwd` and return the relative
+ * paths whose existence or sha256 differs from its snapshot. Snapshots may be
+ * the in-memory Map (`{ exists, hash }`) or the persisted baseline object
+ * (`{ exists, sha256 }`). A file that cannot be read counts as absent.
+ */
+export function findMutatedDirtyBeforeFiles(cwd, dirtyBeforeSnapshots) {
+  const mutated = [];
+  const entries = dirtyBeforeSnapshots instanceof Map
+    ? dirtyBeforeSnapshots.entries()
+    : Object.entries(dirtyBeforeSnapshots);
+  for (const [relPath, snap] of entries) {
+    const fullPath = path.join(cwd, relPath);
+    let currentExists = false;
+    let currentHash = null;
+    try {
+      if (fs.existsSync(fullPath)) {
+        currentHash = sha256FileSync(fullPath);
+        currentExists = true;
+      }
+    } catch {}
+    const snapHash = snap.hash ?? snap.sha256;
+    if (currentExists !== snap.exists || currentHash !== snapHash) {
+      mutated.push(relPath);
+    }
+  }
+  return mutated;
+}
+
 export function resolveSafeRoot(runDir, preferredRoot = null, preferMainCheckout = false) {
   if (preferMainCheckout) {
     try {
@@ -544,28 +574,9 @@ export async function settleRunOutcome({
     resolvedDirtyAfter,
   );
 
-  const mutatedDirtyBeforeFiles = [];
-  if (isReadOnly && dirtyBeforeSnapshots) {
-    const entries = dirtyBeforeSnapshots instanceof Map
-      ? dirtyBeforeSnapshots.entries()
-      : Object.entries(dirtyBeforeSnapshots);
-    for (const [relPath, snap] of entries) {
-      const fullPath = path.join(settlementCwd, relPath);
-      let currentExists = false;
-      let currentHash = null;
-      try {
-        if (fs.existsSync(fullPath)) {
-          const content = fs.readFileSync(fullPath);
-          currentHash = crypto.createHash('sha256').update(content).digest('hex');
-          currentExists = true;
-        }
-      } catch {}
-      const snapHash = snap.hash ?? snap.sha256;
-      if (currentExists !== snap.exists || currentHash !== snapHash) {
-        mutatedDirtyBeforeFiles.push(relPath);
-      }
-    }
-  }
+  const mutatedDirtyBeforeFiles = isReadOnly && dirtyBeforeSnapshots
+    ? findMutatedDirtyBeforeFiles(settlementCwd, dirtyBeforeSnapshots)
+    : [];
 
   let providerCapacityFault = null;
   if (providerCapacitySelection?.status === 'selected') {

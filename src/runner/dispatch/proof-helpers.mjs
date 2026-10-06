@@ -27,6 +27,37 @@ export function computeSha256Digest(value) {
   return `sha256:${crypto.createHash('sha256').update(serialized).digest('hex')}`;
 }
 
+const FILE_HASH_CHUNK_BYTES = 1024 * 1024;
+
+/**
+ * Hex sha256 of a regular file's bytes, read in fixed-size chunks so memory
+ * stays bounded regardless of file size. Symlinks are followed. Anything that
+ * is not a regular file (directory, FIFO, socket, device) throws instead of
+ * being read: a FIFO would block forever and a device can be endless. The open
+ * is non-blocking so a FIFO swapped in after a caller's existence check still
+ * cannot hang the process.
+ */
+export function sha256FileSync(filePath) {
+  const nonBlock = fs.constants.O_NONBLOCK ?? 0;
+  const fd = fs.openSync(filePath, fs.constants.O_RDONLY | nonBlock);
+  try {
+    if (!fs.fstatSync(fd).isFile()) {
+      const err = new Error(`not a regular file: ${filePath}`);
+      err.code = 'ENOTREGULAR';
+      throw err;
+    }
+    const hash = crypto.createHash('sha256');
+    const buf = Buffer.allocUnsafe(FILE_HASH_CHUNK_BYTES);
+    let bytesRead;
+    while ((bytesRead = fs.readSync(fd, buf, 0, buf.length, null)) > 0) {
+      hash.update(buf.subarray(0, bytesRead));
+    }
+    return hash.digest('hex');
+  } finally {
+    fs.closeSync(fd);
+  }
+}
+
 export function normalizeAgentName(raw, { maxLength = 32 } = {}) {
   const cleaned = String(raw ?? '')
     .toLowerCase()

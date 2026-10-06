@@ -1,0 +1,50 @@
+| # | layer | file | bytes | ~tokens |
+|---|---|---|---|---|
+| 1 | user CLAUDE.md | ~/.claude/CLAUDE.md | 8 | 2 |
+| 2 | user @RTK.md | ~/.claude/RTK.md | 964 | 266 |
+| 3 | user rules | ~/.claude/rules/CLAUDE.md | 2765 | 767 |
+| 4 | user rules | ~/.claude/rules/development-rules.md | 1364 | 379 |
+| 5 | user rules | ~/.claude/rules/documentation-management.md | 1143 | 318 |
+| 6 | user rules | ~/.claude/rules/orchestration-protocol.md | 1285 | 357 |
+| 7 | user rules | ~/.claude/rules/primary-workflow.md | 1328 | 369 |
+| 8 | user rules | ~/.claude/rules/review-audit-self-decision.md | 1428 | 397 |
+| 9 | project CLAUDE.md | ~/projects/forgentX/CLAUDE.md | 6643 | 1835 |
+| 10 | project @AGENTS.md | ~/projects/forgentX/AGENTS.md | 17180 | 4578 |
+| 11 | project rules | ~/projects/forgentX/.claude/rules/development-rules.md | 1641 | 455 |
+| 12 | project rules | ~/projects/forgentX/.claude/rules/documentation-management.md | 2527 | 702 |
+| 13 | project rules | ~/projects/forgentX/.claude/rules/orchestration-protocol.md | 2160 | 599 |
+| 14 | project rules | ~/projects/forgentX/.claude/rules/primary-workflow.md | 2643 | 734 |
+| 15 | project rules | ~/projects/forgentX/.claude/rules/process-management.md | 2018 | 561 |
+| 16 | project rules | ~/projects/forgentX/.claude/rules/review-audit-self-decision.md | 1428 | 397 |
+| 17 | project rules | ~/projects/forgentX/.claude/rules/skill-domain-routing.md | 2473 | 687 |
+| 18 | project rules | ~/projects/forgentX/.claude/rules/skill-workflow-routing.md | 1844 | 512 |
+| 19 | auto-memory MEMORY.md | ~/.claude/projects/-home-vantt-projects-forgentX/memory/MEMORY.md | 13118 | 3607 |
+
+TOTAL always-loaded markdown: 63960 bytes, ~17522 tokens
+on-demand: domains/coding/AGENTS.md (read by fgos-routing, not auto-loaded): 6305 bytes, ~1742 tokens
+
+Exact duplicated paragraphs (>=80 chars) across/within layers: 23
+- x2 (1046 ch): ~/projects/forgentX/CLAUDE.md:88-93 ; ~/projects/forgentX/AGENTS.md:175-180 :: "- **MUST run impact analysis before editing any symbol.** Before modif..."
+- x2 (653 ch): ~/projects/forgentX/CLAUDE.md:113-120 ; ~/projects/forgentX/AGENTS.md:200-207 :: "| Task | Read this skill file | |------|---------------------| | Under..."
+- x2 (455 ch): ~/.claude/rules/development-rules.md:16-20 ; ~/projects/forgentX/.claude/rules/development-rules.md:19-23 :: "- Run the narrowest useful test first, then broaden when shared behavi..."
+- x2 (326 ch): ~/projects/forgentX/CLAUDE.md:104-109 ; ~/projects/forgentX/AGENTS.md:191-196 :: "| Resource | Use for | |----------|---------| | `gitnexus://repo/forge..."
+- x2 (324 ch): ~/projects/forgentX/CLAUDE.md:97-100 ; ~/projects/forgentX/AGENTS.md:184-187 :: "- NEVER edit a function, class, or method without first running `impac..."
+- x2 (262 ch): ~/.claude/rules/orchestration-protocol.md:21-24 ; ~/projects/forgentX/.claude/rules/orchestration-protocol.md:24-27 :: "- Do not pass full conversation history. - Summarize only decisions ne..."
+- x2 (226 ch): ~/.claude/rules/review-audit-self-decision.md:26-26 ; ~/projects/forgentX/.claude/rules/review-audit-self-decision.md:26-26 :: "Before applying a security or robustness finding, identify what the co..."
+- x2 (208 ch): ~/projects/forgentX/CLAUDE.md:84-84 ; ~/projects/forgentX/AGENTS.md:171-171 :: "> Index stale? Run `node .gitnexus/run.cjs analyze` from the project r..."
+- x2 (201 ch): ~/.claude/rules/review-audit-self-decision.md:7-7 ; ~/projects/forgentX/.claude/rules/review-audit-self-decision.md:7-7 :: "Once a decision is verified by source, tests, or an empirical check, d..."
+- x2 (196 ch): ~/.claude/rules/orchestration-protocol.md:28-28 ; ~/projects/forgentX/.claude/rules/orchestration-protocol.md:31-31 :: "Use parallel subagents only when file ownership is clear and integrati..."
+- x2 (192 ch): ~/projects/forgentX/CLAUDE.md:82-82 ; ~/projects/forgentX/AGENTS.md:169-169 :: "This project is indexed by GitNexus as **forgent** (58821 symbols, 811..."
+- x2 (186 ch): ~/projects/forgentX/CLAUDE.md:74-77 ; ~/projects/forgentX/AGENTS.md:161-164 :: "Spin up a preview for long docs, tables, Mermaid diagrams, multi-file ..."
+- x2 (179 ch): ~/.claude/rules/review-audit-self-decision.md:13-13 ; ~/projects/forgentX/.claude/rules/review-audit-self-decision.md:13-13 :: "Do not silently undo explicit user decisions. This includes thresholds..."
+- x2 (179 ch): ~/.claude/rules/review-audit-self-decision.md:30-30 ; ~/projects/forgentX/.claude/rules/review-audit-self-decision.md:30-30 :: "For questions answerable by reading the repo, scout before asking. Ask..."
+- x2 (177 ch): ~/.claude/rules/review-audit-self-decision.md:34-34 ; ~/projects/forgentX/.claude/rules/review-audit-self-decision.md:34-34 :: "Do not put plan IDs, phase numbers, audit labels, or finding codes in ..."
+- x2 (176 ch): ~/.claude/rules/primary-workflow.md:21-23 ; ~/projects/forgentX/.claude/rules/primary-workflow.md:37-39 :: "- Run focused tests for touched behavior. - Broaden to lint, typecheck..."
+- x2 (160 ch): ~/projects/forgentX/CLAUDE.md:62-64 ; ~/projects/forgentX/AGENTS.md:149-151 :: "It returns a browser `url`. Tell the user: "You can view this at: `<ur..."
+- x2 (129 ch): ~/.claude/rules/orchestration-protocol.md:34-38 ; ~/projects/forgentX/.claude/rules/orchestration-protocol.md:37-41 :: "```text Status: DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT Su..."
+- x2 (126 ch): ~/.claude/rules/orchestration-protocol.md:40-40 ; ~/projects/forgentX/.claude/rules/orchestration-protocol.md:43-43 :: "Handle `BLOCKED` and `NEEDS_CONTEXT` by changing context, scope, or ap..."
+- x2 (113 ch): ~/projects/forgentX/CLAUDE.md:52-53 ; ~/projects/forgentX/AGENTS.md:139-140 :: "After creating or updating any markdown file, make it viewable in ONE ..."
+- x2 (106 ch): ~/projects/forgentX/CLAUDE.md:59-60 ; ~/projects/forgentX/AGENTS.md:146-147 :: "- `project_root`: absolute path to the project root - `relative_path`:..."
+- x2 (82 ch): ~/.claude/rules/review-audit-self-decision.md:17-20 ; ~/projects/forgentX/.claude/rules/review-audit-self-decision.md:17-20 :: "- the original decision - the audit concern - the trade-off - the conc..."
+- x2 (81 ch): ~/.claude/rules/orchestration-protocol.md:17-17 ; ~/projects/forgentX/.claude/rules/orchestration-protocol.md:20-20 :: "If the shell CWD differs from the primary project, use the primary pro..."
+Redundant bytes (copies beyond the first): ~5783 (9.0% of total)
