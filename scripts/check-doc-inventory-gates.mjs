@@ -605,7 +605,7 @@ export function checkInventory({ repoRoot, inventory, vocabulary, identityRegist
   };
 }
 
-function loadJson(filePath) {
+export function loadJson(filePath) {
   if (!fs.existsSync(filePath)) throw new Error(`File not found: ${filePath}`);
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
 }
@@ -624,7 +624,7 @@ export function regenerateCommand({ inventoryPath, identityRegistryPath, cwd }) 
 
 // The manifest is committed but its shards are not, so a fresh checkout has to
 // regenerate them before the inventory can be read.
-function loadInventory(filePath, context) {
+export function loadInventory(filePath, context) {
   if (!fs.existsSync(filePath)) throw new Error(`File not found: ${filePath}. Regenerate with: ${regenerateCommand(context)}`);
   try { return loadShardedJsonArtifact(filePath, { allowLegacyRawJson: false }); }
   catch (err) { throw new Error(`inventory shards unreadable (${err.message}). The shards are not committed; regenerate with: ${regenerateCommand(context)}`); }

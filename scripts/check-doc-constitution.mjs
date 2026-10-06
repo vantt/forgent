@@ -567,6 +567,33 @@ export function summarizeLedger(rows, schema, vocabulary, { constitution = null,
   return { rows: rows.length, valid: rows.length - invalid, invalid, invalidByReason, usage, usageDrift, neverUsed, gaps };
 }
 
+/**
+ * Cutover mode for the ledger: what must hold on every row before the legacy
+ * sources may be retired. A retained claim (a disposition that keeps authority)
+ * has an owner, an anchor and a classified kind; every row is reviewed and a row
+ * whose disposition requires a rationale carries its own (the item's
+ * proposedRationale fallback is not enough). Counts per reason, never one entry
+ * per row.
+ */
+export function summarizeCutoverRows(rows, vocabulary) {
+  const dispositions = new Map((vocabulary?.sourceDispositions || []).map((d) => [d.id, d]));
+  const blockingKinds = new Set((vocabulary?.claimKinds || []).filter((k) => k.blocksCutover).map((k) => k.id));
+  const byReason = {};
+  const bump = (reason) => { byReason[reason] = (byReason[reason] || 0) + 1; };
+  for (const row of rows) {
+    const disposition = dispositions.get(row?.disposition);
+    if (disposition?.retainsAuthority) {
+      if (!nonEmptyString(row.targetOwner)) bump('retained-without-owner');
+      if (!nonEmptyString(row.targetAnchor)) bump('retained-without-anchor');
+      if (blockingKinds.has(row.claimKind)) bump('retained-with-unclassified-kind');
+    }
+    if (row?.disposition === 'unknown-blocking') bump('unknown-blocking');
+    if (row?.reviewStatus !== 'reviewed') bump('not-reviewed');
+    if (disposition?.requiresRationale && !nonEmptyString(row?.rationale)) bump('without-own-rationale');
+  }
+  return { rows: rows.length, byReason, total: Object.values(byReason).reduce((a, b) => a + b, 0) };
+}
+
 // Item field -> vocabulary section; every value the inventory emits must be defined.
 const ITEM_VOCABULARY_FIELDS = {
   fileClass: 'fileClasses',
@@ -607,7 +634,7 @@ function loadJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
 }
 
-function trackedPlatformDocs(repoRoot) {
+export function trackedPlatformDocs(repoRoot) {
   return execFileSync('git', ['ls-files', 'docs/platform'], { cwd: repoRoot, encoding: 'utf8', maxBuffer: 20 * 1024 * 1024 }).split('\n').filter((f) => f.endsWith('.md'));
 }
 
@@ -622,7 +649,8 @@ export function runCli(argv, cwd = process.cwd()) {
   };
   const repoRoot = option('--repo-root', '.');
   const asJson = argv.includes('--json');
-  const strictRows = argv.includes('--strict-rows');
+  const cutover = argv.includes('--cutover');
+  const strictRows = argv.includes('--strict-rows') || cutover;
   const skipLedger = argv.includes('--no-ledger');
 
   let vocabulary;
@@ -654,6 +682,7 @@ export function runCli(argv, cwd = process.cwd()) {
       const itemRationaleByPath = new Map(items.filter((i) => nonEmptyString(i.proposedRationale)).map((i) => [i.path, i.proposedRationale]));
       ledger = {
         ...summarizeLedger(inventory.claimLedger, schema, vocabulary, { constitution, itemRationaleByPath }),
+        cutover: cutover ? summarizeCutoverRows(inventory.claimLedger, vocabulary) : null,
         itemSummary: summarizeItems(items, vocabulary, constitution),
       };
     } catch (err) {
@@ -678,7 +707,8 @@ export function runCli(argv, cwd = process.cwd()) {
     }, repoRoot);
   }
   const placementProblems = placement ? placement.leftovers.length + placement.ambiguous.length + placement.evidenceWithoutOwner.length : 0;
-  const fatal = fatalFindings.length > 0 || (strictRows && placementProblems > 0) || (strictRows && ledger !== null && (ledger.invalid > 0 || ledger.itemSummary.undefinedTotal > 0 || ledger.itemSummary.dispositionClassMismatch.count > 0));
+  const fatal = fatalFindings.length > 0 || (strictRows && placementProblems > 0) || (strictRows && ledger !== null && (ledger.invalid > 0 || ledger.itemSummary.undefinedTotal > 0 || ledger.itemSummary.dispositionClassMismatch.count > 0))
+    || (cutover && ledger !== null && (ledger.cutover.total > 0 || ledger.usageDrift.length > 0));
   if (asJson) {
     console.log(JSON.stringify({ fatalFindings, ledger, placement, promotion }, null, 2));
     return fatal ? 1 : 0;
@@ -718,6 +748,7 @@ export function runCli(argv, cwd = process.cwd()) {
     for (const [field, counts] of Object.entries(undefinedValues)) {
       for (const [value, n] of Object.entries(counts)) console.log(`    ${field}: ${value} (${n})`);
     }
+    if (ledger.cutover) console.log(`check-doc-constitution: cutover rows: ${ledger.cutover.total} violation(s) over ${ledger.cutover.rows} rows: ${JSON.stringify(ledger.cutover.byReason)}`);
     console.log(`  plan §6.2 fields still empty (data to fill, not invalid): ${JSON.stringify(ledger.gaps)}`);
     if (ledger.usageDrift.length > 0) {
       console.log(`  vocabulary usage flags that disagree with the rows (${ledger.usageDrift.length}):`);

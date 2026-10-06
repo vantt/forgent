@@ -14,6 +14,7 @@ import {
   createRowValidator,
   summarizeLedger,
   summarizeItems,
+  summarizeCutoverRows,
   classifyPath,
   checkPlacement,
   governanceBaselineFields,
@@ -646,4 +647,45 @@ test('the reading map stays outside docs/platform for a recorded reason', () => 
   const reading = constitution.documentKinds.find((k) => k.id === 'reading-map');
   assert.deepEqual(reading.placements.map((p) => p.pattern), ['docs/reading-map.md']);
   assert.match(reading.note, /docs\/specs\/reading-map\.md/);
+});
+
+test('cutover rows: a retained claim needs an owner, an anchor and a classified kind', () => {
+  const retained = (overrides) => validRow({ disposition: 'promote', reviewStatus: 'reviewed', claimKind: 'navigation', targetOwner: 'docs/platform/x/README.md', targetAnchor: 'overview', ...overrides });
+  assert.deepEqual(summarizeCutoverRows([retained()], vocabulary).byReason, {});
+  assert.deepEqual(summarizeCutoverRows([retained({ targetOwner: null })], vocabulary).byReason, { 'retained-without-owner': 1 });
+  assert.deepEqual(summarizeCutoverRows([retained({ targetAnchor: null })], vocabulary).byReason, { 'retained-without-anchor': 1 });
+  assert.deepEqual(summarizeCutoverRows([retained({ claimKind: 'unclassified' })], vocabulary).byReason, { 'retained-with-unclassified-kind': 1 });
+});
+
+test('cutover rows: unreviewed, blocking and rationale-less rows are counted per reason', () => {
+  const evidence = (overrides) => validRow({ disposition: 'retain-as-evidence', reviewStatus: 'reviewed', ...overrides });
+  assert.deepEqual(summarizeCutoverRows([evidence()], vocabulary).byReason, {});
+  const noRationale = evidence();
+  delete noRationale.rationale;
+  assert.deepEqual(summarizeCutoverRows([noRationale], vocabulary).byReason, { 'without-own-rationale': 1 });
+  assert.deepEqual(summarizeCutoverRows([evidence({ reviewStatus: 'pending' })], vocabulary).byReason, { 'not-reviewed': 1 });
+  const blocking = summarizeCutoverRows([validRow()], vocabulary);
+  assert.deepEqual(blocking.byReason, { 'unknown-blocking': 1, 'not-reviewed': 1 });
+  assert.equal(blocking.total, 2);
+});
+
+test('cli: --cutover is fatal while any row is blocking or unreviewed, and a reviewed ledger reports no cutover rows', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-constitution-'));
+  try {
+    const open = writeInventoryFixture(dir, [validRow()]);
+    const normal = captureCli(['--inventory', open]);
+    assert.equal(normal.code, 0);
+    const cutover = captureCli(['--inventory', open, '--cutover']);
+    assert.equal(cutover.code, 1);
+    assert.match(cutover.out, /cutover rows: 2 violation\(s\)/);
+    const reviewedRow = validRow({ disposition: 'retain-as-evidence', reviewStatus: 'reviewed', claimKind: 'navigation' });
+    const closedDir = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-constitution-'));
+    try {
+      const closed = writeInventoryFixture(closedDir, [reviewedRow]);
+      const result = captureCli(['--inventory', closed, '--cutover']);
+      assert.match(result.out, /cutover rows: 0 violation/);
+    } finally { fs.rmSync(closedDir, { recursive: true, force: true }); }
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
 });
