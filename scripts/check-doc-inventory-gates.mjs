@@ -495,7 +495,7 @@ export function loadDecisionShards(target) {
     for (const field of ['version', 'shard', 'sources', 'claims']) {
       if (!(field in shard)) throw new Error(`decision shard ${file}: missing required field "${field}"`);
     }
-    for (const field of ['sources', 'claims', ...('files' in shard ? ['files'] : [])]) {
+    for (const field of ['sources', 'claims', ...['files', 'registryGaps'].filter((field) => field in shard)]) {
       if (!Array.isArray(shard[field])) throw new Error(`decision shard ${file}: "${field}" must be an array`);
     }
     return shard;
@@ -518,6 +518,7 @@ export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf 
   const items = [...(inventory.items || [])];
   const decided = new Set();
   const gapRows = registry ? [...(registry.identityGaps || [])] : null;
+  const decidedGaps = new Set();
   const fail = (type, message, extra = {}) => findings.push({ type, message, ...extra });
 
   for (const shard of shards || []) {
@@ -558,6 +559,19 @@ export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf 
       claimLedger[idx] = merged;
       const gapIdx = gapRows ? gapRows.findIndex((gap) => gap?.claimId === id) : -1;
       if (gapIdx >= 0) gapRows[gapIdx] = { ...gapRows[gapIdx], disposition: d.disposition };
+    }
+    for (const g of shard.registryGaps || []) {
+      const idx = gapRows ? gapRows.findIndex((row) => row?.claimId === g?.claimId) : -1;
+      const at = { path: g?.sourcePath };
+      if (idx < 0) { fail('decision-gap-unknown', `shard ${shard.shard}: ${g?.claimId} is not an identity-gap row of the registry`, at); continue; }
+      if (decidedGaps.has(g.claimId)) { fail('decision-gap-duplicate', `registry gap ${g.claimId} is decided more than once (again in shard ${shard.shard})`, at); continue; }
+      decidedGaps.add(g.claimId);
+      const disposition = dispositions.get(g.disposition);
+      if (!disposition) fail('decision-gap-invalid', `registry gap ${g.claimId}: disposition "${g.disposition}" is not in the vocabulary`, at);
+      else if (disposition.requiresTargetOwner && !(nonEmpty(g.targetOwner) && itemPaths.has(g.targetOwner))) fail('decision-gap-invalid', `registry gap ${g.claimId}: disposition "${g.disposition}" requires a targetOwner that is a document of the inventory`, at);
+      if (!nonEmpty(g.rationale)) fail('decision-gap-invalid', `registry gap ${g.claimId}: rationale is empty`, at);
+      if (gapRows[idx].sourcePath !== g.sourcePath) fail('decision-gap-invalid', `registry gap ${g.claimId}: sourcePath ${g.sourcePath} is not the registry's ${gapRows[idx].sourcePath}`, at);
+      gapRows[idx] = { ...gapRows[idx], disposition: g.disposition, targetOwner: g.targetOwner ?? null, targetAnchor: g.targetAnchor ?? null, dispositionRationale: g.rationale };
     }
     for (const f of shard.files || []) {
       const idx = items.findIndex((i) => i.path === f?.path);

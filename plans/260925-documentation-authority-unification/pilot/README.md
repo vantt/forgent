@@ -23,3 +23,4 @@ node scripts/check-doc-inventory-gates.mjs --inventory <inv> --identity-registry
 6. `searched` is present and non-empty for `unknown-blocking` and every `delete-*` disposition.
 
 An author writes `pending` (or `blocking`); `reviewed` appears only after an independent review of that row.
+7. A `registryGaps` entry names an identity-gap row that exists only in the identity registry (no live claim row carries its id); it must exist in the registry, be decided once, name a vocabulary disposition and a rationale (and a target owner that is an inventory document when the disposition requires one), and match the registry's source path. It overlays the registry in memory, so the strict open-data check for registry gaps without a disposition can pass in scope.

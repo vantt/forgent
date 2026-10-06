@@ -32,6 +32,23 @@
         }
       }
     },
+    "registryGaps": {
+      "type": "array",
+      "description": "Dispositions for identity-gap rows that exist only in the identity registry (the unit's old identity could not be paired with a live row). They overlay the registry in memory; no claim row is touched.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["claimId", "sourcePath", "disposition", "rationale"],
+        "properties": {
+          "claimId": { "type": "string", "pattern": "^claim_[0-9a-f]{32}$" },
+          "sourcePath": { "type": "string", "minLength": 1 },
+          "disposition": { "type": "string", "x-vocabulary": "sourceDispositions" },
+          "targetOwner": { "type": ["string", "null"], "minLength": 1 },
+          "targetAnchor": { "type": ["string", "null"], "minLength": 1 },
+          "rationale": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
     "claims": {
       "type": "array",
       "items": {

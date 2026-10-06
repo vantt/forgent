@@ -386,6 +386,24 @@ test('a decision on a claim that is a registry identity gap gives the gap row it
   assert.equal(gates.applyDecisions(decisionInventory(), [goodShard()], { vocabulary: VOCABULARY, targetAnchorsOf: anchorsOf }).registry, null);
 });
 
+test('a registry gap decision overlays the gap row and reports an unknown, repeated or incomplete one', () => {
+  const GAP = `claim_${'d'.repeat(32)}`;
+  const registry = { identityGaps: [{ claimId: GAP, sourcePath: 'docs/specs/runner.md', sourceAnchor: 'x' }] };
+  const gap = { claimId: GAP, sourcePath: 'docs/specs/runner.md', disposition: 'supersede', targetOwner: OWNER, targetAnchor: 'intro', rationale: 'the live unit at the same anchor carries it' };
+  const apply = (gaps, shards = [goodShard([], { registryGaps: gaps })]) => gates.applyDecisions(decisionInventory(), shards, { vocabulary: VOCABULARY, targetAnchorsOf: anchorsOf, registry });
+  const ok = apply([gap]);
+  assert.deepEqual(ok.findings, []);
+  assert.deepEqual([ok.registry.identityGaps[0].disposition, ok.registry.identityGaps[0].targetOwner, ok.registry.identityGaps[0].dispositionRationale], ['supersede', OWNER, gap.rationale]);
+  assert.equal(registry.identityGaps[0].disposition, undefined);
+  const types = (gaps, shards) => apply(gaps, shards).findings.map((f) => f.type);
+  assert.deepEqual(types([{ ...gap, claimId: `claim_${'e'.repeat(32)}` }]), ['decision-gap-unknown']);
+  assert.deepEqual(types([gap, gap]), ['decision-gap-duplicate']);
+  assert.deepEqual(types([{ ...gap, disposition: 'keep-legacy' }]), ['decision-gap-invalid']);
+  assert.deepEqual(types([{ ...gap, targetOwner: null }]), ['decision-gap-invalid']);
+  assert.deepEqual(types([{ ...gap, rationale: '' }]), ['decision-gap-invalid']);
+  assert.deepEqual(types([{ ...gap, sourcePath: 'docs/other.md' }]), ['decision-gap-invalid']);
+});
+
 test('a file decision replaces the proposed disposition, rationale and target owner of its item', () => {
   const inventory = decisionInventory();
   const files = [{ path: 'docs/specs/runner.md', disposition: 'move', rationale: 'carried by the platform owner', targets: [OWNER, 'docs/platform/cand/README.md'] }, { path: OWNER, disposition: 'retain-as-evidence', rationale: 'kept', targets: [] }];
