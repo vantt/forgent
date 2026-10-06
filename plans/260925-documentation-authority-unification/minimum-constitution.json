@@ -144,7 +144,8 @@
           "cardinality": "singleton",
           "per": "platform"
         }
-      ]
+      ],
+      "note": "Stays at docs/reading-map.md: it routes the whole repository (platform, knowledge and history corpora) per the target tree of docs/doc-governance.md, so it is outside docs/platform. docs/specs/reading-map.md retires at the cutover; AGENTS.md is repointed in the consumer-rewrite phase."
     },
     {
       "id": "vision",
@@ -318,7 +319,7 @@
     {
       "id": "verification",
       "typeName": "Verification",
-      "authorityClass": "evidence",
+      "authorityClass": "verification-record",
       "canonical": true,
       "claimKinds": [
         "verification"
@@ -331,11 +332,6 @@
         },
         {
           "pattern": "docs/platform/<area>/verification/**",
-          "cardinality": "collection",
-          "per": "area"
-        },
-        {
-          "pattern": "docs/platform/<area>/reports/**",
           "cardinality": "collection",
           "per": "area"
         },
@@ -445,12 +441,18 @@
           "per": "subcomponent"
         },
         {
+          "pattern": "docs/platform/<area>/reports/**",
+          "cardinality": "collection",
+          "per": "area"
+        },
+        {
           "pattern": "docs/history/<feature>/**",
           "cardinality": "collection",
           "per": "feature"
         }
       ],
-      "governanceRef": "3. Document Types"
+      "governanceRef": "3. Document Types",
+      "note": "docs/platform/<area>/reports/** are dated snapshots and are classified as history; no file moves. Claims still open inside a report are carried by the claim ledger and get a real owner during transformation."
     },
     {
       "id": "knowledge",
@@ -589,7 +591,7 @@
     "Decision": "decision",
     "Verification": "verification",
     "Verification audit": "verification",
-    "Verification closeout": "verification",
+    "Verification closeout": "history",
     "Proposal": "proposal",
     "Architecture Proposal": "proposal",
     "Discussion scratchpad": "discussion-scratchpad",
@@ -1075,7 +1077,7 @@
       "revisitTrigger": "A reviewed scope amendment admits it into a plan."
     }
   ],
-  "status": "Proposed (freeze pending owner)",
+  "status": "Accepted (frozen 2026-10-06 by the owner)",
   "amendmentRule": "The constitution is frozen at major version 1 for the meaning of every existing rule. Additions (a document kind, a placement, a gate check) are made by recorded exception with evidence and keep the pinned vocabulary major version; a change to an existing rule needs a new major version and an owner decision.",
   "areaNameRules": {
     "reserved": [

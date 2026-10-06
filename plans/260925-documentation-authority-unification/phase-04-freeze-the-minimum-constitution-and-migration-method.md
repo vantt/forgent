@@ -83,7 +83,7 @@ Done:
 
 1. Pre-steps 0a and 0b (generator memory fix, gate-failure investigation).
 2. Step 1: identity carry-forward, dispositions of the removed and edited units, dropped-claims register in the inventory gates.
-3. Step 2: minimum constitution (`minimum-constitution.{json,md}`), vocabulary version 2, `claim-ledger.schema.json`, `scripts/check-doc-constitution.mjs` with tests. Freeze is pending owner decisions (metadata level; see `reports/minimum-constitution-261006.md`).
+3. Step 2 (done, frozen): minimum constitution (`minimum-constitution.{json,md}`), vocabulary version 2, `claim-ledger.schema.json`, `scripts/check-doc-constitution.mjs` with tests. Frozen by the owner on 2026-10-06 (metadata decision (a), evidence-payload kind, reports as history); amendments only as additive 2.x. See `reports/minimum-constitution-261006.md`.
 
 Pending:
 

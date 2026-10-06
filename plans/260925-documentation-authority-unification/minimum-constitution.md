@@ -4,7 +4,7 @@
 Document type: Specification
 Audience: Human reviewer, architect, implementer, agent
 Purpose: State the minimum rules the documentation migration needs before inventory-driven transformation
-Design status: Proposed (freeze pending owner)
+Design status: Accepted (frozen 2026-10-06 by the owner)
 Implementation: Implemented (validated by scripts/check-doc-constitution.mjs; metadata and conservation checks planned)
 Provenance: plans/260925-documentation-authority-unification/plan.md §6.3
 Writer type: Human + agent coauthor
@@ -69,7 +69,7 @@ way one claim has one owner.
 | `architecture` | `architecture-map.md`, `component-boundary.md`, `<A>architecture/**`, `<S>architecture/**` | singleton (platform), collection | yes |
 | `contract` | `docs/platform/contracts/**`, `<A>contracts/**`, `<S>contracts/**` | collection | yes |
 | `decision` | `docs/platform/decisions/**`, `<A>decisions/**`, `<S>decisions/**` | collection | yes |
-| `verification` | `docs/platform/verification/**`, `<A>verification/**`, `<A>reports/**`, `<S>verification/**` | collection | yes |
+| `verification` | `docs/platform/verification/**`, `<A>verification/**`, `<S>verification/**` (authority class `verification-record`) | collection | yes |
 | `guide-runbook` | `<A>operations/**`, `<A>playbooks/**` | collection | yes |
 | `vocabulary` | `<A>vocabulary/**` | collection | yes |
 | `proposal` | `docs/platform/proposals/**`, `<A>proposals/**` | collection | no |
@@ -77,7 +77,7 @@ way one claim has one owner.
 | `rollout-plan` | `<A><name>-rollout-plan.md` | collection | no |
 | `discussion-scratchpad` | `docs/history/<feature>/DISCUSSION.md` | singleton per feature | no |
 | `generated-doc` | `docs/generated/**` and declared generator outputs | collection | no |
-| `history` | `docs/platform/history/**`, `<A>history/**`, `<S>history/**`, `docs/history/<feature>/**` | collection | no |
+| `history` | `docs/platform/history/**`, `<A>history/**`, `<A>reports/**`, `<S>history/**`, `docs/history/<feature>/**` | collection | no |
 | `knowledge` | `docs/knowledge/**` | collection | no |
 | `evidence-payload` | `docs/platform/verification/<collection>/**`, `<A>verification/<collection>/**`, `<S>verification/<collection>/**` | collection | no (metadata exempt) |
 | `redirect-stub` | none; header marker `Document type: Redirect` | collection | no |
@@ -89,6 +89,16 @@ of the area (which stays a canonical `collection-index` and keeps the promotion
 requirement). The kind is assigned by location only; a headerless file anywhere else
 still counts as missing metadata. `--check-placement` also reports evidence whose
 verification index is missing.
+
+`reading-map` stays at `docs/reading-map.md`, outside `docs/platform/`: it routes the
+whole repository (platform, knowledge and history corpora) as the target tree of
+`doc-governance.md` shows. `docs/specs/reading-map.md` retires at the cutover and
+`AGENTS.md` is repointed in the consumer-rewrite phase.
+
+`docs/platform/<area>/reports/**` are dated snapshots and are `history` (non-canonical);
+no file moves. The authority class `evidence` belongs only to non-authority kinds
+(`evidence-payload`, `history`); the canonical `verification` kind has class
+`verification-record`.
 
 Each path belongs to exactly one kind. A kind's header marker wins; otherwise the
 most specific pattern wins (fewest `**`, then most path segments, then fewest placeholders), and equally
@@ -154,7 +164,7 @@ baseline (measured by script on the plan branch, 2026-10-06).
 
 Promotion gap report (report only, not fatal): `node scripts/check-doc-constitution.mjs
 --no-ledger --promotion`. Of 440 Markdown files under `docs/platform/**`, 302 are
-evidence payloads (exempt) and 106 are canonical documents. Of those 106, 56 carry a
+evidence payloads (exempt) and 105 are canonical documents. Of those 105, 55 carry a
 header and 50 do not; none carries the whole promotion list, because none has
 `Supersedes` or `Superseded by`, and only 5 carry the twelve baseline fields. The
 gaps are filled during the area transformation.
@@ -239,7 +249,7 @@ Governance sync: constitution entries that encode `doc-governance.md` carry a
 `governanceRef` naming its heading, and the validator checks the heading exists.
 The JSON is a checked projection of the governance prose, not a second source.
 
-Amendments: the rules are frozen in meaning. An addition (a kind, a placement, a
+Amendments: the rules are frozen in meaning (frozen 2026-10-06 by the owner). An addition (a kind, a placement, a
 gate check) is a recorded exception with evidence and keeps the pinned vocabulary
 major version; changing a rule needs a new major version and an owner decision.
 

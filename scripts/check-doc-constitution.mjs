@@ -31,7 +31,7 @@ export const DEFAULT_CONSTITUTION_PATH = `${PLAN_DIR}/minimum-constitution.json`
 export const DEFAULT_SCHEMA_PATH = `${PLAN_DIR}/claim-ledger.schema.json`;
 export const DEFAULT_INVENTORY_PATH = INVENTORY_MANIFEST_PATH;
 
-const VOCABULARY_SECTIONS = ['sourceDispositions', 'claimKinds', 'fileClasses', 'corpora', 'authorityKinds', 'claimStatuses', 'reviewStatuses', 'relationTypes', 'identityStatuses'];
+const VOCABULARY_SECTIONS = ['sourceDispositions', 'claimKinds', 'fileClasses', 'corpora', 'authorityKinds', 'claimStatuses', 'reviewStatuses', 'relationTypes', 'identityStatuses', 'authorityClasses'];
 const USAGE_VALUES = new Set(['in-use', 'reserved', 'generator-only', 'registry-only']);
 const CARDINALITIES = new Set(['singleton', 'collection']);
 const GATE_KINDS = new Set(['script', 'planned', 'review']);
@@ -300,6 +300,7 @@ export function validateConstitution(constitution, vocabulary, { repoRoot = proc
       if (kind.canonical) add('exempt-kind-canonical', `document kind ${kind.id}: a metadata-exempt kind must not be canonical (evidence is not authority)`);
       if (!nonEmptyString(kind.ownedBy?.ancestorDirectory) || !nonEmptyString(kind.ownedBy?.file)) add('exempt-kind-missing-owner', `document kind ${kind.id}: a metadata-exempt kind needs ownedBy.ancestorDirectory and ownedBy.file`);
     }
+    if (!idsOf(vocabulary?.authorityClasses).includes(kind.authorityClass)) add('unknown-authority-class', `document kind ${kind.id}: authorityClass "${kind.authorityClass}" is not in vocabulary.authorityClasses`);
     if (typeof kind.canonical !== 'boolean') add('malformed-kind', `document kind ${kind.id}: canonical must be a boolean`);
     for (const ck of kind.claimKinds || []) {
       if (!claimKindIds.has(ck) || ck === 'unclassified') add('unknown-claim-kind', `document kind ${kind.id}: claim kind "${ck}" is not a usable vocabulary claim kind`);

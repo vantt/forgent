@@ -144,5 +144,28 @@ Headerless files the evidence rule did not classify (all canonical kinds, so cor
 
 Results: 56 tests pass in the file; all `test/scripts` tests, validator (normal, `--strict-rows`, `--check-placement`, `--promotion`), gates and ratchet re-run below.
 
+## 10. Owner Decisions And Freeze (2026-10-06)
+
+1. `reading-map` stays at `docs/reading-map.md`; the reason and the retirement of `docs/specs/reading-map.md` are on the constitution page.
+2. `docs/platform/<area>/reports/**` is `history` (non-canonical, dated snapshot); no file moves. Claims still open inside `packaging-distribution/reports/track-closeout.md` ("remaining partial claims") are carried by the claim ledger and get their real owner (area verification or roadmap) during transformation. The alias for the type "Verification closeout" now maps to `history`.
+3. The authority class of the `verification` kind is `verification-record` (still canonical). Recorded as vocabulary amendment 2.1-001 (new `authorityClasses` section, 15 classes, minor version 1) with its reason: the old name collided with "evidence is not authority". The validator rejects a kind whose class is not in that section. `evidence` is now used by exactly two kinds, `evidence-payload` and `history`.
+4. Vocabulary version 2 and the minimum constitution are frozen: status "Accepted (frozen 2026-10-06 by the owner)" in JSON and Markdown; amendments only through the additive 2.x rule.
+
+Per-kind file counts under `docs/platform/**` after the change (440 files, 439 classified, 1 recorded exception):
+
+| Kind | Files | Kind | Files |
+|---|---:|---|---:|
+| evidence-payload | 302 | roadmap | 9 |
+| architecture | 25 | guide-runbook | 8 |
+| contract | 19 | proposal | 7 |
+| collection-index | 14 | vision | 4 |
+| history | 13 | area-portal, spec, intent-preservation-ledger, vocabulary | 3 each |
+| decision | 11 | redirect-stub | 2 |
+| verification | 10 | platform-portal, platform-foundations, rollout-plan | 1 each |
+
+Promotion report: 105 canonical documents (the reports file left the set), 55 headered and 50 headerless, 0 complete, 302 evidence payloads exempt.
+
+Results: 60 tests pass in the file; see the final message for the full run.
+
 Status: DONE
-Summary: Proof payloads are an exempt evidence kind assigned by location; every area's verification README stays canonical and now stands out as headerless. Canonical documents drop from 408 to 106 and the placement check still classifies all 440 files.
+Summary: The three owner decisions are applied and the vocabulary and constitution are frozen.

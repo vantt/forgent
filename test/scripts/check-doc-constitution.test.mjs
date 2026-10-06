@@ -613,3 +613,37 @@ test('constitution: an evidence kind that is canonical or has no owner rule is r
   assert.ok(found.includes('exempt-kind-canonical'));
   assert.ok(found.includes('exempt-kind-missing-owner'));
 });
+
+test('reports are history and the verification kind is a verification record', () => {
+  const kindOf = (p) => classifyPath(p, constitution).kind;
+  assert.equal(kindOf('docs/platform/packaging-distribution/reports/track-closeout.md'), 'history');
+  assert.equal(kindOf('docs/platform/agent-coordination/verification/implementation-alignment.md'), 'verification');
+  const byId = (id) => constitution.documentKinds.find((k) => k.id === id);
+  assert.equal(byId('verification').authorityClass, 'verification-record');
+  assert.equal(byId('verification').canonical, true);
+  assert.equal(byId('history').authorityClass, 'evidence');
+  assert.equal(byId('evidence-payload').authorityClass, 'evidence');
+  assert.equal(constitution.documentKinds.filter((k) => k.authorityClass === 'evidence').length, 2);
+});
+
+test('authority classes are a vocabulary section and every kind uses a defined one', () => {
+  assert.ok(vocabulary.authorityClasses.some((c) => c.id === 'verification-record'));
+  const broken = clone(constitution);
+  broken.documentKinds[0].authorityClass = 'made-up';
+  assert.ok(types(validateConstitution(broken, vocabulary, { repoRoot: REPO_ROOT })).includes('unknown-authority-class'));
+});
+
+test('the freeze is recorded and the additive amendment carries its reason', () => {
+  assert.match(vocabulary.status, /^Accepted \(frozen 2026-10-06 by the owner\)/);
+  assert.match(constitution.status, /^Accepted \(frozen 2026-10-06 by the owner\)/);
+  const amendment = vocabulary.amendments.find((a) => a.change.includes('verification-record'));
+  assert.equal(amendment.minor, 1);
+  assert.match(amendment.evidence, /evidence is not authority/);
+  assert.equal(vocabulary.minorVersion, 1);
+});
+
+test('the reading map stays outside docs/platform for a recorded reason', () => {
+  const reading = constitution.documentKinds.find((k) => k.id === 'reading-map');
+  assert.deepEqual(reading.placements.map((p) => p.pattern), ['docs/reading-map.md']);
+  assert.match(reading.note, /docs\/specs\/reading-map\.md/);
+});

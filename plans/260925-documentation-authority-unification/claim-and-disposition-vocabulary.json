@@ -70,6 +70,11 @@
       "id": "v2-007",
       "change": "record per-value usage (in-use, reserved, generator-only) and keep value definitions unchanged",
       "evidence": "Plan §6.3 requires every emitted value to be defined and every unused one flagged."
+    },
+    {
+      "id": "v2-008",
+      "change": "authorityClasses section added by additive amendment v2.1-001",
+      "evidence": "See amendments."
     }
   ],
   "sourceDispositions": [
@@ -771,7 +776,92 @@
       "usage": "generator-only"
     }
   ],
-  "status": "Proposed (freeze pending owner)",
+  "status": "Accepted (frozen 2026-10-06 by the owner)",
   "amendmentRule": "Version 2 is frozen for the meaning of every existing value. A new value or section is added only as an additive amendment (version 2.1, 2.2, ...) recorded in amendments with its evidence; the validator is re-run and the constitution keeps pinning the major version. Changing or removing an existing value needs a new major version and an owner decision.",
-  "amendments": []
+  "amendments": [
+    {
+      "id": "v2.1-001",
+      "minor": 1,
+      "change": "add section authorityClasses and the class verification-record for the canonical verification kind",
+      "evidence": "Naming the canonical verification kind's class evidence collided with the locked rule that evidence is not authority (plan §3 item 10). The class evidence now belongs only to non-authority kinds (evidence-payload, history); verification is canonical and becomes verification-record. Owner decision 2026-10-06."
+    }
+  ],
+  "minorVersion": 1,
+  "authorityClasses": [
+    {
+      "id": "navigation",
+      "definition": "Routes readers; establishes no claim of its own.",
+      "usage": "in-use"
+    },
+    {
+      "id": "direction",
+      "definition": "States the intended direction, scope and non-scope.",
+      "usage": "in-use"
+    },
+    {
+      "id": "intent-traceability",
+      "definition": "Preserves intent across simplified implementation slices.",
+      "usage": "in-use"
+    },
+    {
+      "id": "normative",
+      "definition": "Establishes exact obligations, laws and invariants.",
+      "usage": "in-use"
+    },
+    {
+      "id": "current-state",
+      "definition": "Establishes what is currently true.",
+      "usage": "in-use"
+    },
+    {
+      "id": "design",
+      "definition": "Establishes boundaries, responsibilities and design rationale.",
+      "usage": "in-use"
+    },
+    {
+      "id": "decision-provenance",
+      "definition": "Records what was decided, why, and supersession.",
+      "usage": "in-use"
+    },
+    {
+      "id": "verification-record",
+      "definition": "Canonical record that proves or tracks a claim, contract, behavior or decision; owned by its area verification index.",
+      "usage": "in-use"
+    },
+    {
+      "id": "evidence",
+      "definition": "Non-authority material: proof payloads and history. Evidence is not authority (plan §3 item 10).",
+      "usage": "in-use"
+    },
+    {
+      "id": "operational",
+      "definition": "Supported operator procedure.",
+      "usage": "in-use"
+    },
+    {
+      "id": "planning",
+      "definition": "Plans and roadmaps; non-canonical.",
+      "usage": "in-use"
+    },
+    {
+      "id": "derived",
+      "definition": "Generated projection of a source.",
+      "usage": "in-use"
+    },
+    {
+      "id": "retrospective",
+      "definition": "Lessons and retrospective observations.",
+      "usage": "in-use"
+    },
+    {
+      "id": "non-canonical",
+      "definition": "Proposals and discussions before acceptance.",
+      "usage": "in-use"
+    },
+    {
+      "id": "temporary-pointer",
+      "definition": "Temporary read-only pointer to a canonical target.",
+      "usage": "in-use"
+    }
+  ]
 }

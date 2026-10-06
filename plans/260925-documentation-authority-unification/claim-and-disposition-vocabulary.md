@@ -4,7 +4,7 @@
 Document type: Specification
 Audience: Human reviewer, architect, implementer, agent
 Purpose: Define the frozen claim-kind, source-disposition and ledger-value vocabulary for the documentation migration
-Design status: Proposed (freeze pending owner)
+Design status: Accepted (frozen 2026-10-06 by the owner)
 Implementation: Implemented (validated by scripts/check-doc-constitution.mjs)
 Provenance: plans/260925-documentation-authority-unification/plan.md §6
 Writer type: Human + agent coauthor
@@ -124,7 +124,7 @@ Version 2 is frozen for the meaning of every existing value. A new value or
 section is added only as an additive amendment (2.1, 2.2, ...) listed in
 `amendments` with its evidence, after the validator passes; the constitution keeps
 pinning the major version. Changing or removing a value needs a new major version
-and an owner decision. No amendment exists yet.
+and an owner decision. One amendment exists: 2.1-001 adds the `authorityClasses` section and the class `verification-record`. The canonical verification kind's class was `evidence`, which collided with the locked rule that evidence is not authority (plan §3 item 10); `evidence` now belongs only to non-authority kinds (`evidence-payload`, `history`). Owner decision 2026-10-06.
 
 ## 6. Related Files
 
