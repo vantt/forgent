@@ -32,16 +32,16 @@ Root cause: a result's **location and record shape** are implicit contracts each
 
 ## What is a run (single definition, used by every reader)
 
-- Walk `.fgos/assignments`. A directory named `runs` marks its parent as an assignment directory; the assignment id is the parent's path relative to `.fgos/assignments` (may contain `/`). `assignment.json` is **not** required (role/adapter are then null).
-- A run directory is `<assignmentDir>/runs/<NN>/`. The walk **stops at `runs/`**: nothing inside a run directory (outbox, worker output, fixtures) is ever walked, so a worker cannot plant a run.
-- Symlinks are never followed (skipped and counted `symlink`); depth is capped.
-- A run directory is **observed** when its `result.json` is parseable, has `runId` and a settled timestamp. Otherwise it is skipped with a counted reason: `unparseable`, `no-run-id`, `no-timestamp`, `symlink`, `duplicate-run-id`, `depth`. The inline unit result written by `fgos run record` (`run.mjs:566-579`: has `unitRunId`, no `runId`) is skipped as `inline-record` here and picked up as a seat by the unit summary in phase 4.
-- Node and Rust implement this rule separately and are tied together by one shared fixture, `test/fixtures/run-layout/expected.json`, read by both test suites.
+- Walk `.fgos/assignments`, ordered by valid-Unicode UTF-8 component bytes. A directory named `runs` marks its parent as an assignment directory; the assignment id is the parent's relative path and may contain `/` or be empty. `assignment.json` is optional.
+- Run candidates are `<assignmentDir>/runs/<NN>/`. Stop at `runs/`: an outbox cannot introduce a candidate. This is traversal containment, not authentication of candidates elsewhere; duplicate IDs make show/watch/recover refuse `run-ambiguous`.
+- Never follow symlinks; count conservative traversal barriers and cap depth at 16.
+- Result admission distinguishes `missing-result`, `unparseable`, `no-run-id`, `no-timestamp`, `inline-record`, `duplicate-run-id`, `symlink` and `depth`. Settlement precedence is nonblank result `settledAt`, result `timestamp`, then regular sibling `run.json.settledAt` only if both result fields are absent/blank. Never substitute start/creation/mtime. First otherwise-eligible lexical occurrence wins duplicate admission.
+- Node's directory-only lister and separate production admission projection share one inventory; Rust implements the same two layers. The shared fixture checks directory accounting and admitted IDs/reasons in both languages.
 
 ## Outcome
 
-1. A nested run is findable by `show-run`, listed by inspection, seen by the reconciler's running-run check, and counted by Observe; the rule is written once and enforced by a shared fixture.
-2. A host subcommand `metrics coverage` and a doctor check `observe-run-coverage` fail when runs on disk and runs seen diverge, and say "old host" instead of failing when the host predates the rule.
+1. Nested runs are discoverable by every directory consumer and admitted by the shared per-language result rule; outbox traversal remains closed and ambiguous identity refuses mutation.
+2. `metrics coverage` reports candidate/observed/skipped accounting; `observe-run-coverage` independently compares directories and eligible unique results, tolerating recent candidate directories and recognizing old hosts explicitly.
 3. Discussion measurement on that base: writer-owned unit summaries, `metrics discussions`, a passive stance and agreement sensor, and an `evals` store for rubric-scored comparisons.
 
 ## Non-goals
@@ -72,19 +72,19 @@ Root cause: a result's **location and record shape** are implicit contracts each
 | 5 | [Stance and agreement sensor](./phase-05-stance-and-agreement-sensor.md) | 1.25d | 4 | completed |
 | 6 | [Eval store and rubric](./phase-06-eval-store-and-rubric.md) | 1d | 3 | in-progress (fair-comparison proof reopened) |
 
-Phases 1–3 shipped first as the foundation; the owner explicitly authorized all phases on 2026-10-05. Phases 4–6 now execute under that go decision. Golden fixtures under `test/fixtures/observe/` use the real regeneration command; the measurement regeneration produced no fixture diff. No staging/commit is performed without a request.
+Phases 1–3 shipped first; the owner confirmed the all-phase authorization in the 2026-10-06 conversation. Feature commit `0b06824a7` and the five ordered acceptance repair commits are linked in the repair ledger. Exact golden regeneration produces no fixture diff. The original guard remains unmet, so the whole plan stays in progress.
 
 ## Acceptance (whole plan)
 
 - [x] `fgos dispatch show-run <nested run id>` resolves today's panelist run `run_unit-run-1791219961331-276f364c/panelist-1/1_01`.
 - [x] `findRunningRuns` reports a nested run with `run.json` and no `result.json` (real-shape regression and foundation dry-run).
-- [x] Live `metrics coverage` matches independent Node counts exactly: forgentX 1199, mdview 90; observed + skipped = runDirsSeen, recentRuns 0.
+- [x] Dated foundation live `metrics coverage` matches independent Node counts exactly: forgentX 1199, mdview 90; observed + skipped = runDirsSeen, recentRuns 0. These are the pre-canary/pre-new-Unit snapshot counts, not a claim that later diagnostic admissions left the live roots unchanged.
 - [x] `metrics runs --by=role --since=2026-10-05` lists panelist-N/synthesizer; exact Delphi-window roles and 30 runs are recorded.
 - [x] `observe-run-coverage` passes with rebuilt host, degrades/pass with old host, fails against hidden-run fixture (foundation evidence).
 - [x] Four mdview Delphi workflows include refusal zero seats and two fallback seats; 30 attempts = 30 Dispatch runs, distinct from 28 final seats.
 - [x] Live three-seat panel gives three valid votes and hand/native agreement 1; no-options is unmeasured and malformed stance preserves passing seat (behavioral CLI regression).
 - [ ] Independent current setups reuse the complete 2026-10-04 objective and have an audited isolated Opus judgment. Old records list but were only data-blind, solo consumed panel results and the question differed; corrected provenance is not new comparison proof.
-- [ ] Acceptance repairs: full final npm/Rust suites and live CLI evidence verified after consumer defects are fixed; original baseline was 6,750 pass, zero fail with serial full selection. Specs, CHANGELOG, manifest and doctor rows updated; No component-boundary change.
+- [x] Acceptance repairs: final Rust suites, live CLI proof and exactly one final `env -u CLAUDE_CODE_SESSION_ID npm test` verified (6,851 tests / 6,778 pass / zero fail / eight skip / 65 todo). Specs, CHANGELOG, manifest and doctor rows updated; no component-boundary change. This gate does not waive the unchecked original guard or prove a fresh independent comparison.
 
 ## How Rust changes are verified (important)
 
@@ -178,7 +178,7 @@ Final full-suite verification passed with the unchanged test selection: `FGOS_HO
 
 The three Opus acceptance reports returned **ACCEPT WITH FIXES**: passing tests did not prove every reachable measurement/lifecycle boundary. [Acceptance repair ledger](../reports/observe-acceptance-fixes-261006.md) tracks all findings, commits, exercised evidence and non-fixes. The original source-enumerator guard criterion is restored unchecked; the runtime test prohibition is not represented as a repository law or owner waiver.
 
-The owner confirmed in the current conversation that the 2026-10-05 all-phase request was real. For timestamp policy the owner emphasized accuracy, stability, speed and simplicity, with no compatibility requirement; the repair chooses actual settlement fields only: result `settledAt`/`timestamp`, then sibling `run.json.settledAt`, never started/created time as completion. Implementation and final verification are pending.
+The owner confirmed in this conversation that the 2026-10-05 all-phase request was real. Accuracy, stability, speed and simplicity govern timestamp selection: actual result settlement fields, then sibling owner settlement, never start/creation time. All five repair groups are committed; narrow Node consumers, complete Rust suites, rebuilt/old-host doctor and live dual-root CLI proof are in the repair ledger. Exactly one final full npm run passed: 6,778 pass / zero fail, eight skipped and 65 todo (`artifact://456`). Fresh historical-question Unit seats were actually exercised, but the panel failed before synthesis on a readonly Pi auth-file lock; no quota exhaustion, independent A/B judgment or two new scores is claimed. The original guard stays unchecked and the whole plan stays in progress.
 
 
 ## Open questions

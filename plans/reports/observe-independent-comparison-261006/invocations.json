@@ -1,0 +1,131 @@
+{
+  "profileId": "source-packet",
+  "backend": "bwrap",
+  "promptDelivery": "file-pointer",
+  "definitions": {
+    "claude": {
+      "command": "claude",
+      "providerModel": "claude",
+      "args": [
+        "-p",
+        "{prompt}",
+        "--model",
+        "{model}",
+        "--safe-mode",
+        "--tools",
+        "Read,Write",
+        "--permission-mode",
+        "acceptEdits",
+        "--strict-mcp-config",
+        "--mcp-config",
+        "{\"mcpServers\":{}}",
+        "--setting-sources",
+        "",
+        "--disable-slash-commands",
+        "--no-session-persistence",
+        "--output-format",
+        "stream-json",
+        "--verbose",
+        "--include-hook-events",
+        "--system-prompt-snapshot",
+        "on"
+      ]
+    },
+    "xai": {
+      "command": "pi",
+      "providerModel": "xai",
+      "args": [
+        "--provider",
+        "xai",
+        "--model",
+        "{model}",
+        "--mode",
+        "json",
+        "--print",
+        "--no-session",
+        "--tools",
+        "read,write",
+        "--no-extensions",
+        "--no-skills",
+        "--no-prompt-templates",
+        "--no-themes",
+        "--no-context-files",
+        "--offline",
+        "{prompt}"
+      ]
+    },
+    "glm": {
+      "command": "pi",
+      "providerModel": "z-ai",
+      "args": [
+        "--model",
+        "{model}",
+        "--mode",
+        "json",
+        "--print",
+        "--no-session",
+        "--tools",
+        "read,write",
+        "--no-extensions",
+        "--no-skills",
+        "--no-prompt-templates",
+        "--no-themes",
+        "--no-context-files",
+        "--offline",
+        "{prompt}"
+      ]
+    },
+    "gemini": {
+      "command": "agy",
+      "providerModel": "gemini",
+      "args": [
+        "--print",
+        "{prompt}",
+        "--model",
+        "{model}",
+        "--output-format",
+        "stream-json",
+        "--new-project",
+        "--disable-slash-commands",
+        "--print-timeout",
+        "180s"
+      ]
+    }
+  },
+  "sourceFiles": [
+    {
+      "file": "src/runner/execution/patterns/panel.mjs",
+      "sha256": "52a17415e5fc307925bee24ab86fed66c8c158addc728a88161525770b3b9e81"
+    },
+    {
+      "file": "src/runner/execution/patterns/reviewed.mjs",
+      "sha256": "01a9663454c40f069667a1f3675e9942d7f2d569bb10277b157e00b05e5955a0"
+    },
+    {
+      "file": "docs/specs/runner.md",
+      "ranges": [
+        [
+          1375,
+          1440
+        ],
+        [
+          3042,
+          3080
+        ]
+      ],
+      "sha256": "2adb477c0e95fe55c6fd5b7deddf2731607d3cac2a2f211a8b37465296ae6370"
+    },
+    {
+      "file": "docs/specs/observe.md",
+      "ranges": [
+        [
+          1,
+          85
+        ]
+      ],
+      "sha256": "3d53da00998e79a47831c077ed07710b5e3bd6be7b3fe1d5f243cb5d6b8f53e6"
+    }
+  ],
+  "questionSha256": "1c60ab48808b94195566c2a265518c5ba838771d139f42337bcbe12a33c38d81",
+  "sourcePacketSha256": "9a93aa925f7d3f5c4693227357a0100c79889a45180a1031d5fceac9db7782d2"
+}

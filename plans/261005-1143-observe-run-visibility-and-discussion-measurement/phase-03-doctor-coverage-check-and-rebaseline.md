@@ -13,24 +13,20 @@ dependencies: [1, 2]
 
 Add `observe-run-coverage` to `fgos doctor` so a future layout change cannot hide again, and rebaseline the numbers the blind spot distorted.
 
-Execution evidence: [rebaseline](../reports/observe-rebaseline-261005.md).
-Diagnostic and registry/docs changes are implemented; rebuilt-host, old-host,
-hidden-run and complete doctor paths were exercised. After diagnosing and fixing
-the watchdog timeout-publication race, full `npm test` passes with 6,730 passed,
-zero failed, eight skipped and 65 todo. No commit was requested or made; the
-rebaseline report is present in the working tree, not claimed committed.
+Execution evidence: [historical rebaseline](../reports/observe-rebaseline-261005.md) and [acceptance repairs](../reports/observe-acceptance-fixes-261006.md).
+The initial foundation suite passed 6,730 tests after the watchdog correction; that dated result is not the repair's final gate. The feature was subsequently committed as `0b06824a7`, and doctor/admission repairs as `c439264cd`. Actual rebuilt/old-host doctor checks were exercised; unrelated baseline check failures remain, so overall doctor is not represented as entirely green.
 
 
 ## Requirements
 
-- Functional: the check calls `metrics coverage` through the host helper and compares its `runDirsSeen` with the independent count from the phase 1 Node lister. Equal (allowing for `recentRuns`) passes; fewer seen fails with the shortfall and example paths the Node side can name.
+- Functional: compare host candidate directories with the independent Node inventory and host observed results with independently eligible unique Node results. A shortfall names counts and explicitly sample candidates, not invented confirmed omissions.
 - Functional: an **old host is recognised positively**: `metrics coverage` is an unknown subcommand (the case `src/util/host-bin.mjs:94-104` already reports) or the output has no `layoutRule`. That yields passed-but-degraded with a message that the host predates the layout rule. A host answering normally with the old numbers is therefore never read as healthy.
-- Non-functional: the Node side reads directory names only (no JSON parsing of hundreds of files); the host call does not run the transcripts source.
+- Non-functional: one Node directory walk; the separate admission projection reads bounded result/owner metadata over that inventory. The host does not run the transcripts source.
 - Non-functional: the check runs against the same root the helper passes (the main checkout root, `host-bin.mjs:81-82`); a worktree run says so instead of comparing different stores.
 
 ## Architecture
 
-`registerCheck({ id: 'observe-run-coverage', description, check })` beside the existing observe checks (`src/setup/registrations.mjs:5766-5780`). The check takes an injectable host runner and lister so tests need no host. Comparison tolerance: runs whose `result.json` changed in the last 60 s on either side are excluded; a shortfall larger than that fails.
+`registerCheck({ id: 'observe-run-coverage', description, check })` remains in the existing observe registry. Compare candidate directories and eligible unique results separately. Tolerance is the larger of recent candidate-directory count (including future-clock mtimes and absent results) and unchanged host recent-result count; it is not restricted to result.json existence.
 
 ## Related Code Files
 
@@ -49,10 +45,10 @@ rebaseline report is present in the working tree, not claimed committed.
 ## Success Criteria
 
 - [x] Passes with the fixed host, degraded with the old staged host, fails against a fixture hiding a run.
-- [x] Rebaseline report persisted in working tree; the 260930 plan consistent with it. No commit requested.
-- [x] `npm test` green for the foundation execution (6,730 pass, zero fail); final measurement regression is separately recorded.
+- [x] Rebaseline report committed; dependent classification plan retains its historical before/after boundary.
+- [x] Initial foundation `npm test` gate passed; the repair's single final gate is recorded separately in the acceptance ledger.
 
-Evidence: [`observe-rebaseline-261005.md`](../reports/observe-rebaseline-261005.md). Original report-commit criterion is not asserted: no staging/commit was requested.
+Evidence: [rebaseline](../reports/observe-rebaseline-261005.md) and [acceptance repairs](../reports/observe-acceptance-fixes-261006.md); current eligible/observed parity, recent-directory regressions and old-host upgrade messaging are exercised.
 
 ## Risk Assessment
 

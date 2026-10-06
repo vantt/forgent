@@ -1,0 +1,12 @@
+{
+  "contract": "fgos.v1",
+  "generated_at": "2026-10-06T06:01:22.216Z",
+  "data_hash": "764fc7ad001139fae526aeff54321ed391bb27157edce9ba419a8dc4ce292fe1",
+  "data": {
+    "mechanism": "out-of-process",
+    "configured": true,
+    "reasonCodes": [
+      "native-first.0033.cli-spawn-shaped"
+    ]
+  }
+}

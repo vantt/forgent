@@ -1,0 +1,281 @@
+{
+  "root": "/home/vantt/projects/mdview",
+  "question": "DECISION QUESTION (council-style, read-only, give a position): fgOS's `panel` collaboration pattern (src/runner/execution/patterns/panel.mjs) runs N independent panelists in parallel then a synthesizer on a different provider. The 'council-of-high-intelligence' project adds mechanical quality gates around such a panel: (1) a dissent quota (at least 2 non-overlapping objections else re-prompt), (2) an agreement check (>70% agree -> force a counterfactual from 2 members), (3) anonymized cross-examination round, (4) a confidence-weighted tally that returns a genuine split to the user instead of forcing consensus. Should fgOS add a mechanical dissent/agreement gate to the panel pattern, or is provider-distinct panelists plus the reviewed pattern's red-team already enough? Read the repo to ground your answer (panel.mjs, reviewed.mjs, docs/specs). Reply with: your position, the 2-3 strongest reasons with file:line evidence, what would change your mind, and one concrete next step. Maximum 300 words.",
+  "sourcePacketSha256": "9a93aa925f7d3f5c4693227357a0100c79889a45180a1031d5fceac9db7782d2",
+  "workspaces": [
+    "/tmp/fgos-independent-position-ovgNhO",
+    "/tmp/fgos-independent-position-fXBzQ4"
+  ],
+  "setupError": null,
+  "results": [
+    {
+      "status": "fulfilled",
+      "value": {
+        "unitRunId": "unit-run-1791266482233-ee7efe1a",
+        "outcome": "pass",
+        "results": [
+          {
+            "role": "producer",
+            "round": 1,
+            "outcome": "pass",
+            "runResult": {
+              "runId": "run_unit-run-1791266482233-ee7efe1a/producer/1_01",
+              "executorId": "claude",
+              "model": "opus",
+              "tier": "flagship",
+              "settledAt": "2026-10-06T06:01:54.565Z",
+              "classification": {
+                "execution": {
+                  "status": "completed",
+                  "exitCode": 0
+                },
+                "assessment": {
+                  "verdict": "pass"
+                },
+                "confidence": {
+                  "level": "reported",
+                  "basis": [
+                    "valid-agent-result-claim",
+                    "captured-stdout"
+                  ]
+                },
+                "failure": null,
+                "policy": {
+                  "disposition": "allow",
+                  "code": null
+                },
+                "delivery": {
+                  "mode": "fresh"
+                },
+                "provenance": "native-v3",
+                "outcome": {
+                  "category": "ok",
+                  "reason": "completed-pass"
+                }
+              },
+              "runtime": {
+                "exitCode": 0,
+                "stdoutLog": ".fgos/assignments/unit-run-1791266482233-ee7efe1a/producer/1/runs/01/stdout.log",
+                "stderrLog": ".fgos/assignments/unit-run-1791266482233-ee7efe1a/producer/1/runs/01/stderr.log"
+              },
+              "reportRefs": [
+                {
+                  "path": ".fgos/assignments/unit-run-1791266482233-ee7efe1a/producer/1/runs/01/worker-output/outbox/agent-report.md",
+                  "sha256": "0730b43ac439aaea07841d2b62762b1bccef813047354df4c89e7d272d6fc759"
+                }
+              ],
+              "agentClaim": {
+                "contract": {
+                  "id": "agent-result-claim",
+                  "version": 2
+                },
+                "status": "done",
+                "summary": "Position: don't add a mechanical dissent/agreement gate to panel.mjs yet. (1) The spec already decided agreement is passive measurement, not a gate, with pre-committed K2/K3/K5 review conditions (runner.md:1435) and agreement/genuineSplit metrics (observe.md:61). (2) The council mechanisms already exist as Workflow steps: anonymizeInputs (runner.md:1437), blind (runner.md:1439), independent panelists (panel.mjs:63-68), and a synthesizer on a different provider (panel.mjs:94-97). A gate would add hidden sequencing that ADR 0047 avoided (runner.md:3050). (3) Red-team doesn't cover panels (reviewed.mjs:27-28,52-54), and the panel outcome is just the synthesizer's outcome (panel.mjs:101-104), so the real gap is showing splits to the owner, not forcing dissent. I would change my mind if K2/K3 fires or if panels run single-provider in practice (runner.md:1404-1405). Next step: collect stance data on 30 panel runs and check K2/K3 with fgos metrics discussions; meanwhile pass the measured genuineSplit into the panel result (read-only, non-gating).",
+                "evidenceRefs": [
+                  "src/runner/execution/patterns/panel.mjs:63-68",
+                  "src/runner/execution/patterns/panel.mjs:94-97",
+                  "src/runner/execution/patterns/panel.mjs:101-104",
+                  "src/runner/execution/patterns/reviewed.mjs:27-28",
+                  "src/runner/execution/patterns/reviewed.mjs:52-54",
+                  "docs/specs/runner.md:1404-1405",
+                  "docs/specs/runner.md:1435",
+                  "docs/specs/runner.md:1437",
+                  "docs/specs/runner.md:1439",
+                  "docs/specs/runner.md:3050",
+                  "docs/specs/observe.md:61"
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "unitRunId": "unit-run-1791266482325-8335c3c1",
+        "outcome": "execution-failure",
+        "results": [
+          {
+            "role": "panelist-1",
+            "round": 1,
+            "outcome": "pass",
+            "runResult": {
+              "runId": "run_unit-run-1791266482325-8335c3c1/panelist-1/1_01",
+              "executorId": "claude",
+              "model": "sonnet",
+              "tier": "standard",
+              "settledAt": "2026-10-06T06:01:48.509Z",
+              "classification": {
+                "execution": {
+                  "status": "completed",
+                  "exitCode": 0
+                },
+                "assessment": {
+                  "verdict": "pass"
+                },
+                "confidence": {
+                  "level": "reported",
+                  "basis": [
+                    "valid-agent-result-claim",
+                    "captured-stdout"
+                  ]
+                },
+                "failure": null,
+                "policy": {
+                  "disposition": "allow",
+                  "code": null
+                },
+                "delivery": {
+                  "mode": "fresh"
+                },
+                "provenance": "native-v3",
+                "outcome": {
+                  "category": "ok",
+                  "reason": "completed-pass"
+                }
+              },
+              "runtime": {
+                "exitCode": 0,
+                "stdoutLog": ".fgos/assignments/unit-run-1791266482325-8335c3c1/panelist-1/1/runs/01/stdout.log",
+                "stderrLog": ".fgos/assignments/unit-run-1791266482325-8335c3c1/panelist-1/1/runs/01/stderr.log"
+              },
+              "reportRefs": [
+                {
+                  "path": ".fgos/assignments/unit-run-1791266482325-8335c3c1/panelist-1/1/runs/01/worker-output/outbox/agent-report.md",
+                  "sha256": "c456d9be9b0163276e116dd03b028d74f1184fb379cc094ab00a3fdec3cebc69"
+                }
+              ],
+              "agentClaim": {
+                "contract": {
+                  "id": "agent-result-claim",
+                  "version": 2
+                },
+                "status": "done",
+                "summary": "Position: do not add a blocking dissent/agreement gate to panel.mjs now. Agreement is already a passive measurement by spec (runner.md:1435, observe.md:61), and panel.mjs has no round loop (panel.mjs:57-99). Cross-exam is composable at Workflow level via anonymizeInputs/blind (runner.md:1437-1439). Revisit if K3 fires (a unanimous panel is later reversed) or K2 shows >=90% unanimity. Next step: run fgos metrics discussions and check K2/K3.",
+                "evidenceRefs": [
+                  "src/runner/execution/patterns/panel.mjs:57-99",
+                  "docs/specs/runner.md:1435",
+                  "docs/specs/observe.md:61"
+                ]
+              }
+            }
+          },
+          {
+            "role": "panelist-2",
+            "round": 1,
+            "outcome": "execution-failure",
+            "runResult": {
+              "runId": "run_unit-run-1791266482325-8335c3c1/panelist-2/1_01",
+              "executorId": "xai",
+              "model": "grok-4.3",
+              "tier": "standard",
+              "settledAt": "2026-10-06T06:01:23.210Z",
+              "classification": {
+                "execution": {
+                  "status": "failed",
+                  "exitCode": 1
+                },
+                "assessment": {
+                  "verdict": "not-applicable"
+                },
+                "confidence": {
+                  "level": "failed",
+                  "basis": [
+                    "captured-stdout",
+                    "failed-exit"
+                  ]
+                },
+                "failure": {
+                  "family": "provider",
+                  "code": "nonzero-process-exit"
+                },
+                "policy": {
+                  "disposition": "needs-input",
+                  "code": "nonzero-process-exit"
+                },
+                "delivery": {
+                  "mode": "fresh"
+                },
+                "provenance": "native-v3",
+                "outcome": {
+                  "category": "infra",
+                  "reason": "nonzero-process-exit"
+                }
+              },
+              "runtime": {
+                "exitCode": 1,
+                "stdoutLog": ".fgos/assignments/unit-run-1791266482325-8335c3c1/panelist-2/1/runs/01/stdout.log",
+                "stderrLog": ".fgos/assignments/unit-run-1791266482325-8335c3c1/panelist-2/1/runs/01/stderr.log"
+              },
+              "reportRefs": []
+            }
+          },
+          {
+            "role": "panelist-3",
+            "round": 1,
+            "outcome": "pass",
+            "runResult": {
+              "runId": "run_unit-run-1791266482325-8335c3c1/panelist-3/1_01",
+              "executorId": "gemini",
+              "model": "gemini-3.8-flash-medium",
+              "tier": "standard",
+              "settledAt": "2026-10-06T06:02:12.466Z",
+              "classification": {
+                "execution": {
+                  "status": "completed",
+                  "exitCode": 0
+                },
+                "assessment": {
+                  "verdict": "pass"
+                },
+                "confidence": {
+                  "level": "reported",
+                  "basis": [
+                    "valid-agent-result-claim",
+                    "captured-stdout"
+                  ]
+                },
+                "failure": null,
+                "policy": {
+                  "disposition": "allow",
+                  "code": null
+                },
+                "delivery": {
+                  "mode": "fresh"
+                },
+                "provenance": "native-v3",
+                "outcome": {
+                  "category": "ok",
+                  "reason": "completed-pass"
+                }
+              },
+              "runtime": {
+                "exitCode": 0,
+                "stdoutLog": ".fgos/assignments/unit-run-1791266482325-8335c3c1/panelist-3/1/runs/01/stdout.log",
+                "stderrLog": ".fgos/assignments/unit-run-1791266482325-8335c3c1/panelist-3/1/runs/01/stderr.log"
+              },
+              "reportRefs": [
+                {
+                  "path": ".fgos/assignments/unit-run-1791266482325-8335c3c1/panelist-3/1/runs/01/worker-output/outbox/agent-report.md",
+                  "sha256": "6389212715182619d2a6f8b98a120db60de31a3dda6399c8f309a0234c093ed2"
+                }
+              ],
+              "agentClaim": {
+                "contract": {
+                  "id": "agent-result-claim",
+                  "version": 2
+                },
+                "status": "done",
+                "summary": "Completed position on mechanical dissent/agreement gates for fgOS panel pattern: against mechanical gates in panel.mjs; provider-distinct panelists, reviewed red-team, and Observe passive measurement are sufficient.",
+                "evidenceRefs": [
+                  "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791266482325-8335c3c1/panelist-3/1/runs/01/worker-output/outbox/agent-report.md"
+                ]
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

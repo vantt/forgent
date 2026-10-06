@@ -22,12 +22,12 @@ A passive sensor: each panelist states a stance among declared options; Observe 
 - Functional: a panelist may return `stance: { choice, confidence }` in its result claim; `choice` is one of the options declared for the question, or `other`.
 - Functional: options are declared per question: `fgos workflow start <id> --request ... --stance-options "a|b|c"` (stored with the workflow run, passed to the unit as `stanceOptions`) or the same unit param for `fgos run`. A static template cannot hold them because the question arrives as free text (`src/workflow/runner.mjs:39-41`).
 - Functional: the unit summary (phase 4) carries each final seat's stance, extracted by the Node writer from the settled `result.json` `agentClaim` (already validated and hashed), never from outbox files whose location varies per seat.
-- Functional: `metrics discussions` shows per unit `stances`, `stancesMissing`, `stancesInvalid`, `agreement` (largest group share) and `genuineSplit` (no option reaches 2/3 of seats); a unit with no options reads `unmeasured`.
+- Functional: vote only owner-defined `kind: panelist`, regardless of role label. Synthesizers never vote even when named panelist. With zero valid claims, agreement/split are null and measurement is unmeasured; retain all panelist/missing/invalid denominators. Otherwise agreement is largest valid-choice count over all panelist seats, with the existing passive two-thirds threshold.
 - Non-functional: a malformed or missing stance is recorded, **never** a refusal: `settlement.mjs:224-231, 491-499` fails a seat on an invalid claim, so the contract change is documentation plus tolerance, not new validation.
 
 ## Architecture
 
-D2. The claim validator (`src/runner/dispatch/agent-result-claim-contract.mjs`) already accepts unknown fields; the change documents the optional `stance` and adds a tolerant extractor in `unit-summary.mjs` that returns `{choice, confidence}` or `{invalid: reason}`. The brief for panelists gets the options and "end with your stance" through the existing role-task mechanism (`src/runner/execution/patterns/role-tasks.mjs`, `params.roleTasks`). Agreement is computed in the Rust read side from the summary's stances.
+D2 remains optional and tolerant. Canonical measured-role construction adds stance instructions only to panelists with options; generic workers and synthesizers receive none. Prior panel-member roleTasks behavior is restored except for scoped stance instructions. Writer owns extraction/seat kind, Rust owns passive aggregation. Resume with new stance options explicitly refuses without mutating the stored question.
 
 ## Related Code Files
 
@@ -48,7 +48,7 @@ D2. The claim validator (`src/runner/dispatch/agent-result-claim-contract.mjs`) 
 - [x] Without options reads `unmeasured`; malformed stance is counted `invalid` and the seat still passes (real CLI-prompt/settlement regression).
 - [x] Existing no-stance workflow behavior remains covered and passes the integrated workflow suite.
 
-Evidence: [`observe-discussion-measurement-261005.md`](../reports/observe-discussion-measurement-261005.md); initial blocked panel is preserved as partial evidence, not counted as three valid votes.
+Evidence: [historical measurement](../reports/observe-discussion-measurement-261005.md) and [acceptance repairs](../reports/observe-acceptance-fixes-261006.md), commit `b2c7b4588`. Actual owner-to-native researcher-name and zero-valid-vote scenarios, immutable-resume CLI refusal and no-stance workflow regressions are exercised. Initial blocked panel remains partial evidence.
 
 ## Risk Assessment
 

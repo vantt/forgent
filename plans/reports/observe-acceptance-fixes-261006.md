@@ -1,6 +1,6 @@
 # Observe acceptance repairs — 2026-10-06
 
-Status: in progress. Baseline is committed `0b06824a7` plus watchdog commit `ea1c8fee0`; tracked working tree was clean at start. The original Opus acceptance reports are immutable review records, not edited by this repair.
+Status: reachable repairs complete and verified; original acceptance remains partially outstanding (source/import guards not fixed; fresh independent A/B judgment **UNPROVEN**). Baseline is committed `0b06824a7` plus watchdog commit `ea1c8fee0`; tracked working tree was clean at start. The original Opus acceptance reports are immutable review records, not edited by this repair.
 
 ## Owner decisions and scope
 
@@ -49,12 +49,12 @@ User-supplied Opus probes and failure observations are the pre-fix baseline; the
 
 ## Finding ledger
 
-Each row will receive its commit and exercised proof, or an explicit non-fix/UNPROVEN disposition. Original reports: [foundation](opus-acceptance-review-foundation-261006.md), [discussion](opus-acceptance-review-discussion-measurement-261006.md), [eval/honesty](opus-acceptance-review-phase6-and-honesty-261006.md).
+Every row records its disposition, source repair commit and exercised proof, or a precise non-fix/UNPROVEN limit. Original reports: [foundation](opus-acceptance-review-foundation-261006.md), [discussion](opus-acceptance-review-discussion-measurement-261006.md), [eval/honesty](opus-acceptance-review-phase6-and-honesty-261006.md).
 
 | Report finding | Disposition | Commit / proof |
 |---|---|---|
 | Foundation H1: dropped owner-dated history / incomplete policy choice | **Fixed**: actual sibling settlement fallback; no start/creation substitute; independent doctor admissions | `c439264cd` covers foundation rows; current forgentX eligible/observed929, 219 started-only excluded; native/fixture proof below. |
-| Foundation H2: deleted closure / missing source guard | **Not fixed: runtime test-policy conflict**; original criterion reopened | Current 12-module throwaway closure above; no permanent prevention claimed. |
+| Foundation H2: deleted closure / missing source guard | **Not fixed: runtime test-policy conflict**; original criterion reopened | `842287533` records conflict and restored original checkbox; current 12-module throwaway closure above is not permanent prevention. |
 | Foundation M1: Node/Rust admission equivalence overclaimed | **Fixed**: production Node projection separate from directory-only lister | Shared fixture IDs/reasons/accounting exercised by both implementations; live dual-root parity below. |
 | Foundation M2: newly created dir tolerance | **Fixed**: candidate directory recency, including missing result | Sixty-second boundary/clock-skew/stale-directory regressions pass. |
 | Foundation M3: misleading shortfall example paths | **Fixed**: explicitly sample candidates, not confirmed missing | Doctor code has counts only; no invented per-path omission evidence. |
@@ -75,25 +75,27 @@ Each row will receive its commit and exercised proof, or an explicit non-fix/UNP
 | Discussion L4: derived summary error fatal | **Fixed**: warning preserves authoritative outcome/original exception | Normal, inline and execution-error I/O regressions pass. |
 | Discussion L5: roleTasks now apply to panel members | **Restored prior behavior**: member task wrapping ignored except stance | Prefeature source checked; synthesizer/generic roleUnit overrides unchanged. |
 | Discussion L6: resume silently ignores stance options | **Fixed**: explicit refusal without altering stored question | Actual CLI exits4 with named immutable-question error; regressions pass. |
-| Eval Medium: incomplete known rubric | **Fixed**: exactly five canonical keys on write/read, other rubrics extensible | Main eval suite23 pass; native partial record rejected before store creation. Group commit pending. |
+| Eval Medium: incomplete known rubric | **Fixed**: exactly five canonical keys on write/read, other rubrics extensible | `f11504363` covers eval integrity rows; main eval suite23 pass; native partial record rejected before store creation. |
 | Eval Low-Medium: duplicate evalId | **Fixed**: all-shard identity check and append hold shared Observe lock | Same/different shard, hand-edited duplicates and two-process identity race; native duplicate refuses unchanged original bytes. |
 | Eval Low-Medium: architecture-specific no-follow constant | **Fixed**: target libc constants on existing supported Unix branches | `cargo check -p fgos-observe --target aarch64-unknown-linux-gnu` succeeds; compile proof, not execution on arm64. |
 | Eval Low: lexical timestamp list ordering | **Not changed; documented**: writer UTC/Z sorts correctly, hand-edited offsets have lexical order | No chronological guarantee claimed for arbitrary read timestamps. |
 | Eval Low: unsafe shard silently skipped | **Fixed**: unsafe/nonregular *.jsonl reported invalidline0 without following | Consumer test proves no external scores/writes; invalid store blocks uniqueness-dependent append. Read preflight race remains explicit. |
 | Eval concurrency: same shard not exercised | **Fixed**: six processes / one shard / 30 unique complete records; two same-ID writers exactly one success | Main eval suite23 pass; helpers don't mutate parent process environment. |
-| Honesty High: false isolation provenance | **Corrected before first commit** in both records; metadata, report, plan, journal and how-to aligned | `metrics eval list` returned both corrected records, invalid empty; scores unchanged. |
+| Honesty High: false isolation provenance | **Corrected before first commit** in both records; metadata, report, plan, journal and how-to aligned | `75606d308`; real eval list returned both corrected records, invalid empty and scores unchanged. A later isolated availability canary is separately labeled, not retrospective proof. |
 | Honesty High: solo consumed panel output | **Disclosed** in setup/judge metadata and every comparison claim | Old scores are not an independent comparison; new proof remains conditional. |
 | Honesty High: weakened exact import closure | Same unresolved runtime-policy conflict as foundation H2 | No restoration claimed. |
 | Honesty Medium: different historical question | **Disclosed**; original objective retained for any fresh run | Vietnamese 1000-word vs English repo-reading 300-word distinction explicit. |
 | Honesty Medium: raw judge command contradicts dispatch door | **Corrected**: how-to uses decide/execute and requires configured/audited invocation | Default executor is explicitly data-blind only; actual installed `claude --help` checked. |
 | Honesty Medium: cross-project unqualified runRefs | **Corrected** setup provenance names `/home/vantt/projects/mdview` | IDs/refs unchanged; owning root explicit in both real rows. |
+| Honesty: historical scratch inventory / capability arrays authored by coordinator | **UNPROVEN, disclosed**; no retrospective filesystem or hidden-context proof | `75606d308` corrects original report/JSON/how-to; deleted scratch cannot be reconstructed. Actual canary SDK transcript is new scoped evidence, not retroactive validation. |
+| Honesty: historical dispatch-decide artifact absent | **UNPROVEN, disclosed** | No historical artifact fabricated. Fresh availability and generation decisions are actual retained outputs under the new evidence directory. |
 | Authorization unproven | **Owner confirmed now** | Exact answer above, historical transcript discoverability remains separate. |
 | Watchdog residual append failure may prevent kill | Not changed: outside requested repair groups | Review identifies risk; no claim it is resolved here. |
-| Original all-phase completion / re-review approval claims | Reopened by acceptance; not proof that all consumer defects were absent | New regression and finding-specific proof pending. |
+| Original all-phase completion / re-review approval claims | **Corrected and reopened**; passing baseline is not proof every consumer defect was absent | `842287533` / `75606d308`; original guard remains unmet, final repair gate and fair-comparison outcome are separate below. |
 
 ## Verification
 
-No final full-suite run has started. Final Rust, CLI, narrow and full-suite outputs will be persisted here. Any live re-comparison will use the entire historical objective and genuinely independent arms; lack of real isolation or provider quota will be reported rather than fabricated. No old score will be relabeled as a new comparison.
+The one final `env -u CLAUDE_CODE_SESSION_ID npm test` completed after all narrow, Rust, CLI, golden and provider attempts: **6,851 tests / 6,778 pass / zero fail / zero cancelled / eight skipped / 65 todo**, 334,907.732836ms (`artifact://456`, full runner output `artifact://453`). No commit was made while it ran and no second full npm run was made. The historical-objective comparison reached real fresh Unit seats but remains **UNPROVEN** because panel generation failed before synthesis (private Pi auth-runtime prerequisite), not because quota exhaustion was established. No old score is relabeled and no new scorecard was fabricated.
 
 ### Initial verification correction
 
@@ -142,6 +144,21 @@ No final full-suite run has started. Final Rust, CLI, narrow and full-suite outp
 ### Eval integrity verification
 
 - Main eval test harness: **23 pass / zero fail**, including actual same-shard and duplicate-ID processes; tool aggregate41 includes child harness output (`artifact://403`). Rebuilt host succeeded. Independent scoped eval integrity review found no concrete regression (confidence0.93), no tests run by reviewer.
-- `cargo check -p fgos-observe --target aarch64-unknown-linux-gnu` succeeded (`artifact://405`). Required complete `cargo test -p fgos-run-result -p fgos-observe` succeeded (`artifact://415`, tool aggregate94 including child harnesses); a later added Rust Unicode case is separately11-pass above.
+- `cargo check -p fgos-observe --target aarch64-unknown-linux-gnu` succeeded (`artifact://405`), compile-only proof. Final required `cargo test -p fgos-run-result -p fgos-observe` rerun after the Unicode regression succeeds (`artifact://431`; tool aggregate95 includes child harness results). Exact golden regeneration/build succeeds again and required `git diff --stat -- test/fixtures/observe` is empty.
 - Actual native CLI smoke (foreground transcript output from `node /tmp/fgos-eval-integrity-smoke.mjs`): partial known rubric exits1 before store creation; duplicate exits1 without changing shard bytes; duplicate detection remains visible under unmatched harness filter; a new ID refuses existing invalid store. Throwaway root removed. Real live eval list still has the two original corrected records and invalid[]; no synthetic smoke score enters it.
 - Optional comparison prerequisite: target-project `dispatch decide claude` returned configured/out-of-process; `dispatch execute ... --model opus --tier flagship` returned READY, actual status0/modelopus/providerclaude (`bg_107`). This is only an availability probe using the default unconfined profile, not a fresh arm, isolated judge or score. Quota absence cannot be claimed.
+
+### Final live migration and declared isolation
+
+- ForgentX owner backfill: **81 units, 61 changed, 2 unchanged, 4 active skipped, 14 unsettled skipped, errors[]** (`artifact://436`). Root-wide discussions accounting:81 directories,18 unusable (12 invalid-contract,6 missing-timestamp),31 outside-window. Derived-only regeneration does not invent settlement or mutate source journals.
+- Actual Opus canary through `executeExecutorCli`, routed out-of-process: captured execution wrapper argv includes `--safe-mode`, `--tools ""`, empty MCP map, `--setting-sources ""`, disabled slash commands and no session persistence. SDK init reports model`claude-opus-5-5`, tools[], mcp_servers[], skills[], slash_commands[]; no hook/tool events observed. Three **builtin** plugins remain: no claim all plugins or admin policy are disabled. bwrap attestation `enforced` applies the declared blind/read-only resource controls; network is allowed and host/shared process/session controls are not advertised as isolation (`artifact://435`, `artifact://437`).
+- The first canary declaration incorrectly requested unsupported workspace grants/private-home/session coverage and refused before launch. Corrected canonical read-only workspace policy succeeds. This is configuration diagnosis, not a quota failure, score or fresh comparison.
+- Fresh comparison uses the **entire** historical English objective and one hashed, numbered current-source packet for both actual `runUnit` arms on mdview. Declared temporary project invocation configuration is byte-restored immediately after both owner snapshots; no config default/env/infra is added. Earlier declaration attempts failed closed before provider launch (null confinement, removed referenced invocation IDs, missing backend declaration); then an overlarge inline argument failed E2BIG. File-pointer delivery and bounded relevant excerpts repair those invocation issues without changing the objective.
+- Earlier full-owner solo `unit-run-1791265470164-48ec13db` passed; panel `unit-run-1791265470226-7fe9b3f6` had Sonnet pass but two CLI configuration failures (`x-ai` unknown provider, agy duration missing unit). Corrected actual generation then produced solo `unit-run-1791266482233-ee7efe1a` pass, Sonnet/Gemini panel seats pass, but panel `unit-run-1791266482325-8335c3c1` execution-failure before synthesis. Exact xai error: credential-store lock creation is EROFS under the inherited OMP Pi agent directory. This is **not quota exhaustion**. No historical successful output substitutes for this failed panel and no two fresh evals are invented.
+- Public installed Pi code establishes ordinary CLI authentication requires writable auth-file locking; it exposes no read-only auth switch. Redirecting `PI_CODING_AGENT_DIR` alone does not provision credentials. Existing fgOS capacity provisioning does not provide a Pi/xAI inference credential relay. Completing a confined fresh panel requires a correctly provisioned writable private Pi account runtime; copying/extracting credentials or widening credential-write grants is not done. **Fresh fair comparison and actual A/B judgment remain UNPROVEN**, despite Opus availability and the successful isolated canary.
+- Native owner launches retain prepared invocation/contract and actual SDK stdout but escape parent JS spawn observation. Owner records request the scratch cwd, while observed Claude init reports `/home/vantt`; no claim that planned cwd or prepared argv alone proves effective isolation. Raw generation evidence is reduced to public outcome/model/report/log-reference fields; opaque control tokens are not persisted in committed evidence.
+
+### Final evidence commit scope
+
+- Final pre-commit `detect-changes --scope all --repo /home/vantt/projects/forgentX`: **11 tracked files, 30 document symbols, zero affected processes, LOW**. Two generated instruction files appear in detection and remain excluded from staging. The remaining sync-back is documentation/plans plus new safe evidence and the first-class journal; no production symbol changes after the final full npm proof.
+- Journal auto preference resolved true; `ak journal create ... --stdin` created `plans/journals/2026-10-06-observe-acceptance-repair-verification.md`. AgentWiki publication skipped. Completed throwaway scripts removed; no push.

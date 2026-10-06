@@ -9,9 +9,9 @@ dependencies: [2]
 
 # Phase 4: Unit summaries and `metrics discussions`
 
-Execution gate: owner explicitly requested all remaining phases on 2026-10-05,
-superseding the foundation-only validation gate. Writer, reader, backfill and
-live measurement are now executing; success boxes require observed evidence.
+Execution gate: the owner confirmed all-phase authorization on 2026-10-06.
+Writer/reader lifecycle repairs are committed as `b2c7b4588`; current evidence,
+including clean-cutover backfill and missing/unusable diagnostics, is linked below.
 
 
 ## Overview
@@ -20,8 +20,8 @@ Observe knows runs but not discussions. The execution core, which owns unit sema
 
 ## Requirements
 
-- Functional: `unit-summary.json` in each unit directory: `{ contract, unitRunId, workflow: {runId, stepId, unitId} | null, pattern, capability, outcome, startedAt, settledAt, seats: [{ role, final, attempts: [{ assignmentId, runId, executor, provider, persona, model, outcome, fallbackFrom }] }], inline }`; `final` is the winning attempt by the rules already in `unit-run-history.mjs` (latest fallback wins, outcome mapping).
-- Functional: written when a unit ends, including when it throws or is refused (policy refusal gives zero seats), so crashed units are not orphaned.
+- Functional: each final seat includes owner-defined `kind` as well as role, final attempt and attempt provenance. Canonical pattern definitions, not role labels or Rust reconstruction, decide seat semantics.
+- Functional: only drained pattern completion settles a multi-role Unit. Inline producer completion remains pending; resume invalidates stale regular terminal summaries before reopening. Derived-write errors warn without replacing authoritative outcome. A killed process may have no summary: root-wide diagnostics count missing/unusable artifacts without guessing crash state or a time window.
 - Functional: the workflow runner passes `{runId, stepId, unitId}` into the unit at creation (recorded in `unit.json`), so the link is written by its owner, not reconstructed from events (`unit.scheduled` carries no `unitRunId`, crashed units emit no `unit.complete`: `src/workflow/runner.mjs:377-408`).
 - Functional: `metrics discussions [--since] [--by workflow|executor|persona]`: unit runs, pass rate, seats failed, fallback rate, median duration, and `attempts` (all attempts) next to `seats` (final attempts).
 - Functional: the inline unit result (`fgos run record`, no `runId`) appears as a seat with `inline: true`.
@@ -54,7 +54,7 @@ Writer side (Node): a small function next to `unit-run-history.mjs` builds the s
 - [x] A unit that throws still gets a summary (lifecycle regression; panel throw waits for peer settlement).
 - [x] No second implementation of the attempt rules exists in Rust (independent reader/writer review).
 
-Evidence: [`observe-discussion-measurement-261005.md`](../reports/observe-discussion-measurement-261005.md). Original/result journals unchanged; derived backfill is byte-idempotent, including regeneration when sources differ.
+Evidence: [historical measurement](../reports/observe-discussion-measurement-261005.md) and [acceptance repairs](../reports/observe-acceptance-fixes-261006.md). Derived-only migration skips active/pending and unsupported unsettled history; original Unit/result/event bytes are not rewritten. Node blast-radius consumers259 and Rust reader12 cases pass; all four mdview Delphi groups remain observable.
 
 ## Risk Assessment
 

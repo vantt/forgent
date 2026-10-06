@@ -1,0 +1,69 @@
+{
+  "kind": "availability-and-isolation-canary-not-a-judgment",
+  "actualCapturedExecutionWrapper": [
+    {
+      "command": "bash",
+      "args": [
+        "-c",
+        "for f in $(ls /proc/$$/fd 2>/dev/null); do if [ \"$f\" -ge 3 ] 2>/dev/null; then eval \"exec $f>&-\" 2>/dev/null || true; fi; done; exec \"$@\"",
+        "bwrap-launch",
+        "claude",
+        "-p",
+        "Isolation availability probe only, not a judgment. Reply exactly READY. Do not call tools.",
+        "--model",
+        "opus",
+        "--safe-mode",
+        "--tools",
+        "",
+        "--strict-mcp-config",
+        "--mcp-config",
+        "{\"mcpServers\":{}}",
+        "--setting-sources",
+        "",
+        "--disable-slash-commands",
+        "--no-session-persistence",
+        "--output-format",
+        "stream-json",
+        "--verbose",
+        "--include-hook-events",
+        "--system-prompt-snapshot",
+        "on"
+      ]
+    }
+  ],
+  "actualSdkTranscript": "{\"type\":\"system\",\"subtype\":\"init\",\"cwd\":\"/tmp/fgos-isolation-canary-zuMGxI\",\"session_id\":\"5cdcb7cd-2cb8-4884-ad14-7a2ed712cbf0\",\"tools\":[],\"mcp_servers\":[],\"model\":\"claude-opus-5-5\",\"permissionMode\":\"default\",\"slash_commands\":[],\"apiKeySource\":\"none\",\"claude_code_version\":\"2.1.291\",\"output_style\":\"default\",\"agents\":[\"claude\",\"Explore\",\"general-purpose\",\"Plan\"],\"skills\":[],\"plugins\":[{\"name\":\"cc-plugin-agents-md\",\"path\":\"builtin\",\"source\":\"cc-plugin-agents-md@builtin\"},{\"name\":\"cc-plugin-telemetry\",\"path\":\"builtin\",\"source\":\"cc-plugin-telemetry@builtin\"},{\"name\":\"cc-plugin-plugin-authoring\",\"path\":\"builtin\",\"source\":\"cc-plugin-plugin-authoring@builtin\"}],\"capabilities\":[\"interrupt_receipt_v1\",\"interrupt_cancel_queued_v1\",\"interrupt_send_now_v1\",\"msg_lifecycle_v1\",\"sdk_mcp_tools_list_changed\",\"sdk_mcp_manifests\",\"mcp_read_resource_v1\",\"mcp_tool_ui_meta_v1\",\"ui_surface_v1\"],\"analytics_disabled\":false,\"product_feedback_disabled\":false,\"uuid\":\"bcfb3935-4773-4fbc-bf2f-04a985e5df10\",\"fast_mode_state\":\"off\",\"fast_mode_disabled_reason\":\"sdk_opt_in_required\",\"per_turn_effort_active\":true,\"view_mode\":\"default\"}\n{\"type\":\"assistant\",\"message\":{\"model\":\"claude-opus-5-5\",\"id\":\"msg_011CfkQEQ78zyPy73yX7VNRV\",\"type\":\"message\",\"role\":\"assistant\",\"content\":[{\"type\":\"text\",\"text\":\"READY\"}],\"container\":null,\"stop_reason\":null,\"stop_sequence\":null,\"stop_details\":null,\"usage\":{\"input_tokens\":2,\"cache_creation_input_tokens\":1475,\"cache_read_input_tokens\":535,\"cache_creation\":{\"ephemeral_5m_input_tokens\":0,\"ephemeral_1h_input_tokens\":1475},\"output_tokens\":4,\"service_tier\":\"standard\",\"inference_geo\":\"not_available\"},\"input_transformations\":[],\"diagnostics\":null,\"context_management\":null},\"parent_tool_use_id\":null,\"session_id\":\"5cdcb7cd-2cb8-4884-ad14-7a2ed712cbf0\",\"uuid\":\"33bf4ef6-e10f-4219-84bf-aa5d4c3d5ba6\",\"timestamp\":\"2026-10-06T05:05:38.534Z\",\"request_id\":\"req_011CfkQEPhq2ZeqMrS1hBhgQ\"}\n{\"type\":\"rate_limit_event\",\"rate_limit_info\":{\"status\":\"allowed\",\"resetsAt\":1791269400,\"rateLimitType\":\"five_hour\",\"overageStatus\":\"rejected\",\"overageDisabledReason\":\"org_level_disabled\",\"isUsingOverage\":false,\"unifiedWindows\":{\"five_hour\":{\"utilization\":0.33,\"resetsAt\":1791269400},\"seven_day\":{\"utilization\":0.33,\"resetsAt\":1791712800}}},\"uuid\":\"bb7c205b-c038-42da-adea-02265721a568\",\"session_id\":\"5cdcb7cd-2cb8-4884-ad14-7a2ed712cbf0\"}\n{\"duration_api_ms\":1853,\"stop_reason\":\"end_turn\",\"session_id\":\"5cdcb7cd-2cb8-4884-ad14-7a2ed712cbf0\",\"total_cost_usd\":0.011995,\"usage\":{\"input_tokens\":2,\"cache_creation_input_tokens\":1475,\"cache_read_input_tokens\":535,\"output_tokens\":4,\"output_tokens_details\":{\"thinking_tokens\":0},\"server_tool_use\":{\"web_search_requests\":0,\"web_fetch_requests\":0},\"service_tier\":\"standard\",\"cache_creation\":{\"ephemeral_1h_input_tokens\":1475,\"ephemeral_5m_input_tokens\":0},\"inference_geo\":\"not_available\",\"iterations\":[{\"input_tokens\":2,\"output_tokens\":4,\"cache_read_input_tokens\":535,\"cache_creation_input_tokens\":1475,\"cache_creation\":{\"ephemeral_5m_input_tokens\":0,\"ephemeral_1h_input_tokens\":1475},\"type\":\"message\"}],\"speed\":\"standard\",\"fallback_credit\":null},\"modelUsage\":{\"claude-opus-5-5\":{\"inputTokens\":2,\"outputTokens\":4,\"cacheReadInputTokens\":535,\"cacheCreationInputTokens\":1475,\"webSearchRequests\":0,\"costUSD\":0.011995,\"contextWindow\":1000000,\"maxOutputTokens\":128000,\"thinkingTokens\":0,\"canonicalModel\":\"claude-opus-5-5\",\"provider\":\"firstParty\",\"costBasis\":\"list\"}},\"permission_denials\":[],\"terminal_reason\":\"completed\",\"fast_mode_state\":\"off\",\"fast_mode_disabled_reason\":\"sdk_opt_in_required\",\"subagent_stats\":{\"spawned\":0,\"requested\":{\"background\":0,\"foreground\":0,\"unset\":0},\"started_in_background\":0,\"max_depth\":0,\"spawned_by_subagents\":0,\"completed\":0,\"failed\":0,\"killed\":{\"parent\":0,\"user\":0,\"system\":0},\"refused\":{\"depth_limit\":0,\"concurrency_limit\":0,\"budget\":0},\"by_type\":{}},\"is_error\":false,\"num_turns\":1,\"subtype\":\"success\",\"api_error_status\":null,\"result\":\"READY\",\"ttft_ms\":1880,\"type\":\"result\",\"duration_ms\":1892,\"uuid\":\"1533a17a-6571-459a-bfb8-153c4474d97a\",\"ttft_stream_ms\":1879,\"time_to_request_ms\":40,\"first_content_frame_ms\":1879,\"queued_turn_count\":0,\"result_index\":0}\n",
+  "status": 0,
+  "configuredModel": "opus",
+  "attestation": {
+    "outcome": "enforced",
+    "requestedControls": {
+      "hostWrite": "deny",
+      "hostRead": "blind",
+      "networkEgress": "allow",
+      "process": "host",
+      "home": "host",
+      "session": "shared",
+      "workspace": "shared"
+    },
+    "coverage": {
+      "control:hostWrite": "satisfied",
+      "control:hostRead": "satisfied",
+      "control:networkEgress": "satisfied",
+      "control:process": "satisfied",
+      "control:home": "satisfied",
+      "control:session": "satisfied",
+      "control:workspace": "satisfied",
+      "grant:run-output": "satisfied",
+      "grant:private-home": "satisfied",
+      "grant:executor-credentials": "unverified",
+      "grant:workspace": "satisfied",
+      "grant:workspace-git-metadata": "satisfied"
+    }
+  },
+  "limits": [
+    "Builtin plugins remain; admin-managed policy not disabled",
+    "No system_prompt_snapshot event observed despite actual flag",
+    "Network allowed; requested host/shared process/session posture not advertised as private isolation",
+    "This probe produces no comparison outputs or quality score"
+  ]
+}

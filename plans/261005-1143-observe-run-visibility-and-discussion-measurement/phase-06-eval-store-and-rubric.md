@@ -21,7 +21,7 @@ A repeatable way to score discussion quality with the council's 0-2 rubric, in i
 ## Requirements
 
 - Functional: `metrics eval record` writes an append-only record `{ v, type: "eval", ts, evalId, harness (free label), question, setup, scores: {criterion: 0..2}, rubric, judge, runRefs[] }` to `.fgos/observe/evals/<writerId>.jsonl`; `metrics eval list [--harness] [--question]` reads them.
-- Functional: scores are range-checked when written and when read (a hand-edited tracked line outside 0..2 is reported, not trusted).
+- Functional: write/read range checks plus exactly all five canonical criteria for `discussion-quality.v1`. Duplicate eval IDs are rejected under the shared Observe lock across all shards before append/fsync; invalid existing stores fail closed for uniqueness-dependent writes. Read-side duplicate/unsafe-shard diagnostics precede filters. Existing supported Unix targets use libc no-follow/nonblock constants.
 - Functional: a rubric reference document (the five criteria used on 2026-10-04: perspective spread, decision clarity, counterfactual depth, evidence discipline, execution quality, each 0-2) with an id/version, and a how-to for a blind comparison.
 - Functional: blind judging means the judge receives copies of the outputs in a scratch directory **outside `.fgos`** under neutral names (`A.md`, `B.md`); blind mode alone does not hide `.fgos/observe/evals` or the earlier `ab-*` outputs (`resources.mjs:26-32`).
 - Non-functional: an old host reports `unknown subcommand` for `metrics eval` (detectable, unlike silently dropped fields); evals are only recorded with a host that has the subcommand.
@@ -50,6 +50,8 @@ D4. A new store beside friction, cases and snapshots, with the same shard-per-wr
 - [x] Unchanged installed host rejects `metrics eval` explicitly, exit 4.
 
 Evidence: [`observe-discussion-measurement-261005.md`](../reports/observe-discussion-measurement-261005.md), corrected [judge metadata and actual rationales](../reports/observe-measurement-blind-judge-261005.json), and `.fgos/observe/evals/observe-measurement-261005.jsonl`. Both original texts scored 7/10, but the setup-independence and historical-question confounds invalidate presenting this as a fair setup comparison. [Acceptance repairs](../reports/observe-acceptance-fixes-261006.md) track any new run and unresolved proof; no isolation acceptance is claimed from the old scores.
+
+Store integrity repair `f11504363`: main eval harness23 pass, including six-process same-shard and two-process same-ID behavior; native rejects partial/duplicate/invalid-store writes without inventing scores. Arm64 cargo check is compile-only proof. Fresh Opus isolation canary has real captured argv and SDK tools/MCP/skills-empty transcript, not comparison scores. Full historical-question owner-unit attempts produce real solo pass and Sonnet/Gemini passes, but confined xai cannot create its inherited credential-store lock on readonly storage. A provisioned writable private Pi runtime is missing; no credentials are copied/extracted and no substitute model or fake eval is used. Fair-comparison criterion remains unchecked.
 
 ## Risk Assessment
 

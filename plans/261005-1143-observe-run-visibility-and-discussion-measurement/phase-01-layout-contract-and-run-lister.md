@@ -70,6 +70,8 @@ Readers, in two groups:
 
 Evidence: [`observe-run-layout-261005.md`](../reports/observe-run-layout-261005.md), [`observe-rebaseline-261005.md`](../reports/observe-rebaseline-261005.md), and [acceptance repairs](../reports/observe-acceptance-fixes-261006.md). The original guard criterion is restored verbatim and unchecked. No owner waiver or equivalent permanent prevention is claimed.
 
+Acceptance repairs: `c439264cd` adds independent result admission, owner-settlement fallback and ambiguous-ID refusal; shared Unicode ordering regressions pass in Node/Rust. The original source guard above remains unchecked because of runtime test policy, not a repository law or owner waiver.
+
 ## Risk Assessment
 
 - Behavior change of the reconciler may block worktrees of workflow units and mdview: dry-run first, switch last, one reader per commit so a revert is one commit.

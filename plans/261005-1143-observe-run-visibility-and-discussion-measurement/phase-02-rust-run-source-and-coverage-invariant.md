@@ -15,14 +15,14 @@ Make the run-result source follow the run definition from plan.md, expose how ma
 
 ## Requirements
 
-- Functional: `scan_runs(root) -> RunScan { runs, skipped, run_dirs_seen, recent_runs }` implements the rule: stop at `runs/`, no symlinks (`symlink_metadata`/file type), depth cap, `assignment.json` optional (role null), skip reasons `unparseable | no-run-id | no-timestamp | symlink | duplicate-run-id | depth | inline-record`.
+- Functional: `scan_runs(root) -> RunScan { runs, skipped, run_dirs_seen, recent_runs }` follows stop-at-runs, no-follow and depth-16 directory rules, then separate result admission. Reasons include `missing-result | unparseable | no-run-id | no-timestamp | symlink | duplicate-run-id | depth | inline-record`. Real result settlement fields precede regular sibling `run.json.settledAt`; start/creation/mtime are never settlement.
 - Functional: `RunResultSource::observations` uses `scan_runs`; the shared `ObservationSource` trait does **not** change (skip counts come from `metrics coverage`, not from the trait).
 - Functional: `metrics coverage` prints `{ layoutRule: "v2", runDirsSeen, observed, skipped: {reason: n}, recentRuns }`, where `recentRuns` counts runs whose `result.json` changed in the last 60 s, and `observed + sum(skipped) == runDirsSeen`.
 - Non-functional: reads the runs source only (no transcripts scan); cost measured, not assumed.
 
 ## Architecture
 
-Same rule as phase 1, implemented once in `fgos_run_result`. The Rust test reads `test/fixtures/run-layout/expected.json` and must produce the same run set as the Node test (including the planted-in-outbox run being absent). The read contract `packages/run-result/contracts/run-result.read.v1.json` is corrected: assignment id may contain `/`, `assignment.json` optional, inline-record shape named as skipped. `metrics coverage` is registered where subcommands are listed: `packages/observe/rust/src/metrics_cli/mod.rs:14`, `src/cli/command-registry.mjs:66`, `docs/specs/observe.md` §4.
+The shared fixture tests directory inventory and actual Node/Rust admission IDs/reasons, including owner-dated history, started-only exclusions and valid-Unicode duplicate winners. Node's production projection consumes the existing inventory; it is not a Date.parse/Set approximation. Primary runId remains independent of the possibly empty root-relative assignmentId. See the [acceptance repairs](../reports/observe-acceptance-fixes-261006.md) for the 11-pass Rust layout suite, 99-pass Node consumers and complete final Rust command.
 
 ## Related Code Files
 

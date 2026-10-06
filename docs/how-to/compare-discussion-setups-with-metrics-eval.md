@@ -104,6 +104,10 @@ setting sources. `--safe-mode` still permits admin-managed policy; do not
 claim that every setting is disabled. `--bare` is a different mode that skips
 OAuth/keychain authentication, so it is not an interchangeable switch.
 
+The 2026-10-06 [actual availability canary](../../plans/reports/observe-independent-comparison-261006/isolation-canary.json) demonstrates applied empty arguments and SDK tools/MCP/skills-empty initialization through Dispatch. It is **not** an A/B judgment. Three builtin plugins remain; the snapshot flag produced no snapshot event, so do not infer a complete hidden-instruction inventory. Native Unit prepared argv/cwd also do not alone prove the provider's effective argv/cwd: compare actual SDK initialization and execution evidence.
+
+A confined Pi worker needs a provisioned writable private authentication runtime: ordinary Pi CLI reads take an adjacent auth-file lock. Redirecting its agent directory without provisioning does not supply credentials; never solve a readonly lock failure by copying/extracting credentials or widening grants silently. Record the failed setup and missing prerequisite, not substitute a historical successful panel or claim quota exhaustion.
+
 Run from the target project using the fgOS source entry, with a configured
 judge executor and explicit separate project root and scratch cwd:
 
