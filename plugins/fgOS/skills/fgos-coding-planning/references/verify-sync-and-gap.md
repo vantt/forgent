@@ -153,7 +153,7 @@ candidate questions:
 
   Then hand back to `fgos-coding-exploring` directly, in this same
   session: invoke its flow (Socratic lock, the same three-test filter,
-  appending a new decision id to CONTEXT.md) while `item.stage` stays
+  appending a new decision id to CONTEXT.md) while `item.workflowStep` stays
   `planning` the entire time — there is no `planning -> exploring` edge
   in the state machine, so never attempt to move the item's stage back.
   This is the same no-stage-move shape `fgos-coding-validating` already

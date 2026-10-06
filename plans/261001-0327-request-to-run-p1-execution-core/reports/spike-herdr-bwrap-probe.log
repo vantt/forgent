@@ -1,0 +1,6 @@
+tty: yes
+repo-write exit=1
+outbox-write exit=0
+rundir-write exit=0
+home-write exit=1
+done

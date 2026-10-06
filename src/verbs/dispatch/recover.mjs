@@ -18,7 +18,9 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { findRunDir, readRunSnapshot } from './show-run.mjs';
+import { readRunSnapshot } from './show-run.mjs';
+import { assignmentDir, findRunDir, RunLookupError } from '../../runner/dispatch/assignment-layout.mjs';
+import { fgosDirFromRoot } from '../../runner/paths.mjs';
 import { plan, checkApply, collectEvidence, RecoveryPlannerError } from '../../runner/dispatch/recovery-planner.mjs';
 import { acquireRunControl, releaseRunControl, currentGeneration, controlDirs, isProcessAlive, buildRunControlHolder } from '../../runner/dispatch/run-lock.mjs';
 import { findCoordinationSessionOwningAssignment } from '../../runner/dispatch/runtime-inspection.mjs';
@@ -29,7 +31,7 @@ export class RecoveryError extends Error {
     super(message);
     this.name = 'RecoveryError';
     this.code = code;
-    this.category = (code === 'run-not-found' || code === 'missing-run') ? 'precondition' : 'validation';
+    this.category = (code === 'run-not-found' || code === 'missing-run' || code === 'run-ambiguous') ? 'precondition' : 'validation';
     Object.assign(this, details);
   }
 }
@@ -46,7 +48,14 @@ function requireRunId(runId) {
 
 function resolveRunDir(ctx, runId) {
   const repoRoot = ctx?.repoRoot ?? ctx?.cwd ?? process.cwd();
-  const runDir = findRunDir(repoRoot, runId);
+  let runDir;
+  try { runDir = findRunDir(fgosDirFromRoot(repoRoot), runId); }
+  catch (err) {
+    if (err instanceof RunLookupError) {
+      throw new RecoveryError(err.code, err.message, { runId, repoRoot, locations: err.locations });
+    }
+    throw err;
+  }
   if (!runDir) {
     throw new RecoveryError('run-not-found', `no run "${runId}" under ${repoRoot}`, { runId, repoRoot });
   }
@@ -225,7 +234,9 @@ function appendRecoveryCommand(runDir, record) {
 // safe given they already gated the call, not despite them.
 function clearDispatchClaimForRecoveredDriver(repoRoot, assignmentId, action) {
   if (action?.type !== 'resume-driver' || !assignmentId) return { cleared: false };
-  const claimPath = path.join(repoRoot, '.fgos', 'assignments', assignmentId, 'dispatch.claim');
+  const dir = assignmentDir(fgosDirFromRoot(repoRoot), assignmentId);
+  if (!dir) throw new RecoveryError('invalid-assignment-id', 'assignmentId must not escape the assignments directory.');
+  const claimPath = path.join(dir, 'dispatch.claim');
   try {
     fs.unlinkSync(claimPath);
     return { cleared: true };

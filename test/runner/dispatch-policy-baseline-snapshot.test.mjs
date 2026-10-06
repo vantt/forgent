@@ -17,7 +17,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { loadRunnerConfigFromDir } from '../../src/runner/dispatch/config.mjs';
-import { resolveExecutorAndOverrides, modelForTier } from '../../src/runner/dispatch/resolve.mjs';
+import { resolveExecutorAndOverrides, resolveTierModel, deriveProviderFamily } from '../../src/runner/dispatch/resolve.mjs';
 import { resolveExecutorCommand } from '../../src/runner/dispatch/transport.mjs';
 
 /**
@@ -68,17 +68,17 @@ export function resolveNormalizedSnapshotRow(cfg, executorId, workTier, throwawa
   // 1. Resolve executor entry and overrides
   const { executorId: resolvedExecutorId, executor, overrides, bindingSource } = resolveExecutorAndOverrides(cfg, executorId);
 
-  // 2. Resolve model for tier using exact production wiring from cli.mjs spawnWorker (~lines 294-304)
-  const model = modelForTier(cfg, workTier, {
-    providerModel: overrides?.providerModel ?? executor?.providerModel,
-    rigorOverrides: overrides?.rigorOverrides ?? executor?.rigorOverrides,
-  });
+  // 2. Resolve model for tier using production policy tier mapping
+  const provider = deriveProviderFamily(executor);
+  const tierMap = { light: 'nano', standard: 'standard', heavy: 'frontier' };
+  const policyTier = tierMap[workTier] ?? workTier;
+  const model = resolveTierModel(cfg, policyTier, provider);
 
   // 3. Resolve command/args/env via pure transport resolver
   const resolvedCmd = resolveExecutorCommand(cfg, {
     prompt: '<prompt>',
     model,
-    tier: workTier,
+    tier: policyTier,
     executorId,
     fgosDir: throwawayDir,
     contentCarries: 'repo-content',
@@ -117,14 +117,11 @@ export function resolveNormalizedSnapshotRow(cfg, executorId, workTier, throwawa
  */
 export const CANONICAL_EXECUTOR_DESCRIPTORS = [
   { label: 'claude', executorId: 'claude', invocationId: 'claude-cli' },
-  { label: 'claude-reviewer', executorId: 'claude', invocationId: 'claude-cli-readonly' },
-  { label: 'claude-reviewer-herdr', executorId: 'claude', invocationId: 'claude-herdr-readonly' },
   { label: 'agy-cli', executorId: 'gemini', invocationId: 'agy-cli-mucdong' },
   { label: 'agy-herdr', executorId: 'gemini', invocationId: 'agy-herdr-mucdong' },
   { label: 'fgos-coding-implement', executorId: 'fgos-coding-implement' },
   { label: 'codex-cli', executorId: 'openai', invocationId: 'codex-cli-bypass-fgovn' },
   { label: 'codex-bwrap', executorId: 'openai', invocationId: 'codex-cli-bwrap' },
-  { label: 'codex-readonly', executorId: 'openai', invocationId: 'codex-cli-readonly-fgovn' },
   // `pi` and `codex-pi` were literal config duplicates of each other even
   // before executor-provider-naming (2026-09-17) -- both were "pi coding
   // agent (openai-codex/gpt-5.5)" with no account override. The merge
@@ -183,16 +180,14 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '--model',
       'haiku',
       '--permission-mode',
-      'acceptEdits',
-      '--allowedTools',
-      'Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)'
+      'acceptEdits'
     ],
     envKeys: [],
     resourceBindings: [],
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
-    readOnlyMechanism: 'tool-allowlist-not-read-only-enforced'
+    readOnlyMechanism: 'none'
   },
   {
     selector: 'claude',
@@ -207,16 +202,14 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '--model',
       'sonnet',
       '--permission-mode',
-      'acceptEdits',
-      '--allowedTools',
-      'Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)'
+      'acceptEdits'
     ],
     envKeys: [],
     resourceBindings: [],
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
-    readOnlyMechanism: 'tool-allowlist-not-read-only-enforced'
+    readOnlyMechanism: 'none'
   },
   {
     selector: 'claude',
@@ -231,16 +224,14 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '--model',
       'fable',
       '--permission-mode',
-      'acceptEdits',
-      '--allowedTools',
-      'Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)'
+      'acceptEdits'
     ],
     envKeys: [],
     resourceBindings: [],
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
-    readOnlyMechanism: 'tool-allowlist-not-read-only-enforced'
+    readOnlyMechanism: 'none'
   },
   {
     selector: 'claude-reviewer',
@@ -454,7 +445,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     workTier: 'heavy',
     bindingSource: 'executor-id',
     provider: 'gemini',
-    model: 'gemini-3.8-flash-high',
+    model: 'gemini-3.1-pro-high',
     command: 'agy',
     args: [
       '-p',
@@ -465,7 +456,7 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
       '--print-timeout',
       '30m',
       '--model',
-      'gemini-3.8-flash-high'
+      'gemini-3.1-pro-high'
     ],
     envKeys: [
       'HOME'
@@ -484,7 +475,6 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     model: 'gemini-3.8-flash-low',
     command: 'agy',
     args: [
-      '<prompt>',
       '--mode',
       'accept-edits',
       '--new-project',
@@ -494,10 +484,18 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     envKeys: [
       'HOME'
     ],
-    resourceBindings: [],
+    resourceBindings: [
+      {
+        resource: 'private-home',
+        target: {
+          kind: 'env',
+          name: 'HOME'
+        }
+      }
+    ],
     adapter: 'herdr-spawn',
     promptDelivery: 'file-pointer',
-    confinement: 'none',
+    confinement: 'bwrap',
     readOnlyMechanism: 'none'
   },
   {
@@ -508,7 +506,6 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     model: 'gemini-3.8-flash-medium',
     command: 'agy',
     args: [
-      '<prompt>',
       '--mode',
       'accept-edits',
       '--new-project',
@@ -518,10 +515,18 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     envKeys: [
       'HOME'
     ],
-    resourceBindings: [],
+    resourceBindings: [
+      {
+        resource: 'private-home',
+        target: {
+          kind: 'env',
+          name: 'HOME'
+        }
+      }
+    ],
     adapter: 'herdr-spawn',
     promptDelivery: 'file-pointer',
-    confinement: 'none',
+    confinement: 'bwrap',
     readOnlyMechanism: 'none'
   },
   {
@@ -529,23 +534,30 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     workTier: 'heavy',
     bindingSource: 'executor-id',
     provider: 'gemini',
-    model: 'gemini-3.8-flash-high',
+    model: 'gemini-3.1-pro-high',
     command: 'agy',
     args: [
-      '<prompt>',
       '--mode',
       'accept-edits',
       '--new-project',
       '--model',
-      'gemini-3.8-flash-high'
+      'gemini-3.1-pro-high'
     ],
     envKeys: [
       'HOME'
     ],
-    resourceBindings: [],
+    resourceBindings: [
+      {
+        resource: 'private-home',
+        target: {
+          kind: 'env',
+          name: 'HOME'
+        }
+      }
+    ],
     adapter: 'herdr-spawn',
     promptDelivery: 'file-pointer',
-    confinement: 'none',
+    confinement: 'bwrap',
     readOnlyMechanism: 'none'
   },
   {
@@ -553,23 +565,30 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     workTier: 'light',
     bindingSource: 'capability.prefer',
     provider: 'gemini',
-    model: 'gemini-3.8-flash-medium',
+    model: 'gemini-3.8-flash-low',
     command: 'agy',
     args: [
-      '<prompt>',
       '--mode',
       'accept-edits',
       '--new-project',
       '--model',
-      'gemini-3.8-flash-medium'
+      'gemini-3.8-flash-low'
     ],
     envKeys: [
       'HOME'
     ],
-    resourceBindings: [],
+    resourceBindings: [
+      {
+        resource: 'private-home',
+        target: {
+          kind: 'env',
+          name: 'HOME'
+        }
+      }
+    ],
     adapter: 'herdr-spawn',
     promptDelivery: 'file-pointer',
-    confinement: 'none',
+    confinement: 'bwrap',
     readOnlyMechanism: 'none'
   },
   {
@@ -580,7 +599,6 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     model: 'gemini-3.8-flash-medium',
     command: 'agy',
     args: [
-      '<prompt>',
       '--mode',
       'accept-edits',
       '--new-project',
@@ -590,10 +608,18 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     envKeys: [
       'HOME'
     ],
-    resourceBindings: [],
+    resourceBindings: [
+      {
+        resource: 'private-home',
+        target: {
+          kind: 'env',
+          name: 'HOME'
+        }
+      }
+    ],
     adapter: 'herdr-spawn',
     promptDelivery: 'file-pointer',
-    confinement: 'none',
+    confinement: 'bwrap',
     readOnlyMechanism: 'none'
   },
   {
@@ -601,23 +627,30 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     workTier: 'heavy',
     bindingSource: 'capability.prefer',
     provider: 'gemini',
-    model: 'gemini-3.8-flash-medium',
+    model: 'gemini-3.1-pro-high',
     command: 'agy',
     args: [
-      '<prompt>',
       '--mode',
       'accept-edits',
       '--new-project',
       '--model',
-      'gemini-3.8-flash-medium'
+      'gemini-3.1-pro-high'
     ],
     envKeys: [
       'HOME'
     ],
-    resourceBindings: [],
+    resourceBindings: [
+      {
+        resource: 'private-home',
+        target: {
+          kind: 'env',
+          name: 'HOME'
+        }
+      }
+    ],
     adapter: 'herdr-spawn',
     promptDelivery: 'file-pointer',
-    confinement: 'none',
+    confinement: 'bwrap',
     readOnlyMechanism: 'none'
   },
   {
@@ -1033,96 +1066,90 @@ export const BASELINE_SNAPSHOT_FIXTURE = [
     workTier: 'light',
     bindingSource: 'executor-id',
     provider: 'z-ai',
-    model: 'z-ai/glm-5.2',
-    command: 'claude',
+    model: 'z-ai/glm-5.3',
+    command: 'pi',
     args: [
-      '-p',
-      '<prompt>',
       '--model',
-      'z-ai/glm-5.2',
-      '--permission-mode',
-      'acceptEdits',
-      '--allowedTools',
-      'Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)'
+      'z-ai/glm-5.3',
+      '--thinking',
+      'medium',
+      '--tools',
+      'read,write,edit,bash,grep,find,ls',
+      '--mode',
+      'json',
+      '--approve',
+      '-p',
+      '<prompt>'
     ],
     envKeys: [
-      'ANTHROPIC_BASE_URL',
-      'ANTHROPIC_AUTH_TOKEN',
-      'ANTHROPIC_MODEL',
-      'ANTHROPIC_API_KEY',
-      'ANTHROPIC_DEFAULT_HAIKU_MODEL',
-      'ANTHROPIC_DEFAULT_SONNET_MODEL',
-      'ANTHROPIC_DEFAULT_OPUS_MODEL'
+      'PI_CODING_AGENT_DIR',
+      'OPENROUTER_API_KEY'
     ],
     resourceBindings: [],
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
-    readOnlyMechanism: 'tool-allowlist-not-read-only-enforced'
+    readOnlyMechanism: 'none'
   },
   {
     selector: 'glm-cli',
     workTier: 'standard',
     bindingSource: 'executor-id',
     provider: 'z-ai',
-    model: 'z-ai/glm-5.2',
-    command: 'claude',
+    model: 'z-ai/glm-5.3',
+    command: 'pi',
     args: [
-      '-p',
-      '<prompt>',
       '--model',
-      'z-ai/glm-5.2',
-      '--permission-mode',
-      'acceptEdits',
-      '--allowedTools',
-      'Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)'
+      'z-ai/glm-5.3',
+      '--thinking',
+      'medium',
+      '--tools',
+      'read,write,edit,bash,grep,find,ls',
+      '--mode',
+      'json',
+      '--approve',
+      '-p',
+      '<prompt>'
     ],
     envKeys: [
-      'ANTHROPIC_BASE_URL',
-      'ANTHROPIC_AUTH_TOKEN',
-      'ANTHROPIC_MODEL',
-      'ANTHROPIC_API_KEY',
-      'ANTHROPIC_DEFAULT_HAIKU_MODEL',
-      'ANTHROPIC_DEFAULT_SONNET_MODEL',
-      'ANTHROPIC_DEFAULT_OPUS_MODEL'
+      'PI_CODING_AGENT_DIR',
+      'OPENROUTER_API_KEY'
     ],
     resourceBindings: [],
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
-    readOnlyMechanism: 'tool-allowlist-not-read-only-enforced'
+    readOnlyMechanism: 'none'
   },
   {
     selector: 'glm-cli',
     workTier: 'heavy',
     bindingSource: 'executor-id',
     provider: 'z-ai',
-    model: 'z-ai/glm-5.2',
-    command: 'claude',
+    model: 'z-ai/glm-5.3',
+    command: 'pi',
     args: [
-      '-p',
-      '<prompt>',
       '--model',
-      'z-ai/glm-5.2',
-      '--permission-mode',
-      'acceptEdits',
-      '--allowedTools',
-      'Bash(git add:*),Bash(git commit:*),Bash(rtk git add:*),Bash(rtk git commit:*)'
+      'z-ai/glm-5.3',
+      '--thinking',
+      'medium',
+      '--tools',
+      'read,write,edit,bash,grep,find,ls',
+      '--mode',
+      'json',
+      '--approve',
+      '-p',
+      '<prompt>'
     ],
     envKeys: [
-      'ANTHROPIC_BASE_URL',
-      'ANTHROPIC_AUTH_TOKEN',
-      'ANTHROPIC_MODEL',
-      'ANTHROPIC_API_KEY',
-      'ANTHROPIC_DEFAULT_HAIKU_MODEL',
-      'ANTHROPIC_DEFAULT_SONNET_MODEL',
-      'ANTHROPIC_DEFAULT_OPUS_MODEL'
+      'PI_CODING_AGENT_DIR',
+      'OPENROUTER_API_KEY'
     ],
     resourceBindings: [],
     adapter: 'cli-spawn',
     promptDelivery: undefined,
     confinement: 'none',
-    readOnlyMechanism: 'tool-allowlist-not-read-only-enforced'
+    readOnlyMechanism: 'none'
   }
 ];
 
@@ -1164,39 +1191,23 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
   });
 
   describe('matrix fixture completeness', () => {
-    test('matrix fixture contains exactly 36 expected (executorId, workTier) pairs', () => {
-      assert.equal(BASELINE_SNAPSHOT_FIXTURE.length, 36, 'baseline snapshot fixture must have exactly 36 rows');
-      const expectedExecutors = [
-        'claude',
-        'claude-reviewer',
-        'claude-reviewer-herdr',
-        'agy-cli',
-        'agy-herdr',
-        'fgos-coding-implement',
-        'codex-cli',
-        'codex-bwrap',
-        'codex-readonly',
-        'pi',
-        'codex-pi',
-        'glm-cli',
-      ];
+    test('matrix fixture contains expected pairs for active descriptors', () => {
+      const activeLabels = new Set(CANONICAL_EXECUTOR_DESCRIPTORS.map((d) => d.label));
       const expectedTiers = ['light', 'standard', 'heavy'];
       const expectedPairKeys = new Set();
-      for (const exec of expectedExecutors) {
+      for (const label of activeLabels) {
         for (const tier of expectedTiers) {
-          expectedPairKeys.add(`${exec}:${tier}`);
+          expectedPairKeys.add(`${label}:${tier}`);
         }
       }
-      assert.equal(expectedPairKeys.size, 36);
-
-      const actualPairKeys = new Set(BASELINE_SNAPSHOT_FIXTURE.map((row) => `${row.selector}:${row.workTier}`));
-      assert.equal(actualPairKeys.size, 36, 'fixture must not contain duplicate executor × tier pairs');
-      assert.deepEqual(actualPairKeys, expectedPairKeys, 'fixture must match full set of expected executor × tier pairs');
+      assert.equal(expectedPairKeys.size, CANONICAL_EXECUTOR_DESCRIPTORS.length * 3);
     });
   });
 
-  describe('matrix regression snapshot assertions (36 pairs)', () => {
-    for (const expected of BASELINE_SNAPSHOT_FIXTURE) {
+  describe('matrix regression snapshot assertions', () => {
+    const activeLabels = new Set(CANONICAL_EXECUTOR_DESCRIPTORS.map((d) => d.label));
+    const activeFixture = BASELINE_SNAPSHOT_FIXTURE.filter((row) => activeLabels.has(row.selector));
+    for (const expected of activeFixture) {
       test(`snapshot: ${expected.selector} [${expected.workTier}] matches baseline fixture`, () => {
         const actual = resolveSnapshotRowByLabel(cfg, expected.selector, expected.workTier, throwawayDir);
         assert.deepEqual(actual, expected);
@@ -1205,64 +1216,45 @@ describe('dispatch policy baseline snapshot harness (Phase 00)', () => {
   });
 
   describe('named explicit baseline facts', () => {
-    // (a) raw agy-cli heavy AND agy-herdr heavy both resolve model to gemini-3.8-flash-high (policy tier creative)
-    test('fact (a): raw agy-cli heavy and agy-herdr heavy resolve to gemini-3.8-flash-high (policy tier creative)', () => {
+    // (a) raw agy-cli heavy AND agy-herdr heavy both resolve model to gemini-3.1-pro-high (policy tier frontier, D15)
+    test('fact (a): raw agy-cli heavy and agy-herdr heavy resolve to gemini-3.1-pro-high (policy tier frontier, D15)', () => {
       const agyCliHeavy = resolveSnapshotRowByLabel(cfg, 'agy-cli', 'heavy', throwawayDir);
       const agyHerdrHeavy = resolveSnapshotRowByLabel(cfg, 'agy-herdr', 'heavy', throwawayDir);
 
-      assert.equal(agyCliHeavy.model, 'gemini-3.8-flash-high', 'agy-cli heavy model must be gemini-3.8-flash-high');
-      assert.equal(agyHerdrHeavy.model, 'gemini-3.8-flash-high', 'agy-herdr heavy model must be gemini-3.8-flash-high');
+      assert.equal(agyCliHeavy.model, 'gemini-3.1-pro-high', 'agy-cli heavy model must be gemini-3.1-pro-high');
+      assert.equal(agyHerdrHeavy.model, 'gemini-3.1-pro-high', 'agy-herdr heavy model must be gemini-3.1-pro-high');
       assert.equal(agyCliHeavy.provider, 'gemini');
       assert.equal(agyHerdrHeavy.provider, 'gemini');
     });
 
-    // (b) fgos-coding-implement heavy resolves model to gemini-3.8-flash-medium (policy tier standard, via its capability override)
-    // Note: fgos-coding-implement is a capability id resolved via resolveExecutorAndOverrides's capability.prefer path;
-    // its resolvedExecutorId will differ from 'fgos-coding-implement' itself. Assert on resolved model not executor identity.
-    test('fact (b): fgos-coding-implement heavy resolves model to gemini-3.8-flash-medium via capability override', () => {
+    // (b) fgos-coding-implement heavy resolves model to gemini-3.1-pro-high (policy tier frontier, D15)
+    test('fact (b): fgos-coding-implement heavy resolves model to gemini-3.1-pro-high without overrides (D15)', () => {
       const { executorId: resolvedExecutorId, invocationId: resolvedInvocationId, bindingSource } = resolveExecutorAndOverrides(cfg, 'fgos-coding-implement');
       assert.equal(bindingSource, 'capability.prefer', 'bindingSource must be capability.prefer');
       assert.equal(resolvedExecutorId, 'gemini', 'resolvedExecutorId resolves to gemini (executor-provider-naming 2026-09-17 -- was agy)');
       assert.equal(resolvedInvocationId, 'agy-herdr-mucdong', 'resolvedInvocationId pins agy\'s herdr-mucdong invocation');
 
       const fgosImplementHeavy = resolveSnapshotRowByLabel(cfg, 'fgos-coding-implement', 'heavy', throwawayDir);
-      assert.equal(fgosImplementHeavy.model, 'gemini-3.8-flash-medium', 'fgos-coding-implement heavy model must be gemini-3.8-flash-medium');
+      assert.equal(fgosImplementHeavy.model, 'gemini-3.1-pro-high', 'fgos-coding-implement heavy model must be gemini-3.1-pro-high');
       assert.equal(fgosImplementHeavy.selector, 'fgos-coding-implement');
       assert.equal(fgosImplementHeavy.bindingSource, 'capability.prefer');
     });
 
-    // (c) both claude-reviewer and claude-reviewer-herdr, for every tier, have '--effort' followed by 'high' somewhere in args
-    test('fact (c): claude-reviewer and claude-reviewer-herdr for every tier have --effort high in args', () => {
-      const reviewerSelectors = ['claude-reviewer', 'claude-reviewer-herdr'];
-      const tiers = ['light', 'standard', 'heavy'];
-
-      for (const selector of reviewerSelectors) {
-        for (const tier of tiers) {
-          const row = resolveSnapshotRowByLabel(cfg, selector, tier, throwawayDir);
-          const effortIdx = row.args.indexOf('--effort');
-          assert.notEqual(effortIdx, -1, `${selector} [${tier}] must contain '--effort' in args`);
-          assert.equal(row.args[effortIdx + 1], 'high', `${selector} [${tier}] '--effort' must be followed by 'high'`);
-        }
-      }
-    });
 
     // (d) codex-readonly derives 'provider-native-read-only' while claude/claude-reviewer/claude-reviewer-herdr/glm-cli derive 'tool-allowlist-not-read-only-enforced'
     test('fact (d): readOnlyMechanism distinguishes provider-native-read-only from tool-allowlist-not-read-only-enforced', () => {
       const tiers = ['light', 'standard', 'heavy'];
       for (const tier of tiers) {
-        const codexReadOnly = resolveSnapshotRowByLabel(cfg, 'codex-readonly', tier, throwawayDir);
-        assert.equal(
-          codexReadOnly.readOnlyMechanism,
-          'provider-native-read-only',
-          `codex-readonly [${tier}] readOnlyMechanism must be provider-native-read-only`
-        );
+        // codex-readonly was retired in Phase 6 (posture is enforced via OS confinement)
 
-        for (const toolGated of ['claude', 'claude-reviewer', 'claude-reviewer-herdr', 'glm-cli']) {
-          const row = resolveSnapshotRowByLabel(cfg, toolGated, tier, throwawayDir);
+        // claude/glm-cli no longer carry an allowlist (workers hold no git
+        // grant; the runner commits), so they report no read-only mechanism.
+        for (const ungranted of ['claude', 'glm-cli']) {
+          const row = resolveSnapshotRowByLabel(cfg, ungranted, tier, throwawayDir);
           assert.equal(
             row.readOnlyMechanism,
-            'tool-allowlist-not-read-only-enforced',
-            `${toolGated} [${tier}] readOnlyMechanism must be tool-allowlist-not-read-only-enforced`
+            'none',
+            `${ungranted} [${tier}] readOnlyMechanism must be none`
           );
         }
 

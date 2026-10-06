@@ -5,7 +5,6 @@ import path from 'node:path';
 import os from 'node:os';
 import { loadRunnerConfig, loadRunnerConfigFromDir, RunnerConfigError, normalizeLegacyConfinement, REASONING_EFFORT_VALUES } from '../../src/runner/dispatch/config.mjs';
 import { resolveExecutorConfig, resolveExecutorAndOverrides } from '../../src/runner/dispatch/resolve.mjs';
-import { readOnlyRedirectPool, readOnlyRedirectInvocationFor } from '../../src/runner/dispatch/placement-policy.mjs';
 
 // Phase 01 groups A and C5. The subject here is the CONFIG DOOR: what an executor
 // is allowed to declare about itself, and the one combination that must be refused
@@ -24,7 +23,8 @@ function loadWith(executorEntry) {
   const file = path.join(dir, 'config.json');
   fs.writeFileSync(file, JSON.stringify({
     executor: { command: 'node', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
+    modelPolicies: { node: { standard: 'sonnet' }, claude: { standard: 'sonnet' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: 60000,
     executors: { sample: { kind: 'agent', ...executorEntry } },
   }, null, 2));
@@ -154,7 +154,8 @@ test('A1: the profile reaches the resolver without resolve.mjs being changed for
   const file = path.join(dir, 'config.json');
   fs.writeFileSync(file, JSON.stringify({
     executor: { command: 'node', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
+    modelPolicies: { node: { standard: 'sonnet' }, claude: { standard: 'sonnet' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: 60000,
     executors: {
       profiled: {
@@ -325,7 +326,10 @@ test('Phase C: the real repository config declares identity/supports on "claude"
 function loadRunnerConfigObject(cfgObject) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-redirect-cfg-'));
   const file = path.join(dir, 'config.json');
-  fs.writeFileSync(file, JSON.stringify(cfgObject, null, 2));
+  fs.writeFileSync(file, JSON.stringify({
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+    ...cfgObject,
+  }, null, 2));
   try {
     return loadRunnerConfig(file);
   } finally {
@@ -333,22 +337,22 @@ function loadRunnerConfigObject(cfgObject) {
   }
 }
 
-test('Phase D: the retired top-level "readOnlyExecutorRedirects" field is refused at load, by name, naming its replacement', () => {
+test('Phase D: the retired top-level "readOnlyExecutorRedirects" field is refused at load, by name', () => {
   assert.throws(
     () => loadRunnerConfigObject({
       executor: { command: 'node', args: ['{prompt}'] },
-      models: { standard: 'sonnet' },
+      modelPolicies: { node: { standard: 'sonnet' }, claude: { standard: 'sonnet' } },
       timeoutMs: 60000,
       readOnlyExecutorRedirects: { claude: ['claude-reviewer'] },
     }),
-    (err) => err instanceof RunnerConfigError && /readOnlyExecutorRedirects/.test(err.message) && /removed/.test(err.message) && /placementPolicy/.test(err.message),
+    (err) => err instanceof RunnerConfigError && /readOnly.*removed/.test(err.message),
   );
 });
 
-test('Phase D correction: declaring readOnlyRedirect ON an executor entry (the first, architecturally-wrong Phase D location) is refused at load, by name', () => {
+test('Phase D correction: declaring readOnlyRedirect ON an executor entry is refused at load, by name', () => {
   assert.throws(
     () => loadWith({ command: 'claude', args: ['{prompt}'], readOnlyRedirect: 'claude-reviewer' }),
-    (err) => err instanceof RunnerConfigError && /readOnlyRedirect/.test(err.message) && /removed/.test(err.message) && /placementPolicy/.test(err.message),
+    (err) => err instanceof RunnerConfigError && /readOnlyRedirect/.test(err.message) && /retired|removed/.test(err.message),
   );
 });
 
@@ -357,61 +361,20 @@ test('Phase D: a config declaring no placementPolicy at all still loads unchange
   assert.equal(cfg.placementPolicy, undefined);
 });
 
-test('Phase D: placementPolicy.readOnlyRedirects.<id> accepts a bare string, an array of strings, or {default, operations}', () => {
-  assert.equal(loadRunnerConfigObject({
-    executor: { command: 'node', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 60000,
-    placementPolicy: { readOnlyRedirects: { claude: 'claude-reviewer' } },
-  }).placementPolicy.readOnlyRedirects.claude, 'claude-reviewer');
-
-  assert.deepEqual(loadRunnerConfigObject({
-    executor: { command: 'node', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 60000,
-    placementPolicy: { readOnlyRedirects: { claude: ['claude-reviewer', 'codex-bwrap'] } },
-  }).placementPolicy.readOnlyRedirects.claude, ['claude-reviewer', 'codex-bwrap']);
-
-  const full = { default: ['codex-bwrap'], operations: { 'review-candidate': ['codex-bwrap'] } };
-  assert.deepEqual(loadRunnerConfigObject({
-    executor: { command: 'node', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 60000,
-    placementPolicy: { readOnlyRedirects: { claude: full } },
-  }).placementPolicy.readOnlyRedirects.claude, full);
-});
-
-test('Phase D: placementPolicy.readOnlyRedirects refuses a malformed pool -- empty string, non-string entries, or an unrecognized shape', () => {
-  const withPool = (pool) => loadRunnerConfigObject({
-    executor: { command: 'node', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 60000,
-    placementPolicy: { readOnlyRedirects: { claude: pool } },
-  });
-  assert.throws(() => withPool(''), (err) => err instanceof RunnerConfigError && /readOnlyRedirects\.claude/.test(err.message));
-  assert.throws(() => withPool(['ok', 42]), (err) => err instanceof RunnerConfigError && /readOnlyRedirects\.claude/.test(err.message));
-  assert.throws(() => withPool(42), (err) => err instanceof RunnerConfigError && /readOnlyRedirects\.claude/.test(err.message));
+test('Phase D: placementPolicy and readOnlyRedirects are retired and rejected at load', () => {
   assert.throws(
-    () => withPool({ operations: { 'review-candidate': [42] } }),
-    (err) => err instanceof RunnerConfigError && /readOnlyRedirects\.claude" "operations\.review-candidate"/.test(err.message),
+    () => loadRunnerConfigObject({
+      executor: { command: 'node', args: ['{prompt}'] },
+      modelPolicies: { node: { standard: 'sonnet' }, claude: { standard: 'sonnet' } },
+      timeoutMs: 60000,
+      placementPolicy: { readOnlyRedirects: { claude: 'claude-reviewer' } },
+    }),
+    (err) => err instanceof RunnerConfigError && /retired|removed/.test(err.message),
   );
-});
-
-test('Phase D: the real repository config declares placementPolicy.readOnlyRedirects.claude, no top-level readOnlyExecutorRedirects survives and nothing lives on executors.claude, and it resolves end to end via PlacementPolicy (executor-id-consolidation Step 2: pool entries now pin an invocation, since "codex-bwrap" no longer exists as a separate executor id)', () => {
   const cfg = loadRunnerConfigFromDir(process.cwd());
-  assert.equal(cfg.readOnlyExecutorRedirects, undefined, 'the retired top-level field must not exist in the live repository config');
-  assert.equal(cfg.executors.claude.readOnlyRedirect, undefined, 'the field must not have moved back onto the executor entry');
-  const codexBwrapPin = { executor: 'openai', invocation: 'codex-cli-bwrap' };
-  assert.deepEqual(cfg.placementPolicy.readOnlyRedirects.claude, {
-    default: [codexBwrapPin],
-    operations: {
-      'review-candidate': [codexBwrapPin],
-      'red-team-candidate': [codexBwrapPin],
-    },
-  });
-  assert.deepEqual(readOnlyRedirectPool(cfg, 'claude', 'review-candidate'), ['openai']);
-  assert.deepEqual(readOnlyRedirectPool(cfg, 'claude', 'some-unlisted-op'), ['openai'], 'falls back to "default" for an operation with no specific override');
-  assert.equal(readOnlyRedirectInvocationFor(cfg, 'claude', 'review-candidate', 'openai'), 'codex-cli-bwrap');
+  assert.equal(cfg.readOnlyExecutorRedirects, undefined);
+  assert.equal(cfg.placementPolicy, undefined);
+  assert.equal(cfg.executors?.claude?.readOnlyRedirect, undefined);
 });
 
 // executor-id-consolidation Step 2.1: an invocation can name itself with
@@ -421,7 +384,7 @@ test('Phase D: the real repository config declares placementPolicy.readOnlyRedir
 function multiInvocationConfig(invocations) {
   return loadRunnerConfigObject({
     executor: { command: 'node', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
+    modelPolicies: { node: { standard: 'sonnet' }, claude: { standard: 'sonnet' } },
     timeoutMs: 60000,
     executors: {
       multi: { kind: 'agent', invocations },

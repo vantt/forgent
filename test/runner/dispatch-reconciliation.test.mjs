@@ -202,20 +202,6 @@ test('apply blocks a dead-holder cleanup when an active assignment Run is still 
   assert.equal(fs.existsSync(lockPathFor(dir)), true);
 });
 
-test('apply blocks a dead-holder cleanup when a pending (unsettled) dispatch launch is still bound to this cwd', () => {
-  const dir = root(); deadLock(dir);
-  const plan = planReconciliation(dir, { cwd: dir, now: '2026-09-15T00:00:00.000Z' });
-  assert.equal(plan.outcome, 'planned');
-  const runDir = path.join(dir, '.fgos', 'dispatch-runs', 'fanout-group-x', '01');
-  fs.mkdirSync(runDir, { recursive: true });
-  fs.writeFileSync(path.join(runDir, 'run.json'), JSON.stringify({ runId: 'run-launch-x', cwd: dir }));
-  // No result.json yet: this launch was admitted but has not settled.
-  const result = applyReconciliation(dir, plan, { now: '2026-09-15T00:00:01.000Z' });
-  assert.equal(result.outcome, 'blocked');
-  assert.match(result.reason, /active Run/);
-  assert.equal(fs.existsSync(lockPathFor(dir)), true);
-});
-
 test('reconcile collect-result links an already-written valid result for a standalone Assignment Run', () => {
   const dir = root();
   assignmentDir(dir, 'a');

@@ -1,0 +1,1 @@
+{"v":1,"type":"snapshot","ts":"2026-09-29T10:30:00.000Z","case":"golden-case-1","entropy":{"score":0.12,"components":{"missing-actual":0,"stale-doing":0,"stage-entry":0.05,"awaiting-human":0,"friction-unsettled":0.07}}}

@@ -1,0 +1,198 @@
+{
+  "selector": {
+    "type": "assignment",
+    "value": "unit-run-1790941435696-b0a2d4ec/panelist-1/1"
+  },
+  "caller": {
+    "role": "driver"
+  },
+  "mechanism": "out-of-process",
+  "executorId": "claude-herdr",
+  "capability": "claude-herdr",
+  "invocation": {
+    "via": "cli",
+    "adapter": "herdr-spawn",
+    "protocol": "prompt-stdout-v1"
+  },
+  "governance": {
+    "providerFamily": "claude",
+    "egress": {
+      "kind": "same-provider",
+      "target": "claude",
+      "content": "repo-content"
+    }
+  },
+  "reasonCodes": [
+    "native-first.0033.cli-spawn-shaped"
+  ],
+  "configured": true,
+  "bindingSource": "executor-id",
+  "tier": "standard",
+  "model": "sonnet",
+  "providerModel": "claude",
+  "provenance": {
+    "executor": {
+      "value": "claude-herdr",
+      "source": {
+        "scope": "cliOverride"
+      }
+    },
+    "provider": {
+      "value": "claude",
+      "source": {
+        "scope": "registeredExecutor",
+        "id": "claude-herdr"
+      }
+    },
+    "model": {
+      "value": "sonnet",
+      "source": {
+        "scope": "cliOverride"
+      }
+    },
+    "rigor": {
+      "value": "standard",
+      "source": {
+        "scope": "default"
+      }
+    },
+    "tier": {
+      "value": "standard",
+      "source": {
+        "scope": "rigor",
+        "id": "standard"
+      }
+    },
+    "reasoningEffort": {
+      "value": "medium",
+      "source": {
+        "scope": "derived",
+        "id": "rigor.standard"
+      }
+    },
+    "persona": {
+      "source": {
+        "scope": "default"
+      }
+    },
+    "visibility": {
+      "value": "headless",
+      "source": {
+        "scope": "default"
+      }
+    },
+    "repeatMode": {
+      "value": null,
+      "source": {
+        "scope": "default"
+      }
+    },
+    "constraints": {
+      "value": {
+        "requiresSkills": []
+      },
+      "source": {
+        "scope": "assignment",
+        "id": "unit-run-1790941435696-b0a2d4ec/panelist-1/1"
+      }
+    },
+    "governance": {
+      "value": "allowed",
+      "source": {
+        "scope": "governance",
+        "id": "claude"
+      }
+    }
+  },
+  "policy": {
+    "role": "panelist-1",
+    "executorPreference": [
+      "claude-herdr"
+    ],
+    "executorId": "claude-herdr",
+    "providerModel": "claude",
+    "rigor": "standard",
+    "tier": "standard",
+    "model": "sonnet",
+    "reasoningEffort": "medium",
+    "visibility": "headless",
+    "repeatMode": null,
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "claude-herdr",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "provider": {
+        "value": "claude",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "claude-herdr"
+        }
+      },
+      "model": {
+        "value": "sonnet",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "rigor": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "tier": {
+        "value": "standard",
+        "source": {
+          "scope": "rigor",
+          "id": "standard"
+        }
+      },
+      "reasoningEffort": {
+        "value": "medium",
+        "source": {
+          "scope": "derived",
+          "id": "rigor.standard"
+        }
+      },
+      "persona": {
+        "source": {
+          "scope": "default"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "repeatMode": {
+        "value": null,
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "unit-run-1790941435696-b0a2d4ec/panelist-1/1"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "claude"
+        }
+      }
+    }
+  }
+}

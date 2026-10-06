@@ -7,7 +7,9 @@ import { listWork } from '../state/store.mjs';
 import { hasWorkerSlotRoom } from '../state/worker-slots.mjs';
 import { compileDispatchPlan } from './dispatch/plan.mjs';
 import { executeExecutorCli } from './dispatch/cli.mjs';
-import { buildPrompt } from './work-compat.mjs';
+import { commitUnitWork } from './execution/commit-unit-work.mjs';
+import { buildPrompt, executorIdForWork } from './work-compat.mjs';
+import { workDispatchContext } from './work-dispatch.mjs';
 import fs from 'node:fs';
 import { resolveFgosBin } from '../setup/bin-discovery.mjs';
 
@@ -70,6 +72,7 @@ export async function fanoutBatchExecutorCli(
       const { mechanism, executorId } = compileDispatchPlan(cfg, {
         work: candidateId,
         workItem,
+        workExecutorId: executorIdForWork(workItem),
         hasLiveTaskAccess,
       });
 
@@ -105,11 +108,27 @@ export async function fanoutBatchExecutorCli(
           cwd: wtPath,
           repoRoot: root,
           hasLiveTaskAccess,
-          work: workItem,
+          ...workDispatchContext({ work: workItem, cwd: wtPath, executorId }),
         });
 
+        // The worker only edits files; the runner commits them before
+        // `return` (which demands an advanced branch). A clean tree (worker
+        // that committed itself, or changed nothing) is not an error. A
+        // commit failure throws into the catch below, which returns the item
+        // blocked.
+        const commit = commitUnitWork({
+          worktree: wtPath,
+          unitId: candidateId,
+          summary: `${candidateId}: ${workItem.title}`,
+        });
+        if (commit.status === 'failed') {
+          throw new Error(`runner commit of the worker's changes failed: ${commit.error}`);
+        }
+
         const returnArgs = ['return', candidateId, '--dir', root];
-        if (execRes && execRes.verifiedSha) {
+        // verifiedSha names the worker's own tip; a runner commit moves the
+        // tip past it, so it only applies when the runner committed nothing.
+        if (commit.status !== 'committed' && execRes && execRes.verifiedSha) {
           returnArgs.push('--worker-verified-sha', execRes.verifiedSha);
         }
         execFgos(returnArgs, {

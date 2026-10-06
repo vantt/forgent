@@ -1,0 +1,24 @@
+Reading additional input from stdin...
+OpenAI Codex v0.154.0
+--------
+workdir: /home/vantt/projects/pd-instruction-merge-policy
+model: gpt-5.6-terra
+provider: openai
+approval: never
+sandbox: danger-full-access
+...
++    }
++  ],
++  "evidence": {
++    "commit": "61d4e3da",
++    "commands": [
++      "node --input-type=module (temporary-project reproduction; malformed index and forged composition inputs)",
++      "node --test --test-name-pattern='supersession|host applicability|duplicate active|mutually exclusive|scope|ordering' test/setup/instruction-composition.test.mjs test/setup/instruction-registry.test.mjs"
++    ],
++    "testResult": "15 passed, 0 failed"
++  }
++}
+
+2026-09-14T13:21:05.719895Z ERROR codex_core::session: failed to record rollout items: thread 01a0a011-f1ce-7530-9626-1f8a738c9735 not found
+tokens used
+75,387

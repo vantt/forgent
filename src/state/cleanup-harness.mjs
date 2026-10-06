@@ -33,7 +33,7 @@
 //       only checked when the domain is worktree-backed (the coding
 //       domain's headAtTake/headAtReturn tracking assumes a real git
 //       merge happened; synthetic has neither a worktree nor a merge to
-//       verify, per its own file header in workflow-stage-graphs.mjs).
+//       verify, per its own file header in domain-registry.mjs).
 //       LIMITATION, documented plainly rather than overclaimed: this
 //       checks ANCESTRY (`git merge-base --is-ancestor`), which catches a
 //       force-push/history-rewrite that dropped the commit, but does NOT
@@ -50,7 +50,7 @@
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import { getDomain } from './workflow-stage-graphs.mjs';
+import { getDomain } from './domain-registry.mjs';
 import { isCanceledStatus, resolveRoot } from './frontier.mjs';
 import { resolveDocPath } from '../report/knowledge-resolver.mjs';
 
@@ -562,7 +562,7 @@ export function assessCleanupReadiness({ view, rawEvents, id, repoRoot, worktree
  * first place, so reporting it as "would now unblock" would be
  * misleading; it is reported separately under `notApplicable` instead.
  *
- * Never calls `moveWork`/`addFriction`/`addDecision` -- read-only, same as
+ * Never calls `moveWork`/`recordFriction`/`addDecision` -- read-only, same as
  * `checkMergeStillResolves` itself. Never auto-transitions anything; the
  * item's own scope note (and the named risks in its description --
  * fragile trigger key, flap loop, check-then-transition TOCTOU, no

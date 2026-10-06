@@ -1,0 +1,15 @@
+{
+  "status": "reconciled",
+  "agentName": "fgos-run_unit-run-179093ae501bee",
+  "round": 1,
+  "lastSeenAt": "2026-10-02T09:15:08.088Z",
+  "confinement": {
+    "status": "confined-bwrap",
+    "confined": true
+  },
+  "paneId": "wS:p3TE",
+  "trustSeedFailed": "trust seed refused for \"/var/tmp/p6-accept-work\": its repo root \"/var/tmp/p6-accept-work\" is not itself trusted, so there is nothing to derive trust from.",
+  "promptReadiness": "ready",
+  "outcome": "settled",
+  "trustRemoved": "claude-json"
+}

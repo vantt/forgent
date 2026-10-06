@@ -313,7 +313,8 @@ if (prompt.includes('# Context-discovery')) {
     JSON.stringify({
       runner: {
         executor: { command: process.execPath, args: [executorPath, '{prompt}', '--model', '{model}'] },
-        models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+        modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
+        rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
         timeoutMs: 15000,
         parallel: { maxRoots: 4, maxLeavesPerRoot: 4 },
       },
@@ -328,7 +329,7 @@ if (prompt.includes('# Context-discovery')) {
   const submitted = JSON.parse(
     spawnSync(process.execPath, [FGOS, 'submit', 'Canary footprint proof'], { cwd: fx, encoding: 'utf8' }).stdout,
   ).data;
-  assert.equal(submitted.stage, 'discovery');
+  assert.equal(submitted.workflowStep, 'discovery');
 
   const runOnce = spawnSync(process.execPath, [RUNNER, '--once'], { cwd: fx, encoding: 'utf8' });
   assert.equal(runOnce.status, 0, `runner --once failed: ${runOnce.stderr}`);

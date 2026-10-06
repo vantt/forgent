@@ -456,6 +456,16 @@ export function compareSemanticJson(a, b, timestampPredicate = isIsoTimestamp, c
   return diffs;
 }
 
+function deleteJsonPath(root, dottedPath) {
+  const keys = dottedPath.split(".");
+  let node = root;
+  for (const key of keys.slice(0, -1)) {
+    if (node === null || typeof node !== "object") return;
+    node = node[key];
+  }
+  if (node !== null && typeof node === "object") delete node[keys[keys.length - 1]];
+}
+
 /**
  * Compares execution results from Entry A and Entry B according to declared test case modes.
  */
@@ -546,6 +556,14 @@ export function compareResults(testCase, resultA, resultB) {
       }
 
       if (jsonA && jsonB) {
+        // A case may name top-level-rooted dotted paths (e.g. "data.gitCommit") whose value is
+        // outside what the comparison proves, such as a value both entries read from one shared
+        // mutable source between their two invocations. Each path must still be dropped from BOTH
+        // sides so a path present in only one entry still shows up as a keys mismatch.
+        for (const ignored of testCase.jsonIgnorePaths ?? []) {
+          deleteJsonPath(jsonA, ignored);
+          deleteJsonPath(jsonB, ignored);
+        }
         const jsonDiffs = compareSemanticJson(jsonA, jsonB, testCase.timestampPredicate);
         differences.push(...jsonDiffs);
       }

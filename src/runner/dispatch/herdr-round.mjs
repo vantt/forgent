@@ -31,10 +31,14 @@ import path from 'node:path';
 import fs from 'node:fs';
 import os from 'node:os';
 import crypto from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import { DispatchError } from './dispatch-error.mjs';
 import { createHerdrClient, createBatchTab, normalizeAgentName, isReadyState } from './herdr-agent.mjs';
 import { briefPaths, renderBrief, renderPointer } from './brief.mjs';
-import { evaluateLadder, paneFateFor } from './liveness.mjs';
+import {
+  evaluateLadder, evaluateWorkingScreen, paneFateFor, WORKING_STALL_PROBE_MS, WORKING_STALL_TAIL_LINES,
+} from './liveness.mjs';
+import { captureHerdrDiagnosis, writeHerdrDiagnosis } from './herdr-diagnosis.mjs';
 import { writeVisibility } from './visibility-session.mjs';
 import { createWorkerHome, removeWorkerHome, redactWorkerHome } from './worker-home.mjs';
 import {
@@ -73,6 +77,14 @@ export function shellEscapeArg(arg) {
 }
 
 /**
+ * Variables the shell that runs the launcher rewrites for every program it starts (`bash`
+ * bumps SHLVL, sets `_` to the command path). They describe the shell, not the invocation:
+ * exporting the fgos process's own values would be overwritten at exec, and comparing the
+ * running process against them would call every honest launch an environment tamper.
+ */
+const SHELL_MANAGED_ENV = Object.freeze(['SHLVL', '_', 'PWD', 'OLDPWD']);
+
+/**
  * Generate the launcher script file content for confined launch.
  */
 export function buildLauncherScriptContent({ argv0, command, args, env, workerCommandDigest }) {
@@ -83,6 +95,7 @@ export function buildLauncherScriptContent({ argv0, command, args, env, workerCo
   ];
   if (env && typeof env === 'object') {
     for (const [k, v] of Object.entries(env)) {
+      if (SHELL_MANAGED_ENV.includes(k)) continue;
       if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(k)) {
         lines.push(`export ${k}=${shellEscapeArg(v)}`);
       }
@@ -276,6 +289,7 @@ export function verifyProcessEnvironment(pid, expectedEnv) {
   if (!actual) return null;
 
   for (const [key, value] of Object.entries(expectedEnv)) {
+    if (SHELL_MANAGED_ENV.includes(key)) continue;
     if (actual[key] !== String(value)) return false;
   }
 
@@ -339,6 +353,7 @@ const ERROR_CLASS_FOR_OUTCOME = Object.freeze({
   'timed-out-idle': 'worker-timeout',
   'timed-out-ceiling': 'worker-timeout',
   'paused-limit': 'worker-timeout',
+  'provider-limit': 'worker-timeout',
 });
 
 /**
@@ -354,6 +369,10 @@ const ERROR_CLASS_FOR_OUTCOME = Object.freeze({
  */
 /** `agent start`'s own documented default. */
 const READY_TIMEOUT_MS = 30000;
+/** How long herdr gets to recognise an agent that fgos launched itself (a confined one) before a
+ * state is reported for it. A real agent is recognised within a poll or two; only a process herdr
+ * has no manifest for waits all of it. */
+const AGENT_DETECT_GRACE_MS = 6000;
 /** herdr's own stall detector fires at 5000ms; anything shorter on this side
  * wins the race and hands the caller a bare timeout instead of the real
  * reason. Measured upstream: 5s broke, 20s worked. */
@@ -374,6 +393,30 @@ const HEARTBEAT_MS = 10000;
 const EXIT_DRAIN_MS = 10000;
 
 const sleep = (ms) => new Promise((resolve) => { setTimeout(resolve, ms); });
+
+/** How long a round may show no progress before the ladder looks at the screen. Without one the
+ * idle and usage-limit checks never run and a stalled agent holds its pane until the absolute
+ * timeout. Applies only when the runner config sets no `idleTimeoutMs` (which also governs cli-spawn,
+ * where silence is normal). Progress here is the agent working, an ack, or a new outbox file. */
+export const DEFAULT_IDLE_TIMEOUT_MS = 300000;
+
+/** A typed brief that is still sitting unsubmitted is nudged with Enter no more often
+ * than this, and never more than `SUBMIT_MAX_ENTERS` times. */
+const SUBMIT_ENTER_EVERY_MS = 2500;
+const SUBMIT_MAX_ENTERS = 6;
+/** Consecutive looks with no unsent draft after which the submit check is over. */
+const SUBMIT_NO_DRAFT_POLLS = 4;
+/** How long after typing the runner keeps checking that the brief was taken. */
+const SUBMIT_CONFIRM_MS = 60000;
+/** How often the prompt-ready and submit checks look at the screen detector. */
+const SUBMIT_POLL_MS = 700;
+/** Settle time after the prompt first looks ready: an agent UI draws its prompt box
+ * before its startup work (hooks, session setup) has finished taking input. */
+const PROMPT_SETTLE_MS = 1500;
+/** How long to wait for the UI of an agent herdr has no screen rule for to draw and hold still,
+ * before typing at it anyway. A process that never draws anything must not be waited on forever. */
+const UNRULED_READY_MS = 15000;
+
 
 /** The last line on screen with anything on it -- what a person would read to
  * see why an agent is blocked. Screen text explains a failure; it never
@@ -399,17 +442,27 @@ function lastScreenLine(text) {
  * the difference between a real decomposition and passing the whole context
  * to every function.
  */
-function groupDeadlines({ idleTimeoutMs, timeoutMs, transportDeadlines = {} }) {
+export function groupDeadlines({ idleTimeoutMs, timeoutMs, transportDeadlines = {} }) {
   const promptMs = transportDeadlines.promptTimeoutMs ?? PROMPT_TIMEOUT_MS;
   return {
-    startup: { readyMs: transportDeadlines.readyTimeoutMs ?? READY_TIMEOUT_MS, promptMs },
+    startup: {
+      readyMs: transportDeadlines.readyTimeoutMs ?? READY_TIMEOUT_MS,
+      promptMs,
+      // How long herdr gets to recognise an agent fgos launched before a state is reported for it.
+      detectMs: transportDeadlines.detectTimeoutMs ?? AGENT_DETECT_GRACE_MS,
+    },
     brief: {
       // A brief is re-offered no sooner than one submission is allowed to take;
       // any less and the resend races the delivery it is waiting on.
       resendAfterMs: transportDeadlines.resendAfterMs ?? promptMs,
       maxResends: transportDeadlines.maxResends ?? MAX_RESENDS,
     },
-    round: { idleMs: idleTimeoutMs, ceilingMs: timeoutMs },
+    round: {
+      idleMs: idleTimeoutMs ?? DEFAULT_IDLE_TIMEOUT_MS,
+      ceilingMs: timeoutMs,
+      // How often the screen of an agent that reports `working` is checked for a parked provider error.
+      stallProbeMs: transportDeadlines.stallProbeMs ?? WORKING_STALL_PROBE_MS,
+    },
   };
 }
 
@@ -433,6 +486,9 @@ function openRound({ runDir, workId, tier, model, agentName }) {
     model,
     agentName,
     paneId: null,
+    // True only when this round wrote a trust entry, so teardown removes what it wrote and
+    // never an entry a person vouched for.
+    trustWritten: false,
     note(patch) {
       try { writeVisibility(runDir, patch); } catch { /* a courtesy, not a contract */ }
     },
@@ -591,30 +647,71 @@ export async function establishConfinement({ confinement, round, fullEnv, cwd, r
  * already be trusted by some other route, and the dialog it might still hit
  * is reported by name by the very next step anyway.
  */
-function seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv }) {
+function seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, workerEnv = null }) {
   const projectPath = path.resolve(cwd);
-  const repoRootForTrust = repoRoot ?? path.dirname(projectPath);
-  try {
-    if (trustStore.kind === 'codex-toml') {
-      seedCodexTrust(
-        trustStore.path ?? path.join(fullEnv.CODEX_HOME ?? path.join(os.homedir(), '.codex'), 'config.toml'),
-        { projectPath, repoRoot: repoRootForTrust },
-      );
-    } else if (trustStore.kind === 'agy' || trustStore.kind === 'agy-json') {
-      seedAgyTrust(
-        trustStore.path ?? defaultAgySettingsPath(fullEnv.HOME ?? os.homedir()),
-        { projectPath, repoRoot: repoRootForTrust },
-      );
-    } else {
-      seedTrust(
-        trustStore.path ?? path.join(os.homedir(), '.claude.json'),
-        { projectPath, repoRoot: repoRootForTrust },
-      );
+  const roots = trustRoots(projectPath, repoRoot ?? path.dirname(projectPath));
+  const stores = trustStorePaths({ trustStore, fullEnv, workerEnv });
+  let firstError = null;
+  for (const root of roots) {
+    try {
+      let wrote;
+      if (trustStore.kind === 'codex-toml') {
+        wrote = seedCodexTrust(stores.target, { projectPath, repoRoot: root, rootConfigPath: stores.root });
+      } else if (trustStore.kind === 'agy' || trustStore.kind === 'agy-json') {
+        wrote = seedAgyTrust(stores.target, { projectPath, repoRoot: root, rootSettingsPath: stores.root });
+      } else {
+        wrote = seedTrust(stores.target, { projectPath, repoRoot: root });
+      }
+      // A seed that finds the entry already there wrote nothing: the person (or an earlier
+      // round) owns it, so this round must not remove it on teardown.
+      if (wrote) {
+        round.trustWritten = true;
+        round.note({ trustSeeded: trustStore.kind });
+      }
+      return;
+    } catch (err) {
+      firstError ??= err;
     }
-    round.note({ trustSeeded: trustStore.kind });
-  } catch (err) {
-    round.note({ trustSeedFailed: err.message });
   }
+  round.note({ trustSeedFailed: firstError?.message ?? 'no trust root to derive from' });
+}
+
+/**
+ * Roots a workspace's trust may be derived from: the repository root the run
+ * was started for and, for a linked worktree, the main checkout that owns it
+ * (the same repository, and the root codex itself asks about). Never invents
+ * a root: each is only a candidate for the "already trusted" check.
+ */
+export function trustRoots(projectPath, repoRoot) {
+  const roots = [repoRoot];
+  try {
+    const common = execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'], {
+      cwd: projectPath, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+    if (common && path.basename(common) === '.git') roots.push(path.dirname(common));
+  } catch { /* not a checkout: only the declared root is a candidate */ }
+  return [...new Set(roots)];
+}
+
+/**
+ * Where the trust decision is read (the account's real store) and where the
+ * entry is written. They differ only for a confined worker with a private
+ * home: it reads its store from the private CODEX_HOME / HOME, which starts
+ * empty, so the entry goes there and the account's own store is never touched.
+ */
+export function trustStorePaths({ trustStore, fullEnv, workerEnv }) {
+  if (trustStore.kind === 'codex-toml') {
+    const real = trustStore.path ?? path.join(fullEnv.CODEX_HOME ?? path.join(os.homedir(), '.codex'), 'config.toml');
+    const own = workerEnv?.CODEX_HOME && workerEnv.CODEX_HOME !== fullEnv.CODEX_HOME;
+    return { root: real, target: own ? path.join(workerEnv.CODEX_HOME, 'config.toml') : real };
+  }
+  if (trustStore.kind === 'agy' || trustStore.kind === 'agy-json') {
+    const real = trustStore.path ?? defaultAgySettingsPath(fullEnv.HOME ?? os.homedir());
+    const own = workerEnv?.HOME && workerEnv.HOME !== fullEnv.HOME;
+    return { root: real, target: own ? defaultAgySettingsPath(workerEnv.HOME) : real };
+  }
+  const real = trustStore.path ?? path.join(os.homedir(), '.claude.json');
+  return { root: real, target: real };
 }
 
 /**
@@ -626,25 +723,20 @@ function seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv }) {
  * Never throws, for the same reason `seedWorkspaceTrust` does not: teardown
  * must never be the thing that turns a settled round into a crash.
  */
-function removeWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv }) {
-  if (!trustStore) return;
+function removeWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, workerEnv = null }) {
+  // Only an entry this round wrote. A read-only dispatch runs in the main checkout, whose
+  // entry is the one the person vouched for: deleting it makes every later claude start in
+  // that folder stop at the trust dialog.
+  if (!trustStore || !round.trustWritten) return;
   const projectPath = path.resolve(cwd);
   try {
+    const { target } = trustStorePaths({ trustStore, fullEnv, workerEnv });
     if (trustStore.kind === 'codex-toml') {
-      removeCodexTrust(
-        trustStore.path ?? path.join(fullEnv.CODEX_HOME ?? path.join(os.homedir(), '.codex'), 'config.toml'),
-        projectPath,
-      );
+      removeCodexTrust(target, projectPath);
     } else if (trustStore.kind === 'agy' || trustStore.kind === 'agy-json') {
-      removeAgyTrust(
-        trustStore.path ?? defaultAgySettingsPath(fullEnv.HOME ?? os.homedir()),
-        projectPath,
-      );
+      removeAgyTrust(target, projectPath);
     } else {
-      removeTrust(
-        trustStore.path ?? path.join(os.homedir(), '.claude.json'),
-        projectPath,
-      );
+      removeTrust(target, projectPath);
     }
     round.note({ trustRemoved: trustStore.kind });
   } catch (err) {
@@ -770,7 +862,185 @@ function deliverBrief({ client, round, message, promptMs, resultPath }) {
   }
   throw round.fail('worker-spawn-fail', err.code ?? 'agent_prompt_failed',
     `executor failed to brief the worker for work "${round.workId}": ${err.message}${screen ? ` -- last line on screen: ${screen}` : ''}`,
-    screen ? { screen } : {});
+    { ...(err.code === 'agent_blocked' ? { outcome: 'blocked' } : {}), ...(screen ? { screen } : {}) });
+}
+
+/**
+ * The agent's state as the poll loop should see it: herdr's `agent get`.
+ *
+ * herdr detects the agent in the pane on its own, also behind a sandbox wrapper (measured
+ * 2026-10-05 on 0.9.1 for claude, codex, agy and pi behind bwrap), so its status is true. That
+ * only holds while nothing else reports a state for the pane: a state fgos reported at launch
+ * used to freeze `agent get` at "working" for good, and this function had to read the screen
+ * detector first to see through it, two herdr calls per poll. fgos no longer reports one.
+ * The detector is asked only when `agent get` has no answer.
+ */
+export function readAgentState(client, target) {
+  const status = client.agentGet(target).agentStatus;
+  if (status !== 'unknown') return status;
+  try {
+    const seen = client.agentExplain(target);
+    if (typeof seen?.state === 'string' && seen.state) return seen.state;
+  } catch {
+    // the detector cannot be asked either: the status stays unknown
+  }
+  return status;
+}
+
+/**
+ * Make sure herdr can address the agent in a pane that fgos launched itself.
+ *
+ * herdr recognises claude, codex, agy, pi and the other agents it has manifests for from the process
+ * in the pane, also behind a sandbox wrapper, and then `agent get` is its own, true status. A process
+ * it does not recognise cannot be addressed at all ("agent target not found") until a state is reported
+ * for it, so that is the fallback, after a grace period for detection. Reporting is not the default
+ * because a reported state is the pane's status authority and never changes.
+ *
+ * @returns {Promise<'detected'|'reported'>}
+ */
+export async function ensureHerdrKnowsAgent({ client, round, paneId, agentKind, graceMs = AGENT_DETECT_GRACE_MS, pollMs = 250 }) {
+  const deadline = Date.now() + graceMs;
+  for (;;) {
+    try {
+      client.agentGet(paneId);
+      round.note({ agentKnownToHerdr: 'detected' });
+      return 'detected';
+    } catch {
+      // not recognised (yet)
+    }
+    if (Date.now() >= deadline) break;
+    await sleep(pollMs);
+  }
+  client.reportAgent(paneId, { source: 'fgos', agent: agentKind, state: 'working' });
+  round.note({ agentKnownToHerdr: 'reported' });
+  return 'reported';
+}
+
+/** Whitespace-free form: a prompt box wraps a long line, so text is compared without breaks. */
+const squash = (text) => String(text ?? '').replace(/\s+/g, '');
+
+/**
+ * Wait until the agent's prompt is up and takes input, before the brief is typed.
+ *
+ * A confined agent is launched as a plain process in the pane, so nothing but the
+ * screen says when it can take input; a brief typed while its UI is still starting
+ * is held as an unsent draft and the submit key is lost. Reads herdr's own screen
+ * detector (never the state fgos reported at launch). A blocking dialog stops the
+ * wait at once -- typing at a dialog answers it -- and so does a detector with no
+ * verdict, so an agent kind herdr cannot detect is not made to wait out the deadline.
+ * Returns what ended the wait.
+ */
+export async function awaitPromptReady({ client, target, readyMs, settleMs = PROMPT_SETTLE_MS, pollMs = SUBMIT_POLL_MS }) {
+  const deadline = Date.now() + readyMs;
+  // Only used when herdr has no rule for this agent: see below.
+  let launchScreen = null;
+  let lastScreen = null;
+  let stableSince = null;
+  let unruledSince = null;
+  for (;;) {
+    let seen;
+    try { seen = client.agentExplain(target); } catch { return 'no-detector'; }
+    if (seen.state === null) return 'no-detector';
+    if (seen.visibleBlocker || seen.state === 'blocked') return 'blocked';
+    if (seen.state === 'idle' && !seen.visibleWorking) {
+      if (seen.matchedRule || seen.visibleIdle) {
+        await sleep(settleMs);
+        return 'ready';
+      }
+      // herdr says "idle" for a known agent it has no screen rule for, which is also what a
+      // process still starting looks like, so that verdict says nothing about whether the UI
+      // takes input. The screen does: it has to change from what the launch left there and then
+      // hold still for a settle period.
+      unruledSince ??= Date.now();
+      let screen = null;
+      try { screen = client.agentRead(target, { source: 'visible' }); } catch { screen = null; }
+      if (typeof screen !== 'string') {
+        await sleep(settleMs);
+        return 'ready';
+      }
+      if (Date.now() - unruledSince >= Math.min(UNRULED_READY_MS, readyMs)) return 'unverified';
+      if (launchScreen === null) {
+        launchScreen = screen;
+      } else if (screen !== launchScreen && screen === lastScreen) {
+        stableSince ??= Date.now();
+        if (Date.now() - stableSince >= settleMs) return 'ready';
+      } else {
+        stableSince = null;
+      }
+      lastScreen = screen;
+    }
+    if (Date.now() >= deadline) return 'timeout';
+    await sleep(pollMs);
+  }
+}
+
+/**
+ * A brief typed into a pane that is showing a dialog (or never reached its
+ * prompt) is not a brief: it answers the dialog, and the round then hangs until
+ * the idle ceiling. When readiness says `blocked` or `timeout`, fail the round
+ * now, with the line on screen, and type nothing.
+ */
+export function refuseBriefIntoUnreadyPane({ client, round, readiness }) {
+  if (readiness !== 'blocked' && readiness !== 'timeout') return;
+  const target = round.targetName ?? round.agentName;
+  let screenLine = null;
+  try { screenLine = lastScreenLine(client.agentRead(target, { lines: 60 })); } catch { /* the failure stands without it */ }
+  const reason = readiness === 'blocked' ? 'agent_blocked' : 'agent_not_ready';
+  const why = readiness === 'blocked'
+    ? 'the agent is showing a dialog that needs an answer'
+    : 'the agent never reached a prompt that takes input';
+  cleanupIfWorkerStillLive(client, round.paneId);
+  throw round.fail('worker-spawn-fail', reason,
+    `executor for work "${round.workId}" not briefed: ${why}.${screenLine ? ` Last line on screen: ${screenLine}` : ''}`,
+    { readiness, ...(readiness === 'blocked' ? { outcome: 'blocked' } : {}), ...(screenLine ? { screen: screenLine } : {}) });
+}
+
+/**
+ * After the brief is typed, make sure it was submitted: an unsent draft left in the
+ * prompt box is submitted with Enter.
+ *
+ * `agent prompt` types and returns without waiting for the turn. If the agent's UI
+ * drops the submit key, the text stays in the box and the worker never starts -- and
+ * because the pane's state is the one fgos reported, nothing else notices. This looks
+ * at herdr's detector: working means the brief was taken; idle with the brief still in
+ * the prompt box means it was not, and Enter is pressed (bounded, spaced). Stops as
+ * soon as the worker's own ack or result file exists, a blocking dialog is up (pressing
+ * a key there would answer it), or the window ends. Returns the number of Enters pressed.
+ */
+export async function confirmBriefSubmitted({ client, target, message, paths, round, windowMs = SUBMIT_CONFIRM_MS, pollMs = SUBMIT_POLL_MS }) {
+  const needle = squash(message).slice(-48);
+  const deadline = Date.now() + windowMs;
+  let enters = 0;
+  let lastEnterAt = 0;
+  // Idle with no draft in the box means the brief is not waiting to be submitted; a few
+  // such looks in a row end the check instead of holding the poll loop for the whole window.
+  let noDraftStreak = 0;
+  while (Date.now() < deadline) {
+    if (fs.existsSync(paths.ackPath) || fs.existsSync(paths.resultPath)) break;
+    let seen;
+    try { seen = client.agentExplain(target); } catch { break; }
+    if (seen.state === null) break;
+    if (seen.visibleBlocker || seen.state === 'blocked') break;
+    if (seen.visibleWorking || seen.state === 'working') break;
+    const draftPresent = seen.state === 'idle' && Boolean(needle) && squash(seen.promptText).includes(needle);
+    noDraftStreak = draftPresent ? 0 : noDraftStreak + 1;
+    if (!draftPresent && noDraftStreak >= SUBMIT_NO_DRAFT_POLLS) break;
+    if (draftPresent) {
+      if (enters >= SUBMIT_MAX_ENTERS) break;
+      if (Date.now() - lastEnterAt >= SUBMIT_ENTER_EVERY_MS) {
+        try {
+          client.agentSendKeys(target, ['Enter']);
+        } catch {
+          break;
+        }
+        enters += 1;
+        lastEnterAt = Date.now();
+      }
+    }
+    await sleep(pollMs);
+  }
+  if (enters > 0) round.note({ briefSubmitKeyResent: enters });
+  return enters;
 }
 
 /**
@@ -780,18 +1050,32 @@ function deliverBrief({ client, round, message, promptMs, resultPath }) {
  * that distinction, since a single `unknown` resets an absent streak. A pane
  * that still exists proves nothing about the agent: an idle pane always lists
  * its own shell, so `present` means a foreground process that is not it.
+ *
+ * The one failure that is an answer is herdr saying the pane itself is not
+ * found: the pane was closed, so the agent in it is gone. That counts as
+ * `absent` (and the probe's `cause` says why); an unreachable, timed-out or
+ * unparseable herdr stays `unknown`.
  */
+export const PANE_NOT_FOUND_CODE = 'pane_not_found';
+
 function livenessProbe(client, paneId) {
-  return () => {
+  const probe = () => {
+    probe.cause = null;
     try {
       const info = client.paneProcessInfo(paneId);
       return info.foregroundProcesses.some((p) => p.pid && p.pid !== info.shellPid)
         ? 'present'
         : 'absent';
-    } catch {
+    } catch (err) {
+      if (err?.code === PANE_NOT_FOUND_CODE) {
+        probe.cause = `herdr reports pane ${paneId} not found`;
+        return 'absent';
+      }
       return 'unknown';
     }
   };
+  probe.cause = null;
+  return probe;
 }
 
 /**
@@ -839,6 +1123,9 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
   };
 
   let lastBeatAt = 0;
+  // The watch on a `working` agent's screen: when it last looked and what it has seen standing there.
+  let lastStallProbeAt = 0;
+  let stall = { line: null, since: null };
 
   for (;;) {
     // Say the driver is still here. A round can run for half an hour with no
@@ -866,7 +1153,7 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
     let agentState = 'unknown';
     let statusReadable = false;
     try {
-      agentState = client.agentGet(target).agentStatus;
+      agentState = readAgentState(client, target);
       statusReadable = true;
     } catch {
       agentState = 'unknown';
@@ -895,6 +1182,7 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
     const decision = decide({
       resultFilePresent: fs.existsSync(paths.resultPath),
       liveness,
+      livenessCause: liveness === 'absent' ? (readLiveness.cause ?? null) : null,
       agentState,
       lastProgressAt,
       blindMs,
@@ -904,6 +1192,23 @@ async function pollForOutcome({ client, round, paths, message, deadlines, usageL
     });
     prior = decision;
     if (decision.outcome) return decision;
+
+    // `working` counts as progress, so the ladder never reads the screen of a pane that keeps saying it,
+    // and an agent parked on a provider error would run to the ceiling with no fallback. Look at the
+    // tail of its screen now and then for the narrow wordings that mean exactly that.
+    if (agentState === 'working' && observedAt - lastStallProbeAt >= deadlines.round.stallProbeMs) {
+      lastStallProbeAt = observedAt;
+      let tail = '';
+      try { tail = client.agentRead(target, { lines: WORKING_STALL_TAIL_LINES }); } catch { tail = ''; }
+      const watched = evaluateWorkingScreen({ screen: tail, now: observedAt, prior: stall, probeMs: deadlines.round.stallProbeMs });
+      stall = watched.next;
+      if (watched.outcome) {
+        return {
+          outcome: watched.outcome, reason: watched.reason, screenLine: watched.screenLine,
+          absentStreak: decision.absentStreak ?? 0, needsScreen: false,
+        };
+      }
+    }
 
     if (!ackSeen && resends < deadlines.brief.maxResends
       && Date.now() - lastResendAt >= deadlines.brief.resendAfterMs) {
@@ -940,6 +1245,10 @@ function concludeFailure({ client, round, decision, closeAlways }) {
     try { screenLine = lastScreenLine(client.agentRead(target, { lines: 60 })); } catch { screenLine = null; }
   }
 
+  // herdr's own account of the agent, taken before the pane can be closed: the pane is often gone
+  // soon after, and the next stall should not have to be guessed at again.
+  const diagnosis = writeHerdrDiagnosis(round.runDir, captureHerdrDiagnosis(client, target));
+
   // `died` and `blocked` are states a watcher can act on; the timeouts have
   // no state of their own, so they leave the last real one standing and add
   // the outcome beside it rather than overwriting it with a worse word.
@@ -947,6 +1256,7 @@ function concludeFailure({ client, round, decision, closeAlways }) {
     ...(decision.outcome === 'died' || decision.outcome === 'blocked' ? { status: decision.outcome } : {}),
     outcome: decision.outcome,
     ...(screenLine ? { screen: screenLine } : {}),
+    ...(diagnosis ? { diagnosis } : {}),
   });
 
   const fate = paneFateFor(decision.outcome, { closeAlways });
@@ -957,8 +1267,8 @@ function concludeFailure({ client, round, decision, closeAlways }) {
     decision.outcome,
     `executor for work "${round.workId}" ended as ${decision.outcome}: ${decision.reason}.${
       screenLine ? ` Last line on screen: ${screenLine}` : ''
-    }${fate === 'keep' ? ` Pane ${round.paneId} is left open.` : ''}`,
-    { outcome: decision.outcome, ...(screenLine ? { screen: screenLine } : {}) },
+    }${decision.outcome === 'blocked' ? ` Answer the prompt in the pane, or grant trust for this project in the agent's own home, then run again.` : ''}${fate === 'keep' ? ` Pane ${round.paneId} is left open.` : ''}`,
+    { outcome: decision.outcome, paneRetained: fate !== 'close', ...(screenLine ? { screen: screenLine } : {}), ...(diagnosis ? { diagnosis } : {}) },
   );
 }
 
@@ -972,7 +1282,7 @@ function concludeFailure({ client, round, decision, closeAlways }) {
  * dies and a `setsid` descendant survives it. Nothing here reports this round
  * as cancelled, and nothing should.
  */
-async function settleRound({ client, round, paths, exitCommand = '/exit', promptMs, readLiveness, workerHomePath, launcherScriptPath, trustStore, cwd, repoRoot, fullEnv }) {
+async function settleRound({ client, round, paths, exitCommand = '/exit', promptMs, readLiveness, workerHomePath, launcherScriptPath, trustStore, cwd, repoRoot, fullEnv, workerEnv }) {
   const target = round.targetName ?? round.agentName;
   let stdout = '';
   try {
@@ -1012,7 +1322,7 @@ async function settleRound({ client, round, paths, exitCommand = '/exit', prompt
     // store is the other half of B3 -- without removing it here the store
     // grows one entry per settled round, forever, same as an unremoved
     // failed-round entry would.
-    removeWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv });
+    removeWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, workerEnv });
   }
 
   // LOW-11: the launcher script persists the full prepared env, including
@@ -1327,6 +1637,16 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
     round.note({ confinement: { status: 'confined-bwrap', confined: true } });
   }
 
+  // A confined launch exports its private HOME from the launcher script, so the
+  // pane's own shell never needs it. Handing it the private HOME as well would
+  // start that shell in a home without startup files, where zsh opens its
+  // first-use wizard and swallows the launch command typed right after.
+  let splitEnv = effectivePaneEnv;
+  if (isConfined && splitEnv && 'HOME' in splitEnv) {
+    const { HOME: _workerHome, ...rest } = splitEnv;
+    splitEnv = rest;
+  }
+
   if (existingCmd?.paneId) {
     round.paneId = existingCmd.paneId;
     round.note({ status: 'pane-reused', paneId: round.paneId });
@@ -1342,8 +1662,8 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
 
     try {
       round.paneId = isConfined
-        ? client.paneSplit({ pane: anchor, direction: 'down', ratio: 0.3, focus: false, cwd, env: effectivePaneEnv })
-        : client.paneSplit({ pane: anchor, cwd, env: effectivePaneEnv });
+        ? client.paneSplit({ pane: anchor, direction: 'down', ratio: 0.3, focus: false, cwd, env: splitEnv })
+        : client.paneSplit({ pane: anchor, cwd, env: splitEnv });
       round.note({ status: 'pane-created', paneId: round.paneId });
     } catch (err) {
       if (!anchor || err.code !== 'pane_not_found') {
@@ -1353,8 +1673,8 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
       batchTab?.invalidate(sessionKey);
       try {
         round.paneId = isConfined
-          ? client.paneSplit({ direction: 'down', ratio: 0.3, focus: false, cwd, env: effectivePaneEnv })
-          : client.paneSplit({ cwd, env: effectivePaneEnv });
+          ? client.paneSplit({ direction: 'down', ratio: 0.3, focus: false, cwd, env: splitEnv })
+          : client.paneSplit({ cwd, env: splitEnv });
         round.note({ status: 'pane-created', paneId: round.paneId, anchorLost: true });
       } catch (retryErr) {
         throw round.fail('worker-spawn-fail', retryErr.code ?? 'pane_split_failed',
@@ -1367,7 +1687,7 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
   // the workspace already trusted, so writing to the operator's own store for
   // a directory only the worker will ever see would be pure side effect.
   if (trustStore && !workerHomePath) {
-    seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv });
+    seedWorkspaceTrust({ trustStore, round, cwd, repoRoot, fullEnv, workerEnv: isConfined ? (preparedWorkerInvocation.env || null) : null });
   }
 
   round.targetName = isConfined ? round.paneId : round.agentName;
@@ -1591,12 +1911,11 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
     }
 
     if (!existingCmd?.resourceIncarnation) {
-      client.reportAgent(round.paneId, {
-        source: 'fgos',
-        agent: agentKindToUse,
-        state: 'working',
-      });
-
+      // herdr detects the agent behind the wrapper on its own, so nothing is reported for it: a state
+      // fgos reported ("working") became the pane's status authority and froze `agent get` for the
+      // whole round, hiding a finished, stalled or limited agent. Only a process herdr cannot
+      // recognise as an agent gets a reported state, because that is the one way to address it.
+      await ensureHerdrKnowsAgent({ client, round, paneId: round.paneId, agentKind: agentKindToUse, graceMs: deadlines.startup.detectMs });
       try {
         const ag = client.agentGet(round.paneId);
         if (ag?.agentSession) {
@@ -1672,7 +1991,17 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
 
   const message = briefMessage({ delivery, briefText, runDir, roundNumber });
   try {
+    const confinedTarget = Boolean(round.targetName && round.targetName === round.paneId);
+    if (confinedTarget) {
+      // Nothing started this agent through herdr, so herdr never waited for its prompt.
+      const readiness = await awaitPromptReady({ client, target: round.targetName, readyMs: deadlines.startup.readyMs });
+      round.note({ promptReadiness: readiness });
+      refuseBriefIntoUnreadyPane({ client, round, readiness });
+    }
     deliverBrief({ client, round, message, promptMs: deadlines.startup.promptMs, resultPath: paths.resultPath });
+    if (confinedTarget) {
+      await confirmBriefSubmitted({ client, target: round.targetName, message, paths, round });
+    }
   } catch (err) {
     cleanupIfWorkerStillLive(client, round.paneId);
     throw err;
@@ -1734,7 +2063,7 @@ async function driveRound({ ctx, round, paths, runDir, briefText, roundNumber, d
   const stdout = await settleRound({
     client, round, paths, exitCommand,
     promptMs: deadlines.startup.promptMs, readLiveness, workerHomePath, launcherScriptPath,
-    trustStore, cwd, repoRoot, fullEnv,
+    trustStore, cwd, repoRoot, fullEnv, workerEnv: isConfined ? (preparedWorkerInvocation.env || null) : null,
   });
 
   if (isAssignmentRun) {

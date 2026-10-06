@@ -2,50 +2,42 @@
 name: fgos-group-thinking
 user-invocable: false
 description: >-
-  Launch, resume, or render replay for a group-thinking coordination
-  protocol -- one registered in the group-thinking Protocol Pack
-  (`core/protocol-packs/group-thinking.json`). This is the internal pack gate:
-  it never selects, infers, or defaults a protocol, so its calling surface must
-  supply a pack-registered protocol id. Use fgos-panel for a person's natural-
-  language panel/review/compare/red-team request; use this skill when a preset,
-  work item, or operator already selected the protocol.
-  Examples: "run the rfc-review-lite protocol for this proposal", "resume
-  coordination session coord_xyz", "show me the replay for this
-  group-thinking session".
+  Launch, resume, or render replay for named discussion Workflows
+  (`delphi`, `nominal-group`, `group-cognition`, `architecture-advisory`)
+  and CollaborationPattern presets (`rfc`, `consult`, `research-fan-out`).
+  This is the execution door for named workflows and discussion presets.
+  Use fgos-panel for a person's
+  natural-language panel/review/compare/red-team request; use this skill
+  when a preset, workflow, or operator already selected the discussion shape.
+  Examples: "run the delphi workflow for this decision", "start nominal-group
+  workflow", "run rfc preset for this proposal", "resume workflow run wf_xyz".
 ---
 
 # fgos-group-thinking
 
-This is a core-facing selection gate, not the end-user vocabulary surface.
+This is a core-facing execution gate, not the end-user vocabulary surface.
 [`fgos-panel`](../fgos-panel/SKILL.md) accepts natural language, selects a
-use-case preset from the canonical
-[`Group Thinking Trigger Surface`](../../../docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md),
-and calls this gate with an explicit registered id. Never ask a person to supply
-that id merely because this lower layer requires it from its caller.
+use-case preset, and routes directly to a named Workflow or CollaborationPattern
+preset. Never ask a person to supply a workflow ID or protocol ID merely because
+this lower layer executes named definitions.
 
-A thin selection gate in front of the SAME public coordination doors
-`fgos coordination run`/`fgos coordination show` already expose
-(`src/verbs/coordination/{run,show}.mjs`). This skill adds exactly one
-thing those doors do not have on their own: a caller must explicitly name
-a protocol id that is a **registered member of the group-thinking Protocol
-Pack** before any request naming that protocol is allowed to run. It never
-composes a coordination step on a protocol's behalf, never decides what a
-protocol does, and never talks to the session store directly — see
-[`src/verbs/coordination/group-thinking-pack.mjs`](../../../src/verbs/coordination/group-thinking-pack.mjs)
-for the one gate function this whole skill is built on
-(`runGroupThinkingRequest`).
-
-Protocol semantics live in the FlowDefinition documents themselves
-(`docs/architect/agent-coordination/contracts/flow-definition.md`), never
-in this file — reading a protocol's own declared graph, not this skill's
-prose, is how you learn what RFC-Review-Lite, Nominal-Group-Lite, or
-Delphi-Feedback-Lite actually do.
-
+Discussion patterns in fgOS are represented as:
+1. **Discussion Workflows** in `core/workflows/*.yaml`, executed by the
+   Workflow Runner (`src/workflow/runner.mjs`) and CLI (`fgos workflow`):
+   - `delphi`: Multi-round Delphi deliberation (blind proposals -> feedback synthesis -> second round -> final consensus)
+   - `nominal-group`: Nominal Group Technique (silent generation -> round-robin sharing -> voting/ranking -> final ranking)
+   - `group-cognition`: Group cognition (sense-making -> dialectical inquiry -> action synthesis)
+   - `architecture-advisory`: Architecture advisory panel (framing -> 3-panelist shaping -> critique with red-team -> synthesis -> explanation)
+2. **Single-Unit CollaborationPattern Presets** in `src/runner/execution/patterns/presets.mjs`:
+   - `rfc`: Reviewed collaboration pattern (1 critique round with red-team)
+   - `consult`: Solo advisor pattern (`pattern: solo`, role: `advisor`)
+   - `research-fan-out`: Panel pattern (`pattern: panel`, 3 members)
+   - `code-change`: Reviewed code implementation pattern
 ## Role split: coordinates research, is never the researcher
 
 This skill coordinates multiple contributions — deliberation, independent
 research passes, cross-provider review, synthesis — across several
-actors through a registered protocol. It never replaces
+actors through a registered Workflow or CollaborationPattern. It never replaces
 [`fgos-researching`](../fgos-researching/SKILL.md) (the single-agent
 "turn one question into one grounded finding" workflow) and never becomes
 a second research engine of its own: it has no research logic, no
@@ -55,171 +47,83 @@ several agents' contributions genuinely need coordinating — e.g. several
 research passes need synthesizing, or the same question needs
 cross-provider review.
 
-## 1. See which protocols are registered
+## 1. Discover available Workflows & Presets
+
+Workflows are declared in `core/workflows/*.yaml` and validated by
+`src/workflow/definition.mjs`. Use the Workflow loader to list registered workflows:
 
 ```bash
-fgos coordination pack list --json
+fgos workflow start --help
 ```
 
-An empty `members: []` means no protocol is registered yet — there is
-nothing this skill can run against. Never guess or hand-author a protocol
-id that is not listed here, even if it happens to be a real, loadable
-`CoordinationProtocol` FlowDefinition elsewhere in this repo; pack
-membership is a real narrowing on top of `protocol-loader.mjs`'s own
-project/domain/core discovery, not a restatement of it. Every id/version
-pair here names an already-registered FlowDefinition `metadata.id@version`
-— this pack never assigns a protocol a second identity of its own.
+Single-unit collaboration pattern presets are defined in
+`src/runner/execution/patterns/presets.mjs` (`consult`, `research-fan-out`, `rfc`, `code-change`).
 
-## 2. Read the protocol's own declared shape
+## 2. Start a Discussion Workflow
+
+Launch a named workflow using the unified `fgos workflow start` command:
 
 ```bash
-fgos coordination pack show-protocol "<protocol id from step 1>" --json
+fgos workflow start <workflowId>
 ```
 
-Learn its declared actors, operations, activation modes, and graph from
-this output — never from this skill's own text, which deliberately does
-not enumerate them (Phase 10's own constraint: "do not hide protocol
-semantics in skill prose").
+Examples:
+```bash
+fgos workflow start delphi
+fgos workflow start nominal-group
+fgos workflow start group-cognition
+fgos workflow start architecture-advisory
+```
 
-`show-protocol` accepts any registered `CoordinationProtocol`
-FlowDefinition id, not only a member of the group-thinking pack listed in
-step 1 — unlike `list`, it is a thin, unscoped wrapper over
-`loadCoordinationProtocol` (`src/runner/definitions/protocol-loader.mjs`).
-Reading a non-pack-member protocol's shape this way is fine; running one
-through step 4 below still refuses (pack membership is enforced at `run`
-time, not at `show-protocol` time).
+`start` returns at once with the `workflowRunId` and a `detached` block (`pid`, `logPath`,
+`statusCommand`); the run continues in a detached process. Never treat the output of `start` as the
+result: poll `fgos workflow status <workflowRunId>` (section 3) until the run is `completed`, `failed`
+or parked at a gate. `answer` and `resume` return the same way (`answer` records the answer first,
+then the advance continues detached). Pass `--foreground` only when the caller must wait in place.
 
-## 3. Compose a request
+The Workflow Runner parses the YAML definition, resolves unit capability bindings
+via `src/runner/execution/bind.mjs`, and executes steps sequentially or in parallel
+according to declared DAG dependencies (`dependsOn`).
 
-Build a request object/file in the exact shape `fgos coordination run
---file` already accepts
-([`src/verbs/coordination/schema.mjs`](../../../src/verbs/coordination/schema.mjs)):
-`kind: "declared-protocol"`, `protocolRef: {id: "<the id you selected in
-step 1>"}`, `writerId`, `objective`, and one `operation` / `authorize` /
-`disposition` / `fan-out` / `contribution` step per action, following
-that protocol's own declared graph from step 2. A `contribution` step
-records a contribution-typed deliberation-ledger entry (`proposal` /
-`objection` / `response` / `clarification` / `rank` / `specialist-request`,
-`operation`'s own `contributions.allowedTypes[]` narrows which are legal)
-backed by a settled `assignmentId`, with optional `anchors[]`/`respondsTo`
-lineage — never a `linkedBy`, which the engine always derives from the
-session's own driver identity. `$ref:<label>` placeholders resolve within
-one call only — a resumed request needs the earlier call's real
-assignment ids.
+## 3. Check Status and Handle Gates
 
-**Per-actor provider/tier is a first-class part of this request shape —
-never one hardcoded provider for the whole session.** Add an `actors[]`
-entry per actor that needs a non-default choice: `{id, executor?, model?,
-tier?, persona?}` — e.g. `{id: "reviewer-actor", executor: "codex-cli"}`
-alongside `{id: "red-team-actor", executor: "agy-cli"}` lets Claude,
-Codex, and Antigravity collaborate as different actors within the SAME
-session (all real, registered `cli-spawn` executors in this repo's own
-`.fgos/config.json`). Give each `operation`/`fan-out` step naming that
-actor an explicit `targetActorId` — `run.mjs`'s own per-actor resolution
-(`actorPolicyFields`) only looks up `actors[]` when a step names its actor
-explicitly. This gate never reads or rewrites `actors[]`; it only checks
-`kind`/`protocolRef.id` before forwarding the whole request unchanged (see
-the Gate section below) — a request can bind whatever per-actor executors
-it needs, exactly as a hand-authored `fgos coordination run --file`
-request already could.
-
-## 4. Launch or resume
+Check current workflow progress, step states, and parked gates:
 
 ```bash
-fgos coordination pack run --protocol "<protocol id from step 1>" --file "<path to your request.json>"
+fgos workflow status <workflowRunId>
 ```
 
-`--protocol` is required, and must equal the request's own
-`protocolRef.id` — an unset, unregistered, or mismatched id is refused
-before anything dispatches (see the Gate section below). A request naming
-an **existing** `coordinationId` resumes that session through the exact
-same door (`run.mjs`'s own resume behavior, `findExistingManifest`) — this
-skill adds no separate resume mechanism of its own, and `pack run` adds no
-separate `--resume` flag: resuming is just re-submitting a request file
-whose `coordinationId` already exists. `--executor`/`--tier`/`--model`
-forward exactly the way plain `fgos coordination run` already forwards
-them (global trusted policy, never a portable request-file field).
-
-## 5. Render replay
+When a workflow pauses at an interactive gate (such as `voting-ranking` in
+`nominal-group.yaml`), answer the gate to resume execution:
 
 ```bash
-fgos coordination show <coordinationId> --json
+fgos workflow answer <workflowRunId> --step <stepId> --answer "<answer text>"
 ```
 
-Public replay is the existing `fgos coordination show` command,
-unmodified — this skill renders nothing of its own and hides nothing
-`show.mjs` already reports (authorizations, dispositions, aggregations,
-specialist bindings, pending driver authorizations, dispositions'
-session-ownership marks).
+To resume an interrupted or parked workflow without an explicit answer:
 
+```bash
+fgos workflow resume <workflowRunId>
+```
+
+## 4. Run Single-Unit Collaboration Presets
+
+Single-unit presets (`consult`, `research-fan-out`, `rfc`) execute directly
+via their resolved CollaborationPattern:
+
+```bash
+fgos run --pattern <preset>
+```
+
+## Invariants and Safety
+
+- **Single Authority:** `src/workflow/runner.mjs` is the sequencer; `src/runner/execution/bind.mjs` is the binding authority; `src/runner/execution/run.mjs` is the unit execution door.
+- **Inputs & Visibility:** Step inputs and pane isolation enforce visibility boundaries (e.g. blind proposals in `delphi` round 1, silent generation in `nominal-group`).
+- **No Protocol IDs:** Presets and routes identify workflows and patterns strictly by their canonical names (`delphi`, `nominal-group`, `group-cognition`, `rfc`, etc.).
 ## The gate, and why it holds
-
-The only doors this skill ever invokes are the three `fgos coordination
-pack <list|show-protocol|run>` CLI sub-verbs above (Unit I23) — never a
-hand-authored `node -e` script, and never `runGroupThinkingRequest`
-directly. `pack run` forwards straight into `runGroupThinkingRequest`
-([`group-thinking-pack.mjs`](../../../src/verbs/coordination/group-thinking-pack.mjs)),
-the **only** function in this whole chain that dispatches or resumes
-anything, and it does nothing but: (1) refuse when
-no `protocolId` is given; (2) refuse when `protocolId` is not a member of
-the pack registry, or the registered definition's version has drifted
-from what the pack pinned; (3) refuse when the request's own
-`protocolRef.id` disagrees with the selected `protocolId`, or the request
-is `kind: "agent-led"` (no bound protocol to gate); (4) refuse when any
-step in the request is type `specialist-authorize` (I24a, bypass #4 —
-see below); (5) forward the untouched request straight into
-`runCoordinationUseCase`
-([`run.mjs`](../../../src/verbs/coordination/run.mjs)) — the exact door
-`fgos coordination run` and the headless adapter already use, with zero
-altered fields. Everything after that point is `run.mjs`'s own,
-already-proven behavior; nothing here reimplements or forks it.
-
-This is why four of the five bypasses a later cell (P10.5) proved
-impossible need no special defensive code in this skill — the door it
-calls never exposed them as caller-invocable actions in the first place.
-The fifth, bypass #4 ("authorize a specialist"), is the one exception
-since Unit I24a grew `run.mjs`'s vocabulary a `specialist-authorize` step
-— it now stays refused ONLY because `runGroupThinkingRequest` applies an
-EXPLICIT step-type refusal before forwarding anything, covered in its own
-bullet below:
-
-- **Switch protocols silently.** There is no default or inferred protocol
-  anywhere in this chain. `protocolId` is a required, explicit parameter,
-  checked against the pack registry AND the request body before anything
-  runs — an unset or disagreeing id is refused, never guessed.
-- **Bypass grants.** `run.mjs`'s `authorize` step type dispatches through
-  `authorizeDeclaredOperation`, the same mediated door every hand-authored
-  request already uses, with the same context-grant enforcement. This
-  skill adds no second grant path — it only forwards the request object.
-- **Validate its own aggregate.** `run.mjs`'s public request vocabulary
-  has eight step kinds: `operation`, `authorize`, `disposition`,
-  `fan-out`, `contribution`, `human-turn`, `specialist-authorize`,
-  `close`. None of the first seven calls `validateSessionAggregation` or
-  any other aggregation-validation door — that capability simply is not
-  reachable through this surface (the `contribution` step forwards only
-  into `linkSessionContribution`, a separate, already-independently-
-  mediated door — see
-  `docs/architect/agent-coordination/contracts/coordination-session.md`'s
-  "Group-Thinking Protocol Pack" section for the full proof). The eighth,
-  `close`, is covered by the bullet immediately below.
-- **Authorize a specialist (I24a: reasoning updated, no longer "absence
-  from the vocabulary").** `run.mjs`'s public request vocabulary now
-  includes a `specialist-authorize` step type reaching
-  `authorizeSpecialistSlot` / `recordSpecialistAuthorization` — reachable
-  through any raw coordination request door (`coordination run --file`,
-  `coordination start --steps`, the headless adapter). This bypass now
-  holds ONLY because `runGroupThinkingRequest`
-  (`src/verbs/coordination/group-thinking-pack.mjs`) applies an EXPLICIT
-  step-type refusal on `specialist-authorize` before forwarding anything —
-  never because the vocabulary lacks the step. See
-  `docs/architect/agent-coordination/contracts/coordination-session.md`'s
-  "Five bypasses" section, bypass #4, for the full reasoning.
-- **Close a session outside the quorum gate.** `runCoordinationUseCase`
-  never closes implicitly — reaching full quorum with no explicit close
-  request leaves the session open (`test/cli/coordination.test.mjs`'s own
-  "without close: true and without close step leaves the session active").
-  A request MAY ask to close, either via a top-level `close: true` or a
-  `{type: "close"}` step — but both routes still call the exact same
-  quorum/aggregation-gated `closeSessionByQuorum` an implicit close would
-  have used; asking for it never bypasses or reorders that gate, it only
-  decides whether the attempt happens at all.
+This gate forwards requests directly to the Workflow Runner or unit execution
+subsystem. It guarantees that:
+1. Workflow IDs are validated against discovered YAML definitions in `core/workflows/*.yaml` or `domains/<domain>/workflows/*.yaml`.
+2. All steps and units satisfy G2 constraints (no infrastructure leaks such as hardcoded executors, models, or tiers in workflow definitions).
+3. Human gates park deterministically until explicitly answered via `fgos workflow answer`.
+4. Completed runs emit structured artifacts and events for replay and verification.

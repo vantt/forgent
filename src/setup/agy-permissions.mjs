@@ -248,6 +248,21 @@ export function findAgySubHomes(cwd = process.cwd(), { homeDir = process.env.HOM
     }
   }
 
+  // The credential homes of the declared gemini accounts. A confined (herdr or bwrap) invocation
+  // runs as the account the capacity layer picks for the provider, so these homes matter as much as
+  // the HOME an invocation names.
+  const geminiAccounts = runner.providers?.gemini?.accounts;
+  if (geminiAccounts && typeof geminiAccounts === 'object') {
+    for (const [accountId, account] of Object.entries(geminiAccounts)) {
+      const rawPath = account?.credentialSource?.home;
+      if (typeof rawPath !== 'string' || !rawPath.trim()) continue;
+      const resolved = path.resolve(resolveSubHomePath(rawPath.trim(), homeDir));
+      if (seenPaths.has(resolved)) continue;
+      seenPaths.add(resolved);
+      results.push({ rawPath: rawPath.trim(), resolvedPath: resolved, executorId: 'gemini', invocationId: `account:${accountId}` });
+    }
+  }
+
   return results;
 }
 

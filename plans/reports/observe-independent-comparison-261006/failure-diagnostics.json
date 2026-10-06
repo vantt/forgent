@@ -1,0 +1,16 @@
+{
+  "status": "UNPROVEN",
+  "reason": "Panel generation failed before synthesis; no independent A/B judgment or new eval scorecards were produced.",
+  "owningRoot": "/home/vantt/projects/mdview",
+  "soloUnitRunId": "unit-run-1791266482233-ee7efe1a",
+  "panelUnitRunId": "unit-run-1791266482325-8335c3c1",
+  "failedRunId": "run_unit-run-1791266482325-8335c3c1/panelist-2/1_01",
+  "stderrSource": ".fgos/assignments/unit-run-1791266482325-8335c3c1/panelist-2/1/runs/01/stderr.log:1",
+  "stderrExcerpt": "Credential store read failed for xai: EROFS: read-only file system, mkdir '/home/vantt/.omp/profiles/openai-tetcu72/agent/auth.json.lock'",
+  "quotaConclusion": "No quota exhaustion was established. Opus, Sonnet and Gemini completed actual Unit seats; xai failed before inference; GLM synthesis did not launch.",
+  "missingPrerequisite": "A provisioned writable private Pi account runtime. Redirecting the runtime directory alone does not provision credentials.",
+  "safety": "The assistant did not read, copy, print or provision credentials or secrets.local.env. Providers retained their normal existing authentication path; credential-write grants were not widened.",
+  "temporaryProjectConfigRestoredByteForByte": true,
+  "restorationEvidence": "Actual generation runner output reported restoredConfig=true after synchronously obtaining both Unit configuration snapshots.",
+  "executionEvidenceLimit": "Unit records and prepared confinement arguments are not an observation of child process argv. The solo SDK init reported cwd=/home/vantt rather than the requested scratch directory. The separately retained isolation-canary.json proves only its own invocation and SDK metadata, not this failed comparison."
+}

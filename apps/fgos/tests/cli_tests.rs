@@ -1088,3 +1088,69 @@ fn test_host_rejects_manifest_with_unlisted_payload_symlink() {
 
     let _ = fs::remove_dir_all(&temp_dir);
 }
+
+#[test]
+fn native_discussions_reports_owner_voters_and_root_wide_summary_diagnostics() {
+    use serde_json::{json, Value};
+    let root = std::env::temp_dir().join(format!(
+        "fgos-native-discussions-{}-{}",
+        std::process::id(),
+        std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()
+    ));
+    let assignments = root.join(".fgos/assignments");
+    fs::create_dir_all(assignments.join("unit-run-missing")).unwrap();
+    let attempt = json!({
+        "assignmentId": "unit-run-research/researcher-1/1", "runId": "research-run",
+        "executor": "alpha", "provider": "alpha", "persona": "research", "model": "test-model",
+        "outcome": "pass", "fallbackFrom": null
+    });
+    let mut final_attempt = attempt.clone();
+    final_attempt["stance"] = json!({"status": "valid", "choice": "a", "confidence": null});
+    let mut summary = json!({
+        "contract": {"id": "unit-summary", "version": 1},
+        "unitRunId": "unit-run-research", "workflow": null,
+        "pattern": "research-fan-out", "capability": "analysis", "outcome": "pass",
+        "startedAt": "2026-10-05T12:00:00Z", "settledAt": "2026-10-05T12:01:00Z",
+        "inline": false, "stanceOptions": ["a", "b"],
+        "seats": [
+            {"role": "researcher-1", "kind": "panelist", "round": 1, "final": final_attempt, "attempts": [attempt]},
+            {"role": "panelist", "kind": "synthesizer", "round": 1, "final": final_attempt, "attempts": [attempt]}
+        ]
+    });
+    for (id, timestamp) in [
+        ("unit-run-research", json!("2026-10-05T12:01:00Z")),
+        ("unit-run-outside", json!("2026-10-04T12:01:00Z")),
+        ("unit-run-undated", Value::Null),
+    ] {
+        summary["unitRunId"] = json!(id);
+        summary["settledAt"] = timestamp;
+        let dir = assignments.join(id);
+        fs::create_dir_all(&dir).unwrap();
+        fs::write(dir.join("unit-summary.json"), serde_json::to_vec(&summary).unwrap()).unwrap();
+    }
+    let output = Command::new(fgos_bin())
+        .args(["metrics", "discussions", "--since=2026-10-05", "--by=executor", "--dir"])
+        .arg(&root)
+        .current_dir(&root)
+        .output()
+        .expect("failed to execute native discussions");
+    let _ = fs::remove_dir_all(&root);
+    assert_eq!(output.status.code(), Some(0), "{}", String::from_utf8_lossy(&output.stderr));
+    let envelope: Value = serde_json::from_slice(&output.stdout).expect("native JSON envelope");
+    assert_eq!(envelope["contract"], "fgos.v1");
+    let report = &envelope["data"];
+    assert_eq!(report["totals"]["unitRuns"], 1);
+    assert_eq!(report["totals"]["seats"], 2);
+    assert_eq!(report["groups"]["alpha"]["unitRuns"], 1);
+    assert_eq!(report["units"][0]["unitRunId"], "unit-run-research");
+    assert_eq!(report["units"][0]["stanceSeats"], 1);
+    assert_eq!(report["units"][0]["stancesValid"], 1);
+    assert_eq!(report["units"][0]["agreement"], 1.0);
+    assert_eq!(report["units"][0]["genuineSplit"], false);
+    assert_eq!(report["summaryDiagnosticsScope"], "root-wide");
+    assert_eq!(report["summaryDirsSeen"], 4);
+    assert_eq!(report["summariesMissing"], 1);
+    assert_eq!(report["summariesUnusable"], 1);
+    assert_eq!(report["summariesSkippedByReason"], json!({"missing-timestamp": 1}));
+    assert_eq!(report["summariesOutsideWindow"], 1);
+}

@@ -1,0 +1,69 @@
+{
+  "A": {
+    "scores": {
+      "perspective-spread": 1,
+      "decision-clarity": 2,
+      "counterfactual-depth": 2,
+      "evidence-discipline": 1,
+      "execution-quality": 1
+    },
+    "rationales": {
+      "perspective-spread": {
+        "quote": "the premise that \"red-team already covers it\" is only partly true",
+        "reason": "It challenges the question's framing, which creates real tension. It still presents one voice and does not contrast distinct viewpoints."
+      },
+      "decision-clarity": {
+        "quote": "K2 fires: at least 90% of the first 30 logged panel runs are unanimous.",
+        "reason": "The position is actionable ('don't gate yet'), and the revisit triggers have explicit numeric and time thresholds (90%, 30 runs, 14 days)."
+      },
+      "counterfactual-depth": {
+        "quote": "I'd add a forced-counterfactual round that is opt-in per preset and triggered by the measured `agreement`",
+        "reason": "It tests the gate alternative against existing mechanisms and the correlated-provider weakness. It also specifies what would change the decision and what form the alternative would take."
+      },
+      "evidence-discipline": {
+        "quote": "`panel.mjs:63-68` and `:94-97` only *request* independence",
+        "reason": "Claims are carefully bounded and inference is separated from guarantee. Citations are unverified by this judge, and uncertainty about the cited facts is not tagged explicitly."
+      },
+      "execution-quality": {
+        "quote": "Run `fgos metrics discussions --by workflow` to count panel runs that carry valid `stanceOptions` stances.",
+        "reason": "The step is concrete and executable and includes a conditional fallback. It has no owner. The only deadline is an implicit reference to K5 expiry, and there is no rollback criterion."
+      }
+    }
+  },
+  "B": {
+    "scores": {
+      "perspective-spread": 1,
+      "decision-clarity": 1,
+      "counterfactual-depth": 1,
+      "evidence-discipline": 1,
+      "execution-quality": 1
+    },
+    "rationales": {
+      "perspective-spread": {
+        "quote": "No panelist dissents on the core question — the vote is 3-0 against the gate.",
+        "reason": "It shows three panelists and keeps their sequencing differences visible. However, the views largely paraphrase one another, and the coverage gap raised by panelist-1 gets flattened in the final recommendation."
+      },
+      "decision-clarity": {
+        "quote": "after ~30 panel runs ... if K2/K3 trip, build the council gates as an opt-in `core/workflows/council.yaml`",
+        "reason": "The recommendation is clear and actionable. K2/K3 are never defined, so the revisit thresholds are vague apart from '~30 runs'."
+      },
+      "counterfactual-depth": {
+        "quote": "panel units without a producer (advisory/discussion units) get no red-team coverage — the only acknowledged hole",
+        "reason": "The alternative is examined in part and a gap is named. There is no explicit 'what would change my mind' test, and the gap does not change the verdict."
+      },
+      "evidence-discipline": {
+        "quote": "Provider-distinct seats plus the reviewed pattern's red-team are sufficient for now",
+        "reason": "Citations are plentiful but unverified. This sufficiency claim contradicts the acknowledged red-team coverage hole, and 'independentOf enforces provider independence' is stated without hedging."
+      },
+      "execution-quality": {
+        "quote": "Concrete next step: after ~30 panel runs, run `fgos metrics discussions --by workflow`",
+        "reason": "The step is concrete and conditional. It has no owner, no calendar deadline and no rollback criteria."
+      }
+    }
+  },
+  "limits": [
+    "No repository access, so all file:line citations are unverified; scores do not reflect citation correctness.",
+    "Both deliverables appear to exceed the 300-word limit, B substantially more so. The rubric does not score length, but it is a compliance issue.",
+    "This is a single question with a single judge, so format differences (synthesis-with-panelists vs single position) may confound perspective-spread scoring."
+  ]
+}

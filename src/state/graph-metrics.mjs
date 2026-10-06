@@ -14,7 +14,7 @@
 import { buildUnifiedEdges } from './dep-graph.mjs';
 import { FRONTIER_ORDER_VERSION, frontier, isResolvedStatus } from './frontier.mjs';
 import { viewRevision } from './replay.mjs';
-import { effectiveStage, getDomain } from './workflow-stage-graphs.mjs';
+import { effectiveStep, getDomain } from './domain-registry.mjs';
 import { normalizePath } from '../util/normalize-path.mjs';
 
 /**
@@ -389,7 +389,7 @@ export function goalScopedGreedyTopUnblock(view, focusId, k = 10) {
  * `wontfix`). `newlyReady` is the direct dependents that become
  * DEP-SATISFIED the moment `id` is done: status `todo` and every OTHER dep
  * already RESOLVED. That is a graph fact about dependencies only — NOT full
- * frontier eligibility (it does not check stage/lineage), so a `newlyReady`
+ * frontier eligibility (it does not check step/lineage), so a `newlyReady`
  * item may still wait on context-discovery or an open descendant. An
  * unknown id yields exists:false.
  */
@@ -408,13 +408,13 @@ export function whatIf(view, id) {
     return (Array.isArray(item.deps) ? item.deps : []).every((d) => d === id || isResolvedStatus(work[d]));
   });
   // tsk-4zj D6: `newlyReady` entries are `status: 'todo'`, which spans
-  // every stage — same reasoning as `graphMetrics`'s own `stageByItem`,
+  // every step — same reasoning as `graphMetrics`'s own `stepByItem`,
   // scoped here to just `id` itself plus `newlyReady`'s members rather
   // than the whole work map (this answer is already single-id-scoped).
-  const stageByItem = Object.fromEntries(
-    [id, ...newlyReady].map((itemId) => [itemId, effectiveStage(work[itemId], getDomain(work[itemId].domain))]),
+  const stepByItem = Object.fromEntries(
+    [id, ...newlyReady].map((itemId) => [itemId, effectiveStep(work[itemId], getDomain(work[itemId].domain))]),
   );
-  return { id, exists: true, unblocksTransitive: downstream.size, newlyReady, stageByItem };
+  return { id, exists: true, unblocksTransitive: downstream.size, newlyReady, stepByItem };
 }
 
 // Default node ceiling above which the expensive greedy (topUnblock) is
@@ -465,13 +465,13 @@ export function graphMetrics(view, opts = {}) {
     topUnblock: frame.skipped.includes('topUnblock') ? [] : greedyTopUnblock(view),
     // tsk-4zj D6: `components[].items`/`criticalPath`/`topUnblock` are
     // arrays of bare id strings, `staleBlocked` entries reference ids too
-    // — none of them carry `stage` today. Rather than changing any of
+    // — none of them carry a step today. Rather than changing any of
     // those id-array shapes to object-arrays (a real breaking change,
     // per CONTEXT.md's Scout evidence on the existing `assert.deepEqual`
     // coverage of `components[0].items`), this adds one flat side-map a
     // reader cross-references any id in the output against.
-    stageByItem: Object.fromEntries(
-      Object.keys(work).map((id) => [id, effectiveStage(work[id], getDomain(work[id].domain))]),
+    stepByItem: Object.fromEntries(
+      Object.keys(work).map((id) => [id, effectiveStep(work[id], getDomain(work[id].domain))]),
     ),
   };
 }

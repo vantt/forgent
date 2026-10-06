@@ -1,0 +1,39 @@
+# core/workflows/group-cognition.yaml — Group Cognition Deliberation Workflow
+# Group cognition workflow with divergent sense-making,
+# dialectical inquiry critique with red-team, and convergent action synthesis.
+
+id: group-cognition
+title: Group Cognition Deliberation Workflow
+description: Group cognition workflow with divergent sense-making, dialectical inquiry critique with red-team, and convergent action synthesis.
+
+steps:
+  - id: sense-making
+    title: Sense Making
+    units:
+      - id: sense-making-panel
+        template:
+          capability: group-cognition:explore
+          pattern: panel
+          persona: researcher
+          objective: Conduct divergent exploration and sense-making across multiple independent researcher perspectives
+          blind: true
+  - id: dialectical-inquiry
+    title: Dialectical Inquiry
+    dependsOn: [sense-making]
+    units:
+      - id: dialectical-critique
+        template:
+          capability: group-cognition:critique
+          pattern: reviewed
+          persona: critic
+          objective: Subject sense-making hypotheses to critical challenge, counter-arguments, and red-team review
+  - id: action-synthesis
+    title: Action Synthesis
+    dependsOn: [dialectical-inquiry]
+    units:
+      - id: synthesize-action
+        template:
+          capability: group-cognition:synthesize
+          pattern: solo
+          persona: synthesizer
+          objective: Converge verified evidence and counter-arguments into an actionable synthesis preserving principled dissent

@@ -7,6 +7,9 @@
 // no network, and no mutation of input arguments or global configuration.
 // Production dispatch continues to use the legacy transport path byte-for-byte;
 // this module is invoked in shadow mode by tests and future compiler stages.
+import fs from 'node:fs';
+import path from 'node:path';
+
 
 /**
  * Registry of known policy-shaped flags per provider family.
@@ -492,8 +495,7 @@ export function renderProviderInvocation(inputs = {}) {
 
 /**
  * Phase E step 1 (executor-profile-schema-migration): production binder for
- * argv rendering, self-verifying -- same safety posture as Phase 07's
- * `resolveVerifiedPlacementModel`/Phase 08's `resolveVerifiedRedirectExecutor`.
+ * argv rendering, self-verifying.
  * `legacyArgs` is the caller's own UNCHANGED template-substitution result
  * (`transport.mjs`'s `resolveExecutorCommand`), always computed first and
  * never recomputed here. This module's own rendering
@@ -541,4 +543,23 @@ export function resolveVerifiedProviderArgs({ providerFamily, command, baseArgs,
     };
   }
   return { args: renderedArgs, source: 'provider-adapter', divergence: null };
+}
+
+/**
+ * Durable, local record of a real shadow-binder divergence.
+ *
+ * @param {string|undefined} fgosDir
+ * @param {'placement-model'|'provider-args'} binder
+ * @param {object} fields extra fields to record (executorId, legacy/candidate values, ...)
+ */
+export function recordShadowBinderDivergence(fgosDir, binder, fields = {}) {
+  if (!fgosDir) return;
+  try {
+    const logPath = path.join(fgosDir, 'dispatch', 'shadow-binder-divergence.jsonl');
+    fs.mkdirSync(path.dirname(logPath), { recursive: true });
+    const entry = { ts: new Date().toISOString(), binder, ...fields };
+    fs.appendFileSync(logPath, `${JSON.stringify(entry)}\n`);
+  } catch {
+    // best-effort telemetry -- never block or fail a real dispatch over it
+  }
 }

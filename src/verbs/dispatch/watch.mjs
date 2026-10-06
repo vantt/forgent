@@ -12,7 +12,9 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { findRunDir, readRunSnapshot, DispatchObserveError } from './show-run.mjs';
+import { readRunSnapshot, DispatchObserveError } from './show-run.mjs';
+import { findRunDir, RunLookupError } from '../../runner/dispatch/assignment-layout.mjs';
+import { fgosDirFromRoot } from '../../runner/paths.mjs';
 
 /** How often to look, when the caller does not say. */
 export const DEFAULT_WATCH_INTERVAL_MS = 1000;
@@ -57,7 +59,14 @@ export async function watchRunUseCase(ctx, {
     throw new DispatchObserveError('invalid-run-id', 'dispatch watch requires a runId');
   }
   const repoRoot = ctx?.repoRoot ?? ctx?.cwd ?? process.cwd();
-  const runDir = findRunDir(repoRoot, runId);
+  let runDir;
+  try { runDir = findRunDir(fgosDirFromRoot(repoRoot), runId); }
+  catch (err) {
+    if (err instanceof RunLookupError) {
+      throw new DispatchObserveError(err.code, err.message, { runId, repoRoot, locations: err.locations });
+    }
+    throw err;
+  }
   if (!runDir) {
     throw new DispatchObserveError('run-not-found', `no run "${runId}" under ${repoRoot}`, { runId, repoRoot });
   }

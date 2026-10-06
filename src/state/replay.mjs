@@ -14,10 +14,14 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { readEvents, readLastLineBefore, readEventsFromByte, parseEventLines } from './events.mjs';
 import { DEFAULTS } from './work.mjs';
+import { getDomain, resolveWorkflow, stepForPhase } from './domain-registry.mjs';
+import { resolveStepAlias } from '../workflow/steps.mjs';
 import { applyKnowledgeEvent } from './knowledge-registry.mjs';
 import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
 
 // tsk-49e: every top-level key applyEvent ever writes to `view` is either an
+export const VIEW_SCHEMA_VERSION = 4;
+
 // array `.push`ed onto in place (only `decisions`) or reassigned via a
 // `{...oldValue, ...patch}` spread (every other container: work, gates,
 // settlements, learnings, decisionsById, outcomes, discovery, tools, and any
@@ -34,6 +38,25 @@ function cloneTopLevel(seedView) {
     else out[key] = value;
   }
   return out;
+}
+
+// The ONE place a record's older step label is mapped forward. Records and events
+// written before work items tracked a Workflow step carry `stage` (and the step
+// name `decompose`, now `planning`); a binary from before the rename can still
+// append them. Every read of those shapes goes through here, so the view only
+// ever holds `workflowStep` with the workflow's current step ids.
+function canonicalStep(item, step) {
+  if (typeof step !== 'string') return step;
+  const domain = getDomain(item?.domain, { onUnrecognized: () => {} });
+  return resolveStepAlias(resolveWorkflow(domain, item?.kind), step);
+}
+
+function foldLegacyStage(target, item) {
+  if (target.stage === undefined) return;
+  if (target.workflowStep === undefined) {
+    target.workflowStep = canonicalStep(item ?? target, target.stage);
+  }
+  delete target.stage;
 }
 
 /**
@@ -69,7 +92,21 @@ function applyEvent(view, event) {
     case 'work.add': {
       const item = event.payload;
       if (item && typeof item === 'object' && typeof item.id === 'string') {
-        view.work[item.id] = { ...DEFAULTS, ...item };
+        const normalized = { ...item };
+        if (normalized.tier !== undefined) {
+          if (normalized.size === undefined) {
+            normalized.size = normalized.tier;
+          }
+          delete normalized.tier;
+        }
+        if (normalized.rigor === undefined && normalized.risk === 'heavy') {
+          normalized.rigor = 'high';
+        }
+        foldLegacyStage(normalized);
+        if (normalized.workflowStep !== undefined) {
+          normalized.workflowStep = canonicalStep(normalized, normalized.workflowStep);
+        }
+        view.work[item.id] = { ...DEFAULTS, ...normalized };
       }
       break;
     }
@@ -289,7 +326,7 @@ function applyEvent(view, event) {
       // decision) and 'close' (the item reaching the terminal `done`
       // status, via either entry edge). No new event type (D3/R3 — the
       // data already exists in the log); this only APPENDS a derived
-      // record, mirroring frictions/discovery below (never merge/replace —
+      // record, mirroring discovery below (never merge/replace —
       // a settlement is a one-time occurrence per transition, and reusing
       // the id for a later unrelated settlement must not erase this one).
       // GUARDED on `item` (a real work item this move actually applied to)
@@ -324,13 +361,12 @@ function applyEvent(view, event) {
       // Câu-6 tự động (per Phase 3 S3-closeout (c), six-questions L5): the
       // `done`-closing work.move carries an additive `learning` object
       // composed by store.mjs (never here — replay only folds, per D3).
-      // Mirrors frictions/discovery's fold rule: APPENDED per id, never
+      // Mirrors discovery's fold rule: APPENDED per id, never
       // merged/replaced. `done` is terminal (status-fsm.mjs — no outgoing edge) so
       // in practice at most one learning record ever accumulates per id, but
       // the append shape stays consistent with the other occurrence-style
       // channels. `learnings` is a LAZY key exactly like
-      // `outcomes`/`frictions`/`discovery`: absent until the first item
-      // closes with a `learning` payload (backward-compat.test) — a legacy
+      // `outcomes`/`discovery`: absent until the first item
       // event with no `learning` field (or, per the guard above, no `v` at
       // all) never creates it.
       if (item && to === 'done' && learning) {
@@ -353,7 +389,18 @@ function applyEvent(view, event) {
       const { id, patch, writer } = event.payload ?? {};
       const item = view.work[id];
       if (item && patch && typeof patch === 'object') {
-        Object.assign(item, patch);
+        const normalizedPatch = { ...patch };
+        if (normalizedPatch.tier !== undefined) {
+          if (normalizedPatch.size === undefined) {
+            normalizedPatch.size = normalizedPatch.tier;
+          }
+          delete normalizedPatch.tier;
+        }
+        if (normalizedPatch.risk === 'heavy' && item.rigor === undefined && normalizedPatch.rigor === undefined) {
+          normalizedPatch.rigor = 'high';
+        }
+        foldLegacyStage(normalizedPatch, item);
+        Object.assign(item, normalizedPatch);
       }
       // Writer provenance (D8/D15, str46-io-contract): same unconditional,
       // latest-write-wins fold as work.move above -- writer is a sibling of
@@ -369,7 +416,7 @@ function applyEvent(view, event) {
       // 1190 before the live-log seq repair), decision-schema-rationale-
       // alternatives-source): `id` is optional on a decision (per
       // addDecision) — when present, ALSO fold into a lazy `decisionsById`
-      // key, same append-per-id pattern as `discovery`/`frictions` above
+      // key, same append-per-id pattern as `discovery` above
       // (decisions accumulate over time, never merge/replace). The global
       // push above stays unconditional either way, so id-less decisions and
       // every existing reader of the flat `decisions` array are unaffected.
@@ -403,20 +450,22 @@ function applyEvent(view, event) {
       }
       break;
     }
-    case 'work.stage': {
-      // Additive event type (per stage-clarify D1/D3/D10): a clarify-pass
-      // moves `item.stage` and, when the discovery engine supplied one,
-      // fills in the item's real `verify` at the SAME time — one event,
-      // never two, so there is no window where the item reads `executing`
-      // with a stale placeholder verify (D10). `item.stage` itself is never
-      // defaulted here — a missing `stage` on the record stays missing
-      // (read lazily as `executing` by consumers, per D8); this case only
-      // ever runs for an item that already has a real `work.stage` event in
-      // its history, at which point setting the field explicitly is correct.
-      const { id, from, to, verify, role, writer } = event.payload ?? {};
+    case 'work.stage': // written by a binary from before the rename; same fold as work.step
+    case 'work.step': {
+      // Additive event type: a step move sets `item.workflowStep` and, when the
+      // discovery engine supplied one, fills in the item's real `verify` at the SAME
+      // time — one event, never two, so there is no window where the item reads
+      // as at its execute step with a stale placeholder verify. `workflowStep`
+      // itself is never defaulted here — a missing step on the record stays
+      // missing (read lazily as the execute-phase step by consumers); this case
+      // only ever runs for an item that already has a real step event in its
+      // history, at which point setting the field explicitly is correct.
+      const { id, from: rawFrom, to: rawTo, verify, role, writer } = event.payload ?? {};
       const item = view.work[id];
+      const from = canonicalStep(item, rawFrom);
+      const to = canonicalStep(item, rawTo);
       if (item) {
-        item.stage = to;
+        item.workflowStep = to;
         if (verify !== undefined) {
           item.verify = verify;
         }
@@ -469,7 +518,10 @@ function applyEvent(view, event) {
       // stage` move) settles exactly as it did before this fix — only an
       // explicit `clear: false` suppresses.
       const drivingVerdict = view.discovery?.[id]?.at(-1);
-      if (item && from === 'discovery' && drivingVerdict?.clear !== false) {
+      const discoverEntry = item
+        ? stepForPhase(getDomain(item.domain, { onUnrecognized: () => {} }), 'discover', item.kind)
+        : undefined;
+      if (item && from === discoverEntry && drivingVerdict?.clear !== false) {
         if (!view.settlements) {
           view.settlements = {};
         }
@@ -485,7 +537,7 @@ function applyEvent(view, event) {
       // parks for another role, `holder` changes. Two lazy structures,
       // same absent-key-means-never-happened shape `view.outcomes`/
       // `view.discovery` already use: `view.work[id].holder` is a
-      // latest-write-wins field (mirrors `item.stage` above); `callThreads`
+      // latest-write-wins field (mirrors `item.workflowStep` above); `callThreads`
       // is an APPEND-only per-id log (mirrors `view.discovery`), the
       // record a replaying reader needs to derive open-call depth for the
       // callstack cap (src/state/handoff.mjs's own `openCallDepth` input
@@ -544,11 +596,11 @@ function applyEvent(view, event) {
       break;
     }
     case 'work.discovery': {
-      // Additive event type (per stage-clarify D3/D6) — mirrors work.friction
-      // below: each context-discovery verdict is its own occurrence (pass or
-      // not), so this APPENDS per id rather than merging/replacing. `discovery`
-      // is a LAZY key exactly like `frictions`/`outcomes`/`gates`: absent from
-      // the view until the first work.discovery event folds (backward-compat).
+      // Additive event type (per stage-clarify D3/D6): each context-discovery
+      // verdict is its own occurrence (pass or not), so this APPENDS per id
+      // rather than merging/replacing. `discovery` is a LAZY key exactly like
+      // `outcomes`/`gates`: absent from the view until the first work.discovery
+      // event folds (backward-compat).
       const { id } = event.payload ?? {};
       if (typeof id === 'string') {
         if (!view.discovery) {
@@ -592,35 +644,13 @@ function applyEvent(view, event) {
       // single persisted pointer to the currently active goal id — a
       // scalar OVERWRITE (last-write-wins), never merged like work.outcome
       // above (D4: exactly one active focus at a time). `focus` is a LAZY
-      // key exactly like `outcomes`/`frictions`/`gates`: absent from the
+      // key exactly like `outcomes`/`gates`: absent from the
       // view until the first goal.focus event folds, so replaying a
       // pre-STR67 log produces a view shaped exactly as before this event
       // type existed (backward-compat).
       const { id } = event.payload ?? {};
       if (typeof id === 'string') {
         view.focus = id;
-      }
-      break;
-    }
-    case 'work.friction': {
-      // Additive event type (per D7 schema evolution, mirroring work.outcome
-      // above) — but with the OPPOSITE fold rule: one friction record per
-      // final failure exit (park/halt), and a single id can accumulate
-      // several across re-claims, so this APPENDS per id. It never merges
-      // and never replaces — each record is its own occurrence, and a later
-      // one erasing an earlier one would silently lose history (the exact
-      // fold-replace bug class critical-patterns records). `frictions` is a
-      // LAZY key exactly like `outcomes`/`gates`: absent from the view until
-      // the first work.friction event folds (backward-compat.test).
-      const { id } = event.payload ?? {};
-      if (typeof id === 'string') {
-        if (!view.frictions) {
-          view.frictions = {};
-        }
-        view.frictions[id] = [
-          ...(view.frictions[id] ?? []),
-          { ...event.payload, ts: event.ts },
-        ];
       }
       break;
     }
@@ -734,6 +764,7 @@ function tryIncrementalRebuild(logPath) {
     return null;
   }
   if (!persisted || typeof persisted !== 'object') return null;
+  if (persisted.viewSchemaVersion !== VIEW_SCHEMA_VERSION) return null;
   const snap = persisted.snapshot;
   if (!snap || typeof snap.size !== 'number' || typeof snap.mtimeMs !== 'number' || typeof snap.lastLine !== 'string') return null;
 
@@ -748,7 +779,7 @@ function tryIncrementalRebuild(logPath) {
   // snapshot) from the returned view shape -- everything else in
   // `persisted` IS the real view, per writeView's own "additive sibling
   // field, never folded back" pattern (see viewRevision's own doc comment).
-  const { revision, snapshot, ...savedView } = persisted;
+  const { revision, snapshot, viewSchemaVersion, ...savedView } = persisted;
 
   if (stat.mtimeMs === snap.mtimeMs && stat.size === snap.size) {
     return savedView; // untouched since the snapshot -- zero-read shortcut
@@ -889,10 +920,11 @@ function tryIncrementalRebuildFromDir(dir) {
     return null;
   }
   if (!persisted || typeof persisted !== 'object') return null;
+  if (persisted.viewSchemaVersion !== VIEW_SCHEMA_VERSION) return null;
   const snap = persisted.snapshot;
   if (!snap || typeof snap.files !== 'object' || snap.files === null || typeof snap.maxTs !== 'string') return null;
 
-  const { revision, snapshot, ...savedView } = persisted;
+  const { revision, snapshot, viewSchemaVersion, ...savedView } = persisted;
 
   const currentFiles = discoverEventFilePaths(dir);
   const currentFileNames = new Set(currentFiles.map((f) => f.file));

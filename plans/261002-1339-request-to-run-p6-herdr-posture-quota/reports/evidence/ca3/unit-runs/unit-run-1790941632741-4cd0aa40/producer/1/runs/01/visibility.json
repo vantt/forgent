@@ -1,0 +1,16 @@
+{
+  "status": "reconciled",
+  "agentName": "fgos-run_unit-run-179094b612f4e0",
+  "round": 1,
+  "lastSeenAt": "2026-10-02T11:47:57.719Z",
+  "confinement": {
+    "status": "confined-bwrap",
+    "confined": true
+  },
+  "paneId": "wS:p3W6",
+  "trustSeeded": "claude-json",
+  "promptReadiness": "ready",
+  "briefSubmitKeyResent": 1,
+  "outcome": "settled",
+  "trustRemoved": "claude-json"
+}

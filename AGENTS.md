@@ -39,6 +39,14 @@ Read `docs/specs/reading-map.md`, then the area spec under `docs/specs/` for wha
 you're about to change. Specs are the state layer — BA-grade, tech-agnostic — read
 the spec before the code.
 
+**Prior art before design.** Before designing a mechanism, find out what already existed
+and why it went away: `git log -S'<symbol>'` / `-G` on the symbol, config key and spec term,
+also under the executor ids and names the thing had before the renames (ids were renamed and
+dormant ones deleted), and read the area spec's "Lịch sử quyết định" and settled-facts
+sections. A plan's facts phase answers "what existed before, and which change removed it,
+and was that intended?" next to its questions about current code. Reuse or extend what is
+found; say in the plan what was reused and what was missing.
+
 ## Definition of done (platform-foundations L5)
 
 A stranger agent with no chat history should be able to answer, for any change:
@@ -96,15 +104,18 @@ hình dễ, không chắp vá.
 
 khong phai no nang ma no tum lum
 
-## Dispatch — routing work to a executor
+## Dispatch — routing work to an executor
 
-**Before dispatching any task out of the current turn — a work item, a registered executor, an ad-hoc task, or your own direct Agent/Task-tool call — run `fgos dispatch decide` (or compatibility alias `node src/runner/dispatch.mjs decide`) first. Never decide the mechanism yourself.** A `PreToolUse` hook enforces this on Agent/Task-tool calls: it runs `decide` for you and refuses the call when the answer comes back as anything other than `in-process`.
+`fgos run` is the primary door for executing new work in the execution core.
+For routing checks, `fgos dispatch decide` computes the execution mechanism and executor via `bind()` (`src/runner/execution/bind.mjs`). herdr is the default transport when present in the session/environment.
+
+**Before dispatching any task out of the current turn — a work item, a registered executor, an ad-hoc task, or your own direct Agent/Task-tool call — run `fgos dispatch decide` (or compatibility alias `node src/runner/dispatch.mjs decide`) first. Never decide the mechanism yourself.** A `PreToolUse` hook enforces this on Agent/Task-tool calls: it delegates to `bind()` and refuses the call when the answer comes back as anything other than `in-process`.
 
 Four ways to call `decide`, for four different situations:
 
 - `decide <executorId>` — you already know the exact executor name (e.g. `judge-discovery`).
 - `decide --for <purpose>` — you know what JOB you need done (e.g. `judge`), but not which executor serves it.
-- `decide --work <id> [--stage <stage>]` — you have a real work item and want it dispatched.
+- `decide --work <id> [--step <step>]` — you have a real work item and want it dispatched.
 - `decide --for <label> --needs-soul` — you are about to fire an Agent/Task tool yourself, with no executor or work item to name.
 
 Add `--has-live-task-access` when you already have the Agent/Task tool in your own tool manifest. This is always your own self-declaration — never probed from the environment, never guessed.
@@ -112,16 +123,15 @@ Add `--has-live-task-access` when you already have the Agent/Task tool in your o
 Three possible `mechanism` results, each needing a different response:
 
 - **`"unavailable"`** — nothing serves this. NOT an error: do it inline yourself, and report nothing.
-- **"in-process"** — call it yourself, with your own live capability: pass the returned agentType to your Agent/Task tool, or call the returned mcpTool directly. Dispatch cannot do this for you — it has neither an Agent/Task tool nor an MCP client of its own. When neither field is returned, use whichever agent type you would have used by default.
+- **`"in-process"`** — call it yourself, with your own live capability: pass the returned agentType to your Agent/Task tool, or call the returned mcpTool directly. Dispatch cannot do this for you — it has neither an Agent/Task tool nor an MCP client of its own. When neither field is returned, use whichever agent type you would have used by default.
 - **`"out-of-process"`** — run `fgos dispatch execute` (or compatibility alias `node src/runner/dispatch.mjs execute`). Never run the resolved command yourself through Bash: `execute` invokes the adapter and hands back the real result. (For a worktree-backed item, if passing explicit directory flags, pass `--cwd <worktree path>` and `--repo-root <main checkout path>` as two separate flags — never pass the main checkout as `--dir` alone). Log completed out-of-process runs via `fgos dispatch log` (or compatibility alias `node src/runner/dispatch.mjs log`).
 
 Every result also carries `configured: true|false`, additive `reasonCodes: [...]`, and optional `blockedReason` (e.g. when blocked by governance policy) — `false` means nothing is configured for that name or job, and the answer came from the default.
-
 A skill that dispatches should not re-derive any of this. Point its reasoning step at the shared fragment `.agents/skills/_shared/executor-dispatch-fallback.md` (mirrored byte-identical at `plugins/fgOS/skills/_shared/`). `.claude/skills` contains generated wrappers only; it has no `_shared` directory of its own.
 
-## Starting the herdr gateway — one door, never a raw process
+## Starting the fgos gateway — one door, never a raw process
 
-**If a task needs the herdr-fgos gateway (REST API + web dashboard) running, run `fgos gateway start` — never a hand-rolled `cargo run`/`nohup`/`tmux`/systemd invocation.** (tsk-31v) This is the one place that builds the release binary and spawns it detached, so the process outlives the CLI call. `fgos gateway status` reports real liveness plus an actual `/v1/contract` reachability check; `fgos gateway stop` sends SIGTERM and clears the registry. The gateway's own MCP surface (`search`/`execute`, `herdr-plugin/src/mcp.rs`) is mounted on this SAME process — it cannot bootstrap itself, so starting the gateway is always a `fgos` CLI call, never an MCP tool call.
+**If a task needs the fgos gateway (REST API + web dashboard, binary `fgos-gateway` built from `apps/fgos-gateway`) running, run `fgos gateway start` — never a hand-rolled `cargo run`/`nohup`/`tmux`/systemd invocation.** (tsk-31v) This is the one place that builds the release binary and spawns it detached, so the process outlives the CLI call. `fgos gateway status` reports real liveness plus an actual `/v1/contract` reachability check; `fgos gateway stop` sends SIGTERM and clears the registry. The gateway's own MCP surface (`search`/`execute`, `apps/fgos-gateway/src/mcp.rs`) is mounted on this SAME process — it cannot bootstrap itself, so starting the gateway is always a `fgos` CLI call, never an MCP tool call.
 
 <!-- mdview:START -->
 ## Documentation Viewing (MDView)
@@ -156,7 +166,7 @@ snippets.
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **forgent** (37092 symbols, 51501 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **forgent** (58821 symbols, 81138 relationships, 300 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939).
 

@@ -97,6 +97,8 @@ version = "0.1.0"
 dependencies = [
  "fgos-distribution",
  "fgos-host-runtime",
+ "fgos-observe",
+ "fgos-run-result",
  "fgos-work-state",
  "serde",
  "serde_json",
@@ -133,10 +135,35 @@ dependencies = [
 ]
 
 [[package]]
+name = "fgos-observe"
+version = "0.1.0"
+dependencies = [
+ "fgos-host-runtime",
+ "libc",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "thiserror",
+ "tokio",
+]
+
+[[package]]
+name = "fgos-run-result"
+version = "0.1.0"
+dependencies = [
+ "fgos-host-runtime",
+ "fgos-observe",
+ "serde",
+ "serde_json",
+ "thiserror",
+]
+
+[[package]]
 name = "fgos-work-state"
 version = "0.1.0"
 dependencies = [
  "fgos-host-runtime",
+ "fgos-observe",
  "serde",
  "serde_json",
  "tokio",
@@ -178,6 +205,14 @@ name = "hashbrown"
 version = "0.17.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a"
+
+[[package]]
+name = "herdr-fgos-common"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
 
 [[package]]
 name = "indexmap"

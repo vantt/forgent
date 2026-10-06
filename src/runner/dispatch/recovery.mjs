@@ -45,7 +45,7 @@
 // safe to repeat: `assess` still requires a real, non-`unknown` attestation
 // before it will ever return `eligible`.
 
-import { REPEAT_MODE_VALUES } from '../definitions/schema.mjs';
+import { REPEAT_MODE_VALUES } from './execution-contract.mjs';
 
 export { REPEAT_MODE_VALUES };
 

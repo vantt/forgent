@@ -126,23 +126,32 @@ test('dispatch entry in command-registry declares touchesState: true and externa
 });
 
 test('fgos dispatch execute and node src/runner/dispatch.mjs execute preserve errorClass on stdout and exit 1 identically (F6)', () => {
+  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-dispatch-depth-'));
+  const fgosDir = path.join(tempDir, '.fgos');
+  fs.mkdirSync(fgosDir, { recursive: true });
+  fs.copyFileSync(path.join(repo, '.fgos', 'config.json'), path.join(fgosDir, 'config.json'));
+
   const env = { ...process.env, FGOS_DISPATCH_DEPTH: '10' };
 
-  // 1. Compatibility door (uses configured executor 'claude' rather than unregistered dummy under F4 contract)
-  const direct = runDispatchDirect(['execute', 'claude', '--prompt', 'test'], { env });
-  assert.equal(direct.status, 1, `compat door expected exit 1, got ${direct.status} (stderr: ${direct.stderr})`);
-  const directLines = direct.stdout.trim().split('\n').filter(Boolean);
-  const directJson = JSON.parse(directLines[directLines.length - 1]);
-  assert.equal(directJson.errorClass, 'dispatch-depth-exceeded');
-  assert.match(directJson.error, /nested out-of-process dispatch depth 10 is already at the cap/);
+  try {
+    // 1. Compatibility door (uses configured executor 'claude' rather than unregistered dummy under F4 contract)
+    const direct = runDispatchDirect(['execute', 'claude', '--cwd', tempDir, '--repo-root', tempDir, '--prompt', 'test'], { env });
+    assert.equal(direct.status, 1, `compat door expected exit 1, got ${direct.status} (stderr: ${direct.stderr})`);
+    const directLines = direct.stdout.trim().split('\n').filter(Boolean);
+    const directJson = JSON.parse(directLines[directLines.length - 1]);
+    assert.equal(directJson.errorClass, 'dispatch-depth-exceeded');
+    assert.match(directJson.error, /nested out-of-process dispatch depth 10 is already at the cap/);
 
-  // 2. Production CLI door
-  const fgos = runFgos(['dispatch', 'execute', 'claude', '--prompt', 'test'], { env });
-  assert.equal(fgos.status, 1, `fgos door expected exit 1, got ${fgos.status} (stderr: ${fgos.stderr})`);
-  const fgosLines = fgos.stdout.trim().split('\n').filter(Boolean);
-  const fgosJson = JSON.parse(fgosLines[fgosLines.length - 1]);
-  assert.equal(fgosJson.errorClass, 'dispatch-depth-exceeded');
-  assert.match(fgosJson.error, /nested out-of-process dispatch depth 10 is already at the cap/);
+    // 2. Production CLI door
+    const fgos = runFgos(['dispatch', 'execute', 'claude', '--cwd', tempDir, '--repo-root', tempDir, '--prompt', 'test'], { env });
+    assert.equal(fgos.status, 1, `fgos door expected exit 1, got ${fgos.status} (stderr: ${fgos.stderr})`);
+    const fgosLines = fgos.stdout.trim().split('\n').filter(Boolean);
+    const fgosJson = JSON.parse(fgosLines[fgosLines.length - 1]);
+    assert.equal(fgosJson.errorClass, 'dispatch-depth-exceeded');
+    assert.match(fgosJson.error, /nested out-of-process dispatch depth 10 is already at the cap/);
+  } finally {
+    fs.rmSync(tempDir, { recursive: true, force: true });
+  }
 });
 
 test('fgos dispatch execute and node src/runner/dispatch.mjs execute exit 1 on all execute errors (L3)', () => {

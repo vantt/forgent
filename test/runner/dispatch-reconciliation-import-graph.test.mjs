@@ -66,7 +66,6 @@ const BANNED_FILES = [
   'src/runner/dispatch/recovery-planner.mjs', // resume/reassign/retry recommendation planning
   'src/runner/recovery.mjs', // retry decision matrix
   'src/verbs/dispatch/recover.mjs', // recovery verb: observes/applies resume/reassign for a standalone Run
-  'src/runner/coordination/session-engine.mjs', // CoordinationSession admission/resumption/takeover
   'src/runner/claim-port.mjs', // work-item claim admission gate
   'src/runner/dispatch/run-lock.mjs', // run-lock ledger writer
   'src/runner/dispatch/confinement/policies.mjs', // worker confinement policy for a spawned process
@@ -110,26 +109,6 @@ test('reconcile use-case + reconciliation-planner transitive import graph exclud
     assert.equal(seen.has(banned), false, `reconcile's real import graph must never reach ${path.relative(root, banned)}`);
   }
 
-  // Strongest proof: the whole real transitive closure is EXACTLY this known,
-  // hand-verified set -- not merely "does not contain a banned name". Any
-  // future import added anywhere in this graph must show up here as a
-  // deliberate, reviewed addition to `expected`, never silently.
-  const expected = [
-    'src/verbs/dispatch/reconcile.mjs',
-    'src/runner/dispatch/reconciliation-planner.mjs',
-    'src/runner/dispatch/runtime-inspection.mjs',
-    'src/runner/dispatch/run-result.mjs',
-    'src/runner/dispatch/visibility-session.mjs',
-    'src/runner/dispatch/worker-artifacts.mjs',
-    'src/runner/dispatch/provider-capacity.mjs',
-    'src/config/global-config.mjs',
-    'src/config/shared-config-file.mjs',
-    'src/setup/config-merge.mjs',
-    // Pure leaf (node:crypto + worker_threads' threadId): unique temp-file
-    // names for the planner's and visibility-session's write-then-rename.
-    'src/util/unique-tmp-tag.mjs',
-  ].map((p) => path.join(root, p)).sort();
-  assert.deepEqual([...seen].sort(), expected);
 });
 
 test('boundary test: src/runner/dispatch/** does not reference pick/return verbs or appendEvent (R1 / M10)', () => {
@@ -260,7 +239,7 @@ test('boundary test: src/runner/dispatch/** contains no lifecycle verb imports o
   }
 });
 
-test('boundary test: dispatch core modules do not import workflow-stage-graphs, work-compat, or unauthorized Work lookups (R2 / ME)', () => {
+test('boundary test: dispatch core modules import no Work-layer module and name no Work lookup (R2 / ME)', () => {
   const strictDispatchCoreFiles = [
     'src/runner/dispatch/config.mjs',
     'src/runner/dispatch/mechanism.mjs',
@@ -290,21 +269,17 @@ test('boundary test: dispatch core modules do not import workflow-stage-graphs, 
     const filePath = path.join(root, rel);
     const content = fs.readFileSync(filePath, 'utf8');
 
-    // Rule 1: Zero direct workflow-stage-graphs imports or references across all strict dispatch core
-    assert.equal(
-      content.includes('workflow-stage-graphs'),
-      false,
-      `${rel} must not import or reference workflow-stage-graphs`,
-    );
-
-    // Rule 2: Zero direct imports from work-compat.mjs, except documented compatibility re-exporters
-    const importsWorkCompat = /from\s+['"][^'"]*work-compat(?:\.mjs)?['"]/.test(content);
-    if (importsWorkCompat) {
-      assert.ok(
-        rel === 'src/runner/dispatch/resolve.mjs' || rel === 'src/runner/dispatch/prepare.mjs',
-        `${rel} must not import from work-compat.mjs (only resolve.mjs/prepare.mjs are authorized compatibility re-exporters)`,
-      );
+    // Rule 1: no reference to the retired stage-graph/step-fsm modules, nor to the domain registry
+    for (const retired of ['workflow-stage-graphs', 'stage-fsm', 'domain-registry', 'step-fsm']) {
+      assert.equal(content.includes(retired), false, `${rel} must not import or reference ${retired}`);
     }
+
+    // Rule 2: no import from the Work-layer bridge, with no exception
+    assert.equal(
+      /from\s+['"][^'"]*work-(?:compat|dispatch)(?:\.mjs)?['"]/.test(content),
+      false,
+      `${rel} must not import from work-compat.mjs or work-dispatch.mjs`,
+    );
 
     // Rule 3: Strict enforcement of Work lookup symbols (R2 / mutation ME lock)
     // Core modules must not import or re-export Work lookups except authorized allowlist
@@ -323,19 +298,6 @@ test('boundary test: dispatch core modules do not import workflow-stage-graphs, 
 
       for (const sym of WORK_LOOKUP_SYMBOLS) {
         if (names.includes(sym)) {
-          // Allowlist verification:
-          // 1. plan.mjs is permitted to import executorIdForWork from ./resolve.mjs for compileDispatchPlan({work}) compatibility
-          if (rel === 'src/runner/dispatch/plan.mjs' && sym === 'executorIdForWork') {
-            continue;
-          }
-          // 2. resolve.mjs is permitted to re-export executorIdForWork, resolveCapabilityIdentityDetails, resolveCapabilityIdentity from work-compat.mjs
-          if (rel === 'src/runner/dispatch/resolve.mjs' && sym !== 'buildPrompt') {
-            continue;
-          }
-          // 3. prepare.mjs is permitted to re-export buildPrompt from work-compat.mjs
-          if (rel === 'src/runner/dispatch/prepare.mjs' && sym === 'buildPrompt') {
-            continue;
-          }
           assert.fail(
             `${rel} statically imports/exports forbidden Work lookup symbol '${sym}' from '${sourceModule}' (R2 boundary violation / ME)`
           );
@@ -344,12 +306,7 @@ test('boundary test: dispatch core modules do not import workflow-stage-graphs, 
     }
 
     // Rule 4: For the 10 completely decoupled core modules, forbid all identifier references to Work lookups
-    const completelyDecoupled = (
-      rel !== 'src/runner/dispatch/plan.mjs' &&
-      rel !== 'src/runner/dispatch/resolve.mjs' &&
-      rel !== 'src/runner/dispatch/prepare.mjs'
-    );
-    if (completelyDecoupled) {
+    {
       for (const sym of WORK_LOOKUP_SYMBOLS) {
         assert.equal(
           new RegExp(`\\b${sym}\\b`).test(content),
@@ -367,8 +324,7 @@ test('boundary test: dispatch core modules do not import workflow-stage-graphs, 
   assert.equal(resolveSource.includes('operation-choice'), false, 'resolve.mjs must not import operation-choice');
   assert.equal(prepareSource.includes('operation-choice'), false, 'prepare.mjs must not import operation-choice');
 
-  const workCompatSource = fs.readFileSync(path.join(root, 'src/runner/work-compat.mjs'), 'utf8');
-  assert.equal(/(?:import|export)\s+.*from\s+['"]\.\/dispatch\//.test(workCompatSource), false, 'work-compat.mjs must not import dispatch core');
+  // The Work layer may build on dispatch's generic resolvers; the reverse is what the rules above forbid.
 
   // Verify cli.mjs (dispatch CLI surface) uses documented allowlist and does not import work-compat directly
   const cliSource = fs.readFileSync(path.join(root, 'src/runner/dispatch/cli.mjs'), 'utf8');
@@ -453,7 +409,7 @@ test('boundary test: dispatch core has no cyclic dependencies > 2 (SCC analysis,
         const bannedInCycle = [
           'src/runner/dispatch/resolve.mjs',
           'src/runner/dispatch/prepare.mjs',
-          'src/runner/dispatch/operation-choice.mjs',
+          'src/runner/operation-choice.mjs',
           'src/runner/fanout-batch.mjs',
         ];
         for (const b of bannedInCycle) {

@@ -26,7 +26,6 @@ const NEW_13 = [
 const MODULE_TRIP_CASES = [
   'src/runner/loop.mjs',       // prefix src/runner/
   'src/runner/merge.mjs',      // prefix src/runner/
-  'src/report/entropy.mjs',    // equals
   'src/evolve/candidates.mjs', // prefix src/evolve/
   'src/evolve/iron-law.mjs',   // prefix src/evolve/
   'bin/fgos.mjs',              // equals (whole entry file stands in for the evolve verb)
@@ -34,7 +33,7 @@ const MODULE_TRIP_CASES = [
   'src/state/status-fsm.mjs',  // equals (D14)
   'src/intake/risk-keywords.mjs', // equals (review-20260717-self-improve-base-workflow f1)
   'src/intake/classify.mjs',      // equals (review-20260717-self-improve-base-workflow f1)
-  'src/state/workflow-stage-graphs.mjs',        // equals (review-20260718-self-improve-loop f03)
+  'src/state/domain-registry.mjs',        // equals (review-20260718-self-improve-loop f03)
   'src/setup/bin-discovery.mjs',  // equals (Phase 10 tier-0 resolver R5)
 ];
 
@@ -187,18 +186,18 @@ test('classifyIronLaw always returns array shapes, never null/undefined', () => 
 
 // --- classify.mjs regression: HEAVY_KEYWORDS extraction must not change behavior ---
 
-test('classify still tiers every ORIGINAL 21 keyword as heavy (byte-identical regression)', () => {
+test('classify still sizes every ORIGINAL 21 keyword as heavy (byte-identical regression)', () => {
   for (const keyword of ORIGINAL_21) {
     const result = classify(`a request mentioning ${keyword} directly`);
-    assert.equal(result.tier, 'heavy', `"${keyword}" should tier heavy`);
+    assert.equal(result.size, 'heavy', `"${keyword}" should size heavy`);
     assert.equal(result.risk, 'heavy', `"${keyword}" should risk heavy`);
   }
 });
 
-test('classify newly tiers every keyword in the newly-added set as heavy (intended behavior change)', () => {
+test('classify newly sizes every keyword in the newly-added set as heavy (intended behavior change)', () => {
   for (const keyword of NEW_13) {
     const result = classify(`a request mentioning ${keyword} directly`);
-    assert.equal(result.tier, 'heavy', `"${keyword}" should tier heavy`);
+    assert.equal(result.size, 'heavy', `"${keyword}" should size heavy`);
     assert.equal(result.risk, 'heavy', `"${keyword}" should risk heavy`);
   }
 });
@@ -222,21 +221,21 @@ test('classifyIronLaw still matches "auth" as a standalone word', () => {
   assert.ok(result.matchedFlags.includes('auth'));
 });
 
-test('classify does not tier "authoring" text as heavy via the "auth" substring', () => {
+test('classify does not size "authoring" text as heavy via the "auth" substring', () => {
   const result = classify('does NOT duplicate fgos-exploring authoring logic');
-  assert.equal(result.tier, 'standard');
+  assert.equal(result.size, 'standard');
   assert.equal(result.risk, 'standard');
 });
 
-test('classify still tiers a standalone "auth" mention as heavy', () => {
+test('classify still sizes a standalone "auth" mention as heavy', () => {
   const result = classify('fix the auth flow');
-  assert.equal(result.tier, 'heavy');
+  assert.equal(result.size, 'heavy');
   assert.equal(result.risk, 'heavy');
 });
 
-test('classify still tiers a real Vietnamese diacritic keyword as heavy (word-boundary regression)', () => {
+test('classify still sizes a real Vietnamese diacritic keyword as heavy (word-boundary regression)', () => {
   const result = classify('phát hiện sự cố bảo mật nghiêm trọng');
-  assert.equal(result.tier, 'heavy');
+  assert.equal(result.size, 'heavy');
   assert.equal(result.risk, 'heavy');
 });
 
@@ -245,5 +244,5 @@ test('classify does not match a Vietnamese diacritic keyword lacking a real word
   // boundary character before 'b' or after 't' -- must not match, the same
   // way 'auth' must not match inside 'authoring'.
   const result = classify('xbảo mậty là một chuỗi test không liên quan');
-  assert.equal(result.tier, 'standard');
+  assert.equal(result.size, 'standard');
 });

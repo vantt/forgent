@@ -43,12 +43,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import {
-  DEFAULT_DOMAIN,
-  resolveDomainName,
-  operationsForStage,
-  resolveTaskSpecPath,
-} from '../../state/workflow-stage-graphs.mjs';
+import { resolveTaskSpecPath } from '../paths.mjs';
+
 import { RunnerConfigError } from './config.mjs';
 import {
   NORMALIZER_VERSION,
@@ -65,10 +61,7 @@ import {
 // Step 08 P04.2b: `resolveStrongerTier` is the SAME tier-strength
 // comparison `resolveAssignmentDispatchPolicy` itself uses to guarantee a
 // more-specific scope can only RAISE a tier requirement, never lower one
-// already established -- reused here (never re-implemented) so that
-// merging a domain harness's own `policy.minTier` against an agent's
-// `contract.policy.minTier` at build time follows the exact same
-// never-weaken invariant, rather than a second, competing merge rule.
+// never-weaken invariant.
 import { resolveStrongerTier } from './assignment-policy.mjs';
 import { resolveAndRenderOperationPrompt, TemplateResolutionError } from './operation-prompt-templates.mjs';
 
@@ -79,7 +72,7 @@ import { resolveAndRenderOperationPrompt, TemplateResolutionError } from './oper
 // empirically while building this block. So this discovers every domain's
 // own harness module that actually exists on disk, once, at module load,
 // entirely off filesystem enumeration -- mirroring
-// `workflow-stage-graphs.mjs`'s own `DOMAINS` registry
+// `domain-registry.mjs`'s own `DOMAINS` registry
 // (`loadDomainsFromDisk`, same module-load-time `readdirSync` rationale,
 // same file). The directory name loaded on each loop pass is always a
 // runtime value read off the filesystem, never a source-code literal, so
@@ -307,6 +300,7 @@ function buildDeclaredAssignment({
   workflow,
   stage,
   operation,
+  operations,
   objective,
   contextRefs = [],
   expectedOutputs = [],
@@ -325,16 +319,25 @@ function buildDeclaredAssignment({
     throw new RunnerConfigError('buildAssignment requires a non-empty operation id');
   }
 
-  const resolvedDomain = resolveDomainName(domain ?? work?.domain ?? DEFAULT_DOMAIN);
-  const resolvedWorkflow = workflow ?? work?.workflow ?? 'feature';
+  // The Work layer resolves the domain and the step's operations from the Workflow
+  // definition and hands them in; dispatch never looks a step up itself.
+  const resolvedDomain = typeof domain === 'string' && domain.trim() ? domain.trim() : null;
+  if (!resolvedDomain) {
+    throw new RunnerConfigError('buildAssignment requires a non-empty "domain" (the caller resolves it from the Work item)');
+  }
+  if (!Array.isArray(operations)) {
+    throw new RunnerConfigError(
+      'buildAssignment requires "operations": the legal operations of the step, resolved from its Workflow by the caller',
+    );
+  }
+  const resolvedWorkflow = workflow ?? work?.workflow ?? null;
   const resolvedWorkId = work?.id ?? workId ?? null;
 
-  const stageOps = operationsForStage(resolvedDomain, stage, { kind: resolvedWorkflow });
-  const matchedOp = stageOps.find((o) => o.id === operation);
+  const matchedOp = operations.find((o) => o.id === operation);
 
   if (!matchedOp) {
     throw new RunnerConfigError(
-      `unknown operation "${operation}" for stage "${stage}" in domain "${resolvedDomain}" (declared operations: [${stageOps.map((o) => o.id).join(', ')}])`,
+      `unknown operation "${operation}" for stage "${stage}" in domain "${resolvedDomain}" (declared operations: [${operations.map((o) => o.id).join(', ')}])`,
     );
   }
 
@@ -426,7 +429,7 @@ function buildDeclaredAssignment({
   // change any branch above (Step 02-06 golden behavior is unaffected).
   const stamped = stampDeclaredAssignment({ role: targetRole, operation: matchedOp.id });
   const provenanceValidators = Object.freeze([
-    'workflow-stage-graph-legality',
+    'workflow-step-legality',
     ...(options.allowSyntheticCompatibilityOperation ? [] : ['task-spec-existence']),
   ]);
 
@@ -434,7 +437,7 @@ function buildDeclaredAssignment({
     assignmentId,
     workId: resolvedWorkId,
     domain: resolvedDomain,
-    workflow: resolvedWorkflow,
+    ...(resolvedWorkflow ? { workflow: resolvedWorkflow } : {}),
     stage,
     operation: matchedOp.id,
     role: targetRole,
@@ -457,10 +460,11 @@ function buildDeclaredAssignment({
       validators: provenanceValidators,
       declared: Object.freeze({
         domain: resolvedDomain,
-        workflow: resolvedWorkflow,
+        ...(resolvedWorkflow ? { workflow: resolvedWorkflow } : {}),
         stage,
         operation: matchedOp.id,
         taskSpec: matchedOp.taskSpec,
+        legalOperations: Object.freeze(operations.map((o) => o.id)),
       }),
     }),
     mutation: stamped.mutation,
@@ -503,14 +507,14 @@ function buildInlineAssignment({ provenance, work, workId, createdBy, options = 
   // resolvable for this call, on a Work at a declared Stage -- a work
   // attached with its own `domain` field, or an explicit `options.domain`
   // supplied alongside that same attached work. A standalone inline call
-  // (no work, e.g. mission-lite's own shape) or a work with no `.stage`
+  // (no work, e.g. mission-lite's own shape) or a work with no `.workflowStep`
   // yet skips the seam entirely and passes on generic validation alone
   // (the `validateExecutionContract` call above) -- this is the actual
   // evidence the foundation boundary does not depend on any domain.
   // Deliberately NOT the declared path's `resolveDomainName(... ??
   // DEFAULT_DOMAIN)` silent fold: an inline Work with no explicit
   // `domain`/`options.domain` skips rather than assuming 'coding'.
-  const resolvedDomain = work?.stage ? (work.domain ?? options.domain) : undefined;
+  const resolvedDomain = work?.workflowStep ? (work.domain ?? options.domain) : undefined;
   // Seam enforcement -- including the ADR-007 §3 `contract.supports`
   // legality check below -- is per-domain opt-in, gated on that domain
   // actually having shipped a harness/enrich-and-validate-contract.mjs
@@ -574,7 +578,7 @@ function buildInlineAssignment({ provenance, work, workId, createdBy, options = 
     budget: frozenBudget,
     ...(contract.supports !== undefined ? { supports: contract.supports } : {}),
     ...(contract.contractTemplate !== undefined ? { contractTemplate: contract.contractTemplate } : {}),
-    // Step 08 P04.2b: the agent-declared `{minTier}` policy fragment, when
+    // the agent-declared policy fragment, when present
     // present -- recorded here so the persisted provenance always shows
     // exactly what the caller's own inline contract carried, same as every
     // other field in this snapshot.
@@ -628,26 +632,18 @@ function buildInlineAssignment({ provenance, work, workId, createdBy, options = 
       : {}),
   });
 
-  // Step 08 P04.2b: merge the domain harness's own `policy` (matchedOp.policy
-  // hints, set BEFORE this cell, see harnessPolicy above) with the agent's
-  // own `contract.policy.minTier` (this cell's new, exactly-one-field-wide
-  // addition) -- `contract.policy` is more specific (assignment/caller-level,
-  // same specificity class buildDeclaredAssignment's own caller-supplied
-  // `policy` param already outranks `matchedOp.policy` at), so every OTHER
-  // harnessPolicy field (persona/model/etc.) passes through unchanged, but
-  // `minTier` specifically is resolved via `resolveStrongerTier` rather than
-  // a flat override -- a caller's own inline contract must never be able to
-  // silently WEAKEN a tier floor the domain harness already established,
-  // mirroring resolveAssignmentDispatchPolicy's own never-weaken invariant
-  // for `minTier` at the resolve layer (assignment-policy.mjs).
-  const contractPolicyMinTier = contract.policy?.minTier;
+  // Merge the domain harness's own policy with the validated current
+  // contract.policy.tier. Retired persisted keys are normalized only while
+  // loading assignment.json, never on this new-contract path.
+  const contractPolicyTier = contract.policy?.tier;
   let mergedInlinePolicy = harnessPolicy;
-  if (contractPolicyMinTier !== undefined) {
+  if (contractPolicyTier !== undefined) {
+    const harnessTier = harnessPolicy?.tier;
     mergedInlinePolicy = Object.freeze({
       ...(harnessPolicy || {}),
-      minTier: harnessPolicy?.minTier
-        ? resolveStrongerTier(harnessPolicy.minTier, contractPolicyMinTier)
-        : contractPolicyMinTier,
+      tier: harnessTier
+        ? resolveStrongerTier(harnessTier, contractPolicyTier)
+        : contractPolicyTier,
     });
   }
 
@@ -676,6 +672,103 @@ function buildInlineAssignment({ provenance, work, workId, createdBy, options = 
   };
 
   return Object.freeze(assignment);
+}
+
+function parseSimplePersonaYaml(raw) {
+  try {
+    const result = { persona: {}, decision_boundary: { can_decide: [], must_escalate: [] } };
+    const lines = raw.split('\n');
+    let currentSection = null;
+    let currentSubSection = null;
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) continue;
+
+      const topMatch = line.match(/^([a-zA-Z0-9_-]+):\s*(.*)$/);
+      if (topMatch && !line.startsWith(' ') && !line.startsWith('\t')) {
+        const key = topMatch[1];
+        const val = topMatch[2].trim();
+        if (val) {
+          result[key] = val.replace(/^["'](.*)["']$/, '$1');
+          currentSection = null;
+          currentSubSection = null;
+        } else {
+          currentSection = key;
+          currentSubSection = null;
+        }
+        continue;
+      }
+
+      if (currentSection === 'persona') {
+        const pMatch = line.match(/^\s+([a-zA-Z0-9_-]+):\s*(.*)$/);
+        if (pMatch) {
+          result.persona[pMatch[1]] = pMatch[2].trim().replace(/^["'](.*)["']$/, '$1');
+        }
+      } else if (currentSection === 'decision_boundary') {
+        const dMatch = line.match(/^\s{2}([a-zA-Z0-9_-]+):\s*$/);
+        if (dMatch) {
+          currentSubSection = dMatch[1];
+        } else if (currentSubSection) {
+          const itemMatch = line.match(/^\s+-\s*(.*)$/);
+          if (itemMatch) {
+            if (!result.decision_boundary[currentSubSection]) {
+              result.decision_boundary[currentSubSection] = [];
+            }
+            result.decision_boundary[currentSubSection].push(itemMatch[1].trim());
+          }
+        }
+      }
+    }
+    return result;
+  } catch {
+    return null;
+  }
+}
+
+function renderPersonaSection(personaRef, options = {}) {
+  const root = options.repoRoot ?? options.cwd ?? process.cwd();
+  const personaFile = path.join(root, 'core', 'agents', `${personaRef}.yaml`);
+  let content = null;
+  if (fs.existsSync(personaFile)) {
+    const raw = fs.readFileSync(personaFile, 'utf8');
+    content = parseSimplePersonaYaml(raw);
+  }
+
+  const lines = [
+    '',
+    '# Persona',
+    `You are acting under the resolved persona "${personaRef}". Let this persona`,
+    'shape tone, emphasis, and judgment calls for this assignment, without',
+    'overriding the Role, Objective, or Constraints stated elsewhere in this prompt.',
+  ];
+
+  if (content && typeof content === 'object') {
+    if (content.description) {
+      lines.push(`Description: ${content.description}`);
+    }
+    if (content.persona && typeof content.persona === 'object') {
+      if (content.persona.voice) lines.push(`Voice: ${content.persona.voice}`);
+      if (content.persona.style) lines.push(`Style: ${content.persona.style}`);
+      if (content.persona.archetype) lines.push(`Archetype: ${content.persona.archetype}`);
+    }
+    if (content.decision_boundary && typeof content.decision_boundary === 'object') {
+      lines.push('', '## Decision Boundaries');
+      if (Array.isArray(content.decision_boundary.can_decide) && content.decision_boundary.can_decide.length > 0) {
+        lines.push('Can decide:');
+        for (const item of content.decision_boundary.can_decide) {
+          lines.push(`- ${item}`);
+        }
+      }
+      if (Array.isArray(content.decision_boundary.must_escalate) && content.decision_boundary.must_escalate.length > 0) {
+        lines.push('Must escalate:');
+        for (const item of content.decision_boundary.must_escalate) {
+          lines.push(`- ${item}`);
+        }
+      }
+    }
+  }
+
+  return lines;
 }
 
 /**
@@ -737,13 +830,7 @@ export function renderAssignmentPrompt(assignment, options = {}) {
 
   if (renderedTemplateResult) {
     if (personaRef) {
-      lines.push(
-        '',
-        '# Persona',
-        `You are acting under the resolved persona "${personaRef}". Let this persona`,
-        'shape tone, emphasis, and judgment calls for this assignment, without',
-        'overriding the Role, Objective, or Constraints stated elsewhere in this prompt.',
-      );
+      lines.push(...renderPersonaSection(personaRef, options));
     }
     lines.push('', renderedTemplateResult.renderedBody);
   } else {
@@ -755,13 +842,7 @@ export function renderAssignmentPrompt(assignment, options = {}) {
     );
 
     if (personaRef) {
-      lines.push(
-        '',
-        '# Persona',
-        `You are acting under the resolved persona "${personaRef}". Let this persona`,
-        'shape tone, emphasis, and judgment calls for this assignment, without',
-        'overriding the Role, Objective, or Constraints stated elsewhere in this prompt.',
-      );
+      lines.push(...renderPersonaSection(personaRef, options));
     }
 
     lines.push('Context refs:');
@@ -793,13 +874,16 @@ export function renderAssignmentPrompt(assignment, options = {}) {
   // status:"DONE"/"objection" and failed schema validation
   // (validateAgentResultClaim's own ALLOWED_AGENT_CLAIM_STATUSES, above),
   // then a second real attempt still landed `no-evidence` because
-  // classifyRunEvidence (assignment-runner.mjs) requires this same report
+  // the runner (assignment-runner.mjs) requires this same report
   // artifact for a read-only operation's "done" status to count as
   // evidenced -- a requirement this prompt never disclosed. Both facts are
   // now stated explicitly instead of discovered by two failed attempts.
   if (options.runDir) {
-    const agentResultPath = path.join(options.runDir, 'agent-result.json');
-    const agentReportPath = path.join(options.runDir, 'agent-report.md');
+    // The contract names where this worker may write (a sandboxed worker's
+    // claim lives under worker-output/outbox); the report sits beside it.
+    const agentResultPath = options.effectiveContract?.resultClaim?.path
+      ?? path.join(options.runDir, 'agent-result.json');
+    const agentReportPath = path.join(path.dirname(agentResultPath), 'agent-report.md');
     const readOnly = isReadOnlyAssignment(assignment);
     lines.push('Result artifact:');
     lines.push(`- Write structured JSON to ${agentResultPath}`);

@@ -15,7 +15,6 @@ import {
   addAdHocWorktree,
   addBareOrigin,
   addDiscovery,
-  addFriction,
   addGoalItem,
   addOk,
   addOutcome,
@@ -61,7 +60,7 @@ import {
   makeRunnerProposedLeafItem,
   makeSessionSafeRunnerItem,
   mkLocalDependency,
-  moveStage,
+  moveStep,
   moveWork,
   os,
   path,
@@ -142,7 +141,7 @@ test('add --domain synthetic persists work.domain and stamps stage "assembling" 
   assert.equal(result.status, 0);
   const item = stateView(cwd).work['synthetic-item'];
   assert.equal(item.domain, 'synthetic');
-  assert.equal(item.stage, 'assembling', 'per D1/D2 (add-stage-default-gap): add now stamps an entry stage explicitly; synthetic has no Clarify-mapped stage, so the same fallback that used to run lazily at read-time (domain.stages[0]) now runs at add-time instead, same resulting value');
+  assert.equal(item.workflowStep, 'assembling', 'per D1/D2 (add-stage-default-gap): add now stamps an entry stage explicitly; synthetic has no Clarify-mapped stage, so the same fallback that used to run lazily at read-time (domain.stages[0]) now runs at add-time instead, same resulting value');
   assert.deepEqual(envelopeData(run(cwd, ['ready']).stdout).map((w) => w.id), ['synthetic-item'], 'the item is stamped straight at its domain\'s one Execute-mapped stage ("assembling"), so it is already frontier-ready');
 });
 
@@ -170,24 +169,24 @@ test('add without --stage or --domain now defaults to stage "discovery" (was imp
   // specifically about the CLI's bare, flagless default.
   const result = run(cwd, ['add', 'default-stage-item', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
-  assert.equal(stateView(cwd).work['default-stage-item'].stage, 'discovery');
+  assert.equal(stateView(cwd).work['default-stage-item'].workflowStep, 'discovery');
   assert.deepEqual(envelopeData(run(cwd, ['ready']).stdout).map((w) => w.id), [], 'a stage-discovery item has no dependencies and no unfinished descendants, but is not stage-executing, so it must not appear in the frontier');
 });
 
 
-test('add --stage decompose explicitly persists that stage, exit 0', () => {
+test('add --step planning explicitly persists that step, exit 0', () => {
   const cwd = tmpCwdFromTemplate();
-  const result = run(cwd, ['add', 'stage-flag-decompose', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--stage', 'decompose', '--description', 'tsk-535 fixture description.']);
+  const result = run(cwd, ['add', 'stage-flag-decompose', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--step', 'planning', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
-  assert.equal(stateView(cwd).work['stage-flag-decompose'].stage, 'decompose');
+  assert.equal(stateView(cwd).work['stage-flag-decompose'].workflowStep, 'planning');
 });
 
 
 test('add --stage executing explicitly persists that stage and IS frontier-ready (opts back into pre-fix behavior), exit 0', () => {
   const cwd = tmpCwdFromTemplate();
-  const result = run(cwd, ['add', 'stage-flag-executing', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--stage', 'executing', '--description', 'tsk-535 fixture description.']);
+  const result = run(cwd, ['add', 'stage-flag-executing', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--step', 'executing', '--description', 'tsk-535 fixture description.']);
   assert.equal(result.status, 0);
-  assert.equal(stateView(cwd).work['stage-flag-executing'].stage, 'executing');
+  assert.equal(stateView(cwd).work['stage-flag-executing'].workflowStep, 'executing');
   assert.deepEqual(envelopeData(run(cwd, ['ready']).stdout).map((w) => w.id), ['stage-flag-executing']);
 });
 

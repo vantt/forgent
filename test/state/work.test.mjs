@@ -13,14 +13,14 @@ import {
   validateDuplicates,
   WorkValidationError,
   STATUSES,
-  TIERS,
-  STAGES,
+  SIZES,
+  RIGOR_VALUES,
   GOAL_TIERS,
   URGENCY_LEVELS,
   DEFAULTS,
   SCHEMA_VERSION,
 } from '../../src/state/work.mjs';
-import { DOMAINS, classificationVocabulary } from '../../src/state/workflow-stage-graphs.mjs';
+import { DOMAINS, classificationVocabulary } from '../../src/state/domain-registry.mjs';
 
 function mkRepoRoot() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-work-repo-'));
@@ -383,22 +383,42 @@ test('validateWork does not add supersededBy/duplicates to SCHEMA_VERSION or DEF
   assert.equal(Object.hasOwn(DEFAULTS, 'duplicates'), false);
 });
 
-test('validateWork accepts a work item missing tier (optional, defaulted by the caller per D7b)', () => {
+test('validateWork accepts a work item missing size (optional, defaulted by caller)', () => {
   const work = baseWork();
-  assert.equal(work.tier, undefined);
+  assert.equal(work.size, undefined);
   assert.doesNotThrow(() => validateWork(work));
 });
 
-test('validateWork accepts every tier in TIERS', () => {
-  for (const tier of TIERS) {
-    assert.doesNotThrow(() => validateWork(baseWork({ tier })));
+test('validateWork accepts every size in SIZES', () => {
+  for (const size of SIZES) {
+    assert.doesNotThrow(() => validateWork(baseWork({ size })));
   }
 });
 
-test('validateWork rejects a tier outside the TIERS domain', () => {
+test('validateWork rejects a size outside the SIZES domain', () => {
   assert.throws(
-    () => validateWork(baseWork({ tier: 'ultra-heavy' })),
-    (err) => err instanceof WorkValidationError && /tier/.test(err.message),
+    () => validateWork(baseWork({ size: 'ultra-heavy' })),
+    (err) => err instanceof WorkValidationError && /size/.test(err.message),
+  );
+});
+
+test('validateWork accepts every rigor in RIGOR_VALUES', () => {
+  for (const rigor of RIGOR_VALUES) {
+    assert.doesNotThrow(() => validateWork(baseWork({ rigor })));
+  }
+});
+
+test('validateWork rejects a rigor outside the RIGOR_VALUES domain', () => {
+  assert.throws(
+    () => validateWork(baseWork({ rigor: 'ultra-critical' })),
+    (err) => err instanceof WorkValidationError && /rigor/.test(err.message),
+  );
+});
+
+test('validateWork rejects legacy tier', () => {
+  assert.throws(
+    () => validateWork(baseWork({ tier: 'standard' })),
+    (err) => err instanceof WorkValidationError && /tier is retired/.test(err.message),
   );
 });
 
@@ -458,25 +478,32 @@ test('an untouched legacy kind/risk is grandfathered on edit, but a touched one 
   );
 });
 
-test('DEFAULTS.tier is itself a member of TIERS, and SCHEMA_VERSION is a positive integer', () => {
-  assert.ok(TIERS.includes(DEFAULTS.tier));
+test('DEFAULTS.size is itself a member of SIZES, and SCHEMA_VERSION is a positive integer', () => {
+  assert.ok(SIZES.includes(DEFAULTS.size));
   assert.ok(Number.isInteger(SCHEMA_VERSION) && SCHEMA_VERSION > 0);
 });
 
-test('STAGES: "clarify" is retired entirely (tsk-qod D1/D2) — "discovery" is stages[0], the domain\'s own entry point; "decompose" survives only as a legacy, drain-only alias (D18) ahead of "planning" (tsk-403 D11)', () => {
-  assert.deepEqual(STAGES, ['discovery', 'exploring', 'decompose', 'planning', 'executing']);
-});
+const CODING_STEPS = ['discovery', 'exploring', 'planning', 'executing'];
 
-test('validateWork accepts every stage in STAGES', () => {
-  for (const stage of STAGES) {
-    assert.doesNotThrow(() => validateWork(baseWork({ stage })));
+test('validateWork accepts every step the coding Workflow declares', () => {
+  for (const workflowStep of CODING_STEPS) {
+    assert.doesNotThrow(() => validateWork(baseWork({ workflowStep })));
   }
 });
 
-test('validateWork rejects a stage outside the STAGES domain', () => {
+test('validateWork rejects a step outside the domain\'s Workflow, including the retired "clarify" and "decompose" names', () => {
+  for (const workflowStep of ['bogus-step', 'clarify', 'decompose']) {
+    assert.throws(
+      () => validateWork(baseWork({ workflowStep })),
+      (err) => err instanceof WorkValidationError && /workflowStep/.test(err.message),
+    );
+  }
+});
+
+test('validateWork refuses a record that still carries the retired "stage" field', () => {
   assert.throws(
-    () => validateWork(baseWork({ stage: 'bogus-stage' })),
-    (err) => err instanceof WorkValidationError && /stage/.test(err.message),
+    () => validateWork(baseWork({ stage: 'executing' })),
+    (err) => err instanceof WorkValidationError && /work\.stage is retired/.test(err.message),
   );
 });
 
@@ -500,9 +527,9 @@ test('validateWork rejects a domain outside the DOMAINS registry', () => {
   );
 });
 
-test('validateWork accepts every stage in STAGES when domain is explicitly "coding" (same stage-enum as the default)', () => {
-  for (const stage of STAGES) {
-    assert.doesNotThrow(() => validateWork(baseWork({ domain: 'coding', stage })));
+test('validateWork accepts every coding step when domain is explicitly "coding" (same step set as the default)', () => {
+  for (const workflowStep of CODING_STEPS) {
+    assert.doesNotThrow(() => validateWork(baseWork({ domain: 'coding', workflowStep })));
   }
 });
 
@@ -938,7 +965,7 @@ test('validateWorkShape rejects a holder outside coding\'s declared roles', () =
 
 test('validateWorkShape rejects any holder on a domain with no roleGraph (synthetic)', () => {
   assert.throws(
-    () => validateWorkShape(baseWork({ domain: 'synthetic', stage: 'assembling', holder: 'implementer' })),
+    () => validateWorkShape(baseWork({ domain: 'synthetic', workflowStep: 'assembling', holder: 'implementer' })),
     WorkValidationError,
   );
 });

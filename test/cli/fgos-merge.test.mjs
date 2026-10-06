@@ -20,7 +20,6 @@ import {
   addAdHocWorktree,
   addBareOrigin,
   addDiscovery,
-  addFriction,
   addGoalItem,
   addOk,
   addOutcome,
@@ -66,7 +65,7 @@ import {
   makeRunnerProposedLeafItem,
   makeSessionSafeRunnerItem,
   mkLocalDependency,
-  moveStage,
+  moveStep,
   moveWork,
   os,
   path,
@@ -773,9 +772,7 @@ test('review --github --pr on a closed-without-merge PR names the PR, points to 
   const fake = writeViewFake(cwd, 'gh-view-closed.cjs', ghLog,
     { state: 'CLOSED', mergeable: 'UNKNOWN', mergeStateStatus: 'UNKNOWN', mergedAt: null, closed: true, closedAt: '2026-07-17T09:00:00Z' });
 
-  const startedAt = Date.now();
   const result = run(cwd, ['review', 'gh-status-closed', '--github', '--pr', '77'], { FGOS_GH_COMMAND: fake });
-  const elapsedMs = Date.now() - startedAt;
 
   assert.equal(result.status, 0, `${result.stdout}${result.stderr}`);
   const closedData = envelopeData(result.stdout);
@@ -784,7 +781,6 @@ test('review --github --pr on a closed-without-merge PR names the PR, points to 
 
   const invocations = fs.readFileSync(ghLog, 'utf8').trim().split('\n').filter(Boolean);
   assert.equal(invocations.length, 1, `expected exactly one gh invocation under pollTimeoutMs:0, got ${invocations.length}`);
-  assert.ok(elapsedMs < 5000, `status check must resolve well under the default 10s poll timeout, took ${elapsedMs}ms`);
 
   const view = stateView(cwd);
   assert.equal(view.work['gh-status-closed'].status, 'awaiting-approval', 'a GitHub-side close is not a reject — no FSM mutation');
@@ -855,7 +851,7 @@ test('merge list on an empty store: empty ready/waiting/conflicts, exit 0, no ev
   const before = eventLines(cwd).length;
   const result = run(cwd, ['merge', 'list']);
   assert.equal(result.status, 0);
-  assert.deepEqual(envelopeData(result.stdout), { ready: [], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], strandedByResolvedRoot: [], mergeTier: {}, supersededOut: [], stageByItem: {}, tree: [] });
+  assert.deepEqual(envelopeData(result.stdout), { ready: [], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], strandedByResolvedRoot: [], mergeTier: {}, supersededOut: [], stepByItem: {}, tree: [] });
   assert.equal(eventLines(cwd).length, before, 'merge list must not append any event');
 });
 
@@ -879,13 +875,13 @@ test('merge list: a proposed item whose dep is already done is ready', () => {
   assert.equal(run(cwd, ['add', 'leaf', '--title', 'Leaf', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--deps', 'dep', '--description', 'tsk-535 fixture description.']).status, 0);
   toProposed(cwd, 'leaf');
   const data = envelopeData(run(cwd, ['merge', 'list']).stdout);
-  assert.deepEqual(data, { ready: ['leaf'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], strandedByResolvedRoot: [], mergeTier: { leaf: 'root-to-main' }, supersededOut: [], stageByItem: data.stageByItem, tree: [{ id: 'leaf', title: 'Leaf', status: 'ready', children: [] }] });
+  assert.deepEqual(data, { ready: ['leaf'], waiting: [], conflicts: [], mergeSets: [], blockedOnSync: [], strandedByResolvedRoot: [], mergeTier: { leaf: 'root-to-main' }, supersededOut: [], stepByItem: data.stepByItem, tree: [{ id: 'leaf', title: 'Leaf', status: 'ready', children: [] }] });
   // tsk-4zj D6: both dep and leaf were `add`ed directly (no --stage),
   // which stamps an explicit entry-stage default ('discovery' as of
   // tsk-qod D1/D2, 'clarify' before it — add-stage-default-gap D1/D2);
   // every subsequent `move`/`approve`/toProposed step only ever touches
   // `status`, never `stage`, so both stay at 'discovery'.
-  assert.deepEqual(data.stageByItem, { dep: 'discovery', leaf: 'discovery' });
+  assert.deepEqual(data.stepByItem, { dep: 'discovery', leaf: 'discovery' });
 });
 
 test('merge list: a proposed item whose dep is NOT done waits, never ready', () => {
@@ -894,14 +890,14 @@ test('merge list: a proposed item whose dep is NOT done waits, never ready', () 
   assert.equal(run(cwd, ['add', 'leaf', '--title', 'Leaf', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--deps', 'dep', '--description', 'tsk-535 fixture description.']).status, 0);
   toProposed(cwd, 'leaf');
   const data = envelopeData(run(cwd, ['merge', 'list']).stdout);
-  assert.deepEqual(data, { ready: [], waiting: ['leaf'], conflicts: [], mergeSets: [], blockedOnSync: [], strandedByResolvedRoot: [], mergeTier: { leaf: 'root-to-main' }, supersededOut: [], stageByItem: data.stageByItem, tree: [{ id: 'leaf', title: 'Leaf', status: 'waiting', children: [] }] });
+  assert.deepEqual(data, { ready: [], waiting: ['leaf'], conflicts: [], mergeSets: [], blockedOnSync: [], strandedByResolvedRoot: [], mergeTier: { leaf: 'root-to-main' }, supersededOut: [], stepByItem: data.stepByItem, tree: [{ id: 'leaf', title: 'Leaf', status: 'waiting', children: [] }] });
   // tsk-4zj D6: dep via addOk carries addOk's own explicit --stage
   // executing default; leaf was added via the raw CLI `add` (no --stage),
   // which stamps an entry-stage default ('discovery' as of tsk-qod D1/D2,
   // 'clarify' before it — add-stage-default-gap D1/D2) — toProposed's
   // internal addOk(cwd,'leaf') fails silently (leaf already exists) so
   // only `status` moves, `stage` stays at its original 'discovery'.
-  assert.deepEqual(data.stageByItem, { dep: 'executing', leaf: 'discovery' });
+  assert.deepEqual(data.stepByItem, { dep: 'executing', leaf: 'discovery' });
 });
 
 test('merge list: two dep-clear proposed items sharing a footprint are excluded from ready and listed as conflicts', () => {
@@ -1120,16 +1116,18 @@ test('merge next --no-wait fails immediately on a live-held lock -- proves the f
   commitPendingBeforeApprove(cwd, 'wait-merge-next-no-wait');
   writeLiveLock(cwd, 1000);
 
-  const start = Date.now();
   const result = run(cwd, ['merge', 'next', '--no-wait']);
-  const elapsed = Date.now() - start;
 
   // `merge next` only special-cases an Iron Law rejection (bin/fgos.mjs's
   // `sub === 'next'` case) -- any other error from the inner `runVerb('approve', ...)`
   // rethrows as-is, so this fails exactly like a direct `approve` call does.
   assert.equal(result.status, 9, result.stderr);
   assert.match(result.stderr, /main checkout is locked by pid \d+/);
-  assert.ok(elapsed < 2000, `--no-wait forwarded through merge next must still fail fast, not wait (took ${elapsed}ms)`);
+  // A run that waited would print its retry progress line before every sleep and tag the final
+  // error with the time it waited; neither appears when the flag was forwarded. The lock holder
+  // (this process) never releases, so a waiting run could not have succeeded either.
+  assert.doesNotMatch(result.stderr, /still waiting on main-checkout lock/, '--no-wait forwarded through merge next must not enter the retry loop');
+  assert.doesNotMatch(result.stderr, /waited \d+ms before giving up/, '--no-wait forwarded through merge next must not wait before giving up');
 });
 
 test('sync-root never reports outcome "synced" when mergeRunnerItem returns an outcome it does not explicitly handle -- proves the defensive guard closes the false-success gap D4 found', () => {

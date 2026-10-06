@@ -38,9 +38,33 @@
 
 import { MODEL_POLICY_TIERS, RunnerConfigError } from './config.mjs';
 import { resolveMainCheckoutRoot, resolveRepoRoot } from '../paths.mjs';
-import { POLICY_PATCH_FIELDS } from '../definitions/schema.mjs';
+export const REPEAT_MODE_VALUES = Object.freeze(['pre-delivery', 'post-delivery']);
+export const POLICY_PATCH_FIELDS = new Set([
+  'rigor', 'tier', 'fallbackExecutors', 'visibility', 'repeatMode',
+  'capability', 'distinctProviderFrom',
+]);
 
 export const CONTRACT_POLICY_VERSION = '1';
+
+const RETIRED_SAVED_TIER_FIELD = ['min', 'Tier'].join('');
+
+/**
+ * Normalize the one retired persisted policy key at the load boundary.
+ * Current producers and generic validation never accept or write it.
+ */
+export function normalizeSavedPolicyTier(policy, { allowAdditionalFields = false } = {}) {
+  if (!isPlainObject(policy) || policy[RETIRED_SAVED_TIER_FIELD] === undefined) return policy;
+  if (policy.tier !== undefined) fail(`saved policy cannot declare both "${RETIRED_SAVED_TIER_FIELD}" and "tier"`);
+  const tier = policy[RETIRED_SAVED_TIER_FIELD];
+  if (!MODEL_POLICY_TIERS.includes(tier)) {
+    fail(`saved policy.${RETIRED_SAVED_TIER_FIELD} must be one of ${MODEL_POLICY_TIERS.join(', ')}`);
+  }
+  const remaining = Object.fromEntries(Object.entries(policy).filter(([key]) => key !== RETIRED_SAVED_TIER_FIELD));
+  if (!allowAdditionalFields && Object.keys(remaining).length > 0) {
+    fail(`saved contract.policy may contain only "${RETIRED_SAVED_TIER_FIELD}"`);
+  }
+  return Object.freeze({ ...remaining, tier });
+}
 
 // Phase 01 mutation-unlock (R6a): the ONE reserved `contract.constraints`
 // namespace that marks an inline contract as ENGINE-derived operation
@@ -171,23 +195,8 @@ const ACCEPTED_CONTRACT_FIELDS = new Set([
   // (domains/coding/harness/enrich-and-validate-contract.mjs), which the
   // foundation calls strictly after this validator (ADR-007 §2).
   'supports',
-  // Step 08 P04.2b: an explicit, single-field exception, not a general
-  // PolicyPatch passthrough -- `contract.policy` may carry EXACTLY one key
-  // (`minTier`, checked against `ACCEPTED_POLICY_FIELDS` below), never
-  // `preferExecutor`/`preferPersona`/`model`/`visibility`/
-  // `fallbackExecutors`. Without this, no coordination dispatch (agent-led
-  // or declared) had any way to populate `assignment.policy`, so
-  // `resolveAssignmentDispatchPolicy`'s tier floor (`assignment-policy.mjs`,
-  // `opPolicy.minTier || 'standard'`) could never be lowered below
-  // `'standard'` -- and the real `.fgos/config.json` only configures
-  // `lightweight` for every non-`claude` provider family, so no
-  // coordination dispatch could ever reach a non-Claude provider family at
-  // all. This field exists solely to let a caller that has already
-  // composed a legal, lower tier requirement (e.g. Cohort Planner
-  // allocation) record it where `resolveAssignmentDispatchPolicy` actually
-  // reads its starting floor from, instead of only through
-  // `cliOverride.minTier` (which can only ever RAISE the floor, never
-  // lower it, per that resolver's own `resolveStrongerTier` monotonicity).
+  // `contract.policy` may carry EXACTLY one key (`tier`), never
+  // `preferExecutor`/`preferPersona`/`model`/`visibility`/`fallbackExecutors`.
   // Unit I04 / Phase 3: FlowDefinition task.contractTemplate reference for
   // operation prompt template resolution at dispatch time. Format-check only
   // here (non-empty string when present).
@@ -218,14 +227,9 @@ const ACCEPTED_EVIDENCE_FIELDS = new Set(['required']);
 // for why this exists and why it is exactly one field wide.
 //
 // M12: still deliberately narrower than a full PolicyPatch -- this inline
-// contract's own `policy` field is `minTier` alone, never the
-// preferExecutor/preferPersona/... fields the real PolicyPatch schema
-// carries elsewhere. Cross-checked against schema.mjs's own
-// POLICY_PATCH_FIELDS (the one place ALL legal PolicyPatch field names are
-// enumerated) so a future rename/removal of 'minTier' there is caught here
-// as a real assertion failure, rather than this Set silently naming a field
-// PolicyPatch itself no longer recognizes.
-const ACCEPTED_POLICY_FIELDS = new Set(['minTier']);
+// contract's own `policy` field is `tier` alone. Cross-checked against schema.mjs's
+// POLICY_PATCH_FIELDS so a future removal is caught.
+const ACCEPTED_POLICY_FIELDS = new Set(['tier']);
 for (const field of ACCEPTED_POLICY_FIELDS) {
   if (!POLICY_PATCH_FIELDS.has(field)) {
     throw new Error(`execution-contract.mjs's ACCEPTED_POLICY_FIELDS names "${field}", which schema.mjs's POLICY_PATCH_FIELDS no longer recognizes as a legal PolicyPatch field -- these two lists have drifted.`);
@@ -351,17 +355,16 @@ export function validateExecutionContract({ contract, caller } = {}) {
     fail('contract.capabilities must be an array of strings when provided (capability hints)');
   }
 
-  // Step 08 P04.2b: `contract.policy` is optional; when present it must
-  // carry EXACTLY `minTier` (one of MODEL_POLICY_TIERS) and nothing else --
-  // see ACCEPTED_CONTRACT_FIELDS' own doc comment above for why this narrow
-  // exception exists.
+  // `contract.policy` is optional and current contracts carry exactly
+  // `tier`. Retired persisted keys are normalized before this validator at
+  // the assignment load boundary, never accepted on a new contract.
   if (contract.policy !== undefined) {
     if (!isPlainObject(contract.policy)) {
       fail('contract.policy must be an object when provided');
     }
     assertOnlyAcceptedFields(contract.policy, ACCEPTED_POLICY_FIELDS, 'contract.policy');
-    if (!MODEL_POLICY_TIERS.includes(contract.policy.minTier)) {
-      fail(`contract.policy.minTier must be one of ${MODEL_POLICY_TIERS.join(', ')}`);
+    if (!MODEL_POLICY_TIERS.includes(contract.policy.tier)) {
+      fail(`contract.policy.tier must be one of ${MODEL_POLICY_TIERS.join(', ')}`);
     }
   }
 

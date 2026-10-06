@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { deriveTitle, classify, generateId } from '../../src/intake/classify.mjs';
 import { MAX_TITLE_LENGTH } from '../../src/state/work.mjs';
-import { DOMAINS, classificationVocabulary } from '../../src/state/workflow-stage-graphs.mjs';
+import { DOMAINS, classificationVocabulary } from '../../src/state/domain-registry.mjs';
 
 // Mirrors work.mjs's (unexported) ID_PATTERN: kebab-case, letter-start.
 const ID_PATTERN = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
@@ -81,30 +81,30 @@ test('classify never throws, even for empty or non-string input', () => {
   for (const input of ['', '   ', undefined, null, 123, {}]) {
     assert.doesNotThrow(() => classify(input));
     const result = classify(input);
-    assert.equal(typeof result.tier, 'string');
+    assert.equal(typeof result.size, 'string');
     assert.equal(typeof result.kind, 'string');
     assert.equal(typeof result.risk, 'string');
   }
 });
 
-test('classify falls back to tier "standard" when no keyword matches', () => {
+test('classify falls back to size "standard" when no keyword matches', () => {
   const result = classify('a perfectly ordinary request with no special words');
-  assert.equal(result.tier, 'standard');
+  assert.equal(result.size, 'standard');
 });
 
-test('classify detects a heavy-tier keyword', () => {
+test('classify detects a heavy-size keyword', () => {
   const result = classify('need to run a database migration touching the schema');
-  assert.equal(result.tier, 'heavy');
+  assert.equal(result.size, 'heavy');
 });
 
-test('classify detects a light-tier keyword', () => {
+test('classify detects a light-size keyword', () => {
   const result = classify('fix a typo in the readme');
-  assert.equal(result.tier, 'light');
+  assert.equal(result.size, 'light');
 });
 
 test('classify prefers heavy over light when both kinds of keyword are present', () => {
   const result = classify('fix a typo, but it touches the security auth flow');
-  assert.equal(result.tier, 'heavy');
+  assert.equal(result.size, 'heavy');
 });
 
 test('classify falls back to kind "task" when no kind keyword matches', () => {
@@ -120,11 +120,11 @@ test('classify infers kind "feature" from a feature keyword', () => {
   assert.equal(classify('add a new feature for exporting reports').kind, 'feature');
 });
 
-test('classify sets risk to mirror the tier signal', () => {
+test('classify sets risk to mirror the size signal', () => {
   const heavy = classify('run a production migration');
-  assert.equal(heavy.risk, heavy.tier);
+  assert.equal(heavy.risk, heavy.size);
   const standard = classify('an ordinary request');
-  assert.equal(standard.risk, standard.tier);
+  assert.equal(standard.risk, standard.size);
 });
 
 // The verb feeds addWork directly, so anything classify() can emit has to be

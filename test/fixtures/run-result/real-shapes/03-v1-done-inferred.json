@@ -1,0 +1,142 @@
+{
+  "runId": "run_asgn_claude_lead_code_panel_multicell_facade_op_001_01",
+  "assignmentId": "asgn_claude_lead_code_panel_multicell_facade_op_001",
+  "workId": null,
+  "controlEpoch": 1,
+  "controlToken": "f52be1ee-36da-4e7e-9ead-607edac77410",
+  "executorId": "agy-cli",
+  "policy": {
+    "role": "doer",
+    "persona": "focused-code-implementer",
+    "executorPreference": [
+      "agy-cli"
+    ],
+    "executorId": "agy-cli",
+    "providerModel": "gemini",
+    "tier": "standard",
+    "model": "gemini-3.8-flash-medium",
+    "visibility": "headless",
+    "repeatMode": null,
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "agy-cli",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "provider": {
+        "value": "gemini",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "agy-cli"
+        }
+      },
+      "model": {
+        "value": "gemini-3.8-flash-medium",
+        "source": {
+          "scope": "runnerConfig",
+          "id": "gemini.standard"
+        }
+      },
+      "tier": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "persona": {
+        "value": "focused-code-implementer",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "repeatMode": {
+        "value": null,
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "asgn_claude_lead_code_panel_multicell_facade_op_001"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "gemini"
+        }
+      }
+    }
+  },
+  "executorRedirected": false,
+  "settleReports": [],
+  "status": "done",
+  "confidence": "inferred",
+  "runtime": {
+    "exitCode": 0,
+    "stdoutLog": ".fgos/assignments/asgn_claude_lead_code_panel_multicell_facade_op_001/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/asgn_claude_lead_code_panel_multicell_facade_op_001/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "status": "done",
+    "summary": "Settled"
+  },
+  "evidence": {
+    "gitBefore": "45569ac3379445e93436524c1226159b3869265c",
+    "gitAfter": "45569ac3379445e93436524c1226159b3869265c",
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [
+      "docs/architect/agent-coordination/verification/code-panel-multicell-facade/current-cell.md",
+      "docs/architect/agent-coordination/verification/code-panel-multicell-facade/index.md",
+      "docs/architect/agent-coordination/verification/code-panel-multicell-facade/proofs/baseline/paused-plans-inventory.md",
+      "docs/architect/agent-coordination/verification/code-panel-multicell-facade/proofs/baseline/terminal-close-tsk-1bh-proof.txt",
+      "docs/architect/agent-coordination/verification/code-panel-multicell-facade/proofs/baseline/test-run-counts-baseline.md",
+      "plans/260915-0455-test-suite-feedback-cost/decision-lock.md",
+      "plans/260915-0455-test-suite-feedback-cost/phase-00-harness-writer-hermeticity.md",
+      "plans/260915-0455-test-suite-feedback-cost/phase-01-portable-test-runner-ci.md",
+      "plans/260915-0455-test-suite-feedback-cost/phase-02-green-baseline-and-profile.md",
+      "plans/260915-0455-test-suite-feedback-cost/phase-03-docs-index-pilot.md",
+      "plans/260915-0455-test-suite-feedback-cost/phase-04-external-claude-isolation-pilot.md",
+      "plans/260915-0455-test-suite-feedback-cost/phase-05-related-test-selector-pilot.md",
+      "plans/260915-0455-test-suite-feedback-cost/phase-06-cli-fixture-init-pilot.md",
+      "plans/260915-0455-test-suite-feedback-cost/phase-07-cli-harness-responsibility-audit.md",
+      "plans/260915-0455-test-suite-feedback-cost/phase-08-evidence-decision-and-handoff.md",
+      "plans/260915-0455-test-suite-feedback-cost/plan.md",
+      "plans/260915-code-panel-multicell-facade/phase-00-contract-and-baseline.md",
+      "plans/260915-code-panel-multicell-facade/phase-01-two-mode-facade.md",
+      "plans/260915-code-panel-multicell-facade/phase-02-coding-test-policy-overlay.md",
+      "plans/260915-code-panel-multicell-facade/phase-03-resume-and-compatibility.md",
+      "plans/260915-code-panel-multicell-facade/phase-04-live-proof-and-rollout.md",
+      "plans/260915-code-panel-multicell-facade/plan.md",
+      "plans/260915-executor-policy-dispatch-seams/design.md",
+      "plans/260915-executor-policy-dispatch-seams/phase-00-baseline-snapshot.md",
+      "plans/260915-executor-policy-dispatch-seams/phase-01-provider-adapter-shadow.md",
+      "plans/260915-executor-policy-dispatch-seams/phase-02-persona-prompt-envelope.md",
+      "plans/260915-executor-policy-dispatch-seams/phase-03-effort-and-alias-seam.md",
+      "plans/260915-executor-policy-dispatch-seams/phase-04-quality-bridge.md",
+      "plans/260915-executor-policy-dispatch-seams/phase-05-placement-policy-shadow.md",
+      "plans/260915-executor-policy-dispatch-seams/phase-06-executor-profile-invocations.md",
+      "plans/260915-executor-policy-dispatch-seams/plan.md"
+    ],
+    "mutatedDirtyBeforeFiles": [],
+    "artifacts": [],
+    "tests": []
+  }
+}

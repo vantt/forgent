@@ -21,7 +21,7 @@ import { execFileSync } from 'node:child_process';
 import {
   listWork,
   moveWork,
-  addFriction,
+  recordFriction,
   assertAcceptanceEvidence,
   assertPlanEvidence,
   StoreError,
@@ -392,7 +392,7 @@ export async function approveUseCase(
         const targetBranch = rootId !== id ? branchNameFor(rootId) : detectTrunk(repoRoot);
         const conflict = moveBlockedOrConflict(dir, { id, reason: attestation.reason, role: 'system' });
         if (conflict) return conflict;
-        addFriction(dir, {
+        recordFriction(dir, {
           id,
           disposition: 'blocked',
           errorClass: attestation.reason,
@@ -487,7 +487,7 @@ export async function approveUseCase(
           if (catchupResult.outcome === 'conflict') {
             const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-conflict', role: 'system' });
             if (conflict) return conflict;
-            addFriction(dir, {
+            recordFriction(dir, {
               id,
               disposition: 'blocked',
               errorClass: 'merge-conflict',
@@ -500,7 +500,7 @@ export async function approveUseCase(
           if (catchupResult.outcome === 'merge-refused') {
             const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-failed-unclassified', role: 'system' });
             if (conflict) return conflict;
-            addFriction(dir, {
+            recordFriction(dir, {
               id,
               disposition: 'blocked',
               errorClass: 'merge-fail',
@@ -514,7 +514,7 @@ export async function approveUseCase(
             const mergeReason = catchupResult.timedOut ? 'verify-timeout-post-merge' : 'verify-fail-post-merge';
             const conflict = moveBlockedOrConflict(dir, { id, reason: mergeReason, role: 'system' });
             if (conflict) return conflict;
-            addFriction(dir, {
+            recordFriction(dir, {
               id,
               disposition: 'blocked',
               errorClass: catchupResult.timedOut ? 'verify-timeout' : 'verify-miss',
@@ -545,7 +545,7 @@ export async function approveUseCase(
         if (result.outcome === 'conflict') {
           const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-conflict', role: 'system' });
           if (conflict) return conflict;
-          addFriction(dir, {
+          recordFriction(dir, {
             id,
             disposition: 'blocked',
             errorClass: 'merge-conflict',
@@ -565,7 +565,7 @@ export async function approveUseCase(
           // 'merge-conflict' detail string.
           const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-failed-unclassified', role: 'system' });
           if (conflict) return conflict;
-          addFriction(dir, {
+          recordFriction(dir, {
             id,
             disposition: 'blocked',
             errorClass: 'merge-failed-unclassified',
@@ -585,7 +585,7 @@ export async function approveUseCase(
           // merge state (if any) is exactly as this call found it.
           const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-blocked-other-item', role: 'system' });
           if (conflict) return conflict;
-          addFriction(dir, {
+          recordFriction(dir, {
             id,
             disposition: 'blocked',
             errorClass: 'merge-blocked-other-item',
@@ -602,7 +602,7 @@ export async function approveUseCase(
           // preserving the new lock holder's tree state intact.
           const conflict = moveBlockedOrConflict(dir, { id, reason: 'lock-lost-mid-merge', role: 'system' });
           if (conflict) return conflict;
-          addFriction(dir, {
+          recordFriction(dir, {
             id,
             disposition: 'blocked',
             errorClass: 'lock-lost-mid-merge',
@@ -616,7 +616,7 @@ export async function approveUseCase(
         if (result.outcome === 'fgos-write-rejected') {
           const conflict = moveBlockedOrConflict(dir, { id, reason: 'fgos-write-rejected', role: 'system' });
           if (conflict) return conflict;
-          addFriction(dir, {
+          recordFriction(dir, {
             id,
             disposition: 'blocked',
             errorClass: 'fgos-write-blocked',
@@ -634,7 +634,7 @@ export async function approveUseCase(
           const mergeReason = result.check.timedOut ? 'verify-timeout-post-merge' : 'verify-fail-post-merge';
           const conflict = moveBlockedOrConflict(dir, { id, reason: mergeReason, role: 'system' });
           if (conflict) return conflict;
-          addFriction(dir, {
+          recordFriction(dir, {
             id,
             disposition: 'blocked',
             errorClass: result.check.timedOut ? 'verify-timeout' : 'verify-miss',
@@ -739,7 +739,7 @@ export async function approveUseCase(
         : `git merge --no-commit --no-ff ${result.branch} conflicted; merge aborted, main unchanged`;
       const conflict = moveBlockedOrConflict(dir, { id, reason, role: 'system' });
       if (conflict) return conflict;
-      addFriction(dir, {
+      recordFriction(dir, {
         id,
         disposition: 'blocked',
         errorClass: 'merge-conflict',
@@ -761,7 +761,7 @@ export async function approveUseCase(
         : `git merge --no-commit --no-ff ${result.branch} failed without a real conflict (exit ${result.error.status}): ${result.error.stderr || result.error.message}; merge aborted, main unchanged`;
       const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-failed-unclassified', role: 'system' });
       if (conflict) return conflict;
-      addFriction(dir, {
+      recordFriction(dir, {
         id,
         disposition: 'blocked',
         errorClass: 'merge-failed-unclassified',
@@ -784,7 +784,7 @@ export async function approveUseCase(
         : `main checkout already has a MERGE_HEAD from another item's in-progress merge; merge of ${result.branch} was never attempted`;
       const conflict = moveBlockedOrConflict(dir, { id, reason: 'merge-blocked-other-item', role: 'system' });
       if (conflict) return conflict;
-      addFriction(dir, {
+      recordFriction(dir, {
         id,
         disposition: 'blocked',
         errorClass: 'merge-blocked-other-item',
@@ -803,7 +803,7 @@ export async function approveUseCase(
         : `main checkout lock was lost mid-merge; merge of ${result.branch} was stopped before commit`;
       const conflict = moveBlockedOrConflict(dir, { id, reason: 'lock-lost-mid-merge', role: 'system' });
       if (conflict) return conflict;
-      addFriction(dir, {
+      recordFriction(dir, {
         id,
         disposition: 'blocked',
         errorClass: 'lock-lost-mid-merge',
@@ -826,7 +826,7 @@ export async function approveUseCase(
         : `a path in this item's own file set was dirtied on the main checkout between the pre-merge check and the land step; merge of ${result.branch} was stopped before update-ref`;
       const conflict = moveBlockedOrConflict(dir, { id, reason: 'main-checkout-dirty-mid-merge', role: 'system' });
       if (conflict) return conflict;
-      addFriction(dir, {
+      recordFriction(dir, {
         id,
         disposition: 'blocked',
         errorClass: 'main-checkout-dirty-mid-merge',
@@ -840,7 +840,7 @@ export async function approveUseCase(
     if (result.outcome === 'fgos-write-rejected') {
       const conflict = moveBlockedOrConflict(dir, { id, reason: 'fgos-write-rejected', role: 'system' });
       if (conflict) return conflict;
-      addFriction(dir, {
+      recordFriction(dir, {
         id,
         disposition: 'blocked',
         errorClass: 'fgos-write-blocked',
@@ -863,7 +863,7 @@ export async function approveUseCase(
           : `goal-check failed on staged merge (exit ${result.check.status}); merge aborted, main unchanged`;
       const conflict = moveBlockedOrConflict(dir, { id, reason, role: 'system' });
       if (conflict) return conflict;
-      addFriction(dir, {
+      recordFriction(dir, {
         id,
         disposition: 'blocked',
         errorClass: result.check.timedOut ? 'verify-timeout' : 'verify-miss',
@@ -920,7 +920,7 @@ export async function approveUseCase(
     // not proof the item's verify failed.
     const conflict = moveBlockedOrConflict(dir, { id, reason: check.timedOut ? 'verify-timeout' : 'verify-fail', role: 'system' });
     if (conflict) return conflict;
-    addFriction(dir, {
+    recordFriction(dir, {
       id,
       disposition: 'blocked',
       errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss',

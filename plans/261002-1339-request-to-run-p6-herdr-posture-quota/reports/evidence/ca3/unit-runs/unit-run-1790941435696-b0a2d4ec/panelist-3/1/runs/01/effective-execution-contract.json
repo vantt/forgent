@@ -1,0 +1,81 @@
+{
+  "contract": {
+    "id": "effective-execution-contract",
+    "version": 1
+  },
+  "assignmentId": "unit-run-1790941435696-b0a2d4ec/panelist-3/1",
+  "runId": "run_unit-run-1790941435696-b0a2d4ec/panelist-3/1_01",
+  "mutation": "read-only",
+  "workspace": {
+    "cwd": "/home/vantt/projects/forgentX-p6",
+    "writeScope": [],
+    "mainCheckout": "/home/vantt/projects/forgentX",
+    "posture": "worktree"
+  },
+  "tools": {
+    "shell": {
+      "mode": "restricted",
+      "enforced": false,
+      "enforcement": "instructed",
+      "allowedCommands": []
+    }
+  },
+  "permissions": {
+    "posture": "enforced",
+    "shell": {
+      "mode": "restricted",
+      "enforced": false,
+      "enforcement": "instructed",
+      "allowedCommands": []
+    },
+    "filesystem": {
+      "mode": "read-only",
+      "enforced": true,
+      "enforcement": "enforced",
+      "writeScope": []
+    },
+    "network": {
+      "enforced": false,
+      "enforcement": "instructed"
+    }
+  },
+  "limits": {
+    "executorTimeoutMs": 2100000
+  },
+  "resultClaim": {
+    "contract": {
+      "id": "agent-result-claim",
+      "version": 2
+    },
+    "path": "/home/vantt/projects/forgentX-p6/.fgos/assignments/unit-run-1790941435696-b0a2d4ec/panelist-3/1/runs/01/outbox/result-1.json"
+  },
+  "provenance": {
+    "dispatchPlanHash": "sha256:03477c6cb4ede1d01e25276d904947f196c24c0757ffeec00a59c273968ef3f6",
+    "configHash": "sha256:a529d7dbbbccda5ebe844ea3fe9e374e46ed999dadff4373d694ddcad76b5ede",
+    "executorId": "gemini",
+    "adapter": "herdr-spawn",
+    "adapterFamily": "herdr-spawn"
+  },
+  "providerCapacity": {
+    "contract": "provider-capacity-selection.v1",
+    "status": "selected",
+    "provider": "gemini",
+    "accountId": "mucdong",
+    "accountLabel": "mucdong",
+    "selectedAt": "2026-10-02T11:43:55.906Z",
+    "lease": {
+      "runId": "run_unit-run-1790941435696-b0a2d4ec/panelist-3/1_01",
+      "assignmentId": "unit-run-1790941435696-b0a2d4ec/panelist-3/1",
+      "pid": 2981949
+    },
+    "credentialProvisioned": false
+  },
+  "enforcementPosture": "enforced",
+  "permissionEnforcementPosture": "enforced",
+  "executorId": "gemini",
+  "adapter": "herdr-spawn",
+  "adapterFamily": "herdr-spawn",
+  "assignment": {
+    "role": "panelist-3"
+  }
+}

@@ -5,7 +5,7 @@
 // the centralized `flags.help` check in main() (bin/fgos.mjs, reusing
 // renderHelpText scoped to one COMMAND_REGISTRY entry) fixes both failure
 // modes for every verb, uniformly, with no side effects.
-import { test } from 'node:test';
+import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -17,8 +17,15 @@ import { COMMAND_REGISTRY } from '../../src/cli/command-registry.mjs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
 
+const madeDirs = [];
+after(() => {
+  for (const dir of madeDirs) fs.rmSync(dir, { recursive: true, force: true });
+});
+
 function tmpCwd() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-help-cli-'));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-help-cli-'));
+  madeDirs.push(dir);
+  return dir;
 }
 
 function run(cwd, args) {

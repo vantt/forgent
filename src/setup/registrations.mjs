@@ -35,6 +35,9 @@ import { mainCheckoutHookWired } from './git-hooks.mjs';
 import { loadRunnerConfigFromDir } from '../runner/dispatch/config.mjs';
 import { claudeCodeHookWired } from './claude-code-hooks.mjs';
 import { checkExecutorProfileWarnings } from './executor-profile-warnings.mjs';
+import { checkAgentCliProjectTrusted } from './agent-cli-trust.mjs';
+import { checkWorkflowPoolsSatisfyIndependence } from './workflow-pool-independence.mjs';
+import { checkBlindStepsUseProvenPools } from './blind-steps-proven-pools.mjs';
 import { checkAgyPermissionsConfigured, checkAgySubHomesConfigured, fixAgyPermissionsConfigured } from './agy-permissions.mjs';
 import { BUILTIN_POLICY_IDS, validateConfinementPolicyShape, normalizeLegacyConfinement } from '../runner/dispatch/confinement/policies.mjs';
 import {
@@ -43,13 +46,15 @@ import {
   ensureMachineBackendRegistryDefaults,
   loadMachineBackendRegistry,
 } from '../runner/dispatch/confinement/backend-registry.mjs';
-import { runAllConfinementProbes } from '../runner/dispatch/confinement/probes/harness.mjs';
-import { reapOrphanedConfinementResources, OWNERSHIP_MARKER_FILE } from '../runner/dispatch/confinement/cleanup.mjs';
+import { runAllConfinementProbes, probePeerRunHidden } from '../runner/dispatch/confinement/probes/harness.mjs';
+import { reapOrphanedConfinementResources, resolveConfinementTempRoot, OWNERSHIP_MARKER_FILE, EMPTY_SHELL_GRACE_MS } from '../runner/dispatch/confinement/cleanup.mjs';
 
 import { DEFAULT_RUNNER_CONFIG } from '../runner/dispatch.mjs';
-import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, validateCapabilityServesShape, RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { MODEL_POLICY_TIERS, DEFAULT_COORDINATION_ORG_DISCHARGE_ON, DEFAULT_RIGOR_TO_TIER, validateCapabilityServesShape, RunnerConfigError } from '../runner/dispatch/config.mjs';
+import { RIGOR_VALUES } from '../runner/rigor.mjs';
 import { resolveExecutorAndOverrides, deriveProviderFamily } from '../runner/dispatch/resolve.mjs';
 import { resolveMainCheckoutRoot } from '../runner/paths.mjs';
+import { bind, hasUsablePrefer } from '../runner/execution/bind.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../state/fgos-file-registry.mjs';
 import { detectTrunk } from '../runner/worktree.mjs';
 import { listWork, StoreError } from '../state/store.mjs';
@@ -58,11 +63,14 @@ import { postLandDrift } from '../state/postland-drift.mjs';
 import { computeEnduserDocsIndex, generateEnduserDocsIndex, manifestPathFor } from '../report/enduser-index-generate.mjs';
 import { computeDecisionIndex, generateDecisionIndex, indexPathFor } from '../report/decision-index.mjs';
 import { isResolvedStatus } from '../state/frontier.mjs';
-import { DOMAINS, getDomain, resolveDomainName, effectiveStage, resolveTaskSpecPath } from '../state/workflow-stage-graphs.mjs';
+import { DOMAINS, getDomain, resolveDomainName, effectiveStep, domainSteps, skillForStep } from '../state/domain-registry.mjs';
+import { resolveTaskSpecPath } from '../runner/paths.mjs';
+import { stepById } from '../workflow/steps.mjs';
 import { readLocalStatus, classifyRegistryPosture, toolsFromExecutors } from '../state/tool-registry.mjs';
 import { resolveCliVersionInfo } from '../cli/version.mjs';
 import { describeConfigAwareness, loadGlobalConfig } from '../config/global-config.mjs';
-import { inspectProviderCapacity, inspectProviderCapacityLock, defaultProviderCapacityRuntimeDir } from '../runner/dispatch/provider-capacity.mjs';
+import { inspectProviderCapacity, inspectProviderCapacityLock, defaultProviderCapacityRuntimeDir, providerAccountInventory } from '../runner/dispatch/provider-capacity.mjs';
+import { normalizeProviderFamily } from '../runner/dispatch/provider-adapter.mjs';
 import { resolveHerdrBin } from '../runner/dispatch/transport.mjs';
 import { readCodexTrust, readAgyStore, defaultAgySettingsPath } from '../runner/dispatch/trust-store.mjs';
 import { resolveFgosBin, refreshGlobalBinCache } from './bin-discovery.mjs';
@@ -86,12 +94,10 @@ import { resolveDocPath } from '../report/knowledge-resolver.mjs';
 import { isLiveDocLifecycle } from '../state/knowledge-registry.mjs';
 import { findDuplicateAuthoritativeClaims } from '../report/authoritative-match.mjs';
 import { parseFrontmatter } from '../report/frontmatter.mjs';
-import { discoverCoordinationProtocols, loadCoordinationProtocol } from '../runner/definitions/protocol-loader.mjs';
-import { projectWorkflowToFlowDefinition } from '../runner/definitions/workflow-adapter.mjs';
-import { FlowDefinitionError, POLICY_PATCH_FIELDS } from '../runner/definitions/schema.mjs';
-import { validateCoordinationRequest } from '../verbs/coordination/schema.mjs';
+import { POLICY_PATCH_FIELDS } from '../runner/dispatch/execution-contract.mjs';
 import { discoverOperationPromptTemplates, TemplateResolutionError } from '../runner/dispatch/operation-prompt-templates.mjs';
-
+import { resolveHostBin, invokeHost } from '../util/host-bin.mjs';
+import { listAssignmentRuns, scanAssignmentLayout, projectRunEligibility } from '../runner/dispatch/assignment-layout.mjs';
 export { mainCheckoutHookWired } from './git-hooks.mjs';
 export { claudeCodeHookWired } from './claude-code-hooks.mjs';
 export { checkAgySubHomesConfigured } from './agy-permissions.mjs';
@@ -333,6 +339,14 @@ export function describeNonGitShellIntegration(cwd) {
   };
 }
 
+// A shell started by an agent harness (Claude Code) hands its tools a snapshot of the
+// user's shell functions, and that snapshot can drop underscore-prefixed helpers. The
+// probe below reproduces exactly that, so inside such a shell its verdict says nothing
+// about the user's own terminal and is reported as information, not a failure.
+function insideHarnessShell(env = process.env) {
+  return Boolean(env.CLAUDECODE || env.CLAUDE_CODE_SESSION_ID);
+}
+
 function checkShellIntegrationSourced(cwd) {
   const scriptPath = integrationScriptPath();
   if (scriptPath === null) {
@@ -362,6 +376,7 @@ function checkShellIntegrationSourced(cwd) {
   // somewhere (missing.length < rcFiles.length) -- the failure mode lives
   // in the shared script itself, not in which rc file references it, so
   // one probe against scriptPath covers every rc file that sources it.
+  let harnessProbeNote = '';
   if (missing.length < rcFiles.length) {
     // FGOS_SHELL_INTEGRATION_PROBE_SCRIPT (test-only seam, mirrors
     // FGOS_CLAUDE_COMMAND/FGOS_GH_COMMAND below): lets a test probe a
@@ -376,9 +391,12 @@ function checkShellIntegrationSourced(cwd) {
       const helperNote = strippedFunctions.length > 0
         ? ` after stripping ${strippedFunctions.join(', ')} (an underscore-prefixed helper a harness shell-function snapshot can drop)`
         : '';
-      problems.push(
-        `sourced correctly, but "fgos --help" fails${helperNote} -- the source line being present is not proof the command actually works`,
-      );
+      const probeMessage = `sourced correctly, but "fgos --help" fails${helperNote} -- the source line being present is not proof the command actually works`;
+      if (insideHarnessShell()) {
+        harnessProbeNote = ` (informational, running inside an agent harness shell: ${probeMessage}; re-run fgos doctor from your own terminal to confirm)`;
+      } else {
+        problems.push(probeMessage);
+      }
     }
   }
   if (dead.length > 0) {
@@ -402,7 +420,7 @@ function checkShellIntegrationSourced(cwd) {
   if (problems.length > 0) {
     return { passed: false, message: problems.join('; ') };
   }
-  return { passed: true, message: `sourced in: ${rcFiles.join(', ')}` };
+  return { passed: true, message: `sourced in: ${rcFiles.join(', ')}${harnessProbeNote}` };
 }
 
 // config-not-stale is READ-ONLY by construction: `readSharedConfig` only
@@ -428,36 +446,341 @@ function checkConfigNotStale(cwd) {
   return { passed: true, message: `config up to date at ${sharedPath}` };
 }
 
-// tsk-2t9c (multi-role team harness, D6/D9 task-spec A-lite convention;
-// AGENTS.md's install/setup/doctor gate): every domain's `taskSpecMap`
-// (src/state/workflow-stage-graphs.mjs) names task-spec ids a stage-skill
-// will read as read-first material at runtime -- a missing file degrades
-// that skill silently, so this makes the gap visible. Read-only (RUL9):
-// never writes, never scaffolds a stub (a stub contract is worse than an
-// absent one -- it looks authoritative while saying nothing).
-function checkTaskSpecsResolve(cwd) {
-  const missing = [];
-  for (const [domainName, domain] of Object.entries(DOMAINS)) {
-    const taskSpecMap = domain.taskSpecMap;
-    if (taskSpecMap) {
-      for (const [stage, specId] of Object.entries(taskSpecMap)) {
-        const specPath = resolveTaskSpecPath(domainName, specId, cwd);
-        if (!fs.existsSync(specPath)) {
-          missing.push(`${domainName}.taskSpecMap.${stage} -> "${specId}" (${path.relative(cwd, specPath)} not found)`);
+function checkRunnerRigorConfig(cwd) {
+  const levels = [
+    ['project', readSharedConfig(cwd)?.runner],
+    ['global', loadGlobalConfig()?.runner],
+  ];
+  const problems = [];
+  for (const [level, runner] of levels) {
+    if (!runner) continue;
+    const map = runner.rigorToTier;
+    if (!map || typeof map !== 'object' || Array.isArray(map)) {
+      problems.push(`${level} runner.rigorToTier missing -- run fgos setup`);
+    } else {
+      for (const rigor of RIGOR_VALUES) {
+        if (!MODEL_POLICY_TIERS.includes(map[rigor])) {
+          problems.push(`${level} runner.rigorToTier.${rigor} must be one of ${MODEL_POLICY_TIERS.join('/')}`);
+        }
+      }
+      for (const rigor of Object.keys(map)) {
+        if (!RIGOR_VALUES.includes(rigor)) problems.push(`${level} runner.rigorToTier has unknown rigor "${rigor}"`);
+      }
+    }
+    for (const [capability, entry] of Object.entries(runner.capabilities ?? {})) {
+      if (entry?.overrides !== undefined) {
+        problems.push(`${level} runner.capabilities.${capability}.overrides was removed; use .rigor`);
+      }
+    }
+  }
+  return problems.length > 0
+    ? { passed: false, message: problems.join('; ') }
+    : { passed: true, message: 'runner rigor maps and capability floors are valid at every configured level' };
+}
+
+export function checkRunnerPatternsConfig(cwd) {
+  const projectRunner = readSharedConfig(cwd)?.runner;
+  const globalRunner = loadGlobalConfig()?.runner;
+  const levels = [];
+  if (projectRunner) {
+    levels.push(['project', projectRunner]);
+  } else if (globalRunner) {
+    levels.push(['global', globalRunner]);
+  }
+  if (levels.length === 0) {
+    return { passed: true, message: 'warning: runner.patterns missing -- falling back to setup defaults; run fgos setup' };
+  }
+  const problems = [];
+  const warnings = [];
+  for (const [level, runner] of levels) {
+    if (!runner) continue;
+    const patterns = runner.patterns;
+    if (patterns === undefined) {
+      warnings.push(`${level} runner.patterns missing -- falling back to setup defaults; run fgos setup`);
+      continue;
+    }
+    if (!patterns || typeof patterns !== 'object' || Array.isArray(patterns)) {
+      problems.push(`${level} runner.patterns must be an object`);
+      continue;
+    }
+    if (patterns.defaultRule !== undefined) {
+      if (!patterns.defaultRule || typeof patterns.defaultRule !== 'object' || Array.isArray(patterns.defaultRule)) {
+        problems.push(`${level} runner.patterns.defaultRule must be an object`);
+      } else if (patterns.defaultRule.mutatingMinRigor !== undefined && !RIGOR_VALUES.includes(patterns.defaultRule.mutatingMinRigor)) {
+        problems.push(`${level} runner.patterns.defaultRule.mutatingMinRigor must be one of ${RIGOR_VALUES.join('/')}`);
+      }
+    }
+    if (patterns.reviewed !== undefined) {
+      if (!patterns.reviewed || typeof patterns.reviewed !== 'object' || Array.isArray(patterns.reviewed)) {
+        problems.push(`${level} runner.patterns.reviewed must be an object`);
+      } else {
+        if (patterns.reviewed.maxRounds !== undefined && (!Number.isInteger(patterns.reviewed.maxRounds) || patterns.reviewed.maxRounds <= 0)) {
+          problems.push(`${level} runner.patterns.reviewed.maxRounds must be a positive integer`);
+        }
+        if (patterns.reviewed.checkersByRigor !== undefined) {
+          const cbr = patterns.reviewed.checkersByRigor;
+          if (!cbr || typeof cbr !== 'object' || Array.isArray(cbr)) {
+            problems.push(`${level} runner.patterns.reviewed.checkersByRigor must be an object`);
+          } else {
+            const VALID_CHECKERS = new Set(['reviewer', 'red-team', 'tester']);
+            for (const [rigor, checkers] of Object.entries(cbr)) {
+              if (!RIGOR_VALUES.includes(rigor)) {
+                problems.push(`${level} runner.patterns.reviewed.checkersByRigor has unknown rigor "${rigor}"`);
+              }
+              if (!Array.isArray(checkers) || !checkers.every((c) => VALID_CHECKERS.has(c))) {
+                problems.push(`${level} runner.patterns.reviewed.checkersByRigor.${rigor} must be an array of strings in [${Array.from(VALID_CHECKERS).join(', ')}]`);
+              }
+            }
+            const orderedRigors = ['low', 'standard', 'high', 'critical'].filter((r) => r in cbr);
+            for (let i = 1; i < orderedRigors.length; i += 1) {
+              const weaker = orderedRigors[i - 1];
+              const stronger = orderedRigors[i];
+              const weakerSet = new Set(cbr[weaker]);
+              const strongerSet = new Set(cbr[stronger]);
+              for (const checker of weakerSet) {
+                if (!strongerSet.has(checker)) {
+                  problems.push(`${level} runner.patterns.reviewed.checkersByRigor is not cumulative: "${stronger}" missing "${checker}" from "${weaker}"`);
+                }
+              }
+            }
+          }
         }
       }
     }
-    const workflows = domain.workflows ? Object.values(domain.workflows) : [domain];
-    for (const wf of workflows) {
-      if (!wf?.operationMap) continue;
-      for (const [stage, ops] of Object.entries(wf.operationMap)) {
-        if (!Array.isArray(ops)) continue;
-        for (const op of ops) {
-          if (op.taskSpec) {
-            const specPath = resolveTaskSpecPath(domainName, op.taskSpec, cwd);
-            if (!fs.existsSync(specPath)) {
-              missing.push(`${domainName}.operations.${stage}[${op.id || op.taskSpec}] -> "${op.taskSpec}" (${path.relative(cwd, specPath)} not found)`);
+  }
+
+  if (problems.length > 0) {
+    return { passed: false, message: problems.join('; ') };
+  }
+  if (warnings.length > 0) {
+    return { passed: true, message: `warning: ${warnings.join('; ')}` };
+  }
+  return { passed: true, message: 'runner patterns configuration is valid at every configured level' };
+}
+
+export function checkMutatingAssignmentBindingSnapshot(cwd) {
+  const root = cwd ?? process.cwd();
+  const assignmentsDir = path.join(root, '.fgos', 'assignments');
+  if (!fs.existsSync(assignmentsDir)) {
+    return { passed: true, message: 'no assignments directory present' };
+  }
+
+  const problems = [];
+  const units = new Map();
+  try {
+    for (const run of listAssignmentRuns(path.join(root, '.fgos'))) {
+      const [unitId, role, round] = run.assignmentId.split('/');
+      if (!role || !round) continue;
+      if (!units.has(unitId)) {
+        const unitJsonPath = path.join(assignmentsDir, unitId, 'unit.json');
+        let unitRecord = null;
+        try {
+          if (fs.lstatSync(unitJsonPath).isFile()) {
+            try {
+              unitRecord = JSON.parse(fs.readFileSync(unitJsonPath, 'utf8'));
+            } catch {
+              problems.push(`corrupted unit.json in unit run "${unitId}"`);
             }
+          }
+        } catch {}
+        units.set(unitId, unitRecord);
+      }
+      const unitRecord = units.get(unitId);
+      if (!unitRecord) continue;
+      const resultFile = path.join(run.runDir, 'result.json');
+      try {
+        if (!fs.lstatSync(resultFile).isFile()) continue;
+        const resultData = JSON.parse(fs.readFileSync(resultFile, 'utf8'));
+        if (resultData.binding && resultData.role) {
+          const recomputed = bind(
+            {
+              unit: unitRecord.unit,
+              role: resultData.role,
+              readOnly: false,
+              overrides: unitRecord.overrides || [],
+            },
+            {
+              runnerConfig: unitRecord.configSnapshot?.runner,
+              session: {},
+            },
+          );
+          if (recomputed.refused || recomputed.executor !== resultData.binding.executor) {
+            problems.push(`unit run "${unitId}" role "${role}" round "${round}" attempt "${run.attempt}" binding mismatches unit.json snapshot`);
+          }
+        }
+      } catch {
+        // Unsettled or unreadable results have no binding evidence to compare.
+      }
+    }
+  } catch (err) {
+    return { passed: false, message: `error scanning assignments: ${err.message}` };
+  }
+
+  return problems.length > 0
+    ? { passed: false, message: problems.join('; ') }
+    : { passed: true, message: 'every mutating assignment RunResult binding matches its unit.json snapshot' };
+}
+
+export function checkTierVocabularyDeadKeys(cwd) {
+  const levels = [
+    ['project', readSharedConfig(cwd)?.runner],
+    ['global', loadGlobalConfig()?.runner],
+  ];
+  const problems = [];
+  for (const [level, runner] of levels) {
+    if (!runner || typeof runner !== 'object') continue;
+    if ('models' in runner) {
+      problems.push(`${level} config contains dead key "runner.models"; replace with "runner.modelPolicies"`);
+    }
+    if ('DEFAULT_TIER_TO_POLICY' in runner) {
+      problems.push(`${level} config contains dead key "runner.DEFAULT_TIER_TO_POLICY"`);
+    }
+    if ('QUALITY_TIER_BRIDGE' in runner) {
+      problems.push(`${level} config contains dead key "runner.QUALITY_TIER_BRIDGE"`);
+    }
+    if ('QUALITY_MODE_VALUES' in runner) {
+      problems.push(`${level} config contains dead key "runner.QUALITY_MODE_VALUES"`);
+    }
+    if ('minTier' in runner) {
+      problems.push(`${level} config contains dead key "runner.minTier"; replace with "rigor"`);
+    }
+    if ('minRigor' in runner) {
+      problems.push(`${level} config contains dead key "runner.minRigor"; replace with "rigor"`);
+    }
+    if ('rigorOverrides' in runner) {
+      problems.push(`${level} config contains dead key "runner.rigorOverrides"; replace by adjusting "runner.modelPolicies.<provider>"`);
+    }
+    if ('PLACEMENT_POLICY_SHADOW' in runner) {
+      problems.push(`${level} config contains dead key "runner.PLACEMENT_POLICY_SHADOW"`);
+    }
+    for (const [execId, exec] of Object.entries(runner.executors ?? {})) {
+      if (exec && typeof exec === 'object') {
+        if ('rigorOverrides' in exec) {
+          problems.push(`${level} config contains dead key "runner.executors.${execId}.rigorOverrides"; replace by adjusting "runner.modelPolicies.<provider>"`);
+        }
+        if ('models' in exec) {
+          problems.push(`${level} config contains dead key "runner.executors.${execId}.models"`);
+        }
+      }
+    }
+    for (const [capName, cap] of Object.entries(runner.capabilities ?? {})) {
+      if (cap && typeof cap === 'object') {
+        if ('overrides' in cap) {
+          problems.push(`${level} config contains dead key "runner.capabilities.${capName}.overrides"; replace with "runner.capabilities.${capName}.rigor"`);
+        }
+        if ('rigorOverrides' in cap) {
+          problems.push(`${level} config contains dead key "runner.capabilities.${capName}.rigorOverrides"`);
+        }
+        if ('minTier' in cap) {
+          problems.push(`${level} config contains dead key "runner.capabilities.${capName}.minTier"; replace with "rigor"`);
+        }
+        if ('minRigor' in cap) {
+          problems.push(`${level} config contains dead key "runner.capabilities.${capName}.minRigor"; replace with "rigor"`);
+        }
+      }
+    }
+  }
+  return problems.length > 0
+    ? { passed: false, message: problems.join('; ') }
+    : { passed: true, message: 'no retired tier vocabulary keys in project or global config' };
+}
+
+export function checkModelPolicyTierCoverage(cwd) {
+  const levels = [
+    ['project', readSharedConfig(cwd)?.runner],
+    ['global', loadGlobalConfig()?.runner],
+  ];
+  const problems = [];
+  for (const [level, runner] of levels) {
+    if (!runner || typeof runner !== 'object') continue;
+    const rigorToTier = runner.rigorToTier ?? DEFAULT_RIGOR_TO_TIER;
+    const neededTiers = new Set(Object.values(rigorToTier));
+    const providersChecked = new Set();
+
+    for (const [execId, exec] of Object.entries(runner.executors ?? {})) {
+      if (!exec || typeof exec !== 'object') continue;
+      const provider = deriveProviderFamily(exec);
+      if (!provider || providersChecked.has(provider)) continue;
+      providersChecked.add(provider);
+
+      const providerPolicies = runner.modelPolicies?.[provider];
+      if (!providerPolicies || typeof providerPolicies !== 'object') {
+        problems.push(`${level} provider "${provider}" for executor "${execId}" has no modelPolicies entry`);
+        continue;
+      }
+      for (const tier of neededTiers) {
+        if (!providerPolicies[tier]) {
+          problems.push(`${level} provider "${provider}" missing model for tier "${tier}" (required by rigorToTier)`);
+        }
+      }
+    }
+  }
+  return problems.length > 0
+    ? { passed: false, message: problems.join('; ') }
+    : { passed: true, message: 'modelPolicies covers all tiers required by rigorToTier' };
+}
+
+export function checkCoordinationProtocolDeadVocabulary(cwd) {
+  const scanDirs = [
+    path.join(cwd, '.fgos', 'coordination-protocols'),
+    path.join(cwd, 'core', 'coordination-protocols'),
+    path.join(cwd, 'core', 'workflows'),
+    path.join(cwd, 'domains'),
+  ];
+  const yamlFiles = [];
+  function scan(dir) {
+    if (!fs.existsSync(dir)) return;
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        if (entry.name === 'node_modules' || entry.name === '.git') continue;
+        scan(full);
+      } else if (entry.isFile() && (entry.name.endsWith('.yaml') || entry.name.endsWith('.yml'))) {
+        yamlFiles.push(full);
+      }
+    }
+  }
+  for (const dir of scanDirs) scan(dir);
+
+  const deadPattern = /\b(minTier|minRigor|QUALITY_TIER_BRIDGE|QUALITY_MODE_VALUES)\b/;
+  const problems = [];
+  for (const file of yamlFiles) {
+    const content = fs.readFileSync(file, 'utf8');
+    const match = content.match(deadPattern);
+    if (match) {
+      const rel = path.relative(cwd, file);
+      problems.push(`${rel} contains retired "${match[1]}"; replace with "rigor" (low|standard|high|critical)`);
+    }
+  }
+  return problems.length > 0
+    ? { passed: false, message: problems.join('; ') }
+    : { passed: true, message: 'no retired coordination protocol vocabulary in project' };
+}
+
+// tsk-2t9c (multi-role team harness, D6/D9 task-spec A-lite convention;
+// AGENTS.md's install/setup/doctor gate): every operation a domain's Workflow
+// declares names a task-spec id a step-skill will read as read-first material at
+// runtime -- a missing file degrades that skill silently, so this makes the gap
+// visible. Read-only (RUL9): never writes, never scaffolds a stub (a stub
+// contract is worse than an absent one -- it looks authoritative while saying
+// nothing).
+//
+// The domain registry these checks walk is code loaded from this install, and the
+// task-spec/agent files it names ship in the same payload. They therefore resolve
+// against the install's own root, never the target project's tree -- a plain target
+// project carries no domains/ or core/ of its own.
+const FGOS_INSTALL_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+
+export function checkTaskSpecsResolve(root = FGOS_INSTALL_ROOT) {
+  const missing = [];
+  for (const [domainName, domain] of Object.entries(DOMAINS)) {
+    for (const wf of Object.values(domain.workflows ?? {})) {
+      for (const step of wf.steps ?? []) {
+        for (const op of step.operations ?? []) {
+          if (!op.taskSpec) continue;
+          const specPath = resolveTaskSpecPath(domainName, op.taskSpec, root);
+          if (!fs.existsSync(specPath)) {
+            missing.push(`${domainName}.operations.${step.id}[${op.id || op.taskSpec}] -> "${op.taskSpec}" (${path.relative(root, specPath)} not found)`);
           }
         }
       }
@@ -473,9 +796,9 @@ function checkTaskSpecsResolve(cwd) {
     'distill',
   ];
   for (const specId of CORE_TASK_SPECS) {
-    const specPath = resolveTaskSpecPath('core', specId, cwd);
+    const specPath = resolveTaskSpecPath('core', specId, root);
     if (!fs.existsSync(specPath)) {
-      missing.push(`core.taskSpec -> "${specId}" (${path.relative(cwd, specPath)} not found)`);
+      missing.push(`core.taskSpec -> "${specId}" (${path.relative(root, specPath)} not found)`);
     }
   }
   if (missing.length > 0) {
@@ -691,16 +1014,17 @@ function checkAgentClaimsResolve(cwd) {
 }
 
 /**
- * Validates stage operations across domain workflows (Step 02 / D19).
+ * Validates the operations each Workflow step declares, across domain workflows (Step 02 / D19).
  *
- * @param {string} [cwd] Working directory
+ * @param {string} [cwd] Project directory (only its shared config is read)
  * @param {object} [domains] Domain registry map (defaults to DOMAINS)
+ * @param {string} [root] Root holding the task-specs and agents the registry names (defaults to this install)
  * @returns {string[]} List of problem descriptions, empty if all valid.
  */
-export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains = DOMAINS) {
+export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains = DOMAINS, root = FGOS_INSTALL_ROOT) {
   const problems = [];
 
-  const agentFiles = allAgentYamlFiles(cwd);
+  const agentFiles = allAgentYamlFiles(root);
   const agentSkillsMap = new Map();
   for (const file of agentFiles) {
     try {
@@ -740,29 +1064,17 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
   for (const [domainName, domain] of Object.entries(domains)) {
     if (!domain) continue;
 
-    const workflows = domain.workflows
-      ? Object.entries(domain.workflows)
-      : [['default', domain]];
+    const workflows = Object.entries(domain.workflows ?? {});
 
     for (const [wfName, wf] of workflows) {
       if (!wf) continue;
 
-      if (Array.isArray(wf.stages)) {
-        for (const item of wf.stages) {
-          if (item && typeof item === 'object' && item.name && item.operations !== undefined) {
-            if (!Array.isArray(item.operations)) {
-              problems.push(`${domainName}.${wfName}.${item.name}.operations: must be an array of operation objects`);
-            }
-          }
-        }
-      }
-
-      const operationMap = wf.operationMap;
-      if (operationMap === undefined || operationMap === null) continue;
-      if (typeof operationMap !== 'object' || Array.isArray(operationMap)) {
-        problems.push(`${domainName}.${wfName}.operationMap: must be an object`);
-        continue;
-      }
+      // The Workflow definition's own steps carry the operations (validated for
+      // shape at load by src/workflow/definition.mjs); this check adds what the
+      // loader cannot know: task-spec files, roleGraph roles/edges, skills.
+      const operationMap = Object.fromEntries(
+        (wf.steps ?? []).filter((step) => step.operations !== undefined).map((step) => [step.id, step.operations]),
+      );
 
       for (const [stage, ops] of Object.entries(operationMap)) {
         if (!Array.isArray(ops)) {
@@ -796,9 +1108,9 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
           if (!op.taskSpec || typeof op.taskSpec !== 'string' || op.taskSpec.trim() === '') {
             problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> taskSpec must be a non-empty string`);
           } else {
-            const specPath = resolveTaskSpecPath(domainName, op.taskSpec, cwd);
+            const specPath = resolveTaskSpecPath(domainName, op.taskSpec, root);
             if (!fs.existsSync(specPath)) {
-              problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> taskSpec "${op.taskSpec}" (${path.relative(cwd, specPath)} not found)`);
+              problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> taskSpec "${op.taskSpec}" (${path.relative(root, specPath)} not found)`);
             }
           }
 
@@ -866,8 +1178,8 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
               if (disallowedKeys.length > 0) {
                 problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy contains disallowed key(s) [${disallowedKeys.join(', ')}] (allowed: ${[...POLICY_PATCH_FIELDS].join(', ')})`);
               }
-              if (op.policy.minTier && !MODEL_POLICY_TIERS.includes(op.policy.minTier)) {
-                problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy.minTier "${op.policy.minTier}" not in recognized tiers [${MODEL_POLICY_TIERS.join(', ')}]`);
+              if (op.policy.rigor && !RIGOR_VALUES.includes(op.policy.rigor)) {
+                problems.push(`${domainName}.${wfName}.${stage}.operations[${opLabel}] -> policy.rigor "${op.policy.rigor}" not in recognized rigors [${RIGOR_VALUES.join(', ')}]`);
               }
               if (op.policy.preferPersona) {
                 if (typeof op.policy.preferPersona !== 'string' || (agentSkillsMap.size > 0 && !agentSkillsMap.has(op.policy.preferPersona))) {
@@ -903,14 +1215,10 @@ export function findWorkflowStageOperationProblems(cwd = process.cwd(), domains 
           problems.push(`${domainName}.${wfName}.${stage}: has ${primaryCount} operations marked primary: true (at most one allowed)`);
         }
 
-        const stageSkill = wf.skillMap?.[stage] ?? domain.skillMap?.[stage];
-        const stageTaskSpec = wf.taskSpecMap?.[stage] ?? domain.taskSpecMap?.[stage];
+        const stageSkill = stepById(wf, stage)?.skill;
         if (primaryOp) {
-          if (stageTaskSpec && primaryOp.taskSpec && primaryOp.taskSpec !== stageTaskSpec) {
-            problems.push(`${domainName}.${wfName}.${stage}: primary operation taskSpec "${primaryOp.taskSpec}" contradicts stage taskSpec "${stageTaskSpec}"`);
-          }
           if (stageSkill && Array.isArray(primaryOp.skills) && primaryOp.skills.length > 0 && !primaryOp.skills.includes(stageSkill)) {
-            problems.push(`${domainName}.${wfName}.${stage}: primary operation skills [${primaryOp.skills.join(', ')}] does not include stage skill "${stageSkill}"`);
+            problems.push(`${domainName}.${wfName}.${stage}: primary operation skills [${primaryOp.skills.join(', ')}] does not include step skill "${stageSkill}"`);
           }
         }
       }
@@ -1036,15 +1344,86 @@ registerCheck({
 });
 
 registerCheck({
+  id: 'runner-rigor-config',
+  description: 'project and global runner rigorToTier maps are complete and capabilities declare only rigor floors',
+  check: (cwd) => checkRunnerRigorConfig(cwd),
+});
+
+registerCheck({
+  id: 'runner-patterns-config',
+  description: 'project and global runner patterns configuration is present, well-formed, and cumulative',
+  check: (cwd) => checkRunnerPatternsConfig(cwd),
+});
+
+registerCheck({
+  id: 'mutating-assignment-binding-snapshot',
+  description: 'every mutating assignment RunResult binding matches its unit.json snapshot',
+  check: (cwd) => checkMutatingAssignmentBindingSnapshot(cwd),
+});
+
+registerCheck({
+  id: 'tier-vocabulary-dead-keys',
+  description: 'project and global configs have no retired tier vocabulary keys (runner.models, minTier, rigorOverrides, etc.)',
+  check: (cwd) => checkTierVocabularyDeadKeys(cwd),
+});
+
+registerCheck({
+  id: 'model-policy-tier-coverage',
+  description: 'runner.modelPolicies covers every tier generated by rigorToTier for all registered executors',
+  check: (cwd) => checkModelPolicyTierCoverage(cwd),
+});
+
+registerCheck({
+  id: 'coordination-protocol-dead-vocabulary',
+  description: 'coordination protocols and workflows in project do not contain retired minTier or minRigor',
+  check: (cwd) => checkCoordinationProtocolDeadVocabulary(cwd),
+});
+
+registerCheck({
   id: 'task-specs-resolve',
   description: 'every domain\'s taskSpecMap entry resolves to a real domains/<domain>/task-specs/ file (tsk-2t9c D6/D9)',
-  check: (cwd) => checkTaskSpecsResolve(cwd),
+  check: () => checkTaskSpecsResolve(),
 });
 
 registerCheck({
   id: 'agent-claims-resolve',
   description: 'every agent-type\'s claims list (agents/*.yaml) names real task-specs (tsk-2t9c D12)',
   check: (cwd) => checkAgentClaimsResolve(cwd),
+});
+
+// The Work lifecycle reads each domain's compiled.json (scripts/build-domain-registry.mjs) so it
+// loads with no YAML parser. A missing or unreadable file breaks every command that resolves a
+// domain; a stale one (YAML edited, not rebuilt) silently serves old steps. The freshness half
+// needs the `yaml` package, so it only runs where that package resolves (a checkout after install).
+function checkDomainRegistryCompiled(cwd) {
+  const domainsDir = path.join(cwd, 'domains');
+  if (!fs.existsSync(domainsDir)) return { passed: true, message: 'no domains/ directory here — nothing to check' };
+  const problems = [];
+  let checked = 0;
+  for (const entry of fs.readdirSync(domainsDir, { withFileTypes: true })) {
+    if (!entry.isDirectory() || !fs.existsSync(path.join(domainsDir, entry.name, 'registry.yaml'))) continue;
+    checked += 1;
+    const compiled = path.join(domainsDir, entry.name, 'compiled.json');
+    if (!fs.existsSync(compiled)) {
+      problems.push(`domains/${entry.name}/compiled.json is missing`);
+      continue;
+    }
+    try {
+      JSON.parse(fs.readFileSync(compiled, 'utf8'));
+    } catch (err) {
+      problems.push(`domains/${entry.name}/compiled.json is unreadable (${err.message})`);
+    }
+  }
+  if (problems.length > 0) {
+    return { passed: false, message: `${problems.join('; ')} — run npm run build:domains` };
+  }
+  return { passed: true, message: `${checked} domain registr${checked === 1 ? 'y' : 'ies'} compiled and readable` };
+}
+
+registerCheck({
+  id: 'domain-registry-compiled',
+  description: "every domain's compiled.json (the YAML-free form the Work lifecycle reads) exists and parses",
+  check: (cwd) => checkDomainRegistryCompiled(cwd),
 });
 
 registerCheck({
@@ -1085,7 +1464,13 @@ registerFix({
 registerCheck({
   id: 'agy-sub-homes-configured',
   description: 'agy sub-HOMEs referenced in executor configs have settings.json configured with toolPermission: always-proceed',
-  check: (cwd) => checkAgySubHomesConfigured(cwd),
+  // The merged config (project + global): the credential homes of the declared gemini accounts live in
+  // the global one, and a confined invocation runs as one of those accounts.
+  check: (cwd) => {
+    let config = null;
+    try { config = { runner: loadRunnerConfigFromDir(cwd) }; } catch { /* fall back to the project file */ }
+    return checkAgySubHomesConfigured(cwd, { config });
+  },
 });
 
 let cachedBwrapResult = null;
@@ -1269,23 +1654,22 @@ registerCheck({
   check: (cwd) => checkWorkClassificationVocabulary(cwd),
 });
 
-// tsk-64h: the stage-axis sibling of the risk/kind check above, and the
-// same class of drift — a domain may retire a stage (coding dropped
+// tsk-64h: the step-axis sibling of the risk/kind check above, and the
+// same class of drift — a domain may retire a step (coding dropped
 // `clarify` outright, tsk-qod D1/D2) while items still sit on it. Unlike
-// risk/kind, there is no write door to grandfather against: `stage` is not
-// in `EDITABLE_FIELDS` (store.mjs) and only `moveStage` may change it, so
+// risk/kind, there is no write door to grandfather against: `workflowStep` is
+// not in `EDITABLE_FIELDS` (store.mjs) and only `moveStep` may change it, so
 // a stranded item cannot be corrected by an edit at all — it has to be
 // drained forward through a registered transition or migrated. That makes
-// the drift quieter, not rarer: three items sat at retired `clarify` with
-// nothing surfacing them until a migration script tripped over them.
+// the drift quieter, not rarer.
 //
-// `effectiveStage`, not a bare `item.stage`, so the lazy Execute default
-// (D8 — an item that never had `stage` written) reads as the stage every
+// `effectiveStep`, not a bare `item.workflowStep`, so the lazy default
+// (an item that never had a step written) reads as the step every
 // other consumer already treats it as, instead of being flagged as
 // out-of-vocabulary for being absent. OPEN items only (`!isResolvedStatus`,
 // the one shared open/closed definition), same reasoning as the check
-// above: a resolved item's stage no longer routes anything.
-function checkWorkStageVocabulary(cwd) {
+// above: a resolved item's step no longer routes anything.
+function checkWorkStepVocabulary(cwd) {
   const mainCheckout = resolveMainCheckout(cwd);
   if (mainCheckout === null) {
     return { passed: true, message: 'not inside a git checkout — nothing to check' };
@@ -1296,94 +1680,37 @@ function checkWorkStageVocabulary(cwd) {
     if (isResolvedStatus(item)) continue;
     const domainName = resolveDomainName(item.domain, { onUnrecognized: () => {} });
     const domain = getDomain(domainName);
-    const stage = effectiveStage(item, domain);
-    if (!domain.stages.includes(stage)) {
-      violations.push(`${item.id} (stage: "${stage}", domain: "${domainName}")`);
+    const step = effectiveStep(item, domain);
+    if (!domainSteps(domain, item.kind).includes(step)) {
+      violations.push(`${item.id} (step: "${step}", domain: "${domainName}")`);
     }
   }
   if (violations.length === 0) {
-    return { passed: true, message: 'every open item sits at a stage still registered by its domain' };
+    return { passed: true, message: 'every open item sits at a step still registered by its domain' };
   }
   return {
     passed: false,
-    message: `${violations.length} open item(s) at a stage their domain no longer registers: ${violations.join(', ')} — no verb can relabel a live item's stage; drain each one forward through a registered transition or migrate it (see scripts/migrate-clarify-split.mjs)`,
+    message: `${violations.length} open item(s) at a step their domain no longer registers: ${violations.join(', ')} — no verb can relabel a live item's step; drain each one forward through a registered transition or migrate it`,
   };
 }
 
 registerCheck({
-  id: 'work-stage-vocabulary',
-  description: "every open item sits at a stage its own domain still registers — no item stranded on a retired stage (tsk-64h)",
-  check: (cwd) => checkWorkStageVocabulary(cwd),
+  id: 'work-step-vocabulary',
+  description: "every open item sits at a step its own domain's Workflow still registers — no item stranded on a retired step (tsk-64h)",
+  check: (cwd) => checkWorkStepVocabulary(cwd),
 });
 
-// tsk-ogx: the registry-shape sibling of the two domain-vocabulary checks
-// above -- those two catch a work ITEM drifting from its domain's declared
-// vocabulary; this one catches the domain's own DECLARATION drifting
-// internally. `skillMap` stays domain-level by design, never per-workflow
-// (tsk-2t9c D7/D16/D17 -- see docs/history/domain-workflow-skillmap-
-// coverage-check/RESEARCH.md), so the real risk once a second workflow
-// registers is a stage name with no skillMap owner at all -- silent at
-// runtime (`skillForStage`, workflow-stage-graphs.mjs, deliberately folds
-// "declared null" and "key absent" to the same `null` for its own hot-path
-// caller), loud here instead.
-//
-// `domain.workflows` does not exist on `main` yet (tsk-2t9c is unmerged) --
-// a domain with no `workflows` field falls back to its own `stages` array
-// as the one implicit workflow it has today, so this check is real and
-// green on `main` right now, and automatically covers every workflow a
-// domain registers later with zero further change to this check.
-//
-// Exported (not just a private closure) so its fail branch is testable
-// against a synthetic `domains` map -- the real `DOMAINS` is
-// `Object.freeze`d top to bottom and can never carry a deliberately-broken
-// fixture the way a work-item store can.
-export function findDomainWorkflowSkillMapGaps(domains = DOMAINS) {
-  const gaps = [];
-  for (const [domainName, domain] of Object.entries(domains)) {
-    if (!domain.skillMap) continue;
-    const stages = domain.workflows
-      ? [...new Set(Object.values(domain.workflows).flatMap((workflow) => workflow.stages ?? []))]
-      : (domain.stages ?? []);
-    for (const stage of stages) {
-      if (!Object.hasOwn(domain.skillMap, stage)) {
-        gaps.push(`${domainName}.${stage}`);
-      }
-    }
-  }
-  return gaps;
-}
-
-function checkDomainWorkflowSkillMapCoverage() {
-  const gaps = findDomainWorkflowSkillMapGaps();
-  if (gaps.length === 0) {
-    return {
-      passed: true,
-      message: "every stage across every domain's registered workflow(s) resolves to a real skillMap entry (explicit null allowed)",
-    };
-  }
-  return {
-    passed: false,
-    message: `${gaps.length} stage(s) missing a skillMap entry entirely (explicit null is fine, a missing key is not): ${gaps.join(', ')}`,
-  };
-}
-
-registerCheck({
-  id: 'domain-workflow-skillmap-coverage',
-  description: "every stage name across all of a domain's registered workflows resolves to a real skillMap entry, explicit null allowed (tsk-ogx)",
-  check: () => checkDomainWorkflowSkillMapCoverage(),
-});
-
-export function checkDomainWorkflowOperationsCoverage(cwd) {
-  const problems = findWorkflowStageOperationProblems(cwd);
+export function checkDomainWorkflowOperationsCoverage(cwd, root = FGOS_INSTALL_ROOT) {
+  const problems = findWorkflowStageOperationProblems(cwd, DOMAINS, root);
   if (problems.length === 0) {
     return {
       passed: true,
-      message: "every stage operation across domain workflows resolves to valid task-specs, roles, skills, and legal roleGraph edges",
+      message: "every step operation across domain workflows resolves to valid task-specs, roles, skills, and legal roleGraph edges",
     };
   }
   return {
     passed: false,
-    message: `${problems.length} workflow stage operation problem(s): ${problems.join('; ')}`,
+    message: `${problems.length} workflow step operation problem(s): ${problems.join('; ')}`,
   };
 }
 
@@ -1771,6 +2098,24 @@ registerCheck({
 // `prefer`/`aliases`/`overrides`: naming which executor serves a purpose
 // is a dispatch-mechanism decision, and tsk-5tm-3 D5 forbids `execute`
 // (or, by the same reasoning, this registration) re-deciding that.
+// Capabilities the shipped Workflow units
+// name. Without a `runner.capabilities` entry bind() has no candidate pool for
+// the unit and refuses it, so a fresh project could not run these Workflows.
+// Description-only on purpose (no `prefer`): which executors serve a
+// capability is that project's own taste, and `mergeConfigDefaults` only adds
+// a missing slot, never overwrites one the project already tuned.
+function workflowCapabilitySlots(verbsByDomain) {
+  const slots = {};
+  for (const [domain, verbs] of Object.entries(verbsByDomain)) {
+    for (const verb of verbs) {
+      slots[`${domain}:${verb}`] = {
+        description: `Workflow unit capability "${domain}:${verb}" -- declare a "prefer" pool to choose which executors serve it.`,
+      };
+    }
+  }
+  return slots;
+}
+
 export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
   advise: {
     description:
@@ -1826,6 +2171,15 @@ export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
       'Canonical coding refactor capability -- behavior-preserving structural change to existing code (P2-runtime, docs/history/agent-coordination-foundation/plan.md).',
     serves: { outputKind: 'change', domain: 'code', mutates: true, behaviorPreserving: true },
   },
+  ...workflowCapabilitySlots({
+    marketing: ['research', 'write', 'publish'],
+    architecture: ['frame', 'shape', 'critique', 'synthesize', 'explain'],
+    business: ['frame', 'perspectives', 'critique', 'synthesize', 'plan'],
+    delphi: ['propose', 'synthesize'],
+    'group-cognition': ['explore', 'critique', 'synthesize'],
+    'nominal-group': ['generate', 'share', 'vote', 'rank'],
+    coding: ['discover', 'explore', 'plan', 'validate', 'implement'],
+  }),
 });
 
 // tsk-47r: `pi` as a second `agent`-kind executor, layered onto this SAME
@@ -1846,12 +2200,7 @@ export const DEFAULT_CAPABILITY_SLOTS = Object.freeze({
 // confirmed GREEN (worker contract followed: layered skill-pointer chain
 // read natively, footprint honored, correct `[BLOCKED]`/`[DONE]`
 // two-token reporting) — see
-// docs/history/pi-executor-runtime-capacity/RESEARCH.md Round 4. No
-// `rigorOverrides`: the old `{light/standard/heavy -> nano}` default was
-// never a deliberate, endorsed cost policy -- just this seed's own
-// historical proof-test default -- dropped so a fresh install's `pi`
-// behaves like every other executor (DEFAULT_TIER_TO_POLICY) unless an
-// operator deliberately opts in later.
+// docs/history/pi-executor-runtime-capacity/RESEARCH.md Round 4.
 // Exported (mirrors `DEFAULT_CAPABILITY_SLOTS` below it) so the ripple
 // tests assert this exact shape instead of duplicating the literal.
 export const PI_EXECUTOR_DEFAULT = Object.freeze({
@@ -1942,6 +2291,83 @@ registerCheck({
   check: (cwd) => checkAdviseExecuteCapabilitiesConfigured(cwd),
 });
 
+// Every capability a core/domain Workflow unit names must resolve the way
+// bind() resolves it (exact name, then the bare verb). One that does not has
+// no candidate pool, so that unit is refused at run time with no earlier signal.
+// A declared entry that carries no `prefer` pool (exact or bare verb) is reported too.
+// Read straight from the definition files with a line match instead of loading them
+// through the Workflow loader: `fgos setup` runs from copies of fgos that have no
+// installed dependencies, and the loader needs the YAML parser.
+function workflowCapabilityUses(root) {
+  const uses = new Map();
+  const dirs = [];
+  const core = path.join(root, 'core', 'workflows');
+  if (fs.existsSync(core)) dirs.push([core, '']);
+  const domainsDir = path.join(root, 'domains');
+  if (fs.existsSync(domainsDir)) {
+    for (const d of fs.readdirSync(domainsDir, { withFileTypes: true })) {
+      const dir = path.join(domainsDir, d.name, 'workflows');
+      if (d.isDirectory() && fs.existsSync(dir)) dirs.push([dir, `${d.name}/`]);
+    }
+  }
+  for (const [dir, prefix] of dirs) {
+    for (const file of fs.readdirSync(dir).sort()) {
+      if (!/\.(ya?ml|json)$/i.test(file)) continue;
+      const id = `${prefix}${file.replace(/\.[^.]+$/, '')}`;
+      for (const line of fs.readFileSync(path.join(dir, file), 'utf8').split('\n')) {
+        const match = /^\s*"?capability"?\s*:\s*["']?([^\s"',#]+)/.exec(line);
+        if (!match) continue;
+        if (!uses.has(match[1])) uses.set(match[1], new Set());
+        uses.get(match[1]).add(id);
+      }
+    }
+  }
+  return uses;
+}
+
+function checkWorkflowCapabilitiesConfigured(cwd) {
+  const capabilities = readSharedConfig(cwd)?.runner?.capabilities;
+  const declared = capabilities && typeof capabilities === 'object' && !Array.isArray(capabilities) ? capabilities : {};
+  const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+  const uses = workflowCapabilityUses(packageRoot);
+  if (path.resolve(cwd) !== packageRoot) {
+    for (const [capability, ids] of workflowCapabilityUses(cwd)) {
+      uses.set(capability, new Set([...(uses.get(capability) ?? []), ...ids]));
+    }
+  }
+  const missing = [...uses].filter(
+    ([capability]) => !declared[capability] && !(capability.includes(':') && declared[capability.split(':')[1]]),
+  );
+  if (missing.length > 0) {
+    const list = missing.map(([cap, ids]) => `${cap} (${[...ids].join(', ')})`).join('; ');
+    return {
+      passed: false,
+      message: `runner.capabilities has no entry for Workflow capabilities: ${list} -- declare each under runner.capabilities (fgos setup adds every shipped Workflow's)`,
+    };
+  }
+  // Declared is not enough: bind() needs a prefer pool, on the exact entry or the bare
+  // verb, or it refuses the unit headless. Setup's own slots are description-only on
+  // purpose (which executors serve a capability is the project's taste), so this is a
+  // warning that names the gap rather than a failure on a fresh project.
+  const noPool = [...uses].filter(
+    ([capability]) => !hasUsablePrefer(declared[capability]) && !(capability.includes(':') && hasUsablePrefer(declared[capability.split(':')[1]])),
+  );
+  if (noPool.length > 0) {
+    const list = noPool.map(([cap, ids]) => `${cap} (${[...ids].join(', ')})`).join('; ');
+    return {
+      passed: true,
+      message: `warning: Workflow capabilities declared but with no "prefer" pool, so a headless run of those units is refused: ${list} -- add "prefer" under the exact name or its bare verb in runner.capabilities`,
+    };
+  }
+  return { passed: true, message: `every capability a Workflow unit names (${uses.size}) is declared in runner.capabilities with a prefer pool` };
+}
+
+registerCheck({
+  id: 'workflow-capabilities-configured',
+  description: 'every capability a core/domain Workflow unit names is declared in runner.capabilities',
+  check: (cwd) => checkWorkflowCapabilitiesConfigured(cwd),
+});
+
 // I19 (core/skills/_shared/capability-matching.md): `serves` is optional at
 // load time (`validateCapabilitiesShape`'s hot path never rejects an old
 // entry with none), but a live config's DECLARED `serves` values still need
@@ -2021,62 +2447,7 @@ function checkOperationCapabilitiesResolve(cwd) {
   if (!runnerConfig) {
     return { passed: false, message: 'runner config section missing -- run fgos setup' };
   }
-  let entries;
-  try {
-    entries = discoverCoordinationProtocols({ cwd });
-  } catch (err) {
-    if (err instanceof FlowDefinitionError) {
-      return { passed: false, message: `malformed CoordinationProtocol definition -- ${err.message}` };
-    }
-    throw err;
-  }
-
-  const unresolved = [];
-  const providerFamilies = new Set();
-  let declaredCount = 0;
-  for (const entry of entries) {
-    const definitionId = entry.definition.metadata.id;
-    for (const op of entry.definition.spec.operations ?? []) {
-      const capability = op.policy?.capability;
-      if (!capability) continue;
-      declaredCount += 1;
-      let resolved;
-      try {
-        resolved = resolveExecutorAndOverrides(runnerConfig, capability);
-      } catch (err) {
-        if (err instanceof RunnerConfigError) {
-          unresolved.push(`${definitionId}.${op.id} -> "${capability}": ${err.message}`);
-          continue;
-        }
-        throw err;
-      }
-      // Fix (round 3, MEDIUM): `binding.mjs`'s `bindOperations` (the actual
-      // runtime consumer this check exists to verify) only ever treats
-      // `bindingSource === 'capability.prefer'` as a genuine capability
-      // resolution (H1/H4, red-team rounds 1/2) -- a bare `executor-id`
-      // match or a `capability.for` orphan-executor fallback is refused
-      // there and leaves the actor unbound at real dispatch time. Checking
-      // only `resolved.configured` here would report a capability as
-      // "resolving" (and count its provider family) even when
-      // `bindOperations` would never actually bind it -- a false-positive
-      // on the exact contract this check exists to verify.
-      if (!resolved.configured || resolved.bindingSource !== 'capability.prefer') {
-        unresolved.push(`${definitionId}.${op.id} -> "${capability}": nothing registered through capabilities.${capability}.prefer (a bare executor-id match or a "for"-array fallback does not count -- bindOperations refuses both and leaves the actor unbound)`);
-        continue;
-      }
-      providerFamilies.add(deriveProviderFamily(resolved.executor));
-    }
-  }
-
-  if (unresolved.length > 0) {
-    return { passed: false, message: `${unresolved.length} declared operation.policy.capability value(s) do not resolve: ${unresolved.join('; ')}` };
-  }
-  return {
-    passed: true,
-    message: declaredCount === 0
-      ? 'no CoordinationProtocol operation declares policy.capability yet (nothing to check)'
-      : `${declaredCount} declared operation.policy.capability value(s) resolve; ${providerFamilies.size} distinct provider famil${providerFamilies.size === 1 ? 'y' : 'ies'} reachable ([${[...providerFamilies].sort().join(', ')}])`,
-  };
+  return { passed: true, message: 'no coordination protocols active (retired in favor of workflows)' };
 }
 
 registerCheck({
@@ -2429,7 +2800,7 @@ registerFix({
 
 // tsk-4r1 (found by the gateway audit, plans/reports/gateway-audit-
 // 260814-2110-fable-hidden-bugs-report.md Finding 9): `gateway.token`/
-// `gateway.port` (herdr-plugin/src/gateway.rs's `load_gateway_config`,
+// `gateway.port` (apps/fgos-gateway/src/gateway.rs's `load_gateway_config`,
 // D4/D5) lived nowhere in this registry -- a fresh machine's `fgos setup`
 // never provisioned the section, and `fgos doctor` had no way to notice,
 // violating AGENTS.md's own install/setup/doctor gate.
@@ -2441,7 +2812,7 @@ registerFix({
 // would silently target the wrong file entirely.
 const GATEWAY_HOME_CONFIG_DIR = () => os.homedir();
 
-// Matches herdr-plugin/src/gateway.rs's own `DEFAULT_PORT`.
+// Matches apps/fgos-gateway/src/gateway.rs's own `DEFAULT_PORT`.
 const DEFAULT_GATEWAY_PORT = 4170;
 
 function checkGatewayTokenConfigured() {
@@ -2841,7 +3212,7 @@ registerCheck({
 
 // tsk-2m5 (docs/history/stage-status-driving-coordination/): the
 // herdr-launcher's own auto-launch toggles, read fail-closed from Rust
-// (herdr-plugin/src/settings.rs). Mirrors gateBypass's own shape exactly
+// (packages/herdr-fgos-common/rust/src/settings.rs). Mirrors gateBypass's own shape exactly
 // (config-default + a dedicated check for a present-but-malformed value --
 // `checkConfigNotStale` above already catches the section being entirely
 // MISSING via `assembleRegistryDefaults()`, same as it does for
@@ -2895,7 +3266,7 @@ registerCheck({
 // tsk-48w (D14 of docs/history/herdr-web-dashboard-plan-realignment/
 // CONTEXT.md, carrying forward D10 of the original cluster's own
 // CONTEXT.md): the web dashboard's static-serving toggle, read fail-OPEN
-// from Rust (herdr-plugin/src/settings.rs's `WebDashboardSettings` --
+// from Rust (packages/herdr-fgos-common/rust/src/settings.rs's `WebDashboardSettings` --
 // `static_serving: true` when the section/file is missing). Same
 // registerConfigDefault + registerCheck shape as `herdrOrchestrator`
 // immediately above, deliberately with the opposite default value -- this
@@ -3597,12 +3968,11 @@ registerFix({
 // this makes it discoverable through `fgos doctor` rather than standing
 // alone unregistered. Both checks are READ-ONLY (same RUL9 discipline
 // every other check in this file follows): `discoverCoordinationProtocols`
-// and `projectWorkflowToFlowDefinition` only read from disk/the in-memory
-// domain registry, never write. No new config default is registered
+// only reads from disk, never writes. No new config default is registered
 // alongside these -- discovery is a fixed, deterministic filesystem
 // convention (project `.fgos/coordination-protocols/`, `domains/<name>/
 // coordination-protocols/`, packaged `core/coordination-protocols/`), the
-// same non-configurable style `workflow-stage-graphs.mjs`'s own
+// same non-configurable style `domain-registry.mjs`'s own
 // `domains/`/`core/task-specs/` discovery already uses -- there is no
 // runtime read of a "coordination protocols path" config key to register
 // a default for.
@@ -3614,18 +3984,7 @@ registerFix({
 // which already carries the offending source path (protocol-loader.mjs's
 // `relativeToPackageRoot` suffix on every thrown error).
 function checkCoordinationProtocolFixturesValid(cwd) {
-  try {
-    const entries = discoverCoordinationProtocols({ cwd });
-    return {
-      passed: true,
-      message: `${entries.length} CoordinationProtocol definition(s) discovered and normalized cleanly (project/domain/core tiers)`,
-    };
-  } catch (err) {
-    if (err instanceof FlowDefinitionError) {
-      return { passed: false, message: `malformed CoordinationProtocol definition -- ${err.message}` };
-    }
-    throw err;
-  }
+  return { passed: true, message: 'coordination protocol fixtures retired' };
 }
 
 registerCheck({
@@ -3655,75 +4014,6 @@ registerCheck({
   check: (cwd) => checkOperationPromptTemplatesValid(cwd),
 });
 
-// Exercises R5's adapter itself (not just R7's protocol fixtures) as a
-// doctor-visible health check: every domain that declares `workflows`
-// (today: only `coding`) must still project cleanly into a Workflow-
-// profile FlowDefinition. A domain with no `workflows` at all (every
-// other domain today) is not a failure -- `projectWorkflowToFlowDefinition`
-// only applies where the existing primary-operation compatibility path
-// already applies (flow-definition.md's Workflow profile section), so
-// those domains are a clean skip, not scanned at all.
-//
-// `projectWorkflowToFlowDefinition`'s public contract takes a `kind`, not a
-// workflow NAME (same `operationsForStage`/`resolveWorkflow` calling
-// convention it deliberately mirrors) -- a workflow reached only via
-// `domain.defaultWorkflow` is addressed with `kind: undefined`; a workflow
-// reached only through `domain.workflowFor`'s mapping needs a `kind` that
-// actually maps to it, found here by inverting that table. A workflow name
-// reachable through NEITHER (registered in `domain.workflows` but never
-// wired as anyone's default or `workflowFor` target) has no `kind` this
-// check can legitimately construct -- reported as `unreachable`, a real,
-// separate signal from a validation failure, not silently skipped.
-function checkWorkflowFlowDefinitionProjectsCleanly() {
-  const problems = [];
-  const unreachable = [];
-  let checkedCount = 0;
-  for (const [domainName, domain] of Object.entries(DOMAINS)) {
-    if (!domain?.workflows) continue;
-    const kindByWorkflowName = new Map();
-    for (const [kind, mappedName] of Object.entries(domain.workflowFor || {})) {
-      if (!kindByWorkflowName.has(mappedName)) kindByWorkflowName.set(mappedName, kind);
-    }
-    for (const workflowName of Object.keys(domain.workflows)) {
-      let kind;
-      if (workflowName === domain.defaultWorkflow) {
-        kind = undefined;
-      } else if (kindByWorkflowName.has(workflowName)) {
-        kind = kindByWorkflowName.get(workflowName);
-      } else {
-        unreachable.push(`${domainName}.${workflowName}`);
-        continue;
-      }
-      checkedCount += 1;
-      try {
-        projectWorkflowToFlowDefinition(domainName, { kind });
-      } catch (err) {
-        if (err instanceof FlowDefinitionError) {
-          problems.push(`${domainName}.${workflowName}: ${err.message}`);
-        } else {
-          throw err;
-        }
-      }
-    }
-  }
-  if (problems.length > 0) {
-    return { passed: false, message: problems.join('; ') };
-  }
-  const unreachableNote = unreachable.length > 0
-    ? ` (${unreachable.length} workflow(s) unreachable via any kind, not checked: ${unreachable.join(', ')})`
-    : '';
-  if (checkedCount === 0) {
-    return { passed: true, message: `no domain declares a reachable workflow -- nothing to project${unreachableNote}` };
-  }
-  return { passed: true, message: `${checkedCount} domain workflow(s) project cleanly into a Workflow-profile FlowDefinition${unreachableNote}` };
-}
-
-registerCheck({
-  id: 'workflow-flow-definition-projects-cleanly',
-  description: 'every domain-declared workflow projects cleanly into a Workflow-profile FlowDefinition via the additive adapter (Phase 02 R5)',
-  check: () => checkWorkflowFlowDefinitionProjectsCleanly(),
-});
-
 // Step 08 Phase 07 R3, AGENTS.md's install/setup/doctor gate: `fgos
 // coordination run --file <request>`'s own published example request
 // files (docs/how-to/coordination-examples/*.json -- one agent-led
@@ -3739,43 +4029,7 @@ registerCheck({
 // (RUL9): only reads the example files and the protocol registry, never
 // writes.
 function checkCoordinationExampleRequestsValid(cwd) {
-  const examplesDir = path.join(cwd, 'docs', 'how-to', 'coordination-examples');
-  if (!fs.existsSync(examplesDir)) {
-    return { passed: false, message: `no example request files found at ${path.relative(cwd, examplesDir)} -- Phase 07 R3 requires publishing one agent-led request, declared consult, research protocol, and Group Cognition framework example` };
-  }
-  const files = fs.readdirSync(examplesDir).filter((f) => f.endsWith('.json')).sort();
-  if (files.length === 0) {
-    return { passed: false, message: `${path.relative(cwd, examplesDir)} exists but contains no .json example request files` };
-  }
-  const problems = [];
-  for (const file of files) {
-    const filePath = path.join(examplesDir, file);
-    let raw;
-    try {
-      raw = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-    } catch (err) {
-      problems.push(`${file}: not valid JSON (${err.message})`);
-      continue;
-    }
-    let normalized;
-    try {
-      normalized = validateCoordinationRequest(raw, {});
-    } catch (err) {
-      problems.push(`${file}: fails validateCoordinationRequest (${err.message})`);
-      continue;
-    }
-    if (normalized.kind === 'declared-protocol') {
-      try {
-        loadCoordinationProtocol(normalized.protocolRef.id, { cwd });
-      } catch (err) {
-        problems.push(`${file}: protocolRef.id "${normalized.protocolRef.id}" does not resolve (${err.message})`);
-      }
-    }
-  }
-  if (problems.length > 0) {
-    return { passed: false, message: problems.join('; ') };
-  }
-  return { passed: true, message: `${files.length} coordination example request(s) under ${path.relative(cwd, examplesDir)} validate cleanly and resolve every referenced protocolRef` };
+  return { passed: true, message: 'coordination example requests retired' };
 }
 
 registerCheck({
@@ -3894,6 +4148,46 @@ export function checkTrustStoresReadable(cwd, runnerCfg = {}) {
   return { passed: true, message: notes.length > 0 ? notes.join('; ') : 'no codex-toml or agy trust store declared' };
 }
 
+/**
+ * A confined herdr pane that binds `private-home` starts in an empty home: the account's login only gets
+ * there when the machine-global provider account inventory names it. Without that entry the agent starts
+ * logged out, and the first symptom is a pane sitting at a sign-in screen until the idle limit. This is the
+ * doctor line that names it, per invocation, before a run does.
+ */
+export function checkConfinedPaneAccounts(runnerCfg = {}) {
+  let inventory;
+  try {
+    inventory = providerAccountInventory(runnerCfg);
+  } catch (err) {
+    return { passed: false, message: `provider account inventory is invalid: ${err.message}` };
+  }
+  const expandHome = (value) => String(value ?? '').replace(/^\$\{HOME\}(?=\/|$)/, os.homedir()).replace(/^~(?=\/|$)/, os.homedir());
+  const problems = [];
+  const notes = [];
+  for (const [id, executor] of Object.entries(runnerCfg.executors ?? {})) {
+    for (const inv of executor?.invocations ?? []) {
+      if (inv?.adapter !== 'herdr-spawn' || !(inv.resourceBindings ?? []).some((b) => b?.resource === 'private-home')) continue;
+      const label = `executor "${id}" invocation "${inv.id ?? '?'}"`;
+      const provider = normalizeProviderFamily(executor.providerModel ?? executor.provider);
+      const accounts = Object.values(inventory[provider]?.accounts ?? {});
+      if (accounts.length === 0) {
+        problems.push(`${label}: no runner.providers.${provider}.accounts in the global config, so its pane starts in an empty private home, logged out`);
+        continue;
+      }
+      for (const account of accounts) {
+        const source = account.credentialSource;
+        const home = expandHome(source.home);
+        const files = source.kind === 'home-files' ? source.files : ['auth.json'];
+        const missing = files.filter((rel) => !fs.existsSync(path.join(home, rel)));
+        if (missing.length > 0) problems.push(`${label}: account "${account.id}" is missing ${missing.join(', ')} under ${home}`);
+        else notes.push(`${label}: account "${account.id}" has its ${files.length} credential file(s)`);
+      }
+    }
+  }
+  if (problems.length > 0) return { passed: false, message: problems.join('; ') };
+  return { passed: true, message: notes.length > 0 ? notes.join('; ') : 'no confined herdr invocation binds a private home' };
+}
+
 /** Second reading of the config door's own C5 invariant. Names the executor and
  * the specific flags, because "confinement incomplete" leaves a reader hunting
  * through three booleans for the one that is false. */
@@ -3914,6 +4208,37 @@ export function checkExecutorConfinement(runnerCfg = {}) {
   return {
     passed: false,
     message: `executors declare "permissionMode": "bypass" without full confinement: ${offenders.join('; ')}`,
+  };
+}
+
+/** A worker holds no git write grant: the runner commits what it leaves in the
+ * worktree. A config that still grants `git add`/`git commit` (bare or
+ * `rtk`-wrapped) through an allowlist predates that rule and lets an unconfined
+ * worker move branch refs; named per executor/invocation so the fix is a
+ * one-line edit. Reported as a warning, never auto-removed from a user's file. */
+const GIT_WRITE_GRANT = /\bgit (add|commit)\b/;
+
+function grantsGitWrite(args) {
+  if (!Array.isArray(args)) return false;
+  const at = args.indexOf('--allowedTools');
+  return at !== -1 && typeof args[at + 1] === 'string' && GIT_WRITE_GRANT.test(args[at + 1]);
+}
+
+export function checkInvocationGitWriteGrants(runnerCfg = {}) {
+  const offenders = [];
+  if (grantsGitWrite(runnerCfg.executor?.args)) offenders.push('executor');
+  for (const [id, executor] of Object.entries(runnerCfg.executors ?? {})) {
+    if (grantsGitWrite(executor?.args)) offenders.push(`executors.${id}`);
+    for (const invocation of executor?.invocations ?? []) {
+      if (grantsGitWrite(invocation?.args)) offenders.push(`executors.${id}.invocations.${invocation.id ?? '?'}`);
+    }
+  }
+  if (offenders.length === 0) {
+    return { passed: true, message: 'no executor or invocation grants git add/git commit to a worker' };
+  }
+  return {
+    passed: true,
+    message: `warning: ${offenders.join(', ')} still grant git add/git commit in --allowedTools; workers no longer commit (the runner does) -- remove the grant`,
   };
 }
 
@@ -4048,7 +4373,7 @@ registerCheck({
 
 registerCheck({
   id: 'executor-profile-warnings',
-  description: 'Phase 06 (executor-policy-dispatch-seams): legacy executor/capability entries hardcoding policy-shaped flags, rigorOverrides-as-identity, or account-pool-like env, each named with its documented migration target',
+  description: 'Phase 06 (executor-policy-dispatch-seams): legacy executor entries hardcoding policy-shaped flags or account-pool-like env, each named with its documented migration target',
   check: (cwd) => {
     try {
       return checkExecutorProfileWarnings(cwd, loadRunnerConfigFromDir(cwd));
@@ -4065,6 +4390,18 @@ registerCheck({
 });
 
 registerCheck({
+  id: 'confined-pane-accounts',
+  description: 'every confined herdr invocation that binds a private home has an account in the global provider inventory whose credential files exist, so its pane starts logged in',
+  check: (cwd) => {
+    try {
+      return checkConfinedPaneAccounts(loadRunnerConfigFromDir(cwd));
+    } catch (err) {
+      return { passed: true, message: `runner config not loadable here, confined pane accounts not evaluated: ${err.message}` };
+    }
+  },
+});
+
+registerCheck({
   id: 'non-claude-trust-stores-readable',
   description: 'every executor or invocation declaring a codex-toml or agy/agy-json trustStore reads from a store that is actually readable, the same read a live dispatch will do',
   check: (cwd) => {
@@ -4077,6 +4414,32 @@ registerCheck({
 });
 
 registerCheck({
+  id: 'agent-cli-project-trusted',
+  description: 'the project root is trusted in every codex home and agy sub-HOME the configured executors run under, so a headless dispatch does not stop at a "Trust this folder?" prompt',
+  check: (cwd) => checkAgentCliProjectTrusted(cwd, { loadRunnerConfig: loadRunnerConfigFromDir }),
+});
+
+// Async: the check drives the runner's own pattern code, which is promise-based. `fgos doctor`
+// awaits every check, so a check may return its result directly or as a promise.
+registerCheck({
+  id: 'workflow-pools-satisfy-independence',
+  description: 'for every panel or reviewed Workflow unit, the capability prefer pool supplies enough distinct provider families for bind() to place every role independently',
+  check: (cwd) => checkWorkflowPoolsSatisfyIndependence(cwd, {
+    packageRoot: path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..'),
+    loadRunnerConfig: loadRunnerConfigFromDir,
+  }),
+});
+
+registerCheck({
+  id: 'blind-steps-use-proven-pools',
+  description: 'every blind Workflow unit can only bind executors whose provider family and transport were proven to keep a worker blind (read-only, no model call)',
+  check: (cwd) => checkBlindStepsUseProvenPools(cwd, {
+    packageRoot: path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..'),
+    loadRunnerConfig: loadRunnerConfigFromDir,
+  }),
+});
+
+registerCheck({
   id: 'executor-confinement',
   description: 'no executor declares "permissionMode": "bypass" without privateHome, isolatedSession and ownWorktree all true',
   check: (cwd) => {
@@ -4086,6 +4449,18 @@ registerCheck({
       // A directory with no loadable runner config is not a confinement problem;
       // saying otherwise would make doctor cry wolf everywhere fgOS is not set up.
       return { passed: true, message: `runner config not loadable here, confinement not evaluated: ${err.message}` };
+    }
+  },
+});
+
+registerCheck({
+  id: 'invocation-git-write-grants',
+  description: 'warns when an executor or invocation still grants git add/git commit to a worker through --allowedTools (the runner commits; workers hold no git write grant)',
+  check: (cwd) => {
+    try {
+      return checkInvocationGitWriteGrants(loadRunnerConfigFromDir(cwd));
+    } catch (err) {
+      return { passed: true, message: `runner config not loadable here, git write grants not evaluated: ${err.message}` };
     }
   },
 });
@@ -4536,7 +4911,7 @@ registerFix({
 // --fix`) and at runner start (loop.mjs) is what actually reclaims it.
 
 export function defaultConfinementTempRoots() {
-  const roots = new Set([path.join(os.tmpdir(), 'fgos-confinement')]);
+  const roots = new Set([resolveConfinementTempRoot()]);
   try {
     const registry = loadMachineBackendRegistry();
     for (const instance of Object.values(registry?.confinementBackends || {})) {
@@ -4549,19 +4924,60 @@ export function defaultConfinementTempRoots() {
   return [...roots];
 }
 
+/** Temp roots we own whose mode is not owner-only: a private home under one
+ * holds a copy of an account login, so a group- or world-readable root is a
+ * finding in its own right (counts only; never reads the contents). */
+function looseConfinementRoots(roots) {
+  const uid = typeof process.getuid === 'function' ? process.getuid() : null;
+  const loose = [];
+  for (const root of roots) {
+    try {
+      const st = fs.statSync(root);
+      if ((uid === null || st.uid === uid) && (st.mode & 0o077) !== 0) loose.push(root);
+    } catch { /* absent root: nothing to protect yet */ }
+  }
+  return loose;
+}
+
 export function checkConfinementOrphanedResourcesReaped() {
   // Read-only: reapOrphanedConfinementResources has no dry-run mode of its
   // own (it deletes), so this counts dead-owned markers itself instead of
   // calling it -- a `check` must never mutate.
   const roots = defaultConfinementTempRoots();
   const markedDeadOwnerDirs = countDeadOwnedConfinementDirs(roots);
-  if (markedDeadOwnerDirs === 0) {
+  const loose = looseConfinementRoots(roots);
+  const emptyShells = countEmptyDispatchShells(roots);
+  if (markedDeadOwnerDirs === 0 && emptyShells === 0 && loose.length === 0) {
     return { passed: true, message: 'no orphaned confinement resources found under ' + roots.join(', ') };
   }
-  return {
-    passed: false,
-    message: `${markedDeadOwnerDirs} confinement resource dir(s) owned by a dead process across ${roots.join(', ')} -- run "fgos doctor --fix"`,
-  };
+  const problems = [];
+  if (emptyShells > 0) {
+    problems.push(`${emptyShells} empty per-dispatch dir(s) left behind across ${roots.join(', ')}`);
+  }
+  if (markedDeadOwnerDirs > 0) {
+    problems.push(`${markedDeadOwnerDirs} confinement resource dir(s) owned by a dead process across ${roots.join(', ')}`);
+  }
+  if (loose.length > 0) {
+    problems.push(`confinement root(s) readable beyond the owner (should be 0700): ${loose.join(', ')}`);
+  }
+  return { passed: false, message: `${problems.join('; ')} -- run "fgos doctor --fix"` };
+}
+
+/** Empty per-dispatch directories old enough that the reaper removes them (see reapOrphanedConfinementResources). */
+function countEmptyDispatchShells(roots) {
+  let count = 0;
+  for (const tempRoot of roots) {
+    try {
+      for (const entry of fs.readdirSync(tempRoot, { withFileTypes: true })) {
+        if (!entry.isDirectory()) continue;
+        const dir = path.join(tempRoot, entry.name);
+        if (fs.readdirSync(dir).length === 0 && Date.now() - fs.statSync(dir).mtimeMs > EMPTY_SHELL_GRACE_MS) count += 1;
+      }
+    } catch {
+      // an unreadable or missing root has nothing to count
+    }
+  }
+  return count;
 }
 
 function countDeadOwnedConfinementDirs(roots) {
@@ -4588,6 +5004,8 @@ function countDeadOwnedConfinementDirs(roots) {
         if (!fs.existsSync(markerPath)) continue;
         try {
           const marker = JSON.parse(fs.readFileSync(markerPath, 'utf8'));
+          // A home kept for a left-open pane is awaiting that pane, not orphaned.
+          if (marker.paneId) continue;
           const alive = Number.isInteger(marker.pid) && marker.pid > 0 && (() => {
             try { process.kill(marker.pid, 0); return true; } catch (err) { return err.code === 'EPERM'; }
           })();
@@ -4606,16 +5024,24 @@ export function fixConfinementOrphanedResourcesReaped() {
   const roots = defaultConfinementTempRoots();
   let totalReaped = 0;
   const messages = [];
+  const tightened = looseConfinementRoots(roots);
+  for (const root of tightened) {
+    try { fs.chmodSync(root, 0o700); } catch { /* reported again by the check */ }
+  }
   for (const tempRoot of roots) {
     const { reaped } = reapOrphanedConfinementResources({ tempRoot });
     totalReaped += reaped.length;
     if (reaped.length > 0) messages.push(`${reaped.length} under ${tempRoot}`);
   }
+  const tightenedNote = tightened.length > 0 ? `set ${tightened.join(', ')} to 0700` : '';
   return {
-    changed: totalReaped > 0,
-    message: totalReaped > 0
-      ? `reaped ${totalReaped} orphaned confinement resource dir(s): ${messages.join('; ')}`
-      : 'no orphaned confinement resources to reap',
+    changed: totalReaped > 0 || tightened.length > 0,
+    message: [
+      totalReaped > 0
+        ? `reaped ${totalReaped} orphaned confinement resource dir(s): ${messages.join('; ')}`
+        : 'no orphaned confinement resources to reap',
+      tightenedNote,
+    ].filter(Boolean).join('; '),
   };
 }
 
@@ -4729,6 +5155,49 @@ registerCheck({
   id: 'confinement-probe-freshness',
   description: 'confinement probe freshness status (runs the 8-probe falsification harness against the registered bwrap backend)',
   check: () => checkConfinementProbeFreshness(),
+});
+
+// A blind unit is refused, never run unblind, when its backend cannot keep a worker from
+// reading peer run state. This row says which of those a machine is in: pass, fail (the probe
+// ran and failed), or backend-unsupported (no enabled bwrap backend on Linux, so every blind
+// unit is refused, which is by design and not a fault of an install that runs none).
+export function checkConfinementBlindRead() {
+  let registry;
+  try {
+    registry = loadMachineBackendRegistry();
+  } catch (err) {
+    return { passed: false, message: `blind-read: fail (machine registry not readable: ${err.message})` };
+  }
+
+  const bwrapBackend = registry.confinementBackends?.bwrap;
+  if (!bwrapBackend || bwrapBackend.enabled === false) {
+    return { passed: true, message: 'blind-read: backend-unsupported (no enabled bwrap backend; blind units are refused)' };
+  }
+  if (os.platform() !== 'linux') {
+    return { passed: true, message: `blind-read: backend-unsupported (platform "${os.platform()}" is not Linux; blind units are refused)` };
+  }
+
+  const binaryPath = bwrapBackend.executable || 'bwrap';
+  const available = checkBwrapAvailable(binaryPath);
+  if (!available.passed) {
+    return { passed: true, message: `blind-read: backend-unsupported (bwrap "${binaryPath}" is not usable: ${available.message}; blind units are refused)` };
+  }
+
+  const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-blind-probe-'));
+  try {
+    const result = probePeerRunHidden({ bwrapBin: binaryPath, scratchDir: scratch });
+    return result.passed
+      ? { passed: true, message: 'blind-read: pass (a blind worker cannot read a peer run, home or process)' }
+      : { passed: false, message: `blind-read: fail (${result.detail})` };
+  } finally {
+    fs.rmSync(scratch, { recursive: true, force: true });
+  }
+}
+
+registerCheck({
+  id: 'confinement-blind-read',
+  description: 'a blind unit can be enforced: the registered bwrap backend hides peer run state, homes and processes from a worker',
+  check: () => checkConfinementBlindRead(),
 });
 
 export function checkConfinementStrictReadiness(cwd) {
@@ -5078,9 +5547,8 @@ registerFix({
   }
 });
 
-// dispatch-engine-liveness-hardening Phase 7 (C1): the two remaining shadow
-// binders (`resolveVerifiedPlacementModel`/`resolveVerifiedProviderArgs`,
-// dispatch/placement-policy.mjs's `recordShadowBinderDivergence`) now write
+// dispatch-engine-liveness-hardening Phase 7 (C1): shadow binder
+// (`resolveVerifiedProviderArgs`, `recordShadowBinderDivergence`) now writes
 // a real disagreement to a durable local JSONL instead of only an ephemeral
 // stderr line. Informational, not a gate: a fallback-to-legacy disagreement
 // is handled safely by design (the real spawn never regresses on
@@ -5118,66 +5586,242 @@ registerCheck({
   check: (cwd) => checkShadowBinderDivergence(cwd),
 });
 
-// A coordination session's own manifest.status can stay 'active' forever
-// once the real work inside it is done, if nothing ever calls
-// transitionSessionStatus -- confirmed against real production session data
-// that a large share of sessions with a linked result never reached a
-// terminal status (completed/partial/failed/cancelled, the only
-// STATUS_VALUES members besides 'active'). Purely informational: naming a
-// session here never mutates or closes it -- there is no companion fix,
-// since closing a session safely requires real classification of which
-// actors/assignments are actually done, not something to guess at from
-// outside. 7-day threshold, not 24h: some real sessions (e.g. multi-day
-// architecture-advisory panels with a human in the loop) legitimately stay
-// active far longer than a day, and this check must not turn into noise for
-// those.
-const STALE_ACTIVE_SESSION_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+// ─── Observe Component (Phase F8, plans/260929-1501-metrics-friction-rust-native) ─
 
-function checkCoordinationSessionsClosed(cwd) {
-  const sessionsDir = path.join(cwd, '.fgos', 'coordination', 'sessions');
-  if (!fs.existsSync(sessionsDir)) {
-    return { passed: true, message: 'no coordination sessions directory present' };
-  }
-  let entries;
+export function checkObserveDirWritable(cwd) {
+  const root = resolveMainCheckoutRoot(cwd) ?? cwd;
+  const observeDir = path.join(root, '.fgos', 'observe');
   try {
-    entries = fs.readdirSync(sessionsDir, { withFileTypes: true });
+    if (!fs.existsSync(observeDir)) {
+      fs.mkdirSync(observeDir, { recursive: true });
+    }
+    const probeFile = path.join(observeDir, `.probe-${process.pid}-${Date.now()}`);
+    fs.writeFileSync(probeFile, 'ok', 'utf8');
+    fs.unlinkSync(probeFile);
+    return { passed: true, message: '.fgos/observe is writable' };
   } catch (err) {
-    return { passed: true, message: `coordination sessions directory unreadable: ${err.message}` };
+    return { passed: false, message: `.fgos/observe is not writable: ${err.message}` };
   }
-  const now = Date.now();
-  let staleActive = 0;
-  let oldestId = null;
-  let oldestAgeMs = -1;
-  for (const entry of entries) {
-    if (!entry.isDirectory()) continue;
-    let manifest;
+}
+
+export function checkObserveFrictionMigrated(cwd) {
+  const root = resolveMainCheckoutRoot(cwd) ?? cwd;
+  // `friction` is a Rust host verb: the Node fgos entry refuses it, so the fix is named
+  // against the host binary when one resolves, and by its install location otherwise.
+  const hostBin = resolveHostBin(cwd);
+  const migrateFix = hostBin
+    ? `run: ${hostBin} friction migrate --dir ${root}`
+    : `run \`fgos friction migrate --dir ${root}\` with the Rust host binary (<project>/.fgos/installation/bin/fgos, or FGOS_HOST_BIN); the Node fgos entry has no friction verb and no host binary resolved here`;
+  const fgosDir = path.join(root, '.fgos');
+  if (!fs.existsSync(fgosDir)) {
+    return { passed: true, message: 'no .fgos directory present' };
+  }
+
+  // 1. Scan legacy work.friction records in .fgos/events.jsonl and .fgos/events/*.jsonl
+  const legacyFrictions = [];
+  const filesToScan = [];
+  const baselineEvents = path.join(fgosDir, 'events.jsonl');
+  if (fs.existsSync(baselineEvents)) {
+    filesToScan.push({ src: 'events.jsonl', path: baselineEvents });
+  }
+  const eventsDir = path.join(fgosDir, 'events');
+  if (fs.existsSync(eventsDir) && fs.statSync(eventsDir).isDirectory()) {
     try {
-      manifest = JSON.parse(fs.readFileSync(path.join(sessionsDir, entry.name, 'session.json'), 'utf8'));
-    } catch {
-      continue; // unreadable/mid-write/not a real session dir -- not this check's job
-    }
-    if (manifest.status !== 'active') continue;
-    const createdAt = Date.parse(manifest.createdAt);
-    if (!Number.isFinite(createdAt)) continue;
-    const ageMs = now - createdAt;
-    if (ageMs < STALE_ACTIVE_SESSION_AGE_MS) continue;
-    staleActive += 1;
-    if (ageMs > oldestAgeMs) {
-      oldestAgeMs = ageMs;
-      oldestId = manifest.coordinationId ?? entry.name;
-    }
+      const entries = fs.readdirSync(eventsDir);
+      for (const entry of entries) {
+        if (entry.endsWith('.jsonl')) {
+          filesToScan.push({ src: `events/${entry}`, path: path.join(eventsDir, entry) });
+        }
+      }
+    } catch {}
   }
-  if (staleActive === 0) {
-    return { passed: true, message: 'no coordination session stuck "active" past 7 days' };
+
+  for (const { src, path: filePath } of filesToScan) {
+    try {
+      const content = fs.readFileSync(filePath, 'utf8');
+      const lines = content.split('\n');
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+        try {
+          const ev = JSON.parse(trimmed);
+          if (ev.type === 'work.friction') {
+            const seq = typeof ev.seq === 'number' ? ev.seq : 0;
+            legacyFrictions.push({ src, seq });
+          }
+        } catch {}
+      }
+    } catch {}
   }
+
+  if (legacyFrictions.length === 0) {
+    return { passed: true, message: 'no legacy work.friction records to migrate' };
+  }
+
+  // 2. Scan .fgos/observe/friction/*.jsonl for migration record and migrated (src, seq) pairs
+  const frictionDir = path.join(fgosDir, 'observe', 'friction');
+  if (!fs.existsSync(frictionDir) || !fs.statSync(frictionDir).isDirectory()) {
+    return {
+      passed: false,
+      message: `friction migration not run: .fgos/observe/friction directory missing while legacy work.friction records exist -- ${migrateFix}`,
+    };
+  }
+
+  let hasMigrationRecord = false;
+  const migratedPairs = new Set();
+  try {
+    const entries = fs.readdirSync(frictionDir);
+    for (const entry of entries) {
+      if (entry.endsWith('.jsonl')) {
+        const content = fs.readFileSync(path.join(frictionDir, entry), 'utf8');
+        const lines = content.split('\n');
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed) continue;
+          try {
+            const rec = JSON.parse(trimmed);
+            if (rec.type === 'migration') {
+              hasMigrationRecord = true;
+            }
+            if (rec.legacy && typeof rec.legacy.src === 'string' && typeof rec.legacy.seq === 'number') {
+              migratedPairs.add(`${rec.legacy.src}:${rec.legacy.seq}`);
+            }
+          } catch {}
+        }
+      }
+    }
+  } catch (err) {
+    return { passed: false, message: `failed reading .fgos/observe/friction: ${err.message}` };
+  }
+
+  if (!hasMigrationRecord) {
+    return {
+      passed: false,
+      message: `friction migration not run: no migration record found in .fgos/observe/friction/*.jsonl -- ${migrateFix}`,
+    };
+  }
+
+  const unmigrated = legacyFrictions.filter(({ src, seq }) => !migratedPairs.has(`${src}:${seq}`));
+  if (unmigrated.length > 0) {
+    return {
+      passed: false,
+      message: `${unmigrated.length} legacy work.friction record(s) newer than cursor (not migrated) -- ${migrateFix}`,
+    };
+  }
+
   return {
-    passed: false,
-    message: `${staleActive} coordination session(s) still "active" past 7 days -- oldest: "${oldestId}" (${Math.round(oldestAgeMs / 86400000)}d). A session this old likely finished without ever reaching a terminal status (completed/partial/failed/cancelled) -- worth reviewing, no auto-fix.`,
+    passed: true,
+    message: `all ${legacyFrictions.length} legacy work.friction record(s) migrated to .fgos/observe/friction`,
   };
 }
 
+export function checkObserveHostResolvable(cwd) {
+  const hostBin = resolveHostBin(cwd);
+  if (!hostBin) {
+    return {
+      passed: false,
+      message: 'host binary unavailable (FGOS_HOST_BIN unset and no active installation manifest)',
+    };
+  }
+
+  const root = resolveMainCheckoutRoot(cwd) ?? cwd;
+  try {
+    const stdout = execFileSync(hostBin, ['friction', 'ping', '--dir', root], {
+      stdio: ['pipe', 'pipe', 'pipe'],
+      encoding: 'utf8',
+    });
+    const parsed = JSON.parse(stdout);
+    if (parsed && (parsed.ok || parsed.data?.ok)) {
+      return {
+        passed: true,
+        message: `host binary at ${hostBin} resolved and verified (friction supported)`,
+      };
+    }
+    return {
+      passed: true,
+      message: `host binary at ${hostBin} resolved`,
+    };
+  } catch (err) {
+    const stderr = err.stderr ? err.stderr.toString('utf8').trim() : err.message;
+    return {
+      passed: false,
+      message: `host binary at ${hostBin} failed version check: ${stderr || err.message}`,
+    };
+  }
+}
+
+export function checkObserveRunCoverage(cwd, { hostRunner = invokeHost, scan = scanAssignmentLayout, now = Date.now() } = {}) {
+  const root = resolveMainCheckoutRoot(cwd) ?? cwd;
+  const location = root === cwd ? root : `${root} (main checkout; requested ${cwd})`;
+  let coverage;
+  try {
+    coverage = hostRunner(['metrics', 'coverage'], { dir: root });
+  } catch (err) {
+    if (err.code === 'host-version-mismatch') {
+      return { passed: true, degraded: true, message: `old host predates the run layout rule; upgrade the active release (${location})` };
+    }
+    return { passed: false, message: `run coverage unavailable for ${location}: ${err.message}` };
+  }
+  if (!coverage || typeof coverage !== 'object' || Array.isArray(coverage)) {
+    return { passed: false, message: `invalid run coverage response for ${location}` };
+  }
+  if (!Object.hasOwn(coverage, 'layoutRule')) {
+    return { passed: true, degraded: true, message: `old host predates the run layout rule; upgrade the active release (${location})` };
+  }
+  const counts = Object.values(coverage.skipped ?? {});
+  if (coverage.layoutRule !== 'v2' || !Number.isSafeInteger(coverage.runDirsSeen) || coverage.runDirsSeen < 0
+    || !Number.isSafeInteger(coverage.observed) || coverage.observed < 0
+    || !Number.isSafeInteger(coverage.recentRuns) || coverage.recentRuns < 0
+    || coverage.recentRuns > coverage.runDirsSeen
+    || !coverage.skipped || typeof coverage.skipped !== 'object' || Array.isArray(coverage.skipped)
+    || counts.some((n) => !Number.isSafeInteger(n) || n < 0)
+    || coverage.observed + counts.reduce((sum, n) => sum + n, 0) !== coverage.runDirsSeen) {
+    return { passed: false, message: `invalid run coverage accounting or unsupported layout rule for ${location}` };
+  }
+  let layout;
+  try {
+    layout = scan(path.join(root, '.fgos'));
+  } catch (err) {
+    return { passed: false, message: `cannot enumerate run directories for ${location}: ${err.message}` };
+  }
+  const eligible = projectRunEligibility(layout);
+  let recent = 0;
+  for (const run of layout.runs) {
+    try {
+      const stat = fs.lstatSync(run.runDir);
+      if (stat.isDirectory() && now - stat.mtimeMs <= 60_000) recent++;
+    } catch {}
+  }
+  const directoryDifference = layout.runDirsSeen - coverage.runDirsSeen;
+  const admissionDifference = eligible.observed - coverage.observed;
+  const tolerance = Math.max(recent, coverage.recentRuns);
+  if (Math.abs(directoryDifference) > tolerance || Math.abs(admissionDifference) > tolerance) {
+    const examples = layout.runs.slice(0, 3).map((run) => path.relative(root, run.runDir)).join(', ');
+    return { passed: false, message: `run coverage differs: directories Node ${layout.runDirsSeen}, host ${coverage.runDirsSeen} (difference ${directoryDifference}); eligible Node ${eligible.observed}, observed host ${coverage.observed} (difference ${admissionDifference}); recent tolerance ${tolerance}; ${location}; sample candidates (not confirmed missing): ${examples || '(none)'}` };
+  }
+  return { passed: true, message: `run coverage matches: directories Node ${layout.runDirsSeen}, host ${coverage.runDirsSeen}; eligible Node ${eligible.observed}, observed host ${coverage.observed}; recent tolerance ${tolerance}; ${location}` };
+}
+
 registerCheck({
-  id: 'coordination-sessions-closed',
-  description: 'coordination sessions reach a terminal status (completed/partial/failed/cancelled) instead of staying "active" indefinitely',
-  check: (cwd) => checkCoordinationSessionsClosed(cwd),
+  id: 'observe-dir-writable',
+  description: '.fgos/observe directory is writable',
+  check: (cwd) => checkObserveDirWritable(cwd),
+});
+
+registerCheck({
+  id: 'observe-friction-migrated',
+  description: 'legacy work.friction records are fully migrated to .fgos/observe/friction with no unmigrated records past cursor',
+  check: (cwd) => checkObserveFrictionMigrated(cwd),
+});
+
+registerCheck({
+  id: 'observe-host-resolvable',
+  description: 'Rust host binary resolves and supports observe commands (friction ping)',
+  check: (cwd) => checkObserveHostResolvable(cwd),
+});
+
+registerCheck({
+  id: 'observe-run-coverage',
+  description: 'Observe directory totals and admitted runs match the independent Node layout and eligibility projections',
+  check: (cwd) => checkObserveRunCoverage(cwd),
 });

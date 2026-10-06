@@ -1,0 +1,125 @@
+{
+  "init": "gemini-3.8-flash-medium",
+  "calls": [
+    {
+      "name": "run_command",
+      "parameters": {
+        "CommandLine": "ls -la"
+      }
+    },
+    {
+      "name": "run_command",
+      "parameters": {
+        "CommandLine": "git status"
+      }
+    },
+    {
+      "name": "run_command",
+      "parameters": {
+        "CommandLine": "ls -la /home/vantt/projects/mdview"
+      }
+    },
+    {
+      "name": "run_command",
+      "parameters": {
+        "CommandLine": "find /home/vantt/projects -name \"panel.mjs\" 2>/dev/null"
+      }
+    },
+    {
+      "name": "view_file",
+      "parameters": {
+        "AbsolutePath": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/panelist-3/1/inputs/1-source-packet-d55108fd3c6d.txt"
+      }
+    },
+    {
+      "name": "view_file",
+      "parameters": {
+        "AbsolutePath": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/panelist-3/1/inputs/1-source-packet-d55108fd3c6d.txt"
+      }
+    },
+    {
+      "name": "view_file",
+      "parameters": {
+        "AbsolutePath": "/home/vantt/projects/forgentX/plans/reports/observe-unit-summary-stance-prior-art-261005.md"
+      }
+    },
+    {
+      "name": "view_file",
+      "parameters": {
+        "AbsolutePath": "/home/vantt/projects/forgentX/plans/reports/council-ab-comparison-261004.md"
+      }
+    },
+    {
+      "name": "run_command",
+      "parameters": {
+        "CommandLine": "ls -la /home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/panelist-3/1/runs/01"
+      }
+    },
+    {
+      "name": "run_command",
+      "parameters": {
+        "CommandLine": "ls -la /home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/panelist-3/1/runs/01/worker-output"
+      }
+    },
+    {
+      "name": "run_command",
+      "parameters": {
+        "CommandLine": "ls -la /home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/panelist-3/1/runs/01/worker-output/outbox"
+      }
+    },
+    {
+      "name": "view_file",
+      "parameters": {
+        "AbsolutePath": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/panelist-3/1/runs/01/effective-execution-contract.json"
+      }
+    },
+    {
+      "name": "view_file",
+      "parameters": {
+        "AbsolutePath": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/unit.json"
+      }
+    },
+    {
+      "name": "run_command",
+      "parameters": {
+        "CommandLine": "ls -la /home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b"
+      }
+    },
+    {
+      "name": "view_file",
+      "parameters": {
+        "AbsolutePath": "/home/vantt/projects/forgentX/packages/run-result/contracts/agent-result-claim.v2.json"
+      }
+    },
+    {
+      "name": "run_command",
+      "parameters": {
+        "CommandLine": "find /home/vantt/projects/forgentX -name \"*claim*\" 2>/dev/null"
+      }
+    },
+    {
+      "name": "view_file",
+      "parameters": {
+        "AbsolutePath": "/home/vantt/projects/forgentX/src/runner/dispatch/agent-result-claim-contract.mjs"
+      }
+    },
+    {
+      "name": "write_to_file",
+      "parameters": {
+        "TargetFile": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/panelist-3/1/runs/01/worker-output/outbox/agent-report.md"
+      }
+    },
+    {
+      "name": "write_to_file",
+      "parameters": {
+        "TargetFile": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/panelist-3/1/runs/01/worker-output/outbox/agent-result.json"
+      }
+    },
+    {
+      "name": "run_command",
+      "parameters": {
+        "CommandLine": "node -e '\nimport { validateAgentResultClaimContract } from \"/home/vantt/projects/forgentX/src/runner/dispatch/agent-result-claim-contract.mjs\";\nimport fs from \"fs\";\n\nconst claim = JSON.parse(fs.readFileSync(\"/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002581-a9476c1b/panelist-3/1/runs/01/worker-output/outbox/agent-result.json\", \"utf8\"));\nconst res = validateAgentResultClaimContract(claim, { role: \"panelist-3\" });\nconsole.log(\"Validation result:\", res);\n'"
+      }
+    }
+  ]
+}

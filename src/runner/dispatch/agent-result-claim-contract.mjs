@@ -47,6 +47,7 @@ export function renderAgentResultClaimInstructions(context = {}) {
  * Validate an untrusted claim. Missing `contract` is interpreted as a legacy
  * claim and checked only against the legacy fields; it is never upgraded to a
  * v2 claim or proof. A present contract must be exactly this v2 contract.
+ * Unknown fields, including optional passive `stance`, never change validity.
  */
 export function validateAgentResultClaimContract(value, context = {}) {
   if (value === null || typeof value !== 'object' || Array.isArray(value)) {

@@ -38,7 +38,8 @@ test('allows a real Agent call with no registered executor for its subagent_type
   const repoRoot = mkTempGitRepo();
   writeRunnerConfigFixture(repoRoot, {
     executor: { command: 'claude', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: 5000,
   });
   const result = runHook(repoRoot, { tool_name: 'Agent', tool_input: { subagent_type: 'general-purpose' }, cwd: repoRoot });
@@ -51,9 +52,10 @@ test('blocks a real Agent call whose subagent_type resolves to a registered out-
   const repoRoot = mkTempGitRepo();
   writeRunnerConfigFixture(repoRoot, {
     executor: { command: 'claude', args: ['{prompt}'] },
-    capabilities: { blocked: {} },
-    executors: { 'tool-only': { kind: 'tool', for: ['blocked'], command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
-    models: { standard: 'sonnet' },
+    capabilities: { blocked: { prefer: 'tool-only' } },
+    executors: { 'tool-only': { kind: 'tool', command: 'agy', args: ['{prompt}'], allowCrossProvider: true } },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: 5000,
   });
   const result = runHook(repoRoot, { tool_name: 'Agent', tool_input: { subagent_type: 'blocked' }, cwd: repoRoot });
@@ -67,7 +69,8 @@ test('allows a real Task call the same way an Agent call resolves (both tool nam
   const repoRoot = mkTempGitRepo();
   writeRunnerConfigFixture(repoRoot, {
     executor: { command: 'claude', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: 5000,
   });
   const result = runHook(repoRoot, { tool_name: 'Task', tool_input: { subagent_type: 'general-purpose' }, cwd: repoRoot });
@@ -112,7 +115,8 @@ test('defaults subagent_type to "general-purpose" when tool_input omits it, matc
   const repoRoot = mkTempGitRepo();
   writeRunnerConfigFixture(repoRoot, {
     executor: { command: 'claude', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: 5000,
   });
   const result = runHook(repoRoot, { tool_name: 'Agent', tool_input: {}, cwd: repoRoot });

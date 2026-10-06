@@ -10,6 +10,7 @@ import {
   acquireProviderAccountLease,
   clearProviderAccountQuarantine,
   classifyProviderCapacityFault,
+  parseQuotaResetWindowMs,
   inspectProviderCapacity,
   providerCapacityStatePaths,
   quarantineProviderAccount,
@@ -280,6 +281,71 @@ test('lease reclaim (dispatch-engine-liveness-hardening Phase 4, C2): a live pid
   }
 });
 
+// Real OS processes racing for a lock. The pool is forked ONCE per test and
+// every trial reuses it (a trial is one "go" message per contender), instead
+// of forking a fresh set per trial: ~150 short-lived node processes made
+// the run's cost scale with machine load, and a loaded machine could starve
+// a lock holder past the lock's own wait budget.
+//
+// Two properties keep a failure here a FAILURE rather than a hang:
+//  - a contender that exits before replying rejects the wait, naming the
+//    exit, instead of leaving the parent waiting forever on a dead process;
+//  - `t.after` kills the pool even when the test is cut off by its own
+//    timeout (a `finally` inside the test body never runs then), so no
+//    contender survives to hold the test file's event loop open.
+// Contenders stay alive between trials through their IPC channel alone, which
+// also ends them if the parent dies.
+function nextMessage(child) {
+  return new Promise((resolve, reject) => {
+    const onMessage = (message) => {
+      child.off('exit', onExit);
+      resolve(message);
+    };
+    const onExit = (code, signal) => {
+      child.off('message', onMessage);
+      reject(new Error(`contender pid ${child.pid} exited (code ${code}, signal ${signal}) before replying`));
+    };
+    child.once('message', onMessage);
+    child.once('exit', onExit);
+  });
+}
+
+// `handlerSource` is module source that imports what it needs and defines
+// `function handle(job)`; its return value is sent back to the parent, and a
+// throw is sent back as an error so the parent can fail the trial with it.
+async function startContenders(t, count, handlerSource) {
+  const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-provider-capacity-contenders-'));
+  const scriptPath = path.join(workDir, 'contender.mjs');
+  fs.writeFileSync(scriptPath, `${handlerSource}
+process.on('message', (job) => {
+  try {
+    process.send({ value: handle(job) });
+  } catch (err) {
+    process.send({ error: String(err?.stack ?? err) });
+  }
+});
+process.send({ ready: true });
+`);
+  const children = Array.from({ length: count }, () => fork(scriptPath, { stdio: 'inherit' }));
+  t.after(() => {
+    for (const child of children) child.kill('SIGKILL');
+    fs.rmSync(workDir, { recursive: true, force: true });
+  });
+  await Promise.all(children.map((child) => nextMessage(child)));
+  return {
+    // One job per contender, all sent back to back to contenders that are all
+    // already started and idle -- so they really do contend at the same moment.
+    async race(jobs) {
+      const replies = children.map((child) => nextMessage(child));
+      children.forEach((child, i) => child.send(jobs[i]));
+      const settled = await Promise.all(replies);
+      const failed = settled.find((reply) => reply.error);
+      if (failed) throw new Error(`a contender failed:\n${failed.error}`);
+      return settled.map((reply) => reply.value);
+    },
+  };
+}
+
 // S3 (dispatch-engine-liveness-hardening Phase 4): the audit's own live
 // probe against the real module -- concurrent contenders racing a
 // pre-seeded stale lock (dead pid), no re-check before unlink -- lost a
@@ -308,81 +374,56 @@ test('lease reclaim (dispatch-engine-liveness-hardening Phase 4, C2): a live pid
 //     one-shot child that exits immediately after acquiring would trigger
 //     that (unrelated, correct) reclaim path and produce a false failure
 //     that has nothing to do with this phase's stale-lock TOCTOU fix.
-test('S3 (dispatch-engine-liveness-hardening Phase 4): concurrent contenders racing a pre-seeded stale lock (dead pid) never lose a lease', { timeout: 60_000 }, async () => {
+test('S3 (dispatch-engine-liveness-hardening Phase 4): concurrent contenders racing a pre-seeded stale lock (dead pid) never lose a lease', { timeout: 60_000 }, async (t) => {
   const TRIALS = 10;
   const CONTENDERS = 10;
-  const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-provider-capacity-race-'));
-  const allChildren = [];
-
-  try {
-    for (let trial = 0; trial < TRIALS; trial += 1) {
-      const runtimeDir = mkTempDir();
-      const { statePath, lockDir } = providerCapacityStatePaths(runtimeDir);
-      fs.mkdirSync(lockDir, { recursive: true });
-      // Pre-seed a stale generation-1 lock record left behind by a crashed
-      // holder: a dead pid, no re-checkable content -- exactly the audit's
-      // own probe shape, expressed in the generation-ledger's own on-disk
-      // format (dispatch-engine-liveness-hardening Phase 4 round 2).
-      fs.writeFileSync(
-        path.join(lockDir, '0000000001.json'),
-        JSON.stringify({ holder: { pid: deadPid(), processStartTime: null }, acquiredAt: new Date(0).toISOString() }),
-      );
-
-      const children = Array.from({ length: CONTENDERS }, (_, i) => {
-        const runId = `run_t${trial}_${i}`;
-        const childScript = `
+  const pool = await startContenders(t, CONTENDERS, `
 import { acquireProviderAccountLease } from ${JSON.stringify(pathToFileURL(PROVIDER_CAPACITY_MJS).href)};
-process.send({ ready: true });
-process.once('message', () => {
+const runnerConfig = ${JSON.stringify(runnerConfig())};
+function handle({ runtimeDir, runId, assignmentId }) {
   const result = acquireProviderAccountLease({
-    runnerConfig: ${JSON.stringify(runnerConfig())},
+    runnerConfig,
     provider: 'openai-codex',
-    assignmentId: ${JSON.stringify(`asgn-${i}`)},
-    runId: ${JSON.stringify(runId)},
-    seed: ${JSON.stringify(runId)},
-    runtimeDir: ${JSON.stringify(runtimeDir)},
+    assignmentId,
+    runId,
+    seed: runId,
+    runtimeDir,
   });
-  process.send({ runId: ${JSON.stringify(runId)}, status: result?.status ?? null });
-  setInterval(() => {}, 1000);
-});
-`;
-        const childPath = path.join(workDir, `race-child-t${trial}-${i}.mjs`);
-        fs.writeFileSync(childPath, childScript);
-        const child = fork(childPath, { stdio: 'inherit' });
-        allChildren.push(child);
-        return child;
-      });
+  return { runId, status: result?.status ?? null };
+}
+`);
 
-      // Wait for every contender to finish importing and report 'ready'
-      // before sending 'go' to any of them -- this is what closes the
-      // startup-jitter gap described above.
-      await Promise.all(children.map((child) => new Promise((resolve, reject) => {
-        child.once('message', resolve);
-        child.once('error', reject);
-      })));
-      const finalResultsPromise = Promise.all(children.map((child) => new Promise((resolve, reject) => {
-        child.once('message', resolve);
-        child.once('error', reject);
-      })));
-      children.forEach((child) => child.send('go'));
-      const results = await finalResultsPromise;
+  for (let trial = 0; trial < TRIALS; trial += 1) {
+    const runtimeDir = mkTempDir();
+    t.after(() => fs.rmSync(runtimeDir, { recursive: true, force: true }));
+    const { statePath, lockDir } = providerCapacityStatePaths(runtimeDir);
+    fs.mkdirSync(lockDir, { recursive: true });
+    // Pre-seed a stale generation-1 lock record left behind by a crashed
+    // holder: a dead pid, no re-checkable content -- exactly the audit's
+    // own probe shape, expressed in the generation-ledger's own on-disk
+    // format (dispatch-engine-liveness-hardening Phase 4 round 2).
+    fs.writeFileSync(
+      path.join(lockDir, '0000000001.json'),
+      JSON.stringify({ holder: { pid: deadPid(), processStartTime: null }, acquiredAt: new Date(0).toISOString() }),
+    );
 
-      const selectedRunIds = results.filter((r) => r.status === 'selected').map((r) => r.runId).sort();
-      const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
-      const persistedRunIds = [];
-      for (const acct of Object.values(state.providers?.['openai-codex']?.accounts ?? {})) {
-        persistedRunIds.push(...Object.keys(acct.leases ?? {}));
-      }
-      persistedRunIds.sort();
+    const results = await pool.race(
+      Array.from({ length: CONTENDERS }, (_, i) => ({ runtimeDir, runId: `run_t${trial}_${i}`, assignmentId: `asgn-${i}` })),
+    );
 
-      assert.deepEqual(
-        persistedRunIds,
-        selectedRunIds,
-        `trial ${trial}: every runId reported "selected" must persist its lease in state.json -- a mismatch means a concurrent contender's write clobbered this one (the exact race the audit reproduced 17/25 trials before this fix)`,
-      );
+    const selectedRunIds = results.filter((r) => r.status === 'selected').map((r) => r.runId).sort();
+    const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+    const persistedRunIds = [];
+    for (const acct of Object.values(state.providers?.['openai-codex']?.accounts ?? {})) {
+      persistedRunIds.push(...Object.keys(acct.leases ?? {}));
     }
-  } finally {
-    for (const child of allChildren) child.kill();
+    persistedRunIds.sort();
+
+    assert.deepEqual(
+      persistedRunIds,
+      selectedRunIds,
+      `trial ${trial}: every runId reported "selected" must persist its lease in state.json -- a mismatch means a concurrent contender's write clobbered this one (the exact race the audit reproduced 17/25 trials before this fix)`,
+    );
   }
 });
 
@@ -400,74 +441,52 @@ process.once('message', () => {
 // still be caught here. The critical section briefly busy-waits (a few ms)
 // to widen the window enough for a genuine violation to matter, matching
 // what actually reproduced the round-1 regression during investigation.
-test('S3 round 2 (dispatch-engine-liveness-hardening Phase 4): direct marker-file proof that withFileLock never grants two holders the same lock concurrently', { timeout: 60_000 }, async () => {
+test('S3 round 2 (dispatch-engine-liveness-hardening Phase 4): direct marker-file proof that withFileLock never grants two holders the same lock concurrently', { timeout: 300_000 }, async (t) => {
   const TRIALS = 15;
   const CONTENDERS = 10;
-  const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-provider-capacity-marker-race-'));
-  const allChildren = [];
-
-  try {
-    for (let trial = 0; trial < TRIALS; trial += 1) {
-      const runtimeDir = mkTempDir();
-      const { lockDir } = providerCapacityStatePaths(runtimeDir);
-      fs.mkdirSync(lockDir, { recursive: true });
-      fs.writeFileSync(
-        path.join(lockDir, '0000000001.json'),
-        JSON.stringify({ holder: { pid: deadPid(), processStartTime: null }, acquiredAt: new Date(0).toISOString() }),
-      );
-      const markerPath = path.join(runtimeDir, 'marker');
-      const violationsPath = `${markerPath}.violations`;
-
-      const children = Array.from({ length: CONTENDERS }, (_, i) => {
-        const childScript = `
+  const pool = await startContenders(t, CONTENDERS, `
 import { withFileLock } from ${JSON.stringify(pathToFileURL(PROVIDER_CAPACITY_MJS).href)};
 import fs from 'node:fs';
-process.send({ ready: true });
-process.once('message', () => {
-  withFileLock(${JSON.stringify(lockDir)}, () => {
+function handle({ lockDir, markerPath, violationsPath }) {
+  // Mutual exclusion is the property under test, not how long a contender may wait: a bound that
+  // a loaded machine can exhaust would fail the trial for a reason unrelated to exclusivity.
+  withFileLock(lockDir, () => {
     let mfd;
     try {
-      mfd = fs.openSync(${JSON.stringify(markerPath)}, 'wx');
+      mfd = fs.openSync(markerPath, 'wx');
     } catch (err) {
-      fs.appendFileSync(${JSON.stringify(violationsPath)}, \`MARKER-VIOLATION pid=\${process.pid} err=\${err.code}\\n\`);
+      fs.appendFileSync(violationsPath, \`MARKER-VIOLATION pid=\${process.pid} err=\${err.code}\\n\`);
     }
     const start = Date.now();
     while (Date.now() - start < 5) {} // widen the critical-section window
-    if (mfd !== undefined) { fs.closeSync(mfd); fs.unlinkSync(${JSON.stringify(markerPath)}); }
-  });
-  process.send({ done: true });
-  setInterval(() => {}, 1000);
-});
-`;
-        const childPath = path.join(workDir, `marker-race-child-t${trial}-${i}.mjs`);
-        fs.writeFileSync(childPath, childScript);
-        const child = fork(childPath, { stdio: 'inherit' });
-        allChildren.push(child);
-        return child;
-      });
+    if (mfd !== undefined) { fs.closeSync(mfd); fs.unlinkSync(markerPath); }
+  }, { waitMs: 300_000 });
+  return { done: true };
+}
+`);
 
-      await Promise.all(children.map((child) => new Promise((resolve, reject) => {
-        child.once('message', resolve);
-        child.once('error', reject);
-      })));
-      const donePromise = Promise.all(children.map((child) => new Promise((resolve, reject) => {
-        child.once('message', resolve);
-        child.once('error', reject);
-      })));
-      children.forEach((child) => child.send('go'));
-      await donePromise;
+  for (let trial = 0; trial < TRIALS; trial += 1) {
+    const runtimeDir = mkTempDir();
+    t.after(() => fs.rmSync(runtimeDir, { recursive: true, force: true }));
+    const { lockDir } = providerCapacityStatePaths(runtimeDir);
+    fs.mkdirSync(lockDir, { recursive: true });
+    fs.writeFileSync(
+      path.join(lockDir, '0000000001.json'),
+      JSON.stringify({ holder: { pid: deadPid(), processStartTime: null }, acquiredAt: new Date(0).toISOString() }),
+    );
+    const markerPath = path.join(runtimeDir, 'marker');
+    const violationsPath = `${markerPath}.violations`;
 
-      const hasViolation = fs.existsSync(violationsPath);
-      assert.equal(
-        hasViolation,
-        false,
-        hasViolation
-          ? `trial ${trial}: direct marker-exclusivity violation:\n${fs.readFileSync(violationsPath, 'utf8')}`
-          : undefined,
-      );
-    }
-  } finally {
-    for (const child of allChildren) child.kill();
+    await pool.race(Array.from({ length: CONTENDERS }, () => ({ lockDir, markerPath, violationsPath })));
+
+    const hasViolation = fs.existsSync(violationsPath);
+    assert.equal(
+      hasViolation,
+      false,
+      hasViolation
+        ? `trial ${trial}: direct marker-exclusivity violation:\n${fs.readFileSync(violationsPath, 'utf8')}`
+        : undefined,
+    );
   }
 });
 
@@ -622,4 +641,47 @@ test('manual clear refuses unknown and non-quarantined accounts unless forced, t
   assert.equal(audit.action, 'clear-quarantine');
   assert.equal(audit.previousQuarantine.reasonCode, 'auth-token');
   assert.equal(inspectProviderCapacity({ runnerConfig: runnerConfig(), runtimeDir }).providers['openai-codex'].accounts.a.quarantine, null);
+});
+
+test('inventory: a home-files credential source lists relative files and is carried through to the selected account', () => {
+  const inventory = validateProviderAccountInventory({
+    providers: { xai: { accounts: { vantt: { credentialSource: { kind: 'home-files', home: '/home/u/.pi/accounts/x', files: ['auth.json', 'bin/fd'] } } } } },
+  });
+  assert.deepEqual(inventory.xai.accounts.vantt.credentialSource, { kind: 'home-files', home: '/home/u/.pi/accounts/x', files: ['auth.json', 'bin/fd'] });
+});
+
+test('inventory: a home-files source with no files, an escaping or absolute path, or files on another kind is refused by name', () => {
+  const withSource = (credentialSource) => ({ providers: { xai: { accounts: { a: { credentialSource } } } } });
+  const home = '/home/u/x';
+  assert.throws(() => validateProviderAccountInventory(withSource({ kind: 'home-files', home })), /files\) must be a non-empty list of relative paths/);
+  assert.throws(() => validateProviderAccountInventory(withSource({ kind: 'home-files', home, files: [] })), /non-empty list/);
+  assert.throws(() => validateProviderAccountInventory(withSource({ kind: 'home-files', home, files: ['../up'] })), /relative paths without "\.\."/);
+  assert.throws(() => validateProviderAccountInventory(withSource({ kind: 'home-files', home, files: ['/abs'] })), /relative paths without "\.\."/);
+  assert.throws(() => validateProviderAccountInventory(withSource({ kind: 'codex-home', home, files: ['auth.json'] })), /only valid for kind "home-files"/);
+  assert.throws(() => validateProviderAccountInventory(withSource({ kind: 'dir-mount', home })), /must be one of codex-home, home-files/);
+});
+
+test('a quota quarantine lasts as long as the provider says, in hours, minutes and seconds', () => {
+  const now = Date.parse('2026-10-05T10:00:00.000Z');
+  const fromScreen = classifyProviderCapacityFault({
+    provider: 'gemini',
+    stderr: 'executor ended as provider-limit: Last line on screen: ⚠ Individual quota reached. Please upgrade your subscription to increase your limits. Resets in 24m1s.',
+    adapterOutcome: 'provider-limit',
+    now,
+  });
+  assert.equal(fromScreen.reasonCode, 'quota-limit');
+  assert.equal(fromScreen.until, new Date(now + (24 * 60 + 1) * 1000).toISOString());
+  assert.equal(parseQuotaResetWindowMs('quota reached, reset in 1h 30m'), 90 * 60 * 1000);
+  assert.equal(parseQuotaResetWindowMs('no window named here'), null);
+});
+
+test('a round that ended on a dead credential quarantines the account as an auth fault until a person clears it', () => {
+  const fault = classifyProviderCapacityFault({
+    provider: 'xai',
+    stderr: 'executor ended as provider-limit: Last line on screen: Error: OAuth refresh failed for xai: xAI OAuth token refresh failed (HTTP 400): invalid_grant',
+    adapterOutcome: 'provider-limit',
+  });
+  assert.equal(fault.reasonCode, 'auth-token');
+  assert.equal(fault.quarantineKind, 'manual-clear');
+  assert.equal(fault.until, undefined);
 });

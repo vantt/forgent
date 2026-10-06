@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import { resolveFgosFile, FGOS_FILE } from '../../src/state/fgos-file-registry.mjs';
+import { invokeHost } from '../../src/util/host-bin.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -72,7 +73,7 @@ function add(cwd, id, extra = {}) {
     // is exercising the runner's dispatch loop, which only ever picks up
     // executing-stage items, so default this helper's --stage to
     // 'executing' the same way test/cli/fgos.test.mjs's own addOk does.
-    '--stage', extra.stage ?? 'executing',
+    '--step', extra.workflowStep ?? 'executing',
   ];
   const result = fgos(cwd, ['add', id, ...flags]);
   assert.equal(result.status, 0, `fgos add ${id} failed: ${result.stderr}`);
@@ -84,7 +85,24 @@ function viewPath(cwd) {
 }
 
 function stateView(cwd) {
-  return JSON.parse(fs.readFileSync(viewPath(cwd), 'utf8'));
+  const view = JSON.parse(fs.readFileSync(viewPath(cwd), 'utf8'));
+  if (view && !view.frictions) {
+    view.frictions = new Proxy({}, {
+      get(target, prop) {
+        if (typeof prop === 'string') {
+          try {
+            const data = invokeHost(['friction', 'show', `work:${prop}`], { dir: cwd });
+            const list = data?.records || [];
+            return list.length > 0 ? list : undefined;
+          } catch {
+            return undefined;
+          }
+        }
+        return undefined;
+      }
+    });
+  }
+  return view;
 }
 
 // Every verb's success path prints a single fgos.v1 envelope
@@ -139,7 +157,8 @@ function writeRunnerConfig(repoRoot, executorScript) {
     JSON.stringify({
       runner: {
         executor: { command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'] },
-        models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+        modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
+        rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
         timeoutMs: 15000,
       },
     }),

@@ -1,15 +1,15 @@
 # Shared Fragment: Coding-Cell Policy
 
-This coding-domain fragment defines the technical policy for executing any mutating coding cell — whether a standalone single-cell change (e.g. via `fgos-code-panel` direct mode, or future `fgos-code-change` in Phase 6) or one step within an implementation track. It is completely self-contained and makes no assumptions about multi-cell tracks, plans, or multi-cell status tables.
+This coding-domain fragment defines the technical policy for executing any mutating coding cell — whether a standalone single-cell change (via `fgos-run`) or one step within an implementation track. It is completely self-contained and makes no assumptions about multi-cell tracks, plans, or multi-cell status tables.
 
 ---
 
 ## 1. Isolated Worktree Discipline
 
-Every mutating coding coordination cell must execute inside its own dedicated git worktree on its own dedicated branch:
+Every mutating coding Unit must execute inside its own dedicated git worktree on its own dedicated branch:
 
 1. **Main Checkout Protection:**
-   The fgOS session engine strictly forbids mutating execution in the main checkout: any mutating dispatch where `--cwd` resolves to the repository root is hard-refused.
+   The fgOS execution core strictly forbids mutating execution in the main checkout: any mutating dispatch where `--cwd` resolves to the repository root is hard-refused.
 2. **Canonical Lifecycle Procedure:**
    The exact shell procedure for opening, branch reuse without `-b`, `$base` recording, objective-text branch guards, and cleanup is defined in [`private-cell-worktree.md`](private-cell-worktree.md). Coding cells follow that procedure without variation:
    - Worktree path: `../<prefix>-<slug>` (outside the main checkout directory).
@@ -21,7 +21,7 @@ Every mutating coding coordination cell must execute inside its own dedicated gi
    - Current branch is the designated cell branch.
    - Working tree is clean (`git status --porcelain` empty).
 4. **Explicit CWD Passing:**
-   Every mutating command (`fgos coordination start`, `fgos coordination operation`, `fgos coordination authorize-and-dispatch`) must explicitly pass `--cwd <worktree-path>`.
+   Every mutating command (`fgos run`, `fgos workflow start`) must explicitly pass `--cwd <worktree-path>`.
 
 ---
 
@@ -62,7 +62,7 @@ Reviewer and red-team default to inspecting the recorded proof (command, tree ha
 
 ### Known Engine Limit: Proof Tiers Are Lead Discipline, Not Schema-Enforced
 
-The coordination session's request schema has no field for a proof tier, `FULL_TRIGGERS`, or an environment fingerprint, and `disposition`/`rationale` accepts any non-empty string regardless of what it claims (`schema.mjs`'s `REASON_MAX_LENGTH` bound is the only check). A driver who does not actually run `FULL_TEST`, or who mislabels a real regression as `environmental-precondition`, is not caught by anything the engine checks -- this section is entirely Lead discipline in prose, not an enforced gate.
+The unit / workflow run schema has no field for a proof tier, `FULL_TRIGGERS`, or an environment fingerprint, and `disposition`/`rationale` accepts any non-empty string regardless of what it claims. A driver who does not actually run `FULL_TEST`, or who mislabels a real regression as `environmental-precondition`, is not caught by anything the runner checks -- this section is entirely Lead discipline in prose, not an enforced gate.
 
 ---
 
@@ -77,20 +77,19 @@ The driver must never accept worker self-narration, conversational claims, or un
 
 ---
 
-## 4. Merge and Cleanup Only After Explicit Close
+## 4. Merge and Cleanup Only After Explicit Completion
 
-The sequence between coordination session completion and git branch integration is strictly ordered:
+The sequence between Unit run / Workflow run completion and git branch integration is strictly ordered:
 
 ```text
-quorum reached
-  -> fgos coordination close
-  -> verify session status: completed
+run completed
+  -> verify run status: pass / completed
   -> git merge --no-ff <cell-branch> (into target branch)
   -> git worktree remove <worktree-path>
 ```
 
-1. **No Session Git Authority:** A coordination session possesses zero git merge authority. Merging into the base/target branch is strictly a driver action performed outside the coordination session.
-2. **Close Before Merge:** The driver must never merge a cell branch into the target branch until `fgos coordination close` has succeeded and the session manifest reflects `status: "completed"`.
+1. **No Run Git Authority:** A Unit run possesses zero git merge authority. Merging into the base/target branch is strictly a driver action performed outside the unit run.
+2. **Completion Before Merge:** The driver must never merge a cell branch into the target branch until the run has succeeded and reflects `status: "completed"` / `outcome: "pass"`.
 3. **Post-Close Cleanup:** After the merge commit is verified on the target branch, the cell worktree and temporary branch may be removed.
 
 ---

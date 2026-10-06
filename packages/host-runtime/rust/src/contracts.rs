@@ -17,7 +17,7 @@ use std::str::FromStr;
 /// Error returned when parsing an invalid [`OperationId`].
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
 pub enum OperationIdError {
-    #[error("operation id must have 3 or 4 dot-separated segments (<component>.<object-type>.<action>[.<variant>]), got '{0}'")]
+    #[error("operation id must have 2, 3, or 4 dot-separated segments (<component>.<object-type>[.<action>[.<variant>]]), got '{0}'")]
     InvalidSegmentCount(String),
     #[error("operation id segment cannot be empty in '{0}'")]
     EmptySegment(String),
@@ -44,7 +44,7 @@ impl OperationId {
     pub fn parse(s: impl AsRef<str>) -> Result<Self, OperationIdError> {
         let raw = s.as_ref();
         let segments: Vec<&str> = raw.split('.').collect();
-        if segments.len() < 3 || segments.len() > 4 {
+        if segments.len() < 2 || segments.len() > 4 {
             return Err(OperationIdError::InvalidSegmentCount(raw.to_string()));
         }
         for segment in &segments {
@@ -468,6 +468,10 @@ pub type OperationCatalog = &'static [OperationDescriptor];
 /// provider object it dispatches to, rather than the one shared table
 /// canonical §6 sketches -- two registration tables Phase 08 must keep in
 /// sync instead of one.
+/// Generic JSON outcome payload wrapping a [`serde_json::Value`].
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct JsonOutcome(pub serde_json::Value);
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RegistrySnapshot {
     pub catalog: OperationCatalog,
@@ -516,12 +520,19 @@ mod tests {
         assert_eq!(op4.object_type(), "item");
         assert_eq!(op4.action(), "submit");
         assert_eq!(op4.variant(), Some("quick"));
+
+        let op2 = OperationId::parse("observe.metrics").expect("valid 2 segments");
+        assert_eq!(op2.component(), "observe");
+        assert_eq!(op2.object_type(), "metrics");
+        assert_eq!(op2.action(), "");
+        assert_eq!(op2.variant(), None);
+        assert_eq!(op2.as_str(), "observe.metrics");
     }
 
     #[test]
     fn parse_invalid_operation_ids() {
         assert!(matches!(
-            OperationId::parse("foo.bar"),
+            OperationId::parse("foo"),
             Err(OperationIdError::InvalidSegmentCount(_))
         ));
         assert!(matches!(

@@ -1,4 +1,4 @@
-// fgos-stage.test.mjs -- phần "discover, decompose, evolve, compound" của bộ test CLI, tách nguyên văn
+// fgos-stage.test.mjs -- phần "discover, decompose, compound" của bộ test CLI, tách nguyên văn
 // từ test/cli/fgos.test.mjs (tsk-3um). Nội dung test không đổi, chỉ chỗ ở đổi.
 // Bộ đồ nghề dùng chung nằm ở ./helpers/fgos-cli-harness.mjs.
 import { test } from 'node:test';
@@ -15,7 +15,6 @@ import {
   addAdHocWorktree,
   addBareOrigin,
   addDiscovery,
-  addFriction,
   addGoalItem,
   addOk,
   addOutcome,
@@ -61,7 +60,7 @@ import {
   makeRunnerProposedLeafItem,
   makeSessionSafeRunnerItem,
   mkLocalDependency,
-  moveStage,
+  moveStep,
   moveWork,
   os,
   path,
@@ -91,16 +90,6 @@ import {
 } from './helpers/fgos-cli-harness.mjs';
 
 
-// tsk-5iv D3 (round-3 review, MEDIUM): same STORE_MISSING_WARNING_VERBS gap
-// again, found in `evolve` -- `rankCandidates` over an empty-store view
-// silently returns `[]` instead of the real candidate list.
-test('evolve from a .fgos/-less linked worktree with no --dir warns on stderr instead of a silent []', () => {
-  const { wt } = tmpLinkedWorktree();
-  const result = run(wt, ['evolve']);
-  assert.equal(result.status, 0, 'evolve is requiresExistingStore:false -- it warns, never refuses');
-  assert.match(result.stderr, /\.fgos\/ not found/);
-  assert.deepEqual(envelopeData(result.stdout), [], 'the empty-store rankCandidates result, never silently trusted as "no real candidates exist"');
-});
 
 
 // RETARGET (stage-decompose D2, cell 3): `discover` on a stage-`clarify`
@@ -200,7 +189,7 @@ test('fgos plan on a standard plan without caller verdict advances Work to execu
   assert.equal(res.status, 0);
   const envelope = JSON.parse(res.stdout);
   assert.equal(envelope.data.outcome, 'pass-through');
-  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'executing');
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].workflowStep, 'executing');
 });
 
 
@@ -209,26 +198,26 @@ test('discover on a planning-stage item errors instead of silently dispatching t
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
   advanceThroughDiscoveryToPlanning(cwd, id);
-  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'planning');
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].workflowStep, 'planning');
 
   const result = run(cwd, ['discover', id]);
   assert.equal(result.status, 4);
   assert.match(result.stderr, /not "discovery"\/"exploring"/);
   assert.match(result.stderr, /fgos plan/);
-  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'planning', 'a rejected call must never mutate the item');
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].workflowStep, 'planning', 'a rejected call must never mutate the item');
 });
 
 
 test('plan on a discovery-stage item errors instead of silently dispatching to resolveDiscovery (tsk-2b0 D1: hard split, no fallback)', () => {
   const cwd = tmpCwdFromTemplate();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
-  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'discovery');
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].workflowStep, 'discovery');
 
   const result = run(cwd, ['plan', id]);
   assert.equal(result.status, 4);
   assert.match(result.stderr, /not "planning"/);
   assert.match(result.stderr, /fgos discover/);
-  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'discovery', 'a rejected call must never mutate the item');
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].workflowStep, 'discovery', 'a rejected call must never mutate the item');
 });
 
 
@@ -274,7 +263,7 @@ test('discover on a fresh cwd with no runner config bootstraps the default confi
 
   const view = envelopeData(run(cwd, ['list']).stdout);
   assert.equal(view.work[id].status, 'todo', 'the refused call must never mutate the item');
-  assert.equal(view.work[id].stage, 'discovery');
+  assert.equal(view.work[id].workflowStep, 'discovery');
 });
 
 

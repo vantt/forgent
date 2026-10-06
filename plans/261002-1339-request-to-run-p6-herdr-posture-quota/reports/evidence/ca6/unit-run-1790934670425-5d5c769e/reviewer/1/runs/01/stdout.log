@@ -1,0 +1,42 @@
+# Review Assessment: Documentation Note on Transport Selection
+
+- **Assignment**: `unit-run-1790934670425-5d5c769e/reviewer/1`
+- **Role**: `reviewer`
+- **Assessment Verdict**: **`pass`**
+- **Document Under Review**: [ca6-docs-note.md](file:///var/tmp/p6-accept-work/plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca6-docs-note.md)
+- **Source Reference**: [bind.mjs](file:///var/tmp/p6-accept-work/src/runner/execution/bind.mjs)
+
+---
+
+### 1. Scope & Constraint Verification
+
+1. **Path & Line Count**:
+   - Location: `plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca6-docs-note.md`
+   - Line count: **12 lines** (satisfies the requirement of 8 to 12 lines).
+2. **Reviewer Mutation Invariant**:
+   - Mutation mode is `read-only`.
+   - The reviewer inspected the code and documentation note without editing or touching any repository files.
+
+---
+
+### 2. Line-by-Line Claim Verification Against [`bind.mjs`](file:///var/tmp/p6-accept-work/src/runner/execution/bind.mjs)
+
+| Line | Note Statement | Grounding in `src/runner/execution/bind.mjs` | Verdict |
+|---|---|---|---|
+| **L1** | `# How \`fgos run\` chooses between the herdr and cli transport` | Document header accurately defining subject. | **PASS** |
+| **L3** | `Source: \`src/runner/execution/bind.mjs\`, block "4. Transport (G7)" (lines 253-272), inside \`bind()\`.` | Lines 253–272 contain the block header `// 4. Transport (G7): ...` within the exported `bind()` function. | **PASS** |
+| **L5** | `- Default is \`cli\`, with \`transportSource\` \`default-cli\`; \`herdr\` is chosen only when a rule below overrides it.` | Lines 257–258: `let transport = 'cli'; let transportSource = 'default-cli';`. | **PASS** |
+| **L6** | `- A human-pinned override invocation (\`chosenCandidate.override.invocation\`) stays as pinned and gets \`transportSource\` \`override-pinned-invocation\`. The transport is \`herdr\` only if the pinned invocation's adapter is \`herdr-spawn\`; otherwise it stays \`cli\`.` | Lines 260–263: Checks `chosenCandidate.override?.invocation`, sets `transportSource = 'override-pinned-invocation'`, and sets `transport = 'herdr'` iff `pinned?.adapter === 'herdr-spawn'`. | **PASS** |
+| **L7** | `- Without a pin, \`herdr\` requires all three: the executor has a herdr invocation, \`session.herdrPresent === true\`, and the candidate is not the inline lead fallback (\`isInlineFallback\`).` | Line 264: `else if (herdrInvocation && session.herdrPresent === true && !chosenCandidate.isInlineFallback)`. | **PASS** |
+| **L8** | `- A herdr invocation is one with \`via: 'cli'\`, \`adapter: 'herdr-spawn'\` and a non-empty string \`id\` (\`findHerdrInvocation\`, line 45). One without an id is never chosen because a caller cannot name it.` | Lines 45–52 (`findHerdrInvocation`) and doc comment (lines 42–43): matches `via === 'cli' && adapter === 'herdr-spawn' && typeof id === 'string' && id`. | **PASS** |
+| **L9** | `- The herdr invocation must also pass \`canApplyPosture\` for the resolved posture. On success the transport is \`herdr\`, \`transportSource\` is \`herdr-invocation-present\`, and the invocation that runs is the herdr one.` | Lines 265–269: Checks `canApplyPosture({ executor: executorId, invocation: herdrInvocation.id }, posture, ...)`, sets `transport = 'herdr'`, `transportSource = 'herdr-invocation-present'`, and `invocation = herdrInvocation.id`. | **PASS** |
+| **L10** | `- If the herdr invocation cannot apply the posture, the transport stays \`cli\` with \`transportSource\` \`cli:herdr-invocation-cannot-apply-posture\`.` | Lines 269–271: `else { transportSource = 'cli:herdr-invocation-cannot-apply-posture'; }` (`transport` remains `'cli'`). | **PASS** |
+| **L11** | `- The choice is returned as \`transport\` plus \`provenance.transport\` (\`{ value, source }\`), so each decision can be traced.` | Lines 367 and 383: `provenance.transport = { value: transport, source: transportSource }` and returned `transport` property. | **PASS** |
+
+---
+
+### 3. Artifact Deliverables
+
+The review artifacts have been committed to the execution outbox:
+- Structured claim: `worker-output/outbox/agent-result.json` (and `result-1.json`) with contract `agent-result-claim.v2`, `status: "done"`, and `assessment.verdict: "pass"`.
+- Detailed review report: `worker-output/outbox/agent-report.md` (and `report-1.md`).

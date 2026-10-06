@@ -8,7 +8,10 @@
 //   - validateOverrideConfinementShape: checks that invocation overrides only narrow/harden posture
 //   - normalizeLegacyConfinement: converts legacy {privateHome, isolatedSession, ownWorktree} to v1 controls
 
+import fs from 'node:fs';
 import net from 'node:net';
+import path from 'node:path';
+import { loadMachineBackendRegistry } from './backend-registry.mjs';
 
 export class ConfinementPolicyError extends Error {
   constructor(message) {
@@ -55,7 +58,7 @@ export const BUILTIN_POLICIES = Object.freeze({
       Object.freeze({ resource: 'private-home', access: 'read-write', scope: 'dispatch' }),
       Object.freeze({ resource: 'executor-credentials', access: 'read', scope: 'dispatch' }),
       Object.freeze({ resource: 'workspace', access: 'read-write', scope: 'dispatch' }),
-      Object.freeze({ resource: 'workspace-git-metadata', access: 'read-write', scope: 'dispatch' }),
+      Object.freeze({ resource: 'workspace-git-metadata', access: 'read', scope: 'dispatch' }),
     ]),
   }),
 });
@@ -66,7 +69,7 @@ export const CONFINEMENT_MODES = Object.freeze(['required', 'preferred', 'unconf
 
 export const CONTROL_AXES = Object.freeze({
   hostWrite: Object.freeze(['deny', 'allow']),
-  hostRead: Object.freeze(['deny', 'allow']),
+  hostRead: Object.freeze(['deny', 'blind', 'allow']),
   networkEgress: Object.freeze(['deny', 'filtered', 'allow']),
   process: Object.freeze(['isolated', 'host']),
   home: Object.freeze(['private', 'host']),
@@ -77,7 +80,7 @@ export const CONTROL_AXES = Object.freeze({
 /**
  * Control protection strength order (spec §6.1):
  * hostWrite: deny > allow
- * hostRead: deny > allow
+ * hostRead: deny > blind > allow
  * networkEgress: deny > filtered > allow
  * process: isolated > host
  * home: private > host
@@ -86,13 +89,17 @@ export const CONTROL_AXES = Object.freeze({
  */
 export const CONTROL_ORDER = Object.freeze({
   hostWrite: Object.freeze({ deny: 2, allow: 1 }),
-  hostRead: Object.freeze({ deny: 2, allow: 1 }),
+  hostRead: Object.freeze({ deny: 3, blind: 2, allow: 1 }),
   networkEgress: Object.freeze({ deny: 3, filtered: 2, allow: 1 }),
   process: Object.freeze({ isolated: 2, host: 1 }),
   home: Object.freeze({ private: 2, host: 1 }),
   session: Object.freeze({ isolated: 2, shared: 1 }),
   workspace: Object.freeze({ own: 2, shared: 1 }),
 });
+
+// The hidden roots of `hostRead: blind` and the question whether a request asks for it live in
+// resources.mjs, which resolves them; they are part of this vocabulary and re-exported here.
+export { BLIND_HIDDEN_ROOTS, requestIsBlind } from './resources.mjs';
 
 export const GRANT_ACCESS_LEVELS = Object.freeze({
   'read-write': 3,
@@ -634,4 +641,110 @@ export function resolveConfinementPolicy(policyId, customPolicies = {}) {
     return customPolicies[policyId];
   }
   return null;
+}
+/**
+ * Map a binding posture onto the one existing confinement path.
+ *
+ * Returns a `requirement` shaped for `buildConfinementRequest({ requirement })`;
+ * the backend driver (confinement/drivers/bwrap.mjs) builds the actual argv from
+ * the policy's grants, so nothing here assembles sandbox arguments.
+ *
+ * @param {object} binding { posture } -- anything but 'workspace-write' resolves read-only
+ * @param {object} [ctx] { runnerConfig }
+ * @returns {{ posture: string, policyId: string, policy: object, requirement: object }}
+ */
+export function resolvePosture(binding, ctx = {}) {
+  const posture = binding?.posture === 'workspace-write' ? 'workspace-write' : 'read-only';
+  const policyId = posture === 'workspace-write' ? 'workspace-write' : 'host-write-denied';
+  const policy = resolveConfinementPolicy(policyId, ctx.runnerConfig?.confinementPolicies);
+  return {
+    posture,
+    policyId,
+    policy,
+    requirement: { mode: 'required', policyId, policy },
+  };
+}
+
+function resolveExecutableOnPath(executable, envPath = process.env.PATH ?? '') {
+  const dirs = executable.includes('/') ? [''] : envPath.split(path.delimiter).filter(Boolean);
+  for (const dir of dirs) {
+    const full = dir ? path.join(dir, executable) : executable;
+    try {
+      fs.accessSync(full, fs.constants.X_OK);
+      return true;
+    } catch {
+      // try next PATH entry
+    }
+  }
+  return false;
+}
+
+function pickConfinedInvocation(executorEntry, invocationId, { herdrPresent = false } = {}) {
+  const invocations = Array.isArray(executorEntry?.invocations) ? executorEntry.invocations : [];
+  if (invocationId) {
+    const named = invocations.find((inv) => inv?.id === invocationId);
+    return named ? { inv: named, effective: named.confinement ?? executorEntry.confinement } : null;
+  }
+  // No invocation named: the first plain cli invocation that declares a backend (a
+  // herdr-spawn invocation only runs on the herdr transport, which names it). An
+  // invocation without an id cannot be pinned, so it only counts when it is also
+  // the one a run would take by default (the first cli invocation).
+  const cliInvocations = invocations.filter((inv) => inv?.via === 'cli');
+  const withBackend = cliInvocations.find(
+    (inv) => (herdrPresent || inv.adapter !== 'herdr-spawn')
+      && (inv.confinement ?? executorEntry.confinement)?.backend
+      && (inv.id || inv === cliInvocations[0]),
+  );
+  if (withBackend) return { inv: withBackend, effective: withBackend.confinement ?? executorEntry.confinement };
+  return executorEntry?.confinement ? { inv: null, effective: executorEntry.confinement } : null;
+}
+
+/**
+ * Decide whether a candidate can really apply a posture on this machine and
+ * WHICH invocation carries it. This is the single decision: bind() records the
+ * returned invocation, so the invocation approved here is the one that runs.
+ *
+ * The candidate must declare a confinement backend that is enabled in the
+ * machine registry with a usable executable. An invocation the candidate names
+ * is kept as named; otherwise the first cli invocation that can carry the
+ * posture is selected (not simply the executor's first cli invocation).
+ *
+ * @param {object} candidate { executor, invocation }
+ * @param {string} posture 'read-only' | 'workspace-write' (both need the same backend)
+ * @param {object} [ctx] { runnerConfig, executors, registryPath, envPath, herdrPresent }
+ * @returns {{ ok: boolean, invocation: string|null }}
+ */
+export function resolvePostureInvocation(candidate, posture, ctx = {}) {
+  const none = { ok: false, invocation: null };
+  if (!candidate || !candidate.executor) return none;
+  const executors = ctx.executors ?? ctx.runnerConfig?.executors ?? ctx.runnerConfig?.runner?.executors ?? {};
+  const executorEntry = executors[candidate.executor];
+  if (!executorEntry) return none;
+
+  // A pure native agent (no command, adapter or invocation) runs inside the
+  // Lead's own session as an in-process capability: there is no spawned process
+  // for an OS backend to wrap, and checker roles are never bound to it.
+  if (executorEntry.agentType && !executorEntry.command && !executorEntry.adapter && !executorEntry.invocations) {
+    return { ok: true, invocation: candidate.invocation ?? null };
+  }
+
+  const picked = pickConfinedInvocation(executorEntry, candidate.invocation, { herdrPresent: ctx.herdrPresent === true });
+  const backendId = picked?.effective?.backend;
+  if (typeof backendId !== 'string' || !backendId) return none;
+
+  let registry;
+  try {
+    registry = ctx.registryPath ? loadMachineBackendRegistry(ctx.registryPath) : loadMachineBackendRegistry();
+  } catch {
+    return none;
+  }
+  const instance = registry?.confinementBackends?.[backendId];
+  if (!instance || instance.enabled === false || instance.type !== 'bwrap') return none;
+  if (!resolveExecutableOnPath(instance.executable || 'bwrap', ctx.envPath)) return none;
+  return { ok: true, invocation: candidate.invocation ?? picked.inv?.id ?? null };
+}
+
+/** Boolean view of resolvePostureInvocation. */
+export function canApplyPosture(candidate, posture, ctx = {}) {
+  return resolvePostureInvocation(candidate, posture, ctx).ok;
 }

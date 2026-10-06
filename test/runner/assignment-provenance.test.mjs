@@ -4,7 +4,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { buildAssignment, createAssignmentId } from '../../src/runner/dispatch/assignment.mjs';
+import { createAssignmentId } from '../../src/runner/dispatch/assignment.mjs';
+import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 
 function inlineContract(overrides = {}) {
@@ -46,6 +47,8 @@ test('buildAssignment (declared) stamps provenance.kind="declared" plus provenan
     stage: 'planning',
     operation: 'validate-plan',
     taskSpec: 'validate-plan',
+    // The legal operations of the step the Assignment was built against, from its Workflow.
+    legalOperations: ['shape-plan', 'validate-plan', 'scout-blast-radius', 'resolve-question'],
   });
   assert.equal(assignment.provenance.inline, undefined);
   assert.ok(Object.isFrozen(assignment.provenance));
@@ -189,7 +192,7 @@ test('buildAssignment throws RunnerConfigError naming every declared-shape field
       buildAssignment({
         role: 'reviewer',
         reason: 'assist',
-        policy: { minTier: 'premium' },
+        policy: { tier: 'premium' },
         expectedFiles: ['src/foo.mjs'],
         provenance: { kind: 'inline', contract: inlineContract(), caller: inlineCaller() },
       }),
@@ -229,7 +232,7 @@ test('buildAssignment (inline) derives the Assignment id from caller.writerId en
 // ─── ADR-007 §1: the domain harness seam, called from buildInlineAssignment ──
 
 function planningWorkFor(overrides = {}) {
-  return { id: 'tsk-harness-wiring', stage: 'planning', domain: 'coding', workflow: 'feature', ...overrides };
+  return { id: 'tsk-harness-wiring', workflowStep: 'planning', domain: 'coding', workflow: 'feature', ...overrides };
 }
 
 test('buildAssignment (inline) fires the domain harness seam when a Work with a domain and declared Stage is attached', () => {
@@ -250,11 +253,7 @@ test('buildAssignment (inline) fires the domain harness seam when a Work with a 
   ]);
   assert.ok(assignment.provenance.inline.contract.constraints.includes('scope: repository (read-only)'));
   assert.equal(assignment.provenance.inline.contract.supports, 'validate-plan');
-  assert.deepEqual(assignment.policy, {
-    minTier: 'standard',
-    preferPersona: 'code-reviewer',
-    preferExecutor: 'claude',
-  });
+  assert.deepEqual(assignment.policy, { rigor: 'standard' });
   assert.deepEqual(assignment.provenance.validators, ['execution-contract-schema', 'domain-harness-seam']);
 });
 
@@ -269,14 +268,14 @@ test('buildAssignment (inline) rejects a contract.supports illegal for the attac
         },
         work: planningWorkFor(),
       }),
-    (err) => err instanceof RunnerConfigError && /not a legal operation for stage "planning"/.test(err.message),
+    (err) => err instanceof RunnerConfigError && /not a legal operation for step "planning"/.test(err.message),
   );
 });
 
 test('buildAssignment (inline) skips the harness seam entirely when no domain is resolvable (Work attached but no domain, no options.domain) -- ADR-007 §2', () => {
   const assignment = buildAssignment({
     provenance: { kind: 'inline', contract: inlineContract(), caller: inlineCaller() },
-    work: { id: 'tsk-no-domain', stage: 'planning' },
+    work: { id: 'tsk-no-domain', workflowStep: 'planning' },
   });
   assert.deepEqual(assignment.provenance.validators, ['execution-contract-schema']);
   assert.equal(assignment.policy, undefined);
@@ -299,7 +298,7 @@ test('buildAssignment (inline) resolves domain from options.domain when the Work
       contract: inlineContract({ role: 'reviewer', supports: 'validate-plan' }),
       caller: inlineCaller(),
     },
-    work: { id: 'tsk-options-domain', stage: 'planning', workflow: 'feature' },
+    work: { id: 'tsk-options-domain', workflowStep: 'planning', workflow: 'feature' },
     options: { domain: 'coding' },
   });
   assert.deepEqual(assignment.provenance.validators, ['execution-contract-schema', 'domain-harness-seam']);
@@ -313,19 +312,19 @@ test('buildAssignment (inline) with no work attached at all never fires the harn
   assert.equal(assignment.policy, undefined);
 });
 
-// ─── Step 08 P04.2b: the narrow "contract.policy = {minTier}" exception ────
+// ─── Inline contract explicit tier policy ───────────────────────────────────
 
-test('buildAssignment (inline) with contract.policy = {minTier: "nano"} stamps assignment.policy = {minTier: "nano"}', () => {
+test('buildAssignment (inline) with contract.policy = {tier: "nano"} stamps assignment.policy = {tier: "nano"}', () => {
   const assignment = buildAssignment({
     provenance: {
       kind: 'inline',
-      contract: inlineContract({ policy: { minTier: 'nano' } }),
+      contract: inlineContract({ policy: { tier: 'nano' } }),
       caller: inlineCaller(),
     },
   });
 
-  assert.deepEqual(assignment.policy, { minTier: 'nano' });
-  assert.deepEqual(assignment.provenance.inline.contract.policy, { minTier: 'nano' });
+  assert.deepEqual(assignment.policy, { tier: 'nano' });
+  assert.deepEqual(assignment.provenance.inline.contract.policy, { tier: 'nano' });
   assert.ok(Object.isFrozen(assignment.provenance.inline.contract.policy));
 });
 
@@ -337,7 +336,7 @@ test('buildAssignment (inline) with no contract.policy leaves assignment.policy 
   assert.equal(assignment.provenance.inline.contract.policy, undefined);
 });
 
-test('buildAssignment (inline) rejects contract.policy = {preferExecutor: "x"} end to end (the whitelist widening is exactly one field wide)', () => {
+test('buildAssignment (inline) rejects contract.policy = {preferExecutor: "x"} end to end (the whitelist accepts tier only)', () => {
   assert.throws(
     () =>
       buildAssignment({
@@ -351,38 +350,18 @@ test('buildAssignment (inline) rejects contract.policy = {preferExecutor: "x"} e
   );
 });
 
-test('buildAssignment (inline) merges contract.policy.minTier with a domain harness policy by taking the STRONGER tier, never letting the caller silently weaken a harness-mandated floor', () => {
-  // planning.validate-plan's own declared operation policy (workflow-stage-
-  // graphs.mjs fixture data) sets minTier: 'standard' via the coding domain
-  // harness seam (matchedOp.policy) -- confirmed by the pre-existing harness
-  // test above ("fires the domain harness seam ... assignment.policy ...
-  // minTier: 'standard'"). A caller-declared contract.policy.minTier BELOW
-  // that ('nano') must not weaken it below 'standard'.
-  const weakened = buildAssignment({
+test('buildAssignment (inline) preserves an explicit tier alongside a domain harness rigor policy', () => {
+  const assignment = buildAssignment({
     provenance: {
       kind: 'inline',
-      contract: inlineContract({ role: 'reviewer', supports: 'validate-plan', policy: { minTier: 'nano' } }),
+      contract: inlineContract({ role: 'reviewer', supports: 'validate-plan', policy: { tier: 'frontier' } }),
       caller: inlineCaller(),
     },
-    work: { id: 'tsk-harness-merge-weak', stage: 'planning', domain: 'coding', workflow: 'feature' },
+    work: { id: 'tsk-harness-tier', workflowStep: 'planning', domain: 'coding', workflow: 'feature' },
   });
-  assert.equal(weakened.policy.minTier, 'standard');
 
-  // A caller-declared minTier ABOVE the harness floor ('frontier') must
-  // raise it.
-  const raised = buildAssignment({
-    provenance: {
-      kind: 'inline',
-      contract: inlineContract({ role: 'reviewer', supports: 'validate-plan', policy: { minTier: 'frontier' } }),
-      caller: inlineCaller(),
-    },
-    work: { id: 'tsk-harness-merge-raise', stage: 'planning', domain: 'coding', workflow: 'feature' },
-  });
-  assert.equal(raised.policy.minTier, 'frontier');
-  // Every other harnessPolicy field (persona/executor hints) still passes
-  // through unchanged -- only minTier is resolved via the strength merge.
-  assert.equal(raised.policy.preferPersona, 'code-reviewer');
-  assert.equal(raised.policy.preferExecutor, 'claude');
+  assert.equal(assignment.policy.rigor, 'standard');
+  assert.equal(assignment.policy.tier, 'frontier');
 });
 
 test('DOMAIN_HARNESS_SEAMS discovery isolates a broken domain harness module: it is skipped, not fatal to loading assignment.mjs for every other domain', () => {
@@ -440,7 +419,7 @@ test('buildAssignment (inline) re-validates the harness-enriched contract: an ad
 
     const assignmentUrl = pathToFileURL(path.join(repoRoot, 'src/runner/dispatch/assignment.mjs')).href;
     const script = `import(${JSON.stringify(assignmentUrl)}).then(async (mod) => {` +
-      `const work = { id: 'tsk-adversarial-probe', stage: 'planning', domain: ${JSON.stringify(probeDomain)}, workflow: 'feature' };` +
+      `const work = { id: 'tsk-adversarial-probe', workflowStep: 'planning', domain: ${JSON.stringify(probeDomain)}, workflow: 'feature' };` +
       `try {` +
       `  mod.buildAssignment({ work, provenance: { kind: 'inline', contract: {` +
       `    objective: 'probe', contextRefs: [], constraints: [], expectedOutputs: ['agent-report.md'],` +

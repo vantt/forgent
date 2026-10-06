@@ -1,0 +1,100 @@
+{
+  "runId": "run_asgn_5439cfc7_9ffa_45b0_8997_4d5c34fe8fbf_op_001_01",
+  "assignmentId": "asgn_5439cfc7_9ffa_45b0_8997_4d5c34fe8fbf_op_001",
+  "workId": null,
+  "executorId": "codex-cli",
+  "policy": {
+    "role": "reviewer",
+    "persona": "code-reviewer",
+    "executorPreference": [
+      "codex-cli"
+    ],
+    "executorId": "codex-cli",
+    "providerModel": "claude",
+    "tier": "standard",
+    "model": "sonnet",
+    "visibility": "headless",
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "codex-cli",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "provider": {
+        "value": "claude",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "codex-cli"
+        }
+      },
+      "model": {
+        "value": "sonnet",
+        "source": {
+          "scope": "runnerConfig",
+          "id": "claude.standard"
+        }
+      },
+      "tier": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "persona": {
+        "value": "code-reviewer",
+        "source": {
+          "scope": "default",
+          "id": "reviewer"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "asgn_5439cfc7_9ffa_45b0_8997_4d5c34fe8fbf_op_001"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "claude"
+        }
+      }
+    }
+  },
+  "executorRedirected": false,
+  "settleReports": [],
+  "status": "failed",
+  "confidence": "failed",
+  "runtime": {
+    "exitCode": 0,
+    "stdoutLog": ".fgos/assignments/asgn_5439cfc7_9ffa_45b0_8997_4d5c34fe8fbf_op_001/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/asgn_5439cfc7_9ffa_45b0_8997_4d5c34fe8fbf_op_001/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "status": "failed",
+    "summary": "agent-result.json was present but failed schema validation"
+  },
+  "evidence": {
+    "gitBefore": "7957f6f350b94d2d653dfc938691af3830308db9",
+    "gitAfter": "7957f6f350b94d2d653dfc938691af3830308db9",
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [],
+    "mutatedDirtyBeforeFiles": [],
+    "artifacts": [],
+    "tests": []
+  }
+}

@@ -26,7 +26,7 @@ import { DEFAULT_CAPABILITY_SLOTS } from "../../src/setup/registrations.mjs";
 import { DispatchError } from "../../src/runner/dispatch/transport.mjs";
 import { loadRunnerConfig } from "../../src/runner/dispatch/config.mjs";
 import { loadAttestationRecord } from "../../src/runner/dispatch/confinement/attestation-store.mjs";
-import { resolveCapabilityIdentityDetails } from "../../src/runner/dispatch/resolve.mjs";
+import { resolveCapabilityIdentityDetails } from "../../src/runner/work-compat.mjs";
 
 function mkTemp(prefix) {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));

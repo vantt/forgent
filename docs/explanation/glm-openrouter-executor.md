@@ -4,6 +4,34 @@ authoritative_for: adding a per-executor env override to the fgOS runner dispatc
 
 # Giving one executor its own environment without touching the default one
 
+> **Update 2026-10-05: glm no longer uses the claude CLI.** Behind the
+> OpenRouter gateway, the claude CLI in a herdr pane stopped at
+> "Please run /login · API Error: 401 Missing Authentication header" every
+> time, so `glm` and `glm-herdr` now run the `pi` CLI against OpenRouter
+> (`z-ai/glm-5.3` from the `z-ai` model policy, raised from 5.2 on 2026-10-05), the same shape as `deepseek`
+> (headless) and `xai` (herdr pane). The key is still only a `${VAR}`
+> reference: `OPENROUTER_API_KEY` is set from `${GLM_OPENROUTER_API_KEY}`.
+> The per-executor `env` mechanism described below is unchanged and is what
+> carries that reference. Everything below that names the claude CLI or
+> `ANTHROPIC_*` variables describes the superseded route.
+>
+> **Which invocation to use.** Run headless (`glm` with `pi-cli-bwrap-openrouter`),
+> `z-ai/glm-5.2` answered, calls `bash` and writes its report correctly (checked
+> 2026-10-05, a read-only Unit that read a file under `.fgos` and quoted its first
+> line). The model sometimes degenerates, in a herdr pane
+> and headless alike (measured 2026-10-05: 1 of 3 headless runs, then 0 of 24 with
+> `--thinking` medium, high and off, so the thinking level is not the cause): it
+> streams one tool call whose JSON argument starts normally, then continues with
+> GLM's own XML tool-call text (`..."README.md</arg_value></tool_call><tool_call>read<arg_key>...`)
+> and repeats it without ever closing the JSON, so the call never executes. In a
+> pane this looks like one call repeated forever. The Unit then runs until the
+> output buffer (10 MiB) or the ceiling kills it and fails as an execution failure
+> with no fallback to the next executor. The capability preference pools name
+> `glm` with `pi-cli-bwrap-openrouter`, not `glm-herdr`, which stays defined for
+> investigation. The model was raised to `z-ai/glm-5.3` on 2026-10-05 in the hope that it
+> does not degenerate: 16 of 16 headless runs passed (medium and high), but 5.2 also passed
+> 24 of 24 in the same session, so this is not proof the loop is gone; watch for it.
+
 `tsk-gb3` added a new fgOS runner executor named `glm` that reuses the
 `claude` CLI as its command but routes to GLM 5.2 (`z-ai/glm-5.2`) via
 OpenRouter instead of Anthropic's real API — without affecting the

@@ -1,6 +1,6 @@
 // dispatch/resolve.mjs — unit -> executor -> model/tier/command resolution
-// (D7, tsk-2uf-1): `modelForTier`, the purpose/executorId resolution chain
-// (`resolveExecutorIdForPurpose`/`resolveExecutorAndOverrides`), and
+// (D7, tsk-2uf-1): `resolveTierModel`, the purpose/executorId resolution chain
+// (`resolveExecutorAndOverrides`), and
 // `resolveExecutorConfig` (the executor-block resolve + cross-provider
 // governance gate `dispatch/transport.mjs`'s `resolveExecutorCommand`
 // calls). Split out of the former `src/runner/dispatch.mjs` (2204 lines, 6
@@ -9,87 +9,146 @@
 // barrel. See `docs/history/dispatch-activation-and-handoff-redesign/
 // CONTEXT.md` D7 for the split rationale.
 
-import { RunnerConfigError, EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, DEFAULT_TIER_TO_POLICY, MODEL_POLICY_TIERS, supportsPolicyTier, normalizePreferCandidates } from './config.mjs';
-export {
-  executorIdForWork,
-  resolveCapabilityIdentityDetails,
-  resolveCapabilityIdentity,
-} from '../work-compat.mjs';
+import { RunnerConfigError, EXECUTOR_CARRIES, CLAUDE_CLI_COMMANDS, MODEL_POLICY_TIERS, supportsPolicyTier, normalizePreferCandidates } from './config.mjs';
 
 /**
- * Resolve `tier` (per D6; falls back to `work.mjs`'s declared default when a
- * work item omits `tier`, per D7b) to a model name. An unknown tier — one
- * work.mjs's `TIERS` allows but the resolved table does not cover, or any
- * other string — is a validation error: dispatch time is where that drift
- * would first bite (per D6's own original reasoning, unchanged by D9).
+ * Canonical capability identity for a dispatch, independent of any Work item.
+ * `hints` carries what the caller knows about what the dispatch is FOR:
+ * extra candidate capability names, one capability to prefer when it is a
+ * candidate, and a label to fall back to when nothing else resolves. A Work-driven
+ * caller derives those from its Workflow step (src/runner/work-compat.mjs).
  *
- * tsk-5tm-5 D9: `cfg.modelPolicies` (provider-keyed, 5-tier) is preferred
- * when present — `providerModel` (default `"claude"`, every pre-D9 call
- * site) selects which provider's table to read, and `tier` maps onto one
- * of `MODEL_POLICY_TIERS` via `DEFAULT_TIER_TO_POLICY`, unless
- * `rigorOverrides` (a executor's own override map, threaded in by the
- * caller) names a different policy tier for this specific work tier.
- * Falls back to the legacy flat `cfg.models[tier]` lookup, byte-identical
- * to every pre-D9 caller, when `cfg.modelPolicies` is absent — this
- * signature's first two positional params are UNCHANGED (D9's own
- * constraint): `loop.mjs`'s `modelForTier(config, tier)` call site keeps
- * working exactly as before, options object omitted entirely.
+ * Single, order-independent resolution rules: an explicit purpose wins; else a
+ * candidate with required confinement, then any configured confinement, then the
+ * preferred one, then a registered capability, then the first sorted candidate.
  */
-export function modelForTier(cfg, tier, { providerModel = 'claude', rigorOverrides } = {}) {
-  const policies = cfg && cfg.modelPolicies;
-  if (policies) {
-    const providerPolicy = policies[providerModel];
-    if (!providerPolicy || typeof providerPolicy !== 'object') {
-      throw new RunnerConfigError(`no modelPolicies configured for provider "${providerModel}".`);
+export function resolveCapabilityDetailsFromHints({
+  cfg,
+  executorId,
+  resolvedExecutor,
+  purpose,
+  hints,
+} = {}) {
+  const { candidates = [], preferred = null, fallbackLabel = null } = hints ?? {};
+  const capabilities = cfg?.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities : {};
+
+  function resolveAlias(name) {
+    if (!name || typeof name !== 'string') return name;
+    if (capabilities[name]) return name;
+    for (const [capName, capEntry] of Object.entries(capabilities)) {
+      if (Array.isArray(capEntry?.aliases) && capEntry.aliases.includes(name)) {
+        return capName;
+      }
     }
-    const policyTier = (rigorOverrides && rigorOverrides[tier]) || DEFAULT_TIER_TO_POLICY[tier];
-    if (!policyTier || typeof providerPolicy[policyTier] !== 'string') {
-      throw new RunnerConfigError(`no model configured for tier "${tier}" (policy tier "${policyTier}") under provider "${providerModel}".`);
+    return name;
+  }
+
+  const explicitPurpose = purpose && typeof purpose === 'string' && purpose.trim()
+    ? resolveAlias(purpose.trim())
+    : null;
+
+  const candidateSet = new Set(candidates);
+
+  // Executor declared capabilities (`for: [...]`)
+  if (Array.isArray(resolvedExecutor?.for)) {
+    for (const f of resolvedExecutor.for) {
+      if (typeof f === 'string' && f.trim()) {
+        candidateSet.add(f.trim());
+      }
     }
-    return providerPolicy[policyTier];
   }
-  const models = cfg && cfg.models;
-  if (!models || typeof tier !== 'string' || !(tier in models)) {
-    throw new RunnerConfigError(`no model configured for tier "${tier}".`);
+
+  // Capabilities in config that `prefer` this executor
+  if (executorId || resolvedExecutor) {
+    for (const [capName, capEntry] of Object.entries(capabilities)) {
+      if (capEntry?.prefer && (capEntry.prefer === executorId || (resolvedExecutor && cfg?.executors?.[capEntry.prefer] === resolvedExecutor))) {
+        candidateSet.add(capName);
+      }
+    }
   }
-  return models[tier];
+
+  // Executor ID itself
+  if (executorId && typeof executorId === 'string') {
+    candidateSet.add(executorId);
+  }
+
+  // Normalize all candidates through aliases
+  const normalizedCandidates = Array.from(candidateSet)
+    .map((c) => resolveAlias(c))
+    .filter(Boolean);
+
+  let capability = explicitPurpose;
+  if (!capability && normalizedCandidates.length === 0) {
+    capability = fallbackLabel ?? executorId ?? '(unknown-capability)';
+  }
+
+  // 1. Any candidate with required confinement (confinement.mode === 'required') wins!
+  const requiredCandidates = normalizedCandidates.filter(
+    (c) => capabilities[c]?.confinement?.mode === 'required',
+  );
+  if (!capability && requiredCandidates.length > 0) {
+    requiredCandidates.sort();
+    capability = requiredCandidates[0];
+  }
+
+  // 2. Any candidate with configured confinement wins next
+  const configuredConfinementCandidates = normalizedCandidates.filter(
+    (c) => Boolean(capabilities[c]?.confinement),
+  );
+  if (!capability && configuredConfinementCandidates.length > 0) {
+    configuredConfinementCandidates.sort();
+    capability = configuredConfinementCandidates[0];
+  }
+
+  // 3. The caller's preferred capability, when it is a candidate
+  if (!capability && preferred && normalizedCandidates.includes(preferred)) {
+    capability = preferred;
+  }
+
+  // 4. Prefer registered capabilities in cfg.capabilities
+  const registeredCandidates = normalizedCandidates.filter((c) => Boolean(capabilities[c]));
+  if (!capability && registeredCandidates.length > 0) {
+    registeredCandidates.sort();
+    capability = registeredCandidates[0];
+  }
+
+  // 5. Fallback: sorted candidates first.
+  if (!capability) {
+    normalizedCandidates.sort();
+    capability = normalizedCandidates[0];
+  }
+
+  const policyAnchors = normalizedCandidates
+    .filter((candidate) => candidate !== capability && capabilities[candidate]?.confinement);
+  const requiredAnchors = policyAnchors.filter(
+    (candidate) => capabilities[candidate]?.confinement?.mode === 'required',
+  ).sort();
+  const anchorCapability = requiredAnchors[0] ?? policyAnchors.sort()[0] ?? null;
+
+  return { capability, anchorCapability };
 }
 
 /**
- * Resolve a POLICY tier (`lightweight|standard|creative|analytical|critical`)
- * DIRECTLY against `cfg.modelPolicies.<providerModel>` — no
- * `DEFAULT_TIER_TO_POLICY` indirection (that map is `modelForTier`'s own
- * WORK-tier (`light|standard|heavy`) bridge, untouched by this function).
- * This is the resolver `resolveAssignmentDispatchPolicy` calls: its
- * `effectiveTier` is always already one of `MODEL_POLICY_TIERS` (Phase 00
- * R5, fixes B1 — `assignment-policy.mjs` used to call `modelForTier` with a
- * policy tier as its `tier` arg, which only matches `DEFAULT_TIER_TO_POLICY`
- * by coincidence at `"standard"`; every other policy tier threw, and the
- * caller silently swallowed it).
- *
- * Mirrors `modelForTier`'s own two-table fallback (`cfg.modelPolicies`
- * preferred, else the legacy flat `cfg.models` map — the two are
- * mutually-substitutable per this module's own D9 precedent) but reads
- * `policyTier` directly against whichever table is present, never through a
- * work-tier alias. Fails closed with a named `RunnerConfigError` (provider +
- * tier) when neither table declares the requested tier — never swallowed by
- * a caller.
+ * Resolve a tier to a model name using cfg.modelPolicies[provider][tier].
+ * Valid tiers: nano | mini | standard | advanced | flagship | frontier.
  */
-export function resolvePolicyTierModel(cfg, policyTier, providerModel = 'claude') {
-  if (!MODEL_POLICY_TIERS.includes(policyTier)) {
-    throw new RunnerConfigError(`unrecognized policy tier "${policyTier}". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);
+export function resolveTierModel(cfg, tier, provider = 'claude') {
+  if (!MODEL_POLICY_TIERS.includes(tier)) {
+    throw new RunnerConfigError(`unrecognized tier "${tier}". Valid tiers: [${MODEL_POLICY_TIERS.join(', ')}]`);
   }
-  if (cfg && cfg.modelPolicies) {
-    if (!supportsPolicyTier(cfg, providerModel, policyTier)) {
-      throw new RunnerConfigError(`no model configured for policy tier "${policyTier}" under provider "${providerModel}".`);
-    }
-    return cfg.modelPolicies[providerModel][policyTier];
+  const policies = cfg && cfg.modelPolicies;
+  if (!policies || typeof policies !== 'object') {
+    throw new RunnerConfigError(`no modelPolicies configured.`);
   }
-  const models = cfg && cfg.models;
-  if (!models || typeof models[policyTier] !== 'string') {
-    throw new RunnerConfigError(`no model configured for policy tier "${policyTier}" (no modelPolicies table and no legacy models["${policyTier}"] entry).`);
+  const providerPolicy = policies[provider];
+  if (!providerPolicy || typeof providerPolicy !== 'object') {
+    throw new RunnerConfigError(`no modelPolicies configured for provider "${provider}".`);
   }
-  return models[policyTier];
+  const model = providerPolicy[tier];
+  if (typeof model !== 'string' || !model.trim()) {
+    throw new RunnerConfigError(`no model configured for tier "${tier}" under provider "${provider}".`);
+  }
+  return model;
 }
 
 /**
@@ -178,32 +237,6 @@ function buildAgentTypeExecutor(baseExecutor, agentType) {
 }
 
 /**
- * Resolve a executorId from a declared PURPOSE (`for`, D5/D6, tsk-1o7) —
- * the purpose-based binding US-027 requires: a caller like a gather branch
- * never has a pre-registered executorId to match by name, since its
- * prompt is composed at runtime (tsk-2ie5/tsk-2c1, the first real
- * consumer). Scans `cfg.executors` for the first entry whose own `for`
- * ARRAY includes `purpose` (D15, tsk-in1-4: `for` widened from a single
- * value to `string[]` — one executor can serve multiple capabilities at
- * once); returns `null` when none is registered — a legitimate, expected
- * state (no gather-purpose executor configured yet), never thrown as an
- * error here so a caller can cleanly fall back to its own native dispatch
- * instead of treating "not configured" as malformed config.
- *
- * (tsk-in1-4 D10: re-confirmed at shaping time — namespace conflict #3
- * between `executorIdForWork`'s job-identity result and this registry's
- * own executor-name keys is resolved by reusing this exact function,
- * unchanged, never by changing how `executors` is keyed.)
- */
-export function resolveExecutorIdForPurpose(cfg, purpose) {
-  const executors = cfg && cfg.executors && typeof cfg.executors === 'object' ? cfg.executors : {};
-  for (const [id, executor] of Object.entries(executors)) {
-    if (executor && Array.isArray(executor.for) && executor.for.includes(purpose)) return id;
-  }
-  return null;
-}
-
-/**
  * Resolve a `executorId`-OR-purpose name to its real serving executor,
  * applying `capabilities.<name>.prefer`/`overrides` (2026-08-16 user
  * decision, `docs/decisions/0033-...md`'s sibling `docs/history/
@@ -227,41 +260,22 @@ export function resolveExecutorIdForPurpose(cfg, purpose) {
  * without a proportional safety benefit — a careless `prefer` edit could
  * add a careless `for` entry just as easily). `prefer` naming an executor
  * id that does not exist at all still throws loud (`RunnerConfigError`),
- * matching every other shape-validation gate in this file. (3) failing
- * that, the existing
- * `resolveExecutorIdForPurpose` scan (unchanged, still the "first `for`
- * match wins" behavior for a purpose with no `prefer` set). (4) nothing
+ * matching every other shape-validation gate in this file. (3) nothing
  * found — `{executorId: null, configured: false}`, a legitimate,
- * expected state, never thrown.
+ * expected state, never thrown. An executor's own `for` never binds a
+ * purpose here: only `capabilities.<name>.prefer` does.
  *
- * `overrides` (D2, only when resolved via step 2) is returned, never
- * applied here — each call site decides what it means for ITS OWN
- * resolution, and only 4 fields are ever eligible
- * (`rigorOverrides`/`providerModel`/`tier`/`model` — never `command`/
- * `args`/`adapter`/`invocations`, D2: a capability can retune HOW
- * strongly its executor works, never WHAT command actually runs).
- * `rigorOverrides`/`providerModel` matter to every model-computing call
- * site (`spawnWorker` and `executeExecutorCli` both). `tier`/`model`
- * (a raw, direct override — no `modelForTier` computation at all) only
- * ever mattered for `executeExecutorCli`'s own ad hoc dispatch, the
- * exact same pre-existing scope a plain `executor.tier`/`executor.model`
- * already had before this item — `spawnWorker` resolves `tier` from the
- * WORK ITEM's own classification (`work.tier`, a scope/effort judgment
- * made once at Discovery, not a per-executor opt-out) and never accepted
- * a raw literal model override at all; a capability's `overrides.tier`/
- * `.model` were never meant to reach that door, and self-review found
- * (and left) that scope boundary undisturbed rather than wiring
- * `work.tier` open to being silently overridden by dispatch config.
  */
 export function resolveExecutorAndOverrides(cfg, executorIdOrPurpose) {
   const executors = cfg && cfg.executors && typeof cfg.executors === 'object' ? cfg.executors : {};
   if (executors[executorIdOrPurpose]) {
-    // `bindingSource` (Dispatch Core Contract Normalization, Slice D):
-    // additive-only provenance for WHICH resolution branch bound the
-    // returned executorId, surfaced on DispatchPlan.bindingSource by
-    // plan.mjs. Pre-existing callers that destructure only
-    // {executorId, executor, overrides, configured} are unaffected.
-    return { executorId: executorIdOrPurpose, executor: executors[executorIdOrPurpose], overrides: undefined, configured: true, bindingSource: 'executor-id' };
+    return { executorId: executorIdOrPurpose, executor: executors[executorIdOrPurpose], configured: true, bindingSource: 'executor-id' };
+  }
+  if (!executorIdOrPurpose && cfg?.executor) {
+    return { executorId: cfg.executor.command ?? 'executor', executor: cfg.executor, configured: true, bindingSource: 'default' };
+  }
+  if (cfg?.executor && (executorIdOrPurpose === 'executor' || executorIdOrPurpose === cfg.executor.command || executorIdOrPurpose === cfg.executor.invocations?.[0]?.command || executorIdOrPurpose === cfg.executor.invocations?.[0]?.id)) {
+    return { executorId: executorIdOrPurpose, executor: cfg.executor, configured: true, bindingSource: 'default' };
   }
   const capabilityEntry = cfg && cfg.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities[executorIdOrPurpose] : undefined;
   const preferred = capabilityEntry?.prefer;
@@ -285,24 +299,13 @@ export function resolveExecutorAndOverrides(cfg, executorIdOrPurpose) {
     return {
       executorId: primary.executor,
       executor,
-      overrides: capabilityEntry.overrides,
       configured: true,
       bindingSource: 'capability.prefer',
-      // `invocationId`: consumed by resolveExecutorConfig's Gate B2 (Step
-      // 2.1) when set — `undefined` for every legacy bare-string
-      // candidate, so Gate B2's own "first via:cli" default is unchanged.
       invocationId: primary.invocation,
-      // `candidates`: the FULL ordered pool, for a cascade-aware caller
-      // (e.g. a future fallback consumer) — `resolveExecutorConfig` itself
-      // never reads this; it only ever acts on the primary candidate above.
       candidates,
     };
   }
-  const found = resolveExecutorIdForPurpose(cfg, executorIdOrPurpose);
-  if (found) {
-    return { executorId: found, executor: executors[found], overrides: undefined, configured: true, bindingSource: 'capability.for' };
-  }
-  return { executorId: null, executor: undefined, overrides: undefined, configured: false, bindingSource: null };
+  return { executorId: null, executor: undefined, configured: false, bindingSource: null };
 }
 
 // Exported (additive, D7 module split): `dispatch/transport.mjs`'s
@@ -411,13 +414,19 @@ export function resolveExecutorConfig(cfg, tier, executorId, fgosDir, contentCar
   // requires a command-less, invocation-less entry.
   const effectiveAgentType = executorEntry?.agentType ?? resolvedAgentType;
   const resolvedViaAgentType = !cliInvocation && !(executorEntry && (executorEntry.adapter || executorEntry.command)) && Boolean(effectiveAgentType && cfg && cfg.executor);
+  let defaultCliInvocation = null;
+  if (!executorEntry && cfg?.executor?.invocations) {
+    defaultCliInvocation = cfg.executor.invocations.find((inv) => inv.via === 'cli');
+  }
   const byExecutor = cliInvocation
-    ? { command: cliInvocation.command, args: cliInvocation.args, adapter: cliInvocation.adapter, provider: executorEntry.provider, env: cliInvocation.env ?? executorEntry.env, liveOutput: cliInvocation.liveOutput ?? executorEntry.liveOutput, interactiveMode: cliInvocation.interactiveMode ?? executorEntry.interactiveMode, promptDelivery: cliInvocation.promptDelivery ?? executorEntry.promptDelivery, permissionMode: cliInvocation.permissionMode ?? executorEntry.permissionMode, confinement: cliInvocation.confinement ?? executorEntry.confinement, resourceBindings: cliInvocation.resourceBindings ?? executorEntry.resourceBindings }
+    ? { command: cliInvocation.command, args: cliInvocation.args, adapter: cliInvocation.adapter, provider: executorEntry?.provider, env: cliInvocation.env ?? executorEntry?.env, liveOutput: cliInvocation.liveOutput ?? executorEntry?.liveOutput, interactiveMode: cliInvocation.interactiveMode ?? executorEntry?.interactiveMode, promptDelivery: cliInvocation.promptDelivery ?? executorEntry?.promptDelivery, permissionMode: cliInvocation.permissionMode ?? executorEntry?.permissionMode, confinement: cliInvocation.confinement ?? executorEntry?.confinement, resourceBindings: cliInvocation.resourceBindings ?? executorEntry?.resourceBindings }
     : executorEntry && (executorEntry.adapter || executorEntry.command)
       ? executorEntry
-      : resolvedViaAgentType
-        ? buildAgentTypeExecutor(cfg.executor, effectiveAgentType)
-        : undefined;
+      : defaultCliInvocation
+        ? { command: defaultCliInvocation.command, args: defaultCliInvocation.args, adapter: defaultCliInvocation.adapter, provider: cfg?.executor?.provider, env: defaultCliInvocation.env ?? cfg?.executor?.env, liveOutput: defaultCliInvocation.liveOutput ?? cfg?.executor?.liveOutput, interactiveMode: defaultCliInvocation.interactiveMode ?? cfg?.executor?.interactiveMode, promptDelivery: defaultCliInvocation.promptDelivery ?? cfg?.executor?.promptDelivery, permissionMode: defaultCliInvocation.permissionMode ?? cfg?.executor?.permissionMode, confinement: defaultCliInvocation.confinement ?? cfg?.executor?.confinement, resourceBindings: defaultCliInvocation.resourceBindings ?? cfg?.executor?.resourceBindings }
+        : resolvedViaAgentType
+          ? buildAgentTypeExecutor(cfg.executor, effectiveAgentType)
+          : undefined;
   const executor = byExecutor ?? (cfg && cfg.executor);
   if (!executor || typeof executor.command !== 'string' || !Array.isArray(executor.args)) {
     throw new RunnerConfigError('runner config "executor" must have a string "command" and an "args" array.');

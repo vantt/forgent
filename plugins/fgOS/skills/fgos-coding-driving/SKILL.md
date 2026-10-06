@@ -33,8 +33,8 @@ domain that does not exist yet.
 ## Hard rules
 
 - Never invent a stage-to-skill mapping. Resolve the skill via the same
-  registry lookup the routing skill uses (`getDomain`/`skillForStage`,
-  `src/state/workflow-stage-graphs.mjs`).
+  registry lookup the routing skill uses (`getDomain`/`skillForStep`,
+  `src/state/domain-registry.mjs`).
 - Never apply a stage or status transition directly — every transition
   happens because the loaded stage-skill calls its own engine verb
   (`fgos discover`/`fgos plan`/`fgos return`). This holds even at
@@ -161,16 +161,16 @@ position**, not fixed to `stage`. Position means:
 `status` is the full-lifecycle axis (`src/state/status-fsm.mjs`'s
 `TRANSITIONS`: `todo → doing → awaiting-approval → delivered →
 retrospective → cleanup → done`, plus the `blocked`/`awaiting-human`/
-`wontfix` branches); `stage` is the sub-axis that only carries meaning
+`wontfix` branches); `workflowStep` is the sub-axis that only carries meaning
 across the front of it. Reading position this way is not a second
-mechanism bolted on: the stage-to-skill map
-(`src/state/workflow-stage-graphs.mjs`) has long held both the five stage
-names and the status name `retrospective` in one frozen object, because
-the two vocabularies never collide — which lookup table a key belongs to
-is the caller's concern. The registry was already a position→skill map;
-this loop simply reads it as one.
+mechanism bolted on: the coding Workflow (`domains/coding/workflows/feature.yaml`,
+read through `src/state/domain-registry.mjs`'s `skillForStep`) holds both the
+step names and the status name `retrospective` (`statusSkills`) in one frozen
+definition, because the two vocabularies never collide — which lookup a key
+belongs to is the caller's concern. The registry was already a position→skill
+map; this loop simply reads it as one.
 
-Nothing else about the loop changes. The same `skillForStage(domain,
+Nothing else about the loop changes. The same `skillForStep(domain,
 position)` lookup resolves the skill, the same `null` result means "this
 position is mechanical, nothing to load", and the same three
 `parkReasonForStatus` stops apply. In particular, `cleanup` deliberately
@@ -201,7 +201,7 @@ position has reached or passed it, stop and report "reached ceiling at
 <position>" without invoking anything this turn.
 
 ### Step 4: Resolve the stage skill and prepare to invoke it
-Resolve `skill = skillForStage(domain, position)`. If `null`, stop — this
+Resolve `skill = skillForStep(domain, position)`. If `null`, stop — this
 position is mechanical, nothing left for this skill to load. Otherwise:
 show the item's title/description once per drive, label the session's
 pane once per drive (decoration, never a gate), claim or resync the item's
@@ -235,6 +235,7 @@ thing to the caller — see `references/reclaim-and-role-graph.md`.
 - Secondary operation (e.g. `planning.validate-plan`) creates an Assignment only when the stage skill or deterministic rule selects it.
 - Assignment result is evidence input for driver decision, not lifecycle movement by itself.
 - Only engine verbs (`fgos plan`, `fgos discover`, `fgos return`) move Work lifecycle state.
+- **Workflow Run Integration**: When an item carries `workflowRunId`, driving the item advances its Workflow run via `fgos workflow resume <workflowRunId>` or `fgos workflow answer <workflowRunId>`, executing units through `fgos run`. Work items do not have `stage`; step progression belongs to Workflow runs.
 
 ## Caller contract
 
@@ -247,7 +248,7 @@ and the fan-out contract.
 ## Red flags
 
 - resolving a stage's skill from anything other than the live
-  `getDomain`/`skillForStage` registry lookup
+  `getDomain`/`skillForStep` registry lookup
 - comparing `status` against a literal instead of resolving through
   `parkReasonForStatus(domain, status)`
 - applying a stage or status move directly instead of leaving it to the

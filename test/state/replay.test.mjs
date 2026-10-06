@@ -203,20 +203,6 @@ test('foldEvents on a log with no work.outcome events yields a view with no "out
   assert.equal('outcomes' in view, false);
 });
 
-test('foldEvents APPENDS work.friction records per id — two frictions on one id both survive, in order (never merged, never replaced)', () => {
-  const events = [
-    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.friction', payload: { id: 'a', disposition: 'parked', errorClass: 'verify-miss', layer: 'verification', attempts: 2, detail: 'first' } },
-    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.friction', payload: { id: 'a', disposition: 'halted', errorClass: 'worker-timeout', layer: 'environment', attempts: 1, detail: 'second' } },
-  ];
-  const view = foldEvents(events);
-  assert.equal(view.frictions.a.length, 2);
-  assert.equal(view.frictions.a[0].detail, 'first');
-  assert.equal(view.frictions.a[1].detail, 'second');
-  assert.equal(view.frictions.a[1].layer, 'environment');
-  // event ts rides along for recency display (fgos check cap)
-  assert.equal(view.frictions.a[0].ts, '2026-07-16T00:00:00.000Z');
-});
-
 test('foldEvents on a log with no work.friction events yields a view with no "frictions" key (lazy key, backward-compat)', () => {
   const events = [
     { seq: 1, ts: '2026-07-14T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo' } },
@@ -274,46 +260,74 @@ test('foldEvents on a log with no gate (ask/answer) events yields a view with no
   assert.equal('gates' in view, false);
 });
 
-test('foldEvents applies work.stage to set item.stage', () => {
+test('foldEvents applies work.step to set item.workflowStep', () => {
   const events = [
-    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'clarify' } },
-    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'clarify', to: 'executing' } },
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', workflowStep: 'clarify' } },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.step', payload: { id: 'a', from: 'clarify', to: 'executing' } },
   ];
   const view = foldEvents(events);
-  assert.equal(view.work.a.stage, 'executing');
+  assert.equal(view.work.a.workflowStep, 'executing');
 });
 
-test('foldEvents work.stage also sets item.verify when the event carries one (one event does both)', () => {
+test('foldEvents work.step also sets item.verify when the event carries one (one event does both)', () => {
   const events = [
-    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'clarify', verify: 'P15 will fill this in' } },
-    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'clarify', to: 'executing', verify: 'npm test -- a' } },
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', workflowStep: 'clarify', verify: 'P15 will fill this in' } },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.step', payload: { id: 'a', from: 'clarify', to: 'executing', verify: 'npm test -- a' } },
   ];
   const view = foldEvents(events);
-  assert.equal(view.work.a.stage, 'executing');
+  assert.equal(view.work.a.workflowStep, 'executing');
   assert.equal(view.work.a.verify, 'npm test -- a');
 });
 
-test('foldEvents work.stage without a verify leaves item.verify untouched', () => {
+test('foldEvents work.step without a verify leaves item.verify untouched', () => {
   const events = [
-    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'clarify', verify: 'original verify' } },
-    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'clarify', to: 'executing' } },
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', workflowStep: 'clarify', verify: 'original verify' } },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.step', payload: { id: 'a', from: 'clarify', to: 'executing' } },
   ];
   const view = foldEvents(events);
   assert.equal(view.work.a.verify, 'original verify');
 });
 
-test('foldEvents applies work.stage to set item.stage to "decompose"', () => {
+test('foldEvents maps the older step name "decompose" onto the plan step "planning"', () => {
   const events = [
-    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'clarify' } },
-    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'clarify', to: 'decompose' } },
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', workflowStep: 'discovery' } },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.step', payload: { id: 'a', from: 'discovery', to: 'decompose' } },
   ];
   const view = foldEvents(events);
-  assert.equal(view.work.a.stage, 'decompose');
+  assert.equal(view.work.a.workflowStep, 'planning');
 });
 
-test('foldEvents ignores a work.stage for an id that was never added', () => {
+// --- the single read path for records written before the rename ---
+
+test('foldEvents folds an older work.add carrying `stage` into workflowStep and never leaves `stage` on the item', () => {
+  const view = foldEvents([
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'decompose' } },
+  ]);
+  assert.equal(view.work.a.workflowStep, 'planning');
+  assert.equal(Object.hasOwn(view.work.a, 'stage'), false);
+});
+
+test('foldEvents folds a work.stage event (written by a binary from before the rename) exactly like work.step', () => {
+  const base = { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', workflowStep: 'discovery' } };
+  const viaStage = foldEvents([base, { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'discovery', to: 'planning', verify: 'npm test' } }]);
+  const viaStep = foldEvents([base, { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.step', payload: { id: 'a', from: 'discovery', to: 'planning', verify: 'npm test' } }]);
+  assert.deepEqual(viaStage, viaStep);
+  assert.equal(viaStage.work.a.workflowStep, 'planning');
+  assert.equal(viaStage.work.a.verify, 'npm test');
+});
+
+test('foldEvents folds a work.edit patch carrying `stage` into workflowStep', () => {
+  const view = foldEvents([
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', workflowStep: 'discovery' } },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.edit', payload: { id: 'a', patch: { stage: 'exploring' } } },
+  ]);
+  assert.equal(view.work.a.workflowStep, 'exploring');
+  assert.equal(Object.hasOwn(view.work.a, 'stage'), false);
+});
+
+test('foldEvents ignores a work.step for an id that was never added', () => {
   const events = [
-    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.stage', payload: { id: 'ghost', from: 'clarify', to: 'executing' } },
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.step', payload: { id: 'ghost', from: 'clarify', to: 'executing' } },
   ];
   assert.doesNotThrow(() => foldEvents(events));
   assert.deepEqual(foldEvents(events), { work: {}, decisions: [] });
@@ -342,7 +356,7 @@ test('foldEvents on a log with no work.discovery events yields a view with no "d
 // --- settlement channel (phase-3-compound-learning-5, S3-closeout) --------
 //
 // Three settling kinds derived from EXISTING event types (no new event type,
-// per D3/R3): 'clarify-pass' (work.stage -> executing), 'answer' (work.move
+// per D3/R3): 'clarify-pass' (work.step -> executing), 'answer' (work.move
 // carrying an answer), 'close' (work.move -> done). `role` rides on the
 // SAME event's payload (additive, optional) rather than a separate write.
 //
@@ -352,20 +366,20 @@ test('foldEvents on a log with no work.discovery events yields a view with no "d
 // The settlement `kind` string stays the literal 'clarify-pass' (a stable,
 // already-persisted event-history label, never renamed retroactively).
 
-test('foldEvents derives a clarify-pass settlement from work.stage -> exploring, carrying role + verify as detail', () => {
+test('foldEvents derives a clarify-pass settlement from work.step -> exploring, carrying role + verify as detail', () => {
   const events = [
-    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'discovery' }, v: 2 },
-    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'discovery', to: 'exploring', verify: 'npm test -- a', role: 'runner' }, v: 2 },
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', workflowStep: 'discovery' }, v: 2 },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.step', payload: { id: 'a', from: 'discovery', to: 'exploring', verify: 'npm test -- a', role: 'runner' }, v: 2 },
   ];
   const view = foldEvents(events);
   assert.equal(view.settlements.a.length, 1);
   assert.deepEqual(view.settlements.a[0], { kind: 'clarify-pass', role: 'runner', ts: '2026-07-16T00:00:01.000Z', detail: 'npm test -- a' });
 });
 
-test('foldEvents derives a clarify-pass settlement from work.stage discovery -> planning too (settlement keys off leaving the entry stage, not landing on executing)', () => {
+test('foldEvents derives a clarify-pass settlement from work.step discovery -> planning too (settlement keys off leaving the entry stage, not landing on executing)', () => {
   const events = [
-    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'discovery' }, v: 2 },
-    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'discovery', to: 'planning', verify: 'npm test -- a', role: 'runner' }, v: 2 },
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', workflowStep: 'discovery' }, v: 2 },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.step', payload: { id: 'a', from: 'discovery', to: 'planning', verify: 'npm test -- a', role: 'runner' }, v: 2 },
   ];
   const view = foldEvents(events);
   assert.equal(view.settlements.a.length, 1);
@@ -377,15 +391,15 @@ test('foldEvents derives a clarify-pass settlement from work.stage discovery -> 
 // with an open question. `from === 'discovery'` alone therefore no longer
 // means "settled" — the gate has to read the verdict that drove the move.
 // The verdict is already in the log as the `work.discovery` event this same
-// `resolveDiscovery` call appends immediately BEFORE its `moveStage`
+// `resolveDiscovery` call appends immediately BEFORE its `moveStep`
 // (discovery.mjs), so the fold can read it with no new payload field and no
 // change to already-written events.
 
 test('foldEvents does NOT derive a clarify-pass settlement when the discovery verdict that drove the discovery -> exploring move was unclear', () => {
   const events = [
-    { seq: 1, ts: '2026-08-12T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'discovery' }, v: 2 },
+    { seq: 1, ts: '2026-08-12T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', workflowStep: 'discovery' }, v: 2 },
     { seq: 2, ts: '2026-08-12T00:00:01.000Z', type: 'work.discovery', payload: { id: 'a', clear: false, question: 'Which auth provider?' }, v: 2 },
-    { seq: 3, ts: '2026-08-12T00:00:02.000Z', type: 'work.stage', payload: { id: 'a', from: 'discovery', to: 'exploring', verify: 'chưa xác định — bổ sung thủ công', role: 'session' }, v: 2 },
+    { seq: 3, ts: '2026-08-12T00:00:02.000Z', type: 'work.step', payload: { id: 'a', from: 'discovery', to: 'exploring', verify: 'chưa xác định — bổ sung thủ công', role: 'session' }, v: 2 },
   ];
   const view = foldEvents(events);
   assert.equal('settlements' in view, false);
@@ -393,9 +407,9 @@ test('foldEvents does NOT derive a clarify-pass settlement when the discovery ve
 
 test('foldEvents still derives a clarify-pass settlement when the discovery verdict that drove the move was clear', () => {
   const events = [
-    { seq: 1, ts: '2026-08-12T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'discovery' }, v: 2 },
+    { seq: 1, ts: '2026-08-12T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', workflowStep: 'discovery' }, v: 2 },
     { seq: 2, ts: '2026-08-12T00:00:01.000Z', type: 'work.discovery', payload: { id: 'a', clear: true }, v: 2 },
-    { seq: 3, ts: '2026-08-12T00:00:02.000Z', type: 'work.stage', payload: { id: 'a', from: 'discovery', to: 'planning', verify: 'npm test -- a', role: 'session' }, v: 2 },
+    { seq: 3, ts: '2026-08-12T00:00:02.000Z', type: 'work.step', payload: { id: 'a', from: 'discovery', to: 'planning', verify: 'npm test -- a', role: 'session' }, v: 2 },
   ];
   const view = foldEvents(events);
   assert.equal(view.settlements.a.length, 1);
@@ -409,18 +423,18 @@ test('foldEvents still derives a clarify-pass settlement when the discovery verd
 // keep settling exactly as it did before this fix.
 test('foldEvents still derives a clarify-pass settlement from discovery -> exploring when the log carries no work.discovery verdict at all (legacy log)', () => {
   const events = [
-    { seq: 1, ts: '2026-08-12T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'discovery' }, v: 2 },
-    { seq: 2, ts: '2026-08-12T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'discovery', to: 'exploring', verify: 'npm test -- a', role: 'runner' }, v: 2 },
+    { seq: 1, ts: '2026-08-12T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', workflowStep: 'discovery' }, v: 2 },
+    { seq: 2, ts: '2026-08-12T00:00:01.000Z', type: 'work.step', payload: { id: 'a', from: 'discovery', to: 'exploring', verify: 'npm test -- a', role: 'runner' }, v: 2 },
   ];
   const view = foldEvents(events);
   assert.equal(view.settlements.a.length, 1);
   assert.equal(view.settlements.a[0].kind, 'clarify-pass');
 });
 
-test('foldEvents does NOT derive a settlement from work.stage exploring -> planning (it never leaves discovery)', () => {
+test('foldEvents does NOT derive a settlement from work.step exploring -> planning (it never leaves discovery)', () => {
   const events = [
-    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'exploring' }, v: 2 },
-    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'exploring', to: 'planning' }, v: 2 },
+    { seq: 1, ts: '2026-07-16T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', workflowStep: 'exploring' }, v: 2 },
+    { seq: 2, ts: '2026-07-16T00:00:01.000Z', type: 'work.step', payload: { id: 'a', from: 'exploring', to: 'planning' }, v: 2 },
   ];
   const view = foldEvents(events);
   assert.equal('settlements' in view, false);
@@ -449,8 +463,8 @@ test('foldEvents derives a close settlement from a work.move -> done, with a nul
 
 test('foldEvents settlement APPENDS across multiple settling transitions on the same id — none erase a prior one', () => {
   const events = [
-    { seq: 1, ts: '2026-07-15T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', stage: 'discovery' }, v: 2 },
-    { seq: 2, ts: '2026-07-15T00:00:01.000Z', type: 'work.stage', payload: { id: 'a', from: 'discovery', to: 'exploring', verify: 'npm test', role: 'runner' }, v: 2 },
+    { seq: 1, ts: '2026-07-15T00:00:00.000Z', type: 'work.add', payload: { id: 'a', title: 'A', status: 'todo', workflowStep: 'discovery' }, v: 2 },
+    { seq: 2, ts: '2026-07-15T00:00:01.000Z', type: 'work.step', payload: { id: 'a', from: 'discovery', to: 'exploring', verify: 'npm test', role: 'runner' }, v: 2 },
     { seq: 3, ts: '2026-07-15T00:00:02.000Z', type: 'work.move', payload: { id: 'a', from: 'todo', to: 'awaiting-human', ask: 'sure?' }, v: 2 },
     { seq: 4, ts: '2026-07-15T00:00:03.000Z', type: 'work.move', payload: { id: 'a', from: 'awaiting-human', to: 'todo', answer: 'yes', role: 'human' }, v: 2 },
     { seq: 5, ts: '2026-07-15T00:00:04.000Z', type: 'work.move', payload: { id: 'a', from: 'doing', to: 'done', role: 'human' }, v: 2 },
@@ -851,19 +865,19 @@ test('foldEvents silently skips a malformed goal.focus payload (missing/non-stri
   assert.equal('focus' in foldEvents(events), false);
 });
 
-test("foldEvents folds writer onto the item across work.move, work.edit and work.stage, latest write wins", () => {
+test("foldEvents folds writer onto the item across work.move, work.edit and work.step, latest write wins", () => {
   const base = { seq: 1, ts: "2026-07-27T00:00:00.000Z", type: "work.add", payload: { id: "a", title: "A", status: "todo" } };
   const writerA = { id: "sess-1", source: "env" };
   const writerB = { id: "sess-2", source: "registry" };
   const writerC = { id: 4242, source: "pid" };
   const moveEvent = { seq: 2, ts: "2026-07-27T00:00:01.000Z", type: "work.move", payload: { id: "a", to: "doing", writer: writerA } };
   const editEvent = { seq: 3, ts: "2026-07-27T00:00:02.000Z", type: "work.edit", payload: { id: "a", patch: { title: "A2" }, writer: writerB } };
-  const stageEvent = { seq: 4, ts: "2026-07-27T00:00:03.000Z", type: "work.stage", payload: { id: "a", from: "executing", to: "decompose", writer: writerC } };
+  const stageEvent = { seq: 4, ts: "2026-07-27T00:00:03.000Z", type: "work.step", payload: { id: "a", from: "executing", to: "decompose", writer: writerC } };
 
   const steps = [
     { events: [base, moveEvent], expected: writerA, label: "work.move" },
     { events: [base, moveEvent, editEvent], expected: writerB, label: "work.edit" },
-    { events: [base, moveEvent, editEvent, stageEvent], expected: writerC, label: "work.stage" },
+    { events: [base, moveEvent, editEvent, stageEvent], expected: writerC, label: "work.step" },
   ];
   for (const { events, expected, label } of steps) {
     const view = foldEvents(events);
@@ -1109,7 +1123,7 @@ test('determinism: the zero-read fast path\'s round-tripped view is deep-equal t
   const dir = tmpFgosDir();
   addWork(dir, {
     id: 'a', title: 'A realistic item', kind: 'feature', status: 'todo', deps: [], risk: 'standard', refs: ['docs/x.md'],
-    verify: 'npm test', tier: 'standard', description: 'a full description', footprint: ['src/a.mjs'],
+    verify: 'npm test', size: 'standard', description: 'a full description', footprint: ['src/a.mjs'],
   });
   const logPath = logPathOf(dir);
   moveWork(dir, { id: 'a', to: 'blocked', expectedStatus: 'todo' });

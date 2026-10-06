@@ -1,0 +1,185 @@
+{
+  "contract": {
+    "id": "assignment-run-result",
+    "version": 3
+  },
+  "runId": "run_unit-run-1790934670425-5d5c769e/producer/1_01",
+  "assignmentId": "unit-run-1790934670425-5d5c769e/producer/1",
+  "controlEpoch": 1,
+  "controlToken": "cac5103b-2101-427d-880b-7856b87aa4d4",
+  "executorId": "claude",
+  "adapter": "cli-spawn",
+  "confinement": null,
+  "role": "producer",
+  "executorRedirected": false,
+  "policy": {
+    "role": "producer",
+    "executorPreference": [
+      "claude"
+    ],
+    "executorId": "claude",
+    "providerModel": "claude",
+    "rigor": "standard",
+    "tier": "standard",
+    "model": "sonnet",
+    "reasoningEffort": "medium",
+    "visibility": "headless",
+    "repeatMode": null,
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "claude",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "provider": {
+        "value": "claude",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "claude"
+        }
+      },
+      "model": {
+        "value": "sonnet",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "rigor": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "tier": {
+        "value": "standard",
+        "source": {
+          "scope": "rigor",
+          "id": "standard"
+        }
+      },
+      "reasoningEffort": {
+        "value": "medium",
+        "source": {
+          "scope": "derived",
+          "id": "rigor.standard"
+        }
+      },
+      "persona": {
+        "source": {
+          "scope": "default"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "repeatMode": {
+        "value": null,
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "unit-run-1790934670425-5d5c769e/producer/1"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "claude"
+        }
+      }
+    }
+  },
+  "settledAt": "2026-10-02T09:51:34.481Z",
+  "durationMs": 23662,
+  "settleReports": [],
+  "classification": {
+    "execution": {
+      "status": "completed",
+      "exitCode": 0
+    },
+    "assessment": {
+      "verdict": "pass"
+    },
+    "confidence": {
+      "level": "inferred",
+      "basis": [
+        "captured-stdout",
+        "workspace-git-diff"
+      ]
+    },
+    "failure": null,
+    "policy": {
+      "disposition": "allow",
+      "code": null
+    },
+    "delivery": {
+      "mode": "fresh"
+    },
+    "provenance": "native-v3",
+    "outcome": {
+      "category": "ok",
+      "reason": "completed-pass"
+    }
+  },
+  "runtime": {
+    "exitCode": 0,
+    "stdoutLog": ".fgos/assignments/unit-run-1790934670425-5d5c769e/producer/1/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/unit-run-1790934670425-5d5c769e/producer/1/runs/01/stderr.log"
+  },
+  "runnerNote": {
+    "summary": "Settled"
+  },
+  "usage": {
+    "inputTokens": null,
+    "outputTokens": null,
+    "totalTokens": null,
+    "cacheReadTokens": null,
+    "cacheCreationTokens": null,
+    "source": "transcript"
+  },
+  "evidence": {
+    "gitBefore": "eb8898f95933d7b8428ab68aa63e0f7f2549b01a",
+    "gitAfter": "eb8898f95933d7b8428ab68aa63e0f7f2549b01a",
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [
+      "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca6-docs-note.md"
+    ],
+    "mutatedDirtyBeforeFiles": [],
+    "attribution": [
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca2-posture-note.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca6-docs-note.md",
+        "firstObserved": "post-run",
+        "level": "correlated",
+        "basis": [
+          "pre-post-git-snapshot"
+        ],
+        "coverageMatched": false
+      }
+    ],
+    "artifacts": [],
+    "tests": []
+  }
+}

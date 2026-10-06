@@ -15,7 +15,6 @@ import {
   addAdHocWorktree,
   addBareOrigin,
   addDiscovery,
-  addFriction,
   addGoalItem,
   addOk,
   addOutcome,
@@ -61,7 +60,7 @@ import {
   makeRunnerProposedLeafItem,
   makeSessionSafeRunnerItem,
   mkLocalDependency,
-  moveStage,
+  moveStep,
   moveWork,
   os,
   path,
@@ -100,92 +99,6 @@ import {
 // reason this is a stderr line, never a JSON field: JSON.stringify drops
 // a named property set on an array).
 
-test('check on a directory with no log at all returns an empty outcomes list, exit 0 (a read never initializes .fgos/)', () => {
-  const cwd = rawTmpCwd();
-  const result = run(cwd, ['check']);
-  assert.equal(result.status, 0);
-  const data = envelopeData(result.stdout);
-  assert.deepEqual(data.outcomes, []);
-  assert.equal(data.friction, null);
-  assert.equal(data.entropy, null);
-  assert.ok(!fs.existsSync(path.join(cwd, '.fgos')));
-});
-
-
-test('check returns BOTH predicted and actual values for an item with real outcome data, exit 0', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'checked-item');
-  const dir = path.join(cwd, '.fgos');
-  addOutcome(dir, { id: 'checked-item', predicted: { tier: 'standard', deps: 0, priorVisits: 0 } });
-  addOutcome(dir, {
-    id: 'checked-item',
-    actual: { outcome: 'awaiting-approval', passed: true, attempts: 1, errorClass: null, aheadCount: 1, visits: 1 },
-  });
-
-  const result = run(cwd, ['check', 'checked-item']);
-  assert.equal(result.status, 0);
-  const data = envelopeData(result.stdout);
-  assert.equal(data.outcomes.length, 1);
-  assert.equal(data.outcomes[0].id, 'checked-item');
-  assert.equal(data.outcomes[0].predicted.tier, 'standard');
-  assert.equal(data.outcomes[0].actual.outcome, 'awaiting-approval');
-  assert.equal(data.outcomes[0].actual.passed, true);
-});
-
-
-test('check with no id given reports every item that has outcome data, exit 0', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'item-a');
-  addOk(cwd, 'item-b');
-  const dir = path.join(cwd, '.fgos');
-  addOutcome(dir, { id: 'item-a', predicted: { tier: 'light', deps: 0, priorVisits: 0 } });
-  addOutcome(dir, { id: 'item-a', actual: { outcome: 'awaiting-approval', passed: true, attempts: 1, errorClass: null, aheadCount: 1, visits: 1 } });
-
-  const result = run(cwd, ['check']);
-  assert.equal(result.status, 0);
-  const data = envelopeData(result.stdout);
-  assert.equal(data.outcomes.length, 1);
-  assert.equal(data.outcomes[0].id, 'item-a', 'item-b has no outcome data yet, so it is not listed');
-});
-
-
-// --- Diataxis docType surfacing in `check` (CONTEXT D5/D6) ------------------
-//
-// docType rides the SAME outcome/friction capture these tests above already
-// exercise — no new collector, no new write door. `check` surfaces a tagged
-// outcome via `collectOutcomeEntry`; a tagged friction rides through
-// `collectFrictionData`'s existing `recent` spread with no code change
-// beyond the store validation these tests prove separately.
-
-test('check surfaces docType for a tagged outcome; an untagged outcome nulls it, output shape otherwise unchanged', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'tagged-outcome-item');
-  addOk(cwd, 'untagged-outcome-item');
-  const dir = path.join(cwd, '.fgos');
-  addOutcome(dir, { id: 'tagged-outcome-item', docType: 'tutorial', predicted: { tier: 'standard', deps: 0, priorVisits: 0 } });
-  addOutcome(dir, { id: 'untagged-outcome-item', predicted: { tier: 'standard', deps: 0, priorVisits: 0 } });
-
-  const taggedResult = run(cwd, ['check', 'tagged-outcome-item']);
-  assert.equal(taggedResult.status, 0);
-  assert.deepEqual(envelopeData(taggedResult.stdout).outcomes[0], {
-    id: 'tagged-outcome-item',
-    predicted: { tier: 'standard', deps: 0, priorVisits: 0 },
-    actual: null,
-    docType: 'tutorial',
-    docPath: null,
-  });
-
-  const untaggedResult = run(cwd, ['check', 'untagged-outcome-item']);
-  assert.equal(untaggedResult.status, 0);
-  assert.deepEqual(envelopeData(untaggedResult.stdout).outcomes[0], {
-    id: 'untagged-outcome-item',
-    predicted: { tier: 'standard', deps: 0, priorVisits: 0 },
-    actual: null,
-    docType: null,
-    docPath: null,
-  });
-});
-
 
 // --- rollup view theo bộ (P24) ----------------------------------------------
 //
@@ -210,29 +123,29 @@ test('rollup on a root with n children, k done, prints k/n and lists every child
   assert.equal(data.doneCount, 2);
   assert.equal(data.totalCount, 3);
   assert.deepEqual(data.children, [
-    { id: 'child-a', title: 'Child A', status: 'done', stageEffective: 'executing' },
-    { id: 'child-b', title: 'Child B', status: 'todo', stageEffective: 'executing' },
-    { id: 'child-c', title: 'Child C', status: 'done', stageEffective: 'executing' },
+    { id: 'child-a', title: 'Child A', status: 'done', workflowStepEffective: 'executing' },
+    { id: 'child-b', title: 'Child B', status: 'todo', workflowStepEffective: 'executing' },
+    { id: 'child-c', title: 'Child C', status: 'done', workflowStepEffective: 'executing' },
   ]);
 });
 
 
-test('rollup renders stageEffective on the root and on each child independently, mixing explicit and defaulted stages (tsk-4zj D6)', () => {
+test('rollup renders workflowStepEffective on the root and on each child independently, mixing explicit and defaulted stages (tsk-4zj D6)', () => {
   const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'root-item', { title: 'Root Item' });
   const dir = path.join(cwd, '.fgos');
-  addWork(dir, { id: 'child-a', title: 'Child A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'npm test', parent: 'root-item', stage: 'discovery' });
-  addWork(dir, { id: 'child-b', title: 'Child B', kind: 'task', status: 'doing', deps: [], risk: 'light', refs: [], verify: 'npm test', parent: 'root-item', stage: 'decompose' });
+  addWork(dir, { id: 'child-a', title: 'Child A', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'npm test', parent: 'root-item', workflowStep: 'discovery' });
+  addWork(dir, { id: 'child-b', title: 'Child B', kind: 'task', status: 'doing', deps: [], risk: 'light', refs: [], verify: 'npm test', parent: 'root-item', workflowStep: 'planning' });
   addWork(dir, { id: 'child-c', title: 'Child C', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'npm test', parent: 'root-item' });
 
   const result = run(cwd, ['rollup', 'root-item']);
   assert.equal(result.status, 0);
   const data = envelopeData(result.stdout);
-  assert.equal(data.stageEffective, 'executing');
+  assert.equal(data.workflowStepEffective, 'executing');
   assert.deepEqual(data.children, [
-    { id: 'child-a', title: 'Child A', status: 'todo', stageEffective: 'discovery' },
-    { id: 'child-b', title: 'Child B', status: 'doing', stageEffective: 'decompose' },
-    { id: 'child-c', title: 'Child C', status: 'todo', stageEffective: 'executing' },
+    { id: 'child-a', title: 'Child A', status: 'todo', workflowStepEffective: 'discovery' },
+    { id: 'child-b', title: 'Child B', status: 'doing', workflowStepEffective: 'planning' },
+    { id: 'child-c', title: 'Child C', status: 'todo', workflowStepEffective: 'executing' },
   ]);
 });
 
@@ -370,7 +283,7 @@ test('rollup on an item carrying both children and targets keeps the two count p
   assert.equal(data.totalCount, 1);
   assert.equal(data.targetDoneCount, 1);
   assert.equal(data.targetTotalCount, 1);
-  assert.deepEqual(data.children, [{ id: 'child-a', title: 'Child A', status: 'todo', stageEffective: 'executing' }]);
+  assert.deepEqual(data.children, [{ id: 'child-a', title: 'Child A', status: 'todo', workflowStepEffective: 'executing' }]);
   assert.deepEqual(data.targets, [{ id: 'target-a', title: 'Target A', status: 'done' }]);
 });
 
@@ -410,8 +323,6 @@ test('show returns the work record plus every per-item log scoped to just that i
   run(cwd, ['ask', 'other-item', '--text', '## Context\n\nBackground needed to understand this question without opening another file.\n\n## Why this matters\n\nThis directly affects the outcome: unrelated ask']);
   addOutcome(dir, { id: 'show-detail-item', predicted: { tier: 'standard', deps: 0, priorVisits: 0 } });
   addOutcome(dir, { id: 'other-item', predicted: { tier: 'light', deps: 0, priorVisits: 0 } });
-  addFriction(dir, { id: 'show-detail-item', disposition: 'parked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'goal-check failed' });
-  addFriction(dir, { id: 'other-item', disposition: 'halted', errorClass: 'worker-timeout', layer: 'environment', attempts: 1, detail: 'timed out' });
 
   const result = run(cwd, ['show', 'show-detail-item']);
   assert.equal(result.status, 0);
@@ -432,9 +343,7 @@ test('show returns the work record plus every per-item log scoped to just that i
   assert.equal(data.outcome.id, 'show-detail-item');
   assert.equal(data.outcome.predicted.tier, 'standard');
 
-  assert.equal(data.friction.count, 1);
-  assert.equal(data.friction.recent[0].errorClass, 'verify-miss');
-
+  assert.equal(data.friction, null);
   // Nothing from 'other-item' leaked into 'show-detail-item's scoped view.
   assert.ok(!JSON.stringify(data).includes('unrelated'));
   assert.ok(!JSON.stringify(data).includes('worker-timeout'));

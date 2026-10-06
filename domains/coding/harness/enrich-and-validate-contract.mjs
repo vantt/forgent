@@ -9,10 +9,10 @@
 //
 // Called by the foundation (`buildInlineAssignment`,
 // src/runner/dispatch/assignment.mjs) only when a Work item with a
-// declared Stage is attached to an inline Assignment build. Against that
-// Work's Stage, it:
+// declared step is attached to an inline Assignment build. Against that
+// Work's step, it:
 //   - requires `contract.supports` to name an operation id legal in
-//     `operationsForStage(domain, work.stage)` -- rejects (fail-closed)
+//     `operationsForStep(domain, work.workflowStep)` -- rejects (fail-closed)
 //     otherwise. This is the ADR-007 §3 guarantee, mechanically enforced
 //     here: a declared Stage Operation must use the declared path; inline
 //     may not replace or extend it.
@@ -44,7 +44,7 @@
 
 import path from 'node:path';
 import { RunnerConfigError } from '../../../src/runner/dispatch/config.mjs';
-import { operationsForStage } from '../../../src/state/workflow-stage-graphs.mjs';
+import { getDomain, operationsForStep } from '../../../src/state/domain-registry.mjs';
 
 function fail(reason) {
   throw new RunnerConfigError(`enrich-and-validate-contract: ${reason}`);
@@ -95,7 +95,7 @@ export function mergeHarnessPolicy(opPolicy, callerPolicy) {
  * @param {object} params
  * @param {string} params.domain Domain name (e.g. `'coding'`)
  * @param {object} params.work The Work item this inline Assignment is
- *   attached to -- required; there is no declared Stage to validate
+ *   attached to -- required; there is no declared step to validate
  *   `contract.supports` against without one.
  * @returns {Readonly<{contract: Readonly<object>, policy?: Readonly<object>}>}
  */
@@ -104,19 +104,18 @@ export function enrichAndValidateContract(contract, { domain, work } = {}) {
     fail('contract must be a non-null object');
   }
   if (!work || typeof work !== 'object') {
-    fail('work is required -- there is no declared Stage to validate contract.supports against without one');
+    fail('work is required -- there is no declared step to validate contract.supports against without one');
   }
-  if (!work.stage || typeof work.stage !== 'string') {
-    fail(`work "${work.id ?? '(unknown)'}" has no declared stage -- cannot validate contract.supports`);
+  if (!work.workflowStep || typeof work.workflowStep !== 'string') {
+    fail(`work "${work.id ?? '(unknown)'}" has no declared step -- cannot validate contract.supports`);
   }
 
-  const resolvedWorkflow = work.workflow ?? 'feature';
-  const stageOps = operationsForStage(domain, work.stage, { kind: resolvedWorkflow });
+  const stageOps = operationsForStep(getDomain(domain), work.workflowStep, work.kind);
   const matchedOp = stageOps.find((o) => o.id === contract.supports);
 
   if (!matchedOp) {
     fail(
-      `contract.supports ${JSON.stringify(contract.supports)} is not a legal operation for stage "${work.stage}" in domain "${domain}" (declared operations: [${stageOps.map((o) => o.id).join(', ')}]) -- ADR-007 §3: inline may not replace or extend the declared Stage path`,
+      `contract.supports ${JSON.stringify(contract.supports)} is not a legal operation for step "${work.workflowStep}" in domain "${domain}" (declared operations: [${stageOps.map((o) => o.id).join(', ')}]) -- ADR-007 §3: inline may not replace or extend the declared step path`,
     );
   }
 

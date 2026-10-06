@@ -24,12 +24,12 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { TIERS } from './work.mjs';
+import { SIZES } from './work.mjs';
 import { HEAVY_KEYWORDS, matchesKeyword } from '../intake/risk-keywords.mjs';
 import { readSharedConfig } from '../config/shared-config-file.mjs';
 
 /** Level order, weakest to strongest. 'off' auto-approves nothing. */
-export const LEVELS = Object.freeze(['off', ...TIERS]);
+export const LEVELS = Object.freeze(['off', ...SIZES]);
 
 export const DEFAULT_LEVEL = 'off';
 
@@ -96,16 +96,17 @@ function readLegacyStandaloneLevel(dir) {
 }
 
 /**
- * Does `level` cover `tier`? `off` covers nothing. Any other level covers
- * its own tier and every lighter one (D5's reuse of `TIERS`' own order).
- * An unrecognized tier or level is never covered (fail closed).
+ * Does `level` cover `size`? `off` covers nothing. Any other level covers
+ * its own size and every lighter one (D5's reuse of `SIZES`' own order).
+ * An unrecognized size or level is never covered (fail closed).
  */
-export function isTierCovered(tier, level) {
-  const tierRank = TIERS.indexOf(tier);
+export function isSizeCovered(size, level) {
+  const sizeRank = SIZES.indexOf(size);
   const levelRank = LEVELS.indexOf(level);
-  if (tierRank === -1 || levelRank === -1 || level === 'off') return false;
-  return tierRank < levelRank;
+  if (sizeRank === -1 || levelRank === -1 || level === 'off') return false;
+  return sizeRank < levelRank;
 }
+export const isTierCovered = isSizeCovered;
 
 /**
  * D2's mechanical completeness check on a gated artifact's raw text
@@ -168,7 +169,7 @@ export function canAutoApprove(item, artifactText, level) {
   const hardGateHit = HEAVY_KEYWORDS.some((keyword) => matchesKeyword(haystack, keyword));
   if (hardGateHit) return false;
 
-  if (!isTierCovered(item?.tier, level)) return false;
+  if (!isSizeCovered(item?.size, level)) return false;
   if (hasOpenItems(artifactText)) return false;
   return true;
 }
@@ -254,7 +255,7 @@ export function canAutoApproveMergedGate(item, planText, childSpecs, costVerdict
   const hardGateHit = HEAVY_KEYWORDS.some((keyword) => matchesKeyword(haystack, keyword));
   if (hardGateHit) return false;
 
-  if (!isTierCovered(item?.tier, level)) return false;
+  if (!isSizeCovered(item?.size, level)) return false;
   if (hasOpenItems(planText)) return false;
   if (costVerdict !== COST_REVERSIBLE) return false;
   return true;

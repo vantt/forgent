@@ -79,7 +79,7 @@ itself is genuinely unclear, not when a detail is merely unspecified.
   omitted, even on an unclear intent — a domain guess doesn't need intent
   to already be settled). Read the registered domain vocabulary
   mechanically — `Object.keys(DOMAINS)` from
-  `src/state/workflow-stage-graphs.mjs` (today: `coding`, `synthetic`,
+  `src/state/domain-registry.mjs` (today: `coding`, `synthetic`,
   `triage`, `fixture-marketing`) — never a hardcoded list of your own.
   Judge which one the submitted text fits from its own content directly
   (a live session judgment, same discipline as the intent verdict itself);
@@ -124,7 +124,7 @@ itself is genuinely unclear, not when a detail is merely unspecified.
 
 3. **Classify domain.** Regardless of the intent verdict, read the
    registered domain vocabulary (`Object.keys(DOMAINS)`,
-   `src/state/workflow-stage-graphs.mjs`) and judge which one the text
+   `src/state/domain-registry.mjs`) and judge which one the text
    fits, defaulting to `coding` when nothing else fits. Always included in
    the verdict.
 

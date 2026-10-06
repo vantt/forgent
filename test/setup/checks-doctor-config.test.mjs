@@ -187,6 +187,9 @@ test('shell-integration-sourced fails when the source line is present but the so
   );
   const prevProbe = process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT;
   process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT = fragileFixture;
+  const prevHarness = { CLAUDECODE: process.env.CLAUDECODE, CLAUDE_CODE_SESSION_ID: process.env.CLAUDE_CODE_SESSION_ID };
+  delete process.env.CLAUDECODE;
+  delete process.env.CLAUDE_CODE_SESSION_ID;
   try {
     withHome(homeDir, () => {
       const { passed, message } = checkById('shell-integration-sourced').check(process.cwd());
@@ -194,7 +197,19 @@ test('shell-integration-sourced fails when the source line is present but the so
       assert.match(message, /fgos --help.*fails/);
       assert.match(message, /_fgos_helper/);
     });
+    // Inside an agent harness shell the same dead function is information, not a failure.
+    process.env.CLAUDECODE = '1';
+    withHome(homeDir, () => {
+      const { passed, message } = checkById('shell-integration-sourced').check(process.cwd());
+      assert.equal(passed, true);
+      assert.match(message, /informational, running inside an agent harness shell/);
+      assert.match(message, /_fgos_helper/);
+    });
   } finally {
+    for (const [key, value] of Object.entries(prevHarness)) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
     if (prevProbe === undefined) delete process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT;
     else process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT = prevProbe;
     fs.rmSync(homeDir, { recursive: true, force: true });
@@ -439,6 +454,64 @@ test('advise-execute-capabilities-configured passes when both slots are declared
   const { passed, message } = checkById('advise-execute-capabilities-configured').check(cwd);
   assert.equal(passed, true);
   assert.match(message, /declares "advise", "execute", and "code:implement"/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('workflow-capabilities-configured names a capability a Workflow uses that config lacks', () => {
+  const cwd = mkTemp('doctor-workflow-caps-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  const { 'architecture:frame': _omitted, ...rest } = DEFAULT_CAPABILITY_SLOTS;
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities: rest } }));
+  const { passed, message } = checkById('workflow-capabilities-configured').check(cwd);
+  assert.equal(passed, false);
+  assert.match(message, /architecture:frame \(architecture-advisory\)/);
+  assert.doesNotMatch(message, /marketing:write/, 'a registered capability must not be reported');
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('workflow-capabilities-configured accepts a bare-verb entry the way bind() resolves it', () => {
+  const cwd = mkTemp('doctor-workflow-caps-verb-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  const { 'architecture:critique': _omitted, ...rest } = DEFAULT_CAPABILITY_SLOTS;
+  fs.writeFileSync(
+    path.join(cwd, '.fgos', 'config.json'),
+    JSON.stringify({ runner: { capabilities: { ...rest, critique: { description: 'verb entry', prefer: [{ executor: 'x' }] } } } }),
+  );
+  const { message } = checkById('workflow-capabilities-configured').check(cwd);
+  assert.doesNotMatch(message, /architecture:critique/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('workflow-capabilities-configured warns, naming each Workflow capability with no prefer pool', () => {
+  const cwd = mkTemp('doctor-workflow-caps-nopool-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities: DEFAULT_CAPABILITY_SLOTS } }));
+  const { passed, message } = checkById('workflow-capabilities-configured').check(cwd);
+  assert.equal(passed, true, 'a taste-free fresh setup is a warning, not a failure');
+  assert.match(message, /^warning: .*no "prefer" pool/);
+  assert.match(message, /coding:plan/);
+  assert.match(message, /delphi:propose/);
+  fs.rmSync(cwd, { recursive: true, force: true });
+});
+
+test('workflow-capabilities-configured is clean when each capability resolves to a prefer pool, exact or bare verb', () => {
+  const cwd = mkTemp('doctor-workflow-caps-pool-');
+  fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
+  const capabilities = {};
+  for (const [name, slot] of Object.entries(DEFAULT_CAPABILITY_SLOTS)) {
+    capabilities[name] = slot;
+  }
+  for (const name of Object.keys(DEFAULT_CAPABILITY_SLOTS)) {
+    if (!name.includes(':')) continue;
+    const [domain, verb] = name.split(':');
+    // half by exact name, half by bare verb
+    if (domain.length % 2 === 0) capabilities[name] = { ...capabilities[name], prefer: [{ executor: 'x' }] };
+    else capabilities[verb] = { ...(capabilities[verb] ?? {}), prefer: [{ executor: 'x' }] };
+  }
+  fs.writeFileSync(path.join(cwd, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities } }));
+  const { passed, message } = checkById('workflow-capabilities-configured').check(cwd);
+  assert.equal(passed, true);
+  assert.doesNotMatch(message, /^warning/);
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
@@ -953,6 +1026,117 @@ test('no-stuck-merge-abort check fails and fix reports manual command when MERGE
     assert.equal(changed, false);
     assert.match(fixMessage, /merge in progress or stuck/);
     assert.match(fixMessage, new RegExp(`fgos main-checkout-reset --sha ${headSha} --confirm`));
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('tier-vocabulary-dead-keys check passes on clean config', () => {
+  const dir = mkTemp('checks-tier-dead-clean-');
+  try {
+    fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
+    fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({
+      runner: {
+        rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+        modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', flagship: 'opus', frontier: 'opus' } },
+      },
+    }));
+    const { passed, message } = checkById('tier-vocabulary-dead-keys').check(dir);
+    assert.equal(passed, true);
+    assert.match(message, /no retired tier vocabulary/);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('tier-vocabulary-dead-keys check fails when retired keys are present', () => {
+  const dir = mkTemp('checks-tier-dead-dirty-');
+  try {
+    fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
+    fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({
+      runner: {
+        models: { light: 'haiku' },
+        rigorOverrides: { low: 'standard' },
+        capabilities: {
+          'code:review': { overrides: { tier: 'standard' } },
+        },
+      },
+    }));
+    const { passed, message } = checkById('tier-vocabulary-dead-keys').check(dir);
+    assert.equal(passed, false);
+    assert.match(message, /runner\.models/);
+    assert.match(message, /runner\.rigorOverrides/);
+    assert.match(message, /capabilities\.code:review\.overrides/);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('model-policy-tier-coverage check passes when all needed tiers are covered', () => {
+  const dir = mkTemp('checks-model-coverage-pass-');
+  const fakeHome = mkTemp('fake-home-');
+  try {
+    fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
+    fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({
+      runner: {
+        rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+        executors: {
+          claude: { command: 'claude', providerModel: 'claude' },
+        },
+        modelPolicies: {
+          claude: { nano: 'haiku', standard: 'sonnet', flagship: 'opus', frontier: 'opus' },
+        },
+      },
+    }));
+    withHome(fakeHome, () => {
+      const { passed, message } = checkById('model-policy-tier-coverage').check(dir);
+      assert.equal(passed, true);
+      assert.match(message, /modelPolicies covers all tiers/);
+    });
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+    fs.rmSync(fakeHome, { recursive: true, force: true });
+  }
+});
+
+test('model-policy-tier-coverage check fails when an executor provider lacks tier coverage', () => {
+  const dir = mkTemp('checks-model-coverage-fail-');
+  const fakeHome = mkTemp('fake-home-');
+  try {
+    fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
+    fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({
+      runner: {
+        rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
+        executors: {
+          claude: { command: 'claude', providerModel: 'claude' },
+          openai: { command: 'codex', providerModel: 'openai' },
+        },
+        modelPolicies: {
+          claude: { nano: 'haiku', standard: 'sonnet', flagship: 'opus', frontier: 'opus' },
+          openai: { nano: 'gpt-nano' }, // missing standard, flagship, frontier
+        },
+      },
+    }));
+    withHome(fakeHome, () => {
+      const { passed, message } = checkById('model-policy-tier-coverage').check(dir);
+      assert.equal(passed, false);
+      assert.match(message, /openai.*missing model for tier "standard"/);
+    });
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+    fs.rmSync(fakeHome, { recursive: true, force: true });
+  }
+});
+
+test('coordination-protocol-dead-vocabulary check fails when minTier is in protocol YAML', () => {
+  const dir = mkTemp('checks-coord-proto-dead-');
+  try {
+    const protoDir = path.join(dir, '.fgos', 'coordination-protocols');
+    fs.mkdirSync(protoDir, { recursive: true });
+    fs.writeFileSync(path.join(protoDir, 'test-proto.yaml'), 'steps:\n  - id: step1\n    policy:\n      minTier: standard\n');
+    const { passed, message } = checkById('coordination-protocol-dead-vocabulary').check(dir);
+    assert.equal(passed, false);
+    assert.match(message, /minTier/);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }

@@ -7,7 +7,8 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { buildAssignment, claimAssignmentId } from '../../src/runner/dispatch/assignment.mjs';
+import { claimAssignmentId } from '../../src/runner/dispatch/assignment.mjs';
+import { buildAssignment } from '../helpers/declared-assignment.mjs';
 
 const [, , assignmentsDir, writerId, operation, readyFile, goFile] = process.argv;
 

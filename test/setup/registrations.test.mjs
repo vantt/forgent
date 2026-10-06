@@ -13,7 +13,8 @@ import { execFileSync } from 'node:child_process';
 import crypto from 'node:crypto';
 import { DOCTOR_CHECKS, CONFIG_DEFAULT_REGISTRATIONS, FIX_REGISTRATIONS, registerCheck, registerConfigDefault, registerFix, runFixes, ensureSharedConfigDefaults } from '../../src/setup/checks.mjs';
 import { DEFAULT_RUNNER_CONFIG } from '../../src/runner/dispatch.mjs';
-import { DEFAULT_CAPABILITY_SLOTS, PI_EXECUTOR_DEFAULT, findWorkflowStageOperationProblems } from '../../src/setup/registrations.mjs';
+import { DEFAULT_CAPABILITY_SLOTS, PI_EXECUTOR_DEFAULT, findWorkflowStageOperationProblems, checkTaskSpecsResolve, checkDomainWorkflowOperationsCoverage } from '../../src/setup/registrations.mjs';
+import { seedFileLocalBwrapRegistry } from '../runner/confinement-registry-fixture.helper.mjs';
 import { recordMainCheckoutGuardWarning } from '../../src/state/main-checkout-guard-warnings.mjs';
 
 
@@ -196,6 +197,55 @@ test('ensureSharedConfigDefaults on an already-complete shared file does not rew
   assert.deepEqual(second.addedKeys, []);
   assert.deepEqual(second.config, first.config);
   assert.equal(fs.statSync(sharedPath).mtimeMs, before);
+});
+
+const WORKFLOW_CAPABILITIES = [
+  'marketing:research', 'marketing:write', 'marketing:publish',
+  'architecture:frame', 'architecture:shape', 'architecture:critique', 'architecture:synthesize', 'architecture:explain',
+  'business:frame', 'business:perspectives', 'business:critique', 'business:synthesize', 'business:plan',
+];
+
+test('ensureSharedConfigDefaults on an empty project registers the Workflow capabilities', () => {
+  const dir = mkTempDir();
+  const { config } = ensureSharedConfigDefaults(dir);
+  for (const name of WORKFLOW_CAPABILITIES) {
+    assert.equal(typeof config.runner.capabilities[name]?.description, 'string', `${name} missing`);
+  }
+});
+
+test('ensureSharedConfigDefaults adds missing Workflow capabilities without touching one the project already tuned', () => {
+  const dir = mkTempDir();
+  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
+  const tuned = { description: 'project taste', prefer: [{ executor: 'mine' }] };
+  fs.writeFileSync(
+    path.join(dir, '.fgos', 'config.json'),
+    JSON.stringify({ runner: { capabilities: { 'marketing:write': tuned } } }),
+  );
+  const { config } = ensureSharedConfigDefaults(dir);
+  assert.deepEqual(config.runner.capabilities['marketing:write'], tuned);
+  assert.ok(config.runner.capabilities['marketing:research']);
+  assert.ok(config.runner.capabilities['business:plan']);
+});
+
+seedFileLocalBwrapRegistry();
+
+test('setup adds a coding:plan slot beside a project bare-verb plan pool and bind still serves it from that pool', async () => {
+  const { bind } = await import('../../src/runner/execution/bind.mjs');
+  const dir = mkTempDir();
+  fs.mkdirSync(path.join(dir, '.fgos'), { recursive: true });
+  const plan = { prefer: [{ executor: 'mine' }] };
+  fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({ runner: { capabilities: { plan } } }));
+  const { config } = ensureSharedConfigDefaults(dir);
+  assert.deepEqual(config.runner.capabilities.plan, plan, 'the project entry is untouched');
+  assert.equal(typeof config.runner.capabilities['coding:plan']?.description, 'string', 'the slot is still added');
+  assert.equal(config.runner.capabilities['coding:plan'].prefer, undefined);
+  const runnerConfig = {
+    ...config.runner,
+    executors: { mine: { kind: 'agent', command: 'mine', invocations: [{ id: 'mine-cli', via: 'cli', confinement: { backend: 'bwrap' } }] } },
+  };
+  const bound = bind({ unit: { id: 'u', capability: 'coding:plan', writes: [] }, role: 'producer' }, { runnerConfig, session: { headless: true } });
+  assert.equal(bound.executor, 'mine');
+  assert.equal(bound.provenance.executor.source, 'capability:plan');
 });
 
 // ─── spec/registry agreement. Data Dictionary #7 and #7b used to say the
@@ -443,6 +493,35 @@ test('task-specs-resolve doctor check passes when core/task-specs/ and domain ta
   assert.equal(result.passed, true, `task-specs-resolve failed: ${result.message}`);
 });
 
+test('task-spec and workflow-operation checks pass on a plain target project that carries no fgOS trees', () => {
+  const project = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-plain-target-'));
+  try {
+    assert.equal(fs.existsSync(path.join(project, 'domains')), false);
+    assert.equal(fs.existsSync(path.join(project, 'core')), false);
+    for (const id of ['task-specs-resolve', 'domain-workflow-operations-coverage']) {
+      const entry = DOCTOR_CHECKS.find((c) => c.id === id);
+      const result = entry.check(project);
+      assert.equal(result.passed, true, `${id} failed on a plain target: ${result.message}`);
+    }
+  } finally {
+    fs.rmSync(project, { recursive: true, force: true });
+  }
+});
+
+test('task-spec and workflow-operation checks still fail when the install root lacks its own task-specs', () => {
+  const emptyRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-broken-install-'));
+  try {
+    const specs = checkTaskSpecsResolve(emptyRoot);
+    assert.equal(specs.passed, false);
+    assert.match(specs.message, /missing task-spec file/);
+    const coverage = checkDomainWorkflowOperationsCoverage(emptyRoot, emptyRoot);
+    assert.equal(coverage.passed, false);
+    assert.match(coverage.message, /not found/);
+  } finally {
+    fs.rmSync(emptyRoot, { recursive: true, force: true });
+  }
+});
+
 test('agent-type-names-unique doctor check passes when agent-type names are globally unique', () => {
   const entry = DOCTOR_CHECKS.find((c) => c.id === 'agent-type-names-unique');
   assert.ok(entry, 'agent-type-names-unique check must be registered');
@@ -602,7 +681,27 @@ test('events-compaction-verified fails and names the broken manifest when the ba
   assert.match(result.message, /compact-1\.manifest\.json/);
 });
 
-// --- workflow stage operations validation (Step 02 / D19) ---
+// --- workflow step operations validation (Step 02 / D19) ---
+// These fixtures state a workflow's operations as `operationMap`/`skillMap` keyed by step; the check
+// reads Workflow definitions (`steps[].operations`, `steps[].skill`), so they are lifted into that shape.
+function asWorkflowDomains(domains) {
+  const lifted = {};
+  for (const [domainName, domain] of Object.entries(domains)) {
+    const workflows = {};
+    for (const [wfName, wf] of Object.entries(domain.workflows ?? {})) {
+      workflows[wfName] = {
+        steps: Object.entries(wf.operationMap ?? {}).map(([id, operations]) => ({
+          id,
+          operations,
+          ...(wf.skillMap?.[id] ? { skill: wf.skillMap[id] } : {}),
+        })),
+      };
+    }
+    lifted[domainName] = { ...domain, workflows };
+  }
+  return lifted;
+}
+
 
 test('findWorkflowStageOperationProblems passes on the live repository setup', () => {
   const problems = findWorkflowStageOperationProblems(process.cwd());
@@ -623,7 +722,7 @@ test('findWorkflowStageOperationProblems fails when operation taskSpec does not 
       },
     },
   };
-  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  const problems = findWorkflowStageOperationProblems(process.cwd(), asWorkflowDomains(customDomains));
   assert.equal(problems.length > 0, true);
   assert.match(problems[0], /nonexistent-task-spec-file/);
 });
@@ -645,7 +744,7 @@ test('findWorkflowStageOperationProblems fails when operation role is not in rol
       },
     },
   };
-  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  const problems = findWorkflowStageOperationProblems(process.cwd(), asWorkflowDomains(customDomains));
   assert.equal(problems.length > 0, true);
   assert.match(problems[0], /unknown-role-xyz/);
 });
@@ -664,7 +763,7 @@ test('findWorkflowStageOperationProblems fails when operation skill is not provi
       },
     },
   };
-  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  const problems = findWorkflowStageOperationProblems(process.cwd(), asWorkflowDomains(customDomains));
   assert.equal(problems.length > 0, true);
   assert.match(problems[0], /fgos-completely-fake-skill-123/);
 });
@@ -691,7 +790,7 @@ test('findWorkflowStageOperationProblems fails when operation reason has no matc
       },
     },
   };
-  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  const problems = findWorkflowStageOperationProblems(process.cwd(), asWorkflowDomains(customDomains));
   assert.equal(problems.length > 0, true);
   assert.match(problems[0], /does not match any legal roleGraph edge/);
 });
@@ -711,18 +810,17 @@ test('findWorkflowStageOperationProblems fails when multiple operations are mark
       },
     },
   };
-  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  const problems = findWorkflowStageOperationProblems(process.cwd(), asWorkflowDomains(customDomains));
   assert.equal(problems.length > 0, true);
   assert.match(problems[0], /2 operations marked primary: true/);
 });
 
-test('findWorkflowStageOperationProblems fails when primary operation contradicts stage taskSpec or skill', () => {
+test('findWorkflowStageOperationProblems fails when the primary operation does not carry the step skill', () => {
   const customDomains = {
     coding: {
       workflows: {
         feature: {
           skillMap: { planning: 'fgos-coding-planning' },
-          taskSpecMap: { planning: 'shape-plan' },
           operationMap: {
             planning: [
               { id: 'validate-plan', primary: true, taskSpec: 'validate-plan', role: 'reviewer', skills: ['fgos-coding-validating'] },
@@ -732,13 +830,11 @@ test('findWorkflowStageOperationProblems fails when primary operation contradict
       },
     },
   };
-  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
-  assert.equal(problems.length >= 2, true);
-  assert.ok(problems.some((p) => p.includes('contradicts stage taskSpec')));
-  assert.ok(problems.some((p) => p.includes('does not include stage skill')));
+  const problems = findWorkflowStageOperationProblems(process.cwd(), asWorkflowDomains(customDomains));
+  assert.ok(problems.some((p) => p.includes('does not include step skill')));
 });
 
-test('findWorkflowStageOperationProblems fails when policy minTier or preferPersona is invalid', () => {
+test('findWorkflowStageOperationProblems fails when policy rigor or preferPersona is invalid', () => {
   const customDomains = {
     coding: {
       workflows: {
@@ -750,7 +846,7 @@ test('findWorkflowStageOperationProblems fails when policy minTier or preferPers
                 taskSpec: 'shape-plan',
                 role: 'implementer',
                 skills: ['fgos-coding-planning'],
-                policy: { minTier: 'ultra-mega-tier', preferPersona: 'alien-persona' },
+                policy: { rigor: 'ultra-mega-rigor', preferPersona: 'alien-persona' },
               },
             ],
           },
@@ -758,9 +854,9 @@ test('findWorkflowStageOperationProblems fails when policy minTier or preferPers
       },
     },
   };
-  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  const problems = findWorkflowStageOperationProblems(process.cwd(), asWorkflowDomains(customDomains));
   assert.equal(problems.length >= 2, true);
-  assert.ok(problems.some((p) => p.includes('policy.minTier')));
+  assert.ok(problems.some((p) => p.includes('policy.rigor')));
   assert.ok(problems.some((p) => p.includes('policy.preferPersona')));
 });
 
@@ -792,7 +888,7 @@ test('findWorkflowStageOperationProblems fails on invalid dispatch mode or human
       },
     },
   };
-  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  const problems = findWorkflowStageOperationProblems(process.cwd(), asWorkflowDomains(customDomains));
   assert.ok(problems.some((p) => p.includes('invalid dispatch mode "robot-only"')));
   assert.ok(problems.some((p) => p.includes('dispatch: human-only operation must not declare executor policy')));
 });
@@ -830,7 +926,7 @@ test('findWorkflowStageOperationProblems fails on invalid preferExecutor, fallba
       },
     },
   };
-  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  const problems = findWorkflowStageOperationProblems(process.cwd(), asWorkflowDomains(customDomains));
   assert.ok(problems.some((p) => p.includes('policy.preferExecutor "does-not-exist" is not a recognized executor')));
   assert.ok(problems.some((p) => p.includes('policy.fallbackExecutors must be an array of strings')));
   assert.ok(problems.some((p) => p.includes('policy.visibility "opaque" must be "headless" or "visible"')));
@@ -853,7 +949,7 @@ test('findWorkflowStageOperationProblems fails on duplicate operation id or empt
       },
     },
   };
-  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  const problems = findWorkflowStageOperationProblems(process.cwd(), asWorkflowDomains(customDomains));
   assert.ok(problems.some((p) => p.includes('duplicate operation id "duplicate-id"')));
   assert.ok(problems.some((p) => p.includes('operation id must be a non-empty string')));
 });
@@ -878,7 +974,7 @@ test('findWorkflowStageOperationProblems fails when required fields taskSpec, ro
       },
     },
   };
-  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  const problems = findWorkflowStageOperationProblems(process.cwd(), asWorkflowDomains(customDomains));
   assert.ok(problems.some((p) => p.includes('missing-taskSpec') && p.includes('taskSpec must be a non-empty string')));
   assert.ok(problems.some((p) => p.includes('missing-role') && p.includes('role must be a non-empty string in roleGraph.roles')));
   assert.ok(problems.some((p) => p.includes('missing-skills') && p.includes('skills must be an array of strings')));
@@ -912,7 +1008,7 @@ test('findWorkflowStageOperationProblems strictly enforces role as TARGET role (
       },
     },
   };
-  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  const problems = findWorkflowStageOperationProblems(process.cwd(), asWorkflowDomains(customDomains));
   assert.ok(problems.some((p) => p.includes('bad-target-op') && p.includes('does not match any legal roleGraph edge')));
   assert.ok(!problems.some((p) => p.includes('good-target-op')));
 });
@@ -930,7 +1026,7 @@ test('findWorkflowStageOperationProblems fails when policy contains disallowed k
                 role: 'implementer',
                 skills: ['fgos-coding-planning'],
                 policy: {
-                  minTier: 'standard',
+                  rigor: 'standard',
                   model: 'gpt-5.5',
                   timeoutMs: 999999,
                   prompt: 'Do something',
@@ -942,11 +1038,11 @@ test('findWorkflowStageOperationProblems fails when policy contains disallowed k
       },
     },
   };
-  const problems = findWorkflowStageOperationProblems(process.cwd(), customDomains);
+  const problems = findWorkflowStageOperationProblems(process.cwd(), asWorkflowDomains(customDomains));
   assert.ok(problems.some((p) => p.includes('policy contains disallowed key(s) [model, timeoutMs, prompt]')));
 });
 
-test('findWorkflowStageOperationProblems fails when stage operations is not an array or operationMap is not an object', () => {
+test('findWorkflowStageOperationProblems fails when a step\'s operations is not an array', () => {
   const customDomainsNonArray = {
     coding: {
       workflows: {
@@ -959,38 +1055,9 @@ test('findWorkflowStageOperationProblems fails when stage operations is not an a
       },
     },
   };
-  const problemsNonArray = findWorkflowStageOperationProblems(process.cwd(), customDomainsNonArray);
+  const problemsNonArray = findWorkflowStageOperationProblems(process.cwd(), asWorkflowDomains(customDomainsNonArray));
   assert.ok(problemsNonArray.some((p) => p.includes('coding.feature.planning.operations: must be an array of operation objects')));
   assert.ok(problemsNonArray.some((p) => p.includes('coding.feature.discovery.operations: must be an array of operation objects')));
-
-  const customDomainsBadMap = {
-    coding: {
-      workflows: {
-        feature: {
-          operationMap: 'not-an-object',
-        },
-      },
-    },
-  };
-  const problemsBadMap = findWorkflowStageOperationProblems(process.cwd(), customDomainsBadMap);
-  assert.ok(problemsBadMap.some((p) => p.includes('coding.feature.operationMap: must be an object')));
-
-  // Test unnormalized raw stages array with malformed operations
-  const customDomainsRawStages = {
-    coding: {
-      workflows: {
-        feature: {
-          stages: [
-            { name: 'planning', operations: 'validate-plan' },
-            { name: 'discovery', operations: { id: 'judge-ambiguity' } },
-          ],
-        },
-      },
-    },
-  };
-  const problemsRawStages = findWorkflowStageOperationProblems(process.cwd(), customDomainsRawStages);
-  assert.ok(problemsRawStages.some((p) => p.includes('coding.feature.planning.operations: must be an array of operation objects')));
-  assert.ok(problemsRawStages.some((p) => p.includes('coding.feature.discovery.operations: must be an array of operation objects')));
 });
 
 test('domain-workflow-operations-coverage doctor check is registered and passes on clean repo', () => {
@@ -998,5 +1065,69 @@ test('domain-workflow-operations-coverage doctor check is registered and passes 
   assert.ok(check, 'domain-workflow-operations-coverage doctor check must be registered');
   const result = check.check(process.cwd());
   assert.equal(result.passed, true);
-  assert.match(result.message, /every stage operation across domain workflows resolves/);
+  assert.match(result.message, /every step operation across domain workflows resolves/);
+});
+
+test('doctor check runner-patterns-config passes with defaults or warns when missing', () => {
+  const tmpDir = mkTempDir();
+  const fgosDir = path.join(tmpDir, '.fgos');
+  fs.mkdirSync(fgosDir, { recursive: true });
+
+  // Missing runner.patterns entirely -> warning (passes)
+  fs.writeFileSync(
+    path.join(fgosDir, 'config.json'),
+    JSON.stringify({ runner: { capabilities: DEFAULT_CAPABILITY_SLOTS } }, null, 2),
+    'utf8',
+  );
+  const check = DOCTOR_CHECKS.find((c) => c.id === 'runner-patterns-config');
+  assert.ok(check, 'runner-patterns-config doctor check must be registered');
+  const missingRes = check.check(tmpDir);
+  assert.equal(missingRes.passed, true);
+  assert.match(missingRes.message, /warning/);
+  assert.match(missingRes.message, /falling back to setup defaults/);
+
+  // Present and valid
+  fs.writeFileSync(
+    path.join(fgosDir, 'config.json'),
+    JSON.stringify({
+      runner: {
+        patterns: {
+          defaultRule: { mutatingMinRigor: 'standard' },
+          reviewed: {
+            maxRounds: 2,
+            checkersByRigor: {
+              standard: ['reviewer'],
+              high: ['reviewer', 'red-team'],
+              critical: ['reviewer', 'red-team', 'tester'],
+            },
+          },
+        },
+      },
+    }, null, 2),
+    'utf8',
+  );
+  const validRes = check.check(tmpDir);
+  assert.equal(validRes.passed, true);
+  assert.match(validRes.message, /valid/);
+
+  // Invalid (non-cumulative checkers)
+  fs.writeFileSync(
+    path.join(fgosDir, 'config.json'),
+    JSON.stringify({
+      runner: {
+        patterns: {
+          reviewed: {
+            checkersByRigor: {
+              standard: ['reviewer'],
+              high: ['red-team'],
+            },
+          },
+        },
+      },
+    }, null, 2),
+    'utf8',
+  );
+  const invalidRes = check.check(tmpDir);
+  assert.equal(invalidRes.passed, false);
+  assert.match(invalidRes.message, /not cumulative/);
 });

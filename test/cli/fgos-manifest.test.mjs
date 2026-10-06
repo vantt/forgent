@@ -1,6 +1,6 @@
 // Machine-readable verb manifest tests (entry-standardization P37 deliverable
 // b) — mirrors the run()/spawnSync harness of test/cli/fgos.test.mjs.
-import { test } from 'node:test';
+import { test, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -14,8 +14,15 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
 const FGOS_SOURCE_PATH = path.resolve(__dirname, '../../bin/fgos.mjs');
 
+const madeDirs = [];
+after(() => {
+  for (const dir of madeDirs) fs.rmSync(dir, { recursive: true, force: true });
+});
+
 function tmpCwd() {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-manifest-cli-'));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-manifest-cli-'));
+  madeDirs.push(dir);
+  return dir;
 }
 
 function run(cwd, args) {
@@ -43,15 +50,17 @@ function dispatchedVerbs() {
 
 test('manifest verb-name set equals the set of verbs runVerb() actually dispatches', () => {
   const dispatched = [...new Set(dispatchedVerbs())].sort();
-  const registered = COMMAND_REGISTRY.map((entry) => entry.name).sort();
+  const registered = COMMAND_REGISTRY.filter((entry) => !entry.nativeOnly).map((entry) => entry.name).sort();
   assert.deepEqual(registered, dispatched);
 });
 
 test('every registry entry has touchesState, externalEffect, paginated, requiresExistingStore booleans and the required keys', () => {
+  const baseKeys = ['deprecated', 'description', 'examples', 'externalEffect', 'invoke', 'name', 'paginated', 'parameters', 'requiresExistingStore', 'touchesState'];
   for (const entry of COMMAND_REGISTRY) {
+    const expectedKeys = entry.nativeOnly !== undefined ? [...baseKeys, 'nativeOnly'].sort() : [...baseKeys].sort();
     assert.deepEqual(
       Object.keys(entry).sort(),
-      ['deprecated', 'description', 'examples', 'externalEffect', 'invoke', 'name', 'paginated', 'parameters', 'requiresExistingStore', 'touchesState'].sort(),
+      expectedKeys,
       `entry "${entry.name}" has an unexpected key set`,
     );
     assert.equal(typeof entry.touchesState, 'boolean', `entry "${entry.name}" has invalid touchesState "${entry.touchesState}"`);
@@ -131,7 +140,7 @@ test('fgos --help prints non-empty text listing every verb', () => {
 test('setup is marked deprecated with the fgctl init workspace-onboarding path', () => {
   const setupEntry = COMMAND_REGISTRY.find((entry) => entry.name === 'setup');
   assert.ok(setupEntry, 'COMMAND_REGISTRY is missing a "setup" entry');
-  assert.equal(setupEntry.deprecated, 'since 2026-09-14; target workspace onboarding uses fgctl init, then .fgos/installation/bin/fgos doctor --fix, then .fgos/installation/bin/fgos doctor; legacy setup remains the compatibility path for shell/global integration until a compatibility-window decision retires it');
+  assert.equal(setupEntry.deprecated, 'since 2026-09-14; target workspace onboarding starts with fgctl init (plain fgctl init needs --from <source> when .fgos/distribution.json is absent), then .fgos/installation/bin/fgos doctor --fix and .fgos/installation/bin/fgos doctor; doctor --fix runs only the registered fixes, so run fgos setup once in the project for the config defaults, git hook and Claude Code hook it does not write; shell/global integration stays here until a compatibility-window decision retires it');
 
   const cwd = tmpCwd();
   const manifestResult = run(cwd, ['--help', '--json']);
@@ -201,10 +210,11 @@ test('fgos --help renders move\'s mixed positional/flag args distinctly', () => 
 // be registered in the manifest as optional properties (not in `required`)
 // so they are discoverable via `fgos --help --json`, same shape as the
 // existing domain/discovered-from/deps/acceptance optional entries.
-test('submit\'s registry entry lists tier/kind/risk as optional properties, not required', () => {
+test('submit\'s registry entry lists size/rigor/kind/risk as optional properties, not required, and no tier', () => {
   const submitEntry = COMMAND_REGISTRY.find((entry) => entry.name === 'submit');
   assert.ok(submitEntry, 'COMMAND_REGISTRY is missing a "submit" entry');
-  for (const field of ['tier', 'kind', 'risk']) {
+  assert.equal(submitEntry.parameters.properties.tier, undefined, 'submit registry entry must not have tier');
+  for (const field of ['size', 'rigor', 'kind', 'risk']) {
     assert.ok(
       submitEntry.parameters.properties[field],
       `submit's registry entry is missing a "${field}" property`,

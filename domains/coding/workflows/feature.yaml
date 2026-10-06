@@ -1,139 +1,167 @@
-# domains/coding/workflows/feature.yaml - feature workflow declaration for coding domain (D19/D29)
+# domains/coding/workflows/feature.yaml — Feature implementation workflow for coding domain
 
-stages:
-  - name: discovery
+id: coding/feature
+title: Feature implementation workflow for coding domain
+
+# --- Workflow schema ---
+# `phase` is the coarse role a step plays for a Work item walking the workflow;
+# `operations` are the on-demand operations legal at that step (what dispatch is
+# handed instead of looking them up); `transitions` are the legal step moves for
+# a Work item (the runner itself schedules `units` by `dependsOn`).
+steps:
+  - id: discovery
+    title: Discovery
+    phase: discover
     skill: fgos-coding-discovering
-    taskSpec: judge-ambiguity
     operations:
       - id: judge-ambiguity
         primary: true
         taskSpec: judge-ambiguity
         role: implementer
-        skills:
-          - fgos-coding-discovering
+        skills: [fgos-coding-discovering]
       - id: resolve-question
         taskSpec: resolve-question
         role: researcher
         reason: consult
-        skills:
-          - fgos-researching
-  - name: exploring
+        skills: [fgos-researching]
+    units:
+      - id: judge-ambiguity
+        template:
+          capability: coding:discover
+          pattern: solo
+          taskSpec: judge-ambiguity
+  - id: exploring
+    title: Exploring
+    phase: discover
     skill: fgos-coding-exploring
-    taskSpec: lock-decisions
+    dependsOn: [discovery]
     operations:
       - id: lock-decisions
         primary: true
         taskSpec: lock-decisions
         role: implementer
-        skills:
-          - fgos-coding-exploring
+        skills: [fgos-coding-exploring]
       - id: answer-question
         taskSpec: answer-question
         role: advisor
         reason: advise
         dispatch: human-only
-        skills:
-          - fgos-coding-exploring
+        skills: [fgos-coding-exploring]
       - id: resolve-question
         taskSpec: resolve-question
         role: researcher
         reason: consult
-        skills:
-          - fgos-researching
-  - name: decompose
+        skills: [fgos-researching]
+    units:
+      - id: lock-decisions
+        template:
+          capability: coding:explore
+          pattern: solo
+          taskSpec: lock-decisions
+    gate:
+      kind: human
+      question: Lock decisions for this item?
+  - id: planning
+    title: Planning
+    phase: plan
     skill: fgos-coding-planning
-  - name: planning
-    step: Divide
-    skill: fgos-coding-planning
-    taskSpec: shape-plan
+    dependsOn: [exploring]
     operations:
       - id: shape-plan
         primary: true
         taskSpec: shape-plan
         role: implementer
-        skills:
-          - fgos-coding-planning
+        skills: [fgos-coding-planning]
       - id: validate-plan
         taskSpec: validate-plan
         role: reviewer
         reason: review
-        skills:
-          - fgos-coding-validating
+        skills: [fgos-coding-validating]
         policy:
-          minTier: standard
-          preferPersona: code-reviewer
-          preferExecutor: claude
+          rigor: standard
       - id: scout-blast-radius
         taskSpec: scout-blast-radius
         role: researcher
         reason: consult
-        skills:
-          - fgos-researching
+        skills: [fgos-researching]
       - id: resolve-question
         taskSpec: resolve-question
         role: researcher
         reason: consult
-        skills:
-          - fgos-researching
-  - name: executing
-    step: Execute
+        skills: [fgos-researching]
+    units:
+      - id: shape-plan
+        template:
+          capability: coding:plan
+          pattern: solo
+          taskSpec: shape-plan
+      - id: validate-plan
+        template:
+          capability: coding:validate
+          pattern: reviewed
+          taskSpec: validate-plan
+  - id: executing
+    title: Executing
+    phase: execute
     skill: fgos-coding-implement
-    taskSpec: implement-item
+    dependsOn: [planning]
     operations:
       - id: implement-item
         primary: true
         taskSpec: implement-item
         role: implementer
-        skills:
-          - fgos-coding-implement
+        skills: [fgos-coding-implement]
       - id: review-item
         taskSpec: review-item
         role: reviewer
         reason: review
-        skills:
-          - fgos-coding-validating
+        skills: [fgos-coding-validating]
       - id: fix-verify-red
         taskSpec: fix-verify-red
         role: implementer
-        skills:
-          - fgos-coding-implement
+        skills: [fgos-coding-implement]
       - id: scoped-subtask
         taskSpec: scoped-subtask
         role: helper
         reason: assist
-        skills:
-          - fgos-coding-implement
+        skills: [fgos-coding-implement]
       - id: scout-blast-radius
         taskSpec: scout-blast-radius
         role: researcher
         reason: consult
-        skills:
-          - fgos-researching
+        skills: [fgos-researching]
       - id: resolve-question
         taskSpec: resolve-question
         role: researcher
         reason: consult
-        skills:
-          - fgos-researching
+        skills: [fgos-researching]
+    units:
+      - id: implement-item
+        template:
+          capability: coding:implement
+          pattern: reviewed
+          taskSpec: implement-item
+  - id: integrate
+    kind: integrate
+    dependsOn: [executing]
+  - id: approval
+    dependsOn: [integrate]
+    gate:
+      kind: human
+      question: Approve delivery of this item?
 
+# Legal step moves for a Work item walking this workflow.
 transitions:
-  - from: clarify
-    to: discovery
-  - from: clarify
-    to: exploring
-  - from: decompose
-    to: executing
-  - from: exploring
-    to: decompose
-  - from: discovery
-    to: exploring
-  - from: discovery
-    to: planning
-  - from: exploring
-    to: planning
-  - from: planning
-    to: executing
+  - { from: discovery, to: exploring }
+  - { from: discovery, to: planning }
+  - { from: exploring, to: planning }
+  - { from: planning, to: executing }
 
+# Step names older records carry.
+aliases:
+  decompose: planning
+
+# Work statuses handled by a skill rather than a step.
 statusSkills:
   retrospective:
     skill: fgos-coding-knowledge

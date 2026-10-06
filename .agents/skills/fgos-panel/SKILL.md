@@ -4,10 +4,12 @@ user-invocable: false
 description: >-
   Route natural-language requests for a multi-agent panel, independent
   opinions, proposal review, option comparison, debate, or decision red-team
-  to an existing registered group-thinking protocol without asking the person
-  for a protocol id. Covers architecture, coding-design, product, business,
+  to a registered discussion Workflow (`delphi`, `nominal-group`,
+  `group-cognition`, `architecture-advisory`) or collaboration pattern preset
+  (`rfc`, `consult`, `research-fan-out`) without asking the person for a
+  protocol id. Covers architecture, coding-design, product, business,
   strategy, policy/process, and incident-reflection advisory cases. Does not
-  implement code; use fgos-code-change only when the person explicitly requests
+  implement code; use fgos-run only when the person explicitly requests
   a code change plus review/red-team.
 ---
 
@@ -15,8 +17,8 @@ description: >-
 
 The natural-language entrypoint for group thinking. The person names the
 question and desired thinking shape; this skill selects a use-case preset and
-passes its registered protocol id to [`fgos-group-thinking`](../fgos-group-thinking/SKILL.md).
-
+routes it to the corresponding named Workflow (`core/workflows/*.yaml`) or
+CollaborationPattern preset (`src/runner/execution/patterns/presets.mjs`).
 This skill builds on the shared **Generic Driver Discipline**:
 [`../_shared/coordination-driver.md`](../_shared/coordination-driver.md) defines
 the domain-neutral cycle (`observe -> choose legal action -> dispatch -> verify
@@ -28,9 +30,8 @@ adaptation bounds are never this route's own, per the `disposition criteria`/
 `adaptation bounds` rows below) — it does **not** govern the delegated
 `architecture-panel` (step 3) route, which keeps its own hook table
 ([`fgos-architecture-panel`](../fgos-architecture-panel/SKILL.md)'s own). The
-delegated `code-change-panel` (step 4) route is a known Phase 5 gap:
-`fgos-code-change` does not yet link this fragment or declare a hook table of
-its own. Never assume this one table governs all five routes.
+delegated `code-change-panel` (step 4) route delegates execution to
+`fgos-run`. Never assume this one table governs all five routes.
 
 Read the canonical
 [`Group Thinking Trigger Surface`](../../../docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md)
@@ -41,41 +42,50 @@ extend that map in this skill.
 
 1. Extract the subject, any proposal/artifact, supplied options, and material
    scope or risk constraints from the request and current context.
-2. Select exactly one preset from the canonical Surface Taxonomy.
-3. For `architecture-panel` or architectural `coding-design-panel`, follow
-   [`fgos-architecture-panel`](../fgos-architecture-panel/SKILL.md). The person
-   still never supplies its protocol id.
+2. Select exactly one preset from the canonical Surface Taxonomy:
+   - `architecture-panel` or architectural `coding-design-panel` -> Workflow
+     `architecture-advisory` (follow [`fgos-architecture-panel`](../fgos-architecture-panel/SKILL.md)
+     or run `fgos workflow start architecture-advisory`).
+   - `independent-feedback` / `reflection-review` -> Workflow `delphi`
+     (`fgos workflow start delphi`).
+   - `option-comparison` / `strategy-options` -> Workflow `nominal-group`
+     (`fgos workflow start nominal-group`).
+   - `group-cognition` / complex dialectical sense-making -> Workflow
+     `group-cognition` (`fgos workflow start group-cognition`).
+   - `proposal-review` / `business-review` -> preset `rfc` (pattern `reviewed`,
+     1 critique round with red-team).
+   - `consult` -> preset `consult` (pattern `solo`, role `advisor`).
+   - `research-fan-out` -> preset `research-fan-out` (pattern `panel`, 3 members).
+   - `code-change-panel` -> follow `fgos-run`.
+3. For `architecture-panel`, follow [`fgos-architecture-panel`](../fgos-architecture-panel/SKILL.md).
 4. For `code-change-panel`, continue only when the person explicitly asked to
-   implement/change/fix code, then follow
-   `fgos-code-change`. A coding decision, design
-   review, or "plugin versus core" question is advisory and must not take this
-   route.
-5. For other presets, read the selected registered FlowDefinition to learn its
-   real actors, operations, gates, and bounds. Fill the person's content into
-   the standard declared-protocol request shape, then invoke the unchanged
-   `fgos-group-thinking` pack gate with the preset's explicit id.
-6. When the selected FlowDefinition's own close rules (`close criteria`,
-   below) are satisfied, submit a request carrying `close: true` or an
-   explicit `{type: "close"}` step through that same `fgos coordination pack
-   run --file` door — close is never implicit (`runCoordinationUseCase` never
-   closes on quorum alone; `fgos-group-thinking`'s own gate, "Close a session
-   outside the quorum gate"). Then return the advisory artifact and
-   coordination id. Replay/status remains
-   `fgos coordination show <coordinationId> --json`.
-
+   implement/change/fix code, then follow `fgos-run`. A coding decision,
+   design review, or "plugin versus core" question is advisory and must not take
+   this route.
+5. For discussion workflows (`delphi`, `nominal-group`, `group-cognition`),
+   start the workflow via `fgos workflow start <workflowId>` (or delegate to
+   [`fgos-group-thinking`](../fgos-group-thinking/SKILL.md)).
+   `start`, `answer` and `resume` return at once (the run continues detached); inspect progress and findings via
+   `fgos workflow status <workflowRunId>`, polling until the run completes or parks at a gate.
+   If a workflow parks at a human gate (such as `voting-ranking` in `nominal-group`),
+   submit answers via `fgos workflow answer <workflowRunId> --step <stepId> --answer <text>`.
+6. For single-unit presets (`rfc`, `consult`, `research-fan-out`), dispatch
+   the unit via its resolved CollaborationPattern.
+7. Return the resulting synthesized advice, consensus, or rankings along with
+   the workflow/execution run reference. Status remains `fgos workflow status <workflowRunId>`.
 ## Facade Hook Values (Route Step 5's Generic-Preset Path Only)
 
 | Hook Slot | Value |
 |---|---|
-| `unit of iteration` | One dispatched session for the single non-architecture, non-code-change preset selected in Route step 2 -- one full pass through the unmodified `fgos-group-thinking` pack gate to a returned advisory artifact and coordination id. |
-| `open inputs` | (a) result kind: advisory, never work-product -- this route never implements code (Boundaries). (b) exactly one primary canonical capability, resolved by declaring `DemandFacts` from the extracted request (`outputKind: "decision"`, `domain` from the subject when known or empty, `mutates: false`, `needsIndependentReview` per the selected preset's own collaboration shape, `hasPlanOrTrack: false`, `size`, `rigor`) and calling `fgos capability match --demand '<json>'` (`../_shared/capability-matching.md`) -- per Phase 5's own entry gate (consume the I17 demand doctrine and the I20 `fgos capability match` door instead of keyword-matched skill descriptions), never a keyword-matched guess. `fgos-plan-loop` is not a precedent for this call: it resolves its own capability from `plan.md`'s Product Gates table and never calls `fgos capability match` directly. (c) the person's subject, proposal/artifact, supplied options, and material scope/risk constraint (Route step 1), filled into the selected FlowDefinition's declared request shape (Route step 5). |
-| `evidence verification` | Read the advisory artifact and coordination id back through `fgos coordination show <coordinationId> --json` (Route step 6); never claim a ranking protocol selected a winner, or that mediated feedback guarantees anonymity or consensus -- report only artifacts the real session produced (Boundaries). |
-| `disposition criteria` | None owned by this route. The selected FlowDefinition's own actors, aggregation, and quorum rules govern every finding; this skill never invents protocol semantics, transitions, visibility, grants, reopen, aggregation, or close rules in task prose (Boundaries). |
-| `adaptation bounds` | None owned by this route. Bounded entirely by the selected FlowDefinition's own declared `activation`/`maxInvocations` -- this skill asserts no revision or retry limit of its own. |
+| `unit of iteration` | One dispatched Workflow run (for `delphi`, `nominal-group`, `group-cognition`, or `architecture-advisory`) or one preset collaboration pattern run for the preset selected in Route step 2. |
+| `open inputs` | (a) result kind: advisory, never work-product -- this route never implements code (Boundaries). (b) exactly one primary canonical capability, resolved directly from the selected preset or task capability in `runner.capabilities` (e.g. `advise`), never a keyword-matched guess. (c) the person's subject, proposal/artifact, supplied options, and material scope/risk constraint (Route step 1). |
+| `evidence verification` | Read the advisory artifact and run state back through `fgos workflow status <workflowRunId>` or unit execution results; report only artifacts the real workflow run produced (Boundaries). |
+| `disposition criteria` | None owned by this route. The selected Workflow's own steps, DAG dependencies, and unit patterns govern every finding; this skill never invents workflow semantics or gate rules in task prose (Boundaries). |
+| `adaptation bounds` | None owned by this route. Bounded entirely by the selected Workflow definition steps or preset `maxRounds`. |
 | `human-escalation triggers` | One concise question only when the subject is absent, a requested review has no accessible proposal/artifact, an explicit comparison has no supplied or discoverable options, a material scope/risk constraint cannot be obtained from evidence, or the only ambiguity is implementation authority (advice only or an actual code change) (Clarify Only Real Missing Input). Never ask for a protocol id, method name, role roster, provider, model, executor, or tier. |
-| `close criteria` | The selected FlowDefinition's own close rules, unmodified -- pack membership and FlowDefinition validation remain authoritative (Boundaries). This route asserts no close condition of its own beyond what the door itself reports. Once those rules are satisfied, close is still never implicit -- the request submitted to `fgos coordination pack run --file` must carry `close: true` or an explicit `{type: "close"}` step (`fgos-group-thinking`'s own gate, "Close a session outside the quorum gate") before Route step 6 returns. |
-| `after-close action` | Return the advisory artifact and coordination id to the person (Route step 6). Never turn a coding advisory panel into a parallel implementation executor; never pin a provider, model, executor, or tier (Boundaries). |
-| `continuity artifact` | `fgos coordination show <coordinationId> --json`, unmodified -- replay/status remains this one door (Route step 6). |
+| `close criteria` | The selected Workflow's completion status (`completed` with outcome `pass` or `findings`), or answer of all human gates. |
+| `after-close action` | Return the advisory artifact and workflow run ID to the person. Never turn a coding advisory panel into a parallel implementation executor; never pin a provider, model, executor, or tier (Boundaries). |
+| `continuity artifact` | `fgos workflow status <workflowRunId>`, unmodified -- replay/status remains this door. |
 
 ## Clarify Only Real Missing Input
 
@@ -90,13 +100,13 @@ the person wants advice only or an actual code change.
 
 ## Boundaries
 
-- This is selection and request filling, not a protocol resolver or execution
-  engine. Pack membership and FlowDefinition validation remain authoritative.
-- Never invent protocol semantics, actors, transitions, visibility, grants,
+- This is selection and request filling, not an execution engine. Workflow and
+  CollaborationPattern definitions remain authoritative.
+- Never invent workflow semantics, actors, transitions, visibility, grants,
   reopen, aggregation, quorum, or close rules in task prose.
 - Never pin a provider, model, executor, or tier. Dispatch resolves the
   existing `advise` or coding capability through the Dispatch Control Plane.
 - Never turn a coding advisory panel into a parallel implementation executor.
-- Never claim that a ranking protocol selected a winner or that mediated
+- Never claim that a ranking workflow selected a winner or that mediated
   feedback guarantees anonymity or consensus; report only artifacts the real
   session produced.

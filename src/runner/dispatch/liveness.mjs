@@ -34,18 +34,25 @@
 //     the idle window used to end a healthy round `timed-out-idle` -- a
 //     claim about a worker nobody looked at.
 //
+// The converse is also true: herdr ANSWERING that the pane is not found is a
+// reading, not a failure to take one. A closed pane has no agent in it, so
+// that answer is `absent` and counts towards `died` like any other absence.
+//
 // `agent_status` appears here only as a progress hint and as the blocked
 // signal. It never concludes that work finished -- it was wrong about that
 // twice in production, once before the agent had started at all and once in a
 // gap between two tool calls of a single turn.
 
 /** Every terminal outcome this ladder can reach. */
+import { AUTH_FAILURE_PATTERNS } from './provider-auth-failure.mjs';
+
 export const LADDER_OUTCOMES = Object.freeze([
   'settled',
   'blocked',
   'died',
   'timed-out-ceiling',
   'paused-limit',
+  'provider-limit',
   'timed-out-idle',
 ]);
 
@@ -57,11 +64,12 @@ export const DEFAULT_DEATH_THRESHOLD = 3;
 
 /**
  * Screen text that means "this agent is paused by a provider limit, not
- * broken". NOT MEASURED: no provider's exact wording has been captured in
- * this repo yet, so these are conservative guesses kept deliberately generic,
- * and the list is replaceable per executor. A miss costs a `timed-out-idle`
- * instead of a `paused-limit` -- the pane is kept either way, so a wrong
- * guess here loses a label, never a worker.
+ * broken". Mostly NOT MEASURED: most of these are conservative guesses kept
+ * deliberately generic, and the list is replaceable per executor. The one
+ * measured wording is the codex pane's "Selected model is at capacity. Please
+ * try a different model." (captured 2026-10-05). A miss costs a
+ * `timed-out-idle` instead of a `paused-limit` -- the pane is kept either way,
+ * so a wrong guess here loses a label, never a worker.
  */
 export const DEFAULT_USAGE_LIMIT_PATTERNS = Object.freeze([
   /usage limit/i,
@@ -69,7 +77,11 @@ export const DEFAULT_USAGE_LIMIT_PATTERNS = Object.freeze([
   /quota (?:exceeded|reached)/i,
   /too many requests/i,
   /try again (?:later|in \d)/i,
+  /model is at capacity/i,
 ]);
+
+/** How long an agent has to sit not-working before its screen is read for a credential failure. */
+export const AUTH_PROBE_IDLE_MS = 15000;
 
 /**
  * What happens to the pane for each outcome.
@@ -85,6 +97,7 @@ export const PANE_FATE = Object.freeze({
   'timed-out-ceiling': 'keep',
   'timed-out-idle': 'keep',
   'paused-limit': 'keep-always',
+  'provider-limit': 'keep-always',
 });
 
 /** Resolve the pane decision for an outcome. `closeAlways` is the automated
@@ -110,11 +123,73 @@ export function matchUsageLimit(screen, patterns = DEFAULT_USAGE_LIMIT_PATTERNS)
 }
 
 /**
+ * What an agent that herdr calls `working` can be stuck on.
+ *
+ * The ladder reads the screen only once progress has stopped, and `working` counts as progress, so a
+ * pane that keeps saying `working` while it is really parked on a provider error is never looked at
+ * and the round runs to its absolute ceiling with no fallback (seen 2026-10-05: a codex pane that
+ * printed "Selected model is at capacity" and sat there for fifteen minutes).
+ *
+ * These patterns are deliberately narrow, because a working agent legitimately prints all kinds of
+ * text, "rate limit" included. They match a line that STARTS with the CLI's own error marker and
+ * names the condition. Only measured wordings belong here.
+ */
+export const WORKING_STALL_PATTERNS = Object.freeze([
+  /^■.*model is at capacity/i,
+]);
+
+/** How long the same stall line has to stand on the screen before a working agent is called limited. */
+export const WORKING_STALL_PROBE_MS = 30000;
+
+/** How many lines from the bottom of the screen are read for it. */
+export const WORKING_STALL_TAIL_LINES = 15;
+
+/**
+ * Look at the tail of the screen of an agent that reports `working`.
+ *
+ * Pure, like the ladder: the caller reads the screen, threads `next` back in, and acts on `outcome`.
+ * One sighting is not a verdict, because an agent can print the line and recover. The same line still
+ * on the screen a full `probeMs` later is: a recovering agent has printed more by then and the line
+ * has scrolled out of the tail.
+ *
+ * @param {{ screen: string|null, now: number, prior?: { line?: string|null, since?: number|null },
+ *           probeMs?: number, patterns?: RegExp[] }} args
+ * @returns {{ outcome: 'provider-limit'|null, reason: string|null, screenLine: string|null,
+ *             next: { line: string|null, since: number|null } }}
+ */
+export function evaluateWorkingScreen({ screen, now, prior = {}, probeMs = WORKING_STALL_PROBE_MS, patterns = WORKING_STALL_PATTERNS } = {}) {
+  const kept = { line: prior.line ?? null, since: prior.since ?? null };
+  // An unreadable screen is no evidence either way.
+  if (typeof screen !== 'string' || screen === '') {
+    return { outcome: null, reason: null, screenLine: null, next: kept };
+  }
+  const line = matchUsageLimit(screen, patterns);
+  if (!line) {
+    return { outcome: null, reason: null, screenLine: null, next: { line: null, since: null } };
+  }
+  if (kept.line !== line || kept.since === null) {
+    return { outcome: null, reason: null, screenLine: null, next: { line, since: now } };
+  }
+  if (now - kept.since >= probeMs) {
+    return {
+      outcome: 'provider-limit',
+      reason: `the screen has said a provider limit was reached for ${now - kept.since}ms while the agent reports working`,
+      screenLine: line,
+      next: kept,
+    };
+  }
+  return { outcome: null, reason: null, screenLine: null, next: kept };
+}
+
+/**
  * Run the ladder once.
  *
  * `observation` is what was just read:
  *   resultFilePresent  the worker's own result file exists
- *   liveness           'present' | 'absent' | 'unknown' (failed read -> unknown)
+ *   liveness           'present' | 'absent' | 'unknown' (failed read -> unknown;
+ *                      herdr answering "pane not found" is `absent`, not a failed read)
+ *   livenessCause      why an `absent` reading is absent, when the probe knows (names the
+ *                      `died` reason); optional
  *   agentState         herdr's agent_status, or 'unknown'
  *   lastProgressAt     epoch ms of the last progress signal, or null
  *   blindMs            ms since `lastProgressAt` during which the caller
@@ -137,6 +212,7 @@ export function evaluateLadder({ observation = {}, limits = {}, prior = {} } = {
   const {
     resultFilePresent = false,
     liveness = 'unknown',
+    livenessCause = null,
     agentState = 'unknown',
     lastProgressAt = null,
     blindMs = 0,
@@ -172,7 +248,9 @@ export function evaluateLadder({ observation = {}, limits = {}, prior = {} } = {
 
   // 3. Died. Consecutive absences only.
   if (absentStreak >= deathThreshold) {
-    return settle('died', `no agent process in the pane on ${absentStreak} consecutive reads`);
+    return settle('died', livenessCause
+      ? `${livenessCause} on ${absentStreak} consecutive reads`
+      : `no agent process in the pane on ${absentStreak} consecutive reads`);
   }
 
   // 4. Ceiling. Absolute, regardless of how busy the worker looks.
@@ -188,8 +266,21 @@ export function evaluateLadder({ observation = {}, limits = {}, prior = {} } = {
   // it is an absolute bound on the round, not a claim about the worker.
   const progressRef = lastProgressAt ?? startedAt;
   const idleFor = Math.max(0, now - progressRef - blindMs);
-  const stale = agentState !== 'working' && idleTimeoutMs > 0 && idleFor >= idleTimeoutMs;
+  const notWorking = agentState !== 'working';
+  const stale = notWorking && idleTimeoutMs > 0 && idleFor >= idleTimeoutMs;
   if (!stale) {
+    // A dead credential leaves the agent idle with the error on its screen: look for it long
+    // before the idle timeout, so the next candidate starts minutes sooner.
+    if (!notWorking || idleFor < AUTH_PROBE_IDLE_MS) {
+      return { outcome: null, reason: null, screenLine: null, absentStreak, needsScreen: false };
+    }
+    if (screen === null) {
+      return { outcome: null, reason: null, screenLine: null, absentStreak, needsScreen: true };
+    }
+    const earlyAuthLine = matchUsageLimit(screen, AUTH_FAILURE_PATTERNS);
+    if (earlyAuthLine) {
+      return settle('provider-limit', 'the screen says the provider credential failed', earlyAuthLine);
+    }
     return { outcome: null, reason: null, screenLine: null, absentStreak, needsScreen: false };
   }
 
@@ -199,9 +290,13 @@ export function evaluateLadder({ observation = {}, limits = {}, prior = {} } = {
     return { outcome: null, reason: null, screenLine: null, absentStreak, needsScreen: true };
   }
 
+  const authLine = matchUsageLimit(screen, AUTH_FAILURE_PATTERNS);
+  if (authLine) {
+    return settle('provider-limit', 'the screen says the provider credential failed', authLine);
+  }
   const limitLine = matchUsageLimit(screen, usageLimitPatterns);
   if (limitLine) {
-    return settle('paused-limit', 'the screen says a provider limit was reached', limitLine);
+    return settle('provider-limit', 'the screen says a provider limit was reached', limitLine);
   }
   return settle('timed-out-idle', `no progress for ${idleFor}ms`);
 }

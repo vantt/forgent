@@ -65,7 +65,7 @@ function add(cwd, id, extra = {}) {
     // is exercising the runner's dispatch loop, which only ever picks up
     // executing-stage items, so default this helper's --stage to
     // 'executing' the same way test/cli/fgos.test.mjs's own addOk does.
-    '--stage', extra.stage ?? 'executing',
+    '--step', extra.workflowStep ?? 'executing',
   ];
   if (extra.deps && extra.deps.length) flags.push('--deps', extra.deps.join(','));
   const result = fgos(cwd, ['add', id, ...flags]);
@@ -146,7 +146,8 @@ function writeRunnerConfig(repoRoot, executorScript) {
     JSON.stringify({
       runner: {
         executor: { command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'] },
-        models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+        modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
+        rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
         timeoutMs: 15000,
       },
     }),
@@ -161,7 +162,8 @@ function writeExplicitRunnerConfigFile(repoRoot, executorScript) {
     configPath,
     JSON.stringify({
       executor: { command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'] },
-      models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+      modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 15000,
     }),
   );
@@ -217,6 +219,22 @@ import { execFileSync } from 'node:child_process';
 fs.writeFileSync(${JSON.stringify(produce)}, 'produced by worker\\n');
 execFileSync('git', ['add', ${JSON.stringify(produce)}]);
 execFileSync('git', ['commit', '-q', '-m', ${JSON.stringify(`worker: ${produce}`)}]);
+`,
+  );
+  return scriptPath;
+}
+
+/** A fake executor that only edits files and never touches git — the
+ * contract: the runner commits what the worker leaves behind. */
+function writeEditOnlyExecutor(scriptDir, produce = 'output.txt', { summary } = {}) {
+  const scriptPath = path.join(scriptDir, 'edit-only-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+import fs from 'node:fs';
+${produce ? `fs.writeFileSync(${JSON.stringify(produce)}, 'produced by worker\\n');` : ''}
+${summary ? `console.log('\`\`\`json\\n' + JSON.stringify({ summary: ${JSON.stringify(summary)} }) + '\\n\`\`\`');` : ''}
+console.log('[DONE]');
 `,
   );
   return scriptPath;
@@ -322,23 +340,23 @@ test('e2e stage-clarify+stage-decompose (a) clear+pass-through: --once safely no
   writeRunnerConfig(repoRoot, writeAdaptiveWorkerExecutor(scriptDir));
 
   const submitted = submit(repoRoot, 'Investigate the sluggish overview page');
-  assert.equal(submitted.stage, 'discovery');
+  assert.equal(submitted.workflowStep, 'discovery');
   assert.equal(submitted.verify, 'chưa xác định — P15 bổ sung', 'submit sentinel before discovery runs (D5 fgos.mjs)');
 
   const noop = runner(repoRoot, ['--once']);
   assert.equal(noop.status, 0, `--once failed: ${noop.stderr}`);
-  assert.equal(stateView(repoRoot).work[submitted.id].stage, 'discovery', 'a runner sweep never advances discovery/exploring on its own now (D16)');
+  assert.equal(stateView(repoRoot).work[submitted.id].workflowStep, 'discovery', 'a runner sweep never advances discovery/exploring on its own now (D16)');
 
   const discovered = fgos(repoRoot, ['discover', submitted.id, '--verdict', 'clear', '--verify', 'test -f output.txt && echo VERIFY_OK']);
   assert.equal(discovered.status, 0, `discover failed: ${discovered.stderr}`);
-  assert.equal(stateView(repoRoot).work[submitted.id].stage, 'planning', 'tsk-30v D2/D6: a clear verdict at discovery skips exploring and lands on planning directly, in one hop');
+  assert.equal(stateView(repoRoot).work[submitted.id].workflowStep, 'planning', 'tsk-30v D2/D6: a clear verdict at discovery skips exploring and lands on planning directly, in one hop');
 
   const decomposed = fgos(repoRoot, ['plan', submitted.id, '--verdict', 'pass-through', '--reason', 'single cohesive change']);
   assert.equal(decomposed.status, 0, `decompose failed: ${decomposed.stderr}`);
 
   const afterAdvance = stateView(repoRoot);
   const item = afterAdvance.work[submitted.id];
-  assert.equal(item.stage, 'executing');
+  assert.equal(item.workflowStep, 'executing');
   assert.equal(item.verify, 'test -f output.txt && echo VERIFY_OK', 'the caller-supplied verify replaced the submit sentinel');
   assert.equal(item.status, 'todo', 'a caller-supplied pass-through never dispatches -- the item is only now a frontier head');
 
@@ -352,7 +370,7 @@ test('e2e stage-clarify+stage-decompose (a) clear+pass-through: --once safely no
 
   // `fgos list` (the public read surface) confirms the same facts.
   const list = envelopeData(fgos(repoRoot, ['list']).stdout);
-  assert.equal(list.work[submitted.id].stage, 'executing');
+  assert.equal(list.work[submitted.id].workflowStep, 'executing');
   assert.equal(list.work[submitted.id].verify, 'test -f output.txt && echo VERIFY_OK');
 });
 
@@ -381,7 +399,7 @@ test('e2e stage-clarify (b) unclear verdict: an explicit discover --verdict uncl
 
   const noop = runner(repoRoot, ['--once']);
   assert.equal(noop.status, 0, `--once failed: ${noop.stderr}`);
-  assert.equal(stateView(repoRoot).work[submitted.id].stage, 'discovery', 'a runner sweep never advances discovery on its own now (D16)');
+  assert.equal(stateView(repoRoot).work[submitted.id].workflowStep, 'discovery', 'a runner sweep never advances discovery on its own now (D16)');
 
   const discovered = fgos(repoRoot, ['discover', submitted.id, '--verdict', 'unclear', '--question', question]);
   assert.equal(discovered.status, 0, `discover failed: ${discovered.stderr}`);
@@ -390,7 +408,7 @@ test('e2e stage-clarify (b) unclear verdict: an explicit discover --verdict uncl
   assert.equal(view.work[submitted.id].status, 'awaiting-human');
   // tsk-30v D2/D3: unclear no longer parks in place -- stage advances to
   // exploring even though status stays awaiting-human.
-  assert.equal(view.work[submitted.id].stage, 'exploring');
+  assert.equal(view.work[submitted.id].workflowStep, 'exploring');
   assert.equal(view.gates[submitted.id].ask, question);
   assert.equal(view.discovery[submitted.id].length, 1);
   assert.equal(view.discovery[submitted.id][0].clear, false);
@@ -439,7 +457,7 @@ test('e2e stage-decompose (b) complex item: an explicit decompose --verdict deco
   // becomes the frontier head for the FIRST --once dispatch below.
   let view = stateView(repoRoot);
   const root = view.work[submitted.id];
-  assert.equal(root.stage, 'executing');
+  assert.equal(root.workflowStep, 'executing');
   assert.equal(root.status, 'todo', 'the root itself was never dispatched — its descendants are still open (D4/D5 lineage filter)');
 
   const kids = Object.values(view.work)
@@ -449,8 +467,8 @@ test('e2e stage-decompose (b) complex item: an explicit decompose --verdict deco
   const [childA, childB] = kids;
   assert.equal(childA.deps.length, 0);
   assert.deepEqual(childB.deps, [childA.id], 'sibling dep resolved from the caller-supplied index to a real id');
-  assert.equal(childA.stage, 'executing');
-  assert.equal(childB.stage, 'executing');
+  assert.equal(childA.workflowStep, 'executing');
+  assert.equal(childB.workflowStep, 'executing');
   assert.equal(childA.verify, 'test -f child-a.txt');
   assert.equal(childB.verify, 'test -f child-b.txt');
 
@@ -515,7 +533,7 @@ test('e2e stage-decompose (c) ambiguous verdict: an explicit decompose --verdict
 
   let view = stateView(repoRoot);
   assert.equal(view.work[submitted.id].status, 'awaiting-human');
-  assert.equal(view.work[submitted.id].stage, 'planning', 'need-human never advances stage past planning');
+  assert.equal(view.work[submitted.id].workflowStep, 'planning', 'need-human never advances stage past planning');
   assert.ok(view.gates[submitted.id].ask.includes(reason));
   assert.equal(Object.values(view.work).some((w) => w.parent === submitted.id), false, 'need-human writes nothing to the queue yet (Terms: đề xuất chia)');
   assert.equal(branchExists(repoRoot, `fgw/${submitted.id}`), false);
@@ -528,7 +546,7 @@ test('e2e stage-decompose (c) ambiguous verdict: an explicit decompose --verdict
   assert.equal(noop.status, 0, `--once failed: ${noop.stderr}`);
   view = stateView(repoRoot);
   assert.equal(view.work[submitted.id].status, 'todo', 'the runner sweep still never re-judges decompose on its own (D16) -- a human must call decompose again');
-  assert.equal(view.work[submitted.id].stage, 'planning');
+  assert.equal(view.work[submitted.id].workflowStep, 'planning');
 });
 
 // --- stage-discovery e2e (tsk-5mj D1/D6/D7, tsk-4v6): the runner
@@ -551,7 +569,7 @@ test('e2e stage-decompose (c) ambiguous verdict: an explicit decompose --verdict
  * fgos-coding-discovering's own real content shape (nor the
  * fgos-researching helper it calls) is followed (out of this item's
  * scope -- that skill's own job). */
-function writeResearchWorkerExecutor(scriptDir, featureDir, { clear = true, verify = 'test -f later.txt', question = 'Which approach?' } = {}) {
+function writeResearchWorkerExecutor(scriptDir, featureDir, { clear = true, verify = 'test -f later.txt', question = 'Which approach?', selfCommit = true } = {}) {
   const scriptPath = path.join(scriptDir, 'research-worker-executor.mjs');
   const verdictBody = clear ? { clear: true, verify } : { clear: false, question };
   fs.writeFileSync(
@@ -561,8 +579,8 @@ import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 fs.mkdirSync(${JSON.stringify(featureDir)}, { recursive: true });
 fs.writeFileSync(${JSON.stringify(path.posix.join(featureDir, 'RESEARCH.md'))}, '## Round 1\\n\\nFound: nothing blocking.\\n');
-execFileSync('git', ['add', ${JSON.stringify(path.posix.join(featureDir, 'RESEARCH.md'))}]);
-execFileSync('git', ['commit', '-q', '-m', 'research: round 1']);
+${selfCommit ? `execFileSync('git', ['add', ${JSON.stringify(path.posix.join(featureDir, 'RESEARCH.md'))}]);
+execFileSync('git', ['commit', '-q', '-m', 'research: round 1']);` : ''}
 process.stdout.write(${JSON.stringify('```fgos-verdict\n' + JSON.stringify(verdictBody) + '\n```\n')});
 `,
   );
@@ -577,19 +595,36 @@ test('e2e stage-discovery: --once dispatches a stage:discovery item to a real wo
   assert.equal(fgos(repoRoot, ['init']).status, 0);
   writeRunnerConfig(repoRoot, writeResearchWorkerExecutor(scriptDir, featureDir));
 
-  add(repoRoot, 'item-research', { stage: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
-  assert.equal(stateView(repoRoot).work['item-research'].stage, 'discovery');
+  add(repoRoot, 'item-research', { workflowStep: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
+  assert.equal(stateView(repoRoot).work['item-research'].workflowStep, 'discovery');
 
   const result = runner(repoRoot, ['--once']);
   assert.equal(result.status, 0, `--once failed: ${result.stderr}`);
 
   const view = stateView(repoRoot);
   const item = view.work['item-research'];
-  assert.equal(item.stage, 'planning', 'tsk-30v D2/D6: a clear verdict skips exploring, advancing discovery -> planning directly');
+  assert.equal(item.workflowStep, 'planning', 'tsk-30v D2/D6: a clear verdict skips exploring, advancing discovery -> planning directly');
   assert.equal(item.status, 'todo', 'discovery dispatch never claims/proposes -- planning is the next stop, not a terminal one');
   assert.equal(item.verify, 'test -f later.txt', "the worker's own proposed verify rode onto the item");
   assert.equal(branchExists(repoRoot, 'fgw/item-research'), true, 'the worker ran on its own real dispatch branch');
   assert.match(branchLog(repoRoot, 'fgw/item-research'), /research: round 1/);
+});
+
+test('e2e stage-discovery: a research worker that only writes RESEARCH.md (no git) still advances — the runner commits it', () => {
+  const repoRoot = initTempRepo();
+  const scriptDir = mkTempDir('fgos-runner-e2e-discovery-edit-only-');
+  const featureDir = 'docs/history/discovery-edit-only-item';
+
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+  writeRunnerConfig(repoRoot, writeResearchWorkerExecutor(scriptDir, featureDir, { selfCommit: false }));
+  add(repoRoot, 'item-research-eo', { workflowStep: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
+
+  const result = runner(repoRoot, ['--once']);
+  assert.equal(result.status, 0, `--once failed: ${result.stderr}`);
+
+  assert.equal(stateView(repoRoot).work['item-research-eo'].workflowStep, 'planning');
+  assert.equal(branchAheadCount(repoRoot, 'fgw/item-research-eo'), 1);
+  assert.match(branchLog(repoRoot, 'fgw/item-research-eo'), /item-research-eo: /);
 });
 
 test('e2e stage-discovery: --once advances the item to exploring and parks it in awaiting-human when the real worker reports an unclear verdict (tsk-4v6/tsk-30v)', () => {
@@ -600,14 +635,14 @@ test('e2e stage-discovery: --once advances the item to exploring and parks it in
   assert.equal(fgos(repoRoot, ['init']).status, 0);
   writeRunnerConfig(repoRoot, writeResearchWorkerExecutor(scriptDir, featureDir, { clear: false, question: '## Context\n\nThe worker needs to pick a retry backoff strategy for the research step.\n\n## Why this matters\n\nThis directly affects the outcome: which retry backoff strategy?' }));
 
-  add(repoRoot, 'item-research-unclear', { stage: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
+  add(repoRoot, 'item-research-unclear', { workflowStep: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
 
   const result = runner(repoRoot, ['--once']);
   assert.equal(result.status, 0, `--once failed: ${result.stderr}`);
 
   const view = stateView(repoRoot);
   const item = view.work['item-research-unclear'];
-  assert.equal(item.stage, 'exploring', 'tsk-30v D2/D3: unclear no longer parks in place -- it advances stage to exploring');
+  assert.equal(item.workflowStep, 'exploring', 'tsk-30v D2/D3: unclear no longer parks in place -- it advances stage to exploring');
   assert.equal(item.status, 'awaiting-human', 'an unclear verdict parks the item, matching the interactive driver path');
   assert.equal(view.gates['item-research-unclear'].ask, '## Context\n\nThe worker needs to pick a retry backoff strategy for the research step.\n\n## Why this matters\n\nThis directly affects the outcome: which retry backoff strategy?');
 });
@@ -621,14 +656,14 @@ test('e2e stage-discovery fail-safe: a worker that crashes leaves the item at st
   assert.equal(fgos(repoRoot, ['init']).status, 0);
   writeRunnerConfig(repoRoot, crashingScript);
 
-  add(repoRoot, 'item-research-crash', { stage: 'discovery', verify: 'test -f later.txt' });
+  add(repoRoot, 'item-research-crash', { workflowStep: 'discovery', verify: 'test -f later.txt' });
 
   const result = runner(repoRoot, ['--once']);
   assert.equal(result.status, 0, `--once must still exit 0 -- one item's failed research dispatch never halts the whole tick: ${result.stderr}`);
 
   const view = stateView(repoRoot);
   const item = view.work['item-research-crash'];
-  assert.equal(item.stage, 'discovery', 'left exactly where it was for the next sweep to retry');
+  assert.equal(item.workflowStep, 'discovery', 'left exactly where it was for the next sweep to retry');
   assert.equal(item.status, 'todo');
 });
 
@@ -652,7 +687,7 @@ test('e2e S2-pull: submit pass-throughs 2 stages via discover, a human takes the
   writeRunnerConfig(repoRoot, writeAdaptiveWorkerExecutor(scriptDir));
 
   const submitted = submit(repoRoot, 'Rename a single config key, take by hand');
-  assert.equal(submitted.stage, 'discovery');
+  assert.equal(submitted.workflowStep, 'discovery');
 
   // Pass-through both stages via the SYNC session-role `discover`/`decompose`
   // verbs, each supplying an explicit --verdict (tsk-1x3 D1/D9/D16: a
@@ -663,12 +698,12 @@ test('e2e S2-pull: submit pass-throughs 2 stages via discover, a human takes the
   // never auto-dispatched to a worker.
   const firstDiscover = fgos(repoRoot, ['discover', submitted.id, '--verdict', 'clear', '--verify', 'test -f pull-done.txt && echo PULL_OK']);
   assert.equal(firstDiscover.status, 0, `first discover failed: ${firstDiscover.stderr}`);
-  assert.equal(stateView(repoRoot).work[submitted.id].stage, 'planning', 'tsk-30v D2/D6: a clear verdict at discovery skips exploring and lands on planning directly, in one hop');
+  assert.equal(stateView(repoRoot).work[submitted.id].workflowStep, 'planning', 'tsk-30v D2/D6: a clear verdict at discovery skips exploring and lands on planning directly, in one hop');
 
   const decomposed = fgos(repoRoot, ['plan', submitted.id, '--verdict', 'pass-through', '--reason', 'single cohesive change']);
   assert.equal(decomposed.status, 0, `decompose failed: ${decomposed.stderr}`);
   let view = stateView(repoRoot);
-  assert.equal(view.work[submitted.id].stage, 'executing', 'discovery->planning->executing chained via discover then plan');
+  assert.equal(view.work[submitted.id].workflowStep, 'executing', 'discovery->planning->executing chained via discover then plan');
   assert.equal(view.work[submitted.id].status, 'todo', 'pass-through never dispatches — a human takes it next');
   assert.equal(view.work[submitted.id].verify, 'test -f pull-done.txt && echo PULL_OK');
 
@@ -801,13 +836,11 @@ test('e2e full journey: item1 (no deps) -> awaiting-approval with a worker commi
   // fixture-only), `fgos check` reads the on-disk log and prints BOTH
   // halves of the predicted->actual pair for item1 — real values, not just
   // an "outcome exists" flag.
-  const check = fgos(repoRoot, ['check', 'item1']);
-  assert.equal(check.status, 0, `fgos check failed: ${check.stderr}`);
-  const checkData = envelopeData(check.stdout);
-  assert.equal(checkData.outcomes[0].id, 'item1');
-  assert.equal(checkData.outcomes[0].predicted.tier, 'standard', 'predicted half carries the real claimed tier');
-  assert.equal(checkData.outcomes[0].actual.outcome, 'awaiting-approval', 'actual half carries the real dispatch outcome');
-  assert.equal(checkData.outcomes[0].actual.passed, true);
+  const outcome1 = stateView(repoRoot).outcomes?.item1;
+  assert.ok(outcome1, 'outcome for item1 exists');
+  assert.equal(outcome1.predicted.size, 'standard', 'predicted half carries the real claimed size');
+  assert.equal(outcome1.actual.outcome, 'awaiting-approval', 'actual half carries the real dispatch outcome');
+  assert.equal(outcome1.actual.passed, true);
 });
 
 // CoS evidence (D2/l2-3): the "full journey" test above already asserts
@@ -873,17 +906,115 @@ test('e2e verify-red: a worker that commits the wrong thing fails goal-check on 
     'work.attempt:blocked',
     'work.move:blocked',
     'work.outcome:actual',
-    'work.friction:item-red',
   ]);
 
   // actual on the park terminal, real verify-red evidence — closes the
   // HIGH-risk "failures learn nothing" gap: a park must not be silent.
-  // work.friction (S2, kênh 2 của capture) rides alongside it, real e2e
+  // work.friction moved to .fgos/observe/friction/ (Phase F5), real e2e
   // evidence the friction channel fires on a genuine dispatch, not just unit.
+  const frictionDir = path.join(repoRoot, '.fgos', 'observe', 'friction');
+  assert.ok(fs.existsSync(frictionDir), '.fgos/observe/friction directory exists');
+  const frictionFiles = fs.readdirSync(frictionDir).filter((f) => f.endsWith('.jsonl'));
+  assert.ok(frictionFiles.length > 0, 'at least one friction shard exists');
+  const frictionRecords = frictionFiles.flatMap((f) =>
+    fs.readFileSync(path.join(frictionDir, f), 'utf8')
+      .trim()
+      .split('\n')
+      .map((line) => JSON.parse(line))
+  );
+  const redFriction = frictionRecords.find((r) => r.subject?.kind === 'work' && r.subject?.id === 'item-red');
+  assert.ok(redFriction, 'found friction record for item-red in .fgos/observe/friction/');
+  assert.equal(redFriction.layer, 'verification');
+  assert.equal(redFriction.disposition, 'parked');
+  assert.equal(redFriction.errorClass, 'verify-miss');
   const actualOutcomeEvent = redEvents.find((e) => e.type === 'work.outcome' && e.payload.actual);
   assert.equal(actualOutcomeEvent.payload.actual.outcome, 'parked');
   assert.equal(actualOutcomeEvent.payload.actual.passed, false);
   assert.equal(actualOutcomeEvent.payload.actual.errorClass, 'verify-miss');
+});
+
+test('e2e runner commit: a worker that only edits files gets its work committed by the runner before goal-check -> awaiting-approval with exactly one commit whose subject is the Result summary', () => {
+  const repoRoot = initTempRepo();
+  const scriptDir = mkTempDir('fgos-runner-e2e-exec-');
+
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+  add(repoRoot, 'item-edit', { verify: 'test -f output.txt' });
+  writeRunnerConfig(repoRoot, writeEditOnlyExecutor(scriptDir, 'output.txt', { summary: 'add output file' }));
+
+  const result = runner(repoRoot, ['--once']);
+  assert.equal(result.status, 0, `--once failed: ${result.stderr}`);
+  assert.match(result.stdout, /awaiting-approval/);
+  assert.equal(stateView(repoRoot).work['item-edit'].status, 'awaiting-approval');
+  assert.equal(branchAheadCount(repoRoot, 'fgw/item-edit'), 1);
+  assert.match(branchLog(repoRoot, 'fgw/item-edit'), /add output file/);
+  assert.match(`${result.stdout}${result.stderr}`, /commit for "item-edit": runner/);
+  const workerLog = fs.readFileSync(path.join(repoRoot, '.fgos', 'logs', 'item-edit.log'), 'utf8');
+  assert.match(workerLog, /commit runner/);
+});
+
+test('e2e runner commit: with no Result summary the commit subject falls back to "<id>: <title>"', () => {
+  const repoRoot = initTempRepo();
+  const scriptDir = mkTempDir('fgos-runner-e2e-exec-');
+
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+  add(repoRoot, 'item-fallback', { title: 'Produce the file', verify: 'test -f output.txt' });
+  writeRunnerConfig(repoRoot, writeEditOnlyExecutor(scriptDir));
+
+  const result = runner(repoRoot, ['--once']);
+  assert.equal(result.status, 0, `--once failed: ${result.stderr}`);
+  assert.match(branchLog(repoRoot, 'fgw/item-fallback'), /item-fallback: Produce the file/);
+});
+
+test('e2e runner commit: a worker that already committed itself (older contract) gets no second commit', () => {
+  const repoRoot = initTempRepo();
+  const scriptDir = mkTempDir('fgos-runner-e2e-exec-');
+
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+  add(repoRoot, 'item-self', { verify: 'test -f output.txt' });
+  writeRunnerConfig(repoRoot, writeCommittingExecutor(scriptDir, 'output.txt'));
+
+  const result = runner(repoRoot, ['--once']);
+  assert.equal(result.status, 0, `--once failed: ${result.stderr}`);
+  assert.equal(stateView(repoRoot).work['item-self'].status, 'awaiting-approval');
+  assert.equal(branchAheadCount(repoRoot, 'fgw/item-self'), 1);
+  assert.match(`${result.stdout}${result.stderr}`, /commit for "item-self": self/);
+});
+
+test('e2e runner commit: a worker that changes nothing leaves no commit -> verify-miss, parked, never proposed', () => {
+  const repoRoot = initTempRepo();
+  const scriptDir = mkTempDir('fgos-runner-e2e-exec-');
+
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+  add(repoRoot, 'item-noop', { verify: 'test -f seed.txt' });
+  writeRunnerConfig(repoRoot, writeEditOnlyExecutor(scriptDir, null));
+
+  const result = runner(repoRoot, ['--once']);
+  assert.equal(result.status, 0, `--once should still exit 0 for a parked item: ${result.stderr}`);
+  assert.equal(stateView(repoRoot).work['item-noop'].status, 'blocked');
+  assert.equal(branchAheadCount(repoRoot, 'fgw/item-noop'), 0);
+  assert.match(`${result.stdout}${result.stderr}`, /commit for "item-noop": none/);
+  const actual = events(repoRoot).find((e) => e.type === 'work.outcome' && e.payload.actual);
+  assert.equal(actual.payload.actual.errorClass, 'verify-miss');
+});
+
+test('e2e runner commit: a failing commit (rejecting pre-commit hook) is an infrastructure failure routed through the recovery matrix, never a silent no-commit', () => {
+  const repoRoot = initTempRepo();
+  const scriptDir = mkTempDir('fgos-runner-e2e-exec-');
+  const hook = path.join(repoRoot, '.git', 'hooks', 'pre-commit');
+  fs.writeFileSync(hook, '#!/bin/sh\necho rejected-by-hook >&2\nexit 1\n');
+  fs.chmodSync(hook, 0o755);
+
+  assert.equal(fgos(repoRoot, ['init']).status, 0);
+  add(repoRoot, 'item-hook', { verify: 'test -f output.txt' });
+  writeRunnerConfig(repoRoot, writeEditOnlyExecutor(scriptDir, 'output.txt'));
+
+  const result = runner(repoRoot, ['--once']);
+  assert.equal(result.status, 0, `--once should still exit 0 for a parked item: ${result.stderr}`);
+  assert.equal(stateView(repoRoot).work['item-hook'].status, 'blocked');
+  assert.match(`${result.stdout}${result.stderr}`, /worktree-fail for "item-hook"/);
+  assert.match(`${result.stdout}${result.stderr}`, /rejected-by-hook/);
+  const actual = events(repoRoot).find((e) => e.type === 'work.outcome' && e.payload.actual);
+  assert.equal(actual.payload.actual.errorClass, 'worktree-fail');
 });
 
 // --- case 3: crash-idempotency ----------------------------------------------

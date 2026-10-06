@@ -1,0 +1,191 @@
+{
+  "contract": {
+    "id": "assignment-run-result",
+    "version": 3
+  },
+  "runId": "run_unit-run-1790940074600-14ae6a17/panelist-1/1_01",
+  "assignmentId": "unit-run-1790940074600-14ae6a17/panelist-1/1",
+  "controlEpoch": 1,
+  "controlToken": "986a26f1-7e04-41d7-ac01-e7f8527d5143",
+  "executorId": "claude-herdr",
+  "adapter": "herdr-spawn",
+  "confinement": null,
+  "role": "panelist-1",
+  "executorRedirected": false,
+  "policy": {
+    "role": "panelist-1",
+    "executorPreference": [
+      "claude-herdr"
+    ],
+    "executorId": "claude-herdr",
+    "providerModel": "claude",
+    "rigor": "standard",
+    "tier": "standard",
+    "model": "sonnet",
+    "reasoningEffort": "medium",
+    "visibility": "headless",
+    "repeatMode": null,
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "claude-herdr",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "provider": {
+        "value": "claude",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "claude-herdr"
+        }
+      },
+      "model": {
+        "value": "sonnet",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "rigor": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "tier": {
+        "value": "standard",
+        "source": {
+          "scope": "rigor",
+          "id": "standard"
+        }
+      },
+      "reasoningEffort": {
+        "value": "medium",
+        "source": {
+          "scope": "derived",
+          "id": "rigor.standard"
+        }
+      },
+      "persona": {
+        "source": {
+          "scope": "default"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "repeatMode": {
+        "value": null,
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "unit-run-1790940074600-14ae6a17/panelist-1/1"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "claude"
+        }
+      }
+    }
+  },
+  "settledAt": "2026-10-02T11:21:53.986Z",
+  "durationMs": 39336,
+  "claimSha256": "aeaf8761c4fe2ba5da041c9fde0a1b44c89137599f39a8d2f66d8ab10e1cae46",
+  "settleReports": [
+    {
+      "path": ".fgos/assignments/unit-run-1790940074600-14ae6a17/panelist-1/1/runs/01/outbox/report-1.md",
+      "sha256": "d38915a91b1ee0b77164130f0fdb35c5525ed06a567b393f58727dad00ee7a58"
+    }
+  ],
+  "classification": {
+    "execution": {
+      "status": "completed",
+      "exitCode": 0
+    },
+    "assessment": {
+      "verdict": "pass"
+    },
+    "confidence": {
+      "level": "reported",
+      "basis": [
+        "valid-agent-result-claim",
+        "captured-stdout"
+      ]
+    },
+    "failure": null,
+    "policy": {
+      "disposition": "allow",
+      "code": null
+    },
+    "delivery": {
+      "mode": "fresh"
+    },
+    "provenance": "native-v3",
+    "outcome": {
+      "category": "ok",
+      "reason": "completed-pass"
+    }
+  },
+  "runtime": {
+    "exitCode": 0,
+    "stdoutLog": ".fgos/assignments/unit-run-1790940074600-14ae6a17/panelist-1/1/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/unit-run-1790940074600-14ae6a17/panelist-1/1/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "contract": {
+      "id": "agent-result-claim",
+      "version": 2
+    },
+    "status": "done",
+    "summary": "Recommend keeping per-invocation config (option A) plus a doctor/config-validation guard for missing private-home bindings; the driver is already agent-agnostic and credentials live per account in the machine inventory, so an adapter adds a second source of truth and a trust-boundary change for little gain.",
+    "evidenceRefs": [
+      "docs/specs/confinement-authority.md#13.1",
+      ".fgos/config.json",
+      "src/runner/dispatch/confinement/drivers/bwrap.mjs"
+    ]
+  },
+  "runnerNote": {
+    "summary": "Settled"
+  },
+  "usage": {
+    "inputTokens": null,
+    "outputTokens": null,
+    "totalTokens": null,
+    "cacheReadTokens": null,
+    "cacheCreationTokens": null,
+    "source": "unavailable-herdr"
+  },
+  "evidence": {
+    "gitBefore": "7b4f15da9f16a5b853c3cbbfb5f80bde494aaeff",
+    "gitAfter": "7b4f15da9f16a5b853c3cbbfb5f80bde494aaeff",
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [],
+    "mutatedDirtyBeforeFiles": [],
+    "attribution": [],
+    "artifacts": [
+      ".fgos/assignments/unit-run-1790940074600-14ae6a17/panelist-1/1/runs/01/outbox/report-1.md",
+      ".fgos/assignments/unit-run-1790940074600-14ae6a17/panelist-1/1/runs/01/outbox/result-1.json"
+    ],
+    "tests": [],
+    "findingRefs": [
+      "docs/specs/confinement-authority.md#13.1",
+      ".fgos/config.json",
+      "src/runner/dispatch/confinement/drivers/bwrap.mjs"
+    ]
+  }
+}

@@ -15,7 +15,6 @@ import {
   addAdHocWorktree,
   addBareOrigin,
   addDiscovery,
-  addFriction,
   addGoalItem,
   addOk,
   addOutcome,
@@ -61,7 +60,7 @@ import {
   makeRunnerProposedLeafItem,
   makeSessionSafeRunnerItem,
   mkLocalDependency,
-  moveStage,
+  moveStep,
   moveWork,
   os,
   path,
@@ -150,56 +149,57 @@ test('submit --deps <id1,id2> persists those deps, validated through the same wr
 });
 
 
-// --- str51-llm-assist-classify D2/D5: --tier/--kind/--risk overrides on ---
-// `submit` (each independently overrides classify(text)'s per-field output;
-// an omitted flag stays byte-identical to classify()'s own derived value)
+// --- size/kind/risk overrides on submit (Phase 3) ---
 
-test('submit with no --tier/--kind/--risk flags is byte-identical to pre-feature behavior (regression proof)', () => {
+test('submit with no --size/--kind/--risk flags is byte-identical to pre-feature behavior (regression proof)', () => {
   const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['submit', 'Investigate the sluggish overview page']);
   assert.equal(result.status, 0);
   const id = JSON.parse(result.stdout).data.id;
   const item = envelopeData(run(cwd, ['list']).stdout).work[id];
-  assert.equal(item.tier, 'standard');
+  assert.equal(item.size, 'standard');
   assert.equal(item.kind, 'task');
   assert.equal(item.risk, 'standard');
 });
 
-
-test('submit --tier heavy --kind bug --risk heavy overrides all three fields regardless of classify(text)', () => {
+test('submit with retired --tier is rejected as validation with guidance, exit 4', () => {
   const cwd = tmpCwdFromTemplate();
-  const result = run(cwd, ['submit', 'Investigate the sluggish overview page', '--tier', 'heavy', '--kind', 'bug', '--risk', 'heavy']);
+  const result = run(cwd, ['submit', 'Some task', '--tier', 'heavy']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /--tier is retired/);
+});
+
+test('submit --size heavy --kind bug --risk heavy overrides all three fields regardless of classify(text)', () => {
+  const cwd = tmpCwdFromTemplate();
+  const result = run(cwd, ['submit', 'Investigate the sluggish overview page', '--size', 'heavy', '--kind', 'bug', '--risk', 'heavy']);
   assert.equal(result.status, 0);
   const id = JSON.parse(result.stdout).data.id;
   const item = envelopeData(run(cwd, ['list']).stdout).work[id];
-  assert.equal(item.tier, 'heavy');
+  assert.equal(item.size, 'heavy');
   assert.equal(item.kind, 'bug');
   assert.equal(item.risk, 'heavy');
 });
 
-
-test('submit with only --kind overrides just that field; tier and risk still come from classify(text)', () => {
+test('submit with only --kind overrides just that field; size and risk still come from classify(text)', () => {
   const cwd = tmpCwdFromTemplate();
   const result = run(cwd, ['submit', 'Investigate the sluggish overview page', '--kind', 'bug']);
   assert.equal(result.status, 0);
   const id = JSON.parse(result.stdout).data.id;
   const item = envelopeData(run(cwd, ['list']).stdout).work[id];
   assert.equal(item.kind, 'bug');
-  assert.equal(item.tier, 'standard');
+  assert.equal(item.size, 'standard');
   assert.equal(item.risk, 'standard');
 });
 
-
-test('submit --tier override alone does not change risk -- risk still mirrors classify()\'s own tier, not the override', () => {
+test('submit --size override alone does not change risk -- risk still mirrors classify()\'s own size, not the override', () => {
   const cwd = tmpCwdFromTemplate();
-  const result = run(cwd, ['submit', 'Investigate the sluggish overview page', '--tier', 'heavy']);
+  const result = run(cwd, ['submit', 'Investigate the sluggish overview page', '--size', 'heavy']);
   assert.equal(result.status, 0);
   const id = JSON.parse(result.stdout).data.id;
   const item = envelopeData(run(cwd, ['list']).stdout).work[id];
-  assert.equal(item.tier, 'heavy');
+  assert.equal(item.size, 'heavy');
   assert.equal(item.risk, 'standard');
 });
-
 
 // --- tsk-5gu: --verify override on `submit`, same optionalField shape as ---
 // --tier/--kind/--risk above (a submitter who already stated a real verify
@@ -305,14 +305,14 @@ test('submit stays byte-identical after the submitWork extraction: a plain call 
   assert.equal(plainItem.status, 'todo');
   assert.equal(plainItem.mode, 'sync');
   assert.equal(plainItem.domain, undefined);
-  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[plainItem.id].stage, 'discovery');
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[plainItem.id].workflowStep, 'discovery');
 
   const flagged = run(cwd, ['submit', 'Try the synthetic domain', '--async', '--domain', 'synthetic']);
   assert.equal(flagged.status, 0);
   const flaggedItem = JSON.parse(flagged.stdout).data;
   assert.equal(flaggedItem.mode, 'async');
   assert.equal(flaggedItem.domain, 'synthetic');
-  assert.equal(flaggedItem.stage, 'assembling');
+  assert.equal(flaggedItem.workflowStep, 'assembling');
 
   const unattended = run(cwd, ['submit', 'Draft the onboarding walkthrough', '--unattended']);
   assert.equal(unattended.status, 0);

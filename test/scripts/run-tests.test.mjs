@@ -3,9 +3,11 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { discoverTestFiles, buildTestArgv, buildTestEnv, runTests, runSelectedTests, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT } from '../../scripts/run-tests.mjs';
+import { setTimeout as delay } from 'node:timers/promises';
+import { parseEtime, parsePs, treeOf, findOverdue } from '../../scripts/lib/test-file-watchdog.mjs';
+import { discoverTestFiles, buildTestArgv, buildTestEnv, runTests, runSelectedTests, KEEP_TMP_ENV, REPO_ROOT, DEFAULT_TEST_ROOT, snapshotFgos, diffFgosSnapshots, SENSITIVE_FGOS_FILES } from '../../scripts/run-tests.mjs';
 
 function tmpFixtureRoot() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'run-tests-fixture-'));
@@ -366,3 +368,303 @@ test('runSelectedTests removes the per-run temp dir even when spawning the suite
   assert.equal(fs.existsSync(runTemp), false);
   fs.rmSync(base, { recursive: true, force: true });
 });
+
+// ─── .fgos Store Leak Guardrail Tests ─────────────────────────────────────────
+
+test('snapshotFgos captures files in .fgos including observe/, excluding secrets', () => {
+  const base = tempBase();
+  const fgosDir = path.join(base, '.fgos');
+  fs.mkdirSync(path.join(fgosDir, 'observe', 'friction'), { recursive: true });
+  fs.mkdirSync(path.join(fgosDir, 'coordination'), { recursive: true });
+  fs.writeFileSync(path.join(fgosDir, 'config.json'), '{"runner":{}}');
+  fs.writeFileSync(path.join(fgosDir, 'observe', 'friction', 'data.json'), '{"friction":1}');
+  fs.writeFileSync(path.join(fgosDir, 'secrets.local.env'), 'SECRET_TOKEN=abc');
+  fs.writeFileSync(path.join(fgosDir, 'secrets.env'), 'SECRET_KEY=xyz');
+
+  const snap = snapshotFgos(base);
+  assert.equal(snap.has('config.json'), true);
+  assert.equal(snap.has(path.join('observe', 'friction', 'data.json')), true);
+  assert.equal(snap.has('secrets.local.env'), false, 'secrets.local.env must be excluded from snapshot');
+  assert.equal(snap.has('secrets.env'), false, 'secrets.env must be excluded from snapshot');
+  assert.equal(snap.get('config.json').size, 13);
+
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('diffFgosSnapshots correctly computes added, modified, deleted, and respects allowedMutations', () => {
+  const before = new Map([
+    ['config.json', { mtimeMs: 1000, size: 20 }],
+    ['state.json', { mtimeMs: 1000, size: 50 }],
+    ['to-delete.json', { mtimeMs: 1000, size: 30 }],
+  ]);
+  const after = new Map([
+    ['config.json', { mtimeMs: 1000, size: 20 }], // unchanged
+    ['state.json', { mtimeMs: 2000, size: 60 }], // modified
+    ['new-run.json', { mtimeMs: 2000, size: 100 }], // added
+    ['allowed-new.json', { mtimeMs: 2000, size: 10 }], // allowed added
+  ]);
+
+  const allowed = new Set(['allowed-new.json']);
+  const diff = diffFgosSnapshots(before, after, allowed);
+
+  assert.equal(diff.leaked, true);
+  assert.deepEqual(diff.added, ['new-run.json']);
+  assert.deepEqual(diff.modified, ['state.json']);
+  assert.deepEqual(diff.deleted, ['to-delete.json']);
+});
+
+test('runSelectedTests passes cleanly with status 0 when no .fgos store leak occurs', () => {
+  const base = tempBase();
+  const fgosDir = path.join(base, '.fgos');
+  fs.mkdirSync(fgosDir, { recursive: true });
+  fs.writeFileSync(path.join(fgosDir, 'config.json'), '{"runner":{}}');
+
+  const result = runSelectedTests(['a.test.mjs'], {
+    cwd: base,
+    spawn: () => ({ status: 0 }),
+  });
+
+  assert.equal(result.status, 0);
+  assert.equal(result.fgosDiff.leaked, false);
+  assert.deepEqual(result.fgosDiff.added, []);
+  assert.deepEqual(result.fgosDiff.modified, []);
+  assert.deepEqual(result.fgosDiff.deleted, []);
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('runSelectedTests fails with exit 1 and reports error when test suite leaks a file into .fgos', () => {
+  const base = tempBase();
+  const fgosDir = path.join(base, '.fgos');
+  fs.mkdirSync(fgosDir, { recursive: true });
+  fs.writeFileSync(path.join(fgosDir, 'config.json'), '{"runner":{}}');
+
+  const logs = [];
+  const result = runSelectedTests(['a.test.mjs'], {
+    cwd: base,
+    spawn: () => {
+      // Simulate a test leaking a file into .fgos/dispatch-runs/claude/123/run.json
+      const leakDir = path.join(fgosDir, 'dispatch-runs', 'claude', '123');
+      fs.mkdirSync(leakDir, { recursive: true });
+      fs.writeFileSync(path.join(leakDir, 'run.json'), '{"leaked":true}');
+      return { status: 0 }; // test claimed it passed
+    },
+    log: (msg) => logs.push(msg),
+  });
+
+  assert.equal(result.status, 1, 'suite MUST fail if test leaked into .fgos');
+  assert.equal(result.fgosDiff.leaked, true);
+  assert.equal(result.fgosDiff.added.includes(path.join('dispatch-runs', 'claude', '123', 'run.json')), true);
+  assert.match(logs.join('\n'), /leaked unexpected files/);
+  assert.match(logs.join('\n'), /dispatch-runs.*run\.json/);
+
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('runSelectedTests fails when a test leaks into .fgos/observe/ store', () => {
+  const base = tempBase();
+  const fgosDir = path.join(base, '.fgos');
+  fs.mkdirSync(path.join(fgosDir, 'observe', 'friction'), { recursive: true });
+
+  const logs = [];
+  const result = runSelectedTests(['observe.test.mjs'], {
+    cwd: base,
+    spawn: () => {
+      // Simulate leaking into .fgos/observe/friction/leak.json
+      fs.writeFileSync(path.join(fgosDir, 'observe', 'friction', 'leak.json'), '{"bad":true}');
+      return { status: 0 };
+    },
+    log: (msg) => logs.push(msg),
+  });
+
+  assert.equal(result.status, 1, 'suite MUST fail if test leaked into .fgos/observe/');
+  assert.equal(result.fgosDiff.leaked, true);
+  assert.equal(result.fgosDiff.added.includes(path.join('observe', 'friction', 'leak.json')), true);
+  assert.match(logs.join('\n'), /observe.*leak\.json/);
+
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+test('runSelectedTests permits allowed mutations without failing the suite', () => {
+  const base = tempBase();
+  const fgosDir = path.join(base, '.fgos');
+  fs.mkdirSync(fgosDir, { recursive: true });
+
+  const allowed = new Set(['allowed.log']);
+  const result = runSelectedTests(['a.test.mjs'], {
+    cwd: base,
+    allowedFgosMutations: allowed,
+    spawn: () => {
+      fs.writeFileSync(path.join(fgosDir, 'allowed.log'), 'ok');
+      return { status: 0 };
+    },
+  });
+
+  assert.equal(result.status, 0);
+  assert.equal(result.fgosDiff.leaked, false);
+  fs.rmSync(base, { recursive: true, force: true });
+});
+
+// --- Per-file time limit ----------------------------------------------------
+
+test('parseEtime reads ps elapsed-time formats', () => {
+  assert.equal(parseEtime('00:07'), 7000);
+  assert.equal(parseEtime('12:34'), (12 * 60 + 34) * 1000);
+  assert.equal(parseEtime('01:02:03'), ((1 * 60 + 2) * 60 + 3) * 1000);
+  assert.equal(parseEtime('2-03:04:05'), (((2 * 24 + 3) * 60 + 4) * 60 + 5) * 1000);
+  assert.ok(Number.isNaN(parseEtime('garbage')));
+});
+
+test('findOverdue picks only in-tree test-file processes past their own limit; treeOf lists children first', () => {
+  const procs = parsePs([
+    '  100     1    10:00 node run-tests.mjs',
+    '  200   100    10:00 node --test test/a.test.mjs test/b.test.mjs',
+    '  300   200    09:00 /usr/bin/node test/a.test.mjs',
+    '  400   300    08:59 sleep 99999',
+    '  500   200    00:05 /usr/bin/node test/b.test.mjs',
+    '  600     1    99:00 /usr/bin/node test/a.test.mjs',
+  ].join('\n'));
+  const limits = { 'test/a.test.mjs': 60_000, 'test/b.test.mjs': 60_000 };
+  const overdue = findOverdue(procs, 100, limits);
+  assert.deepEqual(overdue.map((o) => [o.pid, o.file]), [[300, 'test/a.test.mjs']]);
+  assert.deepEqual(treeOf(procs, 300), [400, 300]);
+});
+
+for (const pauseAfterKill of [false, true]) {
+  test(pauseAfterKill
+    ? 'timeout evidence survives the nested runner finishing while the watchdog is paused after killing a file'
+    : 'a hung test file is killed with its whole process tree, named, and the rest of the suite still runs', async (t) => {
+    const root = tmpFixtureRoot();
+    const runnerPidFile = path.join(root, 'runner.pid');
+    const grandchildPidFile = path.join(root, 'grandchild.pid');
+    const okMarker = path.join(root, 'ok.ran');
+    const acknowledged = path.join(root, 'parent-read');
+    const killGapMarker = path.join(root, 'kill-gap');
+    const supervisorPidFile = path.join(root, 'supervisor.pid');
+    const supervisorExited = path.join(root, 'supervisor.exited');
+    const env = { ...process.env };
+    t.after(async () => {
+      try {
+        // Release the real supervisor even if an assertion or spawn failed.
+        fs.writeFileSync(acknowledged, '1');
+        for (const pidFile of [grandchildPidFile, runnerPidFile]) {
+          if (!fs.existsSync(pidFile)) continue;
+          const pid = Number(fs.readFileSync(pidFile, 'utf8'));
+          if (Number.isInteger(pid) && pid > 0) {
+            try { process.kill(pid, 'SIGKILL'); } catch (err) {
+              if (err.code !== 'ESRCH') throw err;
+            }
+          }
+        }
+        if (fs.existsSync(supervisorPidFile)) {
+          const deadline = Date.now() + 60_000;
+          while (!fs.existsSync(supervisorExited) && Date.now() < deadline) await delay(10);
+          if (!fs.existsSync(supervisorExited)) {
+            const pid = Number(fs.readFileSync(supervisorPidFile, 'utf8'));
+            try { process.kill(pid, 'SIGKILL'); } catch (err) {
+              if (err.code !== 'ESRCH') throw err;
+            }
+            assert.fail('the watchdog must exit after the parent acknowledges its result');
+          }
+        }
+      } finally {
+        fs.rmSync(root, { recursive: true, force: true });
+      }
+    });
+    if (pauseAfterKill) {
+      // Hold the real SIGKILL boundary until runTests has read the journal.
+      // No fake process table, source pin, or production-only testing seam:
+      // the nested runner, supervisor, and detached child all run for real.
+      const watchdogPath = fileURLToPath(new URL('../../scripts/lib/test-file-watchdog.mjs', import.meta.url));
+      const preload = write(root, 'pause-watchdog.mjs', `
+import fs from 'node:fs';
+if (process.argv[1] === ${JSON.stringify(watchdogPath)}) {
+  fs.writeFileSync(${JSON.stringify(supervisorPidFile)}, String(process.pid));
+  process.on('exit', () => fs.writeFileSync(${JSON.stringify(supervisorExited)}, '1'));
+  const kill = process.kill;
+  process.kill = function(pid, signal) {
+    const isRunner = signal === 'SIGKILL'
+      && fs.existsSync(${JSON.stringify(runnerPidFile)})
+      && pid === Number(fs.readFileSync(${JSON.stringify(runnerPidFile)}, 'utf8'));
+    const result = kill.call(process, pid, signal);
+    if (isRunner) {
+      fs.writeFileSync(${JSON.stringify(killGapMarker)}, '1');
+      const deadline = Date.now() + 60_000;
+      while (!fs.existsSync(${JSON.stringify(acknowledged)}) && Date.now() < deadline) {
+        Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 10);
+      }
+      if (!fs.existsSync(${JSON.stringify(acknowledged)})) throw new Error('parent never acknowledged the journal read');
+    }
+    return result;
+  };
+}
+`);
+      env.NODE_OPTIONS = `${env.NODE_OPTIONS || ''} --import=${JSON.stringify(pathToFileURL(preload).href)}`.trim();
+    }
+    write(
+      root,
+      'a-hang.test.mjs',
+      "import { test } from 'node:test';\nimport { spawn } from 'node:child_process';\nimport fs from 'node:fs';\n" +
+        `fs.writeFileSync(${JSON.stringify(runnerPidFile)}, String(process.pid));\n` +
+        "const child = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { detached: true, stdio: 'ignore' });\n" +
+        `fs.writeFileSync(${JSON.stringify(grandchildPidFile)}, String(child.pid));\n` +
+        "test('passes, then the process never exits', () => {});\nsetInterval(() => {}, 1000);\n",
+    );
+    write(
+      root,
+      'b-ok.test.mjs',
+      `import { test } from 'node:test';\nimport fs from 'node:fs';\ntest('ok', () => fs.writeFileSync(${JSON.stringify(okMarker)}, '1'));\n`,
+    );
+    const logs = [];
+    const started = Date.now();
+    let nested;
+    let invocation;
+    let result;
+    try {
+      try {
+        result = runTests({
+          root,
+          cwd: root,
+          env,
+          stdio: 'pipe',
+          fileTimeoutMs: 2000,
+          watchdogPollMs: 300,
+          watchdog: true,
+          spawn(execPath, argv, opts) {
+            invocation = {
+              execPath, argv, cwd: opts.cwd,
+              env: Object.fromEntries(['NODE_TEST_CONTEXT', 'NODE_OPTIONS', 'UV_THREADPOOL_SIZE', 'TMPDIR', 'FGOS_HOST_BIN']
+                .map((key) => [key, opts.env[key] ?? null])),
+            };
+            nested = spawnSync(execPath, argv, { ...opts, encoding: 'utf8' });
+            return nested;
+          },
+          log: (m) => logs.push(m),
+        });
+      } finally {
+        fs.writeFileSync(acknowledged, '1');
+      }
+      assert.equal(nested.error, undefined, 'the nested runner must spawn successfully');
+      assert.equal(nested.signal, null, 'the nested runner itself must not be killed');
+      assert.notEqual(result.status, 0);
+      assert.ok(Date.now() - started < 60_000, 'a hung file must not hold the run');
+      assert.deepEqual(result.timedOut.map((hit) => hit.file), ['a-hang.test.mjs']);
+      assert.match(logs.join('\n'), /a-hang\.test\.mjs: timed out/);
+      assert.ok(fs.existsSync(okMarker), 'the other file still ran');
+      const grandchildPid = Number(fs.readFileSync(grandchildPidFile, 'utf8'));
+      assert.throws(() => process.kill(grandchildPid, 0), { code: 'ESRCH' }, 'the detached grandchild was killed too');
+      if (pauseAfterKill) assert.ok(fs.existsSync(killGapMarker), 'the post-kill scheduling gap was exercised');
+      assert.equal(fs.existsSync(result.runTemp), false, 'the run temp dir was cleaned up');
+    } catch (err) {
+      t.diagnostic(JSON.stringify({
+        node: process.version, platform: process.platform, parallelism: os.availableParallelism(),
+        loadavg: os.loadavg(), freeMemory: os.freemem(), durationMs: Date.now() - started,
+        invocation, status: nested?.status, signal: nested?.signal, pid: nested?.pid,
+        error: nested?.error && { message: nested.error.message, code: nested.error.code, syscall: nested.error.syscall },
+        timedOut: result?.timedOut, logs, otherFileRan: fs.existsSync(okMarker),
+      }));
+      t.diagnostic(`nested stdout:\n${nested?.stdout ?? '(not captured)'}`);
+      t.diagnostic(`nested stderr:\n${nested?.stderr ?? '(not captured)'}`);
+      throw err;
+    }
+  });
+}

@@ -15,7 +15,6 @@ import {
   addAdHocWorktree,
   addBareOrigin,
   addDiscovery,
-  addFriction,
   addGoalItem,
   addOk,
   addOutcome,
@@ -61,7 +60,7 @@ import {
   makeRunnerProposedLeafItem,
   makeSessionSafeRunnerItem,
   mkLocalDependency,
-  moveStage,
+  moveStep,
   moveWork,
   os,
   path,
@@ -104,19 +103,29 @@ test('discover with an out-of-vocabulary --kind is rejected as validation (exit 
   assert.match(result.stderr, /work\.kind must be one of/);
 
   const item = envelopeData(run(cwd, ['list']).stdout).work[id];
-  assert.equal(item.stage, 'discovery', 'a rejected classification must never leave the item half-advanced');
+  assert.equal(item.workflowStep, 'discovery', 'a rejected classification must never leave the item half-advanced');
   assert.notEqual(item.kind, 'bogus');
 });
 
 
-test('discover with an out-of-vocabulary --tier is rejected as validation (exit 4) before the item moves at all', () => {
+test('discover with retired --tier is rejected as validation (exit 4) before the item moves at all', () => {
   const cwd = tmpCwdFromTemplate();
   const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
 
   const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- bad-tier', '--tier', 'enormous']);
   assert.equal(result.status, 4);
-  assert.match(result.stderr, /work\.tier must be one of/);
-  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'discovery');
+  assert.match(result.stderr, /--tier is retired/);
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].workflowStep, 'discovery');
+});
+
+test('discover with an out-of-vocabulary --size is rejected as validation (exit 4) before the item moves at all', () => {
+  const cwd = tmpCwdFromTemplate();
+  const id = JSON.parse(run(cwd, ['submit', 'Ship the thing']).stdout).data.id;
+
+  const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- bad-size', '--size', 'enormous']);
+  assert.equal(result.status, 4);
+  assert.match(result.stderr, /work\.size must be one of/);
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].workflowStep, 'discovery');
 });
 
 
@@ -127,7 +136,7 @@ test('discover with a bare --risk (no value) is rejected as validation, exit 4',
   const result = run(cwd, ['discover', id, '--verdict', 'clear', '--verify', 'npm test -- bare-risk', '--risk']);
   assert.equal(result.status, 4);
   assert.match(result.stderr, /--risk/);
-  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].stage, 'discovery');
+  assert.equal(envelopeData(run(cwd, ['list']).stdout).work[id].workflowStep, 'discovery');
 });
 
 
@@ -187,109 +196,7 @@ test('plan --verdict with an unrecognized value is rejected as validation, exit 
 });
 
 
-test.todo('discover (sync verb) on a clear verdict stamps role "session" on the work.stage event and folds into a clarify-pass settlement - migrated to test/direct/fgos-stage.test.mjs');
+test.todo('discover (sync verb) on a clear verdict stamps role "session" on the work.step event and folds into a clarify-pass settlement - migrated to test/direct/fgos-stage.test.mjs');
 
 
 
-// --- `fgos evolve` (self-improve-loop P13 Slice 1, Gate A) -----------------
-//
-// Request-class per D1 (same contract as `ready`/`list`/`check`): a pure
-// read over `listWork(dir)`, ranked by `src/evolve/candidates.mjs`. Two-shot
-// per D11 — `evolve` lists, `evolve --pick <id>` reprints one candidate's
-// friction record — never an interactive stdin loop, never a re-prompt on a
-// bad id. Friction is seeded directly through store.mjs's addFriction (the
-// same single write door the runner uses in production), same discipline as
-// the friction-section tests for `check` above.
-
-test('evolve with zero open friction returns an empty candidate list and exits 0', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'clean-item');
-  const result = run(cwd, ['evolve']);
-  assert.equal(result.status, 0);
-  assert.deepEqual(envelopeData(result.stdout), []);
-});
-
-
-test('evolve on a directory with no log at all returns an empty candidate list, exit 0 (a read never initializes .fgos/)', () => {
-  const cwd = rawTmpCwd();
-  const result = run(cwd, ['evolve']);
-  assert.equal(result.status, 0);
-  assert.deepEqual(envelopeData(result.stdout), []);
-  assert.ok(!fs.existsSync(path.join(cwd, '.fgos')));
-});
-
-
-test('evolve with candidates returns the ranked list with every field id/disposition/errorClass/layer/detail/attempts/score', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'rank-item');
-  const dir = path.join(cwd, '.fgos');
-  addFriction(dir, { id: 'rank-item', disposition: 'blocked', errorClass: 'verify-miss', layer: 'verification', attempts: 2, detail: 'goal-check failed (exit 1)' });
-
-  const result = run(cwd, ['evolve']);
-  assert.equal(result.status, 0);
-  const data = envelopeData(result.stdout);
-  assert.equal(data.length, 1);
-  assert.equal(data[0].id, 'rank-item');
-  assert.equal(data[0].score, 2);
-  assert.equal(data[0].disposition, 'blocked');
-  assert.equal(data[0].errorClass, 'verify-miss');
-  assert.equal(data[0].layer, 'verification');
-  assert.equal(data[0].attempts, 2);
-  assert.equal(data[0].detail, 'goal-check failed (exit 1)');
-});
-
-
-test('evolve with a candidate missing disposition/errorClass/layer/attempts carries those fields as null/undefined, never the literal string "null"', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'sparse-item');
-  const dir = path.join(cwd, '.fgos');
-  addFriction(dir, { id: 'sparse-item' });
-
-  const result = run(cwd, ['evolve']);
-  assert.equal(result.status, 0);
-  assert.doesNotMatch(result.stdout, /"disposition":"null"|"errorClass":"null"|"layer":"null"|"attempts":"null"/);
-});
-
-
-test('evolve --pick <valid-id> returns that candidate\'s full friction record, no state change', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'pick-item');
-  const dir = path.join(cwd, '.fgos');
-  addFriction(dir, { id: 'pick-item', disposition: 'blocked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'goal-check failed' });
-
-  const result = run(cwd, ['evolve', '--pick', 'pick-item']);
-  assert.equal(result.status, 0);
-  const data = envelopeData(result.stdout);
-  assert.equal(data.count, 1);
-  assert.equal(data.recent[0].id, 'pick-item');
-  assert.equal(data.recent[0].disposition, 'blocked');
-  assert.equal(data.recent[0].errorClass, 'verify-miss');
-  assert.equal(data.recent[0].layer, 'verification');
-});
-
-
-test('evolve --pick <invalid-id> prints a clean error and exits non-zero, with no state change', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'exists-item');
-  const dir = path.join(cwd, '.fgos');
-  addFriction(dir, { id: 'exists-item', disposition: 'blocked', errorClass: 'verify-miss', layer: 'verification', attempts: 1, detail: 'x' });
-
-  const logBefore = fs.readFileSync(logPath(cwd), 'utf8');
-  const viewBefore = fs.readFileSync(viewPath(cwd), 'utf8');
-
-  const result = run(cwd, ['evolve', '--pick', 'nonexistent-id']);
-  assert.notEqual(result.status, 0);
-  assert.match(result.stderr, /not an open candidate/);
-
-  assert.equal(fs.readFileSync(logPath(cwd), 'utf8'), logBefore, 'events.jsonl must be untouched by an invalid --pick');
-  assert.equal(fs.readFileSync(viewPath(cwd), 'utf8'), viewBefore, 'state.json must be untouched by an invalid --pick');
-});
-
-
-test('evolve --pick with a bare flag (no value) is refused as validation, not a re-prompt', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'bare-pick-item');
-  const result = run(cwd, ['evolve', '--pick']);
-  assert.notEqual(result.status, 0);
-  assert.match(result.stderr, /evolve --pick requires a non-empty candidate id/);
-});

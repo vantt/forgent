@@ -1,0 +1,2 @@
+{"type":"case-opened","v":1,"ts":"2026-09-29T08:00:00.000Z","name":"golden-case-1","project":"observe-golden-fixture","harness":"fgos","task":"Verify observe component migration and contract boundaries","headAtOpen":"0123456789abcdef0123456789abcdef01234567"}
+{"type":"case-closed","v":1,"ts":"2026-09-29T10:30:00.000Z","name":"golden-case-1","interventions":0,"verdict":"usable","items":["tsk-golden-1"],"sessions":["coord-golden-01"],"headAtClose":"fedcba9876543210fedcba9876543210fedcba98"}

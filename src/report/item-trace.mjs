@@ -22,45 +22,11 @@ export function collectOutcomeEntry(id, entry) {
   };
 }
 
-// Friction report cap (per porting lesson predicted-actual-feedback-store:
-// "gợi ý luôn CAP, không xả vô hạn") — counts are always full, the record
-// list returned is only the newest few.
-export const FRICTION_DISPLAY_CAP = 5;
-
-/** Friction channel data (kênh 2 của capture 2 kênh — Phase 3 Slice 2):
- * per-layer counts over ALL matching records, plus the newest records
- * capped at FRICTION_DISPLAY_CAP. `frictions` is a lazy view key
- * (replay.mjs) — a log with no work.friction events has no key and this
- * returns null, keeping `check`'s data shape byte-identical to
- * pre-friction logs. */
-export function collectFrictionData(view, id) {
-  const frictions = view.frictions ?? {};
-  const records = (id ? [id] : Object.keys(frictions)).flatMap((itemId) =>
-    (frictions[itemId] ?? []).map((r) => ({ ...r, id: r.id ?? itemId })),
-  );
-  if (records.length === 0) {
-    return null;
-  }
-  const byLayer = {};
-  for (const r of records) {
-    byLayer[r.layer] = (byLayer[r.layer] ?? 0) + 1;
-  }
-  const recent = records
-    .sort((a, b) => ((a.ts ?? '') < (b.ts ?? '') ? -1 : 1))
-    .slice(-FRICTION_DISPLAY_CAP)
-    .reverse();
-  return { count: records.length, byLayer, recent };
-}
-
-/** `review`'s trace summary (pr-lifecycle-2 cell action: "kèm trace tóm tắt
- * (outcome/friction)"): reuses the SAME two data sources `check` already
- * returns — no new collector, no new data source — so a reviewer gets
- * exactly the outcome/friction history `fgos check <id>` would show, folded
- * into the review payload instead of requiring a second command. */
+/** `review`'s trace summary (pr-lifecycle-2 cell action):
+ * returns outcome history folded into the review payload. */
 export function collectReviewTrace(view, id) {
   const outcomeEntry = view.outcomes?.[id] ?? null;
   return {
     outcome: outcomeEntry ? collectOutcomeEntry(id, outcomeEntry) : null,
-    friction: collectFrictionData(view, id),
   };
 }

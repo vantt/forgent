@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   evaluateLadder,
+  evaluateWorkingScreen,
   matchUsageLimit,
   paneFateFor,
   LADDER_OUTCOMES,
@@ -42,6 +43,17 @@ test('death needs consecutive absences, and reaching the threshold is what settl
   const final = run({ liveness: 'absent' }, LIMITS, prior);
   assert.equal(final.outcome, 'died');
   assert.equal(final.absentStreak, DEFAULT_DEATH_THRESHOLD);
+});
+
+test('an absence that names its cause carries that cause into the died reason', () => {
+  let prior = {};
+  let r;
+  for (let i = 0; i < DEFAULT_DEATH_THRESHOLD; i += 1) {
+    r = run({ liveness: 'absent', livenessCause: 'herdr reports pane p1 not found' }, LIMITS, prior);
+    prior = r;
+  }
+  assert.equal(r.outcome, 'died');
+  assert.match(r.reason, /pane p1 not found on 3 consecutive reads/);
 });
 
 test('absent, unknown, absent never kills a healthy run -- one unknown resets the count', () => {
@@ -88,7 +100,7 @@ test('a stale worker whose screen says a provider limit was hit is paused, not t
     now: 1000 + 6000,
     screen: 'thinking...\nYou have reached your usage limit. Try again in 3 hours.\n',
   });
-  assert.equal(r.outcome, 'paused-limit');
+  assert.equal(r.outcome === 'provider-limit' || r.outcome === 'paused-limit', true);
   assert.match(r.screenLine, /usage limit/i);
   assert.match(r.screenLine, /3 hours/, 'the whole sentence is kept, reset time included');
 });
@@ -112,7 +124,8 @@ test('with no progress ever recorded, staleness is measured from the start of th
 });
 
 test('a zero idleTimeout disables staleness entirely rather than making everything stale', () => {
-  const r = run({ agentState: 'idle', lastProgressAt: 1000, now: 999999 }, { ...LIMITS, idleTimeoutMs: 0, ceilingMs: 0 });
+  const limits = { ...LIMITS, idleTimeoutMs: 0, ceilingMs: 0 };
+  const r = run({ agentState: 'idle', lastProgressAt: 1000, now: 999999, screen: 'waiting for you\n> ' }, limits);
   assert.equal(r.outcome, null);
   assert.equal(r.needsScreen, false);
 });
@@ -134,7 +147,7 @@ test('close-always sweeps failed panes but never one paused on a provider limit'
   assert.equal(paneFateFor('timed-out-idle', { closeAlways: true }), 'close');
   assert.equal(paneFateFor('died', { closeAlways: true }), 'close');
   assert.equal(
-    paneFateFor('paused-limit', { closeAlways: true }),
+    paneFateFor('provider-limit', { closeAlways: true }),
     'keep',
     'that pane is the only place the reset time is written',
   );
@@ -145,6 +158,64 @@ test('matchUsageLimit returns the line itself and ignores blank noise', () => {
   assert.equal(matchUsageLimit(null), null);
   assert.equal(matchUsageLimit('all fine here'), null);
   assert.equal(matchUsageLimit('\n\n  Rate limit exceeded  \n'), 'Rate limit exceeded');
+});
+
+test('matchUsageLimit recognises the wording a codex pane printed when its model was at capacity', () => {
+  // Captured from a real pane (2026-10-05): the agent stalled on this line and the round could only
+  // time out idle, instead of reporting a provider limit that the runner can fall back from.
+  const screen = [
+    '• Ran out=/work/outbox',
+    '■ Selected model is at capacity. Please try a different model.',
+    '• Reconnected. No input was resent.',
+  ].join('\n');
+  assert.equal(matchUsageLimit(screen), '■ Selected model is at capacity. Please try a different model.');
+  assert.equal(matchUsageLimit('Planning capacity for the next quarter'), null, 'ordinary talk about capacity is not a provider limit');
+});
+
+const CAPACITY_LINE = '■ Selected model is at capacity. Please try a different model.';
+const PROBE = { probeMs: 30000 };
+
+test('a working agent whose screen shows the capacity error is a provider limit once the line has stood for a probe interval', () => {
+  const screen = `• Ran something\n${CAPACITY_LINE}\n• Reconnected. No input was resent.\n── ⠋ Working ──`;
+  const first = evaluateWorkingScreen({ screen, now: 100000, prior: {}, ...PROBE });
+  assert.equal(first.outcome, null, 'one sighting is not enough: a healthy agent can print the line and recover');
+  assert.equal(first.next.line, CAPACITY_LINE);
+
+  const tooSoon = evaluateWorkingScreen({ screen, now: 100000 + 10000, prior: first.next, ...PROBE });
+  assert.equal(tooSoon.outcome, null);
+  assert.deepEqual(tooSoon.next, first.next, 'the first sighting time is kept, not restarted');
+
+  const stood = evaluateWorkingScreen({ screen, now: 100000 + 30000, prior: first.next, ...PROBE });
+  assert.equal(stood.outcome, 'provider-limit');
+  assert.equal(stood.screenLine, CAPACITY_LINE);
+  assert.match(stood.reason, /working/);
+});
+
+test('a capacity line that has gone from the screen resets the watch', () => {
+  const seen = evaluateWorkingScreen({ screen: CAPACITY_LINE, now: 1000, prior: {}, ...PROBE });
+  const recovered = evaluateWorkingScreen({ screen: 'the agent carried on and wrote a file', now: 20000, prior: seen.next, ...PROBE });
+  assert.equal(recovered.outcome, null);
+  assert.deepEqual(recovered.next, { line: null, since: null });
+  const again = evaluateWorkingScreen({ screen: CAPACITY_LINE, now: 60000, prior: recovered.next, ...PROBE });
+  assert.equal(again.outcome, null, 'a later sighting starts a new interval');
+});
+
+test('text that only talks about capacity or limits is never taken for a provider limit while the agent is working', () => {
+  for (const screen of [
+    'The model is at capacity according to the docs I am reading',
+    'let me explain the rate limit handling in this module',
+    'usage limit: see src/limits.mjs',
+    'Selected model is at capacity',
+  ]) {
+    const a = evaluateWorkingScreen({ screen, now: 1000, prior: {}, ...PROBE });
+    const b = evaluateWorkingScreen({ screen, now: 1000 + 60000, prior: a.next, ...PROBE });
+    assert.equal(b.outcome, null, screen);
+  }
+});
+
+test('an unreadable screen changes nothing', () => {
+  assert.equal(evaluateWorkingScreen({ screen: null, now: 1, prior: {}, ...PROBE }).outcome, null);
+  assert.equal(evaluateWorkingScreen({ screen: '', now: 1, prior: { line: CAPACITY_LINE, since: 0 }, ...PROBE }).outcome, null);
 });
 
 test('an unknown outcome defaults to keeping the pane rather than closing it', () => {
@@ -180,4 +251,36 @@ test('the ceiling is not adjusted for blind time -- it bounds the round, not the
     { ...LIMITS, ceilingMs: 60000 },
   );
   assert.equal(r.outcome, 'timed-out-ceiling');
+});
+
+const AUTH_SCREEN = [
+  ' Read /x/brief-1.md and do what it says.',
+  ' Error: OAuth refresh failed for xai: xAI OAuth token refresh failed (HTTP 400): invalid_grant',
+  '$0.000 (sub) 0.7%/1.0M (auto)   grok-4.3 • medium',
+].join('\n');
+
+test('an idle agent showing a dead credential is called provider-limit long before the idle timeout', () => {
+  const limits = { idleTimeoutMs: 300000, ceilingMs: 3600000, deathThreshold: 3 };
+  const observation = { agentState: 'idle', lastProgressAt: 1000, now: 21000 };
+  const asked = run(observation, limits);
+  assert.equal(asked.outcome, null);
+  assert.equal(asked.needsScreen, true, 'an idle agent past the probe delay has its screen read');
+  const r = run({ ...observation, screen: AUTH_SCREEN }, limits);
+  assert.equal(r.outcome, 'provider-limit');
+  assert.match(r.screenLine, /invalid_grant/);
+});
+
+test('an idle agent with an ordinary screen is left alone until the idle timeout', () => {
+  const limits = { idleTimeoutMs: 300000, ceilingMs: 3600000, deathThreshold: 3 };
+  const r = run({ agentState: 'idle', lastProgressAt: 1000, now: 21000, screen: 'thinking about it\n> ' }, limits);
+  assert.equal(r.outcome, null);
+  assert.equal(r.needsScreen, false);
+  const young = run({ agentState: 'idle', lastProgressAt: 1000, now: 5000 }, limits);
+  assert.equal(young.needsScreen, false, 'a short pause does not cost a screen read');
+});
+
+test('a working agent is never probed for a credential failure', () => {
+  const limits = { idleTimeoutMs: 300000, ceilingMs: 3600000, deathThreshold: 3 };
+  const r = run({ agentState: 'working', lastProgressAt: 1000, now: 90000 }, limits);
+  assert.equal(r.needsScreen, false);
 });

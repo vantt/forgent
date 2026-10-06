@@ -63,14 +63,14 @@ import {
   readyWork,
   readRawEvents,
   addOutcome,
-  addFriction,
+  recordFriction,
   categoryOf,
   EXIT_CODES,
   resolveWriterLogPath,
 } from '../state/store.mjs';
 import { readClaims } from '../state/runtime-coordination.mjs';
 import { DEFAULTS, truncateTitle } from '../state/work.mjs';
-import { DEFAULT_DOMAIN, getDomain, resolveWorkflow, stageForStep, classificationVocabulary } from '../state/workflow-stage-graphs.mjs';
+import { DEFAULT_DOMAIN, getDomain, domainSteps, stepForPhase, classificationVocabulary } from '../state/domain-registry.mjs';
 import { resolveAction, resolveStaleDoing } from './recovery.mjs';
 import {
   visitCount,
@@ -80,11 +80,13 @@ import {
   MAX_VISITS,
   BREAKER_MISSES,
 } from './anti-loop.mjs';
-import { spawnWorker, modelForTier } from './dispatch.mjs';
+import { resolveTierModel } from './dispatch.mjs';
+import { spawnWorker } from './work-dispatch.mjs';
 import { appendEvent } from '../state/events.mjs';
 import { appendWorkerLog, appendWorkerLogChunk } from './worker-log.mjs';
 import { createDispatchWorktree, removeDispatchWorktree, listLeftovers, branchNameFor, createBranchRef } from './worktree.mjs';
 import { runGoalCheck } from './goal-check.mjs';
+import { commitUnitWork } from './execution/commit-unit-work.mjs';
 import { createWriteQueue } from './write-queue.mjs';
 import { createOwnershipStore, claimRoot, steerFrontier } from './root-affinity.mjs';
 import { resolveRoot, hasOpenDescendant, indexChildrenByParent } from '../state/frontier.mjs';
@@ -98,8 +100,9 @@ import { resolvePlan, resolveContentRoot } from '../intake/plan.mjs';
 import { planVerdictFromPlanMd } from '../intake/plan-verdict-from-plan-md.mjs';
 import { classify, generateId } from '../intake/classify.mjs';
 import { checkDispatchAttestation } from './attestation-guard.mjs';
-import { chooseStageOperation, executeDriverOperationChoice } from './dispatch/operation-choice.mjs';
-import { reapOrphanedConfinementResources } from './dispatch/confinement/cleanup.mjs';
+import { chooseStageOperation, executeDriverOperationChoice } from './operation-choice.mjs';
+import { runOutcome } from './dispatch/run-result.mjs';
+import { reapOrphanedConfinementResources, resolveConfinementTempRoot } from './dispatch/confinement/cleanup.mjs';
 import { setTimeout as delay } from 'node:timers/promises';
 
 // errorClass -> failure layer: 5-layer self-attribution (task-spec / context /
@@ -337,6 +340,50 @@ export { resolveRepoRoot };
 
 function git(repoRoot, args) {
   return execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', shell: false });
+}
+
+// The worker only edits files; the runner commits what it left. The commit
+// subject is the worker's own fenced-JSON Result `summary` when it reported
+// one, else `<id>: <title>` — never the free prose around it.
+const RESULT_FENCE = /```json[^\n]*\n([\s\S]*?)```/g;
+
+function workerResultSummary(output) {
+  if (typeof output !== 'string' || !output) return null;
+  let summary = null;
+  for (const match of output.matchAll(RESULT_FENCE)) {
+    try {
+      const parsed = JSON.parse(match[1]);
+      if (parsed && typeof parsed === 'object' && typeof parsed.summary === 'string' && parsed.summary.trim()) {
+        summary = parsed.summary;
+      }
+    } catch {
+      // malformed block — keep scanning
+    }
+  }
+  return summary;
+}
+
+/** Commit whatever the worker left in the item's worktree, before goal-check.
+ * A clean tree is not an error: a worker that committed itself (older
+ * contract) or changed nothing leaves nothing to commit. Returns how the
+ * branch tip moved: `runner` (committed here), `self` (worker committed),
+ * `none` (no change at all). A failed commit throws a `worktree-fail`
+ * (environment) error so the recovery matrix routes it like any other
+ * infrastructure failure. */
+function commitWorkerChanges(item, worktree, headBeforeWorker, workerOutput) {
+  const result = commitUnitWork({
+    worktree,
+    unitId: item.id,
+    summary: workerResultSummary(workerOutput) ?? `${item.id}: ${item.title}`,
+  });
+  if (result.status === 'failed') {
+    const err = new Error(`runner commit of the worker's changes failed: ${result.error}`);
+    err.errorClass = 'worktree-fail';
+    throw err;
+  }
+  if (result.status === 'committed') return 'runner';
+  const head = git(worktree, ['rev-parse', 'HEAD']).trim();
+  return head === headBeforeWorker ? 'none' : 'self';
 }
 
 /** Branch facts the recovery matrix needs (stale-doing resolution, goal-
@@ -729,7 +776,8 @@ export function parseVerdictBlock(output) {
           // validation happens where these are actually applied (editWork),
           // not here -- this parse step stays fail-safe-only, same as its
           // sibling `parseDiscoveredBlocks`.
-          ...(typeof parsed.tier === 'string' ? { tier: parsed.tier } : {}),
+          ...(typeof parsed.size === 'string' ? { size: parsed.size } : (typeof parsed.tier === 'string' ? { size: parsed.tier } : {})),
+          ...(typeof parsed.rigor === 'string' ? { rigor: parsed.rigor } : {}),
           ...(typeof parsed.kind === 'string' ? { kind: parsed.kind } : {}),
           ...(typeof parsed.risk === 'string' ? { risk: parsed.risk } : {}),
         }
@@ -840,19 +888,13 @@ async function captureDiscoveredWork({ output, item, queue, dir, log }) {
           refs: [],
           verify: FALLBACK_VERIFY,
           tier: derived.tier,
-          // tsk-qod D1/D2: `stageForStep(domain, 'Clarify')` resolves to
-          // `undefined` for a domain that retired `clarify` entirely
-          // (today: only `coding`) -- assigning `stage: undefined` here
-          // would silently corrupt this new item's own required field.
-          // Falls back to the domain's own first declared stage instead
-          // (`stages[0]`), which for `coding` post-retirement is
-          // `discovery` -- exactly D5's own intent: a runner-created item
-          // (already has title/description, needs no clarify pass) enters
-          // the same stage a migrated pre-existing item now lands on
-          // (`scripts/migrate-clarify-split.mjs`'s own "untouched" target).
-          // A domain that still has a real Clarify-mapped stage (e.g.
-          // `triage`) is unaffected -- the `??` never fires for it.
-          stage: stageForStep(domainObj, 'Clarify') ?? domainObj.stages?.[0],
+          // A domain that retired its clarify-phase step entirely (today: only
+          // `coding`) has no step for `clarify`, and assigning `workflowStep:
+          // undefined` here would silently corrupt this new item. Falls back to
+          // the Workflow's own first declared step — a runner-created item
+          // (already has title/description, needs no clarify pass) enters the
+          // same step a migrated pre-existing item lands on.
+          workflowStep: stepForPhase(domainObj, 'clarify', derived.kind) ?? domainSteps(domainObj, derived.kind)[0],
           domain: item.domain,
           discoveredFrom: item.id,
         });
@@ -869,7 +911,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
   await queue.enqueue(async () => {
     addOutcome(dir, {
       id: item.id,
-      predicted: { tier: item.tier ?? DEFAULTS.tier, deps: item.deps.length, priorVisits },
+      predicted: { size: item.size ?? DEFAULTS.size, deps: item.deps.length, priorVisits },
     });
   });
 
@@ -923,12 +965,11 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       const feedbackView = listWork(dir);
 
       const domain = getDomain(item.domain);
-      const workflow = resolveWorkflow(domain, item.kind);
       const opChoice = chooseStageOperation({
         work: item,
-        stage: item.stage,
+        stage: item.workflowStep,
         domain: domain?.name ?? item.domain,
-        workflow: workflow?.name ?? item.workflow,
+        workflow: item.workflow,
         repoRoot,
       });
 
@@ -940,9 +981,10 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
           runnerConfig: config,
           work: item,
         });
-        log(`fgos-runner: operation "${opChoice.operation}" for "${item.id}" finished (confidence: ${outcome.runResult?.confidence}, status: ${outcome.runResult?.status})`);
+        const runOutcomeResult = outcome.runResult ? runOutcome(outcome.runResult) : null;
+        log(`fgos-runner: operation "${opChoice.operation}" for "${item.id}" finished (confidence: ${runOutcomeResult?.evidence ?? 'none'}, status: ${runOutcomeResult?.category ?? 'none'})`);
 
-        if (outcome.stop || outcome.runResult?.status === 'no-evidence' || outcome.runResult?.status === 'failed') {
+        if (outcome.stop || (runOutcomeResult ? !runOutcomeResult.satisfied : true)) {
           log(`fgos-runner: operation "${opChoice.operation}" for "${item.id}" stopped safely (${outcome.reason}) — Work lifecycle untouched`);
           const isSecondary = opChoice.operation === 'scout-blast-radius' || opChoice.operation === 'review-item' || opChoice.operation === 'resolve-question';
           const finalStatus = isSecondary ? 'blocked' : 'todo';
@@ -1030,6 +1072,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
         }
       }
 
+      const headBeforeWorker = git(wt.path, ['rev-parse', 'HEAD']).trim();
       const worker = await spawnWorker(item, config, wt.path, {
         // tsk-62v D6: lets a `kind: "cli"` executor's presence be checked
         // via `fgos tool query`'s own functions instead of re-probing PATH.
@@ -1095,9 +1138,14 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
       });
       // Persist the worker's own output for after-the-fact recovery (D1/D3/D4):
       // right after the spawn resolves, before goal-check — so success AND
-      // verify-miss are both captured (goal-check runs next).
+      // verify-miss are both captured (goal-check runs next). The runner
+      // commits the worker's file changes first, so goal-check judges the
+      // committed branch.
+      const commit = commitWorkerChanges(item, wt.path, headBeforeWorker, worker.stdout);
+      log(`fgos-runner: commit for "${item.id}": ${commit}`);
       appendWorkerLog(dir, item.id, {
         attempt,
+        commit,
         tier: worker.tier,
         model: worker.model,
         templateName: worker.templateName,
@@ -1150,7 +1198,7 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
         : {
             errorClass: 'verify-miss',
             message: check.passed
-              ? 'verify passed but the branch carries no commit — the worker must commit its work'
+              ? 'verify passed but the worker changed nothing, so the branch carries no commit'
               : `goal-check failed (exit ${check.status})`,
           };
       breaker.recordMiss(item.id);
@@ -1237,7 +1285,8 @@ async function dispatchClaimedItem({ repoRoot, dir, item, config, worktreeDir, b
     // outcome half: outcome carries the numbers the predicted-half is scored
     // against; friction carries the attribution compound-learning mines.
     await queue.enqueue(async () => {
-      addFriction(dir, {
+      recordFriction(dir, {
+        producer: 'runner.loop',
         id: item.id,
         disposition: tripped || decision.action === 'halt' ? 'halted' : 'parked',
         errorClass: failure.errorClass,
@@ -1377,7 +1426,7 @@ export async function runOnce(options = {}) {
     // above, since a dry run must never mutate the filesystem.
     if (!dryRun) {
       try {
-        const confinementReap = reapOrphanedConfinementResources({ tempRoot: path.join(os.tmpdir(), 'fgos-confinement') });
+        const confinementReap = reapOrphanedConfinementResources({ tempRoot: resolveConfinementTempRoot() });
         if (confinementReap.reaped.length > 0) {
           log(`fgos-runner: reaped ${confinementReap.reaped.length} orphaned confinement resource dir(s)`);
         }
@@ -1437,7 +1486,8 @@ export async function runOnce(options = {}) {
       // cheaper and more accurate than a batch grant. `break`, not `continue`
       // — the answer will not change within this pass.
       for (const item of Object.values(listWork(dir).work)) {
-        if (item.stage !== 'discovery' || item.status !== 'todo') continue;
+        const discoverEntry = stepForPhase(getDomain(item.domain, { onUnrecognized: () => {} }), 'discover', item.kind);
+        if (discoverEntry === undefined || item.workflowStep !== discoverEntry || item.status !== 'todo') continue;
         const researchRoom = hasWorkerSlotRoom(listWork(dir), {
           ceiling: readSharedConfigOrEmpty(path.dirname(dir))?.workerSlots?.ceiling,
           excludeId: item.id,
@@ -1450,9 +1500,10 @@ export async function runOnce(options = {}) {
         try {
           wt = createDispatchWorktree(repoRoot, item.id, { worktreeDir });
           const feedbackView = listWork(dir);
+          const headBeforeWorker = git(wt.path, ['rev-parse', 'HEAD']).trim();
           const worker = await spawnWorker(item, config, wt.path, {
             fgosDir: dir,
-            stage: 'discovery',
+            stage: discoverEntry,
             feedback: {
               answer: feedbackView.gates?.[item.id]?.answer,
               reason: feedbackView.work?.[item.id]?.reason,
@@ -1460,7 +1511,9 @@ export async function runOnce(options = {}) {
             onChunk: (stream, chunk) => appendWorkerLogChunk(dir, item.id, chunk),
           });
           log(`fgos-runner: research worker for "${item.id}" exited ${worker.status ?? `signal ${worker.signal}`} (tier ${worker.tier} -> ${worker.model})`);
+          const commit = commitWorkerChanges(item, wt.path, headBeforeWorker, worker.stdout);
           appendWorkerLog(dir, item.id, {
+            commit,
             tier: worker.tier,
             model: worker.model,
             templateName: worker.templateName,
@@ -1546,21 +1599,15 @@ export async function runOnce(options = {}) {
           onUnrecognized: (bad) =>
             log(`fgos-runner: work "${item.id}" has unrecognized domain "${bad}" — folding to "${DEFAULT_DOMAIN}".`),
         });
-        const planningStage = stageForStep(domain, 'Divide');
-        // tsk-403 D18: also sweep the legacy `decompose` alias — an item
-        // still parked there (from before the rename) must keep draining
-        // through the SAME mechanical sweep, not be silently excluded from
-        // it just because `stageForStep` no longer resolves NEW items
-        // there. Only activates when a domain declares both names
-        // distinctly (today: only `coding`).
-        const workflow = resolveWorkflow(domain, item.kind);
-        const legacyPlanStage = (workflow?.stages ?? domain.stages)?.includes('decompose') && planningStage !== 'decompose' ? 'decompose' : undefined;
+        // A step older records name `decompose` is mapped onto the plan step by
+        // replay (the workflow's aliases), so it keeps draining through this sweep.
+        const planningStep = stepForPhase(domain, 'plan', item.kind);
         if (
-          planningStage !== undefined &&
-          (item.stage === planningStage || item.stage === legacyPlanStage) &&
+          planningStep !== undefined &&
+          item.workflowStep === planningStep &&
           item.status === 'todo'
         ) {
-          const choice = chooseStageOperation({ work: item, stage: item.stage, domain: domain.name ?? item.domain, workflow: workflow?.name ?? item.workflow, repoRoot });
+          const choice = chooseStageOperation({ work: item, stage: item.workflowStep, domain: domain.name ?? item.domain, workflow: item.workflow, repoRoot });
           if (choice.dispatch === 'assignment' && choice.operation === 'validate-plan') {
             const contentRoot = resolveContentRoot(repoRoot, item.id, item.docsRef);
             const outcome = await executeDriverOperationChoice(item, choice, {
@@ -1569,7 +1616,8 @@ export async function runOnce(options = {}) {
               runnerConfig: config,
               work: item,
             });
-            log(`fgos-runner: reviewer validation assignment for "${item.id}" executed (confidence: ${outcome.runResult?.confidence}, status: ${outcome.runResult?.status})`);
+            const validateOutcome = outcome.runResult ? runOutcome(outcome.runResult) : null;
+            log(`fgos-runner: reviewer validation assignment for "${item.id}" executed (confidence: ${validateOutcome?.evidence ?? 'none'}, status: ${validateOutcome?.category ?? 'none'})`);
             if (outcome.canAdvanceEdge) {
               // Cell P01.2 (R4/G5): `item.verdictPayload`/`item.callerVerdict`
               // are dead reads (grep-confirmed: no writer for either exists
@@ -1637,11 +1685,13 @@ export async function runOnce(options = {}) {
       if (hasExceededMaxVisits(visits, maxVisits)) {
         return { outcome: 'dry-run', plan: { park: item.id, reason: 'anti-loop-max-visits', visits }, reap, parked, exitCode: 0 };
       }
-      const tier = item.tier ?? DEFAULTS.tier;
+      const itemRigor = item.rigor ?? (item.risk === 'heavy' ? 'high' : 'standard');
+      const tier = config.rigorToTier?.[itemRigor] ?? 'standard';
       const plan = {
         dispatch: item.id,
+        rigor: itemRigor,
         tier,
-        model: modelForTier(config, tier),
+        model: resolveTierModel(config, tier),
         branch: branchNameFor(item.id),
         verify: item.verify,
         visits,

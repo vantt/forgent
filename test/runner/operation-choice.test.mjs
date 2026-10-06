@@ -14,9 +14,9 @@ import {
   hasValidReviewEvidenceRefs,
   isResolvableDiffRef,
   isResolvableVerifyRef,
-} from '../../src/runner/dispatch/operation-choice.mjs';
-import { operationsForStage } from '../../src/state/workflow-stage-graphs.mjs';
-import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
+} from '../../src/runner/operation-choice.mjs';
+import { operationsForStep, getDomain } from '../../src/state/domain-registry.mjs';
+import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { runOnce } from '../../src/runner/loop.mjs';
 import { initStore, addWork, listWork } from '../../src/state/store.mjs';
@@ -168,7 +168,7 @@ function assertAssignmentRunFiles(root, assignmentId) {
 }
 
 test('driver chooses primary path when validation not due', () => {
-  const work = { id: 'tsk-plan-1', stage: 'planning', domain: 'coding', workflow: 'feature' };
+  const work = { id: 'tsk-plan-1', workflowStep: 'planning', domain: 'coding', workflow: 'feature' };
   const choice = chooseStageOperation({
     work,
     contextSignals: { hasPlan: false, validationDue: false },
@@ -182,7 +182,7 @@ test('driver chooses primary path when validation not due', () => {
 });
 
 test('driver chooses validate-plan when plan.md is ready', () => {
-  const work = { id: 'tsk-plan-2', stage: 'planning', domain: 'coding', workflow: 'feature' };
+  const work = { id: 'tsk-plan-2', workflowStep: 'planning', domain: 'coding', workflow: 'feature' };
   const choice = chooseStageOperation({
     work,
     contextSignals: { hasPlan: true, validationDue: true },
@@ -194,8 +194,8 @@ test('driver chooses validate-plan when plan.md is ready', () => {
   assert.equal(choice.reason, 'plan-written-needs-reality-check');
 });
 
-test('driver sees current stage and legal operations via operationsForStage', () => {
-  const ops = operationsForStage('coding', 'planning', { kind: 'feature' });
+test('driver sees current step and legal operations via operationsForStep', () => {
+  const ops = operationsForStep(getDomain('coding'), 'planning');
   const opIds = ops.map((o) => o.id);
 
   assert.ok(opIds.includes('shape-plan'));
@@ -204,7 +204,7 @@ test('driver sees current stage and legal operations via operationsForStage', ()
   assert.ok(opIds.includes('resolve-question'));
 
   const choice = chooseStageOperation({
-    work: { id: 'tsk-ops-test', stage: 'planning', domain: 'coding' },
+    work: { id: 'tsk-ops-test', workflowStep: 'planning', domain: 'coding' },
     availableOperations: ops,
     contextSignals: { hasPlan: true },
   });
@@ -218,7 +218,7 @@ test('hasPlanMd detects presence of non-empty plan.md under docsRef', () => {
   const featureDir = path.join(tempDir, 'docs', 'history', 'feat-test');
   fs.mkdirSync(featureDir, { recursive: true });
 
-  const work = { id: 'tsk-feat-1', stage: 'planning', docsRef: 'docs/history/feat-test' };
+  const work = { id: 'tsk-feat-1', workflowStep: 'planning', docsRef: 'docs/history/feat-test' };
 
   assert.equal(hasPlanMd({ work, repoRoot: tempDir }), false);
 
@@ -231,17 +231,13 @@ test('validate-plan no-evidence does not move Work', async () => {
   seedTaskSpecs(tempDir, ['validate-plan']);
   const executorScript = writeNoEvidenceExecutor(tempDir);
 
-  const runnerConfig = {
-    executor: {
-      allowCrossProvider: true,
-      command: process.execPath,
-      args: [executorScript, '{prompt}'],
-    },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  const runnerConfig = { executor: {
+    allowCrossProvider: true,
+    command: process.execPath,
+    args: [executorScript, '{prompt}'],
+  }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
 
-  const work = { id: 'tsk-no-ev', status: 'doing', stage: 'planning', domain: 'coding' };
+  const work = { id: 'tsk-no-ev', status: 'doing', workflowStep: 'planning', domain: 'coding' };
   const choice = chooseStageOperation({
     work,
     contextSignals: { hasPlan: true, validationDue: true },
@@ -263,7 +259,7 @@ test('validate-plan no-evidence does not move Work', async () => {
 
   // Work object remains completely unchanged
   assert.equal(work.status, 'doing');
-  assert.equal(work.stage, 'planning');
+  assert.equal(work.workflowStep, 'planning');
 });
 
 test('validate-plan failed does not move Work', async () => {
@@ -271,17 +267,13 @@ test('validate-plan failed does not move Work', async () => {
   seedTaskSpecs(tempDir, ['validate-plan']);
   const executorScript = writeFailingExecutor(tempDir);
 
-  const runnerConfig = {
-    executor: {
-      allowCrossProvider: true,
-      command: process.execPath,
-      args: [executorScript, '{prompt}'],
-    },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  const runnerConfig = { executor: {
+    allowCrossProvider: true,
+    command: process.execPath,
+    args: [executorScript, '{prompt}'],
+  }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
 
-  const work = { id: 'tsk-fail-op', status: 'doing', stage: 'planning', domain: 'coding' };
+  const work = { id: 'tsk-fail-op', status: 'doing', workflowStep: 'planning', domain: 'coding' };
   const choice = chooseStageOperation({
     work,
     contextSignals: { hasPlan: true, validationDue: true },
@@ -302,7 +294,7 @@ test('validate-plan failed does not move Work', async () => {
 
   // Work object remains completely unchanged
   assert.equal(work.status, 'doing');
-  assert.equal(work.stage, 'planning');
+  assert.equal(work.workflowStep, 'planning');
 });
 
 test('reported READY allows existing planning edge path', async () => {
@@ -310,17 +302,13 @@ test('reported READY allows existing planning edge path', async () => {
   seedTaskSpecs(tempDir, ['validate-plan']);
   const executorScript = writeFakeExecutor(tempDir, { status: 'done', verdict: 'READY', summary: 'Feasible' });
 
-  const runnerConfig = {
-    executor: {
-      allowCrossProvider: true,
-      command: process.execPath,
-      args: [executorScript, '{prompt}'],
-    },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  const runnerConfig = { executor: {
+    allowCrossProvider: true,
+    command: process.execPath,
+    args: [executorScript, '{prompt}'],
+  }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
 
-  const work = { id: 'tsk-ready-op', status: 'doing', stage: 'planning', domain: 'coding' };
+  const work = { id: 'tsk-ready-op', status: 'doing', workflowStep: 'planning', domain: 'coding' };
   const choice = chooseStageOperation({
     work,
     contextSignals: { hasPlan: true, validationDue: true },
@@ -341,7 +329,7 @@ test('reported READY allows existing planning edge path', async () => {
 
   // Work object remains unchanged by assignment execution itself
   assert.equal(work.status, 'doing');
-  assert.equal(work.stage, 'planning');
+  assert.equal(work.workflowStep, 'planning');
 });
 
 test('driver chooses shape-plan after lastRunResult returned NOT READY', () => {
@@ -353,16 +341,16 @@ test('driver chooses shape-plan after lastRunResult returned NOT READY', () => {
     reportPath,
     '# Reality Gate & Feasibility Report\n' +
       '## Reality Gate Score\n' +
-      '- Mode fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Repo fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Assumptions: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Smaller path: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Proof surface: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Impact-analysis posture: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '## Feasibility Matrix\n- Feasible (citation: src/runner/dispatch/operation-choice.mjs)\n'
+      '- Mode fit: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Repo fit: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Assumptions: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Smaller path: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Proof surface: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Impact-analysis posture: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '## Feasibility Matrix\n- Feasible (citation: src/runner/operation-choice.mjs)\n'
   );
 
-  const work = { id: 'tsk-not-ready', stage: 'planning', domain: 'coding' };
+  const work = { id: 'tsk-not-ready', workflowStep: 'planning', domain: 'coding' };
   const lastRunResult = {
     status: 'done',
     confidence: 'reported',
@@ -372,14 +360,14 @@ test('driver chooses shape-plan after lastRunResult returned NOT READY', () => {
       verdict: 'NOT READY - RETURN TO PLANNING',
       summary: 'Gaps found',
       realityGate: {
-        'mode-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-        'repo-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-        'assumptions-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-        'smaller-path-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-        'proof-surface-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-        'impact-analysis-posture': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+        'mode-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+        'repo-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+        'assumptions-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+        'smaller-path-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+        'proof-surface-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+        'impact-analysis-posture': 'PASS (citation: src/runner/operation-choice.mjs)',
       },
-      feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/dispatch/operation-choice.mjs' }],
+      feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/operation-choice.mjs' }],
     },
     evidence: {
       artifacts: [reportPath],
@@ -400,8 +388,8 @@ test('driver chooses shape-plan after lastRunResult returned NOT READY', () => {
 });
 
 test('human-only operation is refused from auto-dispatch', () => {
-  const work = { id: 'tsk-human-op', stage: 'exploring', domain: 'coding' };
-  const ops = operationsForStage('coding', 'exploring', { kind: 'feature' });
+  const work = { id: 'tsk-human-op', workflowStep: 'exploring', domain: 'coding' };
+  const ops = operationsForStep(getDomain('coding'), 'exploring');
 
   const choice = chooseStageOperation({
     work,
@@ -426,7 +414,7 @@ test('Step 06 planning.validate-plan runs as Work-attached Assignment and stores
   const work = {
     id: 'tsk-step06-plan',
     status: 'doing',
-    stage: 'planning',
+    workflowStep: 'planning',
     domain: 'coding',
     workflow: 'feature',
   };
@@ -452,14 +440,14 @@ test('Step 06 planning.validate-plan runs as Work-attached Assignment and stores
   assertAssignmentRunFiles(tempDir, outcome.assignment.assignmentId);
 
   assert.equal(work.status, 'doing');
-  assert.equal(work.stage, 'planning');
+  assert.equal(work.workflowStep, 'planning');
 });
 
 test('Step 06 planning.validate-plan no-evidence stops safely and does not advance Work', async () => {
   const tempDir = mkTempDir();
   seedTaskSpecs(tempDir, ['validate-plan']);
   const executorScript = writeNoEvidenceExecutor(tempDir);
-  const work = { id: 'tsk-step06-noev', status: 'doing', stage: 'planning', domain: 'coding' };
+  const work = { id: 'tsk-step06-noev', status: 'doing', workflowStep: 'planning', domain: 'coding' };
   const choice = chooseStageOperation({
     work,
     contextSignals: { hasPlan: true, validationDue: true },
@@ -476,14 +464,14 @@ test('Step 06 planning.validate-plan no-evidence stops safely and does not advan
   assert.equal(outcome.stop, true);
   assert.equal(outcome.reason, 'assignment-validate-plan-no-evidence');
   assert.equal(work.status, 'doing');
-  assert.equal(work.stage, 'planning');
+  assert.equal(work.workflowStep, 'planning');
 });
 
 test('Step 06 planning.validate-plan failed stops safely and does not advance Work', async () => {
   const tempDir = mkTempDir();
   seedTaskSpecs(tempDir, ['validate-plan']);
   const executorScript = writeFailingExecutor(tempDir);
-  const work = { id: 'tsk-step06-failed', status: 'doing', stage: 'planning', domain: 'coding' };
+  const work = { id: 'tsk-step06-failed', status: 'doing', workflowStep: 'planning', domain: 'coding' };
   const choice = chooseStageOperation({
     work,
     contextSignals: { hasPlan: true, validationDue: true },
@@ -500,7 +488,7 @@ test('Step 06 planning.validate-plan failed stops safely and does not advance Wo
   assert.equal(outcome.stop, true);
   assert.equal(outcome.reason, 'assignment-validate-plan-failed');
   assert.equal(work.status, 'doing');
-  assert.equal(work.stage, 'planning');
+  assert.equal(work.workflowStep, 'planning');
 });
 
 test('Step 06 planning.validate-plan READY WITH CONSTRAINTS requires recorded constraints before advancing edge', () => {
@@ -512,13 +500,13 @@ test('Step 06 planning.validate-plan READY WITH CONSTRAINTS requires recorded co
     reportPath,
     '# Reality Gate & Feasibility Report\n' +
       '## Reality Gate Score\n' +
-      '- Mode fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Repo fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Assumptions: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Smaller path: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Proof surface: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Impact-analysis posture: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '## Feasibility Matrix\n- Feasible (citation: src/runner/dispatch/operation-choice.mjs)\n'
+      '- Mode fit: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Repo fit: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Assumptions: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Smaller path: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Proof surface: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Impact-analysis posture: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '## Feasibility Matrix\n- Feasible (citation: src/runner/operation-choice.mjs)\n'
   );
 
   const lastRunResult = {
@@ -530,14 +518,14 @@ test('Step 06 planning.validate-plan READY WITH CONSTRAINTS requires recorded co
       verdict: 'READY WITH CONSTRAINTS',
       summary: 'Proceed only after constraints are captured',
       realityGate: {
-        'mode-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-        'repo-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-        'assumptions-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-        'smaller-path-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-        'proof-surface-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-        'impact-analysis-posture': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+        'mode-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+        'repo-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+        'assumptions-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+        'smaller-path-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+        'proof-surface-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+        'impact-analysis-posture': 'PASS (citation: src/runner/operation-choice.mjs)',
       },
-      feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/dispatch/operation-choice.mjs' }],
+      feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/operation-choice.mjs' }],
     },
     evidence: {
       artifacts: [reportPath],
@@ -571,17 +559,17 @@ test('Step 06 planning.validate-plan bare done claim without verdict cannot adva
     reportPath,
     '# Reality Gate & Feasibility Report\n' +
       '## Reality Gate Score\n' +
-      '- Mode fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Repo fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Assumptions: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Smaller path: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Proof surface: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Impact-analysis posture: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '## Feasibility Matrix\n- Feasible (citation: src/runner/dispatch/operation-choice.mjs)\n'
+      '- Mode fit: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Repo fit: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Assumptions: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Smaller path: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Proof surface: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Impact-analysis posture: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '## Feasibility Matrix\n- Feasible (citation: src/runner/operation-choice.mjs)\n'
   );
 
   const choice = chooseStageOperation({
-    work: { id: 'tsk-weak-result', stage: 'planning', domain: 'coding' },
+    work: { id: 'tsk-weak-result', workflowStep: 'planning', domain: 'coding' },
     contextSignals: { hasPlan: true },
     repoRoot: tempDir,
     lastRunResult: {
@@ -592,14 +580,14 @@ test('Step 06 planning.validate-plan bare done claim without verdict cannot adva
         status: 'done',
         summary: 'Looks acceptable',
         realityGate: {
-          'mode-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-          'repo-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-          'assumptions-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-          'smaller-path-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-          'proof-surface-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-          'impact-analysis-posture': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+          'mode-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+          'repo-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+          'assumptions-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+          'smaller-path-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+          'proof-surface-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+          'impact-analysis-posture': 'PASS (citation: src/runner/operation-choice.mjs)',
         },
-        feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/dispatch/operation-choice.mjs' }],
+        feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/operation-choice.mjs' }],
       },
       evidence: {
         artifacts: [reportPath],
@@ -628,7 +616,7 @@ test('Step 06 executing.review-item reject routes to fix operation without lifec
   const work = {
     id: 'tsk-step06-review',
     status: 'doing',
-    stage: 'executing',
+    workflowStep: 'executing',
     domain: 'coding',
     refs: ['evidence:candidate-diff', 'evidence:verify-fail'],
   };
@@ -655,7 +643,7 @@ test('Step 06 executing.review-item reject routes to fix operation without lifec
   assert.equal(outcome.reason, 'review-item-rejected-route-fix');
   assertAssignmentRunFiles(tempDir, outcome.assignment.assignmentId);
   assert.equal(work.status, 'doing');
-  assert.equal(work.stage, 'executing');
+  assert.equal(work.workflowStep, 'executing');
 });
 
 test('Step 06 executing.review-item approval is not a Work lifecycle edge', () => {
@@ -904,7 +892,7 @@ test('driver loop runOnce: validate-plan no-evidence keeps Work in planning with
   addWork(tempDir, {
     id: 'tsk-driver-noev',
     title: 'Test no evidence driver loop',
-    stage: 'planning',
+    workflowStep: 'planning',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -922,7 +910,7 @@ test('driver loop runOnce: validate-plan no-evidence keeps Work in planning with
   await runOnce({ dir: tempDir, repoRoot: tempDir, config: cfg });
 
   const item = listWork(tempDir).work['tsk-driver-noev'];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
 });
 
 test('driver loop runOnce: validate-plan failed keeps Work in planning without advancing stage', async () => {
@@ -938,7 +926,7 @@ test('driver loop runOnce: validate-plan failed keeps Work in planning without a
   addWork(tempDir, {
     id: 'tsk-driver-fail',
     title: 'Test failed driver loop',
-    stage: 'planning',
+    workflowStep: 'planning',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -956,7 +944,7 @@ test('driver loop runOnce: validate-plan failed keeps Work in planning without a
   await runOnce({ dir: tempDir, repoRoot: tempDir, config: cfg });
 
   const item = listWork(tempDir).work['tsk-driver-fail'];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
 });
 
 test('driver loop runOnce: validate-plan reported READY advances Work from planning to executing', async () => {
@@ -972,7 +960,7 @@ test('driver loop runOnce: validate-plan reported READY advances Work from plann
   addWork(tempDir, {
     id: 'tsk-driver-ready',
     title: 'Test ready driver loop',
-    stage: 'planning',
+    workflowStep: 'planning',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -990,13 +978,13 @@ test('driver loop runOnce: validate-plan reported READY advances Work from plann
   await runOnce({ dir: tempDir, repoRoot: tempDir, config: cfg });
 
   const item = listWork(tempDir).work['tsk-driver-ready'];
-  assert.equal(item.stage, 'executing');
+  assert.equal(item.workflowStep, 'executing');
 });
 
 test('buildAssignment populates contextRefs and expectedOutputs when work has docsRef (Finding 1)', () => {
   const work = {
     id: 'tsk-refs-1',
-    stage: 'planning',
+    workflowStep: 'planning',
     domain: 'coding',
     workflow: 'feature',
     docsRef: 'docs/history/feat-refs',
@@ -1026,6 +1014,7 @@ test('executeAssignment rejects execution of an undeclared operation (Finding 3)
     workflow: 'feature',
     stage: 'planning',
     operation: 'nonexistent-operation',
+    provenance: { kind: 'declared', declared: { legalOperations: ['shape-plan', 'validate-plan'] } },
     dispatch: 'assignment',
     taskSpec: 'validate-plan.md',
   };
@@ -1053,6 +1042,7 @@ test('executeAssignment re-checks legality after loading persisted assignment.js
     workflow: 'feature',
     stage: 'exploring',
     operation: 'answer-question',
+    provenance: { kind: 'declared', declared: { legalOperations: ['lock-decisions', 'answer-question'] } },
     dispatch: 'human-only',
     taskSpec: 'answer-question.md',
   };
@@ -1064,6 +1054,7 @@ test('executeAssignment re-checks legality after loading persisted assignment.js
     workflow: 'feature',
     stage: 'planning',
     operation: 'validate-plan',
+    provenance: { kind: 'declared', declared: { legalOperations: ['shape-plan', 'validate-plan'] } },
     dispatch: 'assignment',
     taskSpec: 'validate-plan.md',
   };
@@ -1079,7 +1070,7 @@ test('executeAssignment re-checks legality after loading persisted assignment.js
 test('chooseStageOperation accepts domain passed as object without throwing or warning (Finding 5)', () => {
   const domainObj = { name: 'coding', stages: ['discovery', 'planning', 'executing'] };
   const choice = chooseStageOperation({
-    work: { id: 'tsk-dom-obj', stage: 'planning' },
+    work: { id: 'tsk-dom-obj', workflowStep: 'planning' },
     stage: 'planning',
     domain: domainObj,
     workflow: 'feature',
@@ -1102,7 +1093,7 @@ test('driver loop runOnce: validate-plan with READY ignores reviewer verdictPayl
   addWork(tempDir, {
     id: 'tsk-driver-decomp',
     title: 'Test decompose driver loop',
-    stage: 'planning',
+    workflowStep: 'planning',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -1130,7 +1121,7 @@ test('driver loop runOnce: validate-plan with READY ignores reviewer verdictPayl
 
   const view = listWork(tempDir);
   const rootItem = view.work['tsk-driver-decomp'];
-  assert.equal(rootItem.stage, 'planning');
+  assert.equal(rootItem.workflowStep, 'planning');
 
   const childItems = Object.values(view.work).filter((w) => w.id.startsWith('tsk-driver-decomp-'));
   assert.equal(childItems.length, 0);
@@ -1149,7 +1140,7 @@ test('driver loop runOnce: validate-plan with READY ignores reviewer verdictPayl
   addWork(tempDir, {
     id: 'tsk-driver-human',
     title: 'Test human driver loop',
-    stage: 'planning',
+    workflowStep: 'planning',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -1172,7 +1163,7 @@ test('driver loop runOnce: validate-plan with READY ignores reviewer verdictPayl
 
   const item = listWork(tempDir).work['tsk-driver-human'];
   assert.equal(item.status, 'todo');
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
 });
 
 test('driver loop runOnce: validate-plan with READY WITH CONSTRAINTS and worker self-claim alone STOPS in planning (Finding P2 fix)', async () => {
@@ -1188,7 +1179,7 @@ test('driver loop runOnce: validate-plan with READY WITH CONSTRAINTS and worker 
   addWork(tempDir, {
     id: 'tsk-driver-unrecorded',
     title: 'Test unrecorded constraints driver loop',
-    stage: 'planning',
+    workflowStep: 'planning',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -1211,7 +1202,7 @@ test('driver loop runOnce: validate-plan with READY WITH CONSTRAINTS and worker 
   await runOnce({ dir: tempDir, repoRoot: tempDir, config: cfg });
 
   const item = listWork(tempDir).work['tsk-driver-unrecorded'];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
 });
 
 test('driver loop runOnce: validate-plan modifying dirty-before plan.md fails closed and does not advance Work (Finding 2 fix)', async () => {
@@ -1227,7 +1218,7 @@ test('driver loop runOnce: validate-plan modifying dirty-before plan.md fails cl
   addWork(tempDir, {
     id: 'tsk-driver-recorded',
     title: 'Test recorded constraints driver loop',
-    stage: 'planning',
+    workflowStep: 'planning',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -1250,7 +1241,7 @@ test('driver loop runOnce: validate-plan modifying dirty-before plan.md fails cl
   await runOnce({ dir: tempDir, repoRoot: tempDir, config: cfg });
 
   const item = listWork(tempDir).work['tsk-driver-recorded'];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
 });
 
 test('interpretAssignmentRunResult maps REJECTED verdict to NOT READY - RETURN TO PLANNING (Finding 3)', () => {
@@ -1262,13 +1253,13 @@ test('interpretAssignmentRunResult maps REJECTED verdict to NOT READY - RETURN T
     reportPath,
     '# Reality Gate & Feasibility Report\n' +
       '## Reality Gate Score\n' +
-      '- Mode fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Repo fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Assumptions: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Smaller path: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Proof surface: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Impact-analysis posture: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '## Feasibility Matrix\n- Feasible (citation: src/runner/dispatch/operation-choice.mjs)\n'
+      '- Mode fit: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Repo fit: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Assumptions: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Smaller path: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Proof surface: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Impact-analysis posture: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '## Feasibility Matrix\n- Feasible (citation: src/runner/operation-choice.mjs)\n'
   );
 
   const res = interpretAssignmentRunResult({
@@ -1282,14 +1273,14 @@ test('interpretAssignmentRunResult maps REJECTED verdict to NOT READY - RETURN T
         verdict: 'REJECTED',
         summary: 'Plan rejected',
         realityGate: {
-          'mode-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-          'repo-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-          'assumptions-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-          'smaller-path-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-          'proof-surface-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-          'impact-analysis-posture': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+          'mode-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+          'repo-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+          'assumptions-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+          'smaller-path-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+          'proof-surface-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+          'impact-analysis-posture': 'PASS (citation: src/runner/operation-choice.mjs)',
         },
-        feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/dispatch/operation-choice.mjs' }],
+        feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/operation-choice.mjs' }],
       },
       evidence: {
         artifacts: [reportPath],
@@ -1311,7 +1302,7 @@ test('Step 06 executing.scout-blast-radius report with fake executor stores all 
     summary: 'Scouted 3 affected files and 2 exported symbols',
     findings: [{ file: 'src/core.js', symbol: 'execute' }],
   });
-  const work = { id: 'tsk-step06-scout', status: 'doing', stage: 'executing', domain: 'coding' };
+  const work = { id: 'tsk-step06-scout', status: 'doing', workflowStep: 'executing', domain: 'coding' };
   const choice = chooseStageOperation({
     work,
     contextSignals: { secondaryOperation: 'scout-blast-radius' },
@@ -1332,7 +1323,7 @@ test('Step 06 executing.scout-blast-radius report with fake executor stores all 
   assert.equal(outcome.reason, 'scout-blast-radius-reported');
   assertAssignmentRunFiles(tempDir, outcome.assignment.assignmentId);
   assert.equal(work.status, 'doing');
-  assert.equal(work.stage, 'executing');
+  assert.equal(work.workflowStep, 'executing');
 });
 
 test('Step 06 executing.scout-blast-radius mutating repository state fails closed and stops driver execution', async () => {
@@ -1352,7 +1343,7 @@ test('Step 06 executing.scout-blast-radius mutating repository state fails close
       const resultPath = match[1];
       const runDir = path.dirname(resultPath);
       fs.mkdirSync(runDir, { recursive: true });
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Scout Report\\nSymbol: chooseStageOperation in src/runner/dispatch/operation-choice.mjs\\nSearch posture: active rg cross-check\\n');
+      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Scout Report\\nSymbol: chooseStageOperation in src/runner/operation-choice.mjs\\nSearch posture: active rg cross-check\\n');
       fs.writeFileSync(resultPath, JSON.stringify({ status: 'done', summary: 'Scouted 2 symbols' }));
     }
     fs.writeFileSync(path.join(process.cwd(), 'accidental.txt'), 'unintended mutation\\n');
@@ -1363,7 +1354,7 @@ test('Step 06 executing.scout-blast-radius mutating repository state fails close
   const work = {
     id: 'tsk-scout-mutate',
     status: 'doing',
-    stage: 'executing',
+    workflowStep: 'executing',
     domain: 'coding',
     secondaryOperation: 'scout-blast-radius',
   };
@@ -1711,7 +1702,7 @@ test('Step 06 governance-blocked or failed executor returns a stop without advan
   fs.writeFileSync(path.join(tempDir, 'verify.log'), 'VERIFY: PASS\n');
   seedTaskSpecs(tempDir, ['review-item']);
   const executorScript = writeFailingExecutor(tempDir);
-  const work = { id: 'tsk-step06-fail', status: 'doing', stage: 'executing', domain: 'coding', refs: ['diff:candidate-1', 'verify:pass'] };
+  const work = { id: 'tsk-step06-fail', status: 'doing', workflowStep: 'executing', domain: 'coding', refs: ['diff:candidate-1', 'verify:pass'] };
   const choice = chooseStageOperation({
     work,
     contextSignals: { secondaryOperation: 'review-item' },
@@ -1732,7 +1723,7 @@ test('Step 06 governance-blocked or failed executor returns a stop without advan
   assert.equal(outcome.stop, true);
   assert.equal(outcome.reason, 'assignment-review-item-failed');
   assert.equal(work.status, 'doing');
-  assert.equal(work.stage, 'executing');
+  assert.equal(work.workflowStep, 'executing');
 });
 
 test('Step 06 Herdr and visibility tracking fields do not alter confidence ladder judgment', () => {
@@ -1743,13 +1734,13 @@ test('Step 06 Herdr and visibility tracking fields do not alter confidence ladde
     path.join(runDir, 'agent-report.md'),
     '# Reality Gate & Feasibility Report\n' +
       '## Reality Gate Score\n' +
-      '- Mode fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Repo fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Assumptions: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Smaller path: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Proof surface: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Impact-analysis posture: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '## Feasibility Matrix\n- Feasible (citation: src/runner/dispatch/operation-choice.mjs)\n'
+      '- Mode fit: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Repo fit: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Assumptions: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Smaller path: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Proof surface: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Impact-analysis posture: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '## Feasibility Matrix\n- Feasible (citation: src/runner/operation-choice.mjs)\n'
   );
 
   const resWithHerdr = interpretAssignmentRunResult({
@@ -1763,14 +1754,14 @@ test('Step 06 Herdr and visibility tracking fields do not alter confidence ladde
         verdict: 'READY',
         summary: 'Plan validated',
         realityGate: {
-          'mode-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-          'repo-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-          'assumptions-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-          'smaller-path-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-          'proof-surface-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-          'impact-analysis-posture': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+          'mode-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+          'repo-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+          'assumptions-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+          'smaller-path-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+          'proof-surface-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+          'impact-analysis-posture': 'PASS (citation: src/runner/operation-choice.mjs)',
         },
-        feasibilityMatrix: [{ risk: 'Risk 1', rating: 'Low', citation: 'src/runner/dispatch/operation-choice.mjs' }],
+        feasibilityMatrix: [{ risk: 'Risk 1', rating: 'Low', citation: 'src/runner/operation-choice.mjs' }],
         herdrStatus: 'active',
         herdrPane: 'pane-42',
         visibility: 'internal',
@@ -1802,18 +1793,18 @@ test('chooseStageOperation with lastRunResult READY WITH CONSTRAINTS verifies pl
     path.join(runDir, 'agent-report.md'),
     '# Reality Gate & Feasibility Report\n' +
       '## Reality Gate Score\n' +
-      '- Mode fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Repo fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Assumptions: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Smaller path: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Proof surface: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Impact-analysis posture: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '## Feasibility Matrix\n- Low risk (verified: src/runner/dispatch/operation-choice.mjs)\n'
+      '- Mode fit: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Repo fit: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Assumptions: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Smaller path: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Proof surface: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Impact-analysis posture: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '## Feasibility Matrix\n- Low risk (verified: src/runner/operation-choice.mjs)\n'
   );
 
   const work = {
     id: 'tsk-resume-constraints',
-    stage: 'planning',
+    workflowStep: 'planning',
     domain: 'coding',
     workflow: 'feature',
     docsRef: 'docs/history/feat-resume-constraints',
@@ -1828,14 +1819,14 @@ test('chooseStageOperation with lastRunResult READY WITH CONSTRAINTS verifies pl
       verdict: 'READY WITH CONSTRAINTS',
       summary: 'Plan ready with constraints',
       realityGate: {
-        'mode-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-        'repo-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-        'assumptions-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-        'smaller-path-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-        'proof-surface-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-        'impact-analysis-posture': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+        'mode-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+        'repo-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+        'assumptions-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+        'smaller-path-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+        'proof-surface-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+        'impact-analysis-posture': 'PASS (citation: src/runner/operation-choice.mjs)',
       },
-      feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/dispatch/operation-choice.mjs' }],
+      feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/operation-choice.mjs' }],
     },
     evidence: { artifacts: [path.join(runDir, 'agent-report.md')] },
   };
@@ -1861,13 +1852,13 @@ test('interpretAssignmentRunResult rejects out-of-protocol top-level verdict "de
     path.join(runDir, 'agent-report.md'),
     '# Reality Gate & Feasibility Report\n' +
       '## Reality Gate Score\n' +
-      '- Mode fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Repo fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Assumptions: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Smaller path: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Proof surface: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '- Impact-analysis posture: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-      '## Feasibility Matrix\n- Feasible (citation: src/runner/dispatch/operation-choice.mjs)\n'
+      '- Mode fit: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Repo fit: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Assumptions: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Smaller path: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Proof surface: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '- Impact-analysis posture: PASS (citation: src/runner/operation-choice.mjs)\n' +
+      '## Feasibility Matrix\n- Feasible (citation: src/runner/operation-choice.mjs)\n'
   );
 
   const res = interpretAssignmentRunResult({
@@ -1881,14 +1872,14 @@ test('interpretAssignmentRunResult rejects out-of-protocol top-level verdict "de
         verdict: 'decompose',
         summary: 'Invalid top-level verdict',
         realityGate: {
-          'mode-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-          'repo-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-          'assumptions-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-          'smaller-path-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-          'proof-surface-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-          'impact-analysis-posture': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+          'mode-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+          'repo-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+          'assumptions-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+          'smaller-path-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+          'proof-surface-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+          'impact-analysis-posture': 'PASS (citation: src/runner/operation-choice.mjs)',
         },
-        feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/dispatch/operation-choice.mjs' }],
+        feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/operation-choice.mjs' }],
       },
       evidence: {
         artifacts: [path.join(runDir, 'agent-report.md')],
@@ -1903,7 +1894,7 @@ test('interpretAssignmentRunResult rejects out-of-protocol top-level verdict "de
 });
 
 test('chooseStageOperation ignores secondaryOperation equal to primaryOp.id in planning (Finding P2 fix)', () => {
-  const work = { id: 'tsk-plan-primary', stage: 'planning', domain: 'coding' };
+  const work = { id: 'tsk-plan-primary', workflowStep: 'planning', domain: 'coding' };
   const choice = chooseStageOperation({
     work,
     stage: 'planning',
@@ -1917,7 +1908,7 @@ test('chooseStageOperation ignores secondaryOperation equal to primaryOp.id in p
 });
 
 test('chooseStageOperation ignores secondaryOperation equal to primaryOp.id in executing (Finding P2 fix)', () => {
-  const work = { id: 'tsk-exec-primary', stage: 'executing', domain: 'coding' };
+  const work = { id: 'tsk-exec-primary', workflowStep: 'executing', domain: 'coding' };
   const choice = chooseStageOperation({
     work,
     stage: 'executing',
@@ -2224,7 +2215,7 @@ test('Fix Round 1: scout-blast-radius posture with technique-word only (no state
   fs.mkdirSync(runDir, { recursive: true });
   fs.writeFileSync(path.join(runDir, 'agent-report.md'),
     '# Scout Report\n' +
-    'Symbol: chooseStageOperation in src/runner/dispatch/operation-choice.mjs\n' +
+    'Symbol: chooseStageOperation in src/runner/operation-choice.mjs\n' +
     'Used the dependency graph to trace callers via rg.\n' +
     'Affected callers: src/runner/loop.mjs\n' +
     'Affected processes: none\n' +
@@ -2255,7 +2246,7 @@ test('Fix Round 1: scout-blast-radius posture naming active/full without rg cros
   fs.mkdirSync(runDir, { recursive: true });
   fs.writeFileSync(path.join(runDir, 'agent-report.md'),
     '# Scout Report\n' +
-    'Symbol: chooseStageOperation in src/runner/dispatch/operation-choice.mjs\n' +
+    'Symbol: chooseStageOperation in src/runner/operation-choice.mjs\n' +
     'Search posture: active.\n' +
     'Affected callers: src/runner/loop.mjs\n' +
     'Affected processes: none\n' +
@@ -2284,7 +2275,7 @@ test('Fix Round 1: scout-blast-radius posture naming degraded/inactive WITHOUT r
   fs.mkdirSync(runDir, { recursive: true });
   fs.writeFileSync(path.join(runDir, 'agent-report.md'),
     '# Scout Report\n' +
-    'Symbol: chooseStageOperation in src/runner/dispatch/operation-choice.mjs\n' +
+    'Symbol: chooseStageOperation in src/runner/operation-choice.mjs\n' +
     'Search posture: degraded.\n' +
     'Affected callers: src/runner/loop.mjs\n' +
     'Affected processes: none\n' +
@@ -2315,7 +2306,7 @@ test('Fix Round 1: scout-blast-radius posture naming degraded/inactive WITH rg c
   fs.mkdirSync(runDir, { recursive: true });
   fs.writeFileSync(path.join(runDir, 'agent-report.md'),
     '# Scout Report\n' +
-    'Symbol: chooseStageOperation in src/runner/dispatch/operation-choice.mjs\n' +
+    'Symbol: chooseStageOperation in src/runner/operation-choice.mjs\n' +
     'Search posture: degraded, backed by an rg cross-check of direct callers.\n' +
     'Affected callers: src/runner/loop.mjs\n' +
     'Affected processes: none\n' +
@@ -2370,7 +2361,7 @@ test('P2 fix: chooseStageOperation review-item lastRunResult with missing report
   const choice = chooseStageOperation({
     work: {
       id: 'tsk',
-      stage: 'executing',
+      workflowStep: 'executing',
       domain: 'coding',
       workflow: 'feature',
       refs: ['evidence:candidate-diff', 'evidence:verify-fail'],
@@ -2408,13 +2399,13 @@ test('Positive tests: real valid reports for validate-plan, review-item, scout-b
   fs.writeFileSync(path.join(valDir, 'agent-report.md'),
     '# Reality Gate & Feasibility Report\n' +
     '## Reality Gate Score\n' +
-    '- Mode fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-    '- Repo fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-    '- Assumptions: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-    '- Smaller path: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-    '- Proof surface: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-    '- Impact-analysis posture: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-    '## Feasibility Matrix\n- Risk 1: Low (verified: src/runner/dispatch/operation-choice.mjs)\n'
+    '- Mode fit: PASS (citation: src/runner/operation-choice.mjs)\n' +
+    '- Repo fit: PASS (citation: src/runner/operation-choice.mjs)\n' +
+    '- Assumptions: PASS (citation: src/runner/operation-choice.mjs)\n' +
+    '- Smaller path: PASS (citation: src/runner/operation-choice.mjs)\n' +
+    '- Proof surface: PASS (citation: src/runner/operation-choice.mjs)\n' +
+    '- Impact-analysis posture: PASS (citation: src/runner/operation-choice.mjs)\n' +
+    '## Feasibility Matrix\n- Risk 1: Low (verified: src/runner/operation-choice.mjs)\n'
   );
   const resVal = interpretAssignmentRunResult({
     choice: { operation: 'validate-plan' },
@@ -2427,15 +2418,15 @@ test('Positive tests: real valid reports for validate-plan, review-item, scout-b
         verdict: 'READY',
         summary: 'Plan is ready',
         realityGate: {
-          'mode-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-          'repo-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-          'assumptions-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-          'smaller-path-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-          'proof-surface-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-          'impact-analysis-posture': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+          'mode-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+          'repo-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+          'assumptions-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+          'smaller-path-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+          'proof-surface-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+          'impact-analysis-posture': 'PASS (citation: src/runner/operation-choice.mjs)',
         },
         feasibilityMatrix: [
-          { risk: 'Risk 1', rating: 'Low', citation: 'src/runner/dispatch/operation-choice.mjs' },
+          { risk: 'Risk 1', rating: 'Low', citation: 'src/runner/operation-choice.mjs' },
         ],
       },
       evidence: { artifacts: [path.join(valDir, 'agent-report.md')] },
@@ -2482,7 +2473,7 @@ test('Positive tests: real valid reports for validate-plan, review-item, scout-b
   fs.mkdirSync(scoutDir, { recursive: true });
   fs.writeFileSync(path.join(scoutDir, 'agent-report.md'),
     '# Scout Report\n' +
-    'Symbol: chooseStageOperation in src/runner/dispatch/operation-choice.mjs\n' +
+    'Symbol: chooseStageOperation in src/runner/operation-choice.mjs\n' +
     'Search posture: active rg cross-check performed.\n' +
     'Affected callers: src/runner/loop.mjs\n' +
     'Affected processes: none\n' +
@@ -2508,7 +2499,7 @@ test('Positive tests: real valid reports for validate-plan, review-item, scout-b
   fs.writeFileSync(path.join(resDir, 'agent-report.md'),
     '# Question Resolution Report\n' +
     'Answer: repoRoot parameter is passed to interpretAssignmentRunResult.\n' +
-    'Citations: ref: src/runner/dispatch/operation-choice.mjs:L285\n' +
+    'Citations: ref: src/runner/operation-choice.mjs:L285\n' +
     'Verdict: clear\n' +
     'Remaining uncertainty: None.\n'
   );
@@ -2778,7 +2769,7 @@ test('Finding 2: executeAssignment fails closed on read-only validate-plan mutat
   addWork(tempDir, {
     id: 'tsk-iso-val',
     title: 'Test isolation for validate-plan',
-    stage: 'planning',
+    workflowStep: 'planning',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -2950,7 +2941,7 @@ test('Finding 1 regression test: valid validate-plan NOT READY RunResult causes 
   addWork(tempDir, {
     id: 'tsk-driver-notready',
     title: 'Test NOT READY driver loop',
-    stage: 'planning',
+    workflowStep: 'planning',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -2973,7 +2964,7 @@ test('Finding 1 regression test: valid validate-plan NOT READY RunResult causes 
   await runOnce({ dir: tempDir, repoRoot: tempDir, config: cfg });
 
   const itemAfterFirst = listWork(tempDir).work['tsk-driver-notready'];
-  assert.equal(itemAfterFirst.stage, 'planning', 'Work must remain in planning stage');
+  assert.equal(itemAfterFirst.workflowStep, 'planning', 'Work must remain in planning stage');
 
   // Second pass: chooseStageOperation must choose shape-plan, not validate-plan
   const choiceOnNextPass = chooseStageOperation({
@@ -3139,7 +3130,7 @@ test('Finding 3: chooseStageOperation ignores stale stored READY result when pla
 
   const work = {
     id: 'tsk-stale-ready',
-    stage: 'planning',
+    workflowStep: 'planning',
     domain: 'coding',
     workflow: 'feature',
     docsRef: 'docs/history/feat-stale',
@@ -3198,7 +3189,7 @@ test('Finding 3: chooseStageOperation ignores stale stored READY result when pla
 
   const work = {
     id,
-    stage: 'planning',
+    workflowStep: 'planning',
     domain: 'coding',
     workflow: 'feature',
     docsRef,
@@ -3250,7 +3241,7 @@ test('Finding 3: chooseStageOperation ignores latest non-validate assignment res
 
   const work = {
     id: 'tsk-nonval-op',
-    stage: 'planning',
+    workflowStep: 'planning',
     domain: 'coding',
     workflow: 'feature',
     docsRef: 'docs/history/feat-nonval',
@@ -3288,7 +3279,7 @@ test('Finding 4: review-item selected without work.refs or candidate diff/verify
   const tempDir = mkTempDir();
   const work = {
     id: 'tsk-no-refs',
-    stage: 'executing',
+    workflowStep: 'executing',
     domain: 'coding',
     workflow: 'feature',
     refs: [],
@@ -3318,7 +3309,7 @@ test('Finding 4: review-item happy path with candidate implementation signal bin
   execFileSync('git', ['checkout', 'main'], { cwd: tempDir });
   const work = {
     id: 'tsk-candidate-refs',
-    stage: 'executing',
+    workflowStep: 'executing',
     domain: 'coding',
     workflow: 'feature',
     refs: ['diff:feat-1', 'verify:pass-1'],
@@ -3377,7 +3368,7 @@ test('P1 fix: review-item with hasCandidateImplementation: true but no real diff
   const tempDir = mkTempDir();
   const work = {
     id: 'tsk-candidate-no-real-refs',
-    stage: 'executing',
+    workflowStep: 'executing',
     domain: 'coding',
     workflow: 'feature',
     refs: [],
@@ -3401,7 +3392,7 @@ test('P1 fix: review-item approval fails when only fabricated synthetic placehol
   const tempDir = mkTempDir();
   const work = {
     id: 'tsk-candidate-approval-fail',
-    stage: 'executing',
+    workflowStep: 'executing',
     domain: 'coding',
     workflow: 'feature',
     refs: [],
@@ -3440,7 +3431,7 @@ test('P1 fix: review-item happy path with real bound diff/verify refs still pass
   execFileSync('git', ['checkout', 'main'], { cwd: tempDir });
   const work = {
     id: 'tsk-real-bound-refs',
-    stage: 'executing',
+    workflowStep: 'executing',
     domain: 'coding',
     workflow: 'feature',
     refs: ['diff:patch-01', 'verify:pass-01'],
@@ -3472,7 +3463,7 @@ test('P1 fix: review-item in actual git repo with bogus refs (diff:patch-01, ver
 
   const work = {
     id: 'tsk-bogus-refs',
-    stage: 'executing',
+    workflowStep: 'executing',
     verify: 'node -e "process.exit(0)"',
     refs: ['diff:patch-01', 'verify:pass-01'],
   };
@@ -3560,7 +3551,7 @@ test('P2 fix: stale validate-plan check does not crash when lastRunResult is pro
 
   const work = {
     id: 'tsk-stale-stat-test',
-    stage: 'planning',
+    workflowStep: 'planning',
     domain: 'coding',
     workflow: 'feature',
     docsRef: 'docs/history/feat-stale-test',
@@ -3604,7 +3595,7 @@ test('Finding 1 regression test: Assignment-backed validate-plan with returned c
   addWork(tempDir, {
     id: 'tsk-val-no-children',
     title: 'Test validate-plan cannot decompose',
-    stage: 'planning',
+    workflowStep: 'planning',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -4014,21 +4005,21 @@ test('Finding 4: scout-blast-radius file-only and posture-only reports fail clos
 });
 
 test('Finding 1 regression tests: misspelled executing-stage markers like review-itm and fix-verfy-red stop without primary implementation dispatch', () => {
-  const workReviewTypo = { id: 'tsk-1', stage: 'executing', domain: 'coding', secondaryOperation: 'review-itm' };
+  const workReviewTypo = { id: 'tsk-1', workflowStep: 'executing', domain: 'coding', secondaryOperation: 'review-itm' };
   const choiceReviewTypo = chooseStageOperation({ work: workReviewTypo });
   assert.equal(choiceReviewTypo.stop, true);
   assert.equal(choiceReviewTypo.dispatch, null);
   assert.equal(choiceReviewTypo.operation, 'review-itm');
   assert.equal(choiceReviewTypo.reason, 'undeclared-stage-operation-review-itm');
 
-  const workFixTypo = { id: 'tsk-2', stage: 'executing', domain: 'coding', nextOperation: 'fix-verfy-red' };
+  const workFixTypo = { id: 'tsk-2', workflowStep: 'executing', domain: 'coding', nextOperation: 'fix-verfy-red' };
   const choiceFixTypo = chooseStageOperation({ work: workFixTypo });
   assert.equal(choiceFixTypo.stop, true);
   assert.equal(choiceFixTypo.dispatch, null);
   assert.equal(choiceFixTypo.operation, 'fix-verfy-red');
   assert.equal(choiceFixTypo.reason, 'undeclared-stage-operation-fix-verfy-red');
 
-  const workNoMarker = { id: 'tsk-3', stage: 'executing', domain: 'coding' };
+  const workNoMarker = { id: 'tsk-3', workflowStep: 'executing', domain: 'coding' };
   const choiceNoMarker = chooseStageOperation({ work: workNoMarker });
   assert.equal(choiceNoMarker.stop, false);
   assert.equal(choiceNoMarker.dispatch, 'direct-stage-skill');
@@ -4038,7 +4029,7 @@ test('Finding 1 regression tests: misspelled executing-stage markers like review
 test('Finding 2 regression tests: keyword-only paths like docs/test-plan.md and docs/difficulty-notes.md cannot satisfy review evidence', () => {
   const workDiffPlusDoc = {
     id: 'tsk-rev-bind',
-    stage: 'executing',
+    workflowStep: 'executing',
     domain: 'coding',
     refs: ['diff:candidate-1', 'docs/test-plan.md'],
   };
@@ -4047,7 +4038,7 @@ test('Finding 2 regression tests: keyword-only paths like docs/test-plan.md and 
 
   const workDocPlusVerify = {
     id: 'tsk-rev-bind2',
-    stage: 'executing',
+    workflowStep: 'executing',
     domain: 'coding',
     refs: ['docs/difficulty-notes.md', 'verify:pass'],
   };
@@ -4056,7 +4047,7 @@ test('Finding 2 regression tests: keyword-only paths like docs/test-plan.md and 
 
   const validDiffAndVerify = {
     id: 'tsk-rev-bind3',
-    stage: 'executing',
+    workflowStep: 'executing',
     domain: 'coding',
     refs: ['diff:candidate-1', 'verify:pass'],
     verify: 'node -e "process.exit(0)"',
@@ -4099,7 +4090,7 @@ test('Finding 2 regression tests: keyword-only paths like docs/test-plan.md and 
 
 test('Finding 3 regression tests: executeDriverOperationChoice stopped choices never spawn and human-only choices are non-executed', async () => {
   const tempDir = mkTempDir();
-  const work = { id: 'tsk-stopped-choice', stage: 'executing', domain: 'coding' };
+  const work = { id: 'tsk-stopped-choice', workflowStep: 'executing', domain: 'coding' };
 
   const stoppedChoice = {
     operation: 'review-item',
@@ -4203,7 +4194,7 @@ test('Finding 1 fix: non-tiny/non-small plan where validate-plan returns READY a
   addWork(tempDir, {
     id: 'tsk-med-decomp',
     title: 'Test medium decompose driver loop',
-    stage: 'planning',
+    workflowStep: 'planning',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -4249,7 +4240,7 @@ test('Finding 1 fix: non-tiny/non-small plan where validate-plan returns READY a
 
   const view = listWork(tempDir);
   const parentItem = view.work['tsk-med-decomp'];
-  assert.equal(parentItem.stage, 'executing');
+  assert.equal(parentItem.workflowStep, 'executing');
 
   const createdChildren = Object.values(view.work).filter((w) => w.parent === 'tsk-med-decomp');
   assert.equal(createdChildren.length, 1);
@@ -4269,7 +4260,7 @@ test('Finding 1 fix: non-tiny/non-small plan where validate-plan returns READY a
   addWork(tempDir, {
     id: 'tsk-med-pass',
     title: 'Test medium pass-through driver loop',
-    stage: 'planning',
+    workflowStep: 'planning',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -4314,14 +4305,14 @@ test('Finding 1 fix: non-tiny/non-small plan where validate-plan returns READY a
   await runOnce({ dir: tempDir, repoRoot: tempDir, config: cfg, callerVerdict });
 
   const parentItem = listWork(tempDir).work['tsk-med-pass'];
-  assert.equal(parentItem.stage, 'executing');
+  assert.equal(parentItem.workflowStep, 'executing');
 });
 
 test('Finding 2 fix: echoed sentinel refs without resolvable diff content or verify output stop review-item', () => {
   const dummyRepo = mkTempDir();
   const workSentinelsOnly = {
     id: 'tsk-sentinel-bare',
-    stage: 'executing',
+    workflowStep: 'executing',
     domain: 'coding',
     refs: ['evidence:candidate-diff', 'evidence:verify-pass'],
   };
@@ -4345,7 +4336,7 @@ test('review evidence gate: a tag named fgw/<id> is not a candidate branch and s
 
   const work = {
     id: 'tsk-rt-tag',
-    stage: 'executing',
+    workflowStep: 'executing',
     domain: 'coding',
     refs: ['evidence:candidate-diff', 'evidence:verify-pass'],
     verify: 'node -e "process.exit(0)"',
@@ -4376,7 +4367,7 @@ test('review evidence gate: an early-minted zero-commit fgw/<id> branch produces
 
   const work = {
     id: 'tsk-rt-bare',
-    stage: 'executing',
+    workflowStep: 'executing',
     domain: 'coding',
     refs: ['evidence:candidate-diff', 'evidence:verify-pass'],
     verify: 'node -e "process.exit(0)"',
@@ -4410,7 +4401,7 @@ test('review evidence gate: a candidate branch with commits ahead of base resolv
 
   const workNoVerifyCommand = {
     id: 'tsk-rt-commits',
-    stage: 'executing',
+    workflowStep: 'executing',
     domain: 'coding',
     refs: ['evidence:candidate-diff', 'evidence:verify-pass'],
   };
@@ -4432,7 +4423,7 @@ test('review evidence gate: repoRoot convention artifacts older than the Work it
 
   const work = {
     id: 'tsk-rt-stale',
-    stage: 'executing',
+    workflowStep: 'executing',
     domain: 'coding',
     createdAt: new Date().toISOString(),
     refs: ['evidence:candidate-diff', 'evidence:verify-pass'],
@@ -4451,7 +4442,7 @@ test('review evidence gate: string-only refs and inline text claims are never ev
 
   const work = {
     id: 'tsk-rt-strings',
-    stage: 'executing',
+    workflowStep: 'executing',
     domain: 'coding',
     refs: ['evidence:candidate-diff', 'evidence:verify-pass'],
   };
@@ -4501,21 +4492,21 @@ const PLAN_V1_CONTENT = '# Mode: tiny\nOriginal plan.\n';
 const SUBSTANTIVE_REPORT_TEXT =
   '# Reality Gate & Feasibility Report\n' +
   '## Reality Gate Score\n' +
-  '- Mode fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-  '- Repo fit: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-  '- Assumptions: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-  '- Smaller path: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-  '- Proof surface: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-  '- Impact-analysis posture: PASS (citation: src/runner/dispatch/operation-choice.mjs)\n' +
-  '## Feasibility Matrix\n- Low risk (verified: src/runner/dispatch/operation-choice.mjs)\n';
+  '- Mode fit: PASS (citation: src/runner/operation-choice.mjs)\n' +
+  '- Repo fit: PASS (citation: src/runner/operation-choice.mjs)\n' +
+  '- Assumptions: PASS (citation: src/runner/operation-choice.mjs)\n' +
+  '- Smaller path: PASS (citation: src/runner/operation-choice.mjs)\n' +
+  '- Proof surface: PASS (citation: src/runner/operation-choice.mjs)\n' +
+  '- Impact-analysis posture: PASS (citation: src/runner/operation-choice.mjs)\n' +
+  '## Feasibility Matrix\n- Low risk (verified: src/runner/operation-choice.mjs)\n';
 
 const READY_CLAIM_GATES = {
-  'mode-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-  'repo-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-  'assumptions-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-  'smaller-path-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-  'proof-surface-fit': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
-  'impact-analysis-posture': 'PASS (citation: src/runner/dispatch/operation-choice.mjs)',
+  'mode-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+  'repo-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+  'assumptions-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+  'smaller-path-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+  'proof-surface-fit': 'PASS (citation: src/runner/operation-choice.mjs)',
+  'impact-analysis-posture': 'PASS (citation: src/runner/operation-choice.mjs)',
 };
 
 /** Hand-craft a stored validate-plan Assignment + run result the way the real
@@ -4524,7 +4515,7 @@ const READY_CLAIM_GATES = {
  * runner records before the worker runs, the runner-owned dispatched-run
  * manifest in assignment.json, and the claim-bytes binding (sha256 of the
  * exact agent-result.json bytes the runner classified). */
-function seedStoredValidatePlanResult(tempDir, { id, docsRef, planContent = PLAN_V1_CONTENT, withHash = false, withBinding = true, withReport = true, claimOverride = null, resultExtra = {}, manifest = ['01'], failedExit = null } = {}) {
+function seedStoredValidatePlanResult(tempDir, { id, docsRef, planContent = PLAN_V1_CONTENT, withHash = false, withBinding = true, withReport = true, claimOverride = null, resultExtra = {}, manifest = ['01'], failedExit = null, claimInConfinedOutbox = false } = {}) {
   const docsDir = path.join(tempDir, docsRef);
   fs.mkdirSync(docsDir, { recursive: true });
   const planPath = path.join(docsDir, 'plan.md');
@@ -4559,12 +4550,15 @@ function seedStoredValidatePlanResult(tempDir, { id, docsRef, planContent = PLAN
     verdict: 'READY',
     summary: 'Plan validated',
     realityGate: READY_CLAIM_GATES,
-    feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/dispatch/operation-choice.mjs' }],
+    feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/operation-choice.mjs' }],
   };
   // The claim exists as worker-written bytes on disk; the binding recorded in
   // result.json is the sha256 of those exact bytes.
   const claimBytes = JSON.stringify(agentClaim);
-  fs.writeFileSync(path.join(runDir, 'agent-result.json'), claimBytes);
+  // A confined worker can only write under worker-output/outbox.
+  const claimDir = claimInConfinedOutbox ? path.join(runDir, 'worker-output', 'outbox') : runDir;
+  fs.mkdirSync(claimDir, { recursive: true });
+  fs.writeFileSync(path.join(claimDir, 'agent-result.json'), claimBytes);
 
   const resultJson = {
     runId: `run_${asgnId}_01`,
@@ -4624,6 +4618,49 @@ test('stored validate-plan result with a matching plan content hash is consumabl
   const choice = choosePlanning(tempDir, planningWorkFor('tsk-hash-consume', docsRef));
   assert.equal(choice.canAdvanceEdge, true);
   assert.equal(choice.reason, 'validation-passed-ready-for-planning-edge');
+});
+
+test('stored validate-plan result whose claim lives only under the confined worker-output outbox is consumable cross-pass', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/confined-claim';
+  const { resultPath, runDir } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-confined-claim',
+    docsRef,
+    withHash: true,
+    claimInConfinedOutbox: true,
+  });
+  assert.equal(fs.existsSync(path.join(runDir, 'agent-result.json')), false);
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-confined-claim', docsRef));
+  assert.equal(choice.canAdvanceEdge, true);
+  assert.equal(choice.reason, 'validation-passed-ready-for-planning-edge');
+});
+
+test('stored validate-plan result whose confined claim bytes were edited after settle is not consumed', () => {
+  const tempDir = mkTempDir();
+  initRepo(tempDir);
+  initStore(tempDir);
+  seedTaskSpecs(tempDir, ['validate-plan', 'shape-plan']);
+
+  const docsRef = 'docs/history/confined-claim-tamper';
+  const { resultPath, runDir } = seedStoredValidatePlanResult(tempDir, {
+    id: 'tsk-confined-claim-tamper',
+    docsRef,
+    withHash: true,
+    claimInConfinedOutbox: true,
+  });
+  fs.appendFileSync(path.join(runDir, 'worker-output', 'outbox', 'agent-result.json'), ' ');
+  const future = new Date(Date.now() + 5000);
+  fs.utimesSync(resultPath, future, future);
+
+  const choice = choosePlanning(tempDir, planningWorkFor('tsk-confined-claim-tamper', docsRef));
+  assert.notEqual(choice.reason, 'validation-passed-ready-for-planning-edge');
 });
 
 test('stored validate-plan result whose plan content hash mismatches the current plan.md is never consumed cross-pass', () => {
@@ -4689,7 +4726,7 @@ test('tampered stored validate-plan result with a schema-broken agentClaim is ne
       status: 'done',
       verdict: 'READY',
       realityGate: READY_CLAIM_GATES,
-      feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/dispatch/operation-choice.mjs' }],
+      feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/operation-choice.mjs' }],
     },
   });
   const future = new Date(Date.now() + 5000);
@@ -4737,7 +4774,7 @@ test('tampered stored validate-plan result whose recorded evidence refs point at
       summary: 'Plan validated',
       evidenceRefs: ['docs/history/hash-dead-refs/vanished-evidence.md', 'docs/vanished-proof.txt'],
       realityGate: READY_CLAIM_GATES,
-      feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/dispatch/operation-choice.mjs' }],
+      feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/operation-choice.mjs' }],
     },
   });
   const future = new Date(Date.now() + 5000);
@@ -4775,7 +4812,7 @@ test('in-memory validate-plan result carrying a mismatched plan content hash is 
       verdict: 'READY',
       summary: 'Plan validated',
       realityGate: READY_CLAIM_GATES,
-      feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/dispatch/operation-choice.mjs' }],
+      feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/operation-choice.mjs' }],
     },
     evidence: { artifacts: [path.join(reportDir, 'agent-report.md')] },
   };
@@ -4815,7 +4852,7 @@ test('F2d(a): a phantom run dir the runner never dispatched is never consumed cr
     verdict: 'READY',
     summary: 'Plan validated',
     realityGate: READY_CLAIM_GATES,
-    feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/dispatch/operation-choice.mjs' }],
+    feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/operation-choice.mjs' }],
   };
   const forgedClaimBytes = JSON.stringify(forgedClaim);
   fs.writeFileSync(path.join(forgedDir, 'agent-report.md'), SUBSTANTIVE_REPORT_TEXT);
@@ -4910,7 +4947,7 @@ test('F4b: mixed live+ghost evidence refs resolving inside the run tree are neve
         path.relative(tempDir, path.join(asgnDir, 'runs', '01', 'ghost-evidence.md')),
       ],
       realityGate: READY_CLAIM_GATES,
-      feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/dispatch/operation-choice.mjs' }],
+      feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/operation-choice.mjs' }],
     },
   });
   const future = new Date(Date.now() + 5000);
@@ -4943,7 +4980,7 @@ test('F2d(b): interpretation never satisfies the report gate from a sibling run\
         verdict: 'READY',
         summary: 'Plan validated',
         realityGate: READY_CLAIM_GATES,
-        feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/dispatch/operation-choice.mjs' }],
+        feasibilityMatrix: [{ risk: 'low', citation: 'src/runner/operation-choice.mjs' }],
       },
       // Spread-inherited sibling path: the consuming run's own dir has no report.
       evidence: { artifacts: [path.join(siblingRunDir, 'agent-report.md')] },
@@ -5601,7 +5638,7 @@ test('ADR-006 R5: executeDriverOperationChoice validate-plan onAdvance dispatch 
   );
 
   const executorScript = writeFakeExecutor(tempDir, { status: 'done', verdict: 'READY', summary: 'READY' });
-  const work = { id: 'tsk-r5-onadvance', status: 'doing', stage: 'planning', domain: 'coding', workflow: 'feature', docsRef };
+  const work = { id: 'tsk-r5-onadvance', status: 'doing', workflowStep: 'planning', domain: 'coding', workflow: 'feature', docsRef };
   const choice = chooseStageOperation({ work, contextSignals: { hasPlan: true, validationDue: true } });
 
   const outcome = await executeDriverOperationChoice(work, choice, {
@@ -5628,7 +5665,7 @@ test('ADR-006 R5: executeDriverOperationChoice validate-plan onAdvance dispatch 
   fs.writeFileSync(path.join(docsDir, 'plan.md'), '# Mode: standard\nProposed plan, no split section at all.\n');
 
   const executorScript = writeFakeExecutor(tempDir, { status: 'done', verdict: 'READY', summary: 'READY' });
-  const work = { id: 'tsk-r5-onadvance-noop', status: 'doing', stage: 'planning', domain: 'coding', workflow: 'feature', docsRef };
+  const work = { id: 'tsk-r5-onadvance-noop', status: 'doing', workflowStep: 'planning', domain: 'coding', workflow: 'feature', docsRef };
   const choice = chooseStageOperation({ work, contextSignals: { hasPlan: true, validationDue: true } });
 
   const outcome = await executeDriverOperationChoice(work, choice, {

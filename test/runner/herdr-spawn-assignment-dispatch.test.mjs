@@ -15,7 +15,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
-import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
+import { buildAssignment } from '../helpers/declared-assignment.mjs';
 
 function mkTempDir(prefix = 'fgos-herdr-assignment-test-') {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
@@ -113,11 +113,7 @@ ok({});
 
 async function dispatchHerdrAssignment(repoDir, mock, executorBlock, { workId }) {
   initGitRepo(repoDir);
-  const runnerConfig = {
-    executor: executorBlock,
-    models: { standard: 'sonnet' },
-    timeoutMs: 15000,
-  };
+  const runnerConfig = { executor: executorBlock, modelPolicies: { claude: { standard: 'sonnet' }, agy: { standard: 'sonnet' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 15000 };
   const assignment = buildAssignment({
     workId,
     operation: 'implement-item',
@@ -148,6 +144,9 @@ async function dispatchHerdrAssignment(repoDir, mock, executorBlock, { workId })
  */
 function assertReachedHerdrSeam(result, repoDir) {
   const runResult = result.runResult || result;
+  if (runResult.status !== 'done') {
+    console.error('HERDR TEST FAILURE RESULT:', JSON.stringify(runResult, null, 2));
+  }
   assert.equal(runResult.status, 'done');
 
   const runDir = path.join(repoDir, '.fgos', 'assignments', runResult.assignmentId, 'runs', '01');

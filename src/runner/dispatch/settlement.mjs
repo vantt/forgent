@@ -18,32 +18,13 @@ import {
   currentGeneration,
 } from './run-lock.mjs';
 import { markRunSettled } from './visibility-session.mjs';
-import { normalizeRunResultV2, interpretRunResult } from './run-result.mjs';
+import { normalizeRunResultV2, normalizeRunResultV3, interpretRunResult } from './run-result.mjs';
 import { validateAgentResultClaim, isReadOnlyAssignment } from './assignment.mjs';
 import { resolveWorkerArtifactPath } from './worker-artifacts.mjs';
 import { attributeWorkspaceChanges } from './evidence-attribution.mjs';
+import { parseUsageForAdapter } from './usage-parsers.mjs';
 
 export function resolveRunWorkerArtifactPath(runDir, roundPattern, legacyName) {
-  const candidateDirs = [
-    path.join(runDir, 'worker-output', 'outbox'),
-    path.join(runDir, 'worker-output'),
-    path.join(runDir, 'outbox'),
-  ];
-  for (const dir of candidateDirs) {
-    if (fs.existsSync(dir)) {
-      let entries = [];
-      try { entries = fs.readdirSync(dir); } catch {}
-      const latest = entries
-        .map((name) => ({ name, round: Number((name.match(roundPattern) ?? [])[1]) }))
-        .filter((e) => Number.isFinite(e.round))
-        .sort((a, b) => a.round - b.round)
-        .pop();
-      if (latest) return path.join(dir, latest.name);
-      if (legacyName && entries.includes(legacyName)) {
-        return path.join(dir, legacyName);
-      }
-    }
-  }
   return resolveWorkerArtifactPath(runDir, roundPattern, legacyName);
 }
 import { finalizeConfinementResources } from './confinement/authority.mjs';
@@ -215,13 +196,7 @@ export function computeChangedFiles(dir, gitBefore, gitAfter, dirtyBefore, dirty
   return { changedFiles, changedFileReasons };
 }
 
-/**
- * Classify Run evidence and derive verdict confidence ladder (Step 01 Slice 4/5).
- *
- * @param {object} params
- * @returns {{ status: 'done'|'blocked'|'failed'|'no-evidence', confidence: 'verified'|'reported'|'inferred'|'no-evidence'|'failed' }}
- */
-export function classifyRunEvidence({
+function classifyEvidenceToOutcomeFacts({
   exitCode,
   signal,
   isTimeout,
@@ -231,24 +206,31 @@ export function classifyRunEvidence({
   changedFiles = [],
   hasDirtyBeforeMutation = false,
   isReadOnlyOperation = true,
-  cwd,
-  repoRoot,
-  assignment,
-  work,
   role,
+  assignment,
 }) {
   if (isTimeout || (exitCode !== null && exitCode !== undefined && exitCode !== 0) || signal) {
-    return { status: 'failed', confidence: 'failed' };
+    return {
+      execStatus: 'failed',
+      confidenceLevel: 'failed',
+      verdict: 'not-applicable',
+      failure: isTimeout
+        ? { family: 'resource', code: 'execution-timeout' }
+        : { family: 'provider', code: 'nonzero-process-exit' },
+      policy: null,
+    };
   }
 
-  // Step 04 §5.2: malformed structured claim must fail closed, not degrade to no-evidence.
   if (claimInvalid) {
-    return { status: 'failed', confidence: 'failed' };
+    return {
+      execStatus: 'failed',
+      confidenceLevel: 'failed',
+      verdict: 'not-applicable',
+      failure: { family: 'contract', code: 'invalid-agent-result-claim' },
+      policy: { disposition: 'refuse', code: 'invalid-agent-result-claim' },
+    };
   }
 
-  // Step 04 §5.2: agent-result.json is the structured claim, not evidence by itself.
-  // A read-only operation classifies as reported only with a companion report
-  // artifact (e.g. agent-report.md) the runner detected in the run dir.
   const companionReportArtifacts = workerArtifacts.filter(
     (p) => typeof p === 'string' && !p.endsWith('agent-result.json') && !/[/\\]outbox[/\\]result-\d+\.json$/.test(p),
   );
@@ -258,40 +240,99 @@ export function classifyRunEvidence({
     const isReviewerRole = role === 'reviewer' || role === 'red-team' || assignment?.role === 'reviewer' || assignment?.role === 'red-team';
     const isFindingVerdict = agentClaim?.assessment?.verdict === 'findings';
     if ((isReviewerRole || isFindingVerdict) && hasWorkerReport && exitCode === 0 && !isTimeout) {
-      return { status: 'failed', confidence: 'reported' };
+      return {
+        execStatus: 'completed',
+        confidenceLevel: 'reported',
+        verdict: 'findings',
+        failure: null,
+        policy: { disposition: 'allow', code: null },
+      };
     }
-    return { status: 'failed', confidence: 'failed' };
+    return {
+      execStatus: 'failed',
+      confidenceLevel: 'failed',
+      verdict: 'not-applicable',
+      failure: { family: 'provider', code: 'agent-failed' },
+      policy: null,
+    };
   }
 
   const hasExternalEvidence = changedFiles.length > 0 || hasDirtyBeforeMutation;
 
-  // Step 06 P1: Read-only operation MUST NOT mutate repo state.
   if (isReadOnlyOperation && hasExternalEvidence) {
-    return { status: 'failed', confidence: 'failed' };
+    return {
+      execStatus: 'failed',
+      confidenceLevel: 'failed',
+      verdict: 'not-applicable',
+      failure: { family: 'policy', code: 'read-only-mutation' },
+      policy: { disposition: 'refuse', code: 'read-only-mutation' },
+    };
   }
 
   if (agentClaim?.status === 'blocked') {
-    return { status: 'blocked', confidence: 'reported' };
+    return {
+      execStatus: 'completed',
+      confidenceLevel: 'reported',
+      verdict: 'blocked',
+      failure: null,
+      policy: { disposition: 'allow', code: null },
+    };
   }
 
   if (agentClaim && agentClaim.status === 'done') {
     if (isReadOnlyOperation) {
       if (hasWorkerReport) {
-        return { status: 'done', confidence: 'reported' };
+        return {
+          execStatus: 'completed',
+          confidenceLevel: 'reported',
+          verdict: 'pass',
+          failure: null,
+          policy: { disposition: 'allow', code: null },
+        };
       }
-      return { status: 'no-evidence', confidence: 'no-evidence' };
+      return {
+        execStatus: 'completed',
+        confidenceLevel: 'no-evidence',
+        verdict: 'inconclusive',
+        failure: null,
+        policy: null,
+      };
     }
     if (hasExternalEvidence) {
-      return { status: 'done', confidence: 'verified' };
+      return {
+        execStatus: 'completed',
+        confidenceLevel: 'verified',
+        verdict: 'pass',
+        failure: null,
+        policy: { disposition: 'allow', code: null },
+      };
     }
-    return { status: 'no-evidence', confidence: 'no-evidence' };
+    return {
+      execStatus: 'completed',
+      confidenceLevel: 'no-evidence',
+      verdict: 'inconclusive',
+      failure: null,
+      policy: null,
+    };
   }
 
   if (!isReadOnlyOperation && hasExternalEvidence) {
-    return { status: 'done', confidence: 'inferred' };
+    return {
+      execStatus: 'completed',
+      confidenceLevel: 'inferred',
+      verdict: 'pass',
+      failure: null,
+      policy: { disposition: 'allow', code: null },
+    };
   }
 
-  return { status: 'no-evidence', confidence: 'no-evidence' };
+  return {
+    execStatus: 'completed',
+    confidenceLevel: 'no-evidence',
+    verdict: 'inconclusive',
+    failure: null,
+    policy: null,
+  };
 }
 
 /**
@@ -420,7 +461,6 @@ export async function settleRunOutcome({
   launchCommandId = null,
   receipt = null,
   adapterOutcome = null,
-  classifyRunEvidenceFn = classifyRunEvidence,
   opts = {},
 }) {
   const root = resolveSafeRoot(runDir, opts?.repoRoot);
@@ -433,7 +473,7 @@ export async function settleRunOutcome({
     signal,
     timedOut: Boolean(isTimeout),
     settledAt,
-    durationMs: durationMs ?? 0,
+    durationMs: typeof durationMs === 'number' ? durationMs : null,
   };
   fs.writeFileSync(path.join(runDir, 'exit.json'), `${JSON.stringify(exitInfoData, null, 2)}\n`);
 
@@ -527,24 +567,6 @@ export async function settleRunOutcome({
     }
   }
 
-  const classifyFn = classifyRunEvidenceFn || classifyRunEvidence;
-  const { status, confidence } = classifyFn({
-    exitCode,
-    signal,
-    isTimeout: Boolean(isTimeout),
-    agentClaim,
-    claimInvalid,
-    workerArtifacts: workerArtifactPaths,
-    changedFiles,
-    hasDirtyBeforeMutation: mutatedDirtyBeforeFiles.length > 0,
-    isReadOnlyOperation: isReadOnly,
-    cwd: settlementCwd,
-    repoRoot: root,
-    assignment,
-    work: assignment?.work || opts.work,
-    role: assignment?.role,
-  });
-
   let providerCapacityFault = null;
   if (providerCapacitySelection?.status === 'selected') {
     const fault = classifyProviderCapacityFault({
@@ -609,26 +631,61 @@ export async function settleRunOutcome({
     ...(fallbackEvidence ? { fallback: fallbackEvidence } : {}),
   };
   fs.writeFileSync(path.join(runDir, 'evidence.json'), `${JSON.stringify(evidenceData, null, 2)}\n`);
+  const stdoutPath = path.join(runDir, 'stdout.log');
+  const stderrPath = path.join(runDir, 'stderr.log');
+  let stdoutContent = null;
+  let stderrContent = null;
+  try { if (fs.existsSync(stdoutPath)) stdoutContent = fs.readFileSync(stdoutPath, 'utf8'); } catch {}
+  try { if (fs.existsSync(stderrPath)) stderrContent = fs.readFileSync(stderrPath, 'utf8'); } catch {}
 
-  const runResult = normalizeRunResultV2({
+  const usage = parseUsageForAdapter(resolvedExecutorId || opts?.adapter || 'cli-spawn', {
+    stdout: stdoutContent,
+    stderr: stderrContent,
+  });
+  const evidenceFacts = classifyEvidenceToOutcomeFacts({
+    exitCode,
+    signal,
+    isTimeout: Boolean(isTimeout),
+    agentClaim,
+    claimInvalid,
+    workerArtifacts: workerArtifactPaths,
+    changedFiles,
+    hasDirtyBeforeMutation: mutatedDirtyBeforeFiles.length > 0,
+    isReadOnlyOperation: isReadOnly,
+    role: assignment?.role,
+    assignment,
+  });
+
+  const runResult = normalizeRunResultV3({
+    usage,
     runId: runMeta.runId,
     assignmentId: runMeta.assignmentId,
     workId: runMeta.workId || assignment?.workId,
     controlEpoch,
     controlToken,
-    executorId: resolvedExecutorId || runMeta.executorId || 'cli-spawn',
+    executorId: resolvedExecutorId || runMeta.executorId || null,
+    adapter: opts?.adapter || (resolvedExecutorId?.includes('herdr') ? 'herdr-spawn' : 'cli-spawn'),
+    confinement: (effectivePolicy?.confinement?.requirement?.mode === 'confined' ? (effectivePolicy?.confinement?.backend?.type ?? 'bwrap') : null),
+    role: assignment?.role ?? null,
     ...(effectivePolicy ? { policy: effectivePolicy, executorRedirected } : {}),
     settledAt,
-    durationMs: durationMs ?? 0,
+    durationMs: typeof durationMs === 'number' ? durationMs : null,
     ...(planContentHash ? { planContentHash } : {}),
     ...(claimSha256 ? { claimSha256 } : {}),
     settleReports,
-    status,
-    confidence,
-    role: assignment?.role,
     operation: assignment?.operation,
     isReadOnlyOperation: isReadOnly,
-    confidenceLevel: confidence,
+    ...(evidenceFacts.execStatus ? { execStatusOverride: evidenceFacts.execStatus } : {}),
+    ...(evidenceFacts.verdict ? { assessmentOverride: { verdict: evidenceFacts.verdict } } : {}),
+    confidenceLevel: evidenceFacts.confidenceLevel,
+    // A worker that stopped on a provider limit failed for that reason, not for the
+    // generic exit the adapter reported; the code is what lets a caller move to the
+    // next candidate instead of retrying the same provider. One waiting on a prompt only
+    // a person can answer is `blocked`: retrying or moving on does not clear it.
+    ...(adapterOutcome === 'provider-limit' || adapterOutcome === 'paused-limit' || adapterOutcome === 'blocked'
+      ? { failureOverride: { family: 'provider', code: adapterOutcome } }
+      : evidenceFacts.failure ? { failureOverride: evidenceFacts.failure } : {}),
+    ...(evidenceFacts.policy ? { policyOverride: evidenceFacts.policy } : {}),
     runtime: {
       exitCode,
       isTimeout: Boolean(isTimeout),
@@ -701,7 +758,7 @@ export async function settleFailedRunFromOutcome(runDir, runMeta, command, contr
     signal: null,
     timedOut: false,
     settledAt,
-    durationMs: 0,
+    durationMs: null,
   };
   fs.writeFileSync(path.join(runDir, 'exit.json'), `${JSON.stringify(exitInfoData, null, 2)}\n`);
 
@@ -726,7 +783,6 @@ export async function settleFailedRunFromOutcome(runDir, runMeta, command, contr
     assignmentId: runMeta.assignmentId,
     controlEpoch,
     controlToken,
-    status: 'failed',
     confidence: 'failed',
     confidenceLevel: 'failed',
     runtime: {
@@ -734,10 +790,7 @@ export async function settleFailedRunFromOutcome(runDir, runMeta, command, contr
       stdoutLog: path.relative(root, path.join(runDir, 'stdout.log')),
       stderrLog: path.relative(root, path.join(runDir, 'stderr.log')),
     },
-    agentClaim: {
-      status: 'failed',
-      summary: stderrText,
-    },
+    runnerNote: stderrText,
     evidence: {
       gitBefore: null,
       gitAfter: null,
@@ -809,7 +862,7 @@ export async function settleReceiptRunFromOutcome(
   const isTimeout = receipt?.completion?.kind === 'timeout' || receipt?.completion?.kind === 'idle-timeout';
   const exitCode = receipt?.completion?.exitCode ?? (isTimeout ? 124 : 0);
   const signal = receipt?.completion?.signal ?? (isTimeout ? 'SIGTERM' : null);
-  const durationMs = receipt?.completion?.durationMs ?? 0;
+  const durationMs = typeof receipt?.completion?.durationMs === 'number' ? receipt.completion.durationMs : null;
   const settledAt = receipt?.completion?.settledAt ?? new Date().toISOString();
 
   const candidateAssignmentPaths = [
@@ -844,7 +897,6 @@ export async function settleReceiptRunFromOutcome(
     dirtyBeforeSnapshots: baseline?.dirtyBeforeSnapshots || null,
     launchCommandId,
     receipt,
-    classifyRunEvidenceFn: classifyRunEvidence,
     opts: { ...opts, updateRunJson: 'settled' },
   });
 

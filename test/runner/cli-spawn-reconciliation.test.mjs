@@ -9,9 +9,7 @@ import {
   executeAssignment,
   reconcileCliSpawnRun,
 } from '../../src/runner/dispatch/assignment-runner.mjs';
-import {
-  buildAssignment,
-} from '../../src/runner/dispatch/assignment.mjs';
+import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import {
   runDetachedRunSupervisor,
   startDetachedRunSupervisorProcess,
@@ -29,12 +27,13 @@ import {
   publishDetachedRunAdapterReceipt,
   DetachedRunReceiptPathCollisionError,
 } from '../../src/runner/dispatch/detached-run-supervisor.mjs';
-import { spawnWorker } from '../../src/runner/dispatch/cli.mjs';
+import { spawnWorker } from '../../src/runner/work-dispatch.mjs';
 import { cliSpawnAdapter } from '../../src/runner/dispatch/transport.mjs';
 import {
   buildConfinementRequest,
   validateAssignmentLaunchContext,
 } from '../../src/runner/dispatch/confinement/request.mjs';
+import { writeOwnershipMarker } from '../../src/runner/dispatch/confinement/cleanup.mjs';
 import {
   prepareConfinementForLaunch,
   finalizeConfinementResources,
@@ -44,7 +43,19 @@ function mkTempDir(prefix = 'fgos-reconcile-test-') {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
 }
 
-async function waitForProcessExit(pid, { attempts = 20, intervalMs = 50 } = {}) {
+// Starting a supervisor means a cold node start plus the worker's own, which a loaded machine can
+// stretch far past a few seconds; the outcome is the receipt appearing, so poll for it under a
+// ceiling no loaded run reaches. Quick runs return on the first poll that sees it.
+async function waitForReceipt(runDir, launchCommandId, { timeoutMs = 50_000, intervalMs = 50 } = {}) {
+  const deadline = Date.now() + timeoutMs;
+  for (;;) {
+    const receipt = readDetachedRunAdapterReceipt(runDir, launchCommandId);
+    if (receipt || Date.now() >= deadline) return receipt;
+    await new Promise((r) => setTimeout(r, intervalMs));
+  }
+}
+
+async function waitForProcessExit(pid, { attempts = 600, intervalMs = 50 } = {}) {
   for (let i = 0; i < attempts; i++) {
     if (!isProcessAlive(pid)) return true;
     await new Promise((r) => setTimeout(r, intervalMs));
@@ -129,15 +140,11 @@ test('2. Assignment-owned fresh launch writes pending command, baseline, envelop
     `,
   );
 
-  const runnerConfig = {
-    executor: {
-      allowCrossProvider: true,
-      command: process.execPath,
-      args: [workerScript, '{prompt}'],
-    },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  const runnerConfig = { executor: {
+    allowCrossProvider: true,
+    command: process.execPath,
+    args: [workerScript, '{prompt}'],
+  }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
 
   const assignment = buildAssignment({
     workId: 'tsk-fresh-launch',
@@ -263,12 +270,7 @@ test('3. injected coordinator death after supervisor start still produces protec
   });
 
   // Wait for receipt to appear on disk independently
-  let receipt = null;
-  for (let i = 0; i < 40; i++) {
-    receipt = readDetachedRunAdapterReceipt(runDir, launchCommandId);
-    if (receipt) break;
-    await new Promise((r) => setTimeout(r, 100));
-  }
+  const receipt = await waitForReceipt(runDir, launchCommandId);
 
   assert.ok(receipt, 'Receipt must be published after coordinator disconnects');
   assert.equal(receipt.completion.exitCode, 0);
@@ -382,12 +384,7 @@ test('5. worker PGID differs from supervisor PGID and timeout signals only worke
     launchCommandId,
   });
 
-  let receipt = null;
-  for (let i = 0; i < 40; i++) {
-    receipt = readDetachedRunAdapterReceipt(runDir, launchCommandId);
-    if (receipt) break;
-    await new Promise((r) => setTimeout(r, 100));
-  }
+  const receipt = await waitForReceipt(runDir, launchCommandId);
 
   assert.ok(receipt);
   assert.equal(receipt.completion.kind, 'timeout');
@@ -452,23 +449,17 @@ test('6. escaped descendant keeps pipe open but timeout/maxBuffer receipt publis
   const envPath = path.join(runDir, 'protected', 'launch-envelope', `${launchCommandId}.json`);
   publishImmutableProof(envPath, envelope);
 
-  const startMs = Date.now();
   startDetachedRunSupervisorProcess({
     envelopePath: envPath,
     runDir,
     launchCommandId,
   });
 
-  let receipt = null;
-  for (let i = 0; i < 40; i++) {
-    receipt = readDetachedRunAdapterReceipt(runDir, launchCommandId);
-    if (receipt) break;
-    await new Promise((r) => setTimeout(r, 100));
-  }
+  const receipt = await waitForReceipt(runDir, launchCommandId);
 
-  const durationMs = Date.now() - startMs;
-  assert.ok(receipt);
-  assert.ok(durationMs < 5000, `Supervisor must not hang waiting for open pipes (took ${durationMs}ms)`);
+  // The escaped descendant holds the pipes open for 60s, so a supervisor that waited on them could
+  // not publish before the ceiling above runs out; receiving one is the proof it did not hang.
+  assert.ok(receipt, 'Supervisor must not hang waiting for open pipes');
 });
 
 // 7. PID reuse, boot mismatch and start-time mismatch refuse inspect/kill/settle
@@ -667,12 +658,7 @@ test('10. live onChunk callback failure does not block capture, timers or receip
     },
   });
 
-  let receipt = null;
-  for (let i = 0; i < 40; i++) {
-    receipt = readDetachedRunAdapterReceipt(runDir, launchCommandId);
-    if (receipt) break;
-    await new Promise((r) => setTimeout(r, 100));
-  }
+  const receipt = await waitForReceipt(runDir, launchCommandId);
 
   assert.ok(receipt);
   assert.equal(receipt.completion.exitCode, 0);
@@ -1044,6 +1030,36 @@ test('16. confinement temporary resources are cleaned or retained idempotently w
     descriptor: { ...descriptor, temporaryDirectories: [{ path: '/tmp/some-path', ownershipMarkerDigest: 'none' }] },
   });
   assert.equal(res3.cleanupState, 'retained');
+});
+
+// Finalizing a private home leaves no empty per-dispatch directory behind, and keeps a parent that still holds a sibling.
+test('16b. finalizing a private home removes its per-dispatch parent unless a sibling remains', async () => {
+  const tmp = mkTempDir();
+  try {
+    const runDir = path.join(tmp, 'run');
+    fs.mkdirSync(runDir, { recursive: true });
+    const finalize = async (dispatchId, launchCommandId, withSibling) => {
+      const parent = path.join(tmp, 'confinement', dispatchId);
+      const home = path.join(parent, 'home');
+      fs.mkdirSync(home, { recursive: true });
+      if (withSibling) fs.mkdirSync(path.join(parent, 'sibling'));
+      const markerPath = writeOwnershipMarker(home, { dispatchId, resource: 'private-home' });
+      const ownershipMarkerDigest = computeSha256Digest(JSON.parse(fs.readFileSync(markerPath, 'utf8')));
+      const res = await finalizeConfinementResources({
+        runDir,
+        launchCommandId,
+        receipt: { outcome: { kind: 'exit' } },
+        descriptor: { contract: 'confinement-finalization.v1', launchCommandId, runDir, temporaryDirectories: [{ path: home, ownershipMarkerDigest }] },
+      });
+      assert.equal(res.cleanupState, 'cleaned');
+      assert.equal(fs.existsSync(home), false);
+      return parent;
+    };
+    assert.equal(fs.existsSync(await finalize('disp_1_aaaaaaaa', 'cmd_a', false)), false);
+    assert.equal(fs.existsSync(await finalize('disp_2_bbbbbbbb', 'cmd_b', true)), true);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
 });
 
 // 17. Unsupported recovered cancel and shared-cwd takeover return typed park or refusal

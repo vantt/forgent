@@ -3,7 +3,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import { spawn } from 'node:child_process';
 import { createWorkerHome, removeWorkerHome, redactWorkerHome, WorkerHomeError } from '../../src/runner/dispatch/worker-home.mjs';
+import { normalizeAgentName } from '../../src/runner/dispatch/proof-helpers.mjs';
 
 // Phase 01 group C1. Nothing here touches the operator's real HOME: a synthetic
 // source home is built per test and every read comes from that.
@@ -147,6 +149,33 @@ test('each Run gets its own home, and removeWorkerHome takes it away entirely', 
   } finally { src.cleanup(); }
 });
 
+test('removeWorkerHome stops a process still running inside the home, and leaves every other process alone', async () => {
+  const src = synthSourceHome();
+  const sleeper = ['-e', 'setInterval(() => {}, 1000)'];
+  const alive = (pid) => { try { process.kill(pid, 0); return true; } catch { return false; } };
+  const waitUntil = async (fn, ms = 4000) => { const end = Date.now() + ms; while (Date.now() < end) { if (fn()) return true; await new Promise((r) => setTimeout(r, 25)); } return fn(); };
+  let inside; let outside;
+  try {
+    await withBase(async (base) => {
+      const home = createWorkerHome(base, { runId: 'run-live', sourceHome: src.dir, workspacePath: WORKSPACE, repoRoot: REPO_ROOT, permissionMode: 'ask' });
+      // A daemon an agent CLI started for itself: detached, working directory inside the home.
+      inside = spawn(process.execPath, sleeper, { cwd: home.homePath, detached: true, stdio: 'ignore' });
+      inside.unref();
+      outside = spawn(process.execPath, sleeper, { cwd: base, detached: true, stdio: 'ignore' });
+      outside.unref();
+      assert.ok(alive(inside.pid) && alive(outside.pid), 'both processes are running before teardown');
+
+      assert.equal(removeWorkerHome(home.homePath), true);
+      assert.equal(fs.existsSync(home.homePath), false);
+      assert.ok(await waitUntil(() => !alive(inside.pid)), 'the process running inside the removed home is gone');
+      assert.ok(alive(outside.pid), 'a process outside the home is untouched');
+    });
+  } finally {
+    for (const child of [inside, outside]) { try { if (child) process.kill(child.pid, 'SIGKILL'); } catch { /* already gone */ } }
+    src.cleanup();
+  }
+});
+
 test('removeWorkerHome refuses a path it did not create -- teardown must never delete an arbitrary directory', () => {
   const stranger = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-not-a-home-'));
   fs.writeFileSync(path.join(stranger, 'important.txt'), 'do not delete me');
@@ -211,4 +240,17 @@ test('redact refuses a directory this module did not create', () => {
     });
     assert.ok(fs.existsSync(path.join(stranger, '.claude', '.credentials.json')), 'it touched nothing');
   });
+});
+
+test('nested assignment run ids reach worker-home through the normalized herdr agent name', () => {
+  const src = synthSourceHome();
+  try {
+    withBase((base) => {
+      const runId = normalizeAgentName('fgos-run_unit-run-example/producer/1_01-launch-1');
+      assert.ok(!runId.includes('/'));
+      const { homePath } = createWorkerHome(base, { runId, sourceHome: src.dir, workspacePath: WORKSPACE, repoRoot: REPO_ROOT });
+      assert.equal(path.dirname(homePath), base);
+      assert.equal(fs.readFileSync(path.join(homePath, '.fgos-worker-home'), 'utf8'), `${runId}\n`);
+    });
+  } finally { src.cleanup(); }
 });

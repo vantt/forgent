@@ -1,0 +1,15 @@
+{
+  "contract": {
+    "id": "assignment-run-result",
+    "version": 2
+  },
+  "status": "done",
+  "confidence": "verified",
+  "classification": {
+    "execution": {
+      "status": "invalid-status"
+    }
+  },
+  "assignmentId": "asgn_test_corrupt_v2",
+  "runId": "run_test_corrupt_v2_01"
+}

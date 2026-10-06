@@ -261,26 +261,6 @@ test('disconnected-worktree guard: "merge next" is refused, "merge list" is unaf
   }
 });
 
-test('disconnected-worktree guard: "evolve --submit" is refused, bare "evolve" and "evolve --pick" are unaffected', () => {
-  const main = initGitCwdMainWithCommittedFgos();
-  const wt = addDisconnectedAdHocWorktree(main, 'adhoc-disconnected-evolve');
-  try {
-    const submitResult = run(wt, ['evolve', '--submit', 'tsk-doesnotmatter']);
-    assert.equal(submitResult.status, 4, submitResult.stderr);
-    assert.match(submitResult.stderr, /disconnected snapshot/);
-
-    const bareResult = run(wt, ['evolve']);
-    assert.equal(bareResult.status, 0, bareResult.stderr);
-
-    const pickResult = run(wt, ['evolve', '--pick', 'tsk-doesnotmatter']);
-    // reaches the real handler (not this guard); it fails for an ordinary
-    // reason (not an open candidate), never this guard's message.
-    assert.doesNotMatch(pickResult.stderr, /disconnected snapshot/);
-  } finally {
-    execFileSync('git', ['worktree', 'remove', '--force', wt], { cwd: main });
-  }
-});
-
 // --- Whole-verb additions with their own subcommands (every subcommand
 // mutates, so the guard applies to the bare verb name, not per-subcommand)
 

@@ -4,10 +4,12 @@ user-invocable: false
 description: >-
   Route natural-language requests for a multi-agent panel, independent
   opinions, proposal review, option comparison, debate, or decision red-team
-  to an existing registered group-thinking protocol without asking the person
-  for a protocol id. Covers architecture, coding-design, product, business,
+  to a registered discussion Workflow (`delphi`, `nominal-group`,
+  `group-cognition`, `architecture-advisory`) or collaboration pattern preset
+  (`rfc`, `consult`, `research-fan-out`) without asking the person for a
+  protocol id. Covers architecture, coding-design, product, business,
   strategy, policy/process, and incident-reflection advisory cases. Does not
-  implement code; use fgos-code-change only when the person explicitly requests
+  implement code; use fgos-run only when the person explicitly requests
   a code change plus review/red-team.
 ---
 

@@ -1,0 +1,10 @@
+{
+  "contract": {
+    "id": "unknown-alien-contract",
+    "version": 99
+  },
+  "status": "done",
+  "confidence": "verified",
+  "assignmentId": "asgn_test_unknown_contract",
+  "runId": "run_test_unknown_contract_01"
+}

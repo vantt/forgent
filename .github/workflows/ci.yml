@@ -160,6 +160,9 @@ jobs:
           cache: npm
       - run: npm install
 
+      - name: Build Rust host binary for tests
+        run: cargo build -p fgos
+
       - name: Run related tests
         id: run-tests
         shell: bash

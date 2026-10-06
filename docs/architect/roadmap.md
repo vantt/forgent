@@ -26,8 +26,8 @@ Feed the result back into the architecture only when evidence changes it.
 
 | Stream | Primary Docs | Current Role | Depends On | Blocks / Informs |
 |---|---|---|---|---|
-| Agent Coordination | `agent-coordination/`, `proposals/step-09-group-thinking-substrate.md` | Step 09's implemented group-thinking slice is closed through promoted CoordinationSession/FlowDefinition contracts. Keep the remaining deferred substrate ideas parked unless Step 10 proves a need. | Existing Work lifecycle, runner contracts, and accepted Step 09 proof artifacts. | Coding-domain adoption, runner autonomy, host/gateway visibility. |
-| Coding Domain / Step 10 | `proposals/step-10-coding-domain-adoption.md`, `domainization/`, coding-domain specs/history outside this folder | Make the existing coding domain a real consumer of the reusable Work Driver Core plus CoordinationSession/FlowDefinition, without moving Work lifecycle, git, merge, or status authority into Agent Coordination. | Accepted Step 09 slice, component authority guardrails, and the topology contract for any workspace/worktree mutation. | Real project development workflow, future non-coding domains such as marketing/business workflows, fgOS dogfood, runner unification, package cleanliness. |
+| Agent Coordination / Execution Core | `agent-coordination/`, `proposals/step-09-group-thinking-substrate.md` | Post-P4, the coordination engine is retired in favor of CollaborationPattern (Unit run) and Workflow runner (`src/workflow/**`). Historical contracts are preserved in `agent-coordination/contracts/`. | Existing Work lifecycle, runner contracts, and accepted proof artifacts. | Coding-domain adoption, runner autonomy, host/gateway visibility. |
+| Coding Domain / Step 10 | `proposals/step-10-coding-domain-adoption.md`, `domainization/`, coding-domain specs/history outside this folder | Make the existing coding domain a real consumer of the reusable Work Driver Core plus Workflow runner and Execution Core, without moving Work lifecycle, git, merge, or status authority into Agent Coordination. | Accepted proof slice, component authority guardrails, and the topology contract for any workspace/worktree mutation. | Real project development workflow, future non-coding domains such as marketing/business workflows, fgOS dogfood, runner unification, package cleanliness. |
 | Workspace Topology | `workspace-topology.md`, `workspace-topology-roadmap.md`, `workspace-topology-audit.md` | Define repository/workspace/work-state/runtime identities, root ownership, state classes, worktree modes, and mutation topology; absorb the legacy `.fgos/runtime` and hot-history placement debt. | Current eventlog/worktree/coordination reality. | Packaging, Work State, Coding Domain, runtime coordination, config/init/doctor. |
 | Component Boundary | `component-boundary/`, `proposals/component-authority-boundary-map.md` | Keep high-level component responsibilities and authority boundaries explicit before source layout or implementation migration. | Current architecture evidence from active streams. | Host Invocation, packaging split, repo-layout cleanup, Rust migration. |
 | Host Invocation / fgOS CLI | `host-invocation-routing/` | Define how CLI, remote, gateway, chat, MCP, and future hosts enter one semantic operation path and select providers. | Component boundary and local payload selection. | Node-to-Rust migration, gateway adapter, distribution payload identity. |
@@ -74,7 +74,7 @@ the earlier stream explicitly instead of patching around it locally.
 The practical next order is:
 
 1. Record Step 09 as closed for the implemented slice:
-   keep only the promoted CoordinationSession/FlowDefinition contracts as
+   keep the Execution Core (CollaborationPattern) and Workflow runner contracts as
    canonical; leave deferred group-thinking mechanisms parked.
 2. Start Step 10 A0:
    run the node-only Coding Domain boundary/harness facade pass, including

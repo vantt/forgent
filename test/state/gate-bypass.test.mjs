@@ -75,7 +75,7 @@ None
 const CLEAR_ARTIFACT_TODO_WORD_IN_PROSE = `# feature — plan
 
 A refused claim leaves the item at todo rather than orphaning it at doing.
-herdr-plugin's own WorkTab::Todo enum variant and the "TODO" tab label are
+herdr-dashboard's own WorkTab::Todo enum variant and the "TODO" tab label are
 unrelated to this plan. A TODO-only placeholder is never acceptable here.
 This plan discusses the TODO/FIXME marker family only as a concept.
 
@@ -213,22 +213,22 @@ test('hasOpenItems: non-string input fails closed to open', () => {
 });
 
 test('canAutoApprove: clear artifact + covered tier + no hard-gate hit -> true', () => {
-  const item = { title: 'Add a config toggle', description: 'small ui tweak', tier: 'light' };
+  const item = { title: 'Add a config toggle', description: 'small ui tweak', size: 'light' };
   assert.equal(canAutoApprove(item, CLEAR_ARTIFACT, 'standard'), true);
 });
 
 test('canAutoApprove: level off never approves, even with a clear artifact', () => {
-  const item = { title: 'Add a config toggle', description: 'small ui tweak', tier: 'light' };
+  const item = { title: 'Add a config toggle', description: 'small ui tweak', size: 'light' };
   assert.equal(canAutoApprove(item, CLEAR_ARTIFACT, 'off'), false);
 });
 
 test('canAutoApprove: open artifact never approves regardless of level/tier', () => {
-  const item = { title: 'Add a config toggle', description: 'small ui tweak', tier: 'light' };
+  const item = { title: 'Add a config toggle', description: 'small ui tweak', size: 'light' };
   assert.equal(canAutoApprove(item, OPEN_ARTIFACT_TODO, 'heavy'), false);
 });
 
 test('canAutoApprove: tier not covered by level never approves', () => {
-  const item = { title: 'Add a config toggle', description: 'small ui tweak', tier: 'heavy' };
+  const item = { title: 'Add a config toggle', description: 'small ui tweak', size: 'heavy' };
   assert.equal(canAutoApprove(item, CLEAR_ARTIFACT, 'light'), false);
 });
 
@@ -236,17 +236,17 @@ test('canAutoApprove: tier not covered by level never approves', () => {
 // hard-gate risk-keyword hit must never be skippable, even with a clear
 // artifact at the highest level.
 test('canAutoApprove: D4 floor — hard-gate keyword in title blocks approval at level heavy', () => {
-  const item = { title: 'Add auth bypass for internal service', description: 'small change', tier: 'light' };
+  const item = { title: 'Add auth bypass for internal service', description: 'small change', size: 'light' };
   assert.equal(canAutoApprove(item, CLEAR_ARTIFACT, 'heavy'), false);
 });
 
 test('canAutoApprove: D4 floor — hard-gate keyword in description blocks approval at level heavy', () => {
-  const item = { title: 'Small cleanup', description: 'this also touches payment processing', tier: 'light' };
+  const item = { title: 'Small cleanup', description: 'this also touches payment processing', size: 'light' };
   assert.equal(canAutoApprove(item, CLEAR_ARTIFACT, 'heavy'), false);
 });
 
 test('canAutoApprove: no hard-gate keyword + everything else clear at level heavy -> true', () => {
-  const item = { title: 'Rename a helper function', description: 'pure refactor, no behavior change', tier: 'heavy' };
+  const item = { title: 'Rename a helper function', description: 'pure refactor, no behavior change', size: 'heavy' };
   assert.equal(canAutoApprove(item, CLEAR_ARTIFACT, 'heavy'), true);
 });
 
@@ -254,12 +254,12 @@ test('canAutoApprove: no hard-gate keyword + everything else clear at level heav
 // (finding 11) -- "auth"/"audit" as substrings of unrelated words must
 // never trip the hard-gate floor.
 test('canAutoApprove: "auth" inside "authoring" is not a hard-gate hit (tsk-1gj)', () => {
-  const item = { title: 'Verify authoring during fgos-exploring', description: 'docs-only change', tier: 'light' };
+  const item = { title: 'Verify authoring during fgos-exploring', description: 'docs-only change', size: 'light' };
   assert.equal(canAutoApprove(item, CLEAR_ARTIFACT, 'heavy'), true);
 });
 
 test('canAutoApprove: "audit" inside "audited" is not a hard-gate hit (tsk-1gj)', () => {
-  const item = { title: 'Already done', description: 'already audited every other remaining caller', tier: 'light' };
+  const item = { title: 'Already done', description: 'already audited every other remaining caller', size: 'light' };
   assert.equal(canAutoApprove(item, CLEAR_ARTIFACT, 'heavy'), true);
 });
 
@@ -272,45 +272,45 @@ const CLEAN_PLAN = ['# plan', '', '## Outstanding questions', '', 'None', ''].jo
 const OPEN_PLAN = ['# plan', '', '## Outstanding questions', '', '- still deciding the split', ''].join('\n');
 
 test('canAutoApproveMergedGate: reversible cost + clean plan + covered tier + no hard-gate hit -> true', () => {
-  const item = { title: 'Add a config toggle', description: 'small ui tweak', tier: 'light' };
+  const item = { title: 'Add a config toggle', description: 'small ui tweak', size: 'light' };
   assert.equal(canAutoApproveMergedGate(item, CLEAN_PLAN, [], COST_REVERSIBLE, 'standard'), true);
 });
 
 test('canAutoApproveMergedGate: an expensive cost verdict never approves, regardless of level/tier', () => {
-  const item = { title: 'Add a config toggle', description: 'small ui tweak', tier: 'light' };
+  const item = { title: 'Add a config toggle', description: 'small ui tweak', size: 'light' };
   assert.equal(canAutoApproveMergedGate(item, CLEAN_PLAN, [], 'EXPENSIVE', 'heavy'), false);
 });
 
 // D9's monotone invariant, stated as a test: an unrecognized or missing
 // cost verdict must fail closed rather than being treated as reversible.
 test('canAutoApproveMergedGate: an unrecognized cost verdict fails closed', () => {
-  const item = { title: 'Add a config toggle', description: 'small ui tweak', tier: 'light' };
+  const item = { title: 'Add a config toggle', description: 'small ui tweak', size: 'light' };
   assert.equal(canAutoApproveMergedGate(item, CLEAN_PLAN, [], 'probably fine', 'heavy'), false);
   assert.equal(canAutoApproveMergedGate(item, CLEAN_PLAN, [], undefined, 'heavy'), false);
 });
 
 test('canAutoApproveMergedGate: open items in plan.md never approve, even with a reversible cost', () => {
-  const item = { title: 'Add a config toggle', description: 'small ui tweak', tier: 'light' };
+  const item = { title: 'Add a config toggle', description: 'small ui tweak', size: 'light' };
   assert.equal(canAutoApproveMergedGate(item, OPEN_PLAN, [], COST_REVERSIBLE, 'heavy'), false);
 });
 
 test('canAutoApproveMergedGate: level off never approves', () => {
-  const item = { title: 'Add a config toggle', description: 'small ui tweak', tier: 'light' };
+  const item = { title: 'Add a config toggle', description: 'small ui tweak', size: 'light' };
   assert.equal(canAutoApproveMergedGate(item, CLEAN_PLAN, [], COST_REVERSIBLE, 'off'), false);
 });
 
 test('canAutoApproveMergedGate: tier not covered by level never approves (D11 delegation ceiling)', () => {
-  const item = { title: 'Add a config toggle', description: 'small ui tweak', tier: 'heavy' };
+  const item = { title: 'Add a config toggle', description: 'small ui tweak', size: 'heavy' };
   assert.equal(canAutoApproveMergedGate(item, CLEAN_PLAN, [], COST_REVERSIBLE, 'light'), false);
 });
 
 test('canAutoApproveMergedGate: hard-gate keyword in title blocks approval at level heavy', () => {
-  const item = { title: 'Add auth bypass for internal service', description: 'small change', tier: 'light' };
+  const item = { title: 'Add auth bypass for internal service', description: 'small change', size: 'light' };
   assert.equal(canAutoApproveMergedGate(item, CLEAN_PLAN, [], COST_REVERSIBLE, 'heavy'), false);
 });
 
 test('canAutoApproveMergedGate: hard-gate keyword in description blocks approval at level heavy', () => {
-  const item = { title: 'Small cleanup', description: 'this also touches payment processing', tier: 'light' };
+  const item = { title: 'Small cleanup', description: 'this also touches payment processing', size: 'light' };
   assert.equal(canAutoApproveMergedGate(item, CLEAN_PLAN, [], COST_REVERSIBLE, 'heavy'), false);
 });
 
@@ -319,20 +319,20 @@ test('canAutoApproveMergedGate: hard-gate keyword in description blocks approval
 
 test('canAutoApproveMergedGate: D10 — a hard-gate keyword in the item footprint blocks approval', () => {
   const item = {
-    title: 'Tidy a helper', description: 'pure refactor', tier: 'light',
+    title: 'Tidy a helper', description: 'pure refactor', size: 'light',
     footprint: ['src/state/migration.mjs'],
   };
   assert.equal(canAutoApproveMergedGate(item, CLEAN_PLAN, [], COST_REVERSIBLE, 'heavy'), false);
 });
 
 test('canAutoApproveMergedGate: D10 — a hard-gate keyword in a child footprint blocks approval', () => {
-  const item = { title: 'Tidy a helper', description: 'pure refactor', tier: 'light' };
+  const item = { title: 'Tidy a helper', description: 'pure refactor', size: 'light' };
   const children = [{ title: 'Split the reader', verify: 'npm test', footprint: ['src/db/migration.mjs'] }];
   assert.equal(canAutoApproveMergedGate(item, CLEAN_PLAN, children, COST_REVERSIBLE, 'heavy'), false);
 });
 
 test('canAutoApproveMergedGate: D10 — a hard-gate keyword in a child action blocks approval', () => {
-  const item = { title: 'Tidy a helper', description: 'pure refactor', tier: 'light' };
+  const item = { title: 'Tidy a helper', description: 'pure refactor', size: 'light' };
   const children = [{ title: 'Step one', verify: 'npm test', action: 'D3: delete the stale rows' }];
   assert.equal(canAutoApproveMergedGate(item, CLEAN_PLAN, children, COST_REVERSIBLE, 'heavy'), false);
 });
@@ -343,7 +343,7 @@ test('canAutoApproveMergedGate: D10 — a hard-gate keyword in a child action bl
 // `security`, which are this project's everyday vocabulary — see
 // mergedGateHaystack's own comment for why that would stop discriminating.
 test('canAutoApproveMergedGate: A1 — hard-gate keywords in plan.md prose alone do NOT block approval', () => {
-  const item = { title: 'Add a config toggle', description: 'small ui tweak', tier: 'light' };
+  const item = { title: 'Add a config toggle', description: 'small ui tweak', size: 'light' };
   const prosePlan = [
     '# plan',
     '',
@@ -359,19 +359,19 @@ test('canAutoApproveMergedGate: A1 — hard-gate keywords in plan.md prose alone
 });
 
 test('canAutoApproveMergedGate: malformed childSpecs never throw and never widen the haystack', () => {
-  const item = { title: 'Rename a helper function', description: 'pure refactor', tier: 'heavy' };
+  const item = { title: 'Rename a helper function', description: 'pure refactor', size: 'heavy' };
   for (const bad of [undefined, null, 'not an array', [null], [42], [{ footprint: 'not an array' }]]) {
     assert.equal(canAutoApproveMergedGate(item, CLEAN_PLAN, bad, COST_REVERSIBLE, 'heavy'), true);
   }
 });
 
 test('canAutoApproveMergedGate: "auth" inside "authoring" is not a hard-gate hit (tsk-1gj)', () => {
-  const item = { title: 'Verify authoring during fgos-exploring', description: 'docs-only change', tier: 'light' };
+  const item = { title: 'Verify authoring during fgos-exploring', description: 'docs-only change', size: 'light' };
   assert.equal(canAutoApproveMergedGate(item, CLEAN_PLAN, [], COST_REVERSIBLE, 'heavy'), true);
 });
 
 test('canAutoApproveMergedGate: "audit" inside "audited" is not a hard-gate hit (tsk-1gj)', () => {
-  const item = { title: 'Already done', description: 'already audited every other remaining caller', tier: 'light' };
+  const item = { title: 'Already done', description: 'already audited every other remaining caller', size: 'light' };
   assert.equal(canAutoApproveMergedGate(item, CLEAN_PLAN, [], COST_REVERSIBLE, 'heavy'), true);
 });
 
@@ -380,7 +380,7 @@ test('canAutoApproveMergedGate: "audit" inside "audited" is not a hard-gate hit 
 // `src/authoring/index.mjs` must not read as an `auth` hit.
 test('canAutoApproveMergedGate: D10 — word boundaries hold on footprint paths too', () => {
   const item = {
-    title: 'Tidy a helper', description: 'pure refactor', tier: 'light',
+    title: 'Tidy a helper', description: 'pure refactor', size: 'light',
     footprint: ['src/authoring/index.mjs', 'test/authoring.test.mjs'],
   };
   assert.equal(canAutoApproveMergedGate(item, CLEAN_PLAN, [], COST_REVERSIBLE, 'heavy'), true);
@@ -388,23 +388,23 @@ test('canAutoApproveMergedGate: D10 — word boundaries hold on footprint paths 
 
 // tsk-4gr: doc citations like `AUDIT.md` or bare AUDIT.md filename tokens must not trip keyword floor
 test('canAutoApprove: backtick-quoted doc citation `AUDIT.md` does not trip hard-gate keyword audit (tsk-4gr)', () => {
-  const item = { title: 'Fix false positive', description: 'Citing `AUDIT.md` in description', tier: 'light' };
+  const item = { title: 'Fix false positive', description: 'Citing `AUDIT.md` in description', size: 'light' };
   assert.equal(canAutoApprove(item, CLEAR_ARTIFACT, 'heavy'), true);
 });
 
 test('canAutoApproveMergedGate: backtick-quoted doc citation `AUDIT.md` does not trip hard-gate keyword audit (tsk-4gr)', () => {
-  const item = { title: 'Fix false positive', description: 'Citing `AUDIT.md` in description', tier: 'light' };
+  const item = { title: 'Fix false positive', description: 'Citing `AUDIT.md` in description', size: 'light' };
   assert.equal(canAutoApproveMergedGate(item, CLEAN_PLAN, [], COST_REVERSIBLE, 'heavy'), true);
 });
 
 test('canAutoApprove & canAutoApproveMergedGate: bare AUDIT.md filename token does not trip hard-gate keyword audit (tsk-4gr)', () => {
-  const item = { title: 'Fix false positive', description: 'Citing AUDIT.md in description', tier: 'light' };
+  const item = { title: 'Fix false positive', description: 'Citing AUDIT.md in description', size: 'light' };
   assert.equal(canAutoApprove(item, CLEAR_ARTIFACT, 'heavy'), true);
   assert.equal(canAutoApproveMergedGate(item, CLEAN_PLAN, [], COST_REVERSIBLE, 'heavy'), true);
 });
 
 test('canAutoApprove & canAutoApproveMergedGate: regression — genuine prose keyword mention "audit" still hard-gates (tsk-4gr)', () => {
-  const item = { title: 'Security review', description: 'run a security audit of the login flow', tier: 'light' };
+  const item = { title: 'Security review', description: 'run a security audit of the login flow', size: 'light' };
   assert.equal(canAutoApprove(item, CLEAR_ARTIFACT, 'heavy'), false);
   assert.equal(canAutoApproveMergedGate(item, CLEAN_PLAN, [], COST_REVERSIBLE, 'heavy'), false);
 });
@@ -434,7 +434,7 @@ function tmpGateCheckFixture() {
   const fgosRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-gate-check-cli-'));
   const fgosDir = path.join(fgosRoot, '.fgos');
   fs.mkdirSync(fgosDir, { recursive: true });
-  addWork(fgosDir, { id: 'gate-check-fixture', title: 'Fixture item', description: 'fixture, not real work', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', tier: 'light' });
+  addWork(fgosDir, { id: 'gate-check-fixture', title: 'Fixture item', description: 'fixture, not real work', kind: 'task', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', size: 'light' });
   fs.writeFileSync(path.join(fgosDir, 'gate-bypass.json'), JSON.stringify({ level: 'standard' }));
   const planPath = path.join(fgosRoot, 'plan.md');
   fs.writeFileSync(planPath, CLEAN_PLAN);

@@ -1,0 +1,4356 @@
+[
+  {
+    "id": "01-v1-failed-failed",
+    "record": {
+      "runId": "run_asgn_5439cfc7_9ffa_45b0_8997_4d5c34fe8fbf_op_001_01",
+      "assignmentId": "asgn_5439cfc7_9ffa_45b0_8997_4d5c34fe8fbf_op_001",
+      "workId": null,
+      "executorId": "codex-cli",
+      "policy": {
+        "role": "reviewer",
+        "persona": "code-reviewer",
+        "executorPreference": [
+          "codex-cli"
+        ],
+        "executorId": "codex-cli",
+        "providerModel": "claude",
+        "tier": "standard",
+        "model": "sonnet",
+        "visibility": "headless",
+        "constraints": {
+          "requiresSkills": []
+        },
+        "provenance": {
+          "executor": {
+            "value": "codex-cli",
+            "source": {
+              "scope": "cliOverride"
+            }
+          },
+          "provider": {
+            "value": "claude",
+            "source": {
+              "scope": "registeredExecutor",
+              "id": "codex-cli"
+            }
+          },
+          "model": {
+            "value": "sonnet",
+            "source": {
+              "scope": "runnerConfig",
+              "id": "claude.standard"
+            }
+          },
+          "tier": {
+            "value": "standard",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "persona": {
+            "value": "code-reviewer",
+            "source": {
+              "scope": "default",
+              "id": "reviewer"
+            }
+          },
+          "visibility": {
+            "value": "headless",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "constraints": {
+            "value": {
+              "requiresSkills": []
+            },
+            "source": {
+              "scope": "assignment",
+              "id": "asgn_5439cfc7_9ffa_45b0_8997_4d5c34fe8fbf_op_001"
+            }
+          },
+          "governance": {
+            "value": "allowed",
+            "source": {
+              "scope": "governance",
+              "id": "claude"
+            }
+          }
+        }
+      },
+      "executorRedirected": false,
+      "settleReports": [],
+      "status": "failed",
+      "confidence": "failed",
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": ".fgos/assignments/asgn_5439cfc7_9ffa_45b0_8997_4d5c34fe8fbf_op_001/runs/01/stdout.log",
+        "stderrLog": ".fgos/assignments/asgn_5439cfc7_9ffa_45b0_8997_4d5c34fe8fbf_op_001/runs/01/stderr.log"
+      },
+      "agentClaim": {
+        "status": "failed",
+        "summary": "agent-result.json was present but failed schema validation"
+      },
+      "evidence": {
+        "gitBefore": "7957f6f350b94d2d653dfc938691af3830308db9",
+        "gitAfter": "7957f6f350b94d2d653dfc938691af3830308db9",
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [],
+        "tests": []
+      }
+    },
+    "expected": {
+      "category": "infra",
+      "satisfied": false,
+      "infraFailure": true
+    }
+  },
+  {
+    "id": "02-v1-no-evidence",
+    "record": {
+      "runId": "run_asgn_5439cfc7_9ffa_45b0_8997_4d5c34fe8fbf_op_002_01",
+      "assignmentId": "asgn_5439cfc7_9ffa_45b0_8997_4d5c34fe8fbf_op_002",
+      "workId": null,
+      "executorId": "codex-cli",
+      "policy": {
+        "role": "reviewer",
+        "persona": "code-reviewer",
+        "executorPreference": [
+          "codex-cli"
+        ],
+        "executorId": "codex-cli",
+        "providerModel": "claude",
+        "tier": "standard",
+        "model": "sonnet",
+        "visibility": "headless",
+        "constraints": {
+          "requiresSkills": []
+        },
+        "provenance": {
+          "executor": {
+            "value": "codex-cli",
+            "source": {
+              "scope": "cliOverride"
+            }
+          },
+          "provider": {
+            "value": "claude",
+            "source": {
+              "scope": "registeredExecutor",
+              "id": "codex-cli"
+            }
+          },
+          "model": {
+            "value": "sonnet",
+            "source": {
+              "scope": "runnerConfig",
+              "id": "claude.standard"
+            }
+          },
+          "tier": {
+            "value": "standard",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "persona": {
+            "value": "code-reviewer",
+            "source": {
+              "scope": "default",
+              "id": "reviewer"
+            }
+          },
+          "visibility": {
+            "value": "headless",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "constraints": {
+            "value": {
+              "requiresSkills": []
+            },
+            "source": {
+              "scope": "assignment",
+              "id": "asgn_5439cfc7_9ffa_45b0_8997_4d5c34fe8fbf_op_002"
+            }
+          },
+          "governance": {
+            "value": "allowed",
+            "source": {
+              "scope": "governance",
+              "id": "claude"
+            }
+          }
+        }
+      },
+      "executorRedirected": false,
+      "claimSha256": "ae9261f549b428b1b0902ca9e3291e6d682e6b7c059eabfac186c0e26728f4e4",
+      "settleReports": [],
+      "status": "no-evidence",
+      "confidence": "no-evidence",
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": ".fgos/assignments/asgn_5439cfc7_9ffa_45b0_8997_4d5c34fe8fbf_op_002/runs/01/stdout.log",
+        "stderrLog": ".fgos/assignments/asgn_5439cfc7_9ffa_45b0_8997_4d5c34fe8fbf_op_002/runs/01/stderr.log"
+      },
+      "agentClaim": {
+        "status": "done",
+        "summary": "The top-level package name is forgent.",
+        "evidenceRefs": [
+          "package.json"
+        ],
+        "name": "forgent"
+      },
+      "evidence": {
+        "gitBefore": "7957f6f350b94d2d653dfc938691af3830308db9",
+        "gitAfter": "7957f6f350b94d2d653dfc938691af3830308db9",
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [
+          ".fgos/assignments/asgn_5439cfc7_9ffa_45b0_8997_4d5c34fe8fbf_op_002/runs/01/agent-result.json"
+        ],
+        "tests": []
+      }
+    },
+    "expected": {
+      "category": "infra",
+      "satisfied": false,
+      "infraFailure": true
+    }
+  },
+  {
+    "id": "03-v1-done-inferred",
+    "record": {
+      "runId": "run_asgn_claude_lead_code_panel_multicell_facade_op_001_01",
+      "assignmentId": "asgn_claude_lead_code_panel_multicell_facade_op_001",
+      "workId": null,
+      "controlEpoch": 1,
+      "controlToken": "f52be1ee-36da-4e7e-9ead-607edac77410",
+      "executorId": "agy-cli",
+      "policy": {
+        "role": "doer",
+        "persona": "focused-code-implementer",
+        "executorPreference": [
+          "agy-cli"
+        ],
+        "executorId": "agy-cli",
+        "providerModel": "gemini",
+        "tier": "standard",
+        "model": "gemini-3.8-flash-medium",
+        "visibility": "headless",
+        "repeatMode": null,
+        "constraints": {
+          "requiresSkills": []
+        },
+        "provenance": {
+          "executor": {
+            "value": "agy-cli",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "provider": {
+            "value": "gemini",
+            "source": {
+              "scope": "registeredExecutor",
+              "id": "agy-cli"
+            }
+          },
+          "model": {
+            "value": "gemini-3.8-flash-medium",
+            "source": {
+              "scope": "runnerConfig",
+              "id": "gemini.standard"
+            }
+          },
+          "tier": {
+            "value": "standard",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "persona": {
+            "value": "focused-code-implementer",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "visibility": {
+            "value": "headless",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "repeatMode": {
+            "value": null,
+            "source": {
+              "scope": "default"
+            }
+          },
+          "constraints": {
+            "value": {
+              "requiresSkills": []
+            },
+            "source": {
+              "scope": "assignment",
+              "id": "asgn_claude_lead_code_panel_multicell_facade_op_001"
+            }
+          },
+          "governance": {
+            "value": "allowed",
+            "source": {
+              "scope": "governance",
+              "id": "gemini"
+            }
+          }
+        }
+      },
+      "executorRedirected": false,
+      "settleReports": [],
+      "status": "done",
+      "confidence": "inferred",
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": ".fgos/assignments/asgn_claude_lead_code_panel_multicell_facade_op_001/runs/01/stdout.log",
+        "stderrLog": ".fgos/assignments/asgn_claude_lead_code_panel_multicell_facade_op_001/runs/01/stderr.log"
+      },
+      "agentClaim": {
+        "status": "done",
+        "summary": "Settled"
+      },
+      "evidence": {
+        "gitBefore": "45569ac3379445e93436524c1226159b3869265c",
+        "gitAfter": "45569ac3379445e93436524c1226159b3869265c",
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [
+          "docs/architect/agent-coordination/verification/code-panel-multicell-facade/current-cell.md",
+          "docs/architect/agent-coordination/verification/code-panel-multicell-facade/index.md",
+          "docs/architect/agent-coordination/verification/code-panel-multicell-facade/proofs/baseline/paused-plans-inventory.md",
+          "docs/architect/agent-coordination/verification/code-panel-multicell-facade/proofs/baseline/terminal-close-tsk-1bh-proof.txt",
+          "docs/architect/agent-coordination/verification/code-panel-multicell-facade/proofs/baseline/test-run-counts-baseline.md",
+          "plans/260915-0455-test-suite-feedback-cost/decision-lock.md",
+          "plans/260915-0455-test-suite-feedback-cost/phase-00-harness-writer-hermeticity.md",
+          "plans/260915-0455-test-suite-feedback-cost/phase-01-portable-test-runner-ci.md",
+          "plans/260915-0455-test-suite-feedback-cost/phase-02-green-baseline-and-profile.md",
+          "plans/260915-0455-test-suite-feedback-cost/phase-03-docs-index-pilot.md",
+          "plans/260915-0455-test-suite-feedback-cost/phase-04-external-claude-isolation-pilot.md",
+          "plans/260915-0455-test-suite-feedback-cost/phase-05-related-test-selector-pilot.md",
+          "plans/260915-0455-test-suite-feedback-cost/phase-06-cli-fixture-init-pilot.md",
+          "plans/260915-0455-test-suite-feedback-cost/phase-07-cli-harness-responsibility-audit.md",
+          "plans/260915-0455-test-suite-feedback-cost/phase-08-evidence-decision-and-handoff.md",
+          "plans/260915-0455-test-suite-feedback-cost/plan.md",
+          "plans/260915-code-panel-multicell-facade/phase-00-contract-and-baseline.md",
+          "plans/260915-code-panel-multicell-facade/phase-01-two-mode-facade.md",
+          "plans/260915-code-panel-multicell-facade/phase-02-coding-test-policy-overlay.md",
+          "plans/260915-code-panel-multicell-facade/phase-03-resume-and-compatibility.md",
+          "plans/260915-code-panel-multicell-facade/phase-04-live-proof-and-rollout.md",
+          "plans/260915-code-panel-multicell-facade/plan.md",
+          "plans/260915-executor-policy-dispatch-seams/design.md",
+          "plans/260915-executor-policy-dispatch-seams/phase-00-baseline-snapshot.md",
+          "plans/260915-executor-policy-dispatch-seams/phase-01-provider-adapter-shadow.md",
+          "plans/260915-executor-policy-dispatch-seams/phase-02-persona-prompt-envelope.md",
+          "plans/260915-executor-policy-dispatch-seams/phase-03-effort-and-alias-seam.md",
+          "plans/260915-executor-policy-dispatch-seams/phase-04-quality-bridge.md",
+          "plans/260915-executor-policy-dispatch-seams/phase-05-placement-policy-shadow.md",
+          "plans/260915-executor-policy-dispatch-seams/phase-06-executor-profile-invocations.md",
+          "plans/260915-executor-policy-dispatch-seams/plan.md"
+        ],
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [],
+        "tests": []
+      }
+    },
+    "expected": {
+      "category": "ok",
+      "satisfied": true,
+      "infraFailure": false
+    }
+  },
+  {
+    "id": "04-v1-done-verified",
+    "record": {
+      "runId": "run_asgn_claude_lead_code_panel_multicell_facade_op_002_01",
+      "assignmentId": "asgn_claude_lead_code_panel_multicell_facade_op_002",
+      "workId": null,
+      "controlEpoch": 1,
+      "controlToken": "ac908984-c692-471f-b2a7-4a050069688f",
+      "executorId": "agy-cli",
+      "policy": {
+        "role": "doer",
+        "persona": "focused-code-implementer",
+        "executorPreference": [
+          "agy-cli"
+        ],
+        "executorId": "agy-cli",
+        "providerModel": "gemini",
+        "tier": "standard",
+        "model": "gemini-3.8-flash-medium",
+        "visibility": "headless",
+        "repeatMode": null,
+        "constraints": {
+          "requiresSkills": []
+        },
+        "provenance": {
+          "executor": {
+            "value": "agy-cli",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "provider": {
+            "value": "gemini",
+            "source": {
+              "scope": "registeredExecutor",
+              "id": "agy-cli"
+            }
+          },
+          "model": {
+            "value": "gemini-3.8-flash-medium",
+            "source": {
+              "scope": "runnerConfig",
+              "id": "gemini.standard"
+            }
+          },
+          "tier": {
+            "value": "standard",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "persona": {
+            "value": "focused-code-implementer",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "visibility": {
+            "value": "headless",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "repeatMode": {
+            "value": null,
+            "source": {
+              "scope": "default"
+            }
+          },
+          "constraints": {
+            "value": {
+              "requiresSkills": []
+            },
+            "source": {
+              "scope": "assignment",
+              "id": "asgn_claude_lead_code_panel_multicell_facade_op_002"
+            }
+          },
+          "governance": {
+            "value": "allowed",
+            "source": {
+              "scope": "governance",
+              "id": "gemini"
+            }
+          }
+        }
+      },
+      "executorRedirected": false,
+      "claimSha256": "1a386319f79cff85209ed21d1220d5ec66b842e481fb90a98bc51ec9fee40a13",
+      "settleReports": [
+        {
+          "path": ".fgos/assignments/asgn_claude_lead_code_panel_multicell_facade_op_002/runs/01/agent-report.md",
+          "sha256": "f28fad4981c7cea3493c48fe8697cfc7a863cb91158dac387ebc371cb53aa622"
+        }
+      ],
+      "status": "done",
+      "confidence": "verified",
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": ".fgos/assignments/asgn_claude_lead_code_panel_multicell_facade_op_002/runs/01/stdout.log",
+        "stderrLog": ".fgos/assignments/asgn_claude_lead_code_panel_multicell_facade_op_002/runs/01/stderr.log"
+      },
+      "agentClaim": {
+        "status": "done",
+        "summary": "Fixed orphaned authorization supersession in resolveBindingAuthorization, resolveTaskKeyAuthorization, and same-binding collision check in src/runner/coordination/session-engine.mjs. Landed commit b16dd524 with regression tests in test/runner/coordination-driver-authorization.test.mjs. Mutation verified: reverted fix fails with exact wrong-Assignment-minted symptom, restored fix passes all 134 focused tests with zero regressions.",
+        "commit": "b16dd524621cbf97690663e9764f9ede286583be",
+        "branch": "code-panel-multicell-facade--p04",
+        "focused_tests": {
+          "command": "node --test test/runner/coordination-session-engine.test.mjs test/runner/coordination-driver-authorization.test.mjs test/runner/coordination-recovery-and-quorum.test.mjs",
+          "total": 134,
+          "pass": 134,
+          "fail": 0,
+          "exitCode": 0
+        },
+        "mutation_verification": {
+          "command": "node --test --test-name-pattern=\"superseded\" test/runner/coordination-driver-authorization.test.mjs",
+          "reverted_code_outcome": {
+            "pass": 0,
+            "fail": 2,
+            "exitCode": 1,
+            "error_output": "✖ an older orphaned authorization is superseded by newer consumed siblings -- keyless repeat dispatch refuses rather than minting a 4th Assignment spending the orphan (1752.735078ms)\n  AssertionError [ERR_ASSERTION]: Missing expected rejection.\n✖ an older orphaned authorization is superseded by a newer consumed sibling -- repeat keyless dispatch idempotently resumes the consumed Assignment instead of spending the orphan (1481.097994ms)\n  AssertionError [ERR_ASSERTION]: repeat keyless call must idempotently resume first\n  false !== true"
+          },
+          "fixed_code_outcome": {
+            "pass": 2,
+            "fail": 0,
+            "exitCode": 0,
+            "output": "✔ an older orphaned authorization is superseded by newer consumed siblings -- keyless repeat dispatch refuses rather than minting a 4th Assignment spending the orphan (1502.62459ms)\n✔ an older orphaned authorization is superseded by a newer consumed sibling -- repeat keyless dispatch idempotently resumes the consumed Assignment instead of spending the orphan (727.485918ms)\nℹ tests 2\nℹ pass 2\nℹ fail 0"
+          }
+        }
+      },
+      "evidence": {
+        "gitBefore": "45569ac3379445e93436524c1226159b3869265c",
+        "gitAfter": "b16dd524621cbf97690663e9764f9ede286583be",
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [
+          "src/runner/coordination/session-engine.mjs",
+          "test/runner/coordination-driver-authorization.test.mjs"
+        ],
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [
+          ".fgos/assignments/asgn_claude_lead_code_panel_multicell_facade_op_002/runs/01/agent-report.md",
+          ".fgos/assignments/asgn_claude_lead_code_panel_multicell_facade_op_002/runs/01/agent-result.json"
+        ],
+        "tests": []
+      }
+    },
+    "expected": {
+      "category": "ok",
+      "satisfied": true,
+      "infraFailure": false
+    }
+  },
+  {
+    "id": "05-v1-done-reported",
+    "record": {
+      "runId": "run_asgn_claude_lead_code_panel_multicell_facade_op_003_01",
+      "assignmentId": "asgn_claude_lead_code_panel_multicell_facade_op_003",
+      "workId": null,
+      "controlEpoch": 1,
+      "controlToken": "5e2880e4-a5db-49c0-8bf5-ced98f1e7b68",
+      "executorId": "claude-reviewer",
+      "policy": {
+        "role": "reviewer",
+        "persona": "independent-code-reviewer",
+        "executorPreference": [
+          "claude-reviewer"
+        ],
+        "executorId": "claude-reviewer",
+        "providerModel": "claude",
+        "tier": "analytical",
+        "model": "opus",
+        "visibility": "headless",
+        "repeatMode": "pre-delivery",
+        "constraints": {
+          "requiresSkills": []
+        },
+        "provenance": {
+          "executor": {
+            "value": "claude-reviewer",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "provider": {
+            "value": "claude",
+            "source": {
+              "scope": "registeredExecutor",
+              "id": "claude-reviewer"
+            }
+          },
+          "model": {
+            "value": "opus",
+            "source": {
+              "scope": "runnerConfig",
+              "id": "claude.analytical"
+            }
+          },
+          "tier": {
+            "value": "analytical",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "persona": {
+            "value": "independent-code-reviewer",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "visibility": {
+            "value": "headless",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "repeatMode": {
+            "value": "pre-delivery",
+            "source": {
+              "scope": "cliOverride"
+            }
+          },
+          "constraints": {
+            "value": {
+              "requiresSkills": []
+            },
+            "source": {
+              "scope": "assignment",
+              "id": "asgn_claude_lead_code_panel_multicell_facade_op_003"
+            }
+          },
+          "governance": {
+            "value": "allowed",
+            "source": {
+              "scope": "governance",
+              "id": "claude"
+            }
+          }
+        }
+      },
+      "executorRedirected": false,
+      "claimSha256": "64d97f3fefe234d789c3f67f5f0700a7398bf835ae5b8a66b9c68438b5c6c9b7",
+      "settleReports": [
+        {
+          "path": ".fgos/assignments/asgn_claude_lead_code_panel_multicell_facade_op_003/runs/01/agent-report.md",
+          "sha256": "74bd74222b65a94f4ba4d06df612adf72cf2e6cc0e439759850f70235873d220"
+        }
+      ],
+      "status": "done",
+      "confidence": "reported",
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": ".fgos/assignments/asgn_claude_lead_code_panel_multicell_facade_op_003/runs/01/stdout.log",
+        "stderrLog": ".fgos/assignments/asgn_claude_lead_code_panel_multicell_facade_op_003/runs/01/stderr.log"
+      },
+      "agentClaim": {
+        "status": "done",
+        "summary": "Independent review of the P00 candidate (uncommitted working tree in code-panel-multicell-facade-p00; no cell commit exists on any branch). R1 real and reproduced: 130/130 focused coordination tests re-run by reviewer at HEAD 45569ac3, 9af6362c confirmed ancestor. R5 clean (tracked diff + untracked check on src/core/domains/test). R2 under-specified, R3's contract-assertion deliverable and the declared p00.md are missing, R4 inventory omits the in-flight dispatch-operability-implementation track (I05 next). Recommend one docs-only fix round before close; no engine gap, no re-plan.",
+        "verdict": "fix-round-required",
+        "reviewedTarget": {
+          "kind": "working-tree",
+          "commit": null,
+          "branch": "code-panel-multicell-facade--p00",
+          "head": "45569ac3379445e93436524c1226159b3869265c",
+          "worktree": "/home/vantt/projects/code-panel-multicell-facade-p00"
+        },
+        "requirements": {
+          "R1": {
+            "verdict": "pass",
+            "note": "Proof reproduced by reviewer: 130 pass / 0 fail. Live P04 close evidenced via committed trace 99812f28 (live .fgos not readable in sandbox). Proof file lacks provenance header (F4)."
+          },
+          "R2": {
+            "verdict": "fail",
+            "note": "Only 'plan/phase file referenced' + 'ambiguous never guesses' written; explicit run/resume trigger, direct-single-cell rule, and ambiguous-input behavior absent (F2)."
+          },
+          "R3": {
+            "verdict": "partial",
+            "note": "Ownership table cleanly separates code-panel / plan-loop / engine and matches live sources; but Step 4 contract assertions with source ref + expected outcome do not exist (F1)."
+          },
+          "R4": {
+            "verdict": "fail",
+            "note": "Listed rows accurate (verified test-suite-feedback-cost P02 unmerged, tips match); omits in-flight dispatch-operability-implementation track (I01-I04 merged at 3c58bafc, I05 cell branch at dd0c2342) (F3)."
+          },
+          "R5": {
+            "verdict": "pass",
+            "note": "git diff --exit-code -- src core domains test clean; git status --untracked-files=all on same paths empty."
+          }
+        },
+        "proofSufficiency": {
+          "declaredTier": "focused",
+          "command": "node --test test/runner/coordination-driver-authorization.test.mjs test/runner/coordination-recovery-and-quorum.test.mjs test/verbs/coordination-recovery.test.mjs",
+          "reviewerRerun": {
+            "pass": 130,
+            "fail": 0,
+            "durationMs": 14937,
+            "head": "45569ac3"
+          },
+          "sufficient": true,
+          "note": "Right tier for a docs-only cell; no wider tier warranted. R2/R3/R4 have no mechanical check and rest on review; the artifacts review depends on (p00.md, assertion list) are absent."
+        },
+        "findings": [
+          {
+            "id": "F1",
+            "severity": "high",
+            "requirement": "R3/Step4/Validation-2",
+            "file": "docs/architect/agent-coordination/verification/code-panel-multicell-facade/p00.md",
+            "summary": "Declared p00.md cell trace is missing (dead links at index.md:60,70); the exact contract assertions with source reference + expected outcome that P01 must turn into tests exist nowhere, despite current-cell.md:23 claiming them."
+          },
+          {
+            "id": "F2",
+            "severity": "high",
+            "requirement": "R2",
+            "file": "docs/architect/agent-coordination/verification/code-panel-multicell-facade/index.md",
+            "summary": "Mode-selection contract omits the explicit 'run/resume this implementation plan' trigger and the 'concrete change with no plan track -> direct-single-cell' rule, and does not say what ambiguous input produces."
+          },
+          {
+            "id": "F3",
+            "severity": "medium",
+            "requirement": "R4",
+            "file": "docs/architect/agent-coordination/verification/code-panel-multicell-facade/proofs/baseline/paused-plans-inventory.md",
+            "summary": "In-flight dispatch-operability-implementation track omitted (branch implementation-track--dispatch-operability-evidence-attribution@3c58bafc, I05 next, cell branch dispatch-operability-implementation--i05@dd0c2342); section 3 mislabels the area as a closed design track. Pre-existing branch code-panel-multicell-facade--p04 unexplained."
+          },
+          {
+            "id": "F4",
+            "severity": "medium",
+            "requirement": "R1",
+            "file": "docs/architect/agent-coordination/verification/code-panel-multicell-facade/proofs/baseline/terminal-close-tsk-1bh-proof.txt",
+            "summary": "Proof is raw runner output with no command/HEAD/tree-hash/env-fingerprint/date header; plan.md's proof-reuse rule cannot be applied to it by a later reviewer or red-team."
+          },
+          {
+            "id": "F5",
+            "severity": "low",
+            "requirement": "R1/Step1",
+            "file": "docs/architect/agent-coordination/verification/code-panel-multicell-facade/index.md",
+            "summary": "Terminal-close reproduction not re-run in this cell; relies on committed trace 99812f28. Acceptable, but state it explicitly rather than implying a fresh reproduction."
+          },
+          {
+            "id": "F6",
+            "severity": "low",
+            "requirement": "R5",
+            "file": "docs/architect/agent-coordination/verification/code-panel-multicell-facade/current-cell.md",
+            "summary": "Verification block's git diff --exit-code misses untracked files; add git status --porcelain --untracked-files=all -- src core domains test (verified empty today)."
+          },
+          {
+            "id": "F7",
+            "severity": "low",
+            "requirement": "accuracy",
+            "file": "docs/architect/agent-coordination/verification/code-panel-multicell-facade/index.md",
+            "summary": "index.md:34 renders commit 9af6362c as a file:// link to session-engine.mjs; test-run-counts-baseline.md pre-policy rows are uncited '~' estimates (predecessor-track numbers spot-checked and correct)."
+          },
+          {
+            "id": "F8",
+            "severity": "info",
+            "requirement": "housekeeping (Lead-owned)",
+            "file": "open.json",
+            "summary": "Stray open.json at repo root must not be committed with the cell; plan.md Cell-status row for P00 still 'planned'; plan-loop step-0 BASELINE (full-suite failing-test list + env fingerprint) not yet under proofs/baseline/ — outside doer scope but needed by P04."
+          }
+        ],
+        "findingsBySeverity": {
+          "high": 2,
+          "medium": 2,
+          "low": 3,
+          "info": 1
+        },
+        "limits": [
+          "Sandbox could not read /home/vantt/projects/forgentX/.fgos/ or run node bin/fgos.mjs coordination show; live session state verified only via committed traces."
+        ],
+        "report": "/home/vantt/projects/forgentX/.fgos/assignments/asgn_claude_lead_code_panel_multicell_facade_op_003/runs/01/agent-report.md"
+      },
+      "evidence": {
+        "gitBefore": "45569ac3379445e93436524c1226159b3869265c",
+        "gitAfter": "45569ac3379445e93436524c1226159b3869265c",
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "artifacts": [
+          ".fgos/assignments/asgn_claude_lead_code_panel_multicell_facade_op_003/runs/01/agent-report.md",
+          ".fgos/assignments/asgn_claude_lead_code_panel_multicell_facade_op_003/runs/01/agent-result.json"
+        ],
+        "tests": []
+      }
+    },
+    "expected": {
+      "category": "ok",
+      "satisfied": true,
+      "infraFailure": false
+    }
+  },
+  {
+    "id": "06-v2-completed-pass-verified",
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 2
+      },
+      "runId": "run_asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001_01",
+      "assignmentId": "asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001",
+      "workId": null,
+      "controlEpoch": 1,
+      "controlToken": "5127e530-01c5-4af2-92b0-000c1b63380f",
+      "executorId": "gemini",
+      "executorRedirected": false,
+      "policy": {
+        "role": "doer",
+        "persona": "focused-code-implementer",
+        "executorPreference": [
+          "gemini",
+          "openai"
+        ],
+        "executorId": "gemini",
+        "providerModel": "gemini",
+        "tier": "standard",
+        "model": "gemini-3.8-flash-medium",
+        "quality": {
+          "minRigor": {
+            "value": "standard",
+            "source": {
+              "scope": "derived",
+              "id": "standard"
+            }
+          },
+          "mode": {
+            "value": "balanced",
+            "source": {
+              "scope": "tier-bridge",
+              "id": "standard"
+            },
+            "sourceKind": "implied-by-tier-bridge"
+          }
+        },
+        "lookupPolicyTier": "standard",
+        "reasoningEffort": "medium",
+        "visibility": "headless",
+        "repeatMode": null,
+        "constraints": {
+          "requiresSkills": []
+        },
+        "provenance": {
+          "executor": {
+            "value": "gemini",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "provider": {
+            "value": "gemini",
+            "source": {
+              "scope": "registeredExecutor",
+              "id": "gemini"
+            }
+          },
+          "model": {
+            "value": "gemini-3.8-flash-medium",
+            "source": {
+              "scope": "placement-policy",
+              "id": "gemini.standard"
+            }
+          },
+          "tier": {
+            "value": "standard",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "semanticTier": {
+            "value": "standard",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "quality": {
+            "minRigor": {
+              "value": "standard",
+              "source": {
+                "scope": "derived",
+                "id": "standard"
+              }
+            },
+            "mode": {
+              "value": "balanced",
+              "source": {
+                "scope": "tier-bridge",
+                "id": "standard"
+              },
+              "sourceKind": "implied-by-tier-bridge"
+            }
+          },
+          "lookupPolicyTier": {
+            "value": "standard",
+            "source": {
+              "scope": "default",
+              "kind": "semantic"
+            }
+          },
+          "reasoningEffort": {
+            "value": "medium",
+            "source": {
+              "scope": "derived",
+              "id": "quality.minRigor.standard"
+            }
+          },
+          "persona": {
+            "value": "focused-code-implementer",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "visibility": {
+            "value": "headless",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "repeatMode": {
+            "value": null,
+            "source": {
+              "scope": "default"
+            }
+          },
+          "constraints": {
+            "value": {
+              "requiresSkills": []
+            },
+            "source": {
+              "scope": "assignment",
+              "id": "asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001"
+            }
+          },
+          "governance": {
+            "value": "allowed",
+            "source": {
+              "scope": "governance",
+              "id": "gemini"
+            }
+          }
+        }
+      },
+      "promptEnvelope": {
+        "persona": {
+          "ref": "focused-code-implementer",
+          "delivery": "section",
+          "applied": true,
+          "source": {
+            "scope": "cli",
+            "id": "cli"
+          }
+        }
+      },
+      "settledAt": "2026-09-17T16:32:38.818Z",
+      "durationMs": 485772,
+      "claimSha256": "f53062478a38836f02ce026033850ae2dccc1abdaef2c7cba32aeb4c08fa06b8",
+      "settleReports": [
+        {
+          "path": ".fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001/runs/01/agent-report.md",
+          "sha256": "f376635793537dd4e6efff5737ba6624a858ba7a4a5fff92f1516f06409e20ee"
+        }
+      ],
+      "classification": {
+        "execution": {
+          "status": "completed",
+          "exitCode": 0
+        },
+        "assessment": {
+          "verdict": "pass"
+        },
+        "confidence": {
+          "level": "verified",
+          "basis": [
+            "valid-agent-result-claim",
+            "captured-stdout",
+            "workspace-git-diff"
+          ]
+        },
+        "failure": null,
+        "policy": {
+          "disposition": "allow",
+          "code": null
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v2"
+      },
+      "status": "done",
+      "confidence": "verified",
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": ".fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001/runs/01/stdout.log",
+        "stderrLog": ".fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001/runs/01/stderr.log"
+      },
+      "agentClaim": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "Implemented R3-P1 (Remote Projector And Presenter) in herdr-plugin/src/remote_invocation.rs with project_remote_invocation, present_remote_outcome, and build_invocation_service. Added fgos-host-runtime and fgos-distribution path dependencies to herdr-plugin/Cargo.toml and registered module in herdr-plugin/src/lib.rs. Landed commit 802a0965 and verified all 7 focused unit tests pass.",
+        "evidenceRefs": [
+          "git commit 802a0965",
+          "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+        ]
+      },
+      "evidence": {
+        "gitBefore": "b5d26f6c213733971f3ea17220fb8457c84dbfe5",
+        "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [
+          "herdr-plugin/Cargo.lock",
+          "herdr-plugin/Cargo.toml",
+          "herdr-plugin/src/gateway.rs",
+          "herdr-plugin/src/lib.rs",
+          "herdr-plugin/src/remote_invocation.rs"
+        ],
+        "mutatedDirtyBeforeFiles": [],
+        "attribution": [],
+        "artifacts": [
+          ".fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001/runs/01/agent-report.md",
+          ".fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_001/runs/01/agent-result.json"
+        ],
+        "tests": [],
+        "findingRefs": [
+          "git commit 802a0965",
+          "cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation (7 passed; 0 failed; 183 filtered out)"
+        ]
+      }
+    },
+    "expected": {
+      "category": "ok",
+      "satisfied": true,
+      "infraFailure": false
+    }
+  },
+  {
+    "id": "07-v2-completed-pass-reported",
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 2
+      },
+      "runId": "run_asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_002_01",
+      "assignmentId": "asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_002",
+      "workId": null,
+      "controlEpoch": 1,
+      "controlToken": "c70e33c0-ccc5-4fe2-8560-519a60b77064",
+      "executorId": "gemini",
+      "executorRedirected": false,
+      "policy": {
+        "role": "reviewer",
+        "persona": "code-quality-reviewer",
+        "executorPreference": [
+          "gemini",
+          "claude"
+        ],
+        "executorId": "gemini",
+        "providerModel": "gemini",
+        "tier": "flagship",
+        "model": "gemini-3.1-pro-low",
+        "quality": {
+          "minRigor": {
+            "value": "high",
+            "source": {
+              "scope": "derived",
+              "id": "flagship"
+            }
+          },
+          "mode": {
+            "value": "analytical",
+            "source": {
+              "scope": "tier-bridge",
+              "id": "flagship"
+            },
+            "sourceKind": "implied-by-tier-bridge"
+          }
+        },
+        "lookupPolicyTier": "flagship",
+        "reasoningEffort": "high",
+        "visibility": "headless",
+        "repeatMode": "pre-delivery",
+        "constraints": {
+          "requiresSkills": []
+        },
+        "provenance": {
+          "executor": {
+            "value": "gemini",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "provider": {
+            "value": "gemini",
+            "source": {
+              "scope": "registeredExecutor",
+              "id": "gemini"
+            }
+          },
+          "model": {
+            "value": "gemini-3.1-pro-low",
+            "source": {
+              "scope": "placement-policy",
+              "id": "gemini.flagship"
+            }
+          },
+          "tier": {
+            "value": "flagship",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "semanticTier": {
+            "value": "flagship",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "quality": {
+            "minRigor": {
+              "value": "high",
+              "source": {
+                "scope": "derived",
+                "id": "flagship"
+              }
+            },
+            "mode": {
+              "value": "analytical",
+              "source": {
+                "scope": "tier-bridge",
+                "id": "flagship"
+              },
+              "sourceKind": "implied-by-tier-bridge"
+            }
+          },
+          "lookupPolicyTier": {
+            "value": "flagship",
+            "source": {
+              "scope": "cli",
+              "id": "cli",
+              "kind": "semantic"
+            }
+          },
+          "reasoningEffort": {
+            "value": "high",
+            "source": {
+              "scope": "derived",
+              "id": "quality.minRigor.high"
+            }
+          },
+          "persona": {
+            "value": "code-quality-reviewer",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "visibility": {
+            "value": "headless",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "repeatMode": {
+            "value": "pre-delivery",
+            "source": {
+              "scope": "cliOverride"
+            }
+          },
+          "constraints": {
+            "value": {
+              "requiresSkills": []
+            },
+            "source": {
+              "scope": "assignment",
+              "id": "asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_002"
+            }
+          },
+          "governance": {
+            "value": "allowed",
+            "source": {
+              "scope": "governance",
+              "id": "gemini"
+            }
+          }
+        }
+      },
+      "promptEnvelope": {
+        "persona": {
+          "ref": "code-quality-reviewer",
+          "delivery": "section",
+          "applied": true,
+          "source": {
+            "scope": "cli",
+            "id": "cli"
+          }
+        }
+      },
+      "settledAt": "2026-09-17T16:33:50.909Z",
+      "durationMs": 71949,
+      "claimSha256": "65a0b7bf2875ef319a0e54b6001df3e3ddf93a5f8c696c5ef41cc19215eaedb4",
+      "settleReports": [
+        {
+          "path": ".fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_002/runs/01/agent-report.md",
+          "sha256": "ca2297ca01db5a1d58e3c7d2a3351e68acc3ce8e3d0dd0b3cd4c8752a7308983"
+        }
+      ],
+      "classification": {
+        "execution": {
+          "status": "completed",
+          "exitCode": 0
+        },
+        "assessment": {
+          "verdict": "pass"
+        },
+        "confidence": {
+          "level": "reported",
+          "basis": [
+            "valid-agent-result-claim",
+            "captured-stdout"
+          ]
+        },
+        "failure": null,
+        "policy": {
+          "disposition": "allow",
+          "code": null
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v2"
+      },
+      "status": "done",
+      "confidence": "reported",
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": ".fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_002/runs/01/stdout.log",
+        "stderrLog": ".fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_002/runs/01/stderr.log"
+      },
+      "agentClaim": {
+        "id": "agent-result-claim",
+        "version": 2,
+        "status": "done",
+        "summary": "Review completed successfully. Implementation accurately reflects the constraints, utilizes appropriate error mappings, does not introduce Node.js shelling, and leaves router untouched. Test coverage is robust.",
+        "assessment": {
+          "verdict": "pass"
+        },
+        "evidenceRefs": [
+          "/home/vantt/projects/forgentX/.fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_002/runs/01/agent-report.md"
+        ]
+      },
+      "evidence": {
+        "gitBefore": "802a096540f2c99eaa9bdc3fe471398b807372ba",
+        "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "attribution": [],
+        "artifacts": [
+          ".fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_002/runs/01/agent-report.md",
+          ".fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_002/runs/01/agent-result.json"
+        ],
+        "tests": [],
+        "findingRefs": [
+          "/home/vantt/projects/forgentX/.fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_002/runs/01/agent-report.md"
+        ]
+      }
+    },
+    "expected": {
+      "category": "ok",
+      "satisfied": true,
+      "infraFailure": false
+    }
+  },
+  {
+    "id": "08-v2-completed-findings-reported",
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 2
+      },
+      "runId": "run_asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_003_01",
+      "assignmentId": "asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_003",
+      "workId": null,
+      "controlEpoch": 1,
+      "controlToken": "3d64c44a-be84-4a37-86ca-9bec0adb951f",
+      "executorId": "xai",
+      "executorRedirected": false,
+      "policy": {
+        "role": "red-team",
+        "persona": "edge-case-and-security-attacker",
+        "executorPreference": [
+          "xai",
+          "openai"
+        ],
+        "executorId": "xai",
+        "providerModel": "xai",
+        "tier": "flagship",
+        "model": "grok-4.6",
+        "quality": {
+          "minRigor": {
+            "value": "high",
+            "source": {
+              "scope": "derived",
+              "id": "flagship"
+            }
+          },
+          "mode": {
+            "value": "analytical",
+            "source": {
+              "scope": "tier-bridge",
+              "id": "flagship"
+            },
+            "sourceKind": "implied-by-tier-bridge"
+          }
+        },
+        "lookupPolicyTier": "flagship",
+        "reasoningEffort": "high",
+        "visibility": "headless",
+        "repeatMode": "pre-delivery",
+        "constraints": {
+          "requiresSkills": []
+        },
+        "provenance": {
+          "executor": {
+            "value": "xai",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "provider": {
+            "value": "xai",
+            "source": {
+              "scope": "registeredExecutor",
+              "id": "xai"
+            }
+          },
+          "model": {
+            "value": "grok-4.6",
+            "source": {
+              "scope": "placement-policy",
+              "id": "xai.flagship"
+            }
+          },
+          "tier": {
+            "value": "flagship",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "semanticTier": {
+            "value": "flagship",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "quality": {
+            "minRigor": {
+              "value": "high",
+              "source": {
+                "scope": "derived",
+                "id": "flagship"
+              }
+            },
+            "mode": {
+              "value": "analytical",
+              "source": {
+                "scope": "tier-bridge",
+                "id": "flagship"
+              },
+              "sourceKind": "implied-by-tier-bridge"
+            }
+          },
+          "lookupPolicyTier": {
+            "value": "flagship",
+            "source": {
+              "scope": "cli",
+              "id": "cli",
+              "kind": "semantic"
+            }
+          },
+          "reasoningEffort": {
+            "value": "high",
+            "source": {
+              "scope": "derived",
+              "id": "quality.minRigor.high"
+            }
+          },
+          "persona": {
+            "value": "edge-case-and-security-attacker",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "visibility": {
+            "value": "headless",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "repeatMode": {
+            "value": "pre-delivery",
+            "source": {
+              "scope": "cliOverride"
+            }
+          },
+          "constraints": {
+            "value": {
+              "requiresSkills": []
+            },
+            "source": {
+              "scope": "assignment",
+              "id": "asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_003"
+            }
+          },
+          "governance": {
+            "value": "allowed",
+            "source": {
+              "scope": "governance",
+              "id": "xai"
+            }
+          }
+        }
+      },
+      "promptEnvelope": {
+        "persona": {
+          "ref": "edge-case-and-security-attacker",
+          "delivery": "section",
+          "applied": true,
+          "source": {
+            "scope": "cli",
+            "id": "cli"
+          }
+        }
+      },
+      "settledAt": "2026-09-17T16:39:44.323Z",
+      "durationMs": 353319,
+      "claimSha256": "e450e8760b4c3b91cf128adf3323f7556016abe7cf7f69a9021145f7a3c9bbb5",
+      "settleReports": [
+        {
+          "path": ".fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_003/runs/01/agent-report.md",
+          "sha256": "d96d521849a8b0971116858f38ee276f165887bd8a747f7f7013419d9d62c1d3"
+        }
+      ],
+      "classification": {
+        "execution": {
+          "status": "completed",
+          "exitCode": 0
+        },
+        "assessment": {
+          "verdict": "findings"
+        },
+        "confidence": {
+          "level": "reported",
+          "basis": [
+            "valid-agent-result-claim",
+            "captured-stdout"
+          ]
+        },
+        "failure": null,
+        "policy": {
+          "disposition": "allow",
+          "code": null
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v2"
+      },
+      "status": "failed",
+      "confidence": "reported",
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": ".fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_003/runs/01/stdout.log",
+        "stderrLog": ".fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_003/runs/01/stderr.log"
+      },
+      "agentClaim": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "done",
+        "summary": "Red-team of commit 802a0965 (R3-P1 remote projector/presenter). All four named attacks failed to break the implementation: (1) present_remote_outcome maps a failed BuildShowOutcome downcast to GatewayError::unexpected via ok_or_else — no unwrap/expect/panic on that path; (2) ProviderError maps to at least four distinct ErrorCategory values (Precondition / Conflict / Validation / Unexpected), not a silent Unexpected collapse; (3) include_runtime is a struct-literal true with no caller parameter and no other construction site; (4) cargo metadata shows herdr-fgos is not a root workspace member; cargo pkgid -p fgos and -p fgos-host-runtime still resolve to apps/fgos and packages/host-runtime/rust, and -p herdr-fgos from repo root still fails. Two LOW proof-sufficiency findings: FOCUSED_TESTS never construct a Completed payload that is not BuildShowOutcome, and they never inspect root workspace resolution.",
+        "assessment": {
+          "verdict": "findings"
+        },
+        "findings": [
+          {
+            "id": "L1",
+            "severity": "low",
+            "title": "FOCUSED_TESTS miss the downcast-failure contract present_remote_outcome claims",
+            "detail": "present_remote_outcome is specified to return a mapped GatewayError when ProviderOutcome::Completed.output is not BuildShowOutcome, and the source does that (ok_or_else -> GatewayError::unexpected(\"unsupported outcome payload type\")). Named attack (1) therefore does not break the code. FOCUSED_TESTS still never construct that case: test_present_remote_outcome_completed uses a real BuildShowOutcome, test_present_remote_outcome_parked_fallback uses Parked, and test_present_remote_outcome_error_mappings only feeds ProviderError. A future regression to .unwrap()/.expect() on downcast_ref would still go green under `cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation`.",
+            "evidence": "herdr-plugin/src/remote_invocation.rs:206-213 (mapped error), 267-316 (Completed+Parked tests), 317-382 (error tests; no wrong-type Completed)"
+          },
+          {
+            "id": "L2",
+            "severity": "low",
+            "title": "FOCUSED_TESTS miss the workspace-isolation contract the Cargo.toml path deps change",
+            "detail": "The diff adds path deps on fgos-host-runtime and fgos-distribution to an excluded crate. Named attack (4) does not land: independent `cargo metadata --no-deps` from repo root still has exactly the five original workspace members and zero herdr packages; `cargo pkgid -p fgos` / `-p fgos-host-runtime` still resolve to apps/fgos and packages/host-runtime/rust; `cargo pkgid -p herdr-fgos` from root still exits 101. FOCUSED_TESTS (`cargo test --manifest-path herdr-plugin/Cargo.toml remote_invocation`) cannot observe any of that — they only compile the excluded crate's own graph. A members-list addition in root Cargo.toml would not fail that filter.",
+            "evidence": "cargo metadata --no-deps (root workspace_members=5, no herdr); cargo pkgid -p fgos / fgos-host-runtime / herdr-fgos; git show 802a0965 --stat (root Cargo.toml untouched)"
+          }
+        ],
+        "attacks": {
+          "1_downcast_panic": "failed-to-break",
+          "2_error_category_collapse": "failed-to-break",
+          "3_include_runtime_caller_influence": "failed-to-break",
+          "4_workspace_pollution": "failed-to-break"
+        },
+        "evidenceRefs": [
+          "/home/vantt/projects/forgentX/.fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_003/runs/01/agent-report.md",
+          "git commit 802a096540f2c99eaa9bdc3fe471398b807372ba",
+          "herdr-plugin/src/remote_invocation.rs",
+          "herdr-plugin/Cargo.toml",
+          "Cargo.toml [workspace].members / exclude"
+        ]
+      },
+      "evidence": {
+        "gitBefore": "802a096540f2c99eaa9bdc3fe471398b807372ba",
+        "gitAfter": "802a096540f2c99eaa9bdc3fe471398b807372ba",
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "attribution": [],
+        "artifacts": [
+          ".fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_003/runs/01/agent-report.md",
+          ".fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_003/runs/01/agent-result.json"
+        ],
+        "tests": [],
+        "findingRefs": [
+          "/home/vantt/projects/forgentX/.fgos/assignments/asgn_claude_code_session_015bkzyho2s7dgfk3tyuewnb_op_003/runs/01/agent-report.md",
+          "git commit 802a096540f2c99eaa9bdc3fe471398b807372ba",
+          "herdr-plugin/src/remote_invocation.rs",
+          "herdr-plugin/Cargo.toml",
+          "Cargo.toml [workspace].members / exclude"
+        ]
+      }
+    },
+    "expected": {
+      "category": "verdict",
+      "satisfied": false,
+      "infraFailure": false
+    }
+  },
+  {
+    "id": "09-v2-failed-needs-input-provider",
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 2
+      },
+      "runId": "run_asgn_driver_1_op_001_01",
+      "assignmentId": "asgn_driver_1_op_001",
+      "workId": null,
+      "controlEpoch": 1,
+      "controlToken": "2257bdb9-be59-43d3-a84f-4b180eee6533",
+      "executorId": "openai",
+      "executorRedirected": true,
+      "policy": {
+        "role": "researcher",
+        "executorPreference": [
+          "claude"
+        ],
+        "executorId": "openai",
+        "providerModel": "openai",
+        "tier": "standard",
+        "model": "gpt-5.6-terra",
+        "quality": {
+          "minRigor": {
+            "value": "standard",
+            "source": {
+              "scope": "derived",
+              "id": "standard"
+            }
+          },
+          "mode": {
+            "value": "balanced",
+            "source": {
+              "scope": "tier-bridge",
+              "id": "standard"
+            },
+            "sourceKind": "implied-by-tier-bridge"
+          }
+        },
+        "lookupPolicyTier": "standard",
+        "reasoningEffort": "medium",
+        "visibility": "headless",
+        "repeatMode": null,
+        "constraints": {
+          "requiresSkills": []
+        },
+        "provenance": {
+          "executor": {
+            "value": "claude",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "provider": {
+            "value": "openai",
+            "source": {
+              "scope": "readOnlyExecutorRedirect",
+              "id": "openai"
+            }
+          },
+          "model": {
+            "value": "gpt-5.6-terra",
+            "source": {
+              "scope": "readOnlyExecutorRedirect",
+              "id": "openai.standard"
+            }
+          },
+          "tier": {
+            "value": "standard",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "semanticTier": {
+            "value": "standard",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "quality": {
+            "minRigor": {
+              "value": "standard",
+              "source": {
+                "scope": "derived",
+                "id": "standard"
+              }
+            },
+            "mode": {
+              "value": "balanced",
+              "source": {
+                "scope": "tier-bridge",
+                "id": "standard"
+              },
+              "sourceKind": "implied-by-tier-bridge"
+            }
+          },
+          "lookupPolicyTier": {
+            "value": "standard",
+            "source": {
+              "scope": "default",
+              "kind": "semantic"
+            }
+          },
+          "reasoningEffort": {
+            "value": "medium",
+            "source": {
+              "scope": "derived",
+              "id": "quality.minRigor.standard"
+            }
+          },
+          "persona": {
+            "source": {
+              "scope": "default"
+            }
+          },
+          "visibility": {
+            "value": "headless",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "repeatMode": {
+            "value": null,
+            "source": {
+              "scope": "default"
+            }
+          },
+          "constraints": {
+            "value": {
+              "requiresSkills": []
+            },
+            "source": {
+              "scope": "assignment",
+              "id": "asgn_driver_1_op_001"
+            }
+          },
+          "governance": {
+            "value": "allowed",
+            "source": {
+              "scope": "governance",
+              "id": "claude"
+            }
+          }
+        }
+      },
+      "settledAt": "2026-09-20T02:37:21.215Z",
+      "durationMs": 17692,
+      "settleReports": [],
+      "classification": {
+        "execution": {
+          "status": "failed",
+          "exitCode": 1
+        },
+        "assessment": {
+          "verdict": "not-applicable"
+        },
+        "confidence": {
+          "level": "failed",
+          "basis": [
+            "valid-agent-result-claim",
+            "captured-stdout",
+            "failed-exit"
+          ]
+        },
+        "failure": {
+          "family": "provider",
+          "code": "nonzero-process-exit"
+        },
+        "policy": {
+          "disposition": "needs-input",
+          "code": "nonzero-process-exit"
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v2"
+      },
+      "status": "failed",
+      "confidence": "failed",
+      "runtime": {
+        "exitCode": 1,
+        "stdoutLog": ".fgos/assignments/asgn_driver_1_op_001/runs/01/stdout.log",
+        "stderrLog": ".fgos/assignments/asgn_driver_1_op_001/runs/01/stderr.log"
+      },
+      "agentClaim": {
+        "status": "failed",
+        "summary": "Settled"
+      },
+      "evidence": {
+        "gitBefore": "81437ffffd81d2cf9c81720b646d2a6271d96099",
+        "gitAfter": "81437ffffd81d2cf9c81720b646d2a6271d96099",
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "attribution": [
+          {
+            "path": ".agents/skills/fgos-plan-loop/SKILL.md",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "AGENTS.md",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "CHANGELOG.md",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "CLAUDE.md",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "bin/fgos.mjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "core/skills/fgos-plan-loop/SKILL.md",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "count.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "debug_args.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "debug_spec.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "docs/architect/agent-coordination/contracts/coordination-session.md",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "docs/platform/agent-coordination/README.md",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "docs/platform/agent-coordination/contracts/coordination-session.md",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "docs/specs/runner.md",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "dump.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "fix_assignment.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "fix_herdr.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "fix_herdr2.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "fix_openSession.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "fix_openSession2.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "fix_openSession3.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "fix_openSession4.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "fix_openSession5.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "fix_openSession6.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "fix_openSession_safe.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "fix_test_legacy.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "fix_tests.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "openSession.txt",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "original.txt",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "patch_cli.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "patch_dispatch_test.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "plans/260919-coordination-skill-harness-simplification/phase-00-baseline-and-action-contract.md",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "plans/260919-coordination-skill-harness-simplification/plan.md",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "plans/260919-coordination-skill-harness-simplification/reports/phase-00-dirty-checkout-baseline.json",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "plans/260919-coordination-skill-harness-simplification/reports/phase-00-dirty-checkout-baseline.md",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "plans/reports/coordination-skill-harness-architecture-audit-260919-report.md",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "plugins/fgOS/skills/fgos-plan-loop/SKILL.md",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "reverse.patch",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "rewrite_store.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "scratch/debug-close.mjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "scratch/req-no-close.json",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "scripts/migration-proof-2a.mjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "src/runner/coordination/session-engine.mjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "store_refactor.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "test/cli/coordination.test.mjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "test/runner/coordination-recheck-discharge.test.mjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "test_atomics.mjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "test_concurrency.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "test_concurrency.log",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "test_concurrency2.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "test_concurrency2.log",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "test_herdr.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "test_regex.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "timed-executor.mjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "timed-executor2.mjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          }
+        ],
+        "artifacts": [],
+        "tests": []
+      }
+    },
+    "expected": {
+      "category": "infra",
+      "satisfied": false,
+      "infraFailure": true
+    }
+  },
+  {
+    "id": "10-v2-failed-refuse-provider",
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 2
+      },
+      "runId": "run_asgn_driver_1_op_002_01",
+      "assignmentId": "asgn_driver_1_op_002",
+      "workId": null,
+      "controlEpoch": 1,
+      "controlToken": "f5cad55f-4c51-4176-b6a1-262103590c61",
+      "executorId": "openai",
+      "executorRedirected": true,
+      "policy": {
+        "role": "researcher",
+        "executorPreference": [
+          "claude"
+        ],
+        "executorId": "openai",
+        "providerModel": "openai",
+        "tier": "standard",
+        "model": "gpt-5.6-terra",
+        "quality": {
+          "minRigor": {
+            "value": "standard",
+            "source": {
+              "scope": "derived",
+              "id": "standard"
+            }
+          },
+          "mode": {
+            "value": "balanced",
+            "source": {
+              "scope": "tier-bridge",
+              "id": "standard"
+            },
+            "sourceKind": "implied-by-tier-bridge"
+          }
+        },
+        "lookupPolicyTier": "standard",
+        "reasoningEffort": "medium",
+        "visibility": "headless",
+        "repeatMode": null,
+        "constraints": {
+          "requiresSkills": []
+        },
+        "provenance": {
+          "executor": {
+            "value": "claude",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "provider": {
+            "value": "openai",
+            "source": {
+              "scope": "readOnlyExecutorRedirect",
+              "id": "openai"
+            }
+          },
+          "model": {
+            "value": "gpt-5.6-terra",
+            "source": {
+              "scope": "readOnlyExecutorRedirect",
+              "id": "openai.standard"
+            }
+          },
+          "tier": {
+            "value": "standard",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "semanticTier": {
+            "value": "standard",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "quality": {
+            "minRigor": {
+              "value": "standard",
+              "source": {
+                "scope": "derived",
+                "id": "standard"
+              }
+            },
+            "mode": {
+              "value": "balanced",
+              "source": {
+                "scope": "tier-bridge",
+                "id": "standard"
+              },
+              "sourceKind": "implied-by-tier-bridge"
+            }
+          },
+          "lookupPolicyTier": {
+            "value": "standard",
+            "source": {
+              "scope": "default",
+              "kind": "semantic"
+            }
+          },
+          "reasoningEffort": {
+            "value": "medium",
+            "source": {
+              "scope": "derived",
+              "id": "quality.minRigor.standard"
+            }
+          },
+          "persona": {
+            "source": {
+              "scope": "default"
+            }
+          },
+          "visibility": {
+            "value": "headless",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "repeatMode": {
+            "value": null,
+            "source": {
+              "scope": "default"
+            }
+          },
+          "constraints": {
+            "value": {
+              "requiresSkills": []
+            },
+            "source": {
+              "scope": "assignment",
+              "id": "asgn_driver_1_op_002"
+            }
+          },
+          "governance": {
+            "value": "allowed",
+            "source": {
+              "scope": "governance",
+              "id": "claude"
+            }
+          }
+        }
+      },
+      "settledAt": "2026-09-20T02:37:48.864Z",
+      "durationMs": 17565,
+      "settleReports": [],
+      "classification": {
+        "execution": {
+          "status": "failed",
+          "exitCode": 1
+        },
+        "assessment": {
+          "verdict": "not-applicable"
+        },
+        "confidence": {
+          "level": "failed",
+          "basis": [
+            "valid-agent-result-claim",
+            "captured-stdout",
+            "failed-exit"
+          ]
+        },
+        "failure": {
+          "family": "provider",
+          "code": "nonzero-process-exit"
+        },
+        "policy": {
+          "disposition": "refuse",
+          "code": "mutated-dirty-before-files"
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v2"
+      },
+      "status": "failed",
+      "confidence": "failed",
+      "runtime": {
+        "exitCode": 1,
+        "stdoutLog": ".fgos/assignments/asgn_driver_1_op_002/runs/01/stdout.log",
+        "stderrLog": ".fgos/assignments/asgn_driver_1_op_002/runs/01/stderr.log"
+      },
+      "agentClaim": {
+        "status": "failed",
+        "summary": "Settled"
+      },
+      "evidence": {
+        "gitBefore": "81437ffffd81d2cf9c81720b646d2a6271d96099",
+        "gitAfter": "81437ffffd81d2cf9c81720b646d2a6271d96099",
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [
+          "scratch/debug-close.mjs"
+        ],
+        "attribution": [
+          {
+            "path": ".agents/skills/fgos-plan-loop/SKILL.md",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "AGENTS.md",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "CHANGELOG.md",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "CLAUDE.md",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "bin/fgos.mjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "core/skills/fgos-plan-loop/SKILL.md",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "count.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "debug_args.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "debug_spec.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "docs/architect/agent-coordination/contracts/coordination-session.md",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "docs/platform/agent-coordination/README.md",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "docs/platform/agent-coordination/contracts/coordination-session.md",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "docs/specs/runner.md",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "dump.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "fix_assignment.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "fix_herdr.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "fix_herdr2.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "fix_openSession.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "fix_openSession2.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "fix_openSession3.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "fix_openSession4.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "fix_openSession5.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "fix_openSession6.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "fix_openSession_safe.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "fix_test_legacy.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "fix_tests.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "openSession.txt",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "original.txt",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "patch_cli.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "patch_dispatch_test.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "plans/260919-coordination-skill-harness-simplification/phase-00-baseline-and-action-contract.md",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "plans/260919-coordination-skill-harness-simplification/plan.md",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "plans/260919-coordination-skill-harness-simplification/reports/phase-00-dirty-checkout-baseline.json",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "plans/260919-coordination-skill-harness-simplification/reports/phase-00-dirty-checkout-baseline.md",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "plans/reports/coordination-skill-harness-architecture-audit-260919-report.md",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "plugins/fgOS/skills/fgos-plan-loop/SKILL.md",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "reverse.patch",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "rewrite_store.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "scratch/close-req.json",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "scratch/debug-close.mjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "scratch/req-no-close.json",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "scripts/migration-proof-2a.mjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "src/runner/coordination/session-engine.mjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "store_refactor.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "test/cli/coordination.test.mjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "test/runner/coordination-recheck-discharge.test.mjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "test_atomics.mjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "test_concurrency.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "test_concurrency.log",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "test_concurrency2.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "test_concurrency2.log",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "test_herdr.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "test_regex.cjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "timed-executor.mjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "timed-executor2.mjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          }
+        ],
+        "artifacts": [],
+        "tests": []
+      }
+    },
+    "expected": {
+      "category": "infra",
+      "satisfied": false,
+      "infraFailure": true
+    }
+  },
+  {
+    "id": "11-v2-completed-pass-refuse",
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 2
+      },
+      "runId": "run_asgn_lead_cold_resumable_dag_op_017_01",
+      "assignmentId": "asgn_lead_cold_resumable_dag_op_017",
+      "workId": null,
+      "controlEpoch": 1,
+      "controlToken": "88bbb4a5-5b96-4e6c-bcd3-f15e30a586a1",
+      "executorId": "gemini",
+      "executorRedirected": false,
+      "policy": {
+        "role": "reviewer",
+        "persona": "detail-oriented-rechecker",
+        "executorPreference": [
+          "gemini"
+        ],
+        "executorId": "gemini",
+        "providerModel": "gemini",
+        "tier": "flagship",
+        "model": "gemini-3.1-pro-low",
+        "quality": {
+          "minRigor": {
+            "value": "high",
+            "source": {
+              "scope": "derived",
+              "id": "flagship"
+            }
+          },
+          "mode": {
+            "value": "analytical",
+            "source": {
+              "scope": "tier-bridge",
+              "id": "flagship"
+            },
+            "sourceKind": "implied-by-tier-bridge"
+          }
+        },
+        "lookupPolicyTier": "flagship",
+        "reasoningEffort": "high",
+        "visibility": "headless",
+        "repeatMode": null,
+        "constraints": {
+          "requiresSkills": []
+        },
+        "provenance": {
+          "executor": {
+            "value": "gemini",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "provider": {
+            "value": "gemini",
+            "source": {
+              "scope": "registeredExecutor",
+              "id": "gemini"
+            }
+          },
+          "model": {
+            "value": "gemini-3.1-pro-low",
+            "source": {
+              "scope": "placement-policy",
+              "id": "gemini.flagship"
+            }
+          },
+          "tier": {
+            "value": "flagship",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "semanticTier": {
+            "value": "flagship",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "quality": {
+            "minRigor": {
+              "value": "high",
+              "source": {
+                "scope": "derived",
+                "id": "flagship"
+              }
+            },
+            "mode": {
+              "value": "analytical",
+              "source": {
+                "scope": "tier-bridge",
+                "id": "flagship"
+              },
+              "sourceKind": "implied-by-tier-bridge"
+            }
+          },
+          "lookupPolicyTier": {
+            "value": "flagship",
+            "source": {
+              "scope": "cli",
+              "id": "cli",
+              "kind": "semantic"
+            }
+          },
+          "reasoningEffort": {
+            "value": "high",
+            "source": {
+              "scope": "derived",
+              "id": "quality.minRigor.high"
+            }
+          },
+          "persona": {
+            "value": "detail-oriented-rechecker",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "visibility": {
+            "value": "headless",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "repeatMode": {
+            "value": null,
+            "source": {
+              "scope": "default"
+            }
+          },
+          "constraints": {
+            "value": {
+              "requiresSkills": []
+            },
+            "source": {
+              "scope": "assignment",
+              "id": "asgn_lead_cold_resumable_dag_op_017"
+            }
+          },
+          "governance": {
+            "value": "allowed",
+            "source": {
+              "scope": "governance",
+              "id": "gemini"
+            }
+          }
+        }
+      },
+      "promptEnvelope": {
+        "persona": {
+          "ref": "detail-oriented-rechecker",
+          "delivery": "section",
+          "applied": true,
+          "source": {
+            "scope": "cli",
+            "id": "cli"
+          }
+        }
+      },
+      "settledAt": "2026-09-18T04:42:36.608Z",
+      "durationMs": 98655,
+      "claimSha256": "c3a44fcc66b7f92c155a7f615808ef1acc95a0b0fcb8f4da6cbe50878e4e9ff7",
+      "settleReports": [
+        {
+          "path": ".fgos/assignments/asgn_lead_cold_resumable_dag_op_017/runs/01/agent-report.md",
+          "sha256": "3998e14c882b341639119d90c341f839ccbc778b3b196dd137095d7a2624dc6e"
+        }
+      ],
+      "classification": {
+        "execution": {
+          "status": "completed",
+          "exitCode": 0
+        },
+        "assessment": {
+          "verdict": "pass"
+        },
+        "confidence": {
+          "level": "failed",
+          "basis": [
+            "valid-agent-result-claim",
+            "captured-stdout",
+            "workspace-git-diff"
+          ]
+        },
+        "failure": null,
+        "policy": {
+          "disposition": "refuse",
+          "code": "read-only-mutation"
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v2"
+      },
+      "status": "failed",
+      "confidence": "failed",
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": ".fgos/assignments/asgn_lead_cold_resumable_dag_op_017/runs/01/stdout.log",
+        "stderrLog": ".fgos/assignments/asgn_lead_cold_resumable_dag_op_017/runs/01/stderr.log"
+      },
+      "agentClaim": {
+        "id": "agent-result-claim",
+        "version": 2,
+        "status": "done",
+        "summary": "Rechecked Phase 02 candidate. Verified H-1 by constructing a real request and confirming that `compileDagRequest` handles optional-field-omitted input without throwing. Verified H-2 by confirming unresolvable bare ledger identities are rejected. Verified H-3 by checking p02.md and the previous fixer's agent-result, confirming a real outcome of 59 failing titles. Confirmed M-1, M-2, M-3, L-1 logic in code. Proofs are sufficient.",
+        "assessment": {
+          "verdict": "pass"
+        },
+        "evidenceRefs": [
+          "src/verbs/coordination/schema.mjs",
+          "src/verbs/coordination/dag-request-compiler.mjs"
+        ]
+      },
+      "evidence": {
+        "gitBefore": "9333f09ce56607468e03f42b0226be3d89e4e9d2",
+        "gitAfter": "9333f09ce56607468e03f42b0226be3d89e4e9d2",
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [
+          "scratch_test_h1h2.mjs"
+        ],
+        "mutatedDirtyBeforeFiles": [],
+        "attribution": [
+          {
+            "path": "fix-1.json",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "open.json",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "scratch_test_h1h2.mjs",
+            "firstObserved": "post-run",
+            "level": "correlated",
+            "basis": [
+              "pre-post-git-snapshot"
+            ],
+            "coverageMatched": false
+          }
+        ],
+        "artifacts": [
+          ".fgos/assignments/asgn_lead_cold_resumable_dag_op_017/runs/01/agent-report.md",
+          ".fgos/assignments/asgn_lead_cold_resumable_dag_op_017/runs/01/agent-result.json"
+        ],
+        "tests": [],
+        "findingRefs": [
+          "src/verbs/coordination/schema.mjs",
+          "src/verbs/coordination/dag-request-compiler.mjs"
+        ]
+      }
+    },
+    "expected": {
+      "category": "policy",
+      "satisfied": false,
+      "infraFailure": false
+    }
+  },
+  {
+    "id": "12-v2-completed-pass-inferred",
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 2
+      },
+      "runId": "run_asgn_lead_cold_resumable_dag_op_022_01",
+      "assignmentId": "asgn_lead_cold_resumable_dag_op_022",
+      "workId": null,
+      "controlEpoch": 1,
+      "controlToken": "3f96c354-986f-48e0-ae4c-21767268cc2e",
+      "executorId": "gemini",
+      "executorRedirected": false,
+      "policy": {
+        "role": "doer",
+        "persona": "meticulous-implementer",
+        "executorPreference": [
+          "gemini",
+          "glm"
+        ],
+        "executorId": "gemini",
+        "providerModel": "gemini",
+        "tier": "standard",
+        "model": "gemini-3.8-flash-medium",
+        "quality": {
+          "minRigor": {
+            "value": "standard",
+            "source": {
+              "scope": "derived",
+              "id": "standard"
+            }
+          },
+          "mode": {
+            "value": "balanced",
+            "source": {
+              "scope": "tier-bridge",
+              "id": "standard"
+            },
+            "sourceKind": "implied-by-tier-bridge"
+          }
+        },
+        "lookupPolicyTier": "standard",
+        "reasoningEffort": "medium",
+        "visibility": "headless",
+        "repeatMode": null,
+        "constraints": {
+          "requiresSkills": []
+        },
+        "provenance": {
+          "executor": {
+            "value": "gemini",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "provider": {
+            "value": "gemini",
+            "source": {
+              "scope": "registeredExecutor",
+              "id": "gemini"
+            }
+          },
+          "model": {
+            "value": "gemini-3.8-flash-medium",
+            "source": {
+              "scope": "placement-policy",
+              "id": "gemini.standard"
+            }
+          },
+          "tier": {
+            "value": "standard",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "semanticTier": {
+            "value": "standard",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "quality": {
+            "minRigor": {
+              "value": "standard",
+              "source": {
+                "scope": "derived",
+                "id": "standard"
+              }
+            },
+            "mode": {
+              "value": "balanced",
+              "source": {
+                "scope": "tier-bridge",
+                "id": "standard"
+              },
+              "sourceKind": "implied-by-tier-bridge"
+            }
+          },
+          "lookupPolicyTier": {
+            "value": "standard",
+            "source": {
+              "scope": "default",
+              "kind": "semantic"
+            }
+          },
+          "reasoningEffort": {
+            "value": "medium",
+            "source": {
+              "scope": "derived",
+              "id": "quality.minRigor.standard"
+            }
+          },
+          "persona": {
+            "value": "meticulous-implementer",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "visibility": {
+            "value": "headless",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "repeatMode": {
+            "value": null,
+            "source": {
+              "scope": "default"
+            }
+          },
+          "constraints": {
+            "value": {
+              "requiresSkills": []
+            },
+            "source": {
+              "scope": "assignment",
+              "id": "asgn_lead_cold_resumable_dag_op_022"
+            }
+          },
+          "governance": {
+            "value": "allowed",
+            "source": {
+              "scope": "governance",
+              "id": "gemini"
+            }
+          }
+        }
+      },
+      "promptEnvelope": {
+        "persona": {
+          "ref": "meticulous-implementer",
+          "delivery": "section",
+          "applied": true,
+          "source": {
+            "scope": "cli",
+            "id": "cli"
+          }
+        }
+      },
+      "settledAt": "2026-09-18T05:34:13.636Z",
+      "durationMs": 428376,
+      "settleReports": [],
+      "classification": {
+        "execution": {
+          "status": "completed",
+          "exitCode": 0
+        },
+        "assessment": {
+          "verdict": "pass"
+        },
+        "confidence": {
+          "level": "inferred",
+          "basis": [
+            "valid-agent-result-claim",
+            "captured-stdout",
+            "workspace-git-diff"
+          ]
+        },
+        "failure": null,
+        "policy": {
+          "disposition": "allow",
+          "code": null
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v2"
+      },
+      "status": "done",
+      "confidence": "inferred",
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": ".fgos/assignments/asgn_lead_cold_resumable_dag_op_022/runs/01/stdout.log",
+        "stderrLog": ".fgos/assignments/asgn_lead_cold_resumable_dag_op_022/runs/01/stderr.log"
+      },
+      "agentClaim": {
+        "status": "done",
+        "summary": "Settled"
+      },
+      "evidence": {
+        "gitBefore": "0d12beb9a11042e5ac49ee8c3a18b47cb3639579",
+        "gitAfter": "0d12beb9a11042e5ac49ee8c3a18b47cb3639579",
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [
+          "src/runner/coordination/headless-adapter.mjs",
+          "src/runner/coordination/schema.mjs",
+          "src/verbs/coordination/chain.mjs",
+          "src/verbs/coordination/show.mjs"
+        ],
+        "mutatedDirtyBeforeFiles": [],
+        "attribution": [
+          {
+            "path": "open.json",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "src/runner/coordination/headless-adapter.mjs",
+            "firstObserved": "post-run",
+            "level": "correlated",
+            "basis": [
+              "pre-post-git-snapshot"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "src/runner/coordination/schema.mjs",
+            "firstObserved": "post-run",
+            "level": "correlated",
+            "basis": [
+              "pre-post-git-snapshot"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "src/verbs/coordination/chain.mjs",
+            "firstObserved": "post-run",
+            "level": "correlated",
+            "basis": [
+              "pre-post-git-snapshot"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "src/verbs/coordination/show.mjs",
+            "firstObserved": "post-run",
+            "level": "correlated",
+            "basis": [
+              "pre-post-git-snapshot"
+            ],
+            "coverageMatched": false
+          }
+        ],
+        "artifacts": [],
+        "tests": []
+      }
+    },
+    "expected": {
+      "category": "ok",
+      "satisfied": true,
+      "infraFailure": false
+    }
+  },
+  {
+    "id": "13-v2-completed-inconclusive-no-evidence",
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 2
+      },
+      "runId": "run_asgn_lead_cold_resumable_dag_op_025_01",
+      "assignmentId": "asgn_lead_cold_resumable_dag_op_025",
+      "workId": null,
+      "controlEpoch": 1,
+      "controlToken": "c3d674c1-da2a-41d7-823c-bc056d39a83d",
+      "executorId": "gemini",
+      "executorRedirected": false,
+      "policy": {
+        "role": "fixer",
+        "persona": "pragmatic-fixer",
+        "executorPreference": [
+          "gemini",
+          "glm"
+        ],
+        "executorId": "gemini",
+        "providerModel": "gemini",
+        "tier": "standard",
+        "model": "gemini-3.8-flash-medium",
+        "quality": {
+          "minRigor": {
+            "value": "standard",
+            "source": {
+              "scope": "derived",
+              "id": "standard"
+            }
+          },
+          "mode": {
+            "value": "balanced",
+            "source": {
+              "scope": "tier-bridge",
+              "id": "standard"
+            },
+            "sourceKind": "implied-by-tier-bridge"
+          }
+        },
+        "lookupPolicyTier": "standard",
+        "reasoningEffort": "medium",
+        "visibility": "headless",
+        "repeatMode": null,
+        "constraints": {
+          "requiresSkills": []
+        },
+        "provenance": {
+          "executor": {
+            "value": "gemini",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "provider": {
+            "value": "gemini",
+            "source": {
+              "scope": "registeredExecutor",
+              "id": "gemini"
+            }
+          },
+          "model": {
+            "value": "gemini-3.8-flash-medium",
+            "source": {
+              "scope": "placement-policy",
+              "id": "gemini.standard"
+            }
+          },
+          "tier": {
+            "value": "standard",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "semanticTier": {
+            "value": "standard",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "quality": {
+            "minRigor": {
+              "value": "standard",
+              "source": {
+                "scope": "derived",
+                "id": "standard"
+              }
+            },
+            "mode": {
+              "value": "balanced",
+              "source": {
+                "scope": "tier-bridge",
+                "id": "standard"
+              },
+              "sourceKind": "implied-by-tier-bridge"
+            }
+          },
+          "lookupPolicyTier": {
+            "value": "standard",
+            "source": {
+              "scope": "default",
+              "kind": "semantic"
+            }
+          },
+          "reasoningEffort": {
+            "value": "medium",
+            "source": {
+              "scope": "derived",
+              "id": "quality.minRigor.standard"
+            }
+          },
+          "persona": {
+            "value": "pragmatic-fixer",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "visibility": {
+            "value": "headless",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "repeatMode": {
+            "value": null,
+            "source": {
+              "scope": "default"
+            }
+          },
+          "constraints": {
+            "value": {
+              "requiresSkills": []
+            },
+            "source": {
+              "scope": "assignment",
+              "id": "asgn_lead_cold_resumable_dag_op_025"
+            }
+          },
+          "governance": {
+            "value": "allowed",
+            "source": {
+              "scope": "governance",
+              "id": "gemini"
+            }
+          }
+        }
+      },
+      "promptEnvelope": {
+        "persona": {
+          "ref": "pragmatic-fixer",
+          "delivery": "section",
+          "applied": true,
+          "source": {
+            "scope": "cli",
+            "id": "cli"
+          }
+        }
+      },
+      "settledAt": "2026-09-18T05:57:03.293Z",
+      "durationMs": 538670,
+      "settleReports": [],
+      "classification": {
+        "execution": {
+          "status": "completed",
+          "exitCode": 0
+        },
+        "assessment": {
+          "verdict": "inconclusive"
+        },
+        "confidence": {
+          "level": "no-evidence",
+          "basis": [
+            "valid-agent-result-claim",
+            "captured-stdout"
+          ]
+        },
+        "failure": null,
+        "policy": {
+          "disposition": "allow",
+          "code": null
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v2"
+      },
+      "status": "no-evidence",
+      "confidence": "no-evidence",
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": ".fgos/assignments/asgn_lead_cold_resumable_dag_op_025/runs/01/stdout.log",
+        "stderrLog": ".fgos/assignments/asgn_lead_cold_resumable_dag_op_025/runs/01/stderr.log"
+      },
+      "agentClaim": {
+        "status": "no-evidence",
+        "summary": "Settled"
+      },
+      "evidence": {
+        "gitBefore": "0d12beb9a11042e5ac49ee8c3a18b47cb3639579",
+        "gitAfter": "0d12beb9a11042e5ac49ee8c3a18b47cb3639579",
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [],
+        "mutatedDirtyBeforeFiles": [],
+        "attribution": [
+          {
+            "path": "fix-1.json",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "open.json",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "src/runner/coordination/headless-adapter.mjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "src/runner/coordination/schema.mjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "src/verbs/coordination/chain.mjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "src/verbs/coordination/show.mjs",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          }
+        ],
+        "artifacts": [],
+        "tests": []
+      }
+    },
+    "expected": {
+      "category": "verdict",
+      "satisfied": false,
+      "infraFailure": false
+    }
+  },
+  {
+    "id": "14-v2-completed-blocked-reported",
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 2
+      },
+      "runId": "run_asgn_lead_cold_resumable_dag_op_035_01",
+      "assignmentId": "asgn_lead_cold_resumable_dag_op_035",
+      "workId": null,
+      "controlEpoch": 1,
+      "controlToken": "e0e6930d-0007-4623-9b48-d3ba8f5a1e2d",
+      "executorId": "claude",
+      "executorRedirected": false,
+      "policy": {
+        "role": "doer",
+        "persona": "meticulous-implementer",
+        "executorPreference": [
+          "claude"
+        ],
+        "executorId": "claude",
+        "providerModel": "claude",
+        "tier": "advanced",
+        "model": "sonnet",
+        "quality": {
+          "minRigor": {
+            "value": "standard",
+            "source": {
+              "scope": "derived",
+              "id": "advanced"
+            }
+          },
+          "mode": {
+            "value": "creative",
+            "source": {
+              "scope": "tier-bridge",
+              "id": "advanced"
+            },
+            "sourceKind": "implied-by-tier-bridge"
+          }
+        },
+        "lookupPolicyTier": "advanced",
+        "reasoningEffort": "medium",
+        "visibility": "headless",
+        "repeatMode": null,
+        "constraints": {
+          "requiresSkills": []
+        },
+        "provenance": {
+          "executor": {
+            "value": "claude",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "provider": {
+            "value": "claude",
+            "source": {
+              "scope": "registeredExecutor",
+              "id": "claude"
+            }
+          },
+          "model": {
+            "value": "sonnet",
+            "source": {
+              "scope": "placement-policy",
+              "id": "claude.advanced"
+            }
+          },
+          "tier": {
+            "value": "advanced",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "semanticTier": {
+            "value": "advanced",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "quality": {
+            "minRigor": {
+              "value": "standard",
+              "source": {
+                "scope": "derived",
+                "id": "advanced"
+              }
+            },
+            "mode": {
+              "value": "creative",
+              "source": {
+                "scope": "tier-bridge",
+                "id": "advanced"
+              },
+              "sourceKind": "implied-by-tier-bridge"
+            }
+          },
+          "lookupPolicyTier": {
+            "value": "advanced",
+            "source": {
+              "scope": "cli",
+              "id": "cli",
+              "kind": "semantic"
+            }
+          },
+          "reasoningEffort": {
+            "value": "medium",
+            "source": {
+              "scope": "derived",
+              "id": "quality.minRigor.standard"
+            }
+          },
+          "persona": {
+            "value": "meticulous-implementer",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "visibility": {
+            "value": "headless",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "repeatMode": {
+            "value": null,
+            "source": {
+              "scope": "default"
+            }
+          },
+          "constraints": {
+            "value": {
+              "requiresSkills": []
+            },
+            "source": {
+              "scope": "assignment",
+              "id": "asgn_lead_cold_resumable_dag_op_035"
+            }
+          },
+          "governance": {
+            "value": "allowed",
+            "source": {
+              "scope": "governance",
+              "id": "claude"
+            }
+          }
+        }
+      },
+      "promptEnvelope": {
+        "persona": {
+          "ref": "meticulous-implementer",
+          "delivery": "section",
+          "applied": true,
+          "source": {
+            "scope": "cli",
+            "id": "cli"
+          }
+        }
+      },
+      "settledAt": "2026-09-18T07:37:25.609Z",
+      "durationMs": 1837602,
+      "claimSha256": "1b97959b70dca4c850c376cd1caf9d27899513d27a5ebf85e5ff8ea9866c74f6",
+      "settleReports": [
+        {
+          "path": ".fgos/assignments/asgn_lead_cold_resumable_dag_op_035/runs/01/agent-report.md",
+          "sha256": "c6c5a497388b671dae9d73a723989476093bf06a7e26bd8f419469d4a3cfad42"
+        }
+      ],
+      "classification": {
+        "execution": {
+          "status": "completed",
+          "exitCode": 0
+        },
+        "assessment": {
+          "verdict": "blocked"
+        },
+        "confidence": {
+          "level": "reported",
+          "basis": [
+            "valid-agent-result-claim",
+            "captured-stdout",
+            "workspace-git-diff"
+          ]
+        },
+        "failure": null,
+        "policy": {
+          "disposition": "allow",
+          "code": null
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v2"
+      },
+      "status": "blocked",
+      "confidence": "reported",
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": ".fgos/assignments/asgn_lead_cold_resumable_dag_op_035/runs/01/stdout.log",
+        "stderrLog": ".fgos/assignments/asgn_lead_cold_resumable_dag_op_035/runs/01/stderr.log"
+      },
+      "agentClaim": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "blocked",
+        "summary": "Implemented all 5 named fixes (H-1 code field + show.mjs counts.deferred, H-2 confirmation + tests, H-3 not-found category preservation on show/run + EXIT_CODES entry, H-4 tests incl. 3-peer sharedCwdCaveat + buried mutation/fan-out rejection, M-1 compileDagRequest human-turn check) and committed them on cold-resumable-coordination-dag--p04 at commit abb6b5a96d819b85e40c76f132361601193a2b1d (parent 1669603c, P03's merge). Could NOT execute npm test, node --test, node --check, or node -e in this session -- every attempt (foreground, background, with dangerouslyDisableSandbox, and via an independently-spawned tester subagent) returned the identical 'This command requires approval' with no approver present in this headless dispatch. Git commands (including git add/git commit) worked throughout, so the commit itself is real. Real failure count vs the P03 baseline (56 known-failing titles) is UNKNOWN -- not established, not fabricated. Full gap writeup and per-finding fix rationale in docs/architect/agent-coordination/verification/cold-resumable-coordination-dag/p04.md.",
+        "blocker": "This session's Bash tool denies every node/npm script-execution command ('npm test', 'node --test <file>', 'node --check <file>', 'node -e ...', 'bash -c ...') with the terse error 'This command requires approval', with no human/approver present to grant it in this headless doer dispatch. Read-only git plumbing (git rev-parse/cat-file/ls-files) and real mutating git commands (git add, git commit) work normally, so this is specifically a script-execution permission gap, not a general sandbox or git restriction, and not the same failure class as the prior openai-quota infra rejection (asgn_lead_cold_resumable_dag_op_032/_033). A session with working script execution must run: `npm test -- test/runner/coordination-r5-hard-budgets.test.mjs test/runner/coordination-session-engine.test.mjs test/runner/coordination-recovery-and-quorum.test.mjs test/runner/coordination-r6-security-adversarial.test.mjs` then `npm test`, diff the full-suite failing-title list against p03.md's 56-title baseline, and fix anything a real run surfaces (especially in the newly-authored tests in test/verbs/coordination-run-driver-steps.test.mjs, which were authored carefully against proven existing patterns but never executed) before this cell can be dispositioned as done.",
+        "evidenceRefs": [
+          "cold-resumable-coordination-dag-p04:commit:abb6b5a96d819b85e40c76f132361601193a2b1d",
+          "cold-resumable-coordination-dag-p04:src/runner/coordination/schema.mjs",
+          "cold-resumable-coordination-dag-p04:src/runner/coordination/store.mjs",
+          "cold-resumable-coordination-dag-p04:src/verbs/coordination/show.mjs",
+          "cold-resumable-coordination-dag-p04:src/verbs/coordination/run.mjs",
+          "cold-resumable-coordination-dag-p04:src/state/store.mjs",
+          "cold-resumable-coordination-dag-p04:src/verbs/coordination/dag-request-compiler.mjs",
+          "cold-resumable-coordination-dag-p04:test/verbs/coordination-run-driver-steps.test.mjs",
+          "cold-resumable-coordination-dag-p04:docs/architect/agent-coordination/verification/cold-resumable-coordination-dag/p04.md"
+        ]
+      },
+      "evidence": {
+        "gitBefore": "1669603cd8f13aaf3e2e6fa6b7acb89944e913b3",
+        "gitAfter": "abb6b5a96d819b85e40c76f132361601193a2b1d",
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [
+          "docs/architect/agent-coordination/verification/cold-resumable-coordination-dag/p04.md",
+          "src/runner/coordination/schema.mjs",
+          "src/runner/coordination/store.mjs",
+          "src/state/store.mjs",
+          "src/verbs/coordination/dag-request-compiler.mjs",
+          "src/verbs/coordination/run.mjs",
+          "src/verbs/coordination/show.mjs",
+          "test/verbs/coordination-run-driver-steps.test.mjs"
+        ],
+        "mutatedDirtyBeforeFiles": [],
+        "attribution": [
+          {
+            "path": "open.json",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "retry-1.json",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          }
+        ],
+        "artifacts": [
+          ".fgos/assignments/asgn_lead_cold_resumable_dag_op_035/runs/01/agent-report.md",
+          ".fgos/assignments/asgn_lead_cold_resumable_dag_op_035/runs/01/agent-result.json"
+        ],
+        "tests": [],
+        "findingRefs": [
+          "cold-resumable-coordination-dag-p04:commit:abb6b5a96d819b85e40c76f132361601193a2b1d",
+          "cold-resumable-coordination-dag-p04:src/runner/coordination/schema.mjs",
+          "cold-resumable-coordination-dag-p04:src/runner/coordination/store.mjs",
+          "cold-resumable-coordination-dag-p04:src/verbs/coordination/show.mjs",
+          "cold-resumable-coordination-dag-p04:src/verbs/coordination/run.mjs",
+          "cold-resumable-coordination-dag-p04:src/state/store.mjs",
+          "cold-resumable-coordination-dag-p04:src/verbs/coordination/dag-request-compiler.mjs",
+          "cold-resumable-coordination-dag-p04:test/verbs/coordination-run-driver-steps.test.mjs",
+          "cold-resumable-coordination-dag-p04:docs/architect/agent-coordination/verification/cold-resumable-coordination-dag/p04.md"
+        ]
+      }
+    },
+    "expected": {
+      "category": "blocked",
+      "satisfied": false,
+      "infraFailure": false
+    }
+  },
+  {
+    "id": "15-v2-completed-not-applicable-failed",
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 2
+      },
+      "runId": "run_asgn_lead_cold_resumable_dag_op_042_01",
+      "assignmentId": "asgn_lead_cold_resumable_dag_op_042",
+      "workId": null,
+      "controlEpoch": 1,
+      "controlToken": "da69f4e8-787c-4512-bec5-f997e5ba1f69",
+      "executorId": "openai",
+      "executorRedirected": false,
+      "policy": {
+        "role": "doer",
+        "persona": "meticulous-implementer",
+        "executorPreference": [
+          "openai"
+        ],
+        "executorId": "openai",
+        "providerModel": "openai",
+        "tier": "flagship",
+        "model": "gpt-5.6-terra",
+        "quality": {
+          "minRigor": {
+            "value": "high",
+            "source": {
+              "scope": "derived",
+              "id": "flagship"
+            }
+          },
+          "mode": {
+            "value": "analytical",
+            "source": {
+              "scope": "tier-bridge",
+              "id": "flagship"
+            },
+            "sourceKind": "implied-by-tier-bridge"
+          }
+        },
+        "lookupPolicyTier": "flagship",
+        "reasoningEffort": "high",
+        "visibility": "headless",
+        "repeatMode": null,
+        "constraints": {
+          "requiresSkills": []
+        },
+        "provenance": {
+          "executor": {
+            "value": "openai",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "provider": {
+            "value": "openai",
+            "source": {
+              "scope": "registeredExecutor",
+              "id": "openai"
+            }
+          },
+          "model": {
+            "value": "gpt-5.6-terra",
+            "source": {
+              "scope": "placement-policy",
+              "id": "openai.flagship"
+            }
+          },
+          "tier": {
+            "value": "flagship",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "semanticTier": {
+            "value": "flagship",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "quality": {
+            "minRigor": {
+              "value": "high",
+              "source": {
+                "scope": "derived",
+                "id": "flagship"
+              }
+            },
+            "mode": {
+              "value": "analytical",
+              "source": {
+                "scope": "tier-bridge",
+                "id": "flagship"
+              },
+              "sourceKind": "implied-by-tier-bridge"
+            }
+          },
+          "lookupPolicyTier": {
+            "value": "flagship",
+            "source": {
+              "scope": "cli",
+              "id": "cli",
+              "kind": "semantic"
+            }
+          },
+          "reasoningEffort": {
+            "value": "high",
+            "source": {
+              "scope": "derived",
+              "id": "quality.minRigor.high"
+            }
+          },
+          "persona": {
+            "value": "meticulous-implementer",
+            "source": {
+              "scope": "cli",
+              "id": "cli"
+            }
+          },
+          "visibility": {
+            "value": "headless",
+            "source": {
+              "scope": "default"
+            }
+          },
+          "repeatMode": {
+            "value": null,
+            "source": {
+              "scope": "default"
+            }
+          },
+          "constraints": {
+            "value": {
+              "requiresSkills": []
+            },
+            "source": {
+              "scope": "assignment",
+              "id": "asgn_lead_cold_resumable_dag_op_042"
+            }
+          },
+          "governance": {
+            "value": "allowed",
+            "source": {
+              "scope": "governance",
+              "id": "openai"
+            }
+          }
+        }
+      },
+      "promptEnvelope": {
+        "persona": {
+          "ref": "meticulous-implementer",
+          "delivery": "section",
+          "applied": true,
+          "source": {
+            "scope": "cli",
+            "id": "cli"
+          }
+        }
+      },
+      "settledAt": "2026-09-18T08:35:25.911Z",
+      "durationMs": 264639,
+      "claimSha256": "afca363c5e4b7e5add56aa8145ad3e013c4af60e5f2370a74f6be5fd082e92b5",
+      "settleReports": [],
+      "classification": {
+        "execution": {
+          "status": "completed",
+          "exitCode": 0
+        },
+        "assessment": {
+          "verdict": "not-applicable"
+        },
+        "confidence": {
+          "level": "failed",
+          "basis": [
+            "valid-agent-result-claim",
+            "captured-stdout",
+            "workspace-git-diff"
+          ]
+        },
+        "failure": null,
+        "policy": {
+          "disposition": "allow",
+          "code": null
+        },
+        "delivery": {
+          "mode": "fresh"
+        },
+        "provenance": "native-v2"
+      },
+      "status": "done",
+      "confidence": "failed",
+      "runtime": {
+        "exitCode": 0,
+        "stdoutLog": ".fgos/assignments/asgn_lead_cold_resumable_dag_op_042/runs/01/stdout.log",
+        "stderrLog": ".fgos/assignments/asgn_lead_cold_resumable_dag_op_042/runs/01/stderr.log"
+      },
+      "agentClaim": {
+        "contract": {
+          "id": "agent-result-claim",
+          "version": 2
+        },
+        "status": "failed",
+        "summary": "Incomplete P05 implementation; no commit was created. Real-door existing DAG tests began passing in streamed output, but the required targeted and full npm test gates, new exit-criterion tests, barrier-clock proof, and verification baseline comparison were not completed. Failure count: unverified.",
+        "error": "The assigned delivery could not be completed and verified within this execution window; reporting partial implementation honestly rather than claiming the phase complete.",
+        "evidenceRefs": [
+          "src/verbs/coordination/dag-scheduler.mjs",
+          "src/verbs/coordination/run.mjs",
+          "docs/architect/agent-coordination/verification/cold-resumable-coordination-dag/p05.md"
+        ]
+      },
+      "evidence": {
+        "gitBefore": "d1ed1247263fe99dc9e366f1cb8e9cb34baf9876",
+        "gitAfter": "d1ed1247263fe99dc9e366f1cb8e9cb34baf9876",
+        "gitBeforeSource": "pre-launch",
+        "changedFiles": [
+          "docs/architect/agent-coordination/verification/cold-resumable-coordination-dag/p05.md",
+          "docs/enduser-docs-index.json",
+          "src/verbs/coordination/dag-scheduler.mjs",
+          "src/verbs/coordination/run.mjs"
+        ],
+        "mutatedDirtyBeforeFiles": [],
+        "attribution": [
+          {
+            "path": "docs/architect/agent-coordination/verification/cold-resumable-coordination-dag/p05.md",
+            "firstObserved": "post-run",
+            "level": "correlated",
+            "basis": [
+              "pre-post-git-snapshot"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "docs/enduser-docs-index.json",
+            "firstObserved": "post-run",
+            "level": "correlated",
+            "basis": [
+              "pre-post-git-snapshot"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "open.json",
+            "firstObserved": "pre-launch",
+            "level": "excluded",
+            "basis": [
+              "pre-launch-git-status"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "src/verbs/coordination/dag-scheduler.mjs",
+            "firstObserved": "post-run",
+            "level": "correlated",
+            "basis": [
+              "pre-post-git-snapshot"
+            ],
+            "coverageMatched": false
+          },
+          {
+            "path": "src/verbs/coordination/run.mjs",
+            "firstObserved": "post-run",
+            "level": "correlated",
+            "basis": [
+              "pre-post-git-snapshot"
+            ],
+            "coverageMatched": false
+          }
+        ],
+        "artifacts": [
+          ".fgos/assignments/asgn_lead_cold_resumable_dag_op_042/runs/01/agent-result.json"
+        ],
+        "tests": [],
+        "findingRefs": [
+          "src/verbs/coordination/dag-scheduler.mjs",
+          "src/verbs/coordination/run.mjs",
+          "docs/architect/agent-coordination/verification/cold-resumable-coordination-dag/p05.md"
+        ]
+      }
+    },
+    "expected": {
+      "category": "ok",
+      "satisfied": true,
+      "infraFailure": false
+    }
+  },
+  {
+    "id": "16-v2-corrupt-schema",
+    "record": {
+      "contract": {
+        "id": "assignment-run-result",
+        "version": 2
+      },
+      "status": "done",
+      "confidence": "verified",
+      "classification": {
+        "execution": {
+          "status": "invalid-status"
+        }
+      },
+      "assignmentId": "asgn_test_corrupt_v2",
+      "runId": "run_test_corrupt_v2_01"
+    },
+    "expected": {
+      "category": "corrupt",
+      "satisfied": false,
+      "infraFailure": true
+    }
+  },
+  {
+    "id": "17-unknown-contract",
+    "record": {
+      "contract": {
+        "id": "unknown-alien-contract",
+        "version": 99
+      },
+      "status": "done",
+      "confidence": "verified",
+      "assignmentId": "asgn_test_unknown_contract",
+      "runId": "run_test_unknown_contract_01"
+    },
+    "expected": {
+      "category": "corrupt",
+      "satisfied": false,
+      "infraFailure": true
+    }
+  }
+]

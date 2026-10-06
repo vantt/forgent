@@ -7,6 +7,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import cp from 'node:child_process';
+import { commitUnitWork } from '../../src/runner/execution/commit-unit-work.mjs';
 import { seedFileLocalBwrapRegistry } from './confinement-registry-fixture.helper.mjs';
 
 import {
@@ -620,6 +621,95 @@ test('provider capacity: selected missing credential fails closed before spawn',
   }
 });
 
+// A leased account whose credentials are several files (an agent that keeps its login, settings and
+// helper binary in its own home) is provisioned from an explicit list, never by mounting the real home.
+function homeFilesFixture() {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-home-files-test-'));
+  const source = path.join(tmp, 'account');
+  fs.mkdirSync(path.join(source, 'nested'), { recursive: true });
+  fs.mkdirSync(path.join(source, 'bin'), { recursive: true });
+  fs.writeFileSync(path.join(source, 'auth.json'), '{"token":"t"}', { mode: 0o644 });
+  fs.writeFileSync(path.join(source, 'nested', 'settings.json'), '{"a":1}');
+  fs.writeFileSync(path.join(source, 'bin', 'helper'), '#!/bin/sh\n', { mode: 0o755 });
+  fs.writeFileSync(path.join(source, 'history.jsonl'), 'private history');
+  const privateHomeHost = path.join(tmp, 'private-home');
+  const plan = {
+    contract: 'confinement-plan.v1',
+    dispatchId: 'disp_home_files',
+    decision: 'execute',
+    coverage: {},
+    resources: [{
+      resource: 'private-home',
+      hostTarget: privateHomeHost,
+      executionTarget: { location: 'host', path: '/home/sandbox' },
+      access: 'read-write',
+      delivery: 'mount',
+      allocation: 'temporary',
+    }],
+  };
+  const request = (credentialSource) => ({
+    dispatchId: 'disp_home_files',
+    executorId: 'agent-bwrap',
+    invocation: { command: 'agent-cli', args: [], env: {}, resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: 'AGENT_HOME' } }] },
+    providerCapacity: { provider: 'p', accountId: 'a', credentialSource },
+    context: { cwd: tmp, runDir: tmp },
+  });
+  return { tmp, source, privateHomeHost, plan, request };
+}
+
+test('provider capacity: a home-files credential copies only the listed files, owner-only, keeping the exec bit of a helper', async () => {
+  const f = homeFilesFixture();
+  try {
+    const prepared = await prepareBwrap(f.plan, f.request({ kind: 'home-files', home: f.source, files: ['auth.json', 'nested/settings.json', 'bin/helper'] }), { id: 'bwrap', type: 'bwrap', config: {} });
+    try {
+      const listed = fs.readdirSync(f.privateHomeHost, { recursive: true, withFileTypes: true }).filter((e) => e.isFile() && !e.name.startsWith('.fgos-confinement')).map((e) => path.relative(f.privateHomeHost, path.join(e.parentPath, e.name))).sort();
+      assert.deepEqual(listed, ['auth.json', 'bin/helper', 'nested/settings.json']);
+      assert.equal(fs.readFileSync(path.join(f.privateHomeHost, 'auth.json'), 'utf8'), '{"token":"t"}');
+      assert.equal(fs.statSync(path.join(f.privateHomeHost, 'auth.json')).mode & 0o777, 0o600);
+      assert.equal(fs.statSync(path.join(f.privateHomeHost, 'bin', 'helper')).mode & 0o777, 0o700);
+      assert.equal(prepared.providerCapacity.credentialProvisioned, true);
+      assert.equal(prepared.invocation.env.AGENT_HOME, '/home/sandbox');
+      assert.ok(!prepared.invocation.args.includes(f.source), 'the real account home is never mounted');
+    } finally {
+      await prepared.cleanup();
+    }
+  } finally {
+    fs.rmSync(f.tmp, { recursive: true, force: true });
+  }
+});
+
+test('provider capacity: a home-files credential that is missing, escapes its home, or is not a file fails closed and leaves nothing behind', async () => {
+  const f = homeFilesFixture();
+  try {
+    fs.symlinkSync('/etc/hostname', path.join(f.source, 'link-out'));
+    const cases = [
+      [['auth.json', 'gone.json'], /selected credential file "gone\.json" is missing/],
+      [['../outside'], /must be a relative path without "\.\."/],
+      [['/etc/hostname'], /must be a relative path without "\.\."/],
+      [['link-out'], /not a regular file inside the credential home/],
+      [['nested'], /not a regular file inside the credential home/],
+    ];
+    for (const [files, pattern] of cases) {
+      await assert.rejects(
+        () => prepareBwrap(f.plan, f.request({ kind: 'home-files', home: f.source, files }), { id: 'bwrap', type: 'bwrap', config: {} }),
+        pattern,
+        JSON.stringify(files),
+      );
+      assert.equal(fs.existsSync(f.privateHomeHost), false, 'the allocated private home is cleaned up when provisioning fails');
+    }
+    await assert.rejects(
+      () => prepareBwrap(f.plan, f.request({ kind: 'home-files', home: path.join(f.tmp, 'no-such-home'), files: ['auth.json'] }), { id: 'bwrap', type: 'bwrap', config: {} }),
+      /credential home is not readable/,
+    );
+    await assert.rejects(
+      () => prepareBwrap(f.plan, f.request({ kind: 'home-files', home: f.source, files: [] }), { id: 'bwrap', type: 'bwrap', config: {} }),
+      /needs an absolute "home" and a non-empty "files" list/,
+    );
+  } finally {
+    fs.rmSync(f.tmp, { recursive: true, force: true });
+  }
+});
+
 // =========================================================================
 // R5: Ownership markers and idempotent reaper
 // =========================================================================
@@ -655,6 +745,52 @@ test('R5: writeOwnershipMarker writes valid marker and cleanup removes only owne
     const successClean = cleanupConfinementResource(ownedDir, 'disp_alpha');
     assert.equal(successClean.cleaned, true);
     assert.ok(!fs.existsSync(ownedDir));
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('R5: cleanup stops a process still running from inside the directory it removes', async () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-clean-proc-'));
+  const alive = (pid) => { try { process.kill(pid, 0); return true; } catch { return false; } };
+  let child;
+  try {
+    const ownedDir = path.join(tmp, 'owned');
+    fs.mkdirSync(ownedDir, { recursive: true });
+    writeOwnershipMarker(ownedDir, { dispatchId: 'disp_proc', resource: 'private-home' });
+    // A background server an agent CLI started for itself out of its private home.
+    child = cp.spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { cwd: ownedDir, detached: true, stdio: 'ignore' });
+    child.unref();
+    assert.ok(alive(child.pid));
+
+    assert.equal(cleanupConfinementResource(ownedDir, 'disp_proc').cleaned, true);
+    const end = Date.now() + 4000;
+    while (alive(child.pid) && Date.now() < end) await new Promise((r) => setTimeout(r, 25));
+    assert.equal(alive(child.pid), false, 'nothing keeps running from a directory that was deleted');
+  } finally {
+    try { if (child) process.kill(child.pid, 'SIGKILL'); } catch { /* already gone */ }
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('R5: reapOrphanedConfinementResources removes empty per-dispatch shells once they are old enough, and nothing else without a marker', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-reap-test-'));
+  try {
+    const oldEmpty = path.join(tmp, 'disp_1_old');
+    const freshEmpty = path.join(tmp, 'disp_2_fresh');
+    const foreign = path.join(tmp, 'disp_3_foreign');
+    fs.mkdirSync(oldEmpty);
+    fs.mkdirSync(freshEmpty);
+    fs.mkdirSync(path.join(foreign, 'home'), { recursive: true });
+    fs.writeFileSync(path.join(foreign, 'home', 'keep.txt'), 'not ours');
+    const longAgo = new Date(Date.now() - 2 * 3600 * 1000);
+    fs.utimesSync(oldEmpty, longAgo, longAgo);
+
+    const pass = reapOrphanedConfinementResources({ tempRoot: tmp });
+    assert.ok(!fs.existsSync(oldEmpty), 'an empty shell left behind is removed');
+    assert.ok(fs.existsSync(freshEmpty), 'a new empty directory may still be filled by a dispatch that is starting');
+    assert.ok(fs.existsSync(path.join(foreign, 'home', 'keep.txt')), 'a directory without our marker is never touched');
+    assert.deepEqual(pass.reaped.map((r) => [r.dispatchId, r.reason]), [['disp_1_old', 'empty']]);
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
@@ -1109,5 +1245,65 @@ test('Cleanup: adapter failure and timeout/cancel clean up temporary resources i
     assert.equal(failedAttestation.phase, 'failed');
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('a workspace-write producer in a linked worktree cannot write git metadata; the runner commits for it', async (t) => {
+  const bwrapOk = os.platform() === 'linux'
+    && cp.spawnSync('/usr/bin/bwrap', ['--ro-bind', '/', '/', '--', 'true'], { stdio: 'ignore' }).status === 0;
+  if (!bwrapOk) return t.skip('no working bwrap on this machine');
+  // Outside /tmp: the sandbox mounts a private tmpfs there.
+  const base = fs.mkdtempSync(path.join(fs.existsSync('/var/tmp') ? '/var/tmp' : os.tmpdir(), 'fgos-wt-commit-'));
+  try {
+    const main = path.join(base, 'main');
+    const wt = path.join(base, 'wt');
+    const git = (cwd, ...args) => cp.execFileSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', ...args], { cwd, encoding: 'utf8' });
+    fs.mkdirSync(main);
+    git(main, 'init', '-q', '-b', 'main');
+    git(main, 'commit', '-q', '--allow-empty', '-m', 'init');
+    git(main, 'worktree', 'add', '-q', wt, '-b', 'feat');
+    const objectCount = () => git(main, 'count-objects', '-v').match(/^count: (\d+)/m)[1];
+    const mainBefore = git(main, 'rev-parse', 'main');
+    const objectsBefore = objectCount();
+
+    const resources = resolveConfinementResources({
+      dispatchId: 'disp_wt_commit',
+      context: { cwd: wt, repoRoot: wt },
+      grants: [
+        { resource: 'workspace', access: 'read-write', scope: 'dispatch' },
+        { resource: 'workspace-git-metadata', access: 'read', scope: 'dispatch' },
+      ],
+    });
+    const plan = { contract: 'confinement-plan.v1', dispatchId: 'disp_wt_commit', decision: 'execute', coverage: {}, resources };
+    // The worker may write a file in its worktree, but every git write must fail: staging,
+    // committing, moving a ref, appending to a hook or to the shared config.
+    const script = [
+      'echo produced > f',
+      '! git add f 2>/dev/null',
+      '! git -c user.name=t -c user.email=t@t commit --allow-empty -qm sneaky 2>/dev/null',
+      '! git update-ref refs/heads/main HEAD 2>/dev/null',
+      '! (echo x >> "$COMMON/hooks/post-commit") 2>/dev/null',
+      '! (echo x >> "$COMMON/config") 2>/dev/null',
+    ].join(' && ');
+    const prepared = await prepareBwrap(plan, {
+      dispatchId: 'disp_wt_commit',
+      executorId: 'x',
+      invocation: { command: 'sh', args: ['-c', script], env: { PATH: process.env.PATH, COMMON: path.join(main, '.git') }, resourceBindings: [] },
+      context: { cwd: wt, runDir: base },
+    }, { id: 'bwrap', type: 'bwrap', config: {} });
+    const run = cp.spawnSync(prepared.invocation.command, prepared.invocation.args, { cwd: wt, env: prepared.invocation.env, encoding: 'utf8' });
+    assert.equal(run.status, 0, `${run.stderr}${run.stdout}`);
+    assert.equal(fs.readFileSync(path.join(wt, 'f'), 'utf8').trim(), 'produced', 'the worker could write its file');
+
+    // Then the runner, outside the sandbox, commits it.
+    const commit = commitUnitWork({ worktree: wt, unitId: 'u1', summary: 'Added f\nmore detail' });
+    assert.equal(commit.status, 'committed');
+    assert.deepEqual(commit.files, ['f']);
+    assert.equal(git(wt, 'log', '-1', '--format=%s'), 'Added f\n');
+    assert.equal(git(main, 'rev-parse', 'main'), mainBefore, 'refs/heads/main did not move');
+    assert.notEqual(objectCount(), objectsBefore, 'the runner (not the worker) added the commit objects');
+    assert.equal(commitUnitWork({ worktree: wt, unitId: 'u1', summary: 'again' }).status, 'no-changes');
+  } finally {
+    fs.rmSync(base, { recursive: true, force: true });
   }
 });

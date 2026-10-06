@@ -11,7 +11,8 @@ import { buildConfinementRequest, validateConfinementRequest } from "../../src/r
 import { ensureMachineBackendRegistryDefaults } from "../../src/runner/dispatch/confinement/backend-registry.mjs";
 import { resolveConfinementPolicy } from "../../src/runner/dispatch/confinement/policies.mjs";
 import { DispatchError } from "../../src/runner/dispatch/transport.mjs";
-import { executeExecutorCli, spawnWorker } from "../../src/runner/dispatch/cli.mjs";
+import { executeExecutorCli } from "../../src/runner/dispatch/cli.mjs";
+import { spawnWorker, workDispatchContext } from "../../src/runner/work-dispatch.mjs";
 import { loadRunnerConfigFromDir, RunnerConfigError } from "../../src/runner/dispatch/config.mjs";
 
 test("buildConfinementRequest builds valid confinement-request.v1 shape at dispatch seam", () => {
@@ -292,7 +293,7 @@ test("H1: spawnWorker resolves and binds curated capability confinement (code:im
   const sampleWork = {
     id: "work-h1",
     domain: "coding",
-    stage: "executing",
+    workflowStep: "executing",
     tier: "standard",
     kind: "feat",
   };
@@ -582,7 +583,7 @@ test("MED-1: required policy on execute, advise, and stage names binds on spawnW
       },
     };
     await assert.rejects(
-      () => spawnWorker({ id: "w-exec", domain: "coding", stage: "executing", tier: "standard" }, cfgExecute, tmpDir, { fgosDir: path.join(tmpDir, ".fgos") }),
+      () => spawnWorker({ id: "w-exec", domain: "coding", workflowStep: "executing", tier: "standard" }, cfgExecute, tmpDir, { fgosDir: path.join(tmpDir, ".fgos") }),
       (err) => {
         assert.ok(err instanceof DispatchError);
         assert.ok(err.errorClass === "confinement-backend-missing" || err.errorClass === "confinement-unsupported");
@@ -599,7 +600,7 @@ test("MED-1: required policy on execute, advise, and stage names binds on spawnW
       },
     };
     await assert.rejects(
-      () => spawnWorker({ id: "w-adv", domain: "coding", stage: "exploring", kind: "advise", tier: "standard" }, cfgAdvise, tmpDir, { fgosDir: path.join(tmpDir, ".fgos") }),
+      () => spawnWorker({ id: "w-adv", domain: "coding", workflowStep: "exploring", kind: "advise", tier: "standard" }, cfgAdvise, tmpDir, { fgosDir: path.join(tmpDir, ".fgos") }),
       (err) => {
         assert.ok(err instanceof DispatchError);
         assert.ok(err.errorClass === "confinement-backend-missing" || err.errorClass === "confinement-unsupported");
@@ -616,7 +617,7 @@ test("MED-1: required policy on execute, advise, and stage names binds on spawnW
       },
     };
     await assert.rejects(
-      () => spawnWorker({ id: "w-disc", domain: "coding", stage: "discovery", tier: "standard" }, cfgDiscovery, tmpDir, { fgosDir: path.join(tmpDir, ".fgos") }),
+      () => spawnWorker({ id: "w-disc", domain: "coding", workflowStep: "discovery", tier: "standard" }, cfgDiscovery, tmpDir, { fgosDir: path.join(tmpDir, ".fgos") }),
       (err) => {
         assert.ok(err instanceof DispatchError);
         assert.ok(err.errorClass === "confinement-backend-missing" || err.errorClass === "confinement-unsupported");
@@ -664,7 +665,7 @@ test("MED-2: spawnWorker and executeExecutorCli agree on capability identity for
       },
     };
 
-    const researchWork = { id: "w-research", domain: "research", stage: "executing", tier: "standard" };
+    const researchWork = { id: "w-research", domain: "research", workflowStep: "executing", tier: "standard" };
 
     let spawnRefusedCap;
     try {
@@ -677,8 +678,8 @@ test("MED-2: spawnWorker and executeExecutorCli agree on capability identity for
     let cliRefusedCap;
     try {
       await executeExecutorCli("fgos-coding-implement", {
-        work: researchWork,
-        stage: "executing",
+        // The Work layer derives the capability hints; dispatch's door takes them as given.
+        ...workDispatchContext({ work: researchWork, stage: "executing", cwd: tmpDir, executorId: "fgos-coding-implement" }),
         repoRoot: tmpDir,
         cwd: tmpDir,
         runnerConfig: cfg,
@@ -829,7 +830,7 @@ test("MED-5: fail-closed policy errors produce structured DispatchError with att
     let caughtErr;
     try {
       await spawnWorker(
-        { id: "wleak", domain: "coding", stage: "executing", tier: "standard" },
+        { id: "wleak", domain: "coding", workflowStep: "executing", tier: "standard" },
         cfg,
         tmpDir,
         { fgosDir },
@@ -847,13 +848,25 @@ test("MED-5: fail-closed policy errors produce structured DispatchError with att
     assert.equal(caughtErr.attestation.phase, "refused");
     assert.equal(caughtErr.attestation.outcome, "refused");
 
-    // Check that run.json is NOT left at status 'running'
-    const runsBase = path.join(fgosDir, "dispatch-runs", "wleak");
-    const runSubdirs = fs.readdirSync(runsBase);
-    assert.ok(runSubdirs.length > 0, "run directory must exist");
-    const runJsonPath = path.join(runsBase, runSubdirs[0], "run.json");
-    const runRecord = JSON.parse(fs.readFileSync(runJsonPath, "utf8"));
-    assert.equal(runRecord.status, "settled", "run.json must be closed at settled, never stuck at running");
+    // The dispatch-runs store is retired: a refused dispatch must not leave one behind,
+    // and no run record under assignments may be left at status 'running'.
+    assert.equal(fs.existsSync(path.join(fgosDir, "dispatch-runs")), false, "no dispatch-runs store is written");
+    const assignmentsDir = path.join(fgosDir, "assignments");
+    const stuck = [];
+    if (fs.existsSync(assignmentsDir)) {
+      const walk = (dir) => {
+        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+          const p = path.join(dir, entry.name);
+          if (entry.isDirectory()) walk(p);
+          else if (entry.name === "run.json") {
+            const rec = JSON.parse(fs.readFileSync(p, "utf8"));
+            if (rec.status === "running") stuck.push(p);
+          }
+        }
+      };
+      walk(assignmentsDir);
+    }
+    assert.deepEqual(stuck, [], "run.json must be closed, never stuck at running");
   } finally {
     fs.rmSync(tmpDir, { recursive: true, force: true });
   }

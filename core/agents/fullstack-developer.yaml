@@ -12,7 +12,7 @@ decision_boundary:
     - Choose the concrete implementation approach for a locked design decision
   must_escalate:
     - Any change that requires redesigning scope or architecture beyond what the item's own plan already locked
-model_tier: standard
+rigor: standard
 tool-scope:
   - Read
   - Edit

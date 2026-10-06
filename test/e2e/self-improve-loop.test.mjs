@@ -6,6 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
+import { resolveHostBin } from '../../src/util/host-bin.mjs';
 
 // e2e — the whole self-improve loop (self-improve-loop P13 D1-D17), exercised
 // as real fgos.mjs + fgos-runner.mjs subprocesses against a disposable
@@ -13,7 +14,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 // imports src/runner or src/state directly — on-disk state is the only
 // source of truth for assertions) plus runner-loop.test.mjs's discovery-aware
 // dispatch pattern (writeClearDiscoveryExecutor's 3 call sites), since the
-// item `evolve --submit` creates starts at stage clarify, not executing —
+// item `submit` creates starts at stage clarify, not executing —
 // pr-gate.test.mjs's plain worker-only executor would leave it stuck there.
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -44,6 +45,10 @@ function initTempRepo() {
 }
 
 function fgos(cwd, args) {
+  if (args[0] === 'friction') {
+    const hostBin = resolveHostBin(cwd) || path.resolve(__dirname, '../../target/debug/fgos');
+    return spawnSync(hostBin, [...args, '--dir', cwd], { cwd, encoding: 'utf8' });
+  }
   return spawnSync(process.execPath, [FGOS, ...args], { cwd, encoding: 'utf8' });
 }
 
@@ -143,7 +148,8 @@ function writeRunnerConfig(repoRoot, executorScript) {
     JSON.stringify({
       runner: {
         executor: { command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'] },
-        models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+        modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
+        rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
         timeoutMs: 15000,
       },
     }),
@@ -172,8 +178,8 @@ execFileSync('git', ['commit', '-q', '-m', ${JSON.stringify(`worker: ${produce}`
 }
 
 test(
-  'e2e self-improve loop full contract (D1-D17): friction w/ heavy keyword -> evolve list/--pick (read-only) '
-    + '-> evolve --submit -> runner dispatch -> review -> approve refuses without --acknowledge-iron-law '
+  'e2e self-improve loop full contract (D1-D17): friction w/ heavy keyword -> friction rank/show (read-only) '
+    + '-> fgos submit -> runner dispatch -> review -> approve refuses without --acknowledge-iron-law '
     + '-> approve --acknowledge-iron-law succeeds -> done',
   () => {
     const repoRoot = initTempRepo();
@@ -185,20 +191,23 @@ test(
     // HEAVY_KEYWORDS entry ("schema migration") — the deterministic route to
     // a real Iron-Law-tripping candidate (per this cell's action), never a
     // fabricated module-path-touching commit.
-    seedFriction(repoRoot, {
-      id: 'self-fix-source',
-      disposition: 'blocked',
-      errorClass: 'verify-miss',
-      layer: 'verification',
-      attempts: 2,
-      detail: 'Needs a schema migration in the candidate store before this keeps tripping goal-check.',
-    });
-    commitPending(repoRoot, 'seed friction for self-fix-source');
+    // (2) `fgos friction rank` — candidate appears with every field a human
+    // needs to judge it.
+    // Record friction via Observe CLI
+    const rec = fgos(repoRoot, [
+      'friction', 'record',
+      '--subject', 'work:self-fix-source',
+      '--layer', 'verification',
+      '--error-class', 'verify-miss',
+      '--disposition', 'blocked',
+      '--producer', 'test',
+      '--attempts', '2',
+      '--detail', 'Needs a schema migration in the candidate store before this keeps tripping goal-check.',
+    ]);
+    assert.equal(rec.status, 0, `friction record failed: ${rec.stderr}`);
 
-    // (2) `fgos evolve` (list) — candidate appears with every field a human
-    // needs to judge it (D12).
-    const list = fgos(repoRoot, ['evolve']);
-    assert.equal(list.status, 0, `evolve list failed: ${list.stderr}`);
+    const list = fgos(repoRoot, ['friction', 'rank']);
+    assert.equal(list.status, 0, `friction rank failed: ${list.stderr}`);
     const listData = envelopeData(list.stdout);
     const candidate = listData.find((c) => c.id === 'self-fix-source');
     assert.ok(candidate, 'self-fix-source appears in the ranked list');
@@ -209,28 +218,23 @@ test(
     assert.equal(candidate.attempts, 2);
     assert.match(candidate.detail, /schema migration/);
 
-    // (3) `fgos evolve --pick <id>` is read-only (D6/D11) — byte-compare the
-    // event log before/after, not just an assertion about the return value.
-    const beforePick = eventsRaw(repoRoot);
-    const pick = fgos(repoRoot, ['evolve', '--pick', 'self-fix-source']);
-    assert.equal(pick.status, 0, `evolve --pick failed: ${pick.stderr}`);
-    assert.equal(envelopeData(pick.stdout).recent[0].id, 'self-fix-source');
-    const afterPick = eventsRaw(repoRoot);
-    assert.equal(afterPick, beforePick, 'evolve --pick must append zero events (read-only, D6/D11)');
+    // (3) `fgos friction show <subject>` is read-only
+    const show = fgos(repoRoot, ['friction', 'show', 'work:self-fix-source']);
+    assert.equal(show.status, 0, `friction show failed: ${show.stderr}`);
+    const showData = envelopeData(show.stdout);
+    assert.equal(showData.unsettled, 1);
+    assert.equal(showData.records[0].subject.id, 'self-fix-source');
 
-    // (4) `fgos evolve --submit <id>` — the ONLY mutating action on the whole
-    // evolve surface (D15): creates exactly one new work item, description
-    // composed from the candidate's friction fields (therefore carrying the
-    // same heavy keyword).
-    const submit = fgos(repoRoot, ['evolve', '--submit', 'self-fix-source']);
-    assert.equal(submit.status, 0, `evolve --submit failed: ${submit.stderr}`);
+    // (4) `fgos submit` — creates exactly one new work item
+    const desc = `Self-improve candidate ${candidate.id}: ${candidate.disposition} (${candidate.errorClass}, layer ${candidate.layer}). ${candidate.detail}`;
+    const submit = fgos(repoRoot, ['submit', desc]);
+    assert.equal(submit.status, 0, `submit failed: ${submit.stderr}`);
     const submitted = envelopeData(submit.stdout);
     assert.equal(submitted.status, 'todo');
-    assert.equal(submitted.stage, 'discovery');
+    assert.equal(submitted.workflowStep, 'discovery');
     assert.match(submitted.description, /Self-improve candidate self-fix-source/);
     assert.match(submitted.description, /schema migration/);
-    commitPending(repoRoot, `state: evolve --submit ${submitted.id}`);
-
+    commitPending(repoRoot, `state: submit ${submitted.id}`);
     // The composed description's HEAVY_KEYWORDS match ALSO sets classify()'s
     // risk:'heavy' at submit time (same shared keyword list, D13/D14) —
     // decompose.mjs's risk-heavy gate parks ANY heavy-risk root at
@@ -282,7 +286,7 @@ test(
     const afterDispatch = stateView(repoRoot);
     const item = afterDispatch.work[submitted.id];
     assert.equal(item.status, 'awaiting-approval', 'the discovery-aware executor chains the item all the way to proposed in one --once');
-    assert.equal(item.stage, 'executing');
+    assert.equal(item.workflowStep, 'executing');
     assert.equal(branchExists(repoRoot, `fgw/${submitted.id}`), true);
 
     // (6) `fgos review <id>` — real diff shown.

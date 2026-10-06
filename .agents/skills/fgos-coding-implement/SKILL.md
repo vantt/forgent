@@ -124,7 +124,7 @@ Full mechanics: `references/implement-and-collaboration.md`.
 
 ### Step 3: Verify — proof, not assertion
 Skip entirely when mechanism was `out-of-process` (the worker already
-ran verify). Otherwise run the item's own `verify` command exactly as
+ran verify; it does not commit — you commit its edits in Step 4). Otherwise run the item's own `verify` command exactly as
 recorded; on failure, fix the root cause and rerun the exact command,
 never weaken it. Full mechanics: `references/verify-commit-and-iron-law.md`.
 

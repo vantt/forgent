@@ -15,7 +15,6 @@ import {
   addAdHocWorktree,
   addBareOrigin,
   addDiscovery,
-  addFriction,
   addGoalItem,
   addOk,
   addOutcome,
@@ -61,7 +60,7 @@ import {
   makeRunnerProposedLeafItem,
   makeSessionSafeRunnerItem,
   mkLocalDependency,
-  moveStage,
+  moveStep,
   moveWork,
   os,
   path,
@@ -171,7 +170,7 @@ test('list --id --fields with an invalid field name is rejected as validation er
   const cwd = tmpCwdFromTemplate();
   addOk(cwd, 'item-invalid');
 
-  const result = run(cwd, ['list', '--id', 'item-invalid', '--fields', 'stage,invalidField']);
+  const result = run(cwd, ['list', '--id', 'item-invalid', '--fields', 'workflowStep,invalidField']);
   assert.equal(result.status, 4);
   assert.match(result.stderr, /list --fields: unknown field "invalidField"/);
 });

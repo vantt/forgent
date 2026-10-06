@@ -1,0 +1,265 @@
+{
+  "contract": {
+    "id": "assignment-run-result",
+    "version": 2
+  },
+  "runId": "run_asgn_lead_cold_resumable_dag_op_017_01",
+  "assignmentId": "asgn_lead_cold_resumable_dag_op_017",
+  "workId": null,
+  "controlEpoch": 1,
+  "controlToken": "88bbb4a5-5b96-4e6c-bcd3-f15e30a586a1",
+  "executorId": "gemini",
+  "executorRedirected": false,
+  "policy": {
+    "role": "reviewer",
+    "persona": "detail-oriented-rechecker",
+    "executorPreference": [
+      "gemini"
+    ],
+    "executorId": "gemini",
+    "providerModel": "gemini",
+    "tier": "flagship",
+    "model": "gemini-3.1-pro-low",
+    "quality": {
+      "minRigor": {
+        "value": "high",
+        "source": {
+          "scope": "derived",
+          "id": "flagship"
+        }
+      },
+      "mode": {
+        "value": "analytical",
+        "source": {
+          "scope": "tier-bridge",
+          "id": "flagship"
+        },
+        "sourceKind": "implied-by-tier-bridge"
+      }
+    },
+    "lookupPolicyTier": "flagship",
+    "reasoningEffort": "high",
+    "visibility": "headless",
+    "repeatMode": null,
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "gemini",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "provider": {
+        "value": "gemini",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "gemini"
+        }
+      },
+      "model": {
+        "value": "gemini-3.1-pro-low",
+        "source": {
+          "scope": "placement-policy",
+          "id": "gemini.flagship"
+        }
+      },
+      "tier": {
+        "value": "flagship",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "semanticTier": {
+        "value": "flagship",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "quality": {
+        "minRigor": {
+          "value": "high",
+          "source": {
+            "scope": "derived",
+            "id": "flagship"
+          }
+        },
+        "mode": {
+          "value": "analytical",
+          "source": {
+            "scope": "tier-bridge",
+            "id": "flagship"
+          },
+          "sourceKind": "implied-by-tier-bridge"
+        }
+      },
+      "lookupPolicyTier": {
+        "value": "flagship",
+        "source": {
+          "scope": "cli",
+          "id": "cli",
+          "kind": "semantic"
+        }
+      },
+      "reasoningEffort": {
+        "value": "high",
+        "source": {
+          "scope": "derived",
+          "id": "quality.minRigor.high"
+        }
+      },
+      "persona": {
+        "value": "detail-oriented-rechecker",
+        "source": {
+          "scope": "cli",
+          "id": "cli"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "repeatMode": {
+        "value": null,
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "asgn_lead_cold_resumable_dag_op_017"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "gemini"
+        }
+      }
+    }
+  },
+  "promptEnvelope": {
+    "persona": {
+      "ref": "detail-oriented-rechecker",
+      "delivery": "section",
+      "applied": true,
+      "source": {
+        "scope": "cli",
+        "id": "cli"
+      }
+    }
+  },
+  "settledAt": "2026-09-18T04:42:36.608Z",
+  "durationMs": 98655,
+  "claimSha256": "c3a44fcc66b7f92c155a7f615808ef1acc95a0b0fcb8f4da6cbe50878e4e9ff7",
+  "settleReports": [
+    {
+      "path": ".fgos/assignments/asgn_lead_cold_resumable_dag_op_017/runs/01/agent-report.md",
+      "sha256": "3998e14c882b341639119d90c341f839ccbc778b3b196dd137095d7a2624dc6e"
+    }
+  ],
+  "classification": {
+    "execution": {
+      "status": "completed",
+      "exitCode": 0
+    },
+    "assessment": {
+      "verdict": "pass"
+    },
+    "confidence": {
+      "level": "failed",
+      "basis": [
+        "valid-agent-result-claim",
+        "captured-stdout",
+        "workspace-git-diff"
+      ]
+    },
+    "failure": null,
+    "policy": {
+      "disposition": "refuse",
+      "code": "read-only-mutation"
+    },
+    "delivery": {
+      "mode": "fresh"
+    },
+    "provenance": "native-v2"
+  },
+  "status": "failed",
+  "confidence": "failed",
+  "runtime": {
+    "exitCode": 0,
+    "stdoutLog": ".fgos/assignments/asgn_lead_cold_resumable_dag_op_017/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/asgn_lead_cold_resumable_dag_op_017/runs/01/stderr.log"
+  },
+  "agentClaim": {
+    "id": "agent-result-claim",
+    "version": 2,
+    "status": "done",
+    "summary": "Rechecked Phase 02 candidate. Verified H-1 by constructing a real request and confirming that `compileDagRequest` handles optional-field-omitted input without throwing. Verified H-2 by confirming unresolvable bare ledger identities are rejected. Verified H-3 by checking p02.md and the previous fixer's agent-result, confirming a real outcome of 59 failing titles. Confirmed M-1, M-2, M-3, L-1 logic in code. Proofs are sufficient.",
+    "assessment": {
+      "verdict": "pass"
+    },
+    "evidenceRefs": [
+      "src/verbs/coordination/schema.mjs",
+      "src/verbs/coordination/dag-request-compiler.mjs"
+    ]
+  },
+  "evidence": {
+    "gitBefore": "9333f09ce56607468e03f42b0226be3d89e4e9d2",
+    "gitAfter": "9333f09ce56607468e03f42b0226be3d89e4e9d2",
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [
+      "scratch_test_h1h2.mjs"
+    ],
+    "mutatedDirtyBeforeFiles": [],
+    "attribution": [
+      {
+        "path": "fix-1.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "open.json",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "scratch_test_h1h2.mjs",
+        "firstObserved": "post-run",
+        "level": "correlated",
+        "basis": [
+          "pre-post-git-snapshot"
+        ],
+        "coverageMatched": false
+      }
+    ],
+    "artifacts": [
+      ".fgos/assignments/asgn_lead_cold_resumable_dag_op_017/runs/01/agent-report.md",
+      ".fgos/assignments/asgn_lead_cold_resumable_dag_op_017/runs/01/agent-result.json"
+    ],
+    "tests": [],
+    "findingRefs": [
+      "src/verbs/coordination/schema.mjs",
+      "src/verbs/coordination/dag-request-compiler.mjs"
+    ]
+  }
+}

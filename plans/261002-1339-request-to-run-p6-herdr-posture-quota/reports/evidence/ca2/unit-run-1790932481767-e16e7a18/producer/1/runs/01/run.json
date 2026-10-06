@@ -1,0 +1,20 @@
+{
+  "contract": "assignment-run.v2",
+  "runId": "run_unit-run-1790932481767-e16e7a18/producer/1_01",
+  "assignmentId": "unit-run-1790932481767-e16e7a18/producer/1",
+  "attempt": 1,
+  "supersedesRunId": null,
+  "retryId": null,
+  "payloadDigest": "sha256:a7d0bc9bb546daea75e8171970fdc0ceb11f03f9354c055717f92d27e29fd02c",
+  "dispatchPlanDigest": "sha256:5d1fe1c8d19bd305df1a6fcca37663426a69f91b09df8288759a6c2b2d134654",
+  "phase": "admitted",
+  "delivery": "not-sent",
+  "executorId": "claude-herdr",
+  "dispatchPlanPath": ".fgos/assignments/unit-run-1790932481767-e16e7a18/producer/1/runs/01/dispatch-plan.json",
+  "effectiveContractPath": ".fgos/assignments/unit-run-1790932481767-e16e7a18/producer/1/runs/01/effective-execution-contract.json",
+  "cwd": "/var/tmp/p6-accept-work",
+  "startedAt": "2026-10-02T09:14:41.803Z",
+  "timeoutMs": 2100000,
+  "status": "settled",
+  "settledAt": "2026-10-02T09:15:08.177Z"
+}

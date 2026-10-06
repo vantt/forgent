@@ -27,8 +27,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { judgeVerifySemanticCorrectness } from './verify-pattern-check.mjs';
-import { listWork, moveStage, moveWork, addWork, putInAwaiting, addDecision, editWork, StoreError } from '../state/store.mjs';
-import { getDomain, resolveWorkflow, stageForStep } from '../state/workflow-stage-graphs.mjs';
+import { listWork, moveStep, moveWork, addWork, putInAwaiting, addDecision, editWork, StoreError } from '../state/store.mjs';
+import { getDomain, stepForPhase, effectiveStep } from '../state/domain-registry.mjs';
 import { rankImpact } from '../state/impact.mjs';
 import { computeImpact, computePriority, effortForMode, MODE_EFFORT, isRecognizedRisk } from '../state/priority-formula.mjs';
 import { footprintOverlapAmong } from '../state/graph-metrics.mjs';
@@ -466,7 +466,7 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
   // SAME `fgw/<id>` worktree via branchExists, since it already exists).
   // `work.status` is read once, from the same snapshot as `work` above — the
   // status axis is untouched by anything else in this function, so it stays
-  // valid across all three moveStage(...,'executing',...) call sites below. A
+  // valid across all three moveStep(...,'executing',...) call sites below. A
   // runner-sweep call (item never claimed, `status: 'todo'` already) is a
   // no-op here, matching R15 (sweep only touches todo items).
   // tsk-40m D5: releaseClaimOnExecuting retired. Items at stage planning no
@@ -475,24 +475,18 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
   const releaseClaimOnExecuting = () => {};
 
   // Idempotent no-op (must_haves truth 3): a re-entrant call once the root
-  // is already past `decompose` does nothing — the CAS on the moveStage
+  // is already past `decompose` does nothing — the CAS on the moveStep
   // calls below would otherwise throw a conflict for the exact same case,
   // so this check backs it up ahead of time rather than making every caller
   // catch that error.
   const domain = getDomain(work.domain);
-  const currentStage = work.stage ?? stageForStep(domain, 'Execute');
-  const planningStage = stageForStep(domain, 'Divide');
-  // tsk-403 D18: `decompose` is coding's own drain-only legacy alias for
-  // this same step — an item still parked there (from before the rename)
-  // must NOT read as "already past Divide" here, or this function would
-  // silently no-op on it forever instead of actually processing it. Only
-  // activates when a domain declares both names distinctly (today: only
-  // `coding`) — a domain whose OWN live Divide stage is still literally
-  // named `decompose` (never renamed by this item) already has
-  // `planningStage === 'decompose'`, so this stays a no-op for it.
-  const workflow = resolveWorkflow(domain, work.kind);
-  const legacyPlanStage = (workflow?.stages ?? domain.stages)?.includes('decompose') && planningStage !== 'decompose' ? 'decompose' : undefined;
-  if (currentStage !== planningStage && currentStage !== legacyPlanStage) {
+  // `effectiveStep` maps a record's older step name (`decompose`) onto the plan
+  // step through the workflow's aliases, so an item still parked there does not
+  // read as "already past planning" and silently no-op forever.
+  const currentStep = effectiveStep(work, domain);
+  const planningStep = stepForPhase(domain, 'plan', work.kind);
+  const executeStep = stepForPhase(domain, 'execute', work.kind);
+  if (currentStep !== planningStep) {
     return { outcome: 'noop', id };
   }
 
@@ -501,7 +495,7 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
   // executing must not regenerate children on retry. The signal for "this
   // call's own addWork loop already finished" is a durable
   // decompose-completion decision (`logDecomposeVerdict`'s own 'decompose'
-  // entry below, written BEFORE moveStage) — never bare child existence
+  // entry below, written BEFORE moveStep) — never bare child existence
   // (tsk-4n8): a stray child (a prior partial/superseded --children
   // submission, or a human's manual `fgos add --parent`) must not be
   // mistaken for a completed decompose and permanently block every later
@@ -516,7 +510,7 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
   // was the real command `fgos-coding-planning`'s now-retired `planApprove`
   // gate recorded (coding-planning-validating-gate-redesign D9-D11 removed
   // that gate; no live skill writes a new `planApprove` record). Read once,
-  // reused by every moveStage call below that advances this item to
+  // reused by every moveStep call below that advances this item to
   // `executing`, so none of them silently carry FALLBACK_VERIFY or leave
   // `verify` untouched (transitionStage only overwrites it when passed a
   // value — stage-fsm.mjs:60-65). For every item post-redesign this falls
@@ -527,7 +521,7 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
   const planApproveVerify = view.gates?.[id]?.planApprove?.verify ?? work.verify;
 
   // tsk-4m4 (narrowed, D1): `planApproveVerify` above feeds FOUR separate
-  // `moveStage` call sites below (hasChildren re-entrancy, tiny/small
+  // `moveStep` call sites below (hasChildren re-entrancy, tiny/small
   // skip-and-advance, explicit pass-through, and the real decompose
   // success path) with zero check on it — unlike resolveDiscovery's own
   // caller-verdict path, which runs this same mechanical check before
@@ -566,7 +560,7 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
   }
 
   if (priorDecomposeCompleted) {
-    moveStage(dir, { id, to: stageForStep(domain, 'Execute'), expectedStage: currentStage, verify: planApproveVerify, role });
+    moveStep(dir, { id, to: executeStep, expectedStep: currentStep, verify: planApproveVerify, role });
     releaseClaimOnExecuting();
     return { outcome: 'already-decomposed', id };
   }
@@ -624,7 +618,7 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
         rationale:
           'tsk-19j D7 trust signal: plan.md already committed to no split, so there is nothing to judge — skipping avoids a pointless round-trip, never a real child-generation decision',
       });
-      moveStage(dir, { id, to: stageForStep(domain, 'Execute'), expectedStage: currentStage, verify: planApproveVerify, role });
+      moveStep(dir, { id, to: executeStep, expectedStep: currentStep, verify: planApproveVerify, role });
       releaseClaimOnExecuting();
       return { outcome: 'pass-through', id };
     }
@@ -755,7 +749,7 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
 
   if (verdict.kind === 'pass-through') {
     logDecomposeVerdict(dir, id, 'pass-through', verdict.reason ?? DEFAULT_PASS_THROUGH_RATIONALE);
-    moveStage(dir, { id, to: stageForStep(domain, 'Execute'), expectedStage: currentStage, verify: planApproveVerify, role });
+    moveStep(dir, { id, to: executeStep, expectedStep: currentStep, verify: planApproveVerify, role });
     releaseClaimOnExecuting();
     return { outcome: 'pass-through', id };
   }
@@ -947,15 +941,16 @@ export function resolvePlan(dir, id, cfg, role, callerVerdict) {
       // meaning). Closes the decompose-child half of the description gap
       // this item exists to fix.
       description: child.title,
-      stage: stageForStep(domain, 'Execute'),
+      workflowStep: executeStep,
       parent: id,
-      tier: work.tier,
+      size: work.size ?? DEFAULTS.size,
+      ...(work.rigor !== undefined ? { rigor: work.rigor } : {}),
       domain: work.domain,
     });
   });
 
   logDecomposeVerdict(dir, id, 'decompose', verdict.reason, `${childIds.length} children`);
-  moveStage(dir, { id, to: stageForStep(domain, 'Execute'), expectedStage: currentStage, verify: planApproveVerify, role });
+  moveStep(dir, { id, to: executeStep, expectedStep: currentStep, verify: planApproveVerify, role });
   releaseClaimOnExecuting();
   return { outcome: 'decompose', id, childIds };
 }

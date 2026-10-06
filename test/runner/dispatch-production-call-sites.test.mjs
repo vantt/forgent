@@ -14,15 +14,11 @@ import path from 'node:path';
 import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
-import { spawnWorker, executeExecutorCli } from '../../src/runner/dispatch/cli.mjs';
+import { executeExecutorCli } from '../../src/runner/dispatch/cli.mjs';
+import { spawnWorker } from '../../src/runner/work-dispatch.mjs';
 import { fanoutBatchExecutorCli } from '../../src/runner/fanout-batch.mjs';
 import { loadRunnerConfigFromDir, normalizeLegacyConfinement } from '../../src/runner/dispatch/config.mjs';
 import { addWork, listWork } from '../../src/state/store.mjs';
-import {
-  openDeclaredProtocolSession,
-  dispatchDeclaredOperation,
-} from '../../src/runner/coordination/session-engine.mjs';
-
 const WORKER_SESSION = 'fgos-worker';
 
 const testHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-prod-callsite-home-'));
@@ -116,6 +112,7 @@ const HERDR_EXECUTOR = {
   kind: 'agent',
   adapter: 'herdr-spawn',
   command: 'agy',
+  providerModel: 'agy',
   args: ['-i', '{prompt}', '--mode', 'accept-edits'],
   // agy is not a Claude CLI, so the cross-provider egress gate refuses it
   // unless the executor says so -- the same declaration the live config makes.
@@ -143,8 +140,9 @@ function fixtureRepo(makeExecutor = () => HERDR_EXECUTOR) {
   fs.mkdirSync(path.join(root, '.fgos'), { recursive: true });
   fs.writeFileSync(path.join(root, '.fgos', 'config.json'), JSON.stringify({
     runner: {
-      executor: { command: 'agy', args: ['-i', '{prompt}'] },
-      models: { standard: 'sonnet' },
+      executor: { command: 'agy', providerModel: 'agy', args: ['-i', '{prompt}'] },
+      modelPolicies: { agy: { standard: 'sonnet' }, claude: { standard: 'sonnet' } },
+      rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
       timeoutMs: 20000,
       executors: { 'herdr-worker': makeExecutor(root) },
       capabilities: { [IMPLEMENT_CAPABILITY]: { prefer: 'herdr-worker' } },
@@ -197,9 +195,19 @@ const dispatch = (root, workId, opts = {}) => withMockHerdr(
 
 const runStatus = (runDir) => JSON.parse(fs.readFileSync(path.join(runDir, 'run.json'), 'utf8')).status;
 
-/** The single `dispatch-runs/<workId>/<stamp>` directory a dispatch left. */
+/** The single run directory an execution left (under assignments/ or dispatch-runs/). */
 function soleRunDir(root) {
-  const base = path.join(root, '.fgos', 'dispatch-runs');
+  const fgosDir = path.join(root, '.fgos');
+  const asgnBase = path.join(fgosDir, 'assignments');
+  if (fs.existsSync(asgnBase)) {
+    const asgns = fs.readdirSync(asgnBase);
+    if (asgns.length > 0) {
+      const runsDir = path.join(asgnBase, asgns[0], 'runs');
+      const attempts = fs.readdirSync(runsDir);
+      return path.join(runsDir, attempts[0]);
+    }
+  }
+  const base = path.join(fgosDir, 'dispatch-runs');
   const workIds = fs.readdirSync(base);
   assert.equal(workIds.length, 1, 'exactly one dispatch run was started');
   const stamps = fs.readdirSync(path.join(base, workIds[0]));
@@ -623,7 +631,7 @@ test('fanoutBatchExecutorCli in Work Driver coordinates pick -> execute -> retur
     kind: 'task',
     status: 'todo',
     domain: 'coding',
-    stage: 'planning',
+    workflowStep: 'planning',
     deps: [],
     refs: [],
     risk: 'light',
@@ -636,7 +644,7 @@ test('fanoutBatchExecutorCli in Work Driver coordinates pick -> execute -> retur
     kind: 'task',
     status: 'todo',
     domain: 'coding',
-    stage: 'executing',
+    workflowStep: 'executing',
     deps: [],
     refs: [],
     risk: 'light',
@@ -662,46 +670,6 @@ test('fanoutBatchExecutorCli in Work Driver coordinates pick -> execute -> retur
   }
 });
 
-test('dispatchDeclaredOperation routes to adapter in production coordination flow (R1)', { skip: process.platform === 'win32' && 'mockHerdr is a POSIX shebang wrapper' }, async () => {
-  const root = fixtureRepo();
-  const mock = mockHerdr(root);
-  const DEFINITION_ID = 'core.coordination-protocol.standalone-master-coordination-loop';
-
-  try {
-    await openDeclaredProtocolSession(
-      {
-        definitionId: DEFINITION_ID,
-        coordinationId: 'coord-prod-test',
-        objective: 'Test coordination dispatch down to adapter',
-        writerId: 'coord-driver',
-      },
-      { cwd: root, repoRoot: root },
-    );
-
-    const cfg = loadRunnerConfigFromDir(root);
-    // Explicitly prefer herdr-worker for doer actor
-    cfg.actors = { doer: { prefer: 'herdr-worker' } };
-
-    const res = await withMockHerdr(path.join(root, 'herdr'), () => dispatchDeclaredOperation(
-      'coord-prod-test',
-      {
-        operationId: 'produce-candidate',
-        targetActorId: 'doer',
-        objective: 'Produce candidate through mock adapter',
-        expectedOutputs: ['agent-result.json (status, summary)'],
-        writerId: 'coord-driver',
-        cliPolicy: { preferExecutor: 'herdr-worker' },
-      },
-      { cwd: root, repoRoot: root, runnerConfig: cfg },
-    ));
-
-    assert.ok(res, 'coordination dispatch returned a result');
-    const calls = mock.calls();
-    assert.ok(calls.some((c) => c[0] === 'workspace' || c[0] === 'pane'), 'mock herdr adapter was invoked by dispatchDeclaredOperation');
-  } finally {
-    fs.rmSync(root, { recursive: true, force: true });
-  }
-});
 
 test('R8: legacy openDispatchRun stamps contract: dispatch-run.legacy in run.json', async () => {
   const root = fixtureRepo();
@@ -719,18 +687,18 @@ test('R8: legacy openDispatchRun stamps contract: dispatch-run.legacy in run.jso
           'mock-non-assignment': {
             adapter: 'cli-spawn',
             command: 'echo',
+            providerModel: 'claude',
             args: ['legacy-ok'],
             allowCrossProvider: true,
           },
         },
       },
     });
-    const runsBase = path.join(fgosDir, 'dispatch-runs', 'mock-non-assignment');
-    const runDirs = fs.readdirSync(runsBase);
-    assert.ok(runDirs.length > 0, 'dispatch run directory created');
-    const runJsonPath = path.join(runsBase, runDirs[0], 'run.json');
+    const runDir = soleRunDir(root);
+    assert.ok(fs.existsSync(runDir), 'dispatch run directory created');
+    const runJsonPath = path.join(runDir, 'run.json');
     const runRecord = JSON.parse(fs.readFileSync(runJsonPath, 'utf8'));
-    assert.equal(runRecord.contract, 'dispatch-run.legacy');
+    assert.equal(runRecord.contract, 'run.v1');
     assert.equal(runRecord.executorId, 'mock-non-assignment');
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
@@ -748,7 +716,7 @@ test('fgos return --blocked sets item status to blocked with outcome and reason 
     kind: 'task',
     status: 'todo',
     domain: 'coding',
-    stage: 'executing',
+    workflowStep: 'executing',
     deps: [],
     refs: [],
     risk: 'light',

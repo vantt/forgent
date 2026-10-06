@@ -53,7 +53,6 @@ async function decideBlock() {
   } catch {
     return null;
   }
-
   if (decided.mechanism === 'in-process') return null;
   return { toolName, subagentType };
 }

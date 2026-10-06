@@ -51,7 +51,7 @@ function collectArgsAndEnv(executorEntry) {
 export function collectExecutorProfileWarnings(cfg) {
   const warnings = [];
   const executors = cfg?.executors && typeof cfg.executors === 'object' ? cfg.executors : {};
-  const capabilities = cfg?.capabilities && typeof cfg.capabilities === 'object' ? cfg.capabilities : {};
+
 
   for (const [executorId, executorEntry] of Object.entries(executors)) {
     const { args, env, command, providerModel } = collectArgsAndEnv(executorEntry);
@@ -65,13 +65,6 @@ export function collectExecutorProfileWarnings(cfg) {
       });
     }
 
-    if (executorEntry?.rigorOverrides !== undefined) {
-      warnings.push({
-        id: `executor.${executorId}.rigor-overrides`,
-        migrateTo: 'PlacementPolicy model calibration (design.md §3.6), not executor identity',
-        detail: `executors.${executorId} declares its own "rigorOverrides" -- model calibration living on executor identity instead of PlacementPolicy`,
-      });
-    }
 
     for (const [envName] of Object.entries(env)) {
       if (ACCOUNT_POOL_ENV_NAME_PATTERN.test(envName)) {
@@ -84,16 +77,6 @@ export function collectExecutorProfileWarnings(cfg) {
     }
   }
 
-  for (const [capabilityId, capabilityEntry] of Object.entries(capabilities)) {
-    const overrides = capabilityEntry?.overrides;
-    if (overrides?.rigorOverrides !== undefined) {
-      warnings.push({
-        id: `capability.${capabilityId}.rigor-overrides`,
-        migrateTo: 'PlacementPolicy model calibration (design.md §3.6)',
-        detail: `capabilities.${capabilityId}.overrides declares "rigorOverrides" -- current legacy calibration channel; PlacementPolicy is the documented target source once shadow proof (Phase 05) is promoted to production (Phase 07)`,
-      });
-    }
-  }
 
   return warnings;
 }

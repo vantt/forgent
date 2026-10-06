@@ -15,7 +15,6 @@ import {
   addAdHocWorktree,
   addBareOrigin,
   addDiscovery,
-  addFriction,
   addGoalItem,
   addOk,
   addOutcome,
@@ -61,7 +60,7 @@ import {
   makeRunnerProposedLeafItem,
   makeSessionSafeRunnerItem,
   mkLocalDependency,
-  moveStage,
+  moveStep,
   moveWork,
   os,
   path,
@@ -180,14 +179,14 @@ test('goal focus is not auto-cleared when the focused item reaches status done',
 });
 
 
-test('list shows tier and the proposed status for the real CLI view, exit 0', () => {
+test('list shows size and the proposed status for the real CLI view, exit 0', () => {
   const cwd = tmpCwdFromTemplate();
   toProposed(cwd, 'listed-proposed');
   const result = run(cwd, ['list']);
   assert.equal(result.status, 0);
   const data = envelopeData(result.stdout);
   assert.equal(data.work['listed-proposed'].status, 'awaiting-approval');
-  assert.equal(data.work['listed-proposed'].tier, 'standard');
+  assert.equal(data.work['listed-proposed'].size, 'standard');
 });
 
 
@@ -222,7 +221,7 @@ test('ready opens a todo item once its dep reaches done (approved, not merely pr
   toProposed(cwd, 'dep-approved');
   assert.equal(toDoneViaChain(cwd, 'dep-approved').status, 0);
   assert.equal(
-    run(cwd, ['add', 'unblocked-item', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--deps', 'dep-approved', '--stage', 'executing', '--description', 'tsk-535 fixture description.']).status,
+    run(cwd, ['add', 'unblocked-item', '--title', 'T', '--kind', 'task', '--risk', 'light', '--verify', 'x', '--deps', 'dep-approved', '--step', 'executing', '--description', 'tsk-535 fixture description.']).status,
     0,
   );
 
@@ -256,27 +255,27 @@ test('ready on a corrupt log is refused as corrupt-log, exit 5', () => {
 
 test('ready --step Divide returns only planning-stage items, not the default Execute frontier (tsk-qod D1/D2: Clarify no longer maps to any coding stage, so Divide is the demonstration step now)', () => {
   const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'atplanning', { stage: 'planning' });
-  addOk(cwd, 'atexecuting', { stage: 'executing' });
+  addOk(cwd, 'atplanning', { workflowStep: 'planning' });
+  addOk(cwd, 'atexecuting', { workflowStep: 'executing' });
 
-  const divide = envelopeData(run(cwd, ['ready', '--step', 'Divide']).stdout);
+  const divide = envelopeData(run(cwd, ['ready', '--phase', 'plan']).stdout);
   assert.deepEqual(divide.map((i) => i.id), ['atplanning']);
 
   // tsk-qod D1/D2: `clarify` is retired as a coding stage entirely --
   // stageForStep(domain, 'Clarify') is undefined for coding now, so no
   // item (whatever its own `stage` field reads) can ever match this step.
-  const clarify = envelopeData(run(cwd, ['ready', '--step', 'Clarify']).stdout);
+  const clarify = envelopeData(run(cwd, ['ready', '--phase', 'clarify']).stdout);
   assert.deepEqual(clarify, []);
 });
 
 
 test('ready with no --step defaults to Execute, byte-identical to before --step wiring existed', () => {
   const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'atdiscovery', { stage: 'discovery' });
-  addOk(cwd, 'atexecuting', { stage: 'executing' });
+  addOk(cwd, 'atdiscovery', { workflowStep: 'discovery' });
+  addOk(cwd, 'atexecuting', { workflowStep: 'executing' });
 
   const bare = envelopeData(run(cwd, ['ready']).stdout);
-  const explicitExecute = envelopeData(run(cwd, ['ready', '--step', 'Execute']).stdout);
+  const explicitExecute = envelopeData(run(cwd, ['ready', '--phase', 'execute']).stdout);
   assert.deepEqual(bare.map((i) => i.id), ['atexecuting']);
   assert.deepEqual(bare, explicitExecute);
 });
@@ -341,22 +340,3 @@ test('ready --cursor rejects a stale cursor (id no longer in the current frontie
 test.todo('list --limit paginates only the work map: view.work becomes {items, nextCursor} while other view keys are untouched - migrated to test/direct/fgos-read.test.mjs');
 
 
-
-// --- `fgos check` (phase-3-compound-learning-3): predicted-vs-actual report ---
-//
-// `check` is a pure read (per D1 request-class, same as `ready`/`list`) over
-// `listWork(dir).outcomes` — until compound-learn-enduser-docs slice 3, the
-// CLI had no verb that WRITES a work.outcome event (only the runner did, per
-// plan Approach S1; `compound --doc-type` is now the one CLI producer, see
-// its own tests above), so these tests seed outcome data directly through
-// store.mjs's addOutcome, the same single write door the runner uses, then
-// exercise the real `check` binary.
-
-test('check on an item with no recorded outcome returns a null predicted/actual entry for that id, exit 0, no throw', () => {
-  const cwd = tmpCwdFromTemplate();
-  addOk(cwd, 'unchecked-item');
-  const result = run(cwd, ['check', 'unchecked-item']);
-  assert.equal(result.status, 0);
-  const data = envelopeData(result.stdout);
-  assert.deepEqual(data.outcomes, [{ id: 'unchecked-item', predicted: null, actual: null, docType: null, docPath: null }]);
-});

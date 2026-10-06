@@ -16,7 +16,7 @@ Turns a fuzzy request into locked decisions written down in
 claimed item's `stage` is `exploring` — it finds the flowers; it does not
 build the comb. It can also be invoked directly by `fgos-coding-planning`,
 mid-`planning`, when that skill finds `CONTEXT.md` silent on something
-material to the plan; `item.stage` stays `planning` the entire time in
+material to the plan; `item.workflowStep` stays `planning` the entire time in
 that case — this skill never moves it. See
 `references/re-entry-from-planning.md` for that path.
 

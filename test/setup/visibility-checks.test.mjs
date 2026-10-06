@@ -7,6 +7,8 @@ import {
   checkHerdrAvailable,
   checkTrustStoreWritable,
   checkExecutorConfinement,
+  checkInvocationGitWriteGrants,
+  checkConfinedPaneAccounts,
   checkHerdrExecutorKinds,
   readHerdrAgentKinds,
   readHerdrIntegrationStatus,
@@ -248,4 +250,74 @@ process.exit(0);
     else process.env.FGOS_HERDR_ANCHOR_PANE = oldPane;
     fs.rmSync(tmp, { recursive: true, force: true });
   }
+});
+
+// A confined pane that binds a private home gets its login only from the global provider account
+// inventory. Doctor says so per invocation instead of letting a run sit at a sign-in screen.
+function paneExecutors(providerModel = 'openai') {
+  return {
+    executors: {
+      openai: {
+        providerModel,
+        invocations: [
+          { id: 'codex-herdr', adapter: 'herdr-spawn', resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: 'CODEX_HOME' } }] },
+          { id: 'codex-cli', adapter: 'cli-spawn' },
+        ],
+      },
+    },
+  };
+}
+
+test('checkConfinedPaneAccounts fails by name when a private-home pane has no account inventory', () => {
+  const r = checkConfinedPaneAccounts(paneExecutors());
+  assert.equal(r.passed, false);
+  assert.match(r.message, /executor "openai" invocation "codex-herdr": no runner\.providers\.openai-codex\.accounts/);
+  assert.doesNotMatch(r.message, /codex-cli/, 'only invocations that bind a private home are checked');
+});
+
+test('checkConfinedPaneAccounts passes when every listed credential file exists, and names a missing one', () => {
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-pane-accounts-'));
+  try {
+    fs.writeFileSync(path.join(home, 'auth.json'), '{}');
+    const withInventory = (source) => ({ ...paneExecutors(), providers: { openai: { accounts: { acct: { credentialSource: source } } } } });
+    assert.equal(checkConfinedPaneAccounts(withInventory({ kind: 'codex-home', home })).passed, true);
+    assert.equal(checkConfinedPaneAccounts(withInventory({ kind: 'home-files', home, files: ['auth.json'] })).passed, true);
+    const missing = checkConfinedPaneAccounts(withInventory({ kind: 'home-files', home, files: ['auth.json', 'models.json'] }));
+    assert.equal(missing.passed, false);
+    assert.match(missing.message, /account "acct" is missing models\.json/);
+    const invalid = checkConfinedPaneAccounts(withInventory({ kind: 'home-files', home }));
+    assert.equal(invalid.passed, false);
+    assert.match(invalid.message, /provider account inventory is invalid/);
+  } finally {
+    fs.rmSync(home, { recursive: true, force: true });
+  }
+});
+
+test('checkConfinedPaneAccounts has nothing to say when no herdr invocation binds a private home', () => {
+  const r = checkConfinedPaneAccounts({ executors: { a: { invocations: [{ id: 'x', adapter: 'herdr-spawn' }] } } });
+  assert.equal(r.passed, true);
+  assert.match(r.message, /no confined herdr invocation binds a private home/);
+});
+
+test('checkInvocationGitWriteGrants passes when no executor or invocation grants git add/commit', () => {
+  const r = checkInvocationGitWriteGrants({
+    executor: { command: 'claude', args: ['-p', '{prompt}', '--permission-mode', 'acceptEdits'] },
+    executors: { a: { invocations: [{ id: 'x', args: ['--allowedTools', 'Bash(rg:*)'] }] } },
+  });
+  assert.equal(r.passed, true);
+  assert.doesNotMatch(r.message, /warning/);
+});
+
+test('checkInvocationGitWriteGrants warns, naming each executor and invocation that still grants git add/commit (bare or rtk-wrapped)', () => {
+  const r = checkInvocationGitWriteGrants({
+    executor: { command: 'claude', args: ['--allowedTools', 'Bash(git add:*),Bash(git commit:*)'] },
+    executors: {
+      claude: { invocations: [{ id: 'claude-cli', args: ['--allowedTools', 'Bash(rtk git commit:*)'] }, { id: 'clean', args: ['--allowedTools', 'Bash(rg:*)'] }] },
+    },
+  });
+  assert.equal(r.passed, true, 'a warning never fails doctor');
+  assert.match(r.message, /^warning: /);
+  assert.match(r.message, /executor,/);
+  assert.match(r.message, /executors\.claude\.invocations\.claude-cli/);
+  assert.doesNotMatch(r.message, /clean/);
 });

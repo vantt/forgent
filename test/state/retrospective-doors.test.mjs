@@ -20,6 +20,7 @@ import {
   runFourDoorChecks,
 } from '../../src/state/retrospective-doors.mjs';
 import { readRawEvents } from '../../src/state/store.mjs';
+import { invokeHost } from '../../src/util/host-bin.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const FGOS = path.resolve(__dirname, '../../bin/fgos.mjs');
@@ -247,12 +248,11 @@ test('CLI: retrospective logs advisory friction for a freshness-door gap but sti
   // readRawEvents(dir) is the one door that reads baseline-0 PLUS every
   // per-writer file under `.fgos/events/`, where this CLI subprocess's own
   // writes actually land.
-  const frictionLines = readRawEvents(path.join(cwd, '.fgos')).filter(
-    (e) => e.type === 'work.friction' && e.payload.id === 'host-item',
-  );
-  assert.equal(frictionLines.length, 1);
-  assert.equal(frictionLines[0].payload.errorClass, 'retrospective-door-freshness');
-  assert.equal(frictionLines[0].payload.disposition, 'advisory');
+  const frictionData = invokeHost(['friction', 'show', 'work:host-item'], { dir: cwd });
+  const frictionList = frictionData.records || [];
+  assert.equal(frictionList.length, 1);
+  assert.equal(frictionList[0].errorClass, 'retrospective-door-freshness');
+  assert.equal(frictionList[0].disposition, 'advisory');
 });
 
 test('CLI: retrospective logs no friction and no doorFindings key for a clean item', () => {

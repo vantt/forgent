@@ -1,0 +1,28 @@
+# executor=gemini pane=wS:p3TS unit-run=unit-run-1790935156809-0e9b7453 (herdr pane read, read-only posture, bwrap)
+bash /home/vantt/projects/forgentX-p6/.fgos/assignments/unit-run-1790935156809-0e9b7453/pro
+ducer/1/runs/01/protected/launchers/cmd_1790935156868_840cb111.sh
+design-lap% bash /home/vantt/projects/forgentX-p6/.fgos/assignments/unit-run-1790935156809-
+0e9b7453/producer/1/runs/01/protected/launchers/cmd_1790935156868_840cb111.sh
+Error: unexpected argument "Assignment: unit-run-1790935156809-0e9b7453/producer/1\nWork: (
+none)\nRole: producer\nObjective: Read src/runner/execution/bind.mjs lines 250-270 and repl
+y in your report with one sentence naming the transport variable values possible. Do not mo
+dify any file.\nContext refs:\n- (none)\nExpected outputs:\n- (none)\nResult artifact:\n- W
+rite structured JSON to /home/vantt/projects/forgentX-p6/.fgos/assignments/unit-run-1790935
+156809-0e9b7453/producer/1/runs/01/agent-result.json\n  \"contract\" may be omitted only fo
+r legacy claim input; for v2 use {\"id\":\"agent-result-claim\",\"version\":2}\n  \"status\
+" must be exactly one of: done | blocked | failed | no-evidence\n  \"summary\" must be a re
+quired non-empty string\n  \"blocker\" must be a non-empty string when status is \"blocked\
+"\n  \"error\" must be a non-empty string or object when status is \"failed\"\n  \"evidence
+Refs\" must be an array of non-empty strings if provided\n  Nothing in this claim is proof;
+ evidenceRefs remain untrusted until independently validated\n- Also write a human-readable
+ report to /home/vantt/projects/forgentX-p6/.fgos/assignments/unit-run-1790935156809-0e9b74
+53/producer/1/runs/01/agent-report.md -- REQUIRED for this read-only operation: a \"done\"
+status with no report artifact is treated as unevidenced (no-evidence), not accepted as don
+e.\n- Do not call Work lifecycle verbs unless the task-spec explicitly says this Assignment
+ is the lifecycle driver.\nEffective execution contract:\n- Contract: effective-execution-c
+ontract.v1\n- Mutation: read-only\n- Claim path: /home/vantt/projects/forgentX-p6/.fgos/ass
+ignments/unit-run-1790935156809-0e9b7453/producer/1/runs/01/agent-result.json\n- Timeout: 2
+100000ms\n- Write scope: (none - read-only)\n- Permission enforcement: enforced".
+Prompts are read only from -p/--print, -i/--prompt-interactive, or stdin, so this argument
+would have been ignored.
+design-lap%

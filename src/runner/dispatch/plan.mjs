@@ -6,8 +6,8 @@
 // selector, caller, mechanism, executorId, capability, invocation, governance,
 // and reasonCodes into a canonical DispatchPlan object.
 
-import { DEFAULT_TIER_TO_POLICY, MODEL_POLICY_TIERS, RunnerConfigError } from './config.mjs';
-import { resolveExecutorAndOverrides, resolveExecutorConfig, executorIdForWork } from './resolve.mjs';
+import { RunnerConfigError } from './config.mjs';
+import { resolveExecutorAndOverrides, resolveExecutorConfig } from './resolve.mjs';
 import { decideDispatchMechanism, decideExecutorDispatchMechanism } from './mechanism.mjs';
 import { resolveAssignmentDispatchPolicy } from './assignment-policy.mjs';
 
@@ -23,10 +23,6 @@ function isKnownCapabilityName(cfg, name) {
   return Object.values(capabilities).some((entry) => Array.isArray(entry?.aliases) && entry.aliases.includes(name));
 }
 
-function policyTierForDispatchTier(dispatchTier, rigorOverrides) {
-  const tier = dispatchTier ?? 'standard';
-  return rigorOverrides?.[tier] ?? DEFAULT_TIER_TO_POLICY[tier] ?? (MODEL_POLICY_TIERS.includes(tier) ? tier : undefined);
-}
 
 /**
  * Compiles a canonical DispatchPlan object for a dispatch request.
@@ -37,11 +33,12 @@ function policyTierForDispatchTier(dispatchTier, rigorOverrides) {
  * @param {string} [opts.for] - Purpose identifier
  * @param {string} [opts.work] - Work item identifier
  * @param {string|object} [opts.assignment] - Assignment identifier or object
- * @param {string} [opts.stage] - Workflow stage
  * @param {boolean} [opts.needsSoul=false] - True if caller needs a soul-bearing agent
  * @param {boolean} [opts.hasLiveTaskAccess=false] - True if caller holds live Task tool access
  * @param {object} [opts.caller] - Caller role descriptors ({ role: 'driver'|'launcher' })
  * @param {object} [opts.workItem] - Pre-resolved work item object (for --work option)
+ * @param {string|null} [opts.workExecutorId] - Executor identity the Work layer resolved for that work item
+ *   at its step (null when its Workflow declares none); required with `work`
  * @param {object} [opts.assignmentItem] - Pre-resolved assignment object (for --assignment option)
  * @returns {object} DispatchPlan
  */
@@ -52,11 +49,11 @@ export function compileDispatchPlan(
     for: purpose,
     work: workIdArg,
     assignment: assignmentArg,
-    stage: stageArg,
     needsSoul = false,
     hasLiveTaskAccess = false,
     caller = { role: 'driver' },
     workItem,
+    workExecutorId,
     assignmentItem,
     cliOverride,
     options,
@@ -122,7 +119,12 @@ export function compileDispatchPlan(
     if (!workItem) {
       throw new RunnerConfigError(`no work item "${workIdArg}" found -- cannot resolve its dispatch executor.`);
     }
-    executorId = executorIdForWork(workItem, stageArg);
+    if (workExecutorId === undefined) {
+      throw new RunnerConfigError(
+        `work item "${workIdArg}" was supplied without the executor identity its Workflow step resolves to -- the Work layer must resolve it (dispatch does not look steps up).`,
+      );
+    }
+    executorId = workExecutorId ?? undefined;
     workResolvedInputId = executorId;
     workResolved = resolveExecutorAndOverrides(cfg, executorId);
     const hasExplicitExecutor = workResolved.configured;
@@ -297,7 +299,7 @@ export function compileDispatchPlan(
   let finalMechanism = mechanism;
   if (mechanism === 'out-of-process') {
     const mcpInvocation = Array.isArray(executor?.invocations) ? executor.invocations.find((inv) => inv.via === 'mcp') : undefined;
-    const lookupPurpose = purpose ?? (Array.isArray(executor?.for) && executor.for.length === 1 ? executor.for[0] : undefined);
+    const lookupPurpose = purpose;
     const candidate = lookupPurpose && mcpInvocation?.tools ? mcpInvocation.tools[lookupPurpose] : undefined;
     if (typeof candidate === 'string' && candidate) {
       mcpTool = candidate;
@@ -307,7 +309,7 @@ export function compileDispatchPlan(
   }
 
   const agentType = executor?.agentType;
-  const capability = purpose ?? (Array.isArray(executor?.for) && executor.for.length > 0 ? executor.for[0] : (executorId ?? null));
+    const capability = purpose ?? (executorId ?? null);
 
   // Self-review finding (2026-08-25): the invocation/governance below used
   // to be APPROXIMATED here -- `executor.invocations[0]` instead of the
@@ -341,7 +343,12 @@ export function compileDispatchPlan(
   let resolveError;
   if (finalMechanism === 'out-of-process') {
     try {
-      resolvedForDispatch = resolveExecutorConfig(cfg, undefined, executorId, undefined, undefined, agentType);
+      // A caller that pinned an invocation (bind() picks herdr-spawn vs cli-spawn that
+      // way) must see the plan describe that very invocation, not the executor's first.
+      const pinnedInvocation = typeof cliOverride?.preferInvocation === 'string' && cliOverride.preferInvocation.trim()
+        ? cliOverride.preferInvocation
+        : undefined;
+      resolvedForDispatch = resolveExecutorConfig(cfg, undefined, executorId, undefined, undefined, agentType, pinnedInvocation);
     } catch (err) {
       resolveError = err;
     }
@@ -394,13 +401,9 @@ export function compileDispatchPlan(
   // caller-supplied cliOverride.preferExecutor disagrees anyway.
   const realAssignmentForPolicy = assignmentItem ?? (typeof assignmentArg === 'object' && assignmentArg ? assignmentArg : null);
   const syntheticPolicy = { preferExecutor: executorId };
-  if (resolved.overrides?.providerModel) syntheticPolicy.providerModel = resolved.overrides.providerModel;
-  if (resolved.overrides?.model) syntheticPolicy.model = resolved.overrides.model;
-  const overrideTier = policyTierForDispatchTier(
-    resolved.overrides?.tier ?? workItem?.tier ?? 'standard',
-    resolved.overrides?.rigorOverrides,
-  );
-  if (overrideTier) syntheticPolicy.minTier = overrideTier;
+  const capRigor = capability ? cfg?.capabilities?.[capability]?.rigor : undefined;
+  if (capRigor) syntheticPolicy.rigor = capRigor;
+  if (capability) syntheticPolicy.capability = capability;
   const assignmentForPolicy = realAssignmentForPolicy ?? {
     operation: capability ?? executorId,
     role: undefined,

@@ -1,0 +1,15 @@
+{
+  "status": "reconciled",
+  "agentName": "fgos-run_unit-run-17909431c4e507",
+  "round": 1,
+  "lastSeenAt": "2026-10-02T11:46:17.753Z",
+  "confinement": {
+    "status": "confined-bwrap",
+    "confined": true
+  },
+  "paneId": "wS:p3W4",
+  "trustSeeded": "agy",
+  "promptReadiness": "ready",
+  "outcome": "settled",
+  "trustRemoved": "agy"
+}

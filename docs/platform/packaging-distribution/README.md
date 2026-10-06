@@ -115,7 +115,7 @@ It does not own:
 | --- | --- |
 | Durable work-state topology | Workspace/work-state architecture |
 | Command routing inside a selected runtime | Host invocation routing |
-| Agent coordination protocol behavior | Agent coordination |
+| Collaboration pattern & Workflow behavior | Execution core / Workflow |
 | Shared gateway/dashboard runtime service | Gateway architecture |
 | Confinement policy semantics | Confinement authority |
 

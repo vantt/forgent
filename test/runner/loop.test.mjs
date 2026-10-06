@@ -15,6 +15,17 @@ import { runOnce, runWatch, resolveRepoRoot } from '../../src/runner/loop.mjs';
 import { resolveDiscovery } from '../../src/intake/discovery.mjs';
 import { createMissBreaker } from '../../src/runner/anti-loop.mjs';
 
+// Friction records live in the Observe store (.fgos/observe/friction/*.jsonl),
+// not in the work event log.
+function readFrictionRecords(dir) {
+  const fgosDir = path.basename(dir) === '.fgos' ? dir : path.join(dir, '.fgos');
+  const frictionDir = path.join(fgosDir, 'observe', 'friction');
+  if (!fs.existsSync(frictionDir)) return [];
+  return fs.readdirSync(frictionDir)
+    .filter((f) => f.endsWith('.jsonl'))
+    .flatMap((f) => fs.readFileSync(path.join(frictionDir, f), 'utf8').trim().split('\n').filter(Boolean).map((line) => JSON.parse(line)));
+}
+
 // Fake executors only — every "worker" spawned here is a node script this
 // file writes into a mkdtemp directory. Every test builds its own
 // disposable git repo (git init in mkdtemp) with its own `.fgos/` inside
@@ -109,7 +120,8 @@ execFileSync('git', ['commit', '-q', '-m', 'worker: ' + file]);
   return scriptPath;
 }
 
-/** A worker that produces the verify target but never commits it. */
+/** A worker that produces the verify target but never commits it — the
+ * contract: the runner commits what the worker leaves in the worktree. */
 function writeNonCommittingExecutor(scriptDir, counterFile) {
   const scriptPath = path.join(scriptDir, 'non-committing-executor.mjs');
   fs.writeFileSync(
@@ -118,6 +130,19 @@ function writeNonCommittingExecutor(scriptDir, counterFile) {
 import fs from 'node:fs';
 fs.appendFileSync(${JSON.stringify(counterFile)}, 'run\\n');
 fs.writeFileSync('output.txt', 'uncommitted\\n');
+`,
+  );
+  return scriptPath;
+}
+
+/** A worker that runs but leaves the worktree untouched. */
+function writeNoChangeExecutor(scriptDir, counterFile) {
+  const scriptPath = path.join(scriptDir, 'no-change-executor.mjs');
+  fs.writeFileSync(
+    scriptPath,
+    `
+import fs from 'node:fs';
+fs.appendFileSync(${JSON.stringify(counterFile)}, 'run\\n');
 `,
   );
   return scriptPath;
@@ -237,10 +262,22 @@ if (priorRuns === 0) {
   return scriptPath;
 }
 
+const DUMMY_CONFIG = {
+  executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
+  modelPolicies: {
+    claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' },
+    node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' },
+  },
+  timeoutMs: 30000,
+};
+
 function configFor(scriptPath) {
   return {
-    executor: { allowCrossProvider: true, command: process.execPath, args: [scriptPath, '{prompt}', '--model', '{model}'] },
-    models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+    executor: { allowCrossProvider: true, providerModel: 'node', command: process.execPath, args: [scriptPath, '{prompt}', '--model', '{model}'] },
+    modelPolicies: {
+      node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' },
+      claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' },
+    },
     timeoutMs: 30000,
   };
 }
@@ -342,7 +379,7 @@ test('runOnce full circle: todo -> doing -> worker commit -> goal-check pass -> 
   );
   // predicted is written right at claim time, before dispatch ever runs
   const predictedEvent = events.find((e) => e.type === 'work.outcome' && e.payload.predicted);
-  assert.deepEqual(predictedEvent.payload.predicted, { tier: 'standard', deps: 0, priorVisits: 0 });
+  assert.deepEqual(predictedEvent.payload.predicted, { size: 'standard', deps: 0, priorVisits: 0 });
   // actual is written on the pass terminal, sourced from the runner's own
   // goal-check/branchFacts — never the worker's status/signal
   const actualEvent = events.find((e) => e.type === 'work.outcome' && e.payload.actual);
@@ -426,7 +463,7 @@ test('runOnce\'s executor.dispatch audit event records the REAL spawned command 
         provider: 'claude',
       },
     },
-    models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+    modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' }, node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
     timeoutMs: 30000,
   };
 
@@ -523,7 +560,7 @@ test('runOnce: an item already advanced to planning (via an explicit prior disco
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   const docsRef = 'docs/history/item-clarify';
   mkLockedContextFixture(repoRoot, docsRef, { mode: 'tiny' });
-  seedItem(dir, { id: 'item-clarify', stage: 'discovery', verify: 'test -f output.txt', docsRef });
+  seedItem(dir, { id: 'item-clarify', workflowStep: 'discovery', verify: 'test -f output.txt', docsRef });
   // tsk-qod D1/D2: `clarify` is retired entirely -- a fresh item now starts
   // at `discovery` (`stages[0]`) directly. tsk-30v D2/D6: a clear verdict at
   // discovery now skips exploring and lands on planning directly in ONE
@@ -538,7 +575,7 @@ test('runOnce: an item already advanced to planning (via an explicit prior disco
   assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
   assert.equal(result.dispatched[0].id, 'item-clarify');
   const view = listWork(dir);
-  assert.equal(view.work['item-clarify'].stage, 'executing');
+  assert.equal(view.work['item-clarify'].workflowStep, 'executing');
   assert.equal(view.settlements['item-clarify'].length, 1);
   assert.equal(view.settlements['item-clarify'][0].kind, 'clarify-pass');
   assert.equal(view.settlements['item-clarify'][0].role, 'session');
@@ -575,7 +612,7 @@ test('runOnce decompose sweep folds an unrecognized item.domain to "coding" (fai
       risk: 'light',
       refs: [],
       verify: 'test -f output.txt',
-      stage: 'discovery',
+      workflowStep: 'discovery',
       domain: 'bogus-domain',
       docsRef,
     },
@@ -600,8 +637,8 @@ test('runOnce decompose sweep folds an unrecognized item.domain to "coding" (fai
 // --- clarify/decompose sweeps never match on a domain with no Clarify/Divide
 // stage (base-workflow-model-4): stageForStep returns undefined for the
 // 'synthetic' domain's Clarify/Divide steps, and an item with no explicit
-// `stage` also reads as `item.stage === undefined` (D8 lazy default) — the
-// pre-fix comparison (`item.stage === clarifyStage`) wrongly matched
+// `stage` also reads as `item.workflowStep === undefined` (D8 lazy default) — the
+// pre-fix comparison (`item.workflowStep === clarifyStage`) wrongly matched
 // undefined === undefined and swept the item into resolveDiscovery, which
 // then threw a stage conflict (synthetic's lazily-resolved "from" stage is
 // its own Execute stage, 'assembling', never 'clarify') and halted the whole
@@ -622,17 +659,17 @@ test('runOnce clarify+decompose sweeps never touch a synthetic-domain item with 
   assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
   assert.equal(result.dispatched[0].id, 'item-synthetic');
   assert.equal(listWork(dir).work['item-synthetic'].status, 'awaiting-approval');
-  // no work.discovery / work.stage event was ever written — the sweeps
+  // no work.discovery / work.step event was ever written — the sweeps
   // genuinely skipped it rather than happening to succeed
   const events = readRawEvents(dir);
-  assert.ok(!events.some((e) => e.type === 'work.discovery' || e.type === 'work.stage'));
+  assert.ok(!events.some((e) => e.type === 'work.discovery' || e.type === 'work.step'));
 });
 
 test('runOnce decompose sweep still fires normally for a coding-domain item advanced to planning (no behavior change for coding)', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   const docsRef = 'docs/history/item-coding-clarify';
   mkLockedContextFixture(repoRoot, docsRef, { mode: 'tiny' });
-  seedItem(dir, { id: 'item-coding-clarify', stage: 'discovery', verify: 'test -f output.txt', docsRef });
+  seedItem(dir, { id: 'item-coding-clarify', workflowStep: 'discovery', verify: 'test -f output.txt', docsRef });
   // tsk-30v D2/D6: a clear verdict at discovery now skips exploring and
   // lands on planning directly in ONE hop (previously two hops walked
   // discovery->exploring->planning).
@@ -644,7 +681,7 @@ test('runOnce decompose sweep still fires normally for a coding-domain item adva
   assert.equal(result.outcome, 'drained');
   assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
   assert.equal(result.dispatched[0].id, 'item-coding-clarify');
-  assert.equal(listWork(dir).work['item-coding-clarify'].stage, 'executing');
+  assert.equal(listWork(dir).work['item-coding-clarify'].workflowStep, 'executing');
 });
 
 // --- real parallelism: two independent items overlap in one runOnce -------
@@ -814,7 +851,7 @@ test('the discovery sweep obeys the shared ceiling too: a full lane spawns no re
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   occupySlots(dir, 2);
   writeCeiling(repoRoot, 2);
-  seedItem(dir, { id: 'item-research-blocked', stage: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
+  seedItem(dir, { id: 'item-research-blocked', workflowStep: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
   const body = JSON.stringify({ clear: true, verify: 'npm test -- research' });
   const config = configFor(writeDiscoveryVerdictExecutor(scriptDir, counterFile, body));
 
@@ -823,7 +860,7 @@ test('the discovery sweep obeys the shared ceiling too: a full lane spawns no re
   assert.equal(countRuns(counterFile), 0, 'no research worker may be stood up while the lane is full');
   assert.equal(result.exitCode, 0, 'a refusal is an answer, not a failure');
   const item = listWork(dir).work['item-research-blocked'];
-  assert.equal(item.stage, 'discovery', 'the item is left exactly where it was, for a later poll');
+  assert.equal(item.workflowStep, 'discovery', 'the item is left exactly where it was, for a later poll');
   assert.equal(item.status, 'todo');
 });
 
@@ -831,14 +868,14 @@ test('the discovery sweep still runs normally when the lane has room', async () 
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   occupySlots(dir, 1);
   writeCeiling(repoRoot, 4);
-  seedItem(dir, { id: 'item-research-ok', stage: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
+  seedItem(dir, { id: 'item-research-ok', workflowStep: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
   const body = JSON.stringify({ clear: true, verify: 'npm test -- research' });
   const config = configFor(writeDiscoveryVerdictExecutor(scriptDir, counterFile, body));
 
   await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   assert.equal(countRuns(counterFile), 1, 'room means the sweep is untouched');
-  assert.equal(listWork(dir).work['item-research-ok'].stage, 'planning');
+  assert.equal(listWork(dir).work['item-research-ok'].workflowStep, 'planning');
 });
 
 // "Nothing to do" and "work is waiting behind a full lane" are opposite
@@ -969,13 +1006,13 @@ test('verify-miss: worker commits the wrong thing -> retry once, then park to bl
 
   // friction channel (S2 — kênh 2 của capture): the runner blames itself at
   // the same park choke-point, layer attributed mechanically from the class.
-  const frictionEvent = events.find((e) => e.type === 'work.friction');
-  assert.ok(frictionEvent, 'work.friction written on the park branch');
-  assert.equal(frictionEvent.payload.disposition, 'parked');
-  assert.equal(frictionEvent.payload.errorClass, 'verify-miss');
-  assert.equal(frictionEvent.payload.layer, 'verification');
-  assert.equal(frictionEvent.payload.attempts, 2);
-  assert.ok(frictionEvent.payload.detail, 'friction carries the failure message');
+  const friction = readFrictionRecords(dir).find((r) => r.subject?.kind === 'work' && r.subject?.id === 'item-miss');
+  assert.ok(friction, 'friction written on the park branch');
+  assert.equal(friction.disposition, 'parked');
+  assert.equal(friction.errorClass, 'verify-miss');
+  assert.equal(friction.layer, 'verification');
+  assert.equal(friction.attempts, 2);
+  assert.ok(friction.detail, 'friction carries the failure message');
 });
 
 test('P1 fix: retry resets to this item\'s own dispatch baseline, not HEAD — a differently-committing retry never carries the first (failed) attempt\'s commit forward', async () => {
@@ -1031,17 +1068,38 @@ test('P1 fix (defect-class sweep): a retry on a root item whose branch already c
   assert.equal(fileAtRef(repoRoot, branch, 'junk.txt'), false, "the failed first attempt's own commit was discarded");
 });
 
-test('verify passes but the worker never committed -> classified verify-miss, parked after retries', async () => {
+test('a worker that only edits files is committed by the runner before goal-check -> proposed with exactly one runner commit', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
-  seedItem(dir, { id: 'item-nocommit' });
+  seedItem(dir, { id: 'item-nocommit', title: 'Produce the output file' });
   const config = configFor(writeNonCommittingExecutor(scriptDir, counterFile));
+
+  const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
+
+  assert.equal(result.outcome, 'drained');
+  assert.equal(result.dispatched[0].outcome, 'awaiting-approval');
+  assert.equal(result.dispatched[0].attempts, 1);
+  const branch = branchNameFor('item-nocommit');
+  assert.equal(fileAtRef(repoRoot, branch, 'output.txt'), true, 'the runner committed the worker file');
+  assert.equal(
+    execFileSync('git', ['log', '--format=%s', `HEAD..${branch}`], { cwd: repoRoot, encoding: 'utf8' }).trim(),
+    'item-nocommit: Produce the output file',
+    'subject falls back to "<id>: <title>" when the worker reported no Result summary',
+  );
+  assert.deepEqual(fs.readdirSync(worktreeDir), []);
+});
+
+test('verify passes but the worker changed nothing -> no commit, classified verify-miss, parked after retries', async () => {
+  const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
+  // `seed.txt` is already on trunk, so verify passes with zero worker changes.
+  seedItem(dir, { id: 'item-nochange', verify: 'test -f seed.txt' });
+  const config = configFor(writeNoChangeExecutor(scriptDir, counterFile));
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   assert.equal(result.outcome, 'drained');
   assert.equal(result.dispatched[0].outcome, 'parked');
   assert.equal(result.dispatched[0].errorClass, 'verify-miss');
-  assert.equal(listWork(dir).work['item-nocommit'].status, 'blocked');
+  assert.equal(listWork(dir).work['item-nochange'].status, 'blocked');
   assert.deepEqual(fs.readdirSync(worktreeDir), []);
 });
 
@@ -1050,11 +1108,7 @@ test('verify passes but the worker never committed -> classified verify-miss, pa
 test('worker-spawn-fail: nonexistent executor -> retry per matrix, then park to blocked', async () => {
   const { repoRoot, dir, worktreeDir } = setup();
   seedItem(dir, { id: 'item-nospawn' });
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1230,11 +1284,11 @@ test('breaker trip: a goal-check miss at threshold parks the item and halts the 
 
   // friction channel (S2): the HALT path writes friction too — a halt must
   // not be silent any more than a park (ghi CẢ đường thất bại).
-  const frictionEvent = readRawEvents(dir).find((e) => e.type === 'work.friction');
-  assert.ok(frictionEvent, 'work.friction written on the halt branch');
-  assert.equal(frictionEvent.payload.disposition, 'halted');
-  assert.equal(frictionEvent.payload.errorClass, 'verify-miss');
-  assert.equal(frictionEvent.payload.layer, 'verification');
+  const friction = readFrictionRecords(dir).find((r) => r.subject?.kind === 'work' && r.subject?.id === 'item-breaker');
+  assert.ok(friction, 'friction written on the halt branch');
+  assert.equal(friction.disposition, 'halted');
+  assert.equal(friction.errorClass, 'verify-miss');
+  assert.equal(friction.layer, 'verification');
 });
 
 test('breaker inert under default config: same goal-check miss with no breakerThreshold override parks the item instead of tripping the breaker (phase2-p1-breaker-inert-fix)', async () => {
@@ -1266,11 +1320,7 @@ test('startup reap: a crashed run\'s doing item with a committed, verify-passing
   execFileSync('git', ['commit', '-q', '-m', 'worker: output.txt'], { cwd: wt.path });
   removeWorktree(repoRoot, wt.path);
   // an executor that would blow up if the runner wrongly re-dispatched
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1292,11 +1342,7 @@ test('startup reap reclaims an orphaned checkout left behind by a genuine crash 
   fs.writeFileSync(path.join(wt.path, 'output.txt'), 'done before crash\n');
   execFileSync('git', ['add', 'output.txt'], { cwd: wt.path });
   execFileSync('git', ['commit', '-q', '-m', 'worker: output.txt'], { cwd: wt.path });
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1311,11 +1357,7 @@ test('startup reap: a doing item with nothing on its branch is reclaimed to bloc
   const { repoRoot, dir, worktreeDir } = setup();
   seedItem(dir, { id: 'item-vanished' });
   acquireClaim(dir, { id: 'item-vanished', actor: 'runner', preClaimStatus: 'todo' });
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1334,11 +1376,7 @@ test('startup reap SKIPS a doing item claimed by a human (claimRole) — never r
   const { repoRoot, dir, worktreeDir } = setup();
   const item = seedItem(dir, { id: 'item-human-held' });
   acquireClaim(dir, { id: item.id, actor: 'human', preClaimStatus: 'todo', claimRole: 'human', headAtTake: 'deadbeef' });
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1353,11 +1391,7 @@ test('startup reap SKIPS a doing item claimed by a session, but still reaps a pl
   acquireClaim(dir, { id: held.id, actor: 'session', preClaimStatus: 'todo', claimRole: 'session', headAtTake: 'cafebabe' });
   const vanished = seedItem(dir, { id: 'item-runner-vanished' });
   acquireClaim(dir, { id: vanished.id, actor: 'runner', preClaimStatus: 'todo', claimRole: 'runner' });
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1379,11 +1413,7 @@ test('startup reap: empty fgw/ orphan branches are pruned, branches carrying com
   execFileSync('git', ['add', 'proposal.txt'], { cwd: keeper.path });
   execFileSync('git', ['commit', '-q', '-m', 'worker: proposal.txt'], { cwd: keeper.path });
   removeWorktree(repoRoot, keeper.path);
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1406,11 +1436,7 @@ test('startup reap: a zero-ahead root branch with an open (non-done/wontfix) lea
   seedItem(dir, { id: 'root-a', status: 'cleanup' });
   seedItem(dir, { id: 'leaf-b', parent: 'root-a', status: 'cleanup' });
 
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1426,11 +1452,7 @@ test('startup reap: a zero-ahead root branch whose only descendant is already do
   seedItem(dir, { id: 'root-c', status: 'cleanup' });
   seedItem(dir, { id: 'leaf-d', parent: 'root-c', status: 'done' });
 
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1447,11 +1469,7 @@ test('startup reap: a wontfix branch with real commits ahead and no open descend
   removeWorktree(repoRoot, wt.path);
   seedItem(dir, { id: 'wontfix-a', status: 'wontfix' });
 
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1469,11 +1487,7 @@ test('startup reap: a wontfix branch with an open descendant is kept, not pruned
   seedItem(dir, { id: 'wontfix-root', status: 'wontfix' });
   seedItem(dir, { id: 'child-open', parent: 'wontfix-root', status: 'doing' });
 
-  const config = {
-    executor: { command: '/no/such/executor-binary-xyz', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
-    timeoutMs: 30000,
-  };
+  const config = DUMMY_CONFIG;
 
   const result = await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
@@ -1557,7 +1571,7 @@ test('bin/fgos-runner.mjs run from a SUBDIRECTORY of another repo operates on th
     JSON.stringify({
       runner: {
         executor: { command: process.execPath, args: [scriptPath, '{prompt}', '--model', '{model}'] },
-        models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+        modelPolicies: { node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' }, claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
         timeoutMs: 30000,
       },
     }),
@@ -1635,7 +1649,7 @@ test('wgi-8: a worker fgos-discovered block makes the RUNNER create a new item s
   assert.equal(d.title, 'Wire retry metrics into the dashboard');
   assert.equal(d.description, 'surfaced while doing item-happy');
   assert.equal(d.status, 'todo');
-  assert.equal(d.stage, 'discovery', 'enters at discovery (stages[0], tsk-qod D1/D2: clarify retired) so context-discovery attaches the real verify later');
+  assert.equal(d.workflowStep, 'discovery', 'enters at discovery (stages[0], tsk-qod D1/D2: clarify retired) so context-discovery attaches the real verify later');
   assert.equal(d.kind, 'feature', 'block kind override wins over classify()');
   assert.equal(d.risk, 'standard', 'block risk override wins over classify()');
   assert.equal(d.deps.length, 0);
@@ -1781,7 +1795,7 @@ test('S10: a re-dispatched item re-emitting a block it already captured on a pri
     risk: 'standard',
     refs: [],
     verify: 'chưa xác định',
-    stage: 'discovery',
+    workflowStep: 'discovery',
     discoveredFrom: 'item-redispatch',
   });
   const body = JSON.stringify({ title: 'Wire retry metrics into the dashboard' });
@@ -1875,7 +1889,7 @@ test('wgi-8: even a TIMED-OUT worker (output on the err.stdout path) has its fgo
   const scriptPath = writeHangingDiscoveringExecutor(scriptDir, body);
   const config = {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
-    models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+    modelPolicies: { node: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' }, claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
     timeoutMs: 400,
   };
 
@@ -1918,7 +1932,8 @@ test('runWatch: a cycle that committed is followed by an immediate next cycle; a
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
   seedItem(dir, { id: 'item-watch-timing' });
   const config = configFor(writeCommittingExecutor(scriptDir, counterFile));
-  const pollFallbackMs = 300;
+  // Large enough that a cycle which does real git work under load still finishes inside it.
+  const pollFallbackMs = 3000;
   const timestamps = [];
   const controller = new AbortController();
 
@@ -1952,7 +1967,9 @@ test('runWatch: a cycle that committed is followed by an immediate next cycle; a
 
 test('runWatch stops promptly when its AbortSignal aborts mid-wait, and resolves cleanly without throwing', async () => {
   const { repoRoot, dir, worktreeDir } = setup(); // empty frontier -- idle every cycle
-  const pollFallbackMs = 2000;
+  // Aborting at 30ms must end the wait, not let it run to the fallback; the fallback is long
+  // enough that the first cycle's own work under load cannot be mistaken for it.
+  const pollFallbackMs = 60_000;
   const controller = new AbortController();
   setTimeout(() => controller.abort(), 30);
 
@@ -2009,10 +2026,15 @@ test('runWatch threads the SAME breaker instance into every cycle: misses accumu
 
 test('runWatch catches a runOnce throw, reports it via onCycle with outcome "error", and keeps looping instead of terminating', async () => {
   const { repoRoot, dir, worktreeDir } = setup(); // empty frontier -- reaches the idle log call every cycle
-  let logCalls = 0;
-  const flakyLog = () => {
-    logCalls += 1;
-    if (logCalls === 1) throw new Error('injected-log-throw'); // only the first cycle's log call throws
+  // Throw on the first idle line only. Earlier log calls in a cycle are machine-dependent (a
+  // startup reap logs when other processes left orphaned resources behind, and a throw there is
+  // swallowed by the reap's own catch), so "the first log call" is not always the idle one.
+  let thrown = false;
+  const flakyLog = (message) => {
+    if (!thrown && /frontier empty/.test(message)) {
+      thrown = true;
+      throw new Error('injected-log-throw');
+    }
   };
   const results = [];
   const controller = new AbortController();
@@ -2073,21 +2095,21 @@ test('tsk-30v: DISCOVERY DISPATCH sweep advances discovery -> planning on a clea
   // FALLBACK_VERIFY, not seedItem's default -- a fresh discovery-stage item
   // has no real verify yet, same starting shape as an item that just landed
   // on discovery via the clarify->discovery edge (D3).
-  seedItem(dir, { id: 'item-research-clear', stage: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
+  seedItem(dir, { id: 'item-research-clear', workflowStep: 'discovery', verify: 'chưa xác định — bổ sung thủ công' });
   const body = JSON.stringify({ clear: true, verify: 'npm test -- research' });
   const config = configFor(writeDiscoveryVerdictExecutor(scriptDir, counterFile, body));
 
   await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   const item = listWork(dir).work['item-research-clear'];
-  assert.equal(item.stage, 'planning', 'tsk-30v D2/D6: a clear verdict skips exploring, discovery -> planning directly');
+  assert.equal(item.workflowStep, 'planning', 'tsk-30v D2/D6: a clear verdict skips exploring, discovery -> planning directly');
   assert.equal(item.status, 'todo', 'planning is a fresh todo stop, not doing/awaiting-approval');
   assert.equal(item.verify, 'npm test -- research', "the worker's own proposed verify rides onto the item");
 });
 
 test('tsk-4v6/tsk-30v: DISCOVERY DISPATCH sweep advances the item to exploring AND parks it on an unclear verdict, matching the interactive driver path', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
-  seedItem(dir, { id: 'item-research-unclear', stage: 'discovery' });
+  seedItem(dir, { id: 'item-research-unclear', workflowStep: 'discovery' });
   const question = '## Context\n\nThe research worker needs a retry backoff strategy for this item.\n\n## Why this matters\n\nThis directly affects the outcome: which retry backoff strategy should this follow?';
   const body = JSON.stringify({ clear: false, question });
   const config = configFor(writeDiscoveryVerdictExecutor(scriptDir, counterFile, body));
@@ -2096,14 +2118,14 @@ test('tsk-4v6/tsk-30v: DISCOVERY DISPATCH sweep advances the item to exploring A
 
   const view = listWork(dir);
   const item = view.work['item-research-unclear'];
-  assert.equal(item.stage, 'exploring', 'tsk-30v D2/D3: unclear no longer parks in place -- stage advances to exploring');
+  assert.equal(item.workflowStep, 'exploring', 'tsk-30v D2/D3: unclear no longer parks in place -- stage advances to exploring');
   assert.equal(item.status, 'awaiting-human', 'unclear verdict parks the item, matching resolveDiscovery\'s session-role behavior');
   assert.equal(view.gates?.['item-research-unclear']?.ask, question);
 });
 
 test('tsk-4v6: DISCOVERY DISPATCH sweep never advances the item when a real commit lands but no verdict fence is reported — the exact bug this item fixes', async () => {
   const { repoRoot, dir, scriptDir, worktreeDir, counterFile } = setup();
-  seedItem(dir, { id: 'item-research-silent', stage: 'discovery' });
+  seedItem(dir, { id: 'item-research-silent', workflowStep: 'discovery' });
   // no verdictBody -- the worker commits real research but reports nothing,
   // the same shape the pre-fix worker-prompt-discovery.txt template produced
   const config = configFor(writeDiscoveryVerdictExecutor(scriptDir, counterFile, undefined));
@@ -2111,7 +2133,7 @@ test('tsk-4v6: DISCOVERY DISPATCH sweep never advances the item when a real comm
   await runOnce({ repoRoot, config, worktreeDir, log: noLog });
 
   const item = listWork(dir).work['item-research-silent'];
-  assert.equal(item.stage, 'discovery', 'a commit with no verdict never advances the item (the old bug: any real commit used to advance it)');
+  assert.equal(item.workflowStep, 'discovery', 'a commit with no verdict never advances the item (the old bug: any real commit used to advance it)');
   assert.equal(item.status, 'todo', 'left exactly as today\'s no-commit branch already does, for the next sweep to retry');
 });
 
@@ -2147,8 +2169,8 @@ test('tsk-2yo: parseVerdictBlock parses optional tier/kind/risk additively, with
     verify: 'npm test',
   });
   assert.deepEqual(
-    parseVerdictBlock('```fgos-verdict\n{"clear": true, "verify": "npm test", "tier": "heavy", "kind": "bug", "risk": "heavy"}\n```'),
-    { clear: true, verify: 'npm test', tier: 'heavy', kind: 'bug', risk: 'heavy' },
+    parseVerdictBlock('```fgos-verdict\n{"clear": true, "verify": "npm test", "size": "heavy", "rigor": "high", "kind": "bug", "risk": "heavy"}\n```'),
+    { clear: true, verify: 'npm test', size: 'heavy', rigor: 'high', kind: 'bug', risk: 'heavy' },
   );
   // Partial classification (only one of the three fields) — each key is
   // independent, never all-or-nothing.
@@ -2159,29 +2181,30 @@ test('tsk-2yo: parseVerdictBlock parses optional tier/kind/risk additively, with
   });
   // A non-string classification value is dropped the same way a non-string
   // `verify` already is -- fail-safe, never a thrown error.
-  assert.deepEqual(parseVerdictBlock('```fgos-verdict\n{"clear": true, "verify": "npm test", "tier": 5}\n```'), {
+  assert.deepEqual(parseVerdictBlock('```fgos-verdict\n{"clear": true, "verify": "npm test", "size": 5}\n```'), {
     clear: true,
     verify: 'npm test',
   });
   // An `unclear` verdict never carries classification fields at all — the
   // parser only reads them from the `clear: true` branch.
   assert.deepEqual(
-    parseVerdictBlock('```fgos-verdict\n{"clear": false, "question": "which one?", "tier": "heavy"}\n```'),
+    parseVerdictBlock('```fgos-verdict\n{"clear": false, "question": "which one?", "size": "heavy"}\n```'),
     { clear: false, question: 'which one?' },
   );
 });
 
 test('tsk-2yo: classificationPatchFromVerdict only builds a patch on a clear discovery outcome with a clear caller verdict, and only for fields actually reported', async () => {
   const { classificationPatchFromVerdict } = await import('../../src/runner/loop.mjs');
-  assert.deepEqual(classificationPatchFromVerdict('clear', { clear: true, tier: 'heavy', kind: 'bug', risk: 'heavy' }), {
-    tier: 'heavy',
+  assert.deepEqual(classificationPatchFromVerdict('clear', { clear: true, size: 'heavy', rigor: 'high', kind: 'bug', risk: 'heavy' }), {
+    size: 'heavy',
+    rigor: 'high',
     kind: 'bug',
     risk: 'heavy',
   });
-  assert.deepEqual(classificationPatchFromVerdict('clear', { clear: true, tier: 'heavy' }), { tier: 'heavy' }, 'partial classification stays partial');
+  assert.deepEqual(classificationPatchFromVerdict('clear', { clear: true, size: 'heavy' }), { size: 'heavy' }, 'partial classification stays partial');
   assert.deepEqual(classificationPatchFromVerdict('clear', { clear: true }), {}, 'no classification fields reported -> empty patch, no edit call');
   assert.deepEqual(
-    classificationPatchFromVerdict('unclear', { clear: true, tier: 'heavy' }),
+    classificationPatchFromVerdict('unclear', { clear: true, size: 'heavy' }),
     {},
     'never applies when the discovery outcome itself is not clear',
   );
@@ -2204,15 +2227,16 @@ test('tsk-2yo: a headless clear verdict carrying tier/kind/risk actually applies
     risk: 'standard',
     refs: [],
     verify: 'npm test',
-    tier: 'standard',
-    stage: 'discovery',
+    size: 'standard',
+    workflowStep: 'discovery',
     domain: 'coding',
   });
-  const callerVerdict = { clear: true, verify: 'npm test', tier: 'heavy', kind: 'bug', risk: 'heavy' };
+  const callerVerdict = { clear: true, verify: 'npm test', size: 'heavy', rigor: 'high', kind: 'bug', risk: 'heavy' };
   const patch = classificationPatchFromVerdict('clear', callerVerdict);
   editWork(dir, { id: 'item-headless-classify', patch, role: 'runner' });
   const item = listWork(dir).work['item-headless-classify'];
-  assert.equal(item.tier, 'heavy');
+  assert.equal(item.size, 'heavy');
+  assert.equal(item.rigor, 'high');
   assert.equal(item.kind, 'bug');
   assert.equal(item.risk, 'heavy');
 });
@@ -2301,7 +2325,7 @@ test('Step 06 executing-stage scout-blast-radius operation choice runs through r
       const resultPath = match[1];
       const runDir = path.dirname(resultPath);
       fs.mkdirSync(runDir, { recursive: true });
-      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Scout Report\\nSymbol: chooseStageOperation in src/runner/dispatch/operation-choice.mjs\\nSearch posture: active rg cross-check\\nCallers: src/runner/loop.mjs\\nAffected processes: none\\nRisk read: low risk\\n');
+      fs.writeFileSync(path.join(runDir, 'agent-report.md'), '# Scout Report\\nSymbol: chooseStageOperation in src/runner/operation-choice.mjs\\nSearch posture: active rg cross-check\\nCallers: src/runner/loop.mjs\\nAffected processes: none\\nRisk read: low risk\\n');
       fs.writeFileSync(resultPath, JSON.stringify({ status: 'done', summary: 'Scouted 2 symbols', findings: [] }));
     } else {
       fs.writeFileSync('output.txt', 'done\\n');
@@ -2319,7 +2343,7 @@ test('Step 06 executing-stage scout-blast-radius operation choice runs through r
   const cfg = configFor(executorScript);
   seedItem(dir, {
     id,
-    stage: 'executing',
+    workflowStep: 'executing',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -2327,19 +2351,19 @@ test('Step 06 executing-stage scout-blast-radius operation choice runs through r
   });
 
   const res = await runOnce({ repoRoot, config: cfg, worktreeDir, log: noLog });
-
   assert.equal(res.outcome, 'drained');
   assert.equal(res.dispatched[0].outcome, 'awaiting-approval');
 
   const item = listWork(dir).work[id];
   assert.equal(item.status, 'awaiting-approval');
-  assert.equal(item.stage, 'executing');
+  assert.equal(item.workflowStep, 'executing');
 
   const asgnDir = path.join(dir, 'assignments');
   assert.ok(fs.existsSync(asgnDir));
   const assignments = fs.readdirSync(asgnDir);
   assert.ok(assignments.length > 0);
-  const runsDir = path.join(asgnDir, assignments[0], 'runs', '01');
+  const scoutAsgn = assignments.find((a) => a.includes('scout_blast_radius')) || assignments[0];
+  const runsDir = path.join(asgnDir, scoutAsgn, 'runs', '01');
   assert.ok(fs.existsSync(path.join(runsDir, 'result.json')));
   assert.ok(fs.existsSync(path.join(runsDir, 'dispatch-plan.json')));
 });
@@ -2363,7 +2387,7 @@ test('driver loop runOnce: executing scout-blast-radius with failed or no-eviden
   const cfg = configFor(executorScript);
   seedItem(dir, {
     id,
-    stage: 'executing',
+    workflowStep: 'executing',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -2380,7 +2404,7 @@ test('driver loop runOnce: executing scout-blast-radius with failed or no-eviden
 
   const itemAfterPass1 = listWork(dir).work[id];
   assert.equal(itemAfterPass1.status, 'blocked');
-  assert.equal(itemAfterPass1.stage, 'executing');
+  assert.equal(itemAfterPass1.workflowStep, 'executing');
   assert.equal(itemAfterPass1.secondaryOperation ?? null, null);
 
   // Pass 2: subsequent runOnce sees item is blocked and does NOT fall through to implement-item
@@ -2444,7 +2468,7 @@ test('driver loop runOnce: executing review-item with REJECT verdict on existing
 
   seedItem(dir, {
     id,
-    stage: 'executing',
+    workflowStep: 'executing',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -2512,7 +2536,7 @@ test('driver loop runOnce: executing review-item with APPROVED verdict and passi
 
   seedItem(dir, {
     id,
-    stage: 'executing',
+    workflowStep: 'executing',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -2583,7 +2607,7 @@ test('driver loop runOnce: executing review-item with APPROVED verdict but faili
 
   seedItem(dir, {
     id,
-    stage: 'executing',
+    workflowStep: 'executing',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -2637,7 +2661,7 @@ test('driver loop runOnce: executing review-item on Work with NO candidate diff/
 
   seedItem(dir, {
     id,
-    stage: 'executing',
+    workflowStep: 'executing',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -2654,7 +2678,7 @@ test('driver loop runOnce: executing review-item on Work with NO candidate diff/
 
   const itemAfter = listWork(dir).work[id];
   assert.equal(itemAfter.status, 'blocked');
-  assert.equal(itemAfter.stage, 'executing');
+  assert.equal(itemAfter.workflowStep, 'executing');
   assert.equal(itemAfter.secondaryOperation ?? null, null);
 });
 
@@ -2689,7 +2713,7 @@ test('Finding 5 regression test: scout-blast-radius/review-item assignment paths
 
   seedItem(dir, {
     id,
-    stage: 'executing',
+    workflowStep: 'executing',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -2718,7 +2742,7 @@ test('Finding 1 regression test: planning Work item with status doing (live clai
 
   seedItem(dir, {
     id,
-    stage: 'planning',
+    workflowStep: 'planning',
     status: 'doing',
     domain: 'coding',
     workflow: 'feature',
@@ -2732,7 +2756,7 @@ test('Finding 1 regression test: planning Work item with status doing (live clai
 
   const item = listWork(dir).work[id];
   assert.equal(item.status, 'doing');
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
 });
 
 test('Fix Step 06 cli-spawn cwd selection for planning.validate-plan: runs assignment in worktree root when plan.md exists only in worktree', async () => {
@@ -2796,7 +2820,7 @@ test('Fix Step 06 cli-spawn cwd selection for planning.validate-plan: runs assig
 
   seedItem(dir, {
     id,
-    stage: 'planning',
+    workflowStep: 'planning',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -2898,7 +2922,7 @@ function setupValidatePlanFixture({ planModeLine = '', executorFactory = writeVa
 
   seedItem(base.dir, {
     id,
-    stage: 'planning',
+    workflowStep: 'planning',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -2922,8 +2946,8 @@ test('Cell 6.1 happy path: runOnce dispatches planning.validate-plan to a fake e
   const { runDir } = cell61RunDir(repoRoot);
   const result = JSON.parse(fs.readFileSync(path.join(runDir, 'result.json'), 'utf8'));
   assert.equal(result.workId, id);
-  assert.equal(result.status, 'done');
-  assert.equal(result.confidence, 'reported');
+  assert.equal(result.classification.execution.status, 'completed');
+  assert.equal(result.classification.confidence.level, 'reported');
 
   // The Assignment never moves Work: plan.md here has no "## Split" section
   // at all, so planVerdictFromPlanMd (Cell P01.2, R3/G5) has no signal to
@@ -2931,7 +2955,7 @@ test('Cell 6.1 happy path: runOnce dispatches planning.validate-plan to a fake e
   // fallback then conservatively no-ops, so the item is exactly where the
   // sweep found it.
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.status, 'todo');
 });
 
@@ -2948,15 +2972,15 @@ test('Cell 6.1 happy path: driver consumes READY+reported and feeds the existing
   assert.match(readyLine, /\(pass-through\)/);
 
   // Work stage/status changed only through engine verbs: resolvePlan's
-  // moveStage advanced planning -> executing; the drain run's own claim and
+  // moveStep advanced planning -> executing; the drain run's own claim and
   // settle (verify passed + committed work) then reached awaiting-approval.
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'executing');
+  assert.equal(item.workflowStep, 'executing');
   assert.equal(item.status, 'awaiting-approval');
 
   // Ordering proves the driver, not the Assignment, moved Work: the
   // assignment-finished log precedes the verdict-consumption log.
-  const finishedIdx = capture.findIndex((l) => l.includes('executed (confidence: reported, status: done)'));
+  const finishedIdx = capture.findIndex((l) => l.includes('executed (confidence: reported, status: ok)'));
   assert.ok(finishedIdx !== -1, 'assignment finished with a reported RunResult');
   const consumedIdx = capture.findIndex((l) => l.includes('after READY validation'));
   assert.ok(consumedIdx > finishedIdx, 'Work moved only after the Assignment had settled, via resolvePlan');
@@ -3038,7 +3062,7 @@ function setupValidatePlanDecomposeFixture({ id, docsRef, children }) {
 
   seedItem(base.dir, {
     id,
-    stage: 'planning',
+    workflowStep: 'planning',
     status: 'todo',
     domain: 'coding',
     workflow: 'feature',
@@ -3065,7 +3089,7 @@ test('Cell P01.2: reviewer READY on an item whose plan.md declares split childre
 
   const view = listWork(dir);
   const root = view.work[id];
-  assert.equal(root.stage, 'executing');
+  assert.equal(root.workflowStep, 'executing');
 
   const created = Object.values(view.work).filter((w) => w.parent === id);
   assert.equal(created.length, 2);
@@ -3074,7 +3098,7 @@ test('Cell P01.2: reviewer READY on an item whose plan.md declares split childre
     ['Subtask A', 'Subtask B'],
   );
   for (const child of created) {
-    assert.equal(child.stage, 'executing');
+    assert.equal(child.workflowStep, 'executing');
   }
 });
 
@@ -3099,7 +3123,7 @@ test('Cell P01.2: a child spec without a cited D-ID in plan.md\'s own split JSON
   const root = view.work[id];
   // rejected verdict: the root stays exactly where the sweep found it, and
   // no child is ever written.
-  assert.equal(root.stage, 'planning');
+  assert.equal(root.workflowStep, 'planning');
   assert.equal(root.status, 'todo');
   const created = Object.values(view.work).filter((w) => w.parent === id);
   assert.equal(created.length, 0);
@@ -3415,8 +3439,8 @@ test('Cell 6.2 staleness: plan.md edited after settle is never consumed cross-pa
   const first = cell62RunDirs(repoRoot);
   assert.deepEqual(first.runs, ['01']);
   const result1 = JSON.parse(fs.readFileSync(path.join(first.runsDir, '01', 'result.json'), 'utf8'));
-  assert.equal(result1.status, 'done');
-  assert.equal(result1.confidence, 'reported');
+  assert.equal(result1.classification.execution.status, 'completed');
+  assert.equal(result1.classification.confidence.level, 'reported');
 
   // Edit plan.md after the verdict settled (mtime of the edit is newer than
   // the recorded result.json — the plain, non-hidden case).
@@ -3431,7 +3455,7 @@ test('Cell 6.2 staleness: plan.md edited after settle is never consumed cross-pa
   assert.ok(!secondLogs.some((l) => l.includes('after READY validation')), 'the V1 verdict must never feed the planning edge');
 
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.status, 'todo');
   assert.deepEqual(item, itemBefore, 'neither dispatch pass may mutate any work-record field');
 });
@@ -3460,7 +3484,7 @@ test('Cell 6.2 staleness: an mtime-hidden plan.md edit is still caught by the re
   assert.ok(!secondLogs.some((l) => l.includes('after READY validation')), 'a verdict on a superseded plan revision must never feed the planning edge');
 
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.status, 'todo');
   assert.deepEqual(item, itemBefore, 'neither dispatch pass may mutate any work-record field');
 });
@@ -3474,12 +3498,12 @@ test('Cell 6.2 red-team: string-only evidenceRefs without a companion report nev
 
   const { runsDir } = cell62RunDirs(repoRoot);
   const result = JSON.parse(fs.readFileSync(path.join(runsDir, '01', 'result.json'), 'utf8'));
-  assert.notEqual(result.confidence, 'reported', 'string-only evidenceRefs must never classify reported');
-  assert.equal(result.confidence, 'no-evidence');
+  assert.notEqual(result.classification.confidence.level, 'reported', 'string-only evidenceRefs must never classify reported');
+  assert.equal(result.classification.confidence.level, 'no-evidence');
   assert.ok(!logs.some((l) => l.includes('after READY validation')), 'a forged string-only claim must never feed the planning edge');
 
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.status, 'todo');
   assert.deepEqual(item, itemBefore, 'the forged-claim pass must not mutate any work-record field');
 });
@@ -3508,7 +3532,7 @@ test('Cell 6.2 read-back tamper: a schema-broken agentClaim in the stored result
   assert.ok(!secondLogs.some((l) => l.includes('after READY validation')), 'a tampered claim must never feed the planning edge');
 
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.status, 'todo');
   assert.deepEqual(item, itemBefore, 'neither the settle nor the tamper pass may mutate any work-record field');
 });
@@ -3527,7 +3551,7 @@ test('Cell 6.2 read-back tamper: a deleted agent-report.md is never consumed cro
   assert.ok(!secondLogs.some((l) => l.includes('after READY validation')), 'a verdict whose report artifact vanished must not feed the planning edge');
 
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.status, 'todo');
   assert.deepEqual(item, itemBefore, 'neither the settle nor the tamper pass may mutate any work-record field');
 });
@@ -3541,13 +3565,13 @@ test('Cell 6.2 no-evidence stop: an executor that writes nothing leaves Work unt
 
   const { runsDir } = cell62RunDirs(repoRoot);
   const result = JSON.parse(fs.readFileSync(path.join(runsDir, '01', 'result.json'), 'utf8'));
-  assert.equal(result.status, 'no-evidence');
-  assert.equal(result.confidence, 'no-evidence');
+  assert.equal(result.classification.execution.status, 'completed');
+  assert.equal(result.classification.confidence.level, 'no-evidence');
   assert.ok(logs.some((l) => l.includes('did not report READY')), 'a no-evidence run must log its conservative stop');
   assert.ok(!logs.some((l) => l.includes('after READY validation')));
 
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.status, 'todo');
   assert.deepEqual(item, itemBefore, 'the no-evidence stop must not mutate any work-record field');
 });
@@ -3561,13 +3585,13 @@ test('Cell 6.2 failed stop: malformed agent-result.json fails closed and leaves 
 
   const { runsDir } = cell62RunDirs(repoRoot);
   const result = JSON.parse(fs.readFileSync(path.join(runsDir, '01', 'result.json'), 'utf8'));
-  assert.equal(result.status, 'failed');
-  assert.equal(result.confidence, 'failed');
+  assert.equal(result.classification.execution.status, 'failed');
+  assert.equal(result.classification.confidence.level, 'failed');
   assert.ok(!logs.some((l) => l.includes('after READY validation')));
   assert.ok(logs.some((l) => l.includes('did not report READY')));
 
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.status, 'todo');
   assert.deepEqual(item, itemBefore, 'the failed stop must not mutate any work-record field');
 });
@@ -3581,13 +3605,13 @@ test('Cell 6.2 NOT READY verdict routes back to the primary planning path withou
 
   const { runsDir } = cell62RunDirs(repoRoot);
   const result = JSON.parse(fs.readFileSync(path.join(runsDir, '01', 'result.json'), 'utf8'));
-  assert.equal(result.status, 'done');
-  assert.equal(result.confidence, 'reported');
+  assert.equal(result.classification.execution.status, 'completed');
+  assert.equal(result.classification.confidence.level, 'reported');
   assert.ok(logs.some((l) => l.includes('returned NOT READY — routing back to primary planning path')), 'NOT READY must route back to the primary planning path');
   assert.ok(!logs.some((l) => l.includes('after READY validation')));
 
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.status, 'todo');
   assert.deepEqual(item, itemBefore, 'the routing-back pass must not mutate any work-record field');
 });
@@ -3640,7 +3664,7 @@ test('F2d composed: a phantom future run dir with a recomputed plan hash is neve
   assert.ok(!secondLogs.some((l) => l.includes('after READY validation')), 'the forged V2 verdict must never feed the planning edge');
 
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.status, 'todo');
   assert.deepEqual(item, itemBefore, 'the forgery pass must not mutate any work-record field');
 });
@@ -3669,7 +3693,7 @@ test('F2c composed: a schema-valid NOT READY -> READY flip in the stored result.
   assert.ok(!secondLogs.some((l) => l.includes('after READY validation')), 'the flipped verdict must never feed the planning edge');
 
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.status, 'todo');
   assert.deepEqual(item, itemBefore, 'the flip pass must not mutate any work-record field');
 });
@@ -3705,7 +3729,7 @@ test('F5 anti-wedge: honest re-plan then re-dispatch then consume keeps the norm
   assert.ok(!thirdLogs.some((l) => l.includes('after READY validation')), 'a NOT READY verdict must never feed the planning edge');
 
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.status, 'todo');
   assert.deepEqual(item, itemBefore, 'the healthy re-plan cycle must not mutate any work-record field');
 });
@@ -3759,7 +3783,7 @@ test('F2d(c) composed: a result.json-only tamper cannot relocate evidence to a p
   assert.ok(!secondLogs.some((l) => l.includes('after READY validation')), 'evidence read from a planted dir must never feed the planning edge');
 
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.status, 'todo');
   assert.deepEqual(item, itemBefore, 'the redirect-tamper pass must not mutate any work-record field');
 });
@@ -3813,7 +3837,7 @@ test('P4a composed: a planted pinned-dir report and result.json field edits cann
   assert.ok(!secondLogs.some((l) => l.includes('after READY validation')), 'planted pinned-dir evidence must never feed the planning edge');
 
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.status, 'todo');
   assert.deepEqual(item, itemBefore, 'the pinned-dir plant pass must not mutate any work-record field');
 });
@@ -3832,7 +3856,7 @@ test('S3a composed: a single runtime.exitCode flip cannot erase a settle-classif
   // set, plan hash, stored status/confidence all untouched), future mtime.
   const resultPath = path.join(first.runsDir, '01', 'result.json');
   const res = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
-  assert.equal(res.status, 'failed', 'pass 1 settles as failed — the exploit only works if the stored verdict is honest');
+  assert.equal(res.classification.execution.status, 'failed', 'pass 1 settles as failed — the exploit only works if the stored verdict is honest');
   fs.writeFileSync(resultPath, JSON.stringify({ ...res, runtime: { ...res.runtime, exitCode: 0 } }, null, 2));
   const future = new Date(Date.now() + 5000);
   fs.utimesSync(resultPath, future, future);
@@ -3847,7 +3871,7 @@ test('S3a composed: a single runtime.exitCode flip cannot erase a settle-classif
   assert.ok(!secondLogs.some((l) => l.includes('after READY validation')), 'a re-derived failed verdict must never feed the planning edge');
 
   const item = listWork(dir).work[id];
-  assert.equal(item.stage, 'planning');
+  assert.equal(item.workflowStep, 'planning');
   assert.equal(item.status, 'todo');
   assert.deepEqual(item, itemBefore, 'the exitCode-flip pass must not mutate any work-record field');
 });

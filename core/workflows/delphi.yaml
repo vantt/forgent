@@ -1,0 +1,56 @@
+# core/workflows/delphi.yaml — Delphi Deliberation Workflow
+# Multi-round Delphi deliberation workflow with anonymous blind proposals,
+# mediated feedback synthesis, second-round revision, and final consensus.
+
+id: delphi
+title: Delphi Deliberation Workflow
+description: Multi-round Delphi deliberation with anonymous blind proposals, feedback synthesis, revision, and consensus.
+
+steps:
+  - id: blind-proposals
+    title: Blind Proposals
+    units:
+      - id: propose-round-1
+        template:
+          capability: delphi:propose
+          pattern: panel
+          persona: panelist
+          objective: Generate independent, anonymous initial proposals without cross-participant visibility
+          blind: true
+  - id: feedback-synthesis
+    title: Feedback Synthesis
+    dependsOn: [blind-proposals]
+    units:
+      - id: synthesize-feedback
+        template:
+          capability: delphi:synthesize
+          pattern: solo
+          persona: synthesizer
+          objective: Synthesize round 1 proposals into an anonymized mediated feedback summary. Name each position only by its seat label and never repeat role ids such as panelist-1 or the order in which seats map to roles, so no reader can tell whose position is whose
+          anonymizeInputs: true
+  - id: second-round
+    title: Second Round Proposals
+    dependsOn: [feedback-synthesis]
+    units:
+      - id: propose-round-2
+        template:
+          capability: delphi:propose
+          pattern: panel
+          persona: panelist
+          objective: Revise proposals in light of synthesized panel feedback
+          blind: true
+          anonymizeInputs: true
+          # Each panelist sees the anonymized group summary and its own round 1 proposal, not the others' proposals.
+          inputs:
+            - { step: feedback-synthesis, label: group summary }
+            - { step: blind-proposals, sameSeat: true, label: your own previous proposal }
+  - id: final-consensus
+    title: Final Consensus
+    dependsOn: [second-round]
+    units:
+      - id: synthesize-consensus
+        template:
+          capability: delphi:synthesize
+          pattern: solo
+          persona: synthesizer
+          objective: Produce final consensus synthesis reporting convergence and remaining dissent

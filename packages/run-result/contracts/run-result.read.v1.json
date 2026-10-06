@@ -1,0 +1,75 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "run-result.read.v1",
+  "title": "Run Result Read Contract for Observe Source v1",
+  "description": "Layout rule v2: walk .fgos/assignments lexically to depth 16. A runs directory marks its parent as an assignment; its relative assignment id may contain /. Read only direct runs/<attempt>/result.json children and optional sibling run.json settlement metadata, never descend into attempts or follow symlinks. assignment.json is optional, with absent/unreadable/symlink metadata yielding null role and adapter. Inline unit records with unitRunId but no runId are skipped as inline-record. Coverage counts missing-result, unparseable, no-run-id, no-timestamp, symlink, duplicate-run-id and depth skips; traversal barriers count one skipped candidate, preserving observed + skipped = runDirsSeen.",
+  "type": "object",
+  "properties": {
+    "result": {
+      "type": "object",
+      "description": "Fields read from a regular parseable result.json. Observed records require a runId string that is nonblank after trimming, preserving its original text. Observation time is the first nonblank string from result.settledAt, result.timestamp, then regular parseable sibling run.json.settledAt; no date validation or startedAt, assignment.createdAt or filesystem-mtime fallback. Lexical traversal retains the first otherwise eligible record for a duplicate runId before consumer window filtering. Absent results are missing-result; present unreadable, invalid JSON or nonregular results are unparseable; result symlinks are symlink.",
+      "required": ["runId"],
+      "properties": {
+        "runId": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Identifier of the run, used verbatim as subject id; whitespace-only strings are not admitted."
+        },
+        "settledAt": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Primary observation timestamp when a nonblank string."
+        },
+        "timestamp": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Observation timestamp when result.settledAt is absent, non-string or blank."
+        },
+        "executorId": {
+          "type": "string",
+          "description": "Executor identifier attribute (checked first)."
+        },
+        "executor": {
+          "type": "string",
+          "description": "Executor identifier attribute (fallback)."
+        },
+        "status": {
+          "type": "string",
+          "description": "Settlement status of the run."
+        },
+        "classification": {
+          "type": "object",
+          "description": "Structured run-result failure classification."
+        },
+        "assignmentId": {
+          "type": "string",
+          "description": "Historical record field; the observation assignmentId is the assignment directory's relative path beneath assignments and may contain /."
+        }
+      }
+    },
+    "run": {
+      "type": "object",
+      "description": "Optional sibling run.json, read only if neither result timestamp field supplies a nonblank string. Missing, unreadable, invalid JSON, nonregular or symlink metadata supplies no fallback timestamp and never hides an otherwise eligible primary result.",
+      "properties": {
+        "settledAt": {
+          "type": "string",
+          "description": "Final observation timestamp fallback when nonblank; preserved verbatim."
+        }
+      }
+    },
+    "assignment": {
+      "type": "object",
+      "description": "Optional assignment.json metadata read once per assignment; never follows a symlink. It is not required to observe a run.",
+      "properties": {
+        "role": {
+          "type": ["string", "null"],
+          "description": "Dispatched agent role attribute."
+        },
+        "adapter": {
+          "type": ["string", "null"],
+          "description": "Dispatched provider adapter attribute."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,310 @@
+{
+  "scratch": "/var/tmp/discussion-judge-lyVRkU",
+  "before": [
+    {
+      "name": "A.md",
+      "regular": true,
+      "bytes": 4082,
+      "sha256": "13747bcc5ecf337d19cc0fe827049a49fb6574c1c6c371466a665290f6c0f679"
+    },
+    {
+      "name": "B.md",
+      "regular": true,
+      "bytes": 2388,
+      "sha256": "856f563da40e835d339e1f12dd7b2bbbdfed230f231e9012b17716479b85ed40"
+    }
+  ],
+  "after": [
+    {
+      "name": "A.md",
+      "regular": true,
+      "bytes": 4082,
+      "sha256": "13747bcc5ecf337d19cc0fe827049a49fb6574c1c6c371466a665290f6c0f679"
+    },
+    {
+      "name": "B.md",
+      "regular": true,
+      "bytes": 2388,
+      "sha256": "856f563da40e835d339e1f12dd7b2bbbdfed230f231e9012b17716479b85ed40"
+    }
+  ],
+  "promptSha256": "4b9690d5341552361c6434f8ac12941570f47348df1df130f047e87483b2cd4c",
+  "randomizedMapping": {
+    "A": {
+      "unitRunId": "unit-run-1791270868625-812a0306",
+      "runId": "run_unit-run-1791270868625-812a0306/synthesizer/1_01",
+      "sourcePath": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270868625-812a0306/synthesizer/1/runs/01/worker-output/outbox/agent-report.md",
+      "sha256": "13747bcc5ecf337d19cc0fe827049a49fb6574c1c6c371466a665290f6c0f679"
+    },
+    "B": {
+      "unitRunId": "unit-run-1791270002490-60cc7659",
+      "runId": "run_unit-run-1791270002490-60cc7659/producer/1_01",
+      "sourcePath": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002490-60cc7659/producer/1/runs/01/worker-output/outbox/agent-report.md",
+      "sha256": "856f563da40e835d339e1f12dd7b2bbbdfed230f231e9012b17716479b85ed40"
+    }
+  },
+  "normalization": "Same path/unit/run identity replacement on both final reports; reasoning/citations/uncertainty unchanged.",
+  "execution": [
+    {
+      "command": "/usr/bin/bwrap",
+      "args": [
+        "--ro-bind",
+        "/",
+        "/",
+        "--dev",
+        "/dev",
+        "--proc",
+        "/proc",
+        "--tmpfs",
+        "/tmp",
+        "--bind",
+        "/home/vantt/projects/mdview/.fgos/assignments/asgn-claude-1791271510510/runs/01",
+        "/home/vantt/projects/mdview/.fgos/assignments/asgn-claude-1791271510510/runs/01",
+        "--bind",
+        "/tmp/fgos-confinement/disp_1791271510551_ebe61e1f/home",
+        "/tmp/fgos-confinement/disp_1791271510551_ebe61e1f/home",
+        "--",
+        "bash",
+        "-c",
+        "for f in $(ls /proc/$$/fd 2>/dev/null); do if [ \"$f\" -ge 3 ] 2>/dev/null; then eval \"exec $f>&-\" 2>/dev/null || true; fi; done; exec \"$@\"",
+        "bwrap-launch",
+        "claude",
+        "-p",
+        "Evaluate two anonymous final deliverables for this exact question. Do not infer provider/setup identity, do not call tools, and do not use earlier comparisons. Citation presence does not verify correctness; you have no repository access.\n\nQUESTION:\nDECISION QUESTION (council-style, read-only, give a position): fgOS's `panel` collaboration pattern (src/runner/execution/patterns/panel.mjs) runs N independent panelists in parallel then a synthesizer on a different provider. The 'council-of-high-intelligence' project adds mechanical quality gates around such a panel: (1) a dissent quota (at least 2 non-overlapping objections else re-prompt), (2) an agreement check (>70% agree -> force a counterfactual from 2 members), (3) anonymized cross-examination round, (4) a confidence-weighted tally that returns a genuine split to the user instead of forcing consensus. Should fgOS add a mechanical dissent/agreement gate to the panel pattern, or is provider-distinct panelists plus the reviewed pattern's red-team already enough? Read the repo to ground your answer (panel.mjs, reviewed.mjs, docs/specs). Reply with: your position, the 2-3 strongest reasons with file:line evidence, what would change your mind, and one concrete next step. Maximum 300 words.\n\nFIXED RUBRIC discussion-quality.v1:\n\n\nThe source names criteria but does not define each integer. The following\nanchors operationalize them for repeatable judging; they are fgOS's scoring\nconvention, not a quotation of historical judge instructions.\n\n| Score key | 0 | 1 | 2 |\n|---|---|---|---|\n| `perspective-spread` | One viewpoint, or paraphrases presented as distinct views | Distinct views appear but their material tension is flattened or only partly preserved | Distinct views and their material disagreements are preserved and compared |\n| `decision-clarity` | No actionable recommendation | An actionable recommendation, but conditions or thresholds are vague | An actionable recommendation with explicit conditions or thresholds |\n| `counterfactual-depth` | No serious alternative | An alternative is named and partly examined | The strongest alternative is seriously tested, including what could change the decision |\n| `evidence-discipline` | Unsupported claims or invented evidence | Some claims are justified, but important evidence/inference boundaries remain unclear | Important claims are tagged and justified, with uncertainty and unverifiable claims explicit |\n| `execution-quality` | No concrete executable next step | A concrete next step, but owner, deadline or rollback criteria are incomplete | Concrete owners, deadlines and rollback criteria |\n\nJudge only the submitted deliverable, not an imagined better underlying panel.\nQuote a short passage for every score; state what is missing. Citation presence\nalone does not prove a claim true. A blind judge without repository access\nmust mark citation correctness as unverified rather than invent verification.\n\nThe [historical comparison](../../plans/reports/council-ab-comparison-261004.md)\nis a calibration reference, not a fresh evaluation under these newly explicit\nanchors. It identified an input-plumbing defect and warned that format, provider\nchanges and a single question/judge confounded the result. Do not copy its\nscores into new records as if current setups had been judged.\n\n\n\nReturn ONLY one JSON object: {\"A\":{\"scores\":{\"perspective-spread\":0,\"decision-clarity\":0,\"counterfactual-depth\":0,\"evidence-discipline\":0,\"execution-quality\":0},\"rationales\":{\"perspective-spread\":{\"quote\":\"\",\"reason\":\"\"},\"decision-clarity\":{\"quote\":\"\",\"reason\":\"\"},\"counterfactual-depth\":{\"quote\":\"\",\"reason\":\"\"},\"evidence-discipline\":{\"quote\":\"\",\"reason\":\"\"},\"execution-quality\":{\"quote\":\"\",\"reason\":\"\"}}},\"B\":{\"scores\":{},\"rationales\":{}},\"limits\":[]}. Fill all five scores and rationales for EACH output with your actual judgment, integer 0..2, short literal quotes and reasons. The zero values above are schema examples, not requested scores.\n\n<neutral-A>\n# Synthesis: Should fgOS add a mechanical dissent/agreement gate to the panel pattern?\n\n## Panelist positions\n\n**panelist-1 — No (measure first, compose later).** Agreement is already a passive measurement, not a gate (docs/specs/runner.md:1435, observe.md:61), with pre-registered revisit conditions K2/K3. Cross-examination already exists as Workflow composition via `anonymizeInputs` and `blind` (runner.md:1437-1439), and a `cross-examine` step example plus `delphi.yaml` ship already. A dissent quota risks manufactured, indistinguishable-from-real objections; `reviewed.mjs:24-29,52-54` red-team covers adversarial checks. Next step: run `fgos metrics discussions --by workflow` after ~30 panel runs; if K2/K3 trip, prototype the gate as an opt-in Workflow step, not in `panel.mjs`.\n\n**panelist-2 — No.** `panel.mjs` design centers on independent parallel dispatch (`independentOf`, panel.mjs:63,68) and a cross-family synthesizer (panel.mjs:94-97); adversarial review is covered by `reviewed.mjs:27` (high/critical → reviewer + red-team) and forced red-team for code (reviewed.mjs:52-54). Gates would distort the pattern's intent by forcing splits on legitimate agreement. Next step: log per-panelist outcome agreement and provider family for 20+ runs.\n\n**panelist-3 — No (architectural boundary).** ADR 0047/0049 keep collaboration patterns minimal, pure, history-derived loops (runner.md:3050); stateful multi-round mechanics belong in Workflow DAGs (runner.md:1420) which already support `anonymizeInputs`/`blind`. `independentOf` (panel.mjs:65-71, 94-99) enforces provider independence, which is preferable to mechanical dissent; K2/K3 sensors exist as passive metrics (runner.md:1435, observe.md:61). Next step: package the four council gates into an opt-in `core/workflows/council.yaml` using `anonymizeInputs: true`.\n\n## Disagreement (kept visible)\n\nNo panelist dissents on the core question — the vote is 3-0 against the gate. The remaining disagreement is only about emphasis and sequencing, not the verdict:\n\n- panelist-1 emphasizes waiting for the pre-registered K2/K3 measurement thresholds before any build; panelist-3 is comfortable building the opt-in `council.yaml` workflow template now; panelist-2 proposes instrumentation before either.\n- panelist-1 flags a genuinely unmeasured gap: panel units without a producer (advisory/discussion units) get no red-team coverage — the only acknowledged hole in the \"enough\" argument.\n- On confidence-weighted tallies, panelist-1 notes observe.md:61 already computes agreement and `genuineSplit` (2/3 threshold), so item (4) of the council project needs no code change; the others do not contest this.\n\n## Recommendation\n\n**Do not add a mechanical dissent/agreement gate to `src/runner/execution/patterns/panel.mjs`.** Provider-distinct seats plus the reviewed pattern's red-team are sufficient for now, and the council features are deliverable as opt-in Workflow composition.\n\nEvidence:\n1. `panel.mjs:63-68, 94-97` — panelists and synthesizer are dispatched with `independentOf`, giving genuine provider-family independence rather than mechanically forced disagreement.\n2. `reviewed.mjs:24-29, 52-54` — `high`/`critical` rigor and `code` capability already add a `red-team` checker with `independentOf: ['producer']` (reviewed.mjs:302), supplying adversarial dissent where errors matter.\n3. `docs/specs/runner.md:1435` and `observe.md:61` — agreement/genuine-split is specified as a passive measurement with pre-registered K2/K3 revisit conditions; a gate now would pre-empt the data that should decide the question, and `runner.md:3050` (no new state) plus 1437-1439 (`anonymizeInputs`/`blind`, cross-examine step, `delphi.yaml`) show the composition path already exists.\n\nConcrete next step: after ~30 panel runs, run `fgos metrics discussions --by workflow` (panelist-1) and log per-panelist agreement with provider family (panelist-2); if K2/K3 trip, build the council gates as an opt-in `core/workflows/council.yaml` with `anonymizeInputs: true` (panelist-3) rather than modifying the pattern.\n\n</neutral-A>\n<neutral-B>\n# Position: do not add a mechanical dissent/agreement gate to `panel` now\n\nKeep measuring. Don't gate yet. The repo has already chosen to measure agreement first and has written down the conditions for revisiting that choice. Two of the four council mechanisms already exist in another form. Also, the premise that \"red-team already covers it\" is only partly true.\n\n## Strongest reasons\n\n1. **Measure-first is a settled decision, and it has revisit criteria.** Agreement is \"a passive measurement, not a workflow gate\". Zero valid votes counts as unmeasured, not as a genuine split. The K2, K3 and K5 conditions are the agreed trigger for revisiting (docs/specs/runner.md:1435). The `genuineSplit` metric (no group reaches 2/3) is already computed (docs/specs/observe.md:61). Adding a >70% gate now would skip the evidence step the project set for itself.\n2. **Mechanisms 3 and 4 already exist without changing the pattern.** An anonymized cross-examination step is documented as a Workflow step with `anonymizeInputs` (runner.md:1437). Blind panelists are available through `blind: true` (runner.md:1439). `panel.mjs` stays small and pure, which follows ADR 0047 (runner.md:3050).\n3. **Neither safeguard is guaranteed, so gating the text is premature.** `panel.mjs:63-68` and `:94-97` only *request* independence. The spec records a Codex-only panel that was \"not cross-provider independent review\" (runner.md:1404-1405). Red-team runs only inside `reviewed`, at high or critical rigor or for `code:*` work (reviewed.mjs:24-29, 52-54). Nothing in `panel.mjs:50-105` sends panel output through red-team. A dissent quota would push models to produce disagreement while the actual weakness, correlated providers, stays in place.\n\n## What would change my mind\n\n- K2 fires: at least 90% of the first 30 logged panel runs are unanimous.\n- K3 fires: a unanimous panel is later reversed by red-team or by a human within 14 days.\n\nIf either happens, I'd add a forced-counterfactual round that is opt-in per preset and triggered by the measured `agreement`. It would not be a default re-prompt.\n\n## Next step\n\nRun `fgos metrics discussions --by workflow` to count panel runs that carry valid `stanceOptions` stances. If the count is near zero, the sensor isn't collecting anything. In that case, pass `--stance-options` in the panel workflows first, so K2 and K3 can be checked before K5 expires.\n\n</neutral-B>",
+        "--model",
+        "opus",
+        "--permission-mode",
+        "acceptEdits"
+      ],
+      "cwd": "/var/tmp/discussion-judge-lyVRkU",
+      "level": "actual confinement execution wrapper spawn",
+      "kernel": {
+        "cwd": "/var/tmp/discussion-judge-lyVRkU",
+        "argv": [
+          "/usr/bin/bwrap",
+          "--ro-bind",
+          "/",
+          "/",
+          "--dev",
+          "/dev",
+          "--proc",
+          "/proc",
+          "--tmpfs",
+          "/tmp",
+          "--bind",
+          "/home/vantt/projects/mdview/.fgos/assignments/asgn-claude-1791271510510/runs/01",
+          "/home/vantt/projects/mdview/.fgos/assignments/asgn-claude-1791271510510/runs/01",
+          "--bind",
+          "/tmp/fgos-confinement/disp_1791271510551_ebe61e1f/home",
+          "/tmp/fgos-confinement/disp_1791271510551_ebe61e1f/home",
+          "--",
+          "bash",
+          "-c",
+          "for f in $(ls /proc/$$/fd 2>/dev/null); do if [ \"$f\" -ge 3 ] 2>/dev/null; then eval \"exec $f>&-\" 2>/dev/null || true; fi; done; exec \"$@\"",
+          "bwrap-launch",
+          "claude",
+          "-p",
+          "Evaluate two anonymous final deliverables for this exact question. Do not infer provider/setup identity, do not call tools, and do not use earlier comparisons. Citation presence does not verify correctness; you have no repository access.\n\nQUESTION:\nDECISION QUESTION (council-style, read-only, give a position): fgOS's `panel` collaboration pattern (src/runner/execution/patterns/panel.mjs) runs N independent panelists in parallel then a synthesizer on a different provider. The 'council-of-high-intelligence' project adds mechanical quality gates around such a panel: (1) a dissent quota (at least 2 non-overlapping objections else re-prompt), (2) an agreement check (>70% agree -> force a counterfactual from 2 members), (3) anonymized cross-examination round, (4) a confidence-weighted tally that returns a genuine split to the user instead of forcing consensus. Should fgOS add a mechanical dissent/agreement gate to the panel pattern, or is provider-distinct panelists plus the reviewed pattern's red-team already enough? Read the repo to ground your answer (panel.mjs, reviewed.mjs, docs/specs). Reply with: your position, the 2-3 strongest reasons with file:line evidence, what would change your mind, and one concrete next step. Maximum 300 words.\n\nFIXED RUBRIC discussion-quality.v1:\n\n\nThe source names criteria but does not define each integer. The following\nanchors operationalize them for repeatable judging; they are fgOS's scoring\nconvention, not a quotation of historical judge instructions.\n\n| Score key | 0 | 1 | 2 |\n|---|---|---|---|\n| `perspective-spread` | One viewpoint, or paraphrases presented as distinct views | Distinct views appear but their material tension is flattened or only partly preserved | Distinct views and their material disagreements are preserved and compared |\n| `decision-clarity` | No actionable recommendation | An actionable recommendation, but conditions or thresholds are vague | An actionable recommendation with explicit conditions or thresholds |\n| `counterfactual-depth` | No serious alternative | An alternative is named and partly examined | The strongest alternative is seriously tested, including what could change the decision |\n| `evidence-discipline` | Unsupported claims or invented evidence | Some claims are justified, but important evidence/inference boundaries remain unclear | Important claims are tagged and justified, with uncertainty and unverifiable claims explicit |\n| `execution-quality` | No concrete executable next step | A concrete next step, but owner, deadline or rollback criteria are incomplete | Concrete owners, deadlines and rollback criteria |\n\nJudge only the submitted deliverable, not an imagined better underlying panel.\nQuote a short passage for every score; state what is missing. Citation presence\nalone does not prove a claim true. A blind judge without repository access\nmust mark citation correctness as unverified rather than invent verification.\n\nThe [historical comparison](../../plans/reports/council-ab-comparison-261004.md)\nis a calibration reference, not a fresh evaluation under these newly explicit\nanchors. It identified an input-plumbing defect and warned that format, provider\nchanges and a single question/judge confounded the result. Do not copy its\nscores into new records as if current setups had been judged.\n\n\n\nReturn ONLY one JSON object: {\"A\":{\"scores\":{\"perspective-spread\":0,\"decision-clarity\":0,\"counterfactual-depth\":0,\"evidence-discipline\":0,\"execution-quality\":0},\"rationales\":{\"perspective-spread\":{\"quote\":\"\",\"reason\":\"\"},\"decision-clarity\":{\"quote\":\"\",\"reason\":\"\"},\"counterfactual-depth\":{\"quote\":\"\",\"reason\":\"\"},\"evidence-discipline\":{\"quote\":\"\",\"reason\":\"\"},\"execution-quality\":{\"quote\":\"\",\"reason\":\"\"}}},\"B\":{\"scores\":{},\"rationales\":{}},\"limits\":[]}. Fill all five scores and rationales for EACH output with your actual judgment, integer 0..2, short literal quotes and reasons. The zero values above are schema examples, not requested scores.\n\n<neutral-A>\n# Synthesis: Should fgOS add a mechanical dissent/agreement gate to the panel pattern?\n\n## Panelist positions\n\n**panelist-1 — No (measure first, compose later).** Agreement is already a passive measurement, not a gate (docs/specs/runner.md:1435, observe.md:61), with pre-registered revisit conditions K2/K3. Cross-examination already exists as Workflow composition via `anonymizeInputs` and `blind` (runner.md:1437-1439), and a `cross-examine` step example plus `delphi.yaml` ship already. A dissent quota risks manufactured, indistinguishable-from-real objections; `reviewed.mjs:24-29,52-54` red-team covers adversarial checks. Next step: run `fgos metrics discussions --by workflow` after ~30 panel runs; if K2/K3 trip, prototype the gate as an opt-in Workflow step, not in `panel.mjs`.\n\n**panelist-2 — No.** `panel.mjs` design centers on independent parallel dispatch (`independentOf`, panel.mjs:63,68) and a cross-family synthesizer (panel.mjs:94-97); adversarial review is covered by `reviewed.mjs:27` (high/critical → reviewer + red-team) and forced red-team for code (reviewed.mjs:52-54). Gates would distort the pattern's intent by forcing splits on legitimate agreement. Next step: log per-panelist outcome agreement and provider family for 20+ runs.\n\n**panelist-3 — No (architectural boundary).** ADR 0047/0049 keep collaboration patterns minimal, pure, history-derived loops (runner.md:3050); stateful multi-round mechanics belong in Workflow DAGs (runner.md:1420) which already support `anonymizeInputs`/`blind`. `independentOf` (panel.mjs:65-71, 94-99) enforces provider independence, which is preferable to mechanical dissent; K2/K3 sensors exist as passive metrics (runner.md:1435, observe.md:61). Next step: package the four council gates into an opt-in `core/workflows/council.yaml` using `anonymizeInputs: true`.\n\n## Disagreement (kept visible)\n\nNo panelist dissents on the core question — the vote is 3-0 against the gate. The remaining disagreement is only about emphasis and sequencing, not the verdict:\n\n- panelist-1 emphasizes waiting for the pre-registered K2/K3 measurement thresholds before any build; panelist-3 is comfortable building the opt-in `council.yaml` workflow template now; panelist-2 proposes instrumentation before either.\n- panelist-1 flags a genuinely unmeasured gap: panel units without a producer (advisory/discussion units) get no red-team coverage — the only acknowledged hole in the \"enough\" argument.\n- On confidence-weighted tallies, panelist-1 notes observe.md:61 already computes agreement and `genuineSplit` (2/3 threshold), so item (4) of the council project needs no code change; the others do not contest this.\n\n## Recommendation\n\n**Do not add a mechanical dissent/agreement gate to `src/runner/execution/patterns/panel.mjs`.** Provider-distinct seats plus the reviewed pattern's red-team are sufficient for now, and the council features are deliverable as opt-in Workflow composition.\n\nEvidence:\n1. `panel.mjs:63-68, 94-97` — panelists and synthesizer are dispatched with `independentOf`, giving genuine provider-family independence rather than mechanically forced disagreement.\n2. `reviewed.mjs:24-29, 52-54` — `high`/`critical` rigor and `code` capability already add a `red-team` checker with `independentOf: ['producer']` (reviewed.mjs:302), supplying adversarial dissent where errors matter.\n3. `docs/specs/runner.md:1435` and `observe.md:61` — agreement/genuine-split is specified as a passive measurement with pre-registered K2/K3 revisit conditions; a gate now would pre-empt the data that should decide the question, and `runner.md:3050` (no new state) plus 1437-1439 (`anonymizeInputs`/`blind`, cross-examine step, `delphi.yaml`) show the composition path already exists.\n\nConcrete next step: after ~30 panel runs, run `fgos metrics discussions --by workflow` (panelist-1) and log per-panelist agreement with provider family (panelist-2); if K2/K3 trip, build the council gates as an opt-in `core/workflows/council.yaml` with `anonymizeInputs: true` (panelist-3) rather than modifying the pattern.\n\n</neutral-A>\n<neutral-B>\n# Position: do not add a mechanical dissent/agreement gate to `panel` now\n\nKeep measuring. Don't gate yet. The repo has already chosen to measure agreement first and has written down the conditions for revisiting that choice. Two of the four council mechanisms already exist in another form. Also, the premise that \"red-team already covers it\" is only partly true.\n\n## Strongest reasons\n\n1. **Measure-first is a settled decision, and it has revisit criteria.** Agreement is \"a passive measurement, not a workflow gate\". Zero valid votes counts as unmeasured, not as a genuine split. The K2, K3 and K5 conditions are the agreed trigger for revisiting (docs/specs/runner.md:1435). The `genuineSplit` metric (no group reaches 2/3) is already computed (docs/specs/observe.md:61). Adding a >70% gate now would skip the evidence step the project set for itself.\n2. **Mechanisms 3 and 4 already exist without changing the pattern.** An anonymized cross-examination step is documented as a Workflow step with `anonymizeInputs` (runner.md:1437). Blind panelists are available through `blind: true` (runner.md:1439). `panel.mjs` stays small and pure, which follows ADR 0047 (runner.md:3050).\n3. **Neither safeguard is guaranteed, so gating the text is premature.** `panel.mjs:63-68` and `:94-97` only *request* independence. The spec records a Codex-only panel that was \"not cross-provider independent review\" (runner.md:1404-1405). Red-team runs only inside `reviewed`, at high or critical rigor or for `code:*` work (reviewed.mjs:24-29, 52-54). Nothing in `panel.mjs:50-105` sends panel output through red-team. A dissent quota would push models to produce disagreement while the actual weakness, correlated providers, stays in place.\n\n## What would change my mind\n\n- K2 fires: at least 90% of the first 30 logged panel runs are unanimous.\n- K3 fires: a unanimous panel is later reversed by red-team or by a human within 14 days.\n\nIf either happens, I'd add a forced-counterfactual round that is opt-in per preset and triggered by the measured `agreement`. It would not be a default re-prompt.\n\n## Next step\n\nRun `fgos metrics discussions --by workflow` to count panel runs that carry valid `stanceOptions` stances. If the count is near zero, the sensor isn't collecting anything. In that case, pass `--stance-options` in the panel workflows first, so K2 and K3 can be checked before K5 expires.\n\n</neutral-B>",
+          "--model",
+          "opus",
+          "--permission-mode",
+          "acceptEdits"
+        ]
+      }
+    }
+  ],
+  "toolEventCount": 0,
+  "hookEventCount": 0,
+  "status": 0,
+  "model": "opus",
+  "attestation": {
+    "contract": "confinement-attestation.v1",
+    "dispatchId": "disp_1791271510551_ebe61e1f",
+    "phase": "completed",
+    "outcome": "enforced",
+    "permissionMode": "ask",
+    "requested": {
+      "mode": "required",
+      "policyId": "host-write-denied",
+      "policy": {
+        "contract": "confinement-policy.v1",
+        "controls": {
+          "hostWrite": "deny",
+          "hostRead": "allow",
+          "networkEgress": "allow",
+          "process": "host",
+          "home": "host",
+          "session": "shared",
+          "workspace": "shared"
+        },
+        "grants": [
+          {
+            "resource": "run-output",
+            "access": "write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "private-home",
+            "access": "read-write",
+            "scope": "dispatch"
+          },
+          {
+            "resource": "executor-credentials",
+            "access": "read",
+            "scope": "dispatch"
+          }
+        ]
+      }
+    },
+    "coverage": {
+      "control:hostWrite": "satisfied",
+      "control:hostRead": "satisfied",
+      "control:networkEgress": "satisfied",
+      "control:process": "satisfied",
+      "control:home": "satisfied",
+      "control:session": "satisfied",
+      "control:workspace": "satisfied",
+      "grant:run-output": "satisfied",
+      "grant:private-home": "satisfied",
+      "grant:executor-credentials": "unverified"
+    },
+    "effectiveControls": {},
+    "resources": [
+      {
+        "resource": "run-output",
+        "identity": "run-output:disp_1791271510551_ebe61e1f",
+        "hostTarget": "/home/vantt/projects/mdview/.fgos/assignments/asgn-claude-1791271510510/runs/01",
+        "executionTarget": {
+          "location": "host",
+          "path": "/home/vantt/projects/mdview/.fgos/assignments/asgn-claude-1791271510510/runs/01"
+        },
+        "delivery": "mount",
+        "collect": "artifact",
+        "access": "write",
+        "allocation": "existing"
+      },
+      {
+        "resource": "private-home",
+        "identity": "private-home:disp_1791271510551_ebe61e1f",
+        "hostTarget": "/tmp/fgos-confinement/disp_1791271510551_ebe61e1f/home",
+        "tempRoot": "/tmp/fgos-confinement",
+        "executionTarget": {
+          "location": "host",
+          "path": "/tmp/fgos-confinement/disp_1791271510551_ebe61e1f/home"
+        },
+        "delivery": "mount",
+        "collect": "none",
+        "access": "read-write",
+        "allocation": "temporary"
+      }
+    ],
+    "readiness": {},
+    "channels": [
+      {
+        "name": "filesystem",
+        "coverage": "unknown",
+        "detail": "observe-mode: unverified execution for policy host-write-denied"
+      },
+      {
+        "name": "inherited-fd",
+        "coverage": "unknown",
+        "detail": "observe-mode: unverified execution for policy host-write-denied"
+      },
+      {
+        "name": "stdio",
+        "coverage": "unknown",
+        "detail": "observe-mode: stdio unmanaged"
+      },
+      {
+        "name": "host-ipc",
+        "coverage": "out-of-scope",
+        "detail": "observe-mode: host IPC unmanaged"
+      },
+      {
+        "name": "network",
+        "coverage": "out-of-scope",
+        "detail": "observe-mode: network unmanaged"
+      }
+    ],
+    "receipt": null,
+    "backend": {
+      "id": "bwrap",
+      "type": "bwrap",
+      "version": "local-bwrap-v1",
+      "configDigest": "f0795e2d438d241d899ff10ae3b1ed7d57651abf141d31bdb6762fb4e814ec1d"
+    },
+    "grants": [
+      {
+        "resource": "run-output",
+        "access": "write",
+        "resolvedTarget": "/home/vantt/projects/mdview/.fgos/assignments/asgn-claude-1791271510510/runs/01"
+      },
+      {
+        "resource": "private-home",
+        "access": "read-write",
+        "resolvedTarget": "/tmp/fgos-confinement/disp_1791271510551_ebe61e1f/home"
+      },
+      {
+        "resource": "executor-credentials",
+        "access": "read",
+        "resolvedTarget": "executor-credentials"
+      }
+    ],
+    "mismatches": [],
+    "evidence": [
+      {
+        "kind": "structural-observation",
+        "ref": "dispatch:disp_1791271510551_ebe61e1f",
+        "freshness": "current"
+      },
+      {
+        "kind": "falsification-probe",
+        "ref": "local-bwrap-v1:pre-spawn",
+        "freshness": "current",
+        "fingerprint": {
+          "contract": "confinement-probe-fingerprint.v1",
+          "policyDigest": "7c4f5b9a0f2fdb77cc01382b8d26d8f7d9f0eae59af745854710b2efb11e3905",
+          "driverVersion": "local-bwrap-v1",
+          "backendConfigDigest": "f0795e2d438d241d899ff10ae3b1ed7d57651abf141d31bdb6762fb4e814ec1d",
+          "platformDigest": "e705aed3639153cc172d09041dd54432d554da45e8c2df687a851b6490a3ee50",
+          "proofProfile": "local-bwrap-v1"
+        }
+      }
+    ],
+    "cleanup": {
+      "status": "not-needed"
+    }
+  },
+  "limits": [
+    "Builtin plugins and admin-managed policy may remain; no complete hidden-instruction snapshot is asserted.",
+    "Citation correctness cannot be independently verified by a tool-disabled judge.",
+    "One question and one judge provide directional evidence only."
+  ],
+  "dispatchDecision": {
+    "contract": "fgos.v1",
+    "generated_at": "2026-10-06T07:25:10.489Z",
+    "data_hash": "764fc7ad001139fae526aeff54321ed391bb27157edce9ba419a8dc4ce292fe1",
+    "data": {
+      "mechanism": "out-of-process",
+      "configured": true,
+      "reasonCodes": [
+        "native-first.0033.cli-spawn-shaped"
+      ]
+    }
+  },
+  "dispatchArgv": [
+    "execute",
+    "claude",
+    "--cwd",
+    "/var/tmp/discussion-judge-lyVRkU",
+    "--repo-root",
+    "/home/vantt/projects/mdview",
+    "--model",
+    "opus",
+    "--tier",
+    "flagship",
+    "--prompt",
+    "[exact question, anchors and anonymous deliverables; hash retained]"
+  ],
+  "restoredConfig": true
+}

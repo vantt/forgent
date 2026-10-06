@@ -1,0 +1,413 @@
+{
+  "registry": {
+    "roleGraph": {
+      "roles": [
+        "implementer",
+        "researcher",
+        "reviewer",
+        "helper",
+        "advisor"
+      ],
+      "defaultRole": "implementer",
+      "callstackCap": 3,
+      "edges": {
+        "discovery": [
+          {
+            "from": "implementer",
+            "to": "researcher",
+            "reason": "consult",
+            "mode": "sync"
+          }
+        ],
+        "exploring": [
+          {
+            "from": "implementer",
+            "to": "advisor",
+            "reason": "advise",
+            "mode": "async"
+          },
+          {
+            "from": "implementer",
+            "to": "researcher",
+            "reason": "consult",
+            "mode": "sync"
+          }
+        ],
+        "planning": [
+          {
+            "from": "implementer",
+            "to": "researcher",
+            "reason": "consult",
+            "mode": "sync"
+          },
+          {
+            "from": "implementer",
+            "to": "advisor",
+            "reason": "advise",
+            "mode": "async"
+          },
+          {
+            "from": "implementer",
+            "to": "reviewer",
+            "reason": "review",
+            "mode": "async"
+          }
+        ],
+        "executing": [
+          {
+            "from": "implementer",
+            "to": "researcher",
+            "reason": "consult",
+            "mode": "sync"
+          },
+          {
+            "from": "implementer",
+            "to": "helper",
+            "reason": "assist",
+            "mode": "sync"
+          },
+          {
+            "from": "implementer",
+            "to": "reviewer",
+            "reason": "review",
+            "mode": "async"
+          },
+          {
+            "from": "implementer",
+            "to": "advisor",
+            "reason": "advise",
+            "mode": "async"
+          },
+          {
+            "from": "reviewer",
+            "to": "researcher",
+            "reason": "consult",
+            "mode": "sync"
+          },
+          {
+            "from": "reviewer",
+            "to": "advisor",
+            "reason": "advise",
+            "mode": "async"
+          }
+        ]
+      }
+    },
+    "worktreeBacked": true,
+    "statusLabels": {
+      "backlog": "backlog",
+      "todo": "todo",
+      "doing": "in-progress",
+      "blocked": "in-progress",
+      "awaiting-human": "in-progress",
+      "awaiting-approval": "review",
+      "wontfix": "canceled"
+    },
+    "parkReason": {
+      "blocked": "system-error",
+      "awaiting-human": "human-question",
+      "awaiting-approval": "natural-finish"
+    },
+    "classification": {
+      "kind": [
+        "bug",
+        "chore",
+        "design",
+        "docs",
+        "feature",
+        "task"
+      ],
+      "risk": [
+        "light",
+        "standard",
+        "heavy"
+      ]
+    },
+    "workerContract": ".agents/skills/_shared/coding-worker-contract.md",
+    "defaultWorkflow": "feature",
+    "workflowFor": {}
+  },
+  "workflows": {
+    "feature": {
+      "id": "coding/feature",
+      "title": "Feature implementation workflow for coding domain",
+      "steps": [
+        {
+          "id": "discovery",
+          "title": "Discovery",
+          "phase": "discover",
+          "skill": "fgos-coding-discovering",
+          "operations": [
+            {
+              "id": "judge-ambiguity",
+              "primary": true,
+              "taskSpec": "judge-ambiguity",
+              "role": "implementer",
+              "skills": [
+                "fgos-coding-discovering"
+              ]
+            },
+            {
+              "id": "resolve-question",
+              "taskSpec": "resolve-question",
+              "role": "researcher",
+              "reason": "consult",
+              "skills": [
+                "fgos-researching"
+              ]
+            }
+          ],
+          "units": [
+            {
+              "id": "judge-ambiguity",
+              "template": {
+                "capability": "coding:discover",
+                "pattern": "solo",
+                "taskSpec": "judge-ambiguity"
+              }
+            }
+          ]
+        },
+        {
+          "id": "exploring",
+          "title": "Exploring",
+          "phase": "discover",
+          "skill": "fgos-coding-exploring",
+          "dependsOn": [
+            "discovery"
+          ],
+          "operations": [
+            {
+              "id": "lock-decisions",
+              "primary": true,
+              "taskSpec": "lock-decisions",
+              "role": "implementer",
+              "skills": [
+                "fgos-coding-exploring"
+              ]
+            },
+            {
+              "id": "answer-question",
+              "taskSpec": "answer-question",
+              "role": "advisor",
+              "reason": "advise",
+              "dispatch": "human-only",
+              "skills": [
+                "fgos-coding-exploring"
+              ]
+            },
+            {
+              "id": "resolve-question",
+              "taskSpec": "resolve-question",
+              "role": "researcher",
+              "reason": "consult",
+              "skills": [
+                "fgos-researching"
+              ]
+            }
+          ],
+          "units": [
+            {
+              "id": "lock-decisions",
+              "template": {
+                "capability": "coding:explore",
+                "pattern": "solo",
+                "taskSpec": "lock-decisions"
+              }
+            }
+          ],
+          "gate": {
+            "kind": "human",
+            "question": "Lock decisions for this item?"
+          }
+        },
+        {
+          "id": "planning",
+          "title": "Planning",
+          "phase": "plan",
+          "skill": "fgos-coding-planning",
+          "dependsOn": [
+            "exploring"
+          ],
+          "operations": [
+            {
+              "id": "shape-plan",
+              "primary": true,
+              "taskSpec": "shape-plan",
+              "role": "implementer",
+              "skills": [
+                "fgos-coding-planning"
+              ]
+            },
+            {
+              "id": "validate-plan",
+              "taskSpec": "validate-plan",
+              "role": "reviewer",
+              "reason": "review",
+              "skills": [
+                "fgos-coding-validating"
+              ],
+              "policy": {
+                "rigor": "standard"
+              }
+            },
+            {
+              "id": "scout-blast-radius",
+              "taskSpec": "scout-blast-radius",
+              "role": "researcher",
+              "reason": "consult",
+              "skills": [
+                "fgos-researching"
+              ]
+            },
+            {
+              "id": "resolve-question",
+              "taskSpec": "resolve-question",
+              "role": "researcher",
+              "reason": "consult",
+              "skills": [
+                "fgos-researching"
+              ]
+            }
+          ],
+          "units": [
+            {
+              "id": "shape-plan",
+              "template": {
+                "capability": "coding:plan",
+                "pattern": "solo",
+                "taskSpec": "shape-plan"
+              }
+            },
+            {
+              "id": "validate-plan",
+              "template": {
+                "capability": "coding:validate",
+                "pattern": "reviewed",
+                "taskSpec": "validate-plan"
+              }
+            }
+          ]
+        },
+        {
+          "id": "executing",
+          "title": "Executing",
+          "phase": "execute",
+          "skill": "fgos-coding-implement",
+          "dependsOn": [
+            "planning"
+          ],
+          "operations": [
+            {
+              "id": "implement-item",
+              "primary": true,
+              "taskSpec": "implement-item",
+              "role": "implementer",
+              "skills": [
+                "fgos-coding-implement"
+              ]
+            },
+            {
+              "id": "review-item",
+              "taskSpec": "review-item",
+              "role": "reviewer",
+              "reason": "review",
+              "skills": [
+                "fgos-coding-validating"
+              ]
+            },
+            {
+              "id": "fix-verify-red",
+              "taskSpec": "fix-verify-red",
+              "role": "implementer",
+              "skills": [
+                "fgos-coding-implement"
+              ]
+            },
+            {
+              "id": "scoped-subtask",
+              "taskSpec": "scoped-subtask",
+              "role": "helper",
+              "reason": "assist",
+              "skills": [
+                "fgos-coding-implement"
+              ]
+            },
+            {
+              "id": "scout-blast-radius",
+              "taskSpec": "scout-blast-radius",
+              "role": "researcher",
+              "reason": "consult",
+              "skills": [
+                "fgos-researching"
+              ]
+            },
+            {
+              "id": "resolve-question",
+              "taskSpec": "resolve-question",
+              "role": "researcher",
+              "reason": "consult",
+              "skills": [
+                "fgos-researching"
+              ]
+            }
+          ],
+          "units": [
+            {
+              "id": "implement-item",
+              "template": {
+                "capability": "coding:implement",
+                "pattern": "reviewed",
+                "taskSpec": "implement-item"
+              }
+            }
+          ]
+        },
+        {
+          "id": "integrate",
+          "kind": "integrate",
+          "dependsOn": [
+            "executing"
+          ]
+        },
+        {
+          "id": "approval",
+          "dependsOn": [
+            "integrate"
+          ],
+          "gate": {
+            "kind": "human",
+            "question": "Approve delivery of this item?"
+          }
+        }
+      ],
+      "transitions": [
+        {
+          "from": "discovery",
+          "to": "exploring"
+        },
+        {
+          "from": "discovery",
+          "to": "planning"
+        },
+        {
+          "from": "exploring",
+          "to": "planning"
+        },
+        {
+          "from": "planning",
+          "to": "executing"
+        }
+      ],
+      "aliases": {
+        "decompose": "planning"
+      },
+      "statusSkills": {
+        "retrospective": {
+          "skill": "fgos-coding-knowledge",
+          "taskSpec": "compound-learn"
+        }
+      }
+    }
+  }
+}

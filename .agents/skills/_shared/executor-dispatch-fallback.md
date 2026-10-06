@@ -32,7 +32,7 @@ parameters where the consuming skill's own reasoning step lives:
 This is the dispatch component of a four-fragment shared awareness cluster
 (`docs/history/agent-coordination-foundation/plan.md`):
 [`capability-catalog.md`](./capability-catalog.md) defines the canonical vocabulary and promises;
-[`capability-matching.md`](./capability-matching.md) governs demand-fact derivation and serves-matching (Q1);
+[`capability-matching.md`](./capability-matching.md) governs understanding intent, writing Units, and invoking Workflow runner (Q1);
 [`planning-capability-awareness.md`](./planning-capability-awareness.md) guides plan decomposition and capability assignment;
 and this fragment governs execution-time decision and dispatch (Q2).
 None of these shared fragments is coding-specific.
@@ -63,7 +63,7 @@ calls in a row (e.g. a research pass running `WebSearch` repeatedly).
 node src/runner/dispatch.mjs decide <EXECUTOR_ID> [--has-live-task-access]
 # when you have no executor id, use the door that matches what you know:
 #   decide --for <PURPOSE>  [--has-live-task-access]
-#   decide --work <WORK_ID> [--stage <STAGE>] [--has-live-task-access]
+#   decide --work <WORK_ID> [--step <STEP>] [--has-live-task-access]
 #   decide --for <LABEL> --needs-soul [--has-live-task-access]
 ```
 
@@ -221,7 +221,7 @@ selection logic sits behind either yet — deciding them is a separate,
 later concern — but the slots exist now on purpose: `resolveExecutorCommand`
 already threads `model`/`tier` end-to-end (`src/runner/dispatch.mjs`), and
 leaving them out at this layer would nail every ad-hoc dispatch to
-`executor.model ?? modelForTier(cfg, work.tier)` — always the default
+`executor.model ?? resolveTierModel(cfg, work.tier)` — always the default
 backend — forcing every call site written against this shape to be
 revisited later just to add them.
 
@@ -306,7 +306,7 @@ required field means "do not dispatch, fall back to
 `<INLINE_FALLBACK_HEADING>` — Step C above): here, failing to reach a
 confident tier/provider judgment means dispatch ANYWAY, with the
 executor's own declared default (`executor.tier`/`executor.model`, or the
-computed `modelForTier` fallback) — an unresolved judgment is never a
+computed `resolveTierModel` fallback) — an unresolved judgment is never a
 reason to block a dispatch that would otherwise proceed.
 
 Record whichever tier/model actually gets used — judged or defaulted —

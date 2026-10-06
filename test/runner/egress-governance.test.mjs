@@ -17,7 +17,8 @@ test('declared egress: glm executor keeping command "claude" but setting ANTHROP
         },
       },
     },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
   };
 
   assert.throws(
@@ -44,7 +45,8 @@ test('declared egress: glm executor with ANTHROPIC_BASE_URL and allowCrossProvid
         },
       },
     },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
   };
 
   const res = resolveExecutorConfig(cfg, 'standard', 'glm');
@@ -75,7 +77,8 @@ test('declared egress: a crafted ANTHROPIC_BASE_URL merely CONTAINING "api.anthr
         },
       },
     },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
   };
 
   assert.throws(
@@ -101,7 +104,8 @@ test('declared egress: an unparseable ANTHROPIC_BASE_URL value fails closed (tre
         },
       },
     },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
   };
 
   assert.throws(
@@ -120,7 +124,8 @@ test('declared egress: native claude executor resolves same-provider governance 
         args: ['{prompt}'],
       },
     },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
   };
 
   const res = resolveExecutorConfig(cfg, 'standard', 'claude');
@@ -148,7 +153,8 @@ test('declared egress: non-Claude command (agy) with allowCrossProvider: true re
         carries: 'user-text',
       },
     },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
   };
 
   const res = resolveExecutorConfig(cfg, 'standard', 'agy', undefined, 'user-text');

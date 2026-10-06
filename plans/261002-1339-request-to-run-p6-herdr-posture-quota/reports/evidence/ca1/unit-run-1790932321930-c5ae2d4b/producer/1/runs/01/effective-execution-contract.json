@@ -1,0 +1,77 @@
+{
+  "contract": {
+    "id": "effective-execution-contract",
+    "version": 1
+  },
+  "assignmentId": "unit-run-1790932321930-c5ae2d4b/producer/1",
+  "runId": "run_unit-run-1790932321930-c5ae2d4b/producer/1_01",
+  "mutation": "mutating",
+  "workspace": {
+    "cwd": "/var/tmp/p6-accept-work",
+    "writeScope": [
+      "/var/tmp/p6-accept-work"
+    ],
+    "mainCheckout": "/home/vantt/projects/forgentX",
+    "posture": "worktree"
+  },
+  "tools": {
+    "shell": {
+      "mode": "worktree-write",
+      "enforced": false,
+      "enforcement": "instructed",
+      "allowedCommands": [
+        "git add",
+        "git commit"
+      ]
+    }
+  },
+  "permissions": {
+    "posture": "enforced",
+    "shell": {
+      "mode": "worktree-write",
+      "enforced": false,
+      "enforcement": "instructed",
+      "allowedCommands": [
+        "git add",
+        "git commit"
+      ]
+    },
+    "filesystem": {
+      "mode": "workspace-write",
+      "enforced": true,
+      "enforcement": "enforced",
+      "writeScope": [
+        "/var/tmp/p6-accept-work"
+      ]
+    },
+    "network": {
+      "enforced": false,
+      "enforcement": "instructed"
+    }
+  },
+  "limits": {
+    "executorTimeoutMs": 2100000
+  },
+  "resultClaim": {
+    "contract": {
+      "id": "agent-result-claim",
+      "version": 2
+    },
+    "path": "/home/vantt/projects/forgentX-p6/.fgos/assignments/unit-run-1790932321930-c5ae2d4b/producer/1/runs/01/outbox/result-1.json"
+  },
+  "provenance": {
+    "dispatchPlanHash": "sha256:a27c9c94670f54ace927eab7f75a53e1cf35acc720932c012aeccce639eeb2fa",
+    "configHash": "sha256:debed55c71317f7d9f80c0121a715c8809710b523888d8fd494f5960fc481603",
+    "executorId": "claude-herdr",
+    "adapter": "herdr-spawn",
+    "adapterFamily": "herdr-spawn"
+  },
+  "enforcementPosture": "enforced",
+  "permissionEnforcementPosture": "enforced",
+  "executorId": "claude-herdr",
+  "adapter": "herdr-spawn",
+  "adapterFamily": "herdr-spawn",
+  "assignment": {
+    "role": "producer"
+  }
+}

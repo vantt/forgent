@@ -1,0 +1,99 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "unit-summary.read.v1",
+  "title": "Execution-owned Unit Summary Read Contract v1",
+  "description": "Read only direct .fgos/assignments/unit-run-*/unit-summary.json files, at most 1 MiB each. Never recurse into unit directories or read results, workflow events, transcripts, protected data or outboxes. Skip symlink state roots and unit directories. Each real direct unit directory contributes once to summaryDirsSeen: an in-window observation, summariesMissing, summariesUnusable, or summariesOutsideWindow. Structural diagnostics are root-wide, not window-filtered: missing summaries can belong to active units and undated/unusable summaries cannot be assigned to a time window. summariesSkippedByReason partitions only summariesUnusable (unreadable, oversized, symlink, nonregular, invalid-json, invalid-contract, missing-timestamp, invalid-timestamp). Outside-window counts include only otherwise valid summaries with valid owner-owned RFC3339 settledAt. unitRunId must equal the directory name. Compare timestamp windows temporally in UTC milliseconds with inclusive bounds, never lexicographically; bounds accept RFC3339 or YYYY-MM-DD (UTC midnight), and invalid/reversed bounds are named errors. Emit source unit-summary, kind unit.settled, subject kind run with id unit-run:<unitRunId>. This distinct kind does not increase run.settled totals. Outcome, seat kind and final selection are owned by the Node writer using unit-run-history; Rust never derives or selects attempts.",
+  "type": "object",
+  "required": ["contract", "unitRunId", "workflow", "pattern", "capability", "outcome", "startedAt", "settledAt", "seats", "inline", "stanceOptions"],
+  "properties": {
+    "contract": {
+      "type": "object",
+      "required": ["id", "version"],
+      "properties": {"id": {"const": "unit-summary"}, "version": {"const": 1}}
+    },
+    "unitRunId": {"type": "string", "pattern": "^unit-run-.+"},
+    "workflow": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "required": ["runId", "stepId", "unitId"],
+          "properties": {
+            "runId": {"type": "string", "minLength": 1},
+            "stepId": {"type": "string", "minLength": 1},
+            "unitId": {"type": "string", "minLength": 1}
+          }
+        }
+      ]
+    },
+    "pattern": {"$ref": "#/definitions/nullableString"},
+    "capability": {"$ref": "#/definitions/nullableString"},
+    "outcome": {"type": "string", "minLength": 1, "description": "Opaque execution-owned unit outcome. pass counts as a passing unit; other values remain visible."},
+    "startedAt": {"$ref": "#/definitions/nullableString", "description": "Unit creation time, used only for duration; never a substitute for settlement."},
+    "settledAt": {"type": "string", "minLength": 1, "description": "Required owner settlement time; historical null timestamps are skipped, never creation-derived."},
+    "inline": {"type": "boolean"},
+    "stanceOptions": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "seats": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["role", "kind", "round", "final", "attempts"],
+        "properties": {
+          "role": {"type": "string", "minLength": 1},
+          "kind": {"type": "string", "pattern": "\\S", "description": "Execution-owned semantic seat kind, independent of its role label. Exactly panelist votes; synthesizer and every other kind do not vote. Missing or invalid kinds make the summary unusable."},
+          "round": {"type": "integer", "minimum": 1},
+          "final": {"allOf": [{"$ref": "#/definitions/attempt"}, {"type": "object", "required": ["stance"], "properties": {"stance": {"$ref": "#/definitions/stance"}}}]},
+          "attempts": {"type": "array", "items": {"$ref": "#/definitions/attempt"}}
+        }
+      }
+    }
+  },
+  "definitions": {
+    "nullableString": {"type": ["string", "null"], "minLength": 1},
+    "attempt": {
+      "type": "object",
+      "required": ["assignmentId", "runId", "executor", "provider", "persona", "model", "outcome", "fallbackFrom"],
+      "properties": {
+        "assignmentId": {"type": "string", "minLength": 1},
+        "runId": {"$ref": "#/definitions/nullableString", "description": "null only for an inline unit result, which is a seat but not a dispatch attempt in metrics totals."},
+        "executor": {"$ref": "#/definitions/nullableString"},
+        "provider": {"$ref": "#/definitions/nullableString"},
+        "persona": {"$ref": "#/definitions/nullableString"},
+        "model": {"$ref": "#/definitions/nullableString"},
+        "outcome": {"type": "string", "minLength": 1, "description": "Owner vocabulary: pass, findings, blocked, policy-refusal, provider-limit or execution-failure."},
+        "fallbackFrom": {"$ref": "#/definitions/fallback", "description": "Original execution-owner fallback provenance object, preserved unchanged; repeated/resumed runs without fallback provenance do not count as fallback seats."}
+      }
+    },
+    "fallback": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "required": ["executor", "reason"],
+          "properties": {
+            "executor": {"type": "string", "minLength": 1},
+            "reason": {"type": "string", "minLength": 1},
+            "invocation": {"$ref": "#/definitions/nullableString"},
+            "transport": {"$ref": "#/definitions/nullableString"}
+          }
+        }
+      ]
+    },
+    "stance": {
+      "description": "Tolerant writer extraction from the settled result agentClaim. No report or transcript scanning. Confidence is unweighted. Exactly seats with kind panelist vote, regardless of role label. With declared options and at least one valid vote, largest valid choice group divided by all final voting seats gives agreement; genuineSplit is largest*3 < seats*2. Missing/invalid remain explicit and in the denominator. No options, no voting seats or no valid votes is unmeasured with null agreement and genuineSplit.",
+      "oneOf": [
+        {"type": "object", "required": ["status"], "properties": {"status": {"const": "missing"}}},
+        {"type": "object", "required": ["status", "reason"], "properties": {"status": {"const": "invalid"}, "reason": {"type": "string", "minLength": 1}}},
+        {
+          "type": "object",
+          "required": ["status", "choice", "confidence"],
+          "properties": {
+            "status": {"const": "valid"},
+            "choice": {"type": "string", "minLength": 1, "description": "A declared option or other; an out-of-set choice is invalid, never a group."},
+            "confidence": {"type": ["number", "null"], "minimum": 0, "maximum": 1}
+          }
+        }
+      ]
+    }
+  }
+}

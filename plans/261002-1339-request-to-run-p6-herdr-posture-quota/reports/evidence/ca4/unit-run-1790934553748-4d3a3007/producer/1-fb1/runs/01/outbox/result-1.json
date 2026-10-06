@@ -1,0 +1,1 @@
+{"contract":{"id":"agent-result-claim","version":2},"status":"done","summary":"transport in bind.mjs L250-270 is either 'cli' (default) or 'herdr'.","evidenceRefs":["src/runner/execution/bind.mjs:257","src/runner/execution/bind.mjs:263","src/runner/execution/bind.mjs:266"]}

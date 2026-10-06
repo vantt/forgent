@@ -18,7 +18,7 @@ commit history, and only then moves the item to `awaiting-approval`
 (verify red moves it to `blocked` instead) — it never takes the caller's
 word for it, the same "proof, not assertion" discipline bee's
 cap-with-evidence rule enforces, just applied by the engine instead of a
-recorded trace field. When a `verifiedSha` was captured from an out-of-process Implement step in the SAME drive, pass `--worker-verified-sha <sha>`; when Implement was `unavailable`/`in-process` (no worker, this session verified for real itself, or `dispatch.mjs execute` was never called this drive), call `fgos return <id>` bare with no flag.
+recorded trace field. When a `verifiedSha` was captured from an out-of-process Implement step in the SAME drive AND the branch tip still is that sha (the worker committed itself), pass `--worker-verified-sha <sha>`; after you committed the worker's edits yourself the tip moved past it, so call bare; when Implement was `unavailable`/`in-process` (no worker, this session verified for real itself, or `dispatch.mjs execute` was never called this drive), call `fgos return <id>` bare with no flag.
 
 ## The engine-fired review handoff
 

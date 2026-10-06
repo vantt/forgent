@@ -1,0 +1,20 @@
+[
+  {
+    "harness": "fgos-solo",
+    "status": 0,
+    "ids": [
+      "observe-solo-opus-261005",
+      "observe-independent-solo-261006"
+    ],
+    "invalid": []
+  },
+  {
+    "harness": "fgos-panel",
+    "status": 0,
+    "ids": [
+      "observe-panel-261005",
+      "observe-independent-panel-261006"
+    ],
+    "invalid": []
+  }
+]

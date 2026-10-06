@@ -29,18 +29,20 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { withEventsLock, appendEventLocked } from './events.mjs';
-import { viewRevision, serializeView, readAllEventsFromDir, rebuildViewFromDir, buildSnapshotFromDir } from './replay.mjs';
+import { viewRevision, serializeView, readAllEventsFromDir, rebuildViewFromDir, buildSnapshotFromDir, VIEW_SCHEMA_VERSION } from './replay.mjs';
 import { graphMetrics as computeGraphMetrics, whatIf as computeWhatIf, classifyStaleDoing, classifyStalePostDelivery, footprintOverlapAmong, goalScopedCriticalPath, goalScopedGreedyTopUnblock, computeSchedule, detectCycles } from './graph-metrics.mjs';
 import { transitionWork, FsmError } from './status-fsm.mjs';
-import { transitionStage } from './stage-fsm.mjs';
+import { transitionStep } from './step-fsm.mjs';
 import { validateWork, validateDomainFields, checkAcceptanceEvidenceTraceable, WorkValidationError, DEFAULTS, GOAL_TIERS, truncateTitle } from './work.mjs';
-import { getDomain, statusCategoryFor, parkReasonForStatus, roleGraphFor, effectiveStage } from './workflow-stage-graphs.mjs';
+import { getDomain, statusCategoryFor, parkReasonForStatus, roleGraphFor, effectiveStep, stepForPhase } from './domain-registry.mjs';
 import { evaluateHandoff } from './handoff.mjs';
 import { EventLogError } from './events.mjs';
 import { frontier, frontierAcrossSteps, isDepsAndLineageReady as depsAndLineageReadyView } from './frontier.mjs';
 import { assertNoCycle, assertNoUnifiedCycle } from './dep-graph.mjs';
 import { resolveWriterIdentity } from '../util/session-identity.mjs';
 import { KnowledgeValidationError, applyKnowledgeEvent } from './knowledge-registry.mjs';
+import { resolveFriction, recordFriction } from '../observe/friction-client.mjs';
+export { recordFriction, resolveFriction };
 import { resolveFgosFile, FGOS_FILE } from './fgos-file-registry.mjs';
 import { readClaim, readClaims, releaseClaim, withClaimsLock, buildEffectiveView, getItemDurableRevision } from './runtime-coordination.mjs';
 
@@ -178,7 +180,7 @@ function writeView(viewPath, view, snapshot) {
   // view.
   const { viewStr, revision } = serializeView(view);
   const snapshotPart = snapshot !== undefined ? `,"snapshot":${JSON.stringify(snapshot)}` : '';
-  const persistedContent = `${viewStr.slice(0, -1)},"revision":${JSON.stringify(revision)}${snapshotPart}}\n`;
+  const persistedContent = `${viewStr.slice(0, -1)},"revision":${JSON.stringify(revision)},"viewSchemaVersion":${VIEW_SCHEMA_VERSION}${snapshotPart}}\n`;
   // tsk-4mx: write to a uniquely-named temp file, then rename(2) it onto
   // viewPath -- an atomic replace on POSIX, so a reader can never observe a
   // truncated/partial state.json, same pattern as main-checkout-lock.mjs's
@@ -272,7 +274,7 @@ export function addWork(dir, work) {
     // truncated title is what the appended event carries, and every caller
     // reaching this door (submit and add in bin/fgos.mjs, decompose's children,
     // the runner loop) obeys one rule without any of them repeating it.
-    const item = { ...work, tier: work?.tier ?? DEFAULTS.tier, title: truncateTitle(work?.title) };
+    const item = { ...work, size: work?.size ?? DEFAULTS.size, title: truncateTitle(work?.title) };
     validateWork(item, Object.keys(before.work));
     // domainFields fieldSchema (decision record 0027, D6): a separate,
     // narrower check than validateWork's own domainFields shape rule above
@@ -285,8 +287,8 @@ export function addWork(dir, work) {
     // validateWork above confirms `item.domain` is either absent or a real
     // DOMAINS key — deliberately not folded into the tier/title normalize
     // step above it, because `getDomain` falls back to DEFAULT_DOMAIN with
-    // a `console.warn` for a genuinely unrecognized domain (workflow-stage-
-    // graphs.mjs's `resolveDomainName`), and an invalid `item.domain` must
+    // a `console.warn` for a genuinely unrecognized domain (domain-registry.mjs's
+    // `resolveDomainName`), and an invalid `item.domain` must
     // still fail validation with exactly the same single stderr line as
     // before this cell existed (test/cli/fgos.test.mjs's `submit --domain
     // <bad>` stderr-parity assertion) — never a stray "folding to coding"
@@ -307,8 +309,8 @@ export function addWork(dir, work) {
     }
     // tsk-48i D1: same write-time-stamp shape as statusCategory above, for
     // the domain-owned parkReason table (parkReasonForStatus,
-    // workflow-stage-graphs.mjs) -- lets a domain-agnostic reader (e.g.
-    // herdr-plugin) tell "actively worked" apart from "parked on a person"
+    // domain-registry.mjs) -- lets a domain-agnostic reader (e.g.
+    // herdr-dashboard) tell "actively worked" apart from "parked on a person"
     // or "parked on a system error" without learning the domain's own
     // literal status strings.
     const addParkReason = parkReasonForStatus(getDomain(item.domain), item.status);
@@ -343,18 +345,18 @@ export function addWork(dir, work) {
   });
 }
 
-// D4/D5: the exact field set `edit` may patch. `id`, `status`, `stage`, and
+// D4/D5: the exact field set `edit` may patch. `id`, `status`, `workflowStep`, and
 // `domain` are deliberately absent — each already has its own dedicated
-// write path (identity is immutable; `status` is `move`'s; `stage` is
-// `moveStage`'s) and mixing them into `edit` would open a second door onto
+// write path (identity is immutable; `status` is `move`'s; `workflowStep` is
+// `moveStep`'s) and mixing them into `edit` would open a second door onto
 // the same field.
-const EDITABLE_FIELDS = new Set(['title', 'description', 'kind', 'risk', 'verify', 'tier', 'refs', 'deps', 'acceptance', 'priority', 'intent', 'docsRef', 'parent', 'urgent', 'impact', 'effort', 'footprint', 'action', 'mergeAfter', 'supersededBy', 'duplicates', 'domainFields', 'goalTier', 'nextOperation', 'secondaryOperation']);
+const EDITABLE_FIELDS = new Set(['title', 'description', 'kind', 'risk', 'verify', 'size', 'rigor', 'refs', 'deps', 'acceptance', 'priority', 'intent', 'docsRef', 'parent', 'urgent', 'impact', 'effort', 'footprint', 'action', 'mergeAfter', 'supersededBy', 'duplicates', 'domainFields', 'goalTier', 'nextOperation', 'secondaryOperation', 'workflowRunId']);
 
 /**
  * Patch fields on an existing work item, through the SAME single write door
  * as `addWork`/`moveWork` (per D3). Unlike `addWork` (a full new record),
  * `patch` is a PARTIAL set of fields — only the D4 allowlist above may
- * appear in it; anything else (including a stray `id`/`status`/`stage`/
+ * appear in it; anything else (including a stray `id`/`status`/`workflowStep`/
  * `domain`) is rejected as `validation` before the merge even happens, so an
  * over-broad patch never silently no-ops instead of failing loud. The merged
  * candidate is validated by the SAME `validateWork` entry point `addWork`
@@ -365,7 +367,7 @@ const EDITABLE_FIELDS = new Set(['title', 'description', 'kind', 'risk', 'verify
 // Same held-lock critical section as addWork above (existence + validation
 // check through the append, one withEventsLock/appendEventLocked scope): two
 // processes racing editWork on the same id, or racing editWork against
-// addWork/moveWork/moveStage on ids that would collide (e.g. a deps/parent
+// addWork/moveWork/moveStep on ids that would collide (e.g. a deps/parent
 // cycle only the second writer's patch creates), can no longer both read a
 // precondition that the other's not-yet-visible write is about to invalidate.
 function validateWorkPatch(view, dir, id, patch, role, writer) {
@@ -388,7 +390,7 @@ function validateWorkPatch(view, dir, id, patch, role, writer) {
     throw new StoreError(
       'validation',
       `edit cannot change "kind" on work "${id}" -- status is "${work.status}", not "todo". `
-      + `kind selects the item's workflow/stage graph; it can only change while status is still todo, `
+      + `kind selects the item's Workflow; it can only change while status is still todo, `
       + `before a claim lets the item start walking that graph.`,
     );
   }
@@ -477,11 +479,7 @@ function composeLearning(view, id, closingSettlement) {
     ? { disposition: actual.outcome ?? null, attempts: actual.attempts ?? null, errorClass: actual.errorClass ?? null }
     : null;
 
-  const frictions = {};
-  for (const record of view.frictions?.[id] ?? []) {
-    const layer = record.layer ?? 'unknown';
-    frictions[layer] = (frictions[layer] ?? 0) + 1;
-  }
+  // F5: learning friction removed per Observe migration
 
   const settlementRecords = [...(view.settlements?.[id] ?? []), closingSettlement];
   const settlements = {};
@@ -490,7 +488,7 @@ function composeLearning(view, id, closingSettlement) {
     settlements[key] = (settlements[key] ?? 0) + 1;
   }
 
-  return { outcome, frictions, settlements };
+  return { outcome, settlements };
 }
 
 /**
@@ -672,7 +670,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   }
   // tsk-48i D1: same write-time-stamp shape as statusCategory above, for
   // the domain-owned parkReason table (parkReasonForStatus,
-  // workflow-stage-graphs.mjs).
+  // domain-registry.mjs).
   const parkReason = parkReasonForStatus(getDomain(work.domain), to);
   if (parkReason !== undefined) {
     rawEvent.payload.parkReason = parkReason;
@@ -884,6 +882,19 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
   }
   return appendEventLocked(resolveWriterLogPath(dir), rawEvent, dir); // captures the real seq; rawEvent itself has none
   });
+  if (answer) {
+    try {
+      resolveFriction(dir, { id, reason: 'answer', by: 'work' });
+    } catch {}
+  } else if (result.event.payload.to === 'done') {
+    try {
+      resolveFriction(dir, { id, reason: 'done', by: 'work' });
+    } catch {}
+  } else if (result.event.payload.to === 'wontfix') {
+    try {
+      resolveFriction(dir, { id, reason: 'wontfix', by: 'work' });
+    } catch {}
+  }
   // tsk-2t9c D16: `delivered` is a terminal state for the role/holder axis
   // -- no stage skill ever re-enters an item past this point (every wired
   // reclaim lives at a stage-skill's own entry point), so an async call
@@ -955,8 +966,7 @@ export function moveWork(dir, { id, to, expectedStatus, reason, ask, answer, rol
 /**
  * tsk-1ht: `getItemDurableRevision` hashes ONLY `view.work[id]` — never
  * `view.decisions`/`decisionsById`, `view.gates`, `view.discovery`,
- * `view.outcomes`, `view.frictions`, or `view.callThreads` (all separate,
- * side-log-only structures per `replay.mjs`'s fold switch). An event whose
+ * `view.outcomes`, or `view.callThreads` (all separate,
  * type folds into one of those side logs can NEVER cause a revision drift,
  * no matter who wrote it or whether it carries a writer stamp at all — a
  * confirmed live case: `fgos decision`/`fgos gate-approve` (routinely
@@ -1426,37 +1436,52 @@ export function answerAwaiting(dir, { id, answer, expectedStatus, role, rational
 }
 
 /**
- * Move a work item to a new stage (per stage-clarify D1/D10/D12). Mirrors
- * `moveWork` exactly, one dimension up: looks the item up fresh from the
- * log, delegates the precondition/CAS decision to stage-fsm.mjs (pure — never
- * writes), and only then appends the event it returns.
+ * Move a work item to a new Workflow step. Mirrors `moveWork` exactly, one
+ * dimension up: looks the item up fresh from the log, delegates the
+ * precondition/CAS decision to step-fsm.mjs (pure — never writes), and only
+ * then appends the event it returns.
  *
  * Same held-lock critical section as moveWork above — the lookup, the
- * `expectedStage` CAS decision, and the append all run inside one
+ * `expectedStep` CAS decision, and the append all run inside one
  * `withEventsLock`/`appendEventLocked` scope.
  */
-export function moveStage(dir, { id, to, expectedStage, verify, role } = {}) {
+export function moveStep(dir, { id, to, expectedStep, verify, role } = {}) {
   const { logPath } = paths(dir);
-  return withEventsLockAndRefresh(dir, logPath, () => {
+  let shouldResolveClarify = false;
+  const result = withEventsLockAndRefresh(dir, logPath, () => {
     const before = currentView(dir);
     const work = before.work[id];
     if (!work) {
       throw new StoreError('validation', `work "${id}" not found.`);
     }
 
-    const rawEvent = transitionStage({ work, to, expectedStage, verify }); // FsmError: precondition | conflict
-    // Same post-transition role stamp as moveWork above — stage-fsm.mjs is pure
+    const drivingVerdict = before.discovery?.[id]?.at(-1);
+    const discoverEntry = stepForPhase(getDomain(work.domain, { onUnrecognized: () => {} }), 'discover', work.kind);
+    if (discoverEntry !== undefined && effectiveStep(work, getDomain(work.domain, { onUnrecognized: () => {} })) === discoverEntry && drivingVerdict?.clear !== false) {
+      shouldResolveClarify = true;
+    }
+
+    const rawEvent = transitionStep({ work, to, expectedStep, verify }); // FsmError: precondition | conflict
+    // Same post-transition role stamp as moveWork above — step-fsm.mjs is pure
     // and only ever returns the fields it knows about.
     if (role !== undefined) {
       rawEvent.payload.role = role;
     }
     // Writer provenance (D8/D15/D17/D18, str46-io-contract) -- same
     // post-transition stamp as role above, but unconditional: every
-    // moveStage call records who wrote it, never blocking on a malformed
+    // moveStep call records who wrote it, never blocking on a malformed
     // identity (D18).
     rawEvent.payload.writer = resolveWriterIdentity(dir);
     return appendEventLocked(resolveWriterLogPath(dir), rawEvent, dir);
   });
+
+  if (shouldResolveClarify) {
+    try {
+      resolveFriction(dir, { id, reason: 'clarify-pass', by: 'work' });
+    } catch {}
+  }
+
+  return result;
 }
 
 /**
@@ -1527,18 +1552,17 @@ export function recordCall(dir, { id, toRole, reason, note, outcome, openSyncDep
     const domain = getDomain(work.domain);
     const roleGraph = roleGraphFor(domain);
     const fromRole = work.holder ?? roleGraph?.defaultRole;
-    // effectiveStage, not raw work.stage (tsk-2t9c bugfix, found in
-    // self-review): a work item's `stage` is legitimately absent under
-    // D8's lazy-default rule (workflow-stage-graphs.mjs's own
-    // effectiveStage/stage-fsm.mjs precedent) -- reading work.stage
+    // effectiveStep, not raw work.workflowStep: a work item's step is
+    // legitimately absent under the lazy-default rule (domain-registry.mjs's own
+    // effectiveStep/step-fsm.mjs precedent) -- reading work.workflowStep
     // directly here made every handoff attempt on an item that never had
-    // an explicit moveStage refuse with "stage: undefined", including
-    // split children born straight at 'executing' without ever calling
-    // moveStage (src/intake/plan.mjs's normalizeChild path).
-    const stage = effectiveStage(work, domain);
+    // an explicit moveStep refuse, including split children born straight at
+    // their execute step without ever calling moveStep (src/intake/plan.mjs's
+    // normalizeChild path).
+    const step = effectiveStep(work, domain);
     const openCallDepth = openCallStack(before.callThreads?.[id]).length;
 
-    const result = evaluateHandoff({ domain, stage, fromRole, toRole, reason, openCallDepth, openSyncDepth });
+    const result = evaluateHandoff({ domain, step, fromRole, toRole, reason, openCallDepth, openSyncDepth });
     if (!result.ok) {
       throw new StoreError(
         'validation',
@@ -1592,9 +1616,9 @@ export function recordCallReturn(dir, { id, note } = {}) {
 }
 
 /**
- * Log a context-discovery verdict event (per stage-clarify D3/D6). Mirrors
- * `addFriction` exactly: no FSM/work validation beyond requiring the `id`
- * the fold appends by; each verdict is its own occurrence (pass or not) —
+ * Log a context-discovery verdict event (per stage-clarify D3/D6): no FSM/work
+ * validation beyond requiring the `id` the fold appends by; each verdict is its
+ * own occurrence (pass or not) — the fold APPENDS per id, a later record never
  * the fold APPENDS per id, a later record never erases an earlier one. Same
  * single write door + append-then-refresh tail as every mutation here.
  */
@@ -1763,7 +1787,7 @@ export function parseDecisionRelation(raw) {
 // (pattern/decision/failure). Exactly the four Diataxis quadrants — no
 // audience/type beyond these four is valid when the field is present at
 // all; absent/null stays untagged (never required). Defined once here and
-// shared by `addOutcome`/`addFriction` below.
+// shared by `addOutcome` below.
 const DIATAXIS_DOC_TYPES = new Set(['tutorial', 'how-to', 'reference', 'explanation']);
 
 // Shared optional-shape check for `payload.docType` (mirrors the `docsRef`
@@ -1773,7 +1797,7 @@ const DIATAXIS_DOC_TYPES = new Set(['tutorial', 'how-to', 'reference', 'explanat
 // P1 fix) so a caller — `bin/fgos.mjs`'s `compound --doc-type` — can
 // pre-validate a quadrant BEFORE any write, reusing this single
 // `DIATAXIS_DOC_TYPES` set rather than duplicating the enum at the CLI
-// layer. `addOutcome`/`addFriction` below still call it too, so validation
+// layer. `addOutcome` below still calls it too, so validation
 // stays identical whichever door the payload comes through.
 export function assertValidDocType(payload) {
   if (payload.docType === undefined || payload.docType === null) {
@@ -1805,25 +1829,6 @@ export function addOutcome(dir, payload) {
   }
   assertValidDocType(payload);
   return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(resolveWriterLogPath(dir), { type: 'work.outcome', payload }, dir));
-}
-
-/**
- * Log a work-friction event — the friction channel of the 2-channel capture
- * (per Phase 3 plan Slice 2 / lifecycle-vision §8): the runner writes one at
- * the park/halt choke-point, self-attributed to a failure layer. Unlike
- * `work.outcome` (two halves MERGED by id), frictions are occurrences — the
- * fold APPENDS per id, a later record never erases an earlier one. Same
- * single write door + append-then-refresh tail as every mutation here.
- * `payload.docType` is the same OPTIONAL Diataxis tag as `addOutcome` above
- * (D5/D6) — same shape check, same raw-append-for-fold-survival contract.
- */
-export function addFriction(dir, payload) {
-  const { logPath } = paths(dir);
-  if (!payload || typeof payload.id !== 'string' || !payload.id.trim()) {
-    throw new StoreError('validation', 'friction requires a non-empty "id".');
-  }
-  assertValidDocType(payload);
-  return withEventsLockAndRefresh(dir, logPath, () => appendEventLocked(resolveWriterLogPath(dir), { type: 'work.friction', payload }, dir));
 }
 
 /**
@@ -1874,19 +1879,18 @@ export function listWork(dir) {
  * so `frontier` on it returns `[]` — never an error, exit 0, exactly like
  * `listWork` on an uninitialized dir. A corrupt log throws the same
  * `EventLogError('corrupt-log')` `rebuildView`/`listWork` already throw.
- * `step` (tsk-4so, optional): which domain step counts as "ready to start"
- * — passed straight through to `frontier`'s own `step` option
- * (`'Clarify'`/`'Divide'`/`'Execute'`); omitted, `frontier`'s own default
- * (`'Execute'`) applies, byte-identical to every pre-existing caller.
+ * `phase` (optional): which Workflow phase counts as "ready to start" — passed
+ * straight through to `frontier`'s own `phase` option (`'clarify'`/`'plan'`/
+ * `'execute'`); omitted, `frontier`'s own default (`'execute'`) applies.
  */
-export function readyWork(dir, { step } = {}) {
-  return frontier(currentEffectiveView(dir), step ? { step } : undefined);
+export function readyWork(dir, { phase } = {}) {
+  return frontier(currentEffectiveView(dir), phase ? { phase } : undefined);
 }
 
 /**
  * Read-only stage-independent readiness check (choke-point-take-vs-pick-
  * claim-eligibility): true when `id` has every dep done and no open
- * decomposed child, regardless of its `stage` — see frontier.mjs's
+ * decomposed child, regardless of its `workflowStep` — see frontier.mjs's
  * `isDepsAndLineageReady` for the full rationale. `take`'s explicit `--id`
  * branch uses this instead of `readyWork` so it can claim a clarify/decompose
  * item without losing the deps/lineage guard.

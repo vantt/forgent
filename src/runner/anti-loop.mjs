@@ -44,7 +44,7 @@ export const MAX_VISITS = 3;
  * `work.add` and any later `work.stage` moves) — the two fields
  * frontier.mjs's own eligibility check reads, nothing else. A missing stage
  * reads as the domain's Execute stage (D8 lazy default), same as
- * frontier.mjs and stage-fsm.mjs.
+ * frontier.mjs and step-fsm.mjs.
  */
 function countableDoingMoveIndexes(events, id) {
   const indexes = new Set();

@@ -125,6 +125,80 @@ function collectSourceFiles(baseDir, relativePath, results) {
 }
 
 /**
+ * Finds the installed directory of every production dependency (and of their own dependencies),
+ * so the staged legacy-node payload can load them without a checkout around it.
+ *
+ * A dependency that is not installed is a build error, never a silently thinner payload: the
+ * released CLI would then fail at the first verb that imports it. Two different installed copies
+ * of one name are refused too, since the staged tree keeps one flat copy per name.
+ *
+ * @returns {Map<string, string>} package name to its real directory
+ */
+export function resolveProductionDependencies(repoRoot, pkg) {
+  const resolvedRepo = fs.realpathSync(repoRoot);
+  const found = new Map();
+  const queue = Object.keys(pkg.dependencies ?? {}).map((name) => ({ name, from: resolvedRepo }));
+  while (queue.length > 0) {
+    const { name, from } = queue.shift();
+    let dir = null;
+    for (let at = from; ; at = path.dirname(at)) {
+      const candidate = path.join(at, 'node_modules', name);
+      if (fs.existsSync(path.join(candidate, 'package.json'))) {
+        dir = fs.realpathSync(candidate);
+        break;
+      }
+      if (at === resolvedRepo || at === path.dirname(at)) break;
+    }
+    if (!dir) {
+      throw new Error(`Production dependency "${name}" is not installed; run "npm ci" before building the release tree`);
+    }
+    if (!dir.startsWith(resolvedRepo + path.sep)) {
+      throw new Error(`Production dependency "${name}" resolves outside the checkout: ${dir}`);
+    }
+    if (found.has(name)) {
+      if (found.get(name) !== dir) {
+        throw new Error(`Production dependency "${name}" is installed in two places; the staged tree keeps one copy per name`);
+      }
+      continue;
+    }
+    found.set(name, dir);
+    const own = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf8'));
+    for (const child of Object.keys(own.dependencies ?? {})) {
+      queue.push({ name: child, from: dir });
+    }
+  }
+  return found;
+}
+
+/**
+ * Copies every production dependency into <legacyNodeRoot>/node_modules/<name>/, files only,
+ * refusing symlinks like the rest of the payload.
+ */
+function stageProductionDependencies(repoRoot, pkg, legacyNodeRoot) {
+  const copyTree = (srcDir, dstDir) => {
+    fs.mkdirSync(dstDir, { recursive: true });
+    for (const ent of fs.readdirSync(srcDir).sort()) {
+      if (ent === 'node_modules' || ent === '.bin') continue;
+      const src = path.join(srcDir, ent);
+      const dst = path.join(dstDir, ent);
+      const stat = fs.lstatSync(src);
+      if (stat.isSymbolicLink()) {
+        throw new Error(`Symlink refused in release payload dependency: ${src}`);
+      }
+      if (stat.isDirectory()) {
+        copyTree(src, dst);
+      } else if (stat.isFile()) {
+        fs.copyFileSync(src, dst);
+        fs.chmodSync(dst, stat.mode & 0o111 ? 0o755 : 0o644);
+      }
+    }
+  };
+  for (const [name, dir] of resolveProductionDependencies(repoRoot, pkg)) {
+    copyTree(dir, path.join(legacyNodeRoot, 'node_modules', ...name.split('/')));
+  }
+}
+
+/**
  * Stages the release tree into outDir.
  */
 export function buildRustDistribution({
@@ -217,6 +291,11 @@ export function buildRustDistribution({
       fs.chmodSync(dstFull, 0o644);
     }
   }
+
+  // 3b. The payload's production dependencies. The source copy above skips node_modules on
+  // purpose (the checkout's tree holds dev tooling too); without this the staged CLI cannot
+  // import them and every verb that does (workflow, setup registrations) fails after install.
+  stageProductionDependencies(resolvedRepo, pkg, legacyNodeRoot);
 
   // 4. Build files[] descriptor array over the staged tree
   const stagedFiles = [];

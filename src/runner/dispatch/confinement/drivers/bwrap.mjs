@@ -11,8 +11,8 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { cleanupConfinementResource, writeOwnershipMarker } from '../cleanup.mjs';
-import { resolveConfinementResources } from '../resources.mjs';
+import { cleanupConfinementResource, writeOwnershipMarker, ensurePrivateDir, markResourceRetained } from '../cleanup.mjs';
+import { resolveConfinementResources, isInsideRoot, requestIsBlind } from '../resources.mjs';
 import { assertAttestationStoreIsolated } from '../attestation-store.mjs';
 
 export const BWRAP_DRIVER_TYPE = 'bwrap';
@@ -25,27 +25,74 @@ function expandCredentialHome(home) {
     .replace(/^~(?=\/|$)/, process.env.HOME || '');
 }
 
+function credentialError(message) {
+  const err = new Error(message);
+  err.code = 'credential-provisioning';
+  return err;
+}
+
+/**
+ * Copies an explicit allow-list of files from an account's real home into the
+ * private home, at the same relative paths. Nothing outside the list is
+ * copied and the real home is never mounted. Fails closed: a missing, escaping
+ * or non-regular entry aborts before the worker is spawned.
+ */
+function copyHomeFiles(privateHomeTarget, sourceHome, files) {
+  let realHome;
+  try {
+    realHome = fs.realpathSync(sourceHome);
+  } catch (err) {
+    throw credentialError(`selected credential home is not readable: ${err.message}`);
+  }
+  for (const rel of files) {
+    if (typeof rel !== 'string' || !rel.trim() || path.isAbsolute(rel) || rel.split(/[\\/]/).includes('..')) {
+      throw credentialError(`credential file ${JSON.stringify(rel)} must be a relative path without "..".`);
+    }
+    let realSource;
+    try {
+      realSource = fs.realpathSync(path.join(realHome, rel));
+    } catch {
+      throw credentialError(`selected credential file "${rel}" is missing`);
+    }
+    if (!realSource.startsWith(realHome + path.sep) || !fs.statSync(realSource).isFile()) {
+      throw credentialError(`selected credential file "${rel}" is not a regular file inside the credential home`);
+    }
+    const destination = path.join(privateHomeTarget, rel);
+    try {
+      ensurePrivateDir(path.dirname(destination), { root: privateHomeTarget });
+      fs.copyFileSync(realSource, destination);
+      // Credentials stay owner-only; a listed helper binary keeps its exec bit.
+      fs.chmodSync(destination, fs.statSync(realSource).mode & 0o100 ? 0o700 : 0o600);
+    } catch (copyErr) {
+      throw credentialError(`selected credential file "${rel}" could not be copied: ${copyErr.message}`);
+    }
+  }
+}
+
 function provisionSelectedCodexCredential(privateHomeTarget, request) {
   const source = request?.providerCapacity?.credentialSource;
   if (!source) return false;
-  if (source.kind !== 'codex-home') {
-    const err = new Error(`unsupported provider credential source kind "${source.kind}"`);
-    err.code = 'credential-provisioning';
-    throw err;
-  }
   const home = expandCredentialHome(source.home);
+  if (source.kind === 'home-files') {
+    if (!home || !path.isAbsolute(home) || !Array.isArray(source.files) || source.files.length === 0) {
+      throw credentialError('selected home-files credential needs an absolute "home" and a non-empty "files" list');
+    }
+    copyHomeFiles(privateHomeTarget, home, source.files);
+    return true;
+  }
+  if (source.kind !== 'codex-home') {
+    throw credentialError(`unsupported provider credential source kind "${source.kind}"`);
+  }
   const authCandidate = home ? path.join(home, 'auth.json') : null;
   if (!authCandidate || !fs.existsSync(authCandidate)) {
-    const err = new Error('selected Codex credential auth.json is missing');
-    err.code = 'credential-provisioning';
-    throw err;
+    throw credentialError('selected Codex credential auth.json is missing');
   }
   try {
-    fs.copyFileSync(authCandidate, path.join(privateHomeTarget, 'auth.json'));
+    const authCopy = path.join(privateHomeTarget, 'auth.json');
+    fs.copyFileSync(authCandidate, authCopy);
+    fs.chmodSync(authCopy, 0o600);
   } catch (copyErr) {
-    const err = new Error(`selected Codex credential auth.json could not be copied: ${copyErr.message}`);
-    err.code = 'credential-provisioning';
-    throw err;
+    throw credentialError(`selected Codex credential auth.json could not be copied: ${copyErr.message}`);
   }
   return true;
 }
@@ -98,6 +145,62 @@ export function validateBwrapConfig(config, label = 'bwrap backend config') {
 }
 
 /**
+ * The one invocation override this driver accepts: `hostRead: blind` and nothing else.
+ */
+function isBlindOnlyOverride(override) {
+  const keys = Object.keys(override || {});
+  if (keys.length !== 1 || keys[0] !== 'controls') return false;
+  const controlKeys = Object.keys(override.controls || {});
+  return controlKeys.length === 1 && controlKeys[0] === 'hostRead' && override.controls.hostRead === 'blind';
+}
+
+function realPathOrResolved(p) {
+  try {
+    return fs.realpathSync(p);
+  } catch {
+    return path.resolve(p);
+  }
+}
+
+/**
+ * Refusals specific to `hostRead: blind`, read off the resolved resources: a workspace that
+ * sits inside a hidden root would be masked away from its own worker, and a context ref that
+ * points into a hidden root outside the dispatch's own directory could never be read.
+ */
+function blindRefusals(request, resolvedResources) {
+  const hiddenRoots = resolvedResources.filter((r) => r.resource === 'hidden-root').map((r) => r.hostTarget);
+  const own = resolvedResources.find((r) => r.resource === 'own-assignment')?.hostTarget;
+  const mismatches = [];
+  const context = request.context || {};
+
+  for (const [name, dir] of [['cwd', context.cwd], ['repoRoot', context.repoRoot]]) {
+    if (typeof dir !== 'string' || !dir) continue;
+    const real = realPathOrResolved(dir);
+    const root = hiddenRoots.find((hidden) => isInsideRoot(real, hidden));
+    if (root) {
+      mismatches.push({
+        code: 'blind-hides-workspace',
+        detail: `hostRead: blind would hide the ${name} "${real}" from its own worker: it lies inside the hidden root "${root}".`,
+      });
+    }
+  }
+
+  const base = context.cwd || context.repoRoot || process.cwd();
+  for (const ref of Array.isArray(context.contextRefs) ? context.contextRefs : []) {
+    if (typeof ref !== 'string' || !ref || /^[a-z][a-z0-9+.-]*:/i.test(ref)) continue;
+    const real = realPathOrResolved(path.resolve(base, ref));
+    const root = hiddenRoots.find((hidden) => isInsideRoot(real, hidden));
+    if (root && !(own && isInsideRoot(real, own))) {
+      mismatches.push({
+        code: 'blind-ref-hidden',
+        detail: `context ref "${ref}" lies inside the hidden root "${root}" and outside the dispatch's own directory; a blind worker could not read it.`,
+      });
+    }
+  }
+  return mismatches;
+}
+
+/**
  * Assess confinement request against the default support matrix (spec §9.1, R3).
  */
 export function assessBwrap(request, backend) {
@@ -117,8 +220,9 @@ export function assessBwrap(request, backend) {
     });
   }
 
-  // Invocation override check: default v1 rejects override (spec §9.1)
-  if (request.override && Object.keys(request.override).length > 0) {
+  // Invocation override check: default v1 rejects override (spec §9.1), except the one
+  // that only narrows reads to `blind`.
+  if (request.override && Object.keys(request.override).length > 0 && !isBlindOnlyOverride(request.override)) {
     mismatches.push({
       code: 'confinement-unsupported',
       detail: 'invocation confinement override is not supported in local-bwrap-v1.',
@@ -178,13 +282,14 @@ export function assessBwrap(request, backend) {
       coverage['control:hostWrite'] = 'unknown';
     }
 
-    // hostRead: default v1 only supports allow. deny is unsupported.
-    if (controls.hostRead === 'allow') {
+    // hostRead: default v1 supports allow and blind. deny is unsupported.
+    const hostRead = isBlindOnlyOverride(request.override) ? 'blind' : controls.hostRead;
+    if (hostRead === 'allow' || hostRead === 'blind') {
       coverage['control:hostRead'] = 'satisfied';
     } else {
       mismatches.push({
         code: 'confinement-unsupported',
-        detail: `hostRead: ${controls.hostRead} is not supported by local-bwrap-v1 (only hostRead: allow is supported).`,
+        detail: `hostRead: ${hostRead} is not supported by local-bwrap-v1 (only hostRead: allow and blind are supported).`,
       });
       coverage['control:hostRead'] = 'unsatisfied';
     }
@@ -278,7 +383,9 @@ export function assessBwrap(request, backend) {
       resourceNeeds: request.resourceNeeds,
       backendConfig: backend?.config || {},
       providerSources: {},
+      blind: requestIsBlind(request),
     });
+    if (requestIsBlind(request)) mismatches.push(...blindRefusals(request, resolvedResources));
   } catch (err) {
     mismatches.push({
       code: err.code || 'confinement-grant-invalid',
@@ -344,6 +451,14 @@ export function assessBwrap(request, backend) {
  * confinement control.
  */
 export async function prepareBwrap(plan, request, backend) {
+  return prepareBwrapSync(plan, request, backend);
+}
+
+/**
+ * The body of prepareBwrap. It has nothing to await, and the blind-read probe needs the exact
+ * argv a real dispatch would get from a synchronous caller.
+ */
+export function prepareBwrapSync(plan, request, backend) {
   // Verify attestation store isolation before materializing mounts (H1)
   assertAttestationStoreIsolated(request.context, plan.resources || []);
 
@@ -359,12 +474,22 @@ export async function prepareBwrap(plan, request, backend) {
       '--tmpfs', '/tmp',
     ];
 
-    // Materialize mounts ONLY from plan.resources (R4)
-    for (const res of plan.resources || []) {
-      if (!res.hostTarget || !res.executionTarget?.path) continue;
+    const resources = plan.resources || [];
+    const blind = requestIsBlind(request);
+    const hidden = blind ? resources.filter((r) => r.resource === 'hidden-root' && r.executionTarget?.path) : [];
+    const own = blind ? resources.find((r) => r.resource === 'own-assignment') : null;
+    if (blind && !own) {
+      throw new Error('hostRead: blind plan has no own-assignment resource to bind back.');
+    }
+
+    const materialize = (res) => {
+      if (!res.hostTarget || !res.executionTarget?.path) return;
 
       if (res.allocation === 'temporary') {
-        fs.mkdirSync(res.hostTarget, { recursive: true });
+        // <tempRoot>/<dispatchId>/home: when the resolver names the temp root, the
+        // root, the per-dispatch parent and the home all end up owner-only -- the
+        // home receives a login copy. Nothing above the named root is touched.
+        ensurePrivateDir(res.hostTarget, { root: res.tempRoot ?? res.hostTarget });
         writeOwnershipMarker(res.hostTarget, { dispatchId: request.dispatchId, resource: res.resource });
         allocatedPaths.push(res.hostTarget);
         if (res.resource === 'private-home') {
@@ -378,6 +503,24 @@ export async function prepareBwrap(plan, request, backend) {
       } else {
         bwrapArgs.push('--ro-bind', res.hostTarget, res.executionTarget.path);
       }
+    };
+
+    // Materialize mounts ONLY from plan.resources (R4)
+    const mounts = resources.filter((r) => r.resource !== 'hidden-root' && r.resource !== 'own-assignment');
+    if (!blind) {
+      mounts.forEach(materialize);
+    } else {
+      // A later mount over a parent hides an earlier one beneath it, so the order is the
+      // contract: mounts that do not sit inside a hidden root (a workspace may contain one),
+      // then the masks, then the dispatch's own directory read-only, then the mounts inside
+      // a hidden root (its outbox, its private home), and last the masks made read-only.
+      const insideMasked = (res) => [...hidden, own].some((h) => res.executionTarget?.path && isInsideRoot(res.executionTarget.path, h.executionTarget.path));
+      bwrapArgs.push('--unshare-pid');
+      mounts.filter((r) => !insideMasked(r)).forEach(materialize);
+      for (const h of hidden) bwrapArgs.push('--tmpfs', h.executionTarget.path);
+      bwrapArgs.push('--ro-bind', own.hostTarget, own.executionTarget.path);
+      mounts.filter(insideMasked).forEach(materialize);
+      for (const h of hidden) bwrapArgs.push('--remount-ro', h.executionTarget.path);
     }
 
     // Apply generic resource bindings (spec §6.5: no provider branching!)
@@ -424,11 +567,17 @@ export async function prepareBwrap(plan, request, backend) {
       }
     };
 
+    // The worker's pane was left open after a failed run: keep the homes, tag
+    // them with the pane, and hand back where they are so the failure record
+    // can say. They are reaped once the pane is gone.
+    const retain = ({ paneId } = {}) => allocatedPaths.filter((p) => markResourceRetained(p, { paneId }));
+
     return {
       invocation: preparedInvocation,
       claims: { ...plan.coverage },
       providerCapacity: credentialProvisioned ? { credentialProvisioned: true } : undefined,
       cleanup,
+      retain,
     };
   } catch (err) {
     // On prepare error: clean up any allocated resources before throwing

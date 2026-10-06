@@ -1,0 +1,4 @@
+{"type":"session-opened","ts":"2026-09-29T09:00:00.000Z","payload":{"protocolRef":"rfc-deliberation@v1","driver":"interactive"}}
+{"type":"assignment-created","ts":"2026-09-29T09:05:00.000Z","payload":{"actorId":"agent-1","assignmentId":"asgn-golden-01"}}
+{"type":"result-linked","ts":"2026-09-29T09:20:00.000Z","payload":{"assignmentId":"asgn-golden-01","runId":"run-golden-01"}}
+{"type":"session-completed","ts":"2026-09-29T09:30:00.000Z","payload":{"verdict":"approved"}}

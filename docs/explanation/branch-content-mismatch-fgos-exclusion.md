@@ -39,7 +39,7 @@ indefinitely — retrying hit the same deterministic check every time, even
 though the real code had landed correctly and safely on main. A
 cosmetic/tracking-only symptom, but one that blocked the normal
 `awaiting-approval → delivered` transition and misled anyone reading
-`fgos check`/`fgos list`.
+`fgos metrics outcomes`/`fgos list`.
 
 ## What shipped
 

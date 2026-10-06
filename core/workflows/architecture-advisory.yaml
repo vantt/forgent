@@ -1,0 +1,55 @@
+# core/workflows/architecture-advisory.yaml — Architecture Advisory Workflow
+# Biểu diễn architecture advisory panel thành clean Workflow trên Single Model & Engine Retirement
+
+id: architecture-advisory
+title: Architecture Advisory Panel Workflow
+description: Multi-perspective architecture advisory workflow with framing, 3-panelist shaping, critique, synthesis, and explanation.
+
+steps:
+  - id: framing
+    title: Intake and Framing
+    units:
+      - id: frame-context
+        template:
+          capability: architecture:frame
+          pattern: solo
+          persona: advisor
+          objective: Frame problem context and investigate architectural constraints
+  - id: shaping
+    title: Diverge Proposals
+    dependsOn: [framing]
+    units:
+      - id: shape-proposals
+        template:
+          capability: architecture:shape
+          pattern: panel
+          blind: true
+          objective: Diverge into system, alternative, and constraint-focused proposals across 3 panelists
+  - id: critique
+    title: Critique & Stress-Test
+    dependsOn: [shaping]
+    units:
+      - id: critique-proposals
+        template:
+          capability: architecture:critique
+          pattern: reviewed
+          objective: Critique proposals, identify risks, and stress-test constraints with red-team
+  - id: synthesis
+    title: Converge & Synthesize
+    dependsOn: [critique]
+    units:
+      - id: synthesize-recommendation
+        template:
+          capability: architecture:synthesize
+          pattern: solo
+          objective: Converge findings into a coherent, balanced architectural recommendation
+  - id: explanation
+    title: Explain for Ownership
+    dependsOn: [synthesis]
+    units:
+      - id: explain-recommendation
+        template:
+          capability: architecture:explain
+          pattern: solo
+          persona: advisor
+          objective: Produce ownership-focused explanation and actionable adoption guidance

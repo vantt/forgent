@@ -1,0 +1,154 @@
+{
+  "sourceSha256": "9a93aa925f7d3f5c4693227357a0100c79889a45180a1031d5fceac9db7782d2",
+  "seats": [
+    {
+      "unitRunId": "unit-run-1791270002490-60cc7659",
+      "role": "producer",
+      "models": [
+        "claude-opus-5-5"
+      ],
+      "calls": [
+        {
+          "name": "Read",
+          "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002490-60cc7659/producer/1/inputs/1-source-packet-d55108fd3c6d.txt"
+        },
+        {
+          "name": "Write",
+          "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002490-60cc7659/producer/1/runs/01/worker-output/outbox/agent-report.md"
+        },
+        {
+          "name": "Write",
+          "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002490-60cc7659/producer/1/runs/01/worker-output/outbox/agent-result.json"
+        }
+      ]
+    },
+    {
+      "unitRunId": "unit-run-1791270868625-812a0306",
+      "role": "panelist-1",
+      "models": [
+        "claude-sonnet-5-5"
+      ],
+      "calls": [
+        {
+          "name": "Read",
+          "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270868625-812a0306/panelist-1/1/inputs/1-source-packet-968a69e4cb9f.txt"
+        },
+        {
+          "name": "Read",
+          "path": "/var/tmp/fgos-independent-position-kyDQBV/src/runner/execution/patterns/panel.mjs"
+        },
+        {
+          "name": "Read",
+          "path": "/var/tmp/fgos-independent-position-kyDQBV/src/runner/execution/patterns/reviewed.mjs"
+        },
+        {
+          "name": "Write",
+          "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270868625-812a0306/panelist-1/1/runs/01/worker-output/outbox/agent-report.md"
+        },
+        {
+          "name": "Write",
+          "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270868625-812a0306/panelist-1/1/runs/01/worker-output/outbox/agent-result.json"
+        }
+      ]
+    },
+    {
+      "unitRunId": "unit-run-1791270868625-812a0306",
+      "role": "panelist-2",
+      "models": [
+        "grok-4.3"
+      ],
+      "calls": [
+        {
+          "name": "read",
+          "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270868625-812a0306/panelist-2/1/inputs/1-source-packet-968a69e4cb9f.txt"
+        },
+        {
+          "name": "read",
+          "path": "/home/vantt/projects/mdview/src/runner/execution/patterns/panel.mjs"
+        },
+        {
+          "name": "write",
+          "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270868625-812a0306/panelist-2/1/runs/01/worker-output/outbox/agent-result.json"
+        },
+        {
+          "name": "write",
+          "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270868625-812a0306/panelist-2/1/runs/01/worker-output/outbox/agent-report.md"
+        }
+      ]
+    },
+    {
+      "unitRunId": "unit-run-1791270868625-812a0306",
+      "role": "panelist-3",
+      "models": [
+        "gemini-3.8-flash-medium"
+      ],
+      "calls": [],
+      "accessAudit": "completion-sealed-gemini-access-audit.json"
+    },
+    {
+      "unitRunId": "unit-run-1791270868625-812a0306",
+      "role": "synthesizer",
+      "models": [
+        "z-ai/glm-5.3"
+      ],
+      "calls": [
+        {
+          "name": "read",
+          "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270868625-812a0306/synthesizer/1/inputs/1-source-packet-968a69e4cb9f.txt"
+        },
+        {
+          "name": "read",
+          "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270868625-812a0306/synthesizer/1/inputs/2-panelist-1-r1.md"
+        },
+        {
+          "name": "read",
+          "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270868625-812a0306/synthesizer/1/inputs/3-panelist-2-r1.md"
+        },
+        {
+          "name": "read",
+          "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270868625-812a0306/synthesizer/1/inputs/4-panelist-3-r1.md"
+        },
+        {
+          "name": "write",
+          "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270868625-812a0306/synthesizer/1/runs/01/worker-output/outbox/agent-report.md"
+        },
+        {
+          "name": "write",
+          "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270868625-812a0306/synthesizer/1/runs/01/worker-output/outbox/agent-result.json"
+        }
+      ]
+    }
+  ],
+  "sourcePacketCopies": [
+    {
+      "unitRunId": "unit-run-1791270002490-60cc7659",
+      "role": "producer",
+      "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270002490-60cc7659/producer/1/inputs/1-source-packet-d55108fd3c6d.txt",
+      "sha256": "9a93aa925f7d3f5c4693227357a0100c79889a45180a1031d5fceac9db7782d2"
+    },
+    {
+      "unitRunId": "unit-run-1791270868625-812a0306",
+      "role": "panelist-1",
+      "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270868625-812a0306/panelist-1/1/inputs/1-source-packet-968a69e4cb9f.txt",
+      "sha256": "9a93aa925f7d3f5c4693227357a0100c79889a45180a1031d5fceac9db7782d2"
+    },
+    {
+      "unitRunId": "unit-run-1791270868625-812a0306",
+      "role": "panelist-2",
+      "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270868625-812a0306/panelist-2/1/inputs/1-source-packet-968a69e4cb9f.txt",
+      "sha256": "9a93aa925f7d3f5c4693227357a0100c79889a45180a1031d5fceac9db7782d2"
+    },
+    {
+      "unitRunId": "unit-run-1791270868625-812a0306",
+      "role": "panelist-3",
+      "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270868625-812a0306/panelist-3/1/inputs/1-source-packet-968a69e4cb9f.txt",
+      "sha256": "9a93aa925f7d3f5c4693227357a0100c79889a45180a1031d5fceac9db7782d2"
+    },
+    {
+      "unitRunId": "unit-run-1791270868625-812a0306",
+      "role": "synthesizer",
+      "path": "/home/vantt/projects/mdview/.fgos/assignments/unit-run-1791270868625-812a0306/synthesizer/1/inputs/1-source-packet-968a69e4cb9f.txt",
+      "sha256": "9a93aa925f7d3f5c4693227357a0100c79889a45180a1031d5fceac9db7782d2"
+    }
+  ]
+}

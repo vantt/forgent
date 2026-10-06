@@ -28,7 +28,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
+import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
 
 function mkTempDir() {
@@ -94,11 +94,7 @@ function writeStallingExecutor(dir) {
 }
 
 function admissionRunnerConfig(executorScript) {
-  return {
-    executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] },
-    models: { standard: 'test-model' },
-    timeoutMs: 5000,
-  };
+  return { executor: { allowCrossProvider: true, command: process.execPath, args: [executorScript, '{prompt}'] }, modelPolicies: { claude: { standard: 'test-model' } }, rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' }, timeoutMs: 5000 };
 }
 
 function supervisorBindingPids(runDir) {

@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { listWork, graphMetrics, graphWhatIf, staleDoingAdvisory, stalePostDeliveryAdvisory, StoreError } from '../../state/store.mjs';
 import { readGateBypassLevel, canAutoApprove, canAutoApproveMergedGate } from '../../state/gate-bypass.mjs';
-import { DEFAULT_DOMAIN, resolveDomainName, operationsForStage, getDomain, effectiveStage } from '../../state/workflow-stage-graphs.mjs';
+import { DEFAULT_DOMAIN, resolveDomainName, operationsForStep, getDomain, effectiveStep } from '../../state/domain-registry.mjs';
 import { findRunningRuns, classifyRunOutcome, reconcileRun } from '../../runner/dispatch/visibility-session.mjs';
 import { isResolvedStatus } from '../../state/frontier.mjs';
 import { paginate } from '../../state/cursor.mjs';
@@ -12,15 +12,15 @@ export function graphUseCase({ dir }, { whatIfId } = {}) {
   return graphMetrics(dir);
 }
 
-export function workflowUseCase(_ctx, { stage, domain = DEFAULT_DOMAIN, workflow } = {}) {
-  if (!stage) {
-    throw new StoreError('validation', 'workflow operations requires --stage <stage>');
+export function workflowUseCase(_ctx, { step, domain = DEFAULT_DOMAIN, workflow } = {}) {
+  if (!step) {
+    throw new StoreError('validation', 'workflow operations requires --step <step>');
   }
-  const ops = operationsForStage(domain, stage, { kind: workflow });
+  const ops = operationsForStep(getDomain(domain), step, workflow);
   return {
     domain: resolveDomainName(domain),
     workflow: workflow || 'feature',
-    stage,
+    step,
     operations: ops,
   };
 }
@@ -77,8 +77,8 @@ export function parseListFlag(value) {
     .filter(Boolean);
 }
 
-export function withStageEffective(item) {
-  return { ...item, stageEffective: effectiveStage(item, getDomain(item.domain)) };
+export function withStepEffective(item) {
+  return { ...item, workflowStepEffective: effectiveStep(item, getDomain(item.domain)) };
 }
 
 function childrenOf(view, id) {
@@ -86,7 +86,7 @@ function childrenOf(view, id) {
 }
 
 const ALLOWED_ID_FIELDS = new Set([
-  'stage', 'status', 'holder', 'title', 'docsRef',
+  'workflowStep', 'status', 'holder', 'title', 'docsRef',
   'verify', 'parent', 'id', 'domain', 'kind', 'risk', 'tier',
 ]);
 
@@ -100,7 +100,6 @@ const scopeSideLogsTo = (view, idSet) => ({
   gates: scopedByIds(view.gates, idSet),
   settlements: scopedByIds(view.settlements, idSet),
   outcomes: scopedByIds(view.outcomes, idSet),
-  frictions: scopedByIds(view.frictions, idSet),
   learnings: scopedByIds(view.learnings, idSet),
   decisionsById: scopedByIds(view.decisionsById, idSet),
 });
@@ -126,7 +125,7 @@ export function listUseCase({ dir }, { id, fields, all = false, cursor, limit } 
           throw new StoreError('validation', `list --fields: unknown field "${f}". Allowed fields: ${Array.from(ALLOWED_ID_FIELDS).join(', ')}.`);
         }
       }
-      const fullItem = withStageEffective(item);
+      const fullItem = withStepEffective(item);
       const filteredItem = {};
       for (const f of fieldList) {
         if (fullItem[f] !== undefined) {
@@ -135,7 +134,7 @@ export function listUseCase({ dir }, { id, fields, all = false, cursor, limit } 
       }
       const {
         decisions, discovery, gates, settlements, outcomes,
-        frictions, learnings, decisionsById, callThreads,
+        learnings, decisionsById, callThreads,
         ...restView
       } = rawView;
       const singleView = {
@@ -152,13 +151,12 @@ export function listUseCase({ dir }, { id, fields, all = false, cursor, limit } 
     const scopedById = (section) => (section?.[id] !== undefined ? { [id]: section[id] } : {});
     const singleView = {
       ...rawView,
-      work: { [id]: withStageEffective(item) },
+      work: { [id]: withStepEffective(item) },
       decisions: (rawView.decisions ?? []).filter((d) => d.id === id),
       discovery: scopedById(rawView.discovery),
       gates: scopedById(rawView.gates),
       settlements: scopedById(rawView.settlements),
       outcomes: scopedById(rawView.outcomes),
-      frictions: scopedById(rawView.frictions),
       learnings: scopedById(rawView.learnings),
       decisionsById: scopedById(rawView.decisionsById),
       callThreads: scopedById(rawView.callThreads),
@@ -176,7 +174,7 @@ export function listUseCase({ dir }, { id, fields, all = false, cursor, limit } 
     : Object.fromEntries(Object.entries(rawView.work).filter(([, item]) => !isResolvedStatus(item)));
   const view = {
     ...rawView,
-    work: Object.fromEntries(Object.entries(filteredWork).map(([itemId, item]) => [itemId, withStageEffective(item)])),
+    work: Object.fromEntries(Object.entries(filteredWork).map(([itemId, item]) => [itemId, withStepEffective(item)])),
   };
 
   if (!showAll) {

@@ -15,7 +15,8 @@ import {
   assertNoSecrets,
 } from '../../src/runner/dispatch/effective-execution-contract.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
-import { buildAssignment, renderAssignmentPrompt } from '../../src/runner/dispatch/assignment.mjs';
+import { renderAssignmentPrompt } from '../../src/runner/dispatch/assignment.mjs';
+import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { renderBrief, briefPaths } from '../../src/runner/dispatch/brief.mjs';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
 
@@ -40,7 +41,7 @@ function validAssignment(overrides = {}) {
     role: 'reviewer',
     mutation: 'read-only',
     budget: { timeoutMs: 60000, maxRuns: 1 },
-    policy: { minTier: 'standard', preferExecutor: 'claude' },
+    policy: { rigor: 'standard', preferExecutor: 'claude' },
     ...overrides,
   };
 }
@@ -161,7 +162,7 @@ test('buildEffectiveExecutionContract projects mutating contract with writeScope
   assert.equal(contract.workspace.posture, 'worktree');
   assert.equal(contract.workspace.mainCheckout, repoDir);
   assert.deepEqual(contract.workspace.writeScope, [worktreeDir]);
-  assert.deepEqual(contract.tools.shell.allowedCommands, ['git add', 'git commit']);
+  assert.deepEqual(contract.tools.shell.allowedCommands, [], 'the worker writes files only; the runner commits');
   assert.equal(contract.tools.shell.enforced, false);
   assert.equal(contract.tools.shell.enforcement, 'instructed');
 
@@ -353,6 +354,36 @@ test('prompt and brief agree with effective execution contract on claim path, mu
   assert.ok(brief.includes('effective-execution-contract.json'), 'brief must link to persisted contract file');
 });
 
+test('a confined cli-spawn worker is told to write its claim and report where the sandbox lets it', () => {
+  const assignment = validAssignment({ mutation: 'read-only' });
+  const runDir = '/tmp/assignment-1/runs/01';
+  const outbox = path.join(runDir, 'worker-output', 'outbox');
+  const build = (adapter, confinement) => buildEffectiveExecutionContract({
+    assignment,
+    dispatchPlan: validDispatchPlan({ invocation: { via: 'cli', adapter, protocol: 'prompt-stdout-v1' } }),
+    runId: 'run_01',
+    runDir,
+    cwd: '/tmp/assignment-1',
+    ...(confinement ? { confinement } : {}),
+  });
+  const required = { requirement: { mode: 'required', policyId: 'host-write-denied' } };
+
+  const confined = build('cli-spawn', required);
+  assert.equal(confined.resultClaim.path, path.join(outbox, 'agent-result.json'));
+  const confinedPrompt = renderAssignmentPrompt(assignment, { runDir, effectiveContract: confined });
+  assert.ok(confinedPrompt.includes(`Write structured JSON to ${path.join(outbox, 'agent-result.json')}`));
+  assert.ok(confinedPrompt.includes(path.join(outbox, 'agent-report.md')));
+  assert.ok(!confinedPrompt.includes(path.join(runDir, 'agent-result.json')), 'no flat path the sandbox keeps read-only');
+
+  const unconfined = build('cli-spawn');
+  assert.equal(unconfined.resultClaim.path, path.join(runDir, 'agent-result.json'));
+  const unconfinedPrompt = renderAssignmentPrompt(assignment, { runDir, effectiveContract: unconfined });
+  assert.ok(unconfinedPrompt.includes(path.join(runDir, 'agent-report.md')));
+
+  // herdr-spawn keeps its own outbox contract: the brief rewrites the claim path.
+  assert.equal(build('herdr-spawn', required).resultClaim.path, path.join(runDir, 'agent-result.json'));
+});
+
 test('readEffectiveExecutionContract reads, parses, and validates the contract on disk', () => {
   const tempDir = mkTempDir();
   const runDir = path.join(tempDir, 'runs', '01');
@@ -399,7 +430,8 @@ test('PRODUCTION-DOOR FIXTURE: executeAssignment persists effective-execution-co
   // Configure a real runner environment with mock executor CLI
   const runnerCfg = {
     timeoutMs: 30000,
-    models: { standard: 'test-model' },
+    modelPolicies: { claude: { standard: 'test-model' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     executor: {
       command: 'mock-cli',
       adapter: 'cli-spawn',
@@ -488,9 +520,7 @@ process.exit(0);
       allowCrossProvider: true,
       confinement: { mode: 'required', policyId: 'missing-backend', controls: { hostWrite: 'deny' } },
     },
-    executors: {
-      claude: { command: process.execPath, args: [mockBinPath], adapter: 'cli-spawn', allowCrossProvider: true },
-    },
+    executors: {},
   };
 
   const result = await executeAssignment(assignment, {
@@ -519,7 +549,8 @@ process.exit(0);
   assert.deepEqual(contractOnDisk.workspace.writeScope, []);
   assert.equal(contractOnDisk.limits.executorTimeoutMs, 25000);
   assert.equal(contractOnDisk.resultClaim.path, path.join(runDir, 'agent-result.json'));
-  assert.equal(contractOnDisk.executorId, 'claude');
+  // No executor is selected, so the configured default executor's command identifies it.
+  assert.equal(contractOnDisk.executorId, updatedCfg.executor.command);
   assert.equal(contractOnDisk.adapter, 'cli-spawn');
   assert.equal(contractOnDisk.adapterFamily, 'cli-spawn');
   assert.equal(contractOnDisk.enforcementPosture, 'instructed');

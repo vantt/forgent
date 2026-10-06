@@ -2,11 +2,11 @@
 // interactive discover-loop session to run `fgos discover` on. PURE: no
 // fs, no `.fgos/` read, same discipline as frontier.mjs/impact.mjs. Never
 // used by `frontier()` itself — that function only ever surfaces
-// `stage: executing` items; this covers the earlier clarify pool
+// execute-phase items; this covers the earlier clarify pool
 // `frontier()` deliberately excludes.
 import { rankImpact } from './impact.mjs';
 import { isDepsAndLineageReady } from './frontier.mjs';
-import { getDomain, discoverableStages } from './workflow-stage-graphs.mjs';
+import { getDomain, discoverableSteps } from './domain-registry.mjs';
 
 // tsk-1w7 D10: `discovery`/`exploring` sit between `clarify` and
 // `decompose`/`planning` now — both join the pool as ordinary
@@ -40,7 +40,7 @@ import { getDomain, discoverableStages } from './workflow-stage-graphs.mjs';
 // folds to the default one.
 function isCandidateStage(item) {
   const domain = getDomain(item.domain, { onUnrecognized: () => {} });
-  return discoverableStages(domain).includes(item.stage);
+  return discoverableSteps(domain, item.kind).includes(item.workflowStep);
 }
 
 // work-item-backlog-status Piece 3 (tsk-1av): a clarify-shaped stage
@@ -88,7 +88,7 @@ function compareClarifyOrder(blocksById) {
  * whatever that item's OWN domain declares discoverable (tsk-64h; for
  * `coding` today: `discovery`/`exploring`) — so this pool can never offer
  * a caller an item the `discover` verb would then refuse. The returned
- * `stage` is likewise always the item's own real stage, never a hardcoded
+ * `workflowStep` is likewise always the item's own real step, never a hardcoded
  * literal.
  *
  * tsk-lya D10/D11: no longer also pools `decompose`/`planning` items —
@@ -108,5 +108,5 @@ export function pickNextDiscoverItem(view) {
 
   const blocksById = new Map(rankImpact(view).map((row) => [row.id, row.blocks]));
   clarify.sort(compareClarifyOrder(blocksById));
-  return { id: clarify[0].id, stage: clarify[0].stage };
+  return { id: clarify[0].id, workflowStep: clarify[0].workflowStep };
 }

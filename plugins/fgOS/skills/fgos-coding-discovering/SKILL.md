@@ -29,10 +29,10 @@ chỉ là helper trả verdict/finding về cho caller. `fgos-coding-discovering
 là chủ; `fgos-researching` vẫn là helper, không đổi vai trò sau khi skill
 này tồn tại.
 
-Skill này cũng là nơi phán `tier`/`kind`/`risk` (D12, tsk-2yo): trên bằng
+Skill này cũng là nơi phán `size`/`rigor`/`kind`/`risk` (Phase 3): trên bằng
 chứng đã research xong ở bước 3, không phải suy đoán từ text submit —
 đọc vựng qua `classificationVocabulary(domain, field)`
-(`src/state/workflow-stage-graphs.mjs`), không hardcode mảng giá trị. Xem
+(`src/state/domain-registry.mjs`), không hardcode mảng giá trị. Xem
 bước 4/5.
 
 Hợp đồng đầu việc: `domains/coding/task-specs/judge-ambiguity.md` (D6/D9)
@@ -161,26 +161,28 @@ lệch khỏi hợp đồng đã khoá (tsk-2t9c D16 — task-spec này đã t�
      heading bắt buộc (`## Context` và `## Why this matters`, mỗi phần ít
      nhất 20 ký tự nội dung) — engine từ chối một `ask` thiếu cấu trúc này.
 
-   **Chỉ khi `clear`: phán luôn `tier`/`kind`/`risk`** (D12, tsk-2yo) —
+   **Chỉ khi `clear`: phán luôn `size`/`rigor`/`kind`/`risk`** (Phase 3) —
    trên CÙNG bằng chứng vừa thu ở bước 3, không research thêm vòng mới.
+   Tiêu chí phán `rigor`: độ nghiêm là hậu quả khi làm sai (blast radius,
+   contract công khai, bảo mật, dữ liệu), **không phải** độ lớn việc.
+   `size` là độ lớn, công sức (ước lượng, chia việc).
    Đọc vựng `kind`/`risk` qua `classificationVocabulary(domain, 'kind')` /
    `classificationVocabulary(domain, 'risk')`
-   (`src/state/workflow-stage-graphs.mjs`, không hardcode mảng giá trị);
-   `tier` so với `TIERS` toàn cục của `work.mjs` (không nằm trong bảng
-   `classification` — dùng chung mọi domain, không riêng `coding`). Một
+   (`src/state/domain-registry.mjs`, không hardcode mảng giá trị);
+   `size` so với `SIZES` toàn cục của `work.mjs` (`light`/`standard`/`heavy`);
+   `rigor` so với `RIGOR_VALUES` toàn cục (`low`/`standard`/`high`/`critical`). Một
    verdict `unclear` không phán classification — chưa đủ bằng chứng.
 
 5. **Tự gọi engine verb.** Ngay sau bước 4, không dừng lại chờ gì thêm:
 
     ```bash
-    # clear (nếu tier/kind/risk phán ra khác giá trị hiện có trên item,
+    # clear (nếu size/rigor/kind/risk phán ra khác giá trị hiện có trên item,
     # gọi edit TRƯỚC discover — bỏ qua lệnh edit khi giá trị trùng):
-    fgos edit "<item-id>" --tier "<tier phán>" --kind "<kind phán>" --risk "<risk phán>"
+    fgos edit "<item-id>" --size "<size phán>" --rigor "<rigor phán>" --kind "<kind phán>" --risk "<risk phán>"
     fgos discover "<item-id>" --verdict clear --verify "<verify thật vừa xác nhận ở bước 4>"
     # unclear:
     fgos discover "<item-id>" --verdict unclear --question "<câu hỏi cụ thể, trích bằng chứng>"
     ```
-
    Cả hai nhánh đều là lệnh gọi engine THẬT — verdict `clear` bỏ qua
    `exploring`, verdict `unclear` sang `exploring` cho một người (D2). Ghi
    một dòng `fgos decision` ngắn trước lệnh trên nếu muốn để lại dấu vết
@@ -191,7 +193,7 @@ lệch khỏi hợp đồng đã khoá (tsk-2t9c D16 — task-spec này đã t�
 
 - tự đi research trực tiếp (search repo, tra online) thay vì gọi helper
   `fgos-researching`
-- phán `tier`/`kind`/`risk` từ suy đoán hợp lý thay vì từ finding thật
+- phán `size`/`rigor`/`kind`/`risk` từ suy đoán hợp lý thay vì từ finding thật
   `fgos-researching` đã trả về, hoặc phán classification cho một verdict
   `unclear`
 - hardcode mảng giá trị `kind`/`risk` thay vì đọc qua

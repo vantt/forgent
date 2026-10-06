@@ -23,9 +23,9 @@ import {
   getBackendDriver,
 } from "./backend-registry.mjs";
 import { computeProbeFingerprint, runAllConfinementProbes } from "./probes/harness.mjs";
-import { normalizeLegacyConfinement } from "./policies.mjs";
+import { normalizeLegacyConfinement, requestIsBlind } from "./policies.mjs";
 import { evaluateBypassPairing } from "./bypass-pairing.mjs";
-import { OWNERSHIP_MARKER_FILE } from "./cleanup.mjs";
+import { OWNERSHIP_MARKER_FILE, removeEmptyDispatchParent } from "./cleanup.mjs";
 import {
   canonicalJson,
   computeSha256Digest,
@@ -92,6 +92,9 @@ function applyBackendPlanToAttestation(attestation, backendPlan) {
   attestation.readiness = backendPlan.readiness;
   attestation.grants = backendPlan.grants;
   attestation.backend = backendPlan.backend;
+  // What a blind dispatch could not read, as resolved for this dispatch.
+  const hiddenRoots = (backendPlan.resources || []).filter((r) => r.resource === "hidden-root").map((r) => r.hostTarget);
+  if (hiddenRoots.length > 0) attestation.hiddenRoots = hiddenRoots;
   if (Array.isArray(backendPlan.mismatches)) {
     const existingCodes = new Set((attestation.mismatches || []).map((m) => m.code));
     attestation.mismatches = [
@@ -143,11 +146,14 @@ function verifyRequiredProbe(request, backendInstance, driver) {
     return { passed: false, message: `no falsification probe profile for backend type "${backendInstance.type}"` };
   }
   const executable = backendInstance.config?.executable || "bwrap";
+  // A blind dispatch needs the blind-read probe on top of the standard set, and its own cache entry.
+  const blind = requestIsBlind(request);
   const fingerprint = computeProbeFingerprint({
     policy: request.requirement.policy,
     driverVersion: driver.version,
     backendConfig: backendInstance.config || {},
     bwrapExecutable: executable,
+    blind,
   });
 
   const cached = loadProbeCacheRecord(fingerprint, request?.context);
@@ -158,7 +164,7 @@ function verifyRequiredProbe(request, backendInstance, driver) {
     };
   }
 
-  const result = runAllConfinementProbes({ bwrapBin: executable });
+  const result = runAllConfinementProbes({ bwrapBin: executable, blind });
   if (result.passed) {
     try {
       saveProbeCacheRecord(fingerprint, result, request?.context);
@@ -307,6 +313,8 @@ export function buildConfinementAttestation({
     ...(legacy?.controls ? { ...legacy.controls } : {}),
     ...(hasHostWriteDeny ? { hostWrite: "deny" } : {}),
     ...(hasProcessIsolation ? { process: "isolated" } : {}),
+    // The driver claims it satisfied the request's own hostRead: blind.
+    ...(requestIsBlind(request) && driverClaims?.["control:hostRead"] === "satisfied" ? { hostRead: "blind" } : {}),
   };
 
   const coverage = {};
@@ -501,6 +509,7 @@ export function buildConfinementAttestation({
       mode: reqMode,
       policyId: request.requirement?.policyId ?? null,
       policy: request.requirement?.policy ?? null,
+      ...(request.override ? { override: request.override } : {}),
     },
     coverage,
     effectiveControls,
@@ -1125,6 +1134,7 @@ export async function executeThroughConfinement(request, adapterPort = null) {
   }
 
   let adapterResult;
+  let retainedHomes = [];
   try {
     adapterResult = await adapterFn(preparedInvocation, adapterOpts);
     if (preparedLaunch && adapterResult?.receipt) {
@@ -1153,6 +1163,21 @@ export async function executeThroughConfinement(request, adapterPort = null) {
       }
     }
   } catch (err) {
+    // A failed round whose pane was left open still has a worker running in
+    // that pane against the private home, so the home stays and is tagged
+    // with the pane; every other failure takes the home (and the login copy
+    // in it) away in the finally below.
+    if (err?.paneRetained === true && err.paneId) {
+      for (const prepared of [preparedConfinement, preparedLaunch?.preparedConfinement]) {
+        try { retainedHomes.push(...(prepared?.retain?.({ paneId: err.paneId }) ?? [])); } catch { /* best effort */ }
+      }
+      if (retainedHomes.length > 0) {
+        err.retainedPrivateHomes = [...retainedHomes];
+        // The message is what lands in the run's failure record (stderr.log / runnerNote), so the
+        // path of a login copy kept alive for a pane is written down where an operator looks.
+        err.message = `${err.message} Private home kept for the open pane (removed once the pane is closed): ${retainedHomes.join(', ')}.`;
+      }
+    }
     if (preparedLaunch) {
       const launchCommandId = request.assignmentLaunchContext.command?.launchCommandId;
       const runDir = request.context?.runDir;
@@ -1242,12 +1267,19 @@ export async function executeThroughConfinement(request, adapterPort = null) {
         cleanup: failedAttestation.cleanup,
         result: adapterResult,
         cause: err.message,
+        ...(retainedHomes.length > 0 ? { retainedPrivateHomes: [...retainedHomes] } : {}),
       },
     );
   } finally {
-    if (preparedConfinement?.cleanup) {
+    // An assignment-owned launch prepared its confinement in prepareConfinementForLaunch, so its
+    // resources (a private home holding a copy of the account login) are not on the outer variable.
+    // They are removed whether the worker returned or threw -- the one exception is a failure that
+    // left its pane open, whose home was retained above and is reaped once that pane closes.
+    for (const prepared of [preparedConfinement, preparedLaunch?.preparedConfinement]) {
+      if (!prepared?.cleanup) continue;
+      if (retainedHomes.length > 0 && prepared.retain) continue;
       try {
-        await preparedConfinement.cleanup();
+        await prepared.cleanup();
       } catch {
         // cleanup failure preserved
       }
@@ -1763,11 +1795,14 @@ export async function finalizeConfinementResources({
         allAbsent = false;
         const markerPath = path.join(targetPath, OWNERSHIP_MARKER_FILE);
         let markerDigest = null;
+        let markerDispatchId = null;
         if (fs.existsSync(markerPath)) {
           try {
             const raw = fs.readFileSync(markerPath, 'utf8');
             try {
-              markerDigest = computeSha256Digest(JSON.parse(raw));
+              const parsed = JSON.parse(raw);
+              markerDispatchId = parsed?.dispatchId ?? null;
+              markerDigest = computeSha256Digest(parsed);
             } catch {
               markerDigest = computeSha256Digest(raw);
             }
@@ -1785,6 +1820,7 @@ export async function finalizeConfinementResources({
           typedReason = `cleanup-failed: ${err.message}`;
           break;
         }
+        removeEmptyDispatchParent(targetPath, markerDispatchId);
       }
     }
     if (willClean) {

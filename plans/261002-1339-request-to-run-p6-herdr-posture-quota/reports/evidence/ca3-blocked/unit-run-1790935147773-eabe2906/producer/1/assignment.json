@@ -1,0 +1,123 @@
+{
+  "assignmentId": "unit-run-1790935147773-eabe2906/producer/1",
+  "unitRunId": "unit-run-1790935147773-eabe2906",
+  "role": "producer",
+  "round": 1,
+  "objective": "Read src/runner/execution/bind.mjs lines 250-270 and reply in your report with one sentence naming the transport variable values possible. Do not modify any file.",
+  "mutation": "read-only",
+  "binding": {
+    "contractVersion": "v1alpha1",
+    "executor": "openai",
+    "invocation": "codex-herdr-fgovn",
+    "transport": "herdr",
+    "candidateIndex": 0,
+    "tier": "standard",
+    "model": "gpt-5.6-terra",
+    "persona": null,
+    "mechanism": "out-of-process",
+    "posture": "read-only",
+    "provenance": {
+      "executor": {
+        "value": "openai",
+        "source": "override"
+      },
+      "invocation": {
+        "value": "codex-herdr-fgovn",
+        "source": "override"
+      },
+      "transport": {
+        "value": "herdr",
+        "source": "herdr-invocation-present"
+      },
+      "tier": {
+        "value": "standard",
+        "source": "rigor:standard"
+      },
+      "model": {
+        "value": "gpt-5.6-terra",
+        "source": "resolveTierModel(openai.standard)"
+      },
+      "persona": {
+        "value": null,
+        "source": "none"
+      },
+      "mechanism": {
+        "value": "out-of-process",
+        "source": "decideExecutorDispatchMechanism"
+      },
+      "posture": {
+        "value": "read-only",
+        "source": "read-only-ask-or-writes-empty"
+      },
+      "overridesOrigin": {
+        "value": "human-cli",
+        "source": "override"
+      }
+    }
+  },
+  "provenance": {
+    "kind": "unit-run",
+    "unitRunId": "unit-run-1790935147773-eabe2906",
+    "role": "producer",
+    "round": 1,
+    "binding": {
+      "contractVersion": "v1alpha1",
+      "executor": "openai",
+      "invocation": "codex-herdr-fgovn",
+      "transport": "herdr",
+      "candidateIndex": 0,
+      "tier": "standard",
+      "model": "gpt-5.6-terra",
+      "persona": null,
+      "mechanism": "out-of-process",
+      "posture": "read-only",
+      "provenance": {
+        "executor": {
+          "value": "openai",
+          "source": "override"
+        },
+        "invocation": {
+          "value": "codex-herdr-fgovn",
+          "source": "override"
+        },
+        "transport": {
+          "value": "herdr",
+          "source": "herdr-invocation-present"
+        },
+        "tier": {
+          "value": "standard",
+          "source": "rigor:standard"
+        },
+        "model": {
+          "value": "gpt-5.6-terra",
+          "source": "resolveTierModel(openai.standard)"
+        },
+        "persona": {
+          "value": null,
+          "source": "none"
+        },
+        "mechanism": {
+          "value": "out-of-process",
+          "source": "decideExecutorDispatchMechanism"
+        },
+        "posture": {
+          "value": "read-only",
+          "source": "read-only-ask-or-writes-empty"
+        },
+        "overridesOrigin": {
+          "value": "human-cli",
+          "source": "override"
+        }
+      }
+    }
+  },
+  "expectedOutputs": [],
+  "contextRefs": [],
+  "writes": [],
+  "policy": {
+    "tier": "standard",
+    "preferExecutor": "openai",
+    "preferInvocation": "codex-herdr-fgovn",
+    "preferPersona": null
+  }
+}

@@ -3,13 +3,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import {
-  createAssignmentId,
-  buildAssignment,
-  renderAssignmentPrompt,
-  isReadOnlyAssignment,
-  validateAgentResultClaim,
-} from '../../src/runner/dispatch/assignment.mjs';
+import { createAssignmentId, renderAssignmentPrompt, isReadOnlyAssignment, validateAgentResultClaim } from '../../src/runner/dispatch/assignment.mjs';
+import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { RunnerConfigError } from '../../src/runner/dispatch/config.mjs';
 
 test('createAssignmentId produces deterministic asgn_<safe-work>_<safe-op>_<seq> ids', () => {
@@ -67,11 +62,8 @@ test('buildAssignment creates frozen Assignment from planning.validate-plan with
   assert.equal(assignment.taskSpec, 'validate-plan');
   assert.equal(assignment.dispatch, 'assignment');
   assert.deepEqual(assignment.skills, ['fgos-coding-validating']);
-  assert.deepEqual(assignment.policy, {
-    minTier: 'standard',
-    preferPersona: 'code-reviewer',
-    preferExecutor: 'claude',
-  });
+  // A Workflow never pins an executor or persona (G2); only the rigor floor survives.
+  assert.deepEqual(assignment.policy, { rigor: 'standard' });
   assert.deepEqual(assignment.contextRefs, ['docs/history/tsk-123/plan.md']);
   assert.deepEqual(assignment.expectedOutputs, ['verdict', 'findings if blocked']);
 
@@ -405,7 +397,7 @@ test('buildAssignment succeeds when taskSpec file exists on disk (Step 04 §5.6)
 
 test('buildAssignment({ stage: "decompose", operation: "decompose" }) refuses missing taskSpec by default (Step 04 §5.6)', () => {
   assert.throws(
-    () => buildAssignment({ stage: 'decompose', operation: 'decompose' }),
+    () => buildAssignment({ stage: 'decompose', operation: 'decompose', operations: [{ id: 'decompose', taskSpec: 'decompose' }] }),
     (err) => err instanceof RunnerConfigError && /taskSpec file does not exist/i.test(err.message),
     'buildAssignment must refuse missing taskSpec operation even without explicit options',
   );

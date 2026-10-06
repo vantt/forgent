@@ -39,7 +39,8 @@
     "release:prepare": "node scripts/prepare-release.mjs",
     "setup:hooks": "node scripts/install-git-hooks.mjs",
     "cli": "node bin/fgos.mjs",
-    "build:skills": "node scripts/build-skill-wrappers.mjs"
+    "build:skills": "node scripts/build-skill-wrappers.mjs",
+    "build:domains": "node scripts/build-domain-registry.mjs"
   },
   "exports": {
     "./state/porting": "./src/state/porting.mjs",

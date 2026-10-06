@@ -27,7 +27,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, execSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, addFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf, parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
+import { initStore, addWork, moveWork, settleClaim, editWork, resolveParkReason, addDecision, addOutcome, recordFriction, listWork, readyWork, isDepsAndLineageReady, footprintConflicts, computedSchedule, readRawEvents, rebuild, putInAwaiting, answerAwaiting, setFocus, goalFocusShow, assertAcceptanceEvidence, assertPlanEvidence, assertValidDocType, recordGateApprove, recordCall, recordCallReturn, StoreError, EXIT_CODES, categoryOf, parseDecisionRelation, decisionTextLooksLikeSupersession, registerTopicStore, renameTopicStore, splitTopicStore, mergeTopicStore, retireTopicStore, reserveDocStore, registerDocStore, markDocRenderedStore, promoteDocStore, demoteDocStore, supersedeDocStore, retireDocStore, moveDocPathStore, attestDocStore } from '../src/state/store.mjs';
 import { resolveDocPath } from '../src/report/knowledge-resolver.mjs';
 import { resolveDocId } from '../src/state/knowledge-registry.mjs';
 import { computeKnowledgeProjection } from '../src/report/knowledge-projection.mjs';
@@ -46,10 +46,9 @@ import { wrapEnvelope } from '../src/state/envelope.mjs';
 import { loadRunnerConfig, ensureRunnerConfigForDir, loadRunnerConfigFromDir, RunnerConfigError, runDispatchCli, DispatchError } from '../src/runner/dispatch.mjs';
 import { readGateBypassLevel } from '../src/state/gate-bypass.mjs';
 import { checkDispatchAttestation } from '../src/runner/attestation-guard.mjs';
-import { classifyDispatchConfidence } from '../src/report/dispatch-confidence.mjs';
 import { formatDeprecation } from '../src/cli/deprecation.mjs';
-import { lintPlanCapabilityAnnotations } from '../src/report/capability-plan-lint.mjs';
-import { matchCapability, deriveForm, CapabilityMatchError } from '../src/runner/capability-match.mjs';
+import { checkDirDiffersFromCwd, attachDirWarning } from '../src/workflow/dir-guard.mjs';
+import { lintPlanCapabilityAnnotations, lintPhaseUnits } from '../src/report/capability-plan-lint.mjs';
 import { appendWorkerLog } from '../src/runner/worker-log.mjs';
 
 // tsk-1qi: this running copy's own package root -- the source
@@ -65,18 +64,17 @@ import { resolveFgosFile, FGOS_FILE } from '../src/state/fgos-file-registry.mjs'
 import { resolveCliVersionInfo } from '../src/cli/version.mjs';
 import { hasRealVerify } from '../src/intake/discovery.mjs';
 import { replaceLockedDecisionsSection, resolveContentRoot } from '../src/intake/plan.mjs';
-import { computeEntropy, computeCounts, FINAL_STATUSES } from '../src/report/entropy.mjs';
 import { findSourceCaptureIds } from '../src/report/enduser-index.mjs';
 import { generateEnduserDocsIndex } from '../src/report/enduser-index-generate.mjs';
-import { rankCandidates } from '../src/evolve/candidates.mjs';
 import { rankImpact } from '../src/state/impact.mjs';
+import { FINAL_STATUSES } from '../src/state/work.mjs';
 import { isResolvedStatus } from '../src/state/frontier.mjs';
 import { readClaim, releaseClaim } from '../src/state/runtime-coordination.mjs';
 import { paginate } from '../src/state/cursor.mjs';
 import { runGoalCheck, detachedWorktreeFgosHint, runInvariantChecks, invariantFailureAsCheck } from '../src/runner/goal-check.mjs';
 import { frozenJudgeHits, footprintDiffHits } from '../src/runner/frozen-judge.mjs';
 import { normalizePath } from '../src/util/normalize-path.mjs';
-import { collectOutcomeEntry, collectFrictionData } from '../src/report/item-trace.mjs';
+import { collectOutcomeEntry } from '../src/report/item-trace.mjs';
 import { cleanupMergedBranch, isWorkingTreeClean as isMainTreeClean, isFgosOnlyStatusLine, buildOwnFileSet } from '../src/runner/merge.mjs';
 import { assertSafeMainCheckoutReset } from '../src/runner/main-checkout-reset-guard.mjs';
 import { rejectUseCase } from '../src/verbs/merge/reject.mjs';
@@ -86,36 +84,15 @@ import { promoteToComponentUseCase } from '../src/verbs/merge/promote-to-compone
 import { approveUseCase } from '../src/verbs/merge/approve.mjs';
 import { mergeList, mergeNext } from '../src/verbs/merge/merge.mjs';
 import { catchupUseCase } from '../src/verbs/merge/catchup.mjs';
-import { discoverUseCase, planUseCase } from '../src/verbs/state/stage.mjs';
+import { discoverUseCase, planUseCase } from '../src/verbs/state/step.mjs';
 import { editUseCase, parseEditFlags } from '../src/verbs/state/edit.mjs';
 import { moveUseCase } from '../src/verbs/state/move.mjs';
 import { listUseCase, graphUseCase, workflowUseCase, gateCheckUseCase, staleUseCase } from '../src/verbs/state/read.mjs';
-import { runCoordinationUseCase } from '../src/verbs/coordination/run.mjs';
-import { closeCoordinationUseCase } from '../src/verbs/coordination/close.mjs';
-import { showCoordinationUseCase } from '../src/verbs/coordination/show.mjs';
-import {
-  showCoordinationActionsUseCase,
-  executeOperationUseCase,
-  executeAuthorizeAndDispatchUseCase,
-  executeFanOutUseCase,
-  executeContributionUseCase,
-  executeHumanTurnUseCase,
-  executeDispositionUseCase,
-  executeSpecialistAuthorizeUseCase,
-  executeCloseUseCase,
-} from '../src/verbs/coordination/actions.mjs';
-import { startCoordinationUseCase } from '../src/verbs/coordination/start.mjs';
-import { showCoordinationStatusUseCase } from '../src/verbs/coordination/status.mjs';
-import { launchMasterLoopUseCase } from '../src/verbs/coordination/launch-master-loop.mjs';
 import { showRunUseCase } from '../src/verbs/dispatch/show-run.mjs';
 import { invokeDispatchInspectOperation } from '../src/verbs/dispatch/inspect.mjs';
 import { invokeDispatchReconcileOperation } from '../src/verbs/dispatch/reconcile.mjs';
 import { watchRunUseCase } from '../src/verbs/dispatch/watch.mjs';
 import { recoverObserveUseCase, recoverApplyUseCase } from '../src/verbs/dispatch/recover.mjs';
-import { chainCoordinationUseCase } from '../src/verbs/coordination/chain.mjs';
-import { recoverSessionObserveUseCase, recoverSessionApplyUseCase } from '../src/verbs/coordination/recover.mjs';
-import { loadProtocolPack, runGroupThinkingRequest } from '../src/verbs/coordination/group-thinking-pack.mjs';
-import { loadCoordinationProtocol } from '../src/runner/definitions/protocol-loader.mjs';
 import { unreleasedHasEntries } from '../src/setup/registrations.mjs';
 import { branchNameFor, branchExists, provisionDependencies, resyncWorktree, detectTrunk, isMainWorktree, currentHead, realpathOrSelf as realpathOr } from '../src/runner/worktree.mjs';
 import { claimWork, ClaimError } from '../src/runner/claim-port.mjs';
@@ -137,7 +114,7 @@ import { createSession, endSession, listSessions, reclaimOrphanedSessions, isSes
 import { startGateway, stopGateway, gatewayStatus, GatewayControlError } from '../src/runner/gateway-control.mjs';
 import { visitCount } from '../src/runner/anti-loop.mjs';
 import { DEFAULTS } from '../src/state/work.mjs';
-import { DEFAULT_DOMAIN, getDomain, stageForStep, effectiveStage, resolveDomainName } from '../src/state/workflow-stage-graphs.mjs';
+import { DEFAULT_DOMAIN, getDomain, stepForPhase, domainSteps, effectiveStep, resolveDomainName } from '../src/state/domain-registry.mjs';
 import { writeCoexistenceManifest } from '../src/install/coexist.mjs';
 import { MANIFEST_SCHEMA_VERSION, COMMAND_REGISTRY } from '../src/cli/command-registry.mjs';
 import { recordInvocationFault, resolveFaultLogPath } from '../src/cli/invocation-fault-log.mjs';
@@ -290,7 +267,7 @@ function excludeIronLawEvidence(files, id) {
 // moved under this gitignored bucket -- kept here too since this regex is
 // evaluated against whatever path list a caller hands it, not only
 // `git diff --name-only` (which would never surface an ignored path).
-const FGOS_NOISE_ONLY_PATHS = /^\.fgos\/(events\.jsonl(\.backup-.*)?|events\/.*\.jsonl|events\/archive\/.*|logs\/.*|entropy-history\.jsonl|events-jsonl\.truncation-guard\..*|main-checkout-guard-warnings\..*)$/;
+const FGOS_NOISE_ONLY_PATHS = /^\.fgos\/(events\.jsonl(\.backup-.*)?|events\/.*\.jsonl|events\/archive\/.*|logs\/.*|observe\/.*|events-jsonl\.truncation-guard\..*|main-checkout-guard-warnings\..*)$/;
 function excludeFgosPaths(files) {
   return files.filter((f) => !FGOS_NOISE_ONLY_PATHS.test(normalizePath(f)));
 }
@@ -537,11 +514,15 @@ function parseDiscoverCallerVerdict(flags) {
     // (`classificationPatchFromVerdict`) then re-checks the resolved outcome
     // before anything is written. Each key is present only when the caller
     // actually passed it, so a call that omits all three produces the exact
-    // same verdict shape as before these flags existed.
-    const tier = optionalField(flags.tier, "discover --tier requires a value ('light'/'standard'/'heavy'); omit --tier entirely to leave the item's tier unchanged.");
+    if (flags.tier !== undefined) {
+      throw new StoreError('validation', '--tier is retired; use --size (light|standard|heavy) or --rigor (low|standard|high|critical) instead.');
+    }
+    const size = optionalField(flags.size, "discover --size requires a value ('light'/'standard'/'heavy'); omit --size entirely to leave the item's size unchanged.");
+    const rigor = optionalField(flags.rigor, "discover --rigor requires a value ('low'/'standard'/'high'/'critical'); omit --rigor entirely to leave the item's rigor unchanged.");
     const kind = optionalField(flags.kind, "discover --kind requires a value from the domain's own kind vocabulary; omit --kind entirely to leave the item's kind unchanged.");
     const risk = optionalField(flags.risk, "discover --risk requires a value ('light'/'standard'/'heavy'); omit --risk entirely to leave the item's risk unchanged.");
-    if (tier !== undefined) verdict.tier = tier;
+    if (size !== undefined) verdict.size = size;
+    if (rigor !== undefined) verdict.rigor = rigor;
     if (kind !== undefined) verdict.kind = kind;
     if (risk !== undefined) verdict.risk = risk;
     return verdict;
@@ -617,15 +598,24 @@ function readPaginationFlags(flags, verbLabel) {
 // (per D35: the four paginated verbs' default output stays byte-identical to
 // before this cell). `order` is this verb's own literal order tag (e.g.
 // 'ready-v1'), named once at the call site.
-// tsk-4zj D1/D4: additive-only projection — never mutates `item`, never
-// touches `stage` itself (stays absent when never explicitly set, per the
-// D8 lazy-default contract `test/state/frontier.test.mjs:205`/
-// `test/state/backward-compat.test.mjs:277` lock at the storage layer).
-// Read-verb print sites spread this onto whatever they already return so a
-// reader can tell "explicitly at this stage" from "defaulted here" instead
-// of seeing an absent field with no explanation either way.
-function withStageEffective(item) {
-  return { ...item, stageEffective: effectiveStage(item, getDomain(item.domain)) };
+// Additive-only projection — never mutates `item`, never touches `workflowStep`
+// itself (stays absent when never explicitly set, per the lazy-default contract
+// `test/state/frontier.test.mjs`/`test/state/backward-compat.test.mjs` lock at the
+// storage layer). Read-verb print sites spread this onto whatever they already
+// return so a reader can tell "explicitly at this step" from "defaulted here"
+// instead of seeing an absent field with no explanation either way.
+function withStepEffective(item) {
+  return { ...item, workflowStepEffective: effectiveStep(item, getDomain(item.domain)) };
+}
+
+// The step a freshly created Work item enters: its Workflow's clarify-phase step, or
+// (a domain with none, e.g. coding) the first step the item can be at. A no-op
+// onUnrecognized: an out-of-registry domain is about to be rejected by addWork's
+// validateWork anyway, so getDomain's "folding to coding" warning would describe a
+// fold that never happens.
+function entryStepFor(domainName, kind) {
+  const domain = getDomain(domainName, { onUnrecognized: () => {} });
+  return stepForPhase(domain, 'clarify', kind) ?? domainSteps(domain, kind)[0];
 }
 
 function paginateVerbResult(items, flags, order, verbLabel) {
@@ -731,142 +721,6 @@ function collectMissingOutcomeNag(view, id) {
   return { count: missing.length, ids: missing };
 }
 
-// tsk-3ip (docs/history/automated-changelog-compound-learn/DISCUSSION.md
-// §6.1/§6.4): observe/remind only, never blocks merge (R2, tsk-28x §6.4).
-// `unreleasedHasEntries` (registrations.mjs) is the same structural read
-// the `changelog-unreleased-stale` doctor check uses, so both surfaces
-// agree on what "has an entry" means.
-function changelogNagHistoryPath(dir) {
-  return resolveFgosFile(dir, FGOS_FILE.CHANGELOG_NAG_HISTORY);
-}
-
-// Appends one snapshot per `check` run — same append-only, never-read-back
-// discipline `appendHistoryEntry` (entropy, below) already uses. This file
-// is the item's own required "bộ đếm": raw {ts, hasEntries, deliveredCount}
-// data points that, read back across N real runs spread over N real
-// merges, are what let a person later derive the three numbers the item's
-// description says are currently guesses. This function only records the
-// data point — it never computes a rate itself ("đếm, đừng mắng").
-function appendChangelogNagHistoryEntry(dir, entry) {
-  const logPath = changelogNagHistoryPath(dir);
-  fs.mkdirSync(path.dirname(logPath), { recursive: true });
-  fs.appendFileSync(logPath, `${JSON.stringify(entry)}\n`, 'utf8');
-}
-
-function collectChangelogNag(view, dir) {
-  const root = path.dirname(dir);
-  const changelogPath = path.join(root, 'CHANGELOG.md');
-  if (!fs.existsSync(changelogPath)) {
-    return { fileExists: false };
-  }
-  const content = fs.readFileSync(changelogPath, 'utf8');
-  const hasEntries = unreleasedHasEntries(content);
-  const deliveredCount = Object.values(view.work ?? {}).filter((w) => w.status === 'delivered').length;
-  appendChangelogNagHistoryEntry(dir, { ts: new Date().toISOString(), hasEntries, deliveredCount });
-  return { fileExists: true, hasEntries, deliveredCount };
-}
-
-// Entropy-trend history path (per this cell's action (2) / must_haves: MUST
-// live in the SAME data dir as the store's own events.jsonl — never
-// hardcoded to `repo/.fgos`). `dir` here is always the caller's resolved
-// data dir (dataDir() below, or a test's own tmp dir), the exact same value
-// every other verb in this file already threads through to store.mjs.
-function entropyHistoryPath(dir) {
-  return resolveFgosFile(dir, FGOS_FILE.ENTROPY_HISTORY);
-}
-
-// Reads only the LAST line of the trend history (the one prior checkpoint
-// entropy/seal-digest compare against) — never the whole file, and never
-// throws on a missing file/dir (mirrors readEvents' missing-log contract in
-// events.mjs): no history yet reads as `null`, the "baseline" case.
-function readLastHistoryEntry(dir) {
-  let raw;
-  try {
-    raw = fs.readFileSync(entropyHistoryPath(dir), 'utf8');
-  } catch (err) {
-    if (err.code === 'ENOENT') return null;
-    throw err;
-  }
-  const lines = raw.split('\n').filter(Boolean);
-  // Walk backwards to the last COMPLETE (parseable) line. A crash or a partial
-  // append can leave a torn final line; the last valid checkpoint is whatever
-  // precedes it. One truncated line must never throw the whole `check` over —
-  // the same "absent/corrupt data reads as the baseline, never a crash"
-  // tolerance the missing-file branch above already gives.
-  for (let i = lines.length - 1; i >= 0; i--) {
-    try {
-      return JSON.parse(lines[i]);
-    } catch {
-      // torn/partial line — fall back to the previous one
-    }
-  }
-  return null;
-}
-
-// Appends exactly one history line per `check` run — same
-// append-then-nothing-else discipline as events.mjs's appendEvent, but this
-// file (unlike events.jsonl/state.json) is new per this cell and never
-// read by store.mjs/replay.mjs. Only ever called when collectEntropyData
-// has already confirmed there is work-state data to report on (below) —
-// so a `check` against an uninitialized dir never creates it.
-function appendHistoryEntry(dir, entry) {
-  const logPath = entropyHistoryPath(dir);
-  fs.mkdirSync(path.dirname(logPath), { recursive: true });
-  fs.appendFileSync(logPath, `${JSON.stringify(entry)}\n`, 'utf8');
-}
-
-// Entropy-trend + seal-digest data (per this cell's action (2)/(3)):
-// reported only when at least one work item exists — an empty view (no log
-// at all) returns null, keeping `check`'s existing "no data at all" contract
-// byte-identical (the same "absent data -> null" rule the friction/
-// settlement data already follow), rather than writing a zero-score
-// checkpoint into a directory that was never initialized. `compounded` always
-// carries every channel's raw delta since the last checkpoint (never
-// suppressed for a zero value) — the caller decides what is worth surfacing.
-function collectEntropyData(view, dir) {
-  if (Object.keys(view.work ?? {}).length === 0) {
-    return null;
-  }
-  const { score, parts } = computeEntropy(view);
-  const counts = computeCounts(view);
-  const prev = readLastHistoryEntry(dir);
-  appendHistoryEntry(dir, { ts: new Date().toISOString(), score, counts });
-
-  const trend = prev ? { baseline: false, delta: score - prev.score } : { baseline: true, delta: null };
-  const prevCounts = prev?.counts ?? { outcomes: 0, frictions: 0, settlements: 0 };
-  const compounded = {
-    outcomes: counts.outcomes - prevCounts.outcomes,
-    frictions: counts.frictions - prevCounts.frictions,
-    settlements: counts.settlements - prevCounts.settlements,
-  };
-  return { score, trend, parts: parts.filter((p) => p.count > 0), counts, compounded };
-}
-
-// Read-only data collector (per D1 request-class): folds `view.outcomes`
-// (lazy key — absent on any log with no work.outcome events, per replay.mjs)
-// plus the friction/settlement/learning/nag/entropy channels above into one
-// predicted-vs-actual report. Never throws on missing data — an item with no
-// outcome yet, or a log with no `outcomes` key at all, both return an empty
-// outcomes list and the caller still exits 0 (this is a read, not a
-// validation failure).
-function collectCheckData(view, id, dir) {
-  const outcomes = view.outcomes ?? {};
-  const ids = id ? [id] : Object.keys(outcomes);
-  return {
-    outcomes: ids.map((itemId) => collectOutcomeEntry(itemId, outcomes[itemId])),
-    friction: collectFrictionData(view, id),
-    settlement: collectSettlementData(view, id),
-    learning: collectLearningData(view, id),
-    missingOutcomeNag: collectMissingOutcomeNag(view, id),
-    // Changelog observe/remind nag (tsk-3ip): a whole-work-state summary,
-    // not scoped to `id`, same as `entropy` below.
-    changelogNag: collectChangelogNag(view, dir),
-    // Entropy-trend + seal-digest: a whole-work-state summary, not scoped to
-    // `id` like the fields above — it reports on the learning area as a
-    // whole even when `check <id>` was called for one item.
-    entropy: collectEntropyData(view, dir),
-  };
-}
 
 // Rollup view (P24): direct children only (`w.parent === id`) — decompose
 // (P16) is a single-level split, a root's own children never carry further
@@ -924,7 +778,7 @@ function collectRollupData(view, id) {
     id,
     title: item.title,
     status: item.status,
-    stageEffective: effectiveStage(item, getDomain(item.domain)),
+    workflowStepEffective: effectiveStep(item, getDomain(item.domain)),
     // Children-only, unchanged by tsk-1ug: every already-published
     // consumer of these two fields keeps reading exactly the number it
     // read before. A milestone's own progress lives in the `target*` pair
@@ -935,7 +789,7 @@ function collectRollupData(view, id) {
       id: c.id,
       title: c.title,
       status: c.status,
-      stageEffective: effectiveStage(c, getDomain(c.domain)),
+      workflowStepEffective: effectiveStep(c, getDomain(c.domain)),
     })),
     targetDoneCount: targets.filter((t) => t.status === 'done').length,
     targetTotalCount: targets.length,
@@ -956,7 +810,7 @@ function submitWork(dir, text, opts = {}) {
   // independently overridable per-field; an omitted flag falls through to
   // classify(text)'s own mechanical default for exactly that field, so a
   // flagless call stays byte-identical to the pre-feature behavior.
-  const tier = opts.tier ?? classified.tier;
+  const size = opts.size ?? classified.size;
   const kind = opts.kind ?? classified.kind;
   const risk = opts.risk ?? classified.risk;
   const id = generateId(title, Object.keys(listWork(dir).work));
@@ -993,7 +847,8 @@ function submitWork(dir, text, opts = {}) {
     // opts.X ?? default shape as every other field-parity flag below) --
     // omitted leaves this at the existing sentinel, unchanged.
     verify: opts.verify ?? SUBMIT_VERIFY_SENTINEL,
-    tier,
+    size,
+    ...(opts.rigor !== undefined ? { rigor: opts.rigor } : {}),
     mode: opts.async ? 'async' : 'sync',
     // Per base-workflow-model D1-D4/S2: --domain is optional, same
     // omitted-leaves-undefined shape as `add`'s --domain above; omitting
@@ -1038,31 +893,10 @@ function submitWork(dir, text, opts = {}) {
     // handling never calls getDomain at all for this reason; `submit` still
     // needs the eager stage lookup for a legal domain, so it silences the
     // fallback rather than skip it.
-    stage: stageForStep(getDomain(opts.domain, { onUnrecognized: () => {} }), 'Clarify')
-      ?? getDomain(opts.domain, { onUnrecognized: () => {} }).stages[0],
+    workflowStep: entryStepFor(opts.domain, opts.kind),
   };
   const { event } = addWork(dir, work);
   return event.payload;
-}
-
-// Composes the human-readable description `evolve --submit` hands to
-// submitWork (self-improve-loop D15) from a ranked candidate object (the
-// exact shape `candidates.mjs`'s rankCandidates returns — id/disposition/
-// errorClass/layer/detail/attempts/score). Any field that is null/undefined
-// is omitted rather than printing the literal string "undefined".
-function describeCandidate(candidate) {
-  const meta = [];
-  if (candidate.disposition != null) meta.push(candidate.disposition);
-  const bracket = [candidate.errorClass != null ? candidate.errorClass : null, candidate.layer != null ? `layer ${candidate.layer}` : null].filter(Boolean);
-  if (bracket.length > 0) meta.push(`(${bracket.join(', ')})`);
-  if (candidate.attempts != null) meta.push(`${candidate.attempts} attempt(s)`);
-
-  let description = `Self-improve candidate ${candidate.id}`;
-  description += meta.length > 0 ? `: ${meta.join(' ')}.` : '.';
-  if (candidate.detail != null && candidate.detail !== '') {
-    description += ` ${candidate.detail}`;
-  }
-  return description;
 }
 
 async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slice(3)) {
@@ -1106,6 +940,9 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // long-work-item-ids-max-length-guard.md) — generateId is now the
       // path of least resistance, not a manually-typed guess.
       const idFlag = optionalField(positional[0] ?? flags.id, 'add --id requires a non-empty value; omit --id entirely to auto-generate one from --title.');
+      if (flags.tier !== undefined) {
+        throw new StoreError('validation', '--tier is retired; use --size (light|standard|heavy) or --rigor (low|standard|high|critical) instead.');
+      }
       const id = idFlag ?? generateId(
         requireField(flags.title, 'add requires --title (used to derive the id when --id is omitted, and always required as the item\'s own title regardless)'),
         Object.keys(listWork(dir).work),
@@ -1119,22 +956,10 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         risk: flags.risk,
         refs: parseListFlag(flags.refs),
         verify: flags.verify,
-        // tsk-535 D1: REQUIRED at this CLI handler layer only -- never
-        // added to work.mjs's validateWorkShape, since two other
-        // legitimate addWork callers (loop.mjs's discovered-work, and
-        // this same file's promote-to-component fresh-root creation)
-        // deliberately omit description by design and would break under a
-        // schema-wide requirement (plan.md's own rejected-alternative).
         description: requireField(flags.description, 'add requires --description (the item\'s own full-text intake description)'),
         learn: typeof flags.learn === 'string' ? flags.learn : undefined,
-        // Per D6: --tier is optional; a bare/empty flag is refused the same
-        // as any other malformed value (requireField's rule), while simply
-        // omitting --tier leaves this undefined so store.mjs's addWork
-        // applies work.mjs's declared DEFAULTS.tier. An out-of-domain value
-        // (e.g. --tier extreme) passes through unrejected here — work.mjs's
-        // validateWorkShape is the single source for the TIERS domain and
-        // rejects it as validation, so that rule is never duplicated here.
-        tier: optionalField(flags.tier, 'add --tier requires a tier value (e.g. light/standard/heavy); omit --tier entirely to use the default.'),
+        size: optionalField(flags.size, 'add --size requires a size value (e.g. light/standard/heavy); omit --size entirely to use the default.'),
+        rigor: optionalField(flags.rigor, 'add --rigor requires a rigor value (e.g. low/standard/high/critical); omit --rigor entirely to leave unset.'),
         // Per base-workflow-model D1-D4/S2: --domain is optional, same
         // omitted-leaves-undefined shape as --tier just above; omitting it
         // leaves work.domain undefined so store.mjs's addWork/validateWorkShape
@@ -1156,9 +981,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         // is rejected downstream by store.mjs's validateWorkShape (the
         // single source for the STAGES domain), same "don't duplicate the
         // validation source" discipline --domain/--tier already follow.
-        stage: optionalField(flags.stage, 'add --stage requires a stage value (e.g. discovery/decompose/executing); omit --stage entirely to use the default.')
-          ?? stageForStep(getDomain(flags.domain, { onUnrecognized: () => {} }), 'Clarify')
-          ?? getDomain(flags.domain, { onUnrecognized: () => {} }).stages[0],
+        workflowStep: optionalField(flags.step, 'add --step requires a step value (e.g. discovery/planning/executing); omit --step entirely to use the default.')
+          ?? entryStepFor(flags.domain, flags.kind),
         // Per work-graph-intelligence S2b (producer A): --discovered-from is
         // an explicit, optional scalar provenance flag — same omitted-leaves-
         // undefined shape as --domain/--tier above. work.mjs's
@@ -1241,31 +1065,18 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // on it here.
     case 'submit': {
       const text = requireField(positional[0], 'submit requires a free-text description: fgos submit "<description>" [--async|--unattended]');
+      if (flags.tier !== undefined) {
+        throw new StoreError('validation', '--tier is retired; use --size (light|standard|heavy) or --rigor (low|standard|high|critical) instead.');
+      }
       const opts = {
         async: Boolean(flags.async || flags.unattended),
-        // Per work-item-backlog-status D2: same independent boolean-flag
-        // shape as --async above -- creates the item directly at
-        // status: 'backlog' instead of the default 'todo'.
         backlog: Boolean(flags.backlog),
         domain: optionalField(flags.domain, 'submit --domain requires a domain name (e.g. coding/synthetic); omit --domain entirely to use the default.'),
-        // Per work-graph-intelligence S2b (producer A): two-hop like domain —
-        // parsed here, threaded into submitWork's work object below.
         discoveredFrom: optionalField(flags['discovered-from'], 'submit --discovered-from requires a non-empty id; omit it to leave unset.'),
-        // Per D4 (str83-fgos-slash-commands): same parseListFlag helper
-        // `add`'s --deps already uses (above) — an omitted flag parses to
-        // [], byte-identical to the prior hardcoded deps: []. Cycle/
-        // existence validation happens at the same addWork write-gate
-        // every other verb goes through; no new check here.
         deps: parseListFlag(flags.deps),
-        // Per str73-done-flip-cos-check D2: same optional JSON-encoded
-        // acceptance flag as `add`, threaded through submitWork's opts the
-        // same way domain/discoveredFrom already are, immediately above.
         acceptance: parseAcceptanceFlag(flags.acceptance, 'submit --acceptance requires a JSON-encoded array of {text, evidence} clauses.'),
-        // Per str51-llm-assist-classify D2: three new optional overrides for
-        // classify(text)'s per-field output, same optionalField shape as
-        // add's --tier above; each is independent (D5) and omitted leaves
-        // this field undefined so submitWork falls through to classify().
-        tier: optionalField(flags.tier, 'submit --tier requires a tier value (e.g. light/standard/heavy); omit --tier entirely to use classify()\'s derived value.'),
+        size: optionalField(flags.size, 'submit --size requires a size value (e.g. light/standard/heavy); omit --size entirely to use classify()\'s derived value.'),
+        rigor: optionalField(flags.rigor, 'submit --rigor requires a rigor value (e.g. low/standard/high/critical); omit --rigor entirely to leave unset.'),
         kind: optionalField(flags.kind, 'submit --kind requires a kind value; omit --kind entirely to use classify()\'s derived value.'),
         risk: optionalField(flags.risk, 'submit --risk requires a risk value; omit --risk entirely to use classify()\'s derived value.'),
         // tsk-5gu: same optionalField shape as --tier/--kind/--risk above --
@@ -1320,6 +1131,22 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         ? loadRunnerConfig(flags.config)
         : ensureRunnerConfigForDir(path.dirname(dir));
       const callerVerdict = parseDiscoverCallerVerdict(flags);
+      const repoRoot = path.dirname(dir);
+      const list = listWork(dir).work;
+      const work = list?.[id];
+      if (work?.workflowRunId) {
+        const { statusWorkflow, resumeWorkflow } = await import('../src/workflow/index.mjs');
+        if (flags.resume) {
+          return await resumeWorkflow(work.workflowRunId, { repoRoot, worktree: flags.worktree });
+        }
+        const runState = statusWorkflow(work.workflowRunId, { repoRoot });
+        return {
+          guidance: `Item "${id}" is bound to workflow run "${work.workflowRunId}". Use "fgos workflow status ${work.workflowRunId}" or "fgos workflow resume ${work.workflowRunId}".`,
+          workflowRunId: work.workflowRunId,
+          workflowRun: runState,
+          step: runState.status,
+        };
+      }
       return discoverUseCase({ dir, runnerConfig: cfg }, { id, callerVerdict, role: 'session' });
     }
 
@@ -1342,6 +1169,21 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         : ensureRunnerConfigForDir(path.dirname(dir));
       const callerVerdict = parsePlanCallerVerdict(flags);
       const repoRoot = path.dirname(dir);
+      const list = listWork(dir).work;
+      const work = list?.[id];
+      if (work?.workflowRunId) {
+        const { statusWorkflow, resumeWorkflow } = await import('../src/workflow/index.mjs');
+        if (flags.resume) {
+          return await resumeWorkflow(work.workflowRunId, { repoRoot, worktree: flags.worktree });
+        }
+        const runState = statusWorkflow(work.workflowRunId, { repoRoot });
+        return {
+          guidance: `Item "${id}" is bound to workflow run "${work.workflowRunId}". Use "fgos workflow status ${work.workflowRunId}" or "fgos workflow resume ${work.workflowRunId}".`,
+          workflowRunId: work.workflowRunId,
+          workflowRun: runState,
+          step: runState.status,
+        };
+      }
       return planUseCase(
         { dir, repoRoot, runnerConfig: cfg },
         { id, callerVerdict, validate: Boolean(flags.validate), direct: Boolean(flags.direct), role: 'session' },
@@ -1413,7 +1255,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         for (const [doorName, findings] of Object.entries(doors)) {
           if (findings.length === 0) continue;
           doorFindings[doorName] = findings.length;
-          addFriction(dir, {
+          recordFriction(dir, {
+            producer: 'bin.fgos.retrospective',
             id: item.id,
             disposition: 'advisory',
             errorClass: `retrospective-door-${doorName}`,
@@ -2253,12 +2096,12 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         throw new StoreError('validation', `show: work "${id}" not found.`);
       }
       return {
-        work: withStageEffective(item),
+        work: withStepEffective(item),
         discovery: rawView.discovery?.[id] ?? [],
         decisions: rawView.decisionsById?.[id] ?? [],
         gates: rawView.gates?.[id] ?? null,
         outcome: collectOutcomeEntry(id, rawView.outcomes?.[id]),
-        friction: collectFrictionData(rawView, id),
+        friction: null,
         settlement: collectSettlementData(rawView, id),
         learning: collectLearningData(rawView, id),
       };
@@ -2273,7 +2116,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // omitted, readyWork's own default (`Execute`) applies, byte-identical
     // to every pre-existing caller.
     case 'ready': {
-      return paginateVerbResult(readyWork(dir, flags.step ? { step: flags.step } : undefined).map(withStageEffective), flags, 'ready-v1', 'ready');
+      return paginateVerbResult(readyWork(dir, flags.phase ? { phase: flags.phase } : undefined).map(withStepEffective), flags, 'ready-v1', 'ready');
     }
 
     // Request-class per D1 (same contract as `ready`/`list`): a pure read —
@@ -2318,20 +2161,69 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // different project (docs/history/tsk-65q-gate-bypass-global-install-
     // resolution/RESEARCH.md).
     case 'workflow': {
-      let stage = flags.stage;
-      if (!stage) {
+      const sub = positional[0];
+      // start, answer and resume return at once with the run id and where to read progress,
+      // handing the advancing to a detached process; --foreground keeps it in this process.
+      // The arg parser hands `--foreground <id>` the id as the flag's value.
+      const foreground = flags.foreground !== undefined && flags.foreground !== 'false';
+      const swallowedId = typeof flags.foreground === 'string' && flags.foreground !== 'true' ? flags.foreground : undefined;
+      if (sub === 'start') {
+        const { startWorkflow, startWorkflowDetached } = await import('../src/workflow/index.mjs');
+        const workflowId = positional[1] ?? flags.id ?? swallowedId;
+        const planPath = flags.plan;
+        if (!workflowId && !planPath) {
+          throw new StoreError('validation', 'workflow start requires <workflowId> or --plan <path>');
+        }
+        const startParams = {
+          workflowId,
+          planPath,
+          request: typeof flags.request === 'string' ? flags.request : undefined,
+          stanceOptions: flags['stance-options'] === undefined ? undefined : requireField(flags['stance-options'], '--stance-options requires pipe-separated option labels').split('|'),
+          repoRoot: flags.dir,
+          worktree: flags.worktree,
+        };
+        // Default: record the run, hand advancing to a detached process, return the run id.
+        // --foreground keeps the run in this process until it completes, fails, or parks.
+        const startWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
+        return attachDirWarning(foreground ? await startWorkflow(startParams) : startWorkflowDetached(startParams), startWarning);
+      }
+      if (sub === 'status') {
+        const { statusWorkflow } = await import('../src/workflow/index.mjs');
+        const workflowRunId = requireField(positional[1] ?? flags.id, 'workflow status requires a workflowRunId: fgos workflow status <id>');
+        return statusWorkflow(workflowRunId, { repoRoot: flags.dir });
+      }
+      if (sub === 'answer') {
+        const { answerWorkflow, answerWorkflowDetached } = await import('../src/workflow/index.mjs');
+        const workflowRunId = requireField(positional[1] ?? flags.id ?? swallowedId, 'workflow answer requires a workflowRunId: fgos workflow answer <id> --step <stepId> --answer <text>');
+        const stepId = requireField(flags.step, 'workflow answer requires --step <stepId>');
+        const answer = requireField(flags.answer, 'workflow answer requires --answer <text>');
+        const answerParams = { stepId, answer, repoRoot: flags.dir, worktree: flags.worktree };
+        const answerWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
+        return attachDirWarning(foreground ? await answerWorkflow(workflowRunId, answerParams) : answerWorkflowDetached(workflowRunId, answerParams), answerWarning);
+      }
+      if (sub === 'resume') {
+        const { resumeWorkflow, resumeWorkflowDetached } = await import('../src/workflow/index.mjs');
+        const workflowRunId = requireField(positional[1] ?? flags.id ?? swallowedId, 'workflow resume requires a workflowRunId: fgos workflow resume <id>');
+        const resumeOptions = { repoRoot: flags.dir, worktree: flags.worktree };
+        const resumeWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
+        return attachDirWarning(foreground ? await resumeWorkflow(workflowRunId, resumeOptions) : resumeWorkflowDetached(workflowRunId, resumeOptions), resumeWarning);
+      }
+
+      // Operations a step offers, read from the Workflow definition
+      let step = flags.step;
+      if (!step) {
         if (positional[0] === 'operations') {
-          stage = positional[1];
+          step = positional[1] || flags.step;
         } else if (positional[0]) {
-          stage = positional[0];
+          step = positional[0];
         }
       }
-      if (!stage) {
-        throw new StoreError('validation', 'workflow operations requires --stage <stage>');
+      if (!step) {
+        throw new StoreError('validation', 'workflow operations requires --step <step>');
       }
       const domain = flags.domain || DEFAULT_DOMAIN;
       const workflow = flags.workflow || undefined;
-      return workflowUseCase({ dir }, { stage, domain, workflow });
+      return workflowUseCase({ dir }, { step, domain, workflow });
     }
 
     case 'gate-check': {
@@ -2371,7 +2263,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // re-slice; never mutates anything.
     // Read-only worker-slot ledger: how many work items are running and
     // whether the execution lane has room. This verb IS the port — decision
-    // 0014 makes the CLI the door, and herdr-plugin (Rust) and fgos-fanout
+    // 0014 makes the CLI the door, and herdr-dashboard (Rust) and fgos-fanout
     // (a prose skill) have no other way to ask the engine before they stand a
     // worker up. Pure read: worker-slots.mjs never touches fs, and the
     // ceiling comes from the same config resolution claimWork's own gate uses.
@@ -2411,11 +2303,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       return { id, stopReason: stopReason ?? null, seq: event.seq };
     }
 
-    case 'dispatch-report': {
-      const id = optionalField(positional[0] ?? flags.id, 'dispatch-report [id]');
-      return classifyDispatchConfidence(dir, { id });
-    }
-
     case 'conflicts': {
       // tsk-4zj D7: footprintConflicts' candidate set now spans multiple
       // stages (tsk-4so's frontierAcrossSteps), so stageEffective is real
@@ -2430,45 +2317,12 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         ids.add(a);
         ids.add(b);
       }
-      const stageByItem = Object.fromEntries(
-        [...ids].map((id) => [id, effectiveStage(conflictsView.work[id], getDomain(conflictsView.work[id].domain))]),
+      const stepByItem = Object.fromEntries(
+        [...ids].map((id) => [id, effectiveStep(conflictsView.work[id], getDomain(conflictsView.work[id].domain))]),
       );
-      return { conflicts, stageByItem };
+      return { conflicts, stepByItem };
     }
 
-    // tsk-1wdf: the machine-readable read surface D6 (tsk-5z0) left as
-    // follow-on work -- `recordInvocationFault` writes .fgos/invocation-
-    // faults.jsonl, this reads it back. `resolveFaultLogPath` already
-    // falls back to the main checkout's own store when `dir` doesn't exist
-    // (D5 -- the exact worktree-safety fallback this verb needs too), so
-    // this is deliberately absent from STORE_MISSING_WARNING_VERBS below:
-    // unlike `list`/`stale`, a worktree session with no --dir still reads
-    // the real log correctly here, so warning about "may be empty" would
-    // be actively misleading (same reasoning as docs-index's exclusion).
-    case 'faults': {
-      // Validated before the (possibly early, no-log) return below, so a
-      // malformed --limit is refused the same way regardless of whether
-      // any fault has ever been recorded yet.
-      const rawLimit = optionalField(flags.limit, 'faults --limit requires a positive integer value');
-      let limit;
-      if (rawLimit !== undefined) {
-        limit = Number(rawLimit);
-        if (!Number.isInteger(limit) || limit <= 0) {
-          throw new StoreError('validation', 'faults --limit requires a positive integer value');
-        }
-      }
-      const logPath = resolveFaultLogPath(dir, process.cwd());
-      if (!logPath || !fs.existsSync(logPath)) {
-        return { path: logPath, count: 0, records: [] };
-      }
-      const records = fs
-        .readFileSync(logPath, 'utf8')
-        .split('\n')
-        .filter(Boolean)
-        .map((line) => JSON.parse(line));
-      const mostRecent = limit === undefined ? records : records.slice(-limit);
-      return { path: logPath, count: records.length, records: mostRecent };
-    }
 
     // Read-only, report-only (tsk-597z): re-runs checkMergeStillResolves
     // LIVE against every current status:blocked item -- the same live
@@ -2502,19 +2356,23 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     // that never bootstraps or rewrites `.fgos/config.json`, so a read-only
     // lint never mutates state as a side effect of being run.
     case 'plan-lint': {
-      const rawPath = optionalField(positional[0], 'plan-lint requires a <path> to a plan.md file, e.g. `fgos plan-lint plans/<track>/plan.md`.');
+      const rawPath = optionalField(positional[0], 'plan-lint requires a <path> to a plan directory, plan.md, or phase file, e.g. `fgos plan-lint plans/<track>`.');
       if (rawPath === undefined) {
-        throw new StoreError('precondition', 'plan-lint requires a <path> to a plan.md file, e.g. `fgos plan-lint plans/<track>/plan.md`.');
+        throw new StoreError('precondition', 'plan-lint requires a <path> to a plan directory, plan.md, or phase file, e.g. `fgos plan-lint plans/<track>`.');
       }
       const absPath = path.resolve(process.cwd(), rawPath);
-      if (!fs.existsSync(absPath) || !fs.statSync(absPath).isFile()) {
-        throw new StoreError('precondition', `plan-lint: "${rawPath}" is not an existing file.`);
+      if (!fs.existsSync(absPath)) {
+        throw new StoreError('precondition', `plan-lint: "${rawPath}" is not an existing file or directory.`);
       }
       if (flags.cell === true || flags.cell === null || flags.cell === '') {
         throw new StoreError('precondition', 'plan-lint --cell requires a non-empty value.');
       }
       const cellId = flags.cell === undefined ? undefined : flags.cell;
-      const text = fs.readFileSync(absPath, 'utf8');
+
+      if (flags.phase === true || flags.phase === null || flags.phase === '') {
+        throw new StoreError('precondition', 'plan-lint --phase requires a phase number.');
+      }
+
       const repoRoot = path.dirname(dir);
       let cfg;
       try {
@@ -2527,82 +2385,55 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       }
       const catalog = cfg.capabilities ?? {};
       const registered = Object.keys(catalog);
-      const result = lintPlanCapabilityAnnotations(text, registered, cellId !== undefined ? { cellId } : {});
-      const units = result.units.map((unit) => ({
-        ...unit,
-        description: unit.capability != null ? (catalog[unit.capability]?.description ?? null) : null,
-      }));
-      return { path: absPath, ok: result.ok, units, findings: result.findings };
+
+      let targetPath = absPath;
+      let result;
+
+      if (flags.phase !== undefined) {
+        const planDir = fs.statSync(absPath).isDirectory() ? absPath : path.dirname(absPath);
+        const phaseNum = typeof flags.phase === 'number' ? flags.phase : parseInt(String(flags.phase), 10);
+        if (Number.isNaN(phaseNum)) {
+          throw new StoreError('precondition', `plan-lint: invalid phase number "${flags.phase}".`);
+        }
+        const phasePattern = new RegExp(`^phase-0*${phaseNum}(?:-.*)?\\.md$`, 'i');
+        const files = fs.readdirSync(planDir).filter((f) => phasePattern.test(f)).sort();
+        if (files.length === 0) {
+          throw new StoreError('precondition', `plan-lint: no phase file matching phase ${flags.phase} found in "${planDir}".`);
+        }
+        targetPath = path.join(planDir, files[0]);
+        result = lintPhaseUnits(targetPath, { config: cfg, phase: phaseNum, cellId });
+      } else if (fs.statSync(absPath).isDirectory()) {
+        const planMd = path.join(absPath, 'plan.md');
+        if (!fs.existsSync(planMd)) {
+          throw new StoreError('precondition', `plan-lint: "${rawPath}" is a directory but contains no plan.md.`);
+        }
+        targetPath = planMd;
+        const text = fs.readFileSync(targetPath, 'utf8');
+        result = lintPlanCapabilityAnnotations(text, registered, cellId !== undefined ? { cellId } : {});
+      } else {
+        targetPath = absPath;
+        if (/^phase-\d+/i.test(path.basename(targetPath))) {
+          result = lintPhaseUnits(targetPath, { config: cfg, cellId });
+        } else {
+          const text = fs.readFileSync(targetPath, 'utf8');
+          result = lintPlanCapabilityAnnotations(text, registered, cellId !== undefined ? { cellId } : {});
+        }
+      }
+
+      const units = result.units.map((unit) => {
+        const cap = unit.capability;
+        let desc = null;
+        if (cap != null) {
+          desc = catalog[cap]?.description ?? (cap.includes(':') ? catalog[cap.split(':')[1]]?.description : null) ?? null;
+        }
+        return {
+          ...unit,
+          description: desc,
+        };
+      });
+      return { path: targetPath, ok: result.ok, units, findings: result.findings };
     }
 
-    // Q1 steering CLI door onto matchCapability (src/runner/
-    // capability-match.mjs, a pure function this case never re-implements):
-    // reads the live runner config's `capabilities` catalog via
-    // `ensureRunnerConfigForDir`, matches declared DemandFacts against it,
-    // and appends exactly one `.fgos/logs/capability-match.log` line per
-    // call. Read-only with respect to state -- the log append (git-ignored
-    // operational text, per worker-log.mjs) is the only side effect. Never
-    // calls `decide`, never touches `capabilities.<name>.prefer` -- Q2
-    // binding is a separate, later step.
-    case 'capability': {
-      const sub = requireField(positional[0], 'capability requires a sub-verb: fgos capability match --demand <json>');
-      if (sub !== 'match') {
-        throw new StoreError('validation', `capability: unknown sub-verb "${sub}" (known: match).`);
-      }
-      const demandRaw = requireField(flags.demand, 'capability match requires --demand <json>');
-      let facts;
-      try {
-        facts = JSON.parse(demandRaw);
-      } catch (err) {
-        throw new StoreError('validation', `capability match --demand must be valid JSON: ${err.message}`);
-      }
-      const overrideValue = optionalField(flags.override, 'capability match --override must be a non-empty string when present');
-      const reasonValue = optionalField(flags.reason, 'capability match --reason must be a non-empty string when present');
-      if (overrideValue !== undefined) {
-        requireField(reasonValue, 'capability match --override requires --reason <text>');
-      } else if (reasonValue !== undefined) {
-        throw new StoreError('validation', 'capability match --reason requires --override <capability>.');
-      }
-      const repoRootForCapability = path.dirname(dir);
-      let cfg;
-      try {
-        cfg = ensureRunnerConfigForDir(repoRootForCapability);
-      } catch (err) {
-        if (err instanceof RunnerConfigError) {
-          throw new StoreError('precondition', `capability match: ${err.message}`);
-        }
-        throw err;
-      }
-      const catalog = cfg.capabilities ?? {};
-      let result;
-      try {
-        result = matchCapability(facts, catalog);
-      } catch (err) {
-        if (err instanceof CapabilityMatchError) {
-          throw new StoreError('validation', `capability match: ${err.message}`);
-        }
-        throw err;
-      }
-      if (overrideValue !== undefined) {
-        const canonicalOverride = Object.prototype.hasOwnProperty.call(catalog, overrideValue)
-          ? overrideValue
-          : Object.entries(catalog).find(([, entry]) => Array.isArray(entry?.aliases) && entry.aliases.includes(overrideValue))?.[0];
-        if (canonicalOverride === undefined) {
-          throw new StoreError('validation', `capability match --override "${overrideValue}" is not a registered runner.capabilities key or alias.`);
-        }
-        result = {
-          ...result,
-          capability: canonicalOverride,
-          source: 'override',
-          reason: reasonValue.replace(/[\r\n]+/g, ' '),
-          form: deriveForm(result.facts, canonicalOverride),
-        };
-      }
-      appendWorkerLog(dir, 'capability-match', {
-        message: `source=${result.source} capability=${result.capability ?? 'null'} form=${result.form}: ${result.reason}`,
-      });
-      return result;
-    }
 
     // Request-class per D1 (same contract as `ready`/`triage`/`conflicts`): a
     // pure read. Merge-readiness ranking (docs/history/merge-standardization/
@@ -2790,565 +2621,74 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         });
       }
     }
-
-    case 'coordination': {
-      const KNOWN_COORDINATION_SUBVERBS = [
-        'start',
-        'status',
-        'operation',
-        'authorize-and-dispatch',
-        'fan-out',
-        'contribution',
-        'human-turn',
-        'disposition',
-        'specialist-authorize',
-        'close',
-        'run',
-        'show',
-        'actions',
-        'launch-master-loop',
-        'chain',
-        'recover',
-        'pack',
-      ];
-
-      const sub = requireField(positional[0], 'coordination requires a sub-verb: fgos coordination <start|status|operation|authorize-and-dispatch|fan-out|contribution|human-turn|disposition|specialist-authorize|close|run|show|actions|launch-master-loop|chain|recover|pack> ...');
-      if (!KNOWN_COORDINATION_SUBVERBS.includes(sub)) {
-        throw new StoreError('validation', `coordination: unknown sub-verb "${sub}" (known: start, status, operation, authorize-and-dispatch, fan-out, contribution, human-turn, disposition, specialist-authorize, close, run, show, actions, launch-master-loop, chain, recover, pack).`);
-      }
-
-      const COMMON_FLAGS = new Set(['dir', 'cwd', 'json']);
-      const ALLOWED_COORDINATION_FLAGS = {
-        'start': new Set([
-          ...COMMON_FLAGS,
-          'id', 'coordination-id',
-          'protocol', 'protocol-id', 'protocolRef.id',
-          'kind', 'objective', 'writer-id',
-          'work-ref', 'work', 'primary-role',
-          'task', 'task-file', 'bounds', 'partial-policy',
-          'actors', 'steps', 'executor', 'model', 'tier',
-        ]),
-        'status': new Set([
-          ...COMMON_FLAGS,
-          'id', 'detail', 'replay',
-        ]),
-        'operation': new Set([
-          ...COMMON_FLAGS,
-          'id', 'action-key', 'writer-id', 'objective',
-          'expected-outputs', 'outputs', 'context-refs', 'context',
-          'constraints', 'capabilities', 'from-assignment-id',
-          'intent', 'round', 'task-key', 'mutation',
-          'executor', 'model', 'tier',
-        ]),
-        'authorize-and-dispatch': new Set([
-          ...COMMON_FLAGS,
-          'id', 'action-key', 'writer-id', 'objective', 'reason',
-          'expected-outputs', 'outputs', 'granted-context-refs',
-          'context-refs', 'context', 'constraints', 'capabilities',
-          'target-artifact-ref', 'task-key', 'mutation',
-          'executor', 'model', 'tier',
-        ]),
-        'fan-out': new Set([
-          ...COMMON_FLAGS,
-          'id', 'action-key', 'writer-id', 'branches',
-          'from-assignment-id', 'executor', 'model', 'tier',
-        ]),
-        'contribution': new Set([
-          ...COMMON_FLAGS,
-          'id', 'action-key', 'writer-id', 'type', 'contribution-type',
-          'round-key', 'contribution-id', 'anchors', 'responds-to',
-        ]),
-        'human-turn': new Set([
-          ...COMMON_FLAGS,
-          'id', 'action-key', 'writer-id', 'turn-id', 'turn-ordinal', 'ordinal',
-          'channel', 'artifact-ref', 'external-ref', 'attributed-to',
-          'responds-to-refs', 'responds-to',
-        ]),
-        'disposition': new Set([
-          ...COMMON_FLAGS,
-          'id', 'action-key', 'writer-id', 'disposition', 'rationale',
-          'evidence-refs',
-        ]),
-        'specialist-authorize': new Set([
-          ...COMMON_FLAGS,
-          'id', 'action-key', 'writer-id', 'specialist-actor-id', 'reason',
-          'capabilities', 'max-assignments', 'expires-after-round',
-          'trigger-evidence-refs', 'allowed-context-refs',
-        ]),
-        'close': new Set([
-          ...COMMON_FLAGS,
-          'file', 'id', 'action-key', 'writer-id', 'authorized-by',
-          'dissenting-actor-ids', 'dissent', 'aggregation-id',
-        ]),
-        'run': new Set([
-          ...COMMON_FLAGS,
-          'file', 'executor', 'model', 'tier',
-        ]),
-        'show': new Set([
-          ...COMMON_FLAGS,
-          'id',
-        ]),
-        'actions': new Set([
-          ...COMMON_FLAGS,
-          'id',
-        ]),
-        'launch-master-loop': new Set([
-          ...COMMON_FLAGS,
-          'plan', 'objective', 'writer-id', 'coordination-id',
-          'fixture-version', 'executor', 'model', 'tier',
-        ]),
-        'chain': new Set([
-          ...COMMON_FLAGS,
-          'track',
-        ]),
-        'recover': new Set([
-          ...COMMON_FLAGS,
-          'id', 'action', 'expected-snapshot', 'expected-event-seq',
-          'expected-run-control-epoch', 'expected-expires-at', 'action-key',
-        ]),
-        'pack': new Set([
-          ...COMMON_FLAGS,
-          'protocol', 'protocol-id', 'file', 'executor', 'model', 'tier',
-        ]),
-      };
-
-      const allowedFlags = ALLOWED_COORDINATION_FLAGS[sub];
-      if (allowedFlags) {
-        for (const flag of Object.keys(flags)) {
-          if (!allowedFlags.has(flag)) {
-            throw new StoreError('validation', `coordination ${sub}: unknown or unsupported option "--${flag}"`);
-          }
-        }
-      }
-
-      // Same repoRoot resolution `catchup`/`merge next` already use:
-      // `--dir` names the main checkout's `.fgos/`, so its parent is the
-      // repo root; omitted, the caller's own cwd is the repo root.
-      const repoRootForCoordination = flags.dir !== undefined ? path.dirname(dir) : process.cwd();
-      // R7: `--cwd <path>` names the worker/session working directory this
-      // adapter opens/reads a session against -- distinct from `--dir`
-      // above (the main checkout root, used ONLY to resolve
-      // `repoRootForCoordination` and the runner config). Omitted, `cwd`
-      // stays identical to `repoRootForCoordination`, byte-identical to
-      // this adapter's behavior before this flag existed.
-      const cwdForCoordination = flags.cwd !== undefined ? path.resolve(process.cwd(), flags.cwd) : repoRootForCoordination;
-
-      if (sub === 'start') {
-        const protocolId = flags.protocol ?? flags['protocol-id'] ?? flags['protocolRef.id'];
-        const kind = flags.kind ?? (protocolId ? 'declared-protocol' : 'agent-led');
-        const objective = requireField(flags.objective, 'coordination start requires --objective <text>');
-        const writerId = requireField(flags['writer-id'], 'coordination start requires --writer-id <id>');
-        const coordinationId = positional[1] ?? flags.id ?? flags['coordination-id'];
-        const workRef = flags['work-ref'] ?? flags.work;
-        const primaryRole = flags['primary-role'];
-        let task = flags.task ? (typeof flags.task === 'string' ? JSON.parse(flags.task) : flags.task) : undefined;
-        if (!task && flags['task-file']) {
-          task = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), flags['task-file']), 'utf8'));
-        }
-        let aggregateBounds = flags.bounds ? (typeof flags.bounds === 'string' ? JSON.parse(flags.bounds) : flags.bounds) : undefined;
-        let partialPolicy = flags['partial-policy'] ? (typeof flags['partial-policy'] === 'string' ? JSON.parse(flags['partial-policy']) : flags['partial-policy']) : undefined;
-        let actors = flags.actors ? (typeof flags.actors === 'string' ? JSON.parse(flags.actors) : flags.actors) : undefined;
-        let steps = flags.steps ? (typeof flags.steps === 'string' ? JSON.parse(flags.steps) : flags.steps) : undefined;
-
-        return await startCoordinationUseCase(
-          {
-            cwd: cwdForCoordination,
-            repoRoot: repoRootForCoordination,
-            runnerConfig: ensureRunnerConfigForDir(repoRootForCoordination),
-          },
-          {
-            kind,
-            protocolId,
-            coordinationId,
-            writerId,
-            objective,
-            workRef,
-            primaryRole,
-            task,
-            aggregateBounds,
-            partialPolicy,
-            actors,
-            steps,
-            cliExecutor: flags.executor,
-            cliModel: flags.model,
-            cliTier: flags.tier,
-          },
-        );
-      }
-
-      if (sub === 'status') {
-        const id = requireField(positional[1] ?? flags.id, 'coordination status requires an id: fgos coordination status <id> [--detail] [--replay] [--json]');
-        return showCoordinationStatusUseCase(
-          { cwd: cwdForCoordination, repoRoot: repoRootForCoordination },
-          { id, detail: flags.detail, replay: flags.replay },
-        );
-      }
-
-      if (sub === 'operation') {
-        const id = requireField(positional[1] ?? flags.id, 'coordination operation requires an id: fgos coordination operation <id> --action-key <key> --writer-id <id> --objective <text> --expected-outputs <outputs>');
-        const actionKey = requireField(flags['action-key'], 'coordination operation requires --action-key <sha256:key>');
-        const writerId = requireField(flags['writer-id'], 'coordination operation requires --writer-id <id>');
-        const objective = requireField(flags.objective, 'coordination operation requires --objective <text>');
-        const expectedOutputs = requireField(flags['expected-outputs'] ?? flags.outputs, 'coordination operation requires --expected-outputs <files>');
-
-        return await executeOperationUseCase(
-          {
-            cwd: cwdForCoordination,
-            repoRoot: repoRootForCoordination,
-            runnerConfig: ensureRunnerConfigForDir(repoRootForCoordination),
-          },
-          {
-            id,
-            actionKey,
-            writerId,
-            objective,
-            expectedOutputs,
-            contextRefs: flags['context-refs'] ?? flags.context,
-            constraints: flags.constraints,
-            capabilities: flags.capabilities,
-            fromAssignmentId: flags['from-assignment-id'],
-            intent: flags.intent,
-            round: flags.round,
-            taskKey: flags['task-key'],
-            mutation: flags.mutation,
-            cliExecutor: flags.executor,
-            cliModel: flags.model,
-            cliTier: flags.tier,
-          },
-        );
-      }
-
-      if (sub === 'authorize-and-dispatch') {
-        const id = requireField(positional[1] ?? flags.id, 'coordination authorize-and-dispatch requires an id: fgos coordination authorize-and-dispatch <id> --action-key <key> --writer-id <id> --objective <text> --reason <text>');
-        const actionKey = requireField(flags['action-key'], 'coordination authorize-and-dispatch requires --action-key <sha256:key>');
-        const writerId = requireField(flags['writer-id'], 'coordination authorize-and-dispatch requires --writer-id <id>');
-        const objective = requireField(flags.objective, 'coordination authorize-and-dispatch requires --objective <text>');
-        const reason = requireField(flags.reason, 'coordination authorize-and-dispatch requires --reason <text>');
-
-        return await executeAuthorizeAndDispatchUseCase(
-          {
-            cwd: cwdForCoordination,
-            repoRoot: repoRootForCoordination,
-            runnerConfig: ensureRunnerConfigForDir(repoRootForCoordination),
-          },
-          {
-            id,
-            actionKey,
-            writerId,
-            objective,
-            reason,
-            expectedOutputs: flags['expected-outputs'] ?? flags.outputs,
-            grantedContextRefs: flags['granted-context-refs'],
-            contextRefs: flags['context-refs'] ?? flags.context,
-            constraints: flags.constraints,
-            capabilities: flags.capabilities,
-            targetArtifactRef: flags['target-artifact-ref'],
-            taskKey: flags['task-key'],
-            mutation: flags.mutation,
-            cliExecutor: flags.executor,
-            cliModel: flags.model,
-            cliTier: flags.tier,
-          },
-        );
-      }
-
-      if (sub === 'fan-out') {
-        const id = requireField(positional[1] ?? flags.id, 'coordination fan-out requires an id: fgos coordination fan-out <id> --action-key <key> --writer-id <id> --branches <json>');
-        const actionKey = requireField(flags['action-key'], 'coordination fan-out requires --action-key <sha256:key>');
-        const writerId = requireField(flags['writer-id'], 'coordination fan-out requires --writer-id <id>');
-        let branches = flags.branches;
-        if (typeof branches === 'string') {
+    case 'run': {
+      const sub = positional[0];
+      if (sub === 'record') {
+        const { recordInlineRun } = await import('../src/runner/execution/run.mjs');
+        const unitRunId = requireField(flags['unit-run'], '--unit-run is required for fgos run record');
+        const role = flags.role || 'producer';
+        const roundStr = requireField(flags.round, '--round is required for fgos run record');
+        const round = Number.parseInt(roundStr, 10);
+        const nonce = requireField(flags.nonce, '--nonce is required for fgos run record');
+        const evidenceStr = requireField(flags.evidence, '--evidence is required for fgos run record');
+        const evidenceRefs = evidenceStr.split(',').map((s) => s.trim()).filter(Boolean);
+        const repoRoot = flags.dir;
+        let resultObj = {};
+        const resultJson = flags.result;
+        if (resultJson) {
           try {
-            branches = JSON.parse(branches);
-          } catch (err) {
-            if (fs.existsSync(path.resolve(process.cwd(), branches))) {
-              branches = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), branches), 'utf8'));
-            }
+            resultObj = JSON.parse(resultJson);
+          } catch (e) {
+            throw new StoreError('validation', `invalid JSON for --result: ${e.message}`);
           }
         }
-        if (!Array.isArray(branches)) {
-          throw new StoreError('validation', 'coordination fan-out requires --branches <json-array-or-path>');
-        }
-
-        return await executeFanOutUseCase(
-          {
-            cwd: cwdForCoordination,
-            repoRoot: repoRootForCoordination,
-            runnerConfig: ensureRunnerConfigForDir(repoRootForCoordination),
-          },
-          {
-            id,
-            actionKey,
-            writerId,
-            branches,
-            fromAssignmentId: flags['from-assignment-id'],
-            cliExecutor: flags.executor,
-            cliModel: flags.model,
-            cliTier: flags.tier,
-          },
-        );
-      }
-
-      if (sub === 'contribution') {
-        const id = requireField(positional[1] ?? flags.id, 'coordination contribution requires an id: fgos coordination contribution <id> --action-key <key> --writer-id <id> --type <type> --round-key <key>');
-        const actionKey = requireField(flags['action-key'], 'coordination contribution requires --action-key <sha256:key>');
-        const writerId = requireField(flags['writer-id'], 'coordination contribution requires --writer-id <id>');
-        const contributionType = requireField(flags.type ?? flags['contribution-type'], 'coordination contribution requires --type <type>');
-        const roundKey = requireField(flags['round-key'], 'coordination contribution requires --round-key <key>');
-
-        return await executeContributionUseCase(
-          { cwd: cwdForCoordination, repoRoot: repoRootForCoordination },
-          {
-            id,
-            actionKey,
-            writerId,
-            contributionType,
-            roundKey,
-            contributionId: flags['contribution-id'],
-            anchors: flags.anchors,
-            respondsTo: flags['responds-to'],
-          },
-        );
-      }
-
-      if (sub === 'human-turn') {
-        const id = requireField(positional[1] ?? flags.id, 'coordination human-turn requires an id: fgos coordination human-turn <id> --action-key <key> --writer-id <id> --turn-id <id> --turn-ordinal <num> --channel <channel> --artifact-ref <path> --external-ref <ref> --attributed-to <person>');
-        const actionKey = requireField(flags['action-key'], 'coordination human-turn requires --action-key <sha256:key>');
-        const writerId = requireField(flags['writer-id'], 'coordination human-turn requires --writer-id <id>');
-        const turnId = requireField(flags['turn-id'], 'coordination human-turn requires --turn-id <id>');
-        const ordinal = requireField(flags['turn-ordinal'] ?? flags.ordinal, 'coordination human-turn requires --turn-ordinal <number>');
-        const channel = requireField(flags.channel, 'coordination human-turn requires --channel <channel>');
-        const artifactRef = requireField(flags['artifact-ref'], 'coordination human-turn requires --artifact-ref <path>');
-        const externalRef = requireField(flags['external-ref'], 'coordination human-turn requires --external-ref <ref>');
-        const attributedTo = requireField(flags['attributed-to'], 'coordination human-turn requires --attributed-to <person>');
-
-        return await executeHumanTurnUseCase(
-          { cwd: cwdForCoordination, repoRoot: repoRootForCoordination },
-          {
-            id,
-            actionKey,
-            writerId,
-            turnId,
-            turnOrdinal: ordinal,
-            channel,
-            artifactRef,
-            externalRef,
-            attributedTo,
-            respondsToRefs: flags['responds-to-refs'] ?? flags['responds-to'],
-          },
-        );
-      }
-
-      if (sub === 'disposition') {
-        const id = requireField(positional[1] ?? flags.id, 'coordination disposition requires an id: fgos coordination disposition <id> --action-key <key> --writer-id <id> --disposition <val> --rationale <text>');
-        const actionKey = requireField(flags['action-key'], 'coordination disposition requires --action-key <sha256:key>');
-        const writerId = requireField(flags['writer-id'], 'coordination disposition requires --writer-id <id>');
-        const disposition = requireField(flags.disposition, 'coordination disposition requires --disposition <val>');
-        const rationale = requireField(flags.rationale, 'coordination disposition requires --rationale <text>');
-
-        return await executeDispositionUseCase(
-          { cwd: cwdForCoordination, repoRoot: repoRootForCoordination },
-          {
-            id,
-            actionKey,
-            writerId,
-            disposition,
-            rationale,
-            evidenceRefs: flags['evidence-refs'],
-          },
-        );
-      }
-
-      if (sub === 'specialist-authorize') {
-        const id = requireField(positional[1] ?? flags.id, 'coordination specialist-authorize requires an id: fgos coordination specialist-authorize <id> --action-key <key> --writer-id <id> --specialist-actor-id <id> --reason <text> --max-assignments <n> --expires-after-round <n>');
-        const actionKey = requireField(flags['action-key'], 'coordination specialist-authorize requires --action-key <sha256:key>');
-        const writerId = requireField(flags['writer-id'], 'coordination specialist-authorize requires --writer-id <id>');
-        const specialistActorId = requireField(flags['specialist-actor-id'], 'coordination specialist-authorize requires --specialist-actor-id <id>');
-        const reason = requireField(flags.reason, 'coordination specialist-authorize requires --reason <text>');
-        const maxAssignments = requireField(flags['max-assignments'], 'coordination specialist-authorize requires --max-assignments <n>');
-        const expiresAfterRound = requireField(flags['expires-after-round'], 'coordination specialist-authorize requires --expires-after-round <n>');
-
-        return await executeSpecialistAuthorizeUseCase(
-          { cwd: cwdForCoordination, repoRoot: repoRootForCoordination },
-          {
-            id,
-            actionKey,
-            writerId,
-            specialistActorId,
-            reason,
-            capabilities: flags.capabilities,
-            maxAssignments,
-            expiresAfterRound,
-            triggerEvidenceRefs: flags['trigger-evidence-refs'],
-            allowedContextRefs: flags['allowed-context-refs'],
-          },
-        );
-      }
-
-      if (sub === 'run') {
-        const filePath = requireField(flags.file, 'coordination run requires --file <request-path>: fgos coordination run --file <request.json>');
-        return await runCoordinationUseCase(
-          {
-            cwd: cwdForCoordination,
-            repoRoot: repoRootForCoordination,
-            runnerConfig: ensureRunnerConfigForDir(repoRootForCoordination),
-          },
-          {
-            requestPath: path.resolve(process.cwd(), filePath),
-            cliExecutor: flags.executor,
-            cliModel: flags.model,
-            cliTier: flags.tier,
-          }
-        );
-      }
-      if (sub === 'close') {
-        if (flags.file) {
-          const filePath = flags.file;
-          const requestObject = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), filePath), 'utf8'));
-          return await closeCoordinationUseCase(
-            {
-              cwd: cwdForCoordination,
-              repoRoot: repoRootForCoordination,
-              runnerConfig: ensureRunnerConfigForDir(repoRootForCoordination),
-            },
-            { requestObject }
-          );
-        }
-
-        const id = requireField(positional[1] ?? flags.id, 'coordination close requires an id or --file: fgos coordination close <id> --action-key <key> --writer-id <id>');
-        const actionKey = requireField(flags['action-key'], 'coordination close requires --action-key <sha256:key>');
-        const writerId = requireField(flags['writer-id'] ?? flags['authorized-by'], 'coordination close requires --writer-id <id>');
-
-        return await executeCloseUseCase(
-          {
-            cwd: cwdForCoordination,
-            repoRoot: repoRootForCoordination,
-            runnerConfig: ensureRunnerConfigForDir(repoRootForCoordination),
-          },
-          {
-            id,
-            actionKey,
-            writerId,
-            authorizedBy: flags['authorized-by'] ?? { type: 'driver', id: writerId },
-            dissentingActorIds: flags['dissenting-actor-ids'] ?? flags.dissent,
-            aggregationId: flags['aggregation-id'],
-          },
-        );
-      }
-      if (sub === 'show') {
-        const id = requireField(positional[1] ?? flags.id, 'coordination show requires an id: fgos coordination show <id> [--json]');
-        // `--json` is accepted as a no-op, same convention the existing
-        // `show` (work-item) verb already documents in the registry: the
-        // envelope is always JSON, so the flag changes nothing.
-        return showCoordinationUseCase({ cwd: cwdForCoordination, repoRoot: repoRootForCoordination }, { id });
-      }
-      if (sub === 'actions') {
-        const id = requireField(positional[1] ?? flags.id, 'coordination actions requires an id: fgos coordination actions <id> [--json]');
-        return showCoordinationActionsUseCase({ cwd: cwdForCoordination, repoRoot: repoRootForCoordination }, { id });
-      }
-      if (sub === 'launch-master-loop') {
-        // MVP4 (Step 09, Phase 02) R1-R4: a thin, mechanical composer for
-        // the shipped standalone-master-coordination-loop fixture's
-        // required first pass ONLY -- never an authorize/disposition/
-        // revise/recheck step (see launch-master-loop.mjs's own header
-        // comment). Same door as `run` above: `launchMasterLoopUseCase`
-        // composes a request object and hands it to the SAME
-        // `runCoordinationUseCase` this file already calls for `run`.
-        const planPath = path.resolve(process.cwd(), requireField(flags.plan, 'coordination launch-master-loop requires --plan <path>'));
-        const objective = requireField(flags.objective, 'coordination launch-master-loop requires --objective <text>');
-        const writerId = requireField(flags['writer-id'], 'coordination launch-master-loop requires --writer-id <id>');
-        return await launchMasterLoopUseCase(
-          {
-            cwd: cwdForCoordination,
-            repoRoot: repoRootForCoordination,
-            runnerConfig: ensureRunnerConfigForDir(repoRootForCoordination),
-          },
-          {
-            planPath,
-            objective,
-            writerId,
-            coordinationId: flags['coordination-id'],
-            expectedFixtureVersion: flags['fixture-version'],
-            cliExecutor: flags.executor,
-            cliModel: flags.model,
-            cliTier: flags.tier,
-          },
-        );
-      }
-      if (sub === 'chain') {
-        // Step 09 Phase 02 R2-R5: a read-only status read across a whole
-        // chain of cell-sessions -- thin door onto
-        // src/verbs/coordination/chain.mjs, which never appends an event,
-        // dispatches, authorizes, dispositions, or closes a session.
-        const track = requireField(positional[1] ?? flags.track, 'coordination chain requires a track: fgos coordination chain <track> [--json]');
-        return chainCoordinationUseCase({ cwd: cwdForCoordination, repoRoot: repoRootForCoordination }, { track });
-      }
-      if (sub === 'recover') {
-        // Coordination-session recovery: the session-scoped analog of
-        // `dispatch recover` -- see that verb's own case block, above, for
-        // the identical observe-vs-apply shape this mirrors.
-        const coordinationId = requireField(positional[1] ?? flags.id, 'coordination recover requires a coordinationId: fgos coordination recover <coordinationId>');
-        const recoverCtx = { cwd: cwdForCoordination, repoRoot: repoRootForCoordination };
-        if (flags.action === undefined) {
-          return recoverSessionObserveUseCase(recoverCtx, { coordinationId });
-        }
-        return recoverSessionApplyUseCase(recoverCtx, {
-          coordinationId,
-          action: flags.action,
-          expectedSnapshot: requireField(flags['expected-snapshot'], 'coordination recover --action requires --expected-snapshot'),
-          expectedEventSeq: requireField(flags['expected-event-seq'], 'coordination recover --action requires --expected-event-seq'),
-          expectedRunControlEpoch: requireField(flags['expected-run-control-epoch'], 'coordination recover --action requires --expected-run-control-epoch'),
-          expectedExpiresAt: requireField(flags['expected-expires-at'], 'coordination recover --action requires --expected-expires-at'),
-          actionKey: requireField(flags['action-key'], 'coordination recover --action requires --action-key'),
+        return recordInlineRun({
+          unitRunId,
+          role,
+          round,
+          nonce,
+          evidenceRefs,
+          result: resultObj,
+          repoRoot,
         });
       }
-      if (sub === 'pack') {
-        // Public CLI door onto the group-thinking Protocol Pack gate
-        // (src/verbs/coordination/group-thinking-pack.mjs) -- replaces the
-        // inline `node -e` scripts the fgos-group-thinking skill used to
-        // instruct a dispatching agent to author by hand. A subverb under
-        // the already-registered `coordination` verb, not a new top-level
-        // verb: no COMMAND_REGISTRY.length growth, no rust-host
-        // regeneration. Every function below is called unmodified -- this
-        // block never reimplements pack-membership or dispatch logic.
-        const KNOWN_PACK_SUBVERBS = ['list', 'show-protocol', 'run'];
-        const packSub = requireField(positional[1], 'coordination pack requires a sub-verb: fgos coordination pack <list|show-protocol|run> ...');
-        if (!KNOWN_PACK_SUBVERBS.includes(packSub)) {
-          throw new StoreError('validation', `coordination pack: unknown sub-verb "${packSub}" (known: list, show-protocol, run).`);
-        }
 
-        if (packSub === 'list') {
-          return loadProtocolPack();
-        }
-
-        if (packSub === 'show-protocol') {
-          const protocolId = requireField(
-            positional[2] ?? flags.protocol ?? flags['protocol-id'],
-            'coordination pack show-protocol requires a protocol id: fgos coordination pack show-protocol <id>',
-          );
-          return loadCoordinationProtocol(protocolId, { cwd: cwdForCoordination });
-        }
-
-        // packSub === 'run'
-        const protocolId = requireField(flags.protocol ?? flags['protocol-id'], 'coordination pack run requires --protocol <id>');
-        const filePath = requireField(flags.file, 'coordination pack run requires --file <request-path>');
-        return await runGroupThinkingRequest(
-          {
-            cwd: cwdForCoordination,
-            repoRoot: repoRootForCoordination,
-            runnerConfig: ensureRunnerConfigForDir(repoRootForCoordination),
-          },
-          {
-            protocolId,
-            requestPath: path.resolve(process.cwd(), filePath),
-            cliExecutor: flags.executor,
-            cliModel: flags.model,
-            cliTier: flags.tier,
-          },
-        );
+      const { runUnit } = await import('../src/runner/execution/run.mjs');
+      const unitPath = flags.unit;
+      const resumeUnitRunId = flags.resume;
+      if (!unitPath && !resumeUnitRunId) {
+        throw new StoreError('validation', 'fgos run requires --unit <file|-> or --resume <unitRunId>');
       }
-      throw new StoreError('validation', `coordination: unknown sub-verb "${sub}" (known: ${KNOWN_COORDINATION_SUBVERBS.join(', ')}).`);
+      const pattern = flags.pattern;
+      const overrideStr = flags.override;
+      let overrides = [];
+      if (overrideStr) {
+        try {
+          const parsed = JSON.parse(overrideStr);
+          overrides = Array.isArray(parsed) ? parsed : [parsed];
+          for (const ov of overrides) {
+            if (!ov.origin) ov.origin = 'human-cli';
+          }
+        } catch (e) {
+          throw new StoreError('validation', `invalid JSON for --override: ${e.message}`);
+        }
+      }
+      const repoRoot = flags.dir;
+      const worktree = flags.worktree;
+      const runWarning = checkDirDiffersFromCwd({ dir: typeof flags.dir === 'string' ? flags.dir : undefined, worktree: flags.worktree });
+
+      return attachDirWarning(await runUnit({
+        unitPath,
+        pattern,
+        stanceOptions: flags['stance-options'] === undefined ? undefined : requireField(flags['stance-options'], '--stance-options requires pipe-separated option labels').split('|'),
+        overrides,
+        resumeUnitRunId,
+        repoRoot,
+        worktree,
+      }), runWarning);
     }
+
+
 
     case 'rebuild': {
       const view = rebuild(dir);
@@ -3364,16 +2704,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       const logPath = path.join(dir, 'events.jsonl');
       const { backupPath, droppedLine, eventCount } = repairTruncatedLastLine(logPath);
       return { logPath, backupPath, eventCount, droppedLine };
-    }
-
-    // Request-class per D1 (same contract as `ready`/`list`): a pure read,
-    // never appends an event, never mutates state.json. Reports the
-    // predicted-vs-actual compound-learning signal (per Phase 3 plan
-    // Approach S1) folded from `listWork(dir).outcomes` — no new store
-    // export needed for reading, per this cell's action.
-    case 'check': {
-      const id = optionalField(positional[0] ?? flags.id, 'check --id requires a non-empty id value (omit --id entirely to check every item)');
-      return collectCheckData(listWork(dir), id, dir);
     }
 
     // Rollup view theo bộ (P24, request-class per D1: a pure read — never
@@ -3758,7 +3088,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           role: item.claimRole ?? 'session',
         });
         addOutcome(dir, { id, actual: { outcome: 'blocked', passed: false, attempts: 1, errorClass: reason } });
-        addFriction(dir, {
+        recordFriction(dir, {
+          producer: 'bin.fgos.return',
           id,
           disposition: 'blocked',
           errorClass: reason,
@@ -3806,7 +3137,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         const attestation = checkDispatchAttestation(dir, repoRoot, id, branch);
         if (!attestation.ok) {
           settleClaim(dir, { id, claimId: activeClaim?.claimId, finalStatus: 'blocked', reason: attestation.reason, role: item.claimRole ?? 'session' });
-          addFriction(dir, {
+          recordFriction(dir, {
+            producer: 'bin.fgos.return',
             id,
             disposition: 'blocked',
             errorClass: attestation.reason,
@@ -3933,7 +3265,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
           // of a real verify failure (per the tsk-53o comment above), so it
           // gets no hint either.
           const hint = check.timedOut ? null : detachedWorktreeFgosHint(check.output);
-          addFriction(dir, {
+          recordFriction(dir, {
+            producer: 'bin.fgos.return',
             id,
             disposition: 'blocked',
             errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss',
@@ -4072,7 +3405,8 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
         // the branch-source path above (tsk-53o: a timeout is not proof of
         // a real verify failure).
         const hint = check.timedOut ? null : detachedWorktreeFgosHint(check.output);
-        addFriction(dir, {
+        recordFriction(dir, {
+          producer: 'bin.fgos.return',
           id,
           disposition: 'blocked',
           errorClass: check.timedOut ? 'verify-timeout' : 'verify-miss',
@@ -4229,49 +3563,6 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     }
 
     // Gate A — candidate ranking (self-improve-loop P13 Slice 1, D1/D3/D6):
-    // two-shot, flag-driven, NEVER an interactive stdin loop (D11). `fgos
-    // evolve` (no --pick) ranks every id with unsettled friction and prints
-    // the full list; `fgos evolve --pick <id>` reprints that candidate's
-    // full friction record. Request-class per D1 (same contract as
-    // `ready`/`list`/`check`): reads the view via `listWork` ONLY — never
-    // `rebuild`/`rebuild`-adjacent writers — so a run never appends an
-    // event or touches state.json. Running with no `--pick` IS the "stop"
-    // outcome (D6); there is no separate cancel input and no re-prompt on a
-    // bad `--pick` id (D11) — an unmatched id is a clean validation error.
-    case 'evolve': {
-      const pickId = optionalField(flags.pick, 'evolve --pick requires a non-empty candidate id value (omit --pick entirely to list every candidate)');
-      // Per D15: `--submit <id>` is the only mutating action across the
-      // whole evolve/Gate A surface — `evolve` (no flag) and `evolve --pick`
-      // above are unchanged from Slice 1.
-      const submitId = optionalField(flags.submit, 'evolve --submit requires a non-empty candidate id value');
-      const view = listWork(dir);
-      const candidates = rankCandidates(view);
-      if (submitId !== undefined) {
-        const picked = candidates.find((c) => c.id === submitId);
-        if (!picked) {
-          throw new StoreError(
-            'validation',
-            `evolve --submit: "${submitId}" is not an open candidate — run "fgos evolve" to see the current ranked list.`,
-          );
-        }
-        return submitWork(dir, describeCandidate(picked));
-      }
-      if (pickId === undefined) {
-        return paginateVerbResult(candidates, flags, 'evolve-v1', 'evolve');
-      }
-      const picked = candidates.find((c) => c.id === pickId);
-      if (!picked) {
-        throw new StoreError(
-          'validation',
-          `evolve --pick: "${pickId}" is not an open candidate — run "fgos evolve" to see the current ranked list.`,
-        );
-      }
-      // Reuses the existing friction-record collector (collectFrictionData
-      // above) rather than a new one — the picked candidate's "full record"
-      // IS that id's friction data.
-      return collectFrictionData(view, pickId);
-    }
-
     // Backlog-triage impact ranking (P21) — separate from P14's intake-time
     // risk/lane classification: this ranks open work by blocking fan-out
     // (how many other open items it unblocks), not by how risky it is.
@@ -4341,7 +3632,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     }
 
     // Gateway process lifecycle (tsk-31v): the one-door way any agent
-    // starts/stops/checks the herdr-fgos gateway (REST API + web
+    // starts/stops/checks the fgos gateway (REST API + web
     // dashboard) as a detached background process instead of hand-rolling
     // nohup/tmux/systemd. AGENTS.md's own dispatch doctrine names this as
     // the mandatory entry point.
@@ -4654,10 +3945,12 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
       // silently checking/writing the wrong tree).
       const repoRoot = flags.dir !== undefined ? path.dirname(dir) : (resolveMainCheckoutRoot(process.cwd()) ?? process.cwd());
       const fixed = flags.fix ? runFixes(repoRoot) : undefined;
-      const checks = DOCTOR_CHECKS.map(({ id, description, check }) => {
-        const { passed, message } = check(repoRoot);
-        return { id, description, passed, message };
-      });
+      // A check may return its result directly or as a promise (one drives promise-based runner code).
+      const checks = [];
+      for (const { id, description, check } of DOCTOR_CHECKS) {
+        const { passed, message } = await check(repoRoot);
+        checks.push({ id, description, passed, message });
+      }
       return fixed === undefined ? { checks } : { fixed, checks };
     }
 
@@ -4893,7 +4186,7 @@ async function runVerb(verb, flags, positional, dir, rawArgv = process.argv.slic
     }
 
     default:
-      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|item|ask|answer|decision|list|ready|rebuild|repair|check|rollup|take|return|review|approve|sync-root|reject|catchup|evolve|triage|session|gateway|goal|tool|setup|doctor|unlock|lock-status|main-checkout-reset> ...`);
+      throw new StoreError('validation', `unknown verb "${verb ?? ''}". Usage: fgos <version|init|add|submit|discover|plan|move|retrospective|cleanup|compound|edit|item|ask|answer|decision|list|ready|rebuild|repair|rollup|take|return|review|approve|sync-root|reject|catchup|triage|session|gateway|goal|tool|setup|doctor|unlock|lock-status|main-checkout-reset> ...`);
   }
 }
 
@@ -5123,7 +4416,7 @@ function renderPretty(verb, data) {
 // own hard refusal instead of a soft warning.
 const STORE_MISSING_WARNING_VERBS = new Set([
   'list', 'ready', 'graph', 'stale', 'check', 'rollup', 'show', 'conflicts', 'triage', 'schedule',
-  'gate-bypass', 'doc-sources', 'lock-status', 'evolve', 'recheck-blocked',
+  'gate-bypass', 'doc-sources', 'lock-status', 'recheck-blocked',
 ]);
 
 // State/root-resolution investigation (docs/history/agent-coordination-state-root):
@@ -5224,7 +4517,6 @@ const MUTATING_SUBCOMMAND_PREDICATES = {
     'fan-out', 'contribution', 'human-turn', 'disposition', 'specialist-authorize',
   ].includes(positional[0]) || (positional[0] === 'recover' && flags.action !== undefined),
   merge: (positional) => positional[0] === 'next',
-  evolve: (positional, flags) => flags.submit !== undefined,
   // `dispatch show-run`/`watch` never write; `dispatch recover` writes
   // (controlEpoch bump + one recovery-commands.jsonl line) only when
   // --action is given -- the bare observe form stays read-only.
@@ -5281,6 +4573,10 @@ async function main() {
     // check: refuse when `cwd` is a linked worktree, the one remaining
     // path that could recreate a live `.fgos/` there and defeat ADR0020.
     const entry = COMMAND_REGISTRY.find((e) => e.name === verb);
+    if (entry?.nativeOnly) {
+      process.stderr.write(`fgos: "${verb}" chỉ có ở Rust host.\n`);
+      process.exit(4);
+    }
     faultClass = 'store-missing';
     if (entry?.requiresExistingStore && !fs.existsSync(dir)) {
       throw new StoreError(
@@ -5366,7 +4662,11 @@ async function main() {
     // 1 a hard finding present) rather than always-0-unless-thrown -- its own
     // contract, distinct from the StoreError/EXIT_CODES category map every
     // other verb uses for a THROWN refusal.
-    process.exitCode = verb === 'plan-lint' ? (data.ok ? 0 : 1) : 0;
+    // `doctor --strict` is the other data-dependent exit: 1 when any check still fails after
+    // the (optional) fixes ran. Without it doctor stays exit 0 -- fgctl's init/upgrade/repair
+    // tail runs `doctor --fix` and `doctor` and treats a non-zero exit as a degraded install.
+    const doctorFailed = verb === 'doctor' && flags.strict === true && data.checks.some((c) => !c.passed);
+    process.exitCode = verb === 'plan-lint' ? (data.ok ? 0 : 1) : (doctorFailed ? 1 : 0);
   } catch (err) {
     // tsk-5z0: record before reporting, and only say the record exists when
     // one actually landed — `recordInvocationFault` returns null when the

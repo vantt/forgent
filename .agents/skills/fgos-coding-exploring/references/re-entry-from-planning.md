@@ -28,7 +28,7 @@ When re-entering this way:
   design removes. If the gap resolved without needing a person at all,
   the new decision still reaches one — the plan built on it goes through
   `fgos-coding-validating`'s single gate.
-- **`item.stage` stays `planning` throughout.** There is no
+- **`item.workflowStep` stays `planning` throughout.** There is no
   `planning -> exploring` edge — this is a skill invocation, never a
   stage move. Hand back to `fgos-coding-planning` when the gap is closed.
 

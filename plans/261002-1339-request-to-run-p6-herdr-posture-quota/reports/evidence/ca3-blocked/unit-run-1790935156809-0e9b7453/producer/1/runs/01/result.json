@@ -1,0 +1,186 @@
+{
+  "contract": {
+    "id": "assignment-run-result",
+    "version": 3
+  },
+  "runId": "run_unit-run-1790935156809-0e9b7453/producer/1_01",
+  "assignmentId": "unit-run-1790935156809-0e9b7453/producer/1",
+  "controlEpoch": 1,
+  "controlToken": "99189463-9dba-4fd6-96b7-69ccbd9874c0",
+  "executorId": "gemini",
+  "adapter": "herdr-spawn",
+  "confinement": null,
+  "role": "producer",
+  "executorRedirected": false,
+  "policy": {
+    "role": "producer",
+    "executorPreference": [
+      "gemini"
+    ],
+    "executorId": "gemini",
+    "providerModel": "gemini",
+    "rigor": "standard",
+    "tier": "standard",
+    "model": "gemini-3.8-flash-medium",
+    "reasoningEffort": "medium",
+    "visibility": "headless",
+    "repeatMode": null,
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "gemini",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "provider": {
+        "value": "gemini",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "gemini"
+        }
+      },
+      "model": {
+        "value": "gemini-3.8-flash-medium",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "rigor": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "tier": {
+        "value": "standard",
+        "source": {
+          "scope": "rigor",
+          "id": "standard"
+        }
+      },
+      "reasoningEffort": {
+        "value": "medium",
+        "source": {
+          "scope": "derived",
+          "id": "rigor.standard"
+        }
+      },
+      "persona": {
+        "source": {
+          "scope": "default"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "repeatMode": {
+        "value": null,
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "unit-run-1790935156809-0e9b7453/producer/1"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "gemini"
+        }
+      }
+    }
+  },
+  "settledAt": "2026-10-02T09:59:18.728Z",
+  "durationMs": 1860,
+  "settleReports": [],
+  "classification": {
+    "execution": {
+      "status": "failed",
+      "exitCode": 1
+    },
+    "assessment": {
+      "verdict": "not-applicable"
+    },
+    "confidence": {
+      "level": "failed",
+      "basis": [
+        "captured-stdout",
+        "failed-exit"
+      ]
+    },
+    "failure": {
+      "family": "provider",
+      "code": "nonzero-process-exit"
+    },
+    "policy": {
+      "disposition": "needs-input",
+      "code": "nonzero-process-exit"
+    },
+    "delivery": {
+      "mode": "fresh"
+    },
+    "provenance": "native-v3",
+    "outcome": {
+      "category": "infra",
+      "reason": "nonzero-process-exit"
+    }
+  },
+  "runtime": {
+    "exitCode": 1,
+    "stdoutLog": ".fgos/assignments/unit-run-1790935156809-0e9b7453/producer/1/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/unit-run-1790935156809-0e9b7453/producer/1/runs/01/stderr.log"
+  },
+  "runnerNote": {
+    "summary": "executor failed to brief the worker for work \"gemini\": agent wS:p3TS is no longer the pane foreground process"
+  },
+  "usage": {
+    "inputTokens": null,
+    "outputTokens": null,
+    "totalTokens": null,
+    "cacheReadTokens": null,
+    "cacheCreationTokens": null,
+    "source": "unsupported"
+  },
+  "evidence": {
+    "gitBefore": "eb8898f95933d7b8428ab68aa63e0f7f2549b01a",
+    "gitAfter": "eb8898f95933d7b8428ab68aa63e0f7f2549b01a",
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [],
+    "mutatedDirtyBeforeFiles": [],
+    "attribution": [
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca2-posture-note.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      },
+      {
+        "path": "plans/261002-1339-request-to-run-p6-herdr-posture-quota/reports/evidence/ca6-docs-note.md",
+        "firstObserved": "pre-launch",
+        "level": "excluded",
+        "basis": [
+          "pre-launch-git-status"
+        ],
+        "coverageMatched": false
+      }
+    ],
+    "artifacts": [],
+    "tests": []
+  }
+}

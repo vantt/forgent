@@ -11,7 +11,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
-import { DEFAULT_DOMAIN, resolveDomainName } from '../state/workflow-stage-graphs.mjs';
+import { DEFAULT_DOMAIN, resolveDomainName } from '../state/domain-registry.mjs';
 
 export const TEMPLATE_DIR = path.join(import.meta.dirname, 'prompt-templates');
 
@@ -43,7 +43,7 @@ function ruleMatches(match, input) {
 }
 
 /**
- * Mechanical kind/tier/domain/stage -> template-file-name lookup. Pure and
+ * Mechanical kind/domain/stage -> template-file-name lookup. Pure and
  * synchronous — no model call, ever (R42).
  *
  * The incoming `domain` is folded via `resolveDomainName` (undefined or an
@@ -55,8 +55,8 @@ function ruleMatches(match, input) {
  * byte-identical to every pre-tsk-5mj call — only an explicit
  * `stage: 'discovery'` picks the new rule above.
  */
-export function selectTemplate({ kind, tier, domain, stage } = {}) {
-  const input = { kind, tier, domain: resolveDomainName(domain), stage };
+export function selectTemplate({ kind, domain, stage } = {}) {
+  const input = { kind, domain: resolveDomainName(domain), stage };
   const rule = TEMPLATE_RULES.find((r) => ruleMatches(r.match, input));
   return rule.template;
 }

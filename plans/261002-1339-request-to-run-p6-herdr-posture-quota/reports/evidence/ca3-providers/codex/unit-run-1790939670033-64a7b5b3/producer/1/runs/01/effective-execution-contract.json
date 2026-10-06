@@ -1,0 +1,81 @@
+{
+  "contract": {
+    "id": "effective-execution-contract",
+    "version": 1
+  },
+  "assignmentId": "unit-run-1790939670033-64a7b5b3/producer/1",
+  "runId": "run_unit-run-1790939670033-64a7b5b3/producer/1_01",
+  "mutation": "read-only",
+  "workspace": {
+    "cwd": "/var/tmp/p6-accept-work",
+    "writeScope": [],
+    "mainCheckout": "/home/vantt/projects/forgentX",
+    "posture": "worktree"
+  },
+  "tools": {
+    "shell": {
+      "mode": "restricted",
+      "enforced": false,
+      "enforcement": "instructed",
+      "allowedCommands": []
+    }
+  },
+  "permissions": {
+    "posture": "enforced",
+    "shell": {
+      "mode": "restricted",
+      "enforced": false,
+      "enforcement": "instructed",
+      "allowedCommands": []
+    },
+    "filesystem": {
+      "mode": "read-only",
+      "enforced": true,
+      "enforcement": "enforced",
+      "writeScope": []
+    },
+    "network": {
+      "enforced": false,
+      "enforcement": "instructed"
+    }
+  },
+  "limits": {
+    "executorTimeoutMs": 2100000
+  },
+  "resultClaim": {
+    "contract": {
+      "id": "agent-result-claim",
+      "version": 2
+    },
+    "path": "/home/vantt/projects/forgentX-p6/.fgos/assignments/unit-run-1790939670033-64a7b5b3/producer/1/runs/01/outbox/result-1.json"
+  },
+  "provenance": {
+    "dispatchPlanHash": "sha256:4c68198f2c87e406b225ea445bd59c3ce16190d62cc8ba849bd0ccd3e53c5e78",
+    "configHash": "sha256:a2bb29b97ba3b159c1c3e3257fe8d03301e7cc10c16976266eb40dc9bfa90022",
+    "executorId": "openai",
+    "adapter": "herdr-spawn",
+    "adapterFamily": "herdr-spawn"
+  },
+  "providerCapacity": {
+    "contract": "provider-capacity-selection.v1",
+    "status": "selected",
+    "provider": "openai-codex",
+    "accountId": "fgovn",
+    "accountLabel": "fgovn",
+    "selectedAt": "2026-10-02T11:14:30.059Z",
+    "lease": {
+      "runId": "run_unit-run-1790939670033-64a7b5b3/producer/1_01",
+      "assignmentId": "unit-run-1790939670033-64a7b5b3/producer/1",
+      "pid": 2692362
+    },
+    "credentialProvisioned": false
+  },
+  "enforcementPosture": "enforced",
+  "permissionEnforcementPosture": "enforced",
+  "executorId": "openai",
+  "adapter": "herdr-spawn",
+  "adapterFamily": "herdr-spawn",
+  "assignment": {
+    "role": "producer"
+  }
+}

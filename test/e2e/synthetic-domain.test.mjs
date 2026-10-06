@@ -19,13 +19,13 @@ import { frontier } from '../../src/state/frontier.mjs';
 //
 // Note on "stage resolves to assembling": `fgos add` never writes an
 // explicit `stage` field (it stays lazily-defaulted, per base-workflow-model
-// approach.md); a work.stage event is only ever written by the
+// approach.md); a work.step event is only ever written by the
 // discovery/decompose sweep, which `add`-created items never go through. So
 // there is no on-disk `stage` value to read directly for an added item.
 // IMPORTANT: reaching `proposed` here does NOT, by itself, prove the lazy
 // default resolved to the synthetic domain's own Execute-mapped stage
-// ('assembling') — frontier.mjs's `(item.stage ?? executeStage) !==
-// executeStage` check is trivially satisfied whenever `item.stage` is
+// ('assembling') — frontier.mjs's `(item.workflowStep ?? executeStage) !==
+// executeStage` check is trivially satisfied whenever `item.workflowStep` is
 // absent, for ANY domain's Execute-mapped stage, correct or not. The actual
 // domain-discriminating proof lives in the "frontier: domain-aware stage
 // resolution actually discriminates" test below, which pins two items to
@@ -76,7 +76,7 @@ function add(cwd, id, extra = {}) {
   // domain's OWN Execute-mapped stage via add's bare default (e.g.
   // synthetic's 'assembling'), so a hardcoded helper default would be
   // wrong for exactly the domain this file cares about most.
-  if (extra.stage) flags.push('--stage', extra.stage);
+  if (extra.workflowStep) flags.push('--step', extra.workflowStep);
   const result = fgos(cwd, ['add', id, ...flags]);
   assert.equal(result.status, 0, `fgos add ${id} failed: ${result.stderr}`);
   return result;
@@ -105,7 +105,8 @@ function writeRunnerConfig(repoRoot, executorScript) {
     JSON.stringify({
       runner: {
         executor: { command: process.execPath, args: [executorScript, '{prompt}', '--model', '{model}'] },
-        models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+        modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
+        rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
         timeoutMs: 15000,
         parallel: { maxRoots: 4, maxLeavesPerRoot: 4 },
       },
@@ -176,7 +177,7 @@ test('e2e synthetic domain: add --domain synthetic (no --stage) dispatches throu
     // ('assembling', not 'executing') is still exercised via its bare
     // default, deliberately untouched, since that fallback resolution is
     // this test's whole point.
-    stage: 'executing',
+    workflowStep: 'executing',
   });
 
   // Both items are independent roots (no deps between them), so a single
@@ -242,7 +243,7 @@ test('e2e synthetic domain: add --domain synthetic (no --stage) dispatches throu
 
 // work-item-status-delivered-retrospective-cleanup D5/D8: the cleanup
 // harness's merge-still-resolves check is skipped entirely for a domain
-// that declares worktreeBacked:false (workflow-stage-graphs.mjs) — a
+// that declares worktreeBacked:false (domain-registry.mjs) — a
 // synthetic item has no branch, no worktree, no headAtTake/headAtReturn
 // at all, so the REAL `fgos cleanup` verb (not just a bare `move`, which
 // never invokes the harness) must still close it to done without ever
@@ -285,12 +286,12 @@ test('e2e synthetic domain: submit --domain synthetic is deliberately NOT the en
   // plain `submit` (no --domain at all) stays byte-for-byte unchanged by
   // this feature's existence.
   const submitted = submit(repoRoot, 'Investigate the sluggish overview page');
-  assert.equal(submitted.stage, 'discovery', 'a plain submit still lands in stage discovery, unaffected by the synthetic domain');
+  assert.equal(submitted.workflowStep, 'discovery', 'a plain submit still lands in stage discovery, unaffected by the synthetic domain');
   assert.equal(submitted.domain, undefined, 'a plain submit carries no explicit domain field — it lazily defaults to coding');
 
   const view = stateView(repoRoot);
   const item = view.work[submitted.id];
-  assert.equal(item.stage, 'discovery');
+  assert.equal(item.workflowStep, 'discovery');
   assert.equal(item.domain, undefined);
 });
 
@@ -298,8 +299,8 @@ test('frontier: domain-aware stage resolution actually discriminates — two ite
   // Unlike the e2e test above (which never writes an explicit `stage`, so
   // its "reached proposed" assertion is trivially true for any domain, per
   // the header comment), this pins both items to the exact same explicit
-  // `stage: 'assembling'` value and varies only `domain`. `assembling` is
-  // synthetic's own Execute-mapped stage (workflow-stage-graphs.mjs); it is not one of
+  // `workflowStep: 'assembling'` value and varies only `domain`. `assembling` is
+  // synthetic's own Execute-mapped stage (domain-registry.mjs); it is not one of
   // coding's stages at all (coding's Execute stage is `executing`). A
   // broken synthetic-to-stage mapping — or a frontier that ignored domain
   // entirely — would make both items ready, or neither; this test fails
@@ -310,14 +311,14 @@ test('frontier: domain-aware stage resolution actually discriminates — two ite
         id: 'synth-explicit',
         status: 'todo',
         domain: 'synthetic',
-        stage: 'assembling',
+        workflowStep: 'assembling',
         deps: [],
       },
       'coding-explicit': {
         id: 'coding-explicit',
         status: 'todo',
         domain: 'coding',
-        stage: 'assembling',
+        workflowStep: 'assembling',
         deps: [],
       },
     },

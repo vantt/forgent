@@ -12,9 +12,6 @@ import {
   POLICY_DISPOSITIONS,
   DELIVERY_MODES,
   PROVENANCE_VALUES,
-  projectLegacyStatus,
-  projectLegacyConfidence,
-  projectLegacyStatusAndConfidence,
   validateRunResultV2,
   normalizeRunResultV2,
   interpretRunResult,
@@ -25,14 +22,14 @@ function mkTempDir() {
 }
 
 test('closed vocabularies are defined and frozen', () => {
-  assert.deepEqual(RUN_RESULT_CONTRACT, { id: 'assignment-run-result', version: 2 });
+  assert.deepEqual(RUN_RESULT_CONTRACT, { id: 'assignment-run-result', version: 3 });
   assert.deepEqual(EXECUTION_STATUSES, ['completed', 'failed', 'cancelled', 'completion-unknown']);
   assert.deepEqual(ASSESSMENT_VERDICTS, ['pass', 'findings', 'blocked', 'inconclusive', 'not-applicable']);
   assert.deepEqual(CONFIDENCE_LEVELS, ['verified', 'reported', 'inferred', 'no-evidence', 'failed']);
   assert.deepEqual(FAILURE_FAMILIES, ['provider', 'resource', 'contract', 'policy', 'external-interference', 'unknown']);
   assert.deepEqual(POLICY_DISPOSITIONS, ['allow', 'refuse', 'needs-input', 'not-applicable']);
   assert.deepEqual(DELIVERY_MODES, ['fresh', 'resumed', 'replayed', 'recovered', 'legacy-derived']);
-  assert.deepEqual(PROVENANCE_VALUES, ['native-v2', 'legacy-derived', 'contract-corrupt']);
+  assert.deepEqual(PROVENANCE_VALUES, ['native-v2', 'native-v3', 'native-v4', 'legacy-derived', 'contract-corrupt']);
 });
 
 test('normalizeRunResultV2: clean pass produces done status and native-v2 provenance', () => {

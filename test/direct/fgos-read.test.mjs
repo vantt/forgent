@@ -40,7 +40,7 @@ function addTestWork(dir, id, extra = {}) {
     refs: extra.refs ?? [],
     verify: extra.verify ?? 'npm test',
     description: extra.description ?? 'fixture description',
-    stage: extra.stage ?? 'executing',
+    workflowStep: extra.workflowStep ?? 'executing',
     ...extra,
   });
 }
@@ -234,9 +234,9 @@ test('list --id --fields returns only named fields and omits all history side-lo
   addTestWork(dir, 'item-fields', { title: 'Item Fields' });
   addDecision(dir, { id: 'item-fields', text: 'decision text', rationale: 'rat', relation: 'none' });
 
-  const flagged = listUseCase({ dir }, { id: 'item-fields', fields: 'stage,status,holder' });
+  const flagged = listUseCase({ dir }, { id: 'item-fields', fields: 'workflowStep,status,holder' });
   assert.deepEqual(Object.keys(flagged.work), ['item-fields']);
-  assert.deepEqual(Object.keys(flagged.work['item-fields']).sort(), ['stage', 'status'].sort());
+  assert.deepEqual(Object.keys(flagged.work['item-fields']).sort(), ['workflowStep', 'status'].sort());
   const sideLogKeys = ['decisions', 'discovery', 'gates', 'settlements', 'outcomes', 'frictions', 'learnings', 'decisionsById', 'callThreads'];
   for (const key of sideLogKeys) {
     assert.equal(flagged[key], undefined, `side-log key "${key}" must be omitted when --fields is passed`);
@@ -257,7 +257,6 @@ test('list --id without --fields is unchanged from full behavior', () => {
   assert.ok(data.gates);
   assert.ok(data.settlements);
   assert.ok(data.outcomes);
-  assert.ok(data.frictions);
   assert.ok(data.learnings);
   assert.ok(data.decisionsById);
   assert.ok(data.callThreads);
@@ -269,7 +268,7 @@ test('list --id --fields with an invalid field name is rejected as validation er
   addTestWork(dir, 'item-invalid');
 
   assert.throws(
-    () => listUseCase({ dir }, { id: 'item-invalid', fields: 'stage,invalidField' }),
+    () => listUseCase({ dir }, { id: 'item-invalid', fields: 'workflowStep,invalidField' }),
     (err) => err instanceof StoreError && err.category === 'validation' && /unknown field "invalidField"/i.test(err.message),
   );
 });
@@ -393,7 +392,7 @@ test('graph reports connected components, criticalPath, and topological structur
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
   addTestWork(dir, 'a');
-  addTestWork(dir, 'b', { deps: ['a'], stage: 'discovery' });
+  addTestWork(dir, 'b', { deps: ['a'], workflowStep: 'discovery' });
   addTestWork(dir, 'c');
 
   const data = graphUseCase({ dir });
@@ -402,14 +401,14 @@ test('graph reports connected components, criticalPath, and topological structur
   assert.deepEqual(data.criticalPath, { depth: 2, path: ['b', 'a'] });
   assert.deepEqual(data.staleBlocked, [{ id: 'b', status: 'todo', blockedBy: ['a'] }]);
   assert.deepEqual(data.topUnblock[0], { id: 'a', unblocks: 1, newlyUnblocks: 2 });
-  assert.deepEqual(data.stageByItem, { a: 'executing', b: 'discovery', c: 'executing' });
+  assert.deepEqual(data.stepByItem, { a: 'executing', b: 'discovery', c: 'executing' });
 });
 
 test('graph use case --what-if <id>: reports what completing that item unblocks', () => {
   const cwd = tmpCwdFast();
   const dir = path.join(cwd, '.fgos');
   addTestWork(dir, 'a');
-  addTestWork(dir, 'b', { deps: ['a'], stage: 'discovery' });
+  addTestWork(dir, 'b', { deps: ['a'], workflowStep: 'discovery' });
 
   const data = graphUseCase({ dir }, { whatIfId: 'a' });
   assert.deepEqual(data, {
@@ -417,7 +416,7 @@ test('graph use case --what-if <id>: reports what completing that item unblocks'
     exists: true,
     unblocksTransitive: 1,
     newlyReady: ['b'],
-    stageByItem: { a: 'executing', b: 'discovery' },
+    stepByItem: { a: 'executing', b: 'discovery' },
   });
 });
 

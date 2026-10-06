@@ -1,0 +1,167 @@
+{
+  "contract": {
+    "id": "assignment-run-result",
+    "version": 3
+  },
+  "runId": "run_unit-run-1790991666426-52077593/producer/1_01",
+  "assignmentId": "unit-run-1790991666426-52077593/producer/1",
+  "controlEpoch": 1,
+  "controlToken": "f5bb595d-b7ef-48fa-85ca-83e7874d6bde",
+  "executorId": "fake-limit",
+  "adapter": "herdr-spawn",
+  "confinement": null,
+  "role": "producer",
+  "executorRedirected": false,
+  "policy": {
+    "role": "producer",
+    "executorPreference": [
+      "fake-limit"
+    ],
+    "executorId": "fake-limit",
+    "providerModel": "claude",
+    "rigor": "standard",
+    "tier": "standard",
+    "model": "fake",
+    "reasoningEffort": "medium",
+    "visibility": "headless",
+    "repeatMode": null,
+    "constraints": {
+      "requiresSkills": []
+    },
+    "provenance": {
+      "executor": {
+        "value": "fake-limit",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "provider": {
+        "value": "claude",
+        "source": {
+          "scope": "registeredExecutor",
+          "id": "fake-limit"
+        }
+      },
+      "model": {
+        "value": "fake",
+        "source": {
+          "scope": "cliOverride"
+        }
+      },
+      "rigor": {
+        "value": "standard",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "tier": {
+        "value": "standard",
+        "source": {
+          "scope": "rigor",
+          "id": "standard"
+        }
+      },
+      "reasoningEffort": {
+        "value": "medium",
+        "source": {
+          "scope": "derived",
+          "id": "rigor.standard"
+        }
+      },
+      "persona": {
+        "source": {
+          "scope": "default"
+        }
+      },
+      "visibility": {
+        "value": "headless",
+        "source": {
+          "scope": "default"
+        }
+      },
+      "repeatMode": {
+        "value": null,
+        "source": {
+          "scope": "default"
+        }
+      },
+      "constraints": {
+        "value": {
+          "requiresSkills": []
+        },
+        "source": {
+          "scope": "assignment",
+          "id": "unit-run-1790991666426-52077593/producer/1"
+        }
+      },
+      "governance": {
+        "value": "allowed",
+        "source": {
+          "scope": "governance",
+          "id": "claude"
+        }
+      }
+    }
+  },
+  "settledAt": "2026-10-03T01:42:24.702Z",
+  "durationMs": 78205,
+  "settleReports": [],
+  "classification": {
+    "execution": {
+      "status": "failed",
+      "exitCode": 1
+    },
+    "assessment": {
+      "verdict": "not-applicable"
+    },
+    "confidence": {
+      "level": "failed",
+      "basis": [
+        "captured-stdout",
+        "failed-exit"
+      ]
+    },
+    "failure": {
+      "family": "provider",
+      "code": "provider-limit"
+    },
+    "policy": {
+      "disposition": "needs-input",
+      "code": "provider-limit"
+    },
+    "delivery": {
+      "mode": "fresh"
+    },
+    "provenance": "native-v3",
+    "outcome": {
+      "category": "infra",
+      "reason": "provider-limit"
+    }
+  },
+  "runtime": {
+    "exitCode": 1,
+    "stdoutLog": ".fgos/assignments/unit-run-1790991666426-52077593/producer/1/runs/01/stdout.log",
+    "stderrLog": ".fgos/assignments/unit-run-1790991666426-52077593/producer/1/runs/01/stderr.log"
+  },
+  "runnerNote": {
+    "summary": "executor for work \"fake-limit\" ended as provider-limit: the screen says a provider limit was reached. Last line on screen: Claude usage limit reached. Pane wS:p3WP is left open. Private home kept for the open pane (removed once the pane is closed): /tmp/fgos-confinement/disp_1790991666530_a1df15fe/home."
+  },
+  "usage": {
+    "inputTokens": null,
+    "outputTokens": null,
+    "totalTokens": null,
+    "cacheReadTokens": null,
+    "cacheCreationTokens": null,
+    "source": "unsupported"
+  },
+  "evidence": {
+    "gitBefore": "5b52ac27d3beec7d63f62172aefc01cf1c2ffb2a",
+    "gitAfter": "5b52ac27d3beec7d63f62172aefc01cf1c2ffb2a",
+    "gitBeforeSource": "pre-launch",
+    "changedFiles": [],
+    "mutatedDirtyBeforeFiles": [],
+    "attribution": [],
+    "artifacts": [],
+    "tests": []
+  }
+}

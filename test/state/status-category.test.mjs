@@ -4,7 +4,7 @@
 // foundations.md's L3 replay-from-zero law). This file proves the schema
 // exists (STATUS_CATEGORIES, work.mjs) and that the write door stamps it
 // correctly for the six front-segment statuses (DOMAINS.coding.statusLabels,
-// workflow-stage-graphs.mjs) while leaving the four tail-segment statuses
+// domain-registry.mjs) while leaving the four tail-segment statuses
 // (delivered/retrospective/cleanup/done) untouched, and that replay of an
 // event predating this field neither throws nor invents a category.
 //
@@ -119,7 +119,7 @@ for (const { to, category } of FRONT_SEGMENT_CASES) {
 
 // The sequential tail chain (D1): delivered -> retrospective -> cleanup ->
 // done. None of the four carries a statusLabels entry in DOMAINS.coding
-// (workflow-stage-graphs.mjs), so none of these moves should ever stamp
+// (domain-registry.mjs), so none of these moves should ever stamp
 // statusCategory — literal status stays sufficient for them forever.
 test('moveWork into the four tail-segment statuses never writes statusCategory on the event payload', () => {
   const dir = tmpDir();

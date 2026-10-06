@@ -73,6 +73,19 @@ Ba bất biến, tách bạch rõ để không ai đọc nhầm đây là sandbo
   `dispatch.mjs`'s "TRUSTED-CONFIG NOTE"). File này committed (D2 — bền
   vĩnh viễn, review được như code) nhưng mang đúng mức tin cậy của code: chỉ
   áp dụng từ một checkout đã tin cậy sẵn.
+- **Context ref tới kết quả vai/bước trước là đường dẫn tuyệt đối dưới
+  `.fgos/assignments/` của main checkout.** Worker chỉ đọc, không ghi; runner
+  kiểm sha256 lúc settle trước khi trao. Không mở rộng quyền đọc: worker vốn
+  đọc được (`--ro-bind / /`, `hostRead: allow`). Câu trả lời của owner ở cổng
+  người của một Workflow run cũng đi đường này (`gate-answer:` → file dưới
+  `.fgos/workflow-runs/<id>/gate-answers/`): là input của owner, không phải
+  output của agent khác, và brief nói rõ như vậy. Với `anonymizeInputs` các
+  report được chép sang `<unitDir>/inputs/seat-*.md` để brief không lộ ai nói;
+  đó chỉ là ẩn danh theo thứ được trao, không phải ranh giới đọc.
+  Hợp đồng cấm worker *ghi* `.fgos`; Unit `blind: true` còn cấm nó *đọc* run state của
+  peer (`.fgos/assignments`, `.fgos/workflow-runs`, `.fgos/dispatch-runs`, socket herdr,
+  home và tiến trình của dispatch khác): vai blind chỉ đọc thư mục của chính nó (kết quả vai/bước trước tới nó dưới dạng bản chép nguyên byte
+  trong `inputs/` của thư mục đó) và bị từ chối chạy nếu không thực thi được (`docs/specs/confinement-authority.md` §9.2).
 
 ## Tham chiếu
 

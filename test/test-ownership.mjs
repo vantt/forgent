@@ -46,18 +46,12 @@ export const MANIFEST = [
   { id: 'report-context-render', status: 'shadow', pattern: 'src/report/context-render.mjs', directTests: ['test/report/context-render.test.mjs'], boundaryTests: [] },
   { id: 'report-decision-index', status: 'shadow', pattern: 'src/report/decision-index.mjs', directTests: ['test/report/decision-index.test.mjs'], boundaryTests: [] },
   { id: 'report-enduser-index', status: 'shadow', pattern: 'src/report/enduser-index.mjs', directTests: ['test/report/enduser-index.test.mjs'], boundaryTests: [] },
-  { id: 'report-entropy', status: 'shadow', pattern: 'src/report/entropy.mjs', directTests: ['test/report/entropy.test.mjs'], boundaryTests: [] },
   { id: 'report-frontmatter', status: 'shadow', pattern: 'src/report/frontmatter.mjs', directTests: ['test/report/frontmatter.test.mjs'], boundaryTests: [] },
   { id: 'report-knowledge-resolver', status: 'shadow', pattern: 'src/report/knowledge-resolver.mjs', directTests: ['test/report/knowledge-resolver.test.mjs'], boundaryTests: [] },
-  { id: 'report-dispatch-confidence', status: 'shadow', pattern: 'src/report/dispatch-confidence.mjs', directTests: [], boundaryTests: ['test/runner/dispatch.test.mjs'] },
   { id: 'report-enduser-index-generate', status: 'shadow', pattern: 'src/report/enduser-index-generate.mjs', directTests: [], boundaryTests: ['test/report/enduser-index.test.mjs'] },
   { id: 'report-knowledge-projection', status: 'shadow', pattern: 'src/report/knowledge-projection.mjs', directTests: [], boundaryTests: ['test/setup/knowledge-doctor.test.mjs'] },
   // src/report/item-trace.mjs intentionally NOT listed: no direct or
   // boundary test located. Falls through to unknown -> full.
-
-  // -- src/runner/capability-match.mjs (Q1 steering, capability-aware
-  // dispatch gate) --
-  { id: 'runner-capability-match', status: 'shadow', pattern: 'src/runner/capability-match.mjs', directTests: ['test/runner/capability-match.test.mjs', 'test/cli/capability-match.test.mjs'], boundaryTests: [] },
 
   // -- src/state/** leaf modules only (plan candidate area 3) --
   { id: 'state-awaiting-context', status: 'shadow', pattern: 'src/state/awaiting-context.mjs', directTests: ['test/state/awaiting-context.test.mjs'], boundaryTests: [] },
@@ -79,7 +73,7 @@ export const MANIFEST = [
 
   { id: 'verbs-state-edit', status: 'shadow', pattern: 'src/verbs/state/edit.mjs', directTests: ['test/direct/fgos-edit.test.mjs'], boundaryTests: [] },
   { id: 'verbs-state-read', status: 'shadow', pattern: 'src/verbs/state/read.mjs', directTests: ['test/direct/fgos-read.test.mjs'], boundaryTests: [] },
-  { id: 'verbs-state-stage', status: 'shadow', pattern: 'src/verbs/state/stage.mjs', directTests: ['test/direct/fgos-stage.test.mjs'], boundaryTests: [] },
+  { id: 'verbs-state-step', status: 'shadow', pattern: 'src/verbs/state/step.mjs', directTests: ['test/direct/fgos-step.test.mjs'], boundaryTests: [] },
 ];
 
 // Explicit full-trigger rules (plan's day-one list). Prefix-matched, each

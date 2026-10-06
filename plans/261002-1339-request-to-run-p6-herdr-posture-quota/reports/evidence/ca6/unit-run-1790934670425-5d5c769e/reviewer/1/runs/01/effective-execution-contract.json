@@ -1,0 +1,64 @@
+{
+  "contract": {
+    "id": "effective-execution-contract",
+    "version": 1
+  },
+  "assignmentId": "unit-run-1790934670425-5d5c769e/reviewer/1",
+  "runId": "run_unit-run-1790934670425-5d5c769e/reviewer/1_01",
+  "mutation": "read-only",
+  "workspace": {
+    "cwd": "/var/tmp/p6-accept-work",
+    "writeScope": [],
+    "mainCheckout": "/home/vantt/projects/forgentX",
+    "posture": "worktree"
+  },
+  "tools": {
+    "shell": {
+      "mode": "restricted",
+      "enforced": false,
+      "enforcement": "instructed",
+      "allowedCommands": []
+    }
+  },
+  "permissions": {
+    "posture": "enforced",
+    "shell": {
+      "mode": "restricted",
+      "enforced": false,
+      "enforcement": "instructed",
+      "allowedCommands": []
+    },
+    "filesystem": {
+      "mode": "read-only",
+      "enforced": true,
+      "enforcement": "enforced",
+      "writeScope": []
+    },
+    "network": {
+      "enforced": false,
+      "enforcement": "instructed"
+    }
+  },
+  "limits": {
+    "executorTimeoutMs": 2100000
+  },
+  "resultClaim": {
+    "contract": {
+      "id": "agent-result-claim",
+      "version": 2
+    },
+    "path": "/home/vantt/projects/forgentX-p6/.fgos/assignments/unit-run-1790934670425-5d5c769e/reviewer/1/runs/01/agent-result.json"
+  },
+  "provenance": {
+    "dispatchPlanHash": "sha256:67dfceb54f641289174f0fa7291ab09fbeaeb04ded20bc1635b56aaf6937f924",
+    "configHash": "sha256:debed55c71317f7d9f80c0121a715c8809710b523888d8fd494f5960fc481603",
+    "executorId": "gemini",
+    "adapter": "cli-spawn",
+    "adapterFamily": "cli-spawn"
+  },
+  "enforcementPosture": "enforced",
+  "permissionEnforcementPosture": "enforced",
+  "executorId": "gemini",
+  "adapter": "cli-spawn",
+  "adapterFamily": "cli-spawn"
+}

@@ -20,7 +20,7 @@
 import { rankImpact } from './impact.mjs';
 import { footprintOverlapAmong } from './graph-metrics.mjs';
 import { isResolvedStatus, resolveRoot } from './frontier.mjs';
-import { effectiveStage, getDomain } from './workflow-stage-graphs.mjs';
+import { effectiveStep, getDomain } from './domain-registry.mjs';
 
 /**
  * Rank `proposed` items by merge-readiness.
@@ -82,7 +82,7 @@ import { effectiveStage, getDomain } from './workflow-stage-graphs.mjs';
  *     bucket means "the root branch itself needs syncing," not "the root
  *     is closed out and nothing will ever sync it"), kept as its own
  *     bucket rather than folded into `blockedOnSync` so that name's
- *     existing cross-language contract (`herdr-plugin/src/fgos.rs`
+ *     existing cross-language contract (`packages/herdr-fgos-common/rust/src/fgos.rs`
  *     deserializes it by name) keeps its current meaning unchanged.
  *     Checked independently of `opts.drift` (item status, not a git-shelled
  *     drift computation) — never empty just because `opts.drift` was
@@ -91,9 +91,8 @@ import { effectiveStage, getDomain } from './workflow-stage-graphs.mjs';
  *     `proposed` item, derived from `item.parent` alone (an item with a
  *     parent always merges into SOME `fgw/<root>`, never straight to
  *     `main`) — matches the design report's own §G table split. Named
- *     `mergeTier`, not the canonical reports' bare `tier` (D7): `work.tier`
- *     already exists as a different, unrelated field (the item's own
- *     cost/model-weight).
+ *     `mergeTier`, not the canonical reports' bare `tier` (D7): work scale
+ *     already exists as a different, unrelated field (`work.size`).
  *   - `supersededOut` — ids of otherwise-`ready` candidates carrying a
  *     `supersededBy` target that is RESOLVED, or itself present in this
  *     same call's ready-set (tsk-2ie D2, docs/history/
@@ -230,13 +229,13 @@ export function mergeReadiness(view, opts = {}) {
   // `mergeSets`/`mergeTier` above are all id-referencing, never full item
   // objects (unlike this function's own internal `candidates`/`syncClear`
   // locals, which never reach the return) — so, same as `graphMetrics`'s
-  // own `stageByItem` (graph-metrics.mjs), this adds one flat side-map
+  // own `stepByItem` (graph-metrics.mjs), this adds one flat side-map
   // rather than changing any existing id-array shape to an object-array.
   // Covers every id in `work`, not just ids already surfaced in one of the
   // buckets above, so a reader never has to guess which sub-shape an id
-  // came from before looking its stage up here.
-  const stageByItem = Object.fromEntries(
-    Object.keys(work).map((id) => [id, effectiveStage(work[id], getDomain(work[id].domain))]),
+  // came from before looking its step up here.
+  const stepByItem = Object.fromEntries(
+    Object.keys(work).map((id) => [id, effectiveStep(work[id], getDomain(work[id].domain))]),
   );
 
   return {
@@ -252,7 +251,7 @@ export function mergeReadiness(view, opts = {}) {
     strandedByResolvedRoot: orderByRank(strandedByResolvedRoot),
     mergeTier,
     supersededOut,
-    stageByItem,
+    stepByItem,
   };
 }
 

@@ -1,22 +1,10 @@
-// dispatch/prepare.mjs — payload assembly (D7, tsk-2uf-1): `buildPrompt`
-// (the worker prompt assembled from a work item's own fields) and
-// `prepareDispatch` (a new, small, named concept — D7's own note: "a named
-// concept in the middle"). Split out of the former `src/runner/dispatch.mjs`
-// (2204 lines, 6 concerns in one file) — pure move, no behavior change for
-// `buildPrompt`; `src/runner/dispatch.mjs` re-exports every name below
-// unchanged as a barrel. See `docs/history/dispatch-activation-and-handoff-
-// redesign/CONTEXT.md` D7 for the split rationale.
-//
-// TRUST INVARIANT (security panel, restored — dropped from the pre-split
-// banner during the D7 move, review-caught): `buildPrompt` below assumes
-// the `work` item it is given (title, kind, refs, and especially `verify`)
-// was authored by the repo's own user, not ingested from an untrusted
-// external source. `verify` is run by the runner as a shell command
-// (goal-check, a deliberately different and separate trust boundary from
-// `dispatch/transport.mjs`'s spawn calls); a work item from an unvetted
-// source is an injection vector before it ever reaches dispatch. Never
-// wire an external/untrusted intake path into `work` without a review
-// gate in between.
+// dispatch/prepare.mjs — payload assembly (D7, tsk-2uf-1): `prepareDispatch`
+// (a new, small, named concept — D7's own note: "a named concept in the
+// middle"). the worker prompt assembled from a Work item's own
+// fields lives in the Work layer, src/runner/work-compat.mjs, along with its
+// trust invariant: it assumes the Work item was authored by the repo's own user
+// (`verify` is run by the runner as a shell command), never ingested from an
+// untrusted external source.
 //
 // `prepareDispatch` scope for THIS item (tsk-2uf-1) is deliberately narrow:
 // it validates call legality only — that `unit` is a real, addressable
@@ -32,7 +20,6 @@
 // once a real caller needs it.
 
 import { RunnerConfigError } from './config.mjs';
-export { buildPrompt } from '../work-compat.mjs';
 
 /**
  * Validate that a dispatch call is legal BEFORE any payload is built for

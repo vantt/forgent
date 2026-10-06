@@ -6,7 +6,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
-import { buildAssignment } from '../../src/runner/dispatch/assignment.mjs';
+import { buildAssignment } from '../helpers/declared-assignment.mjs';
 import { executeAssignment } from '../../src/runner/dispatch/assignment-runner.mjs';
 import { COMMAND_REGISTRY } from '../../src/cli/command-registry.mjs';
 import { invokeDispatchReconcileOperation } from '../../src/verbs/dispatch/reconcile.mjs';
@@ -41,10 +41,12 @@ function runnerConfig(executorScript, extra = {}) {
     executor: {
       allowCrossProvider: true,
       command: process.execPath,
+      providerModel: 'claude',
       args: [executorScript, '--sentinel-config-field', 'forwarded-through-adapter', '{prompt}'],
       ...(extra.executor ?? {}),
     },
-    models: { standard: 'test-model', analytical: 'test-analytical-model' },
+    modelPolicies: { claude: { standard: 'test-model', advanced: 'test-analytical-model' }, [process.execPath]: { standard: 'test-model', advanced: 'test-analytical-model' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: extra.timeoutMs ?? 5000,
     ...(extra.config ?? {}),
   };
@@ -65,7 +67,7 @@ function writeAssignmentMaterialization(root, assignmentId, runId, resultBytes) 
   fs.writeFileSync(path.join(runDir, 'result.json'), resultBytes);
 }
 
-test('production assignment door writes RunResult v2, effective contract, adapter argv, and inspect reads the same terminal result', async () => {
+test('production assignment door writes RunResult v3, effective contract, adapter argv, and inspect reads the same terminal result', async () => {
   const root = tempRoot();
   const argvPath = path.join(root, 'argv.json');
   const executor = writeExecutor(root, 'reporting-executor', `
@@ -103,8 +105,8 @@ test('production assignment door writes RunResult v2, effective contract, adapte
     timeoutMs: 4321,
   });
 
-  assert.equal(result.status, 'done');
-  assert.equal(result.classification.provenance, 'native-v2');
+  assert.equal(result.classification.outcome.category, 'ok');
+  assert.equal(result.classification.provenance, 'native-v3');
   assert.equal(result.classification.execution.status, 'completed');
   assert.equal(result.classification.delivery.mode, 'fresh');
 
@@ -112,7 +114,7 @@ test('production assignment door writes RunResult v2, effective contract, adapte
   const stored = readJson(path.join(runDir, 'result.json'));
   const effective = readJson(path.join(runDir, 'effective-execution-contract.json'));
   const argv = readJson(argvPath);
-  assert.deepEqual(stored.contract, { id: 'assignment-run-result', version: 2 });
+  assert.deepEqual(stored.contract, { id: 'assignment-run-result', version: 3 });
   assert.equal(stored.runId, result.runId);
   assert.equal(effective.resultClaim.path, path.join(runDir, 'agent-result.json'));
   assert.equal(effective.limits.executorTimeoutMs, 4321);
@@ -123,7 +125,7 @@ test('production assignment door writes RunResult v2, effective contract, adapte
   const data = JSON.parse(inspected.stdout).data;
   assert.equal(data.inspectionStatus, 'resolved');
   assert.equal(data.runResult.runId, result.runId);
-  assert.equal(data.runResult.classification.provenance, 'native-v2');
+  assert.equal(data.runResult.classification.provenance, 'native-v3');
   assert.equal(data.runObservation.subject.runId, result.runId);
 });
 

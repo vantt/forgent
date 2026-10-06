@@ -240,7 +240,8 @@ export function buildEffectiveExecutionContract({
   // or bwrap confinement; be completely honest and label it 'instructed'.
   const isShellEnforced = false;
   const shellMode = effectiveMutation === 'read-only' ? 'restricted' : 'worktree-write';
-  const allowedCommands = effectiveMutation === 'read-only' ? [] : ['git add', 'git commit'];
+  // The worker writes files only; the runner stages and commits them after the round.
+  const allowedCommands = [];
   const overallPosture = isConfinementEnforced ? 'enforced' : 'instructed';
 
   // Limits
@@ -254,9 +255,16 @@ export function buildEffectiveExecutionContract({
 
   // Result claim
   const absRunDir = path.resolve(runDir);
+  // A sandboxed cli-spawn worker can only write under `worker-output/outbox`
+  // (the one run-output directory the confinement authority binds writable),
+  // so that is where its claim has to be named; the flat run directory is
+  // read-only to it and a write there fails with EROFS.
+  const confinedCliSpawn = isConfinementEnforced && resolvedAdapter === 'cli-spawn';
   const claimPath = resultClaimPath
     ? path.resolve(resultClaimPath)
-    : path.join(absRunDir, 'agent-result.json');
+    : confinedCliSpawn
+      ? path.join(absRunDir, 'worker-output', 'outbox', 'agent-result.json')
+      : path.join(absRunDir, 'agent-result.json');
 
   // Provenance (sanitized of secrets)
   const dispatchPlanHash = computeSha256Digest(stripSecrets(dispatchPlan));

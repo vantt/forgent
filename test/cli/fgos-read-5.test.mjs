@@ -16,7 +16,6 @@ import {
   addAdHocWorktree,
   addBareOrigin,
   addDiscovery,
-  addFriction,
   addGoalItem,
   addOk,
   addOutcome,
@@ -65,7 +64,7 @@ import {
   makeRunnerProposedLeafItem,
   makeSessionSafeRunnerItem,
   mkLocalDependency,
-  moveStage,
+  moveStep,
   moveToDurableDoingForTest,
   moveWork,
   os,
@@ -119,19 +118,19 @@ test.todo('stale verb: a just-delivered item is NOT flagged in postDelivery - mi
 
 test('conflicts verb: two ready items sharing a footprint path are flagged with shared + suggestions, pure read', () => {
   const cwd = tmpCwdFast();
-  assert.equal(run(cwd, ['add', 'a', '--title', 'A', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--footprint', 'src/x.mjs,src/y.mjs', '--stage', 'executing', '--description', 'tsk-535 fixture description.']).status, 0);
-  assert.equal(run(cwd, ['add', 'b', '--title', 'B', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--footprint', 'src/y.mjs,src/z.mjs', '--stage', 'executing', '--description', 'tsk-535 fixture description.']).status, 0);
-  assert.equal(run(cwd, ['add', 'c', '--title', 'C', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--footprint', 'src/w.mjs', '--stage', 'executing', '--description', 'tsk-535 fixture description.']).status, 0);
+  assert.equal(run(cwd, ['add', 'a', '--title', 'A', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--footprint', 'src/x.mjs,src/y.mjs', '--step', 'executing', '--description', 'tsk-535 fixture description.']).status, 0);
+  assert.equal(run(cwd, ['add', 'b', '--title', 'B', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--footprint', 'src/y.mjs,src/z.mjs', '--step', 'executing', '--description', 'tsk-535 fixture description.']).status, 0);
+  assert.equal(run(cwd, ['add', 'c', '--title', 'C', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--footprint', 'src/w.mjs', '--step', 'executing', '--description', 'tsk-535 fixture description.']).status, 0);
 
   const before = eventLines(cwd).length;
   const result = run(cwd, ['conflicts']);
   assert.equal(result.status, 0);
   const data = envelopeData(result.stdout);
-  // tsk-4zj D7: conflicts' output wraps into {conflicts, stageByItem} --
+  // tsk-4zj D7: conflicts' output wraps into {conflicts, stepByItem} --
   // a/b/c were all added with --stage executing above.
   assert.deepEqual(data, {
     conflicts: [{ a: 'a', b: 'b', shared: ['src/y.mjs'], suggestions: ['sequence', 'hoist', 're-slice'] }],
-    stageByItem: { a: 'executing', b: 'executing' },
+    stepByItem: { a: 'executing', b: 'executing' },
   });
   assert.equal(eventLines(cwd).length, before, 'conflicts must not append any event');
 });
@@ -140,7 +139,7 @@ test('conflicts verb: two ready items sharing a footprint path are flagged with 
 test('conflicts verb on a store with no overlaps: empty list, exit 0', () => {
   const cwd = tmpCwdFast();
   assert.equal(addOk(cwd, 'a').status, 0); // no footprint
-  assert.deepEqual(envelopeData(run(cwd, ['conflicts']).stdout), { conflicts: [], stageByItem: {} });
+  assert.deepEqual(envelopeData(run(cwd, ['conflicts']).stdout), { conflicts: [], stepByItem: {} });
 });
 
 
@@ -149,16 +148,16 @@ test('conflicts verb on a store with no overlaps: empty list, exit 0', () => {
 
 test('conflicts verb: items at DIFFERENT stages sharing a footprint are flagged (the real gap: a single-step frontier never saw this)', () => {
   const cwd = tmpCwdFast();
-  assert.equal(run(cwd, ['add', 'atdecompose', '--title', 'A', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--footprint', 'bin/fgos.mjs', '--stage', 'planning', '--description', 'tsk-4so fixture description.']).status, 0);
-  assert.equal(run(cwd, ['add', 'atexecuting', '--title', 'B', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--footprint', 'bin/fgos.mjs', '--stage', 'executing', '--description', 'tsk-4so fixture description.']).status, 0);
+  assert.equal(run(cwd, ['add', 'atdecompose', '--title', 'A', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--footprint', 'bin/fgos.mjs', '--step', 'planning', '--description', 'tsk-4so fixture description.']).status, 0);
+  assert.equal(run(cwd, ['add', 'atexecuting', '--title', 'B', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--footprint', 'bin/fgos.mjs', '--step', 'executing', '--description', 'tsk-4so fixture description.']).status, 0);
 
   const data = envelopeData(run(cwd, ['conflicts']).stdout);
   // tsk-4zj D7: this is exactly the scenario D7 corrects D6 for -- the two
-  // conflicting items are at DIFFERENT stages, so stageByItem is genuinely
+  // conflicting items are at DIFFERENT stages, so stepByItem is genuinely
   // informative here, not a constant.
   assert.deepEqual(data, {
     conflicts: [{ a: 'atdecompose', b: 'atexecuting', shared: ['bin/fgos.mjs'], suggestions: ['sequence', 'hoist', 're-slice'] }],
-    stageByItem: { atdecompose: 'planning', atexecuting: 'executing' },
+    stepByItem: { atdecompose: 'planning', atexecuting: 'executing' },
   });
 });
 
@@ -179,11 +178,11 @@ test('conflicts verb: items at DIFFERENT stages sharing a footprint are flagged 
 // here plainly rather than silently patched over.
 test('conflicts verb: a discovery-stage item and an executing-stage item sharing a footprint are NOT flagged (discovery has no step mapping, so footprintConflicts cannot see it — see comment above)', () => {
   const cwd = tmpCwdFast();
-  assert.equal(run(cwd, ['add', 'atdiscovery', '--title', 'A', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--footprint', 'src/shared.mjs', '--stage', 'discovery', '--description', 'tsk-4so fixture description.']).status, 0);
-  assert.equal(run(cwd, ['add', 'atexecuting', '--title', 'B', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--footprint', 'src/shared.mjs', '--stage', 'executing', '--description', 'tsk-4so fixture description.']).status, 0);
+  assert.equal(run(cwd, ['add', 'atdiscovery', '--title', 'A', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--footprint', 'src/shared.mjs', '--step', 'discovery', '--description', 'tsk-4so fixture description.']).status, 0);
+  assert.equal(run(cwd, ['add', 'atexecuting', '--title', 'B', '--kind', 'task', '--risk', 'light', '--verify', 'true', '--footprint', 'src/shared.mjs', '--step', 'executing', '--description', 'tsk-4so fixture description.']).status, 0);
 
   const data = envelopeData(run(cwd, ['conflicts']).stdout);
-  assert.deepEqual(data, { conflicts: [], stageByItem: {} });
+  assert.deepEqual(data, { conflicts: [], stepByItem: {} });
 });
 
 

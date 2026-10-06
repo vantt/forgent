@@ -16,7 +16,7 @@ shape; this item locked one.
 ## Pinned terms
 
 - **core** — the closed port: code/data/prose used identically by every
-  domain (`bin/`, `src/`, `herdr-plugin/`, `core/skills/`, `core/agents/`,
+  domain (`bin/`, `src/`, `herdr-dashboard/`, `core/skills/`, `core/agents/`,
   `core/task-specs/`, the domain-agnostic slice of root `AGENTS.md`).
 - **domain** (`domains/<name>/`) — the open adapter: everything owned by
   and flavored for exactly one domain. Pure YAML+prose after the
@@ -27,7 +27,7 @@ shape; this item locked one.
 
 ## What did NOT move
 
-`bin/`, `src/`, `herdr-plugin/` stay exactly where they are — moving them
+`bin/`, `src/`, `herdr-dashboard/` stay exactly where they are — moving them
 would break 881 real references and external installs for zero benefit.
 `.agents/skills/`, `.claude/skills/`, `.claude/agents/`, `plugins/fgOS/
 skills/` all stay byte-identical render targets; `fgos setup`'s
@@ -57,7 +57,7 @@ open per-domain adapter territory.
 self-contained `domains/<name>/` folder — mirroring the real
 `plugins/fgOS/` precedent. `workflow-stage-graphs.mjs` becomes a thin
 aggregator auto-discovering `domains/*/registry.yaml`, never a
-hand-maintained import list. Core (`bin/`, `src/`, `herdr-plugin/`) stays
+hand-maintained import list. Core (`bin/`, `src/`, `herdr-dashboard/`) stays
 put (D5). Domain-knowledge (curated) lives at `domains/<name>/knowledge/`,
 distinct from `docs/history/` (raw context, unchanged, shared). Canonical
 skill authoring moves to `core/skills/` + `domains/<name>/skills/`; the

@@ -1,0 +1,78 @@
+{
+  "unit": {
+    "id": "explain-recommendation",
+    "objective": "Produce ownership-focused explanation and actionable adoption guidance\n\nOwner request:\nShould the recipe that lets codex, agy and pi run in confined herdr panes (a private home bound per invocation plus the machine-global provider account inventory, see docs/specs/confinement-authority.md section 13.1) stay per-invocation config, or move into a provider adapter that declares each agent's home layout and credential files? Read section 13.1, the three herdr invocations in .fgos/config.json and src/runner/dispatch/confinement/drivers/bwrap.mjs. Recommend one option with its trade-offs. Do not modify any file.\n\nOutput of earlier steps:\n\n### framing / frame-context\nSummary: Recommend keeping the confined-pane recipe as per-invocation config (credential layout already lives in the provider account inventory; driver stays agent-agnostic), plus a doctor guard requiring a private-home binding on confined non-claude herdr invocations; revisit as a kind-keyed table if a 4th agent or second consumer appears.\n\n### shaping / shape-proposals\nSummary: Read section 13.1 + config herdr invocations + bwrap driver; synthesized recommendation to keep confined-pane recipe as per-invocation config (with doctor guard) per framing, documented trade-offs vs moving to provider adapter.\n\n### critique / critique-proposals\nSummary: Recommend retaining the private-home layout as per-invocation configuration; review found that the proposed doctor guard must fail on a missing binding, not merely validate accounts for bindings that already exist.\n\n### synthesis / synthesize-recommendation\nSummary: Recommend keeping the confined-pane recipe as per-invocation config: credential layout already lives in the provider account inventory and the bwrap driver is deliberately provider-agnostic. Add a doctor guard that fails when a confined non-claude herdr invocation lacks a private-home binding, since confined-pane-accounts currently skips unbound invocations.",
+    "capability": "architecture:explain",
+    "writes": [],
+    "dependsOn": [],
+    "pattern": "solo",
+    "inputs": [],
+    "expectedOutputs": []
+  },
+  "overrides": [],
+  "worktree": "/home/vantt/projects/forgentX-p6",
+  "createdBy": "vantt",
+  "createdAt": "2026-10-02T11:50:37.161Z",
+  "bindings": {
+    "producer/1": [
+      {
+        "role": "producer",
+        "round": 1,
+        "assignmentId": "unit-run-1790941837161-320cbf36/producer/1",
+        "binding": {
+          "contractVersion": "v1alpha1",
+          "executor": "claude-herdr",
+          "invocation": "claude-herdr-bwrap",
+          "transport": "herdr",
+          "candidateIndex": 0,
+          "tier": "standard",
+          "model": "sonnet",
+          "persona": null,
+          "mechanism": "out-of-process",
+          "posture": "read-only",
+          "provenance": {
+            "executor": {
+              "value": "claude-herdr",
+              "source": "capability:architecture:explain"
+            },
+            "invocation": {
+              "value": "claude-herdr-bwrap",
+              "source": "capability:architecture:explain"
+            },
+            "transport": {
+              "value": "herdr",
+              "source": "herdr-invocation-present"
+            },
+            "tier": {
+              "value": "standard",
+              "source": "rigor:standard"
+            },
+            "model": {
+              "value": "sonnet",
+              "source": "resolveTierModel(claude.standard)"
+            },
+            "persona": {
+              "value": null,
+              "source": "none"
+            },
+            "mechanism": {
+              "value": "out-of-process",
+              "source": "decideExecutorDispatchMechanism"
+            },
+            "posture": {
+              "value": "read-only",
+              "source": "read-only-ask-or-writes-empty"
+            }
+          }
+        },
+        "transport": "herdr",
+        "invocation": "claude-herdr-bwrap",
+        "fallbackFrom": null,
+        "boundAt": "2026-10-02T11:50:37.162Z",
+        "outcome": "pass",
+        "runId": "run_unit-run-1790941837161-320cbf36/producer/1_01"
+      }
+    ]
+  },
+  "configSnapshotSha256": "df988feee3c31ec48602cb04ce01dfb52bfebc27dce1543fe92ee3568f14ccb9"
+}

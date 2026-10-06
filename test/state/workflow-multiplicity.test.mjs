@@ -6,7 +6,7 @@
 // second workflow shape, which does not exist yet by design (D7a).
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { DOMAINS, resolveWorkflow } from '../../src/state/workflow-stage-graphs.mjs';
+import { DOMAINS, resolveWorkflow } from '../../src/state/domain-registry.mjs';
 
 const coding = DOMAINS.coding;
 const synthetic = DOMAINS.synthetic;
@@ -17,10 +17,11 @@ test('coding declares exactly one workflow, feature, as the default', () => {
   assert.deepEqual(coding.workflowFor, {});
 });
 
-test('identity proof: workflows.feature.{stages,stepMap,transitions} are the SAME references as the domain-level fields, not a copy', () => {
-  assert.equal(coding.workflows.feature.stages, coding.stages);
-  assert.equal(coding.workflows.feature.stepMap, coding.stepMap);
-  assert.equal(coding.workflows.feature.transitions, coding.transitions);
+test('the Workflow is the only home of a domain\'s steps and transitions: the domain entry holds neither', () => {
+  assert.equal(Object.hasOwn(coding, 'stages'), false);
+  assert.equal(Object.hasOwn(coding, 'transitions'), false);
+  assert.ok(coding.workflows.feature.steps.length > 0);
+  assert.ok(coding.workflows.feature.transitions.length > 0);
 });
 
 test('resolveWorkflow(coding, "bug") resolves to feature -- workflowFor is empty today, every kind folds to the default', () => {
@@ -34,8 +35,8 @@ test('resolveWorkflow folds an unrecognized or absent kind to the default, never
   assert.doesNotThrow(() => resolveWorkflow(coding));
 });
 
-test('resolveWorkflow returns undefined for a domain with no workflows declared (synthetic) -- no throw, no crash', () => {
-  assert.equal(resolveWorkflow(synthetic, 'anything'), undefined);
+test('a fixture domain declares one workflow and every kind folds to it', () => {
+  assert.equal(resolveWorkflow(synthetic, 'anything'), synthetic.workflows.main);
 });
 
 test('resolveWorkflow never throws on a null/undefined domain', () => {
@@ -45,6 +46,6 @@ test('resolveWorkflow never throws on a null/undefined domain', () => {
 });
 
 test('the whole coding domain, including workflows, stays deeply frozen', () => {
-  assert.throws(() => { coding.workflows.feature.stages = []; });
+  assert.throws(() => { coding.workflows.feature.steps = []; });
   assert.throws(() => { coding.workflowFor.bug = 'bugfix'; });
 });

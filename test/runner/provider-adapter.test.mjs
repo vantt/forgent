@@ -12,7 +12,7 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { loadRunnerConfigFromDir } from '../../src/runner/dispatch/config.mjs';
-import { resolveExecutorAndOverrides, modelForTier } from '../../src/runner/dispatch/resolve.mjs';
+import { resolveExecutorAndOverrides } from '../../src/runner/dispatch/resolve.mjs';
 import { resolveExecutorCommand } from '../../src/runner/dispatch/transport.mjs';
 
 import {
@@ -170,7 +170,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
 
   describe('per-provider family rendering, applied statuses, and policyShapedFlags', () => {
     describe('Claude CLI family', () => {
-      test('claude baseline: model, permission-mode, allowedTools', () => {
+      test('claude baseline: model, permission-mode, no tool allowlist (the worker holds no git grant)', () => {
         const template = cfg.executors.claude.invocations[0].args;
         const res = renderProviderInvocation({
           providerFamily: 'claude',
@@ -183,18 +183,22 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
         assert.equal(res.command, 'claude');
         assert.equal(res.applied.model, 'applied');
         assert.equal(res.applied.reasoningEffort, 'unsupported');
-        assert.equal(res.applied.toolIntent, 'applied-via-allowedTools');
+        assert.equal(res.applied.toolIntent, 'unsupported');
         assert.equal(res.applied.readOnly, 'unsupported');
         assert.equal(res.applied.persona, 'unsupported');
 
         assert.ok(res.policyShapedFlags.includes('--model'));
         assert.ok(res.policyShapedFlags.includes('--permission-mode'));
-        assert.ok(res.policyShapedFlags.includes('--allowedTools'));
+        assert.ok(!res.policyShapedFlags.includes('--allowedTools'));
         assert.ok(!res.policyShapedFlags.includes('--effort'));
       });
 
       test('claude-reviewer: applies effort high and readOnly via allowedTools', () => {
-        const template = cfg.executors.claude.invocations.find((inv) => inv.id === 'claude-cli-readonly').args;
+        const template = [
+          "-p", "{prompt}", "--model", "{model}", "--effort", "high",
+          "--permission-mode", "acceptEdits",
+          "--allowedTools", "Bash(git diff:*),Bash(rtk git diff:*),Bash(git log:*),Bash(rtk git log:*),Bash(git show:*),Bash(rtk git show:*),Bash(git status:*),Bash(rtk git status:*),Bash(node --test:*),Bash(rtk node --test:*),Bash(npm test:*),Bash(rtk npm test:*)"
+        ];
         const res = renderProviderInvocation({
           providerFamily: 'claude',
           command: 'claude',
@@ -266,7 +270,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
       });
 
       test('codex-readonly: detects -s read-only and sandbox enforcement', () => {
-        const template = cfg.executors.openai.invocations.find((inv) => inv.id === 'codex-cli-readonly-fgovn').args;
+        const template = ["exec", "-s", "read-only", "--model", "{model}", "{prompt}"];
         const res = renderProviderInvocation({
           providerFamily: 'openai-codex',
           command: 'codex',
@@ -391,26 +395,26 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
       });
     });
 
-    describe('glm (z-ai via Claude route)', () => {
-      test('glm: renders claude invocation with z-ai envPatch', () => {
+    describe('glm (z-ai via pi and OpenRouter)', () => {
+      test('glm: renders a pi invocation under the z-ai family, with the OpenRouter key variable', () => {
         const inv = cfg.executors['glm'].invocations[0];
         const res = renderProviderInvocation({
           providerFamily: 'z-ai',
-          command: 'claude',
+          command: 'pi',
           baseArgs: inv.args,
           promptPlaceholder: '<prompt>',
           model: 'z-ai/glm-5.2',
           executorFacts: { env: inv.env },
         });
 
-        assert.equal(res.command, 'claude');
+        assert.equal(res.command, 'pi', 'the adapter follows the command, not the vendor family');
         assert.equal(res.applied.model, 'applied');
-        assert.equal(res.applied.toolIntent, 'applied-via-allowedTools');
-        assert.equal(res.envPatch.ANTHROPIC_BASE_URL, 'https://openrouter.ai/api');
-        assert.equal(res.envPatch.ANTHROPIC_MODEL, 'z-ai/glm-5.2');
+        assert.equal(res.applied.toolIntent, 'applied-via-tools');
+        assert.ok(Object.hasOwn(res.envPatch, 'OPENROUTER_API_KEY'), 'the key is a substituted environment variable');
+        assert.equal(res.envPatch.ANTHROPIC_BASE_URL, undefined, 'no claude gateway variables remain');
         assert.ok(res.policyShapedFlags.includes('--model'));
-        assert.ok(res.policyShapedFlags.includes('--permission-mode'));
-        assert.ok(res.policyShapedFlags.includes('--allowedTools'));
+        assert.ok(res.policyShapedFlags.includes('--tools'));
+        assert.ok(!res.policyShapedFlags.includes('--permission-mode'));
       });
     });
 
@@ -444,7 +448,7 @@ describe('ProviderAdapter shadow harness (Phase 01)', () => {
           const resolvedCmd = resolveExecutorCommand(cfg, {
             prompt: '<prompt>',
             model: legacyRow.model,
-            tier,
+            tier: legacyRow.tier,
             executorId,
             fgosDir: throwawayDir,
             contentCarries: 'repo-content',

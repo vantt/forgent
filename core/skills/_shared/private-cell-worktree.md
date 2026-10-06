@@ -1,7 +1,6 @@
 # Private cell worktree
 
-Every mutating coordination cell (`fgos-code-change` single-cell change or
-plan-mode cell) runs on its own branch in its own linked git worktree. This is not a
+Every mutating execution cell (`fgos-run` or workflow unit) runs on its own branch in its own linked git worktree. This is not a
 preference: the session engine refuses `mutation: "mutating"` whenever
 `--cwd` resolves to the main checkout (`session-engine.mjs`
 `assertMutatingDispatchAllowed`, Mutation Rule condition 3), and a worker that

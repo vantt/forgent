@@ -67,6 +67,19 @@ function readStore(storePath) {
   }
 }
 
+/** Write `body` to `tmp` and rename it over `target`, keeping the target's own
+ * permission bits. The stores this module edits hold provider credentials or
+ * trust decisions (a 0600 file stays 0600); a temp file created with the
+ * process default would silently widen it to 0664 under a 002 umask. A target
+ * that does not exist yet is created owner-only. */
+function writeFileKeepingMode(tmp, target, body) {
+  let mode = 0o600;
+  try { mode = fs.statSync(target).mode & 0o777; } catch { /* new file: owner-only */ }
+  fs.writeFileSync(tmp, body, { mode });
+  fs.chmodSync(tmp, mode); // writeFileSync's mode is masked by umask; chmod is not
+  fs.renameSync(tmp, target);
+}
+
 /** Write the store atomically: a temp file in the SAME directory (so the rename
  * cannot cross a filesystem boundary and degrade into a copy), then rename over
  * the target. A reader therefore sees either the whole old file or the whole new
@@ -76,8 +89,7 @@ function writeStoreAtomic(storePath, data) {
   const dir = path.dirname(storePath);
   const tmp = path.join(dir, `.${path.basename(storePath)}.fgos-${process.pid}-${Date.now()}.tmp`);
   try {
-    fs.writeFileSync(tmp, `${JSON.stringify(data, null, 2)}\n`);
-    fs.renameSync(tmp, storePath);
+    writeFileKeepingMode(tmp, storePath, `${JSON.stringify(data, null, 2)}\n`);
   } catch (err) {
     try { fs.unlinkSync(tmp); } catch {}
     throw new TrustStoreError('write-failed', `trust store at "${storePath}" could not be written: ${err.message}.`, { storePath });
@@ -245,32 +257,41 @@ function codexSectionPattern(projectPath) {
  * exactly as it is rather than rewritten, so this can never downgrade a
  * decision or reformat a file somebody else maintains.
  */
-export function seedCodexTrust(configPath, { projectPath, repoRoot } = {}) {
+export function seedCodexTrust(configPath, { projectPath, repoRoot, rootConfigPath } = {}) {
   if (typeof projectPath !== 'string' || !path.isAbsolute(projectPath)) {
     throw new TrustStoreError('invalid-path', `seedCodexTrust: projectPath must be absolute, got "${projectPath}".`);
   }
   if (typeof repoRoot !== 'string' || !path.isAbsolute(repoRoot)) {
     throw new TrustStoreError('invalid-path', `seedCodexTrust: repoRoot must be absolute, got "${repoRoot}".`);
   }
+  // `rootConfigPath` is the account's own config, where a person made the trust
+  // decision this derives from. `configPath` is where the entry is written; it
+  // differs only for a confined worker, whose private CODEX_HOME starts without
+  // any config.toml, so the entry is written (and the file created) there while
+  // the root is still vouched for by the real account config.
+  const rootStore = rootConfigPath ?? configPath;
   if (readCodexTrust(configPath, projectPath) === true) return false;
-  if (readCodexTrust(configPath, repoRoot) !== true) {
+  if (readCodexTrust(rootStore, repoRoot) !== true) {
     throw new TrustStoreError(
       'untrusted-root',
-      `codex trust seed refused for "${projectPath}": its repo root "${repoRoot}" is not itself trusted in ${configPath}, so there is nothing to derive trust from.`,
-      { projectPath, repoRoot, configPath },
+      `codex trust seed refused for "${projectPath}": its repo root "${repoRoot}" is not itself trusted in ${rootStore}, so there is nothing to derive trust from.`,
+      { projectPath, repoRoot, configPath: rootStore },
     );
   }
   let body;
   try {
     body = fs.readFileSync(configPath, 'utf8');
   } catch (err) {
-    throw new TrustStoreError('unreadable-store', `could not read codex config at ${configPath}: ${err.message}`, { configPath });
+    if (err.code !== 'ENOENT' || rootStore === configPath) {
+      throw new TrustStoreError('unreadable-store', `could not read codex config at ${configPath}: ${err.message}`, { configPath });
+    }
+    body = '';
   }
   const entry = `\n[projects."${projectPath}"]\ntrust_level = "trusted"\n`;
   const tmp = `${configPath}.tmp-${uniqueTmpTag()}`;
   try {
-    fs.writeFileSync(tmp, `${body.replace(/\n*$/, '\n')}${entry}`);
-    fs.renameSync(tmp, configPath);
+    fs.mkdirSync(path.dirname(configPath), { recursive: true });
+    writeFileKeepingMode(tmp, configPath, `${body.replace(/\n*$/, '\n')}${entry}`);
   } catch (err) {
     try { fs.rmSync(tmp, { force: true }); } catch { /* the temp file is not worth a second failure */ }
     throw new TrustStoreError('write-failed', `could not write codex config at ${configPath}: ${err.message}`, { configPath });
@@ -290,8 +311,7 @@ export function removeCodexTrust(configPath, projectPath) {
   const next = body.replace(codexSectionPattern(projectPath), '');
   const tmp = `${configPath}.tmp-${uniqueTmpTag()}`;
   try {
-    fs.writeFileSync(tmp, next);
-    fs.renameSync(tmp, configPath);
+    writeFileKeepingMode(tmp, configPath, next);
   } catch (err) {
     try { fs.rmSync(tmp, { force: true }); } catch { /* nothing further to do */ }
     throw new TrustStoreError('write-failed', `could not write codex config at ${configPath}: ${err.message}`, { configPath });
@@ -392,7 +412,7 @@ export function readAgyStore(settingsPath) {
  *
  * Idempotent: seeding an already-seeded path rewrites nothing.
  */
-export function seedAgyTrust(settingsPath, { projectPath, repoRoot } = {}) {
+export function seedAgyTrust(settingsPath, { projectPath, repoRoot, rootSettingsPath } = {}) {
   if (typeof settingsPath !== 'string' || !settingsPath.trim()) {
     throw new TrustStoreError('invalid-path', `agy trust seed refused: settingsPath must be a non-empty string, got "${settingsPath}".`);
   }
@@ -406,11 +426,16 @@ export function seedAgyTrust(settingsPath, { projectPath, repoRoot } = {}) {
   const store = readAgyStore(settingsPath);
   const trustedList = Array.isArray(store.trustedWorkspaces) ? store.trustedWorkspaces : [];
 
-  if (!trustedList.some((entry) => matchesPath(entry, repoRoot))) {
+  // `rootSettingsPath`: the account's own settings, where a person trusted the
+  // root. It differs from `settingsPath` only for a confined worker's private HOME.
+  const rootStore = rootSettingsPath ?? settingsPath;
+  const rootData = rootStore === settingsPath ? store : readAgyStore(rootStore);
+  const rootList = Array.isArray(rootData.trustedWorkspaces) ? rootData.trustedWorkspaces : [];
+  if (!rootList.some((entry) => matchesPath(entry, repoRoot))) {
     throw new TrustStoreError(
       'untrusted-root',
-      `agy trust seed refused for "${projectPath}": its repo root "${repoRoot}" is not itself trusted in ${settingsPath}, so there is nothing to derive trust from.`,
-      { projectPath, repoRoot, settingsPath },
+      `agy trust seed refused for "${projectPath}": its repo root "${repoRoot}" is not itself trusted in ${rootStore}, so there is nothing to derive trust from.`,
+      { projectPath, repoRoot, settingsPath: rootStore },
     );
   }
 
@@ -422,8 +447,7 @@ export function seedAgyTrust(settingsPath, { projectPath, repoRoot } = {}) {
   fs.mkdirSync(dir, { recursive: true });
   const tmp = path.join(dir, `.${path.basename(settingsPath)}.fgos-${process.pid}-${Date.now().toString(36)}.tmp`);
   try {
-    fs.writeFileSync(tmp, `${JSON.stringify(store, null, 2)}\n`);
-    fs.renameSync(tmp, settingsPath);
+    writeFileKeepingMode(tmp, settingsPath, `${JSON.stringify(store, null, 2)}\n`);
   } catch (err) {
     try { fs.unlinkSync(tmp); } catch {}
     throw new TrustStoreError('write-failed', `agy trust store at "${settingsPath}" could not be written: ${err.message}.`, { settingsPath });
@@ -445,8 +469,7 @@ export function removeAgyTrust(settingsPath, projectPath) {
     const dir = path.dirname(settingsPath);
     const tmp = path.join(dir, `.${path.basename(settingsPath)}.fgos-${process.pid}-${Date.now().toString(36)}.tmp`);
     try {
-      fs.writeFileSync(tmp, `${JSON.stringify(store, null, 2)}\n`);
-      fs.renameSync(tmp, settingsPath);
+      writeFileKeepingMode(tmp, settingsPath, `${JSON.stringify(store, null, 2)}\n`);
     } catch {
       try { fs.unlinkSync(tmp); } catch {}
       return false;

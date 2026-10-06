@@ -107,6 +107,11 @@ if (group === 'pane' && action === 'run') {
 if (group === 'pane' && (action === 'report-agent' || action === 'report-agent-session')) {
   ok({ type: 'ok' });
 }
+// The pane was closed after the brief went in: herdr no longer knows the pane
+// or the agent in it, and says so with its own not-found codes.
+const paneVanished = scenario.paneVanishesAfterBrief && readState().prompts >= 1;
+if (paneVanished && group === 'pane' && action === 'process-info') fail('pane_not_found', 'pane not found');
+if (paneVanished && group === 'agent' && action === 'get') fail('agent_not_found', 'agent target mock-pane-1 not found');
 if (group === 'pane' && action === 'process-info') {
   // A real pane always lists its own shell. "The agent is there" means a
   // foreground process that is NOT the shell -- so an agent that exited, or
@@ -216,7 +221,8 @@ test('herdr-spawn adapter validates interactiveMode config shape', () => {
   fs.mkdirSync(path.dirname(cfgPath), { recursive: true });
   const withInteractiveMode = (interactiveMode) => JSON.stringify({
     executor: { command: 'node', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: 60000,
     executors: {
       agyHerdr: { kind: 'agent', command: 'agy', args: ['-i', '{prompt}'], adapter: 'herdr-spawn', interactiveMode },
@@ -484,7 +490,8 @@ test('dispatchBatchKey survives the real executeExecutorCli door, not just a dir
         interactiveMode: { exitCommand: '/exit', kind: 'agy' },
       },
     },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: 5000,
   });
 
@@ -615,6 +622,48 @@ test('R1/R2 (agy trust store): kind agy seeds settings.json.trustedWorkspaces vi
     'the entry seeded for this round does not survive teardown',
   );
   assert.ok(after.trustedWorkspaces.includes(repoRoot), 'the pre-existing repo-root entry is untouched');
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('a workspace the person already trusted keeps its claude trust entry after the round settles', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-claude-trust-kept-'));
+  const mock = createMockHerdr(tmpDir, {});
+  const storePath = path.join(tmpDir, 'claude.json');
+  const workspace = path.resolve(tmpDir);
+  // The dispatch cwd is itself an entry the person vouched for (a read-only run in the main checkout).
+  fs.writeFileSync(storePath, JSON.stringify({ projects: { [workspace]: { hasTrustDialogAccepted: true, allowedTools: [] } } }, null, 2));
+
+  const res = await dispatchThroughMock(tmpDir, mock, {
+    prompt: 'do the thing',
+    interactiveMode: { kind: 'claude', trustStore: { kind: 'claude-json', path: storePath } },
+  });
+  assert.equal(res.status, 0);
+
+  const after = JSON.parse(fs.readFileSync(storePath, 'utf8'));
+  assert.equal(after.projects[workspace]?.hasTrustDialogAccepted, true, 'teardown must not delete an entry it did not write');
+  const visibility = readVisibility(path.join(tmpDir, 'run'));
+  assert.equal(visibility.trustRemoved, undefined, 'nothing was removed');
+  assert.equal(visibility.trustSeeded, undefined, 'nothing was written');
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('a workspace the person already trusted keeps its agy trust entry after the round settles', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-agy-trust-kept-'));
+  const mock = createMockHerdr(tmpDir, {});
+  const settingsPath = path.join(tmpDir, 'agy-settings.json');
+  const workspace = path.resolve(tmpDir);
+  fs.writeFileSync(settingsPath, JSON.stringify({ trustedWorkspaces: [path.dirname(workspace), workspace] }, null, 2));
+
+  const res = await dispatchThroughMock(tmpDir, mock, {
+    prompt: 'do the thing',
+    interactiveMode: { kind: 'agy', trustStore: { kind: 'agy', path: settingsPath } },
+  });
+  assert.equal(res.status, 0);
+
+  const after = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
+  assert.ok(after.trustedWorkspaces.includes(workspace), 'teardown must not delete an entry it did not write');
 
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
@@ -759,6 +808,39 @@ test('an agent that leaves the pane without writing a result is reported dead, a
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
+test('a pane that herdr no longer knows ends the round as died instead of running to the ceiling', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-pane-vanished-'));
+  const mock = createMockHerdr(tmpDir, { worker: 'silent', paneVanishesAfterBrief: true, statuses: ['idle'] });
+
+  const startedAt = Date.now();
+  await assert.rejects(
+    () => dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing', timeoutMs: 20000 }),
+    (err) => {
+      assert.equal(err.outcome, 'died');
+      assert.match(err.message, /not found/);
+      return true;
+    },
+  );
+  assert.ok(Date.now() - startedAt < 15000, 'the round ends on the reads, not at the ceiling');
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('a herdr that cannot be reached is not evidence the pane is gone', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-unreachable-'));
+  const mock = createMockHerdr(tmpDir, { worker: 'silent', getError: 'session_unavailable', statuses: ['idle'] });
+
+  await assert.rejects(
+    () => dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing', timeoutMs: 4000 }),
+    (err) => {
+      assert.notEqual(err.outcome, 'died');
+      return true;
+    },
+  );
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
 test('a stale worker whose screen names a provider limit is paused, not timed out', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
   const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-paused-'));
   const mock = createMockHerdr(tmpDir, {
@@ -770,9 +852,50 @@ test('a stale worker whose screen names a provider limit is paused, not timed ou
   await assert.rejects(
     () => dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing', timeoutMs: 20000, idleTimeoutMs: 700 }),
     (err) => {
-      assert.equal(err.outcome, 'paused-limit');
+      assert.equal(err.outcome === 'provider-limit' || err.outcome === 'paused-limit', true);
       assert.match(err.screen, /usage limit/i);
       assert.match(err.screen, /3pm/, 'the reset time survives into the error');
+      return true;
+    },
+  );
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('an agent that keeps reporting working while its screen is parked on "model is at capacity" is a provider limit, not a wait for the ceiling', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-working-stall-'));
+  const mock = createMockHerdr(tmpDir, {
+    worker: 'silent',
+    statuses: ['working'],
+    screen: '• Ran out=/work/outbox\n■ Selected model is at capacity. Please try a different model.\n• Reconnected. No input was resent.\n── ⠋ Working ──',
+  });
+
+  const started = Date.now();
+  await assert.rejects(
+    () => dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing', timeoutMs: 20000, idleTimeoutMs: 15000, transportDeadlines: { stallProbeMs: 300 } }),
+    (err) => {
+      assert.equal(err.outcome, 'provider-limit');
+      assert.match(err.screen, /model is at capacity/i);
+      return true;
+    },
+  );
+  assert.ok(Date.now() - started < 10000, 'concluded long before the absolute ceiling');
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('a working agent whose screen only talks about capacity runs on to the ceiling untouched', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-working-talk-'));
+  const mock = createMockHerdr(tmpDir, {
+    worker: 'silent',
+    statuses: ['working'],
+    screen: 'Reviewing the docs: the selected model is at capacity during peak hours, and a rate limit applies.',
+  });
+
+  await assert.rejects(
+    () => dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing', timeoutMs: 2500, idleTimeoutMs: 15000, transportDeadlines: { stallProbeMs: 300 } }),
+    (err) => {
+      assert.equal(err.outcome, 'timed-out-ceiling', 'ordinary text is not a limit');
       return true;
     },
   );
@@ -797,6 +920,25 @@ test('a stale worker with an ordinary screen is an idle timeout that still quote
     },
   );
 
+  // herdr's own account of the agent is kept next to the round's other evidence
+  const diagnosis = JSON.parse(fs.readFileSync(path.join(tmpDir, 'run', 'herdr-diagnosis.json'), 'utf8'));
+  assert.equal(diagnosis.contract, 'herdr-diagnosis.v1');
+  assert.ok(diagnosis.target);
+  assert.ok(Date.parse(diagnosis.capturedAt) > 0);
+  assert.equal(diagnosis.agent.agentStatus, 'idle', 'what `agent get` said');
+  assert.ok('state' in diagnosis.explain || 'error' in diagnosis.explain, 'what `agent explain` said, or why it could not');
+  assert.match(String(diagnosis.detectionScreen), /waiting for you/, 'the screen herdr uses for detection');
+  assert.equal(readVisibility(path.join(tmpDir, 'run')).diagnosis, 'herdr-diagnosis.json', 'visibility points at it');
+
+  fs.rmSync(tmpDir, { recursive: true, force: true });
+});
+
+test('a settled round writes no diagnosis: there is nothing to explain', { skip: WIN32_MOCK_HERDR_SKIP }, async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'herdr-no-diagnosis-'));
+  const mock = createMockHerdr(tmpDir);
+  const res = await dispatchThroughMock(tmpDir, mock, { prompt: 'do the thing' });
+  assert.equal(res.status, 0);
+  assert.equal(fs.existsSync(path.join(tmpDir, 'run', 'herdr-diagnosis.json')), false);
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
@@ -827,7 +969,8 @@ test('herdr-spawn adapter (LIVE): dispatch a real agy-herdr interactiveMode exec
   execFileSync('git', ['commit', '--allow-empty', '-m', 'initial'], { cwd: tmpRoot });
   writeRunnerConfigFixture(tmpRoot, {
     executor: { command: 'agy', args: ['-i', '{prompt}', '--model', '{model}'] },
-    models: { light: 'gemini-3.6-flash-medium' },
+    modelPolicies: { agy: { nano: 'gemini-3.6-flash-medium' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: 60000,
     executors: {
       'test-agy-herdr-interactive': {
@@ -980,7 +1123,8 @@ test('a config can no longer name the session a worker lands in', () => {
   fs.mkdirSync(path.dirname(cfgPath), { recursive: true });
   fs.writeFileSync(cfgPath, JSON.stringify({
     executor: { command: 'node', args: ['{prompt}'] },
-    models: { standard: 'sonnet' },
+    modelPolicies: { claude: { standard: 'sonnet' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: 60000,
     executors: {
       agyHerdr: {

@@ -123,7 +123,7 @@ Contract diễn tả riêng từng trục. Không có một boolean `confined` c
 | Trục | Giá trị chuẩn | Default đầu tiên |
 |---|---|---|
 | `hostWrite` | `deny` / `allow` | `deny`, trừ các grant được cấp |
-| `hostRead` | `deny` / `allow` | `allow` |
+| `hostRead` | `deny` / `blind` / `allow` | `allow` |
 | `networkEgress` | `deny` / `allow` / `filtered` | `allow` |
 | `process` | `isolated` / `host` | `host` |
 | `home` | `private` / `host` | `host`; `private` khi policy yêu cầu |
@@ -224,7 +224,7 @@ interface ConfinementPolicyV1 {
   contract: 'confinement-policy.v1';
   controls: {
     hostWrite: 'deny' | 'allow';
-    hostRead: 'deny' | 'allow';
+    hostRead: 'deny' | 'blind' | 'allow';
     networkEgress: 'deny' | 'allow' | 'filtered';
     process: 'isolated' | 'host';
     home: 'private' | 'host';
@@ -282,7 +282,7 @@ interface ResourceGrantV1 {
 ```
 
 Thứ tự mức bảo vệ cố định theo từng control: `hostWrite deny > allow`,
-`hostRead deny > allow`, `networkEgress deny > filtered > allow`,
+`hostRead deny > blind > allow`, `networkEgress deny > filtered > allow`,
 `process isolated > host`, `home private > host`, `session isolated > shared`,
 và `workspace own > shared`. Override chỉ hợp lệ khi mỗi control bằng hoặc
 mạnh hơn minimum. `allow`, `host`, `shared` là không đòi hạn chế trên trục đó,
@@ -1167,18 +1167,78 @@ backend, generic composition cho mọi tổ hợp control, hoặc đổi tên ex
 | Contract surface | Default v1 |
 |---|---|
 | Mode | `required`, `unconfined`; `preferred` có trong contract nhưng default chưa nhận config này |
-| Invocation override | Contract đích giữ shape/partial-order; default v1 từ chối config override, dùng policy ID/capability khác |
+| Invocation override | Contract đích giữ shape/partial-order; default v1 từ chối config override, dùng policy ID/capability khác — trừ một override duy nhất, `{ controls: { hostRead: 'blind' } }` (§9.2) |
 | `hostWrite` | `deny` qua bwrap, hoặc `allow` khi explicit `unconfined` |
 | Write grant | run-output, private-home khi cần; workspace/git-metadata cho workspace-write theo readiness |
 | Read grant | `executor-credentials` khi policy của dispatch yêu cầu |
 | `home` | host mặc định; private resource khi provider cần; home private nếu policy thực sự yêu cầu và đã prove |
 | `session`, `workspace` | effective value là `shared`; legacy `isolated/own` được normalize nhưng chưa di dời enforcement ở slice đầu |
-| `hostRead`, `networkEgress`, `process` | effective value là `allow`, `allow`, `host`; request `deny/filtered/isolated` bị `unsupported` |
+| `hostRead` | `allow`, hoặc `blind` (§9.2); request `deny` bị `unsupported` |
+| `networkEgress`, `process` | effective value là `allow`, `host`; request `deny/filtered/isolated` bị `unsupported` |
 | Resource delivery/collect | host direct/mount; copy/remote/workspace-change chưa hỗ trợ |
 | Backend | Linux bwrap; backend khác trả `unsupported` có lý do |
 
 Việc parser hiểu một field không có nghĩa backend đã support field đó. Default
 phải từ chối requirement ngoài matrix thay vì nhận rồi bỏ qua.
+
+### 9.2 `hostRead: blind` — worker mù trước run state của peer
+
+`blind` là giá trị thứ ba của trục `hostRead` (`deny > blind > allow`): host vẫn đọc được,
+trừ run state của các dispatch khác và phiên agent đang sống. Runner gửi nó như một override
+chỉ-thu-hẹp qua slot `override` của request (Unit mang `blind: true`, mọi vai của Unit đó đều
+mù); built-in policy không đổi, không có policy ID mới. Mặc định tắt: argv của dispatch không
+`blind` giữ nguyên từng byte.
+
+Với `blind`, driver bwrap giữ `--ro-bind / /` và thêm, theo đúng thứ tự: `--unshare-pid` (ẩn
+`/proc/<pid>/cmdline` của tiến trình khác); `--tmpfs` che từng *hidden root* đang tồn tại;
+`--ro-bind` thư mục của chính dispatch (round dir `<assignments>/<unit run>/<role>/<round>`,
+hoặc run dir nếu không có assignment) chỉ-đọc; các mount nằm dưới mask (outbox ghi được, private
+home); cuối cùng `--remount-ro` trên các mask. Hidden root là dữ liệu của contract
+(`BLIND_HIDDEN_ROOTS`), không phải code của driver: `{fgosDir}/assignments`,
+`{fgosDir}/workflow-runs`, `{fgosDir}/dispatch-runs` của project dispatch đang chạy, thư mục
+socket của herdr, và confinement temp root (private home của dispatch khác, chứa transcript agent).
+Resource `hidden-root` và `own-assignment` đi vào plan/attestation; attestation ghi thêm
+`requested.override`, `effectiveControls.hostRead: blind` và `hiddenRoots`.
+
+Vì sao như vậy: (1) chỉ che ba thư mục run state chứ không che cả `.fgos`, vì `.fgos` có file
+tracked (config, events) — che cả thư mục làm chúng hiện thành "đã xoá" trong trạng thái checkout,
+và worker ghi được workspace có thể commit việc xoá đó; (2) `--unshare-pid` vì không có nó worker
+đọc được cmdline của tiến trình anh em; (3) socket herdr nằm trong danh sách vì `--ro-bind / /`
+vẫn cho `connect()`, tức worker có thể `pane read` pane của anh em. Blind chỉ dùng được khi cái
+worker *được trao* nằm sẵn trong thư mục của chính nó, nên với Unit `blind` resolver hand-off
+(`resolveUnitInputs`, `src/runner/execution/handoff-refs.mjs`) không giao đường dẫn gốc: mọi input
+`unit-run:`, `gate-answer:` và mọi ref nằm trong hidden root được chép nguyên byte (kiểm lại sha256
+lúc chép; nguồn đã đổi sau settle thì từ chối `report-changed-after-settle`) vào `inputs/` của
+*round dir của chính vai đó* (`<round>/inputs/<tên>`), vô điều kiện, không cần `anonymizeInputs`; tên
+trung tính `seat-A...` cho input `unit-run:` khi `anonymizeInputs` bật, tên cố định `<n>-<vai>-r<vòng>`
+hoặc `<n>-gate-<bước>` nếu không. Mỗi vai một bản riêng (không chia sẻ giữa các vai của Unit), nên
+chỉ vai đó đọc được; danh sách ref của vai là các bản chép. `unit.json` giữ `resolvedInputs` (ref
+đọc được tại chỗ) và `inputMap` (nguồn, tên, sha256); resume dùng lại bản chép đã có, fallback chép
+lại vào round dir của lần thử mới. Synthesizer của pattern `panel` nhận report của panelist theo
+đúng cách đó. `blind-ref-hidden` chỉ còn cho ref không chép được.
+
+Canary sống (2026-10-05, mỗi họ executor một Unit blind chỉ-đọc, input `unit-run:`, và đường dẫn
+tuyệt đối tới report nguồn): claude (herdr), codex (herdr và cli bwrap), xai (pi herdr), glm và
+deepseek (pi cli bwrap) đều đọc bản chép, gặp `ENOENT` ở nguồn và chỉ thấy chuỗi của chính mình
+trong `.fgos/assignments`. Dưới `--unshare-pid` và mask thư mục socket herdr, herdr vẫn nhận ra agent
+trong pane (`agentKnownToHerdr: detected`, trạng thái `unknown` → `working` → `idle`/kết thúc), nên
+mask và `--unshare-pid` giữ nguyên. agy chưa chứng minh được: `agy-herdr` hỏng cả khi không blind
+(`foreground process ... does not match prepared command argv`), `agy-cli-bwrap` dừng vì hết quota
+của tài khoản.
+
+Dispatch `blind` bị **từ chối, không bao giờ chạy không-blind**, với lý do có tên, trước khi
+spawn: `blind-requires-confinement` (mode không phải `required`/không có policy),
+`blind-in-process` (Agent tool/inline không có sandbox quanh worker; `bind()` cũng không chọn nó),
+`blind-hides-workspace` (cwd hoặc repo root nằm trong hidden root), `blind-ref-hidden` (context
+ref nằm trong hidden root ngoài thư mục của chính dispatch), `confinement-backend-missing` /
+`confinement-backend-disabled` (không có bwrap), `confinement-probe-failed` (probe chưa tươi hoặc
+không qua). Probe `peer-run-hidden` (thứ chín, chỉ cho dispatch blind; fingerprint và cache riêng)
+dựng argv từ chính `prepareBwrap`: worker không đọc được report của peer, home của peer, cmdline
+của tiến trình anh em, nhưng đọc được thư mục của mình (chỉ-đọc) và ghi được outbox; falsifier bỏ
+mask thì phải đọc được file peer. `fgos doctor` báo `blind-read: pass | fail |
+backend-unsupported` (check `confinement-blind-read`). Giới hạn còn mở: transcript agent của Lead
+trong host home, `.fgos/secrets.local.env` và project khác (bí mật, không phải mù), và mạng
+localhost.
 
 ## 10. Lộ trình rollout và trạng thái hoàn thành
 
@@ -1288,6 +1348,18 @@ Bảy rủi ro ban đầu đã được giải quyết qua các cell thi công P
 6. **Machine backend registry:** `~/.fgos/confinement-backends.json` được định nghĩa theo schema đóng `confinement-backend-registry.v1`, không cho phép project config ghi đè, và tự động bootstrap qua `fgos doctor --fix` (P01).
 7. **Bản đồ kiến trúc:** Component `src/runner/dispatch/confinement/`, slice `confinement-enforcement`, và contract CTR010 (`confinement-authority.v1`) đã được đăng ký chính thức tại `docs/architecture-map.md` (P07).
 
+### 13.1 Pane herdr bị confine cho agent không phải claude: công thức, lịch sử, vì sao từng bị quên
+
+**Công thức (đã chạy thật, Request-to-Run P6):** một invocation `herdr-spawn` có `confinement.backend: bwrap` giữ trạng thái của agent trong một private home thay vì thư mục account thật (đang read-only dưới posture):
+
+1. `resourceBindings: [{ resource: 'private-home', target: { kind: 'env', name: <CODEX_HOME | HOME | PI_CODING_AGENT_DIR> } }]` trên invocation (cùng dạng `codex-cli-bwrap`).
+2. Login của account đến từ inventory toàn máy `runner.providers.<provider>.accounts.<id>.credentialSource` trong `~/.fgos/config.json` (RUL65b của `docs/specs/runner.md`): kind `codex-home` (`auth.json`) hoặc `home-files` (danh sách file tường minh, copy owner-only, fail closed) — driver `drivers/bwrap.mjs` copy vào private home trước khi spawn. Không mount thư mục account thật, không bypass flag thay sandbox.
+3. Trust của workspace ghi vào store trong private home (`herdr-round.mjs` `trustStorePaths`), dẫn xuất từ store account thật; `fgos doctor` check `confined-pane-accounts` báo pane nào sẽ khởi động chưa đăng nhập.
+
+**Lịch sử (để khỏi suy ra lại):** `5a42bc376` (2026-09-11) `codex-bwrap` cli-spawn có private-home→`CODEX_HOME`; `569f72d3b`, `a1a966ff2`, `ec6a0745d` (09-16, rotator slice 1 thay `FGOS_CODEX_CREDENTIAL_HOMES`) chuyển credential sang inventory (khi đó chỉ `codex-home`). `c54c1888b`, `8c4b4aeeb`, `2cff7102a` (09-11..18) đưa launch confine của herdr-spawn qua Authority — chứng minh bằng worker giả và claude. `e37f8225d` (09-21, H8) từ chối `credential-provisioning-unsupported` cho adapter khác cli-spawn; lý do chỉ nằm trong comment code và `plans/reports/dispatch-execution-engine-architecture-review-260920.md`. `e7bd9b418`, `a9fc61324` (09-17) gộp/đổi tên executor id (`codex-bwrap` thành `openai`/`codex-cli-bwrap`), `5bbd066cd` xoá `claude-herdr`/`pi-herdr` "dormant" nên grep theo tên cũ không còn ra. `cfd670c43` (2026-10-01) áp posture lên mọi invocation herdr nhưng không kèm binding: codex/pi/agy chết ngay lúc khởi động (state dir read-only).
+
+**Vì sao từng bị quên:** (a) cách làm nằm trong commit và trong spec dưới nhãn "Codex bwrap" nên đọc như chuyện riêng của cli-spawn; (b) ngoại lệ H8 loại herdr-spawn không có trong spec; (c) id executor bị đổi tên, tìm theo tên cũ không thấy; (d) phase "facts" của kế hoạch chỉ hỏi về code hiện tại, không hỏi "trước đây đã có gì và vì sao bị bỏ". Bước kiểm tiền lệ nay nằm ở `AGENTS.md` ("Before touching code").
+
 ### Tồn đọng mở (Open Deferred Items):
 
 - **P04 M-3 (Inherited unconfined anchor overclaim):** Khi kế thừa anchor từ capability cha, một capability không khai báo confinement nhận attestation `unconfined` (explicit opt-out) thay vì `unknown`/`omitted`. Cần phân biệt rõ cờ thừa kế trong phase tiếp theo.
@@ -1304,5 +1376,5 @@ Bảy rủi ro ban đầu đã được giải quyết qua các cell thi công P
 - `src/runner/dispatch/config.mjs`: validation của shape confinement cũ.
 - `src/runner/dispatch/herdr-round.mjs`: enforcement session/home hiện tại.
 - `src/setup/registrations.mjs`: doctor checks liên quan.
-- `.fgos/config.json`: ba executor bwrap đang mang invocation hardcode.
+- `.fgos/config.json`: các invocation bwrap (cli-spawn và herdr-spawn) khai `confinement.backend`; invocation herdr của codex/agy/pi khai thêm `resourceBindings` private-home (§13.1).
 - `docs/routing-handoff-contract.md`: worktree containment không phải sandbox.

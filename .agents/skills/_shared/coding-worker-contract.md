@@ -56,7 +56,8 @@ these four rules:
    happened — it reads a fixed, minimal status signal. Two tokens cover
    every outcome this contract defines:
    - `[DONE]` — the work described in your boundary is complete (and, for
-     a lifecycle-bearing unit, committed — see Layer 2). Your caller will
+     a lifecycle-bearing unit, left in the worktree for the runner to commit —
+     see Layer 2). Your caller will
      independently re-verify; your own say-so is never trusted on its own.
    - `[BLOCKED] <exactly what's missing or what stopped you>` — cold-pickup
      refusal (rule 3), or a real mid-work stop: something you needed turned
@@ -88,10 +89,13 @@ cover that case instead.
    Run it yourself; if it fails, fix the root cause and rerun the exact
    command. Never weaken it, swap in an easier check, or report `[DONE]` on
    the strength of your own read of the diff.
-3. **Commit your changes, then stop.** One commit, on the item's own
-   branch, with the item's id in the message. Do not merge, push, tag, or
-   approve your own work — those stay the driver's job, downstream of your
-   `[DONE]`.
+3. **Edit files, then stop — never commit.** Leave your changes in the
+   item's worktree; the runner stages and commits them after you return,
+   with the item id in the message (a fenced JSON Result with a `summary`
+   field becomes the commit subject; its `commit` field is filled in by the
+   runner, not by you). You have no git write access. Do not merge, push,
+   tag, or approve your own work — those stay the driver's job, downstream
+   of your `[DONE]`.
 
 ## The negative rule (V3 — do not violate)
 
@@ -142,39 +146,19 @@ touching only its declared footprint, never called `fgos` itself, and
 reported through the exact two-token vocabulary above. Full evidence:
 `docs/history/pi-executor-runtime-capacity/RESEARCH.md` Round 4.
 
-**Live proof-test finding (tsk-1jt) — RED, config-blocked, not
-contract-blocked:** dispatching the named `claude` executor
-(`runner.executors.claude`) out-of-process against this contract found it
-read the same layered skill-pointer chain correctly and executed the
-file-write step exactly as directed, but could not complete Layer 2 rule 3
-(commit before return): the invocation's own `--permission-mode
-acceptEdits --allowedTools "Bash(git add:*),Bash(git commit:*)"` did not
-grant Bash-tool execution in this headless (`-p`, non-interactive) session
-— every git command was denied, confirmed both by the worker's own report
-and independently by the throwaway worktree's real `git log`/`git status`
-(no commit landed, the file sat untracked). It also did not use this
-file's own `[DONE]`/`[BLOCKED]` vocabulary when blocked — it asked a live
-question a headless dispatch has no one to answer, a second, independent
-deviation from Layer 1 rule 4. Neither finding says `claude` cannot follow
-this contract; both say the CURRENT `runner.executors.claude`/
-`runner.executor` invocation shape cannot complete it end-to-end yet. Full
-evidence: `docs/history/claude-named-executor/RESEARCH.md` Round 3.
-
-**Follow-up finding (tsk-1dsr) — GREEN, root cause was environment-local,
-not `claude` or config as designed:** the RED finding above traced to a
-personal `PreToolUse` hook on the testing machine (an `rtk` proxy that
-rewrites `git ...` to `rtk git ...` before the allowlist match runs) —
-not a syntax defect and not a limit of `claude`'s own comprehension.
-`runner.executors.claude`/`runner.executor` now name both the bare and
-`rtk`-wrapped forms (`"Bash(git add:*),Bash(git commit:*),Bash(rtk git
-add:*),Bash(rtk git commit:*)"`), still scoped to `add`/`commit` only.
-Retested live with this exact config: `claude` completed the full
-contract — wrote the exact requested content, honored the footprint,
-committed with the item id in the message, never called `fgos`, and
-reported through the exact `[DONE]` token. Confirmed independently via
-the throwaway worktree's real `git log`/`git show --stat`, not from the
-self-report alone. Full evidence: `docs/history/claude-named-executor/
-RESEARCH.md` Round 5.
+**Live proof-test findings (tsk-1jt, tsk-1dsr) — superseded:** dispatching
+the named `claude` executor out-of-process against this contract showed it
+reads the layered skill-pointer chain correctly and follows the file-write
+step, but a headless (`-p`, non-interactive) session could not run `git`
+under an `acceptEdits` allowlist — a personal `PreToolUse` hook (an `rtk`
+proxy rewriting `git ...` to `rtk git ...` before the allowlist match) was
+the environment-local cause. That whole class of failure is gone: a worker
+no longer commits (Layer 2 rule 3), so no invocation grants it any git
+write and the runner commits from outside the worker. The worker also asked
+a live question a headless dispatch has no one to answer — a deviation from
+Layer 1 rule 4 that stays a rule: report `[BLOCKED] <reason>`, never ask.
+Full evidence: `docs/history/claude-named-executor/RESEARCH.md` Rounds 3
+and 5.
 
 **Live proof-test finding (tsk-5gd):** dispatching real `agy` with
 `gemini-3.6-flash-medium` against this contract found that when the worker

@@ -6,7 +6,7 @@
 // checks-setup-*.test.mjs bên cạnh.
 //
 // tsk-25b: main đã thêm nhiều check mới (root-drift, leaf-notify-drift,
-// events-jsonl-*, work-*-vocabulary, domain-workflow-skillmap-coverage,
+// events-jsonl-*, work-*-vocabulary,
 // enduser-docs-index-stale, decision-index-stale, ...) từ sau lần chẻ đầu,
 // khiến file này lại vượt ngưỡng ~30s. Phần drift/vocabulary/index-staleness
 // của chính work-item store ở lại đây; phần config/CLI-wiring/doctor runtime
@@ -46,7 +46,7 @@ import {
 } from './helpers/setup-checks-harness.mjs';
 import { DEFAULT_WORKER_SLOT_CEILING } from '../../src/state/worker-slots.mjs';
 import { DEFAULT_CHECKPOINT_FALLBACK_INTERVAL_SEC } from '../../src/state/events-jsonl-truncation-guard.mjs';
-import { DEFAULT_CAPABILITY_SLOTS, DEFAULT_IRON_LAW_LEVEL, PI_EXECUTOR_DEFAULT, findDomainWorkflowSkillMapGaps } from '../../src/setup/registrations.mjs';
+import { DEFAULT_CAPABILITY_SLOTS, DEFAULT_IRON_LAW_LEVEL, PI_EXECUTOR_DEFAULT } from '../../src/setup/registrations.mjs';
 import { addDecision } from '../../src/state/store.mjs';
 import { createSession } from '../../src/runner/session.mjs';
 
@@ -75,8 +75,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'herdr-launcher-configured',
       'herdr-web-dashboard-configured',
       'work-classification-vocabulary',
-      'work-stage-vocabulary',
-      'domain-workflow-skillmap-coverage',
+      'work-step-vocabulary',
       'domain-workflow-operations-coverage',
       'delivered-not-on-trunk',
       'enduser-docs-index-stale',
@@ -85,6 +84,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'events-jsonl-not-truncated',
       'cli-version-visible',
       'worker-slots-ceiling-usable',
+      'workflow-capabilities-configured',
       'gateway-token-configured',
       'readme-install-tag-exists',
       'iron-law-configured',
@@ -92,6 +92,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'task-specs-resolve',
       'agent-claims-resolve',
       'agent-type-names-unique',
+      'domain-registry-compiled',
       'advise-execute-capabilities-configured',
       'capability-serves-valid',
       'decision-index-stale',
@@ -115,14 +116,22 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'no-stuck-merge-abort',
       'coordination-protocol-fixtures-valid',
       'coordination-example-requests-valid',
-      'workflow-flow-definition-projects-cleanly',
       // Phase 01 group D: the three preconditions for an interactive dispatch.
       'herdr-available',
       'trust-store-readable',
       // Phase 07 (herdr-trust-supervisor R3): codex-toml/agy trust stores had
       // no doctor coverage at all -- only claude-json's default path did.
       'non-claude-trust-stores-readable',
+      'confined-pane-accounts',
+      'agent-cli-project-trusted',
+      'workflow-pools-satisfy-independence',
+      'blind-steps-use-proven-pools',
+      'observe-dir-writable',
+      'observe-friction-migrated',
+      'observe-host-resolvable',
+      'observe-run-coverage',
       'executor-confinement',
+      'invocation-git-write-grants',
       'herdr-executor-kinds',
       // Phase 06 (executor-policy-dispatch-seams): legacy policy-shaped
       // executor/capability warnings, named with their migration target.
@@ -138,13 +147,19 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'confinement-herdr-maturity',
       'confinement-orphaned-resources-reaped',
       'confinement-probe-freshness',
+      'confinement-blind-read',
       'confinement-strict-readiness',
       'coordination-abandoned-claims',
-      'coordination-sessions-closed',
       'operation-prompt-templates-valid',
       'operation-capability-resolves',
       'runner-coordination-orgPolicy-shape',
+      'runner-patterns-config',
+      'runner-rigor-config',
+      'mutating-assignment-binding-snapshot',
       'shadow-binder-divergence',
+      'tier-vocabulary-dead-keys',
+      'model-policy-tier-coverage',
+      'coordination-protocol-dead-vocabulary',
     ].sort(),
   );
 });
@@ -423,7 +438,7 @@ test('work-classification-vocabulary lists every violating id, not just the firs
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
-// ─── work-stage-vocabulary (tsk-64h) ───────────────────────────────────────
+// ─── work-step-vocabulary (tsk-64h) ───────────────────────────────────────
 // The stage-axis sibling of work-classification-vocabulary above: an open
 // item may sit at a stage its own domain no longer registers, and nothing
 // surfaced that until now. Same OPEN-only scoping and the same raw
@@ -431,213 +446,114 @@ test('work-classification-vocabulary lists every violating id, not just the firs
 // refuses a retired stage at the write door, so a legacy-shaped item can
 // only be constructed by appending the event directly.
 
-test('work-stage-vocabulary passes on an empty store', () => {
+test('work-step-vocabulary passes on an empty store', () => {
   const dir = initRepo('checks-stage-vocab-empty-');
   const fgosDir = path.join(dir, '.fgos');
   initStore(fgosDir);
 
-  const { passed, message } = checkById('work-stage-vocabulary').check(dir);
+  const { passed, message } = checkById('work-step-vocabulary').check(dir);
   assert.equal(passed, true);
   assert.match(message, /registered by its domain/);
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
-test('work-stage-vocabulary passes for an item whose stage was never written (lazy Execute default)', () => {
+test('work-step-vocabulary passes for an item whose stage was never written (lazy Execute default)', () => {
   const dir = initRepo('checks-stage-vocab-unset-');
   const fgosDir = path.join(dir, '.fgos');
   initStore(fgosDir);
   addWork(fgosDir, { id: 'a', title: 'a', kind: 'feature', risk: 'light', verify: 'true', status: 'todo', deps: [], refs: [] });
 
-  const { passed, message } = checkById('work-stage-vocabulary').check(dir);
+  const { passed, message } = checkById('work-step-vocabulary').check(dir);
   assert.equal(passed, true, message);
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
-test('work-stage-vocabulary passes when every open item sits at a stage its domain registers', () => {
+test('work-step-vocabulary passes when every open item sits at a stage its domain registers', () => {
   const dir = initRepo('checks-stage-vocab-clean-');
   const fgosDir = path.join(dir, '.fgos');
   const logPath = path.join(fgosDir, 'events.jsonl');
   appendEvent(logPath, {
     type: 'work.add',
-    payload: { id: 'a', title: 'a', kind: 'feature', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'planning' },
+    payload: { id: 'a', title: 'a', kind: 'feature', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', workflowStep: 'planning' },
   });
   appendEvent(logPath, {
     type: 'work.add',
-    payload: { id: 'b', title: 'b', kind: 'feature', status: 'doing', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'executing' },
+    payload: { id: 'b', title: 'b', kind: 'feature', status: 'doing', deps: [], risk: 'light', refs: [], verify: 'true', workflowStep: 'executing' },
   });
 
-  const { passed, message } = checkById('work-stage-vocabulary').check(dir);
+  const { passed, message } = checkById('work-step-vocabulary').check(dir);
   assert.equal(passed, true, message);
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
-test('work-stage-vocabulary fails and names an OPEN item sitting at a stage its domain retired', () => {
+test('work-step-vocabulary fails and names an OPEN item sitting at a stage its domain retired', () => {
   const dir = initRepo('checks-stage-vocab-retired-');
   const fgosDir = path.join(dir, '.fgos');
   const logPath = path.join(fgosDir, 'events.jsonl');
   appendEvent(logPath, {
     type: 'work.add',
-    payload: { id: 'stranded', title: 'stranded', kind: 'feature', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'clarify' },
+    payload: { id: 'stranded', title: 'stranded', kind: 'feature', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', workflowStep: 'clarify' },
   });
 
-  const { passed, message } = checkById('work-stage-vocabulary').check(dir);
+  const { passed, message } = checkById('work-step-vocabulary').check(dir);
   assert.equal(passed, false);
   assert.match(message, /stranded/);
-  assert.match(message, /stage: "clarify"/);
+  assert.match(message, /step: "clarify"/);
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
-test("work-stage-vocabulary judges each item against its OWN domain's stages, not the default domain's", () => {
+test("work-step-vocabulary judges each item against its OWN domain's stages, not the default domain's", () => {
   const dir = initRepo('checks-stage-vocab-domain-');
   const fgosDir = path.join(dir, '.fgos');
   const logPath = path.join(fgosDir, 'events.jsonl');
   appendEvent(logPath, {
     type: 'work.add',
-    payload: { id: 'triaged', title: 'triaged', kind: 'feature', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'triage', domain: 'triage' },
+    payload: { id: 'triaged', title: 'triaged', kind: 'feature', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', workflowStep: 'triage', domain: 'triage' },
   });
   appendEvent(logPath, {
     type: 'work.add',
-    payload: { id: 'miscoded', title: 'miscoded', kind: 'feature', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'triage' },
+    payload: { id: 'miscoded', title: 'miscoded', kind: 'feature', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', workflowStep: 'triage' },
   });
 
-  const { passed, message } = checkById('work-stage-vocabulary').check(dir);
+  const { passed, message } = checkById('work-step-vocabulary').check(dir);
   assert.equal(passed, false);
   assert.match(message, /miscoded/);
   assert.doesNotMatch(message, /triaged/);
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
-test('work-stage-vocabulary passes despite a retired stage on an already-resolved (done) item', () => {
+test('work-step-vocabulary passes despite a retired stage on an already-resolved (done) item', () => {
   const dir = initRepo('checks-stage-vocab-resolved-');
   const fgosDir = path.join(dir, '.fgos');
   const logPath = path.join(fgosDir, 'events.jsonl');
   appendEvent(logPath, {
     type: 'work.add',
-    payload: { id: 'old-done', title: 'old-done', kind: 'feature', status: 'done', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'clarify' },
+    payload: { id: 'old-done', title: 'old-done', kind: 'feature', status: 'done', deps: [], risk: 'light', refs: [], verify: 'true', workflowStep: 'clarify' },
   });
 
-  const { passed, message } = checkById('work-stage-vocabulary').check(dir);
+  const { passed, message } = checkById('work-step-vocabulary').check(dir);
   assert.equal(passed, true, message);
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
-test('work-stage-vocabulary lists every violating id, not just the first', () => {
+test('work-step-vocabulary lists every violating id, not just the first', () => {
   const dir = initRepo('checks-stage-vocab-multi-');
   const fgosDir = path.join(dir, '.fgos');
   const logPath = path.join(fgosDir, 'events.jsonl');
   appendEvent(logPath, {
     type: 'work.add',
-    payload: { id: 'bad-one', title: 'bad-one', kind: 'feature', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'clarify' },
+    payload: { id: 'bad-one', title: 'bad-one', kind: 'feature', status: 'todo', deps: [], risk: 'light', refs: [], verify: 'true', workflowStep: 'clarify' },
   });
   appendEvent(logPath, {
     type: 'work.add',
-    payload: { id: 'bad-two', title: 'bad-two', kind: 'feature', status: 'awaiting-human', deps: [], risk: 'light', refs: [], verify: 'true', stage: 'clarify' },
+    payload: { id: 'bad-two', title: 'bad-two', kind: 'feature', status: 'awaiting-human', deps: [], risk: 'light', refs: [], verify: 'true', workflowStep: 'clarify' },
   });
 
-  const { passed, message } = checkById('work-stage-vocabulary').check(dir);
+  const { passed, message } = checkById('work-step-vocabulary').check(dir);
   assert.equal(passed, false);
   assert.match(message, /bad-one/);
   assert.match(message, /bad-two/);
   fs.rmSync(dir, { recursive: true, force: true });
-});
-
-// ─── domain-workflow-skillmap-coverage (tsk-ogx) ───────────────────────────
-// The registry-shape sibling of work-classification-vocabulary/
-// work-stage-vocabulary above: those two catch a work ITEM drifting from
-// its domain's own declared vocabulary; this one catches the domain's own
-// DECLARATION drifting internally -- a stage name reachable through a
-// domain's registered workflow(s) with no entry at all in that domain's
-// own `skillMap` (an explicit `null` is a deliberate "no skill for this
-// stage" answer and must not be flagged).
-//
-// Pure registry check -- no cwd/on-disk state, no fixture repo needed. The
-// real `DOMAINS` registry is `Object.freeze`d and can never carry a
-// deliberately-broken fixture, so `findDomainWorkflowSkillMapGaps` accepts
-// an optional `domains` map (default: the real `DOMAINS`) purely so the
-// fail branch is testable with a synthetic domain -- production wiring
-// (`registerCheck` in registrations.mjs) always calls it zero-arg, against
-// the real registry.
-
-test('domain-workflow-skillmap-coverage passes against the real DOMAINS registry', () => {
-  const { passed, message } = checkById('domain-workflow-skillmap-coverage').check();
-  assert.equal(passed, true, message);
-  assert.match(message, /resolves to a real skillMap entry/);
-});
-
-test('findDomainWorkflowSkillMapGaps passes a domain with no workflows field, checked against its own stages', () => {
-  const domains = {
-    fixture: {
-      stages: ['alpha', 'beta'],
-      skillMap: { alpha: 'some-skill', beta: null },
-    },
-  };
-  assert.deepEqual(findDomainWorkflowSkillMapGaps(domains), []);
-});
-
-test('findDomainWorkflowSkillMapGaps names a stage missing from skillMap entirely, distinct from an explicit null', () => {
-  const domains = {
-    fixture: {
-      stages: ['alpha', 'beta'],
-      skillMap: { alpha: null }, // beta missing entirely -- explicit null on alpha is fine
-    },
-  };
-  assert.deepEqual(findDomainWorkflowSkillMapGaps(domains), ['fixture.beta']);
-});
-
-test('findDomainWorkflowSkillMapGaps walks every stage across every registered workflow, not just domain.stages', () => {
-  const domains = {
-    fixture: {
-      stages: ['alpha'], // the domain-level default -- workflows below add a second, real workflow
-      workflows: {
-        feature: { stages: ['alpha'] },
-        bugfix: { stages: ['alpha', 'gamma'] },
-      },
-      skillMap: { alpha: 'some-skill' }, // gamma missing
-    },
-  };
-  assert.deepEqual(findDomainWorkflowSkillMapGaps(domains), ['fixture.gamma']);
-});
-
-test('findDomainWorkflowSkillMapGaps skips a domain with no skillMap at all', () => {
-  const domains = { fixture: { stages: ['alpha'] } };
-  assert.deepEqual(findDomainWorkflowSkillMapGaps(domains), []);
-});
-
-test('findDomainWorkflowSkillMapGaps lists every violating domain.stage, not just the first', () => {
-  const domains = {
-    one: { stages: ['a', 'b'], skillMap: { a: null } },
-    two: { stages: ['c'], skillMap: {} },
-  };
-  const gaps = findDomainWorkflowSkillMapGaps(domains);
-  assert.deepEqual(gaps.sort(), ['one.b', 'two.c']);
-});
-
-test('dependencies-installed passes when package.json has no dependencies field (pre-tsk-slq behavior)', () => {
-  const tmp = mkTemp('fgos-deps-check-');
-  fs.writeFileSync(path.join(tmp, 'package.json'), JSON.stringify({ name: 'x' }));
-  const { passed, message } = checkById('dependencies-installed').check(tmp);
-  assert.equal(passed, true);
-  assert.match(message, /no runtime dependencies declared/);
-  fs.rmSync(tmp, { recursive: true, force: true });
-});
-
-test('dependencies-installed fails when a declared dependency is missing from node_modules', () => {
-  const tmp = mkTemp('fgos-deps-check-');
-  fs.writeFileSync(path.join(tmp, 'package.json'), JSON.stringify({ name: 'x', dependencies: { yaml: '^2.9.0' } }));
-  const { passed, message } = checkById('dependencies-installed').check(tmp);
-  assert.equal(passed, false);
-  assert.match(message, /missing from node_modules: yaml/);
-  fs.rmSync(tmp, { recursive: true, force: true });
-});
-
-test('dependencies-installed passes when every declared dependency is present in node_modules', () => {
-  const tmp = mkTemp('fgos-deps-check-');
-  fs.writeFileSync(path.join(tmp, 'package.json'), JSON.stringify({ name: 'x', dependencies: { yaml: '^2.9.0' } }));
-  fs.mkdirSync(path.join(tmp, 'node_modules', 'yaml'), { recursive: true });
-  const { passed, message } = checkById('dependencies-installed').check(tmp);
-  assert.equal(passed, true);
-  assert.match(message, /1 dependency installed/);
-  fs.rmSync(tmp, { recursive: true, force: true });
 });
 
 // ─── changelog-unreleased-stale (tsk-3ip, docs/history/ ────────────────────
@@ -873,32 +789,6 @@ test('decision-index-stale fix reports a graceful skip (changed:false, no throw)
   fs.rmSync(tmp, { recursive: true, force: true });
 });
 
-test('fgos check (CLI e2e) reports changelogNag and appends a checkpoint to changelog-nag-history.jsonl', () => {
-  const cwd = mkTemp('fgos-changelog-nag-cli-');
-  execFileSync('git', ['init', '-q'], { cwd, encoding: 'utf8' });
-  const fgosDir = path.join(cwd, '.fgos');
-  initStore(fgosDir);
-  addWork(fgosDir, { id: 'delivered-item', title: 'delivered', kind: 'feature', risk: 'light', verify: 'true', status: 'delivered', deps: [], refs: [] });
-  fs.writeFileSync(
-    path.join(cwd, 'CHANGELOG.md'),
-    '# Changelog\n\n## [Unreleased]\n\n### Added\n\n### Changed\n\n### Fixed\n\n### Removed\n\n## [0.1.0]\n\n### Added\n\n- baseline\n',
-  );
-
-  const result = spawnSync(process.execPath, [FGOS, 'check'], { cwd, encoding: 'utf8', env: NO_CLAUDE_ENV });
-  assert.equal(result.status, 0, `fgos check failed: ${result.stderr}`);
-  const { data } = JSON.parse(result.stdout);
-  assert.deepEqual(data.changelogNag, { fileExists: true, hasEntries: false, deliveredCount: 1 });
-
-  const historyLines = fs
-    .readFileSync(path.join(fgosDir, 'logs', 'changelog-nag-history.jsonl'), 'utf8')
-    .split('\n')
-    .filter(Boolean)
-    .map((l) => JSON.parse(l));
-  assert.equal(historyLines.length, 1);
-  assert.equal(historyLines[0].hasEntries, false);
-  assert.equal(historyLines[0].deliveredCount, 1);
-  fs.rmSync(cwd, { recursive: true, force: true });
-});
 
 // tsk-in1-1 D1: a tool provider is declared directly in
 // `runner.executors.<id>` (`.fgos/config.json`), config-edited like every
@@ -1029,6 +919,9 @@ test('shell-integration-sourced fails when the source line is present but the so
   );
   const prevProbe = process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT;
   process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT = fragileFixture;
+  const prevHarness = { CLAUDECODE: process.env.CLAUDECODE, CLAUDE_CODE_SESSION_ID: process.env.CLAUDE_CODE_SESSION_ID };
+  delete process.env.CLAUDECODE;
+  delete process.env.CLAUDE_CODE_SESSION_ID;
   try {
     withHome(homeDir, () => {
       const { passed, message } = checkById('shell-integration-sourced').check(process.cwd());
@@ -1036,7 +929,19 @@ test('shell-integration-sourced fails when the source line is present but the so
       assert.match(message, /fgos --help.*fails/);
       assert.match(message, /_fgos_helper/);
     });
+    // Inside an agent harness shell the same dead function is information, not a failure.
+    process.env.CLAUDECODE = '1';
+    withHome(homeDir, () => {
+      const { passed, message } = checkById('shell-integration-sourced').check(process.cwd());
+      assert.equal(passed, true);
+      assert.match(message, /informational, running inside an agent harness shell/);
+      assert.match(message, /_fgos_helper/);
+    });
   } finally {
+    for (const [key, value] of Object.entries(prevHarness)) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
     if (prevProbe === undefined) delete process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT;
     else process.env.FGOS_SHELL_INTEGRATION_PROBE_SCRIPT = prevProbe;
     fs.rmSync(homeDir, { recursive: true, force: true });
@@ -1902,171 +1807,13 @@ function writeRunnerConfig(dir, runner) {
   fs.writeFileSync(path.join(dir, '.fgos', 'config.json'), JSON.stringify({ runner }, null, 2));
 }
 
-test('operation-capability-resolves fails a capability that only resolves through a literal executor-id match (H1), never treating it as a genuine capability.prefer resolution', () => {
-  const dir = mkTemp('checks-operation-capability-executor-id-');
+test('operation-capability-resolves reports passing status for retired coordination protocols', () => {
+  const dir = mkTemp('checks-operation-capability-retired-');
   try {
-    writeProjectCoordinationProtocol(
-      dir,
-      `apiVersion: fgos.dev/v1alpha1
-kind: FlowDefinition
-metadata:
-  id: project.coordination-protocol.doctor-check-executor-id-fixture
-  version: 1.0.0
-spec:
-  profile:
-    kind: CoordinationProtocol
-  roles: [doer]
-  actors:
-    - id: doer
-      role: doer
-  operations:
-    - id: produce
-      role: doer
-      policy:
-        capability: fake-cap
-      result:
-        kind: work-product
-        evidenceRequired: reported
-  graph:
-    entry: phase-produce
-    nodes:
-      - id: phase-produce
-        operations:
-          - ref: produce
-            actor: doer
-        transitions: []
-`,
-    );
-    writeRunnerConfig(dir, {
-      executor: { command: 'claude', args: ['{prompt}'] },
-      executors: {
-        'fake-cap': { kind: 'agent', invocations: [{ via: 'cli', adapter: 'cli-spawn', command: 'claude', args: ['{prompt}'] }] },
-      },
-    });
-
-    const { passed, message } = checkById('operation-capability-resolves').check(dir);
-    assert.equal(passed, false, message);
-    assert.match(message, /fake-cap/);
-    assert.match(message, /nothing registered through capabilities\.fake-cap\.prefer/);
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
-});
-
-test('operation-capability-resolves passes a capability that genuinely resolves through capabilities.<name>.prefer', () => {
-  const dir = mkTemp('checks-operation-capability-prefer-');
-  try {
-    writeProjectCoordinationProtocol(
-      dir,
-      `apiVersion: fgos.dev/v1alpha1
-kind: FlowDefinition
-metadata:
-  id: project.coordination-protocol.doctor-check-prefer-fixture
-  version: 1.0.0
-spec:
-  profile:
-    kind: CoordinationProtocol
-  roles: [doer]
-  actors:
-    - id: doer
-      role: doer
-  operations:
-    - id: produce
-      role: doer
-      policy:
-        capability: real-cap
-      result:
-        kind: work-product
-        evidenceRequired: reported
-  graph:
-    entry: phase-produce
-    nodes:
-      - id: phase-produce
-        operations:
-          - ref: produce
-            actor: doer
-        transitions: []
-`,
-    );
-    // Start from the REAL committed runner config (never a hand-trimmed
-    // subset): `discoverCoordinationProtocols` always scans the real core
-    // tier alongside this test's own project-tier fixture, so every real
-    // core CoordinationProtocol's own declared capability must ALSO
-    // resolve, or this "passes" case would spuriously fail on unrelated
-    // repo content instead of proving anything about the fixture below.
-    const repoRoot = path.resolve(import.meta.dirname, '..', '..');
-    const committedRunner = JSON.parse(execFileSync('git', ['show', 'HEAD:.fgos/config.json'], { cwd: repoRoot, encoding: 'utf8' })).runner;
-    writeRunnerConfig(dir, {
-      ...committedRunner,
-      executors: {
-        ...committedRunner.executors,
-        'some-executor': { kind: 'agent', invocations: [{ via: 'cli', adapter: 'cli-spawn', command: 'claude', args: ['{prompt}'] }] },
-      },
-      capabilities: {
-        ...committedRunner.capabilities,
-        'real-cap': { prefer: 'some-executor' },
-      },
-    });
-
+    writeRunnerConfig(dir, { executor: { command: 'claude', args: ['{prompt}'] } });
     const { passed, message } = checkById('operation-capability-resolves').check(dir);
     assert.equal(passed, true, message);
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
-});
-
-function writeCoordinationSession(dir, coordinationId, { status, createdAt }) {
-  const sessionDir = path.join(dir, '.fgos', 'coordination', 'sessions', coordinationId);
-  fs.mkdirSync(sessionDir, { recursive: true });
-  fs.writeFileSync(
-    path.join(sessionDir, 'session.json'),
-    JSON.stringify({ schemaVersion: '1', coordinationId, status, createdAt }, null, 2),
-  );
-}
-
-test('coordination-sessions-closed passes when there is no coordination sessions directory at all', () => {
-  const dir = initRepo('checks-coordination-sessions-closed-absent-');
-  try {
-    const { passed, message } = checkById('coordination-sessions-closed').check(dir);
-    assert.equal(passed, true, message);
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
-});
-
-test('coordination-sessions-closed passes for a fresh active session (well under the 7-day threshold) and for an old session that already reached a terminal status', () => {
-  const dir = initRepo('checks-coordination-sessions-closed-fresh-');
-  try {
-    writeCoordinationSession(dir, 'fresh-active', { status: 'active', createdAt: new Date().toISOString() });
-    writeCoordinationSession(dir, 'old-but-completed', {
-      status: 'completed',
-      createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-    });
-
-    const { passed, message } = checkById('coordination-sessions-closed').check(dir);
-    assert.equal(passed, true, message);
-  } finally {
-    fs.rmSync(dir, { recursive: true, force: true });
-  }
-});
-
-test('coordination-sessions-closed fails and names the oldest offender when a session has been "active" past 7 days', () => {
-  const dir = initRepo('checks-coordination-sessions-closed-stale-');
-  try {
-    writeCoordinationSession(dir, 'stale-active-younger', {
-      status: 'active',
-      createdAt: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
-    });
-    writeCoordinationSession(dir, 'stale-active-oldest', {
-      status: 'active',
-      createdAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
-    });
-    writeCoordinationSession(dir, 'fresh-active-unrelated', { status: 'active', createdAt: new Date().toISOString() });
-
-    const { passed, message } = checkById('coordination-sessions-closed').check(dir);
-    assert.equal(passed, false, 'two sessions are past the 7-day active threshold; the fresh one must not count');
-    assert.match(message, /\b2\b/, `message must report the count of 2 stale sessions, got: ${message}`);
-    assert.match(message, /stale-active-oldest/, `message must name the OLDEST offender specifically, got: ${message}`);
+    assert.match(message, /retired/);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }

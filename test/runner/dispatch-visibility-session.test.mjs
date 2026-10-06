@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import { resolveWorkerArtifactPath } from '../../src/runner/dispatch/assignment-runner.mjs';
+import { resolveWorkerArtifactPath, resolveRunWorkerArtifactPath } from '../../src/runner/dispatch/assignment-runner.mjs';
 import {
   readVisibility,
   writeVisibility,
@@ -226,11 +226,16 @@ test('findRunningRuns sees both run layouts and ignores runs that already settle
     };
     mk('assignments/asgn_a/runs/01', 'running', 'r-assignment');
     mk('assignments/asgn_a/runs/02', 'settled', 'r-done');
+    const nested = mk('assignments/unit-run-example/panelist-1/1/runs/01', 'running', 'r-nested');
+    mk('assignments/unit-run-example/panelist-1/1-fb1/runs/01', 'settled', 'r-nested-done');
+    mk('assignments/asgn_a/runs/01/outbox/planted/runs/01', 'running', 'r-planted');
+    fs.symlinkSync(nested, path.join(fgosDir, 'assignments', 'linked'));
     // The flat layout a runner dispatch writes when it has no Assignment.
     mk('dispatch-runs/tsk-x/1700000000000', 'running', 'r-dispatch');
 
     const ids = findRunningRuns(fgosDir).map((r) => r.runId).sort();
-    assert.deepEqual(ids, ['r-assignment', 'r-dispatch']);
+    assert.deepEqual(ids, ['r-assignment', 'r-dispatch', 'r-nested']);
+    assert.equal(findRunningRuns(fgosDir).find((r) => r.runId === 'r-nested').assignmentId, 'unit-run-example/panelist-1/1');
   } finally { fs.rmSync(fgosDir, { recursive: true, force: true }); }
 });
 
@@ -255,6 +260,7 @@ test('a run whose driver just checked in is busy, not orphaned', () => {
     mk('dispatch-runs/w/1', 'beating', new Date(now - 5000).toISOString());
     mk('dispatch-runs/w/2', 'silent', new Date(now - 600000).toISOString());
     mk('dispatch-runs/w/3', 'never-wrote-one', null);
+    mk('assignments/unit-run-live/producer/1/runs/01', 'nested-beating', new Date(now - 5000).toISOString());
 
     // Writing `unknown` over a run five minutes into a 35-minute ceiling
     // stops every watcher on a run that is still being driven.
@@ -263,8 +269,25 @@ test('a run whose driver just checked in is busy, not orphaned', () => {
 
     // The window is a parameter, not a belief: shrink it and the same live
     // run reads as abandoned.
-    assert.equal(findRunningRuns(fgosDir, { now: () => now, driverFreshMs: 1000 }).length, 3);
+    assert.equal(findRunningRuns(fgosDir, { now: () => now, driverFreshMs: 1000 }).length, 4);
   } finally { fs.rmSync(fgosDir, { recursive: true, force: true }); }
+});
+
+test('a crashed confined run whose claim is only under worker-output/outbox reconciles to settled', () => {
+  const dir = makeRunDir();
+  try {
+    const outbox = path.join(dir, 'worker-output', 'outbox');
+    fs.mkdirSync(outbox, { recursive: true });
+    fs.writeFileSync(path.join(outbox, 'agent-result.json'), JSON.stringify({ status: 'settled' }));
+
+    assert.equal(findWorkerResult(dir), path.join(outbox, 'agent-result.json'));
+    assert.equal(
+      findWorkerResult(dir),
+      resolveRunWorkerArtifactPath(dir, /^result-(\d+)\.json$/, 'agent-result.json'),
+      'reconciliation and settlement resolve one claim to one path',
+    );
+    assert.equal(reconcileRun(dir, { liveness: 'absent' }).outcome, 'settled');
+  } finally { cleanup(dir); }
 });
 
 test('a crashed cli-spawn run that did write its claim reconciles to settled, not unknown', () => {

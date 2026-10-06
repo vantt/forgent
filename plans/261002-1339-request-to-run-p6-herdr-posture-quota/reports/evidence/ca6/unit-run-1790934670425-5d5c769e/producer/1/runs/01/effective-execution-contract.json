@@ -1,0 +1,74 @@
+{
+  "contract": {
+    "id": "effective-execution-contract",
+    "version": 1
+  },
+  "assignmentId": "unit-run-1790934670425-5d5c769e/producer/1",
+  "runId": "run_unit-run-1790934670425-5d5c769e/producer/1_01",
+  "mutation": "mutating",
+  "workspace": {
+    "cwd": "/var/tmp/p6-accept-work",
+    "writeScope": [
+      "/var/tmp/p6-accept-work"
+    ],
+    "mainCheckout": "/home/vantt/projects/forgentX",
+    "posture": "worktree"
+  },
+  "tools": {
+    "shell": {
+      "mode": "worktree-write",
+      "enforced": false,
+      "enforcement": "instructed",
+      "allowedCommands": [
+        "git add",
+        "git commit"
+      ]
+    }
+  },
+  "permissions": {
+    "posture": "enforced",
+    "shell": {
+      "mode": "worktree-write",
+      "enforced": false,
+      "enforcement": "instructed",
+      "allowedCommands": [
+        "git add",
+        "git commit"
+      ]
+    },
+    "filesystem": {
+      "mode": "workspace-write",
+      "enforced": true,
+      "enforcement": "enforced",
+      "writeScope": [
+        "/var/tmp/p6-accept-work"
+      ]
+    },
+    "network": {
+      "enforced": false,
+      "enforcement": "instructed"
+    }
+  },
+  "limits": {
+    "executorTimeoutMs": 2100000
+  },
+  "resultClaim": {
+    "contract": {
+      "id": "agent-result-claim",
+      "version": 2
+    },
+    "path": "/home/vantt/projects/forgentX-p6/.fgos/assignments/unit-run-1790934670425-5d5c769e/producer/1/runs/01/agent-result.json"
+  },
+  "provenance": {
+    "dispatchPlanHash": "sha256:9f38db5533c577eb4d3dc4bd21c2b93239191706cbd89d2442ed1b3c0a114cbf",
+    "configHash": "sha256:debed55c71317f7d9f80c0121a715c8809710b523888d8fd494f5960fc481603",
+    "executorId": "claude",
+    "adapter": "cli-spawn",
+    "adapterFamily": "cli-spawn"
+  },
+  "enforcementPosture": "enforced",
+  "permissionEnforcementPosture": "enforced",
+  "executorId": "claude",
+  "adapter": "cli-spawn",
+  "adapterFamily": "cli-spawn"
+}

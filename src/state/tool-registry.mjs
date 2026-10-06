@@ -63,7 +63,7 @@ export function normalizeCapability(raw) {
  * becoming tool-registry-probeable).
  *
  * tsk-45f D11 (superseded by tsk-34n): `executor.for` (the array `decide
- * --for`/`resolveExecutorIdForPurpose` already read) replaced the older
+ * --for` once read) replaced the older
  * `executor.capability` single-value field entirely — a real executor
  * (`gitnexus`) once declared only `capability`, so `decide --for
  * impact-analysis` always answered `unavailable` despite `fgos tool query

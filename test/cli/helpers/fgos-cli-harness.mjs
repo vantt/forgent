@@ -16,13 +16,14 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { addOutcome, addFriction, addDiscovery, moveWork, moveStage, addWork, editWork, listWork, StoreError, resolveWriterLogPath, rebuild, initStore } from '../../../src/state/store.mjs';
+import { addOutcome, recordFriction, addDiscovery, moveWork, moveStep, addWork, editWork, listWork, StoreError, resolveWriterLogPath, rebuild, initStore } from '../../../src/state/store.mjs';
 import { appendEvent } from '../../../src/state/events.mjs';
 import { releaseClaim } from '../../../src/state/runtime-coordination.mjs';
 import { createSession, endSession } from '../../../src/runner/session.mjs';
 import { DEFAULT_TTL_MS } from '../../../src/runner/main-checkout-lock.mjs';
 import { resolveFgosFile, FGOS_FILE } from '../../../src/state/fgos-file-registry.mjs';
 import { writeCoexistenceManifest } from '../../../src/install/coexist.mjs';
+import { invokeHost } from '../../../src/util/host-bin.mjs';
 
 // The CLI under test, resolved by absolute path so it works regardless of
 // the spawned process's cwd (which every test below points at a fresh
@@ -176,7 +177,24 @@ function eventLines(cwd) {
 // D4) -- the vast majority of callers want this: it reflects a claimed
 // item as 'doing' whether or not claim-time wrote that durably.
 function stateView(cwd) {
-  return listWork(path.join(cwd, '.fgos'));
+  const view = listWork(path.join(cwd, '.fgos'));
+  if (view && !view.frictions) {
+    view.frictions = new Proxy({}, {
+      get(target, prop) {
+        if (typeof prop === 'string') {
+          try {
+            const data = invokeHost(['friction', 'show', `work:${prop}`], { dir: cwd });
+            const list = data?.records || [];
+            return list.length > 0 ? list : undefined;
+          } catch {
+            return undefined;
+          }
+        }
+        return undefined;
+      }
+    });
+  }
+  return view;
 }
 
 // tsk-40m (docs/architect/doing-coordination-redesign.md): `todo -> doing`
@@ -224,10 +242,10 @@ function addOk(cwd, id, extra = {}) {
   // own stage semantics) relied on that old implicit default to get an
   // immediately frontier-ready item — default this helper's own --stage to
   // 'executing' so those call sites stay byte-identical without touching
-  // each one; a caller testing add's own stage behavior passes extra.stage
+  // each one; a caller testing add's own stage behavior passes extra.workflowStep
   // (or bypasses this helper entirely, same as the dedicated --stage tests
   // near "add stamps stage" above do).
-  const flags = ['--title', extra.title ?? `Title ${id}`, '--kind', extra.kind ?? 'task', '--risk', extra.risk ?? 'light', '--verify', extra.verify ?? 'npm test', '--stage', extra.stage ?? 'executing'];
+  const flags = ['--title', extra.title ?? `Title ${id}`, '--kind', extra.kind ?? 'task', '--risk', extra.risk ?? 'light', '--verify', extra.verify ?? 'npm test', '--step', extra.workflowStep ?? 'executing'];
   // --footprint stays omitted unless a caller actually passes one (tsk-598
   // own-file-set tests): matches the CLI's own present-or-absent optional
   // shape, so every existing call site (no extra.footprint) is unaffected.
@@ -384,12 +402,13 @@ const EDIT_PRIORITY_MATRIX_BAD_FLAG_CASES = [
 // test-suite-dry-consolidation/CONTEXT.md); merging keeps every edge case
 // while dropping the repeated shape.
 const ADD_BAD_FLAG_CASES = [
-  ['a --tier outside the TIERS domain', ['--tier', 'extreme']],
-  ['a bare --tier (no value)', ['--tier']],
+  ['a --size outside the SIZES domain', ['--size', 'extreme']],
+  ['a bare --size (no value)', ['--size']],
+  ['a retired --tier flag', ['--tier', 'heavy']],
   ['an unrecognized --domain value', ['--domain', 'bogus']],
   ['a bare --domain (no value)', ['--domain']],
-  ['a --stage outside the domain\'s own stage enum', ['--stage', 'assembling']],
-  ['a bare --stage (no value)', ['--stage']],
+  ['a --stage outside the domain\'s own stage enum', ['--step', 'assembling']],
+  ['a bare --stage (no value)', ['--step']],
   ['an empty --discovered-from ""', ['--discovered-from', '']],
   ['a bare --discovered-from (no value)', ['--discovered-from']],
   ['a --goal-tier outside its own domain', ['--goal-tier', 'bogus']],
@@ -491,7 +510,8 @@ function writeRunnerConfig(cwd, verdict) {
   );
   const cfg = {
     executor: { command: process.execPath, args: [scriptPath, '{prompt}'] },
-    models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+    modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs: 5000,
   };
   fs.mkdirSync(path.join(cwd, '.fgos'), { recursive: true });
@@ -510,7 +530,8 @@ const SUBMIT_BAD_FLAG_CASES = [
   ['an empty --discovered-from ""', ['--discovered-from', '']],
   ['a bare --discovered-from (no value)', ['--discovered-from']],
   ['a nonexistent --deps id', ['--deps', 'ghost-dep']],
-  ['a bare --tier (no value)', ['--tier']],
+  ['a bare --size (no value)', ['--size']],
+  ['a retired --tier flag', ['--tier', 'heavy']],
   ['an empty --docs-ref ""', ['--docs-ref', '']],
   ['an empty --kind ""', ['--kind', '']],
 ];
@@ -539,7 +560,8 @@ function writeShortRunnerConfig(cwd, timeoutMs) {
   // return's own clean-tree check, unrelated to what this test proves.
   const cfg = {
     executor: { command: process.execPath, args: ['{prompt}'] },
-    models: { light: 'haiku', standard: 'sonnet', heavy: 'opus' },
+    modelPolicies: { claude: { nano: 'haiku', standard: 'sonnet', frontier: 'opus' } },
+    rigorToTier: { low: 'nano', standard: 'standard', high: 'flagship', critical: 'frontier' },
     timeoutMs,
     parallel: { maxRoots: 4, maxLeavesPerRoot: 4 },
   };
@@ -1174,7 +1196,7 @@ export {
   addAdHocWorktree,
   addBareOrigin,
   addDiscovery,
-  addFriction,
+  recordFriction,
   addGoalItem,
   addOk,
   addOutcome,
@@ -1224,7 +1246,7 @@ export {
   makeRunnerProposedLeafItem,
   makeSessionSafeRunnerItem,
   mkLocalDependency,
-  moveStage,
+  moveStep,
   moveToDurableDoingForTest,
   moveWork,
   os,

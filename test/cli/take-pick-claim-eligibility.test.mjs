@@ -59,12 +59,12 @@ function envelopeData(stdout) {
 test('take --id claims a status:todo item at stage discovery — matches pick, no longer rejected', () => {
   const cwd = initGitCwd();
   const id = envelopeData(run(cwd, ['submit', 'Fuzzy request needing discovery']).stdout).id;
-  assert.equal(stateView(cwd).work[id].stage, 'discovery');
+  assert.equal(stateView(cwd).work[id].workflowStep, 'discovery');
 
   const result = run(cwd, ['take', '--id', id]);
   assert.equal(result.status, 0, `take failed: ${result.stderr}`);
   assert.equal(stateView(cwd).work[id].status, 'doing');
-  assert.equal(stateView(cwd).work[id].stage, 'discovery', 'take claims the item without touching its stage');
+  assert.equal(stateView(cwd).work[id].workflowStep, 'discovery', 'take claims the item without touching its stage');
 });
 
 test('take --id claims a status:todo item at stage decompose — matches pick, no longer rejected', () => {
@@ -75,7 +75,7 @@ test('take --id claims a status:todo item at stage decompose — matches pick, n
     title: 'Already-shaped item awaiting proof',
     kind: 'task',
     status: 'todo',
-    stage: 'decompose',
+    workflowStep: 'planning',
     deps: [],
     risk: 'light',
     refs: [],
@@ -96,7 +96,7 @@ test('take --id on a discovery-stage item with an unmet dep is still rejected �
     title: 'Discovery-stage item blocked on a dep',
     kind: 'task',
     status: 'todo',
-    stage: 'discovery',
+    workflowStep: 'discovery',
     deps: ['unmet-dep-source'],
     risk: 'light',
     refs: [],
@@ -164,7 +164,7 @@ test('take --id claims an item whose dep is status:delivered — RESOLVED_STATUS
     title: 'Item blocked only by a resolved-but-not-done dep',
     kind: 'task',
     status: 'todo',
-    stage: 'discovery',
+    workflowStep: 'discovery',
     deps: ['delivered-dep'],
     risk: 'light',
     refs: [],
@@ -185,7 +185,7 @@ test('take --id claims an item whose dep is status:wontfix — RESOLVED_STATUSES
     title: 'Item blocked only by a wontfix dep',
     kind: 'task',
     status: 'todo',
-    stage: 'discovery',
+    workflowStep: 'discovery',
     deps: ['wontfix-dep'],
     risk: 'light',
     refs: [],

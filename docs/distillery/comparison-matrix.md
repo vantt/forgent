@@ -236,3 +236,23 @@ OKF là reference format ngoài họ harness chính; các điểm giao cắt đ�
 | bounded-untrusted-enrichment | ✓ [→](sources/okf.md#bounded-web-enrichment) | ✓ distill boundary | Seed, allowlist, page cap và tool enforcement |
 | producer-consumer-contract | ✓ [→](sources/okf.md#producer-consumer-separation) | ✓ Knowledge/Context split | Format và workflow/projection là hai boundary khác nhau |
 | consumer-contract-tolerance | ✓ [→](sources/okf.md#consumer-tolerance-contract-tests) | ~ doc tests | Test permissive behavior và compatibility fallback |
+
+## council-of-high-intelligence vs fgOS (2026-10-04, @fd9f4e5)
+
+So sánh cơ chế thảo luận nhiều agent: council (`sources/council-of-high-intelligence.md`) với các cơ chế sẵn có của fgOS (Pattern `panel`/`reviewed` ở `src/runner/execution/patterns/`, Workflow thảo luận ở `core/workflows/{architecture-advisory,delphi,nominal-group,group-cognition,business-discussion}.yaml`). Cột fgOS ghi hiện trạng ĐÃ kiểm trong code, không phải ý định.
+
+| Feature | council | fgOS hiện có | Best | Ghi chú |
+|---|---|---|---|---|
+| blind-first-parallel-analysis | ✓ [→](sources/council-of-high-intelligence.md#blind-first-parallel-rounds) | ✓ `panel.mjs` (song song, `readOnly`, `independentOf`) | hòa | fgOS còn ép khác provider giữa các panelist; council chỉ "cố gắng" tách cặp đối cực |
+| separate-synthesizer | ✓ [→](sources/council-of-high-intelligence.md#chairman-separate-synthesizer) | ✓ `panel.mjs` synthesizer `independentOf` mọi panelist | fgOS | Ràng buộc thật ở `bind()`; council coi là best-effort và có fallback cùng provider |
+| per-seat-lens-persona | ✓ [→](sources/council-of-high-intelligence.md#persona-contract-with-grounding-protocol) 18 persona, khung 8 mục | ~ persona là MỘT ref theo capability (hoặc override theo `scope.role`); renderer chỉ đưa `description/voice/style/archetype/decision_boundary` (`assignment.mjs:728`) | council | Có thể gắn lăng kính riêng cho từng ghế bằng override theo role (xem kết quả thử bên dưới) |
+| problem-restate-gate | ✓ [→](sources/council-of-high-intelligence.md#problem-restate-gate) | ~ chỉ bước `framing` solo (`architecture-advisory.yaml`) | council | Restate theo từng ghế, trước phân tích |
+| anonymized-cross-examination | ✓ [→](sources/council-of-high-intelligence.md#anonymized-cross-examination) | ~ Delphi vòng 2 thấy bản tóm tắt ẩn danh do synthesizer làm; không có phản biện trực tiếp giữa các ghế | council | fgOS chỉ có đường gián tiếp qua synthesizer |
+| mechanical-dissent-and-agreement-gates | ✓ [→](sources/council-of-high-intelligence.md#post-round-enforcement-scan) | ✗ (`reviewed` ép red-team nêu finding, không đo bất đồng của panel) | council | Khoảng trống chất lượng lớn nhất của panel |
+| weighted-tally-and-genuine-split | ✓ [→](sources/council-of-high-intelligence.md#confidence-weighted-tally-and-split) | ~ `nominal-group:vote` qua cổng người; không có tally có trọng số trong code | council | Hành vi "không ép đồng thuận, trả thế giằng co" hợp ưu tiên Release con người |
+| verdict-unresolved-first | ✓ [→](sources/council-of-high-intelligence.md#verdict-unresolved-first) | ~ bước `explanation`/`synthesize` có mục tiêu, không có schema cố định | council | |
+| provider-routing-preview | ✓ [→](sources/council-of-high-intelligence.md#polarity-pairs-provider-separation) `--dry-route` | ✓ `fgos dispatch decide` / `bind()` | hòa | |
+| decision-outcome-ledger | ✓ [→](sources/council-of-high-intelligence.md#verdict-outcome-ledger) | ✗ (outcome half chỉ cho run, không cho quyết định) | council | |
+| mode-selection-quick-duo-full | ✓ [→](sources/council-of-high-intelligence.md#council-modes-full-quick-duo) | ✓ `solo`/`panel`/`reviewed` + preset (`consult`, `research-fan-out`, `rfc`) | hòa | |
+| skill-mirror-parity-check | ✓ [→](sources/council-of-high-intelligence.md#multi-host-skill-mirrors-with-parity-check) | ✓ `npm run build:skills` + `test/skills/fgos-mirror.test.mjs` | hòa | fgOS sinh từ một nguồn thay vì duy trì tay bốn bản |
+

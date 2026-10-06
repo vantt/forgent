@@ -1,0 +1,702 @@
+
+SOURCE src/runner/execution/patterns/panel.mjs
+src/runner/execution/patterns/panel.mjs:1: /**
+src/runner/execution/patterns/panel.mjs:2:  * Panel collaboration pattern.
+src/runner/execution/patterns/panel.mjs:3:  * Runs N independent panel members in parallel, followed by a synthesizer.
+src/runner/execution/patterns/panel.mjs:4:  */
+src/runner/execution/patterns/panel.mjs:5: 
+src/runner/execution/patterns/panel.mjs:6: import { roleUnit } from './role-tasks.mjs';
+src/runner/execution/patterns/panel.mjs:7: 
+src/runner/execution/patterns/panel.mjs:8: export const VALID_OUTCOMES = Object.freeze([
+src/runner/execution/patterns/panel.mjs:9:   'pass',
+src/runner/execution/patterns/panel.mjs:10:   'findings',
+src/runner/execution/patterns/panel.mjs:11:   'execution-failure',
+src/runner/execution/patterns/panel.mjs:12:   'policy-refusal',
+src/runner/execution/patterns/panel.mjs:13:   'provider-limit',
+src/runner/execution/patterns/panel.mjs:14:   'blocked',
+src/runner/execution/patterns/panel.mjs:15: ]);
+src/runner/execution/patterns/panel.mjs:16: 
+src/runner/execution/patterns/panel.mjs:17: const ERROR_OUTCOMES = Object.freeze([
+src/runner/execution/patterns/panel.mjs:18:   'execution-failure',
+src/runner/execution/patterns/panel.mjs:19:   'policy-refusal',
+src/runner/execution/patterns/panel.mjs:20:   'provider-limit',
+src/runner/execution/patterns/panel.mjs:21:   'blocked',
+src/runner/execution/patterns/panel.mjs:22: ]);
+src/runner/execution/patterns/panel.mjs:23: 
+src/runner/execution/patterns/panel.mjs:24: /** Canonical semantic roles, shared by execution and its derived read model. */
+src/runner/execution/patterns/panel.mjs:25: export function resolvePanelRoles(cfg = {}, { members = 3 } = {}, params = {}) {
+src/runner/execution/patterns/panel.mjs:26:   const memberCount = params?.members ?? members ?? cfg?.patterns?.panel?.members ?? 3;
+src/runner/execution/patterns/panel.mjs:27:   const baseRole = params?.role || 'panelist';
+src/runner/execution/patterns/panel.mjs:28:   return {
+src/runner/execution/patterns/panel.mjs:29:     panelists: (Array.isArray(params?.role)
+src/runner/execution/patterns/panel.mjs:30:       ? params.role
+src/runner/execution/patterns/panel.mjs:31:       : Array.from({ length: memberCount }, (_, idx) => `${baseRole}-${idx + 1}`))
+src/runner/execution/patterns/panel.mjs:32:       .map((role) => ({ role, kind: 'panelist' })),
+src/runner/execution/patterns/panel.mjs:33:     synthesizer: { role: params?.synthesizeRole || 'synthesizer', kind: 'synthesizer' },
+src/runner/execution/patterns/panel.mjs:34:   };
+src/runner/execution/patterns/panel.mjs:35: }
+src/runner/execution/patterns/panel.mjs:36: 
+src/runner/execution/patterns/panel.mjs:37: /**
+src/runner/execution/patterns/panel.mjs:38:  * Run panel pattern for a unit.
+src/runner/execution/patterns/panel.mjs:39:  *
+src/runner/execution/patterns/panel.mjs:40:  * @param {object} unit - The unit data contract.
+src/runner/execution/patterns/panel.mjs:41:  * @param {object} cfg - Runner configuration snapshot.
+src/runner/execution/patterns/panel.mjs:42:  * @param {object} hooks - Injected execution hooks.
+src/runner/execution/patterns/panel.mjs:43:  * @param {Function} hooks.runRole - Function to dispatch a role out-of-process.
+src/runner/execution/patterns/panel.mjs:44:  * @param {Function} [hooks.verify] - Deterministic verify hook.
+src/runner/execution/patterns/panel.mjs:45:  * @param {Function|Array} [hooks.history] - Prior attempts/results.
+src/runner/execution/patterns/panel.mjs:46:  * @param {number} [hooks.members=3] - Number of panel members.
+src/runner/execution/patterns/panel.mjs:47:  * @param {object} [params] - Pattern parameters.
+src/runner/execution/patterns/panel.mjs:48:  * @returns {Promise<{ outcome: string, results: Array<object> }>}
+src/runner/execution/patterns/panel.mjs:49:  */
+src/runner/execution/patterns/panel.mjs:50: export async function runPanel(unit, cfg, { runRole, verify, history, members = 3 } = {}, params = {}) {
+src/runner/execution/patterns/panel.mjs:51:   const { panelists, synthesizer } = resolvePanelRoles(cfg, { members }, params);
+src/runner/execution/patterns/panel.mjs:52:   const synthesizeRole = synthesizer.role;
+src/runner/execution/patterns/panel.mjs:53:   const prior = typeof history === 'function' ? history() : (Array.isArray(history) ? history : []);
+src/runner/execution/patterns/panel.mjs:54: 
+src/runner/execution/patterns/panel.mjs:55:   const allPanelistRoles = panelists.map(({ role }) => role);
+src/runner/execution/patterns/panel.mjs:56:   // Dispatch all panel members in PARALLEL
+src/runner/execution/patterns/panel.mjs:57:   const memberPromises = panelists.map(async ({ role, kind }) => {
+src/runner/execution/patterns/panel.mjs:58:     const existing = prior?.find((h) => h.role === role && h.outcome === 'pass');
+src/runner/execution/patterns/panel.mjs:59:     if (existing) {
+src/runner/execution/patterns/panel.mjs:60:       return existing;
+src/runner/execution/patterns/panel.mjs:61:     }
+src/runner/execution/patterns/panel.mjs:62: 
+src/runner/execution/patterns/panel.mjs:63:     const independentOf = allPanelistRoles.filter((r) => r !== role);
+src/runner/execution/patterns/panel.mjs:64:     return await runRole({
+src/runner/execution/patterns/panel.mjs:65:       role,
+src/runner/execution/patterns/panel.mjs:66:       unit: roleUnit(unit, { role, kind }),
+src/runner/execution/patterns/panel.mjs:67:       readOnly: true,
+src/runner/execution/patterns/panel.mjs:68:       independentOf,
+src/runner/execution/patterns/panel.mjs:69:     });
+src/runner/execution/patterns/panel.mjs:70:   });
+src/runner/execution/patterns/panel.mjs:71: 
+src/runner/execution/patterns/panel.mjs:72:   // Wait for every seat before propagating a throw, so the owner can summarize all settled attempts.
+src/runner/execution/patterns/panel.mjs:73:   const settledMembers = await Promise.allSettled(memberPromises);
+src/runner/execution/patterns/panel.mjs:74:   const thrown = settledMembers.find((result) => result.status === 'rejected');
+src/runner/execution/patterns/panel.mjs:75:   if (thrown) throw thrown.reason;
+src/runner/execution/patterns/panel.mjs:76:   const memberResults = settledMembers.map((result) => result.value);
+src/runner/execution/patterns/panel.mjs:77: 
+src/runner/execution/patterns/panel.mjs:78:   // If any member had execution failure / policy refusal / provider limit / blocked -> propagate
+src/runner/execution/patterns/panel.mjs:79:   const errorResult = memberResults.find((r) => ERROR_OUTCOMES.includes(r.outcome));
+src/runner/execution/patterns/panel.mjs:80:   if (errorResult) {
+src/runner/execution/patterns/panel.mjs:81:     return {
+src/runner/execution/patterns/panel.mjs:82:       outcome: errorResult.outcome,
+src/runner/execution/patterns/panel.mjs:83:       results: memberResults,
+src/runner/execution/patterns/panel.mjs:84:     };
+src/runner/execution/patterns/panel.mjs:85:   }
+src/runner/execution/patterns/panel.mjs:86: 
+src/runner/execution/patterns/panel.mjs:87:   // Once all members complete, run synthesizer
+src/runner/execution/patterns/panel.mjs:88:   const existingSynth = prior?.find((h) => h.role === synthesizeRole && h.outcome === 'pass');
+src/runner/execution/patterns/panel.mjs:89:   const synthResult = existingSynth || await runRole({
+src/runner/execution/patterns/panel.mjs:90:     role: synthesizeRole,
+src/runner/execution/patterns/panel.mjs:91:     // The panelists answer the unit's objective; the synthesizer is told to synthesize their answers.
+src/runner/execution/patterns/panel.mjs:92:     unit: roleUnit(unit, { ...synthesizer, params }),
+src/runner/execution/patterns/panel.mjs:93:     readOnly: (unit?.writes || []).length === 0,
+src/runner/execution/patterns/panel.mjs:94:     // The synthesizer judges every panelist, so it must not share a provider family with any of
+src/runner/execution/patterns/panel.mjs:95:     // them; the runner turns these role names into the executors that played them and bind()
+src/runner/execution/patterns/panel.mjs:96:     // compares provider families.
+src/runner/execution/patterns/panel.mjs:97:     independentOf: allPanelistRoles,
+src/runner/execution/patterns/panel.mjs:98:     inputs: memberResults,
+src/runner/execution/patterns/panel.mjs:99:   });
+src/runner/execution/patterns/panel.mjs:100: 
+src/runner/execution/patterns/panel.mjs:101:   return {
+src/runner/execution/patterns/panel.mjs:102:     outcome: synthResult.outcome,
+src/runner/execution/patterns/panel.mjs:103:     results: [...memberResults, synthResult],
+src/runner/execution/patterns/panel.mjs:104:   };
+src/runner/execution/patterns/panel.mjs:105: }
+src/runner/execution/patterns/panel.mjs:106: 
+
+SOURCE src/runner/execution/patterns/reviewed.mjs
+src/runner/execution/patterns/reviewed.mjs:1: /**
+src/runner/execution/patterns/reviewed.mjs:2:  * Reviewed collaboration pattern.
+src/runner/execution/patterns/reviewed.mjs:3:  * Producer-checker loop with optional deterministic verify and max rounds.
+src/runner/execution/patterns/reviewed.mjs:4:  */
+src/runner/execution/patterns/reviewed.mjs:5: 
+src/runner/execution/patterns/reviewed.mjs:6: import { roleUnit } from './role-tasks.mjs';
+src/runner/execution/patterns/reviewed.mjs:7: 
+src/runner/execution/patterns/reviewed.mjs:8: export const VALID_OUTCOMES = Object.freeze([
+src/runner/execution/patterns/reviewed.mjs:9:   'pass',
+src/runner/execution/patterns/reviewed.mjs:10:   'findings',
+src/runner/execution/patterns/reviewed.mjs:11:   'execution-failure',
+src/runner/execution/patterns/reviewed.mjs:12:   'policy-refusal',
+src/runner/execution/patterns/reviewed.mjs:13:   'provider-limit',
+src/runner/execution/patterns/reviewed.mjs:14:   'blocked',
+src/runner/execution/patterns/reviewed.mjs:15: ]);
+src/runner/execution/patterns/reviewed.mjs:16: 
+src/runner/execution/patterns/reviewed.mjs:17: const ERROR_OUTCOMES = Object.freeze([
+src/runner/execution/patterns/reviewed.mjs:18:   'execution-failure',
+src/runner/execution/patterns/reviewed.mjs:19:   'policy-refusal',
+src/runner/execution/patterns/reviewed.mjs:20:   'provider-limit',
+src/runner/execution/patterns/reviewed.mjs:21:   'blocked',
+src/runner/execution/patterns/reviewed.mjs:22: ]);
+src/runner/execution/patterns/reviewed.mjs:23: 
+src/runner/execution/patterns/reviewed.mjs:24: export const DEFAULT_CHECKERS_BY_RIGOR = Object.freeze({
+src/runner/execution/patterns/reviewed.mjs:25:   low: Object.freeze(['reviewer']),
+src/runner/execution/patterns/reviewed.mjs:26:   standard: Object.freeze(['reviewer']),
+src/runner/execution/patterns/reviewed.mjs:27:   high: Object.freeze(['reviewer', 'red-team']),
+src/runner/execution/patterns/reviewed.mjs:28:   critical: Object.freeze(['reviewer', 'red-team']),
+src/runner/execution/patterns/reviewed.mjs:29: });
+src/runner/execution/patterns/reviewed.mjs:30: 
+src/runner/execution/patterns/reviewed.mjs:31: /**
+src/runner/execution/patterns/reviewed.mjs:32:  * Resolve the set of checker roles for a unit.
+src/runner/execution/patterns/reviewed.mjs:33:  *
+src/runner/execution/patterns/reviewed.mjs:34:  * @param {object} unit
+src/runner/execution/patterns/reviewed.mjs:35:  * @param {object} cfg
+src/runner/execution/patterns/reviewed.mjs:36:  * @param {object} [params]
+src/runner/execution/patterns/reviewed.mjs:37:  * @returns {Array<string>}
+src/runner/execution/patterns/reviewed.mjs:38:  */
+src/runner/execution/patterns/reviewed.mjs:39: export function resolveCheckers(unit, cfg, params = {}) {
+src/runner/execution/patterns/reviewed.mjs:40:   const rigor = unit?.rigor || 'standard';
+src/runner/execution/patterns/reviewed.mjs:41:   const checkersByRigor = cfg?.patterns?.reviewed?.checkersByRigor || DEFAULT_CHECKERS_BY_RIGOR;
+src/runner/execution/patterns/reviewed.mjs:42:   const fromRigor = checkersByRigor[rigor] || DEFAULT_CHECKERS_BY_RIGOR[rigor] || ['reviewer'];
+src/runner/execution/patterns/reviewed.mjs:43: 
+src/runner/execution/patterns/reviewed.mjs:44:   const capConfig = cfg?.capabilities?.[unit?.capability];
+src/runner/execution/patterns/reviewed.mjs:45:   const minFromCap = capConfig?.minCheckers || [];
+src/runner/execution/patterns/reviewed.mjs:46:   const minFromParams = Array.isArray(params?.minCheckers)
+src/runner/execution/patterns/reviewed.mjs:47:     ? params.minCheckers
+src/runner/execution/patterns/reviewed.mjs:48:     : (params?.minCheckers ? [params.minCheckers] : []);
+src/runner/execution/patterns/reviewed.mjs:49: 
+src/runner/execution/patterns/reviewed.mjs:50:   const checkers = new Set([...fromRigor, ...minFromCap, ...minFromParams]);
+src/runner/execution/patterns/reviewed.mjs:51: 
+src/runner/execution/patterns/reviewed.mjs:52:   if (unit?.capability?.startsWith('code:') || unit?.capability === 'code') {
+src/runner/execution/patterns/reviewed.mjs:53:     checkers.add('red-team');
+src/runner/execution/patterns/reviewed.mjs:54:   }
+src/runner/execution/patterns/reviewed.mjs:55: 
+src/runner/execution/patterns/reviewed.mjs:56:   return Array.from(checkers);
+src/runner/execution/patterns/reviewed.mjs:57: }
+src/runner/execution/patterns/reviewed.mjs:58: 
+src/runner/execution/patterns/reviewed.mjs:59: /**
+src/runner/execution/patterns/reviewed.mjs:60:  * Check if a verify command exists on unit, config, or preset params.
+src/runner/execution/patterns/reviewed.mjs:61:  *
+src/runner/execution/patterns/reviewed.mjs:62:  * @param {object} unit
+src/runner/execution/patterns/reviewed.mjs:63:  * @param {object} cfg
+src/runner/execution/patterns/reviewed.mjs:64:  * @param {object} [params]
+src/runner/execution/patterns/reviewed.mjs:65:  * @returns {boolean}
+src/runner/execution/patterns/reviewed.mjs:66:  */
+src/runner/execution/patterns/reviewed.mjs:67: export function hasVerifyCommand(unit, cfg, params = {}) {
+src/runner/execution/patterns/reviewed.mjs:68:   return Boolean(
+src/runner/execution/patterns/reviewed.mjs:69:     unit?.verify ||
+src/runner/execution/patterns/reviewed.mjs:70:     cfg?.capabilities?.[unit?.capability]?.verify ||
+src/runner/execution/patterns/reviewed.mjs:71:     params?.verify
+src/runner/execution/patterns/reviewed.mjs:72:   );
+src/runner/execution/patterns/reviewed.mjs:73: }
+src/runner/execution/patterns/reviewed.mjs:74: 
+src/runner/execution/patterns/reviewed.mjs:75: /**
+src/runner/execution/patterns/reviewed.mjs:76:  * Extract findings array from a result object.
+src/runner/execution/patterns/reviewed.mjs:77:  *
+src/runner/execution/patterns/reviewed.mjs:78:  * @param {object} res
+src/runner/execution/patterns/reviewed.mjs:79:  * @returns {Array<string>}
+src/runner/execution/patterns/reviewed.mjs:80:  */
+src/runner/execution/patterns/reviewed.mjs:81: export function extractFindings(res) {
+src/runner/execution/patterns/reviewed.mjs:82:   if (!res) return [];
+src/runner/execution/patterns/reviewed.mjs:83:   if (Array.isArray(res.findings) && res.findings.length > 0) return res.findings;
+src/runner/execution/patterns/reviewed.mjs:84:   if (typeof res.findings === 'string') return [res.findings];
+src/runner/execution/patterns/reviewed.mjs:85:   if (res.finding) return [res.finding];
+src/runner/execution/patterns/reviewed.mjs:86:   if (res.outcome === 'findings') {
+src/runner/execution/patterns/reviewed.mjs:87:     return [`Role ${res.role || 'checker'} reported findings`];
+src/runner/execution/patterns/reviewed.mjs:88:   }
+src/runner/execution/patterns/reviewed.mjs:89:   return [];
+src/runner/execution/patterns/reviewed.mjs:90: }
+src/runner/execution/patterns/reviewed.mjs:91: 
+src/runner/execution/patterns/reviewed.mjs:92: /**
+src/runner/execution/patterns/reviewed.mjs:93:  * Check whether a round has fully settled in history.
+src/runner/execution/patterns/reviewed.mjs:94:  *
+src/runner/execution/patterns/reviewed.mjs:95:  * @param {number} r
+src/runner/execution/patterns/reviewed.mjs:96:  * @param {Array<object>} priorResults
+src/runner/execution/patterns/reviewed.mjs:97:  * @param {Array<string>} checkerList
+src/runner/execution/patterns/reviewed.mjs:98:  * @param {boolean} hasVerify
+src/runner/execution/patterns/reviewed.mjs:99:  * @returns {boolean}
+src/runner/execution/patterns/reviewed.mjs:100:  */
+src/runner/execution/patterns/reviewed.mjs:101: function isRoundSettledInHistory(r, priorResults, checkerList, hasVerify) {
+src/runner/execution/patterns/reviewed.mjs:102:   const prod = priorResults.find((h) => h.role === 'producer' && (h.round ?? 1) === r);
+src/runner/execution/patterns/reviewed.mjs:103:   if (!prod) return false;
+src/runner/execution/patterns/reviewed.mjs:104:   if (ERROR_OUTCOMES.includes(prod.outcome)) return true;
+src/runner/execution/patterns/reviewed.mjs:105: 
+src/runner/execution/patterns/reviewed.mjs:106:   for (const checkerRole of checkerList) {
+src/runner/execution/patterns/reviewed.mjs:107:     const chk = priorResults.find((h) => h.role === checkerRole && (h.round ?? 1) === r);
+src/runner/execution/patterns/reviewed.mjs:108:     if (!chk) return false;
+src/runner/execution/patterns/reviewed.mjs:109:   }
+src/runner/execution/patterns/reviewed.mjs:110: 
+src/runner/execution/patterns/reviewed.mjs:111:   if (hasVerify) {
+src/runner/execution/patterns/reviewed.mjs:112:     const ver = priorResults.find((h) => (h.role === 'verify' || h.role === 'verifier') && (h.round ?? 1) === r);
+src/runner/execution/patterns/reviewed.mjs:113:     if (!ver) return false;
+src/runner/execution/patterns/reviewed.mjs:114:   }
+src/runner/execution/patterns/reviewed.mjs:115: 
+src/runner/execution/patterns/reviewed.mjs:116:   return true;
+src/runner/execution/patterns/reviewed.mjs:117: }
+src/runner/execution/patterns/reviewed.mjs:118: 
+src/runner/execution/patterns/reviewed.mjs:119: /** Shared by live/history execution and the legacy summary projection. */
+src/runner/execution/patterns/reviewed.mjs:120: function assessRound(results) {
+src/runner/execution/patterns/reviewed.mjs:121:   const error = results.find((res) => ERROR_OUTCOMES.includes(res.outcome));
+src/runner/execution/patterns/reviewed.mjs:122:   if (error) return { outcome: error.outcome, findings: [] };
+src/runner/execution/patterns/reviewed.mjs:123:   const findings = results.flatMap((res) =>
+src/runner/execution/patterns/reviewed.mjs:124:     res.outcome === 'findings' || (res.role === 'verify' && res.outcome !== 'pass')
+src/runner/execution/patterns/reviewed.mjs:125:       ? extractFindings(res) : []);
+src/runner/execution/patterns/reviewed.mjs:126:   return { outcome: findings.length > 0 ? 'findings' : 'pass', findings };
+src/runner/execution/patterns/reviewed.mjs:127: }
+src/runner/execution/patterns/reviewed.mjs:128: 
+src/runner/execution/patterns/reviewed.mjs:129: /**
+src/runner/execution/patterns/reviewed.mjs:130:  * Read a terminal outcome without dispatching/verification. Incomplete history
+src/runner/execution/patterns/reviewed.mjs:131:  * cannot establish completion and must remain unknown to the summary.
+src/runner/execution/patterns/reviewed.mjs:132:  */
+src/runner/execution/patterns/reviewed.mjs:133: export function reviewedHistoryOutcome(unit, cfg, priorResults, params = {}) {
+src/runner/execution/patterns/reviewed.mjs:134:   const maxRounds = params?.maxRounds ?? cfg?.patterns?.reviewed?.maxRounds ?? 2;
+src/runner/execution/patterns/reviewed.mjs:135:   const checkerList = resolveCheckers(unit, cfg, params);
+src/runner/execution/patterns/reviewed.mjs:136:   const hasVerify = hasVerifyCommand(unit, cfg, params);
+src/runner/execution/patterns/reviewed.mjs:137:   for (let round = 1; round <= maxRounds; round++) {
+src/runner/execution/patterns/reviewed.mjs:138:     if (!isRoundSettledInHistory(round, priorResults, checkerList, hasVerify)) return null;
+src/runner/execution/patterns/reviewed.mjs:139:     const producer = priorResults.find((res) => res.role === 'producer' && (res.round ?? 1) === round);
+src/runner/execution/patterns/reviewed.mjs:140:     if (ERROR_OUTCOMES.includes(producer.outcome)) return producer.outcome;
+src/runner/execution/patterns/reviewed.mjs:141:     const results = [producer, ...checkerList.map((role) =>
+src/runner/execution/patterns/reviewed.mjs:142:       priorResults.find((res) => res.role === role && (res.round ?? 1) === round))];
+src/runner/execution/patterns/reviewed.mjs:143:     if (hasVerify) results.push(priorResults.find((res) =>
+src/runner/execution/patterns/reviewed.mjs:144:       (res.role === 'verify' || res.role === 'verifier') && (res.round ?? 1) === round));
+src/runner/execution/patterns/reviewed.mjs:145:     const assessment = assessRound(results.filter(Boolean));
+src/runner/execution/patterns/reviewed.mjs:146:     if (assessment.outcome !== 'findings' || round === maxRounds) return assessment.outcome;
+src/runner/execution/patterns/reviewed.mjs:147:   }
+src/runner/execution/patterns/reviewed.mjs:148:   return null;
+src/runner/execution/patterns/reviewed.mjs:149: }
+src/runner/execution/patterns/reviewed.mjs:150: 
+src/runner/execution/patterns/reviewed.mjs:151: /**
+src/runner/execution/patterns/reviewed.mjs:152:  * Run reviewed pattern for a unit.
+src/runner/execution/patterns/reviewed.mjs:153:  *
+src/runner/execution/patterns/reviewed.mjs:154:  * @param {object} unit - The unit data contract.
+src/runner/execution/patterns/reviewed.mjs:155:  * @param {object} cfg - Runner configuration snapshot.
+src/runner/execution/patterns/reviewed.mjs:156:  * @param {object} hooks - Injected execution hooks.
+src/runner/execution/patterns/reviewed.mjs:157:  * @param {Function} hooks.runRole - Function to dispatch a role out-of-process.
+src/runner/execution/patterns/reviewed.mjs:158:  * @param {Function} [hooks.verify] - Deterministic verify hook.
+src/runner/execution/patterns/reviewed.mjs:159:  * @param {Function|Array} [hooks.history] - Prior attempts/results.
+src/runner/execution/patterns/reviewed.mjs:160:  * @param {object} [params] - Pattern parameters (from preset or caller).
+src/runner/execution/patterns/reviewed.mjs:161:  * @returns {Promise<{ outcome: string, rounds: number, results: Array<object>, findings: Array<string> }>}
+src/runner/execution/patterns/reviewed.mjs:162:  */
+src/runner/execution/patterns/reviewed.mjs:163: export async function runReviewed(unit, cfg, { runRole, verify, history } = {}, params = {}) {
+src/runner/execution/patterns/reviewed.mjs:164:   const maxRounds = params?.maxRounds ?? cfg?.patterns?.reviewed?.maxRounds ?? 2;
+src/runner/execution/patterns/reviewed.mjs:165:   const priorResults = typeof history === 'function' ? history() : (Array.isArray(history) ? history : []);
+src/runner/execution/patterns/reviewed.mjs:166: 
+src/runner/execution/patterns/reviewed.mjs:167:   const checkerList = resolveCheckers(unit, cfg, params);
+src/runner/execution/patterns/reviewed.mjs:168:   const hasVerify = hasVerifyCommand(unit, cfg, params);
+src/runner/execution/patterns/reviewed.mjs:169: 
+src/runner/execution/patterns/reviewed.mjs:170:   const allResults = [];
+src/runner/execution/patterns/reviewed.mjs:171:   const allFindings = [];
+src/runner/execution/patterns/reviewed.mjs:172:   let priorFindings = [];
+src/runner/execution/patterns/reviewed.mjs:173: 
+src/runner/execution/patterns/reviewed.mjs:174:   for (let r = 1; r <= maxRounds; r++) {
+src/runner/execution/patterns/reviewed.mjs:175:     // Check if this round settled entirely in history
+src/runner/execution/patterns/reviewed.mjs:176:     if (isRoundSettledInHistory(r, priorResults, checkerList, hasVerify)) {
+src/runner/execution/patterns/reviewed.mjs:177:       const histProducer = priorResults.find((h) => h.role === 'producer' && (h.round ?? 1) === r);
+src/runner/execution/patterns/reviewed.mjs:178:       allResults.push(histProducer);
+src/runner/execution/patterns/reviewed.mjs:179: 
+src/runner/execution/patterns/reviewed.mjs:180:       if (ERROR_OUTCOMES.includes(histProducer.outcome)) {
+src/runner/execution/patterns/reviewed.mjs:181:         return {
+src/runner/execution/patterns/reviewed.mjs:182:           outcome: histProducer.outcome,
+src/runner/execution/patterns/reviewed.mjs:183:           rounds: r,
+src/runner/execution/patterns/reviewed.mjs:184:           results: allResults,
+src/runner/execution/patterns/reviewed.mjs:185:           findings: allFindings,
+src/runner/execution/patterns/reviewed.mjs:186:         };
+src/runner/execution/patterns/reviewed.mjs:187:       }
+src/runner/execution/patterns/reviewed.mjs:188: 
+src/runner/execution/patterns/reviewed.mjs:189:       const roundHistoryResults = [histProducer];
+src/runner/execution/patterns/reviewed.mjs:190:       for (const checkerRole of checkerList) {
+src/runner/execution/patterns/reviewed.mjs:191:         const histChk = priorResults.find((h) => h.role === checkerRole && (h.round ?? 1) === r);
+src/runner/execution/patterns/reviewed.mjs:192:         allResults.push(histChk);
+src/runner/execution/patterns/reviewed.mjs:193:         roundHistoryResults.push(histChk);
+src/runner/execution/patterns/reviewed.mjs:194:       }
+src/runner/execution/patterns/reviewed.mjs:195: 
+src/runner/execution/patterns/reviewed.mjs:196:       if (hasVerify) {
+src/runner/execution/patterns/reviewed.mjs:197:         const histVer = priorResults.find((h) => (h.role === 'verify' || h.role === 'verifier') && (h.round ?? 1) === r);
+src/runner/execution/patterns/reviewed.mjs:198:         allResults.push(histVer);
+src/runner/execution/patterns/reviewed.mjs:199:         roundHistoryResults.push(histVer);
+src/runner/execution/patterns/reviewed.mjs:200:       }
+src/runner/execution/patterns/reviewed.mjs:201: 
+src/runner/execution/patterns/reviewed.mjs:202:       // Check for errors in history
+src/runner/execution/patterns/reviewed.mjs:203:       const assessment = assessRound(roundHistoryResults);
+src/runner/execution/patterns/reviewed.mjs:204:       if (ERROR_OUTCOMES.includes(assessment.outcome)) {
+src/runner/execution/patterns/reviewed.mjs:205:         return {
+src/runner/execution/patterns/reviewed.mjs:206:           outcome: assessment.outcome,
+src/runner/execution/patterns/reviewed.mjs:207:           rounds: r,
+src/runner/execution/patterns/reviewed.mjs:208:           results: allResults,
+src/runner/execution/patterns/reviewed.mjs:209:           findings: allFindings,
+src/runner/execution/patterns/reviewed.mjs:210:         };
+src/runner/execution/patterns/reviewed.mjs:211:       }
+src/runner/execution/patterns/reviewed.mjs:212: 
+src/runner/execution/patterns/reviewed.mjs:213:       // Check for findings in history
+src/runner/execution/patterns/reviewed.mjs:214:       const roundFindings = assessment.findings;
+src/runner/execution/patterns/reviewed.mjs:215: 
+src/runner/execution/patterns/reviewed.mjs:216:       if (roundFindings.length > 0) {
+src/runner/execution/patterns/reviewed.mjs:217:         allFindings.push(...roundFindings);
+src/runner/execution/patterns/reviewed.mjs:218:         if (r < maxRounds) {
+src/runner/execution/patterns/reviewed.mjs:219:           priorFindings = roundFindings;
+src/runner/execution/patterns/reviewed.mjs:220:           continue; // Move to next round
+src/runner/execution/patterns/reviewed.mjs:221:         } else {
+src/runner/execution/patterns/reviewed.mjs:222:           return {
+src/runner/execution/patterns/reviewed.mjs:223:             outcome: 'findings',
+src/runner/execution/patterns/reviewed.mjs:224:             rounds: r,
+src/runner/execution/patterns/reviewed.mjs:225:             results: allResults,
+src/runner/execution/patterns/reviewed.mjs:226:             findings: allFindings,
+src/runner/execution/patterns/reviewed.mjs:227:           };
+src/runner/execution/patterns/reviewed.mjs:228:         }
+src/runner/execution/patterns/reviewed.mjs:229:       }
+src/runner/execution/patterns/reviewed.mjs:230: 
+src/runner/execution/patterns/reviewed.mjs:231:       // All passed in this settled round
+src/runner/execution/patterns/reviewed.mjs:232:       return {
+src/runner/execution/patterns/reviewed.mjs:233:         outcome: 'pass',
+src/runner/execution/patterns/reviewed.mjs:234:         rounds: r,
+src/runner/execution/patterns/reviewed.mjs:235:         results: allResults,
+src/runner/execution/patterns/reviewed.mjs:236:         findings: [],
+src/runner/execution/patterns/reviewed.mjs:237:       };
+src/runner/execution/patterns/reviewed.mjs:238:     }
+src/runner/execution/patterns/reviewed.mjs:239: 
+src/runner/execution/patterns/reviewed.mjs:240:     // Round is live (partially or not in history)
+src/runner/execution/patterns/reviewed.mjs:241:     const currentRoundResults = [];
+src/runner/execution/patterns/reviewed.mjs:242: 
+src/runner/execution/patterns/reviewed.mjs:243:     // Step A: Run producer role
+src/runner/execution/patterns/reviewed.mjs:244:     const existingProducer = priorResults.find((h) => h.role === 'producer' && (h.round ?? 1) === r && h.outcome === 'pass');
+src/runner/execution/patterns/reviewed.mjs:245:     let producerResult;
+src/runner/execution/patterns/reviewed.mjs:246:     if (existingProducer) {
+src/runner/execution/patterns/reviewed.mjs:247:       producerResult = existingProducer;
+src/runner/execution/patterns/reviewed.mjs:248:     } else {
+src/runner/execution/patterns/reviewed.mjs:249:       const payload = {
+src/runner/execution/patterns/reviewed.mjs:250:         role: 'producer',
+src/runner/execution/patterns/reviewed.mjs:251:         // Round 1 is the unit as given; a later round also lists what the checks found, so the
+src/runner/execution/patterns/reviewed.mjs:252:         // producer knows what to fix.
+src/runner/execution/patterns/reviewed.mjs:253:         unit: roleUnit(unit, { role: 'producer', params, findings: r > 1 ? priorFindings : [] }),
+src/runner/execution/patterns/reviewed.mjs:254:         readOnly: (unit?.writes || []).length === 0,
+src/runner/execution/patterns/reviewed.mjs:255:         round: r,
+src/runner/execution/patterns/reviewed.mjs:256:       };
+src/runner/execution/patterns/reviewed.mjs:257:       producerResult = await runRole(payload);
+src/runner/execution/patterns/reviewed.mjs:258:     }
+src/runner/execution/patterns/reviewed.mjs:259: 
+src/runner/execution/patterns/reviewed.mjs:260:     currentRoundResults.push(producerResult);
+src/runner/execution/patterns/reviewed.mjs:261:     allResults.push(producerResult);
+src/runner/execution/patterns/reviewed.mjs:262: 
+src/runner/execution/patterns/reviewed.mjs:263:     if (ERROR_OUTCOMES.includes(producerResult.outcome)) {
+src/runner/execution/patterns/reviewed.mjs:264:       return {
+src/runner/execution/patterns/reviewed.mjs:265:         outcome: producerResult.outcome,
+src/runner/execution/patterns/reviewed.mjs:266:         rounds: r,
+src/runner/execution/patterns/reviewed.mjs:267:         results: allResults,
+src/runner/execution/patterns/reviewed.mjs:268:         findings: allFindings,
+src/runner/execution/patterns/reviewed.mjs:269:       };
+src/runner/execution/patterns/reviewed.mjs:270:     }
+src/runner/execution/patterns/reviewed.mjs:271: 
+src/runner/execution/patterns/reviewed.mjs:272:     // Step B: Dispatch checkers and verification together, then drain every peer.
+src/runner/execution/patterns/reviewed.mjs:273:     const pendingCheckerRoles = [];
+src/runner/execution/patterns/reviewed.mjs:274:     const reusedCheckerResults = [];
+src/runner/execution/patterns/reviewed.mjs:275: 
+src/runner/execution/patterns/reviewed.mjs:276:     for (const checkerRole of checkerList) {
+src/runner/execution/patterns/reviewed.mjs:277:       const existingChecker = priorResults.find((h) => h.role === checkerRole && (h.round ?? 1) === r && h.outcome === 'pass');
+src/runner/execution/patterns/reviewed.mjs:278:       if (existingChecker) {
+src/runner/execution/patterns/reviewed.mjs:279:         reusedCheckerResults.push(existingChecker);
+src/runner/execution/patterns/reviewed.mjs:280:       } else {
+src/runner/execution/patterns/reviewed.mjs:281:         pendingCheckerRoles.push(checkerRole);
+src/runner/execution/patterns/reviewed.mjs:282:       }
+src/runner/execution/patterns/reviewed.mjs:283:     }
+src/runner/execution/patterns/reviewed.mjs:284: 
+src/runner/execution/patterns/reviewed.mjs:285:     let reusedVerify = null;
+src/runner/execution/patterns/reviewed.mjs:286:     let runPendingVerify = false;
+src/runner/execution/patterns/reviewed.mjs:287:     if (hasVerify) {
+src/runner/execution/patterns/reviewed.mjs:288:       const existingVer = priorResults.find((h) => (h.role === 'verify' || h.role === 'verifier') && (h.round ?? 1) === r && h.outcome === 'pass');
+src/runner/execution/patterns/reviewed.mjs:289:       if (existingVer) {
+src/runner/execution/patterns/reviewed.mjs:290:         reusedVerify = existingVer;
+src/runner/execution/patterns/reviewed.mjs:291:       } else if (typeof verify === 'function') {
+src/runner/execution/patterns/reviewed.mjs:292:         runPendingVerify = true;
+src/runner/execution/patterns/reviewed.mjs:293:       }
+src/runner/execution/patterns/reviewed.mjs:294:     }
+src/runner/execution/patterns/reviewed.mjs:295: 
+src/runner/execution/patterns/reviewed.mjs:296:     const checkerPromises = pendingCheckerRoles.map((checkerRole) =>
+src/runner/execution/patterns/reviewed.mjs:297:       Promise.resolve().then(() => runRole({
+src/runner/execution/patterns/reviewed.mjs:298:         role: checkerRole,
+src/runner/execution/patterns/reviewed.mjs:299:         // Told to check rather than to do the work, and handed the producer's account of this round.
+src/runner/execution/patterns/reviewed.mjs:300:         unit: roleUnit(unit, { role: checkerRole, params }),
+src/runner/execution/patterns/reviewed.mjs:301:         readOnly: true,
+src/runner/execution/patterns/reviewed.mjs:302:         independentOf: ['producer'],
+src/runner/execution/patterns/reviewed.mjs:303:         round: r,
+src/runner/execution/patterns/reviewed.mjs:304:         inputs: [producerResult],
+src/runner/execution/patterns/reviewed.mjs:305:       })),
+src/runner/execution/patterns/reviewed.mjs:306:     );
+src/runner/execution/patterns/reviewed.mjs:307: 
+src/runner/execution/patterns/reviewed.mjs:308:     const verifyPromise = runPendingVerify
+src/runner/execution/patterns/reviewed.mjs:309:       ? Promise.resolve().then(async () => {
+src/runner/execution/patterns/reviewed.mjs:310:           const vRes = await verify(unit);
+src/runner/execution/patterns/reviewed.mjs:311:           return {
+src/runner/execution/patterns/reviewed.mjs:312:             role: 'verify',
+src/runner/execution/patterns/reviewed.mjs:313:             round: r,
+src/runner/execution/patterns/reviewed.mjs:314:             outcome: vRes?.pass ? 'pass' : 'findings',
+src/runner/execution/patterns/reviewed.mjs:315:             findings: vRes?.findings || (vRes?.pass ? [] : ['Verification failed']),
+src/runner/execution/patterns/reviewed.mjs:316:           };
+src/runner/execution/patterns/reviewed.mjs:317:         })
+src/runner/execution/patterns/reviewed.mjs:318:       : null;
+src/runner/execution/patterns/reviewed.mjs:319: 
+src/runner/execution/patterns/reviewed.mjs:320:     let firstRejection;
+src/runner/execution/patterns/reviewed.mjs:321:     let rejected = false;
+src/runner/execution/patterns/reviewed.mjs:322:     const peers = [...checkerPromises, ...(verifyPromise ? [verifyPromise] : [])];
+src/runner/execution/patterns/reviewed.mjs:323:     const settledPeers = await Promise.allSettled(peers.map((peer) => peer.catch((error) => {
+src/runner/execution/patterns/reviewed.mjs:324:       if (!rejected) {
+src/runner/execution/patterns/reviewed.mjs:325:         rejected = true;
+src/runner/execution/patterns/reviewed.mjs:326:         firstRejection = error;
+src/runner/execution/patterns/reviewed.mjs:327:       }
+src/runner/execution/patterns/reviewed.mjs:328:       throw error;
+src/runner/execution/patterns/reviewed.mjs:329:     })));
+src/runner/execution/patterns/reviewed.mjs:330:     if (rejected) throw firstRejection;
+src/runner/execution/patterns/reviewed.mjs:331:     const dispatchedCheckers = settledPeers.slice(0, checkerPromises.length).map((peer) => peer.value);
+src/runner/execution/patterns/reviewed.mjs:332:     const dispatchedVerify = verifyPromise ? settledPeers.at(-1).value : null;
+src/runner/execution/patterns/reviewed.mjs:333: 
+src/runner/execution/patterns/reviewed.mjs:334:     for (const res of reusedCheckerResults) {
+src/runner/execution/patterns/reviewed.mjs:335:       currentRoundResults.push(res);
+src/runner/execution/patterns/reviewed.mjs:336:       allResults.push(res);
+src/runner/execution/patterns/reviewed.mjs:337:     }
+src/runner/execution/patterns/reviewed.mjs:338:     for (const res of dispatchedCheckers) {
+src/runner/execution/patterns/reviewed.mjs:339:       currentRoundResults.push(res);
+src/runner/execution/patterns/reviewed.mjs:340:       allResults.push(res);
+src/runner/execution/patterns/reviewed.mjs:341:     }
+src/runner/execution/patterns/reviewed.mjs:342:     if (reusedVerify) {
+src/runner/execution/patterns/reviewed.mjs:343:       currentRoundResults.push(reusedVerify);
+src/runner/execution/patterns/reviewed.mjs:344:       allResults.push(reusedVerify);
+src/runner/execution/patterns/reviewed.mjs:345:     }
+src/runner/execution/patterns/reviewed.mjs:346:     if (dispatchedVerify) {
+src/runner/execution/patterns/reviewed.mjs:347:       currentRoundResults.push(dispatchedVerify);
+src/runner/execution/patterns/reviewed.mjs:348:       allResults.push(dispatchedVerify);
+src/runner/execution/patterns/reviewed.mjs:349:     }
+src/runner/execution/patterns/reviewed.mjs:350: 
+src/runner/execution/patterns/reviewed.mjs:351:     // Step C: Evaluate results
+src/runner/execution/patterns/reviewed.mjs:352:     // Check for execution failure / policy refusal / provider limit / blocked
+src/runner/execution/patterns/reviewed.mjs:353:     const assessment = assessRound(currentRoundResults);
+src/runner/execution/patterns/reviewed.mjs:354:     if (ERROR_OUTCOMES.includes(assessment.outcome)) {
+src/runner/execution/patterns/reviewed.mjs:355:       return {
+src/runner/execution/patterns/reviewed.mjs:356:         outcome: assessment.outcome,
+src/runner/execution/patterns/reviewed.mjs:357:         rounds: r,
+src/runner/execution/patterns/reviewed.mjs:358:         results: allResults,
+src/runner/execution/patterns/reviewed.mjs:359:         findings: allFindings,
+src/runner/execution/patterns/reviewed.mjs:360:       };
+src/runner/execution/patterns/reviewed.mjs:361:     }
+src/runner/execution/patterns/reviewed.mjs:362: 
+src/runner/execution/patterns/reviewed.mjs:363:     // Check for findings or verify failure
+src/runner/execution/patterns/reviewed.mjs:364:     const roundFindings = assessment.findings;
+src/runner/execution/patterns/reviewed.mjs:365: 
+src/runner/execution/patterns/reviewed.mjs:366:     if (roundFindings.length > 0) {
+src/runner/execution/patterns/reviewed.mjs:367:       allFindings.push(...roundFindings);
+src/runner/execution/patterns/reviewed.mjs:368:       if (r < maxRounds) {
+src/runner/execution/patterns/reviewed.mjs:369:         priorFindings = roundFindings;
+src/runner/execution/patterns/reviewed.mjs:370:         continue; // Loop to next round
+src/runner/execution/patterns/reviewed.mjs:371:       } else {
+src/runner/execution/patterns/reviewed.mjs:372:         return {
+src/runner/execution/patterns/reviewed.mjs:373:           outcome: 'findings',
+src/runner/execution/patterns/reviewed.mjs:374:           rounds: r,
+src/runner/execution/patterns/reviewed.mjs:375:           results: allResults,
+src/runner/execution/patterns/reviewed.mjs:376:           findings: allFindings,
+src/runner/execution/patterns/reviewed.mjs:377:         };
+src/runner/execution/patterns/reviewed.mjs:378:       }
+src/runner/execution/patterns/reviewed.mjs:379:     }
+src/runner/execution/patterns/reviewed.mjs:380: 
+src/runner/execution/patterns/reviewed.mjs:381:     // All checkers pass and verify passes
+src/runner/execution/patterns/reviewed.mjs:382:     return {
+src/runner/execution/patterns/reviewed.mjs:383:       outcome: 'pass',
+src/runner/execution/patterns/reviewed.mjs:384:       rounds: r,
+src/runner/execution/patterns/reviewed.mjs:385:       results: allResults,
+src/runner/execution/patterns/reviewed.mjs:386:       findings: [],
+src/runner/execution/patterns/reviewed.mjs:387:     };
+src/runner/execution/patterns/reviewed.mjs:388:   }
+src/runner/execution/patterns/reviewed.mjs:389: 
+src/runner/execution/patterns/reviewed.mjs:390:   // Fallback if loop finishes
+src/runner/execution/patterns/reviewed.mjs:391:   return {
+src/runner/execution/patterns/reviewed.mjs:392:     outcome: allFindings.length > 0 ? 'findings' : 'pass',
+src/runner/execution/patterns/reviewed.mjs:393:     rounds: maxRounds,
+src/runner/execution/patterns/reviewed.mjs:394:     results: allResults,
+src/runner/execution/patterns/reviewed.mjs:395:     findings: allFindings,
+src/runner/execution/patterns/reviewed.mjs:396:   };
+src/runner/execution/patterns/reviewed.mjs:397: }
+src/runner/execution/patterns/reviewed.mjs:398: 
+
+SOURCE docs/specs/runner.md
+docs/specs/runner.md:1375:   `runOutcome()` built on `classification.outcome`; `RunObservation` is a mutable read
+docs/specs/runner.md:1376:   projection; historical v1/v2 results read deterministically via `interpretRunResult`
+docs/specs/runner.md:1377:   without byte rewrite.
+docs/specs/runner.md:1378: - Dispatch inspection and guard reconciliation: one read operation,
+docs/specs/runner.md:1379:   `dispatch.runtime.inspect`, accepts exactly one selector (`run`,
+docs/specs/runner.md:1380:   `assignment`, or `cwd`); a separate write operation,
+docs/specs/runner.md:1381:   `dispatch.runtime.reconcile`, repairs only proven-stale local
+docs/specs/runner.md:1382:   guards/projections under CAS.
+docs/specs/runner.md:1383: - Evidence attribution: observation, attribution, and policy stay separate;
+docs/specs/runner.md:1384:   Git snapshots provide correlation, never proof of authorship.
+docs/specs/runner.md:1385: 
+docs/specs/runner.md:1386: `fgos dispatch inspect --run <runId>`, `--assignment <assignmentId>`, and
+docs/specs/runner.md:1387: `--cwd <path>` are read-only public doors for this projection. `fgos dispatch
+docs/specs/runner.md:1388: reconcile plan|apply` is the only public door for the shipped reconciliation
+docs/specs/runner.md:1389: actions. The supported actions are exactly `clear-cwd-lock`,
+docs/specs/runner.md:1390: `collect-result`, `clear-assignment-claim`, and `repair-projection`; every
+docs/specs/runner.md:1391: action is planned from current facts, carries a CAS action key/snapshot/expiry,
+docs/specs/runner.md:1392: and is re-read before apply.
+docs/specs/runner.md:1393: 
+docs/specs/runner.md:1394: Negative capabilities remain explicit: no unified recovery door, no automatic
+docs/specs/runner.md:1395: inspect-to-recover forwarding, no force-kill/retry/admit/resume/reassign/
+docs/specs/runner.md:1396: takeover/cancel through reconciliation, no cross-session authority, no
+docs/specs/runner.md:1397: same-`taskKey` semantic change, no host OOM/provider-limit prevention, and no
+docs/specs/runner.md:1398: claim that an inspection hint grants authority. The production-door proof lives
+docs/specs/runner.md:1399: in `test/runner/dispatch-operability-production-door.test.mjs` and covers
+docs/specs/runner.md:1400: positive Assignment/RunResult/inspect behavior plus forbidden recovery routes
+docs/specs/runner.md:1401: through the CLI, command registry/operation boundary, dynamic import, and a
+docs/specs/runner.md:1402: subprocess path.
+docs/specs/runner.md:1403: 
+docs/specs/runner.md:1404: The cross-design review evidence is an operator-authorized, role-separated
+docs/specs/runner.md:1405: Codex-only panel, not cross-provider independent review. The durable panel
+docs/specs/runner.md:1406: evidence lives under
+docs/specs/runner.md:1407: `plans/260914-dispatch-operability-evidence-attribution/architecture-panel/`.
+docs/specs/runner.md:1408: 
+docs/specs/runner.md:1409: Canonical detailed artifacts:
+docs/specs/runner.md:1410: 
+docs/specs/runner.md:1411: - `plans/260914-dispatch-operability-evidence-attribution/contracts/run-result-and-observation.md`
+docs/specs/runner.md:1412: - `plans/260914-dispatch-operability-evidence-attribution/phase-designs/inspection-surface-and-routing.md`
+docs/specs/runner.md:1413: - `plans/260914-dispatch-operability-evidence-attribution/phase-designs/evidence-attribution.md`
+docs/specs/runner.md:1414: - `plans/260914-dispatch-operability-evidence-attribution/phase-designs/guard-reconciliation.md`
+docs/specs/runner.md:1415: - `plans/260914-dispatch-operability-evidence-attribution/phase-designs/executor-contract-and-production-proof.md`
+docs/specs/runner.md:1416: - `docs/how-to/operate-dispatch-runtime-inspection-and-reconciliation.md`
+docs/specs/runner.md:1417: 
+docs/specs/runner.md:1418: **Workflow và CollaborationPattern (mô hình gọn per P4).** Một Unit run có thể
+docs/specs/runner.md:1419: agent-led hoặc declared qua Workflow / CollaborationPattern (`solo`, `reviewed`, `panel` + preset).
+docs/specs/runner.md:1420: Workflow dùng DAG steps + tích hợp vòng đời Work, CollaborationPattern dùng trong Unit run.
+docs/specs/runner.md:1421: Workflow runner (`src/workflow/runner.mjs`) nạp định nghĩa từ `core/workflows/*.yaml` và `domains/<d>/workflows/*.yaml`.
+docs/specs/runner.md:1422: 
+docs/specs/runner.md:1423: **`fgos workflow start` không giữ người gọi.** Một run kéo dài từ vài phút tới hàng chục phút, nên `start` chỉ ghi run vào event log (`.fgos/workflow-runs/<id>/events.jsonl`) rồi trả ngay `workflowRunId` cùng `detached: { pid, logPath, statusCommand }`; việc chạy tiếp do một process tách rời (`fgos workflow resume <id>`, stdout/stderr vào `advance.log` cạnh event log) đảm nhận — sống sót khi người gọi thoát hoặc bị `timeout` kill, và không mồ côi pane herdr. Tiến độ đọc qua `fgos workflow status <id>` (cùng event log, không kênh phụ); câu hỏi treo vẫn trả lời qua `fgos workflow answer`. `answer` và `resume` cũng vậy: `answer` ghi câu trả lời đồng bộ (step/answer sai vẫn lỗi ngay) rồi giao việc chạy tiếp cho process tách rời và trả cùng khối `detached`; `resume` chỉ giao việc chạy tiếp. Một mẫu duy nhất: process tách rời chính là `fgos workflow resume <id> --foreground`, nên không đệ quy. `--foreground` giữ run trong chính process gọi tới khi completed/failed/parked (dùng cho test và người cần chặn tới kết quả). Cùng mẫu với `fgos gateway start` (spawn `detached`, `unref`, log ra file). Một run chỉ có một process chạy tiếp tại một thời điểm: process đang chạy giữ `.fgos/workflow-runs/<id>/advance.lock` (pid), advance thứ hai khi pid đó còn sống bị từ chối với thông báo rõ và không ghi gì (kể cả câu trả lời); lock của process đã chết được tiếp quản. Run đang chạy nền cũng quan sát được mà không phải đọc `events.jsonl`: process tách rời ghi vào `advance.log` một dòng khi mỗi step bắt đầu, kết thúc, thất bại hoặc đỗ chờ trả lời (suy ra từ chính các event đã ghi, không kho trạng thái thứ hai; run chạy `--foreground` không tự in dòng nào), và `fgos workflow status <id>` thêm khối `advance: { running, pid, logPath, lastLines, hint }` — `running`/`pid` lấy từ cùng phép kiểm sống của `advance.lock`, `lastLines` là đuôi (20 dòng cuối, mỗi dòng tối đa 300 ký tự) của `advance.log` khi run chưa `completed` và log không rỗng; khi run còn `running` mà không process nào giữ lock và event cuối đã cũ (hơn 30 giây), `hint` nói advance không chạy và nêu `fgos workflow resume <id>` để chạy tiếp (trường hợp process con chết trước khi kịp ghi event).
+docs/specs/runner.md:1424: 
+docs/specs/runner.md:1425: **`--dir` chỉ quyết định nơi lưu state, không quyết định nơi worker chạy.** Với `fgos workflow start|answer|resume` và `fgos run`, `--dir <project>` trỏ kho `.fgos/` của run, còn pane của worker lấy thư mục làm việc của chính process gọi (trừ khi có `--worktree`). Gọi từ một project khác (git toplevel khác, không lồng nhau, không phải worktree liên kết của cùng repo) khiến mọi worker dừng ở prompt "đọc ngoài thư mục làm việc" và vòng kết thúc `blocked` (mdview dogfood 2026-10-05). Các verb này in một dòng cảnh báo lên stderr và thêm `warnings: [{code: 'dir-differs-from-cwd', message, fix}]` vào output; fix là `cd <project>` rồi chạy lại, hoặc truyền `--worktree <project>` (khi đó không cảnh báo). Chỉ cảnh báo, không từ chối: tổ hợp này vẫn hợp lệ khi lead chạy binary của repo khác trên state của project (`--worktree` tường minh) và không có chỗ nào được ghi là cấm. process con `workflow resume --foreground` do `start` tách ra mang sẵn biến `FGOS_WORKFLOW_ADVANCE_DETACHED` nên không cảnh báo lần hai.
+docs/specs/runner.md:1426: 
+docs/specs/runner.md:1427: **Truyền kết quả giữa các vai và giữa các bước — một cơ chế.** Kết quả trước luôn tới worker sau dưới dạng đường dẫn tuyệt đối, chỉ đọc, tới report của vai đó, trong `contextRefs` của assignment. Trong một Unit run, pattern truyền kết quả vai (`runRole({ inputs })`): `panel` truyền report của mọi panelist cho synthesizer, `reviewed` truyền report của producer (cùng vòng) cho reviewer và red-team. Giữa các bước Workflow, runner ghi `unit.inputs = ['unit-run:<unitRunId>/<role>', ...]` cho mọi vai của mọi unit thuộc các bước phụ thuộc (trực tiếp lẫn gián tiếp); objective chỉ giữ yêu cầu của chủ và một dòng `Summary` cho mỗi unit trước, gắn unit run id. Cú pháp `unit.inputs`: đường dẫn tương đối repo (giữ nguyên), hoặc `unit-run:<unitRunId>/<role>` (vai không kèm vòng: vòng cao nhất thắng, trong một vòng thì lần fallback mới nhất thắng). Một chỗ duy nhất phân giải (`src/runner/execution/handoff-refs.mjs`, đọc lịch sử qua `unit-run-history.mjs`): report đã settle (`settleReports`, kiểm sha256 trước khi trao), không có thì claim; run, vai hoặc report thiếu thì từ chối trước khi dispatch (`no-such-run`, `no-such-role`, `no-report`, `report-changed-after-settle`). Danh sách đã phân giải ghi vào `unit.json` (`resolvedInputs`) lúc tạo Unit run; resume và fallback dùng lại, một unit.json thiếu trường này không resume được. Đường dẫn trỏ vào `.fgos/assignments/` của main checkout, đọc được vì `hostRead: allow` (một main checkout nằm dưới `/tmp` thì bwrap che mất); khi có executor chạy máy khác hoặc `hostRead: deny`, resolver chuyển sang chép report vào thư mục assignment, vẫn một chỗ. Câu trả lời của owner ở cổng người (`workflow answer`) đi cùng đường: lúc ghi nhận, runner viết một file `.fgos/workflow-runs/<id>/gate-answers/<stepId>.md` (câu hỏi, câu trả lời, thời điểm, nêu rõ là input của owner chứ không phải output agent), rồi mỗi unit của bước có cổng và của mọi bước phụ thuộc nó (trực tiếp lẫn gián tiếp) nhận `gate-answer:<workflowRunId>/<stepId>` trong `inputs`, phân giải cũng ở `handoff-refs.mjs` thành đường dẫn tuyệt đối trong `contextRefs`; thiếu file thì từ chối trước khi dispatch (`no-such-answer`). Objective giữ thêm đúng một dòng cho mỗi câu trả lời: id bước, nhãn "owner's answer", và 200 ký tự đầu (gộp khoảng trắng). Trả lời lần hai cho cùng cổng ghi đè file. Step id không thể thành tên file (chứa `/`, `..`) thì lệnh trả lời bị từ chối và không ghi event.
+docs/specs/runner.md:1428: 
+docs/specs/runner.md:1429: Một assignment id là đường dẫn tương đối dưới `.fgos/assignments`, không nhất thiết một tên thư mục phẳng: vai của Unit có dạng `unit-run-<id>/<role>/<round>` hoặc `<round>-fb<n>`, mỗi attempt Dispatch ở `runs/<NN>`. **Một định nghĩa Run cho mọi cửa đọc:** thư mục tên `runs` xác định assignment cha, không cần `assignment.json`; thiếu metadata không được làm lịch sử biến mất (role/adapter không biết thì `null`). Bộ đọc dừng tại `runs`, không duyệt outbox/worker-output vì đó là nội dung worker, không phải kho Run; không theo symlink, giới hạn độ sâu assignment là 16, thư mục không đọc được bị bỏ qua. Cửa Node dùng [`assignment-layout.mjs`](../../src/runner/dispatch/assignment-layout.mjs); `dispatch-runs/<workId>/<timestamp>` chỉ còn là layout legacy cho đọc liveness, không ghi mới và không áp layout đó cho assignments.
+docs/specs/runner.md:1430: 
+docs/specs/runner.md:1431: Component lexical ordering dùng UTF-8 bytes cho valid Unicode filenames ở cả Node và Rust, không dùng JavaScript UTF-16 hay locale collation; duplicate winner và timestamp phải giống nhau, kể cả U+E000/U+10000.
+docs/specs/runner.md:1432: 
+docs/specs/runner.md:1433: Observe chỉ tính RunResult có JSON hợp lệ, `runId` nonblank và thời điểm settle theo `result.settledAt` → `result.timestamp` → regular sibling `run.json.settledAt`; không dùng `startedAt`, `assignment.createdAt` hay mtime thay thế. Các lý do không quan sát được phải đếm rõ: `missing-result`, `unparseable`, `no-run-id`, `no-timestamp`, `symlink`, `duplicate-run-id`, `depth`; kết quả inline của `fgos run record` có `unitRunId` mà không có `runId` là `inline-record`, không phải attempt Dispatch. Barrier symlink/độ sâu được tính một candidate bị bỏ qua, không đọc hậu duệ; result/run metadata symlink cũng không được đọc. Fixture tổng hợp chung ở [`test/fixtures/run-layout/expected.json`](../../test/fixtures/run-layout/expected.json) giữ Node product eligibility projection và Rust scanner cùng luật, tách khỏi directory-only lister. Metrics dedup first eligible theo lexical path; show/watch/recover từ chối run id trùng bằng `run-ambiguous` trước mọi thao tác. Quyền chọn vòng/fallback mới nhất và ánh xạ outcome vẫn thuộc `unit-run-history.mjs`, không chuyển sang bộ đọc Observe. Run lồng còn hoạt động chịu cùng guard cwd/liveness như Run phẳng: thiếu bằng chứng không cho phép tự retry hay tự xóa claim.
+docs/specs/runner.md:1434: 
+docs/specs/runner.md:1435: Execution cũng ghi `unit-summary.read.v1` bên cạnh `unit.json` khi toàn Unit settle (success, fail, exception, policy-refusal không seat, hoặc inline solo). Producer inline của `reviewed`/pattern nhiều vai chỉ ghi seat, không chốt Unit trước khi pattern hoàn tất. Owner ghi execution status để backfill bỏ qua active/pending runs; peer checkers và verify phải drain hết trước khi propagate lỗi và materialize summary. Summary lấy final seat/attempt/outcome theo cùng reader Node, có semantic seat `kind` từ định nghĩa panel owner (chỉ `panelist` là voter, không dựa tên role); workflow runner truyền linkage tường minh `{runId, stepId, unitId}` vào Unit, không bắt Observe suy diễn DAG hay reimplement reader. Backfill tái sinh derived summary theo byte-idempotence chỉ khi có bằng chứng hoàn tất, có thể thay summary cũ nếu nguồn đã đổi; không sửa unit/result/event gốc hoặc bịa timestamp. Legacy linkage dùng exact `unit.complete` trong workflow journal. Lỗi summary I/O cảnh báo, không đổi kết quả authoritative và không che lỗi execution gốc. Optional `stanceOptions` đi từ `workflow start --stance-options "a|b|c"` hoặc Unit tới panelist được đo; truyền options mới cùng `--resume` bị từ chối, không âm thầm bỏ qua hay sửa câu hỏi đã lưu. Claim thêm `stance: {choice, confidence}`; malformed/missing stance chỉ làm measurement invalid/missing, không reject claim hay đổi outcome. Mỗi role/round là một seat: summary giữ stance của final settled attempt, không lấy vote từ fallback/attempt đã bị thay thế. Agreement là phép đo passive, không gate workflow; zero valid votes là unmeasured, không phải genuine split. [Prior-art report](../../plans/reports/observe-unit-summary-stance-prior-art-261005.md) giữ review conditions nguyên văn: K2 “Over the first 30 logged panel runs, at least 90% have a unanimous stance.”; K3 “At least 1 logged unanimous panel is later reversed by the `reviewed.mjs` red-team or by a human revision of the decision within 14 days.”; K5 “The sensor has run 60 days and nobody has read or queried it, so K2 and K3 were never checked.” Đây là điều kiện xem lại dài hạn, không phải gate mới hoặc acceptance của lần triển khai này.
+docs/specs/runner.md:1436: 
+docs/specs/runner.md:1437: **Ẩn danh đầu vào (`anonymizeInputs`) — vai mù thật sự cần che "ai nói".** Mặc định tắt (không đổi hành vi). Một cờ duy nhất, `anonymizeInputs: true`, ở Unit (và ở `template` của Workflow, đi thẳng vào Unit): khi bật, mỗi `unit-run:` trong `inputs` không còn được trao bằng đường dẫn gốc (có tên seat và unit run id) mà được chép nguyên byte (sau khi qua kiểm sha256 như thường) vào `<unitDir>/inputs/seat-A.md`, `seat-B.md`, ... theo thứ tự danh sách `inputs` (người gọi quyết định thứ tự; không xáo trộn, không cấu hình thêm), và chỉ các bản chép đó vào `contextRefs`, sau các ref khác. Bảng tên trung tính → input gốc nằm trong `unit.json` (`inputMap`), không bao giờ vào brief; resume dùng lại đúng danh sách và bản chép. Runner Workflow, khi bật, viết objective chỉ với `### seat-A` + dòng `Summary` của vai đó — không còn tên bước, unit, unit run hay vai. Đường dẫn repo và câu trả lời cổng của owner (`gate-answer:`) giữ nguyên, vì đó là của owner chứ không ẩn danh. Lỗi nêu rõ và xảy ra trước dispatch: run/vai/report thiếu, `report-changed-after-settle`, hoặc `copy-failed`. Giới hạn nói thẳng: đây chỉ là *ẩn danh theo cách dựng thứ được trao*, KHÔNG ngăn một worker chủ động đi tìm — worker vẫn đọc được các file khác trong `.fgos/assignments/` (kể cả outbox của panelist anh em) cho tới khi có giới hạn đọc ở lớp confinement; và nội dung report tự nó có thể lộ giọng/tự xưng. Không áp cho truyền trong-run của pattern (synthesizer của `panel` vẫn nhận report theo tên panelist, vì nó được dặn nêu vị trí từng panelist): muốn tổng hợp mù thì tách thành bước Workflow riêng với `anonymizeInputs`. `core/workflows/delphi.yaml` bật cờ này ở bước tổng hợp phản hồi và vòng hai (Delphi vốn đòi ẩn danh); các Workflow khác để nguyên. Ví dụ bước đối chất: `{ id: cross-examine, dependsOn: [opinions], units: [{ id: x, template: { capability: ..., pattern: solo, objective: "Chỉ ra chỗ yếu của từng ý kiến", anonymizeInputs: true } }] }`.
+docs/specs/runner.md:1438: 
+docs/specs/runner.md:1439: **Vai mù thật sự (`blind`) — chặn đọc run state của peer.** Mặc định tắt (không đổi hành vi). Một cờ ở Unit (và ở `template` của Workflow): `blind: true` làm *mọi vai* của Unit chạy với `hostRead: blind` (`docs/specs/confinement-authority.md` §9.2): worker không đọc được `.fgos/assignments`, `.fgos/workflow-runs`, `.fgos/dispatch-runs` của project, thư mục socket herdr, private home của dispatch khác, hay `/proc/<pid>` của tiến trình anh em; chỉ đọc được thư mục của chính nó (brief, ref đã được trao — chỉ-đọc) và ghi outbox. Phần còn lại của host (repo, `node`, DNS) và file tracked trong `.fgos` không đổi. Unit `blind` không bao giờ chạy không-blind: nếu không thực thi được — `bind()` không chọn in-process/inline, không có bwrap, mode không `required`, probe hỏng/chưa tươi, `cwd` hay ref nằm trong vùng bị che — dispatch bị từ chối trước khi spawn với lý do có tên (`blind-in-process`, `blind-requires-confinement`, `blind-hides-workspace`, `blind-ref-hidden`, `confinement-probe-failed`, ...). Với Unit `blind`, input `unit-run:`/`gate-answer:` (và ref bất kỳ nằm trong vùng bị che) không được giao bằng đường dẫn gốc: lúc dispatch, `resolveUnitInputs` + `copyHandoffsInto` chép nguyên byte (kiểm sha256) vào `inputs/` của round dir của chính vai đó, mỗi vai một bản, tên trung tính khi có `anonymizeInputs`; `unit.json` giữ `inputMap`, resume dùng lại bản chép. `blind-ref-hidden` chỉ còn cho ref không chép được. Workflow bật `blind`: hai bước panel của `delphi` (`propose-round-1`, `propose-round-2`), `generate-ideas` của `nominal-group`, `sense-making-panel` của `group-cognition`; `architecture-advisory` và `business-discussion` chưa bật vì pool của chúng gồm agy, họ chưa qua canary blind.
+docs/specs/runner.md:1440: 
+docs/specs/runner.md:3042: ### 0047 — P1 Lõi thực thi: Unit, một bind(), một cửa chạy fgos run, 3 Pattern cộng tác, đóng 4 mối authority L5
+docs/specs/runner.md:3043: 
+docs/specs/runner.md:3044: - **Trạng thái:** Settled (Request-to-Run P1 Execution Core hoàn tất, 2026-10-01)
+docs/specs/runner.md:3045: - **Bối cảnh:** L5 trước P1 bị phân mảnh: "ai làm" bị quyết định ở nhiều nơi (coordination engine, `decide`, placement-policy, `assignment-policy.mjs`); "chạy qua cửa nào" có nhiều cửa ad-hoc; read-only bị chia rẽ giữa invocation `*-readonly` và tool gating; cổng ghi file phụ thuộc template stamp của engine.
+docs/specs/runner.md:3046: - **Quyết định:**
+docs/specs/runner.md:3047:   1. **Hợp đồng Unit (`src/runner/execution/unit.mjs`):** Hợp đồng dữ liệu duy nhất cho mọi đường vào. Phi hạ tầng (G2) — cấm chứa executor/provider/model/tier/invocation/actors/prefer/overrides.
+docs/specs/runner.md:3048:   2. **Một `bind()` duy nhất (`src/runner/execution/bind.mjs`):** Bảng 5 mức (Session -> Overrides -> Unit role/rigor -> Project taste -> Global taste), tái dùng `mechanism.mjs` theo D-ADR0033 (một cơ chế dispatch).
+docs/specs/runner.md:3049:   3. **Một cửa chạy `fgos run` (`src/runner/execution/run.mjs`):** Bọc `executeAssignment`, mặc định spawn qua pane herdr (G7), cli fallback. Có `fgos run record` cho producer inline với nonce một lần phát kèm chỉ dẫn và kiểm chứng `evidenceRefs`.
+docs/specs/runner.md:3050:   4. **3 Pattern cộng tác (`solo`, `reviewed`, `panel`):** Vòng lặp code nhỏ, thuần, không store mới (Q-B: trạng thái vòng lặp suy từ `history()` của Unit run). `findings` là outcome, không đánh `failed`.
+docs/specs/runner.md:3051:   5. **Cổng ghi file kiểm chứng được (supersede ADR-006 §6):** Assignment `mutating` được admit khi: (a) cwd là linked worktree và `realpath(cwd) == unit.json.worktree`, (b) `bind()` tính lại từ `unit.json` khớp deep-equal. Ngoại lệ có tên: engine protocol stamp giữ tới P4 phase 6. D-ADR0033 (một cơ chế dispatch) giữ nguyên.
+docs/specs/runner.md:3052:   6. **Xoá bỏ hoàn toàn:** Invocations `*-readonly`, `readOnlyRedirects`, `placement-policy.mjs`, `executors.*.for`, PolicyPatch `prefer*`. Posture read-only/ghi file là confinement OS do fgOS áp cho cả herdr lẫn cli (X-1). Quota limit `provider-limit` kích hoạt `bind().nextCandidate` mở pane mới giữ pane cũ (X-3).
+docs/specs/runner.md:3053: Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
+docs/specs/runner.md:3054: 
+docs/specs/runner.md:3055: ### 0048 — P2 Plan chạy được: Unit cho mọi đường vào, driver mỏng fgos-run, bỏ DemandFacts/matcher
+docs/specs/runner.md:3056: 
+docs/specs/runner.md:3057: - **Trạng thái:** Settled (Request-to-Run P2 Runnable Plans hoàn tất, 2026-10-01)
+docs/specs/runner.md:3058: - **Bối cảnh:** Trước P2, việc phân rã và chọn capability/cơ chế bị phân mảnh bởi lớp prose L2 DemandFacts (8 fields) -> matcher -> `form` (`inline|protocol|facade`). Các facade `fgos-code-change`, `fgos-code-panel`, `fgos-plan-loop` tự lập lịch, tự chạy vòng lặp bằng prose, tạo ra nhiều sequencer chồng chéo và gắn chặt vào domain coding.
+docs/specs/runner.md:3059: - **Quyết định:**
+docs/specs/runner.md:3060:   1. **Unit là hợp đồng dữ liệu duy nhất (`src/runner/execution/unit.mjs`):** Mọi đường vào (prompt tự do, plan AgentKit, phase file) đều quy về Unit. `fgos plan-lint` kiểm chứng Unit trong phase file (`## Units`, `- unit:`), phát hiện sớm ghim hạ tầng (G2), trùng id, vòng phụ thuộc, và giao nhau `writes` không có `dependsOn`.
+docs/specs/runner.md:3061:   2. **Driver mỏng (`core/skills/fgos-run`):** Thay thế toàn bộ các facade cũ (`fgos-code-change`, `fgos-code-panel`, `fgos-plan-loop`, `fgos-capability-dispatching`). Driver không tự lập lịch, không tự merge mà giao trọn cho **Workflow runner** (`src/workflow/runner.mjs`, P3a).
+docs/specs/runner.md:3062:   3. **Cổng người thống nhất:** Authorize không parse từ prose plan. Phase chưa được duyệt sẽ dừng ở cổng người của Workflow run (`gate: { kind: "human" }`), owner trả lời qua `fgos workflow answer`. Mọi câu hỏi treo được gom thành một bộ duy nhất.
+docs/specs/runner.md:3063:   4. **Xoá bỏ DemandFacts & matcher:** Xoá `src/runner/capability-match.mjs`, verb `fgos capability match`, các fragment `capability-matching.md`. L2 chỉ còn hiểu yêu cầu và viết Unit với `capability` (`domain:verb`).
+docs/specs/runner.md:3064: Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
+docs/specs/runner.md:3065: 
+docs/specs/runner.md:3066: ### 0049 — P3b Work không còn stage: Work chỉ còn bản ghi/lifecycle, Workflow runner là sequencer duy nhất, đóng A4
+docs/specs/runner.md:3067: 
+docs/specs/runner.md:3068: - **Trạng thái:** Settled (Request-to-Run P3b hoàn tất, 2026-10-02)
+docs/specs/runner.md:3069: - **Bối cảnh:** Trước P3, Work mang trường `stage`, và dispatch đọc thẳng stage/workflow của Work (vi phạm A4). Điều này khiến logic tuần tự bước bị phân tán giữa `loop.mjs`, FSM stage, và prose của skill, đồng thời kéo dispatch phụ thuộc vào state.
+docs/specs/runner.md:3070: - **Quyết định:**
+docs/specs/runner.md:3071:   1. **Work không còn `stage`:** Work trở về đúng bản chất là bản ghi yêu cầu, bảng tiến độ và FSM trạng thái (status lifecycle). Thêm `workflowRunId?` để trỏ tới phiên chạy Workflow độc lập.
+docs/specs/runner.md:3072:   2. **Một đường đọc dữ liệu cũ:** Replay map các event `stage` lịch sử sang `workflowStep` mà không ghi đè dữ liệu cũ. Bump `viewSchemaVersion: 3` (Rust và Node đọc tương thích cả 2 và 3).
+docs/specs/runner.md:3073:   3. **Đóng ranh giới A4 (L5 không phụ thuộc L3):** Xoá sạch toàn bộ import `src/state/**` khỏi `src/runner/dispatch/**` và `src/runner/execution/**`. Xoá writer `dispatch-runs` và các reader cũ.
+docs/specs/runner.md:3074:   4. **Thu hồi adapter Workflow cũ:** Xoá `src/runner/definitions/workflow-adapter.mjs`, bỏ profile `Workflow` khỏi `FlowDefinition`, xoá doctor check `workflow-flow-definition-projects-cleanly`. Workflow runner (`src/workflow/**`) là sequencer duy nhất.
+docs/specs/runner.md:3075: Đổi quyết định này = supersede bằng record mới, không sửa tại chỗ.
+docs/specs/runner.md:3076: 
+docs/specs/runner.md:3077: ### 0050 — P6 Nối thật: herdr là transport mặc định, posture một đường, fallback quota qua pane mới
+docs/specs/runner.md:3078: 
+docs/specs/runner.md:3079: - **Trạng thái:** Settled cho ca 1, 2, 3, 4, 6; ca 5 NOT RUN (xem bằng chứng)
+docs/specs/runner.md:3080: - **Bối cảnh:** Sau 0047, `bind().transport`, `resolvePosture` và `nextCandidate` tồn tại nhưng không ai gọi: mọi lần chạy thật là cli headless, posture tự dựng `bwrapArgs` riêng song song với driver confinement, `canApplyPosture` luôn `true`.
+
+SOURCE docs/specs/observe.md
+docs/specs/observe.md:1: # Observe Component Specification
+docs/specs/observe.md:2: 
+docs/specs/observe.md:3: Document type: BA-grade area specification
+docs/specs/observe.md:4: Ownership: `packages/observe/rust` (`fgos-observe`)
+docs/specs/observe.md:5: Substrate stores: `.fgos/observe/<store>/<writerId>.jsonl`
+docs/specs/observe.md:6: 
+docs/specs/observe.md:7: ## 1. Overview & Boundaries
+docs/specs/observe.md:8: 
+docs/specs/observe.md:9: Observe là platform layer chuyên trách việc đo lường (`fgos metrics`) và theo dõi trở ngại (`fgos friction`) xuyên suốt mọi tầng của hệ thống fgOS.
+docs/specs/observe.md:10: Observe được chuyển trọn gói sang Rust trong kế hoạch `plans/260929-1501-metrics-friction-rust-native`.
+docs/specs/observe.md:11: 
+docs/specs/observe.md:12: ### Owns
+docs/specs/observe.md:13: - Quản lý nhật ký và vòng đời case đo lường (`fgos metrics case`).
+docs/specs/observe.md:14: - Thu thập và tính toán scorecard tầng nền (`fgos metrics harness`, `fgos metrics runs`, `fgos metrics coverage`, `fgos metrics outcomes`, `fgos metrics entropy`, `fgos metrics snapshot`).
+docs/specs/observe.md:15: - Quản lý kho lưu trữ friction độc lập, phi tập trung (`fgos friction record`, `fgos friction resolve`, `fgos friction list`, `fgos friction show`, `fgos friction rank`).
+docs/specs/observe.md:16: - Quản lý store lock (`.fgos/observe/.lock`) và phân mảnh writer shard (`.fgos/observe/<store>/<writerId>.jsonl`).
+docs/specs/observe.md:17: - Khai báo traits `ObservationSource` và `LegacyFrictionSource` cho các crate khác triển khai.
+docs/specs/observe.md:18: 
+docs/specs/observe.md:19: ### Must Not Own
+docs/specs/observe.md:20: - Không sở hữu trạng thái hoặc vòng đời của Work Items (do `packages/work-state` sở hữu).
+docs/specs/observe.md:21: - Không tự ý phân loại hoặc đánh giá lại kết quả RunResult (do `packages/run-result` sở hữu).
+docs/specs/observe.md:22: - Không can thiệp vào logic điều phối hoặc trạng thái của Agent Coordination (do `packages/coordination-state` sở hữu).
+docs/specs/observe.md:23: - Không ép buộc các component khác phụ thuộc ngược vào Observe: Observe độc lập, composition root (`apps/fgos`) nối các nguồn dữ liệu vào.
+docs/specs/observe.md:24: 
+docs/specs/observe.md:25: ## 2. Shared Entities & Subjects
+docs/specs/observe.md:26: 
+docs/specs/observe.md:27: | Subject Kind | Định dạng ID | Ví dụ | Owner dữ liệu |
+docs/specs/observe.md:28: |---|---|---|---|
+docs/specs/observe.md:29: | `run` | `run:<runId>` | `run:run_1a2b3c` | `packages/run-result/rust` |
+docs/specs/observe.md:30: | `run` (unit observation) | `unit-run:<unitRunId>` | `unit-run:unit-run-example` | Node execution writer; Rust run-result read contract |
+docs/specs/observe.md:31: | `session` | `session:<id>` | `session:coord_4d5e6f` | `packages/coordination-state/rust` |
+docs/specs/observe.md:32: | `executor` | `executor:<id>` | `executor:judge-discovery` | `.fgos/config.json` |
+docs/specs/observe.md:33: | `case` | `case:<name>` | `case:observe-f2` | `packages/observe/rust` |
+docs/specs/observe.md:34: | `work` | `work:<id>` | `work:tsk-abc` | `packages/work-state/rust` |
+docs/specs/observe.md:35: 
+docs/specs/observe.md:36: ## 3. Storage Model
+docs/specs/observe.md:37: 
+docs/specs/observe.md:38: - **Tracked Shard theo Writer**: mọi thao tác ghi đều ghi vào `.fgos/observe/<store>/<writerId>.jsonl`.
+docs/specs/observe.md:39: - **Store Lock**: `.fgos/observe/.lock` sử dụng cờ `O_CREAT | O_EXCL`, lưu `{ "pid": u32, "startTime": Option<String>, "ts": String }`. Tự động thu hồi khi holder đã chết hoặc quá TTL 30 giây.
+docs/specs/observe.md:40: - **Envelope chuẩn**: CLI native luôn trả về envelope `fgos.v1`.
+docs/specs/observe.md:41: 
+docs/specs/observe.md:42: ## 4. Commands & Routing
+docs/specs/observe.md:43: 
+docs/specs/observe.md:44: - `fgos metrics <subcommand>` — lệnh đo lường native (Rust host). Subcommands: `ping`, `case`, `harness`, `faults`, `runs`, `coverage`, `discussions`, `eval`, `outcomes`, `entropy`, `snapshot`.
+docs/specs/observe.md:45: - `fgos friction <subcommand>` — lệnh friction native (Rust host). Subcommands: `ping`, `record`, `resolve`, `list`, `show`, `rank`.
+docs/specs/observe.md:46: 
+docs/specs/observe.md:47: Node legacy CLI cắm cờ `nativeOnly: true` cho `metrics` và `friction`, từ chối chạy trực tiếp với exit 4.
+docs/specs/observe.md:48: Mọi component Node hoặc ngôn ngữ ngoài gọi qua helper `src/util/host-bin.mjs` (`invokeHost`).
+docs/specs/observe.md:49: 
+docs/specs/observe.md:50: ## 5. Mục theo làn (Sub-spec sections)
+docs/specs/observe.md:51: 
+docs/specs/observe.md:52: ### § Metrics (Làn A)
+docs/specs/observe.md:53: Dành cho Phase F3 (`case`), F4 (`harness`, `faults`), F6 (`work` source), F7 (`runs`, `outcomes`, `entropy`, `snapshot`).
+docs/specs/observe.md:54: - **Claude Transcripts Source**: Thu thập token usage từ `~/.claude/projects/` (`CLAUDE_CONFIG_DIR`). Nhận tất cả thư mục có tên khớp với encoding của bất kỳ path nào trong `git worktree list` (project root cộng từng worktree ngoài) hoặc bắt đầu bằng `enc + "--claude-worktrees-"`. Giữ bộ lọc `cwd` cho từng record để ngăn match nhầm repo khác, và dedupe theo `message.id`.
+docs/specs/observe.md:55: - **Run Result Source — layout rule `v2`**: `packages/run-result/rust::scan_runs(root)` là scanner duy nhất của Rust. Walk `.fgos/assignments` theo thứ tự lexical; directory tên `runs` đánh dấu parent là assignment, id là relative path (có thể chứa `/`, gồm role/round/fallback; empty nếu `runs` nằm ngay ở assignments root). Không cần `assignment.json`; role/adapter thiếu là null. Đọc `runs/<attempt>/result.json` và chỉ đọc sibling `run.json` khi cần settlement timestamp fallback, không descend vào attempt/outbox và không follow symlink (kể cả result/run/assignment metadata). Assignment-relative depth tối đa 16; attempt không cộng depth. Child directory không đọc được hoặc biến mất bị bỏ qua, sibling vẫn được scan; root không đọc được trả lỗi, root thiếu trả nguồn rỗng.
+docs/specs/observe.md:56: - **Observed run**: result parseable, `runId` nonblank string, settlement timestamp là nonblank string theo precedence `result.settledAt` → `result.timestamp` → regular sibling `run.json.settledAt`. Không dùng `startedAt`, `assignment.createdAt` hay filesystem mtime để giả lập thời điểm settle. Admission không thêm ISO validation; window consumer vẫn lọc observation theo thời gian. First otherwise-eligible record theo lexical path thắng khi trùng `runId`, trước khi lọc window. `ObservationSource` giữ nguyên contract; `RunResultSource::observations` lấy observations từ scanner rồi lọc window. Đây là lựa chọn implementation dưới tiêu chí chính xác/ổn định/đơn giản của owner, không phải owner đã chọn literal fallback sequence.
+docs/specs/observe.md:57: - **`fgos metrics coverage [--dir <root>]`**: chỉ scan run source, không scan transcripts; payload `{ layoutRule: "v2", runDirsSeen, observed, skipped: {reason: count}, recentRuns }` trong envelope `fgos.v1`. Reasons: `missing-result` (không có file), `unparseable` (file hiện hữu nhưng không đọc/parse được hoặc nonregular), `no-run-id`, `no-timestamp`, `symlink`, `duplicate-run-id`, `depth`, `inline-record` (unit result có `unitRunId` nhưng không `runId`). Chỉ reasons có count xuất hiện trong map. Symlink/depth traversal barrier tính một skipped candidate; any symlink entry có thể che directory nên là conservative barrier, không khẳng định `runDirsSeen` chỉ gồm physical directories. Result symlink là skip của candidate run, không tính thêm. Luôn `observed + sum(skipped) = runDirsSeen`. `recentRuns` vẫn đếm candidate có regular result file mtime trong 60 giây gần nhất, kể cả result hỏng/trùng/inline; future mtime cũng là recent để chịu clock skew. Composition root inject callback `scan_coverage` từ owner vào Observe; không reverse dependency và không đổi observation trait.
+docs/specs/observe.md:58: - **Hermetic consumer invariant**: Rust và Node materialize cùng fixture declarative `test/fixtures/run-layout/expected.json`; product Node eligibility projection (tách khỏi directory lister) và Rust scanner phải khớp admitted run ids/accounting, planted run trong outbox không được enumerate. Show/watch/recover dùng metadata-first identity lookup và từ chối `run-ambiguous` nếu nhiều materializations có cùng id; lexical winner chỉ là metrics dedup policy, không phải authority để xem/recover một run. Rust cargo tests không đọc live `.fgos/assignments` và không pin audit-time totals. Doctor so sánh độc lập cả eligible unique count và directory/barrier count; directory mtime trong 60 giây cho bounded race tolerance dù result chưa tồn tại. Failure examples chỉ là sample candidates, không khẳng định host đã bỏ những path đó.
+docs/specs/observe.md:59: - **Unit summaries — writer-owned contract**: Execution ghi `.fgos/assignments/<unitRunId>/unit-summary.json` theo `unit-summary.read.v1` khi toàn Unit settle, kể cả refusal không có seat và inline solo. Producer inline của pattern nhiều vai chỉ ghi kết quả seat, không chốt Unit trước checker/synthesizer. Chọn final seat, numeric attempt, fallback và outcome thuộc Node `unit-run-history.mjs`; mỗi seat có `kind` nonempty do owner pattern ghi, chỉ `kind: "panelist"` là voter, không suy từ tên `panelist-*`/`researcher-*`. Định nghĩa role của panel được owner dùng chung cho execution và materializer. Observe chỉ đọc summary đã settle, không join `unit.json`, Dispatch result hay workflow events để suy diễn; `UnitSummarySource` phát `unit.settled` với subject `unit-run:<id>`, không cộng vào tổng Dispatch runs. Backfill bỏ qua Unit đang chạy/pending hoặc chưa có bằng chứng hoàn tất, tái sinh derived summary byte-idempotently, không sửa unit/result/event gốc; linkage legacy chỉ dùng `unit.complete` có exact unitRunId. Lỗi ghi summary cảnh báo nhưng không đổi outcome authoritative hoặc che lỗi execution gốc.
+docs/specs/observe.md:60: - **Unit execution state**: `unit.json.execution.status` chuyển `running` → `pending-inline` (chờ producer) → `pending` (inline producer đã ghi, pattern chưa xong) → `running` khi resume → `settled`. Backfill báo `skippedActive`/`skippedUnsettled`; trạng thái không thay thế bằng chứng settlement. Resume invalidates regular summary cũ trước khi công bố `running`; nếu không thể xóa artifact cũ thì dừng trước khi reopen, không để Observe tiếp tục đọc outcome terminal đã mất authority. Artifact nonregular không được đo và vẫn là diagnostic khi summary I/O thất bại.
+docs/specs/observe.md:61: - **`metrics discussions [--since <date>] [--by workflow|executor|persona]`**: đo unit runs/pass rate, final seats/failed seats, attempts/fallback và median settled duration; attempts không đồng nghĩa seats. Optional stance chỉ được hỏi ở panelist có options, lấy từ final claim: choice thuộc stanceOptions hoặc `other`, confidence nếu có phải hữu hạn trong [0,1] (null/thiếu không cân trọng số). Missing/malformed stance không làm seat thất bại. Không có options, không có voting seats, hoặc zero valid votes là `unmeasured`, agreement/genuineSplit null; vẫn giữ counts ghế/missing/invalid. Khi có valid vote, agreement là largest valid-choice group / final voting seats, genuineSplit khi không nhóm nào đạt 2/3 số ghế. Missing và invalid vẫn ở mẫu số; split khi thiếu claim chỉ là incomplete-evidence signal, không chứng minh dissent. Synthesizer không bỏ phiếu thay panelist, kể cả tên role trùng quy ước panelist. Group executor/persona giữ attempts theo executor/persona thực thi và seats theo final; một unit có thể xuất hiện nhiều group, không cộng group unit totals làm global total.
+docs/specs/observe.md:62: - **Summary scan diagnostics**: một scan canonical của owner reader cung cấp observations và counts; discussions không scan source hai lần. `summariesMissing` báo Unit directory không có artifact (có thể đang chạy, không tự khẳng định crash); `summariesUnusable` và `summariesSkippedByReason` báo JSON/contract/timestamp/size/read/symlink/nonregular không dùng được, kể cả summary không có settle time. `summariesOutsideWindow` tách summary hợp lệ ngoài window; `summaryDirsSeen` là số Unit directory được xét. Diagnostics có scope root-wide: summary thiếu hoặc không có thời gian không thể gán vào `--since`/`--until`. Callback được composition root inject tương tự coverage scanner; không mở rộng trait `ObservationSource` hay cho Rust tái dựng pattern.
+docs/specs/observe.md:63: - **Discussion time windows**: `--since`/`--until` so sánh inclusive theo UTC milliseconds, không lexical timestamp; offset spellings của cùng instant cho cùng kết quả. `YYYY-MM-DD` là UTC midnight, không end-of-day. Bound malformed hoặc since sau until trả named error trước scan; owner timestamp malformed không được đoán hay đổi payload gốc.
+docs/specs/observe.md:64: - **`metrics eval record|list`**: record append-only vào `.fgos/observe/evals/<writerId>.jsonl` qua Observe lock; `observe.eval.v1` giữ harness/question/setup/rubric/judge/runRefs và từng score integer 0–2. `discussion-quality.v1` bắt buộc đúng năm criterion keys của rubric, validate cả write/read; rubric khác vẫn free-form. Writer tạo timestamp/envelope; evalId unique trên toàn shard: check rồi append dưới cùng lock như case journal. Store có invalid tracked data không thể chứng minh uniqueness nên writer từ chối cho tới khi sửa dữ liệu, không bỏ lỗi hay tự sửa log. Reader validate và phát hiện duplicate trước exact harness/question filters; first valid lexical record được giữ, later duplicate vào invalid, không coi store có invalid là comparison đáng tin. List sort lexical timestamp rồi evalId; writer UTC/Z chuẩn, không bảo đảm chronological ordering cho timestamp offset do hand-edit. Journal lưu đánh giá, không tự chạy judge hay tuyên bố chất lượng khách quan; A/B blind judge phải nhận neutral inputs ngoài `.fgos`, không kèm setup labels hay run metadata.
+docs/specs/observe.md:65: - **Eval journal safety**: writer id phải là một filename component, không path; symlinked/nonregular writer shard bị từ chối. Supported Linux/Android/Darwin/BSD dùng target-specific `libc::O_NOFOLLOW | O_NONBLOCK`, xác nhận regular descriptor; platform không có branch atomic no-follow chỉ create-new, existing shard fail closed. Reader giữ tối đa 1 MiB + một byte mỗi logical line, drain line quá lớn rồi tiếp tục, báo file/line/error kể cả partial EOF. Unsafe/nonregular `*.jsonl` entries báo invalid với line0 (shard-level), không follow để lấy scores. Parent directory và read-side entries được preflight, không tuyên bố chống mọi race thay directory/final read component. Không thêm config/env/tool prerequisite: libc là build dependency, runtime dùng Observe dir-writable doctor row, shard identity và lock hiện có; evals tạo lười như các store Observe khác.
+docs/specs/observe.md:66: ### § Friction (Làn B)
+docs/specs/observe.md:67: Dành cho Phase F5: writer Rust duy nhất, migration lười từ `work.friction`, các lệnh `friction record/resolve/list/show/rank`.
+docs/specs/observe.md:68: 
+docs/specs/observe.md:69: ### § Contract & Quyết định (Làn C / F8)
+docs/specs/observe.md:70: Dành cho Phase F8: khoá ranh giới contracts, golden fixtures và decision records.
+docs/specs/observe.md:71: - Versioned contracts: `packages/observe/contracts/` (`observe.observation.v1.json`, `observe.friction.v1.json`, `observe.case.v1.json`, `observe.snapshot.v1.json`, `observe.eval.v1.json`). Eval rubric: [`discussion-quality.v1`](../reference/discussion-quality-rubric.md); [blind comparison how-to](../how-to/compare-discussion-setups-with-metrics-eval.md).
+docs/specs/observe.md:72: - Source owner read contracts: `packages/run-result/contracts/run-result.read.v1.json`, `packages/run-result/contracts/unit-summary.read.v1.json`, `packages/observe/contracts/coordination-session.read.v1.json` (historic sessions; the coordination engine is retired), `packages/work-state/contracts/work-events.read.v1.json`.
+docs/specs/observe.md:73: - Golden fixtures: `test/fixtures/observe/` sinh bằng CLI Rust và Node trong `scripts/regenerate-observe-fixtures.mjs`.
+docs/specs/observe.md:74: - Doctor checks: `observe-dir-writable`, `observe-friction-migrated`, `observe-host-resolvable`, `observe-run-coverage` (`src/setup/registrations.mjs`). Coverage check gọi host `metrics coverage` qua helper với main-checkout dir, kiểm tra `v2` + accounting rồi so `runDirsSeen` với Node directory-only `scanAssignmentLayout` (gồm symlink/depth barriers). Tolerance là max(Node recent result files, host `recentRuns`) trong cửa sổ 60 giây. Chỉ positive unknown subcommand hoặc payload thiếu `layoutRule` được degraded/pass vì old host; malformed coverage và các lỗi khác fail.
+docs/specs/observe.md:75: 
+docs/specs/observe.md:76: ## 6. Lịch sử quyết định
+docs/specs/observe.md:77: 
+docs/specs/observe.md:78: ### D-ADR0037 (Observe Component Architecture)
+docs/specs/observe.md:79: 
+docs/specs/observe.md:80: - **Một component Observe**: Gom toàn bộ đo lường (`fgos metrics`) và friction (`fgos friction`) vào một crate Rust duy nhất (`packages/observe/rust`).
+docs/specs/observe.md:81: - **Subject tầng nền**: Subject đo lường là các thực thể tầng nền (`run`, `session`, `executor`, `case`); Work Item là source quan sát tuỳ chọn, không phải trung tâm đo lường.
+docs/specs/observe.md:82: - **Friction rời Work**: Lưu trữ friction tách rời khỏi `work.friction` trong Work event store; chuyển thành append-only shards trong `.fgos/observe/friction/<writerId>.jsonl`.
+docs/specs/observe.md:83: - **Writer Rust duy nhất**: Mọi component ghi friction hoặc metrics đều gọi qua native CLI của Rust host. Recursion guard chỉ còn cho `legacy-cli`.
+docs/specs/observe.md:84: - **`nativeOnly`**: Các verb `metrics` và `friction` được đánh dấu `nativeOnly: true` trong command registry, Node legacy CLI từ chối trực tiếp với exit 4.
+docs/specs/observe.md:85: - **Không backward compat**: Supersede luật "Preserve current commands" của `node-to-rust-migration.md` đối với `check/faults/dispatch-report/evolve`; chuyển hẳn sang `metrics` và `friction`.

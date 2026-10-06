@@ -15,7 +15,6 @@ import {
   addAdHocWorktree,
   addBareOrigin,
   addDiscovery,
-  addFriction,
   addGoalItem,
   addOk,
   addOutcome,
@@ -64,7 +63,7 @@ import {
   makeRunnerProposedLeafItem,
   makeSessionSafeRunnerItem,
   mkLocalDependency,
-  moveStage,
+  moveStep,
   moveWork,
   os,
   path,
@@ -193,7 +192,7 @@ test('take with no --id claims the frontier head, defaults role to human, record
   assert.equal(view.work['pull-a'].headAtTake, headBefore);
   assert.equal(view.outcomes['pull-a'].predicted.role, 'human');
   assert.equal(view.outcomes['pull-a'].predicted.headAtTake, headBefore);
-  assert.equal(view.outcomes['pull-a'].predicted.tier, 'standard');
+  assert.equal(view.outcomes['pull-a'].predicted.size, 'standard');
 });
 
 
@@ -456,7 +455,7 @@ test('pick surfaces a real createWorktree failure and reverts the claim it alrea
 test('pick --id claims a status:todo item at stage discovery (not the frontier at all) — the frontier/stage guard is gone (claim-lock §3a)', () => {
   const cwd = initGitCwdFast();
   const id = JSON.parse(run(cwd, ['submit', 'Fuzzy request needing discovery']).stdout).data.id;
-  assert.equal(stateView(cwd).work[id].stage, 'discovery');
+  assert.equal(stateView(cwd).work[id].workflowStep, 'discovery');
   assert.ok(!envelopeData(run(cwd, ['ready']).stdout).some((i) => i.id === id), 'a discovery-stage item is never in the frontier');
 
   const result = run(cwd, ['pick', '--id', id]);
@@ -465,7 +464,7 @@ test('pick --id claims a status:todo item at stage discovery (not the frontier a
   assert.equal(data.from, 'todo');
   assert.equal(data.to, 'doing');
   assert.equal(stateView(cwd).work[id].status, 'doing');
-  assert.equal(stateView(cwd).work[id].stage, 'discovery', 'pick claims the item without touching its stage');
+  assert.equal(stateView(cwd).work[id].workflowStep, 'discovery', 'pick claims the item without touching its stage');
 });
 
 

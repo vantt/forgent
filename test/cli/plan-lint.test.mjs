@@ -184,7 +184,9 @@ test('--cell with no match reports capability.undeclared (hard) and exits 1', ()
 });
 
 test('running plan-lint on the track\'s own plan.md lints clean and shows I15\'s code:implement description', () => {
-  const trackPlan = path.resolve(__dirname, '../../plans/260919-coordination-skill-harness-simplification/plan.md');
+  const activePlan = path.resolve(__dirname, '../../plans/260919-coordination-skill-harness-simplification/plan.md');
+  const archivedPlan = path.resolve(__dirname, '../../archive/plans/260919-coordination-skill-harness-simplification/plan.md');
+  const trackPlan = fs.existsSync(activePlan) ? activePlan : archivedPlan;
   assert.ok(fs.existsSync(trackPlan), 'fixture plan.md must exist in this checkout');
   const cwd = tmpCwd();
   const result = run(cwd, ['plan-lint', trackPlan]);

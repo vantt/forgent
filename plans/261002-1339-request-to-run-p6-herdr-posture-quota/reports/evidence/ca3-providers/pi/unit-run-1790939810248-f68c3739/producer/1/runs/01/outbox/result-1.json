@@ -1,0 +1,4 @@
+{"contract":{"id":"agent-result-claim","version":2},
+ "status": "done",
+ "summary": "Completed read-only posture and account probe successfully; commands (1) and (2) failed as expected on read-only FS providing evidence, env vars and codex status reported without any repo modifications.",
+ "evidenceRefs": ["/home/vantt/projects/forgentX-p6/.fgos/assignments/unit-run-1790939810248-f68c3739/producer/1/runs/01/outbox/report-1.md"]}
