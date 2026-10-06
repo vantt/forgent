@@ -145,6 +145,7 @@ function compilePattern(pattern) {
     regex: new RegExp(`^${source}$`),
     stars: segments.filter((s) => s === '**').length,
     placeholders: placeholdersOf(pattern).length,
+    segments: segments.length,
   };
 }
 
@@ -162,7 +163,7 @@ function compiledPlacements(constitution) {
 /**
  * Finds the one document kind a path belongs to. A header carrying a kind's
  * marker wins outright; otherwise the most specific matching pattern wins
- * (fewest `**`, then fewest placeholders). Equally specific patterns of
+ * (fewest `**`, then most path segments, then fewest placeholders). Equally specific patterns of
  * different kinds are ambiguous. `<area>` never binds a reserved directory.
  */
 export function classifyPath(filePath, constitution, { header = '' } = {}) {
@@ -179,7 +180,7 @@ export function classifyPath(filePath, constitution, { header = '' } = {}) {
     matches.push(entry);
   }
   if (matches.length === 0) return { kind: null, ambiguous: [] };
-  const score = (e) => e.stars * 100 + e.placeholders;
+  const score = (e) => e.stars * 1000 - e.segments * 10 + e.placeholders;
   const best = Math.min(...matches.map(score));
   const kinds = [...new Set(matches.filter((e) => score(e) === best).map((e) => e.kindId))];
   return kinds.length === 1 ? { kind: kinds[0], ambiguous: [] } : { kind: null, ambiguous: kinds };
@@ -192,15 +193,64 @@ export function checkPlacement(files, constitution, readHeader) {
   const leftovers = [];
   const exceptions = [];
   const ambiguous = [];
+  const evidenceWithoutOwner = [];
+  const present = new Set(files);
   let matched = 0;
   for (const file of files) {
     const { kind, ambiguous: clash } = classifyPath(file, constitution, { header: readHeader(file) });
-    if (kind) { matched += 1; byKind[kind] = (byKind[kind] || 0) + 1; }
+    if (kind) {
+      matched += 1;
+      byKind[kind] = (byKind[kind] || 0) + 1;
+      const owner = (constitution.documentKinds || []).find((k) => k.id === kind)?.ownedBy;
+      if (owner) {
+        const parts = file.split('/');
+        const at = parts.indexOf(owner.ancestorDirectory);
+        if (at < 0 || !present.has(`${parts.slice(0, at + 1).join('/')}/${owner.file}`)) evidenceWithoutOwner.push(file);
+      }
+    }
     else if (clash.length) ambiguous.push(`${file}: ${clash.join(', ')}`);
     else if (exceptionPaths.has(file)) exceptions.push(file);
     else leftovers.push(file);
   }
-  return { files: files.length, matched, leftovers, exceptions, ambiguous, byKind };
+  return { files: files.length, matched, leftovers, exceptions, ambiguous, evidenceWithoutOwner, byKind };
+}
+
+/** Fields of the "Required baseline" block of doc-governance.md §5, read from the file so they are never copied. */
+export function governanceBaselineFields(repoRoot) {
+  const file = path.resolve(repoRoot, 'docs/doc-governance.md');
+  if (!fs.existsSync(file)) return [];
+  const text = fs.readFileSync(file, 'utf8');
+  const start = text.indexOf('Required baseline:');
+  const block = start >= 0 ? text.slice(start).match(/```txt\n([\s\S]*?)\n```/) : null;
+  return block ? block[1].split('\n').map((l) => l.replace(/:\s*$/, '').trim()).filter(Boolean) : [];
+}
+
+function headerFields(text) {
+  const block = text.match(/^# .+\n+```txt\n([\s\S]*?)\n```/m);
+  return block ? new Set([...block[1].matchAll(/^([A-Za-z][A-Za-z ]*):/gm)].map((m) => m[1])) : null;
+}
+
+/** Report-only: which canonical documents lack which promotion-gate header fields. */
+export function checkPromotion(files, constitution, readFile, repoRoot) {
+  const promotion = constitution.requiredMetadata?.promotionFields || {};
+  const required = [...governanceBaselineFields(repoRoot), ...(promotion.extra || [])];
+  const missingByField = Object.fromEntries(required.map((f) => [f, 0]));
+  const result = { canonicalDocuments: 0, complete: 0, headerless: 0, headeredIncomplete: 0, headeredDocuments: 0, evidencePayloads: 0, headerlessPaths: [], missingByField, incomplete: [] };
+  for (const file of files) {
+    const text = readFile(file);
+    const { kind } = classifyPath(file, constitution, { header: text.slice(0, 800) });
+    const kindSpec = (constitution.documentKinds || []).find((k) => k.id === kind);
+    if (kindSpec?.metadataExempt) { result.evidencePayloads += 1; continue; }
+    if (!kindSpec?.canonical) continue;
+    result.canonicalDocuments += 1;
+    const fields = headerFields(text);
+    if (!fields) { result.headerless += 1; result.headerlessPaths.push(file); } else result.headeredDocuments += 1;
+    const missing = required.filter((f) => !fields?.has(f));
+    for (const f of missing) result.missingByField[f] += 1;
+    if (missing.length === 0) result.complete += 1;
+    else if (fields) { result.headeredIncomplete += 1; result.incomplete.push({ path: file, missing }); }
+  }
+  return result;
 }
 
 function governanceHeadings(repoRoot) {
@@ -246,6 +296,10 @@ export function validateConstitution(constitution, vocabulary, { repoRoot = proc
     if (!nonEmptyString(kind.typeName)) add('malformed-kind', `document kind ${kind.id}: needs a typeName`);
     else if (typeNames.has(kind.typeName.toLowerCase())) add('duplicate-type-name', `document kind ${kind.id}: typeName "${kind.typeName}" is already used`);
     typeNames.add(String(kind.typeName).toLowerCase());
+    if (kind.metadataExempt) {
+      if (kind.canonical) add('exempt-kind-canonical', `document kind ${kind.id}: a metadata-exempt kind must not be canonical (evidence is not authority)`);
+      if (!nonEmptyString(kind.ownedBy?.ancestorDirectory) || !nonEmptyString(kind.ownedBy?.file)) add('exempt-kind-missing-owner', `document kind ${kind.id}: a metadata-exempt kind needs ownedBy.ancestorDirectory and ownedBy.file`);
+    }
     if (typeof kind.canonical !== 'boolean') add('malformed-kind', `document kind ${kind.id}: canonical must be a boolean`);
     for (const ck of kind.claimKinds || []) {
       if (!claimKindIds.has(ck) || ck === 'unclassified') add('unknown-claim-kind', `document kind ${kind.id}: claim kind "${ck}" is not a usable vocabulary claim kind`);
@@ -291,12 +345,22 @@ export function validateConstitution(constitution, vocabulary, { repoRoot = proc
   // Required metadata.
   const metadata = constitution?.requiredMetadata || {};
   const seenFields = new Map();
-  for (const list of ['promotedCore', 'governanceBaselineExtra', 'generatedExtra']) {
+  for (const list of ['candidateCore', 'generatedExtra']) {
     if (!Array.isArray(metadata[list]) || metadata[list].length === 0) { add('malformed-metadata', `requiredMetadata.${list} must be a non-empty array`); continue; }
     for (const field of metadata[list]) {
       if (seenFields.has(field)) add('duplicate-metadata-field', `metadata field "${field}" is in both ${seenFields.get(field)} and ${list}`);
       seenFields.set(field, list);
     }
+  }
+  const baseline = governanceBaselineFields(repoRoot);
+  for (const field of metadata.candidateCore || []) {
+    if (baseline.length > 0 && !baseline.includes(field)) add('candidate-core-not-in-baseline', `candidate field "${field}" is not in the doc-governance.md required baseline`);
+  }
+  const promotion = metadata.promotionFields;
+  if (!promotion || !nonEmptyString(promotion.governanceRef) || !Array.isArray(promotion.extra) || promotion.extra.length === 0) add('malformed-promotion-fields', 'requiredMetadata.promotionFields needs governanceRef and a non-empty extra list');
+  else {
+    if (baseline.length === 0) add('governance-baseline-unreadable', 'the required baseline block of doc-governance.md could not be read');
+    for (const field of promotion.extra) if (baseline.includes(field)) add('promotion-extra-duplicates-baseline', `promotion field "${field}" is already in the governance baseline`);
   }
   if (!nonEmptyString(metadata.candidateMarker?.source) || !nonEmptyString(metadata.candidateMarker?.rule)) add('malformed-candidate-marker', 'requiredMetadata.candidateMarker needs a source and a rule; Design status text is not a marker');
   if (!Array.isArray(metadata.structure) || metadata.structure.length === 0) add('malformed-metadata', 'requiredMetadata.structure must be a non-empty array');
@@ -539,6 +603,10 @@ function regenerateCommand() {
   return `node scripts/generate-doc-inventory.mjs --commit <commit> --identity-registry ${IDENTITY_REGISTRY_PATH} --json-out ${DEFAULT_INVENTORY_PATH} --md-out ${DEFAULT_INVENTORY_PATH.replace(/\.json$/, '.md')}`;
 }
 
+function trackedPlatformDocs(repoRoot) {
+  return execFileSync('git', ['ls-files', 'docs/platform'], { cwd: repoRoot, encoding: 'utf8', maxBuffer: 20 * 1024 * 1024 }).split('\n').filter((f) => f.endsWith('.md'));
+}
+
 function formatCounts(counts) {
   return Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([key, n]) => `    ${key}: ${n}`);
 }
@@ -592,16 +660,23 @@ export function runCli(argv, cwd = process.cwd()) {
 
   let placement = null;
   if (argv.includes('--check-placement') && fatalFindings.length === 0) {
-    const tracked = execFileSync('git', ['ls-files', 'docs/platform'], { cwd: repoRoot, encoding: 'utf8', maxBuffer: 20 * 1024 * 1024 }).split('\n').filter((f) => f.endsWith('.md'));
+    const tracked = trackedPlatformDocs(repoRoot);
     const readHeader = (file) => {
       try { return fs.readFileSync(path.resolve(repoRoot, file), 'utf8').slice(0, 800); } catch { return ''; }
     };
     placement = checkPlacement(tracked, constitution, readHeader);
   }
-  const placementProblems = placement ? placement.leftovers.length + placement.ambiguous.length : 0;
+  let promotion = null;
+  if (argv.includes('--promotion') && fatalFindings.length === 0) {
+    const tracked = trackedPlatformDocs(repoRoot);
+    promotion = checkPromotion(tracked, constitution, (file) => {
+      try { return fs.readFileSync(path.resolve(repoRoot, file), 'utf8'); } catch { return ''; }
+    }, repoRoot);
+  }
+  const placementProblems = placement ? placement.leftovers.length + placement.ambiguous.length + placement.evidenceWithoutOwner.length : 0;
   const fatal = fatalFindings.length > 0 || (strictRows && placementProblems > 0) || (strictRows && ledger !== null && (ledger.invalid > 0 || ledger.itemSummary.undefinedTotal > 0 || ledger.itemSummary.dispositionClassMismatch.count > 0));
   if (asJson) {
-    console.log(JSON.stringify({ fatalFindings, ledger, placement }, null, 2));
+    console.log(JSON.stringify({ fatalFindings, ledger, placement, promotion }, null, 2));
     return fatal ? 1 : 0;
   }
   if (fatalFindings.length > 0) {
@@ -615,8 +690,13 @@ export function runCli(argv, cwd = process.cwd()) {
     `${constitution.documentKinds.length} document kinds, ${constitution.deferredToEngine.length} deferred items).`
   );
   if (placement) {
-    console.log(`check-doc-constitution: placement: ${placement.files} files, ${placement.matched} matched, ${placement.leftovers.length} leftover, ${placement.ambiguous.length} ambiguous (${placement.exceptions.length} recorded exception(s))`);
-    for (const line of [...placement.leftovers, ...placement.ambiguous]) console.log(`    ${line}`);
+    console.log(`check-doc-constitution: placement: ${placement.files} files, ${placement.matched} matched, ${placement.leftovers.length} leftover, ${placement.ambiguous.length} ambiguous, ${placement.evidenceWithoutOwner.length} evidence without index (${placement.exceptions.length} recorded exception(s))`);
+    for (const line of [...placement.leftovers, ...placement.ambiguous, ...placement.evidenceWithoutOwner]) console.log(`    ${line}`);
+  }
+  if (promotion) {
+    console.log(`check-doc-constitution: promotion: ${promotion.canonicalDocuments} canonical documents, ${promotion.complete} complete, ${promotion.headerless} headerless, ${promotion.headeredIncomplete} headered with missing fields (report only; ${promotion.headeredDocuments} headered, ${promotion.evidencePayloads} evidence payloads exempt)`);
+    for (const file of promotion.headerlessPaths.slice(0, 20)) console.log(`    headerless: ${file}`);
+    console.log(`    missing by field: ${JSON.stringify(promotion.missingByField)}`);
   }
   if (ledger) {
     console.log(`check-doc-constitution: ledger rows: ${ledger.rows}, valid: ${ledger.valid}, invalid: ${ledger.invalid}`);

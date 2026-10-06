@@ -102,5 +102,47 @@ One path matches no kind: `docs/platform/migration-authoring-rules.md` (temporar
 | same with `--strict-rows --check-placement` | exit 0 |
 | `check-doc-inventory-gates.mjs`, `check-legacy-docs-ratchet.mjs` | exit 0 |
 
-Status: DONE_WITH_CONCERNS
-Summary: All red-team fixes except the metadata field list are applied; every Markdown file under `docs/platform/**` classifies to one kind or a recorded exception. Concern: the six-versus-twelve metadata decision is still the owner's.
+## 8. Metadata Decision (a)
+
+Owner decision 2026-10-06, implemented: candidate material needs six fields (`candidateCore`); promotion and every canonical document at the cutover need the governance §5 baseline plus `Supersedes` and `Superseded by` (`promotionFields`). The baseline is derived from `docs/doc-governance.md` by the validator (`governanceBaselineFields`), not copied; the constitution references it with `governanceRef`. The retirement gate gained `reviewed-rationale` (a row reviewed at cutover carries its own rationale) and `canonical-metadata-complete`. Open question 1 of section 6 is closed.
+
+Promotion report (`--no-ledger --promotion`, report only, never fatal, measured on the plan branch):
+
+| Measure | Count |
+|---|---:|
+| Canonical Markdown documents under `docs/platform/**` | 408 |
+| Headerless (mostly verification proofs) | 352 |
+| Headered | 56 |
+| Headered and missing some promotion field | 56 |
+| Complete | 0 |
+| Missing `Supersedes` and `Superseded by` | 408 |
+| Missing `Canonical for` and the other five governance extras | 403 (5 carry them) |
+
+The Lead's estimate was about 59 of 72 headered documents; the difference is the supersession fields, which no document carries, and that the 72 include non-canonical kinds (history, proposals, roadmaps). Gaps are filled in Phase 6.
+
+Results: 52 tests pass in the file (671 earlier across `test/scripts`; re-run below); validator normal, `--strict-rows`, `--check-placement` and `--promotion` exit 0; ratchet exit 0.
+
+## 9. Evidence Payloads Are Not A Canonical Kind
+
+Lead decision (plan §3 item 10: evidence is not authority). New kind `evidence-payload` (24 kinds now): not canonical, `metadataExempt`, owned by the nearest `verification/README.md` of the area. Patterns: `docs/platform/verification/<collection>/**`, `<A>verification/<collection>/**`, `<S>verification/<collection>/**`, i.e. anything nested below a `verification` directory; top-level files of `verification/` stay `verification` (canonical). Classification is by location, never by missing header. The pattern tie-break now prefers more path segments (after fewer `**`), so the nested pattern beats `verification/**`. The validator rejects an exempt kind that is canonical or has no owner rule, and `--check-placement` lists evidence whose verification README is missing (0 now).
+
+Measured on the plan branch:
+
+| Check | Result |
+|---|---|
+| `--check-placement` | 440 files, 439 exactly one kind, 0 leftover, 0 ambiguous, 0 evidence without index, 1 recorded exception |
+| Evidence payloads (exempt) | 302 |
+| Canonical documents | 106 (was 408) |
+| Canonical headerless | 50 |
+| Canonical headered, all with missing fields | 56 |
+| Complete | 0 |
+| Missing `Supersedes` / `Superseded by` | 106 / 106 |
+| Missing `Canonical for` and the five other baseline extras | 101 (5 carry them) |
+| Missing the six candidate fields | 50 |
+
+Headerless files the evidence rule did not classify (all canonical kinds, so correctly shown as missing metadata; all in agent-coordination, none are proofs): architecture 14, decisions 12, playbooks 9, contracts 5, vocabulary 4, and one each of `history/README.md`, `intent-preservation-ledger.md`, `proposals/README.md`, `roadmap/README.md`, `verification/README.md`, `vision.md`. The only one under `verification/` is the area's own `README.md`, the index that owns the evidence. Use `--promotion --json` for the full path list.
+
+Results: 56 tests pass in the file; all `test/scripts` tests, validator (normal, `--strict-rows`, `--check-placement`, `--promotion`), gates and ratchet re-run below.
+
+Status: DONE
+Summary: Proof payloads are an exempt evidence kind assigned by location; every area's verification README stays canonical and now stands out as headerless. Canonical documents drop from 408 to 106 and the placement check still classifies all 440 files.

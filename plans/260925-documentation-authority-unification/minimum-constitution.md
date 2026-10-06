@@ -49,7 +49,7 @@ copy.
 
 ## 2. Document Kinds And Placement
 
-Twenty-three document kinds. Each has placement patterns or, for `redirect-stub`, a header marker. A pattern may use
+Twenty-four document kinds. Each has placement patterns or, for `redirect-stub`, a header marker. A pattern may use
 `<area>`, `<subcomponent>`, `<collection>`, `<name>` and `<feature>` (one path segment each) and `**` (one or more segments). Cardinality
 `singleton` means one canonical document per scope instance (the registry
 invariant); `collection` means many documents, each with its own topic. Either
@@ -79,10 +79,19 @@ way one claim has one owner.
 | `generated-doc` | `docs/generated/**` and declared generator outputs | collection | no |
 | `history` | `docs/platform/history/**`, `<A>history/**`, `<S>history/**`, `docs/history/<feature>/**` | collection | no |
 | `knowledge` | `docs/knowledge/**` | collection | no |
+| `evidence-payload` | `docs/platform/verification/<collection>/**`, `<A>verification/<collection>/**`, `<S>verification/<collection>/**` | collection | no (metadata exempt) |
 | `redirect-stub` | none; header marker `Document type: Redirect` | collection | no |
 
+Evidence is not authority (plan §3 item 10). Proof, run and report files nested
+below a `verification` directory are `evidence-payload` documents: not canonical,
+exempt from candidate and promotion metadata, owned by the nearest `verification/README.md`
+of the area (which stays a canonical `collection-index` and keeps the promotion
+requirement). The kind is assigned by location only; a headerless file anywhere else
+still counts as missing metadata. `--check-placement` also reports evidence whose
+verification index is missing.
+
 Each path belongs to exactly one kind. A kind's header marker wins; otherwise the
-most specific pattern wins (fewest `**`, then fewest placeholders), and equally
+most specific pattern wins (fewest `**`, then most path segments, then fewest placeholders), and equally
 specific patterns of different kinds are an error. The directories `contracts`,
 `decisions`, `verification`, `history` and `proposals` directly under
 `docs/platform/` are platform-wide collections and never area names.
@@ -129,22 +138,26 @@ and are listed as unmapped for an owner decision:
 ## 3. Required Metadata
 
 A maintained or candidate document under `docs/platform/**` opens with a fenced
-`txt` header directly under its single H1.
+`txt` header directly under its single H1. Owner decision of 2026-10-06: two
+levels.
 
-| Level | Fields |
-|---|---|
-| Required (promoted core) | Document type, Audience, Purpose, Design status, Last reviewed, Related |
-| Recommended (rest of the governance baseline) | Implementation, Provenance, Writer type, Canonical for, Use this when, Do not use this for |
-| Generated documents add | Source of truth, Generator, Generator version, Generated at, Freshness check, Do not edit |
+| Level | Applies to | Fields |
+|---|---|---|
+| Candidate core | Candidate material during migration | Document type, Audience, Purpose, Design status, Last reviewed, Related |
+| Promotion fields | A candidate becoming canonical, and every maintained canonical document at the cutover | The whole "Required baseline" of [doc-governance.md §5](../../docs/doc-governance.md) (twelve fields, including `Canonical for`), read from that file by the validator and not copied here, plus `Supersedes` and `Superseded by` |
+| Generated documents add | Generated documents | Source of truth, Generator, Generator version, Generated at, Freshness check, Do not edit |
 
-Evidence for the required level: on the plan branch, 72 documents under
-`docs/platform/**` carry a header. All 72 carry the six core fields, including
-the three promoted area portals. Only 13 carry all twelve governance baseline
-fields (the promoted agent-coordination portal among them; the other two
-promoted portals carry six). Requiring twelve would reject two of the three
-promoted portals, so the constitution requires the six. This differs from
-[doc-governance.md §5](../../docs/doc-governance.md), which names twelve; it is
-listed as an open question in the report.
+`doc-governance.md` is not edited. Evidence for the candidate level: 72 documents
+under `docs/platform/**` carry a header, all 72 carry the six core fields
+(including the three promoted portals), and only 13 carry the whole governance
+baseline (measured by script on the plan branch, 2026-10-06).
+
+Promotion gap report (report only, not fatal): `node scripts/check-doc-constitution.mjs
+--no-ledger --promotion`. Of 440 Markdown files under `docs/platform/**`, 302 are
+evidence payloads (exempt) and 106 are canonical documents. Of those 106, 56 carry a
+header and 50 do not; none carries the whole promotion list, because none has
+`Supersedes` or `Superseded by`, and only 5 carry the twelve baseline fields. The
+gaps are filled during the area transformation.
 
 Structure rules from governance §10 and §5: exactly one H1, sections start at
 H2 and are numbered in maintained canonical documents, and every path in
@@ -195,7 +208,7 @@ Promotion is atomic for the whole platform-documentation system (plan §3, item
 |---|---|
 | Every retained claim has exactly one target owner and no `unknown-blocking` row remains | [check-doc-inventory-gates.mjs](../../scripts/check-doc-inventory-gates.mjs) |
 | No unreviewed legacy growth | [check-legacy-docs-ratchet.mjs](../../scripts/check-legacy-docs-ratchet.mjs) |
-| Required metadata and placement | planned: candidate-status metadata check |
+| Candidate fields on candidate material, promotion fields on a document becoming canonical, and placement | candidate fields: planned check; promotion fields: reported by `check-doc-constitution.mjs --promotion` |
 | Relative links and `Related` paths resolve | planned: candidate-status metadata check |
 | Every claim row is `reviewed` | planned: conservation checker |
 | Intent ledger updated when a vision is narrowed; component-boundary check recorded | review (governance §8, §11) |
@@ -214,6 +227,8 @@ A legacy source is deleted or redirected only at the cutover and only when:
 | Relocated evidence matches its digests | planned: evidence relocation policy and consumer proof |
 | Every previous claim identity is present or has a recorded removal | planned: conservation checker |
 | Rows that share a `semanticClaimId` name one distinct owner | planned: conservation checker |
+| Every canonical document carries all promotion fields | [check-doc-constitution.mjs](../../scripts/check-doc-constitution.mjs) `--promotion` |
+| A row reviewed at cutover carries its own reviewed rationale, not the item's `proposedRationale` fallback | planned: retirement-check dry-run |
 | The ledger validator passes in cutover mode (owner, anchor, classified kind, reviewed; usage drift fatal) | planned: retirement-check dry-run |
 | The legacy ratchet is clean | [check-legacy-docs-ratchet.mjs](../../scripts/check-legacy-docs-ratchet.mjs) |
 | The cutover runs under the documentation-cutover lease | planned: lease design |

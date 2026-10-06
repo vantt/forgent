@@ -16,6 +16,8 @@ import {
   summarizeItems,
   classifyPath,
   checkPlacement,
+  governanceBaselineFields,
+  checkPromotion,
   runCli,
 } from '../../scripts/check-doc-constitution.mjs';
 
@@ -413,7 +415,7 @@ test('placement: each path matches exactly one kind, most specific pattern first
   const kindOf = (p, header = '') => classifyPath(p, constitution, { header });
   assert.equal(kindOf('docs/platform/README.md').kind, 'platform-portal');
   assert.equal(kindOf('docs/platform/agent-coordination/README.md').kind, 'area-portal');
-  assert.equal(kindOf('docs/platform/agent-coordination/verification/panel/P01/p01.md').kind, 'verification');
+  assert.equal(kindOf('docs/platform/agent-coordination/verification/panel/P01/p01.md').kind, 'evidence-payload');
   assert.equal(kindOf('docs/platform/agent-coordination/verification/README.md').kind, 'collection-index');
   assert.equal(kindOf('docs/platform/agent-coordination/subcomponents/README.md').kind, 'collection-index');
   assert.equal(kindOf('docs/platform/agent-coordination/playbooks/prompts/a.md').kind, 'guide-runbook');
@@ -515,4 +517,99 @@ test('cli: a row rationale may come from its inventory item', () => {
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
+});
+
+test('governance baseline fields are derived from doc-governance, not copied', () => {
+  const fields = governanceBaselineFields(REPO_ROOT);
+  assert.equal(fields.length, 12);
+  assert.ok(fields.includes('Canonical for'));
+  assert.deepEqual(constitution.requiredMetadata.promotionFields.extra, ['Supersedes', 'Superseded by']);
+  assert.equal(constitution.requiredMetadata.promotionFields.governanceRef, '5. Metadata');
+  assert.equal(constitution.requiredMetadata.governanceBaselineExtra, undefined);
+});
+
+test('constitution: candidate fields outside the governance baseline and bad promotion fields are reported', () => {
+  const broken = clone(constitution);
+  broken.requiredMetadata.candidateCore.push('Not A Governance Field');
+  broken.requiredMetadata.promotionFields.extra.push('Purpose');
+  const found = types(validateConstitution(broken, vocabulary, { repoRoot: REPO_ROOT }));
+  assert.ok(found.includes('candidate-core-not-in-baseline'));
+  assert.ok(found.includes('promotion-extra-duplicates-baseline'));
+  const missing = clone(constitution);
+  delete missing.requiredMetadata.promotionFields;
+  assert.ok(types(validateConstitution(missing, vocabulary, { repoRoot: REPO_ROOT })).includes('malformed-promotion-fields'));
+});
+
+test('promotion report lists the fields each canonical document lacks', () => {
+  const header = (fields) => `# Title\n\n\`\`\`txt\n${fields.map((f) => `${f}: x`).join('\n')}\n\`\`\`\n`;
+  const all = [...governanceBaselineFields(REPO_ROOT), 'Supersedes', 'Superseded by'];
+  const docs = {
+    'docs/platform/README.md': header(all),
+    'docs/platform/vision.md': header(constitution.requiredMetadata.candidateCore),
+    'docs/platform/architecture-map.md': '# No header\n',
+    'docs/platform/proposals/p.md': header(['Purpose']),
+  };
+  const result = checkPromotion(Object.keys(docs), constitution, (f) => docs[f], REPO_ROOT);
+  assert.equal(result.canonicalDocuments, 3);
+  assert.equal(result.complete, 1);
+  assert.equal(result.headerless, 1);
+  assert.equal(result.headeredIncomplete, 1);
+  assert.equal(result.evidencePayloads, 0);
+  assert.equal(result.missingByField['Canonical for'], 2);
+  assert.equal(result.missingByField['Supersedes'], 2);
+  assert.equal(result.missingByField['Purpose'], 1);
+});
+
+test('cli: the promotion report is informational and never fatal', () => {
+  const { code, out } = captureCli(['--no-ledger', '--promotion', '--strict-rows']);
+  assert.equal(code, 0);
+  assert.match(out, /promotion: \d+ canonical documents, \d+ complete, \d+ headerless, \d+ headered with missing fields/);
+});
+
+test('constitution: the retirement gate requires an own reviewed rationale', () => {
+  assert.ok(constitution.retirementGate.checks.map((c) => c.id).includes('reviewed-rationale'));
+});
+
+test('evidence payloads are classified by location, not by missing header', () => {
+  const kindOf = (p) => classifyPath(p, constitution).kind;
+  assert.equal(kindOf('docs/platform/agent-coordination/verification/panel/proofs/P01/p01.md'), 'evidence-payload');
+  assert.equal(kindOf('docs/platform/agent-coordination/verification/panel/index.md'), 'evidence-payload');
+  assert.equal(kindOf('docs/platform/agent-coordination/subcomponents/s/verification/run/a.md'), 'evidence-payload');
+  assert.equal(kindOf('docs/platform/verification/run/a.md'), 'evidence-payload');
+  assert.equal(kindOf('docs/platform/agent-coordination/verification/implementation-alignment.md'), 'verification');
+  assert.equal(kindOf('docs/platform/agent-coordination/verification/README.md'), 'collection-index');
+  assert.equal(kindOf('docs/platform/agent-coordination/architecture/deep/a.md'), 'architecture');
+  const evidence = constitution.documentKinds.find((k) => k.id === 'evidence-payload');
+  assert.equal(evidence.canonical, false);
+  assert.equal(evidence.metadataExempt, true);
+});
+
+test('placement check reports evidence whose verification index is missing', () => {
+  const evidence = 'docs/platform/a/verification/run/p.md';
+  const owned = checkPlacement(['docs/platform/a/verification/README.md', evidence], constitution, () => '');
+  assert.deepEqual(owned.evidenceWithoutOwner, []);
+  const orphan = checkPlacement([evidence], constitution, () => '');
+  assert.deepEqual(orphan.evidenceWithoutOwner, [evidence]);
+});
+
+test('promotion report skips evidence payloads but lists other headerless canonical files', () => {
+  const docs = {
+    'docs/platform/a/verification/run/p.md': '# Proof\n',
+    'docs/platform/a/verification/README.md': '# Index\n',
+    'docs/platform/a/architecture/x.md': '# Arch\n',
+  };
+  const result = checkPromotion(Object.keys(docs), constitution, (f) => docs[f], REPO_ROOT);
+  assert.equal(result.canonicalDocuments, 2);
+  assert.equal(result.evidencePayloads, 1);
+  assert.deepEqual(result.headerlessPaths.sort(), ['docs/platform/a/architecture/x.md', 'docs/platform/a/verification/README.md']);
+});
+
+test('constitution: an evidence kind that is canonical or has no owner rule is reported', () => {
+  const broken = clone(constitution);
+  const evidence = broken.documentKinds.find((k) => k.id === 'evidence-payload');
+  evidence.canonical = true;
+  delete evidence.ownedBy;
+  const found = types(validateConstitution(broken, vocabulary, { repoRoot: REPO_ROOT }));
+  assert.ok(found.includes('exempt-kind-canonical'));
+  assert.ok(found.includes('exempt-kind-missing-owner'));
 });

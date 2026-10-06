@@ -534,6 +534,37 @@
           "per": "area"
         }
       ]
+    },
+    {
+      "id": "evidence-payload",
+      "typeName": "Evidence payload",
+      "introduced": true,
+      "authorityClass": "evidence",
+      "canonical": false,
+      "metadataExempt": true,
+      "claimKinds": [],
+      "ownedBy": {
+        "ancestorDirectory": "verification",
+        "file": "README.md"
+      },
+      "note": "Proof, run and report files nested below a verification directory. Evidence is not authority (plan §3 item 10): exempt from candidate and promotion metadata, owned by the nearest verification README.md of the area, which stays canonical. Classified by location only; a headerless file elsewhere is still reported as missing metadata.",
+      "placements": [
+        {
+          "pattern": "docs/platform/verification/<collection>/**",
+          "cardinality": "collection",
+          "per": "platform"
+        },
+        {
+          "pattern": "docs/platform/<area>/verification/<collection>/**",
+          "cardinality": "collection",
+          "per": "area"
+        },
+        {
+          "pattern": "docs/platform/<area>/subcomponents/<subcomponent>/verification/<collection>/**",
+          "cardinality": "collection",
+          "per": "subcomponent"
+        }
+      ]
     }
   ],
   "documentTypeAliases": {
@@ -690,9 +721,9 @@
     }
   ],
   "requiredMetadata": {
-    "appliesTo": "Every maintained canonical document and every candidate document under docs/platform/**.",
+    "appliesTo": "Candidate material during migration needs candidateCore; the promotion gate and every maintained canonical document at the cutover need promotionFields.",
     "headerForm": "A fenced txt block directly under the H1 with plain `Field: value` lines.",
-    "promotedCore": [
+    "candidateCore": [
       "Document type",
       "Audience",
       "Purpose",
@@ -700,14 +731,15 @@
       "Last reviewed",
       "Related"
     ],
-    "governanceBaselineExtra": [
-      "Implementation",
-      "Provenance",
-      "Writer type",
-      "Canonical for",
-      "Use this when",
-      "Do not use this for"
-    ],
+    "promotionFields": {
+      "governanceRef": "5. Metadata",
+      "source": "The Required baseline block of docs/doc-governance.md §5, read from that file by the validator (not copied here).",
+      "extra": [
+        "Supersedes",
+        "Superseded by"
+      ],
+      "note": "Applies to a candidate becoming canonical and to every maintained canonical document at the cutover. Canonical for is part of the baseline. docs/doc-governance.md is not edited."
+    },
     "generatedExtra": [
       "Source of truth",
       "Generator",
@@ -726,10 +758,11 @@
       "relationships listed in the Related field are also markdown links in the body",
       "a document that lists related paths links them with relative markdown links"
     ],
-    "evidence": "The six promotedCore fields are present in all 72 headered documents under docs/platform/** and in all three promoted area portals; the other six fields are present in 13 of them (measured by script on the plan branch, 2026-10-06).",
+    "evidence": "The six candidateCore fields are present in all 72 headered documents under docs/platform/** (measured by script on the plan branch, 2026-10-06) and in all three promoted area portals; only 13 carry the whole governance baseline. Owner decision 2026-10-06: six at migration time, the full baseline plus Supersedes and Superseded by at promotion.",
     "checkedBy": {
-      "kind": "planned",
-      "deliverable": "candidate-status metadata check"
+      "kind": "script",
+      "path": "scripts/check-doc-constitution.mjs",
+      "note": "--promotion reports missing promotion fields (report only); the candidate-field check itself is planned."
     },
     "governanceRef": "5. Metadata"
   },
@@ -821,7 +854,7 @@
       },
       {
         "id": "metadata-and-structure",
-        "rule": "The document meets requiredMetadata and its placement pattern.",
+        "rule": "Candidate material carries candidateCore; a document becoming canonical carries the full promotionFields list and meets its placement pattern.",
         "enforcedBy": {
           "kind": "planned",
           "deliverable": "candidate-status metadata check"
@@ -943,6 +976,22 @@
           "kind": "planned",
           "deliverable": "retirement-check dry-run (validator --cutover mode)"
         }
+      },
+      {
+        "id": "reviewed-rationale",
+        "rule": "A row reviewed at cutover carries its own reviewed rationale on the row; the inventory item's proposedRationale fallback is not enough.",
+        "enforcedBy": {
+          "kind": "planned",
+          "deliverable": "retirement-check dry-run (validator --cutover mode)"
+        }
+      },
+      {
+        "id": "canonical-metadata-complete",
+        "rule": "Every maintained canonical document under docs/platform/** carries all promotionFields (the validator --promotion report lists the gaps).",
+        "enforcedBy": {
+          "kind": "script",
+          "path": "scripts/check-doc-constitution.mjs"
+        }
       }
     ]
   },
@@ -1038,7 +1087,7 @@
     ],
     "definition": "Directory names directly under docs/platform/ that hold platform-wide collections; they are never area names."
   },
-  "placementPrecedence": "Each path belongs to exactly one document kind. A header marker of a kind wins; otherwise the most specific matching pattern wins (fewest ** segments, then fewest placeholders). Equally specific patterns of different kinds are an error. <placeholder> matches one path segment (inside a segment it matches the rest of the name); ** matches one or more segments.",
+  "placementPrecedence": "Each path belongs to exactly one document kind. A header marker of a kind wins; otherwise the most specific matching pattern wins (fewest ** segments, then most path segments, then fewest placeholders). Equally specific patterns of different kinds are an error. <placeholder> matches one path segment (inside a segment it matches the rest of the name); ** matches one or more segments.",
   "placementExceptions": [
     {
       "path": "docs/platform/migration-authoring-rules.md",
