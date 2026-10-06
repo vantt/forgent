@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `fgos metrics coverage` reports assignment-run coverage and skip reasons; `fgos doctor` compares it with an independent directory scan and identifies older hosts as degraded.
 - `fgos metrics discussions` reads writer-owned settled Unit summaries: seat/attempt/fallback accounting, workflow grouping, duration, and passive stance agreement. `workflow start --stance-options "a|b|c"` supplies answer options; missing or malformed stance never rejects worker output. `scripts/backfill-unit-summaries.mjs` adds historical summaries without rewriting original results.
+- `fgos run --unit <file> --stance-options "a|b|c"` declares the same answer options for a single Unit. Combining `--stance-options` with `fgos run --resume <unitRunId>` is refused with exit 4 (the stored question is immutable) instead of silently ignoring the new options.
 - `fgos metrics eval record|list` stores per-writer append-only evaluation records with 0–2 rubric scores and harness/question filters. Blind A/B evaluation instructions keep setup identities outside judge inputs.
 
 - A Workflow unit template can declare `inputs: [{ step, sameSeat?, label? }]` to choose which earlier steps' results it receives (without it, every step it builds on, as before). `sameSeat: true` hands each role of a panel the result its own seat left in that step, copied into its own directory as `own-previous.md`, and the brief names it as the role's own earlier result without naming other seats. `delphi` round 2 now gives each panelist the anonymized group summary and its own round 1 proposal instead of every round 1 proposal.
@@ -24,6 +25,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `fgos metrics discussions` needs at least two valid stance votes before it reports agreement or a genuine split; fewer is `unmeasured` and the stance counters are kept.
+- Unit summaries are now contract v2 (`unit-summary.read.v2`). A legacy unit with no recorded pattern is published as `outcome: "undetermined"` with seats of `kind: "unknown"` instead of being derived as solo, and `metrics discussions` reports `unitsUndetermined` and leaves such units out of `passRate` and `unitsFailed`. Summaries of another version are skipped as `unsupported-version`. About 46 older forgentX units are now `undetermined` because nothing records their pattern.
+- `scripts/backfill-unit-summaries.mjs` only fills in missing summaries by default and reports stale ones; the new `--regenerate` rewrites stale summaries and removes the ones that can no longer be established. Active units are never touched.
+- Run observations, `metrics coverage` and the doctor run-coverage check skip a run whose settlement time is not a valid RFC3339 instant as `invalid-timestamp` instead of counting it in every time window, and a run whose mtime is more than 60 seconds in the future is no longer treated as recent.
 - Discussion comparison guidance now includes actual selected-argv/SDK/scratch auditing, normal private-home account provisioning, and prior-result access checks; historical confounded scores remain distinct from new independent evals.
 
 - The pre-commit guard that refuses a commit making a `.fgos/` file shorter than HEAD now applies only to the append-only logs (`.fgos/**/*.jsonl`), which is what it was built and tested for: a stale worktree's older log must not replace main's newer one. A config or state file such as `.fgos/config.json` is edited on purpose and may lose lines.
@@ -36,6 +41,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- A failure to record a unit's failed settlement no longer hides the execution error that caused it.
+- `metrics eval record` refusing an invalid eval store now names each offending shard file and line, and how to repair it.
 - Evaluation provenance now distinguishes data-blind judging from actual isolation and discloses cross-arm result access and question deviations; existing real scores are not presented as an independent setup comparison.
 - Discussion measurement uses owner-written voting seat kinds, reports missing/unusable summaries, and treats zero valid votes as unmeasured. Reviewed inline results wait for pattern settlement; peer failures drain siblings, backfill skips active units, and derived-summary I/O does not turn a successful unit into failure.
 - Run inspection, `dispatch show-run`, the running-run reconciler and Observe discover nested execution-core assignments through the bounded run-layout rule. Traversal stops at attempt directories, so planted runs inside worker outboxes are not enumerated; this is not identity authentication. Show/watch/recover now refuse duplicate run IDs instead of choosing a lexical winner.

@@ -59,8 +59,12 @@ that wrapper only on one side would repeat the old format confound.
 
 ## 2. Blind the judge; distinguish data blindness from isolation
 
-Create a fresh scratch directory **outside `.fgos` and outside the project**
-(for example, using `mktemp -d /tmp/discussion-judge.XXXXXX`). It must contain
+Create a fresh scratch directory **outside `.fgos` and outside the project**,
+under `/var/tmp`, not `/tmp` (for example,
+`scratch=$(mktemp -d /var/tmp/discussion-judge.XXXXXX)`). The confined launch
+mounts an empty tmpfs over `/tmp`, so a `/tmp` scratch is invisible inside the
+sandbox. Confirm the actual SDK cwd in the judge's init event equals the
+scratch path. It must contain
 only two regular files: `A.md` and `B.md`. Make real copies, not symlinks. Keep
 the A/B-to-setup mapping, run metadata, existing scores and output exports
 elsewhere. Randomize the mapping before judging.
@@ -104,11 +108,13 @@ setting sources. `--safe-mode` still permits admin-managed policy; do not
 claim that every setting is disabled. `--bare` is a different mode that skips
 OAuth/keychain authentication, so it is not an interchangeable switch.
 
-The 2026-10-06 [availability canary](../../plans/reports/observe-independent-comparison-261006/isolation-canary.json) is not an A/B judgment. The later [actual comparison judge](../../plans/reports/observe-independent-comparison-261006/completion-judge-evidence.json) retains applied argv, SDK capabilities and an unchanged two-file inventory. Three builtin plugins remain; no complete hidden-instruction inventory is claimed. Native Unit prepared argv/cwd do not alone prove effective execution: compare actual SDK initialization and execution evidence. `dispatch execute` chooses the first CLI invocation when no invocation ID is supplied; editing only a differently named profile does not apply its flags. Preserve referenced IDs and verify the invocation actually selected before a paid run.
+The 2026-10-06 [availability canary](../../plans/reports/observe-independent-comparison-261006/isolation-canary.json) is not an A/B judgment. The later [actual comparison judge](../../plans/reports/observe-independent-comparison-261006/completion-judge-evidence.json) retains applied argv and SDK capabilities; its two-file before/after inventory is a coordinator-authored assertion, not an independently retained listing. That judge profile was a temporary configuration, not a committed one: re-declare and re-audit it each time. Three builtin plugins remain; no complete hidden-instruction inventory is claimed. Native Unit prepared argv/cwd do not alone prove effective execution: compare actual SDK initialization and execution evidence. `dispatch execute` chooses the first CLI invocation when no invocation ID is supplied; editing only a differently named profile does not apply its flags. Preserve referenced IDs and verify the invocation actually selected before a paid run.
 
 A confined Pi worker needs a provisioned writable private authentication runtime: ordinary Pi CLI reads take an adjacent auth-file lock. Redirecting its agent directory without provisioning does not supply credentials. Inspect the owning project's public runner projection for an existing account-backed private-home profile (`PI_CODING_AGENT_DIR` for Pi, `HOME` for agy) and let fgOS's declared account inventory/driver provision the allowlisted files opaquely. Do not manually read/extract/copy credential contents or silently widen host credential-write grants. The earlier readonly failure was configuration, not quota exhaustion or an absent platform mechanism.
 
-Source independence is stronger than hiding sibling runs: old comparisons can still be present in a readable source repository. Use the same immutable current-source packet for both arms, hide previous reports/scores, and audit actual reads. A passing output contract is not evidence that an arm stayed independent; discard contaminated output rather than relabel it or trim its reasoning. The [completed comparison](../../plans/reports/observe-acceptance-fixes-261006.md#independent-comparison-completion--2026-10-06) retains the clean solo, replaces only the contaminated panel, and records all qualification limits.
+Source independence is stronger than hiding sibling runs: old comparisons can still be present in a readable source repository. Use the same immutable current-source packet for both arms, hide previous reports/scores, and audit actual reads. A passing output contract is not evidence that an arm stayed independent; discard contaminated output rather than relabel it or trim its reasoning.
+
+Distinguish two levels and name the one you achieved. **Read-audited**: raw tool calls show no seat read the other arm's output or prior results. **Sandbox-isolated**: no seat *could* read them, because every seat's confinement masks every repository that holds outputs, evidence or prior scores (not only the owning project's run trees). The [completed reference comparison](../../plans/reports/observe-acceptance-fixes-261006.md#cập-nhật-sau-nghiệm-thu-lần-hai) is read-audited only: only one seat masked the evidence repository, and a coordinator file holding one arm's position summary was readable when the other arm launched. Also check what the source packet already concludes: a packet that quotes a decision settled after the historical run changes the evidence condition, even when the question text is byte-identical.
 
 Run from the target project using the fgOS source entry, with a configured
 judge executor and explicit separate project root and scratch cwd:
@@ -151,7 +157,7 @@ avoids accidentally using the old installed release.
 
 After reviewing the judge output, restore the A/B mapping **outside the judge
 session**. Produce one stdin JSON object per evaluated setup, with unique
-`evalId`, free harness label, shared question ID, setup ID, the five real
+`evalId`, free harness label, the shared `question` string, setup ID, the five real
 scores, rubric ID, judge run/setup ID, and the actual `runRefs` array. Exclude
 `v`, `type` and `ts`: Observe owns the envelope and capture time. Keep the judge's
 quoted rationale in the comparison evidence report linked by your judge ID.
@@ -165,11 +171,16 @@ Do not fabricate scores to make an example or a failed live run look complete.
 # eval-a.json / eval-b.json contain the two real, mapped judgments.
 /absolute/path/to/current/fgos metrics eval record --dir /absolute/project/root < eval-a.json
 /absolute/path/to/current/fgos metrics eval record --dir /absolute/project/root < eval-b.json
-/absolute/path/to/current/fgos metrics eval list --question panel-dissent-agreement-261004 --dir /absolute/project/root
-/absolute/path/to/current/fgos metrics eval list --harness=fgos-panel --question=panel-dissent-agreement-261004 --dir /absolute/project/root
+# --question must equal the stored string exactly; here, the full historical objective.
+q="$(jq -r '.objective' plans/reports/council-lens-experiment-261004/unit.json)"
+/absolute/path/to/current/fgos metrics eval list --question "$q" --dir /absolute/project/root
+/absolute/path/to/current/fgos metrics eval list --harness=fgos-panel --question="$q" --dir /absolute/project/root
 ```
 
-`--harness` and `--question` are exact-match, intersecting filters. Inspect the
+`--harness` and `--question` are exact-match, intersecting filters: `--question`
+compares the whole stored `question` string, with no prefix, ID or substring
+matching. Pick one form of the question (a short ID or the full text) before
+recording, and use the same string when filtering. Inspect the
 `fgos.v1` envelope's `data.evals` **and** `data.invalid`: an out-of-range or
 malformed tracked line is reported with shard/line/error and never contributes
 scores, even when it would not match the filters. Fix the evidence source;
