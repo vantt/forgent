@@ -957,7 +957,7 @@
       "claimId": "claim_ce947d10ed900598bde4df5b552e0265",
       "sourceUnitDigest": "c219ee825c3475e6",
       "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
-      "targetAnchor": "entry-fields-and-effect-axes",
+      "targetAnchor": "unheaded-block-31",
       "claimKind": "contract",
       "disposition": "supersede",
       "reviewStatus": "reviewed",
