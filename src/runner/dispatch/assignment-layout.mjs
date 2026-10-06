@@ -91,6 +91,20 @@ export function* listAssignmentRuns(fgosDir) {
   yield* scanAssignmentLayout(fgosDir).runs;
 }
 
+// The same RFC3339 instant grammar the Rust scanner accepts: Observe windows
+// compare settlement instants, so a value outside it fits no window.
+const RFC3339_INSTANT = /^(\d{4})-(\d{2})-(\d{2})[Tt](\d{2}):(\d{2}):(\d{2})(?:\.\d+)?(?:[Zz]|[+-](\d{2}):(\d{2}))$/;
+function isRfc3339Instant(value) {
+  const m = typeof value === 'string' ? RFC3339_INSTANT.exec(value) : null;
+  if (!m) return false;
+  const [year, month, day, hour, minute, second] = m.slice(1, 7).map(Number);
+  const leap = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+  const monthDays = [31, leap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  if (month < 1 || month > 12 || day < 1 || day > monthDays[month - 1]) return false;
+  if (hour > 23 || minute > 59 || second > 59) return false;
+  return m[7] === undefined || (Number(m[7]) <= 23 && Number(m[8]) <= 59);
+}
+
 /** Result admission projected from an already-scanned directory layout. */
 export function projectRunEligibility(layout) {
   const runs = [], skipped = { ...layout.skipped }, seen = new Set();
@@ -114,6 +128,7 @@ export function projectRunEligibility(layout) {
       : nonblank(result.timestamp) ? result.timestamp
         : readJson(path.join(candidate.runDir, 'run.json'))?.settledAt;
     if (!nonblank(timestamp)) { skip('no-timestamp'); continue; }
+    if (!isRfc3339Instant(timestamp)) { skip('invalid-timestamp'); continue; }
     if (seen.has(result.runId)) { skip('duplicate-run-id'); continue; }
     seen.add(result.runId);
     runs.push({ ...candidate, runId: result.runId, timestamp });

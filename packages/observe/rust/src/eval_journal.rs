@@ -252,7 +252,7 @@ pub fn record(root: &Path, input: EvalInput) -> Result<EvalRecord, String> {
         return Err(format!("duplicate evalId: {}", record.eval_id));
     }
     if !existing.invalid.is_empty() {
-        return Err("cannot establish evalId uniqueness while the eval store contains invalid records".into());
+        return Err(invalid_store_error(&existing.invalid));
     }
     let path = shard::shard_path(root, "evals").map_err(|e| e.to_string())?;
     if path != root.join(".fgos/observe/evals").join(format!("{}.jsonl", writer_id)) {
@@ -262,6 +262,25 @@ pub fn record(root: &Path, input: EvalInput) -> Result<EvalRecord, String> {
     file.write_all(&line).map_err(|e| e.to_string())?;
     file.sync_all().map_err(|e| e.to_string())?;
     Ok(record)
+}
+
+/// Names each offending shard line so the operator can repair the append-only
+/// store by hand; the writer never rewrites existing records itself.
+fn invalid_store_error(invalid: &[InvalidEvalLine]) -> String {
+    const SHOWN: usize = 5;
+    let mut locations = invalid
+        .iter()
+        .take(SHOWN)
+        .map(|item| format!("{}:{} ({})", item.file, item.line, item.error))
+        .collect::<Vec<_>>()
+        .join("; ");
+    if invalid.len() > SHOWN {
+        locations.push_str(&format!("; and {} more", invalid.len() - SHOWN));
+    }
+    format!(
+        "cannot establish evalId uniqueness while the eval store contains invalid records: {locations}; \
+         repair or remove those lines by hand (`metrics eval list` reports every invalid line), then record again"
+    )
 }
 
 /// Reads all shards, validates before filtering, and reports each invalid line.

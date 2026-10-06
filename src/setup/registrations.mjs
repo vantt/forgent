@@ -5750,6 +5750,18 @@ export function checkObserveHostResolvable(cwd) {
   }
 }
 
+// A run directory touched within the last minute may still be settling.
+// Writers share this host's clock, so a future mtime is legitimate only within
+// a small skew (e.g. a networked filesystem); beyond it the mtime is not
+// trusted, so it cannot permanently widen the comparison tolerance. The same
+// bounds apply to the host's recentRuns count.
+const RECENT_RUN_WINDOW_MS = 60_000;
+const MAX_FUTURE_MTIME_SKEW_MS = 60_000;
+function isRecentRunMtime(mtimeMs, now) {
+  const age = now - mtimeMs;
+  return age <= RECENT_RUN_WINDOW_MS && age >= -MAX_FUTURE_MTIME_SKEW_MS;
+}
+
 export function checkObserveRunCoverage(cwd, { hostRunner = invokeHost, scan = scanAssignmentLayout, now = Date.now() } = {}) {
   const root = resolveMainCheckoutRoot(cwd) ?? cwd;
   const location = root === cwd ? root : `${root} (main checkout; requested ${cwd})`;
@@ -5789,7 +5801,7 @@ export function checkObserveRunCoverage(cwd, { hostRunner = invokeHost, scan = s
   for (const run of layout.runs) {
     try {
       const stat = fs.lstatSync(run.runDir);
-      if (stat.isDirectory() && now - stat.mtimeMs <= 60_000) recent++;
+      if (stat.isDirectory() && isRecentRunMtime(stat.mtimeMs, now)) recent++;
     } catch {}
   }
   const directoryDifference = layout.runDirsSeen - coverage.runDirsSeen;

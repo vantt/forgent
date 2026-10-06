@@ -234,6 +234,24 @@ test('run coverage tolerates a new directory without a result but not stale dire
   }
 });
 
+test('run coverage failure labels its sample paths as candidates, not as confirmed missing runs', () => {
+  const cwd = mkTempDir();
+  try {
+    const runDir = path.join(cwd, '.fgos/assignments/unit/panelist-1/1/runs/01');
+    fs.mkdirSync(runDir, { recursive: true });
+    fs.utimesSync(runDir, 1, 1);
+    const result = checkObserveRunCoverage(cwd, { hostRunner: () => coverageData(0) });
+    assert.equal(result.passed, false);
+    assert.match(result.message, /directories Node 1, host 0 \(difference 1\)/);
+    assert.ok(
+      result.message.endsWith(`sample candidates (not confirmed missing): ${path.join('.fgos', 'assignments', 'unit', 'panelist-1', '1', 'runs', '01')}`),
+      result.message,
+    );
+  } finally {
+    fs.rmSync(cwd, { recursive: true, force: true });
+  }
+});
+
 test('run coverage independently detects admission mismatch even when directory totals agree', () => {
   const cwd = mkTempDir();
   try {
@@ -254,13 +272,18 @@ test('run coverage independently detects admission mismatch even when directory 
   }
 });
 
-test('run coverage uses directory recency with a bounded sixty-second window and clock skew tolerance', () => {
+test('run coverage uses directory recency with a bounded sixty-second window and bounded clock skew', () => {
   const cwd = mkTempDir();
   const now = Date.parse('2026-10-06T12:00:00Z');
   try {
     const runDir = path.join(cwd, '.fgos/assignments/racing/runs/01');
     fs.mkdirSync(runDir, { recursive: true });
-    for (const [mtime, passed] of [[now - 60_000, true], [now - 61_000, false], [now + 60_000, true]]) {
+    // A future mtime is recent only within the skew bound; a far-future one
+    // must never keep widening the tolerance.
+    for (const [mtime, passed] of [
+      [now - 60_000, true], [now - 61_000, false],
+      [now + 60_000, true], [now + 61_000, false], [now + 365 * 86_400_000, false],
+    ]) {
       fs.utimesSync(runDir, new Date(mtime), new Date(mtime));
       assert.equal(checkObserveRunCoverage(cwd, { now, hostRunner: () => coverageData(0) }).passed, passed);
     }

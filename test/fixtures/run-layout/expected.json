@@ -16,11 +16,15 @@
     { "assignmentId": "missing-result", "attempt": "01", "runId": "missing-result", "run": { "settledAt": "2026-10-05T11:00:00Z" }, "skip": "missing-result" },
     { "assignmentId": "result-time", "attempt": "01", "runId": "result-time", "result": { "settledAt": " ", "timestamp": "2026-10-05T12:00:00Z" }, "run": { "settledAt": "2026-10-05T11:00:00Z" } },
     { "assignmentId": "settled-precedence", "attempt": "01", "runId": "settled-precedence", "result": { "settledAt": "2026-10-05T13:00:00Z", "timestamp": "2026-10-05T12:00:00Z" }, "run": { "settledAt": "2026-10-05T11:00:00Z" } },
+    { "assignmentId": "garbage-time", "attempt": "01", "runId": "garbage-time", "result": { "settledAt": "garbage" }, "skip": "invalid-timestamp" },
+    { "assignmentId": "impossible-date", "attempt": "01", "runId": "impossible-date", "result": { "settledAt": "2026-02-30T10:00:00Z" }, "skip": "invalid-timestamp" },
+    { "assignmentId": "date-only", "attempt": "01", "runId": "date-only", "result": { "settledAt": "2026-10-05" }, "skip": "invalid-timestamp" },
+    { "assignmentId": "offset-instant", "attempt": "01", "runId": "offset-instant", "result": { "settledAt": "2026-10-04T23:00:00.5-01:00" } },
     { "assignmentId": "zz-duplicate", "attempt": "01", "runId": "flat", "skip": "duplicate-run-id" }
   ],
   "symlink": { "path": "symlinked/runs/01", "target": "legacy/runs/01", "skip": "symlink" },
   "planted": { "path": "legacy/runs/01/outbox/forged/runs/01", "runId": "planted" },
-  "observedRunIds": ["fallback", "flat", "nested", "no-assignment", "owner-settled", "result-time", "settled-precedence"],
-  "runDirsSeen": 15,
-  "skipped": { "inline-record": 1, "unparseable": 1, "no-run-id": 1, "no-timestamp": 2, "missing-result": 1, "duplicate-run-id": 1, "symlink": 1 }
+  "observedRunIds": ["fallback", "flat", "nested", "no-assignment", "offset-instant", "owner-settled", "result-time", "settled-precedence"],
+  "runDirsSeen": 19,
+  "skipped": { "inline-record": 1, "unparseable": 1, "no-run-id": 1, "no-timestamp": 2, "invalid-timestamp": 3, "missing-result": 1, "duplicate-run-id": 1, "symlink": 1 }
 }

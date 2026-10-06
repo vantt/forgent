@@ -20,32 +20,19 @@ const root = path.resolve(fileURLToPath(new URL('../..', import.meta.url)));
 // directly from herdr-round.mjs) and is removed as part of this same fix --
 // this test is what proves the removal actually closed the gap, and what
 // catches any future re-introduction.
-const IMPORT_RE = /from\s+['"](\.{1,2}\/[^'"]+)['"]/g;
+// Matches `import .. from '..'`, `export .. from '..'` and side-effect
+// `import '..'`; a dynamic `import(` has a parenthesis and is not matched.
+const IMPORT_RE = /(?:\bfrom|^\s*import)\s+['"](\.{1,2}\/[^'"]+)['"]/gm;
 
-// run-result.mjs is a proven, already-tested leaf boundary: the identical
-// carve-out exists in test/runner/dispatch-runtime-inspect.test.mjs's own
-// static import-graph test, which already proves its own further imports
-// (agent-result-claim-contract.mjs) are safe. Reusing that proof here avoids
-// re-deriving a second walk into the same subtree.
-//
-// provider-capacity.mjs (Provider Capacity Rotator slice 1) is a proven leaf
-// for a different reason: `reconcile.mjs`'s own `provider-capacity
-// clear-quarantine` action imports `clearProviderAccountQuarantine` from it
-// (a real, legitimate import this graph must now include), but the file's
-// source also contains an UNRELATED `process.kill(pid, 0)` liveness check
-// (`isPidAlive`, used only by `reclaimDeadLeases`/`rankProviderAccounts` --
-// never by `clearProviderAccountQuarantine`, which only ever touches
-// `withFileLock`/`fs.readFileSync`/`fs.writeFileSync` on its own state file).
-// A whole-file text scan cannot distinguish "this export is safe" from "some
-// other export in the same file is not" -- verified by direct reading
-// (confirmed here, not assumed) that the reachable export never calls
-// `process.kill`, so this file is proven safe by the same standard every
-// other entry in this test relies on. It imports only `node:crypto`,
-// `node:fs`, `node:os`, `node:path` (no further relative imports to walk).
-const isProvenLeaf = (file) => {
-  const f = file.replaceAll('\\', '/');
-  return f.endsWith('/run-result.mjs') || f.endsWith('/provider-capacity.mjs');
-};
+// No subtree is cut off: the walk goes through every static import, including
+// run-result.mjs and provider-capacity.mjs, which earlier versions of this
+// test treated as leaves. That carve-out had gone stale -- provider-capacity.mjs
+// had gained relative imports (provider-adapter, process-identity and, at one
+// point, liveness.mjs, a banned module) while the comment still said it had
+// none. Walking through them is what keeps that from happening again.
+// Dynamic import() is deliberately not followed: visibility-session.mjs loads
+// its spawn adapters lazily on a path reconcile never takes, and that boundary
+// is asserted by the exact-closure test below staying free of them.
 
 // Concrete modules -- named explicitly, each confirmed by direct reading, not
 // by guessing at names -- that implement process-control, retry/relaunch,
@@ -86,13 +73,19 @@ for (const banned of BANNED_FILES) {
 // worker PGID signalling"), and a bare-word ban would false-positive on that
 // legitimate prose instead of on an actual call.
 const BANNED_CALL_PATTERN = /node:child_process|\bspawn\(|\bexecFile\(|\bfork\(|process\.kill\(|\.kill\(|\.signal\(/;
+// `process.kill(pid, 0)` delivers no signal: it only asks whether a pid exists
+// (provider-capacity.mjs's isPidAlive lease probe). It is liveness evidence,
+// not process control, so it is the one kill form allowed in this graph.
+const SIGNAL_ZERO_PROBE = /process\.kill\(\s*[A-Za-z_$][\w$.]*\s*,\s*0\s*\)/g;
+// Whole-line comments describe process control in prose (process-identity.mjs
+// explains why it does NOT call kill); only code lines are scanned.
+const codeOnly = (source) => source.split('\n').filter((line) => !/^\s*(?:\/\/|\/?\*)/.test(line)).join('\n');
 
 function walk(file, seen) {
   if (seen.has(file)) return;
   seen.add(file);
-  if (isProvenLeaf(file)) return;
   const source = fs.readFileSync(file, 'utf8');
-  assert.doesNotMatch(source, BANNED_CALL_PATTERN, `${path.relative(root, file)} matched a banned process-control call pattern`);
+  assert.doesNotMatch(codeOnly(source).replace(SIGNAL_ZERO_PROBE, ''), BANNED_CALL_PATTERN, `${path.relative(root, file)} matched a banned process-control call pattern`);
   for (const m of source.matchAll(IMPORT_RE)) {
     let target = path.resolve(path.dirname(file), m[1]);
     if (!path.extname(target)) target += '.mjs';
@@ -109,6 +102,42 @@ test('reconcile use-case + reconciliation-planner transitive import graph exclud
     assert.equal(seen.has(banned), false, `reconcile's real import graph must never reach ${path.relative(root, banned)}`);
   }
 
+  // Strongest proof: the whole real transitive closure is EXACTLY this known,
+  // hand-verified set -- not merely "does not contain a banned name". Any
+  // future import added anywhere in this graph must show up here as a
+  // deliberate, reviewed addition to `expected`, never silently.
+  const expected = [
+    'src/verbs/dispatch/reconcile.mjs',
+    'src/runner/dispatch/reconciliation-planner.mjs',
+    'src/runner/dispatch/runtime-inspection.mjs',
+    'src/runner/dispatch/run-result.mjs',
+    'src/runner/dispatch/visibility-session.mjs',
+    'src/runner/dispatch/worker-artifacts.mjs',
+    'src/runner/dispatch/provider-capacity.mjs',
+    'src/config/global-config.mjs',
+    'src/config/shared-config-file.mjs',
+    'src/setup/config-merge.mjs',
+    // Pure leaf (node:crypto + worker_threads' threadId): unique temp-file
+    // names for the planner's and visibility-session's write-then-rename.
+    'src/util/unique-tmp-tag.mjs',
+    // Read-only assignment layout (node:fs + node:path only): runtime
+    // inspection and findRunningRuns enumerate nested runs through it.
+    'src/runner/dispatch/assignment-layout.mjs',
+    // Pure contract table run-result.mjs consults for isAssessmentRequired;
+    // no imports of its own. Reached now that run-result.mjs is walked through.
+    'src/runner/dispatch/agent-result-claim-contract.mjs',
+    // provider-capacity.mjs's own imports, reached now that it is walked through:
+    // provider-family normalization (node:fs/node:path; its only write is a
+    // best-effort shadow-binder telemetry append, no process control) ...
+    'src/runner/dispatch/provider-adapter.mjs',
+    // ... the auth-failure wording table, a leaf with no imports, kept apart
+    // so provider-capacity never imports liveness.mjs for it ...
+    'src/runner/dispatch/provider-auth-failure.mjs',
+    // ... and /proc boot-id/start-time reads that decide lease holder
+    // identity (node:fs only; no signals, no spawn).
+    'src/runner/dispatch/process-identity.mjs',
+  ].map((p) => path.join(root, p)).sort();
+  assert.deepEqual([...seen].sort(), expected);
 });
 
 test('boundary test: src/runner/dispatch/** does not reference pick/return verbs or appendEvent (R1 / M10)', () => {
