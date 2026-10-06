@@ -7,7 +7,12 @@ import { resolvePattern } from './patterns/presets.mjs';
 import { reviewedHistoryOutcome } from './patterns/reviewed.mjs';
 import { resolvePanelRoles, VALID_OUTCOMES } from './patterns/panel.mjs';
 
-export const UNIT_SUMMARY_CONTRACT = Object.freeze({ id: 'unit-summary', version: 1 });
+// Version 2: every seat carries an owner-written kind, and a finished unit whose pattern was never
+// recorded is published as UNDETERMINED_OUTCOME instead of being derived as if it were solo.
+export const UNIT_SUMMARY_CONTRACT = Object.freeze({ id: 'unit-summary', version: 2 });
+
+/** A finished unit whose outcome cannot be derived from its records; never a pass or a failure. */
+export const UNDETERMINED_OUTCOME = 'undetermined';
 
 export function extractStance(agentClaim, options = []) {
   if (agentClaim?.stance === undefined) return { status: 'missing' };
@@ -69,8 +74,10 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
   const record = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8'));
   const unitRunId = path.basename(unitDir);
   if (legacyCompletion && legacyCompletion.unitRunId !== unitRunId) throw new Error('completion belongs to another unit run');
-  const pattern = record.pattern ?? record.unit?.pattern ?? 'solo';
-  const { patternName, params } = resolvePattern(pattern);
+  // Records written before the owner stored its pattern do not say which pattern ran (a caller's
+  // --pattern was never kept), so the pattern stays unknown rather than defaulting to solo.
+  const pattern = record.pattern ?? record.unit?.pattern ?? null;
+  const { patternName, params } = pattern === null ? { patternName: null, params: {} } : resolvePattern(pattern);
   const cfg = record.configSnapshot?.runner ?? {};
   const panelRoles = patternName === 'panel' ? resolvePanelRoles(cfg, {}, params) : null;
   const kinds = new Map(panelRoles
@@ -102,7 +109,8 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
     };
     return {
       role: seat.role,
-      kind: panelRoles ? kinds.get(seat.role) ?? 'unknown'
+      kind: patternName === null ? 'unknown'
+        : panelRoles ? kinds.get(seat.role) ?? 'unknown'
         : patternName === 'solo' || seat.role === 'producer' ? 'producer'
           : seat.role === 'verify' || seat.role === 'verifier' ? 'verifier'
             : patternName === 'reviewed' ? 'checker' : 'unknown',
@@ -116,16 +124,17 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
   const validCompletion = (completion) => VALID_OUTCOMES.includes(completion?.outcome) && timestamp(completion?.settledAt);
   const settlement = validCompletion(record.settlement) ? record.settlement : null;
   const legacy = validCompletion(legacyCompletion) ? legacyCompletion : null;
-  const derivedOutcome = patternHistoryOutcome(patternName, params, cfg, record.unit,
-    rawSeats.filter((seat) => seat.final).map((seat) => ({
-      role: seat.role, round: seat.round, outcome: seat.final.outcome,
-    })), panelRoles);
+  const derivedOutcome = patternName === null ? UNDETERMINED_OUTCOME
+    : patternHistoryOutcome(patternName, params, cfg, record.unit,
+      rawSeats.filter((seat) => seat.final).map((seat) => ({
+        role: seat.role, round: seat.round, outcome: seat.final.outcome,
+      })), panelRoles);
   const outcome = active ? 'unknown' : settlement?.outcome ?? legacy?.outcome ?? derivedOutcome ?? 'unknown';
   return {
     contract: UNIT_SUMMARY_CONTRACT,
     unitRunId,
     workflow: workflowLink(record.workflow) ?? workflowLink(legacyCompletion?.workflow),
-    pattern: typeof pattern === 'string' ? pattern : pattern.pattern,
+    pattern: pattern === null || typeof pattern === 'string' ? pattern : pattern.pattern ?? pattern.patternName ?? null,
     capability: record.unit?.capability ?? null,
     outcome,
     startedAt: timestamp(record.createdAt),
@@ -138,18 +147,34 @@ export function buildUnitSummary(unitDir, { legacyCompletion = null } = {}) {
   };
 }
 
+export function serializeUnitSummary(summary) {
+  return `${JSON.stringify(summary, null, 2)}\n`;
+}
+
+/** The stored summary bytes, or null when there is none. */
+export function readStoredUnitSummary(unitDir) {
+  try { return fs.readFileSync(path.join(unitDir, 'unit-summary.json'), 'utf8'); }
+  catch (error) { if (error.code === 'ENOENT') return null; throw error; }
+}
+
+/**
+ * Why no summary can be published now: 'active' while any attempt or inline step is still open,
+ * 'unsettled' when the unit is finished but has no establishable outcome or settlement time.
+ */
+export function unitSummarySkipReason(unitDir, summary) {
+  if (summary.outcome !== 'unknown' && summary.settledAt) return null;
+  const record = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8'));
+  return unitHasActiveRun(unitDir, record) ? 'active' : 'unsettled';
+}
+
 /** Atomic and byte-idempotent; dry-run performs no writes. */
 export function writeUnitSummary(unitDir, options = {}) {
   const summary = buildUnitSummary(unitDir, options);
-  if (summary.outcome === 'unknown' || !summary.settledAt) {
-    const record = JSON.parse(fs.readFileSync(path.join(unitDir, 'unit.json'), 'utf8'));
-    return { summary, changed: false, skipped: unitHasActiveRun(unitDir, record) ? 'active' : 'unsettled' };
-  }
+  const skipped = unitSummarySkipReason(unitDir, summary);
+  if (skipped) return { summary, changed: false, skipped };
   const file = path.join(unitDir, 'unit-summary.json');
-  const content = `${JSON.stringify(summary, null, 2)}\n`;
-  let existing = null;
-  try { existing = fs.readFileSync(file, 'utf8'); } catch (error) { if (error.code !== 'ENOENT') throw error; }
-  const changed = content !== existing;
+  const content = serializeUnitSummary(summary);
+  const changed = content !== readStoredUnitSummary(unitDir);
   if (changed && !options.dryRun) {
     const tmp = `${file}.${process.pid}.${crypto.randomBytes(4).toString('hex')}.tmp`;
     try { fs.writeFileSync(tmp, content); fs.renameSync(tmp, file); }

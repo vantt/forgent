@@ -66,3 +66,22 @@ test('the default tasks are data: plain strings, frozen', () => {
   assert.ok(Object.isFrozen(DEFAULT_ROLE_TASKS));
   for (const text of Object.values(DEFAULT_ROLE_TASKS)) assert.equal(typeof text, 'string');
 });
+
+test('declared choices and the stance request reach a panelist only, never a synthesizer or other role', () => {
+  const measured = { ...unit, stanceOptions: ['incremental', 'full'] };
+  const panelist = roleUnit(measured, { role: 'panelist-2', kind: 'panelist' });
+  assert.match(panelist.objective, /Declared choices: \["incremental","full"\]/);
+  assert.match(panelist.objective, /"stance": \{"choice"/);
+  assert.match(panelist.objective, /agent-result\.json/);
+  assert.match(panelist.objective, /never changes whether your work passes/);
+  assert.ok(panelist.objective.startsWith(unit.objective), 'the question itself is still what the panelist answers');
+  // The seat's kind decides, not its label: a differently named voter is asked, a role named like one is not.
+  assert.match(roleUnit(measured, { role: 'researcher-1', kind: 'panelist' }).objective, /Declared choices/);
+  assert.equal(roleUnit(measured, { role: 'panelist-1' }), measured);
+  for (const role of ['synthesizer', 'reviewer', 'red-team', 'producer']) {
+    const other = roleUnit(measured, { role });
+    assert.doesNotMatch(other.objective, /Declared choices|stance/i, role);
+  }
+  // No declared choices means nothing to ask.
+  assert.equal(roleUnit(unit, { role: 'panelist-1', kind: 'panelist' }), unit);
+});

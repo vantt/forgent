@@ -22,8 +22,14 @@ import { reapOrphanedConfinementResources, resolveConfinementTempRoot } from '..
 /** Write `file` atomically so a reader never sees half a record. */
 function writeJsonAtomic(file, value) {
   const tmp = `${file}.${process.pid}.${crypto.randomBytes(4).toString('hex')}.tmp`;
-  fs.writeFileSync(tmp, JSON.stringify(value, null, 2));
-  fs.renameSync(tmp, file);
+  try {
+    fs.writeFileSync(tmp, JSON.stringify(value, null, 2));
+    fs.renameSync(tmp, file);
+  } catch (error) {
+    // Removing the partial temp file is best effort; the write error is the one to report.
+    try { fs.rmSync(tmp, { force: true }); } catch { /* keep the write error */ }
+    throw error;
+  }
 }
 
 function publishUnitSummary(unitDir) {
@@ -546,7 +552,14 @@ export async function runUnit(options = {}) {
     findings: patternResult.findings || [],
   };
   } catch (error) {
-    if (!executionSettled) settle('execution-failure');
+    if (!executionSettled) {
+      // The execution error is what the caller must see; failing to record the settlement is
+      // reported beside it, never instead of it.
+      try { settle('execution-failure'); }
+      catch (settleError) {
+        console.warn(`fgos: could not record the failed settlement of unit run "${unitRunId}": ${settleError.message}`);
+      }
+    }
     throw error;
   }
 }

@@ -92,6 +92,10 @@ export function extractFindings(res) {
 /**
  * Check whether a round has fully settled in history.
  *
+ * A round is final only once every seat it dispatches has a result (or its producer failed, so no
+ * checker was dispatched). Until then, resume reuses the seats that passed and retries every other
+ * one, including a checker that failed while a sibling never reported.
+ *
  * @param {number} r
  * @param {Array<object>} priorResults
  * @param {Array<string>} checkerList

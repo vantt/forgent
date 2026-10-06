@@ -51,10 +51,16 @@ pub fn dispatch_discussions(
     Ok(output)
 }
 
+/// The writer's outcome for a finished unit whose outcome its records cannot establish.
+const UNDETERMINED_OUTCOME: &str = "undetermined";
+/// Agreement needs at least two valid votes; one vote cannot agree or split with anyone.
+const MIN_VALID_VOTES: usize = 2;
+
 #[derive(Default)]
 struct Totals {
     units: usize,
     units_passed: usize,
+    units_undetermined: usize,
     seats: usize,
     seats_passed: usize,
     attempts: usize,
@@ -68,6 +74,7 @@ impl Totals {
     fn unit(&mut self, unit: &Map<String, Value>) {
         self.units += 1;
         self.units_passed += usize::from(unit["outcome"] == "pass");
+        self.units_undetermined += usize::from(unit["outcome"] == UNDETERMINED_OUTCOME);
         if let Some(duration) = duration_seconds(unit) {
             self.durations.push(duration);
         }
@@ -96,11 +103,14 @@ impl Totals {
         } else {
             Some((self.durations[n / 2 - 1] + self.durations[n / 2]) / 2.0)
         };
+        // An undetermined unit is visible but neither passed nor failed, so it stays out of the rate.
+        let determined = self.units - self.units_undetermined;
         json!({
             "unitRuns": self.units,
             "unitsPassed": self.units_passed,
-            "unitsFailed": self.units - self.units_passed,
-            "passRate": ratio(self.units_passed, self.units),
+            "unitsFailed": determined - self.units_passed,
+            "unitsUndetermined": self.units_undetermined,
+            "passRate": ratio(self.units_passed, determined),
             "seats": self.seats,
             "seatsPassed": self.seats_passed,
             "seatsFailed": self.seats - self.seats_passed,
@@ -128,6 +138,7 @@ fn group_key(value: &Value, key: &str) -> String {
 /// All final panelist seats (not synthesizers or fallback attempts) are voters.
 /// Missing/invalid votes stay in the denominator and remain explicit counts:
 /// the threshold is a passive signal, not proof that missing voters dissented.
+/// Fewer than two valid votes is unmeasured: a lone vote expresses no agreement or split.
 fn agreement(unit: &Map<String, Value>) -> Value {
     let mut stances = BTreeMap::<String, usize>::new();
     let mut missing = 0;
@@ -154,7 +165,7 @@ fn agreement(unit: &Map<String, Value>) -> Value {
         }
     }
     let valid: usize = stances.values().sum();
-    let measured = options.is_some_and(|options| !options.is_empty()) && valid > 0;
+    let measured = options.is_some_and(|options| !options.is_empty()) && valid >= MIN_VALID_VOTES;
     let largest = stances.values().copied().max().unwrap_or(0);
     json!({
         "measurement": if measured { "measured" } else { "unmeasured" },

@@ -1107,13 +1107,14 @@ fn native_discussions_reports_owner_voters_and_root_wide_summary_diagnostics() {
     let mut final_attempt = attempt.clone();
     final_attempt["stance"] = json!({"status": "valid", "choice": "a", "confidence": null});
     let mut summary = json!({
-        "contract": {"id": "unit-summary", "version": 1},
+        "contract": {"id": "unit-summary", "version": 2},
         "unitRunId": "unit-run-research", "workflow": null,
         "pattern": "research-fan-out", "capability": "analysis", "outcome": "pass",
         "startedAt": "2026-10-05T12:00:00Z", "settledAt": "2026-10-05T12:01:00Z",
         "inline": false, "stanceOptions": ["a", "b"],
         "seats": [
             {"role": "researcher-1", "kind": "panelist", "round": 1, "final": final_attempt, "attempts": [attempt]},
+            {"role": "researcher-2", "kind": "panelist", "round": 1, "final": final_attempt, "attempts": [attempt]},
             {"role": "panelist", "kind": "synthesizer", "round": 1, "final": final_attempt, "attempts": [attempt]}
         ]
     });
@@ -1140,11 +1141,11 @@ fn native_discussions_reports_owner_voters_and_root_wide_summary_diagnostics() {
     assert_eq!(envelope["contract"], "fgos.v1");
     let report = &envelope["data"];
     assert_eq!(report["totals"]["unitRuns"], 1);
-    assert_eq!(report["totals"]["seats"], 2);
+    assert_eq!(report["totals"]["seats"], 3);
     assert_eq!(report["groups"]["alpha"]["unitRuns"], 1);
     assert_eq!(report["units"][0]["unitRunId"], "unit-run-research");
-    assert_eq!(report["units"][0]["stanceSeats"], 1);
-    assert_eq!(report["units"][0]["stancesValid"], 1);
+    assert_eq!(report["units"][0]["stanceSeats"], 2);
+    assert_eq!(report["units"][0]["stancesValid"], 2);
     assert_eq!(report["units"][0]["agreement"], 1.0);
     assert_eq!(report["units"][0]["genuineSplit"], false);
     assert_eq!(report["summaryDiagnosticsScope"], "root-wide");

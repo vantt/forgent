@@ -391,3 +391,34 @@ test('a synchronous checker rejection still dispatches and drains its sibling an
   release();
   await rejection;
 });
+
+test('resume keeps a complete round final but retries every unpassed seat of an interrupted round', async () => {
+  const unit = { id: 'interrupted-review', objective: 'Change the parser', capability: 'code:implement' }; // reviewer + red-team
+  const failedReviewer = { role: 'reviewer', round: 1, outcome: 'execution-failure' };
+  const producer = { role: 'producer', round: 1, outcome: 'pass' };
+
+  // Every checker of the round has a result: the round is settled and its error is the outcome.
+  const settled = [producer, failedReviewer, { role: 'red-team', round: 1, outcome: 'pass' }];
+  const final = await runReviewed(unit, {}, {
+    history: settled,
+    runRole: ({ role }) => assert.fail(`a settled round never dispatches ${role}`),
+  });
+  assert.equal(final.outcome, 'execution-failure');
+  assert.equal(reviewedHistoryOutcome(unit, {}, settled), 'execution-failure');
+
+  // A sibling never reported, so the round never finished: nothing about it is settled yet.
+  const interrupted = [producer, failedReviewer];
+  assert.equal(reviewedHistoryOutcome(unit, {}, interrupted), null, 'an interrupted round has no outcome to publish');
+  const dispatched = [];
+  const resumed = await runReviewed(unit, {}, {
+    history: interrupted,
+    runRole: async ({ role, round }) => {
+      dispatched.push(`${role}/${round}`);
+      return { role, round, outcome: 'pass' };
+    },
+  });
+  // The passed producer is reused; the failed checker is retried beside the missing one.
+  assert.deepEqual(dispatched.sort(), ['red-team/1', 'reviewer/1']);
+  assert.equal(resumed.outcome, 'pass');
+  assert.equal(resumed.rounds, 1);
+});
