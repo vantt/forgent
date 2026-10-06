@@ -1,0 +1,419 @@
+{
+  "version": 1,
+  "shard": "b-io-contract",
+  "sources": [
+    "docs/io-contract.md"
+  ],
+  "claims": [
+    {
+      "claimId": "claim_9466cce125cf03619e4d50ff9f340dcb",
+      "sourceUnitDigest": "f72297b85c91b398",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "1-purpose-and-scope",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Document H1 of the legacy contract; the frozen map section 5 places it under the candidate heading 1. Purpose And Scope (the candidate H1 'CLI I/O Contract' is the document title), so the Vietnamese title is replaced by an English heading title."
+    },
+    {
+      "claimId": "claim_1b5bd12129cc41ea75fc7dd3993142f3",
+      "sourceUnitDigest": "476e7efba05e358c",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-2",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Intro paragraph carried into 1. Purpose And Scope as its own block but CHANGED in two links: the 0014 link (decisions/0014-... .md, dead after the decision corpus retired) is rewritten to plain code text `0014` plus its path, and the 0011 link is repointed to retired-decision-history.md#7-adr-0011-explicit-version-for-every-contract; the rest of the text is verbatim."
+    },
+    {
+      "claimId": "claim_882ee3f986d0dacee87764a5b6bb75d8",
+      "sourceUnitDigest": "accb25b08ef0d839",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "The 'Mục tiêu' goal paragraph (new transport plugs in via transport-to-verb and envelope/manifest) is carried verbatim as the second block of 1. Purpose And Scope."
+    },
+    {
+      "claimId": "claim_51848961a2bbf93d37bc2b46d9f141f5",
+      "sourceUnitDigest": "698037f4efe95080",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "2-input-direction-verb-and-identity",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Section heading 'Chiều vào — verb + danh tính' maps to the frozen heading '2. Input Direction Verb And Identity'; only the title language and numbering differ."
+    },
+    {
+      "claimId": "claim_426f29d1e11055574c203d89cba84cc7",
+      "sourceUnitDigest": "4d3e5ba86bd907ab",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-4",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Single write door rule (CTR001/CTR002, no second write path into .fgos/) carried verbatim under the new H3 Single Write Door; not stated in work-state.md so no merge."
+    },
+    {
+      "claimId": "claim_b5ef9b491d020583ac6ca1379e4115a0",
+      "sourceUnitDigest": "eed0b8520401ce77",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-7",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Lead-in sentence for the writer field; the candidate keeps it verbatim inside Writer Identity next to the work-state.md writer text (map section 6 pairs io 22, 33-39 with ws 154-167), though it sits after the ws paragraph and before the io rationale paragraph."
+    },
+    {
+      "claimId": "claim_f5365b8e40fb58c75adc56a574263242",
+      "sourceUnitDigest": "fa53d50b84fef302",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-10",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "writer.id / writer.source bullet list with the four trust values, carried verbatim under Writer Source Trust Levels; the same four-value claim is the table of work-state.md 169-174 under the same heading (map section 6)."
+    },
+    {
+      "claimId": "claim_cb629f70ad6029530d70253f96ad3221",
+      "sourceUnitDigest": "bd8b780f96dd2ecc",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-8",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Attribution-not-authentication paragraph (D1, D9 never-block rationale, STR38/STR48 out of scope) carried verbatim in Writer Identity alongside the overlapping work-state.md 154-167 text; io-contract is the side that adds the never-block rationale."
+    },
+    {
+      "claimId": "claim_153f56c2d5a2e895f8e6b2607bb7ab3d",
+      "sourceUnitDigest": "25e4a007d2fc9a15",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-13",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "role vs writer paragraph (human/runner/session/system) carried verbatim under the new H3 Caller Role; no counterpart in work-state.md per the map."
+    },
+    {
+      "claimId": "claim_e9c39f67bc2eab533faa3053ff482708",
+      "sourceUnitDigest": "e067ab7149569e51",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "3-output-direction-unified-envelope",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Section heading 'Chiều ra — envelope thống nhất' maps to the frozen heading '3. Output Direction Unified Envelope'; only the title language and numbering differ."
+    },
+    {
+      "claimId": "claim_38ad96d62f2c6cf7a639fc24a83c2621",
+      "sourceUnitDigest": "6dcf0faa76d27fed",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-15",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "First paragraph of the envelope statement (every successful verb in both binaries prints the fgos.v1 envelope), carried verbatim under Envelope Shape; the same four-field envelope is stated by work-state.md 622-634 in the preceding block (map section 6)."
+    },
+    {
+      "claimId": "claim_dc506074dcc2f08f6012ebb078b50371",
+      "sourceUnitDigest": "18c5d821a55d3517",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-16",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "The fenced envelope shape { contract: 'fgos.v1', generated_at, data_hash, data }, carried verbatim as its own block in Envelope Shape; the work-state.md envelope text under the same heading describes the same four fields. Note: the mechanical suggestion pointed at README.md and was wrong."
+    },
+    {
+      "claimId": "claim_62d31ae4e5abfcf0ab158c0c6a8337ee",
+      "sourceUnitDigest": "84367855d92bb2e3",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-17",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "The data-is-structured and error-path-not-enveloped paragraph, carried verbatim in Envelope Shape; work-state.md 622-634 states the same (the ws error-path claim 636-639 also lands in the next H3)."
+    },
+    {
+      "claimId": "claim_5e282fb457ff9ef02e88cf329556cf34",
+      "sourceUnitDigest": "6a5b9a01b0427971",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-20",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "One envelope per call for fgos.mjs and one single-line envelope per --once/--watch cycle for fgos-runner, carried verbatim under Runner Stdout Envelope; duplicate of work-state.md 641-645 (map section 6)."
+    },
+    {
+      "claimId": "claim_5b930b5ce84afec3d4b2c383c7f85925",
+      "sourceUnitDigest": "bdeca0144b587f82",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-21",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Real-envelope recognition rule (parse JSON, check contract === 'fgos.v1', never a text heuristic) carried verbatim under the new H3 Recognizing A Real Envelope; no counterpart in work-state.md."
+    },
+    {
+      "claimId": "claim_f50b3640275fce5d0a7e8d4f4077c0c9",
+      "sourceUnitDigest": "3f95d2bd43575ae5",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "4-exit-codes",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "H3 'Mã thoát (exit code) — một nguồn duy nhất' becomes the H2 '4. Exit Codes' in the frozen layout (level and title changed, single-source claim kept in the body)."
+    },
+    {
+      "claimId": "claim_2fa062c56cf4226e8519e768a5b5cab4",
+      "sourceUnitDigest": "3727b3fa0ee79f8b",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-22",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "EXIT_CODES table plus EXIT_BUSY (6) as the only exit-code table, branch on category not message, carried verbatim under 4. Exit Codes."
+    },
+    {
+      "claimId": "claim_2b155082055823ccabf6fb40242abe42",
+      "sourceUnitDigest": "1ff0b91638812235",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "5-reasoned-envelope-exceptions",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "H3 'Ngoại lệ có lý do' becomes the H2 '5. Reasoned Envelope Exceptions'; title language and level change only."
+    },
+    {
+      "claimId": "claim_b92ac199356ff830e5554647ab143a90",
+      "sourceUnitDigest": "e24cc26161b01726",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-23",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Opening sentence of the four reasoned envelope exceptions, carried verbatim under 5. Reasoned Envelope Exceptions."
+    },
+    {
+      "claimId": "claim_6a8087a3f502f37f9c7b729e871bee9c",
+      "sourceUnitDigest": "74809b036d96332c",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-24",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "The four-item list of unenveloped streams (verb registry, setup/doctor --pretty, worker log, runner progress-trace), carried verbatim as one block."
+    },
+    {
+      "claimId": "claim_3c993001919f57e0f96a36c2a4d92c43",
+      "sourceUnitDigest": "549dded9fe85b1cf",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-25",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "fgos-discovered block is outside this contract (CTR003 worker-to-runner protocol), carried verbatim at the end of 5. Reasoned Envelope Exceptions."
+    },
+    {
+      "claimId": "claim_27d4d4dca46d6a8859628c443df0b31e",
+      "sourceUnitDigest": "413cdab72d47c625",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "6-cursor-pagination",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "H3 'Phân trang — con trỏ đục' becomes the H2 '6. Cursor Pagination'; title language and level change only."
+    },
+    {
+      "claimId": "claim_da21278ab32966f6631c82420552ed2b",
+      "sourceUnitDigest": "c34e8e9c9dbf41ce",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-27",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Opaque-cursor paragraph (four paginated verbs, {items, nextCursor}, validation error for a departed item, conflicts not paginated) carried verbatim; it is a strict subset of the longer work-state.md 678-702 paragraph held in the preceding block under the same heading (map section 6)."
+    },
+    {
+      "claimId": "claim_b38e730cc466114aa1e1ebba6fa880ed",
+      "sourceUnitDigest": "b82a558166f118f3",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-28",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "The paginated field is declared on every verb in the manifest; carried verbatim as the last block of 6. Cursor Pagination, where the work-state.md paragraph also states the paginated flag."
+    },
+    {
+      "claimId": "claim_fda67d0dfc15159dc0e4c62b9dfddd87",
+      "sourceUnitDigest": "07e9c25f094955f0",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "7-machine-readable-verb-registry",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "H2 'Sổ verb máy-đọc — CLI tự mô tả' maps to '7. Machine-Readable Verb Registry'; title language and numbering differ."
+    },
+    {
+      "claimId": "claim_19495d2772ced1aa1af4b20d4640fa3a",
+      "sourceUnitDigest": "83773dda67db8d5f",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-30",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "fgos --help --json returns {schema_version, commands}, schema_version 2.0 raised from 1.0 because access was removed; carried verbatim under Manifest Shape, duplicating the manifest claim of work-state.md 647-663 (which adds the positional-parameter rule)."
+    },
+    {
+      "claimId": "claim_e2377849e4ba8e3d3beaf70880e4ed23",
+      "sourceUnitDigest": "39e4ab1f30a6acc9",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-32",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Per-entry fields list with touchesState and externalEffect axes and the externalEffect examples review, approve, coordination; carried verbatim under Entry Fields And Effect Axes alongside the work-state.md 665-676 text. This io wording is the one the frozen map keeps (the ws exclusive list is the superseded side), but the coordination example is stale (COMMAND_REGISTRY marks 15 verbs and coordination is not among them) and is carried as written."
+    },
+    {
+      "claimId": "claim_535f1aeb31d616e2138a5b3719cb4cd0",
+      "sourceUnitDigest": "78393c0183b6bda3",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-33",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "Both axes remain declarative only; the who-may-call-which-verb gate belongs to STR38. Carried verbatim under Entry Fields And Effect Axes, where work-state.md 665-676 states the same declarative-only point."
+    },
+    {
+      "claimId": "claim_ba1c2ac95c9c161d9fd345e3bfa63741",
+      "sourceUnitDigest": "1a437d176164754d",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "8-multi-value-flag-convention",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "H3 'Quy ước cờ nhiều-giá-trị' becomes the H2 '8. Multi-Value Flag Convention'; title language and level change only."
+    },
+    {
+      "claimId": "claim_d0e16d088cdecf2dd0b491f819009aa6",
+      "sourceUnitDigest": "a8eaefe3669a194a",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-35",
+      "claimKind": "contract",
+      "disposition": "merge",
+      "reviewStatus": "pending",
+      "rationale": "multiValueFormat csv vs json-array convention (deps/refs/footprint/targets vs acceptance), carried verbatim under 8. Multi-Value Flag Convention; duplicate of work-state.md 704-711 held in the preceding block."
+    },
+    {
+      "claimId": "claim_6c529b87f6073cc75fdf836d3507d21d",
+      "sourceUnitDigest": "a1b267899ca12fa9",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "10-version-tokens",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "H2 'Version token' maps to '10. Version Tokens' (section 9 Per-Verb Help sits between, owned only by work-state.md); only title language and numbering differ."
+    },
+    {
+      "claimId": "claim_e9ee744c6e1847ef25b3eb0bf180f577",
+      "sourceUnitDigest": "ae0e60ec193e0ac5",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-38",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Version-token lead sentence carried into 10. Version Tokens, but CHANGED in the link: the 0011 link decisions/0011-version-tuong-minh-cho-moi-contract.md (dead) is repointed to ../decisions/retired-decision-history.md#7-adr-0011-explicit-version-for-every-contract; the wording is otherwise verbatim. The located-file match missed it for that reason."
+    },
+    {
+      "claimId": "claim_6f7c99f38f64abb5af7f07c1e2690730",
+      "sourceUnitDigest": "c9d3ad96d4b03b02",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-39",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "The five-row version-token table (fgos.v1, runner reuse, manifest 2.0, event v 3, gates CTR004/v1), carried verbatim under 10. Version Tokens."
+    },
+    {
+      "claimId": "claim_ea280fa29dca090fe3306f6161ac6ae7",
+      "sourceUnitDigest": "03c9a0137385cea3",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-40",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "CTR006 routing-handoff is outside the version tokens (full spec but no code yet), carried verbatim."
+    },
+    {
+      "claimId": "claim_95a909b7be1252ba8de3be4c15f3638e",
+      "sourceUnitDigest": "6e8ef157c4c9861c",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "11-scope-boundary",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "H2 'Ranh giới — điều gì KHÔNG thuộc hợp đồng này' maps to '11. Scope Boundary'; title language and numbering differ."
+    },
+    {
+      "claimId": "claim_8999e61e46d6c02b407b84263d7a2d67",
+      "sourceUnitDigest": "36d44c8bdf5ad1f0",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-41",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "STR46 unifies existing in/out directions and does not extend to push; three items locked outside the boundary, carried verbatim under 11. Scope Boundary."
+    },
+    {
+      "claimId": "claim_f10fba22a20755dc700bb1720f98f451",
+      "sourceUnitDigest": "fa405ec4333b4351",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-42",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Three out-of-scope bullets with named owners (STR48 initiating output, STR83/STR38 terminal/chat increment, STR38 permission layer), carried verbatim; a contract boundary obligation."
+    },
+    {
+      "claimId": "claim_cf56f4a8b7679435c6bf59abd8c23093",
+      "sourceUnitDigest": "30a3d1465b852976",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-43",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Rationale that the original CoS of STR46 was deliberately narrowed to the spec-contract part, carried verbatim under 11. Scope Boundary."
+    },
+    {
+      "claimId": "claim_deb4b4da2abbc3d6190dfce1c75cabf2",
+      "sourceUnitDigest": "fd7e473ad76cf591",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-44",
+      "claimKind": "contract",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Also out of scope: the daemon, core verb-logic extracted as a lib, and the fgos-discovered block; carried verbatim."
+    },
+    {
+      "claimId": "claim_7524deb4b2a1c12d1652076040bfec36",
+      "sourceUnitDigest": "701eefe16b5100fc",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "12-references",
+      "claimKind": "navigation",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "H2 'Tham chiếu' maps to '12. References'; title language and numbering differ. Reference lists are navigation, not contract."
+    },
+    {
+      "claimId": "claim_d802aabd387ae98595c102f0e857f9b1",
+      "sourceUnitDigest": "7fddf59545c800c1",
+      "targetOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "targetAnchor": "unheaded-block-45",
+      "claimKind": "navigation",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Reference list of legacy paths (decisions 0014/0011, specs, architecture-map, history) carried verbatim as inline code, not links; the map flags that authoring may later rewrite them, but the candidate text is currently identical to the source."
+    }
+  ]
+}
