@@ -1421,13 +1421,13 @@ test('gates CLI names the regenerate command when the default manifest has no sh
     const code = gates.runCli([], tmp);
     assert.equal(code, 1);
     const text = errors.join('\n');
-    assert.match(text, /node scripts\/generate-doc-inventory\.mjs --commit/);
+    assert.match(text, /node scripts\/generate-doc-inventory\.mjs --refresh --commit/);
     assert.match(text, /reports\/doc-inventory\.json/);
     assert.doesNotMatch(text, /\n\s+at /);
     const missing = fs.mkdtempSync(path.join(os.tmpdir(), 'gates-no-manifest-'));
     errors.length = 0;
     assert.equal(gates.runCli([], missing), 1);
-    assert.match(errors.join('\n'), /generate-doc-inventory\.mjs --commit/);
+    assert.match(errors.join('\n'), /generate-doc-inventory\.mjs --refresh --commit/);
     fs.rmSync(missing, { recursive: true, force: true });
   } finally { console.error = original; fs.rmSync(tmp, { recursive: true, force: true }); }
 });

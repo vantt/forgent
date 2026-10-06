@@ -24,6 +24,7 @@ import { execFileSync } from 'node:child_process';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { loadShardedJsonArtifact } from './doc-inventory-artifact.mjs';
 import { INVENTORY_MANIFEST_PATH, IDENTITY_REGISTRY_PATH } from './generate-doc-inventory.mjs';
+import { regenerateCommand } from './check-doc-inventory-gates.mjs';
 
 const PLAN_DIR = 'plans/260925-documentation-authority-unification';
 export const DEFAULT_VOCABULARY_PATH = `${PLAN_DIR}/claim-and-disposition-vocabulary.json`;
@@ -225,9 +226,15 @@ export function governanceBaselineFields(repoRoot) {
   return block ? block[1].split('\n').map((l) => l.replace(/:\s*$/, '').trim()).filter(Boolean) : [];
 }
 
-function headerFields(text) {
+/** The text of the fenced txt header block directly under the H1, or null when the document has none. */
+export function headerBlock(text) {
   const block = text.match(/^# .+\n+```txt\n([\s\S]*?)\n```/m);
-  return block ? new Set([...block[1].matchAll(/^([A-Za-z][A-Za-z ]*):/gm)].map((m) => m[1])) : null;
+  return block ? block[1] : null;
+}
+
+export function headerFields(text) {
+  const block = headerBlock(text);
+  return block !== null ? new Set([...block.matchAll(/^([A-Za-z][A-Za-z ]*):/gm)].map((m) => m[1])) : null;
 }
 
 /** Report-only: which canonical documents lack which promotion-gate header fields. */
@@ -600,10 +607,6 @@ function loadJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
 }
 
-function regenerateCommand() {
-  return `node scripts/generate-doc-inventory.mjs --commit <commit> --identity-registry ${IDENTITY_REGISTRY_PATH} --json-out ${DEFAULT_INVENTORY_PATH} --md-out ${DEFAULT_INVENTORY_PATH.replace(/\.json$/, '.md')}`;
-}
-
 function trackedPlatformDocs(repoRoot) {
   return execFileSync('git', ['ls-files', 'docs/platform'], { cwd: repoRoot, encoding: 'utf8', maxBuffer: 20 * 1024 * 1024 }).split('\n').filter((f) => f.endsWith('.md'));
 }
@@ -654,7 +657,7 @@ export function runCli(argv, cwd = process.cwd()) {
         itemSummary: summarizeItems(items, vocabulary, constitution),
       };
     } catch (err) {
-      console.error(`check-doc-constitution error loading inventory: ${err.message}. The shards are not committed; regenerate with: ${regenerateCommand()}`);
+      console.error(`check-doc-constitution error loading inventory: ${err.message}. The shards are not committed; regenerate with: ${regenerateCommand({ inventoryPath, identityRegistryPath: path.resolve(cwd, IDENTITY_REGISTRY_PATH), cwd })}`);
       return 1;
     }
   }

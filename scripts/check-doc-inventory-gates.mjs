@@ -19,7 +19,8 @@ import { execFileSync } from 'node:child_process';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { normalizePosix, readBlobAtCommit } from './generate-shipped-path-inventory.mjs';
 import { loadShardedJsonArtifact, sha256Buffer } from './doc-inventory-artifact.mjs';
-import { SCAN_ROOTS, ADDITIONAL_ROOT_FILES, parseLsTreeLong, extractMarkdownConservationUnits, extractMixedFileConservationUnit, loadSwitchboard, readCommitBlobMap, buildIdentityRegistryIndex, INVENTORY_MANIFEST_PATH, IDENTITY_REGISTRY_PATH } from './generate-doc-inventory.mjs';
+import { checkRatchet, DEFAULT_BASELINE_PATH as RATCHET_BASELINE_PATH, DEFAULT_EXCEPTIONS_PATH as RATCHET_EXCEPTIONS_PATH } from './check-legacy-docs-ratchet.mjs';
+import { SCAN_ROOTS, ADDITIONAL_ROOT_FILES, registryBindsToCommit, parseLsTreeLong, extractMarkdownConservationUnits, extractMixedFileConservationUnit, loadSwitchboard, readCommitBlobMap, buildIdentityRegistryIndex, INVENTORY_MANIFEST_PATH, IDENTITY_REGISTRY_PATH } from './generate-doc-inventory.mjs';
 
 /**
  * Independently recomputes the in-scope file count directly from the commit
@@ -364,10 +365,13 @@ export function validateCommitBlobIntegrity(repoRoot, inventory) {
   return findings;
 }
 
-export function validateIdentityRegistry(inventory, registry) {
+// A registry bound to an earlier commit stays valid for a later inventory commit
+// whose in-scope tree is identical (needs repoRoot to compare the two commits).
+export function validateIdentityRegistry(inventory, registry, { repoRoot = null } = {}) {
   const findings = [];
   if (!registry || typeof registry !== 'object') return [{ type: 'missing-identity-registry', message: 'Phase 02 identity registry is required' }];
-  if (registry.commit !== inventory.commit) findings.push({ type: 'identity-registry-commit-mismatch', message: `identity registry commit ${registry.commit || '<missing>'} does not match inventory commit ${inventory.commit}` });
+  const bound = registry.commit === inventory.commit || (repoRoot !== null && registryBindsToCommit(registry.commit, inventory.commit, repoRoot));
+  if (!bound) findings.push({ type: 'identity-registry-commit-mismatch', message: `identity registry commit ${registry.commit || '<missing>'} does not match inventory commit ${inventory.commit}` });
   if (inventory.identityRegistry) {
     if (inventory.identityRegistry.documents !== (registry.documents || []).length) findings.push({ type: 'identity-registry-document-count-binding-mismatch', message: `inventory identityRegistry.documents ${inventory.identityRegistry.documents} does not match registry ${(registry.documents || []).length}` });
     if (inventory.identityRegistry.units !== (registry.units || []).length) findings.push({ type: 'identity-registry-unit-count-binding-mismatch', message: `inventory identityRegistry.units ${inventory.identityRegistry.units} does not match registry ${(registry.units || []).length}` });
@@ -441,15 +445,108 @@ export function validateRetiredDispositions(registry, vocabulary) {
     .map((row) => ({ claimId: row.claimId, sourcePath: row.sourcePath, sourceAnchor: row.sourceAnchor }));
 }
 
-export function checkInventory({ repoRoot, inventory, vocabulary, identityRegistry = null, droppedClaimsRegister = null }) {
+// ---- Conservation ---------------------------------------------------------
+// Invariants hold on today's data and are fatal in every mode: a claim identity
+// that vanished, a row without a known disposition, a required target that is
+// missing, two owners for one semantic claim, growth under the legacy roots.
+// Completeness findings describe data that is legitimately unfinished before the
+// cutover (blocking or unreviewed rows, rows without their own rationale, open
+// registry rows, unreviewed dropped claims); they are reported with counts and
+// become fatal in strict (cutover) mode.
+
+const registryRows = (registry) => [...(registry?.units || []), ...(registry?.retiredUnits || []), ...(registry?.identityGaps || [])];
+const EXAMPLE_LIMIT = 5;
+
+function summarizeOpen(type, message, items, describe) {
+  return items.length === 0 ? null : { type, message, count: items.length, examples: items.slice(0, EXAMPLE_LIMIT).map(describe) };
+}
+
+/** Every claim id of the previous registry is still a live, gap or retired row of the current one. */
+export function validateRowSetConservation(registry, previousRegistry) {
+  if (!previousRegistry) return [];
+  const present = new Set(registryRows(registry).map((row) => row?.claimId).filter(Boolean));
+  return registryRows(previousRegistry)
+    .filter((row) => row?.claimId && !present.has(row.claimId))
+    .map((row) => ({ type: 'claim-id-not-conserved', path: row.sourcePath, message: `${row.sourcePath}: claim ${row.claimId} (${row.sourceAnchor}) of the previous registry is neither a live, gap nor retired row of the current registry` }));
+}
+
+/** Rows that share a semanticClaimId must not name two different target owners. */
+export function validateSemanticClaimOwners(claimLedger) {
+  const owners = new Map();
+  for (const claim of claimLedger || []) {
+    if (!claim?.semanticClaimId || typeof claim.targetOwner !== 'string' || claim.targetOwner === '') continue;
+    const set = owners.get(claim.semanticClaimId) || new Set();
+    set.add(claim.targetOwner);
+    owners.set(claim.semanticClaimId, set);
+  }
+  return [...owners.entries()]
+    .filter(([, set]) => set.size > 1)
+    .map(([semanticClaimId, set]) => ({ type: 'semantic-claim-multiple-owners', message: `semantic claim ${semanticClaimId} names ${set.size} different target owners: ${[...set].sort().join(', ')}` }));
+}
+
+/** Every claim row has a disposition of the vocabulary, and a target owner when that disposition requires one. */
+export function validateClaimDispositions(claimLedger, vocabulary) {
+  const findings = [];
+  const dispositions = new Map((vocabulary?.sourceDispositions || []).map((d) => [d.id, d]));
+  for (const claim of claimLedger || []) {
+    const disposition = dispositions.get(claim?.disposition);
+    if (typeof claim?.disposition !== 'string' || claim.disposition === '') findings.push({ type: 'claim-disposition-missing', path: claim?.sourcePath, message: `${claim?.sourcePath}: claim ${claim?.claimId} has no disposition` });
+    else if (!disposition) findings.push({ type: 'claim-disposition-unknown', path: claim.sourcePath, message: `${claim.sourcePath}: claim ${claim.claimId} disposition "${claim.disposition}" is not in the vocabulary` });
+    else if (disposition.requiresTargetOwner && (typeof claim.targetOwner !== 'string' || claim.targetOwner === '')) findings.push({ type: 'claim-target-owner-missing', path: claim.sourcePath, message: `${claim.sourcePath}: claim ${claim.claimId} disposition "${claim.disposition}" requires a targetOwner` });
+  }
+  return findings;
+}
+
+/** Legacy-root growth found by the ratchet, one finding per ratchet violation. */
+export function validateLegacyGrowth(ratchetResult) {
+  return (ratchetResult?.findings || []).map((f) => ({ type: `legacy-growth-${f.type}`, path: f.path, message: f.message }));
+}
+
+/** Open data that blocks the cutover but is not corruption before it. */
+export function summarizeConservationCompleteness({ inventory, registry, vocabulary, droppedClaimsRegister = null }) {
+  const dispositions = new Map((vocabulary?.sourceDispositions || []).map((d) => [d.id, d]));
+  const claims = inventory?.claimLedger || [];
+  const open = [
+    summarizeOpen('claims-unknown-blocking', 'claim rows whose disposition is unknown-blocking', claims.filter((c) => c.disposition === 'unknown-blocking'), (c) => `${c.sourcePath}#${c.sourceAnchor}`),
+    summarizeOpen('claims-not-reviewed', 'claim rows whose reviewStatus is not reviewed', claims.filter((c) => c.reviewStatus !== 'reviewed'), (c) => `${c.sourcePath}#${c.sourceAnchor}`),
+    summarizeOpen('claims-without-own-rationale', 'claim rows whose disposition requires a rationale and that carry none of their own', claims.filter((c) => dispositions.get(c.disposition)?.requiresRationale && !(typeof c.rationale === 'string' && c.rationale !== '')), (c) => `${c.sourcePath}#${c.sourceAnchor}`),
+    summarizeOpen('registry-gaps-without-disposition', 'registry identity-gap rows with no vocabulary disposition', (registry?.identityGaps || []).filter((row) => !dispositions.has(row?.disposition)), (row) => `${row.sourcePath}#${row.sourceAnchor}`),
+    summarizeOpen('retired-rows-incomplete', 'retired rows without a vocabulary disposition, a required target owner or a rationale', (registry?.retiredUnits || []).filter((row) => {
+      const disposition = dispositions.get(row?.disposition);
+      return !disposition || (disposition.requiresTargetOwner && !row.targetOwner) || (disposition.requiresRationale && !(row.dispositionRationale || row.retiredReason));
+    }), (row) => `${row.sourcePath}#${row.sourceAnchor}`),
+    summarizeOpen('dropped-claims-unreviewed', 'dropped-claims register entries without a reviewedDisposition (decision, reviewer, reviewedAt)', (droppedClaimsRegister?.entries || []).filter((entry) => {
+      const review = entry?.reviewedDisposition;
+      return !review || ['decision', 'reviewer', 'reviewedAt'].some((field) => typeof review[field] !== 'string' || review[field].trim() === '');
+    }), (entry) => entry.id),
+  ];
+  return open.filter(Boolean);
+}
+
+/** Runs every conservation rule; invariant findings are fatal in all modes, open findings only when strict. */
+export function checkConservation({ inventory, registry, previousRegistry = null, vocabulary, droppedClaimsRegister = null, ratchetResult = null }) {
+  const invariant = [
+    ...validateRowSetConservation(registry, previousRegistry),
+    ...validateSemanticClaimOwners(inventory?.claimLedger),
+    ...validateClaimDispositions(inventory?.claimLedger, vocabulary),
+    ...(ratchetResult ? validateLegacyGrowth(ratchetResult) : []),
+  ];
+  const open = summarizeConservationCompleteness({ inventory, registry, vocabulary, droppedClaimsRegister });
+  return { invariant, open };
+}
+
+export function checkInventory({ repoRoot, inventory, vocabulary, identityRegistry = null, droppedClaimsRegister = null, previousRegistry = null, ratchetResult = null, strict = false }) {
   const fatalFindings = [
     ...validateStructure(inventory),
     ...validateAgainstVocabulary(inventory, vocabulary, inventory.commit ? deriveValidTargetOwnersFromSwitchboard(loadSwitchboard(inventory.commit, repoRoot)) : null),
     ...validateCommitBlobIntegrity(repoRoot, inventory),
     ...validateSourceUnitCoverage(repoRoot, inventory),
-    ...validateIdentityRegistry(inventory, identityRegistry),
+    ...validateIdentityRegistry(inventory, identityRegistry, { repoRoot }),
     ...(droppedClaimsRegister ? validateDroppedClaims(droppedClaimsRegister, { ledgerClaimIds: new Set((inventory.claimLedger || []).map((c) => c.claimId)), registry: identityRegistry }) : []),
   ];
+  const conservation = checkConservation({ inventory, registry: identityRegistry, previousRegistry, vocabulary, droppedClaimsRegister, ratchetResult });
+  fatalFindings.push(...conservation.invariant);
+  const strictFindings = strict ? conservation.open.map((o) => ({ type: o.type, message: `${o.count} ${o.message} (e.g. ${o.examples.join(', ')})` })) : [];
 
   let coverageFindings = [];
   if (fatalFindings.length === 0 && inventory.commit) {
@@ -478,11 +575,12 @@ export function checkInventory({ repoRoot, inventory, vocabulary, identityRegist
   const duplicateGroups = inventory.duplicateContentGroups || [];
   const semanticConflictGroups = inventory.semanticConflictGroups || [];
 
-  const allFatal = [...fatalFindings, ...coverageFindings];
+  const allFatal = [...fatalFindings, ...coverageFindings, ...strictFindings];
 
   return {
     clean: allFatal.length === 0,
     fatalFindings: allFatal,
+    conservationOpen: conservation.open,
     explicitOpenFindings: {
       gapCount: gapItems.length + claimIdentityGapRows.length,
       fileGapCount: gapItems.length,
@@ -512,9 +610,16 @@ function loadJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
 }
 
-function regenerateCommand({ inventoryPath, identityRegistryPath, cwd }) {
+function currentCommit(cwd) {
+  try { return execFileSync('git', ['rev-parse', 'HEAD'], { cwd, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }).trim(); }
+  catch { return '<commit>'; }
+}
+
+// One command: reuses the committed identity registry when the in-scope tree
+// still matches it, otherwise carries identity forward from it, then regenerates.
+export function regenerateCommand({ inventoryPath, identityRegistryPath, cwd }) {
   const rel = (p) => normalizePosix(path.relative(cwd, p) || p);
-  return `node scripts/generate-doc-inventory.mjs --commit <commit> --identity-registry ${rel(identityRegistryPath)} --json-out ${rel(inventoryPath)} --md-out ${rel(inventoryPath).replace(/\.json$/, '.md')}`;
+  return `node scripts/generate-doc-inventory.mjs --refresh --commit ${currentCommit(cwd)} --identity-registry ${rel(identityRegistryPath)} --json-out ${rel(inventoryPath)} --md-out ${rel(inventoryPath).replace(/\.json$/, '.md')}`;
 }
 
 // The manifest is committed but its shards are not, so a fresh checkout has to
@@ -529,6 +634,17 @@ export const DEFAULT_INVENTORY_PATH = INVENTORY_MANIFEST_PATH;
 export const DEFAULT_VOCABULARY_PATH = 'plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.json';
 export const DEFAULT_DROPPED_CLAIMS_REGISTER_PATH = 'plans/260925-documentation-authority-unification/dropped-claims-register.json';
 export const DEFAULT_IDENTITY_REGISTRY_PATH = IDENTITY_REGISTRY_PATH;
+// The registry sealed at the end of the first inventory generation; row-set
+// conservation is measured against it unless --previous-registry names another.
+export const DEFAULT_PREVIOUS_REGISTRY_PATH = 'plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json';
+
+/** Runs the legacy-docs ratchet against the working tree; null when its baseline is absent. */
+export function loadRatchetResult(repoRoot, argv = []) {
+  const baselinePath = path.resolve(repoRoot, RATCHET_BASELINE_PATH);
+  if (argv.includes('--no-ratchet') || !fs.existsSync(baselinePath)) return null;
+  const exceptionsPath = path.resolve(repoRoot, RATCHET_EXCEPTIONS_PATH);
+  return checkRatchet({ repoRoot, baseline: loadJson(baselinePath), exceptions: fs.existsSync(exceptionsPath) ? loadJson(exceptionsPath) : undefined });
+}
 
 /** Explicit flag: the file must exist. Default path: a missing file skips the check with a notice. */
 export function loadDroppedClaimsRegister(argv, cwd) {
@@ -550,10 +666,14 @@ export function runCli(argv, cwd = process.cwd()) {
   const identityRegistryPath = path.resolve(cwd, identityIdx >= 0 ? argv[identityIdx + 1] : DEFAULT_IDENTITY_REGISTRY_PATH);
   const repoRoot = path.resolve(cwd, repoRootIdx >= 0 ? argv[repoRootIdx + 1] : cwd);
   const asJson = argv.includes('--json');
+  const strict = argv.includes('--strict') || argv.includes('--cutover');
+  const previousIdx = argv.indexOf('--previous-registry');
 
   let inventory;
   let vocabulary;
   let identityRegistry;
+  let previousRegistry = null;
+  let ratchetResult = null;
   let droppedClaimsRegister;
   let droppedClaimsNotice;
   try {
@@ -561,6 +681,10 @@ export function runCli(argv, cwd = process.cwd()) {
     vocabulary = loadJson(vocabularyPath);
     identityRegistry = loadJson(identityRegistryPath);
     ({ register: droppedClaimsRegister, notice: droppedClaimsNotice } = loadDroppedClaimsRegister(argv, cwd));
+    const previousPath = path.resolve(cwd, previousIdx >= 0 ? argv[previousIdx + 1] : DEFAULT_PREVIOUS_REGISTRY_PATH);
+    if (previousIdx >= 0 || fs.existsSync(previousPath)) previousRegistry = loadJson(previousPath);
+    else console.error(`check-doc-inventory-gates: previous registry not found at ${DEFAULT_PREVIOUS_REGISTRY_PATH}; row-set conservation check skipped`);
+    ratchetResult = loadRatchetResult(repoRoot, argv);
     if (droppedClaimsNotice) console.error(`check-doc-inventory-gates: ${droppedClaimsNotice}`);
   } catch (err) {
     console.error(`check-doc-inventory-gates error loading input: ${err.message}`);
@@ -569,7 +693,7 @@ export function runCli(argv, cwd = process.cwd()) {
 
   let result;
   try {
-    result = checkInventory({ repoRoot, inventory, vocabulary, identityRegistry, droppedClaimsRegister });
+    result = checkInventory({ repoRoot, inventory, vocabulary, identityRegistry, droppedClaimsRegister, previousRegistry, ratchetResult, strict });
   } catch (err) {
     console.error(`check-doc-inventory-gates evaluation error: ${err.message}`);
     return 1;
@@ -596,6 +720,11 @@ export function runCli(argv, cwd = process.cwd()) {
     `${result.explicitOpenFindings.registryIdentityGapCount} registry identity-gap row(s), ${result.explicitOpenFindings.retiredWithoutDispositionCount} retired row(s) without disposition; ` +
     `${droppedClaimsRegister ? `${droppedClaimsRegister.entries.length} dropped claim(s) conserved.` : 'dropped-claim check skipped.'}`
   );
+  console.log(`check-doc-inventory-gates: conservation: ${previousRegistry ? 'row set conserved against the previous registry' : 'row-set check skipped'}, one owner per semantic claim, dispositions and targets present, ${ratchetResult ? 'legacy-docs ratchet clean' : 'ratchet skipped'}.`);
+  if (result.conservationOpen.length > 0) {
+    console.log('check-doc-inventory-gates: open conservation data (fatal with --strict or --cutover):');
+    for (const o of result.conservationOpen) console.log(`  - ${o.type}: ${o.count} (${o.message})`);
+  }
   return 0;
 }
 

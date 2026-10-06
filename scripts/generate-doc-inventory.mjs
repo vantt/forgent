@@ -152,6 +152,21 @@ function readIdentityRegistryPath(registryPath, repoRoot = process.cwd()) {
   } catch (err) { throw new Error(`Unable to parse identity registry ${registryPath}: ${err.message}`); }
 }
 
+// Registry identity depends only on the in-scope documents and the switchboard
+// that classifies them, so a registry stays bound to every later commit whose
+// tree is identical for those paths (committing the registry itself changes
+// neither).
+export function identityScopePathspec() {
+  return [...SCAN_ROOTS, ...ADDITIONAL_ROOT_FILES, `${PHASE_DIR}/transitional-switchboard.json`];
+}
+
+export function registryBindsToCommit(registryCommit, commitSha, repoRoot = process.cwd()) {
+  if (!registryCommit || typeof registryCommit !== 'string') return false;
+  if (registryCommit === commitSha) return true;
+  const result = spawnSync('git', ['diff', '--quiet', registryCommit, commitSha, '--', ...identityScopePathspec()], { cwd: repoRoot, stdio: 'ignore' });
+  return result.status === 0;
+}
+
 export function buildIdentityRegistryIndex(registry = {}) {
   const docByPath = new Map();
   const docConflictsByPath = new Map();
@@ -1617,7 +1632,7 @@ export function generateInventory(repoRoot = process.cwd(), options = {}) {
   const commitSha = resolveCommitSha(commit, repoRoot);
   const switchboardIndex = buildSwitchboardIndex(loadSwitchboard(commitSha, repoRoot));
   const identityRegistry = readIdentityRegistryPath(options.identityRegistryPath, repoRoot);
-  if (identityRegistry.commit !== commitSha) throw new Error(`identity registry commit ${identityRegistry.commit || '<missing>'} does not match generation commit ${commitSha}`);
+  if (!registryBindsToCommit(identityRegistry.commit, commitSha, repoRoot)) throw new Error(`identity registry commit ${identityRegistry.commit || '<missing>'} does not match generation commit ${commitSha} and the in-scope tree differs; carry the registry forward with: node scripts/generate-doc-inventory.mjs --refresh --commit ${commitSha}`);
   const identityIndex = buildIdentityRegistryIndex(identityRegistry);
   const shippedIndex = buildShippedContractIndex(loadShippedPathInventory(commitSha, repoRoot));
   const files = scanInScopeFiles(repoRoot, commitSha).sort((a, b) => normalizePosix(a.path).localeCompare(normalizePosix(b.path)));
@@ -1763,6 +1778,7 @@ export function generateInventory(repoRoot = process.cwd(), options = {}) {
     description: 'Repository-wide documentation inventory and conservation ledger (Phase 02 file-level and claim-level accounting)',
     commit: commitSha,
     identityRegistry: {
+      commit: identityRegistry.commit || null,
       path: identityRegistry._binding?.path || null,
       bytes: identityRegistry._binding?.bytes || null,
       sha256: identityRegistry._binding?.sha256 || null,
@@ -1845,6 +1861,36 @@ export function generateMarkdownReport(inventory) {
   return lines.join('\n') + '\n';
 }
 
+// One command that makes the saved inventory current: when the committed
+// registry is still bound to the in-scope tree of `commit` it is used as is,
+// otherwise identity is carried forward from it first (and the registry file is
+// rewritten); the inventory manifest and Markdown report are then regenerated.
+function runRefresh(argv, cwd, commit) {
+  const option = (name, fallback) => path.resolve(cwd, argv.indexOf(name) >= 0 ? argv[argv.indexOf(name) + 1] : fallback);
+  const registryPath = option('--identity-registry', IDENTITY_REGISTRY_PATH);
+  const jsonOut = option('--json-out', INVENTORY_MANIFEST_PATH);
+  const mdOut = option('--md-out', INVENTORY_MANIFEST_PATH.replace(/\.json$/, '.md'));
+  try {
+    const commitSha = resolveCommitSha(commit, cwd);
+    let registry = readIdentityRegistryPath(registryPath, cwd);
+    if (registryBindsToCommit(registry.commit, commitSha, cwd)) {
+      console.log(`generate-doc-inventory: identity registry (commit ${registry.commit}) is bound to ${commitSha}; no carry-forward needed`);
+    } else {
+      const carried = carryForwardIdentityRegistryRepoWide(cwd, { commit: commitSha, identityRegistryPath: registryPath });
+      delete carried._binding;
+      fs.writeFileSync(registryPath, JSON.stringify(carried) + '\n');
+      console.log(`generate-doc-inventory: carried identity registry forward from ${registry.commit} to ${commitSha} (${carried.documents.length} documents, ${carried.units.length} units); commit ${path.relative(cwd, registryPath)}`);
+    }
+    const inventory = generateInventory(cwd, { commit: commitSha, identityRegistryPath: registryPath });
+    fs.mkdirSync(path.dirname(jsonOut), { recursive: true });
+    writeShardedJsonArtifact(jsonOut, inventory);
+    fs.mkdirSync(path.dirname(mdOut), { recursive: true });
+    fs.writeFileSync(mdOut, generateMarkdownReport(inventory));
+    console.log(`generate-doc-inventory: wrote ${path.relative(cwd, jsonOut)} and ${path.relative(cwd, mdOut)}`);
+    return 0;
+  } catch (err) { console.error(`Error: ${err.message}`); return 1; }
+}
+
 export function runCli(argv, cwd = process.cwd()) {
   const commitFlagIdx = argv.indexOf('--commit');
   const commit = commitFlagIdx >= 0 ? argv[commitFlagIdx + 1] : null;
@@ -1856,6 +1902,7 @@ export function runCli(argv, cwd = process.cwd()) {
   const mdOutIdx = argv.indexOf('--md-out');
   const jsonOut = jsonOutIdx >= 0 ? path.resolve(cwd, argv[jsonOutIdx + 1]) : null;
   const mdOut = mdOutIdx >= 0 ? path.resolve(cwd, argv[mdOutIdx + 1]) : null;
+  if (argv.includes('--refresh')) return runRefresh(argv, cwd, commit);
   if (argv.includes('--carry-forward-identity-registry')) {
     const identityIdx = argv.indexOf('--identity-registry');
     const identityRegistryPath = identityIdx >= 0 ? argv[identityIdx + 1] : null;
