@@ -11,11 +11,11 @@ Related:
 - `plans/260925-documentation-authority-unification/plan.md` §7 Phase 02
 ```
 
-- **Commit:** `79530b22149de0decb4dfd389d2f018e8ed9d8e3`
+- **Commit:** `01d84f20262dd361f9d2a01f6d37ae5168d9d84e`
 - **Files scanned:** 4311
-- **Claim rows:** 86085
-- **Headings / unheaded blocks / mixed-file blocks:** 26212 / 58696 / 1177
-- **Gaps:** 1071 (1054 file/routing gap(s), 17 claim identity-gap blocker(s))
+- **Claim rows:** 86086
+- **Headings / unheaded blocks / mixed-file blocks:** 26212 / 58697 / 1177
+- **Gaps:** 1054 (1054 file/routing gap(s), 0 claim identity-gap blocker(s))
 - **Exact duplicate-content groups:** 818
 - **Semantic conflict groups:** 151
 
@@ -66,9 +66,9 @@ Related:
 | Value | Count |
 |---|---:|
 | `literal` | 3186 |
-| `glob` | 2424 |
-| `executable-proof` | 1317 |
-| `dynamic` | 138 |
+| `glob` | 2425 |
+| `executable-proof` | 1322 |
+| `dynamic` | 141 |
 | `fixture` | 102 |
 | `shipped-contract` | 43 |
 
@@ -2107,23 +2107,6 @@ Related:
 
 | Claim | Source | Anchor | Identity status | Disposition |
 |---|---|---|---|---|
-| `claim_identity_gap_e15448dcf74f13907aa98a88` | `docs/how-to/use-fgos-group-thinking.md` | `unheaded-block-11` | `ambiguous-registry-gap` | `unknown-blocking` |
-| `claim_identity_gap_78b0900a66d1f516bde3235d` | `docs/how-to/use-fgos-group-thinking.md` | `unheaded-block-16` | `ambiguous-registry-gap` | `unknown-blocking` |
-| `claim_identity_gap_ecde631f4069cf78b4f0cf88` | `docs/specs/runner.md` | `unheaded-block-142` | `ambiguous-registry-gap` | `unknown-blocking` |
-| `claim_identity_gap_027996c44697e88b4db71cad` | `docs/specs/runner.md` | `unheaded-block-147` | `ambiguous-registry-gap` | `unknown-blocking` |
-| `claim_identity_gap_d9c478ce1da3b55351477951` | `docs/specs/runner.md` | `unheaded-block-159` | `ambiguous-registry-gap` | `unknown-blocking` |
-| `claim_identity_gap_209ed4c5ebf9d67e5a73e5ec` | `docs/specs/runner.md` | `unheaded-block-168` | `ambiguous-registry-gap` | `unknown-blocking` |
-| `claim_identity_gap_f9b6166f9f96627f3d5682fc` | `docs/specs/runner.md` | `unheaded-block-233` | `ambiguous-registry-gap` | `unknown-blocking` |
-| `claim_identity_gap_5e646bfc3b3d272fd3ed1123` | `docs/specs/runner.md` | `unheaded-block-242` | `ambiguous-registry-gap` | `unknown-blocking` |
-| `claim_identity_gap_e43d43e1d3386586328a822a` | `docs/specs/runner.md` | `unheaded-block-266` | `ambiguous-registry-gap` | `unknown-blocking` |
-| `claim_identity_gap_b9d67aced444ef3ae0e6496b` | `docs/specs/runner.md` | `unheaded-block-278` | `ambiguous-registry-gap` | `unknown-blocking` |
-| `claim_identity_gap_a71f63a24e496ecff199564f` | `docs/specs/work-state.md` | `unheaded-block-115` | `ambiguous-registry-gap` | `unknown-blocking` |
-| `claim_identity_gap_6c5aefe5eeb0c9e84b13338f` | `docs/specs/work-state.md` | `unheaded-block-119` | `ambiguous-registry-gap` | `unknown-blocking` |
-| `claim_identity_gap_cb593e704d8a708d98e8e352` | `docs/specs/work-state.md` | `unheaded-block-124` | `ambiguous-registry-gap` | `unknown-blocking` |
-| `claim_identity_gap_6e32cfbd511cf0e7c3f5c36e` | `docs/specs/work-state.md` | `unheaded-block-136` | `ambiguous-registry-gap` | `unknown-blocking` |
-| `claim_identity_gap_479e558b3abb654d24201448` | `docs/specs/work-state.md` | `unheaded-block-142` | `ambiguous-registry-gap` | `unknown-blocking` |
-| `claim_identity_gap_d6cfb594ce8523152ec7d9e6` | `docs/specs/work-state.md` | `unheaded-block-148` | `ambiguous-registry-gap` | `unknown-blocking` |
-| `claim_identity_gap_a34b332208f260010d9dc706` | `docs/specs/work-state.md` | `unheaded-block-172` | `ambiguous-registry-gap` | `unknown-blocking` |
 
 ## Claim Ledger Sample (first 500 rows)
 
