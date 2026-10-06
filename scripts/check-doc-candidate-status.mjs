@@ -22,37 +22,29 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
 import { isMainModule } from './lib/is-main-module.mjs';
-import { DEFAULT_CONSTITUTION_PATH, governanceBaselineFields, headerBlock, headerFields } from './check-doc-constitution.mjs';
+import { DEFAULT_CONSTITUTION_PATH, governanceBaselineFields, headerBlock, headerFields, classifyPath, trackedPlatformDocs } from './check-doc-constitution.mjs';
+import { buildSwitchboardIndex, lookupSwitchboard } from './generate-doc-inventory.mjs';
 
 export const DEFAULT_SWITCHBOARD_PATH = 'plans/260925-documentation-authority-unification/transitional-switchboard.json';
 export const STATUSES = ['promoted', 'candidate', 'legacy-current', 'non-authority', 'unrouted'];
 const ROUTED_STATUSES = new Set(STATUSES.filter((s) => s !== 'unrouted'));
 
-function routeMatches(route, docPath) {
-  return route.endsWith('/**') ? docPath.startsWith(route.slice(0, -2)) : route === docPath;
+const indexCache = new WeakMap();
+
+function switchboardEntry(docPath, switchboard) {
+  if (!indexCache.has(switchboard)) indexCache.set(switchboard, buildSwitchboardIndex(switchboard));
+  return lookupSwitchboard(indexCache.get(switchboard), docPath);
 }
 
 /**
- * The status of a document, derived only from the switchboard. An exact
- * scoped route or root document wins over an area's entry point or canonical
- * route (which carry the area status), which wins over a glob route.
+ * The status of a document, derived only from the switchboard through the same
+ * route index the inventory generator uses (exact route or root document, else
+ * the longest glob prefix), so the two tools cannot disagree.
  */
 export function classifyDocumentStatus(docPath, switchboard) {
-  const scoped = [];
-  const areaLevel = [];
-  for (const area of switchboard?.areas || []) {
-    for (const r of area.scopedRoutes || []) scoped.push({ route: r.route, status: r.authorityStatus });
-    for (const route of [area.entryPoint, ...(area.canonicalRoutes || []), area.canonicalRoute]) {
-      if (typeof route === 'string') areaLevel.push({ route, status: area.authorityStatus });
-    }
-  }
-  for (const r of switchboard?.rootDocuments || []) scoped.push({ route: r.path, status: r.authorityStatus });
-  const valid = (e) => ROUTED_STATUSES.has(e.status);
-  const exact = (list) => list.find((e) => valid(e) && !e.route.endsWith('/**') && e.route === docPath);
-  const hit = exact(scoped) || exact(areaLevel) || [...scoped, ...areaLevel].find((e) => valid(e) && routeMatches(e.route, docPath));
-  return hit ? hit.status : 'unrouted';
+  const status = switchboardEntry(docPath, switchboard)?.authorityStatus;
+  return ROUTED_STATUSES.has(status) ? status : 'unrouted';
 }
 
 function stripCode(text) {
@@ -91,9 +83,15 @@ export function relatedPaths(text) {
     .filter((v) => (v.includes('/') || /\.md$/.test(v)) && !v.includes('*') && !/^[a-z][a-z0-9+.-]*:/i.test(v));
 }
 
+/** Evidence payloads are metadata-exempt; they need a location, not a switchboard status. */
+function isEvidencePayload(file, constitution) {
+  const { kind } = classifyPath(file, constitution, { header: '' });
+  return (constitution.documentKinds || []).find((k) => k.id === kind)?.metadataExempt === true;
+}
+
 export function checkCandidateMetadata({ files, readFile, switchboard, constitution, repoRoot }) {
   const findings = [];
-  const counts = { files: files.length, byStatus: Object.fromEntries(STATUSES.map((s) => [s, 0])), checked: 0, findings: 0, byType: {} };
+  const counts = { files: files.length, byStatus: Object.fromEntries(STATUSES.map((s) => [s, 0])), exemptUnrouted: 0, checked: 0, findings: 0, byType: {} };
   const candidateCore = constitution?.requiredMetadata?.candidateCore || [];
   const promotionRequired = [...governanceBaselineFields(repoRoot), ...(constitution?.requiredMetadata?.promotionFields?.extra || [])];
   const add = (type, file, message) => {
@@ -103,9 +101,13 @@ export function checkCandidateMetadata({ files, readFile, switchboard, constitut
   for (const file of files) {
     const status = classifyDocumentStatus(file, switchboard);
     counts.byStatus[status] += 1;
+    const conflict = switchboardEntry(file, switchboard)?.routeConflict;
+    if (conflict) add('switchboard-route-conflict', file, `the switchboard routes this document more than once (${conflict.length} entries); the status is ambiguous`);
+    if (status === 'unrouted' && constitution && isEvidencePayload(file, constitution)) counts.exemptUnrouted += 1;
     if (status !== 'candidate' && status !== 'promoted') continue;
     counts.checked += 1;
     const text = readFile(file);
+    if (constitution && !classifyPath(file, constitution, { header: text.slice(0, 800) }).kind) add('unplaced-document', file, 'the document matches no placement pattern of the constitution');
     const fields = headerFields(text);
     const required = status === 'candidate' ? candidateCore : promotionRequired;
     const missing = required.filter((f) => !fields?.has(f));
@@ -123,10 +125,6 @@ export function checkCandidateMetadata({ files, readFile, switchboard, constitut
   }
   counts.findings = findings.length;
   return { findings, counts };
-}
-
-function trackedPlatformDocs(repoRoot) {
-  return execFileSync('git', ['ls-files', 'docs/platform'], { cwd: repoRoot, encoding: 'utf8', maxBuffer: 20 * 1024 * 1024 }).split('\n').filter((f) => f.endsWith('.md'));
 }
 
 export function runCli(argv, cwd = process.cwd()) {
@@ -162,7 +160,7 @@ export function runCli(argv, cwd = process.cwd()) {
     console.log(JSON.stringify({ counts, findings }, null, 2));
     return fatal ? 1 : 0;
   }
-  console.log(`check-doc-candidate-status: ${counts.files} documents; ${STATUSES.map((s) => `${s} ${counts.byStatus[s]}`).join(', ')}; ${counts.checked} checked, ${counts.findings} finding(s)${strict ? ' (strict)' : ' (report only)'}.`);
+  console.log(`check-doc-candidate-status: ${counts.files} documents; ${STATUSES.map((s) => `${s} ${counts.byStatus[s]}`).join(', ')}; ${counts.exemptUnrouted} of the unrouted are metadata-exempt evidence payloads; ${counts.checked} checked, ${counts.findings} finding(s)${strict ? ' (strict)' : ' (report only)'}.`);
   for (const [type, n] of Object.entries(counts.byType)) console.log(`    ${type}: ${n}`);
   for (const f of findings) console.log(`    [${f.type}] ${f.path}: ${f.message}`);
   return fatal ? 1 : 0;

@@ -21,7 +21,7 @@ const realSwitchboard = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, DEFAULT_
 
 const switchboard = {
   areas: [
-    { area: 'Laws', authorityStatus: 'candidate', entryPoint: 'docs/platform/laws.md', canonicalRoute: 'docs/laws.md', scopedRoutes: [{ route: 'docs/laws.md', authorityStatus: 'legacy-current' }, { route: 'docs/platform/laws.md', authorityStatus: 'candidate' }] },
+    { area: 'Laws', authorityStatus: 'candidate', entryPoint: 'docs/platform/laws/README.md', canonicalRoute: 'docs/laws.md', scopedRoutes: [{ route: 'docs/laws.md', authorityStatus: 'legacy-current' }, { route: 'docs/platform/laws/README.md', authorityStatus: 'candidate' }] },
     { area: 'Portal', authorityStatus: 'promoted', canonicalRoute: 'docs/platform/portal/README.md', scopedRoutes: [{ route: 'docs/platform/portal/README.md', authorityStatus: 'promoted' }, { route: 'docs/archive/**', authorityStatus: 'non-authority' }] },
   ],
   rootDocuments: [{ path: 'docs/README.md', authorityStatus: 'legacy-current' }],
@@ -50,19 +50,19 @@ function check(root, files) {
 }
 
 test('status comes only from the switchboard', () => {
-  assert.equal(classifyDocumentStatus('docs/platform/laws.md', switchboard), 'candidate');
+  assert.equal(classifyDocumentStatus('docs/platform/laws/README.md', switchboard), 'candidate');
   assert.equal(classifyDocumentStatus('docs/laws.md', switchboard), 'legacy-current');
   assert.equal(classifyDocumentStatus('docs/platform/portal/README.md', switchboard), 'promoted');
   assert.equal(classifyDocumentStatus('docs/archive/deep/old.md', switchboard), 'non-authority');
   assert.equal(classifyDocumentStatus('docs/README.md', switchboard), 'legacy-current');
-  assert.equal(classifyDocumentStatus('docs/platform/other.md', switchboard), 'unrouted');
+  assert.equal(classifyDocumentStatus('docs/platform/other/README.md', switchboard), 'unrouted');
 });
 
 test('a Design status header never changes the computed status', () => {
-  const root = fixtureRoot({ 'docs/platform/laws.md': header(['Document type', 'Audience', 'Purpose', 'Design status', 'Last reviewed', 'Related']).replace('Design status: x', 'Design status: Canonical and accepted') });
+  const root = fixtureRoot({ 'docs/platform/laws/README.md': header(['Document type', 'Audience', 'Purpose', 'Design status', 'Last reviewed', 'Related']).replace('Design status: x', 'Design status: Canonical and accepted') });
   try {
-    assert.equal(classifyDocumentStatus('docs/platform/laws.md', switchboard), 'candidate');
-    const { findings, counts } = check(root, ['docs/platform/laws.md']);
+    assert.equal(classifyDocumentStatus('docs/platform/laws/README.md', switchboard), 'candidate');
+    const { findings, counts } = check(root, ['docs/platform/laws/README.md']);
     assert.equal(counts.byStatus.candidate, 1);
     assert.equal(counts.byStatus.promoted, 0);
     assert.deepEqual(findings, []);
@@ -71,11 +71,11 @@ test('a Design status header never changes the computed status', () => {
 
 test('a candidate missing candidateCore fields is reported; a complete one is clean', () => {
   const root = fixtureRoot({
-    'docs/platform/laws.md': header(candidateFields.filter((f) => f !== 'Purpose' && f !== 'Audience')),
-    'docs/platform/other.md': '# Unrouted\n',
+    'docs/platform/laws/README.md': header(candidateFields.filter((f) => f !== 'Purpose' && f !== 'Audience')),
+    'docs/platform/other/README.md': '# Unrouted\n',
   });
   try {
-    const { findings, counts } = check(root, ['docs/platform/laws.md', 'docs/platform/other.md']);
+    const { findings, counts } = check(root, ['docs/platform/laws/README.md', 'docs/platform/other/README.md']);
     assert.deepEqual(findings.map((f) => f.type), ['missing-candidate-fields']);
     assert.match(findings[0].message, /Audience, Purpose/);
     assert.equal(counts.checked, 1);
@@ -84,9 +84,9 @@ test('a candidate missing candidateCore fields is reported; a complete one is cl
 });
 
 test('a headerless candidate is reported', () => {
-  const root = fixtureRoot({ 'docs/platform/laws.md': '# Laws\n\n## 1. Body\n' });
+  const root = fixtureRoot({ 'docs/platform/laws/README.md': '# Laws\n\n## 1. Body\n' });
   try {
-    assert.deepEqual(check(root, ['docs/platform/laws.md']).findings.map((f) => f.type), ['missing-candidate-fields']);
+    assert.deepEqual(check(root, ['docs/platform/laws/README.md']).findings.map((f) => f.type), ['missing-candidate-fields']);
   } finally { fs.rmSync(root, { recursive: true, force: true }); }
 });
 
@@ -106,10 +106,10 @@ test('a promoted document needs the governance baseline plus the promotion extra
 });
 
 test('unresolved relative links and Related paths are reported, resolved ones are not', () => {
-  const body = `${header(candidateFields.filter((f) => f !== 'Related'), ['docs/platform/portal/README.md', 'docs/platform/missing.md'])}\n[ok](portal/README.md) [bad](nope.md#x) [web](https://example.com/a.md) [anchor](#top)\n\n\`\`\`\n[ignored](in-fence.md)\n\`\`\`\n`;
-  const root = fixtureRoot({ 'docs/platform/laws.md': body, 'docs/platform/portal/README.md': '# P\n' });
+  const body = `${header(candidateFields.filter((f) => f !== 'Related'), ['docs/platform/portal/README.md', 'docs/platform/missing.md'])}\n[ok](../portal/README.md) [bad](nope.md#x) [web](https://example.com/a.md) [anchor](#top)\n\n\`\`\`\n[ignored](in-fence.md)\n\`\`\`\n`;
+  const root = fixtureRoot({ 'docs/platform/laws/README.md': body, 'docs/platform/portal/README.md': '# P\n' });
   try {
-    const { findings } = check(root, ['docs/platform/laws.md']);
+    const { findings } = check(root, ['docs/platform/laws/README.md']);
     assert.deepEqual(findings.map((f) => `${f.type}`).sort(), ['unresolved-link', 'unresolved-related']);
     assert.match(findings.find((f) => f.type === 'unresolved-link').message, /nope\.md/);
     assert.match(findings.find((f) => f.type === 'unresolved-related').message, /missing\.md/);
@@ -122,7 +122,7 @@ test('link and Related extraction helpers', () => {
 });
 
 test('runCli is report-only by default and fatal under --strict', () => {
-  const root = fixtureRoot({ 'docs/platform/laws.md': header(['Purpose']) });
+  const root = fixtureRoot({ 'docs/platform/laws/README.md': header(['Purpose']) });
   const board = path.join(root, 'switchboard.json');
   const consti = path.join(root, 'constitution.json');
   fs.writeFileSync(board, JSON.stringify(switchboard));
@@ -151,4 +151,16 @@ test('the real switchboard routes every promoted and candidate area entry point'
   const statuses = realSwitchboard.areas.filter((a) => a.entryPoint).map((a) => classifyDocumentStatus(a.entryPoint, realSwitchboard));
   assert.ok(statuses.every((s) => s === 'candidate'));
   assert.equal(classifyDocumentStatus('docs/platform/packaging-distribution/README.md', realSwitchboard), 'promoted');
+});
+
+test('a routed document that matches no placement pattern is reported, and an ambiguous switchboard route is surfaced', () => {
+  const board = { areas: [{ area: 'Odd', authorityStatus: 'candidate', scopedRoutes: [{ route: 'docs/platform/zzz/**', authorityStatus: 'candidate' }] }], rootDocuments: [] };
+  const root = fixtureRoot({ 'docs/platform/zzz/qq/ww/ee.md': header(candidateFields) });
+  try {
+    const { findings } = checkCandidateMetadata({ files: ['docs/platform/zzz/qq/ww/ee.md'], readFile: (f) => fs.readFileSync(path.join(root, f), 'utf8'), switchboard: board, constitution, repoRoot: root });
+    assert.deepEqual(findings.map((f) => f.type), ['unplaced-document']);
+  } finally { fs.rmSync(root, { recursive: true, force: true }); }
+  const doubled = { areas: [{ area: 'A', authorityStatus: 'candidate', scopedRoutes: [{ route: 'docs/platform/a/README.md', authorityStatus: 'candidate' }] }, { area: 'B', authorityStatus: 'promoted', scopedRoutes: [{ route: 'docs/platform/a/README.md', authorityStatus: 'promoted' }] }], rootDocuments: [] };
+  const conflicted = checkCandidateMetadata({ files: ['docs/platform/a/README.md'], readFile: () => '', switchboard: doubled, constitution, repoRoot: REPO_ROOT });
+  assert.ok(conflicted.findings.some((f) => f.type === 'switchboard-route-conflict'));
 });

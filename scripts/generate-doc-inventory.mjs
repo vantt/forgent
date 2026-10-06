@@ -1878,6 +1878,11 @@ function runRefresh(argv, cwd, commit) {
     } else {
       const carried = carryForwardIdentityRegistryRepoWide(cwd, { commit: commitSha, identityRegistryPath: registryPath });
       delete carried._binding;
+      // A carry-forward never loses a claim id; refuse to overwrite the registry if one did.
+      const rowIds = (r) => new Set([...(r.units || []), ...(r.retiredUnits || []), ...(r.identityGaps || [])].map((row) => row.claimId));
+      const kept = rowIds(carried);
+      const lost = [...rowIds(registry)].filter((id) => !kept.has(id));
+      if (lost.length > 0) throw new Error(`carry-forward would lose ${lost.length} claim id(s) (first: ${lost[0]}); the registry was not rewritten`);
       fs.writeFileSync(registryPath, JSON.stringify(carried) + '\n');
       console.log(`generate-doc-inventory: carried identity registry forward from ${registry.commit} to ${commitSha} (${carried.documents.length} documents, ${carried.units.length} units); commit ${path.relative(cwd, registryPath)}`);
     }

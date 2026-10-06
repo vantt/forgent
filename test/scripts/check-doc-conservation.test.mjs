@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 
 import * as gates from '../../scripts/check-doc-inventory-gates.mjs';
@@ -92,14 +93,15 @@ test('legacy growth reported by the ratchet becomes a conservation finding', () 
 });
 
 test('checkConservation separates fatal invariants from open data', () => {
-  const inventory = { claimLedger: [row({ disposition: 'unknown-blocking', reviewStatus: 'blocking' })] };
+  const inventory = { items: [{ path: 'docs/specs/runner.md', proposedDisposition: 'unknown-blocking' }], claimLedger: [row({ disposition: 'unknown-blocking', reviewStatus: 'blocking' })] };
   const registry = { units: [{ claimId: 'claim_a' }], identityGaps: [{ claimId: 'g', sourcePath: 'docs/a.md', sourceAnchor: 'g' }], retiredUnits: [{ claimId: 'r', sourcePath: 'docs/a.md', sourceAnchor: 'r', disposition: 'delete-as-obsolete' }] };
   const dropped = { entries: [{ id: 'dropped-x' }] };
-  const result = gates.checkConservation({ inventory, registry, previousRegistry: { units: [{ claimId: 'claim_a' }] }, vocabulary: VOCABULARY, droppedClaimsRegister: dropped });
+  assert.equal(gates.checkConservation({ inventory, registry: { units: [{ claimId: 'claim_a' }] }, previousRegistries: [{ registry: { units: [{ claimId: 'claim_gone', sourcePath: 'docs/a.md', sourceAnchor: 'x' }] }, label: 'the sealed registry' }], vocabulary: VOCABULARY }).invariant[0].type, 'claim-id-not-conserved');
+  const result = gates.checkConservation({ inventory, registry, previousRegistries: [{ registry: { units: [{ claimId: 'claim_a' }] }, label: 'the sealed registry' }], vocabulary: VOCABULARY, droppedClaimsRegister: dropped });
   assert.deepEqual(result.invariant, []);
-  assert.deepEqual(result.open.map((o) => o.type).sort(), ['claims-not-reviewed', 'claims-unknown-blocking', 'claims-without-own-rationale', 'dropped-claims-unreviewed', 'registry-gaps-without-disposition', 'retired-rows-incomplete']);
+  assert.deepEqual(result.open.map((o) => o.type).sort(), ['claims-not-reviewed', 'claims-unknown-blocking', 'claims-without-own-rationale', 'dropped-claims-unreviewed', 'files-unknown-blocking', 'registry-gaps-without-disposition', 'retired-rows-incomplete']);
   const reviewed = { entries: [{ id: 'dropped-x', reviewedDisposition: { decision: 'restoration-owner-named', reviewer: 'owner', reviewedAt: '2026-10-06' } }] };
-  const clean = gates.checkConservation({ inventory: { claimLedger: [row({ reviewStatus: 'reviewed', rationale: 'kept as evidence' })] }, registry: { units: [{ claimId: 'claim_a' }] }, vocabulary: VOCABULARY, droppedClaimsRegister: reviewed });
+  const clean = gates.checkConservation({ inventory: { items: [], claimLedger: [row({ reviewStatus: 'reviewed', rationale: 'kept as evidence' })] }, registry: { units: [{ claimId: 'claim_a' }] }, vocabulary: VOCABULARY, droppedClaimsRegister: reviewed });
   assert.deepEqual(clean, { invariant: [], open: [] });
 });
 
@@ -252,4 +254,87 @@ test('gates CLI names the refresh command with the current commit when the shard
     assert.match(errs.join('\n'), new RegExp(`generate-doc-inventory\\.mjs --refresh --commit ${head} `));
     assert.doesNotMatch(errs.join('\n'), /<commit>/);
   } finally { console.error = err; repo.cleanup(); }
+});
+
+// ---- review round: inputs, retired rows, identical units, anchors ----------
+
+test('a retired row without a vocabulary disposition is not a recorded removal', () => {
+  const registry = { units: [], retiredUnits: [{ claimId: 'r1', sourcePath: 'docs/a.md', sourceAnchor: 'a', status: 'removed-pending-disposition' }, { claimId: 'r2', sourcePath: 'docs/a.md', sourceAnchor: 'b', disposition: 'delete-as-obsolete' }] };
+  const findings = gates.validateRetiredRowDispositions(registry, VOCABULARY);
+  assert.deepEqual(findings.map((f) => f.type), ['retired-row-disposition-missing']);
+  assert.match(findings[0].message, /r1/);
+  assert.deepEqual(gates.checkConservation({ inventory: { claimLedger: [] }, registry, vocabulary: VOCABULARY }).invariant.map((f) => f.type), ['retired-row-disposition-missing']);
+});
+
+test('identical source units that name different owners are reported as open data', () => {
+  const claims = [row({ claimId: 'c1', sourcePath: 'docs/a.md', sourceUnitDigest: 'd1', targetOwner: 'docs/platform/a/README.md' }), row({ claimId: 'c2', sourcePath: 'docs/b.md', sourceUnitDigest: 'd1', targetOwner: 'docs/platform/b/README.md' }), row({ claimId: 'c3', sourcePath: 'docs/c.md', sourceUnitDigest: 'd2', targetOwner: 'docs/platform/a/README.md' })];
+  const open = gates.summarizeConservationCompleteness({ inventory: { items: [], claimLedger: claims }, registry: {}, vocabulary: VOCABULARY });
+  assert.equal(open.find((o) => o.type === 'identical-units-multiple-owners').count, 1);
+});
+
+test('the inventory must describe the current tree and the registry on disk', () => {
+  const repo = makeRepo();
+  try {
+    repo.write('docs/specs/runner.md', `# Runner\n\n${BODY}\n`);
+    const base = repo.commit('base');
+    repo.write('docs/specs/runner.md', `# Runner\n\n${BODY}\n\nEdited.\n`);
+    const head = repo.commit('edit');
+    const stale = gates.validateInventoryFreshness({ inventory: { commit: base }, headCommit: head, repoRoot: repo.tmp });
+    assert.deepEqual(stale.map((f) => f.type), ['inventory-stale']);
+    assert.match(stale[0].message, new RegExp(`--refresh --commit ${head}`));
+    assert.deepEqual(gates.validateInventoryFreshness({ inventory: { commit: head }, headCommit: head, repoRoot: repo.tmp }), []);
+    const bytes = Buffer.from('{"documents":[]}');
+    const sha = crypto.createHash('sha256').update(bytes).digest('hex');
+    assert.deepEqual(gates.validateInventoryFreshness({ inventory: { commit: head, identityRegistry: { sha256: sha } }, headCommit: head, repoRoot: repo.tmp, registryBytes: bytes }), []);
+    assert.deepEqual(gates.validateInventoryFreshness({ inventory: { commit: head, identityRegistry: { sha256: sha } }, headCommit: head, repoRoot: repo.tmp, registryBytes: Buffer.from('{}') }).map((f) => f.type), ['identity-registry-digest-mismatch']);
+  } finally { repo.cleanup(); }
+});
+
+test('a targetAnchor is checked against the headings of the target document at the inventory commit', () => {
+  const repo = makeRepo();
+  try {
+    repo.write('docs/platform/agent-coordination/README.md', '# Agent Coordination\n\n## Real Section\n\nBody text that is long enough to count as a block.\n');
+    const commit = repo.commit('target');
+    const lookup = gates.buildTargetAnchorLookup(repo.tmp, commit);
+    assert.equal(lookup('docs/platform/agent-coordination/README.md').has('real-section'), true);
+    assert.equal(lookup('docs/platform/agent-coordination/README.md').has('missing-section'), false);
+    assert.equal(lookup('docs/platform/no-such.md'), null);
+    const inventory = { items: [{ path: 'docs/specs/runner.md', proposedDisposition: 'merge', proposedTargetOwner: 'docs/platform/agent-coordination/README.md', fileClass: 'maintained-authority' }], claimLedger: [row({ disposition: 'merge', targetOwner: 'docs/platform/agent-coordination/README.md', targetAnchor: 'real-section', sourceId: 's', sourceDigest: 'x', claimKind: 'specification', authorityKind: 'legacy-current', status: 'current', relations: [] })] };
+    const owners = new Set(['docs/platform/agent-coordination/README.md']);
+    assert.deepEqual(gates.validateAgainstVocabulary(inventory, VOCABULARY, owners, { targetAnchorsOf: lookup }).map((f) => f.type), []);
+    inventory.claimLedger[0].targetAnchor = 'missing-section';
+    assert.deepEqual(gates.validateAgainstVocabulary(inventory, VOCABULARY, owners, { targetAnchorsOf: lookup }).map((f) => f.type), ['retained-claim-target-anchor-missing']);
+  } finally { repo.cleanup(); }
+});
+
+test('gates CLI strict mode refuses to run without its conservation inputs, and a stale inventory is always fatal', () => {
+  const repo = makeRepo();
+  const log = console.log;
+  const err = console.error;
+  const errs = [];
+  try {
+    repo.write('docs/specs/runner.md', `# Runner\n\n${BODY}\n`);
+    const base = repo.commit('base');
+    const registry = generator.bootstrapIdentityRegistry(repo.tmp, { commit: base });
+    fs.mkdirSync(path.dirname(repo.registryPath), { recursive: true });
+    fs.writeFileSync(repo.registryPath, JSON.stringify(registry));
+    const registryCommit = repo.commit('commit the registry');
+    console.log = () => {};
+    assert.equal(generator.runCli(['--refresh', '--commit', registryCommit], repo.tmp), 0);
+    console.error = (...a) => errs.push(a.join(' '));
+    assert.equal(gates.runCli([], repo.tmp), 0, errs.join('\n'));
+    errs.length = 0;
+    assert.equal(gates.runCli(['--strict'], repo.tmp), 1);
+    assert.match(errs.join('\n'), /\[conservation-input-missing\] strict mode needs the sealed registry/);
+    assert.match(errs.join('\n'), /\[conservation-input-missing\] strict mode needs the legacy-docs ratchet/);
+    errs.length = 0;
+    assert.equal(gates.runCli(['--previous-registry', 'no-such-registry.json'], repo.tmp), 1);
+    assert.match(errs.join('\n'), /error loading input/);
+
+    repo.write('docs/specs/runner.md', `# Runner\n\n${BODY}\n\nEdited after the inventory.\n`);
+    repo.commit('edit docs');
+    errs.length = 0;
+    assert.equal(gates.runCli([], repo.tmp), 1);
+    assert.match(errs.join('\n'), /\[inventory-stale\]/);
+  } finally { console.log = log; console.error = err; repo.cleanup(); }
 });

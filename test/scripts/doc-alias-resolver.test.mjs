@@ -110,20 +110,46 @@ test('runCli validates, resolves and sets the exit code', () => {
   try {
     const good = path.join(dir, 'good.json');
     const bad = path.join(dir, 'bad.json');
+    fs.mkdirSync(path.join(dir, 'docs/platform/runner'), { recursive: true });
+    fs.writeFileSync(path.join(dir, 'docs/platform/runner/README.md'), '# R\n');
+    const constitutionArgs = ['--constitution', path.join(REPO_ROOT, 'plans/260925-documentation-authority-unification/minimum-constitution.json')];
     fs.writeFileSync(good, JSON.stringify(tableOf(entry())));
     fs.writeFileSync(bad, JSON.stringify(tableOf(entry(), entry({ aliasId: 'dup' }))));
-    assert.equal(runCli(['--table', good], dir), 0);
-    assert.equal(runCli(['--table', good, '--resolve', 'docs/specs/runner.md'], dir), 0);
+    assert.equal(runCli(['--table', good, ...constitutionArgs], dir), 0);
+    assert.equal(runCli(['--table', good, ...constitutionArgs, '--resolve', 'docs/specs/runner.md'], dir), 0);
     assert.ok(logs.some((l) => l.includes('docs/platform/runner/README.md')));
-    assert.equal(runCli(['--table', good, '--resolve', 'docs/nope.md'], dir), 1);
-    assert.equal(runCli(['--table', bad], dir), 1);
+    assert.equal(runCli(['--table', good, ...constitutionArgs, '--resolve', 'docs/nope.md'], dir), 1);
+    assert.equal(runCli(['--table', bad, ...constitutionArgs], dir), 1);
+    fs.writeFileSync(path.join(dir, 'ownerless.json'), JSON.stringify(tableOf(entry({ toOwner: 'docs/platform/nowhere/README.md' }))));
+    assert.equal(runCli(['--table', path.join(dir, 'ownerless.json'), ...constitutionArgs], dir), 1, 'the CLI checks that owners exist');
     logs.length = 0;
-    assert.equal(runCli(['--table', good, '--json', '--resolve', 'docs/specs/runner.md'], dir), 0);
+    assert.equal(runCli(['--table', good, ...constitutionArgs, '--json', '--resolve', 'docs/specs/runner.md'], dir), 0);
     assert.equal(JSON.parse(logs.join('\n')).resolution.via, 'runner-spec');
-    assert.equal(runCli(['--table', path.join(dir, 'missing.json')], dir), 1);
+    assert.equal(runCli(['--table', path.join(dir, 'missing.json'), ...constitutionArgs], dir), 1);
   } finally {
     console.log = origLog;
     console.error = origErr;
     fs.rmSync(dir, { recursive: true, force: true });
   }
+});
+
+test('a split alias must name the old anchor, and a chain through an anchored alias is found', () => {
+  assert.ok(types(tableOf(entry({ kind: 'split' }))).includes('split-without-anchor'));
+  const parts = [entry({ aliasId: 'one', kind: 'split', fromPath: 'docs/specs/runner.md#one', toOwner: 'docs/platform/a/README.md' }), entry({ aliasId: 'two', kind: 'split', fromPath: 'docs/specs/runner.md#two', toOwner: 'docs/platform/b/README.md' })];
+  assert.deepEqual(types(tableOf(...parts)), []);
+  const hop = entry({ aliasId: 'hop', fromPath: 'docs/platform/a/README.md#intro', toOwner: 'docs/platform/c/README.md' });
+  const chained = entry({ aliasId: 'one', fromPath: 'docs/specs/runner.md#one', toOwner: 'docs/platform/a/README.md', toAnchor: 'intro' });
+  assert.deepEqual(types(tableOf(chained, hop)), ['alias-chain']);
+  const unrelated = entry({ aliasId: 'other', fromPath: 'docs/platform/a/README.md#other', toOwner: 'docs/platform/c/README.md' });
+  assert.deepEqual(types(tableOf(chained, unrelated)), [], 'an alias on a different anchor of the owner is not a chain');
+});
+
+test('toAnchor must be a heading of the owner document', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'alias-anchor-'));
+  try {
+    fs.mkdirSync(path.join(root, 'docs/platform/runner'), { recursive: true });
+    fs.writeFileSync(path.join(root, 'docs/platform/runner/README.md'), '# Runner\n\n## Dispatch Lifecycle\n\nBody text that is long enough to count as a block.\n');
+    assert.deepEqual(types(tableOf(entry({ toAnchor: 'dispatch-lifecycle' })), { repoRoot: root }), []);
+    assert.deepEqual(types(tableOf(entry({ toAnchor: 'nonexistent-anchor' })), { repoRoot: root }), ['anchor-missing']);
+  } finally { fs.rmSync(root, { recursive: true, force: true }); }
 });

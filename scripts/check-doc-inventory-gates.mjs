@@ -210,7 +210,26 @@ export function deriveValidTargetOwnersFromSwitchboard(switchboard) {
   return owners;
 }
 
-export function validateAgainstVocabulary(inventory, vocabulary, validTargetOwners = null) {
+/**
+ * Heading anchors of a target document at a commit, so a claim's targetAnchor can
+ * be checked against the owner it names. Returns null when the owner is not a
+ * readable document at that commit.
+ */
+export function buildTargetAnchorLookup(repoRoot, commitSha) {
+  const cache = new Map();
+  return (owner) => {
+    if (cache.has(owner)) return cache.get(owner);
+    let anchors = null;
+    try {
+      const content = readBlobAtCommit(commitSha, owner, repoRoot);
+      anchors = new Set(extractMarkdownConservationUnits(content).flatMap((u) => [u.anchor, u.githubAnchor, u.stableAnchor]).filter(Boolean));
+    } catch { anchors = null; }
+    cache.set(owner, anchors);
+    return anchors;
+  };
+}
+
+export function validateAgainstVocabulary(inventory, vocabulary, validTargetOwners = null, { targetAnchorsOf = null } = {}) {
   const findings = [];
   const dispositionsById = new Map((vocabulary?.sourceDispositions || []).map((d) => [d.id, d]));
   const claimKinds = new Set((vocabulary?.claimKinds || []).map((k) => k.id));
@@ -276,7 +295,11 @@ export function validateAgainstVocabulary(inventory, vocabulary, validTargetOwne
           findings.push({ type: 'retained-claim-owner-not-switchboard-backed', path: item.path, message: `${item.path}: claim ${claim.claimId} targetOwner ${owners[0]} is not a real switchboard-backed target owner` });
         }
         if (claim.targetAnchor && claim.targetOwner !== claim.sourcePath) {
-          findings.push({ type: 'retained-claim-target-anchor-unverified-copy', path: item.path, message: `${item.path}: claim ${claim.claimId} copies targetAnchor ${claim.targetAnchor} onto different targetOwner ${claim.targetOwner} without target verification` });
+          if (targetAnchorsOf === null) {
+            findings.push({ type: 'retained-claim-target-anchor-unverified-copy', path: item.path, message: `${item.path}: claim ${claim.claimId} copies targetAnchor ${claim.targetAnchor} onto different targetOwner ${claim.targetOwner} without target verification` });
+          } else if (!(targetAnchorsOf(claim.targetOwner)?.has(claim.targetAnchor))) {
+            findings.push({ type: 'retained-claim-target-anchor-missing', path: item.path, message: `${item.path}: claim ${claim.claimId} targetAnchor ${claim.targetAnchor} is not a heading or block anchor of ${claim.targetOwner}` });
+          }
         }
       }
     }
@@ -447,12 +470,13 @@ export function validateRetiredDispositions(registry, vocabulary) {
 
 // ---- Conservation ---------------------------------------------------------
 // Invariants hold on today's data and are fatal in every mode: a claim identity
-// that vanished, a row without a known disposition, a required target that is
-// missing, two owners for one semantic claim, growth under the legacy roots.
+// that vanished, a live row without a known disposition, a retired row without
+// one, a required target that is missing, two owners for one semantic claim,
+// growth under the legacy roots, an inventory that no longer matches the tree.
 // Completeness findings describe data that is legitimately unfinished before the
-// cutover (blocking or unreviewed rows, rows without their own rationale, open
-// registry rows, unreviewed dropped claims); they are reported with counts and
-// become fatal in strict (cutover) mode.
+// cutover (blocking or unreviewed rows, rationale-less rows, open registry rows,
+// unreviewed dropped claims); they are reported with counts and become fatal in
+// strict (cutover) mode, where a missing conservation input is fatal as well.
 
 const registryRows = (registry) => [...(registry?.units || []), ...(registry?.retiredUnits || []), ...(registry?.identityGaps || [])];
 const EXAMPLE_LIMIT = 5;
@@ -462,12 +486,12 @@ function summarizeOpen(type, message, items, describe) {
 }
 
 /** Every claim id of the previous registry is still a live, gap or retired row of the current one. */
-export function validateRowSetConservation(registry, previousRegistry) {
+export function validateRowSetConservation(registry, previousRegistry, label = 'the previous registry') {
   if (!previousRegistry) return [];
   const present = new Set(registryRows(registry).map((row) => row?.claimId).filter(Boolean));
   return registryRows(previousRegistry)
     .filter((row) => row?.claimId && !present.has(row.claimId))
-    .map((row) => ({ type: 'claim-id-not-conserved', path: row.sourcePath, message: `${row.sourcePath}: claim ${row.claimId} (${row.sourceAnchor}) of the previous registry is neither a live, gap nor retired row of the current registry` }));
+    .map((row) => ({ type: 'claim-id-not-conserved', path: row.sourcePath, message: `${row.sourcePath}: claim ${row.claimId} (${row.sourceAnchor}) of ${label} is neither a live, gap nor retired row of the current registry` }));
 }
 
 /** Rows that share a semanticClaimId must not name two different target owners. */
@@ -497,23 +521,58 @@ export function validateClaimDispositions(claimLedger, vocabulary) {
   return findings;
 }
 
+/** A recorded removal names a vocabulary disposition; a retired row without one is not a recorded removal. */
+export function validateRetiredRowDispositions(registry, vocabulary) {
+  const known = new Set((vocabulary?.sourceDispositions || []).map((d) => d.id));
+  return (registry?.retiredUnits || [])
+    .filter((row) => !known.has(row?.disposition))
+    .map((row) => ({ type: 'retired-row-disposition-missing', path: row?.sourcePath, message: `${row?.sourcePath}: retired claim ${row?.claimId} (${row?.sourceAnchor}) has no vocabulary disposition, so its removal is not recorded` }));
+}
+
 /** Legacy-root growth found by the ratchet, one finding per ratchet violation. */
 export function validateLegacyGrowth(ratchetResult) {
   return (ratchetResult?.findings || []).map((f) => ({ type: `legacy-growth-${f.type}`, path: f.path, message: f.message }));
+}
+
+/** The saved inventory describes the tree it is checked against, and the registry on disk is the one it was generated from. */
+export function validateInventoryFreshness({ inventory, headCommit, repoRoot, registryBytes = null }) {
+  const findings = [];
+  if (headCommit && inventory?.commit && !registryBindsToCommit(inventory.commit, headCommit, repoRoot)) {
+    findings.push({ type: 'inventory-stale', message: `the inventory was generated at ${inventory.commit} and the in-scope tree at ${headCommit} differs; regenerate with: node scripts/generate-doc-inventory.mjs --refresh --commit ${headCommit}` });
+  }
+  const recorded = inventory?.identityRegistry?.sha256;
+  if (registryBytes && recorded && sha256Buffer(registryBytes) !== recorded) {
+    findings.push({ type: 'identity-registry-digest-mismatch', message: 'the identity registry on disk is not the file the inventory was generated from (sha256 differs); regenerate the inventory' });
+  }
+  return findings;
+}
+
+/** A document is an evidence mirror when it is a payload nested below a verification directory of the legacy or platform tree. */
+export function isEvidenceMirrorPath(p) {
+  return /^docs\/(?:architect|platform)\/(?:.+\/)?verification\/[^/]+\/.+/.test(p);
 }
 
 /** Open data that blocks the cutover but is not corruption before it. */
 export function summarizeConservationCompleteness({ inventory, registry, vocabulary, droppedClaimsRegister = null }) {
   const dispositions = new Map((vocabulary?.sourceDispositions || []).map((d) => [d.id, d]));
   const claims = inventory?.claimLedger || [];
+  const unitOwners = new Map();
+  for (const claim of claims) {
+    if (!claim?.sourceUnitDigest || typeof claim.targetOwner !== 'string' || claim.targetOwner === '') continue;
+    const set = unitOwners.get(claim.sourceUnitDigest) || new Set();
+    set.add(claim.targetOwner);
+    unitOwners.set(claim.sourceUnitDigest, set);
+  }
   const open = [
+    summarizeOpen('files-unknown-blocking', 'inventory files whose file-level disposition is unknown-blocking', (inventory?.items || []).filter((i) => i.proposedDisposition === 'unknown-blocking'), (i) => i.path),
     summarizeOpen('claims-unknown-blocking', 'claim rows whose disposition is unknown-blocking', claims.filter((c) => c.disposition === 'unknown-blocking'), (c) => `${c.sourcePath}#${c.sourceAnchor}`),
     summarizeOpen('claims-not-reviewed', 'claim rows whose reviewStatus is not reviewed', claims.filter((c) => c.reviewStatus !== 'reviewed'), (c) => `${c.sourcePath}#${c.sourceAnchor}`),
     summarizeOpen('claims-without-own-rationale', 'claim rows whose disposition requires a rationale and that carry none of their own', claims.filter((c) => dispositions.get(c.disposition)?.requiresRationale && !(typeof c.rationale === 'string' && c.rationale !== '')), (c) => `${c.sourcePath}#${c.sourceAnchor}`),
+    summarizeOpen('identical-units-multiple-owners', 'identical source units whose rows name different target owners', [...unitOwners.entries()].filter(([, set]) => set.size > 1), ([digest, set]) => `${digest.slice(0, 12)}: ${[...set].sort().join(', ')}`),
     summarizeOpen('registry-gaps-without-disposition', 'registry identity-gap rows with no vocabulary disposition', (registry?.identityGaps || []).filter((row) => !dispositions.has(row?.disposition)), (row) => `${row.sourcePath}#${row.sourceAnchor}`),
-    summarizeOpen('retired-rows-incomplete', 'retired rows without a vocabulary disposition, a required target owner or a rationale', (registry?.retiredUnits || []).filter((row) => {
+    summarizeOpen('retired-rows-incomplete', 'retired rows without a required target owner or a rationale', (registry?.retiredUnits || []).filter((row) => {
       const disposition = dispositions.get(row?.disposition);
-      return !disposition || (disposition.requiresTargetOwner && !row.targetOwner) || (disposition.requiresRationale && !(row.dispositionRationale || row.retiredReason));
+      return disposition && ((disposition.requiresTargetOwner && !row.targetOwner) || (disposition.requiresRationale && !(row.dispositionRationale || row.retiredReason)));
     }), (row) => `${row.sourcePath}#${row.sourceAnchor}`),
     summarizeOpen('dropped-claims-unreviewed', 'dropped-claims register entries without a reviewedDisposition (decision, reviewer, reviewedAt)', (droppedClaimsRegister?.entries || []).filter((entry) => {
       const review = entry?.reviewedDisposition;
@@ -524,29 +583,33 @@ export function summarizeConservationCompleteness({ inventory, registry, vocabul
 }
 
 /** Runs every conservation rule; invariant findings are fatal in all modes, open findings only when strict. */
-export function checkConservation({ inventory, registry, previousRegistry = null, vocabulary, droppedClaimsRegister = null, ratchetResult = null }) {
+export function checkConservation({ inventory, registry, previousRegistries = [], vocabulary, droppedClaimsRegister = null, ratchetResult = null }) {
   const invariant = [
-    ...validateRowSetConservation(registry, previousRegistry),
+    ...previousRegistries.flatMap(({ registry: previous, label }) => validateRowSetConservation(registry, previous, label)),
     ...validateSemanticClaimOwners(inventory?.claimLedger),
     ...validateClaimDispositions(inventory?.claimLedger, vocabulary),
+    ...validateRetiredRowDispositions(registry, vocabulary),
     ...(ratchetResult ? validateLegacyGrowth(ratchetResult) : []),
   ];
   const open = summarizeConservationCompleteness({ inventory, registry, vocabulary, droppedClaimsRegister });
   return { invariant, open };
 }
 
-export function checkInventory({ repoRoot, inventory, vocabulary, identityRegistry = null, droppedClaimsRegister = null, previousRegistry = null, ratchetResult = null, strict = false }) {
+export function checkInventory({ repoRoot, inventory, vocabulary, identityRegistry = null, droppedClaimsRegister = null, previousRegistries = [], ratchetResult = null, strict = false, headCommit = null, registryBytes = null, missingInputs = [] }) {
   const fatalFindings = [
     ...validateStructure(inventory),
-    ...validateAgainstVocabulary(inventory, vocabulary, inventory.commit ? deriveValidTargetOwnersFromSwitchboard(loadSwitchboard(inventory.commit, repoRoot)) : null),
+    ...validateAgainstVocabulary(inventory, vocabulary, inventory.commit ? deriveValidTargetOwnersFromSwitchboard(loadSwitchboard(inventory.commit, repoRoot)) : null, { targetAnchorsOf: inventory.commit ? buildTargetAnchorLookup(repoRoot, inventory.commit) : null }),
     ...validateCommitBlobIntegrity(repoRoot, inventory),
     ...validateSourceUnitCoverage(repoRoot, inventory),
     ...validateIdentityRegistry(inventory, identityRegistry, { repoRoot }),
     ...(droppedClaimsRegister ? validateDroppedClaims(droppedClaimsRegister, { ledgerClaimIds: new Set((inventory.claimLedger || []).map((c) => c.claimId)), registry: identityRegistry }) : []),
   ];
-  const conservation = checkConservation({ inventory, registry: identityRegistry, previousRegistry, vocabulary, droppedClaimsRegister, ratchetResult });
-  fatalFindings.push(...conservation.invariant);
-  const strictFindings = strict ? conservation.open.map((o) => ({ type: o.type, message: `${o.count} ${o.message} (e.g. ${o.examples.join(', ')})` })) : [];
+  const conservation = checkConservation({ inventory, registry: identityRegistry, previousRegistries, vocabulary, droppedClaimsRegister, ratchetResult });
+  fatalFindings.push(...validateInventoryFreshness({ inventory, headCommit, repoRoot, registryBytes }), ...conservation.invariant);
+  const strictFindings = strict ? [
+    ...conservation.open.map((o) => ({ type: o.type, message: `${o.count} ${o.message} (e.g. ${o.examples.join(', ')})` })),
+    ...missingInputs.map((input) => ({ type: 'conservation-input-missing', message: `strict mode needs ${input}` })),
+  ] : [];
 
   let coverageFindings = [];
   if (fatalFindings.length === 0 && inventory.commit) {
@@ -655,6 +718,33 @@ export function loadDroppedClaimsRegister(argv, cwd) {
   return { register: loadJson(defaultPath), notice: null };
 }
 
+/**
+ * The registries a claim id must survive: the sealed first-generation registry
+ * and the registry committed at HEAD (what a refresh is about to replace).
+ * `--previous-registry <path>` names one instead; a named path that is missing
+ * is an error. Absent defaults are returned as `missing` so strict mode can
+ * refuse to run without them.
+ */
+export function loadPreviousRegistries({ repoRoot, cwd, argv, registryRelPath = IDENTITY_REGISTRY_PATH }) {
+  const idx = argv.indexOf('--previous-registry');
+  if (idx >= 0) return { registries: [{ registry: loadJson(path.resolve(cwd, argv[idx + 1])), label: `the registry ${argv[idx + 1]}` }], missing: [] };
+  const registries = [];
+  const missing = [];
+  const sealedPath = path.resolve(cwd, DEFAULT_PREVIOUS_REGISTRY_PATH);
+  if (fs.existsSync(sealedPath)) registries.push({ registry: loadJson(sealedPath), label: 'the sealed first-generation registry' });
+  else missing.push(`the sealed registry ${DEFAULT_PREVIOUS_REGISTRY_PATH}`);
+  try {
+    const committed = execFileSync('git', ['show', `HEAD:${registryRelPath}`], { cwd: repoRoot, maxBuffer: 1024 * 1024 * 1024, stdio: ['pipe', 'pipe', 'pipe'] });
+    registries.push({ registry: JSON.parse(committed.toString('utf8')), label: 'the registry committed at HEAD' });
+  } catch { missing.push(`the registry committed at HEAD (${registryRelPath})`); }
+  return { registries, missing };
+}
+
+function headCommitOf(repoRoot) {
+  try { return execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repoRoot, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] }).trim(); }
+  catch { return null; }
+}
+
 export function runCli(argv, cwd = process.cwd()) {
   const inventoryIdx = argv.indexOf('--inventory');
   const vocabIdx = argv.indexOf('--vocabulary');
@@ -672,19 +762,27 @@ export function runCli(argv, cwd = process.cwd()) {
   let inventory;
   let vocabulary;
   let identityRegistry;
-  let previousRegistry = null;
+  let previousRegistries = [];
+  const missingInputs = [];
+  let registryBytes = null;
   let ratchetResult = null;
   let droppedClaimsRegister;
   let droppedClaimsNotice;
   try {
     inventory = loadInventory(inventoryPath, { inventoryPath, identityRegistryPath, cwd });
     vocabulary = loadJson(vocabularyPath);
-    identityRegistry = loadJson(identityRegistryPath);
+    registryBytes = fs.readFileSync(identityRegistryPath);
+    identityRegistry = JSON.parse(registryBytes.toString('utf8'));
     ({ register: droppedClaimsRegister, notice: droppedClaimsNotice } = loadDroppedClaimsRegister(argv, cwd));
-    const previousPath = path.resolve(cwd, previousIdx >= 0 ? argv[previousIdx + 1] : DEFAULT_PREVIOUS_REGISTRY_PATH);
-    if (previousIdx >= 0 || fs.existsSync(previousPath)) previousRegistry = loadJson(previousPath);
-    else console.error(`check-doc-inventory-gates: previous registry not found at ${DEFAULT_PREVIOUS_REGISTRY_PATH}; row-set conservation check skipped`);
+    if (droppedClaimsRegister === null) missingInputs.push('the dropped-claims register');
+    const previous = loadPreviousRegistries({ repoRoot, cwd, argv, registryRelPath: normalizePosix(path.relative(repoRoot, identityRegistryPath)) });
+    previousRegistries = previous.registries;
+    for (const gone of previous.missing) {
+      console.error(`check-doc-inventory-gates: ${gone} not found; row-set conservation against it skipped`);
+      missingInputs.push(gone);
+    }
     ratchetResult = loadRatchetResult(repoRoot, argv);
+    if (ratchetResult === null) missingInputs.push('the legacy-docs ratchet (baseline missing or --no-ratchet)');
     if (droppedClaimsNotice) console.error(`check-doc-inventory-gates: ${droppedClaimsNotice}`);
   } catch (err) {
     console.error(`check-doc-inventory-gates error loading input: ${err.message}`);
@@ -693,7 +791,7 @@ export function runCli(argv, cwd = process.cwd()) {
 
   let result;
   try {
-    result = checkInventory({ repoRoot, inventory, vocabulary, identityRegistry, droppedClaimsRegister, previousRegistry, ratchetResult, strict });
+    result = checkInventory({ repoRoot, inventory, vocabulary, identityRegistry, droppedClaimsRegister, previousRegistries, ratchetResult, strict, headCommit: headCommitOf(repoRoot), registryBytes, missingInputs });
   } catch (err) {
     console.error(`check-doc-inventory-gates evaluation error: ${err.message}`);
     return 1;
@@ -720,7 +818,7 @@ export function runCli(argv, cwd = process.cwd()) {
     `${result.explicitOpenFindings.registryIdentityGapCount} registry identity-gap row(s), ${result.explicitOpenFindings.retiredWithoutDispositionCount} retired row(s) without disposition; ` +
     `${droppedClaimsRegister ? `${droppedClaimsRegister.entries.length} dropped claim(s) conserved.` : 'dropped-claim check skipped.'}`
   );
-  console.log(`check-doc-inventory-gates: conservation: ${previousRegistry ? 'row set conserved against the previous registry' : 'row-set check skipped'}, one owner per semantic claim, dispositions and targets present, ${ratchetResult ? 'legacy-docs ratchet clean' : 'ratchet skipped'}.`);
+  console.log(`check-doc-inventory-gates: conservation: ${previousRegistries.length > 0 ? `row set conserved against ${previousRegistries.length} previous registr${previousRegistries.length === 1 ? 'y' : 'ies'}` : 'row-set check skipped'}, one owner per semantic claim, dispositions and targets present, ${ratchetResult ? 'legacy-docs ratchet clean' : 'ratchet skipped'}.`);
   if (result.conservationOpen.length > 0) {
     console.log('check-doc-inventory-gates: open conservation data (fatal with --strict or --cutover):');
     for (const o of result.conservationOpen) console.log(`  - ${o.type}: ${o.count} (${o.message})`);

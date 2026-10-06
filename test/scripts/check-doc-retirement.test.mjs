@@ -9,7 +9,8 @@ import {
   evaluateRetirement,
   summarizeResults,
   exitCodeFor,
-  uncoveredImmutableTargets,
+  uncoveredHistoryReferences,
+  openConflictGroups,
   unrewrittenConsumerEdges,
   runCli,
 } from '../../scripts/check-doc-retirement.mjs';
@@ -20,7 +21,9 @@ const clone = (value) => JSON.parse(JSON.stringify(value));
 
 function cleanInputs() {
   return {
-    inventory: { items: [{ path: 'docs/platform/a/README.md', proposedDisposition: 'promote' }], immutableRefEdges: [], consumerEdges: [], duplicateContentGroups: [], semanticConflictGroups: [] },
+    inventory: { items: [{ path: 'docs/platform/a/README.md', proposedDisposition: 'promote' }], consumerEdges: [], duplicateContentGroups: [], semanticConflictGroups: [] },
+    previousRegistries: [{ registry: { units: [] }, label: 'the sealed registry' }],
+    reviewRecords: {},
     conservation: { invariant: [], open: [] },
     cutoverRows: { rows: 1, byReason: {}, total: 0 },
     usageDrift: [],
@@ -28,12 +31,11 @@ function cleanInputs() {
     aliasFindings: [],
     ratchetResult: { findings: [] },
     promotion: { canonicalDocuments: 2, complete: 2, headerless: 0, headeredIncomplete: 0 },
-    candidateStatus: { counts: { byStatus: { unrouted: 0 }, byType: {} }, findings: [] },
-    evidenceManifestPresent: true,
+    candidateStatus: { counts: { byStatus: { unrouted: 0 }, byType: {}, exemptUnrouted: 0 }, findings: [] },
   };
 }
 
-// The checks the constitution still marks planned stay blocked even when their computation is clean.
+// These checks have no implementation yet, so they stay blocked whatever the inputs say.
 const STILL_PLANNED = new Set(['evidence-digests', 'write-lease']);
 
 function statusById(results) {
@@ -52,22 +54,22 @@ test('every check of both gates gets a result; clean inputs leave only the plann
 });
 
 const defects = [
-  ['file-disposition', (i) => { i.inventory.items.push({ path: 'docs/specs/x.md', proposedDisposition: 'unknown-blocking' }); }],
+  ['file-disposition', (i) => { i.conservation.open.push({ type: 'files-unknown-blocking', count: 2, message: 'm', examples: [] }); }],
   ['claims-closed', (i) => { i.conservation.open.push({ type: 'claims-unknown-blocking', count: 3, message: 'm', examples: [] }); }],
   ['claims-reviewed', (i) => { i.conservation.open.push({ type: 'claims-not-reviewed', count: 3, message: 'm', examples: [] }); }],
   ['dropped-claims-resolved', (i) => { i.conservation.open.push({ type: 'dropped-claims-unreviewed', count: 1, message: 'm', examples: [] }); }],
-  ['aliases-cover-immutable-refs', (i) => { i.inventory.immutableRefEdges.push({ ref: 'abc1234', sourcePaths: ['docs/history/x.md'], targetPaths: ['docs/specs/runner.md'] }); }],
+  ['aliases-cover-immutable-refs', (i) => { i.inventory.consumerEdges.push({ path: 'archive/plans/p.md', targetPath: 'docs/specs/runner.md', kind: 'literal' }); }],
   ['consumers-rewritten', (i) => { i.inventory.consumerEdges.push({ path: 'src/a.mjs', targetPath: 'docs/specs/runner.md', kind: 'literal' }); }],
-  ['evidence-digests', (i) => { i.evidenceManifestPresent = false; }],
   ['no-new-legacy-growth', (i) => { i.ratchetResult = { findings: [{ type: 'new-file' }] }; }],
   ['row-set-conserved', (i) => { i.conservation.invariant.push({ type: 'claim-id-not-conserved', message: 'm' }); }],
+  ['row-set-conserved', (i) => { i.previousRegistries = []; }],
   ['one-owner-per-semantic-claim', (i) => { i.conservation.invariant.push({ type: 'semantic-claim-multiple-owners', message: 'm' }); }],
   ['cutover-mode', (i) => { i.cutoverRows = { rows: 1, byReason: { 'not-reviewed': 1 }, total: 1 }; }],
   ['cutover-mode', (i) => { i.usageDrift = [{ section: 'x', id: 'y' }]; }],
   ['reviewed-rationale', (i) => { i.cutoverRows = { rows: 1, byReason: { 'without-own-rationale': 4 }, total: 4 }; }],
   ['canonical-metadata-complete', (i) => { i.promotion = { canonicalDocuments: 2, complete: 1, headerless: 1, headeredIncomplete: 0 }; }],
-  ['metadata-and-structure', (i) => { i.candidateStatus = { counts: { byStatus: { unrouted: 2 }, byType: {} }, findings: [] }; }],
-  ['links-resolve', (i) => { i.candidateStatus = { counts: { byStatus: { unrouted: 0 }, byType: { 'unresolved-link': 1 } }, findings: [] }; }],
+  ['metadata-and-structure', (i) => { i.candidateStatus = { counts: { byStatus: { unrouted: 2 }, byType: {}, exemptUnrouted: 0 }, findings: [] }; }],
+  ['links-resolve', (i) => { i.candidateStatus = { counts: { byStatus: { unrouted: 0 }, byType: { 'unresolved-link': 1 }, exemptUnrouted: 0 }, findings: [] }; }],
   ['owner-per-claim', (i) => { i.cutoverRows = { rows: 1, byReason: { 'retained-without-owner': 2 }, total: 2 }; }],
 ];
 
@@ -85,11 +87,28 @@ for (const [id, mutate] of defects) {
   });
 }
 
-test('with the manifest absent the evidence check says so; with it present the planned marker still blocks until the verifier is built', () => {
-  const absent = cleanInputs();
-  absent.evidenceManifestPresent = false;
-  assert.match(evaluateRetirement(absent, constitution).find((r) => r.id === 'evidence-digests').measure, /no evidence relocation manifest/);
-  assert.match(evaluateRetirement(cleanInputs(), constitution).find((r) => r.id === 'evidence-digests').measure, /still marks this check planned/);
+test('the evidence check stays blocked until a verifier exists, whatever the inputs say', () => {
+  assert.match(evaluateRetirement(cleanInputs(), constitution).find((r) => r.id === 'evidence-digests').measure, /no evidence relocation manifest and no verifier/);
+});
+
+test('a review check stays owed until a record names reviewer, date and evidence, and cutover mode counts it', () => {
+  const owed = evaluateRetirement(cleanInputs(), constitution).find((r) => r.id === 'intent-and-boundary');
+  assert.equal(owed.status, 'review');
+  const partial = cleanInputs();
+  partial.reviewRecords = { 'intent-and-boundary': { reviewer: 'owner' } };
+  assert.equal(evaluateRetirement(partial, constitution).find((r) => r.id === 'intent-and-boundary').status, 'review');
+  const recorded = cleanInputs();
+  recorded.reviewRecords = { 'intent-and-boundary': { reviewer: 'owner', reviewedAt: '2026-10-06', evidence: 'plans/x/review.md' } };
+  assert.equal(evaluateRetirement(recorded, constitution).find((r) => r.id === 'intent-and-boundary').status, 'pass');
+  assert.equal(exitCodeFor({ cutover: true, counts: { pass: 3, blocked: 0, review: 1 }, invariantFailures: [] }), 1);
+});
+
+test('a check dropped from the constitution is reported as blocked', () => {
+  const copy = clone(constitution);
+  copy.retirementGate.checks = copy.retirementGate.checks.filter((c) => c.id !== 'write-lease');
+  const dropped = evaluateRetirement(cleanInputs(), copy).find((r) => r.gate === 'constitution' && r.id === 'write-lease');
+  assert.equal(dropped.status, 'blocked');
+  assert.match(dropped.measure, /no longer lists this check/);
 });
 
 test('an unresolved conflict group blocks the plan acceptance check', () => {
@@ -112,14 +131,25 @@ test('a check the constitution marks planned is blocked even when its computed m
   assert.match(unevaluated.measure, /unevaluated/);
 });
 
-test('immutable references resolve only through an alias on the exact legacy path', () => {
-  const inventory = { immutableRefEdges: [
-    { ref: 'a', sourcePaths: ['docs/history/x.md'], targetPaths: ['docs/specs/runner.md', 'docs/architect/x/y.md', 'docs/history/x.md'] },
-    { ref: 'b', sourcePaths: ['docs/history/y.md'], targetPaths: ['docs/specs/runner.md'] },
+test('legacy paths that history reads by path are covered only by a bare-path alias', () => {
+  const inventory = { consumerEdges: [
+    { path: 'archive/plans/a.md', targetPath: 'docs/specs/runner.md', kind: 'literal' },
+    { path: 'docs/history/x/y.md', targetPath: 'docs/architect/x/y.md', kind: 'literal' },
+    { path: '.fgos/events/e.jsonl', targetPath: 'docs/architect/x/y.md', kind: 'literal' },
+    { path: 'src/a.mjs', targetPath: 'docs/specs/other.md', kind: 'literal' },
+    { path: 'archive/plans/b.md', targetPath: 'docs/platform/a.md', kind: 'literal' },
   ] };
-  assert.deepEqual(uncoveredImmutableTargets(inventory, { entries: [] }), { targets: 2, uncovered: ['docs/architect/x/y.md', 'docs/specs/runner.md'] });
-  const table = { entries: [{ fromPath: 'docs/specs/runner.md#dispatch', toOwner: 'docs/platform/runner/README.md' }] };
-  assert.deepEqual(uncoveredImmutableTargets(inventory, table).uncovered, ['docs/architect/x/y.md']);
+  assert.deepEqual(uncoveredHistoryReferences(inventory, { entries: [] }), { targets: 2, uncovered: ['docs/architect/x/y.md', 'docs/specs/runner.md'] });
+  const anchorOnly = { entries: [{ fromPath: 'docs/specs/runner.md#dispatch', toOwner: 'docs/platform/runner/README.md' }] };
+  assert.deepEqual(uncoveredHistoryReferences(inventory, anchorOnly).uncovered, ['docs/architect/x/y.md', 'docs/specs/runner.md'], 'an anchor alias does not cover the document');
+  const bare = { entries: [{ fromPath: 'docs/specs/runner.md', toOwner: 'docs/platform/runner/README.md' }] };
+  assert.deepEqual(uncoveredHistoryReferences(inventory, bare).uncovered, ['docs/architect/x/y.md']);
+});
+
+test('duplicate groups made only of evidence mirrors resolve by deduplication and do not count as conflicts', () => {
+  const mirror = { key: 'm', paths: ['docs/architect/agent-coordination/verification/panel/P01/a.md', 'docs/platform/agent-coordination/verification/panel/P01/a.md'] };
+  const real = { key: 'r', paths: ['docs/specs/runner.md', 'docs/architect/runner.md'] };
+  assert.deepEqual(openConflictGroups({ duplicateContentGroups: [mirror, mirror, real], semanticConflictGroups: [{ key: 's' }] }), { duplicates: 1, mirrors: 2, semantic: 1 });
 });
 
 test('consumer edges count only authority readers of legacy paths', () => {
@@ -132,7 +162,7 @@ test('consumer edges count only authority readers of legacy paths', () => {
     { path: 'docs/specs/other.md', targetPath: 'docs/specs/runner.md', kind: 'literal' },
     { path: 'src/d.mjs', targetPath: 'docs/platform/a.md', kind: 'literal' },
   ] };
-  assert.deepEqual(unrewrittenConsumerEdges(inventory), { total: 3, byKind: { literal: 2, fixture: 1 } });
+  assert.deepEqual(unrewrittenConsumerEdges(inventory), { total: 3, byKind: { literal: 2, fixture: 1 }, unresolvedDynamic: 0 });
 });
 
 test('the dry run fails only on a conservation invariant; cutover mode also fails while a check is blocked', () => {

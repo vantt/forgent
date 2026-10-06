@@ -8,13 +8,15 @@
 // cite evidence. Chains are rejected: one lookup must land on a current owner,
 // so an alias whose owner is itself the old path of another alias is a
 // finding (a loop is reported as a cycle). Matching is exact on the path (and
-// optional #anchor); there is no globbing. Validation findings are fatal
-// (exit 1).
+// optional #anchor); there is no globbing. A split document is aliased per
+// anchor (one owner per old anchor); a bare path has one owner. Validation
+// findings are fatal (exit 1).
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { isMainModule } from './lib/is-main-module.mjs';
-import { classifyPath } from './check-doc-constitution.mjs';
+import { classifyPath, DEFAULT_CONSTITUTION_PATH } from './check-doc-constitution.mjs';
+import { extractMarkdownConservationUnits } from './generate-doc-inventory.mjs';
 
 export const DEFAULT_ALIAS_TABLE_PATH = 'plans/260925-documentation-authority-unification/alias-table.json';
 export const ALIAS_KINDS = ['moved', 'merged', 'split', 'redirected', 'retired-with-evidence'];
@@ -72,6 +74,7 @@ export function validateAliasTable(table, { repoRoot, constitution } = {}) {
     else seenFrom.set(entry.fromPath, entry.aliasId);
 
     const retired = entry.kind === 'retired-with-evidence';
+    if (entry.kind === 'split' && splitRef(entry.fromPath).anchor === null) add('split-without-anchor', `${label}: a split alias must name the old anchor (fromPath path#anchor), because a bare path resolves to one owner only`, entry.aliasId);
     if (entry.toOwner === null && entry.toAnchor !== null) add('anchor-without-owner', `${label}: toAnchor needs a toOwner`, entry.aliasId);
     if (retired) {
       if (!nonEmptyString(entry.evidenceRef)) add('missing-evidence', `${label}: retired-with-evidence needs an evidenceRef`, entry.aliasId);
@@ -87,24 +90,30 @@ export function validateAliasTable(table, { repoRoot, constitution } = {}) {
 
   // Chains and cycles: following an alias must land on a document that is not itself an old path.
   const byFromPath = new Map();
-  for (const entry of wellFormed) byFromPath.set(splitRef(entry.fromPath).path, entry);
+  for (const entry of wellFormed) byFromPath.set(entry.fromPath, entry);
+  const next = (entry) => (entry.toOwner === null ? null : (entry.toAnchor !== null && byFromPath.get(`${entry.toOwner}#${entry.toAnchor}`)) || byFromPath.get(entry.toOwner) || null);
   for (const entry of wellFormed) {
-    if (entry.toOwner === null) continue;
-    if (!byFromPath.has(entry.toOwner)) continue;
-    let cursor = byFromPath.get(entry.toOwner);
+    let cursor = next(entry);
+    if (!cursor) continue;
     const visited = new Set([entry.aliasId]);
     let cyclic = false;
     while (cursor) {
       if (visited.has(cursor.aliasId)) { cyclic = true; break; }
       visited.add(cursor.aliasId);
-      cursor = cursor.toOwner === null ? null : byFromPath.get(cursor.toOwner);
+      cursor = next(cursor);
     }
-    add(cyclic ? 'alias-cycle' : 'alias-chain', `${entry.aliasId}: toOwner "${entry.toOwner}" is itself the old path of another alias${cyclic ? ' (the aliases form a cycle)' : ''}`, entry.aliasId);
+    add(cyclic ? 'alias-cycle' : 'alias-chain', `${entry.aliasId}: toOwner "${entry.toOwner}"${entry.toAnchor ? `#${entry.toAnchor}` : ''} is itself the old path of another alias${cyclic ? ' (the aliases form a cycle)' : ''}`, entry.aliasId);
   }
 
   if (repoRoot) {
     for (const entry of wellFormed) {
-      if (entry.toOwner && !fs.existsSync(path.resolve(repoRoot, entry.toOwner))) add('owner-missing', `${entry.aliasId}: toOwner "${entry.toOwner}" does not exist`, entry.aliasId);
+      if (!entry.toOwner) continue;
+      const ownerPath = path.resolve(repoRoot, entry.toOwner);
+      if (!fs.existsSync(ownerPath)) { add('owner-missing', `${entry.aliasId}: toOwner "${entry.toOwner}" does not exist`, entry.aliasId); continue; }
+      if (entry.toAnchor !== null && entry.toOwner.toLowerCase().endsWith('.md')) {
+        const anchors = new Set(extractMarkdownConservationUnits(fs.readFileSync(ownerPath, 'utf8')).flatMap((u) => [u.anchor, u.githubAnchor, u.stableAnchor]).filter(Boolean));
+        if (!anchors.has(entry.toAnchor)) add('anchor-missing', `${entry.aliasId}: toAnchor "${entry.toAnchor}" is not a heading or block anchor of ${entry.toOwner}`, entry.aliasId);
+      }
     }
   }
   if (constitution) {
@@ -148,7 +157,14 @@ export function runCli(argv, cwd = process.cwd()) {
     console.error(`doc-alias-resolver error loading ${tablePath}: ${err.message}`);
     return 1;
   }
-  const findings = validateAliasTable(table);
+  let constitution;
+  try {
+    constitution = JSON.parse(fs.readFileSync(path.resolve(cwd, option('--constitution') ?? DEFAULT_CONSTITUTION_PATH), 'utf8'));
+  } catch (err) {
+    console.error(`doc-alias-resolver error loading the constitution: ${err.message}`);
+    return 1;
+  }
+  const findings = validateAliasTable(table, { repoRoot: cwd, constitution });
   const resolution = ref === undefined ? null : resolveAlias(table, ref);
   const failed = findings.length > 0 || (resolution !== null && !resolution.resolved);
   if (asJson) {
