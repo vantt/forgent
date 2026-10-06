@@ -13,7 +13,7 @@ dependencies: [5]
 
 ## Overview
 
-**Status:** `not-started`, `not-authorized`, blocked by Phase 5.
+**Status:** `not-started`, `not-authorized`, blocked by Phase 5. Harness per `plan.md` §7.2. Packaging-distribution is transformed only after Plan C's docs land, or carries dropped-001 as an open conflict (`plan.md` §7.5).
 **Mode:** isolated worktrees per non-overlapping target, merged to plan branch
 **Purpose:** Build the complete target corpus without creating a second live
 system.

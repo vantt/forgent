@@ -13,7 +13,7 @@ dependencies: [9]
 
 ## Overview
 
-**Status:** `not-started`, `not-authorized`, blocked by a verified Phase 9 cutover and follow-on authorization.
+**Status:** `not-started`, `not-authorized`, blocked by a verified Phase 9 cutover and follow-on authorization. Note: Plan B (`fgos convention`) may already cover naming/placement checks; reuse it instead of a second checker.
 **Mode:** follow-on plan may begin only after cutover
 **Purpose:** Prevent recurrence with the smallest useful maintenance system.
 

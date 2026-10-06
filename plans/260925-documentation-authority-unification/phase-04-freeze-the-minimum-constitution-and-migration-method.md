@@ -13,7 +13,7 @@ dependencies: [3]
 
 ## Overview
 
-**Status:** `not-started`, `not-authorized`, blocked by Phase 3.
+**Status:** `not-started`, `not-authorized`. Phase 3 is complete and the former Observe blockers are completed; this phase waits only for the owner's explicit authorization (re-checked 2026-10-06).
 **Mode:** plan branch
 **Purpose:** Turn inventory evidence into a small, testable migration contract.
 
@@ -43,14 +43,21 @@ Program-level data model and execution boundary: `plan.md` §5 (Execution Bounda
 
 ### Execution harness
 
-Type **Decision + Code slice**. See `plan.md` §7.2 and [reports/harness-readiness-2026-09-29.md](reports/harness-readiness-2026-09-29.md) §5.
+Type **Decision + Code slice**. See `plan.md` §7.2 (rewritten 2026-10-06; the coordination-session harness of `reports/harness-readiness-2026-09-29.md` is obsolete).
 - The Lead authors the constitution, the method and the gate scripts.
-- 1 `agent-led` review with `review` for the documents.
-- 1 `agent-led` review with `code:review` for the gate scripts.
-- 1 `group-thinking-rfc-review-lite` session on the method-freeze decision.
-- Each review has at most one re-review after fixes.
-- Observe case `doc-authority-p4`, opened before the first step.
-- Start only after the Observe-related plans are finished (see `plan.md` frontmatter `blockedBy`) **and** explicit authorization of this phase.
+- Review is read-only through the door that `node bin/fgos.mjs dispatch decide --for review --needs-soul --has-live-task-access` returns at phase start (`in-process` on 2026-10-06): one review for the documents, one for the gate scripts, at most one re-review each.
+- Decision record: Doc review plus the `rfc` preset or the `architecture-advisory` workflow.
+- Observe is optional: `fgos metrics case open doc-authority-p4 ...` if the owner wants numbers; never a start condition.
+- Start only on explicit authorization of this phase.
+
+### Resume inputs (2026-10-06)
+
+Must be handled before the method is frozen (see `plan.md` §7.3-§7.4):
+- rerun conservation on the synced tree with identity carry-forward, then disposition the 43 removed and 248 edited claim units listed in `reports/resync-261006/inventory-comparison.json` and the new routing gap `docs/specs/observe.md`;
+- make the plan tooling run on the branch head: the generator must not ingest its own committed inventory artifacts; `scripts/verify-phase-02.mjs` artifact paths must follow the `reports/` move; the content-coupled shipped-path inventory tests used by `scripts/verify-phase-01.mjs` need a decision;
+- decide a standing policy for main-side legacy-root edits until cutover instead of one exception batch per sync;
+- carry `dropped-claims-register.json` into the conservation checker so a dropped claim fails the gate;
+- decide how the Phase 1 "historical path" requirement treats main's move of the knowledge-registry plan to `archive/plans/`.
 
 ## Related Code Files
 

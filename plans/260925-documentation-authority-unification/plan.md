@@ -4,8 +4,8 @@ description: "Collapse the competing platform-documentation authorities into one
 status: in-progress
 priority: P1
 created: 2026-09-25
-revised: 2026-09-29 (converted to AgentKit plan format; phases renumbered from 1)
-blockedBy: [260929-1501-metrics-friction-rust-native, 260929-1703-runresult-classification-single-path]
+revised: 2026-10-06 (resume after main sync: coordination harness retired, Observe blockers completed, dropped-claim register, ordering with Plans A/B/C; earlier 2026-09-29 AgentKit format conversion)
+blockedBy: []
 blocks: []
 ---
 
@@ -15,8 +15,9 @@ blocks: []
 Plan status: In-progress (Phase 1 complete; Phase 2 complete -- independent re-review verdict APPROVE, tagged documentation-authority-phase-01-20260926 at f0c76c5e590339d9c815038539ff1f4a072c64e4; Phase 3 complete -- independent closure-review verdict APPROVE for `f0c76c5e590339d9c815038539ff1f4a072c64e4..0c3e8d8b57c40214fdcdb29a69c9b3c11de552fb`, immutable full receipt pinned on the same-tree boundary, tagged `documentation-authority-phase-02-20260926`; Phases 4-10 unauthorized and deferred)
 Primary objective: Collapse the competing platform-documentation authorities into one canonical system under docs/platform/**
 Long-horizon source: docs/platform/proposals/documentation-system-unification.md
-Historical foundation: plans/260825-1841-knowledge-registry/
-Execution authority: Phase 1 and Phase 2 completed by direct human request on 2026-09-25; Phase 3 authorized by direct human request on 2026-09-26 (Phase 3 doer assignment, isolated worktree /home/vantt/projects/forgentX-phase00-documentation-authority-unification); no authority for Phases 4-10
+Historical foundation: archive/plans/260825-1841-knowledge-registry/ (moved from plans/ by main commit 22e54f834 on 2026-09-30; see §7.4)
+Execution authority: Phase 1 and Phase 2 completed by direct human request on 2026-09-25; Phase 3 authorized by direct human request on 2026-09-26 (Phase 3 doer assignment, isolated worktree /home/vantt/projects/forgentX-phase00-documentation-authority-unification); 2026-10-06 resume authorized for sync, re-inventory and plan update only; no authority for Phases 4-10
+Resume state (2026-10-06): branch synced with main at 2fd5cb6a3; inventory regenerated and compared (§7.4); formal blockers completed; Phase 4 waits only for the owner's explicit authorization
 Risk: Critical documentation migration
 ```
 
@@ -68,7 +69,7 @@ The end-user knowledge registry code foundation from `tsk-28x` landed at commit
 `tsk-5mh` migration commits later that day; the migration projection was then
 regenerated at `1c6aa7a4`. Subsequent corpus drift must be evidenced separately.
 The exact repository-verified timeline is preserved in
-`plans/260825-1841-knowledge-registry/CURRENT-STATE-CORRECTION.md`. The implementation provides event-sourced
+`archive/plans/260825-1841-knowledge-registry/CURRENT-STATE-CORRECTION.md` (historical path `plans/260825-1841-knowledge-registry/`). The implementation provides event-sourced
 topic/document identity, lifecycle, aliases, resolver behavior, projections,
 doctor checks, and writer gating for a Diataxis-oriented profile. It is both a
 foundation and a source of lessons; it is not yet the platform documentation
@@ -249,7 +250,7 @@ Each phase lives in its own `phase-NN-*.md` file (AgentKit plan format). Phases 
 | 1 | Correct planning and routing semantics | 00 | completed | [phase-01-correct-planning-and-routing-semantics.md](phase-01-correct-planning-and-routing-semantics.md) |
 | 2 | Contain further divergence | 01 | completed | [phase-02-contain-further-divergence.md](phase-02-contain-further-divergence.md) |
 | 3 | Build repository-wide inventory and conservation ledger | 02 | completed | [phase-03-build-repository-wide-inventory-and-conservation-ledger.md](phase-03-build-repository-wide-inventory-and-conservation-ledger.md) |
-| 4 | Freeze the minimum constitution and migration method | 03 | pending (not authorized) | [phase-04-freeze-the-minimum-constitution-and-migration-method.md](phase-04-freeze-the-minimum-constitution-and-migration-method.md) |
+| 4 | Freeze the minimum constitution and migration method | 03 | pending (not authorized; waits for owner) | [phase-04-freeze-the-minimum-constitution-and-migration-method.md](phase-04-freeze-the-minimum-constitution-and-migration-method.md) |
 | 5 | Dual pilot: re-audit plus unmigrated mixed area | 04 | pending (not authorized) | [phase-05-dual-pilot-re-audit-plus-unmigrated-mixed-area.md](phase-05-dual-pilot-re-audit-plus-unmigrated-mixed-area.md) |
 | 6 | Transform all platform areas as candidate material | 05 | pending (not authorized) | [phase-06-transform-all-platform-areas-as-candidate-material.md](phase-06-transform-all-platform-areas-as-candidate-material.md) |
 | 7 | Cross-area integrity and fresh-reader review | 06 | pending (not authorized) | [phase-07-cross-area-integrity-and-fresh-reader-review.md](phase-07-cross-area-integrity-and-fresh-reader-review.md) |
@@ -259,7 +260,7 @@ Each phase lives in its own `phase-NN-*.md` file (AgentKit plan format). Phases 
 
 ### 7.1. Detailed status and authorization (snapshot)
 
-Status snapshot: 2026-09-25. `not-started` means no deliverable mutation from
+Status snapshot: 2026-09-25, rows 4-10 revised 2026-10-06. `not-started` means no deliverable mutation from
 that phase has begun; `not-authorized` means the dependency graph alone is not
 permission to execute it.
 
@@ -268,7 +269,7 @@ permission to execute it.
 | 1 | `completed` | Authorized by direct human request | Gate passed; truth reset only | Review unit is `ac19f6d1e..documentation-authority-phase-00-20260925`, including `a725d4788`, `0c38df980`, and the Phase 1 review-follow-up at HEAD; execution record, authority map, correction note, two independent reviews |
 | 2 | `completed` | Authorized by direct human request (asgn_pi_lead_phase01_review_fix_op_001) | Gate passed; containment active | Review unit `38a337ecb31dc97b78aca012eba0da89c003a927..f0c76c5e590339d9c815038539ff1f4a072c64e4`; independent re-review verdict **APPROVE**; tagged `documentation-authority-phase-01-20260926` (annotated tag object `135957aec6e9939b7a1626d2942014c045620a40`, tested/final tree `7f9e3f0907b1751f73e4ca1e4cdb7a75e2135a1a`); operative switchboard (`docs/transitional-switchboard.md`, `transitional-switchboard.json`), vocabulary (`claim-and-disposition-vocabulary.{json,md}`), baseline (`scripts/check-legacy-docs-ratchet.baseline.json`), exceptions ledger, policy-aware ratchet and tests, authoring rules (`docs/platform/migration-authoring-rules.md`), shipped path conventions inventory (`shipped-path-conventions-inventory.{json,md}`), execution and verification records; tag annotation records "Phase 02 remains unauthorized" (legacy numbering: Phase 02 = Phase 3) as of that tag, superseded by this plan's Phase 3 authorization below |
 | 3 | `completed` | Authorized by direct human request on 2026-09-26 (Phase 3 doer assignment, isolated worktree) | Gate passed; immutable full verification and independent closure review **APPROVE**; Phase 4 remains unauthorized | Approved range `f0c76c5e590339d9c815038539ff1f4a072c64e4..0c3e8d8b57c40214fdcdb29a69c9b3c11de552fb`; tagged `documentation-authority-phase-02-20260926`. Deterministic inventory + conservation ledger: manifest `reports/phase-02-doc-inventory.json`, 10 shards, report, and opaque identity registry. Inventory covers 4,305 files, 85,772 claim occurrences, and 98,406 consumer edges; explicit later-phase blockers remain 1,360 total, 818 exact duplicate groups, and 151 semantic-conflict groups. Full suite: 7,832 total / 0 failed. |
-| 4 | `not-started`, `not-authorized` | None | Blocked by Phase 3 | Constitution, mechanical conservation gates, alias resolver, and cutover-lease design remain open |
+| 4 | `not-started`, `not-authorized` | None; waits for the owner's explicit authorization | Phase 3 gate passed; formal `blockedBy` plans completed (archived on main, checked 2026-10-06); no other blocker | Constitution, mechanical conservation gates, alias resolver, and cutover-lease design remain open; resume inputs in §7.4 (re-inventory delta, dropped-claim register, plan tooling that no longer runs on the branch head) |
 | 5 | `not-started`, `not-authorized` | None | Blocked by Phase 4 | Neither pilot has begun; no candidate transformation is authorized |
 | 6 | `not-started`, `not-authorized` | None | Blocked by Phase 5 | No area-wide candidate corpus exists |
 | 7 | `not-started`, `not-authorized` | None | Blocked by Phase 6 | Cross-area and fresh-reader review cannot begin before complete candidates |
@@ -279,30 +280,19 @@ permission to execute it.
 
 ## 7.2. Execution harness and observation
 
-**Start condition:** Phases 4–10 start only after the Observe-related plans are finished, so every phase is measured from its first step:
-- `plans/260929-1501-metrics-friction-rust-native/` on `main`, **including** its follow-up (re-stage, transcript support for worktrees outside `.claude/worktrees`, verification pass);
-- `plans/260929-1703-runresult-classification-single-path/` on `main` (exact verdict/infra split, `usage`).
+Rewritten 2026-10-06. The 2026-09-29 harness (`reports/harness-readiness-2026-09-29.md` §2, §4, §5) assumed the `coordination` engine: agent-led sessions with `task.capabilities`, actor pins, one session per phase, `group-thinking-rfc-review-lite`, and closing coordination sessions. That engine is retired (main commit `2180b4e72`, "L4 coordination engine retired"; `node bin/fgos.mjs coordination` answers `unknown verb`; `docs/specs/runner.md` § CoordinationSession is marked historical). Those parts of the report are obsolete. Its "Revision 2" point still holds: authoring stays with the Lead, review only through a read-only path.
 
-The substrate friction producers (draft plan `260929-1703-baseline-friction-producers`) are **not** a precondition.
+**Start condition:** explicit owner authorization of the named phase (§5 item 11). The former Observe start condition is gone: both `blockedBy` plans (`260929-1501-metrics-friction-rust-native`, `260929-1703-runresult-classification-single-path`) are `completed` and archived under `archive/plans/` on main (checked 2026-10-06). Observe is an optional measurement add-on, never a gate.
 
-**Harness (cost-aware, correct capabilities).** Full rationale and mechanism table: [reports/harness-readiness-2026-09-29.md](reports/harness-readiness-2026-09-29.md) §5.
-- Authoring stays with the Lead in this worktree. In today's fgOS no mutating, non-code, Observe-visible dispatch path exists.
-- The master loop (`code:*`, 4 runs per round) is **not** used for documentation.
-- **Doc:**
-  - 1 `agent-led` reviewer session with `task.capabilities: ["review"]`, read-only, pinned to a provider different from the Lead;
-  - at most 1 re-review after fixes.
-- **Decision:** Doc review **plus one** `group-thinking-rfc-review-lite` session (proposer + 2 objectors) on the decision record.
-- **Code slice:**
-  - Lead inline;
-  - 1 `agent-led` reviewer session with `task.capabilities: ["code:review"]`;
-  - at most 1 re-review.
-- **Fresh-reader:** `independent-research-fan-out-fan-in` (2 independent researchers, read-only).
+**Harness (checked 2026-10-06, re-check at phase start):**
+- **Authoring:** the Lead, in this worktree. No phase delegates writing of target documents or ledgers.
+- **Doc review (read-only):** run `node bin/fgos.mjs dispatch decide --for review --needs-soul --has-live-task-access`. On 2026-10-06 it returned `mechanism: "in-process"` (`configured: false`, reason `native-first.rule-2.live-task-access`), so one in-process read-only reviewer subagent per review unit is available; at most one re-review after fixes. A different mechanism at phase start means follow that answer, not this text.
+- **Out-of-process review alternative:** `fgos run --pattern rfc` (preset `reviewed`, `maxRounds: 1`, checkers `reviewer` + `red-team`) per `docs/specs/runner.md` (Workflow and CollaborationPattern; reviewer confined from writing the repo, writes its outbox). UNPROVEN for documentation phases: not exercised in this plan.
+- **Decision review:** Doc review plus either the `rfc` preset or the `architecture-advisory` workflow (`core/workflows/architecture-advisory.yaml`) for the decision record; choose at phase start.
+- **Code slice (gate scripts):** Lead inline, one read-only code review through the same `dispatch decide` door, at most one re-review.
+- **Fresh-reader:** `research-fan-out` preset (panel, 3 researchers + synthesizer) or two in-process read-only readers without chat history.
 
-**Observation per phase:**
-- Open `fgos metrics case open doc-authority-p<N> --harness fgos --task "<phase title>"` before starting.
-- Close every coordination session explicitly.
-- Close the case with `--interventions`, `--verdict` and `--sessions <ids>`.
-- Read the result with `fgos metrics harness --case doc-authority-p<N>`.
+**Observation (optional add-on, not a gate).** `fgos metrics` is a Rust host command (`docs/specs/observe.md` §4); the Node CLI refuses it. A host built from the synced branch (`cargo build --release --bin fgos`, 2026-10-06) lists `ping, case, harness, faults, runs, coverage, discussions, eval, outcomes, entropy, snapshot`. Usable per phase if the owner wants numbers: `fgos metrics case open doc-authority-p<N> ...` before the first step, close with interventions/verdict, read `fgos metrics harness --case doc-authority-p<N>`; `fgos metrics runs`/`coverage`/`discussions` see `fgos run` Unit runs, not in-process subagents. `case open/close` write `.fgos/observe/`; the exact flags are re-read from `fgos metrics case --help` at phase start.
 
 | Phase | Harness type |
 |---|---|
@@ -313,6 +303,54 @@ The substrate friction producers (draft plan `260929-1703-baseline-friction-prod
 | 8 | Code slice + Doc (consumer and bypass rewrites) |
 | 9 | Decision (cutover approval) + Code slice |
 | 10 | Code slice + Doc |
+
+## 7.3. Dropped-claim conservation
+
+A claim that exists in a legacy source but is missing from its promoted
+`docs/platform/**` target is recorded in
+[dropped-claims-register.json](dropped-claims-register.json). Each entry blocks
+Phase 9 until it is restored at a target anchor or given an explicit reviewed
+disposition; the generated inventory never writes this file.
+
+| Id | Claim | Source | Target gap | Cause | Restoration |
+|---|---|---|---|---|---|
+| dropped-001 | Dev / Source Activation (Settled for V1) | `docs/architect/packaging-distribution/runtime-identity-and-activation.md:73,895-920` (commit `6733de7cf`); Phase 3 ledger `claim_efd5afeb35b4352c0229ea2f7be2356b`, `unknown-blocking`, no target | absent from `docs/platform/packaging-distribution/**` | not intended (owner, 2026-10-06); actual cause UNPROVEN | Plan C (`plans/261006-1445-fgctl-dev-activation/`, draft in main checkout) re-implements it; related overclaim at `docs/platform/host-invocation-routing/intent-preservation-ledger.md:81` (HI-I027) to reconcile |
+
+## 7.4. Resume after main sync (2026-10-06)
+
+Full record: [resume report](../reports/resume-261006-1635-doc-authority-unification.md).
+
+- **Sync:** `git merge` of main at `e63a17b8e` (merge `b9fee1e56`, 3 conflicts outside `docs/platform/**`) and again at `2fd5cb6a3` (merge `6b8ef0e8d`, clean). Main was 400 commits ahead, branch 59.
+- **Legacy roots:** all 20 main-side changes under `docs/specs/**` and `docs/architect/**` since `81f7db801` (19 edits, 1 new file `docs/specs/observe.md`) are accounted as reviewed exceptions in `scripts/check-legacy-docs-ratchet.exceptions.json` (`revisitTrigger`: Phase 9 cutover); per-file content review is still owed. The ratchet is clean (995 legacy files, 24 accounted edits, 1 accounted new file).
+- **Re-inventory:** [reports/resync-261006/](reports/resync-261006/) (manifest, Markdown, comparison). Against the 2026-09-26 inventory: files 4,305 → 4,311 (+6, 0 removed, 73 changed); claim units 85,772 → 86,085 (85,481 unchanged, 248 edited, 43 removed, 356 added, 0 moved); gates clean, explicit gaps 1,360 → 1,361 (new routing gap `docs/specs/observe.md`); duplicate groups 818 and semantic-conflict groups 151 unchanged. The 43 removed and 248 edited units are listed in `reports/resync-261006/inventory-comparison.json`; Phase 4 must rerun conservation with identity carry-forward before any target work.
+- **Plan tooling that does not run on the branch head** (fixes need owner authorization, not done here):
+  1. `scripts/generate-doc-inventory.mjs` scans every text blob, including its own ~250 MB of committed inventory under `reports/`; on the branch head it exhausts memory. The resync used a measurement commit without those three artifact paths (recipe in the comparison file).
+  2. `scripts/verify-phase-02.mjs` still points at the plan root for artifacts that the 2026-09-29 format conversion moved to `reports/` (fails with `ENOENT` on the identity registry).
+  3. `scripts/verify-phase-01.mjs` fails its focused tests: two tests in `test/scripts/generate-shipped-path-inventory.test.mjs` assert on live repository content and already failed before this sync (checked on `551687021`). Its historical-plan byte-identity check will also meet the move below.
+  4. The generator binds the identity registry to one commit, so a rerun on a new commit needs carry-forward or a fresh registry; only the comparison by `(path, fingerprint)` was done here.
+- **Phase 1 deliverable disturbed by main:** main commit `22e54f834` moved `plans/260825-1841-knowledge-registry/` to `archive/plans/` although Phase 1 required it at its historical path. Recorded, not reverted.
+
+## 7.5. Ordering with Plans A, B and C
+
+Three plans pending approval in the main checkout (uncommitted there on 2026-10-06) edit legacy docs on main; each such edit is a legacy-root exception to account at the next sync.
+
+| Plan | Legacy/doc writes | `AGENTS.md` |
+|---|---|---|
+| A `plans/261006-1415-fgos-single-door-mechanisms/` | `docs/specs/distribution.md`, possibly a `docs/specs/reading-map.md` line | phase 06 only (single writer) |
+| B `plans/261006-1415-fgos-convention-component/` | new `docs/platform/convention/spec.md`; pointer lines in `docs/specs/reading-map.md`, `docs/specs/system-overview.md`; a row in `docs/platform/component-boundary.md` | phase 06, after Plan A phase 06 |
+| C `plans/261006-1445-fgctl-dev-activation/` (draft) | `docs/platform/packaging-distribution/**`, row #7 of `docs/specs/distribution.md`; restores dropped-001 | phase 05, after A06 and B06 |
+
+Required order: **Phase 9 (atomic cutover) runs after Plan A phase 06, Plan B phase 06 and Plan C phase 05**, because all of them write `AGENTS.md` and Phase 9 rewrites every reader of legacy paths, `AGENTS.md` included. Phases 4-8 work on this branch and may run in parallel with A/B/C, absorbing their legacy edits at each sync. Phase 6 transforms packaging-distribution only after Plan C's docs land, or carries dropped-001 as an open conflict.
+
+## 7.6. Known split authorities (re-checked 2026-10-06 on the synced tree)
+
+Measured with a script over the working tree (method in the resume report); none is fixed by this plan before Phase 6-9.
+
+- three `platform-foundations.md`: `docs/platform-foundations.md`, `docs/specs/platform-foundations.md`, `docs/platform/platform-foundations.md`; `AGENTS.md` names the first two;
+- two reading maps: `docs/specs/reading-map.md` (named by `AGENTS.md`) and `docs/reading-map.md`; 4 confirmed dead paths in `docs/specs/reading-map.md` (`docs/history/phase-3-compound-learning/reports/f4-benchmark.md`, `plans/260920-immediate-test-feedback-reduction/plan.md` (now under `archive/`), `src/evolve/candidates.mjs`, `src/state/workflow-stage-graphs.mjs`);
+- `plan.md` in three homes: 612 under `docs/history/**`, 19 under `plans/`, 36 under `archive/plans/`; 22 skill/task-spec files in `core/`, `domains/`, `.agents/`, `plugins/` still point plans at `docs/history/<feature>/plan.md`;
+- journals in two places: 11 files under `plans/journals/`, 5 under `docs/journals/`;
+- 302 Markdown files byte-identical between `docs/architect/**` and `docs/platform/**` at the same relative path (372 shared relative paths; 868 identical across all file types).
 
 ## 8. Dependency Graph
 
@@ -386,6 +424,9 @@ reconciled.
 | Evidence is deleted with legacy authority | Relocate non-authority payloads early; verify consumers and digests |
 | Cutover rollback restores git but not runtime state | Snapshot/restore projections, aliases, installation ledgers, and installed surfaces; append no cutover events |
 | A drift check is mistaken for a write freeze | Migration-specific lease enforced by registered writers/dispatch/merge gates plus clean-worktree and digest checks for raw writers |
+| Main keeps editing legacy roots while the branch lives | Account every main-side legacy edit at each sync (ratchet exceptions) and rerun inventory before Phase 9 |
+| Plans A/B/C and cutover race on `AGENTS.md` | Cutover after Plan A phase 06, Plan B phase 06 and Plan C phase 05 (§7.5) |
+| A promoted target silently lacks a settled claim | Dropped-claim register blocks Phase 9 (§7.3) |
 | Final claim ledger is lost with the plan branch | Seal it under `docs/platform/history/documentation-authority-unification/` with digest proof before cutover |
 | Repo cleanup changes shipped fgOS conventions | Inventory `core/`, domains, plugins, and generated instructions as a separate mission #1/#2 contract |
 
@@ -465,8 +506,8 @@ in `independent-frontier-rereview-2026-09-25.md`.
 - Canonical governance: `docs/doc-governance.md`
 - Platform intent ledger: `docs/platform/intent-preservation-ledger.md`
 - Transitional platform portal: `docs/platform/README.md`
-- Historical registry implementation: `plans/260825-1841-knowledge-registry/`
-- Historical registry current-state correction: `plans/260825-1841-knowledge-registry/CURRENT-STATE-CORRECTION.md`
+- Historical registry implementation: `archive/plans/260825-1841-knowledge-registry/` (historical path `plans/260825-1841-knowledge-registry/`)
+- Historical registry current-state correction: `archive/plans/260825-1841-knowledge-registry/CURRENT-STATE-CORRECTION.md`
 - Phase 1 execution record: `plans/260925-documentation-authority-unification/reports/phase-00-execution-record.md`
 - Phase 1 verification: `plans/260925-documentation-authority-unification/reports/phase-00-verification.md`
 - Verified Phase 1 authority map: `plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md`
@@ -489,3 +530,6 @@ in `independent-frontier-rereview-2026-09-25.md`.
 - Phase 3 generator/checker unit tests: `test/scripts/generate-doc-inventory.test.mjs`
 - Phase 3 execution record: `plans/260925-documentation-authority-unification/reports/phase-02-execution-record.md`
 - Phase 3 immutable verification record: `plans/260925-documentation-authority-unification/reports/phase-02-verification.md`
+- Dropped-claim register: `plans/260925-documentation-authority-unification/dropped-claims-register.json`
+- 2026-10-06 re-inventory and comparison: `plans/260925-documentation-authority-unification/reports/resync-261006/`
+- 2026-10-06 resume report: `plans/reports/resume-261006-1635-doc-authority-unification.md`

@@ -13,7 +13,7 @@ dependencies: [4]
 
 ## Overview
 
-**Status:** `not-started`, `not-authorized`, blocked by Phase 4.
+**Status:** `not-started`, `not-authorized`, blocked by Phase 4. Harness per `plan.md` §7.2 (2026-10-06). Pilot A must also check promoted targets for dropped claims of the dropped-001 kind (`plan.md` §7.3).
 **Mode:** isolated worktrees, candidate/review only
 **Purpose:** Falsify both conservation and transformation before applying them
 globally.

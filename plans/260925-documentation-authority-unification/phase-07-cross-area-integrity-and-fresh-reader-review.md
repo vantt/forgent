@@ -13,7 +13,7 @@ dependencies: [6]
 
 ## Overview
 
-**Status:** `not-started`, `not-authorized`, blocked by Phase 6.
+**Status:** `not-started`, `not-authorized`, blocked by Phase 6. Harness per `plan.md` §7.2.
 **Mode:** plan branch, review only except fixes
 **Purpose:** Catch errors that per-area migration cannot see.
 

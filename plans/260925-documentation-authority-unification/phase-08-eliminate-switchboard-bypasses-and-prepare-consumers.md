@@ -13,7 +13,7 @@ dependencies: [7]
 
 ## Overview
 
-**Status:** `not-started`, `not-authorized`, blocked by Phase 7.
+**Status:** `not-started`, `not-authorized`, blocked by Phase 7. Harness per `plan.md` §7.2. Consumer list includes the 22 skill/task-spec files that still point plans at `docs/history/<feature>/plan.md` (`plan.md` §7.6).
 **Mode:** plan branch
 **Purpose:** Ensure cutover changes behavior, not only files. Generic consumers
 should already use the Phase 2 switchboard; this phase rewrites remaining direct
