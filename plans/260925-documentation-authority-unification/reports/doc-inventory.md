@@ -11,10 +11,10 @@ Related:
 - `plans/260925-documentation-authority-unification/plan.md` §7 Phase 02
 ```
 
-- **Commit:** `42802908892833f8048025a9fad290e16740cd0c`
-- **Files scanned:** 4311
-- **Claim rows:** 86086
-- **Headings / unheaded blocks / mixed-file blocks:** 26212 / 58697 / 1177
+- **Commit:** `b02a5d8294c13c470eb9a28742298fa0f23826d2`
+- **Files scanned:** 4317
+- **Claim rows:** 86504
+- **Headings / unheaded blocks / mixed-file blocks:** 26369 / 58958 / 1177
 - **Gaps:** 1054 (1054 file/routing gap(s), 0 claim identity-gap blocker(s))
 - **Exact duplicate-content groups:** 818
 - **Semantic conflict groups:** 151
@@ -25,7 +25,7 @@ Related:
 
 | Value | Count |
 |---|---:|
-| `platform-authority` | 2052 |
+| `platform-authority` | 2058 |
 | `history-evidence` | 1704 |
 | `user-knowledge` | 515 |
 | `consumer-project` | 40 |
@@ -36,7 +36,7 @@ Related:
 |---|---:|
 | `non-authority` | 2266 |
 | `legacy-current` | 1026 |
-| `candidate` | 1002 |
+| `candidate` | 1008 |
 | `unclassified` | 14 |
 | `promoted` | 3 |
 
@@ -44,7 +44,7 @@ Related:
 
 | Value | Count |
 |---|---:|
-| `maintained-authority` | 2530 |
+| `maintained-authority` | 2536 |
 | `history-evidence` | 1704 |
 | `retained-source` | 57 |
 | `unclassified` | 14 |
@@ -55,7 +55,7 @@ Related:
 | Value | Count |
 |---|---:|
 | `retain-as-evidence` | 1703 |
-| `unknown-blocking` | 1383 |
+| `unknown-blocking` | 1389 |
 | `merge` | 665 |
 | `reclassify-out-of-platform-scope` | 553 |
 | `regenerate-from-source` | 4 |
@@ -65,10 +65,10 @@ Related:
 
 | Value | Count |
 |---|---:|
-| `literal` | 3186 |
-| `glob` | 2425 |
-| `executable-proof` | 1322 |
-| `dynamic` | 141 |
+| `literal` | 3196 |
+| `glob` | 2430 |
+| `executable-proof` | 1324 |
+| `dynamic` | 148 |
 | `fixture` | 102 |
 | `shipped-contract` | 43 |
 
