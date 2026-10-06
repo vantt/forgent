@@ -642,6 +642,9 @@ export function rankProviderAccounts({ provider, inventory, state, assignmentId,
 export function acquireProviderAccountLease({
   runnerConfig, provider, assignmentId, runId, seed, runtimeDir, runIsDead, isRunWorkerAlive,
   now = new Date(),
+  // How long to wait for the state lock before throwing
+  // ProviderCapacityLockError; omitted keeps withFileLock's own default.
+  lockWaitMs,
 } = {}) {
   if (!provider || !runId) return null;
   const inventory = providerAccountInventory(runnerConfig);
@@ -682,7 +685,7 @@ export function acquireProviderAccountLease({
       lease: { runId, assignmentId: assignmentId ?? null, pid: process.pid },
       credentialSource: account.credentialSource,
     };
-  });
+  }, { waitMs: lockWaitMs });
 }
 
 export function releaseProviderAccountLease({ provider, accountId, runId, runtimeDir } = {}) {

@@ -8,7 +8,7 @@
 //
 //   node scripts/stress-test-files.mjs [--rounds=N] [--burners=K]
 //        [--concurrency=C] [--round-timeout-s=S] [--log-dir=DIR]
-//        [--burner=shell|node] <test files...>
+//        [--burner=shell|node|fsync] <test files...>
 //
 // With --log-dir, every non-passing round's full output is kept there.
 //
@@ -17,7 +17,11 @@
 // budget. `--burner=shell` (default) is a `bash` busy loop, a few MB each:
 // CPU contention only. `--burner=node` is a busy `node` process (~40 MB
 // each): CPU contention plus memory pressure, which on a machine already
-// short of RAM stalls processes for seconds at a time.
+// short of RAM stalls processes for seconds at a time. `--burner=fsync` is a
+// `node` process rewriting a 4 MB file and fsyncing it in a loop: disk-flush
+// contention, the load a full suite's many file-writing tests put on a lock
+// holder that fsyncs inside its critical section. Its files live in one
+// directory this script removes on exit.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -36,19 +40,33 @@ const burners = Number(opts.burners ?? os.availableParallelism());
 const concurrency = opts.concurrency === undefined ? null : Number(opts.concurrency);
 const roundTimeoutS = Number(opts['round-timeout-s'] ?? 300);
 if (files.length === 0 || !(rounds > 0)) {
-  console.error('usage: stress-test-files.mjs [--rounds=N] [--burners=K] [--concurrency=C] [--round-timeout-s=S] [--log-dir=DIR] [--burner=shell|node] <test files...>');
+  console.error('usage: stress-test-files.mjs [--rounds=N] [--burners=K] [--concurrency=C] [--round-timeout-s=S] [--log-dir=DIR] [--burner=shell|node|fsync] <test files...>');
+  process.exit(2);
+}
+if (opts.burner !== undefined && !['shell', 'node', 'fsync'].includes(opts.burner)) {
+  console.error(`stress-test-files: unknown --burner=${opts.burner} (shell, node or fsync)`);
   process.exit(2);
 }
 
 const budgetMs = (rounds * roundTimeoutS + 30) * 1000;
-const burnerCommand = opts.burner === 'node'
-  ? [process.execPath, ['-e', `const end = Date.now() + ${budgetMs}; while (Date.now() < end) {}`]]
-  : ['bash', ['-c', `while [ $SECONDS -lt ${Math.ceil(budgetMs / 1000)} ]; do :; done`]];
-const burnerProcs = Array.from({ length: burners }, () => spawn(burnerCommand[0], burnerCommand[1], { stdio: 'ignore' }));
+const burnDir = opts.burner === 'fsync' ? fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-stress-fsync-')) : null;
+const fsyncLoop = (file) => `const fs = require('node:fs'); const fd = fs.openSync(${JSON.stringify(file)}, 'w');
+const buf = Buffer.alloc(1 << 20, 1); const end = Date.now() + ${budgetMs};
+while (Date.now() < end) { for (let i = 0; i < 4; i += 1) fs.writeSync(fd, buf, 0, buf.length, i * buf.length); fs.fsyncSync(fd); }`;
+const burnerCommand = (i) => {
+  if (opts.burner === 'node') return [process.execPath, ['-e', `const end = Date.now() + ${budgetMs}; while (Date.now() < end) {}`]];
+  if (opts.burner === 'fsync') return [process.execPath, ['-e', fsyncLoop(path.join(burnDir, `burner-${i}`))]];
+  return ['bash', ['-c', `while [ $SECONDS -lt ${Math.ceil(budgetMs / 1000)} ]; do :; done`]];
+};
+const burnerProcs = Array.from({ length: burners }, (_, i) => {
+  const [cmd, args] = burnerCommand(i);
+  return spawn(cmd, args, { stdio: 'ignore' });
+});
 function stopBurners() {
   for (const b of burnerProcs) {
     try { b.kill('SIGKILL'); } catch { /* already gone */ }
   }
+  if (burnDir) fs.rmSync(burnDir, { recursive: true, force: true });
 }
 process.on('exit', stopBurners);
 for (const sig of ['SIGINT', 'SIGTERM']) process.on(sig, () => process.exit(130));
@@ -61,8 +79,13 @@ env.FGOS_DISABLE_OPPORTUNISTIC_CHECKS = '1';
 const tally = { pass: 0, fail: 0, hang: 0 };
 for (let round = 1; round <= rounds; round += 1) {
   const argv = ['--test', ...(concurrency === null ? [] : [`--test-concurrency=${concurrency}`]), ...files];
+  // Each round gets its own temp dir, removed afterwards, so fixtures the
+  // tests leave behind do not pile up in the OS temp dir round after round.
+  const roundTemp = fs.mkdtempSync(path.join(os.tmpdir(), 'fgos-stress-round-'));
   const started = Date.now();
-  const child = spawn(process.execPath, argv, { env, detached: true, stdio: ['ignore', 'pipe', 'pipe'] });
+  const child = spawn(process.execPath, argv, {
+    env: { ...env, TMPDIR: roundTemp, TMP: roundTemp, TEMP: roundTemp }, detached: true, stdio: ['ignore', 'pipe', 'pipe'],
+  });
   let out = '';
   child.stdout.on('data', (d) => { out += d; });
   child.stderr.on('data', (d) => { out += d; });
@@ -73,6 +96,7 @@ for (let round = 1; round <= rounds; round += 1) {
   }, roundTimeoutS * 1000);
   const code = await new Promise((resolve) => child.on('close', resolve));
   clearTimeout(timer);
+  fs.rmSync(roundTemp, { recursive: true, force: true, maxRetries: 3 });
   const secs = ((Date.now() - started) / 1000).toFixed(1);
   const verdict = hung ? 'hang' : code === 0 ? 'pass' : 'fail';
   tally[verdict] += 1;
