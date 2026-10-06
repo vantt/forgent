@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The provider capacity state lock now waits up to 30 seconds for a live holder instead of 5 before failing; a lock held by a dead process is still reclaimed at once. On a busy disk the holder's fsync could outlast five seconds and fail a dispatch for no fault of its own.
 - `fgos metrics discussions` reports agreement and a genuine split only when the valid stance votes are at least two and more than half of the voting seats; otherwise the unit is `unmeasured` and the stance counters are kept. An older unit summary is reported as `unsupported-version` even when it has no settlement timestamp, because the version is checked before the timestamp.
 - Unit summaries are now contract v2 (`unit-summary.read.v2`). A legacy unit with no recorded pattern is published as `outcome: "undetermined"` with seats of `kind: "unknown"` instead of being derived as solo, and `metrics discussions` reports `unitsUndetermined` and leaves such units out of `passRate` and `unitsFailed`. Summaries of another version are skipped as `unsupported-version`. About 46 older forgentX units are now `undetermined` because nothing records their pattern.
 - `scripts/backfill-unit-summaries.mjs` only fills in missing summaries by default and reports stale ones; the new `--regenerate` rewrites stale summaries and removes the ones that can no longer be established. Active units are never touched.
