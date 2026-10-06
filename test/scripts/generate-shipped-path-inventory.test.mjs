@@ -34,6 +34,56 @@ function mkTmpDir(prefix = 'shipped-inv-test-') {
   return fs.mkdtempSync(path.join(os.tmpdir(), prefix));
 }
 
+const FIXTURE_CORE_SKILL_PATHS = Array.from(
+  { length: 10 },
+  (_, i) => `core/skills/skill-${String(i + 1).padStart(2, '0')}/SKILL.md`
+);
+
+// Builds a committed git repository whose content is fully known to the test, so inventory
+// assertions never depend on the live repository's content.
+function buildInventoryFixtureRepo() {
+  const dir = mkTmpDir('shipped-inv-fixture-');
+  const write = (rel, content) => {
+    fs.mkdirSync(path.dirname(path.join(dir, rel)), { recursive: true });
+    fs.writeFileSync(path.join(dir, rel), content);
+  };
+  const git = (...args) =>
+    execFileSync('git', ['-c', 'user.name=Test', '-c', 'user.email=test@example.com', ...args], {
+      cwd: dir,
+      stdio: 'ignore',
+    });
+
+  for (const p of FIXTURE_CORE_SKILL_PATHS) write(p, '# skill\n');
+  write('core/instructions/platform-laws.md', '# Laws\n');
+  write('docs/specs/runner.md', '# Runner\n');
+  write('src/runner/dispatch.mjs', '// dispatch\n');
+  write(
+    'core/skills/index.md',
+    [
+      '# Index',
+      ...FIXTURE_CORE_SKILL_PATHS.map((p) => `- \`${p}\``),
+      'See `core/instructions/platform-laws.md`, `docs/specs/runner.md`, `src/runner/dispatch.mjs`.',
+      'Clean `src/foo.mjs` and glued junk src/foo.mjscapability or src/runner/dispatch.mjsexecute.',
+      'Examples: `src/auth.mjs` and `scripts/distill.mjs`.',
+      '',
+    ].join('\n')
+  );
+  write(
+    'domains/coding/AGENTS.md',
+    [
+      '# Coding',
+      'Read `docs/specs/runner.md`.',
+      'Examples: `src/runner/retry.mjs`, `test/parser.test.mjs`, `.claude/skills/gitnexus/gitnexus-cli/SKILL.md`.',
+      '',
+    ].join('\n')
+  );
+
+  git('init', '-q');
+  git('add', '.');
+  git('commit', '-q', '-m', 'fixture');
+  return dir;
+}
+
 test('classifyContractScope: distinguishes consumer, repo-local, and mixed contracts', () => {
   // Mixed contracts (dual role: active platform doctrine + template/convention for consumers)
   assert.equal(classifyContractScope('domains/coding/AGENTS.md').scope, 'mixed-repository-local-and-consumer');
@@ -283,36 +333,44 @@ test('table-driven path grammar, negative glued tokens, and positive counterexam
 });
 
 test('deterministic generation: generating inventory twice produces identical results', () => {
-  const inv1 = generateInventory(REPO_ROOT, SHIPPED_SURFACE_DIRS, { commit: 'HEAD' });
-  const inv2 = generateInventory(REPO_ROOT, SHIPPED_SURFACE_DIRS, { commit: 'HEAD' });
+  const fixtureDir = buildInventoryFixtureRepo();
+  try {
+    const inv1 = generateInventory(fixtureDir, SHIPPED_SURFACE_DIRS, { commit: 'HEAD' });
+    const inv2 = generateInventory(fixtureDir, SHIPPED_SURFACE_DIRS, { commit: 'HEAD' });
 
-  assert.equal(
-    JSON.stringify(inv1, null, 2),
-    JSON.stringify(inv2, null, 2),
-    'Consecutive inventory generation must be byte-identical'
-  );
+    assert.equal(
+      JSON.stringify(inv1, null, 2),
+      JSON.stringify(inv2, null, 2),
+      'Consecutive inventory generation must be byte-identical'
+    );
 
-  // Assert inventory contains core/ references and mixed contracts
-  const corePaths = inv1.items.filter((i) => i.path.startsWith('core/'));
-  assert.ok(corePaths.length >= 10, 'Inventory must extract core/ conventions');
-  assert.ok(inv1.summary.mixedRepositoryLocalAndConsumerCount > 0, 'Must model mixed contracts explicitly');
-  assert.equal(inv1.summary.unclassifiedCount, 0, 'Zero unclassified paths should remain');
+    // Every fixture path is classifiable: exact per-scope counts and zero unclassified
+    const corePaths = inv1.items.filter((i) => i.path.startsWith('core/'));
+    assert.equal(corePaths.length, 11, 'Inventory must extract the 10 core/skills paths and the core/instructions path');
+    assert.equal(inv1.summary.consumerProjectContractsCount, 11);
+    assert.equal(inv1.summary.repositoryLocalContractsCount, 7);
+    assert.equal(inv1.summary.mixedRepositoryLocalAndConsumerCount, 1, 'Must model mixed contracts explicitly');
+    assert.equal(inv1.summary.unclassifiedCount, 0, 'Zero unclassified paths should remain');
+    assert.equal(inv1.totalUniquePathsCount, 19);
 
-  // Negative tests against repository inventory: exact and generalized glued token checks (R1)
-  const paths = inv1.items.map((i) => i.path);
-  assert.ok(!paths.includes('src/foo.mjscapability'), 'Repository inventory must NOT contain src/foo.mjscapability');
-  assert.ok(
-    !paths.includes('src/runner/dispatch.mjsexecute'),
-    'Repository inventory must NOT contain src/runner/dispatch.mjsexecute'
-  );
-  assert.ok(paths.includes('src/foo.mjs'), 'Repository inventory MUST contain clean src/foo.mjs');
-  assert.ok(paths.includes('src/runner/dispatch.mjs'), 'Repository inventory MUST contain clean src/runner/dispatch.mjs');
+    // Negative tests against the inventory: exact and generalized glued token checks
+    const paths = inv1.items.map((i) => i.path);
+    assert.ok(!paths.includes('src/foo.mjscapability'), 'Inventory must NOT contain src/foo.mjscapability');
+    assert.ok(
+      !paths.includes('src/runner/dispatch.mjsexecute'),
+      'Inventory must NOT contain src/runner/dispatch.mjsexecute'
+    );
+    assert.ok(paths.includes('src/foo.mjs'), 'Inventory MUST contain clean src/foo.mjs');
+    assert.ok(paths.includes('src/runner/dispatch.mjs'), 'Inventory MUST contain clean src/runner/dispatch.mjs');
 
-  const gluedPaths = inv1.items.filter((i) => GLUED_TOKEN_REGEX.test(i.path));
-  assert.deepEqual(gluedPaths, [], 'Repository inventory must have 0 glued-token paths matching GLUED_TOKEN_REGEX');
+    const gluedPaths = inv1.items.filter((i) => GLUED_TOKEN_REGEX.test(i.path));
+    assert.deepEqual(gluedPaths, [], 'Inventory must have 0 glued-token paths matching GLUED_TOKEN_REGEX');
 
-  const mjsGlued = inv1.items.filter((i) => /\.mjs[a-zA-Z]/.test(i.path));
-  assert.deepEqual(mjsGlued, [], 'Repository inventory must have 0 paths matching /mjs[a-z]/');
+    const mjsGlued = inv1.items.filter((i) => /\.mjs[a-zA-Z]/.test(i.path));
+    assert.deepEqual(mjsGlued, [], 'Inventory must have 0 paths matching /mjs[a-z]/');
+  } finally {
+    fs.rmSync(fixtureDir, { recursive: true, force: true });
+  }
 });
 
 test('CLI: outputs JSON and Markdown files correctly', () => {
@@ -424,57 +482,58 @@ test('classifyPathAttributes: deterministically differentiates referenceKind, ex
 });
 
 test('repository inventory: detects nonexistent examples and never labels them safe rewrite targets', () => {
-  const inv = generateInventory(REPO_ROOT, SHIPPED_SURFACE_DIRS, { commit: 'HEAD' });
+  const fixtureDir = buildInventoryFixtureRepo();
+  try {
+    const inv = generateInventory(fixtureDir, SHIPPED_SURFACE_DIRS, { commit: 'HEAD' });
 
-  const targetExamples = [
-    'scripts/distill.mjs',
-    'src/auth.mjs',
-    'src/foo.mjs',
-    'src/runner/retry.mjs',
-    'test/parser.test.mjs',
-  ];
+    const targetExamples = [
+      'scripts/distill.mjs',
+      'src/auth.mjs',
+      'src/foo.mjs',
+      'src/runner/retry.mjs',
+      'test/parser.test.mjs',
+    ];
 
-  for (const target of targetExamples) {
-    const item = inv.items.find((i) => i.path === target);
-    assert.ok(item, `Inventory must track "${target}"`);
-    assert.equal(item.contractScope, 'repository-local-contract', `"${target}" contractScope is repository-local`);
-    assert.equal(item.existenceStatus, 'nonexistent', `"${target}" must have existenceStatus nonexistent`);
-    assert.equal(item.referenceKind, 'example-or-placeholder', `"${target}" must be example-or-placeholder`);
-    assert.equal(item.sourceRole, 'illustrative-example', `"${target}" must be illustrative-example`);
-    assert.equal(item.resolutionStatus, 'example-not-target', `"${target}" resolutionStatus must be example-not-target`);
-    assert.equal(item.isSafeRewriteTarget, false, `"${target}" must NEVER be labeled safe rewrite target`);
+    for (const target of targetExamples) {
+      const item = inv.items.find((i) => i.path === target);
+      assert.ok(item, `Inventory must track "${target}"`);
+      assert.equal(item.contractScope, 'repository-local-contract', `"${target}" contractScope is repository-local`);
+      assert.equal(item.existenceStatus, 'nonexistent', `"${target}" must have existenceStatus nonexistent`);
+      assert.equal(item.referenceKind, 'example-or-placeholder', `"${target}" must be example-or-placeholder`);
+      assert.equal(item.sourceRole, 'illustrative-example', `"${target}" must be illustrative-example`);
+      assert.equal(item.resolutionStatus, 'example-not-target', `"${target}" resolutionStatus must be example-not-target`);
+      assert.equal(item.isSafeRewriteTarget, false, `"${target}" must NEVER be labeled safe rewrite target`);
+    }
+
+    // Uncommitted GitNexus skills referenced in domains/coding/AGENTS.md must be classified as nonexistent/example-not-target
+    const gitnexusExamples = ['.claude/skills/gitnexus/gitnexus-cli/SKILL.md'];
+
+    for (const target of gitnexusExamples) {
+      const item = inv.items.find((i) => i.path === target);
+      assert.ok(item, `Inventory must track "${target}"`);
+      assert.equal(item.contractScope, 'consumer-project-contract', `"${target}" contractScope is consumer-project-contract`);
+      assert.equal(item.existenceStatus, 'nonexistent', `"${target}" must have existenceStatus nonexistent`);
+      assert.equal(item.referenceKind, 'example-or-placeholder', `"${target}" must be example-or-placeholder`);
+      assert.equal(item.sourceRole, 'illustrative-example', `"${target}" must be illustrative-example`);
+      assert.equal(item.resolutionStatus, 'example-not-target', `"${target}" resolutionStatus must be example-not-target`);
+      assert.equal(item.isSafeRewriteTarget, false, `"${target}" must NEVER be labeled safe rewrite target`);
+    }
+
+    // Summary counts: 5 repository-local examples + 1 consumer example are nonexistent; the 2 committed
+    // repository-local files and 10 committed core skills plus the platform-laws file are literal paths.
+    assert.equal(inv.totalUniquePathsCount, 19);
+    assert.equal(inv.summary.existence.nonexistentCount, 6);
+    assert.equal(inv.summary.rewriteSafety.safeRewriteTargetsCount, 2);
+    assert.equal(inv.summary.rewriteSafety.nonTargetExamplesCount, 17);
+    assert.equal(
+      inv.summary.rewriteSafety.safeRewriteTargetsCount + inv.summary.rewriteSafety.nonTargetExamplesCount,
+      inv.totalUniquePathsCount
+    );
+    assert.equal(inv.summary.referenceKinds.exampleOrPlaceholder, 6);
+    assert.equal(inv.summary.referenceKinds.literalCurrentPath, 13);
+  } finally {
+    fs.rmSync(fixtureDir, { recursive: true, force: true });
   }
-
-  // Untracked GitNexus skills in domains/coding/AGENTS.md must be classified as nonexistent/example-not-target
-  const gitnexusExamples = [
-    '.claude/skills/gitnexus/gitnexus-cli/SKILL.md',
-    '.claude/skills/gitnexus/gitnexus-debugging/SKILL.md',
-    '.claude/skills/gitnexus/gitnexus-exploring/SKILL.md',
-    '.claude/skills/gitnexus/gitnexus-guide/SKILL.md',
-    '.claude/skills/gitnexus/gitnexus-impact-analysis/SKILL.md',
-    '.claude/skills/gitnexus/gitnexus-refactoring/SKILL.md',
-  ];
-
-  for (const target of gitnexusExamples) {
-    const item = inv.items.find((i) => i.path === target);
-    assert.ok(item, `Inventory must track "${target}"`);
-    assert.equal(item.contractScope, 'consumer-project-contract', `"${target}" contractScope is consumer-project-contract`);
-    assert.equal(item.existenceStatus, 'nonexistent', `"${target}" must have existenceStatus nonexistent`);
-    assert.equal(item.referenceKind, 'example-or-placeholder', `"${target}" must be example-or-placeholder`);
-    assert.equal(item.sourceRole, 'illustrative-example', `"${target}" must be illustrative-example`);
-    assert.equal(item.resolutionStatus, 'example-not-target', `"${target}" resolutionStatus must be example-not-target`);
-    assert.equal(item.isSafeRewriteTarget, false, `"${target}" must NEVER be labeled safe rewrite target`);
-  }
-
-  // Summary counts
-  assert.ok(inv.summary.rewriteSafety.safeRewriteTargetsCount > 0);
-  assert.ok(inv.summary.rewriteSafety.nonTargetExamplesCount > 0);
-  assert.equal(
-    inv.summary.rewriteSafety.safeRewriteTargetsCount + inv.summary.rewriteSafety.nonTargetExamplesCount,
-    inv.totalUniquePathsCount
-  );
-  assert.equal(inv.summary.referenceKinds.exampleOrPlaceholder >= 11, true);
-  assert.equal(inv.summary.referenceKinds.literalCurrentPath > 100, true);
 });
 
 test('environmental contamination: untracked files on disk do NOT contaminate inventory derived from git commit', () => {
