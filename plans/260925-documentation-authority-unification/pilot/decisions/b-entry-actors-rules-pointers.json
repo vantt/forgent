@@ -1,0 +1,189 @@
+{
+  "version": 1,
+  "shard": "b-entry-actors-rules-pointers",
+  "sources": [
+    "docs/specs/work-state.md"
+  ],
+  "claims": [
+    {
+      "claimId": "claim_eabede7444bd867855b0afedea32b372",
+      "sourceUnitDigest": "9635c37a607caab2",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "unheaded-block-98",
+      "claimKind": "historical-context",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "YAML front matter (area, updated, sources, decisions, coverage: partial) carried byte-identical into the provenance block of section 15 of the candidate spec; it is source-slice and decision-hash provenance, not behavior, so the generator kind specification is wrong."
+    },
+    {
+      "claimId": "claim_36389ecd6a08422af17bd5af68a6fce5",
+      "sourceUnitDigest": "bbef379255aa6ba7",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "1-purpose-and-scope",
+      "claimKind": "specification",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source H1 \"Spec: Work-State (tầng quản việc của forgent)\" is represented by the frozen heading \"1. Purpose And Scope\"; only the heading title differs (map section 4 rows 9-11), the title text itself is not carried as a separate heading."
+    },
+    {
+      "claimId": "claim_c613cb5faff29ae8bd2374be9af5b48f",
+      "sourceUnitDigest": "d9f06bbaa0ffe5ab",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "unheaded-block-2",
+      "claimKind": "specification",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Purpose paragraph carried line-for-line identical under 1. Purpose And Scope; no wording change."
+    },
+    {
+      "claimId": "claim_8f6ab9b2c2de71369769d27719a09b8e",
+      "sourceUnitDigest": "4c15e244bed2e47c",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "2-entry-points-and-triggers",
+      "claimKind": "specification",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source heading \"Entry Points & Triggers\" is represented by the frozen heading \"2. Entry Points And Triggers\"; only the title (ampersand and numbering) differs."
+    },
+    {
+      "claimId": "claim_a5326477491a9bc30a98744da8e9bfb9",
+      "sourceUnitDigest": "c8fc6e5bf49179cb",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "specification",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "The 24-line CLI entry-point verb list is identical in the candidate block under 2. Entry Points And Triggers (diff clean); the map keeps it as specification, not contract."
+    },
+    {
+      "claimId": "claim_949f208343809a8ca04870aea74402de",
+      "sourceUnitDigest": "e39d99e4a3a0550e",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "10-actors-and-access",
+      "claimKind": "specification",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source heading \"Actors & Access\" is represented by frozen heading \"10. Actors And Access\"; only the title differs."
+    },
+    {
+      "claimId": "claim_f323a5093b365db84b200bcd86a3e019",
+      "sourceUnitDigest": "6d080b8078df1fa4",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "unheaded-block-92",
+      "claimKind": "specification",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Capability-by-actor table carried identical (diff clean) under 10. Actors And Access."
+    },
+    {
+      "claimId": "claim_477a30f4902261e390c34ab888145dcd",
+      "sourceUnitDigest": "da8ed377d2e30211",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "11-business-rules",
+      "claimKind": "specification",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source heading \"Business Rules\" is represented by frozen heading \"11. Business Rules\"; only the numbering prefix differs."
+    },
+    {
+      "claimId": "claim_9bb5739f68a7b4bafcd959ef59104e6a",
+      "sourceUnitDigest": "19f7dcac1af1f366",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "unheaded-block-93",
+      "claimKind": "specification",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "The RUL1..RULn single unit is identical in the candidate (diff clean); kind stays specification, not normative-law, since the vocabulary reserves normative-law for platform laws L1-L8 (map section 7)."
+    },
+    {
+      "claimId": "claim_904f21e704c3d43d63ae2a762bf9791c",
+      "sourceUnitDigest": "791e024dac1ceca7",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "12-edge-cases-settled",
+      "claimKind": "specification",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source heading \"Edge Cases Settled\" is represented by frozen heading \"12. Edge Cases Settled\"; only the numbering prefix differs."
+    },
+    {
+      "claimId": "claim_b64e4bcb5061a6c42c0db1d5a1f2887b",
+      "sourceUnitDigest": "dbace0a231a15099",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "unheaded-block-94",
+      "claimKind": "specification",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "The 66-line settled edge-case list is identical in the candidate (diff clean), kept whole as one unit (map section 11 item 9)."
+    },
+    {
+      "claimId": "claim_d011d26d0e584f25caa838e02c59b613",
+      "sourceUnitDigest": "5ab56881ecf47900",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "13-known-gaps-and-deferred-work",
+      "claimKind": "specification",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source heading \"Open Gaps\" is represented by frozen heading \"13. Known Gaps And Deferred Work\"; the title differs."
+    },
+    {
+      "claimId": "claim_a27bf300f6a6f7901c1c072d5cf9e7da",
+      "sourceUnitDigest": "5ad9c97f20aa0e6f",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "unheaded-block-95",
+      "claimKind": "specification",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Deferred-work bullets carried identical (diff clean); stays in spec.md with kind specification per map section 11 item 3 (no intent ledger invented in this pilot)."
+    },
+    {
+      "claimId": "claim_294491cc27c7f037d7b904b6cfb2eddb",
+      "sourceUnitDigest": "d9e8b7000d47817b",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "unheaded-block-96",
+      "claimKind": "specification",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "The \"Đã đóng\" closed-residue CAS note is carried identical under 13. Known Gaps And Deferred Work; classed specification per map section 4 row 1284-1299."
+    },
+    {
+      "claimId": "claim_1a9c10544a642b6001a8bacae1b6817b",
+      "sourceUnitDigest": "e3d926d43e2e72f2",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "14-presentation-surface",
+      "claimKind": "specification",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source heading \"Visuals\" is represented by frozen heading \"14. Presentation Surface\"; only the title differs."
+    },
+    {
+      "claimId": "claim_2cfd89083b61b2c263e84f24624a6f3c",
+      "sourceUnitDigest": "b0a0db080dad061c",
+      "targetOwner": "docs/platform/work-state/spec.md",
+      "targetAnchor": "unheaded-block-97",
+      "claimKind": "specification",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "\"Not applicable - không có màn hình.\" carried identical under 14. Presentation Surface."
+    },
+    {
+      "claimId": "claim_40f7857c31724be3b7ca7a6de1097818",
+      "sourceUnitDigest": "86ee339dccd8ebfa",
+      "targetOwner": "docs/platform/work-state/architecture/implementation-pointers.md",
+      "targetAnchor": "2-implementation-pointers",
+      "claimKind": "architecture",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "Source heading \"Pointers (implementation)\" is represented by frozen heading \"2. Implementation Pointers\" in the implementation-pointers document; the title differs and the owner moves out of spec.md."
+    },
+    {
+      "claimId": "claim_2e2bc9264b289319dfae5c6487978f99",
+      "sourceUnitDigest": "7542cfb4d64398d3",
+      "targetOwner": "docs/platform/work-state/architecture/implementation-pointers.md",
+      "targetAnchor": "unheaded-block-3",
+      "claimKind": "architecture",
+      "disposition": "promote",
+      "reviewStatus": "pending",
+      "rationale": "The 24-bullet module-pointer list is identical in implementation-pointers.md (diff clean); architecture because the bullets state module responsibilities (map section 11 item 5), and its file names may be stale."
+    }
+  ]
+}
