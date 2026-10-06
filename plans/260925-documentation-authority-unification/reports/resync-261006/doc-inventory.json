@@ -1,0 +1,64 @@
+{
+  "$schema": "https://forgent.dev/schemas/sharded-json-artifact.v1.json",
+  "schemaVersion": 1,
+  "artifactKind": "phase-02-doc-inventory",
+  "encoding": "utf8",
+  "reassembly": "ordered-concat-then-json-parse",
+  "canonicalJson": "pretty-2-space-with-final-newline",
+  "totalBytes": 196878665,
+  "sha256": "f756e2a6d91fc19349da74dc20e48288bc957847fc09075d7d7569dc096b1c41",
+  "partCount": 10,
+  "maxPartBytes": 20971520,
+  "parts": [
+    {
+      "path": "doc-inventory.parts/part-0001.jsonl",
+      "bytes": 20971512,
+      "sha256": "c821664b720d79464f3907cda390d7e9a6b212c59a569eb45aabb1c5fa3ce508"
+    },
+    {
+      "path": "doc-inventory.parts/part-0002.jsonl",
+      "bytes": 20971483,
+      "sha256": "e24d189afce77566354301f1f9322c7ee3c9a39ac4ef2eebdcc6794bfec74a14"
+    },
+    {
+      "path": "doc-inventory.parts/part-0003.jsonl",
+      "bytes": 20971478,
+      "sha256": "ec698141f96f5ba158d1a5623ec9640933221f5c7d61e4267d8f001f2ac7562a"
+    },
+    {
+      "path": "doc-inventory.parts/part-0004.jsonl",
+      "bytes": 20971486,
+      "sha256": "275c21315f1b0993379e4cbbc2f96aeec169b1e36683abf49281e33516e46032"
+    },
+    {
+      "path": "doc-inventory.parts/part-0005.jsonl",
+      "bytes": 20971502,
+      "sha256": "0754f4d530aaa62461d0397f744b92ef5e66c1618c638cce02c99717b42ff824"
+    },
+    {
+      "path": "doc-inventory.parts/part-0006.jsonl",
+      "bytes": 20971517,
+      "sha256": "22903cc711d67c144b4852d25f405a20b9be47d7737beb58ea64533b648c9873"
+    },
+    {
+      "path": "doc-inventory.parts/part-0007.jsonl",
+      "bytes": 20971477,
+      "sha256": "492e525820974215d811d778d147db03b51b74f59c220906546dd4bff24c5895"
+    },
+    {
+      "path": "doc-inventory.parts/part-0008.jsonl",
+      "bytes": 20971464,
+      "sha256": "a313372c00dc3907efdbee1c3a07212ff3a3a9436c9556f718a2045d9f19ad1c"
+    },
+    {
+      "path": "doc-inventory.parts/part-0009.jsonl",
+      "bytes": 20971461,
+      "sha256": "c5da8b4a9913ed808d2ea0429e4f4d099a47d823a1b8946cc3c7988f97b16d7a"
+    },
+    {
+      "path": "doc-inventory.parts/part-0010.jsonl",
+      "bytes": 8135285,
+      "sha256": "df2163250f123f0b494b1c494090718da8b588eb77aec5fb8f401e32a6b57207"
+    }
+  ]
+}

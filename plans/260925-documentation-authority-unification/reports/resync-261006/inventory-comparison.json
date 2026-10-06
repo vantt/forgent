@@ -1,0 +1,675 @@
+{
+ "schema": "documentation-authority.resync-comparison.v1",
+ "measuredAt": "2026-10-06",
+ "branchHead": "e6cd1f07ca29b6afc173644e359ec25fd8b2f02b",
+ "mainSyncedAt": "2fd5cb6a391976b4d3286f90ecaec51301997bce",
+ "measurementCommit": {
+  "commit": "e5c468aba138b68207412cdef20a8acbf80a17c5",
+  "tree": "7a20f5ec97b0a053914de3ff2304349966a8d681",
+  "recipe": "git read-tree <branchHead>; git rm --cached -r reports/phase-02-doc-inventory.parts reports/phase-02-identity-registry.json reports/phase-02-doc-inventory.md (under plans/260925-documentation-authority-unification/); git write-tree; git commit-tree <tree> -p <branchHead>. Unreferenced object; recreate with the recipe if collected.",
+  "why": "generate-doc-inventory scans every text blob of the tree for consumer edges; at the branch head that includes its own ~250 MB of committed inventory JSON, and the run exhausted memory (4 GB heap: V8 abort at 82 s; 7.5 GB heap: killed by the OS after 44 min). Without those three paths the run takes 17 s and 1.9 GB RSS."
+ },
+ "commands": {
+  "bootstrapRegistry": "node scripts/generate-doc-inventory.mjs --commit <measurementCommit> --bootstrap-identity-registry --json-out <scratch>/identity-registry.json  (exit 0)",
+  "generate": "node scripts/generate-doc-inventory.mjs --commit <measurementCommit> --identity-registry <scratch>/identity-registry.json --json-out <scratch>/doc-inventory.json --md-out <scratch>/doc-inventory.md  (exit 0)",
+  "gatesNew": "node scripts/check-doc-inventory-gates.mjs --inventory <scratch>/doc-inventory.json --identity-registry <scratch>/identity-registry.json --json  (exit 0)",
+  "gatesOld": "node scripts/check-doc-inventory-gates.mjs --json  (exit 0, committed Phase 3 artifacts)"
+ },
+ "committedHere": [
+  "doc-inventory.json (shard manifest with part hashes)",
+  "doc-inventory.md"
+ ],
+ "notCommitted": "doc-inventory.parts/*.jsonl (~197 MB) and the bootstrapped identity registry (~43 MB, fresh random IDs, not an identity authority). Regenerate with the commands above; part hashes in doc-inventory.json are only reproducible with the same registry.",
+ "old": {
+  "commit": "f0c76c5e590339d9c815038539ff1f4a072c64e4",
+  "files": 4305,
+  "claimLedgerRows": 85772,
+  "consumerEdges": 98406,
+  "fileDispositions": {
+   "unknown-blocking": 1382,
+   "merge": 665,
+   "regenerate-from-source": 4,
+   "reclassify-out-of-platform-scope": 548,
+   "retain-as-evidence": 1703,
+   "promote": 3
+  },
+  "claimDispositions": {
+   "unknown-blocking": 39554,
+   "merge": 2143,
+   "regenerate-from-source": 106,
+   "reclassify-out-of-platform-scope": 12085,
+   "retain-as-evidence": 31798,
+   "promote": 86
+  },
+  "gapCount": 1360,
+  "fileGapCount": 1054,
+  "claimIdentityGapCount": 306,
+  "duplicateContentGroups": 818,
+  "semanticConflictGroups": 151,
+  "byCorpus": {
+   "platform-authority": 2051,
+   "history-evidence": 1704,
+   "consumer-project": 39,
+   "user-knowledge": 511
+  },
+  "byAuthorityStatus": {
+   "legacy-current": 1025,
+   "unclassified": 14,
+   "non-authority": 2261,
+   "candidate": 1002,
+   "promoted": 3
+  },
+  "byConsumerKind": {
+   "dynamic": 128,
+   "executable-proof": 1052,
+   "fixture": 83,
+   "glob": 2382,
+   "literal": 2348,
+   "shipped-contract": 43
+  }
+ },
+ "new": {
+  "commit": "e5c468aba138b68207412cdef20a8acbf80a17c5",
+  "files": 4311,
+  "claimLedgerRows": 86085,
+  "consumerEdges": 101286,
+  "fileDispositions": {
+   "unknown-blocking": 1383,
+   "merge": 665,
+   "regenerate-from-source": 4,
+   "reclassify-out-of-platform-scope": 553,
+   "retain-as-evidence": 1703,
+   "promote": 3
+  },
+  "claimDispositions": {
+   "unknown-blocking": 39653,
+   "merge": 2143,
+   "regenerate-from-source": 106,
+   "reclassify-out-of-platform-scope": 12297,
+   "retain-as-evidence": 31800,
+   "promote": 86
+  },
+  "gapCount": 1361,
+  "fileGapCount": 1055,
+  "claimIdentityGapCount": 306,
+  "duplicateContentGroups": 818,
+  "semanticConflictGroups": 151,
+  "byCorpus": {
+   "platform-authority": 2052,
+   "history-evidence": 1704,
+   "consumer-project": 40,
+   "user-knowledge": 515
+  },
+  "byAuthorityStatus": {
+   "legacy-current": 1026,
+   "unclassified": 14,
+   "non-authority": 2266,
+   "candidate": 1002,
+   "promoted": 3
+  },
+  "byConsumerKind": {
+   "dynamic": 134,
+   "executable-proof": 1056,
+   "fixture": 99,
+   "glob": 2419,
+   "literal": 2355,
+   "shipped-contract": 43
+  }
+ },
+ "gates": {
+  "old": {
+   "clean": true,
+   "fatal": 0,
+   "gapCount": 1360,
+   "fileGapCount": 1054,
+   "claimIdentityGapCount": 306,
+   "unknownBlockingCount": 1688,
+   "duplicateContentGroupCount": 818,
+   "semanticConflictGroupCount": 151
+  },
+  "new": {
+   "clean": true,
+   "fatal": 0,
+   "gapCount": 1361,
+   "fileGapCount": 1055,
+   "claimIdentityGapCount": 306,
+   "unknownBlockingCount": 1689,
+   "duplicateContentGroupCount": 818,
+   "semanticConflictGroupCount": 151
+  },
+  "newGapPaths": [
+   "docs/specs/observe.md"
+  ]
+ },
+ "claimDiff": {
+  "method": "multiset match on (sourcePath, identityFingerprint) between old registry (commit f0c76c5e590339d9c815038539ff1f4a072c64e4) and freshly bootstrapped registry (commit e5c468aba138b68207412cdef20a8acbf80a17c5); unmatched old units classified moved (same fingerprint on another path), edited (same path+anchor), else removed",
+  "oldUnits": 85772,
+  "newUnits": 86085,
+  "unchanged": 85481,
+  "moved": 0,
+  "edited": 248,
+  "removed": 43,
+  "added": 356,
+  "filesAdded": [
+   "docs/distillery/sources/council-of-high-intelligence.md",
+   "docs/how-to/compare-discussion-setups-with-metrics-eval.md",
+   "docs/how-to/install-fgos-in-a-project-and-use-doctor.md",
+   "docs/how-to/measure-a-real-case.md",
+   "docs/reference/discussion-quality-rubric.md",
+   "docs/specs/observe.md"
+  ],
+  "filesRemoved": [],
+  "filesChangedCount": 73,
+  "filesChanged": [
+   "AGENTS.md",
+   "CLAUDE.md",
+   "docs/architect/agent-coordination/README.md",
+   "docs/architect/agent-coordination/architecture/dispatch-control-plane.md",
+   "docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md",
+   "docs/architect/agent-coordination/architecture/runtime-recovery-design.md",
+   "docs/architect/agent-coordination/contracts/README.md",
+   "docs/architect/agent-coordination/contracts/coordination-session.md",
+   "docs/architect/agent-coordination/contracts/flow-definition.md",
+   "docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md",
+   "docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+   "docs/architect/component-boundary/README.md",
+   "docs/architect/component-boundary/component-boundary-advisory.md",
+   "docs/architect/component-boundary/repo-layout-vision.md",
+   "docs/architect/domainization/README.md",
+   "docs/architect/proposals/component-authority-boundary-map.md",
+   "docs/architect/roadmap.md",
+   "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+   "docs/architect/workspace-topology-audit.md",
+   "docs/architecture-manifest.json",
+   "docs/architecture-map.md",
+   "docs/backlog.md",
+   "docs/contracts/fgos-gateway-api-v1.yaml",
+   "docs/decisions/index.md",
+   "docs/distillery/comparison-matrix.md",
+   "docs/distillery/porting-log.md",
+   "docs/enduser-docs-index.json",
+   "docs/explanation/branch-content-mismatch-fgos-exclusion.md",
+   "docs/explanation/core-foundation-domain-boundary.md",
+   "docs/explanation/dispatch-result-confidence-reader.md",
+   "docs/explanation/fgos-gateway-lifecycle-verb.md",
+   "docs/explanation/glm-openrouter-executor.md",
+   "docs/explanation/herdr-orchestrator-terminology-boundary.md",
+   "docs/explanation/sync-root-error-propagation.md",
+   "docs/history/backlog-execution-reconciliation/RECONCILIATION.md",
+   "docs/how-to/author-a-plan-loop-track.md",
+   "docs/how-to/check-rollup-progress.md",
+   "docs/how-to/configure-and-operate-agent-confinement.md",
+   "docs/how-to/run-a-coordination-session.md",
+   "docs/how-to/use-fgos-architecture-panel.md",
+   "docs/how-to/use-fgos-group-thinking.md",
+   "docs/platform/README.md",
+   "docs/platform/agent-coordination/README.md",
+   "docs/platform/agent-coordination/architecture/dispatch-control-plane.md",
+   "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md",
+   "docs/platform/agent-coordination/architecture/runtime-recovery-design.md",
+   "docs/platform/agent-coordination/contracts/README.md",
+   "docs/platform/agent-coordination/contracts/flow-definition.md",
+   "docs/platform/agent-coordination/intent-preservation-ledger.md",
+   "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md",
+   "docs/platform/agent-coordination/proposals/dag-request-scheduler.md",
+   "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+   "docs/platform/component-boundary.md",
+   "docs/platform/host-invocation-routing/architecture/host-use-cases.md",
+   "docs/platform/host-invocation-routing/architecture/invocation-kernel.md",
+   "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md",
+   "docs/platform/host-invocation-routing/contracts/operation-request-outcome.md",
+   "docs/platform/host-invocation-routing/roadmap.md",
+   "docs/platform/host-invocation-routing/verification/implementation-alignment.md",
+   "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md",
+   "docs/platform/host-invocation-routing/verification/source-preservation-audit.md",
+   "docs/platform/packaging-distribution/README.md",
+   "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md",
+   "docs/platform/packaging-distribution/contracts/skill-package-distribution.md",
+   "docs/reading-map.md",
+   "docs/routing-handoff-contract.md",
+   "docs/specs/confinement-authority.md",
+   "docs/specs/distribution.md",
+   "docs/specs/herdr-web-dashboard.md",
+   "docs/specs/reading-map.md",
+   "docs/specs/runner.md",
+   "docs/specs/system-overview.md",
+   "docs/specs/work-state.md"
+  ],
+  "editedByFile": {
+   "docs/specs/runner.md": 17,
+   "docs/specs/work-state.md": 16,
+   "docs/platform/agent-coordination/contracts/flow-definition.md": 11,
+   "docs/architect/agent-coordination/contracts/flow-definition.md": 11,
+   "docs/specs/distribution.md": 8,
+   "docs/platform/host-invocation-routing/verification/r3-remote-peer-proof.md": 8,
+   "docs/specs/confinement-authority.md": 8,
+   "docs/architect/component-boundary/component-boundary-advisory.md": 7,
+   "docs/explanation/herdr-orchestrator-terminology-boundary.md": 7,
+   "docs/specs/herdr-web-dashboard.md": 7,
+   "docs/how-to/author-a-plan-loop-track.md": 6,
+   "docs/explanation/core-foundation-domain-boundary.md": 6,
+   "docs/platform/component-boundary.md": 6,
+   "docs/explanation/fgos-gateway-lifecycle-verb.md": 5,
+   "docs/how-to/use-fgos-group-thinking.md": 5,
+   "AGENTS.md": 5,
+   "docs/how-to/configure-and-operate-agent-confinement.md": 5,
+   "docs/architect/proposals/component-authority-boundary-map.md": 4,
+   "docs/how-to/use-fgos-architecture-panel.md": 4,
+   "docs/platform/host-invocation-routing/roadmap.md": 4,
+   "docs/architect/roadmap.md": 4,
+   "docs/architect/agent-coordination/architecture/group-thinking-trigger-surface.md": 3,
+   "docs/platform/agent-coordination/README.md": 3,
+   "docs/platform/agent-coordination/proposals/dag-request-scheduler.md": 3,
+   "docs/platform/agent-coordination/architecture/group-thinking-trigger-surface.md": 3,
+   "docs/architect/system-vision-trong-mem-ngoai-cung.md": 2,
+   "docs/platform/agent-coordination/architecture/runtime-recovery-design.md": 2,
+   "docs/platform/packaging-distribution/contracts/skill-package-distribution.md": 2,
+   "docs/platform/host-invocation-routing/architecture/node-to-rust-migration.md": 2,
+   "docs/decisions/index.md": 2,
+   "docs/architect/workspace-topology-audit.md": 2,
+   "docs/explanation/branch-content-mismatch-fgos-exclusion.md": 2,
+   "docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md": 2,
+   "docs/distillery/porting-log.md": 2,
+   "docs/specs/reading-map.md": 2,
+   "docs/platform/agent-coordination/architecture/dispatch-control-plane.md": 2,
+   "docs/how-to/run-a-coordination-session.md": 2,
+   "docs/specs/system-overview.md": 2,
+   "docs/platform/README.md": 2,
+   "docs/platform/packaging-distribution/README.md": 2,
+   "docs/architect/agent-coordination/contracts/coordination-session.md": 2,
+   "docs/architect/agent-coordination/architecture/dispatch-control-plane.md": 2,
+   "CLAUDE.md": 2,
+   "docs/platform/host-invocation-routing/architecture/host-use-cases.md": 2,
+   "docs/reading-map.md": 2,
+   "docs/platform/host-invocation-routing/verification/implementation-alignment.md": 2,
+   "docs/architect/component-boundary/README.md": 2,
+   "docs/architect/domainization/README.md": 2,
+   "docs/platform/host-invocation-routing/contracts/operation-request-outcome.md": 2,
+   "docs/routing-handoff-contract.md": 2,
+   "docs/architect/agent-coordination/architecture/runtime-recovery-design.md": 2,
+   "docs/explanation/sync-root-error-propagation.md": 2,
+   "docs/platform/host-invocation-routing/architecture/invocation-kernel.md": 2,
+   "docs/backlog.md": 2,
+   "docs/architecture-map.md": 2,
+   "docs/architect/agent-coordination/contracts/README.md": 2,
+   "docs/how-to/check-rollup-progress.md": 2,
+   "docs/platform/agent-coordination/playbooks/prompts/master-coordinator.md": 2,
+   "docs/architect/agent-coordination/playbooks/prompts/master-coordinator.md": 2,
+   "docs/platform/agent-coordination/proposals/dispatch-control-plane-redesign.md": 2,
+   "docs/platform/host-invocation-routing/verification/source-preservation-audit.md": 2,
+   "docs/history/backlog-execution-reconciliation/RECONCILIATION.md": 2,
+   "docs/architect/agent-coordination/README.md": 1,
+   "docs/enduser-docs-index.json": 1,
+   "docs/platform/agent-coordination/contracts/README.md": 1,
+   "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md": 1,
+   "docs/architecture-manifest.json": 1,
+   "docs/explanation/glm-openrouter-executor.md": 1,
+   "docs/contracts/fgos-gateway-api-v1.yaml": 1,
+   "docs/explanation/dispatch-result-confidence-reader.md": 1
+  },
+  "removedByFile": {
+   "docs/specs/runner.md": 21,
+   "docs/specs/work-state.md": 6,
+   "AGENTS.md": 6,
+   "docs/architect/component-boundary/component-boundary-advisory.md": 5,
+   "docs/how-to/use-fgos-group-thinking.md": 3,
+   "docs/specs/confinement-authority.md": 1,
+   "docs/architect/agent-coordination/README.md": 1
+  },
+  "addedByFile": {
+   "docs/how-to/install-fgos-in-a-project-and-use-doctor.md": 83,
+   "docs/specs/runner.md": 65,
+   "docs/distillery/sources/council-of-high-intelligence.md": 49,
+   "docs/how-to/compare-discussion-setups-with-metrics-eval.md": 39,
+   "docs/specs/observe.md": 25,
+   "docs/how-to/measure-a-real-case.md": 21,
+   "docs/reference/discussion-quality-rubric.md": 14,
+   "docs/specs/confinement-authority.md": 12,
+   "docs/specs/work-state.md": 11,
+   "AGENTS.md": 7,
+   "docs/architect/component-boundary/component-boundary-advisory.md": 6,
+   "docs/architect/component-boundary/repo-layout-vision.md": 4,
+   "docs/distillery/comparison-matrix.md": 3,
+   "docs/platform/agent-coordination/architecture/dispatch-control-plane.md": 2,
+   "docs/how-to/use-fgos-group-thinking.md": 2,
+   "docs/architect/agent-coordination/architecture/dispatch-control-plane.md": 2,
+   "docs/platform/agent-coordination/intent-preservation-ledger.md": 2,
+   "docs/how-to/configure-and-operate-agent-confinement.md": 2,
+   "docs/history/backlog-execution-reconciliation/RECONCILIATION.md": 2,
+   "docs/how-to/run-a-coordination-session.md": 1,
+   "docs/architect/agent-coordination/README.md": 1,
+   "docs/platform/packaging-distribution/contracts/setup-doctor-registry.md": 1,
+   "docs/explanation/glm-openrouter-executor.md": 1,
+   "docs/platform/agent-coordination/contracts/README.md": 1
+  },
+  "removedUnits": [
+   {
+    "path": "docs/specs/runner.md",
+    "anchor": "unheaded-block-99",
+    "kind": "unheaded-block",
+    "claimId": "claim_fa6abc8371354ba8a8de93ca971c2e66"
+   },
+   {
+    "path": "docs/specs/runner.md",
+    "anchor": "unheaded-block-211",
+    "kind": "unheaded-block",
+    "claimId": "claim_e396cbc034f6ac664eaf8155a0935a20"
+   },
+   {
+    "path": "docs/specs/runner.md",
+    "anchor": "unheaded-block-37",
+    "kind": "unheaded-block",
+    "claimId": "claim_e1c62026b9099c43aa4b1ba650a3c45e"
+   },
+   {
+    "path": "docs/specs/runner.md",
+    "anchor": "unheaded-block-92",
+    "kind": "unheaded-block",
+    "claimId": "claim_efb4e680f0d17a5438451859c559abdc"
+   },
+   {
+    "path": "docs/specs/runner.md",
+    "anchor": "unheaded-block-189",
+    "kind": "unheaded-block",
+    "claimId": "claim_de0e8d5f05ce419e0c6d4d8a9cc7960c"
+   },
+   {
+    "path": "docs/specs/runner.md",
+    "anchor": "unheaded-block-65",
+    "kind": "unheaded-block",
+    "claimId": "claim_54cca1e7b73c1d2f43eeec5285189ac2"
+   },
+   {
+    "path": "docs/specs/runner.md",
+    "anchor": "unheaded-block-56",
+    "kind": "unheaded-block",
+    "claimId": "claim_eeb622ee7429cc4b08aa68260bfd5b9e"
+   },
+   {
+    "path": "docs/specs/runner.md",
+    "anchor": "unheaded-block-103",
+    "kind": "unheaded-block",
+    "claimId": "claim_1fd7a91beca93a03f59f96dc841492b5"
+   },
+   {
+    "path": "docs/architect/component-boundary/component-boundary-advisory.md",
+    "anchor": "unheaded-block-81",
+    "kind": "unheaded-block",
+    "claimId": "claim_b1c46a6aceb33c0e502d8b73835e79c9"
+   },
+   {
+    "path": "docs/specs/confinement-authority.md",
+    "anchor": "unheaded-block-134",
+    "kind": "unheaded-block",
+    "claimId": "claim_ef1840695fa3bd0b47f173693e413674"
+   },
+   {
+    "path": "docs/specs/work-state.md",
+    "anchor": "unheaded-block-100",
+    "kind": "unheaded-block",
+    "claimId": "claim_a5901e20552717706e33c3b2a8bc51eb"
+   },
+   {
+    "path": "docs/how-to/use-fgos-group-thinking.md",
+    "anchor": "unheaded-block-8",
+    "kind": "unheaded-block",
+    "claimId": "claim_1d38ea82c7a59c8fd4deea0981e348f2"
+   },
+   {
+    "path": "AGENTS.md",
+    "anchor": "dispatch-routing-work-to-a-executor",
+    "kind": "heading",
+    "claimId": "claim_b12ca1fdc3534fa31f9d7459c1be9ef7"
+   },
+   {
+    "path": "docs/specs/runner.md",
+    "anchor": "unheaded-block-26",
+    "kind": "unheaded-block",
+    "claimId": "claim_421ba49b187e4b8172ea7cbbae4e2621"
+   },
+   {
+    "path": "docs/specs/runner.md",
+    "anchor": "unheaded-block-90",
+    "kind": "unheaded-block",
+    "claimId": "claim_6b1a6d88eb0dcd673f6bbb31d8d404aa"
+   },
+   {
+    "path": "AGENTS.md",
+    "anchor": "unheaded-block-23",
+    "kind": "unheaded-block",
+    "claimId": "claim_7a4fef4aa802940385df7cd8fc1bf6f0"
+   },
+   {
+    "path": "docs/specs/runner.md",
+    "anchor": "unheaded-block-112",
+    "kind": "unheaded-block",
+    "claimId": "claim_c6412c99f7af04779aa0c9958ad0ab34"
+   },
+   {
+    "path": "AGENTS.md",
+    "anchor": "unheaded-block-34",
+    "kind": "unheaded-block",
+    "claimId": "claim_dea64a2d50bdbadf3b2ebeceec84fa5d"
+   },
+   {
+    "path": "AGENTS.md",
+    "anchor": "unheaded-block-18",
+    "kind": "unheaded-block",
+    "claimId": "claim_806342ec2a1c5fd1d0b6d82ebd54d4e0"
+   },
+   {
+    "path": "docs/specs/work-state.md",
+    "anchor": "unheaded-block-185",
+    "kind": "unheaded-block",
+    "claimId": "claim_f6727f3820b9e1b30a1524a5ca243074"
+   },
+   {
+    "path": "docs/specs/runner.md",
+    "anchor": "unheaded-block-93",
+    "kind": "unheaded-block",
+    "claimId": "claim_d6a62f2a938a99fa88391b37e36f2ec4"
+   },
+   {
+    "path": "docs/specs/work-state.md",
+    "anchor": "unheaded-block-64",
+    "kind": "unheaded-block",
+    "claimId": "claim_964e5976fa2e9e6ca37031c01a8dd022"
+   },
+   {
+    "path": "docs/specs/work-state.md",
+    "anchor": "giai-đoạn-soi-rõ-stage-discovery-và-đào-sâu-stage-exploring",
+    "kind": "heading",
+    "claimId": "claim_8b456d9eeaa0faf2e3bf70ba416fa2be"
+   },
+   {
+    "path": "AGENTS.md",
+    "anchor": "unheaded-block-24",
+    "kind": "unheaded-block",
+    "claimId": "claim_7b209ce1498d7ab5ddafe25d203e5852"
+   },
+   {
+    "path": "docs/how-to/use-fgos-group-thinking.md",
+    "anchor": "unheaded-block-5",
+    "kind": "unheaded-block",
+    "claimId": "claim_5e33c25ba18c210ae0c2ac0ad061e678"
+   },
+   {
+    "path": "docs/specs/work-state.md",
+    "anchor": "unheaded-block-105",
+    "kind": "unheaded-block",
+    "claimId": "claim_fb9eaae4784bfd1195f6f5879adc76ab"
+   },
+   {
+    "path": "docs/specs/runner.md",
+    "anchor": "unheaded-block-83",
+    "kind": "unheaded-block",
+    "claimId": "claim_19510980a1fb8080b4484ebbcd718769"
+   },
+   {
+    "path": "docs/specs/runner.md",
+    "anchor": "unheaded-block-101",
+    "kind": "unheaded-block",
+    "claimId": "claim_649ae42255f4f00f761a1ec3599e329f"
+   },
+   {
+    "path": "AGENTS.md",
+    "anchor": "starting-the-herdr-gateway-one-door-never-a-raw-process",
+    "kind": "heading",
+    "claimId": "claim_21f66ad1c973daaf6c31abf50b6c8cc3"
+   },
+   {
+    "path": "docs/architect/component-boundary/component-boundary-advisory.md",
+    "anchor": "unheaded-block-24",
+    "kind": "unheaded-block",
+    "claimId": "claim_412640d439af368ae2f3f62a9e64da62"
+   },
+   {
+    "path": "docs/architect/component-boundary/component-boundary-advisory.md",
+    "anchor": "unheaded-block-8",
+    "kind": "unheaded-block",
+    "claimId": "claim_419382a067622e99f8318f43a9966535"
+   },
+   {
+    "path": "docs/specs/work-state.md",
+    "anchor": "unheaded-block-187",
+    "kind": "unheaded-block",
+    "claimId": "claim_8db461fed3cf45f4278f053467fd43d2"
+   },
+   {
+    "path": "docs/specs/runner.md",
+    "anchor": "unheaded-block-79",
+    "kind": "unheaded-block",
+    "claimId": "claim_c1d115ab39694b9858b026eda2f54da7"
+   },
+   {
+    "path": "docs/specs/runner.md",
+    "anchor": "unheaded-block-247",
+    "kind": "unheaded-block",
+    "claimId": "claim_a5620044d8d996c01b08c17ab85fd4c3"
+   },
+   {
+    "path": "docs/specs/runner.md",
+    "anchor": "unheaded-block-277",
+    "kind": "unheaded-block",
+    "claimId": "claim_145d08b0f9e52c893593eef0ffe5f23f"
+   },
+   {
+    "path": "docs/specs/runner.md",
+    "anchor": "coordinationsession-điều-phối-agent-work-độc-lập-step-08-phase-00",
+    "kind": "heading",
+    "claimId": "claim_0b60e8b61d2123a37a8d2b02026c04dc"
+   },
+   {
+    "path": "docs/architect/agent-coordination/README.md",
+    "anchor": "purpose",
+    "kind": "heading",
+    "claimId": "claim_a71e6af5b5f3b975f70c2f5fd0cb5359"
+   },
+   {
+    "path": "docs/architect/component-boundary/component-boundary-advisory.md",
+    "anchor": "unheaded-block-130",
+    "kind": "unheaded-block",
+    "claimId": "claim_372ddf40717a9d354fa814fecc05ced4"
+   },
+   {
+    "path": "docs/specs/runner.md",
+    "anchor": "unheaded-block-77",
+    "kind": "unheaded-block",
+    "claimId": "claim_146089ca5fa7770c2ec7e55cc6180626"
+   },
+   {
+    "path": "docs/specs/runner.md",
+    "anchor": "unheaded-block-105",
+    "kind": "unheaded-block",
+    "claimId": "claim_7b37f5b220f9c195a32287362d64642c"
+   },
+   {
+    "path": "docs/how-to/use-fgos-group-thinking.md",
+    "anchor": "operator-path-see-whats-registered",
+    "kind": "heading",
+    "claimId": "claim_622808a8cd9b8fba0171d2ccb18863ad"
+   },
+   {
+    "path": "docs/specs/runner.md",
+    "anchor": "unheaded-block-38",
+    "kind": "unheaded-block",
+    "claimId": "claim_fdcecbc50505731b29ebd22c3c828256"
+   },
+   {
+    "path": "docs/architect/component-boundary/component-boundary-advisory.md",
+    "anchor": "unheaded-block-54",
+    "kind": "unheaded-block",
+    "claimId": "claim_f5afa8b5fdbd179009b7a959e9195476"
+   }
+  ],
+  "movedUnits": []
+ },
+ "splitAuthorityCheck": {
+  "platform_foundations": {
+   "docs/platform-foundations.md": true,
+   "docs/specs/platform-foundations.md": true,
+   "docs/platform/platform-foundations.md": true
+  },
+  "reading_maps": {
+   "docs/specs/reading-map.md": true,
+   "docs/reading-map.md": true,
+   "docs/platform/reading-map.md": false
+  },
+  "agents_pf_refs": [
+   "docs/platform-foundations.md",
+   "docs/specs/platform-foundations.md"
+  ],
+  "agents_readingmap_refs": [
+   "docs/specs/reading-map.md"
+  ],
+  "plan_md_docs_history": 612,
+  "plan_md_plans": 19,
+  "plan_md_archive_plans": 36,
+  "journals_plans": 11,
+  "journals_docs": 5,
+  "skill_files_pointing_docs_history_plan": [
+   ".agents/skills/_shared/capability-catalog.md",
+   ".agents/skills/_shared/executor-dispatch-fallback.md",
+   ".agents/skills/_shared/planning-capability-awareness.md",
+   ".agents/skills/fgos-coding-planning/SKILL.md",
+   ".agents/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+   ".agents/skills/fgos-coding-validating/SKILL.md",
+   ".agents/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+   "core/skills/_shared/capability-catalog.md",
+   "core/skills/_shared/executor-dispatch-fallback.md",
+   "core/skills/_shared/planning-capability-awareness.md",
+   "domains/coding/skills/fgos-coding-planning/SKILL.md",
+   "domains/coding/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+   "domains/coding/skills/fgos-coding-validating/SKILL.md",
+   "domains/coding/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md",
+   "domains/coding/task-specs/shape-plan.md",
+   "plugins/fgOS/skills/_shared/capability-catalog.md",
+   "plugins/fgOS/skills/_shared/executor-dispatch-fallback.md",
+   "plugins/fgOS/skills/_shared/planning-capability-awareness.md",
+   "plugins/fgOS/skills/fgos-coding-planning/SKILL.md",
+   "plugins/fgOS/skills/fgos-coding-planning/references/verify-sync-and-gap.md",
+   "plugins/fgOS/skills/fgos-coding-validating/SKILL.md",
+   "plugins/fgOS/skills/fgos-coding-validating/references/gate-auto-approve-mechanics.md"
+  ],
+  "architect_files": 981,
+  "platform_files": 1006,
+  "same_relpath": 938,
+  "same_relpath_identical": 868,
+  "architect_files_with_identical_content_in_platform": 868,
+  "reading_map_path_tokens": 109,
+  "reading_map_dead": [
+   ".claude-plugin/plugin.json",
+   ".fgos/events.lock",
+   ".fgos/sessions.json",
+   ".fgos/sessions.lock",
+   "contracts/",
+   "docs/history/phase-3-compound-learning/reports/f4-benchmark.md",
+   "patterns/",
+   "plans/260920-immediate-test-feedback-reduction/plan.md",
+   "runner/loop.mjs",
+   "src/evolve/candidates.mjs",
+   "src/state/workflow-stage-graphs.mjs",
+   "state/cursor.mjs"
+  ]
+ }
+}
