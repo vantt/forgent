@@ -44,6 +44,8 @@
 // gap between two tool calls of a single turn.
 
 /** Every terminal outcome this ladder can reach. */
+import { AUTH_FAILURE_PATTERNS } from './provider-auth-failure.mjs';
+
 export const LADDER_OUTCOMES = Object.freeze([
   'settled',
   'blocked',
@@ -76,25 +78,6 @@ export const DEFAULT_USAGE_LIMIT_PATTERNS = Object.freeze([
   /too many requests/i,
   /try again (?:later|in \d)/i,
   /model is at capacity/i,
-]);
-
-/**
- * Screen text that means "this agent cannot reach its provider because its credential is dead",
- * not "it is thinking". The pane shows the error and the agent sits idle, so without this the
- * round waits out the whole idle timeout and ends as `timed-out-idle`. Anchored to wordings
- * measured on a real pane (pi: "OAuth refresh failed for xai ... invalid_grant") plus the
- * standard login prompts. The round ends as `provider-limit`: the provider cannot serve now,
- * so the walk moves to the next candidate; the capacity classifier reads the same line and
- * quarantines the account as an auth fault, not a quota one.
- */
-export const AUTH_FAILURE_PATTERNS = Object.freeze([
-  /oauth (?:token )?refresh failed/i,
-  /\binvalid_grant\b/i,
-  /(?:please )?run \/login/i,
-  /authentication (?:failed|required)/i,
-  /login required/i,
-  /not logged in/i,
-  /api key.{0,20}(?:missing|invalid|expired)/i,
 ]);
 
 /** How long an agent has to sit not-working before its screen is read for a credential failure. */

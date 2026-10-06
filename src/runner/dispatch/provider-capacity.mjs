@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { normalizeProviderFamily } from './provider-adapter.mjs';
-import { AUTH_FAILURE_PATTERNS } from './liveness.mjs';
+import { AUTH_FAILURE_PATTERNS } from './provider-auth-failure.mjs';
 import { getProcessStartTime, resolveHolderLiveness } from './process-identity.mjs';
 
 export const PROVIDER_CAPACITY_STATE_CONTRACT = 'provider-capacity-state.v1';

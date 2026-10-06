@@ -63,6 +63,7 @@
     "src/runner/dispatch/operation-prompt-templates.mjs": "infra",
     "src/runner/dispatch/provider-adapter.mjs": "infra",
     "src/runner/dispatch/provider-capacity.mjs": "infra",
+    "src/runner/dispatch/provider-auth-failure.mjs": "infra",
     "src/runner/dispatch/assignment-runner.mjs": "infra",
     "src/runner/dispatch/settlement.mjs": "infra",
     "src/runner/dispatch/reconcile-cli-spawn.mjs": "infra",
