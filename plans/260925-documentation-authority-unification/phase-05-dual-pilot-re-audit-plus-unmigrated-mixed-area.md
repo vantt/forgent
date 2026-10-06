@@ -1,7 +1,7 @@
 ---
 phase: 5
 title: "Dual pilot: re-audit plus unmigrated mixed area"
-status: pending
+status: in-progress
 priority: P1
 effort: ""
 dependencies: [4]
@@ -13,7 +13,7 @@ dependencies: [4]
 
 ## Overview
 
-**Status:** `not-started`, `not-authorized`. Phase 4 is closed. This file is a plan only (written 2026-10-06); nothing in it has been run. Evidence and the owner question bundle: [reports/phase-05-planning-261006.md](reports/phase-05-planning-261006.md). Harness per `plan.md` §7.2 (2026-10-06). Pilot A must also check promoted targets for dropped claims of the dropped-001 kind (`plan.md` §7.3).
+**Status:** `in-progress`, authorized by the owner on 2026-10-06 (decisions recorded in `plan.md` §7.5b). Phase 4 is closed. Plan written 2026-10-06. Evidence and the owner question bundle: [reports/phase-05-planning-261006.md](reports/phase-05-planning-261006.md). Harness per `plan.md` §7.2 (2026-10-06). Pilot A must also check promoted targets for dropped claims of the dropped-001 kind (`plan.md` §7.3).
 **Mode:** isolated worktree (the plan worktree), candidate/review only
 **Purpose:** Falsify both conservation and transformation before applying them globally.
 
