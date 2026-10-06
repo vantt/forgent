@@ -68,7 +68,7 @@ Must be handled before the method is frozen (see `plan.md` §7.3-§7.4):
 - rerun conservation on the synced tree with identity carry-forward, then disposition the 43 removed and 248 edited claim units listed in `reports/resync-261006/inventory-comparison.json` and the new routing gap `docs/specs/observe.md`;
 - carry `dropped-claims-register.json` into the conservation checker so a dropped claim fails the gate;
 - `scripts/verify-phase-02.mjs` is frozen (owner decision 2026-10-06): do not repair its paths; build this phase's own gates instead;
-- take the legacy-docs ratchet (script, baseline regenerated against main, exceptions, test) to main early as a separate small reviewed change; the switchboard waits for Phase 8 (`plan.md` §7.5b, decision F);
+- the early move of the legacy-docs ratchet to main is deferred (`plan.md` §7.5b, decision F); keep re-accounting main-side legacy edits at each sync;
 - known generator limit: artifacts that sat at the plan root before the 2026-09-29 move into `reports/` are not skipped; matters only when generating on a commit between 2026-09-26 and 2026-09-29.
 
 Already decided (see `plan.md` §7.5b): the standing policy for main-side legacy-root edits and the knowledge-registry plan move.
