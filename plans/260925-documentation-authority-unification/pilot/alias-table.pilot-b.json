@@ -1,0 +1,142 @@
+{
+  "version": 1,
+  "description": "Pilot B alias table for the work-state area: one split alias per H2 section of docs/specs/work-state.md, a bare-path redirect of that document to the area portal, and a bare-path move of docs/io-contract.md to its contract document. Candidate content only; the live alias table stays empty.",
+  "entries": [
+    {
+      "aliasId": "work-state-spec-entry-points-triggers",
+      "fromPath": "docs/specs/work-state.md#entry-points-triggers",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "2-entry-points-and-triggers",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-spec-data-dictionary",
+      "fromPath": "docs/specs/work-state.md#data-dictionary",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "3-work-item-data-dictionary",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-spec-behaviors-operations",
+      "fromPath": "docs/specs/work-state.md#behaviors-operations",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "9-behaviors-and-operations",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-spec-actors-access",
+      "fromPath": "docs/specs/work-state.md#actors-access",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "10-actors-and-access",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-spec-business-rules",
+      "fromPath": "docs/specs/work-state.md#business-rules",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "11-business-rules",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-spec-edge-cases-settled",
+      "fromPath": "docs/specs/work-state.md#edge-cases-settled",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "12-edge-cases-settled",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-spec-open-gaps",
+      "fromPath": "docs/specs/work-state.md#open-gaps",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "13-known-gaps-and-deferred-work",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-spec-visuals",
+      "fromPath": "docs/specs/work-state.md#visuals",
+      "toOwner": "docs/platform/work-state/spec.md",
+      "toAnchor": "14-presentation-surface",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-spec-pointers-implementation",
+      "fromPath": "docs/specs/work-state.md#pointers-implementation",
+      "toOwner": "docs/platform/work-state/architecture/implementation-pointers.md",
+      "toAnchor": "2-implementation-pointers",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-spec-retired-decision-history",
+      "fromPath": "docs/specs/work-state.md#lịch-sử-quyết-định-retired-từ-docsdecisions-tsk-1lv-4",
+      "toOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
+      "toAnchor": "1-provenance-of-retired-decisions",
+      "kind": "split",
+      "evidenceRef": null,
+      "immutableRefs": [],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "work-state-spec-bare",
+      "fromPath": "docs/specs/work-state.md",
+      "toOwner": "docs/platform/work-state/README.md",
+      "toAnchor": null,
+      "kind": "redirected",
+      "evidenceRef": null,
+      "immutableRefs": [
+        "docs/history/align-work-state-runner-specs-runtime-claim-overlay/plan.md:25",
+        "docs/history/cli-data-work-field-shape-ambiguity/CONTEXT.md:63",
+        "docs/decisions/index.md:42",
+        "docs/decisions/index.md:50",
+        "docs/decisions/index.md:53",
+        "plans/reports/audit-round2-260812-1713-tsk-5sr-post-merge-verification-report.md:433",
+        "docs/history/discover-stage-graph-and-skill-layering/FINDINGS.md:535",
+        "docs/history/project-instability-scan/plan.md:105",
+        "docs/history/tsk-483-list-side-log-pagination-scoping/CONTEXT.md:18"
+      ],
+      "recordedAt": "2026-10-07"
+    },
+    {
+      "aliasId": "io-contract-bare",
+      "fromPath": "docs/io-contract.md",
+      "toOwner": "docs/platform/work-state/contracts/cli-io-contract.md",
+      "toAnchor": null,
+      "kind": "moved",
+      "evidenceRef": null,
+      "immutableRefs": [
+        "archive/plans/260920-2217-dispatch-engine-hardening/phase-08-operability-cli-doctor.md:41",
+        "plans/261006-1415-fgos-convention-component/phase-00-spec.md:30",
+        "docs/history/herdr-web-dashboard/plan.md:903",
+        "docs/history/tsk-1lv-4/iron-law-evidence.md:116",
+        "docs/history/fgos-participant-contract/CONTEXT.md:121"
+      ],
+      "recordedAt": "2026-10-07"
+    }
+  ]
+}
