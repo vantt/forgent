@@ -1,0 +1,6 @@
+{
+  "$schema": "./alias-table.schema.json",
+  "version": 1,
+  "description": "Platform alias table: old documentation path -> current platform owner. Intentionally empty until the transformation records real moves; entries are never invented ahead of the move they describe.",
+  "entries": []
+}
