@@ -1,7 +1,7 @@
 ---
 title: "Observe sees every run, and measures discussions"
 description: "One run definition and one lister per language for .fgos/assignments (nested unit-run ids), so Observe, show-run, inspection and the reconciler stop missing discussion runs; then the measurement discussion power needs: coverage subcommand, writer-owned unit summaries, stance/agreement sensor, eval store."
-status: completed
+status: in-progress
 priority: P1
 effort: "~7d"
 tags: [observe, metrics, run-result, discussion, measurement, contract, doctor]
@@ -65,7 +65,7 @@ Root cause: a result's **location and record shape** are implicit contracts each
 
 | # | Phase | Effort | Depends | Status |
 |---|---|---|---|---|
-| 1 | [Run definition, Node lister, and the seven readers](./phase-01-layout-contract-and-run-lister.md) | 1.5d | — | completed (documented test-policy deviation) |
+| 1 | [Run definition, Node lister, and the seven readers](./phase-01-layout-contract-and-run-lister.md) | 1.5d | — | in-progress (original source guard unmet) |
 | 2 | [Rust run scan, `metrics coverage`, hermetic invariant](./phase-02-rust-run-source-and-coverage-invariant.md) | 1.25d | 1 (rule + fixture) | completed |
 | 3 | [Doctor coverage check and rebaseline](./phase-03-doctor-coverage-check-and-rebaseline.md) | 0.75d | 1, 2 | completed |
 | 4 | [Unit summaries and `metrics discussions`](./phase-04-unit-summaries-and-discussions.md) | 1.5d | 2 | completed |
@@ -84,7 +84,7 @@ Phases 1–3 shipped first as the foundation; the owner explicitly authorized al
 - [x] Four mdview Delphi workflows include refusal zero seats and two fallback seats; 30 attempts = 30 Dispatch runs, distinct from 28 final seats.
 - [x] Live three-seat panel gives three valid votes and hand/native agreement 1; no-options is unmeasured and malformed stance preserves passing seat (behavioral CLI regression).
 - [x] Two real current-setup records judged by isolated blind Opus list by exact question/harness in `metrics eval list`.
-- [x] Full suite `FGOS_HOST_BIN=target/debug/fgos npm test -- --test-concurrency=1`: 6,750 pass, zero fail (6,823 tests, eight skip, 65 todo); Rust 74 pass/build. Specs, CHANGELOG, architecture manifest, doctor spec rows and command registry updated; No component-boundary change.
+- [ ] Acceptance repairs: full final npm/Rust suites and live CLI evidence verified after consumer defects are fixed; original baseline was 6,750 pass, zero fail with serial full selection. Specs, CHANGELOG, manifest and doctor rows updated; No component-boundary change.
 
 ## How Rust changes are verified (important)
 
@@ -173,6 +173,12 @@ added. The strict timestamp decision and completed foundation evidence remain.
 [`observe-discussion-measurement-261005.md`](../reports/observe-discussion-measurement-261005.md) records live backfill, four Delphi runs, stance panel, two current setups, blind Opus scores and actual eval shards. Both compared setups scored 7/10; no ranking/gate is inferred from one question. Integrated Rust 74 tests/build and focused Node 55 tests pass; independent writer/reader re-reviews approved all corrections. No component-boundary change, no history rewrite, no staging/commit.
 
 Final full-suite verification passed with the unchanged test selection: `FGOS_HOST_BIN=target/debug/fgos npm test -- --test-concurrency=1`, 6,823 tests / 6,750 pass / zero fail / eight skip / 65 todo (artifact://270). The default parallel run had one existing live-Herdr attestation failure; the actual-gateway diagnostic and complete serial suite both passed, without narrowing/skipping or changing fail-closed/deadlines. [Diagnostic limits](../reports/observe-herdr-acceptance-diagnostic-261005.json) retain the default failure and label contention as an unproven hypothesis.
+
+### Independent acceptance — reopened 2026-10-06
+
+The three Opus acceptance reports returned **ACCEPT WITH FIXES**: passing tests did not prove every reachable measurement/lifecycle boundary. [Acceptance repair ledger](../reports/observe-acceptance-fixes-261006.md) tracks all findings, commits, exercised evidence and non-fixes. The original source-enumerator guard criterion is restored unchecked; the runtime test prohibition is not represented as a repository law or owner waiver.
+
+The owner confirmed in the current conversation that the 2026-10-05 all-phase request was real. For timestamp policy the owner emphasized accuracy, stability, speed and simplicity, with no compatibility requirement; the repair chooses actual settlement fields only: result `settledAt`/`timestamp`, then sibling `run.json.settledAt`, never started/created time as completion. Implementation and final verification are pending.
 
 
 ## Open questions

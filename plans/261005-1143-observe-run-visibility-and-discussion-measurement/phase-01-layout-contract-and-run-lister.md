@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "Run definition, Node lister, and the seven readers"
-status: completed
+status: in-progress
 priority: P1
 effort: "1.5d"
 dependencies: []
@@ -15,9 +15,9 @@ Write the single run definition (see plan.md "What is a run"), give Node one lis
 
 Execution evidence: [layout inventory](../reports/observe-run-layout-261005.md)
 and [rebaseline](../reports/observe-rebaseline-261005.md). Reader migration and
-behavioral coverage are implemented. The source-enumerator guard criterion is
-not checked: session policy forbids permanent source-text/wiring tests. No commit
-was requested or made; the report is present in the working tree.
+behavioral coverage are implemented and committed in `0b06824a7`. The original
+source-enumerator guard remains unmet: this runtime forbids permanent
+source-text/wiring tests, not a repository rule. Inventory is not that guard.
 
 
 ## Requirements
@@ -65,10 +65,10 @@ Readers, in two groups:
 
 - [x] `show-run`, inspection, doctor reader and `findRunningRuns` handle flat, nested and `assignment.json`-less runs through one module.
 - [x] A run planted inside a worker outbox is not listed; a symlinked run is skipped.
-- [x] Inventory report persisted in working tree; justified enumerator inventory and behavioral tests replace the prohibited permanent source-text guard; spec text extended in place. No commit requested.
+- [ ] Inventory report committed; guard test green with a justified allow-list; spec text extended in place.
 - [x] Reconcile dry-run before/after recorded; policy for nested orphans decided, not assumed.
 
-Evidence: [`observe-run-layout-261005.md`](../reports/observe-run-layout-261005.md), [`observe-rebaseline-261005.md`](../reports/observe-rebaseline-261005.md). Original guard/commit wording is superseded by the session's test policy and no-unrequested-commit rule; this is a documented verification-method deviation, not a claim that the original guard was run.
+Evidence: [`observe-run-layout-261005.md`](../reports/observe-run-layout-261005.md), [`observe-rebaseline-261005.md`](../reports/observe-rebaseline-261005.md), and [acceptance repairs](../reports/observe-acceptance-fixes-261006.md). The original guard criterion is restored verbatim and unchecked. No owner waiver or equivalent permanent prevention is claimed.
 
 ## Risk Assessment
 
