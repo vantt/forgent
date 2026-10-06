@@ -25,6 +25,13 @@ export const ADDITIONAL_ROOT_FILES = ['AGENTS.md', 'CLAUDE.md'];
 export const PHASE_DIR = 'plans/260925-documentation-authority-unification';
 // Historical inventory artifacts live under the plan's reports/ directory.
 export const IDENTITY_REGISTRY_PATH = `${PHASE_DIR}/reports/phase-02-identity-registry.json`;
+// The generator's own saved output: the sharded manifest, its `<name>.parts/`
+// directory (layout owned by doc-inventory-artifact.mjs), the Markdown report
+// and the identity registry. The manifest location is the same one
+// check-doc-inventory-gates.mjs defaults to.
+const INVENTORY_MANIFEST_PATH = `${PHASE_DIR}/reports/phase-02-doc-inventory.json`;
+const INVENTORY_PARTS_PREFIX = `${INVENTORY_MANIFEST_PATH.replace(/\.json$/, '')}.parts/`;
+const INVENTORY_REPORT_PATH = INVENTORY_MANIFEST_PATH.replace(/\.json$/, '.md');
 
 function stableHash(input, len = 16) {
   return crypto.createHash('sha256').update(String(input)).digest('hex').slice(0, len);
@@ -665,6 +672,27 @@ function isTextPath(p) {
   return /\.(md|ts|tsx|js|mjs|cjs|py|rs|sh|jsonl|json|yaml|yml|toml|txt|log)$/i.test(p);
 }
 
+// Saved generator output is never an input: reading it back would feed the
+// previous run's artifacts (hundreds of MB) into the consumer scan.
+export function isGeneratorOutputArtifact(filePath) {
+  const norm = normalizePosix(filePath);
+  return norm === INVENTORY_MANIFEST_PATH
+    || norm === INVENTORY_REPORT_PATH
+    || norm === IDENTITY_REGISTRY_PATH
+    || norm.startsWith(INVENTORY_PARTS_PREFIX);
+}
+
+// Every blob in the commit tree except the generator's own saved output.
+export function listCommitEntries(repoRoot, commitSha) {
+  const out = execFileSync('git', ['ls-tree', '-r', '-l', commitSha], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    maxBuffer: 60 * 1024 * 1024,
+    stdio: ['pipe', 'pipe', 'pipe'],
+  });
+  return parseLsTreeLong(out).filter((e) => !isGeneratorOutputArtifact(e.path));
+}
+
 function listCommitPaths(repoRoot, commitSha) {
   const out = execFileSync('git', ['ls-tree', '-r', '--name-only', commitSha], {
     cwd: repoRoot,
@@ -725,12 +753,7 @@ export function collectConsumers(repoRoot, commitSha, targetPaths, shippedIndex 
   const consumersByPath = new Map(normalizedTargets.map((p) => [p, []]));
   const scanGaps = [];
   const unresolvedConsumerEdges = [];
-  const allEntries = parseLsTreeLong(execFileSync('git', ['ls-tree', '-r', '-l', commitSha], {
-    cwd: repoRoot,
-    encoding: 'utf8',
-    maxBuffer: 60 * 1024 * 1024,
-    stdio: ['pipe', 'pipe', 'pipe'],
-  }));
+  const allEntries = listCommitEntries(repoRoot, commitSha);
   const allPaths = allEntries.map((e) => normalizePosix(e.path)).filter(isTextPath).sort();
   const sizeByPath = new Map(allEntries.map((e) => [normalizePosix(e.path), e.size]));
   const pathToken = /(?:^|[\s"'`(<\[])(((?:docs|plans|scripts|src|test|core|domains|plugins|\.agents|\.fgos)\/[A-Za-z0-9_.\/*-]+)(?:#[A-Za-z0-9_.\/-]+)?)/g;
@@ -1338,12 +1361,7 @@ export function generateInventory(repoRoot = process.cwd(), options = {}) {
   const shippedIndex = buildShippedContractIndex(loadShippedPathInventory(commitSha, repoRoot));
   const files = scanInScopeFiles(repoRoot, commitSha).sort((a, b) => normalizePosix(a.path).localeCompare(normalizePosix(b.path)));
   const paths = files.map((f) => normalizePosix(f.path));
-  const allEntries = parseLsTreeLong(execFileSync('git', ['ls-tree', '-r', '-l', commitSha], {
-    cwd: repoRoot,
-    encoding: 'utf8',
-    maxBuffer: 60 * 1024 * 1024,
-    stdio: ['pipe', 'pipe', 'pipe'],
-  }));
+  const allEntries = listCommitEntries(repoRoot, commitSha);
   const blobContentsByPath = readCommitBlobMap(repoRoot, allEntries.filter((e) => isTextPath(normalizePosix(e.path)) || paths.includes(normalizePosix(e.path))));
   const targetRefs = new Map();
   for (const f of files) {

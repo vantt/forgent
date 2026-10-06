@@ -31,6 +31,7 @@ import {
   bootstrapIdentityRegistry,
   carryForwardIdentityRegistry,
 } from '../../scripts/generate-doc-inventory.mjs';
+import * as generator from '../../scripts/generate-doc-inventory.mjs';
 import {
   validateStructure,
   validateAgainstVocabulary,
@@ -38,6 +39,8 @@ import {
   validateSourceUnitCoverage,
   deriveValidTargetOwnersFromSwitchboard,
   validateIdentityRegistry,
+  DEFAULT_INVENTORY_PATH,
+  DEFAULT_IDENTITY_REGISTRY_PATH,
 } from '../../scripts/check-doc-inventory-gates.mjs';
 import {
   writeShardedJsonArtifact,
@@ -687,6 +690,82 @@ test('collectConsumers: dynamic parser skips comments, quotes, and Markdown pros
     assert.deepEqual(alias?.targetPaths, []);
   } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
 });
+
+function makeArtifactFixture() {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-inventory-own-output-'));
+  execFileSync('git', ['init'], { cwd: tmp, stdio: 'ignore' });
+  execFileSync('git', ['config', 'user.email', 't@example.test'], { cwd: tmp });
+  execFileSync('git', ['config', 'user.name', 'Test'], { cwd: tmp });
+  const write = (rel, body) => {
+    fs.mkdirSync(path.dirname(path.join(tmp, rel)), { recursive: true });
+    fs.writeFileSync(path.join(tmp, rel), body);
+  };
+  const reports = `${generator.PHASE_DIR}/reports`;
+  write('docs/specs/runner.md', '# Runner\n');
+  write('src/consumer.ts', 'const x = "docs/specs/runner.md";\n');
+  write(`${reports}/phase-02-doc-inventory.json`, '{"ref":"docs/specs/runner.md"}\n');
+  write(`${reports}/phase-02-doc-inventory.parts/part-0001.json`, '{"ref":"docs/specs/runner.md"}\n');
+  write(`${reports}/phase-02-doc-inventory.md`, 'see docs/specs/runner.md\n');
+  write(`${reports}/phase-02-identity-registry.json`, '{"ref":"docs/specs/runner.md"}\n');
+  write(`${reports}/resync-261006/inventory-comparison.json`, '{"ref":"docs/specs/runner.md"}\n');
+  execFileSync('git', ['add', '.'], { cwd: tmp });
+  execFileSync('git', ['commit', '-m', 'fixture'], { cwd: tmp, stdio: 'ignore' });
+  const commit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: tmp, encoding: 'utf8' }).trim();
+  return { tmp, commit, reports };
+}
+
+test('collectConsumers: the generator ignores its own saved output artifacts and still counts ordinary inputs', () => {
+  const { tmp, commit, reports } = makeArtifactFixture();
+  try {
+    const edges = collectConsumers(tmp, commit, ['docs/specs/runner.md']).get('docs/specs/runner.md');
+    const sources = new Set(edges.map((e) => e.path));
+    assert.equal(sources.has('src/consumer.ts'), true);
+    assert.equal(sources.has(`${reports}/resync-261006/inventory-comparison.json`), true);
+    for (const own of [
+      `${reports}/phase-02-doc-inventory.json`,
+      `${reports}/phase-02-doc-inventory.parts/part-0001.json`,
+      `${reports}/phase-02-doc-inventory.md`,
+      `${reports}/phase-02-identity-registry.json`,
+    ]) assert.equal(sources.has(own), false, `${own} must not be read as a consumer`);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('listCommitEntries: omits only the generator output artifacts from the commit tree', () => {
+  const { tmp, commit, reports } = makeArtifactFixture();
+  try {
+    const listed = generator.listCommitEntries(tmp, commit).map((e) => e.path).sort();
+    assert.deepEqual(listed, [
+      'docs/specs/runner.md',
+      `${reports}/resync-261006/inventory-comparison.json`,
+      'src/consumer.ts',
+    ].sort());
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
+test('isGeneratorOutputArtifact: output locations agree with the checker defaults and the sharded writer layout', () => {
+  assert.equal(generator.isGeneratorOutputArtifact(DEFAULT_INVENTORY_PATH), true);
+  assert.equal(generator.isGeneratorOutputArtifact(DEFAULT_IDENTITY_REGISTRY_PATH), true);
+  assert.equal(generator.isGeneratorOutputArtifact(generator.IDENTITY_REGISTRY_PATH), true);
+  assert.equal(generator.isGeneratorOutputArtifact(DEFAULT_INVENTORY_PATH.replace(/\.json$/, '.md')), true);
+  assert.equal(generator.isGeneratorOutputArtifact(`${DEFAULT_INVENTORY_PATH.replace(/\.json$/, '')}.parts/part-0001.json`), true);
+  assert.equal(generator.isGeneratorOutputArtifact(`${generator.PHASE_DIR}/reports/resync-261006/inventory-comparison.json`), false);
+  assert.equal(generator.isGeneratorOutputArtifact('docs/specs/runner.md'), false);
+
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-inventory-layout-'));
+  try {
+    const manifest = path.join(tmp, 'phase-02-doc-inventory.json');
+    writeShardedJsonArtifact(manifest, { rows: [1, 2, 3] });
+    const written = fs.readdirSync(tmp).sort();
+    assert.deepEqual(written, ['phase-02-doc-inventory.json', 'phase-02-doc-inventory.parts']);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+});
+
 
 test('validateSourceUnitCoverage: detects dropped, duplicate, and digest-mismatched immutable source-unit coverage', () => {
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-inventory-coverage-'));
