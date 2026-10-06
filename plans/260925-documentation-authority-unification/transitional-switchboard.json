@@ -788,6 +788,49 @@
       ]
     },
     {
+      "area": "Observe (metrics and friction)",
+      "authorityStatus": "legacy-current",
+      "fileClasses": [
+        "maintained-authority"
+      ],
+      "canonicalRoute": "docs/specs/observe.md",
+      "canonicalRoutes": [
+        "docs/specs/observe.md"
+      ],
+      "retainedSources": [
+        "packages/observe/rust/**"
+      ],
+      "scopedRoutes": [
+        {
+          "scope": "observe-spec",
+          "route": "docs/specs/observe.md",
+          "authorityStatus": "legacy-current",
+          "role": "Spec owns observation behavior: metrics cases and scorecards, friction records, and the observe store contract"
+        },
+        {
+          "scope": "observe-implementation",
+          "route": "packages/observe/rust/**",
+          "authorityStatus": "legacy-current",
+          "role": "Rust implementation of the observe component (fgos-observe)"
+        }
+      ],
+      "scopeSummary": "Spec owns observation behavior (metrics and friction); the Rust package owns the implementation.",
+      "currentRoutes": [
+        {
+          "scope": "observe-spec",
+          "route": "docs/specs/observe.md",
+          "authorityStatus": "legacy-current",
+          "role": "Spec owns observation behavior: metrics cases and scorecards, friction records, and the observe store contract"
+        },
+        {
+          "scope": "observe-implementation",
+          "route": "packages/observe/rust/**",
+          "authorityStatus": "legacy-current",
+          "role": "Rust implementation of the observe component (fgos-observe)"
+        }
+      ]
+    },
+    {
       "area": "Skills and domainization",
       "authorityStatus": "legacy-current",
       "fileClasses": [

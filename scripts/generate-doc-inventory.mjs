@@ -23,15 +23,18 @@ import { classifyFile as classifyLegacyRootFile } from './check-legacy-docs-ratc
 export const SCAN_ROOTS = ['docs'];
 export const ADDITIONAL_ROOT_FILES = ['AGENTS.md', 'CLAUDE.md'];
 export const PHASE_DIR = 'plans/260925-documentation-authority-unification';
-// Historical inventory artifacts live under the plan's reports/ directory.
-export const IDENTITY_REGISTRY_PATH = `${PHASE_DIR}/reports/phase-02-identity-registry.json`;
-// The generator's own saved output: the sharded manifest, its `<name>.parts/`
-// directory (layout owned by doc-inventory-artifact.mjs), the Markdown report
-// and the identity registry. The manifest location is the same one
-// check-doc-inventory-gates.mjs defaults to.
-const INVENTORY_MANIFEST_PATH = `${PHASE_DIR}/reports/phase-02-doc-inventory.json`;
-const INVENTORY_PARTS_PREFIX = `${INVENTORY_MANIFEST_PATH.replace(/\.json$/, '')}.parts/`;
-const INVENTORY_REPORT_PATH = INVENTORY_MANIFEST_PATH.replace(/\.json$/, '.md');
+// Saved inventory artifacts live under the plan's reports/ directory. The
+// manifest, its Markdown report and the identity registry are committed; the
+// shards (`<name>.parts/`, layout owned by doc-inventory-artifact.mjs) are not.
+// The first generation's phase-02 names stay recognised as generator output.
+export const INVENTORY_MANIFEST_PATH = `${PHASE_DIR}/reports/doc-inventory.json`;
+export const IDENTITY_REGISTRY_PATH = `${PHASE_DIR}/reports/identity-registry.json`;
+const LEGACY_INVENTORY_MANIFEST_PATH = `${PHASE_DIR}/reports/phase-02-doc-inventory.json`;
+const LEGACY_IDENTITY_REGISTRY_PATH = `${PHASE_DIR}/reports/phase-02-identity-registry.json`;
+const OUTPUT_MANIFEST_PATHS = [INVENTORY_MANIFEST_PATH, LEGACY_INVENTORY_MANIFEST_PATH];
+const OUTPUT_REPORT_PATHS = OUTPUT_MANIFEST_PATHS.map((p) => p.replace(/\.json$/, '.md'));
+const OUTPUT_PARTS_PREFIXES = OUTPUT_MANIFEST_PATHS.map((p) => `${p.replace(/\.json$/, '')}.parts/`);
+const OUTPUT_REGISTRY_PATHS = [IDENTITY_REGISTRY_PATH, LEGACY_IDENTITY_REGISTRY_PATH];
 
 function stableHash(input, len = 16) {
   return crypto.createHash('sha256').update(String(input)).digest('hex').slice(0, len);
@@ -197,7 +200,15 @@ function resolveRegisteredClaimId(identityIndex, unitDigest, sourcePath = null, 
     const pathMatches = p ? matches.filter((m) => normalizePosix(m.sourcePath || '') === p) : matches;
     const pathIds = [...new Set(pathMatches.map((m) => m.claimId).filter(Boolean))];
     if (pathIds.length === 1) return { claimId: pathIds[0], identityStatus: 'carried-forward' };
-    if (pathIds.length > 1) { sawAmbiguous = true; continue; }
+    if (pathIds.length > 1) {
+      // Duplicates resolve by anchor only when the registry holds exactly one
+      // row for this path, digest and anchor; rows minted from an unresolved
+      // ambiguity stay ambiguous.
+      const anchorIds = sourceAnchor ? [...new Set(pathMatches.filter((m) => m.sourceAnchor === sourceAnchor && !m.identityNote).map((m) => m.claimId).filter(Boolean))] : [];
+      if (anchorIds.length === 1 && pathMatches.filter((m) => m.sourceAnchor === sourceAnchor).length === 1) return { claimId: anchorIds[0], identityStatus: 'carried-forward' };
+      sawAmbiguous = true;
+      continue;
+    }
     const claimIds = [...new Set(matches.map((m) => m.claimId).filter(Boolean))];
     if (claimIds.length > 0) sawAmbiguous = true;
   }
@@ -676,10 +687,10 @@ function isTextPath(p) {
 // previous run's artifacts (hundreds of MB) into the consumer scan.
 export function isGeneratorOutputArtifact(filePath) {
   const norm = normalizePosix(filePath);
-  return norm === INVENTORY_MANIFEST_PATH
-    || norm === INVENTORY_REPORT_PATH
-    || norm === IDENTITY_REGISTRY_PATH
-    || norm.startsWith(INVENTORY_PARTS_PREFIX);
+  return OUTPUT_MANIFEST_PATHS.includes(norm)
+    || OUTPUT_REPORT_PATHS.includes(norm)
+    || OUTPUT_REGISTRY_PATHS.includes(norm)
+    || OUTPUT_PARTS_PREFIXES.some((prefix) => norm.startsWith(prefix));
 }
 
 // Every blob in the commit tree except the generator's own saved output.
@@ -1271,7 +1282,7 @@ function matchPreviousUnit({ oldByFingerprint, oldByDigest, consumed }, unit, un
   return ambiguousNotes.length > 0 ? { ambiguous: ambiguousNotes.join('; '), ambiguousRows: [...ambiguousRows] } : {};
 }
 
-const CARRY_MARKER_FIELDS = ['reviewStatus', 'lineage', 'movedFrom', 'identityNote', 'origin'];
+const CARRY_MARKER_FIELDS = ['reviewStatus', 'lineage', 'movedFrom', 'identityNote', 'origin', 'pairedByAnchor'];
 
 /** Drops per-carry markers so a later carry only reports what it did itself. */
 function withoutCarryMarkers(row) {
@@ -1312,6 +1323,32 @@ function freshUnitRow(u, { sourcePath, unitDigest, documentType, classification 
 function anchorWithoutNumericSuffix(anchor) {
   const m = String(anchor).match(/^(.+)-\d+$/);
   return m ? m[1] : null;
+}
+
+/**
+ * Units of one file that share a digest and whose old anchor set equals their
+ * new anchor set are paired by anchor: identical content at identical
+ * positions is not a guess. Any other duplicate group stays ambiguous.
+ */
+function pairDuplicatesByAnchor(src, oldHere, ambiguityByOld, consumedOld) {
+  const oldByDigest = multimap(oldHere, (u) => u.unitDigest);
+  const newByDigest = multimap(src.units.map((entry, idx) => ({ ...entry, idx })), (entry) => entry.unitDigest);
+  for (const [digest, olds] of oldByDigest) {
+    const news = newByDigest.get(digest) || [];
+    if (olds.length < 2 || olds.length !== news.length) continue;
+    if (!olds.every((o) => ambiguityByOld.has(o) && !consumedOld.has(o))) continue;
+    if (!news.every((n) => src.ambiguous[n.idx] && !src.matched[n.idx])) continue;
+    const oldAnchors = olds.map((o) => o.sourceAnchor);
+    const newAnchors = news.map((n) => n.u.anchor);
+    if (new Set(oldAnchors).size !== olds.length || [...oldAnchors].sort().join('\0') !== [...newAnchors].sort().join('\0')) continue;
+    for (const n of news) {
+      const previous = olds.find((o) => o.sourceAnchor === n.u.anchor);
+      consumedOld.add(previous);
+      ambiguityByOld.delete(previous);
+      src.matched[n.idx] = { previous, kind: 'paired' };
+      src.ambiguous[n.idx] = null;
+    }
+  }
 }
 
 /** Anchors that cannot be mistaken for a duplicate-title suffix of another anchor in the same file. */
@@ -1419,6 +1456,7 @@ export function carryForwardIdentityRegistryRepoWide(repoRoot = process.cwd(), o
         for (const row of match.ambiguousRows) ambiguityByOld.set(row, src.ambiguous[idx]);
       }
     });
+    pairDuplicatesByAnchor(src, oldHere, ambiguityByOld, consumedOld);
   }
 
   // Different path, digest unique on both sides: the unit moved.
@@ -1455,7 +1493,7 @@ export function carryForwardIdentityRegistryRepoWide(repoRoot = process.cwd(), o
   }
 
   const units = [];
-  const counts = { kept: 0, moved: 0, editedKept: 0, added: 0 };
+  const counts = { kept: 0, paired: 0, moved: 0, editedKept: 0, added: 0 };
   const newAnchorsByPath = new Map();
   for (const src of sources) {
     const unmatchedAnchors = new Set();
@@ -1478,6 +1516,9 @@ export function carryForwardIdentityRegistryRepoWide(repoRoot = process.cwd(), o
         row.reviewStatus = 'needs-review';
         row.lineage = { fromCommit, fromUnitDigest: match.previous.unitDigest, toUnitDigest: unitDigest, fromSourceUnitDigest: match.previous.sourceUnitDigest, toSourceUnitDigest: u.textDigest };
         counts.editedKept += 1;
+      } else if (match.kind === 'paired') {
+        row.pairedByAnchor = true;
+        counts.paired += 1;
       } else counts.kept += 1;
       units.push(row);
     });
@@ -1756,7 +1797,7 @@ export function generateMarkdownReport(inventory) {
   lines.push('Design status: Draft (Phase 02, pending independent review)');
   lines.push('Phase: 02 Deliverable');
   lines.push('Related:');
-  lines.push('- `plans/260925-documentation-authority-unification/reports/phase-02-doc-inventory.json`');
+  lines.push(`- \`${INVENTORY_MANIFEST_PATH}\``);
   lines.push('- `plans/260925-documentation-authority-unification/plan.md` §7 Phase 02');
   lines.push('```');
   lines.push('');

@@ -1174,7 +1174,7 @@ test('repo-wide carry-forward does not match a heading whose title slug is dupli
   } finally { repo.cleanup(); }
 });
 
-test('repo-wide carry-forward turns indistinguishable duplicates into explicit gap rows instead of guessing', () => {
+test('repo-wide carry-forward pairs identical duplicates 1:1 by anchor when the anchor sets match', () => {
   const repo = makeCarryRepo();
   try {
     repo.write('docs/a.md', `# Same\n\n${BODY}\n\n# Same\n\n${BODY}\n`);
@@ -1183,6 +1183,23 @@ test('repo-wide carry-forward turns indistinguishable duplicates into explicit g
     repo.saveRegistry(old);
     repo.write('docs/z.md', `# Z\n\nUnrelated ${BODY}\n`);
     const next = carryAll(repo, repo.commit('add z'));
+    const byAnchor = (reg) => Object.fromEntries(unitsAt(reg, 'docs/a.md').map((u) => [u.sourceAnchor, u.claimId]));
+    assert.deepEqual(byAnchor(next), byAnchor(old));
+    assert.equal(next.identityGaps.length, 0);
+    assert.equal(next.carryForward.paired, unitsAt(old, 'docs/a.md').length);
+    assert.equal(next.carryForward.kept, 0);
+  } finally { repo.cleanup(); }
+});
+
+test('repo-wide carry-forward turns duplicates whose anchor sets differ into explicit gap rows instead of guessing', () => {
+  const repo = makeCarryRepo();
+  try {
+    repo.write('docs/a.md', `# Same\n\n${BODY}\n\n# Same\n\n${BODY}\n`);
+    const oldCommit = repo.commit('old');
+    const old = bootstrapIdentityRegistry(repo.tmp, { commit: oldCommit });
+    repo.saveRegistry(old);
+    repo.write('docs/a.md', `# Same\n\n${BODY}\n\n# Same\n\n${BODY}\n\n# Same\n\n${BODY}\n`);
+    const next = carryAll(repo, repo.commit('third copy'));
     const oldIds = unitsAt(old, 'docs/a.md').map((u) => u.claimId);
     assert.deepEqual(next.identityGaps.map((g) => g.claimId).sort(), [...oldIds].sort());
     assert.equal(next.identityGaps.every((g) => /ambiguous/.test(g.gapReason)), true);
@@ -1236,7 +1253,7 @@ test('repo-wide carry-forward partitions every old unit exactly once and emits d
     assert.deepEqual([...flat].sort(), [...oldIds].sort());
     const c = next.carryForward;
     assert.equal(c.oldUnits, oldIds.length);
-    assert.equal(c.kept + c.moved + c.editedKept + c.gaps + c.retired, c.oldUnits);
+    assert.equal(c.kept + c.paired + c.moved + c.editedKept + c.gaps + c.retired, c.oldUnits);
     const keys = next.units.map((u) => `${u.sourcePath}\u0000${u.sourceAnchor}`);
     assert.deepEqual(keys, [...keys].sort());
     assert.deepEqual(JSON.stringify(next.units), JSON.stringify(carryAllUnitsSorted(next)));
@@ -1319,7 +1336,7 @@ test('repo-wide carry-forward does not let carry markers survive into a later ca
     const second = carryAll(repo, c2);
     for (const rel of ['docs/a.md', 'docs/c.md']) {
       for (const u of unitsAt(second, rel)) {
-        for (const field of ['reviewStatus', 'lineage', 'movedFrom', 'identityNote', 'origin']) assert.equal(field in u, false, `${rel} ${u.sourceAnchor} ${field}`);
+        for (const field of ['reviewStatus', 'lineage', 'movedFrom', 'identityNote', 'origin', 'pairedByAnchor']) assert.equal(field in u, false, `${rel} ${u.sourceAnchor} ${field}`);
       }
     }
     assert.equal('origin' in second.documents.find((d) => d.path === 'docs/c.md'), false);
@@ -1379,4 +1396,78 @@ test('loadDroppedClaimsRegister skips a missing default file with a notice but f
     fs.writeFileSync(file, JSON.stringify({ entries: [] }));
     assert.deepEqual(gates.loadDroppedClaimsRegister(['--dropped-claims-register', 'r.json'], tmp).register, { entries: [] });
   } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
+});
+
+test('isGeneratorOutputArtifact covers the committed artifact names and keeps the first generation names', () => {
+  const reports = 'plans/260925-documentation-authority-unification/reports';
+  for (const name of ['doc-inventory.json', 'doc-inventory.md', 'doc-inventory.parts/part-0001.json', 'identity-registry.json', 'phase-02-doc-inventory.json', 'phase-02-doc-inventory.md', 'phase-02-doc-inventory.parts/part-0001.json', 'phase-02-identity-registry.json']) {
+    assert.equal(generator.isGeneratorOutputArtifact(`${reports}/${name}`), true, name);
+  }
+  assert.equal(generator.isGeneratorOutputArtifact(`${reports}/identity-carry-forward-261006.md`), false);
+  assert.equal(DEFAULT_INVENTORY_PATH, `${reports}/doc-inventory.json`);
+  assert.equal(DEFAULT_IDENTITY_REGISTRY_PATH, `${reports}/identity-registry.json`);
+});
+
+test('gates CLI names the regenerate command when the default manifest has no shards', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'gates-no-shards-'));
+  const errors = [];
+  const original = console.error;
+  try {
+    const manifest = path.join(tmp, DEFAULT_INVENTORY_PATH);
+    fs.mkdirSync(path.dirname(manifest), { recursive: true });
+    writeShardedJsonArtifact(manifest, { items: [] });
+    fs.rmSync(manifest.replace(/\.json$/, '.parts'), { recursive: true, force: true });
+    console.error = (...args) => errors.push(args.join(' '));
+    const code = gates.runCli([], tmp);
+    assert.equal(code, 1);
+    const text = errors.join('\n');
+    assert.match(text, /node scripts\/generate-doc-inventory\.mjs --commit/);
+    assert.match(text, /reports\/doc-inventory\.json/);
+    assert.doesNotMatch(text, /\n\s+at /);
+    const missing = fs.mkdtempSync(path.join(os.tmpdir(), 'gates-no-manifest-'));
+    errors.length = 0;
+    assert.equal(gates.runCli([], missing), 1);
+    assert.match(errors.join('\n'), /generate-doc-inventory\.mjs --commit/);
+    fs.rmSync(missing, { recursive: true, force: true });
+  } finally { console.error = original; fs.rmSync(tmp, { recursive: true, force: true }); }
+});
+
+function ledgerFor(repo, commit, sourcePath) {
+  repo.write('plans/260925-documentation-authority-unification/shipped-path-conventions-inventory.json', JSON.stringify({ entries: [] }));
+  const inventory = generateInventory(repo.tmp, { commit, identityRegistryPath: repo.registryPath });
+  return inventory.claimLedger.filter((c) => c.sourcePath === sourcePath);
+}
+
+test('ledger resolves duplicate-digest units paired by anchor to their carried ids', () => {
+  const repo = makeCarryRepo();
+  try {
+    repo.write('docs/a.md', `# Same\n\n${BODY}\n\n# Same\n\n${BODY}\n`);
+    const c0 = repo.commit('base');
+    const old = bootstrapIdentityRegistry(repo.tmp, { commit: c0 });
+    repo.saveRegistry(old);
+    repo.write('docs/z.md', `# Z\n\nUnrelated ${BODY}\n`);
+    const c1 = repo.commit('add z');
+    const next = carryAll(repo, c1);
+    repo.saveRegistry(next);
+    const rows = ledgerFor(repo, c1, 'docs/a.md');
+    assert.equal(rows.length, unitsAt(old, 'docs/a.md').length);
+    assert.equal(rows.every((r) => r.identityStatus === 'carried-forward'), true);
+    const oldIds = Object.fromEntries(unitsAt(old, 'docs/a.md').map((u) => [u.sourceAnchor, u.claimId]));
+    for (const r of rows) assert.equal(r.claimId, oldIds[r.sourceAnchor]);
+  } finally { repo.cleanup(); }
+});
+
+test('ledger keeps unpaired duplicate-digest units as ambiguous registry gaps', () => {
+  const repo = makeCarryRepo();
+  try {
+    repo.write('docs/a.md', `# Same\n\n${BODY}\n\n# Same\n\n${BODY}\n`);
+    const c0 = repo.commit('base');
+    repo.saveRegistry(bootstrapIdentityRegistry(repo.tmp, { commit: c0 }));
+    repo.write('docs/a.md', `# Same\n\n${BODY}\n\n# Same\n\n${BODY}\n\n# Same\n\n${BODY}\n`);
+    const c1 = repo.commit('third copy');
+    repo.saveRegistry(carryAll(repo, c1));
+    const rows = ledgerFor(repo, c1, 'docs/a.md');
+    assert.equal(rows.length > 0, true);
+    assert.equal(rows.every((r) => r.identityStatus.includes('ambiguous')), true);
+  } finally { repo.cleanup(); }
 });

@@ -19,7 +19,7 @@ import { execFileSync } from 'node:child_process';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { normalizePosix, readBlobAtCommit } from './generate-shipped-path-inventory.mjs';
 import { loadShardedJsonArtifact, sha256Buffer } from './doc-inventory-artifact.mjs';
-import { SCAN_ROOTS, ADDITIONAL_ROOT_FILES, parseLsTreeLong, extractMarkdownConservationUnits, extractMixedFileConservationUnit, loadSwitchboard, readCommitBlobMap, buildIdentityRegistryIndex } from './generate-doc-inventory.mjs';
+import { SCAN_ROOTS, ADDITIONAL_ROOT_FILES, parseLsTreeLong, extractMarkdownConservationUnits, extractMixedFileConservationUnit, loadSwitchboard, readCommitBlobMap, buildIdentityRegistryIndex, INVENTORY_MANIFEST_PATH, IDENTITY_REGISTRY_PATH } from './generate-doc-inventory.mjs';
 
 /**
  * Independently recomputes the in-scope file count directly from the commit
@@ -512,15 +512,23 @@ function loadJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
 }
 
-function loadInventory(filePath) {
-  if (!fs.existsSync(filePath)) throw new Error(`File not found: ${filePath}`);
-  return loadShardedJsonArtifact(filePath, { allowLegacyRawJson: false });
+function regenerateCommand({ inventoryPath, identityRegistryPath, cwd }) {
+  const rel = (p) => normalizePosix(path.relative(cwd, p) || p);
+  return `node scripts/generate-doc-inventory.mjs --commit <commit> --identity-registry ${rel(identityRegistryPath)} --json-out ${rel(inventoryPath)} --md-out ${rel(inventoryPath).replace(/\.json$/, '.md')}`;
 }
 
-export const DEFAULT_INVENTORY_PATH = 'plans/260925-documentation-authority-unification/reports/phase-02-doc-inventory.json';
+// The manifest is committed but its shards are not, so a fresh checkout has to
+// regenerate them before the inventory can be read.
+function loadInventory(filePath, context) {
+  if (!fs.existsSync(filePath)) throw new Error(`File not found: ${filePath}. Regenerate with: ${regenerateCommand(context)}`);
+  try { return loadShardedJsonArtifact(filePath, { allowLegacyRawJson: false }); }
+  catch (err) { throw new Error(`inventory shards unreadable (${err.message}). The shards are not committed; regenerate with: ${regenerateCommand(context)}`); }
+}
+
+export const DEFAULT_INVENTORY_PATH = INVENTORY_MANIFEST_PATH;
 export const DEFAULT_VOCABULARY_PATH = 'plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.json';
 export const DEFAULT_DROPPED_CLAIMS_REGISTER_PATH = 'plans/260925-documentation-authority-unification/dropped-claims-register.json';
-export const DEFAULT_IDENTITY_REGISTRY_PATH = 'plans/260925-documentation-authority-unification/reports/phase-02-identity-registry.json';
+export const DEFAULT_IDENTITY_REGISTRY_PATH = IDENTITY_REGISTRY_PATH;
 
 /** Explicit flag: the file must exist. Default path: a missing file skips the check with a notice. */
 export function loadDroppedClaimsRegister(argv, cwd) {
@@ -549,7 +557,7 @@ export function runCli(argv, cwd = process.cwd()) {
   let droppedClaimsRegister;
   let droppedClaimsNotice;
   try {
-    inventory = loadInventory(inventoryPath);
+    inventory = loadInventory(inventoryPath, { inventoryPath, identityRegistryPath, cwd });
     vocabulary = loadJson(vocabularyPath);
     identityRegistry = loadJson(identityRegistryPath);
     ({ register: droppedClaimsRegister, notice: droppedClaimsNotice } = loadDroppedClaimsRegister(argv, cwd));

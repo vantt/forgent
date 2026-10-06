@@ -112,3 +112,51 @@ All with tests first (5 red, then 88 of 88 green); ratchet exit 0. Rerun on `3b4
 5. Duplicate ids: the carry-forward throws if one claim id appears twice across `units`, `retiredUnits`, `identityGaps`; the gates report a fatal `identity-registry-duplicate-claim-id` for the same condition.
 
 Known, left as is: (6) matching is order dependent when several candidates remain after earlier units consumed some, shared with the single-path function and pre-existing; (7) fresh ids are random, so two runs differ in added ids and a sort tie on equal path and anchor is broken by id (theoretical, anchors are unique per file). The "Decisions for the Lead" above are untouched.
+
+## Owner decisions applied (2026-10-06)
+
+Final run: carry-forward from the committed Phase 3 registry in one carry, then dispositions, then inventory and gates, all bound to a temporary unreferenced commit `1d3e6c7e547c1f6ebb41ee68bc8da93a26792c59` (HEAD `6d099c8c8` plus the uncommitted working-tree changes; built with a throwaway index, no branch, index or worktree change). Reason: the switchboard is read from the commit, so a committed switchboard change cannot be seen from HEAD.
+
+1. **Pairing.** Same file, same digest, equal old and new anchor sets: paired by anchor (row marker `pairedByAnchor`, dropped by the next carry like the other markers). Result 289 paired, 17 still ambiguous gap rows, as expected. The inventory's claim-id lookup is anchor-aware (Lead decision, see below), so the ledger agrees with the registry.
+2. **The 8 removals with no carrier** (commit history read, `git log -S` over `f0c76c5e5..HEAD`): none is unexplained.
+   - Replaced, `delete-as-obsolete`: `AGENTS.md` block 18 (reworded when decide moved onto `bind()`, `cfd670c43`), block 34 (generated GitNexus count line, `120af6b3d`, refreshed by `5df843bdb`), `docs/how-to/use-fgos-group-thinking.md` operator-path heading (`42e822e4d`, `0c23a176d`) and block 5 (pack gate retired, `0c23a176d`).
+   - Edited in place, `supersede` to the unit holding the edited text: `docs/specs/runner.md` blocks 65 (`b048e852d`), 77 (RUL69 kept and marked partly replaced by RUL72, `d480a05b5`, `4b7a20000`), 79 (skill renamed, `0c23a176d`), 112 (terminology sweep, `0c23a176d`). Line-level matching had missed these because the paragraphs were reflowed.
+   - `dropped-claims-register.json` and plan §7.3: no change; no truly ambiguous case to list.
+3. **Switchboard.** Area "Observe (metrics and friction)" added after Distillery in `docs/transitional-switchboard.md` and `transitional-switchboard.json` (JSON round-trips byte-identical otherwise). `docs/specs/observe.md` is no longer a routing gap (0 of 1,054 routing-gap paths) and is owner-blocking like its siblings.
+4. **Dispositions in the registry** (reviewer `lead 2026-10-06`, fields `disposition`, `targetOwner`, `targetAnchor`, `dispositionRationale`, `dispositionEvidence`, `dispositionSource`, `dispositionConfidence`): 43 retired rows: 39 `supersede`, 4 `delete-as-obsolete`. 127 of 128 positional-edit gap rows: 123 `supersede`, 3 `regenerate-from-source`, 1 `delete-as-duplicate`. `retiredWithoutDispositionCount` is 0. Still open: 17 ambiguous gap rows (no disposition by design) and 1 positional gap, `docs/architecture-manifest.json` `file-block` (no vocabulary disposition is allowed for its file class).
+5. **Artifacts and defaults.** Written: `reports/identity-registry.json` (45.4 MB), `reports/doc-inventory.json` (manifest), `reports/doc-inventory.md`. Shards moved out of the tree to scratch (`final/doc-inventory.parts/`); do not commit them. Generator skip list now covers `reports/{doc-inventory.json,doc-inventory.md,doc-inventory.parts/,identity-registry.json}` and keeps the `phase-02-*` names (one list, both generations). Gates defaults point at the new files and the generator constants; with the shards missing the gates exit 1 and print the regenerate command (verified). The generator has no default registry path. Tests touched: only `test/scripts/generate-doc-inventory.test.mjs` (no test ran gates on committed artifacts); it now has 91 tests, all green; ratchet exit 0.
+
+Numbers (scripts, `/usr/bin/time -v`): carry-forward 2.5 s / 0.82 GB; inventory 36.6 s / 1.92 GB; gates 18.7 s / 1.31 GB; all exit 0.
+
+| Old units 85,772 | |
+|---|---:|
+| kept | 85,173 |
+| paired by anchor | 289 |
+| moved | 0 |
+| edited-kept (`needs-review`) | 122 |
+| identity gaps | 145 |
+| retired | 43 |
+| added (fresh ids) | 501 |
+
+85,173 + 289 + 0 + 122 + 145 + 43 = 85,772; every old id appears exactly once; new units 86,085; claim rows 86,085. The one extra edited-kept and one extra gap against the earlier run come from the new switchboard table row in `docs/transitional-switchboard.md`.
+
+Gates (default paths, no flags; numbers after the anchor-aware lookup below): exit 0, clean, 0 fatal. 1,071 gaps = 1,054 file/routing + 17 claim-identity; 1,400 unknown-blocking rows; 145 registry gap rows; 0 retired rows without disposition; dropped-001 conserved (live unit and ledger). Routing gaps: 1,054, `docs/specs/observe.md` not among them.
+
+### Rebinding after you commit
+
+The registry and inventory are bound to the temporary commit, which will not exist in history. After committing the sources (switchboard md and json, scripts, test, plan, this report), bind the artifacts to the real commit `<C>`:
+
+```
+git diff --quiet 1d3e6c7e547c1f6ebb41ee68bc8da93a26792c59 <C> -- docs AGENTS.md CLAUDE.md plans/260925-documentation-authority-unification/transitional-switchboard.json && echo in-scope tree identical
+node -e "const fs=require('fs');const f='plans/260925-documentation-authority-unification/reports/identity-registry.json';const r=JSON.parse(fs.readFileSync(f));const from=r.commit;const to=process.argv[1];r.commit=to;r.carryForward.toCommit=to;for(const x of [...r.retiredUnits,...r.retiredDocuments])if(x.retiredAtCommit===from)x.retiredAtCommit=to;fs.writeFileSync(f,JSON.stringify(r)+'\n')" <C>
+node scripts/generate-doc-inventory.mjs --commit <C> --identity-registry plans/260925-documentation-authority-unification/reports/identity-registry.json --json-out plans/260925-documentation-authority-unification/reports/doc-inventory.json --md-out plans/260925-documentation-authority-unification/reports/doc-inventory.md
+node scripts/check-doc-inventory-gates.mjs
+```
+
+The rebind keeps ids, `needs-review` markers and dispositions (a second carry would strip the markers). Then move `reports/doc-inventory.parts/` out of the tree before committing the three artifacts as a second commit. Scratch inputs for a full redo: `final/classification.json`, `apply-dispositions.mjs` (not committed).
+
+### Anchor-aware ledger lookup (Lead decision 2026-10-06)
+
+`resolveRegisteredClaimId` now resolves a duplicate-digest unit by anchor, but only when the registry holds exactly one row for (source path, digest, anchor) and that row is not one minted from an unresolved ambiguity (`identityNote`). Tests first: a paired duplicate resolves to its carried id, an unpaired duplicate group stays `ambiguous-registry-gap` (red, then green; 93 tests green; ratchet exit 0). Effect on the final run (new temporary commit `1d3e6c7e5…`, same pipeline): ledger identity status 86,068 carried-forward and 17 ambiguous-registry-gap; claim-identity gaps 306 to 17; total gaps 1,360 to 1,071 (1,054 file/routing + 17); unknown-blocking rows 1,400; fatal 0; registry arithmetic unchanged (85,173 + 289 + 0 + 122 + 145 + 43 = 85,772; 86,085 claim rows); inventory 19.3 s / 1.91 GB, gates 12.8 s / 1.48 GB. Side effect: any registry whose same-file duplicates carry distinct anchors (for example a plain bootstrap) now resolves those by anchor too. Because `identityNote` is dropped by the next carry, the 17 ambiguous groups would pair by anchor in a later carry if their content stays identical.
+
+Open item for Phase 6: `docs/architecture-manifest.json` `file-block` (positional edit gap row, file class `unclassified`) has no disposition on purpose.
