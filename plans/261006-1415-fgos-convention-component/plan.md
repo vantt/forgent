@@ -102,6 +102,32 @@ Xem [phase 00 §Câu hỏi mở](phase-00-spec.md#câu-hỏi-mở-mỗi-câu-unp
 
 Plan `260925-documentation-authority-unification` đã chạy dở trên một branch riêng (đã đóng pha kiểm kê, tạm dừng chờ Observe, chưa merge; branch có 59 commit chưa merge vào main, còn main đã đi trước branch 399 commit (tính từ 2026-09-29)). Mọi sửa đổi của plan này lên tài liệu cũ (`docs/specs/reading-map.md`, `docs/specs/system-overview.md`, `docs/specs/distribution.md:70`) là **ngoại lệ cần ghi nhận** khi plan đó được nối lại. Spec mới đặt ở `docs/platform/convention/spec.md` để không thêm nợ di trú.
 
+## Executor brief (`ak:cook`)
+
+Phiên thi hành dùng `/ak:cook <đường dẫn file phase>` (một phase mỗi phiên). Đọc theo thứ tự: file này (§ mục tiêu, phụ thuộc, tiêu chí chấp nhận, Red Team Review), file phase, **mục "Hiệu chỉnh sau red-team" ở cuối file phase (nó thắng nội dung cũ)**, rồi báo cáo tổng hợp `plans/reports/harness-investigation-261006-synthesis.md` khi cần ngữ cảnh.
+
+Quy tắc chung của mọi phiên:
+- Không bao giờ truyền `--yagni`: anh yêu cầu làm đủ phạm vi đã nêu. Mỗi phase cần anh cho phép tường minh trước khi bắt đầu (phase nào đã ghi cổng riêng thì giữ cổng đó).
+- Làm trong một worktree riêng của phase (có `node_modules` và `target/` trước khi chạy test); `pwd` và `git branch --show-current` trước lệnh git; không ghi vào main checkout, nơi phiên khác đang làm việc. Commit bằng đường dẫn tường minh (`git commit -- <paths>`), conventional, không nhắc AI, không nhãn phase hay mã phát hiện trong comment hoặc tên test, và commit ngay khi xanh.
+- Chạy test với `env -u CLAUDE_CODE_SESSION_ID`; chạy ở foreground có timeout, không tự chạy lệnh nền rồi chờ. Đếm bằng script hoặc `rtk proxy`, không dùng `grep | wc` qua hook `rtk` (từng cho 130 thay vì 3320).
+- Chạy impact analysis (GitNexus) cho từng symbol sẽ sửa trước khi sửa; chỉ số đang chậm commit nên đối chiếu thêm bằng grep thô.
+- `ak:cook` bắt buộc code-reviewer và finalize; kết quả review không thay cho kiểm độc lập của người điều phối. Điểm dừng báo anh: một giả định trong phase hoá ra sai, một hiệu chỉnh mâu thuẫn với mã thật, cần sửa ngoài danh sách file, hoặc một bước không đảo ngược được (xoá file, đổi hook).
+- `ak-*`, `ck-*`, hook và rules của AgentKit/ClaudeKit và `rtk` là của người khác: dùng như công cụ, không đề xuất sửa.
+- Model của phiên: gợi ý, chưa đo. Phase cơ khí chạy được với bậc `sonnet` hoặc tương đương; phase đánh dấu `--advice` nên chạy với model mạnh nhất có sẵn. `--advice` bật giám sát `kongming` (theo skill: Fable 5 trên Claude subscription). Chỉ Claude, Codex và Cursor có trong bảng định tuyến của `--advice`; chạy `ak:cook` trên host khác là chưa kiểm chứng.
+
+Chế độ theo phase (mặc định `--interactive`; `--auto` chỉ cho phase cơ khí):
+
+| Phase | Cờ gợi ý | Lý do |
+|---|---|---|
+| 00 | `--advice`, không có mã | Spec là quyết định; duyệt spec là cổng cho mọi phase mã |
+| 01 | `--tdd` | Gộp hàm ngày, chứng minh giống hệt bằng test |
+| 02 | `--tdd` | Crate mới có golden test |
+| 03 | `--tdd` | Nối route, vector, 13 nơi dùng `COMMAND_REGISTRY` |
+| 04 | `--tdd` | Client Node nhỏ, chỉ `conventionCheck` |
+| 05 | `--advice`, **không `--auto`** | Hook và doctor cưỡng chế; chỉ cảnh báo; chạy sau Plan A phase 04 và 05 |
+| 06 | `--advice`, **không `--auto`** | Một dòng `AGENTS.md`, chạy sau dấu hiệu hoàn tất của Plan A phase 06 |
+| 07 | `--auto --no-test` | Tài liệu và changelog |
+
 ## Red Team Review
 
 ### Session 2026-10-06 (`ak plan validate` qua; bốn reviewer: Failure Mode, Assumption, Scope & Complexity, Security)
