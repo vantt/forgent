@@ -6,11 +6,11 @@
     {
       "path": "docs/specs/reading-map.md",
       "kind": "allowed-edit",
-      "rationale": "Phase 01 verified stale standing route correction: update transitional rule banner to cite docs/transitional-switchboard.md, record Phase 00 and Phase 01 completion, and replace defunct fgos-coding-compounding skill references with fgos-coding-knowledge. Re-reviewed 2026-09-29 after main sync: feat(coding): convert fgos-plan-loop/fgos-code-panel to deprecated stubs (Unit I29)",
-      "approvedBy": "Phase 01 unification authorization (asgn_pi_lead_phase01_op_001); human approval 2026-09-29 (user, forgentX session)",
+      "rationale": "Phase 01 verified stale standing route correction: update transitional rule banner to cite docs/transitional-switchboard.md, record Phase 00 and Phase 01 completion, and replace defunct fgos-coding-compounding skill references with fgos-coding-knowledge. Re-reviewed 2026-09-29 after main sync: feat(coding): convert fgos-plan-loop/fgos-code-panel to deprecated stubs (Unit I29) Re-accounted 2026-10-06: Main-side docs edit carried in by sync of main at e63a17b8e (2026-10-06, 7 commit(s) since 81f7db801): feat(observe): see nested runs, add unit summaries, a stance sensor and an eval store | docs(gateway): name the fgos gateway as its own component and guard the retired names | merge: main into p6 (terminology sweep) (+4 more)",
+      "approvedBy": "Phase 01 unification authorization (asgn_pi_lead_phase01_op_001); human approval 2026-09-29 (user, forgentX session); resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report)",
       "owner": "documentation-authority-unification-lead",
-      "expectedDigest": "910cd3edbc121b135e204609fa449c22a413423859ab95d3a0b9ba1a52b2aeb7",
-      "reviewedAt": "2026-09-29",
+      "expectedDigest": "7401cdb708d2da30b5b0c33996a6f8e794ea00b6bc3c47502c1645cb9fb3c1b0",
+      "reviewedAt": "2026-10-06",
       "revisitTrigger": "Phase 08 cutover (retirement of legacy reading-map in favor of docs/reading-map.md)"
     },
     {
@@ -56,11 +56,11 @@
     {
       "path": "docs/architect/agent-coordination/contracts/flow-definition.md",
       "kind": "allowed-edit",
-      "rationale": "Main-side docs edit accompanying landed code, carried in by sync of main: docs: close Unit I32 (outcome (a), no migration) and clarify readOnlyRedirects vs capability.prefer | feat(coordination): per-node dispatch binding for declared protocols (Unit I21)",
-      "approvedBy": "human approval 2026-09-29 (user, forgentX session)",
+      "rationale": "Main-side docs edit accompanying landed code, carried in by sync of main: docs: close Unit I32 (outcome (a), no migration) and clarify readOnlyRedirects vs capability.prefer | feat(coordination): per-node dispatch binding for declared protocols (Unit I21) Re-accounted 2026-10-06: Main-side docs edit carried in by sync of main at e63a17b8e (2026-10-06, 1 commit(s) since 81f7db801): feat(runner): consolidate rigor demand vocabulary",
+      "approvedBy": "human approval 2026-09-29 (user, forgentX session); resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report)",
       "owner": "documentation-authority-unification-lead",
-      "expectedDigest": "2802e3128f9cae0eb43d236d7c4d946f7df9e772008335f233e306ce44d882b8",
-      "reviewedAt": "2026-09-29",
+      "expectedDigest": "834724378ab76a15883687990dc90162b0920abb94fb15482982ca9feff84ac6",
+      "reviewedAt": "2026-10-06",
       "revisitTrigger": "Phase 08 cutover"
     },
     {
@@ -76,32 +76,182 @@
     {
       "path": "docs/architect/component-boundary/component-boundary-advisory.md",
       "kind": "allowed-edit",
-      "rationale": "Main-side docs edit accompanying landed code, carried in by sync of main: docs(dispatch): document component boundaries, ports, and unreleased changes for I12",
-      "approvedBy": "human approval 2026-09-29 (user, forgentX session)",
+      "rationale": "Main-side docs edit accompanying landed code, carried in by sync of main: docs(dispatch): document component boundaries, ports, and unreleased changes for I12 Re-accounted 2026-10-06: Main-side docs edit carried in by sync of main at e63a17b8e (2026-10-06, 2 commit(s) since 81f7db801): docs(gateway): name the fgos gateway as its own component and guard the retired names | docs: sweep request-to-run terminology across specs, skills and guide pages",
+      "approvedBy": "human approval 2026-09-29 (user, forgentX session); resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report)",
       "owner": "documentation-authority-unification-lead",
-      "expectedDigest": "41c4adfa8bef1106cad02ac2c61995e030a66840846584d1cc9874422672af09",
-      "reviewedAt": "2026-09-29",
+      "expectedDigest": "e5996233b06ea99425f6c39bcefd3ca3b3603ffadb22d7a7b68d90146408ad75",
+      "reviewedAt": "2026-10-06",
       "revisitTrigger": "Phase 08 cutover"
     },
     {
       "path": "docs/specs/distribution.md",
       "kind": "allowed-edit",
-      "rationale": "Main-side docs edit accompanying landed code, carried in by sync of main: feat(doctor): add coordination-sessions-closed check for sessions never reaching terminal status | fix(dispatch): retire 2 of 4 shadow binders, consolidate C3's 3-resolver door (S7, dispatch-engine-liveness-hardening Phase 7) | feat(coordination): per-node dispatch binding for declared protocols (Unit I21) (+1 more)",
-      "approvedBy": "human approval 2026-09-29 (user, forgentX session)",
+      "rationale": "Main-side docs edit accompanying landed code, carried in by sync of main: feat(doctor): add coordination-sessions-closed check for sessions never reaching terminal status | fix(dispatch): retire 2 of 4 shadow binders, consolidate C3's 3-resolver door (S7, dispatch-engine-liveness-hardening Phase 7) | feat(coordination): per-node dispatch binding for declared protocols (Unit I21) (+1 more) Re-accounted 2026-10-06: Main-side docs edit carried in by sync of main at e63a17b8e (2026-10-06, 26 commit(s) since 81f7db801): feat(observe): see nested runs, add unit summaries, a stance sensor and an eval store | chore: pools for the discussion capabilities, more proven blind pairs, retire the coordination sessions check | docs(spec): keep the blind pool check row to registered check ids only (+23 more)",
+      "approvedBy": "human approval 2026-09-29 (user, forgentX session); resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report)",
       "owner": "documentation-authority-unification-lead",
-      "expectedDigest": "c5a177a18e808f0ef51e70bc346e45438b4d3f83e493286b5325a0af02540e4a",
-      "reviewedAt": "2026-09-29",
+      "expectedDigest": "38f4ccb7b2be3de6e0cb37639866740a9f73289e270586ab7545e3f2454d2b47",
+      "reviewedAt": "2026-10-06",
       "revisitTrigger": "Phase 08 cutover"
     },
     {
       "path": "docs/specs/runner.md",
       "kind": "allowed-edit",
-      "rationale": "Main-side docs edit accompanying landed code, carried in by sync of main: docs(runner): add D-ADR0043 narrative (bound-invocation-supervisor vs detached-run-supervisor) | docs(dispatch): add capability demand-matching doctrine",
-      "approvedBy": "human approval 2026-09-29 (user, forgentX session)",
+      "rationale": "Main-side docs edit accompanying landed code, carried in by sync of main: docs(runner): add D-ADR0043 narrative (bound-invocation-supervisor vs detached-run-supervisor) | docs(dispatch): add capability demand-matching doctrine Re-accounted 2026-10-06: Main-side docs edit carried in by sync of main at e63a17b8e (2026-10-06, 53 commit(s) since 81f7db801): fix(observe): reconcile eligible history and refuse ambiguous runs | fix(observe): preserve unit settlement authority and measure declared voters | feat(observe): see nested runs, add unit summaries, a stance sensor and an eval store (+50 more)",
+      "approvedBy": "human approval 2026-09-29 (user, forgentX session); resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report)",
       "owner": "documentation-authority-unification-lead",
-      "expectedDigest": "0513598f48c65f34c47bbb550f7c866e415130c98e9bf44c8a03b0176d45ffb4",
-      "reviewedAt": "2026-09-29",
+      "expectedDigest": "2adb477c0e95fe55c6fd5b7deddf2731607d3cac2a2f211a8b37465296ae6370",
+      "reviewedAt": "2026-10-06",
       "revisitTrigger": "Phase 08 cutover"
+    },
+    {
+      "path": "docs/architect/agent-coordination/README.md",
+      "kind": "allowed-edit",
+      "rationale": "Main-side docs edit carried in by sync of main at e63a17b8e (2026-10-06, 1 commit(s) since 81f7db801): docs: sweep request-to-run terminology across specs, skills and guide pages",
+      "approvedBy": "resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report)",
+      "owner": "documentation-authority-unification-lead",
+      "expectedDigest": "75303f27d6e8dfe8162e9ad37d331218a1c74438a400b4d93ddb03e5bb699c3c",
+      "reviewedAt": "2026-10-06",
+      "revisitTrigger": "atomic platform-authority cutover (plan phase 9)"
+    },
+    {
+      "path": "docs/architect/agent-coordination/contracts/README.md",
+      "kind": "allowed-edit",
+      "rationale": "Main-side docs edit carried in by sync of main at e63a17b8e (2026-10-06, 1 commit(s) since 81f7db801): docs: sweep request-to-run terminology across specs, skills and guide pages",
+      "approvedBy": "resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report)",
+      "owner": "documentation-authority-unification-lead",
+      "expectedDigest": "1c210ecaa4a1a2dd762741c06a936b0ec8c52d1788f0d0567d9f49bd8052ee80",
+      "reviewedAt": "2026-10-06",
+      "revisitTrigger": "atomic platform-authority cutover (plan phase 9)"
+    },
+    {
+      "path": "docs/architect/agent-coordination/proposals/dispatch-control-plane-redesign.md",
+      "kind": "allowed-edit",
+      "rationale": "Main-side docs edit carried in by sync of main at e63a17b8e (2026-10-06, 1 commit(s) since 81f7db801): docs(gateway): name the fgos gateway as its own component and guard the retired names",
+      "approvedBy": "resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report)",
+      "owner": "documentation-authority-unification-lead",
+      "expectedDigest": "498cc57324b8246ca7ac4b8b6ec09e2e445087a67cd0c8afe48a4e5e092a53ca",
+      "reviewedAt": "2026-10-06",
+      "revisitTrigger": "atomic platform-authority cutover (plan phase 9)"
+    },
+    {
+      "path": "docs/architect/component-boundary/README.md",
+      "kind": "allowed-edit",
+      "rationale": "Main-side docs edit carried in by sync of main at e63a17b8e (2026-10-06, 1 commit(s) since 81f7db801): docs(gateway): name the fgos gateway as its own component and guard the retired names",
+      "approvedBy": "resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report)",
+      "owner": "documentation-authority-unification-lead",
+      "expectedDigest": "710ede7ac06e2e248e6948feeb878cda6b34c65e79085cee6a2a0e7b894c4ab6",
+      "reviewedAt": "2026-10-06",
+      "revisitTrigger": "atomic platform-authority cutover (plan phase 9)"
+    },
+    {
+      "path": "docs/architect/component-boundary/repo-layout-vision.md",
+      "kind": "allowed-edit",
+      "rationale": "Main-side docs edit carried in by sync of main at e63a17b8e (2026-10-06, 1 commit(s) since 81f7db801): docs(gateway): name the fgos gateway as its own component and guard the retired names",
+      "approvedBy": "resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report)",
+      "owner": "documentation-authority-unification-lead",
+      "expectedDigest": "07691b34374b874752010a5585020635cb3ff396c1719594a4b1980e2318e314",
+      "reviewedAt": "2026-10-06",
+      "revisitTrigger": "atomic platform-authority cutover (plan phase 9)"
+    },
+    {
+      "path": "docs/architect/domainization/README.md",
+      "kind": "allowed-edit",
+      "rationale": "Main-side docs edit carried in by sync of main at e63a17b8e (2026-10-06, 1 commit(s) since 81f7db801): docs(gateway): name the fgos gateway as its own component and guard the retired names",
+      "approvedBy": "resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report)",
+      "owner": "documentation-authority-unification-lead",
+      "expectedDigest": "bf4126c6b5fa6cc77d983800e778e669e0d8a664709df5ef8e89b2f73c013de0",
+      "reviewedAt": "2026-10-06",
+      "revisitTrigger": "atomic platform-authority cutover (plan phase 9)"
+    },
+    {
+      "path": "docs/architect/proposals/component-authority-boundary-map.md",
+      "kind": "allowed-edit",
+      "rationale": "Main-side docs edit carried in by sync of main at e63a17b8e (2026-10-06, 1 commit(s) since 81f7db801): feat(observe): migrate Observe component to Rust native (phases F1-F6, F8)",
+      "approvedBy": "resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report)",
+      "owner": "documentation-authority-unification-lead",
+      "expectedDigest": "f3d6d5de304a1fb08c1785bd1269d53617bda0cd841876c8c301a04debafeb6f",
+      "reviewedAt": "2026-10-06",
+      "revisitTrigger": "atomic platform-authority cutover (plan phase 9)"
+    },
+    {
+      "path": "docs/architect/roadmap.md",
+      "kind": "allowed-edit",
+      "rationale": "Main-side docs edit carried in by sync of main at e63a17b8e (2026-10-06, 1 commit(s) since 81f7db801): docs: sweep request-to-run terminology across specs, skills and guide pages",
+      "approvedBy": "resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report)",
+      "owner": "documentation-authority-unification-lead",
+      "expectedDigest": "198ff048a43ae55a869451be80bd9bf6e3f96e5d5b7a5647df62666bd21163f0",
+      "reviewedAt": "2026-10-06",
+      "revisitTrigger": "atomic platform-authority cutover (plan phase 9)"
+    },
+    {
+      "path": "docs/architect/system-vision-trong-mem-ngoai-cung.md",
+      "kind": "allowed-edit",
+      "rationale": "Main-side docs edit carried in by sync of main at e63a17b8e (2026-10-06, 1 commit(s) since 81f7db801): docs: sweep request-to-run terminology across specs, skills and guide pages",
+      "approvedBy": "resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report)",
+      "owner": "documentation-authority-unification-lead",
+      "expectedDigest": "fe46bff47d74696f8f3784a340707738978f1e723e0911ecbe8e319fa0d6e4a1",
+      "reviewedAt": "2026-10-06",
+      "revisitTrigger": "atomic platform-authority cutover (plan phase 9)"
+    },
+    {
+      "path": "docs/architect/workspace-topology-audit.md",
+      "kind": "allowed-edit",
+      "rationale": "Main-side docs edit carried in by sync of main at e63a17b8e (2026-10-06, 1 commit(s) since 81f7db801): docs: sweep request-to-run terminology across specs, skills and guide pages",
+      "approvedBy": "resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report)",
+      "owner": "documentation-authority-unification-lead",
+      "expectedDigest": "3d510bc773875ebfb6116894d3156304f2bc0710b827e01fb31bd7feefcb3ce7",
+      "reviewedAt": "2026-10-06",
+      "revisitTrigger": "atomic platform-authority cutover (plan phase 9)"
+    },
+    {
+      "path": "docs/specs/confinement-authority.md",
+      "kind": "allowed-edit",
+      "rationale": "Main-side docs edit carried in by sync of main at e63a17b8e (2026-10-06, 3 commit(s) since 81f7db801): docs: blind units receive their inputs as per-role copies; slice 2 canary report | docs: describe blind units and the blind-read doctor row | docs: record the confined non-claude pane recipe and add a prior-art step",
+      "approvedBy": "resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report)",
+      "owner": "documentation-authority-unification-lead",
+      "expectedDigest": "4ed5306dacc55cd475a032afdc2c8d0c0b00978be6d2b1f5c7fb10b0d7a545fe",
+      "reviewedAt": "2026-10-06",
+      "revisitTrigger": "atomic platform-authority cutover (plan phase 9)"
+    },
+    {
+      "path": "docs/specs/herdr-web-dashboard.md",
+      "kind": "allowed-edit",
+      "rationale": "Main-side docs edit carried in by sync of main at e63a17b8e (2026-10-06, 1 commit(s) since 81f7db801): docs(gateway): name the fgos gateway as its own component and guard the retired names",
+      "approvedBy": "resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report)",
+      "owner": "documentation-authority-unification-lead",
+      "expectedDigest": "1468244f4fa316bac35b1e270a79ea3cbe881e4f4c6f5926300bc26afc0aa9b1",
+      "reviewedAt": "2026-10-06",
+      "revisitTrigger": "atomic platform-authority cutover (plan phase 9)"
+    },
+    {
+      "path": "docs/specs/observe.md",
+      "kind": "allowed-new-file",
+      "rationale": "Main-side docs edit carried in by sync of main at e63a17b8e (2026-10-06, 7 commit(s) since 81f7db801): fix(observe): enforce rubric completeness and atomic eval identity | fix(observe): reconcile eligible history and refuse ambiguous runs | fix(observe): preserve unit settlement authority and measure declared voters (+4 more)",
+      "approvedBy": "resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report)",
+      "owner": "documentation-authority-unification-lead",
+      "expectedDigest": "3d53da00998e79a47831c077ed07710b5e3bd6be7b3fe1d5f243cb5d6b8f53e6",
+      "reviewedAt": "2026-10-06",
+      "revisitTrigger": "atomic platform-authority cutover (plan phase 9)"
+    },
+    {
+      "path": "docs/specs/system-overview.md",
+      "kind": "allowed-edit",
+      "rationale": "Main-side docs edit carried in by sync of main at e63a17b8e (2026-10-06, 1 commit(s) since 81f7db801): feat(observe): complete metrics namespace and delete legacy check (phase F7)",
+      "approvedBy": "resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report)",
+      "owner": "documentation-authority-unification-lead",
+      "expectedDigest": "9a184058044f3a252bdea7406598c8ad4a191ea96ecd66b146ffa092fd73e480",
+      "reviewedAt": "2026-10-06",
+      "revisitTrigger": "atomic platform-authority cutover (plan phase 9)"
+    },
+    {
+      "path": "docs/specs/work-state.md",
+      "kind": "allowed-edit",
+      "rationale": "Main-side docs edit carried in by sync of main at e63a17b8e (2026-10-06, 6 commit(s) since 81f7db801): docs(gateway): name the fgos gateway as its own component and guard the retired names | docs: sweep request-to-run terminology across specs, skills and guide pages | refactor(work): Work records workflowStep from its Workflow; dispatch no longer knows Work (+3 more)",
+      "approvedBy": "resume sync authorized by user 2026-10-06 (resume prompt prompt-261006-1533-resume-documentation-authority-unification); recorded as accounted main-side edit, per-file content review pending (see plans/reports resume report)",
+      "owner": "documentation-authority-unification-lead",
+      "expectedDigest": "745c1786a6fccf856592af56429ac0a6c2fed4b4651f2ebeeaf039f337e340ab",
+      "reviewedAt": "2026-10-06",
+      "revisitTrigger": "atomic platform-authority cutover (plan phase 9)"
     }
   ]
 }
