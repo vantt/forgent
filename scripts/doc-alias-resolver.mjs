@@ -14,6 +14,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { classifyPath, DEFAULT_CONSTITUTION_PATH } from './check-doc-constitution.mjs';
 import { extractMarkdownConservationUnits } from './generate-doc-inventory.mjs';
@@ -139,8 +140,12 @@ function githubSlug(title) {
   return title.trim().toLowerCase().replace(/[^\p{L}\p{N}\- _]/gu, '').replace(/ /g, '-');
 }
 
-function readOldDocument(repoRoot, refPath) {
+function readOldDocument(repoRoot, refPath, revision = null) {
   if (!repoRoot || !refPath.toLowerCase().endsWith('.md')) return null;
+  if (revision) {
+    // The old document as it was at a fixed revision, so that retiring or rewriting the file does not change what a reference means.
+    try { return execFileSync('git', ['show', `${revision}:${refPath}`], { cwd: repoRoot, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, stdio: ['ignore', 'pipe', 'ignore'] }); } catch { return null; }
+  }
   try { return fs.readFileSync(path.resolve(repoRoot, refPath), 'utf8'); } catch { return null; }
 }
 
@@ -184,7 +189,7 @@ function normalizeReference(ref, consumerPath) {
  * result says `precision: 'line-to-section'`). A reference whose own anchor has no alias falls back to the
  * nearest enclosing heading that has one, or to the bare path, and says so in `precision`.
  */
-export function resolveAlias(table, rawRef, { repoRoot = null, consumerPath = null } = {}) {
+export function resolveAlias(table, rawRef, { repoRoot = null, consumerPath = null, revision = null } = {}) {
   const entries = Array.isArray(table?.entries) ? table.entries : [];
   const normalized = normalizeReference(String(rawRef), consumerPath);
   if (normalized.error) return { resolved: false, reason: normalized.error };
@@ -193,6 +198,8 @@ export function resolveAlias(table, rawRef, { repoRoot = null, consumerPath = nu
   const lineMatch = ref.match(LINE_RANGE) || ref.match(LINE_FRAGMENT);
   if (lineMatch) { lineForm = { path: lineMatch[1], line: Number(lineMatch[2]) }; ref = lineMatch[1]; }
   const { path: refPath, anchor } = splitRef(ref);
+  if (!isRepoRelativePosix(refPath)) return { resolved: false, reason: 'invalid-path' };
+  if (lineForm && lineMatch[3] !== undefined && Number(lineMatch[3]) < lineForm.line) return { resolved: false, reason: 'invalid-line-range' };
   const found = (hit, extra = {}) => ({
     resolved: true,
     toOwner: hit.toOwner,
@@ -203,7 +210,7 @@ export function resolveAlias(table, rawRef, { repoRoot = null, consumerPath = nu
     ...extra,
   });
   const byFrom = (from) => entries.find((e) => e.fromPath === from);
-  const old = readOldDocument(repoRoot, refPath);
+  const old = readOldDocument(repoRoot, refPath, revision);
 
   if (lineForm) {
     if (old === null) return { resolved: false, reason: 'line-reference-needs-old-document' };
@@ -244,6 +251,8 @@ export function runCli(argv, cwd = process.cwd()) {
   const tablePath = path.resolve(cwd, option('--table') ?? DEFAULT_ALIAS_TABLE_PATH);
   const ref = option('--resolve');
   const consumerPath = option('--from') ?? null;
+  const revision = option('--base') ?? null;
+  const requireExact = argv.includes('--exact');
   let table;
   try {
     table = JSON.parse(fs.readFileSync(tablePath, 'utf8'));
@@ -259,8 +268,8 @@ export function runCli(argv, cwd = process.cwd()) {
     return 1;
   }
   const findings = validateAliasTable(table, { repoRoot: cwd, constitution });
-  const resolution = ref === undefined ? null : resolveAlias(table, ref, { repoRoot: cwd, consumerPath });
-  const failed = findings.length > 0 || (resolution !== null && !resolution.resolved);
+  const resolution = ref === undefined ? null : resolveAlias(table, ref, { repoRoot: cwd, consumerPath, revision });
+  const failed = findings.length > 0 || (resolution !== null && (!resolution.resolved || (requireExact && resolution.precision !== undefined)));
   if (asJson) {
     console.log(JSON.stringify({ findings, resolution }, null, 2));
     return failed ? 1 : 0;

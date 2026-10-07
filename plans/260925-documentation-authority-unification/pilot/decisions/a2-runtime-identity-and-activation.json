@@ -564,9 +564,10 @@
       "targetOwner": "docs/platform/packaging-distribution/contracts/release-manifest.md",
       "targetAnchor": "6-safety-rules",
       "claimKind": "contract",
-      "disposition": "merge",
+      "disposition": "partial-carry",
       "reviewStatus": "pending",
-      "rationale": "Heading; only part of the canonicalization rules is carried by the safety rules (see the table row)."
+      "rationale": "Heading; only part of the canonicalization rules is carried by the safety rules (see the table row). Re-filed as partial-carry by the lead after the gate rule flagged the loss wording on a merge row.",
+      "remainder": "the part of the canonicalization rules that the safety rules do not carry (see the table row of the same section)"
     },
     {
       "claimId": "claim_e53e994efd41de413243c7feb18609f5",

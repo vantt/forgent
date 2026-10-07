@@ -260,7 +260,7 @@ export function validateAgainstVocabulary(inventory, vocabulary, validTargetOwne
   const claimKinds = new Set((vocabulary?.claimKinds || []).map((k) => k.id));
   claimKinds.add('unclassified');
   const RECOGNIZED_FILE_CLASSES = new Set(['maintained-authority', 'retained-source', 'generated', 'history-evidence']);
-  const RETAINED_CLAIM_DISPOSITIONS = new Set(['promote', 'move', 'merge', 'split', 'extract', 'redirect', 'supersede', 'delete-as-duplicate', 'defer-with-owner']);
+  const RETAINED_CLAIM_DISPOSITIONS = new Set(['promote', 'move', 'merge', 'split', 'extract', 'redirect', 'supersede', 'partial-carry', 'delete-as-duplicate', 'defer-with-owner']);
   const switchboardBackedTargetOwners = validTargetOwners || defaultSwitchboardOwners(inventory);
   const claimsBySourcePath = new Map();
   for (const claim of inventory.claimLedger || []) {
@@ -495,6 +495,10 @@ export function validateRetiredDispositions(registry, vocabulary) {
 // A shard is merged onto the inventory in memory; the inventory is never rewritten.
 
 const DECISION_REVIEW_STATUSES = new Set(['blocking', 'pending', 'reviewed']);
+// A rationale that says content is missing belongs to a partial-carry (which names its remainder), never to a disposition that satisfies conservation.
+const LOSS_LANGUAGE = /\b(omits?|omitted|(?:is|are) missing|missing from|absent from|not carried anywhere|only part of|does not carry|lacks)\b/i;
+const TRIVIAL_REMAINDER = /^(none|n\/a|na|-|\.|todo|tbd)$/i;
+const substantiveRemainder = (v) => nonEmpty(v) && v.trim().length >= 15 && !TRIVIAL_REMAINDER.test(v.trim());
 const nonEmpty = (v) => typeof v === 'string' && v.trim() !== '';
 
 export function loadDecisionShards(target) {
@@ -579,7 +583,8 @@ export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf 
       if (d.disposition === 'unknown-blocking' && d.reviewStatus !== 'blocking') fail('decision-blocking-status-mismatch', `claim ${id}: disposition unknown-blocking needs reviewStatus blocking, found "${d.reviewStatus}"`, at);
       if ((d.disposition === 'unknown-blocking' || String(d.disposition).startsWith('delete-')) && !(Array.isArray(d.searched) && d.searched.length > 0)) fail('decision-searched-missing', `claim ${id}: disposition "${d.disposition}" needs a non-empty searched list`, at);
       if (!nonEmpty(d.rationale)) fail('decision-rationale-missing', `claim ${id}: rationale is empty`, at);
-      if (d.disposition === 'partial-carry' && !nonEmpty(d.remainder)) fail('decision-partial-carry-remainder-missing', `claim ${id}: a partial-carry names what the target does not carry in remainder`, at);
+      if (d.disposition === 'partial-carry' && !substantiveRemainder(d.remainder)) fail('decision-partial-carry-remainder-missing', `claim ${id}: a partial-carry names what the target does not carry in remainder (at least 15 characters, not a placeholder)`, at);
+      if (d.disposition !== 'partial-carry' && d.disposition !== 'unknown-blocking' && !String(d.disposition).startsWith('delete-') && LOSS_LANGUAGE.test(String(d.rationale || '')) && !nonEmpty(d.remainder)) fail('decision-loss-without-partial-carry', `claim ${id}: the rationale says content is missing; a unit that loses anything is a partial-carry with a remainder, not ${d.disposition}`, at);
 
       const merged = { ...row, targetOwner: d.targetOwner ?? null, targetAnchor: d.targetAnchor ?? null, claimKind: d.claimKind, disposition: d.disposition, reviewStatus: d.reviewStatus, rationale: d.rationale };
       for (const field of ['reviewedBy', 'reviewedAt', 'searched', 'remainder']) if (d[field] !== undefined) merged[field] = d[field];
@@ -597,8 +602,9 @@ export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf 
       if (!disposition) fail('decision-gap-invalid', `registry gap ${g.claimId}: disposition "${g.disposition}" is not in the vocabulary`, at);
       else if (disposition.requiresTargetOwner && !(nonEmpty(g.targetOwner) && itemPaths.has(g.targetOwner))) fail('decision-gap-invalid', `registry gap ${g.claimId}: disposition "${g.disposition}" requires a targetOwner that is a document of the inventory`, at);
       if (!nonEmpty(g.rationale)) fail('decision-gap-invalid', `registry gap ${g.claimId}: rationale is empty`, at);
+      if (g.disposition === 'partial-carry' && !substantiveRemainder(g.remainder)) fail('decision-gap-invalid', `registry gap ${g.claimId}: a partial-carry names its remainder`, at);
       if (gapRows[idx].sourcePath !== g.sourcePath) fail('decision-gap-invalid', `registry gap ${g.claimId}: sourcePath ${g.sourcePath} is not the registry's ${gapRows[idx].sourcePath}`, at);
-      if (g.disposition !== 'unknown-blocking') gapRows[idx] = { ...gapRows[idx], disposition: g.disposition, targetOwner: g.targetOwner ?? null, targetAnchor: g.targetAnchor ?? null, dispositionRationale: g.rationale };
+      if (g.disposition !== 'unknown-blocking') gapRows[idx] = { ...gapRows[idx], disposition: g.disposition, targetOwner: g.targetOwner ?? null, targetAnchor: g.targetAnchor ?? null, dispositionRationale: g.rationale, ...(g.remainder ? { remainder: g.remainder } : {}) };
     }
     for (const f of shard.files || []) {
       if (decidedFiles.has(f?.path)) { fail('decision-file-duplicate', `file ${f?.path} is decided more than once (again in shard ${shard.shard})`, { path: f?.path }); continue; }
@@ -729,7 +735,7 @@ export function summarizeConservationCompleteness({ inventory, registry, vocabul
   const open = [
     summarizeOpen('files-unknown-blocking', 'inventory files whose file-level disposition is unknown-blocking', (inventory?.items || []).filter((i) => i.proposedDisposition === 'unknown-blocking' && inScope(i.path)), (i) => i.path),
     summarizeOpen('claims-unknown-blocking', 'claim rows whose disposition is unknown-blocking', claims.filter((c) => c.disposition === 'unknown-blocking'), (c) => `${c.sourcePath}#${c.sourceAnchor}`),
-    summarizeOpen('claims-partial-carry', 'claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)', claims.filter((c) => c.disposition === 'partial-carry'), (c) => `${c.sourcePath}#${c.sourceAnchor}`),
+    summarizeOpen('claims-partial-carry', 'claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)', [...claims.filter((c) => c.disposition === 'partial-carry'), ...(registry?.identityGaps || []).filter((row) => inScope(row?.sourcePath) && row?.disposition === 'partial-carry')], (c) => `${c.sourcePath}#${c.sourceAnchor}`),
     summarizeOpen('claims-not-reviewed', 'claim rows whose reviewStatus is not reviewed', claims.filter((c) => c.reviewStatus !== 'reviewed'), (c) => `${c.sourcePath}#${c.sourceAnchor}`),
     summarizeOpen('claims-without-own-rationale', 'claim rows whose disposition requires a rationale and that carry none of their own', claims.filter((c) => dispositions.get(c.disposition)?.requiresRationale && !(typeof c.rationale === 'string' && c.rationale !== '')), (c) => `${c.sourcePath}#${c.sourceAnchor}`),
     summarizeOpen('identical-units-multiple-owners', 'identical source units whose rows name different target owners', [...unitOwners.entries()].filter(([, set]) => set.size > 1), ([digest, set]) => `${digest.slice(0, 12)}: ${[...set].sort().join(', ')}`),

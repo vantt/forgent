@@ -274,7 +274,20 @@ test('a partial-carry row is open data that blocks the cutover, scoped like the 
   const pc = { ...goodDecision(), disposition: 'partial-carry' };
   const types = (d) => gates.applyDecisions(decisionInventory(), [goodShard([d])], { vocabulary: VOCABULARY, targetAnchorsOf: anchorsOf }).findings.map((f) => f.type);
   assert.deepEqual(types(pc), ['decision-partial-carry-remainder-missing']);
+  assert.deepEqual(types({ ...pc, remainder: 'none' }), ['decision-partial-carry-remainder-missing']);
   assert.deepEqual(types({ ...pc, remainder: 'the second paragraph is not carried' }), []);
+  const lossy = { ...goodDecision(), disposition: 'supersede', rationale: 'The target keeps the rule but omits the origin of it.' };
+  assert.deepEqual(types(lossy), ['decision-loss-without-partial-carry']);
+  assert.deepEqual(types({ ...lossy, disposition: 'merge' }), ['decision-loss-without-partial-carry']);
+  assert.deepEqual(types({ ...lossy, rationale: 'The target restates the whole rule in other words.' }), []);
+  const GAP = `claim_${'d'.repeat(32)}`;
+  const registry = { identityGaps: [{ claimId: GAP, sourcePath: 'docs/specs/runner.md', sourceAnchor: 'x' }] };
+  const gap = { claimId: GAP, sourcePath: 'docs/specs/runner.md', disposition: 'partial-carry', targetOwner: OWNER, targetAnchor: 'intro', rationale: 'part carried' };
+  const decided = (g) => gates.applyDecisions(decisionInventory(), [goodShard([], { registryGaps: [g] })], { vocabulary: VOCABULARY, targetAnchorsOf: anchorsOf, registry });
+  assert.deepEqual(decided(gap).findings.map((f) => f.type), ['decision-gap-invalid']);
+  const ok = decided({ ...gap, remainder: 'the second paragraph is not carried' });
+  assert.deepEqual(ok.findings, []);
+  assert.equal(gates.summarizeConservationCompleteness({ inventory: { items: [], claimLedger: [] }, registry: ok.registry, vocabulary: VOCABULARY }).find((o) => o.type === 'claims-partial-carry').count, 1);
   assert.equal(VOCABULARY.sourceDispositions.find((d) => d.id === 'partial-carry').blocksCutover, true);
 });
 

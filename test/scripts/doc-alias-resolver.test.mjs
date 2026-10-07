@@ -218,3 +218,36 @@ test('fromPath anchors are checked against the old document when it exists', () 
     assert.deepEqual(types(gone, { repoRoot: root }), []);
   });
 });
+
+test('references outside the repository, inverted ranges and a fixed revision are handled explicitly', () => {
+  withOldDocument((root) => {
+    const table = sectionTable();
+    for (const ref of ['/etc/x.md', 'docs/../../x.md', 'docs//specs/runner.md']) assert.deepEqual(resolveAlias(table, ref, { repoRoot: root }), { resolved: false, reason: 'invalid-path' }, ref);
+    assert.deepEqual(resolveAlias(table, 'docs/specs/runner.md:9-3', { repoRoot: root }), { resolved: false, reason: 'invalid-line-range' });
+  });
+});
+
+test('the CLI fails an approximate resolution under --exact and names the precision otherwise', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'alias-exact-'));
+  const log = console.log;
+  const err = console.error;
+  console.log = () => {};
+  console.error = () => {};
+  try {
+    fs.mkdirSync(path.join(dir, 'docs/specs'), { recursive: true });
+    fs.mkdirSync(path.join(dir, 'docs/platform/runner'), { recursive: true });
+    fs.writeFileSync(path.join(dir, 'docs/specs/runner.md'), OLD_DOC);
+    fs.writeFileSync(path.join(dir, 'docs/platform/runner/spec.md'), '# S\n');
+    fs.writeFileSync(path.join(dir, 'docs/platform/runner/README.md'), '# R\n');
+    fs.writeFileSync(path.join(dir, 'table.json'), JSON.stringify(tableOf(entry({ aliasId: 'runner-merge', fromPath: 'docs/specs/runner.md#merge-rules', toOwner: 'docs/platform/runner/spec.md', kind: 'split' }), entry({ aliasId: 'runner-bare', fromPath: 'docs/specs/runner.md', kind: 'redirected' }))));
+    const constitution = ['--constitution', path.join(REPO_ROOT, 'plans/260925-documentation-authority-unification/minimum-constitution.json')];
+    const base = ['--table', path.join(dir, 'table.json'), ...constitution];
+    assert.equal(runCli([...base, '--resolve', 'docs/specs/runner.md:11'], dir), 0);
+    assert.equal(runCli([...base, '--exact', '--resolve', 'docs/specs/runner.md:11'], dir), 1);
+    assert.equal(runCli([...base, '--exact', '--resolve', 'docs/specs/runner.md#merge-rules'], dir), 0);
+  } finally {
+    console.log = log;
+    console.error = err;
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});

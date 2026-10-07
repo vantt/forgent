@@ -503,8 +503,8 @@ export function proposeRationale(disposition, { area } = {}) {
   }
 }
 
-const DISPOSITIONS_REQUIRING_TARGET_OWNER = new Set(['promote', 'move', 'merge', 'split', 'extract', 'redirect', 'supersede', 'delete-as-duplicate', 'defer-with-owner']);
-const RETAINED_CLAIM_DISPOSITIONS = new Set(['promote', 'move', 'merge', 'split', 'extract', 'redirect', 'supersede', 'delete-as-duplicate', 'defer-with-owner']);
+const DISPOSITIONS_REQUIRING_TARGET_OWNER = new Set(['promote', 'move', 'merge', 'split', 'extract', 'redirect', 'supersede', 'partial-carry', 'delete-as-duplicate', 'defer-with-owner']);
+const RETAINED_CLAIM_DISPOSITIONS = new Set(['promote', 'move', 'merge', 'split', 'extract', 'redirect', 'supersede', 'partial-carry', 'delete-as-duplicate', 'defer-with-owner']);
 
 function targetOwnerForDisposition(disposition, classification) {
   if (!DISPOSITIONS_REQUIRING_TARGET_OWNER.has(disposition)) return null;
