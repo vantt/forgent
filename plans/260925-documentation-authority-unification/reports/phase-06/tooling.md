@@ -44,3 +44,19 @@ Verification:
 - Scheduling-isolation run: `env -u CLAUDE_CODE_SESSION_ID node --test --test-concurrency=1 test/scripts/*.test.mjs` (43 paths expanded by Node): 791 pass, 0 fail, 35.63 seconds. This exercises every test without changing the threshold or excluding any path. Concurrency contention is an inference from this comparison, not a proven cause. Logs: `/tmp/phase06/mirror-suite.log`, `/tmp/phase06/mirror-suite-serial.log`.
 
 Full tooling independent review, all later tools and the final mutation run remain UNPROVEN.
+
+## Exact-carry proposals
+
+Shard version stays 1. `exact: [{source, target, rows:[{claimId, sourceUnitDigest, targetUnitDigest}]}]` is expanded only after committed-unit proof: one target digest match, equal ancestor heading titles, at least 40 source characters, at least half the source document's units digest-exact. The gate derives the current target anchor by digest. No-match rows are Judgment; all matched rows that miss a threshold are Weak-exact with their demotion reasons, never script-reviewed. Manual proposed rows carry the author identity and remain pending or blocking; author metadata is additive schema data, not a substitute for the independent committed review report.
+
+CLI contract: `node scripts/propose-doc-decisions.mjs --summary --inventory <manifest> [--repo-root <directory>] [--out <json>]`; `--propose` additionally requires `--source <path> --target <path> --shard <name> --author <identity>`. `--help` documents thresholds, input ownership and JSON outputs. Reuses the frozen inventory loader and unit extractors; no loader or extractor change. Summary includes per-area/class counts, multi-legacy duplicate groups, groups not all-mirror, history-read legacy paths and the five reconciliation sources.
+
+Verification:
+
+- Red commit `1f147b961`: exact test module fails to import the missing proposal tool.
+- `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-decision-exact.test.mjs test/scripts/doc-decision-mirrors.test.mjs test/scripts/check-doc-conservation.test.mjs`: 44 pass, 0 fail.
+- `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/*.test.mjs` (44 paths expanded by Node): 796 pass, 0 fail, default concurrency, 5.72 seconds; no scheduling override or exclusions. Scratch log: `/tmp/phase06/exact-full-suite.log`.
+- Actual `--summary`: 1,040 source files / 22,426 rows; Mirror 12,882, Unit-exact 2,787, Weak-exact 971, Judgment 5,786. Reconciliation rows: 22 + 32 + 25 + 5 + 198 = 282. History-read legacy paths: 1,039. Recomputed counts, not planning estimates, govern later maps.
+- Actual `--propose` for `docs/architect/agent-coordination/architecture/coordination-continuation-recovery.md` and its platform counterpart: 40 exact, 9 pending, 2 blocking. The gate with pilot decisions plus `/tmp/phase06/exact-smoke.json` exits 0 with 0 fatal findings. The smoke shard is not committed.
+
+Remaining tooling, maps and independent full tooling review are UNPROVEN.

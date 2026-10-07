@@ -251,6 +251,45 @@ export function buildTargetUnitDigestLookup(repoRoot, commitSha) {
   };
 }
 
+/** Full committed units, including their ancestor heading titles, for exact-carry proof. */
+export function buildConservationUnitLookup(repoRoot, commitSha) {
+  const cache = new Map();
+  return (owner) => {
+    if (!cache.has(owner)) {
+      let units = null;
+      try {
+        const content = readBlobAtCommit(commitSha, owner, repoRoot);
+        const lines = content.split(/\r?\n/);
+        const extracted = owner.toLowerCase().endsWith('.md') ? extractMarkdownConservationUnits(content) : extractMixedFileConservationUnit(owner, content);
+        const headings = [];
+        units = extracted.map((unit) => {
+          if (unit.unitKind === 'heading') while (headings.length && headings.at(-1).level >= unit.level) headings.pop();
+          const ancestry = headings.map((heading) => heading.title);
+          if (unit.unitKind === 'heading') headings.push(unit);
+          return { ...unit, ancestry, text: lines.slice(unit.startLine - 1, unit.endLine).join('\n').trim() };
+        });
+      } catch { units = null; }
+      cache.set(owner, units);
+    }
+    return cache.get(owner);
+  };
+}
+
+/** Only the explicitly authorized class earns script review; every weaker match needs a reviewer. */
+export function classifyExactCarry(sourceUnits, targetUnits, row) {
+  const source = (sourceUnits || []).find((unit) => unit.anchor === row.sourceAnchor && unit.textDigest === row.sourceUnitDigest);
+  const matches = (targetUnits || []).filter((unit) => unit.textDigest === row.sourceUnitDigest);
+  if (!source || matches.length === 0) return { class: 'Judgment', reason: !source ? 'source unit unreadable or stale' : 'no target digest match', targetUnit: null };
+  const targetUnit = matches[0];
+  const exactCount = sourceUnits.filter((unit) => targetUnits.some((other) => other.textDigest === unit.textDigest)).length;
+  const reasons = [];
+  if (matches.length !== 1) reasons.push('target digest repeats');
+  if (JSON.stringify(source.ancestry) !== JSON.stringify(targetUnit.ancestry)) reasons.push('ancestor headings differ');
+  if (source.text.trim().length < 40) reasons.push('source unit shorter than 40 characters');
+  if (exactCount * 2 < sourceUnits.length) reasons.push('document exact share below one half');
+  return { class: reasons.length ? 'Weak-exact' : 'Unit-exact', reason: reasons.join('; ') || 'unique long digest match, equal ancestry, sufficient document exact share', targetUnit };
+}
+
 function defaultSwitchboardOwners(inventory) {
   return new Set((inventory.items || [])
     .filter((item) => ['rootDocument', 'scopedRoute', 'corpusRoot'].includes(item.switchboardSource) && typeof item.path === 'string' && item.path.startsWith('docs/platform/'))
@@ -521,7 +560,7 @@ export function loadDecisionShards(target) {
     for (const field of ['version', 'shard', 'sources', 'claims']) {
       if (!(field in shard)) throw new Error(`decision shard ${file}: missing required field "${field}"`);
     }
-    for (const field of ['sources', 'claims', ...['files', 'registryGaps', 'mirrors'].filter((field) => field in shard)]) {
+    for (const field of ['sources', 'claims', ...['files', 'registryGaps', 'mirrors', 'exact'].filter((field) => field in shard)]) {
       if (!Array.isArray(shard[field])) throw new Error(`decision shard ${file}: "${field}" must be an array`);
     }
     return shard;
@@ -534,10 +573,11 @@ export function decidedPlatformOwners(inventory, shards) {
   return new Set((shards || []).flatMap((shard) => [
     ...(shard.claims || []).map((d) => d?.targetOwner),
     ...(shard.mirrors || []).map((mirror) => mirror?.target),
+    ...(shard.exact || []).map((entry) => entry?.target),
   ]).filter((owner) => platform.has(owner)));
 }
 
-export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf = null, targetUnitDigestOf = null, registry = null } = {}) {
+export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf = null, targetUnitDigestOf = null, unitsOf = null, registry = null } = {}) {
   const findings = [];
   const dispositions = new Map((vocabulary?.sourceDispositions || []).map((d) => [d.id, d]));
   const claimKinds = new Set((vocabulary?.claimKinds || []).map((k) => k.id));
@@ -587,6 +627,34 @@ export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf 
         searched: [`blob:${mirror.blobSha}`, mirror.path, mirror.target],
       });
       mirrorFiles.push({ path: mirror.path, disposition: 'delete-as-duplicate', rationale, targets: [mirror.target] });
+    }
+    for (const entry of shard.exact || []) {
+      const sourceUnits = typeof unitsOf === 'function' ? unitsOf(entry?.source) : null;
+      const targetUnits = typeof unitsOf === 'function' ? unitsOf(entry?.target) : null;
+      if (!sources.has(entry?.source) || !itemPaths.has(entry?.source) || !itemPaths.has(entry?.target) ||
+          !String(entry?.target || '').startsWith('docs/platform/') || !Array.isArray(entry?.rows) || !entry.rows.length ||
+          !sourceUnits || !targetUnits) {
+        fail('decision-exact-invalid', `shard ${shard.shard}: exact entry ${entry?.source} -> ${entry?.target} has no verifiable source, target or rows`);
+        continue;
+      }
+      for (const decision of entry.rows) {
+        const row = claimLedger[claimIndex.get(decision?.claimId)];
+        const proof = row ? classifyExactCarry(sourceUnits, targetUnits, row) : null;
+        if (!row || row.sourcePath !== entry.source || !/^[0-9a-f]{64}$/.test(decision.sourceUnitDigest || '') ||
+            decision.sourceUnitDigest !== row.sourceUnitDigest || decision.targetUnitDigest !== row.sourceUnitDigest ||
+            proof?.class !== 'Unit-exact') {
+          fail('decision-exact-invalid', `shard ${shard.shard}: claim ${decision?.claimId} does not satisfy exact-carry proof (${proof?.reason || 'unknown row or invalid digest'})`, { path: entry.source });
+          continue;
+        }
+        mirrorClaims.push({
+          claimId: row.claimId, sourceUnitDigest: row.sourceUnitDigest,
+          targetOwner: entry.target, targetAnchor: proof.targetUnit.anchor, targetUnitDigest: proof.targetUnit.textDigest,
+          claimKind: row.claimKind, disposition: 'promote', reviewStatus: 'reviewed',
+          authoredBy: 'script:propose-doc-decisions', reviewedBy: 'script:check-doc-inventory-gates',
+          reviewedAt: String(inventory.generatedAt || '').slice(0, 10),
+          rationale: `The entire source unit is present at ${entry.target}#${proof.targetUnit.anchor}; ${proof.reason}.`,
+        });
+      }
     }
     for (const d of [...mirrorClaims, ...(shard.claims || [])]) {
       const id = d?.claimId;
@@ -814,7 +882,7 @@ export function checkInventory({ repoRoot, inventory, vocabulary, identityRegist
   let conservationRegistry = identityRegistry;
   let validTargetOwners = inventory.commit ? deriveValidTargetOwnersFromSwitchboard(loadSwitchboard(inventory.commit, repoRoot)) : null;
   if (decisions && decisions.length > 0) {
-    const applied = applyDecisions(inventory, decisions, { vocabulary, targetAnchorsOf, targetUnitDigestOf: inventory.commit ? buildTargetUnitDigestLookup(repoRoot, inventory.commit) : null, registry: identityRegistry });
+    const applied = applyDecisions(inventory, decisions, { vocabulary, targetAnchorsOf, targetUnitDigestOf: inventory.commit ? buildTargetUnitDigestLookup(repoRoot, inventory.commit) : null, unitsOf: inventory.commit ? buildConservationUnitLookup(repoRoot, inventory.commit) : null, registry: identityRegistry });
     inventory = applied.inventory;
     // Only the conservation open-data summary reads the overlaid gap rows; the identity and dropped-claim validators keep the registry as committed.
     conservationRegistry = applied.registry || identityRegistry;
