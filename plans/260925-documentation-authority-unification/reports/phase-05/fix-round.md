@@ -48,3 +48,10 @@ Three hostile reviewers (assumption, failure mode, scope), 22 findings. Adjudica
 ## 4. Open after the fix round
 
 M-24 label gluing (above); M-05 residual: none (0 uncovered lines); the retirement check still counts only `docs/specs` and `docs/architect` as legacy roots; reviewer independence is free text; the 47-edge judgment queue; the SC-1 owner decision.
+
+## 5. Closing round (owner rulings 2026-10-07)
+
+M-24 fixed (`92f69d884`): a short block that ends with a colon attaches to the following block of its section; any other short block still attaches to the previous one. Carry-forward over the label rule: units 87,153 before and after; gap rows 2,926 to 4,744 (1,818 new), retired rows 66 unchanged; claim ids lost 0; new claim ids 1,818; units with a changed digest and the id kept 336 (114 files). All 1,818 new gap rows were dispositioned `supersede` to the successor unit by a script that proves that every non-blank line differing between the old and the successor unit is a short label ending in a colon (1,818 of 1,818, 0 failures; 1 heading successor). Pilot B: 2 decision rows changed source unit (the ADR 0006 transition list and the `Ngữ nghĩa:` block); both were re-keyed and re-reviewed by a fresh reviewer (verified). Pilot B scoped strict: exit 1 with exactly the two held SC-1 rows, no decision finding; the structural sensitivity run was repeated on freshly generated scenarios: 11 of 11 reported (the clean copy shows only the two held rows). The second-round control shard moved to `pilot/second-round/` because the label rule replaced claim ids of units it touched (it was validated when made). Default gate on the committed manifest: exit 0, row set conserved.
+
+Confirmed by the owner: the `partial-carry` additions in `check-doc-constitution.mjs` and `check-doc-retirement.mjs` (blocks cutover like `unknown-blocking`). Decided: SC-1 (code is the truth, text fix in Phase 6). Phase 8 prerequisite: the 47-edge judgment queue. Procedure note on the constitution page (8.1): no extractor change between decision rounds.
+

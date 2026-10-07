@@ -649,7 +649,7 @@ test('the freeze is recorded and the additive amendment carries its reason', () 
 test('the usage amendment rests on dispositions that the committed decision shards use', () => {
   const used = new Set();
   const statuses = new Set();
-  for (const dir of ['pilot/decisions', 'pilot/first-round']) {
+  for (const dir of ['pilot/decisions', 'pilot/first-round', 'pilot/second-round']) {
     const shardsDir = path.resolve(REPO_ROOT, `plans/260925-documentation-authority-unification/${dir}`);
     for (const name of fs.readdirSync(shardsDir).filter((n) => n.endsWith('.json'))) {
       for (const claim of JSON.parse(fs.readFileSync(path.join(shardsDir, name), 'utf8')).claims || []) { used.add(claim.disposition); statuses.add(claim.reviewStatus); }

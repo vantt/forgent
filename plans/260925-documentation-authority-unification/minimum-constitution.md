@@ -274,6 +274,10 @@ owner, a kind or a review are valid data. `--strict-rows` makes invalid rows
 fatal for steps that must hand over a clean ledger. Empty plan §6.2 fields are
 counted as gaps, never as invalid.
 
+### 8.1 Procedure note: no extractor change between decision rounds
+
+The unit definition of `scripts/generate-doc-inventory.mjs` (what counts as a claim unit, how short blocks and labels are attached) determines claim ids, unit digests and anchors. It is not changed between a round of reviewed decisions and the end of the transformation that depends on it: a change replaces claim ids, orphans decisions and forces a registry carry-forward and re-review (Phase 5 paid this twice). A change that cannot wait needs an owner decision and is followed by a carry-forward with the script-proof of every disposition and a re-review of every decision row whose unit digest changed. This is a procedure note; no rule text of this constitution changes. Recorded 2026-10-07 on the owner's ruling.
+
 ## 9. Deferred To The Future Engine
 
 | Item | Revisit trigger |

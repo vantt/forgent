@@ -55,3 +55,8 @@ To be detailed when this phase is explicitly authorized (plan.md §5). Deliverab
 ## Risk Assessment
 
 Program-level risks and countermeasures: `plan.md` §11.
+
+## Prerequisite from the dual pilot (owner, 2026-10-07)
+
+The 47 inbound edges of the work-state sources that the link preview could not map to a document without a judgment (`reports/phase-05/pilot-b-link-judgment-queue.json`) must be worked off before this phase rewrites consumers: an agent proposes the target for each edge, the Lead reviews, and the owner decides only the ambiguous ones. Phase 6 area transformations need the same queue for their own sources.
+
