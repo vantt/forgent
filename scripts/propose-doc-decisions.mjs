@@ -46,6 +46,8 @@ is reviewed by this command. Mirror rows are counted only after full blob equali
 Review modes never edit target documents. --apply-review writes the shard in place
 and names its report; the gate accepts reviewed rows only after that report is
 committed. Verdicts are ok, rework or hold with an own note for every pending row.
+Hold/rework keeps unknown-blocking rows blocking and other rows pending; no approval
+identity/date remains. The reviewer lists held unknown-blocking rows in owner queue.
 Seed packs contain 24 byte-equal controls and six real mutations, shuffled; score
 passes at >=5/6 mutations caught and <=2/24 false flags. The author must not run
 --seed-pack on a real batch. Key and pack output paths must differ.
@@ -263,7 +265,7 @@ export function applyReviewVerdicts(context, shard, { verdicts, reviewer, report
     const source = sourceRows.get(row.claimId);
     if (!source || source.sourceUnitDigest !== row.sourceUnitDigest) throw new Error(`missing or stale source ${row.claimId}`);
     const verdict = index.get(row.claimId);
-    const updated = { ...row, reviewStatus: 'pending', reviewNote: verdict.note };
+    const updated = { ...row, reviewStatus: row.disposition === 'unknown-blocking' ? 'blocking' : 'pending', reviewNote: verdict.note };
     delete updated.reviewedBy; delete updated.reviewedAt; delete updated.targetUnitDigest;
     if (verdict.verdict === 'ok') {
       if (row.disposition === 'unknown-blocking') throw new Error(`unknown-blocking cannot be approved: ${row.claimId}`);

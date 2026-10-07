@@ -38,13 +38,13 @@ test('seeded review uses six real text mutations and scores missed defects and f
 
 test('review application binds current digest and keeps rework and hold pending without inventing approval', () => {
   const verdicts = shard.claims.map((row, i) => ({ claimId: row.claimId, verdict: i === 0 ? 'ok' : i === 1 ? 'hold' : 'rework', note: i === 0 ? 'Entire contract retained.' : 'Owner decision needed.' }));
-  const result = applyReviewVerdicts(context, shard, { verdicts, reviewer, reportPath: 'plans/example/reports/phase-06/review-02-s02-example.md', reviewedAt: '2026-10-07' });
+  const result = applyReviewVerdicts(context, shard, { verdicts, reviewer, reportPath: 'fixture/review-example.md', reviewedAt: '2026-10-07' });
   assert.equal(result.claims[0].reviewStatus, 'reviewed');
   assert.equal(result.claims[0].targetUnitDigest, digest);
   assert.equal(result.claims[0].reviewedBy, reviewer);
   assert.equal(result.claims[1].reviewStatus, 'pending');
   assert.equal(result.claims[1].reviewNote, 'Owner decision needed.');
-  assert.equal(result.reviewReport, 'plans/example/reports/phase-06/review-02-s02-example.md');
+  assert.equal(result.reviewReport, 'fixture/review-example.md');
   assert.throws(() => applyReviewVerdicts(context, shard, { verdicts, reviewer: `reviewer:${author}`, reportPath: 'report.md' }), /independent/);
   assert.throws(() => applyReviewVerdicts(context, shard, { verdicts: [...verdicts, verdicts[0]], reviewer, reportPath: 'report.md' }), /duplicate/);
   assert.throws(() => applyReviewVerdicts({ ...context, unitsOf: () => [] }, shard, { verdicts, reviewer, reportPath: 'report.md' }), /target/);
