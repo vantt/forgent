@@ -191,7 +191,7 @@ export function buildReviewPack(context, shard) {
   const named = new Set();
   const rows = (shard.claims || []).filter((row) => row.reviewStatus !== 'reviewed').map((decision) => {
     const source = sourceRows.get(decision.claimId);
-    if (!source || source.sourceUnitDigest !== decision.sourceUnitDigest) throw new Error(`missing or stale source ${decision.claimId}`);
+    if (!source || typeof decision.sourceUnitDigest !== 'string' || decision.sourceUnitDigest.length < 16 || !source.sourceUnitDigest.startsWith(decision.sourceUnitDigest)) throw new Error(`missing or stale source ${decision.claimId}`);
     const sourceUnit = (context.unitsOf(source.sourcePath) || []).find((unit) => unit.anchor === source.sourceAnchor && unit.textDigest === source.sourceUnitDigest);
     if (!sourceUnit) throw new Error(`missing source unit ${decision.claimId}`);
     const targetUnit = decision.targetOwner ? (context.unitsOf(decision.targetOwner) || []).find((unit) => unit.anchor === decision.targetAnchor) : null;
@@ -320,7 +320,7 @@ export function applyReviewVerdicts(context, shard, { verdicts, reviewer, report
     if (row.reviewStatus === 'reviewed') return { ...row };
     if (!row.authoredBy || !independentReviewer(reviewer, row.authoredBy)) throw new Error(`independent reviewer required for ${row.claimId}`);
     const source = sourceRows.get(row.claimId);
-    if (!source || source.sourceUnitDigest !== row.sourceUnitDigest) throw new Error(`missing or stale source ${row.claimId}`);
+    if (!source || typeof row.sourceUnitDigest !== 'string' || row.sourceUnitDigest.length < 16 || !source.sourceUnitDigest.startsWith(row.sourceUnitDigest)) throw new Error(`missing or stale source ${row.claimId}`);
     const shown = shownRows.get(row.claimId);
     if (!shown || shown.sourceUnitDigest !== source.sourceUnitDigest || shown.source.path !== source.sourcePath || shown.source.anchor !== source.sourceAnchor) throw new Error(`review pack source binding changed for ${row.claimId}`);
     const verdict = index.get(row.claimId);

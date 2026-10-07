@@ -3,7 +3,7 @@
 Date: 2026-10-07
 Executor: codex-session:1@2026-10-07
 Session counter: 1
-Step: 1, structural mutations pass; valid source-prefix review regression demonstrated
+Step: 1, structural mutations and source-prefix review correction pass
 State: authoring
 Last green conservation commit: dd77ceb4e
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
@@ -17,7 +17,7 @@ Real conflicts: SC-1 is owner-resolved; candidate correction belongs to the root
 Holds: none authored
 Promoted-document edits: none
 
-Next action: commit the digest-prefix red regression and correct pack/apply to accept the schema's minimum 16-character prefix while retaining full seen-text bindings. Then request the independent tooling review required to finish Step 1 item 1; do not advance its review gate or start a real batch.
+Next action: commit the prefix correction, refresh both prior-registry conservation proofs, then finish the Markdown diff-pack contract and investigate old-shape re-review compatibility without changing frozen rules. Request full independent tooling review only after those proofs; do not start a real batch.
 
 Evidence: A3 accounts exactly five commit/path pairs, no other violation; B/C/I unchanged; both resume D proofs pass and match baseline; ratchet clean, placement unchanged, retirement 15 blocked/4 pass/1 review and candidate 5 baseline findings. Red regression 8eb346727: 4 pass/2 fail. Fixed targeted tests: 40/40; standalone hold probe exit 0, blocking preserved, zero unchanged-gate findings. Complete suite 805/805 in 46 files. Both hold and rework retain the note, searched evidence and no approval identity/date. No real held claim exists to add to owner queue. Full tooling fixes/maps/review and scoped E remain UNPROVEN.
 Independent early read-only review at 789870507 was supplied by the owner; its accepted-with-fixes findings are now requirements. It is not the final committed tooling review gate and marks no decision row reviewed.
@@ -39,3 +39,4 @@ Authorship/report corrected evidence: targeted 15/15 including corpus proofs; fu
 Restoration/stub red evidence: `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-restoration-proofs.test.mjs`: 1 pass, 4 fail. Restored owner/anchor/digest and deferred stub checks are missing; uncommitted anchors can masquerade as restored proof. Existing identical-unit multiple-owner reporting remains active. Post-authorship d09f5c962: 844/844 and both D proofs baseline-identical. No real restoration/register edit is authored. Remaining tooling/maps/review remain UNPROVEN.
 Restoration/stub corrected evidence: targeted restoration/mirror probes 10/10; full scripts suite 849/849 in 50 files. Actual gate with fixture-only scratch register accepts a matching committed target digest (exit 0, 0 findings), rejects missing anchor/stale digest with dropped-claim-restore-invalid, and rejects nonexistent deferred stub with dropped-claim-stub-invalid (exit 1). No semantic restoration verdict is claimed. The short-unit test uses two real committed legacy files; the existing four-copy probe still permits only one owner. No real register edit, restoration or deferral is authored. Mutation/maps/full review remain UNPROVEN.
 Structural mutation evidence: clean fixture 0 findings, all 11 defects rejected by actual scoped strict CLI. Post-restoration dd77ceb4e: 849/849, both D proofs baseline-identical. A3 accounts exactly five pairs; A/B/C/I pass; ratchet 995 files, 24 edits/1 new accounted; placement unchanged; retirement and candidate baseline findings unchanged. Valid-prefix red: actual pack rejects a 16-character source digest allowed by the shard schema; `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-decision-review.test.mjs`: 12 pass/1 fail. Prefix correction and independent review remain UNPROVEN.
+Source-prefix corrected evidence: 13/13 review tests and 850/850 across all 50 scripts test files; actual pack now accepts the same 11-row scratch proposal and retains full source hashes. Shorter and stale prefixes still fail. Gate code and legacy decisions unchanged. Markdown diff output, old-shape re-review and full independent review remain UNPROVEN.

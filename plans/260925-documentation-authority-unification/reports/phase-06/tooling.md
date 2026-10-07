@@ -195,3 +195,9 @@ Verification: restoration and existing mirror probes 10/10; full scripts suite 8
 
 Actual gate CLI with fixture-only scratch registers: matching committed target digest exit 0 with 0 fatal findings; missing anchor and stale digest exit 1 with dropped-claim-restore-invalid; nonexistent deferred stub exit 1 with dropped-claim-stub-invalid. This proves mechanical target binding only, not that any real dropped content was restored or independently approved. No production register entry is edited and no real restoration/deferral verdict is authored.
 
+## Source digest prefix compatibility
+
+Red abba648f6: the review test suite has 12 pass/1 fail; an actual CLI pack rejects a schema-valid 16-character source digest as stale. Pack/apply now use the gate's minimum-16-character prefix comparison. Pack source bindings and the reviewed target digest remain complete hashes; shorter and mismatching prefixes are rejected.
+
+Verification: `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-decision-review.test.mjs` has 13/13 passing tests; all 50 scripts test files have 850/850. The actual scratch proposal pack accepts all 11 pending rows with 16-character source prefixes and full 64-character source bindings (exit 0). No gate invariant, previous-registry loader or legacy decision record changes.
+
