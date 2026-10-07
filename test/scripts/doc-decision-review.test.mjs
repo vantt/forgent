@@ -59,6 +59,20 @@ test('review application binds current digest and keeps rework and hold pending 
   assert.equal(shard.claims[0].reviewStatus, 'pending');
 });
 
+test('valid source digest prefixes survive pack and review application with full seen-text bindings', () => {
+  const prefixed = { ...shard, claims: shard.claims.map((row) => ({ ...row, sourceUnitDigest: digest.slice(0, 16) })) };
+  const evidence = reviewEvidence(prefixed);
+  assert.equal(evidence.pack.rows[0].sourceUnitDigest, digest);
+  const verdicts = prefixed.claims.map((row) => ({ claimId: row.claimId, verdict: 'ok', note: 'Entire source and target units retained.' }));
+  const result = applyReviewVerdicts(context, prefixed, { ...evidence, verdicts, reviewer, reportPath: 'fixture/review-example.md' });
+  assert.equal(result.claims[0].reviewStatus, 'reviewed');
+  assert.equal(result.claims[0].sourceUnitDigest, digest.slice(0, 16));
+  assert.equal(result.claims[0].targetUnitDigest, digest);
+  for (const sourceUnitDigest of [digest.slice(0, 15), 'f'.repeat(16)]) {
+    assert.throws(() => buildReviewPack(context, { ...shard, claims: [{ ...shard.claims[0], sourceUnitDigest }] }), /stale source/);
+  }
+});
+
 test('verdict table names the reviewer and requires an explicit verdict and own note for each row', () => {
   const text = `# Review\n\nReviewer: ${reviewer}\n\n| claimId | verdict | note |\n|---|---|---|\n| ${rows[0].claimId} | ok | Entire contract retained. |\n`;
   assert.deepEqual(parseReviewVerdicts(text, reviewer), [{ claimId: rows[0].claimId, verdict: 'ok', note: 'Entire contract retained.' }]);
