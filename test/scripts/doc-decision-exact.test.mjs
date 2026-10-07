@@ -69,6 +69,7 @@ test('committed unit lookup retains full text and the ancestor chain for exact p
     const lookup = buildConservationUnitLookup(root, git('rev-parse', 'HEAD'));
     const block = lookup(source).find((u) => u.text === body);
     assert.deepEqual(block.ancestry, ['Example', 'Admission']);
+    assert.ok(lookup(source).find((u) => u.unitKind === 'heading' && u.title === 'Admission').sectionText?.includes(body));
     fs.writeFileSync(path.join(root, source), '# Changed\n');
     assert.equal(lookup(source).find((u) => u.text === body).text, body);
   } finally { fs.rmSync(root, { recursive: true, force: true }); }
