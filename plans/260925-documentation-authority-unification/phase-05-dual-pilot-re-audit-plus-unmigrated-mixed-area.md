@@ -158,6 +158,10 @@ Three hostile reviewers (assumption destroyer, failure-mode analyst, scope and c
 
 Open Critical or High after the fixes: none that the delegate can fix without the owner; the owner-level items are M-01, M-05, M-11, M-13 and the registry-gap extension (M-06).
 
+## Verdict and fix round (owner, 2026-10-07)
+
+Verdict on the first round: **METHOD-MUST-CHANGE** (E1 strictly failed; E6, E7 and E8 not met; see `reports/phase-05/pilot-method-defects.md`). The owner authorized exactly one fix round and redefined E7 (100% of edges classified; every rewrite-class edge has a document-level target or is in an explicit owner-judgment queue; anchors only where derivable). The fix round and its re-runs are recorded in `reports/phase-05/fix-round.md`; a second failure of a re-run stops the phase.
+
 ## Success Criteria
 
 Pilot passes only when all hold (measured by script or by Lead recount; the number and the method are stated in the report):
