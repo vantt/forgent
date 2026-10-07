@@ -3,7 +3,7 @@
 Date: 2026-10-07
 Executor: codex-session:1@2026-10-07
 Session counter: 1
-Step: 1, automatic-proposal sensitivity regression demonstrated
+Step: 1, verified same-batch controls and one-row rework pass
 State: authoring
 Last green conservation commit: eff2f6557
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
@@ -17,7 +17,7 @@ Real conflicts: SC-1 is owner-resolved; candidate correction belongs to the root
 Holds: none authored
 Promoted-document edits: none
 
-Next action: commit the sensitivity-control regression and include verified script carries/already-reviewed unchanged rows of the same batch as controls, without reopening their decisions or changing thresholds. Then prove old-shape re-review compatibility and request independent tooling review; no real batch.
+Next action: commit verified sensitivity controls and refresh both prior-registry conservation proofs, then prove old-shape re-review compatibility without changing frozen row shape or gate rules. Request independent tooling review only after that proof; no real batch.
 
 Evidence: A3 accounts exactly five commit/path pairs, no other violation; B/C/I unchanged; both resume D proofs pass and match baseline; ratchet clean, placement unchanged, retirement 15 blocked/4 pass/1 review and candidate 5 baseline findings. Red regression 8eb346727: 4 pass/2 fail. Fixed targeted tests: 40/40; standalone hold probe exit 0, blocking preserved, zero unchanged-gate findings. Complete suite 805/805 in 46 files. Both hold and rework retain the note, searched evidence and no approval identity/date. No real held claim exists to add to owner queue. Full tooling fixes/maps/review and scoped E remain UNPROVEN.
 Independent early read-only review at 789870507 was supplied by the owner; its accepted-with-fixes findings are now requirements. It is not the final committed tooling review gate and marks no decision row reviewed.
@@ -43,3 +43,4 @@ Source-prefix corrected evidence: 13/13 review tests and 850/850 across all 50 s
 Diff-pack red evidence: `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-review-format.test.mjs`: 0 pass/2 fail. Normal --pack writes JSON instead of the required Markdown/unified diff; the seeded CLI cannot consume a machine sidecar. Prefix green f2e0e4bb3: both prior-registry D proofs exit 0 and exactly match baseline. The unmodified old I/O shard is rejected by --pack for missing author/session/committed report evidence; its rebind/re-review flow remains UNPROVEN.
 Diff-pack corrected evidence: full scripts suite 852/852 in 51 files; real CLI fixture pack/seed/score flow passes with 6/6 detected and 0 false flags. Public Markdown/key-sidecar collision protection passes. Actual scratch pack renders full source/target/diff and reverse units, exit 0, with machine sidecar retained for binding. No genuine seeded review is run by this author session. Automatic-proposal sensitivity controls, old-shape re-review and full tooling review remain UNPROVEN.
 Sensitivity-control red: actual isolated --propose -> --pack -> --seed-pack flow fails with insufficient eligible rows for swapped-number after valid exact carries are removed from the pending-only pack. `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-review-format.test.mjs`: 2 pass/1 fail. Both prior-registry D proofs after eff2f6557 exit 0 and remain baseline-identical. No genuine seed selection is made on repository source rows.
+Sensitivity controls corrected: 854/854 across 51 scripts test files; automatic fixture proposals seed successfully using re-proven exact units without reopening accepted decisions. Poisoned exact proofs and invented controls fail closed. Actual committed modern CLI accepts 61 fixture rows, rejects uncommitted reports, and then accepts a one-row rationale rework using 60 unchanged controls while preserving earlier report pins and 0 unchanged-overlay findings. Legacy compatibility and full tooling review remain UNPROVEN.

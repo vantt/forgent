@@ -76,6 +76,9 @@ it never approves text merely because that text exists at application time.
 Seed packs contain 24 byte-equal controls and six real mutations, shuffled; score
 passes at >=5/6 mutations caught and <=2/24 false flags. The author must not run
 --seed-pack on a real batch. Key and pack output paths must differ.
+The same-batch sensitivity pool also includes current script-proven carries and
+unchanged independently reviewed rows; their decisions are never reopened.
+Apply rebuilds those control proofs, rejecting invented or stale pool entries.
 Coverage accepts explicit source cells path[#range] and directory/** in the
 first column of frozen map tables; target mentions never count as source coverage.
 --summary --coverage combines both reports. Snapshot rows exclude docs/platform/
@@ -193,7 +196,7 @@ export function buildReviewPack(context, shard) {
   const sourceRows = new Map(context.inventory.claimLedger.map((row) => [row.claimId, row]));
   const targets = new Set();
   const named = new Set();
-  const rows = (shard.claims || []).filter((row) => row.reviewStatus !== 'reviewed').map((decision) => {
+  const reviewRow = (decision) => {
     const source = sourceRows.get(decision.claimId);
     if (!source || typeof decision.sourceUnitDigest !== 'string' || decision.sourceUnitDigest.length < 16 || !source.sourceUnitDigest.startsWith(decision.sourceUnitDigest)) throw new Error(`missing or stale source ${decision.claimId}`);
     const sourceUnit = (context.unitsOf(source.sourcePath) || []).find((unit) => unit.anchor === source.sourceAnchor && unit.textDigest === source.sourceUnitDigest);
@@ -202,7 +205,28 @@ export function buildReviewPack(context, shard) {
     if (decision.targetOwner && !targetUnit) throw new Error(`missing target unit ${decision.claimId}`);
     if (targetUnit) { targets.add(decision.targetOwner); named.add(`${decision.targetOwner}#${targetUnit.anchor}`); }
     return { claimId: decision.claimId, sourceUnitDigest: source.sourceUnitDigest, targetUnitDigest: targetUnit?.textDigest ?? null, decision: { ...decision }, source: { path: source.sourcePath, ...sourceUnit }, target: targetUnit ? { path: decision.targetOwner, ...targetUnit } : null };
-  });
+  };
+  const rows = (shard.claims || []).filter((row) => row.reviewStatus !== 'reviewed').map(reviewRow);
+  const sensitivityControls = (shard.claims || []).filter((row) => row.reviewStatus === 'reviewed').map(reviewRow).filter((row) => row.target && typeof row.decision.targetUnitDigest === 'string' && row.decision.targetUnitDigest.length >= 16 && row.target.textDigest.startsWith(row.decision.targetUnitDigest) && JSON.stringify(row.decision.targetAncestry) === JSON.stringify(row.target.ancestry));
+  if ((shard.exact || []).length || (shard.mirrors || []).length) {
+    const scriptIds = new Set((shard.exact || []).flatMap((entry) => (entry.rows || []).map((row) => row.claimId)));
+    for (const mirror of shard.mirrors || []) for (const row of context.inventory.claimLedger) if (row.sourcePath === mirror.path) scriptIds.add(row.claimId);
+    const proof = applyDecisions(context.inventory, [{
+      version: shard.version, shard: shard.shard, sources: shard.sources,
+      authorSession: shard.authorSession, authorshipRequired: shard.authorshipRequired,
+      exact: shard.exact, mirrors: shard.mirrors,
+    }], {
+      vocabulary: JSON.parse(fs.readFileSync(new URL('../plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.json', import.meta.url), 'utf8')),
+      unitsOf: context.unitsOf, repoRoot: context.repoRoot,
+      targetAnchorsOf: (owner) => { const units = context.unitsOf(owner); return units ? new Set(units.map((unit) => unit.anchor)) : null; },
+      targetUnitDigestOf: (owner, anchor) => (context.unitsOf(owner) || []).find((unit) => unit.anchor === anchor)?.textDigest ?? null,
+    });
+    if (proof.findings.length) throw new Error('sensitivity script proof failed: ' + proof.findings.map((finding) => finding.type).join(', '));
+    for (const row of proof.inventory.claimLedger) if (scriptIds.has(row.claimId)) sensitivityControls.push(reviewRow({
+      ...Object.fromEntries(['claimId', 'sourceUnitDigest', 'targetOwner', 'targetAnchor', 'targetUnitDigest', 'claimKind', 'disposition', 'reviewStatus', 'authoredBy'].map((field) => [field, row[field]])),
+      rationale: row.dispositionRationale,
+    }));
+  }
   for (const decision of shard.claims || []) if (decision.targetOwner) { targets.add(decision.targetOwner); named.add(`${decision.targetOwner}#${decision.targetAnchor}`); }
   for (const entry of shard.exact || []) {
     targets.add(entry.target);
@@ -217,7 +241,7 @@ export function buildReviewPack(context, shard) {
   }
   const unmatchedCandidateUnits = [];
   for (const owner of [...targets].sort()) for (const unit of context.unitsOf(owner) || []) if (!named.has(`${owner}#${unit.anchor}`)) unmatchedCandidateUnits.push({ owner, unit });
-  return { version: 1, commit: context.inventory.commit, shard: shard.shard, authorSession: shard.authorSession, rows, unmatchedCandidateUnits };
+  return { version: 1, commit: context.inventory.commit, shard: shard.shard, authorSession: shard.authorSession, rows, sensitivityControls, unmatchedCandidateUnits };
 }
 
 function shuffle(rows, seed) {
@@ -236,7 +260,9 @@ function jsonDigest(value) {
 }
 
 export function seedReviewPack(pack, { seed, reviewer, authorSession = pack.authorSession, nonce = randomBytes(32).toString('hex') }) {
-  if (!seed || !independentReviewer(reviewer, authorSession) || pack.rows.some((row) => !independentReviewer(reviewer, row.decision.authoredBy))) throw new Error('seed pack requires a seed and an independent reviewer');
+  const batchRows = [...pack.rows, ...(pack.sensitivityControls || [])];
+  if (!seed || !independentReviewer(reviewer, authorSession) || batchRows.some((row) => !independentReviewer(reviewer, row.decision.authoredBy))) throw new Error('seed pack requires a seed and an independent reviewer');
+  if (new Set(batchRows.map((row) => row.claimId)).size !== batchRows.length) throw new Error('sensitivity batch contains duplicate claim ids');
   if (!/^[0-9a-f]{64}$/.test(nonce)) throw new Error('seed replay nonce must be 32 secret bytes');
   const secretSeed = seed + ':' + nonce;
   const mutations = [
@@ -247,7 +273,7 @@ export function seedReviewPack(pack, { seed, reviewer, authorSession = pack.auth
     ['dropped-clause', (text) => text.replace(/;[^\n.]+/, '')],
     ['deleted-list-item', (text) => text.replace(/(?:^|\n)\s*[-*]\s+[^\n]+/, '')],
   ];
-  const available = shuffle(pack.rows.filter((row) => row.target && row.source.textDigest === row.target.textDigest && (row.source.sectionText || row.source.text) === (row.target.sectionText || row.target.text)).map((row) => ({ ...row, source: { ...row.source, text: row.source.sectionText || row.source.text }, target: { ...row.target, text: row.target.sectionText || row.target.text } })), secretSeed);
+  const available = shuffle(batchRows.filter((row) => row.target && row.source.textDigest === row.target.textDigest && (row.source.sectionText || row.source.text) === (row.target.sectionText || row.target.text)).map((row) => ({ ...row, source: { ...row.source, text: row.source.sectionText || row.source.text }, target: { ...row.target, text: row.target.sectionText || row.target.text } })), secretSeed);
   const selected = [];
   const keyRows = [];
   for (const [mutationKind, mutate] of mutations) {
@@ -341,6 +367,7 @@ export function applyReviewVerdicts(context, shard, { verdicts, reviewer, report
     }
     return updated;
   });
+  if (jsonDigest(pack.sensitivityControls || []) !== jsonDigest(buildReviewPack(context, shard).sensitivityControls)) throw new Error('review pack sensitivity controls do not match the committed batch proofs');
   if (context.repoRoot && claims.some((row, i) => row.reviewStatus === 'reviewed' && shard.claims[i].reviewStatus !== 'reviewed')) {
     const reportCommit = execFileSync('git', ['rev-parse', 'HEAD'], { cwd: context.repoRoot, encoding: 'utf8' }).trim();
     const reportOf = buildCommittedReviewReportLookup(context.repoRoot, reportCommit);

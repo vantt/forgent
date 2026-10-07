@@ -74,4 +74,10 @@ test('script-proven carries supply batch sensitivity controls without reopening 
   const exactIds = new Set(shard.exact.flatMap(entry => entry.rows.map(row => row.claimId)));
   assert.ok(key.rows.some(row => exactIds.has(row.claimId)), 'the seeded batch must include independently script-proven source units');
   assert.ok(shard.claims.every(row => row.reviewStatus !== 'reviewed'));
+  const broken = structuredClone(shard);
+  broken.exact[0].rows[0].sourceUnitDigest = 'f'.repeat(64);
+  fs.writeFileSync(path.join(f.root, 'broken.json'), JSON.stringify(broken));
+  const rejected = f.run('--pack', 'broken.json', '--inventory', 'inventory.json', '--out', 'broken.md');
+  assert.equal(rejected.status, 1);
+  assert.equal(fs.existsSync(path.join(f.root, 'broken.md')), false);
 });

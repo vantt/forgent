@@ -213,3 +213,11 @@ node scripts/propose-doc-decisions.mjs --apply-review <shard.json> --inventory <
 
 Verification: `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-review-format.test.mjs` exercises the real CLI in isolated committed fixtures: readable numeric difference, nested source code fences, public seeded Markdown, private-key/sidecar collision rejection before any output write, and 6/6 caught with 0 false flags. All 51 scripts test files: 852/852. Actual working-tree-source scratch pack: exit 0, 11 pending rows and a reverse section; observed Markdown and full-hash machine sidecar. No real reviewer or approval is claimed. JSON output of other modes and both source/target unit hash definitions remain unchanged.
 
+## Same-batch sensitivity controls
+
+Red b9f3f6c67: the actual fixture --propose -> --pack -> --seed-pack flow fails after valid exact carries are excluded from pending review rows (2 pass/1 fail). The sensitivity pack now draws from pending rows plus separately recorded same-batch controls: current exact/mirror carries re-proven by the unchanged gate overlay, and independently reviewed rows whose current target digest and ancestry remain unchanged. Controls do not reopen accepted decisions. Source/target text and full heading context must still be byte-equal; six distinct mutations and 24 controls, thresholds and private nonce remain unchanged.
+
+The proposal pack fails closed on a poisoned exact proof. Applying a verdict rebuilds the control set against committed batch inputs and rejects invented controls even when their sensitivity score passes. No source, target or script identity is accepted merely from an unverified control declaration.
+
+Verification: 854/854 across 51 scripts test files. Actual isolated modern CLI: 61 units; uncommitted approval rejected (exit 1), committed fixture report accepted (exit 0), subsequent pack accepted, unchanged decision invariants 0. A one-row rationale rework then uses 60 unchanged reviewed controls, seeds/scores successfully, commits a separate fixture-only report, reapplies only that row and preserves the other rows' original report pins; unchanged overlay again has 0 findings. These are synthetic mechanical proofs, not genuine batch approvals. Legacy-row compatibility and full independent tooling review remain UNPROVEN.
+

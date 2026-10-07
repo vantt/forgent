@@ -156,3 +156,16 @@ test('approved rows retain the seen unit binding and their own report across rev
   assert.equal(result.claims[0].reviewReport, 'fixture/review.md');
   assert.equal(result.claims[0].reviewPackCommit, context.inventory.commit);
 });
+
+test('sensitivity controls must belong to the bound batch even when the sensitivity score passes', () => {
+  const pack = buildReviewPack(context, shard);
+  const invented = structuredClone(pack.rows[0]);
+  invented.claimId = 'claim_' + 'f'.repeat(32);
+  invented.decision.claimId = invented.claimId;
+  pack.sensitivityControls = [invented];
+  const seeded = seedReviewPack(pack, { seed: 'fixture-only-controls', reviewer, nonce: '1'.repeat(64) });
+  const seedProof = { key: seeded.key, verdicts: seeded.key.rows.map((row) => ({ claimId: row.claimId, verdict: row.mutated ? 'rework' : 'ok', note: 'Compared complete fixture text.' })) };
+  assert.equal(scoreReviewPack(seedProof.key, seedProof.verdicts).pass, true);
+  const verdicts = shard.claims.map((row) => ({ claimId: row.claimId, verdict: 'ok', note: 'Entire shown contract retained.' }));
+  assert.throws(() => applyReviewVerdicts(context, shard, { pack, seedProof, verdicts, reviewer, reportPath: 'fixture/review.md' }), /controls.*batch/);
+});
