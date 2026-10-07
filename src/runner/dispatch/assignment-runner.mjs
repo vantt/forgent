@@ -1244,6 +1244,20 @@ function fallbackSkipIndex(unitRecord, asgn) {
  * @param {object} [opts.options]
  * @returns {Promise<Readonly<object>>} Stored RunResult object
  */
+
+/**
+ * Give back the provider account lease a Run selected. A failure is reported and never thrown: the
+ * caller is already settling or refusing, its own outcome must not be replaced, and a lease left
+ * behind is reclaimed once its Run is dead. It is still said aloud instead of swallowed.
+ */
+function releaseSelectedProviderLease(selection, runId, runtimeDir) {
+  try {
+    releaseProviderAccountLease({ provider: selection.provider, accountId: selection.accountId, runId, runtimeDir });
+  } catch (err) {
+    process.stderr.write(`fgos: could not release the provider lease of ${selection.provider}/${selection.accountId} for ${runId}: ${err?.message ?? err}\n`);
+  }
+}
+
 export async function executeAssignment(assignment, opts = {}) {
   validateAssignmentLegality(assignment, opts);
 
@@ -1681,14 +1695,7 @@ export async function executeAssignment(assignment, opts = {}) {
       const requiresConfinement = confinementMode === 'required';
       const canProvisionCredential = !requiresConfinement || resolvedAdapter === 'cli-spawn' || resolvedAdapter === 'herdr-spawn';
       if (requiresConfinement && !canProvisionCredential) {
-        try {
-          releaseProviderAccountLease({
-            provider: providerCapacitySelection.provider,
-            accountId: providerCapacitySelection.accountId,
-            runId,
-            runtimeDir: opts.providerCapacityRuntimeDir,
-          });
-        } catch {}
+        releaseSelectedProviderLease(providerCapacitySelection, runId, opts.providerCapacityRuntimeDir);
         providerCapacitySelection = {
           status: 'refused',
           provider: providerCapacityProvider,
@@ -1767,14 +1774,7 @@ export async function executeAssignment(assignment, opts = {}) {
           // through to the terminal settlement below, as if the fallback
           // had never been attempted.
           if (fallbackOutcome.lease?.status === 'selected') {
-            try {
-              releaseProviderAccountLease({
-                provider: fallbackOutcome.lease.provider,
-                accountId: fallbackOutcome.lease.accountId,
-                runId,
-                runtimeDir: opts.providerCapacityRuntimeDir,
-              });
-            } catch {}
+            releaseSelectedProviderLease(fallbackOutcome.lease, runId, opts.providerCapacityRuntimeDir);
           }
           fallbackOutcome.evidence = { ...fallbackOutcome.evidence, resolved: null, commitError: err.message };
         }
@@ -2066,14 +2066,7 @@ export async function executeAssignment(assignment, opts = {}) {
   const control = acquireRunControl(runDir, { holder: controlHolder, purpose: 'worker-spawn', ttlMs: opts.controlTtlMs });
   if (control.status !== 'acquired') {
     if (providerCapacitySelection?.status === 'selected') {
-      try {
-        releaseProviderAccountLease({
-          provider: providerCapacitySelection.provider,
-          accountId: providerCapacitySelection.accountId,
-          runId,
-          runtimeDir: opts.providerCapacityRuntimeDir,
-        });
-      } catch {}
+      releaseSelectedProviderLease(providerCapacitySelection, runId, opts.providerCapacityRuntimeDir);
     }
     throw new RunnerConfigError(
       `executeAssignment: could not acquire control for Run "${runId}" (status: "${control.status}") -- another controller currently holds it`,
@@ -2710,14 +2703,7 @@ export async function executeAssignment(assignment, opts = {}) {
       } catch {}
     }
     if (providerCapacitySelection?.status === 'selected') {
-      try {
-        releaseProviderAccountLease({
-          provider: providerCapacitySelection.provider,
-          accountId: providerCapacitySelection.accountId,
-          runId,
-          runtimeDir: opts.providerCapacityRuntimeDir,
-        });
-      } catch {}
+      releaseSelectedProviderLease(providerCapacitySelection, runId, opts.providerCapacityRuntimeDir);
     }
     releaseRunControl(runDir, { controlEpoch, controlToken });
   }
