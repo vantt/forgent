@@ -759,6 +759,91 @@ export function clearProviderAccountQuarantine({ runnerConfig, provider, account
   });
 }
 
+// An account quarantined for a dead credential (`auth-token`, manual clear) has no end time: the owner
+// logs in again and fgOS cannot see that. Rather than wait for a person to run the clear command, a
+// dispatch that would otherwise be refused for lack of any usable account tries each such account with
+// one real call. The call runs outside the state lock (it takes seconds), and an attempt is recorded
+// first so that a second dispatch, or a crash, does not repeat it before the cooldown is over.
+export const DEFAULT_QUARANTINE_PROBE_COOLDOWN_MS = 30 * 60 * 1000;
+
+/**
+ * Try to unlock the `auth-token` quarantined accounts of `provider`, but only when no account of the
+ * provider is usable. At most one real call per account per cooldown; stops after the first account
+ * that answers. Never throws for a failed probe: that is recorded and the account stays quarantined.
+ *
+ * @param {object} options
+ * @param {(request: {provider: string, accountId: string, account: object}) => Promise<{ok: boolean, detail?: string}>} options.probe
+ *   one real, cheap call made with that account's credential
+ * @returns {Promise<Array<{accountId: string, unlocked: boolean, detail: string|null}>>} what was tried
+ */
+export async function probeQuarantinedAccounts({
+  runnerConfig, provider, runtimeDir, probe, now = Date.now(), cooldownMs = DEFAULT_QUARANTINE_PROBE_COOLDOWN_MS,
+} = {}) {
+  if (typeof probe !== 'function' || !provider) return [];
+  const accounts = providerAccountInventory(runnerConfig)[provider]?.accounts;
+  if (!accounts) return [];
+  const { statePath, lockDir } = providerCapacityStatePaths(runtimeDir);
+  const attemptedAt = new Date(now).toISOString();
+
+  const claimed = withFileLock(lockDir, () => {
+    const state = readState(statePath);
+    const providerState = state.providers?.[provider];
+    const isUsable = (accountId) => !isQuarantined(providerState?.accounts?.[accountId] ?? {}, now);
+    if (Object.keys(accounts).some(isUsable)) return [];
+    const picked = [];
+    for (const accountId of Object.keys(accounts)) {
+      const quarantine = providerState?.accounts?.[accountId]?.quarantine;
+      if (quarantine?.kind !== 'manual-clear' || quarantine.reasonCode !== 'auth-token') continue;
+      const last = Date.parse(quarantine.probe?.attemptedAt ?? '');
+      if (Number.isFinite(last) && now - last < cooldownMs) continue;
+      quarantine.probe = { attemptedAt, status: 'running' };
+      picked.push({ accountId, quarantinedAt: quarantine.quarantinedAt });
+    }
+    if (picked.length > 0) writeState(statePath, state);
+    return picked;
+  });
+
+  const tried = [];
+  for (const { accountId, quarantinedAt } of claimed) {
+    let result;
+    try {
+      result = await probe({ provider, accountId, account: accounts[accountId] });
+    } catch (err) {
+      result = { ok: false, detail: err?.message ?? String(err) };
+    }
+    const ok = result?.ok === true;
+    const detail = result?.detail ? String(result.detail).slice(0, 300) : null;
+    withFileLock(lockDir, () => {
+      const state = readState(statePath);
+      const target = state.providers?.[provider]?.accounts?.[accountId];
+      // A person may have cleared or replaced the quarantine while the call ran: leave that alone.
+      if (!target?.quarantine || target.quarantine.quarantinedAt !== quarantinedAt) return;
+      if (ok) {
+        const previous = target.quarantine;
+        target.quarantine = null;
+        state.audit.push({
+          contract: PROVIDER_CAPACITY_AUDIT_CONTRACT,
+          action: 'clear-quarantine',
+          status: 'cleared',
+          clearedAt: new Date().toISOString(),
+          provider,
+          accountId,
+          previousQuarantine: previous,
+          reason: 'one real call succeeded',
+          caller: 'fgos provider-capacity probe',
+          actor: 'fgos provider-capacity probe',
+        });
+      } else {
+        target.quarantine.probe = { attemptedAt, status: 'failed', ...(detail ? { detail } : {}) };
+      }
+      writeState(statePath, state);
+    });
+    tried.push({ accountId, unlocked: ok, detail });
+    if (ok) break;
+  }
+  return tried;
+}
+
 export function inspectProviderCapacity({ runnerConfig, provider, accountId, runtimeDir } = {}) {
   const inventory = providerAccountInventory(runnerConfig);
   const { statePath } = providerCapacityStatePaths(runtimeDir);

@@ -118,6 +118,7 @@ import {
   acquireProviderAccountLease,
   classifyProviderCapacityFault,
   hasProviderAccounts,
+  probeQuarantinedAccounts,
   quarantineProviderAccount,
   redactProviderCapacitySelection,
   releaseProviderAccountLease,
@@ -1654,6 +1655,18 @@ export async function executeAssignment(assignment, opts = {}) {
     // "running"/unsettled with no orphan marker. Route it through the
     // exact same status:'refused' settle path below instead of inventing
     // a second one.
+    // When no account of the provider is usable only because a login died, one real call may show the
+    // owner has logged in again. A probe problem never blocks the dispatch: the selection decides.
+    if (typeof opts.providerCredentialProbe === 'function') {
+      try {
+        await probeQuarantinedAccounts({
+          runnerConfig: cfg,
+          provider: providerCapacityProvider,
+          runtimeDir: opts.providerCapacityRuntimeDir,
+          probe: opts.providerCredentialProbe,
+        });
+      } catch { /* the selection below reports what is unusable */ }
+    }
     try {
       providerCapacitySelection = acquireProviderAccountLease({
         runnerConfig: cfg,

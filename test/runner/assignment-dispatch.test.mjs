@@ -3851,3 +3851,53 @@ test('N6 / M18 lock: settleReceiptRunFromOutcome propagates finalizeConfinementR
     fs.chmodSync(finDir, 0o755);
   }
 });
+
+test('a dispatch whose only account is locked for a dead login tries one real call and runs once the call succeeds', async () => {
+  const tempDir = mkTempDir();
+  const { runnerConfig, runtimeDir } = buildFallbackFixture(tempDir, { primaryQuarantined: true, fallbackQuarantined: false });
+  const work = { id: 'tsk-probe-unlocks', status: 'todo', workflowStep: 'planning', domain: 'coding' };
+  const assignment = buildAssignment({ work, stage: 'planning', operation: 'shape-plan' });
+  const calls = [];
+
+  const result = await executeAssignment(assignment, {
+    cwd: tempDir,
+    repoRoot: tempDir,
+    runnerConfig,
+    providerCapacityRuntimeDir: runtimeDir,
+    providerCredentialProbe: async ({ accountId }) => { calls.push(accountId); return { ok: true }; },
+  });
+
+  assert.deepEqual(calls, ['claude-acct']);
+  assert.notEqual(result.classification?.failure?.code, 'provider-capacity-refused');
+  const state = JSON.parse(fs.readFileSync(providerCapacityStatePaths(runtimeDir).statePath, 'utf8'));
+  assert.equal(state.providers.claude.accounts['claude-acct'].quarantine, null);
+  assert.equal(state.audit.at(-1).actor, 'fgos provider-capacity probe');
+});
+
+test('a dispatch whose locked account still fails the call is refused as before, and the next dispatch within the cooldown makes no new call', async () => {
+  const tempDir = mkTempDir();
+  const { runnerConfig, runtimeDir } = buildFallbackFixture(tempDir, { primaryQuarantined: true, fallbackQuarantined: false });
+  const calls = [];
+  const probe = async ({ accountId }) => { calls.push(accountId); return { ok: false, detail: 'the login is still rejected' }; };
+  const dispatch = (id) => executeAssignment(
+    buildAssignment({ work: { id, status: 'todo', workflowStep: 'planning', domain: 'coding' }, stage: 'planning', operation: 'shape-plan' }),
+    { cwd: tempDir, repoRoot: tempDir, runnerConfig, providerCapacityRuntimeDir: runtimeDir, providerCredentialProbe: probe },
+  );
+
+  const first = await dispatch('tsk-probe-fails-1');
+  const second = await dispatch('tsk-probe-fails-2');
+
+  assert.equal(first.classification.failure.code, 'provider-capacity-refused');
+  assert.equal(second.classification.failure.code, 'provider-capacity-refused');
+  assert.deepEqual(calls, ['claude-acct'], 'one call in the cooldown, however many dispatches ask');
+});
+
+test('without a probe function a locked account is refused and nothing is called', async () => {
+  const tempDir = mkTempDir();
+  const { runnerConfig, runtimeDir } = buildFallbackFixture(tempDir, { primaryQuarantined: true, fallbackQuarantined: false });
+  const assignment = buildAssignment({ work: { id: 'tsk-no-probe', status: 'todo', workflowStep: 'planning', domain: 'coding' }, stage: 'planning', operation: 'shape-plan' });
+
+  const result = await executeAssignment(assignment, { cwd: tempDir, repoRoot: tempDir, runnerConfig, providerCapacityRuntimeDir: runtimeDir });
+
+  assert.equal(result.classification.failure.code, 'provider-capacity-refused');
+});
