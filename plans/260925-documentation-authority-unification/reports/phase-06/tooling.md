@@ -70,3 +70,15 @@ Remaining tooling, maps and independent full tooling review are UNPROVEN.
 Verification: red commit `de2c92e81` fails on the missing review exports. Targeted review/exact tests: 9 pass, 0 fail. Actual `--pack` on the throwaway exact proposal: 11 pending/blocking rows, full unit text, 1 unnamed reverse unit, exit 0. Complete suite: 800 pass, 0 fail, 45 files, default concurrency; scratch log `/tmp/phase06/review-full-suite.log`. Seed/key and review-application behavior are tested only on deterministic fixtures, not authored batch rows. No real seeded pack or actual approval was produced by this author session.
 
 Both A1 D invocations after exact support (`db5ef01d4`) pass, 0 fatal findings, JSON exactly equal baseline. Full tooling review and remaining tools/maps remain UNPROVEN.
+
+## Coverage, rebinding and dry-run snapshots
+
+`--coverage --inventory <manifest> --maps <file-or-directory> [--decisions <path> ...]` counts inventory source files named in the first source cell of frozen map tables or mirror entries. Exact source paths with heading ranges and directory/** prefixes are accepted; target mentions do not cover a source. `--summary --coverage` combines reports. Empty/missing map inputs are errors; unmatched files stay explicit.
+
+`--rebind <shard> --inventory <manifest>` preserves a reviewed row only for one match of its stored target digest in the same owner, deriving the current anchor and full digest. Zero/multiple matches return it to pending and remove approval identity/date; no reviewed row is invented.
+
+`--snapshot --inventory <manifest> --identity-registry <registry> --decisions <path> ... --out <json>` applies normal decision proof, projects merged rows from sources outside docs/platform/ into the frozen claim-ledger schema, sorts by claim id and records sha256 of the rows. `--verify <snapshot>` with the same inputs recomputes both rows and sha256. The registry bytes must match the inventory metadata; registry-gap decisions use the existing registry overlay. This is a dry run, not the future sealed format. No frozen ledger schema or registry loader was changed.
+
+Verification: red commit `7e94480f0` fails on missing helper exports. Targeted helper/review/exact tests: 12 pass, 0 fail. Coverage CLI fixture: 4,318 sources / 937 covered / 3,381 explicitly uncovered, exit 0. Rebind CLI on a throwaway pilot-shard copy: 52 reviewed rows preserved, 0 rebound, 0 pending, exit 0. Initial snapshot smoke caught missing registry input for seven gap decisions; the in-scope fix requires the pinned registry, not a loader amendment. Corrected snapshot and verify both exit 0: 68,372 rows, sha256 `4173ca0041d62dfa762fafc3763be8189ac60594436fe9be3813e84773ef0f47`. Full suite: 803 pass, 0 fail, 46 files, default concurrency; `/tmp/phase06/conservation-helper-suite.log`. No fixture map, smoke shard or snapshot is committed.
+
+Both A1 D invocations after review-pack support (`b828e4896`) pass and exactly equal baseline. Independent full tooling review and remaining tools/maps are UNPROVEN.

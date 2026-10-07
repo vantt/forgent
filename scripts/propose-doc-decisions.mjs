@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { loadShardedJsonArtifact } from './doc-inventory-artifact.mjs';
-import { buildConservationUnitLookup, classifyExactCarry, isEvidenceMirrorPath } from './check-doc-inventory-gates.mjs';
+import { applyDecisions, buildConservationUnitLookup, classifyExactCarry, isEvidenceMirrorPath, loadDecisionShards } from './check-doc-inventory-gates.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
 
 const RECONCILIATION = ['docs/distribution-vision.md', 'docs/id-systems-audit.md', 'docs/work-item-lifecycle-vision.md', 'docs/backlog.md', 'docs/platform/proposals/documentation-system-unification.md'];
@@ -17,6 +17,10 @@ Modes:
   --seed-pack <pack>         Reviewer-only 30-row sensitivity pack; --key required.
   --score-pack <key>         Score the reviewer's markdown --verdicts.
   --apply-review <shard>     Apply independent markdown verdicts to the shard.
+  --coverage                 Source-file coverage by frozen maps and mirror entries.
+  --rebind <shard>           Re-find reviewed units by digest; ambiguity is pending.
+  --snapshot                 Dry-run merged legacy ledger rows plus sha256.
+  --verify <snapshot>        Recompute rows and sha256 against the same inputs.
   --help                     Print this contract.
 
 Inputs:
@@ -31,6 +35,9 @@ Inputs:
   --verdicts <report.md>     Reviewer header and claimId/verdict/note table.
   --seed <text>             Required reproducible seed for --seed-pack.
   --key <path>              Separate seeded key, withheld until verdict commit.
+  --maps <file-or-directory> Frozen area-map markdown for --coverage.
+  --decisions <path>         Repeatable decision input for coverage/snapshot/verify.
+  --identity-registry <path> Required pinned registry for snapshot/verify gap rows.
 
 Proof: Unit-exact requires one target digest match, equal ancestor heading titles,
 at least 40 source characters and at least half the source document's units exact.
@@ -42,6 +49,11 @@ committed. Verdicts are ok, rework or hold with an own note for every pending ro
 Seed packs contain 24 byte-equal controls and six real mutations, shuffled; score
 passes at >=5/6 mutations caught and <=2/24 false flags. The author must not run
 --seed-pack on a real batch. Key and pack output paths must differ.
+Coverage accepts explicit source cells path[#range] and directory/** in the
+first column of frozen map tables; target mentions never count as source coverage.
+--summary --coverage combines both reports. Snapshot rows exclude docs/platform/
+sources and project only the frozen claim-ledger schema fields. Snapshot is a
+dry run, not a sealed format. Verify fails if content or sha256 differs.
 `;
 
 export function analyzeCounterpart({ inventory, unitsOf }, source, target) {
@@ -264,21 +276,87 @@ export function applyReviewVerdicts(context, shard, { verdicts, reviewer, report
   return { ...shard, reviewReport: reportPath, claims };
 }
 
+export function coverageOfSources(inventory, maps, shards) {
+  const named = new Set();
+  const prefixes = [];
+  for (const text of maps) for (const line of text.split(/\r?\n/)) {
+    if (!line.trimStart().startsWith('|')) continue;
+    const sourceCell = line.split('|')[1]?.trim() || '';
+    for (const token of sourceCell.matchAll(/`([^`]+)`/g)) {
+      const source = token[1].split('#')[0];
+      if (source.endsWith('/**')) prefixes.push(source.slice(0, -2));
+      else named.add(source);
+    }
+  }
+  for (const shard of shards) for (const mirror of shard.mirrors || []) named.add(mirror.path);
+  const files = inventory.items.map((item) => item.path).sort();
+  const uncovered = files.filter((p) => !named.has(p) && !prefixes.some((prefix) => p.startsWith(prefix)));
+  return { sourceFiles: files.length, covered: files.length - uncovered.length, uncovered };
+}
+
+export function rebindReviewedDecisions(context, shard) {
+  const rebound = [];
+  const pending = [];
+  const claims = (shard.claims || []).map((row) => {
+    const updated = { ...row };
+    if (row.reviewStatus !== 'reviewed' || !row.targetOwner) return updated;
+    const matches = /^[0-9a-f]{16,64}$/.test(row.targetUnitDigest || '') ? (context.unitsOf(row.targetOwner) || []).filter((unit) => unit.textDigest.startsWith(row.targetUnitDigest)) : [];
+    if (matches.length === 1) {
+      if (row.targetAnchor !== matches[0].anchor) rebound.push(row.claimId);
+      updated.targetAnchor = matches[0].anchor;
+      updated.targetUnitDigest = matches[0].textDigest;
+    } else {
+      updated.reviewStatus = 'pending';
+      updated.reviewNote = matches.length ? 'Stored digest matches multiple target units; independent re-review required.' : 'Stored digest has no target match; independent re-review required.';
+      delete updated.reviewedBy; delete updated.reviewedAt;
+      pending.push(row.claimId);
+    }
+    return updated;
+  });
+  return { shard: { ...shard, claims }, rebound, pending };
+}
+
+export function createClaimSnapshot(context, shards, { vocabulary, schema }) {
+  const merged = applyDecisions(context.inventory, shards, {
+    vocabulary, registry: context.registry, unitsOf: context.unitsOf,
+    targetAnchorsOf: (owner) => { const units = context.unitsOf(owner); return units ? new Set(units.map((unit) => unit.anchor)) : null; },
+    targetUnitDigestOf: (owner, anchor) => (context.unitsOf(owner) || []).find((unit) => unit.anchor === anchor)?.textDigest ?? null,
+  });
+  if (merged.findings.length) throw new Error(`decision proof failed: ${merged.findings.map((finding) => finding.type).join(', ')}`);
+  const rows = merged.inventory.claimLedger.filter((row) => !row.sourcePath.startsWith('docs/platform/')).map((row) => {
+    for (const field of schema.required) if (row[field] === undefined) throw new Error(`required ledger field ${field} missing in ${row.claimId}`);
+    return Object.fromEntries(Object.keys(schema.properties).filter((key) => row[key] !== undefined).map((key) => [key, row[key]]));
+  }).sort((a, b) => a.claimId.localeCompare(b.claimId));
+  return { version: 1, commit: context.inventory.commit, rows, sha256: createHash('sha256').update(JSON.stringify(rows)).digest('hex') };
+}
+
+export function verifyClaimSnapshot(context, shards, snapshot, options) {
+  const expected = createClaimSnapshot(context, shards, options);
+  const sha256 = createHash('sha256').update(JSON.stringify(snapshot.rows)).digest('hex');
+  const ok = snapshot.version === 1 && sha256 === snapshot.sha256 && expected.sha256 === snapshot.sha256 && JSON.stringify(expected.rows) === JSON.stringify(snapshot.rows);
+  return { ok, rows: expected.rows.length, sha256: expected.sha256 };
+}
+
 export function runCli(argv, cwd = process.cwd()) {
   if (argv.includes('--help')) { console.log(HELP); return 0; }
-  const booleanModes = ['--summary', '--propose'];
-  const valuedModes = ['--pack', '--seed-pack', '--score-pack', '--apply-review'];
+  const booleanModes = ['--summary', '--propose', '--coverage', '--snapshot'];
+  const valuedModes = ['--pack', '--seed-pack', '--score-pack', '--apply-review', '--rebind', '--verify'];
   const modes = [...booleanModes, ...valuedModes].filter((mode) => argv.includes(mode));
   const values = new Map();
-  const options = new Set(['--inventory', '--repo-root', '--source', '--target', '--shard', '--author', '--out', '--reviewer', '--verdicts', '--seed', '--key', ...valuedModes]);
+  const options = new Set(['--inventory', '--repo-root', '--source', '--target', '--shard', '--author', '--out', '--reviewer', '--verdicts', '--seed', '--key', '--maps', '--decisions', '--identity-registry', ...valuedModes]);
   try {
-    if (modes.length !== 1) throw new Error('choose exactly one mode listed in --help');
+    if (modes.length !== 1 && !(modes.length === 2 && modes.includes('--summary') && modes.includes('--coverage'))) throw new Error('choose exactly one mode listed in --help, or --summary --coverage');
     for (let i = 0; i < argv.length; i++) {
       if (booleanModes.includes(argv[i])) continue;
       if (!options.has(argv[i])) throw new Error(`unknown option ${argv[i]}`);
       if (!argv[i + 1] || argv[i + 1].startsWith('--')) throw new Error(`${argv[i]} requires a value`);
-      if (values.has(argv[i])) throw new Error(`${argv[i]} is not repeatable`);
-      values.set(argv[i], argv[++i]);
+      const option = argv[i];
+      const value = argv[++i];
+      if (option === '--decisions') values.set(option, [...(values.get(option) || []), value]);
+      else {
+        if (values.has(option)) throw new Error(`${option} is not repeatable`);
+        values.set(option, value);
+      }
     }
     const resolve = (option) => {
       if (!values.has(option)) throw new Error(`${option} is required`);
@@ -296,9 +374,30 @@ export function runCli(argv, cwd = process.cwd()) {
       result = seeded.pack;
     } else {
       const context = loadProposalContext(resolve('--inventory'), path.resolve(cwd, values.get('--repo-root') || '.'));
-      if (modes[0] === '--summary') result = summarizeInventory(context);
+      const shards = (values.get('--decisions') || []).flatMap((input) => loadDecisionShards(path.resolve(cwd, input)));
+      if (modes.includes('--coverage')) {
+        const mapPath = resolve('--maps');
+        const mapFiles = fs.statSync(mapPath).isDirectory() ? fs.readdirSync(mapPath).filter((name) => /^area-map-.*\.md$/.test(name)).sort().map((name) => path.join(mapPath, name)) : [mapPath];
+        if (!mapFiles.length) throw new Error('--maps directory contains no area maps');
+        const coverage = coverageOfSources(context.inventory, mapFiles.map((file) => fs.readFileSync(file, 'utf8')), shards);
+        result = modes.includes('--summary') ? { ...summarizeInventory(context), coverage } : coverage;
+      } else if (modes[0] === '--summary') result = summarizeInventory(context);
       else if (modes[0] === '--propose') result = proposeExactDecisions(context, { source: values.get('--source'), target: values.get('--target'), shard: values.get('--shard'), author: values.get('--author') });
       else if (modes[0] === '--pack') result = buildReviewPack(context, jsonInput('--pack'));
+      else if (modes[0] === '--rebind') {
+        result = rebindReviewedDecisions(context, jsonInput('--rebind'));
+        fs.writeFileSync(resolve('--rebind'), JSON.stringify(result.shard, null, 2) + '\n');
+      } else if (modes[0] === '--snapshot' || modes[0] === '--verify') {
+        const root = context.repoRoot;
+        const registryBytes = fs.readFileSync(resolve('--identity-registry'));
+        if (createHash('sha256').update(registryBytes).digest('hex') !== context.inventory.identityRegistry?.sha256) throw new Error('registry bytes differ from the pinned inventory');
+        context.registry = JSON.parse(registryBytes);
+        const options = {
+          vocabulary: JSON.parse(fs.readFileSync(path.join(root, 'plans/260925-documentation-authority-unification/claim-and-disposition-vocabulary.json'), 'utf8')),
+          schema: JSON.parse(fs.readFileSync(path.join(root, 'plans/260925-documentation-authority-unification/claim-ledger.schema.json'), 'utf8')),
+        };
+        result = modes[0] === '--snapshot' ? createClaimSnapshot(context, shards, options) : verifyClaimSnapshot(context, shards, jsonInput('--verify'), options);
+      }
       else {
         const repoRoot = path.resolve(cwd, values.get('--repo-root') || '.');
         const reportPath = path.relative(repoRoot, resolve('--verdicts')).split(path.sep).join('/');
@@ -310,7 +409,7 @@ export function runCli(argv, cwd = process.cwd()) {
     const json = JSON.stringify(result, null, 2) + '\n';
     if (values.has('--out')) fs.writeFileSync(path.resolve(cwd, values.get('--out')), json);
     else console.log(json.trimEnd());
-    return modes[0] === '--score-pack' && !result.pass ? 1 : 0;
+    return (modes[0] === '--score-pack' && !result.pass) || (modes[0] === '--verify' && !result.ok) ? 1 : 0;
   } catch (err) { console.error(`propose-doc-decisions: ${err.message}`); return 1; }
 }
 
