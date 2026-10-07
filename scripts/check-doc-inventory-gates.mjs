@@ -943,7 +943,17 @@ export function runCli(argv, cwd = process.cwd()) {
   const asJson = argv.includes('--json');
   const strict = argv.includes('--strict') || argv.includes('--cutover');
   const previousIdx = argv.indexOf('--previous-registry');
-  const decisionsIdx = argv.indexOf('--decisions');
+  const decisionPaths = [];
+  for (let idx = 0; idx < argv.length; idx++) {
+    if (argv[idx] !== '--decisions') continue;
+    const value = argv[idx + 1];
+    if (!value || value.startsWith('--')) {
+      console.error('check-doc-inventory-gates error loading input: --decisions requires a file or directory path');
+      return 1;
+    }
+    decisionPaths.push(path.resolve(cwd, value));
+    idx++;
+  }
   const scope = argv.flatMap((arg, idx) => (arg === '--scope' && argv[idx + 1] ? [argv[idx + 1]] : []));
 
   let inventory;
@@ -969,7 +979,7 @@ export function runCli(argv, cwd = process.cwd()) {
       console.error(`check-doc-inventory-gates: ${gone} not found; row-set conservation against it skipped`);
       missingInputs.push(gone);
     }
-    if (decisionsIdx >= 0) decisions = loadDecisionShards(path.resolve(cwd, argv[decisionsIdx + 1]));
+    if (decisionPaths.length > 0) decisions = decisionPaths.flatMap((target) => loadDecisionShards(target));
     ratchetResult = loadRatchetResult(repoRoot, argv);
     if (ratchetResult === null) missingInputs.push('the legacy-docs ratchet (baseline missing or --no-ratchet)');
     if (droppedClaimsNotice) console.error(`check-doc-inventory-gates: ${droppedClaimsNotice}`);
