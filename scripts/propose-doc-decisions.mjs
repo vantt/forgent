@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createHash, randomBytes } from 'node:crypto';
 import { loadShardedJsonArtifact } from './doc-inventory-artifact.mjs';
-import { applyDecisions, buildConservationUnitLookup, classifyExactCarry, isEvidenceMirrorPath, loadDecisionShards } from './check-doc-inventory-gates.mjs';
+import { applyDecisions, buildConservationUnitLookup, classifyExactCarry, isEvidenceMirrorPath, isLegacySourceItem, loadDecisionShards } from './check-doc-inventory-gates.mjs';
 import { isMainModule } from './lib/is-main-module.mjs';
 
 const RECONCILIATION = ['docs/distribution-vision.md', 'docs/id-systems-audit.md', 'docs/work-item-lifecycle-vision.md', 'docs/backlog.md', 'docs/platform/proposals/documentation-system-unification.md'];
@@ -82,7 +82,7 @@ export function analyzeCounterpart({ inventory, unitsOf }, source, target) {
 
 export function proposeExactDecisions(context, { source, target, shard, author }) {
   if (!source || !target || !shard || !author || author.startsWith('script:')) throw new Error('--propose requires --source, --target, --shard and a non-script --author');
-  if (!context.inventory.items.some((item) => item.path === source) || !context.inventory.items.some((item) => item.path === target && item.path.startsWith('docs/platform/'))) throw new Error('source or platform counterpart is not in the pinned inventory');
+  if (source === target || !context.inventory.items.some((item) => item.path === source && isLegacySourceItem(item)) || !context.inventory.items.some((item) => item.path === target && item.path.startsWith('docs/platform/'))) throw new Error('proposal requires a legacy source and a distinct platform counterpart in the pinned inventory');
   const analysis = analyzeCounterpart(context, source, target);
   const rows = new Map(context.inventory.claimLedger.filter((row) => row.sourcePath === source).map((row) => [row.claimId, row]));
   const exact = [];
@@ -109,7 +109,7 @@ export function proposeExactDecisions(context, { source, target, shard, author }
 
 export function summarizeInventory(context) {
   const { inventory } = context;
-  const sourceItems = inventory.items.filter((item) => item.corpus === 'platform-authority' && ['legacy-current', 'unclassified'].includes(item.authorityStatus) && !item.path.startsWith('docs/platform/'));
+  const sourceItems = inventory.items.filter(isLegacySourceItem);
   const byArea = new Map();
   const totals = Object.fromEntries(CLASSES.map((name) => [name, 0]));
   const items = new Map(inventory.items.map((item) => [item.path, item]));

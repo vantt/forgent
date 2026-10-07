@@ -281,6 +281,10 @@ export function buildConservationUnitLookup(repoRoot, commitSha) {
   };
 }
 
+export function isLegacySourceItem(item) {
+  return item?.corpus === 'platform-authority' && ['legacy-current', 'unclassified'].includes(item.authorityStatus) && typeof item.path === 'string' && !item.path.startsWith('docs/platform/');
+}
+
 /** Only the explicitly authorized class earns script review; every weaker match needs a reviewer. */
 export function classifyExactCarry(sourceUnits, targetUnits, row) {
   const source = (sourceUnits || []).find((unit) => unit.anchor === row.sourceAnchor && unit.textDigest === row.sourceUnitDigest);
@@ -290,6 +294,7 @@ export function classifyExactCarry(sourceUnits, targetUnits, row) {
   const exactCount = sourceUnits.filter((unit) => targetUnits.some((other) => other.textDigest === unit.textDigest)).length;
   const reasons = [];
   if (matches.length !== 1) reasons.push('target digest repeats');
+  if (sourceUnits.filter((unit) => unit.textDigest === row.sourceUnitDigest).length > matches.length) reasons.push('source occurrences exceed target occurrences');
   if (JSON.stringify(source.ancestry) !== JSON.stringify(targetUnit.ancestry)) reasons.push('ancestor headings differ');
   if (source.text.trim().length < 40) reasons.push('source unit shorter than 40 characters');
   if (exactCount * 2 < sourceUnits.length) reasons.push('document exact share below one half');
@@ -637,7 +642,8 @@ export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf 
     for (const entry of shard.exact || []) {
       const sourceUnits = typeof unitsOf === 'function' ? unitsOf(entry?.source) : null;
       const targetUnits = typeof unitsOf === 'function' ? unitsOf(entry?.target) : null;
-      if (!sources.has(entry?.source) || !itemPaths.has(entry?.source) || !itemPaths.has(entry?.target) ||
+      if (entry?.source === entry?.target || !isLegacySourceItem(itemIndex.get(entry?.source)) ||
+          !sources.has(entry?.source) || !itemPaths.has(entry?.source) || !itemPaths.has(entry?.target) ||
           !String(entry?.target || '').startsWith('docs/platform/') || !Array.isArray(entry?.rows) || !entry.rows.length ||
           !sourceUnits || !targetUnits) {
         fail('decision-exact-invalid', `shard ${shard.shard}: exact entry ${entry?.source} -> ${entry?.target} has no verifiable source, target or rows`);

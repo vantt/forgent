@@ -118,3 +118,9 @@ The committed-unit helper adds sectionText for review display only. Unit text, i
 Verification: targeted review/exact/conservation helper suite 20/20. Full default-concurrency suite 811/811; /tmp/phase06/review-binding-suite.log. Actual full-text pack smoke exits 0, 11 rows, 10 displayed source heading sections. `env -u CLAUDE_CODE_SESSION_ID node /tmp/phase06/review-binding-smoke.mjs`: exit 0; synthetic-only sensitivity caught 6/6, 0 false flags, no public seed/nonce, hold and rework blocking, 34 fixture approvals and 0 decision-gate findings. No actual approval or real seeded pack was produced.
 
 Exact-source/multiplicity and ancestry/range fixes, committed-report integration, remaining tools/maps and full independent tooling review remain UNPROVEN.
+
+## Early review: legacy-only exact proof and occurrence conservation
+
+Red `e3fa0f11f`: 5 pass, 2 fail. Gate and proposal now require a distinct legacy platform-authority source outside docs/platform/; canonical self-carries, candidate sources and consumer-project sources cannot earn script review. Shared isLegacySourceItem preserves the original summary's source definition. Repeated source digests with more occurrences than the target are Weak-exact and require manual review; a forced exact entry is rejected for each affected claim. Existing target uniqueness, ancestor titles, 40-character threshold and half-document exact-share thresholds remain unchanged.
+
+Targeted exact/mirror/conservation tests: 46/46. Full suite: 813/813. Actual --summary remains 1,040 files / 22,426 rows, Mirror 12,882, Unit-exact 2,787, Weak-exact 971, Judgment 5,786. A regenerated throwaway --propose output passes the actual gate with pilot plus scratch decisions: exit 0, zero fatal findings. No proposal shard or inventory part is committed.
