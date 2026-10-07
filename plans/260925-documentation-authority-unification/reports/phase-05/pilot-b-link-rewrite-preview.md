@@ -4,8 +4,9 @@ Preview of what each inbound reference to `docs/specs/work-state.md` and `docs/i
 
 ## 1. Method
 
-- **Edge set.** Every entry of `consumerEdges` in the inventory (commit `dc088c518`) whose `targetPath` is `docs/specs/work-state.md` or `docs/io-contract.md`: **780 edges** (617 to work-state.md, 163 to io-contract.md). The briefing estimated about 717; the exact inventory count is 780. Of these, 217 are glob edges whose `resolvedTarget` is a pattern (`docs/**`, `docs/specs/*.md` and similar) that merely matches the file; they stay in the counts (they are inventory edges) but carry status `pattern` because no literal reference exists to rewrite.
-- **Text of each edge.** The inventory edge holds consumer `path`, `line` and `kind` only (no anchor). The consumer line was read at the inventory commit (`git show dc088c518:<path>`) and the literal reference was extracted by regex (path, relative prefix, `#anchor` or `:line` suffix). Lines under `.fgos/` are not tracked in git and are classified by location only.
+- **What changed since the first run.** The inventory was regenerated (commit `2d0d67838`), which raised the edge count from 780 to 1130 because the plan and report files written since then cite the two documents (all immutable history). The classifier, the map parser and the extraction rules are unchanged from the first run; only the commit used for `git show` was updated. The acceptance criterion was redefined by the owner: every edge is classified, and every rewrite-class edge either has a document-level target or sits in the owner-judgment queue with a reason; anchors are proposed only where derivable, with no percentage bar.
+- **Edge set.** Every entry of `consumerEdges` in the inventory (commit `2d0d67838`) whose `targetPath` is `docs/specs/work-state.md` or `docs/io-contract.md`: **1130 edges** (901 to work-state.md, 229 to io-contract.md). Of these, 224 are glob edges whose `resolvedTarget` is a pattern (`docs/**`, `docs/specs/*.md` and similar) that merely matches the file; they stay in the counts but carry status `pattern` because no literal reference exists to rewrite.
+- **Text of each edge.** The inventory edge holds consumer `path`, `line` and `kind` only (no anchor). The consumer line was read at the inventory commit (`git show 2d0d67838:<path>`) and the literal reference was extracted by regex (path, relative prefix, `#anchor` or `:line` suffix). Lines under `.fgos/` are not tracked in git and are classified by location only.
 - **Classes by consumer location.** (1) immutable history: `plans/`, `archive/`, `docs/history/`, `docs/decisions/`, `.fgos/` and any consumer the inventory marks as `history-evidence` corpus; alias only, never rewritten. (4) shipped or generated: `core/`, `domains/`, `.agents/`, `plugins/`, `.claude/`, and generated files (`docs/doc-registry.*`, `docs/enduser-docs-index.json`, files the inventory marks `generated`); no rewrite now, handled by the consumer-preparation phase. (3) code and tests: `src/`, `apps/`, `scripts/`, `test/`, `packages/`, `dogfood-fixture/`. (2) docs: every other path (docs/**, README and so on).
 - **Heading to target.** Old anchor to heading: the inventory `githubAnchor` list of the source (heading counts matched: 117 and 11) paired with the heading line found by scan. Heading line to target: the map row (sections 4 and 5) whose source line range holds the heading. The proposed anchor is exactly the frozen target anchor of that row.
 - **Status values (docs and code classes).**
@@ -20,63 +21,63 @@ Preview of what each inbound reference to `docs/specs/work-state.md` and `docs/i
 
 | Measure | Count |
 |---|---:|
-| Total edges | 780 |
-| to `docs/specs/work-state.md` | 617 |
-| to `docs/io-contract.md` | 163 |
+| Total edges | 1130 |
+| to `docs/specs/work-state.md` | 901 |
+| to `docs/io-contract.md` | 229 |
 
 ### 2.1 By class and target source
 
 | Class | work-state.md | io-contract.md | Total |
 |---|---:|---:|---:|
-| 1 immutable history | 467 | 108 | 575 |
+| 1 immutable history | 751 | 172 | 923 |
 | 2 docs | 117 | 45 | 162 |
-| 3 code and tests | 17 | 7 | 24 |
+| 3 code and tests | 17 | 9 | 26 |
 | 4 shipped or generated contracts | 16 | 3 | 19 |
-| **Sum** | **617** | **163** | **780** |
+| **Sum** | **901** | **229** | **1130** |
 
-Sum check: 575 + 162 + 24 + 19 = 780 (total 780): OK. Per target: 617 + 163 = 780: OK.
+Sum check: 923 + 162 + 26 + 19 = 1130 (total 1130): OK. Per target: 901 + 229 = 1130: OK.
 
 ### 2.2 Edge kind (inventory field)
 
 | Kind | Edges |
 |---|---:|
-| literal | 422 |
-| glob | 240 |
-| executable-proof | 98 |
+| literal | 737 |
+| glob | 254 |
+| executable-proof | 117 |
 | dynamic | 13 |
-| fixture | 7 |
-| **Sum** | **780** |
+| fixture | 9 |
+| **Sum** | **1130** |
 
 ### 2.3 Rewrite-class edges (docs and code)
 
-Docs plus code edges: 162 + 24 = 186. Of these, 109 are not link rewrites and are excluded from the rewrite denominator: 72 `pattern`, 28 `candidate-pointer`, 3 `switchboard`, 6 `retire-with-source`. The **rewrite-class denominator is 77** (67 docs, 10 code).
+Docs plus code edges: 162 + 26 = 188. Of these, 109 are not link rewrites and are excluded from the rewrite denominator: 72 `pattern`, 28 `candidate-pointer`, 3 `switchboard`, 6 `retire-with-source`. The **rewrite-class denominator is 79** (67 docs, 12 code).
 
-| Rewrite-class outcome | Edges | Share of 77 |
+| Rewrite-class outcome | Edges | Share of 79 |
 |---|---:|---:|
-| proposed target with anchor (`anchor`) | 12 | 15.6% |
+| proposed target with anchor (`anchor`) | 12 | 15.2% |
 | of which old anchor of the link | 0 | 0.0% |
-| of which inferred from a nearby quoted heading or RUL id | 12 | 15.6% |
-| proposed document-level target, no anchor (`doclevel`) | 20 | 26.0% |
-| any proposal (anchor plus document-level) | 32 | 41.6% |
-| needs owner judgment | 45 | 58.4% |
-| **Sum** | **77** | |
+| of which inferred from a nearby quoted heading or RUL id | 12 | 15.2% |
+| proposed document-level target, no anchor (`doclevel`) | 20 | 25.3% |
+| any proposal (anchor plus document-level) | 32 | 40.5% |
+| needs owner judgment | 47 | 59.5% |
+| **Sum** | **79** | |
 
-Sum check: 12 + 20 + 45 = 77 = 77: OK. Edges in any class whose consumer text carries a `#anchor` on the legacy path: 0 (readable lines only). Finding: no readable consumer line links to a heading of the legacy files, so the old-anchor path of the frozen map is not exercised by any current reference; proposals rest on bare paths, quoted heading names and RUL ids.
+Sum check: 12 + 20 + 47 = 79 = 79: OK. Edges in any class whose consumer text carries a `#anchor` on the legacy path: 140 (readable lines only; by class: history 140). Of the docs and code classes, 0 carry one; no docs or code consumer cites an old anchor, so every proposed anchor rests on a quoted heading name or RUL id.
 
 Per target within the rewrite class:
 
 | Target source | anchor | doclevel | judgment | Total |
 |---|---:|---:|---:|---:|
 | `docs/specs/work-state.md` | 12 | 2 | 44 | 58 |
-| `docs/io-contract.md` | 0 | 18 | 1 | 19 |
+| `docs/io-contract.md` | 0 | 18 | 3 | 21 |
 
 ### 2.4 Edges per consumer location, top 15
 
 | # | Location (first two path segments) | Edges | Class |
 |---:|---|---:|---|
-| 1 | `docs/history` | 238 | history |
-| 2 | `.fgos/ (state.json)` | 100 | history |
-| 3 | `plans/260925-documentation-authority-unification` | 90 | history |
+| 1 | `plans/260925-documentation-authority-unification` | 436 | history |
+| 2 | `docs/history` | 238 | history |
+| 3 | `.fgos/ (state.json)` | 100 | history |
 | 4 | `.fgos/ (events)` | 89 | history |
 | 5 | `docs/platform` | 45 | docs |
 | 6 | `docs/knowledge` | 43 | docs, shipped |
@@ -84,13 +85,13 @@ Per target within the rewrite class:
 | 8 | `docs/specs` | 25 | docs |
 | 9 | `docs/architect` | 21 | docs |
 | 10 | `docs/decisions` | 12 | history |
-| 11 | `docs/distillery` | 10 | docs |
-| 12 | `docs/explanation` | 10 | docs |
-| 13 | `archive/plans` | 9 | history |
-| 14 | `test/scripts` | 9 | code |
+| 11 | `test/scripts` | 11 | code |
+| 12 | `docs/distillery` | 10 | docs |
+| 13 | `docs/explanation` | 10 | docs |
+| 14 | `archive/plans` | 9 | history |
 | 15 | `docs/contracts` | 8 | docs |
 
-Top 15 hold 736 of 780 edges; 45 locations in all.
+Top 15 hold 1084 of 1130 edges; 46 locations in all.
 
 ## 3. Docs and code classes
 
@@ -177,6 +178,8 @@ Status: `anchor` (old anchor of the link or inferred), `doclevel`, `judgment`. `
 | `test/docs/decisions-corpus-retired.test.mjs:78` (proof) | `docs/specs/work-state.md` | - | needs owner judgment | path literal in code, test or data file (read, asserted or listed); rewriting changes behavior and is coupled to its proof |
 | `test/docs/decisions-corpus-retired.test.mjs:78` (proof) | `docs/specs/work-state.md` | - | needs owner judgment | path literal in code, test or data file (read, asserted or listed); rewriting changes behavior and is coupled to its proof |
 | `test/scripts/check-decision-citation-drift.test.mjs:112` (proof) | `docs/specs/work-state.md` | - | needs owner judgment | path literal in code, test or data file (read, asserted or listed); rewriting changes behavior and is coupled to its proof |
+| `test/scripts/check-doc-conservation.test.mjs:447` (proof) | `docs/io-contract.md` | - | needs owner judgment | path literal in code, test or data file (read, asserted or listed); rewriting changes behavior and is coupled to its proof |
+| `test/scripts/check-doc-conservation.test.mjs:448` (proof) | `docs/io-contract.md` | - | needs owner judgment | path literal in code, test or data file (read, asserted or listed); rewriting changes behavior and is coupled to its proof |
 
 ### 3.2 Docs and code edges that are not link rewrites
 
@@ -228,21 +231,25 @@ Status: `anchor` (old anchor of the link or inferred), `doclevel`, `judgment`. `
 | `test/state/decision-relation.test.mjs` | 1 | pattern | glob or dynamic pattern that matches the file; no literal reference exists |
 | **Sum** | **109** | | |
 
-Sum check: 109 = 109: OK; rewrite table rows 77 + 109 = 186 = docs plus code 186: OK.
+Sum check: 109 = 109: OK; rewrite table rows 79 + 109 = 188 = docs plus code 188: OK.
 
-Proof-coupled code edges (rewrite or judgment, flagged): `scripts/generate-shipped-path-inventory.mjs:271`, `dogfood-fixture/scenarios/expr-eval-chain.md:7`, `scripts/check-legacy-docs-ratchet.baseline.json:5977`, `scripts/check-legacy-docs-ratchet.exceptions.json:247`, `test/docs/decisions-corpus-retired.test.mjs:45`, `test/docs/decisions-corpus-retired.test.mjs:78`, `test/docs/decisions-corpus-retired.test.mjs:78`, `test/scripts/check-decision-citation-drift.test.mjs:112`. Also coupled and counted as `pattern`: test fixtures that assert on glob strings (`test/scripts/generate-doc-inventory.test.mjs`, `test/scripts/doc-alias-resolver.test.mjs`); they do not reference the legacy file and need no change.
+Proof-coupled code edges (rewrite or judgment, flagged): `scripts/generate-shipped-path-inventory.mjs:271`, `test/scripts/check-doc-conservation.test.mjs:447`, `test/scripts/check-doc-conservation.test.mjs:448`, `dogfood-fixture/scenarios/expr-eval-chain.md:7`, `scripts/check-legacy-docs-ratchet.baseline.json:5977`, `scripts/check-legacy-docs-ratchet.exceptions.json:247`, `test/docs/decisions-corpus-retired.test.mjs:45`, `test/docs/decisions-corpus-retired.test.mjs:78`, `test/docs/decisions-corpus-retired.test.mjs:78`, `test/scripts/check-decision-citation-drift.test.mjs:112`. Also coupled and counted as `pattern`: test fixtures that assert on glob strings (`test/scripts/generate-doc-inventory.test.mjs`, `test/scripts/doc-alias-resolver.test.mjs`); they do not reference the legacy file and need no change.
 
 ## 4. Immutable history (alias only, never rewritten)
 
-575 edges across 115 consumer paths (`docs/history/<slug>/` and `.fgos/events/*.jsonl` grouped). Each stays as written; the alias table (old path to new owner) resolves it after retirement.
+923 edges across 131 consumer paths (`docs/history/<slug>/` and `.fgos/events/*.jsonl` grouped). The 30 largest are listed, the rest are summed in one row. Each stays as written; the alias table (old path to new owner) resolves it after retirement.
 
 | Consumer path | Edges |
 |---|---:|
+| `plans/260925-documentation-authority-unification/pilot/alias-table.pilot-b.json` | 132 |
+| `plans/260925-documentation-authority-unification/reports/phase-05/pilot-b-link-rewrite-preview.md` | 131 |
 | `.fgos/state.json` | 100 |
 | `.fgos/events.jsonl` | 76 |
+| `plans/260925-documentation-authority-unification/reports/phase-05/pilot-b-alias-test.md` | 39 |
+| `plans/260925-documentation-authority-unification/phase-05-dual-pilot-re-audit-plus-unmigrated-mixed-area.md` | 21 |
 | `docs/history/canonical-decision-projection/` | 18 |
 | `docs/history/tsk-2sp-citation-drift-remaining-backlog/` | 18 |
-| `plans/260925-documentation-authority-unification/phase-05-dual-pilot-re-audit-plus-unmigrated-mixed-area.md` | 16 |
+| `plans/260925-documentation-authority-unification/pilot/decisions/b-files.json` | 18 |
 | `docs/history/spec-docs-lifecycle-realignment/` | 15 |
 | `.fgos/events/*.jsonl` | 13 |
 | `docs/history/tsk-2yu-citation-baseline-cleanup/` | 13 |
@@ -264,98 +271,10 @@ Proof-coupled code edges (rewrite or judgment, flagged): `scripts/generate-shipp
 | `docs/history/tsk-5dk-delivered-event-merge-provenance/` | 6 |
 | `docs/history/work-state-explanation-d20-claims-sync/` | 6 |
 | `docs/history/align-work-state-runner-specs-runtime-claim-overlay/` | 5 |
-| `docs/history/bee-to-fgos-rename/` | 5 |
-| `docs/history/catchup-worktree-cwd-fix/` | 5 |
-| `docs/history/tsk-1lv-4/` | 5 |
-| `plans/260925-documentation-authority-unification/current-authority-map-2026-09-25.md` | 5 |
-| `docs/history/cli-data-work-field-shape-ambiguity/` | 4 |
-| `docs/history/judge-verdict-evidence-discipline/` | 4 |
-| `docs/history/status-proposed-rename/` | 4 |
-| `plans/260925-documentation-authority-unification/cutover-write-lease-design.md` | 4 |
-| `archive/plans/260920-2217-dispatch-engine-hardening/phase-08-operability-cli-doctor.md` | 3 |
-| `archive/plans/260920-2217-dispatch-engine-hardening/reports/phase-08-operability-cli-doctor-implementation.md` | 3 |
-| `docs/history/discover-stage-graph-and-skill-layering/` | 3 |
-| `docs/history/discover-verb-context-blind-clarify-judge/` | 3 |
-| `docs/history/events-lock-concurrency-race/` | 3 |
-| `docs/history/fsm-wontfix-terminal-status/` | 3 |
-| `docs/history/rul11-tum-lum-doctrine-anchor/` | 3 |
-| `docs/history/tsk-4hb-priority-formula-degenerate-axes/` | 3 |
-| `docs/history/tsk-gli/` | 3 |
-| `plans/260925-documentation-authority-unification/independent-frontier-review-2026-09-25.md` | 3 |
-| `plans/260925-documentation-authority-unification/reports/phase-05-planning-261006.md` | 3 |
-| `plans/261006-1415-fgos-convention-component/phase-00-spec.md` | 3 |
-| `plans/reports/research-gate-semantics-260731-1052-approve-vs-movenext-report.md` | 3 |
-| `docs/history/answer-resume-status-help-text/` | 2 |
-| `docs/history/claim-reclaim-branchhead-reset/` | 2 |
-| `docs/history/core-foundation-domain-boundary/` | 2 |
-| `docs/history/fgos-list-triage-open-only-default/` | 2 |
-| `docs/history/fgos-retro-loop/` | 2 |
-| `docs/history/project-instability-scan/` | 2 |
-| `docs/history/recording-points-audit/` | 2 |
-| `docs/history/skill-prose-cleanup/` | 2 |
-| `docs/history/tsk-1lv-1/` | 2 |
-| `docs/history/tsk-2yu/` | 2 |
-| `docs/history/work-item-priority-matrix/` | 2 |
-| `plans/260925-documentation-authority-unification/independent-frontier-review-prompt.md` | 2 |
-| `plans/260925-documentation-authority-unification/pilot/README.md` | 2 |
-| `plans/260925-documentation-authority-unification/reports/phase-05/baseline.md` | 2 |
-| `plans/reports/audit-round2-260812-1713-tsk-5sr-post-merge-verification-report.md` | 2 |
-| `plans/reports/capture-recording-points-audit-260729-1745-report.md` | 2 |
-| `plans/reports/from-code-reviewer-to-planner-orchestration-dispatch-deepdive-260826-1346-orchestration-mechanism-inventory-report.md` | 2 |
-| `archive/plans/260920-2217-dispatch-engine-hardening/reports/phase-08-i08-dispatch-verification-report.md` | 1 |
-| `archive/plans/260928-2327-dispatch-engine-liveness-hardening/reports/unit-P8b-rust-claude-only-execution-report.md` | 1 |
-| `archive/plans/260929-1501-metrics-friction-rust-native/phase-05-f5-friction-in-observe.md` | 1 |
-| `docs/history/compound-learn-artifact-registry/` | 1 |
-| `docs/history/context-md-enforcement-scope/` | 1 |
-| `docs/history/d3-goal-check-rationale-trace/` | 1 |
-| `docs/history/discover-loop-lock-timeout-signal-propagation/` | 1 |
-| `docs/history/fgos-coding-implement-decide-first-prose/` | 1 |
-| `docs/history/fgos-planning-split-step-footprint/` | 1 |
-| `docs/history/gate-approve-vs-movenext-semantics/` | 1 |
-| `docs/history/gate-question-quality-and-routing/` | 1 |
-| `docs/history/herdr-web-dashboard-plan-realignment/` | 1 |
-| `docs/history/iron-law-gate-human-ux/` | 1 |
-| `docs/history/phase-2-status-category-schema/` | 1 |
-| `docs/history/rename-fgos-executing-to-fgos-code-implement/` | 1 |
-| `docs/history/return-close-pre-done-work/` | 1 |
-| `docs/history/tool-registry-capability-port/` | 1 |
-| `docs/history/triage-blocked-by-columns/` | 1 |
-| `docs/history/tsk-19m/` | 1 |
-| `docs/history/tsk-3id-status-fsm-stage-fsm-rename/` | 1 |
-| `docs/history/tsk-3uw4-rul11-citation-gloss/` | 1 |
-| `docs/history/tsk-5vl/` | 1 |
-| `docs/history/tsk-6at-citation-drift-review-round/` | 1 |
-| `docs/history/tsk-yo0-web-client-scaffold/` | 1 |
-| `docs/history/work-item-status-delivered-retrospective-cleanup/` | 1 |
-| `plans/260925-documentation-authority-unification/independent-frontier-rereview-2026-09-25.md` | 1 |
-| `plans/260925-documentation-authority-unification/minimum-constitution.json` | 1 |
-| `plans/260925-documentation-authority-unification/minimum-constitution.md` | 1 |
-| `plans/260925-documentation-authority-unification/phase-01-correct-planning-and-routing-semantics.md` | 1 |
-| `plans/260925-documentation-authority-unification/phase-09-atomic-platform-authority-cutover.md` | 1 |
-| `plans/260925-documentation-authority-unification/reports/phase-01-verification.md` | 1 |
-| `plans/260925-documentation-authority-unification/reports/phase-02-execution-record.md` | 1 |
-| `plans/260925-documentation-authority-unification/reports/red-team-minimum-constitution-261006.md` | 1 |
-| `plans/260930-0445-tier-rigor-vocabulary-consolidation/phase-04-guard-docs-and-main-merge.md` | 1 |
-| `plans/261001-0327-request-to-run-p2-runnable-plans/plan.md` | 1 |
-| `plans/261001-0327-request-to-run-p3-workflow-separate-from-work/phase-06-marketing-smoke-cleanup-boundary.md` | 1 |
-| `plans/261001-0327-request-to-run-p5-terminology-sweep/phase-02-docs-sweep.md` | 1 |
-| `plans/261001-0327-request-to-run-track/reports/red-team-security-adversary.md` | 1 |
-| `plans/261004-1534-fgos-gateway-boundary-split/phase-04-docs-boundary-verify-merge.md` | 1 |
-| `plans/261004-1534-fgos-gateway-boundary-split/plan.md` | 1 |
-| `plans/reports/dispatch-execution-engine-architecture-review-260920.md` | 1 |
-| `plans/reports/distill-repository-harness-260807-0935-rust-core-report.md` | 1 |
-| `plans/reports/from-code-reviewer-to-planner-260817-2010-tsk-37i-post-merge-audit-report.md` | 1 |
-| `plans/reports/from-execution-to-final-review-260815-1616-tsk-49i-parent-branch-regression-audit-report.md` | 1 |
-| `plans/reports/from-scan-team-to-planning-260729-1614-verify-scope-compound-cadence-merge-tiering-report.md` | 1 |
-| `plans/reports/from-scan-team-to-product-owner-260808-1241-end-to-end-operating-ux-gap-analysis-report.md` | 1 |
-| `plans/reports/from-scan-team-to-user-260729-2115-adr0023-impact-audit-report.md` | 1 |
-| `plans/reports/harness-investigation-261006/enforcement-audit-261006.md` | 1 |
-| `plans/reports/provider-capacity-lease-lock-wait-fix-261006.md` | 1 |
-| `plans/reports/research-260731-0848-tsk-4y5-priority-matrix-report.md` | 1 |
-| `plans/reports/resume-261006-1635-doc-authority-unification.md` | 1 |
-| **Sum** | **575** |
+| (other 101 consumer paths, 1 to 5 edges each) | 183 |
+| **Sum** | **923** |
 
-Sum check: 575 = 575: OK.
+Sum check: 923 = 923: OK.
 
 ## 5. Shipped or generated contracts (no rewrite now)
 
@@ -373,11 +292,11 @@ Sum check: 575 = 575: OK.
 | `plugins/fgOS/skills/_shared/citation-format.md` | 1 | shipped contract | glob 1 |
 | **Sum** | **19** | | |
 
-Sum check: 19 = 19: OK. The mentions in `citation-format.md` (three mirrored copies under `core/`, `.agents/`, `plugins/`) are glob examples (`docs/specs/*.md`), not references to the file.
+Sum check: 19 = 19: OK. The `citation-format.md` mentions (mirrored under `core/`, `.agents/`, `plugins/`) and the registry or index files are glob examples or generated listings; `docs/knowledge/decisions-index/decision-record.md` is a generated file.
 
-## 6. Judgment list (needs owner judgment)
+## 6. Judgment queue (needs owner judgment)
 
-45 edges. Each needs a decision on which owner document (spec, contract, architecture, decisions, history) the sentence is about, or on the coupled proof.
+47 edges. Each needs a decision on which owner document (spec, contract, architecture, decisions, history) the sentence is about, or on the coupled proof.
 
 | Consumer path:line | Old reference | Reason |
 |---|---|---|
@@ -389,6 +308,8 @@ Sum check: 19 = 19: OK. The mentions in `citation-format.md` (three mirrored cop
 | `test/docs/decisions-corpus-retired.test.mjs:78` (proof) | `docs/specs/work-state.md` | path literal in code, test or data file (read, asserted or listed); rewriting changes behavior and is coupled to its proof |
 | `test/docs/decisions-corpus-retired.test.mjs:78` (proof) | `docs/specs/work-state.md` | path literal in code, test or data file (read, asserted or listed); rewriting changes behavior and is coupled to its proof |
 | `test/scripts/check-decision-citation-drift.test.mjs:112` (proof) | `docs/specs/work-state.md` | path literal in code, test or data file (read, asserted or listed); rewriting changes behavior and is coupled to its proof |
+| `test/scripts/check-doc-conservation.test.mjs:447` (proof) | `docs/io-contract.md` | path literal in code, test or data file (read, asserted or listed); rewriting changes behavior and is coupled to its proof |
+| `test/scripts/check-doc-conservation.test.mjs:448` (proof) | `docs/io-contract.md` | path literal in code, test or data file (read, asserted or listed); rewriting changes behavior and is coupled to its proof |
 | `docs/architect/component-boundary/component-boundary-advisory.md:140` | `../../specs/work-state.md` | bare path in a topical sentence (68 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script |
 | `docs/architect/domainization/README.md:8` | `../../specs/work-state.md` | bare path in a topical sentence (13 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script |
 | `docs/architect/packaging-distribution/history/distribution-baseline.md:64` | `docs/specs/work-state.md` | bare path in a topical sentence (43 other words, section/rule cue); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script |
@@ -427,6 +348,29 @@ Sum check: 19 = 19: OK. The mentions in `citation-format.md` (three mirrored cop
 | `docs/specs/reading-map.md:55` | `docs/specs/work-state.md` | bare path in a topical sentence (41 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script |
 | `docs/specs/system-overview.md:51` | `docs/specs/work-state.md` | bare path in a topical sentence (113 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script |
 
-## 7. Grand sum check
+## 7. Criterion evaluation
 
-history 575 + docs 162 + code 24 + shipped 19 = 780 = total 780: OK. Docs plus code = rewrite 77 + non-rewrite 109.
+| Criterion | Result |
+|---|---|
+| All inbound edges classified (immutable history, docs, code and tests, shipped or generated) | 1130 of 1130: MET |
+| Every rewrite-class edge has a document-level target or is in the judgment queue | 79 of 79 (32 with a target, 47 in the queue): MET |
+| Edges with a derivable anchor (no percentage bar) | 12 (0 from an old anchor of the link, 12 from a quoted heading name or RUL id) |
+
+Rewrite-class edges are docs and code edges that are real link references: 79 = 162 docs + 26 code - 109 non-link edges (patterns, candidate pointers, switchboard, retire-with-source). Queue file: `pilot-b-link-judgment-queue.json` (47 entries).
+
+Queue reasons:
+
+| Reason class | Edges |
+|---|---:|
+| bare path in a topical sentence (claim owner not identifiable by script) | 35 |
+| path literal in code, test or data file (coupled to a proof) | 10 |
+| line citation into the legacy file (line numbers drift) | 2 |
+| **Sum** | **47** |
+
+Sum check: 47 = 47 = 47: OK.
+
+Per target in the queue: `docs/specs/work-state.md` 44, `docs/io-contract.md` 3.
+
+## 8. Grand sum check
+
+history 923 + docs 162 + code 26 + shipped 19 = 1130 = total 1130: OK. Docs plus code = rewrite 79 + non-rewrite 109.

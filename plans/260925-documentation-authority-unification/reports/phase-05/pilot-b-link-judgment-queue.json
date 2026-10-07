@@ -1,0 +1,331 @@
+[
+  {
+    "consumerPath": "scripts/generate-shipped-path-inventory.mjs",
+    "line": 271,
+    "referenceAsWritten": "docs/io-contract.md",
+    "target": "docs/io-contract.md",
+    "reason": "path literal in code, test or data file (read, asserted or listed); rewriting changes behavior and is coupled to its proof (code or test consumer coupled to a proof)"
+  },
+  {
+    "consumerPath": "test/scripts/check-doc-conservation.test.mjs",
+    "line": 447,
+    "referenceAsWritten": "docs/io-contract.md",
+    "target": "docs/io-contract.md",
+    "reason": "path literal in code, test or data file (read, asserted or listed); rewriting changes behavior and is coupled to its proof (code or test consumer coupled to a proof)"
+  },
+  {
+    "consumerPath": "test/scripts/check-doc-conservation.test.mjs",
+    "line": 448,
+    "referenceAsWritten": "docs/io-contract.md",
+    "target": "docs/io-contract.md",
+    "reason": "path literal in code, test or data file (read, asserted or listed); rewriting changes behavior and is coupled to its proof (code or test consumer coupled to a proof)"
+  },
+  {
+    "consumerPath": "docs/architect/component-boundary/component-boundary-advisory.md",
+    "line": 140,
+    "referenceAsWritten": "../../specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (68 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/architect/domainization/README.md",
+    "line": 8,
+    "referenceAsWritten": "../../specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (13 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/architect/packaging-distribution/history/distribution-baseline.md",
+    "line": 64,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (43 other words, section/rule cue); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/contracts/fgos-gateway-api-v1.yaml",
+    "line": 455,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (11 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/contracts/fgos-gateway-api-v1.yaml",
+    "line": 709,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (5 other words, section/rule cue); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/contracts/fgos-gateway-api-v1.yaml",
+    "line": 738,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (5 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/distillery/deep-dives/parallel-decomposition-and-merge.md",
+    "line": 46,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (39 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/explanation/citation-baseline-cleanup-calibration-slice.md",
+    "line": 28,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (6 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/explanation/citation-baseline-cleanup-calibration-slice.md",
+    "line": 61,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (3 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/explanation/citation-drift-backlog-scope-split-with-tsk-56w.md",
+    "line": 40,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (5 other words, section/rule cue); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/explanation/citation-drift-runner-md-cleanup.md",
+    "line": 10,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (7 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/explanation/runtime-claim-doing-separation.md",
+    "line": 123,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (8 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/how-to/fix-bare-citation-findings.md",
+    "line": 9,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (7 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md",
+    "line": 213,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (7 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md",
+    "line": 248,
+    "referenceAsWritten": "docs/specs/work-state.md:1045",
+    "target": "docs/specs/work-state.md",
+    "reason": "line citation `:1045` into the legacy file; source line numbers drift, so the cited claim cannot be located from the number alone"
+  },
+  {
+    "consumerPath": "docs/knowledge/fgos-participant-contract-what-it-takes-to-be-a-full-partici/fgos-participant-contract.md",
+    "line": 34,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (5 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/knowledge/how-to-find-every-caller-before-making-a-cli-flag-required/find-every-caller-before-requiring-a-cli-flag.md",
+    "line": 79,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (5 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/knowledge/how-to-recover-a-blocked-item-with-fgos-catchup-from-inside/recover-a-blocked-item-with-fgos-catchup-from-inside-its-own-worktree.md",
+    "line": 31,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (6 other words, section/rule cue); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/knowledge/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifec/why-a-clean-npm-test-run-missed-16-edge-gaps-after-the-lifecycle-rebuild.md",
+    "line": 96,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (5 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/knowledge/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias/why-a-retired-stage-name-sometimes-keeps-a-drain-only-alias.md",
+    "line": 171,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (7 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/knowledge/why-bee-prefixed-identifiers-became-fgos-prefixed-and-some-d/why-bee-prefixed-identifiers-became-fgos-prefixed.md",
+    "line": 72,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (7 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/knowledge/why-decompose-checks-footprint-overlap-before-creating-child/why-decompose-checks-footprint-overlap-before-creating-children.md",
+    "line": 122,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (7 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/knowledge/why-decompose-checks-footprint-overlap-before-creating-child/why-decompose-checks-footprint-overlap-before-creating-children.md",
+    "line": 128,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (7 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/knowledge/why-fgos-answer-s-real-resume-behavior-is-statusatask-rather/why-fgos-answer-resumes-to-statusatask-not-always-todo.md",
+    "line": 18,
+    "referenceAsWritten": "docs/specs/work-state.md:229",
+    "target": "docs/specs/work-state.md",
+    "reason": "line citation `:229` into the legacy file; source line numbers drift, so the cited claim cannot be located from the number alone"
+  },
+  {
+    "consumerPath": "docs/knowledge/why-session-claim-liveness-measures-worktree-activity-not-pi/why-session-claim-liveness-reuses-worktree-activity-not-pid-or-event-age.md",
+    "line": 16,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (5 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/knowledge/work-item-pipeline-stages-verbs-actors-handoffs/work-item-pipeline-stages-verbs-and-handoffs.md",
+    "line": 124,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (7 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/platform/migration-authoring-rules.md",
+    "line": 36,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (12 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/routing-handoff-contract.md",
+    "line": 35,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (23 other words, section/rule cue); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/specs/fgos-plugin.md",
+    "line": 169,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (15 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/specs/fgos-plugin.md",
+    "line": 19,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (7 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/specs/herdr-web-dashboard.md",
+    "line": 328,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (6 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/specs/herdr-web-dashboard.md",
+    "line": 68,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (19 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/specs/reading-map.md",
+    "line": 28,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (207 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/specs/reading-map.md",
+    "line": 29,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (230 other words, section/rule cue); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/specs/reading-map.md",
+    "line": 30,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (53 other words, section/rule cue); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/specs/reading-map.md",
+    "line": 55,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (41 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "docs/specs/system-overview.md",
+    "line": 51,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "bare path in a topical sentence (113 other words); the claim owner (spec, contract, architecture, decisions or history) is not identifiable by script"
+  },
+  {
+    "consumerPath": "dogfood-fixture/scenarios/expr-eval-chain.md",
+    "line": 7,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "path literal in code, test or data file (read, asserted or listed); rewriting changes behavior and is coupled to its proof (code or test consumer coupled to a proof)"
+  },
+  {
+    "consumerPath": "scripts/check-legacy-docs-ratchet.baseline.json",
+    "line": 5977,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "path literal in code, test or data file (read, asserted or listed); rewriting changes behavior and is coupled to its proof (code or test consumer coupled to a proof)"
+  },
+  {
+    "consumerPath": "scripts/check-legacy-docs-ratchet.exceptions.json",
+    "line": 247,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "path literal in code, test or data file (read, asserted or listed); rewriting changes behavior and is coupled to its proof (code or test consumer coupled to a proof)"
+  },
+  {
+    "consumerPath": "test/docs/decisions-corpus-retired.test.mjs",
+    "line": 45,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "path literal in code, test or data file (read, asserted or listed); rewriting changes behavior and is coupled to its proof (code or test consumer coupled to a proof)"
+  },
+  {
+    "consumerPath": "test/docs/decisions-corpus-retired.test.mjs",
+    "line": 78,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "path literal in code, test or data file (read, asserted or listed); rewriting changes behavior and is coupled to its proof (code or test consumer coupled to a proof)"
+  },
+  {
+    "consumerPath": "test/docs/decisions-corpus-retired.test.mjs",
+    "line": 78,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "path literal in code, test or data file (read, asserted or listed); rewriting changes behavior and is coupled to its proof (code or test consumer coupled to a proof)"
+  },
+  {
+    "consumerPath": "test/scripts/check-decision-citation-drift.test.mjs",
+    "line": 112,
+    "referenceAsWritten": "docs/specs/work-state.md",
+    "target": "docs/specs/work-state.md",
+    "reason": "path literal in code, test or data file (read, asserted or listed); rewriting changes behavior and is coupled to its proof (code or test consumer coupled to a proof)"
+  }
+]
