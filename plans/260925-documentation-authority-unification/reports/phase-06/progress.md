@@ -3,7 +3,7 @@
 Date: 2026-10-07
 Executor: codex-session:1@2026-10-07
 Session counter: 1
-Step: 1, reverse/constitution/candidate regressions demonstrated; implementation next
+Step: 1, reverse conservation and CLI surfaces corrected; first-use and authorship tooling next
 State: authoring
 Last green conservation commit: ae518cfc6
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
@@ -17,7 +17,7 @@ Real conflicts: SC-1 is owner-resolved; candidate correction belongs to the root
 Holds: none authored
 Promoted-document edits: none
 
-Next action: commit T6 red regressions, implement reverse open data, repeatable constitution decision inputs and untracked candidate discovery, then continue T7 onward sequentially; close pre-reviewed evidence through T8; stop at full independent review.
+Next action: commit corrected T6 tooling, refresh both conservation proofs, then continue T7 onward sequentially; close pre-reviewed evidence through T8; stop at full independent review.
 
 Evidence: A3 accounts exactly five commit/path pairs, no other violation; B/C/I unchanged; both resume D proofs pass and match baseline; ratchet clean, placement unchanged, retirement 15 blocked/4 pass/1 review and candidate 5 baseline findings. Red regression 8eb346727: 4 pass/2 fail. Fixed targeted tests: 40/40; standalone hold probe exit 0, blocking preserved, zero unchanged-gate findings. Complete suite 805/805 in 46 files. Both hold and rework retain the note, searched evidence and no approval identity/date. No real held claim exists to add to owner queue. Full tooling fixes/maps/review and scoped E remain UNPROVEN.
 Independent early read-only review at 789870507 was supplied by the owner; its accepted-with-fixes findings are now requirements. It is not the final committed tooling review gate and marks no decision row reviewed.
@@ -33,3 +33,4 @@ Conflict-resolution corrected evidence: targeted 33/33, full 826/826. Historical
 Retiring-file red evidence: `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/check-doc-retirement.test.mjs`: 33 pass, 3 fail. Root-file history coverage and consumer classification are missing; invalid root data is ignored. Post-conflict aec1b2e8e: 826/826 and both D proofs baseline-identical. No retiring-root ledger or legacy edit is authored; remaining tools/maps/review remain UNPROVEN.
 Retiring-file corrected evidence: red c1bdc4c74; targeted 36/36, full 829/829. Actual retirement CLI with scratch io-contract/doc-governance roots keeps 15 blocked/4 pass/1 review and 0 invariants; history targets 994 to 996, authority-consumer upper bound 3,917 to 4,001. Fixed directories remain included; kept projection/instructions/candidates cannot be configured as retiring. No real root ledger or legacy edit is committed. Remaining tools/maps/full review remain UNPROVEN.
 Reverse/CLI red evidence: `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-candidate-conservation.test.mjs test/scripts/check-doc-constitution.test.mjs test/scripts/check-doc-candidate-status.test.mjs`: 75 pass, 6 fail. Reverse gaps and scoped unnamed siblings are invisible; self references can evade inspection; script carrier coverage is absent; constitution ignores both decision inputs; strict candidate checks omit untracked files. Post-retiring-file ae518cfc6: 829/829 and both D proofs baseline-identical. Remaining implementation/maps/review remain UNPROVEN.
+Reverse/CLI corrected evidence: targeted 81/81, full scripts suite 836/836 in 48 files. Actual scoped exact-proposal gate returns 0 with no fatal findings and lists 16,820 unreferenced candidate units across the target area, including unnamed sibling documents; strict mode returns 1 and retains that blocking type. Actual constitution CLI consumes both pilot and scratch decision inputs: 87,153 rows, 478 promote, 1 supersede, no fatal findings. Actual untracked-candidate CLI rejects missing metadata (exit 1), then accepts complete candidate metadata (exit 0). No candidate material, authority status or real decision approval is authored. Remaining first-use/authorship/restoration tooling, maps and full independent review remain UNPROVEN.

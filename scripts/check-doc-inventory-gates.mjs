@@ -902,8 +902,38 @@ export function pathInScope(p, scope) {
   return typeof p === 'string' && scope.some((s) => p === s || p.startsWith(s.endsWith('/') ? s : `${s}/`));
 }
 
+export function unreferencedCandidateRows(inventory, shards, { scope = null } = {}) {
+  const candidates = new Set((inventory.items || []).filter((item) => item.authorityStatus === 'candidate').map((item) => item.path));
+  const canonical = new Set((inventory.items || []).filter((item) => ['candidate', 'promoted'].includes(item.authorityStatus)).map((item) => item.path));
+  const claimIds = new Set();
+  const mirrorSources = new Set();
+  for (const shard of shards || []) {
+    for (const row of shard.claims || []) claimIds.add(row.claimId);
+    for (const entry of shard.exact || []) for (const row of entry.rows || []) claimIds.add(row.claimId);
+    for (const mirror of shard.mirrors || []) mirrorSources.add(mirror.path);
+  }
+  const named = new Set();
+  const ownersInScope = new Set();
+  for (const row of inventory.claimLedger || []) {
+    if (canonical.has(row.sourcePath) || (!claimIds.has(row.claimId) && !mirrorSources.has(row.sourcePath)) || !row.targetOwner || !row.targetAnchor) continue;
+    named.add(`${row.targetOwner}#${row.targetAnchor}`);
+    if (pathInScope(row.sourcePath, scope)) ownersInScope.add(row.targetOwner);
+  }
+  for (const shard of shards || []) for (const file of shard.files || []) if (pathInScope(file.path, scope)) for (const owner of file.targets || []) ownersInScope.add(owner);
+  const namespaces = [...ownersInScope].map((owner) => {
+    const parts = owner.split('/');
+    return parts.length > 3 ? parts.slice(0, 3).join('/') + '/' : owner;
+  });
+  const scoped = Array.isArray(scope) && scope.length > 0;
+  return (inventory.claimLedger || []).filter((row) => candidates.has(row.sourcePath) &&
+    (!scoped || pathInScope(row.sourcePath, scope) || namespaces.some((prefix) => prefix.endsWith('/') ? row.sourcePath.startsWith(prefix) : row.sourcePath === prefix)) &&
+    !named.has(`${row.sourcePath}#${row.sourceAnchor}`)).map((row) => ({
+      claimId: row.claimId, path: row.sourcePath, anchor: row.sourceAnchor, unitDigest: row.sourceUnitDigest,
+    }));
+}
+
 /** Open data that blocks the cutover but is not corruption before it. */
-export function summarizeConservationCompleteness({ inventory, registry, vocabulary, droppedClaimsRegister = null, scope = null }) {
+export function summarizeConservationCompleteness({ inventory, registry, vocabulary, droppedClaimsRegister = null, scope = null, unreferencedCandidateRows = [] }) {
   const dispositions = new Map((vocabulary?.sourceDispositions || []).map((d) => [d.id, d]));
   const inScope = (p) => pathInScope(p, scope);
   const claims = (inventory?.claimLedger || []).filter((c) => inScope(c?.sourcePath));
@@ -932,12 +962,13 @@ export function summarizeConservationCompleteness({ inventory, registry, vocabul
       const review = entry?.reviewedDisposition;
       return !review || ['decision', 'reviewer', 'reviewedAt'].some((field) => typeof review[field] !== 'string' || review[field].trim() === '');
     }), (entry) => entry.id),
+    summarizeOpen('candidate-blocks-unreferenced', 'candidate conservation units not named by a source decision', unreferencedCandidateRows, (row) => `${row.path}#${row.anchor}`),
   ];
   return open.filter(Boolean);
 }
 
 /** Runs every conservation rule; invariant findings are fatal in all modes, open findings only when strict. */
-export function checkConservation({ inventory, registry, previousRegistries = [], vocabulary, droppedClaimsRegister = null, ratchetResult = null, scope = null }) {
+export function checkConservation({ inventory, registry, previousRegistries = [], vocabulary, droppedClaimsRegister = null, ratchetResult = null, scope = null, decisions = null }) {
   const invariant = [
     ...previousRegistries.flatMap(({ registry: previous, label }) => validateRowSetConservation(registry, previous, label)),
     ...validateSemanticClaimOwners(inventory?.claimLedger),
@@ -945,8 +976,10 @@ export function checkConservation({ inventory, registry, previousRegistries = []
     ...validateRetiredRowDispositions(registry, vocabulary),
     ...(ratchetResult ? validateLegacyGrowth(ratchetResult) : []),
   ];
-  const open = summarizeConservationCompleteness({ inventory, registry, vocabulary, droppedClaimsRegister, scope });
-  return { invariant, open };
+  const reverseEnabled = (decisions || []).some((shard) => shard.authorshipRequired === true);
+  const reverseRows = reverseEnabled ? unreferencedCandidateRows(inventory, decisions, { scope }) : [];
+  const open = summarizeConservationCompleteness({ inventory, registry, vocabulary, droppedClaimsRegister, scope, unreferencedCandidateRows: reverseRows });
+  return { invariant, open, ...(reverseEnabled ? { unreferencedCandidateRows: reverseRows } : {}) };
 }
 
 export function checkInventory({ repoRoot, inventory, vocabulary, identityRegistry = null, droppedClaimsRegister = null, previousRegistries = [], ratchetResult = null, strict = false, headCommit = null, registryBytes = null, missingInputs = [], decisions = null, scope = null }) {
@@ -971,7 +1004,7 @@ export function checkInventory({ repoRoot, inventory, vocabulary, identityRegist
     ...validateIdentityRegistry(inventory, identityRegistry, { repoRoot }),
     ...(droppedClaimsRegister ? validateDroppedClaims(droppedClaimsRegister, { ledgerClaimIds: new Set((inventory.claimLedger || []).map((c) => c.claimId)), registry: identityRegistry }) : []),
   ];
-  const conservation = checkConservation({ inventory, registry: conservationRegistry, previousRegistries, vocabulary, droppedClaimsRegister, ratchetResult, scope });
+  const conservation = checkConservation({ inventory, registry: conservationRegistry, previousRegistries, vocabulary, droppedClaimsRegister, ratchetResult, scope, decisions });
   fatalFindings.push(...validateInventoryFreshness({ inventory, headCommit, repoRoot, registryBytes }), ...conservation.invariant);
   const strictFindings = strict ? [
     ...conservation.open.map((o) => ({ type: o.type, message: `${o.count} ${o.message} (e.g. ${o.examples.join(', ')})` })),
@@ -1012,6 +1045,7 @@ export function checkInventory({ repoRoot, inventory, vocabulary, identityRegist
     fatalFindings: allFatal,
     conservationOpen: conservation.open,
     explicitOpenFindings: {
+      ...(conservation.unreferencedCandidateRows !== undefined ? { unreferencedCandidateRows: conservation.unreferencedCandidateRows } : {}),
       gapCount: gapItems.length + claimIdentityGapRows.length,
       fileGapCount: gapItems.length,
       claimIdentityGapCount: claimIdentityGapRows.length,

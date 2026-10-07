@@ -24,7 +24,7 @@ import { execFileSync } from 'node:child_process';
 import { isMainModule } from './lib/is-main-module.mjs';
 import { loadShardedJsonArtifact } from './doc-inventory-artifact.mjs';
 import { INVENTORY_MANIFEST_PATH, IDENTITY_REGISTRY_PATH } from './generate-doc-inventory.mjs';
-import { regenerateCommand } from './check-doc-inventory-gates.mjs';
+import { regenerateCommand, applyDecisions, loadDecisionShards, buildConservationUnitLookup, validateCommitBlobIntegrity, validateSourceUnitCoverage } from './check-doc-inventory-gates.mjs';
 
 const PLAN_DIR = 'plans/260925-documentation-authority-unification';
 export const DEFAULT_VOCABULARY_PATH = `${PLAN_DIR}/claim-and-disposition-vocabulary.json`;
@@ -635,8 +635,9 @@ function loadJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
 }
 
-export function trackedPlatformDocs(repoRoot) {
-  return execFileSync('git', ['ls-files', 'docs/platform'], { cwd: repoRoot, encoding: 'utf8', maxBuffer: 20 * 1024 * 1024 }).split('\n').filter((f) => f.endsWith('.md'));
+export function trackedPlatformDocs(repoRoot, { includeUntracked = false } = {}) {
+  const args = ['ls-files', '--cached', ...(includeUntracked ? ['--others', '--exclude-standard'] : []), '--', 'docs/platform'];
+  return [...new Set(execFileSync('git', args, { cwd: repoRoot, encoding: 'utf8', maxBuffer: 20 * 1024 * 1024 }).split('\n').filter((file) => file.endsWith('.md')))];
 }
 
 function formatCounts(counts) {
@@ -677,8 +678,29 @@ export function runCli(argv, cwd = process.cwd()) {
     const inventoryPath = option('--inventory', DEFAULT_INVENTORY_PATH);
     try {
       if (!fs.existsSync(inventoryPath)) throw new Error(`File not found: ${inventoryPath}`);
-      const inventory = loadShardedJsonArtifact(inventoryPath, { allowLegacyRawJson: false });
+      let inventory = loadShardedJsonArtifact(inventoryPath, { allowLegacyRawJson: false });
       if (!Array.isArray(inventory?.claimLedger)) throw new Error('inventory has no claimLedger array');
+      const decisionPaths = [];
+      for (let i = 0; i < argv.length; i++) if (argv[i] === '--decisions') {
+        const value = argv[++i];
+        if (!value || value.startsWith('--')) throw new Error('--decisions requires a file or directory path');
+        decisionPaths.push(path.resolve(cwd, value));
+      }
+      if (decisionPaths.length) {
+        const decisions = decisionPaths.flatMap(loadDecisionShards);
+        const registryPath = option('--identity-registry', IDENTITY_REGISTRY_PATH);
+        const registry = argv.includes('--identity-registry') || fs.existsSync(registryPath) ? loadJson(registryPath) : null;
+        if (!registry && decisions.some((shard) => (shard.registryGaps || []).length)) throw new Error(`registry-gap decisions require ${registryPath}`);
+        const unitsOf = inventory.commit ? buildConservationUnitLookup(repoRoot, inventory.commit) : () => null;
+        fatalFindings.push(...validateCommitBlobIntegrity(repoRoot, inventory), ...validateSourceUnitCoverage(repoRoot, inventory));
+        const applied = applyDecisions(inventory, decisions, {
+          vocabulary, registry, repoRoot, unitsOf,
+          targetAnchorsOf: (owner) => { const units = unitsOf(owner); return units ? new Set(units.map((unit) => unit.anchor)) : null; },
+          targetUnitDigestOf: (owner, anchor) => (unitsOf(owner) || []).find((unit) => unit.anchor === anchor)?.textDigest ?? null,
+        });
+        inventory = applied.inventory;
+        fatalFindings.push(...applied.findings);
+      }
       const items = Array.isArray(inventory.items) ? inventory.items : [];
       const itemRationaleByPath = new Map(items.filter((i) => nonEmptyString(i.proposedRationale)).map((i) => [i.path, i.proposedRationale]));
       ledger = {

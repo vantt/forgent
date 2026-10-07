@@ -146,7 +146,7 @@ export function runCli(argv, cwd = process.cwd()) {
   }
   let files;
   try {
-    files = trackedPlatformDocs(repoRoot);
+    files = trackedPlatformDocs(repoRoot, { includeUntracked: true });
   } catch (err) {
     console.error(`check-doc-candidate-status error listing documents: ${err.message}`);
     return 1;
