@@ -3,21 +3,21 @@
 Date: 2026-10-07
 Executor: codex-session:1@2026-10-07
 Session counter: 1
-Step: 1, final tooling compatibility verified
-State: preparing full independent tooling review
-Last green conservation commit: 26ba5c82c; working-tree compatibility proofs pass against both priors
+Step: 1, tooling ready for independent review
+State: ready-for-review
+Last green conservation commit: 1ec3ceca620d0a3fb40f506ae9646f6882410877
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
 SYNC: 57f3e7fe7af86adee1e805925cca82cf7a894164
 Main at sync: 7e36897c0ac131a65f7b1dcb538ba80f6dde9ff9
 Current batch commits: 57f3e7fe7 (authorization), dbe5c4328 (baseline), e0c350de5 (baseline pointer), 73416e048 / 8dcf162c4 (repeatable-input red/green), 5cf4d8f15 (blocker), e82222aaa (owner A1), 3a561ff75 (both prior-registry proofs), abc229123 / b40b5af29 (mirror red/green), 1f147b961 / db5ef01d4 (exact proposal red/green), de2c92e81 / b828e4896 (review-pack red/green), 7e94480f0 / 789870507 (coverage/snapshot red/green), bfd2ade4d (hold blocker), 3693ade08 (owner A2). Resume HEAD 1cc92d7db adds external integrity/consumer-rewrite drafts; preserved unchanged.
-Pending review requests: none; full tooling is not ready for independent review
+Pending review requests: reports/phase-06/review-request-tooling.md; owner-started independent session must commit reports/phase-06/review-tooling.md before continuation
 Owner queue items: none open; isolation resolved by A3, review-status rule resolved by A2, registry inputs resolved by A1
 Archive/delete lists: none authored
 Real conflicts: SC-1 is owner-resolved; candidate correction belongs to the root-authorities batch
 Holds: none authored
 Promoted-document edits: none
 
-Next action: commit the verified legacy review compatibility fix, finalize the full tooling review request and prerequisite proofs, then stop for the owner-started independent reviewer. Review brief, area maps/routes and baseline counts follow the committed tooling verdict; no real batch starts beforehand.
+Next action: STOP. Owner starts a different reviewer session following review-request-tooling.md, which commits review-tooling.md. After its verdict is committed, address any required fixes or continue Step 1 item 2 (review brief), then item 3 (maps/routes), then item 4 (baseline counts). No real batch, approval or authority cutover before the gate.
 
 Evidence: A3 accounts exactly five commit/path pairs, no other violation; B/C/I unchanged; both resume D proofs pass and match baseline; ratchet clean, placement unchanged, retirement 15 blocked/4 pass/1 review and candidate 5 baseline findings. Red regression 8eb346727: 4 pass/2 fail. Fixed targeted tests: 40/40; standalone hold probe exit 0, blocking preserved, zero unchanged-gate findings. Complete suite 805/805 in 46 files. Both hold and rework retain the note, searched evidence and no approval identity/date. No real held claim exists to add to owner queue. Full tooling fixes/maps/review and scoped E remain UNPROVEN.
 Independent early read-only review at 789870507 was supplied by the owner; its accepted-with-fixes findings are now requirements. It is not the final committed tooling review gate and marks no decision row reviewed.
@@ -46,4 +46,6 @@ Sensitivity-control red: actual isolated --propose -> --pack -> --seed-pack flow
 Sensitivity controls corrected: 854/854 across 51 scripts test files; automatic fixture proposals seed successfully using re-proven exact units without reopening accepted decisions. Poisoned exact proofs and invented controls fail closed. Actual committed modern CLI accepts 61 fixture rows, rejects uncommitted reports, and then accepts a one-row rationale rework using 60 unchanged controls while preserving earlier report pins and 0 unchanged-overlay findings. Legacy compatibility and full tooling review remain UNPROVEN.
 Old-shape red: isolated CLI accepts --author but ignores it for a legacy pack; seed then rejects missing identities. `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-review-format.test.mjs`: 3 pass/1 fail. The frozen legacy format stays untouched; author provenance must reside in the new review artifacts, not be fabricated into old rows. Both prior-registry D proofs at 26ba5c82c pass and exactly match baseline. Compatibility and full review remain UNPROVEN.
 Legacy compatibility green: 26/26 targeted and 855/855 scripts tests. Explicit current review author is bound in legacy pack/report without adding historical row authorship or enabling the legacy shard flag. Actual old I/O scratch clone renders 41 rows and keeps the old shape; repository rows are not seeded or approved.
-Complete suite: `env -u CLAUDE_CODE_SESSION_ID node --test <all 389 discovered files>`; existing runner environment, checkout-local Cargo/host artifacts. Exit 0: 7,318 tests, 7,245 pass, 0 fail, 8 skipped, 65 todo. Skipped/todo behavior remains UNPROVEN. Both current D runs exit 0 and produce baseline-identical JSON. Portable strict structural fixture: clean zero findings; all 11 defects rejected against both previous registries.
+Complete suite on committed tooling 1ec3ceca6: `env -u CLAUDE_CODE_SESSION_ID node --test <all 389 discovered files>`; existing runner environment, checkout-local Cargo/host artifacts. Exit 0: 7,318 tests, 7,245 pass, 0 fail, 8 skipped, 65 todo. Skipped/todo behavior remains UNPROVEN. Both current D runs exit 0 and produce baseline-identical JSON; G has zero findings. Portable strict structural fixture: clean zero findings; all 11 defects rejected with its own prior registry. This does not prove actual batch E.
+Final prerequisites: A has zero violations after exactly the five A3 commit/path exemptions; B has zero extractor-closure changes; C has zero changed authority statuses; I has zero changed reader/instruction files. Ratchet exit 0: 995 files, 24 accounted edits, 1 accounted new file. Placement exit 0: 446 files, 445 matched, zero leftover/ambiguous/evidence-without-index, 1 recorded exception. Candidate exit 0: same 5 baseline findings, zero new findings. Retirement expected exit 1: 15 blocked, 4 pass, 1 review, zero invariant failures.
+Green implementation commit: 1ec3ceca6. Review package includes tooling.md, tooling-verification.json and structural-mutation-probe.mjs. Independent full review, 8 skipped/65 todo tests, real-batch E, review brief, maps/routes, baseline counts and all real batches remain UNPROVEN or not started. T7 vocabulary promotion is deliberately deferred until actual first use, not simulated by fixtures.

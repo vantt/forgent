@@ -2,7 +2,7 @@
 
 Executor: codex-session:1@2026-10-07
 Date: 2026-10-07
-State: authoring; independent review not performed.
+State: ready-for-review; independent full tooling review not performed.
 
 ## Repeatable decision input
 
@@ -231,10 +231,10 @@ Verification: targeted review/format/authorship tests 26/26; all 51 scripts test
 
 ## Complete suite and structural gate proof
 
-The complete existing test discovery selected 389 files. Command: `env -u CLAUDE_CODE_SESSION_ID node --test <all 389 discovered test files>`. Environment uses the existing runner's `FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1` and checkout-local `CARGO_TARGET_DIR`/`FGOS_HOST_BIN`; no new skip branch or test filter. Result: exit 0; 7,318 tests, 7,245 pass, 0 fail, 8 skipped, 65 todo. Skipped/todo cases are not claimed as proven. Scratch log: `/tmp/phase06/full-suite.log`.
+The complete existing test discovery selected 389 files. Command: `env -u CLAUDE_CODE_SESSION_ID node --test <all 389 discovered test files>`. Environment uses the existing runner's `FGOS_DISABLE_OPPORTUNISTIC_CHECKS=1` and checkout-local `CARGO_TARGET_DIR`/`FGOS_HOST_BIN`; no new skip branch or test filter. Result on committed tooling `1ec3ceca6`: exit 0; 7,318 tests, 7,245 pass, 0 fail, 8 skipped, 65 todo. Skipped/todo cases are not claimed as proven. Scratch log: `/tmp/phase06/full-suite-committed.log`.
 
 Both invocation-only conservation proofs pass and their complete JSON remains identical to the saved baseline: run the gate once with `reports/identity-registry.json`, once with `reports/phase-02-identity-registry.json`. The previous-registry loader and default gate invariants are unchanged.
 
-Portable structural probe: `node plans/260925-documentation-authority-unification/reports/phase-06/structural-mutation-probe.mjs`. It creates an isolated committed fixture, invokes the actual scoped strict CLI against both prior registries, accepts the clean copy with zero findings, and rejects all 11 mutations: removed row, missing anchor, duplicate row, unknown id, missing reviewer, stale source, stale target, self-review, unequal mirror, changed exact digest, restore without anchor. Fixture reports are synthetic proofs, never real batch reviews.
+Portable structural probe: `node plans/260925-documentation-authority-unification/reports/phase-06/structural-mutation-probe.mjs`. It creates an isolated committed fixture, invokes the actual scoped strict CLI with that fixture's previous registry, accepts the clean copy with zero findings, and rejects all 11 mutations: removed row, missing anchor, duplicate row, unknown id, missing reviewer, stale source, stale target, self-review, unequal mirror, changed exact digest, restore without anchor. Fixture reports are synthetic proofs, never real batch reviews. This is not a real-batch E closure; real-batch E must later run separately against each of the two owner-specified prior registries.
 
 Independent full tooling review remains UNPROVEN. No real batch authoring, first-use vocabulary promotion, area-map freeze, route change, approval or authority cutover has occurred.

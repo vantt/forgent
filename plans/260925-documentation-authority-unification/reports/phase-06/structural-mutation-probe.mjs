@@ -1,0 +1,66 @@
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import assert from 'node:assert/strict';
+import { execFileSync, spawnSync } from 'node:child_process';
+import { bootstrapIdentityRegistry, carryForwardIdentityRegistryRepoWide, generateInventory, IDENTITY_REGISTRY_PATH } from '../../../../scripts/generate-doc-inventory.mjs';
+import { writeShardedJsonArtifact } from '../../../../scripts/doc-inventory-artifact.mjs';
+import { buildConservationUnitLookup } from '../../../../scripts/check-doc-inventory-gates.mjs';
+import { generateBaseline, DEFAULT_BASELINE_PATH } from '../../../../scripts/check-legacy-docs-ratchet.mjs';
+const repo = path.resolve(fileURLToPath(new URL('../../../../', import.meta.url)));
+const plan = 'plans/260925-documentation-authority-unification';
+const root = fs.mkdtempSync(path.join(os.tmpdir(), 'structural-conservation-'));
+const source = 'docs/specs/source.md', target = 'docs/platform/probe/spec.md';
+const mirrorSource = 'docs/architect/agent-coordination/verification/panel/run/proof.md';
+const mirrorTarget = mirrorSource.replace('docs/architect/', 'docs/platform/');
+const author = 'fixture-session:author@2026-10-07', reviewer = 'reviewer:fixture-session:other@2026-10-07';
+const reportPath = plan + '/reports/phase-06/review-contract-fixture.md';
+const git = (...args) => execFileSync('git', args, { cwd: root, encoding: 'utf8', stdio: 'pipe' }).trim();
+const write = (file, value) => { fs.mkdirSync(path.dirname(path.join(root, file)), { recursive: true }); fs.writeFileSync(path.join(root, file), typeof value === 'string' ? value : JSON.stringify(value)); };
+try {
+  git('init', '-q'); git('config', 'user.name', 'Fixture'); git('config', 'user.email', 'fixture@example.invalid');
+  const text = '# Structural conservation fixture with a complete source contract\n\n```txt\nType: Spec\nPurpose: Preserve every distinct source unit and its independently reproducible outcome.\nAudience: Developers\n```\n\nThe consumer MUST conserve every declared unit and route it to exactly one canonical owner.\n';
+  const proof = '# Immutable verification proof fixture with a distinct complete source unit\n\n```txt\nType: Verification\nPurpose: Preserve this copied fixture evidence independently from the specification.\n```\n\nA distinct immutable fixture receipt records the actual source evidence without adding authority.\n';
+  for (const file of [source, target]) write(file, text);
+  for (const file of [mirrorSource, mirrorTarget]) write(file, proof);
+  write('docs/doc-governance.md', fs.readFileSync(repo + '/docs/doc-governance.md', 'utf8'));
+  for (const file of ['claim-and-disposition-vocabulary.json', 'minimum-constitution.json']) write(plan + '/' + file, fs.readFileSync(repo + '/' + plan + '/' + file, 'utf8'));
+  write(plan + '/transitional-switchboard.json', { version: 1, rootDocuments: [], areas: [{ area: 'Fixture', authorityStatus: 'candidate', entryPoint: target, currentRoutes: [{ route: source, authorityStatus: 'legacy-current' }, { route: target, authorityStatus: 'candidate' }] }, { area: 'Agent coordination', authorityStatus: 'candidate', entryPoint: mirrorTarget, currentRoutes: [{ route: mirrorSource, authorityStatus: 'legacy-current' }, { route: mirrorTarget, authorityStatus: 'candidate' }] }] });
+  write(DEFAULT_BASELINE_PATH, generateBaseline({ repoRoot: root }));
+  const tracked = [source, target, mirrorSource, mirrorTarget, 'docs/doc-governance.md', plan + '/claim-and-disposition-vocabulary.json', plan + '/minimum-constitution.json', plan + '/transitional-switchboard.json', DEFAULT_BASELINE_PATH];
+  git('add', '--', ...tracked); git('commit', '-qm', 'docs: record structural fixture', '--', ...tracked);
+  write(IDENTITY_REGISTRY_PATH, bootstrapIdentityRegistry(root, { commit: git('rev-parse', 'HEAD') }));
+  git('add', '--', IDENTITY_REGISTRY_PATH); git('commit', '-qm', 'docs: bind structural identities', '--', IDENTITY_REGISTRY_PATH);
+  let inventory = generateInventory(root, { commit: git('rev-parse', 'HEAD'), identityRegistryPath: path.join(root, IDENTITY_REGISTRY_PATH) });
+  const packCommit = inventory.commit;
+  const unitsOf = buildConservationUnitLookup(root, packCommit);
+  const sourceRows = inventory.claimLedger.filter((row) => row.sourcePath === source);
+  const chosen = sourceRows[0], targetUnit = unitsOf(target).find((unit) => unit.anchor === chosen.sourceAnchor);
+  const manual = { claimId: chosen.claimId, sourceUnitDigest: chosen.sourceUnitDigest, targetOwner: target, targetAnchor: targetUnit.anchor, targetUnitDigest: targetUnit.textDigest, targetAncestry: targetUnit.ancestry, claimKind: chosen.claimKind, disposition: 'promote', reviewStatus: 'reviewed', rationale: 'The complete fixture unit is carried at its matching committed target.', authoredBy: author, reviewedBy: reviewer, reviewedAt: '2026-10-07', reviewReport: reportPath, reviewPackCommit: packCommit, reviewPackId: 'a'.repeat(64), seedScoreId: 'b'.repeat(64), reviewNote: 'Fixture-only independent review of the complete carried unit.' };
+  write(reportPath, `Fixture only: not a real approval.\nReviewer: ${reviewer}\nPack commit: ${packCommit}\nPack id: ${manual.reviewPackId}\nSeed score: ${manual.seedScoreId}\n| ${chosen.claimId} | ok | ${manual.reviewNote} |\n`);
+  git('add', '--', reportPath); git('commit', '-qm', 'docs: record structural fixture review', '--', reportPath);
+  manual.reviewReportCommit = git('rev-parse', 'HEAD');
+  write('previous.json', JSON.parse(fs.readFileSync(path.join(root, IDENTITY_REGISTRY_PATH))));
+  write(IDENTITY_REGISTRY_PATH, carryForwardIdentityRegistryRepoWide(root, { commit: git('rev-parse', 'HEAD'), identityRegistryPath: path.join(root, IDENTITY_REGISTRY_PATH) }));
+  git('add', '--', IDENTITY_REGISTRY_PATH); git('commit', '-qm', 'docs: carry structural identities', '--', IDENTITY_REGISTRY_PATH);
+  inventory = generateInventory(root, { commit: git('rev-parse', 'HEAD'), identityRegistryPath: path.join(root, IDENTITY_REGISTRY_PATH) });
+  writeShardedJsonArtifact(path.join(root, 'inventory.json'), inventory);
+  const shard = { version: 1, shard: 'structural-fixture', authorSession: author, authorshipRequired: true, sources: [source, mirrorSource], claims: [manual], files: [{ path: source, disposition: 'promote', rationale: 'All source fixture units have one target.', targets: [target] }], exact: [{ source, target, rows: sourceRows.slice(1).map((row) => ({ claimId: row.claimId, sourceUnitDigest: row.sourceUnitDigest, targetUnitDigest: row.sourceUnitDigest })) }], mirrors: [{ path: mirrorSource, target: mirrorTarget, blobSha: inventory.items.find((item) => item.path === mirrorSource).blobSha }] };
+  const register = { entries: [{ id: 'fixture-restored', source: { path: source }, status: 'needs-restoration', restorationOwner: 'fixture', gate: 'fixture', phase3Ledger: { claimId: manual.claimId }, reviewedDisposition: { decision: 'restored', reviewer, reviewedAt: '2026-10-07', owner: target, anchor: targetUnit.anchor, unitDigest: targetUnit.textDigest } }] };
+  const mutations = [['clean', null, null], ['removed-row', (s) => { s.claims = []; }, 'claims-not-reviewed'], ['missing-anchor', (s) => { s.claims[0].targetAnchor = 'missing'; }, 'decision-target-anchor-missing'], ['duplicate-row', (s) => s.claims.push({ ...s.claims[0] }), 'decision-claim-duplicate'], ['unknown-id', (s) => { s.claims[0].claimId = 'claim_' + 'f'.repeat(32); }, 'decision-claim-unknown'], ['missing-reviewer', (s) => { delete s.claims[0].reviewedBy; }, 'decision-reviewed-incomplete'], ['stale-source', (s) => { s.claims[0].sourceUnitDigest = 'f'.repeat(64); }, 'decision-digest-stale'], ['stale-target', (s) => { s.claims[0].targetUnitDigest = 'f'.repeat(64); }, 'decision-target-drift'], ['self-review', (s) => { s.claims[0].authoredBy = reviewer.replace('reviewer:', ''); }, 'decision-self-review'], ['unequal-mirror', (s) => { s.mirrors[0].target = target; }, 'decision-mirror-invalid'], ['changed-exact', (s) => { s.exact[0].rows[0].targetUnitDigest = 'f'.repeat(64); }, 'decision-exact-invalid'], ['restore-without-anchor', null, 'dropped-claim-restore-invalid']];
+  const results = [];
+  for (const [name, mutate, expected] of mutations) {
+    const copy = structuredClone(shard), dropped = structuredClone(register);
+    if (mutate) mutate(copy);
+    if (name === 'restore-without-anchor') delete dropped.entries[0].reviewedDisposition.anchor;
+    const dir = 'cases/' + name; write(dir + '/structural-fixture.json', copy); write('dropped.json', dropped);
+    const run = spawnSync('node', [repo + '/scripts/check-doc-inventory-gates.mjs', '--repo-root', root, '--inventory', 'inventory.json', '--identity-registry', IDENTITY_REGISTRY_PATH, '--previous-registry', 'previous.json', '--decisions', dir, '--dropped-claims-register', 'dropped.json', '--strict', '--scope', source, '--scope', mirrorSource, '--json'], { cwd: root, encoding: 'utf8', maxBuffer: 20 * 1024 * 1024 });
+    const result = JSON.parse(run.stdout || '{}');
+    const types = (result.fatalFindings || []).map((row) => row.type);
+    if (name === 'clean') assert.equal(run.status, 0, run.stderr + JSON.stringify(types) + JSON.stringify(result.conservationOpen));
+    else { assert.equal(run.status, 1, name); assert.ok(types.includes(expected), name + ': ' + JSON.stringify(types) + run.stderr); }
+    results.push({ name, exit: run.status, findings: types });
+  }
+  console.log(JSON.stringify(results));
+} finally { fs.rmSync(root, { recursive: true, force: true }); }
