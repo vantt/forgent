@@ -169,3 +169,10 @@ test('sensitivity controls must belong to the bound batch even when the sensitiv
   const verdicts = shard.claims.map((row) => ({ claimId: row.claimId, verdict: 'ok', note: 'Entire shown contract retained.' }));
   assert.throws(() => applyReviewVerdicts(context, shard, { pack, seedProof, verdicts, reviewer, reportPath: 'fixture/review.md' }), /controls.*batch/);
 });
+
+test('reviewer normalization rejects repeated prefixes case folding and invisible self aliases', () => {
+  for (const identity of ['reviewer:reviewer:codex-session:author@2026-10-09', 'reviewer:CODEX-session:AUTHOR@2026-10-09', 'reviewer:codex-session:author\u200b@2026-10-09']) {
+    assert.equal(independentReviewer(identity, author), false, identity);
+  }
+  assert.equal(independentReviewer('reviewer:reviewer:claude-session:other@2026-10-09', author), false);
+});

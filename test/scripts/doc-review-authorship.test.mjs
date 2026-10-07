@@ -89,3 +89,22 @@ test('escaped table pipes retain the exact reviewer note after parsing', (t) => 
   assert.deepEqual(apply(f).findings, []);
   assert.deepEqual(buildReviewPack(f.context, f.shard).rows, []);
 });
+
+test('new shards cannot disable manual review enforcement by omitting or clearing a flag', (t) => {
+  const f = fixture(t);
+  for (const flag of [undefined, false]) {
+    const shard = { ...f.shard, authorshipRequired: flag };
+    const self = { ...f.row, authoredBy: 'fixture-session:other@2026-10-09' };
+    assert.ok(apply(f, self, shard).findings.some((r) => r.type === 'decision-self-review'));
+    const missing = { ...f.row }; delete missing.reviewReport; delete missing.reviewReportCommit; delete missing.authoredBy;
+    assert.ok(apply(f, missing, shard).findings.some((r) => r.type === 'decision-review-report-missing'));
+    assert.ok(apply(f, { ...f.row, authoredBy: 'script:forged' }, shard).findings.some((r) => r.type === 'decision-script-identity'));
+  }
+});
+
+test('case invisible characters and repeated reviewer prefixes cannot hide the author session', (t) => {
+  const f = fixture(t);
+  for (const reviewedBy of ['reviewer:reviewer:fixture-session:author@2026-10-09', 'reviewer:FIXTURE-session:AUTHOR@2026-10-09', 'reviewer:fixture-session:author\u200b@2026-10-09']) {
+    assert.ok(apply(f, { ...f.row, reviewedBy }).findings.some((r) => r.type === 'decision-self-review'), reviewedBy);
+  }
+});
