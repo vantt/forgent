@@ -693,6 +693,36 @@ test('a unit refused by policy fails its step and the workflow; dependent steps 
   assert.deepEqual(types.filter((t) => t === 'step.fail' || t === 'workflow.fail'), ['step.fail', 'workflow.fail']);
 });
 
+test('a unit that throws instead of returning fails its step and the workflow with the reason recorded', async () => {
+  const tmp = setupTestRepo();
+  const workflow = validateWorkflow({
+    id: 'throw-stops-run',
+    steps: [
+      {
+        id: 'first',
+        units: [{ id: 'u1', template: { capability: 'docs:write', pattern: 'no-such-pattern', objective: 'cannot be dispatched' } }],
+      },
+      {
+        id: 'second',
+        dependsOn: ['first'],
+        units: [{ id: 'u2', template: { capability: 'docs:write', pattern: 'solo', objective: 'must never start' } }],
+      },
+    ],
+  });
+
+  const state = await startWorkflow({ workflow, repoRoot: tmp, cwd: tmp, worktree: tmp });
+
+  assert.equal(state.status, 'failed');
+  assert.equal(state.outcome, 'execution-failure');
+  assert.equal(state.steps.first.status, 'failed');
+  assert.match(state.steps.first.reason, /unit u1 could not run: .*no-such-pattern/);
+  assert.equal(state.steps.first.units.u1.status, 'completed');
+  assert.equal(state.steps.first.units.u1.outcome, 'execution-failure');
+  assert.equal(state.steps.second.status, 'pending');
+  const types = readWorkflowEvents({ repoRoot: tmp, workflowRunId: state.workflowRunId }).map((e) => e.type);
+  assert.deepEqual(types.filter((t) => t === 'step.fail' || t === 'workflow.fail'), ['step.fail', 'workflow.fail']);
+});
+
 test('the owner request and earlier step output reach each unit objective', async () => {
   const tmp = setupTestRepo();
   // Worker that records the prompt it was given into its outbox, the one place a confined

@@ -48,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- A workflow run whose unit could not even start (for example a hand-off reference that no longer resolves) now fails its step and the run with the reason recorded, instead of ending the advance with the run still `running` and nothing in its event log.
 - Dispatch no longer loads every pre-existing dirty file into memory for the whole run: dirty-before snapshots keep only existence and a streamed sha256, so a worktree with large untracked files no longer drives `fgos run` to multi-GB RSS or OOM, and a FIFO or device among the dirty files no longer hangs the run.
 - A failure to record a unit's failed settlement no longer hides the execution error that caused it.
 - `metrics eval record` refusing an invalid eval store now names each offending shard file and line, and how to repair it.

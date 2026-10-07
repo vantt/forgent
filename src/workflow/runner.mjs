@@ -385,16 +385,28 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
             },
           });
 
-          // Run Unit via P1 execution door
-          const unitRunResult = await runUnit({
-            unitData,
-            repoRoot: mainRoot,
-            cwd: unitWorktree,
-            worktree: unitWorktree,
-            pattern: unitPatternOf(u.template),
-            overrides: unitOverridesOf(u),
-            workflow: { runId: workflowRunId, stepId: step.id, unitId: u.id },
-          });
+          // Run Unit via P1 execution door. A throw (an unresolvable hand-off ref, a refused
+          // config) is a failed unit like any other: left uncaught it would end the advance with
+          // the run still `running` and no event saying why.
+          let unitRunResult;
+          try {
+            unitRunResult = await runUnit({
+              unitData,
+              repoRoot: mainRoot,
+              cwd: unitWorktree,
+              worktree: unitWorktree,
+              pattern: unitPatternOf(u.template),
+              overrides: unitOverridesOf(u),
+              workflow: { runId: workflowRunId, stepId: step.id, unitId: u.id },
+            });
+          } catch (err) {
+            unitRunResult = {
+              unitRunId: null,
+              outcome: 'execution-failure',
+              results: [],
+              error: String(err?.message ?? err),
+            };
+          }
 
           recordEvent({
             repoRoot: mainRoot,
@@ -415,14 +427,18 @@ async function advanceWorkflowRun({ repoRoot, workflowRunId, workflow, mainRoot,
           // A unit that did not pass stops its step: later units and dependent steps must not
           // run on top of work that was refused, failed, or is still waiting on someone.
           if (unitRunResult.outcome !== 'pass') {
-            failedUnit = { unitId: u.id, outcome: unitRunResult.outcome, results: unitRunResult.results || [] };
+            failedUnit = { unitId: u.id, outcome: unitRunResult.outcome, results: unitRunResult.results || [], error: unitRunResult.error };
             break;
           }
         }
 
         if (failedUnit) {
           const refusal = failedUnit.results.find((r) => r?.refused)?.refused;
-          const reason = refusal ? `${refusal.reason}: ${refusal.detail}` : `unit ${failedUnit.unitId} ended ${failedUnit.outcome}`;
+          const reason = refusal
+            ? `${refusal.reason}: ${refusal.detail}`
+            : failedUnit.error
+              ? `unit ${failedUnit.unitId} could not run: ${failedUnit.error}`
+              : `unit ${failedUnit.unitId} ended ${failedUnit.outcome}`;
           recordEvent({
             repoRoot: mainRoot,
             workflowRunId,
