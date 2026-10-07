@@ -3,7 +3,7 @@
 Date: 2026-10-07
 Executor: codex-session:1@2026-10-07
 Session counter: 1
-Step: 1, ancestry/range regressions demonstrated; implementation next
+Step: 1, ancestry/range fixes verified; remaining tooling next
 State: authoring
 Last green conservation commit: 5aee80444
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
@@ -17,7 +17,7 @@ Real conflicts: SC-1 is owner-resolved; candidate correction belongs to the root
 Holds: none authored
 Promoted-document edits: none
 
-Next action: commit failing ancestry/range regressions, implement context-bound rebind and legacy-only range coverage, then continue remaining tooling sequentially to full independent review.
+Next action: commit context-bound rebind and legacy-only range coverage, run post-commit suite and both D inputs, then continue T3 onward sequentially; close pre-reviewed report evidence through T8; stop at full independent review.
 
 Evidence: A3 accounts exactly five commit/path pairs, no other violation; B/C/I unchanged; both resume D proofs pass and match baseline; ratchet clean, placement unchanged, retirement 15 blocked/4 pass/1 review and candidate 5 baseline findings. Red regression 8eb346727: 4 pass/2 fail. Fixed targeted tests: 40/40; standalone hold probe exit 0, blocking preserved, zero unchanged-gate findings. Complete suite 805/805 in 46 files. Both hold and rework retain the note, searched evidence and no approval identity/date. No real held claim exists to add to owner queue. Full tooling fixes/maps/review and scoped E remain UNPROVEN.
 Independent early read-only review at 789870507 was supplied by the owner; its accepted-with-fixes findings are now requirements. It is not the final committed tooling review gate and marks no decision row reviewed.
@@ -25,3 +25,4 @@ Latest evidence: A2 committed as 64aaab64b; post-commit suite 805/805 and both D
 Binding evidence: red 738bcec1b (three failures), heading-display red 16cfe540e (one failure), corrected targeted 20/20 and full 811/811. Actual pack exposes all heading payloads; synthetic API smoke passes the unchanged decision invariant for hold/rework and binds fixture approvals to seen text. No real approval is produced. Both D proofs after 67e82caf7 remain baseline-identical.
 Exact-source evidence: red e3fa0f11f has two demonstrated failures; corrected targeted 46/46 and full 813/813. Actual summary class/source counts unchanged; regenerated scratch proposal gate exit 0, zero fatal findings. Post-binding 12704fb31 suite 811/811 and both D proofs baseline-identical.
 Ancestry/range red evidence: `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-decision-conservation.test.mjs`: 3 pass, 2 fail. Identical text moved to another heading remains incorrectly reviewed; coverage incorrectly counts candidate and non-authority files. Post-exact commit 5aee80444: suite 813/813 and both D proofs baseline-identical. Remaining fixes and full tooling review are UNPROVEN.
+Ancestry/range corrected evidence: targeted 5/5, full scripts suite 815/815, real committed-unit boundary smoke exit 0. Actual coverage reports 1,040 legacy files rather than all corpora; 937 covered and 103 uncovered by the scratch coordination map. T8 report proof, remaining tooling/maps and full independent review remain UNPROVEN.
