@@ -11,11 +11,11 @@ Related:
 - `plans/260925-documentation-authority-unification/plan.md` §7 Phase 02
 ```
 
-- **Commit:** `5519051da4618d5be4a22186a388a6b5712f07e5`
+- **Commit:** `92f69d884b84f3f1f4672e132808e2e1dbbc1b82`
 - **Files scanned:** 4318
 - **Claim rows:** 87153
 - **Headings / unheaded blocks / mixed-file blocks:** 26371 / 59605 / 1177
-- **Gaps:** 1061 (1054 file/routing gap(s), 7 claim identity-gap blocker(s))
+- **Gaps:** 1054 (1054 file/routing gap(s), 0 claim identity-gap blocker(s))
 - **Exact duplicate-content groups:** 818
 - **Semantic conflict groups:** 151
 
@@ -2107,13 +2107,6 @@ Related:
 
 | Claim | Source | Anchor | Identity status | Disposition |
 |---|---|---|---|---|
-| `claim_identity_gap_902188fcdf84a149bb96630e` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | `unheaded-block-6` | `ambiguous-registry-gap` | `unknown-blocking` |
-| `claim_identity_gap_fe8972db3db2e647b2c413ef` | `docs/architect/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | `unheaded-block-29` | `ambiguous-registry-gap` | `unknown-blocking` |
-| `claim_identity_gap_3c8321782f3796b9f1782681` | `docs/history/stage-status-driving-coordination/plan.md` | `unheaded-block-1` | `ambiguous-registry-gap` | `unknown-blocking` |
-| `claim_identity_gap_432b5378ca7a2d25bc3449a5` | `docs/history/stage-status-driving-coordination/plan.md` | `unheaded-block-13` | `ambiguous-registry-gap` | `unknown-blocking` |
-| `claim_identity_gap_0b40905004b2a2ca66eae292` | `docs/history/stage-status-driving-coordination/plan.md` | `unheaded-block-30` | `ambiguous-registry-gap` | `unknown-blocking` |
-| `claim_identity_gap_52cafe1662702962c56e0940` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | `unheaded-block-6` | `ambiguous-registry-gap` | `unknown-blocking` |
-| `claim_identity_gap_4000c5c2d0f6b828a16a9ca0` | `docs/platform/agent-coordination/verification/step-09-mvp6-to-mvp9/P06.1-P07.1-red-team.md` | `unheaded-block-29` | `ambiguous-registry-gap` | `unknown-blocking` |
 
 ## Claim Ledger Sample (first 500 rows)
 
@@ -2316,8 +2309,8 @@ Related:
 | `claim_0fc7c6e612423aa78420e2b5ad63f1bf` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `contracts` | `architecture` | `unknown-blocking` |  |
 | `claim_976c9258480b6a6549a86ce7f22c593e` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-12` | `architecture` | `unknown-blocking` |  |
 | `claim_a6751b566cc04089bc1ca55950399080` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `dispatchrequest-outer-core` | `architecture` | `unknown-blocking` |  |
-| `claim_7295b122cf1360b5194f968be018cac8` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-13` | `architecture` | `unknown-blocking` |  |
-| `claim_f551735968bce5d31f1a46aa0539221b` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-14` | `architecture` | `unknown-blocking` |  |
+| `claim_88d68c4bcfd5253c805d3f898f3faa4f` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-13` | `architecture` | `unknown-blocking` |  |
+| `claim_30f527420e02587ba71b69c406ed753a` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-14` | `architecture` | `unknown-blocking` |  |
 | `claim_f90925846cf63161875b4657557bdf4f` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-15` | `architecture` | `unknown-blocking` |  |
 | `claim_36cf2353a80eb49cb092dd4bf0df9335` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `policypatch` | `architecture` | `unknown-blocking` |  |
 | `claim_e81aaa3f9c83d22d13567d50efd6f492` | `docs/architect/agent-coordination/architecture/dispatch-control-plane.md` | `unheaded-block-16` | `contract` | `unknown-blocking` |  |

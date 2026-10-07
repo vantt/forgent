@@ -461,30 +461,30 @@
       "targetUnitDigest": "bc5ca7e6617538adf69f4c157336e967"
     },
     {
-      "claimId": "claim_c03100e389a11a8b1198b2190e1a8956",
-      "sourceUnitDigest": "02c8b88dda473400",
+      "claimId": "claim_6175bd55a942311ba1056efd762f44be",
+      "sourceUnitDigest": "23622b5a51f195a4",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "reviewed",
       "targetAnchor": "unheaded-block-20",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0006 (source lines 1447-1454: the transition list and its label line \"Ngữ nghĩa:\") carried line for line into its own block; text identical to the source. The unit now includes the one-line label because the extraction rule merges short blocks into the previous block of their section.",
-      "targetUnitDigest": "02c8b88dda473400c015db8455b8a7f0",
-      "reviewedBy": "independent reviewer (re-review after the extraction change)",
+      "rationale": "Body of ADR 0006 (source lines 1447-1452, the transition list) carried line for line into its own block; text identical to the source.",
+      "targetUnitDigest": "23622b5a51f195a41cc870aac9b70d45",
+      "reviewedBy": "independent reviewer (re-review after the label rule)",
       "reviewedAt": "2026-10-07"
     },
     {
-      "claimId": "claim_2e390ae8e0379eae085591d9d6ff9af3",
-      "sourceUnitDigest": "8510e498faf8f821",
+      "claimId": "claim_e482cc83d02ca103ac12e881c2a712ee",
+      "sourceUnitDigest": "671d794492bb185f",
       "targetOwner": "docs/platform/work-state/decisions/retired-decision-history.md",
       "reviewStatus": "reviewed",
       "targetAnchor": "unheaded-block-21",
       "claimKind": "decision",
       "disposition": "promote",
-      "rationale": "Body of ADR 0006 (source lines 1456-1459, starting \"- **`done` vẫn là trạng thái terminal**, và từ nay nghĩa là **\"đã nhận\") carried line for line into its own block; text identical to the source.",
-      "reviewedBy": "independent reviewer (review-b-decisions-first)",
-      "reviewedAt": "2026-10-07",
-      "targetUnitDigest": "8510e498faf8f8219f1feb772eb5c6fb"
+      "rationale": "The label \"Ngữ nghĩa:\" and the two bullets it introduces (source lines 1454-1459) carried line for line into one block; the extraction rule attaches a short label ending in a colon to the block it introduces, in the candidate as in the source; text identical to the source.",
+      "targetUnitDigest": "671d794492bb185fc86e5b1cdbca92dc",
+      "reviewedBy": "independent reviewer (re-review after the label rule)",
+      "reviewedAt": "2026-10-07"
     },
     {
       "claimId": "claim_e602fe2731b631f7be06ccebc5cf8e91",
