@@ -87,3 +87,34 @@ test('summary lists multi-legacy duplicate groups and required reconciliation so
   assert.deepEqual(report.legacyHistoricalPaths, [source]);
   assert.equal(report.reconciliationSources.find((r) => r.path === 'docs/backlog.md').rows, 1);
 });
+
+test('exact proof cannot script-review canonical self-carries or non-legacy sources', () => {
+  const a = { ...unit(body), textDigest: 'a'.repeat(64) };
+  for (const kind of ['canonical-self', 'candidate-source', 'consumer-source']) {
+    const inventory = inventoryFor([a]);
+    const from = kind === 'canonical-self' ? target : source;
+    if (kind === 'canonical-self') {
+      inventory.items = [inventory.items[1]];
+      inventory.claimLedger[0].sourcePath = target;
+    } else if (kind === 'candidate-source') inventory.items[0].authorityStatus = 'candidate';
+    else inventory.items[0].corpus = 'consumer-project';
+    const context = { inventory, unitsOf: () => [a] };
+    const shard = { version: 1, shard: 'exact', sources: [from], claims: [], exact: [{ source: from, target, rows: [{ claimId: inventory.claimLedger[0].claimId, sourceUnitDigest: a.textDigest, targetUnitDigest: a.textDigest }] }] };
+    assert.ok(applyDecisions(inventory, [shard], { vocabulary, unitsOf: context.unitsOf }).findings.some((finding) => finding.type === 'decision-exact-invalid'));
+    assert.throws(() => proposeExactDecisions(context, { source: from, target, shard: 'exact', author: 'fixture-session:author@2026-10-07' }));
+  }
+});
+
+test('two identical source occurrences cannot both be exact against one target occurrence', () => {
+  const a = { ...unit(body, 'first'), textDigest: 'a'.repeat(64) };
+  const b = { ...a, anchor: 'second' };
+  const inventory = inventoryFor([a, b]);
+  const unitsOf = (owner) => owner === source ? [a, b] : [a];
+  const analysis = analyzeCounterpart({ inventory, unitsOf }, source, target);
+  assert.deepEqual(analysis.map((row) => row.class), ['Weak-exact', 'Weak-exact']);
+  const shard = proposeExactDecisions({ inventory, unitsOf }, { source, target, shard: 'exact', author: 'fixture-session:author@2026-10-07' });
+  assert.equal(shard.exact, undefined);
+  assert.deepEqual(shard.claims.map((row) => row.reviewStatus), ['pending', 'pending']);
+  const forced = { ...shard, claims: [], exact: [{ source, target, rows: inventory.claimLedger.map((row) => ({ claimId: row.claimId, sourceUnitDigest: a.textDigest, targetUnitDigest: a.textDigest })) }] };
+  assert.equal(applyDecisions(inventory, [forced], { vocabulary, unitsOf }).findings.filter((finding) => finding.type === 'decision-exact-invalid').length, 2);
+});
