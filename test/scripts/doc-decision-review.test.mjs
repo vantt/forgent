@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { buildReviewPack, seedReviewPack, scoreReviewPack, applyReviewVerdicts, parseReviewVerdicts } from '../../scripts/propose-doc-decisions.mjs';
+import { applyDecisions } from '../../scripts/check-doc-inventory-gates.mjs';
 
 const author = 'codex-session:author@2026-10-07';
 const reviewer = 'reviewer:claude-session:other@2026-10-07';
@@ -56,3 +57,19 @@ test('verdict table names the reviewer and requires an explicit verdict and own 
   assert.throws(() => parseReviewVerdicts(text, `reviewer:${author}`), /reviewer/);
   assert.throws(() => parseReviewVerdicts(text.replace('Entire contract retained.', ''), reviewer), /note/);
 });
+
+for (const verdict of ['hold', 'rework']) {
+  test(`unknown dispositions remain blocking after a ${verdict} verdict and pass decision validation`, () => {
+    const inventory = { ...context.inventory, items: [{ path: rows[0].sourcePath }], claimLedger: [rows[0]] };
+    const blocked = { ...shard, claims: [{ ...shard.claims[0], targetOwner: null, targetAnchor: null, disposition: 'unknown-blocking', reviewStatus: 'blocking', searched: [rows[0].sourcePath], reviewedBy: reviewer, reviewedAt: '2026-10-06' }] };
+    const note = 'The owner must name the missing carrier.';
+    const result = applyReviewVerdicts({ ...context, inventory }, blocked, { verdicts: [{ claimId: rows[0].claimId, verdict, note }], reviewer, reportPath: 'fixture/review.md' });
+    const decided = result.claims[0];
+    assert.equal(decided.reviewStatus, 'blocking');
+    assert.equal(decided.reviewNote, note);
+    assert.equal(decided.reviewedBy, undefined);
+    assert.equal(decided.reviewedAt, undefined);
+    const vocabulary = { claimKinds: [{ id: 'implementation-fact' }], sourceDispositions: [{ id: 'unknown-blocking', requiresTargetOwner: false }] };
+    assert.deepEqual(applyDecisions(inventory, [result], { vocabulary }).findings, []);
+  });
+}
