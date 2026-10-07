@@ -182,10 +182,23 @@
     },
     {
       "id": "supersede",
-      "definition": "Source or claim has been explicitly superseded by a newer approved decision or architecture, and is retired.",
+      "definition": "The target carries the WHOLE unit (possibly reworded or restructured) in a form that replaces it, and the source claim is retired. A target that carries only part of the unit is a partial-carry, never a supersede.",
       "requiresTargetOwner": true,
       "requiresRationale": true,
       "retainsAuthority": false,
+      "allowedFileClasses": [
+        "maintained-authority",
+        "retained-source"
+      ],
+      "usage": "in-use"
+    },
+    {
+      "id": "partial-carry",
+      "definition": "The target carries part of the unit; the rest is named in the row's remainder and is not carried anywhere. Blocks cutover like unknown-blocking and never satisfies a promotion gate.",
+      "requiresTargetOwner": true,
+      "requiresRationale": true,
+      "retainsAuthority": false,
+      "blocksCutover": true,
       "allowedFileClasses": [
         "maintained-authority",
         "retained-source"
@@ -790,9 +803,15 @@
       "minor": 2,
       "change": "move the dispositions split, supersede, archive-with-reason and delete-as-obsolete and the review status reviewed from usage reserved to usage in-use; no value, definition or rule text changes",
       "evidence": "Used by the dual pilot (2026-10-07): the 966 decision rows (600 of the host-invocation audit, 366 of the work-state transformation) of the shards under plans/260925-documentation-authority-unification/pilot/decisions/ carry split (6 rows), supersede (196), archive-with-reason (20) and delete-as-obsolete (7) next to promote (361), merge (149) and unknown-blocking (227); all 366 rows of the work-state sources carry reviewStatus reviewed with a reviewer and a date, accepted by scripts/check-doc-inventory-gates.mjs --decisions --strict --scope. move, extract, redirect, delete-as-duplicate, defer-with-owner and reject-with-rationale were not used and stay reserved. Evidence limits (stated so the flag is not read as more than it is): of the four dispositions moved, only supersede is used by reviewed rows (1 of the 366 reviewed work-state rows); split, archive-with-reason and delete-as-obsolete appear only in the pending, unreviewed rows of the blind audit of the host-invocation sources, whose supersede/unknown-blocking boundary is open (see the pilot defect report). The flip records that these values are produced in practice; it does not claim they are reviewed."
+    },
+    {
+      "id": "v2.3-001",
+      "minor": 3,
+      "change": "add the disposition partial-carry (blocks cutover, never satisfies a promotion gate) and tighten the definition of supersede to 'the target carries the whole unit, possibly reworded'",
+      "evidence": "In the blind source-to-target audit of the dual pilot (2026-10-07) 134 of the 195 supersede rows carry a rationale saying content is missing, and a unit of the known dropped section (lines 918-920 of the runtime identity source) was filed as supersede although its rationale names the missing sentence. Supersede, a retired disposition that satisfies the conservation gates, was used for partial carries, which no gate blocks. Owner ruling 2026-10-07 (METHOD-MUST-CHANGE, one fix round): the owner authorized this additive disposition and the tightened definition; the existing first-round shards are not re-disposed and stay as first-round evidence."
     }
   ],
-  "minorVersion": 2,
+  "minorVersion": 3,
   "authorityClasses": [
     {
       "id": "navigation",

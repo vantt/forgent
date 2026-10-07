@@ -266,6 +266,18 @@ test('a retired row without a vocabulary disposition is not a recorded removal',
   assert.deepEqual(gates.checkConservation({ inventory: { claimLedger: [] }, registry, vocabulary: VOCABULARY }).invariant.map((f) => f.type), ['retired-row-disposition-missing']);
 });
 
+test('a partial-carry row is open data that blocks the cutover, scoped like the other open checks, and a decision for it names the remainder', () => {
+  const claims = [row({ claimId: 'c1', sourcePath: 'docs/a.md', disposition: 'partial-carry', targetOwner: 'docs/platform/a/README.md', rationale: 'part carried' }), row({ claimId: 'c2', sourcePath: 'docs/b.md', disposition: 'partial-carry', targetOwner: 'docs/platform/a/README.md', rationale: 'part carried' }), row({ claimId: 'c3', sourcePath: 'docs/a.md', disposition: 'supersede', targetOwner: 'docs/platform/a/README.md', rationale: 'whole unit reworded', reviewStatus: 'reviewed' })];
+  const inventory = { items: [], claimLedger: claims };
+  assert.equal(gates.summarizeConservationCompleteness({ inventory, registry: {}, vocabulary: VOCABULARY }).find((o) => o.type === 'claims-partial-carry').count, 2);
+  assert.equal(gates.summarizeConservationCompleteness({ inventory, registry: {}, vocabulary: VOCABULARY, scope: ['docs/a.md'] }).find((o) => o.type === 'claims-partial-carry').count, 1);
+  const pc = { ...goodDecision(), disposition: 'partial-carry' };
+  const types = (d) => gates.applyDecisions(decisionInventory(), [goodShard([d])], { vocabulary: VOCABULARY, targetAnchorsOf: anchorsOf }).findings.map((f) => f.type);
+  assert.deepEqual(types(pc), ['decision-partial-carry-remainder-missing']);
+  assert.deepEqual(types({ ...pc, remainder: 'the second paragraph is not carried' }), []);
+  assert.equal(VOCABULARY.sourceDispositions.find((d) => d.id === 'partial-carry').blocksCutover, true);
+});
+
 test('identical source units that name different owners are reported as open data', () => {
   const claims = [row({ claimId: 'c1', sourcePath: 'docs/a.md', sourceUnitDigest: 'd1', targetOwner: 'docs/platform/a/README.md' }), row({ claimId: 'c2', sourcePath: 'docs/b.md', sourceUnitDigest: 'd1', targetOwner: 'docs/platform/b/README.md' }), row({ claimId: 'c3', sourcePath: 'docs/c.md', sourceUnitDigest: 'd2', targetOwner: 'docs/platform/a/README.md' })];
   const open = gates.summarizeConservationCompleteness({ inventory: { items: [], claimLedger: claims }, registry: {}, vocabulary: VOCABULARY });

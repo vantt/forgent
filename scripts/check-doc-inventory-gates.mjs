@@ -579,9 +579,10 @@ export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf 
       if (d.disposition === 'unknown-blocking' && d.reviewStatus !== 'blocking') fail('decision-blocking-status-mismatch', `claim ${id}: disposition unknown-blocking needs reviewStatus blocking, found "${d.reviewStatus}"`, at);
       if ((d.disposition === 'unknown-blocking' || String(d.disposition).startsWith('delete-')) && !(Array.isArray(d.searched) && d.searched.length > 0)) fail('decision-searched-missing', `claim ${id}: disposition "${d.disposition}" needs a non-empty searched list`, at);
       if (!nonEmpty(d.rationale)) fail('decision-rationale-missing', `claim ${id}: rationale is empty`, at);
+      if (d.disposition === 'partial-carry' && !nonEmpty(d.remainder)) fail('decision-partial-carry-remainder-missing', `claim ${id}: a partial-carry names what the target does not carry in remainder`, at);
 
       const merged = { ...row, targetOwner: d.targetOwner ?? null, targetAnchor: d.targetAnchor ?? null, claimKind: d.claimKind, disposition: d.disposition, reviewStatus: d.reviewStatus, rationale: d.rationale };
-      for (const field of ['reviewedBy', 'reviewedAt', 'searched']) if (d[field] !== undefined) merged[field] = d[field];
+      for (const field of ['reviewedBy', 'reviewedAt', 'searched', 'remainder']) if (d[field] !== undefined) merged[field] = d[field];
       claimLedger[idx] = merged;
       const gapIdx = gapRows ? gapRows.findIndex((gap) => gap?.claimId === id) : -1;
       if (gapIdx >= 0 && d.reviewStatus === 'reviewed' && d.disposition !== 'unknown-blocking') gapRows[gapIdx] = { ...gapRows[gapIdx], disposition: d.disposition };
@@ -728,6 +729,7 @@ export function summarizeConservationCompleteness({ inventory, registry, vocabul
   const open = [
     summarizeOpen('files-unknown-blocking', 'inventory files whose file-level disposition is unknown-blocking', (inventory?.items || []).filter((i) => i.proposedDisposition === 'unknown-blocking' && inScope(i.path)), (i) => i.path),
     summarizeOpen('claims-unknown-blocking', 'claim rows whose disposition is unknown-blocking', claims.filter((c) => c.disposition === 'unknown-blocking'), (c) => `${c.sourcePath}#${c.sourceAnchor}`),
+    summarizeOpen('claims-partial-carry', 'claim rows whose disposition is partial-carry (the target carries only part of the unit; blocks the cutover)', claims.filter((c) => c.disposition === 'partial-carry'), (c) => `${c.sourcePath}#${c.sourceAnchor}`),
     summarizeOpen('claims-not-reviewed', 'claim rows whose reviewStatus is not reviewed', claims.filter((c) => c.reviewStatus !== 'reviewed'), (c) => `${c.sourcePath}#${c.sourceAnchor}`),
     summarizeOpen('claims-without-own-rationale', 'claim rows whose disposition requires a rationale and that carry none of their own', claims.filter((c) => dispositions.get(c.disposition)?.requiresRationale && !(typeof c.rationale === 'string' && c.rationale !== '')), (c) => `${c.sourcePath}#${c.sourceAnchor}`),
     summarizeOpen('identical-units-multiple-owners', 'identical source units whose rows name different target owners', [...unitOwners.entries()].filter(([, set]) => set.size > 1), ([digest, set]) => `${digest.slice(0, 12)}: ${[...set].sort().join(', ')}`),

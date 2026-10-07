@@ -518,7 +518,7 @@ export function createRowValidator(schema, vocabulary, constitution = null) {
       if (!row.targetOwner.startsWith('docs/platform/')) reasons.push('target-owner-outside-platform:targetOwner');
       else if (!classifyPath(row.targetOwner, constitution).kind) reasons.push('target-owner-not-placeable:targetOwner');
     }
-    if (row.reviewStatus === 'reviewed' && (row.disposition === 'unknown-blocking' || blockingKinds.has(row.claimKind))) reasons.push('reviewed-while-blocking:reviewStatus');
+    if (row.reviewStatus === 'reviewed' && (row.disposition === 'unknown-blocking' || row.disposition === 'partial-carry' || blockingKinds.has(row.claimKind))) reasons.push('reviewed-while-blocking:reviewStatus');
     return [...new Set(reasons)];
   };
 }
@@ -588,6 +588,7 @@ export function summarizeCutoverRows(rows, vocabulary) {
       if (blockingKinds.has(row.claimKind)) bump('retained-with-unclassified-kind');
     }
     if (row?.disposition === 'unknown-blocking') bump('unknown-blocking');
+    if (row?.disposition === 'partial-carry') bump('partial-carry');
     if (row?.reviewStatus !== 'reviewed') bump('not-reviewed');
     if (disposition?.requiresRationale && !nonEmptyString(row?.rationale)) bump('without-own-rationale');
   }

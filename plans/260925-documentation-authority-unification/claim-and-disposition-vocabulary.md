@@ -49,7 +49,8 @@ unchanged.
 | `retain-as-evidence` | Source is preserved as immutable historical evidence, test fixture, or audit receipt. | No | Yes | No | in-use |
 | `regenerate-from-source` | File is a derived machine projection generated from code, events, or state. | No | No | No | in-use |
 | `reclassify-out-of-platform-scope` | File belongs to a non-platform corpus (user knowledge, domain doctrine, etc.). | No | Yes | No | in-use |
-| `supersede` | Source or claim has been explicitly superseded by newer approved decisions and retired. | Yes | Yes | No | in-use |
+| `supersede` | The target carries the WHOLE unit (possibly reworded or restructured) in a form that replaces it, and the source claim is retired. A target that carries only part of the unit is a `partial-carry`, never a `supersede`. | Yes | Yes | No | in-use |
+| `partial-carry` | The target carries part of the unit; the rest is named in the row's remainder and is not carried anywhere. Blocks cutover like `unknown-blocking` and never satisfies a promotion gate. | Yes | Yes | No | in-use |
 | `archive-with-reason` | Source is retired and relocated to history/archive with a recorded rationale. | No | Yes | No | in-use |
 | `delete-as-duplicate` | Source is an unneeded exact or semantic duplicate of another document. | Yes | Yes | No | reserved |
 | `delete-as-obsolete` | Source is obsolete with zero evidentiary or historical value. | No | Yes | No | in-use |
@@ -124,7 +125,7 @@ Version 2 is frozen for the meaning of every existing value. A new value or
 section is added only as an additive amendment (2.1, 2.2, ...) listed in
 `amendments` with its evidence, after the validator passes; the constitution keeps
 pinning the major version. Changing or removing a value needs a new major version
-and an owner decision. Two amendments exist: 2.1-001 adds the `authorityClasses` section and the class `verification-record`. The canonical verification kind's class was `evidence`, which collided with the locked rule that evidence is not authority (plan §3 item 10); `evidence` now belongs only to non-authority kinds (`evidence-payload`, `history`). Owner decision 2026-10-06. 2.2-001 moves `split`, `supersede`, `archive-with-reason`, `delete-as-obsolete` and the review status `reviewed` from `reserved` to `in-use` (no meaning changes); evidence: the dual pilot used them (see the amendment in the JSON file).
+and an owner decision. Three amendments exist: 2.1-001 adds the `authorityClasses` section and the class `verification-record`. The canonical verification kind's class was `evidence`, which collided with the locked rule that evidence is not authority (plan §3 item 10); `evidence` now belongs only to non-authority kinds (`evidence-payload`, `history`). Owner decision 2026-10-06. 2.2-001 moves `split`, `supersede`, `archive-with-reason`, `delete-as-obsolete` and the review status `reviewed` from `reserved` to `in-use` (no meaning changes); evidence: the dual pilot used them (see the amendment in the JSON file). 2.3-001 adds the disposition `partial-carry` and tightens the definition of `supersede` (owner ruling 2026-10-07: 134 of 195 `supersede` rows of the blind audit describe missing content).
 
 ## 6. Related Files
 

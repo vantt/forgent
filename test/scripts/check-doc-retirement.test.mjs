@@ -56,6 +56,7 @@ test('every check of both gates gets a result; clean inputs leave only the plann
 const defects = [
   ['file-disposition', (i) => { i.conservation.open.push({ type: 'files-unknown-blocking', count: 2, message: 'm', examples: [] }); }],
   ['claims-closed', (i) => { i.conservation.open.push({ type: 'claims-unknown-blocking', count: 3, message: 'm', examples: [] }); }],
+  ['claims-closed', (i) => { i.conservation.open.push({ type: 'claims-partial-carry', count: 2, message: 'm', examples: [] }); }],
   ['claims-reviewed', (i) => { i.conservation.open.push({ type: 'claims-not-reviewed', count: 3, message: 'm', examples: [] }); }],
   ['dropped-claims-resolved', (i) => { i.conservation.open.push({ type: 'dropped-claims-unreviewed', count: 1, message: 'm', examples: [] }); }],
   ['aliases-cover-immutable-refs', (i) => { i.inventory.consumerEdges.push({ path: 'archive/plans/p.md', targetPath: 'docs/specs/runner.md', kind: 'literal' }); }],

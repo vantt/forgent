@@ -102,9 +102,9 @@ const countsOfCandidateStatus = (candidateStatus) => {
  */
 const EVALUATORS = {
   'file-disposition': ({ conservation }) => verdict(openCount(conservation.open, 'files-unknown-blocking'), 'inventory files whose file-level disposition is unknown-blocking'),
-  'claims-closed': ({ conservation }) => verdict(openCount(conservation.open, 'claims-unknown-blocking') + openCount(conservation.open, 'claims-not-reviewed'), 'claim rows that are unknown-blocking or unreviewed (overlapping counts)'),
+  'claims-closed': ({ conservation }) => verdict(openCount(conservation.open, 'claims-unknown-blocking') + openCount(conservation.open, 'claims-partial-carry') + openCount(conservation.open, 'claims-not-reviewed'), 'claim rows that are unknown-blocking, partial-carry or unreviewed (overlapping counts)'),
   'claims-reviewed': ({ conservation }) => verdict(openCount(conservation.open, 'claims-not-reviewed'), 'claim rows whose reviewStatus is not reviewed'),
-  'owner-per-claim': ({ conservation, cutoverRows }) => verdict(conservation.invariant.filter((f) => /^retained-claim-/.test(f.type)).length + (cutoverRows.byReason['retained-without-owner'] || 0) + (cutoverRows.byReason['unknown-blocking'] || 0), 'owner violations of retained rows, retained rows without an owner and unknown-blocking rows'),
+  'owner-per-claim': ({ conservation, cutoverRows }) => verdict(conservation.invariant.filter((f) => /^retained-claim-/.test(f.type)).length + (cutoverRows.byReason['retained-without-owner'] || 0) + (cutoverRows.byReason['unknown-blocking'] || 0) + (cutoverRows.byReason['partial-carry'] || 0), 'owner violations of retained rows, retained rows without an owner and unknown-blocking rows'),
   'dropped-claims-resolved': ({ conservation }) => verdict(openCount(conservation.open, 'dropped-claims-unreviewed'), 'dropped-claims register entries without a reviewed disposition'),
   'aliases-cover-immutable-refs': ({ inventory, aliasTable, aliasFindings }) => {
     if (aliasFindings.length > 0) return blocked(`alias table invalid: ${aliasFindings.length} finding(s)`);

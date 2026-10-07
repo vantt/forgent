@@ -60,6 +60,7 @@
           "sourceUnitDigest": { "type": "string", "pattern": "^[0-9a-f]{16,64}$", "description": "A prefix of at least 16 hex characters of the row's sourceUnitDigest; it binds the decision to the exact source text that was judged." },
           "targetOwner": { "type": ["string", "null"], "minLength": 1, "description": "The one document that carries the claim; null only when the disposition needs no target owner." },
           "targetAnchor": { "type": ["string", "null"], "minLength": 1, "description": "A heading or block anchor of targetOwner (the anchors the conservation extractor yields); null only when targetOwner is null." },
+          "remainder": { "type": "string", "minLength": 1, "description": "For partial-carry: what part of the unit the target does not carry. Mandatory for partial-carry." },
           "targetUnitDigest": { "type": "string", "pattern": "^[0-9a-f]{16,64}$", "description": "A prefix (at least 16 hex characters) of the text digest of the target unit at targetAnchor when the reviewer compared it. Required for a reviewed decision with a target; when the unit changes the gate reports target drift and the review no longer holds." },
           "claimKind": { "type": "string", "x-vocabulary": "claimKinds" },
           "disposition": { "type": "string", "x-vocabulary": "sourceDispositions" },

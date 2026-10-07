@@ -408,6 +408,8 @@ test('row validator rejects a reviewed row that is still blocking', () => {
   assert.deepEqual(validate(validRow({ reviewStatus: 'reviewed' })), ['reviewed-while-blocking:reviewStatus']);
   const unclassified = validRow({ reviewStatus: 'reviewed', disposition: 'promote', targetOwner: 'docs/platform/x/README.md' });
   assert.deepEqual(validate(unclassified), ['reviewed-while-blocking:reviewStatus']);
+  const partial = validRow({ reviewStatus: 'reviewed', disposition: 'partial-carry', claimKind: 'navigation', targetOwner: 'docs/platform/x/README.md' });
+  assert.deepEqual(validate(partial), ['reviewed-while-blocking:reviewStatus']);
   const ok = validRow({ reviewStatus: 'reviewed', disposition: 'promote', claimKind: 'navigation', targetOwner: 'docs/platform/x/README.md' });
   assert.deepEqual(validate(ok), []);
 });
@@ -640,8 +642,8 @@ test('the freeze is recorded and the additive amendment carries its reason', () 
   const amendment = vocabulary.amendments.find((a) => a.change.includes('verification-record'));
   assert.equal(amendment.minor, 1);
   assert.match(amendment.evidence, /evidence is not authority/);
-  assert.equal(vocabulary.minorVersion, 2);
-  assert.deepEqual(vocabulary.amendments.map((a) => a.id), ['v2.1-001', 'v2.2-001']);
+  assert.equal(vocabulary.minorVersion, 3);
+  assert.deepEqual(vocabulary.amendments.map((a) => a.id), ['v2.1-001', 'v2.2-001', 'v2.3-001']);
 });
 
 test('the usage amendment rests on dispositions that the committed decision shards use', () => {
