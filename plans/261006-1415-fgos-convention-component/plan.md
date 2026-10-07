@@ -3,7 +3,7 @@ title: "fgos convention component (Plan B)"
 description: "Component Rust lõi `convention` sinh và kiểm tên/vị trí report, plan, journal; Node chỉ có client mỏng qua invokeHost."
 status: pending
 priority: P2
-effort: 5d
+effort: 5.5d
 branch: main
 tags: [convention, rust-host, naming, doctor, pre-commit]
 created: 2026-10-06
@@ -17,7 +17,7 @@ Plan status: Proposed — not authorized for execution
 
 Hành động H2 của [synthesis](../reports/harness-investigation-261006-synthesis.md) (§7 hàng H2, §8 mục 5; vấn đề V5, V6, V16, V18). Một nguồn duy nhất, bằng Rust, cho quy ước tên và vị trí của report, plan, journal: `fgos convention name|path|check` trả phong bì `fgos.v1`. Cửa sinh tên thay cho việc agent và brief tự đặt tên; `check` ở pre-commit và doctor bắt file sai quy ước, với mọi ngôn ngữ.
 
-Ngoài phạm vi: H1/H3/H5 (Plan A), H4 (thí nghiệm), H6 (plan `260925-documentation-authority-unification`), cấp phát id (hoãn, xem [phase 00](phase-00-spec.md) §Deferred), mọi file của AgentKit/ClaudeKit/rtk.
+Ngoài phạm vi: H1/H3/H5 (Plan A), H4 (thí nghiệm), H6 (plan `260925-documentation-authority-unification`), cấp phát id (hoãn, xem [phase 00](phase-00-spec.md) §Deferred), mọi file của AgentKit/ClaudeKit/rtk. Plan này **chỉ dành chỗ** (spec + schema v1) cho quy tắc tài liệu, không cài quy tắc tài liệu và không kiểm link/anchor/metadata/nội dung: xem §Quan hệ với plan 260925.
 
 ## Prior art (đã kiểm lại ngày 2026-10-06, trừ chỗ ghi "kế thừa")
 
@@ -45,6 +45,14 @@ Plan A (single-door mechanisms; thư mục chưa có lúc 14:16 ngày 2026-10-06
 2. Phase sửa `AGENTS.md` đầu tiên. [Phase 06](phase-06-agents-line.md) chạy **sau** phase đó.
 3. Chặn rác ở gốc repo trong `.githooks/pre-commit`. [Phase 05](phase-05-enforcement.md) sửa cùng file, chạy **sau** khi thay đổi đó của Plan A đã merge.
 4. Có thể thêm check doctor vào `src/setup/registrations.mjs` và dòng ở `docs/specs/distribution.md:70`: phase 05 rebase lên sau, không sửa song song.
+
+## Quan hệ với plan 260925
+
+Quyết định của anh, 2026-10-07: component `convention` sẽ về sau chứa các kiểm tra đường dẫn bền của tài liệu (module Node `doc-health` của plan `260925-documentation-authority-unification` giữ phần đọc thân file). Plan B chỉ **dành chỗ** trong [phase 00](phase-00-spec.md#chỗ-dành-sẵn-cho-quy-tắc-tài-liệu-2026-10-07-anh-quyết) và schema v1: hình dạng `placement-glob`, operation thuần `classify <path>`, lớp phủ quy tắc theo project (vị trí còn mở, Q13), tư thế `block|warn` và `scope` theo kind. Không cài kind tài liệu; không kiểm link/metadata/nội dung (luật nhận vào giữ nguyên). Dữ liệu vị trí (`minimum-constitution.json`) và danh sách trường metadata bắt buộc (hiện đọc từ văn xuôi `docs/doc-governance.md` §5) được kỳ vọng chuyển vào dữ liệu quy tắc ở Phase 10 của plan 260925, không ở đây. Công thêm ≈0.5d, chia vào phase 00 (spec) và 02 (schema, bộ khớp, golden).
+
+**Thứ tự:** Plan B **không** là điều kiện tiên quyết của plan 260925. Nếu phase 06 của Plan B (dòng `AGENTS.md`) đã xong trước lúc cutover của plan 260925 thì cutover chạy sau nó; nếu chưa, cutover cứ chạy, và Plan B về sau ghi dòng `AGENTS.md` trên cấu trúc mới.
+
+Quyết định (anh, 2026-10-07): nhận đề xuất G1/G2/G4/G6 của bản nháp doc-health; không mở rộng phạm vi triển khai của Plan B.
 
 ## Phases
 
@@ -89,6 +97,7 @@ Mọi phase từ 01 trở đi bị chặn đến khi anh duyệt spec ở phase 
 10. `AGENTS.md` có đúng một dòng nhắc `fgos convention` (`rtk proxy rg -c 'fgos convention' AGENTS.md` = 1).
 11. `CHANGELOG.md` `## [Unreleased]` có một dòng cho `fgos convention`.
 12. Cả bộ test xanh khi chạy ngoài biến phiên: `env -u CLAUDE_CODE_SESSION_ID npm test`.
+13. Golden case của schema v1 gồm ít nhất một case `placement-glob` (khớp và không khớp; singleton và collection) và một case `classify` (ra kind và `unknown-kind`), đọc từ `packages/convention/contracts/`; `rules` schema từ chối `shape` lạ bằng lỗi có tên. Không có kind tài liệu thật trong dữ liệu đóng gói.
 
 ## Rollback tổng
 
@@ -96,7 +105,7 @@ Mỗi phase là một commit (hoặc chuỗi commit) riêng, revert độc lập
 
 ## Câu hỏi mở
 
-Xem [phase 00 §Câu hỏi mở](phase-00-spec.md#câu-hỏi-mở-mỗi-câu-unproven-cho-tới-khi-spec-trả-lời) (Q1-Q12). Q10 (bố cục thư mục) đã quyết. Q6-Q9 (journal, `type`, slug có dấu, múi giờ) đã có **mặc định do lead nhận ngày 2026-10-06**, ghi ở Phase 00; anh đổi được bất cứ lúc nào trước khi spec được duyệt.
+Xem [phase 00 §Câu hỏi mở](phase-00-spec.md#câu-hỏi-mở-mỗi-câu-unproven-cho-tới-khi-spec-trả-lời) (Q1-Q12). Q10 (bố cục thư mục) đã quyết. Q13 (vị trí overlay quy tắc theo project) mở, thêm 2026-10-07. Q6-Q9 (journal, `type`, slug có dấu, múi giờ) đã có **mặc định do lead nhận ngày 2026-10-06**, ghi ở Phase 00; anh đổi được bất cứ lúc nào trước khi spec được duyệt.
 
 ## Ghi chú: tài liệu cũ đang di trú
 

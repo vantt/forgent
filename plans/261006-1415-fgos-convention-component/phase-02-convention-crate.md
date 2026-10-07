@@ -1,6 +1,6 @@
 # Phase 02 — Crate `fgos-convention` + dữ liệu hợp đồng + golden test
 
-Trạng thái: pending · Công: 1-1.5d · Phụ thuộc: phase 01
+Trạng thái: pending · Công: 1.25-1.75d (gồm ≈0.25d bộ khớp `placement-glob` + `classify` + golden case) · Phụ thuộc: phase 01
 
 ## Bối cảnh
 
@@ -13,6 +13,7 @@ Trạng thái: pending · Công: 1-1.5d · Phụ thuộc: phase 01
 - Dữ liệu quy tắc và golden case là file JSON trong `contracts/`, nhúng bằng `include_str!`; code không chứa mẫu tên hay danh sách thư mục dạng literal ngoài file dữ liệu.
 - Ba thao tác `name`, `path`, `check` là hàm thuần nhận `now`/`offset` qua tham số (đồng hồ ghim trong test); chỉ biên provider đọc đồng hồ thật và offset local (theo Q9).
 - `check --all` là thao tác duy nhất đọc FS (duyệt thư mục quy tắc dưới root, không theo symlink thư mục).
+- Theo [phase 00 §Chỗ dành sẵn](phase-00-spec.md#chỗ-dành-sẵn-cho-quy-tắc-tài-liệu-2026-10-07-anh-quyết): schema v1 chấp nhận `shape` `name-template` và `placement-glob`, cờ per-kind (`posture`, `scope`, `canonical`, `metadataExempt`, `generated`) và overlay; thêm operation thuần `classify`; golden case có ít nhất một `placement-glob` và một `classify`. Không cài kind tài liệu thật.
 - Provider descriptor + `OperationProvider` cho operation id đã chốt ở spec (đề xuất `convention.query`), nhưng **chưa** đăng ký vào `CATALOG` hay `apps/fgos` (phase 03).
 
 ## Files
