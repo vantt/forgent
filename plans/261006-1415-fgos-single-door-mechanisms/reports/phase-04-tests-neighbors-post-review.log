@@ -1,0 +1,1697 @@
+env -u CLAUDE_CODE_SESSION_ID node --test --test-reporter=tap test/setup/checks.test.mjs test/setup/registrations.test.mjs test/rust-host/release-tree.test.mjs test/rust-host/fgctl-init.test.mjs test/rust-host/fgctl-upgrade.test.mjs test/rust-host/fgctl-stage.test.mjs test/setup/checks-setup-envelope.test.mjs test/setup/checks-setup-idempotent.test.mjs test/setup/doctor-strict-exit.test.mjs
+TAP version 13
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# Subtest: R5 drift guard: DEFAULT_TTL_MS in src/runner/main-checkout-lock.mjs:110 is 3 * 60 * 1000 ms
+ok 1 - R5 drift guard: DEFAULT_TTL_MS in src/runner/main-checkout-lock.mjs:110 is 3 * 60 * 1000 ms
+  ---
+  duration_ms: 1.811357
+  type: 'test'
+  ...
+# Subtest: R11 & R1-R8, R10: fgctl init in a fresh git project publishes shims, root.json, activation.json, and passes preflight/tail
+ok 2 - R11 & R1-R8, R10: fgctl init in a fresh git project publishes shims, root.json, activation.json, and passes preflight/tail
+  ---
+  duration_ms: 34450.601264
+  type: 'test'
+  ...
+# Subtest: R5 & R11: Hand-written live .fgos/main-checkout.lock refuses init writing nothing
+ok 3 - R5 & R11: Hand-written live .fgos/main-checkout.lock refuses init writing nothing
+  ---
+  duration_ms: 49.497846
+  type: 'test'
+  ...
+# Subtest: R5 & R11: Live string-identity lock within DEFAULT_TTL_MS refuses init writing nothing
+ok 4 - R5 & R11: Live string-identity lock within DEFAULT_TTL_MS refuses init writing nothing
+  ---
+  duration_ms: 49.180793
+  type: 'test'
+  ...
+# Subtest: R5: Ambiguous (unparseable) main-checkout.lock refuses init writing nothing
+ok 5 - R5: Ambiguous (unparseable) main-checkout.lock refuses init writing nothing
+  ---
+  duration_ms: 58.913656
+  type: 'test'
+  ...
+# Subtest: R1 & R11: Non-git directory refuses init with clear error and no .fgos/installation created
+ok 6 - R1 & R11: Non-git directory refuses init with clear error and no .fgos/installation created
+  ---
+  duration_ms: 3.044163
+  type: 'test'
+  ...
+# Subtest: R10: version --runtime-json outside activated workspace reports host: "dev-source" and null fields
+ok 7 - R10: version --runtime-json outside activated workspace reports host: "dev-source" and null fields
+  ---
+  duration_ms: 4.358363
+  type: 'test'
+  ...
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# Subtest: Item 1: Concurrent fgctl init invocations against pre-staged pinned workspace observe activation-lock refusal (exactly one winner)
+ok 8 - Item 1: Concurrent fgctl init invocations against pre-staged pinned workspace observe activation-lock refusal (exactly one winner)
+  ---
+  duration_ms: 30128.419705
+  type: 'test'
+  ...
+# Subtest: Item 2: Pinned workspace reconciles with matching --from source when unstaged, and refuses mismatching --from without overriding pin
+ok 9 - Item 2: Pinned workspace reconciles with matching --from source when unstaged, and refuses mismatching --from without overriding pin
+  ---
+  duration_ms: 28723.04569
+  type: 'test'
+  ...
+# Subtest: Item 3: Idempotent re-run skips stage_release entirely (does not contend for install.lock)
+ok 10 - Item 3: Idempotent re-run skips stage_release entirely (does not contend for install.lock)
+  ---
+  duration_ms: 29371.208424
+  type: 'test'
+  ...
+# Subtest: Item 4: Live-PID lock whose ts is older than DEFAULT_TTL_MS is treated as free
+ok 11 - Item 4: Live-PID lock whose ts is older than DEFAULT_TTL_MS is treated as free
+  ---
+  duration_ms: 26468.816277
+  type: 'test'
+  ...
+# Subtest: Item 5: Staged release whose manifest.json digest mismatches pin is refused
+ok 12 - Item 5: Staged release whose manifest.json digest mismatches pin is refused
+  ---
+  duration_ms: 56.072666
+  type: 'test'
+  ...
+# Subtest: Item 5 (widened): a tampered staged release is refused on the pin+matching --from NoOp arm too, not just the pin-only arm
+ok 13 - Item 5 (widened): a tampered staged release is refused on the pin+matching --from NoOp arm too, not just the pin-only arm
+  ---
+  duration_ms: 76.891917
+  type: 'test'
+  ...
+# Subtest: Item 6: Stale activation.json.tmp.* files left from crash are cleaned up on fgctl init
+ok 14 - Item 6: Stale activation.json.tmp.* files left from crash are cleaned up on fgctl init
+  ---
+  duration_ms: 26044.816935
+  type: 'test'
+  ...
+# Subtest: Item 1 (HIGH): activation.lock orphaned by a killed process (dead pid) is reclaimed, not held forever
+ok 15 - Item 1 (HIGH): activation.lock orphaned by a killed process (dead pid) is reclaimed, not held forever
+  ---
+  duration_ms: 24029.180889
+  type: 'test'
+  ...
+# Subtest: Item 1: A live-pid, within-ttl activation.lock is genuinely held, not reclaimed
+ok 16 - Item 1: A live-pid, within-ttl activation.lock is genuinely held, not reclaimed
+  ---
+  duration_ms: 87.927455
+  type: 'test'
+  ...
+# Subtest: P7: Candidate preflight failure refuses init before publishing activation and writes no host-visible projections or activation.json
+ok 17 - P7: Candidate preflight failure refuses init before publishing activation and writes no host-visible projections or activation.json
+  ---
+  duration_ms: 129.160999
+  type: 'test'
+  ...
+# Subtest: P7 (red-team HIGH): a hostile candidate that passes every static preflight check is never executed before publish and cannot write outside its release tree
+ok 18 - P7 (red-team HIGH): a hostile candidate that passes every static preflight check is never executed before publish and cannot write outside its release tree
+  ---
+  duration_ms: 93.978704
+  type: 'test'
+  ...
+# Subtest: P7: Atomic activation publish ensures valid activation.json without partial tmp artifacts
+ok 19 - P7: Atomic activation publish ensures valid activation.json without partial tmp artifacts
+  ---
+  duration_ms: 26871.62601
+  type: 'test'
+  ...
+# Subtest: P7: Local runtime tail failure leaves workspace in diagnosable state with ready-degraded transaction record
+ok 20 - P7: Local runtime tail failure leaves workspace in diagnosable state with ready-degraded transaction record
+  ---
+  duration_ms: 409.60017
+  type: 'test'
+  ...
+# Subtest: R1: CLI recognizes valid subcommands; refuses unrecognized subcommands
+ok 21 - R1: CLI recognizes valid subcommands; refuses unrecognized subcommands
+  ---
+  duration_ms: 12.333746
+  type: 'test'
+  ...
+# Subtest: R8: status --json on empty store reports empty array, not an error
+ok 22 - R8: status --json on empty store reports empty array, not an error
+  ---
+  duration_ms: 5.66349
+  type: 'test'
+  ...
+# Subtest: R6 & R9: Staging a valid release tree verifies digests and creates releases/<digest>
+ok 23 - R6 & R9: Staging a valid release tree verifies digests and creates releases/<digest>
+  ---
+  duration_ms: 119.314689
+  type: 'test'
+  ...
+# Subtest: R6 & R9: Corrupting one byte before staging triggers quarantine and puts nothing in releases/
+ok 24 - R6 & R9: Corrupting one byte before staging triggers quarantine and puts nothing in releases/
+  ---
+  duration_ms: 202.117293
+  type: 'test'
+  ...
+# Subtest: R6 & R9: Concurrent stage invocations observe lock refusal (exactly one winner)
+ok 25 - R6 & R9: Concurrent stage invocations observe lock refusal (exactly one winner)
+  ---
+  duration_ms: 119.118133
+  type: 'test'
+  ...
+# Subtest: R6 & R9: Re-staging an already-staged digest is a no-op (manifest mtime unchanged)
+ok 26 - R6 & R9: Re-staging an already-staged digest is a no-op (manifest mtime unchanged)
+  ---
+  duration_ms: 271.970097
+  type: 'test'
+  ...
+# Subtest: R7: Staging from a .tar.gz archive extracts with pure Rust and stages successfully
+ok 27 - R7: Staging from a .tar.gz archive extracts with pure Rust and stages successfully
+  ---
+  duration_ms: 1806.938544
+  type: 'test'
+  ...
+# Subtest: R7: A .tar.gz with a path-traversing member alongside a valid release is refused, nothing published, no leftover temp dir
+ok 28 - R7: A .tar.gz with a path-traversing member alongside a valid release is refused, nothing published, no leftover temp dir
+  ---
+  duration_ms: 2484.853625
+  type: 'test'
+  ...
+# Subtest: R7: A .tar.gz with a symlink member alongside a valid release is refused, nothing published
+ok 29 - R7: A .tar.gz with a symlink member alongside a valid release is refused, nothing published
+  ---
+  duration_ms: 1175.740363
+  type: 'test'
+  ...
+# Subtest: L1: ./bin/fgos and bin/fgos are treated as a collision, not two different digests
+ok 30 - L1: ./bin/fgos and bin/fgos are treated as a collision, not two different digests
+  ---
+  duration_ms: 198.792043
+  type: 'test'
+  ...
+# Subtest: P6 HIGH regression: staging a candidate with an in-root directory symlink triggers quarantine and puts nothing in releases/
+ok 31 - P6 HIGH regression: staging a candidate with an in-root directory symlink triggers quarantine and puts nothing in releases/
+  ---
+  duration_ms: 165.671302
+  type: 'test'
+  ...
+# Subtest: Proof gap closure: staging a candidate with mismatched components.legacyNode.digest triggers quarantine and puts nothing in releases/
+ok 32 - Proof gap closure: staging a candidate with mismatched components.legacyNode.digest triggers quarantine and puts nothing in releases/
+  ---
+  duration_ms: 153.738934
+  type: 'test'
+  ...
+# Subtest: P6 HIGH regression: staging a candidate with an unlisted payload symlink triggers quarantine and puts nothing in releases/
+ok 33 - P6 HIGH regression: staging a candidate with an unlisted payload symlink triggers quarantine and puts nothing in releases/
+  ---
+  duration_ms: 142.644354
+  type: 'test'
+  ...
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# Subtest: R1, R2, R3, R6: A -> B upgrade then repair round-trips reported digest with zero work-state changes
+ok 34 - R1, R2, R3, R6: A -> B upgrade then repair round-trips reported digest with zero work-state changes
+  ---
+  duration_ms: 19333.669177
+  type: 'test'
+  ...
+# Subtest: R4, R5, R6: Corrupting one byte in active release triggers quarantine and status reflects quarantined: true
+ok 35 - R4, R5, R6: Corrupting one byte in active release triggers quarantine and status reflects quarantined: true
+  ---
+  duration_ms: 5250.308016
+  type: 'test'
+  ...
+# Subtest: R1, R6: Upgrade candidate whose stateSchemas.write omits workspace current schema is refused before publish
+ok 36 - R1, R6: Upgrade candidate whose stateSchemas.write omits workspace current schema is refused before publish
+  ---
+  duration_ms: 5409.742837
+  type: 'test'
+  ...
+# Subtest: R1, R6: Upgrade candidate whose stateSchemas.read omits workspace current schema is refused before publish
+ok 37 - R1, R6: Upgrade candidate whose stateSchemas.read omits workspace current schema is refused before publish
+  ---
+  duration_ms: 5633.977703
+  type: 'test'
+  ...
+# Subtest: Reviewer M1: a quarantined workspace recovers via fgctl init --from (documented door), status returns to ready
+ok 38 - Reviewer M1: a quarantined workspace recovers via fgctl init --from (documented door), status returns to ready
+  ---
+  duration_ms: 10840.777868
+  type: 'test'
+  ...
+# Subtest: Reviewer M2: upgrading away from a quarantined activation chains previousArtifactDigest past it, not to the moved digest
+ok 39 - Reviewer M2: upgrading away from a quarantined activation chains previousArtifactDigest past it, not to the moved digest
+  ---
+  duration_ms: 10703.562729
+  type: 'test'
+  ...
+# Subtest: Red-team LOW: same-digest upgrade is idempotent (no new activationId, no self-referential previousArtifactDigest)
+ok 40 - Red-team LOW: same-digest upgrade is idempotent (no new activationId, no self-referential previousArtifactDigest)
+  ---
+  duration_ms: 10724.766894
+  type: 'test'
+  ...
+# Subtest: Red-team MEDIUM: repair of a tampered active release (no previousArtifactDigest) quarantines it, not just refuses
+ok 41 - Red-team MEDIUM: repair of a tampered active release (no previousArtifactDigest) quarantines it, not just refuses
+  ---
+  duration_ms: 5420.019027
+  type: 'test'
+  ...
+# Subtest: Red-team MEDIUM: a "falsely ready" binding (release moved but status never updated) self-heals via init --from
+ok 42 - Red-team MEDIUM: a "falsely ready" binding (release moved but status never updated) self-heals via init --from
+  ---
+  duration_ms: 10621.698269
+  type: 'test'
+  ...
+# Subtest: R3: Repair when previousArtifactDigest is null re-verifies active release and heals broken capsule
+ok 43 - R3: Repair when previousArtifactDigest is null re-verifies active release and heals broken capsule
+  ---
+  duration_ms: 10461.403408
+  type: 'test'
+  ...
+# Subtest: P7: Repair failure when no runtime is active refuses with clear message
+ok 44 - P7: Repair failure when no runtime is active refuses with clear message
+  ---
+  duration_ms: 9.558369
+  type: 'test'
+  ...
+# Subtest: P7: Repair failure when rollback previous release is missing refuses with clear message
+ok 45 - P7: Repair failure when rollback previous release is missing refuses with clear message
+  ---
+  duration_ms: 5394.417088
+  type: 'test'
+  ...
+# Subtest: P7: Upgrade failure when no runtime is active refuses with clear message
+ok 46 - P7: Upgrade failure when no runtime is active refuses with clear message
+  ---
+  duration_ms: 9.116889
+  type: 'test'
+  ...
+# Subtest: P7: Upgrade candidate preflight failure refuses upgrade and leaves existing activation untouched
+ok 47 - P7: Upgrade candidate preflight failure refuses upgrade and leaves existing activation untouched
+  ---
+  duration_ms: 5367.207237
+  type: 'test'
+  ...
+# Subtest: P7: Upgrade candidate local tail failure leaves workspace in diagnosable state with ready-degraded transaction
+ok 48 - P7: Upgrade candidate local tail failure leaves workspace in diagnosable state with ready-degraded transaction
+  ---
+  duration_ms: 5718.826004
+  type: 'test'
+  ...
+# Subtest: P7: Repair local tail failure leaves workspace in diagnosable state with ready-degraded transaction
+ok 49 - P7: Repair local tail failure leaves workspace in diagnosable state with ready-degraded transaction
+  ---
+  duration_ms: 5528.28953
+  type: 'test'
+  ...
+# Subtest: the staged legacy-node payload carries its production dependencies and can load them
+ok 50 - the staged legacy-node payload carries its production dependencies and can load them
+  ---
+  duration_ms: 467.469018
+  type: 'test'
+  ...
+# Subtest: R1 & R2: Release tree builder stages release tree and produces canonical manifest with reproducible artifactDigest
+ok 51 - R1 & R2: Release tree builder stages release tree and produces canonical manifest with reproducible artifactDigest
+  ---
+  duration_ms: 175.848005
+  type: 'test'
+  ...
+# Subtest: R3: Staged release tree runs P02 harness from outside checkout with cleaned PATH/NODE_PATH
+ok 52 - R3: Staged release tree runs P02 harness from outside checkout with cleaned PATH/NODE_PATH
+  ---
+  duration_ms: 6614.447966
+  type: 'test'
+  ...
+# Subtest: R4: Doctor checks rust host packaging checks are registered and report the current target posture
+ok 53 - R4: Doctor checks rust host packaging checks are registered and report the current target posture
+  ---
+  duration_ms: 42.499499
+  type: 'test'
+  ...
+# Subtest: fgos setup (no flags) produces valid wrapEnvelope-shaped JSON on stdout
+ok 54 - fgos setup (no flags) produces valid wrapEnvelope-shaped JSON on stdout
+  ---
+  duration_ms: 331.660118
+  type: 'test'
+  ...
+# Subtest: fgos setup fills a missing default key into an existing ~/.fgos/config.json without touching a key the user already customized (tsk-1ri D1)
+ok 55 - fgos setup fills a missing default key into an existing ~/.fgos/config.json without touching a key the user already customized (tsk-1ri D1)
+  ---
+  duration_ms: 312.045502
+  type: 'test'
+  ...
+# Subtest: fgos setup run twice does not rewrite an already-complete ~/.fgos/config.json (tsk-1ri D2, fill-missing-only)
+ok 56 - fgos setup run twice does not rewrite an already-complete ~/.fgos/config.json (tsk-1ri D2, fill-missing-only)
+  ---
+  duration_ms: 643.109956
+  type: 'test'
+  ...
+# Subtest: setup from a real checkout still writes the rc line and reports no declined reason
+ok 57 - setup from a real checkout still writes the rc line and reports no declined reason
+  ---
+  duration_ms: 627.404263
+  type: 'test'
+  ...
+# Subtest: DOCTOR_CHECKS has exactly the registered setup/doctor checks, including instruction-projections-stale
+ok 58 - DOCTOR_CHECKS has exactly the registered setup/doctor checks, including instruction-projections-stale
+  ---
+  duration_ms: 3.761277
+  type: 'test'
+  ...
+# Subtest: root-drift passes when no fgw/<root> branch is ahead of its target
+ok 59 - root-drift passes when no fgw/<root> branch is ahead of its target
+  ---
+  duration_ms: 69.913922
+  type: 'test'
+  ...
+# Subtest: root-drift fails and names the drifted root when fgw/<root> is ahead of main
+ok 60 - root-drift fails and names the drifted root when fgw/<root> is ahead of main
+  ---
+  duration_ms: 77.207695
+  type: 'test'
+  ...
+# Subtest: root-drift reports a CLOSED-OUT root whose branch still holds work outside its target
+ok 61 - root-drift reports a CLOSED-OUT root whose branch still holds work outside its target
+  ---
+  duration_ms: 65.031955
+  type: 'test'
+  ...
+# Subtest: root-drift stays silent for a wontfix root whose branch is ahead — abandoned work is meant to sit outside
+ok 62 - root-drift stays silent for a wontfix root whose branch is ahead — abandoned work is meant to sit outside
+  ---
+  duration_ms: 65.842697
+  type: 'test'
+  ...
+# Subtest: leaf-notify-drift passes when no live session branch has post-land drift against its target
+ok 63 - leaf-notify-drift passes when no live session branch has post-land drift against its target
+  ---
+  duration_ms: 40.815705
+  type: 'test'
+  ...
+# Subtest: leaf-notify-drift fails and names the leaf when a live session branch overlaps files with target land
+ok 64 - leaf-notify-drift fails and names the leaf when a live session branch overlaps files with target land
+  ---
+  duration_ms: 96.603693
+  type: 'test'
+  ...
+# Subtest: events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)
+ok 65 - events-jsonl-not-truncated has no registered fix — a break means real data is already gone, so auto-repair would erase the loud signal (docs/how-to/resolve-an-events-jsonl-truncation.md is the deliberate manual path instead)
+  ---
+  duration_ms: 0.43839
+  type: 'test'
+  ...
+# Subtest: events-jsonl-not-truncated passes and bootstraps a mark on first run against a healthy log
+ok 66 - events-jsonl-not-truncated passes and bootstraps a mark on first run against a healthy log
+  ---
+  duration_ms: 27.937016
+  type: 'test'
+  ...
+# Subtest: events-jsonl-not-truncated fails when the log was truncated then reappended past the old mark
+ok 67 - events-jsonl-not-truncated fails when the log was truncated then reappended past the old mark
+  ---
+  duration_ms: 29.07821
+  type: 'test'
+  ...
+# Subtest: work-classification-vocabulary passes on an empty store
+ok 68 - work-classification-vocabulary passes on an empty store
+  ---
+  duration_ms: 22.258527
+  type: 'test'
+  ...
+# Subtest: work-classification-vocabulary passes when every item is already in-vocabulary
+ok 69 - work-classification-vocabulary passes when every item is already in-vocabulary
+  ---
+  duration_ms: 23.228848
+  type: 'test'
+  ...
+# Subtest: work-classification-vocabulary fails and names an OPEN item carrying a stale risk value
+ok 70 - work-classification-vocabulary fails and names an OPEN item carrying a stale risk value
+  ---
+  duration_ms: 26.928329
+  type: 'test'
+  ...
+# Subtest: work-classification-vocabulary fails and names an OPEN item carrying an out-of-vocabulary kind
+ok 71 - work-classification-vocabulary fails and names an OPEN item carrying an out-of-vocabulary kind
+  ---
+  duration_ms: 28.694275
+  type: 'test'
+  ...
+# Subtest: work-classification-vocabulary passes despite a stale risk/kind on an already-resolved (done) item
+ok 72 - work-classification-vocabulary passes despite a stale risk/kind on an already-resolved (done) item
+  ---
+  duration_ms: 27.38916
+  type: 'test'
+  ...
+# Subtest: work-classification-vocabulary lists every violating id, not just the first
+ok 73 - work-classification-vocabulary lists every violating id, not just the first
+  ---
+  duration_ms: 28.862993
+  type: 'test'
+  ...
+# Subtest: work-step-vocabulary passes on an empty store
+ok 74 - work-step-vocabulary passes on an empty store
+  ---
+  duration_ms: 27.583103
+  type: 'test'
+  ...
+# Subtest: work-step-vocabulary passes for an item whose stage was never written (lazy Execute default)
+ok 75 - work-step-vocabulary passes for an item whose stage was never written (lazy Execute default)
+  ---
+  duration_ms: 27.303673
+  type: 'test'
+  ...
+# Subtest: work-step-vocabulary passes when every open item sits at a stage its domain registers
+ok 76 - work-step-vocabulary passes when every open item sits at a stage its domain registers
+  ---
+  duration_ms: 27.439293
+  type: 'test'
+  ...
+# Subtest: work-step-vocabulary fails and names an OPEN item sitting at a stage its domain retired
+ok 77 - work-step-vocabulary fails and names an OPEN item sitting at a stage its domain retired
+  ---
+  duration_ms: 29.123661
+  type: 'test'
+  ...
+# Subtest: work-step-vocabulary judges each item against its OWN domain's stages, not the default domain's
+ok 78 - work-step-vocabulary judges each item against its OWN domain's stages, not the default domain's
+  ---
+  duration_ms: 34.406296
+  type: 'test'
+  ...
+# Subtest: work-step-vocabulary passes despite a retired stage on an already-resolved (done) item
+ok 79 - work-step-vocabulary passes despite a retired stage on an already-resolved (done) item
+  ---
+  duration_ms: 41.348359
+  type: 'test'
+  ...
+# Subtest: work-step-vocabulary lists every violating id, not just the first
+ok 80 - work-step-vocabulary lists every violating id, not just the first
+  ---
+  duration_ms: 52.102735
+  type: 'test'
+  ...
+# Subtest: changelog-unreleased-stale passes when CHANGELOG.md does not exist
+ok 81 - changelog-unreleased-stale passes when CHANGELOG.md does not exist
+  ---
+  duration_ms: 12.649814
+  type: 'test'
+  ...
+# Subtest: changelog-unreleased-stale fails when CHANGELOG.md exists but \#\# [Unreleased] has no pending entries
+ok 82 - changelog-unreleased-stale fails when CHANGELOG.md exists but \#\# [Unreleased] has no pending entries
+  ---
+  duration_ms: 11.669207
+  type: 'test'
+  ...
+# Subtest: changelog-unreleased-stale passes when \#\# [Unreleased] has a pending entry
+ok 83 - changelog-unreleased-stale passes when \#\# [Unreleased] has a pending entry
+  ---
+  duration_ms: 18.955815
+  type: 'test'
+  ...
+# Subtest: enduser-docs-index-stale passes when docs/enduser-docs-index.json does not exist yet
+ok 84 - enduser-docs-index-stale passes when docs/enduser-docs-index.json does not exist yet
+  ---
+  duration_ms: 18.828365
+  type: 'test'
+  ...
+# Subtest: enduser-docs-index-stale fails and reports a count (not a path list) when a doc on disk is missing from the index
+ok 85 - enduser-docs-index-stale fails and reports a count (not a path list) when a doc on disk is missing from the index
+  ---
+  duration_ms: 17.057328
+  type: 'test'
+  ...
+# Subtest: enduser-docs-index-stale passes when the index already covers every on-disk doc
+ok 86 - enduser-docs-index-stale passes when the index already covers every on-disk doc
+  ---
+  duration_ms: 18.100717
+  type: 'test'
+  ...
+# Subtest: enduser-docs-index-stale fails and reports orphan count when an index entry has no matching doc on disk
+ok 87 - enduser-docs-index-stale fails and reports orphan count when an index entry has no matching doc on disk
+  ---
+  duration_ms: 13.631547
+  type: 'test'
+  ...
+# Subtest: enduser-docs-index-stale counts a doc under docs/decisions toward the explanation quadrant (alias, D6)
+ok 88 - enduser-docs-index-stale counts a doc under docs/decisions toward the explanation quadrant (alias, D6)
+  ---
+  duration_ms: 14.251582
+  type: 'test'
+  ...
+# Subtest: enduser-docs-index-stale fix regenerates the index via the same path fgos docs-index uses, resolving the drift
+ok 89 - enduser-docs-index-stale fix regenerates the index via the same path fgos docs-index uses, resolving the drift
+  ---
+  duration_ms: 60.303138
+  type: 'test'
+  ...
+# Subtest: enduser-docs-index-stale fix is idempotent -- a second run reports changed:false
+ok 90 - enduser-docs-index-stale fix is idempotent -- a second run reports changed:false
+  ---
+  duration_ms: 34.781367
+  type: 'test'
+  ...
+# Subtest: decision-index-stale passes when docs/decisions/index.md does not exist yet (tsk-1lv review-fix F10)
+ok 91 - decision-index-stale passes when docs/decisions/index.md does not exist yet (tsk-1lv review-fix F10)
+  ---
+  duration_ms: 15.67267
+  type: 'test'
+  ...
+# Subtest: decision-index-stale fails when state.decisions has a scope-carrying decision the on-disk index does not reflect
+ok 92 - decision-index-stale fails when state.decisions has a scope-carrying decision the on-disk index does not reflect
+  ---
+  duration_ms: 24.585088
+  type: 'test'
+  ...
+# Subtest: decision-index-stale passes when the on-disk index already matches state.decisions
+ok 93 - decision-index-stale passes when the on-disk index already matches state.decisions
+  ---
+  duration_ms: 42.934432
+  type: 'test'
+  ...
+# Subtest: decision-index-stale fix regenerates the index via the same path fgos decision-index uses, resolving the drift
+ok 94 - decision-index-stale fix regenerates the index via the same path fgos decision-index uses, resolving the drift
+  ---
+  duration_ms: 52.300003
+  type: 'test'
+  ...
+# Subtest: decision-index-stale fix is idempotent -- a second run reports changed:false
+ok 95 - decision-index-stale fix is idempotent -- a second run reports changed:false
+  ---
+  duration_ms: 27.385179
+  type: 'test'
+  ...
+# Subtest: decision-index-stale check FAILS when the index is missing but state.decisions has real rows to index -- H2 tsk-1lv round-2 regression (a missing index with real decisions to project is drift, not "nothing to check")
+ok 96 - decision-index-stale check FAILS when the index is missing but state.decisions has real rows to index -- H2 tsk-1lv round-2 regression (a missing index with real decisions to project is drift, not "nothing to check")
+  ---
+  duration_ms: 17.476593
+  type: 'test'
+  ...
+# Subtest: decision-index-stale fix reports a graceful skip (changed:false, no throw) when generateDecisionIndex refuses to blank an existing populated index -- B3 tsk-1lv round-2 regression (a thrown StoreError here used to abort fgos doctor --fix entirely, discarding every other fix's result)
+ok 97 - decision-index-stale fix reports a graceful skip (changed:false, no throw) when generateDecisionIndex refuses to blank an existing populated index -- B3 tsk-1lv round-2 regression (a thrown StoreError here used to abort fgos doctor --fix entirely, discarding every other fix's result)
+  ---
+  duration_ms: 26.1279
+  type: 'test'
+  ...
+# Subtest: tool-registry-configured passes when no tool-capable executor is declared at all (inactive — a clean skip, never a failure)
+ok 98 - tool-registry-configured passes when no tool-capable executor is declared at all (inactive — a clean skip, never a failure)
+  ---
+  duration_ms: 585.267778
+  type: 'test'
+  ...
+# Subtest: tool-registry-configured passes when every declared tool is checked present (full)
+ok 99 - tool-registry-configured passes when every declared tool is checked present (full)
+  ---
+  duration_ms: 1010.662634
+  type: 'test'
+  ...
+# Subtest: tsk-3oa2: tool-registry-configured FAILS when a declared tool is missing or never checked (degraded) -- no longer a silent passed:true
+ok 100 - tsk-3oa2: tool-registry-configured FAILS when a declared tool is missing or never checked (degraded) -- no longer a silent passed:true
+  ---
+  duration_ms: 492.446094
+  type: 'test'
+  ...
+# Subtest: node-version-and-git passes under the current process (real Node, real git)
+ok 101 - node-version-and-git passes under the current process (real Node, real git)
+  ---
+  duration_ms: 4.178859
+  type: 'test'
+  ...
+# Subtest: shell-integration-sourced passes trivially when no rc files exist
+ok 102 - shell-integration-sourced passes trivially when no rc files exist
+  ---
+  duration_ms: 5.436417
+  type: 'test'
+  ...
+# Subtest: shell-integration-sourced fails when a detected rc file is missing the source line
+ok 103 - shell-integration-sourced fails when a detected rc file is missing the source line
+  ---
+  duration_ms: 5.798549
+  type: 'test'
+  ...
+# Subtest: shell-integration-sourced passes when every detected rc file already has the source line, and the sourced function actually works
+ok 104 - shell-integration-sourced passes when every detected rc file already has the source line, and the sourced function actually works
+  ---
+  duration_ms: 33.269569
+  type: 'test'
+  ...
+# Subtest: shell-integration-sourced fails when the source line is present but the sourced function itself is dead (tsk-2wpi: a text-present source line is not proof the command works)
+ok 105 - shell-integration-sourced fails when the source line is present but the sourced function itself is dead (tsk-2wpi: a text-present source line is not proof the command works)
+  ---
+  duration_ms: 80.252835
+  type: 'test'
+  ...
+# Subtest: config-not-stale reports failed/not-configured when the shared file is absent
+ok 106 - config-not-stale reports failed/not-configured when the shared file is absent
+  ---
+  duration_ms: 0.656841
+  type: 'test'
+  ...
+# Subtest: config-not-stale passes when the existing config already has every default key
+ok 107 - config-not-stale passes when the existing config already has every default key
+  ---
+  duration_ms: 1.999354
+  type: 'test'
+  ...
+# Subtest: config-not-stale fails when the shared file is complete except gateBypass
+ok 108 - config-not-stale fails when the shared file is complete except gateBypass
+  ---
+  duration_ms: 0.91701
+  type: 'test'
+  ...
+# Subtest: config-not-stale fails when the existing config is missing a default key
+ok 109 - config-not-stale fails when the existing config is missing a default key
+  ---
+  duration_ms: 0.728694
+  type: 'test'
+  ...
+# Subtest: invariant-checks-configured fails when the section is missing entirely
+ok 110 - invariant-checks-configured fails when the section is missing entirely
+  ---
+  duration_ms: 0.53489
+  type: 'test'
+  ...
+# Subtest: invariant-checks-configured fails when the section is present but yields no runnable command
+ok 111 - invariant-checks-configured fails when the section is present but yields no runnable command
+  ---
+  duration_ms: 1.777556
+  type: 'test'
+  ...
+# Subtest: invariant-checks-configured passes and names the configured commands
+ok 112 - invariant-checks-configured passes and names the configured commands
+  ---
+  duration_ms: 0.651467
+  type: 'test'
+  ...
+# Subtest: worker-slots-ceiling-usable fails when the section is missing entirely
+ok 113 - worker-slots-ceiling-usable fails when the section is missing entirely
+  ---
+  duration_ms: 0.542513
+  type: 'test'
+  ...
+# Subtest: worker-slots-ceiling-usable fails on a ceiling that silently enforces nothing
+ok 114 - worker-slots-ceiling-usable fails on a ceiling that silently enforces nothing
+  ---
+  duration_ms: 2.067873
+  type: 'test'
+  ...
+# Subtest: worker-slots-ceiling-usable passes on the unarmed null fgos setup writes, and says so
+ok 115 - worker-slots-ceiling-usable passes on the unarmed null fgos setup writes, and says so
+  ---
+  duration_ms: 0.649996
+  type: 'test'
+  ...
+# Subtest: worker-slots-ceiling-usable passes and names a real armed ceiling
+ok 116 - worker-slots-ceiling-usable passes and names a real armed ceiling
+  ---
+  duration_ms: 0.618198
+  type: 'test'
+  ...
+# Subtest: advise-execute-capabilities-configured fails when runner.capabilities is missing entirely
+ok 117 - advise-execute-capabilities-configured fails when runner.capabilities is missing entirely
+  ---
+  duration_ms: 0.570488
+  type: 'test'
+  ...
+# Subtest: advise-execute-capabilities-configured fails when a slot is missing or malformed
+ok 118 - advise-execute-capabilities-configured fails when a slot is missing or malformed
+  ---
+  duration_ms: 2.567882
+  type: 'test'
+  ...
+# Subtest: advise-execute-capabilities-configured passes when both slots are declared
+ok 119 - advise-execute-capabilities-configured passes when both slots are declared
+  ---
+  duration_ms: 0.845516
+  type: 'test'
+  ...
+# Subtest: capability-serves-valid fails when runner.capabilities is missing entirely
+ok 120 - capability-serves-valid fails when runner.capabilities is missing entirely
+  ---
+  duration_ms: 0.701991
+  type: 'test'
+  ...
+# Subtest: capability-serves-valid passes on the curated defaults (serves on every slot, none identical, "review" present)
+ok 121 - capability-serves-valid passes on the curated defaults (serves on every slot, none identical, "review" present)
+  ---
+  duration_ms: 18.540968
+  type: 'test'
+  ...
+# Subtest: capability-serves-valid is a no-op pass on a config with no "serves" anywhere (an entry without one stays valid)
+ok 122 - capability-serves-valid is a no-op pass on a config with no "serves" anywhere (an entry without one stays valid)
+  ---
+  duration_ms: 0.847998
+  type: 'test'
+  ...
+# Subtest: capability-serves-valid fails when a "serves" value has an unknown key or wrong type
+ok 123 - capability-serves-valid fails when a "serves" value has an unknown key or wrong type
+  ---
+  duration_ms: 3.06857
+  type: 'test'
+  ...
+# Subtest: capability-serves-valid fails when two entries declare the identical "serves" attribute set
+ok 124 - capability-serves-valid fails when two entries declare the identical "serves" attribute set
+  ---
+  duration_ms: 0.932481
+  type: 'test'
+  ...
+# Subtest: capability-serves-valid fails when the "review" slot is missing
+ok 125 - capability-serves-valid fails when the "review" slot is missing
+  ---
+  duration_ms: 0.675849
+  type: 'test'
+  ...
+# Subtest: gate-bypass-configured check fails when the shared file has no gateBypass key at all
+ok 126 - gate-bypass-configured check fails when the shared file has no gateBypass key at all
+  ---
+  duration_ms: 0.553089
+  type: 'test'
+  ...
+# Subtest: gate-bypass-configured check fails when gateBypass.level is present but not a recognized level
+ok 127 - gate-bypass-configured check fails when gateBypass.level is present but not a recognized level
+  ---
+  duration_ms: 0.618881
+  type: 'test'
+  ...
+# Subtest: gate-bypass-configured check passes when gateBypass.level is a recognized level
+ok 128 - gate-bypass-configured check passes when gateBypass.level is a recognized level
+  ---
+  duration_ms: 0.546022
+  type: 'test'
+  ...
+# Subtest: gate-bypass-configured fix writes a default level when the shared file has no gateBypass key, preserving other keys
+ok 129 - gate-bypass-configured fix writes a default level when the shared file has no gateBypass key, preserving other keys
+  ---
+  duration_ms: 7.457416
+  type: 'test'
+  ...
+# Subtest: gate-bypass-configured fix repairs a malformed level back to the default
+ok 130 - gate-bypass-configured fix repairs a malformed level back to the default
+  ---
+  duration_ms: 1.253639
+  type: 'test'
+  ...
+# Subtest: gate-bypass-configured fix is idempotent: reports unchanged and never rewrites when level is already valid
+ok 131 - gate-bypass-configured fix is idempotent: reports unchanged and never rewrites when level is already valid
+  ---
+  duration_ms: 0.930136
+  type: 'test'
+  ...
+# Subtest: fgos doctor --fix (CLI e2e) actually bootstraps gateBypass.level via the real fix
+ok 132 - fgos doctor --fix (CLI e2e) actually bootstraps gateBypass.level via the real fix
+  ---
+  duration_ms: 2458.495847
+  type: 'test'
+  ...
+# Subtest: fgos doctor --fix --pretty (CLI e2e) renders a fix line green even when the fix found nothing to change
+ok 133 - fgos doctor --fix --pretty (CLI e2e) renders a fix line green even when the fix found nothing to change
+  ---
+  duration_ms: 1905.551465
+  type: 'test'
+  ...
+# Subtest: herdr-launcher-configured check fails when the shared file has no herdrOrchestrator key at all
+ok 134 - herdr-launcher-configured check fails when the shared file has no herdrOrchestrator key at all
+  ---
+  duration_ms: 0.46939
+  type: 'test'
+  ...
+# Subtest: herdr-launcher-configured check fails when a toggle is present but not a boolean
+ok 135 - herdr-launcher-configured check fails when a toggle is present but not a boolean
+  ---
+  duration_ms: 0.467213
+  type: 'test'
+  ...
+# Subtest: herdr-launcher-configured check passes when every toggle is a boolean
+ok 136 - herdr-launcher-configured check passes when every toggle is a boolean
+  ---
+  duration_ms: 0.474857
+  type: 'test'
+  ...
+# Subtest: herdr-web-dashboard-configured check fails when the shared file has no herdrWebDashboard key at all
+ok 137 - herdr-web-dashboard-configured check fails when the shared file has no herdrWebDashboard key at all
+  ---
+  duration_ms: 0.311339
+  type: 'test'
+  ...
+# Subtest: herdr-web-dashboard-configured check fails when staticServing is present but not a boolean
+ok 138 - herdr-web-dashboard-configured check fails when staticServing is present but not a boolean
+  ---
+  duration_ms: 0.368531
+  type: 'test'
+  ...
+# Subtest: herdr-web-dashboard-configured check passes when staticServing is a boolean
+ok 139 - herdr-web-dashboard-configured check passes when staticServing is a boolean
+  ---
+  duration_ms: 0.489696
+  type: 'test'
+  ...
+# Subtest: config-awareness is registered on DOCTOR_CHECKS and always passes
+ok 140 - config-awareness is registered on DOCTOR_CHECKS and always passes
+  ---
+  duration_ms: 1.1725
+  type: 'test'
+  ...
+# Subtest: config-awareness reports "none" when neither project nor global config exists
+ok 141 - config-awareness reports "none" when neither project nor global config exists
+  ---
+  duration_ms: 0.229711
+  type: 'test'
+  ...
+# Subtest: config-awareness reports project active with global not present, when only project config exists
+ok 142 - config-awareness reports project active with global not present, when only project config exists
+  ---
+  duration_ms: 0.274292
+  type: 'test'
+  ...
+# Subtest: config-awareness reports project active with global also present, when both exist
+ok 143 - config-awareness reports project active with global also present, when both exist
+  ---
+  duration_ms: 0.298265
+  type: 'test'
+  ...
+# Subtest: config-awareness falls back to global active with project not present, when only global config exists
+ok 144 - config-awareness falls back to global active with project not present, when only global config exists
+  ---
+  duration_ms: 0.24074
+  type: 'test'
+  ...
+# Subtest: provider-capacity-state doctor check reports quarantine without clearing it
+ok 145 - provider-capacity-state doctor check reports quarantine without clearing it
+  ---
+  duration_ms: 1.014967
+  type: 'test'
+  ...
+# Subtest: mainCheckoutHookWired is false in a cwd with no .git at all, and never throws
+ok 146 - mainCheckoutHookWired is false in a cwd with no .git at all, and never throws
+  ---
+  duration_ms: 2.124835
+  type: 'test'
+  ...
+# Subtest: mainCheckoutHookWired is false in a real git repo whose core.hooksPath is unset
+ok 147 - mainCheckoutHookWired is false in a real git repo whose core.hooksPath is unset
+  ---
+  duration_ms: 4.421729
+  type: 'test'
+  ...
+# Subtest: mainCheckoutHookWired is false when core.hooksPath points somewhere other than .githooks
+ok 148 - mainCheckoutHookWired is false when core.hooksPath points somewhere other than .githooks
+  ---
+  duration_ms: 7.426392
+  type: 'test'
+  ...
+# Subtest: mainCheckoutHookWired is true once core.hooksPath is set to .githooks
+ok 149 - mainCheckoutHookWired is true once core.hooksPath is set to .githooks
+  ---
+  duration_ms: 8.221785
+  type: 'test'
+  ...
+# Subtest: mainCheckoutHookWired is true when core.hooksPath is an absolute path resolving to repoRoot/.githooks
+ok 150 - mainCheckoutHookWired is true when core.hooksPath is an absolute path resolving to repoRoot/.githooks
+  ---
+  duration_ms: 7.462357
+  type: 'test'
+  ...
+# Subtest: mainCheckoutHookWired is true from inside a linked worktree when the main checkout has an absolute core.hooksPath, not just from the main checkout itself
+ok 151 - mainCheckoutHookWired is true from inside a linked worktree when the main checkout has an absolute core.hooksPath, not just from the main checkout itself
+  ---
+  duration_ms: 31.808015
+  type: 'test'
+  ...
+# Subtest: main-checkout-hook-wired doctor check reports passed/failed matching mainCheckoutHookWired, with an actionable message
+ok 152 - main-checkout-hook-wired doctor check reports passed/failed matching mainCheckoutHookWired, with an actionable message
+  ---
+  duration_ms: 9.744396
+  type: 'test'
+  ...
+# Subtest: fgos doctor (no flags) produces valid wrapEnvelope-shaped JSON on stdout
+ok 153 - fgos doctor (no flags) produces valid wrapEnvelope-shaped JSON on stdout
+  ---
+  duration_ms: 251.462272
+  type: 'test'
+  ...
+# Subtest: fgos doctor --pretty prints colored ANSI text, not JSON
+ok 154 - fgos doctor --pretty prints colored ANSI text, not JSON
+  ---
+  duration_ms: 280.749947
+  type: 'test'
+  ...
+# Subtest: fgos doctor against a fresh cwd with no runner config never creates the shared config file (read-only proof)
+ok 155 - fgos doctor against a fresh cwd with no runner config never creates the shared config file (read-only proof)
+  ---
+  duration_ms: 282.113252
+  type: 'test'
+  ...
+# Subtest: resolveMainCheckout from inside a linked worktree resolves the main checkout, not the worktree
+ok 156 - resolveMainCheckout from inside a linked worktree resolves the main checkout, not the worktree
+  ---
+  duration_ms: 30.760756
+  type: 'test'
+  ...
+# Subtest: resolveMainCheckout returns null outside a git checkout entirely
+ok 157 - resolveMainCheckout returns null outside a git checkout entirely
+  ---
+  duration_ms: 2.151681
+  type: 'test'
+  ...
+# Subtest: integrationScriptPath returns a path that actually exists on disk
+ok 158 - integrationScriptPath returns a path that actually exists on disk
+  ---
+  duration_ms: 2.313433
+  type: 'test'
+  ...
+# Subtest: integrationScriptPath names the main checkout even when this copy runs from a linked worktree
+ok 159 - integrationScriptPath names the main checkout even when this copy runs from a linked worktree
+  ---
+  duration_ms: 4.228247
+  type: 'test'
+  ...
+# Subtest: shell-integration-sourced fails on a dead fgos source line even when the live line is present
+ok 160 - shell-integration-sourced fails on a dead fgos source line even when the live line is present
+  ---
+  duration_ms: 22.106102
+  type: 'test'
+  ...
+# Subtest: shell-integration-sourced counts dead lines per rc file across both bash and zsh
+ok 161 - shell-integration-sourced counts dead lines per rc file across both bash and zsh
+  ---
+  duration_ms: 21.712769
+  type: 'test'
+  ...
+# Subtest: shell-integration-sourced still passes when every rc file has only the live line
+ok 162 - shell-integration-sourced still passes when every rc file has only the live line
+  ---
+  duration_ms: 12.910681
+  type: 'test'
+  ...
+# Subtest: shell-integration-sourced samples dead paths instead of printing all of them
+ok 163 - shell-integration-sourced samples dead paths instead of printing all of them
+  ---
+  duration_ms: 23.523814
+  type: 'test'
+  ...
+# Subtest: no-stuck-merge-abort check passes and fix reports nothing to fix on a clean repo with no MERGE_HEAD
+ok 164 - no-stuck-merge-abort check passes and fix reports nothing to fix on a clean repo with no MERGE_HEAD
+  ---
+  duration_ms: 23.501833
+  type: 'test'
+  ...
+# Subtest: no-stuck-merge-abort check fails and fix reports manual command when MERGE_HEAD exists
+ok 165 - no-stuck-merge-abort check fails and fix reports manual command when MERGE_HEAD exists
+  ---
+  duration_ms: 23.386309
+  type: 'test'
+  ...
+# Subtest: operation-capability-resolves reports passing status for retired coordination protocols
+ok 166 - operation-capability-resolves reports passing status for retired coordination protocols
+  ---
+  duration_ms: 0.693545
+  type: 'test'
+  ...
+# Subtest: fgos doctor exits 0 by default even when a check fails
+ok 167 - fgos doctor exits 0 by default even when a check fails
+  ---
+  duration_ms: 500.639072
+  type: 'test'
+  ...
+# Subtest: fgos doctor --strict exits 1 when a check fails, and still prints the report
+ok 168 - fgos doctor --strict exits 1 when a check fails, and still prints the report
+  ---
+  duration_ms: 761.874384
+  type: 'test'
+  ...
+# Subtest: fgos doctor --fix --strict exits 1 when checks still fail after the fixes ran
+ok 169 - fgos doctor --fix --strict exits 1 when checks still fail after the fixes ran
+  ---
+  duration_ms: 1899.213857
+  type: 'test'
+  ...
+# hint: Using 'master' as the name for the initial branch. This default branch name
+# hint: is subject to change. To configure the initial branch name to use in all
+# hint: of your new repositories, which will suppress this warning, call:
+# hint: 
+# hint: \\tgit config --global init.defaultBranch <name>
+# hint: 
+# hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+# hint: 'development'. The just-created branch can be renamed via this command:
+# hint: 
+# hint: \\tgit branch -m <name>
+# Subtest: a new module can register a check via registrations.mjs and see it in checks.mjs's own DOCTOR_CHECKS, without checks.mjs being edited
+ok 170 - a new module can register a check via registrations.mjs and see it in checks.mjs's own DOCTOR_CHECKS, without checks.mjs being edited
+  ---
+  duration_ms: 4.143559
+  type: 'test'
+  ...
+# Subtest: registering a check with a duplicate id throws rather than silently shadowing the original
+ok 171 - registering a check with a duplicate id throws rather than silently shadowing the original
+  ---
+  duration_ms: 0.993896
+  type: 'test'
+  ...
+# Subtest: a new module can register a config-default independently of any check (D2)
+ok 172 - a new module can register a config-default independently of any check (D2)
+  ---
+  duration_ms: 0.361629
+  type: 'test'
+  ...
+# Subtest: registerConfigDefault rejects a non-object shape
+ok 173 - registerConfigDefault rejects a non-object shape
+  ---
+  duration_ms: 0.391531
+  type: 'test'
+  ...
+# Subtest: registerConfigDefault requires a non-empty key
+ok 174 - registerConfigDefault requires a non-empty key
+  ---
+  duration_ms: 0.303779
+  type: 'test'
+  ...
+# Subtest: the runner's own config-default is registered under the "runner" key (built-in, proves the same mechanism a new module would use)
+ok 175 - the runner's own config-default is registered under the "runner" key (built-in, proves the same mechanism a new module would use)
+  ---
+  duration_ms: 0.235193
+  type: 'test'
+  ...
+# Subtest: a new module can register a fix via registrations.mjs and see it in checks.mjs's own FIX_REGISTRATIONS, without checks.mjs being edited
+ok 176 - a new module can register a fix via registrations.mjs and see it in checks.mjs's own FIX_REGISTRATIONS, without checks.mjs being edited
+  ---
+  duration_ms: 0.341508
+  type: 'test'
+  ...
+# Subtest: registering a fix with a duplicate id throws rather than silently shadowing the original
+ok 177 - registering a fix with a duplicate id throws rather than silently shadowing the original
+  ---
+  duration_ms: 0.266781
+  type: 'test'
+  ...
+# Subtest: registerFix requires a fix function
+ok 178 - registerFix requires a fix function
+  ---
+  duration_ms: 0.292849
+  type: 'test'
+  ...
+# Subtest: runFixes invokes every registered fix against the given cwd and reports id/changed/message per entry
+ok 179 - runFixes invokes every registered fix against the given cwd and reports id/changed/message per entry
+  ---
+  duration_ms: 37.233679
+  type: 'test'
+  ...
+# Subtest: ensureSharedConfigDefaults on a fresh dir writes every registered entry under its own key, including the built-in "runner" one
+ok 180 - ensureSharedConfigDefaults on a fresh dir writes every registered entry under its own key, including the built-in "runner" one
+  ---
+  duration_ms: 1.841603
+  type: 'test'
+  ...
+# Subtest: ensureSharedConfigDefaults on an already-complete shared file does not rewrite it
+ok 181 - ensureSharedConfigDefaults on an already-complete shared file does not rewrite it
+  ---
+  duration_ms: 1.306881
+  type: 'test'
+  ...
+# Subtest: ensureSharedConfigDefaults on an empty project registers the Workflow capabilities
+ok 182 - ensureSharedConfigDefaults on an empty project registers the Workflow capabilities
+  ---
+  duration_ms: 0.602688
+  type: 'test'
+  ...
+# Subtest: ensureSharedConfigDefaults adds missing Workflow capabilities without touching one the project already tuned
+ok 183 - ensureSharedConfigDefaults adds missing Workflow capabilities without touching one the project already tuned
+  ---
+  duration_ms: 0.887019
+  type: 'test'
+  ...
+# Subtest: setup adds a coding:plan slot beside a project bare-verb plan pool and bind still serves it from that pool
+ok 184 - setup adds a coding:plan slot beside a project bare-verb plan pool and bind still serves it from that pool
+  ---
+  duration_ms: 3.856938
+  type: 'test'
+  ...
+# Subtest: Data Dictionary \#7 names exactly the registered doctor checks — no missing entry, no stale one
+ok 185 - Data Dictionary \#7 names exactly the registered doctor checks — no missing entry, no stale one
+  ---
+  duration_ms: 0.811568
+  type: 'test'
+  ...
+# Subtest: Data Dictionary \#7b names exactly the registered doctor fixes — no missing entry, no stale one
+ok 186 - Data Dictionary \#7b names exactly the registered doctor fixes — no missing entry, no stale one
+  ---
+  duration_ms: 0.405686
+  type: 'test'
+  ...
+# Subtest: plugin-skill-cli-reachable passes when a workspace installation exists, reporting tier 0
+ok 187 - plugin-skill-cli-reachable passes when a workspace installation exists, reporting tier 0
+  ---
+  duration_ms: 1.998498
+  type: 'test'
+  ...
+# Subtest: plugin-skill-cli-reachable passes when a local bin/fgos.mjs exists, without touching PATH
+ok 188 - plugin-skill-cli-reachable passes when a local bin/fgos.mjs exists, without touching PATH
+  ---
+  duration_ms: 0.338388
+  type: 'test'
+  ...
+# Subtest: plugin-skill-cli-reachable passes when no local bin/fgos.mjs exists but fgos resolves from PATH
+ok 189 - plugin-skill-cli-reachable passes when no local bin/fgos.mjs exists but fgos resolves from PATH
+  ---
+  duration_ms: 0.626085
+  type: 'test'
+  ...
+# Subtest: plugin-skill-cli-reachable fails when neither a local bin/fgos.mjs, a project-local install, a cached global path, nor a live PATH install exists
+ok 190 - plugin-skill-cli-reachable fails when neither a local bin/fgos.mjs, a project-local install, a cached global path, nor a live PATH install exists
+  ---
+  duration_ms: 0.414074
+  type: 'test'
+  ...
+# Subtest: cli-version-visible passes and its message embeds the resolved packageVersion
+ok 191 - cli-version-visible passes and its message embeds the resolved packageVersion
+  ---
+  duration_ms: 3.684636
+  type: 'test'
+  ...
+# Subtest: plugin-dev-skills-packaged passes cleanly when the project has no .claude/skills or plugins/fgOS/skills at all
+ok 192 - plugin-dev-skills-packaged passes cleanly when the project has no .claude/skills or plugins/fgOS/skills at all
+  ---
+  duration_ms: 0.434
+  type: 'test'
+  ...
+# Subtest: plugin-dev-skills-packaged passes when every .claude/skills/fgos-* dev-skill has a matching plugins/fgOS/skills/ copy
+ok 193 - plugin-dev-skills-packaged passes when every .claude/skills/fgos-* dev-skill has a matching plugins/fgOS/skills/ copy
+  ---
+  duration_ms: 0.60983
+  type: 'test'
+  ...
+# Subtest: plugin-dev-skills-packaged fails and names any .claude/skills/fgos-* dev-skill missing from plugins/fgOS/skills/
+ok 194 - plugin-dev-skills-packaged fails and names any .claude/skills/fgos-* dev-skill missing from plugins/fgOS/skills/
+  ---
+  duration_ms: 0.425065
+  type: 'test'
+  ...
+# Subtest: gateway-token-configured check fails when HOME has no gateway.token, and fix provisions a real one the check then accepts
+ok 195 - gateway-token-configured check fails when HOME has no gateway.token, and fix provisions a real one the check then accepts
+  ---
+  duration_ms: 0.898951
+  type: 'test'
+  ...
+# Subtest: gateway-token-configured fix is idempotent — an existing token is never rotated out from under a client that already has it
+ok 196 - gateway-token-configured fix is idempotent — an existing token is never rotated out from under a client that already has it
+  ---
+  duration_ms: 0.421806
+  type: 'test'
+  ...
+# Subtest: the gateway config-default is registered under the "gateway" key with port and an unarmed null token
+ok 197 - the gateway config-default is registered under the "gateway" key with port and an unarmed null token
+  ---
+  duration_ms: 0.147932
+  type: 'test'
+  ...
+# Subtest: task-specs-resolve doctor check passes when core/task-specs/ and domain task-specs exist
+ok 198 - task-specs-resolve doctor check passes when core/task-specs/ and domain task-specs exist
+  ---
+  duration_ms: 0.594346
+  type: 'test'
+  ...
+# Subtest: task-spec and workflow-operation checks pass on a plain target project that carries no fgOS trees
+ok 199 - task-spec and workflow-operation checks pass on a plain target project that carries no fgOS trees
+  ---
+  duration_ms: 14.624663
+  type: 'test'
+  ...
+# Subtest: task-spec and workflow-operation checks still fail when the install root lacks its own task-specs
+ok 200 - task-spec and workflow-operation checks still fail when the install root lacks its own task-specs
+  ---
+  duration_ms: 1.040362
+  type: 'test'
+  ...
+# Subtest: agent-type-names-unique doctor check passes when agent-type names are globally unique
+ok 201 - agent-type-names-unique doctor check passes when agent-type names are globally unique
+  ---
+  duration_ms: 0.627443
+  type: 'test'
+  ...
+# Subtest: agent-type-names-unique doctor check fails when duplicate agent-type names exist across sources (D33)
+ok 202 - agent-type-names-unique doctor check fails when duplicate agent-type names exist across sources (D33)
+  ---
+  duration_ms: 0.880936
+  type: 'test'
+  ...
+# Subtest: guard-warnings-surface: main-checkout-guard-warnings doctor check passes when no warnings exist and fails when warnings exist
+ok 203 - guard-warnings-surface: main-checkout-guard-warnings doctor check passes when no warnings exist and fails when warnings exist
+  ---
+  duration_ms: 17.295065
+  type: 'test'
+  ...
+# Subtest: events-jsonl-not-truncated: a truncation in a per-writer file under .fgos/events/ fails the check even when baseline-0 holds clean
+ok 204 - events-jsonl-not-truncated: a truncation in a per-writer file under .fgos/events/ fails the check even when baseline-0 holds clean
+  ---
+  duration_ms: 13.543405
+  type: 'test'
+  ...
+# Subtest: events-compaction-verified passes trivially when no compaction has ever run
+ok 205 - events-compaction-verified passes trivially when no compaction has ever run
+  ---
+  duration_ms: 7.818688
+  type: 'test'
+  ...
+# Subtest: events-compaction-verified passes when a real compaction's baseline still matches its archived originals
+ok 206 - events-compaction-verified passes when a real compaction's baseline still matches its archived originals
+  ---
+  duration_ms: 9.836641
+  type: 'test'
+  ...
+# Subtest: events-compaction-verified fails and names the broken manifest when the baseline no longer matches its archived originals
+ok 207 - events-compaction-verified fails and names the broken manifest when the baseline no longer matches its archived originals
+  ---
+  duration_ms: 7.796695
+  type: 'test'
+  ...
+# Subtest: findWorkflowStageOperationProblems passes on the live repository setup
+ok 208 - findWorkflowStageOperationProblems passes on the live repository setup
+  ---
+  duration_ms: 1.178451
+  type: 'test'
+  ...
+# Subtest: findWorkflowStageOperationProblems fails when operation taskSpec does not resolve
+ok 209 - findWorkflowStageOperationProblems fails when operation taskSpec does not resolve
+  ---
+  duration_ms: 1.036641
+  type: 'test'
+  ...
+# Subtest: findWorkflowStageOperationProblems fails when operation role is not in roleGraph.roles
+ok 210 - findWorkflowStageOperationProblems fails when operation role is not in roleGraph.roles
+  ---
+  duration_ms: 0.772291
+  type: 'test'
+  ...
+# Subtest: findWorkflowStageOperationProblems fails when operation skill is not provided by any agent-type
+ok 211 - findWorkflowStageOperationProblems fails when operation skill is not provided by any agent-type
+  ---
+  duration_ms: 0.699049
+  type: 'test'
+  ...
+# Subtest: findWorkflowStageOperationProblems fails when operation reason has no matching roleGraph edge
+ok 212 - findWorkflowStageOperationProblems fails when operation reason has no matching roleGraph edge
+  ---
+  duration_ms: 0.691191
+  type: 'test'
+  ...
+# Subtest: findWorkflowStageOperationProblems fails when multiple operations are marked primary: true
+ok 213 - findWorkflowStageOperationProblems fails when multiple operations are marked primary: true
+  ---
+  duration_ms: 0.855472
+  type: 'test'
+  ...
+# Subtest: findWorkflowStageOperationProblems fails when the primary operation does not carry the step skill
+ok 214 - findWorkflowStageOperationProblems fails when the primary operation does not carry the step skill
+  ---
+  duration_ms: 0.748384
+  type: 'test'
+  ...
+# Subtest: findWorkflowStageOperationProblems fails when policy rigor or preferPersona is invalid
+ok 215 - findWorkflowStageOperationProblems fails when policy rigor or preferPersona is invalid
+  ---
+  duration_ms: 0.773266
+  type: 'test'
+  ...
+# Subtest: findWorkflowStageOperationProblems fails on invalid dispatch mode or human-only with executor policy
+ok 216 - findWorkflowStageOperationProblems fails on invalid dispatch mode or human-only with executor policy
+  ---
+  duration_ms: 0.835329
+  type: 'test'
+  ...
+# Subtest: findWorkflowStageOperationProblems fails on invalid preferExecutor, fallbackExecutors shape/names, or visibility
+ok 217 - findWorkflowStageOperationProblems fails on invalid preferExecutor, fallbackExecutors shape/names, or visibility
+  ---
+  duration_ms: 0.768084
+  type: 'test'
+  ...
+# Subtest: findWorkflowStageOperationProblems fails on duplicate operation id or empty id
+ok 218 - findWorkflowStageOperationProblems fails on duplicate operation id or empty id
+  ---
+  duration_ms: 0.724057
+  type: 'test'
+  ...
+# Subtest: findWorkflowStageOperationProblems fails when required fields taskSpec, role, or skills are missing or empty
+ok 219 - findWorkflowStageOperationProblems fails when required fields taskSpec, role, or skills are missing or empty
+  ---
+  duration_ms: 0.844159
+  type: 'test'
+  ...
+# Subtest: findWorkflowStageOperationProblems strictly enforces role as TARGET role (to) for reason edges
+ok 220 - findWorkflowStageOperationProblems strictly enforces role as TARGET role (to) for reason edges
+  ---
+  duration_ms: 0.75015
+  type: 'test'
+  ...
+# Subtest: findWorkflowStageOperationProblems fails when policy contains disallowed keys
+ok 221 - findWorkflowStageOperationProblems fails when policy contains disallowed keys
+  ---
+  duration_ms: 0.733735
+  type: 'test'
+  ...
+# Subtest: findWorkflowStageOperationProblems fails when a step's operations is not an array
+ok 222 - findWorkflowStageOperationProblems fails when a step's operations is not an array
+  ---
+  duration_ms: 0.655645
+  type: 'test'
+  ...
+# Subtest: domain-workflow-operations-coverage doctor check is registered and passes on clean repo
+ok 223 - domain-workflow-operations-coverage doctor check is registered and passes on clean repo
+  ---
+  duration_ms: 1.042455
+  type: 'test'
+  ...
+# Subtest: doctor check runner-patterns-config passes with defaults or warns when missing
+ok 224 - doctor check runner-patterns-config passes with defaults or warns when missing
+  ---
+  duration_ms: 1.960783
+  type: 'test'
+  ...
+1..224
+# tests 224
+# suites 0
+# pass 224
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 227317.067243
+
+Observed exit: 0; wall seconds: 227.359

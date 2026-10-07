@@ -140,6 +140,7 @@ test('DOCTOR_CHECKS has exactly the registered setup/doctor checks, including in
       'rust-host-binary-present',
       'rust-host-target-supported',
       'legacy-node-payload-present',
+      'active-release-matches-checkout',
       'command-routes-drift',
       'confinement-policies-declared',
       'confinement-backend-registry-readable',

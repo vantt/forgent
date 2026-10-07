@@ -33,6 +33,67 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const HOW_TO_DOC = 'docs/how-to-parallel-lanes.md (workshop root, one level up from repo/)';
 
+// One source of truth; land allowlist changes separately before using them.
+const ROOT_FILE_ALLOWLIST = new Set([
+  '.gitattributes', '.gitignore', 'AGENTS.md', 'CHANGELOG.md', 'CLAUDE.md',
+  'Cargo.lock', 'Cargo.toml', 'LICENSE', 'README.md', 'clippy.toml',
+  'install.sh', 'package-lock.json', 'package.json', 'rustfmt.toml',
+]);
+
+function rootFileRefusal(committingToplevel) {
+  if (!fs.existsSync(path.join(committingToplevel, 'apps/fgos/Cargo.toml'))) return null;
+  const git = (args) => execFileSync('git', args, {
+    cwd: committingToplevel, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  try {
+    const mergeHead = git(['rev-parse', '--git-path', 'MERGE_HEAD']).trim();
+    if (fs.existsSync(path.resolve(committingToplevel, mergeHead))) return null;
+    const roots = git(['diff', '--cached', '--name-only', '--diff-filter=ACR', '-z'])
+      .split('\0').filter((name) => name && !name.includes('/'));
+    if (roots.length === 0) return null;
+
+    const hookPath = '.githooks/pre-commit';
+    if (git(['diff', '--cached', '--name-only', '--', hookPath]).trim()) {
+      // Locate authority only in HEAD, then inspect original diff ranges.
+      // Staged comments or decoy declarations cannot hide a changed block.
+      let headHook = '';
+      try {
+        headHook = git(['show', `HEAD:${hookPath}`]);
+      } catch (error) {
+        if (!(error.status === 128 && /does not exist|exists on disk, but not in/.test(error.stderr?.toString() ?? ''))) throw error;
+      }
+      const blocks = [...headHook.matchAll(/^const ROOT_FILE_ALLOWLIST = new Set\(\[\n[\s\S]*?^\]\);/gm)];
+      const diff = git(['diff', '--cached', '--text', '--no-color', '--no-ext-diff', '--no-textconv', '--unified=0', '--', hookPath]);
+      let changed = blocks.length !== 1;
+      if (!changed) {
+        const block = blocks[0];
+        const first = headHook.slice(0, block.index).split('\n').length;
+        const last = first + block[0].split('\n').length - 1;
+        for (const hunk of diff.matchAll(/^@@ -(\d+)(?:,(\d+))? \+\d+(?:,\d+)? @@/gm)) {
+          const start = Number(hunk[1]);
+          const count = hunk[2] === undefined ? 1 : Number(hunk[2]);
+          if (count === 0 ? start >= first && start < last : start <= last && start + count - 1 >= first) {
+            changed = true;
+            break;
+          }
+        }
+      }
+      // An added mutation/reference can change authority outside the block.
+      changed ||= diff.split('\n').some((line) =>
+        line.startsWith('+') && !line.startsWith('+++') && line.includes('ROOT_FILE_ALLOWLIST'));
+      if (changed) {
+        return `commit refused: root allowlist changes cannot accompany new root files (${roots.join(', ')}). Land the allowlist change in a separate commit on main first, then retry the root addition.`;
+      }
+    }
+    const forbidden = roots.filter((name) => !ROOT_FILE_ALLOWLIST.has(name));
+    return forbidden.length > 0
+      ? `commit refused: new root files outside .githooks/pre-commit's allowlist (${forbidden.join(', ')}). Move scratch files to .fgos/runtime/tmp/ (or /tmp/fgos-work/); place durable files under their owning directory. Legitimate root additions require an allowlist change landed separately on main first.`
+      : null;
+  } catch (error) {
+    return `commit refused: could not safely inspect staged root files (${error.message}). Repair the index or hook inputs and retry.`;
+  }
+}
+
 // HOOK_TTL_MS (tsk-1d9) is this hook's own default -- shorter than
 // claim-port.mjs's/merge.mjs's shared DEFAULT_TTL_MS (main-checkout-
 // lock.mjs), which stays sized for mergeRunnerItem's much longer verify
@@ -350,6 +411,12 @@ function main() {
   const fgosWorkerChanges = stagedFgosChangesOnWorkerBranch(committingToplevel);
   if (fgosWorkerChanges.length > 0) {
     refuse(`commit refused: this commit on a worker branch stages changes under ".fgos/" (${fgosWorkerChanges.join(', ')}) -- worker branches must never commit changes under .fgos/ (ADR0020). See docs/how-to/fix-fgos-write-rejected-merge-block.md for how to restore these paths before committing.`);
+    return;
+  }
+
+  const rootRefusal = rootFileRefusal(committingToplevel);
+  if (rootRefusal) {
+    refuse(rootRefusal);
     return;
   }
 

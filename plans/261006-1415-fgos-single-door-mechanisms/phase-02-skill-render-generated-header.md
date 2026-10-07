@@ -1,6 +1,17 @@
+---
+title: "Generated skill render headers"
+status: done
+dependencies: [1]
+requiresReview: true
+---
+
 # Phase 02 — Generated header on every skill render file
 
-Plan status: Proposed — not authorized for execution
+> Historical revision note: Revision ready — pending; implementation not started or authorized in that planning assignment.
+
+**Current execution evidence:** generated-header implementation, coherent projections, corrected atomic publication and native installed-shim handoff are complete; see [header/consumer observations](reports/phase-02-tests.md), [native handoff](reports/phase-02-native-handoff.md), and [full-plan sync](reports/final-plan-sync.md). The accepted requirements/steps below remain the planning contract; historical future checks are not current NOT RUN claims for these delivered behaviors. Whole-doctor readiness and separate advisory acceptance are not asserted green.
+
+Dependencies: Phase 01 config binding/document truth cleanup. Regenerate one coherent config-cleaned skill set after Phase 01; no advisory source migration or early/full advisory acceptance prerequisite. Header generation is independent of the separate advisory thin-skill cutover.
 
 ## Context links
 
@@ -22,7 +33,7 @@ Plan status: Proposed — not authorized for execution
 
 ## Files
 
-- Modify: `src/setup/skill-wrappers.mjs`, `test/setup/skill-wrappers.test.mjs` (thêm case unit), `docs/specs/distribution.md` (row 4b), `CHANGELOG.md`
+- Modify: `src/setup/skill-wrappers.mjs`, `test/setup/skill-wrappers.test.mjs` (chỉ consumer behavior nếu cần; source/header wording ở temporary validation), `docs/specs/distribution.md` (row 4b), `CHANGELOG.md`
 - Có thể modify (chỉ nếu message/comment khẳng định `.agents` là canonical gây hiểu sai cho người sửa test): `test/skills/fgos-mirror.test.mjs`
 - Regenerated: toàn bộ `.agents/skills/**/*.md`, `plugins/fgOS/skills/{fgos-*,_shared}/**/*.md`, `.claude/skills/{fgos-*,distill}/**`
 - Không sửa: `docs/specs/reading-map.md:26` (cũng gọi `.claude/skills` + mirror; thuộc plan H6 — chuyển giao, xem câu hỏi mở)
@@ -31,20 +42,21 @@ Plan status: Proposed — not authorized for execution
 ## Steps
 
 1. **Impact analysis** (GitNexus posture từ Phase 00): `impact({target:"assembleSkills", direction:"upstream"})`, `impact({target:"generateWrapperContent", direction:"upstream"})`; cross-check bằng `rtk proxy grep -rn "assembleSkills\|generateWrapperContent" src bin scripts test` (hôm nay: `bin/fgos.mjs:130` qua `materializeSkillsIntoProject`, `scripts/build-skill-wrappers.mjs`, `test/setup/skill-wrappers.test.mjs`, `test/skills/fgos-mirror.test.mjs`, `test/cli/fgos-preflight.test.mjs`). Báo HIGH/CRITICAL trước khi sửa.
-2. **Test đỏ trước.** Trong `test/setup/skill-wrappers.test.mjs` thêm case: dựng repo tạm có `core/skills/x/SKILL.md` (có frontmatter), `core/skills/x/references/a.md` (không frontmatter), `core/skills/_shared/f.md`; `assembleSkills(root)`; assert mỗi file đích chứa header nêu đúng source path, frontmatter byte-identical, header nằm ngay sau frontmatter / ở dòng 1; chạy `assembleSkills` hai lần cho cùng output (idempotent, không nhân đôi header). Thêm case `generateWrapperContent` không còn chữ "canonical skill source" và vẫn chứa `GENERATED_WRAPPER_MARKER`.
+2. **Behavior tests before implementation.** Temporary validation fixtures render frontmatter/no-frontmatter/shared/domain markdown twice, prove frontmatter bytes preserved and output idempotent, inspect source-path header placement and unchanged wrapper marker. Header prose, forbidden “canonical” wording and roster scans are temporary validation/report evidence, **not permanent source-text/wording tests**. Preserve existing assembly/mirror/prune consumer-behavior tests; do not add a permanent prose assertion or mock echo test.
 3. **Cài đặt** trong `assembleSkills`: sau khi copy một skill/fragment, ghi lại các file `.md` vừa copy với header (helper nhỏ, ví dụ `withGeneratedHeader(content, sourceRelPath)`; dùng `FRONTMATTER_PATTERN` có sẵn). Source path lấy từ `skill.canonicalDir` / `fragment.sourcePath` mà hai hàm discover đã trả. Không đổi `copyDirRecursive`, `mirrorDevSkillsIntoPlugin`, `isGeneratedWrapper`.
 4. Sửa câu wrapper trong `generateWrapperContent`.
-5. `npm run build:skills`. `git diff --stat`: chỉ render targets + file đã liệt kê. Kiểm `.claude/skills/fgos-*` vẫn đủ 18 + `distill`.
+5. After Phase 01 config binding/document truth cleanup lands, `npm run build:skills` regenerates **all** outputs together. Review changed paths against Files and Phase 01 changes; `.claude` retains 18 fgos wrappers + distill, including copied references. Do not publish an intermediate config-stale regeneration as final output. Advisory completion later regenerates/restages its own changed skill through existing build/release doors; it uses this updated generator if landed, otherwise the existing generator honestly, without a fabricated dependency.
 6. Sửa `docs/specs/distribution.md` row 4b; CHANGELOG "Changed: skill render copies now carry a generated-from header naming their source".
 7. Đếm acceptance (script Node, không qua rtk): số `.md` trong render targets (theo Requirements #4, trừ CLI-wrapper viết tay) không chứa header và không chứa `GENERATED_WRAPPER_MARKER` = 0.
-8. Commit ngay khi xanh.
+8. During authorized implementation only, commit once behavior checks and temporary validation evidence are complete.
+9. **Mandatory native release handoff before Phase 04:** after Phase 01/02 changes land, restage release by existing A route, then run `fgos doctor` **through installation shim**, recording selected release and output. This doctor run cannot prove the new Phase 04 check exists yet; it is header/development/doctor handoff, not advisory product proof. Until restaging, plain `fgos setup` can overwrite checkout renders with old active-release `.agents` copies and old generator; do not invoke it. Phase 06 must document this. Source-checkout copy bypass is an alternative outside this phase. Serialize generation/build/stage writes with the separate advisory plan through an explicit writer baton; no concurrent writes to the same outputs.
 
 ## Tests / validation
 
 Mọi lệnh chạy với `env -u CLAUDE_CODE_SESSION_ID` (npm test không hermetic trong phiên agent).
-1. Hẹp: `node --test test/setup/skill-wrappers.test.mjs` (case mới đỏ → xanh; drift guard :269 xanh sau build).
-2. Mirror: `node --test test/skills/fgos-mirror.test.mjs test/skills/skill-sources-bind-executors-through-config.test.mjs`.
-3. Các test khác đọc `.agents/skills` (đã liệt kê 2026-10-06): `test/skills/fgos-coding-exploring-root-fix.test.mjs`, `test/cli/fgos-preflight.test.mjs`, `test/state/decision-relation.test.mjs`, `test/state/handoff.test.mjs`, `test/state/domain-registry.test.mjs`, `test/setup/instruction-projections.test.mjs`, `test/setup/uninstall-wiring.test.mjs`, `test/scripts/check-decision-citation-drift.test.mjs`, `test/install-packaging.test.mjs`, `test/e2e/coexistence-canary.test.mjs`, `test/e2e/rebuild-determinism.test.mjs`. Baseline `scripts/check-decision-citation-drift.baseline.json` khoá theo file + text (không theo số dòng) — nếu test này đỏ, `git diff` baseline trước khi sinh lại, dùng đúng lệnh mà suite dùng.
+1. Hẹp: `node --test test/setup/skill-wrappers.test.mjs`; preserve assembly/drift/prune behavior, not new wording assertions. Temporary header/source-path/frontmatter/idempotence observations go in validation report.
+2. Mirror: `node --test test/skills/fgos-mirror.test.mjs`. No permanent `skill-sources-bind-executors-through-config.test.mjs`: roster/model source checks are temporary Phase 01 validation.
+3. **Full header impact inventory:** retain historical **20-file** risk inventory and reconcile it against current tree in temporary validation report before execution; existing phase text only named 14 paths and is not proof of a complete 20-file list. Explicit named paths: `test/setup/skill-wrappers.test.mjs`, `test/skills/fgos-mirror.test.mjs`, `test/skills/skill-sources-bind-executors-through-config.test.mjs` (formerly planned source-test; do not create), `test/skills/fgos-coding-exploring-root-fix.test.mjs`, `test/cli/fgos-preflight.test.mjs`, `test/state/decision-relation.test.mjs`, `test/state/handoff.test.mjs`, `test/state/domain-registry.test.mjs`, `test/setup/instruction-projections.test.mjs`, `test/setup/uninstall-wiring.test.mjs`, `test/scripts/check-decision-citation-drift.test.mjs`, `test/install-packaging.test.mjs`, `test/e2e/coexistence-canary.test.mjs`, `test/e2e/rebuild-determinism.test.mjs`. Record actual direct/indirect consumers and any retired/source-wording checks separately; do not invent six paths or weaken real consumer acceptance. Citation baseline is file+text, not line number; review diff before any regeneration using suite's documented command.
 4. Rộng: `env -u CLAUDE_CODE_SESSION_ID npm test`.
 
 ## Risks
@@ -54,15 +66,9 @@ Mọi lệnh chạy với `env -u CLAUDE_CODE_SESSION_ID` (npm test không herme
 | Đổi marker làm prune xoá nhầm/không xoá wrapper ở project ngoài | Low×High | Không đổi `GENERATED_WRAPPER_MARKER`; test sẵn có về prune phải xanh |
 | Fragment `_shared` được nhúng/đo ở nơi khác (word budget, citation drift) | Med×Med | Chạy nhóm test bước 3; header là một dòng comment |
 | Project ngoài: `materializeSkillsIntoProject` gọi `assembleSkills(targetRoot, …, {prune:false})` cho domain riêng của họ → header nêu `domains/<d>/skills/...` của chính họ (đúng) | Low×Low | Case unit cho đường `prune:false` |
-| Phiên khác chạy `fgos setup` trong lúc phase chạy → render ghi đè | Med×Low | Output là tất định; chạy lại `build:skills` trước commit |
+| Old active release `fgos setup` overwrites integrated sources' render outputs | High×High | Plain shim can still run old assembly code; avoid setup until mandatory restage + shim doctor handoff, document in Phase 06; no claim of deterministic protection across different release versions |
 
 ## Rollback
 
 `git revert <commit>` rồi `npm run build:skills` (đưa render về bản không header).
 
-## Hiệu chỉnh sau red-team (2026-10-06)
-
-Mục này **thắng** nội dung cũ của phase khi mâu thuẫn. Bằng chứng đã được lead tự đo lại (script hoặc `rtk proxy`), chi tiết ở bảng Red Team Review trong `plan.md`.
-
-- **Dòng rủi ro "output là tất định" sai.** `fgos` trơn chạy release đang kích hoạt (2026-10-04, không có logic header). `fgos setup` qua nó đi vào `materializeSkillsIntoProject(PACKAGE_ROOT, repoRoot)` (`bin/fgos.mjs:3802`), nhánh `copied` (`src/setup/skill-wrappers.mjs:1211-1215`) chép `.agents/skills` của release đè lên checkout rồi render lại bằng mã cũ: header biến mất, câu "canonical" sai quay lại, và test drift `test/setup/skill-wrappers.test.mjs` đỏ.
-- **Bước bắt buộc sau khi Phase 01 và 02 hạ cánh, trước Phase 04:** stage lại release (phương án A), rồi chạy `fgos doctor` **qua shim** và ghi kết quả. Tới lúc đó, ai chạy `fgos setup` ở checkout này sẽ làm mất header; Phase 06 phải nêu điều này trong quy tắc. Việc để `materializeSkillsIntoProject` bỏ qua bước chép ở checkout nguồn fgOS (marker `apps/fgos/Cargo.toml`) là phương án thay thế, ghi nhận nhưng không nằm trong phase này.

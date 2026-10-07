@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `fgos doctor` reports activated Node-payload drift against a source checkout's working tree without changing activation; `npm run fgos:dev -- <verb>` runs working-tree code through the Rust host, preserving caller cwd and respecting custom Cargo targets without weakening manifest containment.
+- The source-checkout commit hook refuses new root files outside its single allowlist, including linked worktrees; separate allowlist commits and a root-only merge exception preserve normal integration and existing data-loss guards.
 - `fgos metrics coverage` reports assignment-run coverage and skip reasons; `fgos doctor` compares it with an independent directory scan and identifies older hosts as degraded.
 - `fgos metrics discussions` reads writer-owned settled Unit summaries: seat/attempt/fallback accounting, workflow grouping, duration, and passive stance agreement. `workflow start --stance-options "a|b|c"` supplies answer options; missing or malformed stance never rejects worker output. `scripts/backfill-unit-summaries.mjs` adds historical summaries without rewriting original results.
 - `fgos run --unit <file> --stance-options "a|b|c"` declares the same answer options for a single Unit. Combining `--stance-options` with `fgos run --resume <unitRunId>` is refused with exit 4 (the stored question is immutable) instead of silently ignoring the new options.
@@ -26,6 +28,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - The provider capacity state lock now waits up to 30 seconds for a live holder instead of 5 before failing; a lock held by a dead process is still reclaimed at once. On a busy disk the holder's fsync could outlast five seconds and fail a dispatch for no fault of its own.
+- Architecture advisory guidance now uses config-owned binding and the current Workflow door instead of retired executor/model pins and coordination APIs; it preserves role doctrine, requires fail-closed host-write-denied execution, and explicitly separates unsupported advisory capabilities from this hygiene cleanup.
+- Skill render Markdown copies now carry a generated-from header naming their canonical source and the source-repo rebuild command, preserving frontmatter bytes; Claude thin wrappers identify their redirect target as an assembled projection.
+- The fgOS source root keeps only its 14 durable root files; 30 historical scratch artifacts were removed after an annotated preservation snapshot, and the live pick case study was preserved unchanged under `docs/history/live-fgos-pick-case-study/`.
 - `fgos metrics discussions` reports agreement and a genuine split only when the valid stance votes are at least two and more than half of the voting seats; otherwise the unit is `unmeasured` and the stance counters are kept. An older unit summary is reported as `unsupported-version` even when it has no settlement timestamp, because the version is checked before the timestamp.
 - Unit summaries are now contract v2 (`unit-summary.read.v2`). A legacy unit with no recorded pattern is published as `outcome: "undetermined"` with seats of `kind: "unknown"` instead of being derived as solo, and `metrics discussions` reports `unitsUndetermined` and leaves such units out of `passRate` and `unitsFailed`. Summaries of another version are skipped as `unsupported-version`. About 46 older forgentX units are now `undetermined` because nothing records their pattern.
 - `scripts/backfill-unit-summaries.mjs` only fills in missing summaries by default and reports stale ones; the new `--regenerate` rewrites stale summaries and removes the ones that can no longer be established. Active units are never touched.

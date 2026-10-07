@@ -1,0 +1,50 @@
+{
+  "removed": [
+    "/tmp/fgos-phase04-live-CNlZHi/prepare.mjs",
+    "/tmp/fgos-phase04-live-CNlZHi/nested-store.mjs",
+    "/tmp/fgos-phase04-live-CNlZHi/source-check.mjs",
+    "/tmp/fgos-phase04-live-CNlZHi/observe-dev.mjs",
+    "/tmp/fgos-phase04-live-CNlZHi/sync-workspace.mjs",
+    "/tmp/fgos-phase04-live-CNlZHi/selected-check.mjs",
+    "/tmp/fgos-phase04-live-CNlZHi/pause-consumer.mjs",
+    "/tmp/fgos-phase04-live-CNlZHi/concurrency-signal.mjs",
+    "/tmp/fgos-phase04-live-CNlZHi/concurrent-second.release",
+    "/tmp/fgos-phase04-live-CNlZHi/concurrent-first.ready.json",
+    "/tmp/fgos-phase04-live-CNlZHi/concurrent-first.release",
+    "/tmp/fgos-phase04-live-CNlZHi/concurrent-second.ready.json",
+    "/tmp/fgos-phase04-live-CNlZHi/signal-native.ready.json"
+  ],
+  "allRemoved": true,
+  "retained": [
+    "/tmp/fgos-phase04-live-CNlZHi/logs",
+    "/tmp/fgos-phase04-live-CNlZHi/home",
+    "/tmp/fgos-phase04-live-CNlZHi/state-home",
+    "/tmp/fgos-phase04-live-CNlZHi/workspace",
+    "/tmp/fgos-phase04-live-CNlZHi/relative-target",
+    "/tmp/fgos-phase04-live-CNlZHi/absolute-target",
+    "/tmp/fgos-phase04-live-CNlZHi/candidate-phase04",
+    "/tmp/fgos-phase04-live-CNlZHi/candidate-final",
+    "/tmp/fgos-phase04-live-CNlZHi/candidate-post-tail-aligned",
+    "/tmp/fgos-phase04-live-CNlZHi/symlink-refusal-candidate"
+  ],
+  "remainingTempEntries": [
+    "relative-target",
+    "logs",
+    "candidate-final",
+    "home",
+    "absolute-target",
+    "state-home",
+    "symlink-refusal-candidate",
+    "candidate-post-tail-aligned",
+    "workspace",
+    "candidate-phase04"
+  ],
+  "executionScratchEntries": [],
+  "sharedTargetSymlinkPreserved": true,
+  "defaultDebugDigestAfterCustomAndConcurrent": "sha256:f0cd8cb4f020cc0aad5f84da06d32f07379898df3f270f30510ff123f6a2069b",
+  "defaultUnchanged": true,
+  "evidencePath": "/home/vantt/projects/worktrees/forgentX-single-door-execution/plans/261006-1415-fgos-single-door-mechanisms/reports/phase-04-live-evidence.json",
+  "evidenceDigest": "sha256:b3dcb21315bdbc5d4e92c283e7cf18b024ad40b5cc8b7f4a9cf7391912f5b4a2",
+  "priorProofPreserved": true,
+  "notes": "Removed only worker-owned helper scripts and ready/release markers after full logs and helper source captured. Retained owned releases, workspace/store/home, custom-target build caches and logs until parent cleanup; prior Phase02 proof untouched."
+}

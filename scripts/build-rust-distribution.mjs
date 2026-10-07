@@ -124,6 +124,18 @@ function collectSourceFiles(baseDir, relativePath, results) {
   }
 }
 
+/** Source payload selection shared by release packaging and checkout diagnosis. */
+export function listLegacyNodeSourceFiles(repoRoot) {
+  const resolvedRepo = path.resolve(repoRoot);
+  const pkg = JSON.parse(fs.readFileSync(path.join(resolvedRepo, 'package.json'), 'utf8'));
+  const sourceFiles = [];
+  for (const declared of Array.isArray(pkg.files) ? pkg.files : []) {
+    collectSourceFiles(resolvedRepo, declared, sourceFiles);
+  }
+  collectSourceFiles(resolvedRepo, 'package.json', sourceFiles);
+  return [...new Set(sourceFiles.map((file) => path.relative(resolvedRepo, path.resolve(resolvedRepo, file)).replaceAll('\\', '/')))].sort();
+}
+
 /**
  * Finds the installed directory of every production dependency (and of their own dependencies),
  * so the staged legacy-node payload can load them without a checkout around it.
@@ -267,13 +279,7 @@ export function buildRustDistribution({
   const legacyNodeRoot = path.join(resolvedOut, 'libexec', 'legacy-node');
   fs.mkdirSync(legacyNodeRoot, { recursive: true });
 
-  const sourceFiles = [];
-  const declaredFiles = Array.isArray(pkg.files) ? pkg.files : [];
-  for (const declared of declaredFiles) {
-    collectSourceFiles(resolvedRepo, declared, sourceFiles);
-  }
-  // package.json itself is part of npm package
-  collectSourceFiles(resolvedRepo, 'package.json', sourceFiles);
+  const sourceFiles = listLegacyNodeSourceFiles(resolvedRepo);
 
   for (const rel of sourceFiles) {
     const srcFull = path.join(resolvedRepo, rel);
