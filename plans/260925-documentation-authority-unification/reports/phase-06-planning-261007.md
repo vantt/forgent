@@ -198,3 +198,7 @@ Recommendation: (a): six documents, no path moves, additive and recorded by exce
 - Whether candidate rows become non-blocking when the switchboard flips at Phase 9 (the three promoted portals show `promote`, 86 rows): a throwaway-clone rehearsal at B9 measures it; UNPROVEN before that.
 - Token cost per run at this size and Lead time for about 185 runs.
 - Whether all 16 host-invocation drops are still settled design (the Lead checks each against code and git history in B2).
+
+## 11. Revision for a single executor (2026-10-07)
+
+The owner will run Phase 6 himself with one capable agent (Codex) that has repo access. The phase file was rewritten accordingly: no subagent dispatch, no harness roles, batches are numbered Steps 0 to 10 (the B0 to B9 letters in sections 3 to 6 map to Steps 1 to 10 in order: B0 to Step 1, B1 to Step 2, B2 to Step 3, B3 to Step 4, B4 to Step 5, B5 to Step 6, B6 to Step 7, B7 to Step 8, B8 to Step 9, B9 to Step 10). Run counts and token figures in section 6 are Phase 5 measurements used as a rough effort scale; they do not assume Claude subagents. Assumption stated in the phase file: a row is `reviewed` only by someone other than its author (owner or a second session), so one executor cannot review its own rows; this adds owner or second-session review time to the 8 to 12 day estimate. The question bundle (section 9) is unchanged.
