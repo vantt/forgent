@@ -11,14 +11,14 @@ Status: drafted 2026-10-07, nothing run. Purpose: re-measure fgOS discussion out
 
 ## Questions
 
-Same question as 2026-10-04 plus three open fgOS decisions that really have two sides. A question whose answer the design already gives (for example whether to probe a provider before assigning a seat: account rotation, pool fallback and early login-failure detection already answer it) is not asked. Chosen so the answer is not in the repo already; the earlier mdview question ended with all seats agreeing because the feature already existed.
+Same question as 2026-10-04 (Q0, kept for comparability) plus three open fgOS decisions that really have two sides, chosen by the owner on 2026-10-07 (the earlier probe, account-order and persona-location questions were answered by the owner or by the design and are not asked). A question whose answer the design already gives (for example whether to probe a provider before assigning a seat: account rotation, pool fallback and early login-failure detection already answer it) is not asked. Chosen so the answer is not in the repo already; the earlier mdview question ended with all seats agreeing because the feature already existed.
 
 | # | Question | Why it is contestable |
 |---|---|---|
 | Q0 | Should fgOS add a mandatory dissent or agreement gate to the `panel` pattern, or are provider-distinct panelists plus the `reviewed` red-team enough? | Reused for comparability with the first round |
-| Q1 | When a provider account is quarantined for a dead credential (`auth-token`, manual clear), should fgOS clear it by itself after a successful probe, or keep it manual until a person acts? | Safety against wrongly clearing a bad credential versus a person babysitting quotas |
-| Q2 | When choosing among several accounts of one provider, should fgOS prefer the account with the most remaining quota, or keep choosing by hash among the accounts that are usable? | Spreading load without needing quota numbers versus steering work to the account that can finish it; the preferred option needs a quota source fgOS does not have |
-| Q3 | Should lens persona definitions live in the project being run (`core/agents`), or ship with the installed fgOS and be read from there? | Project control versus every project getting the same lenses |
+| A | When a discussion seat fails part way through, should fgOS replace it with another provider on its own (today: convenient, but the quality can change without anyone noticing), or stop and ask a person? | Finishing the run against a silent change in who answered; ties to the rule that a person is asked only when really needed |
+| B | Should fgOS ship a ready set of lens personas to every project, or only on request? | Customers get opinionated lenses for free, against not imposing a viewpoint they did not choose |
+| C | When every seat agrees without exception, should fgOS add a round of challenge on its own, or accept the result? | Guarding against easy consensus, against spending a round when the answer was simply in the repo |
 
 Run each question once through each arm. If cost allows, run Q0 twice per arm to see run-to-run spread.
 
@@ -57,8 +57,8 @@ One table per question: score per criterion per arm, total, judge's pick, cost (
 
 ## Limits to state in the report
 
-Few questions, one judge, one run per arm, the author of this plan knows the topics of Q1 to Q3. Say so; do not claim more than that.
+Few questions, one judge, one run per arm, the author of this plan knows the topics of A to C. Say so; do not claim more than that.
 
 ## Open for the owner
 
-Q1 to Q3 are proposals. Replace any with a question the owner actually needs decided; that makes the run worth more than a benchmark.
+A, B and C are the owner's choice. Replace any with a question the owner actually needs decided; that makes the run worth more than a benchmark.
