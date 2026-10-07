@@ -1,0 +1,5 @@
+scripts/generate-doc-inventory.mjs a52981ff2862cc2c553dbb3181e4e822a26b146b
+scripts/doc-inventory-artifact.mjs 1e6b7bdad954fad1f7c67a4ba6c850c02304ac64
+scripts/generate-shipped-path-inventory.mjs 0f1cd7e1cee308772c0b56c37f3190333039cfb3
+scripts/check-legacy-docs-ratchet.mjs 8bf4fea7c7830a5ab17cbcc8d3ee8fe286fd171d
+scripts/lib/is-main-module.mjs 680570946fa1381474900c9192795514b5b88f48

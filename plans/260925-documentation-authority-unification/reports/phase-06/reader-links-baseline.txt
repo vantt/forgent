@@ -1,0 +1,5 @@
+docs/platform/**
+docs/platform/<area
+docs/platform/README.md
+docs/platform/packaging-distribution/README.md
+docs/platform/packaging-distribution/vision.md

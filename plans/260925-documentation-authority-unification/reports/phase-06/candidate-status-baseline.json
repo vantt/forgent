@@ -1,0 +1,46 @@
+{
+  "counts": {
+    "files": 446,
+    "byStatus": {
+      "promoted": 3,
+      "candidate": 9,
+      "legacy-current": 0,
+      "non-authority": 1,
+      "unrouted": 433
+    },
+    "exemptUnrouted": 302,
+    "checked": 12,
+    "findings": 5,
+    "byType": {
+      "missing-promotion-fields": 3,
+      "unresolved-link": 2
+    }
+  },
+  "findings": [
+    {
+      "type": "missing-promotion-fields",
+      "path": "docs/platform/agent-coordination/README.md",
+      "message": "missing header fields: Supersedes, Superseded by"
+    },
+    {
+      "type": "missing-promotion-fields",
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "message": "missing header fields: Implementation, Provenance, Writer type, Canonical for, Use this when, Do not use this for, Supersedes, Superseded by"
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "message": "link target does not exist: ../../../plans/260915-host-invocation-r2-external-process/plan.md"
+    },
+    {
+      "type": "unresolved-link",
+      "path": "docs/platform/host-invocation-routing/README.md",
+      "message": "link target does not exist: ../../../plans/260918-host-invocation-r3-remote-peer/plan.md"
+    },
+    {
+      "type": "missing-promotion-fields",
+      "path": "docs/platform/packaging-distribution/README.md",
+      "message": "missing header fields: Implementation, Provenance, Writer type, Canonical for, Use this when, Do not use this for, Supersedes, Superseded by"
+    }
+  ]
+}
