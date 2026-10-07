@@ -554,6 +554,39 @@ const TRIVIAL_REMAINDER = /^(none|n\/a|na|-|\.|todo|tbd)$/i;
 const substantiveRemainder = (v) => nonEmpty(v) && v.trim().length >= 15 && !TRIVIAL_REMAINDER.test(v.trim());
 const nonEmpty = (v) => typeof v === 'string' && v.trim() !== '';
 
+export function reviewSessionIdentity(identity) {
+  return typeof identity === 'string' ? identity.replace(/^reviewer:/, '').replace(/@[^@]+$/, '') : '';
+}
+
+export function buildCommittedReviewReportLookup(repoRoot, commitSha) {
+  const cache = new Map();
+  return (reportPath) => {
+    if (typeof reportPath !== 'string' || path.posix.normalize(reportPath) !== reportPath || !/^plans\/[^/]+\/reports\/phase-06\/review-[a-z0-9]+-[a-z0-9-]+\.md$/.test(reportPath)) return null;
+    if (!cache.has(reportPath)) {
+      let report = null;
+      try { report = readBlobAtCommit(commitSha, reportPath, repoRoot); } catch {}
+      cache.set(reportPath, report);
+    }
+    return cache.get(reportPath);
+  };
+}
+
+export function corpusRuleDigest({ corpus, disposition, rationale, claimKind }) {
+  return sha256Buffer(Buffer.from(JSON.stringify({ corpus, disposition, rationale, ...(claimKind === undefined ? {} : { claimKind }) })));
+}
+
+function corpusRuleReviewIsValid(rule, shard, report) {
+  const reviewer = rule.reviewedBy;
+  if (!nonEmpty(rule.authoredBy) || rule.authoredBy.startsWith('script:') || !nonEmpty(shard.authorSession) ||
+      !/^reviewer:[^\s@]+-session:[^\s@]+@\d{4}-\d{2}-\d{2}$/.test(reviewer || '') || !nonEmpty(rule.reviewedAt) ||
+      [rule.authoredBy, shard.authorSession].some((author) => reviewSessionIdentity(author) === reviewSessionIdentity(reviewer)) ||
+      typeof report !== 'string' || report.match(/^Reviewer:\s*(.+)$/mi)?.[1].trim() !== reviewer) return false;
+  const lines = report.split(/\r?\n/).map((line) => line.trim());
+  if (!lines.includes(`Corpus: ${rule.corpus}`) || !lines.includes(`Rule digest: ${corpusRuleDigest(rule)}`)) return false;
+  const verdicts = lines.filter((line) => line.startsWith('|')).map((line) => line.split('|').slice(1, -1).map((cell) => cell.trim())).filter((cells) => cells[0] === `corpus:${rule.corpus}`);
+  return verdicts.length === 1 && verdicts[0][1] === 'ok' && nonEmpty(verdicts[0][2]);
+}
+
 export function loadDecisionShards(target) {
   let files;
   try {
@@ -571,7 +604,7 @@ export function loadDecisionShards(target) {
     for (const field of ['version', 'shard', 'sources', 'claims']) {
       if (!(field in shard)) throw new Error(`decision shard ${file}: missing required field "${field}"`);
     }
-    for (const field of ['sources', 'claims', ...['files', 'registryGaps', 'mirrors', 'exact'].filter((field) => field in shard)]) {
+    for (const field of ['sources', 'claims', ...['files', 'registryGaps', 'mirrors', 'exact', 'corpusRules'].filter((field) => field in shard)]) {
       if (!Array.isArray(shard[field])) throw new Error(`decision shard ${file}: "${field}" must be an array`);
     }
     return shard;
@@ -588,7 +621,7 @@ export function decidedPlatformOwners(inventory, shards) {
   ]).filter((owner) => platform.has(owner)));
 }
 
-export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf = null, targetUnitDigestOf = null, unitsOf = null, registry = null } = {}) {
+export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf = null, targetUnitDigestOf = null, unitsOf = null, registry = null, repoRoot = null } = {}) {
   const findings = [];
   const dispositions = new Map((vocabulary?.sourceDispositions || []).map((d) => [d.id, d]));
   const claimKinds = new Set((vocabulary?.claimKinds || []).map((k) => k.id));
@@ -602,6 +635,8 @@ export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf 
   const decidedFiles = new Set();
   const fail = (type, message, extra = {}) => findings.push({ type, message, ...extra });
   const itemIndex = new Map(items.map((item) => [item.path, item]));
+  const reviewReportOf = repoRoot && inventory.commit ? buildCommittedReviewReportLookup(repoRoot, inventory.commit) : () => null;
+  const corpusDispositions = new Map([['history-evidence', 'retain-as-evidence'], ['user-knowledge', 'reclassify-out-of-platform-scope'], ['consumer-project', 'reclassify-out-of-platform-scope']]);
   const rowsBySource = new Map();
   for (const row of claimLedger) {
     const rows = rowsBySource.get(row.sourcePath) || [];
@@ -613,6 +648,32 @@ export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf 
     const sources = new Set(shard.sources || []);
     const mirrorClaims = [];
     const mirrorFiles = [];
+    for (const rule of shard.corpusRules || []) {
+      const selected = items.filter((item) => item.corpus === rule?.corpus);
+      if (!corpusDispositions.has(rule?.corpus) || rule.disposition !== corpusDispositions.get(rule.corpus) ||
+          !nonEmpty(rule.rationale) || !['pending', 'reviewed'].includes(rule.reviewStatus) ||
+          (rule.claimKind !== undefined && !claimKinds.has(rule.claimKind)) ||
+          selected.length === 0 || selected.some((item) => item.authorityStatus !== 'non-authority' || !sources.has(item.path))) {
+        fail('decision-corpus-invalid', `shard ${shard.shard}: corpus ${rule?.corpus} must name its whole classified non-authority corpus with the matching retention rule`);
+        continue;
+      }
+      if (rule.reviewStatus === 'pending') continue;
+      if (!corpusRuleReviewIsValid(rule, shard, reviewReportOf(rule.reviewReport))) {
+        fail('decision-corpus-review-invalid', `shard ${shard.shard}: corpus ${rule.corpus} lacks a matching committed independent rule verdict`);
+        continue;
+      }
+      for (const item of selected) {
+        const rationale = `${rule.rationale} Item ${item.path} is classified ${item.corpus}/${item.authorityStatus}.`;
+        for (const row of rowsBySource.get(item.path) || []) mirrorClaims.push({
+          claimId: row.claimId, sourceUnitDigest: row.sourceUnitDigest,
+          targetOwner: null, targetAnchor: null, claimKind: rule.claimKind ?? row.claimKind,
+          disposition: rule.disposition, reviewStatus: 'reviewed', rationale,
+          authoredBy: rule.authoredBy, reviewedBy: rule.reviewedBy, reviewedAt: rule.reviewedAt,
+          reviewReport: rule.reviewReport, corpusRule: rule.corpus,
+        });
+        mirrorFiles.push({ path: item.path, disposition: rule.disposition, rationale, targets: [] });
+      }
+    }
     for (const mirror of shard.mirrors || []) {
       const source = itemIndex.get(mirror?.path);
       const target = itemIndex.get(mirror?.target);
@@ -708,7 +769,7 @@ export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf 
       if (d.disposition !== 'partial-carry' && d.disposition !== 'unknown-blocking' && !String(d.disposition).startsWith('delete-') && LOSS_LANGUAGE.test(String(d.rationale || '')) && !nonEmpty(d.remainder)) fail('decision-loss-without-partial-carry', `claim ${id}: the rationale says content is missing; a unit that loses anything is a partial-carry with a remainder, not ${d.disposition}`, at);
 
       const merged = { ...row, targetOwner: d.targetOwner ?? null, targetAnchor: d.targetAnchor ?? null, claimKind: d.claimKind, disposition: d.disposition, reviewStatus: d.reviewStatus, rationale: d.rationale };
-      for (const field of ['authoredBy', 'reviewedBy', 'reviewedAt', 'searched', 'remainder', 'targetUnitDigest']) if (d[field] !== undefined) merged[field] = d[field];
+      for (const field of ['authoredBy', 'reviewedBy', 'reviewedAt', 'searched', 'remainder', 'targetUnitDigest', 'reviewReport', 'corpusRule']) if (d[field] !== undefined) merged[field] = d[field];
       claimLedger[idx] = merged;
       const gapIdx = gapRows ? gapRows.findIndex((gap) => gap?.claimId === id) : -1;
       if (gapIdx >= 0 && d.reviewStatus === 'reviewed' && d.disposition !== 'unknown-blocking') gapRows[gapIdx] = { ...gapRows[gapIdx], disposition: d.disposition };
@@ -894,7 +955,7 @@ export function checkInventory({ repoRoot, inventory, vocabulary, identityRegist
   let conservationRegistry = identityRegistry;
   let validTargetOwners = inventory.commit ? deriveValidTargetOwnersFromSwitchboard(loadSwitchboard(inventory.commit, repoRoot)) : null;
   if (decisions && decisions.length > 0) {
-    const applied = applyDecisions(inventory, decisions, { vocabulary, targetAnchorsOf, targetUnitDigestOf: inventory.commit ? buildTargetUnitDigestLookup(repoRoot, inventory.commit) : null, unitsOf: inventory.commit ? buildConservationUnitLookup(repoRoot, inventory.commit) : null, registry: identityRegistry });
+    const applied = applyDecisions(inventory, decisions, { vocabulary, targetAnchorsOf, targetUnitDigestOf: inventory.commit ? buildTargetUnitDigestLookup(repoRoot, inventory.commit) : null, unitsOf: inventory.commit ? buildConservationUnitLookup(repoRoot, inventory.commit) : null, registry: identityRegistry, repoRoot });
     inventory = applied.inventory;
     // Only the conservation open-data summary reads the overlaid gap rows; the identity and dropped-claim validators keep the registry as committed.
     conservationRegistry = applied.registry || identityRegistry;

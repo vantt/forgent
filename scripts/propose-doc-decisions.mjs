@@ -48,6 +48,13 @@ Proof: Unit-exact requires one target digest match, equal ancestor heading title
 at least 40 source characters and at least half the source document's units exact.
 Every weaker exact match stays pending with its demotion reason. No judgment row
 is reviewed by this command. Mirror rows are counted only after full blob equality.
+Corpus rules select whole history-evidence, user-knowledge or consumer-project
+corpora, all non-authority and all named in sources. History uses retain-as-evidence;
+the other two use reclassify-out-of-platform-scope. Pending rules approve nothing.
+Reviewed rules require authorSession and authoredBy independent from reviewedBy,
+and a committed review-<step>-<shard>.md: Reviewer header, Corpus, Rule digest
+(corpusRuleDigest export), and corpus:<name> | ok | own note. Expansion preserves
+the rule's human identities/report and adds each item's classification rationale.
 Review modes never edit target documents. --apply-review writes the shard in place
 and names its report; the gate accepts reviewed rows only after that report is
 committed. Verdicts are ok, rework or hold with an own note for every pending row.
@@ -405,7 +412,7 @@ export function rebindReviewedDecisions(context, shard) {
 
 export function createClaimSnapshot(context, shards, { vocabulary, schema }) {
   const merged = applyDecisions(context.inventory, shards, {
-    vocabulary, registry: context.registry, unitsOf: context.unitsOf,
+    vocabulary, registry: context.registry, unitsOf: context.unitsOf, repoRoot: context.repoRoot,
     targetAnchorsOf: (owner) => { const units = context.unitsOf(owner); return units ? new Set(units.map((unit) => unit.anchor)) : null; },
     targetUnitDigestOf: (owner, anchor) => (context.unitsOf(owner) || []).find((unit) => unit.anchor === anchor)?.textDigest ?? null,
   });
