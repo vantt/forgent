@@ -332,7 +332,7 @@ export function applyReviewVerdicts(context, shard, { verdicts, reviewer, report
       const target = row.targetOwner ? (context.unitsOf(row.targetOwner) || []).find((unit) => unit.anchor === row.targetAnchor) : null;
       if (row.targetOwner && !target) throw new Error(`missing target for ${row.claimId}`);
       if (row.targetOwner && (shown.target?.path !== row.targetOwner || shown.target.anchor !== row.targetAnchor || shown.targetUnitDigest !== target.textDigest || shown.target.text !== target.text || shown.target.sectionText !== target.sectionText || JSON.stringify(shown.target.ancestry) !== JSON.stringify(target.ancestry))) throw new Error(`target text or ancestry changed after review pack for ${row.claimId}`);
-      for (const field of ['targetOwner', 'targetAnchor', 'claimKind', 'disposition', 'rationale', 'remainder']) if (shown.decision[field] !== row[field]) throw new Error(`review pack decision changed for ${row.claimId}`);
+      for (const field of ['targetOwner', 'targetAnchor', 'claimKind', 'disposition', 'rationale', 'remainder', 'stubOwner', 'stubAnchor']) if (shown.decision[field] !== row[field]) throw new Error(`review pack decision changed for ${row.claimId}`);
       Object.assign(updated, { reviewStatus: 'reviewed', reviewedBy: reviewer, reviewedAt, reviewReport: reportPath, reviewPackCommit: pack.commit, reviewPackId: score.packId, seedScoreId: score.scoreId, ...(target ? { targetUnitDigest: shown.targetUnitDigest, targetAncestry: [...(shown.target.ancestry || [])] } : {}) });
     }
     return updated;

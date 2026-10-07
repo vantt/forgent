@@ -18,7 +18,7 @@ function fixture(t) {
   const unitsOf = buildConservationUnitLookup(root, git('rev-parse', 'HEAD'));
   const unit = unitsOf(owner).find((row) => row.kind !== 'heading') || unitsOf(owner)[0];
   const entry = { id: 'restored-fixture', status: 'needs-restoration', restorationOwner: 'fixture', gate: 'verified', phase3Ledger: { claimId: 'claim_fixture' }, reviewedDisposition: { decision: 'restored', reviewer: 'reviewer:fixture-session:other@2026-10-07', reviewedAt: '2026-10-07', owner, anchor: unit.anchor, unitDigest: unit.textDigest } };
-  return { root, owner, unit, unitsOf, entry };
+  return { root, git, owner, unit, unitsOf, entry };
 }
 const check = (f, entry = f.entry) => validateDroppedClaims({ entries: [entry] }, { ledgerClaimIds: new Set(['claim_fixture']), unitsOf: f.unitsOf });
 test('restored claims require owner anchor and the complete committed unit digest', (t) => {
@@ -52,8 +52,16 @@ test('a deferred decision cannot name a nonexistent stub or omit its fields', (t
   assert.equal(apply(decision).inventory.claimLedger[0].stubOwner, f.owner);
   assert.equal(apply(decision).inventory.claimLedger[0].stubAnchor, f.unit.anchor);
 });
-test('two legacy sources sharing a short unit retain a multiple-owner blocking finding', () => {
-  const claimLedger = ['one', 'two'].map((name) => ({ claimId: 'claim_' + name, sourcePath: 'docs/specs/' + name + '.md', sourceAnchor: 'short', sourceUnitDigest: 'a'.repeat(64), targetOwner: 'docs/platform/' + name + '/spec.md', disposition: 'promote', reviewStatus: 'pending' }));
-  const findings = summarizeConservationCompleteness({ inventory: { items: [], claimLedger }, vocabulary, registry: null });
+test('two legacy sources sharing a short unit retain a multiple-owner blocking finding', (t) => {
+  const f = fixture(t);
+  const sources = ['docs/specs/one.md', 'docs/specs/two.md'];
+  for (const source of sources) { fs.mkdirSync(path.dirname(path.join(f.root, source)), { recursive: true }); fs.writeFileSync(path.join(f.root, source), '# Source\n\nBrief.\n'); }
+  f.git('add', '--', ...sources); f.git('commit', '-qm', 'docs: record shared short source units', '--', ...sources);
+  const unitsOf = buildConservationUnitLookup(f.root, f.git('rev-parse', 'HEAD'));
+  const claimLedger = sources.map((sourcePath, i) => {
+    const unit = unitsOf(sourcePath).find((candidate) => candidate.text.trim() === 'Brief.');
+    return { claimId: 'claim_' + i, sourcePath, sourceAnchor: unit.anchor, sourceUnitDigest: unit.textDigest, targetOwner: 'docs/platform/' + i + '/spec.md', disposition: 'promote', reviewStatus: 'pending' };
+  });
+  const findings = summarizeConservationCompleteness({ inventory: { items: sources.map((sourcePath) => ({ path: sourcePath, authorityStatus: 'legacy-current' })), claimLedger }, vocabulary, registry: null });
   assert.equal(findings.find((row) => row.type === 'identical-units-multiple-owners').count, 1);
 });

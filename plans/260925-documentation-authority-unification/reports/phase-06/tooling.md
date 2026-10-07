@@ -187,3 +187,11 @@ Verification: targeted authorship and corpus tests 15/15; full scripts suite 844
 
 The usage-only amendment is recorded after each reserved disposition's actual first use. Tool/test fixtures and scratch proposals do not substitute for a real authored decision. No unused disposition is prematurely marked in-use. The review brief must carry this first-use dependency into authoring; definitions and rule text remain unchanged.
 
+## Restored claims and committed deferral stubs
+
+Red 9fa7ac044: 1 pass/4 fail. A restored register decision must name a docs/platform owner, existing conservation-unit anchor and complete 64-character unitDigest, recomputed from the inventory's committed tree. Working-tree content cannot supply the proof. A defer-with-owner decision, in either a shard or the register, needs stubOwner and stubAnchor pointing to an existing committed platform unit. Pending deferrals are not allowed to hide a nonexistent stub. Shard expansion preserves both stub fields, and review application binds them to the shown decision.
+
+Verification: restoration and existing mirror probes 10/10; full scripts suite 849/849 in 50 files. The short-unit probe commits two distinct legacy files sharing Brief.; multiple target owners remain explicitly blocking. The existing synthetic four-copy probe (two legacy, two platform) still passes only with one owner.
+
+Actual gate CLI with fixture-only scratch registers: matching committed target digest exit 0 with 0 fatal findings; missing anchor and stale digest exit 1 with dropped-claim-restore-invalid; nonexistent deferred stub exit 1 with dropped-claim-stub-invalid. This proves mechanical target binding only, not that any real dropped content was restored or independently approved. No production register entry is edited and no real restoration/deferral verdict is authored.
+

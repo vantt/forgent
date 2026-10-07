@@ -520,7 +520,7 @@ export function validateIdentityRegistry(inventory, registry, { repoRoot = null 
  * the ledger or in the identity registry (live, retired, or identity-gap rows),
  * and the entry has to name its status, restoration owner and gate.
  */
-export function validateDroppedClaims(register, { ledgerClaimIds = new Set(), registry = null } = {}) {
+export function validateDroppedClaims(register, { ledgerClaimIds = new Set(), registry = null, unitsOf = null } = {}) {
   const findings = [];
   if (!Array.isArray(register?.entries)) return [{ type: 'dropped-claims-register-malformed', message: 'dropped-claims register must be an object with an "entries" array' }];
   const registryIds = new Set([...(registry?.units || []), ...(registry?.retiredUnits || []), ...(registry?.identityGaps || [])].map((row) => row?.claimId).filter(Boolean));
@@ -532,6 +532,13 @@ export function validateDroppedClaims(register, { ledgerClaimIds = new Set(), re
     if (typeof claimId !== 'string' || claimId === '' || (!ledgerClaimIds.has(claimId) && !registryIds.has(claimId))) {
       findings.push({ type: 'dropped-claim-absent-from-ledger', message: `dropped claim ${label}: phase3Ledger.claimId ${claimId || '<missing>'} is absent from the claim ledger and the identity registry` });
     }
+    const review = entry?.reviewedDisposition;
+    if (review?.decision === 'restored') {
+      const unit = nonEmpty(review.owner) && review.owner.startsWith('docs/platform/') && nonEmpty(review.anchor) && typeof unitsOf === 'function'
+        ? (unitsOf(review.owner) || []).find((candidate) => candidate.anchor === review.anchor) : null;
+      if (!unit || !/^[0-9a-f]{64}$/.test(review.unitDigest || '') || unit.textDigest !== review.unitDigest) findings.push({ type: 'dropped-claim-restore-invalid', message: `dropped claim ${label}: restored needs a committed platform owner, anchor and matching full unitDigest` });
+    }
+    if (review?.decision === 'defer-with-owner' && !committedStubExists(review, unitsOf)) findings.push({ type: 'dropped-claim-stub-invalid', message: `dropped claim ${label}: deferred disposition needs an existing committed stubOwner#stubAnchor` });
   }
   return findings;
 }
@@ -553,6 +560,11 @@ const LOSS_LANGUAGE = /\b(omits?|omitted|(?:is|are) missing|missing from|absent 
 const TRIVIAL_REMAINDER = /^(none|n\/a|na|-|\.|todo|tbd)$/i;
 const substantiveRemainder = (v) => nonEmpty(v) && v.trim().length >= 15 && !TRIVIAL_REMAINDER.test(v.trim());
 const nonEmpty = (v) => typeof v === 'string' && v.trim() !== '';
+
+function committedStubExists(row, unitsOf) {
+  return nonEmpty(row.stubOwner) && row.stubOwner.startsWith('docs/platform/') && nonEmpty(row.stubAnchor) &&
+    typeof unitsOf === 'function' && (unitsOf(row.stubOwner) || []).some((unit) => unit.anchor === row.stubAnchor);
+}
 
 export function reviewSessionIdentity(identity) {
   return typeof identity === 'string' ? identity.replace(/^reviewer:/, '').replace(/@[^@]+$/, '') : '';
@@ -774,6 +786,7 @@ export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf 
       decided.add(id);
       const row = claimLedger[idx];
       const at = { path: row.sourcePath };
+      if (d.disposition === 'defer-with-owner' && !committedStubExists(d, unitsOf)) fail('decision-stub-invalid', `claim ${id}: defer-with-owner needs an existing committed stubOwner#stubAnchor`, at);
       if (!sources.has(row.sourcePath)) fail('decision-claim-outside-sources', `shard ${shard.shard}: claim ${id} belongs to ${row.sourcePath}, which is not one of the shard's sources`, at);
       if (typeof d.sourceUnitDigest !== 'string' || d.sourceUnitDigest.length < 16 || !String(row.sourceUnitDigest || '').startsWith(d.sourceUnitDigest)) fail('decision-digest-stale', `claim ${id}: sourceUnitDigest does not match the current source text (needs at least 16 hex characters of the row's digest)`, at);
       const disposition = dispositions.get(d.disposition);
@@ -806,7 +819,7 @@ export function applyDecisions(inventory, shards, { vocabulary, targetAnchorsOf 
       if (d.disposition !== 'partial-carry' && d.disposition !== 'unknown-blocking' && !String(d.disposition).startsWith('delete-') && LOSS_LANGUAGE.test(String(d.rationale || '')) && !nonEmpty(d.remainder)) fail('decision-loss-without-partial-carry', `claim ${id}: the rationale says content is missing; a unit that loses anything is a partial-carry with a remainder, not ${d.disposition}`, at);
 
       const merged = { ...row, targetOwner: d.targetOwner ?? null, targetAnchor: d.targetAnchor ?? null, claimKind: d.claimKind, disposition: d.disposition, reviewStatus: d.reviewStatus, rationale: d.rationale };
-      for (const field of ['authoredBy', 'reviewedBy', 'reviewedAt', 'searched', 'remainder', 'targetUnitDigest', 'targetAncestry', 'reviewReport', 'reviewReportCommit', 'reviewPackCommit', 'reviewPackId', 'seedScoreId', 'reviewNote', 'corpusRule']) if (d[field] !== undefined) merged[field] = d[field];
+      for (const field of ['authoredBy', 'reviewedBy', 'reviewedAt', 'searched', 'remainder', 'targetUnitDigest', 'targetAncestry', 'reviewReport', 'reviewReportCommit', 'reviewPackCommit', 'reviewPackId', 'seedScoreId', 'reviewNote', 'stubOwner', 'stubAnchor', 'corpusRule']) if (d[field] !== undefined) merged[field] = d[field];
       claimLedger[idx] = merged;
       const gapIdx = gapRows ? gapRows.findIndex((gap) => gap?.claimId === id) : -1;
       if (gapIdx >= 0 && d.reviewStatus === 'reviewed' && d.disposition !== 'unknown-blocking') gapRows[gapIdx] = { ...gapRows[gapIdx], disposition: d.disposition };
@@ -1039,7 +1052,7 @@ export function checkInventory({ repoRoot, inventory, vocabulary, identityRegist
     ...validateCommitBlobIntegrity(repoRoot, inventory),
     ...validateSourceUnitCoverage(repoRoot, inventory),
     ...validateIdentityRegistry(inventory, identityRegistry, { repoRoot }),
-    ...(droppedClaimsRegister ? validateDroppedClaims(droppedClaimsRegister, { ledgerClaimIds: new Set((inventory.claimLedger || []).map((c) => c.claimId)), registry: identityRegistry }) : []),
+    ...(droppedClaimsRegister ? validateDroppedClaims(droppedClaimsRegister, { ledgerClaimIds: new Set((inventory.claimLedger || []).map((c) => c.claimId)), registry: identityRegistry, unitsOf: inventory.commit ? buildConservationUnitLookup(repoRoot, inventory.commit) : null }) : []),
   ];
   const conservation = checkConservation({ inventory, registry: conservationRegistry, previousRegistries, vocabulary, droppedClaimsRegister, ratchetResult, scope, decisions });
   fatalFindings.push(...validateInventoryFreshness({ inventory, headCommit, repoRoot, registryBytes }), ...conservation.invariant);

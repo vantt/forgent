@@ -3,7 +3,7 @@
 Date: 2026-10-07
 Executor: codex-session:1@2026-10-07
 Session counter: 1
-Step: 1, restoration/stub regressions demonstrated; implementation next
+Step: 1, restoration/stub proofs corrected; mutation run and maps next
 State: authoring
 Last green conservation commit: d09f5c962
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
@@ -17,7 +17,7 @@ Real conflicts: SC-1 is owner-resolved; candidate correction belongs to the root
 Holds: none authored
 Promoted-document edits: none
 
-Next action: commit T9 red, implement committed restoration/stub proofs, then structural mutations, review brief, frozen maps/routes and recomputed baseline counts sequentially. T7 usage amendments remain dependent on actual first use. Stop at full independent review.
+Next action: commit T9 green and refresh both conservation proofs, then structural mutations, review brief, frozen maps/routes and recomputed baseline counts sequentially. T7 usage amendments remain dependent on actual first use. Stop at full independent review.
 
 Evidence: A3 accounts exactly five commit/path pairs, no other violation; B/C/I unchanged; both resume D proofs pass and match baseline; ratchet clean, placement unchanged, retirement 15 blocked/4 pass/1 review and candidate 5 baseline findings. Red regression 8eb346727: 4 pass/2 fail. Fixed targeted tests: 40/40; standalone hold probe exit 0, blocking preserved, zero unchanged-gate findings. Complete suite 805/805 in 46 files. Both hold and rework retain the note, searched evidence and no approval identity/date. No real held claim exists to add to owner queue. Full tooling fixes/maps/review and scoped E remain UNPROVEN.
 Independent early read-only review at 789870507 was supplied by the owner; its accepted-with-fixes findings are now requirements. It is not the final committed tooling review gate and marks no decision row reviewed.
@@ -37,3 +37,4 @@ Reverse/CLI corrected evidence: targeted 81/81, full scripts suite 836/836 in 48
 Authorship/report red evidence: `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-review-authorship.test.mjs`: 0 pass, 7 fail. Same-session review, missing authors, forged script identities, uncommitted/mismatched verdicts, report ancestry, and loss of valid previous review evidence are demonstrated. Post-reverse 69bb26162: 836/836, both D proofs baseline-identical. No real reviewed decision is authored. Remaining tooling/maps/full review remain UNPROVEN.
 Authorship/report corrected evidence: targeted 15/15 including corpus proofs; full scripts suite 844/844 in 49 files. Actual CLI rehearsal in an isolated fixture has 61 units: uncommitted report application returns 1; committed bound report application returns 0; a subsequent pack accepts verified prior rows with no pending rows; decision invariant findings 0; sensitivity proof passes. Approvals pin their per-row committed report tree, checked as an inventory ancestor; later report rounds cannot erase their proof. Same-session aliases/dates, missing author/session, forged manual script identities, mismatched header/row/pack/score/note and uncommitted or future report pins fail. Escaped-note boundary red 9a062d31b: 7 pass/1 fail; corrected parsing preserves the exact note. No real approval is produced. Remaining restoration tooling/maps/full review remain UNPROVEN.
 Restoration/stub red evidence: `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-restoration-proofs.test.mjs`: 1 pass, 4 fail. Restored owner/anchor/digest and deferred stub checks are missing; uncommitted anchors can masquerade as restored proof. Existing identical-unit multiple-owner reporting remains active. Post-authorship d09f5c962: 844/844 and both D proofs baseline-identical. No real restoration/register edit is authored. Remaining tooling/maps/review remain UNPROVEN.
+Restoration/stub corrected evidence: targeted restoration/mirror probes 10/10; full scripts suite 849/849 in 50 files. Actual gate with fixture-only scratch register accepts a matching committed target digest (exit 0, 0 findings), rejects missing anchor/stale digest with dropped-claim-restore-invalid, and rejects nonexistent deferred stub with dropped-claim-stub-invalid (exit 1). No semantic restoration verdict is claimed. The short-unit test uses two real committed legacy files; the existing four-copy probe still permits only one owner. No real register edit, restoration or deferral is authored. Mutation/maps/full review remain UNPROVEN.

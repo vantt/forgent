@@ -126,6 +126,8 @@
           "targetAnchor": { "type": ["string", "null"], "minLength": 1, "description": "A heading or block anchor of targetOwner (the anchors the conservation extractor yields); null only when targetOwner is null." },
           "remainder": { "type": "string", "minLength": 1, "description": "For partial-carry: what part of the unit the target does not carry. Mandatory for partial-carry." },
           "targetUnitDigest": { "type": "string", "pattern": "^[0-9a-f]{16,64}$", "description": "A prefix (at least 16 hex characters) of the text digest of the target unit at targetAnchor when the reviewer compared it. Required for a reviewed decision with a target; when the unit changes the gate reports target drift and the review no longer holds." },
+          "stubOwner": { "type": "string", "minLength": 1, "description": "Committed platform document containing the explicit deferral stub." },
+          "stubAnchor": { "type": "string", "minLength": 1, "description": "Existing conservation-unit anchor of stubOwner; mandatory for defer-with-owner." },
           "targetAncestry": { "type": "array", "items": { "type": "string" }, "description": "Ancestor heading titles seen at review; text relocation cannot silently retain approval." },
           "reviewReport": { "type": "string", "minLength": 1 },
           "reviewReportCommit": { "type": "string", "pattern": "^[0-9a-f]{40}$", "description": "Committed report tree, required to be an ancestor of the inventory commit; later review rounds cannot erase this row's evidence." },
