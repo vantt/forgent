@@ -3,9 +3,9 @@
 Date: 2026-10-07
 Executor: codex-session:1@2026-10-07
 Session counter: 1
-Step: 1, committed authorship/report verification corrected; restoration tooling next
+Step: 1, restoration/stub regressions demonstrated; implementation next
 State: authoring
-Last green conservation commit: 69bb26162
+Last green conservation commit: d09f5c962
 B0: dbe5c432852837ea01e6025b35868bcb7271495d
 SYNC: 57f3e7fe7af86adee1e805925cca82cf7a894164
 Main at sync: 7e36897c0ac131a65f7b1dcb538ba80f6dde9ff9
@@ -17,7 +17,7 @@ Real conflicts: SC-1 is owner-resolved; candidate correction belongs to the root
 Holds: none authored
 Promoted-document edits: none
 
-Next action: commit T8 green, refresh both conservation proofs, then continue T9 and maps sequentially. T7 usage amendments remain dependent on each disposition's actual first use; no premature usage claim is made. Stop at full independent review.
+Next action: commit T9 red, implement committed restoration/stub proofs, then structural mutations, review brief, frozen maps/routes and recomputed baseline counts sequentially. T7 usage amendments remain dependent on actual first use. Stop at full independent review.
 
 Evidence: A3 accounts exactly five commit/path pairs, no other violation; B/C/I unchanged; both resume D proofs pass and match baseline; ratchet clean, placement unchanged, retirement 15 blocked/4 pass/1 review and candidate 5 baseline findings. Red regression 8eb346727: 4 pass/2 fail. Fixed targeted tests: 40/40; standalone hold probe exit 0, blocking preserved, zero unchanged-gate findings. Complete suite 805/805 in 46 files. Both hold and rework retain the note, searched evidence and no approval identity/date. No real held claim exists to add to owner queue. Full tooling fixes/maps/review and scoped E remain UNPROVEN.
 Independent early read-only review at 789870507 was supplied by the owner; its accepted-with-fixes findings are now requirements. It is not the final committed tooling review gate and marks no decision row reviewed.
@@ -36,3 +36,4 @@ Reverse/CLI red evidence: `env -u CLAUDE_CODE_SESSION_ID node --test test/script
 Reverse/CLI corrected evidence: targeted 81/81, full scripts suite 836/836 in 48 files. Actual scoped exact-proposal gate returns 0 with no fatal findings and lists 16,820 unreferenced candidate units across the target area, including unnamed sibling documents; strict mode returns 1 and retains that blocking type. Actual constitution CLI consumes both pilot and scratch decision inputs: 87,153 rows, 478 promote, 1 supersede, no fatal findings. Actual untracked-candidate CLI rejects missing metadata (exit 1), then accepts complete candidate metadata (exit 0). No candidate material, authority status or real decision approval is authored. Remaining first-use/authorship/restoration tooling, maps and full independent review remain UNPROVEN.
 Authorship/report red evidence: `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-review-authorship.test.mjs`: 0 pass, 7 fail. Same-session review, missing authors, forged script identities, uncommitted/mismatched verdicts, report ancestry, and loss of valid previous review evidence are demonstrated. Post-reverse 69bb26162: 836/836, both D proofs baseline-identical. No real reviewed decision is authored. Remaining tooling/maps/full review remain UNPROVEN.
 Authorship/report corrected evidence: targeted 15/15 including corpus proofs; full scripts suite 844/844 in 49 files. Actual CLI rehearsal in an isolated fixture has 61 units: uncommitted report application returns 1; committed bound report application returns 0; a subsequent pack accepts verified prior rows with no pending rows; decision invariant findings 0; sensitivity proof passes. Approvals pin their per-row committed report tree, checked as an inventory ancestor; later report rounds cannot erase their proof. Same-session aliases/dates, missing author/session, forged manual script identities, mismatched header/row/pack/score/note and uncommitted or future report pins fail. Escaped-note boundary red 9a062d31b: 7 pass/1 fail; corrected parsing preserves the exact note. No real approval is produced. Remaining restoration tooling/maps/full review remain UNPROVEN.
+Restoration/stub red evidence: `env -u CLAUDE_CODE_SESSION_ID node --test test/scripts/doc-restoration-proofs.test.mjs`: 1 pass, 4 fail. Restored owner/anchor/digest and deferred stub checks are missing; uncommitted anchors can masquerade as restored proof. Existing identical-unit multiple-owner reporting remains active. Post-authorship d09f5c962: 844/844 and both D proofs baseline-identical. No real restoration/register edit is authored. Remaining tooling/maps/review remain UNPROVEN.
