@@ -6,6 +6,7 @@ Audience: Human reviewer, architect, maintainer, implementation agent
 Purpose: Owns the input and output contract of the fgOS CLI door and the stdout surface of fgos-runner: writer identity, envelope, exit codes, pagination, verb manifest and version tokens.
 Design status: Candidate
 Last reviewed: 2026-10-06
+Added in candidate: the headings Single Write Door, Writer Source Trust Levels, Writer Resolution Rules, Caller Role, Error Path Is Not Enveloped, Runner Stdout Envelope, Recognizing A Real Envelope and Entry Fields And Effect Axes subdivide sections of the sources that have no heading of their own; the text under them is carried from the sources.
 Related:
 - docs/platform/work-state/README.md
 - docs/platform/work-state/spec.md
