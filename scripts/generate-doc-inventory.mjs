@@ -517,33 +517,24 @@ function isNormativeUnheaded(raw) {
 
 export function extractMarkdownConservationUnits(content) {
   const lines = content.split(/\r?\n/);
-  const units = [];
+  const ordered = [];
   const seenAnchors = new Map();
   let inFence = false;
   let fenceMarker = null;
   let unheaded = [];
   let unheadedStart = 1;
-  let unheadedCount = 0;
-  let beforeFirstHeading = true;
+  let headingCount = 0;
 
+  // A block shorter than 20 non-space characters without a normative keyword is not a unit of its
+  // own: it is merged into the previous block of the same section (or the next one when it comes
+  // first), so no non-blank line of the source is outside every unit. It becomes its own unit only
+  // when its section has no other block.
   function flushUnheaded(endLine) {
     const raw = unheaded.join('\n').trim();
     unheaded = [];
     if (!raw) return;
-    if (raw.replace(/\s+/g, '').length < 20 && !isNormativeUnheaded(raw)) return;
-    unheadedCount += 1;
-    const anchor = `unheaded-block-${unheadedCount}`;
-    units.push({
-      unitKind: beforeFirstHeading ? 'unheaded-preamble' : 'unheaded-block',
-      anchor,
-      githubAnchor: anchor,
-      stableAnchor: anchor,
-      title: beforeFirstHeading ? 'Unheaded preamble' : `Unheaded block ${unheadedCount}`,
-      startLine: unheadedStart,
-      endLine,
-      textDigest: sha256(raw),
-      sample: raw.slice(0, 180),
-    });
+    const short = raw.replace(/\s+/g, '').length < 20 && !isNormativeUnheaded(raw);
+    ordered.push({ block: true, short, section: headingCount, preamble: headingCount === 0, startLine: unheadedStart, originalStart: unheadedStart, endLine });
   }
 
   for (let idx = 0; idx < lines.length; idx += 1) {
@@ -577,8 +568,8 @@ export function extractMarkdownConservationUnits(content) {
       seenAnchors.set(githubBase, count + 1);
       const githubAnchor = count > 0 ? `${githubBase}-${count}` : githubBase;
       const stableAnchor = `h-${stableHash(`${title}\n${lineNo}`, 12)}`;
-      units.push({ unitKind: 'heading', level, title, anchor: githubAnchor, githubAnchor, stableAnchor, startLine: lineNo, endLine: lineNo, textDigest: sha256(title), sample: title });
-      beforeFirstHeading = false;
+      ordered.push({ unit: { unitKind: 'heading', level, title, anchor: githubAnchor, githubAnchor, stableAnchor, startLine: lineNo, endLine: lineNo, textDigest: sha256(title), sample: title } });
+      headingCount += 1;
       unheadedStart = lineNo + 1;
       continue;
     }
@@ -592,6 +583,38 @@ export function extractMarkdownConservationUnits(content) {
     }
   }
   flushUnheaded(lines.length);
+
+  const blocks = ordered.filter((o) => o.block);
+  const kept = [];
+  for (const b of blocks) {
+    if (!b.short) { kept.push(b); continue; }
+    const previous = [...kept].reverse().find((k) => k.section === b.section);
+    if (previous) { previous.endLine = b.endLine; continue; }
+    const next = blocks.find((k) => k.section === b.section && !k.short && k.originalStart > b.endLine);
+    if (next) { next.startLine = Math.min(next.startLine, b.startLine); continue; }
+    kept.push(b);
+  }
+  const keptSet = new Set(kept);
+  const units = [];
+  let unheadedCount = 0;
+  for (const o of ordered) {
+    if (!o.block) { units.push(o.unit); continue; }
+    if (!keptSet.has(o)) continue;
+    const raw = lines.slice(o.startLine - 1, o.endLine).join('\n').trim();
+    unheadedCount += 1;
+    const anchor = `unheaded-block-${unheadedCount}`;
+    units.push({
+      unitKind: o.preamble ? 'unheaded-preamble' : 'unheaded-block',
+      anchor,
+      githubAnchor: anchor,
+      stableAnchor: anchor,
+      title: o.preamble ? 'Unheaded preamble' : `Unheaded block ${unheadedCount}`,
+      startLine: o.startLine,
+      endLine: o.endLine,
+      textDigest: sha256(raw),
+      sample: raw.slice(0, 180),
+    });
+  }
 
   const headingIndexes = units.map((u, idx) => u.unitKind === 'heading' ? idx : -1).filter((idx) => idx >= 0);
   for (let hIdx = 0; hIdx < headingIndexes.length; hIdx += 1) {

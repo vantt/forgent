@@ -1471,3 +1471,20 @@ test('ledger keeps unpaired duplicate-digest units as ambiguous registry gaps', 
     assert.equal(rows.every((r) => r.identityStatus.includes('ambiguous')), true);
   } finally { repo.cleanup(); }
 });
+
+test('extractMarkdownConservationUnits: a short block joins the previous block of its section, or the next one, and no non-blank line is left outside every unit', () => {
+  const md = ['# T', '', 'Label:', '', '- item one is long enough to count here', '- item two', '', 'Tail short', '', '## Next', '', 'Only short', '', '## Third', '', 'A paragraph that is long enough to keep.', '', '---', '', 'Another paragraph that is long enough to keep.'].join('\n');
+  const units = extractMarkdownConservationUnits(md);
+  const blocks = units.filter((u) => u.unitKind !== 'heading');
+  assert.deepEqual(blocks.map((u) => [u.anchor, u.startLine, u.endLine]), [['unheaded-block-1', 3, 8], ['unheaded-block-2', 12, 12], ['unheaded-block-3', 16, 18], ['unheaded-block-4', 20, 20]]);
+  const lines = md.split('\n');
+  const covered = new Set(units.flatMap((u) => Array.from({ length: u.endLine - u.startLine + 1 }, (_, i) => u.startLine + i)));
+  lines.forEach((text, i) => { if (text.trim()) assert.ok(covered.has(i + 1), `line ${i + 1} is outside every unit`); });
+  assert.notEqual(blocks[0].textDigest, extractMarkdownConservationUnits(md.replace('Tail short\n\n', '')).filter((u) => u.unitKind !== 'heading')[0].textDigest);
+});
+
+test('extractMarkdownConservationUnits: consecutive short blocks before the first long block of a section all join that block without overlapping the next one', () => {
+  const md = ['## Mode', '', '**standard.**', '', 'Flags counted:', '', '- a list item that is long enough to be a unit', '- another list item', '', 'A later paragraph that is long enough to be its own unit.'].join('\n');
+  const blocks = extractMarkdownConservationUnits(md).filter((u) => u.unitKind !== 'heading');
+  assert.deepEqual(blocks.map((u) => [u.startLine, u.endLine]), [[3, 8], [10, 10]]);
+});
