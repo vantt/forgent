@@ -11,6 +11,14 @@ const unit = (i) => ({ anchor: `a${i}`, textDigest: digest, ancestry: ['Contract
 const context = { inventory: { commit: 'b'.repeat(40), claimLedger: rows, items: [] }, unitsOf: () => rows.map((_, i) => unit(i)) };
 const shard = { version: 1, shard: 's02-example', sources: ['docs/specs/example.md'], authorSession: author, authorshipRequired: true, claims: rows.map((row, i) => ({ claimId: row.claimId, sourceUnitDigest: digest, targetOwner: 'docs/platform/example.md', targetAnchor: `a${i}`, claimKind: row.claimKind, disposition: 'promote', rationale: 'Retain the entire operation contract.', reviewStatus: 'pending', authoredBy: author })) };
 
+function reviewEvidence(decisions = shard) {
+  const claims = new Map(shard.claims.map((row) => [row.claimId, row]));
+  for (const row of decisions.claims) claims.set(row.claimId, row);
+  const pack = buildReviewPack(context, { ...decisions, claims: [...claims.values()] });
+  const seeded = seedReviewPack(pack, { seed: 'fixture-sensitivity', reviewer, nonce: '1'.repeat(64) });
+  return { pack, seedProof: { key: seeded.key, verdicts: seeded.key.rows.map((row) => ({ claimId: row.claimId, verdict: row.mutated ? 'rework' : 'ok', note: 'Compared the fixture units.' })) } };
+}
+
 test('review pack contains full source and target units and reverse unmatched candidate blocks', () => {
   const pack = buildReviewPack(context, shard);
   assert.equal(pack.rows[0].source.text, unit(0).text);
@@ -38,7 +46,7 @@ test('seeded review uses six real text mutations and scores missed defects and f
 
 test('review application binds current digest and keeps rework and hold pending without inventing approval', () => {
   const verdicts = shard.claims.map((row, i) => ({ claimId: row.claimId, verdict: i === 0 ? 'ok' : i === 1 ? 'hold' : 'rework', note: i === 0 ? 'Entire contract retained.' : 'Owner decision needed.' }));
-  const result = applyReviewVerdicts(context, shard, { verdicts, reviewer, reportPath: 'fixture/review-example.md', reviewedAt: '2026-10-07' });
+  const result = applyReviewVerdicts(context, shard, { ...reviewEvidence(), verdicts, reviewer, reportPath: 'fixture/review-example.md', reviewedAt: '2026-10-07' });
   assert.equal(result.claims[0].reviewStatus, 'reviewed');
   assert.equal(result.claims[0].targetUnitDigest, digest);
   assert.equal(result.claims[0].reviewedBy, reviewer);
@@ -47,7 +55,7 @@ test('review application binds current digest and keeps rework and hold pending 
   assert.equal(result.reviewReport, 'fixture/review-example.md');
   assert.throws(() => applyReviewVerdicts(context, shard, { verdicts, reviewer: `reviewer:${author}`, reportPath: 'report.md' }), /independent/);
   assert.throws(() => applyReviewVerdicts(context, shard, { verdicts: [...verdicts, verdicts[0]], reviewer, reportPath: 'report.md' }), /duplicate/);
-  assert.throws(() => applyReviewVerdicts({ ...context, unitsOf: () => [] }, shard, { verdicts, reviewer, reportPath: 'report.md' }), /target/);
+  assert.throws(() => applyReviewVerdicts({ ...context, unitsOf: () => [] }, shard, { ...reviewEvidence(), verdicts, reviewer, reportPath: 'report.md' }), /target/);
   assert.equal(shard.claims[0].reviewStatus, 'pending');
 });
 
@@ -63,7 +71,7 @@ for (const verdict of ['hold', 'rework']) {
     const inventory = { ...context.inventory, items: [{ path: rows[0].sourcePath }], claimLedger: [rows[0]] };
     const blocked = { ...shard, claims: [{ ...shard.claims[0], targetOwner: null, targetAnchor: null, disposition: 'unknown-blocking', reviewStatus: 'blocking', searched: [rows[0].sourcePath], reviewedBy: reviewer, reviewedAt: '2026-10-06' }] };
     const note = 'The owner must name the missing carrier.';
-    const result = applyReviewVerdicts({ ...context, inventory }, blocked, { verdicts: [{ claimId: rows[0].claimId, verdict, note }], reviewer, reportPath: 'fixture/review.md' });
+    const result = applyReviewVerdicts({ ...context, inventory }, blocked, { ...reviewEvidence(blocked), verdicts: [{ claimId: rows[0].claimId, verdict, note }], reviewer, reportPath: 'fixture/review.md' });
     const decided = result.claims[0];
     assert.equal(decided.reviewStatus, 'blocking');
     assert.equal(decided.reviewNote, note);
@@ -102,4 +110,35 @@ test('a public seeded pack does not expose its replay inputs or retain original 
     assert.notEqual(shown.target.textDigest, digest);
     assert.notEqual(shown.target.text, unit(0).text);
   }
+});
+
+test('review application requires a passing sensitivity result for the exact shown pack', () => {
+  const verdicts = shard.claims.map((row) => ({ claimId: row.claimId, verdict: 'ok', note: 'The entire shown contract is retained.' }));
+  const options = { verdicts, reviewer, reportPath: 'fixture/review.md' };
+  assert.throws(() => applyReviewVerdicts(context, shard, options), /sensitivity/);
+  const evidence = reviewEvidence();
+  const failed = { ...evidence.seedProof, verdicts: evidence.seedProof.verdicts.map((row) => ({ ...row, verdict: 'ok' })) };
+  assert.throws(() => applyReviewVerdicts(context, shard, { ...options, ...evidence, seedProof: failed }), /sensitivity/);
+  const altered = structuredClone(evidence);
+  altered.pack.rows[0].target.text = 'A claim not shown to the reviewer.';
+  assert.throws(() => applyReviewVerdicts(context, shard, { ...options, ...altered }), /pack/);
+});
+
+test('approval cannot attach to target text or heading ancestry changed after the pack', () => {
+  const verdicts = shard.claims.map((row) => ({ claimId: row.claimId, verdict: 'ok', note: 'Entire shown unit retained.' }));
+  const options = { ...reviewEvidence(), verdicts, reviewer, reportPath: 'fixture/review.md' };
+  const drifted = { ...context, unitsOf: (owner) => context.unitsOf(owner).map((unit) => owner.startsWith('docs/platform/') ? { ...unit, textDigest: 'c'.repeat(64), text: 'A different operation contract.' } : unit) };
+  assert.throws(() => applyReviewVerdicts(drifted, shard, options), /target.*changed/);
+  const moved = { ...context, unitsOf: (owner) => context.unitsOf(owner).map((unit) => owner.startsWith('docs/platform/') ? { ...unit, ancestry: ['Examples'] } : unit) };
+  assert.throws(() => applyReviewVerdicts(moved, shard, options), /target.*changed/);
+});
+
+test('approved rows retain the seen unit binding and their own report across review rounds', () => {
+  const verdicts = shard.claims.map((row) => ({ claimId: row.claimId, verdict: 'ok', note: 'Entire shown unit retained.' }));
+  const evidence = reviewEvidence();
+  const result = applyReviewVerdicts(context, shard, { ...evidence, verdicts, reviewer, reportPath: 'fixture/review.md', reviewedAt: '2026-10-07' });
+  assert.equal(result.claims[0].targetUnitDigest, evidence.pack.rows[0].target.textDigest);
+  assert.deepEqual(result.claims[0].targetAncestry, ['Contract']);
+  assert.equal(result.claims[0].reviewReport, 'fixture/review.md');
+  assert.equal(result.claims[0].reviewPackCommit, context.inventory.commit);
 });
