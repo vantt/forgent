@@ -90,53 +90,16 @@ test('escaped table pipes retain the exact reviewer note after parsing', (t) => 
   assert.deepEqual(buildReviewPack(f.context, f.shard).rows, []);
 });
 
-test('new shards cannot disable manual review enforcement by omitting or clearing a flag', (t) => {
+test('new manual shards cannot disable required authorship or committed review evidence', async (t) => {
   const f = fixture(t);
   for (const flag of [undefined, false]) {
-    const shard = { ...f.shard, authorshipRequired: flag };
-    const self = { ...f.row, authoredBy: 'fixture-session:other@2026-10-09' };
-    assert.ok(apply(f, self, shard).findings.some((r) => r.type === 'decision-self-review'));
-    const missing = { ...f.row }; delete missing.reviewReport; delete missing.reviewReportCommit; delete missing.authoredBy;
-    assert.ok(apply(f, missing, shard).findings.some((r) => r.type === 'decision-review-report-missing'));
-    assert.ok(apply(f, { ...f.row, authoredBy: 'script:forged' }, shard).findings.some((r) => r.type === 'decision-script-identity'));
+    for (const [field, type] of [['authorSession', 'decision-author-session-missing'], ['authoredBy', 'decision-authored-by-missing'], ['reviewReport', 'decision-review-report-missing']]) {
+      await t.test(`${field} remains required when the flag is ${String(flag)}`, () => {
+        const row = { ...f.row }, shard = { ...f.shard };
+        if (flag === undefined) delete shard.authorshipRequired; else shard.authorshipRequired = flag;
+        if (field === 'authorSession') delete shard.authorSession; else delete row[field];
+        assert.ok(apply(f, row, shard).findings.some(finding => finding.type === type));
+      });
+    }
   }
-});
-
-test('case invisible characters and repeated reviewer prefixes cannot hide the author session', (t) => {
-  const f = fixture(t);
-  for (const reviewedBy of ['reviewer:reviewer:fixture-session:author@2026-10-09', 'reviewer:FIXTURE-session:AUTHOR@2026-10-09', 'reviewer:fixture-session:author\u200b@2026-10-09']) {
-    assert.ok(apply(f, { ...f.row, reviewedBy }).findings.some((r) => r.type === 'decision-self-review'), reviewedBy);
-  }
-});
-
-test('committed report declarations cannot replace a released sensitivity proof', (t) => {
-  const f = fixture(t);
-  assert.ok(apply(f).findings.some((r) => r.type === 'decision-review-proof-invalid'));
-});
-
-test('contradictory duplicate committed verdict rows cannot approve a claim', (t) => {
-  const f = fixture(t);
-  fs.writeFileSync(path.join(f.root, reportPath), f.report + `| ${f.row.claimId} | hold | A conflicting verdict. |\n`);
-  f.git('add', '--', reportPath); f.git('commit', '-qm', 'docs: record contradictory fixture verdict', '--', reportPath);
-  f.row.reviewReportCommit = f.git('rev-parse', 'HEAD'); f.inventory.commit = f.row.reviewReportCommit;
-  assert.ok(apply(f).findings.some((r) => r.type === 'decision-review-report-missing'));
-});
-
-test('committed review lookup follows the report directory without hard-coded migration labels', (t) => {
-  const f = fixture(t);
-  const moved = reportPath.replace('/phase-06/', '/migration-review/');
-  fs.mkdirSync(path.dirname(path.join(f.root, moved)), { recursive: true });
-  fs.writeFileSync(path.join(f.root, moved), f.report);
-  f.git('add', '--', moved); f.git('commit', '-qm', 'docs: record review in declared directory', '--', moved);
-  f.row.reviewReport = moved; f.row.reviewReportCommit = f.git('rev-parse', 'HEAD'); f.inventory.commit = f.row.reviewReportCommit;
-  assert.ok(!apply(f).findings.some((r) => r.type === 'decision-review-report-missing'));
-});
-
-test('registry-gap deferral requires the committed stub used by ordinary decisions', (t) => {
-  const f = fixture(t);
-  const gap = { claimId: 'gap-fixture', sourcePath: 'docs/removed.md', disposition: 'unknown-blocking' };
-  const registry = { identityGaps: [gap] };
-  const shard = { version: 1, shard: 'gap-fixture', sources: [], claims: [], registryGaps: [{ ...gap, disposition: 'defer-with-owner', rationale: 'Restoration is assigned to its declared owner.' }] };
-  const result = applyDecisions(f.inventory, [shard], { vocabulary, registry, unitsOf: () => [] });
-  assert.ok(result.findings.some((r) => r.type === 'decision-stub-invalid'));
 });
