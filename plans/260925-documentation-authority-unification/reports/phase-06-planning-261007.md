@@ -202,3 +202,54 @@ Recommendation: (a): six documents, no path moves, additive and recorded by exce
 ## 11. Revision for a single executor (2026-10-07)
 
 The owner will run Phase 6 himself with one capable agent (Codex) that has repo access. The phase file was rewritten accordingly: no subagent dispatch, no harness roles, batches are numbered Steps 0 to 10 (the B0 to B9 letters in sections 3 to 6 map to Steps 1 to 10 in order: B0 to Step 1, B1 to Step 2, B2 to Step 3, B3 to Step 4, B4 to Step 5, B5 to Step 6, B6 to Step 7, B7 to Step 8, B8 to Step 9, B9 to Step 10). Run counts and token figures in section 6 are Phase 5 measurements used as a rough effort scale; they do not assume Claude subagents. Assumption stated in the phase file: a row is `reviewed` only by someone other than its author (owner or a second session), so one executor cannot review its own rows; this adds owner or second-session review time to the 8 to 12 day estimate. The question bundle (section 9) is unchanged.
+
+## 12. Change log of the phase file after validation and red-team (2026-10-07)
+
+Inputs: [validation](phase-06-validate-261007.md) (V1 to V7, F1 to F14), [red-team](red-team-phase-06-261007.md) (C1, H1 to H6, M1 to M7, Low). Owner decisions applied: one Codex session executes everything inline (no dispatch, subagents or skills); rows are `reviewed` only through a separate review session per batch; Q1 to Q5 are read from `reports/phase-06/owner-answers.md`. "Phase" below is the phase file; section names are its headings. Sections 6 and 9 of this report are left as measured history; where the phase file restates a figure (B6 cost, run counts), the phase file wins.
+
+| Id | Where addressed in the phase file, or why not |
+|---|---|
+| C1 | Overview "Mode" and "Review model": single inline executor, no dispatch, no skills; the red-team prompt, `ak:plan` and in-process doers are gone; independence comes from the separate review session (shared rules "Decision shards and review"). |
+| V1 | Tool T8 (`authoredBy`, `authorshipRequired`, `decision-self-review`, `script:` identity rule); Terms (identity formats); owner decision of 2026-10-07. |
+| V2 | `review-brief.md` required content (Step 1 item 2); review request, reviewer procedure, flip command `--apply-review`, rework round (shared rules); tool T2r. |
+| V3 | Resume protocol, `progress.md`, `owner-queue.md` (shared rules); N2 in the template (default: one batch at a time, because the owner decided the executor stops at "ready for review"). |
+| V4 | Preconditions, template of `owner-answers.md`, table "What each answer changes"; Step 0 records the answers in `plan.md` 7.5b. |
+| V5 | Check H (new findings against the recorded baseline), with the two unresolved portal links assigned to Step 3 and the three headers to Steps 2 to 4; Step 10 goal 0. |
+| V6 | Terms (`B0`, `SYNC`), checks A, B, C, I (first-parent no-merges history, recorded blob ids, recorded statuses). |
+| V7 | Rollback: per-batch revert, whole phase reset to `B0` only on the owner's say, with a backup branch. |
+| F1, F2 | Shared rules "Decision shards and review": identity formats, verdict file, flip command, rework, independence of the tool review, spot check, recompute and reader runs. |
+| F3 | Check D (one `--decisions` until T0; only existing, non-empty directories), T0 first in the Step 1 table. |
+| F4 | Checks A to I with commands (candidate-status baseline diff because the script has no path filter; placement baseline line; "accounted exceptions" replaced by first-parent history and the ratchet exceptions entry). |
+| F5 | Step 0 items 1 to 4 (commands for blobs, tree hashes, counts from the gate JSON, retirement run, extractor blobs, scratch sizes in Shared rules, stop on dirty tree or missing answers, creation of the progress, queue, holds and review files). "Hash of the extraction functions" replaced by the blob ids of the extractor closure. |
+| F6 | Step 1 tool table with data shapes (mirrors, exact entries, corpus rules, conflict resolutions, retiring roots, schema extension); answer branches in "What each answer changes"; area-map columns. |
+| F7 | Step 1 done-condition links `pilot-b-sensitivity.md` section 1; the seeded-pack thresholds are labelled chosen (Terms). The Step 6 structural mutation run moved to Steps 1 and 10 (the gate is deterministic). |
+| F8 | Terms table (SC-1, HI-I027, dropped-001 to 017, Plan A/B/C, 973 paths, `no-alias`, Phase 5 ids) and the Read first list. |
+| F9 | Stop conditions table, each with a measure; effort measured in rows per session plus owner-reported tokens at three checkpoints (a session cannot see its own token use). |
+| F10 | Success criteria rewritten with measures; the sealed-snapshot bullet reduced to the verified dry-run and the destination README; sampling method in the per-batch loop and Step 2 item 4; reader scenarios and key linked. |
+| F11 | "Allowed paths" table and the never-modified list including the extractor closure. |
+| F12 | Rollback paragraph. |
+| F13 | Reconciliation paragraph under the step table (22,614 against 22,426 and 5,504 against 5,420 explained: 104 rows counted in Steps 5 and 10, 84 rows of three non-authority documents); Effort says the Phase 5 run counts do not transfer. |
+| F14 | "Read first" list. |
+| H1 | Order rule (author, freeze, decide, review; `targetUnitDigest` stamped at review), `post-review-edits.md`, `--rebind`, one link pass in Step 10, SC-1 rows re-reviewed (Step 5), named content edits added to the Allowed paths, unit-exact entries bound by digest, never by a positional anchor. |
+| H2 | Requirements (duplicate-group rule, identical-unit rule and exceptions file), tool T9 probe tests, `--summary` lists groups with several legacy members, check E counts the exceptions. |
+| H3 | Checks D and E (single `--decisions` handling, existing directories only, hold list as counts compared by script), H, I, B (closure of imported modules). |
+| H4 | Preconditions and the answers table: unsupported answers stop and replan; supported non-recommended answers say which steps change. |
+| H5 | Exact-carry classes table (Mirror, Unit-exact, Weak-exact, Judgment), 100% script proof of uniqueness and ancestry, short units and low-share documents demoted; stratified spot check in Step 2 item 4 (strata aimed at the weak classes). Thresholds 40 characters and one half are labelled chosen. |
+| H6 | Tool T9 (restored anchor and digest verified by the gate; stub anchor must exist); Step 3 and Step 10 item 6 use it; promoted-area restores logged in `promoted-edits.md` and shown to the owner. |
+| M1 | Reconciliation paragraph (the 282 rows and the other unrouted or unmapped files named), `--summary --coverage` must list 0 unmapped sources, the 131 unrouted documents get candidate routes in Step 1, the 816 versus 814 groups listed by `--summary` with a rule each. `docs/decisions/index.md`: owner question N1 (default: not a retiring root). |
+| M2 | Step 7 budget restated (about 8 million instead of 2.1 million; total about 36 million, 27 to 52, UNPROVEN); absolute ceiling and checkpoints after Steps 2, 5 and 7 in stop condition 11. |
+| M3 | Step 6 precondition: Plan B state recorded in Step 0; Steps 7 and 8 run first when Plan B is not landed; owner queue question if still not landed; switchboard single writer. |
+| M4 | Requirements: a promoted portal may link only to its own area or to documents already `promoted`; check I watches only the root instruction and navigation documents. This is a default chosen by the planner, listed as an owner question in the final message of this revision. |
+| M5 | Allowed paths (vocabulary and constitution files, schema, shard format); the Phase 4 ruling on the ratchet roots cited in T5. |
+| M6 | Step 2 item 6 (reduced rehearsal after the first batch, with the candidate-row question) and item 5 (corpus rules applied under Q2c i); full rehearsal stays in Step 10; stop condition 12. |
+| M7 | Read first, Terms, the review brief content list and area-map columns; the doer brief no longer exists (single executor). |
+| Low: concurrency wording | Removed with the dispatch model. |
+| Low: per-commit cost | "When each check runs" paragraph (cheap checks per commit, gate with refresh per shard and phase). |
+| Low: alias and link drafts add runs | Kept as drafts in P6; counted in the review sessions; not priced separately. |
+| Low: snapshot format | Step 10 item 8: Phase 9 owns the sealed format; this phase produces a dry-run only. |
+| Low: dispatch flags unverified | No dispatch is used any more. |
+| Low: templates against the shipped-path inventory | Not addressed: it needs the Step 5 area map (decision 11 of `plan.md` section 3 applies); the Step 5 executor checks `shipped-path-conventions-inventory.json` when mapping templates. |
+
+### 12.1 Additions after the second red-team report (2026-10-07)
+
+The red-team report was rewritten against the single-executor text; the additions are covered as follows. C1: Tool T8 now also requires a committed review report per reviewed shard whose reviewer differs from the author (`decision-review-report-missing`), the seeded pack is built and held by the reviewer session, and the effort section prices about 90 review runs. H5: Step 4 closes the `implementation-alignment.md` collision; Step 10 item 2b closes the 12 history conflict groups, the 2 history duplicate groups, the 78-file group and the link queues. M1: a red-team pass by the reviewer session at the end of Steps 2, 5, 7, 9 and 10 (0 open Critical or High), and stop condition 11 measured in rows per review round and rework rate with Steps 3 and 4 as baseline. H6: `progress.md` is in Step 0 and the shared rules. M3: the owner's Plan B rule replaces the reorder of Steps 6 to 8. `reports/phase-06/owner-answers.md` was created with the owner's answers; Q2x, N1 and N2 were then Lead-decided (authorized, keep, no); only the authorization line stays `pending` until the owner starts the phase.
