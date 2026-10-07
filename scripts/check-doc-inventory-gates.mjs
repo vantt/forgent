@@ -262,11 +262,17 @@ export function buildConservationUnitLookup(repoRoot, commitSha) {
         const lines = content.split(/\r?\n/);
         const extracted = owner.toLowerCase().endsWith('.md') ? extractMarkdownConservationUnits(content) : extractMixedFileConservationUnit(owner, content);
         const headings = [];
-        units = extracted.map((unit) => {
+        units = extracted.map((unit, index) => {
           if (unit.unitKind === 'heading') while (headings.length && headings.at(-1).level >= unit.level) headings.pop();
           const ancestry = headings.map((heading) => heading.title);
           if (unit.unitKind === 'heading') headings.push(unit);
-          return { ...unit, ancestry, text: lines.slice(unit.startLine - 1, unit.endLine).join('\n').trim() };
+          let sectionText;
+          if (unit.unitKind === 'heading') {
+            let end = lines.length;
+            for (let next = index + 1; next < extracted.length; next++) if (extracted[next].unitKind === 'heading') { end = extracted[next].startLine - 1; break; }
+            sectionText = lines.slice(unit.startLine - 1, end).join('\n').trim();
+          }
+          return { ...unit, ancestry, text: lines.slice(unit.startLine - 1, unit.endLine).join('\n').trim(), ...(sectionText !== undefined ? { sectionText } : {}) };
         });
       } catch { units = null; }
       cache.set(owner, units);

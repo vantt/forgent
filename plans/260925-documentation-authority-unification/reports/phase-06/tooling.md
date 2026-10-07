@@ -106,3 +106,15 @@ Red commit `e14c88762`: 6 pass, 3 fail, exposing same-session/different-date rev
 Sensitivity selection and order use a fresh cryptographic 32-byte nonce together with the recorded seed. Neither is in the public pack; both stay in the key for replay. All shown target text digests are recomputed from the shown text, including mutated rows; no mutated target retains its original digest. Deterministic fixture replay supplies the recorded nonce; the CLI generates its nonce internally. No real seeded pack is run by the author.
 
 Targeted review tests: 9/9. Complete suite: 808/808, default concurrency; `/tmp/phase06/review-integrity-suite.log`. Actual unreviewed --pack smoke exits 0. Source/extractor/vocabulary invariants are unchanged. Passing sensitivity/text binding, final committed-report validation, exact source/multiplicity, rebind ancestry and legacy/range coverage still require their separate proofs. Full independent tooling review remains UNPROVEN.
+
+## Early review: sensitivity and shown-text approval binding
+
+Red `738bcec1b`: 9 pass, 3 fail, demonstrating approval without a passing sensitivity proof, approval attached to target drift, and missing per-row seen-context/report bindings. Red `16cfe540e`: 4 pass, 1 fail, demonstrating that heading rows hid the payload their frozen digest binds.
+
+Review packs now carry sourceUnitDigest and targetUnitDigest per row. Sensitivity keys bind the full original pack digest and commit; apply replays the key with its private nonce and verifies the chosen thresholds. The manual report must echo Pack commit, Pack id and Seed score headers; CLI apply requires --review-pack, --seed-key and --seed-verdicts. Approval checks source/decision bindings and current target text, full heading payload and ancestry against what was shown, then stamps the shown digest, not a new application-time digest. Each approved row records its report, pack commit/id, score id and seen ancestry; later committed-report integration will preserve earlier-round proofs.
+
+The committed-unit helper adds sectionText for review display only. Unit text, identity, anchors, frozen extraction and exact-class thresholds are unchanged. This exposes heading payloads without redefining a conservation unit. Seed display also uses full heading payloads, selects byte-equal digest-equal controls, removes original target binding metadata and recomputes shown-text digests. Seed/nonce remain private.
+
+Verification: targeted review/exact/conservation helper suite 20/20. Full default-concurrency suite 811/811; /tmp/phase06/review-binding-suite.log. Actual full-text pack smoke exits 0, 11 rows, 10 displayed source heading sections. `env -u CLAUDE_CODE_SESSION_ID node /tmp/phase06/review-binding-smoke.mjs`: exit 0; synthetic-only sensitivity caught 6/6, 0 false flags, no public seed/nonce, hold and rework blocking, 34 fixture approvals and 0 decision-gate findings. No actual approval or real seeded pack was produced.
+
+Exact-source/multiplicity and ancestry/range fixes, committed-report integration, remaining tools/maps and full independent tooling review remain UNPROVEN.

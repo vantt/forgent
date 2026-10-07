@@ -38,6 +38,9 @@ Inputs:
   --maps <file-or-directory> Frozen area-map markdown for --coverage.
   --decisions <path>         Repeatable decision input for coverage/snapshot/verify.
   --identity-registry <path> Required pinned registry for snapshot/verify gap rows.
+  --review-pack <path>       Required full pack seen by the reviewer for apply.
+  --seed-key <path>          Required private sensitivity key for apply.
+  --seed-verdicts <report>   Required sensitivity verdicts; must score passing.
 
 Proof: Unit-exact requires one target digest match, equal ancestor heading titles,
 at least 40 source characters and at least half the source document's units exact.
@@ -48,6 +51,10 @@ and names its report; the gate accepts reviewed rows only after that report is
 committed. Verdicts are ok, rework or hold with an own note for every pending row.
 Hold/rework keeps unknown-blocking rows blocking and other rows pending; no approval
 identity/date remains. The reviewer lists held unknown-blocking rows in owner queue.
+Apply verifies the private key by replay and requires a passing sensitivity score.
+The manual report echoes Pack commit, Pack id and Seed score headers. Approval
+stamps the shown target digest/ancestry and refuses current text or context drift;
+it never approves text merely because that text exists at application time.
 Seed packs contain 24 byte-equal controls and six real mutations, shuffled; score
 passes at >=5/6 mutations caught and <=2/24 false flags. The author must not run
 --seed-pack on a real batch. Key and pack output paths must differ.
@@ -172,7 +179,7 @@ export function buildReviewPack(context, shard) {
     const targetUnit = decision.targetOwner ? (context.unitsOf(decision.targetOwner) || []).find((unit) => unit.anchor === decision.targetAnchor) : null;
     if (decision.targetOwner && !targetUnit) throw new Error(`missing target unit ${decision.claimId}`);
     if (targetUnit) { targets.add(decision.targetOwner); named.add(`${decision.targetOwner}#${targetUnit.anchor}`); }
-    return { claimId: decision.claimId, decision: { ...decision }, source: { path: source.sourcePath, ...sourceUnit }, target: targetUnit ? { path: decision.targetOwner, ...targetUnit } : null };
+    return { claimId: decision.claimId, sourceUnitDigest: source.sourceUnitDigest, targetUnitDigest: targetUnit?.textDigest ?? null, decision: { ...decision }, source: { path: source.sourcePath, ...sourceUnit }, target: targetUnit ? { path: decision.targetOwner, ...targetUnit } : null };
   });
   for (const decision of shard.claims || []) if (decision.targetOwner) { targets.add(decision.targetOwner); named.add(`${decision.targetOwner}#${decision.targetAnchor}`); }
   for (const entry of shard.exact || []) {
@@ -202,6 +209,10 @@ function shuffle(rows, seed) {
   return result;
 }
 
+function jsonDigest(value) {
+  return createHash('sha256').update(JSON.stringify(value)).digest('hex');
+}
+
 export function seedReviewPack(pack, { seed, reviewer, authorSession = pack.authorSession, nonce = randomBytes(32).toString('hex') }) {
   if (!seed || !independentReviewer(reviewer, authorSession) || pack.rows.some((row) => !independentReviewer(reviewer, row.decision.authoredBy))) throw new Error('seed pack requires a seed and an independent reviewer');
   if (!/^[0-9a-f]{64}$/.test(nonce)) throw new Error('seed replay nonce must be 32 secret bytes');
@@ -214,7 +225,7 @@ export function seedReviewPack(pack, { seed, reviewer, authorSession = pack.auth
     ['dropped-clause', (text) => text.replace(/;[^\n.]+/, '')],
     ['deleted-list-item', (text) => text.replace(/(?:^|\n)\s*[-*]\s+[^\n]+/, '')],
   ];
-  const available = shuffle(pack.rows.filter((row) => row.target && row.source.text === row.target.text), secretSeed);
+  const available = shuffle(pack.rows.filter((row) => row.target && row.source.textDigest === row.target.textDigest && (row.source.sectionText || row.source.text) === (row.target.sectionText || row.target.text)).map((row) => ({ ...row, source: { ...row.source, text: row.source.sectionText || row.source.text }, target: { ...row.target, text: row.target.sectionText || row.target.text } })), secretSeed);
   const selected = [];
   const keyRows = [];
   for (const [mutationKind, mutate] of mutations) {
@@ -226,8 +237,13 @@ export function seedReviewPack(pack, { seed, reviewer, authorSession = pack.auth
   }
   if (available.length < 24) throw new Error('seed pack requires 24 additional byte-equal controls');
   for (const row of available.slice(0, 24)) { selected.push(row); keyRows.push({ claimId: row.claimId, mutated: false }); }
-  const shown = shuffle(selected, secretSeed + ':order').map((row) => ({ ...row, target: { ...row.target, textDigest: createHash('sha256').update(row.target.text).digest('hex') } }));
-  return { pack: { version: 1, shard: pack.shard, rows: shown }, key: { version: 1, shard: pack.shard, seed, nonce, reviewer, rows: keyRows } };
+  const displayUnit = (unit) => ({ path: unit.path, anchor: unit.anchor, ancestry: unit.ancestry, text: unit.text, textDigest: createHash('sha256').update(unit.text).digest('hex') });
+  const shown = shuffle(selected, secretSeed + ':order').map((row) => ({
+    claimId: row.claimId,
+    decision: Object.fromEntries(['authoredBy', 'claimKind', 'disposition', 'rationale', 'remainder', 'targetOwner', 'targetAnchor'].filter((field) => row.decision[field] !== undefined).map((field) => [field, row.decision[field]])),
+    source: displayUnit(row.source), target: displayUnit(row.target),
+  }));
+  return { pack: { version: 1, shard: pack.shard, rows: shown }, key: { version: 1, shard: pack.shard, commit: pack.commit, packId: jsonDigest(pack), seed, nonce, reviewer, rows: keyRows } };
 }
 
 function indexVerdicts(verdicts, expectedIds) {
@@ -247,12 +263,17 @@ export function scoreReviewPack(key, verdicts) {
   const index = indexVerdicts(verdicts, new Set(key.rows.map((row) => row.claimId)));
   const caught = key.rows.filter((row) => row.mutated && index.get(row.claimId).verdict !== 'ok').length;
   const falseFlags = key.rows.filter((row) => !row.mutated && index.get(row.claimId).verdict !== 'ok').length;
-  return { caught, mutations: 6, falseFlags, controls: 24, pass: caught >= 5 && falseFlags <= 2 };
+  const scoredVerdicts = [...index.values()].sort((a, b) => a.claimId.localeCompare(b.claimId));
+  return { caught, mutations: 6, falseFlags, controls: 24, pass: caught >= 5 && falseFlags <= 2, reviewer: key.reviewer, commit: key.commit, packId: key.packId, scoreId: jsonDigest({ key, verdicts: scoredVerdicts }) };
 }
 
-export function parseReviewVerdicts(text, reviewer) {
+export function parseReviewVerdicts(text, reviewer, binding = null) {
   const header = text.match(/^Reviewer:\s*(.+)$/im)?.[1]?.trim();
   if (header !== reviewer) throw new Error('reviewer header must equal --reviewer');
+  if (binding) for (const [headerName, expected] of [['Pack commit', binding.commit], ['Pack id', binding.packId], ['Seed score', binding.scoreId]]) {
+    const actual = text.match(new RegExp(`^${headerName}:\\s*(.+)$`, 'im'))?.[1]?.trim();
+    if (actual !== expected) throw new Error(`review report ${headerName} does not match the shown pack or scored sensitivity result`);
+  }
   const verdicts = [];
   for (const line of text.split(/\r?\n/)) {
     if (!/^\s*\|\s*claim_[0-9a-f]{32}\s*\|/.test(line)) continue;
@@ -264,25 +285,37 @@ export function parseReviewVerdicts(text, reviewer) {
   return verdicts;
 }
 
-export function applyReviewVerdicts(context, shard, { verdicts, reviewer, reportPath, reviewedAt = new Date().toISOString().slice(0, 10) }) {
+export function applyReviewVerdicts(context, shard, { verdicts, reviewer, reportPath, pack, seedProof, reviewedAt = new Date().toISOString().slice(0, 10) }) {
   requireUnreviewedShard(shard);
   if (!reportPath || !independentReviewer(reviewer, shard.authorSession)) throw new Error('review application requires a report and an independent reviewer');
   const pending = (shard.claims || []).filter((row) => row.reviewStatus !== 'reviewed');
   const index = indexVerdicts(verdicts, new Set(pending.map((row) => row.claimId)));
+  if (!pack || !seedProof?.key || !Array.isArray(seedProof.verdicts)) throw new Error('review application requires a passing sensitivity proof and the shown pack');
+  if (pack.commit !== context.inventory.commit || pack.shard !== shard.shard) throw new Error('review pack commit or shard changed');
+  const expectedKey = seedReviewPack(pack, { seed: seedProof.key.seed, nonce: seedProof.key.nonce, reviewer }).key;
+  if (JSON.stringify(expectedKey) !== JSON.stringify(seedProof.key)) throw new Error('sensitivity key does not bind this exact review pack and reviewer');
+  const score = scoreReviewPack(seedProof.key, seedProof.verdicts);
+  if (!score.pass) throw new Error('sensitivity review did not pass the chosen thresholds');
+  const shownRows = new Map(pack.rows.map((row) => [row.claimId, row]));
   const sourceRows = new Map(context.inventory.claimLedger.map((row) => [row.claimId, row]));
   const claims = shard.claims.map((row) => {
     if (row.reviewStatus === 'reviewed') return { ...row };
     if (!row.authoredBy || !independentReviewer(reviewer, row.authoredBy)) throw new Error(`independent reviewer required for ${row.claimId}`);
     const source = sourceRows.get(row.claimId);
     if (!source || source.sourceUnitDigest !== row.sourceUnitDigest) throw new Error(`missing or stale source ${row.claimId}`);
+    const shown = shownRows.get(row.claimId);
+    if (!shown || shown.sourceUnitDigest !== source.sourceUnitDigest || shown.source.path !== source.sourcePath || shown.source.anchor !== source.sourceAnchor) throw new Error(`review pack source binding changed for ${row.claimId}`);
     const verdict = index.get(row.claimId);
     const updated = { ...row, reviewStatus: row.disposition === 'unknown-blocking' ? 'blocking' : 'pending', reviewNote: verdict.note };
     delete updated.reviewedBy; delete updated.reviewedAt; delete updated.targetUnitDigest;
+    for (const field of ['targetAncestry', 'reviewReport', 'reviewPackCommit', 'reviewPackId', 'seedScoreId']) delete updated[field];
     if (verdict.verdict === 'ok') {
       if (row.disposition === 'unknown-blocking') throw new Error(`unknown-blocking cannot be approved: ${row.claimId}`);
       const target = row.targetOwner ? (context.unitsOf(row.targetOwner) || []).find((unit) => unit.anchor === row.targetAnchor) : null;
       if (row.targetOwner && !target) throw new Error(`missing target for ${row.claimId}`);
-      Object.assign(updated, { reviewStatus: 'reviewed', reviewedBy: reviewer, reviewedAt, ...(target ? { targetUnitDigest: target.textDigest } : {}) });
+      if (row.targetOwner && (shown.target?.path !== row.targetOwner || shown.target.anchor !== row.targetAnchor || shown.targetUnitDigest !== target.textDigest || shown.target.text !== target.text || shown.target.sectionText !== target.sectionText || JSON.stringify(shown.target.ancestry) !== JSON.stringify(target.ancestry))) throw new Error(`target text or ancestry changed after review pack for ${row.claimId}`);
+      for (const field of ['targetOwner', 'targetAnchor', 'claimKind', 'disposition', 'rationale', 'remainder']) if (shown.decision[field] !== row[field]) throw new Error(`review pack decision changed for ${row.claimId}`);
+      Object.assign(updated, { reviewStatus: 'reviewed', reviewedBy: reviewer, reviewedAt, reviewReport: reportPath, reviewPackCommit: pack.commit, reviewPackId: score.packId, seedScoreId: score.scoreId, ...(target ? { targetUnitDigest: shown.targetUnitDigest, targetAncestry: [...(shown.target.ancestry || [])] } : {}) });
     }
     return updated;
   });
@@ -356,7 +389,7 @@ export function runCli(argv, cwd = process.cwd()) {
   const valuedModes = ['--pack', '--seed-pack', '--score-pack', '--apply-review', '--rebind', '--verify'];
   const modes = [...booleanModes, ...valuedModes].filter((mode) => argv.includes(mode));
   const values = new Map();
-  const options = new Set(['--inventory', '--repo-root', '--source', '--target', '--shard', '--author', '--out', '--reviewer', '--verdicts', '--seed', '--key', '--maps', '--decisions', '--identity-registry', ...valuedModes]);
+  const options = new Set(['--inventory', '--repo-root', '--source', '--target', '--shard', '--author', '--out', '--reviewer', '--verdicts', '--seed', '--key', '--maps', '--decisions', '--identity-registry', '--review-pack', '--seed-key', '--seed-verdicts', ...valuedModes]);
   try {
     if (modes.length !== 1 && !(modes.length === 2 && modes.includes('--summary') && modes.includes('--coverage'))) throw new Error('choose exactly one mode listed in --help, or --summary --coverage');
     for (let i = 0; i < argv.length; i++) {
@@ -415,7 +448,12 @@ export function runCli(argv, cwd = process.cwd()) {
         const repoRoot = path.resolve(cwd, values.get('--repo-root') || '.');
         const reportPath = path.relative(repoRoot, resolve('--verdicts')).split(path.sep).join('/');
         if (reportPath.startsWith('../')) throw new Error('review report must be repository-relative');
-        result = applyReviewVerdicts(context, jsonInput('--apply-review'), { verdicts: parseReviewVerdicts(fs.readFileSync(resolve('--verdicts'), 'utf8'), values.get('--reviewer')), reviewer: values.get('--reviewer'), reportPath });
+        const pack = jsonInput('--review-pack');
+        const key = jsonInput('--seed-key');
+        const seedProof = { key, verdicts: parseReviewVerdicts(fs.readFileSync(resolve('--seed-verdicts'), 'utf8'), key.reviewer) };
+        const score = scoreReviewPack(key, seedProof.verdicts);
+        const verdicts = parseReviewVerdicts(fs.readFileSync(resolve('--verdicts'), 'utf8'), values.get('--reviewer'), score);
+        result = applyReviewVerdicts(context, jsonInput('--apply-review'), { verdicts, reviewer: values.get('--reviewer'), reportPath, pack, seedProof });
         fs.writeFileSync(resolve('--apply-review'), JSON.stringify(result, null, 2) + '\n');
       }
     }
